@@ -42,6 +42,6 @@ export function assertProperty(
     // The `parameters` object is structurally compatible with the
     // fast-check `Parameters` type; we use a cast here to avoid leaking
     // fast-check's generic type constraints into every test.
-     
+
     fc.assert(property as fc.IProperty<unknown>, parameters as any);
 }

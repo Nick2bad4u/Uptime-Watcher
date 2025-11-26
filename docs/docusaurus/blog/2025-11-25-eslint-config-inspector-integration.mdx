@@ -1,0 +1,145 @@
+---
+slug: eslint-config-inspector-integration
+title: "How the ESLint Config Inspector is Integrated into the Docs"
+authors: [nick]
+tags:
+  - eslint
+  - tooling
+  - documentation
+  - docusaurus
+---
+{/* eslint-disable no-unused-vars,@eslint-community/eslint-comments/disable-enable-pair -- Link component is consumed by MDX JSX later in this file */}
+{/* @ts-expect-error -- Link is used in the MDX JSX later in this file */}
+import Link from '@docusaurus/Link';
+
+# How the ESLint Config Inspector is Integrated into the Docs
+
+The ESLint configuration in Uptime Watcher is not small. With dozens of
+plugins and custom rules, understanding what is actually enabled can be
+painful.
+
+To solve that, we integrated a **static build of the ESLint Config
+Inspector** directly into the Docusaurus site, so you can browse the
+current ESLint config as a web UI.
+
+This post summarizes how that integration works and where to look if you
+want to extend or regenerate it.
+
+## High-level flow
+
+The data flow is documented in detail in
+`docs/docusaurus/src/pages/engineering-tooling.mdx`, but the core idea is
+simple:
+
+1. Run `@eslint/config-inspector` against `eslint.config.mjs`.
+2. Emit a static inspector site into `docs/docusaurus/static/eslint-inspector/`.
+3. Let Docusaurus serve it under `/Uptime-Watcher/eslint-inspector/`.
+
+The relevant commands live in `package.json`:
+
+```jsonc
+{
+  "scripts": {
+    "build:eslint-inspector": "npx @eslint/config-inspector build --outDir \"docs/docusaurus/static/eslint-inspector\" --base \"/Uptime-Watcher/eslint-inspector/\"",
+    "build:eslint-inspector:local": "npm run build:eslint-inspector"
+  }
+}
+```
+
+The integration itself is driven by a dedicated script and a Docusaurus
+page.
+
+## Build script and verification
+
+The implementation summary is captured in
+`docs/docusaurus/src/pages/ESLINT-INSPECTOR-DEPLOYMENT-SUMMARY.md`, but the
+key artifacts are:
+
+- `scripts/build-eslint-inspector.mjs` — orchestrates the inspector build.
+- `scripts/verify-eslint-inspector.mjs` — sanity-checks the generated
+  files.
+
+The build script:
+
+- Invokes `npx @eslint/config-inspector build` with the correct base URL.
+- Copies the output into `docs/docusaurus/static/eslint-inspector/`.
+- Writes a small redirect/loader page so navigation feels seamless.
+
+The verification script checks that:
+
+- The static directory exists.
+- `index.html` and redirect assets are present.
+- The expected `_nuxt/`, `api/`, and `fonts/` assets exist.
+
+When everything is wired correctly, you can run:
+
+```bash
+npm run build:eslint-inspector
+npm run docusaurus:build
+```
+
+and the inspector will be part of the generated docs site.
+
+## Docusaurus integration
+
+On the Docusaurus side, the integration is intentionally light:
+
+- Static files live under `docs/docusaurus/static/eslint-inspector/`.
+- The Docusaurus config adds a link in the footer:
+
+  ```ts
+  {
+    href: "https://nick2bad4u.github.io/Uptime-Watcher/eslint-inspector/",
+    label: "🧪 ESlint Config",
+  }
+  ```
+
+- The engineering tooling page includes a section describing the
+  inspector and how it fits into `npm run docs:build`.
+
+No special plugin is required; it is just a static SPA mounted at a
+well-known path.
+
+## Why this matters
+
+The ESLint config is a critical part of the project's quality gates. Having
+an inspector UI baked into the docs site provides concrete benefits:
+
+- **Discoverability** — contributors can quickly see which rules are
+  enabled without reading a large flat config.
+- **Reviewability** — changes to `eslint.config.mjs` can be inspected in a
+  UI before/after running the build script.
+- **Documentation** — the Docusaurus pages and deployment summary explain
+  exactly how the inspector is produced and where it lives.
+
+## How to regenerate the inspector
+
+If you change ESLint rules or want to refresh the inspector after a
+dependency update:
+
+1. Update `eslint.config.mjs` as usual.
+2. Run:
+
+   ```bash
+   npm run build:eslint-inspector
+   ```
+
+3. Optionally verify the output:
+
+   ```bash
+   node scripts/verify-eslint-inspector.mjs
+   ```
+
+4. Rebuild or redeploy the docs site:
+
+   ```bash
+   npm run docs:build
+   ```
+
+That is it — the inspector will reflect the new configuration.
+
+For more detail, see the full
+<Link to="/ESLINT-INSPECTOR-DEPLOYMENT-SUMMARY">
+  ESLint Config Inspector Deployment - Implementation Summary
+</Link>
+page in the docs.

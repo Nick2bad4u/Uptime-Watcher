@@ -252,7 +252,7 @@ repos:
           # TypeScript type checking
           - args: ["--noEmit"]
             entry: npx tsc
-            files: '\.(ts|tsx)$'
+            files: "\\.(ts|tsx)$"
             id: typescript-check
             language: node
             name: "🔍 typescript · Type check all files"
@@ -262,7 +262,7 @@ repos:
           # Electron TypeScript type checking
           - args: ["--project", "tsconfig.electron.json", "--noEmit"]
             entry: npx tsc
-            files: '^electron/.*\.(ts|tsx)$'
+            files: "^electron/.*\\.(ts|tsx)$"
             id: typescript-check-electron
             language: node
             name: "🔍 electron · Type check electron files"
@@ -272,7 +272,7 @@ repos:
           # Vite build check (without output)
           - args: ["build", "--mode", "development", "--emptyOutDir", "false"]
             entry: npx vite
-            files: '^(src/|vite\.config\.|tsconfig\.json|package\.json)'
+            files: "^(src/|vite\\.config\\.|tsconfig\\.json|package\\.json)"
             id: vite-build-check
             language: node
             name: "⚡ vite · Validate build configuration"
@@ -285,7 +285,7 @@ repos:
                 - "const pkg = require('./package.json'); console.log('✅ Package.json is
                   valid')"
             entry: node
-            files: '^package\.json$'
+            files: "^package\\.json$"
             id: package-scripts-check
             language: node
             name: "📦 npm · Validate package.json scripts"

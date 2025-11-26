@@ -641,14 +641,19 @@ describe("JSON Safety Advanced Fuzzing Tests", () => {
         );
 
         // Test performance with repeated operations
-        fcTest.prop([fc.integer({ min: 10, max: 100 })])(
+        fcTest.prop([
+            fc.integer({ min: 10, max: 100 }),
+            fc.record({
+                label: fc.string({ minLength: 1, maxLength: 50 }),
+                count: fc.integer({ min: 0, max: 10_000 }),
+            }),
+        ])(
             "should handle repeated operations efficiently",
-            (iterations) => {
-                const testData = { test: "data", count: 42 };
+            (iterations, payload) => {
                 const results: string[] = [];
 
                 for (let i = 0; i < iterations; i++) {
-                    const result = safeJsonStringify(testData);
+                    const result = safeJsonStringify(payload);
                     if (result.success && result.data) {
                         results.push(result.data);
                     }

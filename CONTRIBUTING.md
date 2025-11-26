@@ -52,7 +52,7 @@ Thank you for considering contributing to Uptime Watcher! This document provides
 | `npm run electron-dev`   | Full App     | Launch complete application (Vite + Electron)  |
 | `npm run electron`       | Electron     | Launch Electron shell (requires Vite running)  |
 | `npm run build`          | Production   | Build application for production               |
-| `npm run test`           | Testing      | Run all test suites (unit, integration, E2E)   |
+| `npm run test`           | Testing      | Run core Vitest suites (unit/integration)      |
 | `npm run lint`           | Code Quality | Check code formatting and style                |
 | `npm run lint:fix`       | Code Quality | Automatically fix linting issues               |
 | `npm run type-check:all` | Type Safety  | Verify TypeScript types across all modules     |
@@ -141,19 +141,19 @@ Fixes #123
 ## 🧩 Project Structure
 
 ```text
-├── electron/          # Electron main process code
+├── electron/         # Electron main process code
 ├── src/              # React frontend code
-├── docs/             # Documentation
+├── docs/             # Documentation (architecture, guides, testing, TSDoc)
 ├── public/           # Static assets
 ├── scripts/          # Build and utility scripts
-└── release/          # Build outputs
+└── dist/             # Packaged application artifacts
 ```
 
 ### Key Files
 
 - `electron/main.ts` - Electron main process entry point
 - `src/App.tsx` - React application root
-- `src/store.ts` - Zustand state management
+- `src/stores/` - Zustand domain stores (sites, alerts, settings, etc.)
 - `docs/` - Complete documentation system
 
 ## 🐛 Reporting Issues
@@ -188,9 +188,10 @@ Use the feature request template and include:
 
 ### Documentation Structure
 
-- **API Docs**: In `docs/api/` - auto-generated from JSDoc
-- **Guides**: In `docs/guides/` - user and developer guides
-- **Component Docs**: In `docs/component-docs/` - React component documentation
+- **Architecture & ADRs**: In `docs/Architecture/` - core architecture, ADRs, and patterns
+- **Guides**: In `docs/Guides/` - user and developer guides
+- **Testing Docs**: In `docs/Testing/` - testing methodology, fuzzing, and Playwright
+- **API / TSDoc**: In `docs/TSDoc/` - generated API documentation and TSDoc references
 
 ### Updating Documentation
 
@@ -215,7 +216,7 @@ Use the feature request template and include:
 |                   | `npm run format`           | Format code with Prettier                                         |
 |                   | `npm run type-check:all`   | TypeScript type checking                                          |
 | **Documentation** | `npm run docs:check-links` | Validate internal documentation links (Architecture & Docusaurus) |
-| **Testing**       | `npm run test`             | Run all test suites                                               |
+| **Testing**       | `npm run test`             | Run core Vitest suites (unit/integration)                         |
 |                   | `npm run test:coverage`    | Generate coverage reports                                         |
 |                   | `npm run test:electron`    | Run Electron-specific tests                                       |
 
@@ -234,7 +235,7 @@ Use the feature request template and include:
 - Emit structured `ApplicationError` instances when validation fails so renderer error handling stays consistent.
 - Review the [Validation Strategy](docs/Guides/VALIDATION_STRATEGY.md) guide before introducing new input flows or modifying existing schemas.
 
-## � Priority Contribution Areas
+## 🌟 Priority Contribution Areas
 
 ### High Impact Opportunities
 
@@ -259,7 +260,7 @@ Use the feature request template and include:
 - **Migration Guides**: Version upgrade and data migration instructions
 - **Integration Examples**: Sample configurations and use cases
 
-## �🌟 Recognition
+## 🌟 Recognition
 
 Contributors are recognized in:
 
@@ -276,7 +277,8 @@ Contributors are recognized in:
 
 ## 📄 License
 
-By contributing to Uptime Watcher, you agree that your contributions will be licensed under the MIT License.
+By contributing to Uptime Watcher, you agree that your contributions will be released under the terms of the
+[Unlicense](LICENSE), consistent with the project's public domain dedication.
 
 ---
 

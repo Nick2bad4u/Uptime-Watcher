@@ -1,0 +1,184 @@
+---
+slug: property-based-testing-real-bugs
+title: "How Property-Based Testing Caught Real Bugs in Monitor Logic"
+authors: [nick]
+tags:
+  - testing
+  - fast-check
+  - property-based-testing
+  - monitoring
+---
+
+# How Property-Based Testing Caught Real Bugs in Monitor Logic
+
+Property-based testing is not just a buzzword in this repo; it has caught
+real bugs in core monitor logic that traditional example-based tests
+missed.
+
+This post walks through how we introduced `fast-check`, where we wired it
+in, and specific bug classes it exposed in Uptime Watcher.
+
+## Where property-based testing fits in the stack
+
+Uptime Watcher uses `fast-check` across multiple layers:
+
+- **Shared validation** – to stress-test helpers like `normalizeHistoryLimit`
+  and `isValidIdentifier` with randomized inputs.
+- **Monitor operations** – to generate randomized monitor definitions and
+  ensure conversions between domain objects and database rows are
+  round-trippable.
+- **Stores and components** – to drive Zustand stores and React components
+  with arbitrary site names, URLs, and identifiers, verifying they stay in a
+  valid state even under noisy input.
+
+You can see this in commits like:
+
+- `0797d4d6f` – introduces shared `fast-check` arbitraries and an
+  `assertProperty` helper.
+- `acb498188` – expands coverage for site-related components using
+  arbitraries for names, URLs, and IDs.
+- `c16d48e54` – tightens strict test directories and adds property-based
+  tests to monitor operations and validation schemas.
+
+## Example: history normalization bugs
+
+One of the early wins came from property-based tests around
+`normalizeHistoryLimit`, which is responsible for clamping and sanitizing
+history retention settings.
+
+A simplified property looked like this (adapted from the real tests):
+
+```ts
+import fc from "fast-check";
+
+import { normalizeHistoryLimit } from "@shared/utils/history";
+
+fc.assert(
+  fc.property(fc.integer({ min: -10_000, max: 10_000 }), (limit) => {
+    const normalized = normalizeHistoryLimit(limit);
+
+    // Invariants
+    expect(normalized).toBeGreaterThanOrEqual(0);
+    expect(normalized).toBeLessThanOrEqual(10_000);
+  })
+);
+```
+
+That single property immediately exposed edge cases where:
+
+- Negative values were not clamped correctly.
+- Large values near the upper bound pushed us past intended limits.
+
+Once the invariants were clear, the implementation was fixed to always
+return a value within the allowed range, and the property became a
+regression test that runs in every CI pass.
+
+## Example: monitor → database mapping
+
+The dynamic monitor schema in
+`electron/services/database/utils/dynamicSchema.ts` is powerful but easy to
+get wrong: it maps monitor objects to database rows and back using generated
+field definitions.
+
+We use property-based tests to generate arbitrary monitor objects and
+exercise the mapping in both directions:
+
+```ts
+fc.assert(
+  fc.property(monitorArbitrary, (monitor) => {
+    const row = mapMonitorToRow(monitor);
+    const roundTripped = mapRowToMonitor(row);
+
+    // We don"t require deep equality because some fields are normalized,
+    // but core identity must hold.
+    expect(roundTripped.siteIdentifier).toBe(monitor.siteIdentifier);
+    expect(roundTripped.type).toBe(monitor.type);
+    expect(roundTripped.timeout).toBeGreaterThan(0);
+  })
+);
+```
+
+This kind of test surfaced issues where:
+
+- Certain dynamic fields were not included in the generated column list.
+- `lastChecked` could end up as `NaN` in the database when passed a
+  malformed value.
+- Boolean flags like `enabled` / `monitoring` were not consistently mapped
+  to integer `0`/`1` values.
+
+The fixes in `dynamicSchema.ts` and the associated helpers are now guarded
+by these properties.
+
+## Example: store invariants under random actions
+
+Zustand stores such as the site and monitor stores are also exercised with
+randomized actions.
+
+A typical pattern:
+
+```ts
+fc.assert(
+  fc.property(siteActionSequenceArb, (actions) => {
+    const store = createSiteStoreTestHarness();
+
+    for (const action of actions) {
+      action.apply(store);
+
+      // Invariants: no duplicate identifiers, selected site (if any) exists
+      const state = store.getState();
+      const identifiers = new Set(state.sites.map((s) => s.identifier));
+
+      expect(identifiers.size).toBe(state.sites.length);
+      if (state.selectedIdentifier) {
+        expect(identifiers.has(state.selectedIdentifier)).toBe(true);
+      }
+    }
+  })
+);
+```
+
+This style of test flushed out subtle bugs where:
+
+- Removing a site did not always clear `selectedIdentifier`.
+- Certain actions could temporarily leave the store in a state where the
+  selected site no longer existed.
+
+Once fixed, the properties ensure those regressions never reappear.
+
+## How to run these tests locally
+
+All the property-based tests live alongside the rest of the Vitest suite.
+Useful commands:
+
+```bash
+# Run all standard tests (frontend default)
+npm test
+
+# Focus on fuzzing/property-based tests across projects
+npm run fuzz
+npm run fuzz:electron
+npm run fuzz:shared
+
+# Run coverage across all test projects
+npm run test:all:coverage
+```
+
+If you are adding new monitor types, complex validation rules, or store
+behaviour, consider:
+
+1. Defining a `fast-check` arbitrary for your domain object.
+2. Writing at least one property that encodes an invariant you care about.
+3. Running the fuzzing commands above to see what breaks.
+
+## Takeaways
+
+- Property-based testing caught bugs in history normalization, monitor
+  mapping, and store invariants that would have required dozens of manual
+  test cases to reproduce.
+- Once the infrastructure (arbitraries, helpers, harnesses) was in place,
+  adding new properties became cheap and paid for itself quickly.
+- The tests now run on every CI pass, giving us confidence that changes to
+  core monitor logic don"t silently corrupt data or state.
+
+For a deeper dive into the overall testing approach, see the <a href="/testing-architecture">Testing Architecture & Strategy</a>
+page and `ADR_010_TESTING_STRATEGY.md` in the Architecture docs.

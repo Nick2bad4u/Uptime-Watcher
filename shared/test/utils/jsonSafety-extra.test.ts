@@ -12,8 +12,23 @@
  */
 
 import { describe, expect, it } from "vitest";
+import { test } from "@fast-check/vitest";
+import * as fc from "fast-check";
 import type { UnknownRecord } from "type-fest";
 import * as jsonSafetyModule from "@shared/utils/jsonSafety";
+
+/** Arbitrary for generating valid JSON-serializable records */
+const jsonRecordArbitrary = fc.record({
+    identifier: fc.string({ minLength: 1, maxLength: 30 }),
+    count: fc.integer({ min: 0, max: 10_000 }),
+    enabled: fc.boolean(),
+});
+
+/** Arbitrary for generating arrays of numbers */
+const numberArrayArbitrary = fc.array(fc.integer({ min: -1000, max: 1000 }), {
+    minLength: 1,
+    maxLength: 20,
+});
 
 describe("shared/utils/jsonSafety Function Coverage Validation", () => {
     describe("Function Coverage Validation", () => {
@@ -36,13 +51,16 @@ describe("shared/utils/jsonSafety Function Coverage Validation", () => {
                 Array.isArray(value);
 
             // Test safeJsonParse function
-            const validJson = '{"key": "value"}';
+            const validJson = '{"identifier": "item-001", "count": 42}';
             const parseResult = jsonSafetyModule.safeJsonParse(
                 validJson,
                 isRecord
             );
             expect(parseResult.success).toBeTruthy();
-            expect(parseResult.data).toEqual({ key: "value" });
+            expect(parseResult.data).toEqual({
+                identifier: "item-001",
+                count: 42,
+            });
 
             const invalidJson = "invalid json";
             const failResult = jsonSafetyModule.safeJsonParse(
@@ -52,16 +70,18 @@ describe("shared/utils/jsonSafety Function Coverage Validation", () => {
             expect(failResult.success).toBeFalsy();
 
             // Test safeJsonParseArray function
-            const validArrayJson = "[1, 2, 3]";
+            const validArrayJson = "[10, 20, 30, 40, 50]";
             const arrayResult = jsonSafetyModule.safeJsonParseArray(
                 validArrayJson,
                 (item): item is number => typeof item === "number"
             );
             expect(arrayResult.success).toBeTruthy();
             expect(arrayResult.data).toEqual([
-                1,
-                2,
-                3,
+                10,
+                20,
+                30,
+                40,
+                50,
             ]);
 
             const invalidArrayJson = '{"not": "array"}';
@@ -75,27 +95,30 @@ describe("shared/utils/jsonSafety Function Coverage Validation", () => {
             const fallbackResult = jsonSafetyModule.safeJsonParseWithFallback(
                 validJson,
                 isRecord,
-                { default: true }
+                { fallback: true }
             );
-            expect(fallbackResult).toEqual({ key: "value" });
+            expect(fallbackResult).toEqual({
+                identifier: "item-001",
+                count: 42,
+            });
 
             const fallbackFailResult =
                 jsonSafetyModule.safeJsonParseWithFallback(
                     invalidJson,
                     isRecord,
-                    { default: true }
+                    { fallback: true }
                 );
-            expect(fallbackFailResult).toEqual({ default: true });
+            expect(fallbackFailResult).toEqual({ fallback: true });
 
             // Test safeJsonStringify function
             const stringifyResult = jsonSafetyModule.safeJsonStringify({
-                key: "value",
+                identifier: "item-001",
             });
             expect(stringifyResult.success).toBeTruthy();
-            expect(stringifyResult.data).toBe('{"key":"value"}');
+            expect(stringifyResult.data).toBe('{"identifier":"item-001"}');
 
             // Test with circular reference
-            const circular: any = { a: 1 };
+            const circular: any = { alpha: 1 };
             circular.self = circular;
             const circularResult = jsonSafetyModule.safeJsonStringify(circular);
             expect(circularResult.success).toBeFalsy();
@@ -103,14 +126,80 @@ describe("shared/utils/jsonSafety Function Coverage Validation", () => {
             // Test safeJsonStringifyWithFallback function
             const fallbackStringifyResult =
                 jsonSafetyModule.safeJsonStringifyWithFallback(
-                    { key: "value" },
+                    { identifier: "item-001" },
                     "{}"
                 );
-            expect(fallbackStringifyResult).toBe('{"key":"value"}');
+            expect(fallbackStringifyResult).toBe('{"identifier":"item-001"}');
 
             const fallbackStringifyFailResult =
                 jsonSafetyModule.safeJsonStringifyWithFallback(circular, "{}");
             expect(fallbackStringifyFailResult).toBe("{}");
+        });
+
+        describe("Property-based Tests", () => {
+            test.prop([jsonRecordArbitrary])(
+                "should round-trip any JSON-serializable record through stringify and parse",
+                (record) => {
+                    const stringifyResult =
+                        jsonSafetyModule.safeJsonStringify(record);
+                    expect(stringifyResult.success).toBeTruthy();
+
+                    if (stringifyResult.success && stringifyResult.data) {
+                        const parseResult = jsonSafetyModule.safeJsonParse(
+                            stringifyResult.data,
+                            (value): value is typeof record =>
+                                typeof value === "object" && value !== null
+                        );
+                        expect(parseResult.success).toBeTruthy();
+                        expect(parseResult.data).toEqual(record);
+                    }
+                }
+            );
+
+            test.prop([numberArrayArbitrary])(
+                "should correctly parse any array of numbers",
+                (numbers) => {
+                    const jsonString = JSON.stringify(numbers);
+                    const result = jsonSafetyModule.safeJsonParseArray(
+                        jsonString,
+                        (item): item is number => typeof item === "number"
+                    );
+                    expect(result.success).toBeTruthy();
+                    expect(result.data).toEqual(numbers);
+                }
+            );
+
+            test.prop([fc.string({ minLength: 1 })])(
+                "should return fallback for invalid JSON strings",
+                (invalidJson) => {
+                    // Ensure the string is not valid JSON
+                    fc.pre(
+                        !invalidJson.startsWith("{") &&
+                            !invalidJson.startsWith("[")
+                    );
+                    const fallbackValue = { fallbackUsed: true };
+                    const result = jsonSafetyModule.safeJsonParseWithFallback(
+                        invalidJson,
+                        (value): value is typeof fallbackValue =>
+                            typeof value === "object" && value !== null,
+                        fallbackValue
+                    );
+                    expect(result).toEqual(fallbackValue);
+                }
+            );
+
+            test.prop([jsonRecordArbitrary, fc.string({ minLength: 1 })])(
+                "should use fallback string when stringify fails",
+                (record, fallbackString) => {
+                    // Normal records should stringify successfully
+                    const result =
+                        jsonSafetyModule.safeJsonStringifyWithFallback(
+                            record,
+                            fallbackString
+                        );
+                    expect(result).toBe(JSON.stringify(record));
+                }
+            );
         });
     });
 });

@@ -1,0 +1,294 @@
+---
+slug: uptime-watcher-development-journey
+title: "Uptime Watcher 19.0: From Local Script to Deeply Tested Desktop App"
+authors: [nick]
+tags:
+  - history
+  - architecture
+  - testing
+  - documentation
+---
+
+{/* eslint-disable no-unused-vars,@eslint-community/eslint-comments/disable-enable-pair -- Link component is consumed by MDX JSX later in this file */}
+{/* @ts-expect-error -- Link is used in the MDX JSX later in this file */}
+import Link from '@docusaurus/Link';
+
+# Uptime Watcher 19.0: From Local Script to Deeply Tested Desktop App
+
+Uptime Watcher started as a pragmatic way to watch a handful of URLs from a local
+machine. By the time we reached **v19.0.0**, it had grown into a
+heavily-tested, architecture-driven Electron app with a full documentation
+and tooling ecosystem around it.
+
+This post walks through that journey using **real commits** from the git
+history, focusing on three themes:
+
+- How the architecture solidified around repositories, events, and IPC
+- How the testing strategy evolved into strict, property-based coverage
+- How documentation and tooling caught up with the rest of the stack
+
+All examples and commit references are taken from the main branch as of
+**2025-11-25**.
+
+## Early focus: correctness and documentation
+
+One of the consistent patterns in this repo is that architecture and
+documentation are treated as first-class citizens.
+
+A good example is the work captured in
+[`4a0e1fdf1`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/4a0e1fdf142441c46574b6d98b8655e3671d6061)
+(tagged as part of **v19.0.0**):
+
+> 📝 \[docs] Update TSDoc links for consistency
+>
+> - Correct links in `TSDoc-Home.md` to point to the appropriate files
+> - Update `TSDoc-Package-Tsdoc.md` link to reflect the correct path
+> - Modify `TSDoc-Spec-Overview.md` to ensure accurate package reference
+> - Adjust comments in `StatusSubscriptionIndicator.utils.ts` for clarity
+> - Refine `useAddSiteForm.ts` documentation by removing unnecessary link syntax
+> - Enhance `chartConfig.ts` comments for better readability
+> - Add Stylelint config schema reference in `stylelint.config.mjs`
+
+This change is representative of the repo's style: fix docs and comments as
+soon as they become stale, keep configuration files typed and schema-backed,
+and treat **tooling** as part of the product.
+
+Another example is
+[`cb0e9ed86`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/cb0e9ed86):
+
+> 📝 \[docs] Update documentation frontmatter and summaries
+>
+> - Add frontmatter to multiple testing docs
+> - Update summaries and metadata for clarity and consistency
+
+That work laid the groundwork for the documentation and Docusaurus site that
+now power the public docs.
+
+## Hardening the tooling and CI pipeline
+
+As the project grew, the CI and linting pipeline became a major focus. Changes
+like
+[`32bba346a`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/32bba346a)
+and
+[`4c29fc698`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/4c29fc698)
+show a pattern:
+
+- Every major tool (ESLint, Stylelint, Mega-Linter, Checkov, Grype, Secretlint,
+  etc.) is wired with **explicit schemas**.
+- New configuration files get schema references immediately, so editors and
+  CI can validate them.
+- Linting and scanning are integrated with `npm` scripts like:
+
+  ```bash
+  npm run lint:ci
+  npm run lint:all:fix
+  npm run docs:check
+  npm run docs:validate-links
+  ```
+
+That level of rigor is not just aesthetic; it means refactors in
+`eslint.config.mjs`, `stylelint.config.mjs`, or docs configs are caught early.
+
+## Architecting for a long-term Electron app
+
+Uptime Watcher is not a toy app. It has a **service container**, a
+**repository layer**, a **TypedEventBus**, and a **typed IPC bridge** between
+main and renderer. These ideas are formalized in the Architecture docs and in
+ADRs like:
+
+- `ADR_001_REPOSITORY_PATTERN.md`
+- `ADR_002_EVENT_DRIVEN_ARCHITECTURE.md`
+- `ADR_004_FRONTEND_STATE_MANAGEMENT.md`
+- `ADR_005_IPC_COMMUNICATION_PROTOCOL.md`
+
+These aren't just documents; they are enforced in code by scripts like
+`scripts/architecture-static-guards.mjs`, which is wired into
+`npm run lint:architecture` and the `lint:ci` pipeline.
+
+One of the commits that made the IPC story much harder to accidentally break
+is
+[`542eb08db`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/542eb08db):
+
+> ✨ \[feat] Implement Docusaurus documentation backup workflow
+>
+> - Add GitHub Actions workflow for building and backing up Docusaurus documentation
+> - Create `backup-docusaurus.yml` to automate documentation deployment
+> - Update `package.json` with commands for subtree backup and force push
+> - Add documentation style guide for Docusaurus setup
+>
+> ...
+
+On the surface this looks like just a docs workflow improvement, but it cements
+the idea that **docs and architecture are part of the app**, not an afterthought.
+
+## The testing story: from unit tests to strict, property-based coverage
+
+The most striking arc in the git log is the evolution of the test strategy.
+
+### Step 1: Strict tests and shared arbitraries
+
+Commit
+[`0797d4d6f`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/0797d4d6f)
+introduced strict test directories and shared `fast-check` arbitraries:
+
+> ✨ \[feat] Introduce property-based testing for various components and utilities
+>
+> - Add property-based tests for `normalizeHistoryLimit`
+> - Implement property-based tests for `isNonEmptyString` and `isValidIdentifier`
+> - Create property-based tests for `useAlertStore`
+> - Add property-based tests for `dataValidation`
+> - Add README for strict tests directory
+> - Introduce shared fast-check arbitraries and an `assertProperty` helper
+
+This commit is where **property-based testing** stopped being an experiment
+and became part of the standard toolbox.
+
+### Step 2: Scaling property-based coverage
+
+The work continued in
+[`acb498188`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/acb498188):
+
+> 🧪 \[test] Enhance comprehensive test coverage for site-related components
+>
+> - Use arbitrary site names, URLs, and identifiers in tests
+> - Refactor multiple component tests to generate dynamic props
+> - Improve branch coverage for modal and settings flows
+
+Here, the pattern is clear:
+
+- First, establish **shared arbitraries** and helpers.
+- Then, systematically roll them out across components, stores, and utilities.
+
+### Step 3: Tightening test configuration
+
+Most recently,
+[`c16d48e54`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c16d48e54)
+(paired with `c45c0afef` and `ef6e0dc1a` for the version bump) pushed testing
+further:
+
+> ✨ \[feat] Enhance testing configurations and add property-based tests
+>
+> - Update tsconfig to include strict test directories for better coverage
+> - Introduce fast-check for property-based testing in monitor operations and validation schemas
+> - Add comprehensive property tests for monitor identifiers and status validation
+> - Improve test coverage for monitor operations with randomized input testing
+> - Extend Vitest configuration to include strict test directories
+
+Combined with the **testing ADR** (`ADR_010_TESTING_STRATEGY.md`), Uptime
+Watcher now has:
+
+- Dedicated Vitest configs for frontend, Electron, shared, and Storybook
+- Strict test projects for cross-cutting concerns
+- Property-based tests for core monitor logic, validation, and state stores
+
+When you run:
+
+```bash
+npm run test:all:coverage
+```
+
+you are not just running unit tests; you are exercising a **multi-project test
+matrix** with coverage gates and mutation testing support via Stryker.
+
+## UX and UI polish in lockstep with tests
+
+The git history also shows that UI/UX improvements are usually paired with
+better tests.
+
+For example,
+[`d6311ce2c`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/d6311ce2c)
+added a new icon set and refined layout/animation behavior:
+
+> ✨ \[feat] Add new icon assets and improve UI styling
+>
+> - Introduced new icon files for various sizes
+> - Updated CSS for layout responsiveness
+> - Improved scrollbar styles and card hover effects
+> - Enhanced modal animations and utility helpers for tests
+
+Later,
+[`f14823e1e`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/f14823e1e)
+introduced density controls for the site table view:
+
+> ✨ \[feat] Enhance Site List and Card Components
+>
+> - Add density options ("comfortable", "compact", "cozy")
+> - Wire density into the UI store
+> - Expand SiteList and SiteListLayoutSelector tests
+
+The pattern is the same throughout:
+
+- Add a UX feature.
+- Wire it into the **Zustand stores**.
+- Extend tests (often with property-based generators) to guarantee the new
+  surface behaves under variation.
+
+## Docusaurus and docs as a first-class product
+
+The documentation site under `docs/docusaurus/` is not an afterthought; it has
+its own build, lint, and backup story.
+
+The commit
+[`542eb08db`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/542eb08db)
+introduced a Docusaurus backup workflow, new scripts, and a documentation
+style guide. Later commits like
+[`f6e2cb2a4`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/f6e2cb2a4)
+and
+[`c8930adb9`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c8930adb9)
+keep that documentation **in sync** with the main codebase and tooling.
+
+Today, you can work entirely from the root via:
+
+```bash
+npm run docs:build
+npm run docusaurus:start
+npm run docusaurus:broken-links
+```
+
+and know that:
+
+- TypeDoc is up to date.
+- ESLint Inspector is regenerated.
+- Architecture guides and ADRs match the actual code.
+
+## Lessons learned
+
+The following themes stand out from this journey:
+
+1. Docs and tests are not optional — a significant portion of the most
+   important commits are pure documentation or testing work; they are treated
+   as **features**, not chores.
+
+2. Property-based testing pays off quickly — once `fast-check` was adopted
+   and shared arbitraries were in place, it became much easier to extend
+   coverage without duplicating effort.
+
+3. Tooling can be a competitive advantage — the investment in linting,
+   schemas, and CI scripts means refactors are safer, documentation stays
+   synchronized, and contributors get rapid feedback from the tooling alone.
+
+4. Electron apps benefit from real architecture — the combination of a
+   service container, repository pattern, TypedEventBus, and strict IPC
+   boundaries makes Uptime Watcher feel more like a production backend than a
+   desktop toy.
+
+## Where we go next
+
+Looking ahead, there are clear directions for Uptime Watcher:
+
+- Expanding the **plugin surface** for custom monitor types and alert rules
+- Deepening **analytics** and historical reporting
+- Introducing new visualizations and dashboards into the Docusaurus site
+- Continuing to push on **testing rigor**, especially around edge-case
+  networking behavior
+
+If you want to dive deeper into how everything fits together, the
+starting points are:
+
+- <Link to="/system-architecture">System Architecture Overview</Link>
+- <Link to="/event-system">Event System & TypedEventBus</Link>
+- <Link to="/testing-architecture">Testing Architecture & Strategy</Link>
+
+Uptime Watcher has come a long way from a simple checker script. The git
+history tells the story: deliberate architecture, aggressive testing, and a
+commitment to documentation all the way down.

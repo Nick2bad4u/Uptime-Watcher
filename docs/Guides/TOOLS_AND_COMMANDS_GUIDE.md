@@ -3,7 +3,7 @@ schema: "../../config/schemas/doc-frontmatter.schema.json"
 title: "Tools and Commands Guide"
 summary: "Reference for how the AI agent uses editing tools, search, tasks, tests, and diagnostics in the Uptime Watcher repository."
 created: "2025-11-15"
-last_reviewed: "2025-11-17"
+last_reviewed: "2025-11-25"
 category: "guide"
 author: "Nick2bad4u"
 tags:
@@ -162,7 +162,7 @@ Additional patterns:
 
 ### Project test suites
 
-- `npm run test` — renderer + shared Vitest suites (default configuration).
+- `npm run test` — frontend/renderer Vitest suites (default configuration).
 - `npm run test:electron` — Electron-specific Vitest config (`vitest.electron.config.ts`).
 - `npm run test:shared` — shared package suites that exercise code reused by both runtimes.
 - `npm run type-check:test` — strict TypeScript program that only targets the test graph; run this whenever you add new helpers or mocks.

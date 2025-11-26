@@ -1568,7 +1568,11 @@ describe("useAddSiteForm Hook - Comprehensive Coverage", () => {
                         update.field === "name"; // name is always valid
 
                     if (shouldUpdate) {
-                        expectedValues[update.field] = update.value;
+                        const normalizedValue =
+                            update.field === "name"
+                                ? update.value.trimStart()
+                                : update.value;
+                        expectedValues[update.field] = normalizedValue;
 
                         await act(async () => {
                             switch (update.field) {

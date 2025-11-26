@@ -36,38 +36,38 @@ describe("Type Guards - Comprehensive Coverage", () => {
             // This ensures that every function in ts is executed
 
             // Test basic object for multiple functions
-            const testObj = { a: 1, b: 2 };
-            const testArray = [
-                1,
-                2,
-                3,
+            const sampleRecord = { alpha: 1, beta: 2 };
+            const sampleNumbers = [
+                100,
+                200,
+                300,
             ];
-            const testDate = new Date();
-            const testError = new Error("test");
+            const sampleDate = new Date();
+            const sampleError = new Error("sample error");
 
             // Call every function with various inputs to ensure coverage
-            expect(isObject(testObj)).toBeTruthy();
+            expect(isObject(sampleRecord)).toBeTruthy();
             expect(isNumber(42)).toBeTruthy();
-            expect(hasProperties(testObj, ["a"])).toBeTruthy();
-            expect(hasProperty(testObj, "a")).toBeTruthy();
-            expect(isArray(testArray)).toBeTruthy();
+            expect(hasProperties(sampleRecord, ["alpha"])).toBeTruthy();
+            expect(hasProperty(sampleRecord, "alpha")).toBeTruthy();
+            expect(isArray(sampleNumbers)).toBeTruthy();
             expect(isBoolean(true)).toBeTruthy();
-            expect(isDate(testDate)).toBeTruthy();
-            expect(isError(testError)).toBeTruthy();
+            expect(isDate(sampleDate)).toBeTruthy();
+            expect(isError(sampleError)).toBeTruthy();
             expect(isFiniteNumber(42)).toBeTruthy();
             expect(isFunction(() => {})).toBeTruthy();
             expect(isNonNegativeNumber(0)).toBeTruthy();
-            expect(isNonNullObject(testObj)).toBeTruthy();
+            expect(isNonNullObject(sampleRecord)).toBeTruthy();
             expect(isPositiveNumber(1)).toBeTruthy();
-            expect(isString("test")).toBeTruthy();
+            expect(isString("sample")).toBeTruthy();
             expect(isValidPort(80)).toBeTruthy();
             expect(isValidTimestamp(Date.now())).toBeTruthy();
 
             // Also test with false cases to ensure all branches are covered
             expect(isObject(null)).toBeFalsy();
             expect(isNumber("not a number")).toBeFalsy();
-            expect(hasProperties(testObj, ["nonexistent"])).toBeFalsy();
-            expect(hasProperty(testObj, "nonexistent")).toBeFalsy();
+            expect(hasProperties(sampleRecord, ["nonexistent"])).toBeFalsy();
+            expect(hasProperty(sampleRecord, "nonexistent")).toBeFalsy();
             expect(isArray("not an array")).toBeFalsy();
             expect(isBoolean("not a boolean")).toBeFalsy();
             expect(isDate("not a date")).toBeFalsy();

@@ -22,105 +22,63 @@ export default function DataModels() {
 
                         ## Entity Relationship Diagram
 
-                        This diagram shows the relationships between different entities in the database:
+                        This diagram reflects the actual SQLite schema created by `createDatabaseSchema` in the Electron layer:
 
                         <Mermaid value={`erDiagram
     SITES ||--o{ MONITORS : has
-    SITES ||--o{ HISTORY : generates
-    MONITORS ||--o{ HISTORY : creates
-    MONITORS ||--o{ MONITOR_CONFIGS : configures
-    USERS ||--o{ SITES : owns
-    USERS ||--|| SETTINGS : has
-    SITES ||--o{ NOTIFICATIONS : triggers
-    MONITOR_CONFIGS ||--o{ MONITOR_TEMPLATES : uses
+    MONITORS ||--o{ HISTORY : records
+
+    SETTINGS ||--|| SITES : controls
+    STATS ||--|| SITES : summarizes
+    LOGS ||--o{ SITES : references
 
     SITES {
-        string id PK
+        string identifier PK
         string name
-        string url
-        string description
-        boolean active
-        timestamp created_at
-        timestamp updated_at
-        string user_id FK
-        json metadata
+        boolean monitoring
     }
 
     MONITORS {
-        string id PK
-        string site_id FK
+        int id PK
+        string site_identifier FK
         string type
-        json configuration
-        boolean enabled
-        int interval_minutes
-        int timeout_seconds
-        timestamp created_at
-        timestamp updated_at
+        int check_interval_ms
+        int timeout_ms
+        int retry_attempts
+        string status
+        int response_time
+        string last_error
+        string active_operations_json
+        int created_at
+        int updated_at
+        // dynamic monitor-specific columns per monitor type
     }
 
     HISTORY {
-        string id PK
-        string site_id FK
-        string monitor_id FK
+        int id PK
+        int monitor_id FK
+        int timestamp
         string status
-        int response_time_ms
+        int responseTime
         string details
-        json metadata
-        timestamp timestamp
-        timestamp created_at
-    }
-
-    MONITOR_CONFIGS {
-        string id PK
-        string monitor_id FK
-        string config_key
-        string config_value
-        string data_type
-        boolean encrypted
-        timestamp created_at
-        timestamp updated_at
-    }
-
-    USERS {
-        string id PK
-        string username
-        string email
-        string password_hash
-        json preferences
-        timestamp created_at
-        timestamp last_login
     }
 
     SETTINGS {
-        string id PK
-        string user_id FK
-        string theme
-        json notification_preferences
-        json dashboard_layout
-        json global_settings
-        timestamp updated_at
+        string key PK
+        string value
     }
 
-    NOTIFICATIONS {
-        string id PK
-        string site_id FK
-        string type
-        string title
+    STATS {
+        string key PK
+        string value
+    }
+
+    LOGS {
+        int id PK
+        datetime timestamp
+        string level
         string message
-        string status
-        json recipients
-        timestamp sent_at
-        timestamp created_at
-    }
-
-    MONITOR_TEMPLATES {
-        string id PK
-        string name
-        string monitor_type
-        json default_config
-        string description
-        boolean public
-        timestamp created_at
+        string data
     }`} />
 
                         ## Monitor Configuration Schema

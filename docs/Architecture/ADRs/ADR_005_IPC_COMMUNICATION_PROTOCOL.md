@@ -577,9 +577,22 @@ mindmap
 - **Monitoring**: `start-monitoring`, `stop-monitoring`, `start-monitoring-for-site`, `check-site-now`
 - **Settings**: `get-history-limit`, `update-history-limit`, `reset-settings`
 - **System/Data**: `download-sqlite-backup`, `export-data`, `import-data`, `open-external`
-- **System/Data**: `download-sqlite-backup`, `export-data`, `import-data`, `open-external`
 - **Diagnostics**: `diagnostics-verify-ipc-handler`, `diagnostics-report-preload-guard`
-- **Events**: Continue using domain-prefixed, past-tense identifiers (e.g., `monitor:status-changed`, `sites:added`).
+- **Events**: Continue using domain-prefixed, past-tense identifiers (e.g., `monitor:status-changed`, `site:added`).
+
+### Authoritative channel definitions
+
+All invoke channels are defined once in `shared/types/ipc.ts` via
+`IpcInvokeChannelMap`. Domain-specific channel maps in
+`shared/types/preload.ts` (`SITES_CHANNELS`, `SETTINGS_CHANNELS`,
+`MONITORING_CHANNELS`, etc.), the preload bridge contracts, and the generated
+IPC channel inventory documentation are derived from this map.
+
+`electron/services/ipc/IpcService.ts` and its helpers consume these
+definitions when registering handlers. Runtime guards (such as the
+`update-notification-preferences` consistency check) exist purely to detect
+drift early; they do not introduce alternative channel identifiers and must
+always agree with the shared map.
 
 ### Consistency Rules
 

@@ -175,6 +175,19 @@ export const SettingsService: SettingsServiceContract = {
      * "History limit propagation (settings & database)" subsection in
      * `docs/Architecture/README.md`.
      *
+     * The requested limit and the backend response are both validated using the
+     * shared {@link DEFAULT_HISTORY_LIMIT_RULES}. This method behaves
+     * differently depending on where validation fails:
+     *
+     * - If the caller supplies an invalid limit (for example, exceeding the
+     *   configured maximum), the shared normaliser raises a {@link RangeError}.
+     *   In that case, this method ultimately throws a {@link TypeError} via
+     *   {@link normalizeHistoryLimitError} so renderer code can surface a
+     *   user-facing validation failure.
+     * - If the caller supplies a valid limit but the backend returns an invalid
+     *   value, the method falls back to the sanitised version of the requested
+     *   limit and logs a structured warning.
+     *
      * @example
      *
      * ```typescript
@@ -187,12 +200,14 @@ export const SettingsService: SettingsServiceContract = {
      * @param limit - The new maximum number of history records to keep per
      *   monitor.
      *
-     * @returns Sanitized history limit after update. If the backend returns a
-     *   non-numeric value, the requested limit is used instead and a warning is
-     *   logged.
+     * @returns Sanitized history limit after update. When the backend returns
+     *   an invalid value but the requested limit is valid, the sanitised
+     *   requested limit is returned instead and a warning is logged.
      *
-     * @throws If the electron API is unavailable or the backend operation
-     *   fails.
+     * @throws TypeError If the caller supplies a limit that cannot be
+     *   normalised according to {@link DEFAULT_HISTORY_LIMIT_RULES} (for
+     *   example, exceeding the configured maximum). Also throws if the electron
+     *   API is unavailable or the backend operation fails fatally.
      */
     updateHistoryLimit: wrap(
         "updateHistoryLimit",

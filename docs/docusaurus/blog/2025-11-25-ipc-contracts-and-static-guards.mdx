@@ -1,0 +1,184 @@
+---
+slug: ipc-contracts-and-static-guards
+title: "IPC Contracts and Static Guards: Keeping Main and Renderer in Sync"
+authors: [nick]
+tags:
+  - ipc
+  - architecture
+  - typed-events
+  - tooling
+---
+
+# IPC Contracts and Static Guards: Keeping Main and Renderer in Sync
+
+Electron IPC is a common place where apps quietly rot: ad-hoc channels, mismatched
+payloads, and copy-pasted handlers that drift over time.
+
+Uptime Watcher takes a different route. IPC contracts are treated as
+**shared types**, and we have scripts that fail the build when main and
+renderer drift apart.
+
+This post explains how the IPC layer is structured, how static guards
+work, and how that shows up in the git history.
+
+## Shared contracts first
+
+IPC contracts live in the shared layer so both the Electron main process
+and the React renderer agree on channel names and payload types.
+
+Key pieces:
+
+- `shared/types/ipc.ts` — maps channels to request/response payloads.
+- `shared/ipc/rendererEvents.ts` — typed event payloads emitted from main
+  to renderer.
+- `shared/types.ts` and related monitor/site types — domain objects used in
+  IPC payloads.
+
+The Electron side uses these contracts in services like
+`electron/services/ipc/IpcService.ts`, while the renderer consumes them via
+preload domain APIs under `electron/preload/domains/` and
+`src/services/*Service.ts`.
+
+## Typed preload APIs
+
+Rather than calling `ipcRenderer.send` directly from React components, the
+preload script defines domain-specific APIs that wrap IPC calls.
+
+Examples:
+
+- `electron/preload/domains/sitesApi.ts` — site CRUD and monitoring
+  operations.
+- `electron/preload/domains/monitoringApi.ts` — monitor control surface.
+
+Each API function:
+
+- Uses a shared channel constant (e.g. `SITES_CHANNELS.addSite`).
+- Accepts and returns typed payloads defined in `@shared/types`.
+- Applies basic validation / shaping before invoking IPC.
+
+On the renderer side, services like `src/services/SiteService.ts` consume
+those APIs, and stores such as `src/stores/sites/useSitesStore.ts` call the
+services, not IPC directly.
+
+## Static architecture guards
+
+The glue that keeps IPC contracts from drifting is a set of static checks
+run as part of CI and `npm run lint:ci`.
+
+The core script is:
+
+- `scripts/architecture-static-guards.mjs`
+
+It validates things like:
+
+- IPC channels referenced in Electron services are **declared in the shared
+  IPC types**.
+- Renderer services don"t talk directly to Electron modules; they go
+  through the preload bridge.
+- Event names used in the TypedEventBus correspond to entries in the shared
+  event maps.
+
+You can run these guards locally via:
+
+```bash
+npm run lint:architecture
+npm run analyze:ipc
+npm run check:ipc
+```
+
+These commands are wired into higher-level scripts like:
+
+```bash
+npm run lint:all:fix
+npm run quality
+```
+
+If a new IPC channel is added only on one side, or if a handler starts
+returning the wrong shape, those scripts fail quickly.
+
+## Git history: when guards caught problems
+
+Multiple commits in the history reflect this IPC discipline.
+
+### IPC generation and checking
+
+The scripts that generate and verify IPC artifacts live under
+`scripts/generate-ipc-artifacts.mts`. Commits around that script tightened
+validation to ensure:
+
+- All IPC channel enums are covered.
+- Renderer event payload maps stay in sync with main-process emitters.
+
+The `npm run analyze:ipc` and `npm run check:ipc` commands now run in
+CI (see `lint:ci` and `quality` scripts in `package.json`). That means
+changes to `IpcService`, preload domains, or shared types won"t silently
+break IPC contracts.
+
+### Event system and IPC alignment
+
+The TypedEventBus defined in `electron/events/TypedEventBus.ts` and
+`electron/events/eventTypes.ts` is wired into IPC so that:
+
+- Internal events (e.g. monitor status changes) are raised with typed
+  payloads.
+- Renderer events are forwarded through a dedicated bridge that uses the
+  shared renderer event payload map.
+
+Architecture docs like
+`docs/Architecture/ADRs/ADR_002_EVENT_DRIVEN_ARCHITECTURE.md` and
+`docs/Architecture/ADRs/ADR_005_IPC_COMMUNICATION_PROTOCOL.md` are not
+free-form essays; they match real type definitions and the guards
+mentioned above.
+
+When something drifts, the combination of TypeScript, the architecture
+script, and the IPC analyzer catches it.
+
+## Practical impact
+
+The IPC contract + static guard approach has concrete benefits:
+
+- **Safer refactors** — you can rename a monitor field in the shared
+  types, update the database mapping, and rely on the IPC checks to tell
+  you where handler payloads need adjustment.
+- **Fewer runtime surprises** — mismatched payloads or missing event
+  subscriptions are caught at build time rather than during a 3am
+  incident.
+- **Better documentation** — the shared IPC types and ADRs serve as
+  living docs; they are always under pressure from CI to stay honest.
+
+## How to extend IPC safely
+
+If you are adding a new IPC feature, the safe workflow looks like:
+
+1. **Define types first**
+
+   - Add or extend shared types in `shared/types/ipc.ts` and related domain
+     types.
+
+2. **Wire Electron handlers**
+
+   - Implement handlers in `electron/services/ipc/IpcService.ts` or a
+     domain-specific coordinator.
+   - Emit typed events via the TypedEventBus where appropriate.
+
+3. **Expose preload APIs**
+
+   - Add domain functions under `electron/preload/domains/*Api.ts` that
+     call the new channel.
+
+4. **Consume from renderer services**
+
+   - Call the preload APIs from `src/services/*Service.ts`.
+   - Keep components and stores IPC-free.
+
+5. **Run the guards**
+
+   ```bash
+   npm run analyze:ipc
+   npm run check:ipc
+   npm run lint:architecture
+   ```
+
+Following that pattern keeps main and renderer aligned and ensures that
+IPC remains a well-behaved, typed boundary instead of a global message
+bus.

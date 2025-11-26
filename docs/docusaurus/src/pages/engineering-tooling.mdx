@@ -230,7 +230,7 @@ The following diagram maps the Docusaurus site located in `docs/docusaurus`. It 
     DocusaurusRoot --> LiveCode["plugins: @docusaurus/theme-live-codeblock"]
     DocusaurusRoot --> MermaidPlugin["plugins: @docusaurus/theme-mermaid"]
     DocusaurusRoot --> ZoomPlugin["plugins: docusaurus-plugin-image-zoom"]
-    DocusaurusRoot --> CopyButton["plugins: docusaurus-plugin-copy-page-button"]
+        DocusaurusRoot --> LLMSPlugin["plugins: docusaurus-plugin-llms"]
     DocusaurusRoot --> ClientModules["src/js/modernEnhancements.ts"]
 
     ConfigTS --> Deployment["deploymentBranch = gh-pages"]
@@ -247,10 +247,9 @@ The following diagram maps the Docusaurus site located in `docs/docusaurus`. It 
     classDef root fill:#0ea5e9,stroke:#0369a1,color:#ffffff
     classDef config fill:#1f2937,stroke:#111827,color:#f1f5f9
     classDef plugin fill:#2563eb,stroke:#1d4ed8,color:#f8fafc
-
-    class DocusaurusRoot root
-    class ConfigTS,Sidebars,ThemeOverrides,Deployment,BaseUrl,MarkdownPipeline,FutureFlags,ThemeConfig,CodeBlocks,CustomPages,ClientModules,staticAssets config
-    class LiveCode,MermaidPlugin,ZoomPlugin,CopyButton,BuildArtifacts plugin
+        class DocusaurusRoot root
+        class ConfigTS,Sidebars,ThemeOverrides,Deployment,BaseUrl,MarkdownPipeline,FutureFlags,ThemeConfig,CodeBlocks,CustomPages,ClientModules,staticAssets config
+        class LiveCode,MermaidPlugin,ZoomPlugin,LLMSPlugin,BuildArtifacts plugin
 `} />
 
 ## Docusaurus Build & TypeDoc Pipeline

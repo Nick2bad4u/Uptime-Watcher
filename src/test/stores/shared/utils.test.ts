@@ -3,6 +3,32 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
+import { test } from "@fast-check/vitest";
+import * as fc from "fast-check";
+
+/** Arbitrary for generating valid store names */
+const storeNameArbitrary = fc
+    .string({ minLength: 1, maxLength: 50 })
+    .filter((value) => value.trim().length > 0)
+    .map((value) => value.replaceAll(/\s/g, ""))
+    .filter((value) => /^[\w-]+$/u.test(value));
+
+/** Arbitrary for generating valid action names */
+const actionNameArbitrary = fc
+    .string({ minLength: 1, maxLength: 50 })
+    .filter((value) => value.trim().length > 0)
+    .map((value) => value.replaceAll(/\s/g, ""))
+    .filter((value) => /^[\w-]+$/u.test(value));
+
+/** Arbitrary for generating valid payload objects */
+const payloadArbitrary = fc.oneof(
+    fc.object({ maxDepth: 2, maxKeys: 5 }),
+    fc.array(fc.anything(), { maxLength: 10 }),
+    fc.string(),
+    fc.integer(),
+    fc.boolean(),
+    fc.constant(null)
+);
 
 // Mock the logger
 vi.mock("../../../services/logger", () => ({
@@ -198,6 +224,71 @@ describe("Store Utils", () => {
             expect(mockLogger.info).toHaveBeenCalledWith(
                 "[TestStore] testAction",
                 true
+            );
+        });
+
+        describe("Property-based Tests", () => {
+            test.prop([storeNameArbitrary, actionNameArbitrary])(
+                "should format log message correctly for any valid store and action names in development",
+                (storeName, actionName) => {
+                    mockIsDevelopment.mockReturnValue(true);
+                    vi.clearAllMocks();
+
+                    logStoreAction(storeName, actionName);
+
+                    expect(mockLogger.info).toHaveBeenCalledWith(
+                        `[${storeName}] ${actionName}`
+                    );
+                }
+            );
+
+            test.prop([
+                storeNameArbitrary,
+                actionNameArbitrary,
+                payloadArbitrary,
+            ])(
+                "should log any valid payload in development mode",
+                (storeName, actionName, payload) => {
+                    mockIsDevelopment.mockReturnValue(true);
+                    vi.clearAllMocks();
+
+                    logStoreAction(storeName, actionName, payload);
+
+                    expect(mockLogger.info).toHaveBeenCalledWith(
+                        `[${storeName}] ${actionName}`,
+                        payload
+                    );
+                }
+            );
+
+            test.prop([
+                storeNameArbitrary,
+                actionNameArbitrary,
+                payloadArbitrary,
+            ])(
+                "should never log in production mode regardless of payload",
+                (storeName, actionName, payload) => {
+                    mockIsDevelopment.mockReturnValue(false);
+                    vi.clearAllMocks();
+
+                    logStoreAction(storeName, actionName, payload);
+
+                    expect(mockLogger.info).not.toHaveBeenCalled();
+                }
+            );
+
+            test.prop([storeNameArbitrary, actionNameArbitrary])(
+                "should handle undefined payload consistently",
+                (storeName, actionName) => {
+                    mockIsDevelopment.mockReturnValue(true);
+                    vi.clearAllMocks();
+
+                    logStoreAction(storeName, actionName, undefined);
+
+                    expect(mockLogger.info).toHaveBeenCalledWith(
+                        `[${storeName}] ${actionName}`
+                    );
+                }
             );
         });
     });

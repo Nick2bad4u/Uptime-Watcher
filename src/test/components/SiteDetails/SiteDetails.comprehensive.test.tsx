@@ -907,13 +907,14 @@ describe(SiteDetails, () => {
                     },
                 ],
             };
+            const { rerender } = renderSiteDetails(initialSite);
+
             expect(
                 screen.getByText(`Site: ${mockSite.name}`)
             ).toBeInTheDocument();
             expect(
                 screen.getByText(`Monitor: ${primaryMonitor.id}`)
             ).toBeInTheDocument();
-            const { rerender } = renderSiteDetails(initialSite);
 
             // Rerender with different site
             rerender(

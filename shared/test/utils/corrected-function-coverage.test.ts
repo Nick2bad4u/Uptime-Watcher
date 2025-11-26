@@ -1,4 +1,6 @@
 import { describe, test, expect } from "vitest";
+import { test as fcTest } from "@fast-check/vitest";
+import * as fc from "fast-check";
 import * as objectSafety from "../../utils/objectSafety";
 import * as guardUtils from "../../utils/typeGuards";
 import * as validation from "../../utils/validation";
@@ -8,14 +10,16 @@ import * as environment from "../../utils/environment";
 import * as safeConversions from "../../utils/safeConversions";
 import * as stringConversion from "../../utils/stringConversion";
 
+/** Arbitrary for generating test objects with various properties */
+const testRecordArbitrary = fc.record({
+    identifier: fc.string({ minLength: 1, maxLength: 30 }),
+    count: fc.integer({ min: 0, max: 1000 }),
+    enabled: fc.boolean(),
+});
+
 describe("Corrected Function Coverage Tests", () => {
     describe("objectSafety functions", () => {
         test("safeObjectAccess function exists", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: corrected-function-coverage", "component");
-            annotate("Category: Utility", "category");
-            annotate("Type: Business Logic", "type");
-
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: corrected-function-coverage", "component");
             annotate("Category: Utility", "category");
@@ -25,21 +29,24 @@ describe("Corrected Function Coverage Tests", () => {
             expect(typeof objectSafety.safeObjectAccess).toBe("function");
 
             // Test basic functionality with correct signature
-            const testObj = { test: "value" };
+            const sampleRecord = { identifier: "item-001", count: 42 };
             expect(
-                objectSafety.safeObjectAccess(testObj, "test", "default")
-            ).toBe("value");
+                objectSafety.safeObjectAccess(
+                    sampleRecord,
+                    "identifier",
+                    "fallback"
+                )
+            ).toBe("item-001");
             expect(
-                objectSafety.safeObjectAccess(testObj, "missing", "default")
-            ).toBe("default");
+                objectSafety.safeObjectAccess(
+                    sampleRecord,
+                    "missing",
+                    "fallback"
+                )
+            ).toBe("fallback");
         });
 
         test("safeObjectIteration function exists", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: corrected-function-coverage", "component");
-            annotate("Category: Utility", "category");
-            annotate("Type: Business Logic", "type");
-
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: corrected-function-coverage", "component");
             annotate("Category: Utility", "category");
@@ -49,9 +56,9 @@ describe("Corrected Function Coverage Tests", () => {
             expect(typeof objectSafety.safeObjectIteration).toBe("function");
 
             // Test iteration with correct signature
-            const testObj = { a: 1, b: 2 };
+            const sampleRecord = { alpha: 1, beta: 2 };
             const results: [string, unknown][] = [];
-            objectSafety.safeObjectIteration(testObj, (key, value) => {
+            objectSafety.safeObjectIteration(sampleRecord, (key, value) => {
                 results.push([key, value]);
             });
             expect(results).toHaveLength(2);
@@ -63,28 +70,53 @@ describe("Corrected Function Coverage Tests", () => {
             annotate("Category: Utility", "category");
             annotate("Type: Business Logic", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: corrected-function-coverage", "component");
-            annotate("Category: Utility", "category");
-            annotate("Type: Business Logic", "type");
-
             expect(objectSafety.typedObjectEntries).toBeDefined();
             expect(typeof objectSafety.typedObjectEntries).toBe("function");
 
             // Test typed entries
-            const testObj = { a: 1, b: 2 };
-            const entries = objectSafety.typedObjectEntries(testObj);
+            const sampleRecord = { alpha: 1, beta: 2 };
+            const entries = objectSafety.typedObjectEntries(sampleRecord);
             expect(Array.isArray(entries)).toBeTruthy();
+        });
+
+        describe("Property-based Tests for objectSafety", () => {
+            fcTest.prop([testRecordArbitrary, fc.string({ minLength: 1 })])(
+                "should return fallback for missing keys",
+                (record, fallbackValue) => {
+                    const result = objectSafety.safeObjectAccess(
+                        record,
+                        "nonExistentKey" as keyof typeof record,
+                        fallbackValue
+                    );
+                    expect(result).toBe(fallbackValue);
+                }
+            );
+
+            fcTest.prop([testRecordArbitrary])(
+                "should iterate over all keys in object",
+                (record) => {
+                    const visitedKeys: string[] = [];
+                    objectSafety.safeObjectIteration(record, (key) => {
+                        visitedKeys.push(key);
+                    });
+                    expect(visitedKeys).toHaveLength(
+                        Object.keys(record).length
+                    );
+                }
+            );
+
+            fcTest.prop([testRecordArbitrary])(
+                "should return correct number of entries",
+                (record) => {
+                    const entries = objectSafety.typedObjectEntries(record);
+                    expect(entries).toHaveLength(Object.keys(record).length);
+                }
+            );
         });
     });
 
     describe("guardUtils functions", () => {
         test("basic guardUtils functions exist", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: corrected-function-coverage", "component");
-            annotate("Category: Utility", "category");
-            annotate("Type: Business Logic", "type");
-
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: corrected-function-coverage", "component");
             annotate("Category: Utility", "category");
@@ -98,6 +130,36 @@ describe("Corrected Function Coverage Tests", () => {
             expect(guardUtils.isFunction).toBeDefined();
             expect(guardUtils.isDate).toBeDefined();
             expect(guardUtils.isError).toBeDefined();
+        });
+
+        describe("Property-based Tests for guardUtils", () => {
+            fcTest.prop([fc.string()])(
+                "isString should correctly identify strings",
+                (value) => {
+                    expect(guardUtils.isString(value)).toBeTruthy();
+                }
+            );
+
+            fcTest.prop([fc.integer()])(
+                "isNumber should correctly identify integers",
+                (value) => {
+                    expect(guardUtils.isNumber(value)).toBeTruthy();
+                }
+            );
+
+            fcTest.prop([fc.boolean()])(
+                "isBoolean should correctly identify booleans",
+                (value) => {
+                    expect(guardUtils.isBoolean(value)).toBeTruthy();
+                }
+            );
+
+            fcTest.prop([fc.array(fc.anything())])(
+                "isArray should correctly identify arrays",
+                (value) => {
+                    expect(guardUtils.isArray(value)).toBeTruthy();
+                }
+            );
         });
     });
 

@@ -3,7 +3,7 @@ schema: "../../config/schemas/doc-frontmatter.schema.json"
 title: "Developer Quick Start Guide"
 summary: "Quick-start guide for setting up the Uptime Watcher development environment and understanding the architecture."
 created: "2025-09-22"
-last_reviewed: "2025-11-17"
+last_reviewed: "2025-11-25"
 category: "guide"
 author: "Nick2bad4u"
 tags:
@@ -39,7 +39,7 @@ Uptime Watcher is a sophisticated Electron desktop application for monitoring we
 ### Prerequisites
 
 - **Node.js**: 24.8+ (required)
-- **npm**: 11.5.2+ (comes with Node.js)
+- **npm**: 11.6.3+ (comes with Node.js)
 - **Git**: Latest version
 
 ### 1. Clone & Install
@@ -174,7 +174,7 @@ npm run dist           # Build and package application
 ### Testing
 
 ```bash
-npm test               # Run all tests (Vitest)
+npm test               # Run core frontend tests (Vitest default config)
 npm run test:electron  # Backend tests only (Electron-focused Vitest config)
 npm run test:frontend  # Frontend tests only (renderer Vitest config)
 ```

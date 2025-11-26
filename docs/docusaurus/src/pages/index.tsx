@@ -392,22 +392,24 @@ const HomepageHeader = (): JSX.Element => (
                             </div>
                             <pre className={styles["codeContent"]}>
                                 {`{
-  "name": "uptime-watcher",
-  "version": "12.5.0",
-  "description": "Desktop uptime monitoring",
-  "main": "dist/main.js",
-  "scripts": {
-    "start": "electron .",
-    "build": "npm run build:electron-vite",
-    "test": "vitest"
-  },
-  "dependencies": {
-    "electron": "^32.1.2",
-    "react": "^18.3.1",
-    "node-sqlite3-wasm": "^0.8.15",
-    "zustand": "^5.0.0"
-  },
-  "license": "Unlicense"
+    "name": "uptime-watcher",
+    "version": "19.0.0",
+    "description": "An Electron app to monitor website uptime status",
+    "main": "dist/main.js",
+    "scripts": {
+        "dev": "vite",
+        "electron-dev": "concurrently "npm run dev" "npm run electron -- {args}" --",
+        "build": "npm run build:electron-vite",
+        "test": "vitest",
+        "test:all": "npm run test && npm run test:storybook && npm run test:storybook:runner"
+    },
+    "dependencies": {
+        "electron": "^39.2.3",
+        "react": "^19.2.0",
+        "node-sqlite3-wasm": "^0.8.51",
+        "zustand": "^5.0.0"
+    },
+    "license": "UNLICENSED"
 }`}
                             </pre>
                         </div>

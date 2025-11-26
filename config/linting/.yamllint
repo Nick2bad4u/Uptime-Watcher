@@ -33,18 +33,6 @@ ignore: |
     *.bundle.js
     docs/Packages/**
     # CI/CD files with known issues
-    .github/workflows/Build.yml
-    .github/workflows/codeql.yml
-    .github/workflows/release-stats.yml
-    .github/workflows/updateChangeLogs.yml
-    .github/workflows/ActionLint.yml
-    .github/workflows/.spellcheck.yml
-    # Config files that may have different formatting needs
-    config/tools/kics.yaml
-    config/tools/.yamllint
-    docs/_config.yml
-    .codecov.yml
-    config/tools/.pre-commit-config.yaml
     docs/docusaurus/docs/documents/docs/Packages/**
     **/.stryker-tmp/**
 
@@ -151,13 +139,14 @@ rules:
         quote-type: double
         required: false
 
-    # New lines configuration (allow platform defaults)
+    # New lines configuration (force consistent Unix newlines across platforms)
     new-lines:
-        type: platform
+        type: unix
 
     # Disable truthy for flexibility with CI/CD configs
     truthy:
         check-keys: false
+        allowed-values: ["yes", "no", "true", "false", "on", "off"]
 
     # Enable trailing spaces check
     trailing-spaces: enable

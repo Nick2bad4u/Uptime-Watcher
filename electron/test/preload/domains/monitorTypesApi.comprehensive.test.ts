@@ -717,15 +717,15 @@ describe("Monitor Types Domain API", () => {
 
         it("should handle function context properly", async () => {
             const { getMonitorTypes } = api;
-            const mockData = { test: "data" };
+            const contextData = { context: "preserved" };
             mockIpcRenderer.invoke.mockResolvedValue(
-                createIpcResponse(mockData)
+                createIpcResponse(contextData)
             );
 
             // Destructured function should work correctly
             const result = await getMonitorTypes();
 
-            expect(result).toEqual(mockData);
+            expect(result).toEqual(contextData);
         });
 
         it("should return Promise types correctly", () => {
@@ -735,24 +735,24 @@ describe("Monitor Types Domain API", () => {
         });
 
         it("should handle method chaining scenarios", async () => {
-            const chainData = { chain: "test" };
+            const chainableData = { chainable: "result" };
             mockIpcRenderer.invoke.mockResolvedValue(
-                createIpcResponse(chainData)
+                createIpcResponse(chainableData)
             );
 
             // Method should be callable and chainable
             const result = await api.getMonitorTypes();
 
-            expect(result).toEqual(chainData);
+            expect(result).toEqual(chainableData);
             expect(typeof api.getMonitorTypes).toBe("function");
         });
     });
 
     describe("Performance and optimization scenarios", () => {
         it("should handle repeated calls efficiently", async () => {
-            const testData = { perf: "test" };
+            const performanceData = { performance: "measured" };
             mockIpcRenderer.invoke.mockResolvedValue(
-                createIpcResponse(testData)
+                createIpcResponse(performanceData)
             );
 
             const start = Date.now();
@@ -769,9 +769,9 @@ describe("Monitor Types Domain API", () => {
         });
 
         it("should handle burst traffic scenarios", async () => {
-            const burstData = { burst: "test" };
+            const concurrentData = { concurrent: "requests" };
             mockIpcRenderer.invoke.mockResolvedValue(
-                createIpcResponse(burstData)
+                createIpcResponse(concurrentData)
             );
 
             // Simulate burst of concurrent requests

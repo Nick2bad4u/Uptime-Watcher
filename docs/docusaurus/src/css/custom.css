@@ -98,6 +98,13 @@
     --container-lg: 1200px;
 }
 
+/* Hide the global copy-page button on the landing page only.
+   Docs, blog, and other routes keep the button visible. */
+
+body[class*="page-home"] .copy-page-button__container {
+    display: none !important;
+}
+
 /* Dark mode palette overrides: These variables are redefined to ensure optimal contrast, readability, and visual accessibility for users in dark mode.
    - Primary color variables are lightened for better visibility against dark backgrounds.
    - Accent and neutral colors are adjusted for improved contrast.
@@ -209,6 +216,10 @@
 
 .sb-cat-tsdoc > .menu__list-item-collapsible .menu__link {
     border-inline-start: 4px solid #d627e3;
+}
+
+.sb-cat-blog > .menu__list-item-collapsible .menu__link {
+    border-inline-start: 4px solid #2563eb;
 }
 
 /* Subtle hover elevation */
@@ -369,6 +380,10 @@
     border-color: #d627e3;
 }
 
+[data-theme="dark"] .sb-cat-blog > .menu__list-item-collapsible .menu__link {
+    border-color: #60a5fa;
+}
+
 /* Overview doc styling */
 .sb-doc-overview .theme-doc-sidebar-item-link a {
     font-weight: 700;
@@ -404,6 +419,10 @@
 
 .menu__list-item[data-badge="docs"] > .menu__link::after {
     background: #d627e3;
+}
+
+.menu__list-item[data-badge="blog"] > .menu__link::after {
+    background: #2563eb;
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -34,14 +34,14 @@ sequenceDiagram
 
 | Dependency        | Version  |
 | ----------------- | -------- |
-| electron          | ^39.0.0  |
+| electron          | ^39.2.3  |
 | electron-builder  | ^26.0.12 |
 | electron-updater  | ^6.6.2   |
-| node-sqlite3-wasm | ^0.8.50  |
+| node-sqlite3-wasm | ^0.8.51  |
 | react             | ^19.2.0  |
 | typescript        | ^5.9.3   |
-| vite              | ^7.1.12  |
-| tailwindcss       | ^4.1.16  |
+| vite              | ^7.2.4   |
+| tailwindcss       | ^4.1.17  |
 
 - Do not monitor sensitive internal URLs that could expose credentials.
 - Be cautious when sharing monitoring configurations that might contain sensitive information.

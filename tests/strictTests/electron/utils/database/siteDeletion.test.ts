@@ -1,7 +1,22 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { test } from "@fast-check/vitest";
+import * as fc from "fast-check";
 
 const modulePath = "../../../../../../electron/utils/database/siteDeletion";
 const errorUtilsPath = "../../../../../../shared/utils/errorHandling";
+
+/** Arbitrary for generating valid site identifiers */
+const siteIdentifierArbitrary = fc
+    .uuid()
+    .map((uuid) => `site-${uuid.slice(0, 8)}`);
+
+/** Arbitrary for generating monitors array */
+const monitorsArbitrary = fc
+    .array(
+        fc.uuid().map((uuid) => ({ id: uuid.slice(0, 8) })),
+        { minLength: 0, maxLength: 10 }
+    )
+    .filter((arr) => arr.length === new Set(arr.map((m) => m.id)).size);
 
 interface MonitorAdapterMocks {
     deleteBySiteIdentifier: ReturnType<typeof vi.fn>;
@@ -199,5 +214,81 @@ describe("deleteSiteWithAdapters", () => {
         expect(deletionError.stage).toBe("site");
         expect(deletionError.message).toBe("Failed to delete site site-42");
         expect(deletionError.cause).toBeUndefined();
+    });
+
+    describe("Property-based Tests", () => {
+        test.prop([siteIdentifierArbitrary, monitorsArbitrary])(
+            "should correctly count preloaded monitors for any valid identifier and monitors",
+            async (siteId, monitors) => {
+                vi.resetModules();
+                const { adapter: monitorAdapter, mocks: monitorMocks } =
+                    createMonitorAdapter();
+                const { adapter: siteAdapter, mocks: siteMocks } =
+                    createSiteAdapter();
+                const { deleteSiteWithAdapters } = await import(modulePath);
+
+                const result = deleteSiteWithAdapters({
+                    identifier: siteId,
+                    monitorAdapter: monitorAdapter as unknown,
+                    preloadedMonitors: monitors as unknown,
+                    siteAdapter: siteAdapter as unknown,
+                });
+
+                expect(result.monitorCount).toBe(monitors.length);
+                expect(result.siteDeleted).toBeTruthy();
+                expect(
+                    monitorMocks.deleteBySiteIdentifier
+                ).toHaveBeenCalledWith(siteId);
+                expect(siteMocks.delete).toHaveBeenCalledWith(siteId);
+            }
+        );
+
+        test.prop([
+            siteIdentifierArbitrary,
+            monitorsArbitrary,
+            fc.boolean(),
+        ])(
+            "should correctly report site deletion status for any identifier",
+            async (siteId, monitors, deletionSuccess) => {
+                vi.resetModules();
+                const { adapter: monitorAdapter, mocks: monitorMocks } =
+                    createMonitorAdapter({
+                        findBySiteIdentifier: vi.fn(() => monitors),
+                    });
+                const { adapter: siteAdapter } = createSiteAdapter({
+                    delete: vi.fn(() => deletionSuccess),
+                });
+                const { deleteSiteWithAdapters } = await import(modulePath);
+
+                const result = deleteSiteWithAdapters({
+                    identifier: siteId,
+                    monitorAdapter: monitorAdapter as unknown,
+                    siteAdapter: siteAdapter as unknown,
+                });
+
+                expect(result.siteDeleted).toBe(deletionSuccess);
+                expect(result.monitorCount).toBe(monitors.length);
+                expect(monitorMocks.findBySiteIdentifier).toHaveBeenCalledWith(
+                    siteId
+                );
+            }
+        );
+
+        test.prop([siteIdentifierArbitrary])(
+            "should create correct error message for any site identifier",
+            async (siteId) => {
+                vi.resetModules();
+                const { SiteDeletionError } = await import(modulePath);
+
+                const siteError = new SiteDeletionError("site", siteId);
+                expect(siteError.stage).toBe("site");
+                expect(siteError.message).toBe(
+                    `Failed to delete site ${siteId}`
+                );
+
+                const monitorError = new SiteDeletionError("monitors", siteId);
+                expect(monitorError.stage).toBe("monitors");
+            }
+        );
     });
 });

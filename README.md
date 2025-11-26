@@ -1,13 +1,13 @@
 # 📊 Uptime Watcher
 
 <div align="center"><a href="https://github.com/Nick2bad4u/Uptime-Watcher/releases">
-  <img src="https://img.shields.io/badge/version-18.2.0-blue.svg" alt="Version">
+  <img src="https://img.shields.io/badge/version-19.0.0-blue.svg" alt="Version">
 </a>
 <a href="LICENSE">
   <img src="https://img.shields.io/badge/license-Unlicense-green.svg" alt="License">
 </a>
 <a href="https://www.electronjs.org/">
-  <img src="https://img.shields.io/badge/Electron-v39.1.0-47848F?logo=electron" alt="Electron">
+  <img src="https://img.shields.io/badge/Electron-v39.2.3-47848F?logo=electron" alt="Electron">
 </a>
 <a href="https://reactjs.org/">
   <img src="https://img.shields.io/badge/React-v19.2.0-61DAFB?logo=react" alt="React">
@@ -73,7 +73,7 @@ Uptime Watcher is a desktop application built with modern web technologies that 
 - **⚡ Real-Time Updates**: Live status changes with sub-second responsiveness
 - **📈 Performance Analytics**: Response time tracking with trend analysis
 - **📜 Historical Data**: Comprehensive uptime history with SQLite storage
-- **⚙️ Flexible Configuration**: Customizable check intervals from 30 seconds to 30 minutes
+- **⚙️ Flexible Configuration**: Customizable check intervals from 5 seconds to 30 days
 - **💾 Data Persistence**: Local SQLite database with backup/restore functionality
 - **🔁 Retention Sync**: Renderer settings stay aligned with orchestrator/database changes via `settings:history-limit-updated`
 - **⚡ Instant Manual Checks**: Optimistic status updates immediately after manual monitor checks resolve
@@ -119,7 +119,7 @@ Uptime Watcher is a desktop application built with modern web technologies that 
 ### <strong>Desktop Framework</strong>
 
 <a href="https://www.electronjs.org/">
-  <img src="https://img.shields.io/badge/Electron-39.1.0-47848F?logo=electron&amp;logoColor=white" alt="Electron">
+  <img src="https://img.shields.io/badge/Electron-39.2.3-47848F?logo=electron&amp;logoColor=white" alt="Electron">
 </a>
 <a href="https://nodejs.org/">
   <img src="https://img.shields.io/badge/Node.js-24.8+-339933?logo=node.js&amp;logoColor=white" alt="Node.js">
@@ -216,7 +216,7 @@ npm run dist
 | Requirement              | Version                         | Download                                    |
 | ------------------------ | ------------------------------- | ------------------------------------------- |
 | <strong>Node.js</strong> | 24.8+ (required)                | <a href="https://nodejs.org/">Download</a>  |
-| <strong>npm</strong>     | 11.5.2+ (included with Node.js) | <a href="https://www.npmjs.com/">Docs</a>   |
+| <strong>npm</strong>     | 11.6.3+ (included with Node.js) | <a href="https://www.npmjs.com/">Docs</a>   |
 | <strong>Git</strong>     | Latest version                  | <a href="https://git-scm.com/">Download</a> |
 
 \> <strong>💡 Tip</strong>: Check out the <a href="./docs/Guides/DEVELOPER_QUICK_START.md">Developer Quick Start Guide</a> for detailed setup instructions and architecture overview.
@@ -326,10 +326,10 @@ HTTP Family • DNS • SSL • Ping • Port • CDN • Replication • Heartb
     class Integrations infra;
 
     click Services "docs/Architecture/README.md" "Open architecture documentation"
-    click Store "docs/Architecture/ADRs/ADR-004-Frontend-State-Management.md" "Read ADR-004"
-    click IPC "docs/Architecture/ADRs/ADR-005-IPC-Communication-Protocol.md" "Read IPC protocol"
-    click EventBus "docs/Architecture/ADRs/ADR-002-Event-Driven-Architecture.md" "Read event-driven architecture"
-    click SQLite "docs/Architecture/ADRs/ADR-001-Repository-Pattern.md" "Review repository pattern"
+    click Store "docs/Architecture/ADRs/ADR_004_FRONTEND_STATE_MANAGEMENT.md" "Read ADR-004"
+    click IPC "docs/Architecture/ADRs/ADR_005_IPC_COMMUNICATION_PROTOCOL.md" "Read IPC protocol"
+    click EventBus "docs/Architecture/ADRs/ADR_002_EVENT_DRIVEN_ARCHITECTURE.md" "Read event-driven architecture"
+    click SQLite "docs/Architecture/ADRs/ADR_001_REPOSITORY_PATTERN.md" "Review repository pattern"
 ```
 
 ### **🔧 Core components**
@@ -391,7 +391,7 @@ We welcome contributions from the community! Here's how you can help:
 
 <div align="center"><strong>Made with ❤️ by <a href="https://github.com/Nick2bad4u">Nick2bad4u</a></strong>
 
-<em>Last updated: November 2025 • Version 18.0.0</em></div>
+<em>Last updated: November 2025 • Version 19.0.0</em></div>
 
 <!-- remark-ignore-start -->
 

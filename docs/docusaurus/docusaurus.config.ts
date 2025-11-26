@@ -460,6 +460,11 @@ const config: Config = {
                     type: "docSidebar",
                 },
                 {
+                    label: "Blog",
+                    position: "left",
+                    to: "/blog",
+                },
+                {
                     className: "persistent",
                     href: "https://github.com/Nick2bad4u/Uptime-Watcher",
                     label: "GitHub",

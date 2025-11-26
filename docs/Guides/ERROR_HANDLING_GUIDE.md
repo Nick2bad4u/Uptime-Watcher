@@ -30,6 +30,36 @@ The application uses a **multi-layered error handling approach** with:
 - **Type-Safe Error Conversion**: Enhanced error handling with type information
 - **Operation-Specific Loading States**: Fine-grained loading feedback
 
+### Error Model Overview
+
+At a high level, error handling is layered as follows:
+
+- **Shared layer (`shared/**`)**
+  - Core primitives live in `shared/utils/errorHandling.ts`:
+    - `ApplicationError` models domain-aware failures with metadata.
+    - `withErrorHandling()` and `withUtilityErrorHandling()` wrap async
+      operations with consistent logging, fallback, and propagation.
+    - `ensureError()` / `convertError()` normalise unknown errors and
+      preserve type information.
+  - JSON and object safety helpers (`jsonSafety`, `objectSafety`) provide
+    defensive parsing/iteration that callers can compose with the wrappers
+    above.
+- **Backend/Electron layer (`electron/**`)**
+  - Services and repositories wrap long-running work with
+    `withErrorHandling()` and `withDatabaseOperation()`, emitting typed
+    events via `TypedEventBus` on failures.
+  - IPC handlers rely on shared validation and surface sanitised error
+    responses to the preload bridge.
+- **Renderer layer (`src/**`)**
+  - Zustand stores use `withErrorHandling()` together with
+    `createStoreErrorHandler()` to wire loading/error state into
+    `useErrorStore` while keeping store logic free of manual try/catch.
+  - UI helpers in `src/utils/fallbacks.ts` (`withAsyncErrorHandling`,
+    `withSyncErrorHandling`) provide lightweight wrappers for component event
+    handlers that only need logging and a local fallback.
+  - Components consume errors from stores and error boundaries instead of
+    handling cross-cutting concerns themselves.
+
 ## Table of Contents
 
 1. [Centralized Error Store](#centralized-error-store)
@@ -253,6 +283,20 @@ const criticalOperation = async () => {
  );
 };
 ```
+
+### Helper selection matrix
+
+The table below summarizes which helper to use for common scenarios. This is a
+convenience reference; see the sections above for detailed examples.
+
+| Scenario                                                                | Recommended helper(s)                                  | Notes                                                                                 |
+| ----------------------------------------------------------------------- | ------------------------------------------------------ | ------------------------------------------------------------------------------------- |
+| Async store operation with loading + error state (renderer)             | `withErrorHandling` + `createStoreErrorHandler`        | Preferred pattern for Zustand stores; wires into `useErrorStore` automatically.       |
+| Shared or backend utility that needs a fallback value                   | `withUtilityErrorHandling`                             | Use when you want to return a fallback instead of throwing in non-critical utilities. |
+| Backend/Electron service operation that logs errors and may rethrow     | `withErrorHandling` with `{ logger, operationName }`   | Centralizes logging and error propagation for services and IPC handlers.              |
+| Simple React event handler that just needs logging (no store wiring)    | `withAsyncErrorHandling` from `src/utils/fallbacks.ts` | Wraps async callbacks to log failures without changing component error state.         |
+| Synchronous operation that should never break the UI and has a fallback | `withSyncErrorHandling` from `src/utils/fallbacks.ts`  | Returns a fallback value on failure and logs with operation name.                     |
+| One-off utility or script that must always surface failures             | `withUtilityErrorHandling` with `throwOnError = true`  | Ensures failures are not silently swallowed; combine with logging as needed.          |
 
 ### Enhanced Error Conversion
 

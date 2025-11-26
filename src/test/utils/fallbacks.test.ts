@@ -22,6 +22,38 @@ import {
 } from "../../utils/fallbacks";
 import type { Monitor } from "@shared/types";
 
+const monitorIdArbitrary = fc.uuid();
+const fallbackIdentifierArbitrary = fc
+    .string({ minLength: 1, maxLength: 48 })
+    .filter((value) => value.trim().length > 0);
+const httpUrlArbitrary = fc
+    .webUrl()
+    .filter((url) => url.startsWith("http://") || url.startsWith("https://"));
+const hostIdentifierArbitrary = fc.oneof(fc.domain(), fc.constant("localhost"));
+const portArbitrary = fc.integer({ min: 1, max: 65_535 });
+const dnsRecordTypeArbitrary = fc.constantFrom(
+    "A",
+    "AAAA",
+    "ANY",
+    "CAA",
+    "CNAME",
+    "MX",
+    "NAPTR",
+    "NS",
+    "PTR",
+    "SOA",
+    "SRV",
+    "TLSA",
+    "TXT"
+);
+
+const buildMinimalMonitor = (overrides: Partial<Monitor>): Monitor =>
+    ({
+        id: overrides.id ?? "monitor-id",
+        type: "http",
+        ...overrides,
+    }) as Monitor;
+
 // Mock the logger module
 vi.mock("../../services/logger", () => ({
     logger: {
@@ -704,18 +736,24 @@ describe("Fallback Utilities", () => {
                 await annotate("Category: Utility", "category");
                 await annotate("Type: Monitoring", "type");
 
-                const monitor: Monitor = {
-                    id: "1",
-                    // name: "Test Monitor", // Monitor interface doesn't have name property
-                    type: "http",
-                    url: "https://example.com",
-                } as unknown as Monitor;
+                await fc.assert(
+                    fc.property(
+                        monitorIdArbitrary,
+                        httpUrlArbitrary,
+                        fallbackIdentifierArbitrary,
+                        (id, url, fallback) => {
+                            const monitor = buildMinimalMonitor({
+                                id,
+                                type: "http",
+                                url,
+                            });
 
-                const result = getMonitorDisplayIdentifier(
-                    monitor,
-                    "Site Fallback"
+                            expect(
+                                getMonitorDisplayIdentifier(monitor, fallback)
+                            ).toBe(url);
+                        }
+                    )
                 );
-                expect(result).toBe("https://example.com");
             });
 
             it("should handle HTTP monitor with undefined URL", async ({
@@ -727,17 +765,24 @@ describe("Fallback Utilities", () => {
                 await annotate("Category: Utility", "category");
                 await annotate("Type: Monitoring", "type");
 
-                const monitor: Monitor = {
-                    id: "1",
-                    // name: "Test Monitor", // Monitor interface doesn't have name property
-                    type: "http",
-                } as unknown as Monitor;
+                await fc.assert(
+                    fc.property(
+                        monitorIdArbitrary,
+                        fallbackIdentifierArbitrary,
+                        (id, fallback) => {
+                            const monitor = buildMinimalMonitor({
+                                id,
+                                type: "http",
+                                url: undefined,
+                                host: undefined,
+                            });
 
-                const result = getMonitorDisplayIdentifier(
-                    monitor,
-                    "Site Fallback"
+                            expect(
+                                getMonitorDisplayIdentifier(monitor, fallback)
+                            ).toBe(fallback);
+                        }
+                    )
                 );
-                expect(result).toBe("Site Fallback");
             });
         });
 
@@ -751,19 +796,27 @@ describe("Fallback Utilities", () => {
                 await annotate("Category: Utility", "category");
                 await annotate("Type: Monitoring", "type");
 
-                const monitor: Monitor = {
-                    id: "1",
-                    // name: "Test Monitor", // Monitor interface doesn't have name property
-                    type: "port",
-                    host: "example.com",
-                    port: 80,
-                } as unknown as Monitor;
+                await fc.assert(
+                    fc.property(
+                        monitorIdArbitrary,
+                        hostIdentifierArbitrary,
+                        portArbitrary,
+                        fallbackIdentifierArbitrary,
+                        (id, host, port, fallback) => {
+                            const monitor = buildMinimalMonitor({
+                                id,
+                                type: "port",
+                                host,
+                                port,
+                                url: undefined,
+                            });
 
-                const result = getMonitorDisplayIdentifier(
-                    monitor,
-                    "Site Fallback"
+                            expect(
+                                getMonitorDisplayIdentifier(monitor, fallback)
+                            ).toBe(`${host}:${port}`);
+                        }
+                    )
                 );
-                expect(result).toBe("example.com:80");
             });
 
             it("should return host only for port monitor without port", async ({
@@ -775,18 +828,26 @@ describe("Fallback Utilities", () => {
                 await annotate("Category: Utility", "category");
                 await annotate("Type: Monitoring", "type");
 
-                const monitor: Monitor = {
-                    id: "1",
-                    // name: "Test Monitor", // Monitor interface doesn't have name property
-                    type: "port",
-                    host: "example.com",
-                } as unknown as Monitor;
+                await fc.assert(
+                    fc.property(
+                        monitorIdArbitrary,
+                        hostIdentifierArbitrary,
+                        fallbackIdentifierArbitrary,
+                        (id, host, fallback) => {
+                            const monitor = buildMinimalMonitor({
+                                id,
+                                type: "port",
+                                host,
+                                port: undefined,
+                                url: undefined,
+                            });
 
-                const result = getMonitorDisplayIdentifier(
-                    monitor,
-                    "Site Fallback"
+                            expect(
+                                getMonitorDisplayIdentifier(monitor, fallback)
+                            ).toBe(host);
+                        }
+                    )
                 );
-                expect(result).toBe("example.com");
             });
 
             it("should use fallback for port monitor with no host", async ({
@@ -798,18 +859,25 @@ describe("Fallback Utilities", () => {
                 await annotate("Category: Utility", "category");
                 await annotate("Type: Monitoring", "type");
 
-                const monitor: Monitor = {
-                    id: "1",
-                    // name: "Test Monitor", // Monitor interface doesn't have name property
-                    type: "port",
-                    port: 80,
-                } as unknown as Monitor;
+                await fc.assert(
+                    fc.property(
+                        monitorIdArbitrary,
+                        portArbitrary,
+                        fallbackIdentifierArbitrary,
+                        (id, port, fallback) => {
+                            const monitor = buildMinimalMonitor({
+                                id,
+                                type: "port",
+                                host: undefined,
+                                port,
+                            });
 
-                const result = getMonitorDisplayIdentifier(
-                    monitor,
-                    "Site Fallback"
+                            expect(
+                                getMonitorDisplayIdentifier(monitor, fallback)
+                            ).toBe(fallback);
+                        }
+                    )
                 );
-                expect(result).toBe("Site Fallback");
             });
         });
 
@@ -823,17 +891,24 @@ describe("Fallback Utilities", () => {
                 await annotate("Category: Utility", "category");
                 await annotate("Type: Monitoring", "type");
 
-                const monitor: Monitor = {
-                    id: "cdn-1",
-                    type: "cdn-edge-consistency",
-                    baselineUrl: "https://baseline.edge.example.com",
-                } as unknown as Monitor;
+                await fc.assert(
+                    fc.property(
+                        monitorIdArbitrary,
+                        httpUrlArbitrary,
+                        fallbackIdentifierArbitrary,
+                        (id, baselineUrl, fallback) => {
+                            const monitor = buildMinimalMonitor({
+                                id,
+                                type: "cdn-edge-consistency",
+                                baselineUrl,
+                            });
 
-                const result = getMonitorDisplayIdentifier(
-                    monitor,
-                    "Site Fallback"
+                            expect(
+                                getMonitorDisplayIdentifier(monitor, fallback)
+                            ).toBe(baselineUrl);
+                        }
+                    )
                 );
-                expect(result).toBe("https://baseline.edge.example.com");
             });
 
             it("should append DNS record type when available", async ({
@@ -845,18 +920,26 @@ describe("Fallback Utilities", () => {
                 await annotate("Category: Utility", "category");
                 await annotate("Type: Monitoring", "type");
 
-                const monitor: Monitor = {
-                    id: "dns-1",
-                    type: "dns",
-                    host: "example.com",
-                    recordType: "AAAA",
-                } as unknown as Monitor;
+                await fc.assert(
+                    fc.property(
+                        monitorIdArbitrary,
+                        hostIdentifierArbitrary,
+                        dnsRecordTypeArbitrary,
+                        fallbackIdentifierArbitrary,
+                        (id, host, recordType, fallback) => {
+                            const monitor = buildMinimalMonitor({
+                                id,
+                                type: "dns",
+                                host,
+                                recordType,
+                            });
 
-                const result = getMonitorDisplayIdentifier(
-                    monitor,
-                    "Site Fallback"
+                            expect(
+                                getMonitorDisplayIdentifier(monitor, fallback)
+                            ).toBe(`${host} (${recordType})`);
+                        }
+                    )
                 );
-                expect(result).toBe("example.com (AAAA)");
             });
 
             it("should prefer primary status URL for replication monitors", async ({
@@ -868,18 +951,26 @@ describe("Fallback Utilities", () => {
                 await annotate("Category: Utility", "category");
                 await annotate("Type: Monitoring", "type");
 
-                const monitor: Monitor = {
-                    id: "replication-1",
-                    type: "replication",
-                    primaryStatusUrl: "https://primary.status",
-                    replicaStatusUrl: "https://replica.status",
-                } as unknown as Monitor;
+                await fc.assert(
+                    fc.property(
+                        monitorIdArbitrary,
+                        httpUrlArbitrary,
+                        httpUrlArbitrary,
+                        fallbackIdentifierArbitrary,
+                        (id, primaryUrl, replicaUrl, fallback) => {
+                            const monitor = buildMinimalMonitor({
+                                id,
+                                type: "replication",
+                                primaryStatusUrl: primaryUrl,
+                                replicaStatusUrl: replicaUrl,
+                            });
 
-                const result = getMonitorDisplayIdentifier(
-                    monitor,
-                    "Site Fallback"
+                            expect(
+                                getMonitorDisplayIdentifier(monitor, fallback)
+                            ).toBe(primaryUrl);
+                        }
+                    )
                 );
-                expect(result).toBe("https://primary.status");
             });
 
             it("should fall back to replica status URL when primary is missing", async ({
@@ -891,17 +982,25 @@ describe("Fallback Utilities", () => {
                 await annotate("Category: Utility", "category");
                 await annotate("Type: Monitoring", "type");
 
-                const monitor: Monitor = {
-                    id: "replication-2",
-                    type: "replication",
-                    replicaStatusUrl: "https://replica-only.status",
-                } as unknown as Monitor;
+                await fc.assert(
+                    fc.property(
+                        monitorIdArbitrary,
+                        httpUrlArbitrary,
+                        fallbackIdentifierArbitrary,
+                        (id, replicaUrl, fallback) => {
+                            const monitor = buildMinimalMonitor({
+                                id,
+                                type: "replication",
+                                primaryStatusUrl: undefined,
+                                replicaStatusUrl: replicaUrl,
+                            });
 
-                const result = getMonitorDisplayIdentifier(
-                    monitor,
-                    "Site Fallback"
+                            expect(
+                                getMonitorDisplayIdentifier(monitor, fallback)
+                            ).toBe(replicaUrl);
+                        }
+                    )
                 );
-                expect(result).toBe("https://replica-only.status");
             });
         });
 
@@ -915,18 +1014,28 @@ describe("Fallback Utilities", () => {
                 await annotate("Category: Utility", "category");
                 await annotate("Type: Error Handling", "type");
 
-                const monitor: Monitor = {
-                    id: "1",
-                    // name: "Test Monitor", // Monitor interface doesn't have name property
-                    type: "http",
-                    url: "https://example.com",
-                } as unknown as Monitor;
+                await fc.assert(
+                    fc.property(
+                        monitorIdArbitrary,
+                        httpUrlArbitrary,
+                        fallbackIdentifierArbitrary,
+                        (id, url, fallback) => {
+                            const monitor = buildMinimalMonitor({
+                                id,
+                                type: "port",
+                                url,
+                                host: undefined,
+                                port: undefined,
+                            });
 
-                const result = getMonitorDisplayIdentifier(
-                    monitor,
-                    "Site Fallback"
+                            const result = getMonitorDisplayIdentifier(
+                                monitor,
+                                fallback
+                            );
+                            expect(result).toBe(url);
+                        }
+                    )
                 );
-                expect(result).toBe("https://example.com");
             });
 
             it("should use host from generic identifier", async ({
@@ -938,18 +1047,27 @@ describe("Fallback Utilities", () => {
                 await annotate("Category: Utility", "category");
                 await annotate("Type: Business Logic", "type");
 
-                const monitor: Monitor = {
-                    id: "1",
-                    // name: "Test Monitor", // Monitor interface doesn't have name property
-                    type: "http",
-                    host: "example.com",
-                } as unknown as Monitor;
+                await fc.assert(
+                    fc.property(
+                        monitorIdArbitrary,
+                        hostIdentifierArbitrary,
+                        fallbackIdentifierArbitrary,
+                        (id, host, fallback) => {
+                            const monitor = buildMinimalMonitor({
+                                id,
+                                type: "http",
+                                host,
+                                url: undefined,
+                            });
 
-                const result = getMonitorDisplayIdentifier(
-                    monitor,
-                    "Site Fallback"
+                            const result = getMonitorDisplayIdentifier(
+                                monitor,
+                                fallback
+                            );
+                            expect(result).toBe(host);
+                        }
+                    )
                 );
-                expect(result).toBe("example.com");
             });
 
             it("should use host:port from generic identifier", async ({
@@ -961,19 +1079,29 @@ describe("Fallback Utilities", () => {
                 await annotate("Category: Utility", "category");
                 await annotate("Type: Business Logic", "type");
 
-                const monitor: Monitor = {
-                    id: "1",
-                    // name: "Test Monitor", // Monitor interface doesn't have name property
-                    type: "http",
-                    host: "example.com",
-                    port: 8080,
-                } as unknown as Monitor;
+                await fc.assert(
+                    fc.property(
+                        monitorIdArbitrary,
+                        hostIdentifierArbitrary,
+                        portArbitrary,
+                        fallbackIdentifierArbitrary,
+                        (id, host, port, fallback) => {
+                            const monitor = buildMinimalMonitor({
+                                id,
+                                type: "http",
+                                host,
+                                port,
+                                url: undefined,
+                            });
 
-                const result = getMonitorDisplayIdentifier(
-                    monitor,
-                    "Site Fallback"
+                            const result = getMonitorDisplayIdentifier(
+                                monitor,
+                                fallback
+                            );
+                            expect(result).toBe(`${host}:${port}`);
+                        }
+                    )
                 );
-                expect(result).toBe("example.com:8080");
             });
         });
 
@@ -987,17 +1115,25 @@ describe("Fallback Utilities", () => {
                 await annotate("Category: Utility", "category");
                 await annotate("Type: Monitoring", "type");
 
-                const monitor: Monitor = {
-                    id: "1",
-                    // name: "Test Monitor", // Monitor interface doesn't have name property
-                    type: "http",
-                } as unknown as Monitor;
+                await fc.assert(
+                    fc.property(
+                        monitorIdArbitrary,
+                        fallbackIdentifierArbitrary,
+                        (id, fallback) => {
+                            const monitor = buildMinimalMonitor({
+                                id,
+                                type: "http",
+                                url: undefined,
+                                host: undefined,
+                                port: undefined,
+                            });
 
-                const result = getMonitorDisplayIdentifier(
-                    monitor,
-                    "Site Fallback"
+                            expect(
+                                getMonitorDisplayIdentifier(monitor, fallback)
+                            ).toBe(fallback);
+                        }
+                    )
                 );
-                expect(result).toBe("Site Fallback");
             });
 
             it("should handle different fallback values", async ({
@@ -1009,17 +1145,28 @@ describe("Fallback Utilities", () => {
                 await annotate("Category: Utility", "category");
                 await annotate("Type: Business Logic", "type");
 
-                const monitor: Monitor = {
-                    id: "1",
-                    // name: "Test Monitor", // Monitor interface doesn't have name property
-                    type: "http",
-                } as unknown as Monitor;
+                await fc.assert(
+                    fc.property(
+                        monitorIdArbitrary,
+                        fallbackIdentifierArbitrary,
+                        fallbackIdentifierArbitrary,
+                        (id, fallbackA, fallbackB) => {
+                            const monitor = buildMinimalMonitor({
+                                id,
+                                type: "http",
+                                url: undefined,
+                                host: undefined,
+                                port: undefined,
+                            });
 
-                expect(
-                    getMonitorDisplayIdentifier(monitor, "Custom Fallback")
-                ).toBe("Custom Fallback");
-                expect(getMonitorDisplayIdentifier(monitor, "http")).toBe(
-                    "http"
+                            expect(
+                                getMonitorDisplayIdentifier(monitor, fallbackA)
+                            ).toBe(fallbackA);
+                            expect(
+                                getMonitorDisplayIdentifier(monitor, fallbackB)
+                            ).toBe(fallbackB);
+                        }
+                    )
                 );
             });
 

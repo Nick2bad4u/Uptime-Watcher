@@ -141,6 +141,26 @@ const sidebars: SidebarsConfig = {
             type: "category",
         },
         {
+            className: "sb-cat-blog",
+            collapsed: true,
+            customProps: { badge: "blog" },
+            items: [
+                {
+                    href: "/Uptime-Watcher/blog",
+                    label: "📰 Blog Home",
+                    type: "link",
+                },
+            ],
+            label: "📰 Blog",
+            link: {
+                description:
+                    "Development updates, deep dives, and release notes.",
+                title: "Blog",
+                type: "generated-index",
+            },
+            type: "category",
+        },
+        {
             className: "sb-cat-tsdoc",
             collapsed: true,
             customProps: { badge: "docs" },

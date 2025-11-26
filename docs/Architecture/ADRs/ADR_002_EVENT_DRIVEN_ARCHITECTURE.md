@@ -296,6 +296,47 @@ renderer must react.
 - `config:changed` - Configuration changes
 - `cache:invalidated` - Cache invalidation events
 
+### Event Summary Table (Public Events)
+
+The following table summarizes the primary public events by domain. Internal
+events (`internal:*`) are documented inline in the sections above and are
+omitted here for brevity.
+
+| Domain              | Event name                       | Description                                           |
+| ------------------- | -------------------------------- | ----------------------------------------------------- |
+| Site                | `site:added`                     | When a site is successfully added.                    |
+| Site                | `site:updated`                   | When site properties are modified.                    |
+| Site                | `site:removed`                   | When a site is deleted.                               |
+| Site / State Sync   | `sites:state-synchronized`       | When frontend and backend site state are synchronized |
+| Monitor             | `monitor:added`                  | When a monitor is created.                            |
+| Monitor             | `monitor:removed`                | When a monitor is deleted.                            |
+| Monitor             | `monitor:status-changed`         | When monitor status changes.                          |
+| Monitor             | `monitor:up`                     | When a monitor detects service is online.             |
+| Monitor             | `monitor:down`                   | When a monitor detects service is offline.            |
+| Monitor             | `monitor:check-completed`        | When a health check finishes.                         |
+| Database            | `database:transaction-completed` | When database transactions finish.                    |
+| Database            | `database:error`                 | When database operations fail.                        |
+| Database            | `database:success`               | When database operations succeed.                     |
+| Database            | `database:retry`                 | When database operations are retried.                 |
+| Database            | `database:backup-created`        | When database backups are created.                    |
+| System / Monitoring | `monitoring:started`             | When the monitoring system starts.                    |
+| System / Monitoring | `monitoring:stopped`             | When the monitoring system stops.                     |
+| System              | `system:startup`                 | Application startup.                                  |
+| System              | `system:shutdown`                | Application shutdown.                                 |
+| System              | `system:error`                   | System-level errors.                                  |
+| Performance         | `performance:metric`             | Performance measurements.                             |
+| Performance         | `performance:warning`            | Performance threshold alerts.                         |
+| Configuration       | `config:changed`                 | Configuration changes.                                |
+| Cache               | `cache:invalidated`              | Cache invalidation events.                            |
+
+> **Event catalog note:** The table above intentionally focuses on the
+> externally relevant public events. The authoritative event payload types
+> live in `shared/types/events.ts` and the Electron event bus definitions.
+> Long term, a generated event catalog (similar to
+> `docs/Architecture/generated/IPC_CHANNEL_INVENTORY.md` for IPC channels)
+> may be introduced to keep this table and the code-level contracts perfectly
+> synchronized.
+
 ## Consequences
 
 ### Positive

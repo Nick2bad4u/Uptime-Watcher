@@ -33,20 +33,6 @@ const createMonitor = (overrides: Partial<Monitor> = {}): Monitor =>
         ...overrides,
     }) as Monitor;
 
-const hostLabelCharacters = [
-    ..."abcdefghijklmnopqrstuvwxyz",
-    ..."0123456789",
-    "-",
-] as const;
-
-const hostLabelArbitrary = fc
-    .array(fc.constantFrom(...hostLabelCharacters), {
-        minLength: 1,
-        maxLength: 8,
-    })
-    .map((chars) => chars.join(""))
-    .filter((label) => /^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/u.test(label));
-
 const portMonitorHostArbitrary = fc.oneof(
     fc.domain(),
     fc.constant("localhost")

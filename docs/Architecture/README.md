@@ -22,15 +22,16 @@ tags:
 1. [📁 Directory Structure](#-directory-structure)
 2. [🏗️ Architecture Decision Records (ADRs)](#️-architecture-decision-records-adrs)
 3. [📋 Development Patterns](#-development-patterns)
-4. [🛠️ Code Templates](#️-code-templates)
-5. [📚 Documentation Standards](#-documentation-standards)
-6. [🧾 Generated Artifacts](#-generated-artifacts)
-7. [🎯 Using This Documentation](#-using-this-documentation)
-8. [🔄 Maintenance Guidelines](#-maintenance-guidelines)
-9. [📊 Compliance Tracking](#-compliance-tracking)
-10. [Current Documentation Audit (2025-11-04)](#current-documentation-audit-2025-11-04)
-11. [🚀 Quick Start](#-quick-start)
-12. [📞 Support](#-support)
+4. [🧩 Recent Consistency Updates](#-recent-consistency-updates)
+5. [🛠️ Code Templates](#️-code-templates)
+6. [📚 Documentation Standards](#-documentation-standards)
+7. [🧾 Generated Artifacts](#-generated-artifacts)
+8. [🎯 Using This Documentation](#-using-this-documentation)
+9. [🔄 Maintenance Guidelines](#-maintenance-guidelines)
+10. [📊 Compliance Tracking](#-compliance-tracking)
+11. [Current Documentation Audit (2025-11-04)](#current-documentation-audit-2025-11-04)
+12. [🚀 Quick Start](#-quick-start)
+13. [📞 Support](#-support)
 
 ## 📁 Directory Structure
 
@@ -180,6 +181,23 @@ End-to-end walkthrough of the main-process site loading pipeline:
 - Asynchronous `MonitoringConfig` guarantees (history limit, start/stop propagation)
 - Renderer synchronization (`sites:state-synchronized`) and background hydration logic
 
+## 🧩 Recent Consistency Updates
+
+The following areas were recently clarified and brought into closer alignment
+with the implemented architecture:
+
+- **Event naming**: ADR-002 and ADR-005 now include an explicit public-event
+  summary table and terminology notes that match the canonical
+  `UptimeEvents`/`OrchestratorEvents` definitions in code.
+- **History limit behavior**: The history-limit propagation section and
+  `SettingsService.updateHistoryLimit` documentation precisely describe how
+  invalid user input and invalid backend responses are handled, including when
+  a `TypeError` is surfaced versus when a sanitised fallback is used.
+- **Error model and helper usage**: The error handling guide and ADR-003 now
+  share a single helper-selection model covering `withErrorHandling`,
+  `withUtilityErrorHandling`, JSON/object safety helpers, and the
+  renderer-specific wrappers in `src/utils/fallbacks.ts`.
+
 ### History limit propagation (settings & database)
 
 This subsection summarizes how history limit changes flow through the system.
@@ -246,6 +264,20 @@ For full implementation details, see the code references listed in
    - Store operations update local state based on the authoritative event
      payload, ensuring the renderer reflects the same limit as the backend and
      that future monitoring operations use the updated retention rules.
+
+**Error handling semantics**
+
+- **Invalid user input**: When the caller supplies a limit that violates the
+  shared history rules (for example, exceeding the configured maximum),
+  `SettingsService.updateHistoryLimit` surfaces a `TypeError` (via
+  `normalizeHistoryLimitError`). Callers should treat this as a user-input
+  validation error and avoid assuming the limit was changed.
+- **Invalid backend response**: When the caller supplies a valid limit but the
+  backend returns an invalid value, the renderer falls back to the sanitised
+  request limit, logs a structured warning, and forwards the corrected limit
+  through `settings:history-limit-updated`. This ensures the renderer and
+  backend converge on a consistent value even in the presence of transient
+  backend issues.
 
 This flow keeps history-limit logic centralized in the database/manager layer
 while providing a clear, event-driven path from a user action in the UI to the

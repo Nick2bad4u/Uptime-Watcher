@@ -707,10 +707,22 @@ try {
 
 ### 2. Use Appropriate Error Handling Level
 
-- **Utilities**: `withUtilityErrorHandling()`
-- **Database**: `withDatabaseOperation()`
-- **Frontend**: `withErrorHandling()` with store
-- **Backend**: `withErrorHandling()` with logger
+- **Utilities**: `withUtilityErrorHandling()` for shared and backend helpers
+  that need simple fallback behavior.
+- **Database**: `withDatabaseOperation()` for repository and transactional
+  operations.
+- **Frontend stores**: `withErrorHandling()` together with
+  `createStoreErrorHandler()` for Zustand stores so errors and loading state
+  flow through `useErrorStore`.
+- **Frontend UI events**: `withAsyncErrorHandling()` /
+  `withSyncErrorHandling()` (see `src/utils/fallbacks.ts`) for simple React
+  handlers that only need logging and a local fallback.
+- **Backend services and IPC handlers**: `withErrorHandling()` with
+  `{ logger, operationName }` for service methods and IPC handlers.
+
+See the "Helper selection matrix" section in
+`docs/Guides/ERROR_HANDLING_GUIDE.md` for concrete examples and additional
+scenarios.
 
 ### 3. Emit Events for Failures
 

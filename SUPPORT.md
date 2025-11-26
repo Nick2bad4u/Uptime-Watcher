@@ -42,7 +42,7 @@ First, please check our comprehensive documentation:
 
 - **[Project README](README.md)** - Project overview and quick start
 - **[Documentation directory](docs/)** - Detailed documentation and guides
-- **[Troubleshooting Guide](docs/Guides/troubleshooting.md)** - Common issues and solutions
+- **[Troubleshooting Guide](docs/Guides/TROUBLESHOOTING.md)** - Common issues and solutions
 
 ### 🐛 Reporting Bugs
 
@@ -94,14 +94,14 @@ Please follow these guidelines when seeking support:
 1. **Application won't start**: Check Node.js version (>=24.8.0 required)
 2. **Build failures**: Try `npm clean-install` to refresh dependencies
 3. **Test failures**: Ensure you're using the correct Node.js version
-4. **Electron issues**: Check our [Electron troubleshooting guide](docs/Guides/troubleshooting.md)
+4. **Electron issues**: Check our [Electron troubleshooting guide](docs/Guides/TROUBLESHOOTING.md)
 
 ### Development Setup
 
 1. Clone the repository
 2. Run `npm install --force` to install dependencies
 3. Use `npm run build` to compile the project
-4. Run `npm start` to launch the application
+4. Run `npm run electron-dev` to launch the application (Vite + Electron)
 
 ## 📞 Contact Information
 
