@@ -1,8 +1,8 @@
 ---
-agent: "BeastMode"
-argument-hint: "Review low confidence AI claims to ensure they are valid issues and implement fixes as needed"
 name: "Low-Confidence-AI-Review"
+agent: "BeastMode"
 description: "Review low confidence AI claims to ensure they are valid issues and implement fixes as needed"
+argument-hint: "Review low confidence AI claims to ensure they are valid issues and implement fixes as needed"
 ---
 
 # Low Confidence AI Claims Review Prompt

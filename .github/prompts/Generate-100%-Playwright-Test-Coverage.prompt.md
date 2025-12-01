@@ -1,8 +1,8 @@
 ---
-agent: "BeastMode"
 name: "Generate-Playwright-Test-Coverage-2"
-argument-hint: "Generate 100% Playwright Test Coverage"
+agent: "BeastMode"
 description: "Generate 100% Playwright Test Coverage"
+argument-hint: "Generate 100% Playwright Test Coverage"
 ---
 # Generate Comprehensive Playwright Test Coverage
 

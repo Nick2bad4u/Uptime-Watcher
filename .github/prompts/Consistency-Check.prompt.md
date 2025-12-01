@@ -1,8 +1,8 @@
 ---
+name: "ConsistencyCheck"
 agent: "BeastMode"
 description: "Run a consistency audit tailored for the Uptime Watcher Electron + React stack."
 argument-hint: "Ensure architectural alignment and uniformity across layers and modules in Uptime Watcher."
-name: "ConsistencyCheck"
 ---
 
 # Uptime Watcher Consistency Audit Prompt

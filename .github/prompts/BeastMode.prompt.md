@@ -1,8 +1,8 @@
 ---
+name: "BeastModePrompt"
 agent: "BeastMode"
 description: "Beast Mode 3.1: An autonomous agent that solves problems step by step, iterating until the problem is completely resolved."
 argument-hint: "Beast Mode 3.1: An autonomous agent that solves problems step by step, iterating until the problem is completely resolved."
-name: "BeastModePrompt"
 ---
 
 # Beast Mode 3.1

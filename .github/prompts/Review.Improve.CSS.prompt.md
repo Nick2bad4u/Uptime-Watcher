@@ -1,8 +1,8 @@
 ---
-agent: "BeastMode"
-argument-hint: "This task involves reviewing the UI/CSS of the entire application to identify issues, improvements, and optimization opportunities while recommending modern CSS best practices."
-description: "Comprehensive UI/CSS Audit"
 name: "Comprehensive-UI-CSS-Audit"
+agent: "BeastMode"
+description: "Comprehensive UI/CSS Audit"
+argument-hint: "This task involves reviewing the UI/CSS of the entire application to identify issues, improvements, and optimization opportunities while recommending modern CSS best practices."
 ---
 
 # Comprehensive UI/CSS Audit Prompt for Long-Form Analysis

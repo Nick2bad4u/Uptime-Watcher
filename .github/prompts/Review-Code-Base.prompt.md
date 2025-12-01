@@ -1,8 +1,8 @@
 ---
-agent: "BeastMode"
-argument-hint: "Deep Review Prompt: Exhaustive multi-dimensional scan of the entire project for risks & improvements."
 name: "Deep-Review-Code-Base"
+agent: "BeastMode"
 description: "Deep Review Prompt: Exhaustive multi-dimensional scan of the entire project for risks & improvements."
+argument-hint: "Deep Review Prompt: Exhaustive multi-dimensional scan of the entire project for risks & improvements."
 ---
 
 # Deep Review Mode

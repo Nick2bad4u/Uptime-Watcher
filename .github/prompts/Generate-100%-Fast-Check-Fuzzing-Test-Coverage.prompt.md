@@ -1,9 +1,9 @@
 ---
-agent: "BeastMode"
-argument-hint: "Generate 100% Fast-Check Fuzzing Test Coverage"
 name: "Generate-Fast-Check-Coverage-2"
+agent: "BeastMode"
 description: "Generate 100% Fast-Check Fuzzing Test Coverage"
 
+argument-hint: "Generate 100% Fast-Check Fuzzing Test Coverage"
 ---
 *Note: This is a generic prompt to achieve complete Playwright test coverage for a JavaScript/TypeScript project. You might have to adapt based on the current state of the codebase or recent changes. Use unlimited time and requests as needed.*
 

@@ -1,8 +1,8 @@
 ---
-agent: "BeastMode"
-argument-hint: "Generate 100% Test Coverage"
 name: "Generate-Test-Coverage"
+agent: "BeastMode"
 description: "Generate 100% Test Coverage"
+argument-hint: "Generate 100% Test Coverage"
 ---
 
 *Note: This is a generic prompt to achieve complete test coverage for a JavaScript/TypeScript project. You might have to adapt based on the current state of the codebase or recent changes. This prompt strives to achieve 95% coverage (or 100% if already above 95%) across all metrics, but it doesn't mean you have to do it in one go. Use unlimited time and requests as needed.*

@@ -1,8 +1,8 @@
 ---
-agent: "BeastMode"
-argument-hint: "Generate end-to-end tests using Playwright"
 name: "E2E-Tests-Playwright"
+agent: "BeastMode"
 description: "Generate end-to-end tests using Playwright"
+argument-hint: "Generate end-to-end tests using Playwright"
 ---
 
 Create E2E tests for: ${input:featureName}

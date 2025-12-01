@@ -1,8 +1,8 @@
 ---
-agent: "BeastMode"
-argument-hint: "Review and update the project's coding documentation to ensure accuracy and completeness."
 name: "Document-Review"
+agent: "BeastMode"
 description: "Review and Update Coding Documentation"
+argument-hint: "Review and update the project's coding documentation to ensure accuracy and completeness."
 ---
 
 # Review and Update Coding Documentation

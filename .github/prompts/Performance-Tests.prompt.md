@@ -1,8 +1,8 @@
 ---
-agent: "BeastMode"
-argument-hint: "Create performance benchmarks and optimization tests"
 name: "Performance-Tests"
+agent: "BeastMode"
 description: "Create performance benchmarks and optimization tests"
+argument-hint: "Create performance benchmarks and optimization tests"
 ---
 
 Create performance tests and benchmarks for: ${input:feature}

@@ -1,8 +1,8 @@
 ---
-agent: "BeastMode"
-argument-hint: "This task involves reviewing the entire TODO list for completion, finishing any unfinished items, ensuring all linters, tests, and typechecks pass, and conducting a final review of all work."
-description: "Review TODO List Completion, Run Quality Checks, and Review Work"
 name: "Review"
+agent: "BeastMode"
+description: "Review TODO List Completion, Run Quality Checks, and Review Work"
+argument-hint: "This task involves reviewing the entire TODO list for completion, finishing any unfinished items, ensuring all linters, tests, and typechecks pass, and conducting a final review of all work."
 ---
 
 - Begin by reviewing the entire TODO list in the designated TODO.md file at the repository root. Assess each item for completion status, implementation details, and any outstanding issues.

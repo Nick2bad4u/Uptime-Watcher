@@ -1,8 +1,8 @@
 ---
-agent: "BeastMode"
-argument-hint: "Review TSDoc comments to ensure they are accurate, complete, and compliant with project standards."
 name: "TSDoc-Improvements-Checklist"
+agent: "BeastMode"
 description: "Review TSDoc comments to ensure they are accurate, complete, and compliant with project standards."
+argument-hint: "Review TSDoc comments to ensure they are accurate, complete, and compliant with project standards."
 ---
 
 ## Task

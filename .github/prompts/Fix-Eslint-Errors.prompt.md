@@ -1,8 +1,8 @@
 ---
-agent: "BeastMode"
-argument-hint: "Fix All ESLint Errors and Warnings"
 name: "FixEslintErrors"
+agent: "BeastMode"
 description: "Fix All ESLint Errors and Warnings"
+argument-hint: "Fix All ESLint Errors and Warnings"
 ---
 
 # Review All ESLint Errors and Warnings

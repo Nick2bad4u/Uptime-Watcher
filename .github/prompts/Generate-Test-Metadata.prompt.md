@@ -1,8 +1,8 @@
 ---
-agent: "BeastMode"
-argument-hint: "Add Metadata and Benchmarks to existing tests"
 name: "Generate-Test-Metadata"
+agent: "BeastMode"
 description: "Add Metadata and Benchmarks to existing tests"
+argument-hint: "Add Metadata and Benchmarks to existing tests"
 ---
 
 1. I want you to work on creating Vitest Benchmarks for our most critical heavy compute areas.

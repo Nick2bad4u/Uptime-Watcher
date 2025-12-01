@@ -1,8 +1,8 @@
 ---
-agent: "BeastMode"
-argument-hint: "Improve Test Coverage with Property-Based Tests"
 name: "Enhance-Tests-With-Property-Based"
+agent: "BeastMode"
 description: "Improve Test Coverage by Replacing Generic Tests with Property-Based Tests Using fast-check"
+argument-hint: "Improve Test Coverage with Property-Based Tests"
 ---
 
 *Note: This prompt extends the generic test coverage prompt by adding specific instructions to replace generic tests with property-based tests using fast-check, and to improve test metadata and quality. Use unlimited time and requests as needed.*

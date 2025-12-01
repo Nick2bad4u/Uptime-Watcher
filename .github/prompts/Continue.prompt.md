@@ -1,8 +1,8 @@
 ---
-agent: "BeastMode"
-argument-hint: "Continue working through the existing TODO list, resuming from where you left off."
-description: "Continue Addressing TODO List Items"
 name: "Continue"
+agent: "BeastMode"
+description: "Continue Addressing TODO List Items"
+argument-hint: "Continue working through the existing TODO list, resuming from where you left off."
 ---
 
 - This is a generic continuation prompt to pick up where you left off in the TODO list, you might have to adapt based on the current state of the TODO list. The file is located at the repository root as TODO.md.

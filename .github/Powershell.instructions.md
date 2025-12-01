@@ -1,7 +1,7 @@
 ---
 name: "Powershell-Cmdlet-Development-Guidelines"
-applyTo: "**/*.ps1,**/*.psm1, **/*.psd1, **/*.pssc, **/*.ps1xml"
 description: "PowerShell cmdlet and scripting best practices based on Microsoft guidelines"
+applyTo: "**/*.ps1, **/*.psm1, **/*.psd1, **/*.pssc, **/*.ps1xml"
 ---
 
 # PowerShell Cmdlet Development Guidelines

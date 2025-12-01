@@ -1,8 +1,8 @@
 ---
-agent: "BeastMode"
-argument-hint: "Types Final comprehensive review"
 name: "Types-Double-Check"
+agent: "BeastMode"
 description: "Types Final comprehensive review"
+argument-hint: "Types Final comprehensive review"
 ---
 
 - Perform a thorough review of all recent changes you made to identify any missed references to the types that were changed or added. Check for conflicting or duplicate interfaces, type errors, etc, and lint issues across the codebase. Also, look for additional opportunities to strengthen type safety while you do this.

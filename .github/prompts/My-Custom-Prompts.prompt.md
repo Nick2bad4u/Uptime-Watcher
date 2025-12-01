@@ -1,8 +1,8 @@
 ---
+name: "My-Custom-Prompts"
 agent: "BeastMode"
 description: "Random Scattered Prompts"
 argument-hint: "Comprehensive Code Cleanup and Review Instructions"
-name: "My-Custom-Prompts"
 ---
 
 # Comprehensive Code Cleanup and Review Instructions

@@ -1,8 +1,8 @@
 ---
-agent: "BeastMode"
-argument-hint: "Review new pull requests (PRs) against the Uptime Watcher repository in a low-confidence safe mode, ensuring correctness and adherence to project standards."
 name: "PR-Review"
+agent: "BeastMode"
 description: "Review new pull requests (PRs) against the Uptime Watcher repository in a low-confidence safe mode, ensuring correctness and adherence to project standards."
+argument-hint: "Review new pull requests (PRs) against the Uptime Watcher repository in a low-confidence safe mode, ensuring correctness and adherence to project standards."
 ---
 # PR Review Assistant — Low-Confidence Safe Mode
 

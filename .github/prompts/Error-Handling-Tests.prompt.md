@@ -1,8 +1,8 @@
 ---
-agent: "BeastMode"
-argument-hint: "Create comprehensive error handling and logging tests"
 name: "Error-Handling-Tests"
+agent: "BeastMode"
 description: "Create comprehensive error handling and logging tests"
+argument-hint: "Create comprehensive error handling and logging tests"
 ---
 
 Generate error handling and logging tests for: ${input:moduleOrFeature}

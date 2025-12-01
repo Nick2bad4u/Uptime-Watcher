@@ -1,8 +1,8 @@
 ---
-agent: "BeastMode"
-argument-hint: "Investigate Removal of Eslint-Disable comments and Warnings"
 name: "Remove-Eslint-Disable"
+agent: "BeastMode"
 description: "Investigate Removal of Eslint-Disable comments and Warnings"
+argument-hint: "Investigate Removal of Eslint-Disable comments and Warnings"
 ---
 
 # Review All ESLint disable comments and Warnings

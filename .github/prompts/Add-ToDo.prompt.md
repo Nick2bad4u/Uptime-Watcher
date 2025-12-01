@@ -1,8 +1,8 @@
 ---
-agent: "BeastMode"
-argument-hint: "This task involves creating a detailed TODO list and systematically addressing each issue using available tools."
 name: "AddToDo"
+agent: "BeastMode"
 description: "Create Detailed TODO List and Address Issues"
+argument-hint: "This task involves creating a detailed TODO list and systematically addressing each issue using available tools."
 ---
 
 # Uptime Watcher TODO Management Prompt

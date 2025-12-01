@@ -1,8 +1,8 @@
 ---
-agent: "BeastMode"
-argument-hint: "This task involves reviewing the entire test suites and linters to ensure they all pass successfully without any errors or warnings."
-description: "Review Test Suites and Linters"
 name: "Review-Linters-Test-Suites"
+agent: "BeastMode"
+description: "Review Test Suites and Linters"
+argument-hint: "This task involves reviewing the entire test suites and linters to ensure they all pass successfully without any errors or warnings."
 ---
 
 -  Run comprehensive quality checks: execute linters (e.g., via `lint:all` or `lint:fix` tasks), run the full test suite (e.g., via `Test`, `Test:Coverage`, and `Test:Playwright` tasks), and perform type-checking (e.g., via `Type-check:all` task). Capture and summarize outputs, fixing any failures before proceeding.

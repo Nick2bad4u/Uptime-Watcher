@@ -1,8 +1,8 @@
 ---
-agent: "BeastMode"
-argument-hint: "Fulfill All Prompts in Stryker Mutator Workflow"
 name: "Stryker-Generate-Stryke-Mutator-Fixes"
+agent: "BeastMode"
 description: "Fulfill All Prompts in Stryker Mutator Workflow"
+argument-hint: "Fulfill All Prompts in Stryker Mutator Workflow"
 ---
 
 # Stryker Mutator Prompt Fulfillment Workflow
