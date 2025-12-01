@@ -33,7 +33,7 @@ handoffs:
    prompt: Continue working on the ToDo list items. You have unlimited compute and resources, accomplish the rest of the todo list. Follow the plan in .github/prompts/Continue.prompt.md
  - label: Continue[No-Prompt]
    agent: BeastMode
-   prompt: Continue working on the ToDo list items. You have unlimited compute and resources, work on accomplishing the rest of the todo list. Use your own judgement and keep going as long as needed.
+   prompt: Continue working on the ToDo list items. You have unlimited compute and resources, work on accomplishing the rest of the todo list. Use your own judgement and keep going as long as needed. Finish all tasks properly and thoroughly according to best practices. No shortcuts, no stubbing, no half-measures. Do whatever it takes to get everything done perfectly.
    send: true
  - label: Review
    agent: BeastMode
@@ -43,7 +43,7 @@ handoffs:
    agent: BeastMode
    prompt: "Keep looking for generic name/objects and change them into fast-check props. Make sure you're looking in all test folders: `src/tests` `tests/` `electron/tests` `shared/tests` - Don't slack off and look hard for more generic names to fix. Keep going until you can't find any more. Search deeply and thoroughly."
    send: true
-tools: ['execute/testFailure', 'execute/getTerminalOutput', 'execute/runTask', 'execute/getTaskOutput', 'execute/runInTerminal', 'execute/runTests', 'read/readFile', 'edit/createDirectory', 'edit/createFile', 'edit/editFiles', 'search/changes', 'search/codebase', 'search/fileSearch', 'search/listDirectory', 'search/problems', 'search/textSearch', 'search/usages', 'tavily-remote-mcp/tavily_extract', 'tavily-remote-mcp/tavily_search', 'deepwiki/ask_question', 'vscode-mcp/execute_command', 'vscode-mcp/get_diagnostics', 'vscode-mcp/get_references', 'vscode-mcp/get_symbol_lsp_info', 'agent', 'updateUserPreferences', 'memory', 'todo']
+tools: ['execute/testFailure', 'execute/getTerminalOutput', 'execute/runTask', 'execute/getTaskOutput', 'execute/runInTerminal', 'execute/runTests', 'read/readFile', 'edit/createDirectory', 'edit/createFile', 'edit/editFiles', 'search/changes', 'search/codebase', 'search/fileSearch', 'search/listDirectory', 'search/problems', 'search/textSearch', 'search/usages', 'tavily-remote-mcp/*', 'deepwiki/ask_question', 'vscode-mcp/execute_command', 'vscode-mcp/get_diagnostics', 'vscode-mcp/get_references', 'vscode-mcp/get_symbol_lsp_info', 'agent', 'digitarald.agent-handoff/handoff', 'updateUserPreferences', 'memory', 'todo']
 ---
 
 <instructions>
