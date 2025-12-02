@@ -19,6 +19,10 @@ import {
     safeParseTimeout,
     safeParseTimestamp,
 } from "../../utils/safeConversions";
+import {
+    MAX_TIMEOUT_MILLISECONDS,
+    MIN_TIMEOUT_MILLISECONDS,
+} from "../../types/units";
 
 describe("Shared Safe Conversions - Backend Coverage", () => {
     // COVERAGE CRITICAL: Call every function to ensure 100% coverage
@@ -610,11 +614,25 @@ describe("Shared Safe Conversions - Backend Coverage", () => {
                         if (
                             typeof input === "number" &&
                             !Number.isNaN(input) &&
+                            Number.isFinite(input) &&
                             input >= 1000
                         ) {
-                            expect(result).toBe(input);
+                            expect(result).toBe(
+                                Math.min(
+                                    Math.trunc(input),
+                                    MAX_TIMEOUT_MILLISECONDS
+                                )
+                            );
                         } else {
-                            expect(result).toBe(defaultVal);
+                            const expectedDefault = Math.min(
+                                Math.trunc(
+                                    Number.isFinite(defaultVal)
+                                        ? defaultVal
+                                        : 1000
+                                ),
+                                MAX_TIMEOUT_MILLISECONDS
+                            );
+                            expect(result).toBe(expectedDefault);
                         }
                     }
                 )
@@ -675,7 +693,13 @@ describe("Shared Safe Conversions - Backend Coverage", () => {
                                 expect(result).toBe(parsed);
                             }
                         } else {
-                            expect(result).toBe(defaultVal);
+                            const fallbackDefault = Math.min(
+                                Number.isFinite(defaultVal)
+                                    ? defaultVal
+                                    : MIN_TIMEOUT_MILLISECONDS,
+                                MAX_TIMEOUT_MILLISECONDS
+                            );
+                            expect(result).toBe(fallbackDefault);
                         }
                     }
                 )
@@ -874,7 +898,9 @@ describe("Shared Safe Conversions - Backend Coverage", () => {
                             Number.isFinite(numValue)
                         ) {
                             // Must be positive AND finite
-                            expect(result).toBe(numValue);
+                            expect(result).toBe(
+                                Math.min(numValue, MAX_TIMEOUT_MILLISECONDS)
+                            );
                         } else {
                             expect(result).toBe(defaultVal);
                         }

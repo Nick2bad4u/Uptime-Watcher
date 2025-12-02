@@ -91,9 +91,11 @@ describe("useSiteDetails - Branch Coverage Tests", () => {
         filteredHistory: [],
         incidentCount: 0,
         mttr: 0,
-        p50: 90,
-        p95: 150,
-        p99: 200,
+        percentileMetrics: {
+            p50: 90,
+            p95: 150,
+            p99: 200,
+        },
         slowestResponse: 200,
         totalChecks: 100,
         totalDowntime: 0,
@@ -142,8 +144,10 @@ describe("useSiteDetails - Branch Coverage Tests", () => {
 
             // Mock validation failure
             mockValidateMonitorFieldClientSide.mockResolvedValue({
-                success: false,
                 errors: ["Invalid interval value"],
+                metadata: {},
+                success: false,
+                warnings: [],
             });
 
             const { result } = renderHook(() =>
@@ -181,8 +185,10 @@ describe("useSiteDetails - Branch Coverage Tests", () => {
 
             // Mock validation failure
             mockValidateMonitorFieldClientSide.mockResolvedValue({
-                success: false,
                 errors: ["Invalid timeout value"],
+                metadata: {},
+                success: false,
+                warnings: [],
             });
 
             const { result } = renderHook(() =>
@@ -220,8 +226,10 @@ describe("useSiteDetails - Branch Coverage Tests", () => {
 
             // Mock validation failure
             mockValidateMonitorFieldClientSide.mockResolvedValue({
-                success: false,
                 errors: ["Invalid retry attempts value"],
+                metadata: {},
+                success: false,
+                warnings: [],
             });
 
             const { result } = renderHook(() =>
@@ -261,8 +269,10 @@ describe("useSiteDetails - Branch Coverage Tests", () => {
 
             // Mock validation success
             mockValidateMonitorFieldClientSide.mockResolvedValue({
-                success: true,
                 errors: [],
+                metadata: {},
+                success: true,
+                warnings: [],
             });
 
             const { result } = renderHook(() =>
@@ -309,8 +319,10 @@ describe("useSiteDetails - Branch Coverage Tests", () => {
 
             // Mock validation success
             mockValidateMonitorFieldClientSide.mockResolvedValue({
-                success: true,
                 errors: [],
+                metadata: {},
+                success: true,
+                warnings: [],
             });
 
             const { result } = renderHook(() =>
@@ -357,8 +369,10 @@ describe("useSiteDetails - Branch Coverage Tests", () => {
 
             // Mock validation success
             mockValidateMonitorFieldClientSide.mockResolvedValue({
-                success: true,
                 errors: [],
+                metadata: {},
+                success: true,
+                warnings: [],
             });
 
             const { result } = renderHook(() =>
@@ -548,8 +562,10 @@ describe("useSiteDetails - Branch Coverage Tests", () => {
             };
 
             mockValidateMonitorFieldClientSide.mockResolvedValue({
-                success: true,
                 errors: [],
+                metadata: {},
+                success: true,
+                warnings: [],
             });
 
             const { result } = renderHook(() =>

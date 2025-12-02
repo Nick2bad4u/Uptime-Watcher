@@ -10,7 +10,7 @@ import {
     createHttpClient,
     setupTimingInterceptors,
 } from "../../../../services/monitoring/utils/httpClient";
-import type { MonitorConfig } from "../../../../services/monitoring/types.js";
+import type { MonitorServiceConfig } from "../../../../services/monitoring/types";
 
 // Mock axios
 vi.mock("axios", () => ({
@@ -54,7 +54,7 @@ describe("HTTP Client Utils", () => {
             await annotate("Component: types", "component");
 
             // Arrange
-            const config: MonitorConfig = {
+            const config: MonitorServiceConfig = {
                 userAgent: "test-agent",
                 timeout: 5000,
             };
@@ -87,7 +87,7 @@ describe("HTTP Client Utils", () => {
             await annotate("Component: types", "component");
 
             // Arrange
-            const config: MonitorConfig = {};
+            const config: MonitorServiceConfig = {};
 
             // Act
             const result = createHttpClient(config);
@@ -113,7 +113,7 @@ describe("HTTP Client Utils", () => {
             await annotate("Component: types", "component");
 
             // Arrange
-            const config: MonitorConfig = {
+            const config: MonitorServiceConfig = {
                 timeout: 5000,
             };
 
@@ -160,7 +160,7 @@ describe("HTTP Client Utils", () => {
             await annotate("Component: types", "component");
 
             // Arrange
-            const config: MonitorConfig = {
+            const config: MonitorServiceConfig = {
                 timeout: 5000,
             };
 

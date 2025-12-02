@@ -11,7 +11,7 @@ import { ensureError } from "@shared/utils/errorHandling";
 import { isValidUrl } from "@shared/validation/validatorUtils";
 import { performance } from "node:perf_hooks";
 
-import type { IMonitorService, MonitorConfig } from "./types";
+import type { IMonitorService, MonitorServiceConfig } from "./types";
 
 import { buildMonitorFactory } from "./shared/monitorFactoryUtils";
 import {
@@ -41,7 +41,7 @@ interface ServerHeartbeatContext {
 
 function resolveMaxDriftSeconds(
     monitor: ServerHeartbeatMonitorInstance,
-    serviceConfig: MonitorConfig
+    serviceConfig: MonitorServiceConfig
 ): number {
     const monitorValue = Reflect.get(
         monitor,
@@ -235,7 +235,7 @@ const behavior: RemoteMonitorBehavior<
 };
 
 const ServerHeartbeatMonitorBase: new (
-    config?: MonitorConfig
+    config?: MonitorServiceConfig
 ) => IMonitorService = buildMonitorFactory(
     () =>
         createRemoteMonitorService<"server-heartbeat", ServerHeartbeatContext>(

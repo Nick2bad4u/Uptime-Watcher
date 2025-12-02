@@ -138,8 +138,8 @@ eventBus.use(
  createRateLimitMiddleware({
   maxEventsPerSecond: 100,
   burstLimit: 10,
-  onRateLimit: (eventName, data) => {
-   logger.warn(`Rate limit exceeded for ${eventName}`);
+  onRateLimit: ({ event, reason }) => {
+   logger.warn(`Rate limit exceeded for ${event} (${reason})`);
   },
  })
 );

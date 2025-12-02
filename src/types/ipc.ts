@@ -47,9 +47,72 @@
  * @packageDocumentation
  */
 
-import type { IpcResponse } from "@shared/types/ipc";
+import type {
+    IpcResponse,
+    IpcDiagnosticsChannel as SharedIpcDiagnosticsChannel,
+    IpcDiagnosticsEvent as SharedIpcDiagnosticsEvent,
+    IpcHandlerVerificationResult as SharedIpcHandlerVerificationResult,
+    IpcInvokeChannel as SharedIpcInvokeChannel,
+    IpcInvokeChannelMap as SharedIpcInvokeChannelMap,
+    IpcInvokeChannelParams as SharedIpcInvokeChannelParams,
+    IpcInvokeChannelResult as SharedIpcInvokeChannelResult,
+    IpcValidationResponse as SharedIpcValidationResponse,
+    PreloadGuardDiagnosticsReport as SharedPreloadGuardDiagnosticsReport,
+    SerializedDatabaseBackupResult as SharedSerializedDatabaseBackupResult,
+} from "@shared/types/ipc";
+import type { Exact, UnknownRecord } from "type-fest";
 
 import { ERROR_CATALOG } from "@shared/utils/errorCatalog";
+
+const IPC_RESPONSE_KEYS = new Set<string>([
+    "data",
+    "error",
+    "metadata",
+    "success",
+    "warnings",
+]);
+
+const isRecord = (value: unknown): value is UnknownRecord =>
+    typeof value === "object" && value !== null && !Array.isArray(value);
+
+const hasOnlyResponseKeys = (record: UnknownRecord): boolean =>
+    Object.keys(record).every((key) => IPC_RESPONSE_KEYS.has(key));
+
+/** Standard renderer-side view of a validated IPC response envelope. */
+export type RendererIpcResponse<TData> = Exact<
+    IpcResponse<TData>,
+    {
+        data?: TData;
+        error?: string;
+        metadata?: UnknownRecord;
+        success: boolean;
+        warnings?: readonly string[];
+    }
+>;
+
+/** Renderer-facing IPC diagnostics channels. */
+export type IpcDiagnosticsChannel = SharedIpcDiagnosticsChannel;
+/** Renderer-facing IPC diagnostics events. */
+export type IpcDiagnosticsEvent = SharedIpcDiagnosticsEvent;
+/** Structured result returned when verifying IPC handlers. */
+export type IpcHandlerVerificationResult = SharedIpcHandlerVerificationResult;
+/** Renderer alias for the shared IPC invoke channel union. */
+export type IpcInvokeChannel = SharedIpcInvokeChannel;
+/** Mapping of invoke channels to request/response signatures. */
+export type IpcInvokeChannelMap = SharedIpcInvokeChannelMap;
+/** Parameter tuples for each IPC invoke channel. */
+export type IpcInvokeChannelParams<TChannel extends IpcInvokeChannel> =
+    SharedIpcInvokeChannelParams<TChannel>;
+/** Renderer view of invoke channel response payloads. */
+export type IpcInvokeChannelResult<TChannel extends IpcInvokeChannel> =
+    SharedIpcInvokeChannelResult<TChannel>;
+/** Standard renderer validation response envelope. */
+export type IpcValidationResponse = SharedIpcValidationResponse;
+/** Diagnostics report emitted by preload guard instrumentation. */
+export type PreloadGuardDiagnosticsReport = SharedPreloadGuardDiagnosticsReport;
+/** Serialized backup payloads returned by the database exporter. */
+export type SerializedDatabaseBackupResult =
+    SharedSerializedDatabaseBackupResult;
 
 /**
  * Type guard to check if a value is an IPC response.
@@ -61,13 +124,14 @@ import { ERROR_CATALOG } from "@shared/utils/errorCatalog";
  * @public
  */
 // eslint-disable-next-line etc/no-misused-generics -- Type parameter must be explicitly provided for type guard
-export function isIpcResponse<T>(value: unknown): value is IpcResponse<T> {
-    return (
-        typeof value === "object" &&
-        value !== null &&
-        "success" in value &&
-        typeof (value as { success: unknown }).success === "boolean"
-    );
+export function isIpcResponse<T>(
+    value: unknown
+): value is RendererIpcResponse<T> {
+    if (!isRecord(value) || typeof value["success"] !== "boolean") {
+        return false;
+    }
+
+    return hasOnlyResponseKeys(value);
 }
 
 /**

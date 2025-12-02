@@ -16,14 +16,17 @@
  */
 
 import { describe, it, expect, beforeEach, vi } from "vitest";
-import { TypedEventBus } from "../../events/TypedEventBus";
+import {
+    TypedEventBus,
+    type EventPayloadValue,
+} from "../../events/TypedEventBus";
 
 // Create a simple test event map
-interface TestEvents {
+interface TestEvents extends Record<string, EventPayloadValue> {
     "test-event": { data: string };
     "another-event": { value: number };
-    [key: string]: unknown;
-    [key: symbol]: unknown;
+    [key: string]: EventPayloadValue;
+    [key: symbol]: EventPayloadValue;
 }
 
 describe(TypedEventBus, () => {

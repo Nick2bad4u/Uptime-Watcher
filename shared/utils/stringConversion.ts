@@ -10,7 +10,21 @@
  * @see {@link safeStringify}
  */
 
+import type { Jsonifiable } from "type-fest";
+
 import { safeJsonStringifyWithFallback } from "./jsonSafety";
+
+const COMPLEX_OBJECT_PLACEHOLDER = "[Complex Object]" as const;
+
+const isJsonSerializableObject = (
+    value: object
+): value is Jsonifiable & object =>
+    !(
+        value instanceof Map ||
+        value instanceof Set ||
+        value instanceof WeakMap ||
+        value instanceof WeakSet
+    );
 
 /**
  * Safely converts any value to a string, handling all JavaScript types with
@@ -42,7 +56,7 @@ import { safeJsonStringifyWithFallback } from "./jsonSafety";
  * safeStringify({ a: 1 }); // '{"a":1}'
  * safeStringify(() => {}); // "[Function]"
  * safeStringify(Symbol("test")); // "Symbol(test)"
- * const circular: any = {};
+ * const circular: Record<string, unknown> = {};
  * circular.self = circular;
  * safeStringify(circular); // "[Complex Object]"
  * ```
@@ -55,10 +69,7 @@ import { safeJsonStringifyWithFallback } from "./jsonSafety";
  */
 export function safeStringify(value: unknown): string {
     // Handle null/undefined early
-    if (value === null) {
-        return "";
-    }
-    if (value === undefined) {
+    if (value === null || value === undefined) {
         return "";
     }
 
@@ -78,17 +89,19 @@ export function safeStringify(value: unknown): string {
         }
         case "object": {
             // Handle Map/Set explicitly: they do not serialize well to JSON
-            if (value instanceof Map || value instanceof Set) {
-                return "[Complex Object]";
+            if (!isJsonSerializableObject(value)) {
+                // For WeakMap/WeakSet, JSON.stringify yields "{}"; align with tests
+                if (value instanceof WeakMap || value instanceof WeakSet) {
+                    return "{}";
+                }
+
+                return COMPLEX_OBJECT_PLACEHOLDER;
             }
-            // For WeakMap/WeakSet, JSON.stringify yields "{}"; align with tests
-            if (value instanceof WeakMap) {
-                return "{}";
-            }
-            if (value instanceof WeakSet) {
-                return "{}";
-            }
-            return safeJsonStringifyWithFallback(value, "[Complex Object]");
+
+            return safeJsonStringifyWithFallback(
+                value,
+                COMPLEX_OBJECT_PLACEHOLDER
+            );
         }
         case "string": {
             return value;

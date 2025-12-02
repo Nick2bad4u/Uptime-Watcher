@@ -25,7 +25,7 @@ import type { IpcParameterValidator } from "../../../services/ipc/types.js";
 function createParameterCountValidator(
     expectedCount: number
 ): IpcParameterValidator {
-    return (params: unknown[]): null | string[] =>
+    return (params: readonly unknown[]): null | string[] =>
         params.length === expectedCount
             ? null
             : [
@@ -36,7 +36,7 @@ function createParameterCountValidator(
 function composeValidators(
     validators: IpcParameterValidator[]
 ): IpcParameterValidator {
-    return (params: unknown[]): null | string[] => {
+    return (params: readonly unknown[]): null | string[] => {
         const allErrors: string[] = [];
 
         for (const validator of validators) {
@@ -51,7 +51,7 @@ function composeValidators(
 }
 
 function createMockStringValidator(paramName: string): IpcParameterValidator {
-    return (params: unknown[]): null | string[] => {
+    return (params: readonly unknown[]): null | string[] => {
         const value = params[0];
         if (typeof value !== "string" || value.trim().length === 0) {
             return [`${paramName} must be a non-empty string`];
@@ -195,8 +195,10 @@ describe("Validator Composition Utilities", () => {
 
             const twoStringValidator = composeValidators([
                 createParameterCountValidator(2),
-                (params: unknown[]) => firstStringValidator([params[0]]),
-                (params: unknown[]) => secondStringValidator([params[1]]),
+                (params: readonly unknown[]) =>
+                    firstStringValidator([params[0]]),
+                (params: readonly unknown[]) =>
+                    secondStringValidator([params[1]]),
             ]);
 
             // Should pass with valid strings
@@ -236,8 +238,8 @@ describe("Validator Composition Utilities", () => {
             // Composition maintains low complexity in each function
             const composed = composeValidators([
                 countValidator,
-                (params: unknown[]) => stringValidator1([params[0]]),
-                (params: unknown[]) => stringValidator2([params[1]]),
+                (params: readonly unknown[]) => stringValidator1([params[0]]),
+                (params: readonly unknown[]) => stringValidator2([params[1]]),
             ]);
 
             expect(composed(["hello", "world"])).toBeNull();

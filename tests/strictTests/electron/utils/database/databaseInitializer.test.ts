@@ -36,7 +36,10 @@ import { initDatabase } from "../../../../../electron/utils/database/databaseIni
 import { monitorLogger } from "../../../../../electron/utils/logger";
 import { withDatabaseOperation } from "../../../../../electron/utils/operationalHooks";
 import type { TypedEventBus } from "../../../../../electron/events/TypedEventBus";
-import type { UptimeEvents } from "../../../../../electron/events/eventTypes";
+import type {
+    UptimeEventName,
+    UptimeEvents,
+} from "../../../../../electron/events/eventTypes";
 import type { DatabaseService } from "../../../../../electron/services/database/DatabaseService";
 
 type DatabaseErrorPayload = UptimeEvents["database:error"];
@@ -127,14 +130,17 @@ describe("databaseInitializer", () => {
         expect(firstCall).toBeDefined();
 
         const [channel, payload] = firstCall as [
-            keyof UptimeEvents,
+            UptimeEventName,
             DatabaseErrorPayload,
         ];
 
         expect(channel).toBe("database:error");
         expect(payload).toMatchObject({
             details: "Failed to initialize database",
-            error: initError,
+            error: {
+                message: "failed to initialize",
+                name: "Error",
+            },
             operation: "initialize-database",
         });
 
@@ -169,11 +175,12 @@ describe("databaseInitializer", () => {
         expect(firstCall).toBeDefined();
 
         const [, payload] = firstCall as [
-            keyof UptimeEvents,
+            UptimeEventName,
             DatabaseErrorPayload,
         ];
 
-        expect(payload.error).toBeInstanceOf(Error);
-        expect(payload.error).toHaveProperty("message", "load failure");
+        expect(payload.error).toMatchObject({
+            message: "load failure",
+        });
     });
 });

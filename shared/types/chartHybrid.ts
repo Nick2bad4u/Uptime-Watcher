@@ -32,6 +32,7 @@
 
 // Import official Chart.js types
 import type { ChartData, ChartOptions } from "chart.js";
+import type { UnknownRecord } from "type-fest";
 
 // Import our custom business logic types
 import type {
@@ -59,9 +60,9 @@ export interface UptimeChartOptions {
         easing?: string;
     };
     /** Dataset configurations */
-    datasets?: Record<string, unknown>;
+    datasets?: UnknownRecord;
     /** Element configurations */
-    elements?: Record<string, unknown>;
+    elements?: UnknownRecord;
     /** Interaction configuration */
     interaction?: {
         intersect?: boolean;

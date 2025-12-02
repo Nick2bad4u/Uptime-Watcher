@@ -3,11 +3,32 @@
  */
 
 import { describe, expect, it, vi } from "vitest";
+import type { UptimeEvents } from "../../events/eventTypes";
+import type { TypedEventBus } from "../../events/TypedEventBus";
 import {
+    createOperationalHookContext,
     withOperationalHooks,
     withDatabaseOperation,
 } from "../../utils/operationalHooks";
 import { logger } from "../../utils/logger";
+
+describe(createOperationalHookContext, () => {
+    it("should freeze and brand plain context objects", () => {
+        const contextInput = { userId: "user-123", operation: "seed" };
+        const context = createOperationalHookContext(contextInput);
+
+        expect(context).toEqual(contextInput);
+        expect(Object.isFrozen(context)).toBeTruthy();
+        expect(context).not.toBe(contextInput);
+    });
+
+    it("should reuse previously branded contexts", () => {
+        const branded = createOperationalHookContext({ region: "iad" });
+        const rehydrated = createOperationalHookContext(branded);
+
+        expect(rehydrated).toBe(branded);
+    });
+});
 
 describe("Operational Hooks", () => {
     describe(withOperationalHooks, () => {
@@ -134,6 +155,79 @@ describe("Operational Hooks", () => {
             expect(onSuccess).toHaveBeenCalledWith("success");
             expect(onRetry).not.toHaveBeenCalled();
             expect(onFailure).not.toHaveBeenCalled();
+        });
+        it("should tag lifecycle events with context metadata", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: operationalHooks", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Event Processing", "type");
+
+            const eventEmitter = {
+                emitTyped: vi.fn().mockResolvedValue(undefined),
+            } as unknown as TypedEventBus<UptimeEvents>;
+
+            await withOperationalHooks(async () => "telemetry", {
+                context: { userId: "user-1" },
+                emitEvents: true,
+                eventEmitter,
+                maxRetries: 1,
+                operationName: "stage-success",
+            });
+
+            expect(eventEmitter.emitTyped).toHaveBeenCalledWith(
+                "database:transaction-completed",
+                expect.objectContaining({
+                    lifecycleStage: "start",
+                    operation: "stage-success:started",
+                    userId: "user-1",
+                })
+            );
+            expect(eventEmitter.emitTyped).toHaveBeenCalledWith(
+                "database:transaction-completed",
+                expect.objectContaining({
+                    lifecycleStage: "success",
+                    operation: "stage-success:completed",
+                })
+            );
+        });
+        it("should emit failure lifecycle tagging when retries exhaust", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: operationalHooks", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Event Processing", "type");
+
+            const eventEmitter = {
+                emitTyped: vi.fn().mockResolvedValue(undefined),
+            } as unknown as TypedEventBus<UptimeEvents>;
+
+            await withOperationalHooks(
+                async () => {
+                    throw new Error("fail-stage");
+                },
+                {
+                    emitEvents: true,
+                    eventEmitter,
+                    initialDelay: 1,
+                    maxRetries: 1,
+                    operationName: "stage-failure",
+                    throwOnFailure: false,
+                }
+            );
+
+            expect(eventEmitter.emitTyped).toHaveBeenCalledWith(
+                "database:transaction-completed",
+                expect.objectContaining({
+                    lifecycleStage: "failure",
+                    operation: "stage-failure:failed",
+                    success: false,
+                })
+            );
         });
     });
     describe(withDatabaseOperation, () => {

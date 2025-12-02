@@ -6,6 +6,7 @@
  * runtime checks remain in sync with the shared type definitions.
  */
 
+import type { ExclusifyUnion } from "type-fest";
 import type { ZodError } from "zod";
 
 import type { Site } from "../types";
@@ -47,19 +48,23 @@ export interface SiteSnapshotValidationIssue {
     readonly value: unknown;
 }
 
+type SiteSnapshotCollectionParseVariant =
+    | {
+          readonly data: Site[];
+          readonly errors: [];
+          readonly status: "success";
+      }
+    | {
+          readonly data: Site[];
+          readonly errors: SiteSnapshotValidationIssue[];
+          readonly status: "failure";
+      };
+
 /**
  * Result shape returned when validating a collection of site snapshots.
  */
-export interface SiteSnapshotCollectionParseResult {
-    /** Successfully parsed site snapshots. */
-    readonly data: Site[];
-    /** Detailed issues for any snapshots that failed validation. */
-    readonly errors: SiteSnapshotValidationIssue[];
-    /**
-     * Indicates whether every snapshot in the collection passed validation.
-     */
-    readonly success: boolean;
-}
+export type SiteSnapshotCollectionParseResult =
+    ExclusifyUnion<SiteSnapshotCollectionParseVariant>;
 
 /**
  * @remarks
@@ -92,9 +97,17 @@ export const validateSiteSnapshots = (
         });
     });
 
+    if (errors.length === 0) {
+        return {
+            data,
+            errors: [],
+            status: "success",
+        } satisfies SiteSnapshotCollectionParseResult;
+    }
+
     return {
         data,
         errors,
-        success: errors.length === 0,
-    };
+        status: "failure",
+    } satisfies SiteSnapshotCollectionParseResult;
 };

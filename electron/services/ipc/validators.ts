@@ -109,7 +109,7 @@ function createParamValidator(
         countMessage = `Expected exactly ${expectedCount} parameter${suffix}`;
     }
 
-    return (params: unknown[]): null | string[] => {
+    return (params: readonly unknown[]): null | string[] => {
         const errors: string[] = [];
 
         if (params.length !== expectedCount) {
@@ -165,7 +165,9 @@ function createSingleObjectValidator(paramName: string): IpcParameterValidator {
     ]);
 }
 
-function validatePreloadGuardReport(params: unknown[]): null | string[] {
+function validatePreloadGuardReport(
+    params: readonly unknown[]
+): null | string[] {
     const errors: string[] = [];
 
     if (params.length !== 1) {
@@ -238,7 +240,9 @@ function createPreloadGuardReportValidator(): IpcParameterValidator {
     return validatePreloadGuardReport;
 }
 
-function validateNotificationPreferences(params: unknown[]): null | string[] {
+function validateNotificationPreferences(
+    params: readonly unknown[]
+): null | string[] {
     const errors: string[] = [];
 
     if (params.length !== 1) {

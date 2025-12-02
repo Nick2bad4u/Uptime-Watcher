@@ -1,5 +1,4 @@
 import type { StatusHistory } from "@shared/types";
-import type { HistoryRow as DatabaseHistoryRow } from "@shared/types/database";
 import type { Database } from "node-sqlite3-wasm";
 
 import {
@@ -9,6 +8,11 @@ import {
 
 import { logger } from "../../../utils/logger";
 import { rowToHistoryEntry } from "./historyMapper";
+import {
+    queryForCount,
+    queryHistoryRow,
+    queryHistoryRows,
+} from "./typedQueries";
 
 /**
  * Utility functions for querying monitor history data from the database.
@@ -66,10 +70,11 @@ export function findHistoryByMonitorId(
     monitorId: string
 ): StatusHistory[] {
     try {
-        const historyRows = db.all(
+        const historyRows = queryHistoryRows(
+            db,
             HISTORY_QUERY_QUERIES.SELECT_ALL_BY_MONITOR,
             [monitorId]
-        ) as DatabaseHistoryRow[];
+        );
 
         return historyRows.map((row) => rowToHistoryEntry(row));
     } catch (error) {
@@ -104,13 +109,26 @@ export function findHistoryByMonitorId(
  */
 export function getHistoryCount(db: Database, monitorId: string): number {
     try {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Database query result has known structure from controlled SQL statement
-        const result = db.get(HISTORY_QUERY_QUERIES.SELECT_COUNT_BY_MONITOR, [
-            monitorId,
-        ]) as undefined | { count: number };
+        const result = queryForCount(
+            db,
+            HISTORY_QUERY_QUERIES.SELECT_COUNT_BY_MONITOR,
+            [monitorId]
+        );
 
         return result?.count ?? 0;
     } catch (error) {
+        if (error instanceof Error && error.message.includes("CountResult")) {
+            const logWarnOrError =
+                typeof logger.warn === "function"
+                    ? logger.warn.bind(logger)
+                    : logger.error.bind(logger);
+            logWarnOrError(
+                `[HistoryQuery] Invalid count result for monitor: ${monitorId}`,
+                error
+            );
+            return 0;
+        }
+
         logger.error(
             `[HistoryQuery] Failed to get history count for monitor: ${monitorId}`,
             error
@@ -143,10 +161,11 @@ export function getLatestHistoryEntry(
     monitorId: string
 ): StatusHistory | undefined {
     try {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Database query result has known structure from controlled SQL statement
-        const row = db.get(HISTORY_QUERY_QUERIES.SELECT_LATEST_BY_MONITOR, [
-            monitorId,
-        ]) as DatabaseHistoryRow | undefined;
+        const row = queryHistoryRow(
+            db,
+            HISTORY_QUERY_QUERIES.SELECT_LATEST_BY_MONITOR,
+            [monitorId]
+        );
 
         if (!row) {
             return undefined;

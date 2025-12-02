@@ -107,6 +107,7 @@ describe(MonitorRepository, () => {
             const mockMonitor = {
                 monitor_id: "mon1",
                 monitor_type: "http",
+                site_identifier: "site-01",
                 url: "https://example.com",
             };
 

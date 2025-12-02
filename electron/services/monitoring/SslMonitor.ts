@@ -15,7 +15,7 @@ import tls, { type PeerCertificate } from "node:tls";
 import type {
     IMonitorService,
     MonitorCheckResult,
-    MonitorConfig,
+    MonitorServiceConfig,
 } from "./types";
 
 import { DEFAULT_REQUEST_TIMEOUT, RETRY_BACKOFF } from "../../constants";
@@ -37,7 +37,7 @@ const MAX_WARNING_THRESHOLD_DAYS = 365;
  * Monitor service implementation for SSL/TLS certificate checks.
  */
 export class SslMonitor implements IMonitorService {
-    private config: MonitorConfig;
+    private config: MonitorServiceConfig;
 
     public async check(
         monitor: Site["monitors"][0],
@@ -367,7 +367,7 @@ export class SslMonitor implements IMonitorService {
         return date.toISOString().slice(0, 10);
     }
 
-    public constructor(config: MonitorConfig = {}) {
+    public constructor(config: MonitorServiceConfig = {}) {
         this.config = {
             timeout: DEFAULT_REQUEST_TIMEOUT,
             ...config,
@@ -378,7 +378,7 @@ export class SslMonitor implements IMonitorService {
         return "ssl";
     }
 
-    public updateConfig(config: Partial<MonitorConfig>): void {
+    public updateConfig(config: Partial<MonitorServiceConfig>): void {
         if (
             config.timeout !== undefined &&
             (typeof config.timeout !== "number" || config.timeout <= 0)

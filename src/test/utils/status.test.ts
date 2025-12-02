@@ -13,6 +13,8 @@ import {
     formatStatusWithIcon,
     getStatusIcon,
     createStatusIdentifier,
+    type StatusIdentifier,
+    type StatusWithIcon,
 } from "../../utils/status";
 
 describe("Status Utilities", () => {
@@ -278,7 +280,8 @@ describe("Status Utilities", () => {
                 await annotate("Category: Utility", "category");
                 await annotate("Type: Business Logic", "type");
 
-                expect(formatStatusWithIcon("down")).toBe("❌ Down");
+                const formatted: StatusWithIcon = formatStatusWithIcon("down");
+                expect(formatted).toBe("❌ Down");
             });
 
             it("should format 'up' status correctly", async ({
@@ -290,7 +293,8 @@ describe("Status Utilities", () => {
                 await annotate("Category: Utility", "category");
                 await annotate("Type: Business Logic", "type");
 
-                expect(formatStatusWithIcon("up")).toBe("✅ Up");
+                const formatted: StatusWithIcon = formatStatusWithIcon("up");
+                expect(formatted).toBe("✅ Up");
             });
 
             it("should format 'mixed' status correctly", async ({
@@ -302,7 +306,8 @@ describe("Status Utilities", () => {
                 await annotate("Category: Utility", "category");
                 await annotate("Type: Business Logic", "type");
 
-                expect(formatStatusWithIcon("mixed")).toBe("🔄 Mixed");
+                const formatted: StatusWithIcon = formatStatusWithIcon("mixed");
+                expect(formatted).toBe("🔄 Mixed");
             });
 
             it("should format 'paused' status correctly", async ({
@@ -929,7 +934,8 @@ describe("Status Utilities", () => {
                     );
                 }),
             ])("should create valid camelCase identifiers", (statusText) => {
-                const result = createStatusIdentifier(statusText);
+                const result: StatusIdentifier =
+                    createStatusIdentifier(statusText);
 
                 // Property: Result should be a non-empty string
                 expect(typeof result).toBe("string");
@@ -952,7 +958,7 @@ describe("Status Utilities", () => {
                     "health ok"
                 ),
             ])("should handle common status phrases correctly", (phrase) => {
-                const result = createStatusIdentifier(phrase);
+                const result: StatusIdentifier = createStatusIdentifier(phrase);
 
                 // Property: Should create valid identifier
                 expect(result).toMatch(/^[a-z][\dA-Za-z]*$/);
@@ -977,7 +983,7 @@ describe("Status Utilities", () => {
             test.prop([
                 fc.constantFrom("status", "monitor", "check", "service"),
             ])("should handle single words correctly", (word) => {
-                const result = createStatusIdentifier(word);
+                const result: StatusIdentifier = createStatusIdentifier(word);
 
                 // Property: Single word should remain lowercase
                 expect(result).toBe(word.toLowerCase());
@@ -990,7 +996,8 @@ describe("Status Utilities", () => {
             ])(
                 "should handle alphabetic strings without separators",
                 (text) => {
-                    const result = createStatusIdentifier(text);
+                    const result: StatusIdentifier =
+                        createStatusIdentifier(text);
 
                     // Property: Should convert to lowercase for single word
                     expect(result).toBe(text.toLowerCase());
@@ -1006,7 +1013,7 @@ describe("Status Utilities", () => {
                 ),
             ])("should combine multiple words into camelCase", (words) => {
                 const phrase = words.join(" ");
-                const result = createStatusIdentifier(phrase);
+                const result: StatusIdentifier = createStatusIdentifier(phrase);
 
                 // Property: Should start with lowercase first word
                 const firstWord = words[0];

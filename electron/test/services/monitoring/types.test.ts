@@ -8,8 +8,8 @@ import { describe, expect, it } from "vitest";
 import type {
     IMonitorService,
     MonitorCheckResult,
-    MonitorConfig,
-} from "../../../services/monitoring/types.js";
+    MonitorServiceConfig,
+} from "../../../services/monitoring/types";
 
 describe("Monitoring Types", () => {
     describe("MonitorCheckResult", () => {
@@ -71,7 +71,7 @@ describe("Monitoring Types", () => {
         });
     });
 
-    describe("MonitorConfig", () => {
+    describe("MonitorServiceConfig", () => {
         it("should validate config with all properties", async ({
             task,
             annotate,
@@ -81,7 +81,7 @@ describe("Monitoring Types", () => {
             await annotate("Category: Service", "category");
             await annotate("Type: Validation", "type");
 
-            const config: MonitorConfig = {
+            const config: MonitorServiceConfig = {
                 timeout: 5000,
                 userAgent: "UptimeWatcher/1.0",
             };
@@ -96,7 +96,7 @@ describe("Monitoring Types", () => {
             await annotate("Category: Service", "category");
             await annotate("Type: Validation", "type");
 
-            const config: MonitorConfig = {};
+            const config: MonitorServiceConfig = {};
 
             expect(config.timeout).toBeUndefined();
             expect(config.userAgent).toBeUndefined();
@@ -124,7 +124,9 @@ describe("Monitoring Types", () => {
                 getType() {
                     return "http";
                 },
-                updateConfig: function (_config: Partial<MonitorConfig>): void {
+                updateConfig: function (
+                    _config: Partial<MonitorServiceConfig>
+                ): void {
                     throw new Error("Function not implemented.");
                 },
             };
@@ -153,7 +155,9 @@ describe("Monitoring Types", () => {
                 getType() {
                     return "port";
                 },
-                updateConfig: function (_config: Partial<MonitorConfig>): void {
+                updateConfig: function (
+                    _config: Partial<MonitorServiceConfig>
+                ): void {
                     throw new Error("Function not implemented.");
                 },
             };

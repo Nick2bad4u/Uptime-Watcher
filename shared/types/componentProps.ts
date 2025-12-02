@@ -20,6 +20,7 @@ import type {
     MouseEvent,
     ReactNode,
 } from "react";
+import type { UnknownRecord } from "type-fest";
 
 /**
  * Core set of structural properties shared by many UI components.
@@ -518,10 +519,11 @@ export interface StandardDataDisplayProperties<TItem>
  *
  * @public
  */
-export type ComponentProperties<
+export type ComponentProperties<TBase, TOverrides = UnknownRecord> = Omit<
     TBase,
-    TOverrides = Record<string, unknown>,
-> = Omit<TBase, keyof TOverrides> & TOverrides;
+    keyof TOverrides
+> &
+    TOverrides;
 
 /**
  * Utility type for making certain properties required.

@@ -60,6 +60,7 @@ import {
     rowToSettingValue,
     settingsToRecord,
 } from "./utils/settingsMapper";
+import { querySettingsRows } from "./utils/typedQueries";
 
 /**
  * Defines the dependencies required by the SettingsRepository for managing
@@ -113,40 +114,6 @@ const SETTINGS_QUERIES = {
     SELECT_ALL: "SELECT * FROM settings",
     SELECT_VALUE_BY_KEY: "SELECT value FROM settings WHERE key = ?",
 } as const;
-
-/**
- * Safely coerces a raw database row into a {@link DatabaseSettingsRow}.
- *
- * @param row - Raw row returned by sqlite.
- *
- * @returns Normalized settings row or undefined when the shape is invalid.
- */
-function toDatabaseSettingsRow(row: unknown): DatabaseSettingsRow | undefined {
-    if (!isRecord(row)) {
-        return undefined;
-    }
-
-    const { id, key, value } = row as Record<string, unknown>;
-    const normalized: DatabaseSettingsRow = {};
-
-    if (typeof id === "number" || typeof id === "string") {
-        normalized.id = id;
-    }
-
-    if (typeof key === "string") {
-        normalized.key = key;
-    }
-
-    if (typeof value === "string") {
-        normalized.value = value;
-    }
-
-    return normalized.id !== undefined ||
-        normalized.key !== undefined ||
-        normalized.value !== undefined
-        ? normalized
-        : undefined;
-}
 
 /**
  * Repository for managing application settings persistence.
@@ -270,20 +237,22 @@ export class SettingsRepository {
      * @throws Error if the database operation fails.
      */
     public async get(key: string): Promise<string | undefined> {
-        return withDatabaseOperation(
-            () =>
-                Promise.resolve(
-                    rowToSettingValue(
-                        toDatabaseSettingsRow(
-                            this.getDb().get(
-                                SETTINGS_QUERIES.SELECT_VALUE_BY_KEY,
-                                [key]
-                            )
-                        )
-                    )
-                ),
-            `get-setting-${key}`
-        );
+        return withDatabaseOperation(() => {
+            const rawRow = this.getDb().get(
+                SETTINGS_QUERIES.SELECT_VALUE_BY_KEY,
+                [key]
+            );
+
+            const normalizedRow: DatabaseSettingsRow | undefined =
+                isRecord(rawRow) && typeof rawRow["value"] === "string"
+                    ? {
+                          key,
+                          value: rawRow["value"],
+                      }
+                    : undefined;
+
+            return Promise.resolve(rowToSettingValue(normalizedRow));
+        }, `get-setting-${key}`);
     }
 
     /**
@@ -307,14 +276,10 @@ export class SettingsRepository {
      */
     public async getAll(): Promise<Record<string, string>> {
         return withDatabaseOperation(() => {
-            const rawRows = this.getDb().all(SETTINGS_QUERIES.SELECT_ALL);
-            const settingsRows = Array.isArray(rawRows)
-                ? rawRows
-                      .map(toDatabaseSettingsRow)
-                      .filter(
-                          (row): row is DatabaseSettingsRow => row !== undefined
-                      )
-                : [];
+            const settingsRows = querySettingsRows(
+                this.getDb(),
+                SETTINGS_QUERIES.SELECT_ALL
+            );
             const normalizedRows = rowsToSettings(settingsRows);
             return Promise.resolve(settingsToRecord(normalizedRows));
         }, "settings-get-all");

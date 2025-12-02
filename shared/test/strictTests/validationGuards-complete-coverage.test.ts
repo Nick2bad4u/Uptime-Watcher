@@ -51,7 +51,7 @@ describe(validateSiteSnapshots, () => {
         ];
         const result = validateSiteSnapshots(snapshots);
 
-        expect(result.success).toBeTruthy();
+        expect(result.status).toBe("success");
         expect(result.errors).toHaveLength(0);
         expect(result.data).toStrictEqual(snapshots);
     });
@@ -76,7 +76,7 @@ describe(validateSiteSnapshots, () => {
             invalidSnapshots[1],
         ]);
 
-        expect(result.success).toBeFalsy();
+        expect(result.status).toBe("failure");
         expect(result.data).toStrictEqual([validSnapshot]);
         expect(result.errors).toHaveLength(2);
         expect(result.errors[0]).toMatchObject({
@@ -109,7 +109,7 @@ describe(validateSiteSnapshots, () => {
     it("gracefully handles empty collections", () => {
         const result = validateSiteSnapshots([]);
 
-        expect(result.success).toBeTruthy();
+        expect(result.status).toBe("success");
         expect(result.data).toHaveLength(0);
         expect(result.errors).toHaveLength(0);
     });

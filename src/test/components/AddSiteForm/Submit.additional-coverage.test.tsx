@@ -43,8 +43,9 @@ vi.mock("../../../utils/monitorValidation", () => ({
     })),
     validateMonitorFormData: vi.fn(),
     validateMonitorFieldClientSide: vi.fn(() => ({
-        success: true,
         errors: [],
+        metadata: {},
+        success: true,
         warnings: [],
     })),
     validateNumericField: vi.fn(() => ({
@@ -134,8 +135,9 @@ interface ValidationModuleMock {
 let validationModule: ValidationModuleMock;
 
 const validationSuccessResult: ValidationResult = {
-    success: true,
     errors: [],
+    metadata: {},
+    success: true,
     warnings: [],
 };
 

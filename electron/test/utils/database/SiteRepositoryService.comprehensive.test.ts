@@ -683,12 +683,14 @@ describe("SiteRepositoryService and SiteLoadingOrchestrator - Comprehensive Cove
             );
             expect(mockEventEmitter.emitTyped).toHaveBeenCalledWith(
                 "database:error",
-                {
+                expect.objectContaining({
                     details: "Failed to load sites into cache: Cache error",
-                    error,
+                    error: expect.objectContaining({
+                        message: "Cache error",
+                    }),
                     operation: "load-sites-into-cache",
                     timestamp: expect.any(Number),
-                }
+                })
             );
         });
 
@@ -714,12 +716,14 @@ describe("SiteRepositoryService and SiteLoadingOrchestrator - Comprehensive Cove
             );
             expect(mockEventEmitter.emitTyped).toHaveBeenCalledWith(
                 "database:error",
-                {
+                expect.objectContaining({
                     details: "Failed to load sites into cache: Unknown error",
-                    error: new Error("String error"),
+                    error: expect.objectContaining({
+                        message: "String error",
+                    }),
                     operation: "load-sites-into-cache",
                     timestamp: expect.any(Number),
-                }
+                })
             );
         });
     });

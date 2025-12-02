@@ -14,7 +14,6 @@ import type { RendererEventPayloadMap } from "@shared/ipc/rendererEvents";
 import type {
     CacheInvalidatedEventData,
     MonitorDownEventData,
-    MonitoringControlEventData,
     MonitorStatusChangedEventData,
     MonitorUpEventData,
     TestEventData,
@@ -78,9 +77,13 @@ type HistoryLimitUpdatedEventPayload =
  *   monitoring-start event.
  */
 const isMonitoringStartedEventData = (
-    data: MonitoringControlEventData
+    data: unknown
 ): data is MonitoringStartedEventData =>
-    typeof data.monitorCount === "number" && typeof data.siteCount === "number";
+    typeof data === "object" &&
+    data !== null &&
+    typeof (data as Partial<MonitoringStartedEventData>).monitorCount ===
+        "number" &&
+    typeof (data as Partial<MonitoringStartedEventData>).siteCount === "number";
 
 /**
  * Runtime type guard narrowing monitoring control payloads to the "stopped"
@@ -92,9 +95,13 @@ const isMonitoringStartedEventData = (
  *   monitoring-stop event.
  */
 const isMonitoringStoppedEventData = (
-    data: MonitoringControlEventData
+    data: unknown
 ): data is MonitoringStoppedEventData =>
-    typeof data.activeMonitors === "number" && typeof data.reason === "string";
+    typeof data === "object" &&
+    data !== null &&
+    typeof (data as Partial<MonitoringStoppedEventData>).activeMonitors ===
+        "number" &&
+    typeof (data as Partial<MonitoringStoppedEventData>).reason === "string";
 
 /**
  * Builds a defensive cleanup handler used when the preload bridge returns an
@@ -334,22 +341,20 @@ export const EventsService: EventsServiceContract = {
         "onMonitoringStarted",
         async (api, callback: (data: MonitoringStartedEventData) => void) =>
             subscribeWithValidation("onMonitoringStarted", () =>
-                api.events.onMonitoringStarted(
-                    (data: MonitoringControlEventData) => {
-                        if (!isMonitoringStartedEventData(data)) {
-                            logger.error(
-                                "[EventsService] Dropped monitoring-start payload: invalid monitoring control event",
-                                undefined,
-                                {
-                                    payload: data,
-                                }
-                            );
-                            return;
-                        }
-
-                        callback(data);
+                api.events.onMonitoringStarted((data) => {
+                    if (!isMonitoringStartedEventData(data)) {
+                        logger.error(
+                            "[EventsService] Dropped monitoring-start payload: invalid monitoring control event",
+                            undefined,
+                            {
+                                payload: data,
+                            }
+                        );
+                        return;
                     }
-                )
+
+                    callback(data);
+                })
             )
     ),
 
@@ -379,22 +384,20 @@ export const EventsService: EventsServiceContract = {
         "onMonitoringStopped",
         async (api, callback: (data: MonitoringStoppedEventData) => void) =>
             subscribeWithValidation("onMonitoringStopped", () =>
-                api.events.onMonitoringStopped(
-                    (data: MonitoringControlEventData) => {
-                        if (!isMonitoringStoppedEventData(data)) {
-                            logger.error(
-                                "[EventsService] Dropped monitoring-stop payload: invalid monitoring control event",
-                                undefined,
-                                {
-                                    payload: data,
-                                }
-                            );
-                            return;
-                        }
-
-                        callback(data);
+                api.events.onMonitoringStopped((data) => {
+                    if (!isMonitoringStoppedEventData(data)) {
+                        logger.error(
+                            "[EventsService] Dropped monitoring-stop payload: invalid monitoring control event",
+                            undefined,
+                            {
+                                payload: data,
+                            }
+                        );
+                        return;
                     }
-                )
+
+                    callback(data);
+                })
             )
     ),
 

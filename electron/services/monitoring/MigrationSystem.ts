@@ -10,14 +10,14 @@
  * @public
  */
 
-import type { UnknownRecord } from "type-fest";
-
 import { withErrorHandling } from "@shared/utils/errorHandling";
 import {
     interpolateLogTemplate,
     LOG_TEMPLATES,
 } from "@shared/utils/logTemplates";
 import isSemVer from "validator/lib/isSemVer";
+
+import type { MonitorConfigurationInput } from "./types";
 
 import { logger } from "../../utils/logger";
 import { MAX_LOG_DATA_LENGTH, MAX_MIGRATION_STEPS } from "./constants";
@@ -82,15 +82,16 @@ export interface MigrationRule {
      * transformation logic for the version upgrade. May throw if transformation
      * fails or data is invalid.
      *
-     * @param data - The {@link UnknownRecord} monitor configuration data to
-     *   transform
+     * @param data - Monitor configuration data to transform.
      *
-     * @returns A promise resolving to the transformed {@link UnknownRecord} data
+     * @returns A promise resolving to the transformed monitor configuration.
      *
      * @throws {@link Error} When transformation fails due to invalid data,
      *   missing required fields, or data validation errors
      */
-    transform: (data: UnknownRecord) => Promise<UnknownRecord>;
+    transform: (
+        data: MonitorConfigurationInput
+    ) => Promise<MonitorConfigurationInput>;
 }
 
 /**
@@ -174,8 +175,7 @@ class MigrationOrchestrator {
      *
      * @param monitorType - The monitor type identifier (e.g., "http", "ping",
      *   "dns")
-     * @param data - The {@link UnknownRecord} monitor configuration data to
-     *   migrate
+     * @param data - Partial monitor configuration data to migrate
      * @param fromVersion - The current semantic version of the data (e.g.,
      *   "1.0.0")
      * @param toVersion - The target semantic version to migrate to (e.g.,
@@ -197,12 +197,12 @@ class MigrationOrchestrator {
      */
     public async migrateMonitorData(
         monitorType: string,
-        data: UnknownRecord,
+        data: MonitorConfigurationInput,
         fromVersion: string,
         toVersion: string
     ): Promise<{
         appliedMigrations: string[];
-        data?: UnknownRecord;
+        data?: MonitorConfigurationInput;
         errors: string[];
         success: boolean;
         warnings: string[];
@@ -877,7 +877,7 @@ export const exampleMigrations = {
      *
      * @defaultValue timeout = 30000 (30 seconds)
      *
-     * @param data - The {@link UnknownRecord} monitor configuration data
+     * @param data - The monitor configuration data
      *
      * @returns Promise resolving to data with `timeout` field set
      *
@@ -888,11 +888,11 @@ export const exampleMigrations = {
         fromVersion: "1.0.0",
         isBreaking: false,
         toVersion: "1.1.0",
-        transform: (data: UnknownRecord) =>
+        transform: (data: MonitorConfigurationInput) =>
             Promise.resolve({
                 ...data,
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe: Migration data extraction with runtime fallback
-                timeout: (data["timeout"] as number | undefined) ?? 30_000, // Default 30 seconds
+                timeout:
+                    typeof data.timeout === "number" ? data.timeout : 30_000,
             }),
     } as MigrationRule,
 
@@ -914,7 +914,7 @@ export const exampleMigrations = {
      * // Result: { port: 8080 }
      * ```
      *
-     * @param data - The {@link UnknownRecord} monitor configuration data
+     * @param data - Monitor configuration data from legacy versions
      *
      * @returns Promise resolving to data with numeric port value
      *
@@ -926,12 +926,12 @@ export const exampleMigrations = {
         fromVersion: "1.0.0",
         isBreaking: false,
         toVersion: "1.1.0",
-        transform: (data: UnknownRecord) => {
-            const portValue = data["port"];
+        transform: (data: MonitorConfigurationInput) => {
+            const rawPort = (data as Record<string, unknown>)["port"];
 
             // Handle different port value types
-            if (typeof portValue === "string") {
-                const parsed = Number.parseInt(portValue, 10);
+            if (typeof rawPort === "string") {
+                const parsed = Number.parseInt(rawPort, 10);
                 // Validate parsed number is valid port
                 if (!Number.isNaN(parsed) && parsed >= 1 && parsed <= 65_535) {
                     return Promise.resolve({
@@ -940,26 +940,26 @@ export const exampleMigrations = {
                     });
                 }
                 throw new Error(
-                    `Invalid port value: ${portValue}. Must be 1-65535.`
+                    `Invalid port value: ${rawPort}. Must be 1-65535.`
                 );
             }
 
             // If already a number, validate it
-            if (typeof portValue === "number") {
-                if (portValue >= 1 && portValue <= 65_535) {
+            if (typeof rawPort === "number") {
+                if (rawPort >= 1 && rawPort <= 65_535) {
                     return Promise.resolve({
                         ...data,
-                        port: portValue,
+                        port: rawPort,
                     });
                 }
                 throw new Error(
-                    `Invalid port number: ${portValue}. Must be 1-65535.`
+                    `Invalid port number: ${rawPort}. Must be 1-65535.`
                 );
             }
 
             // Invalid port type
             throw new Error(
-                `Port must be a number or numeric string, got: ${typeof portValue}`
+                `Port must be a number or numeric string, got: ${typeof rawPort}`
             );
         },
     } as MigrationRule,

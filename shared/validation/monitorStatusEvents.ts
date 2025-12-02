@@ -8,21 +8,21 @@
  * @packageDocumentation
  */
 
+import type { Monitor, Site } from "@shared/types";
 import type { MonitorStatusChangedEventData } from "@shared/types/events";
+import type { UnknownRecord } from "type-fest";
 
 import { validateStatusUpdate } from "./guards";
 
-const isUnknownRecord = (value: unknown): value is Record<string, unknown> =>
-    typeof value === "object" && value !== null;
+const isUnknownRecord = (value: unknown): value is UnknownRecord =>
+    typeof value === "object" && value !== null && !Array.isArray(value);
 
-const stripEventMetadata = (
-    value: Record<string, unknown>
-): Record<string, unknown> => {
+const stripEventMetadata = (value: UnknownRecord): UnknownRecord => {
     if (!Reflect.has(value, "_meta") && !Reflect.has(value, "_originalMeta")) {
         return value;
     }
 
-    const sanitizedRecord = { ...value };
+    const sanitizedRecord: UnknownRecord = { ...value };
 
     if (Reflect.has(sanitizedRecord, "_meta")) {
         Reflect.deleteProperty(sanitizedRecord, "_meta");
@@ -68,6 +68,6 @@ export const isMonitorStatusChangedEventData = (
 export const isEnrichedMonitorStatusChangedEventData = (
     payload: unknown
 ): payload is MonitorStatusChangedEventData & {
-    monitor: Record<string, unknown>;
-    site: Record<string, unknown>;
+    monitor: Monitor;
+    site: Site;
 } => isMonitorStatusChangedEventData(payload);

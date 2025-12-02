@@ -19,7 +19,7 @@ import { WebSocket as NodeWebSocket } from "ws";
 import type {
     IMonitorService,
     MonitorCheckResult,
-    MonitorConfig,
+    MonitorServiceConfig,
 } from "./types";
 
 import { DEFAULT_REQUEST_TIMEOUT } from "../../constants";
@@ -36,7 +36,7 @@ const DEFAULT_PONG_TIMEOUT_MS = 1500;
  * keepalive handshake.
  */
 export class WebsocketKeepaliveMonitor implements IMonitorService {
-    private config: MonitorConfig;
+    private config: MonitorServiceConfig;
 
     public async check(
         monitor: Site["monitors"][0],
@@ -295,7 +295,7 @@ export class WebsocketKeepaliveMonitor implements IMonitorService {
         return DEFAULT_PONG_TIMEOUT_MS;
     }
 
-    public constructor(config: MonitorConfig = {}) {
+    public constructor(config: MonitorServiceConfig = {}) {
         this.config = {
             timeout: DEFAULT_REQUEST_TIMEOUT,
             ...config,
@@ -306,7 +306,7 @@ export class WebsocketKeepaliveMonitor implements IMonitorService {
         return "websocket-keepalive";
     }
 
-    public updateConfig(config: Partial<MonitorConfig>): void {
+    public updateConfig(config: Partial<MonitorServiceConfig>): void {
         this.config = {
             ...this.config,
             ...config,

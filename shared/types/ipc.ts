@@ -22,7 +22,7 @@ import type {
     StateSyncStatusSummary,
 } from "@shared/types/stateSync";
 import type { ValidationResult } from "@shared/types/validation";
-import type { UnknownRecord } from "type-fest";
+import type { ExclusifyUnion, Simplify, UnknownRecord } from "type-fest";
 
 /**
  * Standardized IPC response envelope shared across renderer, preload, and main.
@@ -66,7 +66,7 @@ export interface SerializedDatabaseBackupResult {
     /** Generated filename for the backup artifact. */
     fileName: string;
     /** Metadata describing the backup operation. */
-    metadata: {
+    metadata?: {
         /** Backup creation timestamp in milliseconds since the Unix epoch. */
         createdAt: number;
         /** Original database file path on disk. */
@@ -94,26 +94,70 @@ export interface IpcHandlerVerificationResult {
 }
 
 /**
+ * Structured metadata logged when verifying IPC handler registration.
+ */
+export interface IpcHandlerVerificationLogMetadata {
+    /** Ordered list of registered IPC channel identifiers. */
+    availableChannels: readonly string[];
+    /** Channel name requested by the preload bridge. */
+    channel: string;
+}
+
+/**
  * Structured payload emitted when a preload guard rejects an incoming event.
  *
  * @remarks
  * Enables centralized diagnostics by forwarding guard failures, along with
  * contextual metadata, to the Electron main process.
  */
-export interface PreloadGuardDiagnosticsReport {
+export type PreloadGuardDiagnosticsReport = Simplify<{
     /** IPC channel associated with the rejected payload. */
     channel: string;
     /** Name of the guard function that rejected the payload. */
     guard: string;
     /** Additional metadata describing the guard context. */
-    metadata?: Record<string, unknown>;
+    metadata?: UnknownRecord;
     /** Serialized preview of the rejected payload for debugging. */
     payloadPreview?: string;
     /** Optional human-readable reason supplied by the guard. */
     reason?: string;
     /** Timestamp (milliseconds since Unix epoch) when the guard triggered. */
     timestamp: number;
+}>;
+
+/**
+ * Log metadata emitted when a preload guard rejects an incoming payload.
+ */
+export interface PreloadGuardDiagnosticsLogMetadata {
+    channel: string;
+    guard: string;
+    metadata?: UnknownRecord;
+    payloadPreview?: string;
+    reason?: string;
+    timestamp: number;
 }
+
+type RawDiagnosticsEvent =
+    | {
+          channel: "diagnostics-report-preload-guard";
+          payload: PreloadGuardDiagnosticsReport;
+          type: "preload-guard";
+      }
+    | {
+          channel: "diagnostics-verify-ipc-handler";
+          payload: IpcHandlerVerificationResult;
+          type: "handler-verification";
+      };
+
+/**
+ * Tagged union describing all diagnostics payloads emitted over IPC.
+ */
+export type IpcDiagnosticsEvent = Simplify<ExclusifyUnion<RawDiagnosticsEvent>>;
+
+/**
+ * Supported IPC diagnostics channels constrained by {@link IpcDiagnosticsEvent}.
+ */
+export type IpcDiagnosticsChannel = IpcDiagnosticsEvent["channel"];
 
 /**
  * Mapping of IPC invoke channel names to their parameter tuples and result

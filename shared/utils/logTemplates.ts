@@ -26,7 +26,7 @@
  * @packageDocumentation
  */
 
-import type { UnknownRecord } from "type-fest";
+import type { Simplify, TaggedUnion, UnknownRecord } from "type-fest";
 
 /**
  * Logger interface for type safety with enhanced type utilities.
@@ -42,7 +42,8 @@ interface Logger {
  * Template variable values for log interpolation. Uses Partial to make all
  * variables optional.
  */
-type TemplateVariables = Partial<Record<string, null | number | string>>;
+type TemplateValue = boolean | null | number | string | undefined;
+type TemplateVariables = Simplify<Partial<Record<string, TemplateValue>>>;
 
 // Export enhanced types for external use
 export type { TemplateVariables };
@@ -452,6 +453,20 @@ export type LogTemplate =
     | (typeof SERVICE_LOGS)[keyof typeof SERVICE_LOGS]
     | (typeof WARNING_LOGS)[keyof typeof WARNING_LOGS];
 
+type TemplateCategoryMap = {
+    [Category in keyof LogTemplatesInterface]: {
+        key: keyof LogTemplatesInterface[Category];
+        template: LogTemplatesInterface[Category][keyof LogTemplatesInterface[Category]];
+    };
+};
+
+/**
+ * Structured representation of log templates for strongly typed consumers.
+ */
+export type StructuredLogTemplate = Simplify<
+    TaggedUnion<"category", TemplateCategoryMap>
+>;
+
 /**
  * Helper function to interpolate template variables in log messages.
  *
@@ -474,6 +489,44 @@ export function interpolateLogTemplate(
     template: string,
     variables: TemplateVariables
 ): string {
+    const formatValue = (
+        value: TemplateVariables[keyof TemplateVariables]
+    ): string => {
+        if (value === undefined || value === null) {
+            return "";
+        }
+
+        switch (typeof value) {
+            case "bigint": {
+                return "";
+            }
+            case "boolean": {
+                return value ? "true" : "false";
+            }
+            case "function": {
+                return "";
+            }
+            case "number": {
+                return Number.isFinite(value) ? `${value}` : "NaN";
+            }
+            case "object": {
+                return "";
+            }
+            case "string": {
+                return value;
+            }
+            case "symbol": {
+                return "";
+            }
+            case "undefined": {
+                return "";
+            }
+            default: {
+                return "";
+            }
+        }
+    };
+
     return template.replaceAll(
         // eslint-disable-next-line regexp/strict, regexp/require-unicode-sets-regexp, regexp/require-unicode-regexp -- Conflicting rules: strict wants escaped braces, require-unicode-sets wants v flag, require-unicode wants u flag
         /{(?<variableName>[$_a-z][\w$]*)}/gi,
@@ -483,7 +536,7 @@ export function interpolateLogTemplate(
             const value = variables[key as keyof typeof variables];
             return value === undefined || value === null
                 ? match
-                : String(value);
+                : formatValue(value);
         }
     );
 }

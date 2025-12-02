@@ -50,7 +50,6 @@
  * @public
  */
 import type { Monitor, Site } from "@shared/types";
-import type { MonitorRow } from "@shared/types/database";
 import type { Database } from "node-sqlite3-wasm";
 import type { UnknownRecord } from "type-fest";
 
@@ -69,8 +68,8 @@ import {
 import {
     insertWithReturning,
     queryForIds,
-    queryForRecords,
-    queryForSingleRecord,
+    queryMonitorRow,
+    queryMonitorRows,
 } from "./utils/typedQueries";
 
 /**
@@ -412,11 +411,11 @@ export class MonitorRepository {
             () =>
                 Promise.resolve(
                     rowToMonitorOrUndefined(
-                        queryForSingleRecord(
+                        queryMonitorRow(
                             this.getDb(),
                             MONITOR_QUERIES.SELECT_BY_ID,
                             [monitorId]
-                        ) as MonitorRow | undefined
+                        )
                     )
                 ),
             "monitor-lookup",
@@ -591,7 +590,7 @@ export class MonitorRepository {
         db: Database,
         siteIdentifier: string
     ): Site["monitors"] {
-        const monitorRows = queryForRecords(
+        const monitorRows = queryMonitorRows(
             db,
             MONITOR_QUERIES.SELECT_BY_SITE,
             [siteIdentifier]

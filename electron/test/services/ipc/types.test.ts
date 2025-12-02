@@ -366,7 +366,9 @@ describe("IPC Types", () => {
             await annotate("Category: Service", "category");
             await annotate("Type: Business Logic", "type");
 
-            const validator: IpcParameterValidator = (params: unknown[]) => {
+            const validator: IpcParameterValidator = (
+                params: readonly unknown[]
+            ) => {
                 if (params.length === 0) {
                     return ["No parameters provided"];
                 }
@@ -389,7 +391,9 @@ describe("IPC Types", () => {
             await annotate("Category: Service", "category");
             await annotate("Type: Error Handling", "type");
 
-            const validator: IpcParameterValidator = (params: unknown[]) => {
+            const validator: IpcParameterValidator = (
+                params: readonly unknown[]
+            ) => {
                 const errors: string[] = [];
 
                 if (params.length < 2) {
@@ -432,7 +436,9 @@ describe("IPC Types", () => {
                 name: string;
             }
 
-            const validator: IpcParameterValidator = (params: unknown[]) => {
+            const validator: IpcParameterValidator = (
+                params: readonly unknown[]
+            ) => {
                 if (params.length !== 1) {
                     return ["Exactly one parameter required"];
                 }

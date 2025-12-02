@@ -2,9 +2,8 @@
  * Type-safe event bus with middleware support and debugging capabilities.
  *
  * @remarks
- * Enhances the standard Node.js EventEmitter with compile-time type safety,
- * middleware processing, correlation tracking, and comprehensive logging.
- * Ensures events are properly typed and provides rich debugging information.
+ * Enhances the standard Node.js EventEmitter with compile-time type safety
+ * while preserving rich debugging capabilities.
  *
  * @example
  *
@@ -30,7 +29,7 @@
  */
 
 import type { EventMetadata } from "@shared/types/events";
-import type { UnknownRecord } from "type-fest";
+import type { Simplify } from "type-fest";
 
 import {
     createTemplateLogger,
@@ -43,12 +42,124 @@ import { logger as baseLogger } from "../utils/logger";
 
 const logger = createTemplateLogger(baseLogger);
 
+const isEventMetadataCandidate = (value: unknown): value is EventMetadata => {
+    if (!value || typeof value !== "object") {
+        return false;
+    }
+
+    const candidate = value as Partial<EventMetadata>;
+
+    return (
+        typeof candidate.busId === "string" &&
+        typeof candidate.correlationId === "string" &&
+        typeof candidate.eventName === "string" &&
+        typeof candidate.timestamp === "number"
+    );
+};
+
+interface MetaCarrier {
+    readonly _meta: EventMetadata;
+}
+
+interface OriginalMetaCarrier {
+    readonly _originalMeta: EventMetadata;
+}
+
+const resolveOriginalMetadata = (
+    ...candidates: readonly unknown[]
+): EventMetadata | undefined => candidates.find(isEventMetadataCandidate);
+
 /**
  * Internal symbol used to carry original metadata through event forwarding.
  */
 export const ORIGINAL_METADATA_SYMBOL: unique symbol = Symbol(
     "typed-event-bus:original-meta"
 );
+
+const defineHiddenProperty = (
+    target: object,
+    key: string | symbol,
+    value: unknown,
+    options?: { enumerable?: boolean }
+): void => {
+    Object.defineProperty(target, key, {
+        configurable: false,
+        enumerable: options?.enumerable ?? true,
+        value,
+        writable: false,
+    });
+};
+
+const structuredCloneFn =
+    typeof globalThis.structuredClone === "function"
+        ? globalThis.structuredClone.bind(globalThis)
+        : undefined;
+
+const cloneArrayPayload = <TPayload extends ArrayPayload>(
+    payload: TPayload
+): TPayload => {
+    if (structuredCloneFn) {
+        try {
+            return structuredCloneFn(payload);
+        } catch {
+            // Fall through to manual cloning for non-cloneable payload entries (e.g., functions).
+        }
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Fallback cloning preserves tuple structures when structuredClone is unavailable.
+    return Array.from(payload) as TPayload;
+};
+
+const cloneObjectPayload = <TPayload extends NonArrayObjectPayload>(
+    payload: TPayload
+): TPayload => {
+    if (structuredCloneFn) {
+        try {
+            return structuredCloneFn(payload);
+        } catch {
+            // Fall through to manual cloning for non-cloneable payload entries (e.g., functions).
+        }
+    }
+
+    const prototype = Reflect.getPrototypeOf(payload) ?? Object.prototype;
+    const clone: NonArrayObjectPayload = { ...payload };
+    Reflect.setPrototypeOf(clone, prototype);
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Manual cloning retains the payload shape when structuredClone is unavailable.
+    return clone as TPayload;
+};
+
+const getHiddenProperty = (
+    target: NonArrayObjectPayload,
+    key: string | symbol
+): unknown => {
+    if (!Reflect.has(target, key)) {
+        return undefined;
+    }
+
+    return Reflect.get(target, key);
+};
+
+const attachMetadata: <TPayload extends object>(
+    payload: TPayload,
+    metadata: EventMetadata,
+    options?: { enumerable?: boolean }
+) => asserts payload is MetaCarrier & TPayload = (
+    payload,
+    metadata,
+    options
+) => {
+    defineHiddenProperty(payload, "_meta", metadata, options);
+};
+
+const attachOriginalMetadata: <TPayload extends object>(
+    payload: TPayload,
+    metadata: EventMetadata
+) => asserts payload is OriginalMetaCarrier & TPayload = (
+    payload,
+    metadata
+) => {
+    defineHiddenProperty(payload, "_originalMeta", metadata);
+};
 
 /**
  * Diagnostic information about a {@link TypedEventBus} instance.
@@ -59,11 +170,13 @@ export const ORIGINAL_METADATA_SYMBOL: unique symbol = Symbol(
  *
  * @public
  */
-export interface EventBusDiagnostics {
+export interface EventBusDiagnostics<
+    EventMap extends TypedEventMap = TypedEventMap,
+> {
     /** Unique identifier for this event bus instance. */
     busId: string;
     /** Number of listeners registered for each event. */
-    listenerCounts: Record<string, number>;
+    listenerCounts: Partial<Record<EventKey<EventMap>, number>>;
     /** Maximum number of listeners allowed per event. */
     maxListeners: number;
     /** Maximum number of middleware functions allowed. */
@@ -109,12 +222,96 @@ export interface EventBusDiagnostics {
  */
 
 /**
+ * Read-only array payload supported by the event bus.
+ */
+type ArrayPayload = readonly unknown[] | unknown[];
+
+/**
+ * Primitive payload supported by the event bus.
+ */
+type PrimitivePayload =
+    | bigint
+    | boolean
+    | null
+    | number
+    | string
+    | symbol
+    | undefined;
+
+/**
+ * Non-array object payload shape used to distinguish plain objects from arrays.
+ * The optional `length` exclusion prevents accidental array matches.
+ */
+type NonArrayObjectPayload = Record<PropertyKey, unknown> & {
+    readonly length?: never;
+};
+
+/**
+ * Supported event payload value for the typed event bus.
+ */
+export type EventPayloadValue =
+    | ArrayPayload
+    | NonArrayObjectPayload
+    | PrimitivePayload;
+
+type PrimitiveEventPayload<Value extends PrimitivePayload> = Readonly<{
+    _meta: EventMetadata;
+    _originalMeta?: EventMetadata;
+    value: Value;
+}>;
+
+/**
+ * Mapping between event keys and their typed payload values.
+ */
+export type TypedEventMap = Record<string, EventPayloadValue>;
+
+/**
+ * Extracts the string key union from a typed event map.
+ */
+export type EventKey<EventMap> = Extract<keyof EventMap, string>;
+
+/**
+ * Payload enriched with metadata for downstream listeners.
+ */
+export type EnhancedEventPayload<Payload extends EventPayloadValue> =
+    Payload extends ArrayPayload
+        ? Payload &
+              Readonly<{
+                  readonly _meta: EventMetadata;
+                  readonly _originalMeta?: EventMetadata;
+              }>
+        : Payload extends PrimitivePayload
+          ? PrimitiveEventPayload<Payload>
+          : Simplify<
+                Omit<Payload, "_meta" | "_originalMeta"> & {
+                    readonly _meta: EventMetadata;
+                    readonly _originalMeta?: EventMetadata;
+                }
+            >;
+
+/**
+ * Function signature for strongly typed event listeners.
+ */
+export type TypedEventListener<
+    EventMap extends TypedEventMap,
+    K extends EventKey<EventMap>,
+> = (payload: EnhancedEventPayload<EventMap[K]>) => void;
+
+/**
  * Middleware function signature used by {@link TypedEventBus} to process events
  * before they are emitted to listeners.
  */
-export type EventMiddleware<T = unknown> = (
-    event: string,
-    data: T,
+export type EventMiddleware<EventMap extends TypedEventMap = TypedEventMap> = <
+    K extends EventKey<EventMap>,
+>(
+    event: K,
+    data: EventMap[K],
+    next: () => Promise<void> | void
+) => Promise<void> | void;
+
+type MiddlewareExecutor<EventMap extends TypedEventMap> = (
+    event: EventKey<EventMap>,
+    data: EventMap[EventKey<EventMap>],
     next: () => Promise<void> | void
 ) => Promise<void> | void;
 
@@ -135,7 +332,7 @@ export type EventMiddleware<T = unknown> = (
  * @public
  */
 export class TypedEventBus<
-    EventMap extends UnknownRecord,
+    EventMap extends TypedEventMap,
     // eslint-disable-next-line unicorn/prefer-event-target -- Required for Node.js EventEmitter compatibility
 > extends EventEmitter {
     /**
@@ -163,7 +360,12 @@ export class TypedEventBus<
      * Middleware functions are executed in order during event emission. Used
      * for cross-cutting concerns like logging, validation, and rate limiting.
      */
-    private readonly middlewares: EventMiddleware[] = [];
+    private readonly middlewares: Array<MiddlewareExecutor<EventMap>> = [];
+
+    private readonly middlewareExecutors = new Map<
+        EventMiddleware<EventMap>,
+        Array<MiddlewareExecutor<EventMap>>
+    >();
 
     /**
      * Emit a typed event through the middleware chain.
@@ -219,12 +421,12 @@ export class TypedEventBus<
      *
      * @throws Error when middleware processing fails.
      */
-    public async emitTyped<K extends keyof EventMap>(
+    public async emitTyped<K extends EventKey<EventMap>>(
         event: K,
         data: EventMap[K]
     ): Promise<void> {
         const correlationId = generateCorrelationId();
-        const eventName = String(event);
+        const eventName = event;
 
         logger.debug(LOG_TEMPLATES.debug.EVENT_BUS_EMISSION_START, {
             busId: this.busId,
@@ -234,10 +436,10 @@ export class TypedEventBus<
 
         try {
             // Process through middleware chain
-            await this.processMiddleware(eventName, data, correlationId);
+            await this.processMiddleware(event, data, correlationId);
 
             // Emit the actual event with enhanced data
-            const enhancedData = this.createEnhancedData(data, {
+            const enhancedData = this.createEnhancedData<EventMap[K]>(data, {
                 busId: this.busId,
                 correlationId,
                 eventName,
@@ -287,38 +489,45 @@ export class TypedEventBus<
      *
      * @throws Error if any middleware in the chain throws.
      */
-    private async processMiddleware(
-        eventName: string,
-        data: unknown,
+    private async processMiddleware<K extends EventKey<EventMap>>(
+        event: K,
+        data: EventMap[K],
         correlationId: string
     ): Promise<void> {
         if (this.middlewares.length === 0) {
             return;
         }
 
-        const processNext = async (currentIndex: number): Promise<void> => {
-            if (currentIndex < this.middlewares.length) {
-                const middleware = this.middlewares[currentIndex];
+        const eventName = event;
 
-                if (middleware) {
-                    try {
-                        await middleware(eventName, data, () =>
-                            processNext(currentIndex + 1)
-                        );
-                    } catch (error) {
-                        // Use base logger directly for error objects since
-                        // template logger doesn't support error objects
-                        baseLogger.error(
-                            `[TypedEventBus:${this.busId}] Middleware error for '${eventName}' [${correlationId}]`,
-                            error
-                        );
-                        throw error;
-                    }
-                }
+        const processNext = async (
+            index: number,
+            currentEvent: K,
+            currentData: EventMap[K]
+        ): Promise<void> => {
+            if (index >= this.middlewares.length) {
+                return;
+            }
+
+            const middleware = this.middlewares[index];
+            if (!middleware) {
+                return;
+            }
+
+            try {
+                await middleware(currentEvent, currentData, () =>
+                    processNext(index + 1, currentEvent, currentData)
+                );
+            } catch (error) {
+                baseLogger.error(
+                    `[TypedEventBus:${this.busId}] Middleware error for '${eventName}' [${correlationId}]`,
+                    error
+                );
+                throw error;
             }
         };
 
-        await processNext(0);
+        await processNext(0, event, data);
     }
 
     /**
@@ -389,16 +598,19 @@ export class TypedEventBus<
      * Get diagnostic information about the event bus.
      *
      * @remarks
-     * Provides runtime information useful for debugging and monitoring.
-     * Includes listener counts per event, middleware count, and configuration.
+     * Provides listener counts per event, middleware utilization statistics,
+     * and configured limits. Useful for debugging middleware leaks and
+     * verifying listener cleanup in tests.
      *
      * @returns Diagnostic data including listener counts and middleware
      *   information.
      */
-    public getDiagnostics(): EventBusDiagnostics {
-        const listenerCounts: Record<string, number> = {};
+    public getDiagnostics(): EventBusDiagnostics<EventMap> {
+        const listenerCounts: Partial<Record<EventKey<EventMap>, number>> = {};
         for (const eventName of this.eventNames()) {
-            listenerCounts[String(eventName)] = this.listenerCount(eventName);
+            if (this.isKnownEvent(eventName)) {
+                listenerCounts[eventName] = this.listenerCount(eventName);
+            }
         }
 
         return {
@@ -438,11 +650,11 @@ export class TypedEventBus<
      *
      * @returns This event bus instance for chaining.
      */
-    public offTyped<K extends keyof EventMap>(
+    public offTyped<K extends EventKey<EventMap>>(
         event: K,
-        listener?: (data: EventMap[K] & { _meta: EventMetadata }) => void
+        listener?: TypedEventListener<EventMap, K>
     ): this {
-        const eventName = String(event);
+        const eventName = event;
         if (listener) {
             this.off(eventName, listener);
         } else {
@@ -456,18 +668,21 @@ export class TypedEventBus<
         return this;
     }
 
+    private isKnownEvent(name: unknown): name is EventKey<EventMap> {
+        return typeof name === "string";
+    }
+
     /**
      * Register a one-time typed event listener.
      *
      * @remarks
-     * The listener is automatically removed after the first time the event is
-     * emitted.
+     * Invokes the listener exactly once and then removes it automatically.
+     * Useful for events that should only trigger a single reaction, such as
+     * initialization hooks.
      *
      * @example
      *
      * ```typescript
-     * import { logger } from "../utils/logger";
-     *
      * bus.onceTyped("user:login", (data) => {
      *     logger.info("User logged in", data);
      * });
@@ -481,11 +696,11 @@ export class TypedEventBus<
      *
      * @returns This event bus instance for chaining.
      */
-    public onceTyped<K extends keyof EventMap>(
+    public onceTyped<K extends EventKey<EventMap>>(
         event: K,
-        listener: (data: EventMap[K] & { _meta: EventMetadata }) => void
+        listener: TypedEventListener<EventMap, K>
     ): this {
-        const eventName = String(event);
+        const eventName = event;
         this.once(eventName, listener);
 
         logger.debug(LOG_TEMPLATES.debug.EVENT_BUS_ONE_TIME_LISTENER, {
@@ -510,11 +725,11 @@ export class TypedEventBus<
      *
      * @returns This event bus instance for chaining.
      */
-    public onTyped<K extends keyof EventMap>(
+    public onTyped<K extends EventKey<EventMap>>(
         event: K,
-        listener: (data: EventMap[K] & { _meta: EventMetadata }) => void
+        listener: TypedEventListener<EventMap, K>
     ): this {
-        const eventName = String(event);
+        const eventName = event;
         this.on(eventName, listener);
 
         logger.debug(LOG_TEMPLATES.debug.EVENT_BUS_LISTENER_REGISTERED, {
@@ -534,17 +749,33 @@ export class TypedEventBus<
      *
      * @returns `true` if middleware was found and removed, `false` otherwise.
      */
-    public removeMiddleware(middleware: EventMiddleware): boolean {
-        const index = this.middlewares.indexOf(middleware);
-        if (index !== -1) {
-            this.middlewares.splice(index, 1);
-            logger.debug(LOG_TEMPLATES.debug.EVENT_BUS_MIDDLEWARE_REMOVED, {
-                busId: this.busId,
-                count: this.middlewares.length,
-            });
-            return true;
+    public removeMiddleware(middleware: EventMiddleware<EventMap>): boolean {
+        const executors = this.middlewareExecutors.get(middleware);
+        if (!executors || executors.length === 0) {
+            return false;
         }
-        return false;
+
+        const executor = executors.pop();
+        if (!executor) {
+            return false;
+        }
+
+        const index = this.middlewares.indexOf(executor);
+        if (index === -1) {
+            return false;
+        }
+
+        this.middlewares.splice(index, 1);
+        if (executors.length === 0) {
+            this.middlewareExecutors.delete(middleware);
+        }
+
+        logger.debug(LOG_TEMPLATES.debug.EVENT_BUS_MIDDLEWARE_REMOVED, {
+            busId: this.busId,
+            count: this.middlewares.length,
+        });
+
+        return true;
     }
 
     /**
@@ -561,7 +792,7 @@ export class TypedEventBus<
      *
      * @throws Error when the maximum middleware limit is exceeded.
      */
-    public registerMiddleware(middleware: EventMiddleware): void {
+    public registerMiddleware(middleware: EventMiddleware<EventMap>): void {
         if (this.maxMiddleware <= this.middlewares.length) {
             throw new Error(
                 `Maximum middleware limit (${this.maxMiddleware}) exceeded. ` +
@@ -569,7 +800,19 @@ export class TypedEventBus<
             );
         }
 
-        this.middlewares.push(middleware);
+        const executeMiddleware: MiddlewareExecutor<EventMap> = (
+            event,
+            data,
+            next
+        ) => middleware(event, data, next);
+
+        this.middlewares.push(executeMiddleware);
+        const executorStack = this.middlewareExecutors.get(middleware);
+        if (executorStack) {
+            executorStack.push(executeMiddleware);
+        } else {
+            this.middlewareExecutors.set(middleware, [executeMiddleware]);
+        }
         logger.debug(
             `[TypedEventBus:${this.busId}] Registered middleware (total: ${this.middlewares.length}/${this.maxMiddleware})`
         );
@@ -613,98 +856,109 @@ export class TypedEventBus<
      *
      * @returns Enhanced data with `_meta` property.
      */
-    private createEnhancedData(
-        data: unknown,
+    private createEnhancedData<Payload extends EventPayloadValue>(
+        data: Payload,
         metadata: EventMetadata
-    ): unknown {
-        // Handle primitive types (string, number, boolean, null, undefined)
-        if (typeof data !== "object" || data === null) {
-            return {
-                _meta: metadata,
-                value: data,
-            };
-        }
-        // Handle arrays specially to preserve array nature
-        if (Array.isArray(data)) {
-            // For arrays, we need to preserve both the array type and add _meta
-            // This is a legitimate type transformation that requires careful
-            // handling
-            const result: unknown[] = Array.from(data);
-            // Use defineProperty to add non-enumerable _meta, preserving array
-            // immutability expectations
-            Object.defineProperty(result, "_meta", {
-                configurable: false,
-                enumerable: false,
-                value: metadata,
-                writable: false,
-            });
-            // This assertion is safe because:
-            // 1. result has the same elements as data (Array.from preserves
-            // content) 2. we've added the required _meta property 3.
-            // defineProperty preserves the array nature 4. T is known to be an
-            // array type (from Array.isArray check)
-
-            return result;
+    ): EnhancedEventPayload<Payload> {
+        if (this.isPrimitivePayload(data)) {
+            return this.wrapPrimitivePayload(data, metadata);
         }
 
-        // Handle objects with potential _meta conflicts
-        const hasExistingMeta = Reflect.has(data, "_meta");
-        if (hasExistingMeta) {
-            logger.debug(
-                `[TypedEventBus:${this.busId}] Event data contains _meta property, preserving as _originalMeta`
+        if (this.isArrayPayload(data)) {
+            const clonedArray = cloneArrayPayload(data);
+            attachMetadata(clonedArray, metadata, { enumerable: false });
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Metadata attachment guarantees payload satisfies EnhancedEventPayload.
+            return clonedArray as EnhancedEventPayload<Payload>;
+        }
+
+        if (!this.isObjectPayload(data)) {
+            throw new TypeError(
+                "TypedEventBus received an unsupported payload type"
             );
-
-            const existingMetaCandidate = Reflect.get(data, "_meta") as unknown;
-            const existingOriginalMetaCandidate = Reflect.has(
-                data,
-                "_originalMeta"
-            )
-                ? (Reflect.get(data, "_originalMeta") as unknown)
-                : undefined;
-            const symbolOriginalMetaCandidate = Reflect.has(
-                data,
-                ORIGINAL_METADATA_SYMBOL
-            )
-                ? (Reflect.get(data, ORIGINAL_METADATA_SYMBOL) as unknown)
-                : undefined;
-
-            const resolvedOriginalMeta =
-                symbolOriginalMetaCandidate ??
-                existingOriginalMetaCandidate ??
-                existingMetaCandidate;
-
-            const enhanced = { ...data } as Record<string, unknown>;
-
-            if (Reflect.has(enhanced, "_meta")) {
-                Reflect.deleteProperty(enhanced, "_meta");
-            }
-
-            if (Reflect.has(enhanced, "_originalMeta")) {
-                Reflect.deleteProperty(enhanced, "_originalMeta");
-            }
-
-            if (Reflect.has(enhanced, ORIGINAL_METADATA_SYMBOL)) {
-                Reflect.deleteProperty(enhanced, ORIGINAL_METADATA_SYMBOL);
-            }
-
-            if (symbolOriginalMetaCandidate !== undefined) {
-                Reflect.deleteProperty(data, ORIGINAL_METADATA_SYMBOL);
-            }
-
-            enhanced["_meta"] = metadata;
-
-            if (resolvedOriginalMeta !== undefined) {
-                enhanced["_originalMeta"] = resolvedOriginalMeta;
-            }
-
-            return enhanced;
         }
 
-        // Safe transformation: spreading object and adding _meta
-        return {
-            ...data,
-            _meta: metadata,
-        };
+        const sourcePayload = data;
+        const existingMetaCandidate = getHiddenProperty(sourcePayload, "_meta");
+        const existingOriginalMetaCandidate = getHiddenProperty(
+            sourcePayload,
+            "_originalMeta"
+        );
+        const symbolOriginalMetaCandidate = getHiddenProperty(
+            sourcePayload,
+            ORIGINAL_METADATA_SYMBOL
+        );
+
+        const clonedPayload = cloneObjectPayload(data);
+
+        if (Reflect.has(clonedPayload, "_meta")) {
+            Reflect.deleteProperty(clonedPayload, "_meta");
+        }
+
+        if (Reflect.has(clonedPayload, "_originalMeta")) {
+            Reflect.deleteProperty(clonedPayload, "_originalMeta");
+        }
+
+        if (Reflect.has(clonedPayload, ORIGINAL_METADATA_SYMBOL)) {
+            Reflect.deleteProperty(clonedPayload, ORIGINAL_METADATA_SYMBOL);
+        }
+
+        const metadataCandidates = [
+            symbolOriginalMetaCandidate,
+            existingOriginalMetaCandidate,
+            existingMetaCandidate,
+        ].filter(isEventMetadataCandidate);
+
+        const resolvedOriginalMeta =
+            metadataCandidates.length > 0
+                ? resolveOriginalMetadata(...metadataCandidates)
+                : undefined;
+        const rawOriginalMetaCandidate =
+            symbolOriginalMetaCandidate ??
+            existingOriginalMetaCandidate ??
+            existingMetaCandidate;
+
+        attachMetadata(clonedPayload, metadata);
+
+        if (resolvedOriginalMeta !== undefined) {
+            attachOriginalMetadata(clonedPayload, resolvedOriginalMeta);
+        } else if (rawOriginalMetaCandidate !== undefined) {
+            defineHiddenProperty(
+                clonedPayload,
+                "_originalMeta",
+                rawOriginalMetaCandidate
+            );
+        }
+
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Metadata attachment guarantees payload satisfies EnhancedEventPayload.
+        return clonedPayload as EnhancedEventPayload<Payload>;
+    }
+
+    private wrapPrimitivePayload<Payload extends PrimitivePayload>(
+        value: Payload,
+        metadata: EventMetadata
+    ): EnhancedEventPayload<Payload> {
+        const wrapper = { value };
+        attachMetadata(wrapper, metadata);
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Wrapper structure matches PrimitiveEventPayload after metadata attachment.
+        return wrapper as EnhancedEventPayload<Payload>;
+    }
+
+    private isPrimitivePayload(
+        value: EventPayloadValue
+    ): value is PrimitivePayload {
+        return typeof value !== "object" || value === null;
+    }
+
+    private isArrayPayload(value: EventPayloadValue): value is ArrayPayload {
+        return Array.isArray(value);
+    }
+
+    private isObjectPayload(
+        value: EventPayloadValue
+    ): value is NonArrayObjectPayload {
+        return (
+            typeof value === "object" && value !== null && !Array.isArray(value)
+        );
     }
 }
 
@@ -732,7 +986,7 @@ export class TypedEventBus<
  * @returns A new {@link TypedEventBus} instance.
  */
 // eslint-disable-next-line etc/no-misused-generics -- EventMap must be explicitly provided for type safety
-export function createTypedEventBus<EventMap extends UnknownRecord>(
+export function createTypedEventBus<EventMap extends TypedEventMap>(
     name?: string,
     options?: { maxMiddleware?: number }
 ): TypedEventBus<EventMap> {

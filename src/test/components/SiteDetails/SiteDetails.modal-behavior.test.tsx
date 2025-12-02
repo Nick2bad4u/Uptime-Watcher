@@ -141,7 +141,12 @@ const baseMonitor = {
 };
 
 const createHookState = (overrides: Record<string, unknown> = {}) => {
-    const analytics = {
+    const { analytics: analyticsOverride, ...restOverrides } = overrides;
+    const analyticsOverrides = analyticsOverride as
+        | Record<string, unknown>
+        | undefined;
+
+    const analyticsBase = {
         avgResponseTime: 200,
         degradedCount: 2,
         downCount: 1,
@@ -157,12 +162,44 @@ const createHookState = (overrides: Record<string, unknown> = {}) => {
         p50: 180,
         p95: 400,
         p99: 550,
+        percentileMetrics: {
+            p50: 180,
+            p95: 400,
+            p99: 550,
+        },
         slowestResponse: 600,
         totalChecks: 42,
         totalDowntime: 1200,
         upCount: 5,
         uptime: "95.5%",
-        ...(overrides["analytics"] as Record<string, unknown> | undefined),
+    };
+
+    const mergedAnalytics = {
+        ...analyticsBase,
+        ...analyticsOverrides,
+    } as Record<string, unknown> & {
+        p50?: number;
+        p95?: number;
+        p99?: number;
+    };
+
+    const overridePercentiles = analyticsOverrides?.["percentileMetrics"] as
+        | {
+              p50: number;
+              p95: number;
+              p99: number;
+          }
+        | undefined;
+
+    const percentileMetrics = overridePercentiles ?? {
+        p50: Number(mergedAnalytics.p50 ?? 0),
+        p95: Number(mergedAnalytics.p95 ?? 0),
+        p99: Number(mergedAnalytics.p99 ?? 0),
+    };
+
+    const analytics = {
+        ...mergedAnalytics,
+        percentileMetrics,
     };
 
     return {
@@ -202,7 +239,7 @@ const createHookState = (overrides: Record<string, unknown> = {}) => {
         siteDetailsChartTimeRange: "24h",
         siteExists: true,
         timeoutChanged: false,
-        ...overrides,
+        ...restOverrides,
     } as any;
 };
 

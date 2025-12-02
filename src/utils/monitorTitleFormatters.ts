@@ -1,160 +1,151 @@
-/**
- * Client-side monitor type suffix formatters used for dynamic suffix generation
- * in the frontend.
- *
- * @public
- */
+import type { Monitor, MonitorType } from "@shared/types";
 
-// Import shared Monitor type from shared validation schemas
-import type { Monitor } from "@shared/types";
+import { validateMonitorType } from "@shared/utils/validation";
 
-/**
- * Type for monitor title suffix formatter functions.
- *
- * @param monitor - Monitor object to generate suffix for.
- *
- * @returns Formatted suffix string for display.
- *
- * @public
- */
+/** Function that produces a human-readable suffix for monitor titles. */
 export type TitleSuffixFormatter = (monitor: Monitor) => string;
 
-/**
- * Registry of title suffix formatters for different monitor types
- *
- * @internal
- */
-const titleSuffixFormatters: Record<string, TitleSuffixFormatter> = {
-    "cdn-edge-consistency": (monitor: Monitor) => {
-        const { baselineUrl, replicaStatusUrl } = monitor;
-        if (baselineUrl) {
-            return ` (${baselineUrl})`;
+const isMonitorTypeKey = (candidate: string): candidate is MonitorType =>
+    validateMonitorType(candidate);
+
+const defaultMonitorTitleSuffixFormatters: Partial<
+    Record<MonitorType, TitleSuffixFormatter>
+> = {
+    "cdn-edge-consistency": (monitor) => {
+        if (monitor.baselineUrl) {
+            return ` (${monitor.baselineUrl})`;
         }
-        if (replicaStatusUrl) {
-            return ` (${replicaStatusUrl})`;
+
+        if (monitor.replicaStatusUrl) {
+            return ` (${monitor.replicaStatusUrl})`;
         }
+
         return "";
     },
-    dns: (monitor: Monitor) => {
-        const { host, recordType } = monitor;
-        return host && recordType ? ` (${recordType} ${host})` : "";
-    },
-    http: (monitor: Monitor) => {
-        const { url } = monitor;
-        return url ? ` (${url})` : "";
-    },
-    "http-header": (monitor: Monitor) =>
-        monitor.url ? ` (${monitor.url})` : "",
-    "http-json": (monitor: Monitor) => (monitor.url ? ` (${monitor.url})` : ""),
-    "http-keyword": (monitor: Monitor) =>
-        monitor.url ? ` (${monitor.url})` : "",
-    "http-latency": (monitor: Monitor) =>
-        monitor.url ? ` (${monitor.url})` : "",
-    "http-status": (monitor: Monitor) =>
-        monitor.url ? ` (${monitor.url})` : "",
-    ping: (monitor: Monitor) => (monitor.host ? ` (${monitor.host})` : ""),
-    port: (monitor: Monitor) => {
-        const { host } = monitor;
-        const { port } = monitor;
-        return host && port ? ` (${host}:${port})` : "";
-    },
-    replication: (monitor: Monitor) => {
-        const { primaryStatusUrl, replicaStatusUrl } = monitor;
-        if (primaryStatusUrl) {
-            return ` (${primaryStatusUrl})`;
+    dns: (monitor) =>
+        monitor.host && monitor.recordType
+            ? ` (${monitor.recordType} ${monitor.host})`
+            : "",
+    http: (monitor) => (monitor.url ? ` (${monitor.url})` : ""),
+    "http-header": (monitor) => (monitor.url ? ` (${monitor.url})` : ""),
+    "http-json": (monitor) => (monitor.url ? ` (${monitor.url})` : ""),
+    "http-keyword": (monitor) => (monitor.url ? ` (${monitor.url})` : ""),
+    "http-latency": (monitor) => (monitor.url ? ` (${monitor.url})` : ""),
+    "http-status": (monitor) => {
+        if (monitor.url) {
+            return ` (${monitor.url})`;
         }
-        if (replicaStatusUrl) {
-            return ` (${replicaStatusUrl})`;
+
+        if (monitor.primaryStatusUrl) {
+            return ` (${monitor.primaryStatusUrl})`;
         }
+
+        if (monitor.replicaStatusUrl) {
+            return ` (${monitor.replicaStatusUrl})`;
+        }
+
         return "";
     },
-    "server-heartbeat": (monitor: Monitor) =>
-        monitor.url ? ` (${monitor.url})` : "",
-    ssl: (monitor: Monitor) => {
-        const { host, port } = monitor;
-        if (!host) {
+    ping: (monitor) => (monitor.host ? ` (${monitor.host})` : ""),
+    port: (monitor) =>
+        monitor.host && monitor.port
+            ? ` (${monitor.host}:${monitor.port})`
+            : "",
+    replication: (monitor) => {
+        if (monitor.primaryStatusUrl) {
+            return ` (${monitor.primaryStatusUrl})`;
+        }
+
+        if (monitor.replicaStatusUrl) {
+            return ` (${monitor.replicaStatusUrl})`;
+        }
+
+        return "";
+    },
+    "server-heartbeat": (monitor) => (monitor.url ? ` (${monitor.url})` : ""),
+    ssl: (monitor) => {
+        if (!monitor.host) {
             return "";
         }
-        const portSuffix = port ? `:${port}` : "";
-        return ` (${host}${portSuffix})`;
+
+        if (monitor.port) {
+            return ` (${monitor.host}:${monitor.port})`;
+        }
+
+        return ` (${monitor.host})`;
     },
-    "websocket-keepalive": (monitor: Monitor) =>
+    "websocket-keepalive": (monitor) =>
         monitor.url ? ` (${monitor.url})` : "",
 };
 
+const monitorTitleSuffixFormatters: Partial<
+    Record<MonitorType, TitleSuffixFormatter>
+> = { ...defaultMonitorTitleSuffixFormatters };
+
+const customMonitorTitleSuffixFormatters = new Map<
+    string,
+    TitleSuffixFormatter
+>();
+
 /**
- * Get title suffix formatter for a monitor type.
- *
- * @remarks
- * Used internally by {@link formatTitleSuffix} to retrieve the appropriate
- * formatter function for a given monitor type.
- *
- * @param monitorType - Type of monitor to get formatter for.
- *
- * @returns Formatter function when available; otherwise `undefined`.
- *
- * @public
+ * Retrieves a suffix formatter for a given monitor type.
  */
 export function getTitleSuffixFormatter(
     monitorType: string
 ): TitleSuffixFormatter | undefined {
-    return Object.hasOwn(titleSuffixFormatters, monitorType)
-        ? titleSuffixFormatters[monitorType]
-        : undefined;
+    if (validateMonitorType(monitorType)) {
+        return monitorTitleSuffixFormatters[monitorType];
+    }
+
+    return customMonitorTitleSuffixFormatters.get(monitorType);
 }
 
 /**
- * Format title suffix for a monitor dynamically.
- *
- * @remarks
- * Uses the monitor type to find an appropriate formatter and generate a
- * descriptive suffix for display purposes (e.g., URL for HTTP monitors).
- *
- * @param monitor - Monitor object to generate suffix for.
- *
- * @returns Formatted suffix string, or empty string when no formatter is
- *   available.
- *
- * @public
+ * Formats a title suffix for the provided monitor configuration.
  */
 export function formatTitleSuffix(monitor: Monitor): string {
     const formatter = getTitleSuffixFormatter(monitor.type);
-    if (formatter) {
-        return formatter(monitor);
+    if (!formatter) {
+        return "";
     }
 
-    // Fallback to empty string if no formatter is registered
-    return "";
+    const suffix = formatter(monitor);
+    if (!suffix || suffix.length === 0) {
+        return "";
+    }
+
+    return suffix;
 }
 
 /**
- * Register a title suffix formatter for a monitor type.
- *
- * @remarks
- * This function allows dynamic registration of title suffix formatters for
- * different monitor types. The formatter function will be called with a monitor
- * object and should return a string suffix to be appended to monitor titles for
- * display purposes. If a formatter already exists for the monitor type, it will
- * be replaced with the new formatter.
- *
- * @example
- *
- * ```typescript
- * registerTitleSuffixFormatter(
- *     "custom",
- *     (monitor) => ` (${monitor.customField})`
- * );
- * ```
- *
- * @param monitorType - The monitor type identifier to register formatter for
- * @param formatter - The formatter function that takes a monitor and returns a
- *   suffix string.
- *
- * @public
+ * Registers a custom formatter for either built-in or user-defined monitor
+ * types.
  */
 export function registerTitleSuffixFormatter(
     monitorType: string,
     formatter: TitleSuffixFormatter
 ): void {
-    titleSuffixFormatters[monitorType] = formatter;
+    if (validateMonitorType(monitorType)) {
+        monitorTitleSuffixFormatters[monitorType] = formatter;
+        return;
+    }
+
+    customMonitorTitleSuffixFormatters.set(monitorType, formatter);
+}
+
+/**
+ * Restores the formatter registry to the default state.
+ */
+export function resetMonitorTitleSuffixFormatters(): void {
+    for (const key of Object.keys(monitorTitleSuffixFormatters)) {
+        if (isMonitorTypeKey(key)) {
+            Reflect.deleteProperty(monitorTitleSuffixFormatters, key);
+        }
+    }
+
+    Object.assign(
+        monitorTitleSuffixFormatters,
+        defaultMonitorTitleSuffixFormatters
+    );
+    customMonitorTitleSuffixFormatters.clear();
 }

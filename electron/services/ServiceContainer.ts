@@ -20,7 +20,8 @@ import type { UnknownRecord } from "type-fest";
 
 import { ensureError } from "@shared/utils/errorHandling";
 
-import type { UptimeEvents } from "../events/eventTypes";
+import type { UptimeEventName, UptimeEvents } from "../events/eventTypes";
+import type { EnhancedEventPayload, EventKey } from "../events/TypedEventBus";
 import type { IMonitoringOperations } from "../managers/SiteManager";
 import type { StandardizedCache } from "../utils/cache/StandardizedCache";
 
@@ -80,6 +81,37 @@ function hasInitializeMethod(
     return typeof candidate.initialize === "function";
 }
 
+/**
+ * Supported payload formats for manager events forwarded to the orchestrator.
+ *
+ * @remarks
+ * Manager event buses attach metadata to payloads via {@link EventMetadata}. The
+ * orchestrator should receive the original payload shape without
+ * EventEmitter-specific metadata. This helper type captures both
+ * representations so forwarding helpers can normalize payloads safely while
+ * preserving type safety.
+ */
+type ForwardablePayloadBase<EventName extends EventKey<UptimeEvents>> = Omit<
+    UptimeEvents[EventName],
+    "_meta" | "_originalMeta"
+>;
+
+type ForwardableEventPayload<EventName extends EventKey<UptimeEvents>> =
+    ForwardablePayloadBase<EventName> & {
+        _meta?: EventMetadata;
+        _originalMeta?: EventMetadata;
+    };
+
+type ForwardablePayloadWithMeta<EventName extends EventKey<UptimeEvents>> =
+    ForwardablePayloadBase<EventName> & {
+        _meta: EventMetadata;
+        _originalMeta?: EventMetadata;
+    };
+
+const toForwardablePayload = <EventName extends EventKey<UptimeEvents>>(
+    payload: EnhancedEventPayload<UptimeEvents[EventName]>
+): ForwardableEventPayload<EventName> => payload;
+
 function isPromiseLike(value: unknown): value is PromiseLike<unknown> {
     if (
         (typeof value !== "object" && typeof value !== "function") ||
@@ -95,33 +127,6 @@ function isPromiseLike(value: unknown): value is PromiseLike<unknown> {
 function isNonNullObject(value: unknown): value is UnknownRecord {
     return typeof value === "object" && value !== null;
 }
-
-/**
- * Supported payload formats for manager events forwarded to the orchestrator.
- *
- * @remarks
- * Manager event buses attach metadata to payloads via {@link EventMetadata}. The
- * orchestrator should receive the original payload shape without
- * EventEmitter-specific metadata. This helper type captures both
- * representations so forwarding helpers can normalize payloads safely while
- * preserving type safety.
- */
-type ForwardablePayloadBase<EventName extends keyof UptimeEvents> = Omit<
-    UptimeEvents[EventName],
-    "_meta" | "_originalMeta"
->;
-
-type ForwardableEventPayload<EventName extends keyof UptimeEvents> =
-    ForwardablePayloadBase<EventName> & {
-        _meta?: EventMetadata;
-        _originalMeta?: unknown;
-    };
-
-type ForwardablePayloadWithMeta<EventName extends keyof UptimeEvents> =
-    ForwardablePayloadBase<EventName> & {
-        _meta: EventMetadata;
-        _originalMeta?: unknown;
-    };
 
 /**
  * Configuration options for {@link ServiceContainer}.
@@ -349,36 +354,14 @@ export class ServiceContainer {
     }
 
     /**
-     * Resets the singleton container for testing purposes.
-     *
-     * @remarks
-     * Clears the singleton instance to allow clean test isolation. Does not
-     * clean up existing service instances or close resources. Call cleanup
-     * methods on services before reset if needed.
-     *
-     * @example
-     *
-     * ```typescript
-     * ServiceContainer.resetForTesting();
-     * const container = ServiceContainer.getInstance({
-     *     enableDebugLogging: true,
-     * });
-     * ```
-     *
-     * @internal
+     * Resets the singleton instance for test isolation.
      */
     public static resetForTesting(): void {
         ServiceContainer.instance = undefined;
     }
 
     /**
-     * Initializes all services in the correct order.
-     *
-     * @remarks
-     * Ensures all dependencies are resolved and services are ready for use.
-     * Should be called once during application startup.
-     *
-     * @returns Promise that resolves when all services are initialized.
+     * Initializes all core services and orchestrators in dependency order.
      */
     public async initialize(): Promise<void> {
         logger.info("[ServiceContainer] Initializing services");
@@ -1015,7 +998,7 @@ export class ServiceContainer {
             "internal:database:sites-refreshed",
             "internal:database:update-sites-cache-requested",
             "system:error",
-        ] as const satisfies ReadonlyArray<keyof UptimeEvents>;
+        ] as const satisfies readonly UptimeEventName[];
 
         const maybeTypedBus = managerEventBus as {
             on?: TypedEventBus<UptimeEvents>["on"];
@@ -1027,13 +1010,15 @@ export class ServiceContainer {
                 maybeTypedBus.onTyped(
                     eventName,
                     (
-                        payloadWithMeta: ForwardablePayloadWithMeta<
-                            typeof eventName
+                        payloadWithMeta: EnhancedEventPayload<
+                            UptimeEvents[typeof eventName]
                         >
                     ): void => {
+                        const forwardablePayload =
+                            toForwardablePayload(payloadWithMeta);
                         this.emitForwardedEvent(
                             eventName,
-                            payloadWithMeta,
+                            forwardablePayload,
                             managerName
                         );
                     }
@@ -1086,7 +1071,7 @@ export class ServiceContainer {
      * @param payload - Raw payload emitted by the manager event bus.
      * @param managerName - Name of the originating manager for diagnostics.
      */
-    private emitForwardedEvent<EventName extends keyof UptimeEvents>(
+    private emitForwardedEvent<EventName extends EventKey<UptimeEvents>>(
         eventName: EventName,
         payload: ForwardableEventPayload<EventName>,
         managerName: string
@@ -1097,7 +1082,7 @@ export class ServiceContainer {
         }
 
         const sanitizedPayload = this.stripEventMetadata(eventName, payload);
-        const eventLabel = String(eventName);
+        const eventLabel = eventName;
 
         void (async (): Promise<void> => {
             try {
@@ -1133,16 +1118,20 @@ export class ServiceContainer {
      *
      * @returns Payload suitable for {@link UptimeOrchestrator.emitTyped}.
      */
-    private stripEventMetadata<EventName extends keyof UptimeEvents>(
+    private stripEventMetadata<EventName extends EventKey<UptimeEvents>>(
         eventName: EventName,
         payload: ForwardableEventPayload<EventName>
     ): UptimeEvents[EventName] {
         if (!this.isPayloadWithMetadata(payload)) {
             if (Array.isArray(payload)) {
-                return Array.from(payload) as UptimeEvents[EventName];
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Array.from preserves the structural payload shape while dropping event metadata.
+                return Array.from(
+                    payload
+                ) as unknown as UptimeEvents[EventName];
             }
 
-            return payload;
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Payload is already of the correct event type; we only need to assert away metadata.
+            return payload as unknown as UptimeEvents[EventName];
         }
 
         const payloadWithMeta: ForwardablePayloadWithMeta<EventName> = payload;
@@ -1150,7 +1139,7 @@ export class ServiceContainer {
             this.extractForwardingMetadata(payloadWithMeta);
 
         if (this.config.enableDebugLogging) {
-            const eventLabel = String(eventName);
+            const eventLabel = eventName;
             logger.debug(
                 `[ServiceContainer] Stripped metadata from ${eventLabel} payload before forwarding`,
                 {
@@ -1163,7 +1152,8 @@ export class ServiceContainer {
         if (Array.isArray(payloadWithMeta)) {
             const clonedArray = Array.from(payloadWithMeta);
             this.applyForwardingMetadata(clonedArray, forwarded, original);
-            return clonedArray as UptimeEvents[EventName];
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- The metadata reattachment preserves the runtime payload shape.
+            return clonedArray as unknown as UptimeEvents[EventName];
         }
 
         const clone: Record<string, unknown> = { ...payloadWithMeta };
@@ -1182,13 +1172,14 @@ export class ServiceContainer {
 
         this.applyForwardingMetadata(clone, forwarded, original);
 
-        return clone as UptimeEvents[EventName];
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- After metadata removal, the clone matches the event payload contract.
+        return clone as unknown as UptimeEvents[EventName];
     }
 
     /**
      * Determines whether a payload contains event bus metadata properties.
      */
-    private isPayloadWithMetadata<EventName extends keyof UptimeEvents>(
+    private isPayloadWithMetadata<EventName extends EventKey<UptimeEvents>>(
         payload: ForwardableEventPayload<EventName>
     ): payload is ForwardablePayloadWithMeta<EventName> {
         return (
@@ -1223,7 +1214,7 @@ export class ServiceContainer {
         } satisfies EventMetadata;
     }
 
-    private extractForwardingMetadata<EventName extends keyof UptimeEvents>(
+    private extractForwardingMetadata<EventName extends EventKey<UptimeEvents>>(
         payload: ForwardablePayloadWithMeta<EventName>
     ): {
         forwarded?: EventMetadata;

@@ -37,7 +37,7 @@
  * @public
  *
  * @see {@link IMonitorService} - Interface contract for monitor services
- * @see {@link MonitorConfig} - Configuration options for monitors
+ * @see {@link MonitorServiceConfig} - Service-level configuration options
  * @see {@link performPingCheckWithRetry} - Core ping checking functionality
  */
 
@@ -46,7 +46,7 @@ import type { MonitorType, Site } from "@shared/types";
 import type {
     IMonitorService,
     MonitorCheckResult,
-    MonitorConfig,
+    MonitorServiceConfig,
 } from "./types";
 
 import { DEFAULT_REQUEST_TIMEOUT } from "../../constants";
@@ -98,7 +98,7 @@ import { performPingCheckWithRetry } from "./utils/pingRetry";
  * @public
  */
 export class PingMonitor implements IMonitorService {
-    private config: MonitorConfig;
+    private config: MonitorServiceConfig;
 
     /**
      * Performs a ping connectivity check on the specified monitor.
@@ -206,7 +206,7 @@ export class PingMonitor implements IMonitorService {
      *
      * @param config - Configuration options for the monitor service
      */
-    public constructor(config: MonitorConfig = {}) {
+    public constructor(config: MonitorServiceConfig = {}) {
         this.config = {
             timeout: DEFAULT_REQUEST_TIMEOUT,
             ...config,
@@ -221,11 +221,12 @@ export class PingMonitor implements IMonitorService {
      * external modification. This ensures configuration immutability and
      * prevents accidental state corruption. Note that this is a shallow copy -
      * only the top-level properties are copied. If nested objects are added to
-     * MonitorConfig in the future, they would be referenced, not cloned.
+     * MonitorServiceConfig in the future, they would be referenced, not
+     * cloned.
      *
      * @returns A shallow copy of the current monitor configuration
      */
-    public getConfig(): MonitorConfig {
+    public getConfig(): MonitorServiceConfig {
         return { ...this.config };
     }
 
@@ -253,7 +254,7 @@ export class PingMonitor implements IMonitorService {
      *
      * @param config - Partial configuration to update
      */
-    public updateConfig(config: Partial<MonitorConfig>): void {
+    public updateConfig(config: Partial<MonitorServiceConfig>): void {
         this.config = {
             ...this.config,
             ...config,

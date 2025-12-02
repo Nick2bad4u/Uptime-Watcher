@@ -13,7 +13,7 @@ import type { Site } from "@shared/types";
 import type { HttpMonitorConfig } from "@shared/types/monitorConfig";
 import type {
     MonitorCheckResult,
-    MonitorConfig,
+    MonitorServiceConfig,
 } from "../../../services/monitoring/types";
 
 import { HttpMonitor } from "../../../services/monitoring/HttpMonitor";
@@ -158,7 +158,7 @@ describe("HttpMonitor - Comprehensive Coverage", () => {
             await annotate("Category: Service", "category");
             await annotate("Type: Constructor", "type");
 
-            const config: MonitorConfig = {
+            const config: MonitorServiceConfig = {
                 timeout: 10_000,
                 userAgent: "Custom/1.0",
             };
@@ -176,7 +176,7 @@ describe("HttpMonitor - Comprehensive Coverage", () => {
             await annotate("Category: Service", "category");
             await annotate("Type: Business Logic", "type");
 
-            const config: MonitorConfig = { timeout: 8000 };
+            const config: MonitorServiceConfig = { timeout: 8000 };
             const monitor = new HttpMonitor(config);
 
             const result = monitor.getConfig();

@@ -19,10 +19,13 @@
 
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 import fc from "fast-check";
-import { TypedEventBus } from "../../events/TypedEventBus";
+import {
+    TypedEventBus,
+    type EventPayloadValue,
+} from "../../events/TypedEventBus";
 
 // Define test event map with index signature for TypedEventBus compatibility
-interface TestEvents {
+interface TestEvents extends Record<string, EventPayloadValue> {
     "test:simple": { message: string };
     "test:complex": {
         id: string;
@@ -30,8 +33,8 @@ interface TestEvents {
         metadata?: Record<string, unknown> | undefined;
     };
     "test:empty": Record<string, never>;
-    [key: string]: unknown; // Index signature for UnknownRecord constraint
-    [key: symbol]: unknown; // Symbol index signature
+    [key: string]: EventPayloadValue; // Index signature for UnknownRecord constraint
+    [key: symbol]: EventPayloadValue; // Symbol index signature
 }
 
 describe("TypedEventBus Fuzzing Tests", () => {

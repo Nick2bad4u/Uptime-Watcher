@@ -22,6 +22,8 @@
  * @public
  */
 export interface SerializedError {
+    [key: string]: unknown;
+    [key: symbol]: unknown;
     /** Optional error cause when provided. */
     readonly cause?: unknown;
     /** Error message for display. */

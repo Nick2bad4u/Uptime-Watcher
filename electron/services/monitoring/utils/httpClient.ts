@@ -10,17 +10,16 @@
  * @public
  *
  * @see {@link setupTimingInterceptors}
- * @see {@link MonitorConfig}
+ * @see {@link MonitorServiceConfig}
  */
 
-import type { AxiosInstance } from "axios";
-import type { UnknownRecord } from "type-fest";
+import type { AxiosInstance, AxiosRequestConfig } from "axios";
 
 import axios from "axios";
 import * as http from "node:http";
 import * as https from "node:https";
 
-import type { MonitorConfig } from "../types";
+import type { MonitorServiceConfig } from "../types";
 
 /**
  * Ensures an unknown value is an Error instance.
@@ -136,8 +135,8 @@ export function setupTimingInterceptors(axiosInstance: AxiosInstance): void {
  * });
  * ```
  *
- * @param config - The {@link MonitorConfig} containing timeout, userAgent, and
- *   other HTTP options.
+ * @param config - The {@link MonitorServiceConfig} containing timeout,
+ *   userAgent, and other HTTP options.
  * @param signal - Optional AbortSignal for request cancellation.
  *
  * @returns A configured {@link AxiosInstance} with timing interceptors and
@@ -145,7 +144,7 @@ export function setupTimingInterceptors(axiosInstance: AxiosInstance): void {
  *
  * @public
  *
- * @see {@link MonitorConfig}
+ * @see {@link MonitorServiceConfig}
  * @see {@link setupTimingInterceptors}
  */
 // Security / performance tunables (can be overridden via env for emergency mitigation)
@@ -184,7 +183,7 @@ const DEFAULT_MAX_BODY_LENGTH =
  * @returns Configured Axios instance with pooling, bounds, and timing
  *   interceptors enabled.
  */
-export function createHttpClient(config: MonitorConfig): AxiosInstance {
+export function createHttpClient(config: MonitorServiceConfig): AxiosInstance {
     const headers: Record<string, string> = {};
     if (config.userAgent !== undefined) {
         headers["User-Agent"] = config.userAgent;
@@ -194,7 +193,7 @@ export function createHttpClient(config: MonitorConfig): AxiosInstance {
     // Accept all content types to avoid 406 Not Acceptable responses
     headers["Accept"] = "*/*";
 
-    const createConfig: UnknownRecord = {
+    const createConfig: AxiosRequestConfig = {
         headers,
         // Connection pooling for better performance
         httpAgent: new http.Agent({ keepAlive: true }),
@@ -213,11 +212,11 @@ export function createHttpClient(config: MonitorConfig): AxiosInstance {
          * status code in our monitoring logic. This prevents 4xx/5xx responses
          * from being thrown as Axios errors.
          */
-        validateStatus: (): true => true,
+        validateStatus: (): boolean => true,
     };
 
     if (config.timeout !== undefined) {
-        createConfig["timeout"] = config.timeout;
+        createConfig.timeout = config.timeout;
     }
 
     const axiosInstance = axios.create(createConfig);

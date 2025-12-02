@@ -35,6 +35,8 @@
  * @packageDocumentation
  */
 
+import type { CorrelationId } from "@shared/types/events";
+
 import { randomBytes } from "node:crypto";
 
 /**
@@ -78,6 +80,6 @@ export class ValidationError extends Error {
  *
  * @returns A unique correlation ID string (16 hex characters)
  */
-export function generateCorrelationId(): string {
-    return randomBytes(8).toString("hex");
+export function generateCorrelationId(): CorrelationId {
+    return randomBytes(8).toString("hex") as CorrelationId;
 }

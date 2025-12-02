@@ -30,19 +30,18 @@
  * ## Error Handling & Transaction Guarantees
  *
  * - **Transactional Operations**: `addSite()`, `removeMonitor()`,
- *   `setHistoryLimit()` - **Error Propagation**: All public methods propagate
- *   errors to callers
+ *   `setHistoryLimit()`
+ * - **Error Propagation**: All public methods propagate errors to callers
  * - **Cleanup on Failure**: Failed operations attempt automatic rollback
- * - **Event Error Isolation**: Event handler errors don't affect other handlers -
- *   **Logging**: All errors are logged with context before propagation
+ * - **Event Error Isolation**: Event handler errors don't affect other handlers
+ * - **Logging**: All errors are logged with context before propagation
  *
  * ## Atomicity Guarantees
  *
  * - `addSite()`: Atomic site creation with monitoring setup or full rollback
  * - `removeMonitor()`: Atomic monitor removal with proper cleanup
  * - `setHistoryLimit()`: Atomic limit update with history pruning in transaction
- *
- *   - `updateSite()`: Delegated to SiteManager with transaction support
+ * - `updateSite()`: Delegated to SiteManager with transaction support
  *
  * Events emitted:
  *
@@ -99,6 +98,13 @@ import {
     ApplicationError,
     type ApplicationErrorOptions,
 } from "@shared/utils/errorHandling";
+import {
+    isMonitorSnapshot,
+    isSiteSnapshot,
+    mergeMonitorSnapshots,
+    mergeSiteSnapshots,
+} from "@shared/utils/siteSnapshots";
+import { isObject } from "@shared/utils/typeGuards";
 
 import type { UptimeEvents } from "./events/eventTypes";
 import type { DatabaseManager } from "./managers/DatabaseManager";
@@ -129,6 +135,8 @@ const ORCHESTRATOR_BUS_ID = "UptimeOrchestrator" as const;
 
 type MonitoringOperationScope = "global" | "monitor" | "site";
 
+type ManualCheckCompletedPayload = UptimeEvents["monitor:check-completed"];
+
 const determineMonitoringScope = (
     identifier: string,
     monitorId?: string
@@ -144,49 +152,37 @@ const determineMonitoringScope = (
     return "site";
 };
 
-function mergeMonitorSnapshots(
-    canonicalMonitor: Monitor,
-    cachedMonitor?: Monitor
-): Monitor {
-    if (!cachedMonitor) {
-        return canonicalMonitor;
+const extractMonitorSnapshotFromResult = (
+    result: StatusUpdate | undefined
+): Monitor | undefined => {
+    if (!result) {
+        return undefined;
     }
 
-    const cachedPartial = cachedMonitor as Partial<Monitor>;
-    let mergedHistory = canonicalMonitor.history;
-
-    if (Array.isArray(cachedPartial.history)) {
-        mergedHistory = cachedPartial.history;
+    const resultCandidate: unknown = result;
+    if (!isObject(resultCandidate)) {
+        return undefined;
     }
 
-    return {
-        ...canonicalMonitor,
-        ...cachedPartial,
-        history: mergedHistory,
-    } satisfies Monitor;
-}
+    const { monitor } = resultCandidate;
+    return isMonitorSnapshot(monitor) ? monitor : undefined;
+};
 
-function mergeSiteSnapshots(canonicalSite: Site, cachedSite?: Site): Site {
-    if (!cachedSite) {
-        return canonicalSite;
+const extractSiteSnapshotFromResult = (
+    result: StatusUpdate | undefined
+): Site | undefined => {
+    if (!result) {
+        return undefined;
     }
 
-    const monitors = canonicalSite.monitors.map((canonicalMonitor) =>
-        mergeMonitorSnapshots(
-            canonicalMonitor,
-            cachedSite.monitors.find(
-                (candidate) => candidate.id === canonicalMonitor.id
-            )
-        )
-    );
+    const resultCandidate: unknown = result;
+    if (!isObject(resultCandidate)) {
+        return undefined;
+    }
 
-    return {
-        ...canonicalSite,
-        monitoring: cachedSite.monitoring,
-        monitors,
-    } satisfies Site;
-}
-
+    const { site } = resultCandidate;
+    return isSiteSnapshot(site) ? site : undefined;
+};
 /**
  * Core application orchestrator responsible for wiring together the monitoring,
  * database, and event-bus subsystems in the Electron main process.
@@ -566,9 +562,9 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
                     return;
                 }
 
-                const monitorFromPayload = (result as Partial<StatusUpdate>)
-                    .monitor;
-                const siteFromPayload = (result as Partial<StatusUpdate>).site;
+                const monitorFromPayload =
+                    extractMonitorSnapshotFromResult(result);
+                const siteFromPayload = extractSiteSnapshotFromResult(result);
 
                 const siteFromCache =
                     this.siteManager.getSiteFromCache(siteIdentifier);
@@ -629,13 +625,13 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
                     site: enrichedSite,
                 };
 
-                const payload = {
-                    checkType: "manual" as const,
+                const payload: ManualCheckCompletedPayload = {
+                    checkType: "manual",
                     monitorId,
                     result: enrichedResult,
                     siteIdentifier,
                     timestamp,
-                } satisfies UptimeEvents["monitor:check-completed"];
+                };
 
                 attachForwardedMetadata({
                     busId: ORCHESTRATOR_BUS_ID,
@@ -665,30 +661,38 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
                         data.identifier,
                         data.monitorId
                     );
-                await this.emitTyped(
-                    "internal:site:start-monitoring-response",
+                const payload: UptimeEvents["internal:site:start-monitoring-response"] =
                     {
                         identifier: data.identifier,
-                        monitorId: data.monitorId,
                         operation: "start-monitoring-response",
                         success,
                         timestamp: Date.now(),
-                    }
+                        ...(data.monitorId
+                            ? { monitorId: data.monitorId }
+                            : {}),
+                    };
+                await this.emitTyped(
+                    "internal:site:start-monitoring-response",
+                    payload
                 );
             } catch (error) {
                 logger.error(
                     `[UptimeOrchestrator] Error starting monitoring for site ${data.identifier}:`,
                     error
                 );
-                await this.emitTyped(
-                    "internal:site:start-monitoring-response",
+                const failurePayload: UptimeEvents["internal:site:start-monitoring-response"] =
                     {
                         identifier: data.identifier,
-                        monitorId: data.monitorId,
                         operation: "start-monitoring-response",
                         success: false,
                         timestamp: Date.now(),
-                    }
+                        ...(data.monitorId
+                            ? { monitorId: data.monitorId }
+                            : {}),
+                    };
+                await this.emitTyped(
+                    "internal:site:start-monitoring-response",
+                    failurePayload
                 );
             }
         })();

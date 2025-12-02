@@ -8,6 +8,7 @@ import {
 
 import { isDev } from "../../../electronUtils";
 import { logger } from "../../../utils/logger";
+import { queryForIds } from "./typedQueries";
 
 /**
  * Utility functions for manipulating monitor history data in the database.
@@ -267,17 +268,13 @@ export function pruneHistoryForMonitor(
 
     try {
         // Get entries to delete (keep only the most recent 'limit' entries)
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Query result structure is known and controlled by our SQL
-        const excess = db.all(
+        const excess = queryForIds(
+            db,
             HISTORY_MANIPULATION_QUERIES.SELECT_EXCESS_ENTRIES,
             [monitorId, limit]
-        ) as
-            | Array<{
-                  id: number;
-              }>
-            | undefined;
+        );
 
-        if (excess && excess.length > 0) {
+        if (excess.length > 0) {
             // Convert numeric IDs to ensure type safety and validate they are
             // numbers
             const excessIds = excess

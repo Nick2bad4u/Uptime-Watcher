@@ -14,7 +14,7 @@ import type {
     MonitorFieldDefinition,
     MonitorType,
 } from "@shared/types";
-import type { UnknownRecord } from "type-fest";
+import type { MonitorTypeConfig } from "@shared/types/monitorTypes";
 import type * as z from "zod";
 
 import { MONITOR_STATUS } from "@shared/types";
@@ -29,7 +29,11 @@ import {
     monitorSchemas,
 } from "@shared/validation/schemas";
 
-import type { IMonitorService } from "./types";
+import type {
+    IMonitorService,
+    MonitorConfiguration,
+    MonitorConfigurationInput,
+} from "./types";
 
 import { logger } from "../../utils/logger";
 import { CdnEdgeConsistencyMonitor } from "./CdnEdgeConsistencyMonitor";
@@ -75,81 +79,61 @@ import { WebsocketKeepaliveMonitor } from "./WebsocketKeepaliveMonitor";
  *
  * @public
  */
-export interface BaseMonitorConfig {
-    /** Description of what this monitor checks */
-    readonly description: string;
-    /** Human-readable display name */
-    readonly displayName: string;
-    /** Field definitions for dynamic form generation */
-    readonly fields: MonitorFieldDefinition[];
-    /** Factory function to create monitor service instances */
-    readonly serviceFactory: () => IMonitorService;
-    /** Unique identifier for the monitor type */
-    readonly type: string;
-    /** UI display configuration */
-    readonly uiConfig?: {
-        /** Detail label formatter for different contexts */
-        detailFormats?: {
-            /** Format for analytics display */
-            analyticsLabel?: string;
-            /** Format for history detail column */
-            historyDetail?: (details: string) => string;
-        };
-        /** Display preferences */
-        display?: {
-            showAdvancedMetrics?: boolean;
-            showUrl?: boolean;
-        };
-        /**
-         * Function to format detail display in history (e.g., "Port: 80",
-         * "Response Code: 200")
-         */
-        formatDetail?: (details: string) => string;
-        /**
-         * Function to format title suffix for history charts (e.g., "
-         * (https://example.com)")
-         */
-        formatTitleSuffix?: (monitor: Monitor) => string;
-        /** Help text for form fields */
-        helpTexts?: {
-            primary?: string;
-            secondary?: string;
-        };
-        /** Whether this monitor type supports advanced analytics */
-        supportsAdvancedAnalytics?: boolean;
-        /** Whether this monitor type supports response time analytics */
-        supportsResponseTime?: boolean;
-    };
-    /** Zod validation schema for this monitor type */
-    readonly validationSchema: z.ZodType;
-    /** Version of the monitor implementation */
-    readonly version: string;
-}
+type SharedMonitorUiConfig = NonNullable<MonitorTypeConfig["uiConfig"]>;
 
 /**
- * UI configuration used by the frontend to render monitor-type specific labels,
- * help text, and analytics controls.
+ * Extended UI configuration used by the renderer when displaying monitors.
+ *
+ * @remarks
+ * Augments the shared monitor type configuration with additional metadata that
+ * is only meaningful to the desktop renderer layer, such as historical detail
+ * formatters and analytics toggles.
  */
-export interface MonitorUIConfig {
+export interface MonitorUIConfig extends SharedMonitorUiConfig {
     /** Chart data formatters */
     chartFormatters?: {
         advanced?: boolean;
         responseTime?: boolean;
         uptime?: boolean;
     };
+    /** Detail formats with optional history formatter */
+    detailFormats?: SharedMonitorUiConfig["detailFormats"] & {
+        historyDetail?: (details: string) => string;
+    };
     /** Detail label formatter function name */
     detailLabelFormatter?: string;
-    /** Display preferences */
-    display?: {
-        showAdvancedMetrics?: boolean;
+    /** Display preferences including optional port display */
+    display?: SharedMonitorUiConfig["display"] & {
         showPort?: boolean;
-        showUrl?: boolean;
     };
-    /** Help text for form fields */
-    helpTexts?: {
-        primary?: string;
-        secondary?: string;
-    };
+    /**
+     * Function to format detail display in history (e.g., "Port: 80", "Response
+     * Code: 200")
+     */
+    formatDetail?: (details: string) => string;
+    /**
+     * Function to format title suffix for history charts (e.g., "
+     * (https://example.com)")
+     */
+    formatTitleSuffix?: (monitor: Monitor) => string;
+}
+
+/**
+ * Configuration contract required to register a monitor type in the system.
+ *
+ * @remarks
+ * Mirrors {@link MonitorTypeConfig} but narrows the UI configuration to the
+ * richer {@link MonitorUIConfig} type used by the Electron renderer.
+ */
+export interface BaseMonitorConfig extends Omit<MonitorTypeConfig, "uiConfig"> {
+    /** Field definitions for dynamic form generation */
+    readonly fields: MonitorFieldDefinition[];
+    /** Factory function to create monitor service instances */
+    readonly serviceFactory: () => IMonitorService;
+    /** UI display configuration */
+    readonly uiConfig?: MonitorUIConfig;
+    /** Zod validation schema for this monitor type */
+    readonly validationSchema: z.ZodType;
 }
 
 /**
@@ -239,11 +223,13 @@ export function isValidMonitorType(type: string): boolean {
  *
  * @internal
  */
-function validateMonitorTypeInternal(type: unknown): {
-    error?: string;
-    success: boolean;
-    value?: MonitorType;
-} {
+type MonitorTypeValidationResult =
+    | { error: string; success: false }
+    | { success: true; value: MonitorType };
+
+function validateMonitorTypeInternal(
+    type: unknown
+): MonitorTypeValidationResult {
     if (typeof type !== "string") {
         return {
             error: "Monitor type must be a string",
@@ -317,9 +303,7 @@ export function registerMonitorType(config: BaseMonitorConfig): void {
     monitorTypes.set(config.type, config);
 }
 
-type HttpMonitorUiOverrides = Partial<
-    NonNullable<BaseMonitorConfig["uiConfig"]>
->;
+type HttpMonitorUiOverrides = Partial<MonitorUIConfig>;
 
 function createUrlSuffixResolver(type: string): (monitor: Monitor) => string {
     return (monitor: Monitor) => {
@@ -337,7 +321,7 @@ function createUrlSuffixResolver(type: string): (monitor: Monitor) => string {
 function createHttpMonitorUiConfig(
     type: string,
     overrides: HttpMonitorUiOverrides = {}
-): NonNullable<BaseMonitorConfig["uiConfig"]> {
+): MonitorUIConfig {
     const {
         detailFormats,
         display,
@@ -1216,27 +1200,55 @@ versionManager.setVersion("websocket-keepalive", "1.0.0");
  *
  * @returns Validation result with created monitor or errors
  */
+export interface MonitorCreationResult {
+    errors: string[];
+    monitor?: MonitorConfiguration;
+    success: boolean;
+}
+
+/**
+ * Validates monitor type input and returns a normalized configuration object.
+ *
+ * @param type - Monitor type identifier supplied by the caller.
+ * @param data - Optional monitor configuration overrides.
+ *
+ * @returns Structured result containing either a monitor configuration or
+ *   validation errors.
+ */
 export function createMonitorWithTypeGuards(
     type: string,
-    data: UnknownRecord
-): {
-    errors: string[];
-    monitor?: UnknownRecord;
-    success: boolean;
-} {
+    data: MonitorConfigurationInput = {}
+): MonitorCreationResult {
     // Use internal type validation to avoid circular dependency
     const validationResult = validateMonitorTypeInternal(type);
     if (!validationResult.success) {
+        const errorMessage =
+            "error" in validationResult
+                ? validationResult.error
+                : "Invalid monitor type";
         return {
-            errors: [validationResult.error ?? "Invalid monitor type"],
+            errors: [errorMessage],
             success: false,
         };
     }
 
     const validMonitorType = validationResult.value;
 
-    // Create monitor object with proper validation
-    const monitor: UnknownRecord = {
+    const { type: userProvidedType, ...restData } = data;
+    if (
+        typeof userProvidedType === "string" &&
+        userProvidedType !== validMonitorType
+    ) {
+        logger.warn(
+            `[MonitorTypeRegistry] Ignoring mismatched monitor type override`,
+            {
+                providedType: userProvidedType,
+                validatedType: validMonitorType,
+            }
+        );
+    }
+
+    const monitor: MonitorConfiguration = {
         history: [],
         monitoring: true,
         responseTime: -1,
@@ -1244,7 +1256,7 @@ export function createMonitorWithTypeGuards(
         status: MONITOR_STATUS.PENDING,
         timeout: 10_000,
         type: validMonitorType,
-        ...data,
+        ...restData,
     };
 
     return {
@@ -1320,10 +1332,10 @@ export async function migrateMonitorType(
     monitorType: MonitorType,
     fromVersion: string,
     toVersion: string,
-    data?: UnknownRecord
+    data?: MonitorConfigurationInput
 ): Promise<{
     appliedMigrations: string[];
-    data?: UnknownRecord;
+    data?: MonitorConfigurationInput;
     errors: string[];
     success: boolean;
 }> {
@@ -1334,11 +1346,13 @@ export async function migrateMonitorType(
                 const validationResult =
                     validateMonitorTypeInternal(monitorType);
                 if (!validationResult.success) {
+                    const errorMessage =
+                        "error" in validationResult
+                            ? validationResult.error
+                            : "Invalid monitor type";
                     return {
                         appliedMigrations: [],
-                        errors: [
-                            validationResult.error ?? "Invalid monitor type",
-                        ],
+                        errors: [errorMessage],
                         success: false,
                     };
                 }

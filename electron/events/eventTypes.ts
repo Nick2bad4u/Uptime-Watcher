@@ -24,13 +24,19 @@ import type {
     CacheInvalidatedEventData,
     HistoryLimitUpdatedEventData,
     MonitorDownEventData,
-    MonitoringControlEventData,
+    MonitoringStartedEventData,
+    MonitoringStoppedEventData,
     MonitorStatusChangedEventData,
     MonitorUpEventData,
     SiteAddedSource,
 } from "@shared/types/events";
 import type { SiteSyncDelta } from "@shared/types/stateSync";
-import type { UnknownRecord } from "type-fest";
+import type { SerializedError } from "@shared/utils/logger/common";
+import type { JsonValue } from "type-fest";
+
+import type { EventPayloadValue } from "./TypedEventBus";
+
+type UptimeEventPayload<TPayload extends object> = EventPayloadValue & TPayload;
 
 /**
  * Comprehensive event map for the Uptime Watcher application.
@@ -51,7 +57,7 @@ import type { UnknownRecord } from "type-fest";
  * @see {@link EventSource}
  * @see {@link EventTriggerType}
  */
-export interface UptimeEvents extends UnknownRecord {
+export interface UptimeEvents extends Record<string, EventPayloadValue> {
     // Site events
 
     /**
@@ -62,7 +68,7 @@ export interface UptimeEvents extends UnknownRecord {
      *
      * @see {@link CacheInvalidatedEventData} for payload structure.
      */
-    "cache:invalidated": CacheInvalidatedEventData;
+    "cache:invalidated": UptimeEventPayload<CacheInvalidatedEventData>;
 
     /**
      * Emitted when a configuration setting is changed.
@@ -79,9 +85,9 @@ export interface UptimeEvents extends UnknownRecord {
      */
     "config:changed": {
         /** The new value of the setting. */
-        newValue: unknown;
+        newValue: JsonValue | undefined;
         /** The previous value of the setting. */
-        oldValue: unknown;
+        oldValue: JsonValue | undefined;
         /** The configuration key that changed. */
         setting: string;
         /** Origin of the change (user, system, migration). */
@@ -152,7 +158,7 @@ export interface UptimeEvents extends UnknownRecord {
      * @param timestamp - Unix timestamp (ms) when the error occurred.
      */
     "database:error": {
-        [key: string]: unknown;
+        [key: string]: EventPayloadValue;
 
         /**
          * The error object that caused the database operation to fail.
@@ -161,7 +167,7 @@ export interface UptimeEvents extends UnknownRecord {
          * Contains the specific error information including message, stack
          * trace, and any additional error details for debugging purposes.
          */
-        error: Error;
+        error: SerializedError;
 
         /**
          * The database operation that failed.
@@ -193,7 +199,7 @@ export interface UptimeEvents extends UnknownRecord {
      * @param timestamp - Unix timestamp (ms) when the retry occurred.
      */
     "database:retry": {
-        [key: string]: unknown;
+        [key: string]: EventPayloadValue;
 
         /**
          * The retry attempt number.
@@ -234,7 +240,7 @@ export interface UptimeEvents extends UnknownRecord {
      * @param timestamp - Unix timestamp (ms) when the operation succeeded.
      */
     "database:success": {
-        [key: string]: unknown;
+        [key: string]: EventPayloadValue;
 
         /**
          * Optional duration (ms) of the operation.
@@ -283,6 +289,15 @@ export interface UptimeEvents extends UnknownRecord {
          * complete, including all operations within the transaction.
          */
         duration: number;
+
+        /**
+         * Optional lifecycle tagging for instrumentation consumers.
+         *
+         * @remarks
+         * When present, indicates whether the emission represents the "start",
+         * "success", or "failure" stage of a tracked operation.
+         */
+        lifecycleStage?: "failure" | "start" | "success";
 
         /**
          * The database operation performed in the transaction.
@@ -1067,6 +1082,22 @@ export interface UptimeEvents extends UnknownRecord {
     };
 
     /**
+     * Emitted in response to a start monitoring request.
+     */
+    "internal:site:start-monitoring-response": {
+        /** The unique identifier for the site. */
+        identifier: string;
+        /** Optional monitor ID. */
+        monitorId?: string;
+        /** The operation type (always "start-monitoring-response"). */
+        operation: "start-monitoring-response";
+        /** Whether the start operation was successful. */
+        success: boolean;
+        /** Unix timestamp (ms) when the response was sent. */
+        timestamp: number;
+    };
+
+    /**
      * Emitted when a request is made to stop monitoring for a site.
      *
      * @param identifier - The unique identifier for the site.
@@ -1179,7 +1210,7 @@ export interface UptimeEvents extends UnknownRecord {
      *
      * @see {@link MonitorDownEventData} for payload details.
      */
-    "monitor:down": MonitorDownEventData;
+    "monitor:down": UptimeEventPayload<MonitorDownEventData>;
 
     /**
      * Emitted when a monitor is removed.
@@ -1203,42 +1234,28 @@ export interface UptimeEvents extends UnknownRecord {
      *
      * @see {@link MonitorStatusChangedEventData} for payload details.
      */
-    "monitor:status-changed": MonitorStatusChangedEventData;
+    "monitor:status-changed": UptimeEventPayload<MonitorStatusChangedEventData>;
 
     /**
      * Emitted when a monitor goes up.
      *
      * @see {@link MonitorUpEventData} for payload details.
      */
-    "monitor:up": MonitorUpEventData;
+    "monitor:up": UptimeEventPayload<MonitorUpEventData>;
 
     /**
      * Emitted when monitoring is started.
      *
-     * @see {@link MonitoringControlEventData} for common metadata fields.
+     * @see MonitoringControlEventData (shared/types/events) for common metadata fields.
      */
-    "monitoring:started": MonitoringControlEventData & {
-        /** The number of monitors started. */
-        monitorCount: number;
-        /** The number of sites involved. */
-        siteCount: number;
-        /** Detailed summary of the lifecycle results. */
-        summary?: MonitoringStartSummary;
-    };
+    "monitoring:started": UptimeEventPayload<MonitoringStartedEventData>;
 
     /**
      * Emitted when monitoring is stopped.
      *
-     * @see {@link MonitoringControlEventData} for common metadata fields.
+     * @see MonitoringControlEventData (shared/types/events) for common metadata fields.
      */
-    "monitoring:stopped": MonitoringControlEventData & {
-        /** The number of monitors that were active. */
-        activeMonitors: number;
-        /** The reason for stopping. */
-        reason: "error" | "shutdown" | "user";
-        /** Detailed summary of the lifecycle results. */
-        summary?: MonitoringStopSummary;
-    };
+    "monitoring:stopped": UptimeEventPayload<MonitoringStoppedEventData>;
 
     /**
      * Emitted when a performance metric is recorded.
@@ -1302,7 +1319,7 @@ export interface UptimeEvents extends UnknownRecord {
      *
      * @see {@link HistoryLimitUpdatedEventData} for payload structure.
      */
-    "settings:history-limit-updated": HistoryLimitUpdatedEventData;
+    "settings:history-limit-updated": UptimeEventPayload<HistoryLimitUpdatedEventData>;
 
     "site:added": {
         /** The site object added. */
@@ -1435,6 +1452,15 @@ export interface UptimeEvents extends UnknownRecord {
         version: string;
     };
 }
+
+/**
+ * String literal union of all registered uptime event names.
+ *
+ * @remarks
+ * Useful for authoring utilities that operate on the event catalogue without
+ * requiring a full `UptimeEvents` map.
+ */
+export type UptimeEventName = Extract<keyof UptimeEvents, string>;
 
 /**
  * Category for grouping related events by functional domain.
@@ -1851,9 +1877,9 @@ export const EVENT_PRIORITIES = {
  * @see {@link EVENT_PRIORITIES}
  */
 export function getEventPriority(
-    eventName: keyof UptimeEvents
+    eventName: UptimeEventName
 ): keyof typeof EVENT_PRIORITIES {
-    const eventNameStr = String(eventName);
+    const eventNameStr = eventName;
 
     // Check each priority level using string-based comparison to avoid type
     // assertion issues
@@ -1907,10 +1933,10 @@ export function getEventPriority(
  * @see {@link EVENT_CATEGORIES}
  */
 export function isEventOfCategory(
-    eventName: keyof UptimeEvents,
+    eventName: UptimeEventName,
     category: keyof typeof EVENT_CATEGORIES
 ): boolean {
-    const eventNameStr = String(eventName);
+    const eventNameStr = eventName;
 
     // Type-safe category checking using string-based comparison
     switch (category) {

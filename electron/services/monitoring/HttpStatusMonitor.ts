@@ -6,7 +6,7 @@
 
 import type { Monitor } from "@shared/types";
 
-import type { MonitorConfig } from "./types";
+import type { MonitorServiceConfig } from "./types";
 
 import {
     createHttpMonitorService,
@@ -68,7 +68,7 @@ const behavior: HttpMonitorBehavior<"http-status", { expectedStatus: number }> =
     };
 
 const HttpStatusMonitorBase: new (
-    config?: MonitorConfig
+    config?: MonitorServiceConfig
 ) => HttpMonitorServiceInstance = buildMonitorFactory(
     () =>
         createHttpMonitorService<"http-status", { expectedStatus: number }>(

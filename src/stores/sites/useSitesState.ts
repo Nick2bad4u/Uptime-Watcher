@@ -21,17 +21,54 @@ import { logger } from "../../services/logger";
 import { logStoreAction } from "../utils";
 import {
     buildMonitoringLockKey,
+    isOptimisticLockKey,
+    type OptimisticLockKey,
     type OptimisticMonitoringLock,
 } from "./utils/optimisticMonitoringLock";
 
-const lockExpiryTimers = new Map<string, ReturnType<typeof setTimeout>>();
+const lockExpiryTimers = new Map<
+    OptimisticLockKey,
+    ReturnType<typeof setTimeout>
+>();
 
-const cancelLockExpiryTimer = (key: string): void => {
+const cancelLockExpiryTimer = (key: OptimisticLockKey): void => {
     const timerId = lockExpiryTimers.get(key);
     if (timerId !== undefined) {
         globalThis.clearTimeout(timerId);
         lockExpiryTimers.delete(key);
     }
+};
+
+type OptimisticLockEntry = [OptimisticLockKey, OptimisticMonitoringLock];
+
+const collectActiveLockEntries = (
+    locks: SitesState["optimisticMonitoringLocks"]
+): OptimisticLockEntry[] => {
+    const entries: OptimisticLockEntry[] = [];
+
+    for (const [rawKey, lock] of Object.entries(locks)) {
+        if (isOptimisticLockKey(rawKey) && lock !== undefined) {
+            entries.push([rawKey, lock]);
+        }
+    }
+
+    return entries;
+};
+
+type SelectedMonitorEntry = [Site["identifier"], Monitor["id"]];
+
+const collectSelectedMonitorEntries = (
+    selectedMonitorIds: SitesState["selectedMonitorIds"]
+): SelectedMonitorEntry[] => {
+    const entries: SelectedMonitorEntry[] = [];
+
+    for (const [siteId, monitorId] of Object.entries(selectedMonitorIds)) {
+        if (typeof monitorId === "string") {
+            entries.push([siteId, monitorId]);
+        }
+    }
+
+    return entries;
 };
 
 /**
@@ -50,11 +87,13 @@ export interface SitesState {
      * Active optimistic monitoring locks for monitors keyed by site and monitor
      * id.
      */
-    optimisticMonitoringLocks: Record<string, OptimisticMonitoringLock>;
+    optimisticMonitoringLocks: Partial<
+        Record<string, OptimisticMonitoringLock>
+    >;
     /** Selected monitor IDs per site (UI state, not persisted) */
-    selectedMonitorIds: Record<string, string>;
+    selectedMonitorIds: Partial<Record<Site["identifier"], Monitor["id"]>>;
     /** Currently selected site identifier */
-    selectedSiteIdentifier: string | undefined;
+    selectedSiteIdentifier: Site["identifier"] | undefined;
     /** Array of monitored sites */
     sites: Site[];
     /** Latest status update subscription diagnostics. */
@@ -75,33 +114,36 @@ export interface SitesStateActions {
     addSite: (site: Site) => void;
     /** Clear optimistic monitoring locks for the provided monitors. */
     clearOptimisticMonitoringLocks: (
-        siteIdentifier: string,
-        monitorIds: readonly string[]
+        siteIdentifier: Site["identifier"],
+        monitorIds: ReadonlyArray<Monitor["id"]>
     ) => void;
     /** Returns a snapshot of the current optimistic monitoring locks */
-    getOptimisticMonitoringLocks: () => Record<
-        string,
-        OptimisticMonitoringLock
+    getOptimisticMonitoringLocks: () => Partial<
+        Record<string, OptimisticMonitoringLock>
     >;
     /** Get selected monitor ID for a site */
-    getSelectedMonitorId: (siteIdentifier: string) => string | undefined;
-    /** Get the currently selected site */
+    getSelectedMonitorId: (
+        siteIdentifier: Site["identifier"]
+    ) => Monitor["id"] | undefined;
     getSelectedSite: () => Site | undefined;
     /** Record the latest site synchronization delta */
     recordSiteSyncDelta: (delta: SiteSyncDelta | undefined) => void;
     /** Register optimistic monitoring locks for monitors. */
     registerOptimisticMonitoringLock: (
-        siteIdentifier: string,
-        monitorIds: readonly string[],
+        siteIdentifier: Site["identifier"],
+        monitorIds: ReadonlyArray<Monitor["id"]>,
         monitoring: boolean,
         durationMs: number
     ) => void;
     /** Remove a site from the store */
-    removeSite: (identifier: string) => void;
+    removeSite: (identifier: Site["identifier"]) => void;
     /** Select a site for focused operations and UI display */
     selectSite: (site: Site | undefined) => void;
     /** Set selected monitor ID for a site */
-    setSelectedMonitorId: (siteIdentifier: string, monitorId: string) => void;
+    setSelectedMonitorId: (
+        siteIdentifier: Site["identifier"],
+        monitorId: Monitor["id"]
+    ) => void;
     /** Set sites data */
     setSites: (sites: Site[]) => void;
     /** Persist status subscription diagnostics */
@@ -137,8 +179,8 @@ export const createSitesStateActions = (
     get: () => SitesState
 ): SitesStateActions => {
     const scheduleLockExpiry = (
-        siteIdentifier: string,
-        monitorId: string,
+        siteIdentifier: Site["identifier"],
+        monitorId: Monitor["id"],
         durationMs: number
     ): void => {
         const key = buildMonitoringLockKey(siteIdentifier, monitorId);
@@ -170,15 +212,17 @@ export const createSitesStateActions = (
             set((state) => ({ sites: [...state.sites, site] }));
         },
         clearOptimisticMonitoringLocks: (
-            siteIdentifier: string,
-            monitorIds: readonly string[]
+            siteIdentifier: Site["identifier"],
+            monitorIds: ReadonlyArray<Monitor["id"]>
         ): void => {
             if (monitorIds.length === 0) {
                 return;
             }
 
             set((state) => {
-                const currentLocks = { ...state.optimisticMonitoringLocks };
+                const currentLocks: SitesState["optimisticMonitoringLocks"] = {
+                    ...state.optimisticMonitoringLocks,
+                };
                 let changed = false;
 
                 for (const monitorId of monitorIds) {
@@ -206,7 +250,9 @@ export const createSitesStateActions = (
         getOptimisticMonitoringLocks: () => ({
             ...get().optimisticMonitoringLocks,
         }),
-        getSelectedMonitorId: (siteIdentifier: string): string | undefined => {
+        getSelectedMonitorId: (
+            siteIdentifier: Site["identifier"]
+        ): Monitor["id"] | undefined => {
             const ids = get().selectedMonitorIds;
 
             return ids[siteIdentifier];
@@ -231,8 +277,8 @@ export const createSitesStateActions = (
             set(() => ({ lastSyncDelta: delta }));
         },
         registerOptimisticMonitoringLock: (
-            siteIdentifier: string,
-            monitorIds: readonly string[],
+            siteIdentifier: Site["identifier"],
+            monitorIds: ReadonlyArray<Monitor["id"]>,
             monitoring: boolean,
             durationMs: number
         ): void => {
@@ -243,9 +289,10 @@ export const createSitesStateActions = (
             const expiresAt = Date.now() + Math.max(durationMs, 0);
 
             set((state) => {
-                const optimisticMonitoringLocks = {
-                    ...state.optimisticMonitoringLocks,
-                };
+                const optimisticMonitoringLocks: SitesState["optimisticMonitoringLocks"] =
+                    {
+                        ...state.optimisticMonitoringLocks,
+                    };
 
                 for (const monitorId of monitorIds) {
                     const key = buildMonitoringLockKey(
@@ -270,7 +317,7 @@ export const createSitesStateActions = (
                 }
             }
         },
-        removeSite: (identifier: string): void => {
+        removeSite: (identifier: Site["identifier"]): void => {
             logStoreAction("SitesStore", "removeSite", { identifier });
             set((state) => {
                 const currentMonitorIds = state.selectedMonitorIds;
@@ -279,7 +326,7 @@ export const createSitesStateActions = (
                     Object.entries(currentMonitorIds).filter(
                         ([key]) => key !== identifier
                     )
-                );
+                ) as SitesState["selectedMonitorIds"];
                 return {
                     selectedMonitorIds: remainingMonitorIds,
                     selectedSiteIdentifier:
@@ -299,8 +346,8 @@ export const createSitesStateActions = (
             }));
         },
         setSelectedMonitorId: (
-            siteIdentifier: string,
-            monitorId: string
+            siteIdentifier: Site["identifier"],
+            monitorId: Monitor["id"]
         ): void => {
             logStoreAction("SitesStore", "setSelectedMonitorId", {
                 monitorId,
@@ -339,10 +386,10 @@ export const createSitesStateActions = (
             logStoreAction("SitesStore", "setSites", { count: sites.length });
 
             const locks = get().optimisticMonitoringLocks;
-            const lockEntries = Object.entries(locks);
+            const lockEntries = collectActiveLockEntries(locks);
 
             const now = Date.now();
-            const expiredLockKeys: string[] = [];
+            const expiredLockKeys: OptimisticLockKey[] = [];
             let mutatedSiteCount = 0;
 
             const normalizedSites =
@@ -394,7 +441,7 @@ export const createSitesStateActions = (
             }
 
             set((state) => {
-                const validIdentifiers = new Set(
+                const validIdentifiers = new Set<Site["identifier"]>(
                     sitesForState.map((site) => site.identifier)
                 );
 
@@ -404,14 +451,15 @@ export const createSitesStateActions = (
                         ? state.selectedSiteIdentifier
                         : undefined;
 
-                const siteLookup = new Map(
+                const siteLookup = new Map<Site["identifier"], Site>(
                     sitesForState.map(
                         (site) => [site.identifier, site] as const
                     )
                 );
 
-                const nextSelectedMonitorIds: Record<string, string> = {};
-                for (const [siteId, monitorId] of Object.entries(
+                const nextSelectedMonitorIds: SitesState["selectedMonitorIds"] =
+                    {};
+                for (const [siteId, monitorId] of collectSelectedMonitorEntries(
                     state.selectedMonitorIds
                 )) {
                     if (validIdentifiers.has(siteId)) {

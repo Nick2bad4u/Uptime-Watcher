@@ -1,6 +1,7 @@
 /**
  * Zod schema type definitions for validation schemas.
  */
+import type { LiteralUnion } from "type-fest";
 import type * as z from "zod";
 
 type ActiveOperationsArray = z.ZodOptional<z.ZodArray<z.ZodString>>;
@@ -58,6 +59,26 @@ type DnsRecordEnum = z.ZodEnum<{
     TLSA: "TLSA";
     TXT: "TXT";
 }>;
+
+/**
+ * DNS record identifiers accepted by monitor schemas with extension support.
+ */
+export type DnsRecordType = LiteralUnion<
+    | "A"
+    | "AAAA"
+    | "ANY"
+    | "CAA"
+    | "CNAME"
+    | "MX"
+    | "NAPTR"
+    | "NS"
+    | "PTR"
+    | "SOA"
+    | "SRV"
+    | "TLSA"
+    | "TXT",
+    string
+>;
 
 /**
  * Zod schema capturing common monitor fields shared by all monitor variants.
@@ -308,3 +329,11 @@ export interface MonitorSchemas {
     readonly ssl: SslMonitorSchemaType;
     readonly "websocket-keepalive": WebsocketKeepaliveMonitorSchemaType;
 }
+
+/**
+ * Monitor schema identifiers with autocomplete for built-in monitors.
+ */
+export type MonitorSchemaIdentifier = LiteralUnion<
+    keyof MonitorSchemas,
+    string
+>;

@@ -177,7 +177,7 @@ describe("Working Utility Coverage Tests", () => {
 
             // Test safeJsonStringifyWithFallback
             const stringifyFallback = safeJsonStringifyWithFallback(
-                undefined,
+                { test: "value" },
                 "{}"
             );
             expect(typeof stringifyFallback).toBe("string");

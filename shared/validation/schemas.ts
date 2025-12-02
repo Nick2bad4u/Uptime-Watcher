@@ -34,7 +34,7 @@ import type {
     WebsocketKeepaliveMonitorSchemaType,
 } from "@shared/types/schemaTypes";
 import type { ValidationResult } from "@shared/types/validation";
-import type { UnknownRecord } from "type-fest";
+import type { Jsonify, UnknownRecord } from "type-fest";
 
 import { MIN_MONITOR_CHECK_INTERVAL_MS } from "@shared/constants/monitoring";
 import { STATUS_KIND } from "@shared/types";
@@ -948,6 +948,8 @@ export type DnsMonitor = z.infer<typeof dnsMonitorSchema>;
  * @see {@link monitorSchema}
  */
 export type Monitor = z.infer<typeof monitorSchema>;
+/** JSON-safe representation of a validated monitor. */
+export type MonitorJson = Jsonify<Monitor>;
 
 /**
  * Type representing a validated ping monitor.
@@ -976,6 +978,8 @@ export type SslMonitor = z.infer<typeof sslMonitorSchema>;
  * @see {@link siteSchema}
  */
 export type Site = z.infer<typeof siteSchema>;
+/** JSON-safe representation of a validated site. */
+export type SiteJson = Jsonify<Site>;
 
 // ValidationResult type available for consumers via direct import from
 // ../types/validation
@@ -1106,12 +1110,13 @@ export function validateMonitorData(
         }
 
         const validData = schema.parse(data);
+        const serializedData = JSON.stringify(validData);
         return {
             data: validData,
             errors: [],
             metadata: {
                 monitorType: type,
-                validatedDataSize: JSON.stringify(validData).length,
+                validatedDataSize: serializedData.length,
             },
             success: true,
             warnings: [],

@@ -7,6 +7,7 @@
 
 import type { Logger } from "@shared/utils/logger/interfaces";
 
+import { ensureError } from "@shared/utils/errorHandling";
 import { app } from "electron";
 import path from "node:path";
 
@@ -15,6 +16,7 @@ import type { TypedEventBus } from "../../events/TypedEventBus";
 
 import { DB_FILE_NAME } from "../../constants";
 import { createDatabaseBackup } from "../../services/database/utils/databaseBackup";
+import { toSerializedError } from "../errorSerialization";
 import { SiteLoadingError } from "./interfaces";
 
 /**
@@ -56,22 +58,19 @@ export class DataBackupService {
             this.logger.info(`Database backup created: ${result.fileName}`);
             return result;
         } catch (error) {
-            const message = `Failed to download backup: ${error instanceof Error ? error.message : String(error)}`;
+            const normalizedError = ensureError(error);
+            const message = `Failed to download backup: ${normalizedError.message}`;
             this.logger.error(message, error);
 
             await this.eventEmitter.emitTyped("database:error", {
                 details: message,
-                error:
-                    error instanceof Error ? error : new Error(String(error)),
+                error: toSerializedError(normalizedError),
                 operation: "download-backup",
                 timestamp: Date.now(),
             });
 
             // eslint-disable-next-line ex/use-error-cause -- SiteLoadingError has specific constructor signature
-            throw new SiteLoadingError(
-                `Failed to download backup: ${error instanceof Error ? error.message : String(error)}`,
-                error instanceof Error ? error : undefined
-            );
+            throw new SiteLoadingError(message, normalizedError);
         }
     }
 

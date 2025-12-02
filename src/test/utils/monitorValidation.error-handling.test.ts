@@ -46,6 +46,7 @@ const resolveValidationResult = (
     overrides: Partial<ValidationResult> = {}
 ) => ({
     errors: [],
+    metadata: {},
     success: true,
     warnings: [],
     ...overrides,

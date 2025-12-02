@@ -20,7 +20,7 @@ import {
 import type {
     IMonitorService,
     MonitorCheckResult,
-    MonitorConfig,
+    MonitorServiceConfig,
 } from "../types";
 
 import {
@@ -73,10 +73,10 @@ type MonitorValidationResult<TContext> =
 /**
  * Concrete monitor service instance produced by
  * {@link createHttpMonitorService}, exposing the standard {@link IMonitorService}
- * contract plus access to the resolved {@link MonitorConfig}.
+ * contract plus access to the resolved {@link MonitorServiceConfig}.
  */
 export type HttpMonitorServiceInstance = IMonitorService & {
-    getConfig: () => MonitorConfig;
+    getConfig: () => MonitorServiceConfig;
 };
 
 /**
@@ -116,7 +116,7 @@ export function createHttpMonitorService<
     TContext,
 >(
     behavior: HttpMonitorBehavior<TType, TContext>
-): new (config?: MonitorConfig) => HttpMonitorServiceInstance {
+): new (config?: MonitorServiceConfig) => HttpMonitorServiceInstance {
     const rateLimiter = getSharedHttpRateLimiter();
 
     interface SingleCheckParams {
@@ -130,7 +130,7 @@ export function createHttpMonitorService<
     return class HttpMonitorServiceAdapter implements IMonitorService {
         private axiosInstance: AxiosInstance;
 
-        private config: MonitorConfig;
+        private config: MonitorServiceConfig;
 
         public async check(
             monitor: Site["monitors"][0],
@@ -297,7 +297,7 @@ export function createHttpMonitorService<
             });
         }
 
-        public constructor(config: MonitorConfig = {}) {
+        public constructor(config: MonitorServiceConfig = {}) {
             this.config = {
                 timeout: DEFAULT_REQUEST_TIMEOUT,
                 userAgent: USER_AGENT,
@@ -310,7 +310,7 @@ export function createHttpMonitorService<
             });
         }
 
-        public getConfig(): MonitorConfig {
+        public getConfig(): MonitorServiceConfig {
             return { ...this.config };
         }
 
@@ -318,9 +318,9 @@ export function createHttpMonitorService<
             return behavior.type;
         }
 
-        public updateConfig(config: Partial<MonitorConfig>): void {
-            const nextConfig: MonitorConfig = { ...this.config };
-            const remaining = { ...config } as Partial<MonitorConfig>;
+        public updateConfig(config: Partial<MonitorServiceConfig>): void {
+            const nextConfig: MonitorServiceConfig = { ...this.config };
+            const remaining = { ...config } as Partial<MonitorServiceConfig>;
             delete remaining.timeout;
             delete remaining.userAgent;
 

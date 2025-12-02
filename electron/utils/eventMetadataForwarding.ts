@@ -44,6 +44,9 @@ function isEventMetadataCandidate(value: unknown): value is EventMetadata {
     );
 }
 
+export const isEventMetadata: (value: unknown) => value is EventMetadata =
+    isEventMetadataCandidate;
+
 /**
  * Attaches existing metadata from an internal event to the forwarded payload.
  *

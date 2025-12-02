@@ -1,10 +1,12 @@
-import type { UnknownRecord } from "type-fest";
 import { describe, expect, it, vi } from "vitest";
 
 import { ScopedSubscriptionManager } from "../../events/ScopedSubscriptionManager";
-import { TypedEventBus } from "../../events/TypedEventBus";
+import {
+    TypedEventBus,
+    type EventPayloadValue,
+} from "../../events/TypedEventBus";
 
-interface TestEvents extends UnknownRecord {
+interface TestEvents extends Record<string, EventPayloadValue> {
     "monitor:ping": { latency: number };
 }
 

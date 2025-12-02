@@ -7,7 +7,20 @@
  * conversion functions with proper error handling and fallback values.
  */
 
+import {
+    MAX_TIMEOUT_MILLISECONDS,
+    MIN_TIMEOUT_MILLISECONDS,
+    PORT_NUMBER_RANGE,
+    type PortNumber,
+    type TimeoutMilliseconds,
+    toPortNumber,
+    toTimeoutMilliseconds,
+} from "../types/units";
 import { isBoolean, isNumber, isString } from "./typeGuards";
+
+const DEFAULT_PORT_NUMBER = toPortNumber(80);
+const DEFAULT_CHECK_INTERVAL = toTimeoutMilliseconds(300_000);
+const DEFAULT_TIMEOUT = toTimeoutMilliseconds(10_000);
 
 /**
  * Safely converts any value to a number with fallback.
@@ -56,16 +69,43 @@ export function safeNumberConversion(value: unknown, defaultValue = 0): number {
     return fallback;
 }
 
+const clampTimeoutDefault = (
+    value: number,
+    minimum: number
+): TimeoutMilliseconds => {
+    const normalizedMinimum = Math.max(minimum, MIN_TIMEOUT_MILLISECONDS);
+    const finiteValue = Number.isFinite(value) ? value : normalizedMinimum;
+    const bounded = Math.min(
+        Math.max(finiteValue, normalizedMinimum),
+        MAX_TIMEOUT_MILLISECONDS
+    );
+    return toTimeoutMilliseconds(bounded);
+};
+
 /**
  * Safely converts a value to a check interval (minimum 1000ms) with fallback.
+ *
+ * @remarks
+ * Always returns an integer number of milliseconds.
  */
 export function safeParseCheckInterval(
     value: unknown,
-    defaultValue = 300_000
-): number {
-    const parsed = safeNumberConversion(value, defaultValue);
-    // Enforce a minimum of 1000ms; accept any value >= 1000
-    return parsed >= 1000 ? parsed : defaultValue;
+    defaultValue: number | TimeoutMilliseconds = DEFAULT_CHECK_INTERVAL
+): TimeoutMilliseconds {
+    const normalizedDefault =
+        typeof defaultValue === "number"
+            ? clampTimeoutDefault(Math.trunc(defaultValue), 1000)
+            : defaultValue;
+
+    const parsed = safeNumberConversion(value, normalizedDefault);
+    const normalized = Math.trunc(parsed);
+    // Enforce a minimum of 1000ms; clamp extremely large intervals
+    if (normalized >= 1000 && Number.isFinite(normalized)) {
+        const bounded = Math.min(normalized, MAX_TIMEOUT_MILLISECONDS);
+        return toTimeoutMilliseconds(bounded);
+    }
+
+    return normalizedDefault;
 }
 
 /**
@@ -204,9 +244,19 @@ export function safeParsePercentage(value: unknown, defaultValue = 0): number {
  *
  * @returns Valid port number in range 1-65535, or the default value
  */
-export function safeParsePort(value: unknown, defaultValue = 80): number {
-    const parsed = safeParseInt(value, defaultValue);
-    return parsed >= 1 && parsed <= 65_535 ? parsed : defaultValue;
+export function safeParsePort(
+    value: unknown,
+    defaultValue: number | PortNumber = DEFAULT_PORT_NUMBER
+): PortNumber {
+    const normalizedDefault =
+        typeof defaultValue === "number"
+            ? toPortNumber(defaultValue)
+            : defaultValue;
+
+    const parsed = safeParseInt(value, normalizedDefault);
+    return parsed >= PORT_NUMBER_RANGE.MIN && parsed <= PORT_NUMBER_RANGE.MAX
+        ? toPortNumber(parsed)
+        : normalizedDefault;
 }
 
 /**
@@ -271,9 +321,9 @@ export function safeParseRetryAttempts(
  * Safely converts a value to a timeout value (positive number) with fallback.
  *
  * @remarks
- * Ensures the result is a positive number suitable for timeout operations. Zero
- * and negative values are considered invalid for timeouts and will return the
- * default value. Accepts fractional values for sub-millisecond precision.
+ * Ensures the result is a positive integer number of milliseconds suitable for
+ * timeout operations. Zero and negative values are considered invalid for
+ * timeouts and will return the default value.
  *
  * @example
  *
@@ -291,10 +341,21 @@ export function safeParseRetryAttempts(
  */
 export function safeParseTimeout(
     value: unknown,
-    defaultValue = 10_000
-): number {
-    const parsed = safeNumberConversion(value, defaultValue);
-    return parsed > 0 && Number.isFinite(parsed) ? parsed : defaultValue;
+    defaultValue: number | TimeoutMilliseconds = DEFAULT_TIMEOUT
+): TimeoutMilliseconds {
+    const normalizedDefault =
+        typeof defaultValue === "number"
+            ? clampTimeoutDefault(defaultValue, MIN_TIMEOUT_MILLISECONDS)
+            : defaultValue;
+
+    const parsed = safeNumberConversion(value, normalizedDefault);
+
+    if (!Number.isFinite(parsed) || parsed <= 0) {
+        return normalizedDefault;
+    }
+
+    const bounded = Math.min(parsed, MAX_TIMEOUT_MILLISECONDS);
+    return toTimeoutMilliseconds(bounded);
 }
 
 /**

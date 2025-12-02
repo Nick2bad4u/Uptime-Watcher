@@ -79,9 +79,19 @@ describe("Shared Error Handling and Safety Performance", () => {
     });
 
     bench("safeJsonStringifyWithFallback - complex objects", () => {
+        const serializableErrors = testErrors.map((error) =>
+            error instanceof Error
+                ? {
+                      message: error.message,
+                      name: error.name,
+                      stack: error.stack ?? "",
+                  }
+                : error
+        );
+
         const complexObjects = [
             { timestamp: Date.now(), data: testObjects },
-            { errors: testErrors, metadata: { version: "1.0" } },
+            { errors: serializableErrors, metadata: { version: "1.0" } },
             { circular: null as any },
         ];
 

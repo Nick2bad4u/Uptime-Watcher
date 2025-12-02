@@ -136,8 +136,9 @@ interface ValidationModuleMock {
 let validationModule: ValidationModuleMock;
 
 const validationSuccessResult: ValidationResult = {
-    success: true,
     errors: [],
+    metadata: {},
+    success: true,
     warnings: [],
 };
 

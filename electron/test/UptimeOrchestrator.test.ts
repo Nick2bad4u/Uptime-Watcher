@@ -1429,8 +1429,9 @@ describe(UptimeOrchestrator, () => {
                 monitoring: true,
             };
 
-            orchestrator.emitTyped("internal:site:added" as any, {
+            orchestrator.emitTyped("internal:site:added", {
                 identifier: "imported-site",
+                operation: "added",
                 site: testSite,
                 source: "import",
                 timestamp: Date.now(),
@@ -1468,8 +1469,9 @@ describe(UptimeOrchestrator, () => {
 
             // Emit internal site event with SiteEventData format (what the actual implementation expects)
             // Note: Using 'as any' due to type mismatch between eventTypes.ts and actual implementation
-            orchestrator.emitTyped("internal:site:removed" as any, {
+            orchestrator.emitTyped("internal:site:removed", {
                 identifier: "test-site",
+                operation: "removed",
                 site: testSite,
                 timestamp: Date.now(),
             });
@@ -1498,7 +1500,6 @@ describe(UptimeOrchestrator, () => {
 
             const emitTypedSpy = vi.spyOn(orchestrator, "emitTyped");
 
-            // Create the test site object
             const testSite = {
                 identifier: "fallback-site",
                 name: "Test Site",
@@ -1508,7 +1509,8 @@ describe(UptimeOrchestrator, () => {
 
             // Emit internal site event without identifier to test fallback to site.identifier
             // Note: Using 'as any' due to type mismatch between eventTypes.ts and actual implementation
-            orchestrator.emitTyped("internal:site:removed" as any, {
+            orchestrator.emitTyped("internal:site:removed", {
+                operation: "removed",
                 site: testSite,
                 timestamp: Date.now(),
             });
@@ -1589,10 +1591,11 @@ describe(UptimeOrchestrator, () => {
 
             // Emit internal site event with SiteEventData format (what the actual implementation expects)
             // Note: Using 'as any' due to type mismatch between eventTypes.ts and actual implementation
-            orchestrator.emitTyped("internal:site:updated" as any, {
+            orchestrator.emitTyped("internal:site:updated", {
                 identifier: "test-site",
+                operation: "updated",
                 site: updatedSite,
-                previousSite: previousSite,
+                previousSite,
                 timestamp: Date.now(),
                 updatedFields: ["name"],
             });
@@ -1640,8 +1643,9 @@ describe(UptimeOrchestrator, () => {
                 ],
             } as Site;
 
-            orchestrator.emitTyped("internal:site:updated" as any, {
+            orchestrator.emitTyped("internal:site:updated", {
                 identifier: "site-monitor-test",
+                operation: "updated",
                 previousSite,
                 site: updatedSite,
                 timestamp: Date.now(),
@@ -1688,8 +1692,9 @@ describe(UptimeOrchestrator, () => {
 
             // Emit internal site event without previousSite and updatedFields to test fallbacks
             // Note: Using 'as any' due to type mismatch between eventTypes.ts and actual implementation
-            orchestrator.emitTyped("internal:site:updated" as any, {
+            orchestrator.emitTyped("internal:site:updated", {
                 identifier: "test-site",
+                operation: "updated",
                 site: updatedSite,
                 timestamp: Date.now(),
                 // No previousSite or updatedFields provided to test fallbacks

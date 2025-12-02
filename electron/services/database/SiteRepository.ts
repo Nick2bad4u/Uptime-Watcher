@@ -44,7 +44,6 @@
  * });
  * ```
  */
-import type { SiteRow as DatabaseSiteRow } from "@shared/types/database";
 import type { Database } from "node-sqlite3-wasm";
 
 import { DEFAULT_SITE_NAME } from "@shared/constants/sites";
@@ -54,6 +53,7 @@ import type { DatabaseService } from "./DatabaseService";
 import { logger } from "../../utils/logger";
 import { withDatabaseOperation } from "../../utils/operationalHooks";
 import { rowsToSites, rowToSite, type SiteRow } from "./utils/siteMapper";
+import { querySiteRow, querySiteRows } from "./utils/typedQueries";
 
 /**
  * Defines the dependencies required by the {@link SiteRepository} for managing
@@ -629,7 +629,7 @@ export class SiteRepository {
      * @returns Array of all site records.
      */
     private fetchAllSitesInternal(db: Database): SiteRow[] {
-        const siteRows = db.all(SITE_QUERIES.SELECT_ALL) as DatabaseSiteRow[];
+        const siteRows = querySiteRows(db, SITE_QUERIES.SELECT_ALL);
         return rowsToSites(siteRows);
     }
 
@@ -648,10 +648,9 @@ export class SiteRepository {
         identifier: string
     ): SiteRow | undefined {
         try {
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Database query returns known structure from controlled SQL
-            const siteRow = db.get(SITE_QUERIES.SELECT_BY_ID, [identifier]) as
-                | DatabaseSiteRow
-                | undefined;
+            const siteRow = querySiteRow(db, SITE_QUERIES.SELECT_BY_ID, [
+                identifier,
+            ]);
 
             return siteRow ? rowToSite(siteRow) : undefined;
         } catch (error) {

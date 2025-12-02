@@ -7,7 +7,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
 import type { UptimeEvents } from "../../../events/eventTypes";
-import type { TypedEventBus } from "../../../events/TypedEventBus";
+import type { EventKey, TypedEventBus } from "../../../events/TypedEventBus";
 import type { Site } from "@shared/types";
 import type { StandardizedCache } from "../../../utils/cache/StandardizedCache";
 import type { DatabaseServiceFactory } from "../../../services/factories/DatabaseServiceFactory";
@@ -85,7 +85,7 @@ class TestDatabaseCommand extends DatabaseCommand<string> {
             throw new Error("Test execution failure");
         }
         await this.emitSuccessEvent("internal:database:data-imported", {
-            operation: "test-operation",
+            operation: "data-imported",
         });
         return "test-result";
     }
@@ -108,17 +108,17 @@ class TestDatabaseCommand extends DatabaseCommand<string> {
     }
 
     // Expose protected methods for testing
-    public async testEmitSuccessEvent(
-        eventType: keyof UptimeEvents,
-        data: Partial<UptimeEvents[keyof UptimeEvents]>
+    public async testEmitSuccessEvent<TEvent extends EventKey<UptimeEvents>>(
+        eventType: TEvent,
+        data: Partial<UptimeEvents[TEvent]>
     ): Promise<void> {
         await this.emitSuccessEvent(eventType, data);
     }
 
-    public async testEmitFailureEvent(
-        eventType: keyof UptimeEvents,
+    public async testEmitFailureEvent<TEvent extends EventKey<UptimeEvents>>(
+        eventType: TEvent,
         error: Error,
-        data: Partial<UptimeEvents[keyof UptimeEvents]> = {}
+        data: Partial<UptimeEvents[TEvent]> = {}
     ): Promise<void> {
         await this.emitFailureEvent(eventType, error, data);
     }
@@ -177,7 +177,7 @@ describe("DatabaseCommands", () => {
             await annotate("Category: Service", "category");
             await annotate("Type: Event Processing", "type");
 
-            const testData = { operation: "test-op" };
+            const testData = { operation: "data-imported" } as const;
 
             await command.testEmitSuccessEvent(
                 "internal:database:data-imported",
@@ -189,7 +189,7 @@ describe("DatabaseCommands", () => {
                 expect.objectContaining({
                     success: true,
                     timestamp: expect.any(Number),
-                    operation: "test-op",
+                    operation: "data-imported",
                 })
             );
         });
@@ -204,7 +204,7 @@ describe("DatabaseCommands", () => {
             await annotate("Type: Error Handling", "type");
 
             const testError = new Error("Test error");
-            const testData = { operation: "test-op" };
+            const testData = { operation: "data-imported" } as const;
 
             await command.testEmitFailureEvent(
                 "internal:database:data-imported",
@@ -218,7 +218,7 @@ describe("DatabaseCommands", () => {
                     success: false,
                     error: "Test error",
                     timestamp: expect.any(Number),
-                    operation: "test-op",
+                    operation: "data-imported",
                 })
             );
         });

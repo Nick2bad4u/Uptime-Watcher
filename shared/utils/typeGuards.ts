@@ -1,5 +1,7 @@
 import type { UnknownRecord } from "type-fest";
 
+import type { PortNumber } from "../types/units";
+
 /**
  * Checks whether a value is a non-null object excluding arrays.
  *
@@ -54,7 +56,7 @@ export function isNumber(value: unknown): value is number {
 export function hasProperties<K extends PropertyKey>(
     value: unknown,
     properties: readonly K[]
-): value is Record<K, unknown> {
+): value is Record<K, unknown> & UnknownRecord {
     return (
         isObject(value) &&
         properties.every((prop) => Object.hasOwn(value, prop))
@@ -82,7 +84,7 @@ export function hasProperties<K extends PropertyKey>(
 export function hasProperty<K extends PropertyKey>(
     value: unknown,
     property: K
-): value is Record<K, unknown> {
+): value is Record<K, unknown> & UnknownRecord {
     return isObject(value) && Object.hasOwn(value, property);
 }
 
@@ -245,13 +247,25 @@ export function isString(value: unknown): value is string {
 }
 
 /**
+ * Checks whether a value is a non-empty string after trimming whitespace.
+ *
+ * @param value - Value to evaluate.
+ *
+ * @returns `true` when the value is a string containing at least one
+ *   non-whitespace character.
+ */
+export function isNonEmptyString(value: unknown): value is string {
+    return isString(value) && value.trim().length > 0;
+}
+
+/**
  * Checks whether a value falls within the valid TCP/UDP port range.
  *
  * @param value - Value to evaluate.
  *
  * @returns `true` when the value is an integer between 1 and 65,535.
  */
-export function isValidPort(value: unknown): value is number {
+export function isValidPort(value: unknown): value is PortNumber {
     return (
         isNumber(value) &&
         Number.isInteger(value) &&

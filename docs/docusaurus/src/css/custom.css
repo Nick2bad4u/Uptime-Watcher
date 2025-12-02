@@ -101,8 +101,15 @@
 /* Hide the global copy-page button on the landing page only.
    Docs, blog, and other routes keep the button visible. */
 
-body[class*="page-home"] .copy-page-button__container {
+/* Target both class and ID selectors to ensure the button is hidden on homepage */
+[class*="page-home"] .copy-page-button__container,
+[class*="page-home"] #copy-page-button-container,
+body:not([class*="docs-"]):not([class*="blog-"]) .copy-page-button__container,
+body:not([class*="docs-"]):not([class*="blog-"]) #copy-page-button-container {
     display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
 }
 
 /* Dark mode palette overrides: These variables are redefined to ensure optimal contrast, readability, and visual accessibility for users in dark mode.
@@ -4373,6 +4380,23 @@ html {
     .navbar__items--right {
         gap: 0.25rem;
     }
+}
+
+/* ================================================== */
+/* 🏠 HOMEPAGE-SPECIFIC MOBILE FIXES                  */
+/* ================================================== */
+
+/**
+ * Hide the navbar sidebar "Back to main menu" panel on non-documentation pages.
+ * This panel is only relevant for docs pages with nested sidebar navigation.
+ * On the homepage and other non-doc pages, it creates visual noise.
+ */
+body:not([class*="docs-"]):not([class*="blog-"]) .navbar-sidebar__item.menu,
+body:not([class*="docs-"]):not([class*="blog-"]) .navbar-sidebar__back,
+body:not([class*="docs-"]):not([class*="blog-"])
+    .theme-layout-navbar-sidebar-panel {
+    display: none !important;
+    visibility: hidden !important;
 }
 
 /* Accessibility: Individual reduced motion media queries for each selector group */

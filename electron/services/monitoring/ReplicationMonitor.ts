@@ -13,7 +13,7 @@ import { performance } from "node:perf_hooks";
 import type {
     IMonitorService,
     MonitorCheckResult,
-    MonitorConfig,
+    MonitorServiceConfig,
 } from "./types";
 
 import { buildMonitorFactory } from "./shared/monitorFactoryUtils";
@@ -41,7 +41,7 @@ type ReplicationMonitorInstance = Monitor & { type: "replication" };
 
 function resolveLagThreshold(
     monitor: ReplicationMonitorInstance,
-    serviceConfig: MonitorConfig
+    serviceConfig: MonitorServiceConfig
 ): number {
     const monitorValue = Reflect.get(
         monitor,
@@ -222,15 +222,15 @@ const behavior: RemoteMonitorBehavior<
     type: "replication",
 };
 
-const ReplicationMonitorBase: new (config?: MonitorConfig) => IMonitorService =
-    buildMonitorFactory(
-        () =>
-            createRemoteMonitorService<
-                "replication",
-                ReplicationMonitorContext
-            >(behavior),
-        "ReplicationMonitor"
-    );
+const ReplicationMonitorBase: new (
+    config?: MonitorServiceConfig
+) => IMonitorService = buildMonitorFactory(
+    () =>
+        createRemoteMonitorService<"replication", ReplicationMonitorContext>(
+            behavior
+        ),
+    "ReplicationMonitor"
+);
 
 /**
  * Replication monitor service built atop the shared remote monitor core.

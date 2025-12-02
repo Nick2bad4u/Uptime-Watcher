@@ -19,7 +19,7 @@ import { performance } from "node:perf_hooks";
 import type {
     IMonitorService,
     MonitorCheckResult,
-    MonitorConfig,
+    MonitorServiceConfig,
 } from "./types";
 
 import { DEFAULT_REQUEST_TIMEOUT } from "../../constants";
@@ -60,7 +60,7 @@ const HASH_ALGORITHM = "sha256";
 export class CdnEdgeConsistencyMonitor implements IMonitorService {
     private axiosInstance: AxiosInstance;
 
-    private config: MonitorConfig;
+    private config: MonitorServiceConfig;
 
     public async check(
         monitor: Site["monitors"][0],
@@ -299,7 +299,7 @@ export class CdnEdgeConsistencyMonitor implements IMonitorService {
         return undefined;
     }
 
-    public constructor(config: MonitorConfig = {}) {
+    public constructor(config: MonitorServiceConfig = {}) {
         this.config = {
             timeout: DEFAULT_REQUEST_TIMEOUT,
             ...config,
@@ -311,7 +311,7 @@ export class CdnEdgeConsistencyMonitor implements IMonitorService {
         return "cdn-edge-consistency";
     }
 
-    public updateConfig(config: Partial<MonitorConfig>): void {
+    public updateConfig(config: Partial<MonitorServiceConfig>): void {
         this.config = {
             ...this.config,
             ...config,

@@ -9,10 +9,13 @@
  * @packageDocumentation
  */
 
+import { ensureError } from "@shared/utils/errorHandling";
+
 import type { UptimeEvents } from "../../events/eventTypes";
 import type { TypedEventBus } from "../../events/TypedEventBus";
 import type { DatabaseService } from "../../services/database/DatabaseService";
 
+import { toSerializedError } from "../errorSerialization";
 import { monitorLogger as logger } from "../logger";
 import { withDatabaseOperation } from "../operationalHooks";
 
@@ -41,14 +44,15 @@ export async function initDatabase(
             eventEmitter
         );
     } catch (error) {
+        const normalizedError = ensureError(error);
         logger.error("Failed to initialize database", error);
         await eventEmitter.emitTyped("database:error", {
             details: "Failed to initialize database",
-            error: error instanceof Error ? error : new Error(String(error)),
+            error: toSerializedError(normalizedError),
             operation: "initialize-database",
             timestamp: Date.now(),
         });
-        // Re-throw error following project guidelines for proper error handling
+        // Re-throw original error to preserve upstream expectations
         throw error;
     }
 }

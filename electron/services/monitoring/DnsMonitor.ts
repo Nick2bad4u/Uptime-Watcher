@@ -38,7 +38,7 @@
  * @public
  *
  * @see {@link IMonitorService} - Interface contract for monitor services
- * @see {@link MonitorConfig} - Configuration options for monitors
+ * @see {@link MonitorServiceConfig} - Service-level configuration defaults
  * @see {@link performDnsCheckWithRetry} - Core DNS checking functionality
  */
 
@@ -63,7 +63,7 @@ import {
 import type {
     IMonitorService,
     MonitorCheckResult,
-    MonitorConfig,
+    MonitorServiceConfig,
 } from "./types";
 
 import { DEFAULT_REQUEST_TIMEOUT } from "../../constants";
@@ -75,7 +75,6 @@ import {
 /**
  * Service for performing DNS monitoring checks.
  *
- * @remarks
  * Implements the {@link IMonitorService} interface to provide DNS resolution
  * monitoring with advanced features for reliability and performance. Uses the
  * native Node.js dns module for cross-platform DNS resolution.
@@ -110,7 +109,7 @@ import {
  * @public
  */
 export class DnsMonitor implements IMonitorService {
-    private config: MonitorConfig;
+    private config: MonitorServiceConfig;
 
     /**
      * Performs a DNS resolution check on the specified monitor.
@@ -367,7 +366,7 @@ export class DnsMonitor implements IMonitorService {
      *
      * @param config - Configuration options for the monitor service
      */
-    public constructor(config: MonitorConfig = {}) {
+    public constructor(config: MonitorServiceConfig = {}) {
         this.config = {
             timeout: DEFAULT_REQUEST_TIMEOUT,
             ...config,
@@ -384,7 +383,7 @@ export class DnsMonitor implements IMonitorService {
      *
      * @returns A shallow copy of the current monitor configuration
      */
-    public getConfig(): MonitorConfig {
+    public getConfig(): MonitorServiceConfig {
         return { ...this.config };
     }
 
@@ -412,7 +411,7 @@ export class DnsMonitor implements IMonitorService {
      *
      * @param config - Partial configuration to update
      */
-    public updateConfig(config: Partial<MonitorConfig>): void {
+    public updateConfig(config: Partial<MonitorServiceConfig>): void {
         this.config = {
             ...this.config,
             ...config,

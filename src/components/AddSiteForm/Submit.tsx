@@ -18,6 +18,7 @@ import type {
 import { truncateForLogging } from "../../utils/fallbacks";
 import {
     createMonitorObject,
+    type PartialMonitorFormDataByType,
     validateMonitorFieldClientSide,
     validateMonitorFormData,
 } from "../../utils/monitorValidation";
@@ -117,14 +118,17 @@ interface MonitorValidationFields {
     url: string;
 }
 
+type MonitorValidationBuilderMap = {
+    [K in MonitorType]: (
+        fields: MonitorValidationFields
+    ) => PartialMonitorFormDataByType<K>;
+};
+
 // NOTE: The builders below intentionally mirror the field-mapping logic in
 // `buildMonitorFormData`. When adding new monitor types or fields, update both
 // the validation builders and the form-data builder so that client-side
 // validation and monitor creation stay in sync.
-const monitorValidationBuilders: Record<
-    MonitorType,
-    (fields: MonitorValidationFields) => UnknownRecord
-> = {
+const monitorValidationBuilders: MonitorValidationBuilderMap = {
     "cdn-edge-consistency": ({
         baselineUrl,
         edgeLocations,
@@ -228,14 +232,12 @@ const monitorValidationBuilders: Record<
     }),
 };
 
-const monitorValidationBuilderLookup: Record<
-    string,
-    (fields: MonitorValidationFields) => UnknownRecord
-> = monitorValidationBuilders;
+const monitorValidationBuilderLookup: MonitorValidationBuilderMap =
+    monitorValidationBuilders;
 
-const resolveMonitorValidationBuilder = (
-    monitorType: MonitorType
-): ((fields: MonitorValidationFields) => UnknownRecord) => {
+const resolveMonitorValidationBuilder = <K extends MonitorType>(
+    monitorType: K
+): MonitorValidationBuilderMap[K] => {
     const candidate = monitorValidationBuilderLookup[monitorType];
 
     if (typeof candidate !== "function") {
@@ -470,15 +472,16 @@ async function validateCheckInterval(
  *
  * @returns Promise resolving to array of validation error messages
  */
-async function validateMonitorType(
-    monitorType: MonitorType,
+// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-parameters -- Generic preserves precise builder-to-schema linkage for each monitor type.
+async function validateMonitorType<TType extends MonitorType>(
+    monitorType: TType,
     fields: MonitorValidationFields
 ): Promise<readonly string[]> {
     const builderCandidate = resolveMonitorValidationBuilder(monitorType);
-
-    const formData: UnknownRecord = {
+    const partialData = builderCandidate(fields);
+    const formData: PartialMonitorFormDataByType<TType> = {
+        ...partialData,
         type: monitorType,
-        ...builderCandidate(fields),
     };
 
     const result = await validateMonitorFormData(monitorType, formData);

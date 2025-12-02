@@ -133,14 +133,16 @@ describe("Submit.tsx - Comprehensive Coverage", () => {
             const { validateMonitorFormData, validateMonitorFieldClientSide } =
                 await import("../../../utils/monitorValidation");
             vi.mocked(validateMonitorFormData).mockResolvedValue({
-                success: true,
                 errors: [],
+                metadata: {},
+                success: true,
                 warnings: [],
             });
 
             vi.mocked(validateMonitorFieldClientSide).mockResolvedValue({
-                success: true,
                 errors: [],
+                metadata: {},
+                success: true,
                 warnings: [],
             });
 
@@ -177,8 +179,9 @@ describe("Submit.tsx - Comprehensive Coverage", () => {
                 "../../../utils/monitorValidation"
             );
             vi.mocked(validateMonitorFormData).mockResolvedValue({
-                success: false,
                 errors: ["Invalid URL format"],
+                metadata: {},
+                success: false,
                 warnings: [],
             });
 
@@ -224,14 +227,16 @@ describe("Submit.tsx - Comprehensive Coverage", () => {
             const { validateMonitorFormData, validateMonitorFieldClientSide } =
                 await import("../../../utils/monitorValidation");
             vi.mocked(validateMonitorFormData).mockResolvedValue({
-                success: true,
                 errors: [],
+                metadata: {},
+                success: true,
                 warnings: [],
             });
 
             vi.mocked(validateMonitorFieldClientSide).mockResolvedValue({
-                success: true,
                 errors: [],
+                metadata: {},
+                success: true,
                 warnings: [],
             });
 

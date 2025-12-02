@@ -1,7 +1,9 @@
-import type { EventMetadata } from "@shared/types/events";
-import type { UnknownRecord } from "type-fest";
-
-import type { TypedEventBus } from "./TypedEventBus";
+import type {
+    EventKey,
+    TypedEventBus,
+    TypedEventListener,
+    TypedEventMap,
+} from "./TypedEventBus";
 
 /**
  * Configuration for scoped subscription disposal behaviour.
@@ -77,12 +79,12 @@ export class ScopedSubscriptionManager {
      * @returns Disposer that removes the listener when invoked.
      */
     public onTyped<
-        EventMap extends UnknownRecord,
-        K extends keyof EventMap = keyof EventMap,
+        EventMap extends TypedEventMap,
+        K extends EventKey<EventMap>,
     >(
         bus: TypedEventBus<EventMap>,
         event: K,
-        listener: (data: EventMap[K] & { _meta: EventMetadata }) => void
+        listener: TypedEventListener<EventMap, K>
     ): () => void {
         bus.onTyped(event, listener);
         return this.track(() => {

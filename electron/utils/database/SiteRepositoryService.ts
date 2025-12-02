@@ -36,6 +36,7 @@
 import type { Site } from "@shared/types";
 import type { Logger } from "@shared/utils/logger/interfaces";
 
+import { ensureError } from "@shared/utils/errorHandling";
 import { getErrorMessage } from "@shared/utils/errorUtils";
 
 import type { UptimeEvents } from "../../events/eventTypes";
@@ -49,6 +50,7 @@ import type { StandardizedCache } from "../cache/StandardizedCache";
 import type { MonitoringConfig, SiteLoadingConfig } from "./interfaces";
 
 import { DEFAULT_SITE_NAME } from "../../constants";
+import { toSerializedError } from "../errorSerialization";
 import { SiteLoadingError } from "./interfaces";
 
 /**
@@ -263,19 +265,19 @@ export class SiteRepositoryService {
 
             this.logger.info(`Loaded ${sites.length} sites into cache`);
         } catch (error) {
+            const normalizedError = ensureError(error);
             const message = `Failed to load sites into cache: ${getErrorMessage(error)}`;
             this.logger.error(message, error);
 
             // Emit typed error event
             await this.eventEmitter.emitTyped("database:error", {
                 details: message,
-                error:
-                    error instanceof Error ? error : new Error(String(error)),
+                error: toSerializedError(normalizedError),
                 operation: "load-sites-into-cache",
                 timestamp: Date.now(),
             });
 
-            throw error;
+            throw normalizedError;
         }
     }
 

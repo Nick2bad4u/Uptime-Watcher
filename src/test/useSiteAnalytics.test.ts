@@ -135,9 +135,11 @@ describe(useSiteAnalytics, () => {
                 filteredHistory: [],
                 incidentCount: 0,
                 mttr: 0,
-                p50: 0,
-                p95: 0,
-                p99: 0,
+                percentileMetrics: {
+                    p50: 0,
+                    p95: 0,
+                    p99: 0,
+                },
                 slowestResponse: 0,
                 totalChecks: 0,
                 totalDowntime: 0,
@@ -169,9 +171,11 @@ describe(useSiteAnalytics, () => {
                 filteredHistory: [],
                 incidentCount: 0,
                 mttr: 0,
-                p50: 0,
-                p95: 0,
-                p99: 0,
+                percentileMetrics: {
+                    p50: 0,
+                    p95: 0,
+                    p99: 0,
+                },
                 slowestResponse: 0,
                 totalChecks: 0,
                 totalDowntime: 0,
@@ -473,9 +477,13 @@ describe(useSiteAnalytics, () => {
                 useSiteAnalytics(monitor, "24h")
             );
             // P99 should resolve to last element (20) not undefined
-            expect([10, 20]).toContain(result.current.p99);
-            expect(result.current.p99).toBeGreaterThanOrEqual(10);
-            expect(result.current.p99).toBeLessThanOrEqual(20);
+            expect([10, 20]).toContain(result.current.percentileMetrics.p99);
+            expect(result.current.percentileMetrics.p99).toBeGreaterThanOrEqual(
+                10
+            );
+            expect(result.current.percentileMetrics.p99).toBeLessThanOrEqual(
+                20
+            );
         });
     });
 
@@ -525,9 +533,9 @@ describe(useSiteAnalytics, () => {
                 useSiteAnalytics(mockMonitorWithHistory, "1h")
             );
 
-            expect(result.current.p50).toBe(150); // 50th percentile (median)
-            expect(result.current.p95).toBe(300); // 95th percentile
-            expect(result.current.p99).toBe(300); // 99th percentile
+            expect(result.current.percentileMetrics.p50).toBe(150); // 50th percentile (median)
+            expect(result.current.percentileMetrics.p95).toBe(300); // 95th percentile
+            expect(result.current.percentileMetrics.p99).toBe(300); // 99th percentile
         });
 
         it("should handle single response time for percentiles", async ({
@@ -548,9 +556,9 @@ describe(useSiteAnalytics, () => {
                 useSiteAnalytics(singleRecordMonitor, "24h")
             );
 
-            expect(result.current.p50).toBe(500);
-            expect(result.current.p95).toBe(500);
-            expect(result.current.p99).toBe(500);
+            expect(result.current.percentileMetrics.p50).toBe(500);
+            expect(result.current.percentileMetrics.p95).toBe(500);
+            expect(result.current.percentileMetrics.p99).toBe(500);
         });
 
         it("should handle edge cases in percentile calculation", async ({
@@ -566,9 +574,9 @@ describe(useSiteAnalytics, () => {
                 useSiteAnalytics(mockMonitorEmpty, "24h")
             );
 
-            expect(result.current.p50).toBe(0);
-            expect(result.current.p95).toBe(0);
-            expect(result.current.p99).toBe(0);
+            expect(result.current.percentileMetrics.p50).toBe(0);
+            expect(result.current.percentileMetrics.p95).toBe(0);
+            expect(result.current.percentileMetrics.p99).toBe(0);
         });
     });
 

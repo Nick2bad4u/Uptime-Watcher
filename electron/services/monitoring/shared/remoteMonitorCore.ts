@@ -12,7 +12,7 @@ import { ensureError } from "@shared/utils/errorHandling";
 import type {
     IMonitorService,
     MonitorCheckResult,
-    MonitorConfig,
+    MonitorServiceConfig,
 } from "../types";
 
 import { DEFAULT_REQUEST_TIMEOUT } from "../../../constants";
@@ -84,7 +84,7 @@ export interface RemoteMonitorBehavior<
     /** Resolves monitor-specific configuration and validation. */
     readonly resolveConfiguration: (
         monitor: MonitorByType<TType>,
-        serviceConfig: MonitorConfig
+        serviceConfig: MonitorServiceConfig
     ) => RemoteMonitorConfigResult<TContext>;
     /** Scope label used for structured logging (e.g. "ReplicationMonitor"). */
     readonly scope: string;
@@ -100,11 +100,11 @@ export function createRemoteMonitorService<
     TContext,
 >(
     behavior: RemoteMonitorBehavior<TType, TContext>
-): new (config?: MonitorConfig) => IMonitorService {
+): new (config?: MonitorServiceConfig) => IMonitorService {
     return class RemoteMonitorServiceAdapter implements IMonitorService {
         private axiosInstance: AxiosInstance;
 
-        private config: MonitorConfig;
+        private config: MonitorServiceConfig;
 
         public async check(
             monitor: Site["monitors"][0],
@@ -222,7 +222,7 @@ export function createRemoteMonitorService<
             }
         }
 
-        public constructor(config: MonitorConfig = {}) {
+        public constructor(config: MonitorServiceConfig = {}) {
             this.config = {
                 timeout: DEFAULT_REQUEST_TIMEOUT,
                 ...config,
@@ -234,7 +234,7 @@ export function createRemoteMonitorService<
             return behavior.type;
         }
 
-        public updateConfig(config: Partial<MonitorConfig>): void {
+        public updateConfig(config: Partial<MonitorServiceConfig>): void {
             this.config = {
                 ...this.config,
                 ...config,

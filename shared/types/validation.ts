@@ -8,6 +8,8 @@
  * @packageDocumentation
  */
 
+import type { UnknownRecord } from "type-fest";
+
 /**
  * Base validation result interface.
  *
@@ -186,6 +188,6 @@ export function isValidationResult(
     }
 
     // Type-safe property access after narrowing
-    const obj = result as Record<string, unknown>;
+    const obj = result as UnknownRecord;
     return Array.isArray(obj["errors"]) && typeof obj["success"] === "boolean";
 }

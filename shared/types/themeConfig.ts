@@ -9,7 +9,13 @@
  * @packageDocumentation
  */
 
-import type { Merge, PartialDeep, SetOptional, UnknownRecord } from "type-fest";
+import type {
+    Merge,
+    PartialDeep,
+    SetOptional,
+    Simplify,
+    UnknownRecord,
+} from "type-fest";
 
 /**
  * Animation configuration interface.
@@ -448,26 +454,16 @@ export interface ThemeConfigWithModes {
  * Theme override configuration interface.
  *
  * @remarks
- * Allows partial overrides of theme configuration.
+ * Allows deep overrides of any theme section using type-fest's
+ * {@link PartialDeep}. Each top-level key mirrors {@link ThemeConfig}, and the
+ * nested structure can be partially specified without having to copy the full
+ * object tree.
  *
  * @public
  */
-export interface ThemeOverride {
-    /** Animation overrides */
-    animation?: Partial<AnimationConfig>;
-    /** Border radius overrides */
-    borderRadius?: Partial<BorderRadiusConfig>;
-    /** Color overrides */
-    colors?: Partial<ThemeColors>;
-    /** Component overrides */
-    components?: Partial<ComponentConfig>;
-    /** Shadow overrides */
-    shadows?: Partial<ShadowConfig>;
-    /** Spacing overrides */
-    spacing?: Partial<SpacingConfig>;
-    /** Typography overrides */
-    typography?: Partial<TypographyConfig>;
-}
+export type ThemeOverride = {
+    [Key in keyof ThemeConfig]?: PartialDeep<ThemeConfig[Key]>;
+};
 
 /**
  * Deep partial theme configuration using type-fest's PartialDeep utility.
@@ -497,6 +493,52 @@ export interface ThemeOverride {
  * @public
  */
 export type DeepThemeOverride = PartialDeep<ThemeConfig>;
+
+const isMergeableObject = (value: unknown): value is UnknownRecord =>
+    typeof value === "object" && value !== null && !Array.isArray(value);
+
+function deepMergeSection<TTarget>(
+    target: TTarget,
+    source: PartialDeep<TTarget> | undefined
+): TTarget {
+    if (source === undefined) {
+        return target;
+    }
+
+    if (!isMergeableObject(source)) {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Primitive overrides retain the section's original shape.
+        return source as TTarget;
+    }
+
+    const targetRecord = isMergeableObject(target)
+        ? (target as UnknownRecord)
+        : ({} as UnknownRecord);
+    const result: UnknownRecord = { ...targetRecord };
+
+    for (const [key, sourceValue] of Object.entries(source as UnknownRecord)) {
+        if (sourceValue !== undefined) {
+            if (isMergeableObject(sourceValue)) {
+                const nextTarget = targetRecord[key];
+                result[key] = deepMergeSection(
+                    isMergeableObject(nextTarget)
+                        ? nextTarget
+                        : ({} as UnknownRecord),
+                    sourceValue as PartialDeep<UnknownRecord>
+                );
+            } else {
+                result[key] = sourceValue;
+            }
+        }
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Deep merge produces the same structural shape as the target section.
+    return result as TTarget;
+}
+
+const mergeSection = <TSection>(
+    baseSection: TSection,
+    overrideSection?: PartialDeep<TSection>
+): TSection => deepMergeSection<TSection>(baseSection, overrideSection);
 
 /**
  * Typography configuration interface.
@@ -815,19 +857,21 @@ export function createThemeConfig(
 export function mergeThemeConfig<
     T extends ThemeConfig,
     U extends ThemeOverride,
->(baseTheme: T, overrides: U): Merge<T, U> {
+>(baseTheme: T, overrides: U): Simplify<Merge<T, U>> {
     return {
         ...baseTheme,
         ...overrides,
-        // Deep merge for nested objects
-        animation: { ...baseTheme.animation, ...overrides.animation },
-        borderRadius: { ...baseTheme.borderRadius, ...overrides.borderRadius },
-        colors: { ...baseTheme.colors, ...overrides.colors },
-        components: { ...baseTheme.components, ...overrides.components },
-        shadows: { ...baseTheme.shadows, ...overrides.shadows },
-        spacing: { ...baseTheme.spacing, ...overrides.spacing },
-        typography: { ...baseTheme.typography, ...overrides.typography },
-    } as Merge<T, U>;
+        animation: mergeSection(baseTheme.animation, overrides.animation),
+        borderRadius: mergeSection(
+            baseTheme.borderRadius,
+            overrides.borderRadius
+        ),
+        colors: mergeSection(baseTheme.colors, overrides.colors),
+        components: mergeSection(baseTheme.components, overrides.components),
+        shadows: mergeSection(baseTheme.shadows, overrides.shadows),
+        spacing: mergeSection(baseTheme.spacing, overrides.spacing),
+        typography: mergeSection(baseTheme.typography, overrides.typography),
+    } as Simplify<Merge<T, U>>;
 }
 
 /**
@@ -864,40 +908,5 @@ export function createDeepThemeOverride(
     baseTheme: ThemeConfig,
     deepOverrides: DeepThemeOverride
 ): ThemeConfig {
-    // Deep merge implementation - in production, consider using a library like lodash.merge
-    // Use of 'any' is necessary for flexible object merging
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Deep merge utility requires 'any' type for flexible object property handling
-    const deepMerge = (target: any, source: any): any => {
-        if (source === null || source === undefined) return target;
-        if (typeof source !== "object") return source;
-
-        // Safe assignment with any for flexible merging
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- Deep merge utility requires 'any' type assignment for flexible object property handling
-        const result = { ...target };
-        for (const key in source) {
-            if (
-                // Safe member access for dynamic property checking
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- Dynamic property access requires bypassing type safety for flexible object traversal
-                source[key] !== null &&
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- Dynamic property access requires bypassing type safety for flexible object traversal
-                typeof source[key] === "object" &&
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- Dynamic property access requires bypassing type safety for flexible object traversal
-                !Array.isArray(source[key])
-            ) {
-                // Recursive merge with safe assignment and member access
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access -- Recursive deep merge requires unsafe operations for dynamic object traversal and assignment
-                result[key] = deepMerge(target[key] ?? {}, source[key]);
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- Dynamic property access requires bypassing type safety for flexible object traversal
-            } else if (source[key] !== undefined) {
-                // Safe assignment of source values
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access -- Direct value assignment requires unsafe operations for dynamic object property handling
-                result[key] = source[key];
-            }
-        }
-        return result;
-    };
-
-    // Safe return as ThemeConfig is expected type
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-return -- Deep merge result is guaranteed to be ThemeConfig type by function contract
-    return deepMerge(baseTheme, deepOverrides);
+    return deepMergeSection<ThemeConfig>(baseTheme, deepOverrides);
 }

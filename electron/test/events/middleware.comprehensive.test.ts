@@ -37,6 +37,10 @@ import {
 
 // Import mocked logger after it's been mocked
 import { logger as mockLogger } from "../../utils/logger";
+import type { EventPayloadValue } from "../../events/TypedEventBus";
+
+const asEventPayload = (value: unknown): EventPayloadValue =>
+    value as EventPayloadValue;
 
 describe("middleware.ts - Additional Coverage", () => {
     beforeEach(() => {
@@ -54,7 +58,7 @@ describe("middleware.ts - Additional Coverage", () => {
                 level: "warn",
                 includeData: true,
             });
-            await mw("test:event", { data: "test" }, next);
+            await mw("test:event", asEventPayload({ data: "test" }), next);
 
             expect(mockLogger.warn).toHaveBeenCalledWith(
                 "[EventBus] Event emitted",
@@ -76,7 +80,11 @@ describe("middleware.ts - Additional Coverage", () => {
                 level: "error",
                 includeData: false,
             });
-            await mw("error:event", { error: "something" }, next);
+            await mw(
+                "error:event",
+                asEventPayload({ error: "something" }),
+                next
+            );
 
             expect(mockLogger.error).toHaveBeenCalledWith(
                 "[EventBus] Event emitted",
@@ -104,13 +112,13 @@ describe("middleware.ts - Additional Coverage", () => {
             const circularObj: any = { name: "test" };
             circularObj.self = circularObj;
 
-            await mw("circular:event", circularObj, next);
+            await mw("circular:event", asEventPayload(circularObj), next);
 
             expect(mockLogger.debug).toHaveBeenCalledWith(
                 "[EventBus] Event emitted",
                 expect.objectContaining({
                     event: "circular:event",
-                    data: expect.any(Object), // The actual circular object is logged
+                    data: expect.stringContaining("Unserializable object"),
                 })
             );
             expect(next).toHaveBeenCalled();
@@ -132,7 +140,7 @@ describe("middleware.ts - Additional Coverage", () => {
             // Test with function (non-serializable)
             const functionData = () => "test";
 
-            await mw("function:event", functionData, next);
+            await mw("function:event", asEventPayload(functionData), next);
 
             expect(mockLogger.info).toHaveBeenCalledWith(
                 "[EventBus] Event emitted",
@@ -160,11 +168,11 @@ describe("middleware.ts - Additional Coverage", () => {
                     isValid: false,
                     error: "Custom validation error",
                 }),
-            };
+            } as const;
             const mw = createValidationMiddleware(validators);
 
             await expect(
-                mw("test:event", { data: "invalid" }, next)
+                mw("test:event", asEventPayload({ data: "invalid" }), next)
             ).rejects.toThrow(
                 "Validation failed for event 'test:event': Custom validation error"
             );
@@ -196,7 +204,7 @@ describe("middleware.ts - Additional Coverage", () => {
             const mw = createValidationMiddleware(validators);
 
             await expect(
-                mw("test:event", { data: "invalid" }, next)
+                mw("test:event", asEventPayload({ data: "invalid" }), next)
             ).rejects.toThrow(
                 "Validation failed for event 'test:event': Validation failed"
             );
@@ -230,14 +238,12 @@ describe("middleware.ts - Additional Coverage", () => {
             const mw = createValidationMiddleware(validators);
 
             await expect(
-                mw("test:event", { data: "test" }, next)
-            ).rejects.toThrow(
-                "Validator error for event 'test:event': String error"
-            );
+                mw("test:event", asEventPayload({ data: "test" }), next)
+            ).rejects.toThrow("String error");
 
             expect(mockLogger.error).toHaveBeenCalledWith(
                 expect.stringContaining(
-                    "Validator threw unexpected error for event 'test:event'"
+                    "Validator threw error for event 'test:event'"
                 ),
                 expect.objectContaining({
                     event: "test:event",
@@ -265,7 +271,7 @@ describe("middleware.ts - Additional Coverage", () => {
             const mw = createValidationMiddleware(validators);
 
             await expect(
-                mw("test:event", { data: "test" }, next)
+                mw("test:event", asEventPayload({ data: "test" }), next)
             ).rejects.toThrow("Validation failed for custom reason");
 
             expect(next).not.toHaveBeenCalled();
@@ -285,7 +291,7 @@ describe("middleware.ts - Additional Coverage", () => {
             };
             const mw = createValidationMiddleware(validators);
 
-            await mw("test:event", { data: "test" }, next);
+            await mw("test:event", asEventPayload({ data: "test" }), next);
 
             expect(next).toHaveBeenCalled();
         });
@@ -308,8 +314,10 @@ describe("middleware.ts - Additional Coverage", () => {
             const circularData: any = { name: "test" };
             circularData.self = circularData;
 
-            await expect(mw("test:event", circularData, next)).rejects.toThrow(
-                "Validation failed for event 'test:event'"
+            await expect(
+                mw("test:event", asEventPayload(circularData), next)
+            ).rejects.toThrow(
+                "Validation failed for event 'test:event': Validation failed"
             );
 
             expect(mockLogger.error).toHaveBeenCalledWith(
@@ -318,7 +326,7 @@ describe("middleware.ts - Additional Coverage", () => {
                 ),
                 expect.objectContaining({
                     event: "test:event",
-                    data: "[Circular Reference or Non-Serializable Object]",
+                    data: expect.stringContaining("Unserializable object"),
                 })
             );
             expect(next).not.toHaveBeenCalled();
@@ -374,7 +382,8 @@ describe("middleware.ts - Additional Coverage", () => {
 
             // Should log without data
             expect(mockLogger.debug).toHaveBeenCalledWith(
-                "[EventBus:Debug] Processing event 'simple:event'"
+                "[EventBus:Debug] Processing event 'simple:event'",
+                expect.objectContaining({ event: "simple:event" })
             );
 
             // Should still log completion with timing
@@ -505,7 +514,7 @@ describe("middleware.ts - Additional Coverage", () => {
                 "[EventBus] Event emitted",
                 {
                     event: "symbol:event",
-                    data: symbolData, // Use the exact same symbol reference
+                    data: symbolData.toString(),
                 }
             );
         });
@@ -531,7 +540,7 @@ describe("middleware.ts - Additional Coverage", () => {
                 "[EventBus] Event emitted",
                 {
                     event: "bigint:event",
-                    data: bigintData, // Use the exact same BigInt reference
+                    data: bigintData.toString(),
                 }
             );
         });
@@ -632,16 +641,18 @@ describe("middleware.ts - Additional Coverage", () => {
                 continueOnError: true,
                 onError,
             });
-            await mw("test:event", {}, next);
+            await mw("test:event", asEventPayload({}), next);
 
             expect(onError).toHaveBeenCalledWith(
                 expect.objectContaining({ message: "String error" }),
-                "test:event",
-                {}
+                {
+                    data: {},
+                    event: "test:event",
+                }
             );
             expect(mockLogger.error).toHaveBeenCalledWith(
                 expect.stringContaining(
-                    "[EventBus] Middleware error for event 'test:event'"
+                    "[EventBus] Error in event 'test:event': String error"
                 ),
                 expect.objectContaining({
                     error: expect.any(Error),
@@ -668,15 +679,15 @@ describe("middleware.ts - Additional Coverage", () => {
             const circularData: any = { name: "test" };
             circularData.self = circularData;
 
-            await expect(mw("test:event", circularData, next)).rejects.toThrow(
-                "Test error"
-            );
+            await expect(
+                mw("test:event", asEventPayload(circularData), next)
+            ).rejects.toThrow("Test error");
 
             expect(mockLogger.error).toHaveBeenCalledWith(
-                "[EventBus] Middleware error for event 'test:event'",
+                "[EventBus] Error in event 'test:event': Test error",
                 expect.objectContaining({
                     event: "test:event",
-                    data: "[Circular Reference or Non-Serializable Object]",
+                    data: expect.stringContaining("Unserializable object"),
                     error: expect.any(Error),
                 })
             );

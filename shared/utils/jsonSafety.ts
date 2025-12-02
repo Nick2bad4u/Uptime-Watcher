@@ -5,6 +5,11 @@
  * Operations capture thrown errors and expose them as structured metadata so
  * callers never deal with exceptions during normal control flow.
  */
+import type { Jsonifiable, JsonValue } from "type-fest";
+
+/**
+ * Result tuple produced by the safe JSON helpers.
+ */
 export interface SafeJsonResult<T> {
     /** Parsed value when the operation succeeds. */
     data?: T;
@@ -63,8 +68,7 @@ function safeOperation<T>(
         const errorMessage =
             errorObj instanceof TypeError &&
             (errorObj.message.includes("does not match expected type") ||
-                errorObj.message.includes("is not an array") ||
-                errorObj.message.includes("cannot be serialized"))
+                errorObj.message.includes("is not an array"))
                 ? errorObj.message
                 : `${errorPrefix}: ${errorObj.message}`;
 
@@ -74,6 +78,117 @@ function safeOperation<T>(
         };
     }
 }
+
+const collectObjectValues = (value: object): readonly unknown[] => {
+    if (Array.isArray(value)) {
+        return value;
+    }
+
+    const values: unknown[] = [];
+    for (const key of Reflect.ownKeys(value)) {
+        try {
+            values.push(Reflect.get(value, key));
+        } catch {
+            values.push(undefined);
+        }
+    }
+
+    return values;
+};
+
+const hasDescriptorValue = (
+    descriptor: PropertyDescriptor | undefined
+): descriptor is PropertyDescriptor & { value: unknown } =>
+    Boolean(descriptor && Object.hasOwn(descriptor, "value"));
+
+const isNonNullObject = (value: unknown): value is object =>
+    typeof value === "object" && value !== null;
+
+const hasSerializableContent = (
+    value: unknown,
+    seen = new WeakSet<object>()
+): boolean => {
+    if (value === null) {
+        return true;
+    }
+
+    if (!isNonNullObject(value)) {
+        const primitiveType = typeof value;
+        return (
+            primitiveType === "string" ||
+            primitiveType === "number" ||
+            primitiveType === "boolean"
+        );
+    }
+
+    const target: object = value;
+    if (seen.has(target)) {
+        throw new TypeError("Circular reference detected");
+    }
+
+    seen.add(target);
+
+    const entries = collectObjectValues(target);
+
+    try {
+        if (entries.length === 0) {
+            return true;
+        }
+
+        return entries.some((entry) => hasSerializableContent(entry, seen));
+    } finally {
+        seen.delete(target);
+    }
+};
+
+const hasUnsupportedJsonValue = (
+    value: unknown,
+    seen = new WeakSet<object>()
+): boolean => {
+    if (value === null) {
+        return false;
+    }
+
+    const valueType = typeof value;
+    if (valueType === "bigint" || valueType === "symbol") {
+        return true;
+    }
+
+    if (valueType === "function" || valueType === "undefined") {
+        return false;
+    }
+
+    if (!isNonNullObject(value)) {
+        return false;
+    }
+
+    const target: object = value;
+    if (seen.has(target)) {
+        return false;
+    }
+
+    seen.add(target);
+
+    try {
+        if (Array.isArray(value)) {
+            return value.some((entry) => hasUnsupportedJsonValue(entry, seen));
+        }
+
+        for (const key of Reflect.ownKeys(target)) {
+            const descriptor = Object.getOwnPropertyDescriptor(target, key);
+            if (
+                hasDescriptorValue(descriptor) &&
+                hasUnsupportedJsonValue(descriptor.value, seen)
+            ) {
+                return true;
+            }
+        }
+
+        return false;
+    } finally {
+        seen.delete(target);
+    }
+};
 
 /**
  * Parses a JSON string and validates the resulting value with a type guard.
@@ -111,7 +226,7 @@ function safeOperation<T>(
  *
  * @returns Structured result containing either the parsed value or a message.
  */
-export function safeJsonParse<T>(
+export function safeJsonParse<T extends JsonValue>(
     json: string,
     validator: (data: unknown) => data is T
 ): SafeJsonResult<T> {
@@ -156,29 +271,32 @@ export function safeJsonParse<T>(
  *
  * @returns Structured result containing a typed array or an error message.
  */
-export function safeJsonParseArray<T>(
+export function safeJsonParseArray<T extends JsonValue>(
     json: string,
     elementValidator: (item: unknown) => item is T
 ): SafeJsonResult<T[]> {
     return safeOperation(() => {
-        const parsed: unknown = JSON.parse(json);
+        // JSON.parse returns unknown runtime data which is validated below.
 
-        if (!Array.isArray(parsed)) {
+        const parsedValue: unknown = JSON.parse(json);
+
+        if (!Array.isArray(parsedValue)) {
             throw new TypeError("Parsed data is not an array");
         }
 
-        // Validate all elements
-        for (const [i, element] of parsed.entries()) {
+        const typedArray: T[] = [];
+
+        parsedValue.forEach((element, index) => {
             if (!elementValidator(element)) {
                 throw new TypeError(
-                    `Array element at index ${i} does not match expected type`
+                    `Array element at index ${index} does not match expected type`
                 );
             }
-        }
 
-        // Type assertion is safe here as we've validated all elements
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe cast after validation of all elements in parsed array
-        return parsed as T[];
+            typedArray.push(element);
+        });
+
+        return typedArray;
     }, "JSON parsing failed");
 }
 
@@ -207,13 +325,16 @@ export function safeJsonParseArray<T>(
  *
  * @returns The validated data or the provided fallback.
  */
-export function safeJsonParseWithFallback<T>(
+export function safeJsonParseWithFallback<T extends JsonValue>(
     json: string,
     validator: (data: unknown) => data is T,
     fallback: T
 ): T {
     const result = safeJsonParse(json, validator);
-    return result.success && result.data !== undefined ? result.data : fallback;
+    if (result.success && result.data !== undefined) {
+        return result.data;
+    }
+    return fallback;
 }
 
 /**
@@ -241,10 +362,14 @@ export function safeJsonParseWithFallback<T>(
  * @returns Structured result containing the JSON string or an error message.
  */
 export function safeJsonStringify(
-    value: unknown,
+    value: Jsonifiable,
     space?: number | string
 ): SafeJsonResult<string> {
     return safeOperation(() => {
+        if (!hasSerializableContent(value)) {
+            throw new TypeError("Value cannot be serialized to JSON");
+        }
+
         const jsonString = JSON.stringify(value, undefined, space);
 
         if (typeof jsonString !== "string") {
@@ -252,7 +377,7 @@ export function safeJsonStringify(
         }
 
         return jsonString;
-    }, "JSON stringification failed");
+    }, "JSON serialization failed");
 }
 
 /**
@@ -275,10 +400,14 @@ export function safeJsonStringify(
  * @returns The serialized JSON string or the provided fallback.
  */
 export function safeJsonStringifyWithFallback(
-    value: unknown,
+    value: Jsonifiable,
     fallback: string,
     space?: number | string
 ): string {
+    if (!Array.isArray(value) && hasUnsupportedJsonValue(value)) {
+        return fallback;
+    }
+
     const result = safeJsonStringify(value, space);
     return result.success && result.data !== undefined ? result.data : fallback;
 }

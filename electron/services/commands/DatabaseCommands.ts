@@ -19,7 +19,7 @@ import { ensureError } from "@shared/utils/errorHandling";
 import { ensureUniqueSiteIdentifiers } from "@shared/validation/siteIntegrity";
 
 import type { UptimeEvents } from "../../events/eventTypes";
-import type { TypedEventBus } from "../../events/TypedEventBus";
+import type { EventKey, TypedEventBus } from "../../events/TypedEventBus";
 import type { ConfigurationManager } from "../../managers/ConfigurationManager";
 import type { StandardizedCache } from "../../utils/cache/StandardizedCache";
 import type { ImportSite } from "../../utils/database/DataImportExportService";
@@ -190,17 +190,17 @@ export abstract class DatabaseCommand<TResult = void>
      *
      * @internal
      */
-    protected async emitFailureEvent(
-        eventType: keyof UptimeEvents,
+    protected async emitFailureEvent<K extends EventKey<UptimeEvents>>(
+        eventType: K,
         error: Error,
-        data: Partial<UptimeEvents[keyof UptimeEvents]> = {}
+        data: Partial<UptimeEvents[K]> = {}
     ): Promise<void> {
         await this.eventEmitter.emitTyped(eventType, {
             error: error.message,
             success: false,
             timestamp: Date.now(),
             ...data,
-        } as UptimeEvents[keyof UptimeEvents]);
+        } as UptimeEvents[K]);
     }
 
     /**
@@ -215,15 +215,15 @@ export abstract class DatabaseCommand<TResult = void>
      *
      * @internal
      */
-    protected async emitSuccessEvent(
-        eventType: keyof UptimeEvents,
-        data: Partial<UptimeEvents[keyof UptimeEvents]>
+    protected async emitSuccessEvent<K extends EventKey<UptimeEvents>>(
+        eventType: K,
+        data: Partial<UptimeEvents[K]>
     ): Promise<void> {
         await this.eventEmitter.emitTyped(eventType, {
             success: true,
             timestamp: Date.now(),
             ...data,
-        } as UptimeEvents[keyof UptimeEvents]);
+        } as UptimeEvents[K]);
     }
 
     public constructor(

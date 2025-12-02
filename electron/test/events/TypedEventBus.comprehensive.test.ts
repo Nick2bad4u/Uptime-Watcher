@@ -17,6 +17,7 @@ import {
     createTypedEventBus,
     type EventMiddleware,
     type EventBusDiagnostics,
+    type EventPayloadValue,
 } from "../../events/TypedEventBus";
 
 // Mock logger to prevent actual logging during tests
@@ -41,7 +42,7 @@ vi.mock("../../utils/correlation", () => ({
 }));
 
 // Define comprehensive test event types
-interface TestEvents {
+interface TestEvents extends Record<string, EventPayloadValue> {
     "string-event": string;
     "number-event": number;
     "object-event": { data: string; nested: { value: number } };
@@ -54,8 +55,8 @@ interface TestEvents {
     "primitive-boolean": boolean;
     "null-event": null;
     "undefined-event": undefined;
-    [key: string]: unknown;
-    [key: symbol]: unknown;
+    [key: string]: EventPayloadValue;
+    [key: symbol]: EventPayloadValue;
 }
 
 describe("TypedEventBus - Comprehensive Coverage", () => {

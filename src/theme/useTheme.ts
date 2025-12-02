@@ -7,9 +7,8 @@
  * persistence.
  */
 
-import type { UnknownRecord } from "type-fest";
-
 import { isSiteStatus, type SiteStatus } from "@shared/types";
+import { isRecord } from "@shared/utils/typeHelpers";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import type { SystemThemePreference } from "./components/types";
@@ -17,6 +16,24 @@ import type { Theme, ThemeName } from "./types";
 
 import { useSettingsStore } from "../stores/settings/useSettingsStore";
 import { themeManager, type ThemeManager } from "./ThemeManager";
+
+const resolveThemeColorPath = (
+    colors: Theme["colors"],
+    path: string
+): string | undefined => {
+    const segments = path.split(".");
+    let node: unknown = colors;
+
+    for (const segment of segments) {
+        if (!isRecord(node) || !(segment in node)) {
+            return undefined;
+        }
+
+        node = node[segment];
+    }
+
+    return typeof node === "string" ? node : undefined;
+};
 
 /**
  * Interface for useAvailabilityColors hook return type.
@@ -233,28 +250,9 @@ export function useTheme(): UseThemeReturn {
      *   invalid
      */
     const getColor = useCallback(
-        (path: string) => {
-            const keys = path.split(".");
-            let value: unknown = currentTheme.colors;
-            for (const key of keys) {
-                if (
-                    value &&
-                    typeof value === "object" &&
-                    Object.hasOwn(value, key)
-                ) {
-                    /* eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe property navigation with runtime object checks */
-                    value = (value as UnknownRecord)[key];
-                } else {
-                    value = undefined;
-                    break;
-                }
-            }
-
-            // Use theme-aware fallback instead of hard-coded black
-            return typeof value === "string"
-                ? value
-                : currentTheme.colors.text.primary;
-        },
+        (path: string) =>
+            resolveThemeColorPath(currentTheme.colors, path) ??
+            currentTheme.colors.text.primary,
         [currentTheme.colors]
     );
 

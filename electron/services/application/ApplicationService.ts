@@ -1,3 +1,8 @@
+import {
+    RENDERER_EVENT_CHANNELS,
+    type RendererEventChannel,
+    type RendererEventPayload,
+} from "@shared/ipc/rendererEvents";
 /**
  * Main application service that orchestrates all other services and coordinates
  * application lifecycle across the Electron backend.
@@ -45,7 +50,6 @@
  *
  * @public
  */
-import { RENDERER_EVENT_CHANNELS } from "@shared/ipc/rendererEvents";
 import { isDevelopment } from "@shared/utils/environment";
 import { ensureError } from "@shared/utils/errorHandling";
 import {
@@ -55,10 +59,21 @@ import {
 import { app } from "electron";
 
 import type { UptimeEvents } from "../../events/eventTypes";
+import type { RendererEventBridge } from "../events/RendererEventBridge";
 
 import { ScopedSubscriptionManager } from "../../events/ScopedSubscriptionManager";
+import {
+    type EnhancedEventPayload,
+    type EventKey,
+    ORIGINAL_METADATA_SYMBOL,
+} from "../../events/TypedEventBus";
 import { logger } from "../../utils/logger";
 import { ServiceContainer } from "../ServiceContainer";
+
+const isPlainObjectPayload = (
+    value: unknown
+): value is Record<PropertyKey, unknown> =>
+    typeof value === "object" && value !== null && !Array.isArray(value);
 
 /**
  * Type guard that verifies whether a service-like object exposes a callable
@@ -134,6 +149,10 @@ export class ApplicationService {
             windowService.createMainWindow();
         }
     };
+
+    private get rendererEventBridge(): RendererEventBridge {
+        return this.serviceContainer.getRendererEventBridge();
+    }
 
     /**
      * Cleans up resources before application shutdown.
@@ -344,10 +363,9 @@ export class ApplicationService {
      */
     private setupAutoUpdater(): void {
         const autoUpdater = this.serviceContainer.getAutoUpdaterService();
-        const rendererBridge = this.serviceContainer.getRendererEventBridge();
 
         autoUpdater.setStatusCallback((statusData) => {
-            rendererBridge.sendToRenderers(
+            this.emitRendererEvent(
                 RENDERER_EVENT_CHANNELS.UPDATE_STATUS,
                 statusData
             );
@@ -386,7 +404,7 @@ export class ApplicationService {
      */
     private setupUptimeEventHandlers(): void {
         const orchestrator = this.serviceContainer.getUptimeOrchestrator();
-        const rendererBridge = this.serviceContainer.getRendererEventBridge();
+        const rendererBridge = this.rendererEventBridge;
         const notificationService =
             this.serviceContainer.getNotificationService();
 
@@ -395,23 +413,27 @@ export class ApplicationService {
             UptimeEvents,
             "monitor:status-changed"
         >(orchestrator, "monitor:status-changed", (data) => {
-            const monitorIdentifier = data.monitor.id;
-            const siteIdentifier = data.site.identifier;
+            const payload = this.stripOrchestratorPayloadMetadata(
+                "monitor:status-changed",
+                data
+            );
+            const monitorIdentifier = payload.monitor.id;
+            const siteIdentifier = payload.site.identifier;
             try {
                 logger.debug(
                     LOG_TEMPLATES.debug.APPLICATION_FORWARDING_MONITOR_STATUS,
                     {
                         monitorId: monitorIdentifier,
-                        newStatus: data.status,
-                        previousStatus: data.previousStatus,
+                        newStatus: payload.status,
+                        previousStatus: payload.previousStatus,
                         siteIdentifier,
                     }
                 );
 
                 // Send status update to renderer
-                rendererBridge.sendToRenderers(
+                this.emitRendererEvent(
                     RENDERER_EVENT_CHANNELS.MONITOR_STATUS_CHANGED,
-                    data
+                    payload
                 );
             } catch (error: unknown) {
                 logger.error(
@@ -427,23 +449,27 @@ export class ApplicationService {
             orchestrator,
             "monitor:up",
             (data) => {
+                const payload = this.stripOrchestratorPayloadMetadata(
+                    "monitor:up",
+                    data
+                );
                 try {
                     logger.info(
                         LOG_TEMPLATES.debug.APPLICATION_FORWARDING_MONITOR_UP,
                         {
-                            monitorId: data.monitor.id,
-                            siteIdentifier: data.site.identifier,
-                            siteName: data.site.name,
+                            monitorId: payload.monitor.id,
+                            siteIdentifier: payload.site.identifier,
+                            siteName: payload.site.name,
                         }
                     );
 
-                    rendererBridge.sendToRenderers(
+                    this.emitRendererEvent(
                         RENDERER_EVENT_CHANNELS.MONITOR_UP,
-                        data
+                        payload
                     );
                     notificationService.notifyMonitorUp(
-                        data.site,
-                        data.monitor.id
+                        payload.site,
+                        payload.monitor.id
                     );
                 } catch (error: unknown) {
                     logger.error(
@@ -460,23 +486,27 @@ export class ApplicationService {
             orchestrator,
             "monitor:down",
             (data) => {
+                const payload = this.stripOrchestratorPayloadMetadata(
+                    "monitor:down",
+                    data
+                );
                 try {
                     logger.warn(
                         LOG_TEMPLATES.warnings.APPLICATION_MONITOR_DOWN,
                         {
-                            monitorId: data.monitor.id,
-                            siteIdentifier: data.site.identifier,
-                            siteName: data.site.name,
+                            monitorId: payload.monitor.id,
+                            siteIdentifier: payload.site.identifier,
+                            siteName: payload.site.name,
                         }
                     );
 
-                    rendererBridge.sendToRenderers(
+                    this.emitRendererEvent(
                         RENDERER_EVENT_CHANNELS.MONITOR_DOWN,
-                        data
+                        payload
                     );
                     notificationService.notifyMonitorDown(
-                        data.site,
-                        data.monitor.id
+                        payload.site,
+                        payload.monitor.id
                     );
                 } catch (error: unknown) {
                     logger.error(
@@ -492,19 +522,23 @@ export class ApplicationService {
             UptimeEvents,
             "monitor:check-completed"
         >(orchestrator, "monitor:check-completed", (data) => {
+            const payload = this.stripOrchestratorPayloadMetadata(
+                "monitor:check-completed",
+                data
+            );
             try {
                 logger.debug(
                     LOG_TEMPLATES.debug
                         .APPLICATION_FORWARDING_MANUAL_CHECK_COMPLETED,
                     {
-                        checkType: data.checkType,
-                        monitorId: data.monitorId,
-                        siteIdentifier: data.siteIdentifier,
+                        checkType: payload.checkType,
+                        monitorId: payload.monitorId,
+                        siteIdentifier: payload.siteIdentifier,
                     }
                 );
-                rendererBridge.sendToRenderers(
+                this.emitRendererEvent(
                     RENDERER_EVENT_CHANNELS.MONITOR_CHECK_COMPLETED,
-                    data
+                    payload
                 );
             } catch (error: unknown) {
                 logger.error(
@@ -519,19 +553,23 @@ export class ApplicationService {
             UptimeEvents,
             "settings:history-limit-updated"
         >(orchestrator, "settings:history-limit-updated", (data) => {
+            const payload = this.stripOrchestratorPayloadMetadata(
+                "settings:history-limit-updated",
+                data
+            );
             try {
                 logger.debug(
                     LOG_TEMPLATES.debug
                         .APPLICATION_FORWARDING_HISTORY_LIMIT_UPDATED,
                     {
-                        limit: data.limit,
-                        previousLimit: data.previousLimit,
-                        timestamp: data.timestamp,
+                        limit: payload.limit,
+                        previousLimit: payload.previousLimit,
+                        timestamp: payload.timestamp,
                     }
                 );
-                rendererBridge.sendToRenderers(
+                this.emitRendererEvent(
                     RENDERER_EVENT_CHANNELS.SETTINGS_HISTORY_LIMIT_UPDATED,
-                    data
+                    payload
                 );
             } catch (error: unknown) {
                 logger.error(
@@ -547,12 +585,16 @@ export class ApplicationService {
             orchestrator,
             "system:error",
             (data) => {
+                const payload = this.stripOrchestratorPayloadMetadata(
+                    "system:error",
+                    data
+                );
                 logger.error(
                     interpolateLogTemplate(
                         LOG_TEMPLATES.errors.APPLICATION_SYSTEM_ERROR,
-                        { context: data.context }
+                        { context: payload.context }
                     ),
-                    data.error
+                    payload.error
                 );
             }
         );
@@ -562,15 +604,19 @@ export class ApplicationService {
             orchestrator,
             "monitoring:started",
             (data) => {
+                const payload = this.stripOrchestratorPayloadMetadata(
+                    "monitoring:started",
+                    data
+                );
                 try {
                     logger.debug(
                         LOG_TEMPLATES.debug
                             .APPLICATION_FORWARDING_MONITORING_STARTED,
-                        data
+                        payload
                     );
-                    rendererBridge.sendToRenderers(
+                    this.emitRendererEvent(
                         RENDERER_EVENT_CHANNELS.MONITORING_STARTED,
-                        data
+                        payload
                     );
                 } catch (error: unknown) {
                     logger.error(
@@ -586,15 +632,19 @@ export class ApplicationService {
             orchestrator,
             "monitoring:stopped",
             (data) => {
+                const payload = this.stripOrchestratorPayloadMetadata(
+                    "monitoring:stopped",
+                    data
+                );
                 try {
                     logger.debug(
                         LOG_TEMPLATES.debug
                             .APPLICATION_FORWARDING_MONITORING_STOPPED,
-                        data
+                        payload
                     );
-                    rendererBridge.sendToRenderers(
+                    this.emitRendererEvent(
                         RENDERER_EVENT_CHANNELS.MONITORING_STOPPED,
-                        data
+                        payload
                     );
                 } catch (error: unknown) {
                     logger.error(
@@ -610,17 +660,21 @@ export class ApplicationService {
             orchestrator,
             "site:added",
             (data) => {
+                const payload = this.stripOrchestratorPayloadMetadata(
+                    "site:added",
+                    data
+                );
                 try {
                     logger.debug(
                         LOG_TEMPLATES.debug.APPLICATION_FORWARDING_SITE_ADDED,
                         {
-                            identifier: data.site.identifier,
-                            source: data.source,
+                            identifier: payload.site.identifier,
+                            source: payload.source,
                         }
                     );
-                    rendererBridge.sendToRenderers(
+                    this.emitRendererEvent(
                         RENDERER_EVENT_CHANNELS.SITE_ADDED,
-                        data
+                        payload
                     );
                 } catch (error: unknown) {
                     logger.error(
@@ -636,17 +690,21 @@ export class ApplicationService {
             orchestrator,
             "site:removed",
             (data) => {
+                const payload = this.stripOrchestratorPayloadMetadata(
+                    "site:removed",
+                    data
+                );
                 try {
                     logger.debug(
                         LOG_TEMPLATES.debug.APPLICATION_FORWARDING_SITE_REMOVED,
                         {
-                            cascade: data.cascade,
-                            siteIdentifier: data.siteIdentifier,
+                            cascade: payload.cascade,
+                            siteIdentifier: payload.siteIdentifier,
                         }
                     );
-                    rendererBridge.sendToRenderers(
+                    this.emitRendererEvent(
                         RENDERER_EVENT_CHANNELS.SITE_REMOVED,
-                        data
+                        payload
                     );
                 } catch (error: unknown) {
                     logger.error(
@@ -662,17 +720,21 @@ export class ApplicationService {
             orchestrator,
             "site:updated",
             (data) => {
+                const payload = this.stripOrchestratorPayloadMetadata(
+                    "site:updated",
+                    data
+                );
                 try {
                     logger.debug(
                         LOG_TEMPLATES.debug.APPLICATION_FORWARDING_SITE_UPDATED,
                         {
-                            identifier: data.site.identifier,
-                            updatedFields: data.updatedFields.join(", "),
+                            identifier: payload.site.identifier,
+                            updatedFields: payload.updatedFields.join(", "),
                         }
                     );
-                    rendererBridge.sendToRenderers(
+                    this.emitRendererEvent(
                         RENDERER_EVENT_CHANNELS.SITE_UPDATED,
-                        data
+                        payload
                     );
                 } catch (error: unknown) {
                     logger.error(
@@ -688,17 +750,21 @@ export class ApplicationService {
             UptimeEvents,
             "sites:state-synchronized"
         >(orchestrator, "sites:state-synchronized", (data) => {
+            const payload = this.stripOrchestratorPayloadMetadata(
+                "sites:state-synchronized",
+                data
+            );
             try {
                 logger.debug(
                     LOG_TEMPLATES.debug.APPLICATION_FORWARDING_STATE_SYNC,
                     {
-                        action: data.action,
-                        siteIdentifier: data.siteIdentifier,
-                        sitesCount: data.sites.length,
-                        source: data.source,
+                        action: payload.action,
+                        siteIdentifier: payload.siteIdentifier,
+                        sitesCount: payload.sites.length,
+                        source: payload.source,
                     }
                 );
-                rendererBridge.sendStateSyncEvent(data);
+                rendererBridge.sendStateSyncEvent(payload);
             } catch (error: unknown) {
                 logger.error(
                     LOG_TEMPLATES.errors.APPLICATION_FORWARD_STATE_SYNC_ERROR,
@@ -712,19 +778,23 @@ export class ApplicationService {
             orchestrator,
             "cache:invalidated",
             (data) => {
+                const payload = this.stripOrchestratorPayloadMetadata(
+                    "cache:invalidated",
+                    data
+                );
                 try {
                     logger.debug(
                         LOG_TEMPLATES.debug
                             .APPLICATION_FORWARDING_CACHE_INVALIDATION,
                         {
-                            identifier: data.identifier,
-                            reason: data.reason,
-                            type: data.type,
+                            identifier: payload.identifier,
+                            reason: payload.reason,
+                            type: payload.type,
                         }
                     );
-                    rendererBridge.sendToRenderers(
+                    this.emitRendererEvent(
                         RENDERER_EVENT_CHANNELS.CACHE_INVALIDATED,
-                        data
+                        payload
                     );
                 } catch (error) {
                     logger.error(
@@ -735,5 +805,54 @@ export class ApplicationService {
                 }
             }
         );
+    }
+
+    private stripOrchestratorPayloadMetadata<
+        EventName extends EventKey<UptimeEvents>,
+    >(
+        eventName: EventName,
+        payload: EnhancedEventPayload<UptimeEvents[EventName]>
+    ): UptimeEvents[EventName] {
+        if (Array.isArray(payload)) {
+            const clonedArray = Array.from(payload);
+            this.logMetadataRemoval(eventName, true);
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Array cloning preserves the payload structure while dropping metadata side-effects.
+            return clonedArray as unknown as UptimeEvents[EventName];
+        }
+
+        if (!isPlainObjectPayload(payload)) {
+            throw new TypeError(
+                "Unexpected primitive payload when stripping metadata"
+            );
+        }
+
+        const clonedPayload: Record<PropertyKey, unknown> = {
+            ...payload,
+        };
+
+        Reflect.deleteProperty(clonedPayload, "_meta");
+        Reflect.deleteProperty(clonedPayload, "_originalMeta");
+        Reflect.deleteProperty(clonedPayload, ORIGINAL_METADATA_SYMBOL);
+
+        this.logMetadataRemoval(eventName, false);
+
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- After stripping metadata, the payload matches the event contract.
+        return clonedPayload as unknown as UptimeEvents[EventName];
+    }
+
+    private logMetadataRemoval(
+        eventName: EventKey<UptimeEvents>,
+        isArrayPayload: boolean
+    ): void {
+        logger.debug(
+            `[ApplicationService] Stripped orchestrator metadata for ${eventName} ${isArrayPayload ? "(array payload)" : ""}`.trim()
+        );
+    }
+
+    private emitRendererEvent<K extends RendererEventChannel>(
+        channel: K,
+        payload: RendererEventPayload<K>
+    ): void {
+        this.rendererEventBridge.sendToRenderers(channel, payload);
     }
 }

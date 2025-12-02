@@ -29,7 +29,7 @@
  * @packageDocumentation
  *
  * @see {@link IMonitorService} for interface contract
- * @see {@link MonitorConfig} for configuration options
+ * @see {@link MonitorServiceConfig} for configuration options
  */
 
 import type { MonitorType, Site } from "@shared/types";
@@ -37,7 +37,7 @@ import type { MonitorType, Site } from "@shared/types";
 import type {
     IMonitorService,
     MonitorCheckResult,
-    MonitorConfig,
+    MonitorServiceConfig,
 } from "./types";
 
 import { DEFAULT_REQUEST_TIMEOUT } from "../../constants";
@@ -60,7 +60,7 @@ import { performPortCheckWithRetry } from "./utils/portRetry";
  * provides detailed error reporting for troubleshooting connectivity issues.
  */
 export class PortMonitor implements IMonitorService {
-    private config: MonitorConfig;
+    private config: MonitorServiceConfig;
 
     /**
      * Perform a port connectivity check on the given monitor.
@@ -132,7 +132,7 @@ export class PortMonitor implements IMonitorService {
      *
      * @param config - Configuration options for the monitor
      */
-    public constructor(config: MonitorConfig = {}) {
+    public constructor(config: MonitorServiceConfig = {}) {
         this.config = {
             timeout: DEFAULT_REQUEST_TIMEOUT, // Use consistent default timeout
             ...config,
@@ -147,11 +147,12 @@ export class PortMonitor implements IMonitorService {
      * external modification. This ensures configuration immutability and
      * prevents accidental state corruption. Note that this is a shallow copy -
      * only the top-level properties are copied. If nested objects are added to
-     * MonitorConfig in the future, they would be referenced, not cloned.
+     * MonitorServiceConfig in the future, they would be referenced, not
+     * cloned.
      *
      * @returns A shallow copy of the current monitor configuration
      */
-    public getConfig(): MonitorConfig {
+    public getConfig(): MonitorServiceConfig {
         return { ...this.config };
     }
 
@@ -188,7 +189,7 @@ export class PortMonitor implements IMonitorService {
      *
      * @throws {@link Error} If config contains invalid property types
      */
-    public updateConfig(config: Partial<MonitorConfig>): void {
+    public updateConfig(config: Partial<MonitorServiceConfig>): void {
         // Basic validation of config properties - only validate relevant ones
         // for port monitoring
         if (

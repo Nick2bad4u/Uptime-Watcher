@@ -10,6 +10,57 @@
 
 import type { SetOptional, Simplify, UnknownRecord } from "type-fest";
 
+import type { RequireAllOrNoneFields } from "./typeUtils";
+
+interface HeaderExpectationShape {
+    /** Expected value for the specified response header */
+    expectedHeaderValue?: string;
+    /** Header name to inspect */
+    headerName?: string;
+}
+
+type HeaderExpectationFields = RequireAllOrNoneFields<HeaderExpectationShape>;
+
+interface JsonExpectationShape {
+    /** Expected value at the JSON path */
+    expectedJsonValue?: string;
+    /** JSON path to evaluate in the response body */
+    jsonPath?: string;
+}
+
+type JsonExpectationFields = RequireAllOrNoneFields<JsonExpectationShape>;
+
+const isNonEmptyString = (value: unknown): value is string =>
+    typeof value === "string" && value.trim().length > 0;
+
+interface ReplicationRequirementShape {
+    /** Maximum acceptable replication lag in seconds */
+    maxReplicationLagSeconds?: number;
+    /** Primary status endpoint URL */
+    primaryStatusUrl?: string;
+    /** Replica status endpoint URL */
+    replicaStatusUrl?: string;
+    /** JSON path to replication timestamp value */
+    replicationTimestampField?: string;
+}
+
+type ReplicationRequirementFields =
+    RequireAllOrNoneFields<ReplicationRequirementShape>;
+
+interface HeartbeatRequirementShape {
+    /** Expected status string reported by the heartbeat */
+    heartbeatExpectedStatus?: string;
+    /** Maximum allowed drift in seconds */
+    heartbeatMaxDriftSeconds?: number;
+    /** JSON path to the heartbeat status field */
+    heartbeatStatusField?: string;
+    /** JSON path to the heartbeat timestamp field */
+    heartbeatTimestampField?: string;
+}
+
+type HeartbeatRequirementFields =
+    RequireAllOrNoneFields<HeartbeatRequirementShape>;
+
 /**
  * Base form data interface with common properties.
  *
@@ -79,30 +130,30 @@ export interface HttpKeywordFormData extends BaseFormData {
  *
  * @public
  */
-export interface HttpHeaderFormData extends BaseFormData {
-    /** Expected value for the specified response header */
-    expectedHeaderValue: string;
-    /** Header name to inspect */
-    headerName: string;
-    type: "http-header";
-    /** Target URL to monitor */
-    url: string;
-}
+/**
+ * Form state representation for HTTP header monitors.
+ */
+export type HttpHeaderFormData = BaseFormData &
+    HeaderExpectationFields & {
+        type: "http-header";
+        /** Target URL to monitor */
+        url: string;
+    };
 
 /**
  * Form data for HTTP JSON monitors.
  *
  * @public
  */
-export interface HttpJsonFormData extends BaseFormData {
-    /** Expected value at the JSON path */
-    expectedJsonValue: string;
-    /** JSON path to evaluate in the response body */
-    jsonPath: string;
-    type: "http-json";
-    /** Target URL to monitor */
-    url: string;
-}
+/**
+ * Form state representation for HTTP JSON monitors.
+ */
+export type HttpJsonFormData = BaseFormData &
+    JsonExpectationFields & {
+        type: "http-json";
+        /** Target URL to monitor */
+        url: string;
+    };
 
 /**
  * Form data for HTTP status monitors.
@@ -202,36 +253,22 @@ export interface CdnEdgeConsistencyFormData extends BaseFormData {
  *
  * @public
  */
-export interface ReplicationFormData extends BaseFormData {
-    /** Maximum acceptable replication lag in seconds */
-    maxReplicationLagSeconds: number;
-    /** Primary status endpoint URL */
-    primaryStatusUrl: string;
-    /** Replica status endpoint URL */
-    replicaStatusUrl: string;
-    /** JSON path to replication timestamp value */
-    replicationTimestampField: string;
-    type: "replication";
-}
+export type ReplicationFormData = BaseFormData &
+    ReplicationRequirementFields & {
+        type: "replication";
+    };
 
 /**
  * Form data for server heartbeat monitors.
  *
  * @public
  */
-export interface ServerHeartbeatFormData extends BaseFormData {
-    /** Expected status string reported by the heartbeat */
-    heartbeatExpectedStatus: string;
-    /** Maximum allowed drift in seconds */
-    heartbeatMaxDriftSeconds: number;
-    /** JSON path to the heartbeat status field */
-    heartbeatStatusField: string;
-    /** JSON path to the heartbeat timestamp field */
-    heartbeatTimestampField: string;
-    type: "server-heartbeat";
-    /** Heartbeat endpoint URL */
-    url: string;
-}
+export type ServerHeartbeatFormData = BaseFormData &
+    HeartbeatRequirementFields & {
+        type: "server-heartbeat";
+        /** Heartbeat endpoint URL */
+        url: string;
+    };
 
 /**
  * Form data for WebSocket keepalive monitors.
@@ -625,12 +662,9 @@ export function isReplicationFormData(
 ): data is ReplicationFormData {
     return (
         data.type === "replication" &&
-        typeof data.primaryStatusUrl === "string" &&
-        data.primaryStatusUrl.trim() !== "" &&
-        typeof data.replicaStatusUrl === "string" &&
-        data.replicaStatusUrl.trim() !== "" &&
-        typeof data.replicationTimestampField === "string" &&
-        data.replicationTimestampField.trim() !== "" &&
+        isNonEmptyString(data.primaryStatusUrl) &&
+        isNonEmptyString(data.replicaStatusUrl) &&
+        isNonEmptyString(data.replicationTimestampField) &&
         typeof data.maxReplicationLagSeconds === "number" &&
         Number.isFinite(data.maxReplicationLagSeconds)
     );
@@ -651,14 +685,10 @@ export function isServerHeartbeatFormData(
 ): data is ServerHeartbeatFormData {
     return (
         data.type === "server-heartbeat" &&
-        typeof data.url === "string" &&
-        data.url.trim() !== "" &&
-        typeof data.heartbeatStatusField === "string" &&
-        data.heartbeatStatusField.trim() !== "" &&
-        typeof data.heartbeatTimestampField === "string" &&
-        data.heartbeatTimestampField.trim() !== "" &&
-        typeof data.heartbeatExpectedStatus === "string" &&
-        data.heartbeatExpectedStatus.trim() !== "" &&
+        isNonEmptyString(data.url) &&
+        isNonEmptyString(data.heartbeatStatusField) &&
+        isNonEmptyString(data.heartbeatTimestampField) &&
+        isNonEmptyString(data.heartbeatExpectedStatus) &&
         typeof data.heartbeatMaxDriftSeconds === "number" &&
         Number.isFinite(data.heartbeatMaxDriftSeconds)
     );

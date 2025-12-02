@@ -10,24 +10,17 @@
  */
 
 import type {
-    MonitoringStartSummary,
-    MonitoringStopSummary,
-    Site,
-} from "@shared/types";
-import type {
-    CacheInvalidatedEventData,
-    HistoryLimitUpdatedEventData,
-    MonitorCheckCompletedEventData,
-    MonitorDownEventData,
-    MonitoringControlEventData,
-    MonitoringControlReason,
-    MonitorStatusChangedEventData,
-    MonitorUpEventData,
-    SiteAddedSource,
-    StateSyncEventData,
-    TestEventData,
-    UpdateStatusEventData,
+    RendererEvent as SharedRendererEvent,
+    RendererEventChannel as SharedRendererEventChannel,
+    RendererEventPayloadMap as SharedRendererEventPayloadMap,
 } from "@shared/types/events";
+
+/** Renderer event identifiers emitted from the main process. */
+export type RendererEvent = SharedRendererEvent;
+/** IPC channel names used for renderer-directed events. */
+export type RendererEventChannel = SharedRendererEventChannel;
+/** Mapping of renderer event channels to their payload contracts. */
+export type RendererEventPayloadMap = SharedRendererEventPayloadMap;
 
 /**
  * Canonical list of renderer IPC channels used for backend → renderer events.
@@ -62,68 +55,6 @@ export const RENDERER_EVENT_CHANNELS = {
     /** Broadcast auto-updater status transitions. */
     UPDATE_STATUS: "update-status",
 } as const;
-
-/**
- * Union of all renderer event channel identifiers.
- */
-export type RendererEventChannel =
-    (typeof RENDERER_EVENT_CHANNELS)[keyof typeof RENDERER_EVENT_CHANNELS];
-
-/**
- * Mapping of renderer event channels to their payload contracts.
- */
-export interface RendererEventPayloadMap {
-    /** Payload for cache invalidation notifications. */
-    "cache:invalidated": CacheInvalidatedEventData;
-    /** Payload for monitor check completion events. */
-    "monitor:check-completed": MonitorCheckCompletedEventData;
-    /** Payload for monitor down events. */
-    "monitor:down": MonitorDownEventData;
-    /** Payload for monitor status change events. */
-    "monitor:status-changed": MonitorStatusChangedEventData;
-    /** Payload for monitor up events. */
-    "monitor:up": MonitorUpEventData;
-    /** Payload for monitoring started events. */
-    "monitoring:started": MonitoringControlEventData & {
-        monitorCount: number;
-        siteCount: number;
-        summary?: MonitoringStartSummary;
-    };
-    /** Payload for monitoring stopped events. */
-    "monitoring:stopped": MonitoringControlEventData & {
-        activeMonitors: number;
-        reason: MonitoringControlReason;
-        summary?: MonitoringStopSummary;
-    };
-    /** Payload for database history retention updates. */
-    "settings:history-limit-updated": HistoryLimitUpdatedEventData;
-    /** Payload for site added events. */
-    "site:added": {
-        site: Site;
-        source: SiteAddedSource;
-        timestamp: number;
-    };
-    /** Payload for site removed events. */
-    "site:removed": {
-        cascade: boolean;
-        siteIdentifier: string;
-        siteName: string;
-        timestamp: number;
-    };
-    /** Payload for site updated events. */
-    "site:updated": {
-        previousSite: Site;
-        site: Site;
-        timestamp: number;
-        updatedFields: string[];
-    };
-    /** Payload for full state synchronisation broadcasts. */
-    "state-sync-event": StateSyncEventData;
-    /** Payload for development/test events. */
-    "test-event": TestEventData;
-    /** Payload for auto-updater status notifications. */
-    "update-status": UpdateStatusEventData;
-}
 
 /**
  * Convenience helper for looking up payload type by channel identifier.

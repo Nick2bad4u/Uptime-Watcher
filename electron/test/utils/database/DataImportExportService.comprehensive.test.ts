@@ -266,12 +266,15 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             );
             expect(mockEventEmitter.emitTyped).toHaveBeenCalledWith(
                 "database:error",
-                {
+                expect.objectContaining({
                     details: "Failed to export data: Database export failed",
-                    error: exportError,
+                    error: expect.objectContaining({
+                        message: "Database export failed",
+                        name: "Error",
+                    }),
                     operation: "export-data",
                     timestamp: expect.any(Number),
-                }
+                })
             );
         });
 
@@ -299,7 +302,10 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
                 "database:error",
                 expect.objectContaining({
                     details: "Failed to export data: String error message",
-                    error: expect.any(Error), // Should be converted to Error
+                    error: expect.objectContaining({
+                        message: "String error message",
+                        name: "Error",
+                    }),
                     operation: "export-data",
                 })
             );
@@ -435,6 +441,9 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
                 "database:error",
                 expect.objectContaining({
                     operation: "import-data-parse",
+                    error: expect.objectContaining({
+                        name: "Error",
+                    }),
                 })
             );
         });
@@ -498,7 +507,9 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             expect(mockEventEmitter.emitTyped).toHaveBeenCalledWith(
                 "database:error",
                 expect.objectContaining({
-                    error: expect.any(Error), // Should be converted to Error
+                    error: expect.objectContaining({
+                        name: "Error",
+                    }),
                 })
             );
         });

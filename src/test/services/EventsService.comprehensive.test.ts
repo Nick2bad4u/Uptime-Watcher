@@ -13,6 +13,8 @@ import type { RendererEventPayloadMap } from "@shared/ipc/rendererEvents";
 import {
     MONITORING_CONTROL_REASON,
     type MonitoringControlEventData,
+    type MonitoringStartedEventData as SharedMonitoringStartedEventData,
+    type MonitoringStoppedEventData as SharedMonitoringStoppedEventData,
     type CacheInvalidatedEventData,
     type MonitorDownEventData,
     type MonitorStatusChangedEventData,
@@ -22,11 +24,16 @@ import {
 } from "@shared/types/events";
 import { createMockFunction } from "../utils/mockFactories";
 
-type MonitoringStartedEventData = RendererEventPayloadMap["monitoring:started"];
-type MonitoringStoppedEventData = RendererEventPayloadMap["monitoring:stopped"];
+type MonitoringStartedEventData = SharedMonitoringStartedEventData;
+type MonitoringStoppedEventData = SharedMonitoringStoppedEventData;
 type MonitorCheckCompletedEventPayload =
     RendererEventPayloadMap["monitor:check-completed"];
-type MonitoringEventHandler = (payload: MonitoringControlEventData) => void;
+type MonitoringStartedEventHandler = (
+    payload: MonitoringStartedEventData
+) => void;
+type MonitoringStoppedEventHandler = (
+    payload: MonitoringStoppedEventData
+) => void;
 
 import { EventsService } from "../../services/EventsService";
 
@@ -99,10 +106,10 @@ function createMockEventApi() {
         onMonitorCheckCompleted: vi.fn(() => createEventCleanupFunction()),
         onHistoryLimitUpdated: vi.fn(() => createEventCleanupFunction()),
         onMonitorDown: vi.fn(() => createEventCleanupFunction()),
-        onMonitoringStarted: vi.fn((_handler: MonitoringEventHandler) =>
+        onMonitoringStarted: vi.fn((_handler: MonitoringStartedEventHandler) =>
             createEventCleanupFunction()
         ),
-        onMonitoringStopped: vi.fn((_handler: MonitoringEventHandler) =>
+        onMonitoringStopped: vi.fn((_handler: MonitoringStoppedEventHandler) =>
             createEventCleanupFunction()
         ),
         onMonitorStatusChanged: vi.fn(() => createEventCleanupFunction()),
@@ -416,7 +423,7 @@ describe("EventsService", () => {
 
             const call =
                 mockElectronAPI.events.onMonitoringStarted.mock.calls.at(0) as
-                    | [MonitoringEventHandler]
+                    | [MonitoringStartedEventHandler]
                     | undefined;
             expect(call).toBeDefined();
             if (!call) {
@@ -455,14 +462,16 @@ describe("EventsService", () => {
             const call =
                 mockElectronAPI.events.onMonitoringStarted.mock.calls.at(0);
             expect(call).toBeDefined();
-            const [registeredHandler] = call as [MonitoringEventHandler];
+            const [registeredHandler] = call as [MonitoringStartedEventHandler];
 
             mockLogger.error.mockClear();
 
             const invalidPayload = {
                 invalid: true,
             } as unknown as MonitoringControlEventData;
-            registeredHandler(invalidPayload);
+            registeredHandler(
+                invalidPayload as unknown as MonitoringStartedEventData
+            );
 
             expect(callback).not.toHaveBeenCalled();
             expect(mockLogger.error).toHaveBeenCalledWith(
@@ -486,7 +495,7 @@ describe("EventsService", () => {
 
             const call =
                 mockElectronAPI.events.onMonitoringStopped.mock.calls.at(0) as
-                    | [MonitoringEventHandler]
+                    | [MonitoringStoppedEventHandler]
                     | undefined;
             expect(call).toBeDefined();
             if (!call) {
@@ -525,14 +534,16 @@ describe("EventsService", () => {
             const call =
                 mockElectronAPI.events.onMonitoringStopped.mock.calls.at(0);
             expect(call).toBeDefined();
-            const [registeredHandler] = call as [MonitoringEventHandler];
+            const [registeredHandler] = call as [MonitoringStoppedEventHandler];
 
             mockLogger.error.mockClear();
 
             const invalidPayload = {
                 invalid: true,
             } as unknown as MonitoringControlEventData;
-            registeredHandler(invalidPayload);
+            registeredHandler(
+                invalidPayload as unknown as MonitoringStoppedEventData
+            );
 
             expect(callback).not.toHaveBeenCalled();
             expect(mockLogger.error).toHaveBeenCalledWith(
@@ -803,8 +814,12 @@ describe("EventsService", () => {
                 EventsService.onMonitorCheckCompleted(
                     callbacks.monitorCheckCompleted
                 ),
-                EventsService.onMonitoringStarted(callbacks.monitoringStarted),
-                EventsService.onMonitoringStopped(callbacks.monitoringStopped),
+                EventsService.onMonitoringStarted(
+                    callbacks.monitoringStarted as MonitoringStartedEventHandler
+                ),
+                EventsService.onMonitoringStopped(
+                    callbacks.monitoringStopped as MonitoringStoppedEventHandler
+                ),
                 EventsService.onMonitorStatusChanged(
                     callbacks.monitorStatusChanged
                 ),
@@ -850,11 +865,11 @@ describe("EventsService", () => {
 
             const startedCall =
                 mockElectronAPI.events.onMonitoringStarted.mock.calls.at(0) as
-                    | [MonitoringEventHandler]
+                    | [MonitoringStartedEventHandler]
                     | undefined;
             const stoppedCall =
                 mockElectronAPI.events.onMonitoringStopped.mock.calls.at(0) as
-                    | [MonitoringEventHandler]
+                    | [MonitoringStoppedEventHandler]
                     | undefined;
 
             expect(startedCall).toBeDefined();

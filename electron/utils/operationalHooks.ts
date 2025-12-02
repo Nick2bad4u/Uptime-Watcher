@@ -58,7 +58,7 @@
  * @packageDocumentation
  */
 
-import type { UnknownRecord } from "type-fest";
+import type { Tagged, UnknownRecord } from "type-fest";
 
 import type { UptimeEvents } from "../events/eventTypes";
 import type { TypedEventBus } from "../events/TypedEventBus";
@@ -66,6 +66,76 @@ import type { TypedEventBus } from "../events/TypedEventBus";
 import { logger } from "./logger";
 
 type OperationalLogLevel = "debug" | "error" | "info" | "warn";
+
+type OperationalHookContextTag = "OperationalHookContext";
+
+/**
+ * Frozen metadata attached to operational hook lifecycle events.
+ */
+export type OperationalHookContext = Tagged<
+    Readonly<UnknownRecord>,
+    OperationalHookContextTag
+>;
+
+/**
+ * Strongly typed identifier used to correlate long-running backend operations.
+ */
+type OperationId = Tagged<string, "operation-id">;
+
+/**
+ * Author-supplied context accepted by operational hooks before normalization.
+ */
+export type OperationalHookContextInput =
+    | OperationalHookContext
+    | Readonly<UnknownRecord>;
+
+const isOperationalHookContext = (
+    candidate: unknown
+): candidate is OperationalHookContext =>
+    typeof candidate === "object" &&
+    candidate !== null &&
+    !Array.isArray(candidate) &&
+    Object.isFrozen(candidate);
+
+const freezeOperationalContext = (
+    context: Readonly<UnknownRecord>
+): OperationalHookContext => {
+    const frozen = Object.freeze({ ...context });
+    if (!isOperationalHookContext(frozen)) {
+        throw new Error("Failed to normalize operational hook context");
+    }
+
+    return frozen;
+};
+
+const EMPTY_OPERATIONAL_CONTEXT: OperationalHookContext =
+    ((): OperationalHookContext => {
+        const frozen = Object.freeze({});
+        if (!isOperationalHookContext(frozen)) {
+            throw new Error(
+                "Failed to initialize operational hook context store"
+            );
+        }
+        return frozen;
+    })();
+
+const normalizeOperationalContext = (
+    context?: OperationalHookContextInput
+): OperationalHookContext => {
+    if (!context) {
+        return EMPTY_OPERATIONAL_CONTEXT;
+    }
+
+    if (isOperationalHookContext(context)) {
+        return context;
+    }
+
+    return freezeOperationalContext(context);
+};
+
+export const createOperationalHookContext = (
+    context?: OperationalHookContextInput
+): OperationalHookContext => normalizeOperationalContext(context);
 
 /**
  * Configuration for operational hooks.
@@ -81,7 +151,7 @@ export interface OperationalHooksConfig<T = unknown> {
     /**
      * Context data to include in events.
      */
-    context?: UnknownRecord;
+    context?: OperationalHookContextInput;
 
     /**
      * Whether to emit events for this operation.
@@ -172,14 +242,14 @@ function calculateDelay(
 /**
  * Generate a unique operation ID for tracking using crypto.randomUUID().
  */
-function generateOperationId(): string {
+function generateOperationId(): OperationId {
     if (typeof globalThis.crypto.randomUUID !== "function") {
         throw new TypeError(
             "crypto.randomUUID is unavailable for operation ID generation"
         );
     }
 
-    return `op_${Date.now()}_${globalThis.crypto.randomUUID().slice(0, 8)}`;
+    return `op_${Date.now()}_${globalThis.crypto.randomUUID().slice(0, 8)}` as OperationId;
 }
 
 /**
@@ -189,11 +259,12 @@ async function emitStartEvent(
     eventEmitter: TypedEventBus<UptimeEvents>,
     operationName: string,
     startTime: number,
-    context: UnknownRecord
+    context: OperationalHookContext
 ): Promise<void> {
     try {
         await eventEmitter.emitTyped("database:transaction-completed", {
             duration: 0,
+            lifecycleStage: "start",
             operation: `${operationName}:started`,
             success: true,
             timestamp: startTime,
@@ -253,11 +324,12 @@ async function handleFailure<T>(
     operationName: string,
     startTime: number,
     attempt: number,
-    operationId: string,
+    operationId: OperationId,
+    context: OperationalHookContext,
     throwOnFailure: boolean = true,
     logLevel: OperationalLogLevel = "error"
 ): Promise<T> {
-    const { context = {}, emitEvents, eventEmitter, onFailure } = config;
+    const { emitEvents, eventEmitter, onFailure } = config;
     const duration = Date.now() - startTime;
 
     if (onFailure) {
@@ -276,6 +348,7 @@ async function handleFailure<T>(
         try {
             await eventEmitter.emitTyped("database:transaction-completed", {
                 duration,
+                lifecycleStage: "failure",
                 operation: `${operationName}:failed`,
                 success: false,
                 timestamp: Date.now(),
@@ -291,6 +364,7 @@ async function handleFailure<T>(
 
     const logMessage = `[OperationalHooks] ${operationName} failed permanently after ${attempt} attempts`;
     const logMetadata = {
+        context,
         duration,
         error,
         operationId,
@@ -303,6 +377,7 @@ async function handleFailure<T>(
         }
         case "error": {
             /* V8 ignore next 2 */ logger.error(logMessage, error, {
+                context,
                 duration,
                 operationId,
             });
@@ -320,12 +395,14 @@ async function handleFailure<T>(
             /* V8 ignore next 4 */ logger.warn(
                 `[OperationalHooks] Unknown failure log level, defaulting to error`,
                 {
+                    context,
                     duration,
                     operationId,
                     providedLevel: logLevel,
                 }
             );
             /* V8 ignore next 2 */ logger.error(logMessage, error, {
+                context,
                 duration,
                 operationId,
             });
@@ -349,7 +426,7 @@ async function handleRetry<T>(
     config: OperationalHooksConfig<T>,
     operationName: string,
     attempt: number,
-    operationId: string,
+    operationId: OperationId,
     backoff: "exponential" | "linear" = "exponential",
     initialDelay: number = 100
 ): Promise<void> {
@@ -396,9 +473,10 @@ async function handleSuccess<T>(
     operationName: string,
     startTime: number,
     attempt: number,
-    operationId: string
+    operationId: OperationId,
+    context: OperationalHookContext
 ): Promise<T> {
-    const { context = {}, emitEvents, eventEmitter, onSuccess } = config;
+    const { emitEvents, eventEmitter, onSuccess } = config;
     const duration = Date.now() - startTime;
 
     // Call success callback
@@ -418,6 +496,7 @@ async function handleSuccess<T>(
         try {
             await eventEmitter.emitTyped("database:transaction-completed", {
                 duration,
+                lifecycleStage: "success",
                 operation: `${operationName}:completed`,
                 success: true,
                 timestamp: Date.now(),
@@ -435,6 +514,7 @@ async function handleSuccess<T>(
     /* V8 ignore next 2 */ logger.debug(
         `[OperationalHooks] ${operationName} succeeded after ${attempt} attempt(s)`,
         {
+            context,
             duration,
             operationId,
         }
@@ -453,7 +533,7 @@ export async function withOperationalHooks<T>(
 ): Promise<T> {
     const {
         backoff = "exponential",
-        context = {},
+        context: contextInput,
         emitEvents = true,
         eventEmitter,
         initialDelay = 100,
@@ -462,6 +542,7 @@ export async function withOperationalHooks<T>(
         throwOnFailure = true,
     } = config;
 
+    const context = normalizeOperationalContext(contextInput);
     const operationId = generateOperationId();
     const startTime = Date.now();
 
@@ -491,7 +572,8 @@ export async function withOperationalHooks<T>(
                 operationName,
                 startTime,
                 attempt,
-                operationId
+                operationId,
+                context
             );
         } catch (error) {
             lastError =
@@ -500,6 +582,7 @@ export async function withOperationalHooks<T>(
             /* V8 ignore next 2 */ logger.debug(
                 `[OperationalHooks] ${operationName} failed on attempt ${attempt}/${maxRetries}`,
                 {
+                    context,
                     error: lastError,
                     operationId,
                 }
@@ -521,6 +604,7 @@ export async function withOperationalHooks<T>(
                     startTime,
                     attempt,
                     operationId,
+                    context,
                     throwOnFailure,
                     failureLogLevel
                 );
@@ -574,7 +658,7 @@ export async function withDatabaseOperation<T>(
     operation: () => Promise<T>,
     operationName: string,
     eventEmitter?: TypedEventBus<UptimeEvents>,
-    context?: UnknownRecord
+    context?: OperationalHookContextInput
 ): Promise<T> {
     return withOperationalHooks(operation, {
         backoff: "exponential",

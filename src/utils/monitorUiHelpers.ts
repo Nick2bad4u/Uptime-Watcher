@@ -71,7 +71,7 @@ export interface MonitorHelpTexts {
  *
  * @remarks
  * Checks the cache before performing a backend lookup and stores successful
- * results back into the cache.
+ * results back into the cache for subsequent lookups.
  *
  * @param monitorType - The monitor type to get configuration for.
  * @param signal - Optional `AbortSignal` for cancellation.
@@ -89,7 +89,10 @@ async function getConfig(
         throw new Error("Operation aborted");
     }
 
-    const cacheKey = CacheKeys.config.byName(`monitor-config-${monitorType}`);
+    const buildMonitorConfigCacheKey = (monitorTypeName: MonitorType): string =>
+        CacheKeys.config.byName(`monitor-config-${monitorTypeName}`);
+
+    const cacheKey = buildMonitorConfigCacheKey(monitorType);
 
     // Try to get from cache first
     const cached = AppCaches.uiHelpers.get(cacheKey);

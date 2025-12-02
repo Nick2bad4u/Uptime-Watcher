@@ -18,6 +18,11 @@ import {
     withIpcHandler,
     withIpcHandlerValidation,
 } from "../../../services/ipc/utils";
+import {
+    DATA_CHANNELS,
+    MONITORING_CHANNELS,
+    MONITOR_TYPES_CHANNELS,
+} from "@shared/types/preload";
 
 // Mock electron modules
 vi.mock("electron", () => ({
@@ -56,6 +61,20 @@ vi.mock("@shared/validation/validatorUtils", () => ({
             typeof value === "string" && /^(?:https?:\/\/)[^\s]+$/u.test(value)
     ),
 }));
+
+const CHANNELS_FOR_TESTS = {
+    registration: DATA_CHANNELS.downloadSqliteBackup,
+    validatedRegistration: DATA_CHANNELS.importData,
+    execution: MONITORING_CHANNELS.startMonitoring,
+    validatedExecution: MONITORING_CHANNELS.startMonitoringForMonitor,
+    handlerOne: MONITORING_CHANNELS.stopMonitoring,
+    handlerTwo: MONITOR_TYPES_CHANNELS.formatMonitorDetail,
+    handlerThree: MONITOR_TYPES_CHANNELS.formatMonitorTitleSuffix,
+    duplicate: DATA_CHANNELS.exportData,
+    failure: MONITOR_TYPES_CHANNELS.validateMonitorData,
+} as const;
+
+type TestChannel = (typeof CHANNELS_FOR_TESTS)[keyof typeof CHANNELS_FOR_TESTS];
 
 describe("IPC Utils - Comprehensive Coverage", () => {
     beforeEach(() => {
@@ -1475,21 +1494,21 @@ describe("IPC Utils - Comprehensive Coverage", () => {
                 await annotate("Type: Validation", "type");
 
                 const mockHandler = vi.fn().mockResolvedValue("test");
-                const registeredHandlers = new Set<string>();
+                const registeredHandlers = new Set<TestChannel>();
 
                 registerStandardizedIpcHandler(
-                    "test-registration",
+                    CHANNELS_FOR_TESTS.registration,
                     mockHandler,
                     null,
                     registeredHandlers
                 );
 
                 expect(ipcMain.handle).toHaveBeenCalledWith(
-                    "test-registration",
+                    CHANNELS_FOR_TESTS.registration,
                     expect.any(Function)
                 );
                 expect(
-                    registeredHandlers.has("test-registration")
+                    registeredHandlers.has(CHANNELS_FOR_TESTS.registration)
                 ).toBeTruthy();
             });
 
@@ -1504,21 +1523,23 @@ describe("IPC Utils - Comprehensive Coverage", () => {
 
                 const mockHandler = vi.fn().mockResolvedValue("validated test");
                 const mockValidator = vi.fn().mockReturnValue(null);
-                const registeredHandlers = new Set<string>();
+                const registeredHandlers = new Set<TestChannel>();
 
                 registerStandardizedIpcHandler(
-                    "validated-registration",
+                    CHANNELS_FOR_TESTS.validatedRegistration,
                     mockHandler,
                     mockValidator,
                     registeredHandlers
                 );
 
                 expect(ipcMain.handle).toHaveBeenCalledWith(
-                    "validated-registration",
+                    CHANNELS_FOR_TESTS.validatedRegistration,
                     expect.any(Function)
                 );
                 expect(
-                    registeredHandlers.has("validated-registration")
+                    registeredHandlers.has(
+                        CHANNELS_FOR_TESTS.validatedRegistration
+                    )
                 ).toBeTruthy();
             });
 
@@ -1532,10 +1553,10 @@ describe("IPC Utils - Comprehensive Coverage", () => {
                 await annotate("Type: Validation", "type");
 
                 const mockHandler = vi.fn().mockResolvedValue("execution test");
-                const registeredHandlers = new Set<string>();
+                const registeredHandlers = new Set<TestChannel>();
 
                 registerStandardizedIpcHandler(
-                    "execution-test",
+                    CHANNELS_FOR_TESTS.execution,
                     mockHandler,
                     null,
                     registeredHandlers
@@ -1544,7 +1565,9 @@ describe("IPC Utils - Comprehensive Coverage", () => {
                 // Get the registered function and execute it
                 const handleCall = vi
                     .mocked(ipcMain.handle)
-                    .mock.calls.find((call) => call[0] === "execution-test");
+                    .mock.calls.find(
+                        (call) => call[0] === CHANNELS_FOR_TESTS.execution
+                    );
                 expect(handleCall).toBeDefined();
 
                 const registeredFunction = handleCall![1];
@@ -1572,10 +1595,10 @@ describe("IPC Utils - Comprehensive Coverage", () => {
                     .fn()
                     .mockResolvedValue("validated execution");
                 const mockValidator = vi.fn().mockReturnValue(null);
-                const registeredHandlers = new Set<string>();
+                const registeredHandlers = new Set<TestChannel>();
 
                 registerStandardizedIpcHandler(
-                    "validated-execution",
+                    CHANNELS_FOR_TESTS.validatedExecution,
                     mockHandler,
                     mockValidator,
                     registeredHandlers
@@ -1585,7 +1608,8 @@ describe("IPC Utils - Comprehensive Coverage", () => {
                 const handleCall = vi
                     .mocked(ipcMain.handle)
                     .mock.calls.find(
-                        (call) => call[0] === "validated-execution"
+                        (call) =>
+                            call[0] === CHANNELS_FOR_TESTS.validatedExecution
                     );
                 expect(handleCall).toBeDefined();
 
@@ -1607,31 +1631,37 @@ describe("IPC Utils - Comprehensive Coverage", () => {
                 await annotate("Category: Service", "category");
                 await annotate("Type: Business Logic", "type");
 
-                const registeredHandlers = new Set<string>();
+                const registeredHandlers = new Set<TestChannel>();
 
                 registerStandardizedIpcHandler(
-                    "handler1",
+                    CHANNELS_FOR_TESTS.handlerOne,
                     vi.fn(),
                     null,
                     registeredHandlers
                 );
                 registerStandardizedIpcHandler(
-                    "handler2",
+                    CHANNELS_FOR_TESTS.handlerTwo,
                     vi.fn(),
                     vi.fn(),
                     registeredHandlers
                 );
                 registerStandardizedIpcHandler(
-                    "handler3",
+                    CHANNELS_FOR_TESTS.handlerThree,
                     vi.fn(),
                     null,
                     registeredHandlers
                 );
 
                 expect(registeredHandlers.size).toBe(3);
-                expect(registeredHandlers.has("handler1")).toBeTruthy();
-                expect(registeredHandlers.has("handler2")).toBeTruthy();
-                expect(registeredHandlers.has("handler3")).toBeTruthy();
+                expect(
+                    registeredHandlers.has(CHANNELS_FOR_TESTS.handlerOne)
+                ).toBeTruthy();
+                expect(
+                    registeredHandlers.has(CHANNELS_FOR_TESTS.handlerTwo)
+                ).toBeTruthy();
+                expect(
+                    registeredHandlers.has(CHANNELS_FOR_TESTS.handlerThree)
+                ).toBeTruthy();
             });
 
             it("should reject duplicate handler registrations", async ({
@@ -1643,10 +1673,10 @@ describe("IPC Utils - Comprehensive Coverage", () => {
                 await annotate("Category: Service", "category");
                 await annotate("Type: Validation", "type");
 
-                const registeredHandlers = new Set<string>();
+                const registeredHandlers = new Set<TestChannel>();
 
                 registerStandardizedIpcHandler(
-                    "duplicate-channel",
+                    CHANNELS_FOR_TESTS.duplicate,
                     vi.fn(),
                     null,
                     registeredHandlers
@@ -1654,19 +1684,19 @@ describe("IPC Utils - Comprehensive Coverage", () => {
 
                 expect(() =>
                     registerStandardizedIpcHandler(
-                        "duplicate-channel",
+                        CHANNELS_FOR_TESTS.duplicate,
                         vi.fn(),
                         null,
                         registeredHandlers
                     )
                 ).toThrow(
-                    "[IpcService] Attempted to register duplicate IPC handler for channel 'duplicate-channel'"
+                    `[IpcService] Attempted to register duplicate IPC handler for channel '${CHANNELS_FOR_TESTS.duplicate}'`
                 );
 
                 expect(logger.error).toHaveBeenCalledWith(
-                    "[IpcService] Attempted to register duplicate IPC handler for channel 'duplicate-channel'",
+                    `[IpcService] Attempted to register duplicate IPC handler for channel '${CHANNELS_FOR_TESTS.duplicate}'`,
                     expect.objectContaining({
-                        channel: "duplicate-channel",
+                        channel: CHANNELS_FOR_TESTS.duplicate,
                     })
                 );
                 expect(ipcMain.handle).toHaveBeenCalledTimes(1);
@@ -1681,7 +1711,7 @@ describe("IPC Utils - Comprehensive Coverage", () => {
                 await annotate("Category: Service", "category");
                 await annotate("Type: Error Handling", "type");
 
-                const registeredHandlers = new Set<string>();
+                const registeredHandlers = new Set<TestChannel>();
                 const registrationError = new Error("ipcMain failure");
                 vi.mocked(ipcMain.handle).mockImplementationOnce(() => {
                     throw registrationError;
@@ -1689,16 +1719,18 @@ describe("IPC Utils - Comprehensive Coverage", () => {
 
                 expect(() =>
                     registerStandardizedIpcHandler(
-                        "failing-channel",
+                        CHANNELS_FOR_TESTS.failure,
                         vi.fn(),
                         null,
                         registeredHandlers
                     )
                 ).toThrow(registrationError);
 
-                expect(registeredHandlers.has("failing-channel")).toBeFalsy();
+                expect(
+                    registeredHandlers.has(CHANNELS_FOR_TESTS.failure)
+                ).toBeFalsy();
                 expect(logger.error).toHaveBeenCalledWith(
-                    "[IpcService] Failed to register IPC handler for channel 'failing-channel'",
+                    `[IpcService] Failed to register IPC handler for channel '${CHANNELS_FOR_TESTS.failure}'`,
                     registrationError
                 );
             });

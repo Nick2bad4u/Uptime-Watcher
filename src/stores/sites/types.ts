@@ -20,7 +20,7 @@ import type {
     StatusUpdateSubscriptionSummary,
     StatusUpdateUnsubscribeResult,
 } from "./baseTypes";
-import type { OptimisticMonitoringLock } from "./utils/optimisticMonitoringLock";
+import type { SitesState as SitesStateShape } from "./useSitesState";
 
 /**
  * Sites store actions interface for managing site operations.
@@ -168,25 +168,10 @@ export interface SitesActions {
  * Sites store state interface for managing site data.
  *
  * @remarks
- * Defines the state structure for site management including current sites,
- * selected site tracking, and UI state for monitor selection.
- *
- * @public
+ * Re-exports the canonical state shape defined by {@link useSitesState} so the
+ * store, actions, and modules share the exact same structure.
  */
-export interface SitesState {
-    /** Most recent backend synchronization delta summary. */
-    lastSyncDelta: SiteSyncDelta | undefined;
-    /** Active optimistic monitoring locks keyed by site and monitor identifier. */
-    optimisticMonitoringLocks: Record<string, OptimisticMonitoringLock>;
-    /** Selected monitor IDs per site (UI state, not persisted) */
-    selectedMonitorIds: Record<string, string>;
-    /** Currently selected site identifier */
-    selectedSiteIdentifier: string | undefined;
-    /** Array of monitored sites */
-    sites: Site[];
-    /** Latest subscription diagnostics for monitoring status updates */
-    statusSubscriptionSummary: StatusUpdateSubscriptionSummary | undefined;
-}
+export type SitesState = SitesStateShape;
 
 /**
  * Combined interface for Sites store actions and state. Provides a complete

@@ -53,6 +53,20 @@ export type StatusUpdateSnapshotPayload = Partial<
 > &
     Pick<StatusUpdate, "monitorId" | "siteIdentifier" | "status" | "timestamp">;
 
+type StatusUpdateSnapshotContext = Required<
+    Pick<StatusUpdate, "monitor" | "site">
+>;
+
+const hasSnapshotContext = (
+    payload: StatusUpdateSnapshotPayload
+): payload is StatusUpdateSnapshotContext & StatusUpdateSnapshotPayload =>
+    Boolean(
+        "monitor" in payload &&
+            "site" in payload &&
+            payload["monitor"] &&
+            payload["site"]
+    );
+
 /**
  * Configuration options for status update handler operations.
  *
@@ -159,7 +173,7 @@ export const applyStatusUpdateSnapshot = (
     sites: Site[],
     statusUpdate: StatusUpdateSnapshotPayload
 ): Site[] => {
-    if (!statusUpdate.site || !statusUpdate.monitor) {
+    if (!hasSnapshotContext(statusUpdate)) {
         if (isDevelopment()) {
             logger.debug(
                 "[StatusUpdateHandler] Received status update without site or monitor context; skipping optimistic merge",
@@ -699,7 +713,7 @@ export class StatusUpdateManager {
             logPayload["siteCount"] = event.siteCount;
         }
 
-        logPayload["timestamp"] = event.timestamp;
+        logPayload["timestamp"] = event["timestamp"];
 
         if (typeof event.activeMonitors === "number") {
             logPayload["activeMonitors"] = event.activeMonitors;

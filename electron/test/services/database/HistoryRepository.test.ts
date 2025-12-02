@@ -471,7 +471,8 @@ describe(HistoryRepository, () => {
                 mockDatabaseService.executeTransaction
             ).toHaveBeenCalledTimes(1);
             expect(mockDatabase.all).toHaveBeenCalledWith(
-                "SELECT id FROM monitors"
+                "SELECT id FROM monitors",
+                undefined
             );
             expect(mockDatabase.run).toHaveBeenCalledWith(
                 "DELETE FROM history WHERE id IN (?,?)",
@@ -567,7 +568,8 @@ describe(HistoryRepository, () => {
             historyRepository.pruneAllHistoryInternal(mockDatabase, limit);
 
             expect(mockDatabase.all).toHaveBeenCalledWith(
-                "SELECT id FROM monitors"
+                "SELECT id FROM monitors",
+                undefined
             );
             expect(
                 historyManipulation.pruneHistoryForMonitor

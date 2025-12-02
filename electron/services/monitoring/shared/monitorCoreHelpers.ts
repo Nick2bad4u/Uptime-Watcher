@@ -4,7 +4,7 @@
 
 import type { Site } from "@shared/types";
 
-import type { MonitorConfig } from "../types";
+import type { MonitorServiceConfig } from "../types";
 
 import { DEFAULT_REQUEST_TIMEOUT } from "../../../constants";
 import { createMonitorConfig } from "./monitorServiceHelpers";
@@ -43,7 +43,7 @@ export function deriveMonitorTiming<
     TType extends Site["monitors"][number]["type"],
 >(
     monitor: MonitorByType<TType>,
-    serviceConfig: MonitorConfig
+    serviceConfig: MonitorServiceConfig
 ): {
     retryAttempts: number;
     timeout: number;

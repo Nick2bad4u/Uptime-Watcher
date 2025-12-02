@@ -11,9 +11,9 @@ import type { MockedFunction } from "vitest";
 
 import { PingMonitor } from "../../../services/monitoring/PingMonitor";
 import type {
-    MonitorConfig,
+    MonitorServiceConfig,
     MonitorCheckResult,
-} from "../../../services/monitoring/types.js";
+} from "../../../services/monitoring/types";
 import type { Site } from "@shared/types";
 import * as pingRetryModule from "../../../services/monitoring/utils/pingRetry";
 
@@ -26,7 +26,7 @@ const mockPerformPingCheckWithRetry =
 
 describe(PingMonitor, () => {
     let pingMonitor: PingMonitor;
-    const defaultConfig: MonitorConfig = {
+    const defaultConfig: MonitorServiceConfig = {
         timeout: 5000,
     };
 
@@ -82,7 +82,7 @@ describe(PingMonitor, () => {
             await annotate("Category: Service", "category");
             await annotate("Type: Business Logic", "type");
 
-            const customConfig: MonitorConfig = {
+            const customConfig: MonitorServiceConfig = {
                 timeout: 15_000,
             };
             const monitor = new PingMonitor(customConfig);
@@ -100,7 +100,7 @@ describe(PingMonitor, () => {
             await annotate("Category: Service", "category");
             await annotate("Type: Business Logic", "type");
 
-            const partialConfig: MonitorConfig = {
+            const partialConfig: MonitorServiceConfig = {
                 timeout: 20_000,
             };
             const monitor = new PingMonitor(partialConfig);
@@ -131,7 +131,7 @@ describe(PingMonitor, () => {
             await annotate("Category: Service", "category");
             await annotate("Type: Data Update", "type");
 
-            const newConfig: Partial<MonitorConfig> = {
+            const newConfig: Partial<MonitorServiceConfig> = {
                 timeout: 8000,
             };
 
@@ -150,7 +150,7 @@ describe(PingMonitor, () => {
             await annotate("Category: Service", "category");
             await annotate("Type: Data Update", "type");
 
-            const partialUpdate: Partial<MonitorConfig> = {
+            const partialUpdate: Partial<MonitorServiceConfig> = {
                 timeout: 12_000,
             };
 

@@ -86,12 +86,7 @@ function parseKeyBlocks(frontmatter) {
             }
 
             const match = keyLineRegex.exec(line);
-            if (match && match.groups && match.groups["key"]) {
-                currentKey = match.groups["key"];
-            } else {
-                // Fallback: treat as anonymous block if regex somehow fails
-                currentKey = "";
-            }
+            currentKey = match?.groups?.["key"] ?? "";
             currentLines = [line];
         } else {
             // Continuation line (indented or blank)

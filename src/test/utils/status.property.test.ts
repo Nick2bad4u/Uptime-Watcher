@@ -19,6 +19,8 @@ import {
     getStatusIcon,
     formatStatusWithIcon,
     createStatusIdentifier,
+    type StatusIdentifier,
+    type StatusWithIcon,
 } from "../../utils/status";
 
 describe("Status Utils Property-Based Tests", () => {
@@ -167,7 +169,7 @@ describe("Status Utils Property-Based Tests", () => {
         test.prop([knownStatusValues])(
             "should format known status values correctly",
             (status) => {
-                const formatted = formatStatusWithIcon(status);
+                const formatted: StatusWithIcon = formatStatusWithIcon(status);
                 const icon = getStatusIcon(status);
                 const expectedText =
                     status.charAt(0).toUpperCase() +
@@ -179,7 +181,7 @@ describe("Status Utils Property-Based Tests", () => {
         test.prop([fc.string({ minLength: 1 })])(
             "should always include icon and capitalized text",
             (status) => {
-                const formatted = formatStatusWithIcon(status);
+                const formatted: StatusWithIcon = formatStatusWithIcon(status);
                 const parts = formatted.split(" ");
 
                 expect(parts.length).toBeGreaterThanOrEqual(2);
@@ -197,7 +199,7 @@ describe("Status Utils Property-Based Tests", () => {
         test.prop([fc.string({ minLength: 1 })])(
             "should preserve original status length in text part",
             (status) => {
-                const formatted = formatStatusWithIcon(status);
+                const formatted: StatusWithIcon = formatStatusWithIcon(status);
                 const textPart = formatted.split(" ").slice(1).join(" ");
                 expect(textPart).toHaveLength(status.length);
             }
@@ -206,19 +208,19 @@ describe("Status Utils Property-Based Tests", () => {
         test.prop([statusVariations])(
             "should be consistent with getStatusIcon",
             (status) => {
-                const formatted = formatStatusWithIcon(status);
+                const formatted: StatusWithIcon = formatStatusWithIcon(status);
                 const expectedIcon = getStatusIcon(status);
                 expect(formatted.startsWith(expectedIcon)).toBeTruthy();
             }
         );
 
         test("should handle single character status", () => {
-            const formatted = formatStatusWithIcon("a");
+            const formatted: StatusWithIcon = formatStatusWithIcon("a");
             expect(formatted).toMatch(/^.+ A$/);
         });
 
         test("should handle mixed case input", () => {
-            const formatted = formatStatusWithIcon("tEsT");
+            const formatted: StatusWithIcon = formatStatusWithIcon("tEsT");
             expect(formatted).toMatch(/^.+ Test$/);
         });
     });
@@ -229,14 +231,16 @@ describe("Status Utils Property-Based Tests", () => {
                 .string({ minLength: 1, maxLength: 50 })
                 .filter((s) => s.trim().length > 0),
         ])("should always return a string", (statusText) => {
-            const identifier = createStatusIdentifier(statusText);
+            const identifier: StatusIdentifier =
+                createStatusIdentifier(statusText);
             expect(typeof identifier).toBe("string");
         });
 
         test.prop([multiWordStatuses])(
             "should convert multi-word statuses to camelCase",
             (statusText) => {
-                const identifier = createStatusIdentifier(statusText);
+                const identifier: StatusIdentifier =
+                    createStatusIdentifier(statusText);
 
                 // Should not contain spaces, hyphens, or underscores
                 expect(identifier).not.toMatch(/[\s_-]/);
@@ -270,7 +274,8 @@ describe("Status Utils Property-Based Tests", () => {
         test.prop([
             fc.string({ minLength: 1 }).filter((s) => !/[\s_-]/.test(s)),
         ])("should handle single word inputs correctly", (singleWord) => {
-            const identifier = createStatusIdentifier(singleWord);
+            const identifier: StatusIdentifier =
+                createStatusIdentifier(singleWord);
             expect(identifier).toBe(singleWord.toLowerCase());
         });
 
@@ -283,7 +288,8 @@ describe("Status Utils Property-Based Tests", () => {
             ),
         ])("should create valid camelCase from word arrays", (words) => {
             const statusText = words.join(" ");
-            const identifier = createStatusIdentifier(statusText);
+            const identifier: StatusIdentifier =
+                createStatusIdentifier(statusText);
 
             // Should not be empty
             expect(identifier.length).toBeGreaterThan(0);
@@ -310,7 +316,8 @@ describe("Status Utils Property-Based Tests", () => {
                     (s) => s.includes(" ") || s.includes("-") || s.includes("_")
                 ),
         ])("should handle various delimiters consistently", (statusText) => {
-            const identifier = createStatusIdentifier(statusText);
+            const identifier: StatusIdentifier =
+                createStatusIdentifier(statusText);
 
             // Result should not contain original delimiters
             expect(identifier).not.toMatch(/[\s_-]/);
@@ -354,7 +361,7 @@ describe("Status Utils Property-Based Tests", () => {
         test.prop([fc.string()])(
             "formatStatusWithIcon should include correct icon",
             (status) => {
-                const formatted = formatStatusWithIcon(status);
+                const formatted: StatusWithIcon = formatStatusWithIcon(status);
                 const expectedIcon = getStatusIcon(status);
                 expect(formatted.startsWith(expectedIcon)).toBeTruthy();
             }
@@ -363,7 +370,7 @@ describe("Status Utils Property-Based Tests", () => {
         test.prop([fc.string({ minLength: 1 })])(
             "formatStatusWithIcon should preserve content length relationship",
             (status) => {
-                const formatted = formatStatusWithIcon(status);
+                const formatted: StatusWithIcon = formatStatusWithIcon(status);
                 // Format is "{icon} {text}" where text has same length as status
                 // So formatted length should be icon length + 1 (space) + status length
                 const iconLength = getStatusIcon(status).length;
@@ -377,8 +384,10 @@ describe("Status Utils Property-Based Tests", () => {
                 // Skip multi-word inputs for this test
                 fc.pre(!/[\s_-]/.test(word));
 
-                const identifier1 = createStatusIdentifier(word);
-                const identifier2 = createStatusIdentifier(identifier1);
+                const identifier1: StatusIdentifier =
+                    createStatusIdentifier(word);
+                const identifier2: StatusIdentifier =
+                    createStatusIdentifier(identifier1);
                 expect(identifier1).toBe(identifier2);
             }
         );
@@ -387,8 +396,9 @@ describe("Status Utils Property-Based Tests", () => {
             "all utilities should handle known status values consistently",
             (status) => {
                 const icon = getStatusIcon(status);
-                const formatted = formatStatusWithIcon(status);
-                const identifier = createStatusIdentifier(status);
+                const formatted: StatusWithIcon = formatStatusWithIcon(status);
+                const identifier: StatusIdentifier =
+                    createStatusIdentifier(status);
 
                 // Icon should be one of the expected values
                 expect([
@@ -445,7 +455,8 @@ describe("Status Utils Property-Based Tests", () => {
             expect(getStatusIcon("测试")).toBe("⚪");
             expect(formatStatusWithIcon("🚀").startsWith("⚪")).toBeTruthy();
 
-            const identifier = createStatusIdentifier("test-émoji_status");
+            const identifier: StatusIdentifier =
+                createStatusIdentifier("test-émoji_status");
             expect(identifier).not.toMatch(/[\s_-]/);
         });
     });

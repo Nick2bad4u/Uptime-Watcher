@@ -19,6 +19,19 @@ import type { Theme, ThemeName } from "./types";
 import { themes } from "./themes";
 import { deepMergeTheme } from "./utils/themeMerging";
 
+const isObjectLike = (value: unknown): value is object =>
+    typeof value === "object" && value !== null;
+
+const isRecord = (value: unknown): value is Record<PropertyKey, unknown> =>
+    isObjectLike(value);
+
+type CssVariableKey = number | string;
+
+const isCssVariableKey = (value: PropertyKey): value is CssVariableKey =>
+    typeof value === "string" || typeof value === "number";
+
+const toCssToken = (value: CssVariableKey): string => value.toString();
+
 /**
  * Singleton service for managing application themes. Handles theme selection,
  * system preference detection, and automatic switching.
@@ -228,24 +241,53 @@ export class ThemeManager {
      * Add color CSS variables from theme.
      */
     private addColorVariables(theme: Theme, variables: string[]): void {
-        if (typeof theme.colors === "object" && theme.colors !== null) {
-            /* eslint-disable @typescript-eslint/no-unsafe-type-assertion -- Safe navigation through theme color object structure with runtime type checks */
-            for (const [category, colors] of Object.entries(theme.colors)) {
-                if (typeof colors === "object" && colors !== null) {
-                    // Type-safe access to color values - colors are either
-                    // string or nested color objects
-                    for (const [key, value] of Object.entries(
-                        colors as Record<string, string>
-                    )) {
-                        variables.push(
-                            `  --color-${category}-${key}: ${value};`
-                        );
-                    }
-                } else {
-                    variables.push(`  --color-${category}: ${colors};`);
-                }
+        this.forEachColorVariable(theme.colors, (property, value) => {
+            variables.push(`  ${property}: ${value};`);
+        });
+    }
+
+    private forEachColorVariable(
+        colors: Theme["colors"],
+        visitor: (property: string, value: string) => void
+    ): void {
+        const colorGroups = colors;
+
+        if (!isRecord(colorGroups)) {
+            return;
+        }
+
+        for (const [categoryKey, colorValue] of Object.entries(colorGroups)) {
+            if (isCssVariableKey(categoryKey)) {
+                const categoryToken = toCssToken(categoryKey);
+                this.emitColorValue(categoryToken, colorValue, visitor);
             }
-            /* eslint-enable @typescript-eslint/no-unsafe-type-assertion -- Re-enable after safe theme color processing */
+        }
+    }
+
+    private emitColorValue(
+        categoryToken: string,
+        colorValue: unknown,
+        visitor: (property: string, value: string) => void
+    ): void {
+        if (typeof colorValue === "string") {
+            visitor(`--color-${categoryToken}`, colorValue);
+        } else if (isRecord(colorValue)) {
+            this.emitColorShades(categoryToken, colorValue, visitor);
+        }
+    }
+
+    private emitColorShades(
+        categoryToken: string,
+        shades: Record<PropertyKey, unknown>,
+        visitor: (property: string, value: string) => void
+    ): void {
+        for (const [shadeKey, nestedValue] of Object.entries(shades)) {
+            if (isCssVariableKey(shadeKey) && typeof nestedValue === "string") {
+                visitor(
+                    `--color-${categoryToken}-${toCssToken(shadeKey)}`,
+                    nestedValue
+                );
+            }
         }
     }
 
@@ -359,33 +401,15 @@ export class ThemeManager {
      * Apply color CSS custom properties
      */
     private applyColors(root: HTMLElement, colors: Theme["colors"]): void {
-        if (typeof colors === "object" && colors !== null) {
-            // Batch all style changes to prevent multiple repaints
-            const properties: Array<[string, string]> = [];
+        const properties: Array<[string, string]> = [];
 
-            /* eslint-disable @typescript-eslint/no-unsafe-type-assertion -- Safe navigation through theme color object structure with runtime type checks */
-            for (const [category, colorValue] of Object.entries(colors)) {
-                if (typeof colorValue === "object" && colorValue !== null) {
-                    // Type-safe access to color values - colorValue is a
-                    // nested color object with string values
-                    for (const [key, value] of Object.entries(
-                        colorValue as Record<string, string>
-                    )) {
-                        properties.push([`--color-${category}-${key}`, value]);
-                    }
-                } else {
-                    properties.push([
-                        `--color-${category}`,
-                        colorValue as string,
-                    ]);
-                }
-            }
-            /* eslint-enable @typescript-eslint/no-unsafe-type-assertion -- Re-enable after safe CSS property value processing */
+        this.forEachColorVariable(colors, (property, value) => {
+            properties.push([property, value]);
+        });
 
-            // Apply all properties at once to prevent flickering
-            for (const [property, value] of properties) {
-                root.style.setProperty(property, value);
-            }
+        // Apply all properties at once to prevent flickering
+        for (const [property, value] of properties) {
+            root.style.setProperty(property, value);
         }
     }
 

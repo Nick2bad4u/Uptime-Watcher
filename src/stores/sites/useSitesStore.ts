@@ -63,10 +63,7 @@ import { createSiteSyncActions } from "./useSiteSync";
  * @public
  */
 export const useSitesStore: UseBoundStore<StoreApi<SitesStore>> =
-    create<SitesStore>()((
-        set: (function_: (state: SitesStore) => Partial<SitesStore>) => void,
-        get: () => SitesStore
-    ) => {
+    create<SitesStore>()((set, get) => {
         // Create state actions
         const stateActions = createSitesStateActions(
             (updater) => {

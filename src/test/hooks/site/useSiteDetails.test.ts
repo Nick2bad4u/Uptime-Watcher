@@ -31,23 +31,29 @@ vi.mock("../../../utils/monitorValidation", () => ({
             (value < 10_000 || value > 86_400_000)
         ) {
             return {
-                success: false,
                 errors: ["Check interval must be between 10s and 24h"],
+                metadata: {},
+                success: false,
+                warnings: [],
             };
         }
         if (field === "timeout" && (value < 1000 || value > 30_000)) {
             return {
-                success: false,
                 errors: ["Timeout must be between 1s and 30s"],
+                metadata: {},
+                success: false,
+                warnings: [],
             };
         }
         if (field === "retryAttempts" && (value < 0 || value > 10)) {
             return {
-                success: false,
                 errors: ["Retry attempts must be between 0 and 10"],
+                metadata: {},
+                success: false,
+                warnings: [],
             };
         }
-        return { success: true };
+        return { errors: [], metadata: {}, success: true, warnings: [] };
     }),
 }));
 

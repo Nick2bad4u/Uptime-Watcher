@@ -12,7 +12,10 @@ import { test as fcTest, fc } from "@fast-check/vitest";
 
 // Import event system modules
 import { TypedEventBus } from "../../../electron/events/TypedEventBus";
-import type { UptimeEvents } from "../../../electron/events/eventTypes";
+import type {
+    UptimeEventName,
+    UptimeEvents,
+} from "../../../electron/events/eventTypes";
 import { generateCorrelationId } from "../../../electron/utils/correlation";
 
 // Custom arbitraries for event system testing
@@ -108,7 +111,7 @@ describe("Event System - 100% Fast-Check Fuzzing Coverage", () => {
 
                 // Test event emission doesn't throw
                 await expect(
-                    eventBus.emitTyped(eventType as keyof UptimeEvents, payload)
+                    eventBus.emitTyped(eventType as UptimeEventName, payload)
                 ).resolves.not.toThrow();
             }
         );
@@ -120,7 +123,7 @@ describe("Event System - 100% Fast-Check Fuzzing Coverage", () => {
 
                 // Register listener
                 const result = eventBus.onTyped(
-                    eventType as keyof UptimeEvents,
+                    eventType as UptimeEventName,
                     listener
                 );
                 expect(result).toBe(eventBus); // Should return this for chaining
@@ -130,7 +133,7 @@ describe("Event System - 100% Fast-Check Fuzzing Coverage", () => {
                 expect(listener).not.toHaveBeenCalled();
 
                 // Cleanup
-                eventBus.offTyped(eventType as keyof UptimeEvents, listener);
+                eventBus.offTyped(eventType as UptimeEventName, listener);
             }
         );
 
@@ -138,19 +141,16 @@ describe("Event System - 100% Fast-Check Fuzzing Coverage", () => {
             "should handle event delivery",
             async (eventType, payload) => {
                 const listener = vi.fn();
-                eventBus.onTyped(eventType as keyof UptimeEvents, listener);
+                eventBus.onTyped(eventType as UptimeEventName, listener);
 
                 // Emit event
-                await eventBus.emitTyped(
-                    eventType as keyof UptimeEvents,
-                    payload
-                );
+                await eventBus.emitTyped(eventType as UptimeEventName, payload);
 
                 // Verify listener was called
                 expect(listener).toHaveBeenCalledTimes(1);
 
                 // Cleanup
-                eventBus.offTyped(eventType as keyof UptimeEvents, listener);
+                eventBus.offTyped(eventType as UptimeEventName, listener);
             }
         );
 
@@ -159,21 +159,18 @@ describe("Event System - 100% Fast-Check Fuzzing Coverage", () => {
             fc.array(arbitraryEventPayload, { maxLength: 10 }),
         ])("should handle multiple events", async (eventType, payloads) => {
             const listener = vi.fn();
-            eventBus.onTyped(eventType as keyof UptimeEvents, listener);
+            eventBus.onTyped(eventType as UptimeEventName, listener);
 
             // Emit multiple events
             for (const payload of payloads) {
-                await eventBus.emitTyped(
-                    eventType as keyof UptimeEvents,
-                    payload
-                );
+                await eventBus.emitTyped(eventType as UptimeEventName, payload);
             }
 
             // Verify listener call count
             expect(listener).toHaveBeenCalledTimes(payloads.length);
 
             // Cleanup
-            eventBus.offTyped(eventType as keyof UptimeEvents, listener);
+            eventBus.offTyped(eventType as UptimeEventName, listener);
         });
 
         fcTest.prop([
@@ -186,12 +183,12 @@ describe("Event System - 100% Fast-Check Fuzzing Coverage", () => {
             for (const eventType of uniqueEventTypes) {
                 const listener = vi.fn();
                 listeners.set(eventType, listener);
-                eventBus.onTyped(eventType as keyof UptimeEvents, listener);
+                eventBus.onTyped(eventType as UptimeEventName, listener);
             }
 
             // Emit events and verify isolation
             for (const eventType of eventTypes) {
-                await eventBus.emitTyped(eventType as keyof UptimeEvents, {
+                await eventBus.emitTyped(eventType as UptimeEventName, {
                     test: true,
                 });
             }
@@ -208,7 +205,7 @@ describe("Event System - 100% Fast-Check Fuzzing Coverage", () => {
             // Cleanup
             for (const eventType of uniqueEventTypes) {
                 const listener = listeners.get(eventType);
-                eventBus.offTyped(eventType as keyof UptimeEvents, listener);
+                eventBus.offTyped(eventType as UptimeEventName, listener);
             }
         });
 
@@ -225,14 +222,11 @@ describe("Event System - 100% Fast-Check Fuzzing Coverage", () => {
                 for (let i = 0; i < listenerCount; i++) {
                     const listener = vi.fn();
                     listeners.push(listener);
-                    eventBus.onTyped(eventType as keyof UptimeEvents, listener);
+                    eventBus.onTyped(eventType as UptimeEventName, listener);
                 }
 
                 // Emit event
-                await eventBus.emitTyped(
-                    eventType as keyof UptimeEvents,
-                    payload
-                );
+                await eventBus.emitTyped(eventType as UptimeEventName, payload);
 
                 // Verify all listeners were called
                 for (const listener of listeners) {
@@ -241,10 +235,7 @@ describe("Event System - 100% Fast-Check Fuzzing Coverage", () => {
 
                 // Cleanup
                 for (const listener of listeners) {
-                    eventBus.offTyped(
-                        eventType as keyof UptimeEvents,
-                        listener
-                    );
+                    eventBus.offTyped(eventType as UptimeEventName, listener);
                 }
             }
         );
@@ -375,11 +366,8 @@ describe("Event System - 100% Fast-Check Fuzzing Coverage", () => {
                 // Add middleware
                 eventBus.registerMiddleware(middleware);
 
-                eventBus.onTyped(eventType as keyof UptimeEvents, listener);
-                await eventBus.emitTyped(
-                    eventType as keyof UptimeEvents,
-                    payload
-                );
+                eventBus.onTyped(eventType as UptimeEventName, listener);
+                await eventBus.emitTyped(eventType as UptimeEventName, payload);
 
                 // Verify middleware and listener were called
                 expect(middleware).toHaveBeenCalledTimes(1);
@@ -387,7 +375,7 @@ describe("Event System - 100% Fast-Check Fuzzing Coverage", () => {
 
                 // Cleanup
                 eventBus.removeMiddleware(middleware);
-                eventBus.offTyped(eventType as keyof UptimeEvents, listener);
+                eventBus.offTyped(eventType as UptimeEventName, listener);
             }
         );
 
@@ -414,16 +402,16 @@ describe("Event System - 100% Fast-Check Fuzzing Coverage", () => {
 
                 // Add error middleware
                 eventBus.registerMiddleware(errorMiddleware);
-                eventBus.onTyped(eventType as keyof UptimeEvents, listener);
+                eventBus.onTyped(eventType as UptimeEventName, listener);
 
                 // Event emission should throw due to middleware error
                 await expect(
-                    eventBus.emitTyped(eventType as keyof UptimeEvents, payload)
+                    eventBus.emitTyped(eventType as UptimeEventName, payload)
                 ).rejects.toThrow("Middleware error");
 
                 // Cleanup
                 eventBus.removeMiddleware(errorMiddleware);
-                eventBus.offTyped(eventType as keyof UptimeEvents, listener);
+                eventBus.offTyped(eventType as UptimeEventName, listener);
             }
         );
     });
@@ -575,28 +563,16 @@ describe("Event System - 100% Fast-Check Fuzzing Coverage", () => {
                 });
                 const normalListener = vi.fn();
 
-                eventBus.onTyped(
-                    eventType as keyof UptimeEvents,
-                    errorListener
-                );
-                eventBus.onTyped(
-                    eventType as keyof UptimeEvents,
-                    normalListener
-                );
+                eventBus.onTyped(eventType as UptimeEventName, errorListener);
+                eventBus.onTyped(eventType as UptimeEventName, normalListener);
 
                 // Emit event - should not throw despite error listener (emitTyped handles errors gracefully)
                 await expect(
-                    eventBus.emitTyped(eventType as keyof UptimeEvents, payload)
+                    eventBus.emitTyped(eventType as UptimeEventName, payload)
                 ).resolves.not.toThrow();
 
-                eventBus.offTyped(
-                    eventType as keyof UptimeEvents,
-                    errorListener
-                );
-                eventBus.offTyped(
-                    eventType as keyof UptimeEvents,
-                    normalListener
-                );
+                eventBus.offTyped(eventType as UptimeEventName, errorListener);
+                eventBus.offTyped(eventType as UptimeEventName, normalListener);
             }
         );
     });

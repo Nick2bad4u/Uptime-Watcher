@@ -21,6 +21,7 @@
 
 import { describe, expect } from "vitest";
 import { fc, test as fcTest } from "@fast-check/vitest";
+import type { Jsonifiable, JsonObject, JsonValue } from "type-fest";
 import {
     safeJsonParse,
     safeJsonParseArray,
@@ -92,6 +93,57 @@ function normalizeForJsonComparison(value: any): any {
 
     return normalized;
 }
+
+const jsonValueArbitrary: fc.Arbitrary<JsonValue> = fc
+    .jsonValue()
+    .map((value) => value as JsonValue);
+
+const isJsonValue = (value: unknown): value is JsonValue => {
+    if (
+        value === null ||
+        typeof value === "string" ||
+        typeof value === "number" ||
+        typeof value === "boolean"
+    ) {
+        return true;
+    }
+
+    if (Array.isArray(value)) {
+        return value.every((entry) => isJsonValue(entry));
+    }
+
+    if (typeof value === "object") {
+        return Object.values(value as Record<string, unknown>).every((entry) =>
+            isJsonValue(entry)
+        );
+    }
+
+    return false;
+};
+
+type SerializableMetadata = Record<string, JsonValue>;
+
+const metadataArbitrary: fc.Arbitrary<SerializableMetadata> = fc
+    .dictionary(fc.string(), jsonValueArbitrary)
+    .map((record) => record as SerializableMetadata);
+
+type SerializableComplexObject = JsonObject & {
+    active: boolean;
+    count: number;
+    id: string;
+    metadata: SerializableMetadata | null;
+    tags: string[];
+};
+
+const complexObjectArbitrary: fc.Arbitrary<SerializableComplexObject> = fc
+    .record({
+        active: fc.boolean(),
+        count: fc.integer(),
+        id: fc.string(),
+        metadata: fc.oneof(fc.constant(null), metadataArbitrary),
+        tags: fc.array(fc.string(), { maxLength: 10 }),
+    })
+    .map((record) => ({ ...record }) as SerializableComplexObject);
 
 describe("JSON Safety Advanced Fuzzing Tests", () => {
     describe("safeJsonParse - Malformed Input Handling", () => {
@@ -212,29 +264,58 @@ describe("JSON Safety Advanced Fuzzing Tests", () => {
         });
 
         // Test with complex objects
-        fcTest.prop([
-            fc.record({
-                id: fc.string(),
-                count: fc.integer(),
-                active: fc.boolean(),
-                metadata: fc.oneof(fc.constant(null), fc.object()),
-                tags: fc.array(fc.string(), { maxLength: 10 }),
-            }),
-        ])("should handle complex object structures", (complexObject) => {
-            const jsonString = JSON.stringify(complexObject);
-            const validator = (data: unknown): data is typeof complexObject =>
-                typeof data === "object" && data !== null;
+        fcTest.prop([complexObjectArbitrary])(
+            "should handle complex object structures",
+            (complexObject) => {
+                const jsonString = JSON.stringify(complexObject);
+                const validator = (
+                    data: unknown
+                ): data is SerializableComplexObject => {
+                    if (
+                        typeof data !== "object" ||
+                        data === null ||
+                        typeof (data as SerializableComplexObject).id !==
+                            "string" ||
+                        typeof (data as SerializableComplexObject).count !==
+                            "number" ||
+                        typeof (data as SerializableComplexObject).active !==
+                            "boolean" ||
+                        !Array.isArray(
+                            (data as SerializableComplexObject).tags
+                        ) ||
+                        !(data as SerializableComplexObject).tags.every(
+                            (tag) => typeof tag === "string"
+                        )
+                    ) {
+                        return false;
+                    }
 
-            const result = safeJsonParse(jsonString, validator);
+                    const metadata = (data as SerializableComplexObject)
+                        .metadata;
+                    if (metadata === null) {
+                        return true;
+                    }
 
-            expect(result.success).toBeTruthy();
-            if (result.success) {
-                // Compare with normalized version to account for undefined value removal
-                const normalizedOriginal =
-                    normalizeForJsonComparison(complexObject);
-                expect(result.data).toEqual(normalizedOriginal);
+                    if (typeof metadata !== "object") {
+                        return false;
+                    }
+
+                    return Object.values(metadata).every((entry) =>
+                        isJsonValue(entry)
+                    );
+                };
+
+                const result = safeJsonParse(jsonString, validator);
+
+                expect(result.success).toBeTruthy();
+                if (result.success) {
+                    // Compare with normalized version to account for undefined value removal
+                    const normalizedOriginal =
+                        normalizeForJsonComparison(complexObject);
+                    expect(result.data).toEqual(normalizedOriginal);
+                }
             }
-        });
+        );
 
         // Test with Unicode and special characters
         fcTest.prop([fc.string()])(
@@ -296,7 +377,7 @@ describe("JSON Safety Advanced Fuzzing Tests", () => {
                     fc.integer(),
                     fc.boolean(),
                     fc.constant(null),
-                    fc.object()
+                    fc.record({ key: fc.string() })
                 ),
                 { maxLength: 50 }
             ),
@@ -362,13 +443,7 @@ describe("JSON Safety Advanced Fuzzing Tests", () => {
                     }
                 })
             ), // Truly malformed JSON
-            fc.oneof(
-                fc.string(),
-                fc.integer(),
-                fc.object(),
-                fc.array(fc.string()),
-                fc.constant(null)
-            ), // Fallback value
+            jsonValueArbitrary, // Fallback value
         ])(
             "should return fallback for malformed JSON",
             (malformedJson, fallbackValue) => {
@@ -429,9 +504,11 @@ describe("JSON Safety Advanced Fuzzing Tests", () => {
                     validProp: stringProp,
                     functionProp: () => "test",
                     undefinedProp: undefined,
-                };
+                } as Record<string, unknown>;
 
-                const result = safeJsonStringify(objectWithFunction);
+                const result = safeJsonStringify(
+                    objectWithFunction as unknown as Jsonifiable
+                );
 
                 expect(result.success).toBeTruthy();
                 if (result.success && result.data) {
@@ -532,7 +609,7 @@ describe("JSON Safety Advanced Fuzzing Tests", () => {
                     fc.integer(),
                     fc.boolean(),
                     fc.constant(null),
-                    fc.object({ key: fc.string() })
+                    fc.record({ key: fc.string() })
                 ),
                 { maxLength: 20 }
             ),

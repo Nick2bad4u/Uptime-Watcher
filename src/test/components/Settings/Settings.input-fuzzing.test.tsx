@@ -471,7 +471,10 @@ describe("Settings Component - Notification preference scenarios", () => {
         { notificationsEnabled: false, soundEnabled: false },
     ] as const;
 
-    for (const { notificationsEnabled, soundEnabled } of systemToggleScenarios) {
+    for (const {
+        notificationsEnabled,
+        soundEnabled,
+    } of systemToggleScenarios) {
         it(`enforces invariants when toggling system notifications (notificationsEnabled=${notificationsEnabled}, soundEnabled=${soundEnabled})`, () => {
             resetState();
             applySettingsOverrides({

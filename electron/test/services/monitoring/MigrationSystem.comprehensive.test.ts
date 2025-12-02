@@ -16,6 +16,7 @@ import {
     versionManager,
     type MigrationRule,
 } from "../../../services/monitoring/MigrationSystem";
+import type { MonitorServiceConfig } from "../../../services/monitoring/types";
 
 // Mock the logger to prevent console noise and test logging calls
 vi.mock("../../../utils/logger", () => {
@@ -59,6 +60,11 @@ function createTestData(): Record<string, unknown> {
         url: "https://example.com",
     };
 }
+
+const createMonitorConfig = (
+    config: Record<PropertyKey, unknown>
+): MonitorServiceConfig & Record<PropertyKey, unknown> =>
+    config as MonitorServiceConfig & Record<PropertyKey, unknown>;
 
 describe("MigrationSystem - Comprehensive Coverage", () => {
     beforeEach(() => {
@@ -1067,7 +1073,10 @@ describe("MigrationSystem - Comprehensive Coverage", () => {
                 await annotate("Category: Service", "category");
                 await annotate("Type: Business Logic", "type");
 
-                const data = { host: "localhost", port: "8080" };
+                const data = createMonitorConfig({
+                    host: "localhost",
+                    port: "8080",
+                });
                 const result =
                     await exampleMigrations.portV1_0_to_1_1.transform(data);
 
@@ -1083,7 +1092,10 @@ describe("MigrationSystem - Comprehensive Coverage", () => {
                 await annotate("Category: Service", "category");
                 await annotate("Type: Business Logic", "type");
 
-                const data = { host: "localhost", port: 8080 };
+                const data = createMonitorConfig({
+                    host: "localhost",
+                    port: 8080,
+                });
                 const result =
                     await exampleMigrations.portV1_0_to_1_1.transform(data);
 
@@ -1102,7 +1114,10 @@ describe("MigrationSystem - Comprehensive Coverage", () => {
                 await annotate("Category: Service", "category");
                 await annotate("Type: Business Logic", "type");
 
-                const data = { host: "localhost", port: "invalid" };
+                const data = createMonitorConfig({
+                    host: "localhost",
+                    port: "invalid",
+                });
 
                 expect(() =>
                     exampleMigrations.portV1_0_to_1_1.transform(data)
@@ -1118,7 +1133,10 @@ describe("MigrationSystem - Comprehensive Coverage", () => {
                 await annotate("Category: Service", "category");
                 await annotate("Type: Business Logic", "type");
 
-                const data = { host: "localhost", port: 70_000 };
+                const data = createMonitorConfig({
+                    host: "localhost",
+                    port: 70_000,
+                });
 
                 expect(() =>
                     exampleMigrations.portV1_0_to_1_1.transform(data)
@@ -1131,7 +1149,10 @@ describe("MigrationSystem - Comprehensive Coverage", () => {
                 await annotate("Category: Service", "category");
                 await annotate("Type: Business Logic", "type");
 
-                const data = { host: "localhost", port: -1 };
+                const data = createMonitorConfig({
+                    host: "localhost",
+                    port: -1,
+                });
 
                 expect(() =>
                     exampleMigrations.portV1_0_to_1_1.transform(data)
@@ -1147,7 +1168,10 @@ describe("MigrationSystem - Comprehensive Coverage", () => {
                 await annotate("Category: Service", "category");
                 await annotate("Type: Business Logic", "type");
 
-                const data = { host: "localhost", port: true };
+                const data = createMonitorConfig({
+                    host: "localhost",
+                    port: true,
+                });
 
                 expect(() =>
                     exampleMigrations.portV1_0_to_1_1.transform(data)
@@ -1165,12 +1189,18 @@ describe("MigrationSystem - Comprehensive Coverage", () => {
                 await annotate("Category: Service", "category");
                 await annotate("Type: Business Logic", "type");
 
-                const data1 = { host: "localhost", port: "1" };
+                const data1 = createMonitorConfig({
+                    host: "localhost",
+                    port: "1",
+                });
                 const result1 =
                     await exampleMigrations.portV1_0_to_1_1.transform(data1);
                 expect(result1["port"]).toBe(1);
 
-                const data2 = { host: "localhost", port: 65_535 };
+                const data2 = createMonitorConfig({
+                    host: "localhost",
+                    port: 65_535,
+                });
                 const result2 =
                     await exampleMigrations.portV1_0_to_1_1.transform(data2);
                 expect(result2["port"]).toBe(65_535);
@@ -1236,7 +1266,10 @@ describe("MigrationSystem - Comprehensive Coverage", () => {
             expect(httpResult.data?.["timeout"]).toBe(30_000);
 
             // Test port migration
-            const portData = { host: "localhost", port: "8080" };
+            const portData = createMonitorConfig({
+                host: "localhost",
+                port: "8080",
+            });
             const portResult = await orchestrator.migrateMonitorData(
                 "port",
                 portData,

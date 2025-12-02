@@ -18,7 +18,7 @@
  *
  * **Extension Guidelines:** When adding new monitor types:
  *
- * 1. Extend MonitorConfig with type-specific options if needed
+ * 1. Extend MonitorServiceConfig with type-specific options if needed
  * 2. Ensure MonitorCheckResult covers new result formats
  * 3. Update documentation with new examples
  * 4. Add default value constants to appropriate files
@@ -41,7 +41,8 @@
  *
  * @see {@link Site} in shared/types for complete interface definition
  */
-import type { Site } from "@shared/types";
+import type { Monitor, MonitorType, Site } from "@shared/types";
+import type { Simplify, UnknownRecord } from "type-fest";
 
 /**
  * Interface for monitor services that perform health checks.
@@ -96,7 +97,7 @@ export interface IMonitorService {
      *
      * @param config - Partial configuration to update
      */
-    updateConfig: (config: Partial<MonitorConfig>) => void;
+    updateConfig: (config: Partial<MonitorServiceConfig>) => void;
 }
 
 /**
@@ -151,6 +152,23 @@ export interface MonitorCheckResult {
 }
 
 /**
+ * Partial monitor configuration accepted by registry helpers and migrations.
+ *
+ * @remarks
+ * Represents monitor data prior to persistence where required monitor lifecycle
+ * fields (e.g., `history`, `type`) may not yet be populated. Used by the
+ * monitor type registry and migration system to normalize payloads derived from
+ * renderer forms.
+ */
+export type MonitorConfigurationInput = Simplify<
+    Partial<Omit<Monitor, "history" | "type">> &
+        UnknownRecord & {
+            /** Optional history collection supplied by advanced flows. */
+            history?: Monitor["history"];
+        }
+>;
+
+/**
  * Configuration for monitor check behavior.
  *
  * @remarks
@@ -159,7 +177,9 @@ export interface MonitorCheckResult {
  *
  * @public
  */
-export interface MonitorConfig {
+export interface MonitorServiceConfig
+    extends MonitorConfigurationInput,
+        Record<PropertyKey, unknown> {
     /**
      * Request timeout in milliseconds.
      *
@@ -170,15 +190,26 @@ export interface MonitorConfig {
      * @defaultValue 10000 (10 seconds)
      */
     timeout?: number;
-
-    /**
-     * User agent string for HTTP requests.
-     *
-     * @remarks
-     * Identifies the monitoring application in HTTP request headers. Some
-     * servers may use this for logging or access control.
-     *
-     * @defaultValue "Uptime-Watcher/1.0"
-     */
     userAgent?: string;
 }
+
+/**
+ * Fully-typed monitor configuration emitted by registry helpers.
+ *
+ * @remarks
+ * Extends {@link MonitorConfigurationInput} with a resolved monitor type to
+ * guarantee consumers operate on a strongly typed payload while still allowing
+ * optional overrides for the remaining monitor fields.
+ */
+export type MonitorConfiguration = Simplify<
+    MonitorConfigurationInput & {
+        /** Discriminant monitor type derived from the registry. */
+        type: MonitorType;
+    }
+>;
+
+/**
+ * Deprecated: Use {@link MonitorServiceConfig}. Retained for backward-compatible
+ * test helpers.
+ */
+export type MonitorConfig = MonitorServiceConfig;

@@ -10,8 +10,6 @@
 
 /* eslint-disable tsdoc-require/require -- This module has comprehensive TSDoc coverage, but the tsdoc-require rule currently mis-detects documentation on normalizeMonitor due to nearby directives and complex comments. */
 
-import type { UnknownRecord } from "type-fest";
-
 import {
     DEFAULT_MONITOR_CHECK_INTERVAL_MS,
     MIN_MONITOR_CHECK_INTERVAL_MS,
@@ -414,12 +412,12 @@ function filterMonitorFieldsByType(
     const allowedFields = getAllowedFieldsForMonitorType(type);
     const filtered: Partial<Monitor> = {};
 
-    // Only include fields that are allowed for this monitor type
-    // Use type assertion to safely access monitor properties
-    const monitorRecord = monitor as UnknownRecord;
-    for (const [key, value] of Object.entries(monitorRecord)) {
+    // Only include fields that are allowed for this monitor type. We keep
+    // the external signature strongly typed while using a local record cast
+    // to perform dynamic key assignment.
+    for (const [key, value] of Object.entries(monitor)) {
         if (allowedFields.has(key)) {
-            (filtered as UnknownRecord)[key] = value;
+            (filtered as Record<string, unknown>)[key] = value;
         }
     }
 
@@ -448,19 +446,19 @@ function validateMonitorInput(monitor: Partial<Monitor>): void {
  */
 function applyHttpMonitorDefaults(
     monitor: Monitor,
-    filteredData: UnknownRecord
+    filteredData: Partial<Monitor>
 ): void {
-    const urlValue = filteredData["url"];
+    const urlValue = filteredData.url;
     monitor.url = ensureTrimmedStringOrFallback(urlValue, HTTP_DEFAULT_URL);
 }
 
 function applyHttpKeywordMonitorDefaults(
     monitor: Monitor,
-    filteredData: UnknownRecord
+    filteredData: Partial<Monitor>
 ): void {
     applyHttpMonitorDefaults(monitor, filteredData);
 
-    const keywordValue = filteredData["bodyKeyword"];
+    const keywordValue = filteredData.bodyKeyword;
     if (typeof keywordValue === "string" && keywordValue.trim()) {
         monitor.bodyKeyword = keywordValue.trim();
     } else {
@@ -470,11 +468,11 @@ function applyHttpKeywordMonitorDefaults(
 
 function applyHttpStatusMonitorDefaults(
     monitor: Monitor,
-    filteredData: UnknownRecord
+    filteredData: Partial<Monitor>
 ): void {
     applyHttpMonitorDefaults(monitor, filteredData);
 
-    const statusValue = filteredData["expectedStatusCode"];
+    const statusValue = filteredData.expectedStatusCode;
     if (typeof statusValue === "number" && Number.isFinite(statusValue)) {
         const clamped = Math.trunc(statusValue);
         monitor.expectedStatusCode = Math.min(599, Math.max(100, clamped));
@@ -488,11 +486,11 @@ function applyHttpStatusMonitorDefaults(
  */
 function applyPortMonitorDefaults(
     monitor: Monitor,
-    filteredData: UnknownRecord
+    filteredData: Partial<Monitor>
 ): void {
     // Port monitors require host and port
-    const hostValue = filteredData["host"];
-    const portValue = filteredData["port"];
+    const hostValue = filteredData.host;
+    const portValue = filteredData.port;
 
     monitor.host = isNonEmptyString(hostValue) ? hostValue : "localhost";
     monitor.port = isValidPort(portValue) ? Number(portValue) : 80;
@@ -503,7 +501,7 @@ function applyPortMonitorDefaults(
  */
 function applySslMonitorDefaults(
     monitor: Monitor,
-    filteredData: UnknownRecord
+    filteredData: Partial<Monitor>
 ): void {
     const {
         certificateWarningDays: warningValue,
@@ -530,7 +528,7 @@ function applySslMonitorDefaults(
  */
 function applyPingMonitorDefaults(
     monitor: Monitor,
-    filteredData: UnknownRecord
+    filteredData: Partial<Monitor>
 ): void {
     const { host: hostValue } = filteredData as { host?: unknown };
     monitor.host = isNonEmptyString(hostValue) ? hostValue : "localhost";
@@ -541,7 +539,7 @@ function applyPingMonitorDefaults(
  */
 function applyDnsMonitorDefaults(
     monitor: Monitor,
-    filteredData: UnknownRecord
+    filteredData: Partial<Monitor>
 ): void {
     const {
         expectedValue,
@@ -574,7 +572,7 @@ function applyDnsMonitorDefaults(
  */
 function applyHttpHeaderMonitorDefaults(
     monitor: Monitor,
-    filteredData: UnknownRecord
+    filteredData: Partial<Monitor>
 ): void {
     applyHttpMonitorDefaults(monitor, filteredData);
 
@@ -598,7 +596,7 @@ function applyHttpHeaderMonitorDefaults(
  */
 function applyHttpJsonMonitorDefaults(
     monitor: Monitor,
-    filteredData: UnknownRecord
+    filteredData: Partial<Monitor>
 ): void {
     applyHttpMonitorDefaults(monitor, filteredData);
 
@@ -623,7 +621,7 @@ function applyHttpJsonMonitorDefaults(
  */
 function applyHttpLatencyMonitorDefaults(
     monitor: Monitor,
-    filteredData: UnknownRecord
+    filteredData: Partial<Monitor>
 ): void {
     applyHttpMonitorDefaults(monitor, filteredData);
 
@@ -653,14 +651,18 @@ function applyHttpLatencyMonitorDefaults(
  */
 function applyWebsocketKeepaliveMonitorDefaults(
     monitor: Monitor,
-    filteredData: UnknownRecord
+    filteredData: Partial<Monitor>
 ): void {
     monitor.url = ensureTrimmedStringOrFallback(
-        filteredData["url"],
+        filteredData.url,
         WEBSOCKET_KEEPALIVE_DEFAULT_URL
     );
 
-    const maxPongDelayValue = filteredData["maxPongDelayMs"];
+    const maxPongDelayValue = (
+        filteredData as {
+            maxPongDelayMs?: unknown;
+        }
+    ).maxPongDelayMs;
     let maxPongDelay = WEBSOCKET_KEEPALIVE_DEFAULT_MAX_PONG_MS;
     if (
         typeof maxPongDelayValue === "number" &&
@@ -683,26 +685,30 @@ function applyWebsocketKeepaliveMonitorDefaults(
  */
 function applyServerHeartbeatMonitorDefaults(
     monitor: Monitor,
-    filteredData: UnknownRecord
+    filteredData: Partial<Monitor>
 ): void {
     monitor.url = ensureTrimmedStringOrFallback(
-        filteredData["url"],
+        filteredData.url,
         SERVER_HEARTBEAT_DEFAULT_URL
     );
     monitor.heartbeatStatusField = ensureTrimmedStringOrFallback(
-        filteredData["heartbeatStatusField"],
+        filteredData.heartbeatStatusField,
         SERVER_HEARTBEAT_DEFAULT_STATUS_FIELD
     );
     monitor.heartbeatTimestampField = ensureTrimmedStringOrFallback(
-        filteredData["heartbeatTimestampField"],
+        filteredData.heartbeatTimestampField,
         SERVER_HEARTBEAT_DEFAULT_TIMESTAMP_FIELD
     );
     monitor.heartbeatExpectedStatus = ensureTrimmedStringOrFallback(
-        filteredData["heartbeatExpectedStatus"],
+        filteredData.heartbeatExpectedStatus,
         SERVER_HEARTBEAT_DEFAULT_EXPECTED_STATUS
     );
 
-    const maxDriftValue = filteredData["heartbeatMaxDriftSeconds"];
+    const maxDriftValue = (
+        filteredData as {
+            heartbeatMaxDriftSeconds?: unknown;
+        }
+    ).heartbeatMaxDriftSeconds;
     let maxDrift = SERVER_HEARTBEAT_DEFAULT_MAX_DRIFT_SECONDS;
     if (typeof maxDriftValue === "number" && Number.isFinite(maxDriftValue)) {
         maxDrift = Math.trunc(maxDriftValue);
@@ -725,22 +731,26 @@ function applyServerHeartbeatMonitorDefaults(
  */
 function applyReplicationMonitorDefaults(
     monitor: Monitor,
-    filteredData: UnknownRecord
+    filteredData: Partial<Monitor>
 ): void {
     monitor.primaryStatusUrl = ensureTrimmedStringOrFallback(
-        filteredData["primaryStatusUrl"],
+        filteredData.primaryStatusUrl,
         REPLICATION_DEFAULT_PRIMARY_URL
     );
     monitor.replicaStatusUrl = ensureTrimmedStringOrFallback(
-        filteredData["replicaStatusUrl"],
+        filteredData.replicaStatusUrl,
         REPLICATION_DEFAULT_REPLICA_URL
     );
     monitor.replicationTimestampField = ensureTrimmedStringOrFallback(
-        filteredData["replicationTimestampField"],
+        filteredData.replicationTimestampField,
         REPLICATION_DEFAULT_TIMESTAMP_FIELD
     );
 
-    const maxLagValue = filteredData["maxReplicationLagSeconds"];
+    const maxLagValue = (
+        filteredData as {
+            maxReplicationLagSeconds?: unknown;
+        }
+    ).maxReplicationLagSeconds;
     let maxLagSeconds = REPLICATION_DEFAULT_MAX_LAG_SECONDS;
     if (typeof maxLagValue === "number" && Number.isFinite(maxLagValue)) {
         maxLagSeconds = Math.trunc(maxLagValue);
@@ -763,14 +773,14 @@ function applyReplicationMonitorDefaults(
  */
 function applyCdnEdgeConsistencyMonitorDefaults(
     monitor: Monitor,
-    filteredData: UnknownRecord
+    filteredData: Partial<Monitor>
 ): void {
     monitor.baselineUrl = ensureTrimmedStringOrFallback(
-        filteredData["baselineUrl"],
+        filteredData.baselineUrl,
         CDN_EDGE_DEFAULT_BASELINE_URL
     );
     monitor.edgeLocations = ensureTrimmedStringOrFallback(
-        filteredData["edgeLocations"],
+        filteredData.edgeLocations,
         CDN_EDGE_DEFAULT_EDGE_LOCATIONS
     );
 }
@@ -780,7 +790,7 @@ function applyCdnEdgeConsistencyMonitorDefaults(
  */
 function applyTypeSpecificDefaults(
     monitor: Monitor,
-    filteredData: UnknownRecord
+    filteredData: Partial<Monitor>
 ): void {
     switch (monitor.type) {
         case "cdn-edge-consistency": {
@@ -863,61 +873,52 @@ function applyTypeSpecificDefaults(
  *
  * @public
  */
-/* eslint-disable @typescript-eslint/no-unsafe-type-assertion -- Safe: Dynamic property access with runtime validation after filtering */
+
 export function normalizeMonitor(monitor: Partial<Monitor>): Monitor {
     // Validate input data
     validateMonitorInput(monitor);
-
-    // Cast to unknown first to avoid strict type issues with Partial<Monitor>
-    const monitorData = monitor as unknown as UnknownRecord;
-    const finalizedType = validateMonitorType(monitorData["type"]);
+    const finalizedType = validateMonitorType(monitor.type);
 
     // Filter the monitor data to only include fields appropriate for this type
     const filteredMonitor = filterMonitorFieldsByType(monitor, finalizedType);
 
-    // Cast filtered monitor for safe access
-    const filteredData = filteredMonitor as unknown as UnknownRecord;
-
     // Generate a valid ID - handle empty strings as falsy
-    const rawId = filteredData["id"] as string | undefined;
+    const rawId = filteredMonitor.id;
     const validId = isNonEmptyString(rawId) ? rawId : crypto.randomUUID();
 
     const monitorTypeDefaults = getMonitorTypeDefaults(finalizedType);
 
     // Build base monitor object with guaranteed required fields
     const baseMonitor: Monitor = {
-        activeOperations: Array.isArray(filteredData["activeOperations"])
-            ? (filteredData["activeOperations"] as string[])
+        activeOperations: Array.isArray(filteredMonitor.activeOperations)
+            ? filteredMonitor.activeOperations
             : BASE_MONITOR_DEFAULTS.activeOperations,
         checkInterval: safeInteger(
-            filteredData["checkInterval"] as number | undefined,
+            filteredMonitor.checkInterval,
             monitorTypeDefaults.checkInterval,
             MIN_MONITOR_CHECK_INTERVAL_MS
         ),
-        history: Array.isArray(filteredData["history"])
-            ? (filteredData["history"] as Monitor["history"])
+        history: Array.isArray(filteredMonitor.history)
+            ? filteredMonitor.history
             : BASE_MONITOR_DEFAULTS.history,
         id: validId,
-        monitoring:
-            (filteredData["monitoring"] as boolean | undefined) ??
-            monitorTypeDefaults.enabled,
+        monitoring: filteredMonitor.monitoring ?? monitorTypeDefaults.enabled,
         responseTime:
-            typeof filteredData["responseTime"] === "number"
-                ? filteredData["responseTime"]
+            typeof filteredMonitor.responseTime === "number"
+                ? filteredMonitor.responseTime
                 : BASE_MONITOR_DEFAULTS.responseTime,
         retryAttempts: safeInteger(
-            filteredData["retryAttempts"] as number | undefined,
+            filteredMonitor.retryAttempts,
             monitorTypeDefaults.retryAttempts,
             0,
             10
         ),
         status:
-            filteredData["status"] &&
-            isMonitorStatus(filteredData["status"] as string)
-                ? (filteredData["status"] as Monitor["status"])
+            filteredMonitor.status && isMonitorStatus(filteredMonitor.status)
+                ? filteredMonitor.status
                 : BASE_MONITOR_DEFAULTS.status,
         timeout: safeInteger(
-            filteredData["timeout"] as number | undefined,
+            filteredMonitor.timeout,
             monitorTypeDefaults.timeout,
             1000,
             300_000
@@ -926,18 +927,17 @@ export function normalizeMonitor(monitor: Partial<Monitor>): Monitor {
     };
 
     // Apply type-specific defaults
-    applyTypeSpecificDefaults(baseMonitor, filteredData);
+    applyTypeSpecificDefaults(baseMonitor, filteredMonitor);
 
     // Add optional fields that were provided and valid
-    if (filteredData["lastChecked"] instanceof Date) {
-        baseMonitor.lastChecked = filteredData["lastChecked"];
+    if (filteredMonitor.lastChecked instanceof Date) {
+        baseMonitor.lastChecked = filteredMonitor.lastChecked;
     }
 
     return baseMonitor;
 }
 
 /* eslint-enable tsdoc-require/require -- Re-enable after normalizeMonitor documentation */
-/* eslint-enable @typescript-eslint/no-unsafe-type-assertion -- Re-enable after safe monitor configuration type assertions */
 
 /**
  * Creates a default monitor for a site.

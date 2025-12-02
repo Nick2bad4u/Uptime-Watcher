@@ -5,7 +5,7 @@
 
 /* eslint-disable ex/no-unhandled -- Monitor factory construction is deterministic and safe */
 
-import type { MonitorConfig } from "./types";
+import type { MonitorServiceConfig } from "./types";
 
 import {
     createHttpMonitorService,
@@ -36,7 +36,7 @@ const behavior: HttpMonitorBehavior<"http", undefined> = {
 };
 
 const HttpMonitorBase: new (
-    config?: MonitorConfig
+    config?: MonitorServiceConfig
 ) => HttpMonitorServiceInstance = buildMonitorFactory(
     () => createHttpMonitorService<"http", undefined>(behavior),
     "HttpMonitor"

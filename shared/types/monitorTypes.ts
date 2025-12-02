@@ -7,6 +7,7 @@
  */
 
 import type { MonitorFieldDefinition } from "@shared/types";
+import type { UnknownRecord } from "type-fest";
 
 /**
  * Shared representation of a monitor type configuration used by frontend and
@@ -173,9 +174,7 @@ const isAllowedFieldType = (
  *
  * @returns `true` when the candidate is a non-null object without an array tag.
  */
-const isPlainObject = (
-    candidate: unknown
-): candidate is Record<string, unknown> =>
+const isPlainObject = (candidate: unknown): candidate is UnknownRecord =>
     typeof candidate === "object" &&
     candidate !== null &&
     !Array.isArray(candidate);

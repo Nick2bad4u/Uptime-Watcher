@@ -11,6 +11,49 @@
 import type { HttpMethod, MonitorType } from "@shared/types";
 import type { UnknownRecord } from "type-fest";
 
+import type { RequireAllOrNoneFields } from "./typeUtils";
+
+interface HeaderExpectationShape {
+    /** Expected header value to compare against */
+    expectedHeaderValue?: string;
+    /** Header name to inspect */
+    headerName?: string;
+}
+
+type HeaderExpectationFields = RequireAllOrNoneFields<HeaderExpectationShape>;
+
+interface JsonExpectationShape {
+    /** Expected value for the JSON path */
+    expectedJsonValue?: string;
+    /** JSON path to evaluate */
+    jsonPath?: string;
+}
+
+type JsonExpectationFields = RequireAllOrNoneFields<JsonExpectationShape>;
+
+const isNonEmptyString = (value: unknown): value is string =>
+    typeof value === "string" && value.trim().length > 0;
+
+interface ReplicationMonitorRequirementShape {
+    maxReplicationLagSeconds?: number;
+    primaryStatusUrl?: string;
+    replicaStatusUrl?: string;
+    replicationTimestampField?: string;
+}
+
+type ReplicationMonitorRequirementFields =
+    RequireAllOrNoneFields<ReplicationMonitorRequirementShape>;
+
+interface HeartbeatMonitorRequirementShape {
+    heartbeatExpectedStatus?: string;
+    heartbeatMaxDriftSeconds?: number;
+    heartbeatStatusField?: string;
+    heartbeatTimestampField?: string;
+}
+
+type HeartbeatMonitorRequirementFields =
+    RequireAllOrNoneFields<HeartbeatMonitorRequirementShape>;
+
 /**
  * Base monitor fields common to all monitor types.
  *
@@ -50,28 +93,28 @@ export interface HttpMonitorFields extends BaseMonitorFields {
  *
  * @public
  */
-export interface HttpHeaderMonitorFields extends BaseMonitorFields {
-    /** Expected header value to compare against */
-    expectedHeaderValue: string;
-    /** Header name to inspect */
-    headerName: string;
-    /** URL to monitor */
-    url: string;
-}
+/**
+ * Configuration fields for HTTP header monitors.
+ */
+export type HttpHeaderMonitorFields = BaseMonitorFields &
+    HeaderExpectationFields & {
+        /** URL to monitor */
+        url: string;
+    };
 
 /**
  * HTTP JSON monitor specific fields.
  *
  * @public
  */
-export interface HttpJsonMonitorFields extends BaseMonitorFields {
-    /** Expected value for the JSON path */
-    expectedJsonValue: string;
-    /** JSON path to evaluate */
-    jsonPath: string;
-    /** URL to monitor */
-    url: string;
-}
+/**
+ * Configuration fields for HTTP JSON monitors.
+ */
+export type HttpJsonMonitorFields = BaseMonitorFields &
+    JsonExpectationFields & {
+        /** URL to monitor */
+        url: string;
+    };
 
 /**
  * HTTP latency monitor specific fields.
@@ -228,34 +271,19 @@ export interface CdnEdgeConsistencyMonitorFields extends BaseMonitorFields {
  *
  * @public
  */
-export interface ReplicationMonitorFields extends BaseMonitorFields {
-    /** Maximum allowed replication lag in seconds */
-    maxReplicationLagSeconds: number;
-    /** Primary status endpoint URL */
-    primaryStatusUrl: string;
-    /** Replica status endpoint URL */
-    replicaStatusUrl: string;
-    /** JSON path to the replication timestamp field */
-    replicationTimestampField: string;
-}
+export type ReplicationMonitorFields = BaseMonitorFields &
+    ReplicationMonitorRequirementFields;
 
 /**
  * Server heartbeat monitor specific fields.
  *
  * @public
  */
-export interface ServerHeartbeatMonitorFields extends BaseMonitorFields {
-    /** Expected heartbeat status value */
-    heartbeatExpectedStatus: string;
-    /** Maximum allowed heartbeat drift in seconds */
-    heartbeatMaxDriftSeconds: number;
-    /** JSON path to the heartbeat status field */
-    heartbeatStatusField: string;
-    /** JSON path to the heartbeat timestamp field */
-    heartbeatTimestampField: string;
-    /** Heartbeat endpoint URL */
-    url: string;
-}
+export type ServerHeartbeatMonitorFields = BaseMonitorFields &
+    HeartbeatMonitorRequirementFields & {
+        /** Heartbeat endpoint URL */
+        url: string;
+    };
 
 /**
  * WebSocket keepalive monitor specific fields.
@@ -569,9 +597,12 @@ export function isReplicationMonitorFields(
         "primaryStatusUrl" in fields &&
         "replicaStatusUrl" in fields &&
         "replicationTimestampField" in fields &&
-        typeof fields.primaryStatusUrl === "string" &&
-        typeof fields.replicaStatusUrl === "string" &&
-        typeof fields.replicationTimestampField === "string"
+        "maxReplicationLagSeconds" in fields &&
+        isNonEmptyString(fields.primaryStatusUrl) &&
+        isNonEmptyString(fields.replicaStatusUrl) &&
+        isNonEmptyString(fields.replicationTimestampField) &&
+        typeof fields.maxReplicationLagSeconds === "number" &&
+        Number.isFinite(fields.maxReplicationLagSeconds)
     );
 }
 
@@ -595,9 +626,14 @@ export function isServerHeartbeatMonitorFields(
         "url" in fields &&
         "heartbeatStatusField" in fields &&
         "heartbeatTimestampField" in fields &&
-        typeof fields.url === "string" &&
-        typeof fields.heartbeatStatusField === "string" &&
-        typeof fields.heartbeatTimestampField === "string"
+        "heartbeatExpectedStatus" in fields &&
+        "heartbeatMaxDriftSeconds" in fields &&
+        isNonEmptyString(fields.url) &&
+        isNonEmptyString(fields.heartbeatStatusField) &&
+        isNonEmptyString(fields.heartbeatTimestampField) &&
+        isNonEmptyString(fields.heartbeatExpectedStatus) &&
+        typeof fields.heartbeatMaxDriftSeconds === "number" &&
+        Number.isFinite(fields.heartbeatMaxDriftSeconds)
     );
 }
 

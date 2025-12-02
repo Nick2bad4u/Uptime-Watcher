@@ -9,7 +9,7 @@ import {
     getEventPriority,
     EVENT_CATEGORIES,
     EVENT_PRIORITIES,
-    type UptimeEvents,
+    type UptimeEventName,
 } from "../../events/eventTypes.js";
 
 describe("eventTypes - Comprehensive Coverage", () => {
@@ -661,7 +661,7 @@ describe("eventTypes - Comprehensive Coverage", () => {
                 const categories = Object.keys(
                     EVENT_CATEGORIES
                 ) as (keyof typeof EVENT_CATEGORIES)[];
-                const testEvent = "site:added" as keyof UptimeEvents;
+                const testEvent = "site:added" as UptimeEventName;
 
                 for (const category of categories) {
                     const result = isEventOfCategory(testEvent, category);
@@ -765,7 +765,7 @@ describe("eventTypes - Comprehensive Coverage", () => {
 
                 // Test completely unknown events (though they wouldn't exist in real UptimeEvents)
                 expect(
-                    getEventPriority("unknown:event" as keyof UptimeEvents)
+                    getEventPriority("unknown:event" as UptimeEventName)
                 ).toBe("MEDIUM");
             });
         });
@@ -788,7 +788,7 @@ describe("eventTypes - Comprehensive Coverage", () => {
                 // Test each event returns its correct priority
                 for (const eventName of uniqueEvents) {
                     const priority = getEventPriority(
-                        eventName as keyof UptimeEvents
+                        eventName as UptimeEventName
                     );
                     expect([
                         "CRITICAL",
@@ -811,7 +811,7 @@ describe("eventTypes - Comprehensive Coverage", () => {
                 );
 
                 // Test a selection of events from each category to ensure comprehensive coverage
-                const testEvents: (keyof UptimeEvents)[] = [
+                const testEvents: UptimeEventName[] = [
                     // CACHE
                     "cache:invalidated",
                     // CONFIG
@@ -883,7 +883,7 @@ describe("eventTypes - Comprehensive Coverage", () => {
             );
 
             // This test ensures types work correctly
-            const eventName: keyof UptimeEvents = "site:added";
+            const eventName: UptimeEventName = "site:added";
             const category: keyof typeof EVENT_CATEGORIES = "SITE";
 
             expect(isEventOfCategory(eventName, category)).toBeTruthy();

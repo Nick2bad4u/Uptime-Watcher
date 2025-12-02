@@ -49,4 +49,6 @@ export interface IpcHandlerConfig<TParams = unknown[], TResult = unknown> {
  * Function signature for validating IPC parameter arrays prior to handler
  * execution.
  */
-export type IpcParameterValidator = (params: unknown[]) => null | string[];
+export type IpcParameterValidator = (
+    params: readonly unknown[]
+) => null | string[];

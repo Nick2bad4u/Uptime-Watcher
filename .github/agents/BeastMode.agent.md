@@ -33,7 +33,7 @@ handoffs:
    prompt: Continue working on the ToDo list items. You have unlimited compute and resources, accomplish the rest of the todo list. Follow the plan in .github/prompts/Continue.prompt.md
  - label: Continue[No-Prompt]
    agent: BeastMode
-   prompt: Continue working on the ToDo list items. You have unlimited compute and resources, work on accomplishing the rest of the todo list. Use your own judgement and keep going as long as needed. Finish all tasks properly and thoroughly according to best practices. No shortcuts, no stubbing, no half-measures. Do whatever it takes to get everything done perfectly.
+   prompt: Continue working. You have unlimited compute and resources, work on accomplishing the rest of the tasks. Use your own judgement and keep going as long as needed. Finish all tasks properly and thoroughly according to best practices. No shortcuts, no stubbing, no half-measures. Do whatever it takes to get everything done perfectly.
    send: true
  - label: Review
    agent: BeastMode

@@ -1062,6 +1062,9 @@
     padding: 4rem 0;
     background: #0a0a0a;
     border-block-start: 1px solid #333333;
+    max-inline-size: 100%;
+    /* Prevent horizontal overflow on mobile */
+    overflow-inline: hidden;
 }
 
 .techContent {
@@ -1069,6 +1072,9 @@
     align-items: center;
     gap: 4rem;
     grid-template-columns: 1fr 1fr;
+    /* Prevent content from expanding beyond container */
+    max-inline-size: 100%;
+    min-inline-size: 0;
 }
 
 .techInfo h2 {
@@ -1251,6 +1257,9 @@
     display: flex;
     align-items: flex-start;
     justify-content: center;
+    /* Prevent code block from expanding beyond container */
+    max-inline-size: 100%;
+    min-inline-size: 0;
 }
 
 /* Code Block */
@@ -1260,6 +1269,9 @@
     border: 1px solid #333333;
     border-radius: 8px;
     background: #1a1a1a;
+    /* Prevent code block from expanding beyond container */
+    max-inline-size: 100%;
+    min-inline-size: 0;
     transition: all 0.4s ease;
 
     /* Add matrix-style effect */
@@ -1416,12 +1428,16 @@
 }
 
 .codeContent {
+    box-sizing: border-box;
     padding: 1.5rem;
     margin: 0;
     color: #ffffff;
     font-family: "SF Mono", Consolas, "Liberation Mono", Menlo, monospace;
     font-size: 0.85rem;
     line-height: 1.5;
+    /* Ensure code block doesn't expand beyond container on mobile */
+    max-inline-size: 100%;
+    overflow-block: hidden;
     overflow-inline: auto;
     overscroll-behavior: contain;
     scrollbar-gutter: stable;
@@ -1477,6 +1493,69 @@
     .secondaryButton {
         inline-size: 100%;
         text-align: center;
+    }
+
+    /* ================================================== */
+    /* 📱 TECH SECTION MOBILE OVERFLOW FIX               */
+    /* ================================================== */
+
+    /**
+     * Prevent the tech section from causing horizontal overflow on mobile.
+     * The code block and tech features need proper width constraints.
+     */
+    .techSection {
+        overflow-inline: hidden;
+    }
+
+    .techContent {
+        max-inline-size: 100%;
+        overflow-inline: hidden;
+    }
+
+    .techInfo {
+        max-inline-size: 100%;
+        overflow-wrap: break-word;
+    }
+
+    .techFeatures {
+        max-inline-size: 100%;
+    }
+
+    .techFeature {
+        max-inline-size: 100%;
+        overflow-wrap: break-word;
+    }
+
+    .techCode {
+        max-inline-size: 100%;
+        overflow-inline: hidden;
+    }
+
+    .codeBlock {
+        max-inline-size: 100%;
+        overflow-inline: auto;
+        overscroll-behavior: contain;
+        scrollbar-gutter: stable;
+    }
+
+    .codeContent {
+        font-size: 0.75rem;
+        max-inline-size: 100%;
+        overflow-inline: auto;
+        overflow-wrap: break-word;
+        overscroll-behavior: contain;
+        scrollbar-gutter: stable;
+        white-space: pre-wrap;
+    }
+
+    .codeHeader {
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .codeActions {
+        flex-wrap: wrap;
+        gap: 0.25rem;
     }
 }
 

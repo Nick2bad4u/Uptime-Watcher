@@ -7,7 +7,7 @@ import { describe, expect, it } from "vitest";
 import type {
     MonitorCheckResult,
     IMonitorService,
-    MonitorConfig,
+    MonitorServiceConfig,
 } from "../services/monitoring/types";
 import type { Site } from "@shared/types";
 
@@ -96,7 +96,9 @@ describe("Monitoring Types", () => {
                 getType(): Site["monitors"][0]["type"] {
                     return "http";
                 },
-                updateConfig: function (_config: Partial<MonitorConfig>): void {
+                updateConfig: function (
+                    _config: Partial<MonitorServiceConfig>
+                ): void {
                     throw new Error("Function not implemented.");
                 },
             };
@@ -140,7 +142,9 @@ describe("Monitoring Types", () => {
                 getType(): Site["monitors"][0]["type"] {
                     return "http";
                 },
-                updateConfig: function (_config: Partial<MonitorConfig>): void {
+                updateConfig: function (
+                    _config: Partial<MonitorServiceConfig>
+                ): void {
                     throw new Error("Function not implemented.");
                 },
             };
@@ -190,7 +194,9 @@ describe("Monitoring Types", () => {
                 getType(): Site["monitors"][0]["type"] {
                     return "port";
                 },
-                updateConfig: function (_config: Partial<MonitorConfig>): void {
+                updateConfig: function (
+                    _config: Partial<MonitorServiceConfig>
+                ): void {
                     throw new Error("Function not implemented.");
                 },
             };
@@ -203,14 +209,14 @@ describe("Monitoring Types", () => {
         });
     });
 
-    describe("MonitorConfig interface", () => {
+    describe("MonitorServiceConfig interface", () => {
         it("should create empty config", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitoringTypes", "component");
             await annotate("Category: Core", "category");
             await annotate("Type: Constructor", "type");
 
-            const config: MonitorConfig = {};
+            const config: MonitorServiceConfig = {};
 
             expect(config.timeout).toBeUndefined();
             expect(config.userAgent).toBeUndefined();
@@ -222,7 +228,7 @@ describe("Monitoring Types", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Constructor", "type");
 
-            const config: MonitorConfig = {
+            const config: MonitorServiceConfig = {
                 timeout: 5000,
             };
 
@@ -239,7 +245,7 @@ describe("Monitoring Types", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Constructor", "type");
 
-            const config: MonitorConfig = {
+            const config: MonitorServiceConfig = {
                 userAgent: "Test Agent/1.0",
             };
 
@@ -253,7 +259,7 @@ describe("Monitoring Types", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Constructor", "type");
 
-            const config: MonitorConfig = {
+            const config: MonitorServiceConfig = {
                 timeout: 10_000,
                 userAgent: "Uptime Watcher/1.0",
             };

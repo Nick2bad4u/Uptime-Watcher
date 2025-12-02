@@ -6,7 +6,7 @@
 
 import type { Monitor } from "@shared/types";
 
-import type { MonitorConfig } from "./types";
+import type { MonitorServiceConfig } from "./types";
 
 import { logger } from "../../utils/logger";
 import {
@@ -224,7 +224,7 @@ const behavior: HttpMonitorBehavior<
 };
 
 const HttpJsonMonitorBase: new (
-    config?: MonitorConfig
+    config?: MonitorServiceConfig
 ) => HttpMonitorServiceInstance = buildMonitorFactory(
     () =>
         createHttpMonitorService<

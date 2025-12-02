@@ -244,13 +244,16 @@ describe(DataBackupService, () => {
             );
             expect(mockEventEmitter.emitTyped).toHaveBeenCalledWith(
                 "database:error",
-                {
+                expect.objectContaining({
                     details:
                         "Failed to download backup: Backup creation failed",
-                    error: testError,
+                    error: expect.objectContaining({
+                        message: "Backup creation failed",
+                        name: "Error",
+                    }),
                     operation: "download-backup",
                     timestamp: expect.any(Number),
-                }
+                })
             );
         });
 
@@ -278,12 +281,15 @@ describe(DataBackupService, () => {
             );
             expect(mockEventEmitter.emitTyped).toHaveBeenCalledWith(
                 "database:error",
-                {
+                expect.objectContaining({
                     details: "Failed to download backup: String error message",
-                    error: new Error("String error message"),
+                    error: expect.objectContaining({
+                        message: "String error message",
+                        name: "Error",
+                    }),
                     operation: "download-backup",
                     timestamp: expect.any(Number),
-                }
+                })
             );
         });
 
@@ -341,12 +347,15 @@ describe(DataBackupService, () => {
             // Assert
             expect(mockEventEmitter.emitTyped).toHaveBeenCalledWith(
                 "database:error",
-                {
+                expect.objectContaining({
                     details: "Failed to download backup: Test error",
-                    error: testError,
+                    error: expect.objectContaining({
+                        message: "Test error",
+                        name: "Error",
+                    }),
                     operation: "download-backup",
                     timestamp: expect.any(Number),
-                }
+                })
             );
 
             const emittedEvent = mockEventEmitter.emitTyped.mock.calls[0]![1];

@@ -9,10 +9,10 @@ import {
     clearMonitorFactoryCache,
     updateMonitorConfig,
 } from "../../../services/monitoring/MonitorFactory";
-import type { MonitorConfig } from "../../../services/monitoring/types.js";
+import type { MonitorServiceConfig } from "../../../services/monitoring/types";
 
 describe("MonitorFactory - Fixed", () => {
-    let mockMonitorConfig: MonitorConfig;
+    let mockMonitorConfig: MonitorServiceConfig;
 
     beforeEach(() => {
         vi.clearAllMocks();

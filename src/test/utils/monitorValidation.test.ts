@@ -51,6 +51,7 @@ import {
     type MonitorCreationData,
 } from "../../utils/monitorValidation";
 import type { ValidationResult } from "@shared/types/validation";
+import type { HttpFormData } from "../../types/monitorFormData";
 
 // Import mocked functions
 import { withUtilityErrorHandling } from "@shared/utils/errorHandling";
@@ -805,7 +806,7 @@ describe("Monitor Validation Utilities", () => {
             const portResult = await validateMonitorField(
                 "port",
                 "port",
-                "invalid"
+                Number.NaN
             );
 
             expect(urlResult).toEqual(["URL field is invalid"]);
@@ -1664,7 +1665,7 @@ describe("Monitor Validation Utilities", () => {
 
             const result = await validateMonitorField(
                 "http",
-                longFieldName,
+                longFieldName as unknown as keyof HttpFormData,
                 "value"
             );
 
@@ -1697,7 +1698,7 @@ describe("Monitor Validation Utilities", () => {
 
             const result = await validateMonitorField(
                 "http",
-                specialFieldName,
+                specialFieldName as unknown as keyof HttpFormData,
                 "value"
             );
 

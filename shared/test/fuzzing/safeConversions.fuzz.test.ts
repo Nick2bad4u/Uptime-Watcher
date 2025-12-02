@@ -9,6 +9,7 @@
 import fc from "fast-check";
 import { test } from "@fast-check/vitest";
 import { describe, expect, it } from "vitest";
+import { MAX_TIMEOUT_MILLISECONDS } from "@shared/types/units";
 import {
     safeNumberConversion,
     safeParseCheckInterval,
@@ -115,12 +116,30 @@ describe("SafeConversions utilities fuzzing tests", () => {
             (value, customDefault) => {
                 const result = safeParseCheckInterval(value, customDefault);
 
-                if (typeof value === "number" && value >= 1000) {
-                    expect(result).toBe(value);
+                if (
+                    typeof value === "number" &&
+                    Number.isFinite(value) &&
+                    value >= 1000
+                ) {
+                    const normalized = Math.trunc(value);
+                    const expected = Math.min(
+                        normalized,
+                        MAX_TIMEOUT_MILLISECONDS
+                    );
+                    expect(result).toBe(expected);
                 } else if (typeof value === "string") {
                     const parsed = Number(value);
-                    if (!Number.isNaN(parsed) && parsed >= 1000) {
-                        expect(result).toBe(parsed);
+                    if (
+                        !Number.isNaN(parsed) &&
+                        Number.isFinite(parsed) &&
+                        parsed >= 1000
+                    ) {
+                        const normalized = Math.trunc(parsed);
+                        const expected = Math.min(
+                            normalized,
+                            MAX_TIMEOUT_MILLISECONDS
+                        );
+                        expect(result).toBe(expected);
                     } else {
                         expect(result).toBe(customDefault);
                     }
@@ -373,9 +392,9 @@ describe("SafeConversions utilities fuzzing tests", () => {
             fc
                 .float({ min: Math.fround(0.1), noNaN: true })
                 .filter((n) => Number.isFinite(n)),
-        ])("should return positive timeouts unchanged", (timeout) => {
+        ])("should clamp extremely large timeouts", (timeout) => {
             const result = safeParseTimeout(timeout);
-            expect(result).toBe(timeout);
+            expect(result).toBe(Math.min(timeout, MAX_TIMEOUT_MILLISECONDS));
         });
 
         test("should return default value for infinity", () => {

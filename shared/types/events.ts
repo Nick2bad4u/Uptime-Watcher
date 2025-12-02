@@ -11,10 +11,17 @@
 import type {
     Monitor,
     MonitoringOperationSummary,
+    MonitoringStartSummary,
+    MonitoringStopSummary,
     Site,
     StatusUpdate,
 } from "@shared/types";
-import type { UnknownRecord } from "type-fest";
+import type {
+    ExclusifyUnion,
+    Simplify,
+    Tagged,
+    UnknownRecord,
+} from "type-fest";
 
 import { siteSchema } from "@shared/validation/schemas";
 import * as z from "zod";
@@ -38,21 +45,33 @@ import {
  *
  * @public
  */
+export type CorrelationId = Tagged<string, "correlation-id">;
+
+/**
+ * Structured metadata describing the emission context for events.
+ */
 export interface EventMetadata {
     /** Identifier of the event bus that emitted the event. */
     readonly busId: string;
     /** Correlation identifier for pairing related emissions. */
-    readonly correlationId: string;
+    readonly correlationId: CorrelationId;
     /** Fully-qualified event name. */
     readonly eventName: string;
     /** Millisecond timestamp captured at emission time. */
     readonly timestamp: number;
 }
 
+const correlationIdSchema: z.ZodType<CorrelationId> = z
+    .string()
+    .min(1)
+    // Branding is purely a TypeScript concern; at runtime this remains a
+    // plain string suitable for JSON serialization.
+    .transform((value) => value as CorrelationId);
+
 export const eventMetadataSchema: z.ZodType<EventMetadata> = z
     .object({
         busId: z.string().min(1),
-        correlationId: z.string().min(1),
+        correlationId: correlationIdSchema,
         eventName: z.string().min(1),
         timestamp: z.number().int().nonnegative(),
     })
@@ -73,7 +92,10 @@ export const eventMetadataSchema: z.ZodType<EventMetadata> = z
  * Common base shape shared by all event payloads emitted through the typed
  * event bus.
  */
-export interface BaseEventData {
+export interface BaseEventData extends Record<PropertyKey, unknown> {
+    [key: string]: unknown;
+    [key: number]: unknown;
+    [key: symbol]: unknown;
     /** The time (in milliseconds since epoch) when the event occurred. */
     readonly timestamp: number;
     /** Runtime metadata describing the emission context. */
@@ -644,6 +666,30 @@ export interface MonitoringControlEventData extends BaseEventData {
 }
 
 /**
+ * Canonical payload for monitoring start events emitted to renderer listeners.
+ */
+export type MonitoringStartedEventData = Omit<
+    MonitoringControlEventData,
+    "monitorCount" | "siteCount" | "summary"
+> & {
+    readonly monitorCount: number;
+    readonly siteCount: number;
+    readonly summary?: MonitoringStartSummary;
+};
+
+/**
+ * Canonical payload for monitoring stop events emitted to renderer listeners.
+ */
+export type MonitoringStoppedEventData = Omit<
+    MonitoringControlEventData,
+    "activeMonitors" | "reason" | "summary"
+> & {
+    readonly activeMonitors: number;
+    readonly reason: MonitoringControlReason;
+    readonly summary?: MonitoringStopSummary;
+};
+
+/**
  * Payload for events when a monitor comes back up (becomes available).
  *
  * @remarks
@@ -765,3 +811,54 @@ export type DatabaseOperation =
  * @public
  */
 export type TestEventData = UnknownRecord;
+
+/**
+ * Renderer event payload contracts keyed by their IPC channel identifiers.
+ */
+export interface RendererEventPayloadMap {
+    "cache:invalidated": CacheInvalidatedEventData;
+    "monitor:check-completed": MonitorCheckCompletedEventData;
+    "monitor:down": MonitorDownEventData;
+    "monitor:status-changed": MonitorStatusChangedEventData;
+    "monitor:up": MonitorUpEventData;
+    "monitoring:started": MonitoringStartedEventData;
+    "monitoring:stopped": MonitoringStoppedEventData;
+    "settings:history-limit-updated": HistoryLimitUpdatedEventData;
+    "site:added": {
+        site: Site;
+        source: SiteAddedSource;
+        timestamp: number;
+    };
+    "site:removed": {
+        cascade: boolean;
+        siteIdentifier: string;
+        siteName: string;
+        timestamp: number;
+    };
+    "site:updated": {
+        previousSite: Site;
+        site: Site;
+        timestamp: number;
+        updatedFields: string[];
+    };
+    "state-sync-event": StateSyncEventData;
+    "test-event": TestEventData;
+    "update-status": UpdateStatusEventData;
+}
+
+/**
+ * Union of renderer event channel identifiers.
+ */
+export type RendererEventChannel = keyof RendererEventPayloadMap;
+
+type RendererEventDescriptor = {
+    [Channel in RendererEventChannel]: {
+        channel: Channel;
+        payload: RendererEventPayloadMap[Channel];
+    };
+}[RendererEventChannel];
+
+/**
+ * Discriminated union describing every renderer event emission.
+ */
+export type RendererEvent = Simplify<ExclusifyUnion<RendererEventDescriptor>>;

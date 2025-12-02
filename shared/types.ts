@@ -398,15 +398,19 @@ export interface StatusHistory {
  *
  * @public
  */
-export interface StatusUpdate {
+export interface StatusUpdate extends Readonly<Record<PropertyKey, unknown>> {
     /** Optional diagnostic message describing the change. */
     details?: string;
+    readonly length?: never;
     /** Rich monitor context describing the updated entity. */
     monitor: Monitor;
     /** Identifier of the monitor generating the update. */
     monitorId: string;
     /** Previous status before the update, if known. */
     previousStatus?: MonitorStatus;
+    readonly [key: number]: unknown;
+    readonly [key: string]: unknown;
+    readonly [key: symbol]: unknown;
     /** Latest response time measurement, when recorded. */
     responseTime?: number;
     /** Full site entity associated with the monitor. */

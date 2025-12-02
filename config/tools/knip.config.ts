@@ -40,7 +40,6 @@ const knipConfig: KnipConfig = {
     ],
     ignoreBinaries: [
         "actionlint",
-        "config/tools/knip.config.ts",
         "deploy",
         "detect-secrets",
         "docusaurus",
@@ -50,7 +49,6 @@ const knipConfig: KnipConfig = {
         "grype",
         "hint",
         "jq",
-        "markdownlint",
         "markdownlint",
         "ncu",
         "npm-check",
@@ -68,6 +66,7 @@ const knipConfig: KnipConfig = {
         "typesync",
         "winget",
         "yamllint",
+        "config/tools/knip.config.ts",
     ],
     ignoreDependencies: [
         ".*eslint-formatter-.*",
@@ -148,7 +147,6 @@ const knipConfig: KnipConfig = {
         "electron-debug",
         "electron-devtools-installer",
         "electron-publish",
-        "eslint-config-eslint.config.mjs",
         "eslint-plugin-css",
         "eslint-plugin-es-x",
         "eslint-plugin-eslint-comments",
@@ -162,6 +160,7 @@ const knipConfig: KnipConfig = {
         "force",
         "fs-extra",
         "globals-vitest",
+        "gray-matter",
         "istanbul-lib-coverage",
         "istanbul-lib-report",
         "istanbul-reports",
@@ -262,6 +261,7 @@ const knipConfig: KnipConfig = {
         type: true,
     },
     ignoreUnresolved: [
+        "eslint-config-eslint.config.mjs",
         "remark-@double-great/remark-lint-alt-text",
         "remark-rehype-katex",
     ],

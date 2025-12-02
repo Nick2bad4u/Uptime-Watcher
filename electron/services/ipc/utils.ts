@@ -4,6 +4,11 @@
  * type-safe, consistent IPC handlers.
  */
 
+import type {
+    IpcInvokeChannel,
+    IpcInvokeChannelParams,
+    IpcInvokeChannelResult,
+} from "@shared/types/ipc";
 import type { UnknownRecord } from "type-fest";
 
 import { MONITOR_TYPES_CHANNELS } from "@shared/types/preload";
@@ -27,6 +32,27 @@ const HIGH_FREQUENCY_OPERATIONS = new Set<string>([
     MONITOR_TYPES_CHANNELS.getMonitorTypes,
 ]);
 
+/**
+ * Structured metadata describing IPC handler execution characteristics.
+ *
+ * @remarks
+ * This type intentionally extends {@link UnknownRecord} so additional diagnostic
+ * fields can be attached without weakening the metadata contract for known
+ * properties like {@link handler}, {@link duration}, and {@link paramCount}.
+ * Callers outside this module should continue to treat the public
+ * {@link IpcResponse.metadata} field as an opaque record.
+ */
+interface IpcHandlerMetadata extends UnknownRecord {
+    /** Total handler execution duration in milliseconds. */
+    duration?: number;
+    /** Fully-qualified IPC handler name (channel identifier). */
+    handler?: string;
+    /** Number of parameters supplied to the handler. */
+    paramCount?: number;
+    /** Optional validation errors when parameter validation fails. */
+    validationErrors?: readonly string[];
+}
+
 interface HandlerExecutionFailure {
     duration: number;
     errorMessage: string;
@@ -43,6 +69,21 @@ type HandlerExecutionResult<T> =
     | HandlerExecutionFailure
     | HandlerExecutionSuccess<T>;
 
+interface WithIpcHandlerOptions {
+    readonly metadata?: IpcHandlerMetadata;
+}
+
+type ChannelParams<TChannel extends IpcInvokeChannel> =
+    IpcInvokeChannelParams<TChannel> extends readonly unknown[]
+        ? IpcInvokeChannelParams<TChannel>
+        : never;
+
+type StrictIpcInvokeHandler<TChannel extends IpcInvokeChannel> = (
+    ...params: ChannelParams<TChannel>
+) =>
+    | IpcInvokeChannelResult<TChannel>
+    | Promise<IpcInvokeChannelResult<TChannel>>;
+
 function shouldLogHandler(channelName: string): boolean {
     return isDev() && !HIGH_FREQUENCY_OPERATIONS.has(channelName);
 }
@@ -50,7 +91,7 @@ function shouldLogHandler(channelName: string): boolean {
 async function executeIpcHandler<T>(
     channelName: string,
     handler: () => Promise<T> | T,
-    startMetadata?: Record<string, unknown>
+    startMetadata?: IpcHandlerMetadata
 ): Promise<HandlerExecutionResult<T>> {
     const startTime = Date.now();
     const logStart = shouldLogHandler(channelName);
@@ -331,9 +372,14 @@ export function createValidationResponse(
  */
 export async function withIpcHandler<T>(
     channelName: string,
-    handler: () => Promise<T> | T
+    handler: () => Promise<T> | T,
+    options?: WithIpcHandlerOptions
 ): Promise<IpcResponse<T>> {
-    const execution = await executeIpcHandler(channelName, handler);
+    const execution = await executeIpcHandler(
+        channelName,
+        handler,
+        options?.metadata
+    );
     return createResponseFromExecution(channelName, execution);
 }
 
@@ -366,14 +412,17 @@ export async function withIpcHandler<T>(
  *
  * @public
  */
-export async function withIpcHandlerValidation<T>(
+export async function withIpcHandlerValidation<
+    T,
+    TParams extends readonly unknown[],
+>(
     channelName: string,
-    handler: (...args: unknown[]) => Promise<T> | T,
+    handler: (...validatedParams: TParams) => Promise<T> | T,
     validateParams: IpcParameterValidator,
-    params: unknown[]
+    params: TParams
 ): Promise<IpcResponse<T>> {
     const validationErrors = validateParams(params);
-    if (validationErrors) {
+    if (validationErrors?.length) {
         const errorMessage = `Parameter validation failed: ${validationErrors.join(", ")}`;
         logger.warn(`[IpcHandler] Validation failed ${channelName}`, {
             errors: validationErrors,
@@ -387,7 +436,9 @@ export async function withIpcHandlerValidation<T>(
     const execution = await executeIpcHandler(
         channelName,
         () => handler(...params),
-        { paramCount: params.length }
+        {
+            paramCount: params.length,
+        }
     );
     return createResponseFromExecution(channelName, execution);
 }
@@ -419,11 +470,13 @@ export async function withIpcHandlerValidation<T>(
  *
  * @public
  */
-export function registerStandardizedIpcHandler<T>(
-    channelName: string,
-    handler: (...args: unknown[]) => Promise<T> | T,
+export function registerStandardizedIpcHandler<
+    TChannel extends IpcInvokeChannel,
+>(
+    channelName: TChannel,
+    handler: StrictIpcInvokeHandler<TChannel>,
     validateParams: IpcParameterValidator | null,
-    registeredHandlers: Set<string>
+    registeredHandlers: Set<IpcInvokeChannel>
 ): void {
     if (registeredHandlers.has(channelName)) {
         const errorMessage = `[IpcService] Attempted to register duplicate IPC handler for channel '${channelName}'`;
@@ -439,15 +492,25 @@ export function registerStandardizedIpcHandler<T>(
     registeredHandlers.add(channelName);
 
     try {
-        ipcMain.handle(channelName, async (_, ...args: unknown[]) =>
-            validateParams
-                ? withIpcHandlerValidation(
-                      channelName,
-                      handler,
-                      validateParams,
-                      args
-                  )
-                : withIpcHandler(channelName, () => handler(...args))
+        ipcMain.handle(
+            channelName,
+            async (_event, ...rawArgs: ChannelParams<TChannel>) => {
+                if (validateParams) {
+                    return withIpcHandlerValidation(
+                        channelName,
+                        (...validatedParams: ChannelParams<TChannel>) =>
+                            handler(...validatedParams),
+                        validateParams,
+                        rawArgs
+                    );
+                }
+
+                return withIpcHandler(channelName, () => handler(...rawArgs), {
+                    metadata: {
+                        paramCount: rawArgs.length,
+                    },
+                });
+            }
         );
     } catch (rawError) {
         registeredHandlers.delete(channelName);

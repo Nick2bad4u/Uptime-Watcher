@@ -4,6 +4,8 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
+import { unsafeJsonifiable } from "@shared/test/helpers/jsonTestHelpers";
+import type { UptimeEventName } from "../events/eventTypes";
 
 describe("High-Impact Branch Coverage Tests", () => {
     beforeEach(() => {
@@ -209,7 +211,6 @@ describe("High-Impact Branch Coverage Tests", () => {
                     const undefinedResult =
                         validationModule.validateMonitorData("http", undefined);
                     expect(undefinedResult.success).toBeFalsy();
-
                     // Test with Symbol (non-serializable)
                     const symbolResult = validationModule.validateMonitorData(
                         "http",
@@ -303,8 +304,9 @@ describe("High-Impact Branch Coverage Tests", () => {
                     const circular: any = { name: "test" };
                     circular.self = circular;
 
-                    const circularResult =
-                        jsonSafetyModule.safeJsonStringify(circular);
+                    const circularResult = jsonSafetyModule.safeJsonStringify(
+                        unsafeJsonifiable(circular)
+                    );
                     expect(circularResult.success).toBeFalsy();
                     expect(circularResult.error).toBeDefined();
                     expect(
@@ -323,13 +325,17 @@ describe("High-Impact Branch Coverage Tests", () => {
                     };
 
                     const problematicResult =
-                        jsonSafetyModule.safeJsonStringify(problematic);
+                        jsonSafetyModule.safeJsonStringify(
+                            unsafeJsonifiable(problematic)
+                        );
                     expect(problematicResult.success).toBeFalsy();
 
                     // Test successful case
-                    const goodResult = jsonSafetyModule.safeJsonStringify({
-                        test: "value",
-                    });
+                    const goodResult = jsonSafetyModule.safeJsonStringify(
+                        unsafeJsonifiable({
+                            test: "value",
+                        })
+                    );
                     expect(goodResult.success).toBeTruthy();
                     expect(goodResult.data).toContain("test");
                 }
@@ -683,8 +689,14 @@ describe("High-Impact Branch Coverage Tests", () => {
                     ).toBeFalsy();
                     expect(
                         eventTypesModule.isEventOfCategory(
-                            "unknown:event",
+                            "unknown:event" as unknown as UptimeEventName,
                             "SITE"
+                        )
+                    ).toBeFalsy();
+                    expect(
+                        eventTypesModule.isEventOfCategory(
+                            "" as unknown as UptimeEventName,
+                            "" as any
                         )
                     ).toBeFalsy();
 
@@ -701,9 +713,6 @@ describe("High-Impact Branch Coverage Tests", () => {
                             undefined as any
                         )
                     ).toBeFalsy();
-                    expect(
-                        eventTypesModule.isEventOfCategory("", "" as any)
-                    ).toBeFalsy();
                 }
 
                 if (eventTypesModule.getEventPriority) {
@@ -718,7 +727,7 @@ describe("High-Impact Branch Coverage Tests", () => {
 
                     // Test unknown events (should return default)
                     const unknownPriority = eventTypesModule.getEventPriority(
-                        "unknown:event" as any
+                        "unknown:event" as unknown as UptimeEventName
                     );
                     expect(typeof unknownPriority).toBe("string");
 
@@ -734,7 +743,7 @@ describe("High-Impact Branch Coverage Tests", () => {
                     expect(typeof undefinedPriority).toBe("string");
 
                     const emptyPriority = eventTypesModule.getEventPriority(
-                        "" as any
+                        "" as unknown as UptimeEventName
                     );
                     expect(typeof emptyPriority).toBe("string");
                 }

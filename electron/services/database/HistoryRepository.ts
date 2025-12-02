@@ -69,6 +69,7 @@ import {
     getHistoryCount,
     getLatestHistoryEntry,
 } from "./utils/historyQuery";
+import { queryForIds } from "./utils/typedQueries";
 
 /**
  * Defines the dependencies required by the {@link HistoryRepository} for
@@ -411,16 +412,15 @@ export class HistoryRepository {
             () =>
                 // Use executeTransaction for atomic multi-monitor operation
                 this.databaseService.executeTransaction((db) => {
-                    // Type assertion is safe: SQL query "SELECT id FROM
-                    // monitors" guarantees { id: number } structure
-                    /* eslint-disable @typescript-eslint/no-unsafe-type-assertion -- Database queries return known structures from controlled SQL */
-                    const monitors = db.all(
+                    const monitors = queryForIds(
+                        db,
                         HISTORY_QUERIES.SELECT_MONITOR_IDS
-                    ) as Array<{ id: number }>;
+                    );
                     for (const monitor of monitors) {
                         // Type assertion is safe: SQL query "SELECT id FROM
                         // history..." guarantees { id: number } structure
 
+                        /* eslint-disable @typescript-eslint/no-unsafe-type-assertion -- Database queries return known structures from controlled SQL */
                         const excessEntries = db.all(
                             HISTORY_QUERIES.SELECT_EXCESS_ENTRIES,
                             [String(monitor.id), limit]
@@ -633,14 +633,7 @@ export class HistoryRepository {
         }
 
         // Get all monitor IDs
-        // Type assertion is safe: SQL query "SELECT id FROM monitors"
-        // guarantees { id: number } structure
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Database query returns known structure from controlled SQL
-        const monitorRows = db.all(
-            HISTORY_QUERIES.SELECT_MONITOR_IDS
-        ) as Array<{
-            id: number;
-        }>;
+        const monitorRows = queryForIds(db, HISTORY_QUERIES.SELECT_MONITOR_IDS);
 
         // Prune history for each monitor
         for (const row of monitorRows) {

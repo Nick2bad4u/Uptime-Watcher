@@ -8,7 +8,7 @@
 
 import type { Site, StatusHistory } from "@shared/types";
 import type { Logger } from "@shared/utils/logger/interfaces";
-import type { UnknownRecord } from "type-fest";
+import type { Jsonifiable, JsonValue, UnknownRecord } from "type-fest";
 
 import { MIN_MONITOR_CHECK_INTERVAL_MS } from "@shared/constants/monitoring";
 import { ERROR_CATALOG } from "@shared/utils/errorCatalog";
@@ -38,6 +38,7 @@ import type {
 } from "../../services/database/SiteRepository";
 
 import { createMonitorConfig } from "../../services/monitoring/createMonitorConfig";
+import { toSerializedError } from "../errorSerialization";
 import { withDatabaseOperation } from "../operationalHooks";
 import { SiteLoadingError } from "./interfaces";
 
@@ -68,6 +69,13 @@ export interface ImportSite {
     name?: string;
 }
 
+interface ImportDataPayload {
+    settings?: Record<string, string>;
+    sites: ImportSite[];
+}
+
+type ImportDataJsonPayload = ImportDataPayload & JsonValue;
+
 /**
  * Type guard for expected import data structure.
  *
@@ -78,9 +86,7 @@ export interface ImportSite {
  *
  * @returns True if the object matches the expected import data structure
  */
-function isImportData(
-    obj: unknown
-): obj is { settings?: Record<string, string>; sites: ImportSite[] } {
+function isImportData(obj: unknown): obj is ImportDataPayload {
     return (
         typeof obj === "object" &&
         obj !== null &&
@@ -88,6 +94,53 @@ function isImportData(
         Array.isArray((obj as UnknownRecord)["sites"])
     );
 }
+
+const isImportDataJsonPayload = (
+    value: unknown
+): value is ImportDataJsonPayload => isImportData(value);
+
+// eslint-disable-next-line sonarjs/function-return-type -- This helper intentionally returns the wide Jsonifiable union to normalize arbitrary inputs.
+const toJsonifiable = (value: unknown): Jsonifiable => {
+    if (value === null) {
+        return null;
+    }
+
+    if (
+        typeof value === "string" ||
+        typeof value === "number" ||
+        typeof value === "boolean"
+    ) {
+        return value;
+    }
+
+    if (Array.isArray(value)) {
+        return value.map((entry) => toJsonifiable(entry));
+    }
+
+    if (typeof value === "object") {
+        const result: Record<string, Jsonifiable> = {};
+        for (const [key, nested] of Object.entries(value)) {
+            if (nested !== undefined) {
+                result[key] = toJsonifiable(nested);
+            }
+        }
+        return result;
+    }
+
+    if (typeof value === "bigint" || typeof value === "symbol") {
+        return value.toString();
+    }
+
+    if (typeof value === "function") {
+        return value.name ? `[Function: ${value.name}]` : "[Function]";
+    }
+
+    if (value === undefined) {
+        return "undefined";
+    }
+
+    return "[Unsupported value]";
+};
 
 /**
  * Service for handling data import/export operations.
@@ -122,12 +175,14 @@ export class DataImportExportService {
             const sites = await this.repositories.site.exportAll();
             const settings = await this.repositories.settings.getAll();
 
-            const exportData = {
+            const exportPayload: unknown = {
                 exportedAt: new Date().toISOString(),
                 settings,
                 sites,
                 version: "1.0",
             };
+
+            const exportData = toJsonifiable(exportPayload);
 
             return safeJsonStringifyWithFallback(exportData, "{}", 2);
         } catch (error) {
@@ -147,16 +202,27 @@ export class DataImportExportService {
         jsonData: string
     ): Promise<{ settings: Record<string, string>; sites: ImportSite[] }> {
         try {
-            // Parse and validate the JSON data using safe parsing
-            const parseResult = safeJsonParse(jsonData, isImportData);
+            const parseResult = safeJsonParse<ImportDataJsonPayload>(
+                jsonData,
+                isImportDataJsonPayload
+            );
 
-            if (!parseResult.success || !parseResult.data) {
-                throw new SiteLoadingError(
+            if (!parseResult.success || parseResult.data === undefined) {
+                throw new Error(
                     `${ERROR_CATALOG.database.IMPORT_DATA_INVALID}: ${parseResult.error ?? "Unknown parsing error"}`
                 );
             }
 
-            const validatedData = parseResult.data;
+            const dataCandidate = parseResult.data;
+
+            if (!isImportData(dataCandidate)) {
+                throw new Error(
+                    `${ERROR_CATALOG.database.IMPORT_DATA_INVALID}: Invalid import schema`
+                );
+            }
+
+            const validatedData: ImportDataPayload = dataCandidate;
+
             return {
                 settings: validatedData.settings ?? {},
                 sites: validatedData.sites,
@@ -318,7 +384,7 @@ export class DataImportExportService {
             DataImportExportService.DATABASE_ERROR_EVENT,
             {
                 details: message,
-                error: normalizedError,
+                error: toSerializedError(normalizedError),
                 operation,
                 timestamp: Date.now(),
             }

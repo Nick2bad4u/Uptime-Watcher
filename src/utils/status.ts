@@ -12,7 +12,7 @@
 
 import type { SiteStatus } from "@shared/types";
 import type { IconType } from "react-icons";
-import type { CamelCase } from "type-fest";
+import type { CamelCase, Tagged } from "type-fest";
 
 import { isSiteStatus, STATUS_KIND } from "@shared/types";
 
@@ -24,6 +24,20 @@ import { AppIcons } from "./icons";
  * @public
  */
 export type StatusWithIcon = `${string} ${string}`;
+
+/**
+ * Strongly typed identifier derived from a status label.
+ *
+ * @remarks
+ * Uses {@link CamelCase} to transform arbitrary status strings into a
+ * predictable camelCase token, then brands the resulting string so it cannot be
+ * confused with plain text identifiers. This is useful when generating DOM ids
+ * or analytics keys that need to reference a specific status consistently.
+ */
+export type StatusIdentifier<T extends string = string> = Tagged<
+    CamelCase<T>,
+    "status-identifier"
+>;
 
 /**
  * Union of status literals used for UI presentation.
@@ -167,7 +181,7 @@ export function getStatusIconComponent(status: string): IconType {
  */
 export function createStatusIdentifier<T extends string>(
     statusText: T
-): CamelCase<T> {
+): StatusIdentifier<T> {
     // Simple camelCase conversion avoiding complex regex patterns
     const words = statusText.toLowerCase().split(/[\s\-_]+/v);
     const camelCased = words
@@ -177,5 +191,5 @@ export function createStatusIdentifier<T extends string>(
         .join("");
 
     /* eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Type-fest CamelCase utility ensures correct transformation */
-    return camelCased as CamelCase<T>;
+    return camelCased as StatusIdentifier<T>;
 }

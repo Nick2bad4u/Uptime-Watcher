@@ -10,6 +10,18 @@
 
 import { describe, expect, test, vi, beforeEach } from "vitest";
 import { test as fcTest, fc } from "@fast-check/vitest";
+import {
+    MONITOR_STATUS_VALUES,
+    STATUS_HISTORY_VALUES,
+    type Monitor,
+    type MonitorStatus,
+    type MonitorType,
+    type Site,
+    type StatusHistory,
+    type StatusHistoryStatus,
+    type StatusUpdate,
+} from "@shared/types";
+import type { IpcInvokeChannel, IpcInvokeChannelMap } from "../../types/ipc";
 
 // Define all mocks using vi.hoisted so they're available before vi.mock is hoisted
 const { mockIpcMain, mockBrowserWindow, mockContextBridge, mockIpcRenderer } =
@@ -30,7 +42,7 @@ const { mockIpcMain, mockBrowserWindow, mockContextBridge, mockIpcRenderer } =
             exposeInMainWorld: vi.fn(),
         },
         mockIpcRenderer: {
-            invoke: vi.fn((..._args: unknown[]) => Promise.resolve()),
+            invoke: vi.fn((..._args: unknown[]) => Promise.resolve(undefined)),
             on: vi.fn(),
             off: vi.fn(),
             removeListener: vi.fn(),
@@ -75,6 +87,81 @@ const arbitraryChannelName = fc
     .string({ minLength: 5, maxLength: 50 })
     .filter((s) => /^[A-Za-z][\w:-]*$/.test(s));
 
+const asInvokeChannel = (channel: string): IpcInvokeChannel =>
+    channel as IpcInvokeChannel;
+
+type GenericInvokeResult = IpcInvokeChannelMap[IpcInvokeChannel]["result"];
+
+const registerTestHandler = (
+    channel: string,
+    handler: (...args: unknown[]) => unknown | Promise<unknown>,
+    validator: Parameters<typeof registerStandardizedIpcHandler>[2],
+    handlers: Parameters<typeof registerStandardizedIpcHandler>[3]
+) =>
+    registerStandardizedIpcHandler(
+        asInvokeChannel(channel),
+        async (...params) => {
+            const result = (await handler(...params)) as GenericInvokeResult;
+
+            if (channel === "add-site") {
+                const placeholderSite: Site = {
+                    identifier: "new-site",
+                    monitoring: false,
+                    monitors: [],
+                    name: "New Site",
+                };
+
+                return placeholderSite;
+            }
+
+            return result;
+        },
+        validator,
+        handlers
+    );
+
+const monitorStatusArbitrary = fc.constantFrom<MonitorStatus>(
+    ...MONITOR_STATUS_VALUES
+);
+
+const statusHistoryStatusArbitrary = fc.constantFrom<StatusHistoryStatus>(
+    ...STATUS_HISTORY_VALUES
+);
+
+const statusHistoryArbitrary = fc.record<StatusHistory>({
+    details: fc.option(fc.string(), { nil: undefined }),
+    responseTime: fc.integer({ min: 0, max: 60_000 }),
+    status: statusHistoryStatusArbitrary,
+    timestamp: fc.integer({ min: 0, max: Number.MAX_SAFE_INTEGER }),
+});
+
+const monitorTypeArbitrary = fc.constantFrom<MonitorType>(
+    "http",
+    "ping",
+    "ssl"
+);
+
+const monitorArbitrary = fc.record<Monitor>({
+    checkInterval: fc.integer({ min: 1000, max: 300_000 }),
+    history: fc.array(statusHistoryArbitrary, { maxLength: 5 }),
+    id: fc.string({ minLength: 3, maxLength: 64 }),
+    monitoring: fc.boolean(),
+    responseTime: fc.integer({ min: 0, max: 30_000 }),
+    retryAttempts: fc.integer({ min: 0, max: 5 }),
+    status: monitorStatusArbitrary,
+    timeout: fc.integer({ min: 1000, max: 120_000 }),
+    type: monitorTypeArbitrary,
+});
+
+const arbitrarySiteName = fc.string({ minLength: 3, maxLength: 80 });
+
+const siteArbitrary = fc.record<Site>({
+    identifier: fc.string({ minLength: 3, maxLength: 64 }),
+    monitoring: fc.boolean(),
+    monitors: fc.array(monitorArbitrary, { maxLength: 3 }),
+    name: arbitrarySiteName,
+});
+
 const arbitrarySiteData = fc.record({
     name: fc.string({ minLength: 1, maxLength: 100 }),
     url: fc.webUrl(),
@@ -96,13 +183,18 @@ const arbitrarySiteData = fc.record({
     ),
 });
 
-const arbitraryMonitoringData = fc.record({
-    siteIdentifier: fc.string({ minLength: 1, maxLength: 36 }),
-    monitorId: fc.string({ minLength: 1, maxLength: 36 }),
-    status: fc.constantFrom("up", "down", "warning", "unknown"),
-    timestamp: fc.integer({ min: 0 }),
-    responseTime: fc.option(fc.integer({ min: 0, max: 60_000 })),
-    message: fc.option(fc.string()),
+const arbitraryMonitoringData = fc.record<StatusUpdate>({
+    details: fc.option(fc.string(), { nil: undefined }),
+    monitor: monitorArbitrary,
+    monitorId: fc.string({ minLength: 3, maxLength: 64 }),
+    previousStatus: fc.option(monitorStatusArbitrary, { nil: undefined }),
+    responseTime: fc.option(fc.integer({ min: 0, max: 60_000 }), {
+        nil: undefined,
+    }),
+    site: siteArbitrary,
+    siteIdentifier: fc.string({ minLength: 3, maxLength: 64 }),
+    status: monitorStatusArbitrary,
+    timestamp: fc.date().map((date) => date.toISOString()),
 });
 
 const arbitrarySettingsData = fc.record({
@@ -141,14 +233,14 @@ const arbitraryValidationInput = fc.oneof(
 );
 
 describe("IPC Communication - 100% Fast-Check Fuzzing Coverage", () => {
-    let registeredHandlers: Set<string>;
+    let registeredHandlers: Set<IpcInvokeChannel>;
 
     beforeEach(() => {
         // Reset all mocks
         vi.clearAllMocks();
 
         // Create fresh set for tracking registered handlers
-        registeredHandlers = new Set<string>();
+        registeredHandlers = new Set<IpcInvokeChannel>();
     });
 
     describe("IPC Handler Registration and Management", () => {
@@ -158,10 +250,10 @@ describe("IPC Communication - 100% Fast-Check Fuzzing Coverage", () => {
                 mockIpcMain.handle.mockClear();
                 registeredHandlers.clear();
 
-                const handler = vi.fn(() => Promise.resolve());
+                const handler = vi.fn(() => Promise.resolve(undefined));
 
                 expect(() => {
-                    registerStandardizedIpcHandler(
+                    registerTestHandler(
                         channel,
                         handler,
                         null,
@@ -185,13 +277,8 @@ describe("IPC Communication - 100% Fast-Check Fuzzing Coverage", () => {
                         typeof data === "object" && data !== null
                 );
 
-                const handlerSet = new Set<string>();
-                registerStandardizedIpcHandler(
-                    channel,
-                    handler,
-                    null,
-                    handlerSet
-                );
+                const handlerSet = new Set<IpcInvokeChannel>();
+                registerTestHandler(channel, handler, null, handlerSet);
 
                 // Get the registered handler function
                 const registeredHandler = mockIpcMain.handle.mock.calls.find(
@@ -230,10 +317,10 @@ describe("IPC Communication - 100% Fast-Check Fuzzing Coverage", () => {
             const uniqueChannels = Array.from(new Set(channels)); // Remove duplicates
 
             for (const channel of uniqueChannels) {
-                const handler = vi.fn(() => Promise.resolve());
+                const handler = vi.fn(() => Promise.resolve(undefined));
 
                 expect(() => {
-                    registerStandardizedIpcHandler(
+                    registerTestHandler(
                         channel,
                         handler,
                         null,
@@ -256,12 +343,7 @@ describe("IPC Communication - 100% Fast-Check Fuzzing Coverage", () => {
 
                 const handler = vi.fn(() => Promise.resolve(data));
 
-                registerStandardizedIpcHandler(
-                    channel,
-                    handler,
-                    null,
-                    registeredHandlers
-                );
+                registerTestHandler(channel, handler, null, registeredHandlers);
 
                 const registeredHandler = mockIpcMain.handle.mock.calls.find(
                     (call) => call[0] === channel
@@ -379,12 +461,7 @@ describe("IPC Communication - 100% Fast-Check Fuzzing Coverage", () => {
                     "required" in data &&
                     typeof (data as any).required === "string";
 
-                registerStandardizedIpcHandler(
-                    channel,
-                    handler,
-                    null,
-                    registeredHandlers
-                );
+                registerTestHandler(channel, handler, null, registeredHandlers);
 
                 const registeredHandler = mockIpcMain.handle.mock.calls.find(
                     (call) => call[0] === channel
@@ -418,7 +495,7 @@ describe("IPC Communication - 100% Fast-Check Fuzzing Coverage", () => {
                     throw new Error("Handler error");
                 });
 
-                registerStandardizedIpcHandler(
+                registerTestHandler(
                     channel,
                     errorHandler,
                     null,
@@ -455,7 +532,7 @@ describe("IPC Communication - 100% Fast-Check Fuzzing Coverage", () => {
 
             for (const maliciousChannel of maliciousChannels) {
                 expect(() => {
-                    registerStandardizedIpcHandler(
+                    registerTestHandler(
                         maliciousChannel,
                         vi.fn(),
                         null,
@@ -513,12 +590,7 @@ describe("IPC Communication - 100% Fast-Check Fuzzing Coverage", () => {
                 registeredHandlers.clear();
                 const handler = vi.fn(() => Promise.resolve("response"));
 
-                registerStandardizedIpcHandler(
-                    channel,
-                    handler,
-                    null,
-                    registeredHandlers
-                );
+                registerTestHandler(channel, handler, null, registeredHandlers);
 
                 const registeredHandler = mockIpcMain.handle.mock.calls.find(
                     (call) => call[0] === channel
@@ -555,9 +627,9 @@ describe("IPC Communication - 100% Fast-Check Fuzzing Coverage", () => {
 
             // Register many handlers
             for (const channel of uniqueChannels) {
-                registerStandardizedIpcHandler(
+                registerTestHandler(
                     channel,
-                    vi.fn(() => Promise.resolve()),
+                    vi.fn(() => Promise.resolve(undefined)),
                     null,
                     registeredHandlers
                 );
@@ -578,7 +650,7 @@ describe("IPC Communication - 100% Fast-Check Fuzzing Coverage", () => {
                     throw new Error("Async error");
                 });
 
-                registerStandardizedIpcHandler(
+                registerTestHandler(
                     channel,
                     asyncErrorHandler,
                     null,
@@ -610,12 +682,7 @@ describe("IPC Communication - 100% Fast-Check Fuzzing Coverage", () => {
                 return Promise.resolve(circular);
             });
 
-            registerStandardizedIpcHandler(
-                channel,
-                handler,
-                null,
-                registeredHandlers
-            );
+            registerTestHandler(channel, handler, null, registeredHandlers);
 
             const registeredHandler = mockIpcMain.handle.mock.calls.find(
                 (call) => call[0] === channel
@@ -650,9 +717,7 @@ describe("IPC Communication - 100% Fast-Check Fuzzing Coverage", () => {
                 registeredHandlers.clear();
 
                 const channel = "add-site";
-                const handler = vi.fn(() =>
-                    Promise.resolve({ id: "new-site" })
-                );
+                const handler = vi.fn(() => Promise.resolve(siteData));
                 const siteValidator = (
                     data: unknown
                 ): data is typeof siteData =>
@@ -663,12 +728,7 @@ describe("IPC Communication - 100% Fast-Check Fuzzing Coverage", () => {
                     typeof (data as any).name === "string" &&
                     typeof (data as any).url === "string";
 
-                registerStandardizedIpcHandler(
-                    channel,
-                    handler,
-                    null,
-                    registeredHandlers
-                );
+                registerTestHandler(channel, handler, null, registeredHandlers);
 
                 const registeredHandler = mockIpcMain.handle.mock.calls.find(
                     (call) => call[0] === channel
@@ -680,8 +740,9 @@ describe("IPC Communication - 100% Fast-Check Fuzzing Coverage", () => {
                     if (siteValidator(siteData)) {
                         expect(handler).toHaveBeenCalledWith(siteData);
                         expect(result).toHaveProperty("success", true);
-                        expect(result).toHaveProperty("data", {
-                            id: "new-site",
+                        expect(result).toHaveProperty("data");
+                        expect(result.data).toMatchObject({
+                            identifier: "new-site",
                         });
                     } else {
                         // For invalid data, the handler should still be called since we have no validation
@@ -710,12 +771,7 @@ describe("IPC Communication - 100% Fast-Check Fuzzing Coverage", () => {
                     typeof (data as any).siteIdentifier === "string" &&
                     typeof (data as any).status === "string";
 
-                registerStandardizedIpcHandler(
-                    channel,
-                    handler,
-                    null,
-                    registeredHandlers
-                );
+                registerTestHandler(channel, handler, null, registeredHandlers);
 
                 const registeredHandler = mockIpcMain.handle.mock.calls.find(
                     (call) => call[0] === channel
@@ -744,18 +800,13 @@ describe("IPC Communication - 100% Fast-Check Fuzzing Coverage", () => {
                 registeredHandlers.clear();
 
                 const channel = "settings:update";
-                const handler = vi.fn(() => Promise.resolve());
+                const handler = vi.fn(() => Promise.resolve(undefined));
                 const settingsValidator = (
                     data: unknown
                 ): data is typeof settingsData =>
                     typeof data === "object" && data !== null;
 
-                registerStandardizedIpcHandler(
-                    channel,
-                    handler,
-                    null,
-                    registeredHandlers
-                );
+                registerTestHandler(channel, handler, null, registeredHandlers);
 
                 const registeredHandler = mockIpcMain.handle.mock.calls.find(
                     (call) => call[0] === channel
@@ -785,12 +836,7 @@ describe("IPC Communication - 100% Fast-Check Fuzzing Coverage", () => {
                 const channel = "test:edge-cases";
                 const handler = vi.fn(() => Promise.resolve("success"));
 
-                registerStandardizedIpcHandler(
-                    channel,
-                    handler,
-                    null,
-                    registeredHandlers
-                );
+                registerTestHandler(channel, handler, null, registeredHandlers);
 
                 const registeredHandler = mockIpcMain.handle.mock.calls.find(
                     (call) => call[0] === channel

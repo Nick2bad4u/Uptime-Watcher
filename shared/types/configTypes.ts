@@ -9,7 +9,7 @@
  * @packageDocumentation
  */
 
-import type { Simplify, UnknownRecord } from "type-fest";
+import type { LiteralUnion, Simplify, UnknownRecord } from "type-fest";
 
 import type { MonitorConfig } from "./monitorConfig";
 import type { MonitorTypeConfig } from "./monitorTypes";
@@ -50,9 +50,17 @@ export interface KnownConfigValues {
     notificationsEnabled: boolean;
     /** Auto-refresh interval in milliseconds */
     refreshInterval: number;
-    /** Application theme (dark/light/high-contrast) */
-    theme: "dark" | "high-contrast" | "light";
+    /** Application theme (suggested palette values with extension support) */
+    theme: ThemeIdentifier;
 }
+
+/**
+ * Supported application themes with open-ended extension support.
+ */
+export type ThemeIdentifier = LiteralUnion<
+    "dark" | "high-contrast" | "light",
+    string
+>;
 
 /**
  * Monitor check result information.
@@ -140,7 +148,10 @@ export type ConfigValue = boolean | null | number | string | string[];
  *
  * @public
  */
-export type MonitorStatus = "degraded" | "down" | "paused" | "pending" | "up";
+export type MonitorStatus = LiteralUnion<
+    "degraded" | "down" | "paused" | "pending" | "up",
+    string
+>;
 
 /**
  * Array of MonitorTypeConfig objects for caching.

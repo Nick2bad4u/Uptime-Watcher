@@ -16,29 +16,79 @@
  */
 
 import { bench, describe } from "vitest";
+import type { UnknownRecord } from "type-fest";
 
 interface IpcMessage {
     id: string;
     channel: string;
-    data: any;
+    data: IpcPayload;
     timestamp: number;
     type: "request" | "response" | "notification";
 }
 
+type IpcPayload = unknown;
+
+type IpcHandler = (data: IpcPayload) => unknown | Promise<unknown>;
+
+type SiteStatus = "online" | "offline";
+
+interface SiteRecord {
+    id: string;
+    name: string;
+    url: string;
+    status: SiteStatus;
+    created?: number;
+    updated?: number;
+}
+
+interface MonitorRecord {
+    id: string;
+    siteIdentifier: string;
+    type: "http" | "ping" | "tcp";
+    interval: number;
+    status: "active" | "paused";
+}
+
+interface HistoryEntry {
+    id: string;
+    timestamp: number;
+    status: SiteStatus;
+    responseTime: number;
+}
+
+type CreateSitePayload = Partial<Omit<SiteRecord, "id">> &
+    Pick<SiteRecord, "name" | "url">;
+
+type UpdateSitePayload = Partial<Omit<SiteRecord, "id">> &
+    Pick<SiteRecord, "id">;
+
+type BatchCreatePayload = CreateSitePayload[];
+
+interface HistoryFilters extends UnknownRecord {
+    siteIdentifier?: string;
+    limit?: number;
+}
+
+interface PendingRequest {
+    resolve: (value: unknown) => void;
+    reject: (reason: unknown) => void;
+    timeout: NodeJS.Timeout;
+}
+
 class MockIpcService {
-    private handlers = new Map<string, Function>();
-    private pendingRequests = new Map<
-        string,
-        { resolve: Function; reject: Function; timeout: NodeJS.Timeout }
-    >();
+    private handlers = new Map<string, IpcHandler>();
+    private pendingRequests = new Map<string, PendingRequest>();
     private messageHistory: IpcMessage[] = [];
     private requestTimeout = 30_000; // 30 seconds
 
-    registerHandler(channel: string, handler: Function): void {
-        this.handlers.set(channel, handler);
+    registerHandler<TPayload = IpcPayload>(
+        channel: string,
+        handler: (data: TPayload) => unknown | Promise<unknown>
+    ): void {
+        this.handlers.set(channel, (payload) => handler(payload as TPayload));
     }
 
-    async invoke(channel: string, data: any): Promise<any> {
+    async invoke(channel: string, data: IpcPayload): Promise<unknown> {
         const messageId = this.generateMessageId();
         const message: IpcMessage = {
             id: messageId,
@@ -64,12 +114,13 @@ class MockIpcService {
             setTimeout(() => {
                 const handler = this.handlers.get(channel);
                 if (handler) {
-                    try {
-                        const result = handler(data);
-                        this.handleResponse(messageId, result);
-                    } catch (error) {
-                        this.handleError(messageId, error);
-                    }
+                    Promise.resolve(handler(data))
+                        .then((result) => {
+                            this.handleResponse(messageId, result);
+                        })
+                        .catch((error) => {
+                            this.handleError(messageId, error);
+                        });
                 } else {
                     this.handleError(
                         messageId,
@@ -80,7 +131,7 @@ class MockIpcService {
         });
     }
 
-    send(channel: string, data: any): void {
+    send(channel: string, data: IpcPayload): void {
         const message: IpcMessage = {
             id: this.generateMessageId(),
             channel,
@@ -94,13 +145,11 @@ class MockIpcService {
         // Simulate sending to renderer
         setTimeout(() => {
             const handler = this.handlers.get(channel);
-            if (handler) {
-                handler(data);
-            }
+            handler?.(data);
         }, 1);
     }
 
-    private handleResponse(messageId: string, result: any): void {
+    private handleResponse(messageId: string, result: unknown): void {
         const pending = this.pendingRequests.get(messageId);
         if (pending) {
             clearTimeout(pending.timeout);
@@ -119,7 +168,7 @@ class MockIpcService {
         }
     }
 
-    private handleError(messageId: string, error: any): void {
+    private handleError(messageId: string, error: unknown): void {
         const pending = this.pendingRequests.get(messageId);
         if (pending) {
             clearTimeout(pending.timeout);
@@ -140,26 +189,32 @@ class MockIpcService {
     }
 
     // Simulated handlers for common IPC operations
-    handleGetSites(): any[] {
+    handleGetSites(): SiteRecord[] {
         return Array.from({ length: 100 }, (_, i) => ({
             id: `site-${i}`,
             name: `Site ${i}`,
             url: `https://site${i}.com`,
-            status: ["online", "offline"][i % 2],
+            status: ["online", "offline"][i % 2] as SiteStatus,
         }));
     }
 
-    handleCreateSite(data: any): any {
+    handleCreateSite(data: CreateSitePayload): SiteRecord {
+        const status: SiteStatus = data.status ?? "online";
         return {
             id: `site-${Date.now()}`,
             ...data,
             created: Date.now(),
+            status,
         };
     }
 
-    handleUpdateSite(data: any): any {
+    handleUpdateSite(data: UpdateSitePayload): SiteRecord {
+        const nextStatus: SiteStatus = data.status ?? "online";
         return {
-            ...data,
+            id: data.id,
+            name: data.name ?? `Site ${data.id}`,
+            url: data.url ?? "https://site-update.com",
+            status: nextStatus,
             updated: Date.now(),
         };
     }
@@ -168,7 +223,7 @@ class MockIpcService {
         return true;
     }
 
-    handleGetMonitors(siteIdentifier: string): any[] {
+    handleGetMonitors(siteIdentifier: string): MonitorRecord[] {
         return Array.from({ length: 10 }, (_, i) => ({
             id: `monitor-${i}`,
             siteIdentifier,
@@ -178,11 +233,12 @@ class MockIpcService {
         }));
     }
 
-    handleGetHistory(filters: any): any[] {
-        return Array.from({ length: 1000 }, (_, i) => ({
+    handleGetHistory(filters: HistoryFilters): HistoryEntry[] {
+        const { limit = 1000 } = filters;
+        return Array.from({ length: limit }, (_, i) => ({
             id: `history-${i}`,
             timestamp: Date.now() - i * 60_000,
-            status: ["online", "offline"][i % 2],
+            status: ["online", "offline"][i % 2] as SiteStatus,
             responseTime: Math.random() * 1000,
         }));
     }
@@ -308,7 +364,7 @@ describe("IPC Communication Performance", () => {
             ipcService = new MockIpcService();
             ipcService.registerHandler("concurrent-test", () => "response");
 
-            const promises: Promise<any>[] = [];
+            const promises: Promise<unknown>[] = [];
             for (let i = 0; i < 10; i++) {
                 promises.push(
                     ipcService.invoke("concurrent-test", { index: i })
@@ -324,14 +380,24 @@ describe("IPC Communication Performance", () => {
         "batch operations",
         async () => {
             ipcService = new MockIpcService();
-            ipcService.registerHandler("batch-create", (data: any[]) =>
-                data.map((item) => ({ ...item, id: `item-${Date.now()}` }))
-            );
+            ipcService.registerHandler("batch-create", (data): SiteRecord[] => {
+                const payload = Array.isArray(data)
+                    ? (data as BatchCreatePayload)
+                    : [];
+                return payload.map((item) => ({
+                    ...item,
+                    id: `item-${Date.now()}`,
+                    status: (item.status ?? "online") as SiteStatus,
+                }));
+            });
 
-            const batchData = Array.from({ length: 50 }, (_, i) => ({
-                name: `Item ${i}`,
-                value: i,
-            }));
+            const batchData: BatchCreatePayload = Array.from(
+                { length: 50 },
+                (_, i) => ({
+                    name: `Item ${i}`,
+                    url: `https://item-${i}.example.com`,
+                })
+            );
 
             await ipcService.invoke("batch-create", batchData);
         },

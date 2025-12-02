@@ -12,12 +12,14 @@ import {
     MonitorConfigurationError,
 } from "../../../services/monitoring/MonitorFactory";
 import * as MonitorTypeRegistry from "../../../services/monitoring/MonitorTypeRegistry";
-import type { IMonitorService } from "../../../services/monitoring/types.js";
-import type { MonitorConfig } from "../../../services/monitoring/types.js";
+import type {
+    IMonitorService,
+    MonitorServiceConfig,
+} from "../../../services/monitoring/types";
 import type { Site } from "@shared/types";
 
 describe("MonitorFactory - Fixed", () => {
-    let mockMonitorConfig: MonitorConfig;
+    let mockMonitorConfig: MonitorServiceConfig;
 
     beforeEach(() => {
         vi.clearAllMocks();

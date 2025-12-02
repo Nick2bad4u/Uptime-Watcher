@@ -139,7 +139,8 @@ describe(SettingsRepository, () => {
                 setting2: "value2",
             });
             expect(mockDatabase.all).toHaveBeenCalledWith(
-                expect.stringContaining("SELECT * FROM settings")
+                expect.stringContaining("SELECT * FROM settings"),
+                undefined
             );
         });
         it("should return empty object when no settings exist", async ({

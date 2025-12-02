@@ -75,9 +75,8 @@ export interface SiteMonitoringDependencies {
         monitorIds: readonly string[]
     ) => void;
     /** Snapshot accessor for current optimistic monitoring locks. */
-    getOptimisticMonitoringLocks?: () => Record<
-        string,
-        OptimisticMonitoringLock
+    getOptimisticMonitoringLocks?: () => Partial<
+        Record<string, OptimisticMonitoringLock>
     >;
     /** Reads current sites from the store for optimistic updates */
     getSites: () => Site[];

@@ -10,10 +10,18 @@
  * @packageDocumentation
  */
 
+import type { Promisable } from "type-fest";
+
 import type { UptimeEvents } from "../../events/eventTypes";
 import type { TypedEventBus } from "../../events/TypedEventBus";
 
 import { diagnosticsLogger, logger } from "../logger";
+
+const hasThenProperty = (candidate: unknown): candidate is { then: unknown } =>
+    typeof candidate === "object" && candidate !== null && "then" in candidate;
+
+const isPromiseLike = (candidate: unknown): candidate is PromiseLike<unknown> =>
+    hasThenProperty(candidate) && typeof candidate.then === "function";
 
 type CacheEventName =
     | "internal:cache:all-invalidated"
@@ -26,15 +34,23 @@ type CacheEventName =
     | "internal:cache:item-expired"
     | "internal:cache:item-invalidated";
 
-type CacheEventPayloadMap = {
-    [Event in CacheEventName]: Omit<
-        UptimeEvents[Event],
-        "cacheName" | "timestamp"
+type ReplaceCacheKey<Payload, TKey extends string> = Payload extends {
+    key: string;
+}
+    ? Omit<Payload, "key"> & { key: TKey }
+    : Payload;
+
+type CacheEventPayloadMap<TKey extends string> = {
+    [Event in CacheEventName]: ReplaceCacheKey<
+        Omit<UptimeEvents[Event], "cacheName" | "timestamp">,
+        TKey
     >;
 };
 
-type CacheEventPayload<EventName extends CacheEventName> =
-    CacheEventPayloadMap[EventName];
+type CacheEventPayload<
+    TKey extends string,
+    EventName extends CacheEventName,
+> = CacheEventPayloadMap<TKey>[EventName];
 
 interface CacheEventContext {
     cacheName: string;
@@ -50,31 +66,31 @@ const createItemCountPayload = (
     timestamp: context.timestamp,
 });
 
-const createKeyPayload = (
+const createKeyPayload = <TKey extends string>(
     context: CacheEventContext,
-    data: { key: string }
-): { cacheName: string; key: string; timestamp: number } => ({
+    data: { key: TKey }
+): { cacheName: string; key: TKey; timestamp: number } => ({
     cacheName: context.cacheName,
     key: data.key,
     timestamp: context.timestamp,
 });
 
-const createKeyWithOptionalTtlPayload = (
+const createKeyWithOptionalTtlPayload = <TKey extends string>(
     context: CacheEventContext,
-    data: { key: string; ttl?: number }
-): { cacheName: string; key: string; timestamp: number; ttl?: number } => ({
+    data: { key: TKey; ttl?: number }
+): { cacheName: string; key: TKey; timestamp: number; ttl?: number } => ({
     cacheName: context.cacheName,
     key: data.key,
     timestamp: context.timestamp,
     ...(data.ttl === undefined ? {} : { ttl: data.ttl }),
 });
 
-const createKeyWithReasonPayload = (
+const createKeyWithReasonPayload = <TKey extends string>(
     context: CacheEventContext,
-    data: { key: string; reason: "lru" | "manual" }
+    data: { key: TKey; reason: "lru" | "manual" }
 ): {
     cacheName: string;
-    key: string;
+    key: TKey;
     reason: "lru" | "manual";
     timestamp: number;
 } => ({
@@ -87,7 +103,7 @@ const createKeyWithReasonPayload = (
 const CACHE_EVENT_PAYLOAD_BUILDERS: {
     [Event in CacheEventName]: (
         context: CacheEventContext,
-        data: CacheEventPayload<Event>
+        data: CacheEventPayload<string, Event>
     ) => UptimeEvents[Event];
 } = {
     "internal:cache:all-invalidated": createItemCountPayload,
@@ -156,6 +172,12 @@ export interface CacheStats {
     size: number;
 }
 
+interface CacheItemInput<TValue, TKey extends string> {
+    data: TValue;
+    key: TKey;
+    ttl?: number;
+}
+
 /**
  * Standardized cache implementation.
  *
@@ -168,8 +190,8 @@ export interface CacheStats {
  * - Hit/miss statistics
  * - Bulk operations
  */
-export class StandardizedCache<T> {
-    private readonly cache = new Map<string, CacheEntry<T>>();
+export class StandardizedCache<TValue = unknown, TKey extends string = string> {
+    private readonly cache = new Map<TKey, CacheEntry<TValue>>();
 
     private readonly config: {
         enableStats: boolean;
@@ -179,7 +201,9 @@ export class StandardizedCache<T> {
         ttl: number;
     };
 
-    private readonly invalidationCallbacks = new Set<(key?: string) => void>();
+    private readonly invalidationCallbacks = new Set<
+        (key?: TKey) => Promisable<void>
+    >();
 
     private readonly stats: CacheStats = {
         hitRatio: 0,
@@ -215,10 +239,10 @@ export class StandardizedCache<T> {
      * Note: Emits only a single bulk-updated event for performance. Individual
      * item cache events are not emitted during bulk operations.
      */
-    public bulkUpdate(
-        items: Array<{ data: T; key: string; ttl?: number }>
-    ): void {
-        if (items.length === 0) {
+    public bulkUpdate(items: Iterable<CacheItemInput<TValue, TKey>>): void {
+        const entries = Array.from(items);
+
+        if (entries.length === 0) {
             logger.debug(
                 `[Cache:${this.config.name}] Bulk update skipped (no items)`
             );
@@ -226,10 +250,10 @@ export class StandardizedCache<T> {
         }
 
         logger.debug(
-            `[Cache:${this.config.name}] Bulk updating ${items.length} items`
+            `[Cache:${this.config.name}] Bulk updating ${entries.length} items`
         );
 
-        for (const item of items) {
+        for (const item of entries) {
             this.setEntry(item.key, item.data, item.ttl, {
                 emitEvent: false,
                 logAction: false,
@@ -237,7 +261,7 @@ export class StandardizedCache<T> {
         }
 
         this.emitEvent("internal:cache:bulk-updated", {
-            itemCount: items.length,
+            itemCount: entries.length,
         });
     }
 
@@ -251,17 +275,17 @@ export class StandardizedCache<T> {
      * `internal:cache:bulk-updated` event (with `itemCount: 0`) to keep
      * downstream telemetry consistent with the refresh contract.
      */
-    public replaceAll(
-        items: Array<{ data: T; key: string; ttl?: number }>
-    ): void {
+    public replaceAll(items: Iterable<CacheItemInput<TValue, TKey>>): void {
         this.clear();
 
-        if (items.length === 0) {
+        const entries = Array.from(items);
+
+        if (entries.length === 0) {
             this.emitEvent("internal:cache:bulk-updated", { itemCount: 0 });
             return;
         }
 
-        this.bulkUpdate(items);
+        this.bulkUpdate(entries);
     }
 
     /**
@@ -270,7 +294,7 @@ export class StandardizedCache<T> {
     public cleanup(): number {
         const now = Date.now();
         let cleaned = 0;
-        const cleanedKeys: string[] = [];
+        const cleanedKeys: TKey[] = [];
 
         for (const [key, entry] of this.cache.entries()) {
             if (entry.expiresAt && entry.expiresAt < now) {
@@ -320,7 +344,7 @@ export class StandardizedCache<T> {
     /**
      * Delete item from cache.
      */
-    public delete(key: string): boolean {
+    public delete(key: TKey): boolean {
         const deleted = this.cache.delete(key);
 
         if (deleted) {
@@ -336,9 +360,9 @@ export class StandardizedCache<T> {
     /**
      * Get cache entries iterator.
      */
-    public entries(): IterableIterator<[string, T]> {
+    public entries(): IterableIterator<[TKey, TValue]> {
         const entries = this.cleanupAndExtract(
-            (key, entry) => [key, entry.data] as [string, T]
+            (key, entry) => [key, entry.data] as [TKey, TValue]
         );
 
         // Workaround for ESLint plugin bug: avoid direct [Symbol.iterator]()
@@ -350,7 +374,7 @@ export class StandardizedCache<T> {
     /**
      * Get item from cache.
      */
-    public get(key: string): T | undefined {
+    public get(key: TKey): TValue | undefined {
         const entry = this.cache.get(key);
 
         if (!entry) {
@@ -379,7 +403,7 @@ export class StandardizedCache<T> {
     /**
      * Get all cached values.
      */
-    public getAll(): T[] {
+    public getAll(): TValue[] {
         return this.cleanupAndExtract((_key, entry) => entry.data);
     }
 
@@ -394,7 +418,7 @@ export class StandardizedCache<T> {
     /**
      * Check if key exists in cache.
      */
-    public has(key: string): boolean {
+    public has(key: TKey): boolean {
         const entry = this.cache.get(key);
 
         if (!entry) {
@@ -415,7 +439,7 @@ export class StandardizedCache<T> {
     /**
      * Invalidate specific key.
      */
-    public invalidate(key: string): void {
+    public invalidate(key: TKey): void {
         const deleted = this.delete(key);
 
         if (deleted) {
@@ -455,7 +479,9 @@ export class StandardizedCache<T> {
      *
      * @returns Cleanup function to remove the callback
      */
-    public onInvalidation(callback: (key?: string) => void): () => void {
+    public onInvalidation(
+        callback: (key?: TKey) => Promisable<void>
+    ): () => void {
         this.invalidationCallbacks.add(callback);
         logger.debug(
             `[Cache:${this.config.name}] Invalidation callback registered`
@@ -478,7 +504,7 @@ export class StandardizedCache<T> {
      * @param ttl - Time to live in milliseconds. If 0 or negative, the item
      *   will not expire.
      */
-    public set(key: string, data: T, ttl?: number): void {
+    public set(key: TKey, data: TValue, ttl?: number): void {
         this.setEntry(key, data, ttl, { emitEvent: true, logAction: true });
     }
 
@@ -487,7 +513,7 @@ export class StandardizedCache<T> {
      */
     private emitEvent<EventName extends CacheEventName>(
         eventType: EventName,
-        data: CacheEventPayload<EventName>
+        data: CacheEventPayload<TKey, EventName>
     ): void {
         const { eventEmitter, name } = this.config;
 
@@ -521,7 +547,7 @@ export class StandardizedCache<T> {
      */
     private buildCacheEventPayload<EventName extends CacheEventName>(
         eventType: EventName,
-        data: CacheEventPayload<EventName>
+        data: CacheEventPayload<TKey, EventName>
     ): UptimeEvents[EventName] {
         const context: CacheEventContext = {
             cacheName: this.config.name,
@@ -540,10 +566,10 @@ export class StandardizedCache<T> {
      * @returns Array of extracted values from valid entries
      */
     private cleanupAndExtract<R>(
-        extractFn: (key: string, entry: CacheEntry<T>) => R
+        extractFn: (key: TKey, entry: CacheEntry<TValue>) => R
     ): R[] {
         const results: R[] = [];
-        const expiredKeys: string[] = [];
+        const expiredKeys: TKey[] = [];
         const now = Date.now();
 
         for (const [key, entry] of this.cache.entries()) {
@@ -571,7 +597,7 @@ export class StandardizedCache<T> {
      * Evict least recently used item.
      */
     private evictLRU(): void {
-        let oldestKey: string | undefined = undefined;
+        let oldestKey: TKey | undefined = undefined;
         let oldestTime = Number.POSITIVE_INFINITY;
 
         for (const [key, entry] of this.cache.entries()) {
@@ -604,11 +630,22 @@ export class StandardizedCache<T> {
      * @param key - The invalidated cache key, or undefined if all keys were
      *   invalidated
      */
-    private notifyInvalidation(key?: string): void {
-        for (const callback of this.invalidationCallbacks) {
+    private notifyInvalidation(key?: TKey): void {
+        for (const handler of this.invalidationCallbacks) {
             try {
-                // eslint-disable-next-line n/callback-return -- Synchronous callback for immediate invalidation notification
-                callback(key);
+                const result = handler(key);
+                if (isPromiseLike(result)) {
+                    void (async (): Promise<void> => {
+                        try {
+                            await result;
+                        } catch (error: unknown) {
+                            logger.error(
+                                `[Cache:${this.config.name}] Error in async invalidation callback:`,
+                                error
+                            );
+                        }
+                    })();
+                }
             } catch (error) {
                 logger.error(
                     `[Cache:${this.config.name}] Error in invalidation callback:`,
@@ -655,8 +692,8 @@ export class StandardizedCache<T> {
     }
 
     private setEntry(
-        key: string,
-        data: T,
+        key: TKey,
+        data: TValue,
         ttl: number | undefined,
         options?: { emitEvent?: boolean; logAction?: boolean }
     ): void {
@@ -668,7 +705,7 @@ export class StandardizedCache<T> {
         const now = Date.now();
         const requestedTTL = ttl ?? this.config.ttl;
 
-        const entry: CacheEntry<T> = {
+        const entry: CacheEntry<TValue> = {
             data,
             hits: 0,
             timestamp: now,

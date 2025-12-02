@@ -142,7 +142,7 @@ export const SiteService: SiteServiceContract = {
         const rawSites = await api.sites.getSites();
         const validationResult = validateSiteSnapshots(rawSites);
 
-        if (validationResult.success) {
+        if (validationResult.status === "success") {
             return validationResult.data;
         }
 

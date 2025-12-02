@@ -18,7 +18,7 @@ import {
     LOG_TEMPLATES,
 } from "@shared/utils/logTemplates";
 
-import type { IMonitorService, MonitorConfig } from "./types";
+import type { IMonitorService, MonitorServiceConfig } from "./types";
 
 import { logger } from "../../utils/logger";
 import {
@@ -189,7 +189,7 @@ export function getAvailableMonitorTypes(): readonly string[] {
  */
 export function getMonitorWithResult(
     type: MonitorType,
-    config?: MonitorConfig,
+    config?: MonitorServiceConfig,
     forceConfigUpdate = false
 ): MonitorServiceResult {
     // Validate monitor type using registry
@@ -296,14 +296,14 @@ export function getMonitorWithResult(
  * @public
  *
  * @see {@link IMonitorService}
- * @see {@link MonitorConfig}
+ * @see {@link MonitorServiceConfig}
  * @see {@link getMonitorServiceFactory}
  * @see {@link isValidMonitorType}
  * @see {@link getMonitorWithResult} for version that returns configuration status
  */
 export function getMonitor(
     type: MonitorType,
-    config?: MonitorConfig,
+    config?: MonitorServiceConfig,
     forceConfigUpdate = false
 ): IMonitorService {
     const result = getMonitorWithResult(type, config, forceConfigUpdate);
@@ -332,9 +332,9 @@ export function getMonitor(
  *
  * @public
  *
- * @see {@link MonitorConfig}
+ * @see {@link MonitorServiceConfig}
  */
-export function updateMonitorConfig(config: MonitorConfig): void {
+export function updateMonitorConfig(config: MonitorServiceConfig): void {
     // Update config for all initialized monitor instances
     for (const instance of serviceInstances.values()) {
         try {

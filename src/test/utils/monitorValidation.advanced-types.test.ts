@@ -18,8 +18,6 @@ import * as fc from "fast-check";
 import type { MonitorType } from "@shared/types";
 import type { ValidationResult } from "@shared/types/validation";
 
-import type { MonitorFormData } from "../../types/monitorFormData";
-
 vi.mock("@shared/utils/errorHandling", () => ({
     withUtilityErrorHandling: vi.fn(),
 }));
@@ -29,7 +27,10 @@ vi.mock("@shared/validation/schemas", () => ({
     validateMonitorField: vi.fn(),
 }));
 
-import { validateMonitorFormData } from "../../utils/monitorValidation";
+import {
+    validateMonitorFormData,
+    type PartialMonitorFormDataByType,
+} from "../../utils/monitorValidation";
 import { withUtilityErrorHandling } from "@shared/utils/errorHandling";
 import { validateMonitorField as sharedValidateMonitorField } from "@shared/validation/schemas";
 
@@ -46,9 +47,9 @@ const baseValidationResult: ValidationResult = {
 /**
  * Definition of a monitor scenario for table-driven tests.
  */
-interface MonitorTypeScenario {
-    readonly type: MonitorType;
-    readonly validData: Partial<MonitorFormData>;
+interface MonitorTypeScenario<TType extends MonitorType = MonitorType> {
+    readonly type: TType;
+    readonly validData: PartialMonitorFormDataByType<TType>;
     readonly requiredFields: readonly {
         readonly field: string;
         readonly missingMessage: string;
@@ -82,7 +83,7 @@ const advancedMonitorScenarios = [
             expectedHeaderValue: "MISS",
             headerName: "x-cache",
             url: "https://headers.example.com/inspect",
-        } satisfies Partial<MonitorFormData>,
+        } satisfies PartialMonitorFormDataByType<"http-header">,
     },
     {
         requiredFields: [
@@ -108,7 +109,7 @@ const advancedMonitorScenarios = [
             expectedJsonValue: "ok",
             jsonPath: "$.status",
             url: "https://json.example.com/health",
-        } satisfies Partial<MonitorFormData>,
+        } satisfies PartialMonitorFormDataByType<"http-json">,
     },
     {
         requiredFields: [
@@ -128,7 +129,7 @@ const advancedMonitorScenarios = [
         validData: {
             maxResponseTime: 1500,
             url: "https://latency.example.com/api",
-        } satisfies Partial<MonitorFormData>,
+        } satisfies PartialMonitorFormDataByType<"http-latency">,
     },
     {
         requiredFields: [
@@ -148,7 +149,7 @@ const advancedMonitorScenarios = [
             expectedValue: "93.184.216.34",
             host: "example.com",
             recordType: "A",
-        } satisfies Partial<MonitorFormData>,
+        } satisfies PartialMonitorFormDataByType<"dns">,
     },
     {
         requiredFields: [
@@ -174,7 +175,7 @@ const advancedMonitorScenarios = [
             certificateWarningDays: 30,
             host: "secure.example.com",
             port: 443,
-        } satisfies Partial<MonitorFormData>,
+        } satisfies PartialMonitorFormDataByType<"ssl">,
     },
     {
         requiredFields: [
@@ -196,7 +197,7 @@ const advancedMonitorScenarios = [
             baselineUrl: "https://origin.example.com/status",
             edgeLocations:
                 "https://edge-1.example.com,https://edge-2.example.com",
-        } satisfies Partial<MonitorFormData>,
+        } satisfies PartialMonitorFormDataByType<"cdn-edge-consistency">,
     },
     {
         requiredFields: [
@@ -231,7 +232,7 @@ const advancedMonitorScenarios = [
             primaryStatusUrl: "https://primary.example.com/status",
             replicaStatusUrl: "https://replica.example.com/status",
             replicationTimestampField: "data.replicationTimestamp",
-        } satisfies Partial<MonitorFormData>,
+        } satisfies PartialMonitorFormDataByType<"replication">,
     },
     {
         requiredFields: [
@@ -273,7 +274,7 @@ const advancedMonitorScenarios = [
             heartbeatStatusField: "payload.status",
             heartbeatTimestampField: "payload.timestamp",
             url: "https://heartbeat.example.com/api",
-        } satisfies Partial<MonitorFormData>,
+        } satisfies PartialMonitorFormDataByType<"server-heartbeat">,
     },
     {
         requiredFields: [
@@ -294,7 +295,7 @@ const advancedMonitorScenarios = [
         validData: {
             maxPongDelayMs: 5000,
             url: "wss://socket.example.com/keepalive",
-        } satisfies Partial<MonitorFormData>,
+        } satisfies PartialMonitorFormDataByType<"websocket-keepalive">,
     },
 ] as const satisfies readonly MonitorTypeScenario[];
 
@@ -360,25 +361,29 @@ describe("validateMonitorFormData advanced monitor coverage", () => {
     it.each(missingFieldCases)(
         "returns explicit error when %s is missing for %s monitors",
         async (_fieldName, _monitorType, field, scenario) => {
-            let invalidData: Record<string, unknown> = {
+            let invalidData: PartialMonitorFormDataByType<
+                typeof scenario.type
+            > = {
                 ...scenario.validData,
             };
 
             if (field.invalidValue === undefined) {
                 const { [field.field]: removedValue, ...remainingData } =
-                    invalidData;
+                    invalidData as Record<string, unknown>;
                 void removedValue;
-                invalidData = remainingData;
+                invalidData = remainingData as PartialMonitorFormDataByType<
+                    typeof scenario.type
+                >;
             } else {
                 invalidData = {
                     ...invalidData,
                     [field.field]: field.invalidValue,
-                };
+                } as PartialMonitorFormDataByType<typeof scenario.type>;
             }
 
             const result = await validateMonitorFormData(
                 scenario.type,
-                invalidData as Partial<MonitorFormData>
+                invalidData
             );
 
             expect(result).toEqual({
@@ -394,7 +399,7 @@ describe("validateMonitorFormData advanced monitor coverage", () => {
             expectedValue: "   ",
             host: "dns.example.com",
             recordType: "A",
-        } satisfies Partial<MonitorFormData>;
+        } satisfies PartialMonitorFormDataByType<"dns">;
 
         await validateMonitorFormData("dns", whitespaceData);
         const expectedValueCalls = vi
@@ -410,7 +415,7 @@ describe("validateMonitorFormData advanced monitor coverage", () => {
             expectedValue: "1.1.1.1",
             host: "dns.example.com",
             recordType: "A",
-        } satisfies Partial<MonitorFormData>;
+        } satisfies PartialMonitorFormDataByType<"dns">;
 
         await validateMonitorFormData("dns", populatedData);
         const populatedCalls = vi

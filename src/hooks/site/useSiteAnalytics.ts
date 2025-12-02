@@ -88,18 +88,18 @@ export interface SiteAnalytics {
     downtimePeriods: DowntimePeriod[];
     /** Fastest response time recorded */
     fastestResponse: number;
-    /** Status history filtered by time range */
-    filteredHistory: StatusHistory[];
+    /** Filtered history entries used for analytics */
+    filteredHistory: readonly StatusHistory[];
     /** Number of separate downtime incidents */
     incidentCount: number;
     /** Mean Time To Recovery in milliseconds */
     mttr: number;
-    /** 50th percentile response time */
-    p50: number;
-    /** 95th percentile response time */
-    p95: number;
-    /** 99th percentile response time */
-    p99: number;
+    /** Response time percentiles */
+    percentileMetrics: {
+        p50: number;
+        p95: number;
+        p99: number;
+    };
     /** Slowest response time recorded */
     slowestResponse: number;
     /** Total number of checks performed */
@@ -120,7 +120,7 @@ export interface SiteAnalytics {
  * @internal
  */
 function calculateAverageResponseTime(
-    filteredHistory: StatusHistory[]
+    filteredHistory: readonly StatusHistory[]
 ): number {
     const totalChecks = filteredHistory.length;
     return totalChecks > 0
@@ -137,7 +137,7 @@ function calculateAverageResponseTime(
  * @internal
  */
 function calculateDowntimePeriods(
-    filteredHistory: StatusHistory[]
+    filteredHistory: readonly StatusHistory[]
 ): DowntimePeriod[] {
     const downtimePeriods: DowntimePeriod[] = [];
     let downtimeEnd: number | undefined = undefined; // Most recent "down" timestamp
@@ -195,11 +195,13 @@ function calculateDowntimePeriods(
  *
  * @internal
  */
-function calculateResponseMetrics(filteredHistory: StatusHistory[]): {
+function calculateResponseMetrics(filteredHistory: readonly StatusHistory[]): {
     fastestResponse: number;
-    p50: number;
-    p95: number;
-    p99: number;
+    percentileMetrics: {
+        p50: number;
+        p95: number;
+        p99: number;
+    };
     slowestResponse: number;
 } {
     const responseTimes = filteredHistory.map((h) => h.responseTime);
@@ -227,9 +229,11 @@ function calculateResponseMetrics(filteredHistory: StatusHistory[]): {
 
     return {
         fastestResponse,
-        p50: getPercentile(0.5),
-        p95: getPercentile(0.95),
-        p99: getPercentile(0.99),
+        percentileMetrics: {
+            p50: getPercentile(0.5),
+            p95: getPercentile(0.95),
+            p99: getPercentile(0.99),
+        },
         slowestResponse,
     };
 }
@@ -240,7 +244,7 @@ function calculateResponseMetrics(filteredHistory: StatusHistory[]): {
  * @internal
  */
 function filterHistoryByTimeRange(
-    history: StatusHistory[],
+    history: readonly StatusHistory[],
     timeRange: TimePeriod
 ): StatusHistory[] {
     const now = Date.now();

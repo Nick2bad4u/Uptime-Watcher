@@ -289,6 +289,11 @@ const mockUseSiteDetailsReturn = {
         p50: 140,
         p95: 280,
         p99: 295,
+        percentileMetrics: {
+            p50: 140,
+            p95: 280,
+            p99: 295,
+        },
         totalDowntime: 300_000,
         mttr: 60_000,
         incidentCount: 2,

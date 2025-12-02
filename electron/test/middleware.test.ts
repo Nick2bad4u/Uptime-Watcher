@@ -28,6 +28,9 @@ import {
     MIDDLEWARE_STACKS,
 } from "../events/middleware";
 import { logger } from "../utils/logger";
+import type { EventPayloadValue } from "../events/TypedEventBus";
+const asEventPayload = (value: unknown): EventPayloadValue =>
+    value as EventPayloadValue;
 
 // Mock logger
 vi.mock("../utils/logger", () => ({
@@ -61,7 +64,7 @@ describe("middleware.ts", () => {
                 level: "debug",
                 includeData: true,
             });
-            await mw("eventA", { foo: 1 }, next);
+            await mw("eventA", asEventPayload({ foo: 1 }), next);
             expect(logger.debug).toHaveBeenCalledWith(expect.any(String), {
                 data: { foo: 1 },
                 event: "eventA",
@@ -76,7 +79,7 @@ describe("middleware.ts", () => {
 
             const next = vi.fn();
             const mw = createLoggingMiddleware({ level: "info" });
-            await mw("eventB", { bar: 2 }, next);
+            await mw("eventB", asEventPayload({ bar: 2 }), next);
             expect(logger.info).toHaveBeenCalledWith(expect.any(String), {
                 event: "eventB",
             });
@@ -190,12 +193,18 @@ describe("middleware.ts", () => {
                 onError,
                 continueOnError: true,
             });
-            await mw("eventE", { x: 1 }, next);
+            await mw("eventE", asEventPayload({ x: 1 }), next);
             expect(logger.error).toHaveBeenCalledWith(
-                expect.stringContaining("Middleware error"),
-                expect.any(Object)
+                expect.stringContaining("Error in event 'eventE': fail"),
+                expect.objectContaining({
+                    data: { x: 1 },
+                    event: "eventE",
+                })
             );
-            expect(onError).toHaveBeenCalledWith(error, "eventE", { x: 1 });
+            expect(onError).toHaveBeenCalledWith(error, {
+                data: { x: 1 },
+                event: "eventE",
+            });
         });
         it("throws if continueOnError is false", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
@@ -245,7 +254,11 @@ describe("middleware.ts", () => {
             expect(logger.warn).toHaveBeenCalledWith(
                 expect.stringContaining("burst limit")
             );
-            expect(onRateLimit).toHaveBeenCalledWith("eventH", {});
+            expect(onRateLimit).toHaveBeenCalledWith({
+                data: {},
+                event: "eventH",
+                reason: "burst",
+            });
         });
         it("blocks events over rate limit", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
@@ -267,7 +280,13 @@ describe("middleware.ts", () => {
             expect(logger.warn).toHaveBeenCalledWith(
                 expect.stringContaining("rate limit")
             );
-            expect(onRateLimit).toHaveBeenCalledWith("eventI", {});
+            expect(onRateLimit).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    data: {},
+                    event: "eventI",
+                    reason: "rate",
+                })
+            );
         });
     });
     describe(createValidationMiddleware, () => {
@@ -278,9 +297,10 @@ describe("middleware.ts", () => {
             await annotate("Type: Business Logic", "type");
 
             const next = vi.fn();
-            const validators = { eventJ: (data: any) => data === 42 };
-            const mw =
-                createValidationMiddleware<typeof validators>(validators);
+            const validators = {
+                eventJ: (data: EventPayloadValue) => data === 42,
+            };
+            const mw = createValidationMiddleware(validators);
             await mw("eventJ", 42, next);
             expect(next).toHaveBeenCalled();
         });
@@ -294,9 +314,10 @@ describe("middleware.ts", () => {
             await annotate("Type: Business Logic", "type");
 
             const next = vi.fn();
-            const validators = { eventK: (_data: any) => false };
-            const mw =
-                createValidationMiddleware<typeof validators>(validators);
+            const validators = {
+                eventK: (_data: EventPayloadValue) => false,
+            };
+            const mw = createValidationMiddleware(validators);
             await expect(mw("eventK", 1, next)).rejects.toThrow(
                 "Validation failed for event 'eventK'"
             );
@@ -310,10 +331,12 @@ describe("middleware.ts", () => {
 
             const next = vi.fn();
             const validators = {
-                eventL: (_: any) => ({ isValid: false, error: "bad" }),
+                eventL: (_: EventPayloadValue) => ({
+                    isValid: false,
+                    error: "bad",
+                }),
             };
-            const mw =
-                createValidationMiddleware<typeof validators>(validators);
+            const mw = createValidationMiddleware(validators);
             await expect(mw("eventL", 1, next)).rejects.toThrow("bad");
             expect(logger.error).toHaveBeenCalled();
         });
