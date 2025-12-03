@@ -304,7 +304,7 @@ describe("useSitesState", () => {
                 },
             ];
 
-            expect(() => stateActions.setSites(duplicateSites)).toThrow(
+            expect(() => stateActions.setSites(duplicateSites)).toThrowError(
                 DuplicateSiteIdentifierError
             );
             expect(logger.error).toHaveBeenCalledWith(

@@ -201,7 +201,7 @@ describe("useSiteDetails - Branch Coverage", () => {
                 act(async () => {
                     await result.current.handleSaveInterval();
                 })
-            ).rejects.toThrow("Validation failed: Invalid interval value");
+            ).rejects.toThrowError("Validation failed: Invalid interval value");
 
             expect(mockLogger.site.error).toHaveBeenCalledWith(
                 "test-site",
@@ -297,7 +297,7 @@ describe("useSiteDetails - Branch Coverage", () => {
                 act(async () => {
                     await result.current.handleSaveTimeout();
                 })
-            ).rejects.toThrow("Validation failed: Invalid timeout value");
+            ).rejects.toThrowError("Validation failed: Invalid timeout value");
 
             expect(mockLogger.site.error).toHaveBeenCalledWith(
                 "test-site",
@@ -393,7 +393,7 @@ describe("useSiteDetails - Branch Coverage", () => {
                 act(async () => {
                     await result.current.handleSaveRetryAttempts();
                 })
-            ).rejects.toThrow(
+            ).rejects.toThrowError(
                 "Validation failed: Invalid retry attempts value"
             );
 

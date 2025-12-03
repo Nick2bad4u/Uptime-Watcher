@@ -188,7 +188,7 @@ describe("File Download Utility - Fixed Coverage Tests", () => {
                 throw new Error("createObjectURL failed");
             });
 
-            expect(() => downloadFile({ buffer, fileName })).toThrow();
+            expect(() => downloadFile({ buffer, fileName })).toThrowError();
         });
 
         it("should handle createElement errors", async ({ task, annotate }) => {
@@ -206,7 +206,7 @@ describe("File Download Utility - Fixed Coverage Tests", () => {
                     throw new Error("createElement failed");
                 });
 
-            expect(() => downloadFile({ buffer, fileName })).toThrow();
+            expect(() => downloadFile({ buffer, fileName })).toThrowError();
         });
 
         it("should handle appendChild errors with fallback attempt", async ({
@@ -228,7 +228,7 @@ describe("File Download Utility - Fixed Coverage Tests", () => {
 
             // The fallback will try the same createAndTriggerDownload again, so append will fail again
             // This means the fallback also fails and should throw "File download failed"
-            expect(() => downloadFile({ buffer, fileName })).toThrow(
+            expect(() => downloadFile({ buffer, fileName })).toThrowError(
                 "File download failed"
             );
 
@@ -609,10 +609,10 @@ describe("File Download Utility - Fixed Coverage Tests", () => {
 
             await expect(
                 handleSQLiteBackupDownload(mockDownloadFunction)
-            ).rejects.toThrow(TypeError);
+            ).rejects.toThrowError(TypeError);
             await expect(
                 handleSQLiteBackupDownload(mockDownloadFunction)
-            ).rejects.toThrow("Invalid backup data received");
+            ).rejects.toThrowError("Invalid backup data received");
         });
 
         it("should throw TypeError for null backup data", async ({
@@ -628,7 +628,7 @@ describe("File Download Utility - Fixed Coverage Tests", () => {
 
             await expect(
                 handleSQLiteBackupDownload(mockDownloadFunction)
-            ).rejects.toThrow(TypeError);
+            ).rejects.toThrowError(TypeError);
         });
 
         it("should throw TypeError when required fields are missing", async ({
@@ -655,7 +655,7 @@ describe("File Download Utility - Fixed Coverage Tests", () => {
 
             await expect(
                 handleSQLiteBackupDownload(mockDownloadFunction)
-            ).rejects.toThrow(TypeError);
+            ).rejects.toThrowError(TypeError);
         });
 
         it("should handle empty backup buffers", async ({ task, annotate }) => {
@@ -712,7 +712,7 @@ describe("File Download Utility - Fixed Coverage Tests", () => {
 
             await expect(
                 handleSQLiteBackupDownload(mockDownloadFunction)
-            ).rejects.toThrow("Download trigger failed");
+            ).rejects.toThrowError("Download trigger failed");
         });
 
         it("should handle non-Error click failures", async ({
@@ -733,7 +733,7 @@ describe("File Download Utility - Fixed Coverage Tests", () => {
 
             await expect(
                 handleSQLiteBackupDownload(mockDownloadFunction)
-            ).rejects.toThrow("Download trigger failed");
+            ).rejects.toThrowError("Download trigger failed");
         });
 
         it("should clean up object URL even when click fails", async ({
@@ -754,7 +754,7 @@ describe("File Download Utility - Fixed Coverage Tests", () => {
 
             await expect(
                 handleSQLiteBackupDownload(mockDownloadFunction)
-            ).rejects.toThrow();
+            ).rejects.toThrowError();
 
             expect(globalThis.URL.revokeObjectURL).toHaveBeenCalledWith(
                 "mock-object-url"
@@ -776,7 +776,7 @@ describe("File Download Utility - Fixed Coverage Tests", () => {
 
             await expect(
                 handleSQLiteBackupDownload(mockDownloadFunction)
-            ).rejects.toThrow("Download failed");
+            ).rejects.toThrowError("Download failed");
         });
 
         it("should handle large backup data", async ({ task, annotate }) => {
@@ -822,7 +822,7 @@ describe("File Download Utility - Fixed Coverage Tests", () => {
 
                     await expect(
                         handleSQLiteBackupDownload(mockDownloadFunction)
-                    ).rejects.toThrow(errorMessage);
+                    ).rejects.toThrowError(errorMessage);
 
                     expect(mockDownloadFunction).toHaveBeenCalledTimes(1);
                 }
@@ -863,7 +863,8 @@ describe("File Download Utility - Fixed Coverage Tests", () => {
 
                     expectLatestBlobCall(uint8Data.length);
                     expect(mockAnchor.href).toBe("mock-object-url");
-                    expect(backup.metadata.sizeBytes).toBe(uint8Data.length);
+                    expect(backup.metadata).toBeDefined();
+                    expect(backup.metadata?.sizeBytes).toBe(uint8Data.length);
                 }
             );
         });

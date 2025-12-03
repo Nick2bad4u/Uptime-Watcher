@@ -612,7 +612,7 @@ describe("Cache Utilities", () => {
                 await annotate("Type: Caching", "type");
 
                 const cache = new TypedCache<string, string>({ ttl: 1000 });
-                expect(() => cache.cleanup()).not.toThrow();
+                expect(() => cache.cleanup()).not.toThrowError();
                 expect(cache.size).toBe(0);
             });
 
@@ -811,7 +811,7 @@ describe("Cache Utilities", () => {
 
             await expect(
                 getCachedOrFetch(cache, "key1", mockFetcher)
-            ).rejects.toThrow("Fetch failed");
+            ).rejects.toThrowError("Fetch failed");
             expect(cache.get("key1")).toBeUndefined(); // Should not cache failed result
         });
 

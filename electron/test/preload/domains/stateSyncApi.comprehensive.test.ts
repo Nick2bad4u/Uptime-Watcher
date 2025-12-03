@@ -149,7 +149,7 @@ describe("State Sync Domain API", () => {
             const error = new Error("Failed to get sync status");
             mockIpcRenderer.invoke.mockRejectedValue(error);
 
-            await expect(api.getSyncStatus()).rejects.toThrow(
+            await expect(api.getSyncStatus()).rejects.toThrowError(
                 "Failed to get sync status"
             );
         });
@@ -234,7 +234,7 @@ describe("State Sync Domain API", () => {
             const error = new Error("Sync operation failed");
             mockIpcRenderer.invoke.mockRejectedValue(error);
 
-            await expect(api.requestFullSync()).rejects.toThrow(
+            await expect(api.requestFullSync()).rejects.toThrowError(
                 "Sync operation failed"
             );
         });
@@ -243,7 +243,7 @@ describe("State Sync Domain API", () => {
             const networkError = new Error("Network unreachable during sync");
             mockIpcRenderer.invoke.mockRejectedValue(networkError);
 
-            await expect(api.requestFullSync()).rejects.toThrow(
+            await expect(api.requestFullSync()).rejects.toThrowError(
                 "Network unreachable during sync"
             );
         });
@@ -254,7 +254,7 @@ describe("State Sync Domain API", () => {
             );
             mockIpcRenderer.invoke.mockRejectedValue(conflictError);
 
-            await expect(api.requestFullSync()).rejects.toThrow(
+            await expect(api.requestFullSync()).rejects.toThrowError(
                 "Database conflict during synchronization"
             );
         });
@@ -504,12 +504,12 @@ describe("State Sync Domain API", () => {
                     async (error) => {
                         mockIpcRenderer.invoke.mockRejectedValue(error);
 
-                        await expect(api.getSyncStatus()).rejects.toThrow(
+                        await expect(api.getSyncStatus()).rejects.toThrowError(
                             error.message
                         );
-                        await expect(api.requestFullSync()).rejects.toThrow(
-                            error.message
-                        );
+                        await expect(
+                            api.requestFullSync()
+                        ).rejects.toThrowError(error.message);
                     }
                 ),
                 { numRuns: 10 }
@@ -698,7 +698,7 @@ describe("State Sync Domain API", () => {
             mockIpcRenderer.invoke.mockRejectedValueOnce(
                 new Error("Sync conflict")
             );
-            await expect(api.requestFullSync()).rejects.toThrow(
+            await expect(api.requestFullSync()).rejects.toThrowError(
                 "Sync conflict"
             );
 
@@ -763,10 +763,10 @@ describe("State Sync Domain API", () => {
             const corruptionError = new Error("Database corrupted during sync");
             mockIpcRenderer.invoke.mockRejectedValue(corruptionError);
 
-            await expect(api.getSyncStatus()).rejects.toThrow(
+            await expect(api.getSyncStatus()).rejects.toThrowError(
                 "Database corrupted during sync"
             );
-            await expect(api.requestFullSync()).rejects.toThrow(
+            await expect(api.requestFullSync()).rejects.toThrowError(
                 "Database corrupted during sync"
             );
         });
@@ -777,7 +777,7 @@ describe("State Sync Domain API", () => {
             );
             mockIpcRenderer.invoke.mockRejectedValue(memoryError);
 
-            await expect(api.requestFullSync()).rejects.toThrow(
+            await expect(api.requestFullSync()).rejects.toThrowError(
                 "Out of memory during sync operation"
             );
         });
@@ -816,7 +816,9 @@ describe("State Sync Domain API", () => {
             };
 
             // Should not throw despite callback error
-            expect(() => registeredHandler({}, validEventData)).not.toThrow();
+            expect(() =>
+                registeredHandler({}, validEventData)
+            ).not.toThrowError();
             expect(throwingCallback).toHaveBeenCalledWith(validEventData);
         });
 

@@ -180,7 +180,7 @@ describe("Duration Utils Property-Based Tests", () => {
 
                 expect(() =>
                     calculateMaxDuration(timeout, retries)
-                ).not.toThrow();
+                ).not.toThrowError();
 
                 const result = calculateMaxDuration(timeout, retries);
                 expect(result).toMatch(/^\d+[hms]$/);
@@ -419,15 +419,15 @@ describe("Duration Utils Property-Based Tests", () => {
 
         test("should handle extreme values gracefully", () => {
             // Large timeout
-            expect(() => calculateMaxDuration(10_000, 0)).not.toThrow();
+            expect(() => calculateMaxDuration(10_000, 0)).not.toThrowError();
             expect(calculateMaxDuration(10_000, 0)).toMatch(/^\d+h$/);
 
             // Many retries
-            expect(() => calculateMaxDuration(1, 100)).not.toThrow();
+            expect(() => calculateMaxDuration(1, 100)).not.toThrowError();
             expect(calculateMaxDuration(1, 100)).toMatch(/^\d+[hms]$/);
 
             // Very small timeout
-            expect(() => calculateMaxDuration(0.001, 0)).not.toThrow();
+            expect(() => calculateMaxDuration(0.001, 0)).not.toThrowError();
             expect(calculateMaxDuration(0.001, 0)).toBe("1s"); // Math.ceil(0.001) = 1
         });
 

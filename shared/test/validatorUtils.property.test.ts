@@ -766,7 +766,7 @@ describe("Validator Utils Property-Based Tests", () => {
                     isValidIdentifier(str);
                     isValidFQDN(str);
                     isValidUrl(str);
-                }).not.toThrow();
+                }).not.toThrowError();
             }
         });
 

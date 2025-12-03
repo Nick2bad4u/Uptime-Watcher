@@ -23,7 +23,7 @@ import type {
     UnknownRecord,
 } from "type-fest";
 
-import { siteSchema } from "@shared/validation/schemas";
+import { siteSchema } from "@shared/validation/siteSchemas";
 import * as z from "zod";
 
 import {
@@ -61,12 +61,21 @@ export interface EventMetadata {
     readonly timestamp: number;
 }
 
-const correlationIdSchema: z.ZodType<CorrelationId> = z
+/**
+ * Validates correlation identifiers used across the event bus.
+ */
+export const correlationIdSchema: z.ZodType<CorrelationId> = z
     .string()
     .min(1)
-    // Branding is purely a TypeScript concern; at runtime this remains a
-    // plain string suitable for JSON serialization.
-    .transform((value) => value as CorrelationId);
+    .pipe(
+        z.custom<CorrelationId>(
+            (value): value is CorrelationId =>
+                typeof value === "string" && value.length > 0,
+            {
+                message: "Correlation ID must be a non-empty string",
+            }
+        )
+    );
 
 export const eventMetadataSchema: z.ZodType<EventMetadata> = z
     .object({

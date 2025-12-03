@@ -10,8 +10,8 @@ import { fc, test } from "@fast-check/vitest";
 import {
     validateMonitorData,
     validateMonitorField,
-    validateSiteData,
-} from "@shared/validation/schemas";
+} from "@shared/validation/monitorSchemas";
+import { validateSiteData } from "@shared/validation/siteSchemas";
 
 describe("Schemas Fuzzing - Lines 404,488", () => {
     describe("validateMonitorField - Line 404 Unknown field error", () => {
@@ -39,7 +39,7 @@ describe("Schemas Fuzzing - Lines 404,488", () => {
                 ) {
                     expect(() =>
                         validateMonitorField("http", fieldName, value)
-                    ).toThrow(/Unknown field/);
+                    ).toThrowError(/Unknown field/);
                 }
             }
         );
@@ -48,7 +48,7 @@ describe("Schemas Fuzzing - Lines 404,488", () => {
             // Directly target line 404
             expect(() =>
                 validateMonitorField("http", "totallyInvalidFieldName", "value")
-            ).toThrow("Unknown field: totallyInvalidFieldName");
+            ).toThrowError("Unknown field: totallyInvalidFieldName");
         });
     });
 
@@ -91,12 +91,12 @@ describe("Schemas Fuzzing - Lines 404,488", () => {
                 expect(() => {
                     const result = validateSiteData(input);
                     expect(result).toBeDefined();
-                }).not.toThrow();
+                }).not.toThrowError();
 
                 expect(() => {
                     const result = validateMonitorData("http", input);
                     expect(result).toBeDefined();
-                }).not.toThrow();
+                }).not.toThrowError();
             }
         );
     });

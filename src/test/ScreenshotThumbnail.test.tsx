@@ -1200,7 +1200,7 @@ describe(ScreenshotThumbnail, () => {
             // The cleanup should happen through the useEffect cleanup
             expect(() =>
                 screen.queryByAltText(`Screenshot of ${props.siteName}`)
-            ).not.toThrow();
+            ).not.toThrowError();
 
             clearTimeoutSpy.mockRestore();
             vi.useRealTimers();
@@ -1752,7 +1752,7 @@ describe(ScreenshotThumbnail, () => {
 
             // The component should still unmount cleanly even though the cleanup
             // doesn't actually clear the current timeout/portal refs due to closure
-            expect(() => unmount()).not.toThrow();
+            expect(() => unmount()).not.toThrowError();
 
             // This test documents the current behavior - the cleanup lines 59-60 and 65-66
             // are not actually reachable with the current implementation due to the

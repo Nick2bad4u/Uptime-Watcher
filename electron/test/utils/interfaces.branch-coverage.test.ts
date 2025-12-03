@@ -14,7 +14,7 @@ describe("interfaces.ts - Branch Coverage", () => {
             // Test that the module can be imported without runtime errors
             expect(async () => {
                 await import("../../utils/interfaces.js");
-            }).not.toThrow();
+            }).not.toThrowError();
         });
         it("should export expected interface definitions", async () => {
             // Since this is likely a types-only file, we verify it imports successfully

@@ -114,9 +114,11 @@ vi.mock("../../electron/services/monitoring/MonitorTypeRegistry", () => ({
 }));
 
 // Mock shared validation
-vi.mock("@shared/validation/schemas", async (importOriginal) => {
+vi.mock("@shared/validation/monitorSchemas", async (importOriginal) => {
     const actual =
-        await importOriginal<typeof import("@shared/validation/schemas")>();
+        await importOriginal<
+            typeof import("@shared/validation/monitorSchemas")
+        >();
 
     const createSchemaMock = () => ({
         parse: vi.fn((data) => data),

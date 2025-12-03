@@ -900,7 +900,7 @@ describe("monitorOperations", () => {
 
             expect(() => {
                 updateMonitorInSite(mockSite, "non-existent", updates);
-            }).toThrow("Monitor not found");
+            }).toThrowError("Monitor not found");
         });
 
         it("should not mutate original site", async ({ task, annotate }) => {
@@ -1196,7 +1196,7 @@ describe("monitorOperations", () => {
 
             expect(() => {
                 validateMonitorExists(mockSite, "monitor-1");
-            }).not.toThrow();
+            }).not.toThrowError();
         });
 
         it("should throw error for undefined site", async ({
@@ -1210,7 +1210,7 @@ describe("monitorOperations", () => {
 
             expect(() => {
                 validateMonitorExists(undefined, "monitor-1");
-            }).toThrow(ERROR_CATALOG.sites.NOT_FOUND);
+            }).toThrowError(ERROR_CATALOG.sites.NOT_FOUND);
         });
 
         it("should throw error for non-existent monitor", async ({
@@ -1224,7 +1224,7 @@ describe("monitorOperations", () => {
 
             expect(() => {
                 validateMonitorExists(mockSite, "non-existent");
-            }).toThrow("Monitor not found");
+            }).toThrowError("Monitor not found");
         });
 
         it("should throw error for monitor in empty monitors array", async ({
@@ -1243,7 +1243,7 @@ describe("monitorOperations", () => {
 
             expect(() => {
                 validateMonitorExists(siteWithNoMonitors, "monitor-1");
-            }).toThrow("Monitor not found");
+            }).toThrowError("Monitor not found");
         });
     });
 

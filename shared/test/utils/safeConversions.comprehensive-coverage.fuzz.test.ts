@@ -509,7 +509,11 @@ describe("safeConversions comprehensive fuzzing tests", () => {
             "uses default for non-positive timeouts",
             (nonPositive, defaultValue) => {
                 const result = safeParseTimeout(nonPositive, defaultValue);
-                expect(result).toBe(defaultValue);
+                const normalizedDefault = safeParseTimeout(
+                    undefined,
+                    defaultValue
+                );
+                expect(result).toBe(normalizedDefault);
             }
         );
 

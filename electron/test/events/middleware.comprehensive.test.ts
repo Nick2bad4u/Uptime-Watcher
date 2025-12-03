@@ -173,7 +173,7 @@ describe("middleware.ts - Additional Coverage", () => {
 
             await expect(
                 mw("test:event", asEventPayload({ data: "invalid" }), next)
-            ).rejects.toThrow(
+            ).rejects.toThrowError(
                 "Validation failed for event 'test:event': Custom validation error"
             );
 
@@ -205,7 +205,7 @@ describe("middleware.ts - Additional Coverage", () => {
 
             await expect(
                 mw("test:event", asEventPayload({ data: "invalid" }), next)
-            ).rejects.toThrow(
+            ).rejects.toThrowError(
                 "Validation failed for event 'test:event': Validation failed"
             );
 
@@ -239,7 +239,7 @@ describe("middleware.ts - Additional Coverage", () => {
 
             await expect(
                 mw("test:event", asEventPayload({ data: "test" }), next)
-            ).rejects.toThrow("String error");
+            ).rejects.toThrowError("String error");
 
             expect(mockLogger.error).toHaveBeenCalledWith(
                 expect.stringContaining(
@@ -272,7 +272,7 @@ describe("middleware.ts - Additional Coverage", () => {
 
             await expect(
                 mw("test:event", asEventPayload({ data: "test" }), next)
-            ).rejects.toThrow("Validation failed for custom reason");
+            ).rejects.toThrowError("Validation failed for custom reason");
 
             expect(next).not.toHaveBeenCalled();
         });
@@ -316,7 +316,7 @@ describe("middleware.ts - Additional Coverage", () => {
 
             await expect(
                 mw("test:event", asEventPayload(circularData), next)
-            ).rejects.toThrow(
+            ).rejects.toThrowError(
                 "Validation failed for event 'test:event': Validation failed"
             );
 
@@ -681,7 +681,7 @@ describe("middleware.ts - Additional Coverage", () => {
 
             await expect(
                 mw("test:event", asEventPayload(circularData), next)
-            ).rejects.toThrow("Test error");
+            ).rejects.toThrowError("Test error");
 
             expect(mockLogger.error).toHaveBeenCalledWith(
                 "[EventBus] Error in event 'test:event': Test error",

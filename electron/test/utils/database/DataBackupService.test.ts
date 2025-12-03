@@ -236,7 +236,7 @@ describe(DataBackupService, () => {
             // Act & Assert
             await expect(
                 dataBackupService.downloadDatabaseBackup()
-            ).rejects.toThrow(SiteLoadingError);
+            ).rejects.toThrowError(SiteLoadingError);
 
             expect(mockLogger.error).toHaveBeenCalledWith(
                 "Failed to download backup: Backup creation failed",
@@ -273,7 +273,7 @@ describe(DataBackupService, () => {
             // Act & Assert
             await expect(
                 dataBackupService.downloadDatabaseBackup()
-            ).rejects.toThrow(SiteLoadingError);
+            ).rejects.toThrowError(SiteLoadingError);
 
             expect(mockLogger.error).toHaveBeenCalledWith(
                 "Failed to download backup: String error message",
@@ -378,7 +378,7 @@ describe(DataBackupService, () => {
             // Act & Assert
             await expect(
                 dataBackupService.downloadDatabaseBackup()
-            ).rejects.toThrow(SiteLoadingError);
+            ).rejects.toThrowError(SiteLoadingError);
 
             expect(mockLogger.error).toHaveBeenCalledWith(
                 "Failed to download backup: null",
@@ -499,7 +499,7 @@ describe(DataBackupService, () => {
             // Act & Assert
             await expect(
                 dataBackupService.downloadDatabaseBackup()
-            ).rejects.toThrow(SiteLoadingError);
+            ).rejects.toThrowError(SiteLoadingError);
 
             expect(mockLogger.error).toHaveBeenCalledWith(
                 "Failed to download backup: Cannot access user data path",
@@ -526,7 +526,7 @@ describe(DataBackupService, () => {
             // When event emission fails, the emission error is thrown instead of SiteLoadingError
             await expect(
                 dataBackupService.downloadDatabaseBackup()
-            ).rejects.toThrow("Event emission failed");
+            ).rejects.toThrowError("Event emission failed");
 
             expect(mockLogger.error).toHaveBeenCalledWith(
                 "Failed to download backup: Backup failed",

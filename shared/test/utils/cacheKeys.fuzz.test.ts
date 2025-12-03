@@ -431,7 +431,7 @@ describe("Cache Keys - Property-Based Tests", () => {
                             // These should throw errors (empty or has leading/trailing spaces)
                             expect(() =>
                                 parseCacheKey(key as StandardizedCacheKey)
-                            ).toThrow();
+                            ).toThrowError();
                         } else {
                             // Valid long identifiers should parse correctly
                             const result = parseCacheKey(
@@ -459,7 +459,7 @@ describe("Cache Keys - Property-Based Tests", () => {
                     (invalidKey) => {
                         expect(() => {
                             parseCacheKey(invalidKey as StandardizedCacheKey);
-                        }).toThrow("Invalid cache key format:");
+                        }).toThrowError("Invalid cache key format:");
 
                         return true;
                     }

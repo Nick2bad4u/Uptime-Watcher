@@ -245,7 +245,7 @@ describe("Error Handling Utilities - Comprehensive Coverage", () => {
                     undefined,
                     true
                 )
-            ).rejects.toThrow("operation failed");
+            ).rejects.toThrowError("operation failed");
 
             expect(consoleSpy).toHaveBeenCalledWith(
                 "test operation failed",
@@ -275,7 +275,7 @@ describe("Error Handling Utilities - Comprehensive Coverage", () => {
 
             await expect(
                 withUtilityErrorHandling(failingOperation, "test operation")
-            ).rejects.toThrow(
+            ).rejects.toThrowError(
                 "test operation failed and no fallback value provided. When shouldThrow is false, you must provide a fallbackValue parameter."
             );
 

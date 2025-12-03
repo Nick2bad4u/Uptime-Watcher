@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { safeStringify } from "../utils/stringConversion";
-import { validateMonitorField } from "../validation/schemas";
+import { validateMonitorField } from "@shared/validation/monitorSchemas";
 
 describe("Final 100% Coverage Tests", () => {
     describe("stringConversion - Lines 86-89", () => {
@@ -81,7 +81,7 @@ describe("Final 100% Coverage Tests", () => {
                     "nonExistentField" as any,
                     "someValue"
                 );
-            }).toThrow("Unknown field: nonExistentField");
+            }).toThrowError("Unknown field: nonExistentField");
         });
     });
 });

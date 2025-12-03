@@ -147,22 +147,22 @@ describe("CacheKeys - Complete Function Coverage", () => {
             // Test parseCacheKey error cases
             expect(() =>
                 cacheKeysModule.parseCacheKey("invalid-single-part")
-            ).toThrow();
-            expect(() => cacheKeysModule.parseCacheKey("")).toThrow();
+            ).toThrowError();
+            expect(() => cacheKeysModule.parseCacheKey("")).toThrowError();
             // Note: 'prefix:' is now valid with empty identifier
             expect(() =>
                 cacheKeysModule.parseCacheKey(":identifier")
-            ).toThrow();
+            ).toThrowError();
             expect(() =>
                 cacheKeysModule.parseCacheKey("prefix::identifier")
-            ).toThrow();
+            ).toThrowError();
 
             // ParseCacheKey now throws for keys with too many parts
             expect(() =>
                 cacheKeysModule.parseCacheKey(
                     "prefix:operation:identifier:extra" as any
                 )
-            ).toThrow(
+            ).toThrowError(
                 "Invalid cache key format: prefix:operation:identifier:extra"
             );
 

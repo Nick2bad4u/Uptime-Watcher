@@ -116,7 +116,7 @@ describe("NotificationPreferenceService", () => {
                 systemNotificationsEnabled: false,
                 systemNotificationsSoundEnabled: false,
             })
-        ).rejects.toThrow(
+        ).rejects.toThrowError(
             "Notification bridge unavailable: electronAPI not initialized"
         );
         expect(ensureInitializedMock).toHaveBeenCalledTimes(1);
@@ -132,7 +132,7 @@ describe("NotificationPreferenceService", () => {
                 systemNotificationsEnabled: true,
                 systemNotificationsSoundEnabled: true,
             })
-        ).rejects.toThrow(
+        ).rejects.toThrowError(
             "Notification bridge missing updatePreferences method"
         );
         expect(ensureInitializedMock).toHaveBeenCalledTimes(1);

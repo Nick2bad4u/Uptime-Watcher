@@ -570,7 +570,7 @@ describe("Theme Merging Property-Based Tests", () => {
         const baseTheme = themes.light;
 
         // Should handle empty override
-        expect(() => deepMergeTheme(baseTheme, {})).not.toThrow();
+        expect(() => deepMergeTheme(baseTheme, {})).not.toThrowError();
         const result = deepMergeTheme(baseTheme, {});
         expect(result).toEqual(baseTheme);
     });
@@ -593,7 +593,7 @@ describe("Theme Merging Property-Based Tests", () => {
 
         expect(() =>
             deepMergeTheme(baseTheme, overrideWithNulls)
-        ).not.toThrow();
+        ).not.toThrowError();
         const result = deepMergeTheme(baseTheme, overrideWithNulls);
 
         // Null values should override (explicit null is intentional)

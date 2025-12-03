@@ -122,11 +122,11 @@ describe("DatabaseSchema Simple Fuzzing Tests", () => {
                             if (shouldSucceed) {
                                 expect(() =>
                                     createDatabaseTables(testDb)
-                                ).not.toThrow();
+                                ).not.toThrowError();
                             } else {
                                 expect(() =>
                                     createDatabaseTables(testDb)
-                                ).toThrow();
+                                ).toThrowError();
                             }
                         }
                     }
@@ -159,11 +159,11 @@ describe("DatabaseSchema Simple Fuzzing Tests", () => {
                             if (shouldFail) {
                                 expect(() =>
                                     createDatabaseIndexes(testDb)
-                                ).toThrow();
+                                ).toThrowError();
                             } else {
                                 expect(() =>
                                     createDatabaseIndexes(testDb)
-                                ).not.toThrow();
+                                ).not.toThrowError();
                             }
                         }
                     }
@@ -184,7 +184,7 @@ describe("DatabaseSchema Simple Fuzzing Tests", () => {
                         for (let i = 0; i < callCount; i++) {
                             expect(() =>
                                 setupMonitorTypeValidation()
-                            ).not.toThrow();
+                            ).not.toThrowError();
                         }
                     }
                 )
@@ -218,11 +218,11 @@ describe("DatabaseSchema Simple Fuzzing Tests", () => {
                         if (dbOperationsSucceed) {
                             expect(() =>
                                 createDatabaseSchema(testDb)
-                            ).not.toThrow();
+                            ).not.toThrowError();
                         } else {
                             expect(() =>
                                 createDatabaseSchema(testDb)
-                            ).toThrow();
+                            ).toThrowError();
                         }
                     }
                 )
@@ -256,16 +256,16 @@ describe("DatabaseSchema Simple Fuzzing Tests", () => {
                         // They use fixed SQL statements
                         expect(() =>
                             createDatabaseTables(testDb)
-                        ).not.toThrow();
+                        ).not.toThrowError();
                         expect(() =>
                             createDatabaseIndexes(testDb)
-                        ).not.toThrow();
+                        ).not.toThrowError();
                         expect(() =>
                             setupMonitorTypeValidation()
-                        ).not.toThrow();
+                        ).not.toThrowError();
                         expect(() =>
                             createDatabaseSchema(testDb)
-                        ).not.toThrow();
+                        ).not.toThrowError();
 
                         // Verify that SQL statements are fixed and not influenced by external data
                         const calls = runSpy.mock.calls.flat();

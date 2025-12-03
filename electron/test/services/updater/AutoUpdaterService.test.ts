@@ -336,7 +336,7 @@ describe(AutoUpdaterService, () => {
             handler();
 
             // Should not throw
-            expect(() => handler()).not.toThrow();
+            expect(() => handler()).not.toThrowError();
         });
         it("should call callback when set", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");

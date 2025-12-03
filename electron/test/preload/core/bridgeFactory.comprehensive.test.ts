@@ -116,7 +116,7 @@ describe("bridgeFactory", function describeBridgeFactorySuite() {
             const invoke = createTypedInvoker(startMonitoringChannel);
 
             await expect(invoke()).rejects.toBeInstanceOf(IpcError);
-            await expect(invoke()).rejects.toThrow(
+            await expect(invoke()).rejects.toThrowError(
                 "IPC call failed for channel 'start-monitoring'"
             );
         });
@@ -149,7 +149,7 @@ describe("bridgeFactory", function describeBridgeFactorySuite() {
 
             const invoke = createTypedInvoker(formatDetailChannel);
 
-            await expect(invoke("http", "detail")).rejects.toThrow(
+            await expect(invoke("http", "detail")).rejects.toThrowError(
                 "IPC response missing data field"
             );
         });
@@ -268,7 +268,7 @@ describe("bridgeFactory", function describeBridgeFactorySuite() {
                     success: true,
                 });
 
-            await expect(invoke()).rejects.toThrow(
+            await expect(invoke()).rejects.toThrowError(
                 "IPC response missing data field"
             );
         });

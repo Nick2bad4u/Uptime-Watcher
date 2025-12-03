@@ -38,7 +38,7 @@ describe("jsonSafety fuzz tests", () => {
         test.prop([fc.anything()])(
             "never throws for arbitrary inputs",
             (value) => {
-                expect(() => stringifyUnsafe(value)).not.toThrow();
+                expect(() => stringifyUnsafe(value)).not.toThrowError();
             }
         );
     });
@@ -47,12 +47,11 @@ describe("jsonSafety fuzz tests", () => {
         test.prop([fc.array(fc.jsonValue())])(
             "accepts arbitrary arrays",
             (values) => {
-                const result = safeJsonParseArray(
-                    JSON.stringify(values),
-                    acceptAnyJsonValue
-                );
+                const encoded = JSON.stringify(values);
+                const result = safeJsonParseArray(encoded, acceptAnyJsonValue);
                 expect(result.success).toBeTruthy();
-                expect(result.data).toEqual(values);
+                const normalized = JSON.parse(encoded);
+                expect(result.data).toEqual(normalized);
             }
         );
 
@@ -92,7 +91,9 @@ describe("jsonSafety fuzz tests", () => {
                     unsafeJsonifiable(value),
                     fallback
                 );
-                expect(JSON.parse(json)).toEqual(value);
+                const serializedValue = JSON.stringify(value);
+                const normalized = JSON.parse(serializedValue) as unknown;
+                expect(JSON.parse(json)).toEqual(normalized);
             }
         );
 

@@ -1,0 +1,96 @@
+import type { IpcInvokeChannel } from "@shared/types/ipc";
+import type {
+    StateSyncFullSyncResult,
+    StateSyncStatusSummary,
+} from "@shared/types/stateSync";
+
+import { STATE_SYNC_CHANNELS } from "@shared/types/preload";
+import { STATE_SYNC_ACTION, STATE_SYNC_SOURCE } from "@shared/types/stateSync";
+
+import type { UptimeOrchestrator } from "../../../UptimeOrchestrator";
+
+import { logger } from "../../../utils/logger";
+import { registerStandardizedIpcHandler } from "../utils";
+import { StateSyncHandlerValidators } from "../validators";
+import { withIgnoredIpcEvent } from "./handlerShared";
+
+/**
+ * Dependencies required to register state synchronization IPC handlers.
+ */
+export interface StateSyncHandlersDependencies {
+    readonly getStateSyncStatus: () => StateSyncStatusSummary;
+    readonly registeredHandlers: Set<IpcInvokeChannel>;
+    readonly setStateSyncStatus: (summary: StateSyncStatusSummary) => void;
+    readonly uptimeOrchestrator: UptimeOrchestrator;
+}
+
+/**
+ * Registers IPC handlers responsible for state sync orchestration.
+ */
+export function registerStateSyncHandlers({
+    getStateSyncStatus,
+    registeredHandlers,
+    setStateSyncStatus,
+    uptimeOrchestrator,
+}: StateSyncHandlersDependencies): void {
+    registerStandardizedIpcHandler(
+        STATE_SYNC_CHANNELS.requestFullSync,
+        withIgnoredIpcEvent(async () => {
+            const sites = await uptimeOrchestrator.getSites();
+            const timestamp = Date.now();
+
+            const sanitizedSites =
+                await uptimeOrchestrator.emitSitesStateSynchronized({
+                    action: STATE_SYNC_ACTION.BULK_SYNC,
+                    siteIdentifier: "all",
+                    sites,
+                    source: STATE_SYNC_SOURCE.DATABASE,
+                    timestamp,
+                });
+
+            const responseSites = sanitizedSites.map((site) =>
+                structuredClone(site)
+            );
+
+            logger.debug("[IpcService] Full sync completed", {
+                siteCount: responseSites.length,
+            });
+
+            setStateSyncStatus({
+                lastSyncAt: timestamp,
+                siteCount: responseSites.length,
+                source: STATE_SYNC_SOURCE.DATABASE,
+                synchronized: true,
+            });
+
+            return {
+                completedAt: timestamp,
+                siteCount: responseSites.length,
+                sites: responseSites,
+                source: STATE_SYNC_SOURCE.DATABASE,
+                synchronized: true,
+            } satisfies StateSyncFullSyncResult;
+        }),
+        StateSyncHandlerValidators.requestFullSync,
+        registeredHandlers
+    );
+
+    registerStandardizedIpcHandler(
+        STATE_SYNC_CHANNELS.getSyncStatus,
+        withIgnoredIpcEvent(() => {
+            const currentStatus = getStateSyncStatus();
+            const siteCount = uptimeOrchestrator.getCachedSiteCount();
+            const summary: StateSyncStatusSummary = {
+                lastSyncAt: currentStatus.lastSyncAt ?? null,
+                siteCount,
+                source: currentStatus.source,
+                synchronized: currentStatus.synchronized,
+            };
+
+            setStateSyncStatus(summary);
+            return summary;
+        }),
+        StateSyncHandlerValidators.getSyncStatus,
+        registeredHandlers
+    );
+}

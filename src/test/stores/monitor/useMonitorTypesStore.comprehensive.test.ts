@@ -585,7 +585,7 @@ describe(useMonitorTypesStore, () => {
                         "Response time: 150ms"
                     );
                 });
-            }).rejects.toThrow(); // Should throw an error due to unexpected null response
+            }).rejects.toThrowError(); // Should throw an error due to unexpected null response
         });
     });
 
@@ -686,7 +686,7 @@ describe(useMonitorTypesStore, () => {
                         mockMonitor
                     );
                 });
-            }).rejects.toThrow(); // Should throw an error due to unexpected null response
+            }).rejects.toThrowError(); // Should throw an error due to unexpected null response
         });
     });
 

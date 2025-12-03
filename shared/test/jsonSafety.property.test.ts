@@ -30,16 +30,15 @@ describe("jsonSafety property tests", () => {
             // like the sign of zero ("-0" is serialized as "0"). To avoid
             // asserting a stronger contract than the underlying JSON
             // semantics, compare against the normalized JSON value.
-            const normalizedSample = JSON.parse(
-                JSON.stringify(sample)
-            ) as JsonValue;
+            const serializedSample = JSON.stringify(sample);
+            const normalizedSample = JSON.parse(serializedSample) as JsonValue;
             expect(decoded).toEqual(normalizedSample);
         });
 
         test.prop([fc.anything()])(
             "never throws for arbitrary values",
             (sample) => {
-                expect(() => stringifyUnsafe(sample)).not.toThrow();
+                expect(() => stringifyUnsafe(sample)).not.toThrowError();
             }
         );
 
@@ -150,7 +149,11 @@ describe("jsonSafety property tests", () => {
             "stringifies valid payloads",
             (sample, fallback) => {
                 const json = stringifyUnsafeWithFallback(sample, fallback);
-                expect(JSON.parse(json)).toEqual(sample);
+                const serializedSample = JSON.stringify(sample);
+                const normalizedSample = JSON.parse(
+                    serializedSample
+                ) as JsonValue;
+                expect(JSON.parse(json)).toEqual(normalizedSample);
             }
         );
 

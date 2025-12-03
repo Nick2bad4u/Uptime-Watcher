@@ -385,7 +385,7 @@ describe("ServiceContainer - Working Tests", () => {
             const container = ServiceContainer.getInstance();
 
             expect(container).toBeDefined();
-            expect(() => container.getSiteManager()).not.toThrow();
+            expect(() => container.getSiteManager()).not.toThrowError();
         });
     });
 

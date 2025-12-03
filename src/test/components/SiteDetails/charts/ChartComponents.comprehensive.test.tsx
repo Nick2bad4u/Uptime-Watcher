@@ -824,7 +824,7 @@ describe("ChartComponents", () => {
                     <UptimeChart data={uptimeData} options={doughnutOptions} />
                 );
                 render(<StatusChart data={statusData} options={barOptions} />);
-            }).not.toThrow();
+            }).not.toThrowError();
         });
     });
 });

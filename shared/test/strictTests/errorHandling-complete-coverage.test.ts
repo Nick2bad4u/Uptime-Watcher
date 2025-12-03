@@ -156,7 +156,7 @@ describe(withErrorHandling, () => {
             withErrorHandling(async () => {
                 throw new Error("frontend fail");
             }, store)
-        ).rejects.toThrow("frontend fail");
+        ).rejects.toThrowError("frontend fail");
 
         expect(store.clearError).toHaveBeenCalledTimes(1);
         expect(store.setLoading).toHaveBeenCalledTimes(2);
@@ -181,7 +181,7 @@ describe(withErrorHandling, () => {
                 },
                 { logger, operationName: 99 as unknown as string }
             )
-        ).rejects.toThrow("backend fail");
+        ).rejects.toThrowError("backend fail");
 
         expect(logger.error).toHaveBeenCalledWith(
             "Failed to 99",
@@ -214,7 +214,7 @@ describe(withErrorHandling, () => {
                 },
                 { logger, operationName: "sync" }
             )
-        ).rejects.toThrow("operation fail");
+        ).rejects.toThrowError("operation fail");
 
         expect(consoleErrorSpy).toHaveBeenCalledWith(
             "Failed to sync",
@@ -273,7 +273,7 @@ describe(withUtilityErrorHandling, () => {
                 undefined,
                 true
             )
-        ).rejects.toThrow("fatal");
+        ).rejects.toThrowError("fatal");
 
         expect(consoleErrorSpy).toHaveBeenCalledWith(
             "dangerous failed",
@@ -292,7 +292,9 @@ describe(withUtilityErrorHandling, () => {
             withUtilityErrorHandling(async () => {
                 throw new Error("fatal");
             }, "dangerous")
-        ).rejects.toThrow("dangerous failed and no fallback value provided");
+        ).rejects.toThrowError(
+            "dangerous failed and no fallback value provided"
+        );
 
         expect(consoleErrorSpy).toHaveBeenCalledWith(
             "dangerous failed",

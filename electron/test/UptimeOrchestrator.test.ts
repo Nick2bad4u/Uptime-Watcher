@@ -208,7 +208,7 @@ describe(UptimeOrchestrator, () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Error Handling", "type");
 
-            expect(() => new UptimeOrchestrator()).toThrow(
+            expect(() => new UptimeOrchestrator()).toThrowError(
                 "UptimeOrchestrator requires dependencies to be injected"
             );
         });
@@ -222,7 +222,7 @@ describe(UptimeOrchestrator, () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Error Handling", "type");
 
-            expect(() => new UptimeOrchestrator(undefined)).toThrow(
+            expect(() => new UptimeOrchestrator(undefined)).toThrowError(
                 "UptimeOrchestrator requires dependencies to be injected"
             );
         });
@@ -233,7 +233,7 @@ describe(UptimeOrchestrator, () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Initialization", "type");
 
-            await expect(orchestrator.initialize()).resolves.not.toThrow();
+            await expect(orchestrator.initialize()).resolves.not.toThrowError();
             expect(mockDatabaseManager.initialize).toHaveBeenCalled();
             expect(mockSiteManager.initialize).toHaveBeenCalled();
         });
@@ -287,7 +287,7 @@ describe(UptimeOrchestrator, () => {
             );
             expect(() =>
                 invalidOrchestrator["validateInitialization"]()
-            ).toThrow(
+            ).toThrowError(
                 "DatabaseManager not properly initialized - missing initialize method"
             );
         });
@@ -312,7 +312,7 @@ describe(UptimeOrchestrator, () => {
             );
             expect(() =>
                 invalidOrchestrator["validateInitialization"]()
-            ).toThrow(
+            ).toThrowError(
                 "SiteManager not properly initialized - missing initialize method"
             );
         });
@@ -337,7 +337,7 @@ describe(UptimeOrchestrator, () => {
             );
             expect(() =>
                 invalidOrchestrator["validateInitialization"]()
-            ).toThrow(
+            ).toThrowError(
                 "MonitorManager not properly initialized - missing startMonitoring method"
             );
         });
@@ -1090,7 +1090,7 @@ describe(UptimeOrchestrator, () => {
                     source: "user",
                     timestamp: Date.now(),
                 });
-            }).not.toThrow();
+            }).not.toThrowError();
         });
 
         it("should handle monitor status change events", async ({
@@ -1128,7 +1128,7 @@ describe(UptimeOrchestrator, () => {
                     status: "up",
                     timestamp: new Date().toISOString(),
                 });
-            }).not.toThrow();
+            }).not.toThrowError();
         });
 
         it("should handle internal database events", async ({

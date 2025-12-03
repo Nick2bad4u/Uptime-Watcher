@@ -819,7 +819,7 @@ describe("AddSiteForm Comprehensive Tests", () => {
             Reflect.deleteProperty(mockFormHook, "setUrl");
             vi.mocked(useAddSiteForm).mockReturnValue(mockFormHook);
 
-            expect(() => render(<AddSiteForm />)).not.toThrow();
+            expect(() => render(<AddSiteForm />)).not.toThrowError();
         });
     });
 });

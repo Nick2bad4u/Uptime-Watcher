@@ -71,8 +71,8 @@ describe("Shared Validation Array Declaration Mutation Tests", () => {
             };
 
             // Should validate successfully
-            expect(() => schema.parse(validUpData)).not.toThrow();
-            expect(() => schema.parse(validDownData)).not.toThrow();
+            expect(() => schema.parse(validUpData)).not.toThrowError();
+            expect(() => schema.parse(validDownData)).not.toThrowError();
 
             const parsedUp = schema.parse(validUpData);
             const parsedDown = schema.parse(validDownData);
@@ -88,7 +88,7 @@ describe("Shared Validation Array Declaration Mutation Tests", () => {
                 timestamp: Date.now(),
             };
 
-            expect(() => schema.parse(invalidData)).toThrow();
+            expect(() => schema.parse(invalidData)).toThrowError();
         });
 
         it("should fail if status enum array is mutated to empty", async ({
@@ -125,7 +125,7 @@ describe("Shared Validation Array Declaration Mutation Tests", () => {
                 };
 
                 schema.parse(testData);
-            }).toThrow();
+            }).toThrowError();
 
             // The mutation would break all status validation
             // No status values would be allowed

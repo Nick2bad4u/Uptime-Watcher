@@ -960,7 +960,7 @@ describe("MonitorManager - Comprehensive Coverage", () => {
 
             await expect(
                 manager.setupSiteForMonitoring(siteRequiringRemediation)
-            ).rejects.toThrow(transactionError);
+            ).rejects.toThrowError(transactionError);
 
             expect(
                 mockDependencies.repositories.monitor.updateInternal

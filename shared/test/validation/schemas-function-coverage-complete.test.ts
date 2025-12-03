@@ -7,8 +7,8 @@ import { describe, expect, it } from "vitest";
 import {
     validateMonitorData,
     validateMonitorField,
-    validateSiteData,
-} from "../../validation/schemas";
+} from "../../validation/monitorSchemas";
+import { validateSiteData } from "../../validation/siteSchemas";
 
 describe("schemas.ts - Function Coverage Completion", () => {
     describe("validateSiteData - Success Path Coverage", () => {

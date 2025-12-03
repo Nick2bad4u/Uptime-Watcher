@@ -1011,7 +1011,7 @@ describe("Final Coverage Enhancement Tests - Simplified", () => {
 
             resource.destroy();
             expect(resource.isDestroyed()).toBeTruthy();
-            expect(() => resource.use()).toThrow("Resource is destroyed");
+            expect(() => resource.use()).toThrowError("Resource is destroyed");
         });
 
         it("should handle concurrent operations", async ({

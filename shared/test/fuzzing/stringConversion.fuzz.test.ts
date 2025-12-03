@@ -290,7 +290,7 @@ describe("StringConversion - Fast-Check Fuzzing Tests", () => {
 
     describe("Edge case property validation", () => {
         test.prop([fc.anything()])("should never throw errors", (value) => {
-            expect(() => safeStringify(value)).not.toThrow();
+            expect(() => safeStringify(value)).not.toThrowError();
         });
 
         test.prop([fc.anything()])(

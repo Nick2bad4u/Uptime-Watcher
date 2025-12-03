@@ -844,7 +844,7 @@ describe("Events Domain API", () => {
         it("should work even when no listeners are registered", () => {
             const freshApi = createEventsApi();
 
-            expect(() => freshApi.removeAllListeners()).not.toThrow();
+            expect(() => freshApi.removeAllListeners()).not.toThrowError();
         });
     });
 
@@ -1145,7 +1145,7 @@ describe("Events Domain API", () => {
             // Should not throw when calling the event handler
             expect(() => {
                 eventHandler?.({}, { message: "test", timestamp: Date.now() });
-            }).not.toThrow();
+            }).not.toThrowError();
 
             expect(throwingCallback).toHaveBeenCalled();
         });
@@ -1251,7 +1251,7 @@ describe("Events Domain API", () => {
 
             expect(() => {
                 eventHandler?.({}, circularData);
-            }).not.toThrow();
+            }).not.toThrowError();
 
             expect(callback).toHaveBeenCalledWith(circularData);
         });
@@ -1312,7 +1312,7 @@ describe("Events Domain API", () => {
                 const cleanup = onTestEvent(callback);
                 removeAllListeners();
                 cleanup();
-            }).not.toThrow();
+            }).not.toThrowError();
         });
     });
 });

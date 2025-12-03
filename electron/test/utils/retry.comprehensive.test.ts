@@ -149,7 +149,7 @@ describe("Retry Utilities", () => {
                 // Fast-forward through delays
                 await vi.runAllTimersAsync();
 
-                await expect(resultPromise).rejects.toThrow("error 3");
+                await expect(resultPromise).rejects.toThrowError("error 3");
                 expect(operation).toHaveBeenCalledTimes(3);
                 expect(dbLogger.error).toHaveBeenCalledTimes(4); // 3 failures + 1 persistent failure log
             });
@@ -224,7 +224,9 @@ describe("Retry Utilities", () => {
 
                 await vi.runAllTimersAsync();
 
-                await expect(resultPromise).rejects.toThrow("always fails");
+                await expect(resultPromise).rejects.toThrowError(
+                    "always fails"
+                );
                 expect(operation).toHaveBeenCalledTimes(2);
             });
 
@@ -248,7 +250,7 @@ describe("Retry Utilities", () => {
 
                 await vi.runAllTimersAsync();
 
-                await expect(resultPromise).rejects.toThrow("test error");
+                await expect(resultPromise).rejects.toThrowError("test error");
 
                 expect(dbLogger.error).toHaveBeenCalledWith(
                     "Custom Test Operation failed (attempt 1/1)",
@@ -348,7 +350,7 @@ describe("Retry Utilities", () => {
 
                 const resultPromise = withRetry(operation, { maxRetries: 0 });
 
-                await expect(resultPromise).rejects.toThrow(
+                await expect(resultPromise).rejects.toThrowError(
                     "immediate failure"
                 );
                 expect(operation).not.toHaveBeenCalled();
@@ -368,7 +370,9 @@ describe("Retry Utilities", () => {
 
                 await vi.runAllTimersAsync();
 
-                await expect(resultPromise).rejects.toThrow("single attempt");
+                await expect(resultPromise).rejects.toThrowError(
+                    "single attempt"
+                );
                 expect(operation).toHaveBeenCalledTimes(1);
             });
 
@@ -414,7 +418,7 @@ describe("Retry Utilities", () => {
 
                 await vi.runAllTimersAsync();
 
-                await expect(resultPromise).rejects.toThrow(
+                await expect(resultPromise).rejects.toThrowError(
                     "synchronous error"
                 );
                 expect(operation).toHaveBeenCalledTimes(2);
@@ -538,7 +542,7 @@ describe("Retry Utilities", () => {
 
                 await vi.runAllTimersAsync();
 
-                await expect(resultPromise).rejects.toThrow("db error");
+                await expect(resultPromise).rejects.toThrowError("db error");
                 expect(operation).toHaveBeenCalledTimes(5);
             });
 
@@ -563,7 +567,7 @@ describe("Retry Utilities", () => {
 
                 await vi.runAllTimersAsync();
 
-                await expect(resultPromise).rejects.toThrow("db error");
+                await expect(resultPromise).rejects.toThrowError("db error");
                 expect(operation).toHaveBeenCalledTimes(3);
             });
 
@@ -618,7 +622,7 @@ describe("Retry Utilities", () => {
 
                 await vi.runAllTimersAsync();
 
-                await expect(resultPromise).rejects.toThrow(
+                await expect(resultPromise).rejects.toThrowError(
                     "db connection error"
                 );
 

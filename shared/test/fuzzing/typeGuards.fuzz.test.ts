@@ -590,7 +590,7 @@ describe("TypeGuards Fuzzing Tests", () => {
                     isString(value);
                     isValidPort(value);
                     isValidTimestamp(value);
-                }).not.toThrow();
+                }).not.toThrowError();
             }
         );
 

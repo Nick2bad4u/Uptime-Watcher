@@ -295,7 +295,7 @@ describe("Database Operations Fuzzing Tests", () => {
                             failureIndex < sites.length ? 3 : 1;
 
                         await (failureIndex < sites.length
-                            ? expect(resultPromise).rejects.toThrow(
+                            ? expect(resultPromise).rejects.toThrowError(
                                   SIMULATED_TRANSACTION_FAILURE
                               )
                             : expect(resultPromise).resolves.toBeUndefined());
@@ -357,7 +357,7 @@ describe("Database Operations Fuzzing Tests", () => {
                                 siteIdentifier,
                                 monitorData
                             );
-                        }).not.toThrow();
+                        }).not.toThrowError();
 
                         expect(
                             mockDatabaseService.executeTransaction

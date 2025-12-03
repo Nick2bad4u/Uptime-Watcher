@@ -46,7 +46,7 @@ describe("Shared Utilities Fuzzing Tests", () => {
 
                             const result = isValidString(input);
                             expect(typeof result).toBe("boolean");
-                        }).not.toThrow();
+                        }).not.toThrowError();
                     }
                 )
             );
@@ -99,7 +99,7 @@ describe("Shared Utilities Fuzzing Tests", () => {
 
                             // Property: should have reasonable length
                             expect(result.length).toBeLessThanOrEqual(1000);
-                        }).not.toThrow();
+                        }).not.toThrowError();
                     }
                 )
             );
@@ -148,7 +148,7 @@ describe("Shared Utilities Fuzzing Tests", () => {
 
                             const result = isValidUrl(input);
                             expect(typeof result).toBe("boolean");
-                        }).not.toThrow();
+                        }).not.toThrowError();
                     }
                 )
             );
@@ -268,7 +268,7 @@ describe("Shared Utilities Fuzzing Tests", () => {
                             expect(
                                 Number.isFinite(result.interval)
                             ).toBeTruthy();
-                        }).not.toThrow();
+                        }).not.toThrowError();
                     }
                 )
             );
@@ -317,7 +317,7 @@ describe("Shared Utilities Fuzzing Tests", () => {
                                 expect(input.id.length).toBeGreaterThan(0);
                                 expect(input.name.length).toBeGreaterThan(0);
                             }
-                        }).not.toThrow();
+                        }).not.toThrowError();
                     }
                 )
             );
@@ -404,7 +404,7 @@ describe("Shared Utilities Fuzzing Tests", () => {
 
                             // Property: should not have excessive whitespace
                             expect(result).not.toMatch(/\s{2,}/);
-                        }).not.toThrow();
+                        }).not.toThrowError();
                     }
                 )
             );
@@ -466,7 +466,7 @@ describe("Shared Utilities Fuzzing Tests", () => {
 
                             // Property: should not exceed limits
                             expect(result.length).toBeLessThanOrEqual(100);
-                        }).not.toThrow();
+                        }).not.toThrowError();
                     }
                 )
             );

@@ -263,7 +263,7 @@ describe("Fallback Utils Property-Based Tests", () => {
                     );
 
                     // Should not throw when executed
-                    expect(() => wrappedFunction()).not.toThrow();
+                    expect(() => wrappedFunction()).not.toThrowError();
                 }),
                 { numRuns: 5 }
             ); // Reduced iterations to minimize async overhead
@@ -298,7 +298,7 @@ describe("Fallback Utils Property-Based Tests", () => {
                             );
 
                             // Should not throw even when the async operation fails
-                            expect(() => wrappedFunction()).not.toThrow();
+                            expect(() => wrappedFunction()).not.toThrowError();
                         }
                     ),
                     { numRuns: 3 }
@@ -350,7 +350,7 @@ describe("Fallback Utils Property-Based Tests", () => {
                         operation,
                         `operation-${index}`
                     );
-                    expect(() => wrappedFunction()).not.toThrow();
+                    expect(() => wrappedFunction()).not.toThrowError();
                 }
 
                 // Allow time for async operations to complete
@@ -869,10 +869,10 @@ describe("Fallback Utils Property-Based Tests", () => {
                 expect(withFallback(input, "fallback")).toBe("fallback");
                 expect(() =>
                     getMonitorDisplayIdentifier(input as any, "fallback")
-                ).not.toThrow();
+                ).not.toThrowError();
                 expect(() =>
                     getMonitorTypeDisplayLabel(input as any)
-                ).not.toThrow();
+                ).not.toThrowError();
                 // TruncateForLogging returns the original value for falsy inputs (including null)
                 expect(truncateForLogging(input as any)).toBe(input);
             }
@@ -881,7 +881,7 @@ describe("Fallback Utils Property-Based Tests", () => {
         it("should handle extreme string lengths gracefully", () => {
             // Very long string
             const longString = "a".repeat(100_000);
-            expect(() => truncateForLogging(longString, 50)).not.toThrow();
+            expect(() => truncateForLogging(longString, 50)).not.toThrowError();
             expect(truncateForLogging(longString, 50)).toBe("a".repeat(50));
 
             // Empty string

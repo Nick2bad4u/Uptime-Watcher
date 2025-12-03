@@ -27,7 +27,7 @@ describe("Validation Fuzzing Tests", () => {
             fc.assert(
                 fc.property(fc.string(), (input: string) => {
                     // Property: isValidUrl should never throw exceptions
-                    expect(() => isValidUrl(input)).not.toThrow();
+                    expect(() => isValidUrl(input)).not.toThrowError();
 
                     // Property: result should always be boolean
                     const result = isValidUrl(input);
@@ -81,7 +81,7 @@ describe("Validation Fuzzing Tests", () => {
                     (domain: string, path: string) => {
                         const url = `https://${domain}/${path}`;
 
-                        expect(() => isValidUrl(url)).not.toThrow();
+                        expect(() => isValidUrl(url)).not.toThrowError();
                         const result = isValidUrl(url);
                         expect(typeof result).toBe("boolean");
                     }
@@ -127,7 +127,7 @@ describe("Validation Fuzzing Tests", () => {
         it("should handle various host input types gracefully", () => {
             fc.assert(
                 fc.property(fc.anything(), (input: unknown) => {
-                    expect(() => isValidHost(input)).not.toThrow();
+                    expect(() => isValidHost(input)).not.toThrowError();
                     const result = isValidHost(input);
                     expect(typeof result).toBe("boolean");
                 })
@@ -168,7 +168,9 @@ describe("Validation Fuzzing Tests", () => {
                     (numbers: number[], separator: string) => {
                         const malformedIp = numbers.join(separator);
 
-                        expect(() => isValidHost(malformedIp)).not.toThrow();
+                        expect(() =>
+                            isValidHost(malformedIp)
+                        ).not.toThrowError();
                         const result = isValidHost(malformedIp);
                         expect(typeof result).toBe("boolean");
                     }
@@ -194,7 +196,7 @@ describe("Validation Fuzzing Tests", () => {
                     (domain: string, tld: string) => {
                         const host = `${domain}${tld}`;
 
-                        expect(() => isValidHost(host)).not.toThrow();
+                        expect(() => isValidHost(host)).not.toThrowError();
                         const result = isValidHost(host);
                         expect(typeof result).toBe("boolean");
                     }
@@ -207,7 +209,7 @@ describe("Validation Fuzzing Tests", () => {
                 fc.property(
                     fc.string({ maxLength: 50 }).filter((s) => s.length > 0),
                     (host: string) => {
-                        expect(() => isValidHost(host)).not.toThrow();
+                        expect(() => isValidHost(host)).not.toThrowError();
                         const result = isValidHost(host);
                         expect(typeof result).toBe("boolean");
 
@@ -229,7 +231,7 @@ describe("Validation Fuzzing Tests", () => {
         it("should handle various port input types gracefully", () => {
             fc.assert(
                 fc.property(fc.anything(), (input: unknown) => {
-                    expect(() => isValidPort(input)).not.toThrow();
+                    expect(() => isValidPort(input)).not.toThrowError();
                     const result = isValidPort(input);
                     expect(typeof result).toBe("boolean");
                 })
@@ -275,7 +277,7 @@ describe("Validation Fuzzing Tests", () => {
                         fc.constant("")
                     ),
                     (portStr: string) => {
-                        expect(() => isValidPort(portStr)).not.toThrow();
+                        expect(() => isValidPort(portStr)).not.toThrowError();
                         const result = isValidPort(portStr);
                         expect(typeof result).toBe("boolean");
 
@@ -353,7 +355,7 @@ describe("Validation Fuzzing Tests", () => {
                             }
                             isValidHost(config.host);
                             isValidPort(config.port);
-                        }).not.toThrow();
+                        }).not.toThrowError();
                     }
                 )
             );

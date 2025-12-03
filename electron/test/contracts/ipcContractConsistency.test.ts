@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from "vitest";
 import path from "node:path";
 import ts from "typescript";
 
-const { readFileSync } =
+const { readFileSync, readdirSync } =
     await vi.importActual<typeof import("node:fs")>("node:fs");
 
 const preloadChannels = await vi.importActual<
@@ -120,16 +120,40 @@ function extractRegisteredChannelNames(): Set<string> {
         "ipc",
         "IpcService.ts"
     );
-    const source = readFileSync(ipcServicePath, "utf8");
+
+    const handlersDir = path.join(
+        process.cwd(),
+        "electron",
+        "services",
+        "ipc",
+        "handlers"
+    );
+
+    const handlerFiles = readdirSync(handlersDir)
+        .filter((fileName) => fileName.endsWith(".ts"))
+        .map((fileName) => path.join(handlersDir, fileName));
+
+    const channels = new Set<string>();
+
+    for (const filePath of [ipcServicePath, ...handlerFiles]) {
+        collectChannelsFromFile(filePath, channels);
+    }
+
+    return channels;
+}
+
+function collectChannelsFromFile(
+    filePath: string,
+    channels: Set<string>
+): void {
+    const source = readFileSync(filePath, "utf8");
     const sourceFile = ts.createSourceFile(
-        ipcServicePath,
+        filePath,
         source,
         ts.ScriptTarget.Latest,
         true,
         ts.ScriptKind.TS
     );
-
-    const channels = new Set<string>();
 
     const stringConstants = new Map<string, string>();
 
@@ -213,5 +237,63 @@ function extractRegisteredChannelNames(): Set<string> {
     };
 
     visit(sourceFile);
-    return channels;
+
+    if (filePath.endsWith("IpcService.ts")) {
+        collectInjectedChannels(sourceFile, channels, resolveChannelName);
+    }
+}
+
+function collectInjectedChannels(
+    sourceFile: ts.SourceFile,
+    channels: Set<string>,
+    resolveChannelName: (expression: ts.Expression) => string | undefined
+): void {
+    const visit = (node: ts.Node): void => {
+        if (ts.isCallExpression(node)) {
+            const callee = node.expression;
+
+            if (
+                ts.isIdentifier(callee) &&
+                (callee.text === "registerNotificationHandlers" ||
+                    callee.text === "registerDiagnosticsHandlers")
+            ) {
+                const [configArg] = node.arguments;
+                if (configArg && ts.isObjectLiteralExpression(configArg)) {
+                    for (const property of configArg.properties) {
+                        if (
+                            ts.isPropertyAssignment(property) &&
+                            property.name &&
+                            ts.isIdentifier(property.name)
+                        ) {
+                            const propertyName = property.name.text;
+
+                            if (propertyName === "updatePreferencesChannel") {
+                                const channelName = resolveChannelName(
+                                    property.initializer
+                                );
+                                channels.add(
+                                    channelName ??
+                                        "update-notification-preferences"
+                                );
+                            } else if (
+                                propertyName === "verifyChannel" ||
+                                propertyName === "reportChannel"
+                            ) {
+                                const channelName = resolveChannelName(
+                                    property.initializer
+                                );
+                                if (channelName) {
+                                    channels.add(channelName);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        ts.forEachChild(node, visit);
+    };
+
+    visit(sourceFile);
 }

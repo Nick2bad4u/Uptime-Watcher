@@ -125,7 +125,7 @@ describeFn("AbortUtils Comprehensive Fuzzing Tests", () => {
             ) {
                 await expect(
                     sleep(duration, abortController.signal)
-                ).resolves.not.toThrow();
+                ).resolves.not.toThrowError();
                 return;
             }
 
@@ -145,7 +145,9 @@ describeFn("AbortUtils Comprehensive Fuzzing Tests", () => {
                     abortController.abort("Test timeout");
                 }, 1);
 
-                await expect(sleepPromise).rejects.toThrow("Sleep was aborted");
+                await expect(sleepPromise).rejects.toThrowError(
+                    "Sleep was aborted"
+                );
             }
         });
     });
@@ -255,7 +257,7 @@ describeFn("AbortUtils Comprehensive Fuzzing Tests", () => {
                     expect(raceResult).toBeInstanceOf(Promise);
 
                     abortController.abort("Test abort");
-                    await expect(raceResult).rejects.toThrow();
+                    await expect(raceResult).rejects.toThrowError();
                 } catch (error) {
                     expect(error).toBeDefined();
                 }

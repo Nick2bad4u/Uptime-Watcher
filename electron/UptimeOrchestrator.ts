@@ -80,7 +80,6 @@
 /* eslint max-lines: ["error", { "max": 2100, "skipBlankLines": true, "skipComments": true }] -- Main orchestrator module */
 
 import type {
-    Monitor,
     MonitoringStartSummary,
     MonitoringStopSummary,
     Site,
@@ -98,13 +97,6 @@ import {
     ApplicationError,
     type ApplicationErrorOptions,
 } from "@shared/utils/errorHandling";
-import {
-    isMonitorSnapshot,
-    isSiteSnapshot,
-    mergeMonitorSnapshots,
-    mergeSiteSnapshots,
-} from "@shared/utils/siteSnapshots";
-import { isObject } from "@shared/utils/typeGuards";
 
 import type { UptimeEvents } from "./events/eventTypes";
 import type { DatabaseManager } from "./managers/DatabaseManager";
@@ -122,6 +114,9 @@ import type {
 } from "./UptimeOrchestrator.types";
 
 import { HistoryLimitCoordinator } from "./coordinators/HistoryLimitCoordinator";
+import { MonitoringLifecycleCoordinator } from "./coordinators/MonitoringLifecycleCoordinator";
+import { SiteLifecycleCoordinator } from "./coordinators/SiteLifecycleCoordinator";
+import { SnapshotSyncCoordinator } from "./coordinators/SnapshotSyncCoordinator";
 import {
     createErrorHandlingMiddleware,
     createLoggingMiddleware,
@@ -134,8 +129,6 @@ import { diagnosticsLogger, logger } from "./utils/logger";
 const ORCHESTRATOR_BUS_ID = "UptimeOrchestrator" as const;
 
 type MonitoringOperationScope = "global" | "monitor" | "site";
-
-type ManualCheckCompletedPayload = UptimeEvents["monitor:check-completed"];
 
 const determineMonitoringScope = (
     identifier: string,
@@ -150,38 +143,6 @@ const determineMonitoringScope = (
     }
 
     return "site";
-};
-
-const extractMonitorSnapshotFromResult = (
-    result: StatusUpdate | undefined
-): Monitor | undefined => {
-    if (!result) {
-        return undefined;
-    }
-
-    const resultCandidate: unknown = result;
-    if (!isObject(resultCandidate)) {
-        return undefined;
-    }
-
-    const { monitor } = resultCandidate;
-    return isMonitorSnapshot(monitor) ? monitor : undefined;
-};
-
-const extractSiteSnapshotFromResult = (
-    result: StatusUpdate | undefined
-): Site | undefined => {
-    if (!result) {
-        return undefined;
-    }
-
-    const resultCandidate: unknown = result;
-    if (!isObject(resultCandidate)) {
-        return undefined;
-    }
-
-    const { site } = resultCandidate;
-    return isSiteSnapshot(site) ? site : undefined;
 };
 /**
  * Core application orchestrator responsible for wiring together the monitoring,
@@ -223,20 +184,20 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
     /** Coordinator for history-limit event forwarding. */
     private readonly historyLimitCoordinator: HistoryLimitCoordinator;
 
+    /** Coordinator for site lifecycle operations (add/remove site and monitor). */
+    private readonly siteLifecycleCoordinator: SiteLifecycleCoordinator;
+
+    /** Coordinator for monitoring lifecycle operations. */
+    private readonly monitoringLifecycleCoordinator: MonitoringLifecycleCoordinator;
+
+    /** Coordinator for snapshot/state synchronization and cache-related flows. */
+    private readonly snapshotSyncCoordinator: SnapshotSyncCoordinator;
+
     /** Event handler for sites cache update requests */
     private readonly handleUpdateSitesCacheRequestedEvent = (
         data: UpdateSitesCacheRequestData
     ): void => {
-        void (async (): Promise<void> => {
-            try {
-                await this.handleUpdateSitesCacheRequest(data);
-            } catch (error) {
-                logger.error(
-                    "[UptimeOrchestrator] Error handling update-sites-cache-requested:",
-                    error
-                );
-            }
-        })();
+        this.snapshotSyncCoordinator.handleUpdateSitesCacheRequestedEvent(data);
     };
 
     /**
@@ -251,16 +212,7 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
      * @internal
      */
     private readonly handleGetSitesFromCacheRequestedEvent = (): void => {
-        void (async (): Promise<void> => {
-            try {
-                await this.handleGetSitesFromCacheRequest();
-            } catch (error) {
-                logger.error(
-                    "[UptimeOrchestrator] Error handling get-sites-from-cache-requested:",
-                    error
-                );
-            }
-        })();
+        this.snapshotSyncCoordinator.handleGetSitesFromCacheRequestedEvent();
     };
 
     /**
@@ -535,167 +487,16 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
             _meta?: unknown;
         }
     ): void => {
-        void (async (): Promise<void> => {
-            try {
-                const {
-                    identifier,
-                    monitorId: manualMonitorId,
-                    result,
-                    timestamp,
-                } = eventData;
-                const monitorId = manualMonitorId ?? result.monitorId;
-                const { siteIdentifier } = result;
-
-                if (!monitorId) {
-                    logger.warn(
-                        "[UptimeOrchestrator] Manual check completed without monitor identifier",
-                        { eventIdentifier: identifier }
-                    );
-                    return;
-                }
-
-                if (!siteIdentifier) {
-                    logger.warn(
-                        "[UptimeOrchestrator] Manual check completed without site identifier",
-                        { monitorId }
-                    );
-                    return;
-                }
-
-                const monitorFromPayload =
-                    extractMonitorSnapshotFromResult(result);
-                const siteFromPayload = extractSiteSnapshotFromResult(result);
-
-                const siteFromCache =
-                    this.siteManager.getSiteFromCache(siteIdentifier);
-
-                if (!siteFromCache) {
-                    logger.warn(
-                        "[UptimeOrchestrator] Manual check completion received but site missing from cache",
-                        { monitorId, siteIdentifier }
-                    );
-                }
-
-                const monitorFromCache = siteFromCache?.monitors.find(
-                    (candidate) => candidate.id === monitorId
-                );
-
-                if (siteFromCache && !monitorFromCache) {
-                    logger.warn(
-                        "[UptimeOrchestrator] Manual check completion had no monitor snapshot in cache; using payload context",
-                        { monitorId, siteIdentifier }
-                    );
-                }
-
-                const canonicalMonitor = monitorFromPayload ?? monitorFromCache;
-
-                if (!canonicalMonitor) {
-                    logger.warn(
-                        "[UptimeOrchestrator] Manual check completion missing monitor context after validation",
-                        { monitorId, siteIdentifier }
-                    );
-
-                    return;
-                }
-
-                const canonicalSite = siteFromPayload ?? siteFromCache;
-
-                if (!canonicalSite) {
-                    logger.warn(
-                        "[UptimeOrchestrator] Manual check completion missing site context after validation",
-                        { monitorId, siteIdentifier }
-                    );
-
-                    return;
-                }
-
-                const enrichedMonitor = mergeMonitorSnapshots(
-                    canonicalMonitor,
-                    monitorFromCache
-                );
-
-                const enrichedSite = mergeSiteSnapshots(
-                    canonicalSite,
-                    siteFromCache
-                );
-
-                const enrichedResult: StatusUpdate = {
-                    ...result,
-                    monitor: enrichedMonitor,
-                    site: enrichedSite,
-                };
-
-                const payload: ManualCheckCompletedPayload = {
-                    checkType: "manual",
-                    monitorId,
-                    result: enrichedResult,
-                    siteIdentifier,
-                    timestamp,
-                };
-
-                attachForwardedMetadata({
-                    busId: ORCHESTRATOR_BUS_ID,
-                    forwardedEvent: "monitor:check-completed",
-                    payload,
-                    source: eventData,
-                });
-
-                await this.emitTyped("monitor:check-completed", payload);
-            } catch (error) {
-                logger.error(
-                    "[UptimeOrchestrator] Error handling internal:monitor:manual-check-completed:",
-                    error
-                );
-            }
-        })();
+        this.snapshotSyncCoordinator.handleManualCheckCompletedEvent(eventData);
     };
 
     /** Event handler for monitoring start requests */
     private readonly handleStartMonitoringRequestedEvent = (
         data: StartMonitoringRequestData
     ): void => {
-        void (async (): Promise<void> => {
-            try {
-                const success =
-                    await this.monitorManager.startMonitoringForSite(
-                        data.identifier,
-                        data.monitorId
-                    );
-                const payload: UptimeEvents["internal:site:start-monitoring-response"] =
-                    {
-                        identifier: data.identifier,
-                        operation: "start-monitoring-response",
-                        success,
-                        timestamp: Date.now(),
-                        ...(data.monitorId
-                            ? { monitorId: data.monitorId }
-                            : {}),
-                    };
-                await this.emitTyped(
-                    "internal:site:start-monitoring-response",
-                    payload
-                );
-            } catch (error) {
-                logger.error(
-                    `[UptimeOrchestrator] Error starting monitoring for site ${data.identifier}:`,
-                    error
-                );
-                const failurePayload: UptimeEvents["internal:site:start-monitoring-response"] =
-                    {
-                        identifier: data.identifier,
-                        operation: "start-monitoring-response",
-                        success: false,
-                        timestamp: Date.now(),
-                        ...(data.monitorId
-                            ? { monitorId: data.monitorId }
-                            : {}),
-                    };
-                await this.emitTyped(
-                    "internal:site:start-monitoring-response",
-                    failurePayload
-                );
-            }
-        })();
+        this.monitoringLifecycleCoordinator.handleStartMonitoringRequestedEvent(
+            data
+        );
     };
 
     /**
@@ -715,33 +516,9 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
     private readonly handleStopMonitoringRequestedEvent = (
         data: StopMonitoringRequestData
     ): void => {
-        void (async (): Promise<void> => {
-            try {
-                const success = await this.monitorManager.stopMonitoringForSite(
-                    data.identifier,
-                    data.monitorId
-                );
-                await this.emitTyped("internal:site:stop-monitoring-response", {
-                    identifier: data.identifier,
-                    monitorId: data.monitorId,
-                    operation: "stop-monitoring-response",
-                    success,
-                    timestamp: Date.now(),
-                });
-            } catch (error) {
-                logger.error(
-                    `[UptimeOrchestrator] Error stopping monitoring for site ${data.identifier}:`,
-                    error
-                );
-                await this.emitTyped("internal:site:stop-monitoring-response", {
-                    identifier: data.identifier,
-                    monitorId: data.monitorId,
-                    operation: "stop-monitoring-response",
-                    success: false,
-                    timestamp: Date.now(),
-                });
-            }
-        })();
+        this.monitoringLifecycleCoordinator.handleStopMonitoringRequestedEvent(
+            data
+        );
     };
 
     /**
@@ -761,64 +538,18 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
     private readonly handleIsMonitoringActiveRequestedEvent = (
         data: IsMonitoringActiveRequestData
     ): void => {
-        void (async (): Promise<void> => {
-            const isActive = this.monitorManager.isMonitorActiveInScheduler(
-                data.identifier,
-                data.monitorId
-            );
-            await this.emitTyped(
-                "internal:site:is-monitoring-active-response",
-                {
-                    identifier: data.identifier,
-                    isActive,
-                    monitorId: data.monitorId,
-                    operation: "is-monitoring-active-response",
-                    timestamp: Date.now(),
-                }
-            );
-        })();
+        this.monitoringLifecycleCoordinator.handleIsMonitoringActiveRequestedEvent(
+            data
+        );
     };
 
     /** Event handler for monitoring restart requests */
     private readonly handleRestartMonitoringRequestedEvent = (
         data: RestartMonitoringRequestData
     ): void => {
-        void (async (): Promise<void> => {
-            try {
-                // Note: restartMonitorWithNewConfig is intentionally
-                // synchronous as it only updates scheduler configuration
-                // without async I/O
-                const success = this.monitorManager.restartMonitorWithNewConfig(
-                    data.identifier,
-                    data.monitor
-                );
-                await this.emitTyped(
-                    "internal:site:restart-monitoring-response",
-                    {
-                        identifier: data.identifier,
-                        monitorId: data.monitor.id,
-                        operation: "restart-monitoring-response",
-                        success,
-                        timestamp: Date.now(),
-                    }
-                );
-            } catch (error) {
-                logger.error(
-                    `[UptimeOrchestrator] Error restarting monitoring for site ${data.identifier}:`,
-                    error
-                );
-                await this.emitTyped(
-                    "internal:site:restart-monitoring-response",
-                    {
-                        identifier: data.identifier,
-                        monitorId: data.monitor.id,
-                        operation: "restart-monitoring-response",
-                        success: false,
-                        timestamp: Date.now(),
-                    }
-                );
-            }
-        })();
+        this.monitoringLifecycleCoordinator.handleRestartMonitoringRequestedEvent(
+            data
+        );
     };
 
     /**
@@ -857,43 +588,7 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
      * @throws When site cleanup fails after monitoring setup failure
      */
     public async addSite(siteData: Site): Promise<Site> {
-        let site: Site | undefined = undefined;
-
-        try {
-            // Step 1: Add the site
-            site = await this.siteManager.addSite(siteData);
-
-            // Step 2: Set up monitoring for the new site
-            await this.monitorManager.setupSiteForMonitoring(site);
-
-            return site;
-        } catch (error) {
-            // If monitoring setup fails, attempt to clean up the site
-            if (site) {
-                try {
-                    await this.siteManager.removeSite(site.identifier);
-                    logger.info(
-                        `[UptimeOrchestrator] Cleaned up site ${site.identifier} after monitoring setup failure`
-                    );
-                } catch (cleanupError) {
-                    logger.error(
-                        `[UptimeOrchestrator] Failed to cleanup site ${site.identifier} after monitoring setup failure:`,
-                        cleanupError
-                    );
-                }
-            }
-
-            throw this.createContextualError({
-                cause: error,
-                code: "ORCHESTRATOR_ADD_SITE_FAILED",
-                details: {
-                    monitorCount: siteData.monitors.length,
-                    siteIdentifier: siteData.identifier,
-                },
-                message: `Failed to add site ${siteData.identifier}`,
-                operation: "orchestrator.addSite",
-            });
-        }
+        return this.siteLifecycleCoordinator.addSite(siteData);
     }
 
     /**
@@ -910,7 +605,11 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
         monitorId?: string
     ): Promise<StatusUpdate | undefined> {
         return this.runWithContext(
-            () => this.monitorManager.checkSiteManually(identifier, monitorId),
+            () =>
+                this.monitoringLifecycleCoordinator.checkSiteManually(
+                    identifier,
+                    monitorId
+                ),
             {
                 code: "ORCHESTRATOR_MANUAL_CHECK_FAILED",
                 details: {
@@ -1019,7 +718,7 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
             logger.info("[UptimeOrchestrator] Site manager initialized");
 
             // Step 3: Resume monitoring for sites that were monitoring before app restart
-            await this.resumePersistentMonitoring();
+            await this.monitoringLifecycleCoordinator.resumePersistentMonitoring();
             logger.info("[UptimeOrchestrator] Persistent monitoring resumed");
 
             // Step 4: Validate that managers are properly initialized
@@ -1073,7 +772,10 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
         timestamp?: number;
     }): Promise<Site[]> {
         return this.runWithContext(
-            () => this.siteManager.emitSitesStateSynchronized(payload),
+            () =>
+                this.snapshotSyncCoordinator.emitSitesStateSynchronized(
+                    payload
+                ),
             {
                 code: "ORCHESTRATOR_EMIT_SITES_STATE_SYNC_FAILED",
                 message: "Failed to emit site synchronization event",
@@ -1134,93 +836,6 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
     }
 
     /**
-     * Handles the update sites cache request asynchronously.
-     *
-     * @remarks
-     * Extracted from event handler to enable proper async handling and testing.
-     * Updates the site cache and sets up monitoring for all loaded sites.
-     *
-     * Uses Promise.allSettled to handle monitoring setup failures gracefully.
-     * Critical failures include both rejected promises and fulfilled promises
-     * where the operation reported failure. The logic correctly identifies
-     * failures by checking either rejected status or successful completion with
-     * failure result.
-     *
-     * @param data - The sites cache update request data
-     *
-     * @returns Promise that resolves when the cache update is complete
-     */
-    private async handleUpdateSitesCacheRequest(
-        data: UpdateSitesCacheRequestData
-    ): Promise<void> {
-        const timestamp = Date.now();
-
-        await this.siteManager.updateSitesCache(
-            data.sites,
-            "UptimeOrchestrator.handleUpdateSitesCacheRequest",
-            {
-                action: STATE_SYNC_ACTION.BULK_SYNC,
-                emitSyncEvent: true,
-                siteIdentifier: "all",
-                sites: data.sites,
-                source: STATE_SYNC_SOURCE.CACHE,
-                timestamp,
-            }
-        );
-
-        // CRITICAL: Set up monitoring for each loaded site
-        const setupResults = await Promise.allSettled(
-            data.sites.map(async (site) => {
-                try {
-                    await this.monitorManager.setupSiteForMonitoring(site);
-                    return { site: site.identifier, success: true };
-                } catch (error) {
-                    logger.error(
-                        `[UptimeOrchestrator] Failed to setup monitoring for site ${site.identifier}:`,
-                        error
-                    );
-                    return { error, site: site.identifier, success: false };
-                }
-            })
-        );
-
-        // Validate that critical sites were set up successfully
-        const successful = setupResults.filter(
-            (result) => result.status === "fulfilled" && result.value.success
-        ).length;
-        const failed = setupResults.length - successful;
-
-        if (failed > 0) {
-            const criticalFailures = setupResults.filter(
-                (result) =>
-                    result.status === "rejected" || !result.value.success
-            ).length;
-
-            if (criticalFailures > 0) {
-                const errorMessage = `Critical monitoring setup failures: ${criticalFailures} of ${data.sites.length} sites failed`;
-                logger.error(`[UptimeOrchestrator] ${errorMessage}`);
-                // For critical operations, we might want to emit an error event
-                await this.emitTyped("system:error", {
-                    context: "site-monitoring-setup",
-                    error: new Error(errorMessage),
-                    recovery:
-                        "Check site configurations and restart monitoring",
-                    severity: "high",
-                    timestamp: Date.now(),
-                });
-            } else {
-                logger.warn(
-                    `[UptimeOrchestrator] Site monitoring setup completed: ${successful} successful, ${failed} failed`
-                );
-            }
-        } else {
-            logger.info(
-                `[UptimeOrchestrator] Successfully set up monitoring for all ${successful} loaded sites`
-            );
-        }
-    }
-
-    /**
      * Shuts down the orchestrator and removes all event listeners. Ensures
      * proper cleanup to prevent memory leaks.
      *
@@ -1267,80 +882,10 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
         siteIdentifier: string,
         monitorId: string
     ): Promise<Site> {
-        let monitoringStopped = false;
-
-        try {
-            // Phase 1: Stop monitoring immediately (reversible)
-            monitoringStopped = await this.monitorManager.stopMonitoringForSite(
-                siteIdentifier,
-                monitorId
-            );
-
-            // If stopping monitoring failed, log warning but continue with
-            // database removal. The monitor may not be running, but the database
-            // record should still be removed.
-            if (!monitoringStopped) {
-                logger.warn(
-                    `[UptimeOrchestrator] Failed to stop monitoring for ${siteIdentifier}/${monitorId}, but continuing with database removal`
-                );
-            }
-
-            // Phase 2: Remove monitor from database using transaction
-            // (irreversible) and return the persisted snapshot.
-            return await this.siteManager.removeMonitor(
-                siteIdentifier,
-                monitorId
-            );
-        } catch (error) {
-            let failureCause: unknown = error;
-            // If database removal failed after monitoring was stopped, attempt compensation
-            if (monitoringStopped) {
-                logger.warn(
-                    `[UptimeOrchestrator] Database removal failed for ${siteIdentifier}/${monitorId}, attempting to restart monitoring`
-                );
-                try {
-                    await this.monitorManager.startMonitoringForSite(
-                        siteIdentifier,
-                        monitorId
-                    );
-                    logger.info(
-                        `[UptimeOrchestrator] Successfully restarted monitoring for ${siteIdentifier}/${monitorId} after failed removal`
-                    );
-                } catch (restartError) {
-                    // This is a critical inconsistency - monitor stopped but
-                    // database record exists
-                    const criticalError = new Error(
-                        `Critical state inconsistency: Monitor ${siteIdentifier}/${monitorId} stopped but database removal failed and restart failed`
-                    );
-                    logger.error(
-                        `[UptimeOrchestrator] ${criticalError.message}:`,
-                        restartError
-                    );
-                    // Emit system error for this critical inconsistency
-                    await this.emitTyped("system:error", {
-                        context: "monitor-removal-compensation",
-                        error: criticalError,
-                        recovery:
-                            "Manual intervention required - check monitor state and database consistency",
-                        severity: "critical",
-                        timestamp: Date.now(),
-                    });
-                    failureCause = criticalError;
-                }
-            }
-
-            throw this.createContextualError({
-                cause: failureCause,
-                code: "ORCHESTRATOR_REMOVE_MONITOR_FAILED",
-                details: {
-                    monitorId,
-                    monitoringStopped,
-                    siteIdentifier,
-                },
-                message: `Failed to remove monitor ${siteIdentifier}/${monitorId}`,
-                operation: "orchestrator.removeMonitor",
-            });
-        }
+        return this.siteLifecycleCoordinator.removeMonitor(
+            siteIdentifier,
+            monitorId
+        );
     }
 
     /**
@@ -1356,95 +901,7 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
      * @returns Promise resolving to true if removed, false otherwise.
      */
     public async removeSite(identifier: string): Promise<boolean> {
-        const siteSnapshot = this.siteManager.getSiteFromCache(identifier);
-        const activeMonitorIds = siteSnapshot
-            ? siteSnapshot.monitors
-                  .filter((monitor): monitor is Monitor & { id: string } =>
-                      Boolean(monitor.id && monitor.monitoring)
-                  )
-                  .map((monitor) => monitor.id)
-            : [];
-
-        if (!siteSnapshot) {
-            logger.debug(
-                `[UptimeOrchestrator] removeSite(${identifier}) invoked for site missing from cache`
-            );
-        }
-
-        let monitoringStopped = false;
-        let siteRemoved = false;
-
-        try {
-            monitoringStopped =
-                await this.monitorManager.stopMonitoringForSite(identifier);
-
-            if (!monitoringStopped) {
-                logger.warn(
-                    `[UptimeOrchestrator] Aborting removal of ${identifier} because monitoring could not be stopped`
-                );
-                return false;
-            }
-
-            siteRemoved = await this.siteManager.removeSite(identifier);
-
-            if (siteRemoved) {
-                return true;
-            }
-
-            logger.warn(
-                `[UptimeOrchestrator] Site ${identifier} deletion failed after monitoring shutdown; attempting compensation`
-            );
-
-            if (activeMonitorIds.length === 0) {
-                logger.info(
-                    `[UptimeOrchestrator] No active monitors recorded for ${identifier}; skipping restart after failed removal`
-                );
-                return false;
-            }
-
-            /* eslint-disable no-await-in-loop -- Compensation sequence must restart monitors sequentially */
-            for (const monitorId of activeMonitorIds) {
-                const restartSucceeded =
-                    await this.monitorManager.startMonitoringForSite(
-                        identifier,
-                        monitorId
-                    );
-
-                if (!restartSucceeded) {
-                    const criticalError = new Error(
-                        `Critical state inconsistency: Monitoring stopped for ${identifier} (monitor ${monitorId}) but restart failed after deletion failure`
-                    );
-                    logger.error(
-                        `[UptimeOrchestrator] ${criticalError.message}`
-                    );
-                    await this.emitTyped("system:error", {
-                        context: "site-removal-compensation",
-                        error: criticalError,
-                        recovery:
-                            "Inspect monitor scheduler state and database entries for the affected site",
-                        severity: "critical",
-                        timestamp: Date.now(),
-                    });
-                    throw criticalError;
-                }
-            }
-            /* eslint-enable no-await-in-loop -- Re-enable after sequential compensation */
-
-            return false;
-        } catch (error) {
-            throw this.createContextualError({
-                cause: error,
-                code: "ORCHESTRATOR_REMOVE_SITE_FAILED",
-                details: {
-                    activeMonitorIds,
-                    monitoringStopped,
-                    siteIdentifier: identifier,
-                    siteRemoved,
-                },
-                message: `Failed to remove site ${identifier}`,
-                operation: "orchestrator.removeSite",
-            });
-        }
+        return this.siteLifecycleCoordinator.removeSite(identifier);
     }
 
     /**
@@ -1466,17 +923,7 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
      * @throws If database operation fails.
      */
     public async deleteAllSites(): Promise<number> {
-        await this.runWithContext(() => this.monitorManager.stopMonitoring(), {
-            code: "ORCHESTRATOR_DELETE_ALL_SITES_STOP_MONITORING_FAILED",
-            message: "Failed to stop monitoring prior to bulk site deletion",
-            operation: "orchestrator.deleteAllSites.stopMonitoring",
-        });
-
-        return this.runWithContext(() => this.siteManager.deleteAllSites(), {
-            code: "ORCHESTRATOR_DELETE_ALL_SITES_FAILED",
-            message: "Failed to delete all sites",
-            operation: "orchestrator.deleteAllSites",
-        });
+        return this.siteLifecycleCoordinator.deleteAllSites();
     }
 
     /**
@@ -1486,7 +933,7 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
      */
     public async startMonitoring(): Promise<MonitoringStartSummary> {
         return this.runWithContext(
-            () => this.monitorManager.startMonitoring(),
+            () => this.monitoringLifecycleCoordinator.startMonitoring(),
             {
                 code: "ORCHESTRATOR_START_MONITORING_FAILED",
                 message: "Failed to start monitoring",
@@ -1509,7 +956,7 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
     ): Promise<boolean> {
         return this.runWithContext(
             () =>
-                this.monitorManager.startMonitoringForSite(
+                this.monitoringLifecycleCoordinator.startMonitoringForSite(
                     identifier,
                     monitorId
                 ),
@@ -1528,11 +975,14 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
      * @returns Promise that resolves when monitoring has stopped.
      */
     public async stopMonitoring(): Promise<MonitoringStopSummary> {
-        return this.runWithContext(() => this.monitorManager.stopMonitoring(), {
-            code: "ORCHESTRATOR_STOP_MONITORING_FAILED",
-            message: "Failed to stop monitoring",
-            operation: "orchestrator.stopMonitoring",
-        });
+        return this.runWithContext(
+            () => this.monitoringLifecycleCoordinator.stopMonitoring(),
+            {
+                code: "ORCHESTRATOR_STOP_MONITORING_FAILED",
+                message: "Failed to stop monitoring",
+                operation: "orchestrator.stopMonitoring",
+            }
+        );
     }
 
     /**
@@ -1549,7 +999,7 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
     ): Promise<boolean> {
         return this.runWithContext(
             () =>
-                this.monitorManager.stopMonitoringForSite(
+                this.monitoringLifecycleCoordinator.stopMonitoringForSite(
                     identifier,
                     monitorId
                 ),
@@ -1581,121 +1031,6 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
                 details: { identifier, updatedFields: Object.keys(updates) },
                 message: `Failed to update site ${identifier}`,
                 operation: "orchestrator.updateSite",
-            }
-        );
-    }
-
-    /**
-     * Resumes monitoring for sites that were actively monitoring before app
-     * restart.
-     *
-     * @remarks
-     * During app startup, sites marked as `monitoring: true` in the database
-     * need to be registered with the MonitorScheduler. Without this, the
-     * scheduler has no knowledge of pre-existing running monitors, causing stop
-     * operations to fail silently.
-     *
-     * This method only resumes monitoring for individual monitors that were
-     * actively monitoring before the restart (monitor.monitoring === true), not
-     * for paused monitors.
-     *
-     * @returns Promise that resolves when all persistent monitoring is resumed
-     */
-    private async resumePersistentMonitoring(): Promise<void> {
-        try {
-            // Get all sites from cache (loaded during site manager initialization)
-            const sites = this.siteManager.getSitesFromCache();
-
-            // Find all monitors that were actively monitoring before restart
-            const monitorsToResume: Array<{ monitor: Monitor; site: Site }> =
-                [];
-
-            for (const site of sites) {
-                // Only consider sites where monitoring is enabled
-                if (site.monitoring) {
-                    // Find monitors within this site that were actively monitoring
-                    const activeMonitors = site.monitors.filter(
-                        (monitor) => monitor.monitoring
-                    );
-                    for (const monitor of activeMonitors) {
-                        monitorsToResume.push({ monitor, site });
-                    }
-                }
-            }
-
-            if (monitorsToResume.length === 0) {
-                logger.info(
-                    "[UptimeOrchestrator] No monitors require monitoring resumption"
-                );
-                return;
-            }
-
-            logger.info(
-                `[UptimeOrchestrator] Resuming monitoring for ${monitorsToResume.length} monitors across ${sites.filter((s) => s.monitoring).length} sites`
-            );
-
-            // Resume monitoring for each monitor individually
-            const resumePromises = monitorsToResume.map(
-                async ({ monitor, site }) => {
-                    try {
-                        const success =
-                            await this.monitorManager.startMonitoringForSite(
-                                site.identifier,
-                                monitor.id
-                            );
-
-                        if (success) {
-                            logger.debug(
-                                `[UptimeOrchestrator] Successfully resumed monitoring for monitor: ${site.identifier}/${monitor.id}`
-                            );
-                        } else {
-                            logger.warn(
-                                `[UptimeOrchestrator] Failed to resume monitoring for monitor: ${site.identifier}/${monitor.id}`
-                            );
-                        }
-
-                        return success;
-                    } catch (error) {
-                        logger.error(
-                            `[UptimeOrchestrator] Error resuming monitoring for monitor ${site.identifier}/${monitor.id}:`,
-                            error
-                        );
-                        return false;
-                    }
-                }
-            );
-
-            // Wait for all to complete (use allSettled to handle failures gracefully)
-            const results = await Promise.allSettled(resumePromises);
-            const successCount = results.filter(
-                (result) => result.status === "fulfilled" && result.value
-            ).length;
-
-            logger.info(
-                `[UptimeOrchestrator] Monitoring resumption completed: ${successCount}/${monitorsToResume.length} monitors`
-            );
-        } catch (error) {
-            logger.error(
-                "[UptimeOrchestrator] Critical error during monitoring resumption:",
-                error
-            );
-            // Don't throw - allow app initialization to continue
-        }
-    }
-
-    /**
-     * Handles the get sites from cache request asynchronously.
-     *
-     * @returns Promise that resolves when the response is sent
-     */
-    private async handleGetSitesFromCacheRequest(): Promise<void> {
-        const sites = this.siteManager.getSitesFromCache();
-        await this.emitTyped(
-            "internal:database:get-sites-from-cache-response",
-            {
-                operation: "get-sites-from-cache-response",
-                sites,
-                timestamp: Date.now(),
             }
         );
     }
@@ -1900,6 +1235,32 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
         this.historyLimitCoordinator = new HistoryLimitCoordinator({
             databaseManager: this.databaseManager,
             eventBus: this,
+        });
+
+        this.siteLifecycleCoordinator = new SiteLifecycleCoordinator({
+            createContextualError: (input): ApplicationError =>
+                this.createContextualError(input),
+            emitSystemError: async (payload): Promise<void> => {
+                await this.emitTyped("system:error", payload);
+            },
+            monitorManager: this.monitorManager,
+            siteManager: this.siteManager,
+        });
+
+        this.monitoringLifecycleCoordinator =
+            new MonitoringLifecycleCoordinator({
+                emitTyped: (eventName, payload): Promise<void> =>
+                    this.emitTyped(eventName as string, payload),
+                monitorManager: this.monitorManager,
+                siteManager: this.siteManager,
+            });
+
+        this.snapshotSyncCoordinator = new SnapshotSyncCoordinator({
+            busId: ORCHESTRATOR_BUS_ID,
+            emitTyped: (eventName, payload): Promise<void> =>
+                this.emitTyped(eventName as string, payload),
+            monitorManager: this.monitorManager,
+            siteManager: this.siteManager,
         });
 
         // Set up event-driven communication between managers

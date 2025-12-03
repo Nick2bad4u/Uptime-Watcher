@@ -406,7 +406,7 @@ describe("Comprehensive Validation Function Fuzzing", () => {
                 );
 
                 // Property: Function should never throw
-                expect(() => result).not.toThrow();
+                expect(() => result).not.toThrowError();
 
                 // Property: Result should be boolean
                 expect(typeof result).toBe("boolean");
@@ -471,7 +471,7 @@ describe("Comprehensive Validation Function Fuzzing", () => {
                 const result = measureValidation(isValidUrl, "isValidUrl", url);
 
                 // Property: Function should never throw
-                expect(() => result).not.toThrow();
+                expect(() => result).not.toThrowError();
                 expect(typeof result).toBe("boolean");
 
                 // Property: Should reject dangerous protocols
@@ -577,7 +577,7 @@ describe("Comprehensive Validation Function Fuzzing", () => {
         ])("isValidHost: comprehensive hostname validation", (host) => {
             const result = measureValidation(isValidHost, "isValidHost", host);
 
-            expect(() => result).not.toThrow();
+            expect(() => result).not.toThrowError();
             expect(typeof result).toBe("boolean");
 
             // Property: Empty strings should be rejected
@@ -620,7 +620,7 @@ describe("Comprehensive Validation Function Fuzzing", () => {
                     fqdn
                 );
 
-                expect(() => result).not.toThrow();
+                expect(() => result).not.toThrowError();
                 expect(typeof result).toBe("boolean");
 
                 // Property: Should handle edge cases gracefully
@@ -656,7 +656,7 @@ describe("Comprehensive Validation Function Fuzzing", () => {
                     input
                 );
 
-                expect(() => result).not.toThrow();
+                expect(() => result).not.toThrowError();
                 expect(typeof result).toBe("boolean");
 
                 // Property: Valid integer strings should pass
@@ -694,7 +694,7 @@ describe("Comprehensive Validation Function Fuzzing", () => {
                     fallback
                 );
 
-                expect(() => result).not.toThrow();
+                expect(() => result).not.toThrowError();
                 expect(typeof result).toBe("number");
                 expect(Number.isInteger(result)).toBeTruthy();
 
@@ -737,7 +737,7 @@ describe("Comprehensive Validation Function Fuzzing", () => {
                     input
                 );
 
-                expect(() => result).not.toThrow();
+                expect(() => result).not.toThrowError();
                 expect(typeof result).toBe("boolean");
 
                 // Property: The result should be consistent with what validator.js considers valid
@@ -765,7 +765,7 @@ describe("Comprehensive Validation Function Fuzzing", () => {
                     port
                 );
 
-                expect(() => result).not.toThrow();
+                expect(() => result).not.toThrowError();
                 expect(typeof result).toBe("boolean");
 
                 // Property: Valid port range should pass
@@ -808,7 +808,7 @@ describe("Comprehensive Validation Function Fuzzing", () => {
                     id
                 );
 
-                expect(() => result).not.toThrow();
+                expect(() => result).not.toThrowError();
                 expect(typeof result).toBe("boolean");
 
                 // Property: Non-string inputs should fail
@@ -865,7 +865,7 @@ describe("Comprehensive Validation Function Fuzzing", () => {
                     identifiers
                 );
 
-                expect(() => result).not.toThrow();
+                expect(() => result).not.toThrowError();
                 expect(typeof result).toBe("boolean");
 
                 // Property: Non-array inputs should fail
@@ -901,7 +901,7 @@ describe("Comprehensive Validation Function Fuzzing", () => {
                     type
                 );
 
-                expect(() => result).not.toThrow();
+                expect(() => result).not.toThrowError();
                 expect(typeof result).toBe("boolean");
 
                 // Property: Valid monitor types should pass
@@ -943,7 +943,7 @@ describe("Comprehensive Validation Function Fuzzing", () => {
                     monitorData as any
                 );
 
-                expect(() => result).not.toThrow();
+                expect(() => result).not.toThrowError();
                 expect(Array.isArray(result)).toBeTruthy();
 
                 // Property: Result should be array of strings (error messages)
@@ -975,7 +975,7 @@ describe("Comprehensive Validation Function Fuzzing", () => {
                     uptimeStr
                 );
 
-                expect(() => result).not.toThrow();
+                expect(() => result).not.toThrowError();
                 expect(typeof result).toBe("number");
 
                 // Property: Result should be in valid range [0, 100]
@@ -1015,7 +1015,7 @@ describe("Comprehensive Validation Function Fuzzing", () => {
                     url
                 );
 
-                expect(() => result).not.toThrow();
+                expect(() => result).not.toThrowError();
                 expect(typeof result).toBe("string");
 
                 // Property: Invalid URLs should return empty string

@@ -397,7 +397,7 @@ describe("100% Coverage Edge Cases", () => {
                     undefined,
                     true
                 )
-            ).rejects.toThrow("Async error");
+            ).rejects.toThrowError("Async error");
         });
 
         it("should handle async operation failure without fallback", async () => {
@@ -406,7 +406,7 @@ describe("100% Coverage Edge Cases", () => {
                 .mockRejectedValue(new Error("Async error"));
             await expect(
                 withUtilityErrorHandling(operation, "test-operation")
-            ).rejects.toThrow(
+            ).rejects.toThrowError(
                 "test-operation failed and no fallback value provided"
             );
         });
@@ -460,7 +460,7 @@ describe("100% Coverage Edge Cases", () => {
             expect(form.tagName).toBe("FORM");
 
             // Fire submit event and verify it doesn't throw
-            expect(() => fireEvent.submit(form)).not.toThrow();
+            expect(() => fireEvent.submit(form)).not.toThrowError();
         });
 
         it("should handle radio group changes", () => {
@@ -476,7 +476,7 @@ describe("100% Coverage Edge Cases", () => {
             const radioButton = screen.getByTestId("radio-new");
 
             expect(radioButton).toBeInTheDocument();
-            expect(() => fireEvent.click(radioButton)).not.toThrow();
+            expect(() => fireEvent.click(radioButton)).not.toThrowError();
         });
 
         it("should handle select field changes", () => {
@@ -487,7 +487,7 @@ describe("100% Coverage Edge Cases", () => {
             expect(select).toHaveAttribute("data-testid", "monitorType");
             expect(() =>
                 fireEvent.change(select, { target: { value: "port" } })
-            ).not.toThrow();
+            ).not.toThrowError();
         });
 
         it("should handle text field changes", () => {
@@ -498,7 +498,7 @@ describe("100% Coverage Edge Cases", () => {
             expect(input).toHaveAttribute("data-testid", "siteName");
             expect(() =>
                 fireEvent.change(input, { target: { value: "New Site" } })
-            ).not.toThrow();
+            ).not.toThrowError();
         });
     });
 

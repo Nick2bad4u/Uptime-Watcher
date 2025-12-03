@@ -107,7 +107,7 @@ export interface ErrorBoundaryState {
  *
  * @public
  */
-/* eslint-disable react-prefer-function-component/react-prefer-function-component -- Error boundaries must be class components */
+
 // eslint-disable-next-line react/require-optimization -- ErrorBoundary should always re-render on error state changes
 class ErrorBoundaryBase extends Component<
     ErrorBoundaryProperties,
@@ -139,7 +139,7 @@ class ErrorBoundaryBase extends Component<
             retryCount: 0,
         };
     }
-    /* eslint-enable react-prefer-function-component/react-prefer-function-component -- Error boundaries must be class components */
+
     /* eslint-enable no-constructor-bind/no-constructor-state -- Class component requires constructor state initialization */
 
     public override componentDidCatch(

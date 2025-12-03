@@ -637,7 +637,7 @@ describe("AddSiteForm User Input Fuzzing", () => {
                     fireEvent.change(siteNameInput, {
                         target: { value: maliciousName },
                     });
-                }).not.toThrow();
+                }).not.toThrowError();
 
                 // HTML input elements normalize whitespace, especially newlines
                 // Instead of exact matching, verify the input contains expected content
@@ -904,7 +904,7 @@ describe("AddSiteForm User Input Fuzzing", () => {
                 await expect(async () => {
                     await commitInputValue(portInput, "");
                     await commitInputValue(portInput, invalidPort.toString());
-                }).not.toThrow();
+                }).not.toThrowError();
 
                 // Input should be handled gracefully (validation happens on submit)
                 // For invalid inputs, number fields may clear the value or set to null
@@ -1016,7 +1016,7 @@ describe("AddSiteForm User Input Fuzzing", () => {
                             }
                         }
                     }
-                }).not.toThrow();
+                }).not.toThrowError();
 
                 // Form should still be functional
                 const submitButtons = screen.getAllByRole("button", {

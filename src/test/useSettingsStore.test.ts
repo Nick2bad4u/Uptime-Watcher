@@ -373,7 +373,7 @@ describe(useSettingsStore, () => {
 
             await expect(
                 useSettingsStore.getState().persistHistoryLimit(300)
-            ).rejects.toThrow("Backend error");
+            ).rejects.toThrowError("Backend error");
         });
     });
 

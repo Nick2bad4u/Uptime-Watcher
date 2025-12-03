@@ -152,7 +152,7 @@ describe(MonitorOperationRegistry, () => {
             // Force all subsequent generations to return same existing ID
             mockRandomUUID.mockReturnValue(existingResult.operationId);
 
-            expect(() => registry.initiateCheck(mockMonitorId)).toThrow(
+            expect(() => registry.initiateCheck(mockMonitorId)).toThrowError(
                 "Failed to generate a unique operation ID after multiple attempts."
             );
 

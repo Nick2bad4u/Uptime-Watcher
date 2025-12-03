@@ -27,7 +27,7 @@ import {
     httpLatencyMonitorSchema,
     httpStatusMonitorSchema,
     monitorSchemas,
-} from "@shared/validation/schemas";
+} from "@shared/validation/monitorSchemas";
 
 import type {
     IMonitorService,

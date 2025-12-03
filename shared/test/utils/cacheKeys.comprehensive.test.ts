@@ -69,7 +69,7 @@ describe("cacheKeys utilities - Backend Coverage", () => {
             expect(parsedValidation).toBeDefined();
 
             // Also test negative cases - parseCacheKey throws for invalid keys
-            expect(() => cacheKeys.parseCacheKey("invalid-key")).toThrow(
+            expect(() => cacheKeys.parseCacheKey("invalid-key")).toThrowError(
                 "Invalid cache key format"
             );
         });
@@ -606,7 +606,7 @@ describe("cacheKeys utilities - Backend Coverage", () => {
 
             for (const key of keys) {
                 expect(isStandardizedCacheKey(key)).toBeTruthy();
-                expect(() => parseCacheKey(key)).not.toThrow();
+                expect(() => parseCacheKey(key)).not.toThrowError();
             }
         });
     });

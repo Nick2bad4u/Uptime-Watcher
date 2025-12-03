@@ -52,7 +52,7 @@ describe("typeHelpers Direct Function Coverage", () => {
             typeof val === "string";
         expect(validateAndConvert("test", validator)).toBe("test");
         // The function throws on invalid input, so we need to test that
-        expect(() => validateAndConvert(123, validator)).toThrow(
+        expect(() => validateAndConvert(123, validator)).toThrowError(
             "Type validation failed"
         );
     });

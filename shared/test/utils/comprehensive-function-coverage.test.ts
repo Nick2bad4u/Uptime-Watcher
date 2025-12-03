@@ -764,7 +764,20 @@ describe("Shared Module - 100% Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Validation", "type");
 
-            const schemasModule = await import("../../validation/schemas.js");
+            const [
+                monitorSchemasModule,
+                siteSchemasModule,
+                statusUpdateSchemasModule,
+            ] = await Promise.all([
+                import("../../validation/monitorSchemas.js"),
+                import("../../validation/siteSchemas.js"),
+                import("../../validation/statusUpdateSchemas.js"),
+            ]);
+            const schemasModule = {
+                ...monitorSchemasModule,
+                ...siteSchemasModule,
+                ...statusUpdateSchemasModule,
+            } as const;
 
             // Test validation functions
             const httpMonitor = {

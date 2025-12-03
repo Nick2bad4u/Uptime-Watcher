@@ -122,7 +122,7 @@ describe(ThemeManager, () => {
 
             expect(() => {
                 themeManager.applyTheme(lightTheme);
-            }).not.toThrow();
+            }).not.toThrowError();
         });
     });
 
@@ -323,7 +323,7 @@ describe(ThemeManager, () => {
             const cleanup = themeManager.onSystemThemeChange(callback);
 
             expect(typeof cleanup).toBe("function");
-            expect(() => cleanup()).not.toThrow();
+            expect(() => cleanup()).not.toThrowError();
 
             globalThis.window = originalWindow;
         });
@@ -399,12 +399,12 @@ describe(ThemeManager, () => {
             // This should not throw even with null/undefined properties
             expect(() => {
                 manager.generateCSSVariables(themeWithNullProps);
-            }).not.toThrow();
+            }).not.toThrowError();
 
             // Apply theme should also handle this gracefully
             expect(() => {
                 manager.applyTheme(lightTheme); // Use valid theme object
-            }).not.toThrow();
+            }).not.toThrowError();
         });
 
         it("should handle partial typography object", async ({
@@ -433,7 +433,7 @@ describe(ThemeManager, () => {
 
             expect(() => {
                 manager.generateCSSVariables(themeWithPartialTypography);
-            }).not.toThrow();
+            }).not.toThrowError();
         });
 
         it("should handle empty objects for theme properties", async ({
@@ -490,7 +490,7 @@ describe(ThemeManager, () => {
 
             expect(() => {
                 manager.generateCSSVariables(themeWithComplexColors);
-            }).not.toThrow();
+            }).not.toThrowError();
         });
 
         it("should handle nested null checks in apply methods", async ({
@@ -542,40 +542,42 @@ describe(ThemeManager, () => {
             // These should all complete without throwing, exercising the null checks
             expect(() =>
                 manager.generateCSSVariables(themeWithNullBorderRadius)
-            ).not.toThrow();
+            ).not.toThrowError();
             expect(() =>
                 manager.generateCSSVariables(themeWithNullSpacing)
-            ).not.toThrow();
+            ).not.toThrowError();
             expect(() =>
                 manager.generateCSSVariables(themeWithNullShadows)
-            ).not.toThrow();
+            ).not.toThrowError();
             expect(() =>
                 manager.generateCSSVariables(themeWithNullColors)
-            ).not.toThrow();
+            ).not.toThrowError();
             expect(() =>
                 manager.generateCSSVariables(themeWithNullTypography)
-            ).not.toThrow();
+            ).not.toThrowError();
             expect(() =>
                 manager.generateCSSVariables(themeWithNullFontSize)
-            ).not.toThrow();
+            ).not.toThrowError();
 
             // Also test applyTheme method which calls the apply methods directly
             expect(() =>
                 manager.applyTheme(themeWithNullBorderRadius)
-            ).not.toThrow();
+            ).not.toThrowError();
             expect(() =>
                 manager.applyTheme(themeWithNullSpacing)
-            ).not.toThrow();
+            ).not.toThrowError();
             expect(() =>
                 manager.applyTheme(themeWithNullShadows)
-            ).not.toThrow();
-            expect(() => manager.applyTheme(themeWithNullColors)).not.toThrow();
+            ).not.toThrowError();
+            expect(() =>
+                manager.applyTheme(themeWithNullColors)
+            ).not.toThrowError();
             expect(() =>
                 manager.applyTheme(themeWithNullTypography)
-            ).not.toThrow();
+            ).not.toThrowError();
             expect(() =>
                 manager.applyTheme(themeWithNullFontSize)
-            ).not.toThrow();
+            ).not.toThrowError();
         });
 
         it("should handle undefined document in applyThemeClasses", async ({
@@ -594,7 +596,7 @@ describe(ThemeManager, () => {
             delete (globalThis as any).document;
 
             // This should handle undefined document gracefully
-            expect(() => manager.applyTheme(lightTheme)).not.toThrow();
+            expect(() => manager.applyTheme(lightTheme)).not.toThrowError();
 
             // Restore document
             globalThis.document = originalDocument;

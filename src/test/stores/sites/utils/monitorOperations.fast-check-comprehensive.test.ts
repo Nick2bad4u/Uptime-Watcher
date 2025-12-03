@@ -465,7 +465,7 @@ describe("monitorOperations utilities - Comprehensive Fast-Check Coverage", () =
         });
 
         it("should handle invalid input gracefully", () => {
-            expect(() => normalizeMonitor([] as any)).toThrow();
+            expect(() => normalizeMonitor([] as any)).toThrowError();
         });
 
         it("should provide default URLs for HTTP monitors", () => {
@@ -649,7 +649,7 @@ describe("monitorOperations utilities - Comprehensive Fast-Check Coverage", () =
 
                         expect(() =>
                             updateMonitorInSite(site, nonExistentId, updates)
-                        ).toThrow();
+                        ).toThrowError();
                     }
                 )
             );
@@ -666,7 +666,7 @@ describe("monitorOperations utilities - Comprehensive Fast-Check Coverage", () =
                         expect(targetMonitor).toBeDefined(); // Assert it exists
                         expect(() =>
                             validateMonitorExists(site, targetMonitor!.id)
-                        ).not.toThrow();
+                        ).not.toThrowError();
                     }
                 )
             );
@@ -684,7 +684,7 @@ describe("monitorOperations utilities - Comprehensive Fast-Check Coverage", () =
 
                         expect(() =>
                             validateMonitorExists(site, nonExistentId)
-                        ).toThrow();
+                        ).toThrowError();
                     }
                 )
             );
@@ -697,7 +697,7 @@ describe("monitorOperations utilities - Comprehensive Fast-Check Coverage", () =
                     (monitorId) => {
                         expect(() =>
                             validateMonitorExists(undefined, monitorId)
-                        ).toThrow();
+                        ).toThrowError();
                     }
                 )
             );
@@ -786,7 +786,7 @@ describe("monitorOperations utilities - Comprehensive Fast-Check Coverage", () =
                                 monitor,
                                 invalidStatus as any
                             )
-                        ).toThrow();
+                        ).toThrowError();
                     }
                 )
             );

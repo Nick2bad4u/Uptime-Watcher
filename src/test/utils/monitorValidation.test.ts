@@ -17,7 +17,7 @@ vi.mock("@shared/utils/errorHandling", () => ({
     withUtilityErrorHandling: vi.fn(),
 }));
 
-vi.mock("@shared/validation/schemas", () => ({
+vi.mock("@shared/validation/monitorSchemas", () => ({
     validateMonitorData: vi.fn(),
     validateMonitorField: vi.fn(),
 }));
@@ -58,7 +58,7 @@ import { withUtilityErrorHandling } from "@shared/utils/errorHandling";
 import {
     validateMonitorData as sharedValidateMonitorData,
     validateMonitorField as sharedValidateMonitorField,
-} from "@shared/validation/schemas";
+} from "@shared/validation/monitorSchemas";
 import { useMonitorTypesStore } from "../../stores/monitor/useMonitorTypesStore";
 
 // Helper function to create a complete mock store

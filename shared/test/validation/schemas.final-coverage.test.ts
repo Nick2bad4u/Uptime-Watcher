@@ -7,8 +7,8 @@ import { describe, it, expect } from "vitest";
 import {
     validateMonitorData,
     validateMonitorField,
-    validateSiteData,
-} from "../../validation/schemas";
+} from "../../validation/monitorSchemas";
+import { validateSiteData } from "../../validation/siteSchemas";
 
 describe("Validation Schemas - Final Branch Coverage", () => {
     describe("Warning generation (line 312)", () => {
@@ -133,7 +133,7 @@ describe("Validation Schemas - Final Branch Coverage", () => {
                     "completelyUnknownFieldName",
                     "value"
                 );
-            }).toThrow("Unknown field: completelyUnknownFieldName");
+            }).toThrowError("Unknown field: completelyUnknownFieldName");
         });
 
         it("should handle unknown field in both specific and base schemas", async ({
@@ -148,7 +148,7 @@ describe("Validation Schemas - Final Branch Coverage", () => {
             // Test with field that exists in neither the specific nor base schema
             expect(() => {
                 validateMonitorField("port", "nonExistentField", "value");
-            }).toThrow("Unknown field: nonExistentField");
+            }).toThrowError("Unknown field: nonExistentField");
         });
     });
 
@@ -227,7 +227,7 @@ describe("Validation Schemas - Final Branch Coverage", () => {
                             testCase.field,
                             testCase.value
                         );
-                    }).toThrow("Unknown field: unknownField");
+                    }).toThrowError("Unknown field: unknownField");
                 } else {
                     const result = validateMonitorField(
                         testCase.type,

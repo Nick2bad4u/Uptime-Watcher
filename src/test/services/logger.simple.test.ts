@@ -31,6 +31,6 @@ describe("Logger Service - Basic Tests", () => {
             logger.error("Test error message");
             logger.warn("Test warning message");
             logger.debug("Test debug message");
-        }).not.toThrow();
+        }).not.toThrowError();
     });
 });

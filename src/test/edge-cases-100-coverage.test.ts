@@ -215,7 +215,7 @@ describe("100% Coverage Edge Cases", () => {
                     undefined,
                     true
                 )
-            ).rejects.toThrow("Async error");
+            ).rejects.toThrowError("Async error");
         });
 
         it("should handle async operation failure without fallback", async () => {
@@ -224,7 +224,7 @@ describe("100% Coverage Edge Cases", () => {
                 .mockRejectedValue(new Error("Async error"));
             await expect(
                 withUtilityErrorHandling(operation, "test-operation")
-            ).rejects.toThrow(
+            ).rejects.toThrowError(
                 "test-operation failed and no fallback value provided"
             );
         });
@@ -314,7 +314,7 @@ describe("100% Coverage Edge Cases", () => {
             const wrapper = withAsyncErrorHandling(asyncOp, "test-async");
 
             expect(typeof wrapper).toBe("function");
-            expect(() => wrapper()).not.toThrow();
+            expect(() => wrapper()).not.toThrowError();
 
             // Wait for async operation to complete
             await new Promise((resolve) => setTimeout(resolve, 10));

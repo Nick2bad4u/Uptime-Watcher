@@ -116,7 +116,7 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
             // Try to perform immediate check without callback - should do nothing
             expect(() =>
                 scheduler.performImmediateCheck("site1", "monitor1")
-            ).not.toThrow();
+            ).not.toThrowError();
         });
     });
 
@@ -533,7 +533,7 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
                 monitors: [],
             };
 
-            expect(() => scheduler.startSite(site)).not.toThrow();
+            expect(() => scheduler.startSite(site)).not.toThrowError();
             expect(scheduler.getActiveCount()).toBe(0);
         });
 
@@ -623,7 +623,7 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
             await annotate("Category: Service", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(() => scheduler.stopSite("nonexistent")).not.toThrow();
+            expect(() => scheduler.stopSite("nonexistent")).not.toThrowError();
         });
 
         it("should only stop monitors for specified site", async ({
@@ -737,7 +737,7 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
             await annotate("Category: Service", "category");
             await annotate("Type: Monitoring", "type");
 
-            expect(() => scheduler.stopAll()).not.toThrow();
+            expect(() => scheduler.stopAll()).not.toThrowError();
             expect(scheduler.getActiveCount()).toBe(0);
         });
     });
@@ -776,7 +776,7 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
             // Should not throw even if callback throws
             await expect(
                 scheduler.performImmediateCheck("site1", "monitor1")
-            ).resolves.not.toThrow();
+            ).resolves.not.toThrowError();
 
             expect(errorCallback).toHaveBeenCalledWith("site1", "monitor1");
             // Note: Logger mock verification removed since real MonitorScheduler uses real logger
@@ -793,7 +793,7 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
 
             await expect(
                 scheduler.performImmediateCheck("site1", "monitor1")
-            ).resolves.not.toThrow();
+            ).resolves.not.toThrowError();
         });
     });
 
@@ -875,7 +875,7 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
             });
 
             // Should throw error for invalid interval
-            expect(() => scheduler.startMonitor("site1", monitor)).toThrow(
+            expect(() => scheduler.startMonitor("site1", monitor)).toThrowError(
                 "Invalid check interval: -1000. Must be a positive integer."
             );
         });

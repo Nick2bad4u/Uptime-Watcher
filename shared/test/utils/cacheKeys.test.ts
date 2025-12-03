@@ -788,11 +788,11 @@ describe("cacheKeys", () => {
 
             expect(() =>
                 parseCacheKey("config:" as StandardizedCacheKey)
-            ).toThrow("Invalid cache key format: config:");
+            ).toThrowError("Invalid cache key format: config:");
 
             expect(() =>
                 parseCacheKey("monitor:operation:" as StandardizedCacheKey)
-            ).toThrow("Invalid cache key format: monitor:operation:");
+            ).toThrowError("Invalid cache key format: monitor:operation:");
         });
 
         it("should throw error for invalid two-part format", async ({
@@ -806,7 +806,7 @@ describe("cacheKeys", () => {
 
             expect(() =>
                 parseCacheKey(":identifier" as StandardizedCacheKey)
-            ).toThrow("Invalid cache key format: :identifier");
+            ).toThrowError("Invalid cache key format: :identifier");
             // Note: 'prefix:' with empty identifier is now valid
         });
 
@@ -821,13 +821,13 @@ describe("cacheKeys", () => {
 
             expect(() =>
                 parseCacheKey(":operation:identifier" as StandardizedCacheKey)
-            ).toThrow("Invalid cache key format: :operation:identifier");
+            ).toThrowError("Invalid cache key format: :operation:identifier");
             expect(() =>
                 parseCacheKey("prefix::identifier" as StandardizedCacheKey)
-            ).toThrow("Invalid cache key format: prefix::identifier");
+            ).toThrowError("Invalid cache key format: prefix::identifier");
             expect(() =>
                 parseCacheKey("prefix:operation:" as StandardizedCacheKey)
-            ).toThrow("Invalid cache key format: prefix:operation:");
+            ).toThrowError("Invalid cache key format: prefix:operation:");
         });
 
         it("should handle complex identifiers", async ({ task, annotate }) => {

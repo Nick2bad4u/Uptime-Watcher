@@ -84,18 +84,18 @@ describe("preload.ts - Missing Branch Coverage", () => {
             mockIpcRenderer.invoke.mockRejectedValue(new Error("IPC failed"));
 
             // Test sites API error handling
-            await expect(exposedAPI.sites.getSites()).rejects.toThrow(
+            await expect(exposedAPI.sites.getSites()).rejects.toThrowError(
                 "IPC failed"
             );
-            await expect(exposedAPI.sites.addSite({})).rejects.toThrow(
+            await expect(exposedAPI.sites.addSite({})).rejects.toThrowError(
                 "IPC failed"
             );
-            await expect(exposedAPI.sites.updateSite("id", {})).rejects.toThrow(
-                "IPC failed"
-            );
-            await expect(exposedAPI.sites.removeSite("test")).rejects.toThrow(
-                "IPC failed"
-            );
+            await expect(
+                exposedAPI.sites.updateSite("id", {})
+            ).rejects.toThrowError("IPC failed");
+            await expect(
+                exposedAPI.sites.removeSite("test")
+            ).rejects.toThrowError("IPC failed");
         });
         it("should handle invoke errors in monitoring API", async () => {
             mockIpcRenderer.invoke.mockRejectedValue(
@@ -105,42 +105,42 @@ describe("preload.ts - Missing Branch Coverage", () => {
             // Test monitoring API error handling
             await expect(
                 exposedAPI.monitoring.startMonitoring()
-            ).rejects.toThrow("Monitoring failed");
+            ).rejects.toThrowError("Monitoring failed");
             await expect(
                 exposedAPI.monitoring.stopMonitoring()
-            ).rejects.toThrow("Monitoring failed");
+            ).rejects.toThrowError("Monitoring failed");
             await expect(
                 exposedAPI.monitoring.startMonitoringForSite("test")
-            ).rejects.toThrow("Monitoring failed");
+            ).rejects.toThrowError("Monitoring failed");
             await expect(
                 exposedAPI.monitoring.stopMonitoringForSite("test")
-            ).rejects.toThrow("Monitoring failed");
+            ).rejects.toThrowError("Monitoring failed");
             await expect(
                 exposedAPI.monitoring.startMonitoringForMonitor(
                     "test",
                     "monitor1"
                 )
-            ).rejects.toThrow("Monitoring failed");
+            ).rejects.toThrowError("Monitoring failed");
             await expect(
                 exposedAPI.monitoring.stopMonitoringForMonitor(
                     "test",
                     "monitor1"
                 )
-            ).rejects.toThrow("Monitoring failed");
+            ).rejects.toThrowError("Monitoring failed");
         });
         it("should handle invoke errors in data API", async () => {
             mockIpcRenderer.invoke.mockRejectedValue(new Error("Data failed"));
 
             // Test data API error handling
-            await expect(exposedAPI.data.exportData()).rejects.toThrow(
+            await expect(exposedAPI.data.exportData()).rejects.toThrowError(
                 "Data failed"
             );
-            await expect(exposedAPI.data.importData("[]")).rejects.toThrow(
+            await expect(exposedAPI.data.importData("[]")).rejects.toThrowError(
                 "Data failed"
             );
             await expect(
                 exposedAPI.data.downloadSqliteBackup()
-            ).rejects.toThrow("Data failed");
+            ).rejects.toThrowError("Data failed");
         });
         it("should handle invoke errors in settings API", async () => {
             mockIpcRenderer.invoke.mockRejectedValue(
@@ -148,15 +148,15 @@ describe("preload.ts - Missing Branch Coverage", () => {
             );
 
             // Test settings API error handling
-            await expect(exposedAPI.settings.getHistoryLimit()).rejects.toThrow(
-                "Settings failed"
-            );
+            await expect(
+                exposedAPI.settings.getHistoryLimit()
+            ).rejects.toThrowError("Settings failed");
             await expect(
                 exposedAPI.settings.updateHistoryLimit(100)
-            ).rejects.toThrow("Settings failed");
-            await expect(exposedAPI.settings.resetSettings()).rejects.toThrow(
-                "Settings failed"
-            );
+            ).rejects.toThrowError("Settings failed");
+            await expect(
+                exposedAPI.settings.resetSettings()
+            ).rejects.toThrowError("Settings failed");
         });
         it("should handle invoke errors in system API", async () => {
             mockIpcRenderer.invoke.mockRejectedValue(
@@ -166,7 +166,7 @@ describe("preload.ts - Missing Branch Coverage", () => {
             // Test system API error handling
             await expect(
                 exposedAPI.system.openExternal("https://example.com")
-            ).rejects.toThrow("System failed");
+            ).rejects.toThrowError("System failed");
         });
     });
     describe("Event Listener Edge Cases", () => {
@@ -174,7 +174,7 @@ describe("preload.ts - Missing Branch Coverage", () => {
             // RemoveAllListeners should not throw
             expect(() =>
                 exposedAPI.events.removeAllListeners("test-channel")
-            ).not.toThrow();
+            ).not.toThrowError();
         });
     });
     describe("Parameter Validation", () => {
@@ -286,13 +286,13 @@ describe("preload.ts - Missing Branch Coverage", () => {
             await expect(exposedAPI.sites.getSites()).resolves.toEqual([
                 mockSite,
             ]);
-            await expect(exposedAPI.sites.addSite({})).rejects.toThrow(
+            await expect(exposedAPI.sites.addSite({})).rejects.toThrowError(
                 "Error 2"
             );
             await expect(
                 exposedAPI.monitorTypes.getMonitorTypes()
             ).resolves.toBeTruthy(); // Returns extracted data, not raw response
-            await expect(exposedAPI.data.exportData()).rejects.toThrow(
+            await expect(exposedAPI.data.exportData()).rejects.toThrowError(
                 "Error 4"
             );
         });
@@ -305,19 +305,19 @@ describe("preload.ts - Missing Branch Coverage", () => {
             // Should handle callback errors gracefully
             expect(() =>
                 exposedAPI.events.onTestEvent(errorCallback)
-            ).not.toThrow();
+            ).not.toThrowError();
         });
         it("should handle invalid event names", async () => {
             // Test with various invalid event names - test removeAllListeners with invalid channels
             expect(() =>
                 exposedAPI.events.removeAllListeners("")
-            ).not.toThrow();
+            ).not.toThrowError();
             expect(() =>
                 exposedAPI.events.removeAllListeners(null)
-            ).not.toThrow();
+            ).not.toThrowError();
             expect(() =>
                 exposedAPI.events.removeAllListeners(undefined)
-            ).not.toThrow();
+            ).not.toThrowError();
         });
         it("should handle rapid event registration/removal", async () => {
             // Rapid event operations
@@ -337,21 +337,25 @@ describe("preload.ts - Missing Branch Coverage", () => {
             // Test various event listener methods
             expect(() =>
                 exposedAPI.events.onUpdateStatus(callback)
-            ).not.toThrow();
-            expect(() => exposedAPI.events.onMonitorUp(callback)).not.toThrow();
+            ).not.toThrowError();
+            expect(() =>
+                exposedAPI.events.onMonitorUp(callback)
+            ).not.toThrowError();
             expect(() =>
                 exposedAPI.events.onMonitorDown(callback)
-            ).not.toThrow();
-            expect(() => exposedAPI.events.onTestEvent(callback)).not.toThrow();
+            ).not.toThrowError();
+            expect(() =>
+                exposedAPI.events.onTestEvent(callback)
+            ).not.toThrowError();
             expect(() =>
                 exposedAPI.events.onCacheInvalidated(callback)
-            ).not.toThrow();
+            ).not.toThrowError();
             expect(() =>
                 exposedAPI.events.onMonitoringStarted(callback)
-            ).not.toThrow();
+            ).not.toThrowError();
             expect(() =>
                 exposedAPI.events.onMonitoringStopped(callback)
-            ).not.toThrow();
+            ).not.toThrowError();
         });
     });
     describe("Memory Management", () => {

@@ -1263,7 +1263,7 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
                 throw new Error("Test render error");
             });
 
-            expect(() => renderAddSiteForm()).toThrow("Test render error");
+            expect(() => renderAddSiteForm()).toThrowError("Test render error");
 
             consoleSpy.mockRestore();
         });

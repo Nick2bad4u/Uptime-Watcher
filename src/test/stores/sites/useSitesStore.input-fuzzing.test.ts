@@ -358,10 +358,10 @@ describe("Sites Store - Property-Based Fuzzing Tests", () => {
                     useSitesStore
                         .getState()
                         .removeSite("non-existent-identifier")
-                ).not.toThrow();
+                ).not.toThrowError();
                 expect(() =>
                     useSitesStore.getState().selectSite(site)
-                ).not.toThrow();
+                ).not.toThrowError();
 
                 const state = useSitesStore.getState();
                 expect(state.sites).toHaveLength(0);
@@ -377,7 +377,7 @@ describe("Sites Store - Property-Based Fuzzing Tests", () => {
                 // Act & Assert - malformed operations should not crash
                 expect(() =>
                     useSitesStore.getState().removeSite(malformedId)
-                ).not.toThrow();
+                ).not.toThrowError();
 
                 const state = useSitesStore.getState();
                 expect(state.sites).toHaveLength(0);

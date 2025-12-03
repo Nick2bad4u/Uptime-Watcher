@@ -148,7 +148,7 @@ describe(withRetry, () => {
         // Advance timers to simulate all retry delays
         await vi.advanceTimersByTimeAsync(150);
 
-        await expect(promise).rejects.toThrow("Persistent failure");
+        await expect(promise).rejects.toThrowError("Persistent failure");
         expect(operation).toHaveBeenCalledTimes(3);
         expect(dbLogger.error).toHaveBeenCalledTimes(4); // 3 attempts + 1 final failure
     });
@@ -191,7 +191,7 @@ describe(withRetry, () => {
 
         await vi.advanceTimersByTimeAsync(20);
 
-        await expect(promise).rejects.toThrow("Always fails");
+        await expect(promise).rejects.toThrowError("Always fails");
         expect(operation).toHaveBeenCalledTimes(2);
     });
     it("should call custom onError callback when provided", async ({
@@ -238,7 +238,7 @@ describe(withRetry, () => {
         });
         await vi.advanceTimersByTimeAsync(20);
 
-        await expect(promise).rejects.toThrow("Test error");
+        await expect(promise).rejects.toThrowError("Test error");
 
         expect(dbLogger.error).toHaveBeenCalledWith(
             "database-connection failed (attempt 1/1)",
@@ -266,7 +266,7 @@ describe(withRetry, () => {
         // Default is 5 retries with 300ms delay
         await vi.advanceTimersByTimeAsync(1500);
 
-        await expect(promise).rejects.toThrow("Default test");
+        await expect(promise).rejects.toThrowError("Default test");
         expect(operation).toHaveBeenCalledTimes(5);
 
         // Should log with default operation name
@@ -314,7 +314,7 @@ describe(withRetry, () => {
         // Advance timers for first retry delay only
         await vi.advanceTimersByTimeAsync(100);
 
-        await expect(promise).rejects.toThrow("Final error");
+        await expect(promise).rejects.toThrowError("Final error");
         expect(operation).toHaveBeenCalledTimes(2);
     });
     it("should accumulate all errors and throw the last one", async ({
@@ -340,7 +340,7 @@ describe(withRetry, () => {
 
         await vi.advanceTimersByTimeAsync(150);
 
-        await expect(promise).rejects.toThrow("Third error");
+        await expect(promise).rejects.toThrowError("Third error");
         expect(operation).toHaveBeenCalledTimes(3);
     });
 });
@@ -415,7 +415,7 @@ describe(withDbRetry, () => {
         const promise = withDbRetry(operation, "database-connection", 2);
         await vi.advanceTimersByTimeAsync(600); // 2 attempts * 300ms delay
 
-        await expect(promise).rejects.toThrow("Database is down");
+        await expect(promise).rejects.toThrowError("Database is down");
         expect(operation).toHaveBeenCalledTimes(2);
         expect(dbLogger.error).toHaveBeenCalledTimes(3); // 2 attempts + 1 final failure
         expect(dbLogger.error).toHaveBeenCalledWith(
@@ -436,7 +436,7 @@ describe(withDbRetry, () => {
         const promise = withDbRetry(operation, "database-write", 3);
         await vi.advanceTimersByTimeAsync(900); // 3 attempts * 300ms delay
 
-        await expect(promise).rejects.toThrow("Database locked");
+        await expect(promise).rejects.toThrowError("Database locked");
         expect(operation).toHaveBeenCalledTimes(3);
         expect(dbLogger.error).toHaveBeenCalledWith(
             "database-write failed (attempt 1/3)",
@@ -463,7 +463,7 @@ describe(withDbRetry, () => {
         const promise = withDbRetry(operation, "database-read");
         await vi.advanceTimersByTimeAsync(1500); // 5 attempts * 300ms delay
 
-        await expect(promise).rejects.toThrow("Connection timeout");
+        await expect(promise).rejects.toThrowError("Connection timeout");
         expect(operation).toHaveBeenCalledTimes(5);
         expect(dbLogger.error).toHaveBeenCalledWith(
             "database-read failed (attempt 1/5)",

@@ -759,7 +759,7 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
             await act(async () => {
                 await expect(
                     result.current.handleSaveInterval()
-                ).rejects.toThrow();
+                ).rejects.toThrowError();
             });
 
             // Should not call store method with invalid value
@@ -864,7 +864,7 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
             await act(async () => {
                 await expect(
                     result.current.handleSaveTimeout()
-                ).rejects.toThrow();
+                ).rejects.toThrowError();
             });
 
             // Should not call store method with invalid value
@@ -969,7 +969,7 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
             await act(async () => {
                 await expect(
                     result.current.handleSaveRetryAttempts()
-                ).rejects.toThrow();
+                ).rejects.toThrowError();
             });
 
             // Should not call store method with invalid value
@@ -1506,7 +1506,7 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
             await act(async () => {
                 await expect(
                     result.current.handleSaveInterval()
-                ).rejects.toThrow();
+                ).rejects.toThrowError();
             });
 
             // Validation should prevent the store call

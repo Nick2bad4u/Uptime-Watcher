@@ -69,7 +69,7 @@ describe("Monitor type guards", () => {
 
             const monitor = createMonitor("http");
 
-            expect(() => assertMonitorType(monitor, "http")).not.toThrow();
+            expect(() => assertMonitorType(monitor, "http")).not.toThrowError();
         });
 
         it("throws with default context when types do not match", async ({
@@ -83,7 +83,7 @@ describe("Monitor type guards", () => {
 
             const monitor = createMonitor("port");
 
-            expect(() => assertMonitorType(monitor, "http")).toThrow(
+            expect(() => assertMonitorType(monitor, "http")).toThrowError(
                 "Expected monitor to be type 'http', received 'port'"
             );
         });
@@ -101,7 +101,7 @@ describe("Monitor type guards", () => {
 
             expect(() =>
                 assertMonitorType(monitor, "http", "monitor config")
-            ).toThrow(
+            ).toThrowError(
                 "Expected monitor config to be type 'http', received 'dns'"
             );
         });

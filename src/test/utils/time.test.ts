@@ -714,10 +714,14 @@ describe("Time Utilities", () => {
             const largeNumber = Number.MAX_SAFE_INTEGER;
 
             // These should not throw errors
-            expect(() => formatDuration(largeNumber)).not.toThrow();
-            expect(() => formatIntervalDuration(largeNumber)).not.toThrow();
-            expect(() => formatResponseDuration(largeNumber)).not.toThrow();
-            expect(() => formatResponseTime(largeNumber)).not.toThrow();
+            expect(() => formatDuration(largeNumber)).not.toThrowError();
+            expect(() =>
+                formatIntervalDuration(largeNumber)
+            ).not.toThrowError();
+            expect(() =>
+                formatResponseDuration(largeNumber)
+            ).not.toThrowError();
+            expect(() => formatResponseTime(largeNumber)).not.toThrowError();
         });
 
         it("should handle negative numbers gracefully", async ({
@@ -730,10 +734,10 @@ describe("Time Utilities", () => {
             await annotate("Type: Business Logic", "type");
 
             // These should not throw errors, though behavior may vary
-            expect(() => formatDuration(-1000)).not.toThrow();
-            expect(() => formatIntervalDuration(-1000)).not.toThrow();
-            expect(() => formatResponseDuration(-1000)).not.toThrow();
-            expect(() => formatResponseTime(-1000)).not.toThrow();
+            expect(() => formatDuration(-1000)).not.toThrowError();
+            expect(() => formatIntervalDuration(-1000)).not.toThrowError();
+            expect(() => formatResponseDuration(-1000)).not.toThrowError();
+            expect(() => formatResponseTime(-1000)).not.toThrowError();
         });
 
         it("should handle floating point precision issues", async ({
@@ -879,7 +883,7 @@ describe("Time Utilities", () => {
                     // Property: Should not throw and produce valid date string
                     expect(() =>
                         new Date(timestamp).toLocaleString()
-                    ).not.toThrow();
+                    ).not.toThrowError();
                     expect(result).toBe(new Date(timestamp).toLocaleString());
                 }
             );

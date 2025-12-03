@@ -6,7 +6,7 @@ import { describe, expect, it } from "vitest";
 import {
     validateMonitorData,
     validateMonitorField,
-} from "../../validation/schemas";
+} from "../../validation/monitorSchemas";
 
 describe("Schemas - Final Final Coverage", () => {
     describe("Targeting Lines 399,482 (validation error paths)", () => {

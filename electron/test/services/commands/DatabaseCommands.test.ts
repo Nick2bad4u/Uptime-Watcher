@@ -275,7 +275,7 @@ describe("DatabaseCommands", () => {
 
             command.setExecutionSuccess(false);
 
-            await expect(command.execute()).rejects.toThrow(
+            await expect(command.execute()).rejects.toThrowError(
                 "Test execution failure"
             );
         });
@@ -288,7 +288,7 @@ describe("DatabaseCommands", () => {
 
             command.setRollbackSuccess(false);
 
-            await expect(command.rollback()).rejects.toThrow(
+            await expect(command.rollback()).rejects.toThrowError(
                 "Test rollback failure"
             );
         });
@@ -357,7 +357,7 @@ describe("DatabaseCommands", () => {
                 isValid: false,
             });
 
-            await expect(executor.execute(mockCommand)).rejects.toThrow(
+            await expect(executor.execute(mockCommand)).rejects.toThrowError(
                 "Command validation failed: Validation error"
             );
 
@@ -378,7 +378,7 @@ describe("DatabaseCommands", () => {
                 .fn()
                 .mockRejectedValue(new Error("Execution failed"));
 
-            await expect(executor.execute(mockCommand)).rejects.toThrow(
+            await expect(executor.execute(mockCommand)).rejects.toThrowError(
                 "Execution failed"
             );
 
@@ -406,7 +406,7 @@ describe("DatabaseCommands", () => {
                 .fn()
                 .mockRejectedValue(new Error("Rollback failed"));
 
-            await expect(executor.execute(mockCommand)).rejects.toThrow(
+            await expect(executor.execute(mockCommand)).rejects.toThrowError(
                 "Execution failed"
             );
 
@@ -475,7 +475,7 @@ describe("DatabaseCommands", () => {
             await executor.execute(command2);
 
             // Rollback all should collect errors
-            await expect(executor.rollbackAll()).rejects.toThrow(
+            await expect(executor.rollbackAll()).rejects.toThrowError(
                 "Rollback errors: Rollback 2 failed, Rollback 1 failed"
             );
         });
@@ -496,7 +496,7 @@ describe("DatabaseCommands", () => {
 
             await executor.execute(command1);
 
-            await expect(executor.rollbackAll()).rejects.toThrow(
+            await expect(executor.rollbackAll()).rejects.toThrowError(
                 "Rollback errors: String error"
             );
         });
@@ -595,7 +595,7 @@ describe("DatabaseCommands", () => {
                 new Error("Backup service failed")
             );
 
-            await expect(command.execute()).rejects.toThrow(
+            await expect(command.execute()).rejects.toThrowError(
                 "Backup service failed"
             );
         });
@@ -693,7 +693,7 @@ describe("DatabaseCommands", () => {
                 new Error("Export service failed")
             );
 
-            await expect(command.execute()).rejects.toThrow(
+            await expect(command.execute()).rejects.toThrowError(
                 "Export service failed"
             );
         });
@@ -890,7 +890,7 @@ describe("DatabaseCommands", () => {
                 }
             );
 
-            await expect(command.execute()).rejects.toThrow(
+            await expect(command.execute()).rejects.toThrowError(
                 /invalid site configuration/i
             );
             expect(
@@ -916,7 +916,7 @@ describe("DatabaseCommands", () => {
                 sites: duplicateSites,
             });
 
-            await expect(command.execute()).rejects.toThrow(/duplicate/i);
+            await expect(command.execute()).rejects.toThrowError(/duplicate/i);
             expect(
                 mockImportExportService.persistImportedData
             ).not.toHaveBeenCalled();
@@ -935,7 +935,7 @@ describe("DatabaseCommands", () => {
                 new Error("Import service failed")
             );
 
-            await expect(command.execute()).rejects.toThrow(
+            await expect(command.execute()).rejects.toThrowError(
                 "Import service failed"
             );
         });
@@ -1185,7 +1185,7 @@ describe("DatabaseCommands", () => {
                 new Error("Repository service failed")
             );
 
-            await expect(command.execute()).rejects.toThrow(
+            await expect(command.execute()).rejects.toThrowError(
                 "Repository service failed"
             );
         });
@@ -1350,7 +1350,7 @@ describe("DatabaseCommands", () => {
             );
 
             // Should still throw the event emission error
-            await expect(command.execute()).rejects.toThrow(
+            await expect(command.execute()).rejects.toThrowError(
                 "Event emission failed"
             );
         });
@@ -1376,7 +1376,7 @@ describe("DatabaseCommands", () => {
                 mockCache as unknown as StandardizedCache<Site>
             );
 
-            await expect(command.execute()).rejects.toThrow(
+            await expect(command.execute()).rejects.toThrowError(
                 "Service unavailable"
             );
         });
@@ -1408,7 +1408,7 @@ describe("DatabaseCommands", () => {
                 mockCache as unknown as StandardizedCache<Site>
             );
 
-            await expect(command.execute()).rejects.toThrow(
+            await expect(command.execute()).rejects.toThrowError(
                 "Cache clear failed"
             );
         });

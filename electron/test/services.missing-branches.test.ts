@@ -70,7 +70,7 @@ describe("Service Edge Cases - Missing Branch Coverage", () => {
                         const fallback = String(error);
                         expect(typeof fallback).toBe("string");
                     }
-                }).not.toThrow();
+                }).not.toThrowError();
             }
         });
 
@@ -154,7 +154,7 @@ describe("Service Edge Cases - Missing Branch Coverage", () => {
                     expect(typeof enabled).toBe("boolean");
                     expect(typeof timeout).toBe("number");
                     expect(typeof retries).toBe("number");
-                }).not.toThrow();
+                }).not.toThrowError();
             }
         });
     });
@@ -222,7 +222,7 @@ describe("Service Edge Cases - Missing Branch Coverage", () => {
 
                     const stringified = String(data);
                     expect(typeof stringified).toBe("string");
-                }).not.toThrow();
+                }).not.toThrowError();
             }
         });
 
@@ -350,7 +350,7 @@ describe("Service Edge Cases - Missing Branch Coverage", () => {
                             expect(typeof errorMessage).toBe("string");
                         }
                     }
-                }).not.toThrow();
+                }).not.toThrowError();
             }
         });
 
@@ -430,7 +430,7 @@ describe("Service Edge Cases - Missing Branch Coverage", () => {
                     }
 
                     expect(typeof nextState).toBe("string");
-                }).not.toThrow();
+                }).not.toThrowError();
             }
         });
 
@@ -465,7 +465,7 @@ describe("Service Edge Cases - Missing Branch Coverage", () => {
                         typeof testCase.state === "string" &&
                         validStates.has(testCase.state);
                     expect(isValid).toBe(testCase.isValid);
-                }).not.toThrow();
+                }).not.toThrowError();
             }
         });
     });
@@ -507,7 +507,7 @@ describe("Service Edge Cases - Missing Branch Coverage", () => {
                             expect(typeof errorMessage).toBe("string");
                         }
                     }
-                }).not.toThrow();
+                }).not.toThrowError();
             }
         });
 
@@ -540,7 +540,7 @@ describe("Service Edge Cases - Missing Branch Coverage", () => {
                         const eventListeners = listeners.get(event);
                         expect(Array.isArray(eventListeners)).toBeTruthy();
                     }
-                }).not.toThrow();
+                }).not.toThrowError();
             }
 
             expect(listeners.size).toBeGreaterThan(0);
@@ -574,7 +574,7 @@ describe("Service Edge Cases - Missing Branch Coverage", () => {
 
                     expect(typeof duration).toBe("number");
                     expect(duration).toBeGreaterThanOrEqual(0);
-                }).not.toThrow();
+                }).not.toThrowError();
             }
         });
 
@@ -608,7 +608,7 @@ describe("Service Edge Cases - Missing Branch Coverage", () => {
                 expect(() => {
                     const result = operation();
                     expect(result).toBeDefined();
-                }).not.toThrow();
+                }).not.toThrowError();
             }
         });
     });

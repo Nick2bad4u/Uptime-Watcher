@@ -3,7 +3,6 @@ import type { SerializedError } from "@shared/utils/logger/common";
 import { ensureError } from "@shared/utils/errorHandling";
 import { serializeError } from "@shared/utils/logger/common";
 
-// eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents -- We intentionally intersect the runtime Error instance with the serialized shape for downstream typing.
 type ExtendedError = Error & SerializedError;
 
 const copyAdditionalProperties = (

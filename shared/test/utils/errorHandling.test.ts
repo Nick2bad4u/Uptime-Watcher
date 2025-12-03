@@ -60,7 +60,7 @@ describe("Error Handling Utils", () => {
 
             await expect(
                 withErrorHandling(operation, mockFrontendStore)
-            ).rejects.toThrow("Test error");
+            ).rejects.toThrowError("Test error");
 
             expect(mockFrontendStore.clearError).toHaveBeenCalledTimes(1);
             expect(mockFrontendStore.setLoading).toHaveBeenCalledWith(true);
@@ -191,7 +191,7 @@ describe("Error Handling Utils", () => {
 
             await expect(
                 withErrorHandling(operation, mockBackendContext)
-            ).rejects.toThrow("Test error");
+            ).rejects.toThrowError("Test error");
 
             expect(mockLogger.error).toHaveBeenCalledWith(
                 "Failed to testOperation",
@@ -215,7 +215,7 @@ describe("Error Handling Utils", () => {
 
             await expect(
                 withErrorHandling(operation, contextWithoutName)
-            ).rejects.toThrow("Test error");
+            ).rejects.toThrowError("Test error");
 
             expect(mockLogger.error).toHaveBeenCalledWith(
                 "Async operation failed",

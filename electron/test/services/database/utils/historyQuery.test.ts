@@ -190,9 +190,9 @@ describe("historyQuery utilities", () => {
                 throw dbError;
             });
 
-            expect(() => findHistoryByMonitorId(mockDb, mockMonitorId)).toThrow(
-                dbError
-            );
+            expect(() =>
+                findHistoryByMonitorId(mockDb, mockMonitorId)
+            ).toThrowError(dbError);
 
             expect(logger.error).toHaveBeenCalledWith(
                 "[HistoryQuery] Failed to fetch history for monitor: monitor-123",
@@ -616,7 +616,7 @@ describe("historyQuery utilities", () => {
                 throw dbError;
             });
 
-            expect(() => getHistoryCount(mockDb, mockMonitorId)).toThrow(
+            expect(() => getHistoryCount(mockDb, mockMonitorId)).toThrowError(
                 dbError
             );
 
@@ -751,9 +751,9 @@ describe("historyQuery utilities", () => {
                     });
 
                     // Act & Assert
-                    expect(() => getHistoryCount(mockDb, monitorId)).toThrow(
-                        errorMessage
-                    );
+                    expect(() =>
+                        getHistoryCount(mockDb, monitorId)
+                    ).toThrowError(errorMessage);
                     expect(logger.error).toHaveBeenCalledWith(
                         `[HistoryQuery] Failed to get history count for monitor: ${monitorId}`,
                         dbError
@@ -963,9 +963,9 @@ describe("historyQuery utilities", () => {
                 throw dbError;
             });
 
-            expect(() => getLatestHistoryEntry(mockDb, mockMonitorId)).toThrow(
-                dbError
-            );
+            expect(() =>
+                getLatestHistoryEntry(mockDb, mockMonitorId)
+            ).toThrowError(dbError);
 
             expect(logger.error).toHaveBeenCalledWith(
                 "[HistoryQuery] Failed to get latest history entry for monitor: monitor-123",
@@ -1015,9 +1015,9 @@ describe("historyQuery utilities", () => {
                 throw mappingError;
             });
 
-            expect(() => getLatestHistoryEntry(mockDb, mockMonitorId)).toThrow(
-                mappingError
-            );
+            expect(() =>
+                getLatestHistoryEntry(mockDb, mockMonitorId)
+            ).toThrowError(mappingError);
             expect(rowToHistoryEntry).toHaveBeenCalledWith(mockRow);
         });
 
@@ -1121,7 +1121,7 @@ describe("historyQuery utilities", () => {
                     // Act & Assert
                     expect(() =>
                         getLatestHistoryEntry(mockDb, monitorId)
-                    ).toThrow(errorMessage);
+                    ).toThrowError(errorMessage);
                     expect(logger.error).toHaveBeenCalledWith(
                         `[HistoryQuery] Failed to get latest history entry for monitor: ${monitorId}`,
                         dbError
@@ -1332,15 +1332,15 @@ describe("historyQuery utilities", () => {
                 throw dbError;
             });
 
-            expect(() => findHistoryByMonitorId(mockDb, mockMonitorId)).toThrow(
+            expect(() =>
+                findHistoryByMonitorId(mockDb, mockMonitorId)
+            ).toThrowError(dbError);
+            expect(() => getHistoryCount(mockDb, mockMonitorId)).toThrowError(
                 dbError
             );
-            expect(() => getHistoryCount(mockDb, mockMonitorId)).toThrow(
-                dbError
-            );
-            expect(() => getLatestHistoryEntry(mockDb, mockMonitorId)).toThrow(
-                dbError
-            );
+            expect(() =>
+                getLatestHistoryEntry(mockDb, mockMonitorId)
+            ).toThrowError(dbError);
 
             // All functions should log errors
             expect(logger.error).toHaveBeenCalledTimes(3);

@@ -213,7 +213,7 @@ describe(SiteManager, () => {
                 new Error("Database transaction failed")
             );
 
-            await expect(manager.addSite(newSite)).rejects.toThrow(
+            await expect(manager.addSite(newSite)).rejects.toThrowError(
                 "Database transaction failed"
             );
         });
@@ -595,7 +595,7 @@ describe(SiteManager, () => {
 
             await expect(
                 manager.removeMonitor(site.identifier, "mon1")
-            ).rejects.toThrow(ERROR_CATALOG.monitors.CANNOT_REMOVE_LAST);
+            ).rejects.toThrowError(ERROR_CATALOG.monitors.CANNOT_REMOVE_LAST);
 
             expect(updateSpy).not.toHaveBeenCalled();
         });
@@ -610,7 +610,7 @@ describe(SiteManager, () => {
 
             await expect(
                 manager.removeMonitor(site.identifier, "missing")
-            ).rejects.toThrow("Monitor missing not found on site site1");
+            ).rejects.toThrowError("Monitor missing not found on site site1");
 
             expect(updateSpy).not.toHaveBeenCalled();
         });
@@ -671,14 +671,14 @@ describe(SiteManager, () => {
     });
     describe("initialize", () => {
         it("should initialize without error", async () => {
-            await expect(manager.initialize()).resolves.not.toThrow();
+            await expect(manager.initialize()).resolves.not.toThrowError();
         });
         it("should handle initialization errors", async () => {
             // Mock an error in the initialization process
             vi.spyOn(manager["sitesCache"], "clear").mockImplementation(() => {
                 throw new Error("Cache initialization failed");
             });
-            await expect(manager.initialize()).rejects.toThrow(
+            await expect(manager.initialize()).rejects.toThrowError(
                 "Cache initialization failed"
             );
         });
@@ -774,7 +774,7 @@ describe(SiteManager, () => {
                 // Use reflection to call private method
                 await expect(
                     manager["validateSite"](validSite)
-                ).resolves.not.toThrow();
+                ).resolves.not.toThrowError();
             });
             it("should throw validation error for invalid site", async () => {
                 const invalidSite = {
@@ -798,7 +798,7 @@ describe(SiteManager, () => {
                 );
                 await expect(
                     manager["validateSite"](invalidSite)
-                ).rejects.toThrow();
+                ).rejects.toThrowError();
             });
         });
         describe("createMonitoringConfig", () => {
@@ -943,7 +943,7 @@ describe(SiteManager, () => {
 
                 await expect(
                     manager["getSiteSnapshotForMutation"]("missing-site")
-                ).rejects.toThrow(
+                ).rejects.toThrowError(
                     "Site with identifier missing-site not found"
                 );
             });
@@ -969,7 +969,7 @@ describe(SiteManager, () => {
 
                 await expect(
                     manager["loadSiteInBackground"]("site1")
-                ).resolves.not.toThrow();
+                ).resolves.not.toThrowError();
 
                 expect(
                     manager["siteRepositoryService"].getSiteFromDatabase
@@ -990,7 +990,7 @@ describe(SiteManager, () => {
 
                 await expect(
                     manager["loadSiteInBackground"]("nonexistent")
-                ).resolves.not.toThrow();
+                ).resolves.not.toThrowError();
 
                 // Should not attempt to set cache when site is not found
                 expect(cacheSpy).not.toHaveBeenCalled();
@@ -1004,7 +1004,7 @@ describe(SiteManager, () => {
                 // Should not throw error but should handle it gracefully
                 await expect(
                     manager["loadSiteInBackground"]("site1")
-                ).resolves.not.toThrow();
+                ).resolves.not.toThrowError();
             });
         });
     });
@@ -1067,7 +1067,7 @@ describe(SiteManager, () => {
 
             await expect(
                 manager.updateSitesCache(largeSiteDataset)
-            ).resolves.not.toThrow();
+            ).resolves.not.toThrowError();
 
             expect(replaceAllSpy).toHaveBeenCalledTimes(1);
             expect(replaceAllSpy.mock.calls[0]?.[0]).toHaveLength(
@@ -1092,7 +1092,7 @@ describe(SiteManager, () => {
             );
             await expect(
                 manager["validateSite"](malformedSite)
-            ).rejects.toThrow();
+            ).rejects.toThrowError();
         });
     });
 

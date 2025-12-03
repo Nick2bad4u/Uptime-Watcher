@@ -5,7 +5,7 @@
 import { describe, expect, it } from "vitest";
 
 import { safeStringify } from "../../shared/utils/stringConversion";
-import { validateMonitorField } from "../../shared/validation/schemas";
+import { validateMonitorField } from "@shared/validation/monitorSchemas";
 
 describe("100% Coverage - Remaining Lines", () => {
     describe("stringConversion.ts - Lines 86-89", () => {
@@ -113,7 +113,7 @@ describe("100% Coverage - Remaining Lines", () => {
                 validateMonitorField("http", "nonExistentField", {
                     nonExistentField: "value",
                 });
-            }).toThrow("Unknown field: nonExistentField");
+            }).toThrowError("Unknown field: nonExistentField");
         });
 
         it("should trigger unknown field error for field not in any schema", async ({
@@ -129,7 +129,7 @@ describe("100% Coverage - Remaining Lines", () => {
                 validateMonitorField("http", "totallyMadeUpField", {
                     totallyMadeUpField: "value",
                 });
-            }).toThrow("Unknown field: totallyMadeUpField");
+            }).toThrowError("Unknown field: totallyMadeUpField");
         });
     });
 
@@ -189,7 +189,7 @@ describe("100% Coverage - Remaining Lines", () => {
                 validateMonitorField("http", "unknownField", {
                     unknownField: "test",
                 });
-            }).toThrow("Unknown field: unknownField");
+            }).toThrowError("Unknown field: unknownField");
 
             // These tests ensure we hit all the previously uncovered lines
         });

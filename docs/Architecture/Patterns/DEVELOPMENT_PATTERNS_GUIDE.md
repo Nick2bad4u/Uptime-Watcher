@@ -757,7 +757,7 @@ declare global {
 
 - `remove-monitor` **must** resolve to the persisted `Site` snapshot provided by the orchestrator. Treat the payload as authoritative and feed it directly into `SiteService.removeMonitor` ➔ `applySavedSiteToStore`.
 - Cross-check the canonical implementation in [`SiteService.removeMonitor`](../../../src/services/SiteService.ts), which demonstrates validating the persisted snapshot with `validateSiteSnapshot` before mutating store state.
-- Avoid reconstructing monitor arrays in the renderer. Any transformation risks diverging from the validated schema maintained in [`@shared/validation/schemas`](../../../shared/validation/schemas.ts).
+- Avoid reconstructing monitor arrays in the renderer. Any transformation risks diverging from the validated schema maintained in [`@shared/validation/siteSchemas`](../../../shared/validation/siteSchemas.ts) and [`@shared/validation/monitorSchemas`](../../../shared/validation/monitorSchemas.ts).
 - Reference `docs/TSDoc/stores/sites.md` for the end-to-end mutation flow and optimistic update guidance.
 
 ### IPC Communication Usage Guidelines

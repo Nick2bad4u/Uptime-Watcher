@@ -69,7 +69,7 @@ describe("ServiceContainer - Feature Services", () => {
 
             expect(() => {
                 container.getNotificationService();
-            }).not.toThrow();
+            }).not.toThrowError();
         });
 
         it("should create NotificationService with default settings", async ({
@@ -86,7 +86,7 @@ describe("ServiceContainer - Feature Services", () => {
 
             expect(() => {
                 container.getNotificationService();
-            }).not.toThrow();
+            }).not.toThrowError();
         });
 
         it("should maintain NotificationService singleton pattern", async ({
@@ -122,7 +122,7 @@ describe("ServiceContainer - Feature Services", () => {
 
             expect(() => {
                 container.getAutoUpdaterService();
-            }).not.toThrow();
+            }).not.toThrowError();
         });
 
         it("should handle AutoUpdaterService initialization", async ({
@@ -157,7 +157,7 @@ describe("ServiceContainer - Feature Services", () => {
 
             expect(() => {
                 container.getWindowService();
-            }).not.toThrow();
+            }).not.toThrowError();
         });
 
         it("should maintain WindowService singleton pattern", async ({
@@ -195,7 +195,7 @@ describe("ServiceContainer - Feature Services", () => {
                 container.getNotificationService();
                 container.getAutoUpdaterService();
                 container.getWindowService();
-            }).not.toThrow();
+            }).not.toThrowError();
         });
 
         it("should handle service creation without configuration", async ({
@@ -214,7 +214,7 @@ describe("ServiceContainer - Feature Services", () => {
                 container.getNotificationService();
                 container.getAutoUpdaterService();
                 container.getWindowService();
-            }).not.toThrow();
+            }).not.toThrowError();
         });
 
         it("should maintain service independence", async ({
@@ -258,7 +258,7 @@ describe("ServiceContainer - Feature Services", () => {
                     container.getAutoUpdaterService();
                     container.getWindowService();
                 }
-            }).not.toThrow();
+            }).not.toThrowError();
         });
 
         it("should maintain service references across multiple calls", async ({

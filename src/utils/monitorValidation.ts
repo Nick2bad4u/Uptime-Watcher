@@ -18,7 +18,7 @@ import { withUtilityErrorHandling } from "@shared/utils/errorHandling";
 import {
     validateMonitorData as sharedValidateMonitorData,
     validateMonitorField as sharedValidateMonitorField,
-} from "@shared/validation/schemas";
+} from "@shared/validation/monitorSchemas";
 
 import type {
     CdnEdgeConsistencyFormData,

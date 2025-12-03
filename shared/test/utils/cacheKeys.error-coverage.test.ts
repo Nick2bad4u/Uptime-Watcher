@@ -17,7 +17,7 @@ describe("Cache Keys - Error Coverage", () => {
 
         expect(() => {
             parseCacheKey(":identifier" as any);
-        }).toThrow("Invalid cache key format: :identifier");
+        }).toThrowError("Invalid cache key format: :identifier");
     });
 
     it("should throw error for 2-part key with empty identifier", async ({
@@ -29,7 +29,7 @@ describe("Cache Keys - Error Coverage", () => {
         await annotate("Category: Utility", "category");
         await annotate("Type: Business Logic", "type");
 
-        expect(() => parseCacheKey("prefix:" as any)).toThrow(
+        expect(() => parseCacheKey("prefix:" as any)).toThrowError(
             "Invalid cache key format: prefix:"
         );
     });
@@ -45,7 +45,7 @@ describe("Cache Keys - Error Coverage", () => {
 
         expect(() => {
             parseCacheKey(":operation:identifier" as any);
-        }).toThrow("Invalid cache key format: :operation:identifier");
+        }).toThrowError("Invalid cache key format: :operation:identifier");
     });
 
     it("should throw error for 3-part key with empty operation (line 375)", async ({
@@ -59,7 +59,7 @@ describe("Cache Keys - Error Coverage", () => {
 
         expect(() => {
             parseCacheKey("prefix::identifier" as any);
-        }).toThrow("Invalid cache key format: prefix::identifier");
+        }).toThrowError("Invalid cache key format: prefix::identifier");
     });
 
     it("should throw error for 3-part key with empty identifier (line 375)", async ({
@@ -73,7 +73,7 @@ describe("Cache Keys - Error Coverage", () => {
 
         expect(() => {
             parseCacheKey("prefix:operation:" as any);
-        }).toThrow("Invalid cache key format: prefix:operation:");
+        }).toThrowError("Invalid cache key format: prefix:operation:");
     });
 
     it("should throw error for all empty parts in 2-part key", async ({
@@ -87,7 +87,7 @@ describe("Cache Keys - Error Coverage", () => {
 
         expect(() => {
             parseCacheKey(":" as any);
-        }).toThrow("Invalid cache key format: :");
+        }).toThrowError("Invalid cache key format: :");
     });
 
     it("should throw error for all empty parts in 3-part key", async ({
@@ -101,6 +101,6 @@ describe("Cache Keys - Error Coverage", () => {
 
         expect(() => {
             parseCacheKey("::" as any);
-        }).toThrow("Invalid cache key format: ::");
+        }).toThrowError("Invalid cache key format: ::");
     });
 });

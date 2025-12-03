@@ -253,10 +253,10 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             const exportError = new Error("Database export failed");
             mockRepositories.site.exportAll.mockRejectedValue(exportError);
 
-            await expect(service.exportAllData()).rejects.toThrow(
+            await expect(service.exportAllData()).rejects.toThrowError(
                 SiteLoadingError
             );
-            await expect(service.exportAllData()).rejects.toThrow(
+            await expect(service.exportAllData()).rejects.toThrowError(
                 "Failed to export data: Database export failed"
             );
 
@@ -290,7 +290,7 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             const nonErrorObject = "String error message";
             mockRepositories.site.exportAll.mockRejectedValue(nonErrorObject);
 
-            await expect(service.exportAllData()).rejects.toThrow(
+            await expect(service.exportAllData()).rejects.toThrowError(
                 SiteLoadingError
             );
 
@@ -324,7 +324,7 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             mockRepositories.site.exportAll.mockResolvedValue([]);
             mockRepositories.settings.getAll.mockRejectedValue(settingsError);
 
-            await expect(service.exportAllData()).rejects.toThrow(
+            await expect(service.exportAllData()).rejects.toThrowError(
                 SiteLoadingError
             );
 
@@ -394,10 +394,10 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
 
             await expect(
                 service.importDataFromJson(invalidJsonData)
-            ).rejects.toThrow(SiteLoadingError);
+            ).rejects.toThrowError(SiteLoadingError);
             await expect(
                 service.importDataFromJson(invalidJsonData)
-            ).rejects.toThrow("Failed to parse import data");
+            ).rejects.toThrowError("Failed to parse import data");
 
             expect(mockLogger.error).toHaveBeenCalledWith(
                 expect.stringContaining("Failed to parse import data"),
@@ -433,7 +433,7 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
                 error: null,
             });
 
-            await expect(service.importDataFromJson("{}")).rejects.toThrow(
+            await expect(service.importDataFromJson("{}")).rejects.toThrowError(
                 SiteLoadingError
             );
 
@@ -496,9 +496,9 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
                 throw "String error";
             });
 
-            await expect(service.importDataFromJson("invalid")).rejects.toThrow(
-                SiteLoadingError
-            );
+            await expect(
+                service.importDataFromJson("invalid")
+            ).rejects.toThrowError(SiteLoadingError);
 
             expect(mockLogger.error).toHaveBeenCalledWith(
                 "Failed to parse import data: String error",
@@ -1145,9 +1145,9 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
                 operationError
             );
 
-            await expect(service.persistImportedData([], {})).rejects.toThrow(
-                operationError
-            );
+            await expect(
+                service.persistImportedData([], {})
+            ).rejects.toThrowError(operationError);
         });
 
         it("should handle transaction callback errors", async ({
@@ -1171,9 +1171,9 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
                 async (operation: any) => await operation()
             );
 
-            await expect(service.persistImportedData([], {})).rejects.toThrow(
-                transactionError
-            );
+            await expect(
+                service.persistImportedData([], {})
+            ).rejects.toThrowError(transactionError);
         });
 
         it("should handle repository method failures during transaction", async ({
@@ -1197,9 +1197,9 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
                 async (operation: any) => await operation()
             );
 
-            await expect(service.persistImportedData([], {})).rejects.toThrow(
-                deleteError
-            );
+            await expect(
+                service.persistImportedData([], {})
+            ).rejects.toThrowError(deleteError);
         });
     });
 

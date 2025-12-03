@@ -111,7 +111,7 @@ describe(SettingsRepository, () => {
             (mockDatabase.get as any).mockImplementation(() => {
                 throw error;
             });
-            await expect(repository.get("test-key")).rejects.toThrow(
+            await expect(repository.get("test-key")).rejects.toThrowError(
                 "Database error"
             );
         });
@@ -168,7 +168,9 @@ describe(SettingsRepository, () => {
             (mockDatabase.all as any).mockImplementation(() => {
                 throw error;
             });
-            await expect(repository.getAll()).rejects.toThrow("Database error");
+            await expect(repository.getAll()).rejects.toThrowError(
+                "Database error"
+            );
         });
         it("should handle null value gracefully", async ({
             task,
@@ -222,7 +224,7 @@ describe(SettingsRepository, () => {
 
             await expect(
                 repository.set("test-key", "test-value")
-            ).rejects.toThrow("Database error");
+            ).rejects.toThrowError("Database error");
         });
         it("should handle empty string value", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
@@ -391,7 +393,7 @@ describe(SettingsRepository, () => {
 
                 expect(() =>
                     repository.bulkInsertInternal(mockDatabase, settings)
-                ).toThrow("Statement error");
+                ).toThrowError("Statement error");
                 expect(mockStatement.finalize).toHaveBeenCalled();
             });
         });

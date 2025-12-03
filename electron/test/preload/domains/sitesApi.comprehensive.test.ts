@@ -122,7 +122,7 @@ describe("sitesApi", () => {
     it("throws when an IPC call fails", async () => {
         vi.mocked(ipcRenderer.invoke).mockResolvedValueOnce({ success: false });
 
-        await expect(sitesApi.getSites()).rejects.toThrow(
+        await expect(sitesApi.getSites()).rejects.toThrowError(
             /ipc operation failed/i
         );
     });

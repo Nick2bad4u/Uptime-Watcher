@@ -55,18 +55,15 @@ import type {
     StatusUpdateMonitorCheckResult,
 } from "./MonitorStatusUpdateService";
 import type { OperationTimeoutManager } from "./OperationTimeoutManager";
-import type {
-    IMonitorService,
-    MonitorCheckResult as ServiceMonitorCheckResult,
-} from "./types";
+import type { IMonitorService } from "./types";
 
 import { monitorLogger as logger } from "../../utils/logger";
 import { CdnEdgeConsistencyMonitor } from "./CdnEdgeConsistencyMonitor";
 import {
-    DEFAULT_MONITOR_TIMEOUT_SECONDS,
-    MONITOR_TIMEOUT_BUFFER_MS,
-    SECONDS_TO_MS_MULTIPLIER,
-} from "./constants";
+    createMonitorCheckContext,
+    type MonitorCheckContext,
+} from "./checkContext";
+import { MonitorOperationCoordinator } from "./coordinators/MonitorOperationCoordinator";
 import { DnsMonitor } from "./DnsMonitor";
 import { HttpHeaderMonitor } from "./HttpHeaderMonitor";
 import { HttpJsonMonitor } from "./HttpJsonMonitor";
@@ -79,6 +76,11 @@ import { PortMonitor } from "./PortMonitor";
 import { ReplicationMonitor } from "./ReplicationMonitor";
 import { ServerHeartbeatMonitor } from "./ServerHeartbeatMonitor";
 import { SslMonitor } from "./SslMonitor";
+import {
+    createMonitorStrategyRegistry,
+    type MonitorStrategyRegistry,
+    type StrategyExecutionContext,
+} from "./strategies/MonitorStrategyRegistry";
 import { WebsocketKeepaliveMonitor } from "./WebsocketKeepaliveMonitor";
 
 /**
@@ -272,6 +274,10 @@ export interface EnhancedMonitorCheckConfig {
  */
 export class EnhancedMonitorChecker {
     private readonly config: EnhancedMonitorCheckConfig;
+
+    private readonly operationCoordinator: MonitorOperationCoordinator;
+
+    private readonly strategyRegistry: MonitorStrategyRegistry;
 
     private readonly dnsMonitor: DnsMonitor;
 
@@ -568,15 +574,14 @@ export class EnhancedMonitorChecker {
      * @returns Monitor check result with correlation
      */
     private async executeMonitorCheck(
-        monitor: Monitor,
-        operationId: string,
-        signal?: AbortSignal
+        context: MonitorCheckContext & { operationId: string }
     ): Promise<StatusUpdateMonitorCheckResult> {
         try {
-            // Perform the check based on monitor type with abort signal - now returns full result
-            const serviceResult = await this.performTypeSpecificCheck(
-                monitor,
-                signal
+            const strategyContext: StrategyExecutionContext = context;
+
+            const serviceResult = await this.strategyRegistry.execute(
+                context.monitor,
+                strategyContext
             );
 
             return {
@@ -585,22 +590,25 @@ export class EnhancedMonitorChecker {
                     (serviceResult.status === "up"
                         ? "Check successful"
                         : "Check failed"),
-                monitorId: monitor.id,
-                operationId,
+                monitorId: context.monitor.id,
+                operationId: context.operationId,
                 responseTime: serviceResult.responseTime,
                 status: serviceResult.status,
                 timestamp: new Date(),
             };
         } catch (error) {
-            logger.error(`Monitor check failed for ${monitor.id}`, error);
+            logger.error(
+                `Monitor check failed for ${context.monitor.id}`,
+                error
+            );
 
             return {
                 details:
                     error instanceof Error
                         ? error.message
                         : "Monitor check failed",
-                monitorId: monitor.id,
-                operationId,
+                monitorId: context.monitor.id,
+                operationId: context.operationId,
                 responseTime: 0,
                 status: "down",
                 timestamp: new Date(),
@@ -701,15 +709,22 @@ export class EnhancedMonitorChecker {
         monitor: Site["monitors"][0],
         monitorId: string
     ): Promise<StatusUpdate | undefined> {
-        const operationResult = await this.setupOperationCorrelation(
-            monitor,
-            monitorId
-        );
+        const operationResult = await this.setupOperationCorrelation(monitor);
         if (!operationResult) {
             return undefined;
         }
 
         const { operationId, signal } = operationResult;
+
+        const context: MonitorCheckContext & { operationId: string } = {
+            ...createMonitorCheckContext({
+                monitor,
+                operationId,
+                signal,
+                site,
+            }),
+            operationId,
+        };
 
         logger.info(
             interpolateLogTemplate(LOG_TEMPLATES.debug.MONITOR_CHECK_START, {
@@ -721,11 +736,7 @@ export class EnhancedMonitorChecker {
 
         try {
             // Perform the actual check with abort signal
-            const checkResult = await this.executeMonitorCheck(
-                monitor,
-                operationId,
-                signal
-            );
+            const checkResult = await this.executeMonitorCheck(context);
 
             // Save history entry before updating status
             await this.saveHistoryEntry(monitor, checkResult);
@@ -745,8 +756,7 @@ export class EnhancedMonitorChecker {
             }
         } catch (error) {
             logger.error(`Monitor check failed for ${monitorId}`, error);
-            this.config.operationRegistry.completeOperation(operationId);
-            this.config.timeoutManager.clearTimeout(operationId);
+            this.operationCoordinator.cleanupOperation(operationId);
         }
 
         return undefined;
@@ -766,7 +776,17 @@ export class EnhancedMonitorChecker {
         isManualCheck = false
     ): Promise<StatusUpdate | undefined> {
         try {
-            const serviceResult = await this.performTypeSpecificCheck(monitor);
+            const strategyContext: StrategyExecutionContext =
+                createMonitorCheckContext({
+                    isManualCheck,
+                    monitor,
+                    site,
+                });
+
+            const serviceResult = await this.strategyRegistry.execute(
+                monitor,
+                strategyContext
+            );
 
             // For manual checks on paused monitors, preserve the paused status
             const finalStatus =
@@ -905,157 +925,6 @@ export class EnhancedMonitorChecker {
     }
 
     /**
-     * Performs monitor checks with proper error handling.
-     */
-    private async performMonitorCheck(
-        monitorService: IMonitorService,
-        monitor: Monitor,
-        signal?: AbortSignal
-    ): Promise<ServiceMonitorCheckResult> {
-        try {
-            return await monitorService.check(monitor, signal);
-        } catch (error) {
-            logger.error(`Monitor check failed for ${monitor.id}`, error);
-            return {
-                details:
-                    error instanceof Error
-                        ? error.message
-                        : "Unknown error occurred",
-                responseTime: 0,
-                status: "down",
-            };
-        }
-    }
-
-    /**
-     * Perform type-specific check based on monitor configuration.
-     *
-     * @param monitor - Monitor to check
-     *
-     * @returns Promise resolving to monitor check result with details
-     */
-    private async performTypeSpecificCheck(
-        monitor: Monitor,
-        signal?: AbortSignal
-    ): Promise<ServiceMonitorCheckResult> {
-        switch (monitor.type) {
-            case "cdn-edge-consistency": {
-                return this.performMonitorCheck(
-                    this.cdnEdgeConsistencyMonitor,
-                    monitor,
-                    signal
-                );
-            }
-            case "dns": {
-                return this.performMonitorCheck(
-                    this.dnsMonitor,
-                    monitor,
-                    signal
-                );
-            }
-            case "http": {
-                return this.performMonitorCheck(
-                    this.httpMonitor,
-                    monitor,
-                    signal
-                );
-            }
-            case "http-header": {
-                return this.performMonitorCheck(
-                    this.httpHeaderMonitor,
-                    monitor,
-                    signal
-                );
-            }
-            case "http-json": {
-                return this.performMonitorCheck(
-                    this.httpJsonMonitor,
-                    monitor,
-                    signal
-                );
-            }
-            case "http-keyword": {
-                return this.performMonitorCheck(
-                    this.httpKeywordMonitor,
-                    monitor,
-                    signal
-                );
-            }
-            case "http-latency": {
-                return this.performMonitorCheck(
-                    this.httpLatencyMonitor,
-                    monitor,
-                    signal
-                );
-            }
-            case "http-status": {
-                return this.performMonitorCheck(
-                    this.httpStatusMonitor,
-                    monitor,
-                    signal
-                );
-            }
-            case "ping": {
-                return this.performMonitorCheck(
-                    this.pingMonitor,
-                    monitor,
-                    signal
-                );
-            }
-            case "port": {
-                return this.performMonitorCheck(
-                    this.portMonitor,
-                    monitor,
-                    signal
-                );
-            }
-            case "replication": {
-                return this.performMonitorCheck(
-                    this.replicationMonitor,
-                    monitor,
-                    signal
-                );
-            }
-            case "server-heartbeat": {
-                return this.performMonitorCheck(
-                    this.serverHeartbeatMonitor,
-                    monitor,
-                    signal
-                );
-            }
-            case "ssl": {
-                return this.performMonitorCheck(
-                    this.sslMonitor,
-                    monitor,
-                    signal
-                );
-            }
-            case "websocket-keepalive": {
-                return this.performMonitorCheck(
-                    this.websocketKeepaliveMonitor,
-                    monitor,
-                    signal
-                );
-            }
-            default: {
-                logger.warn(
-                    interpolateLogTemplate(
-                        LOG_TEMPLATES.warnings.MONITOR_TYPE_UNKNOWN_CHECK,
-                        {
-                            monitorType: monitor.type,
-                        }
-                    )
-                );
-                return {
-                    details: `Unknown monitor type: ${monitor.type as string}`,
-                    responseTime: 0,
-                    status: "down",
-                };
-            }
-        }
-    }
-
-    /**
      * Saves a history entry for a monitor check result.
      *
      * @param monitor - Monitor that was checked
@@ -1126,65 +995,33 @@ export class EnhancedMonitorChecker {
      * Sets up operation correlation for a monitor check.
      *
      * @param monitor - Monitor being checked
-     * @param monitorId - Monitor ID
      *
      * @returns Operation result with ID and signal if successful, undefined if
      *   failed
      */
     private async setupOperationCorrelation(
-        monitor: Monitor,
-        monitorId: string
+        monitor: Monitor
     ): Promise<undefined | { operationId: string; signal: AbortSignal }> {
-        // Calculate operation timeout
-        const monitorTimeoutMs =
-            monitor.timeout ||
-            DEFAULT_MONITOR_TIMEOUT_SECONDS * SECONDS_TO_MS_MULTIPLIER;
-        const timeoutMs = monitorTimeoutMs + MONITOR_TIMEOUT_BUFFER_MS;
+        const handle =
+            await this.operationCoordinator.initiateOperation(monitor);
 
-        // Create operation correlation with timeout
-        const operationResult = this.config.operationRegistry.initiateCheck(
-            monitorId,
-            {
-                timeoutMs,
-            }
-        );
-
-        // Schedule additional timeout for cleanup (the AbortSignal.timeout handles the primary timeout)
-        this.config.timeoutManager.scheduleTimeout(
-            operationResult.operationId,
-            timeoutMs
-        );
-
-        // Add operation to monitor's active operations
-        try {
-            const updatedActiveOperations = [
-                ...(monitor.activeOperations ?? []),
-                operationResult.operationId,
-            ];
-            await this.config.monitorRepository.update(monitorId, {
-                activeOperations: updatedActiveOperations,
-            });
-            return {
-                operationId: operationResult.operationId,
-                signal: operationResult.signal,
-            };
-        } catch (error) {
-            logger.error(
-                `Failed to add operation ${operationResult.operationId} to monitor ${monitorId}`,
-                error
-            );
-            this.config.operationRegistry.completeOperation(
-                operationResult.operationId
-            );
-            this.config.timeoutManager.clearTimeout(
-                operationResult.operationId
-            );
+        if (!handle) {
             return undefined;
         }
+
+        return {
+            operationId: handle.operationId,
+            signal: handle.signal,
+        };
     }
 
     public constructor(config: EnhancedMonitorCheckConfig) {
         this.config = config;
+        this.operationCoordinator = new MonitorOperationCoordinator({
+            monitorRepository: config.monitorRepository,
+            operationRegistry: config.operationRegistry,
+            timeoutManager: config.timeoutManager,
+        });
         // Initialize monitor services
         this.cdnEdgeConsistencyMonitor = new CdnEdgeConsistencyMonitor({});
         this.dnsMonitor = new DnsMonitor({});
@@ -1200,6 +1037,67 @@ export class EnhancedMonitorChecker {
         this.replicationMonitor = new ReplicationMonitor({});
         this.serverHeartbeatMonitor = new ServerHeartbeatMonitor({});
         this.websocketKeepaliveMonitor = new WebsocketKeepaliveMonitor({});
+
+        this.strategyRegistry = createMonitorStrategyRegistry([
+            {
+                getService: (): IMonitorService =>
+                    this.cdnEdgeConsistencyMonitor,
+                type: this.cdnEdgeConsistencyMonitor.getType(),
+            },
+            {
+                getService: (): IMonitorService => this.dnsMonitor,
+                type: this.dnsMonitor.getType(),
+            },
+            {
+                getService: (): IMonitorService => this.httpHeaderMonitor,
+                type: this.httpHeaderMonitor.getType(),
+            },
+            {
+                getService: (): IMonitorService => this.httpJsonMonitor,
+                type: this.httpJsonMonitor.getType(),
+            },
+            {
+                getService: (): IMonitorService => this.httpKeywordMonitor,
+                type: this.httpKeywordMonitor.getType(),
+            },
+            {
+                getService: (): IMonitorService => this.httpLatencyMonitor,
+                type: this.httpLatencyMonitor.getType(),
+            },
+            {
+                getService: (): IMonitorService => this.httpMonitor,
+                type: this.httpMonitor.getType(),
+            },
+            {
+                getService: (): IMonitorService => this.httpStatusMonitor,
+                type: this.httpStatusMonitor.getType(),
+            },
+            {
+                getService: (): IMonitorService => this.pingMonitor,
+                type: this.pingMonitor.getType(),
+            },
+            {
+                getService: (): IMonitorService => this.portMonitor,
+                type: this.portMonitor.getType(),
+            },
+            {
+                getService: (): IMonitorService => this.replicationMonitor,
+                type: this.replicationMonitor.getType(),
+            },
+            {
+                getService: (): IMonitorService => this.serverHeartbeatMonitor,
+                type: this.serverHeartbeatMonitor.getType(),
+            },
+            {
+                getService: (): IMonitorService => this.sslMonitor,
+                type: this.sslMonitor.getType(),
+            },
+            {
+                getService: (): IMonitorService =>
+                    this.websocketKeepaliveMonitor,
+                type: this.websocketKeepaliveMonitor.getType(),
+            },
+        ]);
     }
 
     /**

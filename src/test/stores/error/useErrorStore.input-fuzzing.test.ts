@@ -565,7 +565,7 @@ describe("Error Store - Property-Based Fuzzing Tests", () => {
                 store.clearAllErrors();
 
                 // Act - clear again should not crash
-                expect(() => store.clearAllErrors()).not.toThrow();
+                expect(() => store.clearAllErrors()).not.toThrowError();
 
                 // Assert - state should remain clean
                 expect(useErrorStore.getState().lastError).toBeUndefined();

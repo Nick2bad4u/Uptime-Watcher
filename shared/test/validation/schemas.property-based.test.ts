@@ -4,7 +4,7 @@ import { test } from "@fast-check/vitest";
 import {
     baseMonitorSchema,
     httpMonitorSchema,
-} from "../../validation/schemas.js";
+} from "../../validation/monitorSchemas";
 
 /**
  * Custom fast-check arbitraries for Zod schemas Replacing zod-fast-check due to

@@ -223,7 +223,7 @@ describe(StandardizedCache, () => {
 
             expect(() => {
                 new StandardizedCache<string>({ name: "test", maxSize: -1 });
-            }).not.toThrow();
+            }).not.toThrowError();
         });
 
         it("should handle null/undefined values", async ({

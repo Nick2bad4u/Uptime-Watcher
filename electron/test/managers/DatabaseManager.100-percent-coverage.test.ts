@@ -491,7 +491,7 @@ describe("DatabaseManager - 100% Coverage", () => {
             mockCommandExecutor.execute.mockRejectedValue(backupError);
 
             // Act & Assert
-            await expect(databaseManager.downloadBackup()).rejects.toThrow(
+            await expect(databaseManager.downloadBackup()).rejects.toThrowError(
                 "Backup failed"
             );
         });
@@ -539,7 +539,7 @@ describe("DatabaseManager - 100% Coverage", () => {
             mockCommandExecutor.execute.mockRejectedValue(exportError);
 
             // Act & Assert
-            await expect(databaseManager.exportData()).rejects.toThrow(
+            await expect(databaseManager.exportData()).rejects.toThrowError(
                 "Export failed"
             );
         });
@@ -780,16 +780,16 @@ describe("DatabaseManager - 100% Coverage", () => {
             // Act & Assert
             await expect(
                 databaseManager.setHistoryLimit("invalid" as any)
-            ).rejects.toThrow(TypeError);
+            ).rejects.toThrowError(TypeError);
             await expect(
                 databaseManager.setHistoryLimit(null as any)
-            ).rejects.toThrow(TypeError);
+            ).rejects.toThrowError(TypeError);
             await expect(
                 databaseManager.setHistoryLimit(undefined as any)
-            ).rejects.toThrow(TypeError);
+            ).rejects.toThrowError(TypeError);
             await expect(
                 databaseManager.setHistoryLimit(Number.NaN)
-            ).rejects.toThrow(TypeError);
+            ).rejects.toThrowError(TypeError);
         });
 
         it("should normalize non-integer values", async ({
@@ -844,10 +844,10 @@ describe("DatabaseManager - 100% Coverage", () => {
             // Act & Assert - Normalization rejects non-finite values with RangeError
             await expect(
                 databaseManager.setHistoryLimit(Infinity)
-            ).rejects.toThrow(RangeError);
+            ).rejects.toThrowError(RangeError);
             await expect(
                 databaseManager.setHistoryLimit(-Infinity)
-            ).rejects.toThrow(RangeError);
+            ).rejects.toThrowError(RangeError);
         });
 
         it("should reject values exceeding maximum limit", async ({
@@ -875,7 +875,7 @@ describe("DatabaseManager - 100% Coverage", () => {
             // Act & Assert
             await expect(
                 databaseManager.setHistoryLimit(maxLimit + 1)
-            ).rejects.toThrow(RangeError);
+            ).rejects.toThrowError(RangeError);
         });
     });
 
@@ -1108,7 +1108,7 @@ describe("DatabaseManager - 100% Coverage", () => {
                 // Act & Assert
                 await expect(
                     (databaseManager as any).loadSites()
-                ).rejects.toThrow("Loading error");
+                ).rejects.toThrowError("Loading error");
             });
         });
     });
@@ -1187,7 +1187,7 @@ describe("DatabaseManager - 100% Coverage", () => {
             };
 
             // Act & Assert - should not throw
-            expect(() => new DatabaseManager(minimalDeps)).not.toThrow();
+            expect(() => new DatabaseManager(minimalDeps)).not.toThrowError();
         });
     });
 
@@ -1234,10 +1234,10 @@ describe("DatabaseManager - 100% Coverage", () => {
             mockCommandExecutor.execute.mockRejectedValue(complexError);
 
             // Act & Assert
-            await expect(databaseManager.downloadBackup()).rejects.toThrow(
+            await expect(databaseManager.downloadBackup()).rejects.toThrowError(
                 "Complex error"
             );
-            await expect(databaseManager.exportData()).rejects.toThrow(
+            await expect(databaseManager.exportData()).rejects.toThrowError(
                 "Complex error"
             );
 

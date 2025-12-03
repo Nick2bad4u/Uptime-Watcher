@@ -324,7 +324,7 @@ describe("pingErrorHandling", () => {
 
             expect(() => {
                 handlePingCheckError(error, completeContext);
-            }).not.toThrow();
+            }).not.toThrowError();
         });
         it("should work with minimal context", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
@@ -362,7 +362,7 @@ describe("pingErrorHandling", () => {
 
             expect(() => {
                 handlePingCheckError(error, edgeCaseContext);
-            }).not.toThrow();
+            }).not.toThrowError();
 
             expect(mockLogger.error).toHaveBeenCalledWith(
                 "Ping check failed",

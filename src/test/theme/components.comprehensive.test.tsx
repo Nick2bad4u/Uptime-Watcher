@@ -842,7 +842,7 @@ describe("Theme Components - Comprehensive Coverage", () => {
 
             expect(() => {
                 render(<ThemedBox children={undefined as any} />);
-            }).not.toThrow();
+            }).not.toThrowError();
         });
 
         it("should handle invalid enum values gracefully", ({
@@ -864,7 +864,7 @@ describe("Theme Components - Comprehensive Coverage", () => {
                 render(
                     <ThemedButton size={"invalid" as any}>Button</ThemedButton>
                 );
-            }).not.toThrow();
+            }).not.toThrowError();
         });
     });
 

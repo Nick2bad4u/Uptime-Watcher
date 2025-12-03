@@ -168,7 +168,7 @@ describe("DatabaseService Coverage Tests", () => {
         const instance = DatabaseService.getInstance();
         instance.close();
 
-        expect(() => instance.initialize()).not.toThrow();
+        expect(() => instance.initialize()).not.toThrowError();
         expect(createDatabaseSchemaSpy).toHaveBeenCalledTimes(2);
         expect(cleanupLockArtifactsSpy).toHaveBeenCalledTimes(1);
         instance.close();
@@ -323,7 +323,7 @@ describe("DatabaseService Coverage Tests", () => {
                             if (hasFailures) {
                                 await expect(
                                     instance.executeTransaction(mockCallback)
-                                ).rejects.toThrow();
+                                ).rejects.toThrowError();
                             } else {
                                 // All operations should succeed
                                 const result =
@@ -366,10 +366,14 @@ describe("DatabaseService Coverage Tests", () => {
                                 expect(db).toBeDefined();
                             } else if (errorOnConnect) {
                                 // Error scenarios
-                                expect(() => instance.getDatabase()).toThrow();
+                                expect(() =>
+                                    instance.getDatabase()
+                                ).toThrowError();
                             } else if (!initialized) {
                                 // Uninitialized state
-                                expect(() => instance.getDatabase()).toThrow();
+                                expect(() =>
+                                    instance.getDatabase()
+                                ).toThrowError();
                             }
                         } catch (error) {
                             expect(error).toBeInstanceOf(Error);
@@ -417,7 +421,9 @@ describe("DatabaseService Coverage Tests", () => {
                             if (shouldThrow) {
                                 await expect(
                                     instance.executeTransaction(mockCallback)
-                                ).rejects.toThrow("Mock transaction error");
+                                ).rejects.toThrowError(
+                                    "Mock transaction error"
+                                );
                             } else {
                                 const result =
                                     await instance.executeTransaction(
@@ -474,7 +480,7 @@ describe("DatabaseService Coverage Tests", () => {
 
                             await expect(
                                 instance.executeTransaction(mockCallback)
-                            ).rejects.toThrow();
+                            ).rejects.toThrowError();
                         } catch (error) {
                             expect(error).toBeInstanceOf(Error);
                         }

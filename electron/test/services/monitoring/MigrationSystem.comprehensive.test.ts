@@ -95,7 +95,7 @@ describe("MigrationSystem - Comprehensive Coverage", () => {
 
                 expect(() => {
                     migrationRegistry.registerMigration("http", rule);
-                }).not.toThrow();
+                }).not.toThrowError();
             });
 
             it("should register multiple rules and sort them by version", async ({
@@ -139,7 +139,7 @@ describe("MigrationSystem - Comprehensive Coverage", () => {
 
                 expect(() => {
                     migrationRegistry.registerMigration("new-type", rule);
-                }).not.toThrow();
+                }).not.toThrowError();
             });
         });
 
@@ -201,7 +201,7 @@ describe("MigrationSystem - Comprehensive Coverage", () => {
                         "invalid",
                         "1.1.0"
                     );
-                }).toThrow(
+                }).toThrowError(
                     'fromVersion "invalid" is not a valid semantic version'
                 );
 
@@ -211,7 +211,7 @@ describe("MigrationSystem - Comprehensive Coverage", () => {
                         "1.0.0",
                         "invalid"
                     );
-                }).toThrow(
+                }).toThrowError(
                     'toVersion "invalid" is not a valid semantic version'
                 );
             });
@@ -227,11 +227,11 @@ describe("MigrationSystem - Comprehensive Coverage", () => {
 
                 expect(() => {
                     migrationRegistry.getMigrationPath("http", "", "1.1.0");
-                }).toThrow("fromVersion must be a non-empty string");
+                }).toThrowError("fromVersion must be a non-empty string");
 
                 expect(() => {
                     migrationRegistry.getMigrationPath("http", "1.0.0", "");
-                }).toThrow("toVersion must be a non-empty string");
+                }).toThrowError("toVersion must be a non-empty string");
             });
 
             it("should throw error for non-string version parameters", async ({
@@ -249,7 +249,7 @@ describe("MigrationSystem - Comprehensive Coverage", () => {
                         null as any,
                         "1.1.0"
                     );
-                }).toThrow("fromVersion must be a non-empty string");
+                }).toThrowError("fromVersion must be a non-empty string");
 
                 expect(() => {
                     migrationRegistry.getMigrationPath(
@@ -257,7 +257,7 @@ describe("MigrationSystem - Comprehensive Coverage", () => {
                         "1.0.0",
                         undefined as any
                     );
-                }).toThrow("toVersion must be a non-empty string");
+                }).toThrowError("toVersion must be a non-empty string");
             });
 
             it("should throw error when no migration path exists", async ({
@@ -275,7 +275,7 @@ describe("MigrationSystem - Comprehensive Coverage", () => {
                         "1.0.0",
                         "2.0.0"
                     );
-                }).toThrow(
+                }).toThrowError(
                     /No migration path from 1\.0\.0 to 2\.0\.0 for http/
                 );
             });
@@ -301,7 +301,7 @@ describe("MigrationSystem - Comprehensive Coverage", () => {
                         "1.0.0",
                         "1.2.0"
                     );
-                }).toThrow("Circular migration path detected");
+                }).toThrowError("Circular migration path detected");
             });
 
             it("should throw error for paths exceeding maximum steps", async ({
@@ -328,7 +328,7 @@ describe("MigrationSystem - Comprehensive Coverage", () => {
                         "1.0.0",
                         "1.105.0"
                     );
-                }).toThrow("Migration path too long for http");
+                }).toThrowError("Migration path too long for http");
             });
 
             it("should validate version string with numeric parts", async ({
@@ -346,7 +346,7 @@ describe("MigrationSystem - Comprehensive Coverage", () => {
                         "1.0.0",
                         "999999999999999999999.0.0"
                     );
-                }).toThrow("contains invalid numeric parts");
+                }).toThrowError("contains invalid numeric parts");
             });
 
             it("should validate semantic version format", async ({
@@ -360,7 +360,7 @@ describe("MigrationSystem - Comprehensive Coverage", () => {
 
                 expect(() => {
                     migrationRegistry.getMigrationPath("http", "1.0", "1.1.0");
-                }).toThrow("is not a valid semantic version");
+                }).toThrowError("is not a valid semantic version");
             });
         });
 
@@ -438,7 +438,7 @@ describe("MigrationSystem - Comprehensive Coverage", () => {
                 const rule = createTestMigrationRule("1.0.0-alpha", "1.0.0");
                 expect(() => {
                     migrationRegistry.registerMigration("http", rule);
-                }).not.toThrow();
+                }).not.toThrowError();
             });
 
             it("should handle version comparison with build metadata", async ({
@@ -453,7 +453,7 @@ describe("MigrationSystem - Comprehensive Coverage", () => {
                 const rule = createTestMigrationRule("1.0.0+build.1", "1.0.1");
                 expect(() => {
                     migrationRegistry.registerMigration("http", rule);
-                }).not.toThrow();
+                }).not.toThrowError();
             });
         });
     });
@@ -885,7 +885,7 @@ describe("MigrationSystem - Comprehensive Coverage", () => {
                     "2.0.0"
                 );
 
-                await expect(resultPromise).rejects.toThrow(
+                await expect(resultPromise).rejects.toThrowError(
                     /No migration path from 1\.0\.0 to 2\.0\.0 for http/
                 );
             });
@@ -1121,7 +1121,7 @@ describe("MigrationSystem - Comprehensive Coverage", () => {
 
                 expect(() =>
                     exampleMigrations.portV1_0_to_1_1.transform(data)
-                ).toThrow("Invalid port value: invalid. Must be 1-65535.");
+                ).toThrowError("Invalid port value: invalid. Must be 1-65535.");
             });
 
             it("should throw for out-of-range numeric port", async ({
@@ -1140,7 +1140,7 @@ describe("MigrationSystem - Comprehensive Coverage", () => {
 
                 expect(() =>
                     exampleMigrations.portV1_0_to_1_1.transform(data)
-                ).toThrow("Invalid port number: 70000. Must be 1-65535.");
+                ).toThrowError("Invalid port number: 70000. Must be 1-65535.");
             });
 
             it("should throw for negative port", async ({ task, annotate }) => {
@@ -1156,7 +1156,7 @@ describe("MigrationSystem - Comprehensive Coverage", () => {
 
                 expect(() =>
                     exampleMigrations.portV1_0_to_1_1.transform(data)
-                ).toThrow("Invalid port number: -1. Must be 1-65535.");
+                ).toThrowError("Invalid port number: -1. Must be 1-65535.");
             });
 
             it("should throw for non-numeric port type", async ({
@@ -1175,7 +1175,7 @@ describe("MigrationSystem - Comprehensive Coverage", () => {
 
                 expect(() =>
                     exampleMigrations.portV1_0_to_1_1.transform(data)
-                ).toThrow(
+                ).toThrowError(
                     "Port must be a number or numeric string, got: boolean"
                 );
             });

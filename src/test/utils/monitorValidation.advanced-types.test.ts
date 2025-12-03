@@ -22,7 +22,7 @@ vi.mock("@shared/utils/errorHandling", () => ({
     withUtilityErrorHandling: vi.fn(),
 }));
 
-vi.mock("@shared/validation/schemas", () => ({
+vi.mock("@shared/validation/monitorSchemas", () => ({
     validateMonitorData: vi.fn(),
     validateMonitorField: vi.fn(),
 }));
@@ -32,7 +32,7 @@ import {
     type PartialMonitorFormDataByType,
 } from "../../utils/monitorValidation";
 import { withUtilityErrorHandling } from "@shared/utils/errorHandling";
-import { validateMonitorField as sharedValidateMonitorField } from "@shared/validation/schemas";
+import { validateMonitorField as sharedValidateMonitorField } from "@shared/validation/monitorSchemas";
 
 /**
  * Base validation result reused across tests to keep mocks deterministic.

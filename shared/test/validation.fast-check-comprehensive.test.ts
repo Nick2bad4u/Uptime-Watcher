@@ -32,8 +32,8 @@ import {
 import {
     validateMonitorData,
     validateMonitorField,
-    validateSiteData,
-} from "../validation/schemas";
+} from "../validation/monitorSchemas";
+import { validateSiteData } from "../validation/siteSchemas";
 
 describe("Comprehensive Validation Module Fast-Check Tests", () => {
     describe("validatorUtils.ts Functions", () => {
@@ -860,10 +860,14 @@ describe("Comprehensive Validation Module Fast-Check Tests", () => {
                 "should handle boundary inputs consistently",
                 (boundaryInput) => {
                     // All validation functions should handle boundary cases gracefully
-                    expect(() => isNonEmptyString(boundaryInput)).not.toThrow();
-                    expect(() => isValidHost(boundaryInput)).not.toThrow();
-                    expect(() => isValidPort(boundaryInput)).not.toThrow();
-                    expect(() => validateSiteData(boundaryInput)).not.toThrow();
+                    expect(() =>
+                        isNonEmptyString(boundaryInput)
+                    ).not.toThrowError();
+                    expect(() => isValidHost(boundaryInput)).not.toThrowError();
+                    expect(() => isValidPort(boundaryInput)).not.toThrowError();
+                    expect(() =>
+                        validateSiteData(boundaryInput)
+                    ).not.toThrowError();
                 }
             );
 

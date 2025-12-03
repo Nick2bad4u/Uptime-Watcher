@@ -268,9 +268,9 @@ describe(calculateMaxDuration, () => {
             // but the function should not crash
 
             // Act & Assert
-            expect(() => calculateMaxDuration(-5, 0)).not.toThrow();
-            expect(() => calculateMaxDuration(5, -1)).not.toThrow();
-            expect(() => calculateMaxDuration(-5, -1)).not.toThrow();
+            expect(() => calculateMaxDuration(-5, 0)).not.toThrowError();
+            expect(() => calculateMaxDuration(5, -1)).not.toThrowError();
+            expect(() => calculateMaxDuration(-5, -1)).not.toThrowError();
         });
     });
 

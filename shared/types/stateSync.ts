@@ -9,7 +9,7 @@
 
 import type { Site } from "@shared/types";
 
-import { siteSchema } from "@shared/validation/schemas";
+import { siteSchema } from "@shared/validation/siteSchemas";
 import * as z from "zod";
 
 const STATE_SYNC_SOURCE_VALUES = [

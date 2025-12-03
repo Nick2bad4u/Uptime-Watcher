@@ -206,7 +206,7 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
                 await expect(result.current.formatMonitorDetail(
                     "http",
                     "original"
-                )).rejects.toThrow("API error");
+                )).rejects.toThrowError("API error");
             });
 
             // Test formatMonitorTitleSuffix with API error - should throw
@@ -219,7 +219,7 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
                 await expect(result.current.formatMonitorTitleSuffix(
                     "http",
                     {} as Monitor
-                )).rejects.toThrow("API error");
+                )).rejects.toThrowError("API error");
             });
         });
 

@@ -554,7 +554,7 @@ describe("Comprehensive Database Operations Fuzzing", () => {
                             "transaction",
                             operations
                         )
-                ).not.toThrow();
+                ).not.toThrowError();
             }
         );
 
@@ -593,7 +593,7 @@ describe("Comprehensive Database Operations Fuzzing", () => {
                             "safeQuery",
                             injection
                         );
-                    }).toThrow("SQL injection detected");
+                    }).toThrowError("SQL injection detected");
                 }
             }
         );

@@ -69,7 +69,7 @@ describe("Stores Comprehensive Fuzzing", () => {
                         act(() => {
                             result.current.updateSettings(cleanSettings);
                         });
-                    }).not.toThrow();
+                    }).not.toThrowError();
                 } finally {
                     unmount();
                 }
@@ -97,7 +97,7 @@ describe("Stores Comprehensive Fuzzing", () => {
                         act(() => {
                             result.current.setError(errorMessage);
                         });
-                    }).not.toThrow();
+                    }).not.toThrowError();
                 } finally {
                     unmount();
                 }
@@ -112,7 +112,7 @@ describe("Stores Comprehensive Fuzzing", () => {
                     act(() => {
                         result.current.clearError();
                     });
-                }).not.toThrow();
+                }).not.toThrowError();
             } finally {
                 unmount();
             }

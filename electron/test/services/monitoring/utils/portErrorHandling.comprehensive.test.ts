@@ -661,7 +661,7 @@ describe("Port Error Handling", () => {
                 // The function should throw because isDev() throws and there's no error handling
                 expect(() => {
                     handlePortCheckError(error, "error.test", 80);
-                }).toThrow("isDev failed");
+                }).toThrowError("isDev failed");
             });
         });
 

@@ -225,7 +225,7 @@ describe("EventsService", () => {
             const initializationError = new Error("Electron API not available");
             mockWaitForElectronBridge.mockRejectedValue(initializationError);
 
-            await expect(EventsService.initialize()).rejects.toThrow(
+            await expect(EventsService.initialize()).rejects.toThrowError(
                 "Electron API not available"
             );
 
@@ -268,7 +268,7 @@ describe("EventsService", () => {
 
             await expect(
                 EventsService.onCacheInvalidated(callback)
-            ).rejects.toThrow("Init failed");
+            ).rejects.toThrowError("Init failed");
 
             expect(
                 mockElectronAPI.events.onCacheInvalidated
@@ -341,9 +341,9 @@ describe("EventsService", () => {
             mockWaitForElectronBridge.mockRejectedValue(initError);
             const callback = vi.fn();
 
-            await expect(EventsService.onMonitorDown(callback)).rejects.toThrow(
-                "Init failed"
-            );
+            await expect(
+                EventsService.onMonitorDown(callback)
+            ).rejects.toThrowError("Init failed");
 
             expect(mockElectronAPI.events.onMonitorDown).not.toHaveBeenCalled();
         });
@@ -372,7 +372,7 @@ describe("EventsService", () => {
 
             await expect(
                 EventsService.onMonitorCheckCompleted(callback)
-            ).rejects.toThrow("Initialization failed");
+            ).rejects.toThrowError("Initialization failed");
 
             expect(
                 mockElectronAPI.events.onMonitorCheckCompleted
@@ -402,7 +402,7 @@ describe("EventsService", () => {
 
             await expect(
                 EventsService.onHistoryLimitUpdated(callback)
-            ).rejects.toThrow("Initialization failed");
+            ).rejects.toThrowError("Initialization failed");
 
             expect(
                 mockElectronAPI.events.onHistoryLimitUpdated
@@ -448,7 +448,7 @@ describe("EventsService", () => {
 
             await expect(
                 EventsService.onMonitoringStarted(callback)
-            ).rejects.toThrow("Init failed");
+            ).rejects.toThrowError("Init failed");
 
             expect(
                 mockElectronAPI.events.onMonitoringStarted
@@ -520,7 +520,7 @@ describe("EventsService", () => {
 
             await expect(
                 EventsService.onMonitoringStopped(callback)
-            ).rejects.toThrow("Init failed");
+            ).rejects.toThrowError("Init failed");
 
             expect(
                 mockElectronAPI.events.onMonitoringStopped
@@ -575,7 +575,7 @@ describe("EventsService", () => {
 
             await expect(
                 EventsService.onMonitorStatusChanged(callback)
-            ).rejects.toThrow("Init failed");
+            ).rejects.toThrowError("Init failed");
 
             expect(
                 mockElectronAPI.events.onMonitorStatusChanged
@@ -601,9 +601,9 @@ describe("EventsService", () => {
             mockWaitForElectronBridge.mockRejectedValue(initError);
             const callback = vi.fn();
 
-            await expect(EventsService.onMonitorUp(callback)).rejects.toThrow(
-                "Init failed"
-            );
+            await expect(
+                EventsService.onMonitorUp(callback)
+            ).rejects.toThrowError("Init failed");
 
             expect(mockElectronAPI.events.onMonitorUp).not.toHaveBeenCalled();
         });
@@ -627,9 +627,9 @@ describe("EventsService", () => {
             mockWaitForElectronBridge.mockRejectedValue(initError);
             const callback = vi.fn();
 
-            await expect(EventsService.onSiteAdded(callback)).rejects.toThrow(
-                "Init failed"
-            );
+            await expect(
+                EventsService.onSiteAdded(callback)
+            ).rejects.toThrowError("Init failed");
 
             expect(mockElectronAPI.events.onSiteAdded).not.toHaveBeenCalled();
         });
@@ -653,9 +653,9 @@ describe("EventsService", () => {
             mockWaitForElectronBridge.mockRejectedValue(initError);
             const callback = vi.fn();
 
-            await expect(EventsService.onSiteRemoved(callback)).rejects.toThrow(
-                "Init failed"
-            );
+            await expect(
+                EventsService.onSiteRemoved(callback)
+            ).rejects.toThrowError("Init failed");
 
             expect(mockElectronAPI.events.onSiteRemoved).not.toHaveBeenCalled();
         });
@@ -679,9 +679,9 @@ describe("EventsService", () => {
             mockWaitForElectronBridge.mockRejectedValue(initError);
             const callback = vi.fn();
 
-            await expect(EventsService.onSiteUpdated(callback)).rejects.toThrow(
-                "Init failed"
-            );
+            await expect(
+                EventsService.onSiteUpdated(callback)
+            ).rejects.toThrowError("Init failed");
 
             expect(mockElectronAPI.events.onSiteUpdated).not.toHaveBeenCalled();
         });
@@ -705,9 +705,9 @@ describe("EventsService", () => {
             mockWaitForElectronBridge.mockRejectedValue(initError);
             const callback = vi.fn();
 
-            await expect(EventsService.onTestEvent(callback)).rejects.toThrow(
-                "Init failed"
-            );
+            await expect(
+                EventsService.onTestEvent(callback)
+            ).rejects.toThrowError("Init failed");
 
             expect(mockElectronAPI.events.onTestEvent).not.toHaveBeenCalled();
         });
@@ -733,7 +733,7 @@ describe("EventsService", () => {
 
             await expect(
                 EventsService.onUpdateStatus(callback)
-            ).rejects.toThrow("Init failed");
+            ).rejects.toThrowError("Init failed");
 
             expect(
                 mockElectronAPI.events.onUpdateStatus
@@ -921,7 +921,7 @@ describe("EventsService", () => {
 
             await expect(
                 EventsService.onCacheInvalidated(callback)
-            ).rejects.toThrow("Event registration failed");
+            ).rejects.toThrowError("Event registration failed");
         });
 
         it("should handle missing electron API gracefully", async () => {
@@ -932,7 +932,7 @@ describe("EventsService", () => {
 
             await expect(
                 EventsService.onCacheInvalidated(callback)
-            ).rejects.toThrow();
+            ).rejects.toThrowError();
         });
     });
 });

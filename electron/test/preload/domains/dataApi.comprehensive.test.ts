@@ -78,7 +78,7 @@ describe("dataApi", () => {
             };
             ipcRenderer.invoke.mockResolvedValueOnce(response);
 
-            await expect(dataApi.downloadSqliteBackup()).rejects.toThrow(
+            await expect(dataApi.downloadSqliteBackup()).rejects.toThrowError(
                 "unable to create backup"
             );
         });
@@ -108,7 +108,9 @@ describe("dataApi", () => {
             };
             ipcRenderer.invoke.mockResolvedValueOnce(response);
 
-            await expect(dataApi.exportData()).rejects.toThrow("export-failed");
+            await expect(dataApi.exportData()).rejects.toThrowError(
+                "export-failed"
+            );
         });
     });
 
@@ -137,7 +139,7 @@ describe("dataApi", () => {
             };
             ipcRenderer.invoke.mockResolvedValueOnce(response);
 
-            await expect(dataApi.importData("{}")).rejects.toThrow(
+            await expect(dataApi.importData("{}")).rejects.toThrowError(
                 "invalid export signature"
             );
         });

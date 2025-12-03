@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 import { safeStringify } from "@shared/utils/stringConversion";
-import { validateMonitorField } from "@shared/validation/schemas";
+import { validateMonitorField } from "@shared/validation/monitorSchemas";
 
 describe("Final Coverage - Targeting Remaining Lines", () => {
     describe("stringConversion.ts - Lines 86-89 (undefined/default switch cases)", () => {
@@ -96,7 +96,7 @@ describe("Final Coverage - Targeting Remaining Lines", () => {
                     "completelyInvalidFieldName",
                     "value"
                 );
-            }).toThrow("Unknown field: completelyInvalidFieldName");
+            }).toThrowError("Unknown field: completelyInvalidFieldName");
         });
 
         test("should trigger unknown field error for field not in any schema", ({
@@ -116,7 +116,7 @@ describe("Final Coverage - Targeting Remaining Lines", () => {
             // Test with a field name that doesn't exist in any schema
             expect(() => {
                 validateMonitorField("ping", "nonExistentField123", 123);
-            }).toThrow("Unknown field: nonExistentField123");
+            }).toThrowError("Unknown field: nonExistentField123");
         });
     });
 

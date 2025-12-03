@@ -697,7 +697,7 @@ describe(generateUuid, () => {
                 expect(() => {
                     setupScenario();
                     generateUuid();
-                }).not.toThrow(`Scenario ${index + 1} should not throw`);
+                }).not.toThrowError(`Scenario ${index + 1} should not throw`);
             }
         });
 

@@ -118,7 +118,7 @@ describe("databaseService strict coverage", () => {
 
         const service = DatabaseService.getInstance();
 
-        expect(() => service.getDatabase()).toThrow(
+        expect(() => service.getDatabase()).toThrowError(
             "Database not initialized. Call initialize() first."
         );
     });
@@ -166,7 +166,7 @@ describe("databaseService strict coverage", () => {
             throw new Error("boom");
         };
 
-        expect(() => service.initialize()).toThrow("boom");
+        expect(() => service.initialize()).toThrowError("boom");
         const logger = getLoggerMock();
 
         expect(logger.error).toHaveBeenCalledWith(
@@ -197,7 +197,7 @@ describe("databaseService strict coverage", () => {
         expect(logger.info).toHaveBeenCalledWith(
             LOG_TEMPLATES.services.DATABASE_CONNECTION_CLOSED
         );
-        expect(() => service.getDatabase()).toThrow(
+        expect(() => service.getDatabase()).toThrowError(
             "Database not initialized. Call initialize() first."
         );
     });
@@ -217,7 +217,7 @@ describe("databaseService strict coverage", () => {
             throw closeError;
         });
 
-        expect(() => service.close()).toThrow(closeError);
+        expect(() => service.close()).toThrowError(closeError);
         const logger = getLoggerMock();
 
         expect(logger.error).toHaveBeenCalledWith(
@@ -313,7 +313,7 @@ describe("databaseService strict coverage", () => {
             service.executeTransaction(async () => {
                 throw failure;
             })
-        ).rejects.toThrow(failure);
+        ).rejects.toThrowError(failure);
 
         expect(db!.run).toHaveBeenCalledWith("ROLLBACK");
         const logger = getLoggerMock();
@@ -353,7 +353,7 @@ describe("databaseService strict coverage", () => {
             service.executeTransaction(async () => {
                 throw new Error("intermediate failure");
             })
-        ).rejects.toThrow("intermediate failure");
+        ).rejects.toThrowError("intermediate failure");
 
         const logger = getLoggerMock();
 
@@ -385,7 +385,7 @@ describe("databaseService strict coverage", () => {
                 db!.inTransaction = false;
                 throw new Error("auto rollback");
             })
-        ).rejects.toThrow("auto rollback");
+        ).rejects.toThrowError("auto rollback");
 
         const logger = getLoggerMock();
 

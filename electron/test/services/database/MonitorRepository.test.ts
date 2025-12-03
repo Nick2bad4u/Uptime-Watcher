@@ -94,7 +94,7 @@ describe(MonitorRepository, () => {
             });
             await expect(
                 repository.findBySiteIdentifier("site1")
-            ).rejects.toThrow("Database error");
+            ).rejects.toThrowError("Database error");
         });
     });
     describe("findByIdentifier", () => {

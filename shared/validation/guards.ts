@@ -11,7 +11,8 @@ import type { ZodError } from "zod";
 
 import type { Site } from "../types";
 
-import { siteSchema, statusUpdateSchema } from "./schemas";
+import { siteSchema } from "./siteSchemas";
+import { statusUpdateSchema } from "./statusUpdateSchemas";
 /**
  * Validates an unknown payload against the canonical {@link Site} schema.
  *

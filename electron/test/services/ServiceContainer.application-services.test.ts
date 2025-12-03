@@ -102,7 +102,7 @@ describe("ServiceContainer - Application Services", () => {
 
             expect(() => {
                 container.getConfigurationManager();
-            }).not.toThrow();
+            }).not.toThrowError();
         });
 
         it("should return same ConfigurationManager instance", async ({
@@ -138,7 +138,7 @@ describe("ServiceContainer - Application Services", () => {
 
             expect(() => {
                 container.getDatabaseManager();
-            }).not.toThrow();
+            }).not.toThrowError();
         });
 
         it("should maintain DatabaseManager singleton pattern", async ({
@@ -174,7 +174,7 @@ describe("ServiceContainer - Application Services", () => {
 
             expect(() => {
                 container.getSiteManager();
-            }).not.toThrow();
+            }).not.toThrowError();
         });
 
         it("should handle SiteManager dependencies correctly", async ({
@@ -211,7 +211,7 @@ describe("ServiceContainer - Application Services", () => {
                 container.getConfigurationManager();
                 container.getDatabaseManager();
                 container.getSiteManager();
-            }).not.toThrow();
+            }).not.toThrowError();
         });
 
         it("should maintain proper service isolation", async ({

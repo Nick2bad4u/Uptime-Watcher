@@ -77,7 +77,7 @@ describe("ServiceContainer - Core Services", () => {
 
             expect(() => {
                 container.getDatabaseService();
-            }).not.toThrow();
+            }).not.toThrowError();
         });
 
         it("should create HistoryRepository singleton", async ({
@@ -94,7 +94,7 @@ describe("ServiceContainer - Core Services", () => {
 
             expect(() => {
                 container.getHistoryRepository();
-            }).not.toThrow();
+            }).not.toThrowError();
         });
 
         it("should create MonitorRepository singleton", async ({
@@ -111,7 +111,7 @@ describe("ServiceContainer - Core Services", () => {
 
             expect(() => {
                 container.getMonitorRepository();
-            }).not.toThrow();
+            }).not.toThrowError();
         });
 
         it("should create SettingsRepository singleton", async ({
@@ -128,7 +128,7 @@ describe("ServiceContainer - Core Services", () => {
 
             expect(() => {
                 container.getSettingsRepository();
-            }).not.toThrow();
+            }).not.toThrowError();
         });
 
         it("should create SiteRepository singleton", async ({
@@ -145,7 +145,7 @@ describe("ServiceContainer - Core Services", () => {
 
             expect(() => {
                 container.getSiteRepository();
-            }).not.toThrow();
+            }).not.toThrowError();
         });
 
         it("should return same instance on multiple calls", async ({
@@ -206,7 +206,7 @@ describe("ServiceContainer - Core Services", () => {
                 container.getMonitorRepository();
                 container.getSettingsRepository();
                 container.getSiteRepository();
-            }).not.toThrow();
+            }).not.toThrowError();
         });
     });
 
@@ -226,7 +226,7 @@ describe("ServiceContainer - Core Services", () => {
             expect(() => {
                 container.getDatabaseService();
                 container.getHistoryRepository();
-            }).not.toThrow();
+            }).not.toThrowError();
         });
 
         it("should maintain service state across calls", async ({

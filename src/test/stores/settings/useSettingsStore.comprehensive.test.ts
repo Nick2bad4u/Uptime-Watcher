@@ -532,7 +532,7 @@ describe(useSettingsStore, () => {
             await act(async () => {
                 await expect(
                     result.current.persistHistoryLimit(600)
-                ).rejects.toThrow("Update failed");
+                ).rejects.toThrowError("Update failed");
             });
 
             // Should be reverted to previous value (200), not the attempted value (600)
@@ -737,7 +737,7 @@ describe(useSettingsStore, () => {
             await act(async () => {
                 await expect(
                     result.current.persistHistoryLimit(500)
-                ).rejects.toThrow();
+                ).rejects.toThrowError();
             });
 
             expect(mockErrorStore.setStoreError).toHaveBeenCalledWith(
@@ -1254,7 +1254,7 @@ describe(useSettingsStore, () => {
                                     invalidAttempt.invalidValue,
                             } as any);
                         });
-                    }).not.toThrow();
+                    }).not.toThrowError();
                 }
 
                 // Valid settings should still be intact

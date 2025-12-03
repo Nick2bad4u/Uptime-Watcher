@@ -7,8 +7,8 @@ import { describe, it, expect } from "vitest";
 import {
     validateMonitorData,
     validateMonitorField,
-    validateSiteData,
-} from "../../validation/schemas";
+} from "../../validation/monitorSchemas";
+import { validateSiteData } from "../../validation/siteSchemas";
 
 describe("Validation Schemas - Branch Coverage Completion", () => {
     describe("Error handling edge cases", () => {
@@ -123,7 +123,7 @@ describe("Validation Schemas - Branch Coverage Completion", () => {
             // Test completely unknown field to trigger the error case
             expect(() => {
                 validateMonitorField("http", "completelyUnknownField", "value");
-            }).toThrow("Unknown field: completelyUnknownField");
+            }).toThrowError("Unknown field: completelyUnknownField");
         });
 
         it("should test field validation with invalid values to trigger Zod errors", async ({

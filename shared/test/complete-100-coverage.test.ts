@@ -5,7 +5,7 @@
 
 import { describe, expect, it, vi } from "vitest";
 import { safeStringify } from "../utils/stringConversion";
-import { validateMonitorField } from "../validation/schemas";
+import { validateMonitorField } from "@shared/validation/monitorSchemas";
 import { safeGetRowProperty, RowValidationUtils } from "../types/database";
 import { withErrorHandling } from "../utils/errorHandling";
 
@@ -93,7 +93,7 @@ describe("Complete 100% Coverage - Final Tests", () => {
                     "unknownCustomField",
                     "invalidValue"
                 );
-            }).toThrow("Unknown field: unknownCustomField");
+            }).toThrowError("Unknown field: unknownCustomField");
         });
 
         it("should handle error categorization edge cases (lines 478-479, 482)", async ({
@@ -204,7 +204,7 @@ describe("Complete 100% Coverage - Final Tests", () => {
             // This should trigger the error handling path in the finally block
             await expect(
                 withErrorHandling(operation, mockStore)
-            ).rejects.toThrow("Operation failed");
+            ).rejects.toThrowError("Operation failed");
 
             // Verify that setLoading was called twice (once at start, once in finally)
             expect(mockStore.setLoading).toHaveBeenCalledTimes(2);

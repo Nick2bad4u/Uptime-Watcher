@@ -210,7 +210,7 @@ describe("Utility Files - Missing Branch Coverage", () => {
                     expect(typeof isUndefined).toBe("boolean");
                     expect(typeof stringValue).toBe("string");
                     expect(typeof jsonValue).toBe("string");
-                }).not.toThrow();
+                }).not.toThrowError();
             }
         });
     });
@@ -248,7 +248,7 @@ describe("Utility Files - Missing Branch Coverage", () => {
                     const errorString =
                         error instanceof Error ? error.message : String(error);
                     expect(typeof errorString).toBe("string");
-                }).not.toThrow();
+                }).not.toThrowError();
             }
         });
 
@@ -296,7 +296,7 @@ describe("Utility Files - Missing Branch Coverage", () => {
                         // Handle serialization errors
                         String(error);
                     }
-                }).not.toThrow();
+                }).not.toThrowError();
             }
 
             // Test proxy separately and expect it to throw, then handle it
@@ -313,7 +313,7 @@ describe("Utility Files - Missing Branch Coverage", () => {
                         return "proxy-error-handled";
                     }
                 }
-            }).not.toThrow();
+            }).not.toThrowError();
         });
     });
 
@@ -414,7 +414,7 @@ describe("Utility Files - Missing Branch Coverage", () => {
                     expect(typeof timeout).toBe("number");
                     expect(typeof retries).toBe("number");
                     expect(typeof enabled).toBe("boolean");
-                }).not.toThrow();
+                }).not.toThrowError();
             }
         });
     });
@@ -471,7 +471,7 @@ describe("Utility Files - Missing Branch Coverage", () => {
                     expect(typeof hasSome).toBe("boolean");
                     expect(typeof hasAll).toBe("boolean");
                     expect(Array.isArray(spread)).toBeTruthy();
-                }).not.toThrow();
+                }).not.toThrowError();
             }
         });
 
@@ -512,7 +512,7 @@ describe("Utility Files - Missing Branch Coverage", () => {
                     expect(Array.isArray(entries)).toBeTruthy();
                     expect(typeof hasProperty).toBe("boolean");
                     expect(typeof hasKey).toBe("boolean");
-                }).not.toThrow();
+                }).not.toThrowError();
             }
         });
     });
@@ -554,7 +554,7 @@ describe("Utility Files - Missing Branch Coverage", () => {
                 expect(Array.isArray(mapped)).toBeTruthy();
                 expect(typeof keyCount).toBe("number");
                 expect(typeof serialized).toBe("string");
-            }).not.toThrow();
+            }).not.toThrowError();
 
             expect(largeArray).toHaveLength(10_000);
             expect(Object.keys(largeObject)).toHaveLength(10_000);

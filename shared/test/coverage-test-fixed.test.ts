@@ -5,7 +5,7 @@
 
 import { describe, expect, it, vi } from "vitest";
 import { safeStringify } from "../utils/stringConversion";
-import { validateMonitorField } from "../validation/schemas";
+import { validateMonitorField } from "@shared/validation/monitorSchemas";
 import { isValidHistoryRow, safeGetRowProperty } from "../types/database";
 import { withErrorHandling } from "../utils/errorHandling";
 
@@ -58,7 +58,7 @@ describe("Fixed Coverage Tests", () => {
             // Test with a field that doesn't exist in any schema
             expect(() => {
                 validateMonitorField("http", "totallyUnknownField", "value");
-            }).toThrow("Unknown field: totallyUnknownField");
+            }).toThrowError("Unknown field: totallyUnknownField");
         });
     });
 
@@ -150,7 +150,7 @@ describe("Fixed Coverage Tests", () => {
             // This should cover the error handling in the finally block
             await expect(
                 withErrorHandling(operation, mockStore)
-            ).rejects.toThrow("Operation failed");
+            ).rejects.toThrowError("Operation failed");
 
             // Verify the calls happened
             expect(mockStore.setLoading).toHaveBeenCalledTimes(2);

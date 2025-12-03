@@ -445,7 +445,7 @@ describe("SiteManager - Comprehensive", () => {
                 errors: ["Invalid URL", "Missing name"],
             });
 
-            await expect(siteManager.addSite(mockSite)).rejects.toThrow(
+            await expect(siteManager.addSite(mockSite)).rejects.toThrowError(
                 "Site validation failed for 'site-1': \n  - Invalid URL\n  - Missing name"
             );
         });
@@ -466,7 +466,7 @@ describe("SiteManager - Comprehensive", () => {
                 errors: ["Invalid URL"],
             });
 
-            await expect(siteManager.addSite(mockSite)).rejects.toThrow(
+            await expect(siteManager.addSite(mockSite)).rejects.toThrowError(
                 "Site validation failed for 'site-1': Invalid URL"
             );
         });
@@ -487,7 +487,7 @@ describe("SiteManager - Comprehensive", () => {
                 errors: [undefined as any],
             });
 
-            await expect(siteManager.addSite(mockSite)).rejects.toThrow(
+            await expect(siteManager.addSite(mockSite)).rejects.toThrowError(
                 "Site validation failed for 'site-1': "
             );
         });
@@ -507,7 +507,7 @@ describe("SiteManager - Comprehensive", () => {
                 new Error("Database error")
             );
 
-            await expect(siteManager.addSite(mockSite)).rejects.toThrow(
+            await expect(siteManager.addSite(mockSite)).rejects.toThrowError(
                 "Database error"
             );
         });
@@ -654,7 +654,9 @@ describe("SiteManager - Comprehensive", () => {
                 )
                 .mockRejectedValue(new Error("DB error"));
 
-            await expect(siteManager.getSites()).rejects.toThrow("DB error");
+            await expect(siteManager.getSites()).rejects.toThrowError(
+                "DB error"
+            );
             expect(getSitesSpy).toHaveBeenCalled();
         });
     });
@@ -729,7 +731,7 @@ describe("SiteManager - Comprehensive", () => {
             ).mockRejectedValue(new Error("Init error"));
 
             const failingSiteManager = new SiteManager(mockDeps);
-            await expect(failingSiteManager.initialize()).rejects.toThrow(
+            await expect(failingSiteManager.initialize()).rejects.toThrowError(
                 "Init error"
             );
         });
@@ -813,7 +815,9 @@ describe("SiteManager - Comprehensive", () => {
 
             await expect(
                 siteManager["getSiteSnapshotForMutation"]("missing-site")
-            ).rejects.toThrow("Site with identifier missing-site not found");
+            ).rejects.toThrowError(
+                "Site with identifier missing-site not found"
+            );
         });
     });
 
@@ -903,7 +907,7 @@ describe("SiteManager - Comprehensive", () => {
                     singleMonitorSite.identifier,
                     "monitor-1"
                 )
-            ).rejects.toThrow(ERROR_CATALOG.monitors.CANNOT_REMOVE_LAST);
+            ).rejects.toThrowError(ERROR_CATALOG.monitors.CANNOT_REMOVE_LAST);
 
             expect(
                 mockSiteWriterServiceInstance.updateSite
@@ -935,7 +939,7 @@ describe("SiteManager - Comprehensive", () => {
                     siteWithTwoMonitors.identifier,
                     "monitor-1"
                 )
-            ).rejects.toThrow("Update failed");
+            ).rejects.toThrowError("Update failed");
         });
 
         it("should throw when the site is missing", async ({
@@ -949,7 +953,9 @@ describe("SiteManager - Comprehensive", () => {
 
             await expect(
                 siteManager.removeMonitor("missing-site", "monitor-1")
-            ).rejects.toThrow("Site with identifier missing-site not found");
+            ).rejects.toThrowError(
+                "Site with identifier missing-site not found"
+            );
         });
     });
 
@@ -1110,7 +1116,7 @@ describe("SiteManager - Comprehensive", () => {
 
             await expect(
                 siteManager.updateSite("site-1", { name: "New Name" })
-            ).rejects.toThrow("Site with identifier site-1 not found");
+            ).rejects.toThrowError("Site with identifier site-1 not found");
         });
 
         it("should handle validation errors during update", async ({
@@ -1132,7 +1138,7 @@ describe("SiteManager - Comprehensive", () => {
 
             await expect(
                 siteManager.updateSite("site-1", { name: "New Name" })
-            ).rejects.toThrow("Site validation failed");
+            ).rejects.toThrowError("Site validation failed");
         });
 
         it("should handle monitor updates with new monitors", async ({
@@ -1214,7 +1220,7 @@ describe("SiteManager - Comprehensive", () => {
 
             await expect(
                 siteManager.updateSite("site-1", updates)
-            ).rejects.toThrow(
+            ).rejects.toThrowError(
                 "Site with identifier site-1 not found in cache after refresh"
             );
         });
@@ -1339,7 +1345,7 @@ describe("SiteManager - Comprehensive", () => {
 
             await expect(
                 siteManager.updateSite("site-1", updates)
-            ).rejects.toThrow(
+            ).rejects.toThrowError(
                 "MonitoringOperations not available but required for setHistoryLimit"
             );
         });
@@ -1387,7 +1393,7 @@ describe("SiteManager - Comprehensive", () => {
 
             await expect(
                 siteManager.updateSite("site-1", updates)
-            ).rejects.toThrow(
+            ).rejects.toThrowError(
                 "MonitoringOperations not available but required for setupNewMonitors"
             );
         });
@@ -1405,7 +1411,7 @@ describe("SiteManager - Comprehensive", () => {
 
             await expect(
                 config.startMonitoring("site-1", "monitor-1")
-            ).rejects.toThrow(
+            ).rejects.toThrowError(
                 "MonitoringOperations not available but required for startMonitoring"
             );
         });
@@ -1423,7 +1429,7 @@ describe("SiteManager - Comprehensive", () => {
 
             await expect(
                 config.stopMonitoring("site-1", "monitor-1")
-            ).rejects.toThrow(
+            ).rejects.toThrowError(
                 "MonitoringOperations not available but required for stopMonitoring"
             );
         });
@@ -1449,7 +1455,7 @@ describe("SiteManager - Comprehensive", () => {
 
             const config = siteManager["createMonitoringConfig"]();
 
-            await expect(config.setHistoryLimit(100)).rejects.toThrow(
+            await expect(config.setHistoryLimit(100)).rejects.toThrowError(
                 "History limit error"
             );
 
@@ -1677,7 +1683,9 @@ describe("SiteManager - Comprehensive", () => {
                 errors: ["Invalid site"],
             });
 
-            await expect(siteManager["validateSite"](mockSite)).rejects.toThrow(
+            await expect(
+                siteManager["validateSite"](mockSite)
+            ).rejects.toThrowError(
                 "Site validation failed for 'site-1': Invalid site"
             );
         });

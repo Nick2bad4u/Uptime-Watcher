@@ -188,7 +188,7 @@ describe("Monitor Types Domain API", () => {
             const error = new Error("Failed to load monitor types");
             mockIpcRenderer.invoke.mockRejectedValue(error);
 
-            await expect(api.getMonitorTypes()).rejects.toThrow(
+            await expect(api.getMonitorTypes()).rejects.toThrowError(
                 "Failed to load monitor types"
             );
         });
@@ -416,9 +416,9 @@ describe("Monitor Types Domain API", () => {
                     async (error) => {
                         mockIpcRenderer.invoke.mockRejectedValue(error);
 
-                        await expect(api.getMonitorTypes()).rejects.toThrow(
-                            error.message
-                        );
+                        await expect(
+                            api.getMonitorTypes()
+                        ).rejects.toThrowError(error.message);
                     }
                 ),
                 { numRuns: 10 }
@@ -559,7 +559,7 @@ describe("Monitor Types Domain API", () => {
             const timeoutError = new Error("Network timeout");
             mockIpcRenderer.invoke.mockRejectedValue(timeoutError);
 
-            await expect(api.getMonitorTypes()).rejects.toThrow(
+            await expect(api.getMonitorTypes()).rejects.toThrowError(
                 "Network timeout"
             );
         });
@@ -570,7 +570,7 @@ describe("Monitor Types Domain API", () => {
             );
             mockIpcRenderer.invoke.mockRejectedValue(permissionError);
 
-            await expect(api.getMonitorTypes()).rejects.toThrow(
+            await expect(api.getMonitorTypes()).rejects.toThrowError(
                 "Permission denied"
             );
         });
@@ -647,11 +647,11 @@ describe("Monitor Types Domain API", () => {
                 .mockResolvedValueOnce(createIpcResponse(successData));
 
             // Test mixed results
-            await expect(api.getMonitorTypes()).rejects.toThrow(
+            await expect(api.getMonitorTypes()).rejects.toThrowError(
                 "Intermittent failure"
             );
             await expect(api.getMonitorTypes()).resolves.toEqual(successData);
-            await expect(api.getMonitorTypes()).rejects.toThrow(
+            await expect(api.getMonitorTypes()).rejects.toThrowError(
                 "Intermittent failure"
             );
             await expect(api.getMonitorTypes()).resolves.toEqual(successData);

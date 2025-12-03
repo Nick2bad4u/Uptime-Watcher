@@ -60,6 +60,8 @@
 
 import type { Tagged, UnknownRecord } from "type-fest";
 
+import * as z from "zod";
+
 import type { UptimeEvents } from "../events/eventTypes";
 import type { TypedEventBus } from "../events/TypedEventBus";
 
@@ -81,6 +83,16 @@ export type OperationalHookContext = Tagged<
  * Strongly typed identifier used to correlate long-running backend operations.
  */
 type OperationId = Tagged<string, "operation-id">;
+
+const operationIdSchema = z.custom<OperationId>(
+    (value): value is OperationId =>
+        typeof value === "string" &&
+        value.startsWith("op_") &&
+        value.length > 3,
+    {
+        message: "Operation ID must be a non-empty string starting with 'op_'",
+    }
+);
 
 /**
  * Author-supplied context accepted by operational hooks before normalization.
@@ -249,7 +261,10 @@ function generateOperationId(): OperationId {
         );
     }
 
-    return `op_${Date.now()}_${globalThis.crypto.randomUUID().slice(0, 8)}` as OperationId;
+    const candidate = `op_${Date.now()}_${globalThis.crypto
+        .randomUUID()
+        .slice(0, 8)}`;
+    return operationIdSchema.parse(candidate);
 }
 
 /**

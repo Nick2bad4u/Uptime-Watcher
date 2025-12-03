@@ -7,7 +7,7 @@ import { describe, expect, test } from "vitest";
 import {
     validateMonitorField,
     validateMonitorData,
-} from "../../validation/schemas.js";
+} from "../../validation/monitorSchemas";
 
 describe("Schemas - 100% Coverage Tests", () => {
     describe("Targeting Lines 399,482", () => {
@@ -30,7 +30,7 @@ describe("Schemas - 100% Coverage Tests", () => {
             expect(() => {
                 // Create a scenario that will trigger line 399 in validateFieldWithSchema
                 validateMonitorField("http", "unknownField", "test");
-            }).toThrow("Unknown field: unknownField");
+            }).toThrowError("Unknown field: unknownField");
         });
 
         test("should handle validation error categorization at line 482", ({

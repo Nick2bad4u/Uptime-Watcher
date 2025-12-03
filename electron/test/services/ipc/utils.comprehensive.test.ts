@@ -1689,7 +1689,7 @@ describe("IPC Utils - Comprehensive Coverage", () => {
                         null,
                         registeredHandlers
                     )
-                ).toThrow(
+                ).toThrowError(
                     `[IpcService] Attempted to register duplicate IPC handler for channel '${CHANNELS_FOR_TESTS.duplicate}'`
                 );
 
@@ -1724,7 +1724,7 @@ describe("IPC Utils - Comprehensive Coverage", () => {
                         null,
                         registeredHandlers
                     )
-                ).toThrow(registrationError);
+                ).toThrowError(registrationError);
 
                 expect(
                     registeredHandlers.has(CHANNELS_FOR_TESTS.failure)

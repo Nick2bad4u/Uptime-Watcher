@@ -19,9 +19,9 @@ import { test as fcTest } from "@fast-check/vitest";
 import { validateMonitorType, validateSite } from "../../utils/validation";
 import {
     validateMonitorData,
-    validateSiteData,
     validateMonitorField,
-} from "../../validation/schemas";
+} from "../../validation/monitorSchemas";
+import { validateSiteData } from "../../validation/siteSchemas";
 
 // =============================================================================
 // Custom Fast-Check Arbitraries for Validation Testing
@@ -98,7 +98,7 @@ describe("Validation Utils Comprehensive Fuzzing Tests", () => {
             (input) => {
                 expect(() => {
                     validateMonitorType(input);
-                }).not.toThrow();
+                }).not.toThrowError();
             }
         );
     });
@@ -127,7 +127,7 @@ describe("Validation Utils Comprehensive Fuzzing Tests", () => {
             (input) => {
                 expect(() => {
                     validateSite(input as any);
-                }).not.toThrow();
+                }).not.toThrowError();
             }
         );
     });
@@ -161,7 +161,7 @@ describe("Validation Utils Comprehensive Fuzzing Tests", () => {
             (input) => {
                 expect(() => {
                     validateSiteData(input as any);
-                }).not.toThrow();
+                }).not.toThrowError();
             }
         );
     });
@@ -195,7 +195,7 @@ describe("Validation Utils Comprehensive Fuzzing Tests", () => {
             (monitorType, input) => {
                 expect(() => {
                     validateMonitorData(monitorType, input as any);
-                }).not.toThrow();
+                }).not.toThrowError();
             }
         );
     });
@@ -231,7 +231,7 @@ describe("Validation Utils Comprehensive Fuzzing Tests", () => {
             (monitorType, fieldName, input) => {
                 expect(() => {
                     validateMonitorField(monitorType, fieldName, input as any);
-                }).not.toThrow();
+                }).not.toThrowError();
             }
         );
     });
@@ -251,7 +251,7 @@ describe("Validation Utils Comprehensive Fuzzing Tests", () => {
                 validateSite(specialObject as any);
                 validateSiteData(specialObject as any);
                 validateMonitorData("http", specialObject as any);
-            }).not.toThrow();
+            }).not.toThrowError();
         });
 
         fcTest.prop([
@@ -270,7 +270,7 @@ describe("Validation Utils Comprehensive Fuzzing Tests", () => {
 
             expect(() => {
                 validateSiteData(testObject as any);
-            }).not.toThrow();
+            }).not.toThrowError();
         });
 
         fcTest.prop([
@@ -291,7 +291,7 @@ describe("Validation Utils Comprehensive Fuzzing Tests", () => {
             expect(() => {
                 validateSite(testObject as any);
                 validateSiteData(testObject as any);
-            }).not.toThrow();
+            }).not.toThrowError();
         });
     });
 
@@ -319,7 +319,7 @@ describe("Validation Utils Comprehensive Fuzzing Tests", () => {
                     const result = validateSiteData(maliciousObject as any);
                     expect(result).toHaveProperty("success");
                     expect(result).toHaveProperty("errors");
-                }).not.toThrow();
+                }).not.toThrowError();
             }
         );
 
@@ -341,7 +341,7 @@ describe("Validation Utils Comprehensive Fuzzing Tests", () => {
             expect(() => {
                 const result = validateSiteData(testObject as any);
                 expect(typeof result).toBe("object");
-            }).not.toThrow();
+            }).not.toThrowError();
         });
     });
 });

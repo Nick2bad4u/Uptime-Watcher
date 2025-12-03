@@ -248,7 +248,7 @@ describe("StandardizedCache - Comprehensive Tests", () => {
                 cache.set("key1", "value1");
                 cache.delete("key1");
                 cache.clear();
-            }).not.toThrow();
+            }).not.toThrowError();
         });
     });
 
@@ -510,7 +510,7 @@ describe("StandardizedCache - Comprehensive Tests", () => {
             // This should not throw even though there's nothing to evict
             expect(() => {
                 smallCache.set("key1", "value1");
-            }).not.toThrow();
+            }).not.toThrowError();
         });
     });
 
@@ -1056,7 +1056,7 @@ describe("StandardizedCache - Comprehensive Tests", () => {
             expect(() => {
                 cache.set("key1", "value1");
                 cache.delete("key1");
-            }).not.toThrow();
+            }).not.toThrowError();
 
             expect(errorCallback).toHaveBeenCalled();
             expect(goodCallback).toHaveBeenCalled();
@@ -1142,7 +1142,7 @@ describe("StandardizedCache - Comprehensive Tests", () => {
 
             expect(() => {
                 cache.bulkUpdate([]);
-            }).not.toThrow();
+            }).not.toThrowError();
         });
 
         it("should update existing keys in bulk update", async ({
@@ -1361,7 +1361,7 @@ describe("StandardizedCache - Comprehensive Tests", () => {
 
             expect(() => {
                 cache.invalidate("nonexistent");
-            }).not.toThrow();
+            }).not.toThrowError();
         });
 
         it("should handle complex data types", async ({ task, annotate }) => {
@@ -1400,7 +1400,7 @@ describe("StandardizedCache - Comprehensive Tests", () => {
                     maxSize: 0,
                 });
                 cache.set("key1", "value1");
-            }).not.toThrow();
+            }).not.toThrowError();
         });
 
         it("should handle maxSize of 1", async ({ task, annotate }) => {

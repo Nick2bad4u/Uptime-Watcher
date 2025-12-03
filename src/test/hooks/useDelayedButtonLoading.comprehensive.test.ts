@@ -326,7 +326,7 @@ describe(useDelayedButtonLoading, () => {
             // Act & Assert - Should not throw
             expect(() => {
                 renderHook(() => useDelayedButtonLoading(undefined as any));
-            }).not.toThrow();
+            }).not.toThrowError();
         });
 
         it("should handle null isLoading parameter", async ({
@@ -341,7 +341,7 @@ describe(useDelayedButtonLoading, () => {
             // Act & Assert - Should not throw
             expect(() => {
                 renderHook(() => useDelayedButtonLoading(null as any));
-            }).not.toThrow();
+            }).not.toThrowError();
         });
 
         it("should handle very rapid successive calls", async ({
@@ -401,7 +401,7 @@ describe(useDelayedButtonLoading, () => {
                 act(() => vi.advanceTimersByTime(0));
 
                 expect(typeof result.current).toBe("boolean");
-            }).not.toThrow();
+            }).not.toThrowError();
         });
     });
 

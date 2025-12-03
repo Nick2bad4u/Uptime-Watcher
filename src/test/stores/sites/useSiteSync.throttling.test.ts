@@ -124,7 +124,7 @@ describe("useSiteSync throttling and edge cases", () => {
             .mockRejectedValueOnce(new Error("first failure"))
             .mockResolvedValueOnce(undefined);
 
-        await expect(actions.fullResyncSites()).rejects.toThrow(
+        await expect(actions.fullResyncSites()).rejects.toThrowError(
             "first failure"
         );
         await expect(actions.fullResyncSites()).resolves.toBeUndefined();

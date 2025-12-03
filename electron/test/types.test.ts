@@ -737,9 +737,9 @@ describe("Electron Types", () => {
             });
 
             // Valid statuses should work
-            expect(() => createMonitorWithStatus("up")).not.toThrow();
-            expect(() => createMonitorWithStatus("down")).not.toThrow();
-            expect(() => createMonitorWithStatus("pending")).not.toThrow();
+            expect(() => createMonitorWithStatus("up")).not.toThrowError();
+            expect(() => createMonitorWithStatus("down")).not.toThrowError();
+            expect(() => createMonitorWithStatus("pending")).not.toThrowError();
         });
 
         it("should validate timestamp as number in StatusHistory", async ({

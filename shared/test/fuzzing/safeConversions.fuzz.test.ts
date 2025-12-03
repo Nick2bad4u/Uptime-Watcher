@@ -77,7 +77,7 @@ describe("SafeConversions utilities fuzzing tests", () => {
         );
 
         test.prop([fc.anything()])("should never throw errors", (value) => {
-            expect(() => safeNumberConversion(value)).not.toThrow();
+            expect(() => safeNumberConversion(value)).not.toThrowError();
             expect(typeof safeNumberConversion(value)).toBe("number");
         });
 
@@ -174,7 +174,7 @@ describe("SafeConversions utilities fuzzing tests", () => {
         });
 
         test.prop([fc.anything()])("should never throw errors", (value) => {
-            expect(() => safeParseFloat(value)).not.toThrow();
+            expect(() => safeParseFloat(value)).not.toThrowError();
             expect(typeof safeParseFloat(value)).toBe("number");
         });
 
@@ -225,7 +225,7 @@ describe("SafeConversions utilities fuzzing tests", () => {
         );
 
         test.prop([fc.anything()])("should never throw errors", (value) => {
-            expect(() => safeParseInt(value)).not.toThrow();
+            expect(() => safeParseInt(value)).not.toThrowError();
             expect(typeof safeParseInt(value)).toBe("number");
             expect(Number.isInteger(safeParseInt(value))).toBeTruthy();
         });
@@ -483,16 +483,16 @@ describe("SafeConversions utilities fuzzing tests", () => {
         test.prop([fc.anything()])(
             "all functions should never throw errors",
             (value) => {
-                expect(() => safeNumberConversion(value)).not.toThrow();
-                expect(() => safeParseCheckInterval(value)).not.toThrow();
-                expect(() => safeParseFloat(value)).not.toThrow();
-                expect(() => safeParseInt(value)).not.toThrow();
-                expect(() => safeParsePercentage(value)).not.toThrow();
-                expect(() => safeParsePort(value)).not.toThrow();
-                expect(() => safeParsePositiveInt(value)).not.toThrow();
-                expect(() => safeParseRetryAttempts(value)).not.toThrow();
-                expect(() => safeParseTimeout(value)).not.toThrow();
-                expect(() => safeParseTimestamp(value)).not.toThrow();
+                expect(() => safeNumberConversion(value)).not.toThrowError();
+                expect(() => safeParseCheckInterval(value)).not.toThrowError();
+                expect(() => safeParseFloat(value)).not.toThrowError();
+                expect(() => safeParseInt(value)).not.toThrowError();
+                expect(() => safeParsePercentage(value)).not.toThrowError();
+                expect(() => safeParsePort(value)).not.toThrowError();
+                expect(() => safeParsePositiveInt(value)).not.toThrowError();
+                expect(() => safeParseRetryAttempts(value)).not.toThrowError();
+                expect(() => safeParseTimeout(value)).not.toThrowError();
+                expect(() => safeParseTimestamp(value)).not.toThrowError();
             }
         );
 
@@ -516,9 +516,9 @@ describe("SafeConversions utilities fuzzing tests", () => {
             "functions should handle numeric strings without throwing",
             (numStr) => {
                 // All functions should return numbers without throwing
-                expect(() => safeNumberConversion(numStr)).not.toThrow();
-                expect(() => safeParseFloat(numStr)).not.toThrow();
-                expect(() => safeParseInt(numStr)).not.toThrow();
+                expect(() => safeNumberConversion(numStr)).not.toThrowError();
+                expect(() => safeParseFloat(numStr)).not.toThrowError();
+                expect(() => safeParseInt(numStr)).not.toThrowError();
 
                 const baseNum = safeNumberConversion(numStr);
                 const floatNum = safeParseFloat(numStr);

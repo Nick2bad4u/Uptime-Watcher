@@ -261,7 +261,7 @@ describe("Event System - 100% Fast-Check Fuzzing Coverage", () => {
                 // Event emission should throw due to middleware error
                 await expect(
                     eventBus.emitTyped(eventType as UptimeEventName, payload)
-                ).rejects.toThrow("Middleware error");
+                ).rejects.toThrowError("Middleware error");
 
                 // Listener should not be called due to middleware error
                 expect(listener).not.toHaveBeenCalled();
@@ -297,7 +297,7 @@ describe("Event System - 100% Fast-Check Fuzzing Coverage", () => {
             eventBus.clearMiddleware();
 
             // Verify basic functionality still works
-            expect(() => eventBus.clearMiddleware()).not.toThrow();
+            expect(() => eventBus.clearMiddleware()).not.toThrowError();
         });
     });
 
@@ -380,7 +380,7 @@ describe("Event System - 100% Fast-Check Fuzzing Coverage", () => {
                     eventBus.emitTyped(eventType as UptimeEventName, {
                         test: true,
                     })
-                ).resolves.not.toThrow();
+                ).resolves.not.toThrowError();
             }
         );
 
@@ -424,7 +424,7 @@ describe("Event System - 100% Fast-Check Fuzzing Coverage", () => {
                 limitedBus.registerMiddleware(
                     vi.fn().mockImplementation(async (_e, _d, n) => await n())
                 );
-            }).toThrow("Maximum middleware limit");
+            }).toThrowError("Maximum middleware limit");
         });
 
         test("should handle invalid constructor options", () => {
@@ -432,13 +432,13 @@ describe("Event System - 100% Fast-Check Fuzzing Coverage", () => {
                 new TypedEventBus<UptimeEvents>("invalid", {
                     maxMiddleware: 0,
                 });
-            }).toThrow("maxMiddleware must be positive");
+            }).toThrowError("maxMiddleware must be positive");
 
             expect(() => {
                 new TypedEventBus<UptimeEvents>("invalid", {
                     maxMiddleware: -1,
                 });
-            }).toThrow("maxMiddleware must be positive");
+            }).toThrowError("maxMiddleware must be positive");
         });
     });
 

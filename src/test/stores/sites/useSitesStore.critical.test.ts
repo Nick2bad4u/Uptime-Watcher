@@ -611,7 +611,7 @@ describe("useSitesStore Function Coverage Tests", () => {
                     identifier: "test-site",
                     name: "Test Site",
                 })
-            ).rejects.toThrow("Network error");
+            ).rejects.toThrowError("Network error");
         });
 
         it("should handle errors in monitoring operations gracefully", async () => {
@@ -626,7 +626,7 @@ describe("useSitesStore Function Coverage Tests", () => {
             // Test that errors are handled gracefully (thrown after state management)
             await expect(
                 store.startSiteMonitoring("test-site")
-            ).rejects.toThrow("Monitoring error");
+            ).rejects.toThrowError("Monitoring error");
         });
 
         it("should handle errors in sync operations gracefully", async () => {

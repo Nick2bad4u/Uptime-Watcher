@@ -1336,7 +1336,7 @@ describe("Form Utilities", () => {
                 target: { value: "test" },
             } as React.ChangeEvent<HTMLInputElement>;
 
-            expect(() => handler(mockEvent)).toThrow("Validation error");
+            expect(() => handler(mockEvent)).toThrowError("Validation error");
             expect(setValue).not.toHaveBeenCalled();
         });
     });
@@ -1431,7 +1431,7 @@ describe("Form Utilities", () => {
                 target: { value: "test" },
             } as React.ChangeEvent<HTMLInputElement>;
 
-            expect(() => handler(mockEvent)).toThrow("Conversion error");
+            expect(() => handler(mockEvent)).toThrowError("Conversion error");
             expect(setValue).not.toHaveBeenCalled();
         });
 
@@ -1451,7 +1451,7 @@ describe("Form Utilities", () => {
                 target: { value: "123" },
             } as React.ChangeEvent<HTMLInputElement>;
 
-            expect(() => handler(mockEvent)).toThrow("Validation error");
+            expect(() => handler(mockEvent)).toThrowError("Validation error");
             expect(setValue).not.toHaveBeenCalled();
         });
 

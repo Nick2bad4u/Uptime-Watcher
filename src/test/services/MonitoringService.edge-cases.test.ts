@@ -137,7 +137,7 @@ describe("MonitoringService edge cases", () => {
 
         await expect(
             MonitoringService.startMonitoringForMonitor("site-x", "monitor-y")
-        ).rejects.toThrow(
+        ).rejects.toThrowError(
             "Failed to start monitoring for monitor monitor-y of site site-x: Backend operation failed"
         );
     });
@@ -147,7 +147,7 @@ describe("MonitoringService edge cases", () => {
 
         await expect(
             MonitoringService.startMonitoringForSite("site-z")
-        ).rejects.toThrow(
+        ).rejects.toThrowError(
             "Failed to start monitoring for site site-z: Backend operation failed"
         );
     });
@@ -207,7 +207,7 @@ describe("MonitoringService edge cases", () => {
                 "site-err",
                 "monitor-err"
             )
-        ).rejects.toThrow(
+        ).rejects.toThrowError(
             "Failed to stop monitoring for monitor monitor-err of site site-err: Backend operation failed"
         );
     });
@@ -217,7 +217,7 @@ describe("MonitoringService edge cases", () => {
 
         await expect(
             MonitoringService.stopMonitoringForSite("site-stop")
-        ).rejects.toThrow(
+        ).rejects.toThrowError(
             "Failed to stop monitoring for site site-stop: Backend operation failed"
         );
     });

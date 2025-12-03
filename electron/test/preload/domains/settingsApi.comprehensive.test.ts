@@ -58,7 +58,7 @@ describe("settingsApi", () => {
     it("throws when IPC returns failure", async () => {
         vi.mocked(ipcRenderer.invoke).mockResolvedValueOnce({ success: false });
 
-        await expect(settingsApi.getHistoryLimit()).rejects.toThrow(
+        await expect(settingsApi.getHistoryLimit()).rejects.toThrowError(
             /ipc operation failed/i
         );
     });
@@ -69,7 +69,7 @@ describe("settingsApi", () => {
             error: "reset failed",
         });
 
-        await expect(settingsApi.resetSettings()).rejects.toThrow(
+        await expect(settingsApi.resetSettings()).rejects.toThrowError(
             /reset failed/i
         );
     });

@@ -88,7 +88,7 @@ describe("fileDownload utilities - Comprehensive Fast-Check Coverage", () => {
                         };
 
                         // Should not throw
-                        expect(() => downloadFile(options)).not.toThrow();
+                        expect(() => downloadFile(options)).not.toThrowError();
 
                         // Verify Blob creation
                         expect(mockBlob).toHaveBeenCalledWith([buffer], {
@@ -136,7 +136,7 @@ describe("fileDownload utilities - Comprehensive Fast-Check Coverage", () => {
                             throw new Error("createObjectURL failed");
                         });
 
-                        expect(() => downloadFile(options)).toThrow(
+                        expect(() => downloadFile(options)).toThrowError(
                             "createObjectURL failed"
                         );
                     }
@@ -173,7 +173,7 @@ describe("fileDownload utilities - Comprehensive Fast-Check Coverage", () => {
                         });
 
                         // Should not throw as fallback should work
-                        expect(() => downloadFile(options)).not.toThrow();
+                        expect(() => downloadFile(options)).not.toThrowError();
 
                         // Should be called at least once for original attempt and once for fallback
                         expect(
@@ -202,7 +202,7 @@ describe("fileDownload utilities - Comprehensive Fast-Check Coverage", () => {
                             throw new Error("DOM manipulation failed");
                         });
 
-                        expect(() => downloadFile(options)).not.toThrow();
+                        expect(() => downloadFile(options)).not.toThrowError();
 
                         // Should still try to click even with DOM error
                         expect(mockAnchor.click).toHaveBeenCalled();
@@ -227,7 +227,7 @@ describe("fileDownload utilities - Comprehensive Fast-Check Coverage", () => {
                             throw new Error("createElement not available");
                         });
 
-                        expect(() => downloadFile(options)).toThrow(
+                        expect(() => downloadFile(options)).toThrowError(
                             "createElement not available"
                         );
                     }
@@ -251,7 +251,7 @@ describe("fileDownload utilities - Comprehensive Fast-Check Coverage", () => {
                             throw new Error("Click failed");
                         });
 
-                        expect(() => downloadFile(options)).toThrow(
+                        expect(() => downloadFile(options)).toThrowError(
                             "Click failed"
                         );
                     }
@@ -275,7 +275,7 @@ describe("fileDownload utilities - Comprehensive Fast-Check Coverage", () => {
                             throw "string error"; // Non-Error object
                         });
 
-                        expect(() => downloadFile(options)).not.toThrow();
+                        expect(() => downloadFile(options)).not.toThrowError();
                         expect(mockAnchor.click).toHaveBeenCalled();
                     }
                 )
@@ -299,7 +299,7 @@ describe("fileDownload utilities - Comprehensive Fast-Check Coverage", () => {
                             throw new Error("appendChild failed");
                         });
 
-                        expect(() => downloadFile(options)).toThrow(
+                        expect(() => downloadFile(options)).toThrowError(
                             "File download failed"
                         );
                     }
@@ -408,7 +408,7 @@ describe("fileDownload utilities - Comprehensive Fast-Check Coverage", () => {
 
                         await expect(
                             handleSQLiteBackupDownload(downloadFunction)
-                        ).resolves.not.toThrow();
+                        ).resolves.not.toThrowError();
 
                         expect(downloadFunction).toHaveBeenCalled();
                         expectBlobCalledWithLength(backupData.length);
@@ -440,7 +440,7 @@ describe("fileDownload utilities - Comprehensive Fast-Check Coverage", () => {
 
                         await expect(
                             handleSQLiteBackupDownload(downloadFunction)
-                        ).rejects.toThrow("Invalid backup data received");
+                        ).rejects.toThrowError("Invalid backup data received");
                     }
                 )
             );
@@ -461,7 +461,7 @@ describe("fileDownload utilities - Comprehensive Fast-Check Coverage", () => {
 
                         await expect(
                             handleSQLiteBackupDownload(downloadFunction)
-                        ).rejects.toThrow("Download trigger failed");
+                        ).rejects.toThrowError("Download trigger failed");
 
                         expect(mockURL.revokeObjectURL).toHaveBeenCalled();
                     }
@@ -484,7 +484,7 @@ describe("fileDownload utilities - Comprehensive Fast-Check Coverage", () => {
 
                         await expect(
                             handleSQLiteBackupDownload(downloadFunction)
-                        ).rejects.toThrow("Download trigger failed");
+                        ).rejects.toThrowError("Download trigger failed");
 
                         expect(mockURL.revokeObjectURL).toHaveBeenCalled();
                     }
@@ -539,7 +539,7 @@ describe("fileDownload utilities - Comprehensive Fast-Check Coverage", () => {
 
                         await expect(
                             handleSQLiteBackupDownload(downloadFunction)
-                        ).rejects.toThrow(errorMessage);
+                        ).rejects.toThrowError(errorMessage);
 
                         expect(downloadFunction).toHaveBeenCalled();
                         expect(mockBlob).not.toHaveBeenCalled();
@@ -558,7 +558,7 @@ describe("fileDownload utilities - Comprehensive Fast-Check Coverage", () => {
                 mimeType: "text/plain",
             };
 
-            expect(() => downloadFile(options)).not.toThrow();
+            expect(() => downloadFile(options)).not.toThrowError();
             expect(mockBlob).toHaveBeenCalledWith([options.buffer], {
                 type: "text/plain",
             });
@@ -574,7 +574,7 @@ describe("fileDownload utilities - Comprehensive Fast-Check Coverage", () => {
                             fileName: longFileName,
                         };
 
-                        expect(() => downloadFile(options)).not.toThrow();
+                        expect(() => downloadFile(options)).not.toThrowError();
                         expect(mockAnchor.download).toBe(longFileName);
                     }
                 )
@@ -593,7 +593,7 @@ describe("fileDownload utilities - Comprehensive Fast-Check Coverage", () => {
                             fileName,
                         };
 
-                        expect(() => downloadFile(options)).not.toThrow();
+                        expect(() => downloadFile(options)).not.toThrowError();
                         expect(mockAnchor.download).toBe(fileName);
                     }
                 )
@@ -607,7 +607,7 @@ describe("fileDownload utilities - Comprehensive Fast-Check Coverage", () => {
                 // No mimeType provided
             };
 
-            expect(() => downloadFile(options)).not.toThrow();
+            expect(() => downloadFile(options)).not.toThrowError();
             expect(mockBlob).toHaveBeenCalledWith([options.buffer], {
                 type: "application/octet-stream",
             });

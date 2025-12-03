@@ -54,7 +54,7 @@ describe("Backend Validation Fuzzing Tests", () => {
 
                             const result = isValidMonitorType(type);
                             expect(typeof result).toBe("boolean");
-                        }).not.toThrow();
+                        }).not.toThrowError();
                     }
                 )
             );
@@ -108,7 +108,7 @@ describe("Backend Validation Fuzzing Tests", () => {
 
                             const result = hasRequiredFields(monitorData);
                             expect(typeof result).toBe("boolean");
-                        }).not.toThrow();
+                        }).not.toThrowError();
                     }
                 )
             );
@@ -179,7 +179,7 @@ describe("Backend Validation Fuzzing Tests", () => {
                                 // Property: should have reasonable length limits
                                 expect(sanitized.length).toBeLessThan(2001);
                             }
-                        }).not.toThrow();
+                        }).not.toThrowError();
                     }
                 )
             );
@@ -259,7 +259,7 @@ describe("Backend Validation Fuzzing Tests", () => {
                                     253
                                 );
                             }
-                        }).not.toThrow();
+                        }).not.toThrowError();
                     }
                 )
             );
@@ -299,7 +299,7 @@ describe("Backend Validation Fuzzing Tests", () => {
 
                             const result = isValidPort(value);
                             expect(typeof result).toBe("boolean");
-                        }).not.toThrow();
+                        }).not.toThrowError();
 
                         // Test timeout validation
                         expect(() => {
@@ -314,7 +314,7 @@ describe("Backend Validation Fuzzing Tests", () => {
 
                             const result = isValidTimeout(value);
                             expect(typeof result).toBe("boolean");
-                        }).not.toThrow();
+                        }).not.toThrowError();
                     }
                 )
             );
@@ -357,7 +357,7 @@ describe("Backend Validation Fuzzing Tests", () => {
 
                             const result = containsSqlInjection(input);
                             expect(typeof result).toBe("boolean");
-                        }).not.toThrow();
+                        }).not.toThrowError();
                     }
                 )
             );

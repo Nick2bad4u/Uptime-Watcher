@@ -176,7 +176,7 @@ describe("operationalHooks.ts - Branch Coverage", () => {
                     throwOnFailure: true,
                     initialDelay: 10,
                 })
-            ).rejects.toThrow("Persistent failure");
+            ).rejects.toThrowError("Persistent failure");
 
             expect(mockOperation).toHaveBeenCalledTimes(2);
         });
@@ -343,7 +343,7 @@ describe("operationalHooks.ts - Branch Coverage", () => {
                     onFailure,
                     initialDelay: 10,
                 })
-            ).rejects.toThrow();
+            ).rejects.toThrowError();
 
             expect(onFailure).toHaveBeenCalledWith(expect.any(Error), 2);
         });
@@ -369,7 +369,7 @@ describe("operationalHooks.ts - Branch Coverage", () => {
                     maxRetries: 1,
                     initialDelay: 10,
                 })
-            ).rejects.toThrow("string error");
+            ).rejects.toThrowError("string error");
         });
         it("should handle null/undefined thrown", async ({
             task,
@@ -391,7 +391,7 @@ describe("operationalHooks.ts - Branch Coverage", () => {
                     maxRetries: 1,
                     initialDelay: 10,
                 })
-            ).rejects.toThrow("null");
+            ).rejects.toThrowError("null");
         });
         it("should handle callback errors gracefully", async ({
             task,
@@ -445,7 +445,7 @@ describe("operationalHooks.ts - Branch Coverage", () => {
                     maxRetries: 1,
                     failureLogLevel: () => "warn",
                 })
-            ).rejects.toThrow("Cancellation");
+            ).rejects.toThrowError("Cancellation");
 
             expect(loggerModule.logger.warn).toHaveBeenCalled();
             expect(loggerModule.logger.error).not.toHaveBeenCalled();
@@ -476,7 +476,7 @@ describe("operationalHooks.ts - Branch Coverage", () => {
                         throw classifierError;
                     },
                 })
-            ).rejects.toThrow("classification failure");
+            ).rejects.toThrowError("classification failure");
 
             expect(loggerModule.logger.debug).toHaveBeenCalledWith(
                 expect.stringContaining("failureLogLevel callback failed"),

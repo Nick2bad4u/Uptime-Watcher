@@ -135,7 +135,7 @@ describe("useBackendFocusSync Hook", () => {
             const { unmount } = renderHook(() => useBackendFocusSync(false));
 
             // Should not throw when unmounting
-            expect(() => unmount()).not.toThrow();
+            expect(() => unmount()).not.toThrowError();
             expect(mockRemoveEventListener).not.toHaveBeenCalled();
         });
     });
@@ -432,7 +432,7 @@ describe("useBackendFocusSync Hook", () => {
                 if (focusHandler) {
                     focusHandler();
                 }
-            }).not.toThrow();
+            }).not.toThrowError();
         });
 
         it("should handle fullResyncSites returning a rejected promise", async ({
@@ -457,7 +457,7 @@ describe("useBackendFocusSync Hook", () => {
                 if (focusHandler) {
                     focusHandler();
                 }
-            }).not.toThrow();
+            }).not.toThrowError();
         });
 
         it("should work with truthy non-boolean values for enabled", async ({

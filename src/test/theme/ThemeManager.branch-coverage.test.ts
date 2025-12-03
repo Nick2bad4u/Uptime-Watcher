@@ -55,7 +55,7 @@ describe("ThemeManager - Branch Coverage Completion", () => {
                     shadows: { sm: "", md: "", lg: "" },
                     borderRadius: { sm: "", md: "", lg: "" },
                 });
-            }).not.toThrow();
+            }).not.toThrowError();
 
             // Restore document
             Object.defineProperty(globalThis, "document", {
@@ -88,7 +88,7 @@ describe("ThemeManager - Branch Coverage Completion", () => {
             expect(typeof cleanup).toBe("function");
 
             // Cleanup function should not throw
-            expect(() => cleanup()).not.toThrow();
+            expect(() => cleanup()).not.toThrowError();
 
             // Restore window
             Object.defineProperty(globalThis, "window", {

@@ -186,9 +186,15 @@ describe("High-Impact Branch Coverage Tests", () => {
             await annotate("Type: Error Handling", "type");
 
             try {
-                const validationModule = await import(
-                    "../../shared/validation/schemas.js"
-                );
+                const [monitorSchemasModule, siteSchemasModule] =
+                    await Promise.all([
+                        import("../../shared/validation/monitorSchemas.js"),
+                        import("../../shared/validation/siteSchemas.js"),
+                    ]);
+                const validationModule = {
+                    ...monitorSchemasModule,
+                    ...siteSchemasModule,
+                } as const;
 
                 if (validationModule.validateMonitorData) {
                     // Test invalid monitor type

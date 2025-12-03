@@ -121,7 +121,7 @@ describe("monitoringApi", () => {
     it("propagates ipc invocation failures", async () => {
         vi.mocked(ipcRenderer.invoke).mockResolvedValueOnce({ success: false });
 
-        await expect(monitoringApi.startMonitoring()).rejects.toThrow(
+        await expect(monitoringApi.startMonitoring()).rejects.toThrowError(
             /ipc operation failed/i
         );
     });

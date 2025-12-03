@@ -385,7 +385,7 @@ describe("useMonitorTypesStore - 100% Coverage Simplified", () => {
             await act(async () => {
                 await expect(
                     result.current.formatMonitorDetail("http", "details")
-                ).rejects.toThrow("Formatting failed");
+                ).rejects.toThrowError("Formatting failed");
             });
         });
     });

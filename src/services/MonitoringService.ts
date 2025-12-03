@@ -43,10 +43,7 @@ import type {
 import type { ZodError } from "zod";
 
 import { ensureError } from "@shared/utils/errorHandling";
-import {
-    type StatusUpdateParseResult,
-    validateStatusUpdate,
-} from "@shared/validation/guards";
+import { validateStatusUpdate } from "@shared/validation/guards";
 
 import { logger } from "./logger";
 import { getIpcServiceHelpers } from "./utils/createIpcServiceHelpers";
@@ -105,11 +102,6 @@ const logInvalidStatusUpdateAndThrow = (
         { cause: error }
     );
 };
-
-const isStatusUpdateValidationFailure = (
-    result: StatusUpdateParseResult
-): result is Extract<StatusUpdateParseResult, { success: false }> =>
-    !result.success;
 
 interface MonitoringServiceContract {
     checkSiteNow: (
@@ -170,7 +162,7 @@ export const MonitoringService: MonitoringServiceContract = {
 
             const validationResult = validateStatusUpdate(rawStatusUpdate);
 
-            if (isStatusUpdateValidationFailure(validationResult)) {
+            if (!validationResult.success) {
                 return logInvalidStatusUpdateAndThrow(validationResult.error, {
                     monitorId,
                     siteIdentifier,

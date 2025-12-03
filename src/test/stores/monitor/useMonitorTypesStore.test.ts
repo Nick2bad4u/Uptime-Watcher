@@ -313,7 +313,7 @@ describe(useMonitorTypesStore, () => {
             await act(async () => {
                 await result.current.formatMonitorDetail("http", "Raw detail");
             });
-        }).rejects.toThrow("Formatting failed");
+        }).rejects.toThrowError("Formatting failed");
 
         // Error should be set in store state
         expect(result.current.lastError).toBe("Formatting failed");
@@ -423,7 +423,7 @@ describe(useMonitorTypesStore, () => {
                         url: "https://example.com",
                     });
                 });
-            }).rejects.toThrow("Backend unavailable");
+            }).rejects.toThrowError("Backend unavailable");
 
             // Error should be set in store state
             expect(result.current.lastError).toBe("Backend unavailable");

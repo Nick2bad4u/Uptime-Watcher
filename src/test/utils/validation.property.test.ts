@@ -808,10 +808,10 @@ describe("Validation Utils Property-Based Tests", () => {
             "should handle very long strings",
             (longString) => {
                 // Functions should not crash on very long inputs
-                expect(() => isNonEmptyString(longString)).not.toThrow();
-                expect(() => isValidFQDN(longString)).not.toThrow();
-                expect(() => isValidIdentifier(longString)).not.toThrow();
-                expect(() => isValidUrl(longString)).not.toThrow();
+                expect(() => isNonEmptyString(longString)).not.toThrowError();
+                expect(() => isValidFQDN(longString)).not.toThrowError();
+                expect(() => isValidIdentifier(longString)).not.toThrowError();
+                expect(() => isValidUrl(longString)).not.toThrowError();
             }
         );
 
@@ -825,8 +825,8 @@ describe("Validation Utils Property-Based Tests", () => {
             ),
         ])("should handle extreme numeric values", (extremeValue) => {
             // Numeric validation functions should handle extreme values
-            expect(() => isValidPort(extremeValue)).not.toThrow();
-            expect(() => safeInteger(extremeValue, 0)).not.toThrow();
+            expect(() => isValidPort(extremeValue)).not.toThrowError();
+            expect(() => safeInteger(extremeValue, 0)).not.toThrowError();
         });
     });
 

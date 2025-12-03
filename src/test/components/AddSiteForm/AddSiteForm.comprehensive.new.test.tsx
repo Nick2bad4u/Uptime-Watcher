@@ -840,7 +840,7 @@ describe("AddSiteForm - Comprehensive Tests", () => {
                 setUrl: mockSetUrl,
             });
 
-            expect(() => render(<AddSiteForm />)).not.toThrow();
+            expect(() => render(<AddSiteForm />)).not.toThrowError();
         });
     });
 });

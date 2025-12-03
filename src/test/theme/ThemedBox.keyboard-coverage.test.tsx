@@ -241,7 +241,7 @@ describe("ThemedBox - Keyboard Interaction Coverage", () => {
             expect(() => {
                 fireEvent.keyDown(box, { key: "Enter" });
                 fireEvent.keyDown(box, { key: " " });
-            }).not.toThrow();
+            }).not.toThrowError();
         });
     });
 

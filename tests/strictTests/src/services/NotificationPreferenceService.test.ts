@@ -143,7 +143,7 @@ describe("NotificationPreferenceService (strict coverage)", () => {
 
         await expect(
             NotificationPreferenceService.updatePreferences(preferences)
-        ).rejects.toThrow(
+        ).rejects.toThrowError(
             /Notification bridge unavailable|missing updatePreferences/
         );
         expect(updateBridgeSpy).not.toHaveBeenCalled();

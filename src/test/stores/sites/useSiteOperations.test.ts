@@ -212,7 +212,7 @@ describe(createSiteOperationsActions, () => {
 
             await expect(
                 actions.addMonitorToSite("nonexistent-site", mockMonitor)
-            ).rejects.toThrow(ERROR_CATALOG.sites.NOT_FOUND);
+            ).rejects.toThrowError(ERROR_CATALOG.sites.NOT_FOUND);
         });
     });
 
@@ -407,7 +407,7 @@ describe(createSiteOperationsActions, () => {
             const error = new Error("Delete failed");
             mockElectronAPI.sites.removeSite.mockRejectedValue(error);
 
-            await expect(actions.deleteSite("test-site")).rejects.toThrow(
+            await expect(actions.deleteSite("test-site")).rejects.toThrowError(
                 "Delete failed"
             );
             expect(mockDeps.removeSite).not.toHaveBeenCalled();
@@ -424,7 +424,7 @@ describe(createSiteOperationsActions, () => {
 
             mockElectronAPI.sites.removeSite.mockResolvedValueOnce(false);
 
-            await expect(actions.deleteSite("test-site")).rejects.toThrow(
+            await expect(actions.deleteSite("test-site")).rejects.toThrowError(
                 "Site removal failed for test-site: Backend returned false"
             );
             expect(mockDeps.removeSite).not.toHaveBeenCalled();
@@ -485,7 +485,7 @@ describe(createSiteOperationsActions, () => {
                 new Error("Backend error")
             );
 
-            await expect(actions.initializeSites()).rejects.toThrow(
+            await expect(actions.initializeSites()).rejects.toThrowError(
                 "Backend error"
             );
         });
@@ -540,7 +540,7 @@ describe(createSiteOperationsActions, () => {
 
             await expect(
                 actions.modifySite("test-site", { name: "Updated" })
-            ).rejects.toThrow("Update failed");
+            ).rejects.toThrowError("Update failed");
             expect(mockDeps.setSites).not.toHaveBeenCalled();
         });
 

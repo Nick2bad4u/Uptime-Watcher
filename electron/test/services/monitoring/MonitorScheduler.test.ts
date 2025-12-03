@@ -396,7 +396,7 @@ describe(MonitorScheduler, () => {
             await annotate("Category: Service", "category");
             await annotate("Type: Monitoring", "type");
 
-            expect(() => scheduler.stopSite("site-1", [])).not.toThrow();
+            expect(() => scheduler.stopSite("site-1", [])).not.toThrowError();
         });
     });
 
@@ -436,7 +436,7 @@ describe(MonitorScheduler, () => {
             await annotate("Category: Service", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(() => scheduler.stopAll()).not.toThrow();
+            expect(() => scheduler.stopAll()).not.toThrowError();
             expect(scheduler["intervals"].size).toBe(0);
         });
     });

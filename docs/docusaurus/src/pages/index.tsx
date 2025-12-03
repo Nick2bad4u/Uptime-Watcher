@@ -141,11 +141,15 @@ const UIDemo = (): JSX.Element => {
             <div className={styles["appHeader"]}>
                 <div className={styles["appButtons"]}>
                     <span className={styles["appButtonRed"]} />
+
                     <span className={styles["appButtonYellow"]} />
+
                     <span className={styles["appButtonGreen"]} />
                 </div>
+
                 <span className={styles["appTitle"]}>Uptime Watcher</span>
             </div>
+
             <div className={styles["appBody"]}>
                 <div className={styles["appToolbar"]}>
                     <button
@@ -156,10 +160,12 @@ const UIDemo = (): JSX.Element => {
                     >
                         + Add Site (Demo)
                     </button>
+
                     <span className={styles["statusCount"]}>
                         {sites.length} sites monitored
                     </span>
                 </div>
+
                 <div className={styles["siteList"]}>
                     {sites.map((site) => (
                         <div key={site.url} className={styles["siteItem"]}>
@@ -168,14 +174,17 @@ const UIDemo = (): JSX.Element => {
                                     className={styles["statusDot"]}
                                     data-status={site.status}
                                 />
+
                                 <span className={styles["siteUrl"]}>
                                     {site.url}
                                 </span>
                             </div>
+
                             <div className={styles["siteMetrics"]}>
                                 <span className={styles["responseTime"]}>
                                     {site.responseTime}
                                 </span>
+
                                 <span className={styles["uptime"]}>
                                     {site.uptime}
                                 </span>
@@ -209,11 +218,13 @@ const HomepageHeader = (): JSX.Element => (
                                 No drama, just monitoring.
                             </span>
                         </Heading>
+
                         <p className={styles["heroSubtitle"]}>
                             A no-nonsense desktop app for developers and
                             sysadmins who need to know when their stuff breaks.
                             Built by someone who&apos;s been there at 3am.
                         </p>
+
                         <div className={styles["heroCta"]}>
                             <Link
                                 className={clsx(
@@ -225,6 +236,7 @@ const HomepageHeader = (): JSX.Element => (
                             >
                                 Download Latest
                             </Link>
+
                             <Link
                                 className={clsx(
                                     "button",
@@ -235,9 +247,11 @@ const HomepageHeader = (): JSX.Element => (
                             >
                                 View Docs
                             </Link>
+
                             <GitHubStatsComponent />
                         </div>
                     </div>
+
                     <div className={styles["heroDemo"]}>
                         <UIDemo />
                     </div>
@@ -256,6 +270,7 @@ const HomepageHeader = (): JSX.Element => (
                 <Heading as="h2" className={styles["sectionTitle"]}>
                     🚨 Real monitoring stories from the field
                 </Heading>
+
                 <div className={styles["statusGrid"]}>
                     <div
                         className={clsx(
@@ -267,10 +282,12 @@ const HomepageHeader = (): JSX.Element => (
                             <span className={styles["statusIndicator"]}>
                                 🔴
                             </span>
+
                             <span className={styles["statusText"]}>
                                 Saved my ass at 2am
                             </span>
                         </div>
+
                         <p className={styles["statusDescription"]}>
                             &quot;Got woken up by notification that payment API
                             was down. Fixed it before any customers noticed.
@@ -278,6 +295,7 @@ const HomepageHeader = (): JSX.Element => (
                             Engineer
                         </p>
                     </div>
+
                     <div
                         className={clsx(
                             styles["statusCard"],
@@ -288,16 +306,19 @@ const HomepageHeader = (): JSX.Element => (
                             <span className={styles["statusIndicator"]}>
                                 🟢
                             </span>
+
                             <span className={styles["statusText"]}>
                                 Finally, monitoring that works
                             </span>
                         </div>
+
                         <p className={styles["statusDescription"]}>
                             &quot;No cloud dependencies, no monthly fees, no
                             bullshit. Just install and it works. Monitors 15
                             sites without breaking a sweat.&quot; - Solo Dev
                         </p>
                     </div>
+
                     <div
                         className={clsx(
                             styles["statusCard"],
@@ -308,10 +329,12 @@ const HomepageHeader = (): JSX.Element => (
                             <span className={styles["statusIndicator"]}>
                                 🟡
                             </span>
+
                             <span className={styles["statusText"]}>
                                 Lightweight beast
                             </span>
                         </div>
+
                         <p className={styles["statusDescription"]}>
                             &quot;Runs on my old laptop, checks 50+ endpoints,
                             uses less RAM than my Slack app. How is this even
@@ -335,30 +358,37 @@ const HomepageHeader = (): JSX.Element => (
                         <Heading as="h2">
                             Built by developers, for developers
                         </Heading>
+
                         <p>
                             No marketing BS. This started because existing
                             solutions sucked - either too expensive, too
                             complicated, or required uploading your data to
                             someone else&apos;s cloud.
                         </p>
+
                         <div className={styles["techFeatures"]}>
                             <div className={styles["techFeature"]}>
                                 <strong>🛠️ Actually Open Source</strong>
+
                                 <p>
                                     Real open source, not &quot;open core&quot;.
                                     Fork it, modify it, break it. Your choice.
                                 </p>
                             </div>
+
                             <div className={styles["techFeature"]}>
                                 <strong>💾 Your Data Stays Yours</strong>
+
                                 <p>
                                     SQLite database on your machine. No cloud,
                                     no tracking, no data mining your uptime
                                     patterns.
                                 </p>
                             </div>
+
                             <div className={styles["techFeature"]}>
                                 <strong>⚡ Stupid Fast</strong>
+
                                 <p>
                                     Electron + React + TypeScript. Modern stack,
                                     but optimized for performance, not just
@@ -367,10 +397,12 @@ const HomepageHeader = (): JSX.Element => (
                             </div>
                         </div>
                     </div>
+
                     <div className={styles["techCode"]}>
                         <div className={styles["codeBlock"]}>
                             <div className={styles["codeHeader"]}>
                                 <span>package.json</span>
+
                                 <div className={styles["codeActions"]}>
                                     <button
                                         type="button"
@@ -379,6 +411,7 @@ const HomepageHeader = (): JSX.Element => (
                                     >
                                         📋 Copy
                                     </button>
+
                                     {/* eslint-disable-next-line @docusaurus/no-html-links -- External GitHub link requires standard HTML anchor */}
                                     <a
                                         href="https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/package.json"
@@ -390,6 +423,7 @@ const HomepageHeader = (): JSX.Element => (
                                     </a>
                                 </div>
                             </div>
+
                             <pre className={styles["codeContent"]}>
                                 {`{
     "name": "uptime-watcher",
@@ -433,9 +467,12 @@ export default function Home(): JSX.Element {
             description="Open-source desktop app for monitoring website uptime. No cloud, no monthly fees, no drama."
         >
             <HomepageHeader />
+
             <main>
                 <HomepageFeatures />
+
                 <RealTimeStatus />
+
                 <TechStack />
             </main>
         </Layout>

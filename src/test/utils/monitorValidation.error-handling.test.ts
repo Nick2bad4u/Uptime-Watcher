@@ -23,7 +23,7 @@ vi.mock("../../stores/monitor/useMonitorTypesStore", () => {
     };
 });
 
-vi.mock("@shared/validation/schemas", () => ({
+vi.mock("@shared/validation/monitorSchemas", () => ({
     validateMonitorData: vi.fn(),
     validateMonitorField: vi.fn(),
 }));
@@ -32,7 +32,7 @@ import { useMonitorTypesStore } from "../../stores/monitor/useMonitorTypesStore"
 import {
     validateMonitorData as sharedValidateMonitorData,
     validateMonitorField as sharedValidateMonitorField,
-} from "@shared/validation/schemas";
+} from "@shared/validation/monitorSchemas";
 
 type MonitorTypesStoreState = ReturnType<typeof useMonitorTypesStore.getState>;
 

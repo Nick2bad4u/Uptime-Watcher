@@ -65,7 +65,7 @@ describe("StringConversion - Property-Based Tests", () => {
             expect(result).toBe(props.value.toString());
             expect(typeof result).toBe("string");
             // Verify it's a valid bigint string representation
-            expect(() => BigInt(result)).not.toThrow();
+            expect(() => BigInt(result)).not.toThrowError();
         });
 
         test("should handle null and undefined consistently", () => {
@@ -88,7 +88,7 @@ describe("StringConversion - Property-Based Tests", () => {
             expect(result).not.toBe("[object Object]");
 
             // Should be valid JSON
-            expect(() => JSON.parse(result)).not.toThrow();
+            expect(() => JSON.parse(result)).not.toThrowError();
 
             // Verify the content is preserved
             const parsed = JSON.parse(result);
@@ -107,7 +107,7 @@ describe("StringConversion - Property-Based Tests", () => {
             expect(result).not.toBe("[object Object]");
 
             // Should be valid JSON
-            expect(() => JSON.parse(result)).not.toThrow();
+            expect(() => JSON.parse(result)).not.toThrowError();
 
             // Verify the content is preserved
             const parsed = JSON.parse(result);
@@ -175,7 +175,7 @@ describe("StringConversion - Property-Based Tests", () => {
 
             // Should be valid JSON for reasonable depths
             if (props.depth <= 3) {
-                expect(() => JSON.parse(result)).not.toThrow();
+                expect(() => JSON.parse(result)).not.toThrowError();
                 const parsed = JSON.parse(result);
                 expect(parsed).toEqual(nested);
             }
@@ -227,7 +227,7 @@ describe("StringConversion - Property-Based Tests", () => {
         test.prop({
             input: fc.anything(),
         })("should handle any arbitrary input without throwing", (props) => {
-            expect(() => safeStringify(props.input)).not.toThrow();
+            expect(() => safeStringify(props.input)).not.toThrowError();
 
             const result = safeStringify(props.input);
             expect(typeof result).toBe("string");

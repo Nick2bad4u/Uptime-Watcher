@@ -1,19 +1,3 @@
-/**
- * Shared Zod validation schemas and validation utilities for monitor and site
- * data.
- *
- * @remarks
- * These schemas and functions are used by both frontend and backend to ensure
- * data integrity. Validation constraints are synchronized with the UI constants
- * defined in `@shared/constants`. All validation logic is centralized here for
- * consistency and maintainability.
- */
-
-import type {
-    MonitorStatus,
-    StatusHistoryStatus,
-    StatusUpdate,
-} from "@shared/types";
 import type {
     BaseMonitorSchemaType,
     CdnEdgeConsistencyMonitorSchemaType,
@@ -29,7 +13,6 @@ import type {
     PortMonitorSchemaType,
     ReplicationMonitorSchemaType,
     ServerHeartbeatMonitorSchemaType,
-    SiteSchemaType,
     SslMonitorSchemaType,
     WebsocketKeepaliveMonitorSchemaType,
 } from "@shared/types/schemaTypes";
@@ -37,54 +20,14 @@ import type { ValidationResult } from "@shared/types/validation";
 import type { Jsonify, UnknownRecord } from "type-fest";
 
 import { MIN_MONITOR_CHECK_INTERVAL_MS } from "@shared/constants/monitoring";
-import { STATUS_KIND } from "@shared/types";
 import validator from "validator";
 import * as z from "zod";
 
+import {
+    monitorStatusEnumValues,
+    statusHistoryEnumValues,
+} from "./statusValidationPrimitives";
 import { isValidHost, isValidPort } from "./validatorUtils";
-
-/**
- * Ordered tuple of valid {@link StatusHistoryStatus} values for historical
- * monitor records.
- *
- * @remarks
- * The tuple shape enables `z.enum` to infer literal types while ensuring
- * exhaustive coverage for the status history domain model.
- */
-const statusHistoryEnumValues: [StatusHistoryStatus, ...StatusHistoryStatus[]] =
-    [
-        STATUS_KIND.UP,
-        STATUS_KIND.DOWN,
-        STATUS_KIND.DEGRADED,
-    ];
-
-/**
- * Ordered tuple of all {@link MonitorStatus} variants supported by monitor
- * schemas.
- *
- * @remarks
- * The order matches the user-facing status hierarchy so that validation and UI
- * rendering remain in sync.
- */
-const monitorStatusEnumValues: [MonitorStatus, ...MonitorStatus[]] = [
-    STATUS_KIND.DEGRADED,
-    STATUS_KIND.DOWN,
-    STATUS_KIND.PAUSED,
-    STATUS_KIND.PENDING,
-    STATUS_KIND.UP,
-];
-
-/**
- * Reusable host validation schema for monitors. Eliminates duplication between
- * port and ping monitor schemas.
- *
- * @remarks
- * Delegates to {@link isValidHost} so that hostnames, IPv4/IPv6 literals, and
- * `localhost` are all accepted consistently across monitor types.
- */
-const hostValidationSchema = z
-    .string()
-    .refine(isValidHost, "Must be a valid hostname, IP address, or localhost");
 
 /**
  * Zod schema for status history entries.
@@ -121,6 +64,18 @@ const VALIDATION_CONSTRAINTS = {
         MIN: 1000, // 1 second (from TIMEOUT_CONSTRAINTS_MS)
     },
 } as const;
+
+/**
+ * Reusable host validation schema for monitors. Eliminates duplication between
+ * port and ping monitor schemas.
+ *
+ * @remarks
+ * Delegates to {@link isValidHost} so that hostnames, IPv4/IPv6 literals, and
+ * `localhost` are all accepted consistently across monitor types.
+ */
+const hostValidationSchema = z
+    .string()
+    .refine(isValidHost, "Must be a valid hostname, IP address, or localhost");
 
 /**
  * Zod schema for base monitor fields shared by all monitor types.
@@ -435,7 +390,6 @@ const edgeLocationListSchema = z
  * Extends {@link baseMonitorSchema} and adds the `url` field with robust
  * validation.
  */
-
 export const httpMonitorSchema: HttpMonitorSchemaType = baseMonitorSchema
     .extend({
         type: z.literal("http"),
@@ -729,101 +683,6 @@ export const monitorSchema: MonitorSchemaType = z.discriminatedUnion("type", [
 ]);
 
 /**
- * Zod schema for site data.
- *
- * @remarks
- * Validates site identifier, name, monitoring flag, and an array of monitors.
- */
-export const siteSchema: SiteSchemaType = z
-    .object({
-        identifier: z
-            .string()
-            .min(1, "Site identifier is required")
-            .max(100, "Site identifier too long"),
-        monitoring: z.boolean(),
-        monitors: z
-            .array(monitorSchema)
-            .min(1, "At least one monitor is required"),
-        name: z
-            .string()
-            .min(1, "Site name is required")
-            .max(200, "Site name too long"),
-    })
-    .strict();
-
-/**
- * Schema ensuring that timestamp fields contain ISO 8601 date strings.
- *
- * @remarks
- * Uses {@link Date.parse} for validation, mirroring the parsing strategy used
- * throughout the application when interpreting status update timestamps.
- */
-const isoTimestampSchema: z.ZodType<string> = z
-    .string()
-    .refine(
-        (value) => !Number.isNaN(Date.parse(value)),
-        "Timestamp must be a valid ISO 8601 string"
-    );
-
-type MonitorStatusEnumSchema = z.ZodType<MonitorStatus>;
-
-type StatusUpdateSchema = z.ZodObject<{
-    details: z.ZodOptional<z.ZodString>;
-    monitor: MonitorSchemaType;
-    monitorId: z.ZodString;
-    previousStatus: z.ZodOptional<MonitorStatusEnumSchema>;
-    responseTime: z.ZodOptional<z.ZodNumber>;
-    site: SiteSchemaType;
-    siteIdentifier: z.ZodString;
-    status: MonitorStatusEnumSchema;
-    timestamp: z.ZodType<string>;
-}>;
-
-/**
- * Constructs the canonical {@link StatusUpdate} validation schema.
- *
- * @returns A strict {@link z.ZodObject} that models the full status update
- *   payload exchanged between renderer and orchestrator layers.
- */
-const createStatusUpdateSchema = (): StatusUpdateSchema =>
-    z
-        .object({
-            details: z.string().optional(),
-            monitor: monitorSchema,
-            monitorId: z.string().min(1, "Monitor identifier is required"),
-            previousStatus: z.enum(monitorStatusEnumValues).optional(),
-            responseTime: z.number().optional(),
-            site: siteSchema,
-            siteIdentifier: z
-                .string()
-                .min(1, "Site identifier is required for status updates"),
-            status: z.enum(monitorStatusEnumValues),
-            timestamp: isoTimestampSchema,
-        })
-        .strict();
-
-/**
- * Zod schema validating canonical status update payloads.
- *
- * @remarks
- * Generated via {@link createStatusUpdateSchema} to keep type inference in sync
- * with the runtime schema definition.
- */
-export const statusUpdateSchema: ReturnType<typeof createStatusUpdateSchema> =
-    createStatusUpdateSchema();
-
-/**
- * Compile-time assertion verifying {@link statusUpdateSchema} alignment with the
- * {@link StatusUpdate} TypeScript interface.
- */
-export type StatusUpdateSchemaConformanceCheck =
-    z.infer<typeof statusUpdateSchema> extends StatusUpdate
-        ? StatusUpdate extends z.infer<typeof statusUpdateSchema>
-            ? true
-            : never
-        : never;
-
-/**
  * Interface for monitor schemas by type.
  */
 export interface MonitorSchemas {
@@ -971,18 +830,6 @@ export type PortMonitor = z.infer<typeof portMonitorSchema>;
  * @see {@link sslMonitorSchema}
  */
 export type SslMonitor = z.infer<typeof sslMonitorSchema>;
-
-/**
- * Type representing a validated site.
- *
- * @see {@link siteSchema}
- */
-export type Site = z.infer<typeof siteSchema>;
-/** JSON-safe representation of a validated site. */
-export type SiteJson = Jsonify<Site>;
-
-// ValidationResult type available for consumers via direct import from
-// ../types/validation
 
 /**
  * Retrieves the Zod schema associated with a monitor type.
@@ -1151,7 +998,9 @@ export function validateMonitorData(
 
         return {
             errors: [
-                `Validation failed: ${error instanceof Error ? error.message : String(error)}`,
+                `Validation failed: ${
+                    error instanceof Error ? error.message : String(error)
+                }`,
             ],
             metadata: { monitorType: type },
             success: false,
@@ -1226,59 +1075,11 @@ export function validateMonitorField(
 
         return {
             errors: [
-                `Field validation failed: ${error instanceof Error ? error.message : String(error)}`,
+                `Field validation failed: ${
+                    error instanceof Error ? error.message : String(error)
+                }`,
             ],
             metadata: { fieldName, monitorType: type },
-            success: false,
-            warnings: [],
-        };
-    }
-}
-
-/**
- * Validates site data using the shared Zod schema.
- *
- * @remarks
- * Validates the complete site structure, including every monitor. Metadata in
- * the {@link ValidationResult} mirrors key site attributes such as monitor count
- * and identifier.
- *
- * @param data - The site data to validate.
- *
- * @returns The validation result object for the site.
- */
-export function validateSiteData(data: unknown): ValidationResult {
-    try {
-        const validData = siteSchema.parse(data);
-        return {
-            data: validData,
-            errors: [],
-            metadata: {
-                monitorCount: validData.monitors.length,
-                siteIdentifier: validData.identifier,
-            },
-            success: true,
-            warnings: [],
-        };
-    } catch (error) {
-        if (error instanceof z.ZodError) {
-            const errors = error.issues.map(
-                (issue) => `${issue.path.join(".")}: ${issue.message}`
-            );
-
-            return {
-                errors,
-                metadata: {},
-                success: false,
-                warnings: [],
-            };
-        }
-
-        return {
-            errors: [
-                `Validation failed: ${error instanceof Error ? error.message : String(error)}`,
-            ],
-            metadata: {},
             success: false,
             warnings: [],
         };

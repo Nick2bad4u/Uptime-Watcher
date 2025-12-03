@@ -715,7 +715,7 @@ describe("useSiteSync", () => {
                 timestamp: Date.now(),
             };
 
-            expect(() => eventHandler(duplicateEvent)).not.toThrow();
+            expect(() => eventHandler(duplicateEvent)).not.toThrowError();
             expect(logger.error).toHaveBeenCalledWith(
                 "Duplicate site identifiers detected in state sync event",
                 expect.objectContaining({

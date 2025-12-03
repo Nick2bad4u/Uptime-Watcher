@@ -294,7 +294,7 @@ describe("TypedEventBus Fuzzing Tests", () => {
                             // Should throw if any middleware throws
                             await expect(
                                 eventBus.emitTyped("test:simple", eventData)
-                            ).rejects.toThrow();
+                            ).rejects.toThrowError();
                             // Event should not be delivered if middleware fails
                             expect(receivedEvents).toHaveLength(0);
                         } else {

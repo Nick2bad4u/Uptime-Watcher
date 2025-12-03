@@ -267,7 +267,7 @@ describe("PortMonitor Coverage Tests", () => {
 
             expect(() => {
                 portMonitor.updateConfig({ timeout: "invalid" as any });
-            }).toThrow();
+            }).toThrowError();
         });
 
         it("should throw error for negative timeout", async ({
@@ -284,7 +284,7 @@ describe("PortMonitor Coverage Tests", () => {
 
             expect(() => {
                 portMonitor.updateConfig({ timeout: -1000 });
-            }).toThrow();
+            }).toThrowError();
         });
 
         it("should throw error for zero timeout", async ({
@@ -301,7 +301,7 @@ describe("PortMonitor Coverage Tests", () => {
 
             expect(() => {
                 portMonitor.updateConfig({ timeout: 0 });
-            }).toThrow();
+            }).toThrowError();
         });
 
         it("should allow updating userAgent without validation", async ({
@@ -401,7 +401,7 @@ describe("PortMonitor Coverage Tests", () => {
                 type: "http",
             };
 
-            await expect(portMonitor.check(httpMonitor)).rejects.toThrow(
+            await expect(portMonitor.check(httpMonitor)).rejects.toThrowError(
                 "PortMonitor cannot handle monitor type: http"
             );
         });
@@ -584,9 +584,9 @@ describe("PortMonitor Coverage Tests", () => {
             const retryError = new Error("Port check failed after retries");
             vi.mocked(performPortCheckWithRetry).mockRejectedValue(retryError);
 
-            await expect(portMonitor.check(validPortMonitor)).rejects.toThrow(
-                "Port check failed after retries"
-            );
+            await expect(
+                portMonitor.check(validPortMonitor)
+            ).rejects.toThrowError("Port check failed after retries");
         });
 
         it("should handle different host formats", async ({

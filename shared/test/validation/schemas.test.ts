@@ -11,16 +11,18 @@ import {
     httpStatusMonitorSchema,
     portMonitorSchema,
     monitorSchema,
-    siteSchema,
     monitorSchemas,
     validateMonitorData,
     validateMonitorField,
-    validateSiteData,
     type HttpMonitor,
     type PortMonitor,
     type Monitor,
+} from "../../validation/monitorSchemas";
+import {
+    siteSchema,
+    validateSiteData,
     type Site,
-} from "../../validation/schemas";
+} from "../../validation/siteSchemas";
 import type { ValidationResult } from "../../types/validation";
 import { createValidBaseMonitor } from "./testHelpers";
 
@@ -36,7 +38,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
             await annotate("Type: Validation", "type");
 
             const validData = createValidBaseMonitor();
-            expect(() => baseMonitorSchema.parse(validData)).not.toThrow();
+            expect(() => baseMonitorSchema.parse(validData)).not.toThrowError();
         });
 
         it("should reject invalid check intervals", async ({
@@ -52,7 +54,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 checkInterval: 1000, // Below minimum 5000
             });
 
-            expect(() => baseMonitorSchema.parse(invalidData)).toThrow();
+            expect(() => baseMonitorSchema.parse(invalidData)).toThrowError();
         });
 
         it("should reject check intervals exceeding maximum", async ({
@@ -68,7 +70,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 checkInterval: 2_592_000_001, // Above maximum
             });
 
-            expect(() => baseMonitorSchema.parse(invalidData)).toThrow();
+            expect(() => baseMonitorSchema.parse(invalidData)).toThrowError();
         });
 
         it("should reject negative retry attempts", async ({
@@ -84,7 +86,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 retryAttempts: -1,
             });
 
-            expect(() => baseMonitorSchema.parse(invalidData)).toThrow();
+            expect(() => baseMonitorSchema.parse(invalidData)).toThrowError();
         });
 
         it("should reject retry attempts exceeding maximum", async ({
@@ -108,7 +110,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 type: "http" as const,
             };
 
-            expect(() => baseMonitorSchema.parse(invalidData)).toThrow();
+            expect(() => baseMonitorSchema.parse(invalidData)).toThrowError();
         });
 
         it("should reject timeout below minimum", async ({
@@ -132,7 +134,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 type: "http" as const,
             };
 
-            expect(() => baseMonitorSchema.parse(invalidData)).toThrow();
+            expect(() => baseMonitorSchema.parse(invalidData)).toThrowError();
         });
 
         it("should reject timeout exceeding maximum", async ({
@@ -156,7 +158,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 type: "http" as const,
             };
 
-            expect(() => baseMonitorSchema.parse(invalidData)).toThrow();
+            expect(() => baseMonitorSchema.parse(invalidData)).toThrowError();
         });
 
         it("should accept -1 as sentinel value for responseTime", async ({
@@ -180,7 +182,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 type: "http" as const,
             };
 
-            expect(() => baseMonitorSchema.parse(validData)).not.toThrow();
+            expect(() => baseMonitorSchema.parse(validData)).not.toThrowError();
         });
 
         it("should reject responseTime below -1", async ({
@@ -204,7 +206,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 type: "http" as const,
             };
 
-            expect(() => baseMonitorSchema.parse(invalidData)).toThrow();
+            expect(() => baseMonitorSchema.parse(invalidData)).toThrowError();
         });
 
         it("should validate all status enums", async ({ task, annotate }) => {
@@ -232,7 +234,9 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                     type: "http" as const,
                 };
 
-                expect(() => baseMonitorSchema.parse(validData)).not.toThrow();
+                expect(() =>
+                    baseMonitorSchema.parse(validData)
+                ).not.toThrowError();
             }
         });
 
@@ -256,7 +260,9 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                     type,
                 };
 
-                expect(() => baseMonitorSchema.parse(validData)).not.toThrow();
+                expect(() =>
+                    baseMonitorSchema.parse(validData)
+                ).not.toThrowError();
             }
         });
 
@@ -297,7 +303,9 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
                 delete invalidData[fieldToRemove as keyof typeof validData];
 
-                expect(() => baseMonitorSchema.parse(invalidData)).toThrow();
+                expect(() =>
+                    baseMonitorSchema.parse(invalidData)
+                ).toThrowError();
             }
         });
 
@@ -324,7 +332,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
 
             expect(() =>
                 baseMonitorSchema.parse(dataWithoutLastChecked)
-            ).not.toThrow();
+            ).not.toThrowError();
 
             const dataWithLastChecked = {
                 ...dataWithoutLastChecked,
@@ -333,7 +341,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
 
             expect(() =>
                 baseMonitorSchema.parse(dataWithLastChecked)
-            ).not.toThrow();
+            ).not.toThrowError();
         });
     });
 
@@ -357,7 +365,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 url: "https://example.com",
             };
 
-            expect(() => httpMonitorSchema.parse(validData)).not.toThrow();
+            expect(() => httpMonitorSchema.parse(validData)).not.toThrowError();
         });
 
         it("should validate various valid URLs", async ({ task, annotate }) => {
@@ -393,7 +401,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 expect(
                     () => httpMonitorSchema.parse(validData),
                     `URL: ${url} should be valid`
-                ).not.toThrow();
+                ).not.toThrowError();
             }
         });
 
@@ -430,7 +438,9 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                     url,
                 };
 
-                expect(() => httpMonitorSchema.parse(invalidData)).toThrow();
+                expect(() =>
+                    httpMonitorSchema.parse(invalidData)
+                ).toThrowError();
             }
         });
 
@@ -453,7 +463,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 url: "https://example.com",
             };
 
-            expect(() => httpMonitorSchema.parse(invalidData)).toThrow();
+            expect(() => httpMonitorSchema.parse(invalidData)).toThrowError();
         });
     });
 
@@ -478,7 +488,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 type: "port" as const,
             };
 
-            expect(() => portMonitorSchema.parse(validData)).not.toThrow();
+            expect(() => portMonitorSchema.parse(validData)).not.toThrowError();
         });
 
         it("should validate various valid hosts", async ({
@@ -518,7 +528,9 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                     type: "port" as const,
                 };
 
-                expect(() => portMonitorSchema.parse(validData)).not.toThrow();
+                expect(() =>
+                    portMonitorSchema.parse(validData)
+                ).not.toThrowError();
             }
         });
 
@@ -556,7 +568,9 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                     type: "port" as const,
                 };
 
-                expect(() => portMonitorSchema.parse(invalidData)).toThrow();
+                expect(() =>
+                    portMonitorSchema.parse(invalidData)
+                ).toThrowError();
             }
         });
 
@@ -590,7 +604,9 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                     type: "port" as const,
                 };
 
-                expect(() => portMonitorSchema.parse(validData)).not.toThrow();
+                expect(() =>
+                    portMonitorSchema.parse(validData)
+                ).not.toThrowError();
             }
         });
 
@@ -627,7 +643,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                     // Port 0 might be considered valid by validator.js, skip this specific case
                     expect(() =>
                         portMonitorSchema.parse(invalidData)
-                    ).toThrow();
+                    ).toThrowError();
                 }
             }
         });
@@ -652,7 +668,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 type: "http" as const, // Wrong type for port monitor
             };
 
-            expect(() => portMonitorSchema.parse(invalidData)).toThrow();
+            expect(() => portMonitorSchema.parse(invalidData)).toThrowError();
         });
     });
 
@@ -728,7 +744,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 type: "invalid" as any,
             };
 
-            expect(() => monitorSchema.parse(invalidMonitor)).toThrow();
+            expect(() => monitorSchema.parse(invalidMonitor)).toThrowError();
         });
     });
 
@@ -759,7 +775,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 name: "Test Site",
             };
 
-            expect(() => siteSchema.parse(validSite)).not.toThrow();
+            expect(() => siteSchema.parse(validSite)).not.toThrowError();
         });
 
         it("should require site identifier", async ({ task, annotate }) => {
@@ -788,7 +804,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 name: "Test Site",
             };
 
-            expect(() => siteSchema.parse(invalidSite)).toThrow();
+            expect(() => siteSchema.parse(invalidSite)).toThrowError();
         });
 
         it("should reject identifier that's too long", async ({
@@ -820,7 +836,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 name: "Test Site",
             };
 
-            expect(() => siteSchema.parse(invalidSite)).toThrow();
+            expect(() => siteSchema.parse(invalidSite)).toThrowError();
         });
 
         it("should require site name", async ({ task, annotate }) => {
@@ -849,7 +865,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 name: "", // Empty name
             };
 
-            expect(() => siteSchema.parse(invalidSite)).toThrow();
+            expect(() => siteSchema.parse(invalidSite)).toThrowError();
         });
 
         it("should reject name that's too long", async ({ task, annotate }) => {
@@ -878,7 +894,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 name: "a".repeat(201), // Too long (>200 chars)
             };
 
-            expect(() => siteSchema.parse(invalidSite)).toThrow();
+            expect(() => siteSchema.parse(invalidSite)).toThrowError();
         });
 
         it("should require at least one monitor", async ({
@@ -897,7 +913,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 name: "Test Site",
             };
 
-            expect(() => siteSchema.parse(invalidSite)).toThrow();
+            expect(() => siteSchema.parse(invalidSite)).toThrowError();
         });
 
         it("should validate multiple monitors", async ({ task, annotate }) => {
@@ -939,7 +955,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 name: "Test Site",
             };
 
-            expect(() => siteSchema.parse(validSite)).not.toThrow();
+            expect(() => siteSchema.parse(validSite)).not.toThrowError();
         });
     });
 
@@ -1272,7 +1288,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
 
             expect(() => {
                 validateMonitorField("http", "unknownField", "value");
-            }).toThrow("Unknown field: unknownField");
+            }).toThrowError("Unknown field: unknownField");
         });
 
         it("should handle non-Zod errors", async ({ task, annotate }) => {
@@ -1522,7 +1538,9 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 url: "https://a.co", // Minimum valid HTTPS URL
             };
 
-            expect(() => httpMonitorSchema.parse(minValidData)).not.toThrow();
+            expect(() =>
+                httpMonitorSchema.parse(minValidData)
+            ).not.toThrowError();
         });
 
         it("should handle maximum valid values", async ({ task, annotate }) => {
@@ -1545,7 +1563,9 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 port: 65_535, // Maximum port
             };
 
-            expect(() => portMonitorSchema.parse(maxValidData)).not.toThrow();
+            expect(() =>
+                portMonitorSchema.parse(maxValidData)
+            ).not.toThrowError();
         });
 
         it("should handle special IP addresses", async ({ task, annotate }) => {
@@ -1577,7 +1597,9 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                     type: "port" as const,
                 };
 
-                expect(() => portMonitorSchema.parse(validData)).not.toThrow();
+                expect(() =>
+                    portMonitorSchema.parse(validData)
+                ).not.toThrowError();
             }
         });
     });
@@ -1655,7 +1677,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
             // validateFieldWithSchema throws error which validateMonitorField catches and wraps
             expect(() => {
                 validateMonitorField("http", "unknownField", "value");
-            }).toThrow("Unknown field: unknownField");
+            }).toThrowError("Unknown field: unknownField");
         });
 
         it("should handle undefined received type in Zod validation", async ({
@@ -1727,7 +1749,9 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 bodyKeyword: "ready",
             };
 
-            expect(() => httpKeywordMonitorSchema.parse(monitor)).not.toThrow();
+            expect(() =>
+                httpKeywordMonitorSchema.parse(monitor)
+            ).not.toThrowError();
         });
 
         it("should reject empty keyword", async ({ task, annotate }) => {
@@ -1750,7 +1774,9 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 bodyKeyword: " ",
             };
 
-            expect(() => httpKeywordMonitorSchema.parse(monitor)).toThrow();
+            expect(() =>
+                httpKeywordMonitorSchema.parse(monitor)
+            ).toThrowError();
         });
     });
 
@@ -1778,7 +1804,9 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 expectedStatusCode: 204,
             };
 
-            expect(() => httpStatusMonitorSchema.parse(monitor)).not.toThrow();
+            expect(() =>
+                httpStatusMonitorSchema.parse(monitor)
+            ).not.toThrowError();
         });
 
         it("should reject invalid status code", async ({ task, annotate }) => {
@@ -1801,7 +1829,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 expectedStatusCode: 99,
             };
 
-            expect(() => httpStatusMonitorSchema.parse(monitor)).toThrow();
+            expect(() => httpStatusMonitorSchema.parse(monitor)).toThrowError();
         });
     });
 });

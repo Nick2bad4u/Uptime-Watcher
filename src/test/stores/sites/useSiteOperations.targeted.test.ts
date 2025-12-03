@@ -237,7 +237,7 @@ describe("useSiteOperations - Targeted Coverage", () => {
 
             await expect(
                 actions.deleteSite(mockSiteWithSingleMonitor.identifier)
-            ).rejects.toThrow("Delete failed");
+            ).rejects.toThrowError("Delete failed");
 
             expect(
                 mockElectronAPI.monitoring.stopMonitoringForSite
@@ -265,7 +265,7 @@ describe("useSiteOperations - Targeted Coverage", () => {
             // Logger.error should be called and error should be rethrown
             (logger.error as any).mockClear?.();
 
-            await expect(actions.downloadSqliteBackup()).rejects.toThrow(
+            await expect(actions.downloadSqliteBackup()).rejects.toThrowError(
                 "Backup download failed"
             );
 
@@ -309,7 +309,7 @@ describe("useSiteOperations - Targeted Coverage", () => {
                     mockSiteWithSingleMonitor.identifier,
                     mockSiteWithSingleMonitor.monitors[0]!.id
                 )
-            ).rejects.toThrow(ERROR_CATALOG.monitors.CANNOT_REMOVE_LAST);
+            ).rejects.toThrowError(ERROR_CATALOG.monitors.CANNOT_REMOVE_LAST);
 
             // Verify no backend calls were made since validation failed early
             expect(
@@ -372,7 +372,7 @@ describe("useSiteOperations - Targeted Coverage", () => {
                     mockSiteWithMultipleMonitors.identifier,
                     mockSiteWithMultipleMonitors.monitors[0]!.id
                 )
-            ).rejects.toThrow("Monitor removal failed");
+            ).rejects.toThrowError("Monitor removal failed");
 
             expect(mockSiteDeps.setSites).not.toHaveBeenCalled();
             expect(mockSiteDeps.syncSites).not.toHaveBeenCalled();

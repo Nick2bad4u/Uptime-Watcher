@@ -506,13 +506,17 @@ describe("siteStatus Property-based Tests", () => {
             "status calculation functions should handle edge cases gracefully",
             (site) => {
                 // Property: All status functions should handle any valid input without throwing
-                expect(() => calculateSiteMonitoringStatus(site)).not.toThrow();
-                expect(() => calculateSiteStatus(site)).not.toThrow();
-                expect(() => getSiteDisplayStatus(site)).not.toThrow();
-                expect(() => getSiteStatusDescription(site)).not.toThrow();
+                expect(() =>
+                    calculateSiteMonitoringStatus(site)
+                ).not.toThrowError();
+                expect(() => calculateSiteStatus(site)).not.toThrowError();
+                expect(() => getSiteDisplayStatus(site)).not.toThrowError();
+                expect(() => getSiteStatusDescription(site)).not.toThrowError();
 
                 const displayStatus = getSiteDisplayStatus(site);
-                expect(() => getSiteStatusVariant(displayStatus)).not.toThrow();
+                expect(() =>
+                    getSiteStatusVariant(displayStatus)
+                ).not.toThrowError();
             }
         );
     });

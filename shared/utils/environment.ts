@@ -1,168 +1,160 @@
 /**
- * Environment detection utilities for safe, testable environment detection.
+ * Shared environment utilities that work across renderer and main processes.
  *
  * @remarks
- * These utilities abstract direct process.env access and provide consistent
- * environment detection patterns with proper error handling.
- *
- * @packageDocumentation
+ * Every helper in this module is defensive: it never assumes that
+ * `globalThis.process` exists or behaves like a Node.js process. Tests often
+ * delete or stub the global process object, so all reads are routed through a
+ * guarded snapshot accessor.
  */
-
 /**
- * Typed interface for environment variables we use in the application. This
- * provides type safety for environment variable access.
+ * Documented environment variables used throughout the application.
  */
-interface KnownEnvironmentVariables {
-    CODECOV_TOKEN?: string;
-    NODE_ENV?: "development" | "production" | "test";
-    PLAYWRIGHT_COVERAGE?: string;
+export interface KnownEnvironmentVariables {
+    readonly CODECOV_TOKEN?: string;
+    readonly NODE_ENV?: "development" | "production" | "test";
+    readonly PLAYWRIGHT_COVERAGE?: string;
 }
 
-/**
- * Type-safe environment variable access utility. Avoids index signature issues
- * with process.env.
- *
- * @param key - The environment variable key to access
- *
- * @returns The environment variable value or undefined
- */
-export function getEnvVar<K extends keyof KnownEnvironmentVariables>(
-    key: K
-): KnownEnvironmentVariables[K] | undefined {
-    if (typeof process === "undefined") {
+interface ProcessSnapshot {
+    readonly env?: Record<string, string | undefined>;
+    readonly versions?: {
+        readonly node?: unknown;
+    };
+}
+
+interface ProcessSnapshotProvider {
+    process?: ProcessSnapshot;
+}
+
+const getProcessSnapshot = (): ProcessSnapshot | undefined => {
+    if (typeof globalThis !== "object") {
         return undefined;
     }
 
     try {
-        // Use bracket notation to access the environment variable safely
-        // eslint-disable-next-line n/no-process-env -- Environment utility needs safe process.env access
-        const value = process.env[key];
-        // Type assertion is safe here as we're returning the union with undefined
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- safe assertion for environment variable type union
-        return value as KnownEnvironmentVariables[K] | undefined;
+        const candidate = (globalThis as ProcessSnapshotProvider).process;
+        return candidate ?? undefined;
     } catch {
-        // Handle edge cases where process.env might be null or undefined in
-        // tests
+        return undefined;
+    }
+};
+
+const getProcessEnv = (): Record<string, string | undefined> | undefined => {
+    const snapshot = getProcessSnapshot();
+    if (!snapshot) {
+        return undefined;
+    }
+
+    try {
+        return snapshot.env ?? undefined;
+    } catch {
+        return undefined;
+    }
+};
+
+const getProcessVersions = (): ProcessSnapshot["versions"] | undefined => {
+    const snapshot = getProcessSnapshot();
+    if (!snapshot) {
+        return undefined;
+    }
+
+    try {
+        return snapshot.versions ?? undefined;
+    } catch {
+        return undefined;
+    }
+};
+
+const hasProcessSnapshot = (): boolean => getProcessSnapshot() !== undefined;
+
+/**
+ * Reads an environment variable from the safeguarded snapshot.
+ */
+export function getEnvVar(key: string): string | undefined {
+    const env = getProcessEnv();
+    if (!env) {
+        return undefined;
+    }
+
+    try {
+        const value = env[key];
+        return typeof value === "string" ? value : undefined;
+    } catch {
         return undefined;
     }
 }
 
 /**
- * Get the current environment name safely.
- *
- * @remarks
- * Returns 'unknown' as fallback to indicate unspecified environment state. This
- * is intentionally different from getNodeEnv() which assumes 'development' for
- * safety in development workflows. Use this when you need to detect unspecified
- * environments, use getNodeEnv() when you need development defaults.
- *
- * @returns Environment name or 'unknown' if not set
+ * Returns a sanitized snapshot of the current process.env state.
+ */
+export function getEnvSummary(): Record<string, string> {
+    const env = getProcessEnv();
+    if (!env) {
+        return {};
+    }
+
+    const summary: Record<string, string> = {};
+    for (const [key, value] of Object.entries(env)) {
+        if (typeof value === "string") {
+            summary[key] = value;
+        }
+    }
+
+    return summary;
+}
+
+/**
+ * Returns the explicitly configured environment or "unknown" when missing.
  */
 export function getEnvironment(): string {
-    const nodeEnv = getEnvVar("NODE_ENV");
-    return typeof process === "undefined" ? "unknown" : (nodeEnv ?? "unknown");
+    if (!hasProcessSnapshot()) {
+        return "unknown";
+    }
+
+    const rawValue = getEnvVar("NODE_ENV");
+    return rawValue ?? "unknown";
 }
 
 /**
- * Get the current NODE_ENV value safely. Safe alternative to direct
- * process.env.NODE_ENV access.
- *
- * @remarks
- * Returns 'development' as fallback for safer development workflows and
- * testing. This assumes development mode when environment is unspecified, which
- * is appropriate for development tools and debugging features. Use
- * getEnvironment() if you need to detect truly unspecified environments.
- *
- * @example
- *
- * ```typescript
- * const env = getNodeEnv();
- * logger.debug("Current environment:", env);
- * ```
- *
- * @returns The NODE_ENV value or 'development' as fallback
+ * Returns NODE_ENV with a development-friendly fallback.
  */
 export function getNodeEnv(): string {
-    const nodeEnv = getEnvVar("NODE_ENV");
-    return typeof process === "undefined"
-        ? "development"
-        : (nodeEnv ?? "development");
+    return getEnvVar("NODE_ENV") ?? "development";
 }
 
 /**
- * Check if running in browser environment.
- *
- * @remarks
- * Detects browser environment by checking for `window` and `document` objects.
- * This covers most browser contexts but may not detect some browser-like
- * environments such as web workers, service workers, or server-side rendering
- * contexts. For more specific environment detection, use additional checks
- * tailored to your use case.
- *
- * @returns True if in browser environment
+ * Detects whether browser globals are present.
  */
 export function isBrowserEnvironment(): boolean {
     return typeof window !== "undefined" && typeof document !== "undefined";
 }
 
 /**
- * Check if running in development mode. Safe alternative to direct
- * process.env.NODE_ENV access.
- *
- * @remarks
- * Uses strict equality check against 'development' string. Only recognizes the
- * standard NODE_ENV value 'development' - variants like 'dev' are not
- * supported. This ensures consistent behavior across the application.
- *
- * @example
- *
- * ```typescript
- * import { logger } from "@app/services/logger";
- *
- * if (isDevelopment()) {
- *     logger.debug("Debug information");
- * }
- * ```
- *
- * @returns True if in development mode
- */
-export function isDevelopment(): boolean {
-    const nodeEnv = getEnvVar("NODE_ENV");
-    return typeof process !== "undefined" && nodeEnv === "development";
-}
-
-/**
- * Check if process object is available (Node.js environment). Useful for
- * detecting Node.js vs browser environments.
- *
- * @returns True if in Node.js environment
+ * Detects whether Node.js runtime APIs are available.
  */
 export function isNodeEnvironment(): boolean {
-    return (
-        typeof process !== "undefined" &&
-        typeof process.versions === "object" &&
-        Boolean(process.versions.node)
-    );
+    const nodeVersion = getProcessVersions()?.node;
+    return typeof nodeVersion === "string" && nodeVersion.length > 0;
 }
 
 /**
- * Check if running in production mode. Safe alternative to direct
- * process.env.NODE_ENV access.
- *
- * @returns True if in production mode
+ * Checks if NODE_ENV is exactly "development".
+ */
+export function isDevelopment(): boolean {
+    return hasProcessSnapshot() && getEnvVar("NODE_ENV") === "development";
+}
+
+/**
+ * Checks if NODE_ENV is exactly "production".
  */
 export function isProduction(): boolean {
-    const nodeEnv = getEnvVar("NODE_ENV");
-    return typeof process !== "undefined" && nodeEnv === "production";
+    return hasProcessSnapshot() && getEnvVar("NODE_ENV") === "production";
 }
 
 /**
- * Check if running in test mode. Safe alternative to direct
- * process.env.NODE_ENV access.
- *
- * @returns True if in test mode
+ * Checks if NODE_ENV is exactly "test".
  */
 export function isTest(): boolean {
-    const nodeEnv = getEnvVar("NODE_ENV");
-    return typeof process !== "undefined" && nodeEnv === "test";
+    return hasProcessSnapshot() && getEnvVar("NODE_ENV") === "test";
 }

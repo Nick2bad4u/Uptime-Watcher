@@ -283,7 +283,9 @@ describe("Theme Components - Basic Functionality", () => {
             annotate("Category: Core", "category");
             annotate("Type: Business Logic", "type");
 
-            expect(() => render(<StatusIndicator status="up" />)).not.toThrow();
+            expect(() =>
+                render(<StatusIndicator status="up" />)
+            ).not.toThrowError();
         });
 
         it("should show text when enabled", ({ task, annotate }) => {

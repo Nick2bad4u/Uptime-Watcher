@@ -144,7 +144,7 @@ describe("MonitorRepository - Comprehensive Coverage", () => {
                         id: "temp-1",
                     },
                 ])
-            ).rejects.toThrow("Transaction failed");
+            ).rejects.toThrowError("Transaction failed");
         });
     });
     describe("clearActiveOperations", () => {
@@ -178,7 +178,7 @@ describe("MonitorRepository - Comprehensive Coverage", () => {
 
             await expect(
                 repository.clearActiveOperations("monitor-123")
-            ).rejects.toThrow("Clear failed");
+            ).rejects.toThrowError("Clear failed");
         });
     });
     describe("create", () => {
@@ -265,7 +265,7 @@ describe("MonitorRepository - Comprehensive Coverage", () => {
                     responseTime: 0,
                     history: [],
                 })
-            ).rejects.toThrow("Creation failed");
+            ).rejects.toThrowError("Creation failed");
         });
     });
     describe("delete", () => {
@@ -314,7 +314,7 @@ describe("MonitorRepository - Comprehensive Coverage", () => {
                 new Error("Deletion failed")
             );
 
-            await expect(repository.delete("monitor-123")).rejects.toThrow(
+            await expect(repository.delete("monitor-123")).rejects.toThrowError(
                 "Deletion failed"
             );
         });
@@ -353,7 +353,7 @@ describe("MonitorRepository - Comprehensive Coverage", () => {
                 new Error("Delete all failed")
             );
 
-            await expect(repository.deleteAll()).rejects.toThrow(
+            await expect(repository.deleteAll()).rejects.toThrowError(
                 "Delete all failed"
             );
         });
@@ -392,7 +392,7 @@ describe("MonitorRepository - Comprehensive Coverage", () => {
 
             await expect(
                 repository.deleteBySiteIdentifier("site-123")
-            ).rejects.toThrow("Site deletion failed");
+            ).rejects.toThrowError("Site deletion failed");
         });
     });
     describe("update", () => {
@@ -453,7 +453,7 @@ describe("MonitorRepository - Comprehensive Coverage", () => {
 
             await expect(
                 repository.update("monitor-123", { url: "https://example.com" })
-            ).rejects.toThrow("Update failed");
+            ).rejects.toThrowError("Update failed");
         });
         it("should handle monitors with different status values", async ({
             task,
@@ -528,7 +528,7 @@ describe("MonitorRepository - Comprehensive Coverage", () => {
             });
             await expect(
                 repository.findByIdentifier("monitor-123")
-            ).rejects.toThrow("Database connection failed");
+            ).rejects.toThrowError("Database connection failed");
         });
         it("should handle null/undefined responses from database", async ({
             task,

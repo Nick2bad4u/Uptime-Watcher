@@ -739,7 +739,7 @@ describe("shared/utils/typeHelpers.ts - Complete Function Coverage", () => {
                 value !== null &&
                 "success" in value;
 
-            expect(() => castIpcResponse(response, validator)).toThrow();
+            expect(() => castIpcResponse(response, validator)).toThrowError();
         });
 
         it("should throw error for null response", async ({
@@ -756,7 +756,7 @@ describe("shared/utils/typeHelpers.ts - Complete Function Coverage", () => {
 
             const validator = (value: unknown): value is string =>
                 typeof value === "string";
-            expect(() => castIpcResponse(null, validator)).toThrow();
+            expect(() => castIpcResponse(null, validator)).toThrowError();
         });
     });
 
@@ -941,7 +941,7 @@ describe("shared/utils/typeHelpers.ts - Complete Function Coverage", () => {
             const validator = (value: unknown): value is string =>
                 typeof value === "string";
 
-            expect(() => validateAndConvert(123, validator)).toThrow(
+            expect(() => validateAndConvert(123, validator)).toThrowError(
                 "Type validation failed"
             );
         });
@@ -964,7 +964,7 @@ describe("shared/utils/typeHelpers.ts - Complete Function Coverage", () => {
 
             expect(() =>
                 validateAndConvert(123, validator, customMessage)
-            ).toThrow(customMessage);
+            ).toThrowError(customMessage);
         });
 
         it("should handle complex type validation", async ({
@@ -997,7 +997,7 @@ describe("shared/utils/typeHelpers.ts - Complete Function Coverage", () => {
             const invalidObject = { name: "Bob" }; // Missing age
             expect(() =>
                 validateAndConvert(invalidObject, validator)
-            ).toThrow();
+            ).toThrowError();
         });
 
         it("should work with primitive type validators", async ({
@@ -1016,7 +1016,9 @@ describe("shared/utils/typeHelpers.ts - Complete Function Coverage", () => {
                 typeof value === "number" && !Number.isNaN(value);
 
             expect(validateAndConvert(42, numberValidator)).toBe(42);
-            expect(() => validateAndConvert("42", numberValidator)).toThrow();
+            expect(() =>
+                validateAndConvert("42", numberValidator)
+            ).toThrowError();
         });
     });
 

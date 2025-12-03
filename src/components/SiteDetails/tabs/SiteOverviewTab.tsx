@@ -130,7 +130,9 @@ export const SiteOverviewTab = ({
         percentage: number
     ): "error" | "success" | "warning" => {
         const variant = getAvailabilityVariant(percentage);
-        if (variant === "danger") return "error";
+        if (variant === "danger") {
+            return "error";
+        }
         return variant; // "success" | "warning"
     };
 

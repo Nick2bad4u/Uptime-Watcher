@@ -25,8 +25,16 @@ import * as stringConversion from "../utils/stringConversion";
 import * as guardUtils from "../utils/typeGuards";
 import * as helperUtils from "../utils/typeHelpers";
 import * as validationUtils from "../utils/validation";
-import * as schemas from "../validation/schemas";
+import * as monitorSchemas from "../validation/monitorSchemas";
+import * as siteSchemas from "../validation/siteSchemas";
+import * as statusUpdateSchemas from "../validation/statusUpdateSchemas";
 import * as validatorUtilsModule from "../validation/validatorUtils";
+
+const schemas = {
+    ...monitorSchemas,
+    ...siteSchemas,
+    ...statusUpdateSchemas,
+} as const;
 
 describe("Final 90% Function Coverage Push", () => {
     it("should call ALL exported functions from shared/types.ts", ({

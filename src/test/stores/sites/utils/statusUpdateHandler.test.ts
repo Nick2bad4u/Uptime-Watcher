@@ -333,7 +333,7 @@ describe("StatusUpdateHandler", () => {
             await annotate("Type: Business Logic", "type");
 
             expect(manager.isSubscribed()).toBeFalsy();
-            expect(() => manager.unsubscribe()).not.toThrow();
+            expect(() => manager.unsubscribe()).not.toThrowError();
             expect(manager.isSubscribed()).toBeFalsy();
         });
     });
@@ -770,7 +770,9 @@ describe("StatusUpdateHandler", () => {
                 previousStatus: "up" as const,
             };
 
-            expect(() => statusChangedCallback(statusUpdate)).not.toThrow();
+            expect(() =>
+                statusChangedCallback(statusUpdate)
+            ).not.toThrowError();
         });
 
         it("should handle errors in full sync gracefully", async ({
@@ -786,7 +788,7 @@ describe("StatusUpdateHandler", () => {
 
             await manager.subscribe();
 
-            expect(() => statusChangedCallback({})).not.toThrow();
+            expect(() => statusChangedCallback({})).not.toThrowError();
         });
     });
 

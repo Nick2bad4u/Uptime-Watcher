@@ -719,7 +719,7 @@ describe("FormErrorAlert Component - Property-Based Fuzzing", () => {
                             onClearError={invalidHandler as () => void}
                         />
                     );
-                }).not.toThrow();
+                }).not.toThrowError();
 
                 // Component should render even with invalid handler
                 const alertBox = screen.getByTestId("themed-box");
@@ -742,7 +742,7 @@ describe("FormErrorAlert Component - Property-Based Fuzzing", () => {
                             {...{ invalidProp1, invalidProp2 }}
                         />
                     );
-                }).not.toThrow();
+                }).not.toThrowError();
             }
         );
     });

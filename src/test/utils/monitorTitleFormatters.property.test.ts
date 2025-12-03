@@ -129,7 +129,7 @@ describe("MonitorTitleFormatters Property-Based Tests", () => {
                         type: "http",
                         url: invalidUrl as any,
                     });
-                    expect(() => formatTitleSuffix(monitor)).not.toThrow();
+                    expect(() => formatTitleSuffix(monitor)).not.toThrowError();
                     const result = formatTitleSuffix(monitor);
                     expect(result).toBe("");
                 }
@@ -147,7 +147,7 @@ describe("MonitorTitleFormatters Property-Based Tests", () => {
                         type: "http",
                         url: truthyUrl as any,
                     });
-                    expect(() => formatTitleSuffix(monitor)).not.toThrow();
+                    expect(() => formatTitleSuffix(monitor)).not.toThrowError();
                     const result = formatTitleSuffix(monitor);
                     expect(result).toBe(` (${truthyUrl})`);
                     expect(result).toContain(String(truthyUrl));
@@ -225,7 +225,7 @@ describe("MonitorTitleFormatters Property-Based Tests", () => {
                         host: invalidHost as any,
                         port: invalidPort as any,
                     });
-                    expect(() => formatTitleSuffix(monitor)).not.toThrow();
+                    expect(() => formatTitleSuffix(monitor)).not.toThrowError();
                     const result = formatTitleSuffix(monitor);
                     expect(result).toBe("");
                 }
@@ -416,7 +416,7 @@ describe("MonitorTitleFormatters Property-Based Tests", () => {
             "should handle monitors with invalid type properties",
             (invalidType) => {
                 const monitor = createBaseMonitor({ type: invalidType as any });
-                expect(() => formatTitleSuffix(monitor)).not.toThrow();
+                expect(() => formatTitleSuffix(monitor)).not.toThrowError();
                 const result = formatTitleSuffix(monitor);
                 expect(result).toBe("");
             }
@@ -444,7 +444,7 @@ describe("MonitorTitleFormatters Property-Based Tests", () => {
                 });
 
                 // The current implementation doesn't handle errors, but test that it fails predictably
-                expect(() => formatTitleSuffix(testMonitor)).toThrow();
+                expect(() => formatTitleSuffix(testMonitor)).toThrowError();
             });
 
             test.prop([

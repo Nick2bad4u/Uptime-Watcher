@@ -274,7 +274,7 @@ describe("Theme Hooks - Comprehensive Coverage", () => {
                 act(() => {
                     result.current.setTheme("dark");
                 });
-            }).not.toThrow();
+            }).not.toThrowError();
         });
 
         it("should provide toggleTheme function that switches between light and dark", async ({
@@ -296,7 +296,7 @@ describe("Theme Hooks - Comprehensive Coverage", () => {
                 act(() => {
                     result.current.toggleTheme();
                 });
-            }).not.toThrow();
+            }).not.toThrowError();
         });
 
         it("should provide toggleTheme function that switches from dark to light", async ({
@@ -317,7 +317,7 @@ describe("Theme Hooks - Comprehensive Coverage", () => {
                 act(() => {
                     result.current.toggleTheme();
                 });
-            }).not.toThrow();
+            }).not.toThrowError();
         });
 
         it("should provide getColor function for dot-notation paths", async ({
@@ -420,7 +420,7 @@ describe("Theme Hooks - Comprehensive Coverage", () => {
             await new Promise((resolve) => setTimeout(resolve, 1));
 
             // Test that the hook works correctly without errors
-            expect(() => rerender()).not.toThrow();
+            expect(() => rerender()).not.toThrowError();
         });
 
         it("should handle system theme changes", async ({ task, annotate }) => {
@@ -463,7 +463,7 @@ describe("Theme Hooks - Comprehensive Coverage", () => {
             // Test that unmount doesn't throw an error and completes cleanup
             expect(() => {
                 unmount();
-            }).not.toThrow();
+            }).not.toThrowError();
 
             vi.useRealTimers();
         });
@@ -925,9 +925,15 @@ describe("Theme Hooks - Comprehensive Coverage", () => {
             expect(typeof result.current.setTheme).toBe("function");
 
             await act(async () => {
-                expect(() => result.current.setTheme("dark")).not.toThrow();
-                expect(() => result.current.setTheme("light")).not.toThrow();
-                expect(() => result.current.setTheme("system")).not.toThrow();
+                expect(() =>
+                    result.current.setTheme("dark")
+                ).not.toThrowError();
+                expect(() =>
+                    result.current.setTheme("light")
+                ).not.toThrowError();
+                expect(() =>
+                    result.current.setTheme("system")
+                ).not.toThrowError();
             });
         });
 

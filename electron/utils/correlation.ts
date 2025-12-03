@@ -39,6 +39,11 @@ import type { CorrelationId } from "@shared/types/events";
 
 import { randomBytes } from "node:crypto";
 
+const HEX_STRING_PATTERN = /^[a-f0-9]{16}$/v;
+
+const isCorrelationId = (value: string): value is CorrelationId =>
+    HEX_STRING_PATTERN.test(value);
+
 /**
  * Validation error class for business rule violations. Extends Error with
  * additional validation context.
@@ -81,5 +86,9 @@ export class ValidationError extends Error {
  * @returns A unique correlation ID string (16 hex characters)
  */
 export function generateCorrelationId(): CorrelationId {
-    return randomBytes(8).toString("hex") as CorrelationId;
+    const value = randomBytes(8).toString("hex");
+    if (!isCorrelationId(value)) {
+        throw new TypeError("Failed to generate a valid correlation ID");
+    }
+    return value;
 }

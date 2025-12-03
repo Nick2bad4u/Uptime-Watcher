@@ -194,7 +194,12 @@ const arbitraryMonitoringData = fc.record<StatusUpdate>({
     site: siteArbitrary,
     siteIdentifier: fc.string({ minLength: 3, maxLength: 64 }),
     status: monitorStatusArbitrary,
-    timestamp: fc.date().map((date) => date.toISOString()),
+    timestamp: fc
+        .date({
+            min: new Date("1970-01-01T00:00:00.000Z"),
+            max: new Date("3000-01-01T00:00:00.000Z"),
+        })
+        .map((date) => date.toISOString()),
 });
 
 const arbitrarySettingsData = fc.record({
@@ -259,7 +264,7 @@ describe("IPC Communication - 100% Fast-Check Fuzzing Coverage", () => {
                         null,
                         registeredHandlers
                     );
-                }).not.toThrow();
+                }).not.toThrowError();
 
                 expect(mockIpcMain.handle).toHaveBeenCalledWith(
                     channel,
@@ -326,7 +331,7 @@ describe("IPC Communication - 100% Fast-Check Fuzzing Coverage", () => {
                         null,
                         registeredHandlers
                     );
-                }).not.toThrow();
+                }).not.toThrowError();
             }
 
             expect(mockIpcMain.handle).toHaveBeenCalledTimes(
@@ -392,7 +397,7 @@ describe("IPC Communication - 100% Fast-Check Fuzzing Coverage", () => {
                             eventData
                         );
                     }
-                }).not.toThrow();
+                }).not.toThrowError();
 
                 // Reset for other tests
                 mockBrowserWindow.webContents.isDestroyed.mockReturnValue(
@@ -413,7 +418,7 @@ describe("IPC Communication - 100% Fast-Check Fuzzing Coverage", () => {
                     if (webContents && !webContents.isDestroyed()) {
                         webContents.send(channel, {});
                     }
-                }).not.toThrow();
+                }).not.toThrowError();
 
                 // Restore
                 mockBrowserWindow.webContents = originalWebContents;
@@ -538,7 +543,7 @@ describe("IPC Communication - 100% Fast-Check Fuzzing Coverage", () => {
                         null,
                         registeredHandlers
                     );
-                }).not.toThrow(); // Should handle gracefully
+                }).not.toThrowError(); // Should handle gracefully
             }
         });
 

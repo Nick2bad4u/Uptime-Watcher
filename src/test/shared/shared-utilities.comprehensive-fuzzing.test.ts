@@ -40,9 +40,9 @@ describe("Shared Utilities Comprehensive Fuzzing", () => {
         fcTest.prop([fc.anything()])(
             "should handle type guard operations",
             (input) => {
-                expect(() => guards.isObject(input)).not.toThrow();
-                expect(() => guards.isString(input)).not.toThrow();
-                expect(() => guards.isNumber(input)).not.toThrow();
+                expect(() => guards.isObject(input)).not.toThrowError();
+                expect(() => guards.isString(input)).not.toThrowError();
+                expect(() => guards.isNumber(input)).not.toThrowError();
             }
         );
     });

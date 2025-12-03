@@ -376,7 +376,7 @@ describe("Backend Constants", () => {
             // In strict mode, attempt to modify should throw an error
             expect(() => {
                 (RETRY_BACKOFF as any).INITIAL_DELAY = 999;
-            }).toThrow();
+            }).toThrowError();
 
             // Verify values remain unchanged
             expect(RETRY_BACKOFF.INITIAL_DELAY).toBe(500);

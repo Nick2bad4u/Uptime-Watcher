@@ -43,7 +43,7 @@ handoffs:
    agent: BeastMode
    prompt: "Keep looking for generic name/objects and change them into fast-check props. Make sure you're looking in all test folders: `src/tests` `tests/` `electron/tests` `shared/tests` - Don't slack off and look hard for more generic names to fix. Keep going until you can't find any more. Search deeply and thoroughly."
    send: true
-tools: ['execute/testFailure', 'execute/getTerminalOutput', 'execute/runTask', 'execute/getTaskOutput', 'execute/runInTerminal', 'execute/runTests', 'read/readFile', 'edit/createDirectory', 'edit/createFile', 'edit/editFiles', 'search/changes', 'search/codebase', 'search/fileSearch', 'search/listDirectory', 'search/problems', 'search/textSearch', 'search/usages', 'tavily-remote-mcp/*', 'deepwiki/ask_question', 'vscode-mcp/execute_command', 'vscode-mcp/get_diagnostics', 'vscode-mcp/get_references', 'vscode-mcp/get_symbol_lsp_info', 'agent', 'digitarald.agent-handoff/handoff', 'updateUserPreferences', 'memory', 'todo']
+tools: ['execute/testFailure', 'execute/runTests', 'read/readFile', 'edit/createDirectory', 'edit/createFile', 'edit/editFiles', 'search/changes', 'search/codebase', 'search/fileSearch', 'search/listDirectory', 'search/textSearch', 'search/usages', 'tavily-remote-mcp/*', 'deepwiki/ask_question', 'vscode-mcp/execute_command', 'vscode-mcp/get_diagnostics', 'vscode-mcp/get_references', 'vscode-mcp/get_symbol_lsp_info', 'agent', 'digitarald.agent-handoff/handoff', 'updateUserPreferences', 'memory', 'ivan-mezentsev.reliefpilot/ask_report', 'mijur.copilot-terminal-tools/listTerminals', 'mijur.copilot-terminal-tools/cancelCommand', 'todo']
 ---
 
 <instructions>

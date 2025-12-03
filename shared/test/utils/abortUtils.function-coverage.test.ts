@@ -136,7 +136,7 @@ describe("AbortUtils Function Coverage Tests", () => {
 
             await expect(
                 raceWithAbort(operation, controller.signal)
-            ).rejects.toThrow();
+            ).rejects.toThrowError();
         });
 
         test("should reject when signal aborts during operation", async () => {
@@ -150,7 +150,7 @@ describe("AbortUtils Function Coverage Tests", () => {
 
             await expect(
                 raceWithAbort(operation, controller.signal)
-            ).rejects.toThrow();
+            ).rejects.toThrowError();
         });
 
         test("should handle operation that rejects", async () => {
@@ -159,7 +159,7 @@ describe("AbortUtils Function Coverage Tests", () => {
 
             await expect(
                 raceWithAbort(operation, controller.signal)
-            ).rejects.toThrow("operation failed");
+            ).rejects.toThrowError("operation failed");
         });
     });
 });

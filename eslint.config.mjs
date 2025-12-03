@@ -2078,21 +2078,21 @@ export default /** @type {EslintConfig} */ [
             "jsx-a11y/prefer-tag-over-role": "warn",
             // Code spacing and formatting rules
             "lines-around-comment": [
-                "warn",
+                "off",
                 {
                     afterBlockComment: false,
                     afterLineComment: false,
-                    allowArrayEnd: false,
+                    allowArrayEnd: true,
                     allowArrayStart: true,
-                    allowBlockEnd: false,
+                    allowBlockEnd: true,
                     allowBlockStart: true,
-                    allowClassEnd: false,
+                    allowClassEnd: true,
                     allowClassStart: true,
-                    allowObjectEnd: false,
+                    allowObjectEnd: true,
                     allowObjectStart: true,
                     applyDefaultIgnorePatterns: true,
                     beforeBlockComment: true,
-                    beforeLineComment: true,
+                    beforeLineComment: false,
                     ignorePattern: String.raw`^\s*@`, // Ignore TSDoc tags like @param, @returns
                 },
             ],
@@ -2337,10 +2337,10 @@ export default /** @type {EslintConfig} */ [
             ],
             "prefer-const": "error",
             "prefer-template": "warn",
-            "prettier/prettier": [
-                "warn",
-                { usePrettierrc: true },
-            ],
+            //            "prettier/prettier": [
+            //                "warn",
+            //                { usePrettierrc: true },
+            //            ],
             // Promise
             "promise/no-multiple-resolved": "warn",
             "promise/prefer-await-to-callbacks": "off",
@@ -3416,21 +3416,21 @@ export default /** @type {EslintConfig} */ [
             "jsx-a11y/prefer-tag-over-role": "warn",
             // Code spacing and formatting rules
             "lines-around-comment": [
-                "warn",
+                "off",
                 {
                     afterBlockComment: false,
                     afterLineComment: false,
-                    allowArrayEnd: false,
+                    allowArrayEnd: true,
                     allowArrayStart: true,
-                    allowBlockEnd: false,
+                    allowBlockEnd: true,
                     allowBlockStart: true,
-                    allowClassEnd: false,
+                    allowClassEnd: true,
                     allowClassStart: true,
-                    allowObjectEnd: false,
+                    allowObjectEnd: true,
                     allowObjectStart: true,
                     applyDefaultIgnorePatterns: true,
                     beforeBlockComment: true,
-                    beforeLineComment: true,
+                    beforeLineComment: false,
                     ignorePattern: String.raw`^\s*@`, // Ignore TSDoc tags like @param, @returns
                 },
             ],
@@ -3683,10 +3683,10 @@ export default /** @type {EslintConfig} */ [
             "prefer-const": "error",
             "prefer-template": "warn",
             // Code style
-            "prettier/prettier": [
-                "warn",
-                { usePrettierrc: true },
-            ],
+            //            "prettier/prettier": [
+            //                "warn",
+            //                { usePrettierrc: true },
+            //            ],
             // Promise
             "promise/no-multiple-resolved": "warn",
             "promise/prefer-await-to-callbacks": "off",
@@ -3715,7 +3715,10 @@ export default /** @type {EslintConfig} */ [
             "react-hooks/syntax": "warn",
             "react-prefer-function-component/react-prefer-function-component": [
                 "error",
-                { allowComponentDidCatch: false },
+                {
+                    allowErrorBoundary: true,
+                    allowJsxUtilityClass: true,
+                },
             ],
             "react-require-testid/testid-missing": [
                 "warn",
@@ -3895,7 +3898,7 @@ export default /** @type {EslintConfig} */ [
             "react/jsx-no-literals": "off",
             "react/jsx-no-script-url": "warn",
             "react/jsx-no-useless-fragment": "warn",
-            "react/jsx-one-expression-per-line": "warn",
+            "react/jsx-one-expression-per-line": "off",
             "react/jsx-pascal-case": "warn",
             "react/jsx-props-no-multi-spaces": "warn",
             "react/jsx-props-no-spread-multi": "warn",
@@ -5060,21 +5063,21 @@ export default /** @type {EslintConfig} */ [
             "jsx-a11y/prefer-tag-over-role": "warn",
             // Code spacing and formatting rules
             "lines-around-comment": [
-                "warn",
+                "off",
                 {
                     afterBlockComment: false,
                     afterLineComment: false,
-                    allowArrayEnd: false,
+                    allowArrayEnd: true,
                     allowArrayStart: true,
-                    allowBlockEnd: false,
+                    allowBlockEnd: true,
                     allowBlockStart: true,
-                    allowClassEnd: false,
+                    allowClassEnd: true,
                     allowClassStart: true,
-                    allowObjectEnd: false,
+                    allowObjectEnd: true,
                     allowObjectStart: true,
                     applyDefaultIgnorePatterns: true,
                     beforeBlockComment: true,
-                    beforeLineComment: true,
+                    beforeLineComment: false,
                     ignorePattern: String.raw`^\s*@`, // Ignore TSDoc tags like @param, @returns
                 },
             ],
@@ -5327,10 +5330,10 @@ export default /** @type {EslintConfig} */ [
             ],
             "prefer-const": "error",
             "prefer-template": "warn",
-            "prettier/prettier": [
-                "warn",
-                { usePrettierrc: true },
-            ],
+            //            "prettier/prettier": [
+            //                "warn",
+            //                { usePrettierrc: true },
+            //            ],
             // Promise
             "promise/no-multiple-resolved": "warn",
             "promise/prefer-await-to-callbacks": "off",
@@ -6416,21 +6419,21 @@ export default /** @type {EslintConfig} */ [
             "jsx-a11y/prefer-tag-over-role": "warn",
             // Code spacing and formatting rules
             "lines-around-comment": [
-                "warn",
+                "off",
                 {
                     afterBlockComment: false,
                     afterLineComment: false,
-                    allowArrayEnd: false,
+                    allowArrayEnd: true,
                     allowArrayStart: true,
-                    allowBlockEnd: false,
+                    allowBlockEnd: true,
                     allowBlockStart: true,
-                    allowClassEnd: false,
+                    allowClassEnd: true,
                     allowClassStart: true,
-                    allowObjectEnd: false,
+                    allowObjectEnd: true,
                     allowObjectStart: true,
                     applyDefaultIgnorePatterns: true,
                     beforeBlockComment: true,
-                    beforeLineComment: true,
+                    beforeLineComment: false,
                     ignorePattern: String.raw`^\s*@`, // Ignore TSDoc tags like @param, @returns
                 },
             ],
@@ -6684,10 +6687,10 @@ export default /** @type {EslintConfig} */ [
             "prefer-const": "error",
             "prefer-template": "warn",
             // Code style
-            "prettier/prettier": [
-                "warn",
-                { usePrettierrc: true },
-            ],
+            //            "prettier/prettier": [
+            //                "warn",
+            //                { usePrettierrc: true },
+            //            ],
             // Promise
             "promise/no-multiple-resolved": "warn",
             "promise/prefer-await-to-callbacks": "off",
@@ -6716,7 +6719,10 @@ export default /** @type {EslintConfig} */ [
             "react-hooks/syntax": "warn",
             "react-prefer-function-component/react-prefer-function-component": [
                 "error",
-                { allowComponentDidCatch: false },
+                {
+                    allowErrorBoundary: true,
+                    allowJsxUtilityClass: true,
+                },
             ],
             "react-require-testid/testid-missing": [
                 "warn",
@@ -6896,7 +6902,7 @@ export default /** @type {EslintConfig} */ [
             "react/jsx-no-literals": "off",
             "react/jsx-no-script-url": "warn",
             "react/jsx-no-useless-fragment": "warn",
-            "react/jsx-one-expression-per-line": "warn",
+            "react/jsx-one-expression-per-line": "off",
             "react/jsx-pascal-case": "warn",
             "react/jsx-props-no-multi-spaces": "warn",
             "react/jsx-props-no-spread-multi": "warn",
@@ -8543,10 +8549,10 @@ export default /** @type {EslintConfig} */ [
             ],
             "prefer-const": "error",
             "prefer-destructuring": "off",
-            "prettier/prettier": [
-                "warn",
-                { usePrettierrc: true },
-            ],
+            //            "prettier/prettier": [
+            //                "warn",
+            //                { usePrettierrc: true },
+            //            ],
             // Promise
             "promise/no-multiple-resolved": "warn",
             "promise/prefer-await-to-callbacks": "off",

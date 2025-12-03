@@ -318,9 +318,11 @@ export async function handleSQLiteBackupDownload(
             playwrightLastBackup?: SerializedDatabaseBackupResult;
         };
         automationTarget.playwrightLastBackup = backupResult;
+        const metadataSizeBytes =
+            backupResult.metadata?.sizeBytes ?? backupResult.buffer.byteLength;
         logger.info("SQLite backup captured in automation mode", {
             fileName: backupResult.fileName,
-            sizeBytes: backupResult.metadata.sizeBytes,
+            sizeBytes: metadataSizeBytes,
         });
         return;
     }

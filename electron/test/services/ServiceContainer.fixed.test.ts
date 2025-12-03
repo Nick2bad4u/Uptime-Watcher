@@ -466,7 +466,7 @@ describe("ServiceContainer - Fixed Tests", () => {
             container = ServiceContainer.getInstance(emptyConfig);
 
             expect(container).toBeDefined();
-            expect(() => container.getSiteManager()).not.toThrow();
+            expect(() => container.getSiteManager()).not.toThrowError();
         });
     });
 });

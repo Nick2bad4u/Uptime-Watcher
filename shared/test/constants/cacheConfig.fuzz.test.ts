@@ -404,11 +404,11 @@ describe("cacheConfig - Property-Based Fuzzing Tests", () => {
                     // Attempt to modify should fail (frozen objects)
                     expect(() => {
                         (config as any).ttl = 999;
-                    }).toThrow();
+                    }).toThrowError();
 
                     expect(() => {
                         (config as any).name = "modified";
-                    }).toThrow();
+                    }).toThrowError();
                 })
             );
         });
@@ -452,18 +452,18 @@ describe("cacheConfig - Property-Based Fuzzing Tests", () => {
                         // Test all optional suffix functions
                         expect(() =>
                             CACHE_NAMES.monitors(extremeValue)
-                        ).not.toThrow();
+                        ).not.toThrowError();
                         expect(() =>
                             CACHE_NAMES.settings(extremeValue)
-                        ).not.toThrow();
+                        ).not.toThrowError();
                         expect(() =>
                             CACHE_NAMES.sites(extremeValue)
-                        ).not.toThrow();
+                        ).not.toThrowError();
 
                         // Test temporary function (required parameter)
                         expect(() =>
                             CACHE_NAMES.temporary(extremeValue)
-                        ).not.toThrow();
+                        ).not.toThrowError();
 
                         // Verify results are strings
                         expect(typeof CACHE_NAMES.monitors(extremeValue)).toBe(

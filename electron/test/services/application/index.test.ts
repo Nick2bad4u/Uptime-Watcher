@@ -27,6 +27,6 @@ describe("Application Services Index", () => {
         await annotate("Category: Service", "category");
         await annotate("Type: Business Logic", "type");
 
-        expect(() => new ApplicationService()).not.toThrow();
+        expect(() => new ApplicationService()).not.toThrowError();
     });
 });

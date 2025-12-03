@@ -272,7 +272,7 @@ describe("Interfaces Coverage Tests", () => {
                 logger.error("test");
             };
 
-            expect(() => testFunction(mockLogger)).not.toThrow();
+            expect(() => testFunction(mockLogger)).not.toThrowError();
         });
 
         it("should work with async logger implementations", async ({

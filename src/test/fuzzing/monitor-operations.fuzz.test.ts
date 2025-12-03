@@ -373,7 +373,7 @@ describe("Monitor Operations Fuzzing Tests", () => {
                 fc.property(fc.array(fc.anything()), (arrayInput) => {
                     expect(() =>
                         normalizeMonitor(arrayInput as Partial<Monitor>)
-                    ).toThrow(
+                    ).toThrowError(
                         "Invalid monitor data: must be an object, not an array"
                     );
                 })
@@ -520,7 +520,7 @@ describe("Monitor Operations Fuzzing Tests", () => {
                                     monitor,
                                     statusValue as MonitorStatus
                                 )
-                            ).toThrow("Invalid monitor status");
+                            ).toThrowError("Invalid monitor status");
                         }
                     }
                 )
@@ -705,11 +705,11 @@ describe("Monitor Operations Fuzzing Tests", () => {
                     if (monitorExists) {
                         expect(() =>
                             validateMonitorExists(site, randomId)
-                        ).not.toThrow();
+                        ).not.toThrowError();
                     } else {
                         expect(() =>
                             validateMonitorExists(site, randomId)
-                        ).toThrow();
+                        ).toThrowError();
                     }
                 })
             );
@@ -720,7 +720,7 @@ describe("Monitor Operations Fuzzing Tests", () => {
                 fc.property(fc.string(), (monitorId) => {
                     expect(() =>
                         validateMonitorExists(undefined, monitorId)
-                    ).toThrow();
+                    ).toThrowError();
                 })
             );
         });

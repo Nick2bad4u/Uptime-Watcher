@@ -769,7 +769,7 @@ describe("Comprehensive IPC Communication Fuzzing", () => {
                     // Property: Timestamp should be valid ISO string
                     expect(
                         () => new Date(result.error.timestamp)
-                    ).not.toThrow();
+                    ).not.toThrowError();
                 }
             }
         );

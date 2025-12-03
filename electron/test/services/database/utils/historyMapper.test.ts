@@ -684,7 +684,7 @@ describe("historyMapper utilities", () => {
             // Create a circular reference to cause JSON.stringify to throw
             (row.details as any).self = row.details;
 
-            expect(() => rowToHistoryEntry(row)).toThrow();
+            expect(() => rowToHistoryEntry(row)).toThrowError();
             expect(logger.error).toHaveBeenCalledWith(
                 "[HistoryMapper] Failed to map database row to history entry",
                 expect.objectContaining({

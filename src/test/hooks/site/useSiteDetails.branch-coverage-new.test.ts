@@ -166,7 +166,7 @@ describe("useSiteDetails - Branch Coverage Tests", () => {
                 act(async () => {
                     await result.current.handleSaveInterval();
                 })
-            ).rejects.toThrow();
+            ).rejects.toThrowError();
 
             expect(mockLogger.site.error).toHaveBeenCalled();
         });
@@ -207,7 +207,7 @@ describe("useSiteDetails - Branch Coverage Tests", () => {
                 act(async () => {
                     await result.current.handleSaveTimeout();
                 })
-            ).rejects.toThrow();
+            ).rejects.toThrowError();
 
             expect(mockLogger.site.error).toHaveBeenCalled();
         });
@@ -248,7 +248,7 @@ describe("useSiteDetails - Branch Coverage Tests", () => {
                 act(async () => {
                     await result.current.handleSaveRetryAttempts();
                 })
-            ).rejects.toThrow();
+            ).rejects.toThrowError();
 
             expect(mockLogger.site.error).toHaveBeenCalled();
         });

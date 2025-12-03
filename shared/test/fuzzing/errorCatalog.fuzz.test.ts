@@ -87,7 +87,7 @@ describe("ErrorCatalog utilities fuzzing tests", () => {
             (template, params) => {
                 expect(() =>
                     formatErrorMessage(template, params)
-                ).not.toThrow();
+                ).not.toThrowError();
             }
         );
 
@@ -221,7 +221,7 @@ describe("ErrorCatalog utilities fuzzing tests", () => {
                 // FormatErrorMessage should not throw even if params are missing
                 expect(() =>
                     formatErrorMessage(templateWithPlaceholders, params)
-                ).not.toThrow();
+                ).not.toThrowError();
 
                 const result = formatErrorMessage(
                     templateWithPlaceholders,
@@ -350,7 +350,7 @@ describe("ErrorCatalog utilities fuzzing tests", () => {
         test.prop([fc.string()])(
             "should handle edge cases gracefully",
             (input) => {
-                expect(() => isKnownErrorMessage(input)).not.toThrow();
+                expect(() => isKnownErrorMessage(input)).not.toThrowError();
 
                 const result = isKnownErrorMessage(input);
                 expect(typeof result).toBe("boolean");
@@ -436,7 +436,7 @@ describe("ErrorCatalog utilities fuzzing tests", () => {
                     } catch {
                         // Catching any error to ensure the function itself doesn't crash the test
                     }
-                }).not.toThrow();
+                }).not.toThrowError();
             }
         );
     });

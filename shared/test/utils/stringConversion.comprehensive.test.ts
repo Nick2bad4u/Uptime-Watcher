@@ -406,7 +406,7 @@ describe("String Conversion Utilities - Comprehensive Coverage", () => {
 
                 // Should either be a JSON string or fallback
                 if (result.startsWith("[") && result.endsWith("]")) {
-                    expect(() => JSON.parse(result)).not.toThrow();
+                    expect(() => JSON.parse(result)).not.toThrowError();
                 }
             }
         );
@@ -419,7 +419,7 @@ describe("String Conversion Utilities - Comprehensive Coverage", () => {
 
                 // Should either be a JSON string or fallback
                 if (result.startsWith("{") && result.endsWith("}")) {
-                    expect(() => JSON.parse(result)).not.toThrow();
+                    expect(() => JSON.parse(result)).not.toThrowError();
                 }
             }
         );
@@ -444,7 +444,7 @@ describe("String Conversion Utilities - Comprehensive Coverage", () => {
             expect(() => {
                 const result = safeStringify(input);
                 expect(typeof result).toBe("string");
-            }).not.toThrow();
+            }).not.toThrowError();
         });
 
         test.prop([fc.array(fc.jsonValue(), { minLength: 0, maxLength: 10 })])(

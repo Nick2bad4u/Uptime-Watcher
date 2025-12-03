@@ -343,7 +343,7 @@ describe(DatabaseManager, () => {
                 "createBackupService"
             ).mockReturnValue(mockDataBackupService);
 
-            await expect(databaseManager.downloadBackup()).rejects.toThrow(
+            await expect(databaseManager.downloadBackup()).rejects.toThrowError(
                 "Backup failed"
             );
         });
@@ -406,7 +406,7 @@ describe(DatabaseManager, () => {
                 "createImportExportService"
             ).mockReturnValue(mockDataImportExportService);
 
-            await expect(databaseManager.exportData()).rejects.toThrow(
+            await expect(databaseManager.exportData()).rejects.toThrowError(
                 "Export failed"
             );
         });
@@ -548,9 +548,9 @@ describe(DatabaseManager, () => {
                 new Error("Set limit failed")
             );
 
-            await expect(databaseManager.setHistoryLimit(500)).rejects.toThrow(
-                "Set limit failed"
-            );
+            await expect(
+                databaseManager.setHistoryLimit(500)
+            ).rejects.toThrowError("Set limit failed");
         });
 
         it("should update internal history limit on successful set", async () => {
@@ -615,7 +615,7 @@ describe(DatabaseManager, () => {
                 "createBackupService"
             ).mockReturnValue(mockDataBackupService);
 
-            await expect(databaseManager.downloadBackup()).rejects.toThrow(
+            await expect(databaseManager.downloadBackup()).rejects.toThrowError(
                 "Service error"
             );
         });
@@ -626,7 +626,9 @@ describe(DatabaseManager, () => {
             );
 
             // This should not throw because the error is caught and logged
-            await expect(databaseManager.initialize()).resolves.not.toThrow();
+            await expect(
+                databaseManager.initialize()
+            ).resolves.not.toThrowError();
         });
     });
 

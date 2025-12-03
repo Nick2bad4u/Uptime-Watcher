@@ -193,7 +193,9 @@ describe("objectSafety.ts fuzzing tests", () => {
                     throw new Error("Callback error");
                 });
 
-                expect(() => safeObjectIteration(obj, callback)).not.toThrow();
+                expect(() =>
+                    safeObjectIteration(obj, callback)
+                ).not.toThrowError();
                 expect(consoleSpy).toHaveBeenCalledWith(
                     "Object iteration failed for context:",
                     "Safe object iteration",

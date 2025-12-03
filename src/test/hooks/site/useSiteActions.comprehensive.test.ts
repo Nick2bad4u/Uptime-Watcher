@@ -384,8 +384,8 @@ describe("useSiteActions Hook", () => {
             expect(typeof secondRender.handleStartMonitoring).toBe("function");
 
             // Functions should work correctly (testing functional stability rather than reference equality)
-            expect(() => firstRender.handleCardClick()).not.toThrow();
-            expect(() => secondRender.handleCardClick()).not.toThrow();
+            expect(() => firstRender.handleCardClick()).not.toThrowError();
+            expect(() => secondRender.handleCardClick()).not.toThrowError();
         });
 
         it("should work with multiple hook instances", async ({
@@ -415,8 +415,8 @@ describe("useSiteActions Hook", () => {
             expect(typeof result2.current.handleCardClick).toBe("function");
 
             // Both instances should be callable
-            expect(() => result1.current.handleCardClick()).not.toThrow();
-            expect(() => result2.current.handleCardClick()).not.toThrow();
+            expect(() => result1.current.handleCardClick()).not.toThrowError();
+            expect(() => result2.current.handleCardClick()).not.toThrowError();
         });
     });
 

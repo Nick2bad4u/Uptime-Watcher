@@ -285,7 +285,7 @@ describe("ThemeManager Property-Based Tests", () => {
         "should successfully apply any valid theme to DOM",
         (theme) => {
             // Apply theme should not throw and should call style setProperty
-            expect(() => themeManager.applyTheme(theme)).not.toThrow();
+            expect(() => themeManager.applyTheme(theme)).not.toThrowError();
 
             // Verify CSS properties were set
             expect(
@@ -481,7 +481,7 @@ describe("ThemeManager Property-Based Tests", () => {
                 for (const theme of themes) {
                     themeManager.applyTheme(theme);
                 }
-            }).not.toThrow();
+            }).not.toThrowError();
 
             // Should have called setProperty for each unique theme
             expect(
@@ -504,7 +504,7 @@ describe("ThemeManager Property-Based Tests", () => {
             );
 
             // Cleanup should not throw
-            expect(() => cleanup()).not.toThrow();
+            expect(() => cleanup()).not.toThrowError();
         }
     );
 
@@ -554,7 +554,7 @@ describe("ThemeManager Property-Based Tests", () => {
         global.document = undefined as any;
 
         const theme = themes.light;
-        expect(() => themeManager.applyTheme(theme)).not.toThrow();
+        expect(() => themeManager.applyTheme(theme)).not.toThrowError();
     });
 
     it("should handle missing window gracefully", () => {

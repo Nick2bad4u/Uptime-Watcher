@@ -847,7 +847,7 @@ describe("objectSafety comprehensive fuzzing tests", () => {
 
             expect(() => {
                 safeObjectIteration(largeObj, callback);
-            }).not.toThrow();
+            }).not.toThrowError();
 
             expect(callback).toHaveBeenCalledTimes(10_000);
         });

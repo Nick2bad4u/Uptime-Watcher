@@ -141,7 +141,7 @@ describe("TimeoutUtils Property-Based Tests", () => {
             ),
         ])("should handle special numeric values", (specialValue) => {
             // Test that it doesn't crash on special values
-            expect(() => clampTimeoutMs(specialValue)).not.toThrow();
+            expect(() => clampTimeoutMs(specialValue)).not.toThrowError();
             const result = clampTimeoutMs(specialValue);
             // For NaN, Math.max/min behavior is to return NaN, but we want to verify behavior
             expect(
@@ -479,7 +479,7 @@ describe("TimeoutUtils Property-Based Tests", () => {
                 clampTimeoutSeconds(largeNumber);
                 timeoutSecondsToMs(largeNumber);
                 timeoutMsToSeconds(largeNumber);
-            }).not.toThrow();
+            }).not.toThrowError();
         });
     });
 });

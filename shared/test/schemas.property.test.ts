@@ -15,10 +15,9 @@ import {
     pingMonitorSchema,
     dnsMonitorSchema,
     monitorSchema,
-    siteSchema,
     validateMonitorData,
-    validateSiteData,
-} from "../validation/schemas";
+} from "../validation/monitorSchemas";
+import { siteSchema, validateSiteData } from "../validation/siteSchemas";
 import { BASE_MONITOR_TYPES } from "../types";
 
 // Custom arbitraries for monitor data generation that match schema constraints

@@ -101,7 +101,7 @@ describe("SystemService", () => {
             const error = new Error("Electron API unavailable");
             mockWaitForElectronBridge.mockRejectedValue(error);
 
-            await expect(SystemService.initialize()).rejects.toThrow(
+            await expect(SystemService.initialize()).rejects.toThrowError(
                 "Electron API unavailable"
             );
             expect(mockLogger.error).toHaveBeenCalledWith(
@@ -147,7 +147,7 @@ describe("SystemService", () => {
 
             await expect(
                 SystemService.openExternal("https://example.com")
-            ).rejects.toThrow("Initialization failed");
+            ).rejects.toThrowError("Initialization failed");
             expect(mockElectronAPI.system.openExternal).not.toHaveBeenCalled();
         });
 
@@ -157,7 +157,7 @@ describe("SystemService", () => {
 
             await expect(
                 SystemService.openExternal("https://example.com")
-            ).rejects.toThrow("Failed to open external URL");
+            ).rejects.toThrowError("Failed to open external URL");
             expect(mockWaitForElectronBridge).toHaveBeenCalledTimes(1);
             expect(mockElectronAPI.system.openExternal).toHaveBeenCalledWith(
                 "https://example.com"
@@ -252,7 +252,7 @@ describe("SystemService", () => {
             const error = new Error("init failed");
             mockWaitForElectronBridge.mockRejectedValueOnce(error);
 
-            await expect(SystemService.quitAndInstall()).rejects.toThrow(
+            await expect(SystemService.quitAndInstall()).rejects.toThrowError(
                 "init failed"
             );
             expect(
@@ -265,7 +265,7 @@ describe("SystemService", () => {
                 "invalid"
             );
 
-            await expect(SystemService.quitAndInstall()).rejects.toThrow(
+            await expect(SystemService.quitAndInstall()).rejects.toThrowError(
                 /Invalid response received from quitAndInstall/
             );
         });
@@ -273,7 +273,7 @@ describe("SystemService", () => {
         it("should reject when bridge reports failure", async () => {
             mockElectronAPI.system.quitAndInstall.mockResolvedValueOnce(false);
 
-            await expect(SystemService.quitAndInstall()).rejects.toThrow(
+            await expect(SystemService.quitAndInstall()).rejects.toThrowError(
                 "Electron declined to execute quitAndInstall request"
             );
         });
@@ -284,7 +284,7 @@ describe("SystemService", () => {
                 failure
             );
 
-            await expect(SystemService.quitAndInstall()).rejects.toThrow(
+            await expect(SystemService.quitAndInstall()).rejects.toThrowError(
                 "Updater blew up"
             );
         });
@@ -371,7 +371,7 @@ describe("SystemService", () => {
 
             await expect(
                 SystemService.openExternal("https://example.com")
-            ).rejects.toThrow("Synchronous error");
+            ).rejects.toThrowError("Synchronous error");
         });
 
         it("should handle missing electron API gracefully", async () => {
@@ -380,7 +380,7 @@ describe("SystemService", () => {
 
             await expect(
                 SystemService.openExternal("https://example.com")
-            ).rejects.toThrow("Missing electron API");
+            ).rejects.toThrowError("Missing electron API");
         });
 
         it("should handle partial electron API gracefully", async () => {
@@ -390,7 +390,7 @@ describe("SystemService", () => {
 
             await expect(
                 SystemService.openExternal("https://example.com")
-            ).rejects.toThrow();
+            ).rejects.toThrowError();
         });
 
         it("should handle network-like errors in open operations", async () => {
@@ -407,7 +407,7 @@ describe("SystemService", () => {
                 );
                 await expect(
                     SystemService.openExternal("https://example.com")
-                ).rejects.toThrow(error.message);
+                ).rejects.toThrowError(error.message);
             }
         });
 
@@ -425,7 +425,7 @@ describe("SystemService", () => {
                 );
                 await expect(
                     SystemService.openExternal("https://example.com")
-                ).rejects.toThrow(error.message);
+                ).rejects.toThrowError(error.message);
             }
         });
     });
@@ -517,7 +517,7 @@ describe("SystemService", () => {
 
             await expect(
                 SystemService.openExternal("https://example.com")
-            ).rejects.toThrow(
+            ).rejects.toThrowError(
                 "Electron declined to open external URL: https://example.com"
             );
             expect(mockElectronAPI.system.openExternal).toHaveBeenCalledWith(
@@ -541,7 +541,7 @@ describe("SystemService", () => {
                 );
                 await expect(
                     SystemService.openExternal("https://example.com")
-                ).rejects.toThrow(
+                ).rejects.toThrowError(
                     "Electron declined to open external URL: https://example.com"
                 );
                 expect(

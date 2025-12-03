@@ -271,9 +271,9 @@ describe("OperationHelpers", () => {
                 name: "Updated Duplicate",
             };
 
-            expect(() => applySavedSiteToStore(savedSite, mockDeps)).toThrow(
-                DuplicateSiteIdentifierError
-            );
+            expect(() =>
+                applySavedSiteToStore(savedSite, mockDeps)
+            ).toThrowError(DuplicateSiteIdentifierError);
             expect(setSitesSpy).not.toHaveBeenCalled();
             expect(mockLogger.error).toHaveBeenCalledWith(
                 "Duplicate site identifiers detected while persisting backend snapshot",
@@ -313,9 +313,9 @@ describe("OperationHelpers", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Error Handling", "type");
 
-            expect(() => getSiteByIdentifier("nonexistent", mockDeps)).toThrow(
-                "Site not found"
-            );
+            expect(() =>
+                getSiteByIdentifier("nonexistent", mockDeps)
+            ).toThrowError("Site not found");
             expect(getSitesSpy).toHaveBeenCalledTimes(1);
         });
 
@@ -327,7 +327,7 @@ describe("OperationHelpers", () => {
 
             getSitesSpy.mockReturnValue([]);
 
-            expect(() => getSiteByIdentifier("site1", mockDeps)).toThrow(
+            expect(() => getSiteByIdentifier("site1", mockDeps)).toThrowError(
                 "Site not found"
             );
             expect(getSitesSpy).toHaveBeenCalledTimes(1);
@@ -385,7 +385,7 @@ describe("OperationHelpers", () => {
 
             await expect(
                 updateMonitorAndSave("nonexistent", "monitor1", {}, mockDeps)
-            ).rejects.toThrow("Site not found");
+            ).rejects.toThrowError("Site not found");
 
             expect(getSitesSpy).toHaveBeenCalledTimes(1);
             expect(mockUpdateMonitorInSite).not.toHaveBeenCalled();
@@ -407,7 +407,7 @@ describe("OperationHelpers", () => {
 
             await expect(
                 updateMonitorAndSave("site1", "monitor1", {}, mockDeps)
-            ).rejects.toThrow("API Error");
+            ).rejects.toThrowError("API Error");
 
             expect(getSitesSpy).toHaveBeenCalledTimes(1);
             expect(mockUpdateMonitorInSite).toHaveBeenCalled();
@@ -558,7 +558,7 @@ describe("OperationHelpers", () => {
                 withSiteOperation("testOperation", mockOperation, mockDeps, {
                     telemetry: params,
                 })
-            ).rejects.toThrow("Operation failed");
+            ).rejects.toThrowError("Operation failed");
 
             expect(mockLogStoreAction).toHaveBeenNthCalledWith(
                 1,
@@ -603,7 +603,7 @@ describe("OperationHelpers", () => {
                 withSiteOperation("testOperation", mockOperation, mockDeps, {
                     telemetry: params,
                 })
-            ).rejects.toThrow("Sync failed");
+            ).rejects.toThrowError("Sync failed");
 
             expect(mockOperation).toHaveBeenCalledTimes(1);
             expect(mockDeps.syncSites).toHaveBeenCalledTimes(1);
@@ -692,7 +692,7 @@ describe("OperationHelpers", () => {
                         failure: { reason: "ipc" },
                     },
                 })
-            ).rejects.toThrow("failure");
+            ).rejects.toThrowError("failure");
 
             expect(mockLogStoreAction).toHaveBeenCalledTimes(2);
 
@@ -886,7 +886,7 @@ describe("OperationHelpers", () => {
                     mockDeps,
                     { telemetry: params }
                 )
-            ).rejects.toThrow("Operation failed");
+            ).rejects.toThrowError("Operation failed");
 
             expect(mockLogStoreAction).toHaveBeenNthCalledWith(
                 1,
@@ -938,7 +938,7 @@ describe("OperationHelpers", () => {
                     mockDeps,
                     { telemetry: params }
                 )
-            ).rejects.toThrow("Sync failed");
+            ).rejects.toThrowError("Sync failed");
 
             expect(mockOperation).toHaveBeenCalledTimes(1);
             expect(mockDeps.syncSites).toHaveBeenCalledTimes(1);

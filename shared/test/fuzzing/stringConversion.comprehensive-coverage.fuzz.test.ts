@@ -269,7 +269,7 @@ describe("StringConversion Complete Coverage Fuzzing Tests", () => {
         test.prop([fc.anything()])(
             "should handle all edge cases without throwing",
             (value) => {
-                expect(() => safeStringify(value)).not.toThrow();
+                expect(() => safeStringify(value)).not.toThrowError();
                 const result = safeStringify(value);
                 expect(typeof result).toBe("string");
                 expect(result.length).toBeGreaterThanOrEqual(0);
@@ -309,7 +309,7 @@ describe("StringConversion Complete Coverage Fuzzing Tests", () => {
                 const result = safeStringify(value);
 
                 // Should be safe for console.log
-                expect(() => console.log(result)).not.toThrow();
+                expect(() => console.log(result)).not.toThrowError();
 
                 // Should not contain dangerous characters for basic HTML display
                 // (though proper HTML escaping would still be needed)

@@ -116,7 +116,7 @@ describe("abortUtils.ts - Comprehensive Fast-Check Tests", () => {
                                     options as CombineSignalsOptions
                                 );
                                 expect(signal).toBeInstanceOf(AbortSignal);
-                            }).not.toThrow();
+                            }).not.toThrowError();
                         }
                     )
                 );
@@ -194,7 +194,7 @@ describe("abortUtils.ts - Comprehensive Fast-Check Tests", () => {
 
                             await expect(
                                 createAbortableOperation(operation, { cleanup })
-                            ).rejects.toThrow(errorMessage);
+                            ).rejects.toThrowError(errorMessage);
 
                             expect(cleanup).toHaveBeenCalledTimes(1);
                         }
@@ -237,7 +237,9 @@ describe("abortUtils.ts - Comprehensive Fast-Check Tests", () => {
                             setTimeout(() => controller.abort(), abortDelay);
                             vi.advanceTimersByTime(abortDelay);
 
-                            await expect(promise).rejects.toThrow("Aborted");
+                            await expect(promise).rejects.toThrowError(
+                                "Aborted"
+                            );
                             expect(cleanup).toHaveBeenCalledTimes(1);
                         }
                     )
@@ -284,7 +286,7 @@ describe("abortUtils.ts - Comprehensive Fast-Check Tests", () => {
                             );
                             vi.advanceTimersByTime(abortMs);
 
-                            await expect(promise).rejects.toThrow();
+                            await expect(promise).rejects.toThrowError();
                         }
                     )
                 );
@@ -301,7 +303,7 @@ describe("abortUtils.ts - Comprehensive Fast-Check Tests", () => {
 
                             await expect(
                                 sleep(ms, controller.signal)
-                            ).rejects.toThrow();
+                            ).rejects.toThrowError();
                         }
                     )
                 );
@@ -350,7 +352,9 @@ describe("abortUtils.ts - Comprehensive Fast-Check Tests", () => {
                     signal: controller.signal,
                 });
 
-                await expect(promise).rejects.toThrow("Operation was aborted");
+                await expect(promise).rejects.toThrowError(
+                    "Operation was aborted"
+                );
             });
         }
     );
@@ -413,7 +417,7 @@ describe("abortUtils.ts - Comprehensive Fast-Check Tests", () => {
                             setTimeout(() => controller.abort(), abortDelay);
                             vi.advanceTimersByTime(abortDelay + 10);
 
-                            await expect(promise).rejects.toThrow(
+                            await expect(promise).rejects.toThrowError(
                                 "Operation was aborted"
                             );
                         }
@@ -435,7 +439,7 @@ describe("abortUtils.ts - Comprehensive Fast-Check Tests", () => {
 
                             await expect(
                                 raceWithAbort(operation, controller.signal)
-                            ).rejects.toThrow("Operation was aborted");
+                            ).rejects.toThrowError("Operation was aborted");
                         }
                     )
                 );
@@ -499,7 +503,7 @@ describe("abortUtils.ts - Comprehensive Fast-Check Tests", () => {
                             createCombinedAbortSignal({
                                 timeoutMs: invalidTimeout,
                             });
-                        }).not.toThrow();
+                        }).not.toThrowError();
                     }
                 )
             );
@@ -514,7 +518,7 @@ describe("abortUtils.ts - Comprehensive Fast-Check Tests", () => {
                             createCombinedAbortSignal(
                                 options as CombineSignalsOptions | undefined
                             );
-                        }).not.toThrow();
+                        }).not.toThrowError();
                     }
                 )
             );

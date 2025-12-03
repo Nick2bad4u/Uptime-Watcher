@@ -515,7 +515,7 @@ describe("CacheKeys - Complete Function Coverage", () => {
 
             expect(() => {
                 parseCacheKey(":identifier" as StandardizedCacheKey);
-            }).toThrow("Invalid cache key format: :identifier");
+            }).toThrowError("Invalid cache key format: :identifier");
         });
 
         it("should throw error for 2-part format with empty identifier", async ({
@@ -532,7 +532,7 @@ describe("CacheKeys - Complete Function Coverage", () => {
 
             expect(() =>
                 parseCacheKey("config:" as StandardizedCacheKey)
-            ).toThrow("Invalid cache key format: config:");
+            ).toThrowError("Invalid cache key format: config:");
         });
 
         it("should throw error for invalid 3-part format with empty prefix", async ({
@@ -549,7 +549,7 @@ describe("CacheKeys - Complete Function Coverage", () => {
 
             expect(() => {
                 parseCacheKey(":operation:identifier" as StandardizedCacheKey);
-            }).toThrow("Invalid cache key format: :operation:identifier");
+            }).toThrowError("Invalid cache key format: :operation:identifier");
         });
 
         it("should throw error for invalid 3-part format with empty operation", async ({
@@ -566,7 +566,7 @@ describe("CacheKeys - Complete Function Coverage", () => {
 
             expect(() => {
                 parseCacheKey("prefix::identifier" as StandardizedCacheKey);
-            }).toThrow("Invalid cache key format: prefix::identifier");
+            }).toThrowError("Invalid cache key format: prefix::identifier");
         });
 
         it("should throw error for invalid 3-part format with empty identifier", async ({
@@ -583,7 +583,7 @@ describe("CacheKeys - Complete Function Coverage", () => {
 
             expect(() => {
                 parseCacheKey("prefix:operation:" as StandardizedCacheKey);
-            }).toThrow("Invalid cache key format: prefix:operation:");
+            }).toThrowError("Invalid cache key format: prefix:operation:");
         });
 
         it("should handle complex identifiers", async ({ task, annotate }) => {

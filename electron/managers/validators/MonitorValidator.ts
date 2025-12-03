@@ -22,7 +22,7 @@
 import type { Site } from "@shared/types";
 
 import { shouldRemediateMonitorInterval } from "@shared/constants/monitoring";
-import { validateMonitorData } from "@shared/validation/schemas";
+import { validateMonitorData } from "@shared/validation/monitorSchemas";
 
 import type { ValidationResult } from "./interfaces";
 

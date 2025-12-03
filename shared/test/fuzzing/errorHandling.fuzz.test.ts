@@ -41,7 +41,7 @@ describe("ErrorHandling fuzzing - line 141", () => {
 
             await expect(
                 withErrorHandling(failingOperation, context)
-            ).rejects.toThrow("Test error");
+            ).rejects.toThrowError("Test error");
 
             // Verify line 141 was hit - console.error should be called
             expect(consoleErrorSpy).toHaveBeenCalledWith(
@@ -97,7 +97,7 @@ describe("ErrorHandling fuzzing - line 141", () => {
 
                 await expect(
                     withErrorHandling(failingOperation, context)
-                ).rejects.toThrow(errorMessage);
+                ).rejects.toThrowError(errorMessage);
 
                 // Verify line 141 was hit - console.error should be called instead of logger.error
                 expect(consoleErrorSpy).toHaveBeenCalledWith(
@@ -138,7 +138,7 @@ describe("ErrorHandling fuzzing - line 141", () => {
 
                 await expect(
                     withErrorHandling(failingOperation, context)
-                ).rejects.toThrow(errorMessage);
+                ).rejects.toThrowError(errorMessage);
 
                 // Verify the specific message format for line 141
                 expect(consoleErrorSpy).toHaveBeenCalledWith(
@@ -173,7 +173,7 @@ describe("ErrorHandling fuzzing - line 141", () => {
 
             await expect(
                 withErrorHandling(failingOperation, context)
-            ).rejects.toThrow("Test error");
+            ).rejects.toThrowError("Test error");
 
             // Verify line 141 console.error call with default message
             expect(consoleErrorSpy).toHaveBeenCalledWith(
@@ -257,7 +257,7 @@ describe("ErrorHandling fuzzing - line 141", () => {
 
                 await expect(
                     withErrorHandling(failingOperation, context)
-                ).rejects.toThrow(errorMessage);
+                ).rejects.toThrowError(errorMessage);
 
                 // Should call console.error with appropriate message
                 if (
@@ -327,7 +327,7 @@ describe("withErrorHandling backend fuzz coverage", () => {
 
             await expect(
                 withErrorHandling(failingOperation, backendContext)
-            ).rejects.toThrow(errorMessage);
+            ).rejects.toThrowError(errorMessage);
 
             const expectedMessage = operationName
                 ? `Failed to ${operationName}`
@@ -372,7 +372,7 @@ describe("withErrorHandling backend fuzz coverage", () => {
                         failingOperation,
                         operationName ? { logger, operationName } : { logger }
                     )
-                ).rejects.toThrow(errorMessage);
+                ).rejects.toThrowError(errorMessage);
 
                 const expectedMessage = operationName
                     ? `Failed to ${operationName}`
@@ -724,7 +724,7 @@ describe("withUtilityErrorHandling fuzz behavior", () => {
                 withUtilityErrorHandling(async () => {
                     throw new Error("boom");
                 }, "no fallback provided")
-            ).rejects.toThrow("no fallback value provided");
+            ).rejects.toThrowError("no fallback value provided");
         } finally {
             consoleErrorSpy.mockRestore();
         }

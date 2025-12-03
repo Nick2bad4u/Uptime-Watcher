@@ -51,7 +51,7 @@ describe("Database Schema", () => {
         mockDatabase.run.mockImplementation(() => {
             throw new Error("Database error");
         });
-        expect(() => createDatabaseTables(mockDatabase as any)).toThrow(
+        expect(() => createDatabaseTables(mockDatabase as any)).toThrowError(
             "Database error"
         );
     });
@@ -118,7 +118,7 @@ describe("Database Schema", () => {
                         // Act & Assert
                         expect(() =>
                             createDatabaseTables(testDatabase as any)
-                        ).toThrow(errorMessage);
+                        ).toThrowError(errorMessage);
                     }
                 )
             );
@@ -209,7 +209,7 @@ describe("Database Schema", () => {
                         if (shouldSucceed) {
                             expect(() =>
                                 createDatabaseTables(testDatabase as any)
-                            ).not.toThrow();
+                            ).not.toThrowError();
 
                             // Verify SQL commands are well-formed
                             const allCalls = testDatabase.run.mock.calls;
@@ -227,7 +227,7 @@ describe("Database Schema", () => {
                         } else {
                             expect(() =>
                                 createDatabaseTables(testDatabase as any)
-                            ).toThrow("Mock SQL error");
+                            ).toThrowError("Mock SQL error");
                         }
                     }
                 )

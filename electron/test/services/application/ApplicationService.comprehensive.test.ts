@@ -523,7 +523,7 @@ describe(ApplicationService, () => {
             mockUptimeOrchestrator.stopMonitoring.mockRejectedValue(error);
 
             // Act & Assert
-            await expect(applicationService.cleanup()).rejects.toThrow(
+            await expect(applicationService.cleanup()).rejects.toThrowError(
                 "Cleanup failed"
             );
 
@@ -587,7 +587,9 @@ describe(ApplicationService, () => {
             setTimeout(() => abortController.abort(), 10);
 
             // Assert - Should handle cancellation
-            await expect(cleanupPromise).rejects.toThrow("Operation aborted");
+            await expect(cleanupPromise).rejects.toThrowError(
+                "Operation aborted"
+            );
 
             // Verify test signal is still intact
             expect(signal.aborted).toBeFalsy();
@@ -1523,7 +1525,7 @@ describe(ApplicationService, () => {
             );
 
             // Act & Assert - Should not throw during construction
-            expect(() => new ApplicationService()).not.toThrow();
+            expect(() => new ApplicationService()).not.toThrowError();
 
             // Verify signal state
             expect(signal.aborted).toBeFalsy();
@@ -1556,8 +1558,8 @@ describe(ApplicationService, () => {
                 )?.[1];
 
             // Act & Assert - Should not throw
-            expect(() => monitorUpHandler?.(null)).not.toThrow();
-            expect(() => monitorUpHandler?.(undefined)).not.toThrow();
+            expect(() => monitorUpHandler?.(null)).not.toThrowError();
+            expect(() => monitorUpHandler?.(undefined)).not.toThrowError();
 
             // Verify signal state after operations
             expect(signal.aborted).toBeFalsy();
@@ -1589,7 +1591,7 @@ describe(ApplicationService, () => {
             // Act & Assert - The constructor doesn't explicitly check for null/undefined
             // so it will just assign null to this.serviceContainer
             // The error will come later when trying to use the services
-            expect(() => new ApplicationService()).not.toThrow();
+            expect(() => new ApplicationService()).not.toThrowError();
 
             // Reset for other tests
             mockServiceContainer.getInstance.mockReturnValue(

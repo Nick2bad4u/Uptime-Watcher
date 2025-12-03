@@ -6,7 +6,15 @@
  */
 
 import { describe, expect, it } from "vitest";
-import * as schemasModule from "../../validation/schemas";
+import * as monitorSchemasModule from "../../validation/monitorSchemas";
+import * as siteSchemasModule from "../../validation/siteSchemas";
+import * as statusUpdateSchemasModule from "../../validation/statusUpdateSchemas";
+
+const schemasModule = {
+    ...monitorSchemasModule,
+    ...siteSchemasModule,
+    ...statusUpdateSchemasModule,
+} as const;
 
 describe("Schemas - Complete Function Coverage", () => {
     describe("Function Coverage Validation", () => {

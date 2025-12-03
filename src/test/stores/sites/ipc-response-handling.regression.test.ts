@@ -147,7 +147,7 @@ describe("IPC Response Handling Regression Tests", () => {
                 data: null,
             };
 
-            expect(() => extractIpcData(failureResponse)).toThrow(
+            expect(() => extractIpcData(failureResponse)).toThrowError(
                 "Backend operation failed"
             );
         });
@@ -168,7 +168,7 @@ describe("IPC Response Handling Regression Tests", () => {
         it("should throw error for invalid response format", () => {
             const invalidResponse = { not: "valid" };
 
-            expect(() => extractIpcData(invalidResponse)).toThrow();
+            expect(() => extractIpcData(invalidResponse)).toThrowError();
         });
     });
 
