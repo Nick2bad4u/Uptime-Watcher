@@ -15,7 +15,10 @@ import type { UptimeEvents } from "../../events/eventTypes";
 import type { TypedEventBus } from "../../events/TypedEventBus";
 
 import { DB_FILE_NAME } from "../../constants";
-import { createDatabaseBackup } from "../../services/database/utils/databaseBackup";
+import {
+    createDatabaseBackup,
+    type DatabaseBackupResult,
+} from "../../services/database/utils/databaseBackup";
 import { toSerializedError } from "../errorSerialization";
 import { SiteLoadingError } from "./interfaces";
 
@@ -48,10 +51,7 @@ export class DataBackupService {
      *
      * @throws SiteLoadingError when backup creation fails
      */
-    public async downloadDatabaseBackup(): Promise<{
-        buffer: Buffer;
-        fileName: string;
-    }> {
+    public async downloadDatabaseBackup(): Promise<DatabaseBackupResult> {
         try {
             const dbPath = path.join(app.getPath("userData"), DB_FILE_NAME);
             const result = await createDatabaseBackup(dbPath);

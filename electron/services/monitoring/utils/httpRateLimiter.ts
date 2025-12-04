@@ -8,6 +8,7 @@
  * that multiple monitor services can coordinate their traffic shaping.
  */
 
+import { readNumberEnv } from "../../../utils/environment";
 import { logger } from "../../../utils/logger";
 
 /**
@@ -89,22 +90,9 @@ export class HttpRateLimiter {
     }
 }
 
-function getEnv(name: string, fallback: string): string {
-    try {
-        if (typeof process === "undefined") {
-            return fallback;
-        }
-        // eslint-disable-next-line n/no-process-env -- Controlled environment usage for configuration
-        const value = process.env[name];
-        return value === undefined || value === "" ? fallback : value;
-    } catch {
-        return fallback;
-    }
-}
-
 const sharedRateLimiter = new HttpRateLimiter(
-    Number.parseInt(getEnv("UW_HTTP_MAX_CONCURRENT", "8"), 10) || 8,
-    Number.parseInt(getEnv("UW_HTTP_MIN_INTERVAL_MS", "200"), 10) || 200
+    readNumberEnv("UW_HTTP_MAX_CONCURRENT", 8),
+    readNumberEnv("UW_HTTP_MIN_INTERVAL_MS", 200)
 );
 
 /**

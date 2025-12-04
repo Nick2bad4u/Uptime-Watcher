@@ -290,22 +290,26 @@ describe(DatabaseManager, () => {
             };
 
             // Mock the DataBackupService instance
+            const mockBackupMetadata = {
+                createdAt: 1_700_000_400_000,
+                originalPath: "/tmp/uptime-watcher.db",
+                sizeBytes: 1536,
+            };
             const mockDataBackupService = {
                 downloadDatabaseBackup: vi.fn(() =>
                     Promise.resolve({
                         buffer: Buffer.from("backup data"),
                         fileName: "backup-test.db",
+                        metadata: { ...mockBackupMetadata },
                     })
                 ),
             };
 
             // Get references to the mocked modules
-            const { LoggerAdapter } = await import(
-                "../../utils/database/serviceFactory"
-            );
-            const { DataBackupService } = await import(
-                "../../utils/database/DataBackupService"
-            );
+            const { LoggerAdapter } =
+                await import("../../utils/database/serviceFactory");
+            const { DataBackupService } =
+                await import("../../utils/database/DataBackupService");
 
             // Setup mocks to return our mock instances
             vi.mocked(LoggerAdapter).mockReturnValue(mockLoggerAdapter as any);
@@ -318,6 +322,7 @@ describe(DatabaseManager, () => {
             expect(result).toEqual({
                 buffer: expect.any(Buffer),
                 fileName: "backup-test.db",
+                metadata: expect.objectContaining(mockBackupMetadata),
             });
             expect(mockEventEmitter.emitTyped).toHaveBeenCalledWith(
                 "internal:database:backup-downloaded",
@@ -367,12 +372,10 @@ describe(DatabaseManager, () => {
             };
 
             // Get references to the mocked modules
-            const { LoggerAdapter } = await import(
-                "../../utils/database/serviceFactory"
-            );
-            const { DataImportExportService } = await import(
-                "../../utils/database/DataImportExportService"
-            );
+            const { LoggerAdapter } =
+                await import("../../utils/database/serviceFactory");
+            const { DataImportExportService } =
+                await import("../../utils/database/DataImportExportService");
 
             // Setup mocks to return our mock instances
             vi.mocked(LoggerAdapter).mockReturnValue(mockLoggerAdapter as any);
@@ -435,12 +438,10 @@ describe(DatabaseManager, () => {
             (databaseManager as any).loadSites = vi.fn(() => Promise.resolve());
 
             // Get references to the mocked modules
-            const { LoggerAdapter } = await import(
-                "../../utils/database/serviceFactory"
-            );
-            const { DataImportExportService } = await import(
-                "../../utils/database/DataImportExportService"
-            );
+            const { LoggerAdapter } =
+                await import("../../utils/database/serviceFactory");
+            const { DataImportExportService } =
+                await import("../../utils/database/DataImportExportService");
 
             // Setup mocks to return our mock instances
             vi.mocked(LoggerAdapter).mockReturnValue(mockLoggerAdapter as any);
@@ -487,12 +488,10 @@ describe(DatabaseManager, () => {
             (databaseManager as any).loadSites = vi.fn(() => Promise.resolve());
 
             // Get references to the mocked modules
-            const { LoggerAdapter } = await import(
-                "../../utils/database/serviceFactory"
-            );
-            const { DataImportExportService } = await import(
-                "../../utils/database/DataImportExportService"
-            );
+            const { LoggerAdapter } =
+                await import("../../utils/database/serviceFactory");
+            const { DataImportExportService } =
+                await import("../../utils/database/DataImportExportService");
 
             // Setup mocks to return our mock instances
             vi.mocked(LoggerAdapter).mockReturnValue(mockLoggerAdapter as any);
@@ -526,9 +525,8 @@ describe(DatabaseManager, () => {
         it("should set history limit successfully", async () => {
             await databaseManager.setHistoryLimit(500);
 
-            const historyManager = await import(
-                "../../utils/database/historyLimitManager"
-            );
+            const historyManager =
+                await import("../../utils/database/historyLimitManager");
             expect(historyManager.setHistoryLimit).toHaveBeenCalledWith(
                 expect.objectContaining({
                     limit: 500,
@@ -541,9 +539,8 @@ describe(DatabaseManager, () => {
         });
 
         it("should handle setting history limit errors", async () => {
-            const historyManager = await import(
-                "../../utils/database/historyLimitManager"
-            );
+            const historyManager =
+                await import("../../utils/database/historyLimitManager");
             vi.mocked(historyManager.setHistoryLimit).mockRejectedValueOnce(
                 new Error("Set limit failed")
             );
@@ -559,9 +556,8 @@ describe(DatabaseManager, () => {
             // The internal limit should be updated
             // Note: We can't directly test this without exposing internals,
             // but we can verify the call was made correctly
-            const historyManager = await import(
-                "../../utils/database/historyLimitManager"
-            );
+            const historyManager =
+                await import("../../utils/database/historyLimitManager");
             expect(historyManager.setHistoryLimit).toHaveBeenCalledWith(
                 expect.objectContaining({
                     limit: 750,
@@ -635,9 +631,8 @@ describe(DatabaseManager, () => {
     describe("Event Emission", () => {
         it("should emit backup downloaded events with correct data", async () => {
             // Set up the mock to return proper data
-            const { DataBackupService } = await import(
-                "../../utils/database/DataBackupService"
-            );
+            const { DataBackupService } =
+                await import("../../utils/database/DataBackupService");
             const mockBackupService = {
                 downloadDatabaseBackup: vi.fn().mockResolvedValue({
                     buffer: Buffer.from("backup data"),
@@ -663,9 +658,8 @@ describe(DatabaseManager, () => {
 
         it("should emit data exported events with correct data", async () => {
             // Set up the mock to return proper data
-            const { DataImportExportService } = await import(
-                "../../utils/database/DataImportExportService"
-            );
+            const { DataImportExportService } =
+                await import("../../utils/database/DataImportExportService");
             const mockExportService = {
                 exportAllData: vi
                     .fn()
@@ -698,9 +692,8 @@ describe(DatabaseManager, () => {
             // Set new limit
             await databaseManager.setHistoryLimit(500);
 
-            const historyManager = await import(
-                "../../utils/database/historyLimitManager"
-            );
+            const historyManager =
+                await import("../../utils/database/historyLimitManager");
             expect(historyManager.setHistoryLimit).toHaveBeenCalledWith(
                 expect.objectContaining({
                     limit: 500,
@@ -731,9 +724,8 @@ describe(DatabaseManager, () => {
         it("should handle zero history limit", async () => {
             await databaseManager.setHistoryLimit(0);
 
-            const historyManager = await import(
-                "../../utils/database/historyLimitManager"
-            );
+            const historyManager =
+                await import("../../utils/database/historyLimitManager");
             expect(historyManager.setHistoryLimit).toHaveBeenCalledWith(
                 expect.objectContaining({
                     limit: 0,
@@ -742,9 +734,8 @@ describe(DatabaseManager, () => {
         });
 
         it("should clamp negative history limit inputs to the unlimited sentinel", async () => {
-            const historyManager = await import(
-                "../../utils/database/historyLimitManager"
-            );
+            const historyManager =
+                await import("../../utils/database/historyLimitManager");
 
             await databaseManager.setHistoryLimit(-1);
 

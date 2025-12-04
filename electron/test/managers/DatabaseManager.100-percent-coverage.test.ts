@@ -44,6 +44,11 @@ vi.mock("../../services/factories/DatabaseServiceFactory", () => ({
                 downloadBackup: vi.fn().mockResolvedValue({
                     buffer: Buffer.from("backup"),
                     fileName: "backup.sqlite",
+                    metadata: {
+                        createdAt: 1_700_000_300_000,
+                        originalPath: "/tmp/uptime-watcher.db",
+                        sizeBytes: 256,
+                    },
                 }),
             };
         }
@@ -463,6 +468,11 @@ describe("DatabaseManager - 100% Coverage", () => {
             const mockBackupResult = {
                 buffer: Buffer.from("backup-data"),
                 fileName: "backup-2023.sqlite",
+                metadata: {
+                    createdAt: 1_700_000_900_000,
+                    originalPath: "/tmp/uptime-watcher.db",
+                    sizeBytes: 512,
+                },
             };
             mockCommandExecutor.execute.mockResolvedValue(mockBackupResult);
 
@@ -756,9 +766,8 @@ describe("DatabaseManager - 100% Coverage", () => {
 
             // Arrange
             const newLimit = 1000;
-            const { setHistoryLimit: mockSetHistoryLimit } = await import(
-                "../../utils/database/historyLimitManager"
-            );
+            const { setHistoryLimit: mockSetHistoryLimit } =
+                await import("../../utils/database/historyLimitManager");
 
             // Act
             await databaseManager.setHistoryLimit(newLimit);

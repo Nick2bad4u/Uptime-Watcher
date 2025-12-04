@@ -23,6 +23,12 @@ import { STATE_SYNC_ACTION, STATE_SYNC_SOURCE } from "@shared/types/stateSync";
 import { ApplicationError } from "@shared/utils/errorHandling";
 
 // Mock all dependencies with proper typing
+const mockBackupMetadata = {
+    createdAt: 1_700_000_000_000,
+    originalPath: "/tmp/uptime-watcher.db",
+    sizeBytes: 1024,
+};
+
 const mockDatabaseManager = {
     getHistoryLimit: vi.fn(() => 1000),
     setHistoryLimit: vi.fn(() => Promise.resolve()),
@@ -31,6 +37,7 @@ const mockDatabaseManager = {
         Promise.resolve({
             buffer: Buffer.from("test"),
             fileName: "backup.db",
+            metadata: { ...mockBackupMetadata },
         })
     ),
     exportData: vi.fn(() => Promise.resolve('{"sites": []}')),

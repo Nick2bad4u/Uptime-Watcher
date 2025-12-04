@@ -6,7 +6,6 @@ import type {
     StateSyncStatusSummary,
 } from "@shared/types/stateSync";
 
-import { NOTIFICATION_CHANNELS } from "@shared/types/preload";
 import { STATE_SYNC_SOURCE } from "@shared/types/stateSync";
 import { ensureError } from "@shared/utils/errorHandling";
 import { LOG_TEMPLATES } from "@shared/utils/logTemplates";
@@ -28,9 +27,7 @@ import { registerSettingsHandlers } from "./handlers/settingsHandlers";
 import { registerSiteHandlers } from "./handlers/siteHandlers";
 import { registerStateSyncHandlers } from "./handlers/stateSyncHandlers";
 import { registerSystemHandlers } from "./handlers/systemHandlers";
-
-const UPDATE_NOTIFICATION_PREFERENCES_CHANNEL =
-    "update-notification-preferences";
+import { getUpdateNotificationPreferencesChannel } from "./notificationChannelGuards";
 
 const DIAGNOSTICS_VERIFY_CHANNEL: Extract<
     IpcInvokeChannel,
@@ -42,27 +39,7 @@ const DIAGNOSTICS_REPORT_CHANNEL: Extract<
     "diagnostics-report-preload-guard"
 > = "diagnostics-report-preload-guard";
 
-const environment = process.env["NODE_ENV"];
-const notificationChannelCandidate = Reflect.get(
-    NOTIFICATION_CHANNELS,
-    "updatePreferences"
-);
-
-if (typeof notificationChannelCandidate !== "string") {
-    throw new TypeError(
-        "Notification channel constant is not a string at build time"
-    );
-}
-
-const registeredNotificationChannel = notificationChannelCandidate;
-const notificationChannelMismatchDetected =
-    registeredNotificationChannel.localeCompare(
-        UPDATE_NOTIFICATION_PREFERENCES_CHANNEL
-    ) !== 0;
-
-if (environment !== "production" && notificationChannelMismatchDetected) {
-    throw new Error("Notification channel mapping mismatch detected");
-}
+const registeredNotificationChannel = getUpdateNotificationPreferencesChannel();
 
 /**
  * Centralizes registration and lifecycle management of Electron IPC handlers.

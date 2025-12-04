@@ -15,6 +15,12 @@ const mockNotificationService = {
     updateConfig: vi.fn(),
 };
 
+const defaultBackupMetadata = {
+    createdAt: 1_700_000_000_000,
+    originalPath: "/tmp/uptime-watcher.db",
+    sizeBytes: 4096,
+};
+
 const {
     mockUptimeOrchestrator,
     mockAutoUpdaterService,
@@ -35,7 +41,11 @@ const {
         checkSiteManually: vi.fn(),
         startMonitoring: vi.fn(),
         stopMonitoring: vi.fn(),
-        downloadBackup: vi.fn(),
+        downloadBackup: vi.fn().mockResolvedValue({
+            buffer: Buffer.from("mock backup"),
+            fileName: "backup.db",
+            metadata: { ...defaultBackupMetadata },
+        }),
         exportData: vi.fn(),
         importData: vi.fn(),
         getHistoryLimit: vi.fn(),
@@ -495,11 +505,7 @@ describe(IpcService, () => {
                 monitors: [],
                 monitoring: true,
             };
-            const mockSites = [
-                primarySite,
-                duplicateSite,
-                secondarySite,
-            ];
+            const mockSites = [primarySite, duplicateSite, secondarySite];
             vi.mocked(mockUptimeOrchestrator.getSites).mockResolvedValue(
                 mockSites
             );

@@ -102,6 +102,7 @@ import type { UptimeEvents } from "./events/eventTypes";
 import type { DatabaseManager } from "./managers/DatabaseManager";
 import type { MonitorManager } from "./managers/MonitorManager";
 import type { SiteManager } from "./managers/SiteManager";
+import type { DatabaseBackupResult } from "./services/database/utils/databaseBackup";
 import type {
     IsMonitoringActiveRequestData,
     OrchestratorEvents,
@@ -630,12 +631,7 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
      *   - Buffer: Buffer containing the database backup
      *   - FileName: String with the generated backup filename
      */
-    public async downloadBackup(): Promise<{
-        /** Buffer containing the SQLite database backup data */
-        buffer: Buffer;
-        /** Generated filename for the backup file */
-        fileName: string;
-    }> {
+    public async downloadBackup(): Promise<DatabaseBackupResult> {
         return this.runWithContext(
             () => this.databaseManager.downloadBackup(),
             {
@@ -954,6 +950,19 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
         identifier: string,
         monitorId?: string
     ): Promise<boolean> {
+        const isMonitorScoped =
+            typeof monitorId === "string" && monitorId.length > 0;
+        const operation = isMonitorScoped
+            ? "orchestrator.startMonitoringForMonitor"
+            : "orchestrator.startMonitoringForSite";
+        const code = isMonitorScoped
+            ? "ORCHESTRATOR_START_MONITORING_FOR_MONITOR_FAILED"
+            : "ORCHESTRATOR_START_MONITORING_FOR_SITE_FAILED";
+
+        const message = isMonitorScoped
+            ? `Failed to start monitoring for monitor ${monitorId} on site ${identifier}`
+            : `Failed to start monitoring for site ${identifier}`;
+
         return this.runWithContext(
             () =>
                 this.monitoringLifecycleCoordinator.startMonitoringForSite(
@@ -961,10 +970,10 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
                     monitorId
                 ),
             {
-                code: "ORCHESTRATOR_START_MONITORING_FOR_SITE_FAILED",
+                code,
                 details: { identifier, monitorId },
-                message: `Failed to start monitoring for site ${identifier}`,
-                operation: "orchestrator.startMonitoringForSite",
+                message,
+                operation,
             }
         );
     }
@@ -997,6 +1006,18 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
         identifier: string,
         monitorId?: string
     ): Promise<boolean> {
+        const isMonitorScoped =
+            typeof monitorId === "string" && monitorId.length > 0;
+        const operation = isMonitorScoped
+            ? "orchestrator.stopMonitoringForMonitor"
+            : "orchestrator.stopMonitoringForSite";
+        const code = isMonitorScoped
+            ? "ORCHESTRATOR_STOP_MONITORING_FOR_MONITOR_FAILED"
+            : "ORCHESTRATOR_STOP_MONITORING_FOR_SITE_FAILED";
+        const message = isMonitorScoped
+            ? `Failed to stop monitoring for monitor ${monitorId} on site ${identifier}`
+            : `Failed to stop monitoring for site ${identifier}`;
+
         return this.runWithContext(
             () =>
                 this.monitoringLifecycleCoordinator.stopMonitoringForSite(
@@ -1004,10 +1025,10 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
                     monitorId
                 ),
             {
-                code: "ORCHESTRATOR_STOP_MONITORING_FOR_SITE_FAILED",
+                code,
                 details: { identifier, monitorId },
-                message: `Failed to stop monitoring for site ${identifier}`,
-                operation: "orchestrator.stopMonitoringForSite",
+                message,
+                operation,
             }
         );
     }

@@ -538,11 +538,18 @@ describe("DatabaseCommands", () => {
         let command: DownloadBackupCommand;
         let mockBackupService: any;
 
+        const mockBackupMetadata = {
+            createdAt: 1_700_000_200_000,
+            originalPath: "/tmp/uptime-watcher.db",
+            sizeBytes: 512,
+        };
+
         beforeEach(() => {
             mockBackupService = {
                 downloadDatabaseBackup: vi.fn().mockResolvedValue({
                     buffer: Buffer.from("test-backup-data"),
                     fileName: "backup-2024.db",
+                    metadata: { ...mockBackupMetadata },
                 }),
             };
             mockServiceFactory.createBackupService.mockReturnValue(
@@ -570,6 +577,7 @@ describe("DatabaseCommands", () => {
             expect(result).toEqual({
                 buffer: expect.any(Buffer),
                 fileName: "backup-2024.db",
+                metadata: expect.objectContaining(mockBackupMetadata),
             });
             expect(mockBackupService.downloadDatabaseBackup).toHaveBeenCalled();
             expect(mockEventBus.emitTyped).toHaveBeenCalledWith(
@@ -750,10 +758,12 @@ describe("DatabaseCommands", () => {
                 persistImportedData: vi.fn().mockResolvedValue(undefined),
             };
             mockSiteRepositoryService = {
-                getSitesFromDatabase: vi.fn().mockResolvedValue([
-                    createTestSite("test1"),
-                    createTestSite("test2"),
-                ]),
+                getSitesFromDatabase: vi
+                    .fn()
+                    .mockResolvedValue([
+                        createTestSite("test1"),
+                        createTestSite("test2"),
+                    ]),
             };
             mockServiceFactory.createImportExportService.mockReturnValue(
                 mockImportExportService
@@ -1117,10 +1127,12 @@ describe("DatabaseCommands", () => {
 
         beforeEach(() => {
             mockSiteRepositoryService = {
-                getSitesFromDatabase: vi.fn().mockResolvedValue([
-                    createTestSite("loaded1"),
-                    createTestSite("loaded2"),
-                ]),
+                getSitesFromDatabase: vi
+                    .fn()
+                    .mockResolvedValue([
+                        createTestSite("loaded1"),
+                        createTestSite("loaded2"),
+                    ]),
             };
             mockServiceFactory.createSiteRepositoryService.mockReturnValue(
                 mockSiteRepositoryService

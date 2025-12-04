@@ -84,9 +84,8 @@ describe("DatabaseManager - Coverage Tests", () => {
         vi.clearAllMocks();
 
         // Manually setup the history limit mock
-        const historyLimitManager = await import(
-            "../../utils/database/historyLimitManager"
-        );
+        const historyLimitManager =
+            await import("../../utils/database/historyLimitManager");
         vi.mocked(historyLimitManager.setHistoryLimit).mockImplementation(
             async (params) => {
                 if (params?.setHistoryLimit) {
@@ -142,6 +141,11 @@ describe("DatabaseManager - Coverage Tests", () => {
             mockSiteLoadingOrchestrator;
 
         // Mock the private commandExecutor
+        const mockBackupMetadata = {
+            createdAt: 1_700_000_700_000,
+            originalPath: "/tmp/uptime-watcher.db",
+            sizeBytes: 1280,
+        };
         const mockCommandExecutor = {
             execute: vi.fn().mockImplementation(async (command: any) => {
                 // Return different values based on command type
@@ -149,6 +153,7 @@ describe("DatabaseManager - Coverage Tests", () => {
                     return {
                         buffer: Buffer.from("test-backup-data"),
                         fileName: "backup-test.db",
+                        metadata: { ...mockBackupMetadata },
                     };
                 }
                 if (command.constructor.name === "ExportDataCommand") {
@@ -341,6 +346,11 @@ describe("DatabaseManager - Coverage Tests", () => {
             const mockBackupData = {
                 buffer: Buffer.from("test-backup"),
                 fileName: "backup.db",
+                metadata: {
+                    createdAt: 1_700_000_700_000,
+                    originalPath: "/tmp/uptime-watcher.db",
+                    sizeBytes: 1280,
+                },
             };
             vi.mocked(mockExecutor.execute).mockResolvedValue(mockBackupData);
 

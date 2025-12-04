@@ -20,6 +20,7 @@ import {
 import {
     parseStateSyncFullSyncResult,
     parseStateSyncStatusSummary,
+    STATE_SYNC_ACTION,
     type StateSyncFullSyncResult,
     type StateSyncStatusSummary,
 } from "@shared/types/stateSync";
@@ -110,6 +111,7 @@ export const StateSyncService: StateSyncServiceContract = {
             let pendingRecovery: null | Promise<void> = null;
             let subscriptionActive = true;
             let pendingRecoveryExpectation: null | {
+                appliedLocally: boolean;
                 expectedTimestamp: number;
                 siteCount: number;
                 source: StateSyncFullSyncResult["source"];
@@ -157,7 +159,18 @@ export const StateSyncService: StateSyncServiceContract = {
                             return;
                         }
 
+                        const synthesizedEvent: StateSyncEventData = {
+                            action: STATE_SYNC_ACTION.BULK_SYNC,
+                            siteIdentifier: "all",
+                            sites: fullSync.sites,
+                            source: fullSync.source,
+                            timestamp: fullSync.completedAt,
+                        };
+
+                        callback(synthesizedEvent);
+
                         pendingRecoveryExpectation = {
+                            appliedLocally: true,
                             expectedTimestamp: fullSync.completedAt,
                             siteCount: fullSync.siteCount,
                             source: fullSync.source,
@@ -205,7 +218,15 @@ export const StateSyncService: StateSyncServiceContract = {
                         return;
                     }
 
-                    callback(parsedEvent.data);
+                    const shouldSkipCallback =
+                        pendingRecoveryExpectation !== null &&
+                        pendingRecoveryExpectation.appliedLocally &&
+                        parsedEvent.data.timestamp ===
+                            pendingRecoveryExpectation.expectedTimestamp;
+
+                    if (!shouldSkipCallback) {
+                        callback(parsedEvent.data);
+                    }
 
                     if (
                         pendingRecoveryExpectation &&

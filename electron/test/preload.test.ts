@@ -825,6 +825,11 @@ describe("Electron Preload Script", () => {
                 const mockBackupData = {
                     buffer: new ArrayBuffer(1024),
                     fileName: "backup_test.db",
+                    metadata: {
+                        createdAt: 1_700_000_500_000,
+                        originalPath: "/tmp/uptime-watcher.db",
+                        sizeBytes: 1024,
+                    },
                 };
                 const mockBackupResponse = {
                     success: true,

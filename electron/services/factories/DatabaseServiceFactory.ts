@@ -19,6 +19,7 @@ import type { HistoryRepository } from "../database/HistoryRepository";
 import type { MonitorRepository } from "../database/MonitorRepository";
 import type { SettingsRepository } from "../database/SettingsRepository";
 import type { SiteRepository } from "../database/SiteRepository";
+import type { DatabaseBackupResult } from "../database/utils/databaseBackup";
 
 import { DataBackupService } from "../../utils/database/DataBackupService";
 import {
@@ -59,7 +60,7 @@ export interface DatabaseServiceFactoryDependencies {
  * @public
  */
 export interface IDataBackupService {
-    downloadDatabaseBackup: () => Promise<{ buffer: Buffer; fileName: string }>;
+    downloadDatabaseBackup: () => Promise<DatabaseBackupResult>;
 }
 
 /**

@@ -59,6 +59,7 @@ import type { HistoryRepository } from "../services/database/HistoryRepository";
 import type { MonitorRepository } from "../services/database/MonitorRepository";
 import type { SettingsRepository } from "../services/database/SettingsRepository";
 import type { SiteRepository } from "../services/database/SiteRepository";
+import type { DatabaseBackupResult } from "../services/database/utils/databaseBackup";
 import type { ConfigurationManager } from "./ConfigurationManager";
 
 import { DEFAULT_HISTORY_LIMIT } from "../constants";
@@ -230,12 +231,7 @@ export class DatabaseManager {
      *
      * @throws Error if backup creation or file system operations fail.
      */
-    public async downloadBackup(): Promise<{
-        /** The backup data as a Buffer containing the database file contents */
-        buffer: Buffer;
-        /** The generated filename for the backup file */
-        fileName: string;
-    }> {
+    public async downloadBackup(): Promise<DatabaseBackupResult> {
         const command = new DownloadBackupCommand({
             cache: this.siteCache,
             configurationManager: this.configurationManager,

@@ -20,6 +20,12 @@ import type {
     Site,
 } from "@shared/types";
 
+const mockBackupMetadata = {
+    createdAt: 1_700_000_100_000,
+    originalPath: "/tmp/uptime-watcher.db",
+    sizeBytes: 3072,
+};
+
 // Mock Electron modules
 vi.mock("electron", () => ({
     ipcMain: {
@@ -260,6 +266,7 @@ describe("IpcService - Comprehensive Coverage", () => {
             downloadBackup: vi.fn().mockResolvedValue({
                 buffer: Buffer.from("mock backup data"),
                 fileName: "/path/to/backup.db",
+                metadata: { ...mockBackupMetadata },
             }),
             emitSitesStateSynchronized: vi
                 .fn()

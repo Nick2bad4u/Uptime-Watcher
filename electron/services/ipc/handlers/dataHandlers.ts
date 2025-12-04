@@ -53,6 +53,7 @@ export function registerDataHandlers({
             return {
                 buffer: arrayBuffer,
                 fileName: result.fileName,
+                metadata: result.metadata,
             } satisfies SerializedDatabaseBackupResult;
         }),
         DataHandlerValidators.downloadSqliteBackup,

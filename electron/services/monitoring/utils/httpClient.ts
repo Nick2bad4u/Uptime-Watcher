@@ -21,6 +21,8 @@ import * as https from "node:https";
 
 import type { MonitorServiceConfig } from "../types";
 
+import { readNumberEnv } from "../../../utils/environment";
+
 /**
  * Ensures an unknown value is an Error instance.
  *
@@ -148,31 +150,15 @@ export function setupTimingInterceptors(axiosInstance: AxiosInstance): void {
  * @see {@link setupTimingInterceptors}
  */
 // Security / performance tunables (can be overridden via env for emergency mitigation)
-// Centralized accessor to satisfy lint rules about environment usage
-function getEnv(name: string, fallback: string): string {
-    try {
-        // Use safe process.env access pattern from shared utilities
-        if (typeof process === "undefined") {
-            return fallback;
-        }
-        // eslint-disable-next-line n/no-process-env -- Controlled environment access following shared patterns
-        const val = process.env[name];
-        return val === undefined || val === "" ? fallback : val;
-    } catch {
-        return fallback;
-    }
-}
-
-const DEFAULT_MAX_REDIRECTS =
-    Number.parseInt(getEnv("UW_HTTP_MAX_REDIRECTS", "3"), 10) || 3;
-const DEFAULT_MAX_CONTENT_LENGTH =
-    Number.parseInt(
-        getEnv("UW_HTTP_MAX_CONTENT_LENGTH", `${1 * 1024 * 1024}`),
-        10
-    ) || 1 * 1024 * 1024; // 1MB
-const DEFAULT_MAX_BODY_LENGTH =
-    Number.parseInt(getEnv("UW_HTTP_MAX_BODY_LENGTH", `${8 * 1024}`), 10) ||
-    8 * 1024; // 8KB request body cap
+const DEFAULT_MAX_REDIRECTS = readNumberEnv("UW_HTTP_MAX_REDIRECTS", 3);
+const DEFAULT_MAX_CONTENT_LENGTH = readNumberEnv(
+    "UW_HTTP_MAX_CONTENT_LENGTH",
+    1 * 1024 * 1024
+); // 1MB
+const DEFAULT_MAX_BODY_LENGTH = readNumberEnv(
+    "UW_HTTP_MAX_BODY_LENGTH",
+    8 * 1024
+); // 8KB request body cap
 
 /**
  * Creates a hardened Axios HTTP client instance suitable for monitor services.

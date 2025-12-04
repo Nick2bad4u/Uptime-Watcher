@@ -44,6 +44,7 @@ import * as path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { isDev } from "../../electronUtils";
+import { readBooleanEnv } from "../../utils/environment";
 import { logger } from "../../utils/logger";
 
 // ESM equivalent of currentDirectory
@@ -576,23 +577,9 @@ export class WindowService {
     }
 
     /**
-     * Safe environment flag checker following shared utility patterns.
-     *
-     * @param name - Environment variable name to check
-     *
-     * @returns True if the environment variable is set to "true", false
-     *   otherwise
+     * Safe environment flag checker using shared Electron env utilities.
      */
     private getEnvFlag(name: string): boolean {
-        try {
-            if (typeof process === "undefined") {
-                return false;
-            }
-            // eslint-disable-next-line n/no-process-env -- Controlled environment access following shared patterns
-            const val = process.env[name];
-            return val === "true";
-        } catch {
-            return false;
-        }
+        return readBooleanEnv(name);
     }
 }

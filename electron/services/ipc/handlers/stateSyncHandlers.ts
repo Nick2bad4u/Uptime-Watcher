@@ -79,13 +79,25 @@ export function registerStateSyncHandlers({
         STATE_SYNC_CHANNELS.getSyncStatus,
         withIgnoredIpcEvent(() => {
             const currentStatus = getStateSyncStatus();
-            const siteCount = uptimeOrchestrator.getCachedSiteCount();
-            const summary: StateSyncStatusSummary = {
-                lastSyncAt: currentStatus.lastSyncAt ?? null,
-                siteCount,
-                source: currentStatus.source,
-                synchronized: currentStatus.synchronized,
-            };
+            const cachedSiteCount = uptimeOrchestrator.getCachedSiteCount();
+            const hasTrustedDatabaseSummary =
+                currentStatus.synchronized &&
+                currentStatus.source === STATE_SYNC_SOURCE.DATABASE;
+
+            const summary: StateSyncStatusSummary = hasTrustedDatabaseSummary
+                ? {
+                      lastSyncAt: currentStatus.lastSyncAt ?? null,
+                      siteCount:
+                          currentStatus.siteCount ?? cachedSiteCount ?? 0,
+                      source: STATE_SYNC_SOURCE.DATABASE,
+                      synchronized: true,
+                  }
+                : {
+                      lastSyncAt: currentStatus.lastSyncAt ?? null,
+                      siteCount: cachedSiteCount ?? 0,
+                      source: STATE_SYNC_SOURCE.CACHE,
+                      synchronized: false,
+                  };
 
             setStateSyncStatus(summary);
             return summary;

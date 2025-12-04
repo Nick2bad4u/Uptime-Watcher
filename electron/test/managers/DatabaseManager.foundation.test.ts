@@ -17,6 +17,12 @@ describe("DatabaseManager Foundation Tests", () => {
     let mockDependencies: DatabaseManagerDependencies;
     let mockEventEmitter: any;
 
+    const mockBackupMetadata = {
+        createdAt: 1_700_000_600_000,
+        originalPath: "/tmp/uptime-watcher.db",
+        sizeBytes: 2048,
+    };
+
     beforeEach(async () => {
         // Create comprehensive mocks for all dependencies
         mockEventEmitter = {
@@ -125,6 +131,7 @@ describe("DatabaseManager Foundation Tests", () => {
                     const result = {
                         buffer: Buffer.from("backup-data"),
                         fileName: "backup-test.db",
+                        metadata: { ...mockBackupMetadata },
                     };
                     // Emit the expected event
                     await mockEventEmitter.emitTyped(
@@ -230,6 +237,7 @@ describe("DatabaseManager Foundation Tests", () => {
             expect(result).toEqual({
                 buffer: expect.any(Buffer),
                 fileName: "backup-test.db",
+                metadata: expect.objectContaining(mockBackupMetadata),
             });
 
             expect(mockEventEmitter.emitTyped).toHaveBeenCalledWith(

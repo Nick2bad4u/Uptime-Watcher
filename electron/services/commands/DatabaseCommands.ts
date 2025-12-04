@@ -23,6 +23,7 @@ import type { EventKey, TypedEventBus } from "../../events/TypedEventBus";
 import type { ConfigurationManager } from "../../managers/ConfigurationManager";
 import type { StandardizedCache } from "../../utils/cache/StandardizedCache";
 import type { ImportSite } from "../../utils/database/DataImportExportService";
+import type { DatabaseBackupResult } from "../database/utils/databaseBackup";
 import type { DatabaseServiceFactory } from "../factories/DatabaseServiceFactory";
 
 import { logger as backendLogger } from "../../utils/logger";
@@ -157,9 +158,9 @@ function isImportContext(
  * @typeParam TResult - The result type produced by the command when
  *   {@link DatabaseCommand.execute} resolves.
  */
-export abstract class DatabaseCommand<TResult = void>
-    implements IDatabaseCommand<TResult>
-{
+export abstract class DatabaseCommand<
+    TResult = void,
+> implements IDatabaseCommand<TResult> {
     /** Site cache for data synchronization during operations */
     protected readonly cache: StandardizedCache<Site>;
 
@@ -390,20 +391,11 @@ export class DatabaseCommandExecutor {
  *
  * @public
  */
-export class DownloadBackupCommand extends DatabaseCommand<{
-    /** The backup data as a Buffer containing the database file contents */
-    buffer: Buffer;
-    /** The generated filename for the backup file */
-    fileName: string;
-}> {
-    public async execute(): Promise<{
-        /** The backup data as a Buffer containing the database file contents */
-        buffer: Buffer;
-        /** The generated filename for the backup file */
-        fileName: string;
-    }> {
+export class DownloadBackupCommand extends DatabaseCommand<DatabaseBackupResult> {
+    public async execute(): Promise<DatabaseBackupResult> {
         const dataBackupService = this.serviceFactory.createBackupService();
-        const result = await dataBackupService.downloadDatabaseBackup();
+        const result: DatabaseBackupResult =
+            await dataBackupService.downloadDatabaseBackup();
 
         await this.emitSuccessEvent("internal:database:backup-downloaded", {
             fileName: result.fileName,

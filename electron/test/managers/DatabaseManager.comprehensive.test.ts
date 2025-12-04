@@ -70,6 +70,11 @@ vi.mock("../../services/factories/DatabaseServiceFactory", () => ({
                 downloadDatabaseBackup: vi.fn().mockResolvedValue({
                     buffer: Buffer.from("backup data"),
                     fileName: "backup-test.db",
+                    metadata: {
+                        createdAt: 1_700_000_800_000,
+                        originalPath: "/tmp/uptime-watcher.db",
+                        sizeBytes: 1024,
+                    },
                 }),
             };
         }
@@ -1049,27 +1054,25 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
             await annotate("Type: Backup Operation", "type");
 
             // Mock the command executor directly on the instance
-            const mockExecute = vi
-                .fn()
-                .mockResolvedValue("/path/to/backup.json");
+            const mockBackupResult = {
+                buffer: Buffer.from("backup data"),
+                fileName: "backup-test.db",
+                metadata: {
+                    createdAt: 1_700_000_810_000,
+                    originalPath: "/tmp/uptime-watcher.db",
+                    sizeBytes: 2560,
+                },
+            };
+            const mockExecute = vi.fn().mockResolvedValue(mockBackupResult);
             (databaseManager as any).commandExecutor = {
                 execute: mockExecute,
                 rollbackAll: vi.fn().mockResolvedValue(undefined),
             };
 
-            const mockImportService = createDataImportExportServiceMock({
-                downloadBackup: vi
-                    .fn()
-                    .mockResolvedValue("/path/to/backup.json"),
-            });
-            vi.mocked(DataImportExportService).mockImplementation(
-                () => mockImportService as any
-            );
-
             const result = await databaseManager.downloadBackup();
 
             expect(mockExecute).toHaveBeenCalled();
-            expect(result).toBe("/path/to/backup.json");
+            expect(result).toEqual(mockBackupResult);
         });
 
         it("should handle downloadBackup with file system errors", async ({

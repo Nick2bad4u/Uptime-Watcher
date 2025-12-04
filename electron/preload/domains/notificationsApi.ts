@@ -10,8 +10,7 @@
 
 import type { NotificationPreferenceUpdate } from "@shared/types/notifications";
 
-import { NOTIFICATION_CHANNELS } from "@shared/types/preload";
-
+import { UPDATE_NOTIFICATION_PREFERENCES_CHANNEL } from "../../services/ipc/notificationChannelGuards";
 import { createVoidInvoker } from "../core/bridgeFactory";
 
 /**
@@ -35,34 +34,6 @@ export interface NotificationsApiInterface {
  *
  * @public
  */
-const UPDATE_NOTIFICATION_PREFERENCES_CHANNEL =
-    "update-notification-preferences";
-
-const runtimeEnvironment = process.env["NODE_ENV"];
-const updateChannelCandidate = Reflect.get(
-    NOTIFICATION_CHANNELS,
-    "updatePreferences"
-);
-
-if (typeof updateChannelCandidate !== "string") {
-    throw new TypeError(
-        "Notification channel constant is not a string at build time"
-    );
-}
-
-const registeredUpdateChannel = updateChannelCandidate;
-
-const channelMismatchDetected =
-    registeredUpdateChannel.localeCompare(
-        UPDATE_NOTIFICATION_PREFERENCES_CHANNEL
-    ) !== 0;
-
-if (runtimeEnvironment !== "production" && channelMismatchDetected) {
-    throw new Error(
-        "Notification channel constant mismatch detected at build time"
-    );
-}
-
 export const notificationsApi: NotificationsApiInterface = {
     updatePreferences: createVoidInvoker(
         UPDATE_NOTIFICATION_PREFERENCES_CHANNEL

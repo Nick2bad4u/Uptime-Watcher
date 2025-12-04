@@ -394,6 +394,11 @@ export function createMockServiceFactory(): any {
             downloadDatabaseBackup: vi.fn().mockResolvedValue({
                 buffer: Buffer.from("test-backup-data"),
                 fileName: "backup-2024.db",
+                metadata: {
+                    createdAt: 0,
+                    originalPath: "/tmp/uptime-watcher.db",
+                    sizeBytes: 1024,
+                },
             }),
         }),
         createImportExportService: vi.fn().mockReturnValue({
