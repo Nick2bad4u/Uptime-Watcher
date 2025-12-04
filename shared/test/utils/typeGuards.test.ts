@@ -59,13 +59,7 @@ describe("typeGuards", () => {
             await annotate("Type: Business Logic", "type");
 
             expect(isObject([])).toBeFalsy();
-            expect(
-                isObject([
-                    1,
-                    2,
-                    3,
-                ])
-            ).toBeFalsy();
+            expect(isObject([1, 2, 3])).toBeFalsy();
         });
 
         it("should return false for primitive types", async ({
@@ -190,13 +184,7 @@ describe("typeGuards", () => {
             const obj = { foo: "bar", baz: 123, nested: { key: "value" } };
             expect(hasProperties(obj, ["foo"])).toBeTruthy();
             expect(hasProperties(obj, ["foo", "baz"])).toBeTruthy();
-            expect(
-                hasProperties(obj, [
-                    "foo",
-                    "baz",
-                    "nested",
-                ])
-            ).toBeTruthy();
+            expect(hasProperties(obj, ["foo", "baz", "nested"])).toBeTruthy();
         });
 
         it("should return false when object is missing properties", async ({
@@ -333,27 +321,9 @@ describe("typeGuards", () => {
             await annotate("Type: Business Logic", "type");
 
             expect(isArray([])).toBeTruthy();
-            expect(
-                isArray([
-                    1,
-                    2,
-                    3,
-                ])
-            ).toBeTruthy();
-            expect(
-                isArray([
-                    "a",
-                    "b",
-                    "c",
-                ])
-            ).toBeTruthy();
-            expect(
-                isArray([
-                    1,
-                    "mixed",
-                    true,
-                ])
-            ).toBeTruthy();
+            expect(isArray([1, 2, 3])).toBeTruthy();
+            expect(isArray(["a", "b", "c"])).toBeTruthy();
+            expect(isArray([1, "mixed", true])).toBeTruthy();
         });
 
         it("should return false for non-arrays", async ({ task, annotate }) => {
@@ -378,26 +348,8 @@ describe("typeGuards", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Validation", "type");
 
-            expect(
-                isArray(
-                    [
-                        1,
-                        2,
-                        3,
-                    ],
-                    isNumber
-                )
-            ).toBeTruthy();
-            expect(
-                isArray(
-                    [
-                        "a",
-                        "b",
-                        "c",
-                    ],
-                    isString
-                )
-            ).toBeTruthy();
+            expect(isArray([1, 2, 3], isNumber)).toBeTruthy();
+            expect(isArray(["a", "b", "c"], isString)).toBeTruthy();
             expect(isArray([true, false], isBoolean)).toBeTruthy();
         });
 
@@ -410,26 +362,8 @@ describe("typeGuards", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Error Handling", "type");
 
-            expect(
-                isArray(
-                    [
-                        1,
-                        "string",
-                        3,
-                    ],
-                    isNumber
-                )
-            ).toBeFalsy();
-            expect(
-                isArray(
-                    [
-                        "a",
-                        123,
-                        "c",
-                    ],
-                    isString
-                )
-            ).toBeFalsy();
+            expect(isArray([1, "string", 3], isNumber)).toBeFalsy();
+            expect(isArray(["a", 123, "c"], isString)).toBeFalsy();
             expect(isArray([true, "not boolean"], isBoolean)).toBeFalsy();
         });
 
@@ -734,13 +668,7 @@ describe("typeGuards", () => {
             await annotate("Type: Business Logic", "type");
 
             expect(isNonNullObject([])).toBeFalsy();
-            expect(
-                isNonNullObject([
-                    1,
-                    2,
-                    3,
-                ])
-            ).toBeFalsy();
+            expect(isNonNullObject([1, 2, 3])).toBeFalsy();
         });
 
         it("should return false for primitive types", async ({
@@ -772,7 +700,7 @@ describe("typeGuards", () => {
             expect(isPositiveNumber(1)).toBeTruthy();
             expect(isPositiveNumber(123)).toBeTruthy();
             expect(isPositiveNumber(3.14)).toBeTruthy();
-            expect(isPositiveNumber(Infinity)).toBeTruthy();
+            expect(isPositiveNumber(Infinity)).toBeFalsy();
         });
 
         it("should return false for zero", async ({ task, annotate }) => {

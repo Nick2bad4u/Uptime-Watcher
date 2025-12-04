@@ -12,6 +12,7 @@ import type { Page, Locator } from "@playwright/test";
 import { expect } from "@playwright/test";
 import type { Site } from "@/shared/types";
 import type { ConfirmDialogRequest } from "@/stores/ui/useConfirmDialogStore";
+import { isIsolatedUserDataPage } from "./userDataDirectoryRegistry";
 
 /**
  * Wait strategies for different UI operations.
@@ -227,14 +228,14 @@ export async function waitForAppInitialization(
  * bridge.
  *
  * @remarks
- * When the tests are running against an isolated userData directory (as
- * indicated by the `PLAYWRIGHT_USER_DATA_DIR` environment variable), this
- * helper becomes a no-op because the database is discarded after each test.
+ * When the tests are running against one-off, isolated userData directories,
+ * this helper becomes a no-op because the database is discarded after each
+ * test.
  *
  * @param page - Playwright page bound to the primary renderer window.
  */
 export async function removeAllSites(page: Page): Promise<void> {
-    if (typeof process.env["PLAYWRIGHT_USER_DATA_DIR"] === "string") {
+    if (isIsolatedUserDataPage(page)) {
         return;
     }
 
@@ -276,12 +277,12 @@ export async function removeAllSites(page: Page): Promise<void> {
  * @remarks
  * Clears both local and session storage to discard any persisted Zustand store
  * snapshots before refreshing the renderer context. When the tests reuse the
- * real Electron profile (the environment variable `PLAYWRIGHT_USER_DATA_DIR` is
- * not set) the helper reloads the window and removes any persisted sites to
- * guarantee an empty dashboard.
+ * real Electron profile (no isolated userData directory was registered) the
+ * helper reloads the window and removes any persisted sites to guarantee an
+ * empty dashboard.
  *
  * For the default Playwright flow—where the Electron helper provisions an
- * isolated userData directory per run—the helper now avoids forcing a reload.
+ * isolated userData directory per run—the helper avoids forcing a reload.
  * Reloading in headless Electron intermittently closes the window before the
  * renderer is ready, so the helper simply waits for the application to finish
  * bootstrapping after clearing storage.
@@ -291,8 +292,7 @@ export async function removeAllSites(page: Page): Promise<void> {
 export async function resetApplicationState(page: Page): Promise<void> {
     await page.waitForLoadState("domcontentloaded");
 
-    const usingIsolatedUserData =
-        typeof process.env["PLAYWRIGHT_USER_DATA_DIR"] === "string";
+    const usingIsolatedUserData = isIsolatedUserDataPage(page);
 
     await page.evaluate(() => {
         try {
@@ -696,16 +696,15 @@ export async function submitAddSiteForm(page: Page): Promise<void> {
     // Wait for modal to close (indicates success). Some flows may keep the
     // dialog mounted briefly for exit animations, so treat visibility timeouts
     // as non-fatal once the subsequent card/monitor assertions succeed.
-    try {
-        await expect(page.getByTestId("add-site-modal")).not.toBeVisible({
-            timeout: WAIT_TIMEOUTS.LONG,
+    await page
+        .getByTestId("add-site-modal")
+        .waitFor({ state: "hidden", timeout: WAIT_TIMEOUTS.LONG })
+        .catch((error) => {
+            console.warn(
+                "[Playwright] Add site modal did not fully hide within the expected time; continuing after submit",
+                error
+            );
         });
-    } catch (error) {
-        console.warn(
-            "[Playwright] Add site modal did not fully hide within the expected time; continuing after submit",
-            error
-        );
-    }
 }
 
 /**
@@ -759,6 +758,82 @@ export async function openSiteDetails(
         .getByText("Site Actions", { exact: true })
         .waitFor({ state: "visible", timeout: WAIT_TIMEOUTS.SHORT })
         .catch(() => undefined);
+}
+
+/**
+ * Waits for the monitoring status widgets inside the site details modal to
+ * hydrate the latest state from the database.
+ */
+export async function waitForSiteMonitoringHydration(
+    page: Page
+): Promise<void> {
+    await page.waitForFunction(
+        () => {
+            const modal = document.querySelector(
+                '[data-testid="site-details-modal"]'
+            );
+            if (!(modal instanceof HTMLElement)) {
+                return false;
+            }
+
+            const statusDisplay = modal.querySelector(
+                '[data-testid="monitoring-status-display"]'
+            );
+            if (!(statusDisplay instanceof HTMLElement)) {
+                return false;
+            }
+
+            const hasMonitorEntries =
+                statusDisplay.querySelectorAll(
+                    '[data-testid^="monitor-status-"]'
+                ).length > 0;
+            const activeMatch =
+                statusDisplay.textContent?.match(/(\d+)\/1 active/);
+
+            return Boolean(activeMatch) && hasMonitorEntries;
+        },
+        { timeout: WAIT_TIMEOUTS.LONG }
+    );
+}
+
+export async function waitForDialogTeardown(
+    page: Page,
+    testId: string
+): Promise<void> {
+    await page
+        .getByTestId(testId)
+        .waitFor({ state: "hidden", timeout: WAIT_TIMEOUTS.MEDIUM })
+        .catch(() => undefined);
+    await page
+        .getByRole("dialog")
+        .filter({ has: page.getByTestId(testId) })
+        .waitFor({ state: "detached", timeout: WAIT_TIMEOUTS.MEDIUM })
+        .catch(() => undefined);
+}
+
+/**
+ * Opens the settings tab within the site details modal by clicking the
+ * "Settings" button and waiting for the tab content to render.
+ *
+ * @param siteDetailsModal - Locator scoped to the active site details modal.
+ */
+export async function openSiteDetailsSettingsTab(
+    siteDetailsModal: Locator
+): Promise<void> {
+    const settingsButton = siteDetailsModal
+        .getByRole("button", { name: "Settings" })
+        .first();
+
+    await settingsButton.scrollIntoViewIfNeeded();
+    await expect(settingsButton).toBeVisible({
+        timeout: WAIT_TIMEOUTS.MEDIUM,
+    });
+
+    await settingsButton.click({ timeout: WAIT_TIMEOUTS.LONG });
+
+    await expect(siteDetailsModal.getByTestId("settings-tab")).toBeVisible({
+        timeout: WAIT_TIMEOUTS.MEDIUM,
+    });
 }
 
 /**
@@ -899,8 +974,25 @@ export async function openSettingsModal(page: Page): Promise<void> {
 
     const settingsButton = page
         .getByRole("banner")
-        .getByRole("button", { name: "Open settings" });
-    await settingsButton.click();
+        .getByRole("button", { name: "Open settings" })
+        .first();
+
+    await settingsButton.scrollIntoViewIfNeeded().catch(() => undefined);
+    await page.evaluate(() => window.scrollTo({ left: 0, top: 0 }));
+    await expect(settingsButton).toBeVisible({ timeout: WAIT_TIMEOUTS.MEDIUM });
+
+    try {
+        await settingsButton.click({ timeout: WAIT_TIMEOUTS.MEDIUM });
+    } catch (error) {
+        const box = await settingsButton.boundingBox();
+        if (!box) {
+            throw error;
+        }
+
+        await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+        await page.mouse.down();
+        await page.mouse.up();
+    }
 
     // Wait for settings modal to appear
     const settingsModal = page.getByTestId("settings-modal");

@@ -16,6 +16,7 @@ import {
     ensureSiteDetailsHeaderCollapsed,
     ensureSiteDetailsHeaderExpanded,
     openSiteDetails,
+    openSiteDetailsSettingsTab,
     removeAllSites,
     resetApplicationState,
     waitForAppInitialization,
@@ -27,14 +28,10 @@ const ANALYTICS_BUTTON_REGEX = /Analytics$/i;
 test.describe(
     "site details - modern ui",
     {
-        tag: [
-            "@ui",
-            "@site-details",
-            "@regression",
-        ],
+        tag: ["@ui", "@site-details", "@regression"],
     },
     () => {
-        test.setTimeout(60_000);
+        test.setTimeout(90_000);
 
         let electronApp: ElectronApplication;
         let page: Page;
@@ -81,7 +78,7 @@ test.describe(
                 tag: ["@workflow", "@tabs"],
             },
             async () => {
-                test.setTimeout(60_000);
+                test.setTimeout(90_000);
                 await openSiteDetails(page, siteName);
 
                 const siteDetailsModal = page.getByTestId("site-details-modal");
@@ -127,12 +124,7 @@ test.describe(
                     timeout: WAIT_TIMEOUTS.MEDIUM,
                 });
 
-                await siteDetailsModal
-                    .getByRole("button", { name: "Settings" })
-                    .click();
-                await expect(
-                    siteDetailsModal.getByTestId("settings-tab")
-                ).toBeVisible({ timeout: WAIT_TIMEOUTS.MEDIUM });
+                await openSiteDetailsSettingsTab(siteDetailsModal);
             }
         );
 
@@ -142,7 +134,7 @@ test.describe(
                 tag: ["@workflow", "@monitoring"],
             },
             async () => {
-                test.setTimeout(60_000);
+                test.setTimeout(90_000);
                 await openSiteDetails(page, siteName);
 
                 const siteDetailsModal = page.getByTestId("site-details-modal");

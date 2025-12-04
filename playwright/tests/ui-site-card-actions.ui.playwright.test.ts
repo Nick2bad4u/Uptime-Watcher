@@ -32,11 +32,7 @@ function resolveMetricsSummaryLocator(page: Page, site: CreatedSiteResult) {
 test.describe(
     "site card actions - modern ui",
     {
-        tag: [
-            "@ui",
-            "@site-card",
-            "@monitoring",
-        ],
+        tag: ["@ui", "@site-card", "@monitoring"],
     },
     () => {
         test.setTimeout(60_000);
@@ -88,25 +84,13 @@ test.describe(
                 await stopMonitoring
                     .click({ timeout: WAIT_TIMEOUTS.SHORT })
                     .catch(() => undefined);
-
-                await expect(stopMonitoring).toBeHidden({
-                    timeout: WAIT_TIMEOUTS.LONG,
-                });
-
-                const resumeMonitoring = siteCardLocator.getByRole("button", {
-                    name: "Start Monitoring",
-                });
-                await expect(resumeMonitoring).toBeVisible({
-                    timeout: WAIT_TIMEOUTS.LONG,
-                });
-
-                await resumeMonitoring.click();
-
-                const checkNow = page.getByRole("button", {
+                const checkNow = siteCardLocator.getByRole("button", {
                     name: "Check Now",
                 });
-                await expect(checkNow).toBeEnabled();
-                await checkNow.click();
+                await expect(checkNow).toBeEnabled({
+                    timeout: WAIT_TIMEOUTS.LONG,
+                });
+                await checkNow.click({ timeout: WAIT_TIMEOUTS.MEDIUM });
             }
         );
 

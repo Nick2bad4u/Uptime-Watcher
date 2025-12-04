@@ -225,14 +225,14 @@ export function isNonNullObject(value: unknown): value is UnknownRecord {
 }
 
 /**
- * Checks whether a value is a positive number.
+ * Checks whether a value is a positive, finite number.
  *
  * @param value - Value to evaluate.
  *
- * @returns `true` when the value is greater than zero.
+ * @returns `true` when the value is greater than zero and finite.
  */
 export function isPositiveNumber(value: unknown): value is number {
-    return isNumber(value) && !Number.isNaN(value) && value > 0;
+    return isNumber(value) && Number.isFinite(value) && value > 0;
 }
 
 /**

@@ -1,171 +1,168 @@
-/**
- * Playwright TypeScript configuration for Electron app testing.
- *
- * This configuration file sets up Playwright to test the Electron application
- * with proper isolation from other test suites, TypeScript support, and optimal
- * settings for E2E testing.
- *
- * @remarks
- * Watch mode is NOT enabled by default in this configuration. Tests run
- * normally without file watching. Watch mode only activates when:
- *
- * - Running `npx playwright test --ui` to open UI mode
- * - Manually clicking eye icons next to tests in UI mode interface
- *
- * @see https://playwright.dev/docs/test-configuration
- * @see https://playwright.dev/docs/test-typescript
- * @see https://playwright.dev/docs/test-ui-mode#watch-mode
- * @see https://www.electronjs.org/docs/latest/tutorial/automated-testing#using-playwright
- */
-
 import type { PlaywrightTestConfig } from "@playwright/test";
 
 import { defineConfig, devices } from "@playwright/test";
+import * as os from "node:os";
 
-function isPlaywrightAttachmentDiagnosticsEnabled(): boolean {
+const readEnv = (key: string): string | undefined => {
     if (typeof process === "undefined") {
+        return undefined;
+    }
+
+    // eslint-disable-next-line n/no-process-env -- central env accessor
+    return process.env[key];
+};
+
+const coerceEnvFlag = (value: string | undefined): boolean => {
+    if (!value) {
         return false;
     }
 
-    // Use bracket notation with a focused eslint suppression to keep
-    // configuration-time environment access explicit and contained.
-    // eslint-disable-next-line n/no-process-env -- Configuration utility needs controlled process.env access
-    const flagValue = process.env["PLAYWRIGHT_ENABLE_ATTACHMENTS"];
+    const normalized = value.toLowerCase();
+    return normalized === "1" || normalized === "true" || normalized === "yes";
+};
 
-    return flagValue === "true";
+const isCI = coerceEnvFlag(readEnv("CI"));
+const headlessBrowserMode =
+    isCI || coerceEnvFlag(readEnv("PLAYWRIGHT_HEADLESS"));
+const uiTestWorkerCount = isCI ? 2 : Math.min(Math.max(os.cpus().length, 2), 4);
+const slowMoMsValue = readEnv("PLAYWRIGHT_SLOWMO");
+const slowMoMs = slowMoMsValue ? Number.parseInt(slowMoMsValue, 10) || 0 : 0;
+const chromiumDevice = devices["Desktop Chrome"];
+const sharedLaunchArgs = coerceEnvFlag(readEnv("PLAYWRIGHT_DISABLE_GPU"))
+    ? []
+    : ["--disable-gpu"];
+
+interface ElectronProjectOptions {
+    readonly layer: "e2e" | "main" | "renderer";
+    readonly name: string;
+    readonly pattern: string;
+    readonly timeout?: number;
 }
 
+type ProjectConfig = NonNullable<PlaywrightTestConfig["projects"]>[number];
+
+const createElectronProject = ({
+    layer,
+    name,
+    pattern,
+    timeout = 45_000,
+}: ElectronProjectOptions): ProjectConfig => ({
+    fullyParallel: false,
+    metadata: { layer, scope: "electron" },
+    name,
+    testMatch: pattern,
+    timeout,
+    use: {
+        ...chromiumDevice,
+        headless: headlessBrowserMode,
+        launchOptions: {
+            args: sharedLaunchArgs,
+            ...(slowMoMs > 0 ? { slowMo: slowMoMs } : {}),
+        },
+    },
+    workers: 1,
+});
+
+interface UiProjectOptions {
+    readonly grep?: RegExp;
+    readonly grepInvert?: RegExp;
+    readonly metadata?: Record<string, unknown>;
+    readonly name: string;
+    readonly viewport?: { readonly height: number; readonly width: number };
+    readonly workers?: number;
+}
+
+const createUiProject = ({
+    grep,
+    grepInvert,
+    metadata,
+    name,
+    viewport = { height: 720, width: 1280 },
+    workers = uiTestWorkerCount,
+}: UiProjectOptions): ProjectConfig => ({
+    fullyParallel: true,
+    ...(grep ? { grep } : {}),
+    ...(grepInvert ? { grepInvert } : {}),
+    metadata: { scope: "ui", ...metadata },
+    name,
+    testMatch: "**/ui-*.playwright.test.ts",
+    use: {
+        ...chromiumDevice,
+        headless: true,
+        launchOptions: {
+            args: sharedLaunchArgs,
+            ...(slowMoMs > 0 ? { slowMo: slowMoMs } : {}),
+        },
+        viewport,
+    },
+    workers,
+});
+
+const electronProjects: ProjectConfig[] = [
+    createElectronProject({
+        layer: "main",
+        name: "electron-main",
+        pattern: "**/main-process.*.playwright.test.ts",
+    }),
+    createElectronProject({
+        layer: "renderer",
+        name: "electron-renderer",
+        pattern: "**/renderer-process.*.playwright.test.ts",
+    }),
+    createElectronProject({
+        layer: "e2e",
+        name: "electron-e2e",
+        pattern: "**/app-launch.*.playwright.test.ts",
+        timeout: 60 * 1000,
+    }),
+];
+
+const uiProjects: ProjectConfig[] = [
+    createUiProject({
+        grep: /@smoke/v,
+        metadata: { tier: "smoke" },
+        name: "ui-smoke",
+        workers: Math.min(2, uiTestWorkerCount),
+    }),
+    createUiProject({
+        grepInvert: /@smoke/v,
+        metadata: { tier: "regression" },
+        name: "ui-regression",
+    }),
+];
+
+const isPlaywrightAttachmentDiagnosticsEnabled = (): boolean =>
+    coerceEnvFlag(readEnv("PLAYWRIGHT_ENABLE_ATTACHMENTS"));
+
+const mergedProjects: ProjectConfig[] = [...electronProjects, ...uiProjects];
+
 /**
- * Playwright configuration with TypeScript support and comprehensive settings.
- * Includes proper test isolation, recording options, and Electron-specific
- * setup.
- *
- * @remarks
- * This configuration runs tests in normal execution mode by default (no watch
- * mode). Watch mode is only available via UI mode (`--ui` flag) and must be
- * manually enabled.
+ * Complete Playwright configuration shared across Electron and UI projects.
  */
 const config: PlaywrightTestConfig = defineConfig({
     expect: {
-        timeout: 20 * 1000, // 20 seconds for assertions
+        timeout: 20 * 1000,
     },
 
-    forbidOnly: Boolean(process.env["CI"]), // Prevent test.only in CI
-    // Test execution configuration
-    /**
-     * Global setup and teardown scripts for Playwright. These scripts run
-     * before all tests (setup) and after all tests (teardown). Used for
-     * initializing and cleaning up test environments, such as starting/stopping
-     * Electron, seeding databases, etc. See:
-     * https://playwright.dev/docs/test-global-setup-teardown
-     */
+    forbidOnly: isCI,
     globalSetup: "./playwright/fixtures/global-setup.ts",
     globalTeardown: "./playwright/fixtures/global-teardown.ts",
-    // Output and artifacts configuration - organized within playwright directory
     outputDir: "playwright/test-results/",
-    // Multiple projects for different test types
-    projects: [
-        {
-            fullyParallel: false, // Electron stability
-            name: "electron-main",
-            testMatch: "**/main-process.*.playwright.test.ts",
-            use: {
-                ...devices["Desktop Chrome"],
-                // Main process specific configuration
-            },
-        },
-        {
-            fullyParallel: false, // Electron stability
-            name: "electron-renderer",
-            testMatch: "**/renderer-process.*.playwright.test.ts",
-            use: {
-                ...devices["Desktop Chrome"],
-                // Renderer process specific configuration
-            },
-        },
-        {
-            fullyParallel: false, // Electron stability
-            name: "electron-e2e",
-            testMatch: "**/app-launch.*.playwright.test.ts",
-            use: {
-                ...devices["Desktop Chrome"],
-                // E2E specific configuration
-            },
-        },
-        {
-            fullyParallel: false, // Disable parallelism for Electron UI stability
-            name: "ui-tests",
-            testMatch: "**/ui-*.playwright.test.ts",
-            use: {
-                ...devices["Desktop Chrome"],
-                // UI testing specific configuration
-                viewport: { height: 1080, width: 1920 }, // Larger viewport for UI tests
-            },
-        },
-        {
-            fullyParallel: false, // Electron stability
-            name: "comprehensive-e2e",
-            testMatch: "**/e2e-*.e2e.playwright.test.ts",
-            timeout: 60 * 1000, // 60 seconds for comprehensive E2E tests
-            use: {
-                ...devices["Desktop Chrome"],
-                // Comprehensive E2E testing configuration
-                actionTimeout: 30 * 1000, // 30 seconds for actions in comprehensive tests
-                viewport: { height: 1080, width: 1920 },
-            },
-        },
-        {
-            fullyParallel: true, // Enable parallelism for non-Electron comprehensive tests
-            name: "comprehensive-tests",
-            testMatch: [
-                "**/electron-main-process.playwright.test.ts",
-                "**/component-ui-comprehensive.playwright.test.ts",
-                "**/accessibility-performance.playwright.test.ts",
-                "**/edge-cases-error-handling.playwright.test.ts",
-                "**/comprehensive-navigation-structure.playwright.test.ts",
-                "**/advanced-accessibility-wcag.playwright.test.ts",
-                "**/performance-memory-benchmarks.playwright.test.ts",
-                "**/cross-browser-compatibility.playwright.test.ts",
-                "**/comprehensive-integration.playwright.test.ts",
-            ],
-            use: {
-                ...devices["Desktop Chrome"],
-                // Comprehensive testing configuration
-                viewport: { height: 1080, width: 1920 },
-            },
-        },
-    ],
+    projects: mergedProjects,
 
-    // Reporter configuration with multiple formats
     reporter: [
         ["list"],
         [
             "html",
-            {
-                open: "never", // Don't auto-open in CI
-                outputFolder: "playwright/reports/html-report",
-            },
+            { open: "never", outputFolder: "playwright/reports/html-report" },
         ],
-        [
-            "json",
-            {
-                outputFile: "playwright/test-results/results.json",
-            },
-        ],
-        // Add JUnit reporter for CI integration
-        [
-            "junit",
-            {
-                outputFile: "playwright/test-results/results.xml",
-            },
-        ],
+        ["json", { outputFile: "playwright/test-results/results.json" }],
+        ["junit", { outputFile: "playwright/test-results/results.xml" }],
     ],
 
-    retries: process.env["CI"] ? 2 : 0, // Retry on CI only
+    retries: isCI ? 2 : 0,
 
-    // Test directory configuration
     testDir: "./playwright/tests",
-    // Explicitly ignore non-playwright test files
     testIgnore: [
         "**/*.vitest.test.ts",
         "**/*.vitest.test.js",
@@ -176,92 +173,25 @@ const config: PlaywrightTestConfig = defineConfig({
         "**/coverage/**",
         "**/dist*/**",
     ],
+    testMatch: ["**/*.playwright.test.ts"],
 
-    // Test file patterns - only run playwright tests
-    testMatch: ["**/*.test.ts"],
-
-    // Timeout and retry configuration
-    timeout: 20 * 1000, // 20 seconds per test
-    // TypeScript configuration
-    /**
-     * @remarks
-     * Playwright tests use a dedicated tsconfig (`./playwright/tsconfig.json`)
-     * to isolate test-specific TypeScript settings from the main application.
-     * This prevents conflicts with app build settings and ensures Playwright
-     * tests compile and run with their own strictness and module resolution.
-     */
+    timeout: 20 * 1000,
     tsconfig: "./playwright/tsconfig.json",
-    // Global test configuration
+
     use: {
-        /**
-         * Allow file downloads in tests. Electron apps may trigger downloads
-         * for logs, exports, etc.
-         */
         acceptDownloads: true,
-
-        // Action timeouts
-        actionTimeout: 20 * 1000, // 20 seconds for actions
-
-        // Disable web security for Electron testing
+        actionTimeout: 20 * 1000,
         bypassCSP: true,
-
-        /**
-         * @remarks
-         * Electron's automated testing is most reliable with Chromium-based
-         * browsers. The "chrome" channel ensures compatibility with Electron's
-         * underlying Chromium engine, providing consistent results and access
-         * to Electron-specific APIs during testing.
-         *
-         * IMPORTANT: Electron doesn't support true "headless" mode like
-         * browsers. Instead, the headless behavior is controlled at the
-         * Electron app level by preventing windows from showing during tests.
-         * This setting affects browser tests but NOT Electron tests.
-         *
-         * For Electron headless testing:
-         *
-         * - Set HEADLESS=true environment variable
-         * - Your Electron app should check this and skip window.show()
-         * - On Linux CI: use xvfb-run or xvfb-maybe for virtual display
-         *
-         * See: https://github.com/microsoft/playwright/issues/13288
-         * https://www.electronjs.org/docs/latest/tutorial/testing-on-headless-ci
-         */
         channel: "chrome",
         colorScheme: "dark",
-        // Browser configuration - NOTE: This doesn't affect Electron apps
-        headless: Boolean(process.env["CI"]), // For browser tests only
-
+        headless: headlessBrowserMode,
         ignoreHTTPSErrors: true,
-
-        /**
-         * Ensure JavaScript is enabled for all Electron renderer tests.
-         * Electron apps rely on JS for UI and logic.
-         */
         javaScriptEnabled: true,
-
-        /**
-         * Set locale for consistent UI rendering and i18n tests. Electron apps
-         * may display locale-dependent content.
-         */
         locale: "en-US",
-
-        navigationTimeout: 30 * 1000, // 30 seconds for navigation
-
-        // Recording configuration - capture failures.
-        //
-        // NOTE: Playwright 1.56.x can intermittently emit
-        // "Internal error: step id not found: fixture@…" when diagnostics
-        // attachments target fixture steps that have already been discarded
-        // (see https://github.com/microsoft/playwright/issues/37147 and
-        // https://github.com/microsoft/playwright/issues/37747). To keep the
-        // dashboard layout tests stable, we disable automatic attachments by
-        // default and allow opt-in for local debugging via the
-        // PLAYWRIGHT_ENABLE_ATTACHMENTS flag.
+        navigationTimeout: 30 * 1000,
         screenshot: isPlaywrightAttachmentDiagnosticsEnabled()
             ? "only-on-failure"
             : "off",
-
-        // Custom test ID attribute for better selector reliability
         testIdAttribute: "data-testid",
         timezoneId: "America/Detroit",
         trace: isPlaywrightAttachmentDiagnosticsEnabled()
@@ -270,11 +200,8 @@ const config: PlaywrightTestConfig = defineConfig({
         video: isPlaywrightAttachmentDiagnosticsEnabled()
             ? "retain-on-failure"
             : "off",
-        // Viewport configuration for consistent testing
         viewport: { height: 720, width: 1280 },
     },
-
-    workers: 1, // Force single worker for Electron stability
 });
 
 export default config;

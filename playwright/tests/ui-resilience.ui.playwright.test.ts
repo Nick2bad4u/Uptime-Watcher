@@ -19,6 +19,7 @@ import {
     removeAllSites,
     submitAddSiteForm,
     resetApplicationState,
+    waitForDialogTeardown,
     WAIT_TIMEOUTS,
 } from "../utils/ui-helpers";
 import { DEFAULT_TEST_SITE_URL } from "../utils/testData";
@@ -31,6 +32,8 @@ test.describe(
         tag: ["@ui", "@resilience"],
     },
     () => {
+        test.setTimeout(60_000);
+
         let electronApp: ElectronApplication;
         let page: Page;
 
@@ -104,9 +107,7 @@ test.describe(
                 for (let iteration = 0; iteration < 3; iteration += 1) {
                     await openAddSiteModal(page);
                     await closeModal(page, "escape");
-                    await expect(page.getByTestId("add-site-form")).toBeHidden({
-                        timeout: WAIT_TIMEOUTS.MEDIUM,
-                    });
+                    await waitForDialogTeardown(page, "add-site-modal");
                 }
 
                 await openAddSiteModal(page);
@@ -115,9 +116,7 @@ test.describe(
                 });
                 await closeModal(page, "escape");
 
-                await expect(page.getByRole("dialog")).toHaveCount(0, {
-                    timeout: WAIT_TIMEOUTS.MEDIUM,
-                });
+                await waitForDialogTeardown(page, "add-site-modal");
             }
         );
 

@@ -78,13 +78,7 @@ describe("TypeGuards - Complete Function Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             expect(isObject([])).toBeFalsy();
-            expect(
-                isObject([
-                    1,
-                    2,
-                    3,
-                ])
-            ).toBeFalsy();
+            expect(isObject([1, 2, 3])).toBeFalsy();
         });
 
         it("should return false for primitives", async ({ task, annotate }) => {
@@ -407,20 +401,8 @@ describe("TypeGuards - Complete Function Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             expect(isArray([])).toBeTruthy();
-            expect(
-                isArray([
-                    1,
-                    2,
-                    3,
-                ])
-            ).toBeTruthy();
-            expect(
-                isArray([
-                    "a",
-                    "b",
-                    "c",
-                ])
-            ).toBeTruthy();
+            expect(isArray([1, 2, 3])).toBeTruthy();
+            expect(isArray(["a", "b", "c"])).toBeTruthy();
             expect(isArray([true, false])).toBeTruthy();
         });
 
@@ -457,46 +439,10 @@ describe("TypeGuards - Complete Function Coverage", () => {
             const isNumberValidator = (item: unknown): item is number =>
                 typeof item === "number";
 
-            expect(
-                isArray(
-                    [
-                        "a",
-                        "b",
-                        "c",
-                    ],
-                    isStringValidator
-                )
-            ).toBeTruthy();
-            expect(
-                isArray(
-                    [
-                        1,
-                        2,
-                        3,
-                    ],
-                    isNumberValidator
-                )
-            ).toBeTruthy();
-            expect(
-                isArray(
-                    [
-                        "a",
-                        1,
-                        "c",
-                    ],
-                    isStringValidator
-                )
-            ).toBeFalsy();
-            expect(
-                isArray(
-                    [
-                        1,
-                        "b",
-                        3,
-                    ],
-                    isNumberValidator
-                )
-            ).toBeFalsy();
+            expect(isArray(["a", "b", "c"], isStringValidator)).toBeTruthy();
+            expect(isArray([1, 2, 3], isNumberValidator)).toBeTruthy();
+            expect(isArray(["a", 1, "c"], isStringValidator)).toBeFalsy();
+            expect(isArray([1, "b", 3], isNumberValidator)).toBeFalsy();
         });
 
         it("should handle empty arrays with validator", async ({
@@ -896,7 +842,7 @@ describe("TypeGuards - Complete Function Coverage", () => {
             expect(isPositiveNumber(1)).toBeTruthy();
             expect(isPositiveNumber(123)).toBeTruthy();
             expect(isPositiveNumber(3.141_59)).toBeTruthy();
-            expect(isPositiveNumber(Infinity)).toBeTruthy();
+            expect(isPositiveNumber(Infinity)).toBeFalsy();
         });
 
         it("should return false for zero", async ({ task, annotate }) => {
@@ -1189,11 +1135,7 @@ describe("TypeGuards - Complete Function Coverage", () => {
             expect(hasProperty(complexObj, "id")).toBeTruthy();
             expect(hasProperty(complexObj, "metadata")).toBeTruthy();
             expect(
-                hasProperties(complexObj, [
-                    "id",
-                    "name",
-                    "active",
-                ])
+                hasProperties(complexObj, ["id", "name", "active"])
             ).toBeTruthy();
             expect(isNumber(complexObj.id)).toBeTruthy();
             expect(isString(complexObj.name)).toBeTruthy();

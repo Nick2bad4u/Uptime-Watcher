@@ -265,6 +265,10 @@ function isSerializedDatabaseBackupResult(
     }
 
     const metadataCandidate = value["metadata"];
+    if (metadataCandidate === undefined) {
+        return true;
+    }
+
     if (!isRecord(metadataCandidate)) {
         return false;
     }

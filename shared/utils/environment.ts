@@ -16,18 +16,36 @@ export interface KnownEnvironmentVariables {
     readonly PLAYWRIGHT_COVERAGE?: string;
 }
 
-interface ProcessSnapshot {
-    readonly env?: Record<string, string | undefined>;
-    readonly versions?: {
-        readonly node?: unknown;
-    };
+/**
+ * Immutable snapshot of the global process object used for environment
+ * detection. Tests can provide synthetic structures via the override helpers.
+ */
+export interface ProcessSnapshot {
+    readonly env?: Record<string, string | undefined> | undefined;
+    readonly versions?:
+        | undefined
+        | {
+              readonly node?: unknown;
+          };
 }
 
 interface ProcessSnapshotProvider {
     process?: ProcessSnapshot;
 }
 
+type ProcessSnapshotOverride = null | ProcessSnapshot | undefined;
+
+const processSnapshotState: {
+    override: ProcessSnapshotOverride;
+} = {
+    override: undefined,
+};
+
 const getProcessSnapshot = (): ProcessSnapshot | undefined => {
+    if (processSnapshotState.override !== undefined) {
+        return processSnapshotState.override ?? undefined;
+    }
+
     if (typeof globalThis !== "object") {
         return undefined;
     }
@@ -67,6 +85,30 @@ const getProcessVersions = (): ProcessSnapshot["versions"] | undefined => {
 };
 
 const hasProcessSnapshot = (): boolean => getProcessSnapshot() !== undefined;
+
+/**
+ * Testing-only setter for the process snapshot. Allows Vitest suites to
+ * simulate environments where {@link globalThis.process} is missing or has
+ * bespoke values without mutating the real Node.js global and destabilizing the
+ * test runner.
+ *
+ * @remarks
+ * Use {@link resetProcessSnapshotOverrideForTesting} after each test to avoid
+ * leaking overrides across suites.
+ */
+export function setProcessSnapshotOverrideForTesting(
+    snapshot: null | ProcessSnapshot
+): void {
+    processSnapshotState.override = snapshot;
+}
+
+/**
+ * Clears the testing override and resumes reading directly from
+ * {@link globalThis.process}.
+ */
+export function resetProcessSnapshotOverrideForTesting(): void {
+    processSnapshotState.override = undefined;
+}
 
 /**
  * Reads an environment variable from the safeguarded snapshot.

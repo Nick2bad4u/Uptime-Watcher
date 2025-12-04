@@ -8,7 +8,7 @@
  */
 
 import { _electron as electron } from "@playwright/test";
-import type { ElectronApplication } from "@playwright/test";
+import type { ElectronApplication, Page } from "@playwright/test";
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import * as path from "node:path";
@@ -17,6 +17,10 @@ import {
     collectCoverageFromElectronApp,
     isCoverageEnabled,
 } from "../utils/coverage";
+import {
+    registerApplicationUserDataDirectory,
+    registerPageUserDataDirectory,
+} from "../utils/userDataDirectoryRegistry";
 
 /**
  * Launch Electron with CI-compatible configuration.
@@ -45,8 +49,6 @@ export async function launchElectronApp(
     const userDataDir = await mkdtemp(
         path.join(tmpdir(), "uptime-watcher-playwright-")
     );
-    const previousUserDataDir = process.env["PLAYWRIGHT_USER_DATA_DIR"];
-    process.env["PLAYWRIGHT_USER_DATA_DIR"] = userDataDir;
 
     const existingNodeOptions = process.env["NODE_OPTIONS"] ?? "";
     const disableWarningOption = "--disable-warning=DEP0190";
@@ -67,14 +69,6 @@ export async function launchElectronApp(
                     }
                 );
             }
-        },
-        async () => {
-            if (previousUserDataDir === undefined) {
-                delete process.env["PLAYWRIGHT_USER_DATA_DIR"];
-                return;
-            }
-
-            process.env["PLAYWRIGHT_USER_DATA_DIR"] = previousUserDataDir;
         },
     ];
 
@@ -126,6 +120,24 @@ export async function launchElectronApp(
         },
         timeout: 30000, // Add timeout like codegen script
     });
+
+    const attachWindowMetadata = (page: Page): void => {
+        registerPageUserDataDirectory(page, userDataDir);
+    };
+
+    registerApplicationUserDataDirectory(app, userDataDir);
+    app.on("window", attachWindowMetadata);
+
+    const originalFirstWindow = app.firstWindow.bind(app);
+    (
+        app as ElectronApplication & {
+            firstWindow: ElectronApplication["firstWindow"];
+        }
+    ).firstWindow = (async () => {
+        const page = await originalFirstWindow();
+        attachWindowMetadata(page);
+        return page;
+    }) as ElectronApplication["firstWindow"];
 
     app.on("close", () => {
         void runCleanup();

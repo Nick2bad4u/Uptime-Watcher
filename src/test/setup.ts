@@ -588,25 +588,36 @@ const mockElectronAPI: {
 // Suppress noisy CSS parse errors emitted by JSDOM for modern CSS features
 const originalConsoleError = console.error;
 const originalConsoleWarn = console.warn;
-const cssParseWarningPrefix = "Could not parse CSS stylesheet";
-const suppressCssParseWarning = (...args: unknown[]): boolean =>
-    typeof args[0] === "string" && args[0].startsWith(cssParseWarningPrefix);
+const cssParseWarningSignature = "Could not parse CSS stylesheet";
 
-console.error = (...args: unknown[]): void => {
-    if (suppressCssParseWarning(...args)) {
-        return;
-    }
+const containsCssParseWarning = (args: readonly unknown[]): boolean =>
+    args.some((argument) => {
+        if (typeof argument === "string") {
+            return argument.includes(cssParseWarningSignature);
+        }
 
-    originalConsoleError(...args);
-};
+        if (argument instanceof Error) {
+            return argument.message.includes(cssParseWarningSignature);
+        }
 
-console.warn = (...args: unknown[]): void => {
-    if (suppressCssParseWarning(...args)) {
-        return;
-    }
+        return false;
+    });
 
-    originalConsoleWarn(...args);
-};
+const suppressCssParseWarning = <
+    Logger extends (...loggerArgs: unknown[]) => void,
+>(
+    logger: Logger
+): Logger =>
+    ((...loggerArgs: Parameters<Logger>) => {
+        if (containsCssParseWarning(loggerArgs)) {
+            return;
+        }
+
+        logger(...loggerArgs);
+    }) as Logger;
+
+console.error = suppressCssParseWarning(originalConsoleError);
+console.warn = suppressCssParseWarning(originalConsoleWarn);
 
 // Mock window.electronAPI globally
 Object.defineProperty(globalThis, "electronAPI", {
@@ -812,11 +823,7 @@ const mockTheme = {
 vi.mock("../theme/useTheme", () => ({
     useTheme: () => ({
         ...mockTheme,
-        availableThemes: [
-            "light",
-            "dark",
-            "system",
-        ],
+        availableThemes: ["light", "dark", "system"],
         currentTheme: mockTheme,
         getColor: vi.fn((path: string) => {
             const keys = path.split(".");
@@ -845,11 +852,7 @@ vi.mock("../theme/useTheme", () => ({
         themeManager: {
             getTheme: vi.fn(() => mockTheme),
             applyTheme: vi.fn(),
-            getAvailableThemes: vi.fn(() => [
-                "light",
-                "dark",
-                "system",
-            ]),
+            getAvailableThemes: vi.fn(() => ["light", "dark", "system"]),
             onSystemThemeChange: vi.fn(() => vi.fn()),
             getSystemThemePreference: vi.fn(() => "light"),
         },

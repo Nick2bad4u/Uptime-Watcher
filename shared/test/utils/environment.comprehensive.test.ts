@@ -1,4 +1,13 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import {
+    afterEach,
+    beforeAll,
+    beforeEach,
+    describe,
+    expect,
+    it,
+    vi,
+} from "vitest";
+import type { ProcessSnapshot } from "../../utils/environment";
 
 /**
  * Test suite for shared/utils/environment.ts
@@ -6,29 +15,97 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
  * @file Comprehensive tests for environment detection utilities
  */
 
-// Mock process object for environment testing
-const mockProcess = {
-    env: {} as Record<string, string | undefined>,
-    versions: { node: "18.0.0" } as any,
-} as any;
+type EnvironmentModule = typeof import("../../utils/environment");
+
+let environmentModule: EnvironmentModule | undefined = undefined;
+
+let mockProcessEnv: Record<string, string | undefined> = {};
+let mockProcessVersions: ProcessSnapshot["versions"] = { node: "18.0.0" };
+
+const mockProcess: ProcessSnapshot = {
+    get env() {
+        return mockProcessEnv;
+    },
+    get versions() {
+        return mockProcessVersions;
+    },
+};
+
+const resetMockProcessState = (): void => {
+    mockProcessEnv = {};
+    mockProcessVersions = { node: "18.0.0" };
+};
+
+const ensureEnvironmentModule = (): EnvironmentModule => {
+    if (!environmentModule) {
+        throw new Error("Environment utilities have not been initialized");
+    }
+
+    return environmentModule;
+};
+
+const cloneRecord = <T extends Record<string, string | undefined>>(
+    source: T
+): T => ({
+    ...source,
+});
+
+const cloneVersions = (
+    versions: ProcessSnapshot["versions"] | undefined
+): ProcessSnapshot["versions"] => {
+    if (!versions) {
+        return versions;
+    }
+
+    return { ...versions };
+};
+
+const buildProcessSnapshot = (
+    overrides: Partial<ProcessSnapshot> = {}
+): ProcessSnapshot => {
+    const defaultEnv = (mockProcess.env ?? {}) as Record<
+        string,
+        string | undefined
+    >;
+    const env = Object.hasOwn(overrides, "env")
+        ? (overrides.env ?? {})
+        : cloneRecord(defaultEnv);
+    const versions = Object.hasOwn(overrides, "versions")
+        ? (overrides.versions ?? cloneVersions(mockProcess.versions))
+        : cloneVersions(mockProcess.versions);
+
+    return { env, versions };
+};
+
+const applyProcessSnapshot = (
+    snapshot: ProcessSnapshot | null
+): EnvironmentModule => {
+    const module = ensureEnvironmentModule();
+    module.setProcessSnapshotOverrideForTesting(snapshot);
+    return module;
+};
+
+const applyMockProcessSnapshot = (
+    overrides?: Partial<ProcessSnapshot>
+): EnvironmentModule => applyProcessSnapshot(buildProcessSnapshot(overrides));
+
+const resetProcessSnapshot = (): void => {
+    ensureEnvironmentModule().resetProcessSnapshotOverrideForTesting();
+};
 
 describe("Environment Detection Utilities", () => {
-    let originalProcess: any = undefined;
+    beforeAll(async () => {
+        environmentModule = await import("../../utils/environment");
+    });
 
     beforeEach(() => {
-        // Store original process
-        originalProcess = globalThis.process;
-
-        // Reset mock process environment
-        mockProcess.env = {};
-
-        // Clear any existing mocks
+        resetMockProcessState();
         vi.clearAllMocks();
+        resetProcessSnapshot();
     });
 
     afterEach(() => {
-        // Restore original process
-        globalThis.process = originalProcess;
+        resetProcessSnapshot();
     });
 
     describe("getEnvironment", () => {
@@ -41,14 +118,11 @@ describe("Environment Detection Utilities", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            globalThis.process = {
-                ...mockProcess,
+            const envModule = applyMockProcessSnapshot({
                 env: { NODE_ENV: "production" },
-            } as any;
+            });
 
-            const { getEnvironment } = await import("../../utils/environment");
-
-            expect(getEnvironment()).toBe("production");
+            expect(envModule.getEnvironment()).toBe("production");
         });
 
         it("should return 'unknown' when NODE_ENV is not set", async ({
@@ -60,11 +134,9 @@ describe("Environment Detection Utilities", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            globalThis.process = { ...mockProcess, env: {} } as any;
+            const envModule = applyMockProcessSnapshot({ env: {} });
 
-            const { getEnvironment } = await import("../../utils/environment");
-
-            expect(getEnvironment()).toBe("unknown");
+            expect(envModule.getEnvironment()).toBe("unknown");
         });
 
         it("should return 'unknown' when process is undefined", async ({
@@ -76,11 +148,9 @@ describe("Environment Detection Utilities", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            globalThis.process = undefined as any;
+            const envModule = applyProcessSnapshot(null);
 
-            const { getEnvironment } = await import("../../utils/environment");
-
-            expect(getEnvironment()).toBe("unknown");
+            expect(envModule.getEnvironment()).toBe("unknown");
         });
 
         it("should handle all standard NODE_ENV values", async ({
@@ -92,20 +162,13 @@ describe("Environment Detection Utilities", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            const { getEnvironment } = await import("../../utils/environment");
+            const envModule = ensureEnvironmentModule();
 
-            const environments = [
-                "development",
-                "production",
-                "test",
-            ];
+            const environments = ["development", "production", "test"];
 
             for (const env of environments) {
-                globalThis.process = {
-                    ...mockProcess,
-                    env: { NODE_ENV: env },
-                } as any;
-                expect(getEnvironment()).toBe(env);
+                applyMockProcessSnapshot({ env: { NODE_ENV: env } });
+                expect(envModule.getEnvironment()).toBe(env);
             }
         });
     });
@@ -120,15 +183,12 @@ describe("Environment Detection Utilities", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            globalThis.process = {
-                ...mockProcess,
+            const envModule = applyMockProcessSnapshot({
                 env: { NODE_ENV: "test", CODECOV_TOKEN: "test-token" },
-            } as any;
+            });
 
-            const { getEnvVar } = await import("../../utils/environment");
-
-            expect(getEnvVar("NODE_ENV")).toBe("test");
-            expect(getEnvVar("CODECOV_TOKEN")).toBe("test-token");
+            expect(envModule.getEnvVar("NODE_ENV")).toBe("test");
+            expect(envModule.getEnvVar("CODECOV_TOKEN")).toBe("test-token");
         });
 
         it("should return undefined when environment variable doesn't exist", async ({
@@ -140,12 +200,10 @@ describe("Environment Detection Utilities", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            globalThis.process = { ...mockProcess, env: {} } as any;
+            const envModule = applyMockProcessSnapshot({ env: {} });
 
-            const { getEnvVar } = await import("../../utils/environment");
-
-            expect(getEnvVar("NODE_ENV")).toBeUndefined();
-            expect(getEnvVar("CODECOV_TOKEN")).toBeUndefined();
+            expect(envModule.getEnvVar("NODE_ENV")).toBeUndefined();
+            expect(envModule.getEnvVar("CODECOV_TOKEN")).toBeUndefined();
         });
 
         it("should return undefined when process is undefined", async ({
@@ -157,12 +215,10 @@ describe("Environment Detection Utilities", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            globalThis.process = undefined as any;
+            const envModule = applyProcessSnapshot(null);
 
-            const { getEnvVar } = await import("../../utils/environment");
-
-            expect(getEnvVar("NODE_ENV")).toBeUndefined();
-            expect(getEnvVar("CODECOV_TOKEN")).toBeUndefined();
+            expect(envModule.getEnvVar("NODE_ENV")).toBeUndefined();
+            expect(envModule.getEnvVar("CODECOV_TOKEN")).toBeUndefined();
         });
 
         it("should handle empty string values", async ({ task, annotate }) => {
@@ -171,14 +227,11 @@ describe("Environment Detection Utilities", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            globalThis.process = {
-                ...mockProcess,
+            const envModule = applyMockProcessSnapshot({
                 env: { NODE_ENV: "" },
-            } as any;
+            });
 
-            const { getEnvVar } = await import("../../utils/environment");
-
-            expect(getEnvVar("NODE_ENV")).toBe("");
+            expect(envModule.getEnvVar("NODE_ENV")).toBe("");
         });
     });
 
@@ -192,14 +245,11 @@ describe("Environment Detection Utilities", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            globalThis.process = {
-                ...mockProcess,
+            const envModule = applyMockProcessSnapshot({
                 env: { NODE_ENV: "production" },
-            } as any;
+            });
 
-            const { getNodeEnv } = await import("../../utils/environment");
-
-            expect(getNodeEnv()).toBe("production");
+            expect(envModule.getNodeEnv()).toBe("production");
         });
 
         it("should return 'development' when NODE_ENV is not set", async ({
@@ -211,11 +261,9 @@ describe("Environment Detection Utilities", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            globalThis.process = { ...mockProcess, env: {} } as any;
+            const envModule = applyMockProcessSnapshot({ env: {} });
 
-            const { getNodeEnv } = await import("../../utils/environment");
-
-            expect(getNodeEnv()).toBe("development");
+            expect(envModule.getNodeEnv()).toBe("development");
         });
 
         it("should return 'development' when process is undefined", async ({
@@ -227,11 +275,9 @@ describe("Environment Detection Utilities", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            globalThis.process = undefined as any;
+            const envModule = applyProcessSnapshot(null);
 
-            const { getNodeEnv } = await import("../../utils/environment");
-
-            expect(getNodeEnv()).toBe("development");
+            expect(envModule.getNodeEnv()).toBe("development");
         });
 
         it("should handle all standard NODE_ENV values", async ({
@@ -243,20 +289,13 @@ describe("Environment Detection Utilities", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            const { getNodeEnv } = await import("../../utils/environment");
+            const envModule = ensureEnvironmentModule();
 
-            const environments = [
-                "development",
-                "production",
-                "test",
-            ];
+            const environments = ["development", "production", "test"];
 
             for (const env of environments) {
-                globalThis.process = {
-                    ...mockProcess,
-                    env: { NODE_ENV: env },
-                } as any;
-                expect(getNodeEnv()).toBe(env);
+                applyMockProcessSnapshot({ env: { NODE_ENV: env } });
+                expect(envModule.getNodeEnv()).toBe(env);
             }
         });
     });
@@ -287,9 +326,8 @@ describe("Environment Detection Utilities", () => {
             globalThis.window = {} as any;
             globalThis.document = {} as any;
 
-            const { isBrowserEnvironment } = await import(
-                "../../utils/environment"
-            );
+            const { isBrowserEnvironment } =
+                await import("../../utils/environment");
 
             expect(isBrowserEnvironment()).toBeTruthy();
         });
@@ -306,9 +344,8 @@ describe("Environment Detection Utilities", () => {
             globalThis.window = undefined as any;
             globalThis.document = {} as any;
 
-            const { isBrowserEnvironment } = await import(
-                "../../utils/environment"
-            );
+            const { isBrowserEnvironment } =
+                await import("../../utils/environment");
 
             expect(isBrowserEnvironment()).toBeFalsy();
         });
@@ -325,9 +362,8 @@ describe("Environment Detection Utilities", () => {
             globalThis.window = {} as any;
             globalThis.document = undefined as any;
 
-            const { isBrowserEnvironment } = await import(
-                "../../utils/environment"
-            );
+            const { isBrowserEnvironment } =
+                await import("../../utils/environment");
 
             expect(isBrowserEnvironment()).toBeFalsy();
         });
@@ -344,9 +380,8 @@ describe("Environment Detection Utilities", () => {
             globalThis.window = undefined as any;
             globalThis.document = undefined as any;
 
-            const { isBrowserEnvironment } = await import(
-                "../../utils/environment"
-            );
+            const { isBrowserEnvironment } =
+                await import("../../utils/environment");
 
             expect(isBrowserEnvironment()).toBeFalsy();
         });
@@ -362,14 +397,11 @@ describe("Environment Detection Utilities", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            globalThis.process = {
-                ...mockProcess,
+            const envModule = applyMockProcessSnapshot({
                 env: { NODE_ENV: "development" },
-            } as any;
+            });
 
-            const { isDevelopment } = await import("../../utils/environment");
-
-            expect(isDevelopment()).toBeTruthy();
+            expect(envModule.isDevelopment()).toBeTruthy();
         });
 
         it("should return false when NODE_ENV is 'production'", async ({
@@ -381,14 +413,11 @@ describe("Environment Detection Utilities", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            globalThis.process = {
-                ...mockProcess,
+            const envModule = applyMockProcessSnapshot({
                 env: { NODE_ENV: "production" },
-            } as any;
+            });
 
-            const { isDevelopment } = await import("../../utils/environment");
-
-            expect(isDevelopment()).toBeFalsy();
+            expect(envModule.isDevelopment()).toBeFalsy();
         });
 
         it("should return false when NODE_ENV is 'test'", async ({
@@ -400,14 +429,11 @@ describe("Environment Detection Utilities", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            globalThis.process = {
-                ...mockProcess,
+            const envModule = applyMockProcessSnapshot({
                 env: { NODE_ENV: "test" },
-            } as any;
+            });
 
-            const { isDevelopment } = await import("../../utils/environment");
-
-            expect(isDevelopment()).toBeFalsy();
+            expect(envModule.isDevelopment()).toBeFalsy();
         });
 
         it("should return false when NODE_ENV is not set", async ({
@@ -419,11 +445,9 @@ describe("Environment Detection Utilities", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            globalThis.process = { ...mockProcess, env: {} } as any;
+            const envModule = applyMockProcessSnapshot({ env: {} });
 
-            const { isDevelopment } = await import("../../utils/environment");
-
-            expect(isDevelopment()).toBeFalsy();
+            expect(envModule.isDevelopment()).toBeFalsy();
         });
 
         it("should return false when process is undefined", async ({
@@ -435,11 +459,9 @@ describe("Environment Detection Utilities", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            globalThis.process = undefined as any;
+            const envModule = applyProcessSnapshot(null);
 
-            const { isDevelopment } = await import("../../utils/environment");
-
-            expect(isDevelopment()).toBeFalsy();
+            expect(envModule.isDevelopment()).toBeFalsy();
         });
 
         it("should be case sensitive", async ({ task, annotate }) => {
@@ -448,14 +470,11 @@ describe("Environment Detection Utilities", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            globalThis.process = {
-                ...mockProcess,
+            const envModule = applyMockProcessSnapshot({
                 env: { NODE_ENV: "Development" },
-            } as any;
+            });
 
-            const { isDevelopment } = await import("../../utils/environment");
-
-            expect(isDevelopment()).toBeFalsy();
+            expect(envModule.isDevelopment()).toBeFalsy();
         });
     });
 
@@ -469,16 +488,11 @@ describe("Environment Detection Utilities", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            globalThis.process = {
-                ...mockProcess,
+            const envModule = applyMockProcessSnapshot({
                 versions: { node: "18.0.0" },
-            } as any;
+            });
 
-            const { isNodeEnvironment } = await import(
-                "../../utils/environment"
-            );
-
-            expect(isNodeEnvironment()).toBeTruthy();
+            expect(envModule.isNodeEnvironment()).toBeTruthy();
         });
 
         it("should return false when process is undefined", async ({
@@ -490,13 +504,9 @@ describe("Environment Detection Utilities", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            globalThis.process = undefined as any;
+            const envModule = applyProcessSnapshot(null);
 
-            const { isNodeEnvironment } = await import(
-                "../../utils/environment"
-            );
-
-            expect(isNodeEnvironment()).toBeFalsy();
+            expect(envModule.isNodeEnvironment()).toBeFalsy();
         });
 
         it("should return false when process.versions is undefined", async ({
@@ -508,16 +518,11 @@ describe("Environment Detection Utilities", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            globalThis.process = {
-                ...mockProcess,
-                versions: undefined as any,
-            } as any;
+            const envModule = applyMockProcessSnapshot({
+                versions: undefined,
+            });
 
-            const { isNodeEnvironment } = await import(
-                "../../utils/environment"
-            );
-
-            expect(isNodeEnvironment()).toBeFalsy();
+            expect(envModule.isNodeEnvironment()).toBeFalsy();
         });
 
         it("should return false when process.versions is not an object", async ({
@@ -529,16 +534,11 @@ describe("Environment Detection Utilities", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            globalThis.process = {
-                ...mockProcess,
+            const envModule = applyMockProcessSnapshot({
                 versions: "not-an-object" as any,
-            } as any;
+            });
 
-            const { isNodeEnvironment } = await import(
-                "../../utils/environment"
-            );
-
-            expect(isNodeEnvironment()).toBeFalsy();
+            expect(envModule.isNodeEnvironment()).toBeFalsy();
         });
 
         it("should return false when process.versions.node is undefined", async ({
@@ -550,13 +550,11 @@ describe("Environment Detection Utilities", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            globalThis.process = { ...mockProcess, versions: {} as any } as any;
+            const envModule = applyMockProcessSnapshot({
+                versions: {} as any,
+            });
 
-            const { isNodeEnvironment } = await import(
-                "../../utils/environment"
-            );
-
-            expect(isNodeEnvironment()).toBeFalsy();
+            expect(envModule.isNodeEnvironment()).toBeFalsy();
         });
 
         it("should return false when process.versions.node is empty string", async ({
@@ -568,16 +566,11 @@ describe("Environment Detection Utilities", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            globalThis.process = {
-                ...mockProcess,
+            const envModule = applyMockProcessSnapshot({
                 versions: { node: "" } as any,
-            } as any;
+            });
 
-            const { isNodeEnvironment } = await import(
-                "../../utils/environment"
-            );
-
-            expect(isNodeEnvironment()).toBeFalsy();
+            expect(envModule.isNodeEnvironment()).toBeFalsy();
         });
     });
 
@@ -591,14 +584,11 @@ describe("Environment Detection Utilities", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            globalThis.process = {
-                ...mockProcess,
+            const envModule = applyMockProcessSnapshot({
                 env: { NODE_ENV: "production" },
-            } as any;
+            });
 
-            const { isProduction } = await import("../../utils/environment");
-
-            expect(isProduction()).toBeTruthy();
+            expect(envModule.isProduction()).toBeTruthy();
         });
 
         it("should return false when NODE_ENV is 'development'", async ({
@@ -610,14 +600,11 @@ describe("Environment Detection Utilities", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            globalThis.process = {
-                ...mockProcess,
+            const envModule = applyMockProcessSnapshot({
                 env: { NODE_ENV: "development" },
-            } as any;
+            });
 
-            const { isProduction } = await import("../../utils/environment");
-
-            expect(isProduction()).toBeFalsy();
+            expect(envModule.isProduction()).toBeFalsy();
         });
 
         it("should return false when NODE_ENV is 'test'", async ({
@@ -629,14 +616,11 @@ describe("Environment Detection Utilities", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            globalThis.process = {
-                ...mockProcess,
+            const envModule = applyMockProcessSnapshot({
                 env: { NODE_ENV: "test" },
-            } as any;
+            });
 
-            const { isProduction } = await import("../../utils/environment");
-
-            expect(isProduction()).toBeFalsy();
+            expect(envModule.isProduction()).toBeFalsy();
         });
 
         it("should return false when NODE_ENV is not set", async ({
@@ -648,11 +632,9 @@ describe("Environment Detection Utilities", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            globalThis.process = { ...mockProcess, env: {} } as any;
+            const envModule = applyMockProcessSnapshot({ env: {} });
 
-            const { isProduction } = await import("../../utils/environment");
-
-            expect(isProduction()).toBeFalsy();
+            expect(envModule.isProduction()).toBeFalsy();
         });
 
         it("should return false when process is undefined", async ({
@@ -664,11 +646,9 @@ describe("Environment Detection Utilities", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            globalThis.process = undefined as any;
+            const envModule = applyProcessSnapshot(null);
 
-            const { isProduction } = await import("../../utils/environment");
-
-            expect(isProduction()).toBeFalsy();
+            expect(envModule.isProduction()).toBeFalsy();
         });
 
         it("should be case sensitive", async ({ task, annotate }) => {
@@ -677,14 +657,11 @@ describe("Environment Detection Utilities", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            globalThis.process = {
-                ...mockProcess,
+            const envModule = applyMockProcessSnapshot({
                 env: { NODE_ENV: "Production" },
-            } as any;
+            });
 
-            const { isProduction } = await import("../../utils/environment");
-
-            expect(isProduction()).toBeFalsy();
+            expect(envModule.isProduction()).toBeFalsy();
         });
     });
 
@@ -698,14 +675,11 @@ describe("Environment Detection Utilities", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            globalThis.process = {
-                ...mockProcess,
+            const envModule = applyMockProcessSnapshot({
                 env: { NODE_ENV: "test" },
-            } as any;
+            });
 
-            const { isTest } = await import("../../utils/environment");
-
-            expect(isTest()).toBeTruthy();
+            expect(envModule.isTest()).toBeTruthy();
         });
 
         it("should return false when NODE_ENV is 'development'", async ({
@@ -717,14 +691,11 @@ describe("Environment Detection Utilities", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            globalThis.process = {
-                ...mockProcess,
+            const envModule = applyMockProcessSnapshot({
                 env: { NODE_ENV: "development" },
-            } as any;
+            });
 
-            const { isTest } = await import("../../utils/environment");
-
-            expect(isTest()).toBeFalsy();
+            expect(envModule.isTest()).toBeFalsy();
         });
 
         it("should return false when NODE_ENV is 'production'", async ({
@@ -736,14 +707,11 @@ describe("Environment Detection Utilities", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            globalThis.process = {
-                ...mockProcess,
+            const envModule = applyMockProcessSnapshot({
                 env: { NODE_ENV: "production" },
-            } as any;
+            });
 
-            const { isTest } = await import("../../utils/environment");
-
-            expect(isTest()).toBeFalsy();
+            expect(envModule.isTest()).toBeFalsy();
         });
 
         it("should return false when NODE_ENV is not set", async ({
@@ -755,11 +723,9 @@ describe("Environment Detection Utilities", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            globalThis.process = { ...mockProcess, env: {} } as any;
+            const envModule = applyMockProcessSnapshot({ env: {} });
 
-            const { isTest } = await import("../../utils/environment");
-
-            expect(isTest()).toBeFalsy();
+            expect(envModule.isTest()).toBeFalsy();
         });
 
         it("should return false when process is undefined", async ({
@@ -771,11 +737,9 @@ describe("Environment Detection Utilities", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            globalThis.process = undefined as any;
+            const envModule = applyProcessSnapshot(null);
 
-            const { isTest } = await import("../../utils/environment");
-
-            expect(isTest()).toBeFalsy();
+            expect(envModule.isTest()).toBeFalsy();
         });
 
         it("should be case sensitive", async ({ task, annotate }) => {
@@ -784,14 +748,11 @@ describe("Environment Detection Utilities", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            globalThis.process = {
-                ...mockProcess,
+            const envModule = applyMockProcessSnapshot({
                 env: { NODE_ENV: "Test" },
-            } as any;
+            });
 
-            const { isTest } = await import("../../utils/environment");
-
-            expect(isTest()).toBeFalsy();
+            expect(envModule.isTest()).toBeFalsy();
         });
     });
 
@@ -805,18 +766,16 @@ describe("Environment Detection Utilities", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            globalThis.process = {
-                ...mockProcess,
-                env: { NODE_ENV: "development" },
-            } as any;
+            applyMockProcessSnapshot({ env: { NODE_ENV: "development" } });
 
+            const envModule = ensureEnvironmentModule();
             const {
                 isDevelopment,
                 isProduction,
                 isTest,
                 getNodeEnv,
                 getEnvironment,
-            } = await import("../../utils/environment");
+            } = envModule;
 
             expect(isDevelopment()).toBeTruthy();
             expect(isProduction()).toBeFalsy();
@@ -834,8 +793,9 @@ describe("Environment Detection Utilities", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            globalThis.process = undefined as any;
+            applyProcessSnapshot(null);
 
+            const envModule = ensureEnvironmentModule();
             const {
                 isDevelopment,
                 isProduction,
@@ -844,7 +804,7 @@ describe("Environment Detection Utilities", () => {
                 getNodeEnv,
                 getEnvironment,
                 getEnvVar,
-            } = await import("../../utils/environment");
+            } = envModule;
 
             expect(isDevelopment()).toBeFalsy();
             expect(isProduction()).toBeFalsy();
@@ -864,20 +824,13 @@ describe("Environment Detection Utilities", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            const { getEnvVar } = await import("../../utils/environment");
+            const envModule = ensureEnvironmentModule();
 
-            const falsyValues = [
-                "",
-                "0",
-                "false",
-            ];
+            const falsyValues = ["", "0", "false"];
 
             for (const value of falsyValues) {
-                globalThis.process = {
-                    ...mockProcess,
-                    env: { NODE_ENV: value },
-                } as any;
-                expect(getEnvVar("NODE_ENV")).toBe(value);
+                applyMockProcessSnapshot({ env: { NODE_ENV: value } });
+                expect(envModule.getEnvVar("NODE_ENV")).toBe(value);
             }
         });
     });

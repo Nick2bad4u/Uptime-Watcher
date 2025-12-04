@@ -15,6 +15,7 @@ import {
     createSiteViaModal,
     getSiteCardLocator,
     openSiteDetails,
+    openSiteDetailsSettingsTab,
     removeAllSites,
     resetApplicationState,
     resolveConfirmDialog,
@@ -26,11 +27,7 @@ import { DEFAULT_TEST_SITE_URL, generateSiteName } from "../utils/testData";
 test.describe(
     "site removal - modern ui",
     {
-        tag: [
-            "@ui",
-            "@site-details",
-            "@removal",
-        ],
+        tag: ["@ui", "@site-details", "@removal"],
     },
     () => {
         let electronApp: ElectronApplication;
@@ -70,9 +67,7 @@ test.describe(
                 await openSiteDetails(page, siteName);
 
                 const siteDetailsModal = page.getByTestId("site-details-modal");
-                await siteDetailsModal
-                    .getByRole("button", { name: "Settings" })
-                    .click({ timeout: WAIT_TIMEOUTS.MEDIUM });
+                await openSiteDetailsSettingsTab(siteDetailsModal);
 
                 const removeButton = siteDetailsModal
                     .getByRole("button", { name: "Remove Site" })
@@ -168,9 +163,7 @@ test.describe(
                 await openSiteDetails(page, siteName);
 
                 const siteDetailsModal = page.getByTestId("site-details-modal");
-                await siteDetailsModal
-                    .getByRole("button", { name: "Settings" })
-                    .click({ timeout: WAIT_TIMEOUTS.MEDIUM });
+                await openSiteDetailsSettingsTab(siteDetailsModal);
 
                 await expect
                     .poll(

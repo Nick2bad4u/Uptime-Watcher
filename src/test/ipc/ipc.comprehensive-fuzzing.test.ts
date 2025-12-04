@@ -82,6 +82,15 @@ vi.mock("../../../electron/utils/logger", () => ({
 // Import after mocks
 import { registerStandardizedIpcHandler } from "../../../electron/services/ipc/utils";
 
+const toIsoStringSafe = (value: Date): string => {
+    const timestamp = value.getTime();
+    if (Number.isNaN(timestamp)) {
+        return new Date(0).toISOString();
+    }
+
+    return new Date(timestamp).toISOString();
+};
+
 // Custom arbitraries for IPC testing
 const arbitraryChannelName = fc
     .string({ minLength: 5, maxLength: 50 })
@@ -199,7 +208,7 @@ const arbitraryMonitoringData = fc.record<StatusUpdate>({
             min: new Date("1970-01-01T00:00:00.000Z"),
             max: new Date("3000-01-01T00:00:00.000Z"),
         })
-        .map((date) => date.toISOString()),
+        .map((date) => toIsoStringSafe(date)),
 });
 
 const arbitrarySettingsData = fc.record({

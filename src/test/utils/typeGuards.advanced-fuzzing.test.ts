@@ -239,7 +239,7 @@ describe("Type Guards Advanced Fuzzing Tests", () => {
                 const result = isPositiveNumber(value);
                 const expectedResult =
                     typeof value === "number" &&
-                    !Number.isNaN(value) &&
+                    Number.isFinite(value) &&
                     value > 0;
 
                 expect(result).toBe(expectedResult);
@@ -430,13 +430,7 @@ describe("Type Guards Advanced Fuzzing Tests", () => {
             "validateMonitorType should validate monitor types correctly",
             (monitorType) => {
                 const result = validateMonitorType(monitorType);
-                const validTypes = [
-                    "http",
-                    "ping",
-                    "port",
-                    "dns",
-                    "ssl",
-                ];
+                const validTypes = ["http", "ping", "port", "dns", "ssl"];
                 const expectedResult = validTypes.includes(
                     monitorType as string
                 );
@@ -589,12 +583,7 @@ describe("Type Guards Advanced Fuzzing Tests", () => {
                 expect(Array.isArray(result)).toBeTruthy();
 
                 // Check for invalid monitor type first
-                const validTypes = new Set([
-                    "http",
-                    "port",
-                    "ping",
-                    "dns",
-                ]);
+                const validTypes = new Set(["http", "port", "ping", "dns"]);
                 if (
                     !extremeConfig.type ||
                     !validTypes.has(extremeConfig.type)

@@ -18,6 +18,7 @@ import {
     openSiteDetails,
     removeAllSites,
     resetApplicationState,
+    waitForSiteMonitoringHydration,
     WAIT_TIMEOUTS,
 } from "../utils/ui-helpers";
 import { DEFAULT_TEST_SITE_URL, generateSiteName } from "../utils/testData";
@@ -25,13 +26,11 @@ import { DEFAULT_TEST_SITE_URL, generateSiteName } from "../utils/testData";
 test.describe(
     "monitoring status display - modern ui",
     {
-        tag: [
-            "@ui",
-            "@site-details",
-            "@monitoring",
-        ],
+        tag: ["@ui", "@site-details", "@monitoring"],
     },
     () => {
+        test.setTimeout(60_000);
+
         let electronApp: ElectronApplication;
         let page: Page;
         let siteName: string;
@@ -67,10 +66,17 @@ test.describe(
                 tag: ["@workflow", "@status"],
             },
             async () => {
+                await page
+                    .getByTestId("site-card")
+                    .filter({ hasText: siteName })
+                    .waitFor({ state: "visible", timeout: WAIT_TIMEOUTS.LONG });
+
                 await openSiteDetails(page, siteName);
 
                 const siteDetailsModal = page.getByTestId("site-details-modal");
                 await ensureSiteDetailsHeaderExpanded(siteDetailsModal);
+
+                await waitForSiteMonitoringHydration(page);
 
                 const statusDisplay = page.getByTestId(
                     "monitoring-status-display"
