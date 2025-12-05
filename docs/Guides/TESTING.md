@@ -3,7 +3,7 @@ schema: "../../config/schemas/doc-frontmatter.schema.json"
 title: "Testing and Coverage Setup"
 summary: "Overview of Uptime Watcher's testing configurations, coverage setup, and testing commands across frontend, backend, shared, and Storybook projects."
 created: "2025-06-30"
-last_reviewed: "2025-11-17"
+last_reviewed: "2025-12-04"
 category: "guide"
 author: "Nick2bad4u"
 tags:
@@ -91,8 +91,7 @@ npm run test:all
 # Frontend tests (renderer)
 npm run test               # Frontend tests via vitest.config.ts
 npm run test:frontend      # Explicit alias for renderer suite
-npm run test:coverage      # Combined coverage (frontend + electron + shared)
-npm run test:coverage:frontend      # Frontend-only coverage
+npm run test:coverage      # Renderer coverage (vitest.config.ts)
 
 # Electron (main process) tests
 npm run test:electron

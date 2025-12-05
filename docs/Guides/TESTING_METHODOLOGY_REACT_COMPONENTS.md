@@ -3,7 +3,7 @@ schema: "../../config/schemas/doc-frontmatter.schema.json"
 title: "React Component Testing Methodology"
 summary: "Testing methodology and patterns for React components in Uptime Watcher using Vitest and React Testing Library."
 created: "2025-09-22"
-last_reviewed: "2025-11-17"
+last_reviewed: "2025-12-04"
 category: "guide"
 author: "Nick2bad4u"
 tags:
@@ -570,7 +570,7 @@ npm test
 npm run test:coverage
 
 # Run tests in watch mode
-npm run test:watch
+npm run test -- --watch
 
 # Run specific test file
 npm test -- path/to/test.tsx

@@ -302,10 +302,30 @@ export interface ThemeTypography {
     };
 }
 
-/** Available theme names in the application */
+/**
+ * Available theme names in the application.
+ */
 export type ThemeName =
     | "custom"
     | "dark"
     | "high-contrast"
     | "light"
     | "system";
+
+/**
+ * List of all supported {@link ThemeName} values at runtime.
+ */
+export const THEME_NAMES: readonly ThemeName[] = [
+    "custom",
+    "dark",
+    "high-contrast",
+    "light",
+    "system",
+] as const;
+
+/**
+ * Runtime guard to verify whether an arbitrary string is a supported theme
+ * name.
+ */
+export const isThemeName = (value: string): value is ThemeName =>
+    (THEME_NAMES as readonly string[]).includes(value);

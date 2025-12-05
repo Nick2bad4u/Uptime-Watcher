@@ -3,7 +3,7 @@ schema: "../../config/schemas/doc-frontmatter.schema.json"
 title: "Architecture Documentation Index"
 summary: ">-"
 created: "2025-08-05"
-last_reviewed: "2025-11-19"
+last_reviewed: "2025-12-04"
 category: "guide"
 author: "Nick2bad4u"
 tags:
@@ -21,17 +21,18 @@ tags:
 
 1. [📁 Directory Structure](#-directory-structure)
 2. [🏗️ Architecture Decision Records (ADRs)](#️-architecture-decision-records-adrs)
-3. [📋 Development Patterns](#-development-patterns)
-4. [🧩 Recent Consistency Updates](#-recent-consistency-updates)
-5. [🛠️ Code Templates](#️-code-templates)
-6. [📚 Documentation Standards](#-documentation-standards)
-7. [🧾 Generated Artifacts](#-generated-artifacts)
-8. [🎯 Using This Documentation](#-using-this-documentation)
-9. [🔄 Maintenance Guidelines](#-maintenance-guidelines)
-10. [📊 Compliance Tracking](#-compliance-tracking)
-11. [Current Documentation Audit (2025-11-04)](#current-documentation-audit-2025-11-04)
-12. [🚀 Quick Start](#-quick-start)
-13. [📞 Support](#-support)
+3. [Additional ADRs (Draft)](#additional-adrs-draft)
+4. [📋 Development Patterns](#-development-patterns)
+5. [🧩 Recent Consistency Updates](#-recent-consistency-updates)
+6. [🛠️ Code Templates](#️-code-templates)
+7. [📚 Documentation Standards](#-documentation-standards)
+8. [🧾 Generated Artifacts](#-generated-artifacts)
+9. [🎯 Using This Documentation](#-using-this-documentation)
+10. [🔄 Maintenance Guidelines](#-maintenance-guidelines)
+11. [📊 Compliance Tracking](#-compliance-tracking)
+12. [Current Documentation Audit (2025-11-04)](#current-documentation-audit-2025-11-04)
+13. [🚀 Quick Start](#-quick-start)
+14. [📞 Support](#-support)
 
 ## 📁 Directory Structure
 
@@ -44,7 +45,16 @@ docs/Architecture/
 │   ├── ADR_003_ERROR_HANDLING_STRATEGY.md
 │   ├── ADR_004_FRONTEND_STATE_MANAGEMENT.md
 │   ├── ADR_005_IPC_COMMUNICATION_PROTOCOL.md
-│   └── ADR_006_STANDARDIZED_CACHE_CONFIGURATION.md
+│   ├── ADR_006_STANDARDIZED_CACHE_CONFIGURATION.md
+│   ├── ADR_007_SERVICE_CONTAINER_DEPENDENCY_INJECTION.md
+│   ├── ADR_008_MONITOR_TYPE_REGISTRY.md
+│   ├── ADR_009_VALIDATION_STRATEGY.md
+│   ├── ADR_010_TESTING_STRATEGY.md
+│   ├── ADR_011_SCHEDULER_AND_BACKOFF.md
+│   ├── ADR_012_NOTIFICATIONS_AND_ALERTING.md
+│   ├── ADR_013_DATA_PORTABILITY_AND_BACKUP.md
+│   ├── ADR_014_LOGGING_TELEMETRY_AND_DIAGNOSTICS.md
+│   └── ARCHITECTURE_DIAGRAM.md
 ├── generated/                   # Auto-generated reference artifacts
 │   └── IPC_CHANNEL_INVENTORY.md
 ├── Patterns/                    # Development patterns guide
@@ -52,9 +62,12 @@ docs/Architecture/
 │   ├── DEVELOPMENT_PATTERNS_GUIDE.md
 │   └── SITE_LOADING_ORCHESTRATION.md
 ├── Templates/                   # Code templates for common patterns
+│   ├── EVENT_EMISSION_CHECKLIST.md
+│   ├── IPC_DIAGNOSTICS_HANDLER_TEMPLATE.md
 │   ├── IPC_HANDLER_TEMPLATE.md
 │   ├── REPOSITORY_TEMPLATE.md
 │   ├── REPOSITORY_TEMPLATE_CLEAN.md
+│   ├── SCHEDULER_JOB_TEMPLATE.md
 │   └── ZUSTAND_STORE_TEMPLATE.md
 ├── UsageGuides/                 # Onboarding & navigation guidance
 │   └── Using-This-Documentation.md
@@ -83,6 +96,14 @@ flowchart TD
     ADRs --> ADR4["ADR-004 Frontend State Management"]
     ADRs --> ADR5["ADR-005 IPC Protocol"]
     ADRs --> ADR6["ADR-006 Standardized Cache Configuration"]
+    ADRs --> ADR7["ADR-007 Service Container & DI"]
+    ADRs --> ADR8["ADR-008 Monitor Type Registry"]
+    ADRs --> ADR9["ADR-009 Validation Strategy"]
+    ADRs --> ADR10["ADR-010 Testing Strategy"]
+    ADRs --> ADR11["ADR-011 Scheduler & Backoff"]
+    ADRs --> ADR12["ADR-012 Notifications & Alerting"]
+    ADRs --> ADR13["ADR-013 Data Portability & Backup"]
+    ADRs --> ADR14["ADR-014 Logging & Diagnostics"]
 
     Patterns --> PatternGuide["Development Patterns Guide"]
     Patterns --> ComponentProps["Component Props Standards"]
@@ -92,13 +113,16 @@ flowchart TD
     Templates --> RepoTemplateClean["Repository Template (Clean)"]
     Templates --> StoreTemplate["Zustand Store Template"]
     Templates --> IPCTemplate["IPC Handler Template"]
+    Templates --> IPCDiagnosticsTemplate["IPC Diagnostics Handler Template"]
+    Templates --> SchedulerTemplate["Scheduler Job Template"]
+    Templates --> EventChecklist["Event Emission Checklist"]
     Standards --> TsdocStandards["TSDoc Standards"]
     UsageGuides --> QuickStart["Using This Documentation"]
     Generated --> IPCInventory["IPC Channel Inventory"]
 
     class Docs hub;
     class ADRs,Patterns,Templates,Standards,UsageGuides,Generated section;
-    class ADR1,ADR2,ADR3,ADR4,ADR5,ADR6,PatternGuide,ComponentProps,SiteLoading,InitImport,RepoTemplate,RepoTemplateClean,StoreTemplate,IPCTemplate,TsdocStandards,QuickStart,IPCInventory file;
+    class ADR1,ADR2,ADR3,ADR4,ADR5,ADR6,ADR7,ADR8,ADR9,ADR10,ADR11,ADR12,ADR13,ADR14,PatternGuide,ComponentProps,SiteLoading,InitImport,RepoTemplate,RepoTemplateClean,StoreTemplate,IPCTemplate,IPCDiagnosticsTemplate,SchedulerTemplate,EventChecklist,TsdocStandards,QuickStart,IPCInventory file;
 ```
 
 ## 🏗️ Architecture Decision Records (ADRs)
@@ -149,6 +173,80 @@ ADRs document the key architectural decisions made during development, their con
 - Type-safe preload API with contextBridge isolation
 - Consistent validation and error handling
 - Event forwarding protocol for real-time updates
+
+### [ADR-006: Standardized Cache Configuration](./ADRs/ADR_006_STANDARDIZED_CACHE_CONFIGURATION.md)
+
+**Status: Accepted** - Unified cache limits and TTLs for services and managers
+
+- Shared cache constants for eviction, TTL, and size limits
+- Applies to orchestrator managers and services to avoid configuration drift
+- Documents cache invalidation triggers and alignment with repository freshness guarantees
+
+### [ADR-007: Service Container and Dependency Injection](./ADRs/ADR_007_SERVICE_CONTAINER_DEPENDENCY_INJECTION.md)
+
+**Status: Accepted** - Centralized service container for Electron main
+
+- Lazy singleton creation for managers, repositories, and utilities
+- Deterministic initialization order with dependency graph awareness
+- Event bus wiring and IPC handler registration mediated by the container for consistency
+
+### [ADR-008: Monitor Type Registry and Plugin Architecture](./ADRs/ADR_008_MONITOR_TYPE_REGISTRY.md)
+
+**Status: Accepted** - Extensible registry for monitor types
+
+- Plugin-style registration covering validation schemas, UI configuration, and factories
+- Supports versioned migrations for monitor definitions
+- Frontend integration through registry metadata and typed IPC contracts
+
+### [ADR-009: Layered Validation Strategy with Zod](./ADRs/ADR_009_VALIDATION_STRATEGY.md)
+
+**Status: Accepted** - Multi-layer validation across IPC, managers, and persistence
+
+- Zod schemas at IPC boundaries for payload safety
+- Business-rule validation in managers; persistence constraints in repositories
+- Shared error surface and telemetry for validation failures
+
+### [ADR-010: Multi-Configuration Testing Strategy](./ADRs/ADR_010_TESTING_STRATEGY.md)
+
+**Status: Accepted** - Comprehensive test matrix across app layers
+
+- Separate Vitest configs for frontend, electron, shared, and Storybook runner
+- Playwright E2E coverage and property-based testing guidance
+- Coverage strategy and mocking guidance to keep suites reliable and fast
+
+## Additional ADRs (Draft)
+
+### [ADR-011: Scheduler and Backoff Strategy](./ADRs/ADR_011_SCHEDULER_AND_BACKOFF.md)
+
+**Status: Draft** - Defines monitor scheduling cadence, jitter/backoff, timeout defaults, and how manual checks interact with the scheduler.
+
+- Interval selection, jitter, exponential backoff, and cancellation semantics
+- Timeout handling and propagation to monitor workers
+- Reconciliation when manual or priority checks pre-empt scheduled runs
+
+### [ADR-012: Notifications and Alerting Policy](./ADRs/ADR_012_NOTIFICATIONS_AND_ALERTING.md)
+
+**Status: Draft** - Establishes desktop notification and sound alert rules, throttling, suppression, and reliability expectations for outage/restore signals.
+
+- Channels (desktop, sound), debounce/backoff rules, suppression windows
+- Reliability/ordering expectations for outage vs. restore signals
+- Notification lifecycle mapped to monitor events and user preferences
+
+### [ADR-013: Data Portability & Backup/Restore](./ADRs/ADR_013_DATA_PORTABILITY_AND_BACKUP.md)
+
+**Status: Draft** - Documents export/import/backup guarantees, formats, integrity checks, and retention expectations for local SQLite backups.
+
+- Backup formats, checksum/integrity validation, retention guidance
+- User-facing messaging and error handling for backup/restore failures
+- Import/export compatibility and versioning expectations
+
+### [ADR-014: Logging, Telemetry, and Diagnostics](./ADRs/ADR_014_LOGGING_TELEMETRY_AND_DIAGNOSTICS.md)
+
+**Status: Draft** - Standardizes log levels/fields, correlation IDs, diagnostics IPC flows, and privacy/redaction bounds.
+
+- electron-log levels, structured fields, correlation IDs, and retention
+- Diagnostics IPC (e.g., `diagnostics-report-preload-guard`) and validation
+- Privacy, redaction, and PII handling rules across logs and diagnostics artifacts
 
 ## 📋 Development Patterns
 
@@ -325,6 +423,41 @@ Complete IPC communication implementation:
 - Type definitions and error handling
 - Test templates and naming conventions
 
+### [IPC Diagnostics Handler Template](./Templates/IPC_DIAGNOSTICS_HANDLER_TEMPLATE.md)
+
+Diagnostics/report IPC pattern:
+
+- Zod validation and payload size limits
+- Redaction of PII/secrets in responses
+- Structured logging with correlation IDs and error surfacing
+- Tests for malformed/oversized payloads and happy path
+
+### [Scheduler Job Template](./Templates/SCHEDULER_JOB_TEMPLATE.md)
+
+Monitor scheduling/backoff job pattern:
+
+- Job descriptor shape (monitorId, siteIdentifier, scheduledAt, deadline, backoffState, correlationId)
+- Jitter/backoff helpers and cancellation hooks
+- Manual-check pre-emption and reconciliation guidance
+- Tests for backoff bounds and next-run calculation
+
+### [Event Emission Checklist](./Templates/EVENT_EMISSION_CHECKLIST.md)
+
+Checklist for new events across main/renderer:
+
+- Channel naming aligned to RendererEventPayloadMap
+- Payload validation and metadata/correlationId inclusion
+- Renderer broadcast contract and preload validation
+- Logging/telemetry expectations and suppression rules
+
+### Template Backlog (TODO)
+
+> TODO (Nick2bad4u): Add these templates/pattern snippets to keep new work consistent.
+
+- **IPC Diagnostics/Report Handler Template**: Added; extend as new diagnostics channels appear.
+- **Scheduler/Backoff Job Template**: Added; refine alongside ADR-011 implementation.
+- **Event Emission Checklist**: Added; keep synchronized with RendererEventPayloadMap changes.
+
 ## 📚 Documentation Standards
 
 ### [TSDoc Standards](./TSDOC_STANDARDS.md)
@@ -389,9 +522,12 @@ Auto-generated reference documenting the authoritative list of IPC channels expo
 
 ### Automation & Review Cadence
 
-- **Link Validation** - `npm run docs:check-links` verifies internal Markdown links and runs on every `lint:ci`
-- **Quarterly Sync** - Architecture documentation reviewed during the first week of each quarter; action items tracked in `TODO.md`
-- **CI Enforcement** - Documentation checks block merges alongside linting and IPC analysis to prevent drift
+- Run `npm run generate:ipc` and `npm run check:ipc` whenever IPC channels change.
+- Re-run Docusaurus mermaid diagrams review after new ADRs land (Scheduler, Notifications) to extend `system-architecture.mdx` and `ipc-communication.mdx` diagrams.
+- When templates are added (diagnostics IPC, scheduler/backoff), link them here and in Templates/README for AI discoverability.
+- **Link Validation** - `npm run docs:check-links` verifies internal Markdown links and runs on every `lint:ci`.
+- **Quarterly Sync** - Architecture documentation reviewed during the first week of each quarter; action items tracked in `TODO.md`.
+- **CI Enforcement** - Documentation checks block merges alongside linting and IPC analysis to prevent drift.
 
 ## 📊 Compliance Tracking
 

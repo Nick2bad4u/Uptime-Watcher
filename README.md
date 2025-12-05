@@ -1,16 +1,16 @@
 # 📊 Uptime Watcher
 
 <div align="center"><a href="https://github.com/Nick2bad4u/Uptime-Watcher/releases">
-  <img src="https://img.shields.io/badge/version-19.0.0-blue.svg" alt="Version">
+  <img src="https://img.shields.io/badge/version-19.1.0-blue.svg" alt="Version">
 </a>
 <a href="LICENSE">
   <img src="https://img.shields.io/badge/license-Unlicense-green.svg" alt="License">
 </a>
 <a href="https://www.electronjs.org/">
-  <img src="https://img.shields.io/badge/Electron-v39.2.3-47848F?logo=electron" alt="Electron">
+  <img src="https://img.shields.io/badge/Electron-v39.2.5-47848F?logo=electron" alt="Electron">
 </a>
 <a href="https://reactjs.org/">
-  <img src="https://img.shields.io/badge/React-v19.2.0-61DAFB?logo=react" alt="React">
+  <img src="https://img.shields.io/badge/React-v19.2.1-61DAFB?logo=react" alt="React">
 </a>
 <a href="https://www.typescriptlang.org/">
   <img src="https://img.shields.io/badge/TypeScript-v5.9+-3178C6?logo=typescript" alt="TypeScript">
@@ -104,7 +104,7 @@ Uptime Watcher is a desktop application built with modern web technologies that 
 ### <strong>Frontend Architecture</strong>
 
 <a href="https://reactjs.org/">
-  <img src="https://img.shields.io/badge/React-19.2.0-61DAFB?logo=react&amp;logoColor=white" alt="React">
+  <img src="https://img.shields.io/badge/React-19.2.1-61DAFB?logo=react&amp;logoColor=white" alt="React">
 </a>
 <a href="https://www.typescriptlang.org/">
   <img src="https://img.shields.io/badge/TypeScript-5.9+-3178C6?logo=typescript&amp;logoColor=white" alt="TypeScript">
@@ -119,7 +119,7 @@ Uptime Watcher is a desktop application built with modern web technologies that 
 ### <strong>Desktop Framework</strong>
 
 <a href="https://www.electronjs.org/">
-  <img src="https://img.shields.io/badge/Electron-39.2.3-47848F?logo=electron&amp;logoColor=white" alt="Electron">
+  <img src="https://img.shields.io/badge/Electron-39.2.5-47848F?logo=electron&amp;logoColor=white" alt="Electron">
 </a>
 <a href="https://nodejs.org/">
   <img src="https://img.shields.io/badge/Node.js-24.8+-339933?logo=node.js&amp;logoColor=white" alt="Node.js">
@@ -216,7 +216,7 @@ npm run dist
 | Requirement              | Version                         | Download                                    |
 | ------------------------ | ------------------------------- | ------------------------------------------- |
 | <strong>Node.js</strong> | 24.8+ (required)                | <a href="https://nodejs.org/">Download</a>  |
-| <strong>npm</strong>     | 11.6.3+ (included with Node.js) | <a href="https://www.npmjs.com/">Docs</a>   |
+| <strong>npm</strong>     | 11.6.4+ (included with Node.js) | <a href="https://www.npmjs.com/">Docs</a>   |
 | <strong>Git</strong>     | Latest version                  | <a href="https://git-scm.com/">Download</a> |
 
 \> <strong>💡 Tip</strong>: Check out the <a href="./docs/Guides/DEVELOPER_QUICK_START.md">Developer Quick Start Guide</a> for detailed setup instructions and architecture overview.
@@ -391,7 +391,7 @@ We welcome contributions from the community! Here's how you can help:
 
 <div align="center"><strong>Made with ❤️ by <a href="https://github.com/Nick2bad4u">Nick2bad4u</a></strong>
 
-<em>Last updated: November 2025 • Version 19.0.0</em></div>
+<em>Last updated: December 2025 • Version 19.1.0</em></div>
 
 <!-- remark-ignore-start -->
 

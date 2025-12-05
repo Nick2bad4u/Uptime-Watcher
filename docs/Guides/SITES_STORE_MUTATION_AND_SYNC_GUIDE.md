@@ -220,7 +220,10 @@ never touch `window.electronAPI` directly.
   incremental deltas. When no effective changes are present, the store update
   is skipped while still emitting the derived delta via `onSiteDelta`.
 - `getSyncStatus()` is surfaced through the store so components can render
-  high-level sync diagnostics without talking to the IPC layer.
+  high-level sync diagnostics without talking to the IPC layer. The summary
+  normalizes `lastSyncAt` to `null` when no synchronization has completed and
+  falls back to cached site counts when the database summary is not
+  trustworthy.
 - Status-update subscription helpers piggyback on this module but keep cache
   invalidations and state-sync semantics aligned with the broader pipeline.
 

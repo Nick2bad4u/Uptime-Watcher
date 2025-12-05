@@ -7,7 +7,7 @@ Thank you for considering contributing to Uptime Watcher! This document provides
 ### Prerequisites
 
 - **Node.js** 24.8+ (required)
-- **npm** 11.5.2+ (included with Node.js)
+- **npm** 11.6.4+ (included with Node.js)
 - **Git** (latest version)
 
 ### Development Setup
@@ -41,7 +41,7 @@ Thank you for considering contributing to Uptime Watcher! This document provides
 
 - **TypeScript**: Strict TypeScript with comprehensive type safety
 - **ESLint**: 50+ plugins configured for comprehensive code checking
-- **Testing**: >90% test coverage requirement with multiple test types
+- **Testing**: Comprehensive suites (unit, integration, Playwright, property-based, mutation) with sustained coverage growth across modules
 - **Documentation**: TSDoc comments required for all public APIs
 
 ### Development Scripts
@@ -227,7 +227,7 @@ Use the feature request template and include:
 - **E2E Tests**: Required for critical user workflows using Playwright
 - **Property Tests**: Use fast-check for complex algorithmic functions
 - **Mutation Testing**: Stryker configuration validates test quality
-- **Coverage**: Maintain >90% coverage across all modules
+- **Coverage**: Keep coverage trending upward; add tests alongside features and fixes (unit, integration, E2E, property-based, mutation)
 
 ### Validation Layers
 

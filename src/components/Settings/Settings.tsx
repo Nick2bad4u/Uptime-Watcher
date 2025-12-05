@@ -43,7 +43,6 @@ import { safeInteger } from "@shared/validation/validatorUtils";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import type { AppSettings } from "../../stores/types";
-import type { ThemeName } from "../../theme/types";
 
 import { DEFAULT_HISTORY_LIMIT, HISTORY_LIMIT_OPTIONS } from "../../constants";
 import { useConfirmDialog } from "../../hooks/ui/useConfirmDialog";
@@ -60,6 +59,7 @@ import { ThemedCheckbox } from "../../theme/components/ThemedCheckbox";
 import { ThemedSelect } from "../../theme/components/ThemedSelect";
 import { ThemedSlider } from "../../theme/components/ThemedSlider";
 import { ThemedText } from "../../theme/components/ThemedText";
+import { isThemeName, type ThemeName } from "../../theme/types";
 import { useTheme } from "../../theme/useTheme";
 import { AppIcons } from "../../utils/icons";
 import { waitForAnimation } from "../../utils/time/waitForAnimation";
@@ -396,17 +396,12 @@ export const Settings = ({
         await resetSettings();
         clearError();
         logger.user.action("Reset settings to defaults");
-    }, [
-        clearError,
-        requestConfirmation,
-        resetSettings,
-    ]);
+    }, [clearError, requestConfirmation, resetSettings]);
 
     const handleThemeChange = useCallback(
-        (themeName: string) => {
+        (themeName: ThemeName) => {
             const oldTheme = currentThemeName;
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe: Theme name validation from known theme options
-            setTheme(themeName as ThemeName);
+            setTheme(themeName);
             logger.user.settingsChange("theme", oldTheme, themeName);
         },
         [currentThemeName, setTheme]
@@ -559,7 +554,14 @@ export const Settings = ({
 
     const handleThemeSelectChange = useCallback(
         (event: ChangeEvent<HTMLSelectElement>) => {
-            handleThemeChange(event.target.value);
+            const {value} = event.target;
+
+            if (!isThemeName(value)) {
+                logger.warn("Unknown theme value selected", { value });
+                return;
+            }
+
+            handleThemeChange(value);
         },
         [handleThemeChange]
     );
@@ -580,11 +582,7 @@ export const Settings = ({
                 onChange={handleInAppAlertsChange}
             />
         ),
-        [
-            handleInAppAlertsChange,
-            inAppAlertsEnabled,
-            isLoading,
-        ]
+        [handleInAppAlertsChange, inAppAlertsEnabled, isLoading]
     );
 
     const inAppAlertSoundControl = useMemo(
@@ -665,11 +663,7 @@ export const Settings = ({
                 onChange={handleSystemNotificationsChange}
             />
         ),
-        [
-            handleSystemNotificationsChange,
-            isLoading,
-            systemNotificationsEnabled,
-        ]
+        [handleSystemNotificationsChange, isLoading, systemNotificationsEnabled]
     );
 
     const systemNotificationSoundControl = useMemo(
@@ -698,11 +692,7 @@ export const Settings = ({
                 onChange={handleAutoStartChange}
             />
         ),
-        [
-            autoStart,
-            handleAutoStartChange,
-            isLoading,
-        ]
+        [autoStart, handleAutoStartChange, isLoading]
     );
 
     const minimizeToTrayControl = useMemo(
@@ -714,11 +704,7 @@ export const Settings = ({
                 onChange={handleMinimizeToTrayChange}
             />
         ),
-        [
-            handleMinimizeToTrayChange,
-            isLoading,
-            minimizeToTray,
-        ]
+        [handleMinimizeToTrayChange, isLoading, minimizeToTray]
     );
 
     // Manual Sync Now handler (moved from Header)
@@ -762,11 +748,7 @@ export const Settings = ({
                 }`
             );
         }
-    }, [
-        clearError,
-        downloadSqliteBackup,
-        setError,
-    ]);
+    }, [clearError, downloadSqliteBackup, setError]);
     /* eslint-enable @typescript-eslint/no-unsafe-type-assertion -- Re-enable after safe file system operations */
 
     // Click handlers for buttons

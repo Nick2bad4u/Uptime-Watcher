@@ -3,7 +3,7 @@ schema: "../../config/schemas/doc-frontmatter.schema.json"
 title: "Environment Setup Guide"
 summary: "Comprehensive guide for configuring a full Uptime Watcher development environment across platforms."
 created: "2025-08-05"
-last_reviewed: "2025-11-17"
+last_reviewed: "2025-12-04"
 category: "guide"
 author: "Nick2bad4u"
 tags:
@@ -35,7 +35,7 @@ tags:
 ### Required Software
 
 - **Node.js**: 24.8+ (required)
-- **npm**: 11.5.2+ (comes with Node.js)
+- **npm**: 11.6.4+ (comes with Node.js)
 - **Git**: Latest version
 - **VS Code**: Recommended IDE (with extensions)
 
@@ -68,7 +68,7 @@ choco install nodejs --version=24.8.0
 
 ```bash
 node --version  # Should be 24.8+
-npm --version   # Should be 11.5.2+
+npm --version   # Should be 11.6.4+
 ```
 
 ### 2. VS Code Configuration
@@ -358,9 +358,6 @@ The test environment uses an in-memory SQLite database:
 # Run all tests
 npm run test
 
-# Run tests in watch mode
-npm run test:watch
-
 # Run specific test suites
 npm run test:electron  # Backend tests
 npm run test:frontend  # Frontend tests
@@ -371,13 +368,10 @@ npm run test:shared    # Shared utility tests
 
 ```bash
 # Generate coverage reports
-npm run test:coverage             # Combined frontend + electron + shared coverage
-# Frontend-only coverage (if you want a faster run focused on the renderer)
-npm run test:coverage:frontend
-# Electron-only coverage
-npm run test:electron:coverage
-# Shared-only coverage
-npm run test:shared:coverage
+npm run test:coverage             # Renderer coverage (vitest.config.ts)
+npm run test:electron:coverage    # Electron-only coverage
+npm run test:shared:coverage      # Shared-only coverage
+# For full coverage across app layers, run each coverage task and merge artifacts if needed
 
 # View coverage reports
 open coverage/index.html          # macOS
@@ -417,7 +411,7 @@ For consistent development environments:
 
 ```docker
 # Dockerfile.dev
-FROM node:20-alpine
+FROM node:24-alpine
 
 WORKDIR /app
 COPY package*.json ./
@@ -482,8 +476,7 @@ npm run copy-wasm              # Copy SQLite WASM files
 
 # Testing commands
 npm run test                   # Run all tests
-npm run test:coverage          # Run tests with coverage (frontend + electron + shared)
-npm run test:coverage:frontend # Run frontend tests with coverage only
+npm run test:coverage          # Run renderer tests with coverage
 npm run test:electron:coverage # Run Electron/backend tests with coverage only
 npm run test:shared:coverage   # Run shared utility tests with coverage only
 npm run test:electron          # Run Electron/backend tests
@@ -498,16 +491,13 @@ npm run format                 # Format code with Prettier
 
 # Utility commands
 npm run clean                  # Clean build directories
-npm run deps:check             # Check for outdated dependencies
-npm run deps:update            # Update dependencies
+npm run dep:check              # Check for outdated dependencies
+npm run dep:update             # Update dependencies
 ```
 
 ### Build Performance
 
 ```bash
-# Parallel builds
-npm run build:parallel
-
 # Use faster disk I/O (if available)
 npm config set cache-folder ./npm-cache
 ```
@@ -551,7 +541,7 @@ sudo apt-get install -y nodejs
 ### Environment Verification
 
 - \[ ] Node.js 24.8+ installed and active
-- \[ ] npm 11.5.2+ available
+- \[ ] npm 11.6.4+ available
 - \[ ] Git configured with user details
 - \[ ] VS Code with recommended extensions
 - \[ ] Project cloned and dependencies installed

@@ -3,7 +3,7 @@ schema: "../../config/schemas/doc-frontmatter.schema.json"
 title: "Testing documentation"
 summary: "Index of testing documentation, guides, and best practices for the Uptime Watcher application."
 created: "2025-11-15"
-last_reviewed: "2025-11-17"
+last_reviewed: "2025-12-04"
 category: "guide"
 author: "Nick2bad4u"
 tags:
@@ -112,15 +112,14 @@ npm run test:electron
 npm run test:shared
 
 # Run tests with coverage
-npm run test:coverage             # Frontend + Electron + Shared coverage
-npm run test:coverage:frontend    # Frontend-only coverage
+npm run test:coverage             # Renderer coverage (vitest.config.ts)
 npm run test:electron:coverage    # Electron-only coverage
 npm run test:shared:coverage      # Shared-only coverage
 
 # Playwright / E2E suites
-npm run test:playwright
-npm run test:e2e
-npm run test:playwright:coverage
+npm run test:playwright           # E2E via Playwright
+npm run test:e2e                  # Alias for test:playwright
+npm run test:playwright:coverage  # Playwright coverage (when enabled)
 
 # Run performance benchmarks
 npm run bench

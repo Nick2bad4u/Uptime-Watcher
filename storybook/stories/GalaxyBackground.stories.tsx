@@ -21,7 +21,6 @@ const meta: Meta<typeof GalaxyBackground> = {
         layout: "fullscreen",
     },
     tags: ["autodocs"],
-    title: "Theme/GalaxyBackground",
 } satisfies Meta<typeof GalaxyBackground>;
 
 export default meta;

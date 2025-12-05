@@ -3,7 +3,7 @@ schema: "../../config/schemas/doc-frontmatter.schema.json"
 title: "Technology Evolution Guide"
 summary: "Chronological guide to Uptime Watcher's architectural evolution, migrations, and key technical decisions."
 created: "2025-08-05"
-last_reviewed: "2025-11-17"
+last_reviewed: "2025-12-04"
 category: "guide"
 author: "Nick2bad4u"
 tags:
@@ -518,11 +518,11 @@ export class CustomMonitorService implements IMonitorService {
 ## Table of Contents
 
 
-npm run test:all              # All tests (frontend + electron + shared)
+npm run test:all              # All tests (renderer + electron + shared + storybook + storybook runner)
 npm run test:electron         # Backend tests
 npm run test:frontend         # Frontend tests
 npm run test:shared           # Shared utility tests
-npm run test:all:coverage     # Coverage reports (all configurations)
+npm run test:all:coverage     # Coverage reports across renderer/electron/shared/storybook
 ```
 
 ### 📚 Documentation Evolution

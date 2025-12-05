@@ -84,16 +84,20 @@ export function registerStateSyncHandlers({
                 currentStatus.synchronized &&
                 currentStatus.source === STATE_SYNC_SOURCE.DATABASE;
 
+            // Normalize missing timestamps to an explicit null for consistency
+            // with renderer expectations and serialization.
+            const lastSyncAt = currentStatus.lastSyncAt ?? null;
+
             const summary: StateSyncStatusSummary = hasTrustedDatabaseSummary
                 ? {
-                      lastSyncAt: currentStatus.lastSyncAt ?? null,
+                      lastSyncAt,
                       siteCount:
                           currentStatus.siteCount ?? cachedSiteCount ?? 0,
                       source: STATE_SYNC_SOURCE.DATABASE,
                       synchronized: true,
                   }
                 : {
-                      lastSyncAt: currentStatus.lastSyncAt ?? null,
+                      lastSyncAt,
                       siteCount: cachedSiteCount ?? 0,
                       source: STATE_SYNC_SOURCE.CACHE,
                       synchronized: false,

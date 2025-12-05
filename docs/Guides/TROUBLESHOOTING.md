@@ -3,7 +3,7 @@ schema: "../../config/schemas/doc-frontmatter.schema.json"
 title: "Troubleshooting Guide"
 summary: "Troubleshooting guide for common development, database, event system, error handling, build, and runtime issues in Uptime Watcher."
 created: "2025-08-05"
-last_reviewed: "2025-11-17"
+last_reviewed: "2025-12-04"
 category: "guide"
 author: "Nick2bad4u"
 tags:
@@ -563,7 +563,7 @@ npm run lint:fix              # Auto-fix linting issues
 
 ```bash
 # Run tests in watch mode
-npm run test:watch
+npm run test -- --watch
 
 # Test specific files
 npm run test -- --run SitesStore

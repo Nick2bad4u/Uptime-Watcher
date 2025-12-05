@@ -18,74 +18,80 @@ export default function TestingArchitecture() {
 
 # Testing Architecture & Quality Gates
 
-This document maps every automated test surface in Uptime Watcher—unit, integration, property-based, fuzzing, Storybook snap tests, and Playwright E2E—in one place. Each diagram references the actual configs and directories so contributors can trace where data flows and how coverage gates are enforced.
+This document maps every automated test surface in Uptime Watcher—unit, integration, property-based, fuzzing, Storybook component and runner suites, and Playwright E2E—in one place. Each diagram references the actual configs and directories so contributors can trace where data flows and how coverage gates are enforced.
 
 ## Test Suite Topology
 
-The first diagram connects the NPM scripts, Vitest projects, and Playwright projects to the code they exercise. Nodes use the same naming found in `package.json` and the dedicated Vitest configs (`vitest.config.ts`, `vitest.electron.config.ts`, `vitest.shared.config.ts`, `vitest.storybook.config.ts`).
+The first diagram connects the NPM scripts, Vitest projects, Storybook runner, and Playwright projects to the code they exercise. Nodes use the same naming found in `package.json` and the dedicated Vitest configs (`vitest.config.ts`, `vitest.electron.config.ts`, `vitest.shared.config.ts`, `vitest.storybook.config.ts`).
 
 <Mermaid value={`graph TD
+  <Mermaid value={`graph TD
     subgraph CLI["npm scripts (package.json)"]
-        testAll["npm run test:all"]
-        testAllCoverage["npm run test:all:coverage"]
-        testAllDetailed["npm run test:all:detailed"]
-        testE2E["npm run test:e2e"]
-        fuzz["npm run fuzz"]
+      testAll["npm run test:all\n(renderer + storybook + storybook:runner)"]
+      testAllCoverage["npm run test:all:coverage\n(renderer + electron + shared + storybook + storybook:runner)"]
+      testAllDetailed["npm run test:all:detailed"]
+      testPlaywright["npm run test:playwright (alias test:e2e)"]
+      fuzz["npm run fuzz"]
     end
 
     subgraph VitestFront["Vitest Frontend\n(vitest.config.ts)"]
-        FrontDir["src/test/**/*.*"]
-        FrontSetup["src/test/setup.ts\n& src/test/dom-setup.ts"]
-        FrontEnv["JSDOM + @testing-library/jest-dom"]
+      FrontDir["src/test/**/*.*"]
+      FrontSetup["src/test/setup.ts\n& src/test/dom-setup.ts"]
+      FrontEnv["JSDOM + @testing-library/jest-dom"]
     end
 
     subgraph VitestElectron["Vitest Electron\n(vitest.electron.config.ts)"]
-        ElectronDir["electron/test/**/*.*"]
-        ElectronSetup["electron/test/setup.ts\n(mocked electron, fc.configureGlobal)"]
-        ElectronEnv["Node environment\n+ threads pool"]
+      ElectronDir["electron/test/**/*.*"]
+      ElectronSetup["electron/test/setup.ts\n(mocked electron, fc.configureGlobal)"]
+      ElectronEnv["Node environment\n+ threads pool"]
     end
 
     subgraph VitestShared["Vitest Shared\n(vitest.shared.config.ts)"]
-        SharedDir["shared/test/**/*.*"]
-        SharedSetup["shared/test/setup.ts"]
-        SharedFc["@fast-check/vitest\nnumRuns=10, verbose=2"]
+      SharedDir["shared/test/**/*.*"]
+      SharedSetup["shared/test/setup.ts"]
+      SharedFc["@fast-check/vitest\nnumRuns=10, verbose=2"]
     end
 
     subgraph VitestStorybook["Vitest Storybook\n(vitest.storybook.config.ts)"]
-        StorybookDir["storybook stories\nvia @storybook/addon-vitest"]
-        StorybookPlugins["storyboardTest plugin\n+ React compiler"]
+      StorybookDir["storybook stories\nvia @storybook/addon-vitest"]
+      StorybookPlugins["storybookTest plugin\n+ React compiler"]
+    end
+
+    subgraph StorybookRunner["Storybook Runner\n(scripts/run-storybook-tests.mjs)"]
+      RunnerSuites["Playwright-driven story runner"]
     end
 
     subgraph Playwright["Playwright E2E & UI\n(playwright.config.ts)"]
-        GlobalSetup["global-setup.ts\nbuild:electron-main + HEADLESS"]
-        GlobalTeardown["global-teardown.ts\nkill lingering electron"]
-        ElectronHelpers["fixtures/electron-helpers.ts\nlaunchElectronApp"]
-        PWTests["playwright/tests/**/*.playwright.test.ts"]
+      GlobalSetup["global-setup.ts\nbuild:electron-main + HEADLESS"]
+      GlobalTeardown["global-teardown.ts\nkill lingering electron"]
+      ElectronHelpers["fixtures/electron-helpers.ts\nlaunchElectronApp"]
+      PWTests["playwright/tests/**/*.playwright.test.ts"]
     end
 
     subgraph Typecheck["TS type-check configs\n(config/testing)"]
-        tsFrontend["tsconfig.test.json"]
-        tsElectron["tsconfig.electron.test.json"]
-        tsShared["tsconfig.shared.test.json"]
-        tsPlaywright["playwright/tsconfig.json"]
+      tsFrontend["tsconfig.test.json"]
+      tsElectron["tsconfig.electron.test.json"]
+      tsShared["tsconfig.shared.test.json"]
+      tsPlaywright["playwright/tsconfig.json"]
     end
 
     testAll -->|runs| VitestFront
-    testAll -->|runs| VitestElectron
-    testAll -->|runs| VitestShared
     testAll -->|runs| VitestStorybook
+    testAll -->|runs| StorybookRunner
 
     testAllCoverage -->|collects| VitestFront
     testAllCoverage -->|collects| VitestElectron
     testAllCoverage -->|collects| VitestShared
     testAllCoverage -->|collects| VitestStorybook
+    testAllCoverage -->|collects| StorybookRunner
 
     testAllDetailed -->|verbose reports| VitestFront
     testAllDetailed -->|verbose reports| VitestElectron
     testAllDetailed -->|verbose reports| VitestShared
     testAllDetailed -->|verbose reports| VitestStorybook
+    testAllDetailed -->|verbose reports| StorybookRunner
 
-    testE2E --> Playwright
+    testPlaywright --> Playwright
     fuzz --> SharedDir
 
     VitestFront --> FrontDir
@@ -103,6 +109,8 @@ The first diagram connects the NPM scripts, Vitest projects, and Playwright proj
     VitestStorybook --> StorybookDir
     VitestStorybook --> StorybookPlugins
 
+    StorybookRunner --> RunnerSuites
+
     Playwright --> GlobalSetup
     Playwright --> PWTests
     Playwright --> ElectronHelpers
@@ -118,15 +126,16 @@ The first diagram connects the NPM scripts, Vitest projects, and Playwright proj
     classDef setup fill:#1f2937,stroke:#111827,color:#f1f5f9
     classDef type fill:#15803d,stroke:#166534,color:#f0fdf4
 
-    class testAll,testAllCoverage,testAllDetailed,testE2E,fuzz cli
-    class VitestFront,VitestElectron,VitestShared,VitestStorybook,Playwright vitest
+    class testAll,testAllCoverage,testAllDetailed,testPlaywright,fuzz cli
+    class VitestFront,VitestElectron,VitestShared,VitestStorybook,StorybookRunner,Playwright vitest
     class FrontDir,FrontSetup,FrontEnv setup
     class ElectronDir,ElectronSetup,ElectronEnv setup
     class SharedDir,SharedSetup,SharedFc setup
     class StorybookDir,StorybookPlugins setup
+    class RunnerSuites setup
     class GlobalSetup,GlobalTeardown,ElectronHelpers,PWTests setup
     class tsFrontend,tsElectron,tsShared,tsPlaywright,TsDeps,TsDeps2,TsDeps3,TsDeps4 type
-`} />
+  `} />
 
 ## Property & Fuzz Validation Pipelines
 

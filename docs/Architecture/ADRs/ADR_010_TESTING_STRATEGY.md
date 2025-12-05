@@ -3,7 +3,7 @@ schema: "../../../config/schemas/doc-frontmatter.schema.json"
 title: "ADR-010: Multi-Configuration Testing Strategy"
 summary: "Establishes a comprehensive testing architecture with separate Vitest configurations for frontend, backend, and shared code, plus Storybook component testing and Playwright E2E testing."
 created: "2025-11-25"
-last_reviewed: "2025-11-25"
+last_reviewed: "2025-12-04"
 category: "guide"
 author: "Nick2bad4u"
 tags:
@@ -332,8 +332,7 @@ flowchart TB
 
 ```bash
 # Individual coverage
-npm run test:coverage           # Frontend coverage
-npm run test:coverage:frontend  # Frontend only
+npm run test:coverage           # Frontend coverage (vitest.config.ts)
 npm run test:electron:coverage  # Backend coverage
 npm run test:shared:coverage    # Shared coverage
 npm run test:storybook:coverage # Storybook coverage

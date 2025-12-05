@@ -3,7 +3,7 @@ schema: "../../config/schemas/doc-frontmatter.schema.json"
 title: "Test Scripts Verbosity Guide"
 summary: "Overview of the different Vitest script variants and reporters available in Uptime Watcher, from quiet CI-friendly runs to detailed debugging output."
 created: "2025-11-21"
-last_reviewed: "2025-11-16"
+last_reviewed: "2025-12-04"
 category: "guide"
 author: "Nick2bad4u"
 tags:
@@ -93,17 +93,16 @@ Uses `--reporter=verbose --no-truncate` for complete output with no truncation.
 
 ## Coverage Tests
 
-Coverage tests also support verbosity levels:
+Coverage tests also support verbosity levels (renderer suite by default):
 
-- `npm run test:coverage` (default aggregate: frontend + electron + shared)
-- `npm run test:coverage:quiet` (frontend-only, quiet)
-- `npm run test:coverage:minimal` (frontend-only, dot reporter)
-- `npm run test:coverage:verbose` (frontend-only, verbose reporter)
-- `npm run test:coverage:detailed` (frontend-only, verbose + no truncation)
+- `npm run test:coverage` (renderer coverage; use alongside electron/shared coverage for full picture)
+- `npm run test:coverage:quiet` (renderer, quiet)
+- `npm run test:coverage:minimal` (renderer, dot reporter)
+- `npm run test:coverage:verbose` (renderer, verbose reporter)
+- `npm run test:coverage:detailed` (renderer, verbose + no truncation)
 
-For suite-specific coverage with custom verbosity, pair the appropriate
-frontend coverage command with `npm run test:electron:coverage` and
-`npm run test:shared:coverage` as needed.
+For full coverage, pair renderer coverage with `npm run test:electron:coverage`
+and `npm run test:shared:coverage`; merge reports if you need a combined view.
 
 ## Special Documentation Downloader Tests
 

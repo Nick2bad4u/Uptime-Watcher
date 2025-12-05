@@ -1,5 +1,7 @@
 import { ensureError } from "@shared/utils/errorHandling";
 
+import { logger } from "./logger";
+
 /**
  * Centralized helpers for safe environment access in Electron main and preload
  * contexts.
@@ -26,8 +28,8 @@ export const readProcessEnv = (key: string): string | undefined => {
         return value;
     } catch (error: unknown) {
         const normalized = ensureError(error);
-         
-        console.error("[Env] Failed to read process env", {
+
+        logger.error("[Env] Failed to read process env", {
             error: normalized,
             key,
         });

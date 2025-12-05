@@ -3,7 +3,7 @@ schema: "../../config/schemas/doc-frontmatter.schema.json"
 title: "Developer Quick Start Guide"
 summary: "Quick-start guide for setting up the Uptime Watcher development environment and understanding the architecture."
 created: "2025-09-22"
-last_reviewed: "2025-11-25"
+last_reviewed: "2025-12-04"
 category: "guide"
 author: "Nick2bad4u"
 tags:
@@ -39,7 +39,7 @@ Uptime Watcher is a sophisticated Electron desktop application for monitoring we
 ### Prerequisites
 
 - **Node.js**: 24.8+ (required)
-- **npm**: 11.6.3+ (comes with Node.js)
+- **npm**: 11.6.4+ (comes with Node.js)
 - **Git**: Latest version
 
 ### 1. Clone & Install

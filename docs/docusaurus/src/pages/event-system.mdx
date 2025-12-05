@@ -90,52 +90,72 @@ The following diagram shows the event system architecture:
 
 ## Event Type Hierarchy
 
-This diagram shows the typed event system:
+Renderer event contracts are defined in `RendererEventPayloadMap` (see `shared/types/events.ts`). This diagram mirrors the current channels and payload groupings.
 
 <Mermaid value={`classDiagram
-    class UptimeEvents {
+    class RendererEventPayloadMap {
         <<interface>>
-        +"site:added": Site
-        +"site:updated": Site
-        +"site:deleted": string
-        +"monitor:status-changed": MonitorStatusEvent
-        +"monitor:up": MonitorEvent
-        +"monitor:down": MonitorEvent
-        +"state-sync-event": StateSyncPayload
-        +"cache-updated": CacheUpdateEvent
-        +"settings:changed": Settings
-        +"update:available": UpdateInfo
-        +"update:downloaded": UpdateInfo
+        +"cache:invalidated": CacheInvalidatedEventData
+        +"monitor:check-completed": MonitorCheckCompletedEventData
+        +"monitor:down": MonitorDownEventData
+        +"monitor:status-changed": MonitorStatusChangedEventData
+        +"monitor:up": MonitorUpEventData
+        +"monitoring:started": MonitoringStartedEventData
+        +"monitoring:stopped": MonitoringStoppedEventData
+        +"settings:history-limit-updated": HistoryLimitUpdatedEventData
+        +"site:added": SiteAddedEventData
+        +"site:removed": SiteRemovedEventData
+        +"site:updated": SiteUpdatedEventData
+        +"state-sync-event": StateSyncEventData
+        +"test-event": TestEventData
+        +"update-status": UpdateStatusEventData
     }
 
-    class MonitorStatusEvent {
-        +siteId: string
+    class MonitorStatusChangedEventData {
+        +siteIdentifier: string
         +monitorId: string
         +status: MonitorStatus
-        +responseTime: number
-        +timestamp: Date
-        +details: string
+        +responseTime?: number
+        +timestamp: number
     }
 
-    class MonitorEvent {
-        +siteId: string
+    class MonitorCheckCompletedEventData {
+        +siteIdentifier: string
         +monitorId: string
-        +checkType: MonitorType
-        +timestamp: Date
+        +statusUpdate: StatusUpdate
+        +timestamp: number
+    }
+
+    class SiteAddedEventData {
+        +site: Site
+        +source: SiteAddedSource
+        +timestamp: number
+    }
+
+    class SiteUpdatedEventData {
+        +previousSite: Site
+        +site: Site
+        +updatedFields: string[]
+        +timestamp: number
+    }
+
+    class SiteRemovedEventData {
+        +siteIdentifier: string
+        +siteName: string
+        +cascade: boolean
+        +timestamp: number
+    }
+
+    class HistoryLimitUpdatedEventData {
+        +limit: number
+        +previousLimit?: number
+        +timestamp: number
+    }
+
+    class UpdateStatusEventData {
+        +status: UpdateStatus
         +error?: string
-    }
-
-    class StateSyncPayload {
-        +sites: Site[]
-        +timestamp: Date
-        +source: string
-    }
-
-    class CacheUpdateEvent {
-        +cacheType: "sites" | "monitors" | "history"
-        +operation: "set" | "delete" | "clear"
-        +keys: string[]
-        +timestamp: Date
+        +timestamp: number
     }
 
     class TypedEventBus~T~ {
@@ -147,11 +167,14 @@ This diagram shows the typed event system:
         +listenerCount(event): number
     }
 
-    UptimeEvents --> MonitorStatusEvent
-    UptimeEvents --> MonitorEvent
-    UptimeEvents --> StateSyncPayload
-    UptimeEvents --> CacheUpdateEvent
-    TypedEventBus --> UptimeEvents`} />
+    RendererEventPayloadMap --> MonitorStatusChangedEventData
+    RendererEventPayloadMap --> MonitorCheckCompletedEventData
+    RendererEventPayloadMap --> SiteAddedEventData
+    RendererEventPayloadMap --> SiteUpdatedEventData
+    RendererEventPayloadMap --> SiteRemovedEventData
+    RendererEventPayloadMap --> HistoryLimitUpdatedEventData
+    RendererEventPayloadMap --> UpdateStatusEventData
+    TypedEventBus --> RendererEventPayloadMap`} />
 
 ## Event Flow Sequence
 
