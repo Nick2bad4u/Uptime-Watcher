@@ -37,6 +37,14 @@ Draft
 
 Monitor execution needs predictable cadence with resilience to flapping or slow endpoints. Manual checks must coexist with scheduled runs without starving the queue or duplicating work. Timeouts and jitter/backoff must be consistent across monitor types and respect user-configured intervals.
 
+### Why jitter/backoff when users set intervals?
+
+- **Thundering herd avoidance**: Identical user intervals align and spike network/CPU. Jitter staggers start times.
+- **Flapping mitigation**: Backoff tempers rapid retries on down hosts, preventing self-induced DOS.
+- **Timeout recovery**: Stuck checks can overlap the next scheduled tick; backoff plus timeout-aware cancellation prevents piling on.
+- **Manual check coexistence**: Manual/preemptive checks should not immediately re-trigger scheduled runs; backoff reconciles next-run after overrides.
+- **Resource fairness**: Spreading load protects the main process and ensures other monitors still run during incident storms.
+
 ## Decision
 
 - **Scheduling model**: Fixed-base interval per monitor with configurable jitter to prevent thundering herds.
@@ -44,6 +52,7 @@ Monitor execution needs predictable cadence with resilience to flapping or slow 
 - **Timeouts**: Per-check defaults (overridable per monitor type) propagated to worker execution and cancellation tokens.
 - **Manual checks**: High-priority jobs supersede in-flight scheduled jobs for the same monitor; reconcile next-run-at based on outcome and backoff state.
 - **Queue ownership**: Single main-process scheduler with typed job descriptors (correlationId, timestamps) for logging/diagnostics.
+- **Parameters**: ±10% jitter; backoff factor 2.0; backoff cap 5 minutes; default timeout = monitor timeout + buffer (35s by default); minimum interval enforced (5s).
 
 ## Consequences
 

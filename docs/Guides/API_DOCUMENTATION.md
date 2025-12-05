@@ -251,6 +251,31 @@ await handleSQLiteBackupDownload(async () => backup);
 ```
 
 > The renderer receives an `ArrayBuffer`, ensuring compatibility with browser APIs without leaking Node.js `Buffer` instances. Additional metadata (size, creation timestamp, and original on-disk location) can be used for analytics or audit logging.
+>
+> Backup metadata now includes `schemaVersion`, `checksum`, `appVersion`, and a `retentionHintDays` value from ADR-013. Consumers should persist these fields alongside the backup for restore validation and user-facing guidance (for example, surfacing schema version and creation time in the Settings modal).
+
+#### `restoreSqliteBackup(payload: SerializedDatabaseRestorePayload): Promise<SerializedDatabaseRestoreResult>`
+
+Restores a previously downloaded SQLite backup. The payload must be an `ArrayBuffer` created from the `.sqlite` file along with the source file name (used for logging/UI only).
+
+```typescript
+import type { SerializedDatabaseRestorePayload } from "@shared/types/ipc";
+
+const file = await pickFile();
+const payload: SerializedDatabaseRestorePayload = {
+ buffer: await file.arrayBuffer(),
+ fileName: file.name,
+};
+const summary = await DataService.restoreSqliteBackup(payload);
+
+console.info("Restored backup", {
+ checksum: summary.metadata.checksum,
+ schemaVersion: summary.metadata.schemaVersion,
+ restoredAt: summary.restoredAt,
+});
+```
+
+The main process re-validates the payload (checksum, size, schema version) using `validateDatabaseBackupPayload`, writes a pre-restore snapshot to disk, replaces the active database file, and emits cache invalidation events. The returned summary mirrors the download metadata, enabling the UI to confirm the restore operation (e.g., "Restored backup created on 2025-12-05 · schema v7").
 
 ### Monitor Types API (`MonitorTypesService`)
 

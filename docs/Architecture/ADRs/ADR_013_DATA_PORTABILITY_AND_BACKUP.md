@@ -3,7 +3,7 @@ schema: "../../../config/schemas/doc-frontmatter.schema.json"
 title: "ADR-013: Data Portability & Backup/Restore"
 summary: "Documents export/import/backup guarantees, formats, integrity checks, and retention expectations for local SQLite backups."
 created: "2025-12-04"
-last_reviewed: "2025-12-04"
+last_reviewed: "2025-12-05"
 category: "guide"
 author: "Nick2bad4u"
 tags:
@@ -31,7 +31,7 @@ tags:
 
 ## Status
 
-Draft
+Accepted
 
 ## Context
 
@@ -53,10 +53,11 @@ Users need reliable export/import and local backup/restore with clear integrity 
 
 ## Implementation
 
-- Embed `schemaVersion`, `appVersion`, `createdAt`, `checksum` in backup metadata.
-- Provide `download-sqlite-backup` and `import-data` flows with validation and progress events.
-- On restore, run validation before overwriting existing DB; take pre-restore snapshot when feasible.
-- Document manual recovery steps for corrupted backups.
+- Embed `schemaVersion`, `appVersion`, `createdAt`, `checksum`, `retentionHintDays`, and `sizeBytes` in every backup metadata payload (propagated through IPC, preload, renderer stores, and UI). Renderer downloads now receive an `ArrayBuffer` plus the serialized metadata so retention guidance and schema version are always visible to the user.
+- Provide both `download-sqlite-backup` and `restore-sqlite-backup` flows with validation and progress events. The download handler validates checksum, size, and schema version before transferring to the renderer and exposes metadata for retention guidance.
+- The renderer restore button now reads a `.sqlite` file, streams it through the preload bridge, and displays success/error states along with the returned metadata so users can confirm what was restored.
+- On restore, run validation before overwriting the existing DB and capture a pre-restore snapshot on disk. **Restore entry points reuse `validateDatabaseBackupPayload` to reject corrupted or mismatched backups and rehydrate schema metadata by inspecting the uploaded file.**
+- Document manual recovery steps for corrupted backups and where the pre-restore snapshot is stored.
 
 ## Testing & Validation
 
