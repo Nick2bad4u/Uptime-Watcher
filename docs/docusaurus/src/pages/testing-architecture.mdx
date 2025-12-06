@@ -25,7 +25,6 @@ This document maps every automated test surface in Uptime Watcher—unit, integr
 The first diagram connects the NPM scripts, Vitest projects, Storybook runner, and Playwright projects to the code they exercise. Nodes use the same naming found in `package.json` and the dedicated Vitest configs (`vitest.config.ts`, `vitest.electron.config.ts`, `vitest.shared.config.ts`, `vitest.storybook.config.ts`).
 
 <Mermaid value={`graph TD
-  <Mermaid value={`graph TD
     subgraph CLI["npm scripts (package.json)"]
       testAll["npm run test:all\n(renderer + storybook + storybook:runner)"]
       testAllCoverage["npm run test:all:coverage\n(renderer + electron + shared + storybook + storybook:runner)"]

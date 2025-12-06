@@ -15,12 +15,6 @@ const mockNotificationService = {
     updateConfig: vi.fn(),
 };
 
-const defaultBackupMetadata = {
-    createdAt: 1_700_000_000_000,
-    originalPath: "/tmp/uptime-watcher.db",
-    sizeBytes: 4096,
-};
-
 const {
     mockUptimeOrchestrator,
     mockAutoUpdaterService,
@@ -31,6 +25,11 @@ const {
     mockGetMonitorTypeConfig,
     mockValidateMonitorData,
 } = vi.hoisted(() => {
+    const defaultBackupMetadata = {
+        createdAt: 1_700_000_000_000,
+        originalPath: "/tmp/uptime-watcher.db",
+        sizeBytes: 4096,
+    };
     const mockUptimeOrchestrator = {
         addSite: vi.fn(),
         getSites: vi.fn(),
@@ -53,6 +52,7 @@ const {
         historyLimit: 500,
         onTyped: vi.fn(),
         off: vi.fn(),
+        emitTyped: vi.fn(),
     };
 
     const mockAutoUpdaterService = {
@@ -300,6 +300,15 @@ describe(IpcService, () => {
                 reason: "payload-validation",
                 timestamp,
             });
+            expect(mockUptimeOrchestrator.emitTyped).toHaveBeenCalledWith(
+                "diagnostics:report-created",
+                expect.objectContaining({
+                    channel: "monitor:status-changed",
+                    guard: "isMonitorStatusChangedEventData",
+                    payloadPreviewLength: expect.any(Number),
+                    correlationId: expect.any(String),
+                })
+            );
         });
         it("should setup monitoring handlers", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");

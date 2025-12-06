@@ -20,13 +20,7 @@ import type { ThemeName } from "../theme/types";
 vi.mock("../constants", () => ({
     ARIA_LABEL: "aria-label",
     DEFAULT_HISTORY_LIMIT: 100,
-    HISTORY_LIMIT_OPTIONS: [
-        50,
-        100,
-        200,
-        500,
-        1000,
-    ],
+    HISTORY_LIMIT_OPTIONS: [50, 100, 200, 500, 1000],
     TRANSITION_ALL: "all 0.2s ease-in-out",
     UI_DELAYS: {
         LOADING_BUTTON: 100,
@@ -62,12 +56,18 @@ const mockUseStore = {
         buffer: new ArrayBuffer(8),
         fileName: "backup.db",
         metadata: {
+            appVersion: "0.0.0-test",
+            checksum: "mock-checksum",
             createdAt: 0,
             originalPath: "/tmp/backup.db",
+            retentionHintDays: 30,
+            schemaVersion: 1,
             sizeBytes: 8,
         },
     }),
+    lastBackupMetadata: undefined,
     setError: vi.fn(),
+    setLastBackupMetadata: vi.fn(),
     settings: {
         autoStart: false,
         historyLimit: 100,
@@ -95,11 +95,7 @@ const selectorAwareUseSitesStore = vi.fn(
 
 // Mock the theme hook
 const mockUseTheme = {
-    availableThemes: [
-        "light",
-        "dark",
-        "system",
-    ] as ThemeName[],
+    availableThemes: ["light", "dark", "system"] as ThemeName[],
     currentTheme: {
         colors: {
             background: {

@@ -18,6 +18,11 @@ vi.mock("electron", () => ({
     ipcRenderer: mockIpcRenderer,
 }));
 
+const correlationEnvelopeMatcher = expect.objectContaining({
+    __uptimeWatcherIpcContext: true,
+    correlationId: expect.any(String),
+});
+
 import {
     stateSyncApi,
     type StateSyncApiInterface,
@@ -120,7 +125,8 @@ describe("State Sync Domain API", () => {
             const result = await api.getSyncStatus();
 
             expect(mockIpcRenderer.invoke).toHaveBeenCalledWith(
-                STATE_SYNC_CHANNELS.getSyncStatus
+                STATE_SYNC_CHANNELS.getSyncStatus,
+                correlationEnvelopeMatcher
             );
             expect(result).toEqual(mockStatus);
             expect(typeof result.siteCount).toBe("number");
@@ -204,7 +210,8 @@ describe("State Sync Domain API", () => {
             const result = await api.requestFullSync();
 
             expect(mockIpcRenderer.invoke).toHaveBeenCalledWith(
-                STATE_SYNC_CHANNELS.requestFullSync
+                STATE_SYNC_CHANNELS.requestFullSync,
+                correlationEnvelopeMatcher
             );
             expect(result).toEqual(mockResult);
             expect(Array.isArray(result.sites)).toBeTruthy();
@@ -524,19 +531,13 @@ describe("State Sync Domain API", () => {
                     fc.integer({ min: 0 }),
                     fc.option(fc.string({ minLength: 1 }))
                 )
-                .map(
-                    ([
+                .map(([action, source, timestamp, siteIdentifier]) =>
+                    buildStateSyncEventData(
                         action,
                         source,
                         timestamp,
-                        siteIdentifier,
-                    ]) =>
-                        buildStateSyncEventData(
-                            action,
-                            source,
-                            timestamp,
-                            siteIdentifier
-                        )
+                        siteIdentifier
+                    )
                 );
 
             fc.assert(

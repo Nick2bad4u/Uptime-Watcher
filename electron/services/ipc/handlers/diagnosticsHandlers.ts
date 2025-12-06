@@ -6,7 +6,22 @@ import type {
 } from "@shared/types/ipc";
 import type { UnknownRecord } from "type-fest";
 
+import { generateCorrelationId } from "@shared/utils/correlation";
+import {
+    normalizeLogValue,
+    withLogContext,
+} from "@shared/utils/loggingContext";
+
+import type { UptimeEvents } from "../../../events/eventTypes";
+import type { TypedEventBus } from "../../../events/TypedEventBus";
+
 import { diagnosticsLogger, logger } from "../../../utils/logger";
+import {
+    getUtfByteLength,
+    MAX_DIAGNOSTICS_METADATA_BYTES,
+    MAX_DIAGNOSTICS_PAYLOAD_PREVIEW_BYTES,
+    truncateUtfString,
+} from "../diagnosticsLimits";
 import {
     recordMissingHandler,
     recordPreloadGuardFailure,
@@ -32,11 +47,11 @@ const isPreloadGuardDiagnosticsReport = (
         typeof value["timestamp"] === "number"
     );
 };
-
 /**
- * Dependencies for telemetry/diagnostics IPC handlers.
+ * Dependencies required to register diagnostics IPC handlers.
  */
 export interface DiagnosticsHandlersDependencies {
+    readonly eventEmitter: TypedEventBus<UptimeEvents>;
     readonly registeredHandlers: Set<IpcInvokeChannel>;
     readonly reportChannel: Extract<
         IpcInvokeChannel,
@@ -48,10 +63,69 @@ export interface DiagnosticsHandlersDependencies {
     >;
 }
 
+const normalizeDiagnosticsReportPayload = (
+    report: PreloadGuardDiagnosticsReport
+): {
+    metadataTruncated: boolean;
+    payloadPreviewTruncated: boolean;
+    sanitizedReport: PreloadGuardDiagnosticsReport;
+} => {
+    let metadataTruncated = false;
+    let payloadPreviewTruncated = false;
+
+    let metadata: undefined | UnknownRecord = undefined;
+    if (report.metadata) {
+        const sanitizedMetadata = normalizeLogValue(report.metadata);
+        if (isUnknownRecord(sanitizedMetadata)) {
+            const serialized = JSON.stringify(sanitizedMetadata);
+            if (
+                getUtfByteLength(serialized) <= MAX_DIAGNOSTICS_METADATA_BYTES
+            ) {
+                metadata = sanitizedMetadata;
+            } else {
+                metadataTruncated = true;
+            }
+        }
+    }
+
+    let payloadPreview: string | undefined = undefined;
+    if (typeof report.payloadPreview === "string") {
+        const sanitizedPreview = normalizeLogValue(report.payloadPreview);
+        if (typeof sanitizedPreview === "string") {
+            const { truncated, value } = truncateUtfString(
+                sanitizedPreview,
+                MAX_DIAGNOSTICS_PAYLOAD_PREVIEW_BYTES
+            );
+            payloadPreviewTruncated = truncated;
+            payloadPreview = value;
+        }
+    }
+
+    const sanitizedReport: PreloadGuardDiagnosticsReport = {
+        channel: report.channel,
+        guard: report.guard,
+        timestamp: report.timestamp,
+        ...(report.reason ? { reason: report.reason } : {}),
+        ...(metadata ? { metadata } : {}),
+        ...(payloadPreview ? { payloadPreview } : {}),
+    };
+
+    return {
+        metadataTruncated,
+        payloadPreviewTruncated,
+        sanitizedReport,
+    };
+};
+
 /**
  * Registers diagnostics-related IPC handlers used by the preload bridge.
  */
+/**
+ * Wires up diagnostics IPC handlers that support preload guard reporting and
+ * verification.
+ */
 export function registerDiagnosticsHandlers({
+    eventEmitter,
     registeredHandlers,
     reportChannel,
     verifyChannel,
@@ -82,6 +156,11 @@ export function registerDiagnosticsHandlers({
                 };
                 logger.error(
                     "[IpcService] Missing IPC handler requested by preload bridge",
+                    withLogContext({
+                        channel: channelRaw,
+                        event: "diagnostics:verify-ipc-handler",
+                        severity: "error",
+                    }),
                     logMetadata
                 );
             }
@@ -105,7 +184,13 @@ export function registerDiagnosticsHandlers({
                 );
             }
 
-            const report = reportCandidate;
+            const correlationId = generateCorrelationId();
+            const {
+                metadataTruncated,
+                payloadPreviewTruncated,
+                sanitizedReport,
+            } = normalizeDiagnosticsReportPayload(reportCandidate);
+            const report = sanitizedReport;
 
             recordPreloadGuardFailure(report);
 
@@ -124,8 +209,29 @@ export function registerDiagnosticsHandlers({
 
             diagnosticsLogger.warn(
                 "[IpcDiagnostics] Preload guard rejected payload",
-                logMetadata
+                withLogContext({
+                    channel: report.channel,
+                    correlationId,
+                    event: "diagnostics:preload-guard-report",
+                    severity: "warn",
+                }),
+                {
+                    ...logMetadata,
+                    metadataTruncated,
+                    payloadPreviewTruncated,
+                }
             );
+
+            void eventEmitter.emitTyped("diagnostics:report-created", {
+                channel: report.channel,
+                correlationId,
+                guard: report.guard,
+                metadataTruncated,
+                payloadPreviewLength: report.payloadPreview?.length ?? 0,
+                payloadPreviewTruncated,
+                ...(report.reason ? { reason: report.reason } : {}),
+                timestamp: report.timestamp,
+            });
 
             return undefined;
         }),
@@ -133,3 +239,10 @@ export function registerDiagnosticsHandlers({
         registeredHandlers
     );
 }
+
+/** @internal */
+export const DiagnosticsHandlerTestUtils: {
+    normalizeDiagnosticsReportPayload: typeof normalizeDiagnosticsReportPayload;
+} = {
+    normalizeDiagnosticsReportPayload,
+};

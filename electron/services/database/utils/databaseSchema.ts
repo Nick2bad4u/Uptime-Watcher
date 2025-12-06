@@ -75,6 +75,45 @@ const SCHEMA_QUERIES = {
     ROLLBACK: "ROLLBACK",
 } as const;
 
+export const DATABASE_SCHEMA_VERSION = 1;
+
+/**
+ * Ensures the SQLite user_version matches the application schema version.
+ */
+const hasUserVersionProperty = (
+    value: unknown
+): value is { user_version?: unknown } =>
+    typeof value === "object" && value !== null && "user_version" in value;
+
+/**
+ * Ensures the PRAGMA user_version reflects the currently deployed schema.
+ */
+export function synchronizeDatabaseSchemaVersion(database: Database): void {
+    const pragmaResult: unknown = database.prepare("PRAGMA user_version").get();
+
+    const userVersionValue = hasUserVersionProperty(pragmaResult)
+        ? pragmaResult.user_version
+        : undefined;
+
+    const currentVersion =
+        typeof userVersionValue === "number" ? userVersionValue : 0;
+    if (currentVersion === DATABASE_SCHEMA_VERSION) {
+        return;
+    }
+
+    if (currentVersion === 0) {
+        logger.info(
+            `[DatabaseSchema] Initializing schema user_version to ${DATABASE_SCHEMA_VERSION}`
+        );
+    } else {
+        logger.warn(
+            `[DatabaseSchema] Updating schema user_version from ${currentVersion} to ${DATABASE_SCHEMA_VERSION}`
+        );
+    }
+
+    database.prepare(`PRAGMA user_version = ${DATABASE_SCHEMA_VERSION}`).run();
+}
+
 /**
  * Validates a generated SQL schema string before execution.
  *

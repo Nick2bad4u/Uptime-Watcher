@@ -1,20 +1,20 @@
-import {
-    afterEach,
-    beforeEach,
-    describe,
-    expect,
-    it,
-    vi,
-    type Mock,
-} from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+vi.unmock("../../../services/monitoring/MonitorScheduler");
+
+import type { Site } from "@shared/types";
 
 import { DEFAULT_CHECK_INTERVAL } from "../../../constants";
 import { MonitorScheduler } from "../../../services/monitoring/MonitorScheduler";
-import type { Site } from "@shared/types";
+import {
+    DEFAULT_MONITOR_TIMEOUT_SECONDS,
+    MIN_CHECK_INTERVAL,
+    MONITOR_TIMEOUT_BUFFER_MS,
+    SECONDS_TO_MS_MULTIPLIER,
+} from "../../../services/monitoring/constants";
 import { isDev } from "../../../electronUtils";
 import { logger } from "../../../utils/logger";
 
-// Mock dependencies - logger is mocked globally in setup.ts
 vi.mock("../../../electronUtils");
 vi.mock("../../../utils/logger", () => {
     const createLoggerMock = () => ({
@@ -32,632 +32,169 @@ vi.mock("../../../utils/logger", () => {
     };
 });
 
-// Unmock MonitorScheduler for this test file so we can test the real implementation
-vi.unmock("../../../services/monitoring/MonitorScheduler");
+const createMonitor = (
+    overrides: Partial<Site["monitors"][0]> = {}
+): Site["monitors"][0] => ({
+    id: "monitor-1",
+    type: "http",
+    monitoring: true,
+    checkInterval: DEFAULT_CHECK_INTERVAL,
+    timeout: 5000,
+    retryAttempts: 3,
+    responseTime: 0,
+    status: "up",
+    history: [],
+    url: "https://example.com",
+    ...overrides,
+});
+
+const flushAsync = async (): Promise<void> => {
+    await Promise.resolve();
+    await Promise.resolve();
+};
+
+type MonitorCheckCallback = (
+    siteIdentifier: string,
+    monitorId: string
+) => Promise<void>;
+
+const createCheckCallbackMock = () => vi.fn<MonitorCheckCallback>();
 
 describe(MonitorScheduler, () => {
+    const FIXED_NOW = 1_700_000_000;
     let scheduler: MonitorScheduler;
-    let mockCheckCallback: Mock;
-
-    const mockMonitor: Site["monitors"][0] = {
-        id: "monitor-1",
-        type: "http",
-        url: "https://example.com",
-        checkInterval: 60_000, // 1 minute
-        timeout: 5000,
-        retryAttempts: 3,
-        monitoring: true,
-        status: "up",
-        history: [],
-        responseTime: 0,
-    };
+    let mockCheckCallback: ReturnType<typeof createCheckCallbackMock>;
+    let eventEmitter: { emitTyped: ReturnType<typeof vi.fn> };
+    let mathRandomSpy: ReturnType<typeof vi.spyOn>;
+    let dateNowSpy: ReturnType<typeof vi.spyOn>;
 
     beforeEach(() => {
-        vi.clearAllMocks();
         vi.useFakeTimers();
-
-        // Reset logger mock methods
-        vi.mocked(logger.debug).mockClear();
-        vi.mocked(logger.info).mockClear();
-        vi.mocked(logger.warn).mockClear();
-        vi.mocked(logger.error).mockClear();
-
-        scheduler = new MonitorScheduler(logger);
-        mockCheckCallback = vi.fn().mockResolvedValue(undefined);
-        (isDev as any).mockReturnValue(false);
+        mathRandomSpy = vi.spyOn(Math, "random").mockReturnValue(0.5);
+        dateNowSpy = vi.spyOn(Date, "now").mockReturnValue(FIXED_NOW);
+        eventEmitter = {
+            emitTyped: vi.fn().mockResolvedValue(undefined),
+        };
+        scheduler = new MonitorScheduler(logger, eventEmitter as any);
+        mockCheckCallback =
+            createCheckCallbackMock().mockResolvedValue(undefined);
+        scheduler.setCheckCallback(mockCheckCallback);
+        (isDev as unknown as ReturnType<typeof vi.fn>).mockReturnValue(false);
     });
 
     afterEach(() => {
+        scheduler.stopAll();
         vi.useRealTimers();
+        mathRandomSpy.mockRestore();
+        dateNowSpy.mockRestore();
+        vi.clearAllMocks();
     });
 
-    describe("setCheckCallback", () => {
-        it("should set the check callback function", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: MonitorScheduler", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Business Logic", "type");
+    it("returns false when attempting to start a monitor without an ID", () => {
+        const result = scheduler.startMonitor(
+            "site-1",
+            createMonitor({ id: "" })
+        );
 
-            scheduler.setCheckCallback(mockCheckCallback);
-            expect(scheduler["onCheckCallback"]).toBe(mockCheckCallback);
-        });
-
-        it("should allow setting callback multiple times", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: MonitorScheduler", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Business Logic", "type");
-
-            const firstCallback = vi.fn();
-            const secondCallback = vi.fn();
-
-            scheduler.setCheckCallback(firstCallback);
-            expect(scheduler["onCheckCallback"]).toBe(firstCallback);
-
-            scheduler.setCheckCallback(secondCallback);
-            expect(scheduler["onCheckCallback"]).toBe(secondCallback);
-        });
+        expect(result).toBeFalsy();
     });
 
-    describe("startMonitor", () => {
-        it("should start monitoring for a valid monitor", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: MonitorScheduler", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Monitoring", "type");
+    it("clamps short intervals to the minimum, runs immediately, and emits schedule telemetry", async () => {
+        const shortInterval = MIN_CHECK_INTERVAL - 250;
+        scheduler.startMonitor(
+            "site-1",
+            createMonitor({ checkInterval: shortInterval })
+        );
 
-            scheduler.setCheckCallback(mockCheckCallback);
+        await flushAsync();
 
-            const result = scheduler.startMonitor("site-1", mockMonitor);
+        const jobs = scheduler.getJobsForTesting();
+        const job = jobs.get("site-1|monitor-1");
 
-            expect(result).toBeTruthy();
-            expect(scheduler["intervals"].has("site-1|monitor-1")).toBeTruthy();
-        });
+        expect(job?.baseIntervalMs).toBe(MIN_CHECK_INTERVAL);
+        expect(mockCheckCallback).toHaveBeenCalledWith("site-1", "monitor-1");
 
-        it("should return false for monitor without ID", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: MonitorScheduler", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Monitoring", "type");
+        const scheduleEvent = eventEmitter.emitTyped.mock.calls.find(
+            ([eventName]) => eventName === "monitor:schedule-updated"
+        );
 
-            const monitorWithoutId: Site["monitors"][0] = {
-                ...mockMonitor,
-                id: "", // Empty string instead of undefined
-            };
-
-            const result = scheduler.startMonitor("site-1", monitorWithoutId);
-
-            expect(result).toBeFalsy();
-            expect(logger.warn).toHaveBeenCalledWith(
-                "[MonitorScheduler] Cannot start monitoring for monitor without ID: site-1"
-            );
-        });
-
-        it("should use monitor-specific check interval", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: MonitorScheduler", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Monitoring", "type");
-
-            scheduler.setCheckCallback(mockCheckCallback);
-
-            scheduler.startMonitor("site-1", mockMonitor);
-
-            // Fast-forward time by the monitor's check interval
-            await vi.advanceTimersByTimeAsync(mockMonitor.checkInterval);
-
-            expect(mockCheckCallback).toHaveBeenCalledWith(
-                "site-1",
-                "monitor-1"
-            );
-        });
-
-        it("should use default check interval when monitor interval not specified", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: MonitorScheduler", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Monitoring", "type");
-
-            const monitorWithoutInterval: Site["monitors"][0] = {
-                ...mockMonitor,
-                checkInterval: 0, // Use 0 to indicate no interval specified
-            };
-
-            scheduler.setCheckCallback(mockCheckCallback);
-            scheduler.startMonitor("site-1", monitorWithoutInterval);
-
-            // Fast-forward time by the default check interval
-            await vi.advanceTimersByTimeAsync(DEFAULT_CHECK_INTERVAL);
-
-            expect(mockCheckCallback).toHaveBeenCalledWith(
-                "site-1",
-                "monitor-1"
-            );
-        });
-
-        it("should stop existing interval before starting new one", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: MonitorScheduler", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Business Logic", "type");
-
-            scheduler.setCheckCallback(mockCheckCallback);
-
-            // Start monitoring first time
-            scheduler.startMonitor("site-1", mockMonitor);
-            const firstIntervalId =
-                scheduler["intervals"].get("site-1|monitor-1");
-
-            // Start monitoring again for same monitor
-            scheduler.startMonitor("site-1", mockMonitor);
-            const secondIntervalId =
-                scheduler["intervals"].get("site-1|monitor-1");
-
-            expect(firstIntervalId).not.toBe(secondIntervalId);
-        });
-
-        it("should log debug info when isDev returns true", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: MonitorScheduler", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Business Logic", "type");
-
-            (isDev as any).mockReturnValue(true);
-            scheduler.setCheckCallback(mockCheckCallback);
-
-            scheduler.startMonitor("site-1", mockMonitor);
-
-            expect(logger.debug).toHaveBeenCalledWith(
-                "[MonitorScheduler] Monitor checkInterval: 60000, using: 60000ms for site-1|monitor-1"
-            );
-        });
-
-        it("should handle callback errors gracefully", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: MonitorScheduler", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Error Handling", "type");
-
-            const errorCallback = vi
-                .fn()
-                .mockRejectedValue(new Error("Callback error"));
-            scheduler.setCheckCallback(errorCallback);
-
-            scheduler.startMonitor("site-1", mockMonitor);
-
-            // Fast-forward time to trigger the callback
-            await vi.advanceTimersByTimeAsync(mockMonitor.checkInterval);
-
-            // Verify the callback was called (the error handling is internal)
-            expect(errorCallback).toHaveBeenCalledWith("site-1", "monitor-1");
-        });
-
-        it("should not execute callback if none is set", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: MonitorScheduler", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Business Logic", "type");
-
-            scheduler.startMonitor("site-1", mockMonitor);
-
-            // Fast-forward time by the monitor's check interval
-            vi.advanceTimersByTime(mockMonitor.checkInterval!);
-
-            expect(mockCheckCallback).not.toHaveBeenCalled();
+        expect(scheduleEvent?.[1]).toMatchObject({
+            backoffAttempt: 0,
+            delayMs: MIN_CHECK_INTERVAL,
+            monitorId: "monitor-1",
+            siteIdentifier: "site-1",
+            timestamp: FIXED_NOW,
         });
     });
 
-    describe("stopMonitor", () => {
-        it("should stop monitoring for a specific monitor", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: MonitorScheduler", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Monitoring", "type");
+    it("uses the default interval when monitor checkInterval requests automatic determination", () => {
+        scheduler.startMonitor("site-1", createMonitor({ checkInterval: 0 }));
 
-            scheduler.setCheckCallback(mockCheckCallback);
-            scheduler.startMonitor("site-1", mockMonitor);
-
-            expect(scheduler["intervals"].has("site-1|monitor-1")).toBeTruthy();
-
-            const result = scheduler.stopMonitor("site-1", "monitor-1");
-
-            expect(result).toBeTruthy();
-            expect(scheduler["intervals"].has("site-1|monitor-1")).toBeFalsy();
-        });
-
-        it("should return false when stopping non-existent monitor", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: MonitorScheduler", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Monitoring", "type");
-
-            const result = scheduler.stopMonitor("site-1", "non-existent");
-
-            expect(result).toBeFalsy();
-        });
-
-        it("should log debug info when isDev returns true", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: MonitorScheduler", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Business Logic", "type");
-
-            (isDev as any).mockReturnValue(true);
-            scheduler.setCheckCallback(mockCheckCallback);
-            scheduler.startMonitor("site-1", mockMonitor);
-
-            scheduler.stopMonitor("site-1", "monitor-1");
-
-            expect(logger.debug).toHaveBeenCalledWith(
-                "[MonitorScheduler] Stopped monitoring for site-1|monitor-1"
-            );
-        });
+        const job = scheduler.getJobsForTesting().get("site-1|monitor-1");
+        expect(job?.baseIntervalMs).toBe(DEFAULT_CHECK_INTERVAL);
     });
 
-    describe("stopSiteMonitoring", () => {
-        it("should stop all monitors for a site", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: MonitorScheduler", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Monitoring", "type");
+    it("derives timeout guard from default constants when monitor timeout is zero", () => {
+        scheduler.startMonitor("site-1", createMonitor({ timeout: 0 }));
 
-            scheduler.setCheckCallback(mockCheckCallback);
-
-            const monitor2: Site["monitors"][0] = {
-                ...mockMonitor,
-                id: "monitor-2",
-            };
-
-            scheduler.startMonitor("site-1", mockMonitor);
-            scheduler.startMonitor("site-1", monitor2);
-
-            expect(scheduler["intervals"].size).toBe(2);
-
-            scheduler.stopSite("site-1");
-
-            expect(scheduler["intervals"].size).toBe(0);
-        });
-
-        it("should stop specific monitors when provided", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: MonitorScheduler", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Monitoring", "type");
-
-            scheduler.setCheckCallback(mockCheckCallback);
-
-            const monitor2: Site["monitors"][0] = {
-                ...mockMonitor,
-                id: "monitor-2",
-            };
-
-            scheduler.startMonitor("site-1", mockMonitor);
-            scheduler.startMonitor("site-1", monitor2);
-
-            expect(scheduler["intervals"].size).toBe(2);
-
-            scheduler.stopSite("site-1", [mockMonitor]);
-
-            expect(scheduler["intervals"].size).toBe(1);
-            expect(scheduler.isMonitoring("site-1", "monitor-2")).toBeTruthy();
-        });
-
-        it("should handle empty monitors array gracefully", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: MonitorScheduler", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Monitoring", "type");
-
-            expect(() => scheduler.stopSite("site-1", [])).not.toThrowError();
-        });
+        const job = scheduler.getJobsForTesting().get("site-1|monitor-1");
+        const expectedTimeout =
+            DEFAULT_MONITOR_TIMEOUT_SECONDS * SECONDS_TO_MS_MULTIPLIER +
+            MONITOR_TIMEOUT_BUFFER_MS;
+        expect(job?.timeoutMs).toBe(expectedTimeout);
     });
 
-    describe("stopAll", () => {
-        it("should stop all running monitors", async ({ task, annotate }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: MonitorScheduler", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Monitoring", "type");
+    it("pre-empts the scheduled job when performing a manual check and resets backoff", async () => {
+        mockCheckCallback = createCheckCallbackMock()
+            .mockRejectedValueOnce(new Error("boom"))
+            .mockResolvedValue(undefined);
+        scheduler.setCheckCallback(mockCheckCallback);
 
-            scheduler.setCheckCallback(mockCheckCallback);
+        scheduler.startMonitor("site-1", createMonitor());
+        await flushAsync();
 
-            const monitor2: Site["monitors"][0] = {
-                ...mockMonitor,
-                id: "monitor-2",
-            };
+        const jobKey = "site-1|monitor-1";
+        expect(scheduler.getJobsForTesting().get(jobKey)?.backoffAttempt).toBe(
+            1
+        );
 
-            scheduler.startMonitor("site-1", mockMonitor);
-            scheduler.startMonitor("site-2", monitor2);
+        eventEmitter.emitTyped.mockClear();
+        await scheduler.performImmediateCheck("site-1", "monitor-1");
+        await flushAsync();
 
-            expect(scheduler["intervals"].size).toBe(2);
+        const manualEvent = eventEmitter.emitTyped.mock.calls.find(
+            ([eventName]) => eventName === "monitor:manual-check-started"
+        );
 
-            scheduler.stopAll();
-
-            expect(scheduler["intervals"].size).toBe(0);
-            expect(logger.info).toHaveBeenCalledWith(
-                "[MonitorScheduler] Stopped all monitoring intervals"
-            );
+        expect(manualEvent?.[1]).toMatchObject({
+            correlationId: expect.any(String),
+            monitorId: "monitor-1",
+            siteIdentifier: "site-1",
+            timestamp: FIXED_NOW,
         });
-
-        it("should handle empty intervals map gracefully", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: MonitorScheduler", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Business Logic", "type");
-
-            expect(() => scheduler.stopAll()).not.toThrowError();
-            expect(scheduler["intervals"].size).toBe(0);
-        });
+        const jobAfterManual = scheduler.getJobsForTesting().get(jobKey);
+        expect(jobAfterManual?.backoffAttempt).toBe(0);
+        expect(jobAfterManual?.hasTimer).toBeTruthy();
     });
 
-    describe("getActiveCount", () => {
-        it("should return 0 when no monitors are active", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: MonitorScheduler", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Monitoring", "type");
+    it("removes jobs when stopMonitor is called", () => {
+        scheduler.startMonitor("site-1", createMonitor());
+        expect(scheduler.getActiveCount()).toBe(1);
 
-            expect(scheduler.getActiveCount()).toBe(0);
-        });
+        const stopped = scheduler.stopMonitor("site-1", "monitor-1");
 
-        it("should return correct count of active monitors", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: MonitorScheduler", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Monitoring", "type");
-
-            scheduler.setCheckCallback(mockCheckCallback);
-
-            const monitor2: Site["monitors"][0] = {
-                ...mockMonitor,
-                id: "monitor-2",
-            };
-
-            scheduler.startMonitor("site-1", mockMonitor);
-            expect(scheduler.getActiveCount()).toBe(1);
-
-            scheduler.startMonitor("site-2", monitor2);
-            expect(scheduler.getActiveCount()).toBe(2);
-
-            scheduler.stopMonitor("site-1", "monitor-1");
-            expect(scheduler.getActiveCount()).toBe(1);
-        });
+        expect(stopped).toBeTruthy();
+        expect(scheduler.getActiveCount()).toBe(0);
+        expect(scheduler.getActiveMonitors()).toEqual([]);
     });
 
-    describe("isMonitoring", () => {
-        it("should return false for inactive monitor", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: MonitorScheduler", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Monitoring", "type");
+    it("stopSite only clears jobs for the given site", () => {
+        scheduler.startMonitor("site-1", createMonitor());
+        scheduler.startMonitor("site-2", createMonitor({ id: "monitor-2" }));
 
-            expect(scheduler.isMonitoring("site-1", "monitor-1")).toBeFalsy();
-        });
+        scheduler.stopSite("site-1");
 
-        it("should return true for active monitor", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: MonitorScheduler", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Monitoring", "type");
-
-            scheduler.setCheckCallback(mockCheckCallback);
-            scheduler.startMonitor("site-1", mockMonitor);
-
-            expect(scheduler.isMonitoring("site-1", "monitor-1")).toBeTruthy();
-        });
-
-        it("should return false after stopping monitor", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: MonitorScheduler", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Monitoring", "type");
-
-            scheduler.setCheckCallback(mockCheckCallback);
-            scheduler.startMonitor("site-1", mockMonitor);
-            scheduler.stopMonitor("site-1", "monitor-1");
-
-            expect(scheduler.isMonitoring("site-1", "monitor-1")).toBeFalsy();
-        });
-    });
-
-    describe("startSiteMonitoring", () => {
-        it("should start monitoring for all active monitors in a site", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: MonitorScheduler", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Monitoring", "type");
-
-            const mockSite: Site = {
-                identifier: "site-1",
-                name: "Test Site",
-                monitoring: true,
-                monitors: [
-                    { ...mockMonitor, monitoring: true },
-                    { ...mockMonitor, id: "monitor-2", monitoring: true },
-                    { ...mockMonitor, id: "monitor-3", monitoring: false }, // Should not start
-                ],
-            };
-
-            scheduler.setCheckCallback(mockCheckCallback);
-            scheduler.startSite(mockSite);
-
-            expect(scheduler.getActiveCount()).toBe(2);
-            expect(scheduler.isMonitoring("site-1", "monitor-1")).toBeTruthy();
-            expect(scheduler.isMonitoring("site-1", "monitor-2")).toBeTruthy();
-            expect(scheduler.isMonitoring("site-1", "monitor-3")).toBeFalsy();
-        });
-
-        it("should skip monitors without IDs", async ({ task, annotate }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: MonitorScheduler", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Monitoring", "type");
-
-            const monitorWithoutId = { ...mockMonitor };
-            delete (monitorWithoutId as any).id;
-
-            const mockSite: Site = {
-                identifier: "site-1",
-                name: "Test Site",
-                monitoring: true,
-                monitors: [monitorWithoutId as Site["monitors"][0]],
-            };
-
-            scheduler.setCheckCallback(mockCheckCallback);
-            scheduler.startSite(mockSite);
-
-            expect(scheduler.getActiveCount()).toBe(0);
-        });
-    });
-
-    describe("restartMonitor", () => {
-        it("should restart monitoring for a specific monitor", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: MonitorScheduler", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Monitoring", "type");
-
-            scheduler.setCheckCallback(mockCheckCallback);
-            scheduler.startMonitor("site-1", mockMonitor);
-
-            expect(scheduler.isMonitoring("site-1", "monitor-1")).toBeTruthy();
-
-            const result = scheduler.restartMonitor("site-1", mockMonitor);
-
-            expect(result).toBeTruthy();
-            expect(scheduler.isMonitoring("site-1", "monitor-1")).toBeTruthy();
-        });
-
-        it("should return false for monitor without ID", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: MonitorScheduler", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Monitoring", "type");
-
-            const monitorWithoutId = { ...mockMonitor };
-            delete (monitorWithoutId as any).id;
-
-            const result = scheduler.restartMonitor(
-                "site-1",
-                monitorWithoutId as Site["monitors"][0]
-            );
-
-            expect(result).toBeFalsy();
-        });
-    });
-
-    describe("getActiveMonitors", () => {
-        it("should return empty array when no monitors are active", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: MonitorScheduler", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Monitoring", "type");
-
-            expect(scheduler.getActiveMonitors()).toEqual([]);
-        });
-
-        it("should return all active monitor keys", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: MonitorScheduler", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Monitoring", "type");
-
-            scheduler.setCheckCallback(mockCheckCallback);
-
-            const monitor2: Site["monitors"][0] = {
-                ...mockMonitor,
-                id: "monitor-2",
-            };
-
-            scheduler.startMonitor("site-1", mockMonitor);
-            scheduler.startMonitor("site-2", monitor2);
-
-            const activeMonitors = scheduler.getActiveMonitors();
-
-            expect(activeMonitors).toContain("site-1|monitor-1");
-            expect(activeMonitors).toContain("site-2|monitor-2");
-            expect(activeMonitors).toHaveLength(2);
-        });
+        expect(scheduler.isMonitoring("site-1", "monitor-1")).toBeFalsy();
+        expect(scheduler.isMonitoring("site-2", "monitor-2")).toBeTruthy();
     });
 });

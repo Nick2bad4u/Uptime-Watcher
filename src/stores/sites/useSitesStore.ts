@@ -36,6 +36,7 @@
  */
 
 import type { Site } from "@shared/types";
+import type { SerializedDatabaseRestorePayload } from "@shared/types/ipc";
 
 import { create, type StoreApi, type UseBoundStore } from "zustand";
 
@@ -106,6 +107,9 @@ export const useSitesStore: UseBoundStore<StoreApi<SitesStore>> =
                 data: {
                     downloadSqliteBackup: () =>
                         DataService.downloadSqliteBackup(),
+                    restoreSqliteBackup: (
+                        payload: SerializedDatabaseRestorePayload
+                    ) => DataService.restoreSqliteBackup(payload),
                 },
                 site: {
                     addSite: (site: Site) => SiteService.addSite(site),
@@ -120,6 +124,7 @@ export const useSitesStore: UseBoundStore<StoreApi<SitesStore>> =
                         SiteService.updateSite(identifier, updates),
                 },
             },
+            setLastBackupMetadata: stateActions.setLastBackupMetadata,
             setSites: stateActions.setSites,
             syncSites: syncActions.syncSites,
         });

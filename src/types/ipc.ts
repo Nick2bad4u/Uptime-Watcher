@@ -58,7 +58,10 @@ import type {
     IpcInvokeChannelResult as SharedIpcInvokeChannelResult,
     IpcValidationResponse as SharedIpcValidationResponse,
     PreloadGuardDiagnosticsReport as SharedPreloadGuardDiagnosticsReport,
+    SerializedDatabaseBackupMetadata as SharedSerializedDatabaseBackupMetadata,
     SerializedDatabaseBackupResult as SharedSerializedDatabaseBackupResult,
+    SerializedDatabaseRestorePayload as SharedSerializedDatabaseRestorePayload,
+    SerializedDatabaseRestoreResult as SharedSerializedDatabaseRestoreResult,
 } from "@shared/types/ipc";
 import type { Exact, UnknownRecord } from "type-fest";
 
@@ -110,9 +113,18 @@ export type IpcInvokeChannelResult<TChannel extends IpcInvokeChannel> =
 export type IpcValidationResponse = SharedIpcValidationResponse;
 /** Diagnostics report emitted by preload guard instrumentation. */
 export type PreloadGuardDiagnosticsReport = SharedPreloadGuardDiagnosticsReport;
+/** Metadata accompanying serialized database backups. */
+export type SerializedDatabaseBackupMetadata =
+    SharedSerializedDatabaseBackupMetadata;
 /** Serialized backup payloads returned by the database exporter. */
 export type SerializedDatabaseBackupResult =
     SharedSerializedDatabaseBackupResult;
+/** Renderer payload structure for requesting a SQLite restore. */
+export type SerializedDatabaseRestorePayload =
+    SharedSerializedDatabaseRestorePayload;
+/** Renderer-facing restore summary returned by the backend. */
+export type SerializedDatabaseRestoreResult =
+    SharedSerializedDatabaseRestoreResult;
 
 /**
  * Type guard to check if a value is an IPC response.

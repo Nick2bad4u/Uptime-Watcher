@@ -40,6 +40,7 @@ function loggerModuleMockFactory(): typeof import("../../../../../electron/utils
 
 const getPathMock = vi.fn();
 const createDatabaseSchemaMock = vi.fn();
+const synchronizeDatabaseSchemaVersionMock = vi.fn();
 
 interface MockDatabaseInstance {
     close: ReturnType<typeof vi.fn>;
@@ -88,6 +89,8 @@ vi.mock(
     () =>
         ({
             createDatabaseSchema: createDatabaseSchemaMock,
+            synchronizeDatabaseSchemaVersion:
+                synchronizeDatabaseSchemaVersionMock,
         }) satisfies Partial<
             typeof import("../../../../../electron/services/database/utils/databaseSchema")
         >
@@ -100,6 +103,7 @@ describe("databaseService strict coverage", () => {
         databaseConstructionHook = undefined;
         databaseInstances.length = 0;
         createDatabaseSchemaMock.mockReset();
+        synchronizeDatabaseSchemaVersionMock.mockReset();
         getPathMock.mockReset();
         vi.resetModules();
         vi.clearAllMocks();
@@ -112,9 +116,8 @@ describe("databaseService strict coverage", () => {
     });
 
     it("throws when attempting to read database before initialization", async () => {
-        const { DatabaseService } = await import(
-            "../../../../../electron/services/database/DatabaseService"
-        );
+        const { DatabaseService } =
+            await import("../../../../../electron/services/database/DatabaseService");
 
         const service = DatabaseService.getInstance();
 
@@ -124,9 +127,8 @@ describe("databaseService strict coverage", () => {
     });
 
     it("initializes the database exactly once and reuses the existing instance", async () => {
-        const { DatabaseService } = await import(
-            "../../../../../electron/services/database/DatabaseService"
-        );
+        const { DatabaseService } =
+            await import("../../../../../electron/services/database/DatabaseService");
 
         const service = DatabaseService.getInstance();
         getPathMock.mockReturnValue("/tmp/runtime-test");
@@ -156,9 +158,8 @@ describe("databaseService strict coverage", () => {
     });
 
     it("propagates constructor failures during initialization", async () => {
-        const { DatabaseService } = await import(
-            "../../../../../electron/services/database/DatabaseService"
-        );
+        const { DatabaseService } =
+            await import("../../../../../electron/services/database/DatabaseService");
 
         const service = DatabaseService.getInstance();
         getPathMock.mockReturnValue("/tmp/crash");
@@ -177,9 +178,8 @@ describe("databaseService strict coverage", () => {
     });
 
     it("closes the database connection and clears state", async () => {
-        const { DatabaseService } = await import(
-            "../../../../../electron/services/database/DatabaseService"
-        );
+        const { DatabaseService } =
+            await import("../../../../../electron/services/database/DatabaseService");
 
         const service = DatabaseService.getInstance();
         getPathMock.mockReturnValue("/tmp/close-scenario");
@@ -203,9 +203,8 @@ describe("databaseService strict coverage", () => {
     });
 
     it("logs errors encountered during close operations", async () => {
-        const { DatabaseService } = await import(
-            "../../../../../electron/services/database/DatabaseService"
-        );
+        const { DatabaseService } =
+            await import("../../../../../electron/services/database/DatabaseService");
 
         const service = DatabaseService.getInstance();
         getPathMock.mockReturnValue("/tmp/close-failure");
@@ -227,9 +226,8 @@ describe("databaseService strict coverage", () => {
     });
 
     it("executes operations inside existing transactions without starting a new one", async () => {
-        const { DatabaseService } = await import(
-            "../../../../../electron/services/database/DatabaseService"
-        );
+        const { DatabaseService } =
+            await import("../../../../../electron/services/database/DatabaseService");
 
         const service = DatabaseService.getInstance();
         getPathMock.mockReturnValue("/tmp/nested-tx");
@@ -253,9 +251,8 @@ describe("databaseService strict coverage", () => {
     });
 
     it("commits successful transactions and returns the operation result", async () => {
-        const { DatabaseService } = await import(
-            "../../../../../electron/services/database/DatabaseService"
-        );
+        const { DatabaseService } =
+            await import("../../../../../electron/services/database/DatabaseService");
 
         const service = DatabaseService.getInstance();
         getPathMock.mockReturnValue("/tmp/success-tx");
@@ -288,9 +285,8 @@ describe("databaseService strict coverage", () => {
     });
 
     it("rolls back transactions when the operation fails", async () => {
-        const { DatabaseService } = await import(
-            "../../../../../electron/services/database/DatabaseService"
-        );
+        const { DatabaseService } =
+            await import("../../../../../electron/services/database/DatabaseService");
 
         const service = DatabaseService.getInstance();
         getPathMock.mockReturnValue("/tmp/failure-tx");
@@ -328,9 +324,8 @@ describe("databaseService strict coverage", () => {
     });
 
     it("handles rollback errors and logs a diagnostic message", async () => {
-        const { DatabaseService } = await import(
-            "../../../../../electron/services/database/DatabaseService"
-        );
+        const { DatabaseService } =
+            await import("../../../../../electron/services/database/DatabaseService");
 
         const service = DatabaseService.getInstance();
         getPathMock.mockReturnValue("/tmp/rollback-failure");
@@ -364,9 +359,8 @@ describe("databaseService strict coverage", () => {
     });
 
     it("detects when SQLite already rolled back the transaction", async () => {
-        const { DatabaseService } = await import(
-            "../../../../../electron/services/database/DatabaseService"
-        );
+        const { DatabaseService } =
+            await import("../../../../../electron/services/database/DatabaseService");
 
         const service = DatabaseService.getInstance();
         getPathMock.mockReturnValue("/tmp/auto-rollback");

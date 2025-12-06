@@ -23,7 +23,11 @@ import type { EventKey, TypedEventBus } from "../../events/TypedEventBus";
 import type { ConfigurationManager } from "../../managers/ConfigurationManager";
 import type { StandardizedCache } from "../../utils/cache/StandardizedCache";
 import type { ImportSite } from "../../utils/database/DataImportExportService";
-import type { DatabaseBackupResult } from "../database/utils/databaseBackup";
+import type {
+    DatabaseBackupResult,
+    DatabaseRestorePayload,
+    DatabaseRestoreSummary,
+} from "../database/utils/databaseBackup";
 import type { DatabaseServiceFactory } from "../factories/DatabaseServiceFactory";
 
 import { logger as backendLogger } from "../../utils/logger";
@@ -149,6 +153,21 @@ function isImportContext(
 
     const data: unknown = Reflect.get(value, "data");
     return typeof data === "string";
+}
+
+function isRestoreContext(
+    value: unknown
+): value is DatabaseCommandContext & { payload: DatabaseRestorePayload } {
+    if (!isDatabaseCommandContext(value)) {
+        return false;
+    }
+
+    const payload: unknown = Reflect.get(value, "payload");
+    if (payload === null || typeof payload !== "object") {
+        return false;
+    }
+
+    return Buffer.isBuffer(Reflect.get(payload, "buffer"));
 }
 
 /**
@@ -760,6 +779,119 @@ export class ImportDataCommand extends DatabaseCommand<boolean> {
             monitors: Array.isArray(site.monitors) ? site.monitors : [],
             name: safeName,
         } satisfies Site;
+    }
+}
+
+/**
+ * Command responsible for restoring a SQLite backup and refreshing derived
+ * caches.
+ */
+export class RestoreBackupCommand extends DatabaseCommand<DatabaseRestoreSummary> {
+    private previousBackup: DatabaseBackupResult | undefined;
+
+    private readonly payload: DatabaseRestorePayload;
+
+    public async execute(): Promise<DatabaseRestoreSummary> {
+        const backupService = this.serviceFactory.createBackupService();
+        const { metadata, preRestoreBackup, preRestoreFileName, restoredAt } =
+            await backupService.restoreDatabaseBackup(this.payload);
+        this.previousBackup = preRestoreBackup;
+
+        const siteRepositoryService =
+            this.serviceFactory.createSiteRepositoryService();
+        const reloadedSites =
+            await siteRepositoryService.getSitesFromDatabase();
+
+        this.cache.replaceAll(
+            reloadedSites.map((site) => ({
+                data: structuredClone(site),
+                key: site.identifier,
+            }))
+        );
+
+        await this.emitSuccessEvent("internal:database:backup-restored", {
+            fileName: this.payload.fileName ?? "uploaded-backup.sqlite",
+            operation: "backup-restored",
+            schemaVersion: metadata.schemaVersion,
+            sizeBytes: metadata.sizeBytes,
+        });
+
+        return {
+            metadata,
+            preRestoreFileName,
+            restoredAt,
+        } satisfies DatabaseRestoreSummary;
+    }
+
+    public async rollback(): Promise<void> {
+        if (!this.previousBackup) {
+            return;
+        }
+
+        const backupService = this.serviceFactory.createBackupService();
+        await backupService.applyDatabaseBackupResult(this.previousBackup);
+    }
+
+    public async validate(): Promise<{
+        errors: string[];
+        isValid: boolean;
+    }> {
+        const errors: string[] = [];
+
+        if (this.payload.buffer.length === 0) {
+            errors.push("Backup payload cannot be empty");
+        }
+
+        await Promise.resolve();
+        return {
+            errors,
+            isValid: errors.length === 0,
+        };
+    }
+
+    public constructor(
+        serviceFactory: DatabaseServiceFactory,
+        eventEmitter: TypedEventBus<UptimeEvents>,
+        cache: StandardizedCache<Site>,
+        payload: DatabaseRestorePayload
+    );
+
+    public constructor(
+        context: DatabaseCommandContext & { payload: DatabaseRestorePayload }
+    );
+
+    public constructor(
+        a:
+            | (DatabaseCommandContext & { payload: DatabaseRestorePayload })
+            | DatabaseServiceFactory,
+        b?: TypedEventBus<UptimeEvents>,
+        c?: StandardizedCache<Site>,
+        d?: DatabaseRestorePayload
+    ) {
+        if (isRestoreContext(a)) {
+            super(a);
+            this.payload = a.payload;
+            return;
+        }
+
+        if (!d) {
+            throw new TypeError(
+                "RestoreBackupCommand requires a payload when constructed without context."
+            );
+        }
+
+        if (!b || !c) {
+            throw new TypeError(
+                "RestoreBackupCommand requires eventEmitter and cache when constructed without context."
+            );
+        }
+
+        super(a, b, c);
+        this.payload = d;
+    }
+
+    public getDescription(): string {
+        return "Restore SQLite database backup";
     }
 }
 

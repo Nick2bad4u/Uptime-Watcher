@@ -197,13 +197,10 @@ export class SiteRepositoryService {
 
             return await Promise.all(sitePromises);
         } catch (error) {
-            const message = `Failed to fetch sites from database: ${getErrorMessage(error)}`;
-            this.logger.error(message, error);
-            // eslint-disable-next-line ex/use-error-cause -- SiteLoadingError has specific constructor signature
-            throw new SiteLoadingError(
-                message,
-                error instanceof Error ? error : undefined
-            );
+            const normalizedError = ensureError(error);
+            const message = `Failed to fetch sites from database: ${getErrorMessage(normalizedError)}`;
+            this.logger.error(message, normalizedError);
+            throw new SiteLoadingError(message, { cause: normalizedError });
         }
     }
 
@@ -238,13 +235,10 @@ export class SiteRepositoryService {
 
             return await this.buildSiteWithMonitorsAndHistory(siteRow);
         } catch (error) {
-            const message = `Failed to fetch site ${identifier} from database: ${getErrorMessage(error)}`;
-            this.logger.error(message, error);
-            // eslint-disable-next-line ex/use-error-cause -- SiteLoadingError has specific constructor signature
-            throw new SiteLoadingError(
-                message,
-                error instanceof Error ? error : undefined
-            );
+            const normalizedError = ensureError(error);
+            const message = `Failed to fetch site ${identifier} from database: ${getErrorMessage(normalizedError)}`;
+            this.logger.error(message, normalizedError);
+            throw new SiteLoadingError(message, { cause: normalizedError });
         }
     }
 

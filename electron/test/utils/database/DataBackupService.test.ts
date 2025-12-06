@@ -18,6 +18,25 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import path from "node:path";
 
+const mockFsPromises = {
+    copyFile: vi.fn(),
+    mkdtemp: vi.fn(),
+    rm: vi.fn(),
+    writeFile: vi.fn(),
+};
+
+const mockOs = {
+    tmpdir: vi.fn(() => "/tmp"),
+};
+
+const mockDatabaseGet = vi.fn(() => ({ user_version: 1 }));
+const mockDatabasePrepare = vi.fn(() => ({ get: mockDatabaseGet }));
+const mockDatabaseInstance = {
+    close: vi.fn(),
+    prepare: mockDatabasePrepare,
+};
+const mockDatabaseConstructor = vi.fn(() => mockDatabaseInstance);
+
 // Mock dependencies before importing the module under test
 vi.mock("electron", () => ({
     app: {
@@ -27,17 +46,32 @@ vi.mock("electron", () => ({
 
 vi.mock("../../../services/database/utils/databaseBackup", () => ({
     createDatabaseBackup: vi.fn(),
+    validateDatabaseBackupPayload: vi.fn(),
 }));
 
 vi.mock("../../../constants", () => ({
     DB_FILE_NAME: "uptime-watcher.sqlite",
 }));
 
+vi.mock("node:fs", () => ({
+    promises: mockFsPromises,
+}));
+
+vi.mock("node:os", () => mockOs);
+
+vi.mock("node-sqlite3-wasm", () => ({
+    Database: mockDatabaseConstructor,
+}));
+
 // Import after mocks are set up
 import { DataBackupService } from "../../../utils/database/DataBackupService";
 import { SiteLoadingError } from "../../../utils/database/interfaces";
 import { app } from "electron";
-import { createDatabaseBackup } from "../../../services/database/utils/databaseBackup";
+import {
+    createDatabaseBackup,
+    validateDatabaseBackupPayload,
+} from "../../../services/database/utils/databaseBackup";
+import type { DatabaseBackupResult } from "../../../services/database/utils/databaseBackup";
 
 // Test utilities and mocks
 const createMockEventEmitter = () => ({
@@ -60,15 +94,28 @@ const createMockLogger = () => ({
     error: vi.fn(),
 });
 
+const createMockDatabaseService = () => ({
+    close: vi.fn(),
+    initialize: vi.fn(),
+});
+
 describe(DataBackupService, () => {
     let mockEventEmitter: ReturnType<typeof createMockEventEmitter>;
     let mockLogger: ReturnType<typeof createMockLogger>;
+    let mockDatabaseService: ReturnType<typeof createMockDatabaseService>;
     let dataBackupService: DataBackupService;
 
     beforeEach(() => {
         vi.clearAllMocks();
         mockEventEmitter = createMockEventEmitter();
         mockLogger = createMockLogger();
+        mockDatabaseService = createMockDatabaseService();
+        for (const mockFn of Object.values(mockFsPromises)) mockFn.mockReset();
+        mockOs.tmpdir.mockReturnValue("/tmp");
+        mockDatabaseConstructor.mockClear();
+        mockDatabasePrepare.mockClear();
+        mockDatabaseGet.mockClear();
+        mockDatabaseInstance.close.mockClear();
 
         // Reset app.getPath mock
         vi.mocked(app.getPath).mockReturnValue("/test/userdata");
@@ -78,13 +125,22 @@ describe(DataBackupService, () => {
             buffer: Buffer.from("test database content"),
             fileName: "uptime-watcher-backup.sqlite",
             metadata: {
+                appVersion: "0.0.0-test",
+                checksum: "mock-checksum",
                 createdAt: Date.now(),
                 originalPath: "/test/userdata/uptime-watcher.sqlite",
+                retentionHintDays: 30,
+                schemaVersion: 1,
                 sizeBytes: 1024,
             },
         });
 
+        vi.mocked(validateDatabaseBackupPayload).mockImplementation(() => {
+            /* noop */
+        });
+
         dataBackupService = new DataBackupService({
+            databaseService: mockDatabaseService as any,
             eventEmitter: mockEventEmitter as any,
             logger: mockLogger,
         });
@@ -105,6 +161,7 @@ describe(DataBackupService, () => {
             await annotate("Type: Constructor", "type");
 
             const service = new DataBackupService({
+                databaseService: mockDatabaseService as any,
                 eventEmitter: mockEventEmitter as any,
                 logger: mockLogger,
             });
@@ -122,6 +179,7 @@ describe(DataBackupService, () => {
             await annotate("Type: Event Processing", "type");
 
             const service = new DataBackupService({
+                databaseService: mockDatabaseService as any,
                 eventEmitter: mockEventEmitter as any,
                 logger: mockLogger,
             });
@@ -146,8 +204,12 @@ describe(DataBackupService, () => {
                 buffer: Buffer.from("test database content"),
                 fileName: "uptime-watcher-backup.sqlite",
                 metadata: {
+                    appVersion: "0.0.0-test",
+                    checksum: "mock-checksum",
                     createdAt: Date.now(),
                     originalPath: "/test/userdata/uptime-watcher.sqlite",
+                    retentionHintDays: 30,
+                    schemaVersion: 1,
                     sizeBytes: 1024,
                 },
             };
@@ -162,8 +224,15 @@ describe(DataBackupService, () => {
             expect(createDatabaseBackup).toHaveBeenCalledWith(
                 path.join("/test/userdata", "uptime-watcher.sqlite")
             );
+            expect(validateDatabaseBackupPayload).toHaveBeenCalledWith(
+                mockResult
+            );
             expect(mockLogger.info).toHaveBeenCalledWith(
-                "Database backup created: uptime-watcher-backup.sqlite"
+                "Database backup created: uptime-watcher-backup.sqlite",
+                expect.objectContaining({
+                    schemaVersion: mockResult.metadata.schemaVersion,
+                    sizeBytes: mockResult.metadata.sizeBytes,
+                })
             );
         });
 
@@ -200,8 +269,12 @@ describe(DataBackupService, () => {
                 buffer: Buffer.from("custom backup data"),
                 fileName: "custom-backup.sqlite",
                 metadata: {
+                    appVersion: "0.0.0-test",
+                    checksum: "mock-checksum",
                     createdAt: 1_234_567_890,
                     originalPath: "/test/path",
+                    retentionHintDays: 30,
+                    schemaVersion: 1,
                     sizeBytes: 2048,
                 },
             };
@@ -215,8 +288,15 @@ describe(DataBackupService, () => {
             // Assert
             expect(result.buffer).toEqual(customBackupResult.buffer);
             expect(result.fileName).toBe(customBackupResult.fileName);
+            expect(validateDatabaseBackupPayload).toHaveBeenCalledWith(
+                customBackupResult
+            );
             expect(mockLogger.info).toHaveBeenCalledWith(
-                "Database backup created: custom-backup.sqlite"
+                "Database backup created: custom-backup.sqlite",
+                expect.objectContaining({
+                    schemaVersion: customBackupResult.metadata.schemaVersion,
+                    sizeBytes: customBackupResult.metadata.sizeBytes,
+                })
             );
         });
 
@@ -406,8 +486,12 @@ describe(DataBackupService, () => {
                 buffer: Buffer.alloc(0), // Empty buffer
                 fileName: "empty-backup.sqlite",
                 metadata: {
+                    appVersion: "0.0.0-test",
+                    checksum: "mock-checksum",
                     createdAt: Date.now(),
                     originalPath: "/test/path",
+                    retentionHintDays: 30,
+                    schemaVersion: 1,
                     sizeBytes: 0,
                 },
             });
@@ -418,8 +502,14 @@ describe(DataBackupService, () => {
             // Assert
             expect(result.buffer).toHaveLength(0);
             expect(result.fileName).toBe("empty-backup.sqlite");
+            expect(validateDatabaseBackupPayload).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    fileName: "empty-backup.sqlite",
+                })
+            );
             expect(mockLogger.info).toHaveBeenCalledWith(
-                "Database backup created: empty-backup.sqlite"
+                "Database backup created: empty-backup.sqlite",
+                expect.objectContaining({ sizeBytes: 0 })
             );
         });
 
@@ -435,8 +525,12 @@ describe(DataBackupService, () => {
                 buffer: largeBuffer,
                 fileName: "large-backup.sqlite",
                 metadata: {
+                    appVersion: "0.0.0-test",
+                    checksum: "mock-checksum",
                     createdAt: Date.now(),
                     originalPath: "/test/path",
+                    retentionHintDays: 30,
+                    schemaVersion: 1,
                     sizeBytes: largeBuffer.length,
                 },
             });
@@ -463,8 +557,12 @@ describe(DataBackupService, () => {
                 buffer: Buffer.from("test content"),
                 fileName: "test-backup.sqlite",
                 metadata: {
+                    appVersion: "0.0.0-test",
+                    checksum: "mock-checksum",
                     createdAt: 1_234_567_890,
                     originalPath: "/original/path",
+                    retentionHintDays: 30,
+                    schemaVersion: 1,
                     sizeBytes: 12,
                 },
             };
@@ -476,7 +574,84 @@ describe(DataBackupService, () => {
             // Assert
             expect(result.buffer).toBe(backupResult.buffer);
             expect(result.fileName).toBe(backupResult.fileName);
-            // Note: metadata is not returned by the service, only buffer and fileName
+            expect(result.metadata).toEqual(backupResult.metadata);
+            expect(validateDatabaseBackupPayload).toHaveBeenCalledWith(
+                backupResult
+            );
+        });
+    });
+
+    describe("restoreDatabaseBackup", () => {
+        beforeEach(() => {
+            mockFsPromises.mkdtemp.mockResolvedValue("/tmp/mock-restore");
+            mockFsPromises.writeFile.mockResolvedValue(undefined);
+            mockFsPromises.copyFile.mockResolvedValue(undefined);
+            mockFsPromises.rm.mockResolvedValue(undefined);
+        });
+
+        it("should validate payload, snapshot database, and emit events", async () => {
+            const buffer = Buffer.from("restored-db");
+
+            const summary = await dataBackupService.restoreDatabaseBackup({
+                buffer,
+                fileName: "restore.sqlite",
+            });
+
+            expect(mockFsPromises.mkdtemp).toHaveBeenCalled();
+            expect(mockFsPromises.writeFile).toHaveBeenCalled();
+            expect(createDatabaseBackup).toHaveBeenCalled();
+            expect(validateDatabaseBackupPayload).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    buffer,
+                    metadata: expect.objectContaining({
+                        sizeBytes: buffer.length,
+                    }),
+                })
+            );
+            expect(mockDatabaseService.close).toHaveBeenCalled();
+            expect(mockDatabaseService.initialize).toHaveBeenCalled();
+            expect(mockEventEmitter.emitTyped).toHaveBeenCalledWith(
+                "database:backup-restored",
+                expect.objectContaining({
+                    fileName: "restore.sqlite",
+                    size: buffer.length,
+                })
+            );
+            expect(summary.metadata.sizeBytes).toBe(buffer.length);
+        });
+    });
+
+    describe("applyDatabaseBackupResult", () => {
+        beforeEach(() => {
+            mockFsPromises.mkdtemp.mockResolvedValue("/tmp/mock-apply");
+            mockFsPromises.writeFile.mockResolvedValue(undefined);
+            mockFsPromises.copyFile.mockResolvedValue(undefined);
+            mockFsPromises.rm.mockResolvedValue(undefined);
+        });
+
+        it("should copy provided backup and reinitialize database", async () => {
+            const backup: DatabaseBackupResult = {
+                buffer: Buffer.from("previous"),
+                fileName: "pre-restore.sqlite",
+                metadata: {
+                    appVersion: "0.0.0-test",
+                    checksum: "checksum",
+                    createdAt: Date.now(),
+                    originalPath: "/tmp/pre-restore.sqlite",
+                    retentionHintDays: 30,
+                    schemaVersion: 1,
+                    sizeBytes: 9,
+                },
+            };
+
+            const metadata =
+                await dataBackupService.applyDatabaseBackupResult(backup);
+
+            expect(validateDatabaseBackupPayload).toHaveBeenCalledWith(backup);
+            expect(mockDatabaseService.close).toHaveBeenCalled();
+            expect(mockDatabaseService.initialize).toHaveBeenCalled();
+            expect(mockFsPromises.copyFile).toHaveBeenCalled();
+            expect(metadata).toEqual(backup.metadata);
         });
     });
 

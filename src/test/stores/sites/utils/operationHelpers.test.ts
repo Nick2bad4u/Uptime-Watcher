@@ -58,6 +58,10 @@ vi.mock("../../../../stores/sites/utils/monitorOperations", () => ({
 
 // Mock window.electronAPI
 const mockElectronAPI = {
+    data: {
+        downloadSqliteBackup: vi.fn(),
+        restoreSqliteBackup: vi.fn(),
+    },
     sites: {
         updateSite: vi.fn(),
     },
@@ -133,11 +137,18 @@ describe("OperationHelpers", () => {
                 buffer: new ArrayBuffer(0),
                 fileName: "backup.db",
                 metadata: {
+                    appVersion: "0.0.0-test",
+                    checksum: "mock-checksum",
                     createdAt: Date.now(),
                     originalPath: "",
+                    retentionHintDays: 30,
+                    schemaVersion: 1,
                     sizeBytes: 0,
                 },
             })),
+            restoreSqliteBackup: vi.fn(async (payload) =>
+                mockElectronAPI.data.restoreSqliteBackup(payload)
+            ),
         };
 
         const siteService = {
@@ -157,6 +168,7 @@ describe("OperationHelpers", () => {
 
         mockDeps = {
             getSites: getSitesSpy,
+            setLastBackupMetadata: vi.fn(),
             setSites: setSitesSpy,
             removeSite: vi.fn(),
             syncSites: vi.fn().mockResolvedValue(undefined),
@@ -1006,22 +1018,14 @@ describe("OperationHelpers", () => {
             expect(booleanResult).toBeTruthy();
 
             // Test with array result
-            const arrayOperation = vi.fn().mockResolvedValue([
-                1,
-                2,
-                3,
-            ]);
+            const arrayOperation = vi.fn().mockResolvedValue([1, 2, 3]);
             const arrayResult = await withSiteOperationReturning(
                 "arrayOp",
                 arrayOperation,
                 mockDeps,
                 { syncAfter: false }
             );
-            expect(arrayResult).toEqual([
-                1,
-                2,
-                3,
-            ]);
+            expect(arrayResult).toEqual([1, 2, 3]);
         });
 
         it("should handle null and undefined results", async ({

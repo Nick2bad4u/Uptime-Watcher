@@ -19,7 +19,12 @@ import type { HistoryRepository } from "../database/HistoryRepository";
 import type { MonitorRepository } from "../database/MonitorRepository";
 import type { SettingsRepository } from "../database/SettingsRepository";
 import type { SiteRepository } from "../database/SiteRepository";
-import type { DatabaseBackupResult } from "../database/utils/databaseBackup";
+import type {
+    DatabaseBackupMetadata,
+    DatabaseBackupResult,
+    DatabaseRestorePayload,
+    DatabaseRestoreResult,
+} from "../database/utils/databaseBackup";
 
 import { DataBackupService } from "../../utils/database/DataBackupService";
 import {
@@ -60,7 +65,13 @@ export interface DatabaseServiceFactoryDependencies {
  * @public
  */
 export interface IDataBackupService {
+    applyDatabaseBackupResult: (
+        backup: DatabaseBackupResult
+    ) => Promise<DatabaseBackupMetadata>;
     downloadDatabaseBackup: () => Promise<DatabaseBackupResult>;
+    restoreDatabaseBackup: (
+        payload: DatabaseRestorePayload
+    ) => Promise<DatabaseRestoreResult>;
 }
 
 /**
@@ -138,6 +149,7 @@ export class DatabaseServiceFactory {
      */
     public createBackupService(): IDataBackupService {
         return new DataBackupService({
+            databaseService: this.dependencies.databaseService,
             eventEmitter: this.dependencies.eventEmitter,
             logger: this.loggerAdapter,
         });

@@ -3,7 +3,7 @@ schema: "../../../config/schemas/doc-frontmatter.schema.json"
 title: "ADR-014: Logging, Telemetry, and Diagnostics"
 summary: "Standardizes log levels/fields, correlation IDs, diagnostics IPC flows, and privacy/redaction bounds."
 created: "2025-12-04"
-last_reviewed: "2025-12-04"
+last_reviewed: "2025-12-05"
 category: "guide"
 author: "Nick2bad4u"
 tags:
@@ -31,7 +31,7 @@ tags:
 
 ## Status
 
-Draft
+Accepted
 
 ## Context
 
@@ -53,16 +53,17 @@ We need consistent logging and diagnostics with correlation IDs, structured fiel
 
 ## Implementation
 
-- Introduce shared log fields helper; enforce correlationId generation per request/event.
-- Add diagnostics schema for preload guard reports; reuse Zod validation and limit payload size.
-- Emit `diagnostics:report-created` events for observability; guard against recursive logging loops.
-- Document log rotation defaults and user override knobs.
+- Implemented shared logging-context helpers (`withLogContext`, structured severity, automatic correlation IDs, hashed identifiers, passive redaction of URLs/bearer tokens) consumed by both Electron and renderer loggers.
+- Introduced an IPC correlation envelope automatically appended to every `ipcRenderer.invoke` call; `registerStandardizedIpcHandler` extracts the ID, injects it into logs/metadata, and echoes it back to the renderer.
+- Hardened diagnostics IPC handlers with payload byte limits (metadata/payload preview), automatic redaction, structured logging contexts, and a dedicated `diagnostics:report-created` event emitted through the typed event bus.
+- Added rotation defaults (5 MB per file) plus dev/prod log levels, now documented in `README`/guides alongside guidance for overriding via CLI flags.
+- Renderer/Electron tests cover the helper, sanitization behavior, payload truncation, and event emissions to prevent regressions.
 
 ## Testing & Validation
 
-- Unit tests for logging helpers ensuring required fields present and PII-stripping of URLs/tokens.
-- Integration tests for diagnostics IPC validating schema enforcement and oversize rejection.
-- Property tests for redaction to ensure secrets are consistently removed.
+- Unit tests validate logging-context helpers (hashing + redaction) and diagnostics report sanitization.
+- IPC integration tests (IpcService suite) assert metrics updates and `diagnostics:report-created` emissions.
+- Existing fuzz/property suites continue to cover diagnostics IPC input validation.
 
 ## Related ADRs
 

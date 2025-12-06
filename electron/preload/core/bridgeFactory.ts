@@ -20,6 +20,8 @@ import type {
 } from "@shared/types/ipc";
 import type { IpcRendererEvent } from "electron";
 
+import { createIpcCorrelationEnvelope } from "@shared/types/ipc";
+import { generateCorrelationId } from "@shared/utils/correlation";
 import { ipcRenderer } from "electron";
 
 import {
@@ -301,9 +303,11 @@ export function createTypedInvoker<TChannel extends IpcInvokeChannel>(
     ): Promise<IpcInvokeChannelResult<TChannel>> {
         await verifyChannelOrThrow(channel);
         try {
+            const correlationId = generateCorrelationId();
             const response: unknown = await ipcRenderer.invoke(
                 channel,
-                ...args
+                ...args,
+                createIpcCorrelationEnvelope(correlationId)
             );
             return validateIpcResponse<IpcInvokeChannelResult<TChannel>>(
                 response
@@ -337,9 +341,11 @@ export function createVoidInvoker<TChannel extends VoidIpcInvokeChannel>(
     ): Promise<void> {
         await verifyChannelOrThrow(channel);
         try {
+            const correlationId = generateCorrelationId();
             const response: unknown = await ipcRenderer.invoke(
                 channel,
-                ...args
+                ...args,
+                createIpcCorrelationEnvelope(correlationId)
             );
             validateVoidIpcResponse(response);
         } catch (error) {

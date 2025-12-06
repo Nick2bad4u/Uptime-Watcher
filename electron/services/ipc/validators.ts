@@ -16,6 +16,11 @@ import { isRecord } from "@shared/utils/typeHelpers";
 
 import type { IpcParameterValidator } from "./types";
 
+import {
+    getUtfByteLength,
+    MAX_DIAGNOSTICS_METADATA_BYTES,
+    MAX_DIAGNOSTICS_PAYLOAD_PREVIEW_BYTES,
+} from "./diagnosticsLimits";
 import { IpcValidators } from "./utils";
 
 /**
@@ -25,6 +30,7 @@ interface DataHandlerValidatorsInterface {
     downloadSqliteBackup: IpcParameterValidator;
     exportData: IpcParameterValidator;
     importData: IpcParameterValidator;
+    restoreSqliteBackup: IpcParameterValidator;
 }
 
 /**
@@ -140,11 +146,8 @@ function createNoParamsValidator(): IpcParameterValidator {
  */
 function createSingleNumberValidator(paramName: string): IpcParameterValidator {
     return createParamValidator(1, [
-        (
-            value
-        ):
-            | null
-            | string => IpcValidators.requiredNumber(value, paramName),
+        (value): null | string =>
+            IpcValidators.requiredNumber(value, paramName),
     ]);
 }
 
@@ -157,11 +160,8 @@ function createSingleNumberValidator(paramName: string): IpcParameterValidator {
  */
 function createSingleObjectValidator(paramName: string): IpcParameterValidator {
     return createParamValidator(1, [
-        (
-            value
-        ):
-            | null
-            | string => IpcValidators.requiredObject(value, paramName),
+        (value): null | string =>
+            IpcValidators.requiredObject(value, paramName),
     ]);
 }
 
@@ -206,12 +206,21 @@ function validatePreloadGuardReport(
         errors.push(reasonError);
     }
 
+    const payloadPreviewValue = record["payloadPreview"];
     const payloadPreviewError = IpcValidators.optionalString(
-        record["payloadPreview"],
+        payloadPreviewValue,
         "payloadPreview"
     );
     if (payloadPreviewError) {
         errors.push(payloadPreviewError);
+    } else if (
+        typeof payloadPreviewValue === "string" &&
+        getUtfByteLength(payloadPreviewValue) >
+            MAX_DIAGNOSTICS_PAYLOAD_PREVIEW_BYTES
+    ) {
+        errors.push(
+            `payloadPreview exceeds ${MAX_DIAGNOSTICS_PAYLOAD_PREVIEW_BYTES} bytes`
+        );
     }
 
     const metadataValue = record["metadata"];
@@ -222,6 +231,21 @@ function validatePreloadGuardReport(
         );
         if (metadataError) {
             errors.push(metadataError);
+        } else {
+            try {
+                const serialized = JSON.stringify(metadataValue);
+                if (
+                    !serialized ||
+                    getUtfByteLength(serialized) >
+                        MAX_DIAGNOSTICS_METADATA_BYTES
+                ) {
+                    errors.push(
+                        `metadata exceeds ${MAX_DIAGNOSTICS_METADATA_BYTES} bytes`
+                    );
+                }
+            } catch {
+                errors.push("metadata must be serializable");
+            }
         }
     }
 
@@ -284,6 +308,41 @@ function validateNotificationPreferences(
     return errors.length > 0 ? errors : null;
 }
 
+function validateRestorePayload(params: readonly unknown[]): null | string[] {
+    const errors: string[] = [];
+
+    if (params.length !== 1) {
+        errors.push("Expected exactly 1 parameter");
+    }
+
+    const [payload] = params;
+    const objectError = IpcValidators.requiredObject(payload, "payload");
+    if (objectError) {
+        errors.push(objectError);
+        return errors.length > 0 ? errors : null;
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- payload validated as object above
+    const record = payload as Record<string, unknown>;
+    const bufferCandidate = record["buffer"];
+    if (!(bufferCandidate instanceof ArrayBuffer)) {
+        errors.push("payload.buffer must be an ArrayBuffer");
+    }
+
+    const fileNameValue = record["fileName"];
+    if (fileNameValue !== undefined) {
+        const fileNameError = IpcValidators.requiredString(
+            fileNameValue,
+            "fileName"
+        );
+        if (fileNameError) {
+            errors.push(fileNameError);
+        }
+    }
+
+    return errors.length > 0 ? errors : null;
+}
+
 /**
  * Helper function to create validators for handlers expecting a single string
  * parameter.
@@ -294,11 +353,8 @@ function validateNotificationPreferences(
  */
 function createSingleStringValidator(paramName: string): IpcParameterValidator {
     return createParamValidator(1, [
-        (
-            value
-        ):
-            | null
-            | string => IpcValidators.requiredString(value, paramName),
+        (value): null | string =>
+            IpcValidators.requiredString(value, paramName),
     ]);
 }
 
@@ -312,11 +368,7 @@ function createSingleStringValidator(paramName: string): IpcParameterValidator {
  */
 function createSingleUrlValidator(paramName: string): IpcParameterValidator {
     return createParamValidator(1, [
-        (
-            value
-        ):
-            | null
-            | string => IpcValidators.requiredUrl(value, paramName),
+        (value): null | string => IpcValidators.requiredUrl(value, paramName),
     ]);
 }
 
@@ -333,16 +385,10 @@ function createStringObjectValidator(
     objectParamName: string
 ): IpcParameterValidator {
     return createParamValidator(2, [
-        (
-            value
-        ):
-            | null
-            | string => IpcValidators.requiredString(value, stringParamName),
-        (
-            value
-        ):
-            | null
-            | string => IpcValidators.requiredObject(value, objectParamName),
+        (value): null | string =>
+            IpcValidators.requiredString(value, stringParamName),
+        (value): null | string =>
+            IpcValidators.requiredObject(value, objectParamName),
     ]);
 }
 
@@ -358,11 +404,8 @@ function createStringWithUnvalidatedSecondValidator(
     firstParamName: string
 ): IpcParameterValidator {
     return createParamValidator(2, [
-        (
-            value
-        ):
-            | null
-            | string => IpcValidators.requiredString(value, firstParamName),
+        (value): null | string =>
+            IpcValidators.requiredString(value, firstParamName),
         (): null => null,
     ]);
 }
@@ -381,16 +424,10 @@ function createTwoStringValidator(
     secondParamName: string
 ): IpcParameterValidator {
     return createParamValidator(2, [
-        (
-            value
-        ):
-            | null
-            | string => IpcValidators.requiredString(value, firstParamName),
-        (
-            value
-        ):
-            | null
-            | string => IpcValidators.requiredString(value, secondParamName),
+        (value): null | string =>
+            IpcValidators.requiredString(value, firstParamName),
+        (value): null | string =>
+            IpcValidators.requiredString(value, secondParamName),
     ]);
 }
 
@@ -563,6 +600,11 @@ export const DataHandlerValidators: DataHandlerValidatorsInterface = {
      * Expects a single parameter: the data string.
      */
     importData: createSingleStringValidator("data"),
+
+    /**
+     * Validates parameters for the "restore-sqlite-backup" IPC handler.
+     */
+    restoreSqliteBackup: validateRestorePayload,
 } as const;
 
 /**

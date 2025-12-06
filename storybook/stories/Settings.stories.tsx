@@ -3,6 +3,7 @@
  */
 
 import type { SettingsProperties } from "@app/components/Settings/Settings";
+import type { SerializedDatabaseBackupResult } from "@shared/types/ipc";
 import type { Decorator, Meta, StoryObj } from "@storybook/react-vite";
 import type { JSX } from "react/jsx-runtime";
 
@@ -56,6 +57,38 @@ const withSettingsEnvironment: Decorator = (StoryComponent, context) => {
                 {
                     downloadSqliteBackup: async () => {
                         action("sites/downloadSqliteBackup")();
+                        return {
+                            buffer: new ArrayBuffer(0),
+                            fileName: "uptime-watcher-backup.storybook.sqlite",
+                            metadata: {
+                                appVersion: "storybook",
+                                checksum: "storybook-checksum",
+                                createdAt: Date.now(),
+                                originalPath:
+                                    "/var/lib/uptime-watcher/data.sqlite",
+                                retentionHintDays: 30,
+                                schemaVersion: 1,
+                                sizeBytes: 0,
+                            },
+                        } satisfies SerializedDatabaseBackupResult;
+                    },
+                    restoreSqliteBackup: async () => {
+                        action("sites/restoreSqliteBackup")();
+                        return {
+                            metadata: {
+                                appVersion: "storybook",
+                                checksum: "storybook-restore-checksum",
+                                createdAt: Date.now(),
+                                originalPath:
+                                    "/var/lib/uptime-watcher/restore.sqlite",
+                                retentionHintDays: 30,
+                                schemaVersion: 1,
+                                sizeBytes: 0,
+                            },
+                            preRestoreFileName:
+                                "uptime-watcher-pre-restore.storybook.sqlite",
+                            restoredAt: Date.now(),
+                        };
                     },
                     fullResyncSites: async () => {
                         action("sites/fullResyncSites")();

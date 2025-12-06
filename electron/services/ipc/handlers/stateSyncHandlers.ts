@@ -88,17 +88,26 @@ export function registerStateSyncHandlers({
             // with renderer expectations and serialization.
             const lastSyncAt = currentStatus.lastSyncAt ?? null;
 
+            const normalizedCachedSiteCount = Number.isFinite(cachedSiteCount)
+                ? cachedSiteCount
+                : 0;
+
+            const normalizedSiteCount =
+                typeof currentStatus.siteCount === "number" &&
+                Number.isFinite(currentStatus.siteCount)
+                    ? currentStatus.siteCount
+                    : normalizedCachedSiteCount;
+
             const summary: StateSyncStatusSummary = hasTrustedDatabaseSummary
                 ? {
                       lastSyncAt,
-                      siteCount:
-                          currentStatus.siteCount ?? cachedSiteCount ?? 0,
+                      siteCount: normalizedSiteCount,
                       source: STATE_SYNC_SOURCE.DATABASE,
                       synchronized: true,
                   }
                 : {
                       lastSyncAt,
-                      siteCount: cachedSiteCount ?? 0,
+                      siteCount: normalizedCachedSiteCount,
                       source: STATE_SYNC_SOURCE.CACHE,
                       synchronized: false,
                   };

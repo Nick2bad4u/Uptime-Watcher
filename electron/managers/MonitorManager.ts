@@ -977,7 +977,7 @@ export class MonitorManager {
         this.dependencies = dependencies;
         this.eventEmitter = dependencies.eventEmitter;
         this.enhancedMonitoringServices = enhancedServices;
-        this.monitorScheduler = new MonitorScheduler();
+        this.monitorScheduler = new MonitorScheduler(logger, this.eventEmitter);
         this.monitorScheduler.setCheckCallback(
             this.handleScheduledCheck.bind(this)
         );

@@ -378,8 +378,12 @@ describe("fileDownload utilities - Comprehensive Fast-Check Coverage", () => {
             buffer: new Uint8Array(bytes).buffer,
             fileName: "uptime-watcher-backup.sqlite",
             metadata: {
+                appVersion: "0.0.0-test",
+                checksum: "mock-checksum",
                 createdAt: 0,
                 originalPath: "/tmp/uptime-watcher.sqlite",
+                retentionHintDays: 30,
+                schemaVersion: 1,
                 sizeBytes: bytes.length,
             },
         });

@@ -916,7 +916,7 @@ describe("SiteRepositoryService and SiteLoadingOrchestrator - Comprehensive Cove
             await annotate("Type: Error Handling", "type");
 
             const cause = new Error("Original error");
-            const error = new SiteLoadingError("Test error", cause);
+            const error = new SiteLoadingError("Test error", { cause });
 
             expect(error.stack).toContain("SiteLoadingError");
             expect(error.stack).toContain("Caused by:");

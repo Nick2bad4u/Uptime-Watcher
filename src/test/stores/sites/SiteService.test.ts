@@ -41,8 +41,12 @@ const mockElectronAPI = {
             buffer: new ArrayBuffer(8),
             fileName: "backup.db",
             metadata: {
+                appVersion: "0.0.0-test",
+                checksum: "mock-checksum",
                 createdAt: 0,
                 originalPath: "/tmp/backup.db",
+                retentionHintDays: 30,
+                schemaVersion: 1,
                 sizeBytes: 8,
             },
         }),

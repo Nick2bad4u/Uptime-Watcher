@@ -168,6 +168,10 @@ describe(DatabaseServiceFactory, () => {
             expect(typeof backupService.downloadDatabaseBackup).toBe(
                 "function"
             );
+            expect(typeof backupService.restoreDatabaseBackup).toBe("function");
+            expect(typeof backupService.applyDatabaseBackupResult).toBe(
+                "function"
+            );
         });
 
         it("should return a service that implements IDataBackupService interface", async ({
@@ -184,6 +188,12 @@ describe(DatabaseServiceFactory, () => {
             // Verify the service has the required interface methods
             expect(backupService).toHaveProperty("downloadDatabaseBackup");
             expect(typeof backupService.downloadDatabaseBackup).toBe(
+                "function"
+            );
+            expect(backupService).toHaveProperty("restoreDatabaseBackup");
+            expect(typeof backupService.restoreDatabaseBackup).toBe("function");
+            expect(backupService).toHaveProperty("applyDatabaseBackupResult");
+            expect(typeof backupService.applyDatabaseBackupResult).toBe(
                 "function"
             );
         });

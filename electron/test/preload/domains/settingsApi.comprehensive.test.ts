@@ -10,6 +10,11 @@ vi.mock("electron", () => ({
     },
 }));
 
+const correlationEnvelopeMatcher = expect.objectContaining({
+    __uptimeWatcherIpcContext: true,
+    correlationId: expect.any(String),
+});
+
 describe("settingsApi", () => {
     beforeEach(() => {
         vi.clearAllMocks();
@@ -26,7 +31,8 @@ describe("settingsApi", () => {
         expect(result).toBe(365);
         expect(ipcRenderer.invoke).toHaveBeenCalledWith(
             SETTINGS_CHANNELS.updateHistoryLimit,
-            365
+            365,
+            correlationEnvelopeMatcher
         );
     });
 
@@ -40,7 +46,8 @@ describe("settingsApi", () => {
 
         expect(result).toBe(120);
         expect(ipcRenderer.invoke).toHaveBeenCalledWith(
-            SETTINGS_CHANNELS.getHistoryLimit
+            SETTINGS_CHANNELS.getHistoryLimit,
+            correlationEnvelopeMatcher
         );
     });
 
@@ -51,7 +58,8 @@ describe("settingsApi", () => {
 
         await expect(settingsApi.resetSettings()).resolves.toBeUndefined();
         expect(ipcRenderer.invoke).toHaveBeenCalledWith(
-            SETTINGS_CHANNELS.resetSettings
+            SETTINGS_CHANNELS.resetSettings,
+            correlationEnvelopeMatcher
         );
     });
 

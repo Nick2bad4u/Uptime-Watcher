@@ -6,6 +6,7 @@
 import { vi } from "vitest";
 import fc from "fast-check";
 import { resolveFastCheckEnvOverrides } from "@shared/test/utils/fastCheckEnv";
+import { isIpcCorrelationEnvelope } from "@shared/types/ipc";
 
 // Increase Node.js process listener limits for tests to prevent MaxListenersExceededWarning
 process.setMaxListeners(200);
@@ -83,6 +84,45 @@ process.stderr.write = function (chunk: any, encoding?: any, fd?: any) {
     return originalStderr.call(this, chunk, encoding, fd);
 };
 
+const sanitizeIpcInvokeCall = (callArgs: unknown[]): unknown[] => {
+    if (callArgs.length <= 1) {
+        return callArgs;
+    }
+
+    const [channel, ...args] = callArgs;
+    if (args.length === 0) {
+        return callArgs;
+    }
+
+    const maybeEnvelope = args.at(-1);
+    if (isIpcCorrelationEnvelope(maybeEnvelope)) {
+        return [channel, ...args.slice(0, -1)];
+    }
+
+    return callArgs;
+};
+
+const createCorrelationAwareInvokeMock = (): ReturnType<typeof vi.fn> =>
+    new Proxy(vi.fn(), {
+        apply(target, thisArg, argArray) {
+            try {
+                return Reflect.apply(target, thisArg, argArray);
+            } finally {
+                const lastIndex = target.mock.calls.length - 1;
+                if (lastIndex >= 0) {
+                    const currentCall = target.mock.calls[lastIndex];
+                    if (currentCall) {
+                        target.mock.calls[lastIndex] =
+                            sanitizeIpcInvokeCall(currentCall);
+                    }
+                }
+            }
+        },
+        get(target, prop, receiver) {
+            return Reflect.get(target, prop, receiver);
+        },
+    }) as ReturnType<typeof vi.fn>;
+
 // Mock electron before any imports
 vi.mock("electron", () => ({
     app: {
@@ -125,7 +165,7 @@ vi.mock("electron", () => ({
     ipcRenderer: {
         on: vi.fn(),
         send: vi.fn(),
-        invoke: vi.fn(),
+        invoke: createCorrelationAwareInvokeMock(),
         removeAllListeners: vi.fn(),
     },
     contextBridge: {

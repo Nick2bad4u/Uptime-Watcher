@@ -45,8 +45,12 @@ const mockElectronAPI = {
             buffer: new ArrayBuffer(1024),
             fileName: "backup.db",
             metadata: {
+                appVersion: "0.0.0-test",
+                checksum: "mock-checksum",
                 createdAt: 0,
                 originalPath: "/tmp/backup.db",
+                retentionHintDays: 30,
+                schemaVersion: 1,
                 sizeBytes: 1024,
             },
         }),
@@ -103,8 +107,12 @@ vi.mock("../../../services/DataService", () => ({
             buffer: new ArrayBuffer(1024),
             fileName: "backup.db",
             metadata: {
+                appVersion: "0.0.0-test",
+                checksum: "mock-checksum",
                 createdAt: 0,
                 originalPath: "/tmp/backup.db",
+                retentionHintDays: 30,
+                schemaVersion: 1,
                 sizeBytes: 1024,
             },
         }),
@@ -180,9 +188,8 @@ describe("IPC Response Handling Regression Tests", () => {
             );
 
             // Import the service after mocking
-            const { SiteService } = await import(
-                "../../../services/SiteService"
-            );
+            const { SiteService } =
+                await import("../../../services/SiteService");
 
             const testSite: Site = {
                 identifier: "test-site",
@@ -209,9 +216,8 @@ describe("IPC Response Handling Regression Tests", () => {
                 new Error("Database connection failed")
             );
 
-            const { SiteService } = await import(
-                "../../../services/SiteService"
-            );
+            const { SiteService } =
+                await import("../../../services/SiteService");
 
             try {
                 await SiteService.getSites();
@@ -230,9 +236,8 @@ describe("IPC Response Handling Regression Tests", () => {
             );
 
             // Import the sync module after mocking
-            const { createSiteSyncActions } = await import(
-                "../../../stores/sites/useSiteSync"
-            );
+            const { createSiteSyncActions } =
+                await import("../../../stores/sites/useSiteSync");
 
             // Create a minimal deps object for testing
             const mockDeps = {
@@ -269,9 +274,8 @@ describe("IPC Response Handling Regression Tests", () => {
                 new Error("Critical backend error")
             );
 
-            const { SiteService } = await import(
-                "../../../services/SiteService"
-            );
+            const { SiteService } =
+                await import("../../../services/SiteService");
 
             // The error should propagate and not be silently handled
             let caughtError: Error | null = null;

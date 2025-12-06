@@ -150,6 +150,7 @@ export class IpcService {
         });
 
         registerDiagnosticsHandlers({
+            eventEmitter: this.uptimeOrchestrator,
             registeredHandlers: this.registeredIpcHandlers,
             reportChannel: DIAGNOSTICS_REPORT_CHANNEL,
             verifyChannel: DIAGNOSTICS_VERIFY_CHANNEL,

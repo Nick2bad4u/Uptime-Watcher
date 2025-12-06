@@ -34,9 +34,7 @@
  * @public
  */
 
-import type { ChangeEvent, MouseEvent, ReactNode } from "react";
-import type { IconType } from "react-icons";
-import type { JSX } from "react/jsx-runtime";
+import type { ChangeEvent, MouseEvent, ReactElement } from "react";
 
 import { ensureError } from "@shared/utils/errorHandling";
 import { safeInteger } from "@shared/validation/validatorUtils";
@@ -44,7 +42,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import type { AppSettings } from "../../stores/types";
 
-import { DEFAULT_HISTORY_LIMIT, HISTORY_LIMIT_OPTIONS } from "../../constants";
+import { DEFAULT_HISTORY_LIMIT } from "../../constants";
 import { useConfirmDialog } from "../../hooks/ui/useConfirmDialog";
 import { useDelayedButtonLoading } from "../../hooks/useDelayedButtonLoading";
 import { usePrefersReducedMotion } from "../../hooks/usePrefersReducedMotion";
@@ -52,11 +50,9 @@ import { logger } from "../../services/logger";
 import { useErrorStore } from "../../stores/error/useErrorStore";
 import { useSettingsStore } from "../../stores/settings/useSettingsStore";
 import { useSitesStore } from "../../stores/sites/useSitesStore";
-import { StatusIndicator } from "../../theme/components/StatusIndicator";
 import { ThemedBox } from "../../theme/components/ThemedBox";
 import { ThemedButton } from "../../theme/components/ThemedButton";
 import { ThemedCheckbox } from "../../theme/components/ThemedCheckbox";
-import { ThemedSelect } from "../../theme/components/ThemedSelect";
 import { ThemedSlider } from "../../theme/components/ThemedSlider";
 import { ThemedText } from "../../theme/components/ThemedText";
 import { isThemeName, type ThemeName } from "../../theme/types";
@@ -66,8 +62,13 @@ import { waitForAnimation } from "../../utils/time/waitForAnimation";
 import { playInAppAlertTone } from "../Alerts/alertCoordinator";
 import { ErrorAlert } from "../common/ErrorAlert/ErrorAlert";
 import { GalaxyBackground } from "../common/GalaxyBackground/GalaxyBackground";
-import { Tooltip } from "../common/Tooltip/Tooltip";
-import { SettingItem } from "../shared/SettingItem";
+import {
+    ApplicationSection,
+    type BackupSummary,
+    MaintenanceSection,
+    MonitoringSection,
+    NotificationSection,
+} from "./SettingsSections";
 import "./Settings.css";
 
 type SitesStoreState = ReturnType<typeof useSitesStore.getState>;
@@ -75,10 +76,35 @@ type SitesStoreState = ReturnType<typeof useSitesStore.getState>;
 const selectDownloadSqliteBackup = (
     state: SitesStoreState
 ): SitesStoreState["downloadSqliteBackup"] => state.downloadSqliteBackup;
+const selectRestoreSqliteBackup = (
+    state: SitesStoreState
+): SitesStoreState["restoreSqliteBackup"] => state.restoreSqliteBackup;
 
 const selectFullResyncSites = (
     state: SitesStoreState
 ): SitesStoreState["fullResyncSites"] => state.fullResyncSites;
+
+const selectLastBackupMetadata = (
+    state: SitesStoreState
+): SitesStoreState["lastBackupMetadata"] => state.lastBackupMetadata;
+
+const formatBackupSize = (bytes: number): string => {
+    if (!Number.isFinite(bytes) || bytes < 0) {
+        return `${bytes}`;
+    }
+
+    const units = ["B", "KB", "MB", "GB"] as const;
+    let value = bytes;
+    let unitIndex = 0;
+
+    while (value >= 1024 && unitIndex < units.length - 1) {
+        value /= 1024;
+        unitIndex += 1;
+    }
+
+    const precision = value >= 10 || unitIndex === 0 ? 0 : 1;
+    return `${value.toFixed(precision)} ${units[unitIndex]}`;
+};
 
 /**
  * Allowed settings keys that can be updated
@@ -110,69 +136,6 @@ export interface SettingsProperties {
 }
 
 /**
- * Parameters for {@link renderSettingsSection} helper.
- *
- * @internal
- */
-interface SettingsSectionParameters {
-    readonly children: ReactNode;
-    readonly description?: string;
-    readonly icon: IconType;
-    readonly testId?: string;
-    readonly title: string;
-}
-
-/**
- * Decorative wrapper that renders a titled settings section with iconography.
- *
- * @param props - Section layout configuration
- *
- * @returns Structured section markup for the settings modal body
- */
-function renderSettingsSection({
-    children,
-    description,
-    icon: SectionIcon,
-    testId,
-    title,
-}: SettingsSectionParameters): JSX.Element {
-    return (
-        <section className="settings-section" data-testid={testId}>
-            <div className="settings-section__header">
-                <div className="settings-section__icon">
-                    <SectionIcon size={18} />
-                </div>
-                <div>
-                    <ThemedText
-                        className="settings-section__title"
-                        size="md"
-                        weight="semibold"
-                    >
-                        {title}
-                    </ThemedText>
-                    {description ? (
-                        <ThemedText
-                            className="settings-section__description"
-                            size="xs"
-                            variant="secondary"
-                        >
-                            {description}
-                        </ThemedText>
-                    ) : null}
-                </div>
-            </div>
-            <div className="settings-section__content">{children}</div>
-        </section>
-    );
-}
-
-/*
- * ESLint disable: The Settings component has conflicts between rules:
- * - @arthurgeron/react-usememo/require-usememo wants JSX wrapped in useMemo
- * - react/no-unstable-nested-components forbids components in render
- * These requirements are mutually exclusive for complex forms.
- */
-/**
  * Settings component providing comprehensive application configuration.
  *
  * Actual features available:
@@ -194,11 +157,13 @@ function renderSettingsSection({
 
 export const Settings = ({
     onClose,
-}: Readonly<SettingsProperties>): JSX.Element => {
+}: Readonly<SettingsProperties>): ReactElement => {
     const { clearError, isLoading, lastError, setError } = useErrorStore();
     const { persistHistoryLimit, resetSettings, settings, updateSettings } =
         useSettingsStore();
     const downloadSqliteBackup = useSitesStore(selectDownloadSqliteBackup);
+    const restoreSqliteBackup = useSitesStore(selectRestoreSqliteBackup);
+    const lastBackupMetadata = useSitesStore(selectLastBackupMetadata);
 
     const fullResyncSites = useSitesStore(selectFullResyncSites);
     const requestConfirmation = useConfirmDialog();
@@ -210,6 +175,7 @@ export const Settings = ({
     // Local state for sync success message
     const [syncSuccess, setSyncSuccess] = useState(false);
     const [isClosing, setIsClosing] = useState(false);
+    const restoreFileInputRef = useRef<HTMLInputElement | null>(null);
 
     const {
         autoStart,
@@ -531,11 +497,15 @@ export const Settings = ({
 
     const handleSystemNotificationSoundChange = useCallback(
         (event: ChangeEvent<HTMLInputElement>) => {
+            if (!systemNotificationsEnabled) {
+                return;
+            }
+
             applySettingChanges({
                 systemNotificationsSoundEnabled: event.target.checked,
             });
         },
-        [applySettingChanges]
+        [applySettingChanges, systemNotificationsEnabled]
     );
 
     const handleAutoStartChange = useCallback(
@@ -554,7 +524,7 @@ export const Settings = ({
 
     const handleThemeSelectChange = useCallback(
         (event: ChangeEvent<HTMLSelectElement>) => {
-            const {value} = event.target;
+            const { value } = event.target;
 
             if (!isThemeName(value)) {
                 logger.warn("Unknown theme value selected", { value });
@@ -566,12 +536,31 @@ export const Settings = ({
         [handleThemeChange]
     );
 
-    const sliderDisabled =
-        isLoading || !inAppAlertsEnabled || !inAppAlertsSoundEnabled;
+    const isVolumeControlDisabled =
+        !inAppAlertsEnabled || !inAppAlertsSoundEnabled;
+    const sliderDisabled = isLoading || isVolumeControlDisabled;
     const clampedVolume = Math.min(Math.max(inAppAlertVolume, 0), 1);
     const volumePercent = Math.round(clampedVolume * 100);
     const automaticPreviewSuppressed = prefersReducedMotion;
     const isVolumeSilent = clampedVolume <= 0;
+
+    const backupSummary = useMemo<BackupSummary | null>(() => {
+        if (!lastBackupMetadata) {
+            return null;
+        }
+
+        const formattedDate = new Intl.DateTimeFormat(undefined, {
+            dateStyle: "medium",
+            timeStyle: "short",
+        }).format(new Date(lastBackupMetadata.createdAt));
+
+        return {
+            formattedDate,
+            formattedSize: formatBackupSize(lastBackupMetadata.sizeBytes),
+            retentionHintDays: lastBackupMetadata.retentionHintDays,
+            schemaVersion: lastBackupMetadata.schemaVersion,
+        };
+    }, [lastBackupMetadata]);
 
     const inAppAlertsControl = useMemo(
         () => (
@@ -683,6 +672,26 @@ export const Settings = ({
         ]
     );
 
+    const notificationSectionProps = useMemo(
+        () => ({
+            icon: AppIcons.ui.bell,
+            inAppAlertsControl,
+            inAppAlertSoundControl,
+            inAppAlertVolumeControl,
+            isVolumeControlDisabled,
+            systemNotificationsControl,
+            systemNotificationSoundControl,
+        }),
+        [
+            inAppAlertsControl,
+            inAppAlertSoundControl,
+            inAppAlertVolumeControl,
+            isVolumeControlDisabled,
+            systemNotificationsControl,
+            systemNotificationSoundControl,
+        ]
+    );
+
     const autoStartControl = useMemo(
         () => (
             <ThemedCheckbox
@@ -733,8 +742,12 @@ export const Settings = ({
     const handleDownloadSQLite = useCallback(async () => {
         clearError();
         try {
-            await downloadSqliteBackup();
-            logger.user.action("Downloaded SQLite backup");
+            const backup = await downloadSqliteBackup();
+            logger.user.action("Downloaded SQLite backup", {
+                checksum: backup.metadata.checksum,
+                schemaVersion: backup.metadata.schemaVersion,
+                sizeBytes: backup.metadata.sizeBytes,
+            });
         } catch (error: unknown) {
             logger.error(
                 "Failed to download SQLite backup",
@@ -749,6 +762,63 @@ export const Settings = ({
             );
         }
     }, [clearError, downloadSqliteBackup, setError]);
+
+    const handleRestoreSQLite = useCallback(
+        async (file: File) => {
+            clearError();
+            try {
+                const payload = {
+                    buffer: await file.arrayBuffer(),
+                    fileName: file.name,
+                };
+                const restoreSummary = await restoreSqliteBackup(payload);
+                setSyncSuccess(true);
+                logger.user.action("Restored SQLite backup", {
+                    checksum: restoreSummary.metadata.checksum,
+                    schemaVersion: restoreSummary.metadata.schemaVersion,
+                    sizeBytes: restoreSummary.metadata.sizeBytes,
+                });
+            } catch (error: unknown) {
+                logger.error(
+                    "Failed to restore SQLite backup",
+                    ensureError(error)
+                );
+                setError(
+                    `Failed to restore SQLite backup: ${
+                        error && typeof error === "object" && "message" in error
+                            ? (error as { message?: string }).message
+                            : String(error)
+                    }`
+                );
+            }
+        },
+        [clearError, restoreSqliteBackup, setError]
+    );
+
+    const handleRestoreFileChange = useCallback(
+        async (event: ChangeEvent<HTMLInputElement>) => {
+            const input = event.currentTarget;
+            const [file] = Array.from(input.files ?? []);
+            if (!file) {
+                return;
+            }
+
+            try {
+                await handleRestoreSQLite(file);
+            } finally {
+                // Reset the input so the same file can be selected again
+                input.value = "";
+            }
+        },
+        [handleRestoreSQLite]
+    );
+
+    const handleRestoreInputChange = useCallback(
+        (event: ChangeEvent<HTMLInputElement>) => {
+            void handleRestoreFileChange(event);
+        },
+        [handleRestoreFileChange]
+    );
     /* eslint-enable @typescript-eslint/no-unsafe-type-assertion -- Re-enable after safe file system operations */
 
     // Click handlers for buttons
@@ -769,6 +839,10 @@ export const Settings = ({
     const handleDownloadSQLiteClick = useCallback(() => {
         void handleDownloadSQLite();
     }, [handleDownloadSQLite]);
+
+    const handleRestoreSQLiteClick = useCallback(() => {
+        restoreFileInputRef.current?.click();
+    }, []);
 
     const handleResetClick = useCallback(() => {
         void handleReset();
@@ -791,14 +865,16 @@ export const Settings = ({
     const SettingsHeaderIcon = AppIcons.settings.gearFilled;
     const SuccessIcon = AppIcons.status.upFilled;
     const MonitoringIcon = AppIcons.metrics.monitor;
-    const NotificationsIcon = AppIcons.ui.bell;
     const ApplicationIcon = AppIcons.ui.home;
     const MaintenanceIcon = AppIcons.ui.database;
     const DownloadIcon = AppIcons.actions.download;
+    const UploadIcon = AppIcons.actions.upload;
     const RefreshIcon = AppIcons.actions.refresh;
     const ResetIcon = AppIcons.actions.remove;
     // prettier-ignore
     const downloadButtonIcon = useMemo(() => <DownloadIcon size={16} />, [DownloadIcon]);
+    // prettier-ignore
+    const uploadButtonIcon = useMemo(() => <UploadIcon size={16} />, [UploadIcon]);
     // prettier-ignore
     const refreshButtonIcon = useMemo(() => <RefreshIcon size={16} />, [RefreshIcon]);
     // prettier-ignore
@@ -906,218 +982,43 @@ export const Settings = ({
                     ) : null}
 
                     <div className="settings-modal__sections">
-                        {renderSettingsSection({
-                            children: (
-                                <div className="settings-field">
-                                    <ThemedText
-                                        className="settings-field__label"
-                                        size="sm"
-                                        variant="secondary"
-                                        weight="medium"
-                                    >
-                                        History Limit
-                                    </ThemedText>
-                                    <ThemedSelect
-                                        aria-label="Maximum number of history records to keep per site"
-                                        disabled={isLoading}
-                                        onChange={
-                                            handleHistoryLimitSelectChange
-                                        }
-                                        value={currentHistoryLimit}
-                                    >
-                                        {HISTORY_LIMIT_OPTIONS.map((option) => (
-                                            <option
-                                                key={option.value}
-                                                value={option.value}
-                                            >
-                                                {option.label}
-                                            </option>
-                                        ))}
-                                    </ThemedSelect>
-                                    <ThemedText
-                                        className="settings-field__helper"
-                                        size="xs"
-                                        variant="tertiary"
-                                    >
-                                        Limits the number of response records
-                                        stored for each monitor.
-                                    </ThemedText>
-                                </div>
-                            ),
-                            description:
-                                "Control how much monitoring history is retained.",
-                            icon: MonitoringIcon,
-                            testId: "settings-section-monitoring",
-                            title: "Monitoring",
-                        })}
+                        <MonitoringSection
+                            currentHistoryLimit={currentHistoryLimit}
+                            icon={MonitoringIcon}
+                            isLoading={isLoading}
+                            onHistoryLimitChange={
+                                handleHistoryLimitSelectChange
+                            }
+                        />
 
-                        {renderSettingsSection({
-                            children: (
-                                <div className="settings-toggle-stack">
-                                    <SettingItem
-                                        control={inAppAlertsControl}
-                                        description="Show toast notifications within the app when monitors change state."
-                                        title="In-app alerts"
-                                    />
-                                    <SettingItem
-                                        control={inAppAlertSoundControl}
-                                        description="Play a sound when in-app alerts are displayed."
-                                        title="In-app alert sound"
-                                    />
-                                    <SettingItem
-                                        control={inAppAlertVolumeControl}
-                                        description="Fine-tune how loud the in-app alert tone plays."
-                                        disabled={
-                                            !inAppAlertsEnabled ||
-                                            !inAppAlertsSoundEnabled
-                                        }
-                                        title="In-app alert volume"
-                                    />
-                                    <SettingItem
-                                        control={systemNotificationsControl}
-                                        description="Trigger operating system notifications for status changes."
-                                        title="System notifications"
-                                    />
-                                    <SettingItem
-                                        control={systemNotificationSoundControl}
-                                        description="Play a sound when system notifications are shown."
-                                        title="System notification sound"
-                                    />
-                                </div>
-                            ),
-                            description:
-                                "Choose how Uptime Watcher keeps you informed.",
-                            icon: NotificationsIcon,
-                            testId: "settings-section-notifications",
-                            title: "Notifications",
-                        })}
+                        <NotificationSection {...notificationSectionProps} />
 
-                        {renderSettingsSection({
-                            children: (
-                                <>
-                                    <div className="settings-field">
-                                        <ThemedText
-                                            className="settings-field__label"
-                                            size="sm"
-                                            variant="secondary"
-                                            weight="medium"
-                                        >
-                                            Theme
-                                        </ThemedText>
-                                        <ThemedSelect
-                                            aria-label="Select application theme"
-                                            disabled={isLoading}
-                                            onChange={handleThemeSelectChange}
-                                            value={currentThemeName}
-                                        >
-                                            {availableThemes.map((theme) => (
-                                                <option
-                                                    key={theme}
-                                                    value={theme}
-                                                >
-                                                    {theme
-                                                        .charAt(0)
-                                                        .toUpperCase() +
-                                                        theme.slice(1)}
-                                                </option>
-                                            ))}
-                                        </ThemedSelect>
-                                        <div className="settings-theme-preview">
-                                            <ThemedText
-                                                size="xs"
-                                                variant="tertiary"
-                                            >
-                                                Preview:
-                                            </ThemedText>
-                                            <StatusIndicator
-                                                size="sm"
-                                                status="up"
-                                            />
-                                            <StatusIndicator
-                                                size="sm"
-                                                status="down"
-                                            />
-                                            <StatusIndicator
-                                                size="sm"
-                                                status="pending"
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="settings-toggle-stack">
-                                        <SettingItem
-                                            control={autoStartControl}
-                                            description="Launch Uptime Watcher when you sign in to your computer (requires restart)."
-                                            title="Start at login"
-                                        />
-                                        <SettingItem
-                                            control={minimizeToTrayControl}
-                                            description="Keep the app running in the background without cluttering the taskbar."
-                                            title="Minimize to tray"
-                                        />
-                                    </div>
-                                </>
-                            ),
-                            description: "Personalize the desktop experience.",
-                            icon: ApplicationIcon,
-                            testId: "settings-section-application",
-                            title: "Application",
-                        })}
+                        <ApplicationSection
+                            autoStartControl={autoStartControl}
+                            availableThemes={availableThemes}
+                            currentThemeName={currentThemeName}
+                            icon={ApplicationIcon}
+                            isLoading={isLoading}
+                            minimizeToTrayControl={minimizeToTrayControl}
+                            onThemeChange={handleThemeSelectChange}
+                        />
 
-                        {renderSettingsSection({
-                            children: (
-                                <div className="settings-actions">
-                                    <ThemedButton
-                                        className="settings-actions__primary"
-                                        data-testid="settings-export-data"
-                                        disabled={isLoading}
-                                        icon={downloadButtonIcon}
-                                        loading={showButtonLoading}
-                                        onClick={handleDownloadSQLiteClick}
-                                        size="sm"
-                                        variant="primary"
-                                    >
-                                        Export monitoring data
-                                    </ThemedButton>
-                                    <Tooltip content="Refreshes monitoring history from the database">
-                                        {(triggerProps) => (
-                                            <ThemedButton
-                                                {...triggerProps}
-                                                data-testid="settings-refresh-history"
-                                                disabled={isLoading}
-                                                icon={refreshButtonIcon}
-                                                loading={showButtonLoading}
-                                                onClick={handleSyncNowClick}
-                                                size="sm"
-                                                variant="secondary"
-                                            >
-                                                Refresh history
-                                            </ThemedButton>
-                                        )}
-                                    </Tooltip>
-                                    <Tooltip content="Clear all monitoring data and reset settings">
-                                        {(triggerProps) => (
-                                            <ThemedButton
-                                                {...triggerProps}
-                                                data-testid="settings-reset-all"
-                                                disabled={isLoading}
-                                                icon={resetButtonIcon}
-                                                loading={showButtonLoading}
-                                                onClick={handleResetClick}
-                                                size="sm"
-                                                variant="error"
-                                            >
-                                                Reset everything
-                                            </ThemedButton>
-                                        )}
-                                    </Tooltip>
-                                </div>
-                            ),
-                            description:
-                                "Manage data exports and advanced utilities.",
-                            icon: MaintenanceIcon,
-                            testId: "settings-section-data",
-                            title: "Data & Maintenance",
-                        })}
+                        <MaintenanceSection
+                            backupSummary={backupSummary}
+                            downloadButtonIcon={downloadButtonIcon}
+                            icon={MaintenanceIcon}
+                            isLoading={isLoading}
+                            onDownloadBackup={handleDownloadSQLiteClick}
+                            onRefreshHistory={handleSyncNowClick}
+                            onResetData={handleResetClick}
+                            onRestoreClick={handleRestoreSQLiteClick}
+                            onRestoreFileChange={handleRestoreInputChange}
+                            refreshButtonIcon={refreshButtonIcon}
+                            resetButtonIcon={resetButtonIcon}
+                            restoreFileInputRef={restoreFileInputRef}
+                            showButtonLoading={showButtonLoading}
+                            uploadButtonIcon={uploadButtonIcon}
+                        />
                     </div>
 
                     <footer className="settings-modal__footer">

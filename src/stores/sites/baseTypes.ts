@@ -6,6 +6,11 @@
  */
 
 import type { Monitor, Site, StatusUpdate } from "@shared/types";
+import type {
+    SerializedDatabaseBackupResult,
+    SerializedDatabaseRestorePayload,
+    SerializedDatabaseRestoreResult,
+} from "@shared/types/ipc";
 import type { StateSyncStatusSummary } from "@shared/types/stateSync";
 
 /**
@@ -72,12 +77,16 @@ export interface BaseSiteOperations {
     /** Delete a site */
     deleteSite: (identifier: string) => Promise<void>;
     /** Download SQLite backup */
-    downloadSqliteBackup: () => Promise<void>;
+    downloadSqliteBackup: () => Promise<SerializedDatabaseBackupResult>;
     /** Remove a monitor from a site */
     removeMonitorFromSite: (
         siteIdentifier: string,
         monitorId: string
     ) => Promise<void>;
+    /** Restore SQLite backup */
+    restoreSqliteBackup: (
+        payload: SerializedDatabaseRestorePayload
+    ) => Promise<SerializedDatabaseRestoreResult>;
     /** Update monitor retry attempts */
     updateMonitorRetryAttempts: (
         siteIdentifier: string,

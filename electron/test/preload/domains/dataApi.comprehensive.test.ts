@@ -12,7 +12,10 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { IpcResponse } from "../../../preload/core/bridgeFactory";
 import { dataApi } from "../../../preload/domains/dataApi";
 import { DATA_CHANNELS } from "@shared/types/preload";
-import type { SerializedDatabaseBackupResult } from "@shared/types/ipc";
+import type {
+    SerializedDatabaseBackupResult,
+    SerializedDatabaseRestoreResult,
+} from "@shared/types/ipc";
 
 const ipcRenderer = vi.hoisted(() => ({
     invoke: vi.fn(),
@@ -28,15 +31,36 @@ const createBackup = (
     buffer: overrides.buffer ?? new ArrayBuffer(512),
     fileName: overrides.fileName ?? "uptime-watcher-backup.sqlite",
     metadata: {
+        appVersion: overrides.metadata?.appVersion ?? "0.0.0-test",
+        checksum: overrides.metadata?.checksum ?? "mock-checksum",
         createdAt: overrides.metadata?.createdAt ?? Date.now(),
         originalPath:
             overrides.metadata?.originalPath ??
             "C:/backups/uptime-watcher/uptime-watcher.sqlite",
+        retentionHintDays: overrides.metadata?.retentionHintDays ?? 30,
+        schemaVersion: overrides.metadata?.schemaVersion ?? 1,
         sizeBytes:
             overrides.metadata?.sizeBytes ??
             overrides.buffer?.byteLength ??
             512,
     },
+});
+
+const createRestoreSummary = (
+    overrides: Partial<SerializedDatabaseRestoreResult> = {}
+): SerializedDatabaseRestoreResult => ({
+    metadata: {
+        appVersion: overrides.metadata?.appVersion ?? "0.0.0-test",
+        checksum: overrides.metadata?.checksum ?? "restore-checksum",
+        createdAt: overrides.metadata?.createdAt ?? Date.now(),
+        originalPath: overrides.metadata?.originalPath ?? "restore.sqlite",
+        retentionHintDays: overrides.metadata?.retentionHintDays ?? 30,
+        schemaVersion: overrides.metadata?.schemaVersion ?? 1,
+        sizeBytes: overrides.metadata?.sizeBytes ?? 1024,
+    },
+    preRestoreFileName:
+        overrides.preRestoreFileName ?? "uptime-watcher-pre-restore.sqlite",
+    restoredAt: overrides.restoredAt ?? Date.now(),
 });
 
 describe("dataApi", () => {
@@ -50,6 +74,7 @@ describe("dataApi", () => {
                 "downloadSqliteBackup",
                 "exportData",
                 "importData",
+                "restoreSqliteBackup",
             ].toSorted()
         );
     });
@@ -142,6 +167,46 @@ describe("dataApi", () => {
             await expect(dataApi.importData("{}")).rejects.toThrowError(
                 "invalid export signature"
             );
+        });
+    });
+
+    describe("restoreSqliteBackup", () => {
+        it("sends the payload to the restore IPC channel", async () => {
+            const summary = createRestoreSummary();
+            const response: IpcResponse<SerializedDatabaseRestoreResult> = {
+                success: true,
+                data: summary,
+            };
+            ipcRenderer.invoke.mockResolvedValueOnce(response);
+
+            const result = await dataApi.restoreSqliteBackup({
+                buffer: new ArrayBuffer(64),
+                fileName: "restore.sqlite",
+            });
+
+            expect(ipcRenderer.invoke).toHaveBeenCalledWith(
+                DATA_CHANNELS.restoreSqliteBackup,
+                {
+                    buffer: expect.any(ArrayBuffer),
+                    fileName: "restore.sqlite",
+                }
+            );
+            expect(result).toStrictEqual(summary);
+        });
+
+        it("throws if restore fails", async () => {
+            const response: IpcResponse<SerializedDatabaseRestoreResult> = {
+                success: false,
+                error: "restore-failed",
+            };
+            ipcRenderer.invoke.mockResolvedValueOnce(response);
+
+            await expect(
+                dataApi.restoreSqliteBackup({
+                    buffer: new ArrayBuffer(10),
+                    fileName: "restore.db",
+                })
+            ).rejects.toThrowError("restore-failed");
         });
     });
 });

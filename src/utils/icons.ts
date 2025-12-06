@@ -33,6 +33,7 @@ import {
     FiList,
     FiRefreshCw,
     FiTrash2,
+    FiUpload,
     FiX,
 } from "react-icons/fi";
 import {
@@ -88,6 +89,7 @@ export const AppIcons: {
         readonly refresh: IconType;
         readonly refreshAlt: IconType;
         readonly remove: IconType;
+        readonly upload: IconType;
     };
     readonly layout: {
         readonly cards: IconType;
@@ -157,6 +159,7 @@ export const AppIcons: {
         refresh: FiRefreshCw,
         refreshAlt: TbRefresh,
         remove: FiTrash2,
+        upload: FiUpload,
     },
 
     /** Layout and view icons */

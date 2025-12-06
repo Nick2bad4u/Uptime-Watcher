@@ -10,7 +10,11 @@
  * @packageDocumentation
  */
 
-import type { SerializedDatabaseBackupResult } from "@shared/types/ipc";
+import type {
+    SerializedDatabaseBackupResult,
+    SerializedDatabaseRestorePayload,
+    SerializedDatabaseRestoreResult,
+} from "@shared/types/ipc";
 
 import { ensureError } from "@shared/utils/errorHandling";
 
@@ -21,6 +25,9 @@ interface DataServiceContract {
     readonly exportData: () => Promise<string>;
     readonly importData: (data: string) => Promise<boolean>;
     readonly initialize: () => Promise<void>;
+    readonly restoreSqliteBackup: (
+        payload: SerializedDatabaseRestorePayload
+    ) => Promise<SerializedDatabaseRestoreResult>;
 }
 
 const { ensureInitialized, wrap } = ((): ReturnType<
@@ -35,6 +42,7 @@ const { ensureInitialized, wrap } = ((): ReturnType<
                         "downloadSqliteBackup",
                         "exportData",
                         "importData",
+                        "restoreSqliteBackup",
                     ],
                 },
             ],
@@ -133,4 +141,16 @@ export const DataService: DataServiceContract = {
      * @throws If the electron API is not available.
      */
     initialize: ensureInitialized,
+
+    /**
+     * Restores the SQLite database from an uploaded backup payload.
+     */
+    restoreSqliteBackup: wrap(
+        "restoreSqliteBackup",
+        async (
+            api,
+            payload: SerializedDatabaseRestorePayload
+        ): Promise<SerializedDatabaseRestoreResult> =>
+            api.data.restoreSqliteBackup(payload)
+    ),
 };

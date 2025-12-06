@@ -47,11 +47,15 @@ Provide a safe, repeatable pattern for diagnostics/report IPC handlers (e.g., `d
 4. **Preload Bridge**
    - Expose typed API with request/response types; ensure payload validation before forwarding to main.
 
-5. **Logging & Telemetry**
-   - Log diagnostics handling with `correlationId`, `channel`, and outcome.
+5. **Correlation & Payload Limits**
+   - Every `ipcRenderer.invoke` automatically sends a correlation envelope; `registerStandardizedIpcHandler` extracts it, so avoid baking correlation IDs into payload schemas.
+   - Enforce `MAX_DIAGNOSTICS_METADATA_BYTES` and `MAX_DIAGNOSTICS_PAYLOAD_PREVIEW_BYTES` before logging or returning payload previews. Flag truncation in the response/logs.
+
+6. **Logging & Telemetry**
+   - Log diagnostics handling with `correlationId`, `channel`, and outcome via `withLogContext` to avoid leaking PII.
    - Emit `diagnostics:report-created` (or similar) for observability where appropriate.
 
-6. **Testing**
+7. **Testing**
    - Unit tests: schema validation, redaction, oversize rejection, typed success response.
    - Integration tests: preload-to-main round trip with valid/invalid payloads.
 
@@ -93,5 +97,6 @@ contextBridge.exposeInMainWorld("electronAPI", {
 - [ ] Zod schema with size limits
 - [ ] Redaction of secrets/PII
 - [ ] Typed request/response wiring in preload
-- [ ] Structured logging with correlationId
+- [ ] Structured logging with correlationId (via auto envelope)
+- [ ] Metadata/payload previews respect byte limits and surface truncation flags
 - [ ] Tests for invalid, oversize, and success paths

@@ -81,14 +81,16 @@ export class SiteLoadingError extends Error {
      * Create a new SiteLoadingError.
      *
      * @param message - Descriptive error message
-     * @param cause - Optional underlying error that caused this failure
+     * @param options - Optional error options with causal metadata
      */
-    public constructor(message: string, cause?: Error) {
-        super(`Failed to load sites: ${message}`);
+    public constructor(message: string, options?: ErrorOptions) {
+        super(`Failed to load sites: ${message}`, options);
         this.name = "SiteLoadingError";
-        if (cause?.stack) {
+        const causeStack =
+            options?.cause instanceof Error ? options.cause.stack : undefined;
+        if (causeStack && this.stack) {
             // Preserve both stack traces for better debugging
-            this.stack = `${this.stack}\nCaused by: ${cause.stack}`;
+            this.stack = `${this.stack}\nCaused by: ${causeStack}`;
         }
     }
 }

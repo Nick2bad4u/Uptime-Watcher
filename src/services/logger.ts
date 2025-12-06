@@ -28,6 +28,7 @@ import {
     buildErrorLogArguments,
     buildLogArguments,
 } from "@shared/utils/logger/common";
+import { extractLogContext } from "@shared/utils/loggingContext";
 import log from "electron-log/renderer";
 
 /**
@@ -139,38 +140,82 @@ const safeInvoke = (
 const baseLoggerMethods = {
     // Debug level - for development debugging
     debug: (message: string, ...args: unknown[]): void => {
-        const logArgs = buildLogArguments(RENDERER_LOG_PREFIX, message, args);
-        safeInvoke(log.debug.bind(log), logArgs);
+        const { context, remaining } = extractLogContext(args, "debug");
+        const logArgs = buildLogArguments(
+            RENDERER_LOG_PREFIX,
+            message,
+            remaining
+        );
+        const finalArgs = context
+            ? [logArgs[0], context, ...logArgs.slice(1)]
+            : Array.from(logArgs);
+        safeInvoke(log.debug.bind(log), finalArgs);
     },
     // Error level - errors that should be investigated
     error: (message: string, error?: unknown, ...args: unknown[]): void => {
+        const { context, remaining } = extractLogContext(args, "error");
         const logArgs = buildErrorLogArguments(
             RENDERER_LOG_PREFIX,
             message,
             error,
-            args
+            remaining
         );
-        safeInvoke(log.error.bind(log), logArgs);
+        const finalArgs = context
+            ? [logArgs[0], context, ...logArgs.slice(1)]
+            : Array.from(logArgs);
+        safeInvoke(log.error.bind(log), finalArgs);
     },
     // Info level - general application flow
     info: (message: string, ...args: unknown[]): void => {
-        const logArgs = buildLogArguments(RENDERER_LOG_PREFIX, message, args);
-        safeInvoke(log.info.bind(log), logArgs);
+        const { context, remaining } = extractLogContext(args, "info");
+        const logArgs = buildLogArguments(
+            RENDERER_LOG_PREFIX,
+            message,
+            remaining
+        );
+        const finalArgs = context
+            ? [logArgs[0], context, ...logArgs.slice(1)]
+            : Array.from(logArgs);
+        safeInvoke(log.info.bind(log), finalArgs);
     },
     // Silly level - extremely detailed debugging
     silly: (message: string, ...args: unknown[]): void => {
-        const logArgs = buildLogArguments(RENDERER_LOG_PREFIX, message, args);
-        safeInvoke(log.silly.bind(log), logArgs);
+        const { context, remaining } = extractLogContext(args, "debug");
+        const logArgs = buildLogArguments(
+            RENDERER_LOG_PREFIX,
+            message,
+            remaining
+        );
+        const finalArgs = context
+            ? [logArgs[0], context, ...logArgs.slice(1)]
+            : Array.from(logArgs);
+        safeInvoke(log.silly.bind(log), finalArgs);
     },
     // Verbose level - very detailed debugging
     verbose: (message: string, ...args: unknown[]): void => {
-        const logArgs = buildLogArguments(RENDERER_LOG_PREFIX, message, args);
-        safeInvoke(log.verbose.bind(log), logArgs);
+        const { context, remaining } = extractLogContext(args, "debug");
+        const logArgs = buildLogArguments(
+            RENDERER_LOG_PREFIX,
+            message,
+            remaining
+        );
+        const finalArgs = context
+            ? [logArgs[0], context, ...logArgs.slice(1)]
+            : Array.from(logArgs);
+        safeInvoke(log.verbose.bind(log), finalArgs);
     },
     // Warn level - potential issues needing attention
     warn: (message: string, ...args: unknown[]): void => {
-        const logArgs = buildLogArguments(RENDERER_LOG_PREFIX, message, args);
-        safeInvoke(log.warn.bind(log), logArgs);
+        const { context, remaining } = extractLogContext(args, "warn");
+        const logArgs = buildLogArguments(
+            RENDERER_LOG_PREFIX,
+            message,
+            remaining
+        );
+        const finalArgs = context
+            ? [logArgs[0], context, ...logArgs.slice(1)]
+            : Array.from(logArgs);
+        safeInvoke(log.warn.bind(log), finalArgs);
     },
 };
 

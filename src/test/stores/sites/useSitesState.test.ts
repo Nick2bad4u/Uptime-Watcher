@@ -41,6 +41,7 @@ describe("useSitesState", () => {
     let mockSite: Site;
     const cloneSite = (site: Site): Site => structuredClone(site);
     const createState = (overrides: Partial<SitesState> = {}): SitesState => ({
+        lastBackupMetadata: undefined,
         lastSyncDelta: undefined,
         optimisticMonitoringLocks: {},
         selectedMonitorIds: {},
@@ -119,6 +120,7 @@ describe("useSitesState", () => {
             );
 
             expect(initialSitesState).toEqual({
+                lastBackupMetadata: undefined,
                 lastSyncDelta: undefined,
                 optimisticMonitoringLocks: {},
                 selectedMonitorIds: {},
@@ -473,6 +475,7 @@ describe("useSitesState", () => {
                     selectedMonitorIds: {},
                     selectedSiteIdentifier: undefined,
                     sites: [],
+                    lastBackupMetadata: undefined,
                     statusSubscriptionSummary: undefined,
                 });
 

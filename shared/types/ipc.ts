@@ -15,6 +15,7 @@ import type {
     Site,
     StatusUpdate,
 } from "@shared/types";
+import type { CorrelationId } from "@shared/types/events";
 import type { MonitorTypeConfig } from "@shared/types/monitorTypes";
 import type { NotificationPreferenceUpdate } from "@shared/types/notifications";
 import type {
@@ -23,6 +24,8 @@ import type {
 } from "@shared/types/stateSync";
 import type { ValidationResult } from "@shared/types/validation";
 import type { ExclusifyUnion, Simplify, UnknownRecord } from "type-fest";
+
+import { isRecord } from "@shared/utils/typeHelpers";
 
 /**
  * Standardized IPC response envelope shared across renderer, preload, and main.
@@ -39,6 +42,36 @@ export interface IpcResponse<T = unknown> {
     /** Optional non-fatal warnings emitted alongside the result. */
     warnings?: readonly string[];
 }
+
+const IPC_CONTEXT_FLAG = "__uptimeWatcherIpcContext" as const;
+
+/**
+ * Metadata envelope appended to IPC invocations for tracing.
+ */
+export interface IpcCorrelationEnvelope {
+    readonly correlationId: CorrelationId;
+    readonly [IPC_CONTEXT_FLAG]: true;
+}
+
+export const createIpcCorrelationEnvelope = (
+    correlationId: CorrelationId
+): IpcCorrelationEnvelope => ({
+    correlationId,
+    [IPC_CONTEXT_FLAG]: true,
+});
+
+export const isIpcCorrelationEnvelope = (
+    value: unknown
+): value is IpcCorrelationEnvelope => {
+    if (!isRecord(value)) {
+        return false;
+    }
+
+    return (
+        value[IPC_CONTEXT_FLAG] === true &&
+        typeof value["correlationId"] === "string"
+    );
+};
 
 /**
  * Specialized response contract for validation handlers.
@@ -60,20 +93,41 @@ export interface IpcValidationResponse extends IpcResponse<ValidationResult> {
  *
  * @public
  */
+export interface SerializedDatabaseBackupMetadata {
+    appVersion: string;
+    checksum: string;
+    createdAt: number;
+    originalPath: string;
+    retentionHintDays: number;
+    schemaVersion: number;
+    sizeBytes: number;
+}
+
+/**
+ * Renderer-safe structure representing a completed database backup.
+ */
 export interface SerializedDatabaseBackupResult {
-    /** Array buffer containing the SQLite database backup payload. */
     buffer: ArrayBuffer;
-    /** Generated filename for the backup artifact. */
     fileName: string;
-    /** Metadata describing the backup operation. */
-    metadata?: {
-        /** Backup creation timestamp in milliseconds since the Unix epoch. */
-        createdAt: number;
-        /** Original database file path on disk. */
-        originalPath: string;
-        /** Size of the backup in bytes. */
-        sizeBytes: number;
-    };
+    metadata: SerializedDatabaseBackupMetadata;
+}
+
+/**
+ * Payload supplied by renderer processes when restoring SQLite backups.
+ */
+export interface SerializedDatabaseRestorePayload {
+    buffer: ArrayBuffer;
+    fileName?: string;
+}
+
+/**
+ * Result metadata returned to the renderer after a successful restore.
+ */
+export interface SerializedDatabaseRestoreResult {
+    metadata: SerializedDatabaseBackupMetadata;
+    /** Optional filename of the safety snapshot captured before restore */
+    preRestoreFileName?: string;
+    restoredAt: number;
 }
 
 /**
@@ -245,6 +299,10 @@ export interface IpcInvokeChannelMap {
     "reset-settings": {
         params: readonly [];
         result: undefined;
+    };
+    "restore-sqlite-backup": {
+        params: readonly [payload: SerializedDatabaseRestorePayload];
+        result: SerializedDatabaseRestoreResult;
     };
     "start-monitoring": {
         params: readonly [];

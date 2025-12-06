@@ -6,6 +6,7 @@
  */
 
 import type { Monitor, Site } from "@shared/types";
+import type { SerializedDatabaseBackupMetadata } from "@shared/types/ipc";
 import type { SiteSyncDelta } from "@shared/types/stateSync";
 import type { Simplify } from "type-fest";
 
@@ -81,6 +82,8 @@ const collectSelectedMonitorEntries = (
  * @public
  */
 export interface SitesState {
+    /** Latest database backup metadata for UI display and diagnostics. */
+    lastBackupMetadata: SerializedDatabaseBackupMetadata | undefined;
     /** Most recent synchronization delta captured from state sync events. */
     lastSyncDelta: SiteSyncDelta | undefined;
     /**
@@ -139,6 +142,10 @@ export interface SitesStateActions {
     removeSite: (identifier: Site["identifier"]) => void;
     /** Select a site for focused operations and UI display */
     selectSite: (site: Site | undefined) => void;
+    /** Persist latest backup metadata for future display. */
+    setLastBackupMetadata: (
+        metadata: SerializedDatabaseBackupMetadata | undefined
+    ) => void;
     /** Set selected monitor ID for a site */
     setSelectedMonitorId: (
         siteIdentifier: Site["identifier"],
@@ -345,6 +352,16 @@ export const createSitesStateActions = (
                 selectedSiteIdentifier: site ? site.identifier : undefined,
             }));
         },
+        setLastBackupMetadata: (
+            metadata: SerializedDatabaseBackupMetadata | undefined
+        ): void => {
+            logStoreAction("SitesStore", "setLastBackupMetadata", {
+                checksum: metadata?.checksum,
+                schemaVersion: metadata?.schemaVersion,
+                sizeBytes: metadata?.sizeBytes,
+            });
+            set(() => ({ lastBackupMetadata: metadata }));
+        },
         setSelectedMonitorId: (
             siteIdentifier: Site["identifier"],
             monitorId: Monitor["id"]
@@ -518,6 +535,7 @@ export const createSitesStateActions = (
  * @public
  */
 export const initialSitesState: SitesState = {
+    lastBackupMetadata: undefined,
     lastSyncDelta: undefined,
     optimisticMonitoringLocks: {},
     selectedMonitorIds: {},

@@ -390,7 +390,7 @@ export class DataImportExportService {
             }
         );
 
-        throw new SiteLoadingError(message, normalizedError);
+        throw new SiteLoadingError(message, { cause: normalizedError });
     }
 
     /**

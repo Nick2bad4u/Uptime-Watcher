@@ -1,143 +1,189 @@
-import { LOG_TEMPLATES } from "@shared/utils/logTemplates";
-/**
- * Utilities for creating SQLite database backups.
- *
- * @remarks
- * Provides functionality to create backup copies of the SQLite database for
- * export, download, or archival purposes. Uses Node.js file system APIs for
- * reliable and efficient database backup operations.
- *
- * @public
- */
+import { ensureError } from "@shared/utils/errorHandling";
+import { app } from "electron";
+import { createHash } from "node:crypto";
 import { promises as fs } from "node:fs";
 
 import { BACKUP_DB_FILE_NAME } from "../../../constants";
 import { logger } from "../../../utils/logger";
+import { DATABASE_SCHEMA_VERSION } from "./databaseSchema";
+
+export const DEFAULT_BACKUP_RETENTION_HINT_DAYS: number = 30;
+export const DEFAULT_MAX_BACKUP_SIZE_BYTES: number = 50 * 1024 * 1024;
 
 /**
- * Result interface for database backup operations.
- *
- * @remarks
- * Provides a structured return type for backup operations with comprehensive
- * metadata for tracking and validation. Used as the return value for
- * {@link createDatabaseBackup}.
- *
- * @public
+ * Metadata describing a serialized SQLite backup artifact.
  */
-export interface DatabaseBackupResult {
-    /**
-     * Binary buffer containing the complete SQLite database.
-     *
-     * @remarks
-     * The raw contents of the SQLite database file as a Node.js Buffer.
-     */
-    buffer: Buffer;
-    /**
-     * Standardized filename for the backup file.
-     *
-     * @remarks
-     * The filename used for the backup file, typically
-     * "uptime-watcher-backup.sqlite".
-     */
-    fileName: string;
-    /**
-     * Metadata about the backup operation.
-     *
-     * @remarks
-     * Contains details about the backup creation, including timestamp, original
-     * path, and file size.
-     */
-    metadata: {
-        /**
-         * Backup creation timestamp.
-         *
-         * @remarks
-         * The Unix timestamp (in milliseconds) when the backup was created.
-         */
-        createdAt: number;
-        /**
-         * Original database file path.
-         *
-         * @remarks
-         * The absolute path to the original SQLite database file that was
-         * backed up.
-         */
-        originalPath: string;
-        /**
-         * Database file size in bytes.
-         *
-         * @remarks
-         * The size of the database file in bytes at the time of backup.
-         */
-        sizeBytes: number;
-    };
+export interface DatabaseBackupMetadata {
+    appVersion: string;
+    checksum: string;
+    createdAt: number;
+    originalPath: string;
+    retentionHintDays: number;
+    schemaVersion: number;
+    sizeBytes: number;
 }
 
 /**
- * Creates a backup of the SQLite database by reading the file into a buffer.
- *
- * @remarks
- * Reads the entire SQLite database file into memory as a Buffer and returns a
- * structured result with buffer data, filename, and comprehensive metadata.
- * Uses dynamic import of `fs/promises` to minimize startup overhead. Enhanced
- * error handling for import failures and file operations. Loads the entire
- * database into memory (suitable for typical database sizes). For very large
- * databases, consider streaming approaches.
- *
- * @example
- *
- * ```typescript
- * const backup = await createDatabaseBackup("/path/to/database.sqlite");
- * // backup.buffer contains the database data
- * // backup.fileName contains "uptime-watcher-backup.sqlite"
- * // backup.metadata contains operation details
- * ```
- *
- * @param dbPath - Absolute path to the SQLite database file to backup.
- * @param fileName - Optional custom filename for the backup (defaults to
- *   "uptime-watcher-backup.sqlite").
- *
- * @returns Promise resolving to a {@link DatabaseBackupResult} containing the
- *   backup buffer, filename, and metadata.
- *
- * @throws Re-throws file system errors after logging for upstream handling,
- *   including dynamic import failures and file read errors.
- *
- * @public
+ * Optional constraints applied when validating serialized backup payloads.
+ */
+export interface DatabaseBackupValidationOptions {
+    maxSizeBytes?: number;
+}
+
+/**
+ * Result payload produced when exporting the SQLite database.
+ */
+export interface DatabaseBackupResult {
+    buffer: Buffer;
+    fileName: string;
+    metadata: DatabaseBackupMetadata;
+}
+
+/**
+ * Payload supplied by consumers when restoring from a serialized backup.
+ */
+export interface DatabaseRestorePayload {
+    buffer: Buffer;
+    fileName?: string;
+}
+
+/**
+ * Detailed information about a completed restore operation.
+ */
+export interface DatabaseRestoreResult {
+    metadata: DatabaseBackupMetadata;
+    preRestoreBackup: DatabaseBackupResult;
+    preRestoreFileName: string;
+    restoredAt: number;
+}
+
+/**
+ * Summary returned to renderer processes after a restore completes.
+ */
+export interface DatabaseRestoreSummary {
+    metadata: DatabaseBackupMetadata;
+    preRestoreFileName: string;
+    restoredAt: number;
+}
+
+interface CreateDatabaseBackupArgs {
+    dbPath: string;
+    fileName?: string;
+}
+
+type CreateDatabaseBackupParams = CreateDatabaseBackupArgs | string;
+
+function computeBackupChecksum(buffer: Buffer): string {
+    return createHash("sha256").update(buffer).digest("hex");
+}
+
+function buildBackupMetadata(
+    buffer: Buffer,
+    dbPath: string
+): DatabaseBackupMetadata {
+    return {
+        appVersion: app.getVersion(),
+        checksum: computeBackupChecksum(buffer),
+        createdAt: Date.now(),
+        originalPath: dbPath,
+        retentionHintDays: DEFAULT_BACKUP_RETENTION_HINT_DAYS,
+        schemaVersion: DATABASE_SCHEMA_VERSION,
+        sizeBytes: buffer.length,
+    };
+}
+
+function normalizeBackupArgs(
+    params: CreateDatabaseBackupParams,
+    legacyFileName?: string
+): CreateDatabaseBackupArgs {
+    if (typeof params === "string") {
+        if (legacyFileName) {
+            return {
+                dbPath: params,
+                fileName: legacyFileName,
+            };
+        }
+
+        return { dbPath: params };
+    }
+
+    return params;
+}
+
+/**
+ * Creates a byte-for-byte copy of the SQLite database for download/export.
  */
 export async function createDatabaseBackup(
-    dbPath: string,
-    fileName: string = BACKUP_DB_FILE_NAME
+    params: CreateDatabaseBackupParams,
+    legacyFileName?: string
 ): Promise<DatabaseBackupResult> {
+    const { dbPath, fileName = BACKUP_DB_FILE_NAME } = normalizeBackupArgs(
+        params,
+        legacyFileName
+    );
     try {
-        // eslint-disable-next-line security/detect-non-literal-fs-filename -- dbPath is a validated database path parameter
+        // DbPath originates from app-controlled directories (userData, temporary
+        // folders). Inline lint suppression documents the trusted origin.
+        // eslint-disable-next-line security/detect-non-literal-fs-filename -- temp directory path constructed from trusted OS paths and sanitized file names
         const buffer = await fs.readFile(dbPath);
-        const createdAt = Date.now();
+        const metadata = buildBackupMetadata(buffer, dbPath);
 
-        logger.info(LOG_TEMPLATES.services.DATABASE_BACKUP_CREATED, {
-            createdAt,
+        logger.info("[DatabaseBackup] Database backup created successfully", {
+            checksum: metadata.checksum,
+            createdAt: metadata.createdAt,
             dbPath,
             fileName,
-            sizeBytes: buffer.length,
+            schemaVersion: metadata.schemaVersion,
+            sizeBytes: metadata.sizeBytes,
         });
 
         return {
             buffer,
             fileName,
-            metadata: {
-                createdAt,
-                originalPath: dbPath,
-                sizeBytes: buffer.length,
-            },
+            metadata,
         };
     } catch (error) {
-        logger.error(LOG_TEMPLATES.errors.DATABASE_BACKUP_FAILED, {
+        const normalizedError = ensureError(error);
+        logger.error("[DatabaseBackup] Failed to create database backup", {
             dbPath,
-            error: error instanceof Error ? error.message : String(error),
+            error: normalizedError.message,
             fileName,
-            stack: error instanceof Error ? error.stack : undefined,
+            stack: normalizedError.stack,
         });
-        // Re-throw errors after logging (project standard)
-        throw error;
+        throw normalizedError;
+    }
+}
+
+/**
+ * Ensures a backup payload is safe to apply on the current runtime.
+ */
+export function validateDatabaseBackupPayload(
+    payload: Pick<DatabaseBackupResult, "buffer" | "metadata">,
+    options: DatabaseBackupValidationOptions = {}
+): void {
+    const { buffer, metadata } = payload;
+    const { maxSizeBytes = DEFAULT_MAX_BACKUP_SIZE_BYTES } = options;
+
+    if (metadata.sizeBytes !== buffer.byteLength) {
+        throw new Error(
+            `Backup size metadata mismatch: expected ${metadata.sizeBytes} bytes but received ${buffer.byteLength}`
+        );
+    }
+
+    if (metadata.schemaVersion !== DATABASE_SCHEMA_VERSION) {
+        throw new Error(
+            `Backup schema version ${metadata.schemaVersion} is incompatible with current version ${DATABASE_SCHEMA_VERSION}`
+        );
+    }
+
+    if (metadata.sizeBytes > maxSizeBytes) {
+        throw new Error(
+            `Backup size ${metadata.sizeBytes} exceeds maximum allowed ${maxSizeBytes}`
+        );
+    }
+
+    const computedChecksum = computeBackupChecksum(buffer);
+    if (metadata.checksum !== computedChecksum) {
+        throw new Error("Backup checksum mismatch; payload may be corrupted");
     }
 }

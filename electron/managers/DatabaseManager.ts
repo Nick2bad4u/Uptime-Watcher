@@ -59,7 +59,11 @@ import type { HistoryRepository } from "../services/database/HistoryRepository";
 import type { MonitorRepository } from "../services/database/MonitorRepository";
 import type { SettingsRepository } from "../services/database/SettingsRepository";
 import type { SiteRepository } from "../services/database/SiteRepository";
-import type { DatabaseBackupResult } from "../services/database/utils/databaseBackup";
+import type {
+    DatabaseBackupResult,
+    DatabaseRestorePayload,
+    DatabaseRestoreSummary,
+} from "../services/database/utils/databaseBackup";
 import type { ConfigurationManager } from "./ConfigurationManager";
 
 import { DEFAULT_HISTORY_LIMIT } from "../constants";
@@ -68,6 +72,7 @@ import {
     DownloadBackupCommand,
     ExportDataCommand,
     ImportDataCommand,
+    RestoreBackupCommand,
 } from "../services/commands/DatabaseCommands";
 import { DatabaseServiceFactory } from "../services/factories/DatabaseServiceFactory";
 import { StandardizedCache } from "../utils/cache/StandardizedCache";
@@ -239,6 +244,38 @@ export class DatabaseManager {
             serviceFactory: this.serviceFactory,
         });
         return this.commandExecutor.execute(command);
+    }
+
+    /**
+     * Restores the SQLite database from an uploaded backup payload.
+     */
+    public async restoreBackup(
+        payload: DatabaseRestorePayload
+    ): Promise<DatabaseRestoreSummary> {
+        return withErrorHandling(
+            async () => {
+                const command = new RestoreBackupCommand({
+                    cache: this.siteCache,
+                    configurationManager: this.configurationManager,
+                    eventEmitter: this.eventEmitter,
+                    payload,
+                    serviceFactory: this.serviceFactory,
+                });
+                try {
+                    return await this.commandExecutor.execute(command);
+                } finally {
+                    try {
+                        await this.emitSitesCacheUpdateRequested();
+                    } catch (error) {
+                        monitorLogger.error(
+                            "[DatabaseManager] Failed to emit sites cache update after restore:",
+                            error
+                        );
+                    }
+                }
+            },
+            { logger: monitorLogger, operationName: "restore backup" }
+        );
     }
 
     /**

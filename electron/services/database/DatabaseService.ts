@@ -17,7 +17,10 @@ import * as path from "node:path";
 import { DB_FILE_NAME } from "../../constants";
 import { logger } from "../../utils/logger";
 import { cleanupDatabaseLockArtifacts } from "./utils/databaseLockRecovery";
-import { createDatabaseSchema } from "./utils/databaseSchema";
+import {
+    createDatabaseSchema,
+    synchronizeDatabaseSchemaVersion,
+} from "./utils/databaseSchema";
 
 /**
  * Common SQL queries for database service operations.
@@ -331,6 +334,7 @@ export class DatabaseService {
                 this.applyConnectionPragmas(this.db);
 
                 createDatabaseSchema(this.db);
+                synchronizeDatabaseSchemaVersion(this.db);
 
                 logger.info(LOG_TEMPLATES.services.DATABASE_INITIALIZED);
                 return this.db;

@@ -12,6 +12,7 @@ import type { Site } from "@shared/types";
 import type { StandardizedCache } from "../../../utils/cache/StandardizedCache";
 import type { DatabaseServiceFactory } from "../../../services/factories/DatabaseServiceFactory";
 import type { ConfigurationManager } from "../../../managers/ConfigurationManager";
+import type { DatabaseRestorePayload } from "../../../services/database/utils/databaseBackup";
 import { logger as backendLogger } from "../../../utils/logger";
 
 import {
@@ -20,7 +21,9 @@ import {
     DownloadBackupCommand,
     ExportDataCommand,
     ImportDataCommand,
+    RestoreBackupCommand,
     LoadSitesCommand,
+    type DatabaseCommandContext,
     type IDatabaseCommand,
 } from "../../../services/commands/DatabaseCommands";
 
@@ -58,7 +61,6 @@ const createMockCache = () => {
             }
         }),
     };
-
     return mockCache as unknown as StandardizedCache<Site>;
 };
 
@@ -187,9 +189,18 @@ describe("DatabaseCommands", () => {
             expect(mockEventBus.emitTyped).toHaveBeenCalledWith(
                 "internal:database:data-imported",
                 expect.objectContaining({
+                    operation: "data-imported",
                     success: true,
                     timestamp: expect.any(Number),
+                })
+            );
+
+            expect(mockEventBus.emitTyped).toHaveBeenCalledWith(
+                "internal:database:data-imported",
+                expect.objectContaining({
                     operation: "data-imported",
+                    success: true,
+                    timestamp: expect.any(Number),
                 })
             );
         });
@@ -1118,6 +1129,140 @@ describe("DatabaseCommands", () => {
             expect(command.getDescription()).toBe(
                 "Import application data from JSON"
             );
+        });
+    });
+
+    describe(RestoreBackupCommand, () => {
+        let command: RestoreBackupCommand;
+        let payload: { buffer: Buffer; fileName: string };
+        let restoreResult: {
+            metadata: { checksum: string; schemaVersion: number } & Record<
+                string,
+                unknown
+            >;
+            preRestoreBackup: {
+                buffer: Buffer;
+                fileName: string;
+                metadata: Record<string, unknown>;
+            };
+            preRestoreFileName: string;
+            restoredAt: number;
+        };
+        let backupService: any;
+
+        beforeEach(() => {
+            payload = {
+                buffer: Buffer.from("restore-data"),
+                fileName: "restore.sqlite",
+            };
+            restoreResult = {
+                metadata: {
+                    appVersion: "0.0.0-test",
+                    checksum: "restore-checksum",
+                    createdAt: Date.now(),
+                    originalPath: payload.fileName,
+                    retentionHintDays: 30,
+                    schemaVersion: 7,
+                    sizeBytes: payload.buffer.length,
+                },
+                preRestoreBackup: {
+                    buffer: Buffer.from("previous"),
+                    fileName: "pre-restore.sqlite",
+                    metadata: {
+                        appVersion: "0.0.0-test",
+                        checksum: "prev-checksum",
+                        createdAt: Date.now(),
+                        originalPath: "pre-restore.sqlite",
+                        retentionHintDays: 30,
+                        schemaVersion: 7,
+                        sizeBytes: 1024,
+                    },
+                },
+                preRestoreFileName: "pre-restore.sqlite",
+                restoredAt: Date.now(),
+            };
+            backupService = {
+                downloadDatabaseBackup: vi.fn(),
+                restoreDatabaseBackup: vi.fn().mockResolvedValue(restoreResult),
+                applyDatabaseBackupResult: vi
+                    .fn()
+                    .mockResolvedValue(restoreResult.metadata),
+            };
+            mockServiceFactory.createBackupService.mockReturnValue(
+                backupService as never
+            );
+            mockServiceFactory.createSiteRepositoryService.mockReturnValue({
+                getSitesFromDatabase: vi
+                    .fn()
+                    .mockResolvedValue([createTestSite("a")]),
+            });
+
+            const context: DatabaseCommandContext & {
+                payload: DatabaseRestorePayload;
+            } = {
+                cache: mockCache,
+                configurationManager:
+                    mockConfigurationManager as unknown as ConfigurationManager,
+                eventEmitter:
+                    mockEventBus as unknown as TypedEventBus<UptimeEvents>,
+                payload,
+                serviceFactory: mockServiceFactory,
+                updateHistoryLimit: mockUpdateHistoryLimit as unknown as (
+                    limit: number
+                ) => Promise<void>,
+            };
+
+            command = new RestoreBackupCommand(context);
+        });
+
+        it("executes restore and returns metadata summary", async () => {
+            const summary = await command.execute();
+
+            expect(backupService.restoreDatabaseBackup).toHaveBeenCalledWith(
+                payload
+            );
+            expect(mockCache.replaceAll).toHaveBeenCalled();
+            expect(summary.metadata.checksum).toBe(
+                restoreResult.metadata.checksum
+            );
+            expect(mockEventBus.emitTyped).toHaveBeenCalledWith(
+                "internal:database:backup-restored",
+                expect.objectContaining({
+                    operation: "backup-restored",
+                    fileName: payload.fileName,
+                })
+            );
+        });
+
+        it("rolls back by applying the pre-restore snapshot", async () => {
+            await command.execute();
+            await command.rollback();
+
+            expect(
+                backupService.applyDatabaseBackupResult
+            ).toHaveBeenCalledWith(restoreResult.preRestoreBackup);
+        });
+
+        it("fails validation when payload buffer is empty", async () => {
+            const invalidContext: DatabaseCommandContext & {
+                payload: DatabaseRestorePayload;
+            } = {
+                cache: mockCache,
+                configurationManager:
+                    mockConfigurationManager as unknown as ConfigurationManager,
+                eventEmitter:
+                    mockEventBus as unknown as TypedEventBus<UptimeEvents>,
+                payload: { buffer: Buffer.alloc(0), fileName: "restore.db" },
+                serviceFactory: mockServiceFactory,
+                updateHistoryLimit: mockUpdateHistoryLimit as unknown as (
+                    limit: number
+                ) => Promise<void>,
+            };
+
+            const invalidCommand = new RestoreBackupCommand(invalidContext);
+
+            const validation = await invalidCommand.validate();
+            expect(validation.isValid).toBeFalsy();
         });
     });
 

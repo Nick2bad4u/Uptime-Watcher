@@ -381,8 +381,12 @@ const mockElectronAPI: {
             buffer: new ArrayBuffer(8),
             fileName: "test-backup.sqlite",
             metadata: {
+                appVersion: "0.0.0-test",
+                checksum: "mock-checksum",
                 createdAt: Date.now(),
                 originalPath: "/tmp/test-backup.sqlite",
+                retentionHintDays: 30,
+                schemaVersion: 1,
                 sizeBytes: 8,
             },
         }),

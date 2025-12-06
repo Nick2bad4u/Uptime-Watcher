@@ -484,11 +484,7 @@ describe("File Download Utility - Fixed Coverage Tests", () => {
                     if (timestampMatch?.groups) {
                         const { timestamp } = timestampMatch.groups;
                         if (timestamp) {
-                            const [
-                                year,
-                                month,
-                                day,
-                            ] = timestamp.split("-");
+                            const [year, month, day] = timestamp.split("-");
 
                             // Validate timestamp format
                             expect(Number(year)).toBeGreaterThanOrEqual(2000);
@@ -542,16 +538,22 @@ describe("File Download Utility - Fixed Coverage Tests", () => {
             overrides: Partial<SerializedDatabaseBackupResult> = {}
         ): SerializedDatabaseBackupResult => {
             const cloned = new Uint8Array(data);
+            const sizeBytes = overrides.metadata?.sizeBytes ?? data.length;
 
             return {
                 buffer: cloned.buffer,
                 fileName: overrides.fileName ?? "uptime-watcher-backup.sqlite",
                 metadata: {
+                    appVersion: overrides.metadata?.appVersion ?? "0.0.0-test",
+                    checksum: overrides.metadata?.checksum ?? "mock-checksum",
                     createdAt: overrides.metadata?.createdAt ?? 0,
                     originalPath:
                         overrides.metadata?.originalPath ??
                         "/tmp/uptime-watcher.sqlite",
-                    sizeBytes: overrides.metadata?.sizeBytes ?? data.length,
+                    retentionHintDays:
+                        overrides.metadata?.retentionHintDays ?? 30,
+                    schemaVersion: overrides.metadata?.schemaVersion ?? 1,
+                    sizeBytes,
                 },
             };
         };
@@ -577,12 +579,7 @@ describe("File Download Utility - Fixed Coverage Tests", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Backup Operation", "type");
 
-            const payload = new Uint8Array([
-                1,
-                2,
-                3,
-                4,
-            ]);
+            const payload = new Uint8Array([1, 2, 3, 4]);
             const backup = buildBackupResult(payload);
             const mockDownloadFunction = vi.fn().mockResolvedValue(backup);
 

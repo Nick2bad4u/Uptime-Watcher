@@ -136,8 +136,12 @@ describe("useSiteOperations - Targeted Coverage", () => {
                     buffer: new ArrayBuffer(1024),
                     fileName: "backup.db",
                     metadata: {
+                        appVersion: "0.0.0-test",
+                        checksum: "mock-checksum",
                         createdAt: 0,
                         originalPath: "/tmp/backup.db",
+                        retentionHintDays: 30,
+                        schemaVersion: 1,
                         sizeBytes: 1024,
                     },
                 }),
@@ -158,6 +162,9 @@ describe("useSiteOperations - Targeted Coverage", () => {
         const dataService = {
             downloadSqliteBackup: vi.fn(async () =>
                 mockElectronAPI.data.downloadSqliteBackup()
+            ),
+            restoreSqliteBackup: vi.fn(async (payload) =>
+                mockElectronAPI.data.restoreSqliteBackup(payload)
             ),
         };
 
@@ -186,6 +193,7 @@ describe("useSiteOperations - Targeted Coverage", () => {
         mockSiteDeps = {
             getSites: getSitesFn,
             removeSite: vi.fn(),
+            setLastBackupMetadata: vi.fn(),
             setSites: vi.fn(),
             syncSites: vi.fn(),
             services: {
@@ -402,6 +410,7 @@ describe("useSiteOperations - Targeted Coverage", () => {
             const statefulDeps: SiteOperationsDependencies = {
                 getSites: vi.fn(() => sitesState),
                 removeSite: vi.fn(),
+                setLastBackupMetadata: vi.fn(),
                 setSites: vi.fn((sites: Site[]) => {
                     sitesState.length = 0;
                     for (const site of sites) {

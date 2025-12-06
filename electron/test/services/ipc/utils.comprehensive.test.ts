@@ -489,11 +489,7 @@ describe("IPC Utils - Comprehensive Coverage", () => {
                 await annotate("Type: Error Handling", "type");
 
                 const result = IpcValidators.requiredObject(
-                    [
-                        1,
-                        2,
-                        3,
-                    ],
+                    [1, 2, 3],
                     "testParam"
                 );
                 expect(result).toBe("testParam must be a valid object");
@@ -793,11 +789,7 @@ describe("IPC Utils - Comprehensive Coverage", () => {
 
                 const metadata = {
                     nested: { key: "value" },
-                    array: [
-                        1,
-                        2,
-                        3,
-                    ],
+                    array: [1, 2, 3],
                     timestamp: new Date().toISOString(),
                 };
                 const result = createErrorResponse(
@@ -970,22 +962,12 @@ describe("IPC Utils - Comprehensive Coverage", () => {
                 await annotate("Category: Service", "category");
                 await annotate("Type: Business Logic", "type");
 
-                const arrayData = [
-                    1,
-                    2,
-                    3,
-                    "test",
-                ];
+                const arrayData = [1, 2, 3, "test"];
                 const result = createSuccessResponse(arrayData);
 
                 expect(result).toEqual({
                     success: true,
-                    data: [
-                        1,
-                        2,
-                        3,
-                        "test",
-                    ],
+                    data: [1, 2, 3, "test"],
                 });
             });
         });
@@ -1697,6 +1679,14 @@ describe("IPC Utils - Comprehensive Coverage", () => {
                     `[IpcService] Attempted to register duplicate IPC handler for channel '${CHANNELS_FOR_TESTS.duplicate}'`,
                     expect.objectContaining({
                         channel: CHANNELS_FOR_TESTS.duplicate,
+                        event: "ipc:handler:register",
+                        severity: "error",
+                    }),
+                    expect.objectContaining({
+                        channel: CHANNELS_FOR_TESTS.duplicate,
+                        registeredHandlers: expect.arrayContaining([
+                            CHANNELS_FOR_TESTS.duplicate,
+                        ]),
                     })
                 );
                 expect(ipcMain.handle).toHaveBeenCalledTimes(1);
@@ -1731,6 +1721,11 @@ describe("IPC Utils - Comprehensive Coverage", () => {
                 ).toBeFalsy();
                 expect(logger.error).toHaveBeenCalledWith(
                     `[IpcService] Failed to register IPC handler for channel '${CHANNELS_FOR_TESTS.failure}'`,
+                    expect.objectContaining({
+                        channel: CHANNELS_FOR_TESTS.failure,
+                        event: "ipc:handler:register",
+                        severity: "error",
+                    }),
                     registrationError
                 );
             });

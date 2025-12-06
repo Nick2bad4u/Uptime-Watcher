@@ -10,6 +10,10 @@ vi.mock("electron", () => ({
         invoke: vi.fn(),
     },
 }));
+const correlationEnvelopeMatcher = expect.objectContaining({
+    __uptimeWatcherIpcContext: true,
+    correlationId: expect.any(String),
+});
 
 describe("sitesApi", () => {
     const baseSite: Site = {
@@ -34,7 +38,8 @@ describe("sitesApi", () => {
         expect(result).toEqual(baseSite);
         expect(ipcRenderer.invoke).toHaveBeenCalledWith(
             SITES_CHANNELS.addSite,
-            baseSite
+            baseSite,
+            correlationEnvelopeMatcher
         );
     });
 
@@ -48,7 +53,8 @@ describe("sitesApi", () => {
 
         expect(result).toEqual([baseSite]);
         expect(ipcRenderer.invoke).toHaveBeenCalledWith(
-            SITES_CHANNELS.getSites
+            SITES_CHANNELS.getSites,
+            correlationEnvelopeMatcher
         );
     });
 
@@ -63,7 +69,8 @@ describe("sitesApi", () => {
         expect(result).toEqual(baseSite);
         expect(ipcRenderer.invoke).toHaveBeenCalledWith(
             SITES_CHANNELS.removeSite,
-            baseSite.identifier
+            baseSite.identifier,
+            correlationEnvelopeMatcher
         );
     });
 
@@ -82,7 +89,8 @@ describe("sitesApi", () => {
         expect(ipcRenderer.invoke).toHaveBeenCalledWith(
             SITES_CHANNELS.removeMonitor,
             baseSite.identifier,
-            "monitor-1"
+            "monitor-1",
+            correlationEnvelopeMatcher
         );
     });
 
@@ -101,7 +109,8 @@ describe("sitesApi", () => {
         expect(ipcRenderer.invoke).toHaveBeenCalledWith(
             SITES_CHANNELS.updateSite,
             baseSite.identifier,
-            { name: "Updated" }
+            { name: "Updated" },
+            correlationEnvelopeMatcher
         );
     });
 
@@ -115,7 +124,8 @@ describe("sitesApi", () => {
 
         expect(result).toBe(4);
         expect(ipcRenderer.invoke).toHaveBeenCalledWith(
-            SITES_CHANNELS.deleteAllSites
+            SITES_CHANNELS.deleteAllSites,
+            correlationEnvelopeMatcher
         );
     });
 

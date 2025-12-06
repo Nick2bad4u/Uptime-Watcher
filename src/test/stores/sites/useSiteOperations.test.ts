@@ -3,7 +3,14 @@
  * and monitor management
  */
 
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import {
+    beforeEach,
+    describe,
+    expect,
+    it,
+    vi,
+    type MockInstance,
+} from "vitest";
 
 import { type Monitor, type Site } from "@shared/types";
 import { ERROR_CATALOG } from "@shared/utils/errorCatalog";
@@ -69,7 +76,27 @@ vi.mock("../../types/ipc", () => ({
 }));
 
 // Access the global electronAPI mock
-const mockElectronAPI = (globalThis as any).electronAPI;
+const mockElectronAPI = (
+    globalThis as typeof globalThis & { electronAPI: unknown }
+).electronAPI as any;
+const getRestoreMock = (): MockInstance =>
+    mockElectronAPI.data.restoreSqliteBackup as unknown as MockInstance;
+if (!mockElectronAPI.data.restoreSqliteBackup) {
+    (mockElectronAPI.data as Record<string, unknown>)["restoreSqliteBackup"] =
+        vi.fn(async () => ({
+            metadata: {
+                appVersion: "0.0.0-test",
+                checksum: "restore-checksum",
+                createdAt: Date.now(),
+                originalPath: "restore.sqlite",
+                retentionHintDays: 30,
+                schemaVersion: 1,
+                sizeBytes: 0,
+            },
+            preRestoreFileName: "pre-restore.sqlite",
+            restoredAt: Date.now(),
+        }));
+}
 
 describe(createSiteOperationsActions, () => {
     let mockDeps: SiteOperationsDependencies;
@@ -133,6 +160,9 @@ describe(createSiteOperationsActions, () => {
             downloadSqliteBackup: vi.fn(async () =>
                 mockElectronAPI.data.downloadSqliteBackup()
             ),
+            restoreSqliteBackup: vi.fn(async (payload) =>
+                mockElectronAPI.data.restoreSqliteBackup(payload)
+            ),
         };
 
         const siteService = {
@@ -158,6 +188,7 @@ describe(createSiteOperationsActions, () => {
         mockDeps = {
             getSites: vi.fn(() => [mockSite]),
             removeSite: vi.fn(),
+            setLastBackupMetadata: vi.fn(),
             setSites: vi.fn(),
             syncSites: vi.fn(async () => undefined),
             services: {
@@ -744,17 +775,69 @@ describe(createSiteOperationsActions, () => {
                 buffer: new ArrayBuffer(8),
                 fileName: "backup.sqlite",
                 metadata: {
+                    appVersion: "0.0.0-test",
+                    checksum: "mock-checksum",
                     createdAt: 0,
                     originalPath: "/tmp/backup.sqlite",
+                    retentionHintDays: 30,
+                    schemaVersion: 1,
                     sizeBytes: 8,
                 },
             });
 
-            await actions.downloadSqliteBackup();
+            const result = await actions.downloadSqliteBackup();
 
             expect(
                 mockElectronAPI.data.downloadSqliteBackup
             ).toHaveBeenCalled();
+            expect(mockDeps.setLastBackupMetadata).toHaveBeenCalledWith(
+                result.metadata
+            );
+        });
+    });
+
+    describe("restoreSqliteBackup", () => {
+        it("restores backup and syncs sites", async () => {
+            const summary = {
+                metadata: {
+                    appVersion: "0.0.0-test",
+                    checksum: "restore-checksum",
+                    createdAt: Date.now(),
+                    originalPath: "restore.sqlite",
+                    retentionHintDays: 30,
+                    schemaVersion: 1,
+                    sizeBytes: 64,
+                },
+                preRestoreFileName: "pre-restore.sqlite",
+                restoredAt: Date.now(),
+            };
+            getRestoreMock().mockResolvedValue(summary);
+
+            const payload = {
+                buffer: new ArrayBuffer(64),
+                fileName: "restore.sqlite",
+            };
+            const result = await actions.restoreSqliteBackup(payload);
+
+            expect(
+                mockElectronAPI.data.restoreSqliteBackup
+            ).toHaveBeenCalledWith(payload);
+            expect(mockDeps.setLastBackupMetadata).toHaveBeenCalledWith(
+                summary.metadata
+            );
+            expect(mockDeps.syncSites).toHaveBeenCalled();
+            expect(result).toEqual(summary);
+        });
+
+        it("propagates restore errors", async () => {
+            getRestoreMock().mockRejectedValueOnce(new Error("Restore failed"));
+
+            await expect(
+                actions.restoreSqliteBackup({
+                    buffer: new ArrayBuffer(8),
+                    fileName: "restore.sqlite",
+                })
+            ).rejects.toThrowError("Restore failed");
         });
     });
 });

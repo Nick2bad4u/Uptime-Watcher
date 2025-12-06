@@ -44,6 +44,11 @@ export interface DataApiInterface extends DataDomainBridge {
      * @returns Promise resolving to a boolean success flag
      */
     importData: DataDomainBridge["importData"];
+
+    /**
+     * Restores a SQLite database backup from the renderer
+     */
+    restoreSqliteBackup: DataDomainBridge["restoreSqliteBackup"];
 }
 
 /**
@@ -76,6 +81,9 @@ export const dataApi: DataApiInterface = {
      * @returns Promise resolving to a boolean success flag
      */
     importData: createTypedInvoker(DATA_CHANNELS.importData),
+
+    /** Restores a SQLite backup from an uploaded file */
+    restoreSqliteBackup: createTypedInvoker(DATA_CHANNELS.restoreSqliteBackup),
 } as const;
 
 /**

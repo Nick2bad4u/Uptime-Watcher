@@ -83,8 +83,12 @@ const mockElectronAPI = {
             buffer: new ArrayBuffer(100),
             fileName: "settings-backup.sqlite",
             metadata: {
+                appVersion: "0.0.0-test",
+                checksum: "mock-checksum",
                 createdAt: 0,
                 originalPath: "/tmp/settings-backup.sqlite",
+                retentionHintDays: 30,
+                schemaVersion: 1,
                 sizeBytes: 100,
             },
         }),
@@ -140,8 +144,12 @@ describe(useSettingsStore, () => {
             buffer: new ArrayBuffer(100),
             fileName: "settings-backup.sqlite",
             metadata: {
+                appVersion: "0.0.0-test",
+                checksum: "mock-checksum",
                 createdAt: 0,
                 originalPath: "/tmp/settings-backup.sqlite",
+                retentionHintDays: 30,
+                schemaVersion: 1,
                 sizeBytes: 100,
             },
         });
@@ -951,11 +959,9 @@ describe(useSettingsStore, () => {
                 ).toBe(testSettings.systemNotificationsSoundEnabled);
 
                 // Verify setting value constraints
-                expect([
-                    "light",
-                    "dark",
-                    "system",
-                ]).toContain(testSettings.theme);
+                expect(["light", "dark", "system"]).toContain(
+                    testSettings.theme
+                );
                 expect(typeof testSettings.autoStart).toBe("boolean");
                 expect(typeof testSettings.minimizeToTray).toBe("boolean");
                 expect(typeof testSettings.inAppAlertsEnabled).toBe("boolean");
@@ -1292,19 +1298,13 @@ describe(useSettingsStore, () => {
                 });
 
                 expect(result.current.settings.theme).toBe(themeValue);
-                expect([
-                    "light",
-                    "dark",
-                    "system",
-                ]).toContain(result.current.settings.theme);
+                expect(["light", "dark", "system"]).toContain(
+                    result.current.settings.theme
+                );
 
                 // Verify theme value properties
                 expect(typeof themeValue).toBe("string");
-                expect([
-                    "light",
-                    "dark",
-                    "system",
-                ]).toContain(themeValue);
+                expect(["light", "dark", "system"]).toContain(themeValue);
             }
         );
 

@@ -148,6 +148,18 @@ export interface UptimeEvents extends Record<string, EventPayloadValue> {
     };
 
     /**
+     * Emitted when a database backup is restored.
+     */
+    "database:backup-restored": {
+        checksum: string;
+        fileName: string;
+        schemaVersion: number;
+        size: number;
+        timestamp: number;
+        triggerType: "manual" | "scheduled" | "shutdown";
+    };
+
+    /**
      * Emitted when a database error occurs.
      *
      * @remarks
@@ -337,6 +349,28 @@ export interface UptimeEvents extends Record<string, EventPayloadValue> {
     };
 
     /**
+     * Emitted whenever a diagnostics report is captured from preload.
+     */
+    "diagnostics:report-created": {
+        /** The sanitized channel associated with the diagnostics payload. */
+        channel: string;
+        /** Correlation identifier shared with structured logs. */
+        correlationId: string;
+        /** Name of the guard that produced the diagnostics payload. */
+        guard: string;
+        /** True when metadata was omitted due to byte limits. */
+        metadataTruncated: boolean;
+        /** Length of the sanitized payload preview string. */
+        payloadPreviewLength: number;
+        /** True when the payload preview was truncated due to byte limits. */
+        payloadPreviewTruncated: boolean;
+        /** Optional rejection reason reported by the guard. */
+        reason?: string;
+        /** Timestamp supplied by the preload report. */
+        timestamp: number;
+    };
+
+    /**
      * Emitted when every cache entry is invalidated.
      */
     "internal:cache:all-invalidated": {
@@ -384,6 +418,8 @@ export interface UptimeEvents extends Record<string, EventPayloadValue> {
         timestamp: number;
     };
 
+    // Monitor events
+
     /**
      * Emitted when a cache entry is cached or updated.
      */
@@ -397,8 +433,6 @@ export interface UptimeEvents extends Record<string, EventPayloadValue> {
         /** Optional TTL for the cached entry in milliseconds. */
         ttl?: number;
     };
-
-    // Monitor events
 
     /**
      * Emitted when a cache entry is explicitly deleted.
@@ -471,7 +505,10 @@ export interface UptimeEvents extends Record<string, EventPayloadValue> {
         /**
          * The operation type (always "backup-downloaded").
          *
-         * @remarks
+         * ```
+         *     /**
+         * ```
+         *
          * Constant value identifying this specific database operation type for
          * event filtering and routing purposes.
          */
@@ -493,6 +530,18 @@ export interface UptimeEvents extends Record<string, EventPayloadValue> {
          * Provides precise timing of when the backup download operation
          * finished, regardless of success or failure status.
          */
+        timestamp: number;
+    };
+
+    /**
+     * Emitted when a database backup restore completes.
+     */
+    "internal:database:backup-restored": {
+        fileName: string;
+        operation: "backup-restored";
+        schemaVersion: number;
+        sizeBytes: number;
+        success: boolean;
         timestamp: number;
     };
 
@@ -1182,6 +1231,16 @@ export interface UptimeEvents extends Record<string, EventPayloadValue> {
         timestamp: number;
     };
 
+    /** Scheduler backoff applied for a monitor following failure/timeout. */
+    "monitor:backoff-applied": {
+        backoffAttempt: number;
+        correlationId: string;
+        delayMs: number;
+        monitorId: string;
+        siteIdentifier: string;
+        timestamp: number;
+    };
+
     /**
      * Emitted when a monitor check is completed.
      *
@@ -1212,6 +1271,14 @@ export interface UptimeEvents extends Record<string, EventPayloadValue> {
      */
     "monitor:down": UptimeEventPayload<MonitorDownEventData>;
 
+    /** Manual check dispatched for a monitor (pre-empts scheduled job). */
+    "monitor:manual-check-started": {
+        correlationId: string;
+        monitorId: string;
+        siteIdentifier: string;
+        timestamp: number;
+    };
+
     /**
      * Emitted when a monitor is removed.
      *
@@ -1229,12 +1296,31 @@ export interface UptimeEvents extends Record<string, EventPayloadValue> {
         timestamp: number;
     };
 
+    /** Scheduler emitted when a monitor job is scheduled or rescheduled. */
+    "monitor:schedule-updated": {
+        backoffAttempt: number;
+        correlationId: string;
+        delayMs: number;
+        monitorId: string;
+        siteIdentifier: string;
+        timestamp: number;
+    };
+
     /**
      * Emitted when a monitor's status changes.
      *
      * @see {@link MonitorStatusChangedEventData} for payload details.
      */
     "monitor:status-changed": UptimeEventPayload<MonitorStatusChangedEventData>;
+
+    /** Emitted when a monitor check times out before completion. */
+    "monitor:timeout": {
+        correlationId: string;
+        monitorId: string;
+        siteIdentifier: string;
+        timeoutMs: number;
+        timestamp: number;
+    };
 
     /**
      * Emitted when a monitor goes up.
@@ -1623,11 +1709,15 @@ export const EVENT_CATEGORIES = {
      */
     DATABASE: [
         "database:backup-created",
+        "database:backup-restored",
         "database:error",
         "database:retry",
         "database:success",
         "database:transaction-completed",
     ] as const,
+
+    /** Diagnostics events for preload guard reports and validation. */
+    DIAGNOSTICS: ["diagnostics:report-created"] as const,
 
     /**
      * Internal cache management events.
@@ -1654,6 +1744,7 @@ export const EVENT_CATEGORIES = {
      */
     INTERNAL_DATABASE: [
         "internal:database:backup-downloaded",
+        "internal:database:backup-restored",
         "internal:database:data-exported",
         "internal:database:data-imported",
         "internal:database:get-sites-from-cache-requested",
@@ -1713,6 +1804,10 @@ export const EVENT_CATEGORIES = {
     MONITOR: [
         "monitor:added",
         "monitor:check-completed",
+        "monitor:manual-check-started",
+        "monitor:schedule-updated",
+        "monitor:backoff-applied",
+        "monitor:timeout",
         "monitor:removed",
         "monitor:status-changed",
         "monitor:up",
@@ -1763,11 +1858,7 @@ export const EVENT_CATEGORIES = {
      * Events related to system operations including startup, shutdown, and
      * system-level errors that affect the entire application.
      */
-    SYSTEM: [
-        "system:error",
-        "system:shutdown",
-        "system:startup",
-    ] as const,
+    SYSTEM: ["system:error", "system:shutdown", "system:startup"] as const,
 } as const;
 
 /**
@@ -1812,6 +1903,7 @@ export const EVENT_PRIORITIES = {
         "monitor:status-changed",
         "monitor:up",
         "monitor:down",
+        "monitor:timeout",
         "site:removed",
     ] as const,
 
@@ -1845,6 +1937,9 @@ export const EVENT_PRIORITIES = {
     MEDIUM: [
         "config:changed",
         "monitor:added",
+        "monitor:manual-check-started",
+        "monitor:schedule-updated",
+        "monitor:backoff-applied",
         "settings:history-limit-updated",
         "site:added",
         "site:updated",
@@ -1952,6 +2047,11 @@ export function isEventOfCategory(
         }
         case "DATABASE": {
             return (EVENT_CATEGORIES.DATABASE as readonly string[]).includes(
+                eventNameStr
+            );
+        }
+        case "DIAGNOSTICS": {
+            return (EVENT_CATEGORIES.DIAGNOSTICS as readonly string[]).includes(
                 eventNameStr
             );
         }

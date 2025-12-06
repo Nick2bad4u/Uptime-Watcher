@@ -10,6 +10,11 @@
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 
 import { DataService } from "../../services/DataService";
+import type {
+    SerializedDatabaseBackupResult,
+    SerializedDatabaseRestorePayload,
+    SerializedDatabaseRestoreResult,
+} from "@shared/types/ipc";
 
 const MOCK_BRIDGE_ERROR_MESSAGE =
     "ElectronAPI not available after maximum attempts. The application may not be running in an Electron environment.";
@@ -52,20 +57,43 @@ vi.mock("../../../shared/utils/errorHandling", () => ({
 }));
 
 // Helper functions for creating mock data
-function createMockBackupResult(): {
-    buffer: ArrayBuffer;
-    fileName: string;
-    metadata: { createdAt: number; originalPath: string; sizeBytes: number };
-} {
+function createMockBackupResult(): SerializedDatabaseBackupResult {
     const buffer = new ArrayBuffer(1024);
     return {
         buffer,
         fileName: "backup_2024-01-01_12-00-00.sqlite",
         metadata: {
+            appVersion: "0.0.0-test",
+            checksum: "mock-checksum",
             createdAt: 0,
             originalPath: "/tmp/backup.sqlite",
+            retentionHintDays: 30,
+            schemaVersion: 1,
             sizeBytes: 1024,
         },
+    };
+}
+
+function createMockRestoreResult(): SerializedDatabaseRestoreResult {
+    return {
+        metadata: {
+            appVersion: "0.0.0-test",
+            checksum: "restore-checksum",
+            createdAt: Date.now(),
+            originalPath: "/tmp/restore.sqlite",
+            retentionHintDays: 30,
+            schemaVersion: 1,
+            sizeBytes: 2048,
+        },
+        preRestoreFileName: "pre-restore.sqlite",
+        restoredAt: Date.now(),
+    };
+}
+
+function createMockRestorePayload(): SerializedDatabaseRestorePayload {
+    return {
+        buffer: new ArrayBuffer(2048),
+        fileName: "restore.sqlite",
     };
 }
 
@@ -78,6 +106,9 @@ function createMockDataApi() {
             Promise.resolve('{"sites":[],"monitors":[],"settings":{}}')
         ),
         importData: vi.fn(() => Promise.resolve(true)),
+        restoreSqliteBackup: vi.fn(() =>
+            Promise.resolve(createMockRestoreResult())
+        ),
     };
 }
 
@@ -124,6 +155,7 @@ describe("DataService", () => {
                 "downloadSqliteBackup",
                 "exportData",
                 "importData",
+                "restoreSqliteBackup",
                 "initialize",
             ] as const;
 
@@ -232,8 +264,12 @@ describe("DataService", () => {
                 buffer: emptyBuffer,
                 fileName: "empty.sqlite",
                 metadata: {
+                    appVersion: "0.0.0-test",
+                    checksum: "mock-checksum",
                     createdAt: 0,
                     originalPath: "/tmp/empty.sqlite",
+                    retentionHintDays: 30,
+                    schemaVersion: 1,
                     sizeBytes: 0,
                 },
             });
@@ -242,6 +278,31 @@ describe("DataService", () => {
 
             expect(result.buffer).toBe(emptyBuffer);
             expect(result.fileName).toBe("empty.sqlite");
+        });
+    });
+
+    describe("restoreSqliteBackup", () => {
+        it("should restore backup successfully after initialization", async () => {
+            const payload = createMockRestorePayload();
+            const summary = createMockRestoreResult();
+            mockElectronAPI.data.restoreSqliteBackup.mockResolvedValue(summary);
+
+            const result = await DataService.restoreSqliteBackup(payload);
+
+            expect(mockWaitForElectronBridge).toHaveBeenCalled();
+            expect(
+                mockElectronAPI.data.restoreSqliteBackup
+            ).toHaveBeenCalledWith(payload);
+            expect(result).toEqual(summary);
+        });
+
+        it("should surface errors when initialization fails", async () => {
+            const initError = new Error("Bridge init failed");
+            mockWaitForElectronBridge.mockRejectedValueOnce(initError);
+
+            await expect(
+                DataService.restoreSqliteBackup(createMockRestorePayload())
+            ).rejects.toThrowError("Bridge init failed");
         });
     });
 
@@ -458,11 +519,7 @@ describe("DataService", () => {
             );
 
             // Perform concurrent operations
-            const [
-                exported,
-                imported,
-                backup,
-            ] = await Promise.all([
+            const [exported, imported, backup] = await Promise.all([
                 DataService.exportData(),
                 DataService.importData('{"test": true}'),
                 DataService.downloadSqliteBackup(),
@@ -540,8 +597,12 @@ describe("DataService", () => {
                 buffer: largeBuffer,
                 fileName: "large_backup.sqlite",
                 metadata: {
+                    appVersion: "0.0.0-test",
+                    checksum: "mock-checksum",
                     createdAt: 0,
                     originalPath: "/tmp/large_backup.sqlite",
+                    retentionHintDays: 30,
+                    schemaVersion: 1,
                     sizeBytes: 50 * 1024 * 1024,
                 },
             };
@@ -579,8 +640,12 @@ describe("DataService", () => {
                 buffer: new ArrayBuffer(1024),
                 fileName: "backup (copy) #1 [2024-01-01] @12-00-00.sqlite",
                 metadata: {
+                    appVersion: "0.0.0-test",
+                    checksum: "mock-checksum",
                     createdAt: 0,
                     originalPath: "/tmp/backup-special.sqlite",
+                    retentionHintDays: 30,
+                    schemaVersion: 1,
                     sizeBytes: 1024,
                 },
             };

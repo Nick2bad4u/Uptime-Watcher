@@ -5,7 +5,10 @@
  * @packageDocumentation
  */
 
-import type { SerializedDatabaseBackupResult } from "@shared/types/ipc";
+import type {
+    SerializedDatabaseBackupMetadata,
+    SerializedDatabaseBackupResult,
+} from "@shared/types/ipc";
 
 import { logger } from "../../../services/logger";
 import { isPlaywrightAutomation } from "../../../utils/environment";
@@ -265,24 +268,34 @@ function isSerializedDatabaseBackupResult(
     }
 
     const metadataCandidate = value["metadata"];
-    if (metadataCandidate === undefined) {
-        return true;
-    }
-
     if (!isRecord(metadataCandidate)) {
         return false;
     }
 
-    const createdAtCandidate = metadataCandidate["createdAt"];
-    const originalPathCandidate = metadataCandidate["originalPath"];
-    const sizeBytesCandidate = metadataCandidate["sizeBytes"];
+    const {
+        appVersion,
+        checksum,
+        createdAt,
+        originalPath,
+        retentionHintDays,
+        schemaVersion,
+        sizeBytes,
+    } = metadataCandidate as Partial<SerializedDatabaseBackupMetadata>;
 
     return (
-        typeof createdAtCandidate === "number" &&
-        Number.isFinite(createdAtCandidate) &&
-        typeof originalPathCandidate === "string" &&
-        typeof sizeBytesCandidate === "number" &&
-        Number.isFinite(sizeBytesCandidate)
+        typeof appVersion === "string" &&
+        typeof checksum === "string" &&
+        typeof createdAt === "number" &&
+        Number.isFinite(createdAt) &&
+        typeof originalPath === "string" &&
+        typeof retentionHintDays === "number" &&
+        Number.isFinite(retentionHintDays) &&
+        typeof schemaVersion === "number" &&
+        Number.isFinite(schemaVersion) &&
+        typeof sizeBytes === "number" &&
+        Number.isFinite(sizeBytes) &&
+        sizeBytes >= 0 &&
+        sizeBytes === bufferCandidate.byteLength
     );
 }
 
@@ -310,7 +323,7 @@ function isSerializedDatabaseBackupResult(
  */
 export async function handleSQLiteBackupDownload(
     downloadFunction: () => Promise<SerializedDatabaseBackupResult>
-): Promise<void> {
+): Promise<SerializedDatabaseBackupResult> {
     const backupResult = await downloadFunction();
 
     if (!isSerializedDatabaseBackupResult(backupResult)) {
@@ -322,13 +335,16 @@ export async function handleSQLiteBackupDownload(
             playwrightLastBackup?: SerializedDatabaseBackupResult;
         };
         automationTarget.playwrightLastBackup = backupResult;
-        const metadataSizeBytes =
-            backupResult.metadata?.sizeBytes ?? backupResult.buffer.byteLength;
+        const metadataSizeBytes = Number.isFinite(
+            backupResult.metadata.sizeBytes
+        )
+            ? backupResult.metadata.sizeBytes
+            : backupResult.buffer.byteLength;
         logger.info("SQLite backup captured in automation mode", {
             fileName: backupResult.fileName,
             sizeBytes: metadataSizeBytes,
         });
-        return;
+        return backupResult;
     }
 
     const trimmedFileName = backupResult.fileName.trim();
@@ -374,4 +390,6 @@ export async function handleSQLiteBackupDownload(
         // Clean up object URL
         URL.revokeObjectURL(objectURL);
     }
+
+    return backupResult;
 }

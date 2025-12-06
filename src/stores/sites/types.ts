@@ -9,7 +9,11 @@
  */
 
 import type { Monitor, Site, StatusUpdate } from "@shared/types";
-import type { SerializedDatabaseBackupResult } from "@shared/types/ipc";
+import type {
+    SerializedDatabaseBackupResult,
+    SerializedDatabaseRestorePayload,
+    SerializedDatabaseRestoreResult,
+} from "@shared/types/ipc";
 import type {
     SiteSyncDelta,
     StateSyncStatusSummary,
@@ -50,7 +54,7 @@ export interface SitesActions {
     /** Delete a site */
     deleteSite: (identifier: string) => Promise<void>;
     /** Download SQLite backup */
-    downloadSqliteBackup: () => Promise<void>;
+    downloadSqliteBackup: () => Promise<SerializedDatabaseBackupResult>;
     /**
      * Performs complete resynchronization of all sites data from backend.
      *
@@ -88,6 +92,10 @@ export interface SitesActions {
     ) => Promise<void>;
     /** Remove a site from the store */
     removeSite: (identifier: string) => void;
+    /** Restore SQLite backup */
+    restoreSqliteBackup: (
+        payload: SerializedDatabaseRestorePayload
+    ) => Promise<SerializedDatabaseRestoreResult>;
     /** Retry status update subscription */
     retryStatusSubscription: (
         callback?: (update: StatusUpdate) => void
@@ -103,6 +111,10 @@ export interface SitesActions {
      * @param site - Site to select, or undefined to clear selection
      */
     selectSite: (site: Site | undefined) => void;
+    /** Persist latest backup metadata for UI diagnostics */
+    setLastBackupMetadata: (
+        metadata: SerializedDatabaseBackupResult["metadata"] | undefined
+    ) => void;
     /** Set selected monitor ID for a site */
     setSelectedMonitorId: (siteIdentifier: string, monitorId: string) => void;
     /** Set sites data */
@@ -198,6 +210,10 @@ export interface SiteOperationsDependencies {
     removeSite: (identifier: string) => void;
     /** External service dependencies required for operations */
     services: SiteOperationsServiceDependencies;
+    /** Persist latest backup metadata */
+    setLastBackupMetadata: (
+        metadata: SerializedDatabaseBackupResult["metadata"] | undefined
+    ) => void;
     /** Replace all sites in the store */
     setSites: (sites: Site[]) => void;
     /** Synchronize sites from backend storage */
@@ -211,7 +227,10 @@ export interface SiteOperationsDependencies {
  */
 export interface SiteOperationsServiceDependencies {
     /** Data export operations */
-    data: Pick<DataBackupService, "downloadSqliteBackup">;
+    data: Pick<
+        DataBackupService,
+        "downloadSqliteBackup" | "restoreSqliteBackup"
+    >;
     /** Site service operations */
     site: Pick<
         SiteDataService,
@@ -229,4 +248,7 @@ interface SiteDataService {
 
 interface DataBackupService {
     downloadSqliteBackup: () => Promise<SerializedDatabaseBackupResult>;
+    restoreSqliteBackup: (
+        payload: SerializedDatabaseRestorePayload
+    ) => Promise<SerializedDatabaseRestoreResult>;
 }

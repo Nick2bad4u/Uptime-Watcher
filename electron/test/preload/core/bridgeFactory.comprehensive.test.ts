@@ -30,6 +30,11 @@ vi.mock("electron", () => ({
     },
 }));
 
+const correlationEnvelopeMatcher = expect.objectContaining({
+    __uptimeWatcherIpcContext: true,
+    correlationId: expect.any(String),
+});
+
 const formatDetailChannel = "format-monitor-detail" satisfies IpcInvokeChannel;
 const startMonitoringChannel = "start-monitoring" satisfies IpcInvokeChannel;
 const resetSettingsChannel = "reset-settings" satisfies IpcInvokeChannel;
@@ -97,7 +102,8 @@ describe("bridgeFactory", function describeBridgeFactorySuite() {
             expect(ipcRenderer.invoke).toHaveBeenCalledWith(
                 formatDetailChannel,
                 "http",
-                "status-page"
+                "status-page",
+                correlationEnvelopeMatcher
             );
             expect(result).toBe("detail");
         });
@@ -189,7 +195,8 @@ describe("bridgeFactory", function describeBridgeFactorySuite() {
             const reset = createVoidInvoker(resetSettingsChannel);
             await expect(reset()).resolves.toBeUndefined();
             expect(ipcRenderer.invoke).toHaveBeenCalledWith(
-                resetSettingsChannel
+                resetSettingsChannel,
+                correlationEnvelopeMatcher
             );
         });
 

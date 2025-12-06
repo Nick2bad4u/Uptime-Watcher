@@ -4,6 +4,7 @@
  * type-safe, consistent IPC handlers.
  */
 
+import type { CorrelationId } from "@shared/types/events";
 import type {
     IpcInvokeChannel,
     IpcInvokeChannelParams,
@@ -11,7 +12,9 @@ import type {
 } from "@shared/types/ipc";
 import type { UnknownRecord } from "type-fest";
 
+import { isIpcCorrelationEnvelope } from "@shared/types/ipc";
 import { MONITOR_TYPES_CHANNELS } from "@shared/types/preload";
+import { withLogContext } from "@shared/utils/loggingContext";
 import {
     isNonEmptyString,
     isValidUrl,
@@ -25,6 +28,7 @@ import type {
 } from "./types";
 
 import { isDev } from "../../electronUtils";
+import { generateCorrelationId } from "../../utils/correlation";
 import { logger } from "../../utils/logger";
 
 const HIGH_FREQUENCY_OPERATIONS = new Set<string>([
@@ -43,6 +47,8 @@ const HIGH_FREQUENCY_OPERATIONS = new Set<string>([
  * {@link IpcResponse.metadata} field as an opaque record.
  */
 interface IpcHandlerMetadata extends UnknownRecord {
+    /** Correlation identifier propagated from the renderer. */
+    correlationId?: CorrelationId;
     /** Total handler execution duration in milliseconds. */
     duration?: number;
     /** Fully-qualified IPC handler name (channel identifier). */
@@ -70,6 +76,7 @@ type HandlerExecutionResult<T> =
     | HandlerExecutionSuccess<T>;
 
 interface WithIpcHandlerOptions {
+    readonly correlationId?: CorrelationId;
     readonly metadata?: IpcHandlerMetadata;
 }
 
@@ -84,6 +91,44 @@ type StrictIpcInvokeHandler<TChannel extends IpcInvokeChannel> = (
     | IpcInvokeChannelResult<TChannel>
     | Promise<IpcInvokeChannelResult<TChannel>>;
 
+function assertChannelParams<TChannel extends IpcInvokeChannel>(
+    channelName: TChannel,
+    params: readonly unknown[],
+    handler: StrictIpcInvokeHandler<TChannel>
+): asserts params is ChannelParams<TChannel> {
+    if (!Array.isArray(params)) {
+        throw new TypeError(
+            `[IpcService] Expected parameters array when invoking ${channelName}`
+        );
+    }
+
+    const expectedParamCount = handler.length;
+    if (expectedParamCount > 0 && params.length < expectedParamCount) {
+        throw new Error(
+            `[IpcService] Channel ${channelName} expects at least ${expectedParamCount} parameter(s) but received ${params.length}`
+        );
+    }
+}
+
+interface ExtractedIpcContext {
+    readonly args: readonly unknown[];
+    readonly correlationId?: CorrelationId;
+}
+
+const extractIpcCorrelationContext = (
+    args: readonly unknown[]
+): ExtractedIpcContext => {
+    const correlationEnvelope = args.at(-1);
+    if (isIpcCorrelationEnvelope(correlationEnvelope)) {
+        return {
+            args: args.slice(0, -1),
+            correlationId: correlationEnvelope.correlationId,
+        } satisfies ExtractedIpcContext;
+    }
+
+    return { args } satisfies ExtractedIpcContext;
+};
+
 function shouldLogHandler(channelName: string): boolean {
     return isDev() && !HIGH_FREQUENCY_OPERATIONS.has(channelName);
 }
@@ -91,17 +136,28 @@ function shouldLogHandler(channelName: string): boolean {
 async function executeIpcHandler<T>(
     channelName: string,
     handler: () => Promise<T> | T,
-    startMetadata?: IpcHandlerMetadata
+    options?: WithIpcHandlerOptions
 ): Promise<HandlerExecutionResult<T>> {
     const startTime = Date.now();
     const logStart = shouldLogHandler(channelName);
+    const correlationId = options?.correlationId ?? generateCorrelationId();
+    const startMetadata = options?.metadata;
 
     if (logStart) {
         const metadata =
             startMetadata && Object.keys(startMetadata).length > 0
                 ? { handler: channelName, ...startMetadata }
                 : { handler: channelName };
-        logger.debug(`[IpcHandler] Starting ${channelName}`, metadata);
+        logger.debug(
+            `[IpcHandler] Starting ${channelName}`,
+            withLogContext({
+                channel: channelName,
+                correlationId,
+                event: "ipc:handler:start",
+                severity: "debug",
+            }),
+            metadata
+        );
     }
 
     try {
@@ -109,10 +165,19 @@ async function executeIpcHandler<T>(
         const duration = Date.now() - startTime;
 
         if (logStart) {
-            logger.debug(`[IpcHandler] Completed ${channelName}`, {
-                duration,
-                handler: channelName,
-            });
+            logger.debug(
+                `[IpcHandler] Completed ${channelName}`,
+                withLogContext({
+                    channel: channelName,
+                    correlationId,
+                    event: "ipc:handler:completed",
+                    severity: "debug",
+                }),
+                {
+                    duration,
+                    handler: channelName,
+                }
+            );
         }
 
         return {
@@ -125,11 +190,19 @@ async function executeIpcHandler<T>(
         const errorMessage =
             error instanceof Error ? error.message : String(error);
 
-        logger.error(`[IpcHandler] Failed ${channelName}`, {
-            duration,
-            error: errorMessage,
-            handler: channelName,
-        });
+        logger.error(
+            `[IpcHandler] Failed ${channelName}`,
+            withLogContext({
+                channel: channelName,
+                correlationId,
+                event: "ipc:handler:failed",
+                severity: "error",
+            }),
+            {
+                duration,
+                error: errorMessage,
+            }
+        );
 
         return {
             duration,
@@ -304,18 +377,21 @@ export function createSuccessResponse<T>(
 
 function createResponseFromExecution<T>(
     channelName: string,
-    execution: HandlerExecutionResult<T>
+    execution: HandlerExecutionResult<T>,
+    correlationId?: CorrelationId
 ): IpcResponse<T> {
     if (execution.outcome === "success") {
         return createSuccessResponse(execution.value, {
             duration: execution.duration,
             handler: channelName,
+            ...(correlationId ? { correlationId } : {}),
         });
     }
 
     return createErrorResponse<T>(execution.errorMessage, {
         duration: execution.duration,
         handler: channelName,
+        ...(correlationId ? { correlationId } : {}),
     });
 }
 
@@ -375,12 +451,12 @@ export async function withIpcHandler<T>(
     handler: () => Promise<T> | T,
     options?: WithIpcHandlerOptions
 ): Promise<IpcResponse<T>> {
-    const execution = await executeIpcHandler(
+    const execution = await executeIpcHandler(channelName, handler, options);
+    return createResponseFromExecution(
         channelName,
-        handler,
-        options?.metadata
+        execution,
+        options?.correlationId
     );
-    return createResponseFromExecution(channelName, execution);
 }
 
 /**
@@ -419,28 +495,52 @@ export async function withIpcHandlerValidation<
     channelName: string,
     handler: (...validatedParams: TParams) => Promise<T> | T,
     validateParams: IpcParameterValidator,
-    params: TParams
+    params: TParams,
+    options?: WithIpcHandlerOptions
 ): Promise<IpcResponse<T>> {
-    const validationErrors = validateParams(params);
-    if (validationErrors?.length) {
+    const validationErrors = validateParams(params) ?? [];
+    const correlationId = options?.correlationId;
+    const correlationMetadata = correlationId ? { correlationId } : {};
+    if (validationErrors.length > 0) {
         const errorMessage = `Parameter validation failed: ${validationErrors.join(", ")}`;
-        logger.warn(`[IpcHandler] Validation failed ${channelName}`, {
-            errors: validationErrors,
-        });
+        logger.warn(
+            `[IpcHandler] Validation failed ${channelName}`,
+            withLogContext({
+                channel: channelName,
+                ...correlationMetadata,
+                event: "ipc:handler:validation-failed",
+                severity: "warn",
+            }),
+            {
+                errors: validationErrors,
+            }
+        );
         return createErrorResponse<T>(errorMessage, {
             handler: channelName,
+            ...correlationMetadata,
             validationErrors,
         });
     }
 
+    const metadata: IpcHandlerMetadata = {
+        paramCount: params.length,
+        ...options?.metadata,
+    };
+
+    const executionOptions: WithIpcHandlerOptions =
+        correlationId === undefined
+            ? { metadata }
+            : {
+                  correlationId,
+                  metadata,
+              };
+
     const execution = await executeIpcHandler(
         channelName,
         () => handler(...params),
-        {
-            paramCount: params.length,
-        }
+        executionOptions
     );
-    return createResponseFromExecution(channelName, execution);
+    return createResponseFromExecution(channelName, execution, correlationId);
 }
 
 /**
@@ -481,10 +581,18 @@ export function registerStandardizedIpcHandler<
     if (registeredHandlers.has(channelName)) {
         const errorMessage = `[IpcService] Attempted to register duplicate IPC handler for channel '${channelName}'`;
 
-        logger.error(errorMessage, {
-            channel: channelName,
-            registeredHandlers: Array.from(registeredHandlers),
-        });
+        logger.error(
+            errorMessage,
+            withLogContext({
+                channel: channelName,
+                event: "ipc:handler:register",
+                severity: "error",
+            }),
+            {
+                channel: channelName,
+                registeredHandlers: Array.from(registeredHandlers),
+            }
+        );
 
         throw new Error(errorMessage);
     }
@@ -492,26 +600,40 @@ export function registerStandardizedIpcHandler<
     registeredHandlers.add(channelName);
 
     try {
-        ipcMain.handle(
-            channelName,
-            async (_event, ...rawArgs: ChannelParams<TChannel>) => {
-                if (validateParams) {
-                    return withIpcHandlerValidation(
-                        channelName,
-                        (...validatedParams: ChannelParams<TChannel>) =>
-                            handler(...validatedParams),
-                        validateParams,
-                        rawArgs
-                    );
-                }
+        ipcMain.handle(channelName, async (_event, ...rawArgs: unknown[]) => {
+            const { args, correlationId } =
+                extractIpcCorrelationContext(rawArgs);
+            assertChannelParams(channelName, args, handler);
+            const baseMetadata = {
+                paramCount: args.length,
+            } satisfies IpcHandlerMetadata;
+            const handlerOptions: WithIpcHandlerOptions =
+                correlationId === undefined
+                    ? {
+                          metadata: baseMetadata,
+                      }
+                    : {
+                          correlationId,
+                          metadata: baseMetadata,
+                      };
 
-                return withIpcHandler(channelName, () => handler(...rawArgs), {
-                    metadata: {
-                        paramCount: rawArgs.length,
-                    },
-                });
+            if (validateParams) {
+                return withIpcHandlerValidation(
+                    channelName,
+                    (...validatedParams: ChannelParams<TChannel>) =>
+                        handler(...validatedParams),
+                    validateParams,
+                    args,
+                    handlerOptions
+                );
             }
-        );
+
+            return withIpcHandler(
+                channelName,
+                () => handler(...args),
+                handlerOptions
+            );
+        });
     } catch (rawError) {
         registeredHandlers.delete(channelName);
 
@@ -520,6 +642,11 @@ export function registerStandardizedIpcHandler<
 
         logger.error(
             `[IpcService] Failed to register IPC handler for channel '${channelName}'`,
+            withLogContext({
+                channel: channelName,
+                event: "ipc:handler:register",
+                severity: "error",
+            }),
             error
         );
 

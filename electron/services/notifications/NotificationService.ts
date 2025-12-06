@@ -1,380 +1,276 @@
-/**
- * Notification service for desktop system notifications.
- *
- * @remarks
- * Manages system notifications for monitor status changes, providing user
- * alerts for down/up events with configurable notification preferences.
- */
-import type { Site } from "@shared/types";
+import type { Monitor, Site } from "@shared/types";
 
-import { LOG_TEMPLATES } from "@shared/utils/logTemplates";
 import { Notification } from "electron";
 
 import { logger } from "../../utils/logger";
+import { MIN_CHECK_INTERVAL } from "../monitoring/constants";
+
+const LOG_TEMPLATES = {
+    errors: {
+        NOTIFY_DOWN_MONITOR_NOT_FOUND:
+            "[NotificationService] Cannot notify down: monitor with ID %s not found",
+        NOTIFY_DOWN_MONITOR_NULL:
+            "[NotificationService] Cannot notify down: monitorId is invalid",
+        NOTIFY_UP_MONITOR_NOT_FOUND:
+            "[NotificationService] Cannot notify up: monitor with ID %s not found",
+        NOTIFY_UP_MONITOR_NULL:
+            "[NotificationService] Cannot notify up: monitorId is invalid",
+    },
+    warnings: {
+        NOTIFICATIONS_UNSUPPORTED:
+            "Notifications not supported on this platform",
+        NOTIFY_SUPPRESSED:
+            "[NotificationService] Suppressed %s notification for %s due to %s",
+    },
+} as const;
+
+export const DEFAULT_DOWN_ALERT_COOLDOWN_MS = 90_000;
+
+type MonitorStatusKind = "down" | "up";
+
+interface MonitorNotificationState {
+    lastNotifiedAt?: number;
+    lastStatus?: MonitorStatusKind;
+    suppressionUntil?: number;
+}
 
 /**
- * Configuration options for the notification service.
- *
- * @remarks
- * Controls which types of monitor status change notifications are displayed to
- * the user. Both settings can be independently enabled or disabled.
- *
- * @public
+ * User-configurable notification preferences applied to outage/restore alerts.
  */
 export interface NotificationConfig {
-    /** Whether system notifications are enabled globally */
+    downAlertCooldownMs: number;
     enabled: boolean;
-    /** Whether system notifications should play sound when supported */
     playSound: boolean;
-    /** Whether to show notifications when monitors go down */
+    restoreRequiresOutage: boolean;
     showDownAlerts: boolean;
-    /** Whether to show notifications when monitors come back up */
     showUpAlerts: boolean;
 }
 
-/**
- * Dependencies required by the NotificationService for proper operation.
- *
- * @remarks
- * Follows the standardized dependency injection pattern used throughout the
- * application. Provides optional configuration with sensible defaults.
- *
- * @public
- */
-export interface NotificationServiceDependencies {
-    /**
-     * Optional configuration for notification behavior. Defaults to enabled
-     * alerts.
-     */
-    config?: Partial<NotificationConfig>;
-}
-const DEFAULT_NOTIFICATION_CONFIG: NotificationConfig = {
-    enabled: true,
-    playSound: false,
-    showDownAlerts: true,
-    showUpAlerts: true,
-};
-
-function normalizeConfig(
-    overrides?: Partial<NotificationConfig>
-): NotificationConfig {
-    if (!overrides) {
-        return { ...DEFAULT_NOTIFICATION_CONFIG };
-    }
-
-    return {
-        enabled: overrides.enabled ?? DEFAULT_NOTIFICATION_CONFIG.enabled,
-        playSound: overrides.playSound ?? DEFAULT_NOTIFICATION_CONFIG.playSound,
-        showDownAlerts:
-            overrides.showDownAlerts ??
-            DEFAULT_NOTIFICATION_CONFIG.showDownAlerts,
-        showUpAlerts:
-            overrides.showUpAlerts ?? DEFAULT_NOTIFICATION_CONFIG.showUpAlerts,
-    } satisfies NotificationConfig;
-}
-
-function mergeConfig(
-    current: NotificationConfig,
-    updates?: Partial<NotificationConfig>
-): NotificationConfig {
-    if (!updates) {
-        return current;
-    }
-
-    return {
-        enabled: updates.enabled ?? current.enabled,
-        playSound: updates.playSound ?? current.playSound,
-        showDownAlerts: updates.showDownAlerts ?? current.showDownAlerts,
-        showUpAlerts: updates.showUpAlerts ?? current.showUpAlerts,
-    } satisfies NotificationConfig;
+interface NotificationContext {
+    monitor: Monitor;
+    responseTime?: number;
+    site: Site;
+    status: MonitorStatusKind;
 }
 
 /**
- * Service responsible for handling system notifications for monitor status
- * changes.
- *
- * @remarks
- * Manages desktop notifications for monitor status changes using Electron's
- * Notification API. Provides configurable settings for different notification
- * types and handles platform compatibility checks.
- *
- * **Thread Safety and Concurrency:** This service is designed to be thread-safe
- * for typical Electron usage patterns: - Safe to call from main process event
- * handlers
- *
- * - Safe to call from IPC message handlers
- * - Safe to call from multiple timer callbacks concurrently
- * - Configuration updates are applied atomically
- * - No shared mutable state between notification calls
- *
- * **Performance Considerations:**
- *
- * - Monitor lookup uses Array.find() - consider caching for high-frequency usage
- * - Notification creation is synchronous but display is asynchronous
- * - Platform support check is cached by Electron
- *
- * **Error Handling:**
- *
- * - Invalid monitor IDs are logged and skipped gracefully
- * - Platform compatibility issues are handled automatically
- * - Invalid input parameters result in warning logs and early returns
- *
- * @example
- *
- * ```typescript
- * const notificationService = new NotificationService({
- *     config: {
- *         showDownAlerts: true,
- *         showUpAlerts: false,
- *     },
- * });
- *
- * // Show notification when a monitor goes down
- * notificationService.notifyMonitorDown(site, monitorId);
- *
- * // Safe to call from multiple contexts concurrently
- * Promise.all([
- *     notificationService.notifyMonitorDown(site1, monitor1),
- *     notificationService.notifyMonitorUp(site2, monitor2),
- * ]);
- * ```
- *
- * @public
- *
- * @see {@link NotificationConfig} for configuration options
- * @see {@link Site} for site data structure
- * @see `Monitor` (shared type) for monitor data structure
+ * Central notification orchestrator that enforces throttling and ordering rules
+ * before emitting system notifications for monitor outages/restores.
  */
 export class NotificationService {
-    private config: NotificationConfig;
+    private config: NotificationConfig = {
+        downAlertCooldownMs: DEFAULT_DOWN_ALERT_COOLDOWN_MS,
+        enabled: true,
+        playSound: false,
+        restoreRequiresOutage: true,
+        showDownAlerts: true,
+        showUpAlerts: true,
+    };
 
-    /**
-     * Create a new notification service instance.
-     *
-     * @remarks
-     * Uses the standardized dependency injection pattern. If no configuration
-     * is provided in dependencies, both down and up alerts are enabled by
-     * default. The configuration can be updated later using
-     * {@link NotificationService.updateConfig}.
-     *
-     * @param dependencies - Dependencies containing optional configuration
-     */
-    public constructor(dependencies: NotificationServiceDependencies = {}) {
-        this.config = normalizeConfig(dependencies.config);
-    }
+    private readonly monitorState = new Map<string, MonitorNotificationState>();
 
-    /**
-     * Get the current notification configuration.
-     *
-     * @remarks
-     * Returns a copy to prevent external modification of the internal
-     * configuration. Use {@link NotificationService.updateConfig} to modify
-     * settings.
-     *
-     * @returns A copy of the current configuration
-     */
-    public getConfig(): NotificationConfig {
-        return { ...this.config };
-    }
-
-    /**
-     * Check if system notifications are supported on the current platform.
-     *
-     * @remarks
-     * Uses Electron's built-in platform detection to determine notification
-     * support. On unsupported platforms, notification methods will log warnings
-     * instead of attempting to display notifications.
-     *
-     * @returns `true` if notifications are supported, `false` otherwise
-     */
     public isSupported(): boolean {
         return Notification.isSupported();
     }
 
-    /**
-     * Show a notification when a monitor goes down.
-     *
-     * @remarks
-     * Displays a critical urgency notification with site name and monitor type.
-     * Automatically skipped if down alerts are disabled in configuration or if
-     * notifications are not supported on the current platform.
-     *
-     * The notification includes:
-     *
-     * - Site name for easy identification
-     * - Monitor type (HTTP, port, etc.)
-     * - Critical urgency level to ensure visibility
-     *
-     * Error handling:
-     *
-     * - Logs warning and skips notification if monitor not found
-     * - Validates input parameters before processing
-     * - Provides detailed error information for debugging
-     *
-     * @param site - The site containing the monitor that went down
-     * @param monitorId - ID of the specific monitor that went down
-     */
-    public notifyMonitorDown(site: Site, monitorId: string): void {
-        if (!this.config.enabled || !this.config.showDownAlerts) {
-            logger.debug(
-                "[NotificationService] Skipping down alert; notifications disabled",
-                {
-                    enabled: this.config.enabled,
-                    showDownAlerts: this.config.showDownAlerts,
-                }
-            );
-            return;
-        }
-
-        // Validate monitor ID
-        if (!monitorId) {
-            logger.error(
-                "[NotificationService] Cannot notify down: monitorId is invalid"
-            );
-            return;
-        }
-
-        const monitor = site.monitors.find((m) => m.id === monitorId);
-
-        // Handle missing monitor
-        if (!monitor) {
-            logger.warn(
-                `[NotificationService] Monitor not found for down notification: ${monitorId} in site ${site.name}`
-            );
-            return;
-        }
-
-        const monitorType = monitor.type;
-
-        logger.warn(
-            `[NotificationService] Monitor down alert: ${site.name} [${monitorType}]`
-        );
-
-        if (Notification.isSupported()) {
-            new Notification({
-                body: `${site.name} (${monitorType}) is currently down!`,
-                silent: !this.config.playSound,
-                title: "Monitor Down Alert",
-                urgency: "critical",
-            }).show();
-
-            logger.info(
-                `[NotificationService] Notification sent for monitor down: ${site.name} (${monitorType})`
-            );
-        } else {
-            logger.warn(LOG_TEMPLATES.warnings.NOTIFICATIONS_UNSUPPORTED);
-        }
+    public updateConfig(newConfig: Partial<NotificationConfig>): void {
+        this.config = { ...this.config, ...newConfig };
     }
 
-    /**
-     * Show a notification when a monitor comes back up.
-     *
-     * @remarks
-     * Displays a normal urgency notification indicating service restoration.
-     * Automatically skipped if up alerts are disabled in configuration or if
-     * notifications are not supported on the current platform.
-     *
-     * The notification includes:
-     *
-     * - Site name for easy identification
-     * - Monitor type (HTTP, port, etc.)
-     * - Normal urgency level (less intrusive than down alerts)
-     *
-     * Error handling:
-     *
-     * - Logs warning and skips notification if monitor not found
-     * - Validates input parameters before processing
-     * - Provides detailed error information for debugging
-     *
-     * @param site - The site containing the monitor that came back up
-     * @param monitorId - ID of the specific monitor that was restored
-     */
-    public notifyMonitorUp(site: Site, monitorId: string): void {
-        if (!this.config.enabled || !this.config.showUpAlerts) {
-            logger.debug(
-                "[NotificationService] Skipping up alert; notifications disabled",
-                {
-                    enabled: this.config.enabled,
-                    showUpAlerts: this.config.showUpAlerts,
-                }
-            );
+    public getConfig(): NotificationConfig {
+        return { ...this.config };
+    }
+
+    public notifyMonitorDown(site: Site, monitorId: string): void {
+        if (!this.shouldGenerateNotification(this.config.showDownAlerts)) {
             return;
         }
 
-        // Validate monitor ID
+        const monitor = this.findMonitorOrLog(site, monitorId, "down");
+        if (!monitor) return;
+
+        const now = Date.now();
+        const stateKey = this.getStateKey(site.identifier, monitorId);
+        if (!this.shouldDispatchForStatus(stateKey, "down", now)) {
+            return;
+        }
+
+        const context: NotificationContext = {
+            monitor,
+            responseTime: monitor.responseTime,
+            site,
+            status: "down",
+        };
+        this.showNotification(context, {
+            body: this.composeDownBody(context),
+            title: `${site.name} monitor is down`,
+            urgency: "critical",
+        });
+    }
+
+    public notifyMonitorUp(site: Site, monitorId: string): void {
+        if (!this.shouldGenerateNotification(this.config.showUpAlerts)) {
+            return;
+        }
+
+        const monitor = this.findMonitorOrLog(site, monitorId, "up");
+        if (!monitor) return;
+
+        const now = Date.now();
+        const stateKey = this.getStateKey(site.identifier, monitorId);
+        if (!this.shouldDispatchForStatus(stateKey, "up", now)) {
+            return;
+        }
+
+        const context: NotificationContext = {
+            monitor,
+            responseTime: monitor.responseTime,
+            site,
+            status: "up",
+        };
+        this.showNotification(context, {
+            body: this.composeUpBody(context),
+            title: `${site.name} monitor restored`,
+            urgency: "normal",
+        });
+    }
+
+    private shouldGenerateNotification(condition: boolean): boolean {
+        if (!this.config.enabled || !condition) {
+            return false;
+        }
+
+        if (!this.isSupported()) {
+            logger.warn(LOG_TEMPLATES.warnings.NOTIFICATIONS_UNSUPPORTED);
+            return false;
+        }
+
+        return true;
+    }
+
+    private findMonitorOrLog(
+        site: Site,
+        monitorId: string,
+        status: MonitorStatusKind
+    ): Monitor | undefined {
         if (!monitorId) {
             logger.error(
-                "[NotificationService] Cannot notify up: monitorId is invalid"
+                status === "down"
+                    ? LOG_TEMPLATES.errors.NOTIFY_DOWN_MONITOR_NULL
+                    : LOG_TEMPLATES.errors.NOTIFY_UP_MONITOR_NULL
             );
-            return;
+            return undefined;
         }
 
         const monitor = site.monitors.find((m) => m.id === monitorId);
-
-        // Handle missing monitor
         if (!monitor) {
-            logger.warn(
-                `[NotificationService] Monitor not found for up notification: ${monitorId} in site ${site.name}`
+            logger.error(
+                status === "down"
+                    ? LOG_TEMPLATES.errors.NOTIFY_DOWN_MONITOR_NOT_FOUND
+                    : LOG_TEMPLATES.errors.NOTIFY_UP_MONITOR_NOT_FOUND,
+                monitorId
             );
-            return;
         }
 
-        const monitorType = monitor.type;
+        return monitor;
+    }
+
+    private getStateKey(siteIdentifier: string, monitorId: string): string {
+        return `${siteIdentifier}|${monitorId}`;
+    }
+
+    private shouldDispatchForStatus(
+        stateKey: string,
+        nextStatus: MonitorStatusKind,
+        now: number
+    ): boolean {
+        const state = this.monitorState.get(stateKey) ?? {};
+
+        if (nextStatus === "down") {
+            if (
+                state.lastStatus === "down" &&
+                state.suppressionUntil !== undefined &&
+                now < state.suppressionUntil
+            ) {
+                const remaining = state.suppressionUntil - now;
+                logger.debug(
+                    LOG_TEMPLATES.warnings.NOTIFY_SUPPRESSED,
+                    "down",
+                    stateKey,
+                    `cooldown (${remaining}ms remaining)`
+                );
+                return false;
+            }
+
+            state.lastStatus = "down";
+            state.lastNotifiedAt = now;
+            state.suppressionUntil =
+                now +
+                Math.max(this.config.downAlertCooldownMs, MIN_CHECK_INTERVAL);
+            this.monitorState.set(stateKey, state);
+            return true;
+        }
+
+        if (this.config.restoreRequiresOutage && state.lastStatus !== "down") {
+            logger.debug(
+                LOG_TEMPLATES.warnings.NOTIFY_SUPPRESSED,
+                "up",
+                stateKey,
+                "no prior outage notification"
+            );
+            return false;
+        }
+
+        state.lastStatus = "up";
+        state.lastNotifiedAt = now;
+        state.suppressionUntil = 0;
+        this.monitorState.set(stateKey, state);
+        return true;
+    }
+
+    private showNotification(
+        context: NotificationContext,
+        options: {
+            body: string;
+            title: string;
+            urgency: "critical" | "normal";
+        }
+    ): void {
+        const notification = new Notification({
+            body: options.body,
+            silent: !this.config.playSound,
+            title: options.title,
+            urgency: options.urgency,
+        });
+        notification.show();
 
         logger.info(
-            `[NotificationService] Monitor restored: ${site.name} [${monitorType}]`
+            `[NotificationService] Dispatched ${context.status} notification for ${context.site.identifier}|${context.monitor.id}`,
+            {
+                monitorId: context.monitor.id,
+                responseTime: context.responseTime,
+                siteIdentifier: context.site.identifier,
+                status: context.status,
+            }
         );
-
-        if (Notification.isSupported()) {
-            new Notification({
-                body: `${site.name} (${monitorType}) is back online!`,
-                silent: !this.config.playSound,
-                title: "Monitor Restored",
-                urgency: "normal",
-            }).show();
-
-            logger.info(
-                `[NotificationService] Notification sent for monitor restored: ${site.name} (${monitorType})`
-            );
-        } else {
-            logger.warn(LOG_TEMPLATES.warnings.NOTIFICATIONS_UNSUPPORTED);
-        }
     }
 
-    /**
-     * Update the notification configuration.
-     *
-     * @remarks
-     * Allows runtime modification of notification behavior without creating a
-     * new service instance.
-     *
-     * **Partial Update Behavior:**
-     *
-     * - Only properties specified in the config parameter are updated
-     * - Omitted properties retain their current values
-     * - No properties are reset to default values
-     * - Changes take effect immediately for subsequent notifications
-     *
-     * @example
-     *
-     * ```typescript
-     * // Only update showDownAlerts, showUpAlerts remains unchanged
-     * service.updateConfig({ showDownAlerts: false });
-     *
-     * // Update both properties
-     * service.updateConfig({
-     *     showDownAlerts: true,
-     *     showUpAlerts: false,
-     * });
-     * ```
-     *
-     * @param config - Partial configuration object with settings to update
-     */
-    public updateConfig(config: Partial<NotificationConfig>): void {
-        this.config = mergeConfig(this.config, config);
-        logger.debug(
-            "[NotificationService] Configuration updated",
-            this.config
-        );
+    private composeDownBody(context: NotificationContext): string {
+        const metric =
+            context.responseTime === undefined
+                ? "Last response unavailable."
+                : `Last response ${context.responseTime}ms.`;
+        const monitorLabel = this.describeMonitor(context.monitor);
+        return `${monitorLabel} reported DOWN at ${new Date().toLocaleTimeString()}. ${metric}`;
+    }
+
+    private composeUpBody(context: NotificationContext): string {
+        const monitorLabel = this.describeMonitor(context.monitor);
+        return `${monitorLabel} is back online as of ${new Date().toLocaleTimeString()}.`;
+    }
+
+    private describeMonitor(monitor: Monitor): string {
+        const label = monitor.url ?? monitor.host ?? monitor.id;
+        return `${label} (${monitor.type})`;
     }
 }

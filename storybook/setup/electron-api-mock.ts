@@ -7,7 +7,10 @@ import type {
     StatusUpdate,
 } from "@shared/types";
 import type { StateSyncEventData } from "@shared/types/events";
-import type { SerializedDatabaseBackupResult } from "@shared/types/ipc";
+import type {
+    SerializedDatabaseBackupResult,
+    SerializedDatabaseRestoreResult,
+} from "@shared/types/ipc";
 import type { MonitorTypeConfig } from "@shared/types/monitorTypes";
 import type { StateSyncDomainBridge } from "@shared/types/preload";
 import type {
@@ -125,8 +128,12 @@ const electronAPIMockDefinition = {
                 buffer: new ArrayBuffer(0),
                 fileName: "uptime-watcher-backup.sqlite",
                 metadata: {
+                    appVersion: "storybook-mock",
+                    checksum: "mock-checksum",
                     createdAt: Date.now(),
                     originalPath: "C:/mock/uptime-watcher.sqlite",
+                    retentionHintDays: 30,
+                    schemaVersion: 1,
                     sizeBytes: 0,
                 },
             }),
@@ -163,6 +170,21 @@ const electronAPIMockDefinition = {
                 return false;
             }
         },
+        restoreSqliteBackup:
+            async (): Promise<SerializedDatabaseRestoreResult> => ({
+                metadata: {
+                    appVersion: "storybook-mock",
+                    checksum: "mock-restore-checksum",
+                    createdAt: Date.now(),
+                    originalPath: "mock-upload.sqlite",
+                    retentionHintDays: 30,
+                    schemaVersion: 1,
+                    sizeBytes: 0,
+                },
+                preRestoreFileName:
+                    "uptime-watcher-pre-restore-storybook.sqlite",
+                restoredAt: Date.now(),
+            }),
     },
     events: {
         onCacheInvalidated: registerListener,

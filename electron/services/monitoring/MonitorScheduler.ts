@@ -1,21 +1,73 @@
 import type { Site } from "@shared/types";
 import type { Logger } from "@shared/utils/logger/interfaces";
 
+import { randomInt } from "node:crypto";
+
+import type { UptimeEvents } from "../../events/eventTypes";
+import type { TypedEventBus } from "../../events/TypedEventBus";
+
 import { DEFAULT_CHECK_INTERVAL } from "../../constants";
 import { isDev } from "../../electronUtils";
+import { generateCorrelationId } from "../../utils/correlation";
 import { logger as backendLogger } from "../../utils/logger";
-import { MIN_CHECK_INTERVAL } from "./constants";
+import {
+    DEFAULT_MONITOR_TIMEOUT_SECONDS,
+    MIN_CHECK_INTERVAL,
+    MONITOR_TIMEOUT_BUFFER_MS,
+    SECONDS_TO_MS_MULTIPLIER,
+} from "./constants";
+
+const JITTER_PERCENTAGE = 0.1;
+const MAX_BACKOFF_DELAY_MS = 5 * 60 * 1000; // 5 minutes
+
+type MonitorSchedulerEventBus = Pick<TypedEventBus<UptimeEvents>, "emitTyped">;
+
+const noopEventEmitter: MonitorSchedulerEventBus = {
+    async emitTyped() {
+        /* noop */
+    },
+};
+
+class MonitorJobTimeoutError extends Error {
+    public readonly timeoutMs: number;
+
+    public constructor(timeoutMs: number) {
+        super(`Monitor job exceeded timeout after ${timeoutMs}ms`);
+        this.name = "MonitorJobTimeoutError";
+        this.timeoutMs = timeoutMs;
+    }
+}
+
+interface MonitorJob {
+    backoffAttempt: number;
+    baseIntervalMs: number;
+    correlationId: string;
+    isRunning: boolean;
+    monitorId: string;
+    siteIdentifier: string;
+    timeoutMs: number;
+    timer: NodeJS.Timeout | undefined;
+}
+
+interface MonitorJobSnapshot {
+    backoffAttempt: number;
+    baseIntervalMs: number;
+    correlationId: string;
+    hasTimer: boolean;
+    isRunning: boolean;
+    monitorId: string;
+    siteIdentifier: string;
+    timeoutMs: number;
+}
 
 /**
- * Manages scheduling, execution, and lifecycle of monitor checks for sites and
- * their monitors.
+ * Job-based scheduler that emits telemetry and enforces per-monitor timeouts.
  *
  * @remarks
- * Maintains per-monitor interval timers, supports dynamic check intervals, and
- * provides lifecycle management for starting, stopping, and restarting
- * monitoring operations. All monitor checks are triggered via an async
- * callback, and errors during checks are logged without affecting other
- * monitors. Designed for robust, event-driven monitoring orchestration.
+ * Turns each monitor into an independent job that executes immediately, then
+ * reschedules itself using jittered intervals with exponential backoff. Jobs
+ * are guarded by a timeout buffer and surface their lifecycle through typed
+ * events for downstream observability.
  *
  * @example
  *
@@ -37,19 +89,11 @@ export class MonitorScheduler {
      */
     private readonly logger: Logger;
 
-    /**
-     * Map of interval keys to active NodeJS.Timeout objects.
-     *
-     * @remarks
-     * Keys are formatted as `${siteIdentifier}|${monitorId}`. Used internally
-     * to track all active monitor intervals for efficient management and
-     * lookup.
-     *
-     * @internal
-     *
-     * @readonly
-     */
-    private readonly intervals = new Map<string, NodeJS.Timeout>();
+    /** Active monitor jobs keyed by `${siteIdentifier}|${monitorId}`. */
+    private readonly jobs = new Map<string, MonitorJob>();
+
+    /** Event emitter used for surfacing scheduling/backoff/timeout lifecycle. */
+    private readonly eventEmitter: MonitorSchedulerEventBus;
 
     /**
      * Callback invoked to perform a monitor check for a given site and monitor.
@@ -71,43 +115,149 @@ export class MonitorScheduler {
         monitorId: string
     ) => Promise<void>;
 
+    private async runJob(intervalKey: string): Promise<void> {
+        const job = this.jobs.get(intervalKey);
+        const checkOperation = this.onCheckCallback;
+
+        if (!job) {
+            return;
+        }
+
+        if (!checkOperation) {
+            this.logger.warn(
+                `[MonitorScheduler] No check callback configured; skipping ${intervalKey}`
+            );
+            this.scheduleNextRun(intervalKey);
+            return;
+        }
+
+        if (job.isRunning) {
+            this.logger.warn(
+                `[MonitorScheduler] Job already running; skipping overlapping trigger for ${intervalKey}`
+            );
+            return;
+        }
+
+        job.isRunning = true;
+
+        try {
+            await this.executeWithTimeout(job, checkOperation);
+            job.backoffAttempt = 0;
+        } catch (error) {
+            if (error instanceof MonitorJobTimeoutError) {
+                this.emitMonitorTimeoutEvent(job, error.timeoutMs);
+            } else {
+                this.logger.error(
+                    `[MonitorScheduler] Error during monitor job for ${intervalKey}`,
+                    error
+                );
+            }
+
+            job.backoffAttempt += 1;
+        } finally {
+            job.isRunning = false;
+            if (this.jobs.has(intervalKey)) {
+                this.scheduleNextRun(intervalKey);
+            }
+        }
+    }
+
+    private async executeWithTimeout(
+        job: MonitorJob,
+        checkOperation: (
+            siteIdentifier: string,
+            monitorId: string
+        ) => Promise<void>
+    ): Promise<void> {
+        const { clear, promise: timeoutPromise } = this.createTimeoutGuard(
+            job.timeoutMs
+        );
+
+        try {
+            await Promise.race([
+                checkOperation(job.siteIdentifier, job.monitorId),
+                timeoutPromise,
+            ]);
+        } finally {
+            clear();
+        }
+    }
+
     /**
-     * Performs an immediate check for a specific monitor by invoking the
-     * registered check callback.
-     *
-     * @remarks
-     * Invokes the registered check callback for the specified monitor. Errors
-     * are logged and do not interrupt execution. If no callback is set, this
-     * method does nothing.
-     *
-     * @param siteIdentifier - Unique identifier for the site.
-     * @param monitorId - Unique identifier for the monitor.
-     *
-     * @returns A promise that resolves when the check completes.
-     *
-     * @throws Any error thrown by the callback is caught and logged; errors are
-     *   not re-thrown.
-     *
-     * @public
+     * Performs an immediate check for a specific monitor by pre-empting the
+     * scheduled job when available.
      */
     public async performImmediateCheck(
         siteIdentifier: string,
         monitorId: string
     ): Promise<void> {
-        if (this.onCheckCallback) {
-            try {
-                await this.onCheckCallback(siteIdentifier, monitorId);
-            } catch (error) {
-                const intervalKey = this.createIntervalKey(
-                    siteIdentifier,
-                    monitorId
-                );
-                this.logger.error(
-                    `[MonitorScheduler] Error during immediate check for ${intervalKey}`,
-                    error
-                );
-            }
+        const intervalKey = this.createIntervalKey(siteIdentifier, monitorId);
+        const job = this.jobs.get(intervalKey);
+
+        if (job) {
+            this.clearJobTimer(job);
+            job.backoffAttempt = 0;
+            job.correlationId = generateCorrelationId();
+            this.emitManualCheckStartedEvent(job);
+            await this.runJob(intervalKey);
+            return;
         }
+
+        if (!this.onCheckCallback) {
+            return;
+        }
+
+        const correlationId = generateCorrelationId();
+        this.emitManualCheckStartedEvent({
+            correlationId,
+            monitorId,
+            siteIdentifier,
+        });
+
+        try {
+            await this.onCheckCallback(siteIdentifier, monitorId);
+        } catch (error) {
+            this.logger.error(
+                `[MonitorScheduler] Error during immediate check for ${intervalKey}`,
+                error
+            );
+        }
+    }
+
+    private async emitEvent<K extends keyof UptimeEvents>(
+        eventName: K,
+        payload: UptimeEvents[K]
+    ): Promise<void> {
+        try {
+            await this.eventEmitter.emitTyped(String(eventName), payload);
+        } catch (error: unknown) {
+            this.logger.error(
+                `[MonitorScheduler] Failed to emit ${eventName}`,
+                error
+            );
+        }
+    }
+
+    private createTimeoutGuard(timeoutMs: number): {
+        clear: () => void;
+        promise: Promise<never>;
+    } {
+        let handle: NodeJS.Timeout | null = null;
+        const promise = new Promise<never>((_resolve, reject) => {
+            handle = setTimeout(() => {
+                reject(new MonitorJobTimeoutError(timeoutMs));
+            }, timeoutMs);
+        });
+
+        return {
+            clear: (): void => {
+                if (handle) {
+                    clearTimeout(handle);
+                    handle = null;
+                }
+            },
+            promise,
+        };
     }
 
     /**
@@ -116,8 +266,12 @@ export class MonitorScheduler {
      * @param loggerInstance - Optional logger implementation to use for
      *   diagnostic output. Defaults to the shared backend logger.
      */
-    public constructor(loggerInstance: Logger = backendLogger) {
+    public constructor(
+        loggerInstance: Logger = backendLogger,
+        eventEmitter: MonitorSchedulerEventBus = noopEventEmitter
+    ) {
         this.logger = loggerInstance;
+        this.eventEmitter = eventEmitter;
     }
 
     /**
@@ -128,7 +282,7 @@ export class MonitorScheduler {
      * @public
      */
     public getActiveCount(): number {
-        return this.intervals.size;
+        return this.jobs.size;
     }
 
     /**
@@ -140,7 +294,34 @@ export class MonitorScheduler {
      * @public
      */
     public getActiveMonitors(): string[] {
-        return Array.from(this.intervals.keys());
+        return Array.from(this.jobs.keys());
+    }
+
+    /**
+     * Returns a snapshot of the internal job map for diagnostics and tests.
+     *
+     * @remarks
+     * The returned map is a shallow copy and mutating it will not affect the
+     * scheduler's internal state. Only exposed in non-production scenarios.
+     *
+     * @internal
+     */
+    public getJobsForTesting(): ReadonlyMap<string, MonitorJobSnapshot> {
+        return new Map(
+            Array.from(this.jobs.entries(), ([key, job]) => [
+                key,
+                {
+                    backoffAttempt: job.backoffAttempt,
+                    baseIntervalMs: job.baseIntervalMs,
+                    correlationId: job.correlationId,
+                    hasTimer: Boolean(job.timer),
+                    isRunning: job.isRunning,
+                    monitorId: job.monitorId,
+                    siteIdentifier: job.siteIdentifier,
+                    timeoutMs: job.timeoutMs,
+                },
+            ])
+        );
     }
 
     /**
@@ -156,7 +337,7 @@ export class MonitorScheduler {
      */
     public isMonitoring(siteIdentifier: string, monitorId: string): boolean {
         const intervalKey = this.createIntervalKey(siteIdentifier, monitorId);
-        return this.intervals.has(intervalKey);
+        return this.jobs.has(intervalKey);
     }
 
     /**
@@ -257,64 +438,33 @@ export class MonitorScheduler {
 
         const intervalKey = this.createIntervalKey(siteIdentifier, monitor.id);
 
-        // Stop existing interval if any
         this.stopMonitor(siteIdentifier, monitor.id);
 
-        // Use default check interval if monitor doesn't specify one or 0
-        const effectiveCheckInterval =
-            monitor.checkInterval || DEFAULT_CHECK_INTERVAL;
-
-        // Validate the effective check interval
-        const checkInterval = this.validateCheckInterval(
-            effectiveCheckInterval
+        const baseIntervalMs = this.resolveBaseIntervalMs(
+            monitor.checkInterval
         );
+        const timeoutMs = this.resolveTimeout(monitor.timeout);
+
+        const job: MonitorJob = {
+            backoffAttempt: 0,
+            baseIntervalMs,
+            correlationId: generateCorrelationId(),
+            isRunning: false,
+            monitorId: monitor.id,
+            siteIdentifier,
+            timeoutMs,
+            timer: undefined,
+        };
+
+        this.jobs.set(intervalKey, job);
 
         if (isDev()) {
             this.logger.debug(
-                `[MonitorScheduler] Monitor checkInterval: ${monitor.checkInterval}, using: ${checkInterval}ms for ${siteIdentifier}|${monitor.id}`
+                `[MonitorScheduler] Started job for ${intervalKey} with base interval ${baseIntervalMs}ms`
             );
         }
 
-        // Start interval immediately
-        const interval = setInterval((): void => {
-            void (async (): Promise<void> => {
-                if (this.onCheckCallback) {
-                    try {
-                        await this.onCheckCallback(siteIdentifier, monitor.id);
-                    } catch (error) {
-                        this.logger.error(
-                            `[MonitorScheduler] Error during scheduled check for ${intervalKey}`,
-                            error
-                        );
-                    }
-                }
-            })();
-        }, checkInterval);
-
-        this.intervals.set(intervalKey, interval);
-
-        // Perform immediate check when starting (without waiting for interval)
-        if (this.onCheckCallback) {
-            void (async (): Promise<void> => {
-                try {
-                    await this.performImmediateCheck(
-                        siteIdentifier,
-                        monitor.id
-                    );
-                } catch (error) {
-                    this.logger.error(
-                        `[MonitorScheduler] Error during immediate check for ${intervalKey}`,
-                        error
-                    );
-                }
-            })();
-        }
-
-        if (isDev()) {
-            this.logger.debug(
-                `[MonitorScheduler] Started monitoring for ${intervalKey} with interval ${checkInterval}ms (immediate check triggered)`
-            );
-        }
+        void this.runJob(intervalKey);
         return true;
     }
 
@@ -360,11 +510,11 @@ export class MonitorScheduler {
      * @public
      */
     public stopAll(): void {
-        for (const interval of this.intervals.values()) {
-            clearInterval(interval);
+        for (const job of this.jobs.values()) {
+            this.clearJobTimer(job);
         }
-        this.intervals.clear();
-        this.logger.info("[MonitorScheduler] Stopped all monitoring intervals");
+        this.jobs.clear();
+        this.logger.info("[MonitorScheduler] Stopped all monitoring jobs");
     }
 
     /**
@@ -391,18 +541,22 @@ export class MonitorScheduler {
      */
     public stopMonitor(siteIdentifier: string, monitorId: string): boolean {
         const intervalKey = this.createIntervalKey(siteIdentifier, monitorId);
-        const interval = this.intervals.get(intervalKey);
+        const job = this.jobs.get(intervalKey);
 
-        if (interval) {
-            clearInterval(interval);
-            this.intervals.delete(intervalKey);
+        if (!job) {
+            return false;
+        }
+
+        this.clearJobTimer(job);
+        this.jobs.delete(intervalKey);
+
+        if (isDev()) {
             this.logger.debug(
                 `[MonitorScheduler] Stopped monitoring for ${intervalKey}`
             );
-            return true;
         }
 
-        return false;
+        return true;
     }
 
     /**
@@ -436,8 +590,8 @@ export class MonitorScheduler {
             }
         } else {
             // Stop all monitors for this site
-            const siteIntervals = Array.from(this.intervals.keys()).filter(
-                (key) => key.startsWith(`${siteIdentifier}|`)
+            const siteIntervals = Array.from(this.jobs.keys()).filter((key) =>
+                key.startsWith(`${siteIdentifier}|`)
             );
             for (const intervalKey of siteIntervals) {
                 const parsed = this.parseIntervalKey(intervalKey);
@@ -537,7 +691,6 @@ export class MonitorScheduler {
             );
         }
 
-        // Minimum interval to prevent excessive CPU usage
         if (checkInterval < MIN_CHECK_INTERVAL) {
             this.logger.warn(
                 `[MonitorScheduler] Check interval ${checkInterval}ms is below minimum ${MIN_CHECK_INTERVAL}ms; clamping to minimum`
@@ -546,5 +699,119 @@ export class MonitorScheduler {
         }
 
         return checkInterval;
+    }
+
+    private resolveBaseIntervalMs(checkInterval?: number): number {
+        if (typeof checkInterval !== "number" || checkInterval === 0) {
+            return this.validateCheckInterval(DEFAULT_CHECK_INTERVAL);
+        }
+
+        return this.validateCheckInterval(checkInterval);
+    }
+
+    private resolveTimeout(timeoutMs?: number): number {
+        if (typeof timeoutMs === "number" && timeoutMs > 0) {
+            return timeoutMs + MONITOR_TIMEOUT_BUFFER_MS;
+        }
+
+        const defaultTimeoutMs =
+            DEFAULT_MONITOR_TIMEOUT_SECONDS * SECONDS_TO_MS_MULTIPLIER;
+        return defaultTimeoutMs + MONITOR_TIMEOUT_BUFFER_MS;
+    }
+
+    private clearJobTimer(job: MonitorJob): void {
+        if (job.timer) {
+            clearTimeout(job.timer);
+            job.timer = undefined;
+        }
+    }
+
+    private scheduleNextRun(intervalKey: string): void {
+        const job = this.jobs.get(intervalKey);
+        if (!job) {
+            return;
+        }
+
+        this.clearJobTimer(job);
+
+        const delayMs = this.computeNextDelay(job);
+        job.correlationId = generateCorrelationId();
+
+        job.timer = setTimeout(() => {
+            job.timer = undefined;
+            void this.runJob(intervalKey);
+        }, delayMs);
+
+        if (job.backoffAttempt > 0) {
+            this.emitBackoffAppliedEvent(job, delayMs);
+        }
+
+        this.emitScheduleUpdatedEvent(job, delayMs);
+    }
+
+    private computeNextDelay(job: MonitorJob): number {
+        const backoffMultiplier = 2 ** job.backoffAttempt;
+        const targetInterval = Math.min(
+            job.baseIntervalMs * backoffMultiplier,
+            MAX_BACKOFF_DELAY_MS
+        );
+        const jitteredInterval = this.applyJitter(targetInterval);
+        return Math.max(MIN_CHECK_INTERVAL, jitteredInterval);
+    }
+
+    private applyJitter(value: number): number {
+        if (value <= 0) {
+            return MIN_CHECK_INTERVAL;
+        }
+
+        const jitterRange = Math.max(1, Math.round(value * JITTER_PERCENTAGE));
+        const jitterOffset = randomInt(0, jitterRange * 2 + 1) - jitterRange;
+        return Math.max(MIN_CHECK_INTERVAL, value + jitterOffset);
+    }
+
+    /** Emits a schedule updated event with correlation metadata. */
+    private emitScheduleUpdatedEvent(job: MonitorJob, delayMs: number): void {
+        void this.emitEvent("monitor:schedule-updated", {
+            backoffAttempt: job.backoffAttempt,
+            correlationId: job.correlationId,
+            delayMs,
+            monitorId: job.monitorId,
+            siteIdentifier: job.siteIdentifier,
+            timestamp: Date.now(),
+        });
+    }
+
+    private emitBackoffAppliedEvent(job: MonitorJob, delayMs: number): void {
+        void this.emitEvent("monitor:backoff-applied", {
+            backoffAttempt: job.backoffAttempt,
+            correlationId: job.correlationId,
+            delayMs,
+            monitorId: job.monitorId,
+            siteIdentifier: job.siteIdentifier,
+            timestamp: Date.now(),
+        });
+    }
+
+    private emitManualCheckStartedEvent(job: {
+        correlationId: string;
+        monitorId: string;
+        siteIdentifier: string;
+    }): void {
+        void this.emitEvent("monitor:manual-check-started", {
+            correlationId: job.correlationId,
+            monitorId: job.monitorId,
+            siteIdentifier: job.siteIdentifier,
+            timestamp: Date.now(),
+        });
+    }
+
+    private emitMonitorTimeoutEvent(job: MonitorJob, timeoutMs: number): void {
+        void this.emitEvent("monitor:timeout", {
+            correlationId: job.correlationId,
+            monitorId: job.monitorId,
+            siteIdentifier: job.siteIdentifier,
+            timeoutMs,
+            timestamp: Date.now(),
+        });
     }
 }

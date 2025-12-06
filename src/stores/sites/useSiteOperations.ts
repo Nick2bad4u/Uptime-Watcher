@@ -9,6 +9,11 @@
  */
 
 import type { Monitor, MonitorType, Site } from "@shared/types";
+import type {
+    SerializedDatabaseBackupResult,
+    SerializedDatabaseRestorePayload,
+    SerializedDatabaseRestoreResult,
+} from "@shared/types/ipc";
 
 import { DEFAULT_SITE_NAME } from "@shared/constants/sites";
 import { ERROR_CATALOG } from "@shared/utils/errorCatalog";
@@ -62,6 +67,10 @@ export interface SiteOperationsActions extends BaseSiteOperations {
     }>;
     /** Modify an existing site */
     modifySite: (identifier: string, updates: Partial<Site>) => Promise<void>;
+    /** Restore SQLite backup */
+    restoreSqliteBackup: (
+        payload: SerializedDatabaseRestorePayload
+    ) => Promise<SerializedDatabaseRestoreResult>;
 }
 
 /**
@@ -170,15 +179,18 @@ export const createSiteOperationsActions = (
             } // Don't sync after as we're removing directly from deps
         );
     },
-    downloadSqliteBackup: async (): Promise<void> => {
-        await withSiteOperation(
+    downloadSqliteBackup: async (): Promise<SerializedDatabaseBackupResult> =>
+        withSiteOperationReturning(
             "downloadSqliteBackup",
             async () => {
                 try {
-                    await handleSQLiteBackupDownload(() =>
+                    const backupResult = await handleSQLiteBackupDownload(() =>
                         deps.services.data.downloadSqliteBackup()
                     );
+                    deps.setLastBackupMetadata(backupResult.metadata);
+                    return backupResult;
                 } catch (error) {
+                    deps.setLastBackupMetadata(undefined);
                     const resolvedError = ensureError(error);
                     logger.error(
                         "Failed to download SQLite backup:",
@@ -196,8 +208,7 @@ export const createSiteOperationsActions = (
                     },
                 },
             } // Don't sync for backup download
-        );
-    },
+        ),
     initializeSites: async (): Promise<{
         message: string;
         sitesLoaded: number;
@@ -269,6 +280,35 @@ export const createSiteOperationsActions = (
             }
         );
     },
+    restoreSqliteBackup: async (
+        payload: SerializedDatabaseRestorePayload
+    ): Promise<SerializedDatabaseRestoreResult> =>
+        withSiteOperationReturning(
+            "restoreSqliteBackup",
+            async () => {
+                try {
+                    const restoreResult =
+                        await deps.services.data.restoreSqliteBackup(payload);
+                    deps.setLastBackupMetadata(restoreResult.metadata);
+                    return restoreResult;
+                } catch (error) {
+                    const resolvedError = ensureError(error);
+                    logger.error(
+                        "Failed to restore SQLite backup:",
+                        resolvedError
+                    );
+                    throw resolvedError;
+                }
+            },
+            deps,
+            {
+                telemetry: {
+                    success: {
+                        message: "SQLite backup restore completed",
+                    },
+                },
+            }
+        ),
     updateMonitorRetryAttempts: async (
         siteIdentifier: string,
         monitorId: string,

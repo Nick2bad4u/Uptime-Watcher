@@ -727,11 +727,12 @@ export class ServiceContainer {
      */
     public getNotificationService(): NotificationService {
         if (!this.notificationService) {
-            this.notificationService = new NotificationService(
-                this.config.notificationConfig
-                    ? { config: this.config.notificationConfig }
-                    : {}
-            );
+            this.notificationService = new NotificationService();
+            if (this.config.notificationConfig) {
+                this.notificationService.updateConfig(
+                    this.config.notificationConfig
+                );
+            }
             if (this.config.enableDebugLogging) {
                 logger.debug("[ServiceContainer] Created NotificationService");
             }

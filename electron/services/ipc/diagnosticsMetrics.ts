@@ -9,6 +9,7 @@
 import type { PreloadGuardDiagnosticsReport } from "@shared/types/ipc";
 import type { Logger } from "@shared/utils/logger/interfaces";
 
+import { withLogContext } from "@shared/utils/loggingContext";
 import log from "electron-log/main";
 
 import * as loggerModule from "../../utils/logger";
@@ -79,11 +80,19 @@ function logDiagnosticsSnapshot({
     channel,
     event,
 }: DiagnosticsSnapshotContext): void {
-    diagnosticsLog.info("[IpcDiagnostics] Metrics snapshot", {
-        event,
-        ...(channel ? { channel } : {}),
-        snapshot: { ...metrics },
-    });
+    diagnosticsLog.info(
+        "[IpcDiagnostics] Metrics snapshot",
+        withLogContext({
+            ...(channel ? { channel } : {}),
+            event: `diagnostics:metrics:${event}`,
+            severity: "info",
+        }),
+        {
+            event,
+            ...(channel ? { channel } : {}),
+            snapshot: { ...metrics },
+        }
+    );
 }
 
 /**
@@ -109,10 +118,18 @@ export function recordMissingHandler(channel: string): void {
     metrics.lastMissingChannel = channel;
     metrics.lastUpdatedAt = Date.now();
 
-    diagnosticsLog.warn("[IpcDiagnostics] Missing handler detected", {
-        channel,
-        missingHandlerChecks: metrics.missingHandlerChecks,
-    });
+    diagnosticsLog.warn(
+        "[IpcDiagnostics] Missing handler detected",
+        withLogContext({
+            channel,
+            event: "diagnostics:missing-handler",
+            severity: "warn",
+        }),
+        {
+            channel,
+            missingHandlerChecks: metrics.missingHandlerChecks,
+        }
+    );
 
     logDiagnosticsSnapshot({ channel, event: "missing" });
 }
@@ -134,13 +151,21 @@ export function recordPreloadGuardFailure(
         ...(report.reason ? { reason: report.reason } : {}),
     };
 
-    diagnosticsLog.warn("[IpcDiagnostics] Preload guard failure", {
-        channel: report.channel,
-        guard: report.guard,
-        metadata: report.metadata,
-        payloadPreviewLength: report.payloadPreview?.length ?? 0,
-        reason: report.reason,
-    });
+    diagnosticsLog.warn(
+        "[IpcDiagnostics] Preload guard failure",
+        withLogContext({
+            channel: report.channel,
+            event: "diagnostics:preload-guard-report",
+            severity: "warn",
+        }),
+        {
+            channel: report.channel,
+            guard: report.guard,
+            metadata: report.metadata,
+            payloadPreviewLength: report.payloadPreview?.length ?? 0,
+            reason: report.reason,
+        }
+    );
 
     logDiagnosticsSnapshot({
         channel: report.channel,

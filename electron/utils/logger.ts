@@ -26,6 +26,7 @@ import {
     buildErrorLogArguments,
     buildLogArguments,
 } from "@shared/utils/logger/common";
+import { extractLogContext } from "@shared/utils/loggingContext";
 import log from "electron-log/main";
 
 /**
@@ -53,16 +54,41 @@ import log from "electron-log/main";
 function createLogger(prefix: string): Logger {
     return {
         debug: (message: string, ...args: unknown[]): void => {
-            log.debug(...buildLogArguments(prefix, message, args));
+            const { context, remaining } = extractLogContext(args, "debug");
+            const logArguments = buildLogArguments(prefix, message, remaining);
+            const finalArgs = context
+                ? [logArguments[0], context, ...logArguments.slice(1)]
+                : Array.from(logArguments);
+            log.debug(...finalArgs);
         },
         error: (message: string, error?: unknown, ...args: unknown[]): void => {
-            log.error(...buildErrorLogArguments(prefix, message, error, args));
+            const { context, remaining } = extractLogContext(args, "error");
+            const logArguments = buildErrorLogArguments(
+                prefix,
+                message,
+                error,
+                remaining
+            );
+            const finalArgs = context
+                ? [logArguments[0], context, ...logArguments.slice(1)]
+                : Array.from(logArguments);
+            log.error(...finalArgs);
         },
         info: (message: string, ...args: unknown[]): void => {
-            log.info(...buildLogArguments(prefix, message, args));
+            const { context, remaining } = extractLogContext(args, "info");
+            const logArguments = buildLogArguments(prefix, message, remaining);
+            const finalArgs = context
+                ? [logArguments[0], context, ...logArguments.slice(1)]
+                : Array.from(logArguments);
+            log.info(...finalArgs);
         },
         warn: (message: string, ...args: unknown[]): void => {
-            log.warn(...buildLogArguments(prefix, message, args));
+            const { context, remaining } = extractLogContext(args, "warn");
+            const logArguments = buildLogArguments(prefix, message, remaining);
+            const finalArgs = context
+                ? [logArguments[0], context, ...logArguments.slice(1)]
+                : Array.from(logArguments);
+            log.warn(...finalArgs);
         },
     };
 }

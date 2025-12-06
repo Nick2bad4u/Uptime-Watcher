@@ -102,7 +102,11 @@ import type { UptimeEvents } from "./events/eventTypes";
 import type { DatabaseManager } from "./managers/DatabaseManager";
 import type { MonitorManager } from "./managers/MonitorManager";
 import type { SiteManager } from "./managers/SiteManager";
-import type { DatabaseBackupResult } from "./services/database/utils/databaseBackup";
+import type {
+    DatabaseBackupResult,
+    DatabaseRestorePayload,
+    DatabaseRestoreSummary,
+} from "./services/database/utils/databaseBackup";
 import type {
     IsMonitoringActiveRequestData,
     OrchestratorEvents,
@@ -638,6 +642,22 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
                 code: "ORCHESTRATOR_DOWNLOAD_BACKUP_FAILED",
                 message: "Failed to download SQLite backup",
                 operation: "orchestrator.downloadBackup",
+            }
+        );
+    }
+
+    /**
+     * Restores the database from a provided backup payload.
+     */
+    public async restoreBackup(
+        payload: DatabaseRestorePayload
+    ): Promise<DatabaseRestoreSummary> {
+        return this.runWithContext(
+            () => this.databaseManager.restoreBackup(payload),
+            {
+                code: "ORCHESTRATOR_RESTORE_BACKUP_FAILED",
+                message: "Failed to restore SQLite backup",
+                operation: "orchestrator.restoreBackup",
             }
         );
     }

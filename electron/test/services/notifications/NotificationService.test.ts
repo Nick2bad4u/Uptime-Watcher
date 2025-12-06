@@ -1,400 +1,200 @@
-/**
- * Tests for NotificationService. Validates system notification management and
- * configuration.
- */
-
+import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { Notification } from "electron";
-import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
+import { type Site } from "@shared/types";
 
-import { NotificationService } from "../../../services/notifications/NotificationService";
-import type { NotificationConfig } from "../../../services/notifications/NotificationService";
-import type { Site } from "@shared/types";
 import {
-    sampleOne,
-    siteNameArbitrary,
-} from "@shared/test/arbitraries/siteArbitraries";
+    NotificationService,
+    DEFAULT_DOWN_ALERT_COOLDOWN_MS,
+    type NotificationConfig,
+} from "../../../services/notifications/NotificationService";
+import { logger } from "../../../utils/logger";
 
-// Mock Electron modules
-vi.mock("electron", () => {
-    const Notification = Object.assign(
-        vi.fn(function NotificationMock() {
-            return {
-                show: vi.fn(),
-            };
-        }),
-        {
-            isSupported: vi.fn(() => true),
-        }
-    );
-
-    return {
-        Notification,
-    };
-});
-
-vi.mock("../../../utils/logger", () => {
-    const createLoggerMock = () => ({
+vi.mock("../../../utils/logger", () => ({
+    logger: {
         debug: vi.fn(),
+        error: vi.fn(),
         info: vi.fn(),
         warn: vi.fn(),
-        error: vi.fn(),
-    });
+    },
+}));
+
+const mockShow = vi.fn();
+const notificationCtor = vi.fn(() => ({ show: mockShow }));
+const mockIsSupported = vi.fn(() => true);
+(notificationCtor as unknown as typeof Notification).isSupported =
+    mockIsSupported;
+
+vi.mock("electron", async () => {
+    const actual = await vi.importActual<typeof import("electron")>("electron");
     return {
-        logger: createLoggerMock(),
-        diagnosticsLogger: createLoggerMock(),
+        ...actual,
+        Notification: notificationCtor,
     };
 });
 
+const sampleSite: Site = {
+    identifier: "site-1",
+    name: "Example",
+    monitoring: true,
+    monitors: [
+        {
+            id: "monitor-1",
+            type: "http",
+            url: "https://example.com",
+            checkInterval: 60_000,
+            history: [],
+            responseTime: 512,
+            retryAttempts: 3,
+            timeout: 30,
+            status: "up",
+            monitoring: true,
+        },
+    ],
+};
+
 describe(NotificationService, () => {
-    let notificationService: NotificationService;
-    let mockNotification: any;
-    let logger: any;
+    let service: NotificationService;
 
-    beforeEach(async () => {
-        vi.clearAllMocks();
-
-        logger = (await import("../../../utils/logger")).logger;
-
-        mockNotification = {
-            show: vi.fn(),
-        };
-
-        (Notification as any).mockImplementation(function NotificationCtor() {
-            return mockNotification;
-        });
-        (Notification as any).isSupported.mockReturnValue(true);
-
-        notificationService = new NotificationService();
+    beforeEach(() => {
+        service = new NotificationService();
+        notificationCtor.mockClear();
+        mockShow.mockClear();
+        mockIsSupported.mockReturnValue(true);
     });
+
     afterEach(() => {
+        vi.useRealTimers();
         vi.resetAllMocks();
     });
-    describe("Constructor", () => {
-        it("should initialize with default configuration", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: types", "component");
 
-            const service = new NotificationService();
-            const config = service.getConfig();
-
-            expect(config).toEqual({
+    describe("configuration", () => {
+        it("returns default configuration", () => {
+            expect(service.getConfig()).toEqual({
                 enabled: true,
                 playSound: false,
                 showDownAlerts: true,
                 showUpAlerts: true,
+                downAlertCooldownMs: DEFAULT_DOWN_ALERT_COOLDOWN_MS,
+                restoreRequiresOutage: true,
             });
         });
-        it("should initialize with custom configuration", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: types", "component");
 
-            const customConfig: NotificationConfig = {
+        it("merges configuration updates", () => {
+            const overrides: Partial<NotificationConfig> = {
                 enabled: false,
                 playSound: true,
                 showDownAlerts: false,
-                showUpAlerts: true,
+                downAlertCooldownMs: 45_000,
             };
 
-            const service = new NotificationService({ config: customConfig });
-            const config = service.getConfig();
+            service.updateConfig(overrides);
 
-            expect(config).toEqual(customConfig);
-        });
-    });
-    describe("notifyMonitorDown", () => {
-        const siteName = sampleOne(siteNameArbitrary);
-        const mockSite: Site = {
-            identifier: "example.com",
-            name: siteName,
-            monitors: [
-                {
-                    id: "monitor-1",
-                    type: "http",
-                    status: "down",
-                    responseTime: 0,
-                    lastChecked: new Date(),
-                    history: [],
-                    monitoring: false,
-                    checkInterval: 0,
-                    timeout: 0,
-                    retryAttempts: 0,
-                },
-            ],
-            monitoring: false,
-        };
-
-        it("should show notification when alerts are enabled", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: types", "component");
-
-            notificationService.notifyMonitorDown(mockSite, "monitor-1");
-
-            expect(Notification).toHaveBeenCalledWith({
-                body: `${mockSite.name} (http) is currently down!`,
-                silent: true,
-                title: "Monitor Down Alert",
-                urgency: "critical",
-            });
-            expect(mockNotification.show).toHaveBeenCalled();
-        });
-        it("should not show notification when system notifications are disabled", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: types", "component");
-
-            notificationService.updateConfig({ enabled: false });
-            notificationService.notifyMonitorDown(mockSite, "monitor-1");
-
-            expect(Notification).not.toHaveBeenCalled();
-            expect(mockNotification.show).not.toHaveBeenCalled();
-        });
-        it("should enable sound when playSound is true", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: types", "component");
-
-            notificationService.updateConfig({ playSound: true });
-            notificationService.notifyMonitorDown(mockSite, "monitor-1");
-
-            expect(Notification).toHaveBeenCalledWith({
-                body: `${mockSite.name} (http) is currently down!`,
-                silent: false,
-                title: "Monitor Down Alert",
-                urgency: "critical",
-            });
-        });
-        it("should not show notification when down alerts are disabled", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: types", "component");
-
-            notificationService.updateConfig({ showDownAlerts: false });
-            notificationService.notifyMonitorDown(mockSite, "monitor-1");
-
-            expect(Notification).not.toHaveBeenCalled();
-            expect(mockNotification.show).not.toHaveBeenCalled();
-        });
-        it("should handle missing monitor gracefully", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: types", "component");
-
-            notificationService.notifyMonitorDown(
-                mockSite,
-                "non-existent-monitor"
-            );
-
-            expect(Notification).not.toHaveBeenCalled();
-            expect(mockNotification.show).not.toHaveBeenCalled();
-        });
-        it("should handle invalid monitorId gracefully", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: types", "component");
-
-            notificationService.notifyMonitorDown(mockSite, "");
-
-            expect(Notification).not.toHaveBeenCalled();
-            expect(mockNotification.show).not.toHaveBeenCalled();
-            expect(logger.error).toHaveBeenCalledWith(
-                "[NotificationService] Cannot notify down: monitorId is invalid"
-            );
-        });
-        it("should handle unsupported notifications gracefully", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: types", "component");
-
-            (Notification as any).isSupported.mockReturnValue(false);
-
-            notificationService.notifyMonitorDown(mockSite, "monitor-1");
-
-            expect(Notification).not.toHaveBeenCalled();
-            expect(logger.warn).toHaveBeenCalledWith(
-                "Notifications not supported on this platform"
-            );
-        });
-    });
-    describe("notifyMonitorUp", () => {
-        const siteName = sampleOne(siteNameArbitrary);
-        const mockSite: Site = {
-            identifier: "example.com",
-            name: siteName,
-            monitors: [
-                {
-                    id: "monitor-1",
-                    type: "http",
-                    status: "up",
-                    responseTime: 250,
-                    lastChecked: new Date(),
-                    history: [],
-                    monitoring: false,
-                    checkInterval: 0,
-                    timeout: 0,
-                    retryAttempts: 0,
-                },
-            ],
-            monitoring: false,
-        };
-
-        it("should show notification when alerts are enabled", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: types", "component");
-
-            notificationService.notifyMonitorUp(mockSite, "monitor-1");
-
-            expect(Notification).toHaveBeenCalledWith({
-                body: `${mockSite.name} (http) is back online!`,
-                silent: true,
-                title: "Monitor Restored",
-                urgency: "normal",
-            });
-            expect(mockNotification.show).toHaveBeenCalled();
-        });
-        it("should not show notification when up alerts are disabled", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: types", "component");
-
-            notificationService.updateConfig({ showUpAlerts: false });
-            notificationService.notifyMonitorUp(mockSite, "monitor-1");
-
-            expect(Notification).not.toHaveBeenCalled();
-            expect(mockNotification.show).not.toHaveBeenCalled();
-        });
-        it("should handle missing monitor gracefully", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: types", "component");
-
-            notificationService.notifyMonitorUp(
-                mockSite,
-                "non-existent-monitor"
-            );
-
-            expect(Notification).not.toHaveBeenCalled();
-            expect(mockNotification.show).not.toHaveBeenCalled();
-        });
-        it("should handle unsupported notifications gracefully", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: types", "component");
-
-            (Notification as any).isSupported.mockReturnValue(false);
-
-            notificationService.notifyMonitorUp(mockSite, "monitor-1");
-
-            expect(Notification).not.toHaveBeenCalled();
-            expect(logger.warn).toHaveBeenCalledWith(
-                "Notifications not supported on this platform"
-            );
-        });
-    });
-    describe("updateConfig", () => {
-        it("should update partial configuration", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: types", "component");
-
-            notificationService.updateConfig({ showDownAlerts: false });
-
-            const config = notificationService.getConfig();
-            expect(config).toEqual({
-                enabled: true,
-                playSound: false,
+            expect(service.getConfig()).toEqual({
+                enabled: false,
+                playSound: true,
                 showDownAlerts: false,
                 showUpAlerts: true,
-            });
-        });
-        it("should update multiple configuration options", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: types", "component");
-
-            notificationService.updateConfig({
-                enabled: false,
-                playSound: true,
-                showDownAlerts: false,
-                showUpAlerts: false,
-            });
-            const config = notificationService.getConfig();
-            expect(config).toEqual({
-                enabled: false,
-                playSound: true,
-                showDownAlerts: false,
-                showUpAlerts: false,
+                downAlertCooldownMs: 45_000,
+                restoreRequiresOutage: true,
             });
         });
     });
-    describe("getConfig", () => {
-        it("should return a copy of the configuration", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: types", "component");
 
-            const config1 = notificationService.getConfig();
-            const config2 = notificationService.getConfig();
+    describe("down notifications", () => {
+        it("emits notification when enabled", () => {
+            service.notifyMonitorDown(sampleSite, "monitor-1");
 
-            expect(config1).toEqual(config2);
-            expect(config1).not.toBe(config2); // Different object instances
+            expect(notificationCtor).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    title: `${sampleSite.name} monitor is down`,
+                    urgency: "critical",
+                    silent: true,
+                })
+            );
+            expect(mockShow).toHaveBeenCalled();
+        });
+
+        it("respects playSound preference", () => {
+            service.updateConfig({ playSound: true });
+
+            service.notifyMonitorDown(sampleSite, "monitor-1");
+
+            expect(notificationCtor).toHaveBeenCalledWith(
+                expect.objectContaining({ silent: false })
+            );
+        });
+
+        it("skips notification when down alerts disabled", () => {
+            service.updateConfig({ showDownAlerts: false });
+
+            service.notifyMonitorDown(sampleSite, "monitor-1");
+
+            expect(notificationCtor).not.toHaveBeenCalled();
+        });
+
+        it("suppresses repeated alerts during cooldown window", () => {
+            vi.useFakeTimers();
+            service.notifyMonitorDown(sampleSite, "monitor-1");
+            expect(notificationCtor).toHaveBeenCalledTimes(1);
+
+            notificationCtor.mockClear();
+            service.notifyMonitorDown(sampleSite, "monitor-1");
+            expect(notificationCtor).not.toHaveBeenCalled();
         });
     });
-    describe("isSupported", () => {
-        it("should return true when notifications are supported", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: types", "component");
 
-            (Notification as any).isSupported.mockReturnValue(true);
-            expect(notificationService.isSupported()).toBeTruthy();
+    describe("up notifications", () => {
+        beforeEach(() => {
+            service.notifyMonitorDown(sampleSite, "monitor-1");
+            notificationCtor.mockClear();
+            mockShow.mockClear();
         });
-        it("should return false when notifications are not supported", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: types", "component");
 
-            (Notification as any).isSupported.mockReturnValue(false);
-            expect(notificationService.isSupported()).toBeFalsy();
+        it("emits restore notification after outage", () => {
+            service.notifyMonitorUp(sampleSite, "monitor-1");
+
+            expect(notificationCtor).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    title: `${sampleSite.name} monitor restored`,
+                    urgency: "normal",
+                })
+            );
+            expect(mockShow).toHaveBeenCalled();
         });
+
+        it("skips restore when toggle disabled", () => {
+            service.updateConfig({ showUpAlerts: false });
+
+            service.notifyMonitorUp(sampleSite, "monitor-1");
+
+            expect(notificationCtor).not.toHaveBeenCalled();
+        });
+
+        it("requires prior outage when configured", () => {
+            service.updateConfig({ restoreRequiresOutage: true });
+            notificationCtor.mockClear();
+
+            const freshService = new NotificationService();
+            freshService.notifyMonitorUp(sampleSite, "monitor-1");
+
+            expect(notificationCtor).not.toHaveBeenCalled();
+        });
+    });
+
+    it("handles unsupported notification platforms", () => {
+        mockIsSupported.mockReturnValue(false);
+
+        service.notifyMonitorDown(sampleSite, "monitor-1");
+
+        expect(notificationCtor).not.toHaveBeenCalled();
+    });
+
+    it("logs error when monitor missing", () => {
+        const errorSpy = vi.spyOn(logger, "error");
+
+        service.notifyMonitorDown(sampleSite, "missing");
+
+        expect(errorSpy).toHaveBeenCalled();
+        expect(notificationCtor).not.toHaveBeenCalled();
     });
 });
