@@ -13,6 +13,7 @@
  */
 
 import { isRecord } from "@shared/utils/typeHelpers";
+import { validateNotificationPreferenceUpdate } from "@shared/validation/notifications";
 
 import type { IpcParameterValidator } from "./types";
 
@@ -267,10 +268,8 @@ function createPreloadGuardReportValidator(): IpcParameterValidator {
 function validateNotificationPreferences(
     params: readonly unknown[]
 ): null | string[] {
-    const errors: string[] = [];
-
     if (params.length !== 1) {
-        errors.push("Expected exactly 1 parameter");
+        return ["Expected exactly 1 parameter"];
     }
 
     const [preferences] = params;
@@ -280,32 +279,19 @@ function validateNotificationPreferences(
     );
 
     if (objectError) {
-        errors.push(objectError);
-        return errors.length > 0 ? errors : null;
+        return [objectError];
     }
 
     if (!isRecord(preferences)) {
-        errors.push("Notification preferences payload must be an object");
-        return errors;
+        return ["Notification preferences payload must be an object"];
     }
 
-    const enabledError = IpcValidators.requiredBoolean(
-        preferences["systemNotificationsEnabled"],
-        "systemNotificationsEnabled"
-    );
-    if (enabledError) {
-        errors.push(enabledError);
+    const validationResult = validateNotificationPreferenceUpdate(preferences);
+    if (validationResult.success) {
+        return null;
     }
 
-    const soundError = IpcValidators.requiredBoolean(
-        preferences["systemNotificationsSoundEnabled"],
-        "systemNotificationsSoundEnabled"
-    );
-    if (soundError) {
-        errors.push(soundError);
-    }
-
-    return errors.length > 0 ? errors : null;
+    return validationResult.error.issues.map((issue) => issue.message);
 }
 
 function validateRestorePayload(params: readonly unknown[]): null | string[] {

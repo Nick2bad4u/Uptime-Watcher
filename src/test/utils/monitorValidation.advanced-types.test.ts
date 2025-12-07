@@ -32,7 +32,10 @@ import {
     type PartialMonitorFormDataByType,
 } from "../../utils/monitorValidation";
 import { withUtilityErrorHandling } from "@shared/utils/errorHandling";
-import { validateMonitorField as sharedValidateMonitorField } from "@shared/validation/monitorSchemas";
+import {
+    validateMonitorData as sharedValidateMonitorData,
+    validateMonitorField as sharedValidateMonitorField,
+} from "@shared/validation/monitorSchemas";
 
 /**
  * Base validation result reused across tests to keep mocks deterministic.
@@ -308,13 +311,7 @@ const scenarioFieldPairs = advancedMonitorScenarios.flatMap((scenario) =>
 
 const missingFieldCases = advancedMonitorScenarios.flatMap((scenario) =>
     scenario.requiredFields.map(
-        (field) =>
-            [
-                field.field,
-                scenario.type,
-                field,
-                scenario,
-            ] as const
+        (field) => [field.field, scenario.type, field, scenario] as const
     )
 );
 
@@ -335,6 +332,7 @@ beforeEach(() => {
     );
 
     vi.mocked(sharedValidateMonitorField).mockReturnValue(baseValidationResult);
+    vi.mocked(sharedValidateMonitorData).mockReturnValue(baseValidationResult);
 });
 
 describe("validateMonitorFormData advanced monitor coverage", () => {

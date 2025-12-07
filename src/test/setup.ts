@@ -14,10 +14,24 @@ import type {
     StatusUpdate,
 } from "@shared/types";
 import type { ValidationResult } from "@shared/types/validation";
+import { createMonitorTypeConfig } from "./utils/createMonitorTypeConfig";
 
 import EventEmitter from "node:events";
 
 import "./mock-setup";
+
+// Stub problematic aria-query literal-role metadata to avoid SyntaxError
+// crashes originating from third-party role maps while keeping matchers
+// available. Vitest hoists vi.mock calls, so these apply before consumers are
+// loaded.
+vi.mock("aria-query/lib/etc/roles/ariaLiteralRoles", () => ({
+    __esModule: true as const,
+    default: [] as const,
+}));
+vi.mock("aria-query/lib/etc/roles/ariaLiteralRoles.js", () => ({
+    __esModule: true as const,
+    default: [] as const,
+}));
 
 Reflect.set(globalThis, "IS_REACT_ACT_ENVIRONMENT", true);
 
@@ -491,45 +505,45 @@ const mockElectronAPI: {
             .fn()
             .mockResolvedValue("Mock title suffix"),
         getMonitorTypes: vi.fn().mockResolvedValue([
-            {
-                type: "http",
+            createMonitorTypeConfig({
+                description: "HTTP monitoring",
+                displayName: "HTTP",
                 fields: [
                     {
-                        id: "url",
                         label: "URL",
-                        type: "url",
-                        required: true,
+                        name: "url",
                         placeholder: "https://example.com",
+                        required: true,
+                        type: "url",
                     },
                     {
-                        id: "port",
                         label: "Port",
-                        type: "number",
+                        name: "port",
                         required: false,
-                        min: 1,
-                        max: 65_535,
+                        type: "number",
                     },
                 ],
-            },
-            {
-                type: "port",
+                type: "http",
+            }),
+            createMonitorTypeConfig({
+                description: "Port monitoring",
+                displayName: "Port",
                 fields: [
                     {
-                        id: "host",
                         label: "Host",
-                        type: "text",
+                        name: "host",
                         required: true,
+                        type: "text",
                     },
                     {
-                        id: "port",
                         label: "Port",
-                        type: "number",
+                        name: "port",
                         required: true,
-                        min: 1,
-                        max: 65_535,
+                        type: "number",
                     },
                 ],
-            },
+                type: "port",
+            }),
         ]),
         validateMonitorData: vi.fn().mockResolvedValue({
             data: {},

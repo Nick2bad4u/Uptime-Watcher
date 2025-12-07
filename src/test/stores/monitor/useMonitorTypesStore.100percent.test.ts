@@ -223,7 +223,7 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
             });
         });
 
-        it("should handle invalid IPC response structures", async ({
+        it("should surface errors when IPC response structure is invalid", async ({
             task,
             annotate,
         }) => {
@@ -238,13 +238,11 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
                 null,
                 "string response",
                 42,
-                [],
                 { noSuccessField: true },
                 { success: "not-boolean" },
             ];
 
             for (const invalidResponse of invalidResponses) {
-                originalSafeExtractIpcData.mockReturnValueOnce([]);
                 mockElectronAPI.monitorTypes.getMonitorTypes.mockResolvedValueOnce(
                     invalidResponse
                 );
@@ -252,11 +250,30 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
                 const { result } = renderHook(() => useMonitorTypesStore());
 
                 await act(async () => {
-                    await result.current.loadMonitorTypes();
+                        await expect(result.current.loadMonitorTypes()).rejects.toThrowError(
+                        "invalid payload"
+                    );
                 });
 
                 expect(result.current.monitorTypes).toEqual([]);
+                expect(result.current.lastError).toContain("invalid payload");
             }
+
+            // Empty array is now considered a valid (though empty) result
+            mockElectronAPI.monitorTypes.getMonitorTypes.mockResolvedValueOnce(
+                []
+            );
+
+            const { result: emptyResult } = renderHook(() =>
+                useMonitorTypesStore()
+            );
+
+            await act(async () => {
+                await emptyResult.current.loadMonitorTypes();
+            });
+
+            expect(emptyResult.current.monitorTypes).toEqual([]);
+            expect(emptyResult.current.lastError).toBeUndefined();
         });
     });
 
@@ -308,7 +325,6 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
 
             const mixedConfigs = [...malformedConfigs, validConfig];
 
-            originalSafeExtractIpcData.mockReturnValueOnce(mixedConfigs);
             mockElectronAPI.monitorTypes.getMonitorTypes.mockResolvedValueOnce(
                 mixedConfigs
             );
@@ -316,12 +332,13 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
             const { result } = renderHook(() => useMonitorTypesStore());
 
             await act(async () => {
-                await result.current.loadMonitorTypes();
+                await expect(result.current.loadMonitorTypes()).rejects.toThrowError(
+                    "invalid payload"
+                );
             });
 
-            // Should only keep valid configs (filtering happens in store)
-            expect(result.current.isLoaded).toBeTruthy();
-            expect(Array.isArray(result.current.monitorTypes)).toBeTruthy();
+            expect(result.current.monitorTypes).toEqual([]);
+            expect(result.current.lastError).toContain("invalid payload");
         });
 
         it("should handle configs with complex field structures", async ({
@@ -994,21 +1011,16 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
                 () =>
                     new Promise((resolve) => {
                         setTimeout(() => {
-                            resolve({
-                                success: true,
-                                data: [
-                                    createMonitorTypeConfig({
-                                        type: `type-${++resolveCount}`,
-                                        displayName: `Type ${resolveCount}`,
-                                        description: "Test type",
-                                    }),
-                                ],
-                            });
+                            resolve([
+                                createMonitorTypeConfig({
+                                    type: `type-${++resolveCount}`,
+                                    displayName: `Type ${resolveCount}`,
+                                    description: "Test type",
+                                }),
+                            ]);
                         }, 10);
                     })
             );
-
-            originalSafeExtractIpcData.mockImplementation((response) => response?.data || []);
 
             // Make rapid successive calls sequentially to avoid overlapping acts
             for (let i = 0; i < 5; i++) {

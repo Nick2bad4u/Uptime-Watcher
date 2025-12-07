@@ -50,11 +50,30 @@ vi.mock("../../services/logger", () => ({
     logger: mockLogger,
 }));
 
-// Mock ensureError from shared utils
+// Mock ensureError & withUtilityErrorHandling from shared utils
 const mockEnsureError = vi.hoisted(() => vi.fn((error) => error));
-vi.mock("../../../shared/utils/errorHandling", () => ({
-    ensureError: mockEnsureError,
-}));
+const mockWithUtilityErrorHandling = vi.hoisted(() =>
+    vi.fn(
+        <T>(
+            operation: () => Promise<T>,
+            _operationName: string,
+            _fallbackValue?: T,
+            _shouldThrow?: boolean
+        ) => operation()
+    )
+);
+
+vi.mock("../../../shared/utils/errorHandling", async () => {
+    const actual = await vi.importActual<
+        typeof import("../../../shared/utils/errorHandling")
+    >("../../../shared/utils/errorHandling");
+
+    return {
+        ...actual,
+        ensureError: mockEnsureError,
+        withUtilityErrorHandling: mockWithUtilityErrorHandling,
+    };
+});
 
 // Helper functions for creating mock data
 function createMockBackupResult(): SerializedDatabaseBackupResult {

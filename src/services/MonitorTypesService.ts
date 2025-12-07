@@ -16,6 +16,10 @@ import type { MonitorTypeConfig } from "@shared/types/monitorTypes";
 import type { ValidationResult } from "@shared/types/validation";
 
 import { ensureError } from "@shared/utils/errorHandling";
+import {
+    validateMonitorTypeConfigArray,
+    validateValidationResult,
+} from "@shared/validation/dataSchemas";
 
 import { getIpcServiceHelpers } from "./utils/createIpcServiceHelpers";
 
@@ -40,6 +44,35 @@ const { ensureInitialized, wrap } = ((): ReturnType<
         throw ensureError(error);
     }
 })();
+const hasIssueArray = (
+    value: unknown
+): value is { issues: Array<{ message: string }> } =>
+    typeof value === "object" &&
+    value !== null &&
+    "issues" in value &&
+    Array.isArray((value as { issues?: unknown }).issues);
+
+function validateAndUnwrapPayload<T>(
+    operation: string,
+    validate: (
+        value: unknown
+    ) => { data: T; success: true } | { error: unknown; success: false },
+    value: unknown
+): T {
+    const parsed = validate(value);
+    if (!parsed.success) {
+        const { error } = parsed as { error: unknown; success: false };
+        const issues = hasIssueArray(error) ? error.issues : [];
+        const messages = issues.map((issue) => issue.message).join(", ");
+        throw new Error(
+            `[MonitorTypesService] ${operation} returned invalid payload: ${messages}`,
+            { cause: error }
+        );
+    }
+
+    const success = parsed as { data: T; success: true };
+    return success.data;
+}
 
 interface MonitorTypesServiceContract {
     formatMonitorDetail: (type: string, details: string) => Promise<string>;
@@ -89,8 +122,18 @@ export const MonitorTypesService: MonitorTypesServiceContract = {
      */
     formatMonitorDetail: wrap(
         "formatMonitorDetail",
-        async (api, type: string, details: string) =>
-            api.monitorTypes.formatMonitorDetail(type, details)
+        async (api, type: string, details: string) => {
+            const result = await api.monitorTypes.formatMonitorDetail(
+                type,
+                details
+            );
+            if (typeof result !== "string") {
+                throw new TypeError(
+                    "formatMonitorDetail must return a formatted string"
+                );
+            }
+            return result;
+        }
     ),
 
     /**
@@ -115,8 +158,18 @@ export const MonitorTypesService: MonitorTypesServiceContract = {
      */
     formatMonitorTitleSuffix: wrap(
         "formatMonitorTitleSuffix",
-        async (api, type: string, monitor: Monitor) =>
-            api.monitorTypes.formatMonitorTitleSuffix(type, monitor)
+        async (api, type: string, monitor: Monitor) => {
+            const result = await api.monitorTypes.formatMonitorTitleSuffix(
+                type,
+                monitor
+            );
+            if (typeof result !== "string") {
+                throw new TypeError(
+                    "formatMonitorTitleSuffix must return a formatted string"
+                );
+            }
+            return result;
+        }
     ),
 
     /**
@@ -137,20 +190,19 @@ export const MonitorTypesService: MonitorTypesServiceContract = {
      */
     getMonitorTypes: wrap(
         "getMonitorTypes",
-        async (api): Promise<MonitorTypeConfig[]> =>
-            api.monitorTypes.getMonitorTypes()
+        async (api): Promise<MonitorTypeConfig[]> => {
+            try {
+                return validateAndUnwrapPayload(
+                    "getMonitorTypes",
+                    validateMonitorTypeConfigArray,
+                    await api.monitorTypes.getMonitorTypes()
+                );
+            } catch (error: unknown) {
+                throw ensureError(error);
+            }
+        }
     ),
 
-    /**
-     * Ensures the electron API is available before making backend calls.
-     *
-     * @remarks
-     * This method should be called before any backend operation.
-     *
-     * @returns A promise that resolves when the electron API is ready.
-     *
-     * @throws If the electron API is not available.
-     */
     initialize: ensureInitialized,
 
     /**
@@ -184,7 +236,22 @@ export const MonitorTypesService: MonitorTypesServiceContract = {
      */
     validateMonitorData: wrap(
         "validateMonitorData",
-        async (api, type: string, data: unknown): Promise<ValidationResult> =>
-            api.monitorTypes.validateMonitorData(type, data)
+        async (api, type: string, data: unknown): Promise<ValidationResult> => {
+            try {
+                const parsed = validateAndUnwrapPayload(
+                    "validateMonitorData",
+                    validateValidationResult,
+                    await api.monitorTypes.validateMonitorData(type, data)
+                );
+
+                return {
+                    ...parsed,
+                    metadata: parsed.metadata ?? {},
+                    warnings: parsed.warnings ?? [],
+                } satisfies ValidationResult;
+            } catch (error: unknown) {
+                throw ensureError(error);
+            }
+        }
     ),
 };

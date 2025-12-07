@@ -295,6 +295,45 @@ with the implemented architecture:
   share a single helper-selection model covering `withErrorHandling`,
   `withUtilityErrorHandling`, JSON/object safety helpers, and the
   renderer-specific wrappers in `src/utils/fallbacks.ts`.
+- **IPC validation contract**: Both request and response payloads must be
+  validated on each side of the bridge. Monitor types now flow through the
+  shared schema in `@shared/validation/dataSchemas.ts`, while the data backup
+  and import/export channels rely on the same helper plus structured
+  diagnostics in `DataService`.
+
+### IPC validation expectations (data + monitor types)
+
+**Request + response symmetry**
+
+- All IPC traffic that crosses the Electron bridge must validate on _both_
+  the main-process handler and the renderer service. The canonical schemas
+  live under `@shared/validation`, ensuring both sides can share the same
+  contract.
+- Renderer services call `withUtilityErrorHandling` (directly or via
+  higher-level helpers) to log structured context and then delegate to the
+  shared validator. Main-process handlers use the same schema when serializing
+  results back to the renderer.
+
+**Monitor type registry**
+
+- `shared/validation/dataSchemas.ts#monitorTypeConfigArraySchema` defines the
+  authoritative shape for monitor types and their `fields`. Renderer-side
+  access goes through `MonitorTypesService.getMonitorTypes`, which now rejects
+  malformed payloads instead of silently filtering them out.
+- `useMonitorTypesStore` propagates validation failures via `lastError`, so
+  UI surfaces can fail fast when the backend returns invalid data. Valid but
+  empty arrays remain a supported scenario (e.g., onboarding flows).
+
+**Data exports, imports, and backups**
+
+- `DataService` wraps every IPC call with `runDataOperation`, a helper that
+  uses `withUtilityErrorHandling` to log `[DataService] <operation>` context.
+  Validation failures include serialized diagnostics (such as the original
+  filename) so issues can be traced even when the renderer is the only source
+  of logs.
+- Main-process handlers continue to use the same `serializedDatabase*` schemas
+  before responding. If either side detects invalid data, the error propagates
+  with enough context for telemetry to capture the root cause.
 
 ### History limit propagation (settings & database)
 

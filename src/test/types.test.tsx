@@ -14,6 +14,7 @@ import type {
     StatusUpdate,
 } from "@shared/types";
 import type { UpdateStatus } from "../stores/types";
+import { createMonitorTypeConfig } from "./utils/createMonitorTypeConfig";
 
 const createTestMonitor = (overrides: Partial<Monitor> = {}): Monitor => ({
     ...overrides,
@@ -550,7 +551,10 @@ describe("Types Module", () => {
                         Promise.resolve("Formatted detail"),
                     formatMonitorTitleSuffix: () =>
                         Promise.resolve(" (suffix)"),
-                    getMonitorTypes: () => Promise.resolve({}),
+                    getMonitorTypes: () =>
+                        Promise.resolve([
+                            createMonitorTypeConfig({ type: "http" }),
+                        ]),
                     validateMonitorData: () =>
                         Promise.resolve({
                             data: {},

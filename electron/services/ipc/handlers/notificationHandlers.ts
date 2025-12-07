@@ -1,6 +1,6 @@
 import type { IpcInvokeChannel } from "@shared/types/ipc";
 
-import { isRecord } from "@shared/utils/typeHelpers";
+import { parseNotificationPreferenceUpdate } from "@shared/validation/notifications";
 
 import type { NotificationService } from "../../notifications/NotificationService";
 
@@ -16,33 +16,10 @@ interface NormalizedNotificationPreferences {
 const normalizeNotificationPreferenceUpdate = (
     candidate: unknown
 ): NormalizedNotificationPreferences => {
-    if (!isRecord(candidate)) {
-        throw new TypeError(
-            "Invalid notification preference payload received via IPC"
-        );
-    }
-
-    const systemNotificationsEnabledValue = Reflect.get(
-        candidate,
-        "systemNotificationsEnabled"
-    );
-    const systemNotificationsSoundEnabledValue = Reflect.get(
-        candidate,
-        "systemNotificationsSoundEnabled"
-    );
-
-    if (
-        typeof systemNotificationsEnabledValue !== "boolean" ||
-        typeof systemNotificationsSoundEnabledValue !== "boolean"
-    ) {
-        throw new TypeError(
-            "Invalid notification preference payload received via IPC"
-        );
-    }
-
+    const parsed = parseNotificationPreferenceUpdate(candidate);
     return {
-        enabled: systemNotificationsEnabledValue,
-        playSound: systemNotificationsSoundEnabledValue,
+        enabled: parsed.systemNotificationsEnabled,
+        playSound: parsed.systemNotificationsSoundEnabled,
     } satisfies NormalizedNotificationPreferences;
 };
 

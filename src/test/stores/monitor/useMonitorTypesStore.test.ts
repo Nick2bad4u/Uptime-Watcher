@@ -15,45 +15,44 @@ vi.mock("../../../stores/utils", () => ({
 }));
 
 import { useMonitorTypesStore } from "../../../stores/monitor/useMonitorTypesStore";
+import { createMonitorTypeConfig } from "../../utils/createMonitorTypeConfig";
 
 // Mock the electron API
 const mockElectronAPI = {
     monitorTypes: {
         getMonitorTypes: vi.fn().mockResolvedValue([
-            {
-                type: "http",
-                displayName: "HTTP",
+            createMonitorTypeConfig({
                 description: "HTTP monitoring",
-                version: "1.0.0",
+                displayName: "HTTP",
                 fields: [
                     {
-                        name: "url",
-                        type: "url",
-                        required: true,
                         label: "URL",
+                        name: "url",
+                        required: true,
+                        type: "url",
                     },
                 ],
-            },
-            {
-                type: "port",
-                displayName: "Port",
+                type: "http",
+            }),
+            createMonitorTypeConfig({
                 description: "Port monitoring",
-                version: "1.0.0",
+                displayName: "Port",
                 fields: [
                     {
-                        name: "host",
-                        type: "text",
-                        required: true,
                         label: "Host",
+                        name: "host",
+                        required: true,
+                        type: "text",
                     },
                     {
-                        name: "port",
-                        type: "number",
-                        required: true,
                         label: "Port",
+                        name: "port",
+                        required: true,
+                        type: "number",
                     },
                 ],
-            },
+                type: "port",
+            }),
         ] as MonitorTypeConfig[]),
         validateMonitorData: vi.fn().mockResolvedValue({
             success: true,
@@ -172,7 +171,9 @@ describe(useMonitorTypesStore, () => {
         await annotate("Category: Store", "category");
         await annotate("Type: Monitoring", "type");
 
-        const mockMonitorTypes: MonitorTypeConfig[] = [];
+        const mockMonitorTypes: MonitorTypeConfig[] = [
+            createMonitorTypeConfig({ type: "http" }),
+        ];
 
         mockElectronAPI.monitorTypes.getMonitorTypes.mockResolvedValue(
             mockMonitorTypes

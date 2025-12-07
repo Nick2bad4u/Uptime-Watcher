@@ -13,6 +13,7 @@ import type { NotificationPreferenceUpdate } from "@shared/types/notifications";
 
 import { ensureError } from "@shared/utils/errorHandling";
 import { isRecord } from "@shared/utils/typeHelpers";
+import { validateNotificationPreferenceUpdate } from "@shared/validation/notifications";
 
 import { getIpcServiceHelpers } from "./utils/createIpcServiceHelpers";
 
@@ -101,8 +102,21 @@ export const NotificationPreferenceService: NotificationPreferenceServiceContrac
         updatePreferences: wrap(
             "updatePreferences",
             async (api, preferences: NotificationPreferenceUpdate) => {
+                const validation =
+                    validateNotificationPreferenceUpdate(preferences);
+
+                if (!validation.success) {
+                    const issues = validation.error.issues
+                        .map(({ message }) => message)
+                        .join(", ");
+                    throw new Error(
+                        `Invalid notification preferences: ${issues}`,
+                        { cause: validation.error }
+                    );
+                }
+
                 const notificationBridge = getNotificationBridge(api);
-                await notificationBridge.updatePreferences(preferences);
+                await notificationBridge.updatePreferences(validation.data);
             }
         ),
     };

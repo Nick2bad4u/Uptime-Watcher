@@ -184,50 +184,44 @@ describe("useMonitorTypesStore - 100% Coverage Simplified", () => {
             expect(result.current.isLoading).toBeFalsy();
         });
 
-        it("should filter out invalid configurations", async () => {
+        it("should surface an error when backend returns invalid monitor configs", async () => {
             const mixedConfigs = [
-                // Invalid configs that should be filtered out
                 { type: null },
                 { type: "" },
                 { notType: "invalid" },
-                // Valid config that should remain
-                createMonitorTypeConfig({
-                    type: "valid",
-                    displayName: "Valid",
-                    description: "Valid config",
-                }),
             ];
 
             mockElectronAPI.monitorTypes.getMonitorTypes.mockResolvedValue(
                 mixedConfigs
             );
-            mockSafeExtractIpcData.mockReturnValue(mixedConfigs);
 
             const { result } = renderHook(() => useMonitorTypesStore());
 
             await act(async () => {
-                await result.current.loadMonitorTypes();
-            });
-
-            // Only valid config should remain
-            expect(result.current.monitorTypes).toHaveLength(1);
-            expect(result.current.monitorTypes[0]!.type).toBe("valid");
-        });
-
-        it("should handle safeExtractIpcData returning fallback", async () => {
-            mockElectronAPI.monitorTypes.getMonitorTypes.mockResolvedValue(
-                null
-            );
-            mockSafeExtractIpcData.mockReturnValue([]); // Fallback value
-
-            const { result } = renderHook(() => useMonitorTypesStore());
-
-            await act(async () => {
-                await result.current.loadMonitorTypes();
+                await expect(
+                    result.current.loadMonitorTypes()
+                ).rejects.toThrowError("invalid payload");
             });
 
             expect(result.current.monitorTypes).toEqual([]);
-            expect(result.current.isLoaded).toBeTruthy();
+            expect(result.current.lastError).toContain("invalid payload");
+        });
+
+        it("should propagate errors when backend returns null", async () => {
+            mockElectronAPI.monitorTypes.getMonitorTypes.mockResolvedValue(
+                null
+            );
+
+            const { result } = renderHook(() => useMonitorTypesStore());
+
+            await act(async () => {
+                await expect(
+                    result.current.loadMonitorTypes()
+                ).rejects.toThrowError("invalid payload");
+            });
+
+            expect(result.current.monitorTypes).toEqual([]);
+            expect(result.current.lastError).toContain("invalid payload");
         });
     });
 
@@ -340,11 +334,9 @@ describe("useMonitorTypesStore - 100% Coverage Simplified", () => {
             const { result } = renderHook(() => useMonitorTypesStore());
 
             await act(async () => {
-                try {
-                    await result.current.formatMonitorDetail("http", "details");
-                } catch {
-                    // Expected to throw
-                }
+                await expect(
+                    result.current.formatMonitorDetail("http", "details")
+                ).rejects.toThrowError("Format service error");
             });
 
             expect(result.current.lastError).toBe("Format service error");

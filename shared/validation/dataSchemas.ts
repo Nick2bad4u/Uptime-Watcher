@@ -1,0 +1,129 @@
+import type { MonitorTypeConfig } from "@shared/types/monitorTypes";
+
+import { isMonitorTypeConfig } from "@shared/types/monitorTypes";
+import * as z from "zod";
+
+const arrayBufferSchema: z.ZodType<ArrayBuffer> = z.custom<ArrayBuffer>(
+    (value): value is ArrayBuffer => value instanceof ArrayBuffer,
+    "Expected transferable ArrayBuffer"
+);
+
+export const serializedDatabaseBackupMetadataSchema: z.ZodType<{
+    appVersion: string;
+    checksum: string;
+    createdAt: number;
+    originalPath: string;
+    retentionHintDays: number;
+    schemaVersion: number;
+    sizeBytes: number;
+}> = z
+    .object({
+        appVersion: z.string().min(1),
+        checksum: z.string().min(1),
+        createdAt: z.number(),
+        originalPath: z.string().min(1),
+        retentionHintDays: z.number(),
+        schemaVersion: z.number(),
+        sizeBytes: z.number(),
+    })
+    .strict();
+
+export const serializedDatabaseBackupResultSchema: z.ZodType<{
+    buffer: ArrayBuffer;
+    fileName: string;
+    metadata: z.infer<typeof serializedDatabaseBackupMetadataSchema>;
+}> = z
+    .object({
+        buffer: arrayBufferSchema,
+        fileName: z.string().min(1),
+        metadata: serializedDatabaseBackupMetadataSchema,
+    })
+    .strict();
+
+export const serializedDatabaseRestorePayloadSchema: z.ZodType<{
+    buffer: ArrayBuffer;
+    fileName?: string | undefined;
+}> = z
+    .object({
+        buffer: arrayBufferSchema,
+        fileName: z.string().min(1).optional(),
+    })
+    .strict();
+
+export const serializedDatabaseRestoreResultSchema: z.ZodType<{
+    metadata: z.infer<typeof serializedDatabaseBackupMetadataSchema>;
+    preRestoreFileName?: string | undefined;
+    restoredAt: number;
+}> = z
+    .object({
+        metadata: serializedDatabaseBackupMetadataSchema,
+        preRestoreFileName: z.string().min(1).optional(),
+        restoredAt: z.number(),
+    })
+    .strict();
+
+export const monitorTypeConfigSchema: z.ZodType<MonitorTypeConfig> =
+    z.custom<MonitorTypeConfig>(
+        (value): value is MonitorTypeConfig => isMonitorTypeConfig(value),
+        {
+            message: "Invalid monitor type configuration",
+        }
+    );
+
+export const monitorTypeConfigArraySchema: z.ZodType<MonitorTypeConfig[]> = z
+    .array(monitorTypeConfigSchema)
+    .min(0, "Monitor types array may be empty");
+
+export const validationResultSchema: z.ZodType<{
+    data?: unknown;
+    errors: string[];
+    metadata?: Record<string, unknown> | undefined;
+    success: boolean;
+    warnings?: string[] | undefined;
+}> = z
+    .object({
+        data: z.unknown().optional(),
+        errors: z.array(z.string()),
+        metadata: z.record(z.string(), z.unknown()).optional(),
+        success: z.boolean(),
+        warnings: z.array(z.string()).optional(),
+    })
+    .strict();
+
+export const validateSerializedDatabaseBackupResult = (
+    value: unknown
+): ReturnType<typeof serializedDatabaseBackupResultSchema.safeParse> =>
+    serializedDatabaseBackupResultSchema.safeParse(value);
+
+export const validateSerializedDatabaseRestorePayload = (
+    value: unknown
+): ReturnType<typeof serializedDatabaseRestorePayloadSchema.safeParse> =>
+    serializedDatabaseRestorePayloadSchema.safeParse(value);
+
+export const validateSerializedDatabaseRestoreResult = (
+    value: unknown
+): ReturnType<typeof serializedDatabaseRestoreResultSchema.safeParse> =>
+    serializedDatabaseRestoreResultSchema.safeParse(value);
+
+export const validateMonitorTypeConfigArray = (
+    value: unknown
+): ReturnType<typeof monitorTypeConfigArraySchema.safeParse> =>
+    monitorTypeConfigArraySchema.safeParse(value);
+
+export const validateValidationResult = (
+    value: unknown
+): ReturnType<typeof validationResultSchema.safeParse> =>
+    validationResultSchema.safeParse(value);
+
+/** Shared schema type for database backup metadata. */
+export type SerializedDatabaseBackupMetadataSchema =
+    typeof serializedDatabaseBackupMetadataSchema;
+/** Shared schema type for database backup payloads. */
+export type SerializedDatabaseBackupResultSchema =
+    typeof serializedDatabaseBackupResultSchema;
+/** Shared schema type for database restore payloads. */
+export type SerializedDatabaseRestorePayloadSchema =
+    typeof serializedDatabaseRestorePayloadSchema;
+/** Shared schema type for database restore results. */
+export type SerializedDatabaseRestoreResultSchema =
+    typeof serializedDatabaseRestoreResultSchema;

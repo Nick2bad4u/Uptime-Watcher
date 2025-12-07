@@ -88,13 +88,7 @@ describe("String Conversion Utilities - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(
-                safeStringify([
-                    1,
-                    2,
-                    3,
-                ])
-            ).toBe("[1,2,3]");
+            expect(safeStringify([1, 2, 3])).toBe("[1,2,3]");
             expect(safeStringify([])).toBe("[]");
             expect(safeStringify(["a", "b"])).toBe('["a","b"]');
         });
@@ -325,11 +319,7 @@ describe("String Conversion Utilities - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            const set = new Set([
-                1,
-                2,
-                3,
-            ]);
+            const set = new Set([1, 2, 3]);
             const result = safeStringify(set);
             expect(result).toBeDefined();
         });
@@ -404,8 +394,15 @@ describe("String Conversion Utilities - Comprehensive Coverage", () => {
                 const result = safeStringify(arr);
                 expect(typeof result).toBe("string");
 
-                // Should either be a JSON string or fallback
-                if (result.startsWith("[") && result.endsWith("]")) {
+                // Should either be a JSON string or the known fallback
+                // placeholder. The fallback for complex arrays is
+                // "[Complex Object]", which intentionally looks like an
+                // array but is not valid JSON.
+                if (
+                    result.startsWith("[") &&
+                    result.endsWith("]") &&
+                    result !== "[Complex Object]"
+                ) {
                     expect(() => JSON.parse(result)).not.toThrowError();
                 }
             }

@@ -166,9 +166,9 @@ test.describe(
             "should enforce server heartbeat dynamic field validation before creation",
             {
                 tag: ["@validation", "@monitor-types"],
-                timeout: 70_000,
             },
             async () => {
+                test.setTimeout(70_000);
                 const heartbeatSiteName = generateSiteName(
                     "Server Heartbeat Validation"
                 );

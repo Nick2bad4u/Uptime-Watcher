@@ -304,7 +304,7 @@ describe(useMonitorTypesStore, () => {
             expect(result.current.isLoading).toBeFalsy();
         });
 
-        it("should handle empty response with fallback", async ({
+        it("should surface an error when backend returns empty response", async ({
             task,
             annotate,
         }) => {
@@ -320,12 +320,13 @@ describe(useMonitorTypesStore, () => {
             const { result } = renderHook(() => useMonitorTypesStore());
 
             await act(async () => {
-                await result.current.loadMonitorTypes();
+                await expect(
+                    result.current.loadMonitorTypes()
+                ).rejects.toThrowError("invalid payload");
             });
 
             expect(result.current.monitorTypes).toEqual([]);
-            expect(result.current.fieldConfigs).toEqual({});
-            expect(result.current.isLoaded).toBeTruthy();
+            expect(result.current.lastError).toContain("invalid payload");
         });
     });
 

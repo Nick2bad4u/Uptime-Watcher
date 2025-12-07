@@ -14,7 +14,6 @@ import {
     type MonitorType,
 } from "@shared/types";
 import { withUtilityErrorHandling } from "@shared/utils/errorHandling";
-// Import shared validation functions for client-side validation
 import {
     validateMonitorData as sharedValidateMonitorData,
     validateMonitorField as sharedValidateMonitorField,
@@ -177,7 +176,8 @@ type EnhancedValidationResult = Simplify<
  * @public
  */
 export interface MonitorCreationData
-    extends Pick<
+    extends
+        Pick<
             Monitor,
             | "history"
             | "monitoring"
@@ -242,30 +242,22 @@ async function runMonitorValidationOperation<TResult>(
 }
 
 /**
- * Builds a typed partial monitor form data object for single-field validation
- * paths.
+ * Builds a typed partial monitor form data object for single-field validation.
  *
- * @param type - Monitor type discriminator.
- * @param fieldName - Field within the monitor form being validated.
- * @param value - Value supplied for validation (can be undefined during form
- *   entry).
- *
- * @returns A typed partial monitor form data object.
+ * @typeParam TType - Monitor type discriminator.
+ * @typeParam TField - Field name belonging to the specified monitor type.
  */
-const toPartialMonitorFormData = <
+function toPartialMonitorFormData<
     TType extends MonitorType,
     TField extends MonitorFieldName<TType>,
 >(
     fieldName: TField,
     value: OptionalMonitorFieldValue<TType, TField>
-): PartialMonitorFormDataByType<TType> => {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Object.create(null) is used to avoid inherited keys when constructing partial monitor payloads.
-    const partialFormData = Object.create(
-        null
-    ) as PartialMonitorFormDataByType<TType>;
-    partialFormData[fieldName] = value;
-    return partialFormData;
-};
+): PartialMonitorFormDataByType<TType> {
+    return {
+        [fieldName]: value,
+    } as PartialMonitorFormDataByType<TType>;
+}
 
 /**
  * Validate monitor data using backend registry.
@@ -374,12 +366,7 @@ export async function validateMonitorFieldEnhanced<
         },
         async () => {
             const partialPayload = toPartialMonitorFormData(fieldName, value);
-            const payloadWithType: PartialMonitorFormDataByType<TType> = {
-                ...partialPayload,
-                type,
-            };
-
-            const result = await validateMonitorData(type, payloadWithType);
+            const result = await validateMonitorData(type, partialPayload);
 
             const filteredErrors = result.errors.filter((error) =>
                 error.toLowerCase().includes(fieldName.toLowerCase())
@@ -946,12 +933,24 @@ export async function validateMonitorFormData<TType extends MonitorType>(
             warnings: [],
         },
         () => {
-            const errors = validateMonitorFormDataByType(type, data);
+            const manualErrors = validateMonitorFormDataByType(type, data);
+
+            if (manualErrors.length > 0) {
+                return {
+                    errors: manualErrors,
+                    success: false,
+                    warnings: [],
+                } satisfies ValidationResult;
+            }
+
+            const sharedResult = sharedValidateMonitorData(type, data);
+            const errors = Array.from(sharedResult.errors);
+
             return {
                 errors,
-                success: errors.length === 0,
-                warnings: [],
-            };
+                success: sharedResult.success && errors.length === 0,
+                warnings: sharedResult.warnings ?? [],
+            } satisfies ValidationResult;
         }
     );
 }
