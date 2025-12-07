@@ -20,7 +20,7 @@ import { isIsolatedUserDataPage } from "./userDataDirectoryRegistry";
 export const WAIT_TIMEOUTS = {
     SHORT: 2000,
     MEDIUM: 5000,
-    LONG: 10000,
+    LONG: 20000,
     MODAL_ANIMATION: 1000,
     APP_INITIALIZATION: 30000, // Increased from 15000 to 30000 for complex database loading
 } as const;

@@ -196,6 +196,7 @@ describe(WindowService, () => {
                     contextIsolation: true,
                     nodeIntegration: false,
                     preload: expect.any(String),
+                    sandbox: false,
                 },
                 width: 1200,
             });

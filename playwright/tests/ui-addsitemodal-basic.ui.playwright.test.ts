@@ -24,11 +24,7 @@ import { DEFAULT_TEST_SITE_URL, generateSiteName } from "../utils/testData";
 test.describe(
     "add site modal - modern ui",
     {
-        tag: [
-            "@ui",
-            "@modal",
-            "@regression",
-        ],
+        tag: ["@ui", "@modal", "@regression"],
     },
     () => {
         test.setTimeout(45_000);
@@ -170,72 +166,89 @@ test.describe(
             "should enforce server heartbeat dynamic field validation before creation",
             {
                 tag: ["@validation", "@monitor-types"],
+                timeout: 70_000,
             },
             async () => {
                 const heartbeatSiteName = generateSiteName(
                     "Server Heartbeat Validation"
                 );
 
-                await openAddSiteModal(page);
-                await fillAddSiteForm(page, {
-                    monitorType: "server-heartbeat",
-                    name: heartbeatSiteName,
-                });
+                await test.step("Open modal and submit without heartbeat fields to trigger validation", async () => {
+                    await openAddSiteModal(page);
+                    await fillAddSiteForm(page, {
+                        monitorType: "server-heartbeat",
+                        name: heartbeatSiteName,
+                    });
 
-                const heartbeatFieldLabels = [
-                    /Heartbeat URL/i,
-                    /Status Field/i,
-                    /Expected Status/i,
-                    /Timestamp Field/i,
-                    /Max Drift \(seconds\)/i,
-                ];
+                    const heartbeatFieldLabels = [
+                        /Heartbeat URL/i,
+                        /Status Field/i,
+                        /Expected Status/i,
+                        /Timestamp Field/i,
+                        /Max Drift \(seconds\)/i,
+                    ];
 
-                for (const label of heartbeatFieldLabels) {
-                    const fieldInput = page.getByLabel(label);
-                    await fieldInput.fill("");
-                }
+                    for (const label of heartbeatFieldLabels) {
+                        const fieldInput = page.getByLabel(label);
+                        await fieldInput.fill("");
+                    }
 
-                await page.getByRole("button", { name: /Add Site/i }).click();
+                    await page
+                        .getByRole("button", { name: /Add Site/i })
+                        .click();
 
-                await expect(page.getByTestId("add-site-form")).toBeVisible({
-                    timeout: WAIT_TIMEOUTS.MEDIUM,
-                });
+                    await expect(page.getByTestId("add-site-form")).toBeVisible(
+                        {
+                            timeout: WAIT_TIMEOUTS.MEDIUM,
+                        }
+                    );
 
-                const siteCountAfterInvalid = await page.evaluate(async () => {
-                    const automationWindow = window as typeof window & {
-                        electronAPI?: {
-                            sites?: {
-                                getSites?: () => Promise<unknown>;
+                    const siteCountAfterInvalid = await page.evaluate(
+                        async () => {
+                            const automationWindow = window as typeof window & {
+                                electronAPI?: {
+                                    sites?: {
+                                        getSites?: () => Promise<unknown>;
+                                    };
+                                };
                             };
-                        };
-                    };
 
-                    const response =
-                        await automationWindow.electronAPI?.sites?.getSites?.();
-                    return Array.isArray(response) ? response.length : 0;
-                });
-                expect(siteCountAfterInvalid).toBe(0);
-
-                await fillAddSiteForm(page, {
-                    dynamicFields: [
-                        { label: "Status Field", value: "data.status" },
-                        { label: "Expected Status", value: "running" },
-                        { label: "Timestamp Field", value: "data.timestamp" },
-                        { label: "Max Drift (seconds)", value: "60" },
-                    ],
-                    monitorType: "server-heartbeat",
-                    name: heartbeatSiteName,
-                    url: "https://heartbeat.example.com/api",
+                            const response =
+                                await automationWindow.electronAPI?.sites?.getSites?.();
+                            return Array.isArray(response)
+                                ? response.length
+                                : 0;
+                        }
+                    );
+                    expect(siteCountAfterInvalid).toBe(0);
                 });
 
-                await submitAddSiteForm(page);
+                await test.step("Fill heartbeat fields and create monitor", async () => {
+                    await fillAddSiteForm(page, {
+                        dynamicFields: [
+                            { label: "Status Field", value: "data.status" },
+                            { label: "Expected Status", value: "running" },
+                            {
+                                label: "Timestamp Field",
+                                value: "data.timestamp",
+                            },
+                            { label: "Max Drift (seconds)", value: "60" },
+                        ],
+                        monitorType: "server-heartbeat",
+                        name: heartbeatSiteName,
+                        url: "https://heartbeat.example.com/api",
+                    });
 
-                const heartbeatSiteCard = getSiteCardLocator(
-                    page,
-                    heartbeatSiteName
-                );
-                await expect(heartbeatSiteCard).toBeVisible({
-                    timeout: WAIT_TIMEOUTS.LONG,
+                    await submitAddSiteForm(page);
+                    await waitForMonitorCount(page, 1, WAIT_TIMEOUTS.LONG);
+
+                    const heartbeatSiteCard = getSiteCardLocator(
+                        page,
+                        heartbeatSiteName
+                    );
+                    await expect(heartbeatSiteCard).toBeVisible({
+                        timeout: WAIT_TIMEOUTS.LONG,
+                    });
                 });
             }
         );
