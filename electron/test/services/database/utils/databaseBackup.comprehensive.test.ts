@@ -193,24 +193,14 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
             await annotate("Category: Service", "category");
             await annotate("Type: Business Logic", "type");
 
-            const binaryData = Buffer.from([
-                0x00,
-                0xff,
-                0xab,
-                0xcd,
-                0xef,
-            ]);
+            const binaryData = Buffer.from([0x00, 0xff, 0xab, 0xcd, 0xef]);
             mockReadFile.mockResolvedValue(binaryData);
 
             const result = await createDatabaseBackup(testDbPath);
 
             expect(result.buffer).toStrictEqual(binaryData);
             expect(Array.from(result.buffer)).toEqual([
-                0x00,
-                0xff,
-                0xab,
-                0xcd,
-                0xef,
+                0x00, 0xff, 0xab, 0xcd, 0xef,
             ]);
         });
         describe("createDatabaseBackup - Error scenarios", () => {
@@ -278,15 +268,14 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
 
                 mockReadFile.mockRejectedValue("String error");
 
-                await expect(createDatabaseBackup(testDbPath)).rejects.toBe(
-                    "String error"
-                );
+                await expect(
+                    createDatabaseBackup(testDbPath)
+                ).rejects.toThrowError("String error");
 
                 expect(logger.error).toHaveBeenCalledWith(
                     "[DatabaseBackup] Failed to create database backup",
                     expect.objectContaining({
                         error: "String error",
-                        stack: undefined,
                         dbPath: testDbPath,
                         fileName: BACKUP_DB_FILE_NAME,
                     })
@@ -394,12 +383,14 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
 
                 const result = await createDatabaseBackup(testDbPath, "");
 
-                expect(result.fileName).toBe("");
+                expect(result.fileName).toBe(BACKUP_DB_FILE_NAME);
                 expect(logger.info).toHaveBeenCalledWith(
                     "[DatabaseBackup] Database backup created successfully",
                     expect.objectContaining({
-                        fileName: "",
+                        checksum: expect.any(String),
+                        fileName: BACKUP_DB_FILE_NAME,
                         dbPath: testDbPath,
+                        schemaVersion: expect.any(Number),
                         sizeBytes: testBuffer.length,
                         createdAt: expect.any(Number),
                     })
@@ -528,13 +519,7 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
                     Buffer.alloc(1, 0), // Single zero byte
                     Buffer.alloc(1, 255), // Single max byte
                     Buffer.from("test"), // String buffer
-                    Buffer.from([
-                        1,
-                        2,
-                        3,
-                        4,
-                        5,
-                    ]), // Array buffer
+                    Buffer.from([1, 2, 3, 4, 5]), // Array buffer
                 ];
 
                 for (const testCase of testCases) {

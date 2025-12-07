@@ -25,6 +25,10 @@ vi.mock("electron", () => ({
     ipcRenderer,
 }));
 
+const ipcContext = expect.objectContaining({
+    __uptimeWatcherIpcContext: true,
+});
+
 const createBackup = (
     overrides: Partial<SerializedDatabaseBackupResult> = {}
 ): SerializedDatabaseBackupResult => ({
@@ -91,7 +95,8 @@ describe("dataApi", () => {
             const result = await dataApi.downloadSqliteBackup();
 
             expect(ipcRenderer.invoke).toHaveBeenCalledWith(
-                DATA_CHANNELS.downloadSqliteBackup
+                DATA_CHANNELS.downloadSqliteBackup,
+                ipcContext
             );
             expect(result).toStrictEqual(expected);
         });
@@ -121,7 +126,8 @@ describe("dataApi", () => {
             const result = await dataApi.exportData();
 
             expect(ipcRenderer.invoke).toHaveBeenCalledWith(
-                DATA_CHANNELS.exportData
+                DATA_CHANNELS.exportData,
+                ipcContext
             );
             expect(result).toBe(exportBlob);
         });
@@ -152,7 +158,8 @@ describe("dataApi", () => {
 
             expect(ipcRenderer.invoke).toHaveBeenCalledWith(
                 DATA_CHANNELS.importData,
-                payload
+                payload,
+                ipcContext
             );
             expect(result).toBeTruthy();
         });
@@ -189,7 +196,8 @@ describe("dataApi", () => {
                 {
                     buffer: expect.any(ArrayBuffer),
                     fileName: "restore.sqlite",
-                }
+                },
+                ipcContext
             );
             expect(result).toStrictEqual(summary);
         });

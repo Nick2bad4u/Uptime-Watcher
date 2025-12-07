@@ -585,8 +585,8 @@ describe("SiteRepositoryService and SiteLoadingOrchestrator - Comprehensive Cove
                 siteRepositoryService.getSitesFromDatabase()
             ).rejects.toThrowError(SiteLoadingError);
             expect(mockLogger.error).toHaveBeenCalledWith(
-                "Failed to fetch sites from database: Unknown error",
-                "String error"
+                "Failed to fetch sites from database: String error",
+                expect.objectContaining({ message: "String error" })
             );
         });
     });

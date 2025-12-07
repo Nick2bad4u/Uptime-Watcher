@@ -8,6 +8,7 @@
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { ipcMain, type IpcMainInvokeEvent, type IpcMainEvent } from "electron";
+import { createHash } from "node:crypto";
 
 import { IpcService } from "../../../services/ipc/IpcService";
 import type { UptimeOrchestrator } from "../../../UptimeOrchestrator";
@@ -20,10 +21,13 @@ import type {
     Site,
 } from "@shared/types";
 
+const mockBackupBuffer = Buffer.from("mock backup data");
 const mockBackupMetadata = {
+    checksum: createHash("sha256").update(mockBackupBuffer).digest("hex"),
     createdAt: 1_700_000_100_000,
     originalPath: "/tmp/uptime-watcher.db",
-    sizeBytes: 3072,
+    schemaVersion: 1,
+    sizeBytes: mockBackupBuffer.byteLength,
 };
 
 // Mock Electron modules
@@ -264,7 +268,7 @@ describe("IpcService - Comprehensive Coverage", () => {
             getHistoryLimit: vi.fn().mockImplementation(() => historyLimit),
             resetSettings: vi.fn().mockResolvedValue(undefined),
             downloadBackup: vi.fn().mockResolvedValue({
-                buffer: Buffer.from("mock backup data"),
+                buffer: mockBackupBuffer,
                 fileName: "/path/to/backup.db",
                 metadata: { ...mockBackupMetadata },
             }),
@@ -1240,6 +1244,11 @@ describe("IpcService - Comprehensive Coverage", () => {
                 data: {
                     buffer: expect.any(ArrayBuffer),
                     fileName: "/path/to/backup.db",
+                    metadata: expect.objectContaining({
+                        checksum: mockBackupMetadata.checksum,
+                        schemaVersion: mockBackupMetadata.schemaVersion,
+                        sizeBytes: mockBackupMetadata.sizeBytes,
+                    }),
                 },
                 metadata: {
                     duration: expect.any(Number),

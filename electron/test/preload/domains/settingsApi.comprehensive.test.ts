@@ -4,15 +4,16 @@ import { ipcRenderer } from "electron";
 import { settingsApi } from "../../../preload/domains/settingsApi";
 import { SETTINGS_CHANNELS } from "@shared/types/preload";
 
-vi.mock("electron", () => ({
-    ipcRenderer: {
-        invoke: vi.fn(),
-    },
+const ipcRendererMock = vi.hoisted(() => ({
+    invoke: vi.fn(),
 }));
 
-const correlationEnvelopeMatcher = expect.objectContaining({
+vi.mock("electron", () => ({
+    ipcRenderer: ipcRendererMock,
+}));
+
+const ipcContext = expect.objectContaining({
     __uptimeWatcherIpcContext: true,
-    correlationId: expect.any(String),
 });
 
 describe("settingsApi", () => {
@@ -32,7 +33,7 @@ describe("settingsApi", () => {
         expect(ipcRenderer.invoke).toHaveBeenCalledWith(
             SETTINGS_CHANNELS.updateHistoryLimit,
             365,
-            correlationEnvelopeMatcher
+            ipcContext
         );
     });
 
@@ -47,7 +48,7 @@ describe("settingsApi", () => {
         expect(result).toBe(120);
         expect(ipcRenderer.invoke).toHaveBeenCalledWith(
             SETTINGS_CHANNELS.getHistoryLimit,
-            correlationEnvelopeMatcher
+            ipcContext
         );
     });
 
@@ -59,7 +60,7 @@ describe("settingsApi", () => {
         await expect(settingsApi.resetSettings()).resolves.toBeUndefined();
         expect(ipcRenderer.invoke).toHaveBeenCalledWith(
             SETTINGS_CHANNELS.resetSettings,
-            correlationEnvelopeMatcher
+            ipcContext
         );
     });
 

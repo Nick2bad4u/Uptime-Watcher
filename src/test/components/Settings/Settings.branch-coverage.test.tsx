@@ -27,6 +27,10 @@ import {
     createSitesStoreMock,
     updateSitesStoreMock,
 } from "../../utils/createSitesStoreMock";
+import {
+    createSerializedBackupResult,
+    createSerializedRestoreResult,
+} from "../../utils/createSerializedBackupResult";
 
 type MutableSitesStore = ReturnType<typeof createSitesStoreMock>;
 
@@ -34,13 +38,17 @@ type MutableSitesStore = ReturnType<typeof createSitesStoreMock>;
 vi.mock("../../../stores/error/useErrorStore");
 vi.mock("../../../stores/settings/useSettingsStore");
 
-const createDefaultDownloadBackup = () => vi.fn(async () => undefined);
+const createDefaultDownloadBackup = () =>
+    vi.fn(async () => createSerializedBackupResult());
 
 const createDefaultFullResync = () => vi.fn(async () => undefined);
 
 const sitesStoreState = createSitesStoreMock({
     downloadSqliteBackup: createDefaultDownloadBackup(),
     fullResyncSites: createDefaultFullResync(),
+    restoreSqliteBackup: vi.fn(async () => createSerializedRestoreResult()),
+    lastBackupMetadata: createSerializedBackupResult().metadata,
+    setLastBackupMetadata: vi.fn(),
 }) as MutableSitesStore;
 
 const useSitesStoreMock = createSelectorHookMock(sitesStoreState);
@@ -51,6 +59,9 @@ const resetSitesStoreState = (): void => {
     updateSitesStoreMock(sitesStoreState, {
         downloadSqliteBackup: createDefaultDownloadBackup(),
         fullResyncSites: createDefaultFullResync(),
+        restoreSqliteBackup: vi.fn(async () => createSerializedRestoreResult()),
+        lastBackupMetadata: createSerializedBackupResult().metadata,
+        setLastBackupMetadata: vi.fn(),
     });
 };
 
@@ -173,11 +184,7 @@ describe("Settings - Branch Coverage Tests", () => {
         },
         isDark: false,
         setTheme: vi.fn(),
-        availableThemes: [
-            "light",
-            "dark",
-            "system",
-        ],
+        availableThemes: ["light", "dark", "system"],
         getColor: vi.fn(() => "#000"),
         getStatusColor: vi.fn(),
         systemTheme: "light",

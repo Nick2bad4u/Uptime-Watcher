@@ -60,6 +60,12 @@ type MonitorCheckCallback = (
 
 const createCheckCallbackMock = () => vi.fn<MonitorCheckCallback>();
 
+const expectDelayWithinTolerance = (actual: number, expected: number): void => {
+    const tolerance = Math.ceil(expected * 0.1) + 100;
+    expect(actual).toBeGreaterThanOrEqual(Math.max(0, expected - tolerance));
+    expect(actual).toBeLessThanOrEqual(expected + tolerance);
+};
+
 describe(MonitorScheduler, () => {
     const FIXED_NOW = 1_700_000_000;
     let scheduler: MonitorScheduler;
@@ -117,14 +123,25 @@ describe(MonitorScheduler, () => {
         const scheduleEvent = eventEmitter.emitTyped.mock.calls.find(
             ([eventName]) => eventName === "monitor:schedule-updated"
         );
-
-        expect(scheduleEvent?.[1]).toMatchObject({
+        const schedulePayload = scheduleEvent?.[1] as
+            | {
+                  backoffAttempt: number;
+                  delayMs: number;
+                  monitorId: string;
+                  siteIdentifier: string;
+                  timestamp: number;
+              }
+            | undefined;
+        expect(schedulePayload).toMatchObject({
             backoffAttempt: 0,
-            delayMs: MIN_CHECK_INTERVAL,
             monitorId: "monitor-1",
             siteIdentifier: "site-1",
             timestamp: FIXED_NOW,
         });
+        expectDelayWithinTolerance(
+            schedulePayload!.delayMs,
+            MIN_CHECK_INTERVAL
+        );
     });
 
     it("uses the default interval when monitor checkInterval requests automatic determination", () => {

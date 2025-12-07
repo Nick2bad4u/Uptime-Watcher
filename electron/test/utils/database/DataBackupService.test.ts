@@ -18,48 +18,73 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import path from "node:path";
 
-const mockFsPromises = {
+const mockFsPromises = vi.hoisted(() => ({
     copyFile: vi.fn(),
     mkdtemp: vi.fn(),
     rm: vi.fn(),
     writeFile: vi.fn(),
-};
+}));
 
-const mockOs = {
+const mockOs = vi.hoisted(() => ({
     tmpdir: vi.fn(() => "/tmp"),
-};
+}));
 
-const mockDatabaseGet = vi.fn(() => ({ user_version: 1 }));
-const mockDatabasePrepare = vi.fn(() => ({ get: mockDatabaseGet }));
-const mockDatabaseInstance = {
-    close: vi.fn(),
-    prepare: mockDatabasePrepare,
-};
-const mockDatabaseConstructor = vi.fn(() => mockDatabaseInstance);
+const {
+    mockDatabaseConstructor,
+    mockDatabaseGet,
+    mockDatabaseInstance,
+    mockDatabasePrepare,
+} = vi.hoisted(() => {
+    const mockGet = vi.fn(() => ({ user_version: 1 }));
+    const mockPrepare = vi.fn(() => ({ get: mockGet }));
+    const mockInstance = {
+        close: vi.fn(),
+        prepare: mockPrepare,
+    } satisfies {
+        close: ReturnType<typeof vi.fn>;
+        prepare: typeof mockPrepare;
+    };
+    const mockCtor = vi.fn(function DatabaseMock() {
+        return mockInstance;
+    });
+    return {
+        mockDatabaseConstructor: mockCtor,
+        mockDatabaseGet: mockGet,
+        mockDatabaseInstance: mockInstance,
+        mockDatabasePrepare: mockPrepare,
+    };
+});
 
 // Mock dependencies before importing the module under test
 vi.mock("electron", () => ({
     app: {
         getPath: vi.fn(),
+        getVersion: vi.fn(() => "test-version"),
     },
 }));
 
 vi.mock("../../../services/database/utils/databaseBackup", () => ({
     createDatabaseBackup: vi.fn(),
     validateDatabaseBackupPayload: vi.fn(),
+    DEFAULT_BACKUP_RETENTION_HINT_DAYS: 30,
 }));
 
 vi.mock("../../../constants", () => ({
     DB_FILE_NAME: "uptime-watcher.sqlite",
 }));
 
-vi.mock("node:fs", () => ({
-    promises: mockFsPromises,
+vi.mock("node:fs/promises", () => ({
+    default: mockFsPromises,
+    ...mockFsPromises,
 }));
 
-vi.mock("node:os", () => mockOs);
+vi.mock("node:os", () => ({
+    default: mockOs,
+    ...mockOs,
+}));
 
 vi.mock("node-sqlite3-wasm", () => ({
+    default: { Database: mockDatabaseConstructor },
     Database: mockDatabaseConstructor,
 }));
 
@@ -116,6 +141,10 @@ describe(DataBackupService, () => {
         mockDatabasePrepare.mockClear();
         mockDatabaseGet.mockClear();
         mockDatabaseInstance.close.mockClear();
+        mockFsPromises.mkdtemp.mockResolvedValue("/tmp/mock-dir");
+        mockFsPromises.writeFile.mockResolvedValue(undefined as never);
+        mockFsPromises.copyFile.mockResolvedValue(undefined as never);
+        mockFsPromises.rm.mockResolvedValue(undefined as never);
 
         // Reset app.getPath mock
         vi.mocked(app.getPath).mockReturnValue("/test/userdata");
@@ -221,15 +250,17 @@ describe(DataBackupService, () => {
             // Assert
             expect(result).toEqual(mockResult); // The implementation returns the full result
             expect(app.getPath).toHaveBeenCalledWith("userData");
-            expect(createDatabaseBackup).toHaveBeenCalledWith(
-                path.join("/test/userdata", "uptime-watcher.sqlite")
-            );
+            expect(createDatabaseBackup).toHaveBeenCalledWith({
+                dbPath: path.join("/test/userdata", "uptime-watcher.sqlite"),
+            });
             expect(validateDatabaseBackupPayload).toHaveBeenCalledWith(
                 mockResult
             );
             expect(mockLogger.info).toHaveBeenCalledWith(
-                "Database backup created: uptime-watcher-backup.sqlite",
+                "[DataBackupService] Created database backup",
                 expect.objectContaining({
+                    checksum: mockResult.metadata.checksum,
+                    fileName: mockResult.fileName,
                     schemaVersion: mockResult.metadata.schemaVersion,
                     sizeBytes: mockResult.metadata.sizeBytes,
                 })
@@ -250,9 +281,9 @@ describe(DataBackupService, () => {
 
             // Assert
             expect(app.getPath).toHaveBeenCalledWith("userData");
-            expect(createDatabaseBackup).toHaveBeenCalledWith(
-                path.join("/custom/path", "uptime-watcher.sqlite")
-            );
+            expect(createDatabaseBackup).toHaveBeenCalledWith({
+                dbPath: path.join("/custom/path", "uptime-watcher.sqlite"),
+            });
         });
 
         it("should handle different backup results", async ({
@@ -292,8 +323,10 @@ describe(DataBackupService, () => {
                 customBackupResult
             );
             expect(mockLogger.info).toHaveBeenCalledWith(
-                "Database backup created: custom-backup.sqlite",
+                "[DataBackupService] Created database backup",
                 expect.objectContaining({
+                    checksum: customBackupResult.metadata.checksum,
+                    fileName: customBackupResult.fileName,
                     schemaVersion: customBackupResult.metadata.schemaVersion,
                     sizeBytes: customBackupResult.metadata.sizeBytes,
                 })
@@ -319,14 +352,14 @@ describe(DataBackupService, () => {
             ).rejects.toThrowError(SiteLoadingError);
 
             expect(mockLogger.error).toHaveBeenCalledWith(
-                "Failed to download backup: Backup creation failed",
-                testError
+                "Failed to download database backup: Backup creation failed",
+                expect.objectContaining({ message: "Backup creation failed" })
             );
             expect(mockEventEmitter.emitTyped).toHaveBeenCalledWith(
                 "database:error",
                 expect.objectContaining({
                     details:
-                        "Failed to download backup: Backup creation failed",
+                        "Failed to download database backup: Backup creation failed",
                     error: expect.objectContaining({
                         message: "Backup creation failed",
                         name: "Error",
@@ -356,16 +389,16 @@ describe(DataBackupService, () => {
             ).rejects.toThrowError(SiteLoadingError);
 
             expect(mockLogger.error).toHaveBeenCalledWith(
-                "Failed to download backup: String error message",
-                testError
+                "Failed to download database backup: String error message",
+                expect.objectContaining({ message: "String error message" })
             );
             expect(mockEventEmitter.emitTyped).toHaveBeenCalledWith(
                 "database:error",
                 expect.objectContaining({
-                    details: "Failed to download backup: String error message",
+                    details:
+                        "Failed to download database backup: String error message",
                     error: expect.objectContaining({
                         message: "String error message",
-                        name: "Error",
                     }),
                     operation: "download-backup",
                     timestamp: expect.any(Number),
@@ -393,7 +426,7 @@ describe(DataBackupService, () => {
             } catch (error) {
                 expect(error).toBeInstanceOf(SiteLoadingError);
                 expect((error as SiteLoadingError).message).toBe(
-                    "Failed to load sites: Failed to download backup: Original error"
+                    "Failed to load sites: Failed to download database backup: Original error"
                 );
                 expect((error as SiteLoadingError).stack).toContain(
                     "Caused by:"
@@ -428,11 +461,8 @@ describe(DataBackupService, () => {
             expect(mockEventEmitter.emitTyped).toHaveBeenCalledWith(
                 "database:error",
                 expect.objectContaining({
-                    details: "Failed to download backup: Test error",
-                    error: expect.objectContaining({
-                        message: "Test error",
-                        name: "Error",
-                    }),
+                    details: "Failed to download database backup: Test error",
+                    error: expect.objectContaining({ message: "Test error" }),
                     operation: "download-backup",
                     timestamp: expect.any(Number),
                 })
@@ -461,14 +491,14 @@ describe(DataBackupService, () => {
             ).rejects.toThrowError(SiteLoadingError);
 
             expect(mockLogger.error).toHaveBeenCalledWith(
-                "Failed to download backup: null",
-                null
+                "Failed to download database backup: null",
+                expect.objectContaining({ message: "null" })
             );
             expect(mockEventEmitter.emitTyped).toHaveBeenCalledWith(
                 "database:error",
                 {
-                    details: "Failed to download backup: null",
-                    error: new Error("null"),
+                    details: "Failed to download database backup: null",
+                    error: expect.objectContaining({ message: "null" }),
                     operation: "download-backup",
                     timestamp: expect.any(Number),
                 }
@@ -508,8 +538,13 @@ describe(DataBackupService, () => {
                 })
             );
             expect(mockLogger.info).toHaveBeenCalledWith(
-                "Database backup created: empty-backup.sqlite",
-                expect.objectContaining({ sizeBytes: 0 })
+                "[DataBackupService] Created database backup",
+                expect.objectContaining({
+                    checksum: expect.any(String),
+                    fileName: "empty-backup.sqlite",
+                    schemaVersion: expect.any(Number),
+                    sizeBytes: 0,
+                })
             );
         });
 
@@ -613,8 +648,12 @@ describe(DataBackupService, () => {
             expect(mockEventEmitter.emitTyped).toHaveBeenCalledWith(
                 "database:backup-restored",
                 expect.objectContaining({
+                    checksum: expect.any(String),
                     fileName: "restore.sqlite",
+                    schemaVersion: expect.any(Number),
                     size: buffer.length,
+                    timestamp: expect.any(Number),
+                    triggerType: "manual",
                 })
             );
             expect(summary.metadata.sizeBytes).toBe(buffer.length);
@@ -677,8 +716,10 @@ describe(DataBackupService, () => {
             ).rejects.toThrowError(SiteLoadingError);
 
             expect(mockLogger.error).toHaveBeenCalledWith(
-                "Failed to download backup: Cannot access user data path",
-                pathError
+                "Failed to download database backup: Cannot access user data path",
+                expect.objectContaining({
+                    message: "Cannot access user data path",
+                })
             );
         });
 
@@ -703,10 +744,7 @@ describe(DataBackupService, () => {
                 dataBackupService.downloadDatabaseBackup()
             ).rejects.toThrowError("Event emission failed");
 
-            expect(mockLogger.error).toHaveBeenCalledWith(
-                "Failed to download backup: Backup failed",
-                originalError
-            );
+            expect(mockLogger.error).not.toHaveBeenCalled();
         });
     });
 
@@ -735,9 +773,9 @@ describe(DataBackupService, () => {
                 await dataBackupService.downloadDatabaseBackup();
 
                 // Assert
-                expect(createDatabaseBackup).toHaveBeenCalledWith(
-                    path.join(testPath, "uptime-watcher.sqlite")
-                );
+                expect(createDatabaseBackup).toHaveBeenCalledWith({
+                    dbPath: path.join(testPath, "uptime-watcher.sqlite"),
+                });
             }
         });
 

@@ -25,10 +25,13 @@ const {
     mockGetMonitorTypeConfig,
     mockValidateMonitorData,
 } = vi.hoisted(() => {
+    const mockBackupBuffer = Buffer.from("mock backup");
     const defaultBackupMetadata = {
+        checksum: "mock-checksum",
         createdAt: 1_700_000_000_000,
         originalPath: "/tmp/uptime-watcher.db",
-        sizeBytes: 4096,
+        schemaVersion: 1,
+        sizeBytes: mockBackupBuffer.byteLength,
     };
     const mockUptimeOrchestrator = {
         addSite: vi.fn(),
@@ -41,7 +44,7 @@ const {
         startMonitoring: vi.fn(),
         stopMonitoring: vi.fn(),
         downloadBackup: vi.fn().mockResolvedValue({
-            buffer: Buffer.from("mock backup"),
+            buffer: mockBackupBuffer,
             fileName: "backup.db",
             metadata: { ...defaultBackupMetadata },
         }),

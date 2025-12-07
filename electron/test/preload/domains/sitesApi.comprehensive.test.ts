@@ -5,14 +5,16 @@ import { sitesApi } from "../../../preload/domains/sitesApi";
 import { SITES_CHANNELS } from "@shared/types/preload";
 import type { Site } from "@shared/types";
 
-vi.mock("electron", () => ({
-    ipcRenderer: {
-        invoke: vi.fn(),
-    },
+const ipcRendererMock = vi.hoisted(() => ({
+    invoke: vi.fn(),
 }));
-const correlationEnvelopeMatcher = expect.objectContaining({
+
+vi.mock("electron", () => ({
+    ipcRenderer: ipcRendererMock,
+}));
+
+const ipcContext = expect.objectContaining({
     __uptimeWatcherIpcContext: true,
-    correlationId: expect.any(String),
 });
 
 describe("sitesApi", () => {
@@ -39,7 +41,7 @@ describe("sitesApi", () => {
         expect(ipcRenderer.invoke).toHaveBeenCalledWith(
             SITES_CHANNELS.addSite,
             baseSite,
-            correlationEnvelopeMatcher
+            ipcContext
         );
     });
 
@@ -54,7 +56,7 @@ describe("sitesApi", () => {
         expect(result).toEqual([baseSite]);
         expect(ipcRenderer.invoke).toHaveBeenCalledWith(
             SITES_CHANNELS.getSites,
-            correlationEnvelopeMatcher
+            ipcContext
         );
     });
 
@@ -70,7 +72,7 @@ describe("sitesApi", () => {
         expect(ipcRenderer.invoke).toHaveBeenCalledWith(
             SITES_CHANNELS.removeSite,
             baseSite.identifier,
-            correlationEnvelopeMatcher
+            ipcContext
         );
     });
 
@@ -90,7 +92,7 @@ describe("sitesApi", () => {
             SITES_CHANNELS.removeMonitor,
             baseSite.identifier,
             "monitor-1",
-            correlationEnvelopeMatcher
+            ipcContext
         );
     });
 
@@ -110,7 +112,7 @@ describe("sitesApi", () => {
             SITES_CHANNELS.updateSite,
             baseSite.identifier,
             { name: "Updated" },
-            correlationEnvelopeMatcher
+            ipcContext
         );
     });
 
@@ -125,7 +127,7 @@ describe("sitesApi", () => {
         expect(result).toBe(4);
         expect(ipcRenderer.invoke).toHaveBeenCalledWith(
             SITES_CHANNELS.deleteAllSites,
-            correlationEnvelopeMatcher
+            ipcContext
         );
     });
 

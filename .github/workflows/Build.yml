@@ -167,6 +167,8 @@ jobs:
               uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
               with:
                   ref: ${{ github.event.inputs.branch || github.ref }}
+                  fetch-depth: 0
+                  fetch-tags: true
 
             - name: Download bumped package.json from bump-version job
               uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v6.0.0
@@ -375,11 +377,47 @@ jobs:
               uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
               with:
                   ref: ${{ github.event.inputs.branch || github.ref }}
+                  fetch-depth: 0
+                  fetch-tags: true
 
             - name: Download all build artifacts from build job
               uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v6.0.0
               with:
                   path: ./artifacts
+
+            - name: Determine previous release tag
+              id: previous_tag
+              shell: bash
+              run: |
+                  git fetch --tags --force
+                  current_tag="v${{ needs.bump-version.outputs.new_version }}"
+                  prev_tag=$(git describe --tags --match "v*" --abbrev=0 "${current_tag}^" 2>/dev/null || true)
+                  echo "previous_tag=${prev_tag}" >> "$GITHUB_OUTPUT"
+
+            - name: Generate release notes since previous tag
+              id: release_notes_full
+              shell: bash
+              run: |
+                  git fetch --tags --force
+                  current_tag="v${{ needs.bump-version.outputs.new_version }}"
+                  prev_tag="${{ steps.previous_tag.outputs.previous_tag }}"
+
+                  if [ -n "$prev_tag" ]; then
+                    range_spec="${prev_tag}..${current_tag}"
+                  else
+                    range_spec="${current_tag}"
+                  fi
+
+                  notes=$(git log $range_spec --pretty=format:"- %s%n  - Author: %an <%ae>%n  - Commit: [%h](https://github.com/${{ github.repository }}/commit/%H)%n  - Date: %ad%n" --date=short)
+                  if [ -z "$notes" ]; then
+                    notes="No commits found for range ${range_spec}"
+                  fi
+
+                  {
+                    echo "notes<<'EOF'"
+                    echo "$notes"
+                    echo "EOF"
+                  } >> "$GITHUB_OUTPUT"
 
             - name: Print Windows artifact hash (debug, Windows)
               id: print_artifact_hash_windows
@@ -417,33 +455,6 @@ jobs:
                     b64=$(echo "$hash" | xxd -r -p | base64)
                     echo "$file: $b64"
                   done
-
-            - name: Get previous tag created
-              id: get_prev_tag
-              run: |
-                  TAG_COUNT=$(git tag --sort=-creatordate | wc -l)
-                  if [ "$TAG_COUNT" -ge 2 ]; then
-                    PREV_TAG=$(git tag --sort=-creatordate | tail -2 | head -1)
-                  else
-                    PREV_TAG=""
-                  fi
-                  echo "prev_tag=${PREV_TAG}" >> "$GITHUB_OUTPUT"
-                  echo "prev_tag=$PREV_TAG" >> "$GITHUB_OUTPUT"
-
-            - name: Generate release notes for the new version
-              id: release_notes
-              run: |
-                  PREV_TAG="${{ steps.get_prev_tag.outputs.prev_tag }}"
-                  if [ -n "$PREV_TAG" ]; then
-                    NOTES=$(git log "$PREV_TAG"..HEAD --pretty=format:"- %s%n  - Author: %an <%ae>%n  - Commit: [$(%h)](https://github.com/${{ github.repository }}/commit/$(%H))%n  - Date: %ad%n" --date=short)
-                  else
-                    NOTES=$(git log --pretty=format:"- %s%n  - Author: %an <%ae>%n  - Commit: [$(%h)](https://github.com/${{ github.repository }}/commit/$(%H))%n  - Date: %ad%n" --date=short)
-                  fi
-                  {
-                    echo "notes<<EOF"
-                    echo -e "$NOTES"
-                    echo "EOF"
-                  } >> "$GITHUB_OUTPUT"
 
             - name: List artifacts (debug)
               id: list_artifacts
@@ -780,8 +791,7 @@ jobs:
                   name: Uptime-Watcher v${{ needs.bump-version.outputs.new_version }}
                   body: |
                       ## 🚀 Release Notes
-
-                      ${{ github.event.head_commit.message }}
+                      ${{ steps.release_notes_full.outputs.notes }}
 
                       **[📄 View Full Changelog](https://github.com/${{ github.repository }}/blob/main/CHANGELOG.md)**
 
@@ -792,7 +802,7 @@ jobs:
 
                       **Message:**
                       ```
-                      ${{ steps.release_notes.outputs.notes }}
+                      ${{ steps.release_notes_full.outputs.notes }}
                       ```
 
                       **Commit SHA:** `${{ github.sha }}`

@@ -23,10 +23,13 @@ import { STATE_SYNC_ACTION, STATE_SYNC_SOURCE } from "@shared/types/stateSync";
 import { ApplicationError } from "@shared/utils/errorHandling";
 
 // Mock all dependencies with proper typing
+const mockBackupBuffer = Buffer.from("test");
 const mockBackupMetadata = {
+    checksum: "mock-checksum",
     createdAt: 1_700_000_000_000,
     originalPath: "/tmp/uptime-watcher.db",
-    sizeBytes: 1024,
+    schemaVersion: 1,
+    sizeBytes: mockBackupBuffer.byteLength,
 };
 
 const mockDatabaseManager = {
@@ -35,7 +38,7 @@ const mockDatabaseManager = {
     resetSettings: vi.fn(() => Promise.resolve()),
     downloadBackup: vi.fn(() =>
         Promise.resolve({
-            buffer: Buffer.from("test"),
+            buffer: mockBackupBuffer,
             fileName: "backup.db",
             metadata: { ...mockBackupMetadata },
         })
@@ -1006,6 +1009,11 @@ describe(UptimeOrchestrator, () => {
             expect(result).toEqual({
                 buffer: expect.any(Buffer),
                 fileName: "backup.db",
+                metadata: expect.objectContaining({
+                    checksum: mockBackupMetadata.checksum,
+                    schemaVersion: mockBackupMetadata.schemaVersion,
+                    sizeBytes: mockBackupMetadata.sizeBytes,
+                }),
             });
         });
 

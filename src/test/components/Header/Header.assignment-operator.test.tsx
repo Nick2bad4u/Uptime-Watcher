@@ -25,6 +25,10 @@ import type {
     StatusUpdateSubscriptionSummary,
     StatusUpdateUnsubscribeResult,
 } from "../../../stores/sites/baseTypes";
+import {
+    createSerializedBackupResult,
+    createSerializedRestoreResult,
+} from "../../utils/createSerializedBackupResult";
 
 // Mock all store hooks
 vi.mock("../../../stores/sites/useSitesStore");
@@ -126,7 +130,7 @@ const createMockSitesStoreState = (sites: Site[]): SitesStore => {
         checkSiteNow: vi.fn(async () => {}),
         createSite: vi.fn(async () => {}),
         deleteSite: vi.fn(async () => {}),
-        downloadSqliteBackup: vi.fn(async () => {}),
+        downloadSqliteBackup: vi.fn(async () => createSerializedBackupResult()),
         fullResyncSites: vi.fn(async () => {}),
         getSelectedMonitorId: vi.fn(() => undefined),
         getSelectedSite: vi.fn(() => undefined),
@@ -144,11 +148,13 @@ const createMockSitesStoreState = (sites: Site[]): SitesStore => {
         modifySite: vi.fn(async () => {}),
         removeMonitorFromSite: vi.fn(async () => {}),
         removeSite: vi.fn(),
+        restoreSqliteBackup: vi.fn(async () => createSerializedRestoreResult()),
         retryStatusSubscription: retryStatusSubscriptionMock,
         selectSite: vi.fn(),
         setSelectedMonitorId: vi.fn(),
         setSites: vi.fn(),
         setStatusSubscriptionSummary: vi.fn(),
+        setLastBackupMetadata: vi.fn(),
         recordSiteSyncDelta: vi.fn(),
         startSiteMonitoring: vi.fn(async () => {}),
         startSiteMonitorMonitoring: vi.fn(async () => {}),
@@ -165,6 +171,7 @@ const createMockSitesStoreState = (sites: Site[]): SitesStore => {
         optimisticMonitoringLocks: {},
         selectedMonitorIds: {},
         selectedSiteIdentifier: undefined,
+        lastBackupMetadata: createSerializedBackupResult().metadata,
         lastSyncDelta: undefined,
         sites,
     };

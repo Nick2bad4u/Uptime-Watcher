@@ -134,7 +134,12 @@ describe("StateSyncService", () => {
             ).toHaveBeenCalledTimes(1);
         });
 
-        expect(callback).not.toHaveBeenCalled();
+        expect(callback).toHaveBeenCalledTimes(1);
+        expect(callback.mock.calls[0]?.[0]).toMatchObject({
+            action: STATE_SYNC_ACTION.BULK_SYNC,
+            siteIdentifier: "all",
+            source: fullSyncPayload.source,
+        });
 
         const broadcastEvent = {
             action: STATE_SYNC_ACTION.BULK_SYNC,
@@ -151,11 +156,11 @@ describe("StateSyncService", () => {
 
         capturedHandler?.(broadcastEvent);
 
+        // The broadcast event carries the same timestamp as the recovery snapshot
+        // and is intentionally suppressed to avoid duplicate delivery.
         await vi.waitFor(() => {
             expect(callback).toHaveBeenCalledTimes(1);
         });
-
-        expect(callback).toHaveBeenCalledWith(broadcastEvent);
         expect(mockLogger.warn).toHaveBeenCalledWith(
             "[StateSyncService] Attempting full sync recovery after invalid state sync event"
         );

@@ -23,6 +23,10 @@ vi.mock("electron", () => ({
     ipcRenderer: mockIpcRenderer,
 }));
 
+const ipcContext = expect.objectContaining({
+    __uptimeWatcherIpcContext: true,
+});
+
 import {
     monitorTypesApi,
     type MonitorTypesApiInterface,
@@ -78,7 +82,8 @@ describe("Monitor Types Domain API", () => {
             expect(mockIpcRenderer.invoke).toHaveBeenCalledWith(
                 MONITOR_TYPES_CHANNELS.formatMonitorDetail,
                 "http",
-                "status ok"
+                "status ok",
+                ipcContext
             );
             expect(result).toBe("HTTP: status ok");
         });
@@ -107,7 +112,8 @@ describe("Monitor Types Domain API", () => {
             expect(mockIpcRenderer.invoke).toHaveBeenCalledWith(
                 MONITOR_TYPES_CHANNELS.formatMonitorTitleSuffix,
                 "http",
-                monitor
+                monitor,
+                ipcContext
             );
             expect(result).toBe("(HTTP)");
         });
@@ -134,7 +140,8 @@ describe("Monitor Types Domain API", () => {
                 "http",
                 {
                     url: "https://example.com",
-                }
+                },
+                ipcContext
             );
             expect(result).toEqual(validationResult);
         });
@@ -146,11 +153,7 @@ describe("Monitor Types Domain API", () => {
                 http: {
                     name: "HTTP Monitor",
                     description: "Monitors HTTP endpoints",
-                    fields: [
-                        "url",
-                        "method",
-                        "timeout",
-                    ],
+                    fields: ["url", "method", "timeout"],
                     defaultValues: { method: "GET", timeout: 5000 },
                 },
                 ping: {
@@ -168,7 +171,8 @@ describe("Monitor Types Domain API", () => {
             const result = await api.getMonitorTypes();
 
             expect(mockIpcRenderer.invoke).toHaveBeenCalledWith(
-                MONITOR_TYPES_CHANNELS.getMonitorTypes
+                MONITOR_TYPES_CHANNELS.getMonitorTypes,
+                ipcContext
             );
             expect(result).toEqual(mockMonitorTypes);
         });
@@ -203,11 +207,7 @@ describe("Monitor Types Domain API", () => {
                         {
                             name: "method",
                             type: "enum",
-                            values: [
-                                "GET",
-                                "POST",
-                                "PUT",
-                            ],
+                            values: ["GET", "POST", "PUT"],
                             default: "GET",
                         },
                         { name: "headers", type: "object", default: {} },
@@ -255,7 +255,8 @@ describe("Monitor Types Domain API", () => {
 
             expect(result).toEqual(complexTypes);
             expect(mockIpcRenderer.invoke).toHaveBeenCalledWith(
-                "get-monitor-types"
+                "get-monitor-types",
+                ipcContext
             );
         });
 
@@ -362,7 +363,8 @@ describe("Monitor Types Domain API", () => {
 
                         const result = await api.getMonitorTypes();
                         expect(mockIpcRenderer.invoke).toHaveBeenCalledWith(
-                            "get-monitor-types"
+                            "get-monitor-types",
+                            ipcContext
                         );
                         expect(result).toEqual(monitorTypes);
                     }
@@ -530,11 +532,7 @@ describe("Monitor Types Domain API", () => {
                     name: "Custom HTTP Monitor",
                     plugin: true,
                     pluginSource: "custom-plugin-v1.0",
-                    capabilities: [
-                        "headers",
-                        "authentication",
-                        "ssl-check",
-                    ],
+                    capabilities: ["headers", "authentication", "ssl-check"],
                 },
                 "core:basic-ping": {
                     name: "Basic Ping",

@@ -5,11 +5,17 @@ import { monitoringApi } from "../../../preload/domains/monitoringApi";
 import { MONITORING_CHANNELS } from "@shared/types/preload";
 import type { Monitor, Site, StatusUpdate } from "@shared/types";
 
-vi.mock("electron", () => ({
-    ipcRenderer: {
-        invoke: vi.fn(),
-    },
+const ipcRendererMock = vi.hoisted(() => ({
+    invoke: vi.fn(),
 }));
+
+vi.mock("electron", () => ({
+    ipcRenderer: ipcRendererMock,
+}));
+
+const ipcContext = expect.objectContaining({
+    __uptimeWatcherIpcContext: true,
+});
 
 describe("monitoringApi", () => {
     beforeEach(() => {
@@ -26,7 +32,8 @@ describe("monitoringApi", () => {
 
         expect(ipcRenderer.invoke).toHaveBeenCalledWith(
             MONITORING_CHANNELS.startMonitoringForSite,
-            "site-1"
+            "site-1",
+            ipcContext
         );
     });
 
@@ -41,7 +48,8 @@ describe("monitoringApi", () => {
         expect(ipcRenderer.invoke).toHaveBeenCalledWith(
             MONITORING_CHANNELS.startMonitoringForMonitor,
             "site-1",
-            "monitor-1"
+            "monitor-1",
+            ipcContext
         );
     });
 
@@ -55,7 +63,8 @@ describe("monitoringApi", () => {
 
         expect(ipcRenderer.invoke).toHaveBeenCalledWith(
             MONITORING_CHANNELS.stopMonitoringForSite,
-            "site-1"
+            "site-1",
+            ipcContext
         );
     });
 
@@ -70,7 +79,8 @@ describe("monitoringApi", () => {
         expect(ipcRenderer.invoke).toHaveBeenCalledWith(
             MONITORING_CHANNELS.stopMonitoringForMonitor,
             "site-1",
-            "monitor-1"
+            "monitor-1",
+            ipcContext
         );
     });
 
@@ -114,7 +124,8 @@ describe("monitoringApi", () => {
         expect(ipcRenderer.invoke).toHaveBeenCalledWith(
             MONITORING_CHANNELS.checkSiteNow,
             "site-1",
-            "monitor-1"
+            "monitor-1",
+            ipcContext
         );
     });
 

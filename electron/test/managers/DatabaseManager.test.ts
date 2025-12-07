@@ -181,6 +181,13 @@ vi.mock("../../services/factories/DatabaseServiceFactory", () => ({
                 downloadDatabaseBackup: vi.fn().mockResolvedValue({
                     buffer: Buffer.from("backup data"),
                     fileName: "backup-test.db",
+                    metadata: {
+                        checksum: "mock-checksum",
+                        createdAt: 1_700_000_000_000,
+                        originalPath: "/tmp/uptime-watcher.db",
+                        schemaVersion: 1,
+                        sizeBytes: Buffer.from("backup data").byteLength,
+                    },
                 }),
             };
         }
@@ -290,15 +297,18 @@ describe(DatabaseManager, () => {
             };
 
             // Mock the DataBackupService instance
+            const mockBackupBuffer = Buffer.from("backup data");
             const mockBackupMetadata = {
+                checksum: "mock-checksum",
                 createdAt: 1_700_000_400_000,
                 originalPath: "/tmp/uptime-watcher.db",
-                sizeBytes: 1536,
+                schemaVersion: 1,
+                sizeBytes: mockBackupBuffer.byteLength,
             };
             const mockDataBackupService = {
                 downloadDatabaseBackup: vi.fn(() =>
                     Promise.resolve({
-                        buffer: Buffer.from("backup data"),
+                        buffer: mockBackupBuffer,
                         fileName: "backup-test.db",
                         metadata: { ...mockBackupMetadata },
                     })
@@ -322,7 +332,10 @@ describe(DatabaseManager, () => {
             expect(result).toEqual({
                 buffer: expect.any(Buffer),
                 fileName: "backup-test.db",
-                metadata: expect.objectContaining(mockBackupMetadata),
+                metadata: expect.objectContaining({
+                    ...mockBackupMetadata,
+                    createdAt: expect.any(Number),
+                }),
             });
             expect(mockEventEmitter.emitTyped).toHaveBeenCalledWith(
                 "internal:database:backup-downloaded",

@@ -347,9 +347,8 @@ describe("useSiteSync", () => {
             const mockCallback = vi.fn();
 
             // Mock StatusUpdateManager to throw an error during subscribe
-            const statusUpdateHandlerModule = await import(
-                "../../../stores/sites/utils/statusUpdateHandler"
-            );
+            const statusUpdateHandlerModule =
+                await import("../../../stores/sites/utils/statusUpdateHandler");
             const mockStatusUpdateManager = {
                 getExpectedListenerCount: vi.fn(() => 4),
                 subscribe: vi.fn(async () => {
@@ -382,9 +381,8 @@ describe("useSiteSync", () => {
 
     describe("retryStatusSubscription", () => {
         it("retries subscription using the stored callback", async () => {
-            const statusUpdateHandlerModule = await import(
-                "../../../stores/sites/utils/statusUpdateHandler"
-            );
+            const statusUpdateHandlerModule =
+                await import("../../../stores/sites/utils/statusUpdateHandler");
             const StatusUpdateManagerMock = vi.mocked(
                 statusUpdateHandlerModule.StatusUpdateManager
             );
@@ -576,6 +574,7 @@ describe("useSiteSync", () => {
                 selectedSiteIdentifier: "site-1",
                 sites: [],
                 statusSubscriptionSummary: undefined,
+                lastBackupMetadata: undefined,
                 lastSyncDelta: undefined,
             };
 

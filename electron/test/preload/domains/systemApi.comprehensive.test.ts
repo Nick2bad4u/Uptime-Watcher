@@ -4,14 +4,20 @@ import { ipcRenderer } from "electron";
 import { systemApi } from "../../../preload/domains/systemApi";
 import { SYSTEM_CHANNELS } from "@shared/types/preload";
 
-vi.mock("electron", () => ({
-    ipcRenderer: {
-        invoke: vi.fn(),
-        on: vi.fn(),
-        removeListener: vi.fn(),
-        send: vi.fn(),
-    },
+const ipcRendererMock = vi.hoisted(() => ({
+    invoke: vi.fn(),
+    on: vi.fn(),
+    removeListener: vi.fn(),
+    send: vi.fn(),
 }));
+
+vi.mock("electron", () => ({
+    ipcRenderer: ipcRendererMock,
+}));
+
+const ipcContext = expect.objectContaining({
+    __uptimeWatcherIpcContext: true,
+});
 
 describe("systemApi", () => {
     beforeEach(() => {
@@ -29,7 +35,8 @@ describe("systemApi", () => {
         expect(result).toBeTruthy();
         expect(ipcRenderer.invoke).toHaveBeenCalledWith(
             SYSTEM_CHANNELS.openExternal,
-            "https://example.com"
+            "https://example.com",
+            ipcContext
         );
     });
 
@@ -76,7 +83,8 @@ describe("systemApi", () => {
 
         expect(result).toBeTruthy();
         expect(ipcRenderer.invoke).toHaveBeenCalledWith(
-            SYSTEM_CHANNELS.quitAndInstall
+            SYSTEM_CHANNELS.quitAndInstall,
+            ipcContext
         );
     });
 });

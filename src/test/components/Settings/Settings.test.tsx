@@ -16,6 +16,10 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { createSelectorHookMock } from "../../utils/createSelectorHookMock";
 import {
+    createSerializedBackupResult,
+    createSerializedRestoreResult,
+} from "../../utils/createSerializedBackupResult";
+import {
     createSitesStoreMock,
     updateSitesStoreMock,
 } from "../../utils/createSitesStoreMock";
@@ -30,14 +34,21 @@ vi.mock("../../../stores/settings/useSettingsStore", () => ({
     useSettingsStore: vi.fn(),
 }));
 
-const createDefaultDownloadBackup = () => vi.fn(async () => undefined);
+const createDefaultDownloadBackup = () =>
+    vi.fn(async () => createSerializedBackupResult());
+
+const createDefaultRestoreBackup = () =>
+    vi.fn(async () => createSerializedRestoreResult());
 
 const createDefaultFullResync = () => vi.fn(async () => undefined);
 
 // Standard creation bridged through global to avoid hoist-time import errors
 const sitesStoreState = createSitesStoreMock({
-    downloadSqliteBackup: vi.fn(async () => undefined),
-    fullResyncSites: vi.fn(async () => undefined),
+    downloadSqliteBackup: createDefaultDownloadBackup(),
+    restoreSqliteBackup: createDefaultRestoreBackup(),
+    fullResyncSites: createDefaultFullResync(),
+    lastBackupMetadata: createSerializedBackupResult().metadata,
+    setLastBackupMetadata: vi.fn(),
 });
 
 const useSitesStoreMock = createSelectorHookMock(sitesStoreState);
@@ -55,7 +66,10 @@ vi.mock("../../../stores/sites/useSitesStore", () => ({
 const resetSitesStoreState = (): void => {
     updateSitesStoreMock(sitesStoreState, {
         downloadSqliteBackup: createDefaultDownloadBackup(),
+        restoreSqliteBackup: createDefaultRestoreBackup(),
         fullResyncSites: createDefaultFullResync(),
+        lastBackupMetadata: createSerializedBackupResult().metadata,
+        setLastBackupMetadata: vi.fn(),
     });
 };
 
@@ -201,7 +215,6 @@ describe("Settings Component", () => {
             },
             borderRadius: {
                 sm: "4px",
-                md: "8px",
                 lg: "12px",
                 full: "50%",
                 none: "0",

@@ -22,22 +22,22 @@ import type {
 } from "@shared/types/ipc";
 import type { Site } from "@shared/types";
 
-vi.mock("electron", () => ({
-    ipcRenderer: {
-        invoke: vi.fn(),
-        on: vi.fn(),
-        removeListener: vi.fn(),
-    },
+const ipcRendererMock = vi.hoisted(() => ({
+    invoke: vi.fn(),
+    on: vi.fn(),
+    removeListener: vi.fn(),
 }));
 
-const correlationEnvelopeMatcher = expect.objectContaining({
-    __uptimeWatcherIpcContext: true,
-    correlationId: expect.any(String),
-});
+vi.mock("electron", () => ({
+    ipcRenderer: ipcRendererMock,
+}));
 
 const formatDetailChannel = "format-monitor-detail" satisfies IpcInvokeChannel;
 const startMonitoringChannel = "start-monitoring" satisfies IpcInvokeChannel;
 const resetSettingsChannel = "reset-settings" satisfies IpcInvokeChannel;
+const ipcContext = expect.objectContaining({
+    __uptimeWatcherIpcContext: true,
+});
 
 function createHandshakeSuccess(
     channel: string,
@@ -99,11 +99,17 @@ describe("bridgeFactory", function describeBridgeFactorySuite() {
             const invoke = createTypedInvoker(formatDetailChannel);
             const result = await invoke("http", "status-page");
 
-            expect(ipcRenderer.invoke).toHaveBeenCalledWith(
+            expect(ipcRenderer.invoke).toHaveBeenNthCalledWith(
+                1,
+                "diagnostics-verify-ipc-handler",
+                formatDetailChannel
+            );
+            expect(ipcRenderer.invoke).toHaveBeenNthCalledWith(
+                2,
                 formatDetailChannel,
                 "http",
                 "status-page",
-                correlationEnvelopeMatcher
+                ipcContext
             );
             expect(result).toBe("detail");
         });
@@ -194,9 +200,15 @@ describe("bridgeFactory", function describeBridgeFactorySuite() {
 
             const reset = createVoidInvoker(resetSettingsChannel);
             await expect(reset()).resolves.toBeUndefined();
-            expect(ipcRenderer.invoke).toHaveBeenCalledWith(
+            expect(ipcRenderer.invoke).toHaveBeenNthCalledWith(
+                1,
+                "diagnostics-verify-ipc-handler",
+                resetSettingsChannel
+            );
+            expect(ipcRenderer.invoke).toHaveBeenNthCalledWith(
+                2,
                 resetSettingsChannel,
-                correlationEnvelopeMatcher
+                ipcContext
             );
         });
 

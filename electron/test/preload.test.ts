@@ -6,6 +6,7 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
 
 import type { Monitor, Site, StatusUpdate } from "@shared/types";
+import { createCorrelationAwareInvokeMock } from "./utils/ipcCorrelationTestUtils";
 
 describe("Electron Preload Script", () => {
     let mockContextBridge: { exposeInMainWorld: ReturnType<typeof vi.fn> };
@@ -55,19 +56,22 @@ describe("Electron Preload Script", () => {
             ],
         } as Site;
 
+        const invokeMock = createCorrelationAwareInvokeMock();
+        invokeMock.mockImplementation((channel: string) => {
+            // For site operations, return site data
+            if (channel === "add-site" || channel === "update-site") {
+                return Promise.resolve({ success: true, data: mockSite });
+            }
+            // For site array operations
+            if (channel === "get-sites") {
+                return Promise.resolve({ success: true, data: [mockSite] });
+            }
+            // For other operations, return generic success
+            return Promise.resolve({ success: true, data: true });
+        });
+
         mockIpcRenderer = {
-            invoke: vi.fn((channel: string) => {
-                // For site operations, return site data
-                if (channel === "add-site" || channel === "update-site") {
-                    return Promise.resolve({ success: true, data: mockSite });
-                }
-                // For site array operations
-                if (channel === "get-sites") {
-                    return Promise.resolve({ success: true, data: [mockSite] });
-                }
-                // For other operations, return generic success
-                return Promise.resolve({ success: true, data: true });
-            }),
+            invoke: invokeMock,
             on: vi.fn(),
             removeAllListeners: vi.fn(),
             send: vi.fn(),
@@ -1307,7 +1311,12 @@ describe("Electron Preload Script", () => {
 
                 const result = await exposedAPI.system.quitAndInstall();
 
-                expect(mockInvoke).toHaveBeenCalledWith("quit-and-install");
+                expect(mockInvoke).toHaveBeenCalledWith(
+                    "quit-and-install",
+                    expect.objectContaining({
+                        __uptimeWatcherIpcContext: true,
+                    })
+                );
                 expect(result).toBeTruthy();
             });
         });

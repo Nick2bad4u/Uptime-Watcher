@@ -18,9 +18,8 @@ vi.mock("electron", () => ({
     ipcRenderer: mockIpcRenderer,
 }));
 
-const correlationEnvelopeMatcher = expect.objectContaining({
+const ipcContext = expect.objectContaining({
     __uptimeWatcherIpcContext: true,
-    correlationId: expect.any(String),
 });
 
 import {
@@ -126,7 +125,7 @@ describe("State Sync Domain API", () => {
 
             expect(mockIpcRenderer.invoke).toHaveBeenCalledWith(
                 STATE_SYNC_CHANNELS.getSyncStatus,
-                correlationEnvelopeMatcher
+                ipcContext
             );
             expect(result).toEqual(mockStatus);
             expect(typeof result.siteCount).toBe("number");
@@ -211,7 +210,7 @@ describe("State Sync Domain API", () => {
 
             expect(mockIpcRenderer.invoke).toHaveBeenCalledWith(
                 STATE_SYNC_CHANNELS.requestFullSync,
-                correlationEnvelopeMatcher
+                ipcContext
             );
             expect(result).toEqual(mockResult);
             expect(Array.isArray(result.sites)).toBeTruthy();

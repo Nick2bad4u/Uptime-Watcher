@@ -65,23 +65,22 @@ interface Alert {
 }
 
 // Real notification service instances for benchmarking
-const downAlertsService = new NotificationService({
-    config: {
-        showDownAlerts: true,
-        showUpAlerts: false,
-    },
+const downAlertsService = new NotificationService();
+downAlertsService.updateConfig({
+    showDownAlerts: true,
+    showUpAlerts: false,
 });
-const upAlertsService = new NotificationService({
-    config: {
-        showDownAlerts: false,
-        showUpAlerts: true,
-    },
+
+const upAlertsService = new NotificationService();
+upAlertsService.updateConfig({
+    showDownAlerts: false,
+    showUpAlerts: true,
 });
-const fullAlertsService = new NotificationService({
-    config: {
-        showDownAlerts: true,
-        showUpAlerts: true,
-    },
+
+const fullAlertsService = new NotificationService();
+fullAlertsService.updateConfig({
+    showDownAlerts: true,
+    showUpAlerts: true,
 });
 
 // Mock monitor data generators
@@ -92,12 +91,7 @@ function createMockSite(id: string, monitorCount: number): Site {
         monitoring: true,
         monitors: Array.from({ length: monitorCount }, (_, i) => ({
             id: `monitor-${id}-${i}`,
-            type: [
-                "http",
-                "dns",
-                "port",
-                "ping",
-            ][i % 4] as any,
+            type: ["http", "dns", "port", "ping"][i % 4] as any,
             status: "pending" as MonitorStatus,
             monitoring: true,
             responseTime: -1,
@@ -131,21 +125,12 @@ class EnhancedAlertSystem {
             const rule: AlertRule = {
                 id: `rule-${i}`,
                 name: `Alert Rule ${i}`,
-                type: [
-                    "threshold",
-                    "anomaly",
-                    "status_change",
-                ][i % 3] as any,
+                type: ["threshold", "anomaly", "status_change"][i % 3] as any,
                 conditions: {
                     threshold: Math.random() * 1000,
                     timeWindow: 300_000,
                 },
-                severity: [
-                    "low",
-                    "medium",
-                    "high",
-                    "critical",
-                ][i % 4] as any,
+                severity: ["low", "medium", "high", "critical"][i % 4] as any,
                 isEnabled: Math.random() > 0.1,
             };
             this.rules.set(rule.id, rule);

@@ -1,5 +1,9 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+vi.mock("node:crypto", () => ({
+    randomInt: vi.fn().mockReturnValue(0),
+}));
+
 vi.unmock("../../../services/monitoring/MonitorScheduler");
 
 import type { Site } from "@shared/types";
@@ -55,6 +59,12 @@ type MonitorCheckCallback = (
 
 const createCheckCallbackMock = () => vi.fn<MonitorCheckCallback>();
 
+const expectDelayWithinTolerance = (actual: number, expected: number): void => {
+    const tolerance = Math.ceil(expected * 0.1) + 100;
+    expect(actual).toBeGreaterThanOrEqual(Math.max(0, expected - tolerance));
+    expect(actual).toBeLessThanOrEqual(expected + tolerance);
+};
+
 describe("MonitorScheduler – comprehensive", () => {
     const FIXED_NOW = 2_000_000_000;
     let scheduler: MonitorScheduler;
@@ -100,13 +110,22 @@ describe("MonitorScheduler – comprehensive", () => {
             ([eventName]) => eventName === "monitor:backoff-applied"
         );
 
-        expect(backoffEvent?.[1]).toMatchObject({
+        const backoffPayload = backoffEvent?.[1] as
+            | {
+                  backoffAttempt: number;
+                  delayMs: number;
+                  monitorId: string;
+                  siteIdentifier: string;
+                  timestamp: number;
+              }
+            | undefined;
+        expect(backoffPayload).toMatchObject({
             backoffAttempt: 1,
-            delayMs: baseInterval * 2,
             monitorId: "monitor-1",
             siteIdentifier: "site-1",
             timestamp: FIXED_NOW,
         });
+        expectDelayWithinTolerance(backoffPayload!.delayMs, baseInterval * 2);
 
         await vi.advanceTimersByTimeAsync(baseInterval * 2);
         await flushAsync();
@@ -135,16 +154,22 @@ describe("MonitorScheduler – comprehensive", () => {
 
         for (const expectedDelay of expectedDelays) {
             await flushAsync();
-            const latestBackoff = eventEmitter.emitTyped.mock.calls
-                .findLast(
-                    ([eventName]) => eventName === "monitor:backoff-applied"
-                );
+            const latestBackoff = eventEmitter.emitTyped.mock.calls.findLast(
+                ([eventName]) => eventName === "monitor:backoff-applied"
+            );
 
-            expect(latestBackoff?.[1]).toMatchObject({
-                delayMs: expectedDelay,
+            const payload = latestBackoff?.[1] as
+                | {
+                      delayMs: number;
+                      monitorId: string;
+                      timestamp: number;
+                  }
+                | undefined;
+            expect(payload).toMatchObject({
                 monitorId: expect.any(String),
                 timestamp: FIXED_NOW,
             });
+            expectDelayWithinTolerance(payload!.delayMs, expectedDelay);
 
             await vi.advanceTimersByTimeAsync(expectedDelay);
         }

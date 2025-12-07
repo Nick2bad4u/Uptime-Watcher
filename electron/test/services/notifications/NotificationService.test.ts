@@ -1,5 +1,4 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
-import { Notification } from "electron";
 import { type Site } from "@shared/types";
 
 import {
@@ -18,11 +17,26 @@ vi.mock("../../../utils/logger", () => ({
     },
 }));
 
-const mockShow = vi.fn();
-const notificationCtor = vi.fn(() => ({ show: mockShow }));
-const mockIsSupported = vi.fn(() => true);
-(notificationCtor as unknown as typeof Notification).isSupported =
-    mockIsSupported;
+const { mockIsSupported, mockShow, notificationCtor } = vi.hoisted(() => {
+    const mockShowImpl = vi.fn();
+    const mockIsSupportedImpl = vi.fn(() => true);
+
+    const notificationCtorImpl = vi.fn(function NotificationMock(this: {
+        show: typeof mockShowImpl;
+    }) {
+        this.show = mockShowImpl;
+    });
+
+    Object.assign(notificationCtorImpl, {
+        isSupported: mockIsSupportedImpl,
+    });
+
+    return {
+        mockIsSupported: mockIsSupportedImpl,
+        mockShow: mockShowImpl,
+        notificationCtor: notificationCtorImpl,
+    };
+});
 
 vi.mock("electron", async () => {
     const actual = await vi.importActual<typeof import("electron")>("electron");
