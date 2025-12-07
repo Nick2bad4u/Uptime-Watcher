@@ -374,6 +374,7 @@ export class WindowService {
                 contextIsolation: true, // Security: isolate context
                 nodeIntegration: false, // Security: disable node in renderer
                 preload: this.getPreloadPath(), // Safe IPC bridge
+                sandbox: false, // Ensure preload retains full Node built-ins (required for path, fs, etc.)
             },
             width: 1200,
         });

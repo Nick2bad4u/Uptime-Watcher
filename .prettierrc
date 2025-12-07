@@ -7,7 +7,6 @@
     "cursorOffset": -1,
     "embeddedLanguageFormatting": "auto",
     "endOfLine": "auto",
-    "escapeNonLatin1": false,
     "experimentalOperatorPosition": "end",
     "experimentalTernaries": false,
     "htmlWhitespaceSensitivity": "css",
@@ -215,6 +214,7 @@
         {
             "files": "*.properties",
             "options": {
+                "escapeNonLatin1": false,
                 "plugins": [
                     "prettier-plugin-properties"
                 ]
