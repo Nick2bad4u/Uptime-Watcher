@@ -1,3 +1,4 @@
+import type { SerializedDatabaseRestoreResult } from "@shared/types/ipc";
 import type { MonitorTypeConfig } from "@shared/types/monitorTypes";
 
 import { isMonitorTypeConfig } from "@shared/types/monitorTypes";
@@ -102,8 +103,12 @@ export const validateSerializedDatabaseRestorePayload = (
 
 export const validateSerializedDatabaseRestoreResult = (
     value: unknown
-): ReturnType<typeof serializedDatabaseRestoreResultSchema.safeParse> =>
-    serializedDatabaseRestoreResultSchema.safeParse(value);
+):
+    | { data: SerializedDatabaseRestoreResult; success: true }
+    | { error: unknown; success: false } =>
+    serializedDatabaseRestoreResultSchema.safeParse(value) as
+        | { data: SerializedDatabaseRestoreResult; success: true }
+        | { error: unknown; success: false };
 
 export const validateMonitorTypeConfigArray = (
     value: unknown

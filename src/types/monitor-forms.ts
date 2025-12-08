@@ -11,6 +11,8 @@
 import type { HttpMethod, MonitorType } from "@shared/types";
 import type { UnknownRecord } from "type-fest";
 
+import { isNonEmptyString } from "@shared/utils/typeGuards";
+
 import type { RequireAllOrNoneFields } from "./typeUtils";
 
 interface HeaderExpectationShape {
@@ -30,9 +32,6 @@ interface JsonExpectationShape {
 }
 
 type JsonExpectationFields = RequireAllOrNoneFields<JsonExpectationShape>;
-
-const isNonEmptyString = (value: unknown): value is string =>
-    typeof value === "string" && value.trim().length > 0;
 
 interface ReplicationMonitorRequirementShape {
     maxReplicationLagSeconds?: number;

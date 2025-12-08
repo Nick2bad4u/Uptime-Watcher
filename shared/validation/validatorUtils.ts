@@ -32,6 +32,11 @@
 
 import validator from "validator";
 
+import {
+    isNonEmptyString as isNonEmptyStringGuard,
+    isValidPort as isValidNumericPort,
+} from "../utils/typeGuards";
+
 /**
  * Validates that a value is a non-empty string.
  *
@@ -50,7 +55,7 @@ import validator from "validator";
  * @public
  */
 export function isNonEmptyString(value: unknown): value is string {
-    return typeof value === "string" && !validator.isEmpty(value.trim());
+    return isNonEmptyStringGuard(value);
 }
 
 /**
@@ -247,9 +252,9 @@ export function isValidHost(value: unknown): value is string {
  */
 export function isValidPort(value: unknown): boolean {
     if (typeof value === "number") {
-        // Exclude port 0 as it's reserved and not suitable for user configuration
-        if (value === 0) return false;
-        return validator.isPort(value.toString());
+        // Delegate numeric semantics to the shared type guard so the range
+        // and integer rules stay consistent across the codebase.
+        return isValidNumericPort(value);
     }
     if (typeof value === "string") {
         // Exclude port "0" as it's reserved and not suitable for user configuration

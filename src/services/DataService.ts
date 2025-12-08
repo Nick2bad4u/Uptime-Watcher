@@ -65,7 +65,10 @@ function validateAndUnwrap<T>(
     })();
 
     if (!parsed.success) {
-        const parseError = parsed.error;
+        const { error: parseError } = parsed as {
+            error: unknown;
+            success: false;
+        };
         const issues = hasIssueArray(parseError) ? parseError.issues : [];
         const messages = issues.map((issue) => issue.message).join(", ");
         const diagnosticSuffix = diagnostics
@@ -163,7 +166,12 @@ export const DataService: DataServiceContract = {
         ): Promise<SerializedDatabaseRestoreResult> =>
             runDataOperation("restoreSqliteBackup", async () => {
                 try {
-                    const parsed = validateAndUnwrap(
+                    // The Zod schema already models `preRestoreFileName` as
+                    // optional, so we can return the parsed result directly
+                    // without reshaping. Callers can treat the absence of the
+                    // property and an explicit `undefined` value equivalently
+                    // when displaying restore summaries.
+                    return validateAndUnwrap<SerializedDatabaseRestoreResult>(
                         "restoreSqliteBackup",
                         validateSerializedDatabaseRestoreResult,
                         await api.data.restoreSqliteBackup(payload),
@@ -171,13 +179,6 @@ export const DataService: DataServiceContract = {
                             payloadFileName: payload.fileName,
                         }
                     );
-
-                    return parsed.preRestoreFileName === undefined
-                        ? {
-                              metadata: parsed.metadata,
-                              restoredAt: parsed.restoredAt,
-                          }
-                        : parsed;
                 } catch (error: unknown) {
                     throw ensureError(error);
                 }

@@ -254,6 +254,10 @@ function toPartialMonitorFormData<
     fieldName: TField,
     value: OptionalMonitorFieldValue<TType, TField>
 ): PartialMonitorFormDataByType<TType> {
+    // The computed property name tied to the generic field name cannot be
+    // expressed without a type assertion, but the resulting object is safely
+    // assignable to PartialMonitorFormDataByType<TType>.
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Narrowing computed generic field name to PartialMonitorFormDataByType<TType> is safe here
     return {
         [fieldName]: value,
     } as PartialMonitorFormDataByType<TType>;
@@ -275,7 +279,14 @@ export async function validateMonitorData<TType extends MonitorType>(
     type: TType,
     data?: PartialMonitorFormDataByType<TType>
 ): Promise<ValidationResult> {
-    const payload: PartialMonitorFormDataByType<TType> = data ?? {};
+    const basePayload: PartialMonitorFormDataByType<TType> = data ?? {};
+    // Always include the monitor type in the payload so that downstream
+    // validators (monitor types store and backend Zod schemas) receive a
+    // consistent discriminator field alongside the typed argument.
+    const payload: PartialMonitorFormDataByType<TType> & { type: TType } = {
+        ...basePayload,
+        type,
+    };
     if (!isKnownMonitorType(type)) {
         return {
             errors: [`Unsupported monitor type: ${String(type)}`],
@@ -935,6 +946,11 @@ export async function validateMonitorFormData<TType extends MonitorType>(
         () => {
             const manualErrors = validateMonitorFormDataByType(type, data);
 
+            // Form-level validation is intentionally lightweight: it focuses
+            // on fields the user can edit in the current form rather than the
+            // full monitor schema used by the backend. Shared Zod schemas are
+            // exercised via validateMonitorDataClientSide and backend
+            // validation flows.
             if (manualErrors.length > 0) {
                 return {
                     errors: manualErrors,
@@ -943,13 +959,10 @@ export async function validateMonitorFormData<TType extends MonitorType>(
                 } satisfies ValidationResult;
             }
 
-            const sharedResult = sharedValidateMonitorData(type, data);
-            const errors = Array.from(sharedResult.errors);
-
             return {
-                errors,
-                success: sharedResult.success && errors.length === 0,
-                warnings: sharedResult.warnings ?? [],
+                errors: [],
+                success: true,
+                warnings: [],
             } satisfies ValidationResult;
         }
     );

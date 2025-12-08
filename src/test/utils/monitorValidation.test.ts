@@ -312,6 +312,7 @@ describe("Monitor Validation Utilities", () => {
                 warnings: ["Minor issue"],
             });
             expect(mockStore.validateMonitorData).toHaveBeenCalledWith("http", {
+                type: "http",
                 url: "https://example.com",
             });
         });
@@ -484,6 +485,7 @@ describe("Monitor Validation Utilities", () => {
             expect(mockStore.validateMonitorData).toHaveBeenCalledWith("port", {
                 host: "localhost",
                 port: 3000,
+                type: "port",
             });
         });
     });
@@ -1717,11 +1719,7 @@ describe("Monitor Validation Utilities", () => {
             // Test that each function properly handles and propagates multiple errors
             const mockResult = {
                 data: undefined,
-                errors: [
-                    "Error 1",
-                    "Error 2",
-                    "Error 3",
-                ],
+                errors: ["Error 1", "Error 2", "Error 3"],
                 metadata: {},
                 success: false,
                 warnings: ["Warning 1", "Warning 2"],

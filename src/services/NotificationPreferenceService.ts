@@ -4,7 +4,10 @@
  * @remarks
  * Provides a typed abstraction around the notifications preload bridge so UI
  * state can update the main-process notification configuration without touching
- * IPC primitives directly.
+ * IPC primitives directly. This service performs an additional runtime
+ * structural check on the `notifications` domain to surface clearer error
+ * messages when the preload bridge is misconfigured, complementing (rather than
+ * replacing) the standard `getIpcServiceHelpers` readiness guards.
  *
  * @packageDocumentation
  */

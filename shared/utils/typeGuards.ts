@@ -259,6 +259,16 @@ export function isNonEmptyString(value: unknown): value is string {
 }
 
 /**
+ * Internal helper validating a numeric TCP/UDP port value.
+ *
+ * @param value - Numeric candidate to evaluate.
+ *
+ * @returns `true` when the value is an integer between 1 and 65,535.
+ */
+const isValidPortNumber = (value: number): value is PortNumber =>
+    Number.isInteger(value) && value >= 1 && value <= 65_535;
+
+/**
  * Checks whether a value falls within the valid TCP/UDP port range.
  *
  * @param value - Value to evaluate.
@@ -266,12 +276,7 @@ export function isNonEmptyString(value: unknown): value is string {
  * @returns `true` when the value is an integer between 1 and 65,535.
  */
 export function isValidPort(value: unknown): value is PortNumber {
-    return (
-        isNumber(value) &&
-        Number.isInteger(value) &&
-        value >= 1 &&
-        value <= 65_535
-    );
+    return isNumber(value) && isValidPortNumber(value);
 }
 
 /**

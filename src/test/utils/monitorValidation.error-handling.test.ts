@@ -128,7 +128,10 @@ describe("monitorValidation error handling", () => {
         );
 
         const result = await validateMonitorData("ping", { host: "host" });
-        expect(validateSpy).toHaveBeenCalledWith("ping", { host: "host" });
+        expect(validateSpy).toHaveBeenCalledWith("ping", {
+            host: "host",
+            type: "ping",
+        });
         expect(result).toStrictEqual(expected);
     });
 

@@ -126,7 +126,7 @@ export interface SerializedDatabaseRestorePayload {
 export interface SerializedDatabaseRestoreResult {
     metadata: SerializedDatabaseBackupMetadata;
     /** Optional filename of the safety snapshot captured before restore */
-    preRestoreFileName?: string;
+    preRestoreFileName?: string | undefined;
     restoredAt: number;
 }
 

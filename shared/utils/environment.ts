@@ -8,12 +8,31 @@
  * guarded snapshot accessor.
  */
 /**
- * Documented environment variables used throughout the application.
+ * Documented environment variables with cross-layer significance.
+ *
+ * @remarks
+ * This interface is intentionally conservative: it captures only the keys that
+ * influence architectural behaviour (logging, test modes, user-data routing)
+ * rather than attempting to mirror the entire process.env surface.
  */
 export interface KnownEnvironmentVariables {
+    /** Token used by coverage reporting tooling when present. */
     readonly CODECOV_TOKEN?: string;
+    /**
+     * Signals headless test execution for Electron, used to avoid enabling
+     * remote debugging and similar dev-only features.
+     */
+    readonly HEADLESS?: string;
+    /** Standard Node.js environment discriminator. */
     readonly NODE_ENV?: "development" | "production" | "test";
+    /** Flag used to enable Playwright-specific coverage collection. */
     readonly PLAYWRIGHT_COVERAGE?: string;
+    /** Flag injected by Playwright to signal automation mode in preload. */
+    readonly PLAYWRIGHT_TEST?: string;
+    /** Optional override for Playwright-specific userData directory. */
+    readonly PLAYWRIGHT_USER_DATA_DIR?: string;
+    /** Optional override for Electron's userData directory. */
+    readonly UPTIME_WATCHER_USER_DATA_DIR?: string;
 }
 
 /**

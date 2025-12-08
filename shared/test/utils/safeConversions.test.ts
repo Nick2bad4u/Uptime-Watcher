@@ -902,7 +902,25 @@ describe("Shared Safe Conversions - Backend Coverage", () => {
                                 Math.min(numValue, MAX_TIMEOUT_MILLISECONDS)
                             );
                         } else {
-                            expect(result).toBe(defaultVal);
+                            // When the input is invalid (NaN, non-positive,
+                            // or non-finite), safeParseTimeout falls back to
+                            // a *normalized* default that is clamped to the
+                            // configured timeout range. Mirror the
+                            // clampTimeoutDefault logic from the
+                            // implementation here.
+                            const normalizedMinimum = Math.max(
+                                MIN_TIMEOUT_MILLISECONDS,
+                                MIN_TIMEOUT_MILLISECONDS
+                            );
+                            const finiteDefault = Number.isFinite(defaultVal)
+                                ? defaultVal
+                                : normalizedMinimum;
+                            const expectedFallback = Math.min(
+                                Math.max(finiteDefault, normalizedMinimum),
+                                MAX_TIMEOUT_MILLISECONDS
+                            );
+
+                            expect(result).toBe(expectedFallback);
                         }
                     }
                 )
