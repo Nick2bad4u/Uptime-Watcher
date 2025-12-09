@@ -12,10 +12,11 @@ import type { Monitor, Site } from "@shared/types";
 import type { MonitorStatusChangedEventData } from "@shared/types/events";
 import type { UnknownRecord } from "type-fest";
 
+import { isRecord } from "@shared/utils/typeHelpers";
 import { validateStatusUpdate } from "./guards";
 
 const isUnknownRecord = (value: unknown): value is UnknownRecord =>
-    typeof value === "object" && value !== null && !Array.isArray(value);
+    isRecord(value);
 
 const stripEventMetadata = (value: UnknownRecord): UnknownRecord => {
     if (!Reflect.has(value, "_meta") && !Reflect.has(value, "_originalMeta")) {

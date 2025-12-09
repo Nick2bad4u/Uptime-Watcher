@@ -97,7 +97,7 @@ export async function playInAppAlertTone(): Promise<void> {
         } catch (error) {
             logger.debug(
                 "Failed to resume AudioContext; skipping alert tone",
-                error instanceof Error ? error : new Error(String(error))
+                ensureError(error)
             );
             return;
         }

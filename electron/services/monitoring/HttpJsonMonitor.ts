@@ -5,6 +5,7 @@
 /* eslint-disable ex/no-unhandled -- Monitor factory construction is deterministic and safe */
 
 import type { Monitor } from "@shared/types";
+import { isRecord } from "@shared/utils/typeHelpers";
 
 import type { MonitorServiceConfig } from "./types";
 
@@ -24,10 +25,6 @@ function getTrimmedString(value: unknown): null | string {
 
     const trimmed = value.trim();
     return trimmed.length === 0 ? null : trimmed;
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-    return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
 function toError(value: unknown): Error {

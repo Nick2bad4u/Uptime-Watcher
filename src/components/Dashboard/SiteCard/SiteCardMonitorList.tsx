@@ -12,6 +12,7 @@ import { memo, type NamedExoticComponent, useMemo } from "react";
 
 import { ThemedText } from "../../../theme/components/ThemedText";
 import { AppIcons } from "../../../utils/icons";
+import { formatResponseTime } from "../../../utils/time";
 import { Tooltip } from "../../common/Tooltip/Tooltip";
 
 const STATUS_LABELS: Record<MonitorStatus, string> = {
@@ -29,11 +30,6 @@ const STATUS_ICON_MAP = {
     pending: AppIcons.status.pendingFilled,
     up: AppIcons.status.upFilled,
 } as const;
-
-const formatResponseTime = (milliseconds: number): string =>
-    new Intl.NumberFormat("en-US", {
-        maximumFractionDigits: 0,
-    }).format(milliseconds);
 
 const SECOND_IN_MS = 1000;
 const MINUTE_IN_MS = 60 * SECOND_IN_MS;
@@ -142,12 +138,16 @@ export const SiteCardMonitorList: NamedExoticComponent<SiteCardMonitorListProper
                     const lastTimestamp = extractLatestTimestamp(monitor);
                     const isActive = monitor.id === selectedMonitorId;
 
+                    const safeResponseLabel = formatResponseTime(
+                        monitor.responseTime
+                    );
+
                     return {
                         interval: formatInterval(monitor.checkInterval),
                         isActive,
                         lastCheck: formatRelativeTime(lastTimestamp),
                         monitor,
-                        responseTime: formatResponseTime(monitor.responseTime),
+                        responseTime: safeResponseLabel,
                         statusIcon: StatusIcon,
                         statusLabel,
                         statusValue: monitor.status,
@@ -245,7 +245,7 @@ export const SiteCardMonitorList: NamedExoticComponent<SiteCardMonitorListProper
                                                 {...triggerProps}
                                             >
                                                 <ResponseIcon className="site-card__monitor-stat-icon" />
-                                                <span>{responseTime} ms</span>
+                                                <span>{responseTime}</span>
                                             </span>
                                         )}
                                     </Tooltip>

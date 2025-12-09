@@ -7,6 +7,7 @@ import type {
 import type { UnknownRecord } from "type-fest";
 
 import { generateCorrelationId } from "@shared/utils/correlation";
+import { isRecord as isSharedRecord } from "@shared/utils/typeHelpers";
 import {
     normalizeLogValue,
     withLogContext,
@@ -32,7 +33,7 @@ import { SystemHandlerValidators } from "../validators";
 import { withIgnoredIpcEvent } from "./handlerShared";
 
 const isUnknownRecord = (value: unknown): value is UnknownRecord =>
-    typeof value === "object" && value !== null && !Array.isArray(value);
+    isSharedRecord(value);
 
 const isPreloadGuardDiagnosticsReport = (
     value: unknown

@@ -36,7 +36,6 @@
  * @returns {@link ThemeStyles} Containing all CSS-in-JS style properties.
  *
  * @public
- * @public
  */
 
 import type { CSSProperties } from "react";

@@ -42,7 +42,7 @@ interface DatabaseMonitorRow {
     active_operations?: string;
 }
 
-interface Monitor {
+interface BenchmarkMonitor {
     id: string;
     siteIdentifier: string;
     type: string;
@@ -83,31 +83,13 @@ function generateDatabaseRows(count: number): DatabaseMonitorRow[] {
         rows.push({
             id: `monitor-${i}`,
             site_identifier: `site-${Math.floor(i / 10)}`,
-            type: [
-                "http",
-                "ping",
-                "port",
-            ][i % 3],
+            type: ["http", "ping", "port"][i % 3],
             url: i % 3 === 0 ? `https://example${i}.com` : undefined,
             host: i % 3 === 0 ? undefined : `host${i}.example.com`,
             port: i % 3 === 2 ? 8080 + (i % 100) : undefined,
-            checkInterval:
-                [
-                    60,
-                    300,
-                    600,
-                ][i % 3] * 1000,
-            timeout:
-                [
-                    5,
-                    10,
-                    30,
-                ][i % 3] * 1000,
-            retryAttempts: [
-                1,
-                3,
-                5,
-            ][i % 3],
+            checkInterval: [60, 300, 600][i % 3] * 1000,
+            timeout: [5, 10, 30][i % 3] * 1000,
+            retryAttempts: [1, 3, 5][i % 3],
             monitoring: Math.random() > 0.1,
             status: Math.random() > 0.05 ? "up" : "down",
             responseTime: Math.floor(Math.random() * 1000) + 50,
@@ -156,7 +138,7 @@ function parseActiveOperations(activeOperationsJson: string): string[] {
     }
 }
 
-function mapRowToMonitor(row: DatabaseMonitorRow): Monitor {
+function mapRowToMonitor(row: DatabaseMonitorRow): BenchmarkMonitor {
     return {
         id: row.id,
         siteIdentifier: row.site_identifier,
@@ -175,7 +157,7 @@ function mapRowToMonitor(row: DatabaseMonitorRow): Monitor {
     };
 }
 
-function rowsToMonitors(rows: DatabaseMonitorRow[]): Monitor[] {
+function rowsToMonitors(rows: DatabaseMonitorRow[]): BenchmarkMonitor[] {
     return rows.map((row) => mapRowToMonitor(row));
 }
 
@@ -186,7 +168,9 @@ function simulateValidation(data: unknown[]): boolean {
     );
 }
 
-function simulateParameterGeneration(monitors: Monitor[]): unknown[][] {
+function simulateParameterGeneration(
+    monitors: BenchmarkMonitor[]
+): unknown[][] {
     return monitors.map((monitor) => [
         monitor.siteIdentifier,
         monitor.type,

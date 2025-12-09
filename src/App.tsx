@@ -385,7 +385,7 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
             } catch (error) {
                 logger.warn(
                     "Failed to initialize notification preference bridge",
-                    error instanceof Error ? error : new Error(String(error))
+                    ensureError(error)
                 );
             }
 
@@ -850,11 +850,7 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
                 );
             };
         },
-        [
-            isCompactViewport,
-            isSidebarOpen,
-            persistSidebarPreference,
-        ]
+        [isCompactViewport, isSidebarOpen, persistSidebarPreference]
     );
 
     const toggleSidebar = useCallback(() => {
@@ -865,11 +861,7 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
 
         const next = !isSidebarOpen;
         persistSidebarPreference(next);
-    }, [
-        isCompactViewport,
-        isSidebarOpen,
-        persistSidebarPreference,
-    ]);
+    }, [isCompactViewport, isSidebarOpen, persistSidebarPreference]);
 
     const globalMetrics = useGlobalMonitoringMetrics();
 
@@ -894,12 +886,7 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
 
         applyUpdateStatus("idle");
         setUpdateError(undefined);
-    }, [
-        applyUpdate,
-        applyUpdateStatus,
-        setUpdateError,
-        updateStatus,
-    ]);
+    }, [applyUpdate, applyUpdateStatus, setUpdateError, updateStatus]);
 
     /**
      * Handles closing the settings modal.

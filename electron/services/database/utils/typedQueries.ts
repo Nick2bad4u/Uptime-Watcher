@@ -13,6 +13,8 @@
 import type { Database } from "node-sqlite3-wasm";
 import type { UnknownRecord } from "type-fest";
 
+import { isRecord as isSharedRecord } from "@shared/utils/typeHelpers";
+
 import {
     type HistoryRow,
     isValidMonitorRow,
@@ -41,7 +43,7 @@ export interface RowValidationOptions<TRow extends object> {
 }
 
 function isUnknownRecord(value: unknown): value is UnknownRecord {
-    return typeof value === "object" && value !== null && !Array.isArray(value);
+    return isSharedRecord(value);
 }
 
 function describeRow(label?: string, context?: string): string {

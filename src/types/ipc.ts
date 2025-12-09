@@ -66,6 +66,7 @@ import type {
 import type { Exact, UnknownRecord } from "type-fest";
 
 import { ERROR_CATALOG } from "@shared/utils/errorCatalog";
+import { isRecord as isSharedRecord } from "@shared/utils/typeHelpers";
 
 const IPC_RESPONSE_KEYS = new Set<string>([
     "data",
@@ -76,7 +77,7 @@ const IPC_RESPONSE_KEYS = new Set<string>([
 ]);
 
 const isRecord = (value: unknown): value is UnknownRecord =>
-    typeof value === "object" && value !== null && !Array.isArray(value);
+    isSharedRecord(value);
 
 const hasOnlyResponseKeys = (record: UnknownRecord): boolean =>
     Object.keys(record).every((key) => IPC_RESPONSE_KEYS.has(key));

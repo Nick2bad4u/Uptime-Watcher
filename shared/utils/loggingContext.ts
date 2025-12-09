@@ -1,4 +1,5 @@
 import { generateCorrelationId } from "@shared/utils/correlation";
+import { isRecord } from "@shared/utils/typeHelpers";
 
 /** Supported logging severity levels emitted by the structured logger. */
 export type LogSeverity = "debug" | "error" | "info" | "warn";
@@ -117,9 +118,6 @@ const buildBaseLogContext = (
     severity: context?.severity ?? severity,
     timestamp: context?.timestamp ?? Date.now(),
 });
-
-const isRecord = (candidate: unknown): candidate is Record<string, unknown> =>
-    typeof candidate === "object" && candidate !== null;
 
 export const normalizeLogValue = (value: unknown): unknown => {
     if (typeof value === "string") {

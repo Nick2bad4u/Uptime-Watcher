@@ -5,6 +5,7 @@
 /* eslint-disable ex/no-unhandled -- Monitor factory construction is deterministic and safe */
 
 import type { Monitor } from "@shared/types";
+import { isRecord as isSharedRecord } from "@shared/utils/typeHelpers";
 
 import type { MonitorServiceConfig } from "./types";
 
@@ -41,13 +42,9 @@ function normalizeHeaderValue(value: string): string {
     return trimmed;
 }
 
-function isHeaderRecord(value: unknown): value is Record<string, unknown> {
-    return typeof value === "object" && value !== null && !Array.isArray(value);
-}
-
 function resolveHeaderValue(headers: unknown, name: string): null | string {
     const normalizedName = normalizeHeaderName(name);
-    if (!isHeaderRecord(headers)) {
+    if (!isSharedRecord(headers)) {
         return null;
     }
 

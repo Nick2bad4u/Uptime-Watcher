@@ -22,10 +22,10 @@ import { bench, describe } from "vitest";
  *
  * @internal
  */
-interface Site {
+interface BenchmarkSite {
     identifier: string;
     name: string;
-    monitors: Monitor[];
+    monitors: BenchmarkMonitor[];
     monitoring: boolean;
 }
 
@@ -34,7 +34,7 @@ interface Site {
  *
  * @internal
  */
-interface Monitor {
+interface BenchmarkMonitor {
     id: string;
     type: "http" | "ping" | "port";
     status: "up" | "down" | "pending";
@@ -78,11 +78,14 @@ interface UptimeStats {
  *
  * @returns Array of synthetic {@link Site} entities with populated history.
  */
-function generateSites(count: number, monitorsPerSite: number): Site[] {
-    const sites: Site[] = [];
+function generateSites(
+    count: number,
+    monitorsPerSite: number
+): BenchmarkSite[] {
+    const sites: BenchmarkSite[] = [];
 
     for (let i = 0; i < count; i++) {
-        const monitors: Monitor[] = [];
+        const monitors: BenchmarkMonitor[] = [];
 
         for (let j = 0; j < monitorsPerSite; j++) {
             const history: StatusEntry[] = [];
@@ -98,32 +101,14 @@ function generateSites(count: number, monitorsPerSite: number): Site[] {
 
             monitors.push({
                 id: `monitor-${i}-${j}`,
-                type: [
-                    "http",
-                    "ping",
-                    "port",
-                ][j % 3] as any,
+                type: ["http", "ping", "port"][j % 3] as any,
                 status: Math.random() > 0.05 ? "up" : "down",
                 responseTime: Math.floor(Math.random() * 500) + 10,
                 history,
                 monitoring: Math.random() > 0.1, // 90% active
-                checkInterval:
-                    [
-                        30,
-                        60,
-                        300,
-                    ][j % 3] * 1000,
-                timeout:
-                    [
-                        5,
-                        10,
-                        30,
-                    ][j % 3] * 1000,
-                retryAttempts: [
-                    1,
-                    3,
-                    5,
-                ][j % 3],
+                checkInterval: [30, 60, 300][j % 3] * 1000,
+                timeout: [5, 10, 30][j % 3] * 1000,
+                retryAttempts: [1, 3, 5][j % 3],
             });
         }
 
@@ -232,7 +217,9 @@ function filterHistoryByTimeRange(
  *
  * @returns Map of site identifier to computed {@link UptimeStats}.
  */
-function aggregateSiteStatistics(sites: Site[]): Map<string, UptimeStats> {
+function aggregateSiteStatistics(
+    sites: BenchmarkSite[]
+): Map<string, UptimeStats> {
     const stats = new Map<string, UptimeStats>();
 
     for (const site of sites) {

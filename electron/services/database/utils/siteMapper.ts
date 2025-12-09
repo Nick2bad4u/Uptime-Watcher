@@ -7,6 +7,7 @@
  */
 
 import type { SiteRow as DatabaseSiteRow } from "@shared/types/database";
+import { isValidSiteRow as isValidDatabaseSiteRow } from "@shared/types/database";
 
 import { LOG_TEMPLATES } from "@shared/utils/logTemplates";
 import { safeStringify } from "@shared/utils/stringConversion";
@@ -44,28 +45,6 @@ export interface SiteRow {
 }
 
 /**
- * Validate that a row contains the minimum required fields for a site.
- *
- * @remarks
- * Validates that the row has a valid identifier that is not null, undefined, or
- * empty string. This ensures database integrity and prevents invalid site
- * creation.
- *
- * @param row - Database row to validate
- *
- * @returns True if row is valid
- *
- * @public
- */
-export function isValidSiteRow(row: DatabaseSiteRow): boolean {
-    return (
-        row.identifier !== undefined &&
-        typeof row.identifier === "string" &&
-        row.identifier.trim().length > 0
-    );
-}
-
-/**
  * Convert a database row to a Site object (without monitors).
  *
  * @remarks
@@ -84,7 +63,7 @@ export function isValidSiteRow(row: DatabaseSiteRow): boolean {
 export function rowToSite(row: DatabaseSiteRow): SiteRow {
     try {
         // Validate that we have a valid identifier
-        if (!isValidSiteRow(row)) {
+        if (!isValidDatabaseSiteRow(row)) {
             throw new Error("Invalid site row: missing or invalid identifier");
         }
 

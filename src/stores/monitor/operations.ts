@@ -5,6 +5,7 @@ import type { ValidationResult } from "@shared/types/validation";
  */
 import { isMonitorTypeConfig } from "@shared/types/monitorTypes";
 import { withErrorHandling } from "@shared/utils/errorHandling";
+import { isRecord as isSharedRecord } from "@shared/utils/typeHelpers";
 
 import type { MonitorTypesStoreGetter, MonitorTypesStoreSetter } from "./state";
 import type { MonitorTypesStore } from "./types";
@@ -15,10 +16,7 @@ import { logStoreAction } from "../utils";
 
 const isUnknownRecord = (
     candidate: unknown
-): candidate is Record<string, unknown> =>
-    typeof candidate === "object" &&
-    candidate !== null &&
-    !Array.isArray(candidate);
+): candidate is Record<string, unknown> => isSharedRecord(candidate);
 
 /**
  * Creates the operational slice wiring monitor type service calls.

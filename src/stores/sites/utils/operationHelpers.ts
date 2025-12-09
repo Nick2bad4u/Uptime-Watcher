@@ -9,6 +9,7 @@ import type { UnknownRecord } from "type-fest";
 
 import { ERROR_CATALOG } from "@shared/utils/errorCatalog";
 import { ensureError, withErrorHandling } from "@shared/utils/errorHandling";
+import { isRecord as isSharedRecord } from "@shared/utils/typeHelpers";
 import {
     DuplicateSiteIdentifierError,
     ensureUniqueSiteIdentifiers,
@@ -64,7 +65,7 @@ const TELEMETRY_CONFIG_KEYS = [
 ] as const;
 
 const isPlainRecord = (value: unknown): value is Record<string, unknown> =>
-    typeof value === "object" && value !== null && !Array.isArray(value);
+    isSharedRecord(value);
 
 const isTelemetryConfig = (
     value: unknown

@@ -32,7 +32,7 @@ interface MonitorCheckResult {
     error?: string;
 }
 
-interface StatusUpdate {
+interface BenchmarkStatusUpdate {
     monitorId: string;
     status: "up" | "down";
     responseTime: number;
@@ -46,30 +46,17 @@ function generateMonitorConfigs(count: number): MonitorConfig[] {
 
     for (let i = 0; i < count; i++) {
         configs.push({
-            timeout: [
-                5000,
-                10_000,
-                30_000,
-            ][i % 3],
-            retryAttempts: [
-                1,
-                3,
-                5,
-            ][i % 3],
-            checkInterval:
-                [
-                    60,
-                    300,
-                    600,
-                ][i % 3] * 1000,
+            timeout: [5000, 10_000, 30_000][i % 3],
+            retryAttempts: [1, 3, 5][i % 3],
+            checkInterval: [60, 300, 600][i % 3] * 1000,
         });
     }
 
     return configs;
 }
 
-function generateStatusUpdates(count: number): StatusUpdate[] {
-    const updates: StatusUpdate[] = [];
+function generateStatusUpdates(count: number): BenchmarkStatusUpdate[] {
+    const updates: BenchmarkStatusUpdate[] = [];
     const now = Date.now();
 
     for (let i = 0; i < count; i++) {
@@ -135,9 +122,9 @@ function simulateHttpCheck(url: string, timeout: number): MonitorCheckResult {
 }
 
 function processStatusUpdates(
-    updates: StatusUpdate[]
-): Map<string, StatusUpdate> {
-    const latestUpdates = new Map<string, StatusUpdate>();
+    updates: BenchmarkStatusUpdate[]
+): Map<string, BenchmarkStatusUpdate> {
+    const latestUpdates = new Map<string, BenchmarkStatusUpdate>();
 
     for (const update of updates) {
         const existing = latestUpdates.get(update.monitorId);
@@ -211,9 +198,9 @@ describe("Monitoring Operations Performance Benchmarks", () => {
     let smallConfigs: MonitorConfig[];
     let mediumConfigs: MonitorConfig[];
     let largeConfigs: MonitorConfig[];
-    let smallUpdates: StatusUpdate[];
-    let mediumUpdates: StatusUpdate[];
-    let largeUpdates: StatusUpdate[];
+    let smallUpdates: BenchmarkStatusUpdate[];
+    let mediumUpdates: BenchmarkStatusUpdate[];
+    let largeUpdates: BenchmarkStatusUpdate[];
     let smallResults: MonitorCheckResult[];
     let mediumResults: MonitorCheckResult[];
     let largeResults: MonitorCheckResult[];

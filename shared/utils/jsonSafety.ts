@@ -7,6 +7,8 @@
  */
 import type { Jsonifiable, JsonValue } from "type-fest";
 
+import { ensureError } from "@shared/utils/errorHandling";
+
 /**
  * Result tuple produced by the safe JSON helpers.
  */
@@ -20,19 +22,6 @@ export interface SafeJsonResult<T> {
     error?: string;
     /** Indicates whether the underlying operation completed successfully. */
     success: boolean;
-}
-
-/**
- * Normalizes an unknown value into an {@link Error} instance.
- *
- * @param error - Arbitrary error-like value caught during JSON operations.
- *
- * @returns A proper {@link Error} instance describing the problem.
- *
- * @internal
- */
-function ensureError(error: unknown): Error {
-    return error instanceof Error ? error : new Error(String(error));
 }
 
 /**

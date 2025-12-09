@@ -244,9 +244,10 @@ export function useTheme(): UseThemeReturn {
      * const primaryBg = getColor("background.primary");
      * ```
      *
-     * @param path - Dot-notation path to the color (e.g., "colors.status.up")
+     * @param path - Dot-notation path within {@link Theme.colors} (for example,
+     *   "status.up" or "background.primary").
      *
-     * @returns Color value as string, or theme-aware fallback if path is
+     * @returns Color value as string, or theme-aware fallback if the path is
      *   invalid
      */
     const getColor = useCallback(

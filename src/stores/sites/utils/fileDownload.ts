@@ -10,6 +10,8 @@ import type {
     SerializedDatabaseBackupResult,
 } from "@shared/types/ipc";
 
+import { isRecord as isSharedRecord } from "@shared/utils/typeHelpers";
+
 import { logger } from "../../../services/logger";
 import { isPlaywrightAutomation } from "../../../utils/environment";
 
@@ -245,7 +247,7 @@ export function generateBackupFileName(
 }
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
-    typeof value === "object" && value !== null;
+    isSharedRecord(value);
 
 /**
  * Type guard ensuring a value matches {@link SerializedDatabaseBackupResult}.

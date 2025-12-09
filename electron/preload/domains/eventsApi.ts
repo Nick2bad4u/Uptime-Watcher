@@ -52,6 +52,7 @@ import {
     isEnrichedMonitorStatusChangedEventData,
     isMonitorStatusChangedEventData,
 } from "@shared/validation/monitorStatusEvents";
+import { isRecord as isSharedRecord } from "@shared/utils/typeHelpers";
 
 import { createEventManager } from "../core/bridgeFactory";
 import {
@@ -131,7 +132,7 @@ const isUpdateStatus = (value: unknown): value is UpdateStatus =>
     );
 
 const isUnknownRecord = (value: unknown): value is Record<string, unknown> =>
-    typeof value === "object" && value !== null;
+    isSharedRecord(value);
 
 const hasFiniteTimestamp = (value: unknown): value is number =>
     typeof value === "number" && Number.isFinite(value);

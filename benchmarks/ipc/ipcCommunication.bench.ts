@@ -17,15 +17,15 @@
 
 import { bench, describe } from "vitest";
 
-// Type definitions for benchmarking
-interface Site {
+// Type definitions for benchmarking (synthetic shapes)
+interface BenchmarkSite {
     identifier: string;
     name: string;
     monitoring: boolean;
-    monitors: Monitor[];
+    monitors: BenchmarkMonitor[];
 }
 
-interface Monitor {
+interface BenchmarkMonitor {
     id: string;
     type: "http" | "ping" | "port";
     monitoring: boolean;
@@ -49,7 +49,7 @@ interface StatusHistory {
 }
 
 // Mock data generators for benchmarking
-function generateTestSites(count: number): Site[] {
+function generateTestSites(count: number): BenchmarkSite[] {
     return Array.from({ length: count }, (_, i) => ({
         identifier: `site-${i}`,
         name: `Test Site ${i}`,
@@ -58,7 +58,7 @@ function generateTestSites(count: number): Site[] {
     }));
 }
 
-function generateTestMonitors(count: number): Monitor[] {
+function generateTestMonitors(count: number): BenchmarkMonitor[] {
     return Array.from({ length: count }, (_, i) => ({
         id: `monitor-${i}`,
         type: "http" as const,
@@ -92,18 +92,18 @@ function deserializeData(jsonString: string): any {
     return JSON.parse(jsonString);
 }
 
-function validateSiteStructure(site: Site): boolean {
+function validateSiteStructure(site: BenchmarkSite): boolean {
     return Boolean(
         site.identifier && site.name && Array.isArray(site.monitors)
     );
 }
 
-function validateMonitorData(monitor: Monitor): boolean {
+function validateMonitorData(monitor: BenchmarkMonitor): boolean {
     return Boolean(
         monitor.id &&
-            monitor.type &&
-            typeof monitor.checkInterval === "number" &&
-            typeof monitor.timeout === "number"
+        monitor.type &&
+        typeof monitor.checkInterval === "number" &&
+        typeof monitor.timeout === "number"
     );
 }
 

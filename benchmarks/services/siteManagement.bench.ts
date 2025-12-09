@@ -10,8 +10,12 @@ import { bench, describe } from "vitest";
 
 /**
  * Represents site data in the site management benchmark.
+ *
+ * @remarks
+ * This is a synthetic benchmark shape and intentionally does not match the
+ * production Site domain type.
  */
-interface Site {
+interface BenchmarkSite {
     id: string;
     name: string;
     url: string;
@@ -27,7 +31,7 @@ interface Site {
 /**
  * Represents site create request data in the site management benchmark.
  */
-interface SiteCreateRequest {
+interface BenchmarkSiteCreateRequest {
     name: string;
     url: string;
     checkInterval?: number;
@@ -38,7 +42,7 @@ interface SiteCreateRequest {
 /**
  * Represents site update request data in the site management benchmark.
  */
-interface SiteUpdateRequest {
+interface BenchmarkSiteUpdateRequest {
     name?: string;
     url?: string;
     isActive?: boolean;
@@ -50,7 +54,7 @@ interface SiteUpdateRequest {
 /**
  * Represents site filter data in the site management benchmark.
  */
-interface SiteFilter {
+interface BenchmarkSiteFilter {
     status?: string[];
     isActive?: boolean;
     tags?: string[];
@@ -62,17 +66,17 @@ interface SiteFilter {
 /**
  * Represents site pagination options data in the site management benchmark.
  */
-interface SitePaginationOptions {
+interface BenchmarkSitePaginationOptions {
     page: number;
     limit: number;
-    sortBy?: keyof Site;
+    sortBy?: keyof BenchmarkSite;
     sortOrder?: "asc" | "desc";
 }
 
 /**
  * Represents paginated result data in the site management benchmark.
  */
-interface PaginatedResult<T> {
+interface BenchmarkPaginatedResult<T> {
     data: T[];
     total: number;
     page: number;
@@ -84,14 +88,14 @@ interface PaginatedResult<T> {
  * Mock site repository used to drive the site management benchmark.
  */
 class MockSiteRepository {
-    private sites = new Map<string, Site>();
+    private sites = new Map<string, BenchmarkSite>();
     private nextId = 1;
 
-    async create(siteData: SiteCreateRequest): Promise<Site> {
+    async create(siteData: BenchmarkSiteCreateRequest): Promise<BenchmarkSite> {
         const id = `site-${this.nextId++}`;
         const now = new Date();
 
-        const site: Site = {
+        const site: BenchmarkSite = {
             id,
             name: siteData.name,
             url: siteData.url,
@@ -108,15 +112,15 @@ class MockSiteRepository {
         return { ...site };
     }
 
-    async findById(id: string): Promise<Site | null> {
+    async findById(id: string): Promise<BenchmarkSite | null> {
         const site = this.sites.get(id);
         return site ? { ...site } : null;
     }
 
     async findAll(
-        filter?: SiteFilter,
-        pagination?: SitePaginationOptions
-    ): Promise<PaginatedResult<Site>> {
+        filter?: BenchmarkSiteFilter,
+        pagination?: BenchmarkSitePaginationOptions
+    ): Promise<BenchmarkPaginatedResult<BenchmarkSite>> {
         let sites = Array.from(this.sites.values());
 
         // Apply filters
@@ -148,11 +152,14 @@ class MockSiteRepository {
         };
     }
 
-    async update(id: string, updates: SiteUpdateRequest): Promise<Site | null> {
+    async update(
+        id: string,
+        updates: BenchmarkSiteUpdateRequest
+    ): Promise<BenchmarkSite | null> {
         const site = this.sites.get(id);
         if (!site) return null;
 
-        const updatedSite: Site = {
+        const updatedSite: BenchmarkSite = {
             ...site,
             ...updates,
             updatedAt: new Date(),
@@ -166,7 +173,7 @@ class MockSiteRepository {
         return this.sites.delete(id);
     }
 
-    async findByUrl(url: string): Promise<Site | null> {
+    async findByUrl(url: string): Promise<BenchmarkSite | null> {
         for (const site of this.sites.values()) {
             if (site.url === url) {
                 return { ...site };
@@ -175,7 +182,9 @@ class MockSiteRepository {
         return null;
     }
 
-    async findByStatus(status: Site["status"]): Promise<Site[]> {
+    async findByStatus(
+        status: BenchmarkSite["status"]
+    ): Promise<BenchmarkSite[]> {
         return Array.from(this.sites.values())
             .filter((site) => site.status === status)
             .map((site) => ({ ...site }));
@@ -183,8 +192,8 @@ class MockSiteRepository {
 
     async updateStatus(
         id: string,
-        status: Site["status"]
-    ): Promise<Site | null> {
+        status: BenchmarkSite["status"]
+    ): Promise<BenchmarkSite | null> {
         const site = this.sites.get(id);
         if (!site) return null;
 
@@ -194,7 +203,10 @@ class MockSiteRepository {
         return { ...site };
     }
 
-    private applyFilters(sites: Site[], filter: SiteFilter): Site[] {
+    private applyFilters(
+        sites: BenchmarkSite[],
+        filter: BenchmarkSiteFilter
+    ): BenchmarkSite[] {
         return sites.filter((site) => {
             if (filter.status && !filter.status.includes(site.status)) {
                 return false;
@@ -238,10 +250,10 @@ class MockSiteRepository {
     }
 
     private applySorting(
-        sites: Site[],
-        sortBy: keyof Site,
+        sites: BenchmarkSite[],
+        sortBy: keyof BenchmarkSite,
         sortOrder: "asc" | "desc"
-    ): Site[] {
+    ): BenchmarkSite[] {
         return sites.toSorted((a, b) => {
             const aValue = a[sortBy];
             const bValue = b[sortBy];
@@ -315,7 +327,9 @@ class MockSiteManagementService {
         this.urlValidator = /^https?:\/\/.+/;
     }
 
-    async createSite(request: SiteCreateRequest): Promise<Site> {
+    async createSite(
+        request: BenchmarkSiteCreateRequest
+    ): Promise<BenchmarkSite> {
         // Validate input
         this.validateSiteRequest(request);
 
@@ -334,7 +348,10 @@ class MockSiteManagementService {
         return site;
     }
 
-    async updateSite(id: string, request: SiteUpdateRequest): Promise<Site> {
+    async updateSite(
+        id: string,
+        request: BenchmarkSiteUpdateRequest
+    ): Promise<BenchmarkSite> {
         // Validate input
         if (request.url) {
             this.validateUrl(request.url);
@@ -383,7 +400,7 @@ class MockSiteManagementService {
         this.eventBus.emit("site.deleted", { site });
     }
 
-    async getSite(id: string): Promise<Site> {
+    async getSite(id: string): Promise<BenchmarkSite> {
         const site = await this.repository.findById(id);
         if (!site) {
             throw new Error(`Site with ID ${id} not found`);
@@ -392,13 +409,16 @@ class MockSiteManagementService {
     }
 
     async getSites(
-        filter?: SiteFilter,
-        pagination?: SitePaginationOptions
-    ): Promise<PaginatedResult<Site>> {
+        filter?: BenchmarkSiteFilter,
+        pagination?: BenchmarkSitePaginationOptions
+    ): Promise<BenchmarkPaginatedResult<BenchmarkSite>> {
         return await this.repository.findAll(filter, pagination);
     }
 
-    async updateSiteStatus(id: string, status: Site["status"]): Promise<Site> {
+    async updateSiteStatus(
+        id: string,
+        status: BenchmarkSite["status"]
+    ): Promise<BenchmarkSite> {
         const site = await this.repository.findById(id);
         if (!site) {
             throw new Error(`Site with ID ${id} not found`);
@@ -417,14 +437,16 @@ class MockSiteManagementService {
         return updatedSite!;
     }
 
-    async getSitesByStatus(status: Site["status"]): Promise<Site[]> {
+    async getSitesByStatus(
+        status: BenchmarkSite["status"]
+    ): Promise<BenchmarkSite[]> {
         return await this.repository.findByStatus(status);
     }
 
     async bulkUpdateSites(
-        updates: { id: string; data: SiteUpdateRequest }[]
-    ): Promise<Site[]> {
-        const results: Site[] = [];
+        updates: { id: string; data: BenchmarkSiteUpdateRequest }[]
+    ): Promise<BenchmarkSite[]> {
+        const results: BenchmarkSite[] = [];
 
         for (const update of updates) {
             try {
@@ -448,11 +470,11 @@ class MockSiteManagementService {
         return results;
     }
 
-    async archiveSite(id: string): Promise<Site> {
+    async archiveSite(id: string): Promise<BenchmarkSite> {
         return await this.updateSite(id, { isActive: false });
     }
 
-    async activateSite(id: string): Promise<Site> {
+    async activateSite(id: string): Promise<BenchmarkSite> {
         return await this.updateSite(id, { isActive: true });
     }
 
@@ -462,13 +484,13 @@ class MockSiteManagementService {
             limit?: number;
             includeInactive?: boolean;
         }
-    ): Promise<Site[]> {
-        const filter: SiteFilter = {
+    ): Promise<BenchmarkSite[]> {
+        const filter: BenchmarkSiteFilter = {
             searchTerm,
             isActive: options?.includeInactive ? undefined : true,
         };
 
-        const pagination: SitePaginationOptions = {
+        const pagination: BenchmarkSitePaginationOptions = {
             page: 1,
             limit: options?.limit || 50,
             sortBy: "name",
@@ -479,7 +501,7 @@ class MockSiteManagementService {
         return result.data;
     }
 
-    private validateSiteRequest(request: SiteCreateRequest): void {
+    private validateSiteRequest(request: BenchmarkSiteCreateRequest): void {
         if (!request.name || request.name.trim().length === 0) {
             throw new Error("Site name is required");
         }
@@ -518,7 +540,7 @@ class MockSiteManagementService {
 /**
  * Creates site request for the site management benchmark.
  */
-function createSiteRequest(index: number): SiteCreateRequest {
+function createSiteRequest(index: number): BenchmarkSiteCreateRequest {
     return {
         name: `Site ${index}`,
         url: `https://site${index}.example.com`,
@@ -535,7 +557,7 @@ function createSiteRequest(index: number): SiteCreateRequest {
 /**
  * Creates bulk sites for the site management benchmark.
  */
-function createBulkSites(count: number): SiteCreateRequest[] {
+function createBulkSites(count: number): BenchmarkSiteCreateRequest[] {
     return Array.from({ length: count }, (_, i) => createSiteRequest(i + 1));
 }
 
@@ -564,30 +586,17 @@ describe("Site Management Service Performance", () => {
         "create site with validation",
         () => {
             service = new MockSiteManagementService();
-            const request: SiteCreateRequest = {
+            const request: BenchmarkSiteCreateRequest = {
                 name: "Complex Site",
                 url: "https://complex-site.example.com/path?param=value",
                 checkInterval: 120_000,
-                tags: [
-                    "production",
-                    "critical",
-                    "api",
-                    "monitoring",
-                ],
+                tags: ["production", "critical", "api", "monitoring"],
                 metadata: {
                     owner: "team-platform",
                     environment: "production",
                     region: "us-east-1",
-                    alertChannels: [
-                        "slack",
-                        "email",
-                        "pagerduty",
-                    ],
-                    dependencies: [
-                        "database",
-                        "cache",
-                        "cdn",
-                    ],
+                    alertChannels: ["slack", "email", "pagerduty"],
+                    dependencies: ["database", "cache", "cdn"],
                     maintenanceWindow: "02:00-04:00 UTC",
                 },
             };
@@ -790,11 +799,7 @@ describe("Site Management Service Performance", () => {
                     service.getSites(
                         {
                             isActive: true,
-                            tags: [
-                                "tag1",
-                                "tag2",
-                                "category1",
-                            ],
+                            tags: ["tag1", "tag2", "category1"],
                             searchTerm: "site",
                             createdAfter: new Date(Date.now() - 86_400_000), // 24 hours ago
                         },

@@ -1,5 +1,7 @@
 import type { SettingsStore } from "./types";
 
+import { ensureError } from "@shared/utils/errorHandling";
+
 import { logger } from "../../services/logger";
 /**
  * Utilities for synchronizing the settings store after persistence hydration.
@@ -89,7 +91,7 @@ export const syncSettingsAfterRehydration = (
             } catch (error) {
                 logger.warn(
                     "Failed to sync settings after rehydration:",
-                    error instanceof Error ? error : new Error(String(error))
+                    ensureError(error)
                 );
                 logger.info(
                     "[SettingsHydration] applying fallback history limit",
