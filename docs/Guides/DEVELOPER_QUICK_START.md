@@ -248,7 +248,7 @@ registerStandardizedIpcHandler(
   Array.isArray(data.monitors)
 );
 
-import { SiteService } from "src/services/SiteService";
+import { SiteService } from "@app/services/SiteService";
 
 // Frontend: React components call the renderer services facade
 const handleCreateSite = async (siteData: SiteCreationData) => {
@@ -294,7 +294,7 @@ await this.eventBus.emitTyped("sites:added", {
  correlationId: generateCorrelationId(),
 });
 
-import { EventsService } from "src/services/EventsService";
+import { EventsService } from "@app/services/EventsService";
 
 // Frontend: Listen for events via the renderer services facade
 useEffect(() => {

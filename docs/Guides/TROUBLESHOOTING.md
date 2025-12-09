@@ -167,7 +167,7 @@ await eventBus.emitTyped("site:updated", { siteIdentifier: "123" });
 ##### IPC bridge debug snippet
 
 ```typescript
-import { EventsService } from "src/services/EventsService";
+import { EventsService } from "@app/services/EventsService";
 
 // Frontend debugging
 EventsService.initialize()
@@ -232,7 +232,7 @@ useEffect(() => {
 
 ```typescript
 // Use withErrorHandling wrapper
-import { SiteService } from "src/services/SiteService";
+import { SiteService } from "@app/services/SiteService";
 
 const handleSiteCreation = withErrorHandling(
  async (siteData: SiteCreationData) => {

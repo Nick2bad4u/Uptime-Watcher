@@ -146,7 +146,7 @@ Mark each item off during integration reviews. Pull requests must demonstrate au
 | Orchestrator forwarding | `electron/UptimeOrchestrator.ts`                      | Rebroadcasts `monitor:check-completed` and `settings:history-limit-updated` with enrichment. |
 | Application bridge      | `electron/services/application/ApplicationService.ts` | Pipes orchestrator output to `RendererEventBridge`.                                          |
 | Preload guard           | `electron/preload/domains/eventsApi.ts`               | Validates renderer payloads and reports guard failures.                                      |
-| Renderer subscription   | `src/services/EventsService.ts`                       | Provides typed listener helpers with automatic initialization.                               |
+| Renderer subscription   | `@app/services/EventsService.ts`                      | Provides typed listener helpers with automatic initialization.                               |
 | Settings store          | `src/stores/settings/operations.ts`                   | Applies history-limit updates and handles subscription lifecycle.                            |
 | Sites monitoring store  | `src/stores/sites/useSiteMonitoring.ts`               | Applies optimistic manual-check snapshots.                                                   |
 

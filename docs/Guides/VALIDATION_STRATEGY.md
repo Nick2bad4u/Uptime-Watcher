@@ -62,14 +62,25 @@ When adding a new monitor type:
 1. **IPC Schema**: Update the monitor configuration Zod schema so preload rejects malformed input.
 
    ```typescript
-   // shared/validation/MonitorSchemas.ts
+   // shared/validation/monitorSchemas.ts
    import { z } from "zod";
+   import { MIN_MONITOR_CHECK_INTERVAL_MS } from "@shared/constants/monitoring";
 
    export const MonitorConfigSchema = z.object({
-       id: z.string().uuid(),
+       id: z.string().min(1, "Monitor ID is required"),
        url: z.string().url(),
-       interval: z.number().min(5000).max(3600000), // 5s to 1hr
-       type: z.enum(["http", "https", "tcp", "icmp"]),
+       // Align interval bounds with the shared monitoring constants
+       interval: z
+           .number()
+           .min(
+               MIN_MONITOR_CHECK_INTERVAL_MS,
+               "Check interval must be at least 5 seconds"
+           )
+           .max(2_592_000_000, "Check interval cannot exceed 30 days"),
+       // In practice the real implementation uses a richer union of
+       // monitor types; this example focuses on the layered validation
+       // pattern rather than enumerating every supported variant.
+       type: z.enum(["http", "port", "ping", "dns"]),
        enabled: z.boolean().default(true),
    });
    ```

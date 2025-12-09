@@ -115,7 +115,7 @@ export const createSitesStateActions = (set, get) => ({
 });
 
 // useSiteOperations.ts - CRUD operations with IPC
-import { SiteService } from "src/services/SiteService";
+import { SiteService } from "@app/services/SiteService";
 
 export const createSiteOperationsActions = (deps) => ({
  createSite: async (siteData: SiteCreationData): Promise<Site> => {
@@ -145,7 +145,7 @@ export const createSiteOperationsActions = (deps) => ({
 });
 
 // useSiteSync.ts - Backend synchronization
-import { StateSyncService } from "src/services/StateSyncService";
+import { StateSyncService } from "@app/services/StateSyncService";
 
 export const createSiteSyncActions = (deps) => ({
  syncSites: async (): Promise<void> => {
@@ -249,7 +249,7 @@ Both patterns integrate with the TypedEventBus for real-time updates:
 
 ```typescript
 // Event listener setup (usually in root component)
-import { EventsService } from "src/services/EventsService";
+import { EventsService } from "@app/services/EventsService";
 
 export const useStoreEventListeners = () => {
  const sitesStore = useSitesStore();

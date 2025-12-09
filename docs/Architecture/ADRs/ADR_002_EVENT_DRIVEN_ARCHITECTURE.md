@@ -162,7 +162,7 @@ Events are automatically forwarded from backend to frontend with proper cleanup:
 await this.eventBus.emitTyped("monitor:status-changed", eventData);
 
 // Frontend receives with automatic cleanup functions
-import { EventsService } from "src/services/EventsService";
+import { EventsService } from "@app/services/EventsService";
 
 const registerMonitorUpdates = async () =>
  await EventsService.onMonitorStatusChanged((data) => {

@@ -214,7 +214,7 @@ const suffix = await MonitorTypesService.formatMonitorTitleSuffix(
 
 ### Data API (`DataService`)
 
-> Primary entry point: `src/services/DataService`. Internally this wraps `window.electronAPI.data`.
+> Primary entry point: `@app/services/DataService`. Internally this wraps `window.electronAPI.data`.
 
 #### `exportData(): Promise<string>`
 
@@ -279,7 +279,7 @@ The main process re-validates the payload (checksum, size, schema version) using
 
 ### Monitor Types API (`MonitorTypesService`)
 
-> Primary entry point: `src/services/MonitorTypesService`. Internally this delegates exclusively to `window.electronAPI.monitorTypes`, keeping lifecycle controls within the `monitoring` domain. This aligns with ADR-005 by routing all monitor metadata helpers (registry lookup, formatting, and validation) through the dedicated monitor-types bridge.
+> Primary entry point: `@app/services/MonitorTypesService`. Internally this delegates exclusively to `window.electronAPI.monitorTypes`, keeping lifecycle controls within the `monitoring` domain. This aligns with ADR-005 by routing all monitor metadata helpers (registry lookup, formatting, and validation) through the dedicated monitor-types bridge.
 
 #### `getMonitorTypes(): Promise<MonitorTypeConfig[]>`
 
@@ -292,7 +292,7 @@ const monitorTypes = await MonitorTypesService.getMonitorTypes();
 
 ### Settings API (`SettingsService`)
 
-> Primary entry point: `src/services/SettingsService`. Internally this wraps `window.electronAPI.settings`.
+> Primary entry point: `@app/services/SettingsService`. Internally this wraps `window.electronAPI.settings`.
 
 #### `getHistoryLimit(): Promise<number>`
 
@@ -320,7 +320,7 @@ const updatedLimit = await SettingsService.updateHistoryLimit(45);
 
 ### State Sync API (`StateSyncService`)
 
-> Primary entry point: `src/services/StateSyncService`. Internally this wraps `window.electronAPI.stateSync`.
+> Primary entry point: `@app/services/StateSyncService`. Internally this wraps `window.electronAPI.stateSync`.
 
 #### `getSyncStatus(): Promise<StateSyncStatusSummary>`
 

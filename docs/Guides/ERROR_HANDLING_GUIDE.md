@@ -95,8 +95,8 @@ const { setStoreError, clearStoreError, getStoreError } = useErrorStore();
 const { setOperationLoading, getOperationLoading } = useErrorStore();
 
 // Example usage
-import { SiteService } from "src/services/SiteService";
-import { SettingsService } from "src/services/SettingsService";
+import { SiteService } from "@app/services/SiteService";
+import { SettingsService } from "@app/services/SettingsService";
 
 const handleSiteCreation = async () => {
  const errorStore = useErrorStore.getState();
@@ -296,7 +296,7 @@ convenience reference; see the sections above for detailed examples.
 | Backend/Electron service operation that logs errors and may rethrow     | `withErrorHandling` with `{ logger, operationName }`   | Centralizes logging and error propagation for services and IPC handlers.              |
 | Simple React event handler that just needs logging (no store wiring)    | `withAsyncErrorHandling` from `src/utils/fallbacks.ts` | Wraps async callbacks to log failures without changing component error state.         |
 | Synchronous operation that should never break the UI and has a fallback | `withSyncErrorHandling` from `src/utils/fallbacks.ts`  | Returns a fallback value on failure and logs with operation name.                     |
-| One-off utility or script that must always surface failures             | `withUtilityErrorHandling` with `throwOnError = true`  | Ensures failures are not silently swallowed; combine with logging as needed.          |
+| One-off utility or script that must always surface failures             | `withUtilityErrorHandling` with `shouldThrow = true`   | Ensures failures are not silently swallowed; combine with logging as needed.          |
 
 ### Enhanced Error Conversion
 

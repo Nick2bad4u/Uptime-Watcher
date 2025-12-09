@@ -348,7 +348,7 @@ Multi-layered error handling ensures system stability and provides consistent er
 
 ```typescript
 // For operations that need store state management
-import { SiteService } from "src/services/SiteService";
+import { SiteService } from "@app/services/SiteService";
 
 const handleUserAction = async () => {
  await withErrorHandling(async () => {
@@ -983,7 +983,7 @@ Comprehensive memory management patterns to prevent leaks and ensure optimal per
 
 ```typescript
 // Frontend component cleanup
-import { EventsService } from "src/services/EventsService";
+import { EventsService } from "@app/services/EventsService";
 
 useEffect(() => {
  let unsubscribe: (() => void) | undefined;

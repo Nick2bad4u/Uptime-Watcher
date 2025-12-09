@@ -367,7 +367,7 @@ async performOperation() {
 
 ```typescript
 // Frontend operations with store integration
-import { SiteService } from "src/services/SiteService";
+import { SiteService } from "@app/services/SiteService";
 
 const handleAction = async () => {
  await withErrorHandling(async () => {
@@ -567,7 +567,7 @@ Error handling utilities ensure proper resource cleanup:
 
 ```typescript
 // Automatic cleanup in event handlers
-import { EventsService } from "src/services/EventsService";
+import { EventsService } from "@app/services/EventsService";
 
 const registerStatusListener = async () =>
  await EventsService.onMonitorStatusChanged((data) => {

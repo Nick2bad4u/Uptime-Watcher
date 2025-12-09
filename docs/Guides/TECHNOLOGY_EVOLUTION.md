@@ -213,7 +213,7 @@ export const SitesProvider: React.FC = ({ children }) => {
 ###### **After (Zustand with Modular Composition)**:
 
 ```typescript
-import { SiteService } from "src/services/SiteService";
+import { SiteService } from "@app/services/SiteService";
 
 // Modular store composition for complex stores
 export const createSitesStateActions = (

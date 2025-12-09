@@ -40,14 +40,20 @@ This document outlines the architectural patterns, conventions, and standards fo
 **Pattern**: All service methods that can fail should use the standardized `withErrorHandling()` utility.
 
 ```typescript
-// ✅ Correct - Using withErrorHandling
+// ✅ Correct - Using withErrorHandling with backend context
 import { withErrorHandling } from "@shared/utils/errorHandling";
 
 public async migrateData(): Promise<void> {
-    return withErrorHandling(async () => {
-        // Implementation logic here
-        await this.performMigration();
-    }, "Failed to migrate data");
+    return withErrorHandling(
+        async () => {
+            // Implementation logic here
+            await this.performMigration();
+        },
+        {
+            logger: this.logger,
+            operationName: "MigrationSystem.migrateData",
+        }
+    );
 }
 
 // ❌ Incorrect - Raw try-catch
@@ -72,11 +78,19 @@ Always provide meaningful error context and use correlation IDs for tracking:
 
 ```typescript
 import { generateCorrelationId } from "@electron/utils/correlation";
+import { withErrorHandling } from "@shared/utils/errorHandling";
 
 const correlationId = generateCorrelationId();
-return withErrorHandling(async () => {
- // Operations with correlation tracking
-}, `Operation failed [${correlationId}]`);
+return withErrorHandling(
+    async () => {
+        // Operations with correlation tracking
+    },
+    {
+        logger,
+        operationName: "SomeService.operationWithCorrelation",
+        correlationId,
+    }
+);
 ```
 
 ## Logging Patterns

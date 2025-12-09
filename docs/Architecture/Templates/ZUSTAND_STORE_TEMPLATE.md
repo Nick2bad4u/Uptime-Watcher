@@ -70,9 +70,9 @@ For stores with straightforward state that don't require modular composition:
 
 import { create } from "zustand";
 import { persist } from "zustand/middleware"; // Remove if no persistence needed
-import { ExampleService } from "src/services/ExampleService";
-import { SystemService } from "src/services/SystemService";
-import { logger } from "src/services/logger";
+import { ExampleService } from "@app/services/ExampleService";
+import { SystemService } from "@app/services/SystemService";
+import { logger } from "@app/services/logger";
 
 import { ensureError, withErrorHandling } from "@shared/utils/errorHandling";
 import { isValidUrl } from "@shared/validation/validatorUtils";

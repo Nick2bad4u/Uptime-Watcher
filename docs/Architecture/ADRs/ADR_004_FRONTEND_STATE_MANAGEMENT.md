@@ -186,7 +186,7 @@ export const useUIStore = create<UIStore>()(
 Stores integrate with the error handling system:
 
 ```typescript
-import { SiteService } from "src/services/SiteService";
+import { SiteService } from "@app/services/SiteService";
 
 const performAction = async () => {
  await withErrorHandling(async () => {
@@ -519,7 +519,7 @@ stateDiagram-v2
 Stores listen to IPC events for backend state synchronization:
 
 ```typescript
-import { StateSyncService } from "src/services/StateSyncService";
+import { StateSyncService } from "@app/services/StateSyncService";
 
 useEffect(() => {
  let unsubscribe: (() => void) | undefined;

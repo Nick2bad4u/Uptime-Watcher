@@ -168,7 +168,7 @@ vi.stubGlobal("window", {
 ```typescript
 import { render, screen, waitFor } from "@testing-library/react";
 import { SiteCard } from "../SiteCard";
-import { SiteService } from "src/services/SiteService";
+import { SiteService } from "@app/services/SiteService";
 
 describe("SiteCard", () => {
  it("should handle site deletion", async () => {
@@ -191,7 +191,7 @@ describe("SiteCard", () => {
 ```typescript
 import { act, renderHook } from "@testing-library/react";
 import { useSitesStore } from "../useSitesStore";
-import { SiteService } from "src/services/SiteService";
+import { SiteService } from "@app/services/SiteService";
 
 describe("useSitesStore", () => {
  beforeEach(() => {

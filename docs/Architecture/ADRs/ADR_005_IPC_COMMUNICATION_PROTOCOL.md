@@ -465,7 +465,7 @@ flowchart TD
 Standard async operations use the request-response pattern:
 
 ```typescript
-import { SiteService } from "src/services/SiteService";
+import { SiteService } from "@app/services/SiteService";
 
 // Frontend request
 const result = await SiteService.addSite(siteData);
@@ -485,7 +485,7 @@ State changes are broadcast as events:
 // Backend emits event
 await this.eventBus.emitTyped("sites:added", { site: newSite });
 
-import { EventsService } from "src/services/EventsService";
+import { EventsService } from "@app/services/EventsService";
 
 // Frontend listens for event
 const cleanup = await EventsService.onSiteAdded((data) => {
