@@ -146,23 +146,20 @@ export function useSiteActions(
             return;
         }
 
-        try {
-            void startSiteMonitorMonitoring(site.identifier, monitor.id);
-            logger.user.action("Started site monitoring", {
-                monitorId: monitor.id,
-                monitorType: monitor.type,
-                siteIdentifier: site.identifier,
-                siteName: site.name,
-            });
-        } catch (error) {
-            logger.site.error(site.identifier, ensureError(error));
-        }
-    }, [
-        monitor,
-        site.identifier,
-        site.name,
-        startSiteMonitorMonitoring,
-    ]);
+        void (async (): Promise<void> => {
+            try {
+                await startSiteMonitorMonitoring(site.identifier, monitor.id);
+                logger.user.action("Started site monitoring", {
+                    monitorId: monitor.id,
+                    monitorType: monitor.type,
+                    siteIdentifier: site.identifier,
+                    siteName: site.name,
+                });
+            } catch (error) {
+                logger.site.error(site.identifier, ensureError(error));
+            }
+        })();
+    }, [monitor, site.identifier, site.name, startSiteMonitorMonitoring]);
 
     // Stop monitoring the site with proper logging
     const handleStopMonitoring = useCallback(() => {
@@ -178,23 +175,20 @@ export function useSiteActions(
             return;
         }
 
-        try {
-            void stopSiteMonitorMonitoring(site.identifier, monitor.id);
-            logger.user.action("Stopped site monitoring", {
-                monitorId: monitor.id,
-                monitorType: monitor.type,
-                siteIdentifier: site.identifier,
-                siteName: site.name,
-            });
-        } catch (error) {
-            logger.site.error(site.identifier, ensureError(error));
-        }
-    }, [
-        monitor,
-        site.identifier,
-        site.name,
-        stopSiteMonitorMonitoring,
-    ]);
+        void (async (): Promise<void> => {
+            try {
+                await stopSiteMonitorMonitoring(site.identifier, monitor.id);
+                logger.user.action("Stopped site monitoring", {
+                    monitorId: monitor.id,
+                    monitorType: monitor.type,
+                    siteIdentifier: site.identifier,
+                    siteName: site.name,
+                });
+            } catch (error) {
+                logger.site.error(site.identifier, ensureError(error));
+            }
+        })();
+    }, [monitor, site.identifier, site.name, stopSiteMonitorMonitoring]);
 
     // Start monitoring for all monitors in the site with proper logging
     const handleStartSiteMonitoring = useCallback((): void => {
@@ -210,12 +204,7 @@ export function useSiteActions(
                 logger.site.error(site.identifier, ensureError(error));
             }
         })();
-    }, [
-        site.identifier,
-        site.monitors.length,
-        site.name,
-        startSiteMonitoring,
-    ]);
+    }, [site.identifier, site.monitors.length, site.name, startSiteMonitoring]);
 
     // Stop monitoring for all monitors in the site with proper logging
     const handleStopSiteMonitoring = useCallback((): void => {
@@ -231,12 +220,7 @@ export function useSiteActions(
                 logger.site.error(site.identifier, ensureError(error));
             }
         })();
-    }, [
-        site.identifier,
-        site.monitors.length,
-        site.name,
-        stopSiteMonitoring,
-    ]);
+    }, [site.identifier, site.monitors.length, site.name, stopSiteMonitoring]);
 
     // Perform an immediate status check with enhanced logging
     const handleCheckNow = useCallback((): void => {
@@ -274,12 +258,7 @@ export function useSiteActions(
                 // Don't re-throw here since this is a fire-and-forget operation
             }
         })();
-    }, [
-        checkSiteNow,
-        monitor,
-        site.identifier,
-        site.name,
-    ]);
+    }, [checkSiteNow, monitor, site.identifier, site.name]);
 
     // Handle clicking on the site card to show details with navigation logging
     const handleCardClick = useCallback(() => {
@@ -295,13 +274,7 @@ export function useSiteActions(
             setSelectedMonitorId(site.identifier, monitor.id);
         }
         setShowSiteDetails(true);
-    }, [
-        monitor,
-        selectSite,
-        setSelectedMonitorId,
-        setShowSiteDetails,
-        site,
-    ]);
+    }, [monitor, selectSite, setSelectedMonitorId, setShowSiteDetails, site]);
 
     return {
         handleCardClick,

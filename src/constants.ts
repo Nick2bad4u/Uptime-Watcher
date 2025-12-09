@@ -300,7 +300,9 @@ export const DEFAULT_HISTORY_LIMIT: number =
  *
  * @remarks
  * Provides a range of options from 25 to 1,000,000 records to accommodate
- * different monitoring needs and storage constraints.
+ * different monitoring needs and storage constraints. The "Unlimited" option is
+ * represented by a value of `0`, which is interpreted by the shared
+ * history-limit rules as disabling pruning (unlimited retention).
  */
 export const HISTORY_LIMIT_OPTIONS: IntervalOption[] = [
     { label: "25 records", value: 25 },
@@ -316,7 +318,7 @@ export const HISTORY_LIMIT_OPTIONS: IntervalOption[] = [
     { label: "250,000 records", value: 250_000 },
     { label: "500,000 records", value: 500_000 },
     { label: "1,000,000 records", value: 1_000_000 },
-    { label: "Unlimited", value: Number.MAX_SAFE_INTEGER },
+    { label: "Unlimited", value: 0 },
 ];
 
 /**
@@ -436,12 +438,7 @@ export const CHART_TIME_PERIODS: ChartTimePeriods = {
  * filtering and display. Ranges progress from short-term to long-term
  * monitoring.
  */
-export const CHART_TIME_RANGES = [
-    "1h",
-    "24h",
-    "7d",
-    "30d",
-] as const;
+export const CHART_TIME_RANGES = ["1h", "24h", "7d", "30d"] as const;
 
 /**
  * Type definition for chart time range values.

@@ -189,7 +189,7 @@ describe("SiteRepositoryService and SiteLoadingOrchestrator - Comprehensive Cove
             );
         });
 
-        it("should return undefined for negative setting", async ({
+        it("should treat negative setting as unlimited history", async ({
             task,
             annotate,
         }) => {
@@ -202,13 +202,12 @@ describe("SiteRepositoryService and SiteLoadingOrchestrator - Comprehensive Cove
 
             const result = await siteRepositoryService.getHistoryLimitSetting();
 
-            expect(result).toBeUndefined();
-            expect(mockLogger.warn).toHaveBeenCalledWith(
-                "Invalid history limit setting: -10"
-            );
+            // Negative values are normalised to the shared "unlimited"
+            // sentinel value of 0 by normalizeHistoryLimit.
+            expect(result).toBe(0);
         });
 
-        it("should return undefined for zero setting", async ({
+        it("should treat zero setting as unlimited history", async ({
             task,
             annotate,
         }) => {
@@ -221,10 +220,9 @@ describe("SiteRepositoryService and SiteLoadingOrchestrator - Comprehensive Cove
 
             const result = await siteRepositoryService.getHistoryLimitSetting();
 
-            expect(result).toBeUndefined();
-            expect(mockLogger.warn).toHaveBeenCalledWith(
-                "Invalid history limit setting: 0"
-            );
+            // Zero is the canonical sentinel indicating "unlimited" history
+            // retention in the shared history limit rules.
+            expect(result).toBe(0);
         });
 
         it("should handle database error gracefully", async ({

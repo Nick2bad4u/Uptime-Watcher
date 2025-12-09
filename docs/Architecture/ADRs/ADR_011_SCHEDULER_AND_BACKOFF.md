@@ -33,6 +33,21 @@ tags:
 
 Draft
 
+> **Implementation Status**
+>
+> - The centralized scheduler is implemented via `MonitorScheduler` in
+>   `electron/services/monitoring/MonitorScheduler.ts`, which owns
+>   per-monitor jobs, jittered intervals, and exponential backoff with
+>   capping.
+> - `MonitorManager` delegates scheduling and emits
+>   `monitor:schedule-updated`, `monitor:backoff-applied`,
+>   `monitor:manual-check-started`, and `monitor:timeout` in line with this ADR.
+> - Scheduler state is reconstructed deterministically on startup from the
+>   current monitor configuration rather than being persisted, which satisfies
+>   the "persist or rebuild" constraint for now.
+> - Future refinements (for example, persisting next-run state across
+>   restarts) remain open and will be tracked under this ADR.
+
 ## Context
 
 Monitor execution needs predictable cadence with resilience to flapping or slow endpoints. Manual checks must coexist with scheduled runs without starving the queue or duplicating work. Timeouts and jitter/backoff must be consistent across monitor types and respect user-configured intervals.

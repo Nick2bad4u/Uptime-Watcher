@@ -13,7 +13,7 @@ import { ThemedText } from "../../theme/components/ThemedText";
 import { Tooltip } from "../common/Tooltip/Tooltip";
 import { SettingItem } from "../shared/SettingItem";
 
-interface SettingsSectionProps {
+interface SettingsSectionProperties {
     readonly children: ReactNode;
     readonly description: string;
     readonly icon: IconType;
@@ -27,7 +27,7 @@ const SettingsSection = ({
     icon: SectionIcon,
     testId,
     title,
-}: SettingsSectionProps): JSX.Element => (
+}: SettingsSectionProperties): JSX.Element => (
     <section className="settings-section" data-testid={testId}>
         <header className="settings-section__header">
             <div className="settings-section__icon">
@@ -64,7 +64,7 @@ export interface BackupSummary {
     readonly schemaVersion: number;
 }
 
-interface MonitoringSectionProps {
+interface MonitoringSectionProperties {
     readonly currentHistoryLimit: number;
     readonly icon: IconType;
     readonly isLoading: boolean;
@@ -81,7 +81,7 @@ export const MonitoringSection = ({
     icon,
     isLoading,
     onHistoryLimitChange,
-}: MonitoringSectionProps): JSX.Element => (
+}: MonitoringSectionProperties): JSX.Element => (
     <SettingsSection
         description="Control how much monitoring history is retained."
         icon={icon}
@@ -120,7 +120,7 @@ export const MonitoringSection = ({
     </SettingsSection>
 );
 
-interface NotificationSectionProps {
+interface NotificationSectionProperties {
     readonly icon: IconType;
     readonly inAppAlertsControl: ReactNode;
     readonly inAppAlertSoundControl: ReactNode;
@@ -141,7 +141,7 @@ export const NotificationSection = ({
     isVolumeControlDisabled,
     systemNotificationsControl,
     systemNotificationSoundControl,
-}: NotificationSectionProps): JSX.Element => (
+}: NotificationSectionProperties): JSX.Element => (
     <SettingsSection
         description="Choose how Uptime Watcher keeps you informed."
         icon={icon}
@@ -179,7 +179,7 @@ export const NotificationSection = ({
     </SettingsSection>
 );
 
-interface ApplicationSectionProps {
+interface ApplicationSectionProperties {
     readonly autoStartControl: ReactNode;
     readonly availableThemes: readonly ThemeName[];
     readonly currentThemeName: ThemeName;
@@ -200,7 +200,7 @@ export const ApplicationSection = ({
     isLoading,
     minimizeToTrayControl,
     onThemeChange,
-}: ApplicationSectionProps): JSX.Element => (
+}: ApplicationSectionProperties): JSX.Element => (
     <SettingsSection
         description="Personalize the desktop experience."
         icon={icon}
@@ -252,7 +252,7 @@ export const ApplicationSection = ({
     </SettingsSection>
 );
 
-interface MaintenanceSectionProps {
+interface MaintenanceSectionProperties {
     readonly backupSummary: BackupSummary | null;
     readonly downloadButtonIcon: ReactNode;
     readonly icon: IconType;
@@ -290,7 +290,7 @@ export const MaintenanceSection = ({
     restoreFileInputRef,
     showButtonLoading,
     uploadButtonIcon,
-}: MaintenanceSectionProps): JSX.Element => (
+}: MaintenanceSectionProperties): JSX.Element => (
     <SettingsSection
         description="Manage data exports and advanced utilities."
         icon={icon}

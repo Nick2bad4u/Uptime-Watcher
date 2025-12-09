@@ -10,6 +10,7 @@ import { withIgnoredIpcEvent } from "./handlerShared";
 
 interface NormalizedNotificationPreferences {
     readonly enabled: boolean;
+    readonly mutedSiteNotificationIdentifiers: readonly string[];
     readonly playSound: boolean;
 }
 
@@ -19,6 +20,8 @@ const normalizeNotificationPreferenceUpdate = (
     const parsed = parseNotificationPreferenceUpdate(candidate);
     return {
         enabled: parsed.systemNotificationsEnabled,
+        mutedSiteNotificationIdentifiers:
+            parsed.mutedSiteNotificationIdentifiers ?? [],
         playSound: parsed.systemNotificationsSoundEnabled,
     } satisfies NormalizedNotificationPreferences;
 };

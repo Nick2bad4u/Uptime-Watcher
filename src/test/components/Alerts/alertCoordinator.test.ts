@@ -220,9 +220,8 @@ describe("alertCoordinator", () => {
     });
 
     it("synchronizes system notification preferences", async () => {
-        const { NotificationPreferenceService } = await import(
-            "../../../services/NotificationPreferenceService"
-        );
+        const { NotificationPreferenceService } =
+            await import("../../../services/NotificationPreferenceService");
 
         await alertCoordinator.synchronizeNotificationPreferences();
 
@@ -231,13 +230,13 @@ describe("alertCoordinator", () => {
         ).toHaveBeenCalledWith({
             systemNotificationsEnabled: true,
             systemNotificationsSoundEnabled: false,
+            mutedSiteNotificationIdentifiers: [],
         });
     });
 
     it("sends updated notification preferences when toggles change", async () => {
-        const { NotificationPreferenceService } = await import(
-            "../../../services/NotificationPreferenceService"
-        );
+        const { NotificationPreferenceService } =
+            await import("../../../services/NotificationPreferenceService");
 
         useSettingsStore.setState((state) => ({
             settings: {
@@ -254,6 +253,7 @@ describe("alertCoordinator", () => {
         ).toHaveBeenCalledWith({
             systemNotificationsEnabled: false,
             systemNotificationsSoundEnabled: true,
+            mutedSiteNotificationIdentifiers: [],
         });
     });
 });

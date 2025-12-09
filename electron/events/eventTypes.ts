@@ -1344,6 +1344,23 @@ export interface UptimeEvents extends Record<string, EventPayloadValue> {
     "monitoring:stopped": UptimeEventPayload<MonitoringStoppedEventData>;
 
     /**
+     * Emitted when a system notification is dispatched for a monitor status
+     * change.
+     */
+    "notification:sent": {
+        /** Correlation identifier for the notification emission. */
+        correlationId: string;
+        /** Identifier of the monitor that triggered the notification. */
+        monitorId: string;
+        /** Identifier of the site that owns the monitor. */
+        siteIdentifier: string;
+        /** Monitor status associated with the notification. */
+        status: "down" | "up";
+        /** Unix timestamp (ms) when the notification was dispatched. */
+        timestamp: number;
+    };
+
+    /**
      * Emitted when a performance metric is recorded.
      *
      * @param category - The metric category ("database", "monitoring",
@@ -1812,6 +1829,7 @@ export const EVENT_CATEGORIES = {
         "monitor:status-changed",
         "monitor:up",
         "monitor:down",
+        "notification:sent",
     ] as const,
 
     /**
@@ -1940,6 +1958,7 @@ export const EVENT_PRIORITIES = {
         "monitor:manual-check-started",
         "monitor:schedule-updated",
         "monitor:backoff-applied",
+        "notification:sent",
         "settings:history-limit-updated",
         "site:added",
         "site:updated",

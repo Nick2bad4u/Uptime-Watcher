@@ -35,6 +35,7 @@ export const defaultSettings: AppSettings = {
     inAppAlertsSoundEnabled: false,
     inAppAlertVolume: DEFAULT_IN_APP_ALERT_VOLUME,
     minimizeToTray: true,
+    mutedSiteNotificationIdentifiers: [],
     systemNotificationsEnabled: false,
     systemNotificationsSoundEnabled: false,
     theme: "system",

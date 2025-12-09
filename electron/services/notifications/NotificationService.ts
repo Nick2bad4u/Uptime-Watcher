@@ -2,6 +2,10 @@ import type { Monitor, Site } from "@shared/types";
 
 import { Notification } from "electron";
 
+import type { UptimeEvents } from "../../events/eventTypes";
+import type { TypedEventBus } from "../../events/TypedEventBus";
+
+import { generateCorrelationId } from "../../utils/correlation";
 import { logger } from "../../utils/logger";
 import { MIN_CHECK_INTERVAL } from "../monitoring/constants";
 
@@ -34,12 +38,22 @@ interface MonitorNotificationState {
     suppressionUntil?: number;
 }
 
+type NotificationEventBus = Pick<TypedEventBus<UptimeEvents>, "emitTyped">;
+
+const noopEventBus: NotificationEventBus = {
+    async emitTyped() {
+        /* noop */
+    },
+};
+
 /**
  * User-configurable notification preferences applied to outage/restore alerts.
  */
 export interface NotificationConfig {
     downAlertCooldownMs: number;
     enabled: boolean;
+    /** Optional list of muted site identifiers for system notifications. */
+    mutedSiteNotificationIdentifiers?: readonly string[];
     playSound: boolean;
     restoreRequiresOutage: boolean;
     showDownAlerts: boolean;
@@ -69,11 +83,47 @@ export class NotificationService {
 
     private readonly monitorState = new Map<string, MonitorNotificationState>();
 
+    /** Event emitter used to surface notification lifecycle telemetry. */
+    private readonly eventEmitter: NotificationEventBus;
+
+    /** Cached set of muted site identifiers for fast lookup. */
+    private mutedSites = new Set<string>();
+
+    private async emitNotificationSentEvent(
+        context: NotificationContext
+    ): Promise<void> {
+        const correlationId = generateCorrelationId();
+
+        try {
+            await this.eventEmitter.emitTyped("notification:sent", {
+                correlationId,
+                monitorId: context.monitor.id,
+                siteIdentifier: context.site.identifier,
+                status: context.status,
+                timestamp: Date.now(),
+            });
+        } catch (error: unknown) {
+            logger.error(
+                "[NotificationService] Failed to emit notification:sent",
+                error
+            );
+        }
+    }
+
+    public constructor(eventEmitter: NotificationEventBus = noopEventBus) {
+        this.eventEmitter = eventEmitter;
+    }
+
     public isSupported(): boolean {
         return Notification.isSupported();
     }
 
     public updateConfig(newConfig: Partial<NotificationConfig>): void {
+        const mutedIdentifiers = newConfig.mutedSiteNotificationIdentifiers;
+        if (Array.isArray(mutedIdentifiers)) {
+            this.mutedSites = new Set<string>(mutedIdentifiers);
+        }
+
         this.config = { ...this.config, ...newConfig };
     }
 
@@ -91,6 +141,15 @@ export class NotificationService {
 
         const now = Date.now();
         const stateKey = this.getStateKey(site.identifier, monitorId);
+        if (this.isSiteMuted(site.identifier)) {
+            logger.debug(
+                LOG_TEMPLATES.warnings.NOTIFY_SUPPRESSED,
+                "down",
+                stateKey,
+                "site muted"
+            );
+            return;
+        }
         if (!this.shouldDispatchForStatus(stateKey, "down", now)) {
             return;
         }
@@ -118,6 +177,15 @@ export class NotificationService {
 
         const now = Date.now();
         const stateKey = this.getStateKey(site.identifier, monitorId);
+        if (this.isSiteMuted(site.identifier)) {
+            logger.debug(
+                LOG_TEMPLATES.warnings.NOTIFY_SUPPRESSED,
+                "up",
+                stateKey,
+                "site muted"
+            );
+            return;
+        }
         if (!this.shouldDispatchForStatus(stateKey, "up", now)) {
             return;
         }
@@ -253,6 +321,8 @@ export class NotificationService {
                 status: context.status,
             }
         );
+
+        void this.emitNotificationSentEvent(context);
     }
 
     private composeDownBody(context: NotificationContext): string {
@@ -272,5 +342,9 @@ export class NotificationService {
     private describeMonitor(monitor: Monitor): string {
         const label = monitor.url ?? monitor.host ?? monitor.id;
         return `${label} (${monitor.type})`;
+    }
+
+    private isSiteMuted(siteIdentifier: string): boolean {
+        return this.mutedSites.has(siteIdentifier);
     }
 }

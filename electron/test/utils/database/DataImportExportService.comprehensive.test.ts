@@ -90,7 +90,13 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
                 findByMonitorId: vi.fn().mockResolvedValue([]),
             },
             monitor: {
+                // Internal helpers used by the transaction adapter. These
+                // mirror the repository's internal API surface without
+                // requiring a real database.
+                createInternal: vi.fn().mockReturnValue("created-monitor-id"),
                 deleteAllInternal: vi.fn(),
+                // Legacy bulkCreate is kept for compatibility with older
+                // tests but is no longer used by the service implementation.
                 bulkCreate: vi.fn().mockResolvedValue([]),
                 findBySiteIdentifier: vi.fn().mockResolvedValue([]),
             },
@@ -135,6 +141,16 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
         attachTransactionAdapter(mockRepositories.monitor, {
             deleteAll: (db: unknown) =>
                 mockRepositories.monitor["deleteAllInternal"](db),
+            create: (
+                db: unknown,
+                siteIdentifier: string,
+                monitor: Site["monitors"][0]
+            ) =>
+                mockRepositories.monitor["createInternal"](
+                    db,
+                    siteIdentifier,
+                    monitor
+                ),
         });
 
         attachTransactionAdapter(mockRepositories.history, {
@@ -205,9 +221,8 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Export Operation", "type");
 
-            const { safeJsonStringifyWithFallback } = await import(
-                "../../../../shared/utils/jsonSafety"
-            );
+            const { safeJsonStringifyWithFallback } =
+                await import("../../../../shared/utils/jsonSafety");
             const mockSites: Site[] = [
                 {
                     identifier: "test-site",
@@ -345,9 +360,8 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Validation", "type");
 
-            const { safeJsonParse } = await import(
-                "../../../../shared/utils/jsonSafety"
-            );
+            const { safeJsonParse } =
+                await import("../../../../shared/utils/jsonSafety");
             const mockJsonData = '{"sites": [], "settings": {}}';
             const mockParsedData = {
                 sites: [{ identifier: "test-site", name: "Test Site" }],
@@ -381,9 +395,8 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Error Handling", "type");
 
-            const { safeJsonParse } = await import(
-                "../../../../shared/utils/jsonSafety"
-            );
+            const { safeJsonParse } =
+                await import("../../../../shared/utils/jsonSafety");
             const invalidJsonData = "invalid json";
 
             (safeJsonParse as MockedFunction<any>).mockReturnValue({
@@ -423,9 +436,8 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            const { safeJsonParse } = await import(
-                "../../../../shared/utils/jsonSafety"
-            );
+            const { safeJsonParse } =
+                await import("../../../../shared/utils/jsonSafety");
 
             (safeJsonParse as MockedFunction<any>).mockReturnValue({
                 success: true,
@@ -457,9 +469,8 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Import Operation", "type");
 
-            const { safeJsonParse } = await import(
-                "../../../../shared/utils/jsonSafety"
-            );
+            const { safeJsonParse } =
+                await import("../../../../shared/utils/jsonSafety");
             const mockParsedData = {
                 sites: [{ identifier: "test-site" }],
                 // No settings property
@@ -488,9 +499,8 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Error Handling", "type");
 
-            const { safeJsonParse } = await import(
-                "../../../../shared/utils/jsonSafety"
-            );
+            const { safeJsonParse } =
+                await import("../../../../shared/utils/jsonSafety");
 
             (safeJsonParse as MockedFunction<any>).mockImplementation(() => {
                 throw "String error";
@@ -525,9 +535,8 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            const { withDatabaseOperation } = await import(
-                "../../../utils/operationalHooks"
-            );
+            const { withDatabaseOperation } =
+                await import("../../../utils/operationalHooks");
             const mockSites: ImportSite[] = [
                 {
                     identifier: "site1",
@@ -597,9 +606,8 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            const { withDatabaseOperation } = await import(
-                "../../../utils/operationalHooks"
-            );
+            const { withDatabaseOperation } =
+                await import("../../../utils/operationalHooks");
             const mockSites: ImportSite[] = [
                 { identifier: "site1" }, // No name
                 { identifier: "site2", name: "" }, // Empty name
@@ -628,9 +636,8 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Data Sanitization", "type");
 
-            const { withDatabaseOperation } = await import(
-                "../../../utils/operationalHooks"
-            );
+            const { withDatabaseOperation } =
+                await import("../../../utils/operationalHooks");
             const lowIntervalMonitor = {
                 checkInterval: 1000,
                 history: [],
@@ -652,21 +659,22 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             (withDatabaseOperation as MockedFunction<any>).mockImplementation(
                 async (operation: any) => await operation()
             );
-
-            mockRepositories.monitor.bulkCreate.mockResolvedValue([
-                { ...lowIntervalMonitor, id: "created-monitor" },
-            ]);
-
             await service.persistImportedData(mockSites, {});
 
-            expect(mockRepositories.monitor.bulkCreate).toHaveBeenCalledWith(
-                "site-with-low-interval",
-                expect.arrayContaining([
-                    expect.objectContaining({
-                        checkInterval: MIN_MONITOR_CHECK_INTERVAL_MS,
-                        id: "monitor-1",
-                    }),
-                ])
+            expect(
+                mockRepositories.monitor.createInternal
+            ).toHaveBeenCalledTimes(1);
+
+            const [dbArg, siteIdentifier, createdMonitor] =
+                mockRepositories.monitor.createInternal.mock.calls[0]!;
+
+            expect(dbArg).toBe(mockDatabase);
+            expect(siteIdentifier).toBe("site-with-low-interval");
+            expect(createdMonitor).toEqual(
+                expect.objectContaining({
+                    id: "monitor-1",
+                    checkInterval: MIN_MONITOR_CHECK_INTERVAL_MS,
+                })
             );
 
             expect(mockLogger.warn).toHaveBeenCalledWith(
@@ -689,9 +697,8 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            const { withDatabaseOperation } = await import(
-                "../../../utils/operationalHooks"
-            );
+            const { withDatabaseOperation } =
+                await import("../../../utils/operationalHooks");
 
             (withDatabaseOperation as MockedFunction<any>).mockImplementation(
                 async (operation: any) => await operation()
@@ -721,9 +728,8 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Import Operation", "type");
 
-            const { withDatabaseOperation } = await import(
-                "../../../utils/operationalHooks"
-            );
+            const { withDatabaseOperation } =
+                await import("../../../utils/operationalHooks");
             const mockMonitors = [
                 {
                     id: "mon1",
@@ -746,22 +752,6 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
                 },
             ];
 
-            const mockCreatedMonitors = [
-                {
-                    id: "123",
-                    type: "http" as const,
-                    url: "https://example.com",
-                    status: "up" as const,
-                    lastChecked: new Date(),
-                    responseTime: 100,
-                    checkInterval: 5000,
-                    monitoring: true,
-                    retryAttempts: 3,
-                    timeout: 5000,
-                    history: [],
-                },
-            ];
-
             const mockSites: ImportSite[] = [
                 {
                     identifier: "site1",
@@ -770,9 +760,7 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
                 },
             ];
 
-            mockRepositories.monitor.bulkCreate.mockResolvedValue(
-                mockCreatedMonitors
-            );
+            mockRepositories.monitor.createInternal.mockReturnValueOnce("123");
 
             (withDatabaseOperation as MockedFunction<any>).mockImplementation(
                 async (operation: any) => await operation()
@@ -780,9 +768,12 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
 
             await service.persistImportedData(mockSites, {});
 
-            expect(mockRepositories.monitor.bulkCreate).toHaveBeenCalledWith(
+            expect(
+                mockRepositories.monitor.createInternal
+            ).toHaveBeenCalledWith(
+                mockDatabase,
                 "site1",
-                mockMonitors
+                expect.objectContaining({ id: "mon1" })
             );
             expect(
                 mockRepositories.history.addEntryInternal
@@ -810,9 +801,8 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Monitoring", "type");
 
-            const { withDatabaseOperation } = await import(
-                "../../../utils/operationalHooks"
-            );
+            const { withDatabaseOperation } =
+                await import("../../../utils/operationalHooks");
             const mockSites: ImportSite[] = [
                 { identifier: "site1", name: "Site 1" }, // No monitors
                 { identifier: "site2", monitors: [] }, // Empty monitors
@@ -824,7 +814,9 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
 
             await service.persistImportedData(mockSites, {});
 
-            expect(mockRepositories.monitor.bulkCreate).not.toHaveBeenCalled();
+            expect(
+                mockRepositories.monitor.createInternal
+            ).not.toHaveBeenCalled();
             expect(
                 mockRepositories.history.addEntryInternal
             ).not.toHaveBeenCalled();
@@ -839,9 +831,8 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Error Handling", "type");
 
-            const { withDatabaseOperation } = await import(
-                "../../../utils/operationalHooks"
-            );
+            const { withDatabaseOperation } =
+                await import("../../../utils/operationalHooks");
             const mockSites: ImportSite[] = [
                 {
                     identifier: "site1",
@@ -864,11 +855,16 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
                     ],
                 },
             ];
+            const createError = new Error("Monitor creation failed");
+            mockRepositories.monitor.createInternal.mockImplementation(
+                (_db: unknown, siteIdentifier: string) => {
+                    if (siteIdentifier === "site1") {
+                        throw createError;
+                    }
 
-            const bulkCreateError = new Error("Monitor creation failed");
-            mockRepositories.monitor.bulkCreate
-                .mockRejectedValueOnce(bulkCreateError) // Fail for site1
-                .mockResolvedValueOnce([{ id: "456" }]); // Success for site2
+                    return "456";
+                }
+            );
 
             (withDatabaseOperation as MockedFunction<any>).mockImplementation(
                 async (operation: any) => await operation()
@@ -878,7 +874,7 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
 
             expect(mockLogger.error).toHaveBeenCalledWith(
                 "[DataImportExportService] Failed to import monitors for site site1:",
-                bulkCreateError
+                createError
             );
             expect(mockLogger.debug).toHaveBeenCalledWith(
                 "[DataImportExportService] Imported 1 monitors for site: site2"
@@ -894,9 +890,8 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Import Operation", "type");
 
-            const { withDatabaseOperation } = await import(
-                "../../../utils/operationalHooks"
-            );
+            const { withDatabaseOperation } =
+                await import("../../../utils/operationalHooks");
             const originalMonitors = [
                 {
                     type: "http" as const,
@@ -917,15 +912,6 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
                 },
             ];
 
-            const createdMonitors = [
-                {
-                    id: "new-monitor-id",
-                    type: "http" as const,
-                    url: "https://example.com",
-                    port: undefined,
-                },
-            ];
-
             const mockSites: ImportSite[] = [
                 {
                     identifier: "test-site",
@@ -933,8 +919,8 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
                 },
             ];
 
-            mockRepositories.monitor.bulkCreate.mockResolvedValue(
-                createdMonitors
+            mockRepositories.monitor.createInternal.mockReturnValue(
+                "new-monitor-id"
             );
 
             (withDatabaseOperation as MockedFunction<any>).mockImplementation(
@@ -951,7 +937,7 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             ).toHaveBeenNthCalledWith(
                 1,
                 mockDatabase,
-                String(Number.NaN), // Number conversion of "new-monitor-id"
+                "new-monitor-id",
                 { status: "up", timestamp: 1000, responseTime: 50 },
                 ""
             );
@@ -960,7 +946,7 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             ).toHaveBeenNthCalledWith(
                 2,
                 mockDatabase,
-                String(Number.NaN),
+                "new-monitor-id",
                 { status: "down", timestamp: 2000, responseTime: 0 },
                 ""
             );
@@ -975,17 +961,8 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Import Operation", "type");
 
-            const { withDatabaseOperation } = await import(
-                "../../../utils/operationalHooks"
-            );
-            const createdMonitors = [
-                {
-                    // No id property
-                    type: "http" as const,
-                    url: "https://example.com",
-                },
-            ];
-
+            const { withDatabaseOperation } =
+                await import("../../../utils/operationalHooks");
             const mockSites: ImportSite[] = [
                 {
                     identifier: "test-site",
@@ -1005,8 +982,10 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
                 },
             ];
 
-            mockRepositories.monitor.bulkCreate.mockResolvedValue(
-                createdMonitors
+            // Simulate a repository bug returning a falsy ID so that the
+            // history import path skips adding entries.
+            mockRepositories.monitor.createInternal.mockReturnValueOnce(
+                "" as unknown as string
             );
 
             (withDatabaseOperation as MockedFunction<any>).mockImplementation(
@@ -1030,17 +1009,8 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Monitoring", "type");
 
-            const { withDatabaseOperation } = await import(
-                "../../../utils/operationalHooks"
-            );
-            const createdMonitors = [
-                {
-                    id: 123, // Numeric ID
-                    type: "http" as const,
-                    url: "https://example.com",
-                },
-            ];
-
+            const { withDatabaseOperation } =
+                await import("../../../utils/operationalHooks");
             const mockSites: ImportSite[] = [
                 {
                     identifier: "test-site",
@@ -1060,8 +1030,11 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
                 },
             ];
 
-            mockRepositories.monitor.bulkCreate.mockResolvedValue(
-                createdMonitors
+            // Simulate a numeric identifier being returned from the
+            // repository and ensure it is normalised to a string for
+            // history entries.
+            mockRepositories.monitor.createInternal.mockReturnValueOnce(
+                123 as unknown as string
             );
 
             (withDatabaseOperation as MockedFunction<any>).mockImplementation(
@@ -1136,9 +1109,8 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Error Handling", "type");
 
-            const { withDatabaseOperation } = await import(
-                "../../../utils/operationalHooks"
-            );
+            const { withDatabaseOperation } =
+                await import("../../../utils/operationalHooks");
             const operationError = new Error("Database operation failed");
 
             (withDatabaseOperation as MockedFunction<any>).mockRejectedValue(
@@ -1164,9 +1136,8 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
                 transactionError
             );
 
-            const { withDatabaseOperation } = await import(
-                "../../../utils/operationalHooks"
-            );
+            const { withDatabaseOperation } =
+                await import("../../../utils/operationalHooks");
             (withDatabaseOperation as MockedFunction<any>).mockImplementation(
                 async (operation: any) => await operation()
             );
@@ -1190,9 +1161,8 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
                 throw deleteError;
             });
 
-            const { withDatabaseOperation } = await import(
-                "../../../utils/operationalHooks"
-            );
+            const { withDatabaseOperation } =
+                await import("../../../utils/operationalHooks");
             (withDatabaseOperation as MockedFunction<any>).mockImplementation(
                 async (operation: any) => await operation()
             );
@@ -1213,9 +1183,8 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Import Operation", "type");
 
-            const { withDatabaseOperation } = await import(
-                "../../../utils/operationalHooks"
-            );
+            const { withDatabaseOperation } =
+                await import("../../../utils/operationalHooks");
             const complexSites: ImportSite[] = [
                 {
                     identifier: "complex-site",
@@ -1264,19 +1233,9 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
                 autoBackup: "true",
             };
 
-            mockRepositories.monitor.bulkCreate.mockResolvedValue([
-                {
-                    id: "http-monitor-1",
-                    type: "http",
-                    url: "https://api.example.com",
-                },
-                {
-                    id: "port-monitor-1",
-                    type: "port",
-                    url: "database.example.com",
-                    port: 5432,
-                },
-            ]);
+            mockRepositories.monitor.createInternal
+                .mockReturnValueOnce("http-monitor-1")
+                .mockReturnValueOnce("port-monitor-1");
 
             (withDatabaseOperation as MockedFunction<any>).mockImplementation(
                 async (operation: any) => await operation()
@@ -1284,9 +1243,24 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
 
             await service.persistImportedData(complexSites, complexSettings);
 
-            expect(mockRepositories.monitor.bulkCreate).toHaveBeenCalledWith(
+            expect(
+                mockRepositories.monitor.createInternal
+            ).toHaveBeenCalledTimes(2);
+            expect(
+                mockRepositories.monitor.createInternal
+            ).toHaveBeenNthCalledWith(
+                1,
+                mockDatabase,
                 "complex-site",
-                complexSites[0]!.monitors
+                expect.objectContaining({ id: "http-monitor" })
+            );
+            expect(
+                mockRepositories.monitor.createInternal
+            ).toHaveBeenNthCalledWith(
+                2,
+                mockDatabase,
+                "complex-site",
+                expect.objectContaining({ id: "port-monitor" })
             );
             expect(
                 mockRepositories.history.addEntryInternal

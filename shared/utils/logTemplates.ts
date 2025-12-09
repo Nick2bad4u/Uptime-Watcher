@@ -124,6 +124,14 @@ export const SERVICE_LOGS = {
     HISTORY_BULK_INSERT:
         "[HistoryManipulation] Bulk inserted {count} history entries for monitor: {monitorId}",
 
+    /** Delete-all-sites IPC handler completed */
+    IPC_DELETE_ALL_SITES_COMPLETED:
+        "[IpcService] delete-all-sites completed, deleted {deletedCount} site(s)",
+
+    /** Delete-all-sites IPC handler invoked */
+    IPC_DELETE_ALL_SITES_HANDLER_CALLED:
+        "[IpcService] delete-all-sites handler invoked",
+
     /** IPC service cleanup */
     IPC_SERVICE_CLEANUP: "[IpcService] Cleaning up IPC handlers",
 
@@ -340,15 +348,18 @@ export const ERROR_LOGS = {
     HISTORY_PRUNE_FAILED:
         "[HistoryManipulation] Failed to prune history for monitor: {monitorId}",
 
+    /** Duplicate site identifiers detected in get-sites response */
+    IPC_DUPLICATE_SITES_IN_GET_SITES_RESPONSE:
+        "[IpcService] Duplicate site identifiers detected in get-sites response",
     /** Monitor errors */
     MONITOR_CHECK_ENHANCED_FAILED:
         "Enhanced monitor check failed for {monitorId}",
+
     MONITOR_MAPPER_FAILED: "[MonitorMapper] Failed to build monitor parameters",
 
     /** Settings errors */
     SETTINGS_MAPPER_FAILED:
         "[SettingsMapper:rowToSetting] Failed to map database row to setting",
-
     SITE_BACKGROUND_LOAD_EMIT_ERROR:
         "[SiteManager] Failed to emit background load error event",
     /** Site errors */
@@ -357,6 +368,7 @@ export const ERROR_LOGS = {
     SITE_HISTORY_LIMIT_FAILED: "[SiteManager] Failed to set history limit",
     SITE_INITIALIZATION_FAILED: "[SiteManager] Failed to initialize cache",
     SITE_MAPPER_FAILED: "[SiteMapper] Failed to map database row to site",
+
     SITE_MONITOR_REMOVAL_FAILED:
         "[SiteManager] Failed to remove monitor {monitorId} from site {siteIdentifier}",
 } as const;

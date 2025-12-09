@@ -91,13 +91,23 @@ export interface BaseSiteOperations {
     updateMonitorRetryAttempts: (
         siteIdentifier: string,
         monitorId: string,
-        retryAttempts: number
+        /**
+         * New retry-attempts value. When `undefined`, the helper performs a
+         * no-op update for this field while still executing the underlying
+         * monitor update pipeline.
+         */
+        retryAttempts: number | undefined
     ) => Promise<void>;
     /** Update monitor timeout */
     updateMonitorTimeout: (
         siteIdentifier: string,
         monitorId: string,
-        timeout: number
+        /**
+         * New timeout value in milliseconds. When `undefined`, the helper
+         * leaves the existing timeout unchanged while still participating in
+         * the shared update pipeline.
+         */
+        timeout: number | undefined
     ) => Promise<void>;
     /** Update site check interval */
     updateSiteCheckInterval: (

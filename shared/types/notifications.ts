@@ -13,6 +13,11 @@
  */
 export interface NotificationPreferenceUpdate {
     /**
+     * Optional list of site identifiers for which system notifications should
+     * be muted.
+     */
+    mutedSiteNotificationIdentifiers?: readonly string[] | undefined;
+    /**
      * Whether operating-system notifications should be displayed for monitor
      * status changes.
      */

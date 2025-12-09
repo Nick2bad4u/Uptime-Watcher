@@ -117,3 +117,72 @@ export function attachForwardedMetadata<TPayload extends object>(
 
     return payload;
 }
+
+/**
+ * Produces a shallow clone of the provided payload with event-bus metadata
+ * properties removed.
+ *
+ * @remarks
+ * Internal event buses attach metadata on the `_meta`, `_originalMeta`, and
+ * {@link ORIGINAL_METADATA_SYMBOL} properties. When forwarding these payloads
+ * across process or layer boundaries (for example, from the orchestrator to the
+ * renderer), consumers often need a clean view of the domain payload without
+ * bus-specific metadata.
+ *
+ * This helper centralises that stripping logic so multiple callers do not
+ * duplicate knowledge of the metadata property keys.
+ *
+ * @param payload - Payload that may carry forwarded metadata. Must be an array
+ *   or an object; primitives are rejected at runtime.
+ *
+ * @returns A shallow clone of {@link payload} with metadata properties removed.
+ *   The original object is never mutated.
+ *
+ * @throws TypeError If a primitive payload (non-object, non-array) is provided.
+ *   Event metadata is only attached to object or array payloads, so attempting
+ *   to strip metadata from primitives usually indicates a programming error.
+ */
+export function stripForwardedEventMetadata(
+    payload: object | readonly unknown[]
+): object | readonly unknown[] {
+    if (Array.isArray(payload)) {
+        // After the Array.isArray check we know payload is an array. Narrow to a
+        // readonly array for Array.from while preserving element types.
+
+        const arrayPayload = payload as readonly unknown[];
+        const clonedArray = Array.from(arrayPayload);
+
+        Reflect.deleteProperty(clonedArray, FORWARDED_METADATA_PROPERTY_KEY);
+        Reflect.deleteProperty(clonedArray, ORIGINAL_METADATA_PROPERTY_KEY);
+        Reflect.deleteProperty(clonedArray, ORIGINAL_METADATA_SYMBOL);
+
+        return clonedArray;
+    }
+
+    if (Object(payload) !== payload) {
+        throw new TypeError(
+            "Unexpected primitive payload when stripping metadata"
+        );
+    }
+
+    // At this point payload is a non-null object. Clone into a plain record to
+    // strip well-known metadata keys while preserving the remaining shape.
+
+    const clonedPayload: Record<PropertyKey, unknown> = {
+        ...(payload as object),
+    };
+
+    if (Reflect.has(clonedPayload, FORWARDED_METADATA_PROPERTY_KEY)) {
+        Reflect.deleteProperty(clonedPayload, FORWARDED_METADATA_PROPERTY_KEY);
+    }
+
+    if (Reflect.has(clonedPayload, ORIGINAL_METADATA_PROPERTY_KEY)) {
+        Reflect.deleteProperty(clonedPayload, ORIGINAL_METADATA_PROPERTY_KEY);
+    }
+
+    if (Reflect.has(clonedPayload, ORIGINAL_METADATA_SYMBOL)) {
+        Reflect.deleteProperty(clonedPayload, ORIGINAL_METADATA_SYMBOL);
+    }
+
+    return clonedPayload;
+}

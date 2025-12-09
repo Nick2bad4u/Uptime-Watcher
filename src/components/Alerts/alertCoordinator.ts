@@ -1,5 +1,7 @@
 import type { StatusUpdate } from "@shared/types";
 
+import { ensureError } from "@shared/utils/errorHandling";
+
 import type { StatusAlert } from "../../stores/alerts/useAlertStore";
 
 import { logger } from "../../services/logger";
@@ -229,12 +231,15 @@ export const synchronizeNotificationPreferences = async (): Promise<void> => {
     const { settings } = useSettingsStore.getState();
 
     logger.debug("[AlertCoordinator] synchronizing notification preferences", {
+        mutedSites: settings.mutedSiteNotificationIdentifiers.length,
         soundEnabled: settings.systemNotificationsSoundEnabled,
         systemEnabled: settings.systemNotificationsEnabled,
     });
 
     try {
         await NotificationPreferenceService.updatePreferences({
+            mutedSiteNotificationIdentifiers:
+                settings.mutedSiteNotificationIdentifiers,
             systemNotificationsEnabled: settings.systemNotificationsEnabled,
             systemNotificationsSoundEnabled:
                 settings.systemNotificationsSoundEnabled,
@@ -242,10 +247,10 @@ export const synchronizeNotificationPreferences = async (): Promise<void> => {
         logger.debug(
             "[AlertCoordinator] notification preferences synchronized"
         );
-    } catch (error) {
+    } catch (error: unknown) {
         logger.error(
             "Failed to synchronize notification preferences",
-            error instanceof Error ? error : new Error(String(error))
+            ensureError(error)
         );
     }
 };

@@ -18,11 +18,6 @@ interface Site {
     monitors: any[];
 }
 
-// Mock error handling utilities
-vi.mock("@shared/utils/errorHandling", () => ({
-    withUtilityErrorHandling: vi.fn(),
-}));
-
 // Mock validation utilities
 vi.mock("../../../utils/monitorValidation", () => ({
     validateMonitorFieldClientSide: vi.fn((_type, field, value) => {
@@ -132,9 +127,6 @@ import { useErrorStore } from "../../../stores/error/useErrorStore";
 import { useUIStore } from "../../../stores/ui/useUiStore";
 import { useSiteAnalytics } from "../../../hooks/site/useSiteAnalytics";
 import { useConfirmDialog } from "../../../hooks/ui/useConfirmDialog";
-import { withUtilityErrorHandling } from "@shared/utils/errorHandling";
-
-const mockWithUtilityErrorHandling = vi.mocked(withUtilityErrorHandling);
 const mockUseConfirmDialog = vi.mocked(useConfirmDialog);
 
 describe("useSiteDetails Hook - Basic Coverage", () => {
@@ -161,24 +153,9 @@ describe("useSiteDetails Hook - Basic Coverage", () => {
         // Reset confirmation dialog mock to return true by default
         mockUseConfirmDialog.mockReturnValue(vi.fn(async () => true));
 
-        // Setup default mock for withUtilityErrorHandling
-        mockWithUtilityErrorHandling.mockImplementation(
-            async (
-                fn: () => Promise<any>,
-                _operationName: string,
-                fallback?: any
-            ) => {
-                try {
-                    return await fn();
-                } catch {
-                    return fallback;
-                }
-            }
-        );
-
         // Mock sites store to return the current site
         (useSitesStore as any).mockReturnValue({
-            checkSiteNow: vi.fn(),
+            checkSiteNow: mockCheckSiteNow,
             deleteSite: vi.fn(),
             getSelectedMonitorId: vi.fn(() => "monitor-1"),
             modifySite: vi.fn(),
@@ -583,21 +560,6 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
             showAdvancedMetrics: false,
             siteDetailsChartTimeRange: "1h",
         });
-
-        // Reset withUtilityErrorHandling mock
-        mockWithUtilityErrorHandling.mockImplementation(
-            async (
-                fn: () => Promise<any>,
-                _operationName: string,
-                fallback?: any
-            ) => {
-                try {
-                    return await fn();
-                } catch {
-                    return fallback;
-                }
-            }
-        );
     });
 
     describe("Async Handler Error Handling", () => {
@@ -1443,7 +1405,7 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
     });
 
     describe("Error Handling Integration", () => {
-        it("should call withUtilityErrorHandling for async operations", async ({
+        it("should safely handle async errors in operations", async ({
             task,
             annotate,
         }) => {
@@ -1456,9 +1418,12 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
                 useSiteDetails({ site: mockSite })
             );
 
-            await result.current.handleCheckNow();
-
-            expect(withUtilityErrorHandling).toHaveBeenCalled();
+            // The operation should not rethrow to the UI layer even when the
+            // underlying store action fails; errors are handled by store-level
+            // withErrorHandling and logged by the hook.
+            await expect(
+                result.current.handleCheckNow()
+            ).resolves.toBeUndefined();
         });
 
         it("should handle validation errors in field updates", async ({

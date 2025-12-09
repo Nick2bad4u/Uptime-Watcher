@@ -385,7 +385,17 @@ describe("Application Constants", () => {
                 expect(typeof option.label).toBe("string");
                 expect(typeof option.value).toBe("number");
                 expect(option.label.length).toBeGreaterThan(0);
-                expect(option.value).toBeGreaterThan(0);
+
+                const isUnlimitedLabel = option.label
+                    .toLowerCase()
+                    .includes("unlimited");
+
+                if (isUnlimitedLabel) {
+                    // Unlimited history is represented by the sentinel value 0.
+                    expect(option.value).toBe(0);
+                } else {
+                    expect(option.value).toBeGreaterThan(0);
+                }
             }
         });
 
@@ -399,7 +409,7 @@ describe("Application Constants", () => {
                 opt.label.toLowerCase().includes("unlimited")
             );
             expect(unlimitedOption).toBeDefined();
-            expect(unlimitedOption?.value).toBe(Number.MAX_SAFE_INTEGER);
+            expect(unlimitedOption?.value).toBe(0);
         });
     });
 
@@ -571,13 +581,7 @@ describe("Application Constants", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
-            const expectedPeriods = [
-                "1h",
-                "12h",
-                "24h",
-                "7d",
-                "30d",
-            ];
+            const expectedPeriods = ["1h", "12h", "24h", "7d", "30d"];
             for (const period of expectedPeriods) {
                 expect(CHART_TIME_PERIODS).toHaveProperty(period);
                 expect(
@@ -647,12 +651,7 @@ describe("Application Constants", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
-            const validRanges: ChartTimeRange[] = [
-                "1h",
-                "24h",
-                "7d",
-                "30d",
-            ];
+            const validRanges: ChartTimeRange[] = ["1h", "24h", "7d", "30d"];
             for (const range of validRanges) {
                 expect(CHART_TIME_RANGES).toContain(range);
             }
@@ -964,21 +963,53 @@ describe("Application Constants", () => {
                 expect(Array.isArray(HISTORY_LIMIT_OPTIONS)).toBeTruthy();
                 expect(HISTORY_LIMIT_OPTIONS.length).toBeGreaterThan(0);
 
+                let unlimitedCount = 0;
+                const finiteOptions: (typeof HISTORY_LIMIT_OPTIONS)[number][] =
+                    [];
+
                 // All options should have valid structure
                 for (const option of HISTORY_LIMIT_OPTIONS) {
                     expect(typeof option.value).toBe("number");
-                    expect(option.value).toBeGreaterThan(0);
                     expect(typeof option.label).toBe("string");
                     expect(option.label.length).toBeGreaterThan(0);
+
+                    const isUnlimitedLabel = option.label
+                        .toLowerCase()
+                        .includes("unlimited");
+
+                    if (isUnlimitedLabel) {
+                        unlimitedCount += 1;
+                        expect(option.value).toBe(0);
+                    } else {
+                        expect(option.value).toBeGreaterThan(0);
+                        finiteOptions.push(option);
+                    }
                 }
 
-                // Should be sorted in ascending order by value
-                const sortedOptions = HISTORY_LIMIT_OPTIONS.toSorted(
+                // Exactly one unlimited option using the shared sentinel
+                expect(unlimitedCount).toBe(1);
+
+                // Finite options should be sorted in ascending order by value
+                const sortedFinite = finiteOptions.toSorted(
                     (a, b) => a.value - b.value
                 );
-                expect(HISTORY_LIMIT_OPTIONS).toEqual(sortedOptions);
+                expect(finiteOptions).toEqual(sortedFinite);
 
-                // Default should be within the available options
+                // Unlimited option should be the last entry for UX clarity
+                const lastOption = HISTORY_LIMIT_OPTIONS.at(-1);
+                // Runtime guard to satisfy strict null checks while still
+                // asserting the structural invariant we care about.
+                expect(lastOption).toBeDefined();
+                if (!lastOption) {
+                    throw new Error(
+                        "HISTORY_LIMIT_OPTIONS must contain at least one option"
+                    );
+                }
+
+                expect(lastOption.label.toLowerCase()).toContain("unlimited");
+                expect(lastOption.value).toBe(0);
+
+                // Default should be within the available finite options
                 const defaultOption = HISTORY_LIMIT_OPTIONS.find(
                     (option) => option.value === DEFAULT_HISTORY_LIMIT
                 );

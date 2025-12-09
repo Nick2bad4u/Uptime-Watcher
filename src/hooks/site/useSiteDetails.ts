@@ -1,6 +1,3 @@
-/* eslint-disable-next-line @eslint-community/eslint-comments/disable-enable-pair -- Disabled for entire file */
-/* eslint-disable complexity -- The useSiteDetails hook intentionally coordinates multiple store concerns and UI flows, and extracting smaller hooks would hurt cohesion. TSDoc is provided, but the rule currently mis-detects it. */
-
 /**
  * Custom hook for managing site details state and operations
  *
@@ -24,7 +21,7 @@
 import type { Monitor, Site } from "@shared/types";
 
 import { DEFAULT_SITE_NAME } from "@shared/constants/sites";
-import { withUtilityErrorHandling } from "@shared/utils/errorHandling";
+import { ensureError } from "@shared/utils/errorHandling";
 import { safeInteger } from "@shared/validation/validatorUtils";
 import { type ChangeEvent, useCallback, useEffect, useState } from "react";
 
@@ -150,6 +147,25 @@ export interface UseSiteDetailsResult {
 }
 
 /**
+ * Executes a site-details operation and logs failures without rethrowing.
+ *
+ * @remarks
+ * This helper prevents unhandled promise rejections for UI-driven operations
+ * while allowing underlying store-level error handling (for example,
+ * `withErrorHandling` in site stores) to manage user-facing error state.
+ */
+const runSiteDetailsOperation = async (
+    context: string,
+    operation: () => Promise<void>
+): Promise<void> => {
+    try {
+        await operation();
+    } catch (error: unknown) {
+        logger.app.error(context, ensureError(error));
+    }
+};
+
+/**
  * Hook for managing site details state and operations.
  *
  * Provides all necessary state and handlers for the site details view,
@@ -181,6 +197,7 @@ export interface UseSiteDetailsResult {
  *
  * @see {@link UseSiteDetailsResult} for the complete return shape.
  */
+// eslint-disable-next-line complexity -- This orchestrator-style hook necessarily coordinates multiple concerns; further decomposition would add indirection without materially reducing complexity.
 export function useSiteDetails({
     site,
 }: UseSiteDetailsProperties): UseSiteDetailsResult {
@@ -228,7 +245,8 @@ export function useSiteDetails({
     const defaultMonitorId = getDefaultMonitorId(monitorIds);
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- Store may not yet have monitor selections keyed.
     const selectedMonitorIdsBySite = selectedMonitorIds ?? {};
-    const selectedMonitorId =
+
+    let selectedMonitorId =
         selectedMonitorIdsBySite[currentSite.identifier] ??
         getSelectedMonitorId(currentSite.identifier) ??
         defaultMonitorId;
@@ -242,33 +260,28 @@ export function useSiteDetails({
         [currentSite.identifier, syncActiveSiteDetailsTab]
     );
 
-    // Find the selected monitor, and if it doesn't exist, update the selection
-    // to the first monitor
-    const foundMonitor = currentSite.monitors.find(
-        (m) => m.id === selectedMonitorId
+    let selectedMonitor = currentSite.monitors.find(
+        (monitor) => monitor.id === selectedMonitorId
     );
-    const selectedMonitor = foundMonitor ?? currentSite.monitors[0];
 
-    // Use useEffect to handle stale monitor ID updates (avoid state updates
-    // during render)
-    useEffect(
-        function handleStaleMonitorIdUpdate() {
-            // If the selected monitor ID is stale (doesn't exist), update it to
-            // match the actual selected monitor
-            if (!foundMonitor && selectedMonitor) {
-                setSelectedMonitorId(
-                    currentSite.identifier,
-                    selectedMonitor.id
-                );
-            }
-        },
-        [
-            currentSite.identifier,
-            foundMonitor,
-            selectedMonitor,
-            setSelectedMonitorId,
-        ]
-    );
+    // If the selected monitor ID no longer exists for the current site,
+    // automatically fall back to the default monitor and persist the
+    // corrected selection back to the store.
+    if (
+        !selectedMonitor &&
+        currentSite.monitors.length > 0 &&
+        defaultMonitorId
+    ) {
+        selectedMonitorId = defaultMonitorId;
+        selectedMonitor = currentSite.monitors.find(
+            (monitor) => monitor.id === defaultMonitorId
+        );
+        setSelectedMonitorId(currentSite.identifier, defaultMonitorId);
+    }
+
+    const selectedMonitorCheckInterval = selectedMonitor?.checkInterval;
+    const selectedMonitorTimeout = selectedMonitor?.timeout;
+    const selectedMonitorRetryAttempts = selectedMonitor?.retryAttempts;
 
     const isMonitoring = selectedMonitor ? selectedMonitor.monitoring : false;
 
@@ -278,14 +291,14 @@ export function useSiteDetails({
     const [intervalChanged, setIntervalChanged] = useState(false);
     const localCheckInterval =
         userEditedCheckInterval ??
-        selectedMonitor?.checkInterval ??
+        selectedMonitorCheckInterval ??
         DEFAULT_CHECK_INTERVAL;
 
     // Timeout state (stored in seconds for UI, converted to ms when saving)
     const [userEditedTimeout, setUserEditedTimeout] = useState<number>();
     const [timeoutChanged, setTimeoutChanged] = useState(false);
     const localTimeout =
-        userEditedTimeout ?? getTimeoutSeconds(selectedMonitor?.timeout);
+        userEditedTimeout ?? getTimeoutSeconds(selectedMonitorTimeout);
 
     // Retry attempts state - track user edits separately from monitor defaults
     const [userEditedRetryAttempts, setUserEditedRetryAttempts] =
@@ -293,7 +306,7 @@ export function useSiteDetails({
     const [retryAttemptsChanged, setRetryAttemptsChanged] = useState(false);
     const localRetryAttempts =
         userEditedRetryAttempts ??
-        selectedMonitor?.retryAttempts ??
+        selectedMonitorRetryAttempts ??
         RETRY_CONSTRAINTS.DEFAULT;
 
     // Site name state for settings
@@ -320,7 +333,8 @@ export function useSiteDetails({
     // Handler for check now
     const handleCheckNow = useCallback(async () => {
         clearError();
-        await withUtilityErrorHandling(
+        await runSiteDetailsOperation(
+            "useSiteDetails.handleCheckNow",
             async () => {
                 logger.user.action("Manual site check initiated", {
                     monitorId: selectedMonitorId,
@@ -336,10 +350,7 @@ export function useSiteDetails({
                     siteIdentifier: currentSite.identifier,
                     siteName: currentSite.name,
                 });
-            },
-            "Manual site check",
-            undefined,
-            false // Don't throw, handle gracefully
+            }
         );
     }, [
         checkSiteNow,
@@ -390,14 +401,12 @@ export function useSiteDetails({
 
         clearError();
 
-        await withUtilityErrorHandling(
+        await runSiteDetailsOperation(
+            "useSiteDetails.handleRemoveSite",
             async () => {
                 await deleteSite(currentSite.identifier);
                 logger.site.removed(currentSite.identifier);
-            },
-            "Remove site",
-            undefined,
-            false // Don't throw, handle gracefully
+            }
         );
     }, [
         clearError,
@@ -435,7 +444,8 @@ export function useSiteDetails({
 
         clearError();
 
-        await withUtilityErrorHandling(
+        await runSiteDetailsOperation(
+            "useSiteDetails.handleRemoveMonitor",
             async () => {
                 await removeMonitorFromSite(
                     currentSite.identifier,
@@ -446,10 +456,7 @@ export function useSiteDetails({
                     monitorType: selectedMonitor.type,
                     siteIdentifier: currentSite.identifier,
                 });
-            },
-            "Remove monitor from site",
-            undefined,
-            false
+            }
         );
     }, [
         clearError,
@@ -463,7 +470,8 @@ export function useSiteDetails({
     // Site-level monitoring handlers
     const handleStartSiteMonitoring = useCallback(async () => {
         clearError();
-        await withUtilityErrorHandling(
+        await runSiteDetailsOperation(
+            "useSiteDetails.handleStartSiteMonitoring",
             async () => {
                 // Start the monitoring processes directly - this handles setting
                 // the monitoring state appropriately without requiring a separate
@@ -473,10 +481,7 @@ export function useSiteDetails({
                     monitorCount: currentSite.monitors.length,
                     siteIdentifier: currentSite.identifier,
                 });
-            },
-            "Start site monitoring",
-            undefined,
-            false
+            }
         );
     }, [
         clearError,
@@ -487,7 +492,8 @@ export function useSiteDetails({
 
     const handleStopSiteMonitoring = useCallback(async () => {
         clearError();
-        await withUtilityErrorHandling(
+        await runSiteDetailsOperation(
+            "useSiteDetails.handleStopSiteMonitoring",
             async () => {
                 // Stop the monitoring processes directly - this handles setting
                 // the monitoring state appropriately without requiring a separate
@@ -497,10 +503,7 @@ export function useSiteDetails({
                     monitorCount: currentSite.monitors.length,
                     siteIdentifier: currentSite.identifier,
                 });
-            },
-            "Stop site monitoring",
-            undefined,
-            false
+            }
         );
     }, [
         clearError,
@@ -512,7 +515,8 @@ export function useSiteDetails({
     // Monitoring handlers
     const handleStartMonitoring = useCallback(async () => {
         clearError();
-        await withUtilityErrorHandling(
+        await runSiteDetailsOperation(
+            "useSiteDetails.handleStartMonitoring",
             async () => {
                 await startSiteMonitorMonitoring(
                     currentSite.identifier,
@@ -522,10 +526,7 @@ export function useSiteDetails({
                     monitorId: selectedMonitorId,
                     siteIdentifier: currentSite.identifier,
                 });
-            },
-            "Start monitor monitoring",
-            undefined,
-            false
+            }
         );
     }, [
         clearError,
@@ -536,7 +537,8 @@ export function useSiteDetails({
 
     const handleStopMonitoring = useCallback(async () => {
         clearError();
-        await withUtilityErrorHandling(
+        await runSiteDetailsOperation(
+            "useSiteDetails.handleStopMonitoring",
             async () => {
                 await stopSiteMonitorMonitoring(
                     currentSite.identifier,
@@ -546,10 +548,7 @@ export function useSiteDetails({
                     monitorId: selectedMonitorId,
                     siteIdentifier: currentSite.identifier,
                 });
-            },
-            "Stop monitor monitoring",
-            undefined,
-            false
+            }
         );
     }, [
         clearError,
@@ -566,11 +565,16 @@ export function useSiteDetails({
                 DEFAULT_CHECK_INTERVAL
             );
             setUserEditedCheckInterval(newInterval);
-            setIntervalChanged(newInterval !== selectedMonitor?.checkInterval);
+            setIntervalChanged(newInterval !== selectedMonitorCheckInterval);
         },
-        [selectedMonitor?.checkInterval]
+        [
+            selectedMonitorCheckInterval,
+            setIntervalChanged,
+            setUserEditedCheckInterval,
+        ]
     );
 
+    // eslint-disable-next-line react-hooks/preserve-manual-memoization -- Dependencies are intentionally explicit to align with shared validation and logging behaviour.
     const handleSaveInterval = useCallback(async () => {
         clearError();
 
@@ -606,6 +610,7 @@ export function useSiteDetails({
         localCheckInterval,
         selectedMonitor?.type,
         selectedMonitorId,
+        setIntervalChanged,
         updateSiteCheckInterval,
     ]);
 
@@ -619,13 +624,14 @@ export function useSiteDetails({
             setUserEditedTimeout(timeoutInSeconds);
             // Compare against the monitor's timeout converted to seconds
             const currentTimeoutInSeconds = getTimeoutSeconds(
-                selectedMonitor?.timeout
+                selectedMonitorTimeout
             );
             setTimeoutChanged(timeoutInSeconds !== currentTimeoutInSeconds);
         },
-        [selectedMonitor?.timeout]
+        [selectedMonitorTimeout, setTimeoutChanged, setUserEditedTimeout]
     );
 
+    // eslint-disable-next-line react-hooks/preserve-manual-memoization -- Dependencies are intentionally explicit to align with shared validation and logging behaviour.
     const handleSaveTimeout = useCallback(async () => {
         clearError();
 
@@ -662,6 +668,7 @@ export function useSiteDetails({
         localTimeout,
         selectedMonitor?.type,
         selectedMonitorId,
+        setTimeoutChanged,
         updateMonitorTimeout,
     ]);
 
@@ -670,12 +677,13 @@ export function useSiteDetails({
         (e: ChangeEvent<HTMLInputElement>) => {
             const retryAttempts = safeInteger(e.target.value, 3);
             setUserEditedRetryAttempts(retryAttempts);
-            const currentRetryAttempts = selectedMonitor?.retryAttempts ?? 0;
+            const currentRetryAttempts = selectedMonitorRetryAttempts ?? 0;
             setRetryAttemptsChanged(retryAttempts !== currentRetryAttempts);
         },
-        [selectedMonitor?.retryAttempts]
+        [selectedMonitorRetryAttempts]
     );
 
+    // eslint-disable-next-line react-hooks/preserve-manual-memoization -- Dependencies are intentionally explicit to align with shared validation and logging behaviour.
     const handleSaveRetryAttempts = useCallback(async () => {
         clearError();
 
@@ -724,7 +732,8 @@ export function useSiteDetails({
 
         clearError();
 
-        await withUtilityErrorHandling(
+        await runSiteDetailsOperation(
+            "useSiteDetails.handleSaveName",
             async () => {
                 const trimmedName = localName.trim();
                 if (trimmedName) {
@@ -737,10 +746,7 @@ export function useSiteDetails({
                     identifier: currentSite.identifier,
                     name: localName.trim(),
                 });
-            },
-            "Save site name",
-            undefined,
-            false
+            }
         );
     }, [
         clearError,

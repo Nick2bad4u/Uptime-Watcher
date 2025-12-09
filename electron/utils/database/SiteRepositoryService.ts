@@ -36,6 +36,10 @@
 import type { Site } from "@shared/types";
 import type { Logger } from "@shared/utils/logger/interfaces";
 
+import {
+    DEFAULT_HISTORY_LIMIT_RULES,
+    normalizeHistoryLimit,
+} from "@shared/constants/history";
 import { ensureError } from "@shared/utils/errorHandling";
 import { getErrorMessage } from "@shared/utils/errorUtils";
 
@@ -151,16 +155,37 @@ export class SiteRepositoryService {
             if (!historyLimitSetting) {
                 return undefined;
             }
+            const parsedLimit = Number(historyLimitSetting);
 
-            const limit = Number.parseInt(historyLimitSetting, 10);
-            if (Number.isNaN(limit) || limit <= 0) {
+            if (Number.isNaN(parsedLimit)) {
                 this.logger.warn(
                     `Invalid history limit setting: ${historyLimitSetting}`
                 );
                 return undefined;
             }
 
-            return limit;
+            try {
+                // Use the shared normalization rules so semantics match
+                // DatabaseManager.initialize and historyLimitManager.
+                //
+                // This ensures that:
+                // - 0 represents "unlimited" retention
+                // - Values below the minimum are raised to the configured
+                //   minimum
+                // - Values above the maximum are rejected by throwing
+                //   RangeError
+                return normalizeHistoryLimit(
+                    parsedLimit,
+                    DEFAULT_HISTORY_LIMIT_RULES
+                );
+            } catch (error) {
+                const normalizedError = ensureError(error);
+                this.logger.warn(
+                    `Invalid history limit setting: ${historyLimitSetting}`,
+                    normalizedError
+                );
+                return undefined;
+            }
         } catch (error) {
             this.logger.warn(
                 "Could not load history limit from settings:",

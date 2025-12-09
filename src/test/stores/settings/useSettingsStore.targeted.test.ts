@@ -58,6 +58,7 @@ vi.mock("../../../../shared/utils/errorHandling", () => ({
 import { safeExtractIpcData } from "../../../types/ipc";
 import { withErrorHandling } from "@shared/utils/errorHandling";
 import { useSettingsStore } from "../../../stores/settings/useSettingsStore";
+import type { AppSettings } from "../../../stores/types";
 
 const mockWaitForElectronBridge = vi.hoisted(() => vi.fn());
 const MockElectronBridgeNotReadyError = vi.hoisted(
@@ -110,6 +111,7 @@ describe("useSettingsStore - Targeted Coverage", () => {
                 inAppAlertsEnabled: true,
                 inAppAlertsSoundEnabled: false,
                 inAppAlertVolume: 1,
+                mutedSiteNotificationIdentifiers: [],
                 systemNotificationsEnabled: true,
                 systemNotificationsSoundEnabled: false,
                 theme: "system",
@@ -319,7 +321,7 @@ describe("useSettingsStore - Targeted Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             // Set up initial custom settings
-            const customSettings = {
+            const customSettings: AppSettings = {
                 autoStart: true,
                 historyLimit: 100,
                 minimizeToTray: false,
@@ -328,7 +330,8 @@ describe("useSettingsStore - Targeted Coverage", () => {
                 inAppAlertVolume: 0.42,
                 systemNotificationsEnabled: true,
                 systemNotificationsSoundEnabled: true,
-                theme: "dark" as const,
+                theme: "dark",
+                mutedSiteNotificationIdentifiers: [],
             };
 
             useSettingsStore.setState({ settings: customSettings });

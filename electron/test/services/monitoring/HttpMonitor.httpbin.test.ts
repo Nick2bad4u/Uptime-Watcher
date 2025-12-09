@@ -14,46 +14,6 @@ import { describe, it, expect, beforeEach } from "vitest";
 import { HttpMonitor } from "../../../services/monitoring/HttpMonitor";
 import type { Site } from "@shared/types";
 
-const HTTPBIN_PROBE_URL = "https://httpbin.org/status/204";
-const HTTPBIN_PROBE_TIMEOUT_MS = 4000;
-
-let httpbinAvailable = true;
-let httpbinProbeError: unknown;
-
-if (typeof fetch === "function") {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(
-        () => controller.abort(),
-        HTTPBIN_PROBE_TIMEOUT_MS
-    );
-
-    try {
-        await fetch(HTTPBIN_PROBE_URL, {
-            method: "GET",
-            redirect: "manual",
-            signal: controller.signal,
-        });
-    } catch (probeError) {
-        httpbinAvailable = false;
-        httpbinProbeError = probeError;
-    } finally {
-        clearTimeout(timeoutId);
-    }
-} else {
-    httpbinAvailable = false;
-    httpbinProbeError = new Error("global fetch API is unavailable");
-}
-
-if (!httpbinAvailable) {
-    const reason =
-        httpbinProbeError instanceof Error
-            ? httpbinProbeError.message
-            : "unknown probe failure";
-    console.warn(`[httpbin] Skipping httpbin.org integration tests: ${reason}`);
-}
-
-const describeHttpbin = httpbinAvailable ? describe : describe.skip;
-
 const createHttpMonitor = (
     url: string,
     overrides: Partial<Site["monitors"][0]> = {}
@@ -71,7 +31,7 @@ const createHttpMonitor = (
     ...overrides,
 });
 
-describeHttpbin("HTTP Monitor - httpbin.org Integration Tests", () => {
+describe("HTTP Monitor - httpbin.org Integration Tests", () => {
     let httpMonitor: HttpMonitor;
 
     // Some runs against httpbin.org can be impacted by upstream/CDN outages.

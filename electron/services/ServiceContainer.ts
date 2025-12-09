@@ -727,7 +727,9 @@ export class ServiceContainer {
      */
     public getNotificationService(): NotificationService {
         if (!this.notificationService) {
-            this.notificationService = new NotificationService();
+            this.notificationService = new NotificationService(
+                this.getUptimeOrchestrator()
+            );
             if (this.config.notificationConfig) {
                 this.notificationService.updateConfig(
                     this.config.notificationConfig

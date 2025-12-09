@@ -365,6 +365,7 @@ describe(IpcService, () => {
 
             expect(mockNotificationService.updateConfig).toHaveBeenCalledWith({
                 enabled: false,
+                mutedSiteNotificationIdentifiers: [],
                 playSound: true,
             });
         });

@@ -202,28 +202,36 @@ Validators live in `electron/services/ipc/validators.ts` and, in turn, rely on t
 
 ### 3. Type-Safe Preload API
 
-The preload script exposes a type-safe API to the renderer:
+The preload script exposes a type-safe, domain-based API to the renderer. The
+actual implementation uses shared contracts from `shared/types/preload.ts` and
+the modular domain APIs under `electron/preload/domains/*Api.ts`:
 
 ```typescript
-// preload.ts
-const electronAPI = {
- sites: {
-  addSite: (data: SiteCreationData): Promise<Site> =>
-   ipcRenderer.invoke("add-site", data),
-  getSites: (): Promise<Site[]> => ipcRenderer.invoke("get-sites"),
-  removeSite: (identifier: string): Promise<void> =>
-   ipcRenderer.invoke("remove-site", { identifier }),
- },
- events: {
-  onMonitorStatusChanged: (callback: (data: MonitorStatusData) => void) => {
-   const wrappedCallback = (_event: any, data: MonitorStatusData) =>
-    callback(data);
-   ipcRenderer.on("monitor:status-changed", wrappedCallback);
-   return () => ipcRenderer.off("monitor:status-changed", wrappedCallback);
-  },
- },
+// preload.ts (simplified)
+import type { ElectronBridgeApi } from "@shared/types/preload";
+import { contextBridge } from "electron";
+
+import type { EventsApi } from "./preload/domains/eventsApi";
+import type { SystemApi } from "./preload/domains/systemApi";
+
+import { dataApi } from "./preload/domains/dataApi";
+import { createEventsApi } from "./preload/domains/eventsApi";
+import { monitoringApi } from "./preload/domains/monitoringApi";
+import { sitesApi } from "./preload/domains/sitesApi";
+import { stateSyncApi } from "./preload/domains/stateSyncApi";
+import { systemApi } from "./preload/domains/systemApi";
+
+type ElectronAPI = ElectronBridgeApi<EventsApi, SystemApi>;
+
+const electronAPI: ElectronAPI = {
+ data: dataApi,
+ events: createEventsApi(),
+ monitoring: monitoringApi,
+ sites: sitesApi,
+ stateSync: stateSyncApi,
+ system: systemApi,
  // ... other domains
-} as const;
+};
 
 contextBridge.exposeInMainWorld("electronAPI", electronAPI);
 ```

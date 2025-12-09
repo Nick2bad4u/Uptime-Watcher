@@ -29,6 +29,8 @@ export interface AppSettings {
     inAppAlertVolume: number;
     /** Minimize to system tray instead of closing the application */
     minimizeToTray: boolean;
+    /** Identifiers of sites for which system notifications are muted */
+    mutedSiteNotificationIdentifiers: string[];
     /** Enable operating-system notifications for status changes */
     systemNotificationsEnabled: boolean;
     /** Allow operating-system notifications to play sounds when supported */

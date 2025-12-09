@@ -36,6 +36,7 @@
 
 import type { ChangeEvent, MouseEvent, ReactElement } from "react";
 
+import { DEFAULT_HISTORY_LIMIT_RULES } from "@shared/constants/history";
 import { ensureError } from "@shared/utils/errorHandling";
 import { safeInteger } from "@shared/validation/validatorUtils";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -327,8 +328,8 @@ export const Settings = ({
                 const oldLimit = safeInteger(
                     currentHistoryLimit,
                     DEFAULT_HISTORY_LIMIT,
-                    1,
-                    50_000
+                    0,
+                    DEFAULT_HISTORY_LIMIT_RULES.maxLimit
                 );
 
                 await persistHistoryLimit(limit);

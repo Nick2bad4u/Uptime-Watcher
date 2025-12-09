@@ -73,11 +73,13 @@ await withErrorHandling(
 );
 
 // Utility operations with minimal overhead
-await withUtilityErrorHandling(
+const utilityResult = await withUtilityErrorHandling(
  async () => doUtilityWork(),
  "utility-operation",
- undefined,
- false // silent mode for non-critical operations
+ // When shouldThrow is false, a fallbackValue **must** be provided.
+ // It will be returned when the operation fails instead of rethrowing.
+ null,
+ false
 );
 ```
 
@@ -295,24 +297,39 @@ graph TB
     class Services,Repositories,Database,EventBus backend
     class WithErrorHandling,WithDatabaseOp,WithUtilityError,SafeStoreOp utility
     class Correlation,Events,Metrics,Logging monitoring
-```### Layer 1: Utility Level
+```
+
+### Layer 1: Utility Level
 
 ```typescript
-// Frontend utilities
+// Shared/frontend utilities
 export async function withUtilityErrorHandling<T>(
- operation: () => Promise<T>,
- operationName: string,
- fallbackValue?: T
+    operation: () => Promise<T>,
+    operationName: string,
+    fallbackValue?: T,
+    shouldThrow = false
 ): Promise<T> {
- try {
-  return await operation();
- } catch (error) {
-  logger.error(`${operationName} failed`, error);
-  if (fallbackValue !== undefined) {
-   return fallbackValue;
-  }
-  throw error;
- }
+    try {
+        return await operation();
+    } catch (error) {
+        const wrappedError = ensureError(error);
+
+        // Use console logging for shared utilities to avoid logger dependencies.
+        console.error(`${operationName} failed`, wrappedError);
+
+        if (shouldThrow) {
+            throw wrappedError;
+        }
+
+        if (fallbackValue === undefined) {
+            throw new Error(
+                `${operationName} failed and no fallback value provided. When shouldThrow is false, you must provide a fallbackValue parameter.`,
+                { cause: error }
+            );
+        }
+
+        return fallbackValue;
+    }
 }
 ````
 
@@ -707,8 +724,7 @@ try {
 
 ### 2. Use Appropriate Error Handling Level
 
-- **Utilities**: `withUtilityErrorHandling()` for shared and backend helpers
-  that need simple fallback behavior.
+- **Utilities**: `withUtilityErrorHandling(operation, operationName, fallbackValue, shouldThrow)` for shared and backend helpers that need simple fallback behavior. When `shouldThrow` is `false`, you **must** provide a `fallbackValue`; the helper will return this value on failure instead of rethrowing. When `shouldThrow` is `true`, any provided `fallbackValue` is ignored and the wrapped error is rethrown after being logged via `console.error`.
 - **Database**: `withDatabaseOperation()` for repository and transactional
   operations.
 - **Frontend stores**: `withErrorHandling()` together with
@@ -723,6 +739,18 @@ try {
 See the "Helper selection matrix" section in
 `docs/Guides/ERROR_HANDLING_GUIDE.md` for concrete examples and additional
 scenarios.
+
+### 4. Error Handling Patterns Quick Reference
+
+The following table summarizes which helper to use in common scenarios:
+
+| Scenario                                     | Preferred helper                                     | Notes                                                             |
+| -------------------------------------------- | ---------------------------------------------------- | ----------------------------------------------------------------- |
+| Zustand store async action (renderer)        | `withErrorHandling` + `createStoreErrorHandler`      | Manages loading + error state via `useErrorStore`.                |
+| Backend service or IPC handler               | `withErrorHandling` with `{ logger, operationName }` | Logs failures, rethrows original error.                           |
+| Database / long-running repository operation | `withDatabaseOperation` / `withOperationalHooks`     | Adds retry, backoff, and optional event emission.                 |
+| Small shared utility with fallback behaviour | `withUtilityErrorHandling`                           | Provide `fallbackValue` when `shouldThrow` is `false`.            |
+| UI-only event handlers in React components   | `withAsyncErrorHandling` / `withSyncErrorHandling`   | For lightweight logging + local fallback without touching stores. |
 
 ### 3. Emit Events for Failures
 

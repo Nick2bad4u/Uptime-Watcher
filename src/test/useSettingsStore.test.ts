@@ -88,6 +88,7 @@ describe(useSettingsStore, () => {
                 inAppAlertsSoundEnabled: false,
                 inAppAlertVolume: 1,
                 minimizeToTray: true,
+                mutedSiteNotificationIdentifiers: [],
                 systemNotificationsEnabled: false,
                 systemNotificationsSoundEnabled: false,
                 theme: "system",
@@ -117,6 +118,7 @@ describe(useSettingsStore, () => {
                 inAppAlertsSoundEnabled: false,
                 inAppAlertVolume: 1,
                 minimizeToTray: true,
+                mutedSiteNotificationIdentifiers: [],
                 systemNotificationsEnabled: false,
                 systemNotificationsSoundEnabled: false,
                 theme: "system",
@@ -181,6 +183,7 @@ describe(useSettingsStore, () => {
                 inAppAlertsEnabled: true,
                 inAppAlertsSoundEnabled: false,
                 minimizeToTray: true,
+                mutedSiteNotificationIdentifiers: [],
                 systemNotificationsEnabled: false,
                 systemNotificationsSoundEnabled: false,
                 theme: "system",
@@ -571,11 +574,7 @@ describe(useSettingsStore, () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
-            const validThemes = [
-                "system",
-                "light",
-                "dark",
-            ] as const;
+            const validThemes = ["system", "light", "dark"] as const;
 
             for (const theme of validThemes) {
                 useSettingsStore.getState().updateSettings({ theme });

@@ -114,6 +114,28 @@ describe(NotificationService, () => {
         });
     });
 
+    describe("per-site mute", () => {
+        it("suppresses down notifications for muted sites", () => {
+            service.updateConfig({
+                mutedSiteNotificationIdentifiers: [sampleSite.identifier],
+            });
+
+            service.notifyMonitorDown(sampleSite, "monitor-1");
+
+            expect(notificationCtor).not.toHaveBeenCalled();
+        });
+
+        it("suppresses up notifications for muted sites", () => {
+            service.updateConfig({
+                mutedSiteNotificationIdentifiers: [sampleSite.identifier],
+            });
+
+            service.notifyMonitorUp(sampleSite, "monitor-1");
+
+            expect(notificationCtor).not.toHaveBeenCalled();
+        });
+    });
+
     describe("down notifications", () => {
         it("emits notification when enabled", () => {
             service.notifyMonitorDown(sampleSite, "monitor-1");
@@ -210,5 +232,26 @@ describe(NotificationService, () => {
 
         expect(errorSpy).toHaveBeenCalled();
         expect(notificationCtor).not.toHaveBeenCalled();
+    });
+
+    describe("notification:sent diagnostics event", () => {
+        it("emits a notification:sent event when a notification is dispatched", async () => {
+            const emitTyped = vi.fn().mockResolvedValue(undefined);
+            const serviceWithEvents = new NotificationService({ emitTyped });
+
+            serviceWithEvents.notifyMonitorDown(sampleSite, "monitor-1");
+
+            await Promise.resolve();
+
+            expect(emitTyped).toHaveBeenCalledTimes(1);
+            expect(emitTyped).toHaveBeenCalledWith(
+                "notification:sent",
+                expect.objectContaining({
+                    monitorId: "monitor-1",
+                    siteIdentifier: "site-1",
+                    status: "down",
+                })
+            );
+        });
     });
 });

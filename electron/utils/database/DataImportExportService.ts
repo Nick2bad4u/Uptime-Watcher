@@ -252,7 +252,7 @@ export class DataImportExportService {
             async () => {
                 // Use executeTransaction for atomic multi-table operation
                 await this.withImportTransactionAdapters(
-                    async ({ historyTx, monitorTx, settingsTx, siteTx }) => {
+                    ({ historyTx, monitorTx, settingsTx, siteTx }) => {
                         siteTx.deleteAll();
                         settingsTx.deleteAll();
                         monitorTx.deleteAll();
@@ -279,9 +279,13 @@ export class DataImportExportService {
                         });
                         siteTx.bulkInsert(siteRows);
 
-                        // Import monitors and history
-                        await this.importMonitorsWithHistory(
+                        // Import monitors and history as part of the same
+                        // transaction so monitor creation, history entries,
+                        // and settings updates share a single atomic
+                        // boundary.
+                        this.importMonitorsWithHistory(
                             historyTx,
+                            monitorTx,
                             normalizedSites
                         );
 
@@ -300,73 +304,6 @@ export class DataImportExportService {
                 sitesCount: normalizedSites.length,
             }
         );
-    }
-
-    /**
-     * Import monitors with their history for all sites. Private helper method
-     * for monitor data persistence.
-     */
-    private async importMonitorsWithHistory(
-        historyRepositoryTransaction: HistoryRepositoryTransactionAdapter,
-        sites: ImportSite[]
-    ): Promise<void> {
-        // Process sites in parallel since each site's monitor import
-        // is independent
-        const importPromises = sites
-            .filter(
-                (site) =>
-                    Array.isArray(site.monitors) && site.monitors.length > 0
-            )
-            .map(async (site) => {
-                const { identifier } = site;
-                try {
-                    // We know monitors exists and has content from the filter
-                    if (!site.monitors) {
-                        throw new Error(
-                            "Site monitors is unexpectedly undefined"
-                        );
-                    }
-                    const { monitors } = site;
-
-                    // Create monitors using the async bulkCreate method
-                    const createdMonitors =
-                        await this.repositories.monitor.bulkCreate(
-                            identifier,
-                            monitors
-                        );
-
-                    // Import history for the created monitors
-                    this.importHistoryForMonitors(
-                        historyRepositoryTransaction,
-                        createdMonitors,
-                        monitors
-                    );
-
-                    this.logger.debug(
-                        `[DataImportExportService] Imported ${createdMonitors.length} monitors for site: ${identifier}`
-                    );
-                } catch (error) {
-                    this.logger.error(
-                        `[DataImportExportService] Failed to import monitors for site ${identifier}:`,
-                        error
-                    );
-                    // Continue with other sites even if one fails
-                    throw error; // Re-throw to be caught by Promise.allSettled
-                }
-            });
-
-        // Wait for all sites to complete, but continue even if some fail
-        const results = await Promise.allSettled(importPromises);
-
-        // Log any failures
-        const failures = results.filter(
-            (result) => result.status === "rejected"
-        ).length;
-        if (failures > 0) {
-            this.logger.warn(
-                `[DataImportExportService] ${failures} out of ${importPromises.length} site monitor imports failed`
-            );
-        }
     }
 
     private async handleDataOperationFailure(
@@ -422,6 +359,69 @@ export class DataImportExportService {
 
             return operation({ historyTx, monitorTx, settingsTx, siteTx });
         });
+    }
+
+    /**
+     * Import monitors with their history for all sites. Private helper method
+     * for monitor data persistence.
+     */
+    private importMonitorsWithHistory(
+        historyRepositoryTransaction: HistoryRepositoryTransactionAdapter,
+        monitorRepositoryTransaction: MonitorRepositoryTransactionAdapter,
+        sites: ImportSite[]
+    ): void {
+        let failures = 0;
+
+        for (const site of sites) {
+            const { identifier } = site;
+
+            try {
+                const monitors = Array.isArray(site.monitors)
+                    ? site.monitors
+                    : [];
+
+                if (monitors.length === 0) {
+                    // No monitors to import for this site; skip without
+                    // treating as a failure to preserve the original import
+                    // semantics.
+                    continue; // eslint-disable-line no-continue -- Early exit keeps the main logic flatter and avoids deeply nested blocks.
+                }
+
+                const createdMonitors = monitors.map((monitor) => {
+                    const newId = monitorRepositoryTransaction.create(
+                        identifier,
+                        monitor
+                    );
+
+                    return {
+                        ...monitor,
+                        id: newId,
+                    } as Site["monitors"][0];
+                });
+
+                this.importHistoryForMonitors(
+                    historyRepositoryTransaction,
+                    createdMonitors,
+                    monitors
+                );
+
+                this.logger.debug(
+                    `[DataImportExportService] Imported ${createdMonitors.length} monitors for site: ${identifier}`
+                );
+            } catch (error) {
+                failures += 1;
+                this.logger.error(
+                    `[DataImportExportService] Failed to import monitors for site ${identifier}:`,
+                    error
+                );
+            }
+        }
+
+        if (failures > 0) {
+            this.logger.warn(
+                `[DataImportExportService] ${failures} out of ${sites.length} site monitor imports failed`
+            );
+        }
     }
 
     /**
@@ -532,9 +532,14 @@ export class DataImportExportService {
                 originalMonitor.history.length > 0 &&
                 createdMonitor.id
             ) {
+                // Normalize the monitor identifier defensively in case
+                // legacy imports surface non-string identifiers.
+                // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-conversion -- Runtime safety for mixed identifier types
+                const monitorId = String(createdMonitor.id);
+
                 this.importMonitorHistory(
                     historyRepositoryTransaction,
-                    Number(createdMonitor.id),
+                    monitorId,
                     originalMonitor.history
                 );
             }
@@ -547,12 +552,12 @@ export class DataImportExportService {
      */
     private importMonitorHistory(
         historyRepositoryTransaction: HistoryRepositoryTransactionAdapter,
-        monitorId: number,
+        monitorId: string,
         history: StatusHistory[]
     ): void {
         for (const entry of history) {
             historyRepositoryTransaction.addEntry(
-                String(monitorId),
+                monitorId,
                 {
                     responseTime: entry.responseTime,
                     status: entry.status,

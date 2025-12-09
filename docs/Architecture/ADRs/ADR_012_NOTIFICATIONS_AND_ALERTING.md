@@ -33,6 +33,23 @@ tags:
 
 Draft
 
+> **Implementation Status**
+>
+> - Global notification preferences (enable/disable, sound) are persisted in
+>   the `AppSettings` store and synchronized with the main process via
+>   `NotificationPreferenceService` and `update-notification-preferences` IPC.
+> - Per-site system notification mute is implemented through the
+>   `mutedSiteNotificationIdentifiers` setting (configured from the Site
+>   Settings tab) and enforced by `NotificationService`.
+> - Per-monitor throttling and ordering are implemented in
+>   `NotificationService` using `lastStatus`, `lastNotifiedAt`, and
+>   `suppressionUntil`.
+> - A `notification:sent` event is emitted on the main event bus whenever a
+>   system notification is dispatched, with correlationId and timestamp for
+>   diagnostics.
+> - Deeper coupling with scheduler backoff signals (for richer flapping
+>   semantics) is still a future enhancement under this ADR.
+
 ## Context
 
 Outage and restore notifications must be reliable, non-noisy, and consistent with user preferences. Sound cues and desktop notifications should be throttled to prevent spamming during flapping incidents while still surfacing critical transitions.
@@ -53,17 +70,91 @@ Outage and restore notifications must be reliable, non-noisy, and consistent wit
 
 ## Implementation
 
+### Renderer settings surface (AppSettings)
+
+Notification-related preferences are part of the `AppSettings` interface in
+`src/stores/types.ts` and are persisted via `useSettingsStore`:
+
+- `inAppAlertsEnabled`: enable/disable in-app status alerts rendered inside the
+  UI shell.
+- `inAppAlertsSoundEnabled`: toggle the audible chime for in-app alerts.
+- `inAppAlertVolume`: volume multiplier for in-app alert tones, clamped between
+  `0` and `1`.
+- `systemNotificationsEnabled`: enable operating-system notifications for
+  status changes.
+- `systemNotificationsSoundEnabled`: allow OS notifications to play sounds
+  when supported.
+- `mutedSiteNotificationIdentifiers`: identifiers of sites for which **system
+  notifications** (desktop) are muted. In-app alerts continue to be controlled
+  by the in-app flags above.
+
+These settings are the single source of truth for user-facing notification
+preferences in the renderer and are synchronized with the main process via IPC
+channels defined in `@shared/types/ipc` and validated by
+`@shared/validation/notifications`.
+
+### Main-process configuration surface (NotificationConfig)
+
+The Electron main process aggregates notification preferences into
+`NotificationConfig` in
+`electron/services/notifications/NotificationService.ts`:
+
+- `enabled`: master switch controlling whether system notifications are
+  emitted.
+- `playSound`: whether system notifications are allowed to play sounds.
+- `showDownAlerts` / `showUpAlerts`: switches for outage and restore
+  notifications respectively.
+- `downAlertCooldownMs`: per-monitor cooldown window used to throttle repeated
+  "down" alerts.
+- `restoreRequiresOutage`: whether a "restore" notification is only emitted
+  if a prior outage was observed.
+- `mutedSiteNotificationIdentifiers?: readonly string[]`: optional list of
+  site identifiers for which system notifications are suppressed.
+
+`NotificationService.updateConfig()` is the canonical entry point for applying
+preference changes. Internally, it materializes
+`mutedSiteNotificationIdentifiers` into a `Set<string>` for fast lookup when
+evaluating whether a given site is muted.
+
+### IPC propagation and validation
+
+Renderer → main preference updates are expressed using the
+`NotificationPreferenceUpdate` contract in `@shared/types/notifications` and
+validated via `notificationPreferenceUpdateSchema` in
+`@shared/validation/notifications`.
+
+`electron/services/ipc/handlers/notificationHandlers.ts` wires the
+`update-notification-preferences` IPC channel by:
+
+1. Validating the incoming payload with `parseNotificationPreferenceUpdate`.
+2. Normalizing to the `NotificationConfig` shape expected by
+   `NotificationService.updateConfig()` (enabled, playSound, muted sites).
+3. Registering the handler through `registerStandardizedIpcHandler` so it
+   participates in the standard IPC validation, logging, and lifecycle
+   tracking.
+
+### Per-monitor throttling and event emission
+
 - Per-monitor state: `lastStatus`, `lastNotifiedAt`, `suppressionUntil`.
-- Debounce `monitor:down` bursts; immediate pass-through for first transition, suppress duplicates within window.
-- Emit `notification:sent` with correlationId for diagnostics; log suppression events.
-- Integrate with scheduler backoff to avoid duplicate alerts during delayed retries.
-- Align with RendererEventPayloadMap and preload validation for notification events.
+- Debounce `monitor:down` bursts; immediate pass-through for first transition,
+  suppress duplicates within window.
+- Emit `notification:sent` with correlationId for diagnostics; log suppression
+  events.
+- Integrate with scheduler backoff to avoid duplicate alerts during delayed
+  retries.
+- Align with `RendererEventPayloadMap` and preload validation for notification
+  events.
 
 ## Testing & Validation
 
 - Unit tests for suppression windows and ordering (outage then restore).
 - Integration tests for per-monitor preferences and sound enablement.
 - Property tests for flapping scenarios ensuring bounded notification volume.
+  - Electron tests: `electron/test/services/notifications/NotificationService.test.ts` cover
+    per-site mute suppression and `notification:sent` diagnostics emission.
+  - Renderer tests: `src/test/components/Alerts/alertCoordinator.test.ts` and
+    `src/test/services/NotificationPreferenceService.comprehensive.test.ts`
+    validate preference synchronization and preload bridge wiring.
 
 ## Related ADRs
 

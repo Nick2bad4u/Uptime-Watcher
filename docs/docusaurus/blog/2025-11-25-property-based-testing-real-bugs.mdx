@@ -51,15 +51,20 @@ A simplified property looked like this (adapted from the real tests):
 ```ts
 import fc from "fast-check";
 
-import { normalizeHistoryLimit } from "@shared/utils/history";
+import {
+  DEFAULT_HISTORY_LIMIT_RULES,
+  normalizeHistoryLimit,
+} from "@shared/constants/history";
 
 fc.assert(
   fc.property(fc.integer({ min: -10_000, max: 10_000 }), (limit) => {
-    const normalized = normalizeHistoryLimit(limit);
+    const normalized = normalizeHistoryLimit(limit, DEFAULT_HISTORY_LIMIT_RULES);
 
     // Invariants
     expect(normalized).toBeGreaterThanOrEqual(0);
-    expect(normalized).toBeLessThanOrEqual(10_000);
+    expect(normalized).toBeLessThanOrEqual(
+      DEFAULT_HISTORY_LIMIT_RULES.maxLimit,
+    );
   })
 );
 ```

@@ -7,25 +7,38 @@
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 import { ServiceContainer } from "../../services/ServiceContainer.js";
 
-// Mock the TypedEventBus module with factory function
+// Mock the TypedEventBus module with a lightweight EventEmitter-based class.
+//
+// The mock must behave like a proper base class so that UptimeOrchestrator,
+// which extends TypedEventBus, can call its own prototype methods (such as
+// setupMiddleware) without prototype corruption caused by function-based
+// constructor mocks.
 vi.mock("../../events/TypedEventBus.js", () => {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports, unicorn/prefer-module -- Required for mock
+    // eslint-disable-next-line @typescript-eslint/no-require-imports, unicorn/prefer-module -- Required for mock in tests
     const { EventEmitter } = require("node:events");
 
-    return {
-        TypedEventBus: vi.fn().mockImplementation((name?: string) => {
-            // Create an actual EventEmitter instance
-            // eslint-disable-next-line unicorn/prefer-event-target -- Required for Node.js EventEmitter compatibility
-            const eventEmitter = new EventEmitter();
+    // eslint-disable-next-line unicorn/prefer-event-target -- Production TypedEventBus extends EventEmitter; mock must preserve the same base for compatibility
+    class MockTypedEventBus extends EventEmitter {
+        public readonly busId: string;
 
-            // Add TypedEventBus-specific methods
-            return Object.assign(eventEmitter, {
-                onTyped: vi.fn(),
-                emitTyped: vi.fn().mockResolvedValue(undefined),
-                busId: name || "test-bus",
-                destroy: vi.fn(),
-            });
-        }),
+        public constructor(name?: string) {
+            super();
+            this.busId = name ?? "test-bus";
+        }
+
+        public onTyped = vi.fn();
+
+        public emitTyped = vi.fn().mockResolvedValue(undefined);
+
+        public registerMiddleware = vi.fn();
+
+        public clearMiddleware = vi.fn();
+
+        public destroy = vi.fn();
+    }
+
+    return {
+        TypedEventBus: MockTypedEventBus,
     };
 });
 

@@ -12,16 +12,16 @@ interface FeatureItem {
     title: string;
 }
 
-interface FeatureProps extends FeatureItem {
+interface FeatureProperties extends FeatureItem {
     readonly style?: CSSProperties;
 }
 
-const Feature: FC<FeatureProps> = ({
+const Feature: FC<FeatureProperties> = ({
     description,
     icon,
     style,
     title,
-}: Readonly<FeatureProps>) => (
+}: Readonly<FeatureProperties>) => (
     <div className={clsx("col col--4")} style={style}>
         <div className={clsx("text--center", styles["featureCard"])}>
             <div className={styles["featureIcon"]}>{icon}</div>
@@ -131,7 +131,7 @@ export default function HomepageFeatures(): ReactNode {
                     }}
                 >
                     {FeatureList.map((props, idx) => {
-                        const featureProps: FeatureProps = {
+                        const featureProps: FeatureProperties = {
                             ...props,
                             ...(idx < 3 && {
                                 style: {

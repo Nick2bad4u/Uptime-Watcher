@@ -59,21 +59,16 @@ import {
 import { app } from "electron";
 
 import type { UptimeEvents } from "../../events/eventTypes";
+import type {
+    EnhancedEventPayload,
+    EventKey,
+} from "../../events/TypedEventBus";
 import type { RendererEventBridge } from "../events/RendererEventBridge";
 
 import { ScopedSubscriptionManager } from "../../events/ScopedSubscriptionManager";
-import {
-    type EnhancedEventPayload,
-    type EventKey,
-    ORIGINAL_METADATA_SYMBOL,
-} from "../../events/TypedEventBus";
+import { stripForwardedEventMetadata } from "../../utils/eventMetadataForwarding";
 import { logger } from "../../utils/logger";
 import { ServiceContainer } from "../ServiceContainer";
-
-const isPlainObjectPayload = (
-    value: unknown
-): value is Record<PropertyKey, unknown> =>
-    typeof value === "object" && value !== null && !Array.isArray(value);
 
 /**
  * Type guard that verifies whether a service-like object exposes a callable
@@ -813,31 +808,13 @@ export class ApplicationService {
         eventName: EventName,
         payload: EnhancedEventPayload<UptimeEvents[EventName]>
     ): UptimeEvents[EventName] {
-        if (Array.isArray(payload)) {
-            const clonedArray = Array.from(payload);
-            this.logMetadataRemoval(eventName, true);
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Array cloning preserves the payload structure while dropping metadata side-effects.
-            return clonedArray as unknown as UptimeEvents[EventName];
-        }
+        const isArrayPayload = Array.isArray(payload);
+        const sanitizedPayload = stripForwardedEventMetadata(payload);
 
-        if (!isPlainObjectPayload(payload)) {
-            throw new TypeError(
-                "Unexpected primitive payload when stripping metadata"
-            );
-        }
-
-        const clonedPayload: Record<PropertyKey, unknown> = {
-            ...payload,
-        };
-
-        Reflect.deleteProperty(clonedPayload, "_meta");
-        Reflect.deleteProperty(clonedPayload, "_originalMeta");
-        Reflect.deleteProperty(clonedPayload, ORIGINAL_METADATA_SYMBOL);
-
-        this.logMetadataRemoval(eventName, false);
+        this.logMetadataRemoval(eventName, isArrayPayload);
 
         // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- After stripping metadata, the payload matches the event contract.
-        return clonedPayload as unknown as UptimeEvents[EventName];
+        return sanitizedPayload as unknown as UptimeEvents[EventName];
     }
 
     private logMetadataRemoval(

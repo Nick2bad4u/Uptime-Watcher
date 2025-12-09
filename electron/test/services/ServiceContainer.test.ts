@@ -355,7 +355,7 @@ describe(ServiceContainer, () => {
             expect(typeof status).toBe("object");
             expect(status["DatabaseService"]).toBeTruthy();
             expect(status["NotificationService"]).toBeTruthy();
-            expect(status["UptimeOrchestrator"]).toBeFalsy(); // Not initialized yet
+            expect(status["UptimeOrchestrator"]).toBeTruthy(); // Now initialized eagerly
         });
         it("should provide list of initialized services", async ({
             task,

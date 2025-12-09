@@ -243,10 +243,18 @@ All consumers must import helpers from explicit module paths under `@shared/util
 import { withUtilityErrorHandling } from "@shared/utils/errorHandling";
 import { LOG_TEMPLATES } from "@shared/utils/logTemplates";
 
+const FALLBACK_RESULT: Result = { success: false } as Result;
+
 export async function invokeOperation(): Promise<Result> {
- return withUtilityErrorHandling(async () => {
-  // ...operation logic
- }, LOG_TEMPLATES.utilities.OPERATION_FAILED);
+    return withUtilityErrorHandling(
+        async () => {
+            // ...operation logic
+            return await performOperation();
+        },
+        LOG_TEMPLATES.utilities.OPERATION_FAILED,
+        FALLBACK_RESULT,
+        false
+    );
 }
 ```
 

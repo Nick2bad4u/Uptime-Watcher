@@ -47,8 +47,13 @@ export interface SitesActions {
     checkSiteNow: (siteIdentifier: string, monitorId: string) => Promise<void>;
     /** Create a new site */
     createSite: (siteData: {
+        /** Unique site identifier used across layers */
         identifier: string;
+        /** Optional initial monitoring state; defaults to enabled when omitted */
+        monitoring?: boolean;
+        /** Optional initial monitor configuration for the site */
         monitors?: Monitor[];
+        /** Optional human-readable site name */
         name?: string;
     }) => Promise<void>;
     /** Delete a site */
@@ -160,13 +165,23 @@ export interface SitesActions {
     updateMonitorRetryAttempts: (
         siteIdentifier: string,
         monitorId: string,
-        retryAttempts: number
+        /**
+         * New retry-attempts value. When `undefined`, the existing value is
+         * preserved while still going through the shared monitor update
+         * pipeline.
+         */
+        retryAttempts: number | undefined
     ) => Promise<void>;
     /** Update monitor timeout */
     updateMonitorTimeout: (
         siteIdentifier: string,
         monitorId: string,
-        timeout: number
+        /**
+         * New timeout value in milliseconds. When `undefined`, the existing
+         * timeout is preserved while still exercising the shared update helpers
+         * for consistency and logging.
+         */
+        timeout: number | undefined
     ) => Promise<void>;
     /** Update site check interval */
     updateSiteCheckInterval: (

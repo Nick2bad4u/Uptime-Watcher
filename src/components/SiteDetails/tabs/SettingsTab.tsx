@@ -18,6 +18,7 @@ import {
     TIMEOUT_CONSTRAINTS,
 } from "../../../constants";
 import { logger } from "../../../services/logger";
+import { useSettingsStore } from "../../../stores/settings/useSettingsStore";
 import { ThemedBadge } from "../../../theme/components/ThemedBadge";
 import { ThemedBox } from "../../../theme/components/ThemedBox";
 import { ThemedButton } from "../../../theme/components/ThemedButton";
@@ -211,6 +212,7 @@ export const SettingsTab = ({
     timeoutChanged,
 }: SettingsTabProperties): JSX.Element => {
     const { currentTheme } = useTheme();
+    const { settings, updateSettings } = useSettingsStore();
     const identifierLabel = useIdentifierLabel(selectedMonitor);
     const trimmedSiteName = localName.trim();
     const isSiteNameValid = trimmedSiteName.length > 0;
@@ -252,6 +254,35 @@ export const SettingsTab = ({
         trimmedSiteName,
     ]);
 
+    const isSiteMuted = useMemo(
+        () =>
+            settings.mutedSiteNotificationIdentifiers.includes(
+                currentSite.identifier
+            ),
+        [currentSite.identifier, settings.mutedSiteNotificationIdentifiers]
+    );
+
+    const handleToggleSiteMute = useCallback(() => {
+        const currentMuted = settings.mutedSiteNotificationIdentifiers;
+        const nextMuted = isSiteMuted
+            ? currentMuted.filter((id) => id !== currentSite.identifier)
+            : [...currentMuted, currentSite.identifier];
+
+        updateSettings({
+            mutedSiteNotificationIdentifiers: nextMuted,
+        });
+
+        logger.user.action("Settings: Toggled site notification mute", {
+            muted: !isSiteMuted,
+            siteIdentifier: currentSite.identifier,
+        });
+    }, [
+        currentSite.identifier,
+        isSiteMuted,
+        settings.mutedSiteNotificationIdentifiers,
+        updateSettings,
+    ]);
+
     const loggedHandleSaveInterval = useCallback(() => {
         logger.user.action("Settings: Save check interval", {
             monitorId: selectedMonitor.id,
@@ -274,11 +305,7 @@ export const SettingsTab = ({
             siteName: currentSite.name,
         });
         await handleRemoveSite();
-    }, [
-        currentSite.identifier,
-        currentSite.name,
-        handleRemoveSite,
-    ]);
+    }, [currentSite.identifier, currentSite.name, handleRemoveSite]);
 
     const loggedHandleSaveTimeout = useCallback(async () => {
         logger.user.action("Settings: Save timeout", {
@@ -357,6 +384,7 @@ export const SettingsTab = ({
         [iconColors.danger]
     );
     const trashIcon = useMemo(() => <FiTrash2 />, []);
+    const icon = useMemo(() => <WarningIcon />, []);
     return (
         <div className="space-y-6" data-testid="settings-tab">
             {/* Site Configuration */}
@@ -433,6 +461,35 @@ export const SettingsTab = ({
                             Identifier cannot be changed
                         </ThemedText>
                     </div>
+                </div>
+            </ThemedCard>
+
+            <ThemedCard
+                className="site-settings-section"
+                icon={dangerIcon}
+                title="Notifications"
+            >
+                <div className="site-settings-field">
+                    <ThemedText className="mb-2" size="sm" variant="secondary">
+                        System notifications for this site
+                    </ThemedText>
+                    <ThemedText className="mb-4" size="xs" variant="tertiary">
+                        {isSiteMuted
+                            ? "System notifications are muted for this site, even when global notifications are enabled."
+                            : "System notifications will follow your global notification settings for this site."}
+                    </ThemedText>
+                    <ThemedButton
+                        className="site-settings-field__cta"
+                        icon={icon}
+                        loading={isLoading}
+                        onClick={handleToggleSiteMute}
+                        size="sm"
+                        variant={isSiteMuted ? "secondary" : "primary"}
+                    >
+                        {isSiteMuted
+                            ? "Unmute system notifications"
+                            : "Mute system notifications"}
+                    </ThemedButton>
                 </div>
             </ThemedCard>
 

@@ -2,6 +2,10 @@ import type { IpcInvokeChannel } from "@shared/types/ipc";
 import type { DuplicateSiteIdentifier } from "@shared/validation/siteIntegrity";
 
 import { SITES_CHANNELS } from "@shared/types/preload";
+import {
+    interpolateLogTemplate,
+    LOG_TEMPLATES,
+} from "@shared/utils/logTemplates";
 import { deriveSiteSnapshot } from "@shared/utils/siteSnapshots";
 
 import type { UptimeOrchestrator } from "../../../UptimeOrchestrator";
@@ -36,10 +40,20 @@ export function registerSiteHandlers({
     registerStandardizedIpcHandler(
         SITES_CHANNELS.deleteAllSites,
         withIgnoredIpcEvent(async () => {
-            logger.info("delete-all-sites IPC handler called");
-            const result = await uptimeOrchestrator.deleteAllSites();
-            logger.info(`delete-all-sites completed, deleted ${result} sites`);
-            return result;
+            logger.info(
+                LOG_TEMPLATES.services.IPC_DELETE_ALL_SITES_HANDLER_CALLED
+            );
+
+            const deletedCount = await uptimeOrchestrator.deleteAllSites();
+
+            logger.info(
+                interpolateLogTemplate(
+                    LOG_TEMPLATES.services.IPC_DELETE_ALL_SITES_COMPLETED,
+                    { deletedCount }
+                )
+            );
+
+            return deletedCount;
         }),
         SiteHandlerValidators.deleteAllSites,
         registeredHandlers
@@ -62,7 +76,8 @@ export function registerSiteHandlers({
 
             if (snapshot.duplicates.length > 0) {
                 logger.error(
-                    "[IpcService] Duplicate site identifiers detected in get-sites response",
+                    LOG_TEMPLATES.errors
+                        .IPC_DUPLICATE_SITES_IN_GET_SITES_RESPONSE,
                     undefined,
                     {
                         duplicateCount: snapshot.duplicates.length,
