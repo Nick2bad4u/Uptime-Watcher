@@ -7,14 +7,543 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
-[[95f3aa7](https://github.com/Nick2bad4u/Uptime-Watcher/commit/95f3aa7ca783508d99ec60facbb772a714eb5f04)...
-[95f3aa7](https://github.com/Nick2bad4u/Uptime-Watcher/commit/95f3aa7ca783508d99ec60facbb772a714eb5f04)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/95f3aa7ca783508d99ec60facbb772a714eb5f04...95f3aa7ca783508d99ec60facbb772a714eb5f04))
+[[0872f2d](https://github.com/Nick2bad4u/Uptime-Watcher/commit/0872f2dbcca4e243d719cf0bea9adeaad93e74ac)...
+[0872f2d](https://github.com/Nick2bad4u/Uptime-Watcher/commit/0872f2dbcca4e243d719cf0bea9adeaad93e74ac)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/0872f2dbcca4e243d719cf0bea9adeaad93e74ac...0872f2dbcca4e243d719cf0bea9adeaad93e74ac))
 
 
 ### 📦 Dependencies
 
+- [dependency] Update version 19.5.0 [`(0872f2d)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/0872f2dbcca4e243d719cf0bea9adeaad93e74ac)
+
+
+
+
+
+
+## [19.5.0] - 2025-12-09
+
+
+[[e113a1e](https://github.com/Nick2bad4u/Uptime-Watcher/commit/e113a1ea1763692f1325d8ea91700f48cf173faf)...
+[ef1fdb8](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ef1fdb85322390fd105b7634adeb37176b6d15ca)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/e113a1ea1763692f1325d8ea91700f48cf173faf...ef1fdb85322390fd105b7634adeb37176b6d15ca))
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 19.4.0 [`(e113a1e)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/e113a1ea1763692f1325d8ea91700f48cf173faf)
+
+
+
+### 👷 CI/CD
+
+- Update Build.yml [`(ef1fdb8)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ef1fdb85322390fd105b7634adeb37176b6d15ca)
+
+
+
+
+
+
+## [19.4.0] - 2025-12-09
+
+
+[[79a2d7d](https://github.com/Nick2bad4u/Uptime-Watcher/commit/79a2d7dd9cd4cb418b76588c581b57d0d3158017)...
+[0b3763e](https://github.com/Nick2bad4u/Uptime-Watcher/commit/0b3763ec52c7069a980bb804a2e8f125eac7eb3e)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/79a2d7dd9cd4cb418b76588c581b57d0d3158017...0b3763ec52c7069a980bb804a2e8f125eac7eb3e))
+
+
+### 📦 Dependencies
+
+- *(deps)* [dependency] Update dependency group [`(0b3763e)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/0b3763ec52c7069a980bb804a2e8f125eac7eb3e)
+
+
+- *(deps)* [dependency] Update the npm-all group across 1 directory with 26 updates [`(c9a924b)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c9a924bc5b67dabf20d9f54d4ff97dab8b9d9958)
+
+
+- *(deps)* [dependency] Update jws 3.2.3 [`(2244aef)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/2244aef2971ea98527490a08e5e89fe11a14a219)
+
+
+- [dependency] Update version 19.3.0 [`(79a2d7d)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/79a2d7dd9cd4cb418b76588c581b57d0d3158017)
+
+
+
+
+
+
+## [19.3.0] - 2025-12-09
+
+
+[[216fdd9](https://github.com/Nick2bad4u/Uptime-Watcher/commit/216fdd9ffb745a5cdf2f80fb9245c8e8d26b1f45)...
+[446f6ed](https://github.com/Nick2bad4u/Uptime-Watcher/commit/446f6ed5c44a1dd05e5d0816133d510c3490b0d7)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/216fdd9ffb745a5cdf2f80fb9245c8e8d26b1f45...446f6ed5c44a1dd05e5d0816133d510c3490b0d7))
+
+
+### ✨ Features
+
+- ✨ [feat] Implement site notification mute functionality
+ - 🛠️ [fix] Update SettingsSection component to use more descriptive interface names
+ - 🔧 [build] Integrate muted site notification identifiers into settings store
+ - ✨ [feat] Add mute/unmute button for site notifications in SettingsTab
+ - 📝 [docs] Update constants to reflect unlimited history retention logic
+ - ⚡ [perf] Refactor site monitoring actions to use async/await for better error handling
+ - 🧪 [test] Enhance tests for notification preferences synchronization and settings updates
+ - 🎨 [style] Clean up code formatting and improve readability across multiple files
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(baab69a)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/baab69a04788758ee330477adcf1162dbc126d1d)
+
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 19.2.0 [`(216fdd9)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/216fdd9ffb745a5cdf2f80fb9245c8e8d26b1f45)
+
+
+
+### 🔧 Build System
+
+- 🔧 [build] Update Build.yml to refine path ignore rules
+
+ - Adjusted path ignore settings to exclude shared and electron directories
+ - Removed specific ignore rules for CHANGELOG.md to ensure it is included in builds
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(446f6ed)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/446f6ed5c44a1dd05e5d0816133d510c3490b0d7)
+
+
+- 🔧 [build] Update linting configurations for improved analysis
+
+ - 🛠️ Adjust `lint:circular:shared` and `lint:madge:electron` scripts to include additional file extensions for better compatibility
+ - 🛠️ Modify `sonar.exclusions` to exclude specific Tailwind CSS modules from analysis
+ - 🛠️ Refine `sonar.inclusions` to restrict analysis to source and documentation files only
+ - 🛠️ Enhance `sonar.coverage.exclusions` to include CSS files in coverage reports
+ - 🛠️ Update `sonar.cpd.exclusions` to exclude specific Tailwind CSS directories from duplication detection
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(3151f24)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/3151f243628c90d7b48ce63055bbb9f301338da4)
+
+
+- 🔧 [build] Update package.json for improved build and linting processes
+ - 🛠️ Remove `build-storybook` command from the build scripts to streamline the build process
+ - 🧹 Reorganize type checking commands:
+   - Add `check-types`, `check-types:all`, and `check-types:all:all` back to the scripts for better type validation
+ - 🎨 Update linting commands:
+   - Modify `lint:format` to run `lint:prettier` for consistency in formatting checks
+   - Adjust `lint:prettier` and `lint:prettier-fix` to improve logging and disable autofix for multiline arrays
+ - 🔄 Update dependencies:
+   - [dependency] Update versions of `type-fest`, `@snyk/protect`, `@storybook/addon-designs`, `@types/node`, `@typescript-eslint/*`, `vite`, and others for better compatibility and features
+ - ⚡ Enhance linting and testing scripts:
+   - Add `lint-pretty` and `lint-pretty:fix` for improved linting output and fixes
+   - Introduce new scripts for spell checking and markdown link validation
+ - 📝 Update documentation scripts to ensure frontmatter validation and link checking are included
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(bde6359)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/bde6359be97670b7225bed742f21162df6469379)
+
+
+
+
+
+
+## [19.2.0] - 2025-12-08
+
+
+[[95f3aa7](https://github.com/Nick2bad4u/Uptime-Watcher/commit/95f3aa7ca783508d99ec60facbb772a714eb5f04)...
+[ba94cc6](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ba94cc68427605be82be1a2071febe16c69984f7)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/95f3aa7ca783508d99ec60facbb772a714eb5f04...ba94cc68427605be82be1a2071febe16c69984f7))
+
+
+### ✨ Features
+
+- ✨ [feat] Enhance various components and documentation
+
+ - 📝 [docs] Add comprehensive overview for Sites Store and State Sync
+ - 🔧 [build] Update tools in BeastMode agent for improved functionality
+ - 🛠️ [fix] Adjust preRestoreFileName type in SerializedDatabaseRestoreResult for clarity
+ - 🛠️ [fix] Improve validation logic in DataService for database restore operations
+ - 🛠️ [fix] Refine environment variables documentation for better understanding
+ - 🎨 [style] Clean up type guards and validation utilities for consistency
+ - 🛠️ [fix] Update NotificationPreferenceService to include runtime checks for better error handling
+ - 🧪 [test] Enhance monitor validation tests to ensure accurate type handling
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(ba94cc6)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ba94cc68427605be82be1a2071febe16c69984f7)
+
+
+- ✨ [feat] Enhance notification preferences validation and data handling
+ - 🛠️ Refactor `validateNotificationPreferences` to utilize `validateNotificationPreferenceUpdate` for improved validation logic
+ - 🔧 Introduce `notificationPreferenceUpdateSchema` for structured validation of notification preferences
+ - 🛠️ Update `NotificationPreferenceService` to validate preferences before updating, ensuring data integrity
+
+🚜 [refactor] Improve data service error handling and validation
+ - 🔧 Implement `runDataOperation` for consistent error handling across data operations
+ - 🛠️ Add `validateAndUnwrap` function to streamline validation of serialized database results
+ - ⚡ Enhance `DataService` methods to validate responses from IPC calls, ensuring they conform to expected schemas
+
+🧪 [test] Expand test coverage for data service and monitor types store
+ - 🛠️ Update tests to reflect changes in validation logic and error handling
+ - 🎨 Refactor tests for clarity and maintainability, ensuring they accurately reflect the new validation structure
+
+✨ [feat] Introduce comprehensive validation schemas for database operations
+ - 🔧 Add `dataSchemas.ts` to define schemas for serialized database backup and restore operations
+ - 🛠️ Implement validation functions for these schemas to ensure data integrity during operations
+
+🎨 [style] Clean up code formatting and comments for better readability
+ - ⚡ Remove unnecessary comments and improve inline documentation for clarity
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(de2f15a)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/de2f15aab6b010978b3d635e20963b18137ba9d6)
+
+
+- ✨ [feat] Enhance SQLite Backup and Restore Functionality
+ - 🛠️ Update `downloadSqliteBackup` to return detailed metadata including `appVersion`, `checksum`, `retentionHintDays`, and `schemaVersion`.
+ - 🛠️ Implement `restoreSqliteBackup` to provide comprehensive metadata upon restoring, ensuring consistency with backup metadata.
+ - 🔧 Modify `createMockSitesStore` and related mocks to include new metadata fields for backups and restores.
+ - 🧪 Add tests for `restoreSqliteBackup` in `DataService` to verify successful restoration and error handling.
+ - 🧪 Enhance existing tests across various services and stores to validate the new metadata structure in backup and restore operations.
+ - 🧪 Update Storybook mocks to reflect changes in backup and restore functionalities, ensuring accurate representation in UI components.
+ - 📝 Update IPC types to include new serialized structures for backup and restore operations, improving type safety and clarity.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(a29fc68)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/a29fc687b8de09eb61b505bd77af8da7e8322478)
+
+
+- ✨ [feat] Enhance database backup functionality and improve environment variable handling
+ - 🛠️ Update `DatabaseManager` to return a structured `DatabaseBackupResult` type from `downloadBackup` method, encapsulating backup data and metadata.
+ - 🛠️ Modify `DownloadBackupCommand` to utilize the new `DatabaseBackupResult` type, ensuring consistent data handling across the application.
+ - 🛠️ Refactor `DataBackupService` to return `DatabaseBackupResult` from `downloadDatabaseBackup`, improving type safety and clarity.
+ - 🛠️ Introduce `environment.ts` utility for safe access to environment variables, including methods for reading strings, booleans, and numbers.
+ - ⚡ Update various services and handlers to leverage the new environment variable utilities, enhancing code maintainability and readability.
+ - 🧪 Add comprehensive tests to validate the new backup metadata structure and ensure proper functionality of the updated methods.
+ - 🎨 Introduce `GalaxyBackground` component stories in Storybook for visual regression testing and design validation.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(90217b5)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/90217b55b4025ea04a590f709e17f820bcaaf42c)
+
+
+
+### 🛠️ Bug Fixes
+
+- 🛠️ [fix] Update WindowService test configuration and improve Add Site modal tests
+ - 🛠️ Adjust WindowService test to include sandbox option set to false
+ - 🛠️ Refactor Add Site modal tests for better readability and structure
+ - 🛠️ Increase timeout for server heartbeat validation test to 70 seconds
+ - 🛠️ Update WAIT_TIMEOUTS to extend LONG timeout from 10 seconds to 20 seconds
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(284fa7a)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/284fa7a35e6292ef75f74198acba8e690a9f9edb)
+
+
+- 🛠️ [fix] Update IPC context handling in state sync and system APIs
+ - 🔧 Refactor correlation envelope matcher to ipcContext for consistency in stateSyncApi tests
+ - 🔧 Adjust tests to use ipcContext in systemApi tests for better clarity and maintainability
+
+🛠️ [fix] Improve database backup tests for better error handling and metadata validation
+ - 🔧 Simplify binary data initialization in databaseBackup tests for readability
+ - 🔧 Enhance error handling in createDatabaseBackup tests to throw specific errors
+ - 🔧 Ensure metadata validation includes checksum and schema version in databaseBackup tests
+
+🧪 [test] Enhance IPC service tests with accurate backup metadata
+ - 🔧 Update mock backup metadata to include checksum and sizeBytes for consistency
+ - 🔧 Validate metadata structure in IpcService tests to ensure correctness
+
+🧪 [test] Refactor monitor scheduler tests for better delay tolerance checks
+ - 🔧 Introduce expectDelayWithinTolerance function to validate delay timings in MonitorScheduler tests
+ - 🔧 Update assertions to use the new delay tolerance checks for improved accuracy
+
+🧪 [test] Improve notification service tests with better mock implementations
+ - 🔧 Refactor notification mock to improve clarity and maintainability in NotificationService tests
+
+🧪 [test] Enhance data backup service tests with detailed error logging
+ - 🔧 Update error messages in DataBackupService tests to provide clearer context on failures
+
+🧪 [test] Add utility functions for serialized backup and restore results
+ - ✨ Introduce createSerializedBackupResult and createSerializedRestoreResult utilities for consistent test data generation
+
+🧪 [test] Update site sync tests to include lastBackupMetadata handling
+ - 🔧 Ensure lastBackupMetadata is correctly initialized and validated in useSiteSync tests
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(b6e9b73)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b6e9b736712ae64797c98e63b91f63c90aefdf81)
+
+
+- 🛠️ [fix] Improve type guard functions and tests
+ - 🔧 Update `isPositiveNumber` to check for finite values, ensuring it returns false for `Infinity`
+ - 🔧 Modify `isSerializedDatabaseBackupResult` to return true if `metadata` is undefined
+ - 🔧 Refactor type guard tests to simplify array checks, removing unnecessary multiline formatting
+ - 🔧 Enhance `hasProperties` checks in tests for better readability
+ - 🔧 Adjust `toIsoStringSafe` function to handle invalid dates gracefully in IPC tests
+ - 🔧 Update environment utility to allow testing overrides for process snapshots
+ - 🔧 Ensure `isNonNullObject` and `isObject` return false for arrays, improving type safety
+ - 🔧 Fix various test cases to ensure they accurately reflect expected behavior for type guards
+ - 🔧 Clean up console error handling in test setup to suppress CSS parse warnings more effectively
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(05dabb3)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/05dabb3d25e490f6d993087acb5124e2e9dee21d)
+
+
+
+### 📦 Dependencies
+
+- [chore] Merge Branch 'main' of https://github.com/nick2bad4u/uptime-watcher
+
+* 'main' of https://github.com/nick2bad4u/uptime-watcher:
+  test[docusaurus](deps): [dependency] Update the npm-all group
+  [ci][skip-ci](deps): [dependency] Update dependency group
+  test(deps): [dependency] Update express
+  test[docusaurus](deps): [dependency] Update mdast-util-to-hast
+  test(deps): [dependency] Update mdast-util-to-hast 13.2.1 [`(8173893)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/8173893c94d2ee524ad775fe4abbe0ce3ac29c26)
+
+
+- *(deps)* [dependency] Update the npm-all group [`(e879f18)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/e879f18429503a2203aca37c404b8a32106ceeaf)
+
+
+- *(deps)* [dependency] Update dependency group [`(c3b4c20)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c3b4c208d0febb7543762e697f5ddd1e715f4381)
+
+
+- *(deps)* [dependency] Update express [`(5e56853)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5e56853c18ef10580db6809b584a0b346767dfcc)
+
+
+- *(deps)* [dependency] Update mdast-util-to-hast 13.2.1 [`(3653039)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/36530397429019fa1f4854b8498b3cba6fed28ef)
+
+
+- *(deps)* [dependency] Update mdast-util-to-hast [`(2965170)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/29651700fce7f89b2dc6c156cd91174afad9d1a9)
+
+
 - [dependency] Update version 19.1.0 [`(95f3aa7)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/95f3aa7ca783508d99ec60facbb772a714eb5f04)
+
+
+
+### 🛠️ Other Changes
+
+- Merge PR #115
+
+test(deps): [dependency] Update mdast-util-to-hast 13.2.1 [`(96ab7cc)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/96ab7ccb8edceb41b5f79f242ac78b36e0935821)
+
+
+- Merge PR #116
+
+test[docusaurus](deps): [dependency] Update mdast-util-to-hast 13.2.1 in /docs/docusaurus [`(7bf1eb5)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7bf1eb50b10b02a196b6a55b1b208cab81d110c2)
+
+
+
+### 🚜 Refactor
+
+- 🚜 [refactor] Decompose UptimeOrchestrator into specialized coordinators
+
+This commit introduces a major refactoring of the `UptimeOrchestrator` to improve modularity, separation of concerns, and maintainability. Its core responsibilities have been delegated to new, specialized coordinator classes.
+
+### 🚜 [refactor] Orchestrator Decomposition
+- Extracts business logic from `UptimeOrchestrator` into three new coordinators:
+    - 🔀 `SiteLifecycleCoordinator`: Manages the lifecycle of sites and monitors (add, remove, delete all). Encapsulates transactional logic with compensation for failures.
+    - 🔄 `MonitoringLifecycleCoordinator`: Handles the state of monitoring operations (start, stop, restart, resume, manual checks).
+    - 💾 `SnapshotSyncCoordinator`: Orchestrates state synchronization, cache updates, and snapshot management between processes.
+- The `UptimeOrchestrator` now acts as a high-level conductor, wiring together managers and coordinators and delegating tasks.
+
+### 🚜 [refactor] IPC Handler Organization
+- Decomposes the monolithic IPC handler setup in `IpcService` into domain-specific registration functions.
+- Each functional area (sites, monitoring, data, settings, etc.) now has its own handler registration file in `electron/services/ipc/handlers/`, making the `IpcService` cleaner and easier to manage.
+
+### 🚜 [refactor] Monitor Checking Strategy
+- Introduces the Strategy pattern for executing monitor checks in `EnhancedMonitorChecker`.
+- Creates a `MonitorStrategyRegistry` to map monitor types to their corresponding check service implementations.
+- Implements `MonitorOperationCoordinator` to centralize the logic for initiating, tracking, and timing out monitor check operations.
+
+### 📝 [docs] Update Project Documentation
+- Updates dependency locks and versions for the Docusaurus documentation site.
+- Corrects documentation to reflect the refactoring of validation schemas into separate `siteSchemas` and `monitorSchemas` files.
+
+### 🎨 [style] Refine Prettier Configuration
+- Moves Prettier plugin definitions from the global scope into file-specific `overrides`. This ensures plugins only operate on relevant file types, improving performance and accuracy.
+- Adds new overrides for SQL, Shell, Properties, and INI files.
+- Removes the `prettier-plugin-multiline-arrays` plugin.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(e8fb7f0)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/e8fb7f0c945c8378e59f335bd1efac012e7fdba4)
+
+
+- 🚜 [refactor] Overhaul application-wide TypeScript typings
+
+This commit introduces a massive, systematic refactoring to strengthen TypeScript typings across the entire application, guided by a comprehensive typing audit. The primary goal is to eliminate or tightly constrain `any`, `unknown`, and `UnknownRecord` types in favor of specific, branded, and validated types, thereby improving code safety, maintainability, and developer experience.
+
+✨ [feat] Core System Enhancements
+ - 🚌 **Typed Event Bus**
+   - Enforces `EventPayloadValue` so all event payloads are primitives, plain objects, or arrays, preventing emission of functions, class instances, and other non-serializable values.
+   - Defensively clones array/object payloads before emission so no listener can mutate shared state seen by other listeners.
+   - Attaches metadata (`_meta`, `_originalMeta`) as non-enumerable properties on payloads, preserving payload shape while still enabling correlation and tracing across processes.
+   - Passes a fully typed middleware context (including event name, payload type, correlation metadata, and bus identifiers) into all event middleware, improving safety for rate limiting, logging, and diagnostics.
+
+✨ [feat] Branded & Validated Types
+ - 🏷️ **Branded Units & IDs**
+   - Introduces branded units such as `TimeoutMilliseconds` and `CheckIntervalMilliseconds` plus helpers that enforce shared min/max constraints at runtime, ensuring safe time-based configuration everywhere.
+   - Adds a branded `CorrelationId` type and `generateCorrelationId()` utility in the Electron layer so event bus metadata uses strong, non-guessable IDs instead of arbitrary strings.
+   - Adds an internal branded `OperationId` type for operational hooks, ensuring operation identifiers are only produced by the dedicated generator while remaining fully compatible with logging and JSON.
+   - Uses composable utility patterns like “require-all-or-none” / “require-at-least-one” to model invariants on complex configuration objects and reduce invalid partial states.
+
+✨ [feat] Error Handling & Serialization
+ - ⚙️ **Consistent Error Serialization**
+   - Enhances `errorSerialization` helpers so all thrown `unknown` values are normalized into a `SerializedError` shape, which is then used consistently across logs, IPC responses, and tests.
+   - Tightens `jsonSafety` around `JsonValue` / `Jsonifiable` unions, ensuring only JSON-safe values flow into serialization helpers and that non-serializable values produce clear error/fallback results.
+
+✨ [feat] Operational Hooks & Context
+ - 🪝 **Typed Operational Context**
+   - Introduces a branded `OperationalHookContext` that carries immutable, typed metadata through `withOperationalHooks` and `withDatabaseOperation`, reducing reliance on ad-hoc `Record<string, unknown>` blobs.
+   - Strengthens lifecycle telemetry for retries, failures, and completions by threading `OperationId`, duration, log level, and context through typed helper functions and centralized logging logic.
+
+🚜 [refactor] Electron & Shared Code Refactoring
+ - 💾 **Database Interactions**
+   - Adds type-safe query helpers (`querySiteRows`, `querySiteRow`, `queryMonitorRows`, `queryMonitorRow`, `queryHistoryRows`, `queryHistoryRow`, `querySettingsRows`, `querySettingsRow`) that validate SQLite rows using shared guards (`isValidSiteRow`, `isValidMonitorRow`, `isValidSettingsRow`, `isValidHistoryRow`) instead of scattered `as` casts.
+   - Introduces `RowValidationOptions` plus `ensureValidRow` / `ensureValidRows` utilities to centralize row validation, provide better error messages, and reduce duplicated validation logic across repositories.
+   - Narrows helper result types such as `CountResult` and `IdOnlyResult` from `UnknownRecord` to concrete `{ count: number }` / `{ id: number }` interfaces so callers cannot accidentally rely on undeclared fields.
+   - Normalizes legacy monitor schemas (e.g. `monitor_id`, `monitor_type`, `timeout_ms`, `interval_ms`) into the canonical `MonitorRow` shape before validation, allowing older migrations to coexist with stricter current typings.
+
+ - 🧱 **Monitor Mapping & Dynamic Schema**
+   - Refactors `dynamicSchema` and `monitorMapper` to use structured field-mapping helpers for standard and dynamic fields, reducing error-prone manual key juggling.
+   - Replaces ad-hoc `Number(...)` conversions with `safeInteger` and explicit bounds for `checkInterval`, `timeout`, `responseTime`, and `retryAttempts`, preventing NaN or out-of-range numeric values from leaking into domain models.
+   - Validates `activeOperations` by parsing JSON and guarding with `isValidIdentifierArray`, logging warnings and falling back to an empty array whenever data is malformed or unsafe.
+
+ - 📡 **IPC System**
+   - Enforces typed IPC handlers through `IpcInvokeChannel`, `IpcInvokeChannelParams`, and `IpcInvokeChannelResult`, so Electron main handlers no longer rely on manual parameter/result casting.
+   - Centralizes validation using `IpcValidators` (`requiredString`, `requiredNumber`, `requiredBoolean`, `requiredObject`, `requiredUrl`, etc.) and `withIpcHandlerValidation`, ensuring all handlers return a consistent `IpcResponse<T>` envelope on success or failure.
+   - Introduces `IpcHandlerMetadata` to capture diagnostics (channel name, duration, param count, validation errors) in a structured, typed way, while keeping the public `IpcResponse.metadata` as a generic `UnknownRecord` for flexibility.
+   - Adds shared diagnostics log metadata types (`IpcHandlerVerificationLogMetadata`, `PreloadGuardDiagnosticsLogMetadata`) in ipc.ts and uses them in `IpcService` for structured logging of missing handlers and preload guard failures.
+   - Keeps diagnostics payload types (`IpcHandlerVerificationResult`, `PreloadGuardDiagnosticsReport`, `IpcDiagnosticsEvent`) in the shared IPC module as the single source of truth for diagnostics contracts consumed by main, preload, and renderer.
+
+ - 🩺 **Monitoring Services**
+   - Standardizes monitor configuration via `MonitorServiceConfig` (derived from shared `Monitor` types) so all monitor implementations (HTTP, ping, ports, DNS, SSL, latency, etc.) consume a unified configuration contract.
+   - Aligns `EnhancedMonitorChecker` and related monitoring services with shared types for status updates, history entries, and operation metadata, reducing divergence between renderer, Electron, and shared layers.
+   - Routes monitor validation through shared schema helpers and consistent status update structures, ensuring invalid configurations are caught early and reported with typed metadata.
+
+ - 📊 **Events & Metadata Forwarding**
+   - Wires the typed event bus, middleware, and metadata-forwarding utilities to use shared `EventMetadata` plus the new branded `CorrelationId` end-to-end.
+   - Strengthens `eventMetadataSchema` with a dedicated `correlationId` Zod schema that accepts strings and brands them as `CorrelationId` in TypeScript, preserving runtime JSON behavior while satisfying strict typing.
+   - Ensures forwarded event payloads carefully strip and reattach metadata (`_meta`, `_originalMeta`) in a controlled manner, preserving original emission context while updating forwarded event names and timestamps.
+
+🎨 [style] Frontend & UI Improvements
+ - 🐻 **Zustand & Site/Monitor Stores**
+   - Refactors site and monitor Zustand slices to use shared typed identifiers and snapshot overlays instead of loose `Record<string, unknown>` maps, improving safety for optimistic updates and synchronization.
+   - Introduces typed operation-helper contexts for site operations (base/pending/success/failure metadata), making it easier for UI code to reason about operation state without ad-hoc context objects.
+
+ - ⚛️ **Component & Hook Typing**
+   - Replaces generic `Record<string, unknown>` and raw `string` props in key components and hooks with shared domain types (e.g. monitor form data, site snapshots, status helpers), reducing duplication and drift.
+   - Ensures theme and status utilities (`useTheme`, status icon/color helpers) consume shared status enums and theme configuration types, keeping the renderer aligned with shared configuration models.
+
+📝 [docs] Documentation and Audits
+ - 📜 **Typing Audit Artifacts**
+   - Adds/updates `TYPING_AUDIT_HISTORY.md` with a detailed record of the typing audit: what was tightened, what remains intentionally generic, and where future refactors are planned (e.g. splitting `IpcService` and decomposing `EnhancedMonitorChecker`).
+   - Documents new branded types (`CorrelationId`, `TimeoutMilliseconds`, etc.) and shared helper modules (`jsonSafety`, `siteSnapshots`, type guards, units) so future contributors understand the invariants enforced by this refactor.
+
+ - 💅 **Supporting Docs & Examples**
+   - Updates ADR examples to reflect the new event bus middleware and rate limiting APIs.
+   - Keeps developer-facing documentation in sync with the stricter typed IPC and monitoring contracts now enforced across the stack.
+
+🧪 [test] Test Suite Modernization
+ - 🔬 **Typed Test Data & Fuzzing**
+   - Updates dozens of unit, integration, and fuzz tests to use the new typed event payloads, IPC contracts, and monitor configurations (`MonitorServiceConfig`, `EventMetadata`, `IpcResponse`) as first-class citizens instead of untyped fixtures.
+   - Aligns JSON fuzz/property tests with *actual* JSON semantics for edge cases like `-0` vs `0` by comparing against `JSON.parse(JSON.stringify(sample))` (the normalized JSON representation) rather than the raw sample, ensuring helpers behave like native JSON rather than asserting impossible invariants.
+   - Fixes the `safeParseCheckInterval` fuzz property to match real runtime semantics:
+     - Intervals are truncated to integer milliseconds,
+     - Values are clamped to `MAX_TIMEOUT_MILLISECONDS`,
+     - Non-finite values (e.g. `Infinity`, `-Infinity`) fall back to the provided default instead of leaking invalid numbers into the system.
+   - Strengthens IPC and diagnostics tests to account for branded IDs and structured metadata, verifying that correlation IDs, handler diagnostics, and preload guard reports preserve their fully typed shapes through logging and IPC round-trips.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(3e34403)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/3e34403589d8dbbd436473401a7d17434e845c70)
+
+
+
+### 📝 Documentation
+
+- 📝 [docs] Update ADR-011 and ADR-013 documentation
+
+ - 📝 [docs] Enhance ADR-011 with detailed explanations on jitter/backoff benefits:
+   - **Thundering herd avoidance**: Staggered start times to reduce network/CPU spikes.
+   - **Flapping mitigation**: Backoff strategy to temper rapid retries on down hosts.
+   - **Timeout recovery**: Prevent overlapping checks with timeout-aware cancellation.
+   - **Manual check coexistence**: Backoff reconciles next-run after manual overrides.
+   - **Resource fairness**: Spreading load during incident storms.
+
+ - 📝 [docs] Revise ADR-013 to reflect changes in backup metadata:
+   - Updated `last_reviewed` date to "2025-12-05".
+   - Changed status from "Draft" to "Accepted".
+   - Expanded implementation details for backup and restore processes:
+     - Embed additional metadata fields in backups for validation and user guidance.
+     - Documented validation steps and manual recovery processes for corrupted backups.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(50d4df9)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/50d4df99f0817a3675f740c2f877f263739b1ef8)
+
+
+- 📝 [docs] Update prompt metadata for consistency and clarity
+ - 🔧 [build] Standardize agent names across all prompts to "BeastMode"
+ - 📝 [docs] Update argument hints and descriptions for clarity in prompts
+ - 🛠️ [fix] Correct prompt names to ensure consistency in naming conventions
+ - 🎨 [style] Improve formatting and organization of prompt files for better readability
+
+🔧 [build] Update package version and dependencies
+ - 🔧 [build] [dependency] Update version 19.1.0
+ - 🧹 [chore] Add new dependencies: gray-matter and yaml for frontmatter processing
+ - 🛠️ [fix] Update package-lock.json to reflect new dependencies and versions
+
+🧹 [chore] Add scripts for sorting frontmatter in markdown files
+ - ✨ [feat] Implement sort-frontmatter.mjs to reorder frontmatter keys
+ - ✨ [feat] Create sort-frontmatter-all.mjs to process multiple markdown files
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(2ca2f62)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/2ca2f6210a42343a36be54eef7bbc3f634221885)
+
+
+
+### 🧹 Chores
+
+- Update changelogs for v19.1.0 [skip ci] [`(0b105d6)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/0b105d6214042fd51fa754771a6a429e3190ca24)
+
+
+
+### 🔧 Build System
+
+- 🔧 [build] Update dependencies and configuration
+
+ - 🔧 Update `@awmottaz/prettier-plugin-void-html` from `^1.10.0` to `^2.0.0` in `package.json` and `package-lock.json`
+ - 🔧 Update `@fast-check/vitest` from `^0.2.3` to `^0.2.4` in `package.json` and `package-lock.json`
+ - 🔧 Update `markdown-to-jsx` from `^9.3.0` to `^9.3.2` in `package.json` and `package-lock.json`
+ - 🔧 Update `stylelint-use-nesting` from `^6.0.0` to `^6.0.1` in `package.json` and `package-lock.json`
+ - 🔧 Update `eslint-plugin-boundaries` from `^5.3.0` to `^5.3.1` in `package.json` and `package-lock.json`
+ - 🔧 Update `eslint-plugin-jsdoc` from `^61.4.1` to `^61.4.2` in `package.json` and `package-lock.json`
+ - 🔧 Update `fast-check` from `^4.3.0` to `^4.4.0` in `package.json` and `package-lock.json`
+ - 🔧 Update `typedoc-plugin-dt-links` from `^2.0.31` to `^2.0.32` in `package.json` and `package-lock.json`
+ - 🎨 Update `.prettierrc` to include `escapeNonLatin1` option under `properties` file options
+ - 🛠️ Modify `WindowService.ts` to set `sandbox` to `false` for full Node built-ins access
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(26bca1e)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/26bca1eaea6173d24a27a5f1ecc49a9f39f447eb)
+
+
+- 🔧 [build] Update dependencies in package.json
+ - 📦 Upgrade `node-sqlite3-wasm` from `0.8.51` to `0.8.52`
+ - 📦 Upgrade `react` and `react-dom` from `19.2.0` to `19.2.1`
+ - 📦 Upgrade `@awmottaz/prettier-plugin-void-html` from `1.9.0` to `1.10.0`
+ - 📦 Upgrade `@eslint-react/eslint-plugin` from `2.3.11` to `2.3.12`
+ - 📦 Upgrade `@storybook/addon-*` packages from `10.1.3` to `10.1.4`
+ - 📦 Upgrade `electron` from `39.2.4` to `39.2.5`
+ - 📦 Upgrade `eslint-plugin-es-x` from `9.2.0` to `9.3.0`
+ - 📦 Upgrade `eslint-plugin-putout` from `29.0.1` to `29.0.2`
+ - 📦 Upgrade `eslint-plugin-react-dom` from `2.3.11` to `2.3.12`
+ - 📦 Upgrade `markdownlint` from `0.39.0` to `0.40.0`
+ - 📦 Upgrade `putout` from `40.15.1` to `41.0.0`
+ - 📦 Upgrade `storybook` from `10.1.3` to `10.1.4`
+ - 📦 Upgrade `yaml-eslint-parser` from `1.3.1` to `1.3.2`
+ - 📦 Upgrade `prettier-plugin-multiline-arrays` from `4.0.4` to `4.0.5`
+
+🛠️ [fix] Refactor environment test utility
+ - 🔄 Simplify the way `versions` are assigned in `environment.comprehensive.test.ts` by directly using `overrides.versions` instead of a fallback.
+
+🚜 [refactor] Clean up stateSync.ts
+ - 🔄 Remove unnecessary array declarations for `STATE_SYNC_SOURCE_VALUES` and `STATE_SYNC_ACTION_VALUES` to improve readability.
+
+📝 [docs] Enhance ThemeName type documentation
+ - 📜 Add detailed comments to `ThemeName` and introduce `THEME_NAMES` array for runtime validation in `types.ts`.
+
+🎨 [style] Adjust GalaxyBackground story metadata
+ - ✏️ Remove redundant title property from `GalaxyBackground` story in `GalaxyBackground.stories.tsx`.
+
+🧪 [test] Improve theme handling in Settings component
+ - 🔄 Change theme handling to use `ThemeName` type for better type safety in `Settings.tsx`.
+ - 🔄 Add runtime guard to validate theme names in `handleThemeSelectChange`.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(b2a4749)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b2a4749f197120534b21622f653878cef325d12a)
+
+
+- 🔧 [build] Enhance BeastMode agent prompts for thorough task completion
+
+ - Updated the 'Continue[No-Prompt]' prompt to emphasize the importance of completing tasks thoroughly and according to best practices, avoiding shortcuts.
+ - Adjusted the tools list to include wildcard entries for better flexibility in task execution.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(076eb33)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/076eb33e009ca60e6e4bd782ac4fe87ed8ec2c8c)
 
 
 
