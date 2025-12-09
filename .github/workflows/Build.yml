@@ -118,7 +118,6 @@ jobs:
                     - windows-latest
                     - macos-15
                     - macos-latest
-                    - macos-13
 
                 arch: [x64, ia32, arm64]
                 exclude:
