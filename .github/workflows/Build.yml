@@ -14,8 +14,8 @@ on:
             - "*"
             - "*/**"
             - "!src/**"
-            - "**/CHANGELOG.md"
-            - "CHANGELOG.md"
+            - "!shared/**"
+            - "!electron/**"
     workflow_dispatch:
         inputs:
             branch:
