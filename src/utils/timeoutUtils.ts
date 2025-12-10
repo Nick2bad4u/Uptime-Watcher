@@ -120,9 +120,15 @@ export function timeoutMsToSeconds(timeoutMs: number): number {
  * @public
  */
 export function getTimeoutSeconds(monitorTimeout?: number): number {
-    return monitorTimeout
-        ? timeoutMsToSeconds(monitorTimeout)
-        : DEFAULT_REQUEST_TIMEOUT_SECONDS;
+    if (
+        typeof monitorTimeout !== "number" ||
+        !Number.isFinite(monitorTimeout) ||
+        monitorTimeout <= 0
+    ) {
+        return DEFAULT_REQUEST_TIMEOUT_SECONDS;
+    }
+
+    return timeoutMsToSeconds(monitorTimeout);
 }
 
 /**

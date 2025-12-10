@@ -130,10 +130,6 @@ jobs:
                       arch: ia32
                     - os: macos-15
                       arch: x64
-                    - os: macos-13
-                      arch: ia32
-                    - os: macos-13
-                      arch: arm64
                     # Exclude Ubuntu with ia32 and arm64 architectures as they are not commonly used and not officially supported except for ubuntu-24.04-arm/arm64
                     - os: ubuntu-latest
                       arch: ia32
@@ -274,8 +270,6 @@ jobs:
                     npx electron-builder --config electron-builder.config.ts --arm64
                   elif [[ "${{ matrix.os }}" == "macos-latest" ]]; then
                     npx electron-builder --config electron-builder.config.ts --universal
-                  elif [[ "${{ matrix.os }}" == "macos-13" ]]; then
-                    npx electron-builder --config electron-builder.config.ts --mac --${{ matrix.arch }}
                   elif [[ "${{ matrix.os }}" == "windows-latest" ]]; then
                     if [[ "${{ matrix.arch }}" == "x64" ]]; then
                       npx electron-builder --config electron-builder.config.ts --win

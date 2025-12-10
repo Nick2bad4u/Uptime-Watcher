@@ -22,6 +22,7 @@ import {
 } from "@shared/validation/dataSchemas";
 
 import { getIpcServiceHelpers } from "./utils/createIpcServiceHelpers";
+import { validateServicePayload } from "./utils/validation";
 
 const { ensureInitialized, wrap } = ((): ReturnType<
     typeof getIpcServiceHelpers
@@ -44,35 +45,6 @@ const { ensureInitialized, wrap } = ((): ReturnType<
         throw ensureError(error);
     }
 })();
-const hasIssueArray = (
-    value: unknown
-): value is { issues: Array<{ message: string }> } =>
-    typeof value === "object" &&
-    value !== null &&
-    "issues" in value &&
-    Array.isArray((value as { issues?: unknown }).issues);
-
-function validateAndUnwrapPayload<T>(
-    operation: string,
-    validate: (
-        value: unknown
-    ) => { data: T; success: true } | { error: unknown; success: false },
-    value: unknown
-): T {
-    const parsed = validate(value);
-    if (!parsed.success) {
-        const { error } = parsed as { error: unknown; success: false };
-        const issues = hasIssueArray(error) ? error.issues : [];
-        const messages = issues.map((issue) => issue.message).join(", ");
-        throw new Error(
-            `[MonitorTypesService] ${operation} returned invalid payload: ${messages}`,
-            { cause: error }
-        );
-    }
-
-    const success = parsed as { data: T; success: true };
-    return success.data;
-}
 
 interface MonitorTypesServiceContract {
     formatMonitorDetail: (type: string, details: string) => Promise<string>;
@@ -192,10 +164,13 @@ export const MonitorTypesService: MonitorTypesServiceContract = {
         "getMonitorTypes",
         async (api): Promise<MonitorTypeConfig[]> => {
             try {
-                return validateAndUnwrapPayload(
-                    "getMonitorTypes",
+                return validateServicePayload(
                     validateMonitorTypeConfigArray,
-                    await api.monitorTypes.getMonitorTypes()
+                    await api.monitorTypes.getMonitorTypes(),
+                    {
+                        operation: "getMonitorTypes",
+                        serviceName: "MonitorTypesService",
+                    }
                 );
             } catch (error: unknown) {
                 throw ensureError(error);
@@ -238,10 +213,13 @@ export const MonitorTypesService: MonitorTypesServiceContract = {
         "validateMonitorData",
         async (api, type: string, data: unknown): Promise<ValidationResult> => {
             try {
-                const parsed = validateAndUnwrapPayload(
-                    "validateMonitorData",
+                const parsed = validateServicePayload(
                     validateValidationResult,
-                    await api.monitorTypes.validateMonitorData(type, data)
+                    await api.monitorTypes.validateMonitorData(type, data),
+                    {
+                        operation: "validateMonitorData",
+                        serviceName: "MonitorTypesService",
+                    }
                 );
 
                 return {

@@ -181,7 +181,18 @@ export class ThemeManager {
             return themes[systemPreference];
         }
 
-        /* eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- name is validated as ThemeName, safe to use as themes key */
+        // Defensive fallback: if the provided theme name does not correspond
+        // to a concrete theme entry (for example a stale or experimental
+        // value such as "custom"), fall back to the system preference instead
+        // of returning an incomplete theme. This prevents corrupted
+        // configuration from breaking rendering while keeping the set of
+        // selectable themes driven by the concrete `themes` registry.
+        if (!(name in themes)) {
+            const systemPreference = this.getSystemThemePreference();
+            return themes[systemPreference];
+        }
+
+        /* eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- name is validated as ThemeName or falls back above, safe to use as themes key */
         return themes[name as keyof typeof themes];
     }
 

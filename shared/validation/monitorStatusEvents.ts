@@ -13,6 +13,7 @@ import type { MonitorStatusChangedEventData } from "@shared/types/events";
 import type { UnknownRecord } from "type-fest";
 
 import { isRecord } from "@shared/utils/typeHelpers";
+
 import { validateStatusUpdate } from "./guards";
 
 const isUnknownRecord = (value: unknown): value is UnknownRecord =>

@@ -5,6 +5,7 @@
 /* eslint-disable ex/no-unhandled -- Monitor factory construction is deterministic and safe */
 
 import type { Monitor } from "@shared/types";
+
 import { isRecord } from "@shared/utils/typeHelpers";
 
 import type { MonitorServiceConfig } from "./types";

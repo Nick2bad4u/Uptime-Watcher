@@ -7,11 +7,11 @@ import type {
 import type { UnknownRecord } from "type-fest";
 
 import { generateCorrelationId } from "@shared/utils/correlation";
-import { isRecord as isSharedRecord } from "@shared/utils/typeHelpers";
 import {
     normalizeLogValue,
     withLogContext,
 } from "@shared/utils/loggingContext";
+import { isRecord as isSharedRecord } from "@shared/utils/typeHelpers";
 
 import type { UptimeEvents } from "../../../events/eventTypes";
 import type { TypedEventBus } from "../../../events/TypedEventBus";

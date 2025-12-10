@@ -20,14 +20,7 @@ import {
 } from "@shared/validation/dataSchemas";
 
 import { getIpcServiceHelpers } from "./utils/createIpcServiceHelpers";
-
-const hasIssueArray = (
-    value: unknown
-): value is { issues: Array<{ message: string }> } =>
-    typeof value === "object" &&
-    value !== null &&
-    "issues" in value &&
-    Array.isArray((value as { issues?: unknown }).issues);
+import { validateServicePayload } from "./utils/validation";
 
 const runDataOperation = async <T>(
     operation: string,
@@ -39,49 +32,6 @@ const runDataOperation = async <T>(
         undefined,
         true
     );
-
-function validateAndUnwrap<T>(
-    operation: string,
-    validate: (
-        value: unknown
-    ) => { data: T; success: true } | { error: unknown; success: false },
-    value: unknown,
-    diagnostics?: Record<string, unknown>
-): T {
-    const parsed: ReturnType<typeof validate> = ((): ReturnType<
-        typeof validate
-    > => {
-        try {
-            return validate(value);
-        } catch (error: unknown) {
-            const diagnosticSuffix = diagnostics
-                ? ` | diagnostics=${JSON.stringify(diagnostics)}`
-                : "";
-            throw new Error(
-                `[DataService] ${operation} threw during validation${diagnosticSuffix}`,
-                { cause: error }
-            );
-        }
-    })();
-
-    if (!parsed.success) {
-        const { error: parseError } = parsed as {
-            error: unknown;
-            success: false;
-        };
-        const issues = hasIssueArray(parseError) ? parseError.issues : [];
-        const messages = issues.map((issue) => issue.message).join(", ");
-        const diagnosticSuffix = diagnostics
-            ? ` | diagnostics=${JSON.stringify(diagnostics)}`
-            : "";
-        throw new Error(
-            `[DataService] ${operation} returned invalid payload: ${messages}${diagnosticSuffix}`,
-            { cause: parseError }
-        );
-    }
-
-    return parsed.data;
-}
 
 interface DataServiceContract {
     readonly downloadSqliteBackup: () => Promise<SerializedDatabaseBackupResult>;
@@ -119,10 +69,13 @@ export const DataService: DataServiceContract = {
     downloadSqliteBackup: wrap("downloadSqliteBackup", async (api) =>
         runDataOperation("downloadSqliteBackup", async () => {
             try {
-                return validateAndUnwrap(
-                    "downloadSqliteBackup",
+                return validateServicePayload(
                     validateSerializedDatabaseBackupResult,
-                    await api.data.downloadSqliteBackup()
+                    await api.data.downloadSqliteBackup(),
+                    {
+                        operation: "downloadSqliteBackup",
+                        serviceName: "DataService",
+                    }
                 );
             } catch (error: unknown) {
                 throw ensureError(error);
@@ -171,12 +124,15 @@ export const DataService: DataServiceContract = {
                     // without reshaping. Callers can treat the absence of the
                     // property and an explicit `undefined` value equivalently
                     // when displaying restore summaries.
-                    return validateAndUnwrap<SerializedDatabaseRestoreResult>(
-                        "restoreSqliteBackup",
+                    return validateServicePayload<SerializedDatabaseRestoreResult>(
                         validateSerializedDatabaseRestoreResult,
                         await api.data.restoreSqliteBackup(payload),
                         {
-                            payloadFileName: payload.fileName,
+                            diagnostics: {
+                                payloadFileName: payload.fileName,
+                            },
+                            operation: "restoreSqliteBackup",
+                            serviceName: "DataService",
                         }
                     );
                 } catch (error: unknown) {

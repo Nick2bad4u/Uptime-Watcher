@@ -146,6 +146,15 @@ export interface UseSiteDetailsResult {
     timeoutChanged: boolean;
 }
 
+interface MonitorEditState {
+    readonly intervalChanged: boolean;
+    readonly retryAttemptsChanged: boolean;
+    readonly timeoutChanged: boolean;
+    readonly userEditedCheckInterval?: number | undefined;
+    readonly userEditedRetryAttempts?: number | undefined;
+    readonly userEditedTimeout?: number | undefined;
+}
+
 /**
  * Executes a site-details operation and logs failures without rethrowing.
  *
@@ -285,25 +294,40 @@ export function useSiteDetails({
 
     const isMonitoring = selectedMonitor ? selectedMonitor.monitoring : false;
 
-    // Check interval state - track user edits separately from monitor defaults
-    const [userEditedCheckInterval, setUserEditedCheckInterval] =
-        useState<number>();
-    const [intervalChanged, setIntervalChanged] = useState(false);
+    // Per-monitor edit state so that unsaved edits do not bleed across
+    // monitors and we do not rely on effects to reset local state.
+    const [monitorEditStateById, setMonitorEditStateById] = useState<
+        Record<string, MonitorEditState>
+    >({});
+
+    const effectiveMonitorId = selectedMonitorId;
+    const editStateForSelectedMonitor: MonitorEditState = (effectiveMonitorId
+        ? monitorEditStateById[effectiveMonitorId]
+        : undefined) ?? {
+        intervalChanged: false,
+        retryAttemptsChanged: false,
+        timeoutChanged: false,
+    };
+
+    const {
+        intervalChanged,
+        retryAttemptsChanged,
+        timeoutChanged,
+        userEditedCheckInterval,
+        userEditedRetryAttempts,
+        userEditedTimeout,
+    } = editStateForSelectedMonitor;
+
     const localCheckInterval =
         userEditedCheckInterval ??
         selectedMonitorCheckInterval ??
         DEFAULT_CHECK_INTERVAL;
 
     // Timeout state (stored in seconds for UI, converted to ms when saving)
-    const [userEditedTimeout, setUserEditedTimeout] = useState<number>();
-    const [timeoutChanged, setTimeoutChanged] = useState(false);
     const localTimeout =
         userEditedTimeout ?? getTimeoutSeconds(selectedMonitorTimeout);
 
     // Retry attempts state - track user edits separately from monitor defaults
-    const [userEditedRetryAttempts, setUserEditedRetryAttempts] =
-        useState<number>();
-    const [retryAttemptsChanged, setRetryAttemptsChanged] = useState(false);
     const localRetryAttempts =
         userEditedRetryAttempts ??
         selectedMonitorRetryAttempts ??
@@ -314,21 +338,6 @@ export function useSiteDetails({
 
     // Derived state: computed during render
     const hasUnsavedChanges = localName !== currentSite.name;
-
-    // Reset user edits when monitor identity changes (using key pattern)
-    const monitorChangeKey = `${selectedMonitor?.id}-${currentSite.identifier}`;
-    const [lastMonitorKey, setLastMonitorKey] = useState(monitorChangeKey);
-
-    // Check if monitor changed and reset edits during render
-    if (monitorChangeKey !== lastMonitorKey) {
-        setLastMonitorKey(monitorChangeKey);
-        setUserEditedCheckInterval(undefined);
-        setIntervalChanged(false);
-        setUserEditedTimeout(undefined);
-        setTimeoutChanged(false);
-        setUserEditedRetryAttempts(undefined);
-        setRetryAttemptsChanged(false);
-    }
 
     // Handler for check now
     const handleCheckNow = useCallback(async () => {
@@ -559,18 +568,35 @@ export function useSiteDetails({
 
     // Interval change handlers
     const handleIntervalChange = useCallback(
-        (e: ChangeEvent<HTMLSelectElement>) => {
+        (e: ChangeEvent<HTMLSelectElement>): void => {
             const newInterval = safeInteger(
                 e.target.value,
                 DEFAULT_CHECK_INTERVAL
             );
-            setUserEditedCheckInterval(newInterval);
-            setIntervalChanged(newInterval !== selectedMonitorCheckInterval);
+            setMonitorEditStateById((previous) => {
+                const current: MonitorEditState = previous[
+                    selectedMonitorId
+                ] ?? {
+                    intervalChanged: false,
+                    retryAttemptsChanged: false,
+                    timeoutChanged: false,
+                };
+
+                return {
+                    ...previous,
+                    [selectedMonitorId]: {
+                        ...current,
+                        intervalChanged:
+                            newInterval !== selectedMonitorCheckInterval,
+                        userEditedCheckInterval: newInterval,
+                    },
+                };
+            });
         },
         [
             selectedMonitorCheckInterval,
-            setIntervalChanged,
-            setUserEditedCheckInterval,
+            selectedMonitorId,
+            setMonitorEditStateById,
         ]
     );
 
@@ -598,7 +624,22 @@ export function useSiteDetails({
             selectedMonitorId,
             localCheckInterval
         );
-        setIntervalChanged(false);
+        setMonitorEditStateById((previous) => {
+            const current: MonitorEditState = previous[selectedMonitorId] ?? {
+                intervalChanged: false,
+                retryAttemptsChanged: false,
+                timeoutChanged: false,
+            };
+
+            return {
+                ...previous,
+                [selectedMonitorId]: {
+                    ...current,
+                    intervalChanged: false,
+                    userEditedCheckInterval: undefined,
+                },
+            };
+        });
         logger.user.action("Updated check interval", {
             monitorId: selectedMonitorId,
             newInterval: localCheckInterval,
@@ -610,25 +651,42 @@ export function useSiteDetails({
         localCheckInterval,
         selectedMonitor?.type,
         selectedMonitorId,
-        setIntervalChanged,
+        setMonitorEditStateById,
         updateSiteCheckInterval,
     ]);
 
     // Timeout change handlers
     const handleTimeoutChange = useCallback(
-        (e: ChangeEvent<HTMLInputElement>) => {
+        (e: ChangeEvent<HTMLInputElement>): void => {
             // Work directly with seconds in the UI
             const timeoutInSeconds = clampTimeoutSeconds(
                 safeInteger(e.target.value, 5)
             );
-            setUserEditedTimeout(timeoutInSeconds);
             // Compare against the monitor's timeout converted to seconds
             const currentTimeoutInSeconds = getTimeoutSeconds(
                 selectedMonitorTimeout
             );
-            setTimeoutChanged(timeoutInSeconds !== currentTimeoutInSeconds);
+            setMonitorEditStateById((previous) => {
+                const current: MonitorEditState = previous[
+                    selectedMonitorId
+                ] ?? {
+                    intervalChanged: false,
+                    retryAttemptsChanged: false,
+                    timeoutChanged: false,
+                };
+
+                return {
+                    ...previous,
+                    [selectedMonitorId]: {
+                        ...current,
+                        timeoutChanged:
+                            timeoutInSeconds !== currentTimeoutInSeconds,
+                        userEditedTimeout: timeoutInSeconds,
+                    },
+                };
+            });
         },
-        [selectedMonitorTimeout, setTimeoutChanged, setUserEditedTimeout]
+        [selectedMonitorId, selectedMonitorTimeout, setMonitorEditStateById]
     );
 
     // eslint-disable-next-line react-hooks/preserve-manual-memoization -- Dependencies are intentionally explicit to align with shared validation and logging behaviour.
@@ -656,7 +714,22 @@ export function useSiteDetails({
             selectedMonitorId,
             timeoutInMs
         );
-        setTimeoutChanged(false);
+        setMonitorEditStateById((previous) => {
+            const current: MonitorEditState = previous[selectedMonitorId] ?? {
+                intervalChanged: false,
+                retryAttemptsChanged: false,
+                timeoutChanged: false,
+            };
+
+            return {
+                ...previous,
+                [selectedMonitorId]: {
+                    ...current,
+                    timeoutChanged: false,
+                    userEditedTimeout: undefined,
+                },
+            };
+        });
         logger.user.action("Updated monitor timeout", {
             monitorId: selectedMonitorId,
             newTimeout: timeoutInMs,
@@ -668,19 +741,39 @@ export function useSiteDetails({
         localTimeout,
         selectedMonitor?.type,
         selectedMonitorId,
-        setTimeoutChanged,
         updateMonitorTimeout,
     ]);
 
     // Retry attempts change handlers
     const handleRetryAttemptsChange = useCallback(
-        (e: ChangeEvent<HTMLInputElement>) => {
+        (e: ChangeEvent<HTMLInputElement>): void => {
             const retryAttempts = safeInteger(e.target.value, 3);
-            setUserEditedRetryAttempts(retryAttempts);
             const currentRetryAttempts = selectedMonitorRetryAttempts ?? 0;
-            setRetryAttemptsChanged(retryAttempts !== currentRetryAttempts);
+            setMonitorEditStateById((previous) => {
+                const current: MonitorEditState = previous[
+                    selectedMonitorId
+                ] ?? {
+                    intervalChanged: false,
+                    retryAttemptsChanged: false,
+                    timeoutChanged: false,
+                };
+
+                return {
+                    ...previous,
+                    [selectedMonitorId]: {
+                        ...current,
+                        retryAttemptsChanged:
+                            retryAttempts !== currentRetryAttempts,
+                        userEditedRetryAttempts: retryAttempts,
+                    },
+                };
+            });
         },
-        [selectedMonitorRetryAttempts]
+        [
+            selectedMonitorId,
+            selectedMonitorRetryAttempts,
+            setMonitorEditStateById,
+        ]
     );
 
     // eslint-disable-next-line react-hooks/preserve-manual-memoization -- Dependencies are intentionally explicit to align with shared validation and logging behaviour.
@@ -709,7 +802,22 @@ export function useSiteDetails({
             selectedMonitorId,
             localRetryAttempts
         );
-        setRetryAttemptsChanged(false);
+        setMonitorEditStateById((previous) => {
+            const current: MonitorEditState = previous[selectedMonitorId] ?? {
+                intervalChanged: false,
+                retryAttemptsChanged: false,
+                timeoutChanged: false,
+            };
+
+            return {
+                ...previous,
+                [selectedMonitorId]: {
+                    ...current,
+                    retryAttemptsChanged: false,
+                    userEditedRetryAttempts: undefined,
+                },
+            };
+        });
         logger.user.action("Updated monitor retry attempts", {
             monitorId: selectedMonitorId,
             newRetryAttempts: localRetryAttempts,

@@ -1,6 +1,6 @@
-import type { SettingsStore } from "./types";
-
 import { ensureError } from "@shared/utils/errorHandling";
+
+import type { SettingsStore } from "./types";
 
 import { logger } from "../../services/logger";
 /**

@@ -15,7 +15,6 @@
 import type { NotificationPreferenceUpdate } from "@shared/types/notifications";
 
 import { ensureError } from "@shared/utils/errorHandling";
-import { isRecord } from "@shared/utils/typeHelpers";
 import { validateNotificationPreferenceUpdate } from "@shared/validation/notifications";
 
 import { getIpcServiceHelpers } from "./utils/createIpcServiceHelpers";
@@ -36,47 +35,6 @@ const { ensureInitialized, wrap } = ((): ReturnType<
         throw ensureError(error);
     }
 })();
-
-interface NotificationBridgeLike {
-    readonly updatePreferences: (
-        preferences: NotificationPreferenceUpdate
-    ) => Promise<void>;
-}
-
-const isNotificationBridge = (
-    candidate: unknown
-): candidate is NotificationBridgeLike => {
-    if (!isRecord(candidate)) {
-        return false;
-    }
-
-    const { updatePreferences } = candidate as {
-        updatePreferences?: unknown;
-    };
-    return typeof updatePreferences === "function";
-};
-
-const getNotificationBridge = (
-    api: typeof window.electronAPI
-): NotificationBridgeLike => {
-    const apiCandidate: unknown = api;
-
-    if (!isRecord(apiCandidate)) {
-        throw new TypeError(
-            "Notification bridge unavailable: electronAPI not initialized"
-        );
-    }
-
-    const notifications = Reflect.get(apiCandidate, "notifications");
-
-    if (!isNotificationBridge(notifications)) {
-        throw new TypeError(
-            "Notification bridge missing updatePreferences method"
-        );
-    }
-
-    return notifications;
-};
 
 /**
  * Contract describing notification preference operations from the renderer.
@@ -118,8 +76,7 @@ export const NotificationPreferenceService: NotificationPreferenceServiceContrac
                     );
                 }
 
-                const notificationBridge = getNotificationBridge(api);
-                await notificationBridge.updatePreferences(validation.data);
+                await api.notifications.updatePreferences(validation.data);
             }
         ),
     };

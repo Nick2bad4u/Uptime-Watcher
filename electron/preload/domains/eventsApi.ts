@@ -47,12 +47,12 @@ import {
     SITE_ADDED_SOURCES,
     UPDATE_STATUS_VALUES,
 } from "@shared/types/events";
+import { isRecord as isSharedRecord } from "@shared/utils/typeHelpers";
 import { validateSiteSnapshot } from "@shared/validation/guards";
 import {
     isEnrichedMonitorStatusChangedEventData,
     isMonitorStatusChangedEventData,
 } from "@shared/validation/monitorStatusEvents";
-import { isRecord as isSharedRecord } from "@shared/utils/typeHelpers";
 
 import { createEventManager } from "../core/bridgeFactory";
 import {

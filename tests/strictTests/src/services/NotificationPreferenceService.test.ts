@@ -88,9 +88,8 @@ describe("NotificationPreferenceService (strict coverage)", () => {
     });
 
     it("delegates initialization to the preload helper", async () => {
-        const { NotificationPreferenceService } = await import(
-            "@app/services/NotificationPreferenceService"
-        );
+        const { NotificationPreferenceService } =
+            await import("@app/services/NotificationPreferenceService");
 
         await NotificationPreferenceService.initialize();
 
@@ -108,9 +107,8 @@ describe("NotificationPreferenceService (strict coverage)", () => {
             systemNotificationsSoundEnabled: false,
         };
 
-        const { NotificationPreferenceService } = await import(
-            "@app/services/NotificationPreferenceService"
-        );
+        const { NotificationPreferenceService } =
+            await import("@app/services/NotificationPreferenceService");
 
         await NotificationPreferenceService.updatePreferences(preferences);
 
@@ -132,9 +130,8 @@ describe("NotificationPreferenceService (strict coverage)", () => {
             systemNotificationsSoundEnabled: true,
         };
 
-        const { NotificationPreferenceService } = await import(
-            "@app/services/NotificationPreferenceService"
-        );
+        const { NotificationPreferenceService } =
+            await import("@app/services/NotificationPreferenceService");
 
         Object.defineProperty(window, "electronAPI", {
             configurable: true,
@@ -143,9 +140,7 @@ describe("NotificationPreferenceService (strict coverage)", () => {
 
         await expect(
             NotificationPreferenceService.updatePreferences(preferences)
-        ).rejects.toThrowError(
-            /Notification bridge unavailable|missing updatePreferences/
-        );
+        ).rejects.toThrowError();
         expect(updateBridgeSpy).not.toHaveBeenCalled();
     });
 });

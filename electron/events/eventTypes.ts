@@ -505,10 +505,7 @@ export interface UptimeEvents extends Record<string, EventPayloadValue> {
         /**
          * The operation type (always "backup-downloaded").
          *
-         * ```
-         *     /**
-         * ```
-         *
+         * @remarks
          * Constant value identifying this specific database operation type for
          * event filtering and routing purposes.
          */

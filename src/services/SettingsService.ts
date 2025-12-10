@@ -234,7 +234,7 @@ export const SettingsService: SettingsServiceContract = {
 
                 if (sanitizedRequestLimit === undefined) {
                     logger.warn(
-                        "Received invalid history limit from backend; falling back to requested value",
+                        "History limit update rejected: requested limit could not be normalised",
                         {
                             error: normalizedError.message,
                             receivedValue: updatedLimit,

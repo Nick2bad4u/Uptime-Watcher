@@ -77,17 +77,27 @@ export const StatusAlertToast = ({
         ? STATUS_HEADLINE[resolvedStatus]
         : STATUS_HEADLINE.pending;
 
-    const timestampLabel = useMemo(() => {
+    const { timestampDateTime, timestampLabel } = useMemo(() => {
         const date = new Date(alert.timestamp);
+
         if (Number.isNaN(date.getTime())) {
-            return "Just now";
+            const now = new Date();
+            return {
+                timestampDateTime: now.toISOString(),
+                timestampLabel: "Just now",
+            } as const;
         }
 
-        return new Intl.DateTimeFormat(undefined, {
+        const localizedLabel = new Intl.DateTimeFormat(undefined, {
             hour: "numeric",
             minute: "2-digit",
             second: "2-digit",
         }).format(date);
+
+        return {
+            timestampDateTime: date.toISOString(),
+            timestampLabel: localizedLabel,
+        } as const;
     }, [alert.timestamp]);
 
     const previousLabel =
@@ -120,7 +130,7 @@ export const StatusAlertToast = ({
                     <time
                         aria-hidden="true"
                         className="status-alert__timestamp"
-                        dateTime={new Date(alert.timestamp).toISOString()}
+                        dateTime={timestampDateTime}
                     >
                         {timestampLabel}
                     </time>

@@ -7,8 +7,8 @@
  */
 
 import type { SiteRow as DatabaseSiteRow } from "@shared/types/database";
-import { isValidSiteRow as isValidDatabaseSiteRow } from "@shared/types/database";
 
+import { isValidSiteRow as isValidDatabaseSiteRow } from "@shared/types/database";
 import { LOG_TEMPLATES } from "@shared/utils/logTemplates";
 import { safeStringify } from "@shared/utils/stringConversion";
 

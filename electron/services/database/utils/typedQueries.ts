@@ -13,8 +13,6 @@
 import type { Database } from "node-sqlite3-wasm";
 import type { UnknownRecord } from "type-fest";
 
-import { isRecord as isSharedRecord } from "@shared/utils/typeHelpers";
-
 import {
     type HistoryRow,
     isValidMonitorRow,
@@ -24,6 +22,7 @@ import {
     type SettingsRow,
     type SiteRow,
 } from "@shared/types/database";
+import { isRecord as isSharedRecord } from "@shared/utils/typeHelpers";
 
 import type { DbValue } from "./valueConverters";
 

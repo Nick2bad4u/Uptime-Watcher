@@ -710,7 +710,11 @@ export class MonitorScheduler {
     }
 
     private resolveTimeout(timeoutMs?: number): number {
-        if (typeof timeoutMs === "number" && timeoutMs > 0) {
+        if (
+            typeof timeoutMs === "number" &&
+            Number.isFinite(timeoutMs) &&
+            timeoutMs > 0
+        ) {
             return timeoutMs + MONITOR_TIMEOUT_BUFFER_MS;
         }
 

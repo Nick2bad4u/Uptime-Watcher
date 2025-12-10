@@ -157,11 +157,7 @@ const mockThemeManager = {
         },
     }),
     applyTheme: vi.fn(),
-    getAvailableThemes: vi.fn().mockReturnValue([
-        "light",
-        "dark",
-        "system",
-    ]),
+    getAvailableThemes: vi.fn().mockReturnValue(["light", "dark", "system"]),
     onSystemThemeChange: vi.fn().mockImplementation((callback) => {
         // Store the callback so tests can trigger it
         mockThemeManager._systemThemeCallback = callback;
@@ -187,13 +183,10 @@ vi.mock("../../constants", async (importOriginal) => {
 });
 
 // Mock site status type guard
-const mockIsSiteStatus = vi.fn((status: string) =>
-    [
-        "up",
-        "down",
-        "pending",
-        "unknown",
-    ].includes(status)
+const mockIsSiteStatus = vi.hoisted(() =>
+    vi.fn((status: string) =>
+        ["up", "down", "pending", "unknown"].includes(status)
+    )
 );
 
 vi.mock("../../../shared/utils/typeHelpers", () => ({

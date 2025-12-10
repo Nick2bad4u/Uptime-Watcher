@@ -205,6 +205,16 @@ export async function createAbortableOperation<T>(
     }
 }
 
+const createSleepAbortHandler =
+    (
+        timeoutId: ReturnType<typeof setTimeout>,
+        reject: (error: Error) => void
+    ): (() => void) =>
+    (): void => {
+        clearTimeout(timeoutId);
+        reject(new Error("Sleep was aborted"));
+    };
+
 /**
  * Promise-based sleep helper with {@link AbortSignal} support.
  *
@@ -256,13 +266,12 @@ export async function sleep(ms: number, signal?: AbortSignal): Promise<void> {
             resolve();
         }, ms);
 
-        // Handle abort during sleep
-        const handleAbort = (): void => {
-            clearTimeout(timeoutId);
-            reject(new Error("Sleep was aborted"));
-        };
+        const handleAbort = createSleepAbortHandler(timeoutId, reject);
 
-        signal?.addEventListener("abort", handleAbort, { once: true });
+        // Handle abort during sleep
+        if (signal) {
+            signal.addEventListener("abort", handleAbort, { once: true });
+        }
     });
 }
 

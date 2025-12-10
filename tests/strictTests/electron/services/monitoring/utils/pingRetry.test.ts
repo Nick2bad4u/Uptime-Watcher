@@ -71,9 +71,8 @@ describe("pingRetry utilities", () => {
     });
 
     it("routes HTTP URLs through checkHttpConnectivity", async () => {
-        const module = await import(
-            "../../../../../../electron/services/monitoring/utils/pingRetry"
-        );
+        const module =
+            await import("../../../../../../electron/services/monitoring/utils/pingRetry");
         const { performSinglePingCheck } = module;
 
         const result = await performSinglePingCheck(
@@ -82,9 +81,7 @@ describe("pingRetry utilities", () => {
         );
 
         const connectivity = vi.mocked(
-            await import(
-                "../../../../../../electron/services/monitoring/utils/nativeConnectivity"
-            )
+            await import("../../../../../../electron/services/monitoring/utils/nativeConnectivity")
         );
 
         expect(connectivity.checkHttpConnectivity).toHaveBeenCalledTimes(1);
@@ -97,17 +94,14 @@ describe("pingRetry utilities", () => {
     });
 
     it("routes non-HTTP hosts through checkConnectivity", async () => {
-        const module = await import(
-            "../../../../../../electron/services/monitoring/utils/pingRetry"
-        );
+        const module =
+            await import("../../../../../../electron/services/monitoring/utils/pingRetry");
         const { performSinglePingCheck } = module;
 
         const result = await performSinglePingCheck("example.com", 2500);
 
         const connectivity = vi.mocked(
-            await import(
-                "../../../../../../electron/services/monitoring/utils/nativeConnectivity"
-            )
+            await import("../../../../../../electron/services/monitoring/utils/nativeConnectivity")
         );
 
         expect(connectivity.checkConnectivity).toHaveBeenCalledWith(
@@ -123,15 +117,12 @@ describe("pingRetry utilities", () => {
 
     it("wraps connectivity failures with a descriptive error", async () => {
         const connectivity = vi.mocked(
-            await import(
-                "../../../../../../electron/services/monitoring/utils/nativeConnectivity"
-            )
+            await import("../../../../../../electron/services/monitoring/utils/nativeConnectivity")
         );
         connectivity.checkConnectivity.mockRejectedValueOnce(MOCK_ERROR);
 
-        const module = await import(
-            "../../../../../../electron/services/monitoring/utils/pingRetry"
-        );
+        const module =
+            await import("../../../../../../electron/services/monitoring/utils/pingRetry");
         const { performSinglePingCheck } = module;
 
         await expect(
@@ -144,13 +135,10 @@ describe("pingRetry utilities", () => {
             await import("../../../../../../electron/utils/operationalHooks")
         );
         const connectivity = vi.mocked(
-            await import(
-                "../../../../../../electron/services/monitoring/utils/nativeConnectivity"
-            )
+            await import("../../../../../../electron/services/monitoring/utils/nativeConnectivity")
         );
-        const module = await import(
-            "../../../../../../electron/services/monitoring/utils/pingRetry"
-        );
+        const module =
+            await import("../../../../../../electron/services/monitoring/utils/pingRetry");
         const { performPingCheckWithRetry } = module;
 
         connectivity.checkConnectivity.mockImplementationOnce(async () => ({
@@ -165,7 +153,7 @@ describe("pingRetry utilities", () => {
             expect.any(Function),
             expect.objectContaining({
                 initialDelay: 50,
-                maxRetries: 2,
+                maxRetries: 3,
                 operationName: "connectivity-check",
             })
         );
@@ -179,14 +167,12 @@ describe("pingRetry utilities", () => {
         const { isDev } = vi.mocked(
             await import("../../../../../../electron/electronUtils")
         );
-        const { logger } = await import(
-            "../../../../../../electron/utils/logger"
-        );
+        const { logger } =
+            await import("../../../../../../electron/utils/logger");
         isDev.mockReturnValueOnce(true);
 
-        const module = await import(
-            "../../../../../../electron/services/monitoring/utils/pingRetry"
-        );
+        const module =
+            await import("../../../../../../electron/services/monitoring/utils/pingRetry");
         const { performPingCheckWithRetry } = module;
 
         await performPingCheckWithRetry("dev.example", 500, 1);
@@ -205,14 +191,12 @@ describe("pingRetry utilities", () => {
         const hooks = vi.mocked(
             await import("../../../../../../electron/utils/operationalHooks")
         );
-        const errorHandling = await import(
-            "../../../../../../electron/services/monitoring/utils/pingErrorHandling"
-        );
+        const errorHandling =
+            await import("../../../../../../electron/services/monitoring/utils/pingErrorHandling");
         hooks.withOperationalHooks.mockRejectedValueOnce(MOCK_ERROR);
 
-        const module = await import(
-            "../../../../../../electron/services/monitoring/utils/pingRetry"
-        );
+        const module =
+            await import("../../../../../../electron/services/monitoring/utils/pingRetry");
         const { performPingCheckWithRetry } = module;
 
         const outcome = await performPingCheckWithRetry(

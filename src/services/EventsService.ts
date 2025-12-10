@@ -368,7 +368,7 @@ export const EventsService: EventsServiceContract = {
      *
      * const cleanup = await EventsService.onMonitoringStopped((data) => {
      *     logger.info("Monitoring stopped", {
-     *         pausedMonitors: data.monitorCount,
+     *         activeMonitors: data.activeMonitors,
      *     });
      * });
      * // Later: cleanup();

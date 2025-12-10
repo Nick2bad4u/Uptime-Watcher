@@ -168,10 +168,21 @@ export async function performPingCheckWithRetry(
     timeout: number,
     maxRetries: number
 ): Promise<MonitorCheckResult> {
+    const normalizedRetries =
+        typeof maxRetries === "number" && Number.isFinite(maxRetries)
+            ? Math.max(0, Math.floor(maxRetries))
+            : 0;
+
+    // With operational hooks, `maxRetries` is interpreted as the total number
+    // of attempts. The public API for this helper exposes `maxRetries` as the
+    // number of additional retry attempts after the initial call (0 = one
+    // attempt). Convert the caller value into an attempt count here.
+    const totalAttempts = normalizedRetries + 1;
+
     if (isDev()) {
         logger.debug("Starting connectivity check with retry", {
             host,
-            maxRetries,
+            maxRetries: normalizedRetries,
             timeout,
         });
     }
@@ -181,14 +192,14 @@ export async function performPingCheckWithRetry(
             async () => performSinglePingCheck(host, timeout),
             {
                 initialDelay: RETRY_BACKOFF.INITIAL_DELAY,
-                maxRetries,
+                maxRetries: totalAttempts,
                 operationName: "connectivity-check",
             }
         );
     } catch (error) {
         return handlePingCheckError(error, {
             host,
-            maxRetries,
+            maxRetries: normalizedRetries,
             timeout,
         });
     }

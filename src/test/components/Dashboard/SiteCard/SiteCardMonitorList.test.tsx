@@ -237,12 +237,14 @@ describe(SiteCardMonitorList, () => {
         expect(screen.getByText("invalid-url")).toBeInTheDocument();
         expect(screen.getByText("DNS")).toBeInTheDocument();
 
-        expect(screen.getByText("321 ms")).toBeInTheDocument();
-        expect(screen.getByText("512 ms")).toBeInTheDocument();
-        expect(screen.getByText("89 ms")).toBeInTheDocument();
-        expect(screen.getByText("144 ms")).toBeInTheDocument();
-        expect(screen.getByText("204 ms")).toBeInTheDocument();
-        expect(screen.getByText("65 ms")).toBeInTheDocument();
+        // Response times are rendered without a space before the unit suffix
+        // (see formatResponseTime in src/utils/time.ts).
+        expect(screen.getByText("321ms")).toBeInTheDocument();
+        expect(screen.getByText("512ms")).toBeInTheDocument();
+        expect(screen.getByText("89ms")).toBeInTheDocument();
+        expect(screen.getByText("144ms")).toBeInTheDocument();
+        expect(screen.getByText("204ms")).toBeInTheDocument();
+        expect(screen.getByText("65ms")).toBeInTheDocument();
 
         expect(screen.getByText("N/A")).toBeInTheDocument();
         expect(screen.getByText("45s")).toBeInTheDocument();
