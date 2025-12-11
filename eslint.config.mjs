@@ -328,6 +328,15 @@ export default /** @type {EslintConfig} */ [
         },
     },
     {
+        files: ["storybook/**/*.{ts,tsx,js,jsx,mts,mjs}"],
+        name: "Storybook Dev Helpers - storybook/**/*.{ts,tsx,js,jsx,mts,mjs}",
+        rules: {
+            "import-x/no-extraneous-dependencies": "off",
+            "n/no-extraneous-import": "off",
+            "sonarjs/no-implicit-dependencies": "off",
+        },
+    },
+    {
         files: ["shared/**/*.{ts,tsx,cts,mts}"],
         name: "Shared Layer Isolation",
         plugins: {
@@ -604,10 +613,7 @@ export default /** @type {EslintConfig} */ [
             "html/prefer-https": "warn",
             "html/require-attrs": "warn",
             "html/require-button-type": "warn",
-            "html/require-closing-tags": [
-                "error",
-                { selfClosing: "always" },
-            ],
+            "html/require-closing-tags": "off",
             "html/require-explicit-size": "warn",
             "html/require-form-method": "warn",
             "html/require-frame-title": "warn",
@@ -652,10 +658,7 @@ export default /** @type {EslintConfig} */ [
                 "error",
                 { enforceBeforeSelfClose: true },
             ],
-            "html/require-closing-tags": [
-                "error",
-                { selfClosing: "always" },
-            ],
+            "html/require-closing-tags": "off",
             "styled-components-a11y/lang": "off",
             "xss/no-mixed-html": [
                 "off",

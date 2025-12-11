@@ -71,10 +71,10 @@ const stringifyDiagnostics = (
  * This helper is intentionally opinionated about the resulting error messages,
  * following the pattern used by data-oriented services:
  *
- * - When the validator throws, the error message uses the form `"[ServiceName]
- *   <operation> threw during validation"`.
- * - When validation fails, the message uses the form `"[ServiceName] <operation>
- *   returned invalid payload: <issues>"`.
+ * - When the validator throws, the error message uses the form
+ *   `"[ServiceName] <operation> threw during validation"`.
+ * - When validation fails, the message uses the form
+ *   `"[ServiceName] <operation> returned invalid payload: <issues>"`.
  *
  * In both cases, the original error (validator exception or Zod error) is
  * attached via {@link Error.cause}. Callers are expected to allow these errors
