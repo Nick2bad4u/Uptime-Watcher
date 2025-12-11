@@ -146,8 +146,7 @@ class MockMonitorServiceManager {
         this.operationCount++;
 
         const registrationPromises = monitors.map((monitor) =>
-            this.registerMonitor(monitor)
-        );
+            this.registerMonitor(monitor));
 
         await Promise.all(registrationPromises);
     }
@@ -220,8 +219,7 @@ class MockMonitorServiceManager {
         for (let i = 0; i < monitorIds.length; i += maxConcurrency) {
             const batch = monitorIds.slice(i, i + maxConcurrency);
             const batchPromises = batch.map((id) =>
-                this.performMonitorCheck(id)
-            );
+                this.performMonitorCheck(id));
             const batchResults = await Promise.allSettled(batchPromises);
 
             for (const result of batchResults) {
@@ -482,7 +480,12 @@ class MockMonitorServiceManager {
         this.operationCount++;
 
         // Generate test monitors with valid monitor types
-        const validMonitorTypes = ["http", "dns", "port", "ping"] as const;
+        const validMonitorTypes = [
+            "http",
+            "dns",
+            "port",
+            "ping",
+        ] as const;
         const testMonitors = Array.from({ length: monitorCount }, (_, i) => ({
             id: `stress-test-${i}`,
             siteIdentifier: `site-${Math.floor(i / 10)}`,
@@ -710,7 +713,12 @@ function generateMonitors(
     siteCount: number = 10
 ): BenchmarkMonitor[] {
     const monitors: BenchmarkMonitor[] = [];
-    const types = ["http", "dns", "port", "ping"] as const;
+    const types = [
+        "http",
+        "dns",
+        "port",
+        "ping",
+    ] as const;
 
     for (let i = 0; i < count; i++) {
         const siteIdentifier = `site-${(i % siteCount) + 1}`;
@@ -724,17 +732,27 @@ function generateMonitors(
             url: type === "http" ? `https://example${i}.com` : undefined,
             host: type === "http" ? undefined : `host${i}.example.com`,
             port: type === "port" ? 80 + (i % 100) : undefined,
-            interval: [30_000, 60_000, 120_000, 300_000][
-                Math.floor(Math.random() * 4)
-            ],
-            timeout: [3000, 5000, 10_000][Math.floor(Math.random() * 3)],
+            interval: [
+                30_000,
+                60_000,
+                120_000,
+                300_000,
+            ][Math.floor(Math.random() * 4)],
+            timeout: [
+                3000,
+                5000,
+                10_000,
+            ][Math.floor(Math.random() * 3)],
             retryAttempts: Math.floor(Math.random() * 3) + 1,
             enabled: Math.random() > 0.1, // 90% enabled
             status: "pending",
             metadata: {
-                priority: ["critical", "high", "normal", "low"][
-                    Math.floor(Math.random() * 4)
-                ],
+                priority: [
+                    "critical",
+                    "high",
+                    "normal",
+                    "low",
+                ][Math.floor(Math.random() * 4)],
                 tags: [`tag-${i % 5}`, type],
             },
         });
@@ -1071,13 +1089,13 @@ describe("Monitor Service Management Benchmarks", () => {
                     metadata: { ...m.metadata, priority: "normal" },
                 }));
 
-                const lowPriorityMonitors = generateMonitors(100, 25).map(
-                    (m) => ({
-                        ...m,
-                        interval: 600_000, // 10 minutes
-                        metadata: { ...m.metadata, priority: "low" },
-                    })
-                );
+                const lowPriorityMonitors = generateMonitors(100, 25).map((
+                    m
+                ) => ({
+                    ...m,
+                    interval: 600_000, // 10 minutes
+                    metadata: { ...m.metadata, priority: "low" },
+                }));
 
                 const allMonitors = [
                     ...criticalMonitors,

@@ -166,8 +166,7 @@ export class SiteLifecycleCoordinator {
         const activeMonitorIds = siteSnapshot
             ? siteSnapshot.monitors
                   .filter((monitor): monitor is Monitor & { id: string } =>
-                      Boolean(monitor.id && monitor.monitoring)
-                  )
+                      Boolean(monitor.id && monitor.monitoring))
                   .map((monitor) => monitor.id)
             : [];
 

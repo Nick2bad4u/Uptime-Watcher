@@ -968,16 +968,16 @@ describe("Database Connection Pooling Benchmarks", () => {
             healthChecks.reduce((sum, check) => sum + check.responseTime, 0) /
             healthChecks.length;
 
-        const connectionHealthSummary = Object.values(connectionStates).map(
-            (conn) => ({
-                connectionId: conn.connectionId,
-                finalHealthScore: conn.healthScore,
-                totalChecks: conn.totalChecks,
-                consecutiveFailures: conn.consecutiveFailures,
-                avgResponseTime: conn.avgResponseTime,
-                staleness: currentTime - conn.lastSuccessfulCheck,
-            })
-        );
+        const connectionHealthSummary = Object.values(connectionStates).map((
+            conn
+        ) => ({
+            connectionId: conn.connectionId,
+            finalHealthScore: conn.healthScore,
+            totalChecks: conn.totalChecks,
+            consecutiveFailures: conn.consecutiveFailures,
+            avgResponseTime: conn.avgResponseTime,
+            staleness: currentTime - conn.lastSuccessfulCheck,
+        }));
 
         const healthyConnections = connectionHealthSummary.filter(
             (c) => c.finalHealthScore >= 0.8

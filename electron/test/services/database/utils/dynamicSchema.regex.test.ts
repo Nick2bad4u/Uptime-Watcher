@@ -52,9 +52,8 @@ describe("DynamicSchema Regex Mutations", () => {
         vi.clearAllMocks();
 
         // Import the function under test
-        const module = await import(
-            "../../../../services/database/utils/dynamicSchema"
-        );
+        const module =
+            await import("../../../../services/database/utils/dynamicSchema");
         generateDatabaseFieldDefinitions =
             module.generateDatabaseFieldDefinitions;
     });

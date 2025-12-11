@@ -379,8 +379,7 @@ const edgeLocationListSchema = z
                 require_protocol: true,
                 require_tld: true,
                 validate_length: true,
-            })
-        );
+            }));
     }, "Edge endpoints must be valid HTTP or HTTPS URLs separated by commas or new lines");
 
 /**

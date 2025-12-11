@@ -919,8 +919,7 @@ describe("Database Index Operations Benchmarks", () => {
             "subquery-flattening",
         ].map((technique) => {
             const techniqueResults = optimizationResults.filter((r) =>
-                r.optimizationTechnique.includes(technique)
-            );
+                r.optimizationTechnique.includes(technique));
 
             return {
                 technique,

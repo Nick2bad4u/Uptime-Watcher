@@ -81,9 +81,7 @@ describe("HttpMonitor Active Counter Assignment Operations", () => {
         createHttpClient.mockReturnValue(mockAxiosInstance);
 
         const { createMonitorConfig, validateMonitorUrl } = vi.mocked(
-            await import(
-                "../../../services/monitoring/shared/monitorServiceHelpers"
-            )
+            await import("../../../services/monitoring/shared/monitorServiceHelpers")
         );
         validateMonitorUrl.mockReturnValue(null);
         createMonitorConfig.mockReturnValue({
@@ -277,8 +275,7 @@ describe("HttpMonitor Active Counter Assignment Operations", () => {
                 ...monitor,
                 url: `https://example${i}.com`,
                 id: `test-monitor-${i}`,
-            })
-        );
+            }));
 
         const results = await Promise.all(promises);
 

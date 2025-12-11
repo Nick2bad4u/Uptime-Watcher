@@ -43,34 +43,32 @@ vi.mock("../../../utils/monitorValidation", () => ({
 
 // Mock the error handling utility
 vi.mock("../../../utils/errorHandling", () => ({
-    withUtilityErrorHandling: vi.fn(
-        async (
-            fn,
-            operationName,
-            fallbackValue = undefined,
-            shouldThrow = false
-        ) => {
-            try {
-                return await fn();
-            } catch (error) {
-                // Mock the logging behavior but don't actually log
-                // console.log(`${operationName} failed`, error);
+    withUtilityErrorHandling: vi.fn(async (
+        fn,
+        operationName,
+        fallbackValue = undefined,
+        shouldThrow = false
+    ) => {
+        try {
+            return await fn();
+        } catch (error) {
+            // Mock the logging behavior but don't actually log
+            // console.log(`${operationName} failed`, error);
 
-                if (shouldThrow) {
-                    throw error;
-                }
-
-                if (fallbackValue === undefined) {
-                    throw new Error(
-                        `${operationName} failed and no fallback value provided`,
-                        { cause: error }
-                    );
-                }
-
-                return fallbackValue;
+            if (shouldThrow) {
+                throw error;
             }
+
+            if (fallbackValue === undefined) {
+                throw new Error(
+                    `${operationName} failed and no fallback value provided`,
+                    { cause: error }
+                );
+            }
+
+            return fallbackValue;
         }
-    ),
+    }),
 }));
 
 // Mock the fallbacks
@@ -156,9 +154,8 @@ const applyFieldValidationResult = (result: ValidationResult): void => {
 
 beforeEach(async () => {
     vi.clearAllMocks();
-    validationModule = (await import(
-        "../../../utils/monitorValidation"
-    )) as unknown as ValidationModuleMock;
+    validationModule =
+        (await import("../../../utils/monitorValidation")) as unknown as ValidationModuleMock;
     validationModule.validateMonitorFormData.mockReset();
     validationModule.validateMonitorFieldClientSide.mockReset();
     validationModule.createMonitorObject.mockReset();

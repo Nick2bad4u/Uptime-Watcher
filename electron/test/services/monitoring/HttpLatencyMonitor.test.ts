@@ -18,18 +18,17 @@ const {
     validateMonitorUrlMock,
     withOperationalHooksMock,
 } = vi.hoisted(() => {
-    const schedule = vi.fn(
-        async (_url: string, operation: () => Promise<MonitorCheckResult>) =>
-            operation()
-    );
+    const schedule = vi.fn(async (
+        _url: string,
+        operation: () => Promise<MonitorCheckResult>
+    ) => operation());
     const createMonitorConfig = vi.fn();
     const createMonitorErrorResult = vi.fn();
     const validateMonitorUrl = vi.fn();
     const handleCheckError = vi.fn();
     const axiosGet = vi.fn();
     const withOperationalHooks = vi.fn(async <T>(operation: () => Promise<T>) =>
-        operation()
-    );
+        operation());
 
     return {
         axiosGetMock: axiosGet,
@@ -119,9 +118,9 @@ describe(HttpLatencyMonitor, () => {
             timeout: 5000,
         });
         validateMonitorUrlMock.mockReturnValue(null);
-        withOperationalHooksMock.mockImplementation(
-            async <T>(operation: () => Promise<T>) => operation()
-        );
+        withOperationalHooksMock.mockImplementation(async <T>(
+            operation: () => Promise<T>
+        ) => operation());
         handleCheckErrorMock.mockReturnValue({
             details: "request error",
             responseTime: 0,

@@ -69,8 +69,7 @@ import { useTheme, useThemeClasses } from "../useTheme";
  * @public
  */
 export interface ThemedSelectProperties
-    extends AccessibilityProperties,
-        CoreComponentProperties {
+    extends AccessibilityProperties, CoreComponentProperties {
     /** Whether the select should expand to fill its container width */
     readonly fluid?: boolean;
     /** Unique identifier for the select element */

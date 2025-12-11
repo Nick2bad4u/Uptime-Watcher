@@ -193,14 +193,24 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
             await annotate("Category: Service", "category");
             await annotate("Type: Business Logic", "type");
 
-            const binaryData = Buffer.from([0x00, 0xff, 0xab, 0xcd, 0xef]);
+            const binaryData = Buffer.from([
+                0x00,
+                0xff,
+                0xab,
+                0xcd,
+                0xef,
+            ]);
             mockReadFile.mockResolvedValue(binaryData);
 
             const result = await createDatabaseBackup(testDbPath);
 
             expect(result.buffer).toStrictEqual(binaryData);
             expect(Array.from(result.buffer)).toEqual([
-                0x00, 0xff, 0xab, 0xcd, 0xef,
+                0x00,
+                0xff,
+                0xab,
+                0xcd,
+                0xef,
             ]);
         });
         describe("createDatabaseBackup - Error scenarios", () => {
@@ -519,7 +529,13 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
                     Buffer.alloc(1, 0), // Single zero byte
                     Buffer.alloc(1, 255), // Single max byte
                     Buffer.from("test"), // String buffer
-                    Buffer.from([1, 2, 3, 4, 5]), // Array buffer
+                    Buffer.from([
+                        1,
+                        2,
+                        3,
+                        4,
+                        5,
+                    ]), // Array buffer
                 ];
 
                 for (const testCase of testCases) {

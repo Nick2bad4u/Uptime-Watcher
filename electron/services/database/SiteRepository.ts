@@ -208,8 +208,7 @@ export class SiteRepository {
         return withDatabaseOperation(
             () =>
                 this.databaseService.executeTransaction((db) =>
-                    Promise.resolve(this.deleteInternal(db, identifier))
-                ),
+                    Promise.resolve(this.deleteInternal(db, identifier))),
             "site-delete",
             undefined,
             { identifier }
@@ -387,8 +386,7 @@ export class SiteRepository {
         operationName: string
     ): Promise<SiteRow[]> {
         return this.runSiteReadOperation(operationName, (db) =>
-            this.fetchAllSitesInternal(db)
-        );
+            this.fetchAllSitesInternal(db));
     }
 
     /**

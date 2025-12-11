@@ -34,10 +34,9 @@ import { validateServicePayload } from "./utils/validation";
  *
  * @remarks
  * This helper wraps the supplied asynchronous {@link handler} with
- * {@link withUtilityErrorHandling}, tagging log entries with a
- * `"[DataService] <operation>"` prefix. Errors are logged and then rethrown so
- * that callers can surface failures to the UI while still benefiting from
- * structured telemetry.
+ * {@link withUtilityErrorHandling}, tagging log entries with a `"[DataService]
+ * <operation>"` prefix. Errors are logged and then rethrown so that callers can
+ * surface failures to the UI while still benefiting from structured telemetry.
  *
  * @typeParam T - Result type returned by the wrapped handler.
  *
@@ -136,8 +135,7 @@ export const DataService: DataServiceContract = {
             } catch (error: unknown) {
                 throw ensureError(error);
             }
-        })
-    ),
+        })),
 
     /**
      * Exports all application data as a serialized JSON string.
@@ -166,8 +164,7 @@ export const DataService: DataServiceContract = {
             }
 
             return payload;
-        })
-    ),
+        })),
 
     /**
      * Imports a JSON data snapshot previously produced by
@@ -194,8 +191,7 @@ export const DataService: DataServiceContract = {
             }
 
             return result;
-        })
-    ),
+        })),
 
     /**
      * Ensures that the preload bridge for the `data` domain is initialized

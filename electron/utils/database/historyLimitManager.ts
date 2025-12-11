@@ -149,17 +149,16 @@ export async function setHistoryLimit(
     // both fail
     await withDatabaseOperation(
         async () =>
-            withHistorySettingsAdapters(
-                databaseService,
-                repositories,
-                ({ historyTx, settingsTx }) => {
-                    settingsTx.set("historyLimit", finalLimit.toString());
+            withHistorySettingsAdapters(databaseService, repositories, ({
+                historyTx,
+                settingsTx,
+            }) => {
+                settingsTx.set("historyLimit", finalLimit.toString());
 
-                    if (finalLimit > 0) {
-                        historyTx.pruneAllHistory(finalLimit);
-                    }
+                if (finalLimit > 0) {
+                    historyTx.pruneAllHistory(finalLimit);
                 }
-            ),
+            }),
         "history-limit-manager-set",
         undefined,
         { limit: finalLimit }

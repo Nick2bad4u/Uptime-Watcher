@@ -4,12 +4,9 @@ import type { Site } from "@shared/types";
 
 const ensureErrorMock = vi.hoisted(() =>
     vi.fn((error: unknown) =>
-        error instanceof Error ? error : new Error(String(error))
-    )
-);
+        error instanceof Error ? error : new Error(String(error))));
 const withErrorHandlingMock = vi.hoisted(() =>
-    vi.fn(async <T>(operation: () => Promise<T>) => await operation())
-);
+    vi.fn(async <T>(operation: () => Promise<T>) => await operation()));
 
 vi.mock("@shared/utils/errorHandling", () => ({
     ensureError: ensureErrorMock,
@@ -24,8 +21,7 @@ vi.mock("../../../stores/utils", () => ({
 const createStoreErrorHandlerMock = vi.hoisted(() =>
     vi.fn(() => ({
         setError: vi.fn(),
-    }))
-);
+    })));
 vi.mock("../../../stores/utils/storeErrorHandling", () => ({
     createStoreErrorHandler: createStoreErrorHandlerMock,
 }));
@@ -62,8 +58,7 @@ const statusUpdateManagerConstructor = vi.hoisted(() =>
             })),
             unsubscribe: vi.fn(),
         };
-    })
-);
+    }));
 vi.mock("../../../stores/sites/utils/statusUpdateHandler", () => ({
     StatusUpdateManager: statusUpdateManagerConstructor,
 }));
@@ -180,12 +175,12 @@ describe("useSiteSync throttling and edge cases", () => {
     it("logs malformed sync events lacking site snapshots", async () => {
         const cleanup = vi.fn();
         let emittedHandler: ((event: any) => void) | undefined;
-        stateSyncServiceMock.onStateSyncEvent.mockImplementation(
-            async (handler: (event: any) => void) => {
-                emittedHandler = handler;
-                return cleanup;
-            }
-        );
+        stateSyncServiceMock.onStateSyncEvent.mockImplementation(async (
+            handler: (event: any) => void
+        ) => {
+            emittedHandler = handler;
+            return cleanup;
+        });
 
         const actions = createSiteSyncActions(deps);
         const unsubscribe = actions.subscribeToSyncEvents();

@@ -111,8 +111,7 @@ export const createSitesStoreMock = (
         stopSiteMonitoring: asyncVoid(),
         stopSiteMonitorMonitoring: asyncVoid(),
         subscribeToStatusUpdates: vi.fn(async () =>
-            createSubscriptionSummary()
-        ),
+            createSubscriptionSummary()),
         subscribeToSyncEvents: vi.fn(() => vi.fn()),
         syncSites: asyncVoid(),
         unsubscribeFromStatusUpdates: vi.fn(() => createUnsubscribeResult()),

@@ -152,14 +152,13 @@ describe("cacheConfig - Property-Based Fuzzing Tests", () => {
 
         it("should handle special characters in suffix", () => {
             fc.assert(
-                fc.property(
-                    fc.string({ minLength: 1, maxLength: 10 }),
-                    (suffix) => {
-                        const result = CACHE_NAMES.monitors(suffix);
-                        expect(result).toBe(`monitors-${suffix}`);
-                        expect(result.startsWith("monitors-")).toBeTruthy();
-                    }
-                )
+                fc.property(fc.string({ minLength: 1, maxLength: 10 }), (
+                    suffix
+                ) => {
+                    const result = CACHE_NAMES.monitors(suffix);
+                    expect(result).toBe(`monitors-${suffix}`);
+                    expect(result.startsWith("monitors-")).toBeTruthy();
+                })
             );
         });
     });
@@ -272,18 +271,15 @@ describe("cacheConfig - Property-Based Fuzzing Tests", () => {
     describe("CACHE_NAMES.temporary function", () => {
         it("should always require an operation parameter", () => {
             fc.assert(
-                fc.property(
-                    fc.string({ minLength: 1, maxLength: 20 }),
-                    (operation) => {
-                        const result = CACHE_NAMES.temporary(operation);
-                        expect(result).toBe(`temporary-${operation}`);
-                        expect(result).toMatch(/^temporary-.+$/);
-                        expect(typeof result).toBe("string");
-                        expect(result.length).toBeGreaterThan(
-                            "temporary-".length
-                        );
-                    }
-                )
+                fc.property(fc.string({ minLength: 1, maxLength: 20 }), (
+                    operation
+                ) => {
+                    const result = CACHE_NAMES.temporary(operation);
+                    expect(result).toBe(`temporary-${operation}`);
+                    expect(result).toMatch(/^temporary-.+$/);
+                    expect(typeof result).toBe("string");
+                    expect(result.length).toBeGreaterThan("temporary-".length);
+                })
             );
         });
 
@@ -298,15 +294,14 @@ describe("cacheConfig - Property-Based Fuzzing Tests", () => {
             ];
 
             fc.assert(
-                fc.property(
-                    fc.constantFrom(...commonOperations),
-                    (operation) => {
-                        const result = CACHE_NAMES.temporary(operation);
-                        expect(result).toBe(`temporary-${operation}`);
-                        expect(result.startsWith("temporary-")).toBeTruthy();
-                        expect(result.endsWith(operation)).toBeTruthy();
-                    }
-                )
+                fc.property(fc.constantFrom(...commonOperations), (
+                    operation
+                ) => {
+                    const result = CACHE_NAMES.temporary(operation);
+                    expect(result).toBe(`temporary-${operation}`);
+                    expect(result.startsWith("temporary-")).toBeTruthy();
+                    expect(result.endsWith(operation)).toBeTruthy();
+                })
             );
         });
 
@@ -342,37 +337,30 @@ describe("cacheConfig - Property-Based Fuzzing Tests", () => {
     describe("Cross-function consistency", () => {
         it("should maintain unique naming patterns across all cache name functions", () => {
             fc.assert(
-                fc.property(
-                    fc.string({ minLength: 1, maxLength: 10 }),
-                    (suffix) => {
-                        const monitorsName = CACHE_NAMES.monitors(suffix);
-                        const settingsName = CACHE_NAMES.settings(suffix);
-                        const sitesName = CACHE_NAMES.sites(suffix);
-                        const temporaryName = CACHE_NAMES.temporary(suffix);
+                fc.property(fc.string({ minLength: 1, maxLength: 10 }), (
+                    suffix
+                ) => {
+                    const monitorsName = CACHE_NAMES.monitors(suffix);
+                    const settingsName = CACHE_NAMES.settings(suffix);
+                    const sitesName = CACHE_NAMES.sites(suffix);
+                    const temporaryName = CACHE_NAMES.temporary(suffix);
 
-                        // All should be different when suffix is provided
-                        const names = [
-                            monitorsName,
-                            settingsName,
-                            sitesName,
-                            temporaryName,
-                        ];
-                        const uniqueNames = new Set(names);
-                        expect(uniqueNames.size).toBe(names.length);
+                    // All should be different when suffix is provided
+                    const names = [
+                        monitorsName,
+                        settingsName,
+                        sitesName,
+                        temporaryName,
+                    ];
+                    const uniqueNames = new Set(names);
+                    expect(uniqueNames.size).toBe(names.length);
 
-                        // Each should start with their respective prefix
-                        expect(
-                            monitorsName.startsWith("monitors")
-                        ).toBeTruthy();
-                        expect(
-                            settingsName.startsWith("settings")
-                        ).toBeTruthy();
-                        expect(sitesName.startsWith("sites")).toBeTruthy();
-                        expect(
-                            temporaryName.startsWith("temporary")
-                        ).toBeTruthy();
-                    }
-                )
+                    // Each should start with their respective prefix
+                    expect(monitorsName.startsWith("monitors")).toBeTruthy();
+                    expect(settingsName.startsWith("settings")).toBeTruthy();
+                    expect(sitesName.startsWith("sites")).toBeTruthy();
+                    expect(temporaryName.startsWith("temporary")).toBeTruthy();
+                })
             );
         });
     });
@@ -446,40 +434,35 @@ describe("cacheConfig - Property-Based Fuzzing Tests", () => {
             ];
 
             fc.assert(
-                fc.property(
-                    fc.constantFrom(...extremeValues),
-                    (extremeValue) => {
-                        // Test all optional suffix functions
-                        expect(() =>
-                            CACHE_NAMES.monitors(extremeValue)
-                        ).not.toThrowError();
-                        expect(() =>
-                            CACHE_NAMES.settings(extremeValue)
-                        ).not.toThrowError();
-                        expect(() =>
-                            CACHE_NAMES.sites(extremeValue)
-                        ).not.toThrowError();
+                fc.property(fc.constantFrom(...extremeValues), (
+                    extremeValue
+                ) => {
+                    // Test all optional suffix functions
+                    expect(() =>
+                        CACHE_NAMES.monitors(extremeValue)).not.toThrowError();
+                    expect(() =>
+                        CACHE_NAMES.settings(extremeValue)).not.toThrowError();
+                    expect(() =>
+                        CACHE_NAMES.sites(extremeValue)).not.toThrowError();
 
-                        // Test temporary function (required parameter)
-                        expect(() =>
-                            CACHE_NAMES.temporary(extremeValue)
-                        ).not.toThrowError();
+                    // Test temporary function (required parameter)
+                    expect(() =>
+                        CACHE_NAMES.temporary(extremeValue)).not.toThrowError();
 
-                        // Verify results are strings
-                        expect(typeof CACHE_NAMES.monitors(extremeValue)).toBe(
-                            "string"
-                        );
-                        expect(typeof CACHE_NAMES.settings(extremeValue)).toBe(
-                            "string"
-                        );
-                        expect(typeof CACHE_NAMES.sites(extremeValue)).toBe(
-                            "string"
-                        );
-                        expect(typeof CACHE_NAMES.temporary(extremeValue)).toBe(
-                            "string"
-                        );
-                    }
-                )
+                    // Verify results are strings
+                    expect(typeof CACHE_NAMES.monitors(extremeValue)).toBe(
+                        "string"
+                    );
+                    expect(typeof CACHE_NAMES.settings(extremeValue)).toBe(
+                        "string"
+                    );
+                    expect(typeof CACHE_NAMES.sites(extremeValue)).toBe(
+                        "string"
+                    );
+                    expect(typeof CACHE_NAMES.temporary(extremeValue)).toBe(
+                        "string"
+                    );
+                })
             );
         });
 

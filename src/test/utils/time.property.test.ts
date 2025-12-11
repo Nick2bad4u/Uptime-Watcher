@@ -336,15 +336,15 @@ describe("Time Utils Property-Based Tests", () => {
         fcTest.prop([
             fc.string({ minLength: 1, maxLength: 20 }),
             fc.integer({ min: 1000, max: 60_000 }),
-        ])(
-            "should use custom label when provided in interval object",
-            (label, value) => {
-                const intervalObj = { label, value };
-                const result = getIntervalLabel(intervalObj);
+        ])("should use custom label when provided in interval object", (
+            label,
+            value
+        ) => {
+            const intervalObj = { label, value };
+            const result = getIntervalLabel(intervalObj);
 
-                expect(result).toBe(label);
-            }
-        );
+            expect(result).toBe(label);
+        });
 
         fcTest.prop([fc.integer({ min: 1000, max: 60_000 })])(
             "should fallback to formatted duration when no label in object",
@@ -424,11 +424,9 @@ describe("Time Utils Property-Based Tests", () => {
                 // Functions should not throw for negative inputs
                 expect(() => formatDuration(Math.abs(ms))).not.toThrowError();
                 expect(() =>
-                    formatIntervalDuration(Math.abs(ms))
-                ).not.toThrowError();
+                    formatIntervalDuration(Math.abs(ms))).not.toThrowError();
                 expect(() =>
-                    formatResponseDuration(Math.abs(ms))
-                ).not.toThrowError();
+                    formatResponseDuration(Math.abs(ms))).not.toThrowError();
             }
         );
 
@@ -448,15 +446,12 @@ describe("Time Utils Property-Based Tests", () => {
 
         fcTest.prop([
             fc.integer({ min: 0, max: 1_000_000_000 }), // 1 billion
-        ])(
-            "should handle very large timestamps without throwing",
-            (timestamp) => {
-                expect(() => formatFullTimestamp(timestamp)).not.toThrowError();
-                expect(() =>
-                    formatRelativeTimestamp(timestamp)
-                ).not.toThrowError();
-            }
-        );
+        ])("should handle very large timestamps without throwing", (
+            timestamp
+        ) => {
+            expect(() => formatFullTimestamp(timestamp)).not.toThrowError();
+            expect(() => formatRelativeTimestamp(timestamp)).not.toThrowError();
+        });
 
         fcTest.prop([
             fc.record({
@@ -464,14 +459,13 @@ describe("Time Utils Property-Based Tests", () => {
                 label: fc.constant(""), // Empty string label
                 extraProp: fc.string(),
             }),
-        ])(
-            "should handle interval objects with empty labels",
-            (intervalObj) => {
-                const result = getIntervalLabel(intervalObj);
-                // Should fallback to formatted duration for empty label
-                expect(result).toBe(formatIntervalDuration(intervalObj.value));
-            }
-        );
+        ])("should handle interval objects with empty labels", (
+            intervalObj
+        ) => {
+            const result = getIntervalLabel(intervalObj);
+            // Should fallback to formatted duration for empty label
+            expect(result).toBe(formatIntervalDuration(intervalObj.value));
+        });
     });
 
     describe("Performance and determinism", () => {
@@ -500,17 +494,16 @@ describe("Time Utils Property-Based Tests", () => {
                 }),
                 { minLength: 1, maxLength: 10 }
             ),
-        ])(
-            "should be consistent for relative timestamp formatting",
-            (timestamps) => {
-                for (const timestamp of timestamps) {
-                    const result1 = formatRelativeTimestamp(timestamp);
-                    const result2 = formatRelativeTimestamp(timestamp);
+        ])("should be consistent for relative timestamp formatting", (
+            timestamps
+        ) => {
+            for (const timestamp of timestamps) {
+                const result1 = formatRelativeTimestamp(timestamp);
+                const result2 = formatRelativeTimestamp(timestamp);
 
-                    expect(result1).toBe(result2);
-                }
+                expect(result1).toBe(result2);
             }
-        );
+        });
 
         fcTest.prop([
             fc.array(fc.integer({ min: 0, max: 10_000 }), {
@@ -520,8 +513,7 @@ describe("Time Utils Property-Based Tests", () => {
         ])("should handle batch processing efficiently", (responseTimes) => {
             // Should be able to process many values without issues
             const results = responseTimes.map((time) =>
-                formatResponseTime(time)
-            );
+                formatResponseTime(time));
 
             expect(results).toHaveLength(responseTimes.length);
             for (const result of results) {

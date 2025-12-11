@@ -89,13 +89,16 @@ describe("cacheKeys Direct Function Coverage", () => {
 
         // Test error cases
         expect(() =>
-            parseCacheKey("invalid" as StandardizedCacheKey)
-        ).toThrowError("Invalid cache key format");
+            parseCacheKey("invalid" as StandardizedCacheKey)).toThrowError(
+            "Invalid cache key format"
+        );
         expect(() =>
-            parseCacheKey(":missing" as StandardizedCacheKey)
-        ).toThrowError("Invalid cache key format");
+            parseCacheKey(":missing" as StandardizedCacheKey)).toThrowError(
+            "Invalid cache key format"
+        );
         expect(() =>
-            parseCacheKey("missing::" as StandardizedCacheKey)
-        ).toThrowError("Invalid cache key format");
+            parseCacheKey("missing::" as StandardizedCacheKey)).toThrowError(
+            "Invalid cache key format"
+        );
     });
 });

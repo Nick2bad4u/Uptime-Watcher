@@ -178,8 +178,7 @@ export type MonitorConfigurationInput = Simplify<
  * @public
  */
 export interface MonitorServiceConfig
-    extends MonitorConfigurationInput,
-        Record<PropertyKey, unknown> {
+    extends MonitorConfigurationInput, Record<PropertyKey, unknown> {
     /**
      * Request timeout in milliseconds.
      *

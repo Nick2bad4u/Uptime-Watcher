@@ -155,8 +155,7 @@ describe(ScreenshotThumbnail, () => {
 
         // Mock getBoundingClientRect
         Element.prototype.getBoundingClientRect = vi.fn(() =>
-            createMockBoundingClientRect()
-        );
+            createMockBoundingClientRect());
     });
 
     afterEach(() => {
@@ -261,62 +260,57 @@ describe(ScreenshotThumbnail, () => {
          */
         it("renders snapshot details for any site name and URL", async () => {
             await fc.assert(
-                fc.asyncProperty(
-                    siteNameArbitrary,
-                    siteUrlArbitrary,
-                    async (siteName, url) => {
-                        const trimmedUrl = url.trim();
-                        render(
-                            <ScreenshotThumbnail
-                                siteName={siteName}
-                                url={url}
-                            />
-                        );
+                fc.asyncProperty(siteNameArbitrary, siteUrlArbitrary, async (
+                    siteName,
+                    url
+                ) => {
+                    const trimmedUrl = url.trim();
+                    render(
+                        <ScreenshotThumbnail siteName={siteName} url={url} />
+                    );
 
-                        const expectedAriaLabel =
-                            trimmedUrl.length > 0
-                                ? `Open ${trimmedUrl} in browser`
-                                : "Open in browser";
-                        const links = screen.queryAllByRole("link");
-                        expect(links.length).toBeGreaterThan(0);
-                        expect(
-                            links.some(
-                                (linkElement) =>
-                                    linkElement.getAttribute("aria-label") ===
-                                    expectedAriaLabel
-                            )
-                        ).toBeTruthy();
+                    const expectedAriaLabel =
+                        trimmedUrl.length > 0
+                            ? `Open ${trimmedUrl} in browser`
+                            : "Open in browser";
+                    const links = screen.queryAllByRole("link");
+                    expect(links.length).toBeGreaterThan(0);
+                    expect(
+                        links.some(
+                            (linkElement) =>
+                                linkElement.getAttribute("aria-label") ===
+                                expectedAriaLabel
+                        )
+                    ).toBeTruthy();
 
-                        const images = screen.queryAllByRole("img");
-                        expect(images.length).toBeGreaterThan(0);
-                        const matchingImage = images.find(
-                            (element) =>
-                                element.getAttribute("alt") ===
-                                `Screenshot of ${siteName}`
+                    const images = screen.queryAllByRole("img");
+                    expect(images.length).toBeGreaterThan(0);
+                    const matchingImage = images.find(
+                        (element) =>
+                            element.getAttribute("alt") ===
+                            `Screenshot of ${siteName}`
+                    );
+                    expect(matchingImage).toBeDefined();
+                    if (matchingImage) {
+                        expect(matchingImage).toHaveAttribute(
+                            "src",
+                            `https://api.microlink.io/?url=${encodeURIComponent(trimmedUrl)}&screenshot=true&meta=false&embed=screenshot.url&colorScheme=auto`
                         );
-                        expect(matchingImage).toBeDefined();
-                        if (matchingImage) {
-                            expect(matchingImage).toHaveAttribute(
-                                "src",
-                                `https://api.microlink.io/?url=${encodeURIComponent(trimmedUrl)}&screenshot=true&meta=false&embed=screenshot.url&colorScheme=auto`
-                            );
-                        }
-
-                        const captionElements = Array.from(
-                            document.querySelectorAll(
-                                ".site-details-thumbnail-caption"
-                            )
-                        );
-                        expect(captionElements.length).toBeGreaterThan(0);
-                        expect(
-                            captionElements.some(
-                                (element) =>
-                                    element.textContent ===
-                                    `Preview: ${siteName}`
-                            )
-                        ).toBeTruthy();
                     }
-                ),
+
+                    const captionElements = Array.from(
+                        document.querySelectorAll(
+                            ".site-details-thumbnail-caption"
+                        )
+                    );
+                    expect(captionElements.length).toBeGreaterThan(0);
+                    expect(
+                        captionElements.some(
+                            (element) =>
+                                element.textContent === `Preview: ${siteName}`
+                        )
+                    ).toBeTruthy();
+                }),
                 {
                     numRuns: 30,
                 }
@@ -1199,8 +1193,9 @@ describe(ScreenshotThumbnail, () => {
 
             // The cleanup should happen through the useEffect cleanup
             expect(() =>
-                screen.queryByAltText(`Screenshot of ${props.siteName}`)
-            ).not.toThrowError();
+                screen.queryByAltText(
+                    `Screenshot of ${props.siteName}`
+                )).not.toThrowError();
 
             clearTimeoutSpy.mockRestore();
             vi.useRealTimers();
@@ -1670,8 +1665,7 @@ describe(ScreenshotThumbnail, () => {
 
             // Restore defaults
             Element.prototype.getBoundingClientRect = vi.fn(() =>
-                createMockBoundingClientRect()
-            );
+                createMockBoundingClientRect());
         });
 
         it("should handle all event combinations that can clear timeouts", ({

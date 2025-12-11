@@ -17,9 +17,8 @@ describe("Function Coverage Boost Tests", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Validation", "type");
 
-            const { validateMonitorType } = await import(
-                "../../shared/utils/validation"
-            );
+            const { validateMonitorType } =
+                await import("../../shared/utils/validation");
 
             // Test all valid monitor types
             expect(validateMonitorType("http")).toBeTruthy();
@@ -47,9 +46,8 @@ describe("Function Coverage Boost Tests", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Validation", "type");
 
-            const { validateSite } = await import(
-                "../../shared/utils/validation"
-            );
+            const { validateSite } =
+                await import("../../shared/utils/validation");
 
             // Valid site object
             const validSite = {
@@ -120,9 +118,8 @@ describe("Function Coverage Boost Tests", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Error Handling", "type");
 
-            const { getMonitorValidationErrors } = await import(
-                "../../shared/utils/validation"
-            );
+            const { getMonitorValidationErrors } =
+                await import("../../shared/utils/validation");
 
             // Test various invalid monitor objects
             expect(getMonitorValidationErrors({})).toContain(
@@ -209,9 +206,8 @@ describe("Function Coverage Boost Tests", () => {
             await annotate("Type: Caching", "type");
 
             try {
-                const cacheModule = await import(
-                    "../../shared/utils/cacheKeys"
-                );
+                const cacheModule =
+                    await import("../../shared/utils/cacheKeys");
 
                 // Test any exported functions that might exist
                 const moduleKeys = Object.keys(cacheModule);
@@ -238,9 +234,8 @@ describe("Function Coverage Boost Tests", () => {
             await annotate("Type: Business Logic", "type");
 
             try {
-                const envModule = await import(
-                    "../../shared/utils/environment"
-                );
+                const envModule =
+                    await import("../../shared/utils/environment");
 
                 if (envModule.isDevelopment) {
                     const result = envModule.isDevelopment();
@@ -274,9 +269,8 @@ describe("Function Coverage Boost Tests", () => {
             await annotate("Type: Business Logic", "type");
 
             try {
-                const objectSafetyModule = await import(
-                    "../../shared/utils/objectSafety"
-                );
+                const objectSafetyModule =
+                    await import("../../shared/utils/objectSafety");
 
                 const moduleKeys = Object.keys(objectSafetyModule);
                 for (const key of moduleKeys) {
@@ -316,9 +310,8 @@ describe("Function Coverage Boost Tests", () => {
             await annotate("Type: Business Logic", "type");
 
             try {
-                const helpersModule = await import(
-                    "../../shared/utils/typeHelpers"
-                );
+                const helpersModule =
+                    await import("../../shared/utils/typeHelpers");
 
                 const moduleKeys = Object.keys(helpersModule);
                 for (const key of moduleKeys) {
@@ -342,9 +335,8 @@ describe("Function Coverage Boost Tests", () => {
             await annotate("Type: Business Logic", "type");
 
             try {
-                const guardsModule = await import(
-                    "../../shared/utils/typeGuards"
-                );
+                const guardsModule =
+                    await import("../../shared/utils/typeGuards");
 
                 const moduleKeys = Object.keys(guardsModule);
                 for (const key of moduleKeys) {
@@ -444,19 +436,17 @@ describe("Function Coverage Boost Tests", () => {
             }));
 
             vi.doMock("@shared/utils/errorHandling", () => ({
-                withUtilityErrorHandling: vi.fn(
-                    async <T>(
-                        operation: () => Promise<T>,
-                        _context: string,
-                        fallback: T
-                    ) => {
-                        try {
-                            return await operation();
-                        } catch {
-                            return fallback;
-                        }
+                withUtilityErrorHandling: vi.fn(async <T>(
+                    operation: () => Promise<T>,
+                    _context: string,
+                    fallback: T
+                ) => {
+                    try {
+                        return await operation();
+                    } catch {
+                        return fallback;
                     }
-                ),
+                }),
             }));
 
             vi.doMock("../stores/monitor/useMonitorTypesStore", () => {
@@ -609,9 +599,8 @@ describe("Function Coverage Boost Tests", () => {
             await annotate("Type: Validation", "type");
 
             try {
-                const monitorValidationModule = await import(
-                    "../utils/monitorValidation"
-                );
+                const monitorValidationModule =
+                    await import("../utils/monitorValidation");
 
                 // Test exported functions
                 const moduleKeys = Object.keys(monitorValidationModule);

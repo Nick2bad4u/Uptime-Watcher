@@ -238,9 +238,8 @@ describe("useSitesStore - Complete Function Coverage", () => {
 
             // Import renderHook for proper React hook testing
             const { renderHook } = await import("@testing-library/react");
-            const { useSitesStore } = await import(
-                "../../../stores/sites/useSitesStore"
-            );
+            const { useSitesStore } =
+                await import("../../../stores/sites/useSitesStore");
 
             // Verify the store is created and has expected methods
             expect(useSitesStore).toBeDefined();

@@ -228,13 +228,14 @@ vi.mock("../../../components/AddSiteForm/SelectField", () => ({
                     onChange={handleChange}
                     data-testid={`selectfield-${id}`}
                 >
-                    {options?.map(
-                        (option: { value: string; label: string }) => (
-                            <option key={option.value} value={option.value}>
-                                {option.label}
-                            </option>
-                        )
-                    )}
+                    {options?.map((option: {
+                        value: string;
+                        label: string;
+                    }) => (
+                        <option key={option.value} value={option.value}>
+                            {option.label}
+                        </option>
+                    ))}
                 </select>
             </div>
         );
@@ -329,20 +330,21 @@ vi.mock("../../../components/AddSiteForm/RadioGroup", () => ({
             <div>
                 <fieldset>
                     <legend>{label}</legend>
-                    {options?.map(
-                        (option: { value: string; label: string }) => (
-                            <div key={option.value}>
-                                <input
-                                    type="radio"
-                                    value={option.value}
-                                    checked={value === option.value}
-                                    onChange={handleChange}
-                                    data-testid={`radio-${option.value}`}
-                                />
-                                <label>{option.label}</label>
-                            </div>
-                        )
-                    )}
+                    {options?.map((option: {
+                        value: string;
+                        label: string;
+                    }) => (
+                        <div key={option.value}>
+                            <input
+                                type="radio"
+                                value={option.value}
+                                checked={value === option.value}
+                                onChange={handleChange}
+                                data-testid={`radio-${option.value}`}
+                            />
+                            <label>{option.label}</label>
+                        </div>
+                    ))}
                 </fieldset>
             </div>
         );
@@ -437,8 +439,7 @@ vi.mock("../../../theme/components/ThemedText", () => ({
 
 vi.mock("../../../components/common/ErrorAlert/ErrorAlert", () => ({
     ErrorAlert: vi.fn(({ message }) =>
-        message ? <div data-testid="error-alert">{message}</div> : null
-    ),
+        message ? <div data-testid="error-alert">{message}</div> : null),
 }));
 
 // Import the component under test
@@ -506,47 +507,44 @@ describe("AddSiteForm User Input Fuzzing", () => {
                 ),
             ],
             { numRuns: 2, timeout: 30_000 }
-        )(
-            "should handle realistic site name inputs safely",
-            async (siteName) => {
-                const user = userEvent.setup();
-                await renderForm();
+        )("should handle realistic site name inputs safely", async (
+            siteName
+        ) => {
+            const user = userEvent.setup();
+            await renderForm();
 
-                // Switch to "new" mode to show site name field
-                const newRadios = screen.getAllByDisplayValue("new");
-                const newRadio = newRadios[0]!;
-                await user.click(newRadio);
+            // Switch to "new" mode to show site name field
+            const newRadios = screen.getAllByDisplayValue("new");
+            const newRadio = newRadios[0]!;
+            await user.click(newRadio);
 
-                // Find and interact with site name input
-                const siteNameInputs = screen.getAllByLabelText(/site name/i);
-                const siteNameInput = siteNameInputs[0]!;
-                expect(siteNameInput).toBeInTheDocument();
+            // Find and interact with site name input
+            const siteNameInputs = screen.getAllByLabelText(/site name/i);
+            const siteNameInput = siteNameInputs[0]!;
+            expect(siteNameInput).toBeInTheDocument();
 
-                // Test input handling
-                await user.clear(siteNameInput);
-                await commitInputValue(siteNameInput, siteName);
+            // Test input handling
+            await user.clear(siteNameInput);
+            await commitInputValue(siteNameInput, siteName);
 
-                // Verify input was accepted (no crash or rejection)
-                expect(siteNameInput).toHaveValue(siteName);
+            // Verify input was accepted (no crash or rejection)
+            expect(siteNameInput).toHaveValue(siteName);
 
-                // Verify no XSS injection (input should be treated as plain text)
+            // Verify no XSS injection (input should be treated as plain text)
+            expect((siteNameInput as HTMLInputElement).value).toBe(siteName);
+
+            // Check for reasonable length limits (prevent memory exhaustion)
+            if (siteName.length <= 100) {
                 expect((siteNameInput as HTMLInputElement).value).toBe(
                     siteName
                 );
-
-                // Check for reasonable length limits (prevent memory exhaustion)
-                if (siteName.length <= 100) {
-                    expect((siteNameInput as HTMLInputElement).value).toBe(
-                        siteName
-                    );
-                } else {
-                    // Should either truncate or reject very long inputs
-                    expect(
-                        (siteNameInput as HTMLInputElement).value.length
-                    ).toBeLessThanOrEqual(200);
-                }
+            } else {
+                // Should either truncate or reject very long inputs
+                expect(
+                    (siteNameInput as HTMLInputElement).value.length
+                ).toBeLessThanOrEqual(200);
             }
-        );
+        });
 
         fcTest.prop(
             [
@@ -561,46 +559,45 @@ describe("AddSiteForm User Input Fuzzing", () => {
                 ),
             ],
             { numRuns: 2, timeout: 30_000 }
-        )(
-            "should handle empty and whitespace site names appropriately",
-            async (emptyName) => {
-                const user = userEvent.setup();
-                await renderForm();
+        )("should handle empty and whitespace site names appropriately", async (
+            emptyName
+        ) => {
+            const user = userEvent.setup();
+            await renderForm();
 
-                // Switch to "new" mode
-                const newRadios = screen.getAllByDisplayValue("new");
-                const newRadio = newRadios[0]!;
-                await user.click(newRadio);
+            // Switch to "new" mode
+            const newRadios = screen.getAllByDisplayValue("new");
+            const newRadio = newRadios[0]!;
+            await user.click(newRadio);
 
-                const siteNameInputs = screen.getAllByLabelText(/site name/i);
-                const siteNameInput = siteNameInputs[0]!;
+            const siteNameInputs = screen.getAllByLabelText(/site name/i);
+            const siteNameInput = siteNameInputs[0]!;
 
-                // Clear and set value using act-aware helper for more control
-                await commitInputValue(siteNameInput, emptyName);
+            // Clear and set value using act-aware helper for more control
+            await commitInputValue(siteNameInput, emptyName);
 
-                // HTML input elements may normalize whitespace, but we primarily care that:
-                // 1. The component doesn't crash
-                // 2. The input accepts the value without throwing
-                // 3. The result is still whitespace-only for whitespace-only inputs
-                const inputValue = (siteNameInput as HTMLInputElement).value;
+            // HTML input elements may normalize whitespace, but we primarily care that:
+            // 1. The component doesn't crash
+            // 2. The input accepts the value without throwing
+            // 3. The result is still whitespace-only for whitespace-only inputs
+            const inputValue = (siteNameInput as HTMLInputElement).value;
 
-                if (emptyName.trim() === "") {
-                    // For whitespace-only inputs, verify the result is also whitespace-only when trimmed
-                    // (HTML may normalize, but it should still be functionally empty)
-                    expect(inputValue.trim()).toBe("");
-                } else {
-                    // For non-whitespace inputs, verify content is preserved
-                    // (basic functional test rather than exact whitespace preservation)
-                    expect(inputValue.length).toBeGreaterThan(0);
-                }
-
-                // Submit button should still be present (validation is on submit)
-                const submitButtons = screen.getAllByRole("button", {
-                    name: /add/i,
-                });
-                expect(submitButtons.length).toBeGreaterThan(0);
+            if (emptyName.trim() === "") {
+                // For whitespace-only inputs, verify the result is also whitespace-only when trimmed
+                // (HTML may normalize, but it should still be functionally empty)
+                expect(inputValue.trim()).toBe("");
+            } else {
+                // For non-whitespace inputs, verify content is preserved
+                // (basic functional test rather than exact whitespace preservation)
+                expect(inputValue.length).toBeGreaterThan(0);
             }
-        );
+
+            // Submit button should still be present (validation is on submit)
+            const submitButtons = screen.getAllByRole("button", {
+                name: /add/i,
+            });
+            expect(submitButtons.length).toBeGreaterThan(0);
+        });
 
         fcTest.prop(
             [
@@ -619,64 +616,57 @@ describe("AddSiteForm User Input Fuzzing", () => {
                 ),
             ],
             { numRuns: 2, timeout: 30_000 }
-        )(
-            "should safely handle potentially malicious site name inputs",
-            async (maliciousName) => {
-                const user = userEvent.setup();
-                await renderForm();
+        )("should safely handle potentially malicious site name inputs", async (
+            maliciousName
+        ) => {
+            const user = userEvent.setup();
+            await renderForm();
 
-                const newRadios = screen.getAllByDisplayValue("new");
-                const newRadio = newRadios[0]!;
-                await user.click(newRadio);
+            const newRadios = screen.getAllByDisplayValue("new");
+            const newRadio = newRadios[0]!;
+            await user.click(newRadio);
 
-                const siteNameInputs = screen.getAllByLabelText(/site name/i);
-                const siteNameInput = siteNameInputs[0]!;
+            const siteNameInputs = screen.getAllByLabelText(/site name/i);
+            const siteNameInput = siteNameInputs[0]!;
 
-                // Should not throw or crash when handling malicious input
-                expect(() => {
-                    fireEvent.change(siteNameInput, {
-                        target: { value: maliciousName },
-                    });
-                }).not.toThrowError();
+            // Should not throw or crash when handling malicious input
+            expect(() => {
+                fireEvent.change(siteNameInput, {
+                    target: { value: maliciousName },
+                });
+            }).not.toThrowError();
 
-                // HTML input elements normalize whitespace, especially newlines
-                // Instead of exact matching, verify the input contains expected content
-                const inputValue = (siteNameInput as HTMLInputElement).value;
+            // HTML input elements normalize whitespace, especially newlines
+            // Instead of exact matching, verify the input contains expected content
+            const inputValue = (siteNameInput as HTMLInputElement).value;
 
-                // For malicious inputs, verify content is preserved (even if whitespace is normalized)
-                if (maliciousName.includes("\n")) {
-                    // If original had newlines, they should be converted to spaces
-                    const normalizedExpected = maliciousName.replaceAll(
-                        "\n",
-                        " "
-                    );
-                    // Allow for some whitespace normalization variations
-                    // eslint-disable-next-line unicorn/prefer-string-replace-all
-                    const actualTrimmed = inputValue.replace(/\s+/g, " ");
-                    // eslint-disable-next-line unicorn/prefer-string-replace-all
-                    const expectedTrimmed = normalizedExpected.replace(
-                        /\s+/g,
-                        " "
-                    );
-                    expect(actualTrimmed).toBe(expectedTrimmed);
-                } else {
-                    // For inputs without newlines, should match exactly
-                    expect(inputValue).toBe(maliciousName);
-                }
-
-                // No script execution or HTML injection should occur
-                const scripts = document.querySelectorAll("script");
-                const initialScriptCount = scripts.length;
-
-                // Trigger any potential XSS
-                await user.click(siteNameInput);
-
-                // No new scripts should be created
-                expect(document.querySelectorAll("script")).toHaveLength(
-                    initialScriptCount
-                );
+            // For malicious inputs, verify content is preserved (even if whitespace is normalized)
+            if (maliciousName.includes("\n")) {
+                // If original had newlines, they should be converted to spaces
+                const normalizedExpected = maliciousName.replaceAll("\n", " ");
+                // Allow for some whitespace normalization variations
+                // eslint-disable-next-line unicorn/prefer-string-replace-all
+                const actualTrimmed = inputValue.replace(/\s+/g, " ");
+                // eslint-disable-next-line unicorn/prefer-string-replace-all
+                const expectedTrimmed = normalizedExpected.replace(/\s+/g, " ");
+                expect(actualTrimmed).toBe(expectedTrimmed);
+            } else {
+                // For inputs without newlines, should match exactly
+                expect(inputValue).toBe(maliciousName);
             }
-        );
+
+            // No script execution or HTML injection should occur
+            const scripts = document.querySelectorAll("script");
+            const initialScriptCount = scripts.length;
+
+            // Trigger any potential XSS
+            await user.click(siteNameInput);
+
+            // No new scripts should be created
+            expect(document.querySelectorAll("script")).toHaveLength(
+                initialScriptCount
+            );
+        });
     });
 
     describe("URL Input Validation (Critical Security Boundary)", () => {
@@ -784,25 +774,24 @@ describe("AddSiteForm User Input Fuzzing", () => {
                 numRuns: 2, // Reduced from 3 to 2
                 timeout: 1500, // Increased fast-check timeout to 1.5s
             }
-        )(
-            "should handle valid host names and IP addresses",
-            async (validHost) => {
-                // Set the mock state to port type before rendering - no DOM interaction needed
-                mockState.monitorType = "port";
+        )("should handle valid host names and IP addresses", async (
+            validHost
+        ) => {
+            // Set the mock state to port type before rendering - no DOM interaction needed
+            mockState.monitorType = "port";
 
-                await renderForm();
+            await renderForm();
 
-                // Verify host input is available
-                const hostInputs = screen.getAllByLabelText(/host/i);
-                const hostInput = hostInputs[0]!; // Take the first one if multiple exist
-                expect(hostInput).toBeInTheDocument();
+            // Verify host input is available
+            const hostInputs = screen.getAllByLabelText(/host/i);
+            const hostInput = hostInputs[0]!; // Take the first one if multiple exist
+            expect(hostInput).toBeInTheDocument();
 
-                // Use direct DOM manipulation instead of userEvent for speed
-                await commitInputValue(hostInput, validHost);
+            // Use direct DOM manipulation instead of userEvent for speed
+            await commitInputValue(hostInput, validHost);
 
-                expect(hostInput).toHaveValue(validHost);
-            }
-        );
+            expect(hostInput).toHaveValue(validHost);
+        });
 
         fcTest.prop(
             [
@@ -819,34 +808,33 @@ describe("AddSiteForm User Input Fuzzing", () => {
                 ),
             ],
             { numRuns: 2, timeout: 10_000 }
-        )(
-            "should safely handle malicious host name inputs",
-            async (maliciousHost) => {
-                // Set the mock state to port type before rendering to avoid state changes
-                mockState.monitorType = "port";
+        )("should safely handle malicious host name inputs", async (
+            maliciousHost
+        ) => {
+            // Set the mock state to port type before rendering to avoid state changes
+            mockState.monitorType = "port";
 
-                await renderForm();
+            await renderForm();
 
-                // Use faster query with proper timeout
-                const hostInput = await waitFor(
-                    () => {
-                        const inputs = screen.queryAllByLabelText(/host/i);
-                        if (inputs.length === 0) {
-                            throw new Error("Host input not found");
-                        }
-                        return inputs[0]!;
-                    },
-                    { timeout: 2000 }
-                );
+            // Use faster query with proper timeout
+            const hostInput = await waitFor(
+                () => {
+                    const inputs = screen.queryAllByLabelText(/host/i);
+                    if (inputs.length === 0) {
+                        throw new Error("Host input not found");
+                    }
+                    return inputs[0]!;
+                },
+                { timeout: 2000 }
+            );
 
-                // Should not crash - use direct DOM manipulation for speed
-                const limitedHost = maliciousHost.slice(0, 50); // Limit to reasonable length
-                await commitInputValue(hostInput, limitedHost);
+            // Should not crash - use direct DOM manipulation for speed
+            const limitedHost = maliciousHost.slice(0, 50); // Limit to reasonable length
+            await commitInputValue(hostInput, limitedHost);
 
-                // Verify the input was set without crashing
-                expect(hostInput).toBeInTheDocument();
-            }
-        );
+            // Verify the input was set without crashing
+            expect(hostInput).toBeInTheDocument();
+        });
     });
 
     describe("Port Number Validation", () => {
@@ -887,31 +875,30 @@ describe("AddSiteForm User Input Fuzzing", () => {
                 ),
             ],
             { numRuns: 2, timeout: 15_000 }
-        )(
-            "should handle invalid port number inputs appropriately",
-            async (invalidPort) => {
-                // Set the mock state to port type before rendering
-                mockState.monitorType = "port";
+        )("should handle invalid port number inputs appropriately", async (
+            invalidPort
+        ) => {
+            // Set the mock state to port type before rendering
+            mockState.monitorType = "port";
 
-                await renderForm();
+            await renderForm();
 
-                // Port input should be available immediately
-                const portInputs = screen.getAllByLabelText(/port/i);
-                const portInput = portInputs[0]!; // Take the first one if multiple exist
-                expect(portInput).toBeInTheDocument();
+            // Port input should be available immediately
+            const portInputs = screen.getAllByLabelText(/port/i);
+            const portInput = portInputs[0]!; // Take the first one if multiple exist
+            expect(portInput).toBeInTheDocument();
 
-                // Should not crash on invalid input while simulating user entry
-                await expect(async () => {
-                    await commitInputValue(portInput, "");
-                    await commitInputValue(portInput, invalidPort.toString());
-                }).not.toThrowError();
+            // Should not crash on invalid input while simulating user entry
+            await expect(async () => {
+                await commitInputValue(portInput, "");
+                await commitInputValue(portInput, invalidPort.toString());
+            }).not.toThrowError();
 
-                // Input should be handled gracefully (validation happens on submit)
-                // For invalid inputs, number fields may clear the value or set to null
-                // The key is that it doesn't crash
-                expect(portInput).toBeInTheDocument();
-            }
-        );
+            // Input should be handled gracefully (validation happens on submit)
+            // For invalid inputs, number fields may clear the value or set to null
+            // The key is that it doesn't crash
+            expect(portInput).toBeInTheDocument();
+        });
     });
 
     describe("Form Submission Edge Cases", () => {
@@ -927,108 +914,95 @@ describe("AddSiteForm User Input Fuzzing", () => {
                 }),
             ],
             { numRuns: 2, timeout: 30_000 }
-        )(
-            "should handle edge case form submissions without crashing",
-            async (formData) => {
-                const user = userEvent.setup();
-                await renderForm();
+        )("should handle edge case form submissions without crashing", async (
+            formData
+        ) => {
+            const user = userEvent.setup();
+            await renderForm();
 
-                // Should not crash during form interaction
-                await expect(async () => {
-                    // Set mode - use query to handle missing elements
-                    const modeRadios = screen.queryAllByDisplayValue(
-                        formData.mode
+            // Should not crash during form interaction
+            await expect(async () => {
+                // Set mode - use query to handle missing elements
+                const modeRadios = screen.queryAllByDisplayValue(formData.mode);
+                const modeRadio = modeRadios[0];
+                if (modeRadio) {
+                    await user.click(modeRadio);
+                }
+
+                // Set monitor type - use query to handle missing elements
+                const monitorTypeSelect =
+                    screen.queryByLabelText(/monitor type/i);
+                if (monitorTypeSelect) {
+                    await user.selectOptions(
+                        monitorTypeSelect,
+                        formData.monitorType
                     );
-                    const modeRadio = modeRadios[0];
-                    if (modeRadio) {
-                        await user.click(modeRadio);
+                }
+
+                // Fill in fields based on monitor type and mode
+                if (formData.mode === "new") {
+                    const siteNameInput = screen.queryByLabelText(/site name/i);
+                    if (siteNameInput) {
+                        await user.clear(siteNameInput);
+                        // Use faster direct assignment
+                        const limitedSiteName = formData.siteName.slice(0, 50);
+                        await commitInputValue(siteNameInput, limitedSiteName);
+                    }
+                }
+
+                // Fill type-specific fields
+                if (formData.monitorType === "http") {
+                    const urlInput =
+                        screen.queryByLabelText(/url/i) ||
+                        screen.queryByPlaceholderText(/url/i);
+                    if (urlInput) {
+                        await user.clear(urlInput);
+                        // Use faster direct assignment
+                        const limitedUrl = formData.url.slice(0, 100);
+                        await commitInputValue(urlInput, limitedUrl);
+                    }
+                }
+
+                if (
+                    formData.monitorType === "port" ||
+                    formData.monitorType === "ping" ||
+                    formData.monitorType === "dns"
+                ) {
+                    const hostInput =
+                        screen.queryByLabelText(/host/i) ||
+                        screen.queryByPlaceholderText(/host/i);
+                    if (hostInput) {
+                        await user.clear(hostInput);
+                        // Use faster direct assignment
+                        const limitedHost = formData.host.slice(0, 50);
+                        await commitInputValue(hostInput, limitedHost);
                     }
 
-                    // Set monitor type - use query to handle missing elements
-                    const monitorTypeSelect =
-                        screen.queryByLabelText(/monitor type/i);
-                    if (monitorTypeSelect) {
-                        await user.selectOptions(
-                            monitorTypeSelect,
-                            formData.monitorType
-                        );
-                    }
-
-                    // Fill in fields based on monitor type and mode
-                    if (formData.mode === "new") {
-                        const siteNameInput =
-                            screen.queryByLabelText(/site name/i);
-                        if (siteNameInput) {
-                            await user.clear(siteNameInput);
+                    if (formData.monitorType === "port") {
+                        const portInput =
+                            screen.queryByLabelText(/port/i) ||
+                            screen.queryByRole("spinbutton", {
+                                name: /port/i,
+                            });
+                        if (portInput) {
+                            await user.clear(portInput);
                             // Use faster direct assignment
-                            const limitedSiteName = formData.siteName.slice(
-                                0,
-                                50
-                            );
-                            await commitInputValue(
-                                siteNameInput,
-                                limitedSiteName
-                            );
+                            await commitInputValue(portInput, formData.port);
                         }
                     }
+                }
+            }).not.toThrowError();
 
-                    // Fill type-specific fields
-                    if (formData.monitorType === "http") {
-                        const urlInput =
-                            screen.queryByLabelText(/url/i) ||
-                            screen.queryByPlaceholderText(/url/i);
-                        if (urlInput) {
-                            await user.clear(urlInput);
-                            // Use faster direct assignment
-                            const limitedUrl = formData.url.slice(0, 100);
-                            await commitInputValue(urlInput, limitedUrl);
-                        }
-                    }
-
-                    if (
-                        formData.monitorType === "port" ||
-                        formData.monitorType === "ping" ||
-                        formData.monitorType === "dns"
-                    ) {
-                        const hostInput =
-                            screen.queryByLabelText(/host/i) ||
-                            screen.queryByPlaceholderText(/host/i);
-                        if (hostInput) {
-                            await user.clear(hostInput);
-                            // Use faster direct assignment
-                            const limitedHost = formData.host.slice(0, 50);
-                            await commitInputValue(hostInput, limitedHost);
-                        }
-
-                        if (formData.monitorType === "port") {
-                            const portInput =
-                                screen.queryByLabelText(/port/i) ||
-                                screen.queryByRole("spinbutton", {
-                                    name: /port/i,
-                                });
-                            if (portInput) {
-                                await user.clear(portInput);
-                                // Use faster direct assignment
-                                await commitInputValue(
-                                    portInput,
-                                    formData.port
-                                );
-                            }
-                        }
-                    }
-                }).not.toThrowError();
-
-                // Form should still be functional
-                const submitButtons = screen.getAllByRole("button", {
-                    name: /add/i,
-                });
-                const submitButton =
-                    submitButtons.length > 0
-                        ? submitButtons[0]
-                        : screen.getAllByRole("button", { name: /submit/i })[0];
-                expect(submitButton).toBeInTheDocument();
-            }
-        );
+            // Form should still be functional
+            const submitButtons = screen.getAllByRole("button", {
+                name: /add/i,
+            });
+            const submitButton =
+                submitButtons.length > 0
+                    ? submitButtons[0]
+                    : screen.getAllByRole("button", { name: /submit/i })[0];
+            expect(submitButton).toBeInTheDocument();
+        });
     });
 
     describe("Validation Function Tests", () => {
@@ -1071,24 +1045,23 @@ describe("AddSiteForm User Input Fuzzing", () => {
                 }),
             ],
             { numRuns: 2, timeout: 30_000 }
-        )(
-            "should validate site configurations with realistic inputs",
-            async (config) => {
-                // Test that valid configurations would create proper site objects
-                const mockSite: Partial<Site> = {
-                    name: config.siteName,
-                    identifier: "test-id",
-                    monitoring: true,
-                    monitors: [],
-                };
+        )("should validate site configurations with realistic inputs", async (
+            config
+        ) => {
+            // Test that valid configurations would create proper site objects
+            const mockSite: Partial<Site> = {
+                name: config.siteName,
+                identifier: "test-id",
+                monitoring: true,
+                monitors: [],
+            };
 
-                // For valid inputs, we should get valid sites
-                if (config.siteName.trim().length > 0) {
-                    expect(mockSite.name).toBe(config.siteName);
-                    expect(mockSite.monitoring).toBeTruthy();
-                    expect(Array.isArray(mockSite.monitors)).toBeTruthy();
-                }
+            // For valid inputs, we should get valid sites
+            if (config.siteName.trim().length > 0) {
+                expect(mockSite.name).toBe(config.siteName);
+                expect(mockSite.monitoring).toBeTruthy();
+                expect(Array.isArray(mockSite.monitors)).toBeTruthy();
             }
-        );
+        });
     });
 });

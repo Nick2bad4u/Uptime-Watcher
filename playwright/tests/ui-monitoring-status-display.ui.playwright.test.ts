@@ -26,7 +26,11 @@ import { DEFAULT_TEST_SITE_URL, generateSiteName } from "../utils/testData";
 test.describe(
     "monitoring status display - modern ui",
     {
-        tag: ["@ui", "@site-details", "@monitoring"],
+        tag: [
+            "@ui",
+            "@site-details",
+            "@monitoring",
+        ],
     },
     () => {
         test.setTimeout(60_000);

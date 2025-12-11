@@ -322,9 +322,8 @@ describe("Final Function Coverage Push", () => {
         }
 
         // Test safeConversions functions
-        const safeConversions = await import(
-            "../../shared/utils/safeConversions"
-        );
+        const safeConversions =
+            await import("../../shared/utils/safeConversions");
         for (const key of Object.keys(safeConversions)) {
             const fn = (safeConversions as any)[key];
             if (typeof fn === "function") {
@@ -343,9 +342,8 @@ describe("Final Function Coverage Push", () => {
         }
 
         // Test stringConversion functions
-        const stringConversion = await import(
-            "../../shared/utils/stringConversion"
-        );
+        const stringConversion =
+            await import("../../shared/utils/stringConversion");
         for (const key of Object.keys(stringConversion)) {
             const fn = (stringConversion as any)[key];
             if (typeof fn === "function") {
@@ -383,9 +381,8 @@ describe("Final Function Coverage Push", () => {
         }
 
         // Test validatorUtils functions
-        const validatorUtils = await import(
-            "../../shared/validation/validatorUtils"
-        );
+        const validatorUtils =
+            await import("../../shared/validation/validatorUtils");
         for (const key of Object.keys(validatorUtils)) {
             const fn = (validatorUtils as any)[key];
             if (typeof fn === "function") {

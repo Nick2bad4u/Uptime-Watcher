@@ -518,7 +518,11 @@ describe(IpcService, () => {
                 monitors: [],
                 monitoring: true,
             };
-            const mockSites = [primarySite, duplicateSite, secondarySite];
+            const mockSites = [
+                primarySite,
+                duplicateSite,
+                secondarySite,
+            ];
             vi.mocked(mockUptimeOrchestrator.getSites).mockResolvedValue(
                 mockSites
             );

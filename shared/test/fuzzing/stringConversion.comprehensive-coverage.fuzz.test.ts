@@ -23,14 +23,13 @@ import { safeStringify } from "../../utils/stringConversion";
 
 describe("StringConversion Complete Coverage Fuzzing Tests", () => {
     describe(safeStringify, () => {
-        test.prop([fc.constant(null)])(
-            "should return empty string for null",
-            (nullValue) => {
-                const result = safeStringify(nullValue);
-                expect(result).toBe("");
-                expect(typeof result).toBe("string");
-            }
-        );
+        test.prop([fc.constant(null)])("should return empty string for null", (
+            nullValue
+        ) => {
+            const result = safeStringify(nullValue);
+            expect(result).toBe("");
+            expect(typeof result).toBe("string");
+        });
 
         test.prop([fc.constant(undefined)])(
             "should return empty string for undefined",
@@ -47,15 +46,14 @@ describe("StringConversion Complete Coverage Fuzzing Tests", () => {
             expect(typeof result).toBe("string");
         });
 
-        test.prop([fc.integer()])(
-            "should convert numbers to strings",
-            (num) => {
-                const result = safeStringify(num);
-                expect(result).toBe(String(num));
-                expect(typeof result).toBe("string");
-                expect(Number(result)).toBe(num);
-            }
-        );
+        test.prop([fc.integer()])("should convert numbers to strings", (
+            num
+        ) => {
+            const result = safeStringify(num);
+            expect(result).toBe(String(num));
+            expect(typeof result).toBe("string");
+            expect(Number(result)).toBe(num);
+        });
 
         test.prop([fc.float()])("should convert floats to strings", (num) => {
             const result = safeStringify(num);
@@ -74,25 +72,23 @@ describe("StringConversion Complete Coverage Fuzzing Tests", () => {
             }
         });
 
-        test.prop([fc.boolean()])(
-            "should convert booleans to strings",
-            (bool) => {
-                const result = safeStringify(bool);
-                expect(result).toBe(String(bool));
-                expect(typeof result).toBe("string");
-                expect(result === "true" || result === "false").toBeTruthy();
-            }
-        );
+        test.prop([fc.boolean()])("should convert booleans to strings", (
+            bool
+        ) => {
+            const result = safeStringify(bool);
+            expect(result).toBe(String(bool));
+            expect(typeof result).toBe("string");
+            expect(result === "true" || result === "false").toBeTruthy();
+        });
 
-        test.prop([fc.bigInt()])(
-            "should convert bigints to strings",
-            (bigint) => {
-                const result = safeStringify(bigint);
-                expect(result).toBe(bigint.toString());
-                expect(typeof result).toBe("string");
-                expect(BigInt(result)).toBe(bigint);
-            }
-        );
+        test.prop([fc.bigInt()])("should convert bigints to strings", (
+            bigint
+        ) => {
+            const result = safeStringify(bigint);
+            expect(result).toBe(bigint.toString());
+            expect(typeof result).toBe("string");
+            expect(BigInt(result)).toBe(bigint);
+        });
 
         it("should convert symbols to strings", () => {
             const symbol = Symbol("test");
@@ -218,13 +214,12 @@ describe("StringConversion Complete Coverage Fuzzing Tests", () => {
             expect(result).toBeDefined();
         });
 
-        test.prop([fc.anything()])(
-            "should never return '[object Object]'",
-            (value) => {
-                const result = safeStringify(value);
-                expect(result).not.toBe("[object Object]");
-            }
-        );
+        test.prop([fc.anything()])("should never return '[object Object]'", (
+            value
+        ) => {
+            const result = safeStringify(value);
+            expect(result).not.toBe("[object Object]");
+        });
 
         test.prop([fc.anything()])("should be deterministic", (value) => {
             const result1 = safeStringify(value);

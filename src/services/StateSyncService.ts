@@ -152,187 +152,178 @@ export const StateSyncService: StateSyncServiceContract = {
      *   handler returned by the preload bridge cannot be normalized, or cleanup
      *   itself throws unexpectedly.
      */
-    onStateSyncEvent: wrap(
-        "onStateSyncEvent",
-        async (api, callback: (event: StateSyncEventData) => void) => {
-            /* eslint-disable n/no-sync, n/callback-return -- IPC bridge exposes asynchronous APIs with "Sync" suffix and forwards callbacks */
-            let pendingRecovery: null | Promise<void> = null;
-            let subscriptionActive = true;
-            let pendingRecoveryExpectation: null | {
-                appliedLocally: boolean;
-                expectedTimestamp: number;
-                siteCount: number;
-                source: StateSyncFullSyncResult["source"];
-            } = null;
-            let pendingRecoveryTimer: null | ReturnType<typeof setTimeout> =
-                null;
+    onStateSyncEvent: wrap("onStateSyncEvent", async (
+        api,
+        callback: (event: StateSyncEventData) => void
+    ) => {
+        /* eslint-disable n/no-sync, n/callback-return -- IPC bridge exposes asynchronous APIs with "Sync" suffix and forwards callbacks */
+        let pendingRecovery: null | Promise<void> = null;
+        let subscriptionActive = true;
+        let pendingRecoveryExpectation: null | {
+            appliedLocally: boolean;
+            expectedTimestamp: number;
+            siteCount: number;
+            source: StateSyncFullSyncResult["source"];
+        } = null;
+        let pendingRecoveryTimer: null | ReturnType<typeof setTimeout> = null;
 
-            const clearPendingRecoveryExpectation = (): void => {
-                if (pendingRecoveryTimer) {
-                    clearTimeout(pendingRecoveryTimer);
-                    pendingRecoveryTimer = null;
-                }
-                pendingRecoveryExpectation = null;
-            };
+        const clearPendingRecoveryExpectation = (): void => {
+            if (pendingRecoveryTimer) {
+                clearTimeout(pendingRecoveryTimer);
+                pendingRecoveryTimer = null;
+            }
+            pendingRecoveryExpectation = null;
+        };
 
-            const scheduleRecovery = (): void => {
-                if (
-                    pendingRecovery !== null ||
-                    pendingRecoveryExpectation !== null
-                ) {
-                    return;
-                }
+        const scheduleRecovery = (): void => {
+            if (
+                pendingRecovery !== null ||
+                pendingRecoveryExpectation !== null
+            ) {
+                return;
+            }
 
-                pendingRecovery = (async (): Promise<void> => {
-                    try {
-                        logger.warn(
-                            "[StateSyncService] Attempting full sync recovery after invalid state sync event"
-                        );
+            pendingRecovery = (async (): Promise<void> => {
+                try {
+                    logger.warn(
+                        "[StateSyncService] Attempting full sync recovery after invalid state sync event"
+                    );
 
-                        const rawFullSync =
-                            await api.stateSync.requestFullSync();
-                        const fullSync =
-                            parseStateSyncFullSyncResult(rawFullSync);
+                    const rawFullSync = await api.stateSync.requestFullSync();
+                    const fullSync = parseStateSyncFullSyncResult(rawFullSync);
 
-                        logger.info(
-                            "[StateSyncService] Full sync recovery snapshot retrieved",
-                            {
-                                siteCount: fullSync.siteCount,
-                                source: fullSync.source,
-                                timestamp: fullSync.completedAt,
-                            }
-                        );
-
-                        if (!subscriptionActive) {
-                            return;
-                        }
-
-                        const synthesizedEvent: StateSyncEventData = {
-                            action: STATE_SYNC_ACTION.BULK_SYNC,
-                            siteIdentifier: "all",
-                            sites: fullSync.sites,
-                            source: fullSync.source,
-                            timestamp: fullSync.completedAt,
-                        };
-
-                        callback(synthesizedEvent);
-
-                        pendingRecoveryExpectation = {
-                            appliedLocally: true,
-                            expectedTimestamp: fullSync.completedAt,
+                    logger.info(
+                        "[StateSyncService] Full sync recovery snapshot retrieved",
+                        {
                             siteCount: fullSync.siteCount,
                             source: fullSync.source,
-                        };
-
-                        if (pendingRecoveryTimer) {
-                            clearTimeout(pendingRecoveryTimer);
+                            timestamp: fullSync.completedAt,
                         }
+                    );
 
-                        pendingRecoveryTimer = setTimeout(() => {
-                            logger.warn(
-                                "[StateSyncService] Full sync recovery broadcast not received within expected window",
-                                {
-                                    expectedTimestamp:
-                                        pendingRecoveryExpectation?.expectedTimestamp,
-                                }
-                            );
-                            clearPendingRecoveryExpectation();
-                        }, 5000);
-                    } catch (error: unknown) {
-                        logger.error(
-                            "[StateSyncService] Full sync recovery failed",
-                            ensureError(error)
-                        );
-                    } finally {
-                        pendingRecovery = null;
-                    }
-                })();
-            };
-
-            const unsubscribeCandidate = await Promise.resolve(
-                api.stateSync.onStateSyncEvent((rawEvent) => {
-                    const parsedEvent = safeParseStateSyncEventData(rawEvent);
-
-                    if (!parsedEvent.success) {
-                        logger.error(
-                            "[StateSyncService] Ignoring invalid state sync event payload",
-                            parsedEvent.error,
-                            {
-                                rawEvent,
-                            }
-                        );
-
-                        scheduleRecovery();
+                    if (!subscriptionActive) {
                         return;
                     }
 
-                    const shouldSkipCallback =
-                        pendingRecoveryExpectation !== null &&
-                        pendingRecoveryExpectation.appliedLocally &&
-                        parsedEvent.data.timestamp ===
-                            pendingRecoveryExpectation.expectedTimestamp;
+                    const synthesizedEvent: StateSyncEventData = {
+                        action: STATE_SYNC_ACTION.BULK_SYNC,
+                        siteIdentifier: "all",
+                        sites: fullSync.sites,
+                        source: fullSync.source,
+                        timestamp: fullSync.completedAt,
+                    };
 
-                    if (!shouldSkipCallback) {
-                        callback(parsedEvent.data);
+                    callback(synthesizedEvent);
+
+                    pendingRecoveryExpectation = {
+                        appliedLocally: true,
+                        expectedTimestamp: fullSync.completedAt,
+                        siteCount: fullSync.siteCount,
+                        source: fullSync.source,
+                    };
+
+                    if (pendingRecoveryTimer) {
+                        clearTimeout(pendingRecoveryTimer);
                     }
 
-                    if (
-                        pendingRecoveryExpectation &&
-                        parsedEvent.data.timestamp ===
-                            pendingRecoveryExpectation.expectedTimestamp
-                    ) {
-                        logger.info(
-                            "[StateSyncService] Full sync recovery broadcast applied",
+                    pendingRecoveryTimer = setTimeout(() => {
+                        logger.warn(
+                            "[StateSyncService] Full sync recovery broadcast not received within expected window",
                             {
-                                siteCount: parsedEvent.data.sites.length,
-                                source: parsedEvent.data.source,
-                                timestamp: parsedEvent.data.timestamp,
+                                expectedTimestamp:
+                                    pendingRecoveryExpectation?.expectedTimestamp,
                             }
                         );
                         clearPendingRecoveryExpectation();
-                    }
-                })
-            );
-            /* eslint-enable n/no-sync, n/callback-return -- Restore linting after state sync subscription block */
-
-            const normalizedCleanup = resolveCleanupHandler(
-                unsubscribeCandidate,
-                {
-                    handleCleanupError: (error: unknown) => {
-                        logger.error(
-                            "[StateSyncService] Failed to cleanup state sync subscription:",
-                            ensureError(error)
-                        );
-                    },
-                    handleInvalidCleanup: ({
-                        actualType,
-                        cleanupCandidate,
-                    }) => {
-                        logger.error(
-                            "[StateSyncService] Preload bridge returned an invalid unsubscribe handler",
-                            {
-                                actualType,
-                                value: cleanupCandidate,
-                            }
-                        );
-
-                        return (): void => {
-                            logger.error(
-                                "[StateSyncService] Skip cleanup, unsubscribe handler was not a function"
-                            );
-                        };
-                    },
+                    }, 5000);
+                } catch (error: unknown) {
+                    logger.error(
+                        "[StateSyncService] Full sync recovery failed",
+                        ensureError(error)
+                    );
+                } finally {
+                    pendingRecovery = null;
                 }
-            );
+            })();
+        };
 
-            return (): void => {
-                subscriptionActive = false;
-                clearPendingRecoveryExpectation();
-                pendingRecovery = null;
-                normalizedCleanup();
-            };
-        }
-    ),
+        const unsubscribeCandidate = await Promise.resolve(
+            api.stateSync.onStateSyncEvent((rawEvent) => {
+                const parsedEvent = safeParseStateSyncEventData(rawEvent);
+
+                if (!parsedEvent.success) {
+                    logger.error(
+                        "[StateSyncService] Ignoring invalid state sync event payload",
+                        parsedEvent.error,
+                        {
+                            rawEvent,
+                        }
+                    );
+
+                    scheduleRecovery();
+                    return;
+                }
+
+                const shouldSkipCallback =
+                    pendingRecoveryExpectation !== null &&
+                    pendingRecoveryExpectation.appliedLocally &&
+                    parsedEvent.data.timestamp ===
+                        pendingRecoveryExpectation.expectedTimestamp;
+
+                if (!shouldSkipCallback) {
+                    callback(parsedEvent.data);
+                }
+
+                if (
+                    pendingRecoveryExpectation &&
+                    parsedEvent.data.timestamp ===
+                        pendingRecoveryExpectation.expectedTimestamp
+                ) {
+                    logger.info(
+                        "[StateSyncService] Full sync recovery broadcast applied",
+                        {
+                            siteCount: parsedEvent.data.sites.length,
+                            source: parsedEvent.data.source,
+                            timestamp: parsedEvent.data.timestamp,
+                        }
+                    );
+                    clearPendingRecoveryExpectation();
+                }
+            })
+        );
+        /* eslint-enable n/no-sync, n/callback-return -- Restore linting after state sync subscription block */
+
+        const normalizedCleanup = resolveCleanupHandler(unsubscribeCandidate, {
+            handleCleanupError: (error: unknown) => {
+                logger.error(
+                    "[StateSyncService] Failed to cleanup state sync subscription:",
+                    ensureError(error)
+                );
+            },
+            handleInvalidCleanup: ({ actualType, cleanupCandidate }) => {
+                logger.error(
+                    "[StateSyncService] Preload bridge returned an invalid unsubscribe handler",
+                    {
+                        actualType,
+                        value: cleanupCandidate,
+                    }
+                );
+
+                return (): void => {
+                    logger.error(
+                        "[StateSyncService] Skip cleanup, unsubscribe handler was not a function"
+                    );
+                };
+            },
+        });
+
+        return (): void => {
+            subscriptionActive = false;
+            clearPendingRecoveryExpectation();
+            pendingRecovery = null;
+            normalizedCleanup();
+        };
+    }),
 
     /**
      * Requests a full state synchronization cycle.

@@ -55,19 +55,17 @@ vi.mock("../../utils/cache", () => ({
 }));
 
 vi.mock("@shared/utils/errorHandling", () => ({
-    withUtilityErrorHandling: vi.fn(
-        async <T>(
-            operation: () => Promise<T>,
-            _context: string,
-            fallback: T
-        ) => {
-            try {
-                return await operation();
-            } catch {
-                return fallback;
-            }
+    withUtilityErrorHandling: vi.fn(async <T>(
+        operation: () => Promise<T>,
+        _context: string,
+        fallback: T
+    ) => {
+        try {
+            return await operation();
+        } catch {
+            return fallback;
         }
-    ),
+    }),
 }));
 
 const mockGetAvailableMonitorTypes =
@@ -220,14 +218,14 @@ beforeEach(() => {
 
     loadMonitorTypesMock.mockResolvedValue(undefined);
 
-    monitorTypesStoreState.formatMonitorDetail.mockImplementation(
-        (type, details) =>
-            MonitorTypesService.formatMonitorDetail(type, details)
-    );
-    monitorTypesStoreState.formatMonitorTitleSuffix.mockImplementation(
-        (type, monitor) =>
-            MonitorTypesService.formatMonitorTitleSuffix(type, monitor)
-    );
+    monitorTypesStoreState.formatMonitorDetail.mockImplementation((
+        type,
+        details
+    ) => MonitorTypesService.formatMonitorDetail(type, details));
+    monitorTypesStoreState.formatMonitorTitleSuffix.mockImplementation((
+        type,
+        monitor
+    ) => MonitorTypesService.formatMonitorTitleSuffix(type, monitor));
 
     const mockedService = vi.mocked(MonitorTypesService);
     mockedService.formatMonitorDetail.mockResolvedValue("Formatted detail");

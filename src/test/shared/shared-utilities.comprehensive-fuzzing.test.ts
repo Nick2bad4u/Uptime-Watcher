@@ -37,30 +37,28 @@ describe("Shared Utilities Comprehensive Fuzzing", () => {
     });
 
     describe("typeGuards", () => {
-        fcTest.prop([fc.anything()])(
-            "should handle type guard operations",
-            (input) => {
-                expect(() => guards.isObject(input)).not.toThrowError();
-                expect(() => guards.isString(input)).not.toThrowError();
-                expect(() => guards.isNumber(input)).not.toThrowError();
-            }
-        );
+        fcTest.prop([fc.anything()])("should handle type guard operations", (
+            input
+        ) => {
+            expect(() => guards.isObject(input)).not.toThrowError();
+            expect(() => guards.isString(input)).not.toThrowError();
+            expect(() => guards.isNumber(input)).not.toThrowError();
+        });
     });
 
     describe("jsonSafety", () => {
-        fcTest.prop([fc.jsonValue()])(
-            "should handle JSON operations safely",
-            (value) => {
-                const result = jsonSafety.safeJsonStringify(value);
-                expect(result).toBeDefined();
-                expect(typeof result).toBe("object");
-                expect(typeof result.success).toBe("boolean");
+        fcTest.prop([fc.jsonValue()])("should handle JSON operations safely", (
+            value
+        ) => {
+            const result = jsonSafety.safeJsonStringify(value);
+            expect(result).toBeDefined();
+            expect(typeof result).toBe("object");
+            expect(typeof result.success).toBe("boolean");
 
-                // If successful, should have data as string
-                if (result.success) {
-                    expect(typeof result.data).toBe("string");
-                }
+            // If successful, should have data as string
+            if (result.success) {
+                expect(typeof result.data).toBe("string");
             }
-        );
+        });
     });
 });

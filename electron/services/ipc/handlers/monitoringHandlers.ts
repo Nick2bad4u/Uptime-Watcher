@@ -40,8 +40,7 @@ export function registerMonitoringHandlers({
     registerStandardizedIpcHandler(
         MONITORING_CHANNELS.startMonitoringForSite,
         withIgnoredIpcEvent((siteIdentifier) =>
-            uptimeOrchestrator.startMonitoringForSite(siteIdentifier)
-        ),
+            uptimeOrchestrator.startMonitoringForSite(siteIdentifier)),
         MonitoringHandlerValidators.startMonitoringForSite,
         registeredHandlers
     );
@@ -52,8 +51,7 @@ export function registerMonitoringHandlers({
             uptimeOrchestrator.startMonitoringForSite(
                 siteIdentifier,
                 monitorIdentifier
-            )
-        ),
+            )),
         MonitoringHandlerValidators.startMonitoringForMonitor,
         registeredHandlers
     );
@@ -61,8 +59,7 @@ export function registerMonitoringHandlers({
     registerStandardizedIpcHandler(
         MONITORING_CHANNELS.stopMonitoringForSite,
         withIgnoredIpcEvent((siteIdentifier) =>
-            uptimeOrchestrator.stopMonitoringForSite(siteIdentifier)
-        ),
+            uptimeOrchestrator.stopMonitoringForSite(siteIdentifier)),
         MonitoringHandlerValidators.stopMonitoringForSite,
         registeredHandlers
     );
@@ -73,8 +70,7 @@ export function registerMonitoringHandlers({
             uptimeOrchestrator.stopMonitoringForSite(
                 siteIdentifier,
                 monitorIdentifier
-            )
-        ),
+            )),
         MonitoringHandlerValidators.stopMonitoringForMonitor,
         registeredHandlers
     );
@@ -85,8 +81,7 @@ export function registerMonitoringHandlers({
             uptimeOrchestrator.checkSiteManually(
                 siteIdentifier,
                 monitorIdentifier
-            )
-        ),
+            )),
         MonitoringHandlerValidators.checkSiteNow,
         registeredHandlers
     );

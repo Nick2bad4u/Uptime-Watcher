@@ -45,13 +45,11 @@ vi.mock("../../../stores/utils", () => ({
 
 vi.mock("../../../../shared/utils/errorHandling", () => ({
     ensureError: vi.fn((error) =>
-        error instanceof Error ? error : new Error(String(error))
-    ),
+        error instanceof Error ? error : new Error(String(error))),
     withErrorHandling: vi.fn(async (operation) => await operation()),
     withUtilityErrorHandling: vi.fn(),
     convertError: vi.fn((error) =>
-        error instanceof Error ? error : new Error(String(error))
-    ),
+        error instanceof Error ? error : new Error(String(error))),
 }));
 
 vi.mock("../../../stores/sites/utils/statusUpdateHandler", () => ({
@@ -216,9 +214,8 @@ describe("useSiteSync - Line Coverage Completion", () => {
 
             describe("retryStatusSubscription success path", () => {
                 it("clears previous diagnostics before re-subscribing", async () => {
-                    const statusUpdateHandlerModule = await import(
-                        "../../../stores/sites/utils/statusUpdateHandler"
-                    );
+                    const statusUpdateHandlerModule =
+                        await import("../../../stores/sites/utils/statusUpdateHandler");
                     const StatusUpdateManagerMock = vi.mocked(
                         statusUpdateHandlerModule.StatusUpdateManager
                     );
@@ -279,9 +276,8 @@ describe("useSiteSync - Line Coverage Completion", () => {
             });
 
             // Mock StatusUpdateManager to throw during subscribe
-            const statusUpdateHandlerModule = await import(
-                "../../../stores/sites/utils/statusUpdateHandler"
-            );
+            const statusUpdateHandlerModule =
+                await import("../../../stores/sites/utils/statusUpdateHandler");
             const mockStatusUpdateManager = {
                 getExpectedListenerCount: vi.fn(() => LISTENER_NAMES.length),
                 subscribe: vi.fn(async () => {
@@ -328,12 +324,12 @@ describe("useSiteSync - Line Coverage Completion", () => {
             await annotate("Type: Data Deletion", "type");
 
             let eventHandler: any;
-            mockStateSyncService.onStateSyncEvent.mockImplementation(
-                async (handler) => {
-                    eventHandler = handler;
-                    return vi.fn();
-                }
-            );
+            mockStateSyncService.onStateSyncEvent.mockImplementation(async (
+                handler
+            ) => {
+                eventHandler = handler;
+                return vi.fn();
+            });
 
             syncActions.subscribeToSyncEvents();
 
@@ -362,12 +358,12 @@ describe("useSiteSync - Line Coverage Completion", () => {
             await annotate("Type: Data Update", "type");
 
             let eventHandler: any;
-            mockStateSyncService.onStateSyncEvent.mockImplementation(
-                async (handler) => {
-                    eventHandler = handler;
-                    return vi.fn();
-                }
-            );
+            mockStateSyncService.onStateSyncEvent.mockImplementation(async (
+                handler
+            ) => {
+                eventHandler = handler;
+                return vi.fn();
+            });
 
             syncActions.subscribeToSyncEvents();
 
@@ -409,12 +405,12 @@ describe("useSiteSync - Line Coverage Completion", () => {
             await annotate("Type: Error Handling", "type");
 
             let eventHandler: any;
-            mockStateSyncService.onStateSyncEvent.mockImplementation(
-                async (handler) => {
-                    eventHandler = handler;
-                    return vi.fn();
-                }
-            );
+            mockStateSyncService.onStateSyncEvent.mockImplementation(async (
+                handler
+            ) => {
+                eventHandler = handler;
+                return vi.fn();
+            });
 
             syncActions.subscribeToSyncEvents();
 
@@ -454,22 +450,22 @@ describe("useSiteSync - Line Coverage Completion", () => {
             );
 
             // Mock withErrorHandling to call the handlers
-            vi.mocked(withErrorHandling).mockImplementationOnce(
-                async (operation, handlers) => {
-                    // Call all the handlers to cover lines 335-341
-                    const frontendHandlers = handlers as any;
-                    if (frontendHandlers?.clearError)
-                        frontendHandlers.clearError();
-                    if (frontendHandlers?.setError)
-                        frontendHandlers.setError(new Error("test"));
-                    if (frontendHandlers?.setLoading)
-                        frontendHandlers.setLoading(true);
-                    if (frontendHandlers?.setLoading)
-                        frontendHandlers.setLoading(false);
+            vi.mocked(withErrorHandling).mockImplementationOnce(async (
+                operation,
+                handlers
+            ) => {
+                // Call all the handlers to cover lines 335-341
+                const frontendHandlers = handlers as any;
+                if (frontendHandlers?.clearError) frontendHandlers.clearError();
+                if (frontendHandlers?.setError)
+                    frontendHandlers.setError(new Error("test"));
+                if (frontendHandlers?.setLoading)
+                    frontendHandlers.setLoading(true);
+                if (frontendHandlers?.setLoading)
+                    frontendHandlers.setLoading(false);
 
-                    return await operation();
-                }
-            );
+                return await operation();
+            });
 
             const fullSyncResult = {
                 completedAt: Date.now(),
@@ -512,12 +508,12 @@ describe("useSiteSync - Line Coverage Completion", () => {
             await annotate("Type: Business Logic", "type");
 
             let eventHandler: any;
-            mockStateSyncService.onStateSyncEvent.mockImplementation(
-                async (handler) => {
-                    eventHandler = handler;
-                    return vi.fn();
-                }
-            );
+            mockStateSyncService.onStateSyncEvent.mockImplementation(async (
+                handler
+            ) => {
+                eventHandler = handler;
+                return vi.fn();
+            });
 
             syncActions.subscribeToSyncEvents();
 

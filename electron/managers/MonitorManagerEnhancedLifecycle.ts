@@ -460,15 +460,15 @@ export async function startMonitoringForSiteEnhancedFlow(params: {
     const rawMonitors = (
         Array.isArray(site.monitors) ? site.monitors : []
     ) as Array<Monitor | undefined>;
-    const validMonitors = rawMonitors.filter(
-        (candidate): candidate is Monitor & { id: string } => {
-            if (!candidate) {
-                return false;
-            }
-
-            return typeof candidate.id === "string" && candidate.id.length > 0;
+    const validMonitors = rawMonitors.filter((
+        candidate
+    ): candidate is Monitor & { id: string } => {
+        if (!candidate) {
+            return false;
         }
-    );
+
+        return typeof candidate.id === "string" && candidate.id.length > 0;
+    });
     let hasSuccessfulStart = false;
 
     await runSequentially(validMonitors, async (monitorWithId) => {
@@ -568,19 +568,19 @@ export async function stopMonitoringForSiteEnhancedFlow(params: {
     const rawMonitors = (
         Array.isArray(site.monitors) ? site.monitors : []
     ) as Array<Monitor | undefined>;
-    const validMonitors = rawMonitors.filter(
-        (candidate): candidate is Monitor & { id: string } => {
-            if (!candidate) {
-                return false;
-            }
-
-            return (
-                typeof candidate.id === "string" &&
-                candidate.id.length > 0 &&
-                candidate.monitoring
-            );
+    const validMonitors = rawMonitors.filter((
+        candidate
+    ): candidate is Monitor & { id: string } => {
+        if (!candidate) {
+            return false;
         }
-    );
+
+        return (
+            typeof candidate.id === "string" &&
+            candidate.id.length > 0 &&
+            candidate.monitoring
+        );
+    });
     let allStoppedSuccessfully = true;
 
     await runSequentially(validMonitors, async (monitorWithId) => {

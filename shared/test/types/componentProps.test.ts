@@ -301,8 +301,7 @@ describe("Component Props - EventHandlers Namespace", () => {
                 "data-testid"?: string;
             }
 
-            interface ClickableComponentProperties
-                extends BaseComponentProperties {
+            interface ClickableComponentProperties extends BaseComponentProperties {
                 onClick?: ClickWithEventHandler<HTMLButtonElement>;
             }
 

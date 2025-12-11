@@ -279,37 +279,38 @@ describe(useAlertStore, () => {
             fc.string({ maxLength: 40 }),
         ],
         { numRuns: 60 }
-    )(
-        "site name derivation trims or falls back to identifiers",
-        (rawSiteName, rawSiteIdentifier, rawEventIdentifier) => {
-            const update = createStatusUpdate({
-                site: {
-                    identifier: rawSiteIdentifier,
-                    monitoring: true,
-                    monitors: [],
-                    name: rawSiteName,
-                },
-                siteIdentifier: rawEventIdentifier,
-            });
+    )("site name derivation trims or falls back to identifiers", (
+        rawSiteName,
+        rawSiteIdentifier,
+        rawEventIdentifier
+    ) => {
+        const update = createStatusUpdate({
+            site: {
+                identifier: rawSiteIdentifier,
+                monitoring: true,
+                monitors: [],
+                name: rawSiteName,
+            },
+            siteIdentifier: rawEventIdentifier,
+        });
 
-            const alert = mapStatusUpdateToAlert(update);
+        const alert = mapStatusUpdateToAlert(update);
 
-            const trimmedName = rawSiteName.trim();
-            const trimmedIdentifier = rawSiteIdentifier.trim();
-            const trimmedEventIdentifier = rawEventIdentifier.trim();
+        const trimmedName = rawSiteName.trim();
+        const trimmedIdentifier = rawSiteIdentifier.trim();
+        const trimmedEventIdentifier = rawEventIdentifier.trim();
 
-            const expectedSiteName =
-                trimmedName.length > 0
-                    ? trimmedName
-                    : trimmedIdentifier.length > 0
-                      ? trimmedIdentifier
-                      : trimmedEventIdentifier.length > 0
-                        ? trimmedEventIdentifier
-                        : "unknown-site";
+        const expectedSiteName =
+            trimmedName.length > 0
+                ? trimmedName
+                : trimmedIdentifier.length > 0
+                  ? trimmedIdentifier
+                  : trimmedEventIdentifier.length > 0
+                    ? trimmedEventIdentifier
+                    : "unknown-site";
 
-            expect(alert.siteName).toBe(expectedSiteName);
-        }
-    );
+        expect(alert.siteName).toBe(expectedSiteName);
+    });
 
     it("normalizes invalid timestamps to Date.now() when mapping status updates", () => {
         const fixedNow = 1_725_000_000_000;

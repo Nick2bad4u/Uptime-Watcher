@@ -623,11 +623,9 @@ describe(useErrorStore, () => {
             });
 
             const { result: result1, rerender: rerender1 } = renderHook(() =>
-                useErrorStore()
-            );
+                useErrorStore());
             const { result: result2, rerender: rerender2 } = renderHook(() =>
-                useErrorStore()
-            );
+                useErrorStore());
 
             // Verify initial state is clean
             expect(

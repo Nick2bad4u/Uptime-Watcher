@@ -176,16 +176,16 @@ describe("getMonitorDisplayIdentifier monitor type coverage", () => {
         fc
             .string({ minLength: 3, maxLength: 40 })
             .filter((label) => label.trim().length > 0),
-    ])(
-        "returns fallback label when URL data is unavailable",
-        (monitorType, siteIdentifier) => {
-            const monitorWithoutUrl = createMonitorFixture(monitorType, {
-                url: undefined,
-            });
+    ])("returns fallback label when URL data is unavailable", (
+        monitorType,
+        siteIdentifier
+    ) => {
+        const monitorWithoutUrl = createMonitorFixture(monitorType, {
+            url: undefined,
+        });
 
-            expect(
-                getMonitorDisplayIdentifier(monitorWithoutUrl, siteIdentifier)
-            ).toBe(siteIdentifier);
-        }
-    );
+        expect(
+            getMonitorDisplayIdentifier(monitorWithoutUrl, siteIdentifier)
+        ).toBe(siteIdentifier);
+    });
 });

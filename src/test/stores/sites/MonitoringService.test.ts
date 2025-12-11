@@ -887,8 +887,7 @@ describe("MonitoringService", () => {
                 MonitoringService.startMonitoringForMonitor(
                     `site-${i}`,
                     `monitor-${i}`
-                )
-            );
+                ));
 
             mockElectronAPI.monitoring.startMonitoringForMonitor.mockResolvedValue(
                 true
@@ -914,8 +913,7 @@ describe("MonitoringService", () => {
                 MonitoringService.stopMonitoringForMonitor(
                     `site-${i}`,
                     `monitor-${i}`
-                )
-            );
+                ));
 
             mockElectronAPI.monitoring.stopMonitoringForMonitor.mockResolvedValue(
                 true
@@ -941,14 +939,12 @@ describe("MonitoringService", () => {
                 MonitoringService.startMonitoringForMonitor(
                     `site-${i}`,
                     `monitor-${i}`
-                )
-            );
+                ));
             const stopOps = Array.from({ length: 3 }, (_, i) =>
                 MonitoringService.stopMonitoringForMonitor(
                     `site-${i + 3}`,
                     `monitor-${i + 3}`
-                )
-            );
+                ));
 
             mockElectronAPI.monitoring.startMonitoringForMonitor.mockResolvedValue(
                 true

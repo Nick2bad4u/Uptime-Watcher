@@ -29,12 +29,12 @@ const contentArbitrary = fc
 let rafSpy: { mockRestore: () => void } | null = null;
 
 beforeEach(() => {
-    rafSpy = vi
-        .spyOn(window, "requestAnimationFrame")
-        .mockImplementation((callback: FrameRequestCallback) => {
-            callback(0);
-            return 1;
-        });
+    rafSpy = vi.spyOn(window, "requestAnimationFrame").mockImplementation((
+        callback: FrameRequestCallback
+    ) => {
+        callback(0);
+        return 1;
+    });
 });
 
 afterEach(() => {
@@ -163,61 +163,56 @@ describe("Tooltip fast-check coverage", () => {
             fc.constantFrom("inline", "block"),
         ],
         { numRuns: 6, timeout: 4000 }
-    )(
-        "applies positional styling and layout classes correctly",
-        async (
-            tooltipClass,
-            containerClass,
-            content,
-            maxWidth,
-            position,
-            wrapMode
-        ) => {
-            const { unmount } = render(
-                <Tooltip
-                    className={tooltipClass}
-                    content={content}
-                    delay={0}
-                    maxWidth={maxWidth}
-                    position={position}
-                    wrapMode={wrapMode}
-                    {...(containerClass
-                        ? { containerClassName: containerClass }
-                        : {})}
-                >
-                    {(triggerProps) => <span {...triggerProps}>Trigger</span>}
-                </Tooltip>
-            );
+    )("applies positional styling and layout classes correctly", async (
+        tooltipClass,
+        containerClass,
+        content,
+        maxWidth,
+        position,
+        wrapMode
+    ) => {
+        const { unmount } = render(
+            <Tooltip
+                className={tooltipClass}
+                content={content}
+                delay={0}
+                maxWidth={maxWidth}
+                position={position}
+                wrapMode={wrapMode}
+                {...(containerClass
+                    ? { containerClassName: containerClass }
+                    : {})}
+            >
+                {(triggerProps) => <span {...triggerProps}>Trigger</span>}
+            </Tooltip>
+        );
 
-            const container = document.querySelector(
-                ".tooltip-container"
-            ) as HTMLDivElement;
-            fireEvent.mouseEnter(container);
-            await waitFor(
-                () => expect(document.querySelector(".tooltip")).not.toBeNull(),
-                { timeout: 500 }
-            );
+        const container = document.querySelector(
+            ".tooltip-container"
+        ) as HTMLDivElement;
+        fireEvent.mouseEnter(container);
+        await waitFor(
+            () => expect(document.querySelector(".tooltip")).not.toBeNull(),
+            { timeout: 500 }
+        );
 
-            const tooltip = document.querySelector(
-                ".tooltip"
-            ) as HTMLDivElement;
-            expect(tooltip).not.toBeNull();
-            expect(tooltip).toHaveClass(`tooltip--${position}`);
-            expect(tooltip).toHaveClass(tooltipClass);
-            expect(tooltip.style.maxWidth).toBe(`${maxWidth}px`);
-            expect(tooltip.textContent).toContain(content);
+        const tooltip = document.querySelector(".tooltip") as HTMLDivElement;
+        expect(tooltip).not.toBeNull();
+        expect(tooltip).toHaveClass(`tooltip--${position}`);
+        expect(tooltip).toHaveClass(tooltipClass);
+        expect(tooltip.style.maxWidth).toBe(`${maxWidth}px`);
+        expect(tooltip.textContent).toContain(content);
 
-            if (wrapMode === "block") {
-                expect(container).toHaveClass("tooltip-container--block");
-            } else {
-                expect(container).toHaveClass("tooltip-container--inline");
-            }
-
-            if (containerClass) {
-                expect(container).toHaveClass(containerClass);
-            }
-
-            unmount();
+        if (wrapMode === "block") {
+            expect(container).toHaveClass("tooltip-container--block");
+        } else {
+            expect(container).toHaveClass("tooltip-container--inline");
         }
-    );
+
+        if (containerClass) {
+            expect(container).toHaveClass(containerClass);
+        }
+
+        unmount();
+    });
 });

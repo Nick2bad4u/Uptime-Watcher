@@ -184,7 +184,11 @@ describe("Settings - Branch Coverage Tests", () => {
         },
         isDark: false,
         setTheme: vi.fn(),
-        availableThemes: ["light", "dark", "system"],
+        availableThemes: [
+            "light",
+            "dark",
+            "system",
+        ],
         getColor: vi.fn(() => "#000"),
         getStatusColor: vi.fn(),
         systemTheme: "light",

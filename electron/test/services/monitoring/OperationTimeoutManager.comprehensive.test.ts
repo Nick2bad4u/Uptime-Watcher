@@ -36,8 +36,7 @@ vi.mock("@shared/utils/logTemplates", () => ({
         template.replaceAll(
             /{(?<key>\w+)}/g,
             (match, key) => params[key] || match
-        )
-    ),
+        )),
     LOG_TEMPLATES: {
         debug: {
             OPERATION_TIMEOUT_SCHEDULED:
@@ -118,9 +117,8 @@ describe("OperationTimeoutManager - Comprehensive Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             const { monitorLogger } = await import("../../../utils/logger");
-            const { interpolateLogTemplate, LOG_TEMPLATES } = await import(
-                "@shared/utils/logTemplates"
-            );
+            const { interpolateLogTemplate, LOG_TEMPLATES } =
+                await import("@shared/utils/logTemplates");
 
             const operationId = "op-456";
             const timeoutMs = 3000;
@@ -263,9 +261,8 @@ describe("OperationTimeoutManager - Comprehensive Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             const { monitorLogger } = await import("../../../utils/logger");
-            const { interpolateLogTemplate, LOG_TEMPLATES } = await import(
-                "@shared/utils/logTemplates"
-            );
+            const { interpolateLogTemplate, LOG_TEMPLATES } =
+                await import("@shared/utils/logTemplates");
 
             const operationId = "op-timeout";
             const monitorId = "monitor-123";
@@ -560,9 +557,9 @@ describe("OperationTimeoutManager - Comprehensive Coverage", () => {
                 },
             ];
 
-            vi.mocked(mockOperationRegistry.getOperation).mockImplementation(
-                (id) => operations.find((op) => op.id === id)
-            );
+            vi.mocked(mockOperationRegistry.getOperation).mockImplementation((
+                id
+            ) => operations.find((op) => op.id === id));
 
             // Schedule timeouts with different durations
             operationTimeoutManager.scheduleTimeout("op-1", 1000);

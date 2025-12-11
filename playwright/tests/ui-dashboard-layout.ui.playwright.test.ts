@@ -21,7 +21,11 @@ import {
 test.describe(
     "dashboard layout selector - modern ui",
     {
-        tag: ["@ui", "@dashboard", "@regression"],
+        tag: [
+            "@ui",
+            "@dashboard",
+            "@regression",
+        ],
     },
     () => {
         test.setTimeout(60_000);

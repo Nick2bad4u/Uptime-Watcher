@@ -1010,22 +1010,19 @@ export class ServiceContainer {
 
         if (typeof maybeTypedBus.onTyped === "function") {
             for (const eventName of eventsToForward) {
-                maybeTypedBus.onTyped(
-                    eventName,
-                    (
-                        payloadWithMeta: EnhancedEventPayload<
-                            UptimeEvents[typeof eventName]
-                        >
-                    ): void => {
-                        const forwardablePayload =
-                            toForwardablePayload(payloadWithMeta);
-                        this.emitForwardedEvent(
-                            eventName,
-                            forwardablePayload,
-                            managerName
-                        );
-                    }
-                );
+                maybeTypedBus.onTyped(eventName, (
+                    payloadWithMeta: EnhancedEventPayload<
+                        UptimeEvents[typeof eventName]
+                    >
+                ): void => {
+                    const forwardablePayload =
+                        toForwardablePayload(payloadWithMeta);
+                    this.emitForwardedEvent(
+                        eventName,
+                        forwardablePayload,
+                        managerName
+                    );
+                });
             }
         } else {
             for (const eventName of eventsToForward) {
@@ -1036,19 +1033,15 @@ export class ServiceContainer {
                 ).on;
 
                 if (typeof rawOn === "function") {
-                    rawOn.call(
-                        managerEventBus,
-                        eventName,
-                        (
-                            payload: ForwardableEventPayload<typeof eventName>
-                        ): void => {
-                            this.emitForwardedEvent(
-                                eventName,
-                                payload,
-                                managerName
-                            );
-                        }
-                    );
+                    rawOn.call(managerEventBus, eventName, (
+                        payload: ForwardableEventPayload<typeof eventName>
+                    ): void => {
+                        this.emitForwardedEvent(
+                            eventName,
+                            payload,
+                            managerName
+                        );
+                    });
                 } else if (this.config.enableDebugLogging) {
                     logger.warn(
                         `[ServiceContainer] Skipping forwarding for ${eventName} because manager event bus for ${managerName} lacks an on() method`

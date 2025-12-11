@@ -21,7 +21,7 @@ import { existsSync } from "node:fs";
 import path from "node:path";
 
 // Will be loaded dynamically in main()
-/** @type {function(string): string|undefined} */
+/** @type {function(string): string | undefined} */
 let applyLintCompliantTransforms;
 
 // Parse command line arguments

@@ -77,8 +77,7 @@ import { useTheme, useThemeClasses } from "../useTheme";
  * @public
  */
 export interface ThemedInputProperties
-    extends AccessibilityProperties,
-        CoreComponentProperties {
+    extends AccessibilityProperties, CoreComponentProperties {
     /** Unique identifier for the input element */
     readonly id?: string;
     /** Maximum value (for number inputs) or maximum length (for text inputs) */

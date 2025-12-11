@@ -175,9 +175,8 @@ describe("Submit.tsx - Comprehensive Coverage", () => {
             const properties = createMockProperties();
 
             // Mock validation failure
-            const { validateMonitorFormData } = await import(
-                "../../../utils/monitorValidation"
-            );
+            const { validateMonitorFormData } =
+                await import("../../../utils/monitorValidation");
             vi.mocked(validateMonitorFormData).mockResolvedValue({
                 errors: ["Invalid URL format"],
                 metadata: {},

@@ -147,8 +147,11 @@ function createNoParamsValidator(): IpcParameterValidator {
  */
 function createSingleNumberValidator(paramName: string): IpcParameterValidator {
     return createParamValidator(1, [
-        (value): null | string =>
-            IpcValidators.requiredNumber(value, paramName),
+        (
+            value
+        ):
+            | null
+            | string => IpcValidators.requiredNumber(value, paramName),
     ]);
 }
 
@@ -161,8 +164,11 @@ function createSingleNumberValidator(paramName: string): IpcParameterValidator {
  */
 function createSingleObjectValidator(paramName: string): IpcParameterValidator {
     return createParamValidator(1, [
-        (value): null | string =>
-            IpcValidators.requiredObject(value, paramName),
+        (
+            value
+        ):
+            | null
+            | string => IpcValidators.requiredObject(value, paramName),
     ]);
 }
 
@@ -339,8 +345,11 @@ function validateRestorePayload(params: readonly unknown[]): null | string[] {
  */
 function createSingleStringValidator(paramName: string): IpcParameterValidator {
     return createParamValidator(1, [
-        (value): null | string =>
-            IpcValidators.requiredString(value, paramName),
+        (
+            value
+        ):
+            | null
+            | string => IpcValidators.requiredString(value, paramName),
     ]);
 }
 
@@ -354,7 +363,11 @@ function createSingleStringValidator(paramName: string): IpcParameterValidator {
  */
 function createSingleUrlValidator(paramName: string): IpcParameterValidator {
     return createParamValidator(1, [
-        (value): null | string => IpcValidators.requiredUrl(value, paramName),
+        (
+            value
+        ):
+            | null
+            | string => IpcValidators.requiredUrl(value, paramName),
     ]);
 }
 
@@ -371,10 +384,16 @@ function createStringObjectValidator(
     objectParamName: string
 ): IpcParameterValidator {
     return createParamValidator(2, [
-        (value): null | string =>
-            IpcValidators.requiredString(value, stringParamName),
-        (value): null | string =>
-            IpcValidators.requiredObject(value, objectParamName),
+        (
+            value
+        ):
+            | null
+            | string => IpcValidators.requiredString(value, stringParamName),
+        (
+            value
+        ):
+            | null
+            | string => IpcValidators.requiredObject(value, objectParamName),
     ]);
 }
 
@@ -390,8 +409,11 @@ function createStringWithUnvalidatedSecondValidator(
     firstParamName: string
 ): IpcParameterValidator {
     return createParamValidator(2, [
-        (value): null | string =>
-            IpcValidators.requiredString(value, firstParamName),
+        (
+            value
+        ):
+            | null
+            | string => IpcValidators.requiredString(value, firstParamName),
         (): null => null,
     ]);
 }
@@ -410,10 +432,16 @@ function createTwoStringValidator(
     secondParamName: string
 ): IpcParameterValidator {
     return createParamValidator(2, [
-        (value): null | string =>
-            IpcValidators.requiredString(value, firstParamName),
-        (value): null | string =>
-            IpcValidators.requiredString(value, secondParamName),
+        (
+            value
+        ):
+            | null
+            | string => IpcValidators.requiredString(value, firstParamName),
+        (
+            value
+        ):
+            | null
+            | string => IpcValidators.requiredString(value, secondParamName),
     ]);
 }
 

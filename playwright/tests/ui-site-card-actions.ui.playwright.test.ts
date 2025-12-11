@@ -32,7 +32,11 @@ function resolveMetricsSummaryLocator(page: Page, site: CreatedSiteResult) {
 test.describe(
     "site card actions - modern ui",
     {
-        tag: ["@ui", "@site-card", "@monitoring"],
+        tag: [
+            "@ui",
+            "@site-card",
+            "@monitoring",
+        ],
     },
     () => {
         test.setTimeout(60_000);

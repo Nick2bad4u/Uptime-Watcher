@@ -246,36 +246,38 @@ describe("Store Utils", () => {
                 storeNameArbitrary,
                 actionNameArbitrary,
                 payloadArbitrary,
-            ])(
-                "should log any valid payload in development mode",
-                (storeName, actionName, payload) => {
-                    mockIsDevelopment.mockReturnValue(true);
-                    vi.clearAllMocks();
+            ])("should log any valid payload in development mode", (
+                storeName,
+                actionName,
+                payload
+            ) => {
+                mockIsDevelopment.mockReturnValue(true);
+                vi.clearAllMocks();
 
-                    logStoreAction(storeName, actionName, payload);
+                logStoreAction(storeName, actionName, payload);
 
-                    expect(mockLogger.info).toHaveBeenCalledWith(
-                        `[${storeName}] ${actionName}`,
-                        payload
-                    );
-                }
-            );
+                expect(mockLogger.info).toHaveBeenCalledWith(
+                    `[${storeName}] ${actionName}`,
+                    payload
+                );
+            });
 
             test.prop([
                 storeNameArbitrary,
                 actionNameArbitrary,
                 payloadArbitrary,
-            ])(
-                "should never log in production mode regardless of payload",
-                (storeName, actionName, payload) => {
-                    mockIsDevelopment.mockReturnValue(false);
-                    vi.clearAllMocks();
+            ])("should never log in production mode regardless of payload", (
+                storeName,
+                actionName,
+                payload
+            ) => {
+                mockIsDevelopment.mockReturnValue(false);
+                vi.clearAllMocks();
 
-                    logStoreAction(storeName, actionName, payload);
+                logStoreAction(storeName, actionName, payload);
 
-                    expect(mockLogger.info).not.toHaveBeenCalled();
-                }
-            );
+                expect(mockLogger.info).not.toHaveBeenCalled();
+            });
 
             test.prop([storeNameArbitrary, actionNameArbitrary])(
                 "should handle undefined payload consistently",

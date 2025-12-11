@@ -593,14 +593,14 @@ export class DatabaseManager {
             setHistoryLimit: (newLimit) => {
                 this.historyLimit = newLimit;
                 // Use centralized event emission (fire and forget)
-                this.emitHistoryLimitUpdated(newLimit).catch(
-                    (error: unknown) => {
-                        monitorLogger.error(
-                            "[DatabaseManager] Failed to emit history limit updated event:",
-                            error
-                        );
-                    }
-                );
+                this.emitHistoryLimitUpdated(newLimit).catch((
+                    error: unknown
+                ) => {
+                    monitorLogger.error(
+                        "[DatabaseManager] Failed to emit history limit updated event:",
+                        error
+                    );
+                });
             },
         });
     }
@@ -774,10 +774,10 @@ export class DatabaseManager {
         }
 
         // Atomically replace the main cache (prevents race conditions)
-        const serializedEntries = Array.from(
-            tempCache.entries(),
-            ([key, site]) => ({ data: site, key })
-        );
+        const serializedEntries = Array.from(tempCache.entries(), ([
+            key,
+            site,
+        ]) => ({ data: site, key }));
         this.siteCache.replaceAll(serializedEntries);
 
         // Update the cache with loaded sites (final update to ensure

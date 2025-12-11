@@ -67,18 +67,19 @@ vi.mock("../stores/ui/useUiStore", () => ({
 vi.mock("../hooks/useMount", () => {
     const calledCallbacks = new WeakSet();
     return {
-        useMount: vi.fn(
-            (callback: () => void, cleanupCallback?: () => void) => {
-                // Only call the callback once per component instance to avoid infinite loops
-                // This simulates the real useMount behavior
-                if (!calledCallbacks.has(callback)) {
-                    calledCallbacks.add(callback);
-                    callback();
-                }
-                // Return cleanup function if provided (for testing unmount behavior)
-                return cleanupCallback;
+        useMount: vi.fn((
+            callback: () => void,
+            cleanupCallback?: () => void
+        ) => {
+            // Only call the callback once per component instance to avoid infinite loops
+            // This simulates the real useMount behavior
+            if (!calledCallbacks.has(callback)) {
+                calledCallbacks.add(callback);
+                callback();
             }
-        ),
+            // Return cleanup function if provided (for testing unmount behavior)
+            return cleanupCallback;
+        }),
     };
 });
 

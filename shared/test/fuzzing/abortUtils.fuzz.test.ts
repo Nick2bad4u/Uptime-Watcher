@@ -368,25 +368,23 @@ describe("AbortUtils Fuzzing Tests", () => {
     });
 
     describe(isAbortError, () => {
-        test.prop([fc.string()])(
-            "should identify AbortError by name",
-            (message) => {
-                const error = new Error(message);
-                error.name = "AbortError";
+        test.prop([fc.string()])("should identify AbortError by name", (
+            message
+        ) => {
+            const error = new Error(message);
+            error.name = "AbortError";
 
-                expect(isAbortError(error)).toBeTruthy();
-            }
-        );
+            expect(isAbortError(error)).toBeTruthy();
+        });
 
-        test.prop([fc.string()])(
-            "should identify TimeoutError by name",
-            (message) => {
-                const error = new Error(message);
-                error.name = "TimeoutError";
+        test.prop([fc.string()])("should identify TimeoutError by name", (
+            message
+        ) => {
+            const error = new Error(message);
+            error.name = "TimeoutError";
 
-                expect(isAbortError(error)).toBeTruthy();
-            }
-        );
+            expect(isAbortError(error)).toBeTruthy();
+        });
 
         test.prop([
             fc.oneof(
@@ -492,17 +490,16 @@ describe("AbortUtils Fuzzing Tests", () => {
             }
         );
 
-        test.prop([fc.string()])(
-            "should handle operation that rejects",
-            async (errorMessage) => {
-                const controller = new AbortController();
-                const operation = Promise.reject(new Error(errorMessage));
+        test.prop([fc.string()])("should handle operation that rejects", async (
+            errorMessage
+        ) => {
+            const controller = new AbortController();
+            const operation = Promise.reject(new Error(errorMessage));
 
-                await expect(
-                    raceWithAbort(operation, controller.signal)
-                ).rejects.toThrowError(errorMessage);
-            }
-        );
+            await expect(
+                raceWithAbort(operation, controller.signal)
+            ).rejects.toThrowError(errorMessage);
+        });
 
         test("should clean up event listeners", async () => {
             const controller = new AbortController();
@@ -595,8 +592,7 @@ describe("AbortUtils Fuzzing Tests", () => {
                 retryWithAbort(() => operation(signal), {
                     maxRetries: 5,
                     initialDelay: 1,
-                })
-            );
+                }));
 
             expect(result).toBe("finally succeeded");
             expect(attempts).toBe(3);

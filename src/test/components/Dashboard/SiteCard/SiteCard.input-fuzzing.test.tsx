@@ -653,24 +653,23 @@ describe("SiteCard Component - Property-Based Fuzzing Tests", () => {
         fcTest.prop([validSiteArbitrary], {
             numRuns: 20,
             timeout: 3000,
-        })(
-            "should provide proper ARIA labels and accessibility attributes",
-            (site) => {
-                const { unmount } = renderSiteCard(site);
+        })("should provide proper ARIA labels and accessibility attributes", (
+            site
+        ) => {
+            const { unmount } = renderSiteCard(site);
 
-                try {
-                    // Use consistent testId pattern
-                    const testId = `themed-box-${site.identifier}-${site.name.replaceAll(/[^\dA-Za-z]/g, "_")}`;
-                    const themedBox = screen.getByTestId(testId);
-                    expect(themedBox).toHaveAttribute(
-                        "aria-label",
-                        `View details for ${site.name}`
-                    );
-                } finally {
-                    unmount();
-                }
+            try {
+                // Use consistent testId pattern
+                const testId = `themed-box-${site.identifier}-${site.name.replaceAll(/[^\dA-Za-z]/g, "_")}`;
+                const themedBox = screen.getByTestId(testId);
+                expect(themedBox).toHaveAttribute(
+                    "aria-label",
+                    `View details for ${site.name}`
+                );
+            } finally {
+                unmount();
             }
-        );
+        });
     });
 
     describe("Memory Management", () => {

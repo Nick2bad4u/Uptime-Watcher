@@ -356,167 +356,157 @@ describe("Comprehensive State Management Fuzzing", () => {
                 }),
                 { minLength: 1, maxLength: 10 }
             ),
-        ])(
-            "Bulk state updates should maintain consistency",
-            (
-                initialMonitors: MonitorState[],
+        ])("Bulk state updates should maintain consistency", (
+            initialMonitors: MonitorState[],
+            updates: {
+                id: number;
                 updates: {
-                    id: number;
-                    updates: {
-                        name?: string | undefined;
-                        status?:
-                            | "up"
-                            | "down"
-                            | "pending"
-                            | "paused"
-                            | undefined;
-                        enabled?: boolean | undefined;
-                    };
-                }[]
-            ) => {
-                const bulkMonitors = new Map<number, any>();
-                const mockBulkStore = {
-                    monitors: bulkMonitors,
-
-                    bulkAdd: (
-                        monitors: MonitorState[]
-                    ): {
-                        results: MonitorState[];
-                        errors: string[];
-                        total: number;
-                    } => {
-                        const results: MonitorState[] = [];
-                        const errors: string[] = [];
-
-                        for (const monitor of monitors) {
-                            try {
-                                if (bulkMonitors.has(monitor.id)) {
-                                    errors.push(
-                                        `Monitor ${monitor.id} already exists`
-                                    );
-                                    // Skip duplicate instead of continue
-                                } else {
-                                    const newMonitor = {
-                                        ...monitor,
-                                        createdAt: new Date(monitor.createdAt),
-                                        updatedAt: new Date(),
-                                    };
-
-                                    bulkMonitors.set(monitor.id, newMonitor);
-                                    results.push(newMonitor);
-                                }
-                            } catch (error) {
-                                errors.push(
-                                    `Failed to add monitor ${monitor.id}: ${error}`
-                                );
-                            }
-                        }
-
-                        return { results, errors, total: monitors.length };
-                    },
-
-                    bulkUpdate: (
-                        updateRequests: {
-                            id: number;
-                            updates: {
-                                name?: string | undefined;
-                                status?:
-                                    | "up"
-                                    | "down"
-                                    | "pending"
-                                    | "paused"
-                                    | undefined;
-                                enabled?: boolean | undefined;
-                            };
-                        }[]
-                    ): {
-                        results: MonitorState[];
-                        errors: string[];
-                        total: number;
-                    } => {
-                        const results: MonitorState[] = [];
-                        const errors: string[] = [];
-
-                        for (const update of updateRequests) {
-                            try {
-                                const existing = bulkMonitors.get(update.id);
-                                if (existing) {
-                                    const updated = {
-                                        ...existing,
-                                        ...update.updates,
-                                        id: existing.id,
-                                        updatedAt: new Date(),
-                                    };
-
-                                    bulkMonitors.set(update.id, updated);
-                                    results.push(updated);
-                                } else {
-                                    errors.push(
-                                        `Monitor ${update.id} not found`
-                                    );
-                                }
-                            } catch (error) {
-                                errors.push(
-                                    `Failed to update monitor ${update.id}: ${error}`
-                                );
-                            }
-                        }
-
-                        return {
-                            results,
-                            errors,
-                            total: updateRequests.length,
-                        };
-                    },
-
-                    getState: () => ({
-                        monitors: Array.from(bulkMonitors.values()),
-                        count: bulkMonitors.size,
-                    }),
+                    name?: string | undefined;
+                    status?: "up" | "down" | "pending" | "paused" | undefined;
+                    enabled?: boolean | undefined;
                 };
+            }[]
+        ) => {
+            const bulkMonitors = new Map<number, any>();
+            const mockBulkStore = {
+                monitors: bulkMonitors,
 
-                // Test bulk operations
-                const addResult = measureStateAction(
-                    mockBulkStore.bulkAdd.bind(mockBulkStore),
-                    "bulkAdd",
-                    initialMonitors
-                );
+                bulkAdd: (
+                    monitors: MonitorState[]
+                ): {
+                    results: MonitorState[];
+                    errors: string[];
+                    total: number;
+                } => {
+                    const results: MonitorState[] = [];
+                    const errors: string[] = [];
 
-                // Property: Bulk add should handle all monitors
-                expect(addResult.total).toBe(initialMonitors.length);
-                expect(
-                    addResult.results.length + addResult.errors.length
-                ).toBeLessThanOrEqual(addResult.total);
+                    for (const monitor of monitors) {
+                        try {
+                            if (bulkMonitors.has(monitor.id)) {
+                                errors.push(
+                                    `Monitor ${monitor.id} already exists`
+                                );
+                                // Skip duplicate instead of continue
+                            } else {
+                                const newMonitor = {
+                                    ...monitor,
+                                    createdAt: new Date(monitor.createdAt),
+                                    updatedAt: new Date(),
+                                };
 
-                // Property: Successfully added monitors should be in state
-                const state = mockBulkStore.getState();
-                expect(state.monitors).toHaveLength(addResult.results.length);
-
-                // Test bulk updates
-                const updateResult = measureStateAction(
-                    mockBulkStore.bulkUpdate.bind(mockBulkStore),
-                    "bulkUpdate",
-                    updates
-                );
-
-                // Property: Update results should be consistent
-                expect(updateResult.total).toBe(updates.length);
-                expect(
-                    updateResult.results.length + updateResult.errors.length
-                ).toBeLessThanOrEqual(updateResult.total);
-
-                // Property: Updated monitors should reflect changes
-                for (const updatedMonitor of updateResult.results) {
-                    const currentState = mockBulkStore.monitors.get(
-                        updatedMonitor.id
-                    );
-                    expect(currentState).not.toBeNull();
-                    if (currentState) {
-                        expect(currentState.updatedAt).toBeInstanceOf(Date);
+                                bulkMonitors.set(monitor.id, newMonitor);
+                                results.push(newMonitor);
+                            }
+                        } catch (error) {
+                            errors.push(
+                                `Failed to add monitor ${monitor.id}: ${error}`
+                            );
+                        }
                     }
+
+                    return { results, errors, total: monitors.length };
+                },
+
+                bulkUpdate: (
+                    updateRequests: {
+                        id: number;
+                        updates: {
+                            name?: string | undefined;
+                            status?:
+                                | "up"
+                                | "down"
+                                | "pending"
+                                | "paused"
+                                | undefined;
+                            enabled?: boolean | undefined;
+                        };
+                    }[]
+                ): {
+                    results: MonitorState[];
+                    errors: string[];
+                    total: number;
+                } => {
+                    const results: MonitorState[] = [];
+                    const errors: string[] = [];
+
+                    for (const update of updateRequests) {
+                        try {
+                            const existing = bulkMonitors.get(update.id);
+                            if (existing) {
+                                const updated = {
+                                    ...existing,
+                                    ...update.updates,
+                                    id: existing.id,
+                                    updatedAt: new Date(),
+                                };
+
+                                bulkMonitors.set(update.id, updated);
+                                results.push(updated);
+                            } else {
+                                errors.push(`Monitor ${update.id} not found`);
+                            }
+                        } catch (error) {
+                            errors.push(
+                                `Failed to update monitor ${update.id}: ${error}`
+                            );
+                        }
+                    }
+
+                    return {
+                        results,
+                        errors,
+                        total: updateRequests.length,
+                    };
+                },
+
+                getState: () => ({
+                    monitors: Array.from(bulkMonitors.values()),
+                    count: bulkMonitors.size,
+                }),
+            };
+
+            // Test bulk operations
+            const addResult = measureStateAction(
+                mockBulkStore.bulkAdd.bind(mockBulkStore),
+                "bulkAdd",
+                initialMonitors
+            );
+
+            // Property: Bulk add should handle all monitors
+            expect(addResult.total).toBe(initialMonitors.length);
+            expect(
+                addResult.results.length + addResult.errors.length
+            ).toBeLessThanOrEqual(addResult.total);
+
+            // Property: Successfully added monitors should be in state
+            const state = mockBulkStore.getState();
+            expect(state.monitors).toHaveLength(addResult.results.length);
+
+            // Test bulk updates
+            const updateResult = measureStateAction(
+                mockBulkStore.bulkUpdate.bind(mockBulkStore),
+                "bulkUpdate",
+                updates
+            );
+
+            // Property: Update results should be consistent
+            expect(updateResult.total).toBe(updates.length);
+            expect(
+                updateResult.results.length + updateResult.errors.length
+            ).toBeLessThanOrEqual(updateResult.total);
+
+            // Property: Updated monitors should reflect changes
+            for (const updatedMonitor of updateResult.results) {
+                const currentState = mockBulkStore.monitors.get(
+                    updatedMonitor.id
+                );
+                expect(currentState).not.toBeNull();
+                if (currentState) {
+                    expect(currentState.updatedAt).toBeInstanceOf(Date);
                 }
             }
-        );
+        });
     });
 
     describe("Action Validation and Dispatch", () => {
@@ -781,189 +771,185 @@ describe("Comprehensive State Management Fuzzing", () => {
                 sites: fc.array(siteStateData, { minLength: 0, maxLength: 5 }),
                 settings: settingsStateData,
             }),
-        ])(
-            "State persistence should maintain data integrity",
-            (stateSnapshot) => {
-                const mockPersistence = {
-                    serialize(state: typeof stateSnapshot) {
-                        try {
-                            // Simulate state serialization with validation
-                            const serialized = JSON.stringify(
-                                state,
-                                (_key, value) => {
-                                    if (value instanceof Date) {
-                                        return {
-                                            __type: "Date",
-                                            value: value.toISOString(),
-                                        };
-                                    }
-                                    return value;
-                                }
-                            );
+        ])("State persistence should maintain data integrity", (
+            stateSnapshot
+        ) => {
+            const mockPersistence = {
+                serialize(state: typeof stateSnapshot) {
+                    try {
+                        // Simulate state serialization with validation
+                        const serialized = JSON.stringify(state, (
+                            _key,
+                            value
+                        ) => {
+                            if (value instanceof Date) {
+                                return {
+                                    __type: "Date",
+                                    value: value.toISOString(),
+                                };
+                            }
+                            return value;
+                        });
 
-                            return {
-                                success: true,
-                                data: serialized,
-                                size: serialized.length,
-                            };
-                        } catch (error) {
-                            return {
-                                success: false,
-                                error:
-                                    error instanceof Error
-                                        ? error.message
-                                        : "Serialization failed",
-                                data: null,
-                            };
-                        }
-                    },
+                        return {
+                            success: true,
+                            data: serialized,
+                            size: serialized.length,
+                        };
+                    } catch (error) {
+                        return {
+                            success: false,
+                            error:
+                                error instanceof Error
+                                    ? error.message
+                                    : "Serialization failed",
+                            data: null,
+                        };
+                    }
+                },
 
-                    deserialize(serializedData: string) {
-                        try {
-                            const parsed = JSON.parse(
-                                serializedData,
-                                (key, value) => {
-                                    // Handle Date objects serialized with __type marker
-                                    if (
-                                        value &&
-                                        typeof value === "object" &&
-                                        value.__type === "Date"
-                                    ) {
-                                        return new Date(value.value);
-                                    }
+                deserialize(serializedData: string) {
+                    try {
+                        const parsed = JSON.parse(serializedData, (
+                            key,
+                            value
+                        ) => {
+                            // Handle Date objects serialized with __type marker
+                            if (
+                                value &&
+                                typeof value === "object" &&
+                                value.__type === "Date"
+                            ) {
+                                return new Date(value.value);
+                            }
 
-                                    // Handle direct Date ISO strings (common date fields)
-                                    // Include support for extended year format (+/-YYYYYY)
-                                    if (
-                                        typeof value === "string" &&
-                                        (key === "createdAt" ||
-                                            key === "updatedAt" ||
-                                            key === "lastChecked") &&
-                                        /^[+-]?\d{4,6}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/.test(
-                                            value
-                                        )
-                                    ) {
-                                        const dateObj = new Date(value);
-                                        // Only return Date if valid (not Invalid Date)
-                                        return Number.isNaN(dateObj.getTime())
-                                            ? value
-                                            : dateObj;
-                                    }
+                            // Handle direct Date ISO strings (common date fields)
+                            // Include support for extended year format (+/-YYYYYY)
+                            if (
+                                typeof value === "string" &&
+                                (key === "createdAt" ||
+                                    key === "updatedAt" ||
+                                    key === "lastChecked") &&
+                                /^[+-]?\d{4,6}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/.test(
+                                    value
+                                )
+                            ) {
+                                const dateObj = new Date(value);
+                                // Only return Date if valid (not Invalid Date)
+                                return Number.isNaN(dateObj.getTime())
+                                    ? value
+                                    : dateObj;
+                            }
 
-                                    return value;
-                                }
-                            );
+                            return value;
+                        });
 
-                            return {
-                                success: true,
-                                state: parsed,
-                                valid: this.validateState(parsed),
-                            };
-                        } catch (error) {
-                            return {
-                                success: false,
-                                error:
-                                    error instanceof Error
-                                        ? error.message
-                                        : "Deserialization failed",
-                                state: null,
-                            };
-                        }
-                    },
+                        return {
+                            success: true,
+                            state: parsed,
+                            valid: this.validateState(parsed),
+                        };
+                    } catch (error) {
+                        return {
+                            success: false,
+                            error:
+                                error instanceof Error
+                                    ? error.message
+                                    : "Deserialization failed",
+                            state: null,
+                        };
+                    }
+                },
 
-                    validateState(state: any) {
-                        const errors: string[] = [];
+                validateState(state: any) {
+                    const errors: string[] = [];
 
-                        if (!state || typeof state !== "object") {
-                            errors.push("Invalid state object");
-                            return { valid: false, errors };
-                        }
+                    if (!state || typeof state !== "object") {
+                        errors.push("Invalid state object");
+                        return { valid: false, errors };
+                    }
 
-                        if (state.monitors && !Array.isArray(state.monitors)) {
-                            errors.push("Monitors must be array");
-                        }
+                    if (state.monitors && !Array.isArray(state.monitors)) {
+                        errors.push("Monitors must be array");
+                    }
 
-                        if (state.sites && !Array.isArray(state.sites)) {
-                            errors.push("Sites must be array");
-                        }
+                    if (state.sites && !Array.isArray(state.sites)) {
+                        errors.push("Sites must be array");
+                    }
 
-                        if (
-                            state.settings &&
-                            typeof state.settings !== "object"
-                        ) {
-                            errors.push("Settings must be object");
-                        }
+                    if (state.settings && typeof state.settings !== "object") {
+                        errors.push("Settings must be object");
+                    }
 
-                        return { valid: errors.length === 0, errors };
-                    },
-                };
+                    return { valid: errors.length === 0, errors };
+                },
+            };
 
-                // Test serialization
-                const serialResult = measureStateAction(
-                    mockPersistence.serialize.bind(mockPersistence),
-                    "serialize",
-                    stateSnapshot
+            // Test serialization
+            const serialResult = measureStateAction(
+                mockPersistence.serialize.bind(mockPersistence),
+                "serialize",
+                stateSnapshot
+            );
+
+            expect(serialResult).toHaveProperty("success");
+            expect(typeof serialResult.success).toBe("boolean");
+
+            if (serialResult.success && serialResult.data) {
+                // Property: Serialized data should be valid JSON string
+                expect(typeof serialResult.data).toBe("string");
+                expect(serialResult.size).toBeGreaterThan(0);
+
+                // Test deserialization
+                const deserialResult = measureStateAction(
+                    mockPersistence.deserialize.bind(mockPersistence),
+                    "deserialize",
+                    serialResult.data
                 );
 
-                expect(serialResult).toHaveProperty("success");
-                expect(typeof serialResult.success).toBe("boolean");
+                expect(deserialResult.success).toBeTruthy();
 
-                if (serialResult.success && serialResult.data) {
-                    // Property: Serialized data should be valid JSON string
-                    expect(typeof serialResult.data).toBe("string");
-                    expect(serialResult.size).toBeGreaterThan(0);
+                if (deserialResult.success && deserialResult.state) {
+                    // Property: Deserialized state should match original structure
+                    expect(deserialResult.state).toHaveProperty("monitors");
+                    expect(deserialResult.state).toHaveProperty("sites");
+                    expect(deserialResult.state).toHaveProperty("settings");
 
-                    // Test deserialization
-                    const deserialResult = measureStateAction(
-                        mockPersistence.deserialize.bind(mockPersistence),
-                        "deserialize",
-                        serialResult.data
+                    // Property: Arrays should maintain length
+                    expect(deserialResult.state.monitors).toHaveLength(
+                        stateSnapshot.monitors.length
+                    );
+                    expect(deserialResult.state.sites).toHaveLength(
+                        stateSnapshot.sites.length
                     );
 
-                    expect(deserialResult.success).toBeTruthy();
+                    // Property: Date objects should be restored (if they were valid originally)
+                    if (
+                        stateSnapshot.monitors.length > 0 &&
+                        stateSnapshot.monitors[0]
+                    ) {
+                        const originalDate =
+                            stateSnapshot.monitors[0].createdAt;
+                        const deserializedDate =
+                            deserialResult.state.monitors[0]?.createdAt;
 
-                    if (deserialResult.success && deserialResult.state) {
-                        // Property: Deserialized state should match original structure
-                        expect(deserialResult.state).toHaveProperty("monitors");
-                        expect(deserialResult.state).toHaveProperty("sites");
-                        expect(deserialResult.state).toHaveProperty("settings");
-
-                        // Property: Arrays should maintain length
-                        expect(deserialResult.state.monitors).toHaveLength(
-                            stateSnapshot.monitors.length
-                        );
-                        expect(deserialResult.state.sites).toHaveLength(
-                            stateSnapshot.sites.length
-                        );
-
-                        // Property: Date objects should be restored (if they were valid originally)
+                        // If the original date was valid, expect the deserialized date to be valid
                         if (
-                            stateSnapshot.monitors.length > 0 &&
-                            stateSnapshot.monitors[0]
+                            !Number.isNaN(originalDate.getTime()) &&
+                            deserializedDate
                         ) {
-                            const originalDate =
-                                stateSnapshot.monitors[0].createdAt;
-                            const deserializedDate =
-                                deserialResult.state.monitors[0]?.createdAt;
-
-                            // If the original date was valid, expect the deserialized date to be valid
-                            if (
-                                !Number.isNaN(originalDate.getTime()) &&
-                                deserializedDate
-                            ) {
-                                expect(deserializedDate).toBeInstanceOf(Date);
-                                expect(
-                                    Number.isNaN(deserializedDate.getTime())
-                                ).toBeFalsy();
-                            } else {
-                                // If the original date was invalid (NaN), it becomes null during serialization
-                                expect(deserializedDate).toBeNull();
-                            }
+                            expect(deserializedDate).toBeInstanceOf(Date);
+                            expect(
+                                Number.isNaN(deserializedDate.getTime())
+                            ).toBeFalsy();
+                        } else {
+                            // If the original date was invalid (NaN), it becomes null during serialization
+                            expect(deserializedDate).toBeNull();
                         }
                     }
                 }
             }
-        );
+        });
 
         fcTest.prop([
             fc.record({
@@ -979,224 +965,214 @@ describe("Comprehensive State Management Fuzzing", () => {
                     fc.string()
                 ),
             }),
-        ])(
-            "State recovery should handle corrupted data gracefully",
-            (corruptionTest) => {
-                const mockRecovery = {
-                    attemptRecovery: (corruptedDataStr: string) => {
-                        const recoveryStrategies = [
-                            // Try parsing as-is (but validate result is not null)
-                            () => {
-                                const result = JSON.parse(corruptedDataStr);
-                                if (
-                                    result === null ||
-                                    typeof result !== "object"
-                                ) {
-                                    throw new Error(
-                                        "Parsed data is null or not an object"
-                                    );
-                                }
-                                return result;
-                            },
-
-                            // Try fixing common JSON issues
-                            () => {
-                                let fixed = corruptedDataStr.replaceAll(
-                                    /,(\s*[\]}])/g,
-                                    "$1"
-                                ); // Remove trailing commas
-                                fixed = fixed.replaceAll(
-                                    /([,{]\s*)(\w+):/g,
-                                    '$1"$2":'
-                                ); // Quote unquoted keys
-                                const result = JSON.parse(fixed);
-                                if (
-                                    result === null ||
-                                    typeof result !== "object"
-                                ) {
-                                    throw new Error(
-                                        "Fixed data is null or not an object"
-                                    );
-                                }
-                                return result;
-                            },
-
-                            // Return default state
-                            () => ({
-                                monitors: [],
-                                sites: [],
-                                settings: {
-                                    theme: "light",
-                                    language: "en",
-                                    notifications: {
-                                        enabled: true,
-                                        desktop: false,
-                                        email: false,
-                                        sound: false,
-                                    },
-                                    monitoring: {
-                                        defaultInterval: 60_000,
-                                        defaultTimeout: 30_000,
-                                        maxRetries: 3,
-                                        enableAnalytics: true,
-                                    },
-                                    ui: {
-                                        sidebarCollapsed: false,
-                                        showTooltips: true,
-                                        animationsEnabled: true,
-                                        compactMode: false,
-                                    },
-                                },
-                            }),
-                        ];
-
-                        const attempts: any[] = [];
-
-                        for (const [
-                            i,
-                            recoveryStrategy,
-                        ] of recoveryStrategies.entries()) {
-                            try {
-                                const result = recoveryStrategy();
-                                attempts.push({
-                                    strategy: i,
-                                    success: true,
-                                    result,
-                                });
-                                return {
-                                    recovered: true,
-                                    state: result,
-                                    attempts,
-                                    strategy: i,
-                                };
-                            } catch (error) {
-                                attempts.push({
-                                    strategy: i,
-                                    success: false,
-                                    error:
-                                        error instanceof Error
-                                            ? error.message
-                                            : "Unknown error",
-                                });
+        ])("State recovery should handle corrupted data gracefully", (
+            corruptionTest
+        ) => {
+            const mockRecovery = {
+                attemptRecovery: (corruptedDataStr: string) => {
+                    const recoveryStrategies = [
+                        // Try parsing as-is (but validate result is not null)
+                        () => {
+                            const result = JSON.parse(corruptedDataStr);
+                            if (result === null || typeof result !== "object") {
+                                throw new Error(
+                                    "Parsed data is null or not an object"
+                                );
                             }
+                            return result;
+                        },
+
+                        // Try fixing common JSON issues
+                        () => {
+                            let fixed = corruptedDataStr.replaceAll(
+                                /,(\s*[\]}])/g,
+                                "$1"
+                            ); // Remove trailing commas
+                            fixed = fixed.replaceAll(
+                                /([,{]\s*)(\w+):/g,
+                                '$1"$2":'
+                            ); // Quote unquoted keys
+                            const result = JSON.parse(fixed);
+                            if (result === null || typeof result !== "object") {
+                                throw new Error(
+                                    "Fixed data is null or not an object"
+                                );
+                            }
+                            return result;
+                        },
+
+                        // Return default state
+                        () => ({
+                            monitors: [],
+                            sites: [],
+                            settings: {
+                                theme: "light",
+                                language: "en",
+                                notifications: {
+                                    enabled: true,
+                                    desktop: false,
+                                    email: false,
+                                    sound: false,
+                                },
+                                monitoring: {
+                                    defaultInterval: 60_000,
+                                    defaultTimeout: 30_000,
+                                    maxRetries: 3,
+                                    enableAnalytics: true,
+                                },
+                                ui: {
+                                    sidebarCollapsed: false,
+                                    showTooltips: true,
+                                    animationsEnabled: true,
+                                    compactMode: false,
+                                },
+                            },
+                        }),
+                    ];
+
+                    const attempts: any[] = [];
+
+                    for (const [
+                        i,
+                        recoveryStrategy,
+                    ] of recoveryStrategies.entries()) {
+                        try {
+                            const result = recoveryStrategy();
+                            attempts.push({
+                                strategy: i,
+                                success: true,
+                                result,
+                            });
+                            return {
+                                recovered: true,
+                                state: result,
+                                attempts,
+                                strategy: i,
+                            };
+                        } catch (error) {
+                            attempts.push({
+                                strategy: i,
+                                success: false,
+                                error:
+                                    error instanceof Error
+                                        ? error.message
+                                        : "Unknown error",
+                            });
                         }
+                    }
 
-                        return {
-                            recovered: false,
-                            state: null,
-                            attempts,
-                            strategy: -1,
-                        };
-                    },
-                };
+                    return {
+                        recovered: false,
+                        state: null,
+                        attempts,
+                        strategy: -1,
+                    };
+                },
+            };
 
-                const recoveryResult = measureStateAction(
-                    mockRecovery.attemptRecovery.bind(mockRecovery),
-                    "recovery",
-                    corruptionTest.corruptedData
-                );
+            const recoveryResult = measureStateAction(
+                mockRecovery.attemptRecovery.bind(mockRecovery),
+                "recovery",
+                corruptionTest.corruptedData
+            );
 
-                // Property: Recovery should never throw
-                expect(recoveryResult).toHaveProperty("recovered");
-                expect(recoveryResult).toHaveProperty("attempts");
-                expect(Array.isArray(recoveryResult.attempts)).toBeTruthy();
+            // Property: Recovery should never throw
+            expect(recoveryResult).toHaveProperty("recovered");
+            expect(recoveryResult).toHaveProperty("attempts");
+            expect(Array.isArray(recoveryResult.attempts)).toBeTruthy();
 
-                // Property: Recovery should try multiple strategies
-                expect(recoveryResult.attempts.length).toBeGreaterThan(0);
+            // Property: Recovery should try multiple strategies
+            expect(recoveryResult.attempts.length).toBeGreaterThan(0);
 
-                // Property: If recovery succeeds, state should be valid
-                if (recoveryResult.recovered) {
-                    expect(recoveryResult.state).not.toBeNull();
-                    expect(typeof recoveryResult.state).toBe("object");
-                    expect(recoveryResult.strategy).toBeGreaterThanOrEqual(0);
-                }
-
-                // Property: All strategies should be attempted if earlier ones fail
-                // const failedStrategies = recoveryResult.attempts.filter(
-                //     (a) => !a.success
-                // );
-                const successfulStrategies = recoveryResult.attempts.filter(
-                    (a) => a.success
-                );
-
-                if (successfulStrategies.length > 0) {
-                    // Should stop at first successful strategy
-                    expect(recoveryResult.recovered).toBeTruthy();
-                }
+            // Property: If recovery succeeds, state should be valid
+            if (recoveryResult.recovered) {
+                expect(recoveryResult.state).not.toBeNull();
+                expect(typeof recoveryResult.state).toBe("object");
+                expect(recoveryResult.strategy).toBeGreaterThanOrEqual(0);
             }
-        );
+
+            // Property: All strategies should be attempted if earlier ones fail
+            // const failedStrategies = recoveryResult.attempts.filter(
+            //     (a) => !a.success
+            // );
+            const successfulStrategies = recoveryResult.attempts.filter(
+                (a) => a.success
+            );
+
+            if (successfulStrategies.length > 0) {
+                // Should stop at first successful strategy
+                expect(recoveryResult.recovered).toBeTruthy();
+            }
+        });
     });
 
     describe("Performance and Concurrency", () => {
         fcTest.prop(
             [fc.array(stateActions, { minLength: 50, maxLength: 200 })],
             { timeout: 10_000, numRuns: 3 }
-        )(
-            "High-frequency state updates should maintain performance",
-            (highFrequencyActions) => {
-                const mockHighPerfStore = {
-                    state: new Map(),
-                    actionCount: 0,
+        )("High-frequency state updates should maintain performance", (
+            highFrequencyActions
+        ) => {
+            const mockHighPerfStore = {
+                state: new Map(),
+                actionCount: 0,
 
-                    batchProcess: (actions: typeof highFrequencyActions) => {
-                        const startTime = performance.now();
-                        const results: any[] = [];
+                batchProcess: (actions: typeof highFrequencyActions) => {
+                    const startTime = performance.now();
+                    const results: any[] = [];
 
-                        // Process actions in batches for performance
-                        const batchSize = 10;
-                        for (let i = 0; i < actions.length; i += batchSize) {
-                            const batch = actions.slice(i, i + batchSize);
+                    // Process actions in batches for performance
+                    const batchSize = 10;
+                    for (let i = 0; i < actions.length; i += batchSize) {
+                        const batch = actions.slice(i, i + batchSize);
 
-                            for (const [index, action] of batch.entries()) {
-                                mockHighPerfStore.actionCount++;
-                                results.push({
-                                    actionIndex: i + index,
-                                    type: action.type,
-                                    processed: true,
-                                    timestamp: performance.now(),
-                                });
-                            }
+                        for (const [index, action] of batch.entries()) {
+                            mockHighPerfStore.actionCount++;
+                            results.push({
+                                actionIndex: i + index,
+                                type: action.type,
+                                processed: true,
+                                timestamp: performance.now(),
+                            });
                         }
+                    }
 
-                        const endTime = performance.now();
-                        const totalTime = endTime - startTime;
+                    const endTime = performance.now();
+                    const totalTime = endTime - startTime;
 
-                        return {
-                            processed: results.length,
-                            totalTime,
-                            averageTime: totalTime / results.length,
-                            actionsPerSecond: Math.round(
-                                results.length / (totalTime / 1000)
-                            ),
-                            results,
-                        };
-                    },
-                };
+                    return {
+                        processed: results.length,
+                        totalTime,
+                        averageTime: totalTime / results.length,
+                        actionsPerSecond: Math.round(
+                            results.length / (totalTime / 1000)
+                        ),
+                        results,
+                    };
+                },
+            };
 
-                const result = measureStateAction(
-                    mockHighPerfStore.batchProcess.bind(mockHighPerfStore),
-                    "batchProcess",
-                    highFrequencyActions
-                );
+            const result = measureStateAction(
+                mockHighPerfStore.batchProcess.bind(mockHighPerfStore),
+                "batchProcess",
+                highFrequencyActions
+            );
 
-                // Property: All actions should be processed
-                expect(result.processed).toBe(highFrequencyActions.length);
+            // Property: All actions should be processed
+            expect(result.processed).toBe(highFrequencyActions.length);
 
-                // Property: Performance should be reasonable (> 1000 actions/second)
-                expect(result.actionsPerSecond).toBeGreaterThan(100);
+            // Property: Performance should be reasonable (> 1000 actions/second)
+            expect(result.actionsPerSecond).toBeGreaterThan(100);
 
-                // Property: Average time per action should be minimal (< 1ms)
-                expect(result.averageTime).toBeLessThan(1);
+            // Property: Average time per action should be minimal (< 1ms)
+            expect(result.averageTime).toBeLessThan(1);
 
-                // Property: Results should maintain order
-                expect(result.results).toHaveLength(
-                    highFrequencyActions.length
-                );
-                for (let i = 0; i < Math.min(10, result.results.length); i++) {
-                    expect(result.results[i].actionIndex).toBe(i);
-                }
+            // Property: Results should maintain order
+            expect(result.results).toHaveLength(highFrequencyActions.length);
+            for (let i = 0; i < Math.min(10, result.results.length); i++) {
+                expect(result.results[i].actionIndex).toBe(i);
             }
-        );
+        });
     });
 });
 

@@ -94,21 +94,19 @@ vi.mock("../../../theme/useTheme", () => {
     const useThemeMock = vi.fn(() => themeState.current);
     const useThemeClassesMock = vi.fn(() => ({
         join: vi.fn((...classes: readonly string[]) =>
-            classes.filter(Boolean).join(" ")
-        ),
+            classes.filter(Boolean).join(" ")),
         cx: vi.fn((...classes: readonly string[]) =>
-            classes.filter(Boolean).join(" ")
-        ),
+            classes.filter(Boolean).join(" ")),
     }));
-    const useThemeValueMock = vi.fn(
-        (selector: (theme: Record<string, unknown>) => unknown) =>
-            selector(
-                (themeState.current["currentTheme"] ?? {}) as Record<
-                    string,
-                    unknown
-                >
-            )
-    );
+    const useThemeValueMock = vi.fn((
+        selector: (theme: Record<string, unknown>) => unknown
+    ) =>
+        selector(
+            (themeState.current["currentTheme"] ?? {}) as Record<
+                string,
+                unknown
+            >
+        ));
 
     return {
         useTheme: useThemeMock,
@@ -130,8 +128,7 @@ vi.mock("../../../services/logger", () => ({
 
 vi.mock("../../../utils/errorHandling", () => ({
     ensureError: vi.fn((error) =>
-        error instanceof Error ? error : new Error(String(error))
-    ),
+        error instanceof Error ? error : new Error(String(error))),
 }));
 
 vi.mock("../../../hooks/usePrefersReducedMotion", () => ({
@@ -410,8 +407,7 @@ describe("Settings Component", () => {
         fireEvent.click(resetButton);
 
         await waitFor(() =>
-            expect(mockSettingsStore.resetSettings).toHaveBeenCalled()
-        );
+            expect(mockSettingsStore.resetSettings).toHaveBeenCalled());
         expect(confirmMock).toHaveBeenCalledWith(
             expect.objectContaining({
                 message:
@@ -445,8 +441,7 @@ describe("Settings Component", () => {
         fireEvent.click(resetButton);
 
         await waitFor(() =>
-            expect(mockSettingsStore.resetSettings).not.toHaveBeenCalled()
-        );
+            expect(mockSettingsStore.resetSettings).not.toHaveBeenCalled());
     });
 
     it("should handle sync settings", async ({ task, annotate }) => {

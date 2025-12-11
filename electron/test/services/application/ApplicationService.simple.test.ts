@@ -91,9 +91,8 @@ describe("ApplicationService Coverage Tests", () => {
         await annotate("Category: Service", "category");
         await annotate("Type: Error Handling", "type");
 
-        const { ApplicationService } = await import(
-            "../../../services/application/ApplicationService"
-        );
+        const { ApplicationService } =
+            await import("../../../services/application/ApplicationService");
         expect(ApplicationService).toBeDefined();
     });
     it("should create service instance", async ({ task, annotate }) => {
@@ -102,9 +101,8 @@ describe("ApplicationService Coverage Tests", () => {
         await annotate("Category: Service", "category");
         await annotate("Type: Constructor", "type");
 
-        const { ApplicationService } = await import(
-            "../../../services/application/ApplicationService"
-        );
+        const { ApplicationService } =
+            await import("../../../services/application/ApplicationService");
 
         const service = new ApplicationService();
         expect(service).toBeDefined();
@@ -116,9 +114,8 @@ describe("ApplicationService Coverage Tests", () => {
         await annotate("Category: Service", "category");
         await annotate("Type: Business Logic", "type");
 
-        const { ApplicationService } = await import(
-            "../../../services/application/ApplicationService"
-        );
+        const { ApplicationService } =
+            await import("../../../services/application/ApplicationService");
 
         try {
             const service = new ApplicationService();
@@ -138,9 +135,8 @@ describe("ApplicationService Coverage Tests", () => {
         await annotate("Category: Service", "category");
         await annotate("Type: Business Logic", "type");
 
-        const { ApplicationService } = await import(
-            "../../../services/application/ApplicationService"
-        );
+        const { ApplicationService } =
+            await import("../../../services/application/ApplicationService");
 
         try {
             const service = new ApplicationService();
@@ -158,9 +154,8 @@ describe("ApplicationService Coverage Tests", () => {
         await annotate("Category: Service", "category");
         await annotate("Type: Event Processing", "type");
 
-        const { ApplicationService } = await import(
-            "../../../services/application/ApplicationService"
-        );
+        const { ApplicationService } =
+            await import("../../../services/application/ApplicationService");
 
         try {
             const service = new ApplicationService();
@@ -180,9 +175,8 @@ describe("ApplicationService Coverage Tests", () => {
         await annotate("Category: Service", "category");
         await annotate("Type: Business Logic", "type");
 
-        const { ApplicationService } = await import(
-            "../../../services/application/ApplicationService"
-        );
+        const { ApplicationService } =
+            await import("../../../services/application/ApplicationService");
 
         try {
             const service = new ApplicationService();
@@ -203,9 +197,8 @@ describe("ApplicationService Coverage Tests", () => {
         await annotate("Category: Service", "category");
         await annotate("Type: Error Handling", "type");
 
-        const { ApplicationService } = await import(
-            "../../../services/application/ApplicationService"
-        );
+        const { ApplicationService } =
+            await import("../../../services/application/ApplicationService");
 
         try {
             const service = new ApplicationService();
@@ -222,9 +215,8 @@ describe("ApplicationService Coverage Tests", () => {
         await annotate("Category: Service", "category");
         await annotate("Type: Constructor", "type");
 
-        const { ApplicationService } = await import(
-            "../../../services/application/ApplicationService"
-        );
+        const { ApplicationService } =
+            await import("../../../services/application/ApplicationService");
 
         try {
             // Test multiple instantiations to cover different paths
@@ -243,9 +235,8 @@ describe("ApplicationService Coverage Tests", () => {
         await annotate("Category: Service", "category");
         await annotate("Type: Business Logic", "type");
 
-        const { ApplicationService } = await import(
-            "../../../services/application/ApplicationService"
-        );
+        const { ApplicationService } =
+            await import("../../../services/application/ApplicationService");
 
         try {
             const service = new ApplicationService();
@@ -265,9 +256,8 @@ describe("ApplicationService Coverage Tests", () => {
         await annotate("Category: Service", "category");
         await annotate("Type: Business Logic", "type");
 
-        const { ApplicationService } = await import(
-            "../../../services/application/ApplicationService"
-        );
+        const { ApplicationService } =
+            await import("../../../services/application/ApplicationService");
 
         try {
             const service = new ApplicationService();

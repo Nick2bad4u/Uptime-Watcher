@@ -57,24 +57,22 @@ vi.mock("../../../../components/Dashboard/SiteCard/SiteCardStatus", () => ({
 }));
 
 vi.mock("../../../../components/Dashboard/SiteCard/SiteCardMetrics", () => ({
-    SiteCardMetrics: vi.fn(
-        ({
-            metrics,
-        }: {
-            metrics: readonly {
-                readonly key: string;
-                readonly label: string;
-                readonly value: string | number;
-            }[];
-        }) => (
-            <div data-testid="site-card-metrics-content">
-                Metrics:{" "}
-                {metrics
-                    .map((metric) => `${metric.label}: ${metric.value}`)
-                    .join(" | ")}
-            </div>
-        )
-    ),
+    SiteCardMetrics: vi.fn(({
+        metrics,
+    }: {
+        metrics: readonly {
+            readonly key: string;
+            readonly label: string;
+            readonly value: string | number;
+        }[];
+    }) => (
+        <div data-testid="site-card-metrics-content">
+            Metrics:{" "}
+            {metrics
+                .map((metric) => `${metric.label}: ${metric.value}`)
+                .join(" | ")}
+        </div>
+    )),
 }));
 
 vi.mock("../../../../components/Dashboard/SiteCard/SiteCardHistory", () => ({

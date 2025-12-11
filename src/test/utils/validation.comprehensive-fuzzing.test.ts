@@ -430,19 +430,18 @@ describe("Comprehensive Validation Function Fuzzing", () => {
                 fc.array(fc.string()),
                 fc.record({})
             ),
-        ])(
-            "isNonEmptyString: should reject all non-string types",
-            (nonString) => {
-                const result = measureValidation(
-                    isNonEmptyString,
-                    "isNonEmptyString",
-                    nonString
-                );
+        ])("isNonEmptyString: should reject all non-string types", (
+            nonString
+        ) => {
+            const result = measureValidation(
+                isNonEmptyString,
+                "isNonEmptyString",
+                nonString
+            );
 
-                expect(result).toBeFalsy();
-                expect(typeof result).toBe("boolean");
-            }
-        );
+            expect(result).toBeFalsy();
+            expect(typeof result).toBe("boolean");
+        });
 
         fcTest.prop([
             fc.oneof(
@@ -611,39 +610,34 @@ describe("Comprehensive Validation Function Fuzzing", () => {
                 ),
                 malformedHosts
             ),
-        ])(
-            "isValidFQDN: FQDN validation with comprehensive edge cases",
-            (fqdn) => {
-                const result = measureValidation(
-                    isValidFQDN,
-                    "isValidFQDN",
-                    fqdn
-                );
+        ])("isValidFQDN: FQDN validation with comprehensive edge cases", (
+            fqdn
+        ) => {
+            const result = measureValidation(isValidFQDN, "isValidFQDN", fqdn);
 
-                expect(() => result).not.toThrowError();
-                expect(typeof result).toBe("boolean");
+            expect(() => result).not.toThrowError();
+            expect(typeof result).toBe("boolean");
 
-                // Property: Should handle edge cases gracefully
-                if (typeof fqdn === "string") {
-                    // Property: Empty strings should be rejected
-                    if (fqdn.trim().length === 0) {
-                        expect(result).toBeFalsy();
-                    }
-
-                    // Property: Strings with consecutive dots should be rejected
-                    if (fqdn.includes("..")) {
-                        expect(result).toBeFalsy();
-                    }
-
-                    // Property: Strings starting/ending with dots should be rejected
-                    if (fqdn.startsWith(".") || fqdn.endsWith(".")) {
-                        expect(result).toBeFalsy();
-                    }
-                } else {
+            // Property: Should handle edge cases gracefully
+            if (typeof fqdn === "string") {
+                // Property: Empty strings should be rejected
+                if (fqdn.trim().length === 0) {
                     expect(result).toBeFalsy();
                 }
+
+                // Property: Strings with consecutive dots should be rejected
+                if (fqdn.includes("..")) {
+                    expect(result).toBeFalsy();
+                }
+
+                // Property: Strings starting/ending with dots should be rejected
+                if (fqdn.startsWith(".") || fqdn.endsWith(".")) {
+                    expect(result).toBeFalsy();
+                }
+            } else {
+                expect(result).toBeFalsy();
             }
-        );
+        });
     });
 
     describe("Numeric Validation Functions", () => {
@@ -799,45 +793,44 @@ describe("Comprehensive Validation Function Fuzzing", () => {
                 maliciousStrings,
                 extremeBoundaryStrings
             ),
-        ])(
-            "isValidIdentifier: identifier validation with security checks",
-            (id) => {
-                const result = measureValidation(
-                    isValidIdentifier,
-                    "isValidIdentifier",
-                    id
-                );
+        ])("isValidIdentifier: identifier validation with security checks", (
+            id
+        ) => {
+            const result = measureValidation(
+                isValidIdentifier,
+                "isValidIdentifier",
+                id
+            );
 
-                expect(() => result).not.toThrowError();
-                expect(typeof result).toBe("boolean");
+            expect(() => result).not.toThrowError();
+            expect(typeof result).toBe("boolean");
 
-                // Property: Non-string inputs should fail
-                if (typeof id !== "string") {
-                    expect(result).toBeFalsy();
-                }
-
-                // Property: Empty strings should fail
-                if (
-                    id === "" ||
-                    (typeof id === "string" && id.trim().length === 0)
-                ) {
-                    expect(result).toBeFalsy();
-                }
-
-                // Property: Malicious characters should be rejected
-                if (
-                    typeof id === "string" &&
-                    (id.includes("<") ||
-                        id.includes(">") ||
-                        id.includes("'") ||
-                        id.includes('"') ||
-                        id.includes(";") ||
-                        id.includes("&"))
-                ) {
-                    expect(result).toBeFalsy();
-                }
+            // Property: Non-string inputs should fail
+            if (typeof id !== "string") {
+                expect(result).toBeFalsy();
             }
-        );
+
+            // Property: Empty strings should fail
+            if (
+                id === "" ||
+                (typeof id === "string" && id.trim().length === 0)
+            ) {
+                expect(result).toBeFalsy();
+            }
+
+            // Property: Malicious characters should be rejected
+            if (
+                typeof id === "string" &&
+                (id.includes("<") ||
+                    id.includes(">") ||
+                    id.includes("'") ||
+                    id.includes('"') ||
+                    id.includes(";") ||
+                    id.includes("&"))
+            ) {
+                expect(result).toBeFalsy();
+            }
+        });
 
         fcTest.prop([
             fc.oneof(
@@ -856,39 +849,38 @@ describe("Comprehensive Validation Function Fuzzing", () => {
                     ]
                 )
             ),
-        ])(
-            "isValidIdentifierArray: array of identifiers validation",
-            (identifiers) => {
-                const result = measureValidation(
-                    isValidIdentifierArray,
-                    "isValidIdentifierArray",
-                    identifiers
+        ])("isValidIdentifierArray: array of identifiers validation", (
+            identifiers
+        ) => {
+            const result = measureValidation(
+                isValidIdentifierArray,
+                "isValidIdentifierArray",
+                identifiers
+            );
+
+            expect(() => result).not.toThrowError();
+            expect(typeof result).toBe("boolean");
+
+            // Property: Non-array inputs should fail
+            if (!Array.isArray(identifiers)) {
+                expect(result).toBeFalsy();
+            }
+
+            // Property: Arrays with invalid identifiers should fail
+            if (Array.isArray(identifiers)) {
+                const hasInvalidIdentifier = identifiers.some(
+                    (id) =>
+                        typeof id !== "string" ||
+                        id.trim().length === 0 ||
+                        id.includes("<") ||
+                        id.includes(">")
                 );
 
-                expect(() => result).not.toThrowError();
-                expect(typeof result).toBe("boolean");
-
-                // Property: Non-array inputs should fail
-                if (!Array.isArray(identifiers)) {
+                if (hasInvalidIdentifier) {
                     expect(result).toBeFalsy();
                 }
-
-                // Property: Arrays with invalid identifiers should fail
-                if (Array.isArray(identifiers)) {
-                    const hasInvalidIdentifier = identifiers.some(
-                        (id) =>
-                            typeof id !== "string" ||
-                            id.trim().length === 0 ||
-                            id.includes("<") ||
-                            id.includes(">")
-                    );
-
-                    if (hasInvalidIdentifier) {
-                        expect(result).toBeFalsy();
-                    }
-                }
             }
-        );
+        });
     });
 
     describe("Monitor Type Validation Functions", () => {
@@ -1080,35 +1072,34 @@ describe("Comprehensive Validation Function Fuzzing", () => {
 
         fcTest.prop([
             fc.constantFrom("http", "ping") as fc.Arbitrary<MonitorType>,
-        ])(
-            "Comprehensive monitor object validation consistency",
-            (monitorType) => {
-                // Generate a complete, valid monitor object for the given type
-                const monitorObj = {
-                    id: `test-${Math.random().toString(36).slice(2)}`,
-                    type: monitorType,
-                    status: "up" as const,
-                    checkInterval: 30_000,
-                    timeout: 5000,
-                    retryAttempts: 3,
-                    ...(monitorType === "http"
-                        ? { url: "https://example.com" }
-                        : {}),
-                    ...(monitorType === "ping" ? { host: "example.com" } : {}),
-                };
+        ])("Comprehensive monitor object validation consistency", (
+            monitorType
+        ) => {
+            // Generate a complete, valid monitor object for the given type
+            const monitorObj = {
+                id: `test-${Math.random().toString(36).slice(2)}`,
+                type: monitorType,
+                status: "up" as const,
+                checkInterval: 30_000,
+                timeout: 5000,
+                retryAttempts: 3,
+                ...(monitorType === "http"
+                    ? { url: "https://example.com" }
+                    : {}),
+                ...(monitorType === "ping" ? { host: "example.com" } : {}),
+            };
 
-                // Test composite validation
-                const errors = measureValidation(
-                    getMonitorValidationErrors,
-                    "getMonitorValidationErrors",
-                    monitorObj
-                );
+            // Test composite validation
+            const errors = measureValidation(
+                getMonitorValidationErrors,
+                "getMonitorValidationErrors",
+                monitorObj
+            );
 
-                // Property: Well-formed monitor objects should have no validation errors
-                expect(Array.isArray(errors)).toBeTruthy();
-                expect(errors).toHaveLength(0);
-            }
-        );
+            // Property: Well-formed monitor objects should have no validation errors
+            expect(Array.isArray(errors)).toBeTruthy();
+            expect(errors).toHaveLength(0);
+        });
     });
 
     describe("Performance and Security Edge Cases", () => {

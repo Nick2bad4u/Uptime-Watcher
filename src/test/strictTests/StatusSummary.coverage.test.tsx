@@ -8,19 +8,17 @@ import { render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const tooltipMock = vi.hoisted(() => ({
-    render: vi.fn(
-        ({
-            children,
-            content,
-        }: {
-            children: (props: Record<string, never>) => ReactNode;
-            content: string;
-        }) => (
-            <div data-testid="tooltip" data-content={content}>
-                {children({})}
-            </div>
-        )
-    ),
+    render: vi.fn(({
+        children,
+        content,
+    }: {
+        children: (props: Record<string, never>) => ReactNode;
+        content: string;
+    }) => (
+        <div data-testid="tooltip" data-content={content}>
+            {children({})}
+        </div>
+    )),
 }));
 
 vi.mock("../../components/common/Tooltip/Tooltip", () => ({

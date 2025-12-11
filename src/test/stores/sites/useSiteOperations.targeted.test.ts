@@ -117,15 +117,16 @@ describe("useSiteOperations - Targeted Coverage", () => {
 
         mockElectronAPI = {
             sites: {
-                removeMonitor: vi.fn(
-                    async (siteIdentifier: string, monitorId: string) => ({
-                        ...mockSiteWithMultipleMonitors,
-                        identifier: siteIdentifier,
-                        monitors: mockSiteWithMultipleMonitors.monitors.filter(
-                            (monitor) => monitor.id !== monitorId
-                        ),
-                    })
-                ),
+                removeMonitor: vi.fn(async (
+                    siteIdentifier: string,
+                    monitorId: string
+                ) => ({
+                    ...mockSiteWithMultipleMonitors,
+                    identifier: siteIdentifier,
+                    monitors: mockSiteWithMultipleMonitors.monitors.filter(
+                        (monitor) => monitor.id !== monitorId
+                    ),
+                })),
                 removeSite: vi.fn().mockResolvedValue(true),
             },
             monitoring: {
@@ -161,33 +162,29 @@ describe("useSiteOperations - Targeted Coverage", () => {
 
         const dataService = {
             downloadSqliteBackup: vi.fn(async () =>
-                mockElectronAPI.data.downloadSqliteBackup()
-            ),
+                mockElectronAPI.data.downloadSqliteBackup()),
             restoreSqliteBackup: vi.fn(async (payload) =>
-                mockElectronAPI.data.restoreSqliteBackup(payload)
-            ),
+                mockElectronAPI.data.restoreSqliteBackup(payload)),
         };
 
         siteService = {
             addSite: vi.fn(async (site: Site) => site),
             getSites: vi.fn(async () => getSitesFn()),
-            removeMonitor: vi.fn(
-                async (siteIdentifier: string, monitorId: string) =>
-                    mockElectronAPI.sites.removeMonitor(
-                        siteIdentifier,
-                        monitorId
-                    )
-            ),
+            removeMonitor: vi.fn(async (
+                siteIdentifier: string,
+                monitorId: string
+            ) =>
+                mockElectronAPI.sites.removeMonitor(siteIdentifier, monitorId)),
             removeSite: vi.fn(async (identifier: string) =>
-                mockElectronAPI.sites.removeSite(identifier)
-            ),
-            updateSite: vi.fn(
-                async (identifier: string, updates: Partial<Site>) => ({
-                    ...mockSiteWithMultipleMonitors,
-                    ...updates,
-                    identifier,
-                })
-            ),
+                mockElectronAPI.sites.removeSite(identifier)),
+            updateSite: vi.fn(async (
+                identifier: string,
+                updates: Partial<Site>
+            ) => ({
+                ...mockSiteWithMultipleMonitors,
+                ...updates,
+                identifier,
+            })),
         };
 
         mockSiteDeps = {
@@ -397,12 +394,12 @@ describe("useSiteOperations - Targeted Coverage", () => {
 
             const baseSite: Site = {
                 ...mockSiteWithMultipleMonitors,
-                monitors: mockSiteWithMultipleMonitors.monitors.map(
-                    (monitor) => ({
-                        ...monitor,
-                        history: Array.from(monitor.history),
-                    })
-                ),
+                monitors: mockSiteWithMultipleMonitors.monitors.map((
+                    monitor
+                ) => ({
+                    ...monitor,
+                    history: Array.from(monitor.history),
+                })),
             };
 
             const sitesState: Site[] = [baseSite];
@@ -422,14 +419,15 @@ describe("useSiteOperations - Targeted Coverage", () => {
                     data: mockSiteDeps.services.data,
                     site: {
                         ...mockSiteDeps.services.site,
-                        removeMonitor: vi.fn(
-                            async (_identifier, removedMonitorId) => ({
-                                ...baseSite,
-                                monitors: baseSite.monitors.filter(
-                                    (monitor) => monitor.id !== removedMonitorId
-                                ),
-                            })
-                        ),
+                        removeMonitor: vi.fn(async (
+                            _identifier,
+                            removedMonitorId
+                        ) => ({
+                            ...baseSite,
+                            monitors: baseSite.monitors.filter(
+                                (monitor) => monitor.id !== removedMonitorId
+                            ),
+                        })),
                     },
                 },
             } satisfies SiteOperationsDependencies;

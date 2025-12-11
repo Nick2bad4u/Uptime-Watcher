@@ -380,8 +380,7 @@ export async function validateMonitorFieldEnhanced<
             const result = await validateMonitorData(type, partialPayload);
 
             const filteredErrors = result.errors.filter((error) =>
-                error.toLowerCase().includes(fieldName.toLowerCase())
-            );
+                error.toLowerCase().includes(fieldName.toLowerCase()));
 
             const finalErrors =
                 result.errors.length > 0 &&
@@ -397,8 +396,9 @@ export async function validateMonitorFieldEnhanced<
                 validationType: "field" as const,
                 warnings:
                     result.warnings?.filter((warning) =>
-                        warning.toLowerCase().includes(fieldName.toLowerCase())
-                    ) ?? [],
+                        warning
+                            .toLowerCase()
+                            .includes(fieldName.toLowerCase())) ?? [],
             };
         }
     );

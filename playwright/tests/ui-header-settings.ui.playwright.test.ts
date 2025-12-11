@@ -50,8 +50,7 @@ test.describe(
                 await expect(addSiteButton).toBeVisible();
 
                 const initialIsDark = await page.evaluate(() =>
-                    document.documentElement.classList.contains("dark")
-                );
+                    document.documentElement.classList.contains("dark"));
 
                 const themeButton = page.getByRole("button", {
                     name: /Switch to (light|dark) theme/i,
@@ -71,8 +70,7 @@ test.describe(
                 );
 
                 const toggledIsDark = await page.evaluate(() =>
-                    document.documentElement.classList.contains("dark")
-                );
+                    document.documentElement.classList.contains("dark"));
                 expect(toggledIsDark).not.toBe(initialIsDark);
 
                 const updatedThemeButton = page.getByRole("button", {
@@ -104,13 +102,13 @@ test.describe(
                 const headerIconPresent = await modal.evaluate((element) =>
                     Boolean(
                         element.querySelector(".settings-modal__header-icon")
-                    )
-                );
+                    ));
                 expect(headerIconPresent).toBe(true);
 
                 const accentValue = await modal.evaluate((element) =>
-                    getComputedStyle(element).getPropertyValue("--modal-accent")
-                );
+                    getComputedStyle(element).getPropertyValue(
+                        "--modal-accent"
+                    ));
                 expect(accentValue.trim().length).toBeGreaterThan(0);
 
                 const closeButton = page.getByRole("button", {

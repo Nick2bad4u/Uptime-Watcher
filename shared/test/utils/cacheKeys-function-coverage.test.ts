@@ -212,8 +212,9 @@ describe("Cache Keys Function Coverage", () => {
             await annotate("Type: Error Handling", "type");
 
             expect(() =>
-                parseCacheKey(":loading:site-123" as any)
-            ).toThrowError("Invalid cache key format:");
+                parseCacheKey(":loading:site-123" as any)).toThrowError(
+                "Invalid cache key format:"
+            );
             expect(() => parseCacheKey("site::site-123" as any)).toThrowError(
                 "Invalid cache key format:"
             );

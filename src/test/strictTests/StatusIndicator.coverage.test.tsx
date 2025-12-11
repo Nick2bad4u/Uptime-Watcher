@@ -25,8 +25,7 @@ const themeMock = vi.hoisted(() => ({
         },
     },
     getStatusColor: vi.fn((status: string) =>
-        status === "down" ? "#ff4d4f" : "#22c55e"
-    ),
+        status === "down" ? "#ff4d4f" : "#22c55e"),
 }));
 
 vi.mock("../../theme/useTheme", async (importOriginal) => {
@@ -47,8 +46,7 @@ const statusUtilsMock = vi.hoisted(() => ({
                 data-color={color}
                 data-size={size}
             />
-        ))
-    ),
+        ))),
 }));
 
 vi.mock("../../utils/status", () => statusUtilsMock);

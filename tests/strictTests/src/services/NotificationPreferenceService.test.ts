@@ -62,16 +62,16 @@ describe("NotificationPreferenceService (strict coverage)", () => {
         vi.resetModules();
         capturedWrapper = undefined;
         ensureInitializedMock.mockReset().mockResolvedValue(undefined);
-        wrapFactoryMock
-            .mockReset()
-            .mockImplementation((_: string, handler: WrapHandler) => {
-                const wrapper = vi.fn(
-                    async (payload: NotificationPreferenceUpdate) =>
-                        handler(window.electronAPI as unknown, payload)
-                );
-                capturedWrapper = wrapper;
-                return wrapper;
-            });
+        wrapFactoryMock.mockReset().mockImplementation((
+            _: string,
+            handler: WrapHandler
+        ) => {
+            const wrapper = vi.fn(async (
+                payload: NotificationPreferenceUpdate
+            ) => handler(window.electronAPI as unknown, payload));
+            capturedWrapper = wrapper;
+            return wrapper;
+        });
         getIpcServiceHelpersMock.mockClear();
 
         updateBridgeSpy = vi.fn(async () => undefined);

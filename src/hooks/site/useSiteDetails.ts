@@ -686,7 +686,11 @@ export function useSiteDetails({
                 };
             });
         },
-        [selectedMonitorId, selectedMonitorTimeout, setMonitorEditStateById]
+        [
+            selectedMonitorId,
+            selectedMonitorTimeout,
+            setMonitorEditStateById,
+        ]
     );
 
     // eslint-disable-next-line react-hooks/preserve-manual-memoization -- Dependencies are intentionally explicit to align with shared validation and logging behaviour.

@@ -79,8 +79,7 @@ const mockSiteManager = vi.hoisted(() =>
             eventBus: mockEventBus(),
             getEventBus: vi.fn().mockReturnValue(mockEventBus()),
         };
-    })
-);
+    }));
 
 const mockMonitorManager = vi.hoisted(() =>
     vi.fn(function MockMonitorManager() {
@@ -94,8 +93,7 @@ const mockMonitorManager = vi.hoisted(() =>
             eventBus: mockEventBus(),
             getEventBus: vi.fn().mockReturnValue(mockEventBus()),
         };
-    })
-);
+    }));
 
 const mockDatabaseManager = vi.hoisted(() =>
     vi.fn(function MockDatabaseManager() {
@@ -110,8 +108,7 @@ const mockDatabaseManager = vi.hoisted(() =>
             eventBus: mockEventBus(),
             getEventBus: vi.fn().mockReturnValue(mockEventBus()),
         };
-    })
-);
+    }));
 
 const mockUptimeOrchestrator = vi.hoisted(() =>
     vi.fn(function MockUptimeOrchestrator() {
@@ -124,8 +121,7 @@ const mockUptimeOrchestrator = vi.hoisted(() =>
             getHistoryLimit: vi.fn().mockReturnValue(100),
             eventBus: mockEventBus(),
         };
-    })
-);
+    }));
 
 const mockIpcService = vi.hoisted(() =>
     vi.fn(function MockIpcService() {
@@ -134,8 +130,7 @@ const mockIpcService = vi.hoisted(() =>
             cleanup: vi.fn(),
             isInitialized: vi.fn().mockReturnValue(true),
         };
-    })
-);
+    }));
 
 // Hoisted mocks for all dependencies
 vi.mock("../../services/database/DatabaseService", () => ({

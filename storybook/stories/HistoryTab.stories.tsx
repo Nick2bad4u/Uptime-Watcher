@@ -40,8 +40,7 @@ const outageMonitor: Monitor = {
                   responseTime: 500 + index * 40,
                   status: index < 3 ? "down" : "degraded",
               }
-            : entry
-    ),
+            : entry),
     status: "down",
 };
 

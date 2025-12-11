@@ -19,9 +19,8 @@ describe("Shared Module - 100% Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            const chartConfigModule = await import(
-                "../../types/chartConfig.js"
-            );
+            const chartConfigModule =
+                await import("../../types/chartConfig.js");
 
             // Ensure hasPlugins function is called
             expect(chartConfigModule.hasPlugins({})).toBeFalsy();
@@ -51,9 +50,8 @@ describe("Shared Module - 100% Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            const environmentModule = await import(
-                "../../utils/environment.js"
-            );
+            const environmentModule =
+                await import("../../utils/environment.js");
 
             // Call all exported functions to ensure coverage
             expect(
@@ -119,9 +117,8 @@ describe("Shared Module - 100% Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            const themeConfigModule = await import(
-                "../../types/themeConfig.js"
-            );
+            const themeConfigModule =
+                await import("../../types/themeConfig.js");
 
             // Call type guard functions
             const validColorPalette = {
@@ -259,9 +256,8 @@ describe("Shared Module - 100% Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            const objectSafetyModule = await import(
-                "../../utils/objectSafety.js"
-            );
+            const objectSafetyModule =
+                await import("../../utils/objectSafety.js");
 
             const testObj = { a: 1, b: 2, c: 3 };
 
@@ -315,9 +311,8 @@ describe("Shared Module - 100% Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            const safeConversionsModule = await import(
-                "../../utils/safeConversions.js"
-            );
+            const safeConversionsModule =
+                await import("../../utils/safeConversions.js");
 
             // Call all exported functions
             expect(safeConversionsModule.safeNumberConversion("123", 0)).toBe(
@@ -406,9 +401,8 @@ describe("Shared Module - 100% Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            const helperUtilsModule = await import(
-                "../../utils/typeHelpers.js"
-            );
+            const helperUtilsModule =
+                await import("../../utils/typeHelpers.js");
 
             // Call all exported functions
             expect(helperUtilsModule.castIpcResponse("test")).toBe("test");
@@ -443,9 +437,8 @@ describe("Shared Module - 100% Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            const stringConversionModule = await import(
-                "../../utils/stringConversion.js"
-            );
+            const stringConversionModule =
+                await import("../../utils/stringConversion.js");
 
             // Call all exported functions
             expect(stringConversionModule.safeStringify("test")).toBe("test");
@@ -559,9 +552,8 @@ describe("Shared Module - 100% Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Error Handling", "type");
 
-            const errorCatalogModule = await import(
-                "../../utils/errorCatalog.js"
-            );
+            const errorCatalogModule =
+                await import("../../utils/errorCatalog.js");
 
             // Call all exported functions
             expect(
@@ -602,9 +594,8 @@ describe("Shared Module - 100% Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Error Handling", "type");
 
-            const errorHandlingModule = await import(
-                "../../utils/errorHandling.js"
-            );
+            const errorHandlingModule =
+                await import("../../utils/errorHandling.js");
 
             // Create mock store for testing
             const mockStore = {
@@ -635,9 +626,8 @@ describe("Shared Module - 100% Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            const logTemplatesModule = await import(
-                "../../utils/logTemplates.js"
-            );
+            const logTemplatesModule =
+                await import("../../utils/logTemplates.js");
 
             // Access all template categories
             expect(logTemplatesModule.SERVICE_LOGS).toBeDefined();
@@ -723,9 +713,8 @@ describe("Shared Module - 100% Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Validation", "type");
 
-            const validatorUtilsModule = await import(
-                "../../validation/validatorUtils.js"
-            );
+            const validatorUtilsModule =
+                await import("../../validation/validatorUtils.js");
 
             // Call all exported functions
             expect(validatorUtilsModule.isNonEmptyString("test")).toBeTruthy();

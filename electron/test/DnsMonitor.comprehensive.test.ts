@@ -7,11 +7,9 @@ vi.mock("node:dns/promises", () => ({
     resolve6: vi.fn(() => Promise.resolve(["2001:db8::1"])),
     resolveCname: vi.fn(() => Promise.resolve(["canonical.example.com"])),
     resolveMx: vi.fn(() =>
-        Promise.resolve([{ exchange: "mail.example.com", priority: 10 }])
-    ),
+        Promise.resolve([{ exchange: "mail.example.com", priority: 10 }])),
     resolveTxt: vi.fn(() =>
-        Promise.resolve([["v=spf1 include:_spf.example.com ~all"]])
-    ),
+        Promise.resolve([["v=spf1 include:_spf.example.com ~all"]])),
     resolveNs: vi.fn(() => Promise.resolve(["ns1.example.com"])),
     resolveSrv: vi.fn(() =>
         Promise.resolve([
@@ -21,8 +19,7 @@ vi.mock("node:dns/promises", () => ({
                 priority: 10,
                 weight: 5,
             },
-        ])
-    ),
+        ])),
     resolvePtr: vi.fn(() => Promise.resolve(["example.com"])),
     resolveSoa: vi.fn(() =>
         Promise.resolve({
@@ -33,11 +30,9 @@ vi.mock("node:dns/promises", () => ({
             retry: 7200,
             expire: 3_600_000,
             minttl: 300,
-        })
-    ),
+        })),
     resolveAny: vi.fn(() =>
-        Promise.resolve([{ type: "A", address: "192.168.1.1", ttl: 300 }])
-    ),
+        Promise.resolve([{ type: "A", address: "192.168.1.1", ttl: 300 }])),
     resolveTlsa: vi.fn(() =>
         Promise.resolve([
             {
@@ -46,11 +41,9 @@ vi.mock("node:dns/promises", () => ({
                 matchingType: 1,
                 certificate: "abc123",
             },
-        ])
-    ),
+        ])),
     resolveCaa: vi.fn(() =>
-        Promise.resolve([{ critical: 0, issue: "letsencrypt.org" }])
-    ),
+        Promise.resolve([{ critical: 0, issue: "letsencrypt.org" }])),
     resolveNaptr: vi.fn(() =>
         Promise.resolve([
             {
@@ -61,8 +54,7 @@ vi.mock("node:dns/promises", () => ({
                 replacement: "",
                 service: "sip+d2u",
             },
-        ])
-    ),
+        ])),
 }));
 
 // Import after mocking

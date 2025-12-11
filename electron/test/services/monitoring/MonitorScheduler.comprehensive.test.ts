@@ -150,7 +150,11 @@ describe("MonitorScheduler – comprehensive", () => {
             createMonitor({ checkInterval: baseInterval })
         );
 
-        const expectedDelays = [baseInterval * 2, 300_000, 300_000];
+        const expectedDelays = [
+            baseInterval * 2,
+            300_000,
+            300_000,
+        ];
 
         for (const expectedDelay of expectedDelays) {
             await flushAsync();

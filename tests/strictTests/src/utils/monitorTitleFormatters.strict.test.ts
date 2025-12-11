@@ -30,9 +30,8 @@ describe("monitorTitleFormatters strict coverage", () => {
     });
 
     it("includes DNS record type in the suffix when available", async () => {
-        const { formatTitleSuffix } = await import(
-            "@app/utils/monitorTitleFormatters"
-        );
+        const { formatTitleSuffix } =
+            await import("@app/utils/monitorTitleFormatters");
 
         const monitor = createMonitor({
             type: "dns",
@@ -44,9 +43,8 @@ describe("monitorTitleFormatters strict coverage", () => {
     });
 
     it("prefers primary replication status URLs with replica fallback", async () => {
-        const { formatTitleSuffix } = await import(
-            "@app/utils/monitorTitleFormatters"
-        );
+        const { formatTitleSuffix } =
+            await import("@app/utils/monitorTitleFormatters");
 
         const monitorWithPrimary = createMonitor({
             type: "replication",
@@ -69,9 +67,8 @@ describe("monitorTitleFormatters strict coverage", () => {
     });
 
     it("formats SSL monitors with optional port information", async () => {
-        const { formatTitleSuffix } = await import(
-            "@app/utils/monitorTitleFormatters"
-        );
+        const { formatTitleSuffix } =
+            await import("@app/utils/monitorTitleFormatters");
 
         const hostOnly = createMonitor({ type: "ssl", host: "example.com" });
         expect(formatTitleSuffix(hostOnly)).toBe(" (example.com)");
@@ -85,9 +82,8 @@ describe("monitorTitleFormatters strict coverage", () => {
     });
 
     it("formats URL-driven monitor types consistently", async () => {
-        const { formatTitleSuffix } = await import(
-            "@app/utils/monitorTitleFormatters"
-        );
+        const { formatTitleSuffix } =
+            await import("@app/utils/monitorTitleFormatters");
 
         const urlTypes = [
             "http",
@@ -113,9 +109,8 @@ describe("monitorTitleFormatters strict coverage", () => {
     });
 
     it("renders host-based monitor identifiers", async () => {
-        const { formatTitleSuffix } = await import(
-            "@app/utils/monitorTitleFormatters"
-        );
+        const { formatTitleSuffix } =
+            await import("@app/utils/monitorTitleFormatters");
 
         const pingMonitor = createMonitor({
             type: "ping",
@@ -164,9 +159,8 @@ describe("monitorTitleFormatters strict coverage", () => {
     });
 
     it("returns empty suffix when no formatter or source data is available", async () => {
-        const { formatTitleSuffix } = await import(
-            "@app/utils/monitorTitleFormatters"
-        );
+        const { formatTitleSuffix } =
+            await import("@app/utils/monitorTitleFormatters");
 
         const unknownMonitor = {
             ...createMonitor(),

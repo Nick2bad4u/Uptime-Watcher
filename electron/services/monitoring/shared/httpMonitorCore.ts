@@ -177,8 +177,7 @@ export function createHttpMonitorService<
             };
 
             return rateLimiter.schedule(url, () =>
-                this.performCheckWithRetry(retryParams)
-            );
+                this.performCheckWithRetry(retryParams));
         }
 
         private async performCheckWithRetry(params: {

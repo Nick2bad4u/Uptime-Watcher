@@ -392,8 +392,11 @@ describe("DNS Monitoring Performance Benchmarks", () => {
                     "TLSA",
                 ];
                 const promises = complexTypes.map((type) =>
-                    dnsService.resolveDnsRecord(`test.example.com`, type, 5000)
-                );
+                    dnsService.resolveDnsRecord(
+                        `test.example.com`,
+                        type,
+                        5000
+                    ));
                 await Promise.all(promises);
             },
             { iterations: 50 }
@@ -454,8 +457,7 @@ describe("DNS Monitoring Performance Benchmarks", () => {
                     "NS",
                 ]);
                 const promises = requests.map((req) =>
-                    dnsService.checkWithRetry(req)
-                );
+                    dnsService.checkWithRetry(req));
                 await Promise.all(promises);
             },
             { iterations: 100 }

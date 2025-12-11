@@ -134,8 +134,7 @@ class MockTokenService {
     /** Produces a random refresh token value. */
     generateRefreshToken(): string {
         return Array.from({ length: 64 }, () =>
-            Math.random().toString(36).charAt(2)
-        ).join("");
+            Math.random().toString(36).charAt(2)).join("");
     }
 
     /** Validates a token signature and expiration. */
@@ -867,17 +866,13 @@ describe("Authentication Service Performance", () => {
                     userData.password
                 );
                 service.login(loginRequest).then((response) => {
-                    service
-                        .verifyToken(response.accessToken)
-                        .then((context) => {
-                            if (context) {
-                                service.checkPermission(
-                                    context,
-                                    "sites",
-                                    "read"
-                                );
-                            }
-                        });
+                    service.verifyToken(response.accessToken).then((
+                        context
+                    ) => {
+                        if (context) {
+                            service.checkPermission(context, "sites", "read");
+                        }
+                    });
                 });
             });
         },
@@ -976,8 +971,7 @@ describe("Authentication Service Performance", () => {
         () => {
             service = new MockAuthenticationService();
             const users = Array.from({ length: 20 }, (_, i) =>
-                createTestUser(i + 1)
-            );
+                createTestUser(i + 1));
 
             Promise.all(users.map((user) => service.createUser(user)));
         },
@@ -989,8 +983,7 @@ describe("Authentication Service Performance", () => {
         () => {
             service = new MockAuthenticationService();
             const users = Array.from({ length: 10 }, (_, i) =>
-                createTestUser(i + 1)
-            );
+                createTestUser(i + 1));
 
             Promise.all(users.map((user) => service.createUser(user))).then(
                 () => {
@@ -1044,8 +1037,7 @@ describe("Authentication Service Performance", () => {
 
                 Promise.all(loginPromises).then((responses) => {
                     const verifyPromises = responses.map((response) =>
-                        service.verifyToken(response.accessToken)
-                    );
+                        service.verifyToken(response.accessToken));
 
                     Promise.all(verifyPromises).then((contexts) => {
                         const permissionChecks = contexts.map((context) => {
@@ -1084,8 +1076,7 @@ describe("Authentication Service Performance", () => {
         () => {
             service = new MockAuthenticationService();
             const users = Array.from({ length: 15 }, (_, i) =>
-                createTestUser(i + 1)
-            );
+                createTestUser(i + 1));
 
             Promise.all(users.map((user) => service.createUser(user))).then(
                 () => {
@@ -1135,8 +1126,7 @@ describe("Authentication Service Performance", () => {
         () => {
             service = new MockAuthenticationService();
             const users = Array.from({ length: 10 }, (_, i) =>
-                createTestUser(i + 1)
-            );
+                createTestUser(i + 1));
 
             Promise.all(users.map((user) => service.createUser(user))).then(
                 () => {
@@ -1152,8 +1142,7 @@ describe("Authentication Service Performance", () => {
         () => {
             service = new MockAuthenticationService();
             const users = Array.from({ length: 8 }, (_, i) =>
-                createTestUser(i + 1)
-            );
+                createTestUser(i + 1));
 
             Promise.all(users.map((user) => service.createUser(user))).then(
                 () => {

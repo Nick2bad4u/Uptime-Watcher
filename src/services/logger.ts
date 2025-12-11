@@ -147,7 +147,11 @@ const baseLoggerMethods = {
             remaining
         );
         const finalArgs = context
-            ? [logArgs[0], context, ...logArgs.slice(1)]
+            ? [
+                  logArgs[0],
+                  context,
+                  ...logArgs.slice(1),
+              ]
             : Array.from(logArgs);
         safeInvoke(log.debug.bind(log), finalArgs);
     },
@@ -161,7 +165,11 @@ const baseLoggerMethods = {
             remaining
         );
         const finalArgs = context
-            ? [logArgs[0], context, ...logArgs.slice(1)]
+            ? [
+                  logArgs[0],
+                  context,
+                  ...logArgs.slice(1),
+              ]
             : Array.from(logArgs);
         safeInvoke(log.error.bind(log), finalArgs);
     },
@@ -174,7 +182,11 @@ const baseLoggerMethods = {
             remaining
         );
         const finalArgs = context
-            ? [logArgs[0], context, ...logArgs.slice(1)]
+            ? [
+                  logArgs[0],
+                  context,
+                  ...logArgs.slice(1),
+              ]
             : Array.from(logArgs);
         safeInvoke(log.info.bind(log), finalArgs);
     },
@@ -187,7 +199,11 @@ const baseLoggerMethods = {
             remaining
         );
         const finalArgs = context
-            ? [logArgs[0], context, ...logArgs.slice(1)]
+            ? [
+                  logArgs[0],
+                  context,
+                  ...logArgs.slice(1),
+              ]
             : Array.from(logArgs);
         safeInvoke(log.silly.bind(log), finalArgs);
     },
@@ -200,7 +216,11 @@ const baseLoggerMethods = {
             remaining
         );
         const finalArgs = context
-            ? [logArgs[0], context, ...logArgs.slice(1)]
+            ? [
+                  logArgs[0],
+                  context,
+                  ...logArgs.slice(1),
+              ]
             : Array.from(logArgs);
         safeInvoke(log.verbose.bind(log), finalArgs);
     },
@@ -213,7 +233,11 @@ const baseLoggerMethods = {
             remaining
         );
         const finalArgs = context
-            ? [logArgs[0], context, ...logArgs.slice(1)]
+            ? [
+                  logArgs[0],
+                  context,
+                  ...logArgs.slice(1),
+              ]
             : Array.from(logArgs);
         safeInvoke(log.warn.bind(log), finalArgs);
     },

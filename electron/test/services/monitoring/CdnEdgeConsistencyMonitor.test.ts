@@ -10,8 +10,7 @@ const httpGetMock = vi.fn();
 
 vi.mock("../../../utils/operationalHooks", () => ({
     withOperationalHooks: vi.fn(async (operation: () => Promise<unknown>) =>
-        operation()
-    ),
+        operation()),
 }));
 
 vi.mock("../../../services/monitoring/utils/httpClient", () => ({

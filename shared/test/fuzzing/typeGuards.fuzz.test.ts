@@ -94,13 +94,12 @@ describe("TypeGuards Fuzzing Tests", () => {
             }
         );
 
-        test.prop([fc.float()])(
-            "should return true for all finite numbers",
-            (num) => {
-                fc.pre(!Number.isNaN(num)); // Skip NaN inputs
-                expect(isNumber(num)).toBeTruthy();
-            }
-        );
+        test.prop([fc.float()])("should return true for all finite numbers", (
+            num
+        ) => {
+            fc.pre(!Number.isNaN(num)); // Skip NaN inputs
+            expect(isNumber(num)).toBeTruthy();
+        });
 
         test.prop([fc.constantFrom(Number.NaN, Infinity, -Infinity)])(
             "should handle special number values correctly",
@@ -119,35 +118,32 @@ describe("TypeGuards Fuzzing Tests", () => {
         test.prop([
             fc.anything(),
             fc.array(fc.oneof(fc.string(), fc.constantFrom(Symbol("test")))),
-        ])(
-            "should return true only when object has all specified properties",
-            (value, properties) => {
-                const result = hasProperties(value, properties);
+        ])("should return true only when object has all specified properties", (
+            value,
+            properties
+        ) => {
+            const result = hasProperties(value, properties);
 
-                // Always make at least one assertion
-                expect(typeof result).toBe("boolean");
+            // Always make at least one assertion
+            expect(typeof result).toBe("boolean");
 
-                if (result) {
-                    // If hasProperties returns true, value must be object with all props
-                    expect(isObject(value)).toBeTruthy();
-                    for (const prop of properties) {
-                        expect(
-                            Object.hasOwn(value as object, prop)
-                        ).toBeTruthy();
-                    }
-                }
-
-                if (isObject(value)) {
-                    const allPropsExist = properties.every((prop) =>
-                        Object.hasOwn(value, prop)
-                    );
-                    expect(result).toBe(allPropsExist);
-                } else {
-                    // If value is not an object, result should always be false
-                    expect(result).toBeFalsy();
+            if (result) {
+                // If hasProperties returns true, value must be object with all props
+                expect(isObject(value)).toBeTruthy();
+                for (const prop of properties) {
+                    expect(Object.hasOwn(value as object, prop)).toBeTruthy();
                 }
             }
-        );
+
+            if (isObject(value)) {
+                const allPropsExist = properties.every((prop) =>
+                    Object.hasOwn(value, prop));
+                expect(result).toBe(allPropsExist);
+            } else {
+                // If value is not an object, result should always be false
+                expect(result).toBeFalsy();
+            }
+        });
 
         test.prop([fc.dictionary(fc.string(), fc.anything())])(
             "should return true when checking for properties that exist",
@@ -205,13 +201,12 @@ describe("TypeGuards Fuzzing Tests", () => {
     });
 
     describe(isArray, () => {
-        test.prop([fc.anything()])(
-            "should return true only for arrays",
-            (value) => {
-                const result = isArray(value);
-                expect(result).toBe(Array.isArray(value));
-            }
-        );
+        test.prop([fc.anything()])("should return true only for arrays", (
+            value
+        ) => {
+            const result = isArray(value);
+            expect(result).toBe(Array.isArray(value));
+        });
 
         test.prop([fc.array(fc.anything())])(
             "should return true for all arrays without validator",
@@ -249,12 +244,11 @@ describe("TypeGuards Fuzzing Tests", () => {
             }
         );
 
-        test.prop([fc.boolean()])(
-            "should return true for all boolean values",
-            (bool) => {
-                expect(isBoolean(bool)).toBeTruthy();
-            }
-        );
+        test.prop([fc.boolean()])("should return true for all boolean values", (
+            bool
+        ) => {
+            expect(isBoolean(bool)).toBeTruthy();
+        });
     });
 
     describe(isDate, () => {
@@ -346,13 +340,12 @@ describe("TypeGuards Fuzzing Tests", () => {
     });
 
     describe(isFunction, () => {
-        test.prop([fc.anything()])(
-            "should return true only for functions",
-            (value) => {
-                const result = isFunction(value);
-                expect(result).toBe(typeof value === "function");
-            }
-        );
+        test.prop([fc.anything()])("should return true only for functions", (
+            value
+        ) => {
+            const result = isFunction(value);
+            expect(result).toBe(typeof value === "function");
+        });
 
         test.prop([fc.func(fc.anything())])(
             "should return true for generated functions",
@@ -400,12 +393,11 @@ describe("TypeGuards Fuzzing Tests", () => {
     });
 
     describe(isNonNullObject, () => {
-        test.prop([fc.anything()])(
-            "should be equivalent to isObject",
-            (value) => {
-                expect(isNonNullObject(value)).toBe(isObject(value));
-            }
-        );
+        test.prop([fc.anything()])("should be equivalent to isObject", (
+            value
+        ) => {
+            expect(isNonNullObject(value)).toBe(isObject(value));
+        });
     });
 
     describe(isPositiveNumber, () => {
@@ -446,20 +438,18 @@ describe("TypeGuards Fuzzing Tests", () => {
     });
 
     describe(isString, () => {
-        test.prop([fc.anything()])(
-            "should return true only for strings",
-            (value) => {
-                const result = isString(value);
-                expect(result).toBe(typeof value === "string");
-            }
-        );
+        test.prop([fc.anything()])("should return true only for strings", (
+            value
+        ) => {
+            const result = isString(value);
+            expect(result).toBe(typeof value === "string");
+        });
 
-        test.prop([fc.string()])(
-            "should return true for all strings",
-            (str) => {
-                expect(isString(str)).toBeTruthy();
-            }
-        );
+        test.prop([fc.string()])("should return true for all strings", (
+            str
+        ) => {
+            expect(isString(str)).toBeTruthy();
+        });
     });
 
     describe(isValidPort, () => {

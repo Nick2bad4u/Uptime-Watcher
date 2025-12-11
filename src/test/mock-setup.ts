@@ -288,57 +288,57 @@ const mockElectronAPI: ElectronAPI = {
         }),
     },
     monitoring: {
-        checkSiteNow: vi.fn<ElectronAPI["monitoring"]["checkSiteNow"]>(
-            async (siteIdentifier, monitorId) => {
-                const base = cloneSite(defaultSite);
-                base.identifier = siteIdentifier;
+        checkSiteNow: vi.fn<ElectronAPI["monitoring"]["checkSiteNow"]>(async (
+            siteIdentifier,
+            monitorId
+        ) => {
+            const base = cloneSite(defaultSite);
+            base.identifier = siteIdentifier;
 
-                const monitor = base.monitors.find(
-                    (candidate) => candidate.id === monitorId
-                );
+            const monitor = base.monitors.find(
+                (candidate) => candidate.id === monitorId
+            );
 
-                if (!monitor) {
-                    return undefined;
-                }
-
-                const timestamp = new Date().toISOString();
-                const previousStatus = monitor.status;
-
-                const updatedSite = cloneSite({
-                    ...base,
-                    monitors: base.monitors.map((candidate) =>
-                        candidate.id === monitorId
-                            ? {
-                                  ...candidate,
-                                  lastChecked: new Date(),
-                                  responseTime: Math.max(
-                                      10,
-                                      Math.round(Math.random() * 200)
-                                  ),
-                                  status: "up",
-                              }
-                            : candidate
-                    ),
-                });
-
-                const updatedMonitor = updatedSite.monitors.find(
-                    (candidate) => candidate.id === monitorId
-                );
-
-                const statusUpdate: StatusUpdate = {
-                    details: `Manual check run for monitor '${monitorId}'.`,
-                    monitor: updatedMonitor ?? monitor,
-                    monitorId,
-                    previousStatus,
-                    site: updatedSite,
-                    siteIdentifier,
-                    status: updatedMonitor?.status ?? previousStatus,
-                    timestamp,
-                };
-
-                return statusUpdate;
+            if (!monitor) {
+                return undefined;
             }
-        ),
+
+            const timestamp = new Date().toISOString();
+            const previousStatus = monitor.status;
+
+            const updatedSite = cloneSite({
+                ...base,
+                monitors: base.monitors.map((candidate) =>
+                    candidate.id === monitorId
+                        ? {
+                              ...candidate,
+                              lastChecked: new Date(),
+                              responseTime: Math.max(
+                                  10,
+                                  Math.round(Math.random() * 200)
+                              ),
+                              status: "up",
+                          }
+                        : candidate),
+            });
+
+            const updatedMonitor = updatedSite.monitors.find(
+                (candidate) => candidate.id === monitorId
+            );
+
+            const statusUpdate: StatusUpdate = {
+                details: `Manual check run for monitor '${monitorId}'.`,
+                monitor: updatedMonitor ?? monitor,
+                monitorId,
+                previousStatus,
+                site: updatedSite,
+                siteIdentifier,
+                status: updatedMonitor?.status ?? previousStatus,
+                timestamp,
+            };
+
+            return statusUpdate;
+        }),
         startMonitoring: vi.fn<ElectronAPI["monitoring"]["startMonitoring"]>(
             async () => startSummaryMock
         ),
@@ -397,8 +397,7 @@ const mockElectronAPI: ElectronAPI = {
 
     sites: {
         addSite: vi.fn<ElectronAPI["sites"]["addSite"]>(async (site) =>
-            cloneSite(site)
-        ),
+            cloneSite(site)),
         deleteAllSites: vi.fn<ElectronAPI["sites"]["deleteAllSites"]>(
             async () => 0
         ),
@@ -406,24 +405,23 @@ const mockElectronAPI: ElectronAPI = {
             cloneSite(defaultSite),
         ]),
         removeMonitor: vi.fn<ElectronAPI["sites"]["removeMonitor"]>(async () =>
-            cloneSite(defaultSite)
-        ),
+            cloneSite(defaultSite)),
         removeSite: vi.fn<ElectronAPI["sites"]["removeSite"]>(async () => true),
-        updateSite: vi.fn<ElectronAPI["sites"]["updateSite"]>(
-            async (siteIdentifier, updates) => {
-                const base = cloneSite(defaultSite);
-                return {
-                    ...base,
-                    ...updates,
-                    identifier: siteIdentifier,
-                    monitors: updates.monitors
-                        ? updates.monitors.map((monitor: Monitor) =>
-                              cloneMonitor(monitor)
-                          )
-                        : base.monitors,
-                };
-            }
-        ),
+        updateSite: vi.fn<ElectronAPI["sites"]["updateSite"]>(async (
+            siteIdentifier,
+            updates
+        ) => {
+            const base = cloneSite(defaultSite);
+            return {
+                ...base,
+                ...updates,
+                identifier: siteIdentifier,
+                monitors: updates.monitors
+                    ? updates.monitors.map((monitor: Monitor) =>
+                          cloneMonitor(monitor))
+                    : base.monitors,
+            };
+        }),
     },
 
     stateSync: {
@@ -437,8 +435,7 @@ const mockElectronAPI: ElectronAPI = {
             async () => ({
                 ...defaultFullSyncResult,
                 sites: defaultFullSyncResult.sites.map((site: Site) =>
-                    cloneSite(site)
-                ),
+                    cloneSite(site)),
             })
         ),
     },

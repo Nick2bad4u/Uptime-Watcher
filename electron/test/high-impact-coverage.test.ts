@@ -24,9 +24,8 @@ describe("High-Impact Branch Coverage Tests", () => {
 
             // Test errorHandling utility edge cases
             try {
-                const errorHandlingModule = await import(
-                    "../../shared/utils/errorHandling.js"
-                );
+                const errorHandlingModule =
+                    await import("../../shared/utils/errorHandling.js");
 
                 if (errorHandlingModule.withErrorHandling) {
                     const frontendStore = {
@@ -91,9 +90,8 @@ describe("High-Impact Branch Coverage Tests", () => {
             await annotate("Type: Error Handling", "type");
 
             try {
-                const errorHandlingModule = await import(
-                    "../services/monitoring/utils/errorHandling.js"
-                );
+                const errorHandlingModule =
+                    await import("../services/monitoring/utils/errorHandling.js");
 
                 if (errorHandlingModule.handleCheckError) {
                     // Test with different error types
@@ -276,9 +274,8 @@ describe("High-Impact Branch Coverage Tests", () => {
             await annotate("Type: Error Handling", "type");
 
             try {
-                const jsonSafetyModule = await import(
-                    "../../shared/utils/jsonSafety.js"
-                );
+                const jsonSafetyModule =
+                    await import("../../shared/utils/jsonSafety.js");
 
                 if (jsonSafetyModule.safeJsonParse) {
                     // Test with validator (required parameter)
@@ -363,9 +360,8 @@ describe("High-Impact Branch Coverage Tests", () => {
 
             try {
                 // eslint-disable-next-line unicorn/no-keyword-prefix
-                const typeGuardsModule = await import(
-                    "../../shared/utils/typeGuards.js"
-                );
+                const typeGuardsModule =
+                    await import("../../shared/utils/typeGuards.js");
                 // eslint-enable-next-line unicorn/no-keyword-prefix
 
                 if (typeGuardsModule.isError) {
@@ -466,9 +462,8 @@ describe("High-Impact Branch Coverage Tests", () => {
             await annotate("Type: Business Logic", "type");
 
             try {
-                const objectSafetyModule = await import(
-                    "../../shared/utils/objectSafety.js"
-                );
+                const objectSafetyModule =
+                    await import("../../shared/utils/objectSafety.js");
 
                 if (objectSafetyModule.safeObjectIteration) {
                     const mockCallback = vi.fn();
@@ -545,9 +540,8 @@ describe("High-Impact Branch Coverage Tests", () => {
             await annotate("Type: Business Logic", "type");
 
             try {
-                const stringConversionModule = await import(
-                    "../../shared/utils/stringConversion.js"
-                );
+                const stringConversionModule =
+                    await import("../../shared/utils/stringConversion.js");
 
                 if (stringConversionModule.safeStringify) {
                     // Test various input types
@@ -661,9 +655,8 @@ describe("High-Impact Branch Coverage Tests", () => {
             await annotate("Type: Event Processing", "type");
 
             try {
-                const eventTypesModule = await import(
-                    "../events/eventTypes.js"
-                );
+                const eventTypesModule =
+                    await import("../events/eventTypes.js");
 
                 if (eventTypesModule.isEventOfCategory) {
                     // Test valid categories and events
@@ -770,9 +763,8 @@ describe("High-Impact Branch Coverage Tests", () => {
             await annotate("Type: Business Logic", "type");
 
             try {
-                const siteStatusModule = await import(
-                    "../../shared/utils/siteStatus.js"
-                );
+                const siteStatusModule =
+                    await import("../../shared/utils/siteStatus.js");
 
                 if (siteStatusModule.calculateSiteStatus) {
                     // Test with no monitors

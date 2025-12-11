@@ -226,8 +226,7 @@ class MockQueryExecutor {
         );
 
         const matchingMonitors = monitors.filter((monitor) =>
-            monitor.name.toLowerCase().includes(lowerSearchTerm)
-        );
+            monitor.name.toLowerCase().includes(lowerSearchTerm));
 
         return { sites: matchingSites, monitors: matchingMonitors };
     }

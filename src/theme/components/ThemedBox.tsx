@@ -46,8 +46,7 @@ import { CSS_CLASSES } from "./types";
  * @public
  */
 export interface ThemedBoxProperties
-    extends AccessibilityProperties,
-        CoreComponentProperties {
+    extends AccessibilityProperties, CoreComponentProperties {
     /**
      * Element type to render (for example `div`, `button`, `section`).
      *

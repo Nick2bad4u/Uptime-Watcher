@@ -57,8 +57,7 @@ function normalizeForJsonComparison(value: any): any {
 
     if (Array.isArray(value)) {
         return value.map((item) =>
-            item === undefined ? null : normalizeForJsonComparison(item)
-        );
+            item === undefined ? null : normalizeForJsonComparison(item));
     }
 
     // For objects, remove undefined properties and handle special values
@@ -114,8 +113,7 @@ const isJsonValue = (value: unknown): value is JsonValue => {
 
     if (typeof value === "object") {
         return Object.values(value as Record<string, unknown>).every((entry) =>
-            isJsonValue(entry)
-        );
+            isJsonValue(entry));
     }
 
     return false;
@@ -185,17 +183,16 @@ describe("JSON Safety Advanced Fuzzing Tests", () => {
                 fc.constant("-Infinity"),
                 fc.constant("NaN")
             ),
-        ])(
-            "should handle malformed JSON strings gracefully",
-            (malformedJson) => {
-                const validator = (_data: unknown): _data is any => true;
-                const result = safeJsonParse(malformedJson, validator);
+        ])("should handle malformed JSON strings gracefully", (
+            malformedJson
+        ) => {
+            const validator = (_data: unknown): _data is any => true;
+            const result = safeJsonParse(malformedJson, validator);
 
-                expect(result.success).toBeFalsy();
-                expect(result.error).toBeDefined();
-                expect(result.data).toBeUndefined();
-            }
-        );
+            expect(result.success).toBeFalsy();
+            expect(result.error).toBeDefined();
+            expect(result.data).toBeUndefined();
+        });
 
         // Test with extremely large JSON strings
         fcTest.prop([fc.integer({ min: 1000, max: 50_000 })])(
@@ -301,8 +298,7 @@ describe("JSON Safety Advanced Fuzzing Tests", () => {
                     }
 
                     return Object.values(metadata).every((entry) =>
-                        isJsonValue(entry)
-                    );
+                        isJsonValue(entry));
                 };
 
                 const result = safeJsonParse(jsonString, validator);
@@ -318,36 +314,33 @@ describe("JSON Safety Advanced Fuzzing Tests", () => {
         );
 
         // Test with Unicode and special characters
-        fcTest.prop([fc.string()])(
-            "should handle Unicode strings correctly",
-            (unicodeString) => {
-                const jsonString = JSON.stringify(unicodeString);
-                const validator = (data: unknown): data is string =>
-                    typeof data === "string";
+        fcTest.prop([fc.string()])("should handle Unicode strings correctly", (
+            unicodeString
+        ) => {
+            const jsonString = JSON.stringify(unicodeString);
+            const validator = (data: unknown): data is string =>
+                typeof data === "string";
 
-                const result = safeJsonParse(jsonString, validator);
+            const result = safeJsonParse(jsonString, validator);
 
-                expect(result.success).toBeTruthy();
-                if (result.success) {
-                    expect(result.data).toBe(unicodeString);
-                }
+            expect(result.success).toBeTruthy();
+            if (result.success) {
+                expect(result.data).toBe(unicodeString);
             }
-        );
+        });
 
         // Test validator rejection
-        fcTest.prop([fc.anything()])(
-            "should respect validator rejection",
-            (data) => {
-                const jsonString = JSON.stringify(data);
-                const rejectingValidator = (_data: unknown): _data is any =>
-                    false;
+        fcTest.prop([fc.anything()])("should respect validator rejection", (
+            data
+        ) => {
+            const jsonString = JSON.stringify(data);
+            const rejectingValidator = (_data: unknown): _data is any => false;
 
-                const result = safeJsonParse(jsonString, rejectingValidator);
+            const result = safeJsonParse(jsonString, rejectingValidator);
 
-                expect(result.success).toBeFalsy();
-                expect(result.error).toBeDefined();
-            }
-        );
+            expect(result.success).toBeFalsy();
+            expect(result.error).toBeDefined();
+        });
     });
 
     describe("safeJsonParseArray - Array-Specific Edge Cases", () => {
@@ -444,55 +437,54 @@ describe("JSON Safety Advanced Fuzzing Tests", () => {
                 })
             ), // Truly malformed JSON
             jsonValueArbitrary, // Fallback value
-        ])(
-            "should return fallback for malformed JSON",
-            (malformedJson, fallbackValue) => {
-                const validator = (
-                    _data: unknown
-                ): _data is typeof fallbackValue => true;
+        ])("should return fallback for malformed JSON", (
+            malformedJson,
+            fallbackValue
+        ) => {
+            const validator = (_data: unknown): _data is typeof fallbackValue =>
+                true;
 
-                const result = safeJsonParseWithFallback(
-                    malformedJson,
-                    validator,
-                    fallbackValue
-                );
+            const result = safeJsonParseWithFallback(
+                malformedJson,
+                validator,
+                fallbackValue
+            );
 
-                // For truly malformed JSON, should return fallback
-                expect(result).toBe(fallbackValue);
-            }
-        );
+            // For truly malformed JSON, should return fallback
+            expect(result).toBe(fallbackValue);
+        });
 
         // Test successful parsing vs fallback
         fcTest.prop([
             fc.record({ test: fc.string() }),
             fc.record({ test: fc.string() }), // Changed to match validator expectation
-        ])(
-            "should parse valid JSON instead of using fallback",
-            (validData, fallbackData) => {
-                // Skip test if both objects would be identical
-                fc.pre(
-                    !JSON.stringify(validData).includes(
-                        JSON.stringify(fallbackData)
-                    ) &&
-                        !JSON.stringify(fallbackData).includes(
-                            JSON.stringify(validData)
-                        )
-                );
+        ])("should parse valid JSON instead of using fallback", (
+            validData,
+            fallbackData
+        ) => {
+            // Skip test if both objects would be identical
+            fc.pre(
+                !JSON.stringify(validData).includes(
+                    JSON.stringify(fallbackData)
+                ) &&
+                    !JSON.stringify(fallbackData).includes(
+                        JSON.stringify(validData)
+                    )
+            );
 
-                const jsonString = JSON.stringify(validData);
-                const validator = (data: unknown): data is typeof validData =>
-                    typeof data === "object" && data !== null && "test" in data;
+            const jsonString = JSON.stringify(validData);
+            const validator = (data: unknown): data is typeof validData =>
+                typeof data === "object" && data !== null && "test" in data;
 
-                const result = safeJsonParseWithFallback(
-                    jsonString,
-                    validator,
-                    fallbackData
-                );
+            const result = safeJsonParseWithFallback(
+                jsonString,
+                validator,
+                fallbackData
+            );
 
-                expect(result).toEqual(validData);
-                expect(result).not.toEqual(fallbackData);
-            }
-        );
+            expect(result).toEqual(validData);
+            expect(result).not.toEqual(fallbackData);
+        });
     });
 
     describe("safeJsonStringify - Complex Object Serialization", () => {
@@ -694,28 +686,27 @@ describe("JSON Safety Advanced Fuzzing Tests", () => {
                 fc.integer(),
                 fc.boolean()
             ),
-        ])(
-            "should maintain round-trip consistency for valid data",
-            (originalData) => {
-                // Stringify then parse should return equivalent data
-                const stringifyResult = safeJsonStringify(originalData);
+        ])("should maintain round-trip consistency for valid data", (
+            originalData
+        ) => {
+            // Stringify then parse should return equivalent data
+            const stringifyResult = safeJsonStringify(originalData);
 
-                if (stringifyResult.success && stringifyResult.data) {
-                    const validator = (
-                        _data: unknown
-                    ): _data is typeof originalData => true;
-                    const parseResult = safeJsonParse(
-                        stringifyResult.data,
-                        validator
-                    );
+            if (stringifyResult.success && stringifyResult.data) {
+                const validator = (
+                    _data: unknown
+                ): _data is typeof originalData => true;
+                const parseResult = safeJsonParse(
+                    stringifyResult.data,
+                    validator
+                );
 
-                    expect(parseResult.success).toBeTruthy();
-                    if (parseResult.success) {
-                        expect(parseResult.data).toEqual(originalData);
-                    }
+                expect(parseResult.success).toBeTruthy();
+                if (parseResult.success) {
+                    expect(parseResult.data).toEqual(originalData);
                 }
             }
-        );
+        });
 
         // Test performance with repeated operations
         fcTest.prop([
@@ -724,36 +715,36 @@ describe("JSON Safety Advanced Fuzzing Tests", () => {
                 label: fc.string({ minLength: 1, maxLength: 50 }),
                 count: fc.integer({ min: 0, max: 10_000 }),
             }),
-        ])(
-            "should handle repeated operations efficiently",
-            (iterations, payload) => {
-                const results: string[] = [];
+        ])("should handle repeated operations efficiently", (
+            iterations,
+            payload
+        ) => {
+            const results: string[] = [];
 
-                for (let i = 0; i < iterations; i++) {
-                    const result = safeJsonStringify(payload);
-                    if (result.success && result.data) {
-                        results.push(result.data);
-                    }
+            for (let i = 0; i < iterations; i++) {
+                const result = safeJsonStringify(payload);
+                if (result.success && result.data) {
+                    results.push(result.data);
                 }
-
-                expect(results).toHaveLength(iterations);
-                // All results should be identical for the same input
-                expect(new Set(results).size).toBe(1);
             }
-        );
+
+            expect(results).toHaveLength(iterations);
+            // All results should be identical for the same input
+            expect(new Set(results).size).toBe(1);
+        });
 
         // Test memory usage with large datasets
         fcTest.prop([fc.integer({ min: 50, max: 200 })])(
             "should not leak memory with large datasets",
             (datasetSize) => {
-                const largeDataset = Array.from(
-                    { length: datasetSize },
-                    (_, i) => ({
-                        id: i,
-                        name: `item-${i}`,
-                        metadata: { index: i, squared: i * i },
-                    })
-                );
+                const largeDataset = Array.from({ length: datasetSize }, (
+                    _,
+                    i
+                ) => ({
+                    id: i,
+                    name: `item-${i}`,
+                    metadata: { index: i, squared: i * i },
+                }));
 
                 const stringifyResult = safeJsonStringify(largeDataset);
 

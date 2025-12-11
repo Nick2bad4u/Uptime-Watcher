@@ -231,8 +231,7 @@ class MockEventSubscriptionManager {
 
     getActiveSubscriptions(): EventSubscription[] {
         return this.getAllSubscriptions().filter((sub) =>
-            this.isSubscriptionActive(sub)
-        );
+            this.isSubscriptionActive(sub));
     }
 
     getSubscriptionGroups(): SubscriptionGroup[] {
@@ -443,12 +442,11 @@ describe("Event Subscriptions Performance", () => {
         "publish event with single subscriber",
         async () => {
             subscriptionManager = new MockEventSubscriptionManager();
-            subscriptionManager.subscribe(
-                "single.event",
-                async (payload: any) => {
-                    // Simulate handler work
-                }
-            );
+            subscriptionManager.subscribe("single.event", async (
+                payload: any
+            ) => {
+                // Simulate handler work
+            });
             await subscriptionManager.publishEvent("single.event", {
                 data: "test",
             });

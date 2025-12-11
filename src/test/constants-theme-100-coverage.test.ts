@@ -218,13 +218,13 @@ describe("Constants and Configuration 100% Coverage", () => {
         });
 
         it("should handle monitor type options as dropdown data", () => {
-            const selectOptions = FALLBACK_MONITOR_TYPE_OPTIONS.map(
-                (option) => ({
-                    text: option.label,
-                    value: option.value,
-                    selected: option.value === "http",
-                })
-            );
+            const selectOptions = FALLBACK_MONITOR_TYPE_OPTIONS.map((
+                option
+            ) => ({
+                text: option.label,
+                value: option.value,
+                selected: option.value === "http",
+            }));
 
             expect(selectOptions).toHaveLength(
                 FALLBACK_MONITOR_TYPE_OPTIONS.length
@@ -438,8 +438,7 @@ describe("Constants and Configuration 100% Coverage", () => {
             // Test some/every operations
             const allPositive = CHECK_INTERVALS.every((i) => i.value > 0);
             const hasMinutes = CHECK_INTERVALS.some((i) =>
-                i.label.includes("minute")
-            );
+                i.label.includes("minute"));
 
             expect(allPositive).toBeTruthy();
             expect(hasMinutes).toBeTruthy();

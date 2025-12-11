@@ -161,27 +161,25 @@ describe("Monitoring Service Benchmarks", () => {
             enabled: boolean;
         }
 
-        const scheduleEntries: ScheduleEntry[] = Array.from(
-            { length: 500 },
-            (_, i) => ({
-                monitorId: `sched-monitor-${i}`,
-                siteIdentifier: `sched-site-${i % 100}`,
-                type: monitorTypes[
-                    Math.floor(Math.random() * monitorTypes.length)
-                ],
-                interval:
-                    [
-                        30,
-                        60,
-                        300,
-                        600,
-                        3600,
-                    ][Math.floor(Math.random() * 5)] * 1000, // 30s to 1h
-                nextRun: Date.now() + Math.random() * 60_000, // Next run within 1 minute
-                priority: Math.floor(Math.random() * 10) + 1, // 1-10 priority
-                enabled: i % 8 !== 0, // 87.5% enabled
-            })
-        );
+        const scheduleEntries: ScheduleEntry[] = Array.from({ length: 500 }, (
+            _,
+            i
+        ) => ({
+            monitorId: `sched-monitor-${i}`,
+            siteIdentifier: `sched-site-${i % 100}`,
+            type: monitorTypes[Math.floor(Math.random() * monitorTypes.length)],
+            interval:
+                [
+                    30,
+                    60,
+                    300,
+                    600,
+                    3600,
+                ][Math.floor(Math.random() * 5)] * 1000, // 30s to 1h
+            nextRun: Date.now() + Math.random() * 60_000, // Next run within 1 minute
+            priority: Math.floor(Math.random() * 10) + 1, // 1-10 priority
+            enabled: i % 8 !== 0, // 87.5% enabled
+        }));
 
         // Simulate scheduling algorithm
         for (const entry of scheduleEntries) {

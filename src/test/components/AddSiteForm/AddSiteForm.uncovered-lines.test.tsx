@@ -404,12 +404,13 @@ describe("AddSiteForm Uncovered Lines Coverage", () => {
         annotate("Type: Business Logic", "type");
 
         // Mock handleSubmit to call the onSuccess callback
-        vi.mocked(handleSubmit).mockImplementation(
-            async (_event, properties) => {
-                // Simulate successful submission - call the onSuccess callback
-                properties.onSuccess?.();
-            }
-        );
+        vi.mocked(handleSubmit).mockImplementation(async (
+            _event,
+            properties
+        ) => {
+            // Simulate successful submission - call the onSuccess callback
+            properties.onSuccess?.();
+        });
 
         render(<AddSiteForm onSuccess={mockOnSuccess} />);
 

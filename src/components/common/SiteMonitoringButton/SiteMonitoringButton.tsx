@@ -60,8 +60,7 @@ export type SiteMonitoringDisabledReason = "loading" | "unconfigured";
  *
  * @public
  */
-export interface SiteMonitoringButtonProperties
-    extends CoreComponentProperties {
+export interface SiteMonitoringButtonProperties extends CoreComponentProperties {
     /** Whether all monitors are currently running - determines button state */
     readonly allMonitorsRunning: boolean;
     /** Whether to show compact text (for smaller spaces) */

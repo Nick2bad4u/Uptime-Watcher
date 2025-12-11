@@ -618,8 +618,7 @@ class MockAnalyticsService {
                     timeRange,
                     aggregation: agg,
                     filters: { siteIdentifier },
-                })
-            )
+                }))
         );
 
         return {

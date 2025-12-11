@@ -22,7 +22,12 @@ const monitorIdentifierRef = { value: "" };
 
 // Mock all external dependencies
 vi.mock("../../../../constants", () => ({
-    CHECK_INTERVALS: [30_000, 60_000, 300_000, 600_000],
+    CHECK_INTERVALS: [
+        30_000,
+        60_000,
+        300_000,
+        600_000,
+    ],
     TIMEOUT_CONSTRAINTS: { MIN: 1, MAX: 300, STEP: 1 },
     RETRY_CONSTRAINTS: { MIN: 0, MAX: 10, STEP: 1 },
     DEFAULT_HISTORY_LIMIT: 500,
@@ -68,7 +73,11 @@ vi.mock("../../../../theme/useTheme", () => ({
                     "4xl": "36px",
                 },
                 fontFamily: {
-                    sans: ["Inter", "system-ui", "sans-serif"],
+                    sans: [
+                        "Inter",
+                        "system-ui",
+                        "sans-serif",
+                    ],
                     mono: ["JetBrains Mono", "monospace"],
                 },
                 fontWeight: {
@@ -213,15 +222,17 @@ vi.mock("../../../../utils/duration", () => ({
 }));
 
 vi.mock("../../../../utils/errorHandling", () => ({
-    withUtilityErrorHandling: vi
-        .fn()
-        .mockImplementation(async (fn, _desc, fallback) => {
-            try {
-                return await fn();
-            } catch {
-                return fallback;
-            }
-        }),
+    withUtilityErrorHandling: vi.fn().mockImplementation(async (
+        fn,
+        _desc,
+        fallback
+    ) => {
+        try {
+            return await fn();
+        } catch {
+            return fallback;
+        }
+    }),
 }));
 
 describe(SettingsTab, () => {

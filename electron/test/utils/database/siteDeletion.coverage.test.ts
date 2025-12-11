@@ -128,8 +128,7 @@ describe("deleteSiteWithAdapters runtime coverage", () => {
                 monitorAdapter: monitorAdapter,
                 preloadedMonitors: [] as never,
                 siteAdapter: siteAdapter,
-            })
-        ).toThrowError(SiteDeletionError);
+            })).toThrowError(SiteDeletionError);
 
         const thrown = vi.mocked(ensureErrorSpy).mock.calls[0]?.[0];
         expect(thrown).toBe(failure);

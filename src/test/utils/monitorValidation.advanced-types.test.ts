@@ -306,30 +306,36 @@ const scenarioFieldPairs = advancedMonitorScenarios.flatMap((scenario) =>
     scenario.requiredFields.map((field) => ({
         field,
         scenario,
-    }))
-);
+    })));
 
 const missingFieldCases = advancedMonitorScenarios.flatMap((scenario) =>
     scenario.requiredFields.map(
-        (field) => [field.field, scenario.type, field, scenario] as const
-    )
-);
+        (field) =>
+            [
+                field.field,
+                scenario.type,
+                field,
+                scenario,
+            ] as const
+    ));
 
 beforeEach(() => {
     vi.clearAllMocks();
 
-    vi.mocked(withUtilityErrorHandling).mockImplementation(
-        async (operation, _description, fallback) => {
-            try {
-                return await operation();
-            } catch (error) {
-                if (fallback !== undefined) {
-                    return fallback;
-                }
-                throw error;
+    vi.mocked(withUtilityErrorHandling).mockImplementation(async (
+        operation,
+        _description,
+        fallback
+    ) => {
+        try {
+            return await operation();
+        } catch (error) {
+            if (fallback !== undefined) {
+                return fallback;
             }
+            throw error;
         }
-    );
+    });
 
     vi.mocked(sharedValidateMonitorField).mockReturnValue(baseValidationResult);
     vi.mocked(sharedValidateMonitorData).mockReturnValue(baseValidationResult);
@@ -443,35 +449,31 @@ test.prop([
     fc
         .string({ minLength: 5, maxLength: 40 })
         .filter((message) => /\S/.test(message)),
-])(
-    "propagates shared schema errors for advanced monitor fields",
-    async ({ field, scenario }, schemaErrorMessage) => {
-        vi.mocked(sharedValidateMonitorField).mockImplementation(
-            (monitorType, fieldName) => {
-                if (
-                    monitorType === scenario.type &&
-                    fieldName === field.field
-                ) {
-                    return {
-                        ...baseValidationResult,
-                        errors: [schemaErrorMessage],
-                        success: false,
-                    } satisfies ValidationResult;
-                }
-                return baseValidationResult;
-            }
-        );
+])("propagates shared schema errors for advanced monitor fields", async (
+    { field, scenario },
+    schemaErrorMessage
+) => {
+    vi.mocked(sharedValidateMonitorField).mockImplementation((
+        monitorType,
+        fieldName
+    ) => {
+        if (monitorType === scenario.type && fieldName === field.field) {
+            return {
+                ...baseValidationResult,
+                errors: [schemaErrorMessage],
+                success: false,
+            } satisfies ValidationResult;
+        }
+        return baseValidationResult;
+    });
 
-        const result = await validateMonitorFormData(
-            scenario.type,
-            scenario.validData
-        );
+    const result = await validateMonitorFormData(
+        scenario.type,
+        scenario.validData
+    );
 
-        expect(result.errors).toContain(schemaErrorMessage);
-        expect(result.success).toBeFalsy();
+    expect(result.errors).toContain(schemaErrorMessage);
+    expect(result.success).toBeFalsy();
 
-        vi.mocked(sharedValidateMonitorField).mockReturnValue(
-            baseValidationResult
-        );
-    }
-);
+    vi.mocked(sharedValidateMonitorField).mockReturnValue(baseValidationResult);
+});

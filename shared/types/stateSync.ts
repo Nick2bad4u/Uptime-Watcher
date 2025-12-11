@@ -12,7 +12,11 @@ import type { Site } from "@shared/types";
 import { siteSchema } from "@shared/validation/siteSchemas";
 import * as z from "zod";
 
-const STATE_SYNC_SOURCE_VALUES = ["cache", "database", "frontend"] as const;
+const STATE_SYNC_SOURCE_VALUES = [
+    "cache",
+    "database",
+    "frontend",
+] as const;
 
 /**
  * Union of all valid state synchronization sources.
@@ -55,7 +59,11 @@ export const STATE_SYNC_SOURCES: readonly StateSyncSource[] = Object.freeze(
     Array.from(STATE_SYNC_SOURCE_VALUES)
 );
 
-const STATE_SYNC_ACTION_VALUES = ["bulk-sync", "delete", "update"] as const;
+const STATE_SYNC_ACTION_VALUES = [
+    "bulk-sync",
+    "delete",
+    "update",
+] as const;
 
 /**
  * Union of all supported state synchronization lifecycle actions.

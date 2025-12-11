@@ -323,24 +323,25 @@ describe("Logger Service - Property-Based Fuzzing Tests", () => {
             arbitraries.logMessage,
             arbitraries.errorObject,
             arbitraries.arbitraryArgs,
-        ])(
-            "should handle error logging with error and additional arguments",
-            (message, error, args) => {
-                // Act
-                logger.error(message, error, ...args);
+        ])("should handle error logging with error and additional arguments", (
+            message,
+            error,
+            args
+        ) => {
+            // Act
+            logger.error(message, error, ...args);
 
-                // Assert
-                expect(mockError).toHaveBeenCalledWith(
-                    `[UPTIME-WATCHER] ${message}`,
-                    {
-                        message: error.message,
-                        name: error.name,
-                        stack: error.stack,
-                    },
-                    ...args
-                );
-            }
-        );
+            // Assert
+            expect(mockError).toHaveBeenCalledWith(
+                `[UPTIME-WATCHER] ${message}`,
+                {
+                    message: error.message,
+                    name: error.name,
+                    stack: error.stack,
+                },
+                ...args
+            );
+        });
 
         fcTest.prop([arbitraries.logMessage, arbitraries.structuredData])(
             "should handle logging with structured data",
@@ -463,33 +464,35 @@ describe("Logger Service - Property-Based Fuzzing Tests", () => {
             arbitraries.siteIdentifier,
             arbitraries.logMessage,
             arbitraries.logMessage,
-        ])(
-            "should handle site status change logging",
-            (siteIdentifier, oldStatus, newStatus) => {
-                // Act
-                logger.site.statusChange(siteIdentifier, oldStatus, newStatus);
+        ])("should handle site status change logging", (
+            siteIdentifier,
+            oldStatus,
+            newStatus
+        ) => {
+            // Act
+            logger.site.statusChange(siteIdentifier, oldStatus, newStatus);
 
-                // Assert
-                expect(mockInfo).toHaveBeenCalledWith(
-                    `[UPTIME-WATCHER] Site status change: ${siteIdentifier} - ${oldStatus} -> ${newStatus}`
-                );
-            }
-        );
+            // Assert
+            expect(mockInfo).toHaveBeenCalledWith(
+                `[UPTIME-WATCHER] Site status change: ${siteIdentifier} - ${oldStatus} -> ${newStatus}`
+            );
+        });
 
         fcTest.prop([
             arbitraries.siteIdentifier,
             arbitraries.logMessage,
             arbitraries.performanceDuration,
-        ])(
-            "should handle site check logging",
-            (siteIdentifier, status, responseTime) => {
-                // Act
-                logger.site.check(siteIdentifier, status, responseTime);
+        ])("should handle site check logging", (
+            siteIdentifier,
+            status,
+            responseTime
+        ) => {
+            // Act
+            logger.site.check(siteIdentifier, status, responseTime);
 
-                // Assert
-                expect(mockInfo).toHaveBeenCalled();
-            }
-        );
+            // Assert
+            expect(mockInfo).toHaveBeenCalled();
+        });
     });
 
     describe("System Domain Logging", () => {
@@ -564,18 +567,19 @@ describe("Logger Service - Property-Based Fuzzing Tests", () => {
             arbitraries.logMessage,
             arbitraries.logMessage,
             arbitraries.logMessage,
-        ])(
-            "should handle user settings change logging",
-            (setting, oldValue, newValue) => {
-                // Act
-                logger.user.settingsChange(setting, oldValue, newValue);
+        ])("should handle user settings change logging", (
+            setting,
+            oldValue,
+            newValue
+        ) => {
+            // Act
+            logger.user.settingsChange(setting, oldValue, newValue);
 
-                // Assert
-                expect(mockInfo).toHaveBeenCalledWith(
-                    `[UPTIME-WATCHER] Settings change: ${setting} - ${oldValue} -> ${newValue}`
-                );
-            }
-        );
+            // Assert
+            expect(mockInfo).toHaveBeenCalledWith(
+                `[UPTIME-WATCHER] Settings change: ${setting} - ${oldValue} -> ${newValue}`
+            );
+        });
     });
 
     describe("Concurrent Logging Operations", () => {
@@ -632,26 +636,26 @@ describe("Logger Service - Property-Based Fuzzing Tests", () => {
                 maxLength: 5,
             }),
             fc.array(arbitraries.actionName, { minLength: 1, maxLength: 5 }),
-        ])(
-            "should handle concurrent domain logging",
-            (siteIdentifiers, actions) => {
-                // Clear mock before starting
-                mockInfo.mockClear();
+        ])("should handle concurrent domain logging", (
+            siteIdentifiers,
+            actions
+        ) => {
+            // Clear mock before starting
+            mockInfo.mockClear();
 
-                // Act - mix site and user logging
-                for (const siteIdentifier of siteIdentifiers) {
-                    logger.site.added(siteIdentifier);
-                }
-                for (const action of actions) {
-                    logger.user.action(action);
-                }
-
-                // Assert - verify all logging calls were made
-                expect(mockInfo).toHaveBeenCalledTimes(
-                    siteIdentifiers.length + actions.length
-                );
+            // Act - mix site and user logging
+            for (const siteIdentifier of siteIdentifiers) {
+                logger.site.added(siteIdentifier);
             }
-        );
+            for (const action of actions) {
+                logger.user.action(action);
+            }
+
+            // Assert - verify all logging calls were made
+            expect(mockInfo).toHaveBeenCalledTimes(
+                siteIdentifiers.length + actions.length
+            );
+        });
     });
 
     describe("Edge Cases and Error Scenarios", () => {
@@ -660,14 +664,11 @@ describe("Logger Service - Property-Based Fuzzing Tests", () => {
             (nullishMessage) => {
                 // Act & Assert - should not crash with null/undefined
                 expect(() =>
-                    logger.info(nullishMessage as any)
-                ).not.toThrowError();
+                    logger.info(nullishMessage as any)).not.toThrowError();
                 expect(() =>
-                    logger.debug(nullishMessage as any)
-                ).not.toThrowError();
+                    logger.debug(nullishMessage as any)).not.toThrowError();
                 expect(() =>
-                    logger.error(nullishMessage as any)
-                ).not.toThrowError();
+                    logger.error(nullishMessage as any)).not.toThrowError();
             }
         );
 
@@ -706,8 +707,10 @@ describe("Logger Service - Property-Based Fuzzing Tests", () => {
 
                 // Act & Assert - should not crash with circular references
                 expect(() =>
-                    logger.error("Circular error", circularError)
-                ).not.toThrowError();
+                    logger.error(
+                        "Circular error",
+                        circularError
+                    )).not.toThrowError();
                 expect(mockError).toHaveBeenCalled();
             }
         );
@@ -758,52 +761,54 @@ describe("Logger Service - Property-Based Fuzzing Tests", () => {
         fcTest.prop([
             fc.array(arbitraries.logMessage, { minLength: 1, maxLength: 100 }),
             fc.array(arbitraries.errorObject, { minLength: 1, maxLength: 10 }),
-        ])(
-            "should maintain consistent state across high-volume logging",
-            (messages, errors) => {
-                // Clear mocks before starting
-                mockInfo.mockClear();
-                mockDebug.mockClear();
-                mockError.mockClear();
+        ])("should maintain consistent state across high-volume logging", (
+            messages,
+            errors
+        ) => {
+            // Clear mocks before starting
+            mockInfo.mockClear();
+            mockDebug.mockClear();
+            mockError.mockClear();
 
-                // Act - high volume logging
-                for (const [index, message] of messages.entries()) {
-                    if (index % 2 === 0) {
-                        logger.info(message);
-                    } else {
-                        logger.debug(message);
-                    }
+            // Act - high volume logging
+            for (const [index, message] of messages.entries()) {
+                if (index % 2 === 0) {
+                    logger.info(message);
+                } else {
+                    logger.debug(message);
                 }
-
-                for (const error of errors) {
-                    logger.error("Error occurred", error);
-                }
-
-                // Assert - verify all calls were made
-                const infoCount = Math.ceil(messages.length / 2);
-                const debugCount = Math.floor(messages.length / 2);
-
-                expect(mockInfo).toHaveBeenCalledTimes(infoCount);
-                expect(mockDebug).toHaveBeenCalledTimes(debugCount);
-                expect(mockError).toHaveBeenCalledTimes(errors.length);
             }
-        );
+
+            for (const error of errors) {
+                logger.error("Error occurred", error);
+            }
+
+            // Assert - verify all calls were made
+            const infoCount = Math.ceil(messages.length / 2);
+            const debugCount = Math.floor(messages.length / 2);
+
+            expect(mockInfo).toHaveBeenCalledTimes(infoCount);
+            expect(mockDebug).toHaveBeenCalledTimes(debugCount);
+            expect(mockError).toHaveBeenCalledTimes(errors.length);
+        });
 
         fcTest.prop([
             arbitraries.operationName,
             arbitraries.performanceDuration,
-        ])(
-            "should handle performance logging edge cases",
-            (operation, duration) => {
-                // Test with negative duration
-                const negativeDuration = -Math.abs(duration);
+        ])("should handle performance logging edge cases", (
+            operation,
+            duration
+        ) => {
+            // Test with negative duration
+            const negativeDuration = -Math.abs(duration);
 
-                // Act & Assert - should handle negative durations gracefully
-                expect(() =>
-                    logger.app.performance(operation, negativeDuration)
-                ).not.toThrowError();
-                expect(mockDebug).toHaveBeenCalled();
-            }
-        );
+            // Act & Assert - should handle negative durations gracefully
+            expect(() =>
+                logger.app.performance(
+                    operation,
+                    negativeDuration
+                )).not.toThrowError();
+            expect(mockDebug).toHaveBeenCalled();
+        });
     });
 });

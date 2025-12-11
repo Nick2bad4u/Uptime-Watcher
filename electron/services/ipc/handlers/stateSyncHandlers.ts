@@ -49,8 +49,7 @@ export function registerStateSyncHandlers({
                 });
 
             const responseSites = sanitizedSites.map((site) =>
-                structuredClone(site)
-            );
+                structuredClone(site));
 
             logger.debug("[IpcService] Full sync completed", {
                 siteCount: responseSites.length,

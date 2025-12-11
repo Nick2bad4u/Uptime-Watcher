@@ -37,7 +37,11 @@ describe("Type Guards - Comprehensive Coverage", () => {
 
             // Test basic object for multiple functions
             const sampleRecord = { alpha: 1, beta: 2 };
-            const sampleNumbers = [100, 200, 300];
+            const sampleNumbers = [
+                100,
+                200,
+                300,
+            ];
             const sampleDate = new Date();
             const sampleError = new Error("sample error");
 
@@ -91,7 +95,13 @@ describe("Type Guards - Comprehensive Coverage", () => {
 
             const obj = { a: 1, b: 2, c: 3 };
             expect(hasProperties(obj, ["a", "b"])).toBeTruthy();
-            expect(hasProperties(obj, ["a", "b", "c"])).toBeTruthy();
+            expect(
+                hasProperties(obj, [
+                    "a",
+                    "b",
+                    "c",
+                ])
+            ).toBeTruthy();
             expect(hasProperties(obj, [])).toBeTruthy(); // Empty array - vacuous truth
         });
 
@@ -105,7 +115,13 @@ describe("Type Guards - Comprehensive Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             const obj = { a: 1, b: 2 };
-            expect(hasProperties(obj, ["a", "b", "c"])).toBeFalsy();
+            expect(
+                hasProperties(obj, [
+                    "a",
+                    "b",
+                    "c",
+                ])
+            ).toBeFalsy();
             expect(hasProperties(obj, ["d"])).toBeFalsy();
         });
 
@@ -258,9 +274,27 @@ describe("Type Guards - Comprehensive Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             expect(isArray([])).toBeTruthy();
-            expect(isArray([1, 2, 3])).toBeTruthy();
-            expect(isArray(["a", "b", "c"])).toBeTruthy();
-            expect(isArray([1, "mixed", true])).toBeTruthy();
+            expect(
+                isArray([
+                    1,
+                    2,
+                    3,
+                ])
+            ).toBeTruthy();
+            expect(
+                isArray([
+                    "a",
+                    "b",
+                    "c",
+                ])
+            ).toBeTruthy();
+            expect(
+                isArray([
+                    1,
+                    "mixed",
+                    true,
+                ])
+            ).toBeTruthy();
         });
 
         it("should return false for non-arrays", async ({ task, annotate }) => {
@@ -291,14 +325,41 @@ describe("Type Guards - Comprehensive Coverage", () => {
             const localIsNumber = (value: unknown): value is number =>
                 typeof value === "number";
 
-            expect(isArray(["a", "b", "c"], localIsString)).toBeTruthy();
-            expect(isArray([1, 2, 3], localIsNumber)).toBeTruthy();
+            expect(
+                isArray(
+                    [
+                        "a",
+                        "b",
+                        "c",
+                    ],
+                    localIsString
+                )
+            ).toBeTruthy();
+            expect(
+                isArray(
+                    [
+                        1,
+                        2,
+                        3,
+                    ],
+                    localIsNumber
+                )
+            ).toBeTruthy();
             expect(isArray([], isString)).toBeTruthy(); // Empty array passes any validator
 
             // Mixed arrays should fail type-specific validators
             expect(isArray([1, "mixed"], isString)).toBeFalsy();
             expect(isArray(["mixed", 1], isNumber)).toBeFalsy();
-            expect(isArray([1, 2, "not number"], isNumber)).toBeFalsy();
+            expect(
+                isArray(
+                    [
+                        1,
+                        2,
+                        "not number",
+                    ],
+                    isNumber
+                )
+            ).toBeFalsy();
         });
 
         it("should handle complex validators", async ({ task, annotate }) => {
@@ -310,9 +371,36 @@ describe("Type Guards - Comprehensive Coverage", () => {
             const localIsPositiveNumber = (value: unknown): value is number =>
                 typeof value === "number" && value > 0;
 
-            expect(isArray([1, 2, 3], localIsPositiveNumber)).toBeTruthy();
-            expect(isArray([0, 1, 2], localIsPositiveNumber)).toBeFalsy(); // 0 is not positive
-            expect(isArray([-1, 1, 2], localIsPositiveNumber)).toBeFalsy(); // -1 is not positive
+            expect(
+                isArray(
+                    [
+                        1,
+                        2,
+                        3,
+                    ],
+                    localIsPositiveNumber
+                )
+            ).toBeTruthy();
+            expect(
+                isArray(
+                    [
+                        0,
+                        1,
+                        2,
+                    ],
+                    localIsPositiveNumber
+                )
+            ).toBeFalsy(); // 0 is not positive
+            expect(
+                isArray(
+                    [
+                        -1,
+                        1,
+                        2,
+                    ],
+                    localIsPositiveNumber
+                )
+            ).toBeFalsy(); // -1 is not positive
         });
     });
 
@@ -750,7 +838,13 @@ describe("Type Guards - Comprehensive Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             expect(isNonNullObject([])).toBeFalsy();
-            expect(isNonNullObject([1, 2, 3])).toBeFalsy();
+            expect(
+                isNonNullObject([
+                    1,
+                    2,
+                    3,
+                ])
+            ).toBeFalsy();
         });
 
         it("should return false for primitives", async ({ task, annotate }) => {
@@ -910,7 +1004,13 @@ describe("Type Guards - Comprehensive Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             expect(isObject([])).toBeFalsy();
-            expect(isObject([1, 2, 3])).toBeFalsy();
+            expect(
+                isObject([
+                    1,
+                    2,
+                    3,
+                ])
+            ).toBeFalsy();
         });
 
         it("should return false for primitives", async ({ task, annotate }) => {

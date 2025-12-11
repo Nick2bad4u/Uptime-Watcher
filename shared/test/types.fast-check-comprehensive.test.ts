@@ -208,12 +208,11 @@ describe("Fast-Check Property-Based Tests for shared/types.ts Functions", () => 
                 .filter(
                     (s) => !validMonitorStatuses.includes(s as MonitorStatus)
                 ),
-        ])(
-            "should return false for invalid monitor statuses",
-            (invalidStatus: string) => {
-                expect(isMonitorStatus(invalidStatus)).toBeFalsy();
-            }
-        );
+        ])("should return false for invalid monitor statuses", (
+            invalidStatus: string
+        ) => {
+            expect(isMonitorStatus(invalidStatus)).toBeFalsy();
+        });
 
         test.prop([fc.anything()])(
             "should return false for non-string inputs",
@@ -265,12 +264,11 @@ describe("Fast-Check Property-Based Tests for shared/types.ts Functions", () => 
             fc
                 .string()
                 .filter((s) => !validSiteStatuses.includes(s as SiteStatus)),
-        ])(
-            "should return false for invalid site statuses",
-            (invalidStatus: string) => {
-                expect(isSiteStatus(invalidStatus)).toBeFalsy();
-            }
-        );
+        ])("should return false for invalid site statuses", (
+            invalidStatus: string
+        ) => {
+            expect(isSiteStatus(invalidStatus)).toBeFalsy();
+        });
 
         test.prop([fc.anything()])(
             "should return false for non-string inputs",
@@ -285,12 +283,11 @@ describe("Fast-Check Property-Based Tests for shared/types.ts Functions", () => 
             fc
                 .string({ minLength: 1 })
                 .filter((s) => !validSiteStatuses.includes(s as SiteStatus)),
-        ])(
-            "should return false for random invalid strings",
-            (invalidStatus: string) => {
-                expect(isSiteStatus(invalidStatus)).toBeFalsy();
-            }
-        );
+        ])("should return false for random invalid strings", (
+            invalidStatus: string
+        ) => {
+            expect(isSiteStatus(invalidStatus)).toBeFalsy();
+        });
     });
 
     describe("validateMonitor property-based tests", () => {
@@ -316,12 +313,11 @@ describe("Fast-Check Property-Based Tests for shared/types.ts Functions", () => 
                 retryAttempts: fc.nat(),
                 history: fc.array(fc.anything()),
             }),
-        ])(
-            "should return false when id is not a string",
-            (invalidMonitor: any) => {
-                expect(validateMonitor(invalidMonitor)).toBeFalsy();
-            }
-        );
+        ])("should return false when id is not a string", (
+            invalidMonitor: any
+        ) => {
+            expect(validateMonitor(invalidMonitor)).toBeFalsy();
+        });
 
         test.prop([
             fc.record({
@@ -339,12 +335,11 @@ describe("Fast-Check Property-Based Tests for shared/types.ts Functions", () => 
                 retryAttempts: fc.nat(),
                 history: fc.array(fc.anything()),
             }),
-        ])(
-            "should return false when type is not a valid MonitorType",
-            (invalidMonitor: any) => {
-                expect(validateMonitor(invalidMonitor)).toBeFalsy();
-            }
-        );
+        ])("should return false when type is not a valid MonitorType", (
+            invalidMonitor: any
+        ) => {
+            expect(validateMonitor(invalidMonitor)).toBeFalsy();
+        });
 
         test.prop([
             fc.record({
@@ -366,12 +361,11 @@ describe("Fast-Check Property-Based Tests for shared/types.ts Functions", () => 
                 retryAttempts: fc.nat(),
                 history: fc.array(fc.anything()),
             }),
-        ])(
-            "should return false when status is not a valid MonitorStatus",
-            (invalidMonitor: any) => {
-                expect(validateMonitor(invalidMonitor)).toBeFalsy();
-            }
-        );
+        ])("should return false when status is not a valid MonitorStatus", (
+            invalidMonitor: any
+        ) => {
+            expect(validateMonitor(invalidMonitor)).toBeFalsy();
+        });
 
         test.prop([
             fc.record({
@@ -385,12 +379,11 @@ describe("Fast-Check Property-Based Tests for shared/types.ts Functions", () => 
                 retryAttempts: fc.nat(),
                 history: fc.array(fc.anything()),
             }),
-        ])(
-            "should return false when monitoring is not a boolean",
-            (invalidMonitor: any) => {
-                expect(validateMonitor(invalidMonitor)).toBeFalsy();
-            }
-        );
+        ])("should return false when monitoring is not a boolean", (
+            invalidMonitor: any
+        ) => {
+            expect(validateMonitor(invalidMonitor)).toBeFalsy();
+        });
 
         test.prop([
             fc.record({
@@ -406,12 +399,11 @@ describe("Fast-Check Property-Based Tests for shared/types.ts Functions", () => 
                 retryAttempts: fc.nat(),
                 history: fc.array(fc.anything()),
             }),
-        ])(
-            "should return false when responseTime is not a number",
-            (invalidMonitor: any) => {
-                expect(validateMonitor(invalidMonitor)).toBeFalsy();
-            }
-        );
+        ])("should return false when responseTime is not a number", (
+            invalidMonitor: any
+        ) => {
+            expect(validateMonitor(invalidMonitor)).toBeFalsy();
+        });
 
         test.prop([
             fc.record({
@@ -427,12 +419,11 @@ describe("Fast-Check Property-Based Tests for shared/types.ts Functions", () => 
                 retryAttempts: fc.nat(),
                 history: fc.array(fc.anything()),
             }),
-        ])(
-            "should return false when checkInterval is not a number",
-            (invalidMonitor: any) => {
-                expect(validateMonitor(invalidMonitor)).toBeFalsy();
-            }
-        );
+        ])("should return false when checkInterval is not a number", (
+            invalidMonitor: any
+        ) => {
+            expect(validateMonitor(invalidMonitor)).toBeFalsy();
+        });
 
         test.prop([
             fc.record({
@@ -446,12 +437,11 @@ describe("Fast-Check Property-Based Tests for shared/types.ts Functions", () => 
                 retryAttempts: fc.nat(),
                 history: fc.array(fc.anything()),
             }),
-        ])(
-            "should return false when timeout is not a number",
-            (invalidMonitor: any) => {
-                expect(validateMonitor(invalidMonitor)).toBeFalsy();
-            }
-        );
+        ])("should return false when timeout is not a number", (
+            invalidMonitor: any
+        ) => {
+            expect(validateMonitor(invalidMonitor)).toBeFalsy();
+        });
 
         test.prop([
             fc.record({
@@ -467,12 +457,11 @@ describe("Fast-Check Property-Based Tests for shared/types.ts Functions", () => 
                     .filter((x) => typeof x !== "number"),
                 history: fc.array(fc.anything()),
             }),
-        ])(
-            "should return false when retryAttempts is not a number",
-            (invalidMonitor: any) => {
-                expect(validateMonitor(invalidMonitor)).toBeFalsy();
-            }
-        );
+        ])("should return false when retryAttempts is not a number", (
+            invalidMonitor: any
+        ) => {
+            expect(validateMonitor(invalidMonitor)).toBeFalsy();
+        });
 
         test.prop([
             fc.record({
@@ -486,12 +475,11 @@ describe("Fast-Check Property-Based Tests for shared/types.ts Functions", () => 
                 retryAttempts: fc.nat(),
                 history: fc.anything().filter((x) => !Array.isArray(x)),
             }),
-        ])(
-            "should return false when history is not an array",
-            (invalidMonitor: any) => {
-                expect(validateMonitor(invalidMonitor)).toBeFalsy();
-            }
-        );
+        ])("should return false when history is not an array", (
+            invalidMonitor: any
+        ) => {
+            expect(validateMonitor(invalidMonitor)).toBeFalsy();
+        });
 
         test.prop([
             fc.record({
@@ -519,12 +507,11 @@ describe("Fast-Check Property-Based Tests for shared/types.ts Functions", () => 
                     )
                 ),
             }),
-        ])(
-            "should return false when activeOperations is invalid",
-            (invalidMonitor: any) => {
-                expect(validateMonitor(invalidMonitor)).toBeFalsy();
-            }
-        );
+        ])("should return false when activeOperations is invalid", (
+            invalidMonitor: any
+        ) => {
+            expect(validateMonitor(invalidMonitor)).toBeFalsy();
+        });
 
         test.prop([
             fc.oneof(
@@ -535,12 +522,11 @@ describe("Fast-Check Property-Based Tests for shared/types.ts Functions", () => 
                 fc.boolean(),
                 fc.array(fc.anything())
             ),
-        ])(
-            "should return false for null, undefined, or non-object inputs",
-            (invalidInput: any) => {
-                expect(validateMonitor(invalidInput)).toBeFalsy();
-            }
-        );
+        ])("should return false for null, undefined, or non-object inputs", (
+            invalidInput: any
+        ) => {
+            expect(validateMonitor(invalidInput)).toBeFalsy();
+        });
 
         // Test valid activeOperations arrays
         test.prop([
@@ -561,12 +547,11 @@ describe("Fast-Check Property-Based Tests for shared/types.ts Functions", () => 
                     { maxLength: 5 }
                 ),
             }),
-        ])(
-            "should return true when activeOperations contains valid strings",
-            (monitorWithActiveOps: any) => {
-                expect(validateMonitor(monitorWithActiveOps)).toBeTruthy();
-            }
-        );
+        ])("should return true when activeOperations contains valid strings", (
+            monitorWithActiveOps: any
+        ) => {
+            expect(validateMonitor(monitorWithActiveOps)).toBeTruthy();
+        });
     });
 
     describe("Constants and exports validation", () => {
@@ -623,14 +608,13 @@ describe("Fast-Check Property-Based Tests for shared/types.ts Functions", () => 
                 fc.constant("pending"),
                 fc.constant("paused")
             ),
-        ])(
-            "should validate that monitor statuses are also site statuses",
-            (status: MonitorStatus) => {
-                expect(isMonitorStatus(status)).toBeTruthy();
-                expect(isSiteStatus(status)).toBeTruthy();
-                expect(isComputedSiteStatus(status)).toBeFalsy();
-            }
-        );
+        ])("should validate that monitor statuses are also site statuses", (
+            status: MonitorStatus
+        ) => {
+            expect(isMonitorStatus(status)).toBeTruthy();
+            expect(isSiteStatus(status)).toBeTruthy();
+            expect(isComputedSiteStatus(status)).toBeFalsy();
+        });
 
         test.prop([fc.oneof(fc.constant("mixed"), fc.constant("unknown"))])(
             "should validate that computed site statuses are site statuses but not monitor statuses",
@@ -682,14 +666,11 @@ describe("Fast-Check Property-Based Tests for shared/types.ts Functions", () => 
                 history: fc.array(fc.anything()),
                 activeOperations: fc.constant(undefined),
             }),
-        ])(
-            "should return true when activeOperations is undefined",
-            (monitorWithUndefinedActiveOps: any) => {
-                expect(
-                    validateMonitor(monitorWithUndefinedActiveOps)
-                ).toBeTruthy();
-            }
-        );
+        ])("should return true when activeOperations is undefined", (
+            monitorWithUndefinedActiveOps: any
+        ) => {
+            expect(validateMonitor(monitorWithUndefinedActiveOps)).toBeTruthy();
+        });
 
         test.prop([
             fc.record({
@@ -704,12 +685,11 @@ describe("Fast-Check Property-Based Tests for shared/types.ts Functions", () => 
                 history: fc.array(fc.anything()),
                 activeOperations: fc.constant([]),
             }),
-        ])(
-            "should return true when activeOperations is an empty array",
-            (monitorWithEmptyActiveOps: any) => {
-                expect(validateMonitor(monitorWithEmptyActiveOps)).toBeTruthy();
-            }
-        );
+        ])("should return true when activeOperations is an empty array", (
+            monitorWithEmptyActiveOps: any
+        ) => {
+            expect(validateMonitor(monitorWithEmptyActiveOps)).toBeTruthy();
+        });
 
         // Test specific isValidActiveOperations scenarios through validateMonitor
         test.prop([
@@ -725,14 +705,13 @@ describe("Fast-Check Property-Based Tests for shared/types.ts Functions", () => 
                 history: fc.array(fc.anything()),
                 activeOperations: fc.array(fc.constant(""), { minLength: 1 }),
             }),
-        ])(
-            "should return false when activeOperations contains empty strings",
-            (monitorWithEmptyStringActiveOps: any) => {
-                expect(
-                    validateMonitor(monitorWithEmptyStringActiveOps)
-                ).toBeFalsy();
-            }
-        );
+        ])("should return false when activeOperations contains empty strings", (
+            monitorWithEmptyStringActiveOps: any
+        ) => {
+            expect(
+                validateMonitor(monitorWithEmptyStringActiveOps)
+            ).toBeFalsy();
+        });
 
         test.prop([
             fc.record({

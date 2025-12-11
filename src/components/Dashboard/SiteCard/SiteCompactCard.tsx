@@ -184,27 +184,30 @@ export const SiteCompactCard: NamedExoticComponent<SiteCompactCardProperties> =
                         />
                     </div>
                     <div className="site-card__compact-status">
-                        {compactStatusEntries.map(
-                            ({ id, label, status: statusValue, value }) => (
-                                <div
-                                    className="site-card__compact-status-item"
-                                    key={id}
-                                >
-                                    <StatusIndicator
-                                        size="sm"
-                                        status={statusValue}
-                                    />
-                                    <div className="site-card__compact-status-meta">
-                                        <span className="site-card__compact-status-label">
-                                            {label}
-                                        </span>
-                                        <span className="site-card__compact-status-value">
-                                            {value}
-                                        </span>
-                                    </div>
+                        {compactStatusEntries.map(({
+                            id,
+                            label,
+                            status: statusValue,
+                            value,
+                        }) => (
+                            <div
+                                className="site-card__compact-status-item"
+                                key={id}
+                            >
+                                <StatusIndicator
+                                    size="sm"
+                                    status={statusValue}
+                                />
+                                <div className="site-card__compact-status-meta">
+                                    <span className="site-card__compact-status-label">
+                                        {label}
+                                    </span>
+                                    <span className="site-card__compact-status-value">
+                                        {value}
+                                    </span>
                                 </div>
-                            )
-                        )}
+                            </div>
+                        ))}
                     </div>
                 </div>
 

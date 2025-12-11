@@ -123,8 +123,7 @@ describe(useSiteAnalytics, () => {
             await annotate("Type: Monitoring", "type");
 
             const { result } = renderHook(() =>
-                useSiteAnalytics(undefined, "24h")
-            );
+                useSiteAnalytics(undefined, "24h"));
 
             expect(result.current).toEqual({
                 avgResponseTime: 0,
@@ -159,8 +158,7 @@ describe(useSiteAnalytics, () => {
             await annotate("Type: Monitoring", "type");
 
             const { result } = renderHook(() =>
-                useSiteAnalytics(mockMonitorEmpty, "24h")
-            );
+                useSiteAnalytics(mockMonitorEmpty, "24h"));
 
             expect(result.current).toEqual({
                 avgResponseTime: 0,
@@ -195,8 +193,7 @@ describe(useSiteAnalytics, () => {
             await annotate("Type: Business Logic", "type");
 
             const { result } = renderHook(() =>
-                useSiteAnalytics(mockMonitorWithHistory)
-            );
+                useSiteAnalytics(mockMonitorWithHistory));
 
             // Should default to "24h" and filter out older records
             expect(result.current.totalChecks).toBe(6); // Only records within last 24h
@@ -216,8 +213,7 @@ describe(useSiteAnalytics, () => {
                 useSiteAnalytics(
                     mockMonitorWithHistory,
                     "invalid" as TimePeriod
-                )
-            );
+                ));
 
             // Should default to "24h" when invalid time range is provided
             expect(result.current.totalChecks).toBe(6);
@@ -236,8 +232,7 @@ describe(useSiteAnalytics, () => {
             await annotate("Type: Business Logic", "type");
 
             const { result } = renderHook(() =>
-                useSiteAnalytics(mockMonitorWithHistory, "1h")
-            );
+                useSiteAnalytics(mockMonitorWithHistory, "1h"));
 
             // Only records within last hour (5 records)
             expect(result.current.totalChecks).toBe(5);
@@ -255,8 +250,7 @@ describe(useSiteAnalytics, () => {
             await annotate("Type: Business Logic", "type");
 
             const { result } = renderHook(() =>
-                useSiteAnalytics(mockMonitorWithHistory, "24h")
-            );
+                useSiteAnalytics(mockMonitorWithHistory, "24h"));
 
             // Records within last 24 hours (6 records)
             expect(result.current.totalChecks).toBe(6);
@@ -274,8 +268,7 @@ describe(useSiteAnalytics, () => {
             await annotate("Type: Business Logic", "type");
 
             const { result } = renderHook(() =>
-                useSiteAnalytics(mockMonitorWithHistory, "7d")
-            );
+                useSiteAnalytics(mockMonitorWithHistory, "7d"));
 
             // Records within last 7 days (8 records - oneWeekAgo is exactly at the boundary)
             expect(result.current.totalChecks).toBe(8);
@@ -293,8 +286,7 @@ describe(useSiteAnalytics, () => {
             await annotate("Type: Business Logic", "type");
 
             const { result } = renderHook(() =>
-                useSiteAnalytics(mockMonitorWithHistory, "30d")
-            );
+                useSiteAnalytics(mockMonitorWithHistory, "30d"));
 
             // All records (8 records)
             expect(result.current.totalChecks).toBe(8);
@@ -314,8 +306,7 @@ describe(useSiteAnalytics, () => {
             await annotate("Type: Business Logic", "type");
 
             const { result } = renderHook(() =>
-                useSiteAnalytics(mockMonitorWithHistory, "1h")
-            );
+                useSiteAnalytics(mockMonitorWithHistory, "1h"));
 
             // Within 1h: 4 records (now-1000, now-2000, now-3000, now-4000)
             // 3 up out of 5 total = 60%
@@ -332,8 +323,7 @@ describe(useSiteAnalytics, () => {
             await annotate("Type: Business Logic", "type");
 
             const { result } = renderHook(() =>
-                useSiteAnalytics(mockMonitorWithHistory, "1h")
-            );
+                useSiteAnalytics(mockMonitorWithHistory, "1h"));
 
             // (200 + 0 + 150 + 300 + 0) / 5 = 130
             expect(result.current.avgResponseTime).toBe(130);
@@ -354,8 +344,7 @@ describe(useSiteAnalytics, () => {
             };
 
             const { result } = renderHook(() =>
-                useSiteAnalytics(emptyMonitor, "24h")
-            );
+                useSiteAnalytics(emptyMonitor, "24h"));
 
             expect(result.current.uptime).toBe("0.00");
             expect(result.current.avgResponseTime).toBe(0);
@@ -393,8 +382,7 @@ describe(useSiteAnalytics, () => {
             };
 
             const { result } = renderHook(() =>
-                useSiteAnalytics(monitor, "24h")
-            );
+                useSiteAnalytics(monitor, "24h"));
             // Duration should be t1 - t0 (1000ms)
             expect(result.current.downtimePeriods).toHaveLength(1);
             expect(result.current.downtimePeriods[0]?.duration).toBe(1000);
@@ -438,8 +426,7 @@ describe(useSiteAnalytics, () => {
                 retryAttempts: 0,
             };
             const { result } = renderHook(() =>
-                useSiteAnalytics(monitor, "24h")
-            );
+                useSiteAnalytics(monitor, "24h"));
             // Total downtime = 1000 + 500 = 1500; count=2 -> mttr=750
             expect(result.current.totalDowntime).toBe(1500);
             expect(result.current.incidentCount).toBe(2);
@@ -474,8 +461,7 @@ describe(useSiteAnalytics, () => {
                 retryAttempts: 0,
             };
             const { result } = renderHook(() =>
-                useSiteAnalytics(monitor, "24h")
-            );
+                useSiteAnalytics(monitor, "24h"));
             // P99 should resolve to last element (20) not undefined
             expect([10, 20]).toContain(result.current.percentileMetrics.p99);
             expect(result.current.percentileMetrics.p99).toBeGreaterThanOrEqual(
@@ -498,8 +484,7 @@ describe(useSiteAnalytics, () => {
             await annotate("Type: Business Logic", "type");
 
             const { result } = renderHook(() =>
-                useSiteAnalytics(mockMonitorWithHistory, "1h")
-            );
+                useSiteAnalytics(mockMonitorWithHistory, "1h"));
 
             expect(result.current.fastestResponse).toBe(0); // Down status has 0 response time
             expect(result.current.slowestResponse).toBe(300);
@@ -512,8 +497,7 @@ describe(useSiteAnalytics, () => {
             await annotate("Type: Business Logic", "type");
 
             const { result } = renderHook(() =>
-                useSiteAnalytics(mockMonitorEmpty, "24h")
-            );
+                useSiteAnalytics(mockMonitorEmpty, "24h"));
 
             expect(result.current.fastestResponse).toBe(0);
             expect(result.current.slowestResponse).toBe(0);
@@ -530,8 +514,7 @@ describe(useSiteAnalytics, () => {
 
             // Create monitor with sorted response times: [0, 150, 200, 300]
             const { result } = renderHook(() =>
-                useSiteAnalytics(mockMonitorWithHistory, "1h")
-            );
+                useSiteAnalytics(mockMonitorWithHistory, "1h"));
 
             expect(result.current.percentileMetrics.p50).toBe(150); // 50th percentile (median)
             expect(result.current.percentileMetrics.p95).toBe(300); // 95th percentile
@@ -553,8 +536,7 @@ describe(useSiteAnalytics, () => {
             };
 
             const { result } = renderHook(() =>
-                useSiteAnalytics(singleRecordMonitor, "24h")
-            );
+                useSiteAnalytics(singleRecordMonitor, "24h"));
 
             expect(result.current.percentileMetrics.p50).toBe(500);
             expect(result.current.percentileMetrics.p95).toBe(500);
@@ -571,8 +553,7 @@ describe(useSiteAnalytics, () => {
             await annotate("Type: Business Logic", "type");
 
             const { result } = renderHook(() =>
-                useSiteAnalytics(mockMonitorEmpty, "24h")
-            );
+                useSiteAnalytics(mockMonitorEmpty, "24h"));
 
             expect(result.current.percentileMetrics.p50).toBe(0);
             expect(result.current.percentileMetrics.p95).toBe(0);
@@ -600,8 +581,7 @@ describe(useSiteAnalytics, () => {
             };
 
             const { result } = renderHook(() =>
-                useSiteAnalytics(alwaysUpMonitor, "24h")
-            );
+                useSiteAnalytics(alwaysUpMonitor, "24h"));
 
             expect(result.current.incidentCount).toBe(0);
             expect(result.current.downtimePeriods).toHaveLength(0);
@@ -630,8 +610,7 @@ describe(useSiteAnalytics, () => {
             };
 
             const { result } = renderHook(() =>
-                useSiteAnalytics(multipleDowntimeMonitor, "24h")
-            );
+                useSiteAnalytics(multipleDowntimeMonitor, "24h"));
 
             expect(result.current.incidentCount).toBe(2);
             expect(result.current.totalDowntime).toBe(0); // Both periods have duration 0
@@ -650,8 +629,7 @@ describe(useSiteAnalytics, () => {
             await annotate("Type: Monitoring", "type");
 
             const { result } = renderHook(() =>
-                useSiteAnalytics(mockMonitorWithHistory, "24h")
-            );
+                useSiteAnalytics(mockMonitorWithHistory, "24h"));
 
             expect(result.current.totalChecks).toBeGreaterThan(0);
             expect(result.current.filteredHistory).toEqual(
@@ -674,8 +652,7 @@ describe(useSiteAnalytics, () => {
             await annotate("Type: Monitoring", "type");
 
             const { result } = renderHook(() =>
-                useSiteAnalytics(mockPortMonitor, "24h")
-            );
+                useSiteAnalytics(mockPortMonitor, "24h"));
 
             expect(result.current.totalChecks).toBe(3);
             expect(result.current.upCount).toBe(2);
@@ -811,8 +788,7 @@ describe(useSiteAnalytics, () => {
             };
 
             const { result } = renderHook(() =>
-                useSiteAnalytics(minimalMonitor, "24h")
-            );
+                useSiteAnalytics(minimalMonitor, "24h"));
 
             expect(result.current.totalChecks).toBe(1);
             expect(result.current.uptime).toBe("100.00");
@@ -836,8 +812,7 @@ describe(useSiteAnalytics, () => {
             };
 
             const { result } = renderHook(() =>
-                useSiteAnalytics(largeResponseMonitor, "24h")
-            );
+                useSiteAnalytics(largeResponseMonitor, "24h"));
 
             expect(result.current.avgResponseTime).toBe(1_000_000); // Math.round(999999.5) = 1000000
             expect(result.current.slowestResponse).toBe(1_000_000);
@@ -858,8 +833,7 @@ describe(useSiteAnalytics, () => {
             };
 
             const { result } = renderHook(() =>
-                useSiteAnalytics(zeroResponseMonitor, "24h")
-            );
+                useSiteAnalytics(zeroResponseMonitor, "24h"));
 
             expect(result.current.avgResponseTime).toBe(0);
             expect(result.current.fastestResponse).toBe(0);
@@ -881,8 +855,7 @@ describe(useSiteAnalytics, () => {
             };
 
             const { result } = renderHook(() =>
-                useSiteAnalytics(oldHistoryMonitor, "1h")
-            );
+                useSiteAnalytics(oldHistoryMonitor, "1h"));
 
             expect(result.current.totalChecks).toBe(0);
             expect(result.current.uptime).toBe("0.00");
@@ -928,8 +901,7 @@ describe(useChartData, () => {
         await annotate("Type: Business Logic", "type");
 
         const { result } = renderHook(() =>
-            useChartData(mockMonitor, mockTheme)
-        );
+            useChartData(mockMonitor, mockTheme));
 
         expect(result.current.lineChartData).toBeDefined();
         expect(result.current.lineChartData.datasets).toHaveLength(1);
@@ -949,8 +921,7 @@ describe(useChartData, () => {
         await annotate("Type: Business Logic", "type");
 
         const { result } = renderHook(() =>
-            useChartData(mockMonitor, mockTheme)
-        );
+            useChartData(mockMonitor, mockTheme));
 
         const dataset = result.current.lineChartData.datasets[0];
         expect(dataset).toBeDefined();
@@ -968,8 +939,7 @@ describe(useChartData, () => {
         await annotate("Type: Business Logic", "type");
 
         const { result } = renderHook(() =>
-            useChartData(mockMonitor, mockTheme)
-        );
+            useChartData(mockMonitor, mockTheme));
 
         const dataset = result.current.lineChartData.datasets[0];
         expect(dataset).toBeDefined();
@@ -997,8 +967,7 @@ describe(useChartData, () => {
         };
 
         const { result } = renderHook(() =>
-            useChartData(emptyMonitor, mockTheme)
-        );
+            useChartData(emptyMonitor, mockTheme));
 
         const dataset = result.current.lineChartData.datasets[0];
         expect(dataset).toBeDefined();
@@ -1022,8 +991,7 @@ describe(useChartData, () => {
         };
 
         const { result } = renderHook(() =>
-            useChartData(unsortedMonitor, mockTheme)
-        );
+            useChartData(unsortedMonitor, mockTheme));
 
         const dataset = result.current.lineChartData.datasets[0];
         expect(dataset).toBeDefined();

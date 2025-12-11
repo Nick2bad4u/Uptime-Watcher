@@ -520,26 +520,26 @@ function rewriteLinks(content, baseUrl, logger) {
     let linkCount = 0;
 
     /** @type {string} */
-    const processed = content.replace(
-        /\((\.{1,2}\/[^\)\s]+)\)/g,
-        (match, relPath) => {
-            if (relPath.includes("#") || relPath.includes("?")) {
-                return match; // Skip anchors and query params
-            }
-
-            try {
-                /** @type {string} */
-                const absUrl = new URL(relPath, baseUrl + "/").toString();
-                linkCount++;
-                return `(${absUrl})`;
-            } catch (error) {
-                logger.warn(
-                    `Failed to rewrite link: ${relPath} - ${error instanceof Error ? error.message : String(error)}`
-                );
-                return match;
-            }
+    const processed = content.replace(/\((\.{1,2}\/[^\)\s]+)\)/g, (
+        match,
+        relPath
+    ) => {
+        if (relPath.includes("#") || relPath.includes("?")) {
+            return match; // Skip anchors and query params
         }
-    );
+
+        try {
+            /** @type {string} */
+            const absUrl = new URL(relPath, baseUrl + "/").toString();
+            linkCount++;
+            return `(${absUrl})`;
+        } catch (error) {
+            logger.warn(
+                `Failed to rewrite link: ${relPath} - ${error instanceof Error ? error.message : String(error)}`
+            );
+            return match;
+        }
+    });
 
     if (linkCount > 0) {
         logger.debug(`Rewrote ${linkCount} relative links to absolute URLs`);
@@ -600,8 +600,7 @@ function cleanContent(content, config, logger) {
         const filteredLines = lines.filter(
             (line) =>
                 !config.removeLineMarkers.some((marker) =>
-                    line.includes(marker)
-                )
+                    line.includes(marker))
         );
 
         if (filteredLines.length < originalLineCount) {
@@ -651,8 +650,7 @@ async function rawDownload(url, timeoutMs) {
         );
         req.on("error", (/** @type {Error} */ err) => reject(err));
         req.setTimeout(timeoutMs, () =>
-            req.destroy(new Error("Request timeout"))
-        );
+            req.destroy(new Error("Request timeout")));
     });
 }
 

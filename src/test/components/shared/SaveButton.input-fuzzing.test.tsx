@@ -39,37 +39,35 @@ import { createMockFunction } from "../../utils/mockFactories";
 
 // Mock ThemedButton component
 vi.mock("../../../theme/components/ThemedButton", () => ({
-    ThemedButton: vi.fn(
-        ({
-            children,
-            onClick,
-            disabled,
-            className,
-            variant,
-            size,
-            icon,
-            "aria-label": ariaLabel,
-            ...props
-        }) => {
-            const safeProps = sanitizeDomProps(props);
-            return (
-                <button
-                    type="button"
-                    className={className}
-                    onClick={onClick}
-                    disabled={disabled}
-                    data-testid="themed-button"
-                    data-variant={variant}
-                    data-size={size}
-                    aria-label={ariaLabel}
-                    {...safeProps}
-                >
-                    {icon && <span data-testid="button-icon">{icon}</span>}
-                    {children}
-                </button>
-            );
-        }
-    ),
+    ThemedButton: vi.fn(({
+        children,
+        onClick,
+        disabled,
+        className,
+        variant,
+        size,
+        icon,
+        "aria-label": ariaLabel,
+        ...props
+    }) => {
+        const safeProps = sanitizeDomProps(props);
+        return (
+            <button
+                type="button"
+                className={className}
+                onClick={onClick}
+                disabled={disabled}
+                data-testid="themed-button"
+                data-variant={variant}
+                data-size={size}
+                aria-label={ariaLabel}
+                {...safeProps}
+            >
+                {icon && <span data-testid="button-icon">{icon}</span>}
+                {children}
+            </button>
+        );
+    }),
 }));
 
 // Mock React Icons
@@ -214,80 +212,70 @@ describe("SaveButton Component - Property-Based Fuzzing", () => {
         fcTest.prop([ariaLabelArbitrary], {
             numRuns: 50,
             timeout: 5000,
-        })(
-            "should handle various aria-label configurations",
-            async (ariaLabel) => {
-                // Create unique container for this test instance
-                const container = document.createElement("div");
-                container.id = `savebutton-aria-test-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
-                document.body.append(container);
+        })("should handle various aria-label configurations", async (
+            ariaLabel
+        ) => {
+            // Create unique container for this test instance
+            const container = document.createElement("div");
+            container.id = `savebutton-aria-test-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
+            document.body.append(container);
 
-                try {
-                    render(
-                        <SaveButton
-                            onClick={mockOnClick}
-                            aria-label={ariaLabel}
-                        />,
-                        { container }
-                    );
+            try {
+                render(
+                    <SaveButton onClick={mockOnClick} aria-label={ariaLabel} />,
+                    { container }
+                );
 
-                    const button = screen.getByTestId("themed-button");
-                    // The component uses the provided aria-label directly, even if empty string
-                    // Default "Save changes" only applies when aria-label prop is undefined
-                    const expectedAriaLabel =
-                        ariaLabel === undefined ? "Save changes" : ariaLabel;
-                    expect(button).toHaveAttribute(
-                        "aria-label",
-                        expectedAriaLabel
-                    );
-                } finally {
-                    // Clean up container
-                    container.remove();
-                }
+                const button = screen.getByTestId("themed-button");
+                // The component uses the provided aria-label directly, even if empty string
+                // Default "Save changes" only applies when aria-label prop is undefined
+                const expectedAriaLabel =
+                    ariaLabel === undefined ? "Save changes" : ariaLabel;
+                expect(button).toHaveAttribute("aria-label", expectedAriaLabel);
+            } finally {
+                // Clean up container
+                container.remove();
             }
-        );
+        });
     });
 
     describe("State Management Fuzzing", () => {
         fcTest.prop([booleanArbitrary, booleanArbitrary], {
             numRuns: 50,
             timeout: 5000,
-        })(
-            "should handle disabled and loading state combinations",
-            async (disabled, isLoading) => {
-                // Create unique container for this test instance
-                const container = document.createElement("div");
-                container.id = `savebutton-state-test-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
-                document.body.append(container);
+        })("should handle disabled and loading state combinations", async (
+            disabled,
+            isLoading
+        ) => {
+            // Create unique container for this test instance
+            const container = document.createElement("div");
+            container.id = `savebutton-state-test-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
+            document.body.append(container);
 
-                try {
-                    render(
-                        <SaveButton
-                            onClick={mockOnClick}
-                            disabled={disabled}
-                            isLoading={isLoading}
-                        />,
-                        { container }
-                    );
+            try {
+                render(
+                    <SaveButton
+                        onClick={mockOnClick}
+                        disabled={disabled}
+                        isLoading={isLoading}
+                    />,
+                    { container }
+                );
 
-                    const button = screen.getByTestId("themed-button");
+                const button = screen.getByTestId("themed-button");
 
-                    // Button should be disabled if either disabled prop is true or isLoading is true
-                    const shouldBeDisabled = disabled || isLoading;
-                    expect(button).toHaveProperty("disabled", shouldBeDisabled);
+                // Button should be disabled if either disabled prop is true or isLoading is true
+                const shouldBeDisabled = disabled || isLoading;
+                expect(button).toHaveProperty("disabled", shouldBeDisabled);
 
-                    // Variant should be secondary if disabled, primary otherwise
-                    const expectedVariant = disabled ? "secondary" : "primary";
-                    expect(button).toHaveAttribute(
-                        "data-variant",
-                        expectedVariant
-                    );
-                } finally {
-                    // Clean up container
-                    container.remove();
-                }
+                // Variant should be secondary if disabled, primary otherwise
+                const expectedVariant = disabled ? "secondary" : "primary";
+                expect(button).toHaveAttribute("data-variant", expectedVariant);
+            } finally {
+                // Clean up container
+                container.remove();
             }
-        );
+        });
 
         fcTest.prop([fc.integer({ min: 1, max: 10 })], {
             numRuns: 30,
@@ -375,49 +363,47 @@ describe("SaveButton Component - Property-Based Fuzzing", () => {
         fcTest.prop([fc.integer({ min: 1, max: 10 })], {
             numRuns: 30,
             timeout: 10_000,
-        })(
-            "should not call onClick when disabled or loading",
-            async (clickCount) => {
-                // Create unique container for this test instance
-                const container = document.createElement("div");
-                container.id = `savebutton-disabled-test-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
-                document.body.append(container);
+        })("should not call onClick when disabled or loading", async (
+            clickCount
+        ) => {
+            // Create unique container for this test instance
+            const container = document.createElement("div");
+            container.id = `savebutton-disabled-test-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
+            document.body.append(container);
 
-                try {
-                    // Test disabled state
-                    render(
-                        <SaveButton onClick={mockOnClick} disabled={true} />,
-                        { container }
-                    );
+            try {
+                // Test disabled state
+                render(<SaveButton onClick={mockOnClick} disabled={true} />, {
+                    container,
+                });
 
-                    const disabledButton = screen.getByTestId("themed-button");
+                const disabledButton = screen.getByTestId("themed-button");
 
-                    for (let i = 0; i < clickCount; i++) {
-                        fireEvent.click(disabledButton);
-                    }
-
-                    expect(mockOnClick).not.toHaveBeenCalled();
-
-                    // Reset and test loading state
-                    mockOnClick.mockClear();
-
-                    const { rerender: _rerender } = render(
-                        <SaveButton onClick={mockOnClick} isLoading={true} />,
-                        { container }
-                    );
-                    const loadingButton = screen.getByTestId("themed-button");
-
-                    for (let i = 0; i < clickCount; i++) {
-                        fireEvent.click(loadingButton);
-                    }
-
-                    expect(mockOnClick).not.toHaveBeenCalled();
-                } finally {
-                    // Clean up container
-                    container.remove();
+                for (let i = 0; i < clickCount; i++) {
+                    fireEvent.click(disabledButton);
                 }
+
+                expect(mockOnClick).not.toHaveBeenCalled();
+
+                // Reset and test loading state
+                mockOnClick.mockClear();
+
+                const { rerender: _rerender } = render(
+                    <SaveButton onClick={mockOnClick} isLoading={true} />,
+                    { container }
+                );
+                const loadingButton = screen.getByTestId("themed-button");
+
+                for (let i = 0; i < clickCount; i++) {
+                    fireEvent.click(loadingButton);
+                }
+
+                expect(mockOnClick).not.toHaveBeenCalled();
+            } finally {
+                // Clean up container
+                container.remove();
             }
-        );
+        });
     });
 
     describe("Accessibility Fuzzing", () => {
@@ -467,119 +453,113 @@ describe("SaveButton Component - Property-Based Fuzzing", () => {
         fcTest.prop([fc.integer({ min: 1, max: 5 })], {
             numRuns: 20,
             timeout: 5000,
-        })(
-            "should handle keyboard navigation correctly",
-            async (keyPressCount) => {
-                // Create unique container for this test instance
-                const container = document.createElement("div");
-                container.id = `savebutton-keyboard-test-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
-                document.body.append(container);
+        })("should handle keyboard navigation correctly", async (
+            keyPressCount
+        ) => {
+            // Create unique container for this test instance
+            const container = document.createElement("div");
+            container.id = `savebutton-keyboard-test-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
+            document.body.append(container);
 
-                try {
-                    render(<SaveButton onClick={mockOnClick} />, { container });
+            try {
+                render(<SaveButton onClick={mockOnClick} />, { container });
 
-                    const button = screen.getByTestId("themed-button");
+                const button = screen.getByTestId("themed-button");
 
-                    for (let i = 0; i < keyPressCount; i++) {
-                        // Test Enter key
-                        fireEvent.keyDown(button, { key: "Enter" });
+                for (let i = 0; i < keyPressCount; i++) {
+                    // Test Enter key
+                    fireEvent.keyDown(button, { key: "Enter" });
 
-                        // Test Space key
-                        fireEvent.keyDown(button, { key: " " });
-                    }
-
-                    // Component should handle keyboard events without crashing
-                    expect(button).toBeInTheDocument();
-                } finally {
-                    // Clean up container
-                    container.remove();
+                    // Test Space key
+                    fireEvent.keyDown(button, { key: " " });
                 }
+
+                // Component should handle keyboard events without crashing
+                expect(button).toBeInTheDocument();
+            } finally {
+                // Clean up container
+                container.remove();
             }
-        );
+        });
     });
 
     describe("Icon Rendering Fuzzing", () => {
         fcTest.prop([buttonConfigArbitrary], {
             numRuns: 50,
             timeout: 5000,
-        })(
-            "should render save icon consistently across configurations",
-            async (config) => {
-                // Create unique container for this test instance
-                const container = document.createElement("div");
-                container.id = `savebutton-icon-test-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
-                document.body.append(container);
+        })("should render save icon consistently across configurations", async (
+            config
+        ) => {
+            // Create unique container for this test instance
+            const container = document.createElement("div");
+            container.id = `savebutton-icon-test-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
+            document.body.append(container);
 
-                try {
-                    render(
-                        <SaveButton
-                            onClick={mockOnClick}
-                            size={config.size}
-                            disabled={config.disabled}
-                            isLoading={config.isLoading}
-                            aria-label={config.ariaLabel}
-                            className={config.className}
-                        />,
-                        { container }
-                    );
+            try {
+                render(
+                    <SaveButton
+                        onClick={mockOnClick}
+                        size={config.size}
+                        disabled={config.disabled}
+                        isLoading={config.isLoading}
+                        aria-label={config.ariaLabel}
+                        className={config.className}
+                    />,
+                    { container }
+                );
 
-                    // Icon should always be present
-                    const icon = screen.getByTestId("button-icon");
-                    expect(icon).toBeInTheDocument();
+                // Icon should always be present
+                const icon = screen.getByTestId("button-icon");
+                expect(icon).toBeInTheDocument();
 
-                    const saveIcon = screen.getByTestId("save-icon");
-                    expect(saveIcon).toBeInTheDocument();
-                } finally {
-                    // Clean up container
-                    container.remove();
-                }
+                const saveIcon = screen.getByTestId("save-icon");
+                expect(saveIcon).toBeInTheDocument();
+            } finally {
+                // Clean up container
+                container.remove();
             }
-        );
+        });
     });
 
     describe("CSS Class Handling Fuzzing", () => {
         fcTest.prop([classNameArbitrary], {
             numRuns: 50,
             timeout: 5000,
-        })(
-            "should handle various className configurations",
-            async (className) => {
-                // Create unique container for this test instance
-                const container = document.createElement("div");
-                container.id = `savebutton-class-test-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
-                document.body.append(container);
+        })("should handle various className configurations", async (
+            className
+        ) => {
+            // Create unique container for this test instance
+            const container = document.createElement("div");
+            container.id = `savebutton-class-test-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
+            document.body.append(container);
 
-                try {
-                    render(
-                        <SaveButton
-                            onClick={mockOnClick}
-                            className={className}
-                        />,
-                        { container }
-                    );
+            try {
+                render(
+                    <SaveButton onClick={mockOnClick} className={className} />,
+                    { container }
+                );
 
-                    const button = screen.getByTestId("themed-button");
+                const button = screen.getByTestId("themed-button");
 
-                    const normalizedClassName = className.trim();
+                const normalizedClassName = className.trim();
 
-                    if (normalizedClassName.length > 0) {
-                        const expectedClasses = normalizedClassName
-                            .split(/\s+/u)
-                            .filter((candidate) => candidate.length > 0);
+                if (normalizedClassName.length > 0) {
+                    const expectedClasses = normalizedClassName
+                        .split(/\s+/u)
+                        .filter((candidate) => candidate.length > 0);
 
-                        if (expectedClasses.length > 0) {
-                            expect(button).toHaveClass(...expectedClasses);
-                        }
+                    if (expectedClasses.length > 0) {
+                        expect(button).toHaveClass(...expectedClasses);
                     }
-
-                    // Should not crash with any className
-                    expect(button).toBeInTheDocument();
-                } finally {
-                    // Clean up container
-                    container.remove();
                 }
+
+                // Should not crash with any className
+                expect(button).toBeInTheDocument();
+            } finally {
+                // Clean up container
+                container.remove();
             }
-        );
+        });
     });
 
     describe("Performance Fuzzing", () => {
@@ -667,116 +647,112 @@ describe("SaveButton Component - Property-Based Fuzzing", () => {
         fcTest.prop([fc.anything()], {
             numRuns: 30,
             timeout: 5000,
-        })(
-            "should handle invalid onClick handlers gracefully",
-            async (invalidHandler) => {
-                // Create unique container for this test instance
-                const container = document.createElement("div");
-                container.id = `savebutton-error-test-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
-                document.body.append(container);
+        })("should handle invalid onClick handlers gracefully", async (
+            invalidHandler
+        ) => {
+            // Create unique container for this test instance
+            const container = document.createElement("div");
+            container.id = `savebutton-error-test-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
+            document.body.append(container);
 
-                try {
-                    expect(() => {
-                        render(
-                            <SaveButton
-                                onClick={invalidHandler as () => void}
-                            />,
-                            { container }
-                        );
-                    }).not.toThrowError();
+            try {
+                expect(() => {
+                    render(
+                        <SaveButton onClick={invalidHandler as () => void} />,
+                        { container }
+                    );
+                }).not.toThrowError();
 
-                    // Button should render even with invalid handler
-                    const button = screen.getByTestId("themed-button");
-                    expect(button).toBeInTheDocument();
-                } finally {
-                    // Clean up container
-                    container.remove();
-                }
+                // Button should render even with invalid handler
+                const button = screen.getByTestId("themed-button");
+                expect(button).toBeInTheDocument();
+            } finally {
+                // Clean up container
+                container.remove();
             }
-        );
+        });
 
         fcTest.prop([fc.anything(), fc.anything()], {
             numRuns: 20,
             timeout: 3000,
-        })(
-            "should not crash with completely invalid props",
-            async (invalidProp1, invalidProp2) => {
-                // Create unique container for this test instance
-                const container = document.createElement("div");
-                container.id = `savebutton-invalid-test-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
-                document.body.append(container);
+        })("should not crash with completely invalid props", async (
+            invalidProp1,
+            invalidProp2
+        ) => {
+            // Create unique container for this test instance
+            const container = document.createElement("div");
+            container.id = `savebutton-invalid-test-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
+            document.body.append(container);
 
+            try {
+                // Some invalid props may cause conversion errors - that's expected behavior
+                // so we just test that the render attempt doesn't crash the test framework
                 try {
-                    // Some invalid props may cause conversion errors - that's expected behavior
-                    // so we just test that the render attempt doesn't crash the test framework
-                    try {
-                        render(
-                            <SaveButton
-                                onClick={mockOnClick}
-                                {...{ invalidProp1, invalidProp2 }}
-                            />,
-                            { container }
-                        );
-                        // If render succeeds, button should be present
-                        expect(
-                            screen.getByTestId("themed-button")
-                        ).toBeInTheDocument();
-                    } catch (error: unknown) {
-                        // If render fails due to invalid props, that's acceptable behavior
-                        // as long as it doesn't crash the test framework itself
-                        expect(error).toBeInstanceOf(Error);
-                    }
-                } finally {
-                    // Clean up container
-                    container.remove();
+                    render(
+                        <SaveButton
+                            onClick={mockOnClick}
+                            {...{ invalidProp1, invalidProp2 }}
+                        />,
+                        { container }
+                    );
+                    // If render succeeds, button should be present
+                    expect(
+                        screen.getByTestId("themed-button")
+                    ).toBeInTheDocument();
+                } catch (error: unknown) {
+                    // If render fails due to invalid props, that's acceptable behavior
+                    // as long as it doesn't crash the test framework itself
+                    expect(error).toBeInstanceOf(Error);
                 }
+            } finally {
+                // Clean up container
+                container.remove();
             }
-        );
+        });
     });
 
     describe("Memoization Fuzzing", () => {
         fcTest.prop([fc.integer({ min: 1, max: 20 })], {
             numRuns: 20,
             timeout: 10_000,
-        })(
-            "should maintain icon memoization across re-renders",
-            async (rerenderCount) => {
-                // Create unique container for this test instance
-                const container = document.createElement("div");
-                container.id = `savebutton-memo-test-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
-                document.body.append(container);
+        })("should maintain icon memoization across re-renders", async (
+            rerenderCount
+        ) => {
+            // Create unique container for this test instance
+            const container = document.createElement("div");
+            container.id = `savebutton-memo-test-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
+            document.body.append(container);
 
-                try {
-                    const { rerender } = render(
-                        <SaveButton onClick={mockOnClick} />,
-                        { container }
+            try {
+                const { rerender } = render(
+                    <SaveButton onClick={mockOnClick} />,
+                    { container }
+                );
+
+                // Get initial icon reference
+                const initialIcon = screen.getByTestId("button-icon");
+                // Icon state tracking for future test expansion
+                void initialIcon;
+
+                for (let i = 0; i < rerenderCount; i++) {
+                    // Re-render with different props that shouldn't affect icon memoization
+                    rerender(
+                        <SaveButton
+                            onClick={mockOnClick}
+                            disabled={i % 2 === 0}
+                            className={`class-${i}`}
+                        />
                     );
 
-                    // Get initial icon reference
-                    const initialIcon = screen.getByTestId("button-icon");
-                    // Icon state tracking for future test expansion
-                    void initialIcon;
-
-                    for (let i = 0; i < rerenderCount; i++) {
-                        // Re-render with different props that shouldn't affect icon memoization
-                        rerender(
-                            <SaveButton
-                                onClick={mockOnClick}
-                                disabled={i % 2 === 0}
-                                className={`class-${i}`}
-                            />
-                        );
-
-                        // Icon should still be present
-                        expect(
-                            screen.getByTestId("button-icon")
-                        ).toBeInTheDocument();
-                    }
-                } finally {
-                    // Clean up container
-                    container.remove();
+                    // Icon should still be present
+                    expect(
+                        screen.getByTestId("button-icon")
+                    ).toBeInTheDocument();
                 }
+            } finally {
+                // Clean up container
+                container.remove();
             }
-        );
+        });
     });
 });

@@ -306,92 +306,92 @@ describe("withErrorHandling backend fuzz coverage", () => {
     test.prop([
         fc.option(fc.string({ maxLength: 50 }), { nil: undefined }),
         fc.string({ minLength: 1, maxLength: 120 }),
-    ])(
-        "should fuzz-log failures with provided logger",
-        async (operationName, errorMessage) => {
-            const logCalls: { message: string; error: unknown }[] = [];
-            const logger = {
-                error: vi.fn((msg: string, err: unknown) => {
-                    logCalls.push({ message: msg, error: err });
-                }),
-            } satisfies ErrorHandlingBackendContext["logger"];
+    ])("should fuzz-log failures with provided logger", async (
+        operationName,
+        errorMessage
+    ) => {
+        const logCalls: { message: string; error: unknown }[] = [];
+        const logger = {
+            error: vi.fn((msg: string, err: unknown) => {
+                logCalls.push({ message: msg, error: err });
+            }),
+        } satisfies ErrorHandlingBackendContext["logger"];
 
-            const failingOperation = async () => {
-                throw new Error(errorMessage);
-            };
+        const failingOperation = async () => {
+            throw new Error(errorMessage);
+        };
 
-            const backendContext: ErrorHandlingBackendContext =
-                operationName && operationName.length > 0
-                    ? { logger, operationName }
-                    : { logger };
+        const backendContext: ErrorHandlingBackendContext =
+            operationName && operationName.length > 0
+                ? { logger, operationName }
+                : { logger };
 
+        await expect(
+            withErrorHandling(failingOperation, backendContext)
+        ).rejects.toThrowError(errorMessage);
+
+        const expectedMessage = operationName
+            ? `Failed to ${operationName}`
+            : "Async operation failed";
+
+        expect(logger.error).toHaveBeenCalledTimes(1);
+        expect(logger.error).toHaveBeenCalledWith(
+            expectedMessage,
+            expect.any(Error)
+        );
+        expect(logCalls[0]?.message).toBe(expectedMessage);
+        expect(logCalls[0]?.error).toBeInstanceOf(Error);
+    });
+
+    test.prop([
+        fc.option(fc.string({ maxLength: 40 }), { nil: undefined }),
+        fc.string({ minLength: 1, maxLength: 80 }),
+    ])("should fuzz fallback to console when logger throws", async (
+        operationName,
+        errorMessage
+    ) => {
+        const consoleErrorSpy = vi
+            .spyOn(console, "error")
+            .mockImplementation(() => {});
+        const consoleWarnSpy = vi
+            .spyOn(console, "warn")
+            .mockImplementation(() => {});
+
+        const logger = {
+            error: vi.fn(() => {
+                throw new Error("logger failure");
+            }),
+        } satisfies ErrorHandlingBackendContext["logger"];
+
+        const failingOperation = async () => {
+            throw new Error(errorMessage);
+        };
+
+        try {
             await expect(
-                withErrorHandling(failingOperation, backendContext)
+                withErrorHandling(
+                    failingOperation,
+                    operationName ? { logger, operationName } : { logger }
+                )
             ).rejects.toThrowError(errorMessage);
 
             const expectedMessage = operationName
                 ? `Failed to ${operationName}`
                 : "Async operation failed";
 
-            expect(logger.error).toHaveBeenCalledTimes(1);
-            expect(logger.error).toHaveBeenCalledWith(
+            expect(consoleErrorSpy).toHaveBeenCalledWith(
                 expectedMessage,
                 expect.any(Error)
             );
-            expect(logCalls[0]?.message).toBe(expectedMessage);
-            expect(logCalls[0]?.error).toBeInstanceOf(Error);
+            expect(consoleWarnSpy).toHaveBeenCalledWith(
+                "Logger error during error handling:",
+                expect.any(Error)
+            );
+        } finally {
+            consoleErrorSpy.mockRestore();
+            consoleWarnSpy.mockRestore();
         }
-    );
-
-    test.prop([
-        fc.option(fc.string({ maxLength: 40 }), { nil: undefined }),
-        fc.string({ minLength: 1, maxLength: 80 }),
-    ])(
-        "should fuzz fallback to console when logger throws",
-        async (operationName, errorMessage) => {
-            const consoleErrorSpy = vi
-                .spyOn(console, "error")
-                .mockImplementation(() => {});
-            const consoleWarnSpy = vi
-                .spyOn(console, "warn")
-                .mockImplementation(() => {});
-
-            const logger = {
-                error: vi.fn(() => {
-                    throw new Error("logger failure");
-                }),
-            } satisfies ErrorHandlingBackendContext["logger"];
-
-            const failingOperation = async () => {
-                throw new Error(errorMessage);
-            };
-
-            try {
-                await expect(
-                    withErrorHandling(
-                        failingOperation,
-                        operationName ? { logger, operationName } : { logger }
-                    )
-                ).rejects.toThrowError(errorMessage);
-
-                const expectedMessage = operationName
-                    ? `Failed to ${operationName}`
-                    : "Async operation failed";
-
-                expect(consoleErrorSpy).toHaveBeenCalledWith(
-                    expectedMessage,
-                    expect.any(Error)
-                );
-                expect(consoleWarnSpy).toHaveBeenCalledWith(
-                    "Logger error during error handling:",
-                    expect.any(Error)
-                );
-            } finally {
-                consoleErrorSpy.mockRestore();
-                consoleWarnSpy.mockRestore();
-            }
-        }
-    );
+    });
 });
 
 describe("withErrorHandling frontend fuzz integration", () => {
@@ -501,55 +501,55 @@ describe("withErrorHandling frontend fuzz integration", () => {
             setLoadingFalseThrows: fc.boolean(),
         }),
         fc.anything(),
-    ])(
-        "should fuzz-surface thrown errors and set error message",
-        async (config, errorValue) => {
-            const state = {
-                loading: false,
-                error: undefined as string | undefined,
-            };
-            const store = buildStore(config, state);
+    ])("should fuzz-surface thrown errors and set error message", async (
+        config,
+        errorValue
+    ) => {
+        const state = {
+            loading: false,
+            error: undefined as string | undefined,
+        };
+        const store = buildStore(config, state);
 
-            const consoleWarnSpy = vi
-                .spyOn(console, "warn")
-                .mockImplementation(() => {});
-            const consoleErrorSpy = vi
-                .spyOn(console, "error")
-                .mockImplementation(() => {});
+        const consoleWarnSpy = vi
+            .spyOn(console, "warn")
+            .mockImplementation(() => {});
+        const consoleErrorSpy = vi
+            .spyOn(console, "error")
+            .mockImplementation(() => {});
 
-            try {
-                await expect(
-                    withErrorHandling(async () => {
-                        throw errorValue;
-                    }, store)
-                ).rejects.toBe(errorValue);
+        try {
+            await expect(
+                withErrorHandling(async () => {
+                    throw errorValue;
+                }, store)
+            ).rejects.toBe(errorValue);
 
-                const setErrorCall = store.calls.find(
-                    (call) => call.method === "setError"
-                );
-                const expectedMessage =
-                    errorValue instanceof Error
-                        ? errorValue.message
-                        : convertError(errorValue).error.message;
-                expect(setErrorCall?.payload).toBe(expectedMessage);
+            const setErrorCall = store.calls.find(
+                (call) => call.method === "setError"
+            );
+            const expectedMessage =
+                errorValue instanceof Error
+                    ? errorValue.message
+                    : convertError(errorValue).error.message;
+            expect(setErrorCall?.payload).toBe(expectedMessage);
 
-                const originalErrorLog = consoleErrorSpy.mock.calls.find(
-                    (call) => call[0] === "Original operation error:"
-                );
-                if (config.setErrorThrows && Boolean(errorValue)) {
-                    expect(originalErrorLog).toEqual([
-                        "Original operation error:",
-                        errorValue,
-                    ]);
-                } else {
-                    expect(originalErrorLog).toBeUndefined();
-                }
-            } finally {
-                consoleWarnSpy.mockRestore();
-                consoleErrorSpy.mockRestore();
+            const originalErrorLog = consoleErrorSpy.mock.calls.find(
+                (call) => call[0] === "Original operation error:"
+            );
+            if (config.setErrorThrows && Boolean(errorValue)) {
+                expect(originalErrorLog).toEqual([
+                    "Original operation error:",
+                    errorValue,
+                ]);
+            } else {
+                expect(originalErrorLog).toBeUndefined();
             }
+        } finally {
+            consoleWarnSpy.mockRestore();
+            consoleErrorSpy.mockRestore();
         }
-    );
+    });
 
     it("should fuzz-log original error when setError throws", async () => {
         const consoleWarnSpy = vi

@@ -115,32 +115,33 @@ describe("Event System - 100% Fast-Check Fuzzing Coverage", () => {
             arbitraryValidEventType,
             arbitraryEventPayload,
             fc.integer({ min: 2, max: 5 }),
-        ])(
-            "should handle multiple listeners per event",
-            async (eventType, payload, listenerCount) => {
-                const listeners: any[] = [];
+        ])("should handle multiple listeners per event", async (
+            eventType,
+            payload,
+            listenerCount
+        ) => {
+            const listeners: any[] = [];
 
-                // Register multiple listeners
-                for (let i = 0; i < listenerCount; i++) {
-                    const listener = vi.fn();
-                    listeners.push(listener);
-                    eventBus.onTyped(eventType as UptimeEventName, listener);
-                }
-
-                // Emit event
-                await eventBus.emitTyped(eventType as UptimeEventName, payload);
-
-                // Verify all listeners were called
-                for (const listener of listeners) {
-                    expect(listener).toHaveBeenCalledTimes(1);
-                }
-
-                // Cleanup
-                for (const listener of listeners) {
-                    eventBus.offTyped(eventType as UptimeEventName, listener);
-                }
+            // Register multiple listeners
+            for (let i = 0; i < listenerCount; i++) {
+                const listener = vi.fn();
+                listeners.push(listener);
+                eventBus.onTyped(eventType as UptimeEventName, listener);
             }
-        );
+
+            // Emit event
+            await eventBus.emitTyped(eventType as UptimeEventName, payload);
+
+            // Verify all listeners were called
+            for (const listener of listeners) {
+                expect(listener).toHaveBeenCalledTimes(1);
+            }
+
+            // Cleanup
+            for (const listener of listeners) {
+                eventBus.offTyped(eventType as UptimeEventName, listener);
+            }
+        });
 
         test("should support once listeners", async () => {
             const listener = vi.fn();
@@ -165,18 +166,17 @@ describe("Event System - 100% Fast-Check Fuzzing Coverage", () => {
     });
 
     describe("Event Metadata and Correlation", () => {
-        fcTest.prop([arbitraryCorrelationId])(
-            "should handle correlation IDs",
-            (correlationId) => {
-                expect(typeof correlationId).toBe("string");
-                expect(correlationId.length).toBeGreaterThan(0);
+        fcTest.prop([arbitraryCorrelationId])("should handle correlation IDs", (
+            correlationId
+        ) => {
+            expect(typeof correlationId).toBe("string");
+            expect(correlationId.length).toBeGreaterThan(0);
 
-                // Test correlation ID format validation
-                const isValidFormat =
-                    correlationId.length >= 8 && correlationId.length <= 36;
-                expect(isValidFormat).toBeTruthy();
-            }
-        );
+            // Test correlation ID format validation
+            const isValidFormat =
+                correlationId.length >= 8 && correlationId.length <= 36;
+            expect(isValidFormat).toBeTruthy();
+        });
 
         test("should generate valid correlation IDs", () => {
             const correlationId = generateCorrelationId();
@@ -185,8 +185,7 @@ describe("Event System - 100% Fast-Check Fuzzing Coverage", () => {
 
             // Test uniqueness by generating multiple IDs
             const ids = Array.from({ length: 100 }, () =>
-                generateCorrelationId()
-            );
+                generateCorrelationId());
             const uniqueIds = new Set(ids);
             expect(uniqueIds.size).toBe(ids.length); // All should be unique
         });
@@ -218,11 +217,13 @@ describe("Event System - 100% Fast-Check Fuzzing Coverage", () => {
         fcTest.prop([arbitraryValidEventType, arbitraryEventPayload])(
             "should handle middleware execution",
             async (eventType, payload) => {
-                const middleware = vi
-                    .fn()
-                    .mockImplementation(async (_event, _data, next) => {
-                        await next();
-                    });
+                const middleware = vi.fn().mockImplementation(async (
+                    _event,
+                    _data,
+                    next
+                ) => {
+                    await next();
+                });
                 const listener = vi.fn();
 
                 // Add middleware

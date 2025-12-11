@@ -337,8 +337,7 @@ class MockReactListRenderer {
                             groupKey,
                             indexInGroup: index,
                         }
-                    )
-                );
+                    ));
                 elements.push(...groupItemElements);
             }
         });
@@ -467,8 +466,7 @@ class MockReactListRenderer {
                         item,
                         itemIndex,
                         column.heights[itemIndex]
-                    )
-                )
+                    ))
             );
             elements.push(columnElement);
         });
@@ -569,8 +567,7 @@ class MockReactListRenderer {
         }
 
         return items.map((item, index) =>
-            this.elementFactory.createListItemElement(item, index)
-        );
+            this.elementFactory.createListItemElement(item, index));
     }
 
     private renderGroupedItems(groupedItems: GroupedItems): ReactListElement[] {
@@ -581,8 +578,7 @@ class MockReactListRenderer {
             if (!group.collapsed) {
                 elements.push(
                     ...group.items.map((item, index) =>
-                        this.elementFactory.createListItemElement(item, index)
-                    )
+                        this.elementFactory.createListItemElement(item, index))
                 );
             }
         });
@@ -616,8 +612,9 @@ class MockReactListRenderer {
         items.forEach((item) => {
             // Find column with minimum height
             const targetColumn = columns.reduce((minColumn, column) =>
-                column.totalHeight < minColumn.totalHeight ? column : minColumn
-            );
+                column.totalHeight < minColumn.totalHeight
+                    ? column
+                    : minColumn);
 
             const itemHeight = config.estimateItemHeight(item);
             targetColumn.items.push(item);
@@ -1002,8 +999,8 @@ class ListSorter {
 class ListFilterer {
     filterItems(items: ListItem[], criteria: FilterCriteria[]): ListItem[] {
         return items.filter((item) =>
-            criteria.every((criterion) => this.evaluateFilter(item, criterion))
-        );
+            criteria.every((criterion) =>
+                this.evaluateFilter(item, criterion)));
     }
 
     private evaluateFilter(item: ListItem, criterion: FilterCriteria): boolean {
@@ -1251,37 +1248,37 @@ describe("React List Operations Performance", () => {
                 components[Math.floor(Math.random() * components.length)];
             const itemCount = 50 + Math.floor(Math.random() * 150);
 
-            const items: ListItem[] = Array.from(
-                { length: itemCount },
-                (_, index) => ({
-                    id: `item-${index}`,
-                    value: `Item ${index}`,
-                    metadata: {
-                        created: Date.now() - Math.random() * 86_400_000,
-                        modified: Date.now(),
-                        tags: [`tag${index % 5}`, `category${index % 3}`],
-                        category: `Category ${index % 5}`,
-                        priority: Math.random(),
-                        size: 100 + Math.floor(Math.random() * 200),
-                        complexity: 1 + Math.floor(Math.random() * 3),
+            const items: ListItem[] = Array.from({ length: itemCount }, (
+                _,
+                index
+            ) => ({
+                id: `item-${index}`,
+                value: `Item ${index}`,
+                metadata: {
+                    created: Date.now() - Math.random() * 86_400_000,
+                    modified: Date.now(),
+                    tags: [`tag${index % 5}`, `category${index % 3}`],
+                    category: `Category ${index % 5}`,
+                    priority: Math.random(),
+                    size: 100 + Math.floor(Math.random() * 200),
+                    complexity: 1 + Math.floor(Math.random() * 3),
+                },
+                renderProps: {
+                    key: `item-${index}`,
+                    className: `list-item item-${index % 5}`,
+                    eventHandlers: {
+                        onClick: () => console.log(`Clicked item ${index}`),
+                        onHover: () => console.log(`Hovered item ${index}`),
                     },
-                    renderProps: {
-                        key: `item-${index}`,
-                        className: `list-item item-${index % 5}`,
-                        eventHandlers: {
-                            onClick: () => console.log(`Clicked item ${index}`),
-                            onHover: () => console.log(`Hovered item ${index}`),
-                        },
-                    },
-                    state: {
-                        selected: false,
-                        visible: true,
-                        expanded: false,
-                        loading: false,
-                        cached: false,
-                    },
-                })
-            );
+                },
+                state: {
+                    selected: false,
+                    visible: true,
+                    expanded: false,
+                    loading: false,
+                    cached: false,
+                },
+            }));
 
             renderer.renderList(componentId, items);
         }
@@ -1305,39 +1302,39 @@ describe("React List Operations Performance", () => {
                 components[Math.floor(Math.random() * components.length)];
 
             // Create a large dataset
-            const items: ListItem[] = Array.from(
-                { length: 500 },
-                (_, index) => ({
-                    id: `item-${index}`,
-                    value: {
-                        name: `Item ${index}`,
-                        description: `Description for item ${index}`,
-                        price: Math.random() * 1000,
-                        rating: Math.random() * 5,
-                        inStock: Math.random() > 0.3,
-                    },
-                    metadata: {
-                        created: Date.now() - Math.random() * 86_400_000,
-                        modified: Date.now(),
-                        tags: [`tag${index % 10}`, `type${index % 7}`],
-                        category: `Category ${index % 8}`,
-                        priority: Math.random(),
-                        size: 150 + Math.floor(Math.random() * 300),
-                        complexity: 1 + Math.floor(Math.random() * 5),
-                    },
-                    renderProps: {
-                        key: `item-${index}`,
-                        eventHandlers: {},
-                    },
-                    state: {
-                        selected: false,
-                        visible: true,
-                        expanded: false,
-                        loading: false,
-                        cached: false,
-                    },
-                })
-            );
+            const items: ListItem[] = Array.from({ length: 500 }, (
+                _,
+                index
+            ) => ({
+                id: `item-${index}`,
+                value: {
+                    name: `Item ${index}`,
+                    description: `Description for item ${index}`,
+                    price: Math.random() * 1000,
+                    rating: Math.random() * 5,
+                    inStock: Math.random() > 0.3,
+                },
+                metadata: {
+                    created: Date.now() - Math.random() * 86_400_000,
+                    modified: Date.now(),
+                    tags: [`tag${index % 10}`, `type${index % 7}`],
+                    category: `Category ${index % 8}`,
+                    priority: Math.random(),
+                    size: 150 + Math.floor(Math.random() * 300),
+                    complexity: 1 + Math.floor(Math.random() * 5),
+                },
+                renderProps: {
+                    key: `item-${index}`,
+                    eventHandlers: {},
+                },
+                state: {
+                    selected: false,
+                    visible: true,
+                    expanded: false,
+                    loading: false,
+                    cached: false,
+                },
+            }));
 
             // Apply different filter combinations
             const filterConfigs = [
@@ -1421,38 +1418,38 @@ describe("React List Operations Performance", () => {
             const componentId =
                 components[Math.floor(Math.random() * components.length)];
 
-            const items: ListItem[] = Array.from(
-                { length: 300 },
-                (_, index) => ({
-                    id: `item-${index}`,
-                    value: {
-                        name: `Item ${Math.floor(Math.random() * 1000)}`,
-                        timestamp: Date.now() - Math.random() * 86_400_000,
-                        score: Math.random() * 100,
-                        category: `Category ${index % 5}`,
-                    },
-                    metadata: {
-                        created: Date.now() - Math.random() * 86_400_000 * 30,
-                        modified: Date.now() - Math.random() * 86_400_000 * 7,
-                        tags: [`tag${index % 12}`],
-                        category: `Category ${index % 5}`,
-                        priority: Math.random(),
-                        size: 100 + Math.floor(Math.random() * 400),
-                        complexity: 1 + Math.floor(Math.random() * 4),
-                    },
-                    renderProps: {
-                        key: `item-${index}`,
-                        eventHandlers: {},
-                    },
-                    state: {
-                        selected: false,
-                        visible: true,
-                        expanded: false,
-                        loading: false,
-                        cached: false,
-                    },
-                })
-            );
+            const items: ListItem[] = Array.from({ length: 300 }, (
+                _,
+                index
+            ) => ({
+                id: `item-${index}`,
+                value: {
+                    name: `Item ${Math.floor(Math.random() * 1000)}`,
+                    timestamp: Date.now() - Math.random() * 86_400_000,
+                    score: Math.random() * 100,
+                    category: `Category ${index % 5}`,
+                },
+                metadata: {
+                    created: Date.now() - Math.random() * 86_400_000 * 30,
+                    modified: Date.now() - Math.random() * 86_400_000 * 7,
+                    tags: [`tag${index % 12}`],
+                    category: `Category ${index % 5}`,
+                    priority: Math.random(),
+                    size: 100 + Math.floor(Math.random() * 400),
+                    complexity: 1 + Math.floor(Math.random() * 4),
+                },
+                renderProps: {
+                    key: `item-${index}`,
+                    eventHandlers: {},
+                },
+                state: {
+                    selected: false,
+                    visible: true,
+                    expanded: false,
+                    loading: false,
+                    cached: false,
+                },
+            }));
 
             // Different sorting configurations
             const sortConfigs = [
@@ -1499,36 +1496,36 @@ describe("React List Operations Performance", () => {
                 components[Math.floor(Math.random() * components.length)];
 
             // Large dataset for virtualization
-            const items: ListItem[] = Array.from(
-                { length: 5000 },
-                (_, index) => ({
-                    id: `virtual-item-${index}`,
-                    value: {
-                        content: `Content for item ${index}`,
-                        data: Array.from({ length: 20 }, () => Math.random()),
-                    },
-                    metadata: {
-                        created: Date.now(),
-                        modified: Date.now(),
-                        tags: [`tag${index % 15}`],
-                        category: `Category ${index % 10}`,
-                        priority: Math.random(),
-                        size: 200 + Math.floor(Math.random() * 300),
-                        complexity: 1 + Math.floor(Math.random() * 6),
-                    },
-                    renderProps: {
-                        key: `virtual-item-${index}`,
-                        eventHandlers: {},
-                    },
-                    state: {
-                        selected: false,
-                        visible: true,
-                        expanded: false,
-                        loading: false,
-                        cached: false,
-                    },
-                })
-            );
+            const items: ListItem[] = Array.from({ length: 5000 }, (
+                _,
+                index
+            ) => ({
+                id: `virtual-item-${index}`,
+                value: {
+                    content: `Content for item ${index}`,
+                    data: Array.from({ length: 20 }, () => Math.random()),
+                },
+                metadata: {
+                    created: Date.now(),
+                    modified: Date.now(),
+                    tags: [`tag${index % 15}`],
+                    category: `Category ${index % 10}`,
+                    priority: Math.random(),
+                    size: 200 + Math.floor(Math.random() * 300),
+                    complexity: 1 + Math.floor(Math.random() * 6),
+                },
+                renderProps: {
+                    key: `virtual-item-${index}`,
+                    eventHandlers: {},
+                },
+                state: {
+                    selected: false,
+                    visible: true,
+                    expanded: false,
+                    loading: false,
+                    cached: false,
+                },
+            }));
 
             // Different virtualization configurations
             const virtualizationConfigs: VirtualizationConfig[] = [
@@ -1578,42 +1575,42 @@ describe("React List Operations Performance", () => {
             const componentId =
                 components[Math.floor(Math.random() * components.length)];
 
-            const items: ListItem[] = Array.from(
-                { length: 400 },
-                (_, index) => ({
-                    id: `grouped-item-${index}`,
-                    value: {
-                        title: `Item ${index}`,
-                        department: `Department ${index % 8}`,
-                        team: `Team ${index % 15}`,
-                        status: [
-                            "active",
-                            "pending",
-                            "completed",
-                        ][index % 3],
-                    },
-                    metadata: {
-                        created: Date.now() - Math.random() * 86_400_000 * 30,
-                        modified: Date.now(),
-                        tags: [`tag${index % 8}`],
-                        category: `Category ${index % 6}`,
-                        priority: Math.random(),
-                        size: 120 + Math.floor(Math.random() * 250),
-                        complexity: 1 + Math.floor(Math.random() * 4),
-                    },
-                    renderProps: {
-                        key: `grouped-item-${index}`,
-                        eventHandlers: {},
-                    },
-                    state: {
-                        selected: false,
-                        visible: true,
-                        expanded: false,
-                        loading: false,
-                        cached: false,
-                    },
-                })
-            );
+            const items: ListItem[] = Array.from({ length: 400 }, (
+                _,
+                index
+            ) => ({
+                id: `grouped-item-${index}`,
+                value: {
+                    title: `Item ${index}`,
+                    department: `Department ${index % 8}`,
+                    team: `Team ${index % 15}`,
+                    status: [
+                        "active",
+                        "pending",
+                        "completed",
+                    ][index % 3],
+                },
+                metadata: {
+                    created: Date.now() - Math.random() * 86_400_000 * 30,
+                    modified: Date.now(),
+                    tags: [`tag${index % 8}`],
+                    category: `Category ${index % 6}`,
+                    priority: Math.random(),
+                    size: 120 + Math.floor(Math.random() * 250),
+                    complexity: 1 + Math.floor(Math.random() * 4),
+                },
+                renderProps: {
+                    key: `grouped-item-${index}`,
+                    eventHandlers: {},
+                },
+                state: {
+                    selected: false,
+                    visible: true,
+                    expanded: false,
+                    loading: false,
+                    cached: false,
+                },
+            }));
 
             // Different grouping configurations
             const groupingConfigs: GroupingConfig[] = [
@@ -1659,37 +1656,37 @@ describe("React List Operations Performance", () => {
             const componentId =
                 components[Math.floor(Math.random() * components.length)];
 
-            const items: ListItem[] = Array.from(
-                { length: 200 },
-                (_, index) => ({
-                    id: `selectable-item-${index}`,
-                    value: {
-                        name: `Selectable Item ${index}`,
-                        selectable: Math.random() > 0.1, // 90% selectable
-                        disabled: Math.random() > 0.95, // 5% disabled
-                    },
-                    metadata: {
-                        created: Date.now(),
-                        modified: Date.now(),
-                        tags: [`tag${index % 6}`],
-                        category: `Category ${index % 4}`,
-                        priority: Math.random(),
-                        size: 100 + Math.floor(Math.random() * 200),
-                        complexity: 1 + Math.floor(Math.random() * 3),
-                    },
-                    renderProps: {
-                        key: `selectable-item-${index}`,
-                        eventHandlers: {},
-                    },
-                    state: {
-                        selected: Math.random() > 0.8, // 20% pre-selected
-                        visible: true,
-                        expanded: false,
-                        loading: false,
-                        cached: false,
-                    },
-                })
-            );
+            const items: ListItem[] = Array.from({ length: 200 }, (
+                _,
+                index
+            ) => ({
+                id: `selectable-item-${index}`,
+                value: {
+                    name: `Selectable Item ${index}`,
+                    selectable: Math.random() > 0.1, // 90% selectable
+                    disabled: Math.random() > 0.95, // 5% disabled
+                },
+                metadata: {
+                    created: Date.now(),
+                    modified: Date.now(),
+                    tags: [`tag${index % 6}`],
+                    category: `Category ${index % 4}`,
+                    priority: Math.random(),
+                    size: 100 + Math.floor(Math.random() * 200),
+                    complexity: 1 + Math.floor(Math.random() * 3),
+                },
+                renderProps: {
+                    key: `selectable-item-${index}`,
+                    eventHandlers: {},
+                },
+                state: {
+                    selected: Math.random() > 0.8, // 20% pre-selected
+                    visible: true,
+                    expanded: false,
+                    loading: false,
+                    cached: false,
+                },
+            }));
 
             const selectedItems = new Set(
                 items
@@ -1749,41 +1746,41 @@ describe("React List Operations Performance", () => {
             const componentId =
                 components[Math.floor(Math.random() * components.length)];
 
-            const items: ListItem[] = Array.from(
-                { length: 1000 },
-                (_, index) => ({
-                    id: `complex-item-${index}`,
-                    value: {
-                        name: `Complex Item ${index}`,
-                        price: Math.random() * 2000,
-                        rating: Math.random() * 5,
-                        category: `Category ${index % 12}`,
-                        brand: `Brand ${index % 8}`,
-                        inStock: Math.random() > 0.2,
-                        featured: Math.random() > 0.7,
-                    },
-                    metadata: {
-                        created: Date.now() - Math.random() * 86_400_000 * 365,
-                        modified: Date.now() - Math.random() * 86_400_000 * 30,
-                        tags: [`tag${index % 20}`, `feature${index % 15}`],
-                        category: `Category ${index % 12}`,
-                        priority: Math.random(),
-                        size: 150 + Math.floor(Math.random() * 400),
-                        complexity: 1 + Math.floor(Math.random() * 8),
-                    },
-                    renderProps: {
-                        key: `complex-item-${index}`,
-                        eventHandlers: {},
-                    },
-                    state: {
-                        selected: false,
-                        visible: true,
-                        expanded: false,
-                        loading: false,
-                        cached: false,
-                    },
-                })
-            );
+            const items: ListItem[] = Array.from({ length: 1000 }, (
+                _,
+                index
+            ) => ({
+                id: `complex-item-${index}`,
+                value: {
+                    name: `Complex Item ${index}`,
+                    price: Math.random() * 2000,
+                    rating: Math.random() * 5,
+                    category: `Category ${index % 12}`,
+                    brand: `Brand ${index % 8}`,
+                    inStock: Math.random() > 0.2,
+                    featured: Math.random() > 0.7,
+                },
+                metadata: {
+                    created: Date.now() - Math.random() * 86_400_000 * 365,
+                    modified: Date.now() - Math.random() * 86_400_000 * 30,
+                    tags: [`tag${index % 20}`, `feature${index % 15}`],
+                    category: `Category ${index % 12}`,
+                    priority: Math.random(),
+                    size: 150 + Math.floor(Math.random() * 400),
+                    complexity: 1 + Math.floor(Math.random() * 8),
+                },
+                renderProps: {
+                    key: `complex-item-${index}`,
+                    eventHandlers: {},
+                },
+                state: {
+                    selected: false,
+                    visible: true,
+                    expanded: false,
+                    loading: false,
+                    cached: false,
+                },
+            }));
 
             // Complex configuration with multiple operations
             const config: ListOperationConfig = {
@@ -1850,64 +1847,61 @@ describe("React List Operations Performance", () => {
                 ];
 
             // Very large dataset
-            const items: ListItem[] = Array.from(
-                { length: 10_000 },
-                (_, index) => ({
-                    id: `stress-item-${index}`,
-                    value: {
-                        title: `Stress Item ${index}`,
-                        content: `Content ${index}`.repeat(10), // Large content
-                        data: Array.from({ length: 50 }, () => Math.random()), // Large data array
-                        nested: {
-                            level1: {
-                                level2: {
-                                    level3: `Deep value ${index}`,
-                                    array: Array.from(
-                                        { length: 20 },
-                                        (_, j) => ({
-                                            id: j,
-                                            value: Math.random(),
-                                        })
-                                    ),
-                                },
+            const items: ListItem[] = Array.from({ length: 10_000 }, (
+                _,
+                index
+            ) => ({
+                id: `stress-item-${index}`,
+                value: {
+                    title: `Stress Item ${index}`,
+                    content: `Content ${index}`.repeat(10), // Large content
+                    data: Array.from({ length: 50 }, () => Math.random()), // Large data array
+                    nested: {
+                        level1: {
+                            level2: {
+                                level3: `Deep value ${index}`,
+                                array: Array.from({ length: 20 }, (_, j) => ({
+                                    id: j,
+                                    value: Math.random(),
+                                })),
                             },
                         },
                     },
-                    metadata: {
-                        created: Date.now() - Math.random() * 86_400_000 * 365,
-                        modified: Date.now(),
-                        tags: Array.from(
-                            { length: 10 },
-                            (_, j) => `tag${j}-${index % 50}`
-                        ),
-                        category: `Category ${index % 25}`,
-                        priority: Math.random(),
-                        size: 500 + Math.floor(Math.random() * 1000),
-                        complexity: 5 + Math.floor(Math.random() * 10),
+                },
+                metadata: {
+                    created: Date.now() - Math.random() * 86_400_000 * 365,
+                    modified: Date.now(),
+                    tags: Array.from(
+                        { length: 10 },
+                        (_, j) => `tag${j}-${index % 50}`
+                    ),
+                    category: `Category ${index % 25}`,
+                    priority: Math.random(),
+                    size: 500 + Math.floor(Math.random() * 1000),
+                    complexity: 5 + Math.floor(Math.random() * 10),
+                },
+                renderProps: {
+                    key: `stress-item-${index}`,
+                    className: `stress-item complexity-${index % 10}`,
+                    style: {
+                        height: `${40 + (index % 10) * 10}px`,
+                        backgroundColor: `hsl(${index % 360}, 50%, 95%)`,
                     },
-                    renderProps: {
-                        key: `stress-item-${index}`,
-                        className: `stress-item complexity-${index % 10}`,
-                        style: {
-                            height: `${40 + (index % 10) * 10}px`,
-                            backgroundColor: `hsl(${index % 360}, 50%, 95%)`,
-                        },
-                        eventHandlers: {
-                            onClick: () => Math.random(),
-                            onHover: () => Math.random(),
-                            onFocus: () => Math.random(),
-                            onBlur: () => Math.random(),
-                        },
+                    eventHandlers: {
+                        onClick: () => Math.random(),
+                        onHover: () => Math.random(),
+                        onFocus: () => Math.random(),
+                        onBlur: () => Math.random(),
                     },
-                    state: {
-                        selected: Math.random() > 0.9,
-                        visible: Math.random() > 0.05,
-                        expanded: Math.random() > 0.8,
-                        loading: Math.random() > 0.95,
-                        cached: Math.random() > 0.7,
-                    },
-                })
-            );
+                },
+                state: {
+                    selected: Math.random() > 0.9,
+                    visible: Math.random() > 0.05,
+                    expanded: Math.random() > 0.8,
+                    loading: Math.random() > 0.95,
+                    cached: Math.random() > 0.7,
+                },
+            }));
 
             // Complex stress configuration
             const stressConfig: ListOperationConfig = {

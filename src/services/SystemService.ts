@@ -78,46 +78,42 @@ export const SystemService: SystemServiceContract = {
      * @throws If the electron API is unavailable, the underlying operation
      *   fails, or Electron declines to open the target URL.
      */
-    openExternal: wrap(
-        "openExternal",
-        async (api, url: string): Promise<boolean> => {
-            const requestedUrl = url;
-            const urlForMessage: string = url;
-            const isSafeUrl = isValidUrl(requestedUrl);
+    openExternal: wrap("openExternal", async (
+        api,
+        url: string
+    ): Promise<boolean> => {
+        const requestedUrl = url;
+        const urlForMessage: string = url;
+        const isSafeUrl = isValidUrl(requestedUrl);
 
-            if (!isSafeUrl) {
-                const error = new TypeError(
-                    `Invalid URL provided to SystemService.openExternal: ${urlForMessage}`
-                );
+        if (!isSafeUrl) {
+            const error = new TypeError(
+                `Invalid URL provided to SystemService.openExternal: ${urlForMessage}`
+            );
 
-                logger.error(
-                    "Rejected unsafe URL for external navigation",
-                    error,
-                    {
-                        url: urlForMessage,
-                    }
-                );
+            logger.error("Rejected unsafe URL for external navigation", error, {
+                url: urlForMessage,
+            });
 
-                throw error;
-            }
-
-            const opened = await api.system.openExternal(requestedUrl);
-
-            if (typeof opened !== "boolean") {
-                throw new TypeError(
-                    `Electron declined to open external URL: ${urlForMessage} (received ${typeof opened})`
-                );
-            }
-
-            if (!opened) {
-                throw new Error(
-                    `Electron declined to open external URL: ${urlForMessage}`
-                );
-            }
-
-            return opened;
+            throw error;
         }
-    ),
+
+        const opened = await api.system.openExternal(requestedUrl);
+
+        if (typeof opened !== "boolean") {
+            throw new TypeError(
+                `Electron declined to open external URL: ${urlForMessage} (received ${typeof opened})`
+            );
+        }
+
+        if (!opened) {
+            throw new Error(
+                `Electron declined to open external URL: ${urlForMessage}`
+            );
+        }
+
+        return opened;
+    }),
 
     /**
      * Quits the application and installs a pending update.

@@ -683,8 +683,7 @@ class MockTemplateEngine {
         ];
 
         templates.forEach((template) =>
-            this.templates.set(template.id, template as NotificationTemplate)
-        );
+            this.templates.set(template.id, template as NotificationTemplate));
     }
 
     /**
@@ -1148,8 +1147,7 @@ describe("Notification Service Performance", () => {
                     `test${i}@example.com`,
                     "Rate Limit Test",
                     "Testing rate limits"
-                )
-            );
+                ));
 
             Promise.all(sends);
         },
@@ -1232,21 +1230,21 @@ describe("Notification Service Performance", () => {
         () => {
             service = new MockNotificationService();
 
-            const scheduledNotifications = Array.from(
-                { length: 10 },
-                (_, i) => ({
-                    templateId: "maintenance",
-                    channelIds: ["email-primary"],
-                    recipients: [`scheduled${i}@example.com`],
-                    variables: {
-                        siteName: `Scheduled Site ${i}`,
-                        startTime: new Date().toISOString(),
-                        duration: "30 minutes",
-                    },
-                    priority: "normal" as const,
-                    scheduledAt: new Date(Date.now() + i * 60_000), // Schedule every minute
-                })
-            );
+            const scheduledNotifications = Array.from({ length: 10 }, (
+                _,
+                i
+            ) => ({
+                templateId: "maintenance",
+                channelIds: ["email-primary"],
+                recipients: [`scheduled${i}@example.com`],
+                variables: {
+                    siteName: `Scheduled Site ${i}`,
+                    startTime: new Date().toISOString(),
+                    duration: "30 minutes",
+                },
+                priority: "normal" as const,
+                scheduledAt: new Date(Date.now() + i * 60_000), // Schedule every minute
+            }));
 
             service.sendBulkNotifications(scheduledNotifications);
         },

@@ -24,7 +24,11 @@ import { DEFAULT_TEST_SITE_URL, generateSiteName } from "../utils/testData";
 test.describe(
     "add site modal - modern ui",
     {
-        tag: ["@ui", "@modal", "@regression"],
+        tag: [
+            "@ui",
+            "@modal",
+            "@regression",
+        ],
     },
     () => {
         test.setTimeout(45_000);
@@ -139,16 +143,15 @@ test.describe(
                 const monitorTypeSelect = page.getByLabel(/Monitor Type/i);
                 await expect(monitorTypeSelect).toBeVisible();
 
-                const monitorTypeValues = await monitorTypeSelect.evaluate(
-                    (element) =>
-                        Array.from(
-                            element.querySelectorAll("option"),
-                            (option) => ({
-                                label: option.label,
-                                value: option.value,
-                            })
-                        )
-                );
+                const monitorTypeValues = await monitorTypeSelect.evaluate((
+                    element
+                ) =>
+                    Array.from(element.querySelectorAll("option"), (
+                        option
+                    ) => ({
+                        label: option.label,
+                        value: option.value,
+                    })));
 
                 expect(monitorTypeValues.length).toBeGreaterThanOrEqual(5);
                 expect(

@@ -254,22 +254,21 @@ describe("environment comprehensive fuzzing tests", () => {
             expect(result).toBe("development");
         });
 
-        test.prop([fc.string()])(
-            "returns custom NODE_ENV values correctly",
-            (customEnv) => {
-                fc.pre(customEnv !== ""); // Avoid empty string
+        test.prop([fc.string()])("returns custom NODE_ENV values correctly", (
+            customEnv
+        ) => {
+            fc.pre(customEnv !== ""); // Avoid empty string
 
-                globalThis.process = {
-                    ...originalProcess,
-                    env: {
-                        NODE_ENV: customEnv as any,
-                    },
-                };
+            globalThis.process = {
+                ...originalProcess,
+                env: {
+                    NODE_ENV: customEnv as any,
+                },
+            };
 
-                const result = getNodeEnv();
-                expect(result).toBe(customEnv);
-            }
-        );
+            const result = getNodeEnv();
+            expect(result).toBe(customEnv);
+        });
 
         test("handles undefined NODE_ENV gracefully", () => {
             globalThis.process = {
@@ -350,20 +349,19 @@ describe("environment comprehensive fuzzing tests", () => {
 
         test.prop([
             fc.constantFrom("production", "test", "staging", "unknown"),
-        ])(
-            'returns false when NODE_ENV is not "development"',
-            (nodeEnvValue) => {
-                globalThis.process = {
-                    ...originalProcess,
-                    env: {
-                        NODE_ENV: nodeEnvValue as any,
-                    },
-                };
+        ])('returns false when NODE_ENV is not "development"', (
+            nodeEnvValue
+        ) => {
+            globalThis.process = {
+                ...originalProcess,
+                env: {
+                    NODE_ENV: nodeEnvValue as any,
+                },
+            };
 
-                const result = isDevelopment();
-                expect(result).toBeFalsy();
-            }
-        );
+            const result = isDevelopment();
+            expect(result).toBeFalsy();
+        });
 
         test("returns false when NODE_ENV is not set", () => {
             globalThis.process = {
@@ -528,20 +526,19 @@ describe("environment comprehensive fuzzing tests", () => {
 
         test.prop([
             fc.constantFrom("development", "test", "staging", "unknown"),
-        ])(
-            'returns false when NODE_ENV is not "production"',
-            (nodeEnvValue) => {
-                globalThis.process = {
-                    ...originalProcess,
-                    env: {
-                        NODE_ENV: nodeEnvValue as any,
-                    },
-                };
+        ])('returns false when NODE_ENV is not "production"', (
+            nodeEnvValue
+        ) => {
+            globalThis.process = {
+                ...originalProcess,
+                env: {
+                    NODE_ENV: nodeEnvValue as any,
+                },
+            };
 
-                const result = isProduction();
-                expect(result).toBeFalsy();
-            }
-        );
+            const result = isProduction();
+            expect(result).toBeFalsy();
+        });
 
         test("returns false when NODE_ENV is not set", () => {
             globalThis.process = {

@@ -270,20 +270,19 @@ const setOnCacheInvalidatedHandler = (
                 normalize
                     ? normalizeCacheInvalidatedEvent(candidate)
                     : (candidate as CacheInvalidatedEventData)
-            )
-        );
+            ));
 
         return (cleanup ?? noopCleanup) as () => void;
     };
 
-    mockEventsService.onCacheInvalidated.mockImplementation(
-        async (callback: unknown) =>
-            invokeHandler(
-                callback as (
-                    event: CacheInvalidatedEventData
-                ) => unknown | Promise<unknown>
-            )
-    );
+    mockEventsService.onCacheInvalidated.mockImplementation(async (
+        callback: unknown
+    ) =>
+        invokeHandler(
+            callback as (
+                event: CacheInvalidatedEventData
+            ) => unknown | Promise<unknown>
+        ));
 
     const electronWindow = globalThis.window as typeof globalThis.window & {
         electronAPI: MockElectronAPI;
@@ -333,8 +332,7 @@ describe("cacheSync", () => {
             sitesResyncSpy as unknown as AsyncStoreOperation;
 
         mockEnsureError.mockImplementation((error) =>
-            error instanceof Error ? error : new Error(String(error))
-        );
+            error instanceof Error ? error : new Error(String(error)));
         mockRefreshMonitorTypes.mockImplementation(async () => {
             // No-op default implementation
         });
@@ -1231,68 +1229,66 @@ describe("cacheSync", () => {
                     nil: undefined,
                 }),
             }),
-        ])(
-            "should handle cache invalidation with enumerated reasons",
-            async (invalidationData) => {
-                setupCacheSync();
+        ])("should handle cache invalidation with enumerated reasons", async (
+            invalidationData
+        ) => {
+            setupCacheSync();
 
-                const overrides: Partial<CacheInvalidatedEventData> = {
-                    reason: invalidationData.reason,
-                    type: invalidationData.type,
-                    ...(invalidationData.identifier === undefined
-                        ? {}
-                        : { identifier: invalidationData.identifier }),
-                };
+            const overrides: Partial<CacheInvalidatedEventData> = {
+                reason: invalidationData.reason,
+                type: invalidationData.type,
+                ...(invalidationData.identifier === undefined
+                    ? {}
+                    : { identifier: invalidationData.identifier }),
+            };
 
-                const dispatchedEvent = await triggerCacheInvalidation(
-                    mockOnCacheInvalidated,
-                    overrides
-                );
+            const dispatchedEvent = await triggerCacheInvalidation(
+                mockOnCacheInvalidated,
+                overrides
+            );
 
-                expect(mockLogger.debug).toHaveBeenCalledWith(
-                    "Received cache invalidation event",
-                    expect.objectContaining({
-                        reason: dispatchedEvent.reason,
-                        type: dispatchedEvent.type,
-                    })
-                );
-            }
-        );
+            expect(mockLogger.debug).toHaveBeenCalledWith(
+                "Received cache invalidation event",
+                expect.objectContaining({
+                    reason: dispatchedEvent.reason,
+                    type: dispatchedEvent.type,
+                })
+            );
+        });
 
         test.prop([
             fc.array(fc.string({ minLength: 1, maxLength: 20 }), {
                 minLength: 1,
                 maxLength: 5,
             }),
-        ])(
-            "should handle cache clearing errors gracefully",
-            async (errorMessages) => {
-                // Test that cache clearing errors are properly handled
-                const testErrors = errorMessages.map((msg) => new Error(msg));
-                let errorIndex = 0;
+        ])("should handle cache clearing errors gracefully", async (
+            errorMessages
+        ) => {
+            // Test that cache clearing errors are properly handled
+            const testErrors = errorMessages.map((msg) => new Error(msg));
+            let errorIndex = 0;
 
-                mockClearMonitorTypeCache.mockImplementation(() => {
-                    if (errorIndex < testErrors.length) {
-                        throw testErrors[errorIndex++];
-                    }
-                });
-
-                setupCacheSync();
-
-                await triggerCacheInvalidation(mockOnCacheInvalidated, {
-                    reason: CACHE_INVALIDATION_REASON.MANUAL,
-                    type: CACHE_INVALIDATION_TYPE.ALL,
-                });
-
-                // Property: Errors should be properly logged (during clearAllFrontendCaches)
-                if (testErrors.length > 0) {
-                    expect(mockLogger.error).toHaveBeenCalledWith(
-                        "[CacheSync] Failed to clear monitorType cache:",
-                        expect.any(Error)
-                    );
+            mockClearMonitorTypeCache.mockImplementation(() => {
+                if (errorIndex < testErrors.length) {
+                    throw testErrors[errorIndex++];
                 }
+            });
+
+            setupCacheSync();
+
+            await triggerCacheInvalidation(mockOnCacheInvalidated, {
+                reason: CACHE_INVALIDATION_REASON.MANUAL,
+                type: CACHE_INVALIDATION_TYPE.ALL,
+            });
+
+            // Property: Errors should be properly logged (during clearAllFrontendCaches)
+            if (testErrors.length > 0) {
+                expect(mockLogger.error).toHaveBeenCalledWith(
+                    "[CacheSync] Failed to clear monitorType cache:",
+                    expect.any(Error)
+                );
             }
-        );
+        });
 
         test.prop([
             fc.record({
@@ -1300,76 +1296,74 @@ describe("cacheSync", () => {
                 hasElectronAPI: fc.boolean(),
                 hasEvents: fc.boolean(),
             }),
-        ])(
-            "should handle setupCacheSync environment variations",
-            async (environment) => {
-                const normalizedEnvironment = {
-                    ...environment,
-                    hasEvents:
-                        environment.hasElectronAPI && environment.hasEvents,
+        ])("should handle setupCacheSync environment variations", async (
+            environment
+        ) => {
+            const normalizedEnvironment = {
+                ...environment,
+                hasEvents: environment.hasElectronAPI && environment.hasEvents,
+            };
+
+            // Setup different environment configurations
+            if (!normalizedEnvironment.hasWindow) {
+                delete (globalThis as any).window;
+            } else if (!normalizedEnvironment.hasElectronAPI) {
+                (globalThis as any).window = {};
+            } else if (!normalizedEnvironment.hasEvents) {
+                (globalThis as any).window = {
+                    electronAPI: {
+                        ...createMockElectronAPI(true, false),
+                        events: undefined,
+                    },
                 };
+            }
 
-                // Setup different environment configurations
-                if (!normalizedEnvironment.hasWindow) {
-                    delete (globalThis as any).window;
-                } else if (!normalizedEnvironment.hasElectronAPI) {
-                    (globalThis as any).window = {};
-                } else if (!normalizedEnvironment.hasEvents) {
-                    (globalThis as any).window = {
-                        electronAPI: {
-                            ...createMockElectronAPI(true, false),
-                            events: undefined,
-                        },
-                    };
-                }
-
-                mockEventsService.onCacheInvalidated.mockImplementation(
-                    async (callback: unknown) => {
-                        if (
-                            !normalizedEnvironment.hasElectronAPI ||
-                            !normalizedEnvironment.hasEvents
-                        ) {
-                            throw new Error("Cache events unavailable");
-                        }
-
-                        if (typeof callback !== "function") {
-                            throw new TypeError(
-                                "Cache invalidation listener must be callable"
-                            );
-                        }
-
-                        return () => {
-                            mockCleanup();
-                        };
-                    }
-                );
-
-                // Property: setupCacheSync should always return a function
-                const cleanup = setupCacheSync();
-                expect(typeof cleanup).toBe("function");
-
-                // Property: Cleanup function should not throw
-                expect(() => cleanup()).not.toThrowError();
-
-                // Property: Warning should be logged when cache sync is not available
-                if (!normalizedEnvironment.hasWindow) {
-                    expect(mockLogger.warn).toHaveBeenCalledWith(
-                        "Cache invalidation events not available - frontend cache sync disabled"
-                    );
-                } else if (
+            mockEventsService.onCacheInvalidated.mockImplementation(async (
+                callback: unknown
+            ) => {
+                if (
                     !normalizedEnvironment.hasElectronAPI ||
                     !normalizedEnvironment.hasEvents
                 ) {
-                    await flushAsyncOperations();
-                    await flushAsyncOperations();
-                    const warnCalls = mockLogger.warn.mock.calls.filter(
-                        ([message]) =>
-                            message ===
-                            "Cache invalidation events not available - frontend cache sync disabled"
-                    );
-                    expect(warnCalls.length).toBeGreaterThan(0);
+                    throw new Error("Cache events unavailable");
                 }
+
+                if (typeof callback !== "function") {
+                    throw new TypeError(
+                        "Cache invalidation listener must be callable"
+                    );
+                }
+
+                return () => {
+                    mockCleanup();
+                };
+            });
+
+            // Property: setupCacheSync should always return a function
+            const cleanup = setupCacheSync();
+            expect(typeof cleanup).toBe("function");
+
+            // Property: Cleanup function should not throw
+            expect(() => cleanup()).not.toThrowError();
+
+            // Property: Warning should be logged when cache sync is not available
+            if (!normalizedEnvironment.hasWindow) {
+                expect(mockLogger.warn).toHaveBeenCalledWith(
+                    "Cache invalidation events not available - frontend cache sync disabled"
+                );
+            } else if (
+                !normalizedEnvironment.hasElectronAPI ||
+                !normalizedEnvironment.hasEvents
+            ) {
+                await flushAsyncOperations();
+                await flushAsyncOperations();
+                const warnCalls = mockLogger.warn.mock.calls.filter(
+                    ([message]) =>
+                        message ===
+                        "Cache invalidation events not available - frontend cache sync disabled"
+                );
+                expect(warnCalls.length).toBeGreaterThan(0);
             }
-        );
+        });
     });
 });

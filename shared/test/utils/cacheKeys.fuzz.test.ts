@@ -221,24 +221,20 @@ describe("Cache Keys - Property-Based Tests", () => {
     describe("CacheKeys.validation functions", () => {
         it("should generate consistent validation cache keys by type", () => {
             fc.assert(
-                fc.property(
-                    shortValidCacheKeyPart,
-                    validCacheKeyPart,
-                    (type, identifier) => {
-                        const key = CacheKeys.validation.byType(
-                            type,
-                            identifier
-                        );
+                fc.property(shortValidCacheKeyPart, validCacheKeyPart, (
+                    type,
+                    identifier
+                ) => {
+                    const key = CacheKeys.validation.byType(type, identifier);
 
-                        expect(key).toBe(`validation:${type}:${identifier}`);
-                        expect(key.startsWith("validation:")).toBeTruthy();
-                        expect(key).toContain(type);
-                        expect(key).toContain(identifier);
-                        expect(isStandardizedCacheKey(key)).toBeTruthy();
+                    expect(key).toBe(`validation:${type}:${identifier}`);
+                    expect(key.startsWith("validation:")).toBeTruthy();
+                    expect(key).toContain(type);
+                    expect(key).toContain(identifier);
+                    expect(isStandardizedCacheKey(key)).toBeTruthy();
 
-                        return true;
-                    }
-                ),
+                    return true;
+                }),
                 { numRuns: 100 }
             );
         });
@@ -430,8 +426,9 @@ describe("Cache Keys - Property-Based Tests", () => {
                         ) {
                             // These should throw errors (empty or has leading/trailing spaces)
                             expect(() =>
-                                parseCacheKey(key as StandardizedCacheKey)
-                            ).toThrowError();
+                                parseCacheKey(
+                                    key as StandardizedCacheKey
+                                )).toThrowError();
                         } else {
                             // Valid long identifiers should parse correctly
                             const result = parseCacheKey(

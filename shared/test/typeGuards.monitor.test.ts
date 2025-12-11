@@ -100,8 +100,11 @@ describe("Monitor type guards", () => {
             const monitor = createMonitor("dns");
 
             expect(() =>
-                assertMonitorType(monitor, "http", "monitor config")
-            ).toThrowError(
+                assertMonitorType(
+                    monitor,
+                    "http",
+                    "monitor config"
+                )).toThrowError(
                 "Expected monitor config to be type 'http', received 'dns'"
             );
         });

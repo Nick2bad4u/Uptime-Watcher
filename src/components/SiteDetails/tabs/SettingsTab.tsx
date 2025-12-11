@@ -305,7 +305,11 @@ export const SettingsTab = ({
             siteName: currentSite.name,
         });
         await handleRemoveSite();
-    }, [currentSite.identifier, currentSite.name, handleRemoveSite]);
+    }, [
+        currentSite.identifier,
+        currentSite.name,
+        handleRemoveSite,
+    ]);
 
     const loggedHandleSaveTimeout = useCallback(async () => {
         logger.user.action("Settings: Save timeout", {

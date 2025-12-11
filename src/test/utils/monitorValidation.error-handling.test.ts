@@ -94,17 +94,17 @@ describe("monitorValidation error handling", () => {
             status: fc.constantFrom("up", "down", "degraded", "pending"),
             timeout: fc.integer({ min: 1, max: 60_000 }),
         }),
-    ])(
-        "createMonitorObject preserves provided fields and applies defaults",
-        (type, overrides) => {
-            const monitor = createMonitorObject(type, overrides);
+    ])("createMonitorObject preserves provided fields and applies defaults", (
+        type,
+        overrides
+    ) => {
+        const monitor = createMonitorObject(type, overrides);
 
-            expect(monitor.type).toBe(type);
-            expect(monitor.monitoring).toBe(overrides.monitoring ?? true);
-            expect(monitor.retryAttempts).toBe(overrides.retryAttempts ?? 3);
-            expect(monitor.status).toBe(overrides.status ?? "pending");
-        }
-    );
+        expect(monitor.type).toBe(type);
+        expect(monitor.monitoring).toBe(overrides.monitoring ?? true);
+        expect(monitor.retryAttempts).toBe(overrides.retryAttempts ?? 3);
+        expect(monitor.status).toBe(overrides.status ?? "pending");
+    });
 
     it("returns fallback result when monitor type store is unavailable", async () => {
         mockedMonitorTypesStore.mockReturnValueOnce(

@@ -91,7 +91,12 @@ function createMockSite(id: string, monitorCount: number): Site {
         monitoring: true,
         monitors: Array.from({ length: monitorCount }, (_, i) => ({
             id: `monitor-${id}-${i}`,
-            type: ["http", "dns", "port", "ping"][i % 4] as any,
+            type: [
+                "http",
+                "dns",
+                "port",
+                "ping",
+            ][i % 4] as any,
             status: "pending" as MonitorStatus,
             monitoring: true,
             responseTime: -1,
@@ -125,12 +130,21 @@ class EnhancedAlertSystem {
             const rule: AlertRule = {
                 id: `rule-${i}`,
                 name: `Alert Rule ${i}`,
-                type: ["threshold", "anomaly", "status_change"][i % 3] as any,
+                type: [
+                    "threshold",
+                    "anomaly",
+                    "status_change",
+                ][i % 3] as any,
                 conditions: {
                     threshold: Math.random() * 1000,
                     timeWindow: 300_000,
                 },
-                severity: ["low", "medium", "high", "critical"][i % 4] as any,
+                severity: [
+                    "low",
+                    "medium",
+                    "high",
+                    "critical",
+                ][i % 4] as any,
                 isEnabled: Math.random() > 0.1,
             };
             this.rules.set(rule.id, rule);
@@ -252,8 +266,7 @@ describe("Real Alert System Performance", () => {
     beforeAll(() => {
         // Pre-generate test sites to avoid affecting benchmark timing
         testSites = Array.from({ length: 10 }, (_, i) =>
-            createMockSite(`site-${i}`, 5)
-        );
+            createMockSite(`site-${i}`, 5));
     });
 
     bench(

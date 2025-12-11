@@ -195,15 +195,13 @@ describe("Application Constants", () => {
             await annotate("Type: Business Logic", "type");
 
             const lowercaseMonoFonts = FONT_FAMILY_MONO.map((f) =>
-                f.toLowerCase()
-            );
+                f.toLowerCase());
             expect(
                 lowercaseMonoFonts.some((f) => f.includes("mono"))
             ).toBeTruthy();
 
             const lowercaseSansFonts = FONT_FAMILY_SANS.map((f) =>
-                f.toLowerCase()
-            );
+                f.toLowerCase());
             expect(
                 lowercaseSansFonts.some(
                     (f) => f.includes("inter") || f.includes("system")
@@ -406,8 +404,7 @@ describe("Application Constants", () => {
             await annotate("Type: Configuration", "type");
 
             const unlimitedOption = HISTORY_LIMIT_OPTIONS.find((opt) =>
-                opt.label.toLowerCase().includes("unlimited")
-            );
+                opt.label.toLowerCase().includes("unlimited"));
             expect(unlimitedOption).toBeDefined();
             expect(unlimitedOption?.value).toBe(0);
         });
@@ -581,7 +578,13 @@ describe("Application Constants", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
-            const expectedPeriods = ["1h", "12h", "24h", "7d", "30d"];
+            const expectedPeriods = [
+                "1h",
+                "12h",
+                "24h",
+                "7d",
+                "30d",
+            ];
             for (const period of expectedPeriods) {
                 expect(CHART_TIME_PERIODS).toHaveProperty(period);
                 expect(
@@ -651,7 +654,12 @@ describe("Application Constants", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
-            const validRanges: ChartTimeRange[] = ["1h", "24h", "7d", "30d"];
+            const validRanges: ChartTimeRange[] = [
+                "1h",
+                "24h",
+                "7d",
+                "30d",
+            ];
             for (const range of validRanges) {
                 expect(CHART_TIME_RANGES).toContain(range);
             }

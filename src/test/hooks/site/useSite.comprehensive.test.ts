@@ -379,8 +379,7 @@ describe("useSite Hook", () => {
             });
 
             const { result } = renderHook(() =>
-                useSite(disabledMonitoringSite)
-            );
+                useSite(disabledMonitoringSite));
 
             expect(result.current.status).toBe("down");
         });
@@ -423,8 +422,7 @@ describe("useSite Hook", () => {
 
             const { result: firstResult } = renderHook(() => useSite(mockSite));
             const { result: secondResult } = renderHook(() =>
-                useSite(mockSite)
-            );
+                useSite(mockSite));
 
             // Functions should be stable across renders with same data
             expect(typeof firstResult.current.handleStartMonitoring).toBe(

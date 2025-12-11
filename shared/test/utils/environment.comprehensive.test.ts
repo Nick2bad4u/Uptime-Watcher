@@ -164,7 +164,11 @@ describe("Environment Detection Utilities", () => {
 
             const envModule = ensureEnvironmentModule();
 
-            const environments = ["development", "production", "test"];
+            const environments = [
+                "development",
+                "production",
+                "test",
+            ];
 
             for (const env of environments) {
                 applyMockProcessSnapshot({ env: { NODE_ENV: env } });
@@ -291,7 +295,11 @@ describe("Environment Detection Utilities", () => {
 
             const envModule = ensureEnvironmentModule();
 
-            const environments = ["development", "production", "test"];
+            const environments = [
+                "development",
+                "production",
+                "test",
+            ];
 
             for (const env of environments) {
                 applyMockProcessSnapshot({ env: { NODE_ENV: env } });
@@ -826,7 +834,11 @@ describe("Environment Detection Utilities", () => {
 
             const envModule = ensureEnvironmentModule();
 
-            const falsyValues = ["", "0", "false"];
+            const falsyValues = [
+                "",
+                "0",
+                "false",
+            ];
 
             for (const value of falsyValues) {
                 applyMockProcessSnapshot({ env: { NODE_ENV: value } });

@@ -188,8 +188,7 @@ class MockMonitorRepository {
             UPDATE monitors SET status = ?, lastChecked = ? WHERE id = ?
         `);
         return updates.map((update) =>
-            stmt.run(update.status, update.lastChecked, update.id)
-        );
+            stmt.run(update.status, update.lastChecked, update.id));
     }
 
     getStatistics() {

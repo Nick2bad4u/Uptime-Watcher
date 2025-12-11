@@ -38,8 +38,7 @@ export function registerDataHandlers({
     registerStandardizedIpcHandler(
         DATA_CHANNELS.importData,
         withIgnoredIpcEvent((serializedBackup) =>
-            uptimeOrchestrator.importData(serializedBackup)
-        ),
+            uptimeOrchestrator.importData(serializedBackup)),
         DataHandlerValidators.importData,
         registeredHandlers
     );

@@ -136,8 +136,7 @@ function calculateComplexity(content) {
     ];
 
     const foundTerms = technicalTerms.filter((term) =>
-        content.toLowerCase().includes(term.toLowerCase())
-    );
+        content.toLowerCase().includes(term.toLowerCase()));
     score += Math.min(foundTerms.length * 0.3, 3);
 
     // Length affects complexity
@@ -307,8 +306,7 @@ function displayReport(stats) {
             `   Missing frontmatter (${stats.missingFrontmatter.length}):`
         );
         stats.missingFrontmatter.forEach((file) =>
-            console.log(`     - ${file}`)
-        );
+            console.log(`     - ${file}`));
         console.log();
     }
 

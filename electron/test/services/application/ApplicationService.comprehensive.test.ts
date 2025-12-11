@@ -189,9 +189,8 @@ describe(ApplicationService, () => {
         mockDatabaseService.close.mockReset();
 
         // Get the mocked ServiceContainer reference
-        const serviceContainerModule = await import(
-            "../../../services/ServiceContainer"
-        );
+        const serviceContainerModule =
+            await import("../../../services/ServiceContainer");
         mockServiceContainer = vi.mocked(
             serviceContainerModule.ServiceContainer
         );
@@ -283,9 +282,8 @@ describe(ApplicationService, () => {
             );
 
             // Arrange
-            const { isDevelopment } = await import(
-                "../../../../shared/utils/environment"
-            );
+            const { isDevelopment } =
+                await import("../../../../shared/utils/environment");
             vi.mocked(isDevelopment).mockReturnValue(true);
 
             // Act

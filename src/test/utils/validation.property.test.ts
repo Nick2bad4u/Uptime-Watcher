@@ -244,12 +244,11 @@ describe("Validation Utils Property-Based Tests", () => {
     });
 
     describe("isValidInteger function", () => {
-        fcTest.prop([fc.integer()])(
-            "should accept valid integer strings",
-            (num) => {
-                expect(isValidInteger(num.toString())).toBeTruthy();
-            }
-        );
+        fcTest.prop([fc.integer()])("should accept valid integer strings", (
+            num
+        ) => {
+            expect(isValidInteger(num.toString())).toBeTruthy();
+        });
 
         fcTest.prop([
             fc.oneof(
@@ -452,24 +451,26 @@ describe("Validation Utils Property-Based Tests", () => {
             fc.integer({ min: 0, max: 100 }),
             fc.integer({ min: 1, max: 500 }),
             fc.integer({ min: 501, max: 1000 }),
-        ])(
-            "should convert valid integers within bounds",
-            (value, defaultVal, minVal, maxVal) => {
-                const result = safeInteger(
-                    value.toString(),
-                    defaultVal,
-                    minVal,
-                    maxVal
-                );
+        ])("should convert valid integers within bounds", (
+            value,
+            defaultVal,
+            minVal,
+            maxVal
+        ) => {
+            const result = safeInteger(
+                value.toString(),
+                defaultVal,
+                minVal,
+                maxVal
+            );
 
-                expect(result).toBeGreaterThanOrEqual(minVal);
-                expect(result).toBeLessThanOrEqual(maxVal);
+            expect(result).toBeGreaterThanOrEqual(minVal);
+            expect(result).toBeLessThanOrEqual(maxVal);
 
-                if (value >= minVal && value <= maxVal) {
-                    expect(result).toBe(value);
-                }
+            if (value >= minVal && value <= maxVal) {
+                expect(result).toBe(value);
             }
-        );
+        });
 
         fcTest.prop([
             fc.oneof(
@@ -479,32 +480,34 @@ describe("Validation Utils Property-Based Tests", () => {
                 fc.constant(undefined)
             ),
             fc.integer({ min: 0, max: 100 }),
-        ])(
-            "should return default value for invalid inputs",
-            (invalidValue, defaultVal) => {
-                expect(safeInteger(invalidValue, defaultVal)).toBe(defaultVal);
-            }
-        );
+        ])("should return default value for invalid inputs", (
+            invalidValue,
+            defaultVal
+        ) => {
+            expect(safeInteger(invalidValue, defaultVal)).toBe(defaultVal);
+        });
 
         fcTest.prop([
             fc.integer({ min: -1000, max: 1000 }),
             fc.integer({ min: 0, max: 100 }),
             fc.integer({ min: 1, max: 50 }),
             fc.integer({ min: 51, max: 100 }),
-        ])(
-            "should clamp values to bounds",
-            (value, defaultVal, minVal, maxVal) => {
-                const result = safeInteger(value, defaultVal, minVal, maxVal);
+        ])("should clamp values to bounds", (
+            value,
+            defaultVal,
+            minVal,
+            maxVal
+        ) => {
+            const result = safeInteger(value, defaultVal, minVal, maxVal);
 
-                if (value < minVal) {
-                    expect(result).toBe(minVal);
-                } else if (value > maxVal) {
-                    expect(result).toBe(maxVal);
-                } else {
-                    expect(result).toBe(value);
-                }
+            if (value < minVal) {
+                expect(result).toBe(minVal);
+            } else if (value > maxVal) {
+                expect(result).toBe(maxVal);
+            } else {
+                expect(result).toBe(value);
             }
-        );
+        });
     });
 
     describe("validateMonitorType function", () => {
@@ -690,21 +693,18 @@ describe("Validation Utils Property-Based Tests", () => {
                     }
                 )
             ),
-        ])(
-            "should return no errors for valid basic monitor data",
-            (monitor) => {
-                const errors = getMonitorValidationErrors(monitor);
-                expect(Array.isArray(errors)).toBeTruthy();
+        ])("should return no errors for valid basic monitor data", (
+            monitor
+        ) => {
+            const errors = getMonitorValidationErrors(monitor);
+            expect(Array.isArray(errors)).toBeTruthy();
 
-                // Should not have basic field errors
-                expect(
-                    errors.some((e) => e.includes("is required"))
-                ).toBeFalsy();
-                expect(
-                    errors.some((e) => e.includes("Invalid monitor"))
-                ).toBeFalsy();
-            }
-        );
+            // Should not have basic field errors
+            expect(errors.some((e) => e.includes("is required"))).toBeFalsy();
+            expect(
+                errors.some((e) => e.includes("Invalid monitor"))
+            ).toBeFalsy();
+        });
 
         fcTest.prop([
             fc
@@ -793,16 +793,15 @@ describe("Validation Utils Property-Based Tests", () => {
                 fc.string({ maxLength: 0 }),
                 fc.constantFrom("   ", "\t\t", "\n\n")
             ),
-        ])(
-            "should handle empty/null/whitespace inputs consistently",
-            (emptyInput) => {
-                // All validation functions should handle empty inputs gracefully
-                expect(isNonEmptyString(emptyInput)).toBeFalsy();
-                expect(isValidFQDN(emptyInput)).toBeFalsy();
-                expect(isValidIdentifier(emptyInput)).toBeFalsy();
-                expect(isValidUrl(emptyInput)).toBeFalsy();
-            }
-        );
+        ])("should handle empty/null/whitespace inputs consistently", (
+            emptyInput
+        ) => {
+            // All validation functions should handle empty inputs gracefully
+            expect(isNonEmptyString(emptyInput)).toBeFalsy();
+            expect(isValidFQDN(emptyInput)).toBeFalsy();
+            expect(isValidIdentifier(emptyInput)).toBeFalsy();
+            expect(isValidUrl(emptyInput)).toBeFalsy();
+        });
 
         fcTest.prop([fc.string({ minLength: 1000, maxLength: 2000 })])(
             "should handle very long strings",

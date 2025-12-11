@@ -242,9 +242,8 @@ export namespace EventHandlers {
      * @public
      */
     export type ChangeWithEvent<
-        TElement extends
-            | HTMLInputElement
-            | HTMLSelectElement = HTMLInputElement,
+        TElement extends HTMLInputElement | HTMLSelectElement =
+            HTMLInputElement,
     > = ChangeWithEventHandler<TElement>;
 
     /**
@@ -316,7 +315,8 @@ export type KeyPressHandler<TElement extends HTMLElement = HTMLElement> = (
  * @public
  */
 export interface StandardButtonProperties
-    extends AccessibilityProperties,
+    extends
+        AccessibilityProperties,
         CoreComponentProperties,
         IconProperties,
         StateProperties,
@@ -339,7 +339,8 @@ export interface StandardButtonProperties
  * @public
  */
 export interface StandardInputProperties
-    extends AccessibilityProperties,
+    extends
+        AccessibilityProperties,
         CoreComponentProperties,
         FormFieldBaseProperties {
     /** Blur event handler */
@@ -366,7 +367,8 @@ export interface StandardInputProperties
  * @public
  */
 export interface StandardSelectProperties
-    extends AccessibilityProperties,
+    extends
+        AccessibilityProperties,
         CoreComponentProperties,
         FormFieldBaseProperties {
     /** Whether multiple selections are allowed */
@@ -407,8 +409,7 @@ export interface SelectOption {
  * @public
  */
 export interface StandardCheckableProperties
-    extends AccessibilityProperties,
-        CoreComponentProperties {
+    extends AccessibilityProperties, CoreComponentProperties {
     /** Whether the input is checked */
     readonly checked: boolean;
     /** Unique identifier for the input */
@@ -433,7 +434,8 @@ export interface StandardCheckableProperties
  * @public
  */
 export interface StandardContainerProperties
-    extends AccessibilityProperties,
+    extends
+        AccessibilityProperties,
         CoreComponentProperties,
         StylingProperties {
     /** Whether the container has border styling */
@@ -456,8 +458,7 @@ export interface StandardContainerProperties
  * @public
  */
 export interface StandardModalProperties
-    extends AccessibilityProperties,
-        CoreComponentProperties {
+    extends AccessibilityProperties, CoreComponentProperties {
     /** Whether pressing escape closes the modal */
     readonly closeOnEscape?: boolean;
     /** Whether clicking outside closes the modal */
@@ -482,8 +483,7 @@ export interface StandardModalProperties
  * @public
  */
 export interface StandardDataDisplayProperties<TItem>
-    extends AccessibilityProperties,
-        CoreComponentProperties {
+    extends AccessibilityProperties, CoreComponentProperties {
     /** Optional empty state content */
     readonly emptyContent?: ReactNode;
     /** Error state content */

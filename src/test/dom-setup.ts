@@ -88,102 +88,100 @@ beforeAll(() => {
     });
 
     // Mock IntersectionObserver for component visibility testing
-    globalThis.IntersectionObserver = class MockIntersectionObserver
-        implements IntersectionObserver
-    {
-        private readonly callback: IntersectionObserverCallback;
+    globalThis.IntersectionObserver =
+        class MockIntersectionObserver implements IntersectionObserver {
+            private readonly callback: IntersectionObserverCallback;
 
-        public readonly root: Element | Document | null;
+            public readonly root: Element | Document | null;
 
-        public readonly rootMargin: string;
+            public readonly rootMargin: string;
 
-        public readonly thresholds: readonly number[];
+            public readonly thresholds: readonly number[];
 
-        public constructor(
-            callback: IntersectionObserverCallback = NOOP_INTERSECTION_OBSERVER_CALLBACK,
-            options: IntersectionObserverInit = {}
-        ) {
-            this.callback = callback;
-            this.root = options.root ?? null;
-            this.rootMargin = options.rootMargin ?? "";
-            const threshold = options.threshold;
-            if (Array.isArray(threshold)) {
-                this.thresholds = Object.freeze(Array.from(threshold));
-            } else if (typeof threshold === "number") {
-                this.thresholds = Object.freeze([threshold]);
-            } else {
-                this.thresholds = Object.freeze([]);
+            public constructor(
+                callback: IntersectionObserverCallback = NOOP_INTERSECTION_OBSERVER_CALLBACK,
+                options: IntersectionObserverInit = {}
+            ) {
+                this.callback = callback;
+                this.root = options.root ?? null;
+                this.rootMargin = options.rootMargin ?? "";
+                const threshold = options.threshold;
+                if (Array.isArray(threshold)) {
+                    this.thresholds = Object.freeze(Array.from(threshold));
+                } else if (typeof threshold === "number") {
+                    this.thresholds = Object.freeze([threshold]);
+                } else {
+                    this.thresholds = Object.freeze([]);
+                }
             }
-        }
 
-        public disconnect(): void {
-            // no-op
-        }
+            public disconnect(): void {
+                // no-op
+            }
 
-        public observe(target: Element): void {
-            this.callback(
-                [
-                    {
-                        boundingClientRect: target.getBoundingClientRect(),
-                        intersectionRatio: 0,
-                        intersectionRect: target.getBoundingClientRect(),
-                        isIntersecting: false,
-                        rootBounds: null,
-                        target,
-                        time: performance.now(),
-                    },
-                ],
-                this
-            );
-        }
+            public observe(target: Element): void {
+                this.callback(
+                    [
+                        {
+                            boundingClientRect: target.getBoundingClientRect(),
+                            intersectionRatio: 0,
+                            intersectionRect: target.getBoundingClientRect(),
+                            isIntersecting: false,
+                            rootBounds: null,
+                            target,
+                            time: performance.now(),
+                        },
+                    ],
+                    this
+                );
+            }
 
-        public takeRecords(): IntersectionObserverEntry[] {
-            return [];
-        }
+            public takeRecords(): IntersectionObserverEntry[] {
+                return [];
+            }
 
-        public unobserve(_target: Element): void {
-            // no-op
-        }
-    } as unknown as typeof IntersectionObserver;
+            public unobserve(_target: Element): void {
+                // no-op
+            }
+        } as unknown as typeof IntersectionObserver;
 
     // Mock ResizeObserver for responsive component testing
-    globalThis.ResizeObserver = class MockResizeObserver
-        implements ResizeObserver
-    {
-        private readonly callback: ResizeObserverCallback;
+    globalThis.ResizeObserver =
+        class MockResizeObserver implements ResizeObserver {
+            private readonly callback: ResizeObserverCallback;
 
-        public constructor(
-            callback: ResizeObserverCallback = NOOP_RESIZE_OBSERVER_CALLBACK
-        ) {
-            this.callback = callback;
-        }
+            public constructor(
+                callback: ResizeObserverCallback = NOOP_RESIZE_OBSERVER_CALLBACK
+            ) {
+                this.callback = callback;
+            }
 
-        public disconnect(): void {
-            // no-op
-        }
+            public disconnect(): void {
+                // no-op
+            }
 
-        public observe(
-            target: Element,
-            _options?: ResizeObserverOptions
-        ): void {
-            this.callback(
-                [
-                    {
-                        borderBoxSize: [],
-                        contentBoxSize: [],
-                        contentRect: target.getBoundingClientRect(),
-                        devicePixelContentBoxSize: [],
-                        target,
-                    },
-                ],
-                this
-            );
-        }
+            public observe(
+                target: Element,
+                _options?: ResizeObserverOptions
+            ): void {
+                this.callback(
+                    [
+                        {
+                            borderBoxSize: [],
+                            contentBoxSize: [],
+                            contentRect: target.getBoundingClientRect(),
+                            devicePixelContentBoxSize: [],
+                            target,
+                        },
+                    ],
+                    this
+                );
+            }
 
-        public unobserve(_target: Element): void {
-            // no-op
-        }
-    } as unknown as typeof ResizeObserver;
+            public unobserve(_target: Element): void {
+                // no-op
+            }
+        } as unknown as typeof ResizeObserver;
 
     // Mock requestIdleCallback for performance testing
     globalThis.requestIdleCallback = (
@@ -349,17 +347,18 @@ beforeAll(() => {
             }
         );
 
-        public readonly readAsText: FileReader["readAsText"] = vi.fn(
-            async (blob: Blob, encoding = "utf8") => {
-                this.readyState = MockFileReader.LOADING;
-                this.emitProgressEvent("loadstart");
-                const buffer = await blob.arrayBuffer();
-                this.result = new TextDecoder(encoding).decode(buffer);
-                this.readyState = MockFileReader.DONE;
-                this.emitProgressEvent("load");
-                this.emitProgressEvent("loadend");
-            }
-        );
+        public readonly readAsText: FileReader["readAsText"] = vi.fn(async (
+            blob: Blob,
+            encoding = "utf8"
+        ) => {
+            this.readyState = MockFileReader.LOADING;
+            this.emitProgressEvent("loadstart");
+            const buffer = await blob.arrayBuffer();
+            this.result = new TextDecoder(encoding).decode(buffer);
+            this.readyState = MockFileReader.DONE;
+            this.emitProgressEvent("load");
+            this.emitProgressEvent("loadend");
+        });
 
         private emitProgressEvent(
             type: "abort" | "load" | "loadend" | "loadstart"

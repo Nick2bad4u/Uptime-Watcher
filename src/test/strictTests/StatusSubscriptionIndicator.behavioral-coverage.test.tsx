@@ -103,8 +103,7 @@ const deriveStatusSubscriptionHealthMock = vi.hoisted(() =>
         (
             summary: StatusUpdateSubscriptionSummary | undefined
         ) => typeof healthState.value
-    >(() => healthState.value)
-);
+    >(() => healthState.value));
 
 vi.mock("../../hooks/useStatusSubscriptionHealth", () => ({
     deriveStatusSubscriptionHealth: (
@@ -127,8 +126,7 @@ const createSummary = (
 
 const siteStoreState = vi.hoisted(() => ({
     retryStatusSubscription: vi.fn(async () =>
-        createSummary({ expectedListeners: 3, listenersAttached: 2 })
-    ),
+        createSummary({ expectedListeners: 3, listenersAttached: 2 })),
     summary: undefined as StatusUpdateSubscriptionSummary | undefined,
 }));
 
@@ -278,8 +276,7 @@ describe("StatusSubscriptionIndicator coverage", () => {
         fireEvent.click(retryButtonsCollection[0]!);
 
         await waitFor(() =>
-            expect(siteStoreState.retryStatusSubscription).toHaveBeenCalled()
-        );
+            expect(siteStoreState.retryStatusSubscription).toHaveBeenCalled());
 
         expect(
             screen.getByText("Last retry attached 3/3 channels.")

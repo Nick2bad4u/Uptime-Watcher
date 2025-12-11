@@ -378,8 +378,7 @@ describe("Bulk Transaction Performance Benchmarks", () => {
                         responseTime: Math.floor(Math.random() * 1000),
                         lastChecked: new Date(),
                     },
-                ])
-            );
+                ]));
 
             await Promise.all(promises);
         });
@@ -442,8 +441,7 @@ describe("Bulk Transaction Performance Benchmarks", () => {
 
                 // Generate history for each monitor
                 const allHistory = monitors.flatMap((monitor) =>
-                    generateStatusHistory(100)
-                );
+                    generateStatusHistory(100));
 
                 // Simulate statistics calculation
                 const stats = allHistory.reduce(
@@ -466,11 +464,9 @@ describe("Bulk Transaction Performance Benchmarks", () => {
         bench("Data export: Serialize all site data", async () => {
             const sites = generateSites(100);
             const allMonitors = sites.flatMap((site) =>
-                generateMonitors(10, site.identifier)
-            );
+                generateMonitors(10, site.identifier));
             const allHistory = allMonitors.flatMap((monitor) =>
-                generateStatusHistory(50)
-            );
+                generateStatusHistory(50));
 
             // Simulate JSON serialization
             const exportData = {
@@ -483,8 +479,7 @@ describe("Bulk Transaction Performance Benchmarks", () => {
             // Simulate serialization time
             const jsonData = JSON.stringify(exportData);
             await new Promise((resolve) =>
-                setTimeout(resolve, jsonData.length / 100_000)
-            ); // Simulate based on size
+                setTimeout(resolve, jsonData.length / 100_000)); // Simulate based on size
         });
     });
 });

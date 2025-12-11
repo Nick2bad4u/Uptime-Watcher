@@ -675,29 +675,29 @@ describe("Updater Service Benchmarks", () => {
             {} as Record<string, InstallationProgress[]>
         );
 
-        const installationStats = Object.values(installationGroups).map(
-            (progressList) => {
-                const lastProgress = progressList.at(-1);
-                const success =
-                    !lastProgress.error && lastProgress.progress >= 0.95;
-                const totalDuration =
-                    lastProgress.currentTime - progressList[0].startTime;
-                const phases = Array.from(
-                    new Set(progressList.map((p) => p.phase))
-                );
+        const installationStats = Object.values(installationGroups).map((
+            progressList
+        ) => {
+            const lastProgress = progressList.at(-1);
+            const success =
+                !lastProgress.error && lastProgress.progress >= 0.95;
+            const totalDuration =
+                lastProgress.currentTime - progressList[0].startTime;
+            const phases = Array.from(
+                new Set(progressList.map((p) => p.phase))
+            );
 
-                return {
-                    installId: lastProgress.installId,
-                    success,
-                    totalDuration,
-                    phases: phases.length,
-                    backupCreated: lastProgress.backupCreated,
-                    rollbackAvailable: lastProgress.rollbackAvailable,
-                    finalProgress: lastProgress.progress,
-                    error: lastProgress.error,
-                };
-            }
-        );
+            return {
+                installId: lastProgress.installId,
+                success,
+                totalDuration,
+                phases: phases.length,
+                backupCreated: lastProgress.backupCreated,
+                rollbackAvailable: lastProgress.rollbackAvailable,
+                finalProgress: lastProgress.progress,
+                error: lastProgress.error,
+            };
+        });
 
         const successfulInstallations = installationStats.filter(
             (s) => s.success

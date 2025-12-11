@@ -267,8 +267,7 @@ export class MonitorRepository {
                 this.databaseService.executeTransaction((db) =>
                     Promise.resolve(
                         this.createInternal(db, siteIdentifier, monitor)
-                    )
-                ),
+                    )),
             "monitor-create",
             undefined,
             { siteIdentifier, type: monitor.type }

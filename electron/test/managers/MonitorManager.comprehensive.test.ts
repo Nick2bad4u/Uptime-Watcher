@@ -120,11 +120,11 @@ describe("MonitorManager - Comprehensive Coverage", () => {
 
         mockDependencies = {
             databaseService: {
-                executeTransaction: vi.fn(
-                    async (fn: (db: unknown) => Promise<void>) => {
-                        await fn({});
-                    }
-                ),
+                executeTransaction: vi.fn(async (
+                    fn: (db: unknown) => Promise<void>
+                ) => {
+                    await fn({});
+                }),
                 getDatabase: vi.fn(() => ({})),
             },
             eventEmitter: {
@@ -136,17 +136,16 @@ describe("MonitorManager - Comprehensive Coverage", () => {
                 history: {},
                 monitor: {
                     updateInternal: vi.fn(),
-                    createTransactionAdapter: vi
-                        .fn()
-                        .mockImplementation((db: unknown) => ({
-                            update: vi.fn((id: string, changes: unknown) =>
-                                mockDependencies.repositories.monitor.updateInternal(
-                                    db,
-                                    id,
-                                    changes
-                                )
-                            ),
-                        })),
+                    createTransactionAdapter: vi.fn().mockImplementation((
+                        db: unknown
+                    ) => ({
+                        update: vi.fn((id: string, changes: unknown) =>
+                            mockDependencies.repositories.monitor.updateInternal(
+                                db,
+                                id,
+                                changes
+                            )),
+                    })),
                 },
                 site: {},
             },
@@ -1013,9 +1012,8 @@ describe("MonitorManager - Comprehensive Coverage", () => {
             new MonitorManager(mockDependencies, testEnhancedServices); // Don't need to store reference
 
             // Simulate a scheduled check by getting the callback and calling it
-            const MonitorSchedulerMock = await import(
-                "../../services/monitoring/MonitorScheduler"
-            );
+            const MonitorSchedulerMock =
+                await import("../../services/monitoring/MonitorScheduler");
             const scheduleInstance =
                 new MonitorSchedulerMock.MonitorScheduler();
 

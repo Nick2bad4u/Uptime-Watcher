@@ -288,14 +288,16 @@ describe("HttpMonitor - Comprehensive Coverage", () => {
             await annotate("Type: Error Handling", "type");
 
             expect(() =>
-                httpMonitor.updateConfig({ timeout: -1000 })
-            ).toThrowError("Invalid timeout: must be a positive number");
+                httpMonitor.updateConfig({ timeout: -1000 })).toThrowError(
+                "Invalid timeout: must be a positive number"
+            );
             expect(() => httpMonitor.updateConfig({ timeout: 0 })).toThrowError(
                 "Invalid timeout: must be a positive number"
             );
             expect(() =>
-                httpMonitor.updateConfig({ timeout: "invalid" as any })
-            ).toThrowError("Invalid timeout: must be a positive number");
+                httpMonitor.updateConfig({
+                    timeout: "invalid" as any,
+                })).toThrowError("Invalid timeout: must be a positive number");
         });
 
         it("should throw error for invalid userAgent", async ({
@@ -308,8 +310,9 @@ describe("HttpMonitor - Comprehensive Coverage", () => {
             await annotate("Type: Error Handling", "type");
 
             expect(() =>
-                httpMonitor.updateConfig({ userAgent: 123 as any })
-            ).toThrowError("Invalid userAgent: must be a string");
+                httpMonitor.updateConfig({
+                    userAgent: 123 as any,
+                })).toThrowError("Invalid userAgent: must be a string");
         });
     });
 
@@ -350,9 +353,7 @@ describe("HttpMonitor - Comprehensive Coverage", () => {
             await annotate("Type: Error Handling", "type");
 
             const { validateMonitorUrl, createMonitorErrorResult } = vi.mocked(
-                await import(
-                    "../../../services/monitoring/shared/monitorServiceHelpers"
-                )
+                await import("../../../services/monitoring/shared/monitorServiceHelpers")
             );
 
             validateMonitorUrl.mockReturnValue("Invalid URL");
@@ -396,9 +397,7 @@ describe("HttpMonitor - Comprehensive Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             const { createMonitorConfig, validateMonitorUrl } = vi.mocked(
-                await import(
-                    "../../../services/monitoring/shared/monitorServiceHelpers"
-                )
+                await import("../../../services/monitoring/shared/monitorServiceHelpers")
             );
             const { withOperationalHooks: mockWithHooks } = vi.mocked(
                 await import("../../../utils/operationalHooks")
@@ -449,9 +448,7 @@ describe("HttpMonitor - Comprehensive Coverage", () => {
             await annotate("Type: Error Handling", "type");
 
             const { createMonitorConfig, validateMonitorUrl } = vi.mocked(
-                await import(
-                    "../../../services/monitoring/shared/monitorServiceHelpers"
-                )
+                await import("../../../services/monitoring/shared/monitorServiceHelpers")
             );
             const { withOperationalHooks: mockWithHooks } = vi.mocked(
                 await import("../../../utils/operationalHooks")
@@ -512,9 +509,7 @@ describe("HttpMonitor - Comprehensive Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             const { determineMonitorStatus } = vi.mocked(
-                await import(
-                    "../../../services/monitoring/utils/httpStatusUtils"
-                )
+                await import("../../../services/monitoring/utils/httpStatusUtils")
             );
 
             const mockResponse: AxiosResponse = {
@@ -560,9 +555,7 @@ describe("HttpMonitor - Comprehensive Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             const { determineMonitorStatus } = vi.mocked(
-                await import(
-                    "../../../services/monitoring/utils/httpStatusUtils"
-                )
+                await import("../../../services/monitoring/utils/httpStatusUtils")
             );
 
             const mockResponse: AxiosResponse = {
@@ -594,9 +587,7 @@ describe("HttpMonitor - Comprehensive Coverage", () => {
             await annotate("Type: Error Handling", "type");
 
             const { determineMonitorStatus } = vi.mocked(
-                await import(
-                    "../../../services/monitoring/utils/httpStatusUtils"
-                )
+                await import("../../../services/monitoring/utils/httpStatusUtils")
             );
 
             const mockResponse: AxiosResponse = {
@@ -638,9 +629,7 @@ describe("HttpMonitor - Comprehensive Coverage", () => {
             const { isDev } = vi.mocked(await import("../../../electronUtils"));
             const { logger } = vi.mocked(await import("../../../utils/logger"));
             const { determineMonitorStatus } = vi.mocked(
-                await import(
-                    "../../../services/monitoring/utils/httpStatusUtils"
-                )
+                await import("../../../services/monitoring/utils/httpStatusUtils")
             );
             const { interpolateLogTemplate, LOG_TEMPLATES } = vi.mocked(
                 await import("@shared/utils/logTemplates")
@@ -692,9 +681,7 @@ describe("HttpMonitor - Comprehensive Coverage", () => {
             const { isDev } = vi.mocked(await import("../../../electronUtils"));
             const { logger } = vi.mocked(await import("../../../utils/logger"));
             const { determineMonitorStatus } = vi.mocked(
-                await import(
-                    "../../../services/monitoring/utils/httpStatusUtils"
-                )
+                await import("../../../services/monitoring/utils/httpStatusUtils")
             );
 
             isDev.mockReturnValue(false);
@@ -730,17 +717,13 @@ describe("HttpMonitor - Comprehensive Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             const { createMonitorConfig, validateMonitorUrl } = vi.mocked(
-                await import(
-                    "../../../services/monitoring/shared/monitorServiceHelpers"
-                )
+                await import("../../../services/monitoring/shared/monitorServiceHelpers")
             );
             const { withOperationalHooks: mockWithHooks } = vi.mocked(
                 await import("../../../utils/operationalHooks")
             );
             const { determineMonitorStatus } = vi.mocked(
-                await import(
-                    "../../../services/monitoring/utils/httpStatusUtils"
-                )
+                await import("../../../services/monitoring/utils/httpStatusUtils")
             );
 
             validateMonitorUrl.mockReturnValue(null);

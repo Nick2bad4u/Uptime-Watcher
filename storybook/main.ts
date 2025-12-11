@@ -101,19 +101,17 @@ const config: StorybookConfig = {
             return [plugins];
         };
 
-        const preservedPlugins = toArray(existingConfig.plugins).filter(
-            (plugin) => {
-                if (!plugin || typeof plugin !== "object") {
-                    return Boolean(plugin);
-                }
-
-                const name = "name" in plugin ? plugin.name : undefined;
-
-                return (
-                    name !== "vite:react-babel" && name !== "vite:react-refresh"
-                );
+        const preservedPlugins = toArray(existingConfig.plugins).filter((
+            plugin
+        ) => {
+            if (!plugin || typeof plugin !== "object") {
+                return Boolean(plugin);
             }
-        );
+
+            const name = "name" in plugin ? plugin.name : undefined;
+
+            return name !== "vite:react-babel" && name !== "vite:react-refresh";
+        });
 
         const reactPluginOptions = createStorybookReactPluginOptions();
 
@@ -126,8 +124,7 @@ const config: StorybookConfig = {
                 .map((plugin) =>
                     plugin && typeof plugin === "object" && "name" in plugin
                         ? (plugin.name as string | undefined)
-                        : undefined
-                )
+                        : undefined)
                 .filter((name): name is string => typeof name === "string")
         );
 

@@ -380,8 +380,7 @@ describe("Service Container Benchmarks", () => {
                         memoryUsage: memoryAllocated,
                         state: "active",
                         dependencies: serviceInstances.filter((si) =>
-                            targetService.dependencies.includes(si.serviceId)
-                        ),
+                            targetService.dependencies.includes(si.serviceId)),
                         children: [],
                     };
 

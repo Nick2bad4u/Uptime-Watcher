@@ -45,14 +45,20 @@ describe("Logger Utilities", () => {
                 // These tests verify the logger can be called without throwing errors
                 expect(() => logger.debug("Debug message")).not.toThrowError();
                 expect(() =>
-                    logger.info("Info message", { key: "value" })
-                ).not.toThrowError();
+                    logger.info("Info message", {
+                        key: "value",
+                    })).not.toThrowError();
                 expect(() =>
-                    logger.warn("Warning message", "extra", 123)
-                ).not.toThrowError();
+                    logger.warn(
+                        "Warning message",
+                        "extra",
+                        123
+                    )).not.toThrowError();
                 expect(() =>
-                    logger.error("Error message", new Error("test"))
-                ).not.toThrowError();
+                    logger.error(
+                        "Error message",
+                        new Error("test")
+                    )).not.toThrowError();
             });
 
             it("should handle Error objects in error method", async ({
@@ -68,8 +74,7 @@ describe("Logger Utilities", () => {
                 error.stack = "Error stack trace";
 
                 expect(() =>
-                    logger.error("Error occurred", error)
-                ).not.toThrowError();
+                    logger.error("Error occurred", error)).not.toThrowError();
             });
 
             it("should handle non-Error objects in error method", async ({
@@ -84,8 +89,10 @@ describe("Logger Utilities", () => {
                 const errorObject = { code: 500, message: "Server error" };
 
                 expect(() =>
-                    logger.error("Custom error", errorObject)
-                ).not.toThrowError();
+                    logger.error(
+                        "Custom error",
+                        errorObject
+                    )).not.toThrowError();
             });
 
             it("should handle edge cases", async ({ task, annotate }) => {
@@ -97,11 +104,12 @@ describe("Logger Utilities", () => {
                 expect(() => logger.info("")).not.toThrowError();
                 expect(() => logger.debug("Just message")).not.toThrowError();
                 expect(() =>
-                    logger.error("Null error", null)
-                ).not.toThrowError();
+                    logger.error("Null error", null)).not.toThrowError();
                 expect(() =>
-                    logger.error("Undefined error", undefined)
-                ).not.toThrowError();
+                    logger.error(
+                        "Undefined error",
+                        undefined
+                    )).not.toThrowError();
             });
         });
 
@@ -134,24 +142,23 @@ describe("Logger Utilities", () => {
                 expect(() =>
                     dbLogger.debug("Executing query", {
                         sql: "SELECT * FROM users",
-                    })
-                ).not.toThrowError();
+                    })).not.toThrowError();
                 expect(() =>
                     dbLogger.info("Database migration completed", {
                         version: "1.2.0",
-                    })
-                ).not.toThrowError();
+                    })).not.toThrowError();
                 expect(() =>
                     dbLogger.warn("Connection pool low", {
                         available: 2,
                         total: 10,
-                    })
-                ).not.toThrowError();
+                    })).not.toThrowError();
 
                 const dbError = new Error("Connection timeout");
                 expect(() =>
-                    dbLogger.error("Database connection failed", dbError)
-                ).not.toThrowError();
+                    dbLogger.error(
+                        "Database connection failed",
+                        dbError
+                    )).not.toThrowError();
             });
         });
 
@@ -185,24 +192,23 @@ describe("Logger Utilities", () => {
                     monitorLogger.debug("Response time recorded", {
                         time: 245,
                         url: "https://example.com",
-                    })
-                ).not.toThrowError();
+                    })).not.toThrowError();
                 expect(() =>
                     monitorLogger.info("Monitor check started", {
                         siteIdentifier: "abc123",
-                    })
-                ).not.toThrowError();
+                    })).not.toThrowError();
                 expect(() =>
                     monitorLogger.warn("High response time detected", {
                         responseTime: 5000,
                         threshold: 3000,
-                    })
-                ).not.toThrowError();
+                    })).not.toThrowError();
 
                 const timeoutError = new Error("Request timeout");
                 expect(() =>
-                    monitorLogger.error("Monitor check failed", timeoutError)
-                ).not.toThrowError();
+                    monitorLogger.error(
+                        "Monitor check failed",
+                        timeoutError
+                    )).not.toThrowError();
             });
         });
 

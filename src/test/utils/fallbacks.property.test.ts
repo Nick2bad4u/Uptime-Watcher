@@ -397,23 +397,22 @@ describe("Fallback Utils Property-Based Tests", () => {
 
         it("should return fallback value when operation throws", () => {
             fc.assert(
-                fc.property(
-                    fc.string(),
-                    fc.string(),
-                    fc.string(),
-                    (operationName, errorMessage, fallbackValue) => {
-                        const failingOperation = () => {
-                            throw new Error(errorMessage);
-                        };
+                fc.property(fc.string(), fc.string(), fc.string(), (
+                    operationName,
+                    errorMessage,
+                    fallbackValue
+                ) => {
+                    const failingOperation = () => {
+                        throw new Error(errorMessage);
+                    };
 
-                        const result = withSyncErrorHandling(
-                            failingOperation,
-                            operationName,
-                            fallbackValue
-                        );
-                        expect(result).toBe(fallbackValue);
-                    }
-                )
+                    const result = withSyncErrorHandling(
+                        failingOperation,
+                        operationName,
+                        fallbackValue
+                    );
+                    expect(result).toBe(fallbackValue);
+                })
             );
         });
 
@@ -458,32 +457,31 @@ describe("Fallback Utils Property-Based Tests", () => {
 
         it("should preserve type consistency between success and fallback", () => {
             fc.assert(
-                fc.property(
-                    fc.integer(),
-                    fc.integer(),
-                    (successValue, fallbackValue) => {
-                        const successOp = () => successValue;
-                        const failOp = () => {
-                            throw new Error("fail");
-                        };
+                fc.property(fc.integer(), fc.integer(), (
+                    successValue,
+                    fallbackValue
+                ) => {
+                    const successOp = () => successValue;
+                    const failOp = () => {
+                        throw new Error("fail");
+                    };
 
-                        const successResult = withSyncErrorHandling(
-                            successOp,
-                            "success",
-                            fallbackValue
-                        );
-                        const failResult = withSyncErrorHandling(
-                            failOp,
-                            "fail",
-                            fallbackValue
-                        );
+                    const successResult = withSyncErrorHandling(
+                        successOp,
+                        "success",
+                        fallbackValue
+                    );
+                    const failResult = withSyncErrorHandling(
+                        failOp,
+                        "fail",
+                        fallbackValue
+                    );
 
-                        expect(typeof successResult).toBe(typeof fallbackValue);
-                        expect(typeof failResult).toBe(typeof fallbackValue);
-                        expect(successResult).toBe(successValue);
-                        expect(failResult).toBe(fallbackValue);
-                    }
-                )
+                    expect(typeof successResult).toBe(typeof fallbackValue);
+                    expect(typeof failResult).toBe(typeof fallbackValue);
+                    expect(successResult).toBe(successValue);
+                    expect(failResult).toBe(fallbackValue);
+                })
             );
         });
     });
@@ -495,23 +493,22 @@ describe("Fallback Utils Property-Based Tests", () => {
     describe("getMonitorDisplayIdentifier function", () => {
         it("should return URL for HTTP monitors when available", () => {
             fc.assert(
-                fc.property(
-                    fc.webUrl(),
-                    fc.string({ minLength: 1 }),
-                    (url, siteFallback) => {
-                        const monitor = {
-                            id: "1",
-                            type: "http",
-                            status: "up",
-                            url,
-                        } as Monitor;
-                        const result = getMonitorDisplayIdentifier(
-                            monitor,
-                            siteFallback
-                        );
-                        expect(result).toBe(url);
-                    }
-                )
+                fc.property(fc.webUrl(), fc.string({ minLength: 1 }), (
+                    url,
+                    siteFallback
+                ) => {
+                    const monitor = {
+                        id: "1",
+                        type: "http",
+                        status: "up",
+                        url,
+                    } as Monitor;
+                    const result = getMonitorDisplayIdentifier(
+                        monitor,
+                        siteFallback
+                    );
+                    expect(result).toBe(url);
+                })
             );
         });
 
@@ -753,14 +750,13 @@ describe("Fallback Utils Property-Based Tests", () => {
 
         it("should use default maxLength of 50 when not specified", () => {
             fc.assert(
-                fc.property(
-                    fc.string({ minLength: 51, maxLength: 1000 }),
-                    (str) => {
-                        const result = truncateForLogging(str);
-                        expect(result).toHaveLength(50);
-                        expect(result).toBe(str.slice(0, 50));
-                    }
-                )
+                fc.property(fc.string({ minLength: 51, maxLength: 1000 }), (
+                    str
+                ) => {
+                    const result = truncateForLogging(str);
+                    expect(result).toHaveLength(50);
+                    expect(result).toBe(str.slice(0, 50));
+                })
             );
         });
 
@@ -868,11 +864,14 @@ describe("Fallback Utils Property-Based Tests", () => {
                 expect(isNullOrUndefined(input)).toBeTruthy();
                 expect(withFallback(input, "fallback")).toBe("fallback");
                 expect(() =>
-                    getMonitorDisplayIdentifier(input as any, "fallback")
-                ).not.toThrowError();
+                    getMonitorDisplayIdentifier(
+                        input as any,
+                        "fallback"
+                    )).not.toThrowError();
                 expect(() =>
-                    getMonitorTypeDisplayLabel(input as any)
-                ).not.toThrowError();
+                    getMonitorTypeDisplayLabel(
+                        input as any
+                    )).not.toThrowError();
                 // TruncateForLogging returns the original value for falsy inputs (including null)
                 expect(truncateForLogging(input as any)).toBe(input);
             }
@@ -960,17 +959,13 @@ describe("Fallback Utils Property-Based Tests", () => {
                         // Process all monitors and strings
                         const results = {
                             identifiers: monitors.map((m) =>
-                                getMonitorDisplayIdentifier(m, "fallback")
-                            ),
+                                getMonitorDisplayIdentifier(m, "fallback")),
                             types: strings.map((s) =>
-                                getMonitorTypeDisplayLabel(s)
-                            ),
+                                getMonitorTypeDisplayLabel(s)),
                             truncated: strings.map((s) =>
-                                truncateForLogging(s, 30)
-                            ),
+                                truncateForLogging(s, 30)),
                             fallbacks: strings.map((s) =>
-                                withFallback(s, "default")
-                            ),
+                                withFallback(s, "default")),
                         };
 
                         const endTime = Date.now();

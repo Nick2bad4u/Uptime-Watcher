@@ -110,8 +110,7 @@ describe("useTheme Basic Coverage", () => {
         await annotate("Type: Business Logic", "type");
 
         const { result } = renderHook(() =>
-            useThemeValue((theme) => theme.name)
-        );
+            useThemeValue((theme) => theme.name));
 
         expect(typeof result.current).toBe("string");
     });

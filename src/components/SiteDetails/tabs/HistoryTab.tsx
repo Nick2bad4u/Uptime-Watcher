@@ -229,9 +229,16 @@ export const HistoryTab: NamedExoticComponent<HistoryTabProperties> = memo(
         // entry, clamped to the resolved backend limit and the available
         // history length.
         const maxShow = Math.min(backendLimit, historyLength);
-        const showOptions = [10, 25, 50, 100, 250, 500, 1000, 10_000].filter(
-            (opt) => opt <= maxShow
-        );
+        const showOptions = [
+            10,
+            25,
+            50,
+            100,
+            250,
+            500,
+            1000,
+            10_000,
+        ].filter((opt) => opt <= maxShow);
 
         // Always include 'All' if there are fewer than backendLimit
         if (
@@ -333,7 +340,11 @@ export const HistoryTab: NamedExoticComponent<HistoryTabProperties> = memo(
                     totalRecords: historyLength,
                 });
             },
-            [historyLength, selectedMonitor.id, selectedMonitor.type]
+            [
+                historyLength,
+                selectedMonitor.id,
+                selectedMonitor.type,
+            ]
         );
 
         const handleHistoryLimitChange = useCallback(
@@ -350,7 +361,11 @@ export const HistoryTab: NamedExoticComponent<HistoryTabProperties> = memo(
                     totalRecords: historyLength,
                 });
             },
-            [backendLimit, historyLength, selectedMonitor.id]
+            [
+                backendLimit,
+                historyLength,
+                selectedMonitor.id,
+            ]
         );
 
         const filterIcon = useMemo(
@@ -371,7 +386,11 @@ export const HistoryTab: NamedExoticComponent<HistoryTabProperties> = memo(
                     totalRecords: historyLength,
                 });
             },
-            [historyLength, selectedMonitor.id, setHistoryDensity]
+            [
+                historyLength,
+                selectedMonitor.id,
+                setHistoryDensity,
+            ]
         );
 
         const createDensityHandler = useCallback(

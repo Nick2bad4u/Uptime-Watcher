@@ -123,8 +123,7 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
 
                     for (const [key, factory] of Object.entries(builders)) {
                         adapter[key] = vi.fn((...args: unknown[]) =>
-                            factory(db, ...args)
-                        );
+                            factory(db, ...args));
                     }
 
                     return adapter;
@@ -665,8 +664,11 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
                 mockRepositories.monitor.createInternal
             ).toHaveBeenCalledTimes(1);
 
-            const [dbArg, siteIdentifier, createdMonitor] =
-                mockRepositories.monitor.createInternal.mock.calls[0]!;
+            const [
+                dbArg,
+                siteIdentifier,
+                createdMonitor,
+            ] = mockRepositories.monitor.createInternal.mock.calls[0]!;
 
             expect(dbArg).toBe(mockDatabase);
             expect(siteIdentifier).toBe("site-with-low-interval");
@@ -856,15 +858,16 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
                 },
             ];
             const createError = new Error("Monitor creation failed");
-            mockRepositories.monitor.createInternal.mockImplementation(
-                (_db: unknown, siteIdentifier: string) => {
-                    if (siteIdentifier === "site1") {
-                        throw createError;
-                    }
-
-                    return "456";
+            mockRepositories.monitor.createInternal.mockImplementation((
+                _db: unknown,
+                siteIdentifier: string
+            ) => {
+                if (siteIdentifier === "site1") {
+                    throw createError;
                 }
-            );
+
+                return "456";
+            });
 
             (withDatabaseOperation as MockedFunction<any>).mockImplementation(
                 async (operation: any) => await operation()
@@ -1067,28 +1070,29 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             const { safeJsonParse } = await import("@shared/utils/jsonSafety");
 
             // The type guard is passed to safeJsonParse, so we test it indirectly
-            (safeJsonParse as MockedFunction<any>).mockImplementation(
-                (_jsonData: any, guardFunction: any) => {
-                    // Test the type guard with valid data
-                    const validData = {
-                        sites: [{ identifier: "test" }],
-                        settings: {},
-                    };
-                    const invalidData = { notSites: "invalid" };
+            (safeJsonParse as MockedFunction<any>).mockImplementation((
+                _jsonData: any,
+                guardFunction: any
+            ) => {
+                // Test the type guard with valid data
+                const validData = {
+                    sites: [{ identifier: "test" }],
+                    settings: {},
+                };
+                const invalidData = { notSites: "invalid" };
 
-                    expect(guardFunction(validData)).toBeTruthy();
-                    expect(guardFunction(invalidData)).toBeFalsy();
-                    expect(guardFunction(null)).toBeFalsy();
-                    expect(guardFunction("string")).toBeFalsy();
-                    expect(guardFunction({})).toBeFalsy(); // No sites array
+                expect(guardFunction(validData)).toBeTruthy();
+                expect(guardFunction(invalidData)).toBeFalsy();
+                expect(guardFunction(null)).toBeFalsy();
+                expect(guardFunction("string")).toBeFalsy();
+                expect(guardFunction({})).toBeFalsy(); // No sites array
 
-                    return {
-                        success: true,
-                        data: validData,
-                        error: null,
-                    };
-                }
-            );
+                return {
+                    success: true,
+                    data: validData,
+                    error: null,
+                };
+            });
 
             await service.importDataFromJson('{"sites": []}');
 

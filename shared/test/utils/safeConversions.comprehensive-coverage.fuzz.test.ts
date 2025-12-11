@@ -85,14 +85,14 @@ describe("safeConversions comprehensive fuzzing tests", () => {
         test.prop([
             fc.boolean(),
             fc.float({ min: -1000, max: 1000, noNaN: true }),
-        ])(
-            "treats booleans as non-numeric and returns default",
-            (boolInput, defaultValue) => {
-                const result = safeNumberConversion(boolInput, defaultValue);
-                const expected = Number.isNaN(defaultValue) ? 0 : defaultValue;
-                expect(result).toBe(expected);
-            }
-        );
+        ])("treats booleans as non-numeric and returns default", (
+            boolInput,
+            defaultValue
+        ) => {
+            const result = safeNumberConversion(boolInput, defaultValue);
+            const expected = Number.isNaN(defaultValue) ? 0 : defaultValue;
+            expect(result).toBe(expected);
+        });
 
         test("handles special values correctly", () => {
             const defaultValue = 42;
@@ -146,16 +146,16 @@ describe("safeConversions comprehensive fuzzing tests", () => {
         test.prop([
             fc.integer({ min: -1000, max: 999 }),
             fc.integer({ min: 1000, max: 300_000 }),
-        ])(
-            "uses default for intervals below 1000ms",
-            (invalidInterval, defaultValue) => {
-                const result = safeParseCheckInterval(
-                    invalidInterval,
-                    defaultValue
-                );
-                expect(result).toBe(defaultValue);
-            }
-        );
+        ])("uses default for intervals below 1000ms", (
+            invalidInterval,
+            defaultValue
+        ) => {
+            const result = safeParseCheckInterval(
+                invalidInterval,
+                defaultValue
+            );
+            expect(result).toBe(defaultValue);
+        });
 
         test.prop([fc.integer({ min: 300_001, max: 2_000_000 })])(
             // no upper bound
@@ -178,27 +178,27 @@ describe("safeConversions comprehensive fuzzing tests", () => {
         test.prop([
             fc.anything(),
             fc.float({ min: -1000, max: 1000, noNaN: true }),
-        ])(
-            "returns valid float or default for any input",
-            (input, defaultValue) => {
-                const result = safeParseFloat(input, defaultValue);
-                expect(typeof result).toBe("number");
-                expect(Number.isNaN(result)).toBeFalsy();
+        ])("returns valid float or default for any input", (
+            input,
+            defaultValue
+        ) => {
+            const result = safeParseFloat(input, defaultValue);
+            expect(typeof result).toBe("number");
+            expect(Number.isNaN(result)).toBeFalsy();
 
-                // SafeParseFloat preserves infinity from numeric inputs but rejects it from strings
-                if (
-                    typeof input === "number" &&
-                    !Number.isFinite(input) &&
-                    !Number.isNaN(input)
-                ) {
-                    // Numeric infinity should be preserved
-                    expect(result).toBe(input);
-                } else {
-                    // All other cases should return finite numbers
-                    expect(Number.isFinite(result)).toBeTruthy();
-                }
+            // SafeParseFloat preserves infinity from numeric inputs but rejects it from strings
+            if (
+                typeof input === "number" &&
+                !Number.isFinite(input) &&
+                !Number.isNaN(input)
+            ) {
+                // Numeric infinity should be preserved
+                expect(result).toBe(input);
+            } else {
+                // All other cases should return finite numbers
+                expect(Number.isFinite(result)).toBeTruthy();
             }
-        );
+        });
 
         test.prop([fc.float({ min: -1000, max: 1000, noNaN: true })])(
             "preserves valid float numbers exactly",
@@ -370,13 +370,13 @@ describe("safeConversions comprehensive fuzzing tests", () => {
         test.prop([
             fc.integer({ min: 65_536, max: 100_000 }),
             fc.integer({ min: 1, max: 65_535 }),
-        ])(
-            "uses default for ports above 65535",
-            (invalidPort, defaultValue) => {
-                const result = safeParsePort(invalidPort, defaultValue);
-                expect(result).toBe(defaultValue);
-            }
-        );
+        ])("uses default for ports above 65535", (
+            invalidPort,
+            defaultValue
+        ) => {
+            const result = safeParsePort(invalidPort, defaultValue);
+            expect(result).toBe(defaultValue);
+        });
 
         test("handles port edge cases", () => {
             const defaultValue = 80;
@@ -411,13 +411,13 @@ describe("safeConversions comprehensive fuzzing tests", () => {
         test.prop([
             fc.integer({ min: -1000, max: 0 }),
             fc.integer({ min: 1, max: 1000 }),
-        ])(
-            "uses default for non-positive values",
-            (nonPositive, defaultValue) => {
-                const result = safeParsePositiveInt(nonPositive, defaultValue);
-                expect(result).toBe(defaultValue);
-            }
-        );
+        ])("uses default for non-positive values", (
+            nonPositive,
+            defaultValue
+        ) => {
+            const result = safeParsePositiveInt(nonPositive, defaultValue);
+            expect(result).toBe(defaultValue);
+        });
 
         test("handles positive integer edge cases", () => {
             expect(safeParsePositiveInt("5", 1)).toBe(5);
@@ -450,30 +450,30 @@ describe("safeConversions comprehensive fuzzing tests", () => {
         test.prop([
             fc.integer({ min: 11, max: 100 }),
             fc.integer({ min: 0, max: 10 }),
-        ])(
-            "uses default for attempts above 10",
-            (invalidAttempts, defaultValue) => {
-                const result = safeParseRetryAttempts(
-                    invalidAttempts,
-                    defaultValue
-                );
-                expect(result).toBe(defaultValue);
-            }
-        );
+        ])("uses default for attempts above 10", (
+            invalidAttempts,
+            defaultValue
+        ) => {
+            const result = safeParseRetryAttempts(
+                invalidAttempts,
+                defaultValue
+            );
+            expect(result).toBe(defaultValue);
+        });
 
         test.prop([
             fc.integer({ min: -100, max: -1 }),
             fc.integer({ min: 0, max: 10 }),
-        ])(
-            "uses default for negative attempts",
-            (negativeAttempts, defaultValue) => {
-                const result = safeParseRetryAttempts(
-                    negativeAttempts,
-                    defaultValue
-                );
-                expect(result).toBe(defaultValue);
-            }
-        );
+        ])("uses default for negative attempts", (
+            negativeAttempts,
+            defaultValue
+        ) => {
+            const result = safeParseRetryAttempts(
+                negativeAttempts,
+                defaultValue
+            );
+            expect(result).toBe(defaultValue);
+        });
 
         test("handles retry attempts edge cases", () => {
             expect(safeParseRetryAttempts("3", 3)).toBe(3);
@@ -505,17 +505,14 @@ describe("safeConversions comprehensive fuzzing tests", () => {
         test.prop([
             fc.float({ min: -1000, max: 0, noNaN: true }),
             fc.float({ min: 1, max: 300_000 }),
-        ])(
-            "uses default for non-positive timeouts",
-            (nonPositive, defaultValue) => {
-                const result = safeParseTimeout(nonPositive, defaultValue);
-                const normalizedDefault = safeParseTimeout(
-                    undefined,
-                    defaultValue
-                );
-                expect(result).toBe(normalizedDefault);
-            }
-        );
+        ])("uses default for non-positive timeouts", (
+            nonPositive,
+            defaultValue
+        ) => {
+            const result = safeParseTimeout(nonPositive, defaultValue);
+            const normalizedDefault = safeParseTimeout(undefined, defaultValue);
+            expect(result).toBe(normalizedDefault);
+        });
 
         test("handles timeout edge cases", () => {
             const defaultValue = 10_000;
@@ -531,18 +528,17 @@ describe("safeConversions comprehensive fuzzing tests", () => {
     });
 
     describe(safeParseTimestamp, () => {
-        test.prop([fc.anything()])(
-            "returns valid timestamp or default",
-            (input) => {
-                const result = safeParseTimestamp(input);
-                expect(typeof result).toBe("number");
-                expect(result).toBeGreaterThan(0);
-                expect(Number.isFinite(result)).toBeTruthy();
+        test.prop([fc.anything()])("returns valid timestamp or default", (
+            input
+        ) => {
+            const result = safeParseTimestamp(input);
+            expect(typeof result).toBe("number");
+            expect(result).toBeGreaterThan(0);
+            expect(Number.isFinite(result)).toBeTruthy();
 
-                // Should not be unreasonably far in the future (more than 1 day)
-                expect(result).toBeLessThanOrEqual(Date.now() + 86_400_000);
-            }
-        );
+            // Should not be unreasonably far in the future (more than 1 day)
+            expect(result).toBeLessThanOrEqual(Date.now() + 86_400_000);
+        });
 
         test.prop([fc.integer({ min: 1, max: Date.now() + 86_400_000 })])(
             "preserves valid timestamps",
@@ -561,13 +557,12 @@ describe("safeConversions comprehensive fuzzing tests", () => {
                 min: Date.now() + 86_400_001,
                 max: Date.now() + 172_800_000,
             }),
-        ])(
-            "uses current time for timestamps too far in future",
-            (futureTimestamp) => {
-                const result = safeParseTimestamp(futureTimestamp);
-                expect(result).toBeLessThanOrEqual(Date.now() + 86_400_000);
-            }
-        );
+        ])("uses current time for timestamps too far in future", (
+            futureTimestamp
+        ) => {
+            const result = safeParseTimestamp(futureTimestamp);
+            expect(result).toBeLessThanOrEqual(Date.now() + 86_400_000);
+        });
 
         test.prop([fc.integer({ min: -1_000_000, max: 0 })])(
             "uses current time for negative timestamps",

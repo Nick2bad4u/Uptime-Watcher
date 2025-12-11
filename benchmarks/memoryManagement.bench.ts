@@ -152,8 +152,7 @@ class MemoryPressureSimulator {
         const bytesPerMB = 1024 * 1024;
         const arraySize = (sizeInMB * bytesPerMB) / 8; // 8 bytes per number
         const largeArray = Array.from({ length: arraySize }, () =>
-            Math.random()
-        );
+            Math.random());
         this.allocatedObjects.push(largeArray);
     }
 
@@ -850,8 +849,7 @@ describe("Memory Usage and Cache Performance Benchmarks", () => {
                 // Process both types
                 smallObjects.forEach((obj) => (obj.processed = true));
                 largeObjects.forEach((obj) =>
-                    obj.data.forEach((item) => (item.processed = true))
-                );
+                    obj.data.forEach((item) => (item.processed = true)));
             },
             { iterations: 20 }
         );

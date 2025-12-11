@@ -402,9 +402,8 @@ describe("middleware.ts - Additional Coverage", () => {
             await annotate("Category: Event System", "category");
             await annotate("Type: Business Logic", "type");
 
-            const { isDevelopment } = await import(
-                "../../../shared/utils/environment"
-            );
+            const { isDevelopment } =
+                await import("../../../shared/utils/environment");
             vi.mocked(isDevelopment).mockReturnValue(true);
 
             const next = vi.fn();

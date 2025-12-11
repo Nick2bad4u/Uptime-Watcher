@@ -186,16 +186,14 @@ class MockSiteListComponent {
 
             if (this.props.filters?.status) {
                 filtered = filtered.filter((site) =>
-                    this.props.filters.status.includes(site.status)
-                );
+                    this.props.filters.status.includes(site.status));
             }
 
             if (this.props.filters?.searchTerm) {
                 filtered = filtered.filter((site) =>
                     site.name
                         .toLowerCase()
-                        .includes(this.props.filters.searchTerm.toLowerCase())
-                );
+                        .includes(this.props.filters.searchTerm.toLowerCase()));
             }
 
             return filtered.toSorted((a, b) => {
@@ -208,20 +206,19 @@ class MockSiteListComponent {
             sortOrder,
         ]);
 
-        const selectSite = this.hookManager.useCallback(
-            (siteIdentifier: string) => {
-                setSelectedSites((prev) => {
-                    const newSet = new Set(prev);
-                    if (newSet.has(siteIdentifier)) {
-                        newSet.delete(siteIdentifier);
-                    } else {
-                        newSet.add(siteIdentifier);
-                    }
-                    return newSet;
-                });
-            },
-            []
-        );
+        const selectSite = this.hookManager.useCallback((
+            siteIdentifier: string
+        ) => {
+            setSelectedSites((prev) => {
+                const newSet = new Set(prev);
+                if (newSet.has(siteIdentifier)) {
+                    newSet.delete(siteIdentifier);
+                } else {
+                    newSet.add(siteIdentifier);
+                }
+                return newSet;
+            });
+        }, []);
 
         const selectAllSites = this.hookManager.useCallback(() => {
             setSelectedSites(new Set(filteredSites.map((site) => site.id)));
@@ -370,27 +367,26 @@ class MockFormComponent {
             Record<string, boolean>
         >({});
 
-        const validateField = this.hookManager.useCallback(
-            (name: string, value: any) => {
-                const fieldErrors: Record<string, string> = {};
+        const validateField = this.hookManager.useCallback((
+            name: string,
+            value: any
+        ) => {
+            const fieldErrors: Record<string, string> = {};
 
-                if (name === "name" && (!value || value.trim().length < 2)) {
-                    fieldErrors.name = "Name must be at least 2 characters";
-                }
+            if (name === "name" && (!value || value.trim().length < 2)) {
+                fieldErrors.name = "Name must be at least 2 characters";
+            }
 
-                if (name === "url" && (!value || !value.startsWith("http"))) {
-                    fieldErrors.url = "URL must start with http:// or https://";
-                }
+            if (name === "url" && (!value || !value.startsWith("http"))) {
+                fieldErrors.url = "URL must start with http:// or https://";
+            }
 
-                if (name === "interval" && (!value || value < 30)) {
-                    fieldErrors.interval =
-                        "Interval must be at least 30 seconds";
-                }
+            if (name === "interval" && (!value || value < 30)) {
+                fieldErrors.interval = "Interval must be at least 30 seconds";
+            }
 
-                return fieldErrors;
-            },
-            []
-        );
+            return fieldErrors;
+        }, []);
 
         const updateField = this.hookManager.useCallback(
             (name: string, value: any) => {

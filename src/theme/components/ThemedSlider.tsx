@@ -51,8 +51,7 @@ const selectSliderAccentColor = (theme: Theme): string =>
  * @public
  */
 export interface ThemedSliderProperties
-    extends AccessibilityProperties,
-        CoreComponentProperties {
+    extends AccessibilityProperties, CoreComponentProperties {
     /** Textual representation for assistive tech */
     readonly "aria-valuetext"?: string;
     /** Optional identifier associated with the range input */

@@ -294,13 +294,11 @@ export function useChartData(monitor: Monitor, theme: Theme): ChartData {
                     pointBackgroundColor: sortedHistory.map((record) =>
                         record.status === "up"
                             ? theme.colors.success
-                            : theme.colors.error
-                    ),
+                            : theme.colors.error),
                     pointBorderColor: sortedHistory.map((record) =>
                         record.status === "up"
                             ? theme.colors.success
-                            : theme.colors.error
-                    ),
+                            : theme.colors.error),
                     pointHoverRadius: 6,
                     pointRadius: 4,
                     tension: 0.1,

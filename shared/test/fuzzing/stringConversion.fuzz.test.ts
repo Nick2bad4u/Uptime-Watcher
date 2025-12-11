@@ -33,38 +33,34 @@ describe("StringConversion - Fast-Check Fuzzing Tests", () => {
             }
         );
 
-        test.prop([fc.string()])(
-            "should return strings unchanged",
-            (stringValue) => {
-                const result = safeStringify(stringValue);
-                expect(result).toBe(stringValue);
-            }
-        );
+        test.prop([fc.string()])("should return strings unchanged", (
+            stringValue
+        ) => {
+            const result = safeStringify(stringValue);
+            expect(result).toBe(stringValue);
+        });
 
-        test.prop([fc.integer()])(
-            "should convert numbers to strings",
-            (num) => {
-                const result = safeStringify(num);
-                expect(result).toBe(num.toString());
-            }
-        );
+        test.prop([fc.integer()])("should convert numbers to strings", (
+            num
+        ) => {
+            const result = safeStringify(num);
+            expect(result).toBe(num.toString());
+        });
 
-        test.prop([fc.boolean()])(
-            "should convert booleans to strings",
-            (bool) => {
-                const result = safeStringify(bool);
-                expect(result).toBe(bool.toString());
-            }
-        );
+        test.prop([fc.boolean()])("should convert booleans to strings", (
+            bool
+        ) => {
+            const result = safeStringify(bool);
+            expect(result).toBe(bool.toString());
+        });
 
-        test.prop([fc.date()])(
-            "should convert dates to ISO strings",
-            (date) => {
-                const result = safeStringify(date);
-                // Dates are handled as objects, JSON stringified with quotes
-                expect(result).toBe(JSON.stringify(date));
-            }
-        );
+        test.prop([fc.date()])("should convert dates to ISO strings", (
+            date
+        ) => {
+            const result = safeStringify(date);
+            // Dates are handled as objects, JSON stringified with quotes
+            expect(result).toBe(JSON.stringify(date));
+        });
 
         // Fuzzing for functions
         test.prop([fc.func(fc.string())])("should handle functions", (func) => {
@@ -94,16 +90,15 @@ describe("StringConversion - Fast-Check Fuzzing Tests", () => {
         });
 
         // Fuzzing for circular references
-        test.prop([fc.string()])(
-            "should handle circular reference objects",
-            (name) => {
-                const obj: any = { name };
-                obj.self = obj; // Create circular reference
+        test.prop([fc.string()])("should handle circular reference objects", (
+            name
+        ) => {
+            const obj: any = { name };
+            obj.self = obj; // Create circular reference
 
-                const result = safeStringify(obj);
-                expect(result).toBe("[Complex Object]");
-            }
-        );
+            const result = safeStringify(obj);
+            expect(result).toBe("[Complex Object]");
+        });
 
         // Fuzzing for symbols
         test.prop([fc.string({ minLength: 1, maxLength: 20 })])(
@@ -142,13 +137,12 @@ describe("StringConversion - Fast-Check Fuzzing Tests", () => {
         );
 
         // Fuzzing for BigInt values
-        test.prop([fc.bigInt()])(
-            "should handle BigInt values",
-            (bigIntValue) => {
-                const result = safeStringify(bigIntValue);
-                expect(result).toBe(bigIntValue.toString());
-            }
-        );
+        test.prop([fc.bigInt()])("should handle BigInt values", (
+            bigIntValue
+        ) => {
+            const result = safeStringify(bigIntValue);
+            expect(result).toBe(bigIntValue.toString());
+        });
 
         // Fuzzing to attempt reaching the default case
         test.prop([fc.string()])(
@@ -234,39 +228,38 @@ describe("StringConversion - Fast-Check Fuzzing Tests", () => {
         });
 
         // Fuzzing with type manipulation to try to reach the default case
-        test.prop([fc.string()])(
-            "should handle type manipulation attempts",
-            (baseValue) => {
-                // Attempt to create values that might have unusual typeof results
-                const manipulatedValues = [
-                    baseValue,
-                    Object.assign(Object.create(null), {
-                        toString: () => baseValue,
-                    }),
-                    new Proxy(
-                        {},
-                        {
-                            get(_target, prop) {
-                                if (
-                                    prop === Symbol.toPrimitive ||
-                                    prop === "valueOf" ||
-                                    prop === "toString"
-                                ) {
-                                    return () => baseValue;
-                                }
-                                return undefined;
-                            },
-                        }
-                    ),
-                ];
+        test.prop([fc.string()])("should handle type manipulation attempts", (
+            baseValue
+        ) => {
+            // Attempt to create values that might have unusual typeof results
+            const manipulatedValues = [
+                baseValue,
+                Object.assign(Object.create(null), {
+                    toString: () => baseValue,
+                }),
+                new Proxy(
+                    {},
+                    {
+                        get(_target, prop) {
+                            if (
+                                prop === Symbol.toPrimitive ||
+                                prop === "valueOf" ||
+                                prop === "toString"
+                            ) {
+                                return () => baseValue;
+                            }
+                            return undefined;
+                        },
+                    }
+                ),
+            ];
 
-                for (const value of manipulatedValues) {
-                    const result = safeStringify(value);
-                    expect(typeof result).toBe("string");
-                    expect(result).toBeDefined();
-                }
+            for (const value of manipulatedValues) {
+                const result = safeStringify(value);
+                expect(typeof result).toBe("string");
+                expect(result).toBeDefined();
             }
-        );
+        });
 
         // Edge case for attempting to reach lines 89-92 (the default case)
         it("should handle the theoretical default case", () => {
@@ -293,22 +286,20 @@ describe("StringConversion - Fast-Check Fuzzing Tests", () => {
             expect(() => safeStringify(value)).not.toThrowError();
         });
 
-        test.prop([fc.anything()])(
-            "should maintain consistent behavior",
-            (value) => {
-                const result1 = safeStringify(value);
-                const result2 = safeStringify(value);
-                expect(result1).toBe(result2);
-            }
-        );
+        test.prop([fc.anything()])("should maintain consistent behavior", (
+            value
+        ) => {
+            const result1 = safeStringify(value);
+            const result2 = safeStringify(value);
+            expect(result1).toBe(result2);
+        });
 
-        test.prop([fc.anything()])(
-            "should handle memory-intensive values",
-            (value) => {
-                // Test with values that might cause memory issues
-                const result = safeStringify(value);
-                expect(result.length).toBeLessThan(1_000_000); // Reasonable size limit
-            }
-        );
+        test.prop([fc.anything()])("should handle memory-intensive values", (
+            value
+        ) => {
+            // Test with values that might cause memory issues
+            const result = safeStringify(value);
+            expect(result.length).toBeLessThan(1_000_000); // Reasonable size limit
+        });
     });
 });

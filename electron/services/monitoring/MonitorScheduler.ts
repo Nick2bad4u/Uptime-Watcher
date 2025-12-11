@@ -591,8 +591,7 @@ export class MonitorScheduler {
         } else {
             // Stop all monitors for this site
             const siteIntervals = Array.from(this.jobs.keys()).filter((key) =>
-                key.startsWith(`${siteIdentifier}|`)
-            );
+                key.startsWith(`${siteIdentifier}|`));
             for (const intervalKey of siteIntervals) {
                 const parsed = this.parseIntervalKey(intervalKey);
                 if (parsed) {

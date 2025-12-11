@@ -523,8 +523,7 @@ describe("Monitor Forms Types Coverage Tests", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
-            const createHandler =
-                <T>(expectedType: string) =>
+            const createHandler = <T>(expectedType: string) =>
                 (fieldName: string, value: T) => ({
                     fieldName,
                     value,

@@ -41,8 +41,7 @@ const mockDatabaseManager = {
             buffer: mockBackupBuffer,
             fileName: "backup.db",
             metadata: { ...mockBackupMetadata },
-        })
-    ),
+        })),
     exportData: vi.fn(() => Promise.resolve('{"sites": []}')),
     importData: vi.fn(() => Promise.resolve(true)),
     initialize: vi.fn(() => Promise.resolve()),
@@ -89,8 +88,7 @@ const mockMonitorManager = {
                     },
                 ],
             },
-        } as StatusUpdate)
-    ),
+        } as StatusUpdate)),
     startMonitoringForSite: vi.fn(() => Promise.resolve(true)),
     stopMonitoringForSite: vi.fn(() => Promise.resolve(true)),
     startMonitoring: vi.fn(() =>
@@ -103,8 +101,7 @@ const mockMonitorManager = {
             succeeded: 2,
             isMonitoring: true,
             alreadyActive: false,
-        } satisfies MonitoringStartSummary)
-    ),
+        } satisfies MonitoringStartSummary)),
     stopMonitoring: vi.fn(() =>
         Promise.resolve({
             attempted: 2,
@@ -115,8 +112,7 @@ const mockMonitorManager = {
             succeeded: 2,
             isMonitoring: false,
             alreadyInactive: false,
-        } satisfies MonitoringStopSummary)
-    ),
+        } satisfies MonitoringStopSummary)),
     isMonitoringActive: vi.fn(() => true),
     getActiveMonitorCount: vi.fn(() => 5),
     isMonitorActiveInScheduler: vi.fn(() => true),
@@ -130,8 +126,7 @@ const mockSiteManager = {
             name: "Test Site",
             monitors: [],
             monitoring: true,
-        } as Site)
-    ),
+        } as Site)),
     removeSite: vi.fn(() => Promise.resolve(true)),
     getSiteFromCache: vi.fn((_identifier?: string) => ({
         identifier: "test-site",
@@ -149,8 +144,7 @@ const mockSiteManager = {
             name: "Updated Site",
             monitors: [],
             monitoring: true,
-        } as Site)
-    ),
+        } as Site)),
     getSites: vi.fn(() => Promise.resolve([])),
     getSitesFromCache: vi.fn(() => [
         {
@@ -170,8 +164,7 @@ const mockSiteManager = {
                 { id: "monitor-2", monitoring: false },
             ] as unknown as Monitor[],
             monitoring: true,
-        } as Site)
-    ),
+        } as Site)),
     initialize: vi.fn(() => Promise.resolve()),
 } as unknown as SiteManager;
 
@@ -296,8 +289,7 @@ describe(UptimeOrchestrator, () => {
                 invalidDependencies
             );
             expect(() =>
-                invalidOrchestrator["validateInitialization"]()
-            ).toThrowError(
+                invalidOrchestrator["validateInitialization"]()).toThrowError(
                 "DatabaseManager not properly initialized - missing initialize method"
             );
         });
@@ -321,8 +313,7 @@ describe(UptimeOrchestrator, () => {
                 invalidDependencies
             );
             expect(() =>
-                invalidOrchestrator["validateInitialization"]()
-            ).toThrowError(
+                invalidOrchestrator["validateInitialization"]()).toThrowError(
                 "SiteManager not properly initialized - missing initialize method"
             );
         });
@@ -346,8 +337,7 @@ describe(UptimeOrchestrator, () => {
                 invalidDependencies
             );
             expect(() =>
-                invalidOrchestrator["validateInitialization"]()
-            ).toThrowError(
+                invalidOrchestrator["validateInitialization"]()).toThrowError(
                 "MonitorManager not properly initialized - missing startMonitoring method"
             );
         });

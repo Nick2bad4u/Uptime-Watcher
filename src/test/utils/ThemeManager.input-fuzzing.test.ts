@@ -297,8 +297,7 @@ describe("ThemeManager Property-Based Tests", () => {
                 mockDocument.documentElement.style.setProperty as any
             ).mock.calls;
             const colorCalls = setPropertyCalls.filter((call: any[]) =>
-                call[0].startsWith("--color-")
-            );
+                call[0].startsWith("--color-"));
             expect(colorCalls.length).toBeGreaterThan(0);
         }
     );
@@ -346,38 +345,38 @@ describe("ThemeManager Property-Based Tests", () => {
             },
             { requiredKeys: [] }
         ),
-    ])(
-        "should create custom themes with proper deep merging",
-        (baseTheme, overrides) => {
-            const customTheme = themeManager.createCustomTheme(
-                baseTheme,
-                // @ts-expect-error - Fuzzing test with intentionally partial theme data for edge case testing
-                overrides
-            );
+    ])("should create custom themes with proper deep merging", (
+        baseTheme,
+        overrides
+    ) => {
+        const customTheme = themeManager.createCustomTheme(
+            baseTheme,
+            // @ts-expect-error - Fuzzing test with intentionally partial theme data for edge case testing
+            overrides
+        );
 
-            // Result should be a complete theme
-            expect(customTheme).toHaveProperty("name");
-            expect(customTheme).toHaveProperty("isDark");
-            expect(customTheme).toHaveProperty("colors");
-            expect(customTheme).toHaveProperty("typography");
-            expect(customTheme).toHaveProperty("spacing");
-            expect(customTheme).toHaveProperty("shadows");
-            expect(customTheme).toHaveProperty("borderRadius");
+        // Result should be a complete theme
+        expect(customTheme).toHaveProperty("name");
+        expect(customTheme).toHaveProperty("isDark");
+        expect(customTheme).toHaveProperty("colors");
+        expect(customTheme).toHaveProperty("typography");
+        expect(customTheme).toHaveProperty("spacing");
+        expect(customTheme).toHaveProperty("shadows");
+        expect(customTheme).toHaveProperty("borderRadius");
 
-            // Override properties should be applied
-            if (overrides.name) {
-                expect(customTheme.name).toBe(overrides.name);
-            }
-            if (typeof overrides.isDark === "boolean") {
-                expect(customTheme.isDark).toBe(overrides.isDark);
-            }
-
-            // Non-overridden properties should be preserved
-            if (!(overrides as any).typography) {
-                expect(customTheme.typography).toEqual(baseTheme.typography);
-            }
+        // Override properties should be applied
+        if (overrides.name) {
+            expect(customTheme.name).toBe(overrides.name);
         }
-    );
+        if (typeof overrides.isDark === "boolean") {
+            expect(customTheme.isDark).toBe(overrides.isDark);
+        }
+
+        // Non-overridden properties should be preserved
+        if (!(overrides as any).typography) {
+            expect(customTheme.typography).toEqual(baseTheme.typography);
+        }
+    });
 
     fcTest.prop([validThemeNameArbitrary])(
         "should retrieve valid themes for all theme names",
@@ -403,23 +402,20 @@ describe("ThemeManager Property-Based Tests", () => {
         }
     );
 
-    fcTest.prop([fc.string()])(
-        "should properly validate theme names",
-        (potentialThemeName) => {
-            const isValid = themeManager.isValidThemeName(potentialThemeName);
-            const availableThemes = themeManager.getAvailableThemes();
+    fcTest.prop([fc.string()])("should properly validate theme names", (
+        potentialThemeName
+    ) => {
+        const isValid = themeManager.isValidThemeName(potentialThemeName);
+        const availableThemes = themeManager.getAvailableThemes();
 
-            if (isValid) {
-                expect(availableThemes).toContain(
-                    potentialThemeName as ThemeName
-                );
-            } else {
-                expect(availableThemes).not.toContain(
-                    potentialThemeName as ThemeName
-                );
-            }
+        if (isValid) {
+            expect(availableThemes).toContain(potentialThemeName as ThemeName);
+        } else {
+            expect(availableThemes).not.toContain(
+                potentialThemeName as ThemeName
+            );
         }
-    );
+    });
 
     fcTest.prop([fc.boolean()])(
         "should handle system theme preference detection",
@@ -474,21 +470,20 @@ describe("ThemeManager Property-Based Tests", () => {
 
     fcTest.prop([
         fc.array(completeThemeArbitrary, { minLength: 5, maxLength: 20 }),
-    ])(
-        "should handle multiple rapid theme switches without errors",
-        (themes) => {
-            expect(() => {
-                for (const theme of themes) {
-                    themeManager.applyTheme(theme);
-                }
-            }).not.toThrowError();
+    ])("should handle multiple rapid theme switches without errors", (
+        themes
+    ) => {
+        expect(() => {
+            for (const theme of themes) {
+                themeManager.applyTheme(theme);
+            }
+        }).not.toThrowError();
 
-            // Should have called setProperty for each unique theme
-            expect(
-                mockDocument.documentElement.style.setProperty
-            ).toHaveBeenCalled();
-        }
-    );
+        // Should have called setProperty for each unique theme
+        expect(
+            mockDocument.documentElement.style.setProperty
+        ).toHaveBeenCalled();
+    });
 
     fcTest.prop([fc.constant(null)])(
         "should handle system theme change listeners",

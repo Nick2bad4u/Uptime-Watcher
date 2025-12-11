@@ -57,7 +57,11 @@ function createLogger(prefix: string): Logger {
             const { context, remaining } = extractLogContext(args, "debug");
             const logArguments = buildLogArguments(prefix, message, remaining);
             const finalArgs = context
-                ? [logArguments[0], context, ...logArguments.slice(1)]
+                ? [
+                      logArguments[0],
+                      context,
+                      ...logArguments.slice(1),
+                  ]
                 : Array.from(logArguments);
             log.debug(...finalArgs);
         },
@@ -70,7 +74,11 @@ function createLogger(prefix: string): Logger {
                 remaining
             );
             const finalArgs = context
-                ? [logArguments[0], context, ...logArguments.slice(1)]
+                ? [
+                      logArguments[0],
+                      context,
+                      ...logArguments.slice(1),
+                  ]
                 : Array.from(logArguments);
             log.error(...finalArgs);
         },
@@ -78,7 +86,11 @@ function createLogger(prefix: string): Logger {
             const { context, remaining } = extractLogContext(args, "info");
             const logArguments = buildLogArguments(prefix, message, remaining);
             const finalArgs = context
-                ? [logArguments[0], context, ...logArguments.slice(1)]
+                ? [
+                      logArguments[0],
+                      context,
+                      ...logArguments.slice(1),
+                  ]
                 : Array.from(logArguments);
             log.info(...finalArgs);
         },
@@ -86,7 +98,11 @@ function createLogger(prefix: string): Logger {
             const { context, remaining } = extractLogContext(args, "warn");
             const logArguments = buildLogArguments(prefix, message, remaining);
             const finalArgs = context
-                ? [logArguments[0], context, ...logArguments.slice(1)]
+                ? [
+                      logArguments[0],
+                      context,
+                      ...logArguments.slice(1),
+                  ]
                 : Array.from(logArguments);
             log.warn(...finalArgs);
         },

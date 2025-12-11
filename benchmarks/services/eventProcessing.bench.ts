@@ -341,8 +341,7 @@ class MockTypedEventBus {
         }[]
     ): string[] {
         return subscriptions.map((sub) =>
-            this.subscribe(sub.eventType, sub.handler, sub.options)
-        );
+            this.subscribe(sub.eventType, sub.handler, sub.options));
     }
 
     bulkUnsubscribe(subscriptionIds: string[]): number {
@@ -448,16 +447,16 @@ class MockTypedEventBus {
         const enabledSubscriptions = subscriptions.filter((sub) => sub.enabled);
 
         // Execute handlers in priority order
-        const handlerPromises = enabledSubscriptions.map(
-            async (subscription) => {
-                try {
-                    await subscription.handler(event);
-                } catch (error) {
-                    // Log error but don't throw to prevent stopping other handlers
-                    console.error(`Handler ${subscription.id} failed:`, error);
-                }
+        const handlerPromises = enabledSubscriptions.map(async (
+            subscription
+        ) => {
+            try {
+                await subscription.handler(event);
+            } catch (error) {
+                // Log error but don't throw to prevent stopping other handlers
+                console.error(`Handler ${subscription.id} failed:`, error);
             }
-        );
+        });
 
         await Promise.all(handlerPromises);
     }
@@ -1043,12 +1042,12 @@ describe("TypedEventBus and Event Processing Benchmarks", () => {
             async () => {
                 // Generate correlated events
                 const correlationId = "test-correlation-1";
-                const correlatedEvents = generateMixedEvents(20, siteIds).map(
-                    (event) => ({
-                        ...event,
-                        correlationId,
-                    })
-                );
+                const correlatedEvents = generateMixedEvents(20, siteIds).map((
+                    event
+                ) => ({
+                    ...event,
+                    correlationId,
+                }));
 
                 await eventBus.emitBatch(correlatedEvents);
 
@@ -1085,19 +1084,18 @@ describe("TypedEventBus and Event Processing Benchmarks", () => {
                 ];
 
                 for (const corrId of correlationIds) {
-                    const events = generateMixedEvents(15, siteIds).map(
-                        (event) => ({
-                            ...event,
-                            correlationId: corrId,
-                        })
-                    );
+                    const events = generateMixedEvents(15, siteIds).map((
+                        event
+                    ) => ({
+                        ...event,
+                        correlationId: corrId,
+                    }));
                     await eventBus.emitBatch(events);
                 }
 
                 // Analyze all correlations
                 const analyses = correlationIds.map((corrId) =>
-                    eventBus.analyzeEventCorrelations(corrId)
-                );
+                    eventBus.analyzeEventCorrelations(corrId));
 
                 // Aggregate analysis
                 const totalEvents = analyses.reduce(
@@ -1143,8 +1141,7 @@ describe("TypedEventBus and Event Processing Benchmarks", () => {
 
                         // Simulate async work
                         await new Promise((resolve) =>
-                            setTimeout(resolve, Math.random() * 5)
-                        );
+                            setTimeout(resolve, Math.random() * 5));
                     },
                     { priority: 10 }
                 );
@@ -1154,8 +1151,7 @@ describe("TypedEventBus and Event Processing Benchmarks", () => {
                     async (event) => {
                         // Simulate database write
                         await new Promise((resolve) =>
-                            setTimeout(resolve, Math.random() * 10)
-                        );
+                            setTimeout(resolve, Math.random() * 10));
 
                         // Type-safe check for monitor event
                         if (event.type === "monitor-check-completed") {
@@ -1174,8 +1170,7 @@ describe("TypedEventBus and Event Processing Benchmarks", () => {
                     async (event) => {
                         // Simulate notification sending
                         await new Promise((resolve) =>
-                            setTimeout(resolve, Math.random() * 15)
-                        );
+                            setTimeout(resolve, Math.random() * 15));
                     },
                     { priority: 1 }
                 );
@@ -1192,20 +1187,19 @@ describe("TypedEventBus and Event Processing Benchmarks", () => {
                 // Create many subscriptions
                 const subscriptionIds: string[] = [];
                 for (let i = 0; i < 200; i++) {
-                    const id = eventBus.subscribe(
-                        "site-status-changed",
-                        async (event) => {
-                            // Store event data in memory (simulate caching)
-                            const cache = new Map([[event.id, event]]);
+                    const id = eventBus.subscribe("site-status-changed", async (
+                        event
+                    ) => {
+                        // Store event data in memory (simulate caching)
+                        const cache = new Map([[event.id, event]]);
 
-                            // Process event
-                            const processed = {
-                                ...event,
-                                processedBy: `handler-${i}`,
-                                processedAt: Date.now(),
-                            };
-                        }
-                    );
+                        // Process event
+                        const processed = {
+                            ...event,
+                            processedBy: `handler-${i}`,
+                            processedAt: Date.now(),
+                        };
+                    });
                     subscriptionIds.push(id);
                 }
 
@@ -1251,8 +1245,7 @@ describe("TypedEventBus and Event Processing Benchmarks", () => {
                             eventType,
                             async () => {
                                 await new Promise((resolve) =>
-                                    setTimeout(resolve, Math.random() * 3)
-                                );
+                                    setTimeout(resolve, Math.random() * 3));
                             },
                             { priority: Math.floor(Math.random() * 10) }
                         );

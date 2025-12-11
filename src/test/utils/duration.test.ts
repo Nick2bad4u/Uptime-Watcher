@@ -427,112 +427,100 @@ describe("Duration Utilities", () => {
                         noNaN: true,
                     }),
                     fc.integer({ min: 0, max: 10 }),
-                ])(
-                    "should always return a valid duration string format",
-                    (timeout, retryAttempts) => {
-                        const result = calculateMaxDuration(
-                            timeout,
-                            retryAttempts
-                        );
+                ])("should always return a valid duration string format", (
+                    timeout,
+                    retryAttempts
+                ) => {
+                    const result = calculateMaxDuration(timeout, retryAttempts);
 
-                        // Property: Result should match duration format pattern
-                        expect(result).toMatch(/^\d+[hms]$/);
+                    // Property: Result should match duration format pattern
+                    expect(result).toMatch(/^\d+[hms]$/);
 
-                        // Property: Should be one of the three valid unit types
-                        const unit = result.at(-1);
-                        expect([
-                            "s",
-                            "m",
-                            "h",
-                        ]).toContain(unit);
+                    // Property: Should be one of the three valid unit types
+                    const unit = result.at(-1);
+                    expect([
+                        "s",
+                        "m",
+                        "h",
+                    ]).toContain(unit);
 
-                        // Property: Numeric part should be positive
-                        const numericPart = Number.parseInt(
-                            result.slice(0, -1),
-                            10
-                        );
-                        expect(numericPart).toBeGreaterThan(0);
-                    }
-                );
+                    // Property: Numeric part should be positive
+                    const numericPart = Number.parseInt(
+                        result.slice(0, -1),
+                        10
+                    );
+                    expect(numericPart).toBeGreaterThan(0);
+                });
 
                 test.prop([
                     fc
                         .float({ min: Math.fround(0.1), max: Math.fround(100) })
                         .filter((x) => !Number.isNaN(x) && Number.isFinite(x)),
                     fc.integer({ min: 0, max: 20 }),
-                ])(
-                    "should increase duration with more retry attempts",
-                    (timeout, retryAttempts) => {
-                        const noRetries = calculateMaxDuration(timeout, 0);
-                        const withRetries = calculateMaxDuration(
-                            timeout,
-                            retryAttempts
+                ])("should increase duration with more retry attempts", (
+                    timeout,
+                    retryAttempts
+                ) => {
+                    const noRetries = calculateMaxDuration(timeout, 0);
+                    const withRetries = calculateMaxDuration(
+                        timeout,
+                        retryAttempts
+                    );
+
+                    const noRetriesSeconds = parseToSeconds(noRetries);
+                    const withRetriesSeconds = parseToSeconds(withRetries);
+
+                    // Property: More retries should result in equal or longer duration
+                    if (retryAttempts > 0) {
+                        expect(withRetriesSeconds).toBeGreaterThanOrEqual(
+                            noRetriesSeconds
                         );
-
-                        const noRetriesSeconds = parseToSeconds(noRetries);
-                        const withRetriesSeconds = parseToSeconds(withRetries);
-
-                        // Property: More retries should result in equal or longer duration
-                        if (retryAttempts > 0) {
-                            expect(withRetriesSeconds).toBeGreaterThanOrEqual(
-                                noRetriesSeconds
-                            );
-                        } else {
-                            expect(withRetriesSeconds).toBe(noRetriesSeconds);
-                        }
+                    } else {
+                        expect(withRetriesSeconds).toBe(noRetriesSeconds);
                     }
-                );
+                });
 
                 test.prop([
                     fc.float({ min: Math.fround(0.1), max: Math.fround(60) }),
                     fc.constant(0),
-                ])(
-                    "should format seconds correctly for short durations",
-                    (timeout, retryAttempts) => {
-                        const result = calculateMaxDuration(
-                            timeout,
-                            retryAttempts
+                ])("should format seconds correctly for short durations", (
+                    timeout,
+                    retryAttempts
+                ) => {
+                    const result = calculateMaxDuration(timeout, retryAttempts);
+
+                    // Property: For single timeout under 60s with no retries, should be in seconds
+                    if (Math.ceil(timeout) < 60) {
+                        expect(result).toMatch(/^\d+s$/);
+
+                        const seconds = Number.parseInt(
+                            result.slice(0, -1),
+                            10
                         );
-
-                        // Property: For single timeout under 60s with no retries, should be in seconds
-                        if (Math.ceil(timeout) < 60) {
-                            expect(result).toMatch(/^\d+s$/);
-
-                            const seconds = Number.parseInt(
-                                result.slice(0, -1),
-                                10
-                            );
-                            expect(seconds).toBe(Math.ceil(timeout));
-                        }
+                        expect(seconds).toBe(Math.ceil(timeout));
                     }
-                );
+                });
 
                 test.prop([
                     fc.float({ min: Math.fround(60), max: Math.fround(3599) }),
                     fc.constant(0),
-                ])(
-                    "should format minutes correctly for medium durations",
-                    (timeout, retryAttempts) => {
-                        const result = calculateMaxDuration(
-                            timeout,
-                            retryAttempts
+                ])("should format minutes correctly for medium durations", (
+                    timeout,
+                    retryAttempts
+                ) => {
+                    const result = calculateMaxDuration(timeout, retryAttempts);
+
+                    // Property: For timeouts 60s+ but under 3600s, should be in minutes
+                    if (Math.ceil(timeout) >= 60 && Math.ceil(timeout) < 3600) {
+                        expect(result).toMatch(/^\d+m$/);
+
+                        const minutes = Number.parseInt(
+                            result.slice(0, -1),
+                            10
                         );
-
-                        // Property: For timeouts 60s+ but under 3600s, should be in minutes
-                        if (
-                            Math.ceil(timeout) >= 60 &&
-                            Math.ceil(timeout) < 3600
-                        ) {
-                            expect(result).toMatch(/^\d+m$/);
-
-                            const minutes = Number.parseInt(
-                                result.slice(0, -1),
-                                10
-                            );
-                            expect(minutes).toBe(Math.ceil(timeout / 60));
-                        }
+                        expect(minutes).toBe(Math.ceil(timeout / 60));
                     }
-                );
+                });
 
                 test.prop([
                     fc.float({
@@ -540,67 +528,60 @@ describe("Duration Utilities", () => {
                         max: Math.fround(10_800),
                     }),
                     fc.constant(0),
-                ])(
-                    "should format hours correctly for long durations",
-                    (timeout, retryAttempts) => {
-                        const result = calculateMaxDuration(
-                            timeout,
-                            retryAttempts
-                        );
+                ])("should format hours correctly for long durations", (
+                    timeout,
+                    retryAttempts
+                ) => {
+                    const result = calculateMaxDuration(timeout, retryAttempts);
 
-                        // Property: For timeouts 3600s+, should be in hours
-                        if (Math.ceil(timeout) >= 3600) {
-                            expect(result).toMatch(/^\d+h$/);
+                    // Property: For timeouts 3600s+, should be in hours
+                    if (Math.ceil(timeout) >= 3600) {
+                        expect(result).toMatch(/^\d+h$/);
 
-                            const hours = Number.parseInt(
-                                result.slice(0, -1),
-                                10
-                            );
-                            expect(hours).toBe(Math.ceil(timeout / 3600));
-                        }
+                        const hours = Number.parseInt(result.slice(0, -1), 10);
+                        expect(hours).toBe(Math.ceil(timeout / 3600));
                     }
-                );
+                });
 
                 test.prop([
                     fc.float({ min: Math.fround(1), max: Math.fround(30) }),
                     fc.integer({ min: 1, max: 5 }),
-                ])(
-                    "should demonstrate exponential backoff effect",
-                    (timeout, retryAttempts) => {
-                        const result = calculateMaxDuration(
-                            timeout,
-                            retryAttempts
-                        );
+                ])("should demonstrate exponential backoff effect", (
+                    timeout,
+                    retryAttempts
+                ) => {
+                    const result = calculateMaxDuration(timeout, retryAttempts);
 
-                        // Property: Should include backoff time in calculation
-                        // Calculate expected using exact same algorithm as the function
-                        const totalAttempts = retryAttempts + 1;
-                        const timeoutTime = timeout * totalAttempts;
-                        const backoffTime =
-                            retryAttempts > 0
-                                ? Array.from(
-                                      { length: retryAttempts },
-                                      (_, index) =>
-                                          Math.min(0.5 * 2 ** index, 5)
-                                  ).reduce((a, b) => a + b, 0)
-                                : 0;
+                    // Property: Should include backoff time in calculation
+                    // Calculate expected using exact same algorithm as the function
+                    const totalAttempts = retryAttempts + 1;
+                    const timeoutTime = timeout * totalAttempts;
+                    const backoffTime =
+                        retryAttempts > 0
+                            ? Array.from({ length: retryAttempts }, (
+                                  _,
+                                  index
+                              ) => Math.min(0.5 * 2 ** index, 5)).reduce(
+                                  (a, b) => a + b,
+                                  0
+                              )
+                            : 0;
 
-                        const totalTime = Math.ceil(timeoutTime + backoffTime);
+                    const totalTime = Math.ceil(timeoutTime + backoffTime);
 
-                        // Format using the same logic as the function
-                        let expectedFormat: string;
-                        if (totalTime < 60) {
-                            expectedFormat = `${totalTime}s`;
-                        } else if (totalTime < 3600) {
-                            expectedFormat = `${Math.ceil(totalTime / 60)}m`;
-                        } else {
-                            expectedFormat = `${Math.ceil(totalTime / 3600)}h`;
-                        }
-
-                        // Property: Result should match expected formatted output
-                        expect(result).toBe(expectedFormat);
+                    // Format using the same logic as the function
+                    let expectedFormat: string;
+                    if (totalTime < 60) {
+                        expectedFormat = `${totalTime}s`;
+                    } else if (totalTime < 3600) {
+                        expectedFormat = `${Math.ceil(totalTime / 60)}m`;
+                    } else {
+                        expectedFormat = `${Math.ceil(totalTime / 3600)}h`;
                     }
-                );
+
+                    // Property: Result should match expected formatted output
+                    expect(result).toBe(expectedFormat);
+                });
 
                 test.prop([fc.constant(0), fc.integer({ min: 0, max: 5 })])(
                     "should handle zero timeout gracefully",
@@ -665,11 +646,13 @@ describe("Duration Utilities", () => {
                         const timeoutTime = timeout * totalAttempts;
                         const backoffTime =
                             retryAttempts > 0
-                                ? Array.from(
-                                      { length: retryAttempts },
-                                      (_, index) =>
-                                          Math.min(0.5 * 2 ** index, 5)
-                                  ).reduce((a, b) => a + b, 0)
+                                ? Array.from({ length: retryAttempts }, (
+                                      _,
+                                      index
+                                  ) => Math.min(0.5 * 2 ** index, 5)).reduce(
+                                      (a, b) => a + b,
+                                      0
+                                  )
                                 : 0;
 
                         const totalTime = Math.ceil(timeoutTime + backoffTime);
@@ -701,54 +684,52 @@ describe("Duration Utilities", () => {
                         .float({ min: Math.fround(0.1), max: Math.fround(10) })
                         .filter((x) => !Number.isNaN(x) && Number.isFinite(x)),
                     fc.integer({ min: 0, max: 3 }),
-                ])(
-                    "should respect monotonicity with timeout increases",
-                    (timeout, retryAttempts) => {
-                        const smallerTimeout = timeout;
-                        const largerTimeout = timeout * 2;
+                ])("should respect monotonicity with timeout increases", (
+                    timeout,
+                    retryAttempts
+                ) => {
+                    const smallerTimeout = timeout;
+                    const largerTimeout = timeout * 2;
 
-                        const smallResult = calculateMaxDuration(
-                            smallerTimeout,
-                            retryAttempts
+                    const smallResult = calculateMaxDuration(
+                        smallerTimeout,
+                        retryAttempts
+                    );
+                    const largeResult = calculateMaxDuration(
+                        largerTimeout,
+                        retryAttempts
+                    );
+
+                    // Helper to convert to comparable seconds
+                    const toSeconds = (duration: string): number => {
+                        const unit = duration.at(-1);
+                        const value = Number.parseInt(
+                            duration.slice(0, -1),
+                            10
                         );
-                        const largeResult = calculateMaxDuration(
-                            largerTimeout,
-                            retryAttempts
-                        );
 
-                        // Helper to convert to comparable seconds
-                        const toSeconds = (duration: string): number => {
-                            const unit = duration.at(-1);
-                            const value = Number.parseInt(
-                                duration.slice(0, -1),
-                                10
-                            );
-
-                            switch (unit) {
-                                case "s": {
-                                    return value;
-                                }
-                                case "m": {
-                                    return value * 60;
-                                }
-                                case "h": {
-                                    return value * 3600;
-                                }
-                                default: {
-                                    return value;
-                                }
+                        switch (unit) {
+                            case "s": {
+                                return value;
                             }
-                        };
+                            case "m": {
+                                return value * 60;
+                            }
+                            case "h": {
+                                return value * 3600;
+                            }
+                            default: {
+                                return value;
+                            }
+                        }
+                    };
 
-                        const smallSeconds = toSeconds(smallResult);
-                        const largeSeconds = toSeconds(largeResult);
+                    const smallSeconds = toSeconds(smallResult);
+                    const largeSeconds = toSeconds(largeResult);
 
-                        // Property: Larger timeout should produce larger or equal duration
-                        expect(largeSeconds).toBeGreaterThanOrEqual(
-                            smallSeconds
-                        );
-                    }
-                );
+                    // Property: Larger timeout should produce larger or equal duration
+                    expect(largeSeconds).toBeGreaterThanOrEqual(smallSeconds);
+                });
 
                 test.prop([
                     fc.oneof(
@@ -757,23 +738,22 @@ describe("Duration Utilities", () => {
                         fc.constant(Math.fround(3599.9)),
                         fc.constant(Math.fround(3600.1))
                     ),
-                ])(
-                    "should handle unit boundary edge cases correctly",
-                    (timeout) => {
-                        const result = calculateMaxDuration(timeout, 0);
+                ])("should handle unit boundary edge cases correctly", (
+                    timeout
+                ) => {
+                    const result = calculateMaxDuration(timeout, 0);
 
-                        // Property: Should handle boundary transitions correctly
-                        const totalSeconds = Math.ceil(timeout);
+                    // Property: Should handle boundary transitions correctly
+                    const totalSeconds = Math.ceil(timeout);
 
-                        if (totalSeconds < 60) {
-                            expect(result).toMatch(/^\d+s$/);
-                        } else if (totalSeconds < 3600) {
-                            expect(result).toMatch(/^\d+m$/);
-                        } else {
-                            expect(result).toMatch(/^\d+h$/);
-                        }
+                    if (totalSeconds < 60) {
+                        expect(result).toMatch(/^\d+s$/);
+                    } else if (totalSeconds < 3600) {
+                        expect(result).toMatch(/^\d+m$/);
+                    } else {
+                        expect(result).toMatch(/^\d+h$/);
                     }
-                );
+                });
             });
         });
     });

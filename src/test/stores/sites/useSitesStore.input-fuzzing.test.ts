@@ -131,21 +131,20 @@ describe("Sites Store - Property-Based Fuzzing Tests", () => {
     });
 
     describe("Site Management", () => {
-        fcTest.prop([arbitraries.site])(
-            "should handle adding sites",
-            (site) => {
-                // Arrange - ensure fresh state
-                createTestSitesStore();
+        fcTest.prop([arbitraries.site])("should handle adding sites", (
+            site
+        ) => {
+            // Arrange - ensure fresh state
+            createTestSitesStore();
 
-                // Act
-                useSitesStore.getState().addSite(site);
+            // Act
+            useSitesStore.getState().addSite(site);
 
-                // Assert
-                const state = useSitesStore.getState();
-                expect(state.sites).toHaveLength(1);
-                expect(state.sites[0]).toEqual(site);
-            }
-        );
+            // Assert
+            const state = useSitesStore.getState();
+            expect(state.sites).toHaveLength(1);
+            expect(state.sites[0]).toEqual(site);
+        });
 
         fcTest.prop([arbitraries.multipleSites])(
             "should handle multiple site additions",
@@ -167,42 +166,38 @@ describe("Sites Store - Property-Based Fuzzing Tests", () => {
             }
         );
 
-        fcTest.prop([arbitraries.site])(
-            "should handle removing sites",
-            (site) => {
-                // Arrange - add site first
-                createTestSitesStore();
-                useSitesStore.getState().addSite(site);
+        fcTest.prop([arbitraries.site])("should handle removing sites", (
+            site
+        ) => {
+            // Arrange - add site first
+            createTestSitesStore();
+            useSitesStore.getState().addSite(site);
 
-                // Act
-                useSitesStore.getState().removeSite(site.identifier);
+            // Act
+            useSitesStore.getState().removeSite(site.identifier);
 
-                // Assert
-                const state = useSitesStore.getState();
-                expect(state.sites).toHaveLength(0);
-            }
-        );
+            // Assert
+            const state = useSitesStore.getState();
+            expect(state.sites).toHaveLength(0);
+        });
     });
 
     describe("Site Selection", () => {
-        fcTest.prop([arbitraries.site])(
-            "should handle site selection",
-            (site) => {
-                // Arrange - add site first
-                createTestSitesStore();
-                useSitesStore.getState().addSite(site);
+        fcTest.prop([arbitraries.site])("should handle site selection", (
+            site
+        ) => {
+            // Arrange - add site first
+            createTestSitesStore();
+            useSitesStore.getState().addSite(site);
 
-                // Act
-                useSitesStore.getState().selectSite(site);
+            // Act
+            useSitesStore.getState().selectSite(site);
 
-                // Assert
-                const state = useSitesStore.getState();
-                expect(state.selectedSiteIdentifier).toBe(site.identifier);
-                expect(useSitesStore.getState().getSelectedSite()).toEqual(
-                    site
-                );
-            }
-        );
+            // Assert
+            const state = useSitesStore.getState();
+            expect(state.selectedSiteIdentifier).toBe(site.identifier);
+            expect(useSitesStore.getState().getSelectedSite()).toEqual(site);
+        });
 
         fcTest.prop([arbitraries.site])(
             "should handle clearing site selection",
@@ -357,31 +352,33 @@ describe("Sites Store - Property-Based Fuzzing Tests", () => {
                 expect(() =>
                     useSitesStore
                         .getState()
-                        .removeSite("non-existent-identifier")
-                ).not.toThrowError();
+                        .removeSite(
+                            "non-existent-identifier"
+                        )).not.toThrowError();
                 expect(() =>
-                    useSitesStore.getState().selectSite(site)
-                ).not.toThrowError();
+                    useSitesStore
+                        .getState()
+                        .selectSite(site)).not.toThrowError();
 
                 const state = useSitesStore.getState();
                 expect(state.sites).toHaveLength(0);
             }
         );
 
-        fcTest.prop([fc.string()])(
-            "should handle malformed site identifiers",
-            (malformedId) => {
-                // Arrange
-                createTestSitesStore();
+        fcTest.prop([fc.string()])("should handle malformed site identifiers", (
+            malformedId
+        ) => {
+            // Arrange
+            createTestSitesStore();
 
-                // Act & Assert - malformed operations should not crash
-                expect(() =>
-                    useSitesStore.getState().removeSite(malformedId)
-                ).not.toThrowError();
+            // Act & Assert - malformed operations should not crash
+            expect(() =>
+                useSitesStore
+                    .getState()
+                    .removeSite(malformedId)).not.toThrowError();
 
-                const state = useSitesStore.getState();
-                expect(state.sites).toHaveLength(0);
-            }
-        );
+            const state = useSitesStore.getState();
+            expect(state.sites).toHaveLength(0);
+        });
     });
 });

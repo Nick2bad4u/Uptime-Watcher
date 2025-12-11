@@ -26,9 +26,8 @@ vi.mock("../../../../hooks/ui/useOverflowMarquee", async () => {
     >;
 });
 
-const { useOverflowMarquee } = await import(
-    "../../../../hooks/ui/useOverflowMarquee"
-);
+const { useOverflowMarquee } =
+    await import("../../../../hooks/ui/useOverflowMarquee");
 
 const mockUseOverflowMarquee = vi.mocked(useOverflowMarquee);
 
@@ -88,81 +87,78 @@ describe("MarqueeText fast-check coverage", () => {
         optionalCssClassArbitrary,
         optionalCssClassArbitrary,
         optionalCssClassArbitrary,
-    ])(
-        "renders base segment with composed classes when marquee is inactive",
-        (
+    ])("renders base segment with composed classes when marquee is inactive", (
+        text,
+        className,
+        trackClassName,
+        segmentClassName,
+        textPropsClassName,
+        activeClassName
+    ) => {
+        mockUseOverflowMarquee.mockReset();
+        mockUseOverflowMarquee.mockReturnValue({
+            containerRef: { current: null },
+            isOverflowing: false,
+        });
+
+        const textProps: MarqueeTextProperties["textProps"] =
+            textPropsClassName === undefined
+                ? undefined
+                : { className: textPropsClassName };
+
+        const props: MarqueeTextProperties = {
             text,
-            className,
-            trackClassName,
-            segmentClassName,
-            textPropsClassName,
-            activeClassName
-        ) => {
-            mockUseOverflowMarquee.mockReset();
-            mockUseOverflowMarquee.mockReturnValue({
-                containerRef: { current: null },
-                isOverflowing: false,
-            });
+            ...(className === undefined ? {} : { className }),
+            ...(trackClassName === undefined ? {} : { trackClassName }),
+            ...(segmentClassName === undefined ? {} : { segmentClassName }),
+            ...(textProps === undefined ? {} : { textProps }),
+            ...(activeClassName === undefined ? {} : { activeClassName }),
+        };
 
-            const textProps: MarqueeTextProperties["textProps"] =
-                textPropsClassName === undefined
-                    ? undefined
-                    : { className: textPropsClassName };
+        const { container, unmount } = render(<MarqueeText {...props} />);
 
-            const props: MarqueeTextProperties = {
-                text,
-                ...(className === undefined ? {} : { className }),
-                ...(trackClassName === undefined ? {} : { trackClassName }),
-                ...(segmentClassName === undefined ? {} : { segmentClassName }),
-                ...(textProps === undefined ? {} : { textProps }),
-                ...(activeClassName === undefined ? {} : { activeClassName }),
-            };
-
-            const { container, unmount } = render(<MarqueeText {...props} />);
-
-            const wrapper = container.firstElementChild as HTMLElement;
-            expect(wrapper).toHaveClass("marquee-text");
-            if (className) {
-                expect(wrapper).toHaveClass(className);
-            }
-            expect(wrapper).not.toHaveClass("marquee-text--active");
-            if (
-                activeClassName &&
-                activeClassName !== className &&
-                activeClassName !== "marquee-text" &&
-                activeClassName !== "marquee-text--active"
-            ) {
-                expect(wrapper).not.toHaveClass(activeClassName);
-            }
-
-            const trackElem = wrapper.querySelector(
-                ".marquee-text__track"
-            ) as HTMLElement | null;
-            expect(trackElem).not.toBeNull();
-            if (trackClassName) {
-                expect(trackElem).toHaveClass(trackClassName);
-            }
-
-            const segments = wrapper.querySelectorAll(".marquee-text__segment");
-            expect(segments).toHaveLength(1);
-
-            const segment = segments.item(0) as HTMLElement;
-            expect(segment.textContent).toBe(text);
-            expect(segment).not.toHaveClass("marquee-text__segment--clone");
-            if (segmentClassName) {
-                expect(segment).toHaveClass(segmentClassName);
-            }
-            if (textPropsClassName) {
-                expect(segment).toHaveClass(textPropsClassName);
-            }
-
-            const callArgs = mockUseOverflowMarquee.mock.calls.at(-1);
-            expect(callArgs).toBeDefined();
-            expect(callArgs?.[0]?.dependencies).toEqual([text]);
-
-            unmount();
+        const wrapper = container.firstElementChild as HTMLElement;
+        expect(wrapper).toHaveClass("marquee-text");
+        if (className) {
+            expect(wrapper).toHaveClass(className);
         }
-    );
+        expect(wrapper).not.toHaveClass("marquee-text--active");
+        if (
+            activeClassName &&
+            activeClassName !== className &&
+            activeClassName !== "marquee-text" &&
+            activeClassName !== "marquee-text--active"
+        ) {
+            expect(wrapper).not.toHaveClass(activeClassName);
+        }
+
+        const trackElem = wrapper.querySelector(
+            ".marquee-text__track"
+        ) as HTMLElement | null;
+        expect(trackElem).not.toBeNull();
+        if (trackClassName) {
+            expect(trackElem).toHaveClass(trackClassName);
+        }
+
+        const segments = wrapper.querySelectorAll(".marquee-text__segment");
+        expect(segments).toHaveLength(1);
+
+        const segment = segments.item(0) as HTMLElement;
+        expect(segment.textContent).toBe(text);
+        expect(segment).not.toHaveClass("marquee-text__segment--clone");
+        if (segmentClassName) {
+            expect(segment).toHaveClass(segmentClassName);
+        }
+        if (textPropsClassName) {
+            expect(segment).toHaveClass(textPropsClassName);
+        }
+
+        const callArgs = mockUseOverflowMarquee.mock.calls.at(-1);
+        expect(callArgs).toBeDefined();
+        expect(callArgs?.[0]?.dependencies).toEqual([text]);
+
+        unmount();
+    });
 
     fcTest.prop<
         [
@@ -261,26 +257,26 @@ describe("MarqueeText fast-check coverage", () => {
             maxLength: 5,
             minLength: 1,
         }),
-    ])(
-        "passes explicit dependency lists through to the overflow hook",
-        (text, dependencies) => {
-            mockUseOverflowMarquee.mockReset();
-            mockUseOverflowMarquee.mockReturnValue({
-                containerRef: { current: null },
-                isOverflowing: false,
-            });
+    ])("passes explicit dependency lists through to the overflow hook", (
+        text,
+        dependencies
+    ) => {
+        mockUseOverflowMarquee.mockReset();
+        mockUseOverflowMarquee.mockReturnValue({
+            containerRef: { current: null },
+            isOverflowing: false,
+        });
 
-            const { unmount } = render(
-                <MarqueeText dependencies={dependencies} text={text} />
-            );
+        const { unmount } = render(
+            <MarqueeText dependencies={dependencies} text={text} />
+        );
 
-            const callArgs = mockUseOverflowMarquee.mock.calls.at(-1);
-            expect(callArgs).toBeDefined();
-            expect(callArgs?.[0]?.dependencies).toBe(dependencies);
+        const callArgs = mockUseOverflowMarquee.mock.calls.at(-1);
+        expect(callArgs).toBeDefined();
+        expect(callArgs?.[0]?.dependencies).toBe(dependencies);
 
-            unmount();
-        }
-    );
+        unmount();
+    });
 
     fcTest.prop<
         [string, string | undefined, string | undefined, string | undefined]
@@ -289,55 +285,57 @@ describe("MarqueeText fast-check coverage", () => {
         fontWeightArbitrary,
         gapArbitrary,
         durationArbitrary,
-    ])(
-        "merges inline style overrides with computed marquee variables",
-        (color, fontWeight, gap, duration) => {
-            mockUseOverflowMarquee.mockReset();
-            mockUseOverflowMarquee.mockReturnValue({
-                containerRef: { current: null },
-                isOverflowing: false,
-            });
+    ])("merges inline style overrides with computed marquee variables", (
+        color,
+        fontWeight,
+        gap,
+        duration
+    ) => {
+        mockUseOverflowMarquee.mockReset();
+        mockUseOverflowMarquee.mockReturnValue({
+            containerRef: { current: null },
+            isOverflowing: false,
+        });
 
-            const baseStyle: CSSProperties = { color };
-            if (fontWeight) {
-                baseStyle.fontWeight = fontWeight;
-            }
-
-            const props: MarqueeTextProperties = {
-                style: baseStyle,
-                text: "stylish marquee",
-                ...(gap === undefined ? {} : { gap }),
-                ...(duration === undefined ? {} : { duration }),
-            };
-
-            const { container, unmount } = render(<MarqueeText {...props} />);
-
-            const wrapper = container.firstElementChild as HTMLElement;
-            expect(wrapper.style.getPropertyValue("color")).toBe(color);
-            if (fontWeight) {
-                expect(wrapper.style.fontWeight).toBe(fontWeight);
-            }
-
-            const gapValue = wrapper.style.getPropertyValue("--marquee-gap");
-            const durationValue =
-                wrapper.style.getPropertyValue("--marquee-duration");
-
-            if (gap === undefined) {
-                expect(gapValue).toBe("");
-            } else {
-                expect(gapValue).toBe(gap);
-            }
-
-            if (duration === undefined) {
-                expect(durationValue).toBe("");
-            } else {
-                expect(durationValue).toBe(duration);
-            }
-
-            expect(baseStyle).not.toHaveProperty("--marquee-gap");
-            expect(baseStyle).not.toHaveProperty("--marquee-duration");
-
-            unmount();
+        const baseStyle: CSSProperties = { color };
+        if (fontWeight) {
+            baseStyle.fontWeight = fontWeight;
         }
-    );
+
+        const props: MarqueeTextProperties = {
+            style: baseStyle,
+            text: "stylish marquee",
+            ...(gap === undefined ? {} : { gap }),
+            ...(duration === undefined ? {} : { duration }),
+        };
+
+        const { container, unmount } = render(<MarqueeText {...props} />);
+
+        const wrapper = container.firstElementChild as HTMLElement;
+        expect(wrapper.style.getPropertyValue("color")).toBe(color);
+        if (fontWeight) {
+            expect(wrapper.style.fontWeight).toBe(fontWeight);
+        }
+
+        const gapValue = wrapper.style.getPropertyValue("--marquee-gap");
+        const durationValue =
+            wrapper.style.getPropertyValue("--marquee-duration");
+
+        if (gap === undefined) {
+            expect(gapValue).toBe("");
+        } else {
+            expect(gapValue).toBe(gap);
+        }
+
+        if (duration === undefined) {
+            expect(durationValue).toBe("");
+        } else {
+            expect(durationValue).toBe(duration);
+        }
+
+        expect(baseStyle).not.toHaveProperty("--marquee-gap");
+        expect(baseStyle).not.toHaveProperty("--marquee-duration");
+
+        unmount();
+    });
 });

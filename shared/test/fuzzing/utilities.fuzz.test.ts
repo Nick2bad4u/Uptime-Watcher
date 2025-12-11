@@ -300,11 +300,11 @@ describe("Shared Utilities Fuzzing Tests", () => {
                             ): obj is { id: string; name: string } =>
                                 Boolean(
                                     obj &&
-                                        typeof obj === "object" &&
-                                        typeof obj.id === "string" &&
-                                        typeof obj.name === "string" &&
-                                        obj.id.length > 0 &&
-                                        obj.name.length > 0
+                                    typeof obj === "object" &&
+                                    typeof obj.id === "string" &&
+                                    typeof obj.name === "string" &&
+                                    obj.id.length > 0 &&
+                                    obj.name.length > 0
                                 );
 
                             const result = hasIdAndName(input);

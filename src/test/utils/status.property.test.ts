@@ -97,16 +97,13 @@ describe("Status Utils Property-Based Tests", () => {
                 fc.constant("Up"),
                 fc.constant("MiXeD")
             ),
-        ])(
-            "should be case-insensitive for known status values",
-            (caseVariation) => {
-                const icon = getStatusIcon(caseVariation);
-                const lowerCaseIcon = getStatusIcon(
-                    caseVariation.toLowerCase()
-                );
-                expect(icon).toBe(lowerCaseIcon);
-            }
-        );
+        ])("should be case-insensitive for known status values", (
+            caseVariation
+        ) => {
+            const icon = getStatusIcon(caseVariation);
+            const lowerCaseIcon = getStatusIcon(caseVariation.toLowerCase());
+            expect(icon).toBe(lowerCaseIcon);
+        });
 
         test.prop([
             fc.string().filter(
@@ -120,22 +117,20 @@ describe("Status Utils Property-Based Tests", () => {
                         "up",
                     ].includes(s.toLowerCase())
             ),
-        ])(
-            "should return default emoji for unknown status values",
-            (unknownStatus) => {
-                const icon = getStatusIcon(unknownStatus);
-                expect(icon).toBe("⚪");
-            }
-        );
+        ])("should return default emoji for unknown status values", (
+            unknownStatus
+        ) => {
+            const icon = getStatusIcon(unknownStatus);
+            expect(icon).toBe("⚪");
+        });
 
-        test.prop([fc.string()])(
-            "should always return a non-empty string",
-            (anyStatus) => {
-                const icon = getStatusIcon(anyStatus);
-                expect(typeof icon).toBe("string");
-                expect(icon.length).toBeGreaterThan(0);
-            }
-        );
+        test.prop([fc.string()])("should always return a non-empty string", (
+            anyStatus
+        ) => {
+            const icon = getStatusIcon(anyStatus);
+            expect(typeof icon).toBe("string");
+            expect(icon.length).toBeGreaterThan(0);
+        });
 
         test.prop([fc.string()])(
             "should return one of the expected emoji values",
@@ -349,14 +344,13 @@ describe("Status Utils Property-Based Tests", () => {
     });
 
     describe("Invariant properties", () => {
-        test.prop([fc.string()])(
-            "getStatusIcon should be deterministic",
-            (status) => {
-                const icon1 = getStatusIcon(status);
-                const icon2 = getStatusIcon(status);
-                expect(icon1).toBe(icon2);
-            }
-        );
+        test.prop([fc.string()])("getStatusIcon should be deterministic", (
+            status
+        ) => {
+            const icon1 = getStatusIcon(status);
+            const icon2 = getStatusIcon(status);
+            expect(icon1).toBe(icon2);
+        });
 
         test.prop([fc.string()])(
             "formatStatusWithIcon should include correct icon",
@@ -448,8 +442,7 @@ describe("Status Utils Property-Based Tests", () => {
             expect(() => getStatusIcon("测试")).not.toThrowError();
             expect(() => formatStatusWithIcon("🚀 status")).not.toThrowError();
             expect(() =>
-                createStatusIdentifier("test-émoji_status")
-            ).not.toThrowError();
+                createStatusIdentifier("test-émoji_status")).not.toThrowError();
 
             // Results should still be valid
             expect(getStatusIcon("测试")).toBe("⚪");

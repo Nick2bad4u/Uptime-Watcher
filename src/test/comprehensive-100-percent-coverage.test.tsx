@@ -486,8 +486,9 @@ describe("100% Coverage Edge Cases", () => {
             expect(select).toBeInTheDocument();
             expect(select).toHaveAttribute("data-testid", "monitorType");
             expect(() =>
-                fireEvent.change(select, { target: { value: "port" } })
-            ).not.toThrowError();
+                fireEvent.change(select, {
+                    target: { value: "port" },
+                })).not.toThrowError();
         });
 
         it("should handle text field changes", () => {
@@ -497,8 +498,9 @@ describe("100% Coverage Edge Cases", () => {
             expect(input).toBeInTheDocument();
             expect(input).toHaveAttribute("data-testid", "siteName");
             expect(() =>
-                fireEvent.change(input, { target: { value: "New Site" } })
-            ).not.toThrowError();
+                fireEvent.change(input, {
+                    target: { value: "New Site" },
+                })).not.toThrowError();
         });
     });
 
@@ -606,16 +608,14 @@ describe("100% Coverage Edge Cases", () => {
             // Test valid monitor type
             fireEvent.change(select, { target: { value: "http" } });
             await waitFor(() =>
-                expect(setMonitorType).toHaveBeenCalledWith("http")
-            );
+                expect(setMonitorType).toHaveBeenCalledWith("http"));
 
             // Test invalid monitor type - check that logger.error was called with some message
             fireEvent.change(select, { target: { value: "invalid" } });
             await waitFor(() =>
                 expect(logger.error).toHaveBeenCalledWith(
                     expect.stringContaining("Invalid monitor type value")
-                )
-            );
+                ));
         });
 
         it("should handle check interval validation", () => {

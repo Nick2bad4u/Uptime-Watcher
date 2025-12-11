@@ -94,9 +94,8 @@ describe("DatabaseService Coverage Tests", () => {
         await annotate("Pattern: Singleton", "pattern");
         await annotate("Priority: Critical", "priority");
 
-        const { DatabaseService } = await import(
-            "../../../services/database/DatabaseService"
-        );
+        const { DatabaseService } =
+            await import("../../../services/database/DatabaseService");
 
         const instance1 = DatabaseService.getInstance();
         const instance2 = DatabaseService.getInstance();
@@ -112,9 +111,8 @@ describe("DatabaseService Coverage Tests", () => {
         await annotate("Operation: Initialization", "operation");
         await annotate("Priority: High", "priority");
 
-        const { DatabaseService } = await import(
-            "../../../services/database/DatabaseService"
-        );
+        const { DatabaseService } =
+            await import("../../../services/database/DatabaseService");
 
         try {
             const instance = DatabaseService.getInstance();
@@ -126,9 +124,8 @@ describe("DatabaseService Coverage Tests", () => {
         }
     });
     it("should handle database operations", async () => {
-        const { DatabaseService } = await import(
-            "../../../services/database/DatabaseService"
-        );
+        const { DatabaseService } =
+            await import("../../../services/database/DatabaseService");
 
         try {
             const instance = DatabaseService.getInstance();
@@ -140,15 +137,12 @@ describe("DatabaseService Coverage Tests", () => {
         }
     });
     it("should recover from locked database errors during initialization", async () => {
-        const { DatabaseService } = await import(
-            "../../../services/database/DatabaseService"
-        );
-        const schemaModule = await import(
-            "../../../services/database/utils/databaseSchema"
-        );
-        const recoveryModule = await import(
-            "../../../services/database/utils/databaseLockRecovery"
-        );
+        const { DatabaseService } =
+            await import("../../../services/database/DatabaseService");
+        const schemaModule =
+            await import("../../../services/database/utils/databaseSchema");
+        const recoveryModule =
+            await import("../../../services/database/utils/databaseLockRecovery");
 
         const createDatabaseSchemaSpy = vi.spyOn(
             schemaModule,
@@ -174,16 +168,14 @@ describe("DatabaseService Coverage Tests", () => {
         instance.close();
     });
     it("should handle transaction operations", async () => {
-        const { DatabaseService } = await import(
-            "../../../services/database/DatabaseService"
-        );
+        const { DatabaseService } =
+            await import("../../../services/database/DatabaseService");
 
         try {
             const instance = DatabaseService.getInstance();
             await instance.executeTransaction(() =>
                 // Mock transaction operation
-                Promise.resolve("success")
-            );
+                Promise.resolve("success"));
             expect(true).toBeTruthy();
         } catch (error) {
             // Transaction might fail in test environment
@@ -191,9 +183,8 @@ describe("DatabaseService Coverage Tests", () => {
         }
     });
     it("should handle cleanup operations", async () => {
-        const { DatabaseService } = await import(
-            "../../../services/database/DatabaseService"
-        );
+        const { DatabaseService } =
+            await import("../../../services/database/DatabaseService");
 
         try {
             const instance = DatabaseService.getInstance();
@@ -206,16 +197,14 @@ describe("DatabaseService Coverage Tests", () => {
     });
     it("should have proper constants defined", async () => {
         // This will import the file and exercise any top-level code
-        const module = await import(
-            "../../../services/database/DatabaseService"
-        );
+        const module =
+            await import("../../../services/database/DatabaseService");
         expect(module).toBeDefined();
         expect(module.DatabaseService).toBeDefined();
     });
     it("should handle database path generation", async () => {
-        const { DatabaseService } = await import(
-            "../../../services/database/DatabaseService"
-        );
+        const { DatabaseService } =
+            await import("../../../services/database/DatabaseService");
 
         try {
             const instance = DatabaseService.getInstance();
@@ -226,9 +215,8 @@ describe("DatabaseService Coverage Tests", () => {
         }
     });
     it("should handle error scenarios", async () => {
-        const { DatabaseService } = await import(
-            "../../../services/database/DatabaseService"
-        );
+        const { DatabaseService } =
+            await import("../../../services/database/DatabaseService");
 
         try {
             const instance = DatabaseService.getInstance();
@@ -251,9 +239,8 @@ describe("DatabaseService Coverage Tests", () => {
                         const { app } = await import("electron");
                         (app.getPath as any).mockReturnValue(mockPath);
 
-                        const { DatabaseService } = await import(
-                            "../../../services/database/DatabaseService"
-                        );
+                        const { DatabaseService } =
+                            await import("../../../services/database/DatabaseService");
 
                         try {
                             const instance = DatabaseService.getInstance();
@@ -295,9 +282,8 @@ describe("DatabaseService Coverage Tests", () => {
                         { minLength: 1, maxLength: 5 }
                     ),
                     async (operations) => {
-                        const { DatabaseService } = await import(
-                            "../../../services/database/DatabaseService"
-                        );
+                        const { DatabaseService } =
+                            await import("../../../services/database/DatabaseService");
 
                         try {
                             const instance = DatabaseService.getInstance();
@@ -349,9 +335,8 @@ describe("DatabaseService Coverage Tests", () => {
                         errorOnConnect: fc.boolean(),
                     }),
                     async ({ initialized, shouldConnect, errorOnConnect }) => {
-                        const { DatabaseService } = await import(
-                            "../../../services/database/DatabaseService"
-                        );
+                        const { DatabaseService } =
+                            await import("../../../services/database/DatabaseService");
 
                         try {
                             const instance = DatabaseService.getInstance();
@@ -367,13 +352,11 @@ describe("DatabaseService Coverage Tests", () => {
                             } else if (errorOnConnect) {
                                 // Error scenarios
                                 expect(() =>
-                                    instance.getDatabase()
-                                ).toThrowError();
+                                    instance.getDatabase()).toThrowError();
                             } else if (!initialized) {
                                 // Uninitialized state
                                 expect(() =>
-                                    instance.getDatabase()
-                                ).toThrowError();
+                                    instance.getDatabase()).toThrowError();
                             }
                         } catch (error) {
                             expect(error).toBeInstanceOf(Error);
@@ -397,9 +380,8 @@ describe("DatabaseService Coverage Tests", () => {
                     ),
                     fc.boolean(),
                     async (returnValue, shouldThrow) => {
-                        const { DatabaseService } = await import(
-                            "../../../services/database/DatabaseService"
-                        );
+                        const { DatabaseService } =
+                            await import("../../../services/database/DatabaseService");
 
                         try {
                             const instance = DatabaseService.getInstance();
@@ -461,9 +443,8 @@ describe("DatabaseService Coverage Tests", () => {
                         fc.string({ minLength: 5, maxLength: 50 })
                     ),
                     async (errorType) => {
-                        const { DatabaseService } = await import(
-                            "../../../services/database/DatabaseService"
-                        );
+                        const { DatabaseService } =
+                            await import("../../../services/database/DatabaseService");
 
                         try {
                             const instance = DatabaseService.getInstance();

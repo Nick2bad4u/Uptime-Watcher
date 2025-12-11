@@ -295,7 +295,11 @@ export const createStorybookPlugins = (
     const reactOptions =
         options?.reactOptions ?? createStorybookReactPluginOptions();
 
-    return [tsconfigPaths(), viteReact(reactOptions), ...additionalPlugins];
+    return [
+        tsconfigPaths(),
+        viteReact(reactOptions),
+        ...additionalPlugins,
+    ];
 };
 
 /**
@@ -346,7 +350,11 @@ export const createStorybookBaseViteConfig = (
         },
         optimizeDeps: {
             esbuildOptions: {
-                conditions: ["module", "browser", "node"],
+                conditions: [
+                    "module",
+                    "browser",
+                    "node",
+                ],
             },
             exclude: Array.from(optimizeDepsExclude),
             include: Array.from(optimizeDepsInclude),

@@ -562,8 +562,7 @@ class MockComponentLifecycle {
             () => ({ key: Math.random(), nested: { value: Math.random() } }),
             () =>
                 Array.from({ length: Math.floor(Math.random() * 10) }, () =>
-                    Math.random()
-                ),
+                    Math.random()),
             () => new Date(),
             () => Math.random() > 0.5,
         ];
@@ -1051,8 +1050,7 @@ describe("React Component Lifecycle Performance", () => {
                     type: j % 2 === 0 ? "useState" : "useEffect",
                     value: Math.random(),
                     dependencies: Array.from({ length: 3 }, () =>
-                        Math.random()
-                    ),
+                        Math.random()),
                     hasChanged: false,
                 });
             }

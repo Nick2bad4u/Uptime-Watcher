@@ -138,9 +138,8 @@ vi.mock("../../../../hooks/site/useSite", async () => {
 const { useSite } = await import("../../../../hooks/site/useSite");
 const mockUseSite = vi.mocked(useSite);
 
-const { SiteTableRow } = await import(
-    "../../../../components/Dashboard/SiteList/SiteTableRow"
-);
+const { SiteTableRow } =
+    await import("../../../../components/Dashboard/SiteList/SiteTableRow");
 
 const identifierArbitrary = fc
     .string({ maxLength: 24, minLength: 1 })

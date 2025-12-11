@@ -24,5 +24,4 @@ export default defineConfig((configEnv) =>
                 }, // Custom project name and color for Vitest
             },
         })
-    )
-) satisfies ViteUserConfigFnObject as ViteUserConfigFnObject;
+    )) satisfies ViteUserConfigFnObject as ViteUserConfigFnObject;

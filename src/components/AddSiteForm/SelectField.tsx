@@ -55,8 +55,10 @@ import {
  *
  * @public
  */
-export interface SelectFieldProperties
-    extends Omit<StringFieldPropsBase, "value"> {
+export interface SelectFieldProperties extends Omit<
+    StringFieldPropsBase,
+    "value"
+> {
     /** Array of options to display in the dropdown */
     readonly options: SelectOption[];
     /** Placeholder text shown when no option is selected */

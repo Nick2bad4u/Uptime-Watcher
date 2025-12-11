@@ -44,19 +44,18 @@ describe("SafeConversions utilities fuzzing tests", () => {
             expect(safeNumberConversion(false, fallback)).toBe(0);
         });
 
-        test.prop([fc.string()])(
-            "should convert valid numeric strings",
-            (str) => {
-                const result = safeNumberConversion(str);
-                const expected = Number(str);
+        test.prop([fc.string()])("should convert valid numeric strings", (
+            str
+        ) => {
+            const result = safeNumberConversion(str);
+            const expected = Number(str);
 
-                if (Number.isNaN(expected)) {
-                    expect(result).toBe(0);
-                } else {
-                    expect(result).toBe(expected);
-                }
+            if (Number.isNaN(expected)) {
+                expect(result).toBe(0);
+            } else {
+                expect(result).toBe(expected);
             }
-        );
+        });
 
         test.prop([fc.anything(), fc.float()])(
             "should use default value for non-convertible values",
@@ -210,19 +209,18 @@ describe("SafeConversions utilities fuzzing tests", () => {
             }
         );
 
-        test.prop([fc.string()])(
-            "should parse valid integer strings",
-            (str) => {
-                const result = safeParseInt(str);
-                const expected = Number.parseInt(str, 10);
+        test.prop([fc.string()])("should parse valid integer strings", (
+            str
+        ) => {
+            const result = safeParseInt(str);
+            const expected = Number.parseInt(str, 10);
 
-                if (Number.isNaN(expected)) {
-                    expect(result).toBe(0);
-                } else {
-                    expect(result).toBe(expected);
-                }
+            if (Number.isNaN(expected)) {
+                expect(result).toBe(0);
+            } else {
+                expect(result).toBe(expected);
             }
-        );
+        });
 
         test.prop([fc.anything()])("should never throw errors", (value) => {
             expect(() => safeParseInt(value)).not.toThrowError();
@@ -299,14 +297,13 @@ describe("SafeConversions utilities fuzzing tests", () => {
             }
         );
 
-        test.prop([fc.anything()])(
-            "should always return valid port number",
-            (value) => {
-                const result = safeParsePort(value);
-                expect(result).toBeGreaterThanOrEqual(1);
-                expect(result).toBeLessThanOrEqual(65_535);
-            }
-        );
+        test.prop([fc.anything()])("should always return valid port number", (
+            value
+        ) => {
+            const result = safeParsePort(value);
+            expect(result).toBeGreaterThanOrEqual(1);
+            expect(result).toBeLessThanOrEqual(65_535);
+        });
 
         it("should handle edge cases", () => {
             expect(safeParsePort("8080")).toBe(8080);
@@ -335,14 +332,13 @@ describe("SafeConversions utilities fuzzing tests", () => {
             }
         );
 
-        test.prop([fc.anything()])(
-            "should always return positive integer",
-            (value) => {
-                const result = safeParsePositiveInt(value);
-                expect(result).toBeGreaterThan(0);
-                expect(Number.isInteger(result)).toBeTruthy();
-            }
-        );
+        test.prop([fc.anything()])("should always return positive integer", (
+            value
+        ) => {
+            const result = safeParsePositiveInt(value);
+            expect(result).toBeGreaterThan(0);
+            expect(Number.isInteger(result)).toBeTruthy();
+        });
 
         it("should handle edge cases", () => {
             expect(safeParsePositiveInt("5")).toBe(5);
@@ -411,13 +407,12 @@ describe("SafeConversions utilities fuzzing tests", () => {
             }
         );
 
-        test.prop([fc.anything()])(
-            "should always return positive timeout",
-            (value) => {
-                const result = safeParseTimeout(value);
-                expect(result).toBeGreaterThan(0);
-            }
-        );
+        test.prop([fc.anything()])("should always return positive timeout", (
+            value
+        ) => {
+            const result = safeParseTimeout(value);
+            expect(result).toBeGreaterThan(0);
+        });
 
         it("should handle edge cases", () => {
             expect(safeParseTimeout("5000")).toBe(5000);
@@ -458,13 +453,12 @@ describe("SafeConversions utilities fuzzing tests", () => {
             expect(result).toBeLessThanOrEqual(afterCall);
         });
 
-        test.prop([fc.anything()])(
-            "should always return positive timestamp",
-            (value) => {
-                const result = safeParseTimestamp(value);
-                expect(result).toBeGreaterThan(0);
-            }
-        );
+        test.prop([fc.anything()])("should always return positive timestamp", (
+            value
+        ) => {
+            const result = safeParseTimestamp(value);
+            expect(result).toBeGreaterThan(0);
+        });
 
         it("should handle custom default values", () => {
             const customDefault = 1_640_995_200_000; // Fixed timestamp
@@ -480,37 +474,35 @@ describe("SafeConversions utilities fuzzing tests", () => {
     });
 
     describe("Integration and consistency", () => {
-        test.prop([fc.anything()])(
-            "all functions should never throw errors",
-            (value) => {
-                expect(() => safeNumberConversion(value)).not.toThrowError();
-                expect(() => safeParseCheckInterval(value)).not.toThrowError();
-                expect(() => safeParseFloat(value)).not.toThrowError();
-                expect(() => safeParseInt(value)).not.toThrowError();
-                expect(() => safeParsePercentage(value)).not.toThrowError();
-                expect(() => safeParsePort(value)).not.toThrowError();
-                expect(() => safeParsePositiveInt(value)).not.toThrowError();
-                expect(() => safeParseRetryAttempts(value)).not.toThrowError();
-                expect(() => safeParseTimeout(value)).not.toThrowError();
-                expect(() => safeParseTimestamp(value)).not.toThrowError();
-            }
-        );
+        test.prop([fc.anything()])("all functions should never throw errors", (
+            value
+        ) => {
+            expect(() => safeNumberConversion(value)).not.toThrowError();
+            expect(() => safeParseCheckInterval(value)).not.toThrowError();
+            expect(() => safeParseFloat(value)).not.toThrowError();
+            expect(() => safeParseInt(value)).not.toThrowError();
+            expect(() => safeParsePercentage(value)).not.toThrowError();
+            expect(() => safeParsePort(value)).not.toThrowError();
+            expect(() => safeParsePositiveInt(value)).not.toThrowError();
+            expect(() => safeParseRetryAttempts(value)).not.toThrowError();
+            expect(() => safeParseTimeout(value)).not.toThrowError();
+            expect(() => safeParseTimestamp(value)).not.toThrowError();
+        });
 
-        test.prop([fc.anything()])(
-            "all functions should return numbers",
-            (value) => {
-                expect(typeof safeNumberConversion(value)).toBe("number");
-                expect(typeof safeParseCheckInterval(value)).toBe("number");
-                expect(typeof safeParseFloat(value)).toBe("number");
-                expect(typeof safeParseInt(value)).toBe("number");
-                expect(typeof safeParsePercentage(value)).toBe("number");
-                expect(typeof safeParsePort(value)).toBe("number");
-                expect(typeof safeParsePositiveInt(value)).toBe("number");
-                expect(typeof safeParseRetryAttempts(value)).toBe("number");
-                expect(typeof safeParseTimeout(value)).toBe("number");
-                expect(typeof safeParseTimestamp(value)).toBe("number");
-            }
-        );
+        test.prop([fc.anything()])("all functions should return numbers", (
+            value
+        ) => {
+            expect(typeof safeNumberConversion(value)).toBe("number");
+            expect(typeof safeParseCheckInterval(value)).toBe("number");
+            expect(typeof safeParseFloat(value)).toBe("number");
+            expect(typeof safeParseInt(value)).toBe("number");
+            expect(typeof safeParsePercentage(value)).toBe("number");
+            expect(typeof safeParsePort(value)).toBe("number");
+            expect(typeof safeParsePositiveInt(value)).toBe("number");
+            expect(typeof safeParseRetryAttempts(value)).toBe("number");
+            expect(typeof safeParseTimeout(value)).toBe("number");
+            expect(typeof safeParseTimestamp(value)).toBe("number");
+        });
 
         test.prop([fc.string()])(
             "functions should handle numeric strings without throwing",

@@ -58,8 +58,7 @@ const FRONTMATTER_SCHEMA_PATH = path.resolve(
 function isIgnoredPath(filePath) {
     const normalized = filePath.replaceAll("\\", "/");
     return IGNORED_PATH_SUBSTRINGS.some((substring) =>
-        normalized.endsWith(substring)
-    );
+        normalized.endsWith(substring));
 }
 
 /**

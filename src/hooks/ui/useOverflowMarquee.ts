@@ -256,16 +256,15 @@ export function useOverflowMarquee<
         false
     );
 
-    const measureOverflow = useCallback(
-        (element: ElementType | null): boolean => {
-            if (!element) {
-                return false;
-            }
+    const measureOverflow = useCallback((
+        element: ElementType | null
+    ): boolean => {
+        if (!element) {
+            return false;
+        }
 
-            return element.scrollWidth - element.clientWidth > 1;
-        },
-        []
-    );
+        return element.scrollWidth - element.clientWidth > 1;
+    }, []);
 
     const latestContainerRef =
         useRef<RefObject<ElementType | null>>(containerRef);

@@ -18,42 +18,39 @@ const stringifyUnsafe = (value: unknown) =>
 
 describe("jsonSafety fuzz tests", () => {
     describe(safeJsonStringify, () => {
-        test.prop([fc.jsonValue()])(
-            "round-trips arbitrary JSON values",
-            (value) => {
-                const encoded = stringifyUnsafe(value);
-                expect(encoded.success).toBeTruthy();
+        test.prop([fc.jsonValue()])("round-trips arbitrary JSON values", (
+            value
+        ) => {
+            const encoded = stringifyUnsafe(value);
+            expect(encoded.success).toBeTruthy();
 
-                const parsed = safeJsonParse(encoded.data!, acceptAnyJsonValue);
-                expect(parsed.success).toBeTruthy();
-                // JSON's semantics do not preserve certain edge cases like the
-                // sign of zero ("-0" is serialized as "0"). To avoid
-                // asserting a stronger contract than native JSON, we compare
-                // against the normalized value produced by JSON.parse.
-                const normalized = JSON.parse(encoded.data!);
-                expect(parsed.data).toEqual(normalized);
-            }
-        );
+            const parsed = safeJsonParse(encoded.data!, acceptAnyJsonValue);
+            expect(parsed.success).toBeTruthy();
+            // JSON's semantics do not preserve certain edge cases like the
+            // sign of zero ("-0" is serialized as "0"). To avoid
+            // asserting a stronger contract than native JSON, we compare
+            // against the normalized value produced by JSON.parse.
+            const normalized = JSON.parse(encoded.data!);
+            expect(parsed.data).toEqual(normalized);
+        });
 
-        test.prop([fc.anything()])(
-            "never throws for arbitrary inputs",
-            (value) => {
-                expect(() => stringifyUnsafe(value)).not.toThrowError();
-            }
-        );
+        test.prop([fc.anything()])("never throws for arbitrary inputs", (
+            value
+        ) => {
+            expect(() => stringifyUnsafe(value)).not.toThrowError();
+        });
     });
 
     describe(safeJsonParseArray, () => {
-        test.prop([fc.array(fc.jsonValue())])(
-            "accepts arbitrary arrays",
-            (values) => {
-                const encoded = JSON.stringify(values);
-                const result = safeJsonParseArray(encoded, acceptAnyJsonValue);
-                expect(result.success).toBeTruthy();
-                const normalized = JSON.parse(encoded);
-                expect(result.data).toEqual(normalized);
-            }
-        );
+        test.prop([fc.array(fc.jsonValue())])("accepts arbitrary arrays", (
+            values
+        ) => {
+            const encoded = JSON.stringify(values);
+            const result = safeJsonParseArray(encoded, acceptAnyJsonValue);
+            expect(result.success).toBeTruthy();
+            const normalized = JSON.parse(encoded);
+            expect(result.data).toEqual(normalized);
+        });
 
         test.prop([fc.jsonValue()])("rejects non-array payloads", (value) => {
             const result = safeJsonParseArray(
@@ -69,18 +66,18 @@ describe("jsonSafety fuzz tests", () => {
     });
 
     describe(safeJsonParseWithFallback, () => {
-        test.prop([fc.string(), fc.string()])(
-            "falls back when parsing fails",
-            (input, fallback) => {
-                const corrupted = `${input}@@`;
-                const parsed = safeJsonParseWithFallback(
-                    corrupted,
-                    acceptAnyJsonValue,
-                    fallback
-                );
-                expect(parsed).toBe(fallback);
-            }
-        );
+        test.prop([fc.string(), fc.string()])("falls back when parsing fails", (
+            input,
+            fallback
+        ) => {
+            const corrupted = `${input}@@`;
+            const parsed = safeJsonParseWithFallback(
+                corrupted,
+                acceptAnyJsonValue,
+                fallback
+            );
+            expect(parsed).toBe(fallback);
+        });
     });
 
     describe(safeJsonStringifyWithFallback, () => {

@@ -133,25 +133,24 @@ vi.mock("../../../services/monitoring/MonitorTypeRegistry", () => ({
 }));
 
 // Mock shared validation
-vi.mock(
-    "../../../../shared/validation/monitorSchemas",
-    async (importOriginal) => {
-        const actual =
-            await importOriginal<
-                typeof import("../../../../shared/validation/monitorSchemas")
-            >();
+vi.mock("../../../../shared/validation/monitorSchemas", async (
+    importOriginal
+) => {
+    const actual =
+        await importOriginal<
+            typeof import("../../../../shared/validation/monitorSchemas")
+        >();
 
-        return {
-            ...actual,
-            validateMonitorData: vi.fn((type: string, _data: unknown) => ({
-                success: type !== "invalid",
-                errors: type === "invalid" ? ["Invalid monitor type"] : [],
-                warnings: type === "warning" ? ["Warning message"] : [],
-                metadata: { validated: true },
-            })),
-        };
-    }
-);
+    return {
+        ...actual,
+        validateMonitorData: vi.fn((type: string, _data: unknown) => ({
+            success: type !== "invalid",
+            errors: type === "invalid" ? ["Invalid monitor type"] : [],
+            warnings: type === "warning" ? ["Warning message"] : [],
+            metadata: { validated: true },
+        })),
+    };
+});
 
 describe("IpcService - Comprehensive Coverage", () => {
     let ipcService: IpcService;
@@ -235,16 +234,17 @@ describe("IpcService - Comprehensive Coverage", () => {
             isMonitoring: false,
             alreadyInactive: false,
         };
-        const offMock = vi.fn(
-            (eventName: string, handler: (data: any) => void) => {
-                if (
-                    eventName === "sites:state-synchronized" &&
-                    handler === stateSyncListener
-                ) {
-                    stateSyncListener = undefined;
-                }
+        const offMock = vi.fn((
+            eventName: string,
+            handler: (data: any) => void
+        ) => {
+            if (
+                eventName === "sites:state-synchronized" &&
+                handler === stateSyncListener
+            ) {
+                stateSyncListener = undefined;
             }
-        );
+        });
 
         mockUptimeOrchestrator = {
             addSite: vi.fn().mockResolvedValue(true),
@@ -260,11 +260,11 @@ describe("IpcService - Comprehensive Coverage", () => {
             checkSiteManually: vi.fn().mockResolvedValue(true),
             exportData: vi.fn().mockResolvedValue("export-data"),
             importData: vi.fn().mockResolvedValue(true),
-            setHistoryLimit: vi
-                .fn()
-                .mockImplementation(async (limit: number) => {
-                    historyLimit = limit;
-                }),
+            setHistoryLimit: vi.fn().mockImplementation(async (
+                limit: number
+            ) => {
+                historyLimit = limit;
+            }),
             getHistoryLimit: vi.fn().mockImplementation(() => historyLimit),
             resetSettings: vi.fn().mockResolvedValue(undefined),
             downloadBackup: vi.fn().mockResolvedValue({
@@ -276,18 +276,17 @@ describe("IpcService - Comprehensive Coverage", () => {
                 .fn()
                 .mockImplementation(async ({ sites }) =>
                     (sites ?? mockSites).map((site: Site) =>
-                        structuredClone(site)
-                    )
-                ),
+                        structuredClone(site))),
             emitTyped: vi.fn().mockResolvedValue(undefined),
-            onTyped: vi.fn(
-                (eventName: string, handler: (data: any) => void) => {
-                    if (eventName === "sites:state-synchronized") {
-                        stateSyncListener = handler;
-                    }
-                    return undefined;
+            onTyped: vi.fn((
+                eventName: string,
+                handler: (data: any) => void
+            ) => {
+                if (eventName === "sites:state-synchronized") {
+                    stateSyncListener = handler;
                 }
-            ),
+                return undefined;
+            }),
             off: offMock,
             offTyped: offMock,
         } as unknown as UptimeOrchestrator;

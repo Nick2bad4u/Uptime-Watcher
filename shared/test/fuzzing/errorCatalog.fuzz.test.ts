@@ -86,8 +86,7 @@ describe("ErrorCatalog utilities fuzzing tests", () => {
             "should handle any template and params without throwing",
             (template, params) => {
                 expect(() =>
-                    formatErrorMessage(template, params)
-                ).not.toThrowError();
+                    formatErrorMessage(template, params)).not.toThrowError();
             }
         );
 
@@ -97,47 +96,45 @@ describe("ErrorCatalog utilities fuzzing tests", () => {
                 key1: fc.oneof(fc.string(), fc.integer()),
                 key2: fc.oneof(fc.string(), fc.integer()),
             }),
-        ])(
-            "should replace all placeholders with parameter values",
-            (template, params) => {
-                // Create template with known placeholders
-                const templateWithPlaceholders = `${template} {key1} and {key2}`;
-                const result = formatErrorMessage(
-                    templateWithPlaceholders,
-                    params
-                );
+        ])("should replace all placeholders with parameter values", (
+            template,
+            params
+        ) => {
+            // Create template with known placeholders
+            const templateWithPlaceholders = `${template} {key1} and {key2}`;
+            const result = formatErrorMessage(templateWithPlaceholders, params);
 
-                expect(result).toContain(String(params.key1));
-                expect(result).toContain(String(params.key2));
-                expect(result).not.toContain("{key1}");
-                expect(result).not.toContain("{key2}");
-            }
-        );
+            expect(result).toContain(String(params.key1));
+            expect(result).toContain(String(params.key2));
+            expect(result).not.toContain("{key1}");
+            expect(result).not.toContain("{key2}");
+        });
 
         test.prop([
             fc.string(),
             fc.string(),
             fc.oneof(fc.string(), fc.integer()),
-        ])(
-            "should handle single parameter replacement",
-            (prefix, key, value) => {
-                const template = `${prefix} {${key}}`;
-                const params = { [key]: value };
-                const result = formatErrorMessage(template, params);
+        ])("should handle single parameter replacement", (
+            prefix,
+            key,
+            value
+        ) => {
+            const template = `${prefix} {${key}}`;
+            const params = { [key]: value };
+            const result = formatErrorMessage(template, params);
 
-                // Check for dangerous keys that should not be replaced for security
-                if (
-                    key === "__proto__" ||
-                    key === "constructor" ||
-                    key === "prototype"
-                ) {
-                    // Dangerous keys should remain as placeholders for security
-                    expect(result).toBe(`${prefix} {${key}}`);
-                } else {
-                    expect(result).toBe(`${prefix} ${String(value)}`);
-                }
+            // Check for dangerous keys that should not be replaced for security
+            if (
+                key === "__proto__" ||
+                key === "constructor" ||
+                key === "prototype"
+            ) {
+                // Dangerous keys should remain as placeholders for security
+                expect(result).toBe(`${prefix} {${key}}`);
+            } else {
+                expect(result).toBe(`${prefix} ${String(value)}`);
             }
-        );
+        });
 
         test.prop([
             fc.string(),
@@ -162,39 +159,36 @@ describe("ErrorCatalog utilities fuzzing tests", () => {
                             !RESERVED_PLACEHOLDER_KEYS.has(key)
                     );
                 }),
-        ])(
-            "should handle multiple parameter replacements",
-            (template, paramPairs) => {
-                let templateWithPlaceholders = template;
-                const params: Record<string, string | number> = {};
+        ])("should handle multiple parameter replacements", (
+            template,
+            paramPairs
+        ) => {
+            let templateWithPlaceholders = template;
+            const params: Record<string, string | number> = {};
 
-                for (const [key, value] of paramPairs) {
-                    templateWithPlaceholders += ` {${key}}`;
-                    params[key] = value;
-                }
+            for (const [key, value] of paramPairs) {
+                templateWithPlaceholders += ` {${key}}`;
+                params[key] = value;
+            }
 
-                const result = formatErrorMessage(
-                    templateWithPlaceholders,
-                    params
-                );
+            const result = formatErrorMessage(templateWithPlaceholders, params);
 
-                expect(result).toBeDefined();
-                // All placeholders should be replaced (except dangerous ones like __proto__)
-                for (const [key, value] of paramPairs) {
-                    if (
-                        key !== "__proto__" &&
-                        key !== "constructor" &&
-                        key !== "prototype"
-                    ) {
-                        expect(result).toContain(String(value));
-                        expect(result).not.toContain(`{${key}}`);
-                    } else {
-                        // Dangerous keys should remain as placeholders for security
-                        expect(result).toContain(`{${key}}`);
-                    }
+            expect(result).toBeDefined();
+            // All placeholders should be replaced (except dangerous ones like __proto__)
+            for (const [key, value] of paramPairs) {
+                if (
+                    key !== "__proto__" &&
+                    key !== "constructor" &&
+                    key !== "prototype"
+                ) {
+                    expect(result).toContain(String(value));
+                    expect(result).not.toContain(`{${key}}`);
+                } else {
+                    // Dangerous keys should remain as placeholders for security
+                    expect(result).toContain(`{${key}}`);
                 }
             }
-        );
+        });
 
         test.prop([fc.string()])(
             "should leave template unchanged when no placeholders exist",
@@ -210,32 +204,32 @@ describe("ErrorCatalog utilities fuzzing tests", () => {
             fc.string(),
             fc.array(fc.string(), { minLength: 1, maxLength: 3 }),
             fc.record({}, { requiredKeys: [] }),
-        ])(
-            "should handle missing parameters gracefully",
-            (template, keys, params) => {
-                let templateWithPlaceholders = template;
-                for (const key of keys) {
-                    templateWithPlaceholders += ` {${key}}`;
-                }
+        ])("should handle missing parameters gracefully", (
+            template,
+            keys,
+            params
+        ) => {
+            let templateWithPlaceholders = template;
+            for (const key of keys) {
+                templateWithPlaceholders += ` {${key}}`;
+            }
 
-                // FormatErrorMessage should not throw even if params are missing
-                expect(() =>
-                    formatErrorMessage(templateWithPlaceholders, params)
-                ).not.toThrowError();
-
-                const result = formatErrorMessage(
+            // FormatErrorMessage should not throw even if params are missing
+            expect(() =>
+                formatErrorMessage(
                     templateWithPlaceholders,
                     params
-                );
+                )).not.toThrowError();
 
-                // Missing placeholders should remain as-is
-                for (const key of keys) {
-                    if (!(key in params)) {
-                        expect(result).toContain(`{${key}}`);
-                    }
+            const result = formatErrorMessage(templateWithPlaceholders, params);
+
+            // Missing placeholders should remain as-is
+            for (const key of keys) {
+                if (!(key in params)) {
+                    expect(result).toContain(`{${key}}`);
                 }
             }
-        );
+        });
 
         test.prop([
             fc.string({ minLength: 1 }),
@@ -269,13 +263,12 @@ describe("ErrorCatalog utilities fuzzing tests", () => {
     });
 
     describe(isKnownErrorMessage, () => {
-        test.prop([fc.string()])(
-            "should return boolean for any string input",
-            (message) => {
-                const result = isKnownErrorMessage(message);
-                expect(typeof result).toBe("boolean");
-            }
-        );
+        test.prop([fc.string()])("should return boolean for any string input", (
+            message
+        ) => {
+            const result = isKnownErrorMessage(message);
+            expect(typeof result).toBe("boolean");
+        });
 
         test("should return true for all catalog error messages", () => {
             // Test all error messages from all categories
@@ -295,10 +288,9 @@ describe("ErrorCatalog utilities fuzzing tests", () => {
         test.prop([
             fc.string().filter((str) => {
                 // Generate strings that are definitely not in the catalog
-                const allMessages = Object.values(ERROR_CATALOG).flatMap(
-                    (category) =>
-                        Object.values(category as Record<string, string>)
-                );
+                const allMessages = Object.values(ERROR_CATALOG).flatMap((
+                    category
+                ) => Object.values(category as Record<string, string>));
                 return !allMessages.includes(str);
             }),
         ])("should return false for unknown error messages", (message) => {
@@ -347,15 +339,14 @@ describe("ErrorCatalog utilities fuzzing tests", () => {
             }
         });
 
-        test.prop([fc.string()])(
-            "should handle edge cases gracefully",
-            (input) => {
-                expect(() => isKnownErrorMessage(input)).not.toThrowError();
+        test.prop([fc.string()])("should handle edge cases gracefully", (
+            input
+        ) => {
+            expect(() => isKnownErrorMessage(input)).not.toThrowError();
 
-                const result = isKnownErrorMessage(input);
-                expect(typeof result).toBe("boolean");
-            }
-        );
+            const result = isKnownErrorMessage(input);
+            expect(typeof result).toBe("boolean");
+        });
     });
 
     describe("Error catalog integrity", () => {

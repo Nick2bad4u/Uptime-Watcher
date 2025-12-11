@@ -60,8 +60,7 @@ vi.mock("../../../stores/utils", () => ({
 vi.mock("../../../../shared/utils/errorHandling", () => ({
     withErrorHandling: vi.fn(),
     ensureError: vi.fn((error) =>
-        error instanceof Error ? error : new Error(String(error))
-    ),
+        error instanceof Error ? error : new Error(String(error))),
 }));
 
 // Import mocked modules to get references
@@ -162,15 +161,16 @@ describe(useSettingsStore, () => {
         mockElectronAPI.stateSync.onStateSyncEvent.mockReturnValue(() => {});
 
         mockExtractIpcData.mockImplementation((response: any) => response.data);
-        mockSafeExtractIpcData.mockImplementation(
-            (response: any, fallback: any) => {
-                try {
-                    return response?.data ?? fallback;
-                } catch {
-                    return fallback;
-                }
+        mockSafeExtractIpcData.mockImplementation((
+            response: any,
+            fallback: any
+        ) => {
+            try {
+                return response?.data ?? fallback;
+            } catch {
+                return fallback;
             }
-        );
+        });
 
         // Setup withErrorHandling to execute function properly
         mockWithErrorHandling.mockImplementation(async (fn, handlers) => {
@@ -381,16 +381,14 @@ describe(useSettingsStore, () => {
                 | Parameters<ElectronAPI["events"]["onHistoryLimitUpdated"]>[0]
                 | undefined;
 
-            mockElectronAPI.events.onHistoryLimitUpdated.mockImplementation(
-                (
-                    handler: Parameters<
-                        ElectronAPI["events"]["onHistoryLimitUpdated"]
-                    >[0]
-                ) => {
-                    capturedHandler = handler;
-                    return () => undefined;
-                }
-            );
+            mockElectronAPI.events.onHistoryLimitUpdated.mockImplementation((
+                handler: Parameters<
+                    ElectronAPI["events"]["onHistoryLimitUpdated"]
+                >[0]
+            ) => {
+                capturedHandler = handler;
+                return () => undefined;
+            });
 
             const { result } = renderHook(() => useSettingsStore());
 
@@ -926,58 +924,57 @@ describe(useSettingsStore, () => {
                 systemNotificationsEnabled: fc.boolean(),
                 systemNotificationsSoundEnabled: fc.boolean(),
             }),
-        ])(
-            "should handle various settings configurations correctly",
-            async (testSettings) => {
-                const { result } = renderHook(() => useSettingsStore());
+        ])("should handle various settings configurations correctly", async (
+            testSettings
+        ) => {
+            const { result } = renderHook(() => useSettingsStore());
 
-                act(() => {
-                    result.current.updateSettings(testSettings);
-                });
+            act(() => {
+                result.current.updateSettings(testSettings);
+            });
 
-                expect(result.current.settings.theme).toBe(testSettings.theme);
-                expect(result.current.settings.autoStart).toBe(
-                    testSettings.autoStart
-                );
-                expect(result.current.settings.minimizeToTray).toBe(
-                    testSettings.minimizeToTray
-                );
-                expect(result.current.settings.historyLimit).toBe(
-                    testSettings.historyLimit
-                );
-                expect(result.current.settings.inAppAlertsEnabled).toBe(
-                    testSettings.inAppAlertsEnabled
-                );
-                expect(result.current.settings.inAppAlertsSoundEnabled).toBe(
-                    testSettings.inAppAlertsSoundEnabled
-                );
-                expect(result.current.settings.systemNotificationsEnabled).toBe(
-                    testSettings.systemNotificationsEnabled
-                );
-                expect(
-                    result.current.settings.systemNotificationsSoundEnabled
-                ).toBe(testSettings.systemNotificationsSoundEnabled);
+            expect(result.current.settings.theme).toBe(testSettings.theme);
+            expect(result.current.settings.autoStart).toBe(
+                testSettings.autoStart
+            );
+            expect(result.current.settings.minimizeToTray).toBe(
+                testSettings.minimizeToTray
+            );
+            expect(result.current.settings.historyLimit).toBe(
+                testSettings.historyLimit
+            );
+            expect(result.current.settings.inAppAlertsEnabled).toBe(
+                testSettings.inAppAlertsEnabled
+            );
+            expect(result.current.settings.inAppAlertsSoundEnabled).toBe(
+                testSettings.inAppAlertsSoundEnabled
+            );
+            expect(result.current.settings.systemNotificationsEnabled).toBe(
+                testSettings.systemNotificationsEnabled
+            );
+            expect(
+                result.current.settings.systemNotificationsSoundEnabled
+            ).toBe(testSettings.systemNotificationsSoundEnabled);
 
-                // Verify setting value constraints
-                expect(["light", "dark", "system"]).toContain(
-                    testSettings.theme
-                );
-                expect(typeof testSettings.autoStart).toBe("boolean");
-                expect(typeof testSettings.minimizeToTray).toBe("boolean");
-                expect(typeof testSettings.inAppAlertsEnabled).toBe("boolean");
-                expect(typeof testSettings.inAppAlertsSoundEnabled).toBe(
-                    "boolean"
-                );
-                expect(typeof testSettings.systemNotificationsEnabled).toBe(
-                    "boolean"
-                );
-                expect(
-                    typeof testSettings.systemNotificationsSoundEnabled
-                ).toBe("boolean");
-                expect(testSettings.historyLimit).toBeGreaterThanOrEqual(100);
-                expect(testSettings.historyLimit).toBeLessThanOrEqual(10_000);
-            }
-        );
+            // Verify setting value constraints
+            expect([
+                "light",
+                "dark",
+                "system",
+            ]).toContain(testSettings.theme);
+            expect(typeof testSettings.autoStart).toBe("boolean");
+            expect(typeof testSettings.minimizeToTray).toBe("boolean");
+            expect(typeof testSettings.inAppAlertsEnabled).toBe("boolean");
+            expect(typeof testSettings.inAppAlertsSoundEnabled).toBe("boolean");
+            expect(typeof testSettings.systemNotificationsEnabled).toBe(
+                "boolean"
+            );
+            expect(typeof testSettings.systemNotificationsSoundEnabled).toBe(
+                "boolean"
+            );
+            expect(testSettings.historyLimit).toBeGreaterThanOrEqual(100);
+            expect(testSettings.historyLimit).toBeLessThanOrEqual(10_000);
+        });
 
         test.prop([
             fc.array(
@@ -1017,50 +1014,49 @@ describe(useSettingsStore, () => {
                 ),
                 { minLength: 1, maxLength: 6 }
             ),
-        ])(
-            "should handle sequential setting updates correctly",
-            async (settingUpdates) => {
-                const { result } = renderHook(() => useSettingsStore());
-                const finalExpectedState: any = {};
+        ])("should handle sequential setting updates correctly", async (
+            settingUpdates
+        ) => {
+            const { result } = renderHook(() => useSettingsStore());
+            const finalExpectedState: any = {};
 
-                for (const update of settingUpdates) {
-                    const partialSettings: any = {
-                        [update.setting]: update.value,
-                    };
-                    finalExpectedState[update.setting] = update.value;
+            for (const update of settingUpdates) {
+                const partialSettings: any = {
+                    [update.setting]: update.value,
+                };
+                finalExpectedState[update.setting] = update.value;
 
-                    act(() => {
-                        result.current.updateSettings(partialSettings);
-                    });
-                }
-
-                // Check that the final state contains all the updates
-                for (const [setting, expectedValue] of Object.entries(
-                    finalExpectedState
-                )) {
-                    expect((result.current.settings as any)[setting]).toBe(
-                        expectedValue
-                    );
-                }
-
-                // Verify updates array properties
-                expect(Array.isArray(settingUpdates)).toBeTruthy();
-                expect(settingUpdates.length).toBeGreaterThanOrEqual(1);
-                expect(settingUpdates.length).toBeLessThanOrEqual(6);
-                for (const update of settingUpdates) {
-                    expect([
-                        "theme",
-                        "autoStart",
-                        "minimizeToTray",
-                        "inAppAlertsEnabled",
-                        "inAppAlertsSoundEnabled",
-                        "systemNotificationsEnabled",
-                        "systemNotificationsSoundEnabled",
-                        "historyLimit",
-                    ]).toContain(update.setting);
-                }
+                act(() => {
+                    result.current.updateSettings(partialSettings);
+                });
             }
-        );
+
+            // Check that the final state contains all the updates
+            for (const [setting, expectedValue] of Object.entries(
+                finalExpectedState
+            )) {
+                expect((result.current.settings as any)[setting]).toBe(
+                    expectedValue
+                );
+            }
+
+            // Verify updates array properties
+            expect(Array.isArray(settingUpdates)).toBeTruthy();
+            expect(settingUpdates.length).toBeGreaterThanOrEqual(1);
+            expect(settingUpdates.length).toBeLessThanOrEqual(6);
+            for (const update of settingUpdates) {
+                expect([
+                    "theme",
+                    "autoStart",
+                    "minimizeToTray",
+                    "inAppAlertsEnabled",
+                    "inAppAlertsSoundEnabled",
+                    "systemNotificationsEnabled",
+                    "systemNotificationsSoundEnabled",
+                    "historyLimit",
+                ]).toContain(update.setting);
+            }
+        });
 
         test.prop([fc.boolean()])(
             "should handle boolean settings appropriately",
@@ -1137,39 +1133,36 @@ describe(useSettingsStore, () => {
                     minimizeToTray: fc.boolean(),
                 })
             ),
-        ])(
-            "should handle partial settings updates correctly",
-            async (partialSettings) => {
-                const { result } = renderHook(() => useSettingsStore());
+        ])("should handle partial settings updates correctly", async (
+            partialSettings
+        ) => {
+            const { result } = renderHook(() => useSettingsStore());
 
-                // Get initial state
-                const initialSettings = { ...result.current.settings };
+            // Get initial state
+            const initialSettings = { ...result.current.settings };
 
-                act(() => {
-                    result.current.updateSettings(partialSettings);
-                });
+            act(() => {
+                result.current.updateSettings(partialSettings);
+            });
 
-                // Check that updated fields have new values
-                for (const [key, value] of Object.entries(partialSettings)) {
-                    expect((result.current.settings as any)[key]).toBe(value);
-                }
-
-                // Check that non-updated fields remain unchanged
-                for (const [key, initialValue] of Object.entries(
-                    initialSettings
-                )) {
-                    if (!(key in partialSettings)) {
-                        expect((result.current.settings as any)[key]).toBe(
-                            initialValue
-                        );
-                    }
-                }
-
-                // Verify partial settings properties
-                expect(typeof partialSettings).toBe("object");
-                expect(partialSettings).not.toBeNull();
+            // Check that updated fields have new values
+            for (const [key, value] of Object.entries(partialSettings)) {
+                expect((result.current.settings as any)[key]).toBe(value);
             }
-        );
+
+            // Check that non-updated fields remain unchanged
+            for (const [key, initialValue] of Object.entries(initialSettings)) {
+                if (!(key in partialSettings)) {
+                    expect((result.current.settings as any)[key]).toBe(
+                        initialValue
+                    );
+                }
+            }
+
+            // Verify partial settings properties
+            expect(typeof partialSettings).toBe("object");
+            expect(partialSettings).not.toBeNull();
+        });
 
         test.prop([fc.integer({ min: 1, max: 10 })])(
             "should handle multiple rapid updates correctly",
@@ -1224,69 +1217,69 @@ describe(useSettingsStore, () => {
                     { maxLength: 3 }
                 ),
             }),
-        ])(
-            "should handle mixed valid and invalid settings gracefully",
-            async ({ validSettings, invalidAttempts }) => {
-                const { result } = renderHook(() => useSettingsStore());
+        ])("should handle mixed valid and invalid settings gracefully", async ({
+            validSettings,
+            invalidAttempts,
+        }) => {
+            const { result } = renderHook(() => useSettingsStore());
 
-                // Apply valid settings first
-                act(() => {
-                    result.current.updateSettings(validSettings);
-                });
+            // Apply valid settings first
+            act(() => {
+                result.current.updateSettings(validSettings);
+            });
 
-                expect(result.current.settings.theme).toBe(validSettings.theme);
-                expect(result.current.settings.inAppAlertsEnabled).toBe(
-                    validSettings.inAppAlertsEnabled
-                );
-                expect(result.current.settings.inAppAlertsSoundEnabled).toBe(
-                    validSettings.inAppAlertsSoundEnabled
-                );
-                expect(result.current.settings.systemNotificationsEnabled).toBe(
-                    validSettings.systemNotificationsEnabled
-                );
-                expect(
-                    result.current.settings.systemNotificationsSoundEnabled
-                ).toBe(validSettings.systemNotificationsSoundEnabled);
-                expect(result.current.settings.historyLimit).toBe(
-                    validSettings.historyLimit
-                );
+            expect(result.current.settings.theme).toBe(validSettings.theme);
+            expect(result.current.settings.inAppAlertsEnabled).toBe(
+                validSettings.inAppAlertsEnabled
+            );
+            expect(result.current.settings.inAppAlertsSoundEnabled).toBe(
+                validSettings.inAppAlertsSoundEnabled
+            );
+            expect(result.current.settings.systemNotificationsEnabled).toBe(
+                validSettings.systemNotificationsEnabled
+            );
+            expect(
+                result.current.settings.systemNotificationsSoundEnabled
+            ).toBe(validSettings.systemNotificationsSoundEnabled);
+            expect(result.current.settings.historyLimit).toBe(
+                validSettings.historyLimit
+            );
 
-                // Attempt invalid updates (should not break the store)
-                for (const invalidAttempt of invalidAttempts) {
-                    expect(() => {
-                        act(() => {
-                            result.current.updateSettings({
-                                [invalidAttempt.invalidKey]:
-                                    invalidAttempt.invalidValue,
-                            } as any);
-                        });
-                    }).not.toThrowError();
-                }
-
-                // Valid settings should still be intact
-                expect(result.current.settings.theme).toBe(validSettings.theme);
-                expect(result.current.settings.inAppAlertsEnabled).toBe(
-                    validSettings.inAppAlertsEnabled
-                );
-                expect(result.current.settings.inAppAlertsSoundEnabled).toBe(
-                    validSettings.inAppAlertsSoundEnabled
-                );
-                expect(result.current.settings.systemNotificationsEnabled).toBe(
-                    validSettings.systemNotificationsEnabled
-                );
-                expect(
-                    result.current.settings.systemNotificationsSoundEnabled
-                ).toBe(validSettings.systemNotificationsSoundEnabled);
-                expect(result.current.settings.historyLimit).toBe(
-                    validSettings.historyLimit
-                );
-
-                // Verify mixed settings properties
-                expect(typeof validSettings).toBe("object");
-                expect(Array.isArray(invalidAttempts)).toBeTruthy();
-                expect(invalidAttempts.length).toBeLessThanOrEqual(3);
+            // Attempt invalid updates (should not break the store)
+            for (const invalidAttempt of invalidAttempts) {
+                expect(() => {
+                    act(() => {
+                        result.current.updateSettings({
+                            [invalidAttempt.invalidKey]:
+                                invalidAttempt.invalidValue,
+                        } as any);
+                    });
+                }).not.toThrowError();
             }
-        );
+
+            // Valid settings should still be intact
+            expect(result.current.settings.theme).toBe(validSettings.theme);
+            expect(result.current.settings.inAppAlertsEnabled).toBe(
+                validSettings.inAppAlertsEnabled
+            );
+            expect(result.current.settings.inAppAlertsSoundEnabled).toBe(
+                validSettings.inAppAlertsSoundEnabled
+            );
+            expect(result.current.settings.systemNotificationsEnabled).toBe(
+                validSettings.systemNotificationsEnabled
+            );
+            expect(
+                result.current.settings.systemNotificationsSoundEnabled
+            ).toBe(validSettings.systemNotificationsSoundEnabled);
+            expect(result.current.settings.historyLimit).toBe(
+                validSettings.historyLimit
+            );
+
+            // Verify mixed settings properties
+            expect(typeof validSettings).toBe("object");
+            expect(Array.isArray(invalidAttempts)).toBeTruthy();
+            expect(invalidAttempts.length).toBeLessThanOrEqual(3);
+        });
 
         test.prop([fc.constantFrom("light", "dark", "system")])(
             "should handle theme switching correctly",
@@ -1298,13 +1291,19 @@ describe(useSettingsStore, () => {
                 });
 
                 expect(result.current.settings.theme).toBe(themeValue);
-                expect(["light", "dark", "system"]).toContain(
-                    result.current.settings.theme
-                );
+                expect([
+                    "light",
+                    "dark",
+                    "system",
+                ]).toContain(result.current.settings.theme);
 
                 // Verify theme value properties
                 expect(typeof themeValue).toBe("string");
-                expect(["light", "dark", "system"]).toContain(themeValue);
+                expect([
+                    "light",
+                    "dark",
+                    "system",
+                ]).toContain(themeValue);
             }
         );
 
@@ -1323,53 +1322,48 @@ describe(useSettingsStore, () => {
                     })
                 )
                 .chain(([settingsA, settingsB]) =>
-                    fc.constant({ settingsA, settingsB })
-                ),
-        ])(
-            "should handle overlapping settings updates correctly",
-            async ({ settingsA, settingsB }) => {
-                const { result } = renderHook(() => useSettingsStore());
+                    fc.constant({ settingsA, settingsB })),
+        ])("should handle overlapping settings updates correctly", async ({
+            settingsA,
+            settingsB,
+        }) => {
+            const { result } = renderHook(() => useSettingsStore());
 
-                // Apply first set of settings
-                act(() => {
-                    result.current.updateSettings(settingsA);
-                });
+            // Apply first set of settings
+            act(() => {
+                result.current.updateSettings(settingsA);
+            });
 
-                expect(result.current.settings.theme).toBe(settingsA.theme);
-                expect(result.current.settings.autoStart).toBe(
-                    settingsA.autoStart
-                );
-                expect(result.current.settings.systemNotificationsEnabled).toBe(
-                    settingsA.systemNotificationsEnabled
-                );
+            expect(result.current.settings.theme).toBe(settingsA.theme);
+            expect(result.current.settings.autoStart).toBe(settingsA.autoStart);
+            expect(result.current.settings.systemNotificationsEnabled).toBe(
+                settingsA.systemNotificationsEnabled
+            );
 
-                // Apply overlapping second set
-                act(() => {
-                    result.current.updateSettings(settingsB);
-                });
+            // Apply overlapping second set
+            act(() => {
+                result.current.updateSettings(settingsB);
+            });
 
-                // Theme should be updated to settingsB value
-                expect(result.current.settings.theme).toBe(settingsB.theme);
-                // Non-overlapping fields from settingsA should remain
-                expect(result.current.settings.autoStart).toBe(
-                    settingsA.autoStart
-                );
-                expect(result.current.settings.systemNotificationsEnabled).toBe(
-                    settingsA.systemNotificationsEnabled
-                );
-                // New fields from settingsB should be set
-                expect(result.current.settings.minimizeToTray).toBe(
-                    settingsB.minimizeToTray
-                );
-                expect(result.current.settings.historyLimit).toBe(
-                    settingsB.historyLimit
-                );
+            // Theme should be updated to settingsB value
+            expect(result.current.settings.theme).toBe(settingsB.theme);
+            // Non-overlapping fields from settingsA should remain
+            expect(result.current.settings.autoStart).toBe(settingsA.autoStart);
+            expect(result.current.settings.systemNotificationsEnabled).toBe(
+                settingsA.systemNotificationsEnabled
+            );
+            // New fields from settingsB should be set
+            expect(result.current.settings.minimizeToTray).toBe(
+                settingsB.minimizeToTray
+            );
+            expect(result.current.settings.historyLimit).toBe(
+                settingsB.historyLimit
+            );
 
-                // Verify overlapping settings properties
-                expect(typeof settingsA).toBe("object");
-                expect(typeof settingsB).toBe("object");
-                expect(settingsA.theme).not.toBe(settingsB.theme); // Should be different to test overlap
-            }
-        );
+            // Verify overlapping settings properties
+            expect(typeof settingsA).toBe("object");
+            expect(typeof settingsB).toBe("object");
+            expect(settingsA.theme).not.toBe(settingsB.theme); // Should be different to test overlap
+        });
     });
 });

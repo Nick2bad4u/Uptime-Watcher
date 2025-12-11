@@ -229,8 +229,7 @@ class MockFileSystem {
 
         if (options.tags && options.tags.length > 0) {
             results = results.filter((file) =>
-                options.tags!.some((tag) => file.tags.includes(tag))
-            );
+                options.tags!.some((tag) => file.tags.includes(tag)));
         }
 
         if (options.limit) {
@@ -895,8 +894,7 @@ describe("File Management Service Performance", () => {
 
             Promise.all(
                 testFiles.map((file) =>
-                    service.saveFile(file.path, file.content, file.options)
-                )
+                    service.saveFile(file.path, file.content, file.options))
             ).then(() => {
                 service.listDirectory("/test");
             });
@@ -916,8 +914,7 @@ describe("File Management Service Performance", () => {
 
             Promise.all(
                 testFiles.map((file) =>
-                    service.saveFile(file.path, file.content, file.options)
-                )
+                    service.saveFile(file.path, file.content, file.options))
             ).then(() => {
                 service.listDirectory("/test", true);
             });
@@ -933,8 +930,7 @@ describe("File Management Service Performance", () => {
 
             Promise.all(
                 testFiles.map((file) =>
-                    service.saveFile(file.path, file.content, file.options)
-                )
+                    service.saveFile(file.path, file.content, file.options))
             ).then(() => {
                 service.searchFiles({
                     pattern: String.raw`file_1.*\.txt`,
@@ -953,8 +949,7 @@ describe("File Management Service Performance", () => {
 
             Promise.all(
                 testFiles.map((file) =>
-                    service.saveFile(file.path, file.content, file.options)
-                )
+                    service.saveFile(file.path, file.content, file.options))
             ).then(() => {
                 service.searchFiles({
                     tags: ["tag1", "tag2"],
@@ -973,8 +968,7 @@ describe("File Management Service Performance", () => {
 
             Promise.all(
                 testFiles.map((file) =>
-                    service.saveFile(file.path, file.content, file.options)
-                )
+                    service.saveFile(file.path, file.content, file.options))
             ).then(() => {
                 service.searchFiles({
                     sizeRange: { min: 100, max: 1000 },
@@ -1031,8 +1025,7 @@ describe("File Management Service Performance", () => {
 
             Promise.all(
                 testFiles.map((file) =>
-                    service.saveFile(file.path, file.content, file.options)
-                )
+                    service.saveFile(file.path, file.content, file.options))
             ).then(() => {
                 service.createBackup("/backup_source", {
                     recursive: true,
@@ -1052,8 +1045,7 @@ describe("File Management Service Performance", () => {
 
             Promise.all(
                 testFiles.map((file) =>
-                    service.saveFile(file.path, file.content, file.options)
-                )
+                    service.saveFile(file.path, file.content, file.options))
             ).then(() => {
                 service.createBackup("/backup_test").then((backup) => {
                     service.restoreBackup(backup.id, "/restored");
@@ -1071,8 +1063,7 @@ describe("File Management Service Performance", () => {
 
             Promise.all(
                 testFiles.map((file) =>
-                    service.saveFile(file.path, file.content, file.options)
-                )
+                    service.saveFile(file.path, file.content, file.options))
             ).then(() => {
                 service.getStorageStats();
             });
@@ -1088,13 +1079,11 @@ describe("File Management Service Performance", () => {
 
             Promise.all(
                 testFiles.map((file) =>
-                    service.saveFile(file.path, file.content, file.options)
-                )
+                    service.saveFile(file.path, file.content, file.options))
             ).then(() => {
                 // Load files to populate cache
                 const loadPromises = testFiles.map((file) =>
-                    service.loadFile(file.path, true)
-                );
+                    service.loadFile(file.path, true));
 
                 Promise.all(loadPromises).then(() => {
                     // Check cache stats
@@ -1117,13 +1106,11 @@ describe("File Management Service Performance", () => {
                 service.saveFile(
                     `/concurrent/write_${i}.txt`,
                     `Concurrent content ${i}`
-                )
-            );
+                ));
 
             Promise.all(writePromises).then(() => {
                 const readPromises = Array.from({ length: 10 }, (_, i) =>
-                    service.loadFile(`/concurrent/write_${i}.txt`)
-                );
+                    service.loadFile(`/concurrent/write_${i}.txt`));
                 Promise.all(readPromises);
             });
         },
@@ -1140,8 +1127,7 @@ describe("File Management Service Performance", () => {
 
             Promise.all(
                 initialFiles.map((file) =>
-                    service.saveFile(file.path, file.content, file.options)
-                )
+                    service.saveFile(file.path, file.content, file.options))
             ).then(() => {
                 // Perform mixed operations
                 const operations = [
@@ -1170,8 +1156,7 @@ describe("File Management Service Performance", () => {
 
             Promise.all(
                 testFiles.map((file) =>
-                    service.saveFile(file.path, file.content, file.options)
-                )
+                    service.saveFile(file.path, file.content, file.options))
             ).then(() => {
                 service.createBackup("/reset_test").then(() => {
                     service.reset();

@@ -88,8 +88,7 @@ const mockSiteLoadingOrchestrator = {
             success: true,
             sitesLoaded: 2,
             message: "Sites loaded successfully",
-        })
-    ),
+        })),
 };
 
 vi.mock("../../utils/database/SiteRepositoryService", () => ({
@@ -311,8 +310,7 @@ describe(DatabaseManager, () => {
                         buffer: mockBackupBuffer,
                         fileName: "backup-test.db",
                         metadata: { ...mockBackupMetadata },
-                    })
-                ),
+                    })),
             };
 
             // Get references to the mocked modules
@@ -351,8 +349,7 @@ describe(DatabaseManager, () => {
             // Create a mock backup service that throws an error
             const mockDataBackupService = {
                 downloadDatabaseBackup: vi.fn(() =>
-                    Promise.reject(new Error("Backup failed"))
-                ),
+                    Promise.reject(new Error("Backup failed"))),
             };
 
             // Spy on the service factory's createBackupService method
@@ -380,8 +377,7 @@ describe(DatabaseManager, () => {
             // Mock the DataImportExportService instance
             const mockDataImportExportService = {
                 exportAllData: vi.fn(() =>
-                    Promise.resolve('{"sites": [], "settings": []}')
-                ),
+                    Promise.resolve('{"sites": [], "settings": []}')),
             };
 
             // Get references to the mocked modules
@@ -412,8 +408,7 @@ describe(DatabaseManager, () => {
             // Create a mock import/export service that throws an error
             const mockDataImportExportService = {
                 exportAllData: vi.fn(() =>
-                    Promise.reject(new Error("Export failed"))
-                ),
+                    Promise.reject(new Error("Export failed"))),
             };
 
             // Spy on the service factory's createImportExportService method
@@ -441,8 +436,7 @@ describe(DatabaseManager, () => {
             // Mock the DataImportExportService instance with error
             const mockDataImportExportService = {
                 importDataFromJson: vi.fn(() =>
-                    Promise.reject(new Error("Import failed"))
-                ),
+                    Promise.reject(new Error("Import failed"))),
                 persistImportedData: vi.fn(() => Promise.resolve()),
             };
 
@@ -491,8 +485,7 @@ describe(DatabaseManager, () => {
             // Mock the DataImportExportService instance with error
             const mockDataImportExportService = {
                 importDataFromJson: vi.fn(() =>
-                    Promise.reject(new Error("Import failed"))
-                ),
+                    Promise.reject(new Error("Import failed"))),
                 persistImportedData: vi.fn(() => Promise.resolve()),
             };
 
@@ -614,8 +607,7 @@ describe(DatabaseManager, () => {
             // Create a mock backup service that throws an error
             const mockDataBackupService = {
                 downloadDatabaseBackup: vi.fn(() =>
-                    Promise.reject(new Error("Service error"))
-                ),
+                    Promise.reject(new Error("Service error"))),
             };
 
             // Spy on the service factory's createBackupService method

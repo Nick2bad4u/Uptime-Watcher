@@ -57,7 +57,11 @@ describe("Settings Component Coverage Tests", () => {
                 "theme",
             ];
 
-            const invalidKeys = ["invalidKey", "anotherInvalid", "notAllowed"];
+            const invalidKeys = [
+                "invalidKey",
+                "anotherInvalid",
+                "notAllowed",
+            ];
 
             for (const key of validKeys) {
                 expect(ALLOWED_SETTINGS_KEYS.has(key as any)).toBeTruthy();
@@ -176,7 +180,11 @@ describe("Settings Component Coverage Tests", () => {
             await annotate("Type: Business Logic", "type");
 
             const theme = {
-                availableThemes: ["light", "dark", "system"],
+                availableThemes: [
+                    "light",
+                    "dark",
+                    "system",
+                ],
                 isDark: false,
                 setTheme: vi.fn(),
             };
@@ -343,7 +351,14 @@ describe("Settings Component Coverage Tests", () => {
             await annotate("Category: Component", "category");
             await annotate("Type: Configuration", "type");
 
-            const HISTORY_LIMIT_OPTIONS = [25, 50, 100, 250, 500, 1000];
+            const HISTORY_LIMIT_OPTIONS = [
+                25,
+                50,
+                100,
+                250,
+                500,
+                1000,
+            ];
             const DEFAULT_HISTORY_LIMIT = 100;
 
             expect(Array.isArray(HISTORY_LIMIT_OPTIONS)).toBeTruthy();
@@ -424,11 +439,19 @@ describe("Settings Component Coverage Tests", () => {
             await annotate("Category: Component", "category");
             await annotate("Type: Business Logic", "type");
 
-            const themeNames = ["light", "dark", "system"];
+            const themeNames = [
+                "light",
+                "dark",
+                "system",
+            ];
 
             for (const theme of themeNames) {
                 expect(typeof theme).toBe("string");
-                expect(["light", "dark", "system"]).toContain(theme);
+                expect([
+                    "light",
+                    "dark",
+                    "system",
+                ]).toContain(theme);
             }
         });
 
@@ -440,7 +463,11 @@ describe("Settings Component Coverage Tests", () => {
 
             const setTheme = vi.fn();
 
-            const themes = ["light", "dark", "system"];
+            const themes = [
+                "light",
+                "dark",
+                "system",
+            ];
             for (const theme of themes) {
                 setTheme(theme);
                 expect(setTheme).toHaveBeenCalledWith(theme);

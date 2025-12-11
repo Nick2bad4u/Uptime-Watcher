@@ -60,8 +60,7 @@ vi.mock("../../stores/utils", () => ({
 vi.mock("../../../shared/utils/errorHandling", () => ({
     withErrorHandling: vi.fn((fn) => fn()),
     ensureError: vi.fn((error) =>
-        error instanceof Error ? error : new Error(String(error))
-    ),
+        error instanceof Error ? error : new Error(String(error))),
 }));
 
 const mockStateSyncService = {
@@ -121,9 +120,8 @@ describe("Store Alias Methods", () => {
 
     describe("Settings Store Aliases", () => {
         it("persistHistoryLimit should exist and delegate correctly", async () => {
-            const { useSettingsStore } = await import(
-                "../../stores/settings/useSettingsStore"
-            );
+            const { useSettingsStore } =
+                await import("../../stores/settings/useSettingsStore");
 
             const store = useSettingsStore.getState();
 
@@ -147,9 +145,8 @@ describe("Store Alias Methods", () => {
 
     describe("Sites Sync Store Aliases", () => {
         it("syncSites should exist and be callable", async () => {
-            const { useSitesStore } = await import(
-                "../../stores/sites/useSitesStore"
-            );
+            const { useSitesStore } =
+                await import("../../stores/sites/useSitesStore");
 
             const store = useSitesStore.getState();
 
@@ -162,9 +159,8 @@ describe("Store Alias Methods", () => {
         });
 
         it("fullResyncSites should exist and be callable", async () => {
-            const { useSitesStore } = await import(
-                "../../stores/sites/useSitesStore"
-            );
+            const { useSitesStore } =
+                await import("../../stores/sites/useSitesStore");
 
             const store = useSitesStore.getState();
 
@@ -179,9 +175,8 @@ describe("Store Alias Methods", () => {
 
     describe("Updates Store Aliases", () => {
         it("applyUpdateStatus should exist and work correctly", async () => {
-            const { useUpdatesStore } = await import(
-                "../../stores/updates/useUpdatesStore"
-            );
+            const { useUpdatesStore } =
+                await import("../../stores/updates/useUpdatesStore");
 
             // Reset store to initial state
             useUpdatesStore.setState({ updateStatus: "idle" });
@@ -201,9 +196,8 @@ describe("Store Alias Methods", () => {
         });
 
         it("applyUpdateStatus should handle different status values", async () => {
-            const { useUpdatesStore } = await import(
-                "../../stores/updates/useUpdatesStore"
-            );
+            const { useUpdatesStore } =
+                await import("../../stores/updates/useUpdatesStore");
 
             const statusValues = [
                 "idle",
@@ -230,15 +224,12 @@ describe("Store Alias Methods", () => {
     describe("Basic Integration Tests", () => {
         it("all alias methods should be accessible from their respective stores", async () => {
             // Import all stores
-            const { useSettingsStore } = await import(
-                "../../stores/settings/useSettingsStore"
-            );
-            const { useSitesStore } = await import(
-                "../../stores/sites/useSitesStore"
-            );
-            const { useUpdatesStore } = await import(
-                "../../stores/updates/useUpdatesStore"
-            );
+            const { useSettingsStore } =
+                await import("../../stores/settings/useSettingsStore");
+            const { useSitesStore } =
+                await import("../../stores/sites/useSitesStore");
+            const { useUpdatesStore } =
+                await import("../../stores/updates/useUpdatesStore");
 
             const settingsStore = useSettingsStore.getState();
             const sitesStore = useSitesStore.getState();
@@ -258,12 +249,10 @@ describe("Store Alias Methods", () => {
         });
 
         it("async aliases should return promises", async () => {
-            const { useSettingsStore } = await import(
-                "../../stores/settings/useSettingsStore"
-            );
-            const { useSitesStore } = await import(
-                "../../stores/sites/useSitesStore"
-            );
+            const { useSettingsStore } =
+                await import("../../stores/settings/useSettingsStore");
+            const { useSitesStore } =
+                await import("../../stores/sites/useSitesStore");
 
             const settingsStore = useSettingsStore.getState();
             const sitesStore = useSitesStore.getState();

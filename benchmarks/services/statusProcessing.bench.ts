@@ -1089,9 +1089,12 @@ describe("Status Processing and Aggregation Benchmarks", () => {
                         siteIdentifiers,
                         10
                     );
-                    await statusService.processBulkStatusUpdates(bulkEntries, [
-                        3_600_000,
-                    ]);
+                    await statusService.processBulkStatusUpdates(
+                        bulkEntries,
+                        [
+                            3_600_000,
+                        ]
+                    );
                 }
             },
             { iterations: 5 }

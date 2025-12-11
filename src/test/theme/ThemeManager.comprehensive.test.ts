@@ -281,8 +281,7 @@ describe(ThemeManager, () => {
 
             const lightTheme = themeManager.getTheme("light");
             expect(() =>
-                themeManager.applyTheme(lightTheme)
-            ).not.toThrowError();
+                themeManager.applyTheme(lightTheme)).not.toThrowError();
 
             // Restore document
             globalThis.document = originalDocument;
@@ -303,8 +302,7 @@ describe(ThemeManager, () => {
 
             // Apply theme and verify it doesn't throw
             expect(() =>
-                themeManager.applyTheme(lightTheme)
-            ).not.toThrowError();
+                themeManager.applyTheme(lightTheme)).not.toThrowError();
 
             // Verify basic functionality (the actual calls may vary based on internal implementation)
             // We just verify that the applyTheme method executes without errors
@@ -484,11 +482,11 @@ describe(ThemeManager, () => {
             } as any;
 
             expect(() =>
-                themeManager.applyTheme(incompleteTheme)
-            ).not.toThrowError();
+                themeManager.applyTheme(incompleteTheme)).not.toThrowError();
             expect(() =>
-                themeManager.generateCSSVariables(incompleteTheme)
-            ).not.toThrowError();
+                themeManager.generateCSSVariables(
+                    incompleteTheme
+                )).not.toThrowError();
         });
 
         it("should handle null/undefined values gracefully", async ({
@@ -510,8 +508,7 @@ describe(ThemeManager, () => {
             } as any;
 
             expect(() =>
-                themeManager.applyTheme(themeWithNulls)
-            ).not.toThrowError();
+                themeManager.applyTheme(themeWithNulls)).not.toThrowError();
         });
 
         it("should work without DOM environment", async ({

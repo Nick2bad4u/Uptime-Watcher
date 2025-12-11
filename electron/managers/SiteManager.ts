@@ -290,8 +290,7 @@ export class SiteManager {
         });
 
         this.lastStateSyncSnapshot = emissionSnapshot.map((site) =>
-            structuredClone(site)
-        );
+            structuredClone(site));
 
         return emissionSnapshot;
     }

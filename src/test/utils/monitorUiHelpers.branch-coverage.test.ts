@@ -50,9 +50,8 @@ async function setupMonitorTypesMock(
     ) as unknown as MockInstance<() => Promise<MonitorTypeConfig[]>>;
     spy.mockResolvedValue(configs);
 
-    const { getTypesWithFeature } = await import(
-        "../../utils/monitorUiHelpers"
-    );
+    const { getTypesWithFeature } =
+        await import("../../utils/monitorUiHelpers");
 
     return {
         getTypesWithFeature,

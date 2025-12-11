@@ -137,11 +137,11 @@ function formatTestNames(testStructures, format = "list") {
                 ) {
                     treeOutput += `\n📁 ${structure.file}\n`;
 
-                    structure.describes.forEach(
-                        (/** @type {any} */ describe) => {
-                            treeOutput += `  📝 ${describe}\n`;
-                        }
-                    );
+                    structure.describes.forEach((
+                        /** @type {any} */ describe
+                    ) => {
+                        treeOutput += `  📝 ${describe}\n`;
+                    });
 
                     structure.tests.forEach((/** @type {any} */ test) => {
                         treeOutput += `  ✅ ${test}\n`;
@@ -173,11 +173,11 @@ function formatTestNames(testStructures, format = "list") {
 
                     if (structure.describes.length > 0) {
                         listOutput += "\nDescribe blocks:\n";
-                        structure.describes.forEach(
-                            (/** @type {any} */ describe) => {
-                                listOutput += `  - ${describe}\n`;
-                            }
-                        );
+                        structure.describes.forEach((
+                            /** @type {any} */ describe
+                        ) => {
+                            listOutput += `  - ${describe}\n`;
+                        });
                     }
 
                     if (structure.tests.length > 0) {
@@ -206,8 +206,7 @@ function main() {
                     "--tree",
                     "--flat",
                     "--list",
-                ].includes(arg)
-            )
+                ].includes(arg))
             ?.replace("--", "") || "list";
     const projectRoot = path.resolve(import.meta.dirname, "..");
 

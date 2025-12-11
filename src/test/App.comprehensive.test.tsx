@@ -214,8 +214,7 @@ describe("App Component - Comprehensive Coverage", () => {
         const baseTheme = isDark ? darkTheme : lightTheme;
         const currentTheme = cloneTheme(baseTheme);
         const mockGetColor = vi.fn((path: string) =>
-            getThemeColorByPath(currentTheme, path)
-        );
+            getThemeColorByPath(currentTheme, path));
         const mockGetStatusColor = vi.fn(
             (status: keyof typeof currentTheme.colors.status) =>
                 currentTheme.colors.status[status] ??
@@ -303,18 +302,15 @@ describe("App Component - Comprehensive Coverage", () => {
                 ? (selector as (state: typeof defaultSettingsStore) => unknown)(
                       defaultSettingsStore
                   )
-                : defaultSettingsStore
-        );
+                : defaultSettingsStore);
         mockUseSitesStore.mockImplementation((selector: any) =>
             typeof selector === "function"
                 ? selector(defaultSitesStore)
-                : defaultSitesStore
-        );
+                : defaultSitesStore);
         mockUseUIStore.mockImplementation((selector: any) =>
             typeof selector === "function"
                 ? selector(defaultUIStore)
-                : defaultUIStore
-        );
+                : defaultUIStore);
         mockUseUpdatesStore.mockImplementation(() => defaultUpdatesStore);
         mockUseTheme.mockReturnValue(createMockTheme());
 
@@ -967,9 +963,8 @@ describe("App Component - Comprehensive Coverage", () => {
             });
 
             // Mock useSelectedSite to return a site
-            const mockUseSelectedSite = await import(
-                "../hooks/useSelectedSite"
-            );
+            const mockUseSelectedSite =
+                await import("../hooks/useSelectedSite");
             vi.mocked(mockUseSelectedSite.useSelectedSite).mockReturnValue(
                 mockSite
             );
@@ -1004,9 +999,8 @@ describe("App Component - Comprehensive Coverage", () => {
             });
 
             // Mock useSelectedSite to return null
-            const mockUseSelectedSite = await import(
-                "../hooks/useSelectedSite"
-            );
+            const mockUseSelectedSite =
+                await import("../hooks/useSelectedSite");
             vi.mocked(mockUseSelectedSite.useSelectedSite).mockReturnValue(
                 undefined
             );
@@ -1040,9 +1034,8 @@ describe("App Component - Comprehensive Coverage", () => {
             });
 
             // Mock useSelectedSite to return a site
-            const mockUseSelectedSite = await import(
-                "../hooks/useSelectedSite"
-            );
+            const mockUseSelectedSite =
+                await import("../hooks/useSelectedSite");
             vi.mocked(mockUseSelectedSite.useSelectedSite).mockReturnValue(
                 mockSite
             );
@@ -1205,9 +1198,8 @@ describe("App Component - Comprehensive Coverage", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Data Update", "type");
 
-            const mockEnvironment = await import(
-                "../../shared/utils/environment"
-            );
+            const mockEnvironment =
+                await import("../../shared/utils/environment");
             vi.mocked(mockEnvironment.isDevelopment).mockReturnValue(true);
 
             const mockLogger = await import("../services/logger");
@@ -1261,9 +1253,8 @@ describe("App Component - Comprehensive Coverage", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
-            const mockBackendFocusSync = await import(
-                "../hooks/useBackendFocusSync"
-            );
+            const mockBackendFocusSync =
+                await import("../hooks/useBackendFocusSync");
 
             await renderApp();
 
@@ -1288,9 +1279,8 @@ describe("App Component - Comprehensive Coverage", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
-            const mockEnvironment = await import(
-                "../../shared/utils/environment"
-            );
+            const mockEnvironment =
+                await import("../../shared/utils/environment");
             vi.mocked(mockEnvironment.isProduction).mockReturnValue(true);
 
             const mockLogger = await import("../services/logger");
@@ -1316,9 +1306,8 @@ describe("App Component - Comprehensive Coverage", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
-            const mockEnvironment = await import(
-                "../../shared/utils/environment"
-            );
+            const mockEnvironment =
+                await import("../../shared/utils/environment");
             vi.mocked(mockEnvironment.isProduction).mockReturnValue(false);
 
             const mockLogger = await import("../services/logger");

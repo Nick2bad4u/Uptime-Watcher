@@ -939,29 +939,27 @@ describe("Notification Service Benchmarks", () => {
             {} as Record<string, ChannelDelivery[]>
         );
 
-        const coordinationStats = Object.values(notificationGroups).map(
-            (group) => {
-                const primaryChannels = group.filter((d) => !d.fallbackUsed);
-                const fallbackChannels = group.filter((d) => d.fallbackUsed);
-                const anySuccess = group.some((d) => d.success);
-                const allPrimarySuccess = primaryChannels.every(
-                    (d) => d.success
-                );
+        const coordinationStats = Object.values(notificationGroups).map((
+            group
+        ) => {
+            const primaryChannels = group.filter((d) => !d.fallbackUsed);
+            const fallbackChannels = group.filter((d) => d.fallbackUsed);
+            const anySuccess = group.some((d) => d.success);
+            const allPrimarySuccess = primaryChannels.every((d) => d.success);
 
-                return {
-                    notificationId: group[0].notificationId,
-                    totalChannels: group.length,
-                    primaryChannels: primaryChannels.length,
-                    fallbackChannels: fallbackChannels.length,
-                    anySuccess,
-                    allPrimarySuccess,
-                    totalLatency:
-                        Math.max(...group.map((d) => d.endTime)) -
-                        Math.min(...group.map((d) => d.startTime)),
-                    fallbackUsed: fallbackChannels.length > 0,
-                };
-            }
-        );
+            return {
+                notificationId: group[0].notificationId,
+                totalChannels: group.length,
+                primaryChannels: primaryChannels.length,
+                fallbackChannels: fallbackChannels.length,
+                anySuccess,
+                allPrimarySuccess,
+                totalLatency:
+                    Math.max(...group.map((d) => d.endTime)) -
+                    Math.min(...group.map((d) => d.startTime)),
+                fallbackUsed: fallbackChannels.length > 0,
+            };
+        });
 
         const overallCoordinationSuccess =
             coordinationStats.filter((s) => s.anySuccess).length /

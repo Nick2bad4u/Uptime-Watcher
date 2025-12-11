@@ -76,8 +76,7 @@ const argv = await yargs(hideBin(process.argv))
             const flattened = dirs.flatMap((/** @type {string} */ dir) =>
                 typeof dir === "string"
                     ? dir.split(",").map((d) => d.trim())
-                    : dir
-            );
+                    : dir);
             return flattened.filter(
                 (/** @type {string | any[]} */ d) => d.length > 0
             );
@@ -94,12 +93,12 @@ const argv = await yargs(hideBin(process.argv))
             ".vscode",
         ],
         coerce: (excludes) => {
-            const flattened = excludes.flatMap(
-                (/** @type {string} */ exclude) =>
-                    typeof exclude === "string"
-                        ? exclude.split(",").map((e) => e.trim())
-                        : exclude
-            );
+            const flattened = excludes.flatMap((
+                /** @type {string} */ exclude
+            ) =>
+                typeof exclude === "string"
+                    ? exclude.split(",").map((e) => e.trim())
+                    : exclude);
             return flattened.filter(
                 (/** @type {string | any[]} */ e) => e.length > 0
             );

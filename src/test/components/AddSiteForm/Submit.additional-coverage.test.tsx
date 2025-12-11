@@ -155,9 +155,8 @@ const applyFieldValidationResult = (result: ValidationResult): void => {
 
 beforeEach(async () => {
     vi.clearAllMocks();
-    validationModule = (await import(
-        "../../../utils/monitorValidation"
-    )) as unknown as ValidationModuleMock;
+    validationModule =
+        (await import("../../../utils/monitorValidation")) as unknown as ValidationModuleMock;
     validationModule.validateMonitorFormData.mockReset();
     validationModule.validateMonitorFieldClientSide.mockReset();
     validationModule.createMonitorObject.mockReset();

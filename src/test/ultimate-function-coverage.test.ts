@@ -39,8 +39,7 @@ describe("Ultimate Function Coverage - Error Handling", () => {
                 "Connection refused",
             ];
             return knownErrors.some((err) =>
-                message.toLowerCase().includes(err.toLowerCase())
-            );
+                message.toLowerCase().includes(err.toLowerCase()));
         };
 
         // Test formatErrorMessage with various inputs
@@ -116,17 +115,17 @@ describe("Ultimate Function Coverage - Chart Configuration", () => {
         const hasPlugins = (config: any): boolean =>
             Boolean(
                 config &&
-                    typeof config === "object" &&
-                    config !== null &&
-                    "plugins" in config
+                typeof config === "object" &&
+                config !== null &&
+                "plugins" in config
             );
 
         const hasScales = (config: any): boolean =>
             Boolean(
                 config &&
-                    typeof config === "object" &&
-                    config !== null &&
-                    "scales" in config
+                typeof config === "object" &&
+                config !== null &&
+                "scales" in config
             );
 
         // Test hasPlugins

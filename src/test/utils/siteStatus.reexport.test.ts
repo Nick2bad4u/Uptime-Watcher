@@ -17,9 +17,8 @@ describe("Shared SiteStatus Utilities", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Export Operation", "type");
 
-            const { calculateSiteMonitoringStatus } = await import(
-                "@shared/utils/siteStatus"
-            );
+            const { calculateSiteMonitoringStatus } =
+                await import("@shared/utils/siteStatus");
             expect(typeof calculateSiteMonitoringStatus).toBe("function");
         });
 
@@ -32,9 +31,8 @@ describe("Shared SiteStatus Utilities", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Export Operation", "type");
 
-            const { calculateSiteStatus } = await import(
-                "@shared/utils/siteStatus"
-            );
+            const { calculateSiteStatus } =
+                await import("@shared/utils/siteStatus");
             expect(typeof calculateSiteStatus).toBe("function");
         });
 
@@ -47,9 +45,8 @@ describe("Shared SiteStatus Utilities", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Export Operation", "type");
 
-            const { getSiteDisplayStatus } = await import(
-                "@shared/utils/siteStatus"
-            );
+            const { getSiteDisplayStatus } =
+                await import("@shared/utils/siteStatus");
             expect(typeof getSiteDisplayStatus).toBe("function");
         });
 
@@ -62,9 +59,8 @@ describe("Shared SiteStatus Utilities", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Export Operation", "type");
 
-            const { getSiteStatusDescription } = await import(
-                "@shared/utils/siteStatus"
-            );
+            const { getSiteStatusDescription } =
+                await import("@shared/utils/siteStatus");
             expect(typeof getSiteStatusDescription).toBe("function");
         });
 
@@ -77,9 +73,8 @@ describe("Shared SiteStatus Utilities", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Export Operation", "type");
 
-            const { getSiteStatusVariant } = await import(
-                "@shared/utils/siteStatus"
-            );
+            const { getSiteStatusVariant } =
+                await import("@shared/utils/siteStatus");
             expect(typeof getSiteStatusVariant).toBe("function");
         });
     });
@@ -113,9 +108,8 @@ describe("Shared SiteStatus Utilities", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Export Operation", "type");
 
-            const { calculateSiteStatus } = await import(
-                "@shared/utils/siteStatus"
-            );
+            const { calculateSiteStatus } =
+                await import("@shared/utils/siteStatus");
 
             const site = {
                 monitors: [
@@ -147,9 +141,8 @@ describe("Shared SiteStatus Utilities", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Export Operation", "type");
 
-            const { getSiteDisplayStatus } = await import(
-                "@shared/utils/siteStatus"
-            );
+            const { getSiteDisplayStatus } =
+                await import("@shared/utils/siteStatus");
 
             const site = {
                 monitors: [
@@ -176,9 +169,8 @@ describe("Shared SiteStatus Utilities", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Export Operation", "type");
 
-            const { getSiteStatusDescription } = await import(
-                "@shared/utils/siteStatus"
-            );
+            const { getSiteStatusDescription } =
+                await import("@shared/utils/siteStatus");
 
             const site = {
                 monitors: [
@@ -205,9 +197,8 @@ describe("Shared SiteStatus Utilities", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Export Operation", "type");
 
-            const { getSiteStatusVariant } = await import(
-                "@shared/utils/siteStatus"
-            );
+            const { getSiteStatusVariant } =
+                await import("@shared/utils/siteStatus");
 
             const result = getSiteStatusVariant("up");
             expect(result).toBeDefined();
@@ -223,9 +214,8 @@ describe("Shared SiteStatus Utilities", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Export Operation", "type");
 
-            const { calculateSiteMonitoringStatus } = await import(
-                "@shared/utils/siteStatus"
-            );
+            const { calculateSiteMonitoringStatus } =
+                await import("@shared/utils/siteStatus");
 
             const site = {
                 monitors: [
@@ -256,9 +246,8 @@ describe("Shared SiteStatus Utilities", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Monitoring", "type");
 
-            const { calculateSiteStatus } = await import(
-                "@shared/utils/siteStatus"
-            );
+            const { calculateSiteStatus } =
+                await import("@shared/utils/siteStatus");
 
             const site = { monitors: [] };
             const result = calculateSiteStatus(site);
@@ -274,14 +263,12 @@ describe("Shared SiteStatus Utilities", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            const { getSiteStatusVariant } = await import(
-                "@shared/utils/siteStatus"
-            );
+            const { getSiteStatusVariant } =
+                await import("@shared/utils/siteStatus");
 
             // These should handle invalid inputs gracefully
             expect(() =>
-                getSiteStatusVariant("invalid" as any)
-            ).not.toThrowError();
+                getSiteStatusVariant("invalid" as any)).not.toThrowError();
         });
     });
 });

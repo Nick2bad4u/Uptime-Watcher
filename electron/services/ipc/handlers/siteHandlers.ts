@@ -62,8 +62,7 @@ export function registerSiteHandlers({
     registerStandardizedIpcHandler(
         SITES_CHANNELS.removeSite,
         withIgnoredIpcEvent((siteIdentifier) =>
-            uptimeOrchestrator.removeSite(siteIdentifier)
-        ),
+            uptimeOrchestrator.removeSite(siteIdentifier)),
         SiteHandlerValidators.removeSite,
         registeredHandlers
     );
@@ -81,12 +80,12 @@ export function registerSiteHandlers({
                     undefined,
                     {
                         duplicateCount: snapshot.duplicates.length,
-                        duplicates: snapshot.duplicates.map(
-                            (entry: DuplicateSiteIdentifier) => ({
-                                identifier: entry.identifier,
-                                occurrences: entry.occurrences,
-                            })
-                        ),
+                        duplicates: snapshot.duplicates.map((
+                            entry: DuplicateSiteIdentifier
+                        ) => ({
+                            identifier: entry.identifier,
+                            occurrences: entry.occurrences,
+                        })),
                         originalSites: sites.length,
                         sanitizedSites: snapshot.sanitizedSites.length,
                     }
@@ -102,8 +101,7 @@ export function registerSiteHandlers({
     registerStandardizedIpcHandler(
         SITES_CHANNELS.updateSite,
         withIgnoredIpcEvent((siteIdentifier, updates) =>
-            uptimeOrchestrator.updateSite(siteIdentifier, updates)
-        ),
+            uptimeOrchestrator.updateSite(siteIdentifier, updates)),
         SiteHandlerValidators.updateSite,
         registeredHandlers
     );
@@ -111,8 +109,10 @@ export function registerSiteHandlers({
     registerStandardizedIpcHandler(
         SITES_CHANNELS.removeMonitor,
         withIgnoredIpcEvent((siteIdentifier, monitorIdentifier) =>
-            uptimeOrchestrator.removeMonitor(siteIdentifier, monitorIdentifier)
-        ),
+            uptimeOrchestrator.removeMonitor(
+                siteIdentifier,
+                monitorIdentifier
+            )),
         SiteHandlerValidators.removeMonitor,
         registeredHandlers
     );

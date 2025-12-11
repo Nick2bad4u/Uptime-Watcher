@@ -129,8 +129,7 @@ describe("useSiteMonitor Hook", () => {
             });
 
             const { result } = renderHook(() =>
-                useSiteMonitor(emptyMonitorsSite)
-            );
+                useSiteMonitor(emptyMonitorsSite));
 
             expect(result.current.monitor).toBeUndefined();
             expect(result.current.monitorIds).toEqual([]);
@@ -366,8 +365,7 @@ describe("useSiteMonitor Hook", () => {
             });
 
             const { result } = renderHook(() =>
-                useSiteMonitor(siteWithUndefinedStatus)
-            );
+                useSiteMonitor(siteWithUndefinedStatus));
 
             expect(result.current.status).toBe("pending");
         });
@@ -402,8 +400,7 @@ describe("useSiteMonitor Hook", () => {
             });
 
             const { result } = renderHook(() =>
-                useSiteMonitor(siteWithUndefinedMonitoring)
-            );
+                useSiteMonitor(siteWithUndefinedMonitoring));
 
             // Should default to true when monitoring is undefined
             expect(result.current.isMonitoring).toBeTruthy();
@@ -439,8 +436,7 @@ describe("useSiteMonitor Hook", () => {
             });
 
             const { result } = renderHook(() =>
-                useSiteMonitor(siteWithDisabledMonitoring)
-            );
+                useSiteMonitor(siteWithDisabledMonitoring));
 
             expect(result.current.isMonitoring).toBeFalsy();
         });
@@ -457,8 +453,7 @@ describe("useSiteMonitor Hook", () => {
             await annotate("Type: Business Logic", "type");
 
             const { result, rerender } = renderHook(() =>
-                useSiteMonitor(mockSite)
-            );
+                useSiteMonitor(mockSite));
 
             const firstHandler = result.current.handleMonitorIdChange;
             const firstMonitorIds = result.current.monitorIds;

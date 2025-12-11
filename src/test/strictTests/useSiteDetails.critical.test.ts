@@ -178,8 +178,7 @@ describe("useSiteDetails - Critical Coverage Tests", () => {
         confirmMock.mockResolvedValue(false);
 
         const { result } = renderHook(() =>
-            useSiteDetails({ site: siteWithMonitor })
-        );
+            useSiteDetails({ site: siteWithMonitor }));
 
         await act(async () => {
             await result.current.handleRemoveMonitor();
@@ -215,8 +214,7 @@ describe("useSiteDetails - Critical Coverage Tests", () => {
         confirmMock.mockResolvedValue(true);
 
         const { result } = renderHook(() =>
-            useSiteDetails({ site: siteWithMonitor })
-        );
+            useSiteDetails({ site: siteWithMonitor }));
 
         await act(async () => {
             await result.current.handleRemoveMonitor();
@@ -299,8 +297,7 @@ describe("useSiteDetails - Critical Coverage Tests", () => {
         (useSitesStore as any).mockReturnValue(mockStore);
 
         const { result } = renderHook(() =>
-            useSiteDetails({ site: siteWithSpecialMonitor })
-        );
+            useSiteDetails({ site: siteWithSpecialMonitor }));
 
         // Check that monitor name formatting handles DNS type
         expect(result.current.currentSite).toBeDefined();
@@ -335,8 +332,7 @@ describe("useSiteDetails - Critical Coverage Tests", () => {
         (useSitesStore as any).mockReturnValue(mockStore);
 
         const { result } = renderHook(() =>
-            useSiteDetails({ site: siteWithoutMonitors })
-        );
+            useSiteDetails({ site: siteWithoutMonitors }));
 
         // Should handle empty monitors array gracefully
         expect(result.current.currentSite?.monitors).toEqual([]);
@@ -384,8 +380,7 @@ describe("useSiteDetails - Critical Coverage Tests", () => {
         (useSitesStore as any).mockReturnValue(mockStore);
 
         const { result } = renderHook(() =>
-            useSiteDetails({ site: siteWithoutMonitors })
-        );
+            useSiteDetails({ site: siteWithoutMonitors }));
 
         // Should handle monitoring controls gracefully with no monitors
         await act(async () => {
@@ -487,8 +482,7 @@ describe("useSiteDetails - Critical Coverage Tests", () => {
         (useSitesStore as any).mockReturnValue(mockStore);
 
         const { result } = renderHook(() =>
-            useSiteDetails({ site: siteWithInvalidMonitor })
-        );
+            useSiteDetails({ site: siteWithInvalidMonitor }));
 
         // Should handle different monitor type gracefully
         expect(result.current.selectedMonitor).toEqual(invalidTypeMonitor);

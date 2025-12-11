@@ -23,7 +23,11 @@ import { DEFAULT_TEST_SITE_URL, generateSiteName } from "../utils/testData";
 test.describe(
     "sidebar search - modern ui",
     {
-        tag: ["@ui", "@sidebar", "@search"],
+        tag: [
+            "@ui",
+            "@sidebar",
+            "@search",
+        ],
     },
     () => {
         test.setTimeout(60_000);

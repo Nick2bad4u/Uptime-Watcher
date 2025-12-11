@@ -873,8 +873,8 @@ describe("Chart Utilities", () => {
                         ? false
                         : Boolean(
                               input &&
-                                  typeof input === "object" &&
-                                  "scales" in input
+                              typeof input === "object" &&
+                              "scales" in input
                           )
                 );
                 expect(getScaleConfig(input, "x")).toBeUndefined();
@@ -904,9 +904,9 @@ describe("Chart Utilities", () => {
                     // Property: Only object with 'scales' property should return true
                     const expected = Boolean(
                         input &&
-                            typeof input === "object" &&
-                            input !== null &&
-                            "scales" in input
+                        typeof input === "object" &&
+                        input !== null &&
+                        "scales" in input
                     );
                     expect(result).toBe(expected);
                 }
@@ -923,20 +923,19 @@ describe("Chart Utilities", () => {
                         fc.anything()
                     ),
                 }),
-            ])(
-                "should validate scales property existence and type",
-                (config) => {
-                    const result = hasScales(config);
+            ])("should validate scales property existence and type", (
+                config
+            ) => {
+                const result = hasScales(config);
 
-                    // Property: Should return true only if scales is an object
-                    const expected = Boolean(
-                        config.scales &&
-                            typeof config.scales === "object" &&
-                            config.scales !== null
-                    );
-                    expect(result).toBe(expected);
-                }
-            );
+                // Property: Should return true only if scales is an object
+                const expected = Boolean(
+                    config.scales &&
+                    typeof config.scales === "object" &&
+                    config.scales !== null
+                );
+                expect(result).toBe(expected);
+            });
 
             test.prop([
                 fc.oneof(
@@ -965,18 +964,18 @@ describe("Chart Utilities", () => {
             test.prop([
                 fc.anything(),
                 fc.oneof(fc.constant("x"), fc.constant("y")),
-            ])(
-                "should handle arbitrary config inputs safely",
-                (config, axis) => {
-                    // Property: Function should never throw
-                    const result = getScaleConfig(config, axis);
+            ])("should handle arbitrary config inputs safely", (
+                config,
+                axis
+            ) => {
+                // Property: Function should never throw
+                const result = getScaleConfig(config, axis);
 
-                    // Property: Should return undefined for invalid configs
-                    if (!hasScales(config)) {
-                        expect(result).toBeUndefined();
-                    }
+                // Property: Should return undefined for invalid configs
+                if (!hasScales(config)) {
+                    expect(result).toBeUndefined();
                 }
-            );
+            });
 
             test.prop([
                 fc.record({
@@ -989,29 +988,26 @@ describe("Chart Utilities", () => {
                     ),
                 }),
                 fc.oneof(fc.constant("x"), fc.constant("y")),
-            ])(
-                "should extract correct scale configurations",
-                (config, axis) => {
-                    const result = getScaleConfig(config, axis);
+            ])("should extract correct scale configurations", (
+                config,
+                axis
+            ) => {
+                const result = getScaleConfig(config, axis);
 
-                    if (axis in config.scales) {
-                        const scaleValue = config.scales[axis];
-                        if (
-                            typeof scaleValue === "object" &&
-                            scaleValue !== null
-                        ) {
-                            // Property: Should return the scale object when valid
-                            expect(result).toBe(scaleValue);
-                        } else {
-                            // Property: Should return undefined for non-object scales
-                            expect(result).toBeUndefined();
-                        }
+                if (axis in config.scales) {
+                    const scaleValue = config.scales[axis];
+                    if (typeof scaleValue === "object" && scaleValue !== null) {
+                        // Property: Should return the scale object when valid
+                        expect(result).toBe(scaleValue);
                     } else {
-                        // Property: Should return undefined when axis doesn't exist
+                        // Property: Should return undefined for non-object scales
                         expect(result).toBeUndefined();
                     }
+                } else {
+                    // Property: Should return undefined when axis doesn't exist
+                    expect(result).toBeUndefined();
                 }
-            );
+            });
 
             test.prop([
                 fc.record({
@@ -1065,18 +1061,19 @@ describe("Chart Utilities", () => {
                 fc.anything(),
                 fc.oneof(fc.constant("x"), fc.constant("y")),
                 fc.string(),
-            ])(
-                "should handle arbitrary inputs safely",
-                (config, axis, property) => {
-                    // Property: Function should never throw
-                    const result = getScaleProperty(config, axis, property);
+            ])("should handle arbitrary inputs safely", (
+                config,
+                axis,
+                property
+            ) => {
+                // Property: Function should never throw
+                const result = getScaleProperty(config, axis, property);
 
-                    // Property: Should return undefined for invalid configs
-                    if (!hasScales(config)) {
-                        expect(result).toBeUndefined();
-                    }
+                // Property: Should return undefined for invalid configs
+                if (!hasScales(config)) {
+                    expect(result).toBeUndefined();
                 }
-            );
+            });
 
             test.prop([
                 fc.record({
@@ -1096,28 +1093,28 @@ describe("Chart Utilities", () => {
                     }),
                 }),
                 fc.oneof(fc.constant("x"), fc.constant("y")),
-            ])(
-                "should extract specific properties correctly",
-                (config, axis) => {
-                    const scale = config.scales[axis];
+            ])("should extract specific properties correctly", (
+                config,
+                axis
+            ) => {
+                const scale = config.scales[axis];
 
-                    // Test each known property
-                    for (const [key, value] of Object.entries(scale)) {
-                        const result = getScaleProperty(config, axis, key);
+                // Test each known property
+                for (const [key, value] of Object.entries(scale)) {
+                    const result = getScaleProperty(config, axis, key);
 
-                        // Property: Should return exact property value
-                        expect(result).toBe(value);
-                    }
-
-                    // Property: Should return undefined for non-existent properties
-                    const nonExistentResult = getScaleProperty(
-                        config,
-                        axis,
-                        "nonExistentProperty"
-                    );
-                    expect(nonExistentResult).toBeUndefined();
+                    // Property: Should return exact property value
+                    expect(result).toBe(value);
                 }
-            );
+
+                // Property: Should return undefined for non-existent properties
+                const nonExistentResult = getScaleProperty(
+                    config,
+                    axis,
+                    "nonExistentProperty"
+                );
+                expect(nonExistentResult).toBeUndefined();
+            });
 
             test.prop([
                 fc.record({
@@ -1153,18 +1150,19 @@ describe("Chart Utilities", () => {
                 fc.anything(),
                 fc.oneof(fc.constant("x"), fc.constant("y")),
                 fc.string(),
-            ])(
-                "should handle arbitrary inputs safely",
-                (config, axis, path) => {
-                    // Property: Function should never throw
-                    const result = getNestedScaleProperty(config, axis, path);
+            ])("should handle arbitrary inputs safely", (
+                config,
+                axis,
+                path
+            ) => {
+                // Property: Function should never throw
+                const result = getNestedScaleProperty(config, axis, path);
 
-                    // Property: Should return undefined for invalid configs
-                    if (!hasScales(config)) {
-                        expect(result).toBeUndefined();
-                    }
+                // Property: Should return undefined for invalid configs
+                if (!hasScales(config)) {
+                    expect(result).toBeUndefined();
                 }
-            );
+            });
 
             test.prop([
                 fc.record({
@@ -1304,28 +1302,24 @@ describe("Chart Utilities", () => {
                     }),
                 }),
                 fc.string().filter((s) => s.length > 0),
-            ])(
-                "should return undefined for invalid paths",
-                (config, invalidPath) => {
-                    fc.pre(!invalidPath.startsWith("validProp")); // Ensure path doesn't match existing property
+            ])("should return undefined for invalid paths", (
+                config,
+                invalidPath
+            ) => {
+                fc.pre(!invalidPath.startsWith("validProp")); // Ensure path doesn't match existing property
 
-                    // Property: Invalid paths should return undefined
-                    const result = getNestedScaleProperty(
-                        config,
-                        "x",
-                        invalidPath
-                    );
-                    expect(result).toBeUndefined();
+                // Property: Invalid paths should return undefined
+                const result = getNestedScaleProperty(config, "x", invalidPath);
+                expect(result).toBeUndefined();
 
-                    // Property: Paths that start valid but become invalid should return undefined
-                    const invalidExtension = getNestedScaleProperty(
-                        config,
-                        "x",
-                        `validProp.nonExistent`
-                    );
-                    expect(invalidExtension).toBeUndefined();
-                }
-            );
+                // Property: Paths that start valid but become invalid should return undefined
+                const invalidExtension = getNestedScaleProperty(
+                    config,
+                    "x",
+                    `validProp.nonExistent`
+                );
+                expect(invalidExtension).toBeUndefined();
+            });
 
             test.prop([
                 fc.record({
@@ -1400,50 +1394,49 @@ describe("Chart Utilities", () => {
                         }),
                     }),
                 }),
-            ])(
-                "should maintain consistency across all utility functions",
-                (config) => {
-                    // Property: hasScales should return true for valid config
-                    expect(hasScales(config)).toBeTruthy();
+            ])("should maintain consistency across all utility functions", (
+                config
+            ) => {
+                // Property: hasScales should return true for valid config
+                expect(hasScales(config)).toBeTruthy();
 
-                    // Property: getScaleConfig should return valid scale objects
-                    const xScale = getScaleConfig(config, "x");
-                    const yScale = getScaleConfig(config, "y");
-                    expect(xScale).toBeDefined();
-                    expect(yScale).toBeDefined();
+                // Property: getScaleConfig should return valid scale objects
+                const xScale = getScaleConfig(config, "x");
+                const yScale = getScaleConfig(config, "y");
+                expect(xScale).toBeDefined();
+                expect(yScale).toBeDefined();
 
-                    // Property: getScaleProperty should match getScaleConfig results
-                    for (const axis of ["x", "y"] as const) {
-                        const scale = getScaleConfig(config, axis);
-                        if (scale && typeof scale === "object") {
-                            for (const [key, value] of Object.entries(scale)) {
-                                const propertyResult = getScaleProperty(
-                                    config,
-                                    axis,
-                                    key
-                                );
-                                expect(propertyResult).toBe(value);
-                            }
+                // Property: getScaleProperty should match getScaleConfig results
+                for (const axis of ["x", "y"] as const) {
+                    const scale = getScaleConfig(config, axis);
+                    if (scale && typeof scale === "object") {
+                        for (const [key, value] of Object.entries(scale)) {
+                            const propertyResult = getScaleProperty(
+                                config,
+                                axis,
+                                key
+                            );
+                            expect(propertyResult).toBe(value);
                         }
                     }
-
-                    // Property: getNestedScaleProperty should match getScaleProperty for single properties
-                    expect(getNestedScaleProperty(config, "x", "type")).toBe(
-                        getScaleProperty(config, "x", "type")
-                    );
-                    expect(
-                        getNestedScaleProperty(config, "y", "beginAtZero")
-                    ).toBe(getScaleProperty(config, "y", "beginAtZero"));
-
-                    // Property: getNestedScaleProperty should access nested properties correctly
-                    const expectedTitleText = (
-                        config.scales.x.title as Record<string, unknown>
-                    )["text"];
-                    expect(
-                        getNestedScaleProperty(config, "x", "title.text")
-                    ).toBe(expectedTitleText);
                 }
-            );
+
+                // Property: getNestedScaleProperty should match getScaleProperty for single properties
+                expect(getNestedScaleProperty(config, "x", "type")).toBe(
+                    getScaleProperty(config, "x", "type")
+                );
+                expect(getNestedScaleProperty(config, "y", "beginAtZero")).toBe(
+                    getScaleProperty(config, "y", "beginAtZero")
+                );
+
+                // Property: getNestedScaleProperty should access nested properties correctly
+                const expectedTitleText = (
+                    config.scales.x.title as Record<string, unknown>
+                )["text"];
+                expect(getNestedScaleProperty(config, "x", "title.text")).toBe(
+                    expectedTitleText
+                );
+            });
 
             test.prop([fc.anything().filter((v) => !hasScales(v))])(
                 "should consistently handle invalid configurations",

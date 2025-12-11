@@ -213,9 +213,8 @@ describe("ServiceContainer - Factory Bypass Test", () => {
         expect(monitorManager).toBeDefined();
 
         // Verify that EnhancedMonitoringServiceFactory.createServices was called
-        const { EnhancedMonitoringServiceFactory } = await import(
-            "../../services/monitoring/EnhancedMonitoringServiceFactory"
-        );
+        const { EnhancedMonitoringServiceFactory } =
+            await import("../../services/monitoring/EnhancedMonitoringServiceFactory");
         expect(
             EnhancedMonitoringServiceFactory.createServices
         ).toHaveBeenCalled();

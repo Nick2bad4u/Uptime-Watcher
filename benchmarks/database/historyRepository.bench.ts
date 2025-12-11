@@ -193,8 +193,7 @@ class MockHistoryRepository {
                 event.message,
                 event.metadata,
                 event.timestamp
-            )
-        );
+            ));
     }
 
     deleteOldRecords(cutoffTimestamp: number) {

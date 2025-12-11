@@ -899,48 +899,45 @@ describe("Database Query Performance Benchmarks", () => {
         const bestOptimization = optimizationResults.reduce((best, current) =>
             current.improvementPercentage > best.improvementPercentage
                 ? current
-                : best
-        );
+                : best);
 
-        const worstOptimization = optimizationResults.reduce(
-            (worst, current) =>
-                current.improvementPercentage < worst.improvementPercentage
-                    ? current
-                    : worst
-        );
+        const worstOptimization = optimizationResults.reduce((
+            worst,
+            current
+        ) =>
+            current.improvementPercentage < worst.improvementPercentage
+                ? current
+                : worst);
 
         // Technique effectiveness analysis
-        const techniqueEffectiveness = optimizationTechniques.map(
-            (technique) => {
-                const resultsWithTechnique = optimizationResults.filter(
-                    (result) =>
-                        result.optimizationTechniques.includes(technique)
-                );
+        const techniqueEffectiveness = optimizationTechniques.map((
+            technique
+        ) => {
+            const resultsWithTechnique = optimizationResults.filter((result) =>
+                result.optimizationTechniques.includes(technique));
 
-                const averageImprovement =
+            const averageImprovement =
+                resultsWithTechnique.length > 0
+                    ? resultsWithTechnique.reduce(
+                          (sum, result) => sum + result.improvementPercentage,
+                          0
+                      ) / resultsWithTechnique.length
+                    : 0;
+
+            return {
+                technique,
+                usageCount: resultsWithTechnique.length,
+                averageImprovement,
+                maxImprovement:
                     resultsWithTechnique.length > 0
-                        ? resultsWithTechnique.reduce(
-                              (sum, result) =>
-                                  sum + result.improvementPercentage,
-                              0
-                          ) / resultsWithTechnique.length
-                        : 0;
-
-                return {
-                    technique,
-                    usageCount: resultsWithTechnique.length,
-                    averageImprovement,
-                    maxImprovement:
-                        resultsWithTechnique.length > 0
-                            ? Math.max(
-                                  ...resultsWithTechnique.map(
-                                      (r) => r.improvementPercentage
-                                  )
+                        ? Math.max(
+                              ...resultsWithTechnique.map(
+                                  (r) => r.improvementPercentage
                               )
-                            : 0,
-                };
-            }
-        );
+                          )
+                        : 0,
+            };
+        });
 
         // Sort by effectiveness
         techniqueEffectiveness.sort(

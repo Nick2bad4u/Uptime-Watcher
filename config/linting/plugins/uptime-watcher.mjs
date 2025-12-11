@@ -171,15 +171,12 @@ function extractArrayLiteral(expression) {
  * Retrieves an ArrayExpression node from an ESTree initializer, unwrapping
  * TypeScript-specific wrappers like `as const`.
  *
- * @param {import("@typescript-eslint/utils").TSESTree.Expression
- *     | null
- *     | undefined} initializer
+ * @param {import("@typescript-eslint/utils").TSESTree.Expression | null | undefined} initializer
  *   -
  *
  *   Initializer node from a variable declaration.
  *
- * @returns {import("@typescript-eslint/utils").TSESTree.ArrayExpression
- *     | null}
+ * @returns {import("@typescript-eslint/utils").TSESTree.ArrayExpression | null}
  *   Array expression when found.
  */
 function getArrayExpression(initializer) {
@@ -280,10 +277,7 @@ const monitorFallbackConsistencyRule = {
                 }
 
                 /**
-                 * @type {Map<
-                 *     string,
-                 *     import("@typescript-eslint/utils").TSESTree.ObjectExpression
-                 * >}
+                 * @type {Map<string, import("@typescript-eslint/utils").TSESTree.ObjectExpression>}
                  */
                 const optionMap = new Map();
                 const reportedNodes = new Set();
@@ -1221,8 +1215,7 @@ const noDeprecatedExportsRule = {
          * @param {import("@typescript-eslint/utils").TSESTree.Node} node - Node
          *   to inspect.
          *
-         * @returns {import("@typescript-eslint/utils").TSESTree.BlockComment
-         *     | null}
+         * @returns {import("@typescript-eslint/utils").TSESTree.BlockComment | null}
          */
         function getJSDoc(node) {
             if (!node) {
@@ -1264,9 +1257,7 @@ const noDeprecatedExportsRule = {
         /**
          * Reports when the inspected node carries a @deprecated tag.
          *
-         * @param {import("@typescript-eslint/utils").TSESTree.Node
-         *     | null
-         *     | undefined} targetNode
+         * @param {import("@typescript-eslint/utils").TSESTree.Node | null | undefined} targetNode
          *   - Node whose JSDoc should be analysed.
          * @param {import("@typescript-eslint/utils").TSESTree.Node} reportNode
          *   - Node to attach the ESLint violation to.

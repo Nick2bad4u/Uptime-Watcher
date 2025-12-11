@@ -27,7 +27,11 @@ import { DEFAULT_TEST_SITE_URL, generateSiteName } from "../utils/testData";
 test.describe(
     "site removal - modern ui",
     {
-        tag: ["@ui", "@site-details", "@removal"],
+        tag: [
+            "@ui",
+            "@site-details",
+            "@removal",
+        ],
     },
     () => {
         let electronApp: ElectronApplication;
@@ -93,8 +97,7 @@ test.describe(
                                     button.textContent
                                         ?.trim()
                                         .toLowerCase()
-                                        .startsWith("remove site")
-                                );
+                                        .startsWith("remove site"));
 
                                 if (!target || target.disabled) {
                                     return "pending";
@@ -183,8 +186,7 @@ test.describe(
                                     button.textContent
                                         ?.trim()
                                         .toLowerCase()
-                                        .startsWith("remove site")
-                                );
+                                        .startsWith("remove site"));
 
                                 if (!target || target.disabled) {
                                     return "pending";

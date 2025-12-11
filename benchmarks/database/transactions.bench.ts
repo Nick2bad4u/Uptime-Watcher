@@ -126,8 +126,7 @@ class MockTransactionManager {
                 }
                 // Simulate retry delay
                 await new Promise((resolve) =>
-                    setTimeout(resolve, 2 ** attempt * 10)
-                );
+                    setTimeout(resolve, 2 ** attempt * 10));
             }
         }
 
@@ -147,8 +146,7 @@ class MockTransactionManager {
                 "UPDATE test SET data = ? WHERE id = ?"
             );
             return updates.map((update) =>
-                stmt.run(JSON.stringify(update.data), update.id)
-            );
+                stmt.run(JSON.stringify(update.data), update.id));
         });
     }
 

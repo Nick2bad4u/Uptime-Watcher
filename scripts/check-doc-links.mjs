@@ -106,8 +106,7 @@ async function collectMarkdownFiles(startDirectory) {
  */
 function isExternalLink(link) {
     return EXTERNAL_PROTOCOLS.some((protocol) =>
-        link.toLowerCase().startsWith(protocol)
-    );
+        link.toLowerCase().startsWith(protocol));
 }
 
 /**

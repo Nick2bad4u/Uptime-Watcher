@@ -55,8 +55,7 @@ vi.mock("../stores/utils", () => ({
         asyncFn().catch((error: Error) => {
             handlers.setError(error);
             throw error;
-        })
-    ),
+        })),
 }));
 
 // Mock useErrorStore
@@ -574,7 +573,11 @@ describe(useSettingsStore, () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
-            const validThemes = ["system", "light", "dark"] as const;
+            const validThemes = [
+                "system",
+                "light",
+                "dark",
+            ] as const;
 
             for (const theme of validThemes) {
                 useSettingsStore.getState().updateSettings({ theme });

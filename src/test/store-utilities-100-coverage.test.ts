@@ -413,12 +413,13 @@ describe("Integration Tests", () => {
         vi.mocked(isDevelopment).mockReturnValue(true);
         vi.mocked(logger.info).mockClear(); // Clear any previous calls
 
-        const debouncedLog = debounce(
-            (store: string, action: string, payload: any) => {
-                logStoreAction(store, action, payload);
-            },
-            50
-        );
+        const debouncedLog = debounce((
+            store: string,
+            action: string,
+            payload: any
+        ) => {
+            logStoreAction(store, action, payload);
+        }, 50);
 
         debouncedLog("TestStore", "action1", { id: 1 });
         debouncedLog("TestStore", "action2", { id: 2 });

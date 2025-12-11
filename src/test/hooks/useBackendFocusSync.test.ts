@@ -591,11 +591,9 @@ describe("useBackendFocusSync Hook", () => {
             await annotate("Type: Business Logic", "type");
 
             const { unmount: unmount1 } = renderHook(() =>
-                useBackendFocusSync(true)
-            );
+                useBackendFocusSync(true));
             const { unmount: unmount2 } = renderHook(() =>
-                useBackendFocusSync(true)
-            );
+                useBackendFocusSync(true));
 
             expect(mockAddEventListener).toHaveBeenCalledTimes(2);
 

@@ -48,12 +48,11 @@ describe("Validation Utils Property-Based Tests", () => {
     });
 
     describe(isValidFQDN, () => {
-        test.prop([fc.domain()])(
-            "should accept valid domain names",
-            (domain) => {
-                expect(isValidFQDN(domain)).toBeTruthy();
-            }
-        );
+        test.prop([fc.domain()])("should accept valid domain names", (
+            domain
+        ) => {
+            expect(isValidFQDN(domain)).toBeTruthy();
+        });
 
         test.prop([
             fc.constantFrom(
@@ -108,8 +107,7 @@ describe("Validation Utils Property-Based Tests", () => {
                 fc
                     .string({ minLength: 1 })
                     .filter((s) =>
-                        /^[\dA-Za-z]+(?:[_-]*[\dA-Za-z]+)*$/.test(s)
-                    ),
+                        /^[\dA-Za-z]+(?:[_-]*[\dA-Za-z]+)*$/.test(s)),
                 { minLength: 1 }
             ),
         ])("should accept arrays of valid identifiers", (identifiers) => {
@@ -118,16 +116,13 @@ describe("Validation Utils Property-Based Tests", () => {
 
         test.prop([
             fc.array(fc.constantFrom("", "invalid identifier", "id@symbol")),
-        ])(
-            "should reject arrays containing invalid identifiers",
-            (invalidIdentifiers) => {
-                if (invalidIdentifiers.length > 0) {
-                    expect(
-                        isValidIdentifierArray(invalidIdentifiers)
-                    ).toBeFalsy();
-                }
+        ])("should reject arrays containing invalid identifiers", (
+            invalidIdentifiers
+        ) => {
+            if (invalidIdentifiers.length > 0) {
+                expect(isValidIdentifierArray(invalidIdentifiers)).toBeFalsy();
             }
-        );
+        });
 
         test.prop([fc.constantFrom(null, undefined, "not-an-array", 123)])(
             "should reject non-array values",
@@ -187,12 +182,11 @@ describe("Validation Utils Property-Based Tests", () => {
             expect(isValidHost(ipv6)).toBeTruthy();
         });
 
-        test.prop([fc.domain()])(
-            "should accept valid domain names",
-            (domain) => {
-                expect(isValidHost(domain)).toBeTruthy();
-            }
-        );
+        test.prop([fc.domain()])("should accept valid domain names", (
+            domain
+        ) => {
+            expect(isValidHost(domain)).toBeTruthy();
+        });
 
         test("should accept localhost as a special case", () => {
             expect(isValidHost("localhost")).toBeTruthy();
@@ -292,24 +286,21 @@ describe("Validation Utils Property-Based Tests", () => {
             fc.integer(),
             fc.integer(),
             fc.integer(),
-        ])(
-            "should convert valid integers correctly",
-            (value, defaultValue, min, max) => {
-                const result = safeInteger(
-                    String(value),
-                    defaultValue,
-                    min,
-                    max
-                );
-                expect(typeof result).toBe("number");
-                expect(Number.isInteger(result)).toBeTruthy();
+        ])("should convert valid integers correctly", (
+            value,
+            defaultValue,
+            min,
+            max
+        ) => {
+            const result = safeInteger(String(value), defaultValue, min, max);
+            expect(typeof result).toBe("number");
+            expect(Number.isInteger(result)).toBeTruthy();
 
-                if (min !== undefined && max !== undefined && min <= max) {
-                    expect(result).toBeGreaterThanOrEqual(Math.min(min, max));
-                    expect(result).toBeLessThanOrEqual(Math.max(min, max));
-                }
+            if (min !== undefined && max !== undefined && min <= max) {
+                expect(result).toBeGreaterThanOrEqual(Math.min(min, max));
+                expect(result).toBeLessThanOrEqual(Math.max(min, max));
             }
-        );
+        });
 
         test.prop([fc.constantFrom("abc", "not-a-number", ""), fc.integer()])(
             "should return default value for invalid inputs",
@@ -369,8 +360,7 @@ describe("Validation Utils Property-Based Tests", () => {
                     port: fc.integer({ min: 1, max: 65_535 }),
                     host: fc.domain(),
                     url: fc.webUrl(),
-                })
-            );
+                }));
 
             // Validate multiple times
             const results = Array.from({ length: 5 }, () => ({
@@ -399,8 +389,7 @@ describe("Validation Utils Property-Based Tests", () => {
             (identifiers) => {
                 const arrayResult = isValidIdentifierArray(identifiers);
                 const individualResults = identifiers.map((id) =>
-                    isValidIdentifier(id)
-                );
+                    isValidIdentifier(id));
 
                 expect(arrayResult).toBe(individualResults.every(Boolean));
             }

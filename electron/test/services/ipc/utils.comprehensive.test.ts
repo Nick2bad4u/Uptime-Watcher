@@ -489,7 +489,11 @@ describe("IPC Utils - Comprehensive Coverage", () => {
                 await annotate("Type: Error Handling", "type");
 
                 const result = IpcValidators.requiredObject(
-                    [1, 2, 3],
+                    [
+                        1,
+                        2,
+                        3,
+                    ],
                     "testParam"
                 );
                 expect(result).toBe("testParam must be a valid object");
@@ -789,7 +793,11 @@ describe("IPC Utils - Comprehensive Coverage", () => {
 
                 const metadata = {
                     nested: { key: "value" },
-                    array: [1, 2, 3],
+                    array: [
+                        1,
+                        2,
+                        3,
+                    ],
                     timestamp: new Date().toISOString(),
                 };
                 const result = createErrorResponse(
@@ -962,12 +970,22 @@ describe("IPC Utils - Comprehensive Coverage", () => {
                 await annotate("Category: Service", "category");
                 await annotate("Type: Business Logic", "type");
 
-                const arrayData = [1, 2, 3, "test"];
+                const arrayData = [
+                    1,
+                    2,
+                    3,
+                    "test",
+                ];
                 const result = createSuccessResponse(arrayData);
 
                 expect(result).toEqual({
                     success: true,
-                    data: [1, 2, 3, "test"],
+                    data: [
+                        1,
+                        2,
+                        3,
+                        "test",
+                    ],
                 });
             });
         });
@@ -1670,8 +1688,7 @@ describe("IPC Utils - Comprehensive Coverage", () => {
                         vi.fn(),
                         null,
                         registeredHandlers
-                    )
-                ).toThrowError(
+                    )).toThrowError(
                     `[IpcService] Attempted to register duplicate IPC handler for channel '${CHANNELS_FOR_TESTS.duplicate}'`
                 );
 
@@ -1713,8 +1730,7 @@ describe("IPC Utils - Comprehensive Coverage", () => {
                         vi.fn(),
                         null,
                         registeredHandlers
-                    )
-                ).toThrowError(registrationError);
+                    )).toThrowError(registrationError);
 
                 expect(
                     registeredHandlers.has(CHANNELS_FOR_TESTS.failure)

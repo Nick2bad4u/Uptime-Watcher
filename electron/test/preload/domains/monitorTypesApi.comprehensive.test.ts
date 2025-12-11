@@ -153,7 +153,11 @@ describe("Monitor Types Domain API", () => {
                 http: {
                     name: "HTTP Monitor",
                     description: "Monitors HTTP endpoints",
-                    fields: ["url", "method", "timeout"],
+                    fields: [
+                        "url",
+                        "method",
+                        "timeout",
+                    ],
                     defaultValues: { method: "GET", timeout: 5000 },
                 },
                 ping: {
@@ -207,7 +211,11 @@ describe("Monitor Types Domain API", () => {
                         {
                             name: "method",
                             type: "enum",
-                            values: ["GET", "POST", "PUT"],
+                            values: [
+                                "GET",
+                                "POST",
+                                "PUT",
+                            ],
                             default: "GET",
                         },
                         { name: "headers", type: "object", default: {} },
@@ -311,8 +319,7 @@ describe("Monitor Types Domain API", () => {
             );
 
             const promises = Array.from({ length: 5 }, () =>
-                api.getMonitorTypes()
-            );
+                api.getMonitorTypes());
             const results = await Promise.all(promises);
 
             expect(mockIpcRenderer.invoke).toHaveBeenCalledTimes(5);
@@ -439,8 +446,7 @@ describe("Monitor Types Domain API", () => {
                         );
 
                         const promises = Array.from({ length: callCount }, () =>
-                            api.getMonitorTypes()
-                        );
+                            api.getMonitorTypes());
 
                         const results = await Promise.all(promises);
                         expect(mockIpcRenderer.invoke).toHaveBeenCalledTimes(
@@ -532,7 +538,11 @@ describe("Monitor Types Domain API", () => {
                     name: "Custom HTTP Monitor",
                     plugin: true,
                     pluginSource: "custom-plugin-v1.0",
-                    capabilities: ["headers", "authentication", "ssl-check"],
+                    capabilities: [
+                        "headers",
+                        "authentication",
+                        "ssl-check",
+                    ],
                 },
                 "core:basic-ping": {
                     name: "Basic Ping",
@@ -673,8 +683,7 @@ describe("Monitor Types Domain API", () => {
 
             // Multiple concurrent calls with large data
             const promises = Array.from({ length: 5 }, () =>
-                api.getMonitorTypes()
-            );
+                api.getMonitorTypes());
             const results = await Promise.all(promises);
 
             for (const result of results) {
@@ -775,8 +784,7 @@ describe("Monitor Types Domain API", () => {
             // Simulate burst of concurrent requests
             const burstSize = 20;
             const promises = Array.from({ length: burstSize }, () =>
-                api.getMonitorTypes()
-            );
+                api.getMonitorTypes());
 
             const start = Date.now();
             const results = await Promise.all(promises);

@@ -43,12 +43,13 @@ const wrapMock = vi.hoisted(() =>
         ) =>
             async (...args: TArgs): Promise<TResult> =>
                 handler({ monitoring: monitoringApi }, ...args)
-    )
-);
+    ));
 
 const getHelpersMock = vi.hoisted(() =>
-    vi.fn(() => ({ ensureInitialized: ensureInitializedMock, wrap: wrapMock }))
-);
+    vi.fn(() => ({
+        ensureInitialized: ensureInitializedMock,
+        wrap: wrapMock,
+    })));
 
 vi.mock("../../services/utils/createIpcServiceHelpers", () => ({
     getIpcServiceHelpers: getHelpersMock,

@@ -133,9 +133,8 @@ describe("Additional Uncovered Lines Tests", () => {
             const fileName = "test.txt";
 
             await expect(async () => {
-                const { downloadFile } = await import(
-                    "../stores/sites/utils/fileDownload"
-                );
+                const { downloadFile } =
+                    await import("../stores/sites/utils/fileDownload");
                 downloadFile({ buffer, fileName });
             }).rejects.toThrowError("Failed to create object URL");
         });
@@ -169,9 +168,8 @@ describe("Additional Uncovered Lines Tests", () => {
             const buffer = new ArrayBuffer(8);
             const fileName = "test.txt";
 
-            const { downloadFile } = await import(
-                "../stores/sites/utils/fileDownload"
-            );
+            const { downloadFile } =
+                await import("../stores/sites/utils/fileDownload");
             downloadFile({ buffer, fileName });
 
             expect(mockClick).toHaveBeenCalled();
@@ -201,9 +199,8 @@ describe("Additional Uncovered Lines Tests", () => {
             const fileName = "test.txt";
 
             await expect(async () => {
-                const { downloadFile } = await import(
-                    "../stores/sites/utils/fileDownload"
-                );
+                const { downloadFile } =
+                    await import("../stores/sites/utils/fileDownload");
                 downloadFile({ buffer, fileName });
             }).rejects.toThrowError("File download failed");
         });

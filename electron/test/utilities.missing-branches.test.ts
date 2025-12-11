@@ -36,8 +36,7 @@ describe("Utility Files - Missing Branch Coverage", () => {
 
             // Generate multiple IDs to test randomness
             const ids = Array.from({ length: 100 }, () =>
-                generateCorrelationId()
-            );
+                generateCorrelationId());
 
             // All should be unique
             const uniqueIds = new Set(ids);
@@ -336,8 +335,7 @@ describe("Utility Files - Missing Branch Coverage", () => {
                 Promise.resolve(0),
                 Promise.resolve(false),
                 new Promise((resolve) =>
-                    setTimeout(() => resolve("delayed"), 1)
-                ),
+                    setTimeout(() => resolve("delayed"), 1)),
             ];
 
             // Handle all promises
@@ -358,8 +356,7 @@ describe("Utility Files - Missing Branch Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             const timeoutPromise = new Promise((_, reject) =>
-                setTimeout(() => reject(new Error("Timeout")), 10)
-            );
+                setTimeout(() => reject(new Error("Timeout")), 10));
 
             const racePromise = Promise.race([
                 Promise.resolve("fast"),

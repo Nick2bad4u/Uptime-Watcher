@@ -1873,7 +1873,11 @@ export const EVENT_CATEGORIES = {
      * Events related to system operations including startup, shutdown, and
      * system-level errors that affect the entire application.
      */
-    SYSTEM: ["system:error", "system:shutdown", "system:startup"] as const,
+    SYSTEM: [
+        "system:error",
+        "system:shutdown",
+        "system:startup",
+    ] as const,
 } as const;
 
 /**

@@ -28,7 +28,11 @@ const ANALYTICS_BUTTON_REGEX = /Analytics$/i;
 test.describe(
     "site details - modern ui",
     {
-        tag: ["@ui", "@site-details", "@regression"],
+        tag: [
+            "@ui",
+            "@site-details",
+            "@regression",
+        ],
     },
     () => {
         test.setTimeout(90_000);

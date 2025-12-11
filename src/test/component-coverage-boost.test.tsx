@@ -1226,8 +1226,7 @@ describe("Component Coverage Boost", () => {
                     label: string
                 ): ChartData => ({
                     labels: rawData.map((item) =>
-                        new Date(item.timestamp).toLocaleTimeString()
-                    ),
+                        new Date(item.timestamp).toLocaleTimeString()),
                     datasets: [
                         {
                             label,

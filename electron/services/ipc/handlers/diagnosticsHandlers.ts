@@ -138,9 +138,10 @@ export function registerDiagnosticsHandlers({
                 throw new TypeError("Channel name must be a non-empty string");
             }
 
-            const availableChannels = Array.from(registeredHandlers).toSorted(
-                (left, right) => left.localeCompare(right)
-            );
+            const availableChannels = Array.from(registeredHandlers).toSorted((
+                left,
+                right
+            ) => left.localeCompare(right));
 
             const matchedChannel = availableChannels.find(
                 (registeredChannel) => registeredChannel === channelRaw

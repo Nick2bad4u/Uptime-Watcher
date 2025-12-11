@@ -56,8 +56,7 @@ process.emitWarning = ((warning: unknown, ...args: unknown[]) => {
     if (
         message !== "" &&
         SUPPRESSED_WARNING_SIGNATURES.some((fragment) =>
-            message.includes(fragment)
-        )
+            message.includes(fragment))
     ) {
         return;
     }
@@ -410,43 +409,34 @@ const mockElectronAPI: {
     events: {
         onMonitorCheckCompleted: vi.fn((_callback: any) =>
             // Mock implementation - return cleanup function
-            vi.fn()
-        ),
+            vi.fn()),
         onHistoryLimitUpdated: vi.fn((_callback: any) =>
             // Mock implementation - return cleanup function
-            vi.fn()
-        ),
+            vi.fn()),
         onMonitorStatusChanged: vi.fn((_callback: any) =>
             // Mock implementation - return cleanup function
-            vi.fn()
-        ),
+            vi.fn()),
         onMonitorUp: vi.fn((_callback: any) =>
             // Mock implementation - return cleanup function
-            vi.fn()
-        ),
+            vi.fn()),
         onSiteAdded: vi.fn((_callback: any) => vi.fn()),
         onSiteRemoved: vi.fn((_callback: any) => vi.fn()),
         onSiteUpdated: vi.fn((_callback: any) => vi.fn()),
         onMonitorDown: vi.fn((_callback: any) =>
             // Mock implementation - return cleanup function
-            vi.fn()
-        ),
+            vi.fn()),
         onMonitoringStarted: vi.fn((_callback: any) =>
             // Mock implementation - return cleanup function
-            vi.fn()
-        ),
+            vi.fn()),
         onMonitoringStopped: vi.fn((_callback: any) =>
             // Mock implementation - return cleanup function
-            vi.fn()
-        ),
+            vi.fn()),
         onTestEvent: vi.fn((_callback: any) =>
             // Mock implementation - return cleanup function
-            vi.fn()
-        ),
+            vi.fn()),
         onUpdateStatus: vi.fn((_callback: any) =>
             // Mock implementation - return cleanup function
-            vi.fn()
-        ),
+            vi.fn()),
         removeAllListeners: vi.fn(),
     },
     monitoring: {
@@ -841,7 +831,11 @@ const mockTheme = {
 vi.mock("../theme/useTheme", () => ({
     useTheme: () => ({
         ...mockTheme,
-        availableThemes: ["light", "dark", "system"],
+        availableThemes: [
+            "light",
+            "dark",
+            "system",
+        ],
         currentTheme: mockTheme,
         getColor: vi.fn((path: string) => {
             const keys = path.split(".");
@@ -870,7 +864,11 @@ vi.mock("../theme/useTheme", () => ({
         themeManager: {
             getTheme: vi.fn(() => mockTheme),
             applyTheme: vi.fn(),
-            getAvailableThemes: vi.fn(() => ["light", "dark", "system"]),
+            getAvailableThemes: vi.fn(() => [
+                "light",
+                "dark",
+                "system",
+            ]),
             onSystemThemeChange: vi.fn(() => vi.fn()),
             getSystemThemePreference: vi.fn(() => "light"),
         },

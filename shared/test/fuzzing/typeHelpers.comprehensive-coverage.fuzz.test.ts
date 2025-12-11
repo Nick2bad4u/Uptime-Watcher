@@ -66,13 +66,11 @@ describe("TypeHelpers Complete Coverage Fuzzing Tests", () => {
 
                 if (validatorFunc(input)) {
                     expect(() =>
-                        castIpcResponse(input, validator)
-                    ).not.toThrowError();
+                        castIpcResponse(input, validator)).not.toThrowError();
                     expect(castIpcResponse(input, validator)).toBe(input);
                 } else {
                     expect(() =>
-                        castIpcResponse(input, validator)
-                    ).toThrowError();
+                        castIpcResponse(input, validator)).toThrowError();
                 }
             }
         );
@@ -149,19 +147,17 @@ describe("TypeHelpers Complete Coverage Fuzzing Tests", () => {
     });
 
     describe(isRecord, () => {
-        test.prop([fc.object()])(
-            "should return true for plain objects",
-            (obj) => {
-                expect(isRecord(obj)).toBeTruthy();
-            }
-        );
+        test.prop([fc.object()])("should return true for plain objects", (
+            obj
+        ) => {
+            expect(isRecord(obj)).toBeTruthy();
+        });
 
-        test.prop([fc.array(fc.anything())])(
-            "should return false for arrays",
-            (arr) => {
-                expect(isRecord(arr)).toBeFalsy();
-            }
-        );
+        test.prop([fc.array(fc.anything())])("should return false for arrays", (
+            arr
+        ) => {
+            expect(isRecord(arr)).toBeFalsy();
+        });
 
         test.prop([
             fc.oneof(
@@ -188,17 +184,16 @@ describe("TypeHelpers Complete Coverage Fuzzing Tests", () => {
             expect(isRecord(() => {})).toBeFalsy();
         });
 
-        test.prop([fc.anything()])(
-            "should be consistent with internal logic",
-            (value) => {
-                const result = isRecord(value);
-                const expected =
-                    typeof value === "object" &&
-                    value !== null &&
-                    !Array.isArray(value);
-                expect(result).toBe(expected);
-            }
-        );
+        test.prop([fc.anything()])("should be consistent with internal logic", (
+            value
+        ) => {
+            const result = isRecord(value);
+            const expected =
+                typeof value === "object" &&
+                value !== null &&
+                !Array.isArray(value);
+            expect(result).toBe(expected);
+        });
     });
 
     describe(safePropertyAccess, () => {
@@ -255,17 +250,16 @@ describe("TypeHelpers Complete Coverage Fuzzing Tests", () => {
             expect(safePropertyAccess(obj, "nonexistent")).toBeUndefined();
         });
 
-        test.prop([fc.string()])(
-            "should handle inherited properties",
-            (key) => {
-                const parent = { [key]: "inherited" };
-                const child = Object.create(parent);
-                child.own = "own-property";
+        test.prop([fc.string()])("should handle inherited properties", (
+            key
+        ) => {
+            const parent = { [key]: "inherited" };
+            const child = Object.create(parent);
+            child.own = "own-property";
 
-                const result = safePropertyAccess(child, key);
-                expect(result).toBe("inherited");
-            }
-        );
+            const result = safePropertyAccess(child, key);
+            expect(result).toBe("inherited");
+        });
     });
 
     describe(validateAndConvert, () => {
@@ -280,50 +274,52 @@ describe("TypeHelpers Complete Coverage Fuzzing Tests", () => {
             }
         );
 
-        test.prop([fc.integer()])(
-            "should throw when validator fails",
-            (num) => {
-                const isString = (val: unknown): val is string =>
-                    typeof val === "string";
-                expect(() => validateAndConvert(num, isString)).toThrowError(
-                    "Type validation failed"
-                );
-            }
-        );
+        test.prop([fc.integer()])("should throw when validator fails", (
+            num
+        ) => {
+            const isString = (val: unknown): val is string =>
+                typeof val === "string";
+            expect(() => validateAndConvert(num, isString)).toThrowError(
+                "Type validation failed"
+            );
+        });
 
         test.prop([fc.anything(), fc.string()])(
             "should use custom error message when provided",
             (value, errorMessage) => {
                 const alwaysFail = (_: unknown): _ is never => false;
                 expect(() =>
-                    validateAndConvert(value, alwaysFail, errorMessage)
-                ).toThrowError(errorMessage);
+                    validateAndConvert(
+                        value,
+                        alwaysFail,
+                        errorMessage
+                    )).toThrowError(errorMessage);
             }
         );
 
-        test.prop([fc.anything()])(
-            "should work with complex validators",
-            (value) => {
-                const isArrayOfNumbers = (val: unknown): val is number[] =>
-                    Array.isArray(val) &&
-                    val.every((item) => typeof item === "number");
+        test.prop([fc.anything()])("should work with complex validators", (
+            value
+        ) => {
+            const isArrayOfNumbers = (val: unknown): val is number[] =>
+                Array.isArray(val) &&
+                val.every((item) => typeof item === "number");
 
-                if (
-                    Array.isArray(value) &&
-                    value.every((item) => typeof item === "number")
-                ) {
-                    expect(() =>
-                        validateAndConvert(value, isArrayOfNumbers)
-                    ).not.toThrowError();
-                    const result = validateAndConvert(value, isArrayOfNumbers);
-                    expect(Array.isArray(result)).toBeTruthy();
-                } else {
-                    expect(() =>
-                        validateAndConvert(value, isArrayOfNumbers)
-                    ).toThrowError();
-                }
+            if (
+                Array.isArray(value) &&
+                value.every((item) => typeof item === "number")
+            ) {
+                expect(() =>
+                    validateAndConvert(
+                        value,
+                        isArrayOfNumbers
+                    )).not.toThrowError();
+                const result = validateAndConvert(value, isArrayOfNumbers);
+                expect(Array.isArray(result)).toBeTruthy();
+            } else {
+                expect(() =>
+                    validateAndConvert(value, isArrayOfNumbers)).toThrowError();
             }
-        );
+        });
 
         it("should handle type narrowing correctly", () => {
             const mixed: unknown = "hello";
@@ -343,46 +339,45 @@ describe("TypeHelpers Complete Coverage Fuzzing Tests", () => {
 
                 if (validatorFunc(value)) {
                     expect(() =>
-                        validateAndConvert(value, validator)
-                    ).not.toThrowError();
+                        validateAndConvert(
+                            value,
+                            validator
+                        )).not.toThrowError();
                     expect(validateAndConvert(value, validator)).toBe(value);
                 } else {
                     expect(() =>
-                        validateAndConvert(value, validator)
-                    ).toThrowError();
+                        validateAndConvert(value, validator)).toThrowError();
                 }
             }
         );
     });
 
     describe("Integration Tests", () => {
-        test.prop([fc.anything()])(
-            "should work together in common patterns",
-            (value) => {
-                // Pattern: Check if array, then access properties safely
-                if (isArray(value)) {
-                    expect(Array.isArray(value)).toBeTruthy();
-                    const length = safePropertyAccess(value, "length");
-                    expect(typeof length).toBe("number");
-                }
+        test.prop([fc.anything()])("should work together in common patterns", (
+            value
+        ) => {
+            // Pattern: Check if array, then access properties safely
+            if (isArray(value)) {
+                expect(Array.isArray(value)).toBeTruthy();
+                const length = safePropertyAccess(value, "length");
+                expect(typeof length).toBe("number");
+            }
 
-                // Pattern: Check if record, then validate and convert
-                if (isRecord(value)) {
-                    const isRecordValidator = (
-                        val: unknown
-                    ): val is Record<string, unknown> => isRecord(val);
+            // Pattern: Check if record, then validate and convert
+            if (isRecord(value)) {
+                const isRecordValidator = (
+                    val: unknown
+                ): val is Record<string, unknown> => isRecord(val);
 
-                    expect(() =>
-                        validateAndConvert(value, isRecordValidator)
-                    ).not.toThrowError();
-                    const converted = validateAndConvert(
+                expect(() =>
+                    validateAndConvert(
                         value,
                         isRecordValidator
-                    );
-                    expect(isRecord(converted)).toBeTruthy();
-                }
+                    )).not.toThrowError();
+                const converted = validateAndConvert(value, isRecordValidator);
+                expect(isRecord(converted)).toBeTruthy();
             }
-        );
+        });
 
         test.prop([fc.object(), fc.string()])(
             "should handle IPC response pattern",

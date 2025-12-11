@@ -88,7 +88,13 @@ describe("String Conversion Utilities - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(safeStringify([1, 2, 3])).toBe("[1,2,3]");
+            expect(
+                safeStringify([
+                    1,
+                    2,
+                    3,
+                ])
+            ).toBe("[1,2,3]");
             expect(safeStringify([])).toBe("[]");
             expect(safeStringify(["a", "b"])).toBe('["a","b"]');
         });
@@ -319,7 +325,11 @@ describe("String Conversion Utilities - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            const set = new Set([1, 2, 3]);
+            const set = new Set([
+                1,
+                2,
+                3,
+            ]);
             const result = safeStringify(set);
             expect(result).toBeDefined();
         });
@@ -369,24 +379,22 @@ describe("String Conversion Utilities - Comprehensive Coverage", () => {
             }
         );
 
-        test.prop([fc.float()])(
-            "should handle all float values consistently",
-            (num) => {
-                const result = safeStringify(num);
-                expect(typeof result).toBe("string");
-                expect(result).toBe(String(num));
-            }
-        );
+        test.prop([fc.float()])("should handle all float values consistently", (
+            num
+        ) => {
+            const result = safeStringify(num);
+            expect(typeof result).toBe("string");
+            expect(result).toBe(String(num));
+        });
 
-        test.prop([fc.boolean()])(
-            "should handle boolean values consistently",
-            (bool) => {
-                const result = safeStringify(bool);
-                expect(typeof result).toBe("string");
-                expect(result).toBe(String(bool));
-                expect(["true", "false"]).toContain(result);
-            }
-        );
+        test.prop([fc.boolean()])("should handle boolean values consistently", (
+            bool
+        ) => {
+            const result = safeStringify(bool);
+            expect(typeof result).toBe("string");
+            expect(result).toBe(String(bool));
+            expect(["true", "false"]).toContain(result);
+        });
 
         test.prop([fc.array(fc.anything())])(
             "should handle arrays of any content",
@@ -489,8 +497,7 @@ describe("String Conversion Utilities - Comprehensive Coverage", () => {
                     const normalizeSignedZeros = (value: unknown): unknown => {
                         if (Array.isArray(value)) {
                             return value.map((item) =>
-                                normalizeSignedZeros(item)
-                            );
+                                normalizeSignedZeros(item));
                         } else if (value && typeof value === "object") {
                             const normalized: Record<string, unknown> = {};
                             for (const [key, val] of Object.entries(value)) {

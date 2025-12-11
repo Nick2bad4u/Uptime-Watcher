@@ -685,14 +685,14 @@ describe("React Event Handling Performance", () => {
                 relatedTarget: `element-${Math.floor(Math.random() * 100)}`,
                 deltaX: Math.random() * 100 - 50,
                 deltaY: Math.random() * 100 - 50,
-                touches: Array.from(
-                    { length: Math.floor(Math.random() * 5) },
-                    (_, j) => ({
-                        identifier: j,
-                        clientX: Math.random() * 1920,
-                        clientY: Math.random() * 1080,
-                    })
-                ),
+                touches: Array.from({ length: Math.floor(Math.random() * 5) }, (
+                    _,
+                    j
+                ) => ({
+                    identifier: j,
+                    clientX: Math.random() * 1920,
+                    clientY: Math.random() * 1080,
+                })),
             };
 
             const metrics = eventSystem.dispatchEvent(
@@ -732,12 +732,10 @@ describe("React Event Handling Performance", () => {
         ];
 
         customEventTypes.forEach((eventType) => {
-            const listeners = Array.from(
-                { length: 20 },
-                (_, i) => (event: CustomEvent) => {
+            const listeners = Array.from({ length: 20 }, (_, i) =>
+                (event: CustomEvent) => {
                     const processing = Math.random() * event.detail.complexity;
-                }
-            );
+                });
             eventListeners.set(eventType, listeners);
         });
 
@@ -777,8 +775,7 @@ describe("React Event Handling Performance", () => {
         let lastThrottleTime = 0;
         let debounceTimeout: NodeJS.Timeout | null = null;
 
-        const throttle =
-            (fn: Function, limit: number) =>
+        const throttle = (fn: Function, limit: number) =>
             (...args: any[]) => {
                 const now = Date.now();
                 if (now - lastThrottleTime >= limit) {
@@ -787,8 +784,7 @@ describe("React Event Handling Performance", () => {
                 }
             };
 
-        const debounce =
-            (fn: Function, delay: number) =>
+        const debounce = (fn: Function, delay: number) =>
             (...args: any[]) => {
                 if (debounceTimeout) {
                     clearTimeout(debounceTimeout);
@@ -848,15 +844,12 @@ describe("React Event Handling Performance", () => {
 
         // Register many handlers and delegators
         for (let i = 0; i < 200; i++) {
-            eventSystem.addEventListener(
-                `stress-element-${i}`,
-                "click",
-                (event) => {
-                    const computation = Array.from({ length: 10 }, () =>
-                        Math.random()
-                    ).reduce((a, b) => a + b, 0);
-                }
-            );
+            eventSystem.addEventListener(`stress-element-${i}`, "click", (
+                event
+            ) => {
+                const computation = Array.from({ length: 10 }, () =>
+                    Math.random()).reduce((a, b) => a + b, 0);
+            });
 
             if (i % 10 === 0) {
                 eventSystem.addEventDelegator(

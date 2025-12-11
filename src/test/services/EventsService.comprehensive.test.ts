@@ -107,11 +107,9 @@ function createMockEventApi() {
         onHistoryLimitUpdated: vi.fn(() => createEventCleanupFunction()),
         onMonitorDown: vi.fn(() => createEventCleanupFunction()),
         onMonitoringStarted: vi.fn((_handler: MonitoringStartedEventHandler) =>
-            createEventCleanupFunction()
-        ),
+            createEventCleanupFunction()),
         onMonitoringStopped: vi.fn((_handler: MonitoringStoppedEventHandler) =>
-            createEventCleanupFunction()
-        ),
+            createEventCleanupFunction()),
         onMonitorStatusChanged: vi.fn(() => createEventCleanupFunction()),
         onMonitorUp: vi.fn(() => createEventCleanupFunction()),
         onSiteAdded: vi.fn(() => createEventCleanupFunction()),

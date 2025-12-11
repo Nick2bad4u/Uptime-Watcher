@@ -307,9 +307,8 @@ describe("main.ts - Electron Main Process", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Constructor", "type");
 
-            const { ApplicationService } = await import(
-                "../services/application/ApplicationService"
-            );
+            const { ApplicationService } =
+                await import("../services/application/ApplicationService");
 
             vi.resetModules();
             await import("../main");
@@ -542,9 +541,8 @@ describe("main.ts - Electron Main Process", () => {
                 value: { ...originalVersions, electron: "25.0.0" },
                 writable: true,
             });
-            const { ApplicationService } = await import(
-                "../services/application/ApplicationService"
-            );
+            const { ApplicationService } =
+                await import("../services/application/ApplicationService");
 
             await import("../main");
 
@@ -567,9 +565,8 @@ describe("main.ts - Electron Main Process", () => {
             });
             delete (process.versions as any).electron;
 
-            const { ApplicationService } = await import(
-                "../services/application/ApplicationService"
-            );
+            const { ApplicationService } =
+                await import("../services/application/ApplicationService");
 
             await import("../main");
 
@@ -611,9 +608,8 @@ describe("main.ts - Electron Main Process", () => {
             await annotate("Type: Business Logic", "type");
 
             vi.resetModules();
-            const { ApplicationService } = await import(
-                "../services/application/ApplicationService"
-            );
+            const { ApplicationService } =
+                await import("../services/application/ApplicationService");
             (ApplicationService as any).mockImplementation(
                 function NullApplicationServiceMock() {
                     return null as unknown as ApplicationServiceType;

@@ -720,9 +720,8 @@ describe(SiteList, () => {
             annotate("Type: Business Logic", "type");
 
             // Arrange
-            const { EmptyState: mockEmptyState } = await import(
-                "../../../../components/Dashboard/SiteList/EmptyState"
-            );
+            const { EmptyState: mockEmptyState } =
+                await import("../../../../components/Dashboard/SiteList/EmptyState");
             const mockEmptyStateMocked = vi.mocked(mockEmptyState);
             setSitesSnapshot([] as Site[]);
             mockUseTheme.mockReturnValue(createMockTheme(false));

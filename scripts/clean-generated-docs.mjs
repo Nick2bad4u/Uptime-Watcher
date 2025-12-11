@@ -91,8 +91,7 @@ const removeGeneratedTargets = async (targets) => {
  */
 const recreatePlaceholders = async (typedocOutputs) => {
     const typedocRoot = Array.from(typedocOutputs).find((outputPath) =>
-        outputPath.startsWith(docusaurusRoot)
-    );
+        outputPath.startsWith(docusaurusRoot));
 
     if (!typedocRoot) {
         return;

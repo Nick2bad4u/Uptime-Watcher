@@ -27,10 +27,7 @@ import validateUptimeWatcherDocs from "./config/linting/remark/validate-uptime-w
 /** @typedef {import("mdast").Root} Root */
 /** @typedef {import("vfile").VFile} VFile */
 /**
- * @typedef {string
- *     | Plugin
- *     | Preset
- *     | [string | Plugin | Preset, ...unknown[]]} PluginEntry
+ * @typedef {string | Plugin | Preset | [string | Plugin | Preset, ...unknown[]]} PluginEntry
  */
 
 // Imported plugin types - these plugins don't typically export specific option types

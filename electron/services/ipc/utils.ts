@@ -435,8 +435,7 @@ export function createValidationResponse(
  *
  * ```typescript
  * const result = await withIpcHandler("get-sites", async () =>
- *     this.uptimeOrchestrator.getSites()
- * );
+ *     this.uptimeOrchestrator.getSites());
  * ```
  *
  * @param channelName - Name of the IPC channel

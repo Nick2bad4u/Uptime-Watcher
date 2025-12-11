@@ -136,15 +136,9 @@ describe("Architectural Fixes Regression Tests", () => {
             // The previous monitoring lifecycle has been replaced with enhanced monitoring
             await expect(async () => {
                 // The enhanced monitoring system should import without throwing
-                await import(
-                    "../../electron/services/monitoring/EnhancedMonitorChecker"
-                );
-                await import(
-                    "../../electron/services/monitoring/MonitorOperationRegistry"
-                );
-                await import(
-                    "../../electron/services/monitoring/OperationTimeoutManager"
-                );
+                await import("../../electron/services/monitoring/EnhancedMonitorChecker");
+                await import("../../electron/services/monitoring/MonitorOperationRegistry");
+                await import("../../electron/services/monitoring/OperationTimeoutManager");
             }).not.toThrowError();
         });
     });

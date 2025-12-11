@@ -223,8 +223,7 @@ describe("Validation Operations Performance Benchmarks", () => {
             "validate bulk monitors (500 items)",
             () => {
                 monitors.every((monitor) =>
-                    validateSchema(monitor, monitorSchema)
-                );
+                    validateSchema(monitor, monitorSchema));
             },
             {
                 time: 2000,
@@ -302,8 +301,7 @@ describe("Validation Operations Performance Benchmarks", () => {
             "check number ranges (timeout values)",
             () => {
                 monitors.every((monitor) =>
-                    validateNumberRange(monitor.timeout, 1000, 30_000)
-                );
+                    validateNumberRange(monitor.timeout, 1000, 30_000));
             },
             {
                 time: 1000,
@@ -315,8 +313,11 @@ describe("Validation Operations Performance Benchmarks", () => {
             "check number ranges (intervals)",
             () => {
                 monitors.every((monitor) =>
-                    validateNumberRange(monitor.checkInterval, 10_000, 300_000)
-                );
+                    validateNumberRange(
+                        monitor.checkInterval,
+                        10_000,
+                        300_000
+                    ));
             },
             {
                 time: 1000,
@@ -328,8 +329,7 @@ describe("Validation Operations Performance Benchmarks", () => {
             "validate URL formats",
             () => {
                 monitors.every((monitor) =>
-                    monitor.url ? validateUrl(monitor.url) : true
-                );
+                    monitor.url ? validateUrl(monitor.url) : true);
             },
             {
                 time: 1000,

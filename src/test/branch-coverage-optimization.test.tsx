@@ -405,55 +405,53 @@ describe("Branch Coverage Optimization Tests", () => {
     });
 
     describe("Props Comparison Function Coverage", () => {
-        const SiteCardHistoryWrapped = React.memo(
-            SiteCardHistory,
-            (prev, next) => {
-                // Test all branches of areHistoryPropsEqual function
+        const SiteCardHistoryWrapped = React.memo(SiteCardHistory, (
+            prev,
+            next
+        ) => {
+            // Test all branches of areHistoryPropsEqual function
 
-                // Compare history arrays length
-                if (
-                    prev.filteredHistory.length !== next.filteredHistory.length
-                ) {
-                    return false;
-                }
-
-                // Compare first history item timestamp
-                const prevTimestamp = prev.filteredHistory[0]?.timestamp;
-                const nextTimestamp = next.filteredHistory[0]?.timestamp;
-                if (prevTimestamp !== nextTimestamp) {
-                    return false;
-                }
-
-                // Compare monitor objects
-                const prevMonitor = prev.monitor;
-                const nextMonitor = next.monitor;
-
-                // Both undefined
-                if (prevMonitor === undefined && nextMonitor === undefined) {
-                    return true;
-                }
-
-                // One undefined, one defined
-                if (prevMonitor === undefined || nextMonitor === undefined) {
-                    return false;
-                }
-
-                // Compare monitor properties
-                if (
-                    prevMonitor.id !== nextMonitor.id ||
-                    prevMonitor.type !== nextMonitor.type
-                ) {
-                    return false;
-                }
-
-                // Compare optional properties
-                return !(
-                    prevMonitor.url !== nextMonitor.url ||
-                    prevMonitor.port !== nextMonitor.port ||
-                    prevMonitor.host !== nextMonitor.host
-                );
+            // Compare history arrays length
+            if (prev.filteredHistory.length !== next.filteredHistory.length) {
+                return false;
             }
-        );
+
+            // Compare first history item timestamp
+            const prevTimestamp = prev.filteredHistory[0]?.timestamp;
+            const nextTimestamp = next.filteredHistory[0]?.timestamp;
+            if (prevTimestamp !== nextTimestamp) {
+                return false;
+            }
+
+            // Compare monitor objects
+            const prevMonitor = prev.monitor;
+            const nextMonitor = next.monitor;
+
+            // Both undefined
+            if (prevMonitor === undefined && nextMonitor === undefined) {
+                return true;
+            }
+
+            // One undefined, one defined
+            if (prevMonitor === undefined || nextMonitor === undefined) {
+                return false;
+            }
+
+            // Compare monitor properties
+            if (
+                prevMonitor.id !== nextMonitor.id ||
+                prevMonitor.type !== nextMonitor.type
+            ) {
+                return false;
+            }
+
+            // Compare optional properties
+            return !(
+                prevMonitor.url !== nextMonitor.url ||
+                prevMonitor.port !== nextMonitor.port ||
+                prevMonitor.host !== nextMonitor.host
+            );
+        });
 
         it("should handle different history lengths", ({ task, annotate }) => {
             annotate(`Testing: ${task.name}`, "functional");

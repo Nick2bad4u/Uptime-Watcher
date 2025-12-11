@@ -52,8 +52,7 @@ import type { TextAlign, TextSize, TextVariant, TextWeight } from "./types";
  * @public
  */
 export interface ThemedTextProperties
-    extends AccessibilityProperties,
-        CoreComponentProperties {
+    extends AccessibilityProperties, CoreComponentProperties {
     /** Text alignment within the container */
     readonly align?: TextAlign;
     /** Semantic HTML element to render (defaults to `<span>`). */

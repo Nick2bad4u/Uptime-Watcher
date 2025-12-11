@@ -483,12 +483,12 @@ describe("useSiteSync", () => {
             await annotate("Type: Event Processing", "type");
 
             let eventHandler: any;
-            mockStateSyncService.onStateSyncEvent.mockImplementation(
-                async (handler) => {
-                    eventHandler = handler;
-                    return vi.fn();
-                }
-            );
+            mockStateSyncService.onStateSyncEvent.mockImplementation(async (
+                handler
+            ) => {
+                eventHandler = handler;
+                return vi.fn();
+            });
 
             syncActions.subscribeToSyncEvents();
 
@@ -519,12 +519,12 @@ describe("useSiteSync", () => {
 
             // Test delete event handling by simulating the sync event subscription
             let eventHandler: any;
-            mockStateSyncService.onStateSyncEvent.mockImplementation(
-                async (handler) => {
-                    eventHandler = handler;
-                    return vi.fn();
-                }
-            );
+            mockStateSyncService.onStateSyncEvent.mockImplementation(async (
+                handler
+            ) => {
+                eventHandler = handler;
+                return vi.fn();
+            });
 
             syncActions.subscribeToSyncEvents();
 
@@ -559,12 +559,12 @@ describe("useSiteSync", () => {
             await annotate("Type: Data Integrity", "type");
 
             let eventHandler: any;
-            mockStateSyncService.onStateSyncEvent.mockImplementation(
-                async (handler) => {
-                    eventHandler = handler;
-                    return vi.fn();
-                }
-            );
+            mockStateSyncService.onStateSyncEvent.mockImplementation(async (
+                handler
+            ) => {
+                eventHandler = handler;
+                return vi.fn();
+            });
 
             const state: typeof initialSitesState = {
                 optimisticMonitoringLocks: {},
@@ -629,12 +629,12 @@ describe("useSiteSync", () => {
             await annotate("Type: Error Handling", "type");
 
             let eventHandler: any;
-            mockStateSyncService.onStateSyncEvent.mockImplementation(
-                async (handler) => {
-                    eventHandler = handler;
-                    return vi.fn();
-                }
-            );
+            mockStateSyncService.onStateSyncEvent.mockImplementation(async (
+                handler
+            ) => {
+                eventHandler = handler;
+                return vi.fn();
+            });
 
             syncActions.subscribeToSyncEvents();
 
@@ -682,12 +682,12 @@ describe("useSiteSync", () => {
             await annotate("Type: Regression", "type");
 
             let eventHandler: any;
-            mockStateSyncService.onStateSyncEvent.mockImplementation(
-                async (handler) => {
-                    eventHandler = handler;
-                    return vi.fn();
-                }
-            );
+            mockStateSyncService.onStateSyncEvent.mockImplementation(async (
+                handler
+            ) => {
+                eventHandler = handler;
+                return vi.fn();
+            });
 
             const duplicateSites: Site[] = [
                 {
@@ -886,46 +886,43 @@ describe("useSiteSync", () => {
                 minLength: 1,
                 maxLength: 8,
             }),
-        ])(
-            "sanitizes duplicate identifiers in full sync payloads",
-            async (identifiers: readonly string[]) => {
-                mockDeps.setSites.mockClear();
-                mockStateSyncService.requestFullSync.mockClear();
+        ])("sanitizes duplicate identifiers in full sync payloads", async (
+            identifiers: readonly string[]
+        ) => {
+            mockDeps.setSites.mockClear();
+            mockStateSyncService.requestFullSync.mockClear();
 
-                const sites = identifiers.map((identifier) =>
-                    buildSite(identifier)
-                );
+            const sites = identifiers.map((identifier) =>
+                buildSite(identifier));
 
-                mockStateSyncService.requestFullSync.mockResolvedValueOnce({
-                    completedAt: Date.now(),
-                    siteCount: sites.length,
-                    sites,
-                    source: "property-test" as const,
-                    synchronized: true,
-                });
+            mockStateSyncService.requestFullSync.mockResolvedValueOnce({
+                completedAt: Date.now(),
+                siteCount: sites.length,
+                sites,
+                source: "property-test" as const,
+                synchronized: true,
+            });
 
-                await syncActions.syncSites();
+            await syncActions.syncSites();
 
-                expect(mockDeps.setSites).toHaveBeenCalledTimes(1);
-                const [sanitizedSites] =
-                    mockDeps.setSites.mock.calls.at(-1) ?? [];
+            expect(mockDeps.setSites).toHaveBeenCalledTimes(1);
+            const [sanitizedSites] = mockDeps.setSites.mock.calls.at(-1) ?? [];
 
-                expect(Array.isArray(sanitizedSites)).toBeTruthy();
-                const sanitizedIdentifiers = sanitizedSites.map(
-                    (site: Site) => site.identifier
-                );
+            expect(Array.isArray(sanitizedSites)).toBeTruthy();
+            const sanitizedIdentifiers = sanitizedSites.map(
+                (site: Site) => site.identifier
+            );
 
-                const uniqueIdentifiers = Array.from(
-                    new Set(identifiers)
-                ).toSorted();
-                const sortedSanitized = sanitizedIdentifiers.toSorted();
+            const uniqueIdentifiers = Array.from(
+                new Set(identifiers)
+            ).toSorted();
+            const sortedSanitized = sanitizedIdentifiers.toSorted();
 
-                expect(sortedSanitized).toEqual(uniqueIdentifiers);
-                expect(new Set(sanitizedIdentifiers).size).toBe(
-                    sanitizedIdentifiers.length
-                );
-            }
-        );
+            expect(sortedSanitized).toEqual(uniqueIdentifiers);
+            expect(new Set(sanitizedIdentifiers).size).toBe(
+                sanitizedIdentifiers.length
+            );
+        });
 
         it("should handle sync errors", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");

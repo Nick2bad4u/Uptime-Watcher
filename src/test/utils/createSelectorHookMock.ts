@@ -29,12 +29,13 @@ export type SelectorHookMock<State extends object> = ReturnType<
 export function createSelectorHookMock<State extends object>(
     state: State
 ): SelectorHookMock<State> {
-    const mock = vi.fn(
-        <Result = State>(
-            selector?: Selector<State, Result>,
-            _equality?: EqualityChecker<Result>
-        ) => (typeof selector === "function" ? selector(state) : state)
-    ) as unknown as SelectorHookMock<State>;
+    const mock = vi.fn(<Result = State>(
+        selector?: Selector<State, Result>,
+        _equality?: EqualityChecker<Result>
+    ) =>
+        typeof selector === "function"
+            ? selector(state)
+            : state) as unknown as SelectorHookMock<State>;
 
     mock.getState = vi.fn(() => state);
     mock.setState = vi.fn((partial) => {

@@ -512,8 +512,7 @@ describe("App Additional Coverage Tests", () => {
                           state: typeof mockSettingsStoreState
                       ) => unknown
                   )(mockSettingsStoreState)
-                : mockSettingsStoreState
-        );
+                : mockSettingsStoreState);
 
         Object.assign(mockThemeState, {
             isDark: false,
@@ -523,8 +522,7 @@ describe("App Additional Coverage Tests", () => {
         // Mock the store hooks to return the reactive state objects
         mockUseUpdatesStore.mockImplementation(() => mockUpdatesStoreState);
         mockUseSitesStore.mockImplementation((selector: any) =>
-            selector ? selector(mockSitesStoreState) : mockSitesStoreState
-        );
+            selector ? selector(mockSitesStoreState) : mockSitesStoreState);
         mockUseErrorStore.mockImplementation(() => mockErrorStoreState);
 
         // Mock the getState method for useErrorStore (needed by createStoreErrorHandler)
@@ -548,8 +546,7 @@ describe("App Additional Coverage Tests", () => {
             .mockReturnValue(mockSettingsStoreState);
 
         mockUseUIStore.mockImplementation((selector: any) =>
-            selector ? selector(mockUIStoreState) : mockUIStoreState
-        );
+            selector ? selector(mockUIStoreState) : mockUIStoreState);
         mockUseTheme.mockImplementation(() => mockThemeState);
 
         // Mock useAvailabilityColors hook

@@ -963,8 +963,9 @@ describe("shared/utils/typeHelpers.ts - Complete Function Coverage", () => {
             const customMessage = "Expected string but got number";
 
             expect(() =>
-                validateAndConvert(123, validator, customMessage)
-            ).toThrowError(customMessage);
+                validateAndConvert(123, validator, customMessage)).toThrowError(
+                customMessage
+            );
         });
 
         it("should handle complex type validation", async ({
@@ -996,8 +997,7 @@ describe("shared/utils/typeHelpers.ts - Complete Function Coverage", () => {
 
             const invalidObject = { name: "Bob" }; // Missing age
             expect(() =>
-                validateAndConvert(invalidObject, validator)
-            ).toThrowError();
+                validateAndConvert(invalidObject, validator)).toThrowError();
         });
 
         it("should work with primitive type validators", async ({
@@ -1017,8 +1017,7 @@ describe("shared/utils/typeHelpers.ts - Complete Function Coverage", () => {
 
             expect(validateAndConvert(42, numberValidator)).toBe(42);
             expect(() =>
-                validateAndConvert("42", numberValidator)
-            ).toThrowError();
+                validateAndConvert("42", numberValidator)).toThrowError();
         });
     });
 

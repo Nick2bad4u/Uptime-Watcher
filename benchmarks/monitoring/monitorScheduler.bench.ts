@@ -51,8 +51,7 @@ class MockMonitorScheduler {
 
     bulkSchedule(monitors: { id: string; interval: number }[]): void {
         monitors.forEach((monitor) =>
-            this.schedule(monitor.id, monitor.interval)
-        );
+            this.schedule(monitor.id, monitor.interval));
     }
 
     reschedule(monitorId: string, newInterval: number): void {

@@ -221,8 +221,7 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
                             _row: UnknownRecord
                         ): _row is UnknownRecord => false,
                     }
-                )
-            ).toThrowError(/ValidatedRow/);
+                )).toThrowError(/ValidatedRow/);
         });
         it("should handle empty array parameters", async ({
             task,
@@ -269,20 +268,21 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
                     name: fc.string({ maxLength: 50 }),
                     timestamp: fc.integer({ min: 0, max: Date.now() }),
                 }),
-            ])(
-                "should handle various SQL queries and parameters",
-                (query, params, mockResult) => {
-                    // Arrange
-                    mockGet.mockReturnValue(mockResult);
+            ])("should handle various SQL queries and parameters", (
+                query,
+                params,
+                mockResult
+            ) => {
+                // Arrange
+                mockGet.mockReturnValue(mockResult);
 
-                    // Act
-                    const result = insertWithReturning(mockDb, query, params);
+                // Act
+                const result = insertWithReturning(mockDb, query, params);
 
-                    // Assert
-                    expect(result).toEqual(mockResult);
-                    expect(mockGet).toHaveBeenCalledWith(query, params);
-                }
-            );
+                // Assert
+                expect(result).toEqual(mockResult);
+                expect(mockGet).toHaveBeenCalledWith(query, params);
+            });
 
             test.prop([
                 fc.constantFrom(
@@ -299,29 +299,25 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
                     ),
                     { minLength: 0, maxLength: 5 }
                 ),
-            ])(
-                "should handle realistic database INSERT queries",
-                (insertQuery, params) => {
-                    // Arrange
-                    const expectedResult = {
-                        id: Math.floor(Math.random() * 1000) + 1,
-                        created_at: new Date().toISOString(),
-                        updated_at: new Date().toISOString(),
-                    };
-                    mockGet.mockReturnValue(expectedResult);
+            ])("should handle realistic database INSERT queries", (
+                insertQuery,
+                params
+            ) => {
+                // Arrange
+                const expectedResult = {
+                    id: Math.floor(Math.random() * 1000) + 1,
+                    created_at: new Date().toISOString(),
+                    updated_at: new Date().toISOString(),
+                };
+                mockGet.mockReturnValue(expectedResult);
 
-                    // Act
-                    const result = insertWithReturning(
-                        mockDb,
-                        insertQuery,
-                        params
-                    );
+                // Act
+                const result = insertWithReturning(mockDb, insertQuery, params);
 
-                    // Assert
-                    expect(result).toEqual(expectedResult);
-                    expect(mockGet).toHaveBeenCalledWith(insertQuery, params);
-                }
-            );
+                // Assert
+                expect(result).toEqual(expectedResult);
+                expect(mockGet).toHaveBeenCalledWith(insertQuery, params);
+            });
 
             test.prop([
                 fc.string({ minLength: 20, maxLength: 150 }),
@@ -337,26 +333,26 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
                     ),
                     created_at: fc.integer({ min: 0, max: Date.now() }),
                 }),
-            ])(
-                "should return various result structures correctly",
-                (query, mockResult) => {
-                    // Arrange
-                    mockGet.mockReturnValue(mockResult);
+            ])("should return various result structures correctly", (
+                query,
+                mockResult
+            ) => {
+                // Arrange
+                mockGet.mockReturnValue(mockResult);
 
-                    // Act
-                    const result = insertWithReturning(mockDb, query, []);
+                // Act
+                const result = insertWithReturning(mockDb, query, []);
 
-                    // Assert
-                    expect(result).toEqual(mockResult);
-                    expect(typeof result).toBe("object");
-                    expect(result).not.toBeNull();
+                // Assert
+                expect(result).toEqual(mockResult);
+                expect(typeof result).toBe("object");
+                expect(result).not.toBeNull();
 
-                    // Verify all properties are preserved
-                    for (const [key, value] of Object.entries(mockResult)) {
-                        expect(result[key]).toEqual(value);
-                    }
+                // Verify all properties are preserved
+                for (const [key, value] of Object.entries(mockResult)) {
+                    expect(result[key]).toEqual(value);
                 }
-            );
+            });
 
             test.prop([
                 fc.array(
@@ -380,34 +376,33 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
                     }),
                     { minLength: 1, maxLength: 5 }
                 ),
-            ])(
-                "should handle multiple sequential inserts",
-                (insertOperations) => {
-                    // Reset mock for this property-based test iteration
-                    mockGet.mockClear();
+            ])("should handle multiple sequential inserts", (
+                insertOperations
+            ) => {
+                // Reset mock for this property-based test iteration
+                mockGet.mockClear();
 
-                    // Act & Assert
-                    let callCount = 0;
-                    for (const operation of insertOperations) {
-                        mockGet.mockReturnValue(operation.result);
+                // Act & Assert
+                let callCount = 0;
+                for (const operation of insertOperations) {
+                    mockGet.mockReturnValue(operation.result);
 
-                        const result = insertWithReturning(
-                            mockDb,
-                            operation.query,
-                            operation.params
-                        );
+                    const result = insertWithReturning(
+                        mockDb,
+                        operation.query,
+                        operation.params
+                    );
 
-                        expect(result).toEqual(operation.result);
-                        callCount++;
-                        expect(mockGet).toHaveBeenCalledTimes(callCount);
-                        expect(mockGet).toHaveBeenNthCalledWith(
-                            callCount,
-                            operation.query,
-                            operation.params
-                        );
-                    }
+                    expect(result).toEqual(operation.result);
+                    callCount++;
+                    expect(mockGet).toHaveBeenCalledTimes(callCount);
+                    expect(mockGet).toHaveBeenNthCalledWith(
+                        callCount,
+                        operation.query,
+                        operation.params
+                    );
                 }
-            );
+            });
         });
         describe(queryForCount, () => {
             it("should return count result from COUNT query", async ({
@@ -549,26 +544,26 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
                         "SELECT COUNT(*) as count FROM monitors WHERE status = 'running'"
                     ),
                     fc.integer({ min: 0, max: 10_000 }),
-                ])(
-                    "should return count results for various COUNT queries",
-                    (query, expectedCount) => {
-                        // Arrange
-                        const mockResult: CountResult = {
-                            count: expectedCount,
-                        };
-                        mockGet.mockReturnValue(mockResult);
+                ])("should return count results for various COUNT queries", (
+                    query,
+                    expectedCount
+                ) => {
+                    // Arrange
+                    const mockResult: CountResult = {
+                        count: expectedCount,
+                    };
+                    mockGet.mockReturnValue(mockResult);
 
-                        // Act
-                        const result = queryForCount(mockDb, query);
+                    // Act
+                    const result = queryForCount(mockDb, query);
 
-                        // Assert
-                        expect(result).toEqual(mockResult);
-                        expect(result).toBeDefined();
-                        expect(result!.count).toBe(expectedCount);
-                        expect(typeof result!.count).toBe("number");
-                        expect(mockGet).toHaveBeenCalledWith(query, undefined);
-                    }
-                );
+                    // Assert
+                    expect(result).toEqual(mockResult);
+                    expect(result).toBeDefined();
+                    expect(result!.count).toBe(expectedCount);
+                    expect(typeof result!.count).toBe("number");
+                    expect(mockGet).toHaveBeenCalledWith(query, undefined);
+                });
 
                 test.prop([
                     fc.string({ minLength: 20, maxLength: 150 }),
@@ -581,54 +576,52 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
                         { minLength: 0, maxLength: 5 }
                     ),
                     fc.integer({ min: 0, max: 100_000 }),
-                ])(
-                    "should handle COUNT queries with parameters",
-                    (query, params, expectedCount) => {
-                        // Arrange
-                        const mockResult: CountResult = {
-                            count: expectedCount,
-                        };
-                        mockGet.mockReturnValue(mockResult);
+                ])("should handle COUNT queries with parameters", (
+                    query,
+                    params,
+                    expectedCount
+                ) => {
+                    // Arrange
+                    const mockResult: CountResult = {
+                        count: expectedCount,
+                    };
+                    mockGet.mockReturnValue(mockResult);
 
-                        // Act
-                        const result = queryForCount(mockDb, query, params);
+                    // Act
+                    const result = queryForCount(mockDb, query, params);
 
-                        // Assert
-                        expect(result).toEqual(mockResult);
-                        expect(result).toBeDefined();
-                        expect(result!.count).toBe(expectedCount);
-                        expect(mockGet).toHaveBeenCalledWith(query, params);
-                    }
-                );
+                    // Assert
+                    expect(result).toEqual(mockResult);
+                    expect(result).toBeDefined();
+                    expect(result!.count).toBe(expectedCount);
+                    expect(mockGet).toHaveBeenCalledWith(query, params);
+                });
 
                 test.prop([
                     fc.array(fc.integer({ min: 0, max: 1000 }), {
                         minLength: 1,
                         maxLength: 10,
                     }),
-                ])(
-                    "should handle various count values including edge cases",
-                    (countValues) => {
-                        // Act & Assert
-                        for (const count of countValues) {
-                            const mockResult: CountResult = { count };
-                            mockGet.mockReturnValue(mockResult);
+                ])("should handle various count values including edge cases", (
+                    countValues
+                ) => {
+                    // Act & Assert
+                    for (const count of countValues) {
+                        const mockResult: CountResult = { count };
+                        mockGet.mockReturnValue(mockResult);
 
-                            const result = queryForCount(
-                                mockDb,
-                                "SELECT COUNT(*) as count FROM test_table"
-                            );
+                        const result = queryForCount(
+                            mockDb,
+                            "SELECT COUNT(*) as count FROM test_table"
+                        );
 
-                            expect(result).toBeDefined();
-                            expect(result!.count).toBe(count);
-                            expect(typeof result!.count).toBe("number");
-                            expect(
-                                Number.isInteger(result!.count)
-                            ).toBeTruthy();
-                            expect(result!.count).toBeGreaterThanOrEqual(0);
-                        }
+                        expect(result).toBeDefined();
+                        expect(result!.count).toBe(count);
+                        expect(typeof result!.count).toBe("number");
+                        expect(Number.isInteger(result!.count)).toBeTruthy();
+                        expect(result!.count).toBeGreaterThanOrEqual(0);
                     }
-                );
+                });
 
                 test.prop([
                     fc.constantFrom(0, 1, 100, 1000, 9999),
@@ -637,26 +630,26 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
                         "SELECT COUNT(id) as count FROM table2",
                         "SELECT COUNT(DISTINCT column) as count FROM table3"
                     ),
-                ])(
-                    "should handle specific edge case count values",
-                    (count, query) => {
-                        // Arrange
-                        const mockResult: CountResult = { count };
-                        mockGet.mockReturnValue(mockResult);
+                ])("should handle specific edge case count values", (
+                    count,
+                    query
+                ) => {
+                    // Arrange
+                    const mockResult: CountResult = { count };
+                    mockGet.mockReturnValue(mockResult);
 
-                        // Act
-                        const result = queryForCount(mockDb, query);
+                    // Act
+                    const result = queryForCount(mockDb, query);
 
-                        // Assert
-                        expect(result).toBeDefined();
-                        expect(result!.count).toBe(count);
-                        expect(mockGet).toHaveBeenCalledWith(query, undefined);
+                    // Assert
+                    expect(result).toBeDefined();
+                    expect(result!.count).toBe(count);
+                    expect(mockGet).toHaveBeenCalledWith(query, undefined);
 
-                        // Verify structure
-                        expect(Object.keys(result!)).toEqual(["count"]);
-                        expect(Object.hasOwn(result!, "count")).toBeTruthy();
-                    }
-                );
+                    // Verify structure
+                    expect(Object.keys(result!)).toEqual(["count"]);
+                    expect(Object.hasOwn(result!, "count")).toBeTruthy();
+                });
             });
         });
         describe(queryForIds, () => {
@@ -812,28 +805,28 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
                             maxLength: 20,
                         }
                     ),
-                ])(
-                    "should return arrays of ID objects for various queries",
-                    (query, expectedIds) => {
-                        // Arrange
-                        mockAll.mockReturnValue(expectedIds);
+                ])("should return arrays of ID objects for various queries", (
+                    query,
+                    expectedIds
+                ) => {
+                    // Arrange
+                    mockAll.mockReturnValue(expectedIds);
 
-                        // Act
-                        const result = queryForIds(mockDb, query);
+                    // Act
+                    const result = queryForIds(mockDb, query);
 
-                        // Assert
-                        expect(result).toEqual(expectedIds);
-                        expect(Array.isArray(result)).toBeTruthy();
-                        expect(result).toHaveLength(expectedIds.length);
+                    // Assert
+                    expect(result).toEqual(expectedIds);
+                    expect(Array.isArray(result)).toBeTruthy();
+                    expect(result).toHaveLength(expectedIds.length);
 
-                        for (const item of result!) {
-                            expect(item).toHaveProperty("id");
-                            expect(typeof item.id).toBe("number");
-                        }
-
-                        expect(mockAll).toHaveBeenCalledWith(query, undefined);
+                    for (const item of result!) {
+                        expect(item).toHaveProperty("id");
+                        expect(typeof item.id).toBe("number");
                     }
-                );
+
+                    expect(mockAll).toHaveBeenCalledWith(query, undefined);
+                });
 
                 test.prop([
                     fc.string({ minLength: 20, maxLength: 100 }),
@@ -851,27 +844,28 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
                         }),
                         { minLength: 0, maxLength: 15 }
                     ),
-                ])(
-                    "should handle ID queries with parameters",
-                    (query, params, expectedIds) => {
-                        // Arrange
-                        mockAll.mockReturnValue(expectedIds);
+                ])("should handle ID queries with parameters", (
+                    query,
+                    params,
+                    expectedIds
+                ) => {
+                    // Arrange
+                    mockAll.mockReturnValue(expectedIds);
 
-                        // Act
-                        const result = queryForIds(mockDb, query, params);
+                    // Act
+                    const result = queryForIds(mockDb, query, params);
 
-                        // Assert
-                        expect(result).toEqual(expectedIds);
-                        expect(mockAll).toHaveBeenCalledWith(query, params);
+                    // Assert
+                    expect(result).toEqual(expectedIds);
+                    expect(mockAll).toHaveBeenCalledWith(query, params);
 
-                        if (result) {
-                            for (const item of result) {
-                                expect(typeof item.id).toBe("number");
-                                expect(item.id).toBeGreaterThan(0);
-                            }
+                    if (result) {
+                        for (const item of result) {
+                            expect(typeof item.id).toBe("number");
+                            expect(item.id).toBeGreaterThan(0);
                         }
                     }
-                );
+                });
 
                 test.prop([fc.integer({ min: 0, max: 3 })])(
                     "should handle empty result arrays",
@@ -940,8 +934,7 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
                         validate: (
                             _row: UnknownRecord
                         ): _row is UnknownRecord => false,
-                    })
-                ).toThrowError(/TestRow/);
+                    })).toThrowError(/TestRow/);
             });
             it("should return empty array for no records", async ({
                 task,
@@ -976,8 +969,10 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
                 );
 
                 // Arrange
-                interface MonitorRecord
-                    extends Record<string | symbol, unknown> {
+                interface MonitorRecord extends Record<
+                    string | symbol,
+                    unknown
+                > {
                     id: number;
                     url: string;
                     status: string;
@@ -1040,8 +1035,10 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
                 );
 
                 // Arrange
-                interface JoinedRecord
-                    extends Record<string | symbol, unknown> {
+                interface JoinedRecord extends Record<
+                    string | symbol,
+                    unknown
+                > {
                     site_id: number;
                     site_name: string;
                     monitor_id: number;
@@ -1273,8 +1270,7 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
                                 _row: UnknownRecord
                             ): _row is UnknownRecord => false,
                         }
-                    )
-                ).toThrowError(/SingleRow/);
+                    )).toThrowError(/SingleRow/);
             });
             it("should handle query without parameters", async ({
                 task,
@@ -1439,22 +1435,22 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
                             fc.constant(null)
                         ),
                     }),
-                ])(
-                    "should return single records for various queries",
-                    (query, expectedRecord) => {
-                        // Arrange
-                        mockGet.mockReturnValue(expectedRecord);
+                ])("should return single records for various queries", (
+                    query,
+                    expectedRecord
+                ) => {
+                    // Arrange
+                    mockGet.mockReturnValue(expectedRecord);
 
-                        // Act
-                        const result = queryForSingleRecord(mockDb, query);
+                    // Act
+                    const result = queryForSingleRecord(mockDb, query);
 
-                        // Assert
-                        expect(result).toEqual(expectedRecord);
-                        expect(typeof result).toBe("object");
-                        expect(result).not.toBeNull();
-                        expect(mockGet).toHaveBeenCalledWith(query, undefined);
-                    }
-                );
+                    // Assert
+                    expect(result).toEqual(expectedRecord);
+                    expect(typeof result).toBe("object");
+                    expect(result).not.toBeNull();
+                    expect(mockGet).toHaveBeenCalledWith(query, undefined);
+                });
 
                 test.prop([
                     fc.string({ minLength: 30, maxLength: 150 }),
@@ -1474,31 +1470,28 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
                         }),
                         fc.constant(null)
                     ),
-                ])(
-                    "should handle single record queries with parameters",
-                    (query, params, expectedResult) => {
-                        // Arrange
-                        mockGet.mockReturnValue(expectedResult);
+                ])("should handle single record queries with parameters", (
+                    query,
+                    params,
+                    expectedResult
+                ) => {
+                    // Arrange
+                    mockGet.mockReturnValue(expectedResult);
 
-                        // Act
-                        const result = queryForSingleRecord(
-                            mockDb,
-                            query,
-                            params
-                        );
+                    // Act
+                    const result = queryForSingleRecord(mockDb, query, params);
 
-                        // Assert
-                        expect(result).toEqual(expectedResult);
-                        expect(mockGet).toHaveBeenCalledWith(query, params);
+                    // Assert
+                    expect(result).toEqual(expectedResult);
+                    expect(mockGet).toHaveBeenCalledWith(query, params);
 
-                        if (expectedResult) {
-                            expect(typeof result).toBe("object");
-                            expect(result).not.toBeNull();
-                        } else {
-                            expect(result).toBeNull();
-                        }
+                    if (expectedResult) {
+                        expect(typeof result).toBe("object");
+                        expect(result).not.toBeNull();
+                    } else {
+                        expect(result).toBeNull();
                     }
-                );
+                });
 
                 test.prop([
                     fc.constantFrom(
@@ -1506,26 +1499,25 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
                         "SELECT * FROM sites WHERE deleted = 1",
                         "SELECT * FROM monitors WHERE non_existent_field IS NOT NULL"
                     ),
-                ])(
-                    "should handle null results from database",
-                    (queryReturningNull) => {
-                        // Arrange
-                        mockGet.mockReturnValue(null);
+                ])("should handle null results from database", (
+                    queryReturningNull
+                ) => {
+                    // Arrange
+                    mockGet.mockReturnValue(null);
 
-                        // Act
-                        const result = queryForSingleRecord(
-                            mockDb,
-                            queryReturningNull
-                        );
+                    // Act
+                    const result = queryForSingleRecord(
+                        mockDb,
+                        queryReturningNull
+                    );
 
-                        // Assert
-                        expect(result).toBeNull();
-                        expect(mockGet).toHaveBeenCalledWith(
-                            queryReturningNull,
-                            undefined
-                        );
-                    }
-                );
+                    // Assert
+                    expect(result).toBeNull();
+                    expect(mockGet).toHaveBeenCalledWith(
+                        queryReturningNull,
+                        undefined
+                    );
+                });
 
                 test.prop([
                     fc.array(
@@ -1548,34 +1540,33 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
                         }),
                         { minLength: 1, maxLength: 5 }
                     ),
-                ])(
-                    "should handle multiple sequential single record queries",
-                    (queryOperations) => {
-                        // Reset mock for this property-based test iteration
-                        mockGet.mockClear();
+                ])("should handle multiple sequential single record queries", (
+                    queryOperations
+                ) => {
+                    // Reset mock for this property-based test iteration
+                    mockGet.mockClear();
 
-                        // Act & Assert
-                        let callCount = 0;
-                        for (const operation of queryOperations) {
-                            mockGet.mockReturnValue(operation.expectedResult);
+                    // Act & Assert
+                    let callCount = 0;
+                    for (const operation of queryOperations) {
+                        mockGet.mockReturnValue(operation.expectedResult);
 
-                            const result = queryForSingleRecord(
-                                mockDb,
-                                operation.query,
-                                operation.params
-                            );
+                        const result = queryForSingleRecord(
+                            mockDb,
+                            operation.query,
+                            operation.params
+                        );
 
-                            expect(result).toEqual(operation.expectedResult);
-                            callCount++;
-                            expect(mockGet).toHaveBeenCalledTimes(callCount);
-                            expect(mockGet).toHaveBeenNthCalledWith(
-                                callCount,
-                                operation.query,
-                                operation.params
-                            );
-                        }
+                        expect(result).toEqual(operation.expectedResult);
+                        callCount++;
+                        expect(mockGet).toHaveBeenCalledTimes(callCount);
+                        expect(mockGet).toHaveBeenNthCalledWith(
+                            callCount,
+                            operation.query,
+                            operation.params
+                        );
                     }
-                );
+                });
             });
         });
 
@@ -1601,8 +1592,10 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
                 ]);
 
                 expect(() =>
-                    queryMonitorRows(mockDb, "SELECT * FROM monitors")
-                ).toThrowError(/MonitorRow/);
+                    queryMonitorRows(
+                        mockDb,
+                        "SELECT * FROM monitors"
+                    )).toThrowError(/MonitorRow/);
             });
 
             it("should validate single history rows", () => {

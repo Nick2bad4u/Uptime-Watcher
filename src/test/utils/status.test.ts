@@ -779,15 +779,14 @@ describe("Status Utilities", () => {
                 fc
                     .string()
                     .filter((s) => !knownStatuses.includes(s.toLowerCase())),
-            ])(
-                "should return default icon for unknown statuses",
-                (unknownStatus) => {
-                    const result = getStatusIcon(unknownStatus);
+            ])("should return default icon for unknown statuses", (
+                unknownStatus
+            ) => {
+                const result = getStatusIcon(unknownStatus);
 
-                    // Property: Unknown statuses should return default icon
-                    expect(result).toBe("⚪");
-                }
-            );
+                // Property: Unknown statuses should return default icon
+                expect(result).toBe("⚪");
+            });
 
             test.prop([
                 fc.oneof(
@@ -795,17 +794,16 @@ describe("Status Utilities", () => {
                     fc.constant("   "),
                     fc.constant("\t\n")
                 ),
-            ])(
-                "should handle empty/whitespace strings gracefully",
-                (emptyStatus) => {
-                    const result = getStatusIcon(emptyStatus);
+            ])("should handle empty/whitespace strings gracefully", (
+                emptyStatus
+            ) => {
+                const result = getStatusIcon(emptyStatus);
 
-                    // Property: Empty/whitespace should return default icon
-                    expect(result).toBe("⚪");
-                    expect(typeof result).toBe("string");
-                    expect(result.length).toBeGreaterThan(0);
-                }
-            );
+                // Property: Empty/whitespace should return default icon
+                expect(result).toBe("⚪");
+                expect(typeof result).toBe("string");
+                expect(result.length).toBeGreaterThan(0);
+            });
 
             test.prop([fc.string()])(
                 "should always return a non-empty string",
@@ -853,26 +851,25 @@ describe("Status Utilities", () => {
 
             test.prop([
                 fc.string({ minLength: 1 }).filter((s) => s.trim().length > 0),
-            ])(
-                "should always format with icon and capitalized text",
-                (status) => {
-                    const result = formatStatusWithIcon(status);
+            ])("should always format with icon and capitalized text", (
+                status
+            ) => {
+                const result = formatStatusWithIcon(status);
 
-                    // Property: Should always contain an icon and text separated by space
-                    expect(result).toMatch(/^.+ .+$/);
+                // Property: Should always contain an icon and text separated by space
+                expect(result).toMatch(/^.+ .+$/);
 
-                    // Property: Should contain expected icon
-                    const expectedIcon = getStatusIcon(status);
-                    expect(result.startsWith(expectedIcon)).toBeTruthy();
+                // Property: Should contain expected icon
+                const expectedIcon = getStatusIcon(status);
+                expect(result.startsWith(expectedIcon)).toBeTruthy();
 
-                    // Property: Text portion should be properly formatted
-                    // The text part is: first char uppercase + rest lowercase
-                    const expectedText =
-                        status.charAt(0).toUpperCase() +
-                        status.slice(1).toLowerCase();
-                    expect(result).toContain(expectedText);
-                }
-            );
+                // Property: Text portion should be properly formatted
+                // The text part is: first char uppercase + rest lowercase
+                const expectedText =
+                    status.charAt(0).toUpperCase() +
+                    status.slice(1).toLowerCase();
+                expect(result).toContain(expectedText);
+            });
 
             test.prop([fc.constantFrom(...knownStatuses)])(
                 "should be consistent with getStatusIcon",
@@ -923,8 +920,7 @@ describe("Status Utilities", () => {
                         .map((word, index) =>
                             index === 0
                                 ? word
-                                : word.charAt(0).toUpperCase() + word.slice(1)
-                        )
+                                : word.charAt(0).toUpperCase() + word.slice(1))
                         .join("");
 
                     // Must produce valid camelCase: non-empty and starts with lowercase
@@ -993,16 +989,14 @@ describe("Status Utilities", () => {
                 fc
                     .string({ minLength: 1, maxLength: 20 })
                     .filter((s) => /^[a-zA-Z]+$/u.test(s)),
-            ])(
-                "should handle alphabetic strings without separators",
-                (text) => {
-                    const result: StatusIdentifier =
-                        createStatusIdentifier(text);
+            ])("should handle alphabetic strings without separators", (
+                text
+            ) => {
+                const result: StatusIdentifier = createStatusIdentifier(text);
 
-                    // Property: Should convert to lowercase for single word
-                    expect(result).toBe(text.toLowerCase());
-                }
-            );
+                // Property: Should convert to lowercase for single word
+                expect(result).toBe(text.toLowerCase());
+            });
 
             test.prop([
                 fc.array(
@@ -1063,8 +1057,7 @@ describe("Status Utilities", () => {
                     // Property: None of these should throw
                     expect(() => getStatusIcon(status)).not.toThrowError();
                     expect(() =>
-                        formatStatusWithIcon(status)
-                    ).not.toThrowError();
+                        formatStatusWithIcon(status)).not.toThrowError();
 
                     // Property: All should return non-empty strings
                     const icon = getStatusIcon(status);
@@ -1087,8 +1080,7 @@ describe("Status Utilities", () => {
                         .map((word, index) =>
                             index === 0
                                 ? word
-                                : word.charAt(0).toUpperCase() + word.slice(1)
-                        )
+                                : word.charAt(0).toUpperCase() + word.slice(1))
                         .join("");
 
                     // Must produce valid camelCase: non-empty and starts with lowercase
@@ -1102,8 +1094,7 @@ describe("Status Utilities", () => {
                 (text) => {
                     // Property: Should not throw with valid text input
                     expect(() =>
-                        createStatusIdentifier(text)
-                    ).not.toThrowError();
+                        createStatusIdentifier(text)).not.toThrowError();
 
                     const result = createStatusIdentifier(text);
 

@@ -147,13 +147,14 @@ describe("SslMonitor service", () => {
             timeout: 5000,
             checkInterval: 30_000,
         });
-        vi.mocked(createMonitorErrorResult).mockImplementation(
-            (message: string, responseTime = 0) => ({
-                error: message,
-                responseTime,
-                status: "down",
-            })
-        );
+        vi.mocked(createMonitorErrorResult).mockImplementation((
+            message: string,
+            responseTime = 0
+        ) => ({
+            error: message,
+            responseTime,
+            status: "down",
+        }));
 
         sslMonitor = new SslMonitor();
     });

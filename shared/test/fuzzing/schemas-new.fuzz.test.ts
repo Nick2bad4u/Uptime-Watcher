@@ -38,8 +38,11 @@ describe("Schemas Fuzzing - Lines 404,488", () => {
                     ].includes(fieldName)
                 ) {
                     expect(() =>
-                        validateMonitorField("http", fieldName, value)
-                    ).toThrowError(/Unknown field/);
+                        validateMonitorField(
+                            "http",
+                            fieldName,
+                            value
+                        )).toThrowError(/Unknown field/);
                 }
             }
         );
@@ -47,8 +50,11 @@ describe("Schemas Fuzzing - Lines 404,488", () => {
         it("should trigger unknown field error for completely invalid fields", () => {
             // Directly target line 404
             expect(() =>
-                validateMonitorField("http", "totallyInvalidFieldName", "value")
-            ).toThrowError("Unknown field: totallyInvalidFieldName");
+                validateMonitorField(
+                    "http",
+                    "totallyInvalidFieldName",
+                    "value"
+                )).toThrowError("Unknown field: totallyInvalidFieldName");
         });
     });
 
@@ -84,20 +90,19 @@ describe("Schemas Fuzzing - Lines 404,488", () => {
     });
 
     describe("Edge cases for comprehensive coverage", () => {
-        test.prop([fc.anything()])(
-            "should handle any input without crashing",
-            (input) => {
-                // Test robustness
-                expect(() => {
-                    const result = validateSiteData(input);
-                    expect(result).toBeDefined();
-                }).not.toThrowError();
+        test.prop([fc.anything()])("should handle any input without crashing", (
+            input
+        ) => {
+            // Test robustness
+            expect(() => {
+                const result = validateSiteData(input);
+                expect(result).toBeDefined();
+            }).not.toThrowError();
 
-                expect(() => {
-                    const result = validateMonitorData("http", input);
-                    expect(result).toBeDefined();
-                }).not.toThrowError();
-            }
-        );
+            expect(() => {
+                const result = validateMonitorData("http", input);
+                expect(result).toBeDefined();
+            }).not.toThrowError();
+        });
     });
 });

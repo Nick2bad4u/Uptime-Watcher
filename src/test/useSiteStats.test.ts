@@ -550,14 +550,14 @@ describe(useSiteStats, () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
-            const history: StatusHistory[] = Array.from(
-                { length: 1000 },
-                (_, i) => ({
-                    responseTime: i % 2 === 0 ? 200 : 0,
-                    status: i % 2 === 0 ? "up" : "down",
-                    timestamp: 1_640_995_200_000 + i * 60_000,
-                })
-            ) as StatusHistory[];
+            const history: StatusHistory[] = Array.from({ length: 1000 }, (
+                _,
+                i
+            ) => ({
+                responseTime: i % 2 === 0 ? 200 : 0,
+                status: i % 2 === 0 ? "up" : "down",
+                timestamp: 1_640_995_200_000 + i * 60_000,
+            })) as StatusHistory[];
 
             const { result } = renderHook(() => useSiteStats(history));
 

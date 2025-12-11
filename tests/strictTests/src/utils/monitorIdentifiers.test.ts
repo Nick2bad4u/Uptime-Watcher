@@ -53,9 +53,8 @@ describe("monitor identifier fallbacks (strict coverage)", () => {
     });
 
     it("prefers dedicated generators for known monitor types", async () => {
-        const { getMonitorDisplayIdentifier } = await import(
-            "@app/utils/fallbacks"
-        );
+        const { getMonitorDisplayIdentifier } =
+            await import("@app/utils/fallbacks");
 
         const monitor = createMonitor({
             type: "cdn-edge-consistency",
@@ -69,35 +68,32 @@ describe("monitor identifier fallbacks (strict coverage)", () => {
     });
 
     it("falls back to generic URL and host heuristics when generators return undefined", async () => {
-        const { getMonitorDisplayIdentifier } = await import(
-            "@app/utils/fallbacks"
-        );
+        const { getMonitorDisplayIdentifier } =
+            await import("@app/utils/fallbacks");
 
         await assertProperty(
-            fc.property(
-                portMonitorHostArbitrary,
-                fallbackLabelArbitrary,
-                (host, siteFallback) => {
-                    const monitor = createMonitor({
-                        type: "port",
-                        host,
-                    });
+            fc.property(portMonitorHostArbitrary, fallbackLabelArbitrary, (
+                host,
+                siteFallback
+            ) => {
+                const monitor = createMonitor({
+                    type: "port",
+                    host,
+                });
 
-                    const result = getMonitorDisplayIdentifier(
-                        monitor,
-                        siteFallback
-                    );
+                const result = getMonitorDisplayIdentifier(
+                    monitor,
+                    siteFallback
+                );
 
-                    expect(result).toBe(host);
-                }
-            )
+                expect(result).toBe(host);
+            })
         );
     });
 
     it("returns the provided site fallback when no identifier can be derived", async () => {
-        const { getMonitorDisplayIdentifier } = await import(
-            "@app/utils/fallbacks"
-        );
+        const { getMonitorDisplayIdentifier } =
+            await import("@app/utils/fallbacks");
 
         await assertProperty(
             fc.property(fallbackLabelArbitrary, (siteFallback) => {
@@ -116,9 +112,8 @@ describe("monitor identifier fallbacks (strict coverage)", () => {
     });
 
     it("logs and returns the fallback when a generator throws", async () => {
-        const { getMonitorDisplayIdentifier } = await import(
-            "@app/utils/fallbacks"
-        );
+        const { getMonitorDisplayIdentifier } =
+            await import("@app/utils/fallbacks");
 
         const monitor = createMonitor({
             type: "dns",

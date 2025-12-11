@@ -121,12 +121,14 @@ describe("DatabaseSchema Simple Fuzzing Tests", () => {
                         for (let i = 0; i < executionCount; i++) {
                             if (shouldSucceed) {
                                 expect(() =>
-                                    createDatabaseTables(testDb)
-                                ).not.toThrowError();
+                                    createDatabaseTables(
+                                        testDb
+                                    )).not.toThrowError();
                             } else {
                                 expect(() =>
-                                    createDatabaseTables(testDb)
-                                ).toThrowError();
+                                    createDatabaseTables(
+                                        testDb
+                                    )).toThrowError();
                             }
                         }
                     }
@@ -158,12 +160,14 @@ describe("DatabaseSchema Simple Fuzzing Tests", () => {
                         for (let i = 0; i < numberOfCalls; i++) {
                             if (shouldFail) {
                                 expect(() =>
-                                    createDatabaseIndexes(testDb)
-                                ).toThrowError();
+                                    createDatabaseIndexes(
+                                        testDb
+                                    )).toThrowError();
                             } else {
                                 expect(() =>
-                                    createDatabaseIndexes(testDb)
-                                ).not.toThrowError();
+                                    createDatabaseIndexes(
+                                        testDb
+                                    )).not.toThrowError();
                             }
                         }
                     }
@@ -183,8 +187,7 @@ describe("DatabaseSchema Simple Fuzzing Tests", () => {
                     ({ callCount, shouldLog: _shouldLog }) => {
                         for (let i = 0; i < callCount; i++) {
                             expect(() =>
-                                setupMonitorTypeValidation()
-                            ).not.toThrowError();
+                                setupMonitorTypeValidation()).not.toThrowError();
                         }
                     }
                 )
@@ -217,12 +220,12 @@ describe("DatabaseSchema Simple Fuzzing Tests", () => {
 
                         if (dbOperationsSucceed) {
                             expect(() =>
-                                createDatabaseSchema(testDb)
-                            ).not.toThrowError();
+                                createDatabaseSchema(
+                                    testDb
+                                )).not.toThrowError();
                         } else {
                             expect(() =>
-                                createDatabaseSchema(testDb)
-                            ).toThrowError();
+                                createDatabaseSchema(testDb)).toThrowError();
                         }
                     }
                 )
@@ -255,17 +258,13 @@ describe("DatabaseSchema Simple Fuzzing Tests", () => {
                         // These functions should not accept user input directly
                         // They use fixed SQL statements
                         expect(() =>
-                            createDatabaseTables(testDb)
-                        ).not.toThrowError();
+                            createDatabaseTables(testDb)).not.toThrowError();
                         expect(() =>
-                            createDatabaseIndexes(testDb)
-                        ).not.toThrowError();
+                            createDatabaseIndexes(testDb)).not.toThrowError();
                         expect(() =>
-                            setupMonitorTypeValidation()
-                        ).not.toThrowError();
+                            setupMonitorTypeValidation()).not.toThrowError();
                         expect(() =>
-                            createDatabaseSchema(testDb)
-                        ).not.toThrowError();
+                            createDatabaseSchema(testDb)).not.toThrowError();
 
                         // Verify that SQL statements are fixed and not influenced by external data
                         const calls = runSpy.mock.calls.flat();

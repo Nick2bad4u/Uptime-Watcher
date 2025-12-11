@@ -657,8 +657,7 @@ describe("MigrationSystem - Comprehensive Coverage", () => {
                 await annotate("Type: Business Logic", "type");
 
                 const transformFn = vi.fn((data) =>
-                    Promise.resolve({ ...data, timeout: 30_000 })
-                );
+                    Promise.resolve({ ...data, timeout: 30_000 }));
                 const rule = createTestMigrationRule(
                     "1.0.0",
                     "1.1.0",
@@ -1120,8 +1119,11 @@ describe("MigrationSystem - Comprehensive Coverage", () => {
                 });
 
                 expect(() =>
-                    exampleMigrations.portV1_0_to_1_1.transform(data)
-                ).toThrowError("Invalid port value: invalid. Must be 1-65535.");
+                    exampleMigrations.portV1_0_to_1_1.transform(
+                        data
+                    )).toThrowError(
+                    "Invalid port value: invalid. Must be 1-65535."
+                );
             });
 
             it("should throw for out-of-range numeric port", async ({
@@ -1139,8 +1141,11 @@ describe("MigrationSystem - Comprehensive Coverage", () => {
                 });
 
                 expect(() =>
-                    exampleMigrations.portV1_0_to_1_1.transform(data)
-                ).toThrowError("Invalid port number: 70000. Must be 1-65535.");
+                    exampleMigrations.portV1_0_to_1_1.transform(
+                        data
+                    )).toThrowError(
+                    "Invalid port number: 70000. Must be 1-65535."
+                );
             });
 
             it("should throw for negative port", async ({ task, annotate }) => {
@@ -1155,8 +1160,11 @@ describe("MigrationSystem - Comprehensive Coverage", () => {
                 });
 
                 expect(() =>
-                    exampleMigrations.portV1_0_to_1_1.transform(data)
-                ).toThrowError("Invalid port number: -1. Must be 1-65535.");
+                    exampleMigrations.portV1_0_to_1_1.transform(
+                        data
+                    )).toThrowError(
+                    "Invalid port number: -1. Must be 1-65535."
+                );
             });
 
             it("should throw for non-numeric port type", async ({
@@ -1174,8 +1182,9 @@ describe("MigrationSystem - Comprehensive Coverage", () => {
                 });
 
                 expect(() =>
-                    exampleMigrations.portV1_0_to_1_1.transform(data)
-                ).toThrowError(
+                    exampleMigrations.portV1_0_to_1_1.transform(
+                        data
+                    )).toThrowError(
                     "Port must be a number or numeric string, got: boolean"
                 );
             });

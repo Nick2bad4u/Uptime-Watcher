@@ -94,7 +94,12 @@ const formatBackupSize = (bytes: number): string => {
         return `${bytes}`;
     }
 
-    const units = ["B", "KB", "MB", "GB"] as const;
+    const units = [
+        "B",
+        "KB",
+        "MB",
+        "GB",
+    ] as const;
     let value = bytes;
     let unitIndex = 0;
 
@@ -363,7 +368,11 @@ export const Settings = ({
         await resetSettings();
         clearError();
         logger.user.action("Reset settings to defaults");
-    }, [clearError, requestConfirmation, resetSettings]);
+    }, [
+        clearError,
+        requestConfirmation,
+        resetSettings,
+    ]);
 
     const handleThemeChange = useCallback(
         (themeName: ThemeName) => {
@@ -572,7 +581,11 @@ export const Settings = ({
                 onChange={handleInAppAlertsChange}
             />
         ),
-        [handleInAppAlertsChange, inAppAlertsEnabled, isLoading]
+        [
+            handleInAppAlertsChange,
+            inAppAlertsEnabled,
+            isLoading,
+        ]
     );
 
     const inAppAlertSoundControl = useMemo(
@@ -653,7 +666,11 @@ export const Settings = ({
                 onChange={handleSystemNotificationsChange}
             />
         ),
-        [handleSystemNotificationsChange, isLoading, systemNotificationsEnabled]
+        [
+            handleSystemNotificationsChange,
+            isLoading,
+            systemNotificationsEnabled,
+        ]
     );
 
     const systemNotificationSoundControl = useMemo(
@@ -702,7 +719,11 @@ export const Settings = ({
                 onChange={handleAutoStartChange}
             />
         ),
-        [autoStart, handleAutoStartChange, isLoading]
+        [
+            autoStart,
+            handleAutoStartChange,
+            isLoading,
+        ]
     );
 
     const minimizeToTrayControl = useMemo(
@@ -714,7 +735,11 @@ export const Settings = ({
                 onChange={handleMinimizeToTrayChange}
             />
         ),
-        [handleMinimizeToTrayChange, isLoading, minimizeToTray]
+        [
+            handleMinimizeToTrayChange,
+            isLoading,
+            minimizeToTray,
+        ]
     );
 
     // Manual Sync Now handler (moved from Header)
@@ -762,7 +787,11 @@ export const Settings = ({
                 }`
             );
         }
-    }, [clearError, downloadSqliteBackup, setError]);
+    }, [
+        clearError,
+        downloadSqliteBackup,
+        setError,
+    ]);
 
     const handleRestoreSQLite = useCallback(
         async (file: File) => {
@@ -793,7 +822,11 @@ export const Settings = ({
                 );
             }
         },
-        [clearError, restoreSqliteBackup, setError]
+        [
+            clearError,
+            restoreSqliteBackup,
+            setError,
+        ]
     );
 
     const handleRestoreFileChange = useCallback(

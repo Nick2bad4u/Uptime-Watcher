@@ -88,8 +88,7 @@ vi.mock("../../../services/logger", () => ({
 
 vi.mock("../../../../shared/utils/errorHandling", () => ({
     ensureError: vi.fn((error) =>
-        error instanceof Error ? error : new Error(String(error))
-    ),
+        error instanceof Error ? error : new Error(String(error))),
     withErrorHandling: vi.fn(async (operation, context) => {
         try {
             return await operation();
@@ -262,25 +261,24 @@ describe("useSitesStore Function Coverage Tests", () => {
             await mockWaitForElectronBridge();
             return mockElectronAPI.sites.removeSite(id);
         });
-        mockSiteService.removeMonitor.mockImplementation(
-            async (siteIdentifier, monitorId) => {
-                await mockWaitForElectronBridge();
-                return mockElectronAPI.sites.removeMonitor(
-                    siteIdentifier,
-                    monitorId
-                );
-            }
-        );
+        mockSiteService.removeMonitor.mockImplementation(async (
+            siteIdentifier,
+            monitorId
+        ) => {
+            await mockWaitForElectronBridge();
+            return mockElectronAPI.sites.removeMonitor(
+                siteIdentifier,
+                monitorId
+            );
+        });
 
-        mockMonitoringService.checkSiteNow.mockImplementation(
-            async (siteId, monitorId) => {
-                await mockWaitForElectronBridge();
-                return mockElectronAPI.monitoring.checkSiteNow(
-                    siteId,
-                    monitorId
-                );
-            }
-        );
+        mockMonitoringService.checkSiteNow.mockImplementation(async (
+            siteId,
+            monitorId
+        ) => {
+            await mockWaitForElectronBridge();
+            return mockElectronAPI.monitoring.checkSiteNow(siteId, monitorId);
+        });
         mockMonitoringService.startMonitoring.mockImplementation(async () => {
             await mockWaitForElectronBridge();
             return mockElectronAPI.monitoring.startMonitoring();
@@ -289,20 +287,18 @@ describe("useSitesStore Function Coverage Tests", () => {
             await mockWaitForElectronBridge();
             return mockElectronAPI.monitoring.stopMonitoring();
         });
-        mockMonitoringService.startMonitoringForSite.mockImplementation(
-            async (siteId) => {
-                await mockWaitForElectronBridge();
-                return mockElectronAPI.monitoring.startMonitoringForSite(
-                    siteId
-                );
-            }
-        );
-        mockMonitoringService.stopMonitoringForSite.mockImplementation(
-            async (siteId) => {
-                await mockWaitForElectronBridge();
-                return mockElectronAPI.monitoring.stopMonitoringForSite(siteId);
-            }
-        );
+        mockMonitoringService.startMonitoringForSite.mockImplementation(async (
+            siteId
+        ) => {
+            await mockWaitForElectronBridge();
+            return mockElectronAPI.monitoring.startMonitoringForSite(siteId);
+        });
+        mockMonitoringService.stopMonitoringForSite.mockImplementation(async (
+            siteId
+        ) => {
+            await mockWaitForElectronBridge();
+            return mockElectronAPI.monitoring.stopMonitoringForSite(siteId);
+        });
         mockMonitoringService.startMonitoringForMonitor.mockImplementation(
             async (siteId, monitorId) => {
                 await mockWaitForElectronBridge();

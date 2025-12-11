@@ -577,8 +577,7 @@ export class ImportDataCommand extends DatabaseCommand<boolean> {
                         site: structuredClone(site),
                         source: SITE_ADDED_SOURCE.IMPORT,
                         timestamp: Date.now(),
-                    })
-                )
+                    }))
             );
         }
 
@@ -686,8 +685,7 @@ export class ImportDataCommand extends DatabaseCommand<boolean> {
 
         const validationResults = await Promise.all(
             canonicalSites.map((site) =>
-                configurationManager.validateSiteConfiguration(site)
-            )
+                configurationManager.validateSiteConfiguration(site))
         );
 
         const invalidSites: Array<{

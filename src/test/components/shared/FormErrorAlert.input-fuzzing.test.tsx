@@ -89,24 +89,29 @@ vi.mock("../../../theme/components/ThemedText", () => ({
 }));
 
 vi.mock("../../../theme/components/ThemedButton", () => ({
-    ThemedButton: vi.fn(
-        ({ children, onClick, className, size, variant, ...props }) => {
-            const safeProps = sanitizeDomProps(props);
-            return (
-                <button
-                    type="button"
-                    className={className}
-                    onClick={onClick}
-                    data-testid="themed-button"
-                    data-size={size}
-                    data-variant={variant}
-                    {...safeProps}
-                >
-                    {children}
-                </button>
-            );
-        }
-    ),
+    ThemedButton: vi.fn(({
+        children,
+        onClick,
+        className,
+        size,
+        variant,
+        ...props
+    }) => {
+        const safeProps = sanitizeDomProps(props);
+        return (
+            <button
+                type="button"
+                className={className}
+                onClick={onClick}
+                data-testid="themed-button"
+                data-size={size}
+                data-variant={variant}
+                {...safeProps}
+            >
+                {children}
+            </button>
+        );
+    }),
 }));
 
 /**
@@ -192,76 +197,73 @@ describe("FormErrorAlert Component - Property-Based Fuzzing", () => {
         fcTest.prop([errorMessageArbitrary], {
             numRuns: 100,
             timeout: 10_000,
-        })(
-            "should display arbitrary error messages correctly",
-            async (errorMessage) => {
-                // FastCheck iterations need manual cleanup between property test runs
-                cleanupIteration();
+        })("should display arbitrary error messages correctly", async (
+            errorMessage
+        ) => {
+            // FastCheck iterations need manual cleanup between property test runs
+            cleanupIteration();
 
-                render(
-                    <FormErrorAlert
-                        error={errorMessage}
-                        onClearError={mockOnClearError}
-                    />
-                );
+            render(
+                <FormErrorAlert
+                    error={errorMessage}
+                    onClearError={mockOnClearError}
+                />
+            );
 
-                if (errorMessage) {
-                    // Error alert should be visible
-                    const alertBox = screen.getByTestId("themed-box");
-                    expect(alertBox).toBeInTheDocument();
+            if (errorMessage) {
+                // Error alert should be visible
+                const alertBox = screen.getByTestId("themed-box");
+                expect(alertBox).toBeInTheDocument();
 
-                    const errorText = screen.getByTestId("themed-text");
-                    // HTML normalizes whitespace (tabs/newlines become spaces)
+                const errorText = screen.getByTestId("themed-text");
+                // HTML normalizes whitespace (tabs/newlines become spaces)
 
-                    const normalizedExpected = errorMessage
-                        .replaceAll(/\s+/g, " ")
-                        .trim();
+                const normalizedExpected = errorMessage
+                    .replaceAll(/\s+/g, " ")
+                    .trim();
 
-                    const actualText =
-                        errorText.textContent?.replaceAll(/\s+/g, " ").trim() ||
-                        "";
+                const actualText =
+                    errorText.textContent?.replaceAll(/\s+/g, " ").trim() || "";
 
-                    if (normalizedExpected) {
-                        expect(actualText).toBe(normalizedExpected);
-                    } else {
-                        // For whitespace-only content, DOM may render as empty
-                        expect(actualText).toBe("");
-                    }
-                    expect(errorText).toHaveAttribute("data-variant", "error");
-
-                    // Close button should be present
-                    const closeButton = screen.getByTestId("themed-button");
-                    expect(closeButton).toBeInTheDocument();
-                    const closeIcon = closeButton.querySelector("svg");
-                    expect(closeIcon).not.toBeNull();
+                if (normalizedExpected) {
+                    expect(actualText).toBe(normalizedExpected);
                 } else {
-                    // No error should mean no rendered content
-                    const alertBoxes = screen.queryAllByTestId("themed-box");
-                    expect(alertBoxes).toHaveLength(0);
+                    // For whitespace-only content, DOM may render as empty
+                    expect(actualText).toBe("");
                 }
+                expect(errorText).toHaveAttribute("data-variant", "error");
+
+                // Close button should be present
+                const closeButton = screen.getByTestId("themed-button");
+                expect(closeButton).toBeInTheDocument();
+                const closeIcon = closeButton.querySelector("svg");
+                expect(closeIcon).not.toBeNull();
+            } else {
+                // No error should mean no rendered content
+                const alertBoxes = screen.queryAllByTestId("themed-box");
+                expect(alertBoxes).toHaveLength(0);
             }
-        );
+        });
 
         fcTest.prop([nullErrorArbitrary], {
             numRuns: 20,
             timeout: 3000,
-        })(
-            "should not render when error is null or undefined",
-            async (nullError) => {
-                cleanupIteration();
+        })("should not render when error is null or undefined", async (
+            nullError
+        ) => {
+            cleanupIteration();
 
-                render(
-                    <FormErrorAlert
-                        error={nullError ?? null}
-                        onClearError={mockOnClearError}
-                    />
-                );
+            render(
+                <FormErrorAlert
+                    error={nullError ?? null}
+                    onClearError={mockOnClearError}
+                />
+            );
 
-                // Component should not render anything
-                const alertBoxes = screen.queryAllByTestId("themed-box");
-                expect(alertBoxes).toHaveLength(0);
-            }
-        );
+            // Component should not render anything
+            const alertBoxes = screen.queryAllByTestId("themed-box");
+            expect(alertBoxes).toHaveLength(0);
+        });
 
         fcTest.prop(
             [fc.array(errorMessageArbitrary, { minLength: 1, maxLength: 20 })],
@@ -269,55 +271,98 @@ describe("FormErrorAlert Component - Property-Based Fuzzing", () => {
                 numRuns: 30,
                 timeout: 15_000,
             }
-        )(
-            "should handle multiple error messages in sequence",
-            async (errorMessages) => {
-                cleanupIteration();
+        )("should handle multiple error messages in sequence", async (
+            errorMessages
+        ) => {
+            cleanupIteration();
 
-                const { rerender } = render(
+            const { rerender } = render(
+                <FormErrorAlert
+                    error={errorMessages[0] ?? null}
+                    onClearError={mockOnClearError}
+                />
+            );
+
+            for (let i = 1; i < errorMessages.length; i++) {
+                rerender(
                     <FormErrorAlert
-                        error={errorMessages[0] ?? null}
+                        error={errorMessages[i] ?? null}
                         onClearError={mockOnClearError}
                     />
                 );
 
-                for (let i = 1; i < errorMessages.length; i++) {
-                    rerender(
-                        <FormErrorAlert
-                            error={errorMessages[i] ?? null}
-                            onClearError={mockOnClearError}
-                        />
-                    );
+                if (errorMessages[i]) {
+                    const errorText = screen.getByTestId("themed-text");
+                    // HTML normalizes whitespace (tabs/newlines become spaces)
+                    const normalizedExpected = errorMessages[i]!.replace(
+                        /\s+/g,
+                        " "
+                    ).trim();
 
-                    if (errorMessages[i]) {
-                        const errorText = screen.getByTestId("themed-text");
-                        // HTML normalizes whitespace (tabs/newlines become spaces)
-                        const normalizedExpected = errorMessages[i]!.replace(
-                            /\s+/g,
-                            " "
-                        ).trim();
-
-                        const actualText =
-                            errorText.textContent
-                                ?.replaceAll(/\s+/g, " ")
-                                .trim() || "";
-                        expect(actualText).toBe(normalizedExpected);
-                    }
+                    const actualText =
+                        errorText.textContent?.replaceAll(/\s+/g, " ").trim() ||
+                        "";
+                    expect(actualText).toBe(normalizedExpected);
                 }
             }
-        );
+        });
     });
 
     describe("Theme Integration Fuzzing", () => {
         fcTest.prop([errorMessageArbitrary, booleanArbitrary], {
             numRuns: 50,
             timeout: 5000,
-        })(
-            "should handle theme states correctly",
-            async (errorMessage, isDark) => {
-                cleanupIteration();
+        })("should handle theme states correctly", async (
+            errorMessage,
+            isDark
+        ) => {
+            cleanupIteration();
 
-                render(
+            render(
+                <FormErrorAlert
+                    error={errorMessage}
+                    onClearError={mockOnClearError}
+                    isDark={isDark}
+                />
+            );
+
+            if (errorMessage) {
+                const alertBox = screen.getByTestId("themed-box");
+                const closeButton = screen.getByTestId("themed-button");
+
+                if (isDark) {
+                    expect(alertBox).toHaveClass("dark");
+                    expect(closeButton).toHaveClass("dark");
+                } else {
+                    expect(alertBox).not.toHaveClass("dark");
+                    expect(closeButton).not.toHaveClass("dark");
+                }
+            }
+        });
+
+        fcTest.prop([errorMessageArbitrary, fc.integer({ min: 1, max: 10 })], {
+            numRuns: 20,
+            timeout: 10_000,
+        })("should handle rapid theme changes", async (
+            errorMessage,
+            themeChanges
+        ) => {
+            cleanupIteration();
+
+            if (!errorMessage) return; // Skip if no error to display
+
+            const { rerender } = render(
+                <FormErrorAlert
+                    error={errorMessage}
+                    onClearError={mockOnClearError}
+                    isDark={false}
+                />
+            );
+
+            for (let i = 0; i < themeChanges; i++) {
+                const isDark = i % 2 === 1;
+
+                rerender(
                     <FormErrorAlert
                         error={errorMessage}
                         onClearError={mockOnClearError}
@@ -325,116 +370,71 @@ describe("FormErrorAlert Component - Property-Based Fuzzing", () => {
                     />
                 );
 
-                if (errorMessage) {
-                    const alertBox = screen.getByTestId("themed-box");
-                    const closeButton = screen.getByTestId("themed-button");
-
-                    if (isDark) {
-                        expect(alertBox).toHaveClass("dark");
-                        expect(closeButton).toHaveClass("dark");
-                    } else {
-                        expect(alertBox).not.toHaveClass("dark");
-                        expect(closeButton).not.toHaveClass("dark");
-                    }
+                const alertBox = screen.getByTestId("themed-box");
+                if (isDark) {
+                    expect(alertBox).toHaveClass("dark");
+                } else {
+                    expect(alertBox).not.toHaveClass("dark");
                 }
             }
-        );
-
-        fcTest.prop([errorMessageArbitrary, fc.integer({ min: 1, max: 10 })], {
-            numRuns: 20,
-            timeout: 10_000,
-        })(
-            "should handle rapid theme changes",
-            async (errorMessage, themeChanges) => {
-                cleanupIteration();
-
-                if (!errorMessage) return; // Skip if no error to display
-
-                const { rerender } = render(
-                    <FormErrorAlert
-                        error={errorMessage}
-                        onClearError={mockOnClearError}
-                        isDark={false}
-                    />
-                );
-
-                for (let i = 0; i < themeChanges; i++) {
-                    const isDark = i % 2 === 1;
-
-                    rerender(
-                        <FormErrorAlert
-                            error={errorMessage}
-                            onClearError={mockOnClearError}
-                            isDark={isDark}
-                        />
-                    );
-
-                    const alertBox = screen.getByTestId("themed-box");
-                    if (isDark) {
-                        expect(alertBox).toHaveClass("dark");
-                    } else {
-                        expect(alertBox).not.toHaveClass("dark");
-                    }
-                }
-            }
-        );
+        });
     });
 
     describe("User Interaction Fuzzing", () => {
         fcTest.prop([errorMessageArbitrary, fc.integer({ min: 1, max: 10 })], {
             numRuns: 50,
             timeout: 10_000,
-        })(
-            "should handle close button interactions",
-            async (errorMessage, clickCount) => {
-                cleanupIteration();
+        })("should handle close button interactions", async (
+            errorMessage,
+            clickCount
+        ) => {
+            cleanupIteration();
 
-                if (!errorMessage) return; // Skip if no error to display
+            if (!errorMessage) return; // Skip if no error to display
 
-                render(
-                    <FormErrorAlert
-                        error={errorMessage}
-                        onClearError={mockOnClearError}
-                    />
-                );
+            render(
+                <FormErrorAlert
+                    error={errorMessage}
+                    onClearError={mockOnClearError}
+                />
+            );
 
-                const closeButton = screen.getByTestId("themed-button");
+            const closeButton = screen.getByTestId("themed-button");
 
-                for (let i = 0; i < clickCount; i++) {
-                    fireEvent.click(closeButton);
-                }
-
-                expect(mockOnClearError).toHaveBeenCalledTimes(clickCount);
+            for (let i = 0; i < clickCount; i++) {
+                fireEvent.click(closeButton);
             }
-        );
+
+            expect(mockOnClearError).toHaveBeenCalledTimes(clickCount);
+        });
 
         fcTest.prop([errorMessageArbitrary, fc.integer({ min: 1, max: 20 })], {
             numRuns: 30,
             timeout: 15_000,
-        })(
-            "should handle rapid close button clicks",
-            async (errorMessage, rapidClicks) => {
-                cleanupIteration();
+        })("should handle rapid close button clicks", async (
+            errorMessage,
+            rapidClicks
+        ) => {
+            cleanupIteration();
 
-                if (!errorMessage) return; // Skip if no error to display
+            if (!errorMessage) return; // Skip if no error to display
 
-                render(
-                    <FormErrorAlert
-                        error={errorMessage}
-                        onClearError={mockOnClearError}
-                    />
-                );
+            render(
+                <FormErrorAlert
+                    error={errorMessage}
+                    onClearError={mockOnClearError}
+                />
+            );
 
-                const closeButton = screen.getByTestId("themed-button");
+            const closeButton = screen.getByTestId("themed-button");
 
-                // Rapid clicks without delays
-                for (let i = 0; i < rapidClicks; i++) {
-                    fireEvent.click(closeButton);
-                }
-
-                expect(mockOnClearError).toHaveBeenCalledTimes(rapidClicks);
+            // Rapid clicks without delays
+            for (let i = 0; i < rapidClicks; i++) {
+                fireEvent.click(closeButton);
             }
-        );
+
+            expect(mockOnClearError).toHaveBeenCalledTimes(rapidClicks);
+        });
 
         fcTest.prop([errorMessageArbitrary], {
             numRuns: 30,
@@ -473,81 +473,78 @@ describe("FormErrorAlert Component - Property-Based Fuzzing", () => {
         fcTest.prop([errorTransitionArbitrary], {
             numRuns: 30,
             timeout: 20_000,
-        })(
-            "should handle error state transitions correctly",
-            async (scenario) => {
-                cleanupIteration();
-                const { rerender } = render(
+        })("should handle error state transitions correctly", async (
+            scenario
+        ) => {
+            cleanupIteration();
+            const { rerender } = render(
+                <FormErrorAlert
+                    error={scenario.initialError ?? null}
+                    onClearError={mockOnClearError}
+                />
+            );
+
+            for (const nextError of scenario.subsequentErrors) {
+                // Perform error state transition (removing delays to prevent timeout)
+                rerender(
                     <FormErrorAlert
-                        error={scenario.initialError ?? null}
+                        error={nextError ?? null}
                         onClearError={mockOnClearError}
                     />
                 );
 
-                for (const nextError of scenario.subsequentErrors) {
-                    // Perform error state transition (removing delays to prevent timeout)
-                    rerender(
-                        <FormErrorAlert
-                            error={nextError ?? null}
-                            onClearError={mockOnClearError}
-                        />
-                    );
+                // Verify correct state after transition
+                if (nextError) {
+                    const errorText = screen.getByTestId("themed-text");
+                    // HTML normalizes whitespace (tabs/newlines become spaces)
 
-                    // Verify correct state after transition
-                    if (nextError) {
-                        const errorText = screen.getByTestId("themed-text");
-                        // HTML normalizes whitespace (tabs/newlines become spaces)
+                    const normalizedExpected = nextError
+                        .replaceAll(/\s+/g, " ")
+                        .trim();
 
-                        const normalizedExpected = nextError
-                            .replaceAll(/\s+/g, " ")
-                            .trim();
-
-                        const actualText =
-                            errorText.textContent
-                                ?.replaceAll(/\s+/g, " ")
-                                .trim() || "";
-                        expect(actualText).toBe(normalizedExpected);
-                    } else {
-                        const alertBoxes =
-                            screen.queryAllByTestId("themed-box");
-                        expect(alertBoxes).toHaveLength(0);
-                    }
+                    const actualText =
+                        errorText.textContent?.replaceAll(/\s+/g, " ").trim() ||
+                        "";
+                    expect(actualText).toBe(normalizedExpected);
+                } else {
+                    const alertBoxes = screen.queryAllByTestId("themed-box");
+                    expect(alertBoxes).toHaveLength(0);
                 }
             }
-        );
+        });
     });
 
     describe("CSS Class Handling Fuzzing", () => {
         fcTest.prop([errorMessageArbitrary, classNameArbitrary], {
             numRuns: 50,
             timeout: 5000,
-        })(
-            "should handle various className configurations",
-            async (errorMessage, className) => {
-                cleanupIteration();
-                if (!errorMessage) return; // Skip if no error to display
+        })("should handle various className configurations", async (
+            errorMessage,
+            className
+        ) => {
+            cleanupIteration();
+            if (!errorMessage) return; // Skip if no error to display
 
-                render(
-                    <FormErrorAlert
-                        error={errorMessage}
-                        onClearError={mockOnClearError}
-                        className={className}
-                    />
-                );
+            render(
+                <FormErrorAlert
+                    error={errorMessage}
+                    onClearError={mockOnClearError}
+                    className={className}
+                />
+            );
 
-                const alertBox = screen.getByTestId("themed-box");
+            const alertBox = screen.getByTestId("themed-box");
 
-                // Base classes should always be present
-                expect(alertBox).toHaveClass("error-alert");
+            // Base classes should always be present
+            expect(alertBox).toHaveClass("error-alert");
 
-                if (className && className.trim()) {
-                    expect(alertBox).toHaveClass(className);
-                }
-
-                // Should not crash with any className
-                expect(alertBox).toBeInTheDocument();
+            if (className && className.trim()) {
+                expect(alertBox).toHaveClass(className);
             }
-        );
+
+            // Should not crash with any className
+            expect(alertBox).toBeInTheDocument();
+        });
     });
 
     describe("Accessibility Fuzzing", () => {
@@ -605,27 +602,26 @@ describe("FormErrorAlert Component - Property-Based Fuzzing", () => {
                 numRuns: 30,
                 timeout: 5000,
             }
-        )(
-            "should handle potentially malicious content safely",
-            async (maliciousContent) => {
-                cleanupIteration();
-                render(
-                    <FormErrorAlert
-                        error={maliciousContent}
-                        onClearError={mockOnClearError}
-                    />
-                );
+        )("should handle potentially malicious content safely", async (
+            maliciousContent
+        ) => {
+            cleanupIteration();
+            render(
+                <FormErrorAlert
+                    error={maliciousContent}
+                    onClearError={mockOnClearError}
+                />
+            );
 
-                const errorText = screen.getByTestId("themed-text");
+            const errorText = screen.getByTestId("themed-text");
 
-                // Content should be displayed as text, not executed
-                expect(errorText).toHaveTextContent(maliciousContent);
-                expect(errorText).toBeInTheDocument();
+            // Content should be displayed as text, not executed
+            expect(errorText).toHaveTextContent(maliciousContent);
+            expect(errorText).toBeInTheDocument();
 
-                // No scripts should have been executed (component should still be safe)
-                expect(screen.getByTestId("themed-button")).toBeInTheDocument();
-            }
-        );
+            // No scripts should have been executed (component should still be safe)
+            expect(screen.getByTestId("themed-button")).toBeInTheDocument();
+        });
     });
 
     describe("Performance Fuzzing", () => {
@@ -708,73 +704,71 @@ describe("FormErrorAlert Component - Property-Based Fuzzing", () => {
         fcTest.prop([fc.anything()], {
             numRuns: 30,
             timeout: 5000,
-        })(
-            "should handle invalid onClearError handlers gracefully",
-            async (invalidHandler) => {
-                cleanupIteration();
-                expect(() => {
-                    render(
-                        <FormErrorAlert
-                            error="Test error"
-                            onClearError={invalidHandler as () => void}
-                        />
-                    );
-                }).not.toThrowError();
+        })("should handle invalid onClearError handlers gracefully", async (
+            invalidHandler
+        ) => {
+            cleanupIteration();
+            expect(() => {
+                render(
+                    <FormErrorAlert
+                        error="Test error"
+                        onClearError={invalidHandler as () => void}
+                    />
+                );
+            }).not.toThrowError();
 
-                // Component should render even with invalid handler
-                const alertBox = screen.getByTestId("themed-box");
-                expect(alertBox).toBeInTheDocument();
-            }
-        );
+            // Component should render even with invalid handler
+            const alertBox = screen.getByTestId("themed-box");
+            expect(alertBox).toBeInTheDocument();
+        });
 
         fcTest.prop([fc.anything(), fc.anything()], {
             numRuns: 20,
             timeout: 3000,
-        })(
-            "should not crash with completely invalid props",
-            async (invalidProp1, invalidProp2) => {
-                cleanupIteration();
-                expect(() => {
-                    render(
-                        <FormErrorAlert
-                            error="Test error"
-                            onClearError={mockOnClearError}
-                            {...{ invalidProp1, invalidProp2 }}
-                        />
-                    );
-                }).not.toThrowError();
-            }
-        );
+        })("should not crash with completely invalid props", async (
+            invalidProp1,
+            invalidProp2
+        ) => {
+            cleanupIteration();
+            expect(() => {
+                render(
+                    <FormErrorAlert
+                        error="Test error"
+                        onClearError={mockOnClearError}
+                        {...{ invalidProp1, invalidProp2 }}
+                    />
+                );
+            }).not.toThrowError();
+        });
     });
 
     describe("Memory Management Fuzzing", () => {
         fcTest.prop([fc.integer({ min: 1, max: 15 })], {
             numRuns: 20,
             timeout: 15_000,
-        })(
-            "should clean up resources properly on unmount",
-            async (mountCount) => {
-                cleanupIteration();
-                for (let i = 0; i < mountCount; i++) {
-                    const { unmount } = render(
-                        <FormErrorAlert
-                            error={`Error message ${i}`}
-                            onClearError={mockOnClearError}
-                        />
-                    );
+        })("should clean up resources properly on unmount", async (
+            mountCount
+        ) => {
+            cleanupIteration();
+            for (let i = 0; i < mountCount; i++) {
+                const { unmount } = render(
+                    <FormErrorAlert
+                        error={`Error message ${i}`}
+                        onClearError={mockOnClearError}
+                    />
+                );
 
-                    // Interact with the alert
-                    const closeButton = screen.getByTestId("themed-button");
-                    fireEvent.click(closeButton);
+                // Interact with the alert
+                const closeButton = screen.getByTestId("themed-button");
+                fireEvent.click(closeButton);
 
-                    // Unmount component
-                    unmount();
-                }
-
-                // No memory leaks or errors should occur
-                expect(mockOnClearError).toHaveBeenCalledTimes(mountCount);
+                // Unmount component
+                unmount();
             }
-        );
+
+            // No memory leaks or errors should occur
+            expect(mockOnClearError).toHaveBeenCalledTimes(mountCount);
+        });
     });
 });
 /* eslint-enable unicorn/prefer-string-replace-all */

@@ -92,8 +92,7 @@ const validUrlArbitrary = fc
             require_protocol: true,
             require_tld: true,
             validate_length: true,
-        })
-    );
+        }));
 
 // Valid host arbitrary that passes isValidHost validation
 const validHostArbitrary = fc
@@ -148,14 +147,11 @@ const HEADER_SYMBOLS = [
 ] as const;
 
 const DIGIT_CHARS = Array.from({ length: 10 }, (_, index) =>
-    String.fromCodePoint(48 + index)
-);
+    String.fromCodePoint(48 + index));
 const LOWER_ALPHA_CHARS = Array.from({ length: 26 }, (_, index) =>
-    String.fromCodePoint(97 + index)
-);
+    String.fromCodePoint(97 + index));
 const UPPER_ALPHA_CHARS = Array.from({ length: 26 }, (_, index) =>
-    String.fromCodePoint(65 + index)
-);
+    String.fromCodePoint(65 + index));
 
 const HEADER_TOKEN_CHAR_SET = [
     ...DIGIT_CHARS,

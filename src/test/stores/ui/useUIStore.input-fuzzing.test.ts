@@ -415,18 +415,17 @@ describe("UI Store - Property-Based Fuzzing Tests", () => {
     });
 
     describe("Site Selection Management", () => {
-        fcTest.prop([arbitraries.site])(
-            "should handle site selection",
-            (site) => {
-                // Act
-                useUIStore.getState().selectSite(site);
+        fcTest.prop([arbitraries.site])("should handle site selection", (
+            site
+        ) => {
+            // Act
+            useUIStore.getState().selectSite(site);
 
-                // Assert
-                expect(useUIStore.getState().selectedSiteIdentifier).toBe(
-                    site.identifier
-                );
-            }
-        );
+            // Assert
+            expect(useUIStore.getState().selectedSiteIdentifier).toBe(
+                site.identifier
+            );
+        });
 
         fcTest.prop([
             fc.array(arbitraries.site, { minLength: 1, maxLength: 10 }),
@@ -474,16 +473,15 @@ describe("UI Store - Property-Based Fuzzing Tests", () => {
     });
 
     describe("Tab Navigation Management", () => {
-        fcTest.prop([arbitraries.tabId])(
-            "should handle active tab changes",
-            (tabId) => {
-                // Act
-                useUIStore.getState().setActiveSiteDetailsTab(tabId);
+        fcTest.prop([arbitraries.tabId])("should handle active tab changes", (
+            tabId
+        ) => {
+            // Act
+            useUIStore.getState().setActiveSiteDetailsTab(tabId);
 
-                // Assert
-                expect(useUIStore.getState().activeSiteDetailsTab).toBe(tabId);
-            }
-        );
+            // Assert
+            expect(useUIStore.getState().activeSiteDetailsTab).toBe(tabId);
+        });
 
         fcTest.prop([
             fc.array(arbitraries.tabId, { minLength: 1, maxLength: 20 }),
@@ -559,32 +557,29 @@ describe("UI Store - Property-Based Fuzzing Tests", () => {
     });
 
     describe("External URL Handling", () => {
-        fcTest.prop([arbitraries.url])(
-            "should handle external URL opening",
-            (url) => {
-                // Clear any previous calls
-                mockOpenExternal.mockClear();
-                mockErrorStore.setStoreError.mockClear();
+        fcTest.prop([arbitraries.url])("should handle external URL opening", (
+            url
+        ) => {
+            // Clear any previous calls
+            mockOpenExternal.mockClear();
+            mockErrorStore.setStoreError.mockClear();
 
-                // Act
-                useUIStore.getState().openExternal(url);
+            // Act
+            useUIStore.getState().openExternal(url);
 
-                const allowed = isValidUrl(url);
+            const allowed = isValidUrl(url);
 
-                if (allowed) {
-                    expect(mockOpenExternal).toHaveBeenCalledWith(url);
-                    expect(mockErrorStore.setStoreError).not.toHaveBeenCalled();
-                } else {
-                    expect(mockOpenExternal).not.toHaveBeenCalled();
-                    expect(mockErrorStore.setStoreError).toHaveBeenCalledWith(
-                        "system-open-external",
-                        expect.stringContaining(
-                            "URL must start with http(s)://"
-                        )
-                    );
-                }
+            if (allowed) {
+                expect(mockOpenExternal).toHaveBeenCalledWith(url);
+                expect(mockErrorStore.setStoreError).not.toHaveBeenCalled();
+            } else {
+                expect(mockOpenExternal).not.toHaveBeenCalled();
+                expect(mockErrorStore.setStoreError).toHaveBeenCalledWith(
+                    "system-open-external",
+                    expect.stringContaining("URL must start with http(s)://")
+                );
             }
-        );
+        });
 
         fcTest.prop([arbitraries.url, arbitraries.siteName])(
             "should handle external URL opening with context",
@@ -696,89 +691,82 @@ describe("UI Store - Property-Based Fuzzing Tests", () => {
             arbitraries.site,
             arbitraries.modalStates,
             arbitraries.uiState,
-        ])(
-            "should handle complex state combinations",
-            (site, modalStates, uiState) => {
-                // Act - set complex state combination
-                useUIStore.getState().selectSite(site);
-                useUIStore.getState().setShowSettings(modalStates.showSettings);
-                useUIStore
-                    .getState()
-                    .setShowSiteDetails(modalStates.showSiteDetails);
-                useUIStore
-                    .getState()
-                    .setShowAddSiteModal(modalStates.showAddSiteModal);
-                useUIStore
-                    .getState()
-                    .setShowAdvancedMetrics(modalStates.showAdvancedMetrics);
-                useUIStore
-                    .getState()
-                    .setActiveSiteDetailsTab(uiState.activeSiteDetailsTab);
-                useUIStore
-                    .getState()
-                    .setSiteDetailsChartTimeRange(
-                        uiState.siteDetailsChartTimeRange
-                    );
-
-                // Assert - all state should be consistent
-                expect(useUIStore.getState().selectedSiteIdentifier).toBe(
-                    site.identifier
-                );
-                expect(useUIStore.getState().showSettings).toBe(
-                    modalStates.showSettings
-                );
-                expect(useUIStore.getState().showSiteDetails).toBe(
-                    modalStates.showSiteDetails
-                );
-                expect(useUIStore.getState().showAddSiteModal).toBe(
-                    modalStates.showAddSiteModal
-                );
-                expect(useUIStore.getState().showAdvancedMetrics).toBe(
-                    modalStates.showAdvancedMetrics
-                );
-                expect(useUIStore.getState().activeSiteDetailsTab).toBe(
-                    uiState.activeSiteDetailsTab
-                );
-                expect(useUIStore.getState().siteDetailsChartTimeRange).toBe(
+        ])("should handle complex state combinations", (
+            site,
+            modalStates,
+            uiState
+        ) => {
+            // Act - set complex state combination
+            useUIStore.getState().selectSite(site);
+            useUIStore.getState().setShowSettings(modalStates.showSettings);
+            useUIStore
+                .getState()
+                .setShowSiteDetails(modalStates.showSiteDetails);
+            useUIStore
+                .getState()
+                .setShowAddSiteModal(modalStates.showAddSiteModal);
+            useUIStore
+                .getState()
+                .setShowAdvancedMetrics(modalStates.showAdvancedMetrics);
+            useUIStore
+                .getState()
+                .setActiveSiteDetailsTab(uiState.activeSiteDetailsTab);
+            useUIStore
+                .getState()
+                .setSiteDetailsChartTimeRange(
                     uiState.siteDetailsChartTimeRange
                 );
-            }
-        );
+
+            // Assert - all state should be consistent
+            expect(useUIStore.getState().selectedSiteIdentifier).toBe(
+                site.identifier
+            );
+            expect(useUIStore.getState().showSettings).toBe(
+                modalStates.showSettings
+            );
+            expect(useUIStore.getState().showSiteDetails).toBe(
+                modalStates.showSiteDetails
+            );
+            expect(useUIStore.getState().showAddSiteModal).toBe(
+                modalStates.showAddSiteModal
+            );
+            expect(useUIStore.getState().showAdvancedMetrics).toBe(
+                modalStates.showAdvancedMetrics
+            );
+            expect(useUIStore.getState().activeSiteDetailsTab).toBe(
+                uiState.activeSiteDetailsTab
+            );
+            expect(useUIStore.getState().siteDetailsChartTimeRange).toBe(
+                uiState.siteDetailsChartTimeRange
+            );
+        });
 
         fcTest.prop([
             fc.array(arbitraries.site, { minLength: 1, maxLength: 5 }),
             fc.array(arbitraries.tabId, { minLength: 1, maxLength: 5 }),
-        ])(
-            "should handle site selection with tab navigation",
-            (sites, tabIds) => {
-                // Act - alternate between site selection and tab navigation
-                for (
-                    let i = 0;
-                    i < Math.max(sites.length, tabIds.length);
-                    i++
-                ) {
-                    if (i < sites.length) {
-                        useUIStore.getState().selectSite(sites[i]);
-                    }
-                    if (i < tabIds.length) {
-                        useUIStore
-                            .getState()
-                            .setActiveSiteDetailsTab(tabIds[i]!);
-                    }
+        ])("should handle site selection with tab navigation", (
+            sites,
+            tabIds
+        ) => {
+            // Act - alternate between site selection and tab navigation
+            for (let i = 0; i < Math.max(sites.length, tabIds.length); i++) {
+                if (i < sites.length) {
+                    useUIStore.getState().selectSite(sites[i]);
                 }
-
-                // Assert - final state should be consistent
-                const lastSite = sites.at(-1);
-                const lastTabId = tabIds.at(-1);
-
-                expect(useUIStore.getState().selectedSiteIdentifier).toBe(
-                    lastSite!.identifier
-                );
-                expect(useUIStore.getState().activeSiteDetailsTab).toBe(
-                    lastTabId
-                );
+                if (i < tabIds.length) {
+                    useUIStore.getState().setActiveSiteDetailsTab(tabIds[i]!);
+                }
             }
-        );
+
+            // Assert - final state should be consistent
+            const lastSite = sites.at(-1);
+            const lastTabId = tabIds.at(-1);
+
+            expect(useUIStore.getState().selectedSiteIdentifier).toBe(
+                lastSite!.identifier
+            );
+            expect(useUIStore.getState().activeSiteDetailsTab).toBe(lastTabId);
+        });
     });
 
     describe("State Transitions", () => {
@@ -886,45 +874,43 @@ describe("UI Store - Property-Based Fuzzing Tests", () => {
         fcTest.prop([
             fc.array(arbitraries.site, { minLength: 2, maxLength: 5 }),
             fc.array(arbitraries.url, { minLength: 2, maxLength: 5 }),
-        ])(
-            "should handle concurrent site selection and URL operations",
-            (sites, urls) => {
-                // Clear any previous calls
-                mockOpenExternal.mockClear();
-                mockErrorStore.setStoreError.mockClear();
+        ])("should handle concurrent site selection and URL operations", (
+            sites,
+            urls
+        ) => {
+            // Clear any previous calls
+            mockOpenExternal.mockClear();
+            mockErrorStore.setStoreError.mockClear();
 
-                // Act - interleave site selection and URL operations
-                for (let i = 0; i < Math.max(sites.length, urls.length); i++) {
-                    if (i < sites.length) {
-                        useUIStore.getState().selectSite(sites[i]);
-                    }
-                    if (i < urls.length) {
-                        useUIStore.getState().openExternal(urls[i]!);
-                    }
+            // Act - interleave site selection and URL operations
+            for (let i = 0; i < Math.max(sites.length, urls.length); i++) {
+                if (i < sites.length) {
+                    useUIStore.getState().selectSite(sites[i]);
                 }
-
-                // Assert - final site should be selected
-                const finalSite = sites.at(-1);
-                expect(useUIStore.getState().selectedSiteIdentifier).toBe(
-                    finalSite!.identifier
-                );
-
-                const validUrls = urls.filter((url) => isValidUrl(url));
-                const invalidCount = urls.length - validUrls.length;
-
-                expect(mockOpenExternal).toHaveBeenCalledTimes(
-                    validUrls.length
-                );
-
-                if (invalidCount > 0) {
-                    expect(mockErrorStore.setStoreError).toHaveBeenCalledTimes(
-                        invalidCount
-                    );
-                } else {
-                    expect(mockErrorStore.setStoreError).not.toHaveBeenCalled();
+                if (i < urls.length) {
+                    useUIStore.getState().openExternal(urls[i]!);
                 }
             }
-        );
+
+            // Assert - final site should be selected
+            const finalSite = sites.at(-1);
+            expect(useUIStore.getState().selectedSiteIdentifier).toBe(
+                finalSite!.identifier
+            );
+
+            const validUrls = urls.filter((url) => isValidUrl(url));
+            const invalidCount = urls.length - validUrls.length;
+
+            expect(mockOpenExternal).toHaveBeenCalledTimes(validUrls.length);
+
+            if (invalidCount > 0) {
+                expect(mockErrorStore.setStoreError).toHaveBeenCalledTimes(
+                    invalidCount
+                );
+            } else {
+                expect(mockErrorStore.setStoreError).not.toHaveBeenCalled();
+            }
+        });
     });
 
     describe("Edge Cases and Error Scenarios", () => {
@@ -934,8 +920,7 @@ describe("UI Store - Property-Based Fuzzing Tests", () => {
 
             // Act & Assert - setting undefined site should not crash
             expect(() =>
-                useUIStore.getState().selectSite(undefined)
-            ).not.toThrowError();
+                useUIStore.getState().selectSite(undefined)).not.toThrowError();
             expect(
                 useUIStore.getState().selectedSiteIdentifier
             ).toBeUndefined();
@@ -953,8 +938,9 @@ describe("UI Store - Property-Based Fuzzing Tests", () => {
                 try {
                     // Act & Assert - should not crash
                     expect(() =>
-                        useUIStore.getState().openExternal(url)
-                    ).not.toThrowError();
+                        useUIStore
+                            .getState()
+                            .openExternal(url)).not.toThrowError();
                 } finally {
                     // Restore electronAPI
                     if (globalThis.window && originalAPI) {

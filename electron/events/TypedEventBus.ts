@@ -516,8 +516,7 @@ export class TypedEventBus<
 
             try {
                 await middleware(currentEvent, currentData, () =>
-                    processNext(index + 1, currentEvent, currentData)
-                );
+                    processNext(index + 1, currentEvent, currentData));
             } catch (error) {
                 baseLogger.error(
                     `[TypedEventBus:${this.busId}] Middleware error for '${eventName}' [${correlationId}]`,

@@ -112,8 +112,7 @@ function shouldRethrowError(error: Error): boolean {
     ];
 
     return rethrownErrorMessages.some((message) =>
-        error.message.includes(message)
-    );
+        error.message.includes(message));
 }
 
 /**

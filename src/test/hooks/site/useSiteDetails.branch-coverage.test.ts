@@ -110,8 +110,7 @@ describe("useSiteDetails - Branch Coverage", () => {
             await annotate("Type: Monitoring", "type");
 
             const { result } = renderHook(() =>
-                useSiteDetails({ site: mockSite })
-            );
+                useSiteDetails({ site: mockSite }));
 
             await act(async () => {
                 await result.current.handleStartMonitoring();
@@ -144,8 +143,7 @@ describe("useSiteDetails - Branch Coverage", () => {
             await annotate("Type: Monitoring", "type");
 
             const { result } = renderHook(() =>
-                useSiteDetails({ site: mockSite })
-            );
+                useSiteDetails({ site: mockSite }));
 
             await act(async () => {
                 await result.current.handleStopMonitoring();
@@ -186,8 +184,7 @@ describe("useSiteDetails - Branch Coverage", () => {
             });
 
             const { result } = renderHook(() =>
-                useSiteDetails({ site: mockSite })
-            );
+                useSiteDetails({ site: mockSite }));
 
             // Set up the interval change first
             act(() => {
@@ -230,8 +227,7 @@ describe("useSiteDetails - Branch Coverage", () => {
             });
 
             const { result } = renderHook(() =>
-                useSiteDetails({ site: mockSite })
-            );
+                useSiteDetails({ site: mockSite }));
 
             // Set up the interval change first
             act(() => {
@@ -282,8 +278,7 @@ describe("useSiteDetails - Branch Coverage", () => {
             });
 
             const { result } = renderHook(() =>
-                useSiteDetails({ site: mockSite })
-            );
+                useSiteDetails({ site: mockSite }));
 
             // Set up the timeout change first
             act(() => {
@@ -326,8 +321,7 @@ describe("useSiteDetails - Branch Coverage", () => {
             });
 
             const { result } = renderHook(() =>
-                useSiteDetails({ site: mockSite })
-            );
+                useSiteDetails({ site: mockSite }));
 
             // Set up the timeout change first
             act(() => {
@@ -378,8 +372,7 @@ describe("useSiteDetails - Branch Coverage", () => {
             });
 
             const { result } = renderHook(() =>
-                useSiteDetails({ site: mockSite })
-            );
+                useSiteDetails({ site: mockSite }));
 
             // Set up the retry attempts change first
             act(() => {
@@ -424,8 +417,7 @@ describe("useSiteDetails - Branch Coverage", () => {
             });
 
             const { result } = renderHook(() =>
-                useSiteDetails({ site: mockSite })
-            );
+                useSiteDetails({ site: mockSite }));
 
             // Set up the retry attempts change first
             act(() => {
@@ -466,8 +458,7 @@ describe("useSiteDetails - Branch Coverage", () => {
             await annotate("Type: Data Saving", "type");
 
             const { result } = renderHook(() =>
-                useSiteDetails({ site: mockSite })
-            );
+                useSiteDetails({ site: mockSite }));
 
             // Don't make any name changes, so hasUnsavedChanges should be false
             await act(async () => {
@@ -491,8 +482,7 @@ describe("useSiteDetails - Branch Coverage", () => {
             await annotate("Type: Data Saving", "type");
 
             const { result } = renderHook(() =>
-                useSiteDetails({ site: mockSite })
-            );
+                useSiteDetails({ site: mockSite }));
 
             // Make a name change to trigger hasUnsavedChanges
             act(() => {
@@ -559,8 +549,7 @@ describe("useSiteDetails - Branch Coverage", () => {
             });
 
             const { result } = renderHook(() =>
-                useSiteDetails({ site: siteWithoutType })
-            );
+                useSiteDetails({ site: siteWithoutType }));
 
             act(() => {
                 result.current.handleIntervalChange({

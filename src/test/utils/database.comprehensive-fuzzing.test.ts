@@ -560,43 +560,42 @@ describe("Comprehensive Database Operations Fuzzing", () => {
 
         fcTest.prop([
             fc.array(sqlInjectionStrings, { minLength: 1, maxLength: 5 }),
-        ])(
-            "SQL injection attempts should be safely rejected",
-            (injectionAttempts) => {
-                const mockSafeQueryValidator = (userInput: string) => {
-                    // Simulate a safe query function that validates input
-                    const hasSqlInjection =
-                        /drop\s+table/i.test(userInput) ||
-                        /delete\s+from.*where.*or.*1.*=.*1/i.test(userInput) ||
-                        /union\s+select/i.test(userInput) ||
-                        /waitfor\s+delay/i.test(userInput) ||
-                        /admin\s*'?\s*--/i.test(userInput) ||
-                        /'--/i.test(userInput) ||
-                        /;\s*--/i.test(userInput) ||
-                        /\/\*.*\*\//i.test(userInput) ||
-                        /'\s*or\s*'1'\s*=\s*'1/i.test(userInput) ||
-                        /'\s*or\s*1\s*=\s*1/i.test(userInput);
+        ])("SQL injection attempts should be safely rejected", (
+            injectionAttempts
+        ) => {
+            const mockSafeQueryValidator = (userInput: string) => {
+                // Simulate a safe query function that validates input
+                const hasSqlInjection =
+                    /drop\s+table/i.test(userInput) ||
+                    /delete\s+from.*where.*or.*1.*=.*1/i.test(userInput) ||
+                    /union\s+select/i.test(userInput) ||
+                    /waitfor\s+delay/i.test(userInput) ||
+                    /admin\s*'?\s*--/i.test(userInput) ||
+                    /'--/i.test(userInput) ||
+                    /;\s*--/i.test(userInput) ||
+                    /\/\*.*\*\//i.test(userInput) ||
+                    /'\s*or\s*'1'\s*=\s*'1/i.test(userInput) ||
+                    /'\s*or\s*1\s*=\s*1/i.test(userInput);
 
-                    if (hasSqlInjection) {
-                        throw new Error("SQL injection detected");
-                    }
-
-                    // Safe query - return sanitized result
-                    return { rows: [], rowCount: 0, sanitized: true };
-                };
-
-                for (const injection of injectionAttempts) {
-                    // Property: Safe query should reject SQL injection attempts
-                    expect(() => {
-                        measureDbOperation(
-                            mockSafeQueryValidator,
-                            "safeQuery",
-                            injection
-                        );
-                    }).toThrowError("SQL injection detected");
+                if (hasSqlInjection) {
+                    throw new Error("SQL injection detected");
                 }
+
+                // Safe query - return sanitized result
+                return { rows: [], rowCount: 0, sanitized: true };
+            };
+
+            for (const injection of injectionAttempts) {
+                // Property: Safe query should reject SQL injection attempts
+                expect(() => {
+                    measureDbOperation(
+                        mockSafeQueryValidator,
+                        "safeQuery",
+                        injection
+                    );
+                }).toThrowError("SQL injection detected");
             }
-        );
+        });
     });
 
     describe("Data Integrity Testing", () => {
@@ -783,61 +782,61 @@ describe("Comprehensive Database Operations Fuzzing", () => {
         fcTest.prop([
             fc.array(monitorDbData, { minLength: 2, maxLength: 10 }),
             fc.integer({ min: 2, max: 5 }),
-        ])(
-            "Concurrent inserts should handle conflicts gracefully",
-            (monitorDataArray, concurrentCount) => {
-                const simulateConcurrentInserts = async (
-                    dataArray: typeof monitorDataArray,
-                    concurrency: number
-                ) => {
-                    const insertPromises = dataArray.slice(0, concurrency).map(
-                        async (data, index) =>
-                            // Simulate database insert operation
-                            new Promise((resolve) => {
-                                setTimeout(() => {
-                                    resolve({
-                                        id: index + 1,
-                                        name: data.name,
-                                        success: true,
-                                        insertTime: performance.now(),
-                                    });
-                                }, Math.random() * 10);
-                            })
-                    );
+        ])("Concurrent inserts should handle conflicts gracefully", (
+            monitorDataArray,
+            concurrentCount
+        ) => {
+            const simulateConcurrentInserts = async (
+                dataArray: typeof monitorDataArray,
+                concurrency: number
+            ) => {
+                const insertPromises = dataArray.slice(0, concurrency).map(
+                    async (data, index) =>
+                        // Simulate database insert operation
+                        new Promise((resolve) => {
+                            setTimeout(() => {
+                                resolve({
+                                    id: index + 1,
+                                    name: data.name,
+                                    success: true,
+                                    insertTime: performance.now(),
+                                });
+                            }, Math.random() * 10);
+                        })
+                );
 
-                    return Promise.all(insertPromises);
-                };
+                return Promise.all(insertPromises);
+            };
 
-                const resultPromise = measureDbOperation(
-                    simulateConcurrentInserts,
-                    "concurrentInserts",
-                    monitorDataArray,
-                    concurrentCount
-                ) as Promise<
-                    {
-                        id: number;
-                        name: string;
-                        success: boolean;
-                        insertTime: number;
-                    }[]
-                >;
+            const resultPromise = measureDbOperation(
+                simulateConcurrentInserts,
+                "concurrentInserts",
+                monitorDataArray,
+                concurrentCount
+            ) as Promise<
+                {
+                    id: number;
+                    name: string;
+                    success: boolean;
+                    insertTime: number;
+                }[]
+            >;
 
-                // Property: Concurrent operations should complete successfully
-                expect(resultPromise).toBeInstanceOf(Promise);
+            // Property: Concurrent operations should complete successfully
+            expect(resultPromise).toBeInstanceOf(Promise);
 
-                return resultPromise.then((results) => {
-                    expect(Array.isArray(results)).toBeTruthy();
-                    expect(results).toHaveLength(
-                        Math.min(monitorDataArray.length, concurrentCount)
-                    );
+            return resultPromise.then((results) => {
+                expect(Array.isArray(results)).toBeTruthy();
+                expect(results).toHaveLength(
+                    Math.min(monitorDataArray.length, concurrentCount)
+                );
 
-                    for (const result of results) {
-                        expect(result).toHaveProperty("success");
-                        expect(result.success).toBeTruthy();
-                    }
-                });
-            }
-        );
+                for (const result of results) {
+                    expect(result).toHaveProperty("success");
+                    expect(result.success).toBeTruthy();
+                }
+            });
+        });
 
         fcTest.prop([
             fc.array(fc.integer({ min: 1, max: 1000 }), {
@@ -962,89 +961,84 @@ describe("Comprehensive Database Operations Fuzzing", () => {
                     fc.oneof(fc.string(), fc.integer(), fc.boolean())
                 ),
             }),
-        ])(
-            "Database operations should validate table access",
-            (dbOperation) => {
-                const validateTableAccess = (operation: typeof dbOperation) => {
-                    const allowedTables = [
-                        "monitors",
-                        "sites",
-                        "status_updates",
-                        "monitor_configs",
-                    ];
-                    const dangerousOperations = [
-                        "DROP",
-                        "ALTER",
-                        "CREATE",
-                    ];
+        ])("Database operations should validate table access", (
+            dbOperation
+        ) => {
+            const validateTableAccess = (operation: typeof dbOperation) => {
+                const allowedTables = [
+                    "monitors",
+                    "sites",
+                    "status_updates",
+                    "monitor_configs",
+                ];
+                const dangerousOperations = [
+                    "DROP",
+                    "ALTER",
+                    "CREATE",
+                ];
 
-                    const errors: string[] = [];
+                const errors: string[] = [];
 
-                    // Table name validation
-                    if (!allowedTables.includes(operation.tableName)) {
-                        errors.push(
-                            `Access denied to table: ${operation.tableName}`
-                        );
-                    }
-
-                    // Operation validation
-                    if (
-                        dangerousOperations.some((dangerous) =>
-                            operation.operation
-                                .toUpperCase()
-                                .includes(dangerous)
-                        )
-                    ) {
-                        errors.push(
-                            `Dangerous operation not allowed: ${operation.operation}`
-                        );
-                    }
-
-                    // Parameter validation
-                    if (
-                        operation.params.some(
-                            (param) =>
-                                typeof param === "string" &&
-                                param.includes("--")
-                        )
-                    ) {
-                        errors.push("SQL comment detected in parameters");
-                    }
-
-                    return {
-                        allowed: errors.length === 0,
-                        errors,
-                        operation: operation.operation,
-                        table: operation.tableName,
-                    };
-                };
-
-                const result = measureDbOperation(
-                    validateTableAccess,
-                    "tableAccess",
-                    dbOperation
-                ) as {
-                    allowed: boolean;
-                    errors: string[];
-                    operation: string;
-                    table: string;
-                };
-
-                // Property: Access control should never throw
-                expect(result).toHaveProperty("allowed");
-                expect(result).toHaveProperty("errors");
-                expect(typeof result.allowed).toBe("boolean");
-
-                // Property: Dangerous operations should be blocked
-                if (
-                    dbOperation.tableName === "users" ||
-                    dbOperation.tableName === "admin"
-                ) {
-                    expect(result.allowed).toBeFalsy();
-                    expect(result.errors.length).toBeGreaterThan(0);
+                // Table name validation
+                if (!allowedTables.includes(operation.tableName)) {
+                    errors.push(
+                        `Access denied to table: ${operation.tableName}`
+                    );
                 }
+
+                // Operation validation
+                if (
+                    dangerousOperations.some((dangerous) =>
+                        operation.operation.toUpperCase().includes(dangerous))
+                ) {
+                    errors.push(
+                        `Dangerous operation not allowed: ${operation.operation}`
+                    );
+                }
+
+                // Parameter validation
+                if (
+                    operation.params.some(
+                        (param) =>
+                            typeof param === "string" && param.includes("--")
+                    )
+                ) {
+                    errors.push("SQL comment detected in parameters");
+                }
+
+                return {
+                    allowed: errors.length === 0,
+                    errors,
+                    operation: operation.operation,
+                    table: operation.tableName,
+                };
+            };
+
+            const result = measureDbOperation(
+                validateTableAccess,
+                "tableAccess",
+                dbOperation
+            ) as {
+                allowed: boolean;
+                errors: string[];
+                operation: string;
+                table: string;
+            };
+
+            // Property: Access control should never throw
+            expect(result).toHaveProperty("allowed");
+            expect(result).toHaveProperty("errors");
+            expect(typeof result.allowed).toBe("boolean");
+
+            // Property: Dangerous operations should be blocked
+            if (
+                dbOperation.tableName === "users" ||
+                dbOperation.tableName === "admin"
+            ) {
+                expect(result.allowed).toBeFalsy();
+                expect(result.errors.length).toBeGreaterThan(0);
             }
-        );
+        });
     });
 
     describe("Performance and Resource Management", () => {
@@ -1165,51 +1159,49 @@ describe("Comprehensive Database Operations Fuzzing", () => {
                 minLength: 1,
                 maxLength: 20,
             }),
-        ])(
-            "Connection timeouts should be handled gracefully",
-            async (timeoutScenarios) => {
-                const simulateConnectionTimeouts = (timeouts: number[]) => {
-                    const results = timeouts.map((timeout) => {
-                        // Const startTime = performance.now();
+        ])("Connection timeouts should be handled gracefully", async (
+            timeoutScenarios
+        ) => {
+            const simulateConnectionTimeouts = (timeouts: number[]) => {
+                const results = timeouts.map((timeout) => {
+                    // Const startTime = performance.now();
 
-                        // Simulate connection attempt
-                        const connectionSuccess = timeout > 1000; // Arbitrary threshold
-                        const actualTime = Math.min(timeout, 2000); // Max 2s simulation
-
-                        return {
-                            requestedTimeout: timeout,
-                            actualTime,
-                            success: connectionSuccess,
-                            retryNeeded: !connectionSuccess,
-                        };
-                    });
+                    // Simulate connection attempt
+                    const connectionSuccess = timeout > 1000; // Arbitrary threshold
+                    const actualTime = Math.min(timeout, 2000); // Max 2s simulation
 
                     return {
-                        totalAttempts: results.length,
-                        successfulConnections: results.filter((r) => r.success)
-                            .length,
-                        failedConnections: results.filter((r) => !r.success)
-                            .length,
-                        avgConnectionTime:
-                            results.reduce((sum, r) => sum + r.actualTime, 0) /
-                            results.length,
+                        requestedTimeout: timeout,
+                        actualTime,
+                        success: connectionSuccess,
+                        retryNeeded: !connectionSuccess,
                     };
+                });
+
+                return {
+                    totalAttempts: results.length,
+                    successfulConnections: results.filter((r) => r.success)
+                        .length,
+                    failedConnections: results.filter((r) => !r.success).length,
+                    avgConnectionTime:
+                        results.reduce((sum, r) => sum + r.actualTime, 0) /
+                        results.length,
                 };
+            };
 
-                const result = await measureDbOperation(
-                    simulateConnectionTimeouts,
-                    "connectionTimeouts",
-                    timeoutScenarios
-                );
+            const result = await measureDbOperation(
+                simulateConnectionTimeouts,
+                "connectionTimeouts",
+                timeoutScenarios
+            );
 
-                // Property: Timeout handling should be predictable
-                expect(result.totalAttempts).toBe(timeoutScenarios.length);
-                expect(
-                    result.successfulConnections + result.failedConnections
-                ).toBe(result.totalAttempts);
-                expect(result.avgConnectionTime).toBeGreaterThan(0);
-            }
-        );
+            // Property: Timeout handling should be predictable
+            expect(result.totalAttempts).toBe(timeoutScenarios.length);
+            expect(
+                result.successfulConnections + result.failedConnections
+            ).toBe(result.totalAttempts);
+            expect(result.avgConnectionTime).toBeGreaterThan(0);
+        });
     });
 
     describe("Advanced Concurrency Control", () => {
@@ -1302,73 +1294,70 @@ describe("Comprehensive Database Operations Fuzzing", () => {
 
         fcTest.prop([
             fc.array(concurrencyScenarios, { minLength: 2, maxLength: 5 }),
-        ])(
-            "Deadlock detection should prevent infinite waits",
-            async (scenarios) => {
-                const simulateDeadlockScenario = (
-                    configs: typeof scenarios
-                ) => {
-                    const transactions = configs.map((config, index) => ({
-                        id: index + 1,
-                        isolationLevel: config.isolationLevel,
-                        lockType: config.lockType,
-                        startTime: performance.now(),
-                        completed: false,
-                        deadlocked: false,
-                    }));
+        ])("Deadlock detection should prevent infinite waits", async (
+            scenarios
+        ) => {
+            const simulateDeadlockScenario = (configs: typeof scenarios) => {
+                const transactions = configs.map((config, index) => ({
+                    id: index + 1,
+                    isolationLevel: config.isolationLevel,
+                    lockType: config.lockType,
+                    startTime: performance.now(),
+                    completed: false,
+                    deadlocked: false,
+                }));
 
-                    // Simulate potential deadlock detection
-                    const hasDeadlock =
-                        configs.some((c) => c.deadlockDetection) &&
-                        configs.length > 2 &&
-                        Math.random() < 0.3;
+                // Simulate potential deadlock detection
+                const hasDeadlock =
+                    configs.some((c) => c.deadlockDetection) &&
+                    configs.length > 2 &&
+                    Math.random() < 0.3;
 
-                    if (hasDeadlock) {
-                        // Simulate deadlock resolution by aborting one transaction
-                        const victimIndex = Math.floor(
-                            Math.random() * transactions.length
-                        );
-                        transactions[victimIndex]!.deadlocked = true;
-                    }
-
-                    // Complete remaining transactions
-                    for (const t of transactions) {
-                        if (!t.deadlocked) {
-                            t.completed = true;
-                        }
-                    }
-
-                    return {
-                        totalTransactions: transactions.length,
-                        completedTransactions: transactions.filter(
-                            (t) => t.completed
-                        ).length,
-                        deadlockedTransactions: transactions.filter(
-                            (t) => t.deadlocked
-                        ).length,
-                        deadlockDetected: hasDeadlock,
-                        resolutionTime: hasDeadlock ? Math.random() * 1000 : 0,
-                    };
-                };
-
-                const result = await measureDbOperation(
-                    simulateDeadlockScenario,
-                    "deadlockDetection",
-                    scenarios
-                );
-
-                // Property: All transactions should either complete or be resolved
-                expect(result.totalTransactions).toBe(scenarios.length);
-                expect(
-                    result.completedTransactions + result.deadlockedTransactions
-                ).toBe(result.totalTransactions);
-
-                if (result.deadlockDetected) {
-                    expect(result.deadlockedTransactions).toBeGreaterThan(0);
-                    expect(result.resolutionTime).toBeGreaterThan(0);
+                if (hasDeadlock) {
+                    // Simulate deadlock resolution by aborting one transaction
+                    const victimIndex = Math.floor(
+                        Math.random() * transactions.length
+                    );
+                    transactions[victimIndex]!.deadlocked = true;
                 }
+
+                // Complete remaining transactions
+                for (const t of transactions) {
+                    if (!t.deadlocked) {
+                        t.completed = true;
+                    }
+                }
+
+                return {
+                    totalTransactions: transactions.length,
+                    completedTransactions: transactions.filter(
+                        (t) => t.completed
+                    ).length,
+                    deadlockedTransactions: transactions.filter(
+                        (t) => t.deadlocked
+                    ).length,
+                    deadlockDetected: hasDeadlock,
+                    resolutionTime: hasDeadlock ? Math.random() * 1000 : 0,
+                };
+            };
+
+            const result = await measureDbOperation(
+                simulateDeadlockScenario,
+                "deadlockDetection",
+                scenarios
+            );
+
+            // Property: All transactions should either complete or be resolved
+            expect(result.totalTransactions).toBe(scenarios.length);
+            expect(
+                result.completedTransactions + result.deadlockedTransactions
+            ).toBe(result.totalTransactions);
+
+            if (result.deadlockDetected) {
+                expect(result.deadlockedTransactions).toBeGreaterThan(0);
+                expect(result.resolutionTime).toBeGreaterThan(0);
             }
-        );
+        });
     });
 
     describe("Foreign Key and Relationship Integrity", () => {
@@ -1435,77 +1424,74 @@ describe("Comprehensive Database Operations Fuzzing", () => {
 
         fcTest.prop([
             fc.array(relationshipData, { minLength: 2, maxLength: 5 }),
-        ])(
-            "Circular references should be detected and handled",
-            async (relationships) => {
-                const detectCircularReferences = (
-                    rels: typeof relationships
-                ) => {
-                    const graph = new Map<string, Set<string>>();
+        ])("Circular references should be detected and handled", async (
+            relationships
+        ) => {
+            const detectCircularReferences = (rels: typeof relationships) => {
+                const graph = new Map<string, Set<string>>();
 
-                    // Build relationship graph
-                    for (const rel of rels) {
-                        if (!graph.has(rel.parentTable)) {
-                            graph.set(rel.parentTable, new Set());
-                        }
-                        graph.get(rel.parentTable)!.add(rel.childTable);
+                // Build relationship graph
+                for (const rel of rels) {
+                    if (!graph.has(rel.parentTable)) {
+                        graph.set(rel.parentTable, new Set());
+                    }
+                    graph.get(rel.parentTable)!.add(rel.childTable);
+                }
+
+                // Simple cycle detection using visited set
+                const visited = new Set<string>();
+                const recursionStack = new Set<string>();
+                const cycles: string[] = [];
+
+                const hasCycle = (node: string): boolean => {
+                    if (recursionStack.has(node)) {
+                        cycles.push(`Cycle detected involving ${node}`);
+                        return true;
+                    }
+                    if (visited.has(node)) {
+                        return false;
                     }
 
-                    // Simple cycle detection using visited set
-                    const visited = new Set<string>();
-                    const recursionStack = new Set<string>();
-                    const cycles: string[] = [];
+                    visited.add(node);
+                    recursionStack.add(node);
 
-                    const hasCycle = (node: string): boolean => {
-                        if (recursionStack.has(node)) {
-                            cycles.push(`Cycle detected involving ${node}`);
+                    const children = graph.get(node) || new Set();
+                    for (const child of children) {
+                        if (hasCycle(child)) {
                             return true;
                         }
-                        if (visited.has(node)) {
-                            return false;
-                        }
-
-                        visited.add(node);
-                        recursionStack.add(node);
-
-                        const children = graph.get(node) || new Set();
-                        for (const child of children) {
-                            if (hasCycle(child)) {
-                                return true;
-                            }
-                        }
-
-                        recursionStack.delete(node);
-                        return false;
-                    };
-
-                    for (const [node] of graph) {
-                        if (!visited.has(node)) {
-                            hasCycle(node);
-                        }
                     }
 
-                    return {
-                        totalRelationships: rels.length,
-                        circularReferences: cycles,
-                        cycleDetected: cycles.length > 0,
-                        graphValid: cycles.length === 0,
-                    };
+                    recursionStack.delete(node);
+                    return false;
                 };
 
-                const result = await measureDbOperation(
-                    detectCircularReferences,
-                    "circularReferenceDetection",
-                    relationships
-                );
+                for (const [node] of graph) {
+                    if (!visited.has(node)) {
+                        hasCycle(node);
+                    }
+                }
 
-                // Property: Circular reference detection should work
-                expect(result).toHaveProperty("cycleDetected");
-                expect(result).toHaveProperty("circularReferences");
-                expect(Array.isArray(result.circularReferences)).toBeTruthy();
-                expect(result.totalRelationships).toBe(relationships.length);
-            }
-        );
+                return {
+                    totalRelationships: rels.length,
+                    circularReferences: cycles,
+                    cycleDetected: cycles.length > 0,
+                    graphValid: cycles.length === 0,
+                };
+            };
+
+            const result = await measureDbOperation(
+                detectCircularReferences,
+                "circularReferenceDetection",
+                relationships
+            );
+
+            // Property: Circular reference detection should work
+            expect(result).toHaveProperty("cycleDetected");
+            expect(result).toHaveProperty("circularReferences");
+            expect(Array.isArray(result.circularReferences)).toBeTruthy();
+            expect(result.totalRelationships).toBe(relationships.length);
+        });
     });
 
     describe("Migration and Schema Evolution", () => {
@@ -1597,67 +1583,66 @@ describe("Comprehensive Database Operations Fuzzing", () => {
 
         fcTest.prop([
             fc.array(migrationScenarios, { minLength: 2, maxLength: 5 }),
-        ])(
-            "Sequential migrations should maintain version consistency",
-            async (migrations) => {
-                const simulateSequentialMigrations = (
-                    scenarios: typeof migrations
-                ) => {
-                    let currentVersion = 1;
-                    const migrationHistory: any[] = [];
-                    const errors: string[] = [];
+        ])("Sequential migrations should maintain version consistency", async (
+            migrations
+        ) => {
+            const simulateSequentialMigrations = (
+                scenarios: typeof migrations
+            ) => {
+                let currentVersion = 1;
+                const migrationHistory: any[] = [];
+                const errors: string[] = [];
 
-                    // Sort migrations by target version for proper sequencing
-                    const sortedMigrations = Array.from(scenarios).toSorted(
-                        (a, b) => a.toVersion - b.toVersion
-                    );
+                // Sort migrations by target version for proper sequencing
+                const sortedMigrations = Array.from(scenarios).toSorted(
+                    (a, b) => a.toVersion - b.toVersion
+                );
 
-                    for (const migration of sortedMigrations) {
-                        // Check version compatibility
-                        if (migration.fromVersion === currentVersion) {
-                            // Execute migration
-                            const migrationResult = {
-                                fromVersion: migration.fromVersion,
-                                toVersion: migration.toVersion,
-                                steps: migration.migrationSteps.length,
-                                success: true,
-                                timestamp: new Date().toISOString(),
-                            };
+                for (const migration of sortedMigrations) {
+                    // Check version compatibility
+                    if (migration.fromVersion === currentVersion) {
+                        // Execute migration
+                        const migrationResult = {
+                            fromVersion: migration.fromVersion,
+                            toVersion: migration.toVersion,
+                            steps: migration.migrationSteps.length,
+                            success: true,
+                            timestamp: new Date().toISOString(),
+                        };
 
-                            migrationHistory.push(migrationResult);
-                            currentVersion = migration.toVersion;
-                        } else {
-                            errors.push(
-                                `Version mismatch: expected ${currentVersion}, got ${migration.fromVersion}`
-                            );
-                        }
+                        migrationHistory.push(migrationResult);
+                        currentVersion = migration.toVersion;
+                    } else {
+                        errors.push(
+                            `Version mismatch: expected ${currentVersion}, got ${migration.fromVersion}`
+                        );
                     }
+                }
 
-                    return {
-                        finalVersion: currentVersion,
-                        migrationHistory,
-                        errors,
-                        totalMigrations: scenarios.length,
-                        successfulMigrations: migrationHistory.length,
-                        versionConsistency: errors.length === 0,
-                    };
+                return {
+                    finalVersion: currentVersion,
+                    migrationHistory,
+                    errors,
+                    totalMigrations: scenarios.length,
+                    successfulMigrations: migrationHistory.length,
+                    versionConsistency: errors.length === 0,
                 };
+            };
 
-                const result = await measureDbOperation(
-                    simulateSequentialMigrations,
-                    "sequentialMigrations",
-                    migrations
-                );
+            const result = await measureDbOperation(
+                simulateSequentialMigrations,
+                "sequentialMigrations",
+                migrations
+            );
 
-                // Property: Sequential migrations should maintain consistency
-                expect(result).toHaveProperty("versionConsistency");
-                expect(result).toHaveProperty("finalVersion");
-                expect(result.finalVersion).toBeGreaterThanOrEqual(1);
-                expect(result.successfulMigrations).toBeLessThanOrEqual(
-                    result.totalMigrations
-                );
-            }
-        );
+            // Property: Sequential migrations should maintain consistency
+            expect(result).toHaveProperty("versionConsistency");
+            expect(result).toHaveProperty("finalVersion");
+            expect(result.finalVersion).toBeGreaterThanOrEqual(1);
+            expect(result.successfulMigrations).toBeLessThanOrEqual(
+                result.totalMigrations
+            );
+        });
     });
 
     describe("Security and Access Control", () => {
@@ -1754,76 +1739,69 @@ describe("Comprehensive Database Operations Fuzzing", () => {
 
         fcTest.prop([
             fc.array(securityContexts, { minLength: 1, maxLength: 3 }),
-        ])(
-            "Role-based access control should work correctly",
-            async (securityRoles) => {
-                const simulateRoleBasedAccess = (
-                    roles: typeof securityRoles
-                ) => {
-                    const accessResults = roles.map((role) => {
-                        const hasAdminAccess =
-                            role.permissions.includes("ADMIN");
-                        const hasReadAccess = role.permissions.includes("READ");
-                        const hasWriteAccess =
-                            role.permissions.includes("WRITE");
-
-                        return {
-                            role: role.authenticationMethod,
-                            adminOperations: hasAdminAccess
-                                ? [
-                                      "CREATE_USER",
-                                      "DELETE_USER",
-                                      "MODIFY_SCHEMA",
-                                  ]
-                                : [],
-                            dataOperations: hasReadAccess ? ["SELECT"] : [],
-                            writeOperations: hasWriteAccess
-                                ? [
-                                      "INSERT",
-                                      "UPDATE",
-                                      "DELETE",
-                                  ]
-                                : [],
-                            securityViolations:
-                                !hasReadAccess && role.permissions.length === 0
-                                    ? 1
-                                    : 0,
-                        };
-                    });
+        ])("Role-based access control should work correctly", async (
+            securityRoles
+        ) => {
+            const simulateRoleBasedAccess = (roles: typeof securityRoles) => {
+                const accessResults = roles.map((role) => {
+                    const hasAdminAccess = role.permissions.includes("ADMIN");
+                    const hasReadAccess = role.permissions.includes("READ");
+                    const hasWriteAccess = role.permissions.includes("WRITE");
 
                     return {
-                        totalRoles: roles.length,
-                        adminRoles: accessResults.filter(
-                            (r) => r.adminOperations.length > 0
-                        ).length,
-                        readOnlyRoles: accessResults.filter(
-                            (r) =>
-                                r.dataOperations.length > 0 &&
-                                r.writeOperations.length === 0
-                        ).length,
-                        securityViolations: accessResults.reduce(
-                            (sum, r) => sum + r.securityViolations,
-                            0
-                        ),
-                        accessMatrix: accessResults,
+                        role: role.authenticationMethod,
+                        adminOperations: hasAdminAccess
+                            ? [
+                                  "CREATE_USER",
+                                  "DELETE_USER",
+                                  "MODIFY_SCHEMA",
+                              ]
+                            : [],
+                        dataOperations: hasReadAccess ? ["SELECT"] : [],
+                        writeOperations: hasWriteAccess
+                            ? [
+                                  "INSERT",
+                                  "UPDATE",
+                                  "DELETE",
+                              ]
+                            : [],
+                        securityViolations:
+                            !hasReadAccess && role.permissions.length === 0
+                                ? 1
+                                : 0,
                     };
+                });
+
+                return {
+                    totalRoles: roles.length,
+                    adminRoles: accessResults.filter(
+                        (r) => r.adminOperations.length > 0
+                    ).length,
+                    readOnlyRoles: accessResults.filter(
+                        (r) =>
+                            r.dataOperations.length > 0 &&
+                            r.writeOperations.length === 0
+                    ).length,
+                    securityViolations: accessResults.reduce(
+                        (sum, r) => sum + r.securityViolations,
+                        0
+                    ),
+                    accessMatrix: accessResults,
                 };
+            };
 
-                const result = await measureDbOperation(
-                    simulateRoleBasedAccess,
-                    "roleBasedAccess",
-                    securityRoles
-                );
+            const result = await measureDbOperation(
+                simulateRoleBasedAccess,
+                "roleBasedAccess",
+                securityRoles
+            );
 
-                // Property: Role-based access should be properly configured
-                expect(result.totalRoles).toBe(securityRoles.length);
-                expect(result.adminRoles).toBeLessThanOrEqual(
-                    result.totalRoles
-                );
-                expect(result.securityViolations).toBe(0); // No violations expected in valid config
-                expect(Array.isArray(result.accessMatrix)).toBeTruthy();
-            }
-        );
+            // Property: Role-based access should be properly configured
+            expect(result.totalRoles).toBe(securityRoles.length);
+            expect(result.adminRoles).toBeLessThanOrEqual(result.totalRoles);
+            expect(result.securityViolations).toBe(0); // No violations expected in valid config
+            expect(Array.isArray(result.accessMatrix)).toBeTruthy();
+        });
     });
 
     describe("Recovery and Fault Tolerance", () => {
@@ -2290,80 +2268,76 @@ describe("Comprehensive Database Operations Fuzzing", () => {
 
         fcTest.prop([
             fc.array(maintenanceOperations, { minLength: 2, maxLength: 4 }),
-        ])(
-            "Maintenance scheduling should prevent conflicts",
-            async (operations) => {
-                const scheduleMaintenanceOperations = (
-                    ops: typeof operations
-                ) => {
-                    const schedule: any[] = [];
-                    let totalDowntime = 0;
-                    const conflicts: string[] = [];
+        ])("Maintenance scheduling should prevent conflicts", async (
+            operations
+        ) => {
+            const scheduleMaintenanceOperations = (ops: typeof operations) => {
+                const schedule: any[] = [];
+                let totalDowntime = 0;
+                const conflicts: string[] = [];
 
-                    // Sort operations by priority (downtime operations first)
-                    const sortedOps = ops.toSorted((a, b) => {
-                        if (a.requiresDowntime && !b.requiresDowntime)
-                            return -1;
-                        if (!a.requiresDowntime && b.requiresDowntime) return 1;
-                        return a.estimatedDuration - b.estimatedDuration;
-                    });
+                // Sort operations by priority (downtime operations first)
+                const sortedOps = ops.toSorted((a, b) => {
+                    if (a.requiresDowntime && !b.requiresDowntime) return -1;
+                    if (!a.requiresDowntime && b.requiresDowntime) return 1;
+                    return a.estimatedDuration - b.estimatedDuration;
+                });
 
-                    let currentTime = 0;
-                    for (const op of sortedOps) {
-                        const startTime = currentTime;
-                        const endTime = currentTime + op.estimatedDuration;
+                let currentTime = 0;
+                for (const op of sortedOps) {
+                    const startTime = currentTime;
+                    const endTime = currentTime + op.estimatedDuration;
 
-                        // Check for conflicts with maintenance window
-                        if (endTime > op.maintenanceWindow) {
-                            conflicts.push(
-                                `${op.operationType} exceeds maintenance window`
-                            );
-                        }
-
-                        schedule.push({
-                            operation: op.operationType,
-                            startTime,
-                            endTime,
-                            duration: op.estimatedDuration,
-                            requiresDowntime: op.requiresDowntime,
-                        });
-
-                        if (op.requiresDowntime) {
-                            totalDowntime += op.estimatedDuration;
-                        }
-
-                        currentTime = endTime;
+                    // Check for conflicts with maintenance window
+                    if (endTime > op.maintenanceWindow) {
+                        conflicts.push(
+                            `${op.operationType} exceeds maintenance window`
+                        );
                     }
 
-                    return {
-                        totalOperations: ops.length,
-                        scheduledOperations: schedule.length,
-                        totalDowntime,
-                        conflicts: conflicts.length,
-                        conflictDetails: conflicts,
-                        schedule,
-                    };
+                    schedule.push({
+                        operation: op.operationType,
+                        startTime,
+                        endTime,
+                        duration: op.estimatedDuration,
+                        requiresDowntime: op.requiresDowntime,
+                    });
+
+                    if (op.requiresDowntime) {
+                        totalDowntime += op.estimatedDuration;
+                    }
+
+                    currentTime = endTime;
+                }
+
+                return {
+                    totalOperations: ops.length,
+                    scheduledOperations: schedule.length,
+                    totalDowntime,
+                    conflicts: conflicts.length,
+                    conflictDetails: conflicts,
+                    schedule,
                 };
+            };
 
-                const result = await measureDbOperation(
-                    scheduleMaintenanceOperations,
-                    "maintenanceScheduling",
-                    operations
-                );
+            const result = await measureDbOperation(
+                scheduleMaintenanceOperations,
+                "maintenanceScheduling",
+                operations
+            );
 
-                // Property: All operations should be schedulable
-                expect(result.totalOperations).toBe(operations.length);
-                expect(result.scheduledOperations).toBe(operations.length);
-                expect(Array.isArray(result.schedule)).toBeTruthy();
+            // Property: All operations should be schedulable
+            expect(result.totalOperations).toBe(operations.length);
+            expect(result.scheduledOperations).toBe(operations.length);
+            expect(Array.isArray(result.schedule)).toBeTruthy();
 
-                // Property: Downtime should be minimized
-                expect(result.totalDowntime).toBeGreaterThanOrEqual(0);
+            // Property: Downtime should be minimized
+            expect(result.totalDowntime).toBeGreaterThanOrEqual(0);
 
-                // Property: Conflicts should be identified
-                expect(result.conflicts).toBeGreaterThanOrEqual(0);
-                expect(Array.isArray(result.conflictDetails)).toBeTruthy();
-            }
-        );
+            // Property: Conflicts should be identified
+            expect(result.conflicts).toBeGreaterThanOrEqual(0);
+            expect(Array.isArray(result.conflictDetails)).toBeTruthy();
+        });
     });
 
     describe("Advanced Index Management and Performance", () => {
@@ -2433,111 +2407,104 @@ describe("Comprehensive Database Operations Fuzzing", () => {
 
         fcTest.prop([
             fc.array(indexOperationScenarios, { minLength: 2, maxLength: 5 }),
-        ])(
-            "Concurrent index operations should not interfere",
-            async (operations) => {
-                const executeConcurrentIndexOperations = (
-                    ops: typeof operations
-                ) => {
-                    const conflicts: string[] = [];
-                    const completedOperations: any[] = [];
-                    let totalLockTime = 0;
+        ])("Concurrent index operations should not interfere", async (
+            operations
+        ) => {
+            const executeConcurrentIndexOperations = (
+                ops: typeof operations
+            ) => {
+                const conflicts: string[] = [];
+                const completedOperations: any[] = [];
+                let totalLockTime = 0;
 
-                    // Check for conflicting operations on same table
-                    const tableOperations = new Map<string, string[]>();
-                    for (const op of ops) {
-                        if (!tableOperations.has(op.targetTable)) {
-                            tableOperations.set(op.targetTable, []);
-                        }
-                        tableOperations
-                            .get(op.targetTable)!
-                            .push(op.operationType);
+                // Check for conflicting operations on same table
+                const tableOperations = new Map<string, string[]>();
+                for (const op of ops) {
+                    if (!tableOperations.has(op.targetTable)) {
+                        tableOperations.set(op.targetTable, []);
                     }
+                    tableOperations.get(op.targetTable)!.push(op.operationType);
+                }
 
-                    // Detect conflicts
-                    for (const [table, opTypes] of tableOperations.entries()) {
-                        const hasCreate = opTypes.some((t) =>
-                            t.includes("CREATE")
+                // Detect conflicts
+                for (const [table, opTypes] of tableOperations.entries()) {
+                    const hasCreate = opTypes.some((t) => t.includes("CREATE"));
+                    const hasDrop = opTypes.some((t) => t.includes("DROP"));
+                    const hasRebuild = opTypes.some((t) =>
+                        t.includes("REBUILD"));
+
+                    if (
+                        (hasCreate && hasDrop) ||
+                        (hasRebuild && (hasCreate || hasDrop))
+                    ) {
+                        conflicts.push(
+                            `Conflicting operations on table ${table}`
                         );
-                        const hasDrop = opTypes.some((t) => t.includes("DROP"));
-                        const hasRebuild = opTypes.some((t) =>
-                            t.includes("REBUILD")
-                        );
+                    }
+                }
 
-                        if (
-                            (hasCreate && hasDrop) ||
-                            (hasRebuild && (hasCreate || hasDrop))
-                        ) {
-                            conflicts.push(
-                                `Conflicting operations on table ${table}`
-                            );
-                        }
+                // Simulate execution
+                for (const [index, op] of ops.entries()) {
+                    const executionTime = Math.random() * 1000 + 100; // 100-1100ms
+                    const lockRequired = [
+                        "CREATE_INDEX",
+                        "DROP_INDEX",
+                        "REBUILD_INDEX",
+                    ].includes(op.operationType);
+
+                    if (lockRequired) {
+                        totalLockTime += executionTime;
                     }
 
-                    // Simulate execution
-                    for (const [index, op] of ops.entries()) {
-                        const executionTime = Math.random() * 1000 + 100; // 100-1100ms
-                        const lockRequired = [
-                            "CREATE_INDEX",
-                            "DROP_INDEX",
-                            "REBUILD_INDEX",
-                        ].includes(op.operationType);
+                    completedOperations.push({
+                        id: index,
+                        operation: op.operationType,
+                        table: op.targetTable,
+                        executionTime,
+                        lockRequired,
+                        success: conflicts.length === 0 || Math.random() > 0.3,
+                    });
+                }
 
-                        if (lockRequired) {
-                            totalLockTime += executionTime;
-                        }
-
-                        completedOperations.push({
-                            id: index,
-                            operation: op.operationType,
-                            table: op.targetTable,
-                            executionTime,
-                            lockRequired,
-                            success:
-                                conflicts.length === 0 || Math.random() > 0.3,
-                        });
-                    }
-
-                    return {
-                        totalOperations: ops.length,
-                        completedOperations: completedOperations.length,
-                        conflicts: conflicts.length,
-                        conflictDetails: conflicts,
-                        totalLockTime,
-                        averageExecutionTime:
-                            completedOperations.reduce(
-                                (sum, op) => sum + op.executionTime,
-                                0
-                            ) / completedOperations.length,
-                        successRate:
-                            completedOperations.filter((op) => op.success)
-                                .length / completedOperations.length,
-                    };
+                return {
+                    totalOperations: ops.length,
+                    completedOperations: completedOperations.length,
+                    conflicts: conflicts.length,
+                    conflictDetails: conflicts,
+                    totalLockTime,
+                    averageExecutionTime:
+                        completedOperations.reduce(
+                            (sum, op) => sum + op.executionTime,
+                            0
+                        ) / completedOperations.length,
+                    successRate:
+                        completedOperations.filter((op) => op.success).length /
+                        completedOperations.length,
                 };
+            };
 
-                const result = await measureDbOperation(
-                    executeConcurrentIndexOperations,
-                    "concurrentIndexOperations",
-                    operations
-                );
+            const result = await measureDbOperation(
+                executeConcurrentIndexOperations,
+                "concurrentIndexOperations",
+                operations
+            );
 
-                // Property: All operations should be processed
-                expect(result.totalOperations).toBe(operations.length);
-                expect(result.completedOperations).toBe(operations.length);
+            // Property: All operations should be processed
+            expect(result.totalOperations).toBe(operations.length);
+            expect(result.completedOperations).toBe(operations.length);
 
-                // Property: Success rate should be reasonable
-                expect(result.successRate).toBeGreaterThanOrEqual(0);
-                expect(result.successRate).toBeLessThanOrEqual(1);
+            // Property: Success rate should be reasonable
+            expect(result.successRate).toBeGreaterThanOrEqual(0);
+            expect(result.successRate).toBeLessThanOrEqual(1);
 
-                // Property: Performance should be measurable
-                expect(result.averageExecutionTime).toBeGreaterThan(0);
-                expect(result.totalLockTime).toBeGreaterThanOrEqual(0);
+            // Property: Performance should be measurable
+            expect(result.averageExecutionTime).toBeGreaterThan(0);
+            expect(result.totalLockTime).toBeGreaterThanOrEqual(0);
 
-                // Property: Conflicts should be properly detected
-                expect(result.conflicts).toBeGreaterThanOrEqual(0);
-                expect(Array.isArray(result.conflictDetails)).toBeTruthy();
-            }
-        );
+            // Property: Conflicts should be properly detected
+            expect(result.conflicts).toBeGreaterThanOrEqual(0);
+            expect(Array.isArray(result.conflictDetails)).toBeTruthy();
+        });
 
         fcTest.prop([
             fc.record({

@@ -56,8 +56,7 @@ class MockHttpMonitor {
 
         // Simulate HTTP request
         await new Promise((resolve) =>
-            setTimeout(resolve, Math.random() * config.timeout)
-        );
+            setTimeout(resolve, Math.random() * config.timeout));
 
         const endTime = Date.now();
         const responseTime = endTime - startTime;
@@ -365,8 +364,7 @@ class MockMonitorService {
                 lastError = error as Error;
                 if (attempt < monitor.retries) {
                     await new Promise((resolve) =>
-                        setTimeout(resolve, 1000 * attempt)
-                    );
+                        setTimeout(resolve, 1000 * attempt));
                 }
             }
         }

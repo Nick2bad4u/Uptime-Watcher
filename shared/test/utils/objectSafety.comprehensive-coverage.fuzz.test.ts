@@ -41,27 +41,29 @@ describe("objectSafety comprehensive fuzzing tests", () => {
             fc.anything(),
             fc.string(),
             fc.anything(),
-        ])(
-            "returns fallback for non-object inputs",
-            (nonObject, key, fallback) => {
-                fc.pre(typeof nonObject !== "object" || nonObject === null);
-                const result = safeObjectAccess(nonObject, key, fallback);
-                expect(result).toBe(fallback);
-            }
-        );
+        ])("returns fallback for non-object inputs", (
+            nonObject,
+            key,
+            fallback
+        ) => {
+            fc.pre(typeof nonObject !== "object" || nonObject === null);
+            const result = safeObjectAccess(nonObject, key, fallback);
+            expect(result).toBe(fallback);
+        });
 
         test.prop([
             fc.record({}),
             fc.string(),
             fc.anything(),
-        ])(
-            "returns fallback for non-existent keys",
-            (obj, nonExistentKey, fallback) => {
-                fc.pre(!Object.hasOwn(obj, nonExistentKey));
-                const result = safeObjectAccess(obj, nonExistentKey, fallback);
-                expect(result).toBe(fallback);
-            }
-        );
+        ])("returns fallback for non-existent keys", (
+            obj,
+            nonExistentKey,
+            fallback
+        ) => {
+            fc.pre(!Object.hasOwn(obj, nonExistentKey));
+            const result = safeObjectAccess(obj, nonExistentKey, fallback);
+            expect(result).toBe(fallback);
+        });
 
         test.prop([fc.record({ test: fc.string() }), fc.string()])(
             "returns actual value when key exists and types match",
@@ -195,26 +197,25 @@ describe("objectSafety comprehensive fuzzing tests", () => {
     });
 
     describe(safeObjectIteration, () => {
-        test.prop([fc.anything()])(
-            "handles non-object inputs gracefully",
-            (nonObject) => {
-                fc.pre(typeof nonObject !== "object" || nonObject === null);
+        test.prop([fc.anything()])("handles non-object inputs gracefully", (
+            nonObject
+        ) => {
+            fc.pre(typeof nonObject !== "object" || nonObject === null);
 
-                const callback = vi.fn();
-                const consoleSpy = vi
-                    .spyOn(console, "warn")
-                    .mockImplementation(() => {});
+            const callback = vi.fn();
+            const consoleSpy = vi
+                .spyOn(console, "warn")
+                .mockImplementation(() => {});
 
-                safeObjectIteration(nonObject, callback);
+            safeObjectIteration(nonObject, callback);
 
-                expect(callback).not.toHaveBeenCalled();
-                expect(consoleSpy).toHaveBeenCalledWith(
-                    `Safe object iteration: Expected object, got ${typeof nonObject}`
-                );
+            expect(callback).not.toHaveBeenCalled();
+            expect(consoleSpy).toHaveBeenCalledWith(
+                `Safe object iteration: Expected object, got ${typeof nonObject}`
+            );
 
-                consoleSpy.mockRestore();
-            }
-        );
+            consoleSpy.mockRestore();
+        });
 
         test.prop([fc.record({})])(
             "iterates over object properties correctly",
@@ -323,21 +324,19 @@ describe("objectSafety comprehensive fuzzing tests", () => {
         test.prop([
             fc.record({ a: fc.string(), b: fc.integer() }),
             fc.array(fc.string()),
-        ])(
-            "handles omitting non-existent keys gracefully",
-            (obj, nonExistentKeys) => {
-                fc.pre(
-                    nonExistentKeys.every((key) => !Object.hasOwn(obj, key))
-                );
+        ])("handles omitting non-existent keys gracefully", (
+            obj,
+            nonExistentKeys
+        ) => {
+            fc.pre(nonExistentKeys.every((key) => !Object.hasOwn(obj, key)));
 
-                // Use type assertion to handle the generic constraint
-                const result = safeObjectOmit(
-                    obj as Record<string, unknown>,
-                    nonExistentKeys as readonly string[]
-                );
-                expect(result).toEqual(obj);
-            }
-        );
+            // Use type assertion to handle the generic constraint
+            const result = safeObjectOmit(
+                obj as Record<string, unknown>,
+                nonExistentKeys as readonly string[]
+            );
+            expect(result).toEqual(obj);
+        });
 
         test("handles symbol properties correctly", () => {
             const symbolKey = Symbol("symbol");
@@ -420,21 +419,19 @@ describe("objectSafety comprehensive fuzzing tests", () => {
         test.prop([
             fc.record({ a: fc.string(), b: fc.integer() }),
             fc.array(fc.string()),
-        ])(
-            "handles picking non-existent keys gracefully",
-            (obj, nonExistentKeys) => {
-                fc.pre(
-                    nonExistentKeys.every((key) => !Object.hasOwn(obj, key))
-                );
+        ])("handles picking non-existent keys gracefully", (
+            obj,
+            nonExistentKeys
+        ) => {
+            fc.pre(nonExistentKeys.every((key) => !Object.hasOwn(obj, key)));
 
-                // Use type assertion to handle the generic constraint
-                const result = safeObjectPick(
-                    obj as Record<string, unknown>,
-                    nonExistentKeys as readonly string[]
-                );
-                expect(result).toEqual({});
-            }
-        );
+            // Use type assertion to handle the generic constraint
+            const result = safeObjectPick(
+                obj as Record<string, unknown>,
+                nonExistentKeys as readonly string[]
+            );
+            expect(result).toEqual({});
+        });
 
         test("handles symbol keys correctly", () => {
             const symbolKey = Symbol("symbol");
@@ -507,22 +504,21 @@ describe("objectSafety comprehensive fuzzing tests", () => {
     });
 
     describe(typedObjectEntries, () => {
-        test.prop([fc.record({})])(
-            "returns entries in correct format",
-            (obj) => {
-                const result = typedObjectEntries(obj);
-                const expected = Object.entries(obj);
+        test.prop([fc.record({})])("returns entries in correct format", (
+            obj
+        ) => {
+            const result = typedObjectEntries(obj);
+            const expected = Object.entries(obj);
 
-                expect(result).toEqual(expected);
-                expect(Array.isArray(result)).toBeTruthy();
+            expect(result).toEqual(expected);
+            expect(Array.isArray(result)).toBeTruthy();
 
-                for (const [key, value] of result) {
-                    expect(typeof key).toBe("string");
-                    expect(obj).toHaveProperty(key);
-                    expect(obj[key]).toBe(value);
-                }
+            for (const [key, value] of result) {
+                expect(typeof key).toBe("string");
+                expect(obj).toHaveProperty(key);
+                expect(obj[key]).toBe(value);
             }
-        );
+        });
 
         test.prop([
             fc.record({ a: fc.string(), b: fc.integer(), c: fc.boolean() }),
@@ -638,21 +634,20 @@ describe("objectSafety comprehensive fuzzing tests", () => {
     });
 
     describe(typedObjectValues, () => {
-        test.prop([fc.record({})])(
-            "returns values in correct format",
-            (obj) => {
-                const result = typedObjectValues(obj);
-                const expected = Object.values(obj);
+        test.prop([fc.record({})])("returns values in correct format", (
+            obj
+        ) => {
+            const result = typedObjectValues(obj);
+            const expected = Object.values(obj);
 
-                expect(result).toEqual(expected);
-                expect(Array.isArray(result)).toBeTruthy();
+            expect(result).toEqual(expected);
+            expect(Array.isArray(result)).toBeTruthy();
 
-                const objectValues = Object.values(obj);
-                for (const [i, element] of result.entries()) {
-                    expect(element).toBe(objectValues[i]);
-                }
+            const objectValues = Object.values(obj);
+            for (const [i, element] of result.entries()) {
+                expect(element).toBe(objectValues[i]);
             }
-        );
+        });
 
         test.prop([
             fc.record({ a: fc.string(), b: fc.integer(), c: fc.boolean() }),
@@ -751,15 +746,14 @@ describe("objectSafety comprehensive fuzzing tests", () => {
             }
         );
 
-        test.prop([fc.record({})])(
-            "keys and values have matching lengths",
-            (obj) => {
-                const keys = typedObjectKeys(obj);
-                const values = typedObjectValues(obj);
+        test.prop([fc.record({})])("keys and values have matching lengths", (
+            obj
+        ) => {
+            const keys = typedObjectKeys(obj);
+            const values = typedObjectValues(obj);
 
-                expect(keys).toHaveLength(values.length);
-            }
-        );
+            expect(keys).toHaveLength(values.length);
+        });
 
         test.prop([fc.record({ a: fc.anything(), b: fc.anything() })])(
             "safeObjectAccess works with all keys from typedObjectKeys",

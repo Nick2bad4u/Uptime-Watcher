@@ -70,9 +70,8 @@ describe("SettingsRepository Coverage Tests", () => {
         await annotate("Category: Service", "category");
         await annotate("Type: Error Handling", "type");
 
-        const { SettingsRepository } = await import(
-            "../../../services/database/SettingsRepository"
-        );
+        const { SettingsRepository } =
+            await import("../../../services/database/SettingsRepository");
         expect(SettingsRepository).toBeDefined();
     });
     it("should create repository instance with dependencies", async ({
@@ -84,9 +83,8 @@ describe("SettingsRepository Coverage Tests", () => {
         await annotate("Category: Service", "category");
         await annotate("Type: Constructor", "type");
 
-        const { SettingsRepository } = await import(
-            "../../../services/database/SettingsRepository"
-        );
+        const { SettingsRepository } =
+            await import("../../../services/database/SettingsRepository");
 
         const repository = new SettingsRepository({
             databaseService: mockDatabaseService,
@@ -100,9 +98,8 @@ describe("SettingsRepository Coverage Tests", () => {
         await annotate("Category: Service", "category");
         await annotate("Type: Data Retrieval", "type");
 
-        const { SettingsRepository } = await import(
-            "../../../services/database/SettingsRepository"
-        );
+        const { SettingsRepository } =
+            await import("../../../services/database/SettingsRepository");
 
         try {
             const repository = new SettingsRepository({
@@ -121,9 +118,8 @@ describe("SettingsRepository Coverage Tests", () => {
         await annotate("Category: Service", "category");
         await annotate("Type: Business Logic", "type");
 
-        const { SettingsRepository } = await import(
-            "../../../services/database/SettingsRepository"
-        );
+        const { SettingsRepository } =
+            await import("../../../services/database/SettingsRepository");
 
         try {
             const repository = new SettingsRepository({
@@ -141,9 +137,8 @@ describe("SettingsRepository Coverage Tests", () => {
         await annotate("Category: Service", "category");
         await annotate("Type: Data Deletion", "type");
 
-        const { SettingsRepository } = await import(
-            "../../../services/database/SettingsRepository"
-        );
+        const { SettingsRepository } =
+            await import("../../../services/database/SettingsRepository");
 
         try {
             const repository = new SettingsRepository({
@@ -161,9 +156,8 @@ describe("SettingsRepository Coverage Tests", () => {
         await annotate("Category: Service", "category");
         await annotate("Type: Data Retrieval", "type");
 
-        const { SettingsRepository } = await import(
-            "../../../services/database/SettingsRepository"
-        );
+        const { SettingsRepository } =
+            await import("../../../services/database/SettingsRepository");
 
         try {
             const repository = new SettingsRepository({
@@ -181,9 +175,8 @@ describe("SettingsRepository Coverage Tests", () => {
         await annotate("Category: Service", "category");
         await annotate("Type: Business Logic", "type");
 
-        const { SettingsRepository } = await import(
-            "../../../services/database/SettingsRepository"
-        );
+        const { SettingsRepository } =
+            await import("../../../services/database/SettingsRepository");
 
         try {
             const repository = new SettingsRepository({
@@ -204,9 +197,8 @@ describe("SettingsRepository Coverage Tests", () => {
         await annotate("Category: Service", "category");
         await annotate("Type: Data Deletion", "type");
 
-        const { SettingsRepository } = await import(
-            "../../../services/database/SettingsRepository"
-        );
+        const { SettingsRepository } =
+            await import("../../../services/database/SettingsRepository");
 
         try {
             const repository = new SettingsRepository({
@@ -227,9 +219,8 @@ describe("SettingsRepository Coverage Tests", () => {
         await annotate("Category: Service", "category");
         await annotate("Type: Error Handling", "type");
 
-        const { SettingsRepository } = await import(
-            "../../../services/database/SettingsRepository"
-        );
+        const { SettingsRepository } =
+            await import("../../../services/database/SettingsRepository");
 
         try {
             const repository = new SettingsRepository({
@@ -252,9 +243,8 @@ describe("SettingsRepository Coverage Tests", () => {
         await annotate("Category: Service", "category");
         await annotate("Type: Business Logic", "type");
 
-        const { SettingsRepository } = await import(
-            "../../../services/database/SettingsRepository"
-        );
+        const { SettingsRepository } =
+            await import("../../../services/database/SettingsRepository");
 
         try {
             const repository = new SettingsRepository({
@@ -276,9 +266,8 @@ describe("SettingsRepository Coverage Tests", () => {
         await annotate("Category: Service", "category");
         await annotate("Type: Business Logic", "type");
 
-        const { SettingsRepository } = await import(
-            "../../../services/database/SettingsRepository"
-        );
+        const { SettingsRepository } =
+            await import("../../../services/database/SettingsRepository");
 
         try {
             const repository = new SettingsRepository({
@@ -312,9 +301,8 @@ describe("SettingsRepository Coverage Tests", () => {
                         })
                     ),
                     async (settingKey, settingValue) => {
-                        const { SettingsRepository } = await import(
-                            "../../../services/database/SettingsRepository"
-                        );
+                        const { SettingsRepository } =
+                            await import("../../../services/database/SettingsRepository");
 
                         try {
                             const repository = new SettingsRepository({
@@ -370,9 +358,8 @@ describe("SettingsRepository Coverage Tests", () => {
                         { requiredKeys: [] }
                     ),
                     async (settingsObject) => {
-                        const { SettingsRepository } = await import(
-                            "../../../services/database/SettingsRepository"
-                        );
+                        const { SettingsRepository } =
+                            await import("../../../services/database/SettingsRepository");
 
                         try {
                             const repository = new SettingsRepository({
@@ -455,9 +442,8 @@ describe("SettingsRepository Coverage Tests", () => {
                         { minLength: 1, maxLength: 15 }
                     ),
                     async (settingKeys) => {
-                        const { SettingsRepository } = await import(
-                            "../../../services/database/SettingsRepository"
-                        );
+                        const { SettingsRepository } =
+                            await import("../../../services/database/SettingsRepository");
 
                         try {
                             const repository = new SettingsRepository({
@@ -516,9 +502,8 @@ describe("SettingsRepository Coverage Tests", () => {
                         })
                     ),
                     async (settingKey, edgeValue) => {
-                        const { SettingsRepository } = await import(
-                            "../../../services/database/SettingsRepository"
-                        );
+                        const { SettingsRepository } =
+                            await import("../../../services/database/SettingsRepository");
 
                         try {
                             const repository = new SettingsRepository({
@@ -578,9 +563,8 @@ describe("SettingsRepository Coverage Tests", () => {
                     fc.string({ minLength: 1, maxLength: 50 }),
                     fc.string({ minLength: 0, maxLength: 100 }),
                     async (errorType, settingKey, settingValue) => {
-                        const { SettingsRepository } = await import(
-                            "../../../services/database/SettingsRepository"
-                        );
+                        const { SettingsRepository } =
+                            await import("../../../services/database/SettingsRepository");
 
                         try {
                             const repository = new SettingsRepository({
@@ -617,9 +601,8 @@ describe("SettingsRepository Coverage Tests", () => {
         it("should validate settings repository structure and methods", async () => {
             await fc.assert(
                 fc.asyncProperty(fc.boolean(), async (mockSuccessfully) => {
-                    const { SettingsRepository } = await import(
-                        "../../../services/database/SettingsRepository"
-                    );
+                    const { SettingsRepository } =
+                        await import("../../../services/database/SettingsRepository");
 
                     try {
                         const repository = new SettingsRepository({

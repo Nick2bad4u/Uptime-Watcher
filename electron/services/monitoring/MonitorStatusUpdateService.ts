@@ -166,8 +166,7 @@ export class MonitorStatusUpdateService {
             // Find the site containing this monitor
             const sites = this.sites.getAll();
             const site = sites.find((s) =>
-                s.monitors.some((m) => m.id === monitorId)
-            );
+                s.monitors.some((m) => m.id === monitorId));
 
             if (!site) {
                 logger.warn(
@@ -193,8 +192,7 @@ export class MonitorStatusUpdateService {
             const updatedSite = {
                 ...site,
                 monitors: site.monitors.map((m) =>
-                    m.id === monitorId ? freshMonitor : m
-                ),
+                    m.id === monitorId ? freshMonitor : m),
             };
 
             this.sites.set(site.identifier, updatedSite);

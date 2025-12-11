@@ -198,7 +198,11 @@ vi.mock("../../../stores/sites/useSitesStore", () => ({
 
 vi.mock("../../../theme/useTheme", () => ({
     useTheme: () => ({
-        availableThemes: ["light", "dark", "system"],
+        availableThemes: [
+            "light",
+            "dark",
+            "system",
+        ],
         isDark: storeState.settings.theme === "dark",
         setTheme: mocks.setTheme,
         theme: {

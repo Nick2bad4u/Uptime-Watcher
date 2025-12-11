@@ -221,8 +221,7 @@ class MockSiteRepository {
 
             if (filter.tags && filter.tags.length > 0) {
                 const hasTag = filter.tags.some((tag) =>
-                    site.tags.includes(tag)
-                );
+                    site.tags.includes(tag));
                 if (!hasTag) return false;
             }
 
@@ -232,8 +231,7 @@ class MockSiteRepository {
                     site.name.toLowerCase().includes(searchLower) ||
                     site.url.toLowerCase().includes(searchLower) ||
                     site.tags.some((tag) =>
-                        tag.toLowerCase().includes(searchLower)
-                    );
+                        tag.toLowerCase().includes(searchLower));
                 if (!matchesSearch) return false;
             }
 
@@ -590,13 +588,26 @@ describe("Site Management Service Performance", () => {
                 name: "Complex Site",
                 url: "https://complex-site.example.com/path?param=value",
                 checkInterval: 120_000,
-                tags: ["production", "critical", "api", "monitoring"],
+                tags: [
+                    "production",
+                    "critical",
+                    "api",
+                    "monitoring",
+                ],
                 metadata: {
                     owner: "team-platform",
                     environment: "production",
                     region: "us-east-1",
-                    alertChannels: ["slack", "email", "pagerduty"],
-                    dependencies: ["database", "cache", "cdn"],
+                    alertChannels: [
+                        "slack",
+                        "email",
+                        "pagerduty",
+                    ],
+                    dependencies: [
+                        "database",
+                        "cache",
+                        "cdn",
+                    ],
                     maintenanceWindow: "02:00-04:00 UTC",
                 },
             };
@@ -728,15 +739,15 @@ describe("Site Management Service Performance", () => {
         () => {
             service = new MockSiteManagementService();
             const sites = createBulkSites(30);
-            Promise.all(sites.map((site) => service.createSite(site))).then(
-                (createdSites) => {
-                    const updates = createdSites.slice(0, 10).map((site) => ({
-                        id: site.id,
-                        data: { isActive: false, tags: ["bulk-updated"] },
-                    }));
-                    service.bulkUpdateSites(updates);
-                }
-            );
+            Promise.all(sites.map((site) => service.createSite(site))).then((
+                createdSites
+            ) => {
+                const updates = createdSites.slice(0, 10).map((site) => ({
+                    id: site.id,
+                    data: { isActive: false, tags: ["bulk-updated"] },
+                }));
+                service.bulkUpdateSites(updates);
+            });
         },
         { warmupIterations: 5, iterations: 200 }
     );
@@ -746,19 +757,17 @@ describe("Site Management Service Performance", () => {
         () => {
             service = new MockSiteManagementService();
             const sites = createBulkSites(40);
-            Promise.all(sites.map((site) => service.createSite(site))).then(
-                (createdSites) => {
-                    // Update some sites to online status
-                    const statusUpdates = createdSites
-                        .slice(0, 20)
-                        .map((site) =>
-                            service.updateSiteStatus(site.id, "online")
-                        );
-                    Promise.all(statusUpdates).then(() => {
-                        service.getSitesByStatus("online");
-                    });
-                }
-            );
+            Promise.all(sites.map((site) => service.createSite(site))).then((
+                createdSites
+            ) => {
+                // Update some sites to online status
+                const statusUpdates = createdSites
+                    .slice(0, 20)
+                    .map((site) => service.updateSiteStatus(site.id, "online"));
+                Promise.all(statusUpdates).then(() => {
+                    service.getSitesByStatus("online");
+                });
+            });
         },
         { warmupIterations: 5, iterations: 400 }
     );
@@ -799,7 +808,11 @@ describe("Site Management Service Performance", () => {
                     service.getSites(
                         {
                             isActive: true,
-                            tags: ["tag1", "tag2", "category1"],
+                            tags: [
+                                "tag1",
+                                "tag2",
+                                "category1",
+                            ],
                             searchTerm: "site",
                             createdAfter: new Date(Date.now() - 86_400_000), // 24 hours ago
                         },

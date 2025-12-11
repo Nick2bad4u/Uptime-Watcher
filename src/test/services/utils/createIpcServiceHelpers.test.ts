@@ -17,8 +17,7 @@ interface SetupOverrides {
 
 const createEnsureErrorMock = () =>
     vi.fn((error: unknown) =>
-        error instanceof Error ? error : new Error(String(error))
-    );
+        error instanceof Error ? error : new Error(String(error)));
 
 const setupModule = async (overrides: SetupOverrides = {}) => {
     vi.resetModules();
@@ -59,9 +58,8 @@ const setupModule = async (overrides: SetupOverrides = {}) => {
         waitForElectronBridge,
     }));
 
-    const module = await import(
-        "../../../services/utils/createIpcServiceHelpers"
-    );
+    const module =
+        await import("../../../services/utils/createIpcServiceHelpers");
 
     return {
         TestElectronBridgeNotReadyError,
@@ -165,11 +163,12 @@ describe("createIpcServiceHelpers", () => {
         waitForElectronBridge.mockResolvedValueOnce(undefined);
         const helpers = module.createIpcServiceHelpers("HistoryService");
         const handlerError = new Error("handler failed");
-        const handler = vi.fn(
-            async (_api: typeof window.electronAPI, _siteId: string) => {
-                throw handlerError;
-            }
-        );
+        const handler = vi.fn(async (
+            _api: typeof window.electronAPI,
+            _siteId: string
+        ) => {
+            throw handlerError;
+        });
 
         const wrapped = helpers.wrap("fetchHistory", handler);
 

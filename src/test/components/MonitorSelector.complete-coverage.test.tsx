@@ -14,18 +14,19 @@ import { createValidMonitor } from "@shared/test/testHelpers";
 
 // Mock ThemedSelect
 vi.mock("../../theme/components/ThemedSelect", () => ({
-    ThemedSelect: forwardRef<HTMLSelectElement, any>(
-        ({ children, className, fluid, tone, ...rest }, ref) => (
-            <select
-                {...rest}
-                className={className}
-                data-testid="themed-select"
-                ref={ref}
-            >
-                {children}
-            </select>
-        )
-    ),
+    ThemedSelect: forwardRef<HTMLSelectElement, any>((
+        { children, className, fluid, tone, ...rest },
+        ref
+    ) => (
+        <select
+            {...rest}
+            className={className}
+            data-testid="themed-select"
+            ref={ref}
+        >
+            {children}
+        </select>
+    )),
 }));
 
 const createMockMonitor = (

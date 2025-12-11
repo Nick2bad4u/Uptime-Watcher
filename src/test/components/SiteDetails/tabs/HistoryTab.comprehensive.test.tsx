@@ -106,8 +106,7 @@ const mockUseTheme = vi.mocked(useTheme);
 
 describe(HistoryTab, () => {
     const mockFormatFullTimestamp = vi.fn((timestamp: number) =>
-        new Date(timestamp).toISOString()
-    );
+        new Date(timestamp).toISOString());
     const mockFormatResponseTime = vi.fn((time: number) => `${time}ms`);
     const createMockMonitor = (historyLength: number = 5): Monitor => ({
         id: "test-monitor",
@@ -273,8 +272,7 @@ describe(HistoryTab, () => {
                 "Down",
             ];
             const filterButtons = filterLabels.map((label) =>
-                screen.getByRole("button", { name: label })
-            );
+                screen.getByRole("button", { name: label }));
 
             expect(filterButtons).toHaveLength(filterLabels.length);
         });
@@ -738,8 +736,7 @@ describe(HistoryTab, () => {
             expect(() =>
                 render(
                     <HistoryTab {...defaultProps} selectedMonitor={monitor} />
-                )
-            ).not.toThrowError();
+                )).not.toThrowError();
         });
 
         it("should handle missing settings gracefully", ({
@@ -768,8 +765,7 @@ describe(HistoryTab, () => {
             expect(() =>
                 render(
                     <HistoryTab {...defaultProps} selectedMonitor={monitor} />
-                )
-            ).not.toThrowError();
+                )).not.toThrowError();
         });
 
         it("should handle history records with missing fields", ({
@@ -796,8 +792,7 @@ describe(HistoryTab, () => {
             expect(() =>
                 render(
                     <HistoryTab {...defaultProps} selectedMonitor={monitor} />
-                )
-            ).not.toThrowError();
+                )).not.toThrowError();
         });
     });
 

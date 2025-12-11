@@ -79,9 +79,8 @@ describe("Targeted Coverage for Missing Branches", () => {
 
             // Test that imports handle errors gracefully
             try {
-                const correlationModule = await import(
-                    "../utils/correlation.js"
-                );
+                const correlationModule =
+                    await import("../utils/correlation.js");
                 expect(correlationModule.generateCorrelationId).toBeDefined();
 
                 // Test with various edge cases
@@ -168,9 +167,8 @@ describe("Targeted Coverage for Missing Branches", () => {
             await annotate("Type: Business Logic", "type");
 
             try {
-                const { ServiceContainer } = await import(
-                    "../services/ServiceContainer.js"
-                );
+                const { ServiceContainer } =
+                    await import("../services/ServiceContainer.js");
 
                 // Test edge cases in service container
                 const container = ServiceContainer.getInstance();

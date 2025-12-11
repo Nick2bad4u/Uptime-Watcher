@@ -71,35 +71,38 @@ describe("useSiteMonitoring", () => {
             return currentSites;
         });
         const monitoringService = {
-            checkSiteNow: vi.fn(
-                async (siteIdentifier: string, monitorId: string) =>
-                    mockElectronAPI.monitoring.checkSiteNow(
-                        siteIdentifier,
-                        monitorId
-                    )
-            ),
-            startMonitoringForMonitor: vi.fn(
-                async (siteIdentifier: string, monitorId: string) =>
-                    mockElectronAPI.monitoring.startMonitoringForMonitor(
-                        siteIdentifier,
-                        monitorId
-                    )
-            ),
+            checkSiteNow: vi.fn(async (
+                siteIdentifier: string,
+                monitorId: string
+            ) =>
+                mockElectronAPI.monitoring.checkSiteNow(
+                    siteIdentifier,
+                    monitorId
+                )),
+            startMonitoringForMonitor: vi.fn(async (
+                siteIdentifier: string,
+                monitorId: string
+            ) =>
+                mockElectronAPI.monitoring.startMonitoringForMonitor(
+                    siteIdentifier,
+                    monitorId
+                )),
             startMonitoringForSite: vi.fn(async (siteIdentifier: string) =>
                 mockElectronAPI.monitoring.startMonitoringForSite(
                     siteIdentifier
-                )
-            ),
-            stopMonitoringForMonitor: vi.fn(
-                async (siteIdentifier: string, monitorId: string) =>
-                    mockElectronAPI.monitoring.stopMonitoringForMonitor(
-                        siteIdentifier,
-                        monitorId
-                    )
-            ),
+                )),
+            stopMonitoringForMonitor: vi.fn(async (
+                siteIdentifier: string,
+                monitorId: string
+            ) =>
+                mockElectronAPI.monitoring.stopMonitoringForMonitor(
+                    siteIdentifier,
+                    monitorId
+                )),
             stopMonitoringForSite: vi.fn(async (siteIdentifier: string) =>
-                mockElectronAPI.monitoring.stopMonitoringForSite(siteIdentifier)
-            ),
+                mockElectronAPI.monitoring.stopMonitoringForSite(
+                    siteIdentifier
+                )),
         };
 
         actions = createSiteMonitoringActions({

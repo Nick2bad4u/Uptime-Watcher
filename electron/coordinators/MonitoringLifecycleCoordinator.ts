@@ -127,35 +127,36 @@ export class MonitoringLifecycleCoordinator {
             );
 
             // Resume monitoring for each monitor individually
-            const resumePromises = monitorsToResume.map(
-                async ({ monitor, site }) => {
-                    try {
-                        const success =
-                            await this.monitorManager.startMonitoringForSite(
-                                site.identifier,
-                                monitor.id
-                            );
-
-                        if (success) {
-                            logger.debug(
-                                `[UptimeOrchestrator] Successfully resumed monitoring for monitor: ${site.identifier}/${monitor.id}`
-                            );
-                        } else {
-                            logger.warn(
-                                `[UptimeOrchestrator] Failed to resume monitoring for monitor: ${site.identifier}/${monitor.id}`
-                            );
-                        }
-
-                        return success;
-                    } catch (error) {
-                        logger.error(
-                            `[UptimeOrchestrator] Error resuming monitoring for monitor ${site.identifier}/${monitor.id}:`,
-                            error
+            const resumePromises = monitorsToResume.map(async ({
+                monitor,
+                site,
+            }) => {
+                try {
+                    const success =
+                        await this.monitorManager.startMonitoringForSite(
+                            site.identifier,
+                            monitor.id
                         );
-                        return false;
+
+                    if (success) {
+                        logger.debug(
+                            `[UptimeOrchestrator] Successfully resumed monitoring for monitor: ${site.identifier}/${monitor.id}`
+                        );
+                    } else {
+                        logger.warn(
+                            `[UptimeOrchestrator] Failed to resume monitoring for monitor: ${site.identifier}/${monitor.id}`
+                        );
                     }
+
+                    return success;
+                } catch (error) {
+                    logger.error(
+                        `[UptimeOrchestrator] Error resuming monitoring for monitor ${site.identifier}/${monitor.id}:`,
+                        error
+                    );
+                    return false;
                 }
-            );
+            });
 
             // Wait for all to complete (use allSettled to handle failures gracefully)
             const results = await Promise.allSettled(resumePromises);

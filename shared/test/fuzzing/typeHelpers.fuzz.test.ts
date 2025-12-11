@@ -75,8 +75,7 @@ describe("TypeHelpers utilities fuzzing tests", () => {
                     expect(castIpcResponse(response, validator)).toBe(response);
                 } else {
                     expect(() =>
-                        castIpcResponse(response, validator)
-                    ).toThrowError();
+                        castIpcResponse(response, validator)).toThrowError();
                 }
             }
         );
@@ -140,12 +139,11 @@ describe("TypeHelpers utilities fuzzing tests", () => {
     });
 
     describe(isRecord, () => {
-        test.prop([fc.record({})])(
-            "should return true for all records",
-            (record) => {
-                expect(isRecord(record)).toBeTruthy();
-            }
-        );
+        test.prop([fc.record({})])("should return true for all records", (
+            record
+        ) => {
+            expect(isRecord(record)).toBeTruthy();
+        });
 
         test.prop([
             fc
@@ -175,12 +173,11 @@ describe("TypeHelpers utilities fuzzing tests", () => {
             expect(isRecord(new Error("Test error"))).toBeTruthy();
         });
 
-        test.prop([fc.record({})])(
-            "should work with empty records",
-            (record) => {
-                expect(isRecord(record)).toBeTruthy();
-            }
-        );
+        test.prop([fc.record({})])("should work with empty records", (
+            record
+        ) => {
+            expect(isRecord(record)).toBeTruthy();
+        });
     });
 
     describe(safePropertyAccess, () => {
@@ -223,12 +220,12 @@ describe("TypeHelpers utilities fuzzing tests", () => {
             }
         });
 
-        test.prop([fc.anything(), fc.string()])(
-            "should never throw errors",
-            (obj, key) => {
-                expect(() => safePropertyAccess(obj, key)).not.toThrowError();
-            }
-        );
+        test.prop([fc.anything(), fc.string()])("should never throw errors", (
+            obj,
+            key
+        ) => {
+            expect(() => safePropertyAccess(obj, key)).not.toThrowError();
+        });
 
         it("should handle special property names", () => {
             const obj = {
@@ -317,8 +314,11 @@ describe("TypeHelpers utilities fuzzing tests", () => {
                     .mockReturnValue(false) as unknown as ValidatorFunction;
 
                 expect(() =>
-                    validateAndConvert(value, validator, errorMessage)
-                ).toThrowError(errorMessage);
+                    validateAndConvert(
+                        value,
+                        validator,
+                        errorMessage
+                    )).toThrowError(errorMessage);
             }
         );
 
@@ -335,8 +335,7 @@ describe("TypeHelpers utilities fuzzing tests", () => {
                     expect(validateAndConvert(value, validator)).toBe(value);
                 } else {
                     expect(() =>
-                        validateAndConvert(value, validator)
-                    ).toThrowError();
+                        validateAndConvert(value, validator)).toThrowError();
                 }
             }
         );
@@ -372,8 +371,7 @@ describe("TypeHelpers utilities fuzzing tests", () => {
                 expect(() => isArray(input)).not.toThrowError();
                 expect(() => isRecord(input)).not.toThrowError();
                 expect(() =>
-                    safePropertyAccess(input, "key")
-                ).not.toThrowError();
+                    safePropertyAccess(input, "key")).not.toThrowError();
             }
         );
 

@@ -62,9 +62,9 @@ const hasSnapshotContext = (
 ): payload is StatusUpdateSnapshotContext & StatusUpdateSnapshotPayload =>
     Boolean(
         "monitor" in payload &&
-            "site" in payload &&
-            payload["monitor"] &&
-            payload["site"]
+        "site" in payload &&
+        payload["monitor"] &&
+        payload["site"]
     );
 
 /**
@@ -480,85 +480,79 @@ export class StatusUpdateManager {
             {
                 label: "monitor-check-completed",
                 register: () =>
-                    EventsService.onMonitorCheckCompleted(
-                        (
-                            event: RendererEventPayloadMap["monitor:check-completed"]
-                        ) => {
-                            void (async (): Promise<void> => {
-                                try {
-                                    if (
-                                        this.isMonitorStatusChangedEvent(
-                                            event.result
-                                        )
-                                    ) {
-                                        logger.debug(
-                                            "Processing manual monitor check completion event"
-                                        );
-                                        await this.handleIncrementalStatusUpdate(
-                                            event.result
-                                        );
-                                    } else {
-                                        if (isDevelopment()) {
-                                            logger.warn(
-                                                "Manual check completion payload missing enriched monitor/site data, triggering full sync",
-                                                event
-                                            );
-                                        }
-                                        await this.fullResyncSites();
-                                    }
-                                } catch (error) {
-                                    logger.error(
-                                        "Manual monitor check completion processing failed",
-                                        ensureError(error)
+                    EventsService.onMonitorCheckCompleted((
+                        event: RendererEventPayloadMap["monitor:check-completed"]
+                    ) => {
+                        void (async (): Promise<void> => {
+                            try {
+                                if (
+                                    this.isMonitorStatusChangedEvent(
+                                        event.result
+                                    )
+                                ) {
+                                    logger.debug(
+                                        "Processing manual monitor check completion event"
                                     );
+                                    await this.handleIncrementalStatusUpdate(
+                                        event.result
+                                    );
+                                } else {
+                                    if (isDevelopment()) {
+                                        logger.warn(
+                                            "Manual check completion payload missing enriched monitor/site data, triggering full sync",
+                                            event
+                                        );
+                                    }
+                                    await this.fullResyncSites();
                                 }
-                            })();
-                        }
-                    ),
+                            } catch (error) {
+                                logger.error(
+                                    "Manual monitor check completion processing failed",
+                                    ensureError(error)
+                                );
+                            }
+                        })();
+                    }),
                 scope: "monitor-check-completed",
             },
             {
                 label: "monitoring-started",
                 register: () =>
-                    EventsService.onMonitoringStarted(
-                        (
-                            event: RendererEventPayloadMap["monitoring:started"]
-                        ) => {
-                            try {
-                                this.handleMonitoringLifecycleEvent(
-                                    "started",
-                                    event
-                                );
-                            } catch (error) {
-                                logger.error(
-                                    "Error while processing monitoring started lifecycle event",
-                                    ensureError(error)
-                                );
-                            }
+                    EventsService.onMonitoringStarted((
+                        event: RendererEventPayloadMap["monitoring:started"]
+                    ) => {
+                        try {
+                            this.handleMonitoringLifecycleEvent(
+                                "started",
+                                event
+                            );
+                        } catch (error) {
+                            logger.error(
+                                "Error while processing monitoring started lifecycle event",
+                                ensureError(error)
+                            );
                         }
-                    ),
+                    }),
                 scope: "monitoring-started",
             },
             {
                 label: "monitoring-stopped",
                 register: () =>
-                    EventsService.onMonitoringStopped(
-                        (
-                            event: RendererEventPayloadMap["monitoring:stopped"]
-                        ) => {
-                            try {
-                                this.handleMonitoringLifecycleEvent(
-                                    "stopped",
-                                    event
-                                );
-                            } catch (error) {
-                                logger.error(
-                                    "Error while processing monitoring stopped lifecycle event",
-                                    ensureError(error)
-                                );
-                            }
+                    EventsService.onMonitoringStopped((
+                        event: RendererEventPayloadMap["monitoring:stopped"]
+                    ) => {
+                        try {
+                            this.handleMonitoringLifecycleEvent(
+                                "stopped",
+                                event
+                            );
+                        } catch (error) {
+                            logger.error(
+                                "Error while processing monitoring stopped lifecycle event",
+                                ensureError(error)
+                            );
                         }
-                    ),
+                    }),
                 scope: "monitoring-stopped",
             },
         ];
@@ -585,12 +579,13 @@ export class StatusUpdateManager {
                 listenersAttached += 1;
                 const state = listenerStates[index];
                 if (state) {
-                    listenerStates = listenerStates.map(
-                        (listenerState, listenerIndex) =>
-                            listenerIndex === index
-                                ? { ...listenerState, attached: true }
-                                : listenerState
-                    );
+                    listenerStates = listenerStates.map((
+                        listenerState,
+                        listenerIndex
+                    ) =>
+                        listenerIndex === index
+                            ? { ...listenerState, attached: true }
+                            : listenerState);
                 }
             } catch (error) {
                 const normalizedError = ensureError(error);

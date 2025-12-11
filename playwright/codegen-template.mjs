@@ -201,8 +201,7 @@ function applyLintCompliantTransforms(codegenOutput) {
 
     // Batch locator transformations using a single regex and replacer
     const locatorKeys = Object.keys(locatorTransforms).map((k) =>
-        k.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
-    );
+        k.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
     if (locatorKeys.length > 0) {
         const locatorRegex = new RegExp(locatorKeys.join("|"), "g");
         transformed = transformed.replace(
@@ -213,8 +212,7 @@ function applyLintCompliantTransforms(codegenOutput) {
 
     // Batch title transformations using a single regex and replacer
     const titleKeys = Object.keys(titleTransforms).map((k) =>
-        k.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
-    );
+        k.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
     if (titleKeys.length > 0) {
         const titleRegex = new RegExp(titleKeys.join("|"), "g");
         transformed = transformed.replace(

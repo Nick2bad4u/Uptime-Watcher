@@ -43,8 +43,7 @@ describe("MonitorRepository - Comprehensive Coverage", () => {
         mockDatabaseService = {
             getDatabase: vi.fn(() => mockDatabase),
             executeTransaction: vi.fn(async (callback) =>
-                callback(mockDatabase)
-            ),
+                callback(mockDatabase)),
             initialize: vi.fn(),
             close: vi.fn(),
         } as any;

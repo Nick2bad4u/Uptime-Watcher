@@ -388,21 +388,22 @@ describe("Database Migration Operations Benchmarks", () => {
             ); // 10-50% of data
             const batchCount = Math.ceil(recordsToProcess / scenario.batchSize);
 
-            const operations: MigrationOperation[] = scenario.operations.map(
-                (opType, index) => ({
-                    operationId: `data-op-${migrationCounter}-${index}`,
-                    type: opType as MigrationOperation["type"],
-                    target: `table_${Math.floor(Math.random() * dbSize.tableCount)}`,
-                    sql: `-- ${opType} operation processing ${recordsToProcess} records`,
-                    estimatedRows: Math.floor(
-                        recordsToProcess / scenario.operations.length
-                    ),
-                    parameters: {
-                        batchSize: scenario.batchSize,
-                        totalBatches: batchCount,
-                    },
-                })
-            );
+            const operations: MigrationOperation[] = scenario.operations.map((
+                opType,
+                index
+            ) => ({
+                operationId: `data-op-${migrationCounter}-${index}`,
+                type: opType as MigrationOperation["type"],
+                target: `table_${Math.floor(Math.random() * dbSize.tableCount)}`,
+                sql: `-- ${opType} operation processing ${recordsToProcess} records`,
+                estimatedRows: Math.floor(
+                    recordsToProcess / scenario.operations.length
+                ),
+                parameters: {
+                    batchSize: scenario.batchSize,
+                    totalBatches: batchCount,
+                },
+            }));
 
             const migration: MigrationDefinition = {
                 migrationId: `data-migration-${migrationCounter++}`,
@@ -461,8 +462,7 @@ describe("Database Migration Operations Benchmarks", () => {
 
                     // Database size impact
                     const dbSize = databaseSizes.find((db) =>
-                        migration.name.includes(db.name)
-                    );
+                        migration.name.includes(db.name));
                     if (dbSize) {
                         const sizeMultiplier =
                             {
@@ -558,13 +558,11 @@ describe("Database Migration Operations Benchmarks", () => {
 
         const batchingAnalysis = dataMigrationScenarios.map((scenario) => {
             const scenarioMigrations = dataMigrations.filter((m) =>
-                m.name.includes(scenario.name)
-            );
+                m.name.includes(scenario.name));
             const scenarioExecutions = dataExecutions.filter((exec) =>
                 scenarioMigrations.some(
                     (m) => m.migrationId === exec.migrationId
-                )
-            );
+                ));
 
             const avgThroughput =
                 scenarioExecutions.length > 0
@@ -983,22 +981,22 @@ describe("Database Migration Operations Benchmarks", () => {
             const criticalPath: string[] = [];
             if (executionGroups.length > 0) {
                 for (const group of executionGroups) {
-                    const longestMigration = group.reduce(
-                        (longest, migrationId) => {
-                            const migration = migrations.find(
-                                (m) => m.migrationId === migrationId
-                            );
-                            const longestMig = migrations.find(
-                                (m) => m.migrationId === longest
-                            );
+                    const longestMigration = group.reduce((
+                        longest,
+                        migrationId
+                    ) => {
+                        const migration = migrations.find(
+                            (m) => m.migrationId === migrationId
+                        );
+                        const longestMig = migrations.find(
+                            (m) => m.migrationId === longest
+                        );
 
-                            return (migration?.estimatedDuration || 0) >
-                                (longestMig?.estimatedDuration || 0)
-                                ? migrationId
-                                : longest;
-                        },
-                        group[0]
-                    );
+                        return (migration?.estimatedDuration || 0) >
+                            (longestMig?.estimatedDuration || 0)
+                            ? migrationId
+                            : longest;
+                    }, group[0]);
 
                     criticalPath.push(longestMigration);
                 }

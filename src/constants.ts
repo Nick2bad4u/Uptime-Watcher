@@ -438,7 +438,12 @@ export const CHART_TIME_PERIODS: ChartTimePeriods = {
  * filtering and display. Ranges progress from short-term to long-term
  * monitoring.
  */
-export const CHART_TIME_RANGES = ["1h", "24h", "7d", "30d"] as const;
+export const CHART_TIME_RANGES = [
+    "1h",
+    "24h",
+    "7d",
+    "30d",
+] as const;
 
 /**
  * Type definition for chart time range values.

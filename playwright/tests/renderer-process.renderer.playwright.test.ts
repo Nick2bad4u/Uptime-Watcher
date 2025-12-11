@@ -189,15 +189,15 @@ test.describe(
                 await window.waitForTimeout(1000);
 
                 // Verify the window exists and has been resized (smoke test)
-                const bounds = await electronApp.evaluate(
-                    async ({ BrowserWindow }) => {
-                        const windows = BrowserWindow.getAllWindows();
-                        if (windows.length > 0 && windows[0]) {
-                            return windows[0].getBounds();
-                        }
-                        return null;
+                const bounds = await electronApp.evaluate(async ({
+                    BrowserWindow,
+                }) => {
+                    const windows = BrowserWindow.getAllWindows();
+                    if (windows.length > 0 && windows[0]) {
+                        return windows[0].getBounds();
                     }
-                );
+                    return null;
+                });
 
                 expect(bounds).toBeTruthy();
                 expect(bounds?.width).toBeGreaterThan(0);
@@ -253,8 +253,7 @@ test.describe(
                             setTimeout(
                                 () => reject(new Error("Timeout")),
                                 10000
-                            )
-                        ),
+                            )),
                     ]);
 
                     expect(typeof canOpenDevTools).toBe("boolean");

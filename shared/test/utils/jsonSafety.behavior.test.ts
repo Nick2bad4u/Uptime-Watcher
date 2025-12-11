@@ -78,10 +78,9 @@ describe("jsonSafety behavior", () => {
                 { id: "mon_1", name: "Primary", enabled: true },
                 { id: "mon_2", name: "Backup", enabled: false },
             ];
-            const result = safeJsonParseArray(
-                JSON.stringify(payload),
-                (entry): entry is JsonValue => isMonitorJsonValue(entry)
-            );
+            const result = safeJsonParseArray(JSON.stringify(payload), (
+                entry
+            ): entry is JsonValue => isMonitorJsonValue(entry));
             expect(result.success).toBeTruthy();
             expect(result.data).toEqual(payload);
         });

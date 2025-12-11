@@ -648,8 +648,11 @@ describe("monitorOperations utilities - Comprehensive Fast-Check Coverage", () =
                         }
 
                         expect(() =>
-                            updateMonitorInSite(site, nonExistentId, updates)
-                        ).toThrowError();
+                            updateMonitorInSite(
+                                site,
+                                nonExistentId,
+                                updates
+                            )).toThrowError();
                     }
                 )
             );
@@ -665,8 +668,10 @@ describe("monitorOperations utilities - Comprehensive Fast-Check Coverage", () =
                         const targetMonitor = site.monitors[0];
                         expect(targetMonitor).toBeDefined(); // Assert it exists
                         expect(() =>
-                            validateMonitorExists(site, targetMonitor!.id)
-                        ).not.toThrowError();
+                            validateMonitorExists(
+                                site,
+                                targetMonitor!.id
+                            )).not.toThrowError();
                     }
                 )
             );
@@ -683,8 +688,10 @@ describe("monitorOperations utilities - Comprehensive Fast-Check Coverage", () =
                         }
 
                         expect(() =>
-                            validateMonitorExists(site, nonExistentId)
-                        ).toThrowError();
+                            validateMonitorExists(
+                                site,
+                                nonExistentId
+                            )).toThrowError();
                     }
                 )
             );
@@ -692,14 +699,15 @@ describe("monitorOperations utilities - Comprehensive Fast-Check Coverage", () =
 
         it("should throw for undefined site", () => {
             fc.assert(
-                fc.property(
-                    fc.string({ minLength: 1, maxLength: 50 }),
-                    (monitorId) => {
-                        expect(() =>
-                            validateMonitorExists(undefined, monitorId)
-                        ).toThrowError();
-                    }
-                )
+                fc.property(fc.string({ minLength: 1, maxLength: 50 }), (
+                    monitorId
+                ) => {
+                    expect(() =>
+                        validateMonitorExists(
+                            undefined,
+                            monitorId
+                        )).toThrowError();
+                })
             );
         });
     });
@@ -718,35 +726,33 @@ describe("monitorOperations utilities - Comprehensive Fast-Check Coverage", () =
 
         it("should update check interval", () => {
             fc.assert(
-                fc.property(
-                    monitorArb,
-                    checkIntervalArb,
-                    (monitor, newInterval) => {
-                        const updated = monitorOperations.updateCheckInterval(
-                            monitor,
-                            newInterval
-                        );
-                        expect(updated.checkInterval).toBe(newInterval);
-                        expect(updated.id).toBe(monitor.id);
-                    }
-                )
+                fc.property(monitorArb, checkIntervalArb, (
+                    monitor,
+                    newInterval
+                ) => {
+                    const updated = monitorOperations.updateCheckInterval(
+                        monitor,
+                        newInterval
+                    );
+                    expect(updated.checkInterval).toBe(newInterval);
+                    expect(updated.id).toBe(monitor.id);
+                })
             );
         });
 
         it("should update retry attempts", () => {
             fc.assert(
-                fc.property(
-                    monitorArb,
-                    retryAttemptsArb,
-                    (monitor, newRetries) => {
-                        const updated = monitorOperations.updateRetryAttempts(
-                            monitor,
-                            newRetries
-                        );
-                        expect(updated.retryAttempts).toBe(newRetries);
-                        expect(updated.id).toBe(monitor.id);
-                    }
-                )
+                fc.property(monitorArb, retryAttemptsArb, (
+                    monitor,
+                    newRetries
+                ) => {
+                    const updated = monitorOperations.updateRetryAttempts(
+                        monitor,
+                        newRetries
+                    );
+                    expect(updated.retryAttempts).toBe(newRetries);
+                    expect(updated.id).toBe(monitor.id);
+                })
             );
         });
 
@@ -785,8 +791,7 @@ describe("monitorOperations utilities - Comprehensive Fast-Check Coverage", () =
                             monitorOperations.updateStatus(
                                 monitor,
                                 invalidStatus as any
-                            )
-                        ).toThrowError();
+                            )).toThrowError();
                     }
                 )
             );

@@ -23,21 +23,21 @@ describe("AbortUtils Coverage Gap Fuzzing Tests", () => {
             return controller.signal;
         });
 
-        vi.spyOn(AbortSignal, "any").mockImplementation(
-            (signals: AbortSignal[]) => {
-                const controller = new AbortController();
-                for (const signal of signals) {
-                    if (signal.aborted) {
-                        controller.abort();
-                        break;
-                    }
-                    signal.addEventListener("abort", () => controller.abort(), {
-                        once: true,
-                    });
+        vi.spyOn(AbortSignal, "any").mockImplementation((
+            signals: AbortSignal[]
+        ) => {
+            const controller = new AbortController();
+            for (const signal of signals) {
+                if (signal.aborted) {
+                    controller.abort();
+                    break;
                 }
-                return controller.signal;
+                signal.addEventListener("abort", () => controller.abort(), {
+                    once: true,
+                });
             }
-        );
+            return controller.signal;
+        });
     });
 
     beforeEach(() => {
@@ -114,14 +114,13 @@ describe("AbortUtils Coverage Gap Fuzzing Tests", () => {
                 }),
             ],
             { numRuns: 15, timeout: 2000 }
-        )(
-            "should return false for errors with non-abort names and messages",
-            (errorData) => {
-                const error = new Error(errorData.message);
-                error.name = errorData.name;
-                expect(isAbortError(error)).toBeFalsy();
-            }
-        );
+        )("should return false for errors with non-abort names and messages", (
+            errorData
+        ) => {
+            const error = new Error(errorData.message);
+            error.name = errorData.name;
+            expect(isAbortError(error)).toBeFalsy();
+        });
 
         test("should handle DOMException types correctly", () => {
             // Test DOMException with AbortError name
@@ -148,19 +147,18 @@ describe("AbortUtils Coverage Gap Fuzzing Tests", () => {
         test.prop(
             [fc.constantFrom("result1", "result2", "test", "data", "value")],
             { numRuns: 10, timeout: 3000 }
-        )(
-            "should handle already aborted signal synchronously",
-            async (result) => {
-                const controller = new AbortController();
-                controller.abort(); // Abort immediately
+        )("should handle already aborted signal synchronously", async (
+            result
+        ) => {
+            const controller = new AbortController();
+            controller.abort(); // Abort immediately
 
-                const operation = Promise.resolve(result);
+            const operation = Promise.resolve(result);
 
-                await expect(
-                    raceWithAbort(operation, controller.signal)
-                ).rejects.toThrowError("Operation was aborted");
-            }
-        );
+            await expect(
+                raceWithAbort(operation, controller.signal)
+            ).rejects.toThrowError("Operation was aborted");
+        });
 
         test.prop(
             [
@@ -168,31 +166,31 @@ describe("AbortUtils Coverage Gap Fuzzing Tests", () => {
                 fc.integer({ min: 1, max: 50 }),
             ],
             { numRuns: 10, timeout: 5000 }
-        )(
-            "should handle abort during operation execution",
-            async (result, delayMs) => {
-                const controller = new AbortController();
+        )("should handle abort during operation execution", async (
+            result,
+            delayMs
+        ) => {
+            const controller = new AbortController();
 
-                // Create a longer-running operation
-                const operation = new Promise<string>((resolve) => {
-                    setTimeout(() => resolve(result), delayMs * 2);
-                });
+            // Create a longer-running operation
+            const operation = new Promise<string>((resolve) => {
+                setTimeout(() => resolve(result), delayMs * 2);
+            });
 
-                // Start the race
-                const racePromise = raceWithAbort(operation, controller.signal);
+            // Start the race
+            const racePromise = raceWithAbort(operation, controller.signal);
 
-                // Abort after a shorter delay
-                setTimeout(() => {
-                    controller.abort();
-                }, delayMs);
+            // Abort after a shorter delay
+            setTimeout(() => {
+                controller.abort();
+            }, delayMs);
 
-                vi.advanceTimersByTime(delayMs + 10);
+            vi.advanceTimersByTime(delayMs + 10);
 
-                await expect(racePromise).rejects.toThrowError(
-                    "Operation was aborted"
-                );
-            }
-        );
+            await expect(racePromise).rejects.toThrowError(
+                "Operation was aborted"
+            );
+        });
 
         test.prop(
             [fc.constantFrom("result1", "result2", "test", "data", "value")],
@@ -223,17 +221,16 @@ describe("AbortUtils Coverage Gap Fuzzing Tests", () => {
                 ),
             ],
             { numRuns: 10, timeout: 3000 }
-        )(
-            "should handle operation rejection independently of abort",
-            async (errorMessage) => {
-                const controller = new AbortController();
-                const operation = Promise.reject(new Error(errorMessage));
+        )("should handle operation rejection independently of abort", async (
+            errorMessage
+        ) => {
+            const controller = new AbortController();
+            const operation = Promise.reject(new Error(errorMessage));
 
-                await expect(
-                    raceWithAbort(operation, controller.signal)
-                ).rejects.toThrowError(errorMessage);
-            }
-        );
+            await expect(
+                raceWithAbort(operation, controller.signal)
+            ).rejects.toThrowError(errorMessage);
+        });
     });
 
     describe("createCombinedAbortSignal - Edge Cases", () => {
@@ -322,8 +319,7 @@ describe("AbortUtils Coverage Gap Fuzzing Tests", () => {
 
                 // Start all races
                 const racePromises = operations.map((op) =>
-                    raceWithAbort(op, controller.signal)
-                );
+                    raceWithAbort(op, controller.signal));
 
                 // Abort after the shortest delay
                 const minDelay = Math.min(...delays);
@@ -338,8 +334,7 @@ describe("AbortUtils Coverage Gap Fuzzing Tests", () => {
                     racePromises.map((promise) =>
                         expect(promise).rejects.toThrowError(
                             "Operation was aborted"
-                        )
-                    )
+                        ))
                 );
             }
         );

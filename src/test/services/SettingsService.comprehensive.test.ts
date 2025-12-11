@@ -187,7 +187,15 @@ describe("SettingsService", () => {
         });
 
         it("should handle different history limit values", async () => {
-            const limits = [0, 1, 100, 500, 1000, 10_000, 999_999];
+            const limits = [
+                0,
+                1,
+                100,
+                500,
+                1000,
+                10_000,
+                999_999,
+            ];
 
             for (const limit of limits) {
                 mockElectronAPI.settings.getHistoryLimit.mockResolvedValueOnce(
@@ -349,7 +357,16 @@ describe("SettingsService", () => {
         });
 
         it("should handle different limit values", async () => {
-            const limits = [0, 1, 50, 100, 500, 1000, 5000, 10_000];
+            const limits = [
+                0,
+                1,
+                50,
+                100,
+                500,
+                1000,
+                5000,
+                10_000,
+            ];
 
             for (const limit of limits) {
                 mockElectronAPI.settings.updateHistoryLimit.mockResolvedValueOnce(
@@ -372,7 +389,11 @@ describe("SettingsService", () => {
         });
 
         it("should handle edge case limit values", async () => {
-            const resolvableEdgeCases = [-1, 0, 999_999];
+            const resolvableEdgeCases = [
+                -1,
+                0,
+                999_999,
+            ];
             for (const limit of resolvableEdgeCases) {
                 mockElectronAPI.settings.updateHistoryLimit.mockResolvedValueOnce(
                     limit
@@ -415,7 +436,12 @@ describe("SettingsService", () => {
         });
 
         it("should handle non-integer values", async () => {
-            const floatValues = [1.5, 999.99, 0.1, -1.5];
+            const floatValues = [
+                1.5,
+                999.99,
+                0.1,
+                -1.5,
+            ];
 
             for (const limit of floatValues) {
                 mockElectronAPI.settings.updateHistoryLimit.mockResolvedValueOnce(
@@ -662,7 +688,13 @@ describe("SettingsService", () => {
         });
 
         it("should handle special numeric values", async () => {
-            const specialValues = [Number.NaN, Infinity, -Infinity, 0, -0];
+            const specialValues = [
+                Number.NaN,
+                Infinity,
+                -Infinity,
+                0,
+                -0,
+            ];
 
             for (const value of specialValues) {
                 mockLogger.warn.mockClear();
@@ -707,7 +739,14 @@ describe("SettingsService", () => {
 
         it("should handle API returning unexpected promise resolutions", async () => {
             // Test when updateHistoryLimit returns different types
-            const returnValues = [null, undefined, "success", {}, [], 42];
+            const returnValues = [
+                null,
+                undefined,
+                "success",
+                {},
+                [],
+                42,
+            ];
 
             for (const returnValue of returnValues) {
                 mockLogger.warn.mockClear();

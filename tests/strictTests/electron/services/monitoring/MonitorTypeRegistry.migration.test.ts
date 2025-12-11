@@ -102,9 +102,8 @@ describe("migrateMonitorType", () => {
     });
 
     it("returns validation error when monitor type is not registered", async () => {
-        const { migrateMonitorType } = await import(
-            "../../../../../electron/services/monitoring/MonitorTypeRegistry"
-        );
+        const { migrateMonitorType } =
+            await import("../../../../../electron/services/monitoring/MonitorTypeRegistry");
 
         const result = await migrateMonitorType(
             "non-existent" as unknown as MonitorType,
@@ -121,9 +120,8 @@ describe("migrateMonitorType", () => {
     });
 
     it("short-circuits when versions match while preserving data", async () => {
-        const { migrateMonitorType } = await import(
-            "../../../../../electron/services/monitoring/MonitorTypeRegistry"
-        );
+        const { migrateMonitorType } =
+            await import("../../../../../electron/services/monitoring/MonitorTypeRegistry");
 
         const data = { url: "https://example.com" };
         const result = await migrateMonitorType("http", "1.0.0", "1.0.0", data);
@@ -143,9 +141,8 @@ describe("migrateMonitorType", () => {
     });
 
     it("records placeholder migration when bumping version without data", async () => {
-        const { migrateMonitorType } = await import(
-            "../../../../../electron/services/monitoring/MonitorTypeRegistry"
-        );
+        const { migrateMonitorType } =
+            await import("../../../../../electron/services/monitoring/MonitorTypeRegistry");
 
         const result = await migrateMonitorType("http", "1.0.0", "1.1.0");
 
@@ -158,9 +155,8 @@ describe("migrateMonitorType", () => {
     });
 
     it("delegates to orchestrator when data is provided", async () => {
-        const { migrateMonitorType } = await import(
-            "../../../../../electron/services/monitoring/MonitorTypeRegistry"
-        );
+        const { migrateMonitorType } =
+            await import("../../../../../electron/services/monitoring/MonitorTypeRegistry");
 
         const orchestratorResult = {
             appliedMigrations: ["http_1.0.0_to_1.2.0"],
@@ -188,9 +184,8 @@ describe("migrateMonitorType", () => {
 
     it("returns catch-block failure details when migration pipeline throws", async () => {
         withErrorHandlingMock.mockRejectedValueOnce(new Error("boom"));
-        const { migrateMonitorType } = await import(
-            "../../../../../electron/services/monitoring/MonitorTypeRegistry"
-        );
+        const { migrateMonitorType } =
+            await import("../../../../../electron/services/monitoring/MonitorTypeRegistry");
 
         const result = await migrateMonitorType("http", "1.0.0", "2.0.0");
 
@@ -202,9 +197,8 @@ describe("migrateMonitorType", () => {
     });
 
     it("propagates orchestrator errors when migration fails", async () => {
-        const { migrateMonitorType } = await import(
-            "../../../../../electron/services/monitoring/MonitorTypeRegistry"
-        );
+        const { migrateMonitorType } =
+            await import("../../../../../electron/services/monitoring/MonitorTypeRegistry");
 
         migratorMock.migrateMonitorData.mockResolvedValueOnce({
             appliedMigrations: ["http_1.0.0_to_1.2.0"],

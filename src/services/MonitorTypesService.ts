@@ -92,21 +92,22 @@ export const MonitorTypesService: MonitorTypesServiceContract = {
      * @throws If the electron API is unavailable or the formatting operation
      *   fails.
      */
-    formatMonitorDetail: wrap(
-        "formatMonitorDetail",
-        async (api, type: string, details: string) => {
-            const result = await api.monitorTypes.formatMonitorDetail(
-                type,
-                details
+    formatMonitorDetail: wrap("formatMonitorDetail", async (
+        api,
+        type: string,
+        details: string
+    ) => {
+        const result = await api.monitorTypes.formatMonitorDetail(
+            type,
+            details
+        );
+        if (typeof result !== "string") {
+            throw new TypeError(
+                "formatMonitorDetail must return a formatted string"
             );
-            if (typeof result !== "string") {
-                throw new TypeError(
-                    "formatMonitorDetail must return a formatted string"
-                );
-            }
-            return result;
         }
-    ),
+        return result;
+    }),
 
     /**
      * Generates formatted title suffix for a monitor.
@@ -128,21 +129,22 @@ export const MonitorTypesService: MonitorTypesServiceContract = {
      * @throws If the electron API is unavailable or the formatting operation
      *   fails.
      */
-    formatMonitorTitleSuffix: wrap(
-        "formatMonitorTitleSuffix",
-        async (api, type: string, monitor: Monitor) => {
-            const result = await api.monitorTypes.formatMonitorTitleSuffix(
-                type,
-                monitor
+    formatMonitorTitleSuffix: wrap("formatMonitorTitleSuffix", async (
+        api,
+        type: string,
+        monitor: Monitor
+    ) => {
+        const result = await api.monitorTypes.formatMonitorTitleSuffix(
+            type,
+            monitor
+        );
+        if (typeof result !== "string") {
+            throw new TypeError(
+                "formatMonitorTitleSuffix must return a formatted string"
             );
-            if (typeof result !== "string") {
-                throw new TypeError(
-                    "formatMonitorTitleSuffix must return a formatted string"
-                );
-            }
-            return result;
         }
-    ),
+        return result;
+    }),
 
     /**
      * Gets all available monitor types from backend registry.
@@ -160,23 +162,22 @@ export const MonitorTypesService: MonitorTypesServiceContract = {
      *
      * @throws If the electron API is unavailable or the operation fails.
      */
-    getMonitorTypes: wrap(
-        "getMonitorTypes",
-        async (api): Promise<MonitorTypeConfig[]> => {
-            try {
-                return validateServicePayload(
-                    validateMonitorTypeConfigArray,
-                    await api.monitorTypes.getMonitorTypes(),
-                    {
-                        operation: "getMonitorTypes",
-                        serviceName: "MonitorTypesService",
-                    }
-                );
-            } catch (error: unknown) {
-                throw ensureError(error);
-            }
+    getMonitorTypes: wrap("getMonitorTypes", async (
+        api
+    ): Promise<MonitorTypeConfig[]> => {
+        try {
+            return validateServicePayload(
+                validateMonitorTypeConfigArray,
+                await api.monitorTypes.getMonitorTypes(),
+                {
+                    operation: "getMonitorTypes",
+                    serviceName: "MonitorTypesService",
+                }
+            );
+        } catch (error: unknown) {
+            throw ensureError(error);
         }
-    ),
+    }),
 
     initialize: ensureInitialized,
 
@@ -209,27 +210,28 @@ export const MonitorTypesService: MonitorTypesServiceContract = {
      * @throws If the electron API is unavailable or the validation operation
      *   fails.
      */
-    validateMonitorData: wrap(
-        "validateMonitorData",
-        async (api, type: string, data: unknown): Promise<ValidationResult> => {
-            try {
-                const parsed = validateServicePayload(
-                    validateValidationResult,
-                    await api.monitorTypes.validateMonitorData(type, data),
-                    {
-                        operation: "validateMonitorData",
-                        serviceName: "MonitorTypesService",
-                    }
-                );
+    validateMonitorData: wrap("validateMonitorData", async (
+        api,
+        type: string,
+        data: unknown
+    ): Promise<ValidationResult> => {
+        try {
+            const parsed = validateServicePayload(
+                validateValidationResult,
+                await api.monitorTypes.validateMonitorData(type, data),
+                {
+                    operation: "validateMonitorData",
+                    serviceName: "MonitorTypesService",
+                }
+            );
 
-                return {
-                    ...parsed,
-                    metadata: parsed.metadata ?? {},
-                    warnings: parsed.warnings ?? [],
-                } satisfies ValidationResult;
-            } catch (error: unknown) {
-                throw ensureError(error);
-            }
+            return {
+                ...parsed,
+                metadata: parsed.metadata ?? {},
+                warnings: parsed.warnings ?? [],
+            } satisfies ValidationResult;
+        } catch (error: unknown) {
+            throw ensureError(error);
         }
-    ),
+    }),
 };

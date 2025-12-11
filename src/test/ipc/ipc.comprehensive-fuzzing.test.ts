@@ -556,19 +556,19 @@ describe("IPC Communication - 100% Fast-Check Fuzzing Coverage", () => {
             }
         });
 
-        fcTest.prop([fc.anything()])(
-            "should validate contextBridge exposure",
-            (apiData) => {
-                // Test that contextBridge is used properly
-                expect(mockContextBridge.exposeInMainWorld).toBeDefined();
+        fcTest.prop([fc.anything()])("should validate contextBridge exposure", (
+            apiData
+        ) => {
+            // Test that contextBridge is used properly
+            expect(mockContextBridge.exposeInMainWorld).toBeDefined();
 
-                // Should expose APIs safely
-                mockContextBridge.exposeInMainWorld("electronAPI", apiData);
-                expect(
-                    mockContextBridge.exposeInMainWorld
-                ).toHaveBeenCalledWith("electronAPI", apiData);
-            }
-        );
+            // Should expose APIs safely
+            mockContextBridge.exposeInMainWorld("electronAPI", apiData);
+            expect(mockContextBridge.exposeInMainWorld).toHaveBeenCalledWith(
+                "electronAPI",
+                apiData
+            );
+        });
 
         test("should not expose dangerous globals", () => {
             const dangerousProperties = [
@@ -613,8 +613,7 @@ describe("IPC Communication - 100% Fast-Check Fuzzing Coverage", () => {
                 if (registeredHandler) {
                     // Simulate multiple simultaneous calls
                     const promises = Array.from({ length: callCount }, (_, i) =>
-                        registeredHandler({}, { callId: i })
-                    );
+                        registeredHandler({}, { callId: i }));
 
                     const results = await Promise.allSettled(promises);
 

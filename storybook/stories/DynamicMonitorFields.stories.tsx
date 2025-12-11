@@ -67,13 +67,11 @@ const DynamicMonitorFieldsStory = ({
 }: DynamicMonitorFieldsStoryArgs): ReactElement => {
     const resolvedMonitorType = monitorType as MonitorType;
     const [values, setValues] = useState<Record<string, FieldValue>>(() =>
-        getFieldDefaults(resolvedMonitorType)
-    );
+        getFieldDefaults(resolvedMonitorType));
     const [isLoading, setIsLoading] = useState(false);
 
     const fields = useMonitorTypesStore((state) =>
-        state.getFieldConfig(resolvedMonitorType)
-    );
+        state.getFieldConfig(resolvedMonitorType));
 
     const handleChangeMap = useMemo<FieldChangeHandlers>(() => {
         if (!fields) {

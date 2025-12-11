@@ -80,14 +80,13 @@ describe("SafeConversions - Property-Based Tests", () => {
     describe(safeParseCheckInterval, () => {
         test.prop({
             value: fc.integer({ min: 1000, max: 1_000_000 }),
-        })(
-            "should return the same value for valid intervals >= 1000ms",
-            (props) => {
-                const result = safeParseCheckInterval(props.value);
-                expect(result).toBe(props.value);
-                expect(result).toBeGreaterThanOrEqual(1000);
-            }
-        );
+        })("should return the same value for valid intervals >= 1000ms", (
+            props
+        ) => {
+            const result = safeParseCheckInterval(props.value);
+            expect(result).toBe(props.value);
+            expect(result).toBeGreaterThanOrEqual(1000);
+        });
 
         test.prop({
             value: fc.integer({ min: 0, max: 999 }),
@@ -140,14 +139,13 @@ describe("SafeConversions - Property-Based Tests", () => {
     describe(safeParseInt, () => {
         test.prop({
             value: fc.integer(),
-        })(
-            "should return the same integer for valid integer inputs",
-            (props) => {
-                const result = safeParseInt(props.value);
-                expect(result).toBe(props.value);
-                expect(Number.isInteger(result)).toBeTruthy();
-            }
-        );
+        })("should return the same integer for valid integer inputs", (
+            props
+        ) => {
+            const result = safeParseInt(props.value);
+            expect(result).toBe(props.value);
+            expect(Number.isInteger(result)).toBeTruthy();
+        });
 
         test.prop({
             value: fc
@@ -386,30 +384,29 @@ describe("SafeConversions - Property-Based Tests", () => {
     describe("Cross-function consistency", () => {
         test.prop({
             input: fc.anything(),
-        })(
-            "all functions should handle arbitrary input gracefully",
-            (props) => {
-                const functions = [
-                    () => safeNumberConversion(props.input),
-                    () => safeParseCheckInterval(props.input),
-                    () => safeParseFloat(props.input),
-                    () => safeParseInt(props.input),
-                    () => safeParsePercentage(props.input),
-                    () => safeParsePort(props.input),
-                    () => safeParsePositiveInt(props.input),
-                    () => safeParseRetryAttempts(props.input),
-                    () => safeParseTimeout(props.input),
-                    () => safeParseTimestamp(props.input),
-                ];
+        })("all functions should handle arbitrary input gracefully", (
+            props
+        ) => {
+            const functions = [
+                () => safeNumberConversion(props.input),
+                () => safeParseCheckInterval(props.input),
+                () => safeParseFloat(props.input),
+                () => safeParseInt(props.input),
+                () => safeParsePercentage(props.input),
+                () => safeParsePort(props.input),
+                () => safeParsePositiveInt(props.input),
+                () => safeParseRetryAttempts(props.input),
+                () => safeParseTimeout(props.input),
+                () => safeParseTimestamp(props.input),
+            ];
 
-                for (const fn of functions) {
-                    expect(() => fn()).not.toThrowError();
-                    const result = fn();
-                    expect(typeof result).toBe("number");
-                    expect(Number.isNaN(result)).toBeFalsy();
-                }
+            for (const fn of functions) {
+                expect(() => fn()).not.toThrowError();
+                const result = fn();
+                expect(typeof result).toBe("number");
+                expect(Number.isNaN(result)).toBeFalsy();
             }
-        );
+        });
 
         test.prop({
             stringValue: fc.string({ minLength: 1, maxLength: 20 }),

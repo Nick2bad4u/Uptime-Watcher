@@ -465,8 +465,7 @@ describe("State Sync Domain API", () => {
                     sites.map((site) => ({
                         ...site,
                         monitors: [],
-                    }))
-                );
+                    })));
 
             await fc.assert(
                 fc.asyncProperty(
@@ -530,14 +529,18 @@ describe("State Sync Domain API", () => {
                     fc.integer({ min: 0 }),
                     fc.option(fc.string({ minLength: 1 }))
                 )
-                .map(([action, source, timestamp, siteIdentifier]) =>
+                .map(([
+                    action,
+                    source,
+                    timestamp,
+                    siteIdentifier,
+                ]) =>
                     buildStateSyncEventData(
                         action,
                         source,
                         timestamp,
                         siteIdentifier
-                    )
-                );
+                    ));
 
             fc.assert(
                 fc.property(eventArb, (eventData) => {
@@ -817,8 +820,7 @@ describe("State Sync Domain API", () => {
 
             // Should not throw despite callback error
             expect(() =>
-                registeredHandler({}, validEventData)
-            ).not.toThrowError();
+                registeredHandler({}, validEventData)).not.toThrowError();
             expect(throwingCallback).toHaveBeenCalledWith(validEventData);
         });
 
@@ -836,16 +838,16 @@ describe("State Sync Domain API", () => {
             api.onStateSyncEvent(mockCallback);
 
             // Send rapid sequence of events
-            const events: StateSyncEventData[] = Array.from(
-                { length: 100 },
-                (_, i) => ({
-                    action: "update",
-                    sites: [],
-                    source: "database",
-                    timestamp: Date.now() + i,
-                    siteIdentifier: `rapid-${i}`,
-                })
-            );
+            const events: StateSyncEventData[] = Array.from({ length: 100 }, (
+                _,
+                i
+            ) => ({
+                action: "update",
+                sites: [],
+                source: "database",
+                timestamp: Date.now() + i,
+                siteIdentifier: `rapid-${i}`,
+            }));
 
             for (const event of events) {
                 registeredHandler({}, event);

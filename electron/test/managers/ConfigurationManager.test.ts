@@ -130,8 +130,7 @@ describe(ConfigurationManager, () => {
 
             // The cache is private, so we just test that the method executes without error
             expect(() =>
-                configManager.clearValidationCache()
-            ).not.toThrowError();
+                configManager.clearValidationCache()).not.toThrowError();
         });
     });
 

@@ -42,8 +42,7 @@ const incidentSite: Site = {
                   responseTime: 680,
                   status: "down",
               }
-            : monitor
-    ),
+            : monitor),
 };
 
 const pausedSite: Site = {
@@ -62,7 +61,11 @@ const meta: Meta<typeof SiteTableRow> = {
     },
     component: SiteTableRow,
     decorators: [
-        createSiteDecorator(() => [baseSite, incidentSite, pausedSite]),
+        createSiteDecorator(() => [
+            baseSite,
+            incidentSite,
+            pausedSite,
+        ]),
     ],
     parameters: {
         layout: "padded",

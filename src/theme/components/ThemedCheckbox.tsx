@@ -14,8 +14,7 @@ import { ARIA_LABEL } from "../../constants";
  * @public
  */
 export interface ThemedCheckboxProperties
-    extends AccessibilityProperties,
-        CoreComponentProperties {
+    extends AccessibilityProperties, CoreComponentProperties {
     /** Whether the checkbox is checked */
     readonly checked?: boolean;
     /** Callback fired when checkbox state changes */

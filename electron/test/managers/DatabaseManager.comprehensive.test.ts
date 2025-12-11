@@ -247,17 +247,15 @@ const attachTransactionAdapter = (
     repository: Record<string, any>,
     builders: Record<string, Function>
 ) => {
-    repository["createTransactionAdapter"] = vi
-        .fn()
-        .mockImplementation((db: unknown) => {
-            const adapter: Record<string, any> = {};
-            for (const [key, factory] of Object.entries(builders)) {
-                adapter[key] = vi.fn((...args: unknown[]) =>
-                    factory(db, ...args)
-                );
-            }
-            return adapter;
-        });
+    repository["createTransactionAdapter"] = vi.fn().mockImplementation((
+        db: unknown
+    ) => {
+        const adapter: Record<string, any> = {};
+        for (const [key, factory] of Object.entries(builders)) {
+            adapter[key] = vi.fn((...args: unknown[]) => factory(db, ...args));
+        }
+        return adapter;
+    });
 };
 
 const initializeTransactionAdapters = (): void => {
@@ -392,13 +390,14 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
             );
 
             // Mock event emission to fail for specific database events only
-            vi.mocked(mockEventEmitter.emitTyped).mockImplementation(
-                async (eventName, _payload) => {
-                    if (eventName === "database:transaction-completed") {
-                        throw new Error("Event emission failed");
-                    }
+            vi.mocked(mockEventEmitter.emitTyped).mockImplementation(async (
+                eventName,
+                _payload
+            ) => {
+                if (eventName === "database:transaction-completed") {
+                    throw new Error("Event emission failed");
                 }
-            );
+            });
 
             // Should not throw even if event emission fails
             await expect(databaseManager.initialize()).resolves.toBeUndefined();
@@ -536,18 +535,19 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
             // Reset and configure the SiteLoadingOrchestrator mock
             // Mock to test the cache operations in loadSites
             const mockOrchestrator = createSiteLoadingOrchestratorMock({
-                loadSitesFromDatabase: vi
-                    .fn()
-                    .mockImplementation(async (_tempCache, config) => {
-                        // Call the callbacks to test cache operations
-                        if (config.stopMonitoring)
-                            await config.stopMonitoring("site1", "monitor1");
-                        return {
-                            success: true,
-                            sitesLoaded: 1,
-                            message: "Success",
-                        };
-                    }),
+                loadSitesFromDatabase: vi.fn().mockImplementation(async (
+                    _tempCache,
+                    config
+                ) => {
+                    // Call the callbacks to test cache operations
+                    if (config.stopMonitoring)
+                        await config.stopMonitoring("site1", "monitor1");
+                    return {
+                        success: true,
+                        sitesLoaded: 1,
+                        message: "Success",
+                    };
+                }),
             });
 
             // Direct property assignment since vi.mock doesn't intercept constructor calls
@@ -631,15 +631,14 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
             await databaseManager.initialize();
 
             // Mock event emission to fail specifically for start monitoring
-            vi.mocked(mockEventEmitter.emitTyped).mockImplementation(
-                async (eventName, _payload) => {
-                    if (
-                        eventName === "internal:site:start-monitoring-requested"
-                    ) {
-                        throw new Error("Event emission failed");
-                    }
+            vi.mocked(mockEventEmitter.emitTyped).mockImplementation(async (
+                eventName,
+                _payload
+            ) => {
+                if (eventName === "internal:site:start-monitoring-requested") {
+                    throw new Error("Event emission failed");
                 }
-            );
+            });
 
             // Should not throw even if event emission fails
             await expect(
@@ -666,18 +665,19 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
             // Reset and configure the SiteLoadingOrchestrator mock
             // Create a mock that uses the startMonitoring callback
             const mockOrchestrator = createSiteLoadingOrchestratorMock({
-                loadSitesFromDatabase: vi
-                    .fn()
-                    .mockImplementation(async (_tempCache, config) => {
-                        // Simulate calling startMonitoring which triggers emitSitesCacheUpdateRequested
-                        if (config.startMonitoring)
-                            await config.startMonitoring("site1", "monitor1");
-                        return {
-                            success: true,
-                            sitesLoaded: 1,
-                            message: "Success",
-                        };
-                    }),
+                loadSitesFromDatabase: vi.fn().mockImplementation(async (
+                    _tempCache,
+                    config
+                ) => {
+                    // Simulate calling startMonitoring which triggers emitSitesCacheUpdateRequested
+                    if (config.startMonitoring)
+                        await config.startMonitoring("site1", "monitor1");
+                    return {
+                        success: true,
+                        sitesLoaded: 1,
+                        message: "Success",
+                    };
+                }),
             });
             vi.mocked(SiteLoadingOrchestrator).mockImplementation(
                 function SiteLoadingOrchestratorHistoryMock() {
@@ -689,15 +689,14 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
                 mockOrchestrator as any;
 
             // Mock event emission to fail
-            vi.mocked(mockEventEmitter.emitTyped).mockImplementation(
-                async (eventName, _payload) => {
-                    if (
-                        eventName === "internal:site:start-monitoring-requested"
-                    ) {
-                        throw new Error("Event emission failed");
-                    }
+            vi.mocked(mockEventEmitter.emitTyped).mockImplementation(async (
+                eventName,
+                _payload
+            ) => {
+                if (eventName === "internal:site:start-monitoring-requested") {
+                    throw new Error("Event emission failed");
                 }
-            );
+            });
 
             await expect(databaseManager.initialize()).rejects.toThrowError(
                 "Event emission failed"
@@ -866,19 +865,20 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
 
             // Reset and configure the SiteLoadingOrchestrator mock
             const mockOrchestrator = createSiteLoadingOrchestratorMock({
-                loadSitesFromDatabase: vi
-                    .fn()
-                    .mockImplementation(async (_tempCache, config) => {
-                        // Test the stopMonitoring callback
-                        if (config.stopMonitoring) {
-                            await config.stopMonitoring("site1", "monitor1");
-                        }
-                        return {
-                            success: true,
-                            sitesLoaded: 1,
-                            message: "Success",
-                        };
-                    }),
+                loadSitesFromDatabase: vi.fn().mockImplementation(async (
+                    _tempCache,
+                    config
+                ) => {
+                    // Test the stopMonitoring callback
+                    if (config.stopMonitoring) {
+                        await config.stopMonitoring("site1", "monitor1");
+                    }
+                    return {
+                        success: true,
+                        sitesLoaded: 1,
+                        message: "Success",
+                    };
+                }),
             });
             vi.mocked(SiteLoadingOrchestrator).mockImplementation(
                 function SiteLoadingOrchestratorMonitoringMock() {
@@ -900,18 +900,19 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
             await annotate("Type: Error Handling", "type");
 
             const mockOrchestrator = createSiteLoadingOrchestratorMock({
-                loadSitesFromDatabase: vi
-                    .fn()
-                    .mockImplementation(async (_tempCache, config) => {
-                        if (config.stopMonitoring) {
-                            await config.stopMonitoring("site1", "monitor1");
-                        }
-                        return {
-                            success: true,
-                            sitesLoaded: 1,
-                            message: "Success",
-                        };
-                    }),
+                loadSitesFromDatabase: vi.fn().mockImplementation(async (
+                    _tempCache,
+                    config
+                ) => {
+                    if (config.stopMonitoring) {
+                        await config.stopMonitoring("site1", "monitor1");
+                    }
+                    return {
+                        success: true,
+                        sitesLoaded: 1,
+                        message: "Success",
+                    };
+                }),
             });
             vi.mocked(SiteLoadingOrchestrator).mockImplementation(
                 function SiteLoadingOrchestratorStopFailureMock() {
@@ -922,15 +923,14 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
             (databaseManager as any).siteLoadingOrchestrator =
                 mockOrchestrator as any;
 
-            vi.mocked(mockEventEmitter.emitTyped).mockImplementation(
-                async (eventName, _payload) => {
-                    if (
-                        eventName === "internal:site:stop-monitoring-requested"
-                    ) {
-                        throw new Error("Stop event failed");
-                    }
+            vi.mocked(mockEventEmitter.emitTyped).mockImplementation(async (
+                eventName,
+                _payload
+            ) => {
+                if (eventName === "internal:site:stop-monitoring-requested") {
+                    throw new Error("Stop event failed");
                 }
-            );
+            });
 
             await expect(databaseManager.initialize()).rejects.toThrowError(
                 "Stop event failed"
@@ -948,22 +948,23 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
 
             // Reset and configure the SiteLoadingOrchestrator mock
             const mockOrchestrator = createSiteLoadingOrchestratorMock({
-                loadSitesFromDatabase: vi
-                    .fn()
-                    .mockImplementation(async (_tempCache, config) => {
-                        // Test the setupNewMonitors callback
-                        if (config.setupNewMonitors) {
-                            await config.setupNewMonitors([
-                                "monitor1",
-                                "monitor2",
-                            ]);
-                        }
-                        return {
-                            success: true,
-                            sitesLoaded: 1,
-                            message: "Success",
-                        };
-                    }),
+                loadSitesFromDatabase: vi.fn().mockImplementation(async (
+                    _tempCache,
+                    config
+                ) => {
+                    // Test the setupNewMonitors callback
+                    if (config.setupNewMonitors) {
+                        await config.setupNewMonitors([
+                            "monitor1",
+                            "monitor2",
+                        ]);
+                    }
+                    return {
+                        success: true,
+                        sitesLoaded: 1,
+                        message: "Success",
+                    };
+                }),
             });
             vi.mocked(SiteLoadingOrchestrator).mockImplementation(
                 function SiteLoadingOrchestratorIntegrationMock() {
@@ -994,19 +995,20 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
 
             // Reset and configure the SiteLoadingOrchestrator mock
             const mockOrchestrator = createSiteLoadingOrchestratorMock({
-                loadSitesFromDatabase: vi
-                    .fn()
-                    .mockImplementation(async (_tempCache, config) => {
-                        // Test the setHistoryLimit callback
-                        if (config.setHistoryLimit) {
-                            await config.setHistoryLimit(200);
-                        }
-                        return {
-                            success: true,
-                            sitesLoaded: 1,
-                            message: "Success",
-                        };
-                    }),
+                loadSitesFromDatabase: vi.fn().mockImplementation(async (
+                    _tempCache,
+                    config
+                ) => {
+                    // Test the setHistoryLimit callback
+                    if (config.setHistoryLimit) {
+                        await config.setHistoryLimit(200);
+                    }
+                    return {
+                        success: true,
+                        sitesLoaded: 1,
+                        message: "Success",
+                    };
+                }),
             });
             vi.mocked(SiteLoadingOrchestrator).mockImplementation(
                 function SiteLoadingOrchestratorEdgeCaseMock() {

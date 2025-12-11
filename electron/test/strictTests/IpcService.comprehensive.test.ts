@@ -256,11 +256,11 @@ describe("IpcService - Comprehensive Coverage", () => {
             checkSiteManually: vi.fn().mockResolvedValue(true),
             exportData: vi.fn().mockResolvedValue("export-data"),
             importData: vi.fn().mockResolvedValue(true),
-            setHistoryLimit: vi
-                .fn()
-                .mockImplementation(async (limit: number) => {
-                    historyLimit = limit;
-                }),
+            setHistoryLimit: vi.fn().mockImplementation(async (
+                limit: number
+            ) => {
+                historyLimit = limit;
+            }),
             getHistoryLimit: vi.fn().mockImplementation(() => historyLimit),
             resetSettings: vi.fn().mockResolvedValue(undefined),
             downloadBackup: vi.fn().mockResolvedValue({
@@ -272,9 +272,7 @@ describe("IpcService - Comprehensive Coverage", () => {
                 .fn()
                 .mockImplementation(async ({ sites }) =>
                     (sites ?? mockSites).map((site: Site) =>
-                        structuredClone(site)
-                    )
-                ),
+                        structuredClone(site))),
             emitTyped: vi.fn().mockResolvedValue(undefined),
             onTyped: vi.fn(),
             off: vi.fn(),

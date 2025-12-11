@@ -7,8 +7,10 @@ import { MarqueeText } from "@app/components/common/MarqueeText/MarqueeText";
 /**
  * Story arguments for the marquee presenter.
  */
-interface MarqueeStoryArgs
-    extends Omit<ComponentProps<typeof MarqueeText>, "textProps"> {
+interface MarqueeStoryArgs extends Omit<
+    ComponentProps<typeof MarqueeText>,
+    "textProps"
+> {
     readonly textSize: TextSize;
     readonly textWeight: TextWeight;
 }

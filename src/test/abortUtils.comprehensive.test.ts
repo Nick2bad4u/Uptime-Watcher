@@ -21,33 +21,31 @@ describe("abortUtils.ts - Comprehensive Coverage", () => {
     beforeAll(() => {
         // Mock AbortSignal.timeout and AbortSignal.any for older Node versions
         if (!AbortSignal.timeout) {
-            vi.spyOn(AbortSignal, "timeout").mockImplementation(
-                (delay: number) => {
-                    const controller = new AbortController();
-                    setTimeout(() => controller.abort(), delay);
-                    return controller.signal;
-                }
-            );
+            vi.spyOn(AbortSignal, "timeout").mockImplementation((
+                delay: number
+            ) => {
+                const controller = new AbortController();
+                setTimeout(() => controller.abort(), delay);
+                return controller.signal;
+            });
         }
 
         if (!AbortSignal.any) {
-            vi.spyOn(AbortSignal, "any").mockImplementation(
-                (signals: AbortSignal[]) => {
-                    const controller = new AbortController();
-                    for (const signal of signals) {
-                        if (signal.aborted) {
-                            controller.abort();
-                            break;
-                        }
-                        signal.addEventListener(
-                            "abort",
-                            () => controller.abort(),
-                            { once: true }
-                        );
+            vi.spyOn(AbortSignal, "any").mockImplementation((
+                signals: AbortSignal[]
+            ) => {
+                const controller = new AbortController();
+                for (const signal of signals) {
+                    if (signal.aborted) {
+                        controller.abort();
+                        break;
                     }
-                    return controller.signal;
+                    signal.addEventListener("abort", () => controller.abort(), {
+                        once: true,
+                    });
                 }
-            );
+                return controller.signal;
+            });
         }
     });
 
@@ -578,8 +576,7 @@ describe("abortUtils.ts - Comprehensive Coverage", () => {
 
         it("should handle race with multiple operations", async () => {
             const slow = new Promise((resolve) =>
-                setTimeout(() => resolve("slow"), 1000)
-            );
+                setTimeout(() => resolve("slow"), 1000));
             const fast = Promise.resolve("fast");
             const controller = new AbortController();
 

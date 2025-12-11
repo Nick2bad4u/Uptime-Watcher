@@ -512,8 +512,9 @@ describe("CacheKeys - Complete Function Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             expect(() =>
-                parseCacheKey("site:" as StandardizedCacheKey)
-            ).toThrowError("Invalid cache key format: site:");
+                parseCacheKey("site:" as StandardizedCacheKey)).toThrowError(
+                "Invalid cache key format: site:"
+            );
         });
 
         it("should throw error for invalid 2-part format with empty prefix", async ({
@@ -546,8 +547,9 @@ describe("CacheKeys - Complete Function Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             expect(() =>
-                parseCacheKey("config:" as StandardizedCacheKey)
-            ).toThrowError("Invalid cache key format: config:");
+                parseCacheKey("config:" as StandardizedCacheKey)).toThrowError(
+                "Invalid cache key format: config:"
+            );
         });
 
         it("should throw error for invalid 3-part format with empty prefix", async ({

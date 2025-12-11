@@ -485,44 +485,44 @@ describe("Theme Merging Property-Based Tests", () => {
     fcTest.prop([
         fc.constantFrom(...Object.values(themes)),
         partialThemeArbitrary,
-    ])(
-        "should work with predefined themes from themes.ts",
-        (baseTheme, overrideTheme) => {
-            const result = deepMergeTheme(
-                baseTheme,
-                overrideTheme as Partial<Theme>
-            );
+    ])("should work with predefined themes from themes.ts", (
+        baseTheme,
+        overrideTheme
+    ) => {
+        const result = deepMergeTheme(
+            baseTheme,
+            overrideTheme as Partial<Theme>
+        );
 
-            // Should maintain theme structure and type safety
-            if (Object.hasOwn(overrideTheme, "name")) {
-                // When override explicitly has name property, use that value (even if undefined)
-                expect(result.name).toBe(overrideTheme.name);
-            } else {
-                // When override doesn't have name, preserve base theme value
-                expect(result.name).toBeDefined();
-            }
-            if (Object.hasOwn(overrideTheme, "isDark")) {
-                // When override explicitly has isDark, use that value (even if undefined)
-                expect(result.isDark).toBe(overrideTheme.isDark);
-            } else {
-                // When override doesn't have isDark, preserve base theme value
-                expect(typeof result.isDark).toBe("boolean");
-            }
-
-            // Colors should be properly merged based on override presence
-            if (overrideTheme.colors === undefined) {
-                expect(result.colors).toEqual(baseTheme.colors);
-            } else {
-                // Check that colors structure is maintained
-                expect(result.colors.background).toBeDefined();
-                expect(result.colors.primary).toBeDefined();
-            }
-
-            // Should preserve predefined theme quality
-            expect(Object.keys(result.colors.primary)).toHaveLength(10); // 50-900 shades
-            expect(Object.keys(result.colors.status)).toHaveLength(7); // All status colors
+        // Should maintain theme structure and type safety
+        if (Object.hasOwn(overrideTheme, "name")) {
+            // When override explicitly has name property, use that value (even if undefined)
+            expect(result.name).toBe(overrideTheme.name);
+        } else {
+            // When override doesn't have name, preserve base theme value
+            expect(result.name).toBeDefined();
         }
-    );
+        if (Object.hasOwn(overrideTheme, "isDark")) {
+            // When override explicitly has isDark, use that value (even if undefined)
+            expect(result.isDark).toBe(overrideTheme.isDark);
+        } else {
+            // When override doesn't have isDark, preserve base theme value
+            expect(typeof result.isDark).toBe("boolean");
+        }
+
+        // Colors should be properly merged based on override presence
+        if (overrideTheme.colors === undefined) {
+            expect(result.colors).toEqual(baseTheme.colors);
+        } else {
+            // Check that colors structure is maintained
+            expect(result.colors.background).toBeDefined();
+            expect(result.colors.primary).toBeDefined();
+        }
+
+        // Should preserve predefined theme quality
+        expect(Object.keys(result.colors.primary)).toHaveLength(10); // 50-900 shades
+        expect(Object.keys(result.colors.status)).toHaveLength(7); // All status colors
+    });
 
     fcTest.prop([completeThemeArbitrary, partialThemeArbitrary])(
         "should preserve immutability - original themes should not be modified",
@@ -541,30 +541,30 @@ describe("Theme Merging Property-Based Tests", () => {
     fcTest.prop([
         fc.array(completeThemeArbitrary, { minLength: 2, maxLength: 5 }),
         fc.array(partialThemeArbitrary, { minLength: 1, maxLength: 3 }),
-    ])(
-        "should handle multiple theme merging operations",
-        (baseThemes, overrideThemes) => {
-            // Start with first base theme
-            let result = baseThemes[0];
+    ])("should handle multiple theme merging operations", (
+        baseThemes,
+        overrideThemes
+    ) => {
+        // Start with first base theme
+        let result = baseThemes[0];
 
-            // Apply each override sequentially
-            for (const override of overrideThemes) {
-                // @ts-expect-error - Fuzzing test with complex theme type compatibility issues
-                result = deepMergeTheme(result, override as Partial<Theme>);
-            }
-
-            // Result should still be a valid theme
-            expect(result).toHaveProperty("name");
-            expect(result).toHaveProperty("isDark");
-            expect(result).toHaveProperty("colors");
-            expect(result!.colors).toHaveProperty("background");
-            expect(result!.colors).toHaveProperty("primary");
-
-            // Should maintain structural integrity after multiple merges
-            expect(Object.keys(result!.colors.primary)).toHaveLength(10);
-            expect(Object.keys(result!.colors.status)).toHaveLength(7);
+        // Apply each override sequentially
+        for (const override of overrideThemes) {
+            // @ts-expect-error - Fuzzing test with complex theme type compatibility issues
+            result = deepMergeTheme(result, override as Partial<Theme>);
         }
-    );
+
+        // Result should still be a valid theme
+        expect(result).toHaveProperty("name");
+        expect(result).toHaveProperty("isDark");
+        expect(result).toHaveProperty("colors");
+        expect(result!.colors).toHaveProperty("background");
+        expect(result!.colors).toHaveProperty("primary");
+
+        // Should maintain structural integrity after multiple merges
+        expect(Object.keys(result!.colors.primary)).toHaveLength(10);
+        expect(Object.keys(result!.colors.status)).toHaveLength(7);
+    });
 
     it("should handle empty override objects gracefully", () => {
         const baseTheme = themes.light;
@@ -592,8 +592,7 @@ describe("Theme Merging Property-Based Tests", () => {
         } as Partial<Theme>;
 
         expect(() =>
-            deepMergeTheme(baseTheme, overrideWithNulls)
-        ).not.toThrowError();
+            deepMergeTheme(baseTheme, overrideWithNulls)).not.toThrowError();
         const result = deepMergeTheme(baseTheme, overrideWithNulls);
 
         // Null values should override (explicit null is intentional)

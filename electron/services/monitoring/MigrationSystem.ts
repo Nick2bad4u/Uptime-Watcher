@@ -514,8 +514,7 @@ class MigrationRegistry {
 
         // Sort by version using immutable operation
         const sortedRules = rules.toSorted((a, b) =>
-            this.compareVersions(a.fromVersion, b.fromVersion)
-        );
+            this.compareVersions(a.fromVersion, b.fromVersion));
         rules.length = 0;
         rules.push(...sortedRules);
 

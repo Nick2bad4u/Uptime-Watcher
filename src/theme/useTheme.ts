@@ -169,15 +169,13 @@ export function useTheme(): UseThemeReturn {
         [currentTheme.name, systemTheme]
     );
 
-    const updateSystemTheme = useCallback(
-        (newSystemTheme: SystemThemePreference) => {
-            // Only update if the theme actually changed to prevent unnecessary re-renders
-            setSystemTheme((prev) =>
-                prev === newSystemTheme ? prev : newSystemTheme
-            );
-        },
-        []
-    );
+    const updateSystemTheme = useCallback((
+        newSystemTheme: SystemThemePreference
+    ) => {
+        // Only update if the theme actually changed to prevent unnecessary re-renders
+        setSystemTheme((prev) =>
+            prev === newSystemTheme ? prev : newSystemTheme);
+    }, []);
 
     // Listen for system theme changes
     useEffect(
