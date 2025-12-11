@@ -9411,7 +9411,7 @@ export default /** @type {EslintConfig} */ [
             "perfectionist/sort-jsx-props": "off",
             "perfectionist/sort-objects": "off",
             "perfectionist/sort-union-types": "off",
-            "prettier/prettier": "off",
+            "prettier/prettier": "off", // Using in Prettier directly for less noise for AI
             "react-perf/jsx-no-jsx-as-prop": "off",
             "react-perf/jsx-no-new-function-as-prop": "off",
             "react-perf/jsx-no-new-object-as-prop": "off",
