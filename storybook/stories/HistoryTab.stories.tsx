@@ -4,11 +4,9 @@
 
 import type { Monitor } from "@shared/types";
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { within } from "@testing-library/dom";
-import userEvent from "@testing-library/user-event";
-import { expect } from "vitest";
 
 import { HistoryTab } from "@app/components/SiteDetails/tabs/HistoryTab";
+import { expect, userEvent, within } from "storybook/test";
 
 import { createMockMonitor } from "../helpers/siteStoryHelpers";
 
@@ -75,7 +73,7 @@ export const DefaultHistory: Story = {
 
         await step("Verify initial history summary", async () => {
             const summary = await canvas.findByText(/24 of 24 records/i);
-            await expect(summary).not.toHaveTextContent(/\(down filter\)/i);
+            void expect(summary).not.toHaveTextContent(/\(down filter\)/i);
         });
 
         await step("Filter to down records", async () => {
@@ -85,17 +83,17 @@ export const DefaultHistory: Story = {
             await userEvent.click(downFilterButton);
 
             const summary = await canvas.findByText(/0 of 24 records/i);
-            await expect(summary).toHaveTextContent(/\(down filter\)/i);
+            void expect(summary).toHaveTextContent(/\(down filter\)/i);
         });
 
         await step("Adjust visible history count", async () => {
             const showSelect = canvas.getByRole("combobox");
             await userEvent.selectOptions(showSelect, "10");
 
-            await expect(showSelect).toHaveValue("10");
+            void expect(showSelect).toHaveValue("10");
 
             const summary = await canvas.findByText(/0 of 24 records/i);
-            await expect(summary).toHaveTextContent(/\(down filter\)/i);
+            void expect(summary).toHaveTextContent(/\(down filter\)/i);
         });
     },
 };

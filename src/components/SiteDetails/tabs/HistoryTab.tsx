@@ -24,7 +24,6 @@
  * @public
  */
 
-import { DEFAULT_HISTORY_LIMIT_RULES } from "@shared/constants/history";
 import type { Monitor, SiteStatus, StatusHistory } from "@shared/types";
 import type {
     ChangeEvent,
@@ -34,6 +33,7 @@ import type {
 } from "react";
 import type { JSX } from "react/jsx-runtime";
 
+import { DEFAULT_HISTORY_LIMIT_RULES } from "@shared/constants/history";
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FiFilter, FiInbox } from "react-icons/fi";
 import { MdHistory } from "react-icons/md";

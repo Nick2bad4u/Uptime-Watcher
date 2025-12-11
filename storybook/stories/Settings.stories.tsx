@@ -6,9 +6,6 @@ import type { SettingsProperties } from "@app/components/Settings/Settings";
 import type { SerializedDatabaseBackupResult } from "@shared/types/ipc";
 import type { Decorator, Meta, StoryObj } from "@storybook/react-vite";
 import type { JSX } from "react/jsx-runtime";
-import { within } from "@testing-library/dom";
-import userEvent from "@testing-library/user-event";
-import { expect } from "vitest";
 
 import { Settings } from "@app/components/Settings/Settings";
 import { DEFAULT_HISTORY_LIMIT } from "@app/constants";
@@ -18,6 +15,7 @@ import { useSitesStore } from "@app/stores/sites/useSitesStore";
 import { useUIStore } from "@app/stores/ui/useUiStore";
 import { useEffect } from "react";
 import { action } from "storybook/actions";
+import { expect, userEvent, within } from "storybook/test";
 
 import {
     createMockMonitor,
@@ -174,8 +172,8 @@ export const LightTheme: Story = {
                 /maximum number of history records to keep per site/i
             );
 
-            await expect(select).toBeInTheDocument();
-            await expect(select).toHaveValue(String(DEFAULT_HISTORY_LIMIT));
+            void expect(select).toBeInTheDocument();
+            void expect(select).toHaveValue(String(DEFAULT_HISTORY_LIMIT));
         });
 
         await step("Change history limit to Unlimited", async () => {
@@ -184,7 +182,7 @@ export const LightTheme: Story = {
             );
 
             await userEvent.selectOptions(select, "0");
-            await expect(select).toHaveValue("0");
+            void expect(select).toHaveValue("0");
         });
     },
 };

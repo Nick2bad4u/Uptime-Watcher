@@ -68,7 +68,8 @@
             "error",
             {
                 "exceptions": [
-                    "vitest-environment-browser"
+                    "vitest-environment-browser",
+                    "prettier-plugin-multiline-arrays"
                 ]
             }
         ],

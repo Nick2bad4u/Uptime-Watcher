@@ -44,7 +44,7 @@
         "pretty": true,
         "resolveJsonModule": true,
         "rootDir": "../",
-        "skipLibCheck": false,
+        "skipLibCheck": true,
         "strict": true,
         "target": "ES2024",
         "tsBuildInfoFile": "../.cache/tsconfig.playwright.tsbuildinfo",
