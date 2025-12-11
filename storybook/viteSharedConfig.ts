@@ -181,7 +181,6 @@ export const storybookOptimizeDepsInclude: readonly string[] = Object.freeze([
     "chartjs-adapter-date-fns",
     "chartjs-plugin-zoom",
     "electron-log/renderer",
-    "expect-type",
     "fast-deep-equal",
     "msw-storybook-addon",
     "react",
@@ -296,11 +295,7 @@ export const createStorybookPlugins = (
     const reactOptions =
         options?.reactOptions ?? createStorybookReactPluginOptions();
 
-    return [
-        tsconfigPaths(),
-        viteReact(reactOptions),
-        ...additionalPlugins,
-    ];
+    return [tsconfigPaths(), viteReact(reactOptions), ...additionalPlugins];
 };
 
 /**
@@ -351,11 +346,7 @@ export const createStorybookBaseViteConfig = (
         },
         optimizeDeps: {
             esbuildOptions: {
-                conditions: [
-                    "module",
-                    "browser",
-                    "node",
-                ],
+                conditions: ["module", "browser", "node"],
             },
             exclude: Array.from(optimizeDepsExclude),
             include: Array.from(optimizeDepsInclude),

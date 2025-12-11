@@ -114,37 +114,50 @@ This diagram shows the standardized IPC channel registration and handler mapping
     class SitesChannel {
         +handle("add-site", payload)
         +handle("update-site", payload)
-        +handle("delete-site", payload)
+        +handle("remove-site", payload)
+        +handle("remove-monitor", payload)
+        +handle("delete-all-sites", payload)
         +handle("get-sites", payload)
-        +handle("get-site", payload)
     }
 
     class MonitoringChannel {
         +handle("start-monitoring", payload)
         +handle("stop-monitoring", payload)
+        +handle("start-monitoring-for-site", payload)
+        +handle("start-monitoring-for-monitor", payload)
+        +handle("stop-monitoring-for-site", payload)
+        +handle("stop-monitoring-for-monitor", payload)
+        +handle("check-site-now", payload)
+    }
+
+    class MonitorTypesChannel {
         +handle("get-monitor-types", payload)
-        +handle("run-manual-check", payload)
+        +handle("format-monitor-detail", payload)
+        +handle("format-monitor-title-suffix", payload)
+        +handle("validate-monitor-data", payload)
     }
 
     class SettingsChannel {
-        +handle("get-settings", payload)
-        +handle("update-settings", payload)
+        +handle("get-history-limit", payload)
+        +handle("update-history-limit", payload)
         +handle("reset-settings", payload)
     }
 
     class EventsChannel {
         +emit("site:added", data)
         +emit("site:updated", data)
-        +emit("site:deleted", data)
+        +emit("site:removed", data)
         +emit("monitor:status-changed", data)
         +emit("monitor:up", data)
         +emit("monitor:down", data)
         +emit("state-sync-event", data)
+        +emit("settings:history-limit-updated", data)
     }
 
     IpcService --> StandardizedIpcHandler
     StandardizedIpcHandler <|.. SitesChannel
     StandardizedIpcHandler <|.. MonitoringChannel
+    StandardizedIpcHandler <|.. MonitorTypesChannel
     StandardizedIpcHandler <|.. SettingsChannel
     IpcService --> EventsChannel`} />
 

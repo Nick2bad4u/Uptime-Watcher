@@ -142,8 +142,8 @@ validated via `notificationPreferenceUpdateSchema` in
   events.
 - Integrate with scheduler backoff to avoid duplicate alerts during delayed
   retries.
-- Align with `RendererEventPayloadMap` and preload validation for notification
-  events.
+- Align with the typed `UptimeEvents` contract and main-process event
+  validation for notification-related diagnostics events.
 
 ## Testing & Validation
 

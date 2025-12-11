@@ -1,17 +1,16 @@
 /**
  * Monitoring service layer for handling all monitoring-related operations.
- * Provides a clean abstraction over electron API calls.
  *
  * @remarks
- * This service provides a frontend abstraction layer for monitoring operations,
- * ensuring the electron API is available before making calls and providing
- * consistent error handling patterns. All methods automatically initialize the
- * service before performing operations.
+ * This service provides a renderer-facing abstraction over the typed
+ * `monitoring` preload domain. It ensures the Electron bridge is initialized
+ * before making IPC calls and applies consistent error handling patterns.
  *
  * The service supports both specific monitor operations and site-wide
- * operations: - Individual monitor control with monitor ID
+ * operations:
  *
- * - Site-wide operations affecting all monitors of a site
+ * - Individual monitor control via monitor ID.
+ * - Site-wide operations affecting all monitors of a site.
  *
  * @example
  *
@@ -25,14 +24,12 @@
  * // Start monitoring for all monitors of a site
  * await MonitoringService.startMonitoringForSite("site-123");
  *
- * // Stop specific monitor
+ * // Stop a specific monitor
  * await MonitoringService.stopMonitoringForMonitor(
  *     "site-123",
  *     "monitor-456"
  * );
  * ```
- *
- * @public
  */
 
 import type {
@@ -73,6 +70,20 @@ const { ensureInitialized, wrap } = ((): ReturnType<
     }
 })();
 
+/**
+ * Resolves a candidate value to a non-empty identifier string.
+ *
+ * @remarks
+ * Used to avoid logging ambiguous `undefined` or whitespace-only identifiers
+ * when constructing error messages for failed status updates.
+ *
+ * @param candidate - Value that may contain an identifier.
+ * @param fallback - Fallback identifier used when {@link candidate} is not a
+ *   non-empty string.
+ *
+ * @returns The trimmed identifier when {@link candidate} is a non-empty string;
+ *   otherwise the provided {@link fallback}.
+ */
 const resolveIdentifier = (candidate: unknown, fallback: string): string => {
     if (typeof candidate === "string" && candidate.trim().length > 0) {
         return candidate;
@@ -81,6 +92,26 @@ const resolveIdentifier = (candidate: unknown, fallback: string): string => {
     return fallback;
 };
 
+/**
+ * Logs an invalid status update and throws a descriptive error.
+ *
+ * @remarks
+ * This helper augments the provided {@link metadata} with validation issues from
+ * the {@link ZodError} and emits a structured error log entry before throwing.
+ * The thrown {@link Error} message includes resolved `monitorId` and
+ * `siteIdentifier` values for easier correlation in logs.
+ *
+ * @param error - The {@link ZodError} instance describing validation failures
+ *   for the status update.
+ * @param metadata - Additional contextual fields such as `monitorId` and
+ *   `siteIdentifier` included in the log payload.
+ *
+ * @returns This function never returns; it always throws.
+ *
+ * @throws {@link Error} Always throws an error describing which monitor and
+ *   site produced the invalid status update. The original {@link ZodError} is
+ *   attached as the `cause`.
+ */
 const logInvalidStatusUpdateAndThrow = (
     error: ZodError,
     metadata: Record<string, unknown>
@@ -103,46 +134,88 @@ const logInvalidStatusUpdateAndThrow = (
     );
 };
 
+/**
+ * Contract for renderer-facing monitoring operations.
+ *
+ * @remarks
+ * All operations are asynchronous and delegate to the `monitoring` preload
+ * domain. Implementations must ensure the Electron bridge is initialized before
+ * invoking any underlying channel.
+ */
 interface MonitoringServiceContract {
+    /**
+     * Performs an immediate manual check for a specific monitor.
+     */
     checkSiteNow: (
         siteIdentifier: string,
         monitorId: string
     ) => Promise<StatusUpdate | undefined>;
+    /**
+     * Ensures the monitoring bridge is initialized prior to IPC usage.
+     */
     initialize: () => Promise<void>;
+    /**
+     * Starts monitoring across all configured sites.
+     */
     startMonitoring: () => Promise<MonitoringStartSummary>;
+    /**
+     * Starts monitoring for a single monitor within a site.
+     */
     startMonitoringForMonitor: (
         siteIdentifier: string,
         monitorId: string
     ) => Promise<void>;
+    /**
+     * Starts monitoring for every monitor within the specified site.
+     */
     startMonitoringForSite: (siteIdentifier: string) => Promise<void>;
+    /**
+     * Stops monitoring across all configured sites.
+     */
     stopMonitoring: () => Promise<MonitoringStopSummary>;
+    /**
+     * Stops monitoring for a specific monitor within a site.
+     */
     stopMonitoringForMonitor: (
         siteIdentifier: string,
         monitorId: string
     ) => Promise<void>;
+    /**
+     * Stops monitoring for every monitor belonging to the specified site.
+     */
     stopMonitoringForSite: (siteIdentifier: string) => Promise<void>;
 }
 
 /**
- * Service for managing monitoring operations through Electron IPC.
+ * Facade for managing monitoring operations through Electron IPC.
  *
  * @remarks
- * Provides a clean interface for all monitoring-related operations including
- * starting and stopping monitors, manual checks, and site-wide monitoring
- * control with automatic service initialization and error handling.
- *
- * @public
+ * This service offers a high-level interface for starting and stopping
+ * monitoring globally, per-site, and per-monitor, as well as performing manual
+ * checks via {@link MonitoringService.checkSiteNow}. It validates returned
+ * {@link StatusUpdate} payloads and monitoring summaries before exposing them to
+ * callers, and logs structured diagnostics when backend operations fail or
+ * return invalid data.
  */
 export const MonitoringService: MonitoringServiceContract = {
     /**
-     * Perform an immediate manual check for a specific monitor.
+     * Performs an immediate manual check for a specific monitor.
      *
-     * @param siteIdentifier - The identifier of the site containing the
-     *   monitor.
-     * @param monitorId - The identifier of the monitor to check.
+     * @remarks
+     * The raw status update returned by the backend is validated with
+     * {@link validateStatusUpdate}. When validation fails, the service logs a
+     * detailed error and throws, rather than returning potentially malformed
+     * data. Optional fields such as `details`, `previousStatus`, and
+     * `responseTime` are preserved when present.
      *
-     * @returns The latest {@link StatusUpdate} when available, otherwise
-     *   undefined.
+     * @param siteIdentifier - Identifier of the site containing the monitor.
+     * @param monitorId - Identifier of the monitor to check.
+     *
+     * @returns A promise that resolves with the latest {@link StatusUpdate} when
+     *   available, or `undefined` when the backend reports no new data.
+     *
+     * @throws {@link Error} When the backend returns an invalid status update
+     *   payload or the IPC bridge encounters an unexpected error.
      */
     checkSiteNow: wrap(
         "checkSiteNow",
@@ -196,15 +269,34 @@ export const MonitoringService: MonitoringServiceContract = {
     ),
     /**
      * Ensures the preload bridge is ready before invoking monitoring APIs.
+     *
+     * @remarks
+     * Call this during application startup to avoid paying the bridge
+     * initialization cost on the first monitoring operation.
+     *
+     * @returns A promise that resolves when the `monitoring` bridge is ready
+     *   for use.
+     *
+     * @throws {@link Error} When the Electron environment is unavailable or the
+     *   preload bridge cannot be initialized.
      */
     initialize: ensureInitialized,
     /**
      * Starts monitoring across all configured sites.
      *
-     * @returns A cloned {@link MonitoringStartSummary} describing the result of
-     *   the global start request.
+     * @remarks
+     * When the backend reports partial failures, a warning is logged but the
+     * operation may still be considered successful if `isMonitoring` is `true`.
+     * If `isMonitoring` remains `false`, this method throws an {@link Error}
+     * whose `summary` property contains the {@link MonitoringStartSummary} for
+     * further inspection.
      *
-     * @throws Error when the backend declines to start global monitoring.
+     * @returns A promise that resolves with a cloned
+     *   {@link MonitoringStartSummary} describing the outcome of the global
+     *   start request.
+     *
+     * @throws {@link Error} When the backend declines to start global
+     *   monitoring or no eligible monitors are available.
      */
     startMonitoring: wrap(
         "startMonitoring",
@@ -241,10 +333,13 @@ export const MonitoringService: MonitoringServiceContract = {
     /**
      * Starts monitoring for a single monitor within a site.
      *
-     * @param siteIdentifier - Site that owns the monitor.
-     * @param monitorId - Monitor identifier to start.
+     * @param siteIdentifier - Identifier of the site that owns the monitor.
+     * @param monitorId - Identifier of the monitor to start.
      *
-     * @throws Error when the backend reports failure for the targeted monitor.
+     * @returns A promise that resolves when the backend reports success.
+     *
+     * @throws {@link Error} When the backend reports failure for the targeted
+     *   monitor.
      */
     startMonitoringForMonitor: wrap(
         "startMonitoringForMonitor",
@@ -271,7 +366,9 @@ export const MonitoringService: MonitoringServiceContract = {
      * @param siteIdentifier - Identifier of the site whose monitors should
      *   begin monitoring.
      *
-     * @throws Error when the backend declines the request.
+     * @returns A promise that resolves when the backend reports success.
+     *
+     * @throws {@link Error} When the backend declines the request.
      */
     startMonitoringForSite: wrap(
         "startMonitoringForSite",
@@ -289,10 +386,19 @@ export const MonitoringService: MonitoringServiceContract = {
     /**
      * Stops monitoring across all configured sites.
      *
-     * @returns A cloned {@link MonitoringStopSummary} describing the outcome of
-     *   the global stop request.
+     * @remarks
+     * When the backend reports partial failures, a warning is logged but the
+     * operation may still be considered successful if `isMonitoring` becomes
+     * `false`. If monitoring remains active, this method throws an {@link Error}
+     * whose `summary` property contains the {@link MonitoringStopSummary} for
+     * further debugging.
      *
-     * @throws Error when the backend declines to stop global monitoring.
+     * @returns A promise that resolves with a cloned
+     *   {@link MonitoringStopSummary} describing the outcome of the global stop
+     *   request.
+     *
+     * @throws {@link Error} When the backend declines to stop global monitoring
+     *   or no running monitors can be located.
      */
     stopMonitoring: wrap(
         "stopMonitoring",
@@ -329,10 +435,13 @@ export const MonitoringService: MonitoringServiceContract = {
     /**
      * Stops monitoring for a specific monitor within a site.
      *
-     * @param siteIdentifier - Site that owns the monitor.
-     * @param monitorId - Monitor identifier to stop.
+     * @param siteIdentifier - Identifier of the site that owns the monitor.
+     * @param monitorId - Identifier of the monitor to stop.
      *
-     * @throws Error when the backend reports failure for the targeted monitor.
+     * @returns A promise that resolves when the backend reports success.
+     *
+     * @throws {@link Error} When the backend reports failure for the targeted
+     *   monitor.
      */
     stopMonitoringForMonitor: wrap(
         "stopMonitoringForMonitor",
@@ -359,7 +468,9 @@ export const MonitoringService: MonitoringServiceContract = {
      * @param siteIdentifier - Identifier of the site whose monitors should stop
      *   monitoring.
      *
-     * @throws Error when the backend declines the request.
+     * @returns A promise that resolves when the backend reports success.
+     *
+     * @throws {@link Error} When the backend declines the request.
      */
     stopMonitoringForSite: wrap(
         "stopMonitoringForSite",

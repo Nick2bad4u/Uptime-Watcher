@@ -563,83 +563,167 @@ if (result.success) {
 
 ### IPC Exposure
 
-The registry is exposed to the renderer via IPC:
+The registry is exposed to the renderer via IPC using the shared preload
+channel map:
 
 ```typescript
-// IpcService.ts
+// electron/services/ipc/handlers/monitorTypeHandlers.ts
 registerStandardizedIpcHandler(
-    MONITOR_TYPES_CHANNELS.getAllMonitorTypes,
-    async () => {
+    MONITOR_TYPES_CHANNELS.getMonitorTypes,
+    withIgnoredIpcEvent(() => {
         const configs = getAllMonitorTypeConfigs();
-        return configs.map(serializeMonitorConfig);
-    },
-    MonitorTypesHandlerValidators.getAllMonitorTypes,
-    this.registeredIpcHandlers
+        return configs.map((config) => serializeMonitorTypeConfig(config));
+    }),
+    MonitorTypeHandlerValidators.getMonitorTypes,
+    registeredHandlers
 );
 ```
 
 ### Frontend Service
 
+The renderer talks to the monitor-type registry exclusively through the
+`MonitorTypesService` IPC façade, which in turn uses
+`getIpcServiceHelpers("MonitorTypesService")` so callers never touch
+`window.electronAPI` directly:
+
 ```typescript
-// MonitorTypesService.ts
+// src/services/MonitorTypesService.ts
 export const MonitorTypesService = {
-    async getAllMonitorTypes(): Promise<MonitorTypeConfig[]> {
-        return window.electronAPI.monitorTypes.getAllMonitorTypes();
-    },
+    formatMonitorDetail: wrap(
+        "formatMonitorDetail",
+        async (api, type: string, details: string): Promise<string> => {
+            const result = await api.monitorTypes.formatMonitorDetail(
+                type,
+                details
+            );
+            if (typeof result !== "string") {
+                throw new TypeError(
+                    "formatMonitorDetail must return a formatted string"
+                );
+            }
+            return result;
+        }
+    ),
 
-    async getMonitorTypeConfig(type: string): Promise<MonitorTypeConfig | undefined> {
-        return window.electronAPI.monitorTypes.getMonitorTypeConfig(type);
-    },
+    formatMonitorTitleSuffix: wrap(
+        "formatMonitorTitleSuffix",
+        async (api, type: string, monitor: Monitor): Promise<string> => {
+            const result =
+                await api.monitorTypes.formatMonitorTitleSuffix(type, monitor);
+            if (typeof result !== "string") {
+                throw new TypeError(
+                    "formatMonitorTitleSuffix must return a formatted string"
+                );
+            }
+            return result;
+        }
+    ),
 
-    isValidMonitorType(type: string): boolean {
-        const store = useMonitorTypesStore.getState();
-        return store.monitorTypes.some((t) => t.type === type);
-    },
-};
+    getMonitorTypes: wrap(
+        "getMonitorTypes",
+        async (api): Promise<MonitorTypeConfig[]> =>
+            validateServicePayload(
+                validateMonitorTypeConfigArray,
+                await api.monitorTypes.getMonitorTypes(),
+                {
+                    operation: "getMonitorTypes",
+                    serviceName: "MonitorTypesService",
+                }
+            )
+    ),
+
+    initialize: ensureInitialized,
+
+    validateMonitorData: wrap(
+        "validateMonitorData",
+        async (api, type: string, data: unknown): Promise<ValidationResult> =>
+            validateServicePayload(
+                validateValidationResult,
+                await api.monitorTypes.validateMonitorData(type, data),
+                {
+                    operation: "validateMonitorData",
+                    serviceName: "MonitorTypesService",
+                }
+            )
+    ),
+} satisfies MonitorTypesServiceContract;
 ```
 
-### Zustand Store Integration
+### Zustand Store and Helper Integration
+
+Rather than calling IPC directly, the renderer caches monitor type metadata in
+a dedicated store and exposes helpers for consumer components:
 
 ```typescript
-// useMonitorTypesStore.ts
-interface MonitorTypesState {
-    monitorTypes: MonitorTypeConfig[];
-    isLoading: boolean;
-    error: string | undefined;
-}
-
-interface MonitorTypesActions {
-    loadMonitorTypes: () => Promise<void>;
-    getMonitorTypeByType: (type: string) => MonitorTypeConfig | undefined;
-    getFieldsForType: (type: string) => MonitorFieldDefinition[];
-}
-
-export const useMonitorTypesStore = create<MonitorTypesState & MonitorTypesActions>()(
+// src/stores/monitor/useMonitorTypesStore.ts
+export const useMonitorTypesStore = create<MonitorTypesStore>()(
     (set, get) => ({
         monitorTypes: [],
+        isLoaded: false,
         isLoading: false,
-        error: undefined,
+        lastError: undefined,
 
-        loadMonitorTypes: async () => {
-            set({ isLoading: true, error: undefined });
+        loadMonitorTypes: async (): Promise<void> => {
+            if (get().isLoaded && !get().lastError) return;
+
+            set({ isLoading: true, lastError: undefined });
             try {
-                const types = await MonitorTypesService.getAllMonitorTypes();
-                set({ monitorTypes: types, isLoading: false });
+                const rawConfigs = await MonitorTypesService.getMonitorTypes();
+                const configsArray = Array.isArray(rawConfigs)
+                    ? (rawConfigs as unknown[])
+                    : [];
+
+                const validConfigs: MonitorTypeConfig[] = [];
+                // ...validation and logging elided for brevity
+
+                set({
+                    isLoaded: true,
+                    isLoading: false,
+                    lastError: undefined,
+                    monitorTypes: validConfigs,
+                });
             } catch (error) {
-                set({ error: String(error), isLoading: false });
+                const normalized = ensureError(error);
+                set({
+                    isLoaded: false,
+                    isLoading: false,
+                    lastError: normalized.message,
+                });
             }
-        },
-
-        getMonitorTypeByType: (type) => {
-            return get().monitorTypes.find((t) => t.type === type);
-        },
-
-        getFieldsForType: (type) => {
-            const config = get().getMonitorTypeByType(type);
-            return config?.fields ?? [];
         },
     })
 );
+
+// src/utils/monitorTypeHelper.ts
+export async function getAvailableMonitorTypes(): Promise<MonitorTypeConfig[]> {
+    const cacheKey = CacheKeys.config.byName("all-monitor-types");
+    const cached = AppCaches.monitorTypes.get(cacheKey) as
+        | MonitorTypeConfig[]
+        | undefined;
+    if (cached) return cached;
+
+    const types = await withUtilityErrorHandling(
+        async () => {
+            const store = useMonitorTypesStore.getState();
+            if (!store.isLoaded) {
+                await store.loadMonitorTypes();
+            }
+            return useMonitorTypesStore.getState().monitorTypes;
+        },
+        "Fetch monitor types from backend",
+        [] as MonitorTypeConfig[]
+    );
+
+    AppCaches.monitorTypes.set(cacheKey, types);
+    return types;
+}
+
+export async function getMonitorTypeConfig(
+    type: string
+): Promise<MonitorTypeConfig | undefined> {
+    const configs = await getAvailableMonitorTypes();
+    return configs.find((config) => config.type === type);
+}
 ```
 
 ## Consequences

@@ -62,15 +62,25 @@ const meta: Meta<typeof SiteTableRow> = {
     },
     component: SiteTableRow,
     decorators: [
-        createSiteDecorator(() => [
-            baseSite,
-            incidentSite,
-            pausedSite,
-        ]),
+        createSiteDecorator(() => [baseSite, incidentSite, pausedSite]),
     ],
     parameters: {
         layout: "padded",
     },
+    // Wrap the row in a semantic table structure to avoid invalid
+    // `<tr>`-inside-`<div>` markup, which React 19+ rightfully warns about and
+    // can cause hydration issues. The underlying component still renders a
+    // single `<tr>` as in the main app; the story just supplies a proper
+    // `<table><tbody>` parent.
+    render: (args) => (
+        <div className="max-w-4xl overflow-x-auto">
+            <table className="site-table w-full border-collapse">
+                <tbody>
+                    <SiteTableRow {...args} />
+                </tbody>
+            </table>
+        </div>
+    ),
     tags: ["autodocs"],
 } satisfies Meta<typeof SiteTableRow>;
 

@@ -6,6 +6,9 @@ import type { SettingsProperties } from "@app/components/Settings/Settings";
 import type { SerializedDatabaseBackupResult } from "@shared/types/ipc";
 import type { Decorator, Meta, StoryObj } from "@storybook/react-vite";
 import type { JSX } from "react/jsx-runtime";
+import { within } from "@testing-library/dom";
+import userEvent from "@testing-library/user-event";
+import { expect } from "vitest";
 
 import { Settings } from "@app/components/Settings/Settings";
 import { DEFAULT_HISTORY_LIMIT } from "@app/constants";
@@ -162,7 +165,29 @@ const meta: Meta<SettingsStoryArgs> = {
 
 export default meta;
 
-export const LightTheme: Story = {};
+export const LightTheme: Story = {
+    play: async ({ canvasElement, step }) => {
+        const canvas = within(canvasElement);
+
+        await step("Locate history limit control", async () => {
+            const select = await canvas.findByLabelText(
+                /maximum number of history records to keep per site/i
+            );
+
+            await expect(select).toBeInTheDocument();
+            await expect(select).toHaveValue(String(DEFAULT_HISTORY_LIMIT));
+        });
+
+        await step("Change history limit to Unlimited", async () => {
+            const select = await canvas.findByLabelText(
+                /maximum number of history records to keep per site/i
+            );
+
+            await userEvent.selectOptions(select, "0");
+            await expect(select).toHaveValue("0");
+        });
+    },
+};
 
 export const DarkTheme: Story = {
     args: {

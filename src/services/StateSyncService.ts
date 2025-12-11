@@ -2,10 +2,11 @@
  * Service layer for handling state synchronization operations via Electron IPC.
  *
  * @remarks
- * Ensures all state synchronization interactions go through the preload bridge
- * with proper initialization, logging, and error handling. Provides typed
- * wrappers for sync status retrieval, full sync requests, and event
- * subscriptions.
+ * Ensures all state synchronization interactions go through the typed
+ * `stateSync` preload domain with proper initialization, logging, and error
+ * handling. Provides typed wrappers for sync status retrieval, full sync
+ * requests, and event subscriptions, so renderer code never touches the
+ * `window.electronAPI.stateSync` bridge directly.
  *
  * For a store-level view of how these operations integrate with the sites
  * cache, see the "State sync pipeline" section in `docs/TSDoc/stores/sites.md`
@@ -78,11 +79,34 @@ interface StateSyncServiceContract {
     readonly requestFullSync: () => Promise<StateSyncFullSyncResult>;
 }
 
+/**
+ * Facade for state synchronization status, full-sync requests, and incremental
+ * sync events.
+ *
+ * @remarks
+ * This service delegates to the typed `stateSync` preload domain via
+ * {@link getIpcServiceHelpers}, and validates all IPC responses using the shared
+ * snapshot helpers from `@shared/types/stateSync`. It also implements a guarded
+ * subscription pipeline that recovers from malformed `state-sync-event`
+ * payloads by triggering a full-sync and synthesizing a replacement `BULK_SYNC`
+ * event.
+ */
 export const StateSyncService: StateSyncServiceContract = {
     /**
      * Retrieves the latest synchronization summary from the backend.
      *
-     * @returns {@link StateSyncStatusSummary} Describing recent sync activity.
+     * @remarks
+     * The raw status returned by the preload bridge is parsed with
+     * {@link parseStateSyncStatusSummary} to enforce the
+     * {@link StateSyncStatusSummary} contract before it is returned to callers.
+     *
+     * @returns A promise that resolves with a {@link StateSyncStatusSummary}
+     *   describing recent sync activity, including `lastSyncAt`, `siteCount`,
+     *   `source`, and `synchronized` flags.
+     *
+     * @throws {@link Error} When the IPC bridge fails, the backend rejects the
+     *   request, or the returned payload cannot be parsed into a valid
+     *   {@link StateSyncStatusSummary}.
      */
     getSyncStatus: wrap("getSyncStatus", async (api) => {
         // eslint-disable-next-line n/no-sync -- IPC channel is asynchronous despite "Sync" suffix.
@@ -93,16 +117,40 @@ export const StateSyncService: StateSyncServiceContract = {
     /**
      * Ensures the preload bridge is initialized prior to invoking IPC.
      *
-     * @returns Promise that resolves when the bridge is ready.
+     * @remarks
+     * Call this during application startup to ensure subsequent state-sync
+     * operations do not pay the initialization cost on first use.
+     *
+     * @returns A promise that resolves when the `stateSync` bridge is ready for
+     *   use.
+     *
+     * @throws {@link Error} When the Electron environment is unavailable or the
+     *   preload bridge fails to initialize.
      */
     initialize: ensureInitialized,
 
     /**
      * Subscribes to incremental state synchronization updates.
      *
-     * @param callback - Handler invoked with {@link StateSyncEventData}.
+     * @remarks
+     * Incoming `state-sync-event` payloads are first validated with
+     * {@link safeParseStateSyncEventData}. When invalid payloads are observed,
+     * the service logs structured diagnostics and schedules a guarded full-sync
+     * recovery via {@link StateSyncService.requestFullSync}. A synthesized
+     * `BULK_SYNC` event is emitted to the subscriber, and the service waits for
+     * a matching broadcast from the backend before clearing its recovery
+     * expectation.
      *
-     * @returns Cleanup callback that removes the subscription.
+     * @param callback - Handler invoked with validated
+     *   {@link StateSyncEventData} instances describing bulk or incremental site
+     *   snapshots.
+     *
+     * @returns A promise that resolves with a cleanup function which removes
+     *   the subscription when invoked.
+     *
+     * @throws {@link Error} When the bridge registration fails, the unsubscribe
+     *   handler returned by the preload bridge cannot be normalized, or cleanup
+     *   itself throws unexpectedly.
      */
     onStateSyncEvent: wrap(
         "onStateSyncEvent",
@@ -289,7 +337,18 @@ export const StateSyncService: StateSyncServiceContract = {
     /**
      * Requests a full state synchronization cycle.
      *
-     * @returns {@link StateSyncFullSyncResult} Emitted by the backend.
+     * @remarks
+     * The raw snapshot returned by the backend is parsed using
+     * {@link parseStateSyncFullSyncResult} to ensure it conforms to the
+     * {@link StateSyncFullSyncResult} contract before being exposed to callers.
+     *
+     * @returns A promise that resolves with the {@link StateSyncFullSyncResult}
+     *   emitted by the backend, including the authoritative `sites` array,
+     *   `siteCount`, `completedAt` timestamp, and sync `source`.
+     *
+     * @throws {@link Error} When the IPC bridge fails, the backend rejects the
+     *   request, or the returned payload cannot be parsed into a valid
+     *   {@link StateSyncFullSyncResult}.
      */
     requestFullSync: wrap("requestFullSync", async (api) => {
         // eslint-disable-next-line n/no-sync -- IPC bridge exposes async method with "Sync" suffix.

@@ -214,7 +214,10 @@ const suffix = await MonitorTypesService.formatMonitorTitleSuffix(
 
 ### Data API (`DataService`)
 
-> Primary entry point: `@app/services/DataService`. Internally this wraps `window.electronAPI.data`.
+> Primary entry point: `@app/services/DataService`. Internally this uses the
+> typed `data` domain exposed by the preload bridge via
+> `getIpcServiceHelpers("DataService")`, so UI code never touches
+> `window.electronAPI` directly.
 
 #### `exportData(): Promise<string>`
 
@@ -279,7 +282,12 @@ The main process re-validates the payload (checksum, size, schema version) using
 
 ### Monitor Types API (`MonitorTypesService`)
 
-> Primary entry point: `@app/services/MonitorTypesService`. Internally this delegates exclusively to `window.electronAPI.monitorTypes`, keeping lifecycle controls within the `monitoring` domain. This aligns with ADR-005 by routing all monitor metadata helpers (registry lookup, formatting, and validation) through the dedicated monitor-types bridge.
+> Primary entry point: `@app/services/MonitorTypesService`. Internally this
+> uses the typed `monitorTypes` domain from the preload bridge via
+> `getIpcServiceHelpers("MonitorTypesService")`, keeping lifecycle controls
+> within the monitoring domain. This aligns with ADR-005 by routing all
+> monitor metadata helpers (registry lookup, formatting, and validation)
+> through the dedicated monitor-types bridge.
 
 #### `getMonitorTypes(): Promise<MonitorTypeConfig[]>`
 
@@ -292,7 +300,10 @@ const monitorTypes = await MonitorTypesService.getMonitorTypes();
 
 ### Settings API (`SettingsService`)
 
-> Primary entry point: `@app/services/SettingsService`. Internally this wraps `window.electronAPI.settings`.
+> Primary entry point: `@app/services/SettingsService`. Internally this uses
+> the typed `settings` domain from the preload bridge via
+> `getIpcServiceHelpers("SettingsService")`, ensuring renderer code only sees
+> a service abstraction rather than raw IPC or `window.electronAPI`.
 
 #### `getHistoryLimit(): Promise<number>`
 
@@ -312,7 +323,16 @@ await SettingsService.resetSettings();
 
 #### `updateHistoryLimit(limitDays: number): Promise<number>`
 
-Sets the history retention limit and returns the persisted value.
+Sets the history retention limit and returns the final, sanitised value used by
+the backend.
+
+If the caller supplies an invalid limit (for example, exceeding the configured
+maximum), the request is rejected with a `TypeError` and no change is
+persisted. When the requested limit is valid but the backend responds with an
+invalid value, the renderer falls back to a sanitised version of the requested
+limit and logs structured diagnostics; see the "History limit propagation
+(settings & database)" section in `docs/Architecture/README.md` for the
+end-to-end flow.
 
 ```typescript
 const updatedLimit = await SettingsService.updateHistoryLimit(45);
@@ -320,7 +340,10 @@ const updatedLimit = await SettingsService.updateHistoryLimit(45);
 
 ### State Sync API (`StateSyncService`)
 
-> Primary entry point: `@app/services/StateSyncService`. Internally this wraps `window.electronAPI.stateSync`.
+> Primary entry point: `@app/services/StateSyncService`. Internally this uses
+> the typed `stateSync` domain from the preload bridge via
+> `getIpcServiceHelpers("StateSyncService")`, so renderer code never talks to
+> `window.electronAPI.stateSync` directly.
 
 #### `getSyncStatus(): Promise<StateSyncStatusSummary>`
 
@@ -340,7 +363,7 @@ const { sites } = await StateSyncService.requestFullSync();
 useSitesStore.getState().setSites(sites);
 ```
 
-#### `onStateSyncEvent(callback: (event: StateSyncEventData) => void): () => void`
+#### `onStateSyncEvent(callback: (event: StateSyncEventData) => void): Promise<() => void>`
 
 Registers a listener for incremental state sync events (bulk-sync, update, delete). Returns a cleanup function to unsubscribe.
 
@@ -354,13 +377,17 @@ const cleanup = await StateSyncService.onStateSyncEvent((event) => {
 // Later: cleanup();
 ```
 
-### System API (`window.electronAPI.system`)
+### System API (`SystemService`)
 
 #### `openExternal(url: string): Promise<boolean>`
 
-Opens HTTP(S) URLs in the user's default external browser. The call resolves to `true` when Electron successfully delegates the navigation request.
+Opens HTTP(S) URLs in the user's default external browser. The call resolves to
+`true` when Electron successfully delegates the navigation request.
 
-> **Recommendation:** Access this capability through the renderer `SystemService` (`@app/services/SystemService`) rather than using the raw preload bridge. The service enforces URL validation, logging, and consistent error reporting.
+Under the hood this delegates to the typed `system` preload domain
+(`window.electronAPI.system.openExternal`) via `SystemService`, so renderer
+code never talks to the raw bridge directly. The service enforces URL
+validation, logging, and consistent error reporting.
 
 ```typescript
 import { SystemService } from "@app/services/SystemService";
@@ -394,7 +421,7 @@ The application uses a sophisticated event system for real-time communication:
 
 ### Event Listener Registration
 
-Realtime listeners exposed via the renderer `EventsService` focus on monitoring, cache invalidation, update status, and diagnostic test events. These helpers wrap the underlying `window.electronAPI.events` bridge and ensure consistent cleanup semantics:
+Realtime listeners exposed via the renderer `EventsService` focus on monitoring, cache invalidation, update status, and diagnostic test events. These helpers use `getIpcServiceHelpers("EventsService")` against the typed `events` preload domain so UI code never talks to `window.electronAPI.events` directly, while still ensuring consistent cleanup semantics:
 
 ```typescript
 import { EventsService } from "../services/EventsService";
@@ -552,7 +579,7 @@ interface UptimeEvents {
   previousStatus?: MonitorStatus;
   responseTime?: number;
   details?: string;
-  timestamp: string; // ISO-8601
+  timestamp: number; // Unix timestamp (ms)
   monitor?: Monitor;
   site?: Site;
  };
@@ -568,7 +595,7 @@ interface UptimeEvents {
 }
 ```
 
-Monitor lifecycle events (`monitor:down`/`monitor:up`) reuse the shared `StatusUpdate` payload, so every downstream consumer sees the canonical `siteIdentifier`, `monitorId`, and ISO-8601 `timestamp` values alongside populated `monitor` and `site` context.
+Monitor lifecycle events (`monitor:down`/`monitor:up`) reuse the shared `StatusUpdate` payload, so every downstream consumer sees the canonical `siteIdentifier`, `monitorId`, and Unix `timestamp` values (milliseconds since epoch) alongside populated `monitor` and `site` context.
 
 #### Application Events
 
@@ -917,22 +944,34 @@ try {
 
 ### Context Isolation
 
-All IPC communication uses Electron's context isolation for security:
+All IPC communication uses Electron's context isolation and the typed preload
+bridge for security:
 
 ```typescript
-// preload.ts - Secure exposure
-const electronAPI = {
- sites: {
-  getSites: () => ipcRenderer.invoke("get-sites"),
-  addSite: (data: SiteCreationData) => ipcRenderer.invoke("add-site", data),
-  updateSite: (identifier: string, updates: Partial<Site>) =>
-   ipcRenderer.invoke("update-site", identifier, updates),
-  removeSite: (identifier: string) =>
-   ipcRenderer.invoke("remove-site", identifier),
-  removeMonitor: (identifier: string, monitorId: string) =>
-   ipcRenderer.invoke("remove-monitor", identifier, monitorId),
-  deleteAllSites: () => ipcRenderer.invoke("delete-all-sites"),
- },
+// electron/preload.ts - Secure exposure
+import type { ElectronBridgeApi } from "@shared/types/preload";
+import { contextBridge } from "electron";
+
+import { dataApi } from "./preload/domains/dataApi";
+import { monitoringApi } from "./preload/domains/monitoringApi";
+import { monitorTypesApi } from "./preload/domains/monitorTypesApi";
+import { notificationsApi } from "./preload/domains/notificationsApi";
+import { settingsApi } from "./preload/domains/settingsApi";
+import { sitesApi } from "./preload/domains/sitesApi";
+import { stateSyncApi } from "./preload/domains/stateSyncApi";
+import { systemApi } from "./preload/domains/systemApi";
+import { createEventsApi } from "./preload/domains/eventsApi";
+
+const electronAPI: ElectronBridgeApi<ReturnType<typeof createEventsApi>, typeof systemApi> = {
+  data: dataApi,
+  events: createEventsApi(),
+  monitoring: monitoringApi,
+  monitorTypes: monitorTypesApi,
+  notifications: notificationsApi,
+  settings: settingsApi,
+  sites: sitesApi,
+  stateSync: stateSyncApi,
+  system: systemApi,
 } as const;
 
 contextBridge.exposeInMainWorld("electronAPI", electronAPI);

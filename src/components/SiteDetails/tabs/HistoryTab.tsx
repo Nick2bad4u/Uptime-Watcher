@@ -24,6 +24,7 @@
  * @public
  */
 
+import { DEFAULT_HISTORY_LIMIT_RULES } from "@shared/constants/history";
 import type { Monitor, SiteStatus, StatusHistory } from "@shared/types";
 import type {
     ChangeEvent,
@@ -77,6 +78,45 @@ const HISTORY_DENSITY_LABELS: Record<InterfaceDensity, string> = {
 };
 type HistoryRowStyle = CSSProperties & {
     "--surface-order"?: number;
+};
+
+/**
+ * Resolves the effective backend history limit used to cap history display
+ * options.
+ *
+ * @remarks
+ * The shared history-limit rules treat a persisted value of `0` as "unlimited"
+ * retention. When the settings store reports `0`, this helper interprets it as
+ * an unbounded backend limit for the purposes of the history-tab UI so that the
+ * dropdown can offer up to the full available history instead of incorrectly
+ * falling back to a small default window.
+ *
+ * For non-zero values the helper simply normalizes to a finite, positive
+ * integer, falling back to the shared default when settings are not yet
+ * populated.
+ */
+const resolveBackendHistoryLimit = (
+    rawLimit: number | undefined,
+    historyLength: number
+): number => {
+    if (rawLimit === 0) {
+        // Unlimited retention – cap UI at the number of available records.
+        return historyLength > 0
+            ? historyLength
+            : DEFAULT_HISTORY_LIMIT_RULES.defaultLimit;
+    }
+
+    if (typeof rawLimit !== "number" || Number.isNaN(rawLimit)) {
+        return DEFAULT_HISTORY_LIMIT_RULES.defaultLimit;
+    }
+
+    const normalized = Math.floor(rawLimit);
+
+    if (normalized <= 0) {
+        return DEFAULT_HISTORY_LIMIT_RULES.minLimit;
+    }
+
+    return normalized;
 };
 
 /**
@@ -158,8 +198,10 @@ export const HistoryTab: NamedExoticComponent<HistoryTabProperties> = memo(
         const [historyFilter, setHistoryFilter] =
             useState<HistoryFilter>("all");
         const historyLength = selectedMonitor.history.length;
-
-        const backendLimit = settings.historyLimit || 25;
+        const backendLimit = resolveBackendHistoryLimit(
+            settings.historyLimit,
+            historyLength
+        );
 
         // Track the last monitor ID and type we logged for to prevent duplicate
         // logging
@@ -183,19 +225,13 @@ export const HistoryTab: NamedExoticComponent<HistoryTabProperties> = memo(
 
         const FilterAllIcon = AppIcons.ui.analytics;
 
-        // Dropdown options: 25, 50, 100, All (clamped to backendLimit and
-        // available history)
+        // Dropdown options: a curated set of record counts plus an "All"
+        // entry, clamped to the resolved backend limit and the available
+        // history length.
         const maxShow = Math.min(backendLimit, historyLength);
-        const showOptions = [
-            10,
-            25,
-            50,
-            100,
-            250,
-            500,
-            1000,
-            10_000,
-        ].filter((opt) => opt <= maxShow);
+        const showOptions = [10, 25, 50, 100, 250, 500, 1000, 10_000].filter(
+            (opt) => opt <= maxShow
+        );
 
         // Always include 'All' if there are fewer than backendLimit
         if (
@@ -297,11 +333,7 @@ export const HistoryTab: NamedExoticComponent<HistoryTabProperties> = memo(
                     totalRecords: historyLength,
                 });
             },
-            [
-                historyLength,
-                selectedMonitor.id,
-                selectedMonitor.type,
-            ]
+            [historyLength, selectedMonitor.id, selectedMonitor.type]
         );
 
         const handleHistoryLimitChange = useCallback(
@@ -318,11 +350,7 @@ export const HistoryTab: NamedExoticComponent<HistoryTabProperties> = memo(
                     totalRecords: historyLength,
                 });
             },
-            [
-                backendLimit,
-                historyLength,
-                selectedMonitor.id,
-            ]
+            [backendLimit, historyLength, selectedMonitor.id]
         );
 
         const filterIcon = useMemo(
@@ -343,11 +371,7 @@ export const HistoryTab: NamedExoticComponent<HistoryTabProperties> = memo(
                     totalRecords: historyLength,
                 });
             },
-            [
-                historyLength,
-                selectedMonitor.id,
-                setHistoryDensity,
-            ]
+            [historyLength, selectedMonitor.id, setHistoryDensity]
         );
 
         const createDensityHandler = useCallback(

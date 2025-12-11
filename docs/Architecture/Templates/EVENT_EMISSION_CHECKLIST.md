@@ -48,7 +48,7 @@ export interface RendererEventPayloadMap {
     "notifications:sent": NotificationSentEventData;
 }
 
-// main
+// main (orchestrator / manager event bus)
 await eventBus.emitTyped("notifications:sent", {
     notificationId,
     siteIdentifier,
@@ -57,9 +57,31 @@ await eventBus.emitTyped("notifications:sent", {
     timestamp: Date.now(),
 });
 
-// preload
-ipcRenderer.on("notifications:sent", (_event, payload: NotificationSentEventData) => {
-    validateNotificationPayload(payload);
-    window.electronAPI.events.emit("notifications:sent", payload);
-});
+// main (ApplicationService → renderer event bridge)
+this.scopedSubscriptions.onTyped<UptimeEvents, "notifications:sent">(
+    orchestrator,
+    "notifications:sent",
+    (data) => {
+        const payload = this.stripOrchestratorPayloadMetadata(
+            "notifications:sent",
+            data
+        );
+
+        this.emitRendererEvent(
+            RENDERER_EVENT_CHANNELS.NOTIFICATIONS_SENT,
+            payload
+        );
+    }
+);
+
+// preload (events domain bridge – conceptual)
+ipcRenderer.on(
+    RENDERER_EVENT_CHANNELS.NOTIFICATIONS_SENT,
+    (_event, payload: NotificationSentEventData) => {
+        validateNotificationPayload(payload);
+        // Bridge forwards to window.electronAPI.events.onNotificationsSent
+        // via createEventManager/EventsDomainBridge; renderer code only sees
+        // typed subscription helpers (for example, EventsService.onNotificationsSent).
+    }
+);
 ```

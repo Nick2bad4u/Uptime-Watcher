@@ -374,8 +374,10 @@ const mockElectronAPI = {
         updateHistoryLimit: vi.fn(),
     },
     monitorTypes: {
-        getAllMonitorTypes: vi.fn().mockResolvedValue([]),
-        getMonitorTypeConfig: vi.fn(),
+        getMonitorTypes: vi.fn().mockResolvedValue([]),
+        formatMonitorDetail: vi.fn(),
+        formatMonitorTitleSuffix: vi.fn(),
+        validateMonitorData: vi.fn(),
     },
     data: {
         exportData: vi.fn(),
