@@ -39,9 +39,9 @@ handoffs:
    agent: BeastMode
    prompt: Review the recent work and ToDo list to ensure all tasks are complete. Follow the plan in .github/prompts/Review.prompt.md - If everything is complete, clear the todo list.
    send: false
- - label: FC Prop
+ - label: Review Loop
    agent: BeastMode
-   prompt: "Keep looking for generic name/objects and change them into fast-check props. Make sure you're looking in all test folders: `src/tests` `tests/` `electron/tests` `shared/tests` - Don't slack off and look hard for more generic names to fix. Keep going until you can't find any more. Search deeply and thoroughly."
+   prompt: "As an autonomous agent, review my entire codebase for improvements, bugs, or issues. Use your best judgment to construct and execute a dynamic, iterative plan: categorize findings into high-priority bugs (e.g., security or crashes), medium-priority enhancements (e.g., performance or readability), and low-priority tweaks (e.g., style or minor optimizations). Each iteration of this prompt, focus on a different aspect or section of the code (e.g., rotate through modules, functions, tests, or architectural patterns). Even if this prompt repeats identically, prioritize novel discoveries, adapt based on prior reviews or new insights, and avoid rehashing the same points. For each issue, implement fixes directly by editing code, applying changes, etc. Summarize your current work including what you fixed this iteration."
    send: true
 tools: ['execute/testFailure', 'execute/getTerminalOutput', 'execute/runTask', 'execute/createAndRunTask', 'execute/runInTerminal', 'execute/runTests', 'read/readFile', 'read/terminalLastCommand', 'read/getTaskOutput', 'edit/createDirectory', 'edit/createFile', 'edit/editFiles', 'search/changes', 'search/codebase', 'search/fileSearch', 'search/listDirectory', 'search/textSearch', 'search/usages', 'tavily-remote-mcp/*', 'vscode-mcp/execute_command', 'vscode-mcp/get_diagnostics', 'vscode-mcp/get_references', 'vscode-mcp/get_symbol_lsp_info', 'vscode-mcp/rename_symbol', 'agent', 'updateUserPreferences', 'memory', 'todo']
 ---

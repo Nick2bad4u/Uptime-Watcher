@@ -3,7 +3,7 @@
  *
  * This configuration is specifically tailored for:
  *
- * - Electron + React + TypeScript architecture
+            rules: {
  * - Domain-driven design with Zustand stores
  * - Service-based backend architecture
  * - High code quality with reduced false positives
@@ -1418,6 +1418,7 @@ export default /** @type {EslintConfig} */ [
             "@eslint-react/avoid-shorthand-boolean": "off",
             "@eslint-react/dom/no-missing-button-type": "warn",
             "@eslint-react/dom/no-missing-iframe-sandbox": "warn",
+            "@eslint-react/dom/no-string-style-prop": "error",
             "@eslint-react/dom/no-unknown-property": "warn",
             "@eslint-react/dom/no-unsafe-target-blank": "warn",
             /* DOM subplugin */
@@ -7390,9 +7391,9 @@ export default /** @type {EslintConfig} */ [
             "require-unicode-regexp": "off",
             "sort-imports": "off",
             "sort-keys": "off",
-            "testing-library/await-async-queries": "error",
-            "testing-library/no-await-sync-queries": "error",
-            "testing-library/no-debugging-utils": "off",
+                "testing-library/await-async-queries": "error",
+                "testing-library/no-await-sync-queries": "error",
+                "testing-library/no-debugging-utils": "off",
             "testing-library/no-node-access": "off",
             "testing-library/prefer-screen-queries": "warn",
             "undefined-css-classes/no-undefined-css-classes": "off",
@@ -7526,7 +7527,7 @@ export default /** @type {EslintConfig} */ [
             "unused-imports": pluginUnusedImports,
             vitest: vitest,
         },
-        rules: {
+            rules: {
             // Test Files Backend Rules (Electron Tests)
             ...js.configs.all.rules,
             ...tseslint.configs["recommendedTypeChecked"],
@@ -7621,9 +7622,9 @@ export default /** @type {EslintConfig} */ [
             "require-unicode-regexp": "off",
             "sort-imports": "off",
             "sort-keys": "off",
-            "testing-library/await-async-queries": "error",
-            "testing-library/no-await-sync-queries": "error",
-            "testing-library/no-debugging-utils": "off",
+                "testing-library/await-async-queries": "error",
+                "testing-library/no-await-sync-queries": "error",
+                "testing-library/no-debugging-utils": "off",
             "testing-library/no-node-access": "off",
             "testing-library/prefer-screen-queries": "warn",
             "unicorn/consistent-function-scoping": "off", // Tests often use different scoping
@@ -7829,9 +7830,9 @@ export default /** @type {EslintConfig} */ [
             "require-unicode-regexp": "off",
             "sort-imports": "off",
             "sort-keys": "off",
-            "testing-library/await-async-queries": "error",
-            "testing-library/no-await-sync-queries": "error",
-            "testing-library/no-debugging-utils": "off",
+                "testing-library/await-async-queries": "error",
+                "testing-library/no-await-sync-queries": "error",
+                "testing-library/no-debugging-utils": "off",
             "testing-library/no-node-access": "off",
             "testing-library/prefer-screen-queries": "warn",
             "undefined-css-classes/no-undefined-css-classes": "off",
