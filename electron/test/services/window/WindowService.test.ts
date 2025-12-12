@@ -27,6 +27,7 @@ vi.mock("electron", () => {
             openDevTools: vi.fn(),
             removeListener: vi.fn(),
             send: vi.fn(),
+            setWindowOpenHandler: vi.fn(),
             session: {
                 webRequest: {
                     onHeadersReceived: vi.fn(),
@@ -43,6 +44,9 @@ vi.mock("electron", () => {
 
     return {
         BrowserWindow: MockBrowserWindow,
+        shell: {
+            openExternal: vi.fn().mockResolvedValue(undefined),
+        },
     };
 });
 
@@ -195,8 +199,13 @@ describe(WindowService, () => {
                 webPreferences: {
                     contextIsolation: true,
                     nodeIntegration: false,
+                    nodeIntegrationInSubFrames: false,
+                    nodeIntegrationInWorker: false,
                     preload: expect.any(String),
                     sandbox: false,
+                    webSecurity: true,
+                    webviewTag: false,
+                    allowRunningInsecureContent: false,
                 },
                 width: 1200,
             });
@@ -228,6 +237,13 @@ describe(WindowService, () => {
                 "did-fail-load",
                 expect.any(Function)
             );
+            expect(window.webContents.on).toHaveBeenCalledWith(
+                "will-navigate",
+                expect.any(Function)
+            );
+            expect(
+                window.webContents.setWindowOpenHandler
+            ).toHaveBeenCalledWith(expect.any(Function));
             expect(window.on).toHaveBeenCalledWith(
                 "closed",
                 expect.any(Function)

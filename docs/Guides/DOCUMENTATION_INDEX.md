@@ -3,7 +3,7 @@ schema: "../../config/schemas/doc-frontmatter.schema.json"
 title: "Documentation Index"
 summary: "Navigation hub and master index for all Uptime Watcher documentation, organized by topic and audience."
 created: "2025-08-05"
-last_reviewed: "2025-11-17"
+last_reviewed: "2025-12-12"
 category: "guide"
 author: "Nick2bad4u"
 tags:
@@ -59,13 +59,28 @@ System design, patterns, and architectural decisions:
 
 #### ADRs (Architecture Decision Records)
 
-| Document                                                                                                | Decision                 | Status     |
-| ------------------------------------------------------------------------------------------------------- | ------------------------ | ---------- |
-| [ADR\_001\_REPOSITORY\_PATTERN.md](../Architecture/ADRs/ADR_001_REPOSITORY_PATTERN.md)                  | Database access pattern  | ✅ Accepted |
-| [ADR\_002\_EVENT\_DRIVEN\_ARCHITECTURE.md](../Architecture/ADRs/ADR_002_EVENT_DRIVEN_ARCHITECTURE.md)   | Event system design      | ✅ Accepted |
-| [ADR\_003\_ERROR\_HANDLING\_STRATEGY.md](../Architecture/ADRs/ADR_003_ERROR_HANDLING_STRATEGY.md)       | Error handling approach  | ✅ Accepted |
-| [ADR\_004\_FRONTEND\_STATE\_MANAGEMENT.md](../Architecture/ADRs/ADR_004_FRONTEND_STATE_MANAGEMENT.md)   | Zustand state management | ✅ Accepted |
-| [ADR\_005\_IPC\_COMMUNICATION\_PROTOCOL.md](../Architecture/ADRs/ADR_005_IPC_COMMUNICATION_PROTOCOL.md) | IPC communication design | ✅ Accepted |
+| Document                                                                                                                         | Decision                                    | Status      |
+| -------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------- | ----------- |
+| [ADR\_001\_REPOSITORY\_PATTERN.md](../Architecture/ADRs/ADR_001_REPOSITORY_PATTERN.md)                                           | Database access pattern                     | ✅ Accepted  |
+| [ADR\_002\_EVENT\_DRIVEN\_ARCHITECTURE.md](../Architecture/ADRs/ADR_002_EVENT_DRIVEN_ARCHITECTURE.md)                            | Event system design                         | ✅ Accepted  |
+| [ADR\_003\_ERROR\_HANDLING\_STRATEGY.md](../Architecture/ADRs/ADR_003_ERROR_HANDLING_STRATEGY.md)                                | Error handling approach                     | ✅ Accepted  |
+| [ADR\_004\_FRONTEND\_STATE\_MANAGEMENT.md](../Architecture/ADRs/ADR_004_FRONTEND_STATE_MANAGEMENT.md)                            | Zustand state management                    | ✅ Accepted  |
+| [ADR\_005\_IPC\_COMMUNICATION\_PROTOCOL.md](../Architecture/ADRs/ADR_005_IPC_COMMUNICATION_PROTOCOL.md)                          | IPC communication design                    | ✅ Accepted  |
+| [ADR\_006\_STANDARDIZED\_CACHE\_CONFIGURATION.md](../Architecture/ADRs/ADR_006_STANDARDIZED_CACHE_CONFIGURATION.md)              | Cache configuration standardization         | ✅ Accepted  |
+| [ADR\_007\_SERVICE\_CONTAINER\_DEPENDENCY\_INJECTION.md](../Architecture/ADRs/ADR_007_SERVICE_CONTAINER_DEPENDENCY_INJECTION.md) | Service container/DI                        | ✅ Accepted  |
+| [ADR\_008\_MONITOR\_TYPE\_REGISTRY.md](../Architecture/ADRs/ADR_008_MONITOR_TYPE_REGISTRY.md)                                    | Monitor type registry + plugin architecture | ✅ Accepted  |
+| [ADR\_009\_VALIDATION\_STRATEGY.md](../Architecture/ADRs/ADR_009_VALIDATION_STRATEGY.md)                                         | Validation strategy                         | ✅ Accepted  |
+| [ADR\_010\_TESTING\_STRATEGY.md](../Architecture/ADRs/ADR_010_TESTING_STRATEGY.md)                                               | Testing strategy                            | ✅ Accepted  |
+| [ADR\_011\_SCHEDULER\_AND\_BACKOFF.md](../Architecture/ADRs/ADR_011_SCHEDULER_AND_BACKOFF.md)                                    | Scheduler and backoff                       | 📝 Draft    |
+| [ADR\_012\_NOTIFICATIONS\_AND\_ALERTING.md](../Architecture/ADRs/ADR_012_NOTIFICATIONS_AND_ALERTING.md)                          | Notifications policy                        | 📝 Draft    |
+| [ADR\_013\_DATA\_PORTABILITY\_AND\_BACKUP.md](../Architecture/ADRs/ADR_013_DATA_PORTABILITY_AND_BACKUP.md)                       | Data portability + backup/restore           | ✅ Accepted  |
+| [ADR\_014\_LOGGING\_TELEMETRY\_AND\_DIAGNOSTICS.md](../Architecture/ADRs/ADR_014_LOGGING_TELEMETRY_AND_DIAGNOSTICS.md)           | Logging + diagnostics                       | ✅ Accepted  |
+| [ADR\_015\_CLOUD\_SYNC\_AND\_REMOTE\_BACKUP.md](../Architecture/ADRs/ADR_015_CLOUD_SYNC_AND_REMOTE_BACKUP.md)                    | Cloud sync + remote backups                 | 📝 Draft    |
+| [ADR\_016\_MULTI\_DEVICE\_SYNC\_MODEL.md](../Architecture/ADRs/ADR_016_MULTI_DEVICE_SYNC_MODEL.md)                               | True multi-device sync model                | 📝 Draft    |
+| [ADR\_017\_EXTERNAL\_ALERT\_INTEGRATIONS.md](../Architecture/ADRs/ADR_017_EXTERNAL_ALERT_INTEGRATIONS.md)                        | Slack/Discord/webhook alerts                | 💡 Proposed |
+| [ADR\_018\_MAINTENANCE\_WINDOWS\_AND\_SILENCING.md](../Architecture/ADRs/ADR_018_MAINTENANCE_WINDOWS_AND_SILENCING.md)           | Maintenance windows + silence rules         | 💡 Proposed |
+| [ADR\_019\_TEMPLATES\_AND\_BULK\_OPERATIONS.md](../Architecture/ADRs/ADR_019_TEMPLATES_AND_BULK_OPERATIONS.md)                   | Templates + bulk import/export              | 💡 Proposed |
+| [ADR\_020\_SUPPORT\_DIAGNOSTICS\_BUNDLE.md](../Architecture/ADRs/ADR_020_SUPPORT_DIAGNOSTICS_BUNDLE.md)                          | Diagnostics bundle export                   | 💡 Proposed |
 
 #### Patterns & standards
 

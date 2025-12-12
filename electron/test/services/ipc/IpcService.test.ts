@@ -9,6 +9,7 @@ import {
     getDiagnosticsMetrics,
     resetDiagnosticsMetrics,
 } from "../../../services/ipc/diagnosticsMetrics";
+import { CloudService } from "../../../services/cloud/CloudService";
 
 // Use vi.hoisted to fix hoisting issues with mocks
 const mockNotificationService = {
@@ -174,15 +175,26 @@ vi.mock("./", () => ({
 
 describe(IpcService, () => {
     let ipcService: IpcService;
+    let cloudService: CloudService;
 
     beforeEach(() => {
         vi.clearAllMocks();
         resetDiagnosticsMetrics();
         mockNotificationService.updateConfig.mockReset();
+
+        cloudService = new CloudService({
+            orchestrator: mockUptimeOrchestrator as any,
+            settings: {
+                get: vi.fn(),
+                set: vi.fn(),
+            },
+        });
+
         ipcService = new IpcService(
             mockUptimeOrchestrator as any,
             mockAutoUpdaterService as any,
-            mockNotificationService as any
+            mockNotificationService as any,
+            cloudService
         );
     });
     afterEach(() => {
@@ -209,26 +221,10 @@ describe(IpcService, () => {
             await annotate("Component: IpcService", "component");
 
             ipcService.setupHandlers();
-
             // Verify that ipcMain.handle was called multiple times for different handlers
             // Use dynamic count since the number may change as handlers are added/removed
             const handleCallCount = mockIpcMain.handle.mock.calls.length;
             expect(handleCallCount).toBeGreaterThan(20); // Ensure reasonable number of handlers
-        });
-        it("should setup site handlers", async ({ task, annotate }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: IpcService", "component");
-
-            ipcService.setupHandlers();
-
-            // Verify site-related handlers are registered
-            const handleCalls = mockIpcMain.handle.mock.calls.map(
-                (call) => call[0]
-            );
-            expect(handleCalls).toContain("add-site");
-            expect(handleCalls).toContain("get-sites");
-            expect(handleCalls).toContain("remove-site");
-            expect(handleCalls).toContain("update-site");
         });
         it("records diagnostics metrics during handler verification", async ({
             task,

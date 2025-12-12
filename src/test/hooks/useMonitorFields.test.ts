@@ -12,6 +12,7 @@ import type { MonitorFieldDefinition } from "@shared/types";
 
 import { useMonitorFields } from "../../hooks/useMonitorFields";
 import type { MonitorTypeConfig } from "@shared/types/monitorTypes";
+import { useErrorStore } from "../../stores/error/useErrorStore";
 
 // Mock the monitor types store
 const mockMonitorTypesStore = {
@@ -114,6 +115,9 @@ Object.defineProperty(globalThis, "electronAPI", {
 describe("useMonitorFields Hook", () => {
     beforeEach(() => {
         vi.clearAllMocks();
+
+        useErrorStore.getState().clearAllErrors();
+
         // Reset mock store state - default to loaded for most tests
         mockMonitorTypesStore.fieldConfigs = {};
         mockMonitorTypesStore.isLoaded = true;
@@ -541,8 +545,9 @@ describe("useMonitorFields Hook", () => {
             await annotate("Category: Hook", "category");
             await annotate("Type: Error Handling", "type");
 
-            // Configure mock store to have an error
-            mockMonitorTypesStore.lastError = "IPC communication failed";
+            useErrorStore
+                .getState()
+                .setStoreError("monitor-types", "IPC communication failed");
             mockMonitorTypesStore.isLoaded = true;
             mockMonitorTypesStore.fieldConfigs = {};
 
@@ -559,9 +564,12 @@ describe("useMonitorFields Hook", () => {
             await annotate("Category: Hook", "category");
             await annotate("Type: Error Handling", "type");
 
-            // Configure mock store to have an error
-            mockMonitorTypesStore.lastError =
-                "Failed to load monitor field configurations";
+            useErrorStore
+                .getState()
+                .setStoreError(
+                    "monitor-types",
+                    "Failed to load monitor field configurations"
+                );
             mockMonitorTypesStore.isLoaded = true;
             mockMonitorTypesStore.fieldConfigs = {};
 
@@ -583,9 +591,12 @@ describe("useMonitorFields Hook", () => {
             await annotate("Category: Hook", "category");
             await annotate("Type: Error Handling", "type");
 
-            // Configure mock store to have an error
-            mockMonitorTypesStore.lastError =
-                "Failed to load monitor field configurations";
+            useErrorStore
+                .getState()
+                .setStoreError(
+                    "monitor-types",
+                    "Failed to load monitor field configurations"
+                );
             mockMonitorTypesStore.isLoaded = true;
             mockMonitorTypesStore.fieldConfigs = {};
 
@@ -606,8 +617,9 @@ describe("useMonitorFields Hook", () => {
             await annotate("Category: Hook", "category");
             await annotate("Type: Error Handling", "type");
 
-            // Configure mock store to have an error but still be loaded
-            mockMonitorTypesStore.lastError = "Some error occurred";
+            useErrorStore
+                .getState()
+                .setStoreError("monitor-types", "Some error occurred");
             mockMonitorTypesStore.isLoaded = true;
             mockMonitorTypesStore.fieldConfigs = {};
 

@@ -35,6 +35,17 @@ interface DataHandlerValidatorsInterface {
 }
 
 /**
+ * Interface for cloud handler validators.
+ */
+interface CloudHandlerValidatorsInterface {
+    configureFilesystemProvider: IpcParameterValidator;
+    getStatus: IpcParameterValidator;
+    listBackups: IpcParameterValidator;
+    restoreBackup: IpcParameterValidator;
+    uploadLatestBackup: IpcParameterValidator;
+}
+
+/**
  * Interface for settings handler validators.
  */
 interface SettingsHandlerValidatorsInterface {
@@ -170,6 +181,35 @@ function createSingleObjectValidator(paramName: string): IpcParameterValidator {
             | null
             | string => IpcValidators.requiredObject(value, paramName),
     ]);
+}
+
+function validateCloudFilesystemProviderConfig(
+    params: readonly unknown[]
+): null | string[] {
+    const errors: string[] = [];
+
+    if (params.length !== 1) {
+        errors.push("Expected exactly 1 parameter");
+    }
+
+    const [config] = params;
+    const objectError = IpcValidators.requiredObject(config, "config");
+    if (objectError) {
+        errors.push(objectError);
+        return errors;
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- config validated as object
+    const record = config as Record<string, unknown>;
+    const baseDirectoryError = IpcValidators.requiredString(
+        record["baseDirectory"],
+        "baseDirectory"
+    );
+    if (baseDirectoryError) {
+        errors.push(baseDirectoryError);
+    }
+
+    return errors.length > 0 ? errors : null;
 }
 
 function validatePreloadGuardReport(
@@ -619,6 +659,17 @@ export const DataHandlerValidators: DataHandlerValidatorsInterface = {
      * Validates parameters for the "restore-sqlite-backup" IPC handler.
      */
     restoreSqliteBackup: validateRestorePayload,
+} as const;
+
+/**
+ * Parameter validators for cloud IPC handlers.
+ */
+export const CloudHandlerValidators: CloudHandlerValidatorsInterface = {
+    configureFilesystemProvider: validateCloudFilesystemProviderConfig,
+    getStatus: createNoParamsValidator(),
+    listBackups: createNoParamsValidator(),
+    restoreBackup: createSingleStringValidator("key"),
+    uploadLatestBackup: createNoParamsValidator(),
 } as const;
 
 /**

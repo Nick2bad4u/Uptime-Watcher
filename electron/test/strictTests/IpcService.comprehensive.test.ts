@@ -15,6 +15,7 @@ import { IpcService } from "../../../electron/services/ipc/IpcService";
 import type { UptimeOrchestrator } from "../../../electron/UptimeOrchestrator";
 import type { AutoUpdaterService } from "../../../electron/services/updater/AutoUpdaterService";
 import type { NotificationService } from "../../../electron/services/notifications/NotificationService";
+import { CloudService } from "../../../electron/services/cloud/CloudService";
 import { STATE_SYNC_SOURCE } from "@shared/types/stateSync";
 import {
     BASE_MONITOR_TYPES,
@@ -165,6 +166,7 @@ vi.mock("@shared/validation/monitorSchemas", async (importOriginal) => {
 
 describe("IpcService - Comprehensive Coverage", () => {
     let ipcService: IpcService;
+    let cloudService: CloudService;
     let mockUptimeOrchestrator: UptimeOrchestrator;
     let mockAutoUpdaterService: AutoUpdaterService;
     let mockNotificationService: NotificationService;
@@ -288,10 +290,19 @@ describe("IpcService - Comprehensive Coverage", () => {
         mockNotificationService =
             notificationServiceMock as unknown as NotificationService;
 
+        cloudService = new CloudService({
+            orchestrator: mockUptimeOrchestrator,
+            settings: {
+                get: vi.fn(),
+                set: vi.fn(),
+            },
+        });
+
         ipcService = new IpcService(
             mockUptimeOrchestrator,
             mockAutoUpdaterService,
-            mockNotificationService
+            mockNotificationService,
+            cloudService
         );
     });
 

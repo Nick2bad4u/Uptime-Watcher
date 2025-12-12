@@ -23,6 +23,11 @@ import type {
     StateSyncStatusSummary,
 } from "@shared/types/stateSync";
 import type { ValidationResult } from "@shared/types/validation";
+import type {
+    CloudBackupEntry,
+    CloudFilesystemProviderConfig,
+    CloudStatusSummary,
+} from "@shared/types/cloud";
 import type { ExclusifyUnion, Simplify, UnknownRecord } from "type-fest";
 
 import { isRecord } from "@shared/utils/typeHelpers";
@@ -227,6 +232,26 @@ export interface IpcInvokeChannelMap {
     "check-site-now": {
         params: readonly [siteIdentifier: string, monitorId: string];
         result: StatusUpdate | undefined;
+    };
+    "cloud-configure-filesystem-provider": {
+        params: readonly [config: CloudFilesystemProviderConfig];
+        result: CloudStatusSummary;
+    };
+    "cloud-get-status": {
+        params: readonly [];
+        result: CloudStatusSummary;
+    };
+    "cloud-list-backups": {
+        params: readonly [];
+        result: CloudBackupEntry[];
+    };
+    "cloud-restore-backup": {
+        params: readonly [key: string];
+        result: SerializedDatabaseRestoreResult;
+    };
+    "cloud-upload-latest-backup": {
+        params: readonly [];
+        result: CloudBackupEntry;
     };
     "delete-all-sites": {
         params: readonly [];

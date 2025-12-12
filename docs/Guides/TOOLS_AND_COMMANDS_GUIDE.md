@@ -3,7 +3,7 @@ schema: "../../config/schemas/doc-frontmatter.schema.json"
 title: "Tools and Commands Guide"
 summary: "Reference for how the AI agent uses editing tools, search, tasks, tests, and diagnostics in the Uptime Watcher repository."
 created: "2025-11-15"
-last_reviewed: "2025-11-25"
+last_reviewed: "2025-12-12"
 category: "guide"
 author: "Nick2bad4u"
 tags:
@@ -22,8 +22,9 @@ tags:
 2. [🔍 Reading and search](#-reading-and-search)
 3. [🧪 Commands, tasks, and test runs](#-commands-tasks-and-test-runs)
 4. [🧰 Diagnostics and IDE integration](#-diagnostics-and-ide-integration)
-5. [🗂️ Orchestration and meta-tools](#️-orchestration-and-meta-tools)
-6. [🌐 External documentation helpers](#-external-documentation-helpers)
+5. [Documentation linting gotchas (Markdown + TSDoc)](#documentation-linting-gotchas-markdown--tsdoc)
+6. [🗂️ Orchestration and meta-tools](#️-orchestration-and-meta-tools)
+7. [🌐 External documentation helpers](#-external-documentation-helpers)
 
 ## 🔧 Editing and filesystem operations
 
@@ -80,6 +81,21 @@ Common failure modes:
 - **Missing wrapper or headers**: patches must include both the `*** Begin Patch`/`*** End Patch` wrapper and a `*** <Action> File:` line for each file.
 - **Overlapping hunks**: avoid multiple hunks that share the same context; keep each region's pre/post context unique.
 
+Additional reliability tips (learned the hard way):
+
+- **Always re-read after a patch applies**: a patch can apply successfully but still introduce a syntax error if the context
+  matched an unexpected region. Run VS Code diagnostics right away (see
+  [Language server diagnostics](#language-server-diagnostics)).
+- **Deleting files via patch can be flaky**: if a `*** Delete File:` patch does not remove the file (or `file_search` appears
+  to still list it), verify with PowerShell and delete using:
+
+  ```powershell
+  Test-Path -LiteralPath "c:\\path\\to\\file.ts"
+  Remove-Item -LiteralPath "c:\\path\\to\\file.ts" -Force -Verbose
+  ```
+
+  Then re-run `Test-Path` to confirm it is actually gone.
+
 ## 🔍 Reading and search
 
 ### Listing directories
@@ -116,6 +132,13 @@ Formatting tips:
 
 - Treat `includePattern` as a glob, not a regex. Use forward slashes and keep it relative to the workspace root (for example, `src/test/stores/alerts/**`).
 - When looking for a symbol that appears across multiple files, narrow the pattern early (e.g. to `src/stores/**`) to avoid excessive, low-signal matches.
+
+Glob gotchas:
+
+- **No brace expansion**: patterns like `{electron,src}/**/*.ts` may return no results even though the files exist. Prefer
+  running two searches with separate `includePattern` values.
+- **Search exclusions can hide matches**: if you strongly expect a match (especially in generated or ignored folders), re-run
+  the search with `includeIgnoredFiles: true`.
 
 ### File search (glob-based)
 
@@ -229,6 +252,13 @@ Formatting notes:
 
 - Task IDs are the exact strings shown in the workspace config (for example, `npm: Test`, `npm: Test:Coverage`).
 - When invoking tasks programmatically, always provide the absolute `workspaceFolder` path along with the task ID, and read output via the associated task terminal or task-output helpers.
+
+Operational tips:
+
+- **Don't assume a task exists**: for example, some workspaces expose `npm: Lint:Fix` but not `npm: Lint`. If a task run
+  fails with "Task not found", use the task list shown in the workspace info and pick the exact ID.
+- **For long-running tasks, fetch the final summary**: task terminals can truncate output. Prefer querying task output once
+  it finishes (for example, via `get_task_output`) to capture the full completion summary.
 
 ### Targeted Vitest executions
 
@@ -367,6 +397,19 @@ Usage tips:
   - Locate definitions and implementations.
   - List all references across the workspace with a configurable context window.
 - These tools are preferable to raw search when refactoring types or APIs.
+
+Disambiguation tip:
+
+- Some LSP helpers require an exact `codeSnippet` to disambiguate repeated symbols. If you get a "multiple occurrences"
+  error, provide a snippet that includes unique surrounding text (for example, the exact call-site line).
+
+## Documentation linting gotchas (Markdown + TSDoc)
+
+- **TSDoc code spans cannot cross line breaks**. If you write a backtick code span in a doc comment, keep it on one line.
+  Prettier will happily wrap prose in ways that break the TSDoc parser.
+- If you need to show a wrapped string, prefer splitting into two sentences so the code span remains short, e.g.
+  "The prefix format is `\"[Service] <operation>\"`."
+- Do **not** assume inline tags like `{@code ...}` are supported; that depends on the repo's TSDoc configuration.
 
 ### Rename refactors
 

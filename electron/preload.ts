@@ -17,6 +17,7 @@ import { contextBridge } from "electron";
 import type { EventsApi } from "./preload/domains/eventsApi";
 import type { SystemApi } from "./preload/domains/systemApi";
 
+import { cloudApi } from "./preload/domains/cloudApi";
 import { dataApi } from "./preload/domains/dataApi";
 import { createEventsApi } from "./preload/domains/eventsApi";
 import { monitoringApi } from "./preload/domains/monitoringApi";
@@ -71,6 +72,7 @@ type ElectronAPI = ElectronBridgeApi<EventsApi, SystemApi>;
  * The complete domain-based electron API exposed to the renderer process
  */
 const electronAPI: ElectronAPI = {
+    cloud: cloudApi,
     data: dataApi,
     events: createEventsApi(),
     monitoring: monitoringApi,

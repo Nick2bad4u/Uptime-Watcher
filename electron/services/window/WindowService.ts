@@ -33,12 +33,12 @@
  * @packageDocumentation
  */
 
-import type { Event } from "electron";
+import type { Event, HandlerDetails } from "electron";
 
 import { getNodeEnv } from "@shared/utils/environment";
 import { withErrorHandling } from "@shared/utils/errorHandling";
 import { getErrorMessage } from "@shared/utils/errorUtils";
-import { BrowserWindow } from "electron";
+import { BrowserWindow, shell } from "electron";
 // eslint-disable-next-line unicorn/import-style -- Need namespace import for path operations
 import * as path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -79,6 +79,22 @@ export class WindowService {
 
     /** Reference to the main application window (null if not created) */
     private mainWindow: BrowserWindow | null = null;
+
+    private readonly handleWindowOpen = (
+        details: HandlerDetails
+    ): { action: "deny" } => {
+        void this.openExternalIfSafe(details.url, "window-open");
+        return { action: "deny" };
+    };
+
+    private readonly handleWillNavigate = (event: Event, url: string): void => {
+        if (this.isAllowedNavigationTarget(url)) {
+            return;
+        }
+
+        event.preventDefault();
+        void this.openExternalIfSafe(url, "will-navigate");
+    };
 
     /**
      * Named event handler for ready-to-show event
@@ -137,6 +153,40 @@ export class WindowService {
         logger.info("[WindowService] Main window closed");
         this.mainWindow = null;
     };
+
+    private async openExternalIfSafe(
+        targetUrl: string,
+        context: string
+    ): Promise<void> {
+        try {
+            const parsed = new URL(targetUrl);
+            const isHttp =
+                parsed.protocol === "http:" || parsed.protocol === "https:";
+            const isMailTo = parsed.protocol === "mailto:";
+
+            if (!isHttp && !isMailTo) {
+                logger.warn(
+                    "[WindowService] Blocked external navigation to non-http(s)/mailto URL",
+                    {
+                        context,
+                        protocol: parsed.protocol,
+                        url: targetUrl,
+                    }
+                );
+                return;
+            }
+
+            await shell.openExternal(targetUrl);
+        } catch {
+            logger.warn(
+                "[WindowService] Blocked external navigation due to invalid URL",
+                {
+                    context,
+                    url: targetUrl,
+                }
+            );
+        }
+    }
 
     /**
      * Load development content after waiting for Vite server.
@@ -322,6 +372,49 @@ export class WindowService {
     }
 
     /**
+     * Determines whether a navigation target should be allowed inside the app
+     * window.
+     *
+     * @remarks
+     * Electron apps should aggressively restrict top-level navigation to
+     * prevent:
+     *
+     * - Unexpected protocol handlers (`javascript:`, `data:`)
+     * - Clickjacking / phishing by navigating away from the app
+     * - Renderer exploitation by loading remote content in the main window
+     */
+    private isAllowedNavigationTarget(targetUrl: string): boolean {
+        if (targetUrl === "about:blank") {
+            return true;
+        }
+
+        try {
+            const parsed = new URL(targetUrl);
+
+            // DevTools / extensions may use these schemes.
+            if (
+                parsed.protocol === "devtools:" ||
+                parsed.protocol === "chrome-extension:"
+            ) {
+                return true;
+            }
+
+            if (!isDev()) {
+                return parsed.protocol === "file:";
+            }
+
+            // In development, allow navigation within the Vite dev server origin.
+            const viteOrigin = new URL(
+                WindowService.VITE_SERVER_CONFIG.SERVER_URL
+            ).origin;
+
+            return parsed.origin === viteOrigin;
+        } catch {
+            return false;
+        }
+    }
+
+    /**
      * Create a new WindowService instance.
      *
      * @remarks
@@ -371,10 +464,15 @@ export class WindowService {
             show: false, // Hidden initially to prevent flash
             titleBarStyle: "default",
             webPreferences: {
+                allowRunningInsecureContent: false,
                 contextIsolation: true, // Security: isolate context
                 nodeIntegration: false, // Security: disable node in renderer
+                nodeIntegrationInSubFrames: false,
+                nodeIntegrationInWorker: false,
                 preload: this.getPreloadPath(), // Safe IPC bridge
-                sandbox: false, // Ensure preload retains full Node built-ins (required for path, fs, etc.)
+                sandbox: false, // Preload is currently compiled as CJS and relies on require(); enabling sandbox would break it.
+                webSecurity: true,
+                webviewTag: false,
             },
             width: 1200,
         });
@@ -415,8 +513,10 @@ export class WindowService {
             );
         }
 
-        this.loadContent();
+        // Install window event handlers (including navigation restrictions)
+        // before loading any content.
         this.setupWindowEvents();
+        this.loadContent();
 
         return this.mainWindow;
     }
@@ -548,6 +648,17 @@ export class WindowService {
             this.handleDidFinishLoad
         );
         this.mainWindow.webContents.on("did-fail-load", this.handleDidFailLoad);
+
+        // Prevent window.open() from creating new BrowserWindows. Instead, open
+        // safe external links in the user's default browser.
+        this.mainWindow.webContents.setWindowOpenHandler(this.handleWindowOpen);
+
+        // Block top-level navigations away from the app origin.
+        this.mainWindow.webContents.on(
+            "will-navigate",
+            this.handleWillNavigate
+        );
+
         this.mainWindow.on("closed", this.handleClosed);
     }
 
@@ -574,6 +685,12 @@ export class WindowService {
             "did-fail-load",
             this.handleDidFailLoad
         );
+
+        this.mainWindow.webContents.removeListener(
+            "will-navigate",
+            this.handleWillNavigate
+        );
+
         this.mainWindow.removeListener("closed", this.handleClosed);
     }
 

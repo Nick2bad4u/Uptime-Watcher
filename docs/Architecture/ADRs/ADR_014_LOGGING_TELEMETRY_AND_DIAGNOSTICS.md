@@ -70,6 +70,7 @@ We need consistent logging and diagnostics with correlation IDs, structured fiel
 - ADR-005 (IPC protocol) for diagnostics channels
 - ADR-011 (Scheduler) for correlation/logging of scheduled jobs
 - ADR-013 (Backup) for logging/redaction in export/import flows
+- ADR-020 (Support diagnostics bundle) for export packaging and redaction guarantees
 
 ## Review
 

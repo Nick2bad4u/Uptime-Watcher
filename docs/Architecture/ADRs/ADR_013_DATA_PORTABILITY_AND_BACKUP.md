@@ -3,7 +3,7 @@ schema: "../../../config/schemas/doc-frontmatter.schema.json"
 title: "ADR-013: Data Portability & Backup/Restore"
 summary: "Documents export/import/backup guarantees, formats, integrity checks, and retention expectations for local SQLite backups."
 created: "2025-12-04"
-last_reviewed: "2025-12-05"
+last_reviewed: "2025-12-12"
 category: "guide"
 author: "Nick2bad4u"
 tags:
@@ -41,7 +41,8 @@ Users need reliable export/import and local backup/restore with clear integrity 
 
 - **Formats**: SQLite DB backup plus optional JSON export for portability; include version metadata and checksum.
 - **Integrity**: Generate checksums for backup payloads; validate before restore; reject mismatched versions unless explicit migrate path exists.
-- **Retention**: Default retention guidance (e.g., keep last N backups) and user-controlled location; do not auto-upload off-device.
+- **Retention**: Default retention guidance (e.g., keep last N backups) and user-controlled location; **no off-device upload by default**.
+  - Opt-in remote backup/sync is defined in ADR-015 and does not change the local backup guarantees in this ADR.
 - **Messaging**: Surface errors with actionable remediation; emit `database:backup-created` and diagnostics events for observability.
 - **Compatibility**: Define minimum/target schema versions; migrations must be idempotent and recorded.
 
@@ -70,6 +71,7 @@ Users need reliable export/import and local backup/restore with clear integrity 
 - ADR-002 (Event-driven architecture) for backup events
 - ADR-005 (IPC protocol) for backup/import channels
 - ADR-014 (Logging/diagnostics) for telemetry and redaction during backup flows
+- ADR-015 (Cloud sync and remote backup providers) for opt-in off-device storage
 
 ## Review
 

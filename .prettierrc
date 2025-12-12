@@ -91,6 +91,7 @@
                     "prettier-plugin-multiline-arrays",
                     "prettier-plugin-jsdoc",
                     "prettier-plugin-jsdoc-type",
+                    "prettier-plugin-tailwindcss",
                     "prettier-plugin-merge"
                 ]
             }

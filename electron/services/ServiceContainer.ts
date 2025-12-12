@@ -44,6 +44,7 @@ import { HistoryRepository } from "./database/HistoryRepository";
 import { MonitorRepository } from "./database/MonitorRepository";
 import { SettingsRepository } from "./database/SettingsRepository";
 import { SiteRepository } from "./database/SiteRepository";
+import { CloudService } from "./cloud/CloudService";
 import { RendererEventBridge } from "./events/RendererEventBridge";
 import { IpcService } from "./ipc/IpcService";
 import { EnhancedMonitoringServiceFactory } from "./monitoring/EnhancedMonitoringServiceFactory";
@@ -303,6 +304,9 @@ export class ServiceContainer {
     /** Renderer event bridge singleton. */
     private rendererEventBridge?: RendererEventBridge;
 
+    /** Cloud backup/sync service singleton. */
+    private cloudService?: CloudService;
+
     /**
      * Singleton instance of {@link SettingsRepository}.
      *
@@ -551,6 +555,7 @@ export class ServiceContainer {
     public getInitializationStatus(): Record<string, boolean> {
         return {
             AutoUpdaterService: this.autoUpdaterService !== undefined,
+            CloudService: this.cloudService !== undefined,
             ConfigurationManager: this.configurationManager !== undefined,
             DatabaseManager: this.databaseManager !== undefined,
             DatabaseService: this.databaseService !== undefined,
@@ -581,6 +586,7 @@ export class ServiceContainer {
         const services: ServiceInfo[] = [];
         const serviceMap: UnknownRecord = {
             AutoUpdaterService: this.autoUpdaterService,
+            CloudService: this.cloudService,
             ConfigurationManager: this.configurationManager,
             DatabaseManager: this.databaseManager,
             DatabaseService: this.databaseService,
@@ -619,10 +625,12 @@ export class ServiceContainer {
             const orchestrator = this.getUptimeOrchestrator();
             const updater = this.getAutoUpdaterService();
             const notificationService = this.getNotificationService();
+            const cloudService = this.getCloudService();
             this.ipcService = new IpcService(
                 orchestrator,
                 updater,
-                notificationService
+                notificationService,
+                cloudService
             );
             if (this.config.enableDebugLogging) {
                 logger.debug(
@@ -631,6 +639,24 @@ export class ServiceContainer {
             }
         }
         return this.ipcService;
+    }
+
+    /**
+     * Gets the {@link CloudService} singleton.
+     */
+    public getCloudService(): CloudService {
+        if (!this.cloudService) {
+            this.cloudService = new CloudService({
+                orchestrator: this.getUptimeOrchestrator(),
+                settings: this.getSettingsRepository(),
+            });
+
+            if (this.config.enableDebugLogging) {
+                logger.debug("[ServiceContainer] Created CloudService");
+            }
+        }
+
+        return this.cloudService;
     }
 
     /**

@@ -247,6 +247,42 @@ export const SETTINGS_CHANNELS: SettingsChannelMap =
 export type SettingsDomainBridge = DomainBridge<typeof SETTINGS_CHANNELS>;
 
 /**
+ * Mapping from cloud domain methods to IPC channels.
+ *
+ * @internal
+ */
+interface CloudChannelMap {
+    readonly configureFilesystemProvider:
+        "cloud-configure-filesystem-provider";
+    readonly getStatus: "cloud-get-status";
+    readonly listBackups: "cloud-list-backups";
+    readonly restoreBackup: "cloud-restore-backup";
+    readonly uploadLatestBackup: "cloud-upload-latest-backup";
+}
+
+const CLOUD_CHANNELS_DEFINITION: CloudChannelMap = {
+    configureFilesystemProvider: "cloud-configure-filesystem-provider",
+    getStatus: "cloud-get-status",
+    listBackups: "cloud-list-backups",
+    restoreBackup: "cloud-restore-backup",
+    uploadLatestBackup: "cloud-upload-latest-backup",
+};
+
+/**
+ * Strongly typed channel mapping for cloud-domain IPC interactions.
+ *
+ * @public
+ */
+export const CLOUD_CHANNELS: CloudChannelMap = CLOUD_CHANNELS_DEFINITION;
+
+/**
+ * Renderer-facing preload bridge for cloud-domain IPC interactions.
+ *
+ * @public
+ */
+export type CloudDomainBridge = DomainBridge<typeof CLOUD_CHANNELS>;
+
+/**
  * Mapping from sites domain methods to IPC channels.
  *
  * @internal
@@ -362,6 +398,7 @@ export interface ElectronBridgeApi<
     TEventsApi,
     TSystemApi extends SystemDomainBridge,
 > {
+    readonly cloud: CloudDomainBridge;
     readonly data: DataDomainBridge;
     readonly events: TEventsApi;
     readonly monitoring: MonitoringDomainBridge;

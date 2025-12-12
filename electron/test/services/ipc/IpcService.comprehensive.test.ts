@@ -14,6 +14,7 @@ import { IpcService } from "../../../services/ipc/IpcService";
 import type { UptimeOrchestrator } from "../../../UptimeOrchestrator";
 import type { AutoUpdaterService } from "../../../services/updater/AutoUpdaterService";
 import type { NotificationService } from "../../../services/notifications/NotificationService";
+import { CloudService } from "../../../services/cloud/CloudService";
 import type {
     Monitor,
     MonitoringStartSummary,
@@ -154,6 +155,7 @@ vi.mock("../../../../shared/validation/monitorSchemas", async (
 
 describe("IpcService - Comprehensive Coverage", () => {
     let ipcService: IpcService;
+    let cloudService: CloudService;
     let mockUptimeOrchestrator: UptimeOrchestrator;
     let mockAutoUpdaterService: AutoUpdaterService;
     let mockNotificationService: NotificationService;
@@ -301,10 +303,19 @@ describe("IpcService - Comprehensive Coverage", () => {
         mockNotificationService =
             notificationServiceMock as unknown as NotificationService;
 
+        cloudService = new CloudService({
+            orchestrator: mockUptimeOrchestrator,
+            settings: {
+                get: vi.fn(),
+                set: vi.fn(),
+            },
+        });
+
         ipcService = new IpcService(
             mockUptimeOrchestrator,
             mockAutoUpdaterService,
-            mockNotificationService
+            mockNotificationService,
+            cloudService
         );
     });
 

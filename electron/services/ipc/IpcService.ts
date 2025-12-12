@@ -18,6 +18,8 @@ import type { AutoUpdaterService } from "../updater/AutoUpdaterService";
 
 import { ScopedSubscriptionManager } from "../../events/ScopedSubscriptionManager";
 import { logger } from "../../utils/logger";
+import type { CloudService } from "../cloud/CloudService";
+import { registerCloudHandlers } from "./handlers/cloudHandlers";
 import { registerDataHandlers } from "./handlers/dataHandlers";
 import { registerDiagnosticsHandlers } from "./handlers/diagnosticsHandlers";
 import { registerMonitoringHandlers } from "./handlers/monitoringHandlers";
@@ -49,6 +51,8 @@ export class IpcService {
 
     private readonly notificationService: NotificationService;
 
+    private readonly cloudService: CloudService;
+
     private readonly handleStateSyncStatusUpdate = (
         data: UptimeEvents["sites:state-synchronized"] & {
             _meta: EventMetadata;
@@ -60,11 +64,13 @@ export class IpcService {
     public constructor(
         uptimeOrchestrator: UptimeOrchestrator,
         autoUpdaterService: AutoUpdaterService,
-        notificationService: NotificationService
+        notificationService: NotificationService,
+        cloudService: CloudService
     ) {
         this.uptimeOrchestrator = uptimeOrchestrator;
         this.autoUpdaterService = autoUpdaterService;
         this.notificationService = notificationService;
+        this.cloudService = cloudService;
         this.stateSyncStatus = {
             lastSyncAt: null,
             siteCount: 0,
@@ -95,6 +101,11 @@ export class IpcService {
     }
 
     public setupHandlers(): void {
+        registerCloudHandlers({
+            cloudService: this.cloudService,
+            registeredHandlers: this.registeredIpcHandlers,
+        });
+
         registerSiteHandlers({
             registeredHandlers: this.registeredIpcHandlers,
             uptimeOrchestrator: this.uptimeOrchestrator,

@@ -44,8 +44,13 @@ import type { MonitorFieldDefinition } from "@shared/types";
 
 import { useCallback, useEffect } from "react";
 
+import type { ErrorStore } from "../stores/error/types";
+
 import { useErrorStore } from "../stores/error/useErrorStore";
 import { useMonitorTypesStore } from "../stores/monitor/useMonitorTypesStore";
+
+const selectMonitorTypesError = (state: ErrorStore): string | undefined =>
+    state.getStoreError("monitor-types");
 
 /**
  * Result interface for the useMonitorFields hook
@@ -80,9 +85,7 @@ export interface UseMonitorFieldsResult {
  * @see {@link useMonitorTypesStore} for the underlying registry.
  */
 export function useMonitorFields(): UseMonitorFieldsResult {
-    const monitorTypesError = useErrorStore(
-        useCallback((state) => state.storeErrors["monitor-types"], [])
-    );
+    const monitorTypesError = useErrorStore(selectMonitorTypesError);
 
     const { fieldConfigs, isLoaded, loadMonitorTypes } = useMonitorTypesStore();
 
