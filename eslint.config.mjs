@@ -298,7 +298,18 @@ export default /** @type {EslintConfig} */ [
         },
         rules: {
             "uptime-watcher/electron-no-console": "error",
+            "uptime-watcher/electron-no-direct-ipc-handle": "error",
+            "uptime-watcher/electron-no-direct-ipc-handler-wrappers": "error",
+            "uptime-watcher/electron-no-direct-ipcMain-import": "error",
+            "uptime-watcher/electron-no-inline-ipc-channel-literal": "error",
+            "uptime-watcher/electron-no-inline-ipc-channel-type-argument":
+                "error",
             "uptime-watcher/electron-no-renderer-import": "error",
+            "uptime-watcher/electron-preload-no-direct-ipcRenderer-usage":
+                "error",
+            "uptime-watcher/electron-preload-no-inline-ipc-channel-constant":
+                "error",
+            "uptime-watcher/no-inline-ipc-channel-type-literals": "error",
         },
     },
     {
@@ -354,8 +365,16 @@ export default /** @type {EslintConfig} */ [
             "uptime-watcher": uptimeWatcherPlugin,
         },
         rules: {
+            "uptime-watcher/no-inline-ipc-channel-type-literals": "error",
             "uptime-watcher/renderer-no-browser-dialogs": "error",
+            "uptime-watcher/renderer-no-direct-bridge-readiness": "error",
+            "uptime-watcher/renderer-no-direct-electron-log": "error",
+            "uptime-watcher/renderer-no-direct-networking": "error",
+            "uptime-watcher/renderer-no-direct-preload-bridge": "error",
             "uptime-watcher/renderer-no-electron-import": "error",
+            "uptime-watcher/renderer-no-import-internal-service-utils": "error",
+            "uptime-watcher/renderer-no-ipcRenderer-usage": "error",
+            "uptime-watcher/renderer-no-preload-bridge-writes": "error",
         },
     },
     {
@@ -363,10 +382,12 @@ export default /** @type {EslintConfig} */ [
             "electron/**/*.{ts,tsx}",
             "shared/**/*.{ts,tsx}",
             "src/**/*.{ts,tsx}",
+            "storybook/**/*.{ts,tsx}",
         ],
         ignores: [
             "electron/test/**/*",
             "src/test/**/*",
+            "shared/test/**/*",
         ],
         name: "No Deprecated Exports",
         plugins: {
@@ -374,6 +395,8 @@ export default /** @type {EslintConfig} */ [
         },
         rules: {
             "uptime-watcher/no-deprecated-exports": "error",
+            "uptime-watcher/no-local-error-normalizers": "error",
+            "uptime-watcher/no-local-record-guards": "error",
             "uptime-watcher/prefer-app-alias": "error",
         },
     },

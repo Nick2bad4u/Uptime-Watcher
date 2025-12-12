@@ -15,6 +15,7 @@ import type {
 import type { MonitorTypeConfig } from "@shared/types/monitorTypes";
 import type { ValidationResult } from "@shared/types/validation";
 import { useMonitorTypesStore } from "../../../stores/monitor/useMonitorTypesStore";
+import { useErrorStore } from "../../../stores/error/useErrorStore";
 
 // Mock dependencies
 vi.mock("@shared/utils/errorHandling", () => ({
@@ -93,16 +94,18 @@ describe(useMonitorTypesStore, () => {
         // Reset all mocks
         vi.clearAllMocks();
 
-        // Reset Zustand store to initial state using store methods
-        const store = useMonitorTypesStore.getState();
-        store.clearError();
-        store.setLoading(false);
+        useErrorStore.setState({
+            isLoading: false,
+            lastError: undefined,
+            operationLoading: {},
+            storeErrors: {},
+        });
+
+        // Reset Zustand store to initial state
         useMonitorTypesStore.setState({
             monitorTypes: [],
             fieldConfigs: {},
             isLoaded: false,
-            isLoading: false,
-            lastError: undefined,
         });
     });
 
@@ -120,8 +123,9 @@ describe(useMonitorTypesStore, () => {
 
             expect(result.current.fieldConfigs).toEqual({});
             expect(result.current.isLoaded).toBeFalsy();
-            expect(result.current.isLoading).toBeFalsy();
-            expect(result.current.lastError).toBeUndefined();
+            expect(
+                useErrorStore.getState().getStoreError("monitor-types")
+            ).toBe(undefined);
             expect(result.current.monitorTypes).toEqual([]);
         });
     });
@@ -299,8 +303,14 @@ describe(useMonitorTypesStore, () => {
                 }
             });
 
-            expect(result.current.lastError).toBe(errorMessage);
-            expect(result.current.isLoading).toBeFalsy();
+            expect(
+                useErrorStore.getState().getStoreError("monitor-types")
+            ).toBe(errorMessage);
+            expect(
+                useErrorStore
+                    .getState()
+                    .getOperationLoading("monitorTypes.loadTypes")
+            ).toBeFalsy();
         });
 
         it("should surface an error when backend returns empty response", async ({
@@ -325,7 +335,9 @@ describe(useMonitorTypesStore, () => {
             });
 
             expect(result.current.monitorTypes).toEqual([]);
-            expect(result.current.lastError).toContain("invalid payload");
+            expect(
+                useErrorStore.getState().getStoreError("monitor-types")
+            ).toContain("invalid payload");
         });
     });
 
@@ -496,7 +508,9 @@ describe(useMonitorTypesStore, () => {
                 }
             });
 
-            expect(result.current.lastError).toBe(errorMessage);
+            expect(
+                useErrorStore.getState().getStoreError("monitor-types")
+            ).toBe(errorMessage);
         });
     });
 
@@ -558,7 +572,9 @@ describe(useMonitorTypesStore, () => {
                 }
             });
 
-            expect(result.current.lastError).toBe("Formatting failed");
+            expect(
+                useErrorStore.getState().getStoreError("monitor-types")
+            ).toBe("Formatting failed");
         });
 
         it("should handle null response as error", async ({
@@ -659,7 +675,9 @@ describe(useMonitorTypesStore, () => {
                 }
             });
 
-            expect(result.current.lastError).toBe("Title formatting failed");
+            expect(
+                useErrorStore.getState().getStoreError("monitor-types")
+            ).toBe("Title formatting failed");
         });
 
         it("should handle null response as error", async ({
@@ -749,68 +767,55 @@ describe(useMonitorTypesStore, () => {
         });
     });
 
-    describe("Base Store Actions", () => {
-        it("should clear error", async ({ task, annotate }) => {
+    describe("ErrorStore Actions", () => {
+        it("should support store error lifecycle", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: useMonitorTypesStore", "component");
+            await annotate("Component: useErrorStore", "component");
             await annotate("Category: Store", "category");
             await annotate("Type: Error Handling", "type");
 
-            const { result } = renderHook(() => useMonitorTypesStore());
+            useErrorStore
+                .getState()
+                .setStoreError("monitor-types", "Test error");
+            expect(
+                useErrorStore.getState().getStoreError("monitor-types")
+            ).toBe("Test error");
 
-            act(() => {
-                result.current.lastError = "Test error";
-            });
-
-            expect(result.current.lastError).toBe("Test error");
-
-            act(() => {
-                result.current.clearError();
-            });
-
-            expect(result.current.lastError).toBeUndefined();
+            useErrorStore.getState().clearStoreError("monitor-types");
+            expect(
+                useErrorStore.getState().getStoreError("monitor-types")
+            ).toBe(undefined);
         });
 
-        it("should set error", async ({ task, annotate }) => {
+        it("should support operation loading lifecycle", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: useMonitorTypesStore", "component");
-            await annotate("Category: Store", "category");
-            await annotate("Type: Error Handling", "type");
-
-            const { result } = renderHook(() => useMonitorTypesStore());
-
-            act(() => {
-                result.current.setError("New error");
-            });
-
-            expect(result.current.lastError).toBe("New error");
-
-            act(() => {
-                result.current.setError(undefined);
-            });
-
-            expect(result.current.lastError).toBeUndefined();
-        });
-
-        it("should set loading state", async ({ task, annotate }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: useMonitorTypesStore", "component");
+            await annotate("Component: useErrorStore", "component");
             await annotate("Category: Store", "category");
             await annotate("Type: Data Loading", "type");
 
-            const { result } = renderHook(() => useMonitorTypesStore());
+            useErrorStore
+                .getState()
+                .setOperationLoading("monitorTypes.loadTypes", true);
+            expect(
+                useErrorStore
+                    .getState()
+                    .getOperationLoading("monitorTypes.loadTypes")
+            ).toBeTruthy();
 
-            act(() => {
-                result.current.setLoading(true);
-            });
-
-            expect(result.current.isLoading).toBeTruthy();
-
-            act(() => {
-                result.current.setLoading(false);
-            });
-
-            expect(result.current.isLoading).toBeFalsy();
+            useErrorStore
+                .getState()
+                .setOperationLoading("monitorTypes.loadTypes", false);
+            expect(
+                useErrorStore
+                    .getState()
+                    .getOperationLoading("monitorTypes.loadTypes")
+            ).toBeFalsy();
         });
     });
 
@@ -922,7 +927,9 @@ describe(useMonitorTypesStore, () => {
                 }
             });
 
-            expect(result.current.lastError).toBe("Network error");
+            expect(
+                useErrorStore.getState().getStoreError("monitor-types")
+            ).toBe("Network error");
             expect(result.current.isLoaded).toBeFalsy();
 
             // Then recover with successful call
@@ -938,7 +945,9 @@ describe(useMonitorTypesStore, () => {
                 await result.current.loadMonitorTypes();
             });
 
-            expect(result.current.lastError).toBeUndefined();
+            expect(
+                useErrorStore.getState().getStoreError("monitor-types")
+            ).toBe(undefined);
             expect(result.current.isLoaded).toBeTruthy();
             expect(result.current.monitorTypes).toEqual(mockMonitorTypes);
         });
@@ -990,9 +999,11 @@ describe(useMonitorTypesStore, () => {
                     monitorTypes: [],
                     fieldConfigs: {},
                     isLoaded: false,
-                    isLoading: false,
-                    lastError: undefined,
                 });
+                useErrorStore.getState().clearStoreError("monitor-types");
+                useErrorStore
+                    .getState()
+                    .setOperationLoading("monitorTypes.loadTypes", false);
                 await new Promise((resolve) => setTimeout(resolve, 50));
             });
         });
@@ -1014,11 +1025,13 @@ describe(useMonitorTypesStore, () => {
                 monitorTypes: [],
                 fieldConfigs: {},
                 isLoaded: false,
-                isLoading: false,
-                lastError: undefined,
             };
 
             useMonitorTypesStore.setState(initialState);
+            useErrorStore.getState().clearStoreError("monitor-types");
+            useErrorStore
+                .getState()
+                .setOperationLoading("monitorTypes.loadTypes", false);
 
             // Give the store time to settle
             await new Promise((resolve) => setTimeout(resolve, 100));

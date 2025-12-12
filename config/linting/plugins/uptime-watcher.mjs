@@ -92,15 +92,14 @@ function loadBaseMonitorTypes() {
         ts.ScriptKind.TS
     );
 
-    /** @type {string[] | null} */
-    let values = null;
-
     /**
-     * Visits nodes until the BASE_MONITOR_TYPES declaration is located.
+     * Traverses the AST to locate the BASE_MONITOR_TYPES declaration.
      *
      * @param {ts.Node} node - AST node under inspection.
+     *
+     * @returns {string[] | null} The extracted monitor type list when found.
      */
-    function visit(node) {
+    function findValues(node) {
         if (ts.isVariableStatement(node)) {
             for (const declaration of node.declarationList.declarations) {
                 if (
@@ -111,20 +110,31 @@ function loadBaseMonitorTypes() {
                     const arrayExpression = extractArrayLiteral(
                         declaration.initializer
                     );
-                    if (arrayExpression) {
-                        values = arrayExpression.elements
-                            .filter(ts.isStringLiteral)
-                            .map((literal) => literal.text);
-                        return;
+
+                    if (!arrayExpression) {
+                        continue;
                     }
+
+                    return arrayExpression.elements
+                        .filter(ts.isStringLiteral)
+                        .map((literal) => literal.text);
                 }
             }
         }
 
-        ts.forEachChild(node, visit);
+        // Avoid callback-based traversal so static analysis doesn't treat the
+        // result as constant.
+        for (const child of node.getChildren(sourceFile)) {
+            const found = findValues(child);
+            if (found) {
+                return found;
+            }
+        }
+
+        return null;
     }
 
-    visit(sourceFile);
+    const values = findValues(sourceFile);
 
     if (!values) {
         throw new Error(
@@ -805,6 +815,1534 @@ const electronNoRendererImportRule = {
     },
 };
 
+/**
+ * ESLint rule ensuring Electron runtime code never registers IPC handlers via
+ * raw `ipcMain.handle`/`ipcMain.handleOnce`.
+ *
+ * @remarks
+ * IPC handler registration must go through the centralized helper
+ * `registerStandardizedIpcHandler` in `electron/services/ipc/utils.ts` so we
+ * keep consistent validation, error normalization, diagnostics logging, and
+ * duplicate-registration protection.
+ */
+const electronNoDirectIpcHandleRule = {
+    meta: {
+        docs: {
+            description:
+                "Disallow ipcMain.handle/handleOnce outside the centralized IPC registration helper.",
+            recommended: false,
+        },
+        messages: {
+            useStandardizedRegistration:
+                "Do not call ipcMain.{{method}} directly. Register IPC handlers via registerStandardizedIpcHandler in electron/services/ipc/utils.ts.",
+        },
+        schema: [],
+        type: "problem",
+    },
+    create(context) {
+        const rawFilename = context.getFilename();
+        const normalizedFilename = normalizePath(rawFilename);
+
+        if (
+            normalizedFilename === "<input>" ||
+            (!normalizedFilename.startsWith(`${NORMALIZED_ELECTRON_DIR}/`) &&
+                normalizedFilename !== NORMALIZED_ELECTRON_DIR) ||
+            normalizedFilename.includes("/electron/test/") ||
+            normalizedFilename.includes("/electron/benchmarks/")
+        ) {
+            return {};
+        }
+
+        // Allow the canonical helper module to register handlers.
+        if (normalizedFilename.endsWith("/electron/services/ipc/utils.ts")) {
+            return {};
+        }
+
+        const forbiddenMethods = new Set(["handle", "handleOnce"]);
+
+        return {
+            CallExpression(node) {
+                if (node.callee.type !== "MemberExpression") {
+                    return;
+                }
+
+                if (node.callee.computed) {
+                    return;
+                }
+
+                const { object, property } = node.callee;
+
+                if (
+                    object.type !== "Identifier" ||
+                    object.name !== "ipcMain" ||
+                    property.type !== "Identifier" ||
+                    !forbiddenMethods.has(property.name)
+                ) {
+                    return;
+                }
+
+                context.report({
+                    data: { method: property.name },
+                    messageId: "useStandardizedRegistration",
+                    node: node.callee,
+                });
+            },
+        };
+    },
+};
+
+/**
+ * ESLint rule enforcing that `ipcMain` is only imported in the centralized IPC
+ * service modules.
+ *
+ * @remarks
+ * Prevents new ad-hoc IPC registration/removal/listener codepaths from showing
+ * up elsewhere in the Electron runtime.
+ */
+const electronNoDirectIpcMainImportRule = {
+    meta: {
+        docs: {
+            description:
+                "Disallow importing ipcMain outside electron/services/ipc/*.",
+            recommended: false,
+        },
+        messages: {
+            avoidIpcMain:
+                "Do not import ipcMain here. Use the centralized IpcService / registerStandardizedIpcHandler utilities under electron/services/ipc/.",
+        },
+        schema: [],
+        type: "problem",
+    },
+    create(context) {
+        const rawFilename = context.getFilename();
+        const normalizedFilename = normalizePath(rawFilename);
+
+        if (
+            normalizedFilename === "<input>" ||
+            (!normalizedFilename.startsWith(`${NORMALIZED_ELECTRON_DIR}/`) &&
+                normalizedFilename !== NORMALIZED_ELECTRON_DIR) ||
+            normalizedFilename.includes("/electron/test/") ||
+            normalizedFilename.includes("/electron/benchmarks/")
+        ) {
+            return {};
+        }
+
+        // Allow only the canonical IPC service modules.
+        if (
+            normalizedFilename.startsWith(
+                `${NORMALIZED_ELECTRON_DIR}/services/ipc/`
+            )
+        ) {
+            return {};
+        }
+
+        return {
+            ImportDeclaration(node) {
+                if (
+                    node.source.type !== "Literal" ||
+                    node.source.value !== "electron"
+                ) {
+                    return;
+                }
+
+                for (const specifier of node.specifiers) {
+                    if (specifier.type !== "ImportSpecifier") {
+                        continue;
+                    }
+
+                    const importedName =
+                        specifier.imported.type === "Identifier"
+                            ? specifier.imported.name
+                            : typeof specifier.imported.value === "string"
+                              ? specifier.imported.value
+                              : null;
+
+                    if (importedName !== "ipcMain") {
+                        continue;
+                    }
+
+                    context.report({
+                        messageId: "avoidIpcMain",
+                        node: specifier,
+                    });
+                }
+            },
+            CallExpression(node) {
+                // Guard against `const { ipcMain } = require("electron")`.
+                if (
+                    node.callee.type !== "Identifier" ||
+                    node.callee.name !== "require" ||
+                    node.arguments.length !== 1
+                ) {
+                    return;
+                }
+
+                const [first] = node.arguments;
+                if (
+                    !first ||
+                    first.type !== "Literal" ||
+                    first.value !== "electron"
+                ) {
+                    return;
+                }
+
+                // We only flag the require call when we see it being
+                // destructured to ipcMain. ESLint doesn't provide parent types
+                // here in a typed way (plugin is JS), but this heuristic covers
+                // the main abuse case.
+                const parent = node.parent;
+                if (
+                    parent &&
+                    parent.type === "VariableDeclarator" &&
+                    parent.id &&
+                    parent.id.type === "ObjectPattern" &&
+                    parent.id.properties.some(
+                        (property) =>
+                            property.type === "Property" &&
+                            !property.computed &&
+                            property.key.type === "Identifier" &&
+                            property.key.name === "ipcMain"
+                    )
+                ) {
+                    context.report({
+                        messageId: "avoidIpcMain",
+                        node,
+                    });
+                }
+            },
+        };
+    },
+};
+
+/**
+ * ESLint rule requiring IPC channel constants for handler registration.
+ *
+ * @remarks
+ * Prevents new, inline channel strings from being introduced in handler
+ * registration calls.
+ *
+ * In this codebase, canonical channel constants live in `@shared/types/preload`
+ * as `*_CHANNELS` mappings.
+ */
+const electronNoInlineIpcChannelLiteralRule = {
+    meta: {
+        docs: {
+            description:
+                "Disallow inline string literals as IPC channel names in registerStandardizedIpcHandler calls.",
+            recommended: false,
+        },
+        messages: {
+            useSharedChannelConstant:
+                "Do not inline IPC channel strings. Use a shared *_CHANNELS constant (from @shared/types/preload) or another imported channel constant.",
+        },
+        schema: [],
+        type: "problem",
+    },
+    create(context) {
+        const rawFilename = context.getFilename();
+        const normalizedFilename = normalizePath(rawFilename);
+
+        if (
+            normalizedFilename === "<input>" ||
+            (!normalizedFilename.startsWith(`${NORMALIZED_ELECTRON_DIR}/`) &&
+                normalizedFilename !== NORMALIZED_ELECTRON_DIR) ||
+            normalizedFilename.includes("/electron/test/") ||
+            normalizedFilename.includes("/electron/benchmarks/")
+        ) {
+            return {};
+        }
+
+        // The IPC utils module is the lower-level infrastructure and may need
+        // to use literals in internal examples or test-only helpers.
+        if (normalizedFilename.endsWith("/electron/services/ipc/utils.ts")) {
+            return {};
+        }
+
+        /**
+         * @param {
+         *     | import("@typescript-eslint/utils").TSESTree.Expression
+         *     | import("@typescript-eslint/utils").TSESTree.SpreadElement
+         *     | null
+         *     | undefined} arg
+         */
+        function isInlineStringLiteral(arg) {
+            if (!arg) {
+                return false;
+            }
+
+            if (arg.type === "Literal" && typeof arg.value === "string") {
+                return true;
+            }
+
+            if (
+                arg.type === "TemplateLiteral" &&
+                arg.expressions.length === 0
+            ) {
+                return true;
+            }
+
+            return false;
+        }
+
+        return {
+            CallExpression(node) {
+                if (node.callee.type !== "Identifier") {
+                    return;
+                }
+
+                if (node.callee.name !== "registerStandardizedIpcHandler") {
+                    return;
+                }
+
+                const firstArg = node.arguments[0];
+                if (!isInlineStringLiteral(firstArg)) {
+                    return;
+                }
+
+                context.report({
+                    messageId: "useSharedChannelConstant",
+                    node: firstArg,
+                });
+            },
+        };
+    },
+};
+
+/**
+ * ESLint rule preventing preload code from defining inline IPC channel string
+ * constants.
+ *
+ * @remarks
+ * The preload layer should import canonical channel constants from shared types
+ * (e.g. `@shared/types/preload`) instead of redefining channel strings. This
+ * prevents drift and keeps AI changes on the established contract codepath.
+ */
+const electronPreloadNoInlineIpcChannelConstantRule = {
+    meta: {
+        docs: {
+            description:
+                "Disallow defining inline *_CHANNEL string constants in electron/preload; use shared channel constants instead.",
+            recommended: false,
+        },
+        messages: {
+            noInlineChannelConstant:
+                "Do not define IPC channel string constants here. Import canonical channel constants from @shared/types/preload (or another shared registry).",
+        },
+        schema: [],
+        type: "problem",
+    },
+    create(context) {
+        const rawFilename = context.getFilename();
+        const normalizedFilename = normalizePath(rawFilename);
+
+        if (
+            normalizedFilename === "<input>" ||
+            !normalizedFilename.includes("/electron/preload/") ||
+            normalizedFilename.includes("/electron/test/") ||
+            normalizedFilename.includes("/electron/benchmarks/")
+        ) {
+            return {};
+        }
+
+        /**
+         * @param {import("@typescript-eslint/utils").TSESTree.Expression | null | undefined} expression
+         *
+         * @returns {import("@typescript-eslint/utils").TSESTree.Expression | null}
+         */
+        function unwrapTsExpression(expression) {
+            if (!expression) {
+                return null;
+            }
+
+            if (
+                expression.type === "TSAsExpression" ||
+                expression.type === "TSSatisfiesExpression" ||
+                expression.type === "TSTypeAssertion"
+            ) {
+                return unwrapTsExpression(expression.expression);
+            }
+
+            return expression;
+        }
+
+        /**
+         * @param {import("@typescript-eslint/utils").TSESTree.Expression | null | undefined} expression
+         */
+        function isInlineStringLiteral(expression) {
+            const unwrapped = unwrapTsExpression(expression);
+            if (!unwrapped) {
+                return false;
+            }
+
+            if (
+                unwrapped.type === "Literal" &&
+                typeof unwrapped.value === "string"
+            ) {
+                return true;
+            }
+
+            return (
+                unwrapped.type === "TemplateLiteral" &&
+                unwrapped.expressions.length === 0
+            );
+        }
+
+        return {
+            VariableDeclarator(node) {
+                if (node.id.type !== "Identifier") {
+                    return;
+                }
+
+                // Heuristic: most channel constants are ALL_CAPS with
+                // CHANNEL in the name.
+                if (!/CHANNEL/u.test(node.id.name)) {
+                    return;
+                }
+
+                if (!isInlineStringLiteral(node.init)) {
+                    return;
+                }
+
+                context.report({
+                    messageId: "noInlineChannelConstant",
+                    node: node.id,
+                });
+            },
+        };
+    },
+};
+
+/**
+ * ESLint rule discouraging string-literal type arguments when registering IPC
+ * handlers.
+ *
+ * @remarks
+ * `registerStandardizedIpcHandler<"some-channel">(...)` duplicates the channel
+ * identifier in the type position and encourages drift. Prefer inference from
+ * the channel constant passed as the first argument.
+ */
+const electronNoInlineIpcChannelTypeArgumentRule = {
+    meta: {
+        docs: {
+            description:
+                "Disallow string-literal type arguments on registerStandardizedIpcHandler; rely on inference from shared channel constants.",
+            recommended: false,
+        },
+        messages: {
+            noInlineTypeChannel:
+                "Do not use a string-literal type argument for registerStandardizedIpcHandler. Use a shared channel constant and let TypeScript infer the channel type.",
+        },
+        schema: [],
+        type: "suggestion",
+    },
+    create(context) {
+        const rawFilename = context.getFilename();
+        const normalizedFilename = normalizePath(rawFilename);
+
+        if (
+            normalizedFilename === "<input>" ||
+            (!normalizedFilename.startsWith(`${NORMALIZED_ELECTRON_DIR}/`) &&
+                normalizedFilename !== NORMALIZED_ELECTRON_DIR) ||
+            normalizedFilename.includes("/electron/test/") ||
+            normalizedFilename.includes("/electron/benchmarks/")
+        ) {
+            return {};
+        }
+
+        /**
+         * @param {unknown} typeParams
+         *
+         * @returns {readonly unknown[]}
+         */
+        function getTypeArguments(typeParams) {
+            if (!typeParams || typeof typeParams !== "object") {
+                return [];
+            }
+
+            // @typescript-eslint uses `typeArguments` (newer) but older nodes may
+            // expose `params`.
+            if (
+                "typeArguments" in typeParams &&
+                Array.isArray(typeParams.typeArguments)
+            ) {
+                return typeParams.typeArguments;
+            }
+
+            if ("params" in typeParams && Array.isArray(typeParams.params)) {
+                return typeParams.params;
+            }
+
+            return [];
+        }
+
+        return {
+            CallExpression(node) {
+                if (node.callee.type !== "Identifier") {
+                    return;
+                }
+
+                if (node.callee.name !== "registerStandardizedIpcHandler") {
+                    return;
+                }
+
+                const typeParams = /** @type {unknown} */ (
+                    node.typeArguments ?? node.typeParameters
+                );
+                const args = getTypeArguments(typeParams);
+                if (args.length === 0) {
+                    return;
+                }
+
+                const firstTypeArg = args[0];
+                if (
+                    firstTypeArg &&
+                    typeof firstTypeArg === "object" &&
+                    firstTypeArg.type === "TSLiteralType" &&
+                    firstTypeArg.literal &&
+                    firstTypeArg.literal.type === "Literal" &&
+                    typeof firstTypeArg.literal.value === "string"
+                ) {
+                    context.report({
+                        messageId: "noInlineTypeChannel",
+                        node: firstTypeArg,
+                    });
+                }
+            },
+        };
+    },
+};
+
+/**
+ * ESLint rule preventing IPC channel string literals from being duplicated in
+ * TypeScript _type positions_.
+ *
+ * @remarks
+ * Examples of banned patterns outside the canonical shared contract modules:
+ *
+ * - `Extract<IpcInvokeChannel, "add-site">`
+ * - `const channel = "add-site" satisfies IpcInvokeChannel`
+ * - `const channel = "add-site" as IpcInvokeChannel`
+ *
+ * These are all forms of duplicating channel identifiers in places that are not
+ * the shared contract registry. Prefer importing channel constants (e.g.
+ * `SITES_CHANNELS.addSite`) or referencing the shared mappings.
+ */
+const noInlineIpcChannelTypeLiteralsRule = {
+    meta: {
+        docs: {
+            description:
+                "Disallow IPC channel string literals in TS type positions; rely on shared channel constants and inference.",
+            recommended: false,
+        },
+        messages: {
+            noInlineChannelTypeLiteral:
+                "Do not encode IPC channel strings in TypeScript type positions. Use shared channel constants/mappings (from @shared/types/preload) and let types be inferred.",
+        },
+        schema: [],
+        type: "problem",
+    },
+    create(context) {
+        const rawFilename = context.getFilename();
+        const normalizedFilename = normalizePath(rawFilename);
+
+        if (normalizedFilename === "<input>") {
+            return {};
+        }
+
+        // Allow the canonical registry modules where channel literals are
+        // expected and intentional.
+        if (
+            normalizedFilename.endsWith("/shared/types/preload.ts") ||
+            normalizedFilename.endsWith("/shared/types/ipc.ts")
+        ) {
+            return {};
+        }
+
+        // Ignore tests/benchmarks.
+        if (
+            normalizedFilename.includes("/test/") ||
+            normalizedFilename.includes("/tests/") ||
+            normalizedFilename.includes("/benchmarks/")
+        ) {
+            return {};
+        }
+
+        /**
+         * @param {unknown} node
+         *
+         * @returns {node is import("@typescript-eslint/utils").TSESTree.TSLiteralType}
+         */
+        function isStringLiteralType(node) {
+            if (!node || typeof node !== "object") {
+                return false;
+            }
+
+            if (node.type !== "TSLiteralType") {
+                return false;
+            }
+
+            const literal = node.literal;
+
+            return (
+                literal?.type === "Literal" && typeof literal.value === "string"
+            );
+        }
+
+        /**
+         * @param {unknown} node
+         *
+         * @returns {node is import("@typescript-eslint/utils").TSESTree.TSTypeReference}
+         */
+        function isTypeReference(node) {
+            return Boolean(
+                node &&
+                typeof node === "object" &&
+                node.type === "TSTypeReference"
+            );
+        }
+
+        /**
+         * @param {unknown} node
+         *
+         * @returns {node is import("@typescript-eslint/utils").TSESTree.Identifier}
+         */
+        function isIdentifier(node) {
+            return Boolean(
+                node && typeof node === "object" && node.type === "Identifier"
+            );
+        }
+
+        /**
+         * @param {unknown} expression
+         *
+         * @returns {expression is import("@typescript-eslint/utils").TSESTree.Expression}
+         */
+        function isExpression(expression) {
+            return Boolean(
+                expression &&
+                typeof expression === "object" &&
+                "type" in expression
+            );
+        }
+
+        /**
+         * @param {import("@typescript-eslint/utils").TSESTree.Expression} expression
+         */
+        function isInlineStringExpression(expression) {
+            if (
+                expression.type === "Literal" &&
+                typeof expression.value === "string"
+            ) {
+                return true;
+            }
+
+            return (
+                expression.type === "TemplateLiteral" &&
+                expression.expressions.length === 0
+            );
+        }
+
+        return {
+            TSTypeReference(node) {
+                // Extract<IpcInvokeChannel, "some-channel">
+                if (
+                    !isIdentifier(node.typeName) ||
+                    node.typeName.name !== "Extract"
+                ) {
+                    return;
+                }
+
+                const params = node.typeArguments?.params;
+                if (!params || params.length < 2) {
+                    return;
+                }
+
+                const [firstParam, secondParam] = params;
+                if (!isTypeReference(firstParam)) {
+                    return;
+                }
+
+                if (
+                    !isIdentifier(firstParam.typeName) ||
+                    firstParam.typeName.name !== "IpcInvokeChannel"
+                ) {
+                    return;
+                }
+
+                if (!isStringLiteralType(secondParam)) {
+                    return;
+                }
+
+                context.report({
+                    messageId: "noInlineChannelTypeLiteral",
+                    node: secondParam,
+                });
+            },
+            TSSatisfiesExpression(node) {
+                // "some-channel" satisfies IpcInvokeChannel
+                const annotation = node.typeAnnotation;
+                if (!annotation || !isTypeReference(annotation)) {
+                    return;
+                }
+
+                if (
+                    !isIdentifier(annotation.typeName) ||
+                    annotation.typeName.name !== "IpcInvokeChannel"
+                ) {
+                    return;
+                }
+
+                if (isInlineStringExpression(node.expression)) {
+                    context.report({
+                        messageId: "noInlineChannelTypeLiteral",
+                        node,
+                    });
+                }
+            },
+            TSAsExpression(node) {
+                // "some-channel" as IpcInvokeChannel
+                if (!isInlineStringExpression(node.expression)) {
+                    return;
+                }
+
+                const annotation = node.typeAnnotation;
+                if (!annotation || !isTypeReference(annotation)) {
+                    return;
+                }
+
+                if (
+                    !isIdentifier(annotation.typeName) ||
+                    annotation.typeName.name !== "IpcInvokeChannel"
+                ) {
+                    return;
+                }
+
+                context.report({
+                    messageId: "noInlineChannelTypeLiteral",
+                    node,
+                });
+            },
+        };
+    },
+};
+
+/**
+ * ESLint rule preventing preload domain modules from touching `ipcRenderer`
+ * directly.
+ *
+ * @remarks
+ * Only the core bridge infrastructure should talk to `ipcRenderer`. Domain
+ * modules must compose bridges via the core factory utilities.
+ */
+const electronPreloadNoDirectIpcRendererUsageRule = {
+    meta: {
+        docs: {
+            description:
+                "Disallow ipcRenderer usage in preload modules outside core bridge infrastructure.",
+            recommended: false,
+        },
+        messages: {
+            noDirectIpcRenderer:
+                "Do not use ipcRenderer directly in preload domain modules. Use the core bridgeFactory helpers instead.",
+        },
+        schema: [],
+        type: "problem",
+    },
+    create(context) {
+        const rawFilename = context.getFilename();
+        const normalizedFilename = normalizePath(rawFilename);
+
+        if (
+            normalizedFilename === "<input>" ||
+            !normalizedFilename.includes("/electron/preload/") ||
+            normalizedFilename.includes("/electron/test/") ||
+            normalizedFilename.includes("/electron/benchmarks/")
+        ) {
+            return {};
+        }
+
+        // Allow the core modules that legitimately speak ipcRenderer.
+        if (
+            normalizedFilename.endsWith(
+                "/electron/preload/core/bridgeFactory.ts"
+            ) ||
+            normalizedFilename.endsWith(
+                "/electron/preload/utils/preloadLogger.ts"
+            )
+        ) {
+            return {};
+        }
+
+        return {
+            ImportDeclaration(node) {
+                if (
+                    node.source.type !== "Literal" ||
+                    node.source.value !== "electron"
+                ) {
+                    return;
+                }
+
+                for (const specifier of node.specifiers) {
+                    if (specifier.type !== "ImportSpecifier") {
+                        continue;
+                    }
+
+                    const importedName =
+                        specifier.imported.type === "Identifier"
+                            ? specifier.imported.name
+                            : typeof specifier.imported.value === "string"
+                              ? specifier.imported.value
+                              : null;
+
+                    if (importedName === "ipcRenderer") {
+                        context.report({
+                            messageId: "noDirectIpcRenderer",
+                            node: specifier,
+                        });
+                    }
+                }
+            },
+            MemberExpression(node) {
+                // Any usage of a free identifier `ipcRenderer` in preload domain
+                // code is banned.
+                if (
+                    node.object.type === "Identifier" &&
+                    node.object.name === "ipcRenderer"
+                ) {
+                    context.report({
+                        messageId: "noDirectIpcRenderer",
+                        node: node.object,
+                    });
+                }
+            },
+        };
+    },
+};
+
+/**
+ * ESLint rule preventing renderer application code from accessing
+ * `window.electronAPI` directly.
+ *
+ * @remarks
+ * The renderer should reach the preload bridge via the established service
+ * wrappers in `src/services/*` (built using `getIpcServiceHelpers`). Direct
+ * access tends to create parallel, untested codepaths with inconsistent
+ * readiness checks and error handling.
+ */
+const rendererNoDirectPreloadBridgeRule = {
+    meta: {
+        docs: {
+            description:
+                "Disallow direct window.electronAPI usage outside the IPC service helper utilities.",
+            recommended: false,
+        },
+        messages: {
+            avoidDirectBridge:
+                "Do not access {{owner}}.electronAPI directly. Use the established src/services/*Service wrappers (via getIpcServiceHelpers) instead.",
+        },
+        schema: [],
+        type: "problem",
+    },
+    create(context) {
+        const rawFilename = context.getFilename();
+        const normalizedFilename = normalizePath(rawFilename);
+
+        if (
+            normalizedFilename === "<input>" ||
+            !normalizedFilename.startsWith(`${NORMALIZED_SRC_DIR}/`) ||
+            normalizedFilename.includes("/src/test/")
+        ) {
+            return {};
+        }
+
+        // Allow the helper module that centrally gates and logs access.
+        if (
+            normalizedFilename.endsWith(
+                "/src/services/utils/createIpcServiceHelpers.ts"
+            )
+        ) {
+            return {};
+        }
+
+        /**
+         * Determines whether the member expression is `window.electronAPI` or
+         * `globalThis.window.electronAPI` etc.
+         *
+         * @param {import("@typescript-eslint/utils").TSESTree.MemberExpression} member
+         *
+         * @returns {{ owner: string } | null}
+         */
+        function matchElectronApiMember(member) {
+            const property = member.property;
+            if (member.computed) {
+                if (
+                    property.type === "Literal" &&
+                    property.value === "electronAPI"
+                ) {
+                    // Computed access like window["electronAPI"].
+                } else {
+                    return null;
+                }
+            } else if (
+                property.type !== "Identifier" ||
+                property.name !== "electronAPI"
+            ) {
+                return null;
+            }
+
+            const object = member.object;
+            if (object.type === "Identifier") {
+                if (
+                    object.name === "window" ||
+                    object.name === "globalThis" ||
+                    object.name === "global"
+                ) {
+                    return { owner: object.name };
+                }
+
+                return null;
+            }
+
+            if (object.type === "MemberExpression" && !object.computed) {
+                // Match globalThis.window.electronAPI
+                const innerObject = object.object;
+                const innerProperty = object.property;
+                if (
+                    innerObject.type === "Identifier" &&
+                    (innerObject.name === "globalThis" ||
+                        innerObject.name === "global") &&
+                    innerProperty.type === "Identifier" &&
+                    innerProperty.name === "window"
+                ) {
+                    return { owner: `${innerObject.name}.window` };
+                }
+            }
+
+            return null;
+        }
+
+        return {
+            MemberExpression(node) {
+                const match = matchElectronApiMember(node);
+                if (!match) {
+                    return;
+                }
+
+                context.report({
+                    data: { owner: match.owner },
+                    messageId: "avoidDirectBridge",
+                    node,
+                });
+            },
+        };
+    },
+};
+
+/**
+ * ESLint rule preventing assignments/mutations of `window.electronAPI` in
+ * renderer production code.
+ *
+ * @remarks
+ * Only tests/mocks should ever define or overwrite the preload bridge.
+ */
+const rendererNoPreloadBridgeWritesRule = {
+    meta: {
+        docs: {
+            description:
+                "Disallow mutating window.electronAPI in renderer code (non-test).",
+            recommended: false,
+        },
+        messages: {
+            noBridgeWrites:
+                "Do not assign/define window.electronAPI in application code. Preload owns the bridge; renderer should only read it via services.",
+        },
+        schema: [],
+        type: "problem",
+    },
+    create(context) {
+        const rawFilename = context.getFilename();
+        const normalizedFilename = normalizePath(rawFilename);
+
+        if (
+            normalizedFilename === "<input>" ||
+            !normalizedFilename.startsWith(`${NORMALIZED_SRC_DIR}/`) ||
+            normalizedFilename.includes("/src/test/")
+        ) {
+            return {};
+        }
+
+        /**
+         * @param {import("@typescript-eslint/utils").TSESTree.MemberExpression} member
+         */
+        function isElectronApiMember(member) {
+            if (member.computed) {
+                return (
+                    member.property.type === "Literal" &&
+                    member.property.value === "electronAPI"
+                );
+            }
+
+            return (
+                member.property.type === "Identifier" &&
+                member.property.name === "electronAPI"
+            );
+        }
+
+        return {
+            AssignmentExpression(node) {
+                if (node.left.type !== "MemberExpression") {
+                    return;
+                }
+
+                if (!isElectronApiMember(node.left)) {
+                    return;
+                }
+
+                // Only flag obvious roots: window / globalThis / global.
+                const object = node.left.object;
+                if (
+                    object.type === "Identifier" &&
+                    (object.name === "window" ||
+                        object.name === "globalThis" ||
+                        object.name === "global")
+                ) {
+                    context.report({
+                        messageId: "noBridgeWrites",
+                        node,
+                    });
+                }
+            },
+            CallExpression(node) {
+                // Object.defineProperty(window, "electronAPI", ...)
+                if (
+                    node.callee.type !== "MemberExpression" ||
+                    node.callee.computed
+                ) {
+                    return;
+                }
+
+                if (
+                    node.callee.object.type !== "Identifier" ||
+                    node.callee.object.name !== "Object" ||
+                    node.callee.property.type !== "Identifier" ||
+                    node.callee.property.name !== "defineProperty"
+                ) {
+                    return;
+                }
+
+                const [target, propertyName] = node.arguments;
+                if (!target || !propertyName) {
+                    return;
+                }
+
+                if (
+                    target.type === "Identifier" &&
+                    (target.name === "window" ||
+                        target.name === "globalThis" ||
+                        target.name === "global") &&
+                    ((propertyName.type === "Literal" &&
+                        propertyName.value === "electronAPI") ||
+                        (propertyName.type === "TemplateLiteral" &&
+                            propertyName.expressions.length === 0 &&
+                            propertyName.quasis.length === 1 &&
+                            propertyName.quasis[0]?.value?.cooked ===
+                                "electronAPI"))
+                ) {
+                    context.report({
+                        messageId: "noBridgeWrites",
+                        node,
+                    });
+                }
+            },
+        };
+    },
+};
+
+/**
+ * ESLint rule restricting direct usage of electron-log/renderer.
+ *
+ * @remarks
+ * Renderer logging should be centralized through `src/services/logger.ts` (and
+ * the IPC helper fallback) to avoid a proliferation of custom logging setups.
+ */
+const rendererNoDirectElectronLogRule = {
+    meta: {
+        docs: {
+            description:
+                "Disallow importing electron-log/renderer outside the renderer logger modules.",
+            recommended: false,
+        },
+        messages: {
+            useRendererLogger:
+                "Do not import {{module}} here. Use src/services/logger.ts (or inject a logger) to keep logging centralized.",
+        },
+        schema: [],
+        type: "problem",
+    },
+    create(context) {
+        const rawFilename = context.getFilename();
+        const normalizedFilename = normalizePath(rawFilename);
+
+        if (
+            normalizedFilename === "<input>" ||
+            !normalizedFilename.startsWith(`${NORMALIZED_SRC_DIR}/`) ||
+            normalizedFilename.includes("/src/test/")
+        ) {
+            return {};
+        }
+
+        // Allow canonical logger modules.
+        if (
+            normalizedFilename.endsWith("/src/services/logger.ts") ||
+            normalizedFilename.endsWith(
+                "/src/services/utils/createIpcServiceHelpers.ts"
+            )
+        ) {
+            return {};
+        }
+
+        const forbiddenModules = new Set([
+            "electron-log/renderer",
+            "electron-log",
+        ]);
+
+        return {
+            ImportDeclaration(node) {
+                if (
+                    node.source.type !== "Literal" ||
+                    typeof node.source.value !== "string"
+                ) {
+                    return;
+                }
+
+                const moduleName = node.source.value;
+                if (!forbiddenModules.has(moduleName)) {
+                    return;
+                }
+
+                context.report({
+                    data: { module: moduleName },
+                    messageId: "useRendererLogger",
+                    node: node.source,
+                });
+            },
+        };
+    },
+};
+
+/**
+ * ESLint rule preventing non-service modules from importing internal
+ * `src/services/utils/*` helpers.
+ */
+const rendererNoImportInternalServiceUtilsRule = {
+    meta: {
+        docs: {
+            description:
+                "Disallow importing src/services/utils/* outside src/services/*.",
+            recommended: false,
+        },
+        messages: {
+            noInternalUtils:
+                "Do not import internal service utilities (src/services/utils/*) outside the service layer. Use the public service APIs instead.",
+        },
+        schema: [],
+        type: "problem",
+    },
+    create(context) {
+        const rawFilename = context.getFilename();
+        const normalizedFilename = normalizePath(rawFilename);
+
+        if (
+            normalizedFilename === "<input>" ||
+            !normalizedFilename.startsWith(`${NORMALIZED_SRC_DIR}/`) ||
+            normalizedFilename.includes("/src/test/")
+        ) {
+            return {};
+        }
+
+        // Services are allowed to use their own internal utilities.
+        if (normalizedFilename.includes("/src/services/")) {
+            return {};
+        }
+
+        return {
+            ImportDeclaration(node) {
+                if (
+                    node.source.type !== "Literal" ||
+                    typeof node.source.value !== "string"
+                ) {
+                    return;
+                }
+
+                const moduleName = node.source.value;
+
+                // Catch both Vite alias and relative imports.
+                if (
+                    moduleName.includes("/services/utils/") ||
+                    moduleName.includes("\\services\\utils\\") ||
+                    moduleName.startsWith("./services/utils/") ||
+                    moduleName.startsWith("../services/utils/") ||
+                    moduleName.startsWith("@app/services/utils/")
+                ) {
+                    context.report({
+                        messageId: "noInternalUtils",
+                        node: node.source,
+                    });
+                }
+            },
+        };
+    },
+};
+
+/**
+ * ESLint rule preventing direct networking calls from UI code.
+ *
+ * @remarks
+ * Renderer code should not scatter `fetch`/`axios` calls throughout components
+ * and hooks. If networking is required in the renderer, centralize it in the
+ * service layer (src/services/**) so callers share retry, logging, caching, and
+ * error normalization.
+ */
+const rendererNoDirectNetworkingRule = {
+    meta: {
+        docs: {
+            description:
+                "Disallow direct fetch/axios usage outside the renderer service layer.",
+            recommended: false,
+        },
+        messages: {
+            noDirectNetworking:
+                "Do not perform direct networking ({{api}}) here. Centralize networking in src/services/* (or Electron) to avoid duplicated codepaths.",
+        },
+        schema: [],
+        type: "problem",
+    },
+    create(context) {
+        const sourceCode = context.sourceCode ?? context.getSourceCode();
+        const rawFilename = context.getFilename();
+        const normalizedFilename = normalizePath(rawFilename);
+
+        if (
+            normalizedFilename === "<input>" ||
+            !normalizedFilename.startsWith(`${NORMALIZED_SRC_DIR}/`) ||
+            normalizedFilename.includes("/src/test/")
+        ) {
+            return {};
+        }
+
+        // Allow networking inside the service layer (single canonical place).
+        if (normalizedFilename.includes("/src/services/")) {
+            return {};
+        }
+
+        /** @type {Set<string>} */
+        const axiosLocalNames = new Set();
+
+        function hasLocalBinding(name, node) {
+            let scope = sourceCode.getScope(node);
+            while (scope) {
+                const variable = scope.set.get(name);
+                if (variable && variable.defs.length > 0) {
+                    return true;
+                }
+                scope = scope.upper;
+            }
+            return false;
+        }
+
+        return {
+            ImportDeclaration(node) {
+                if (
+                    node.source.type !== "Literal" ||
+                    node.source.value !== "axios"
+                ) {
+                    return;
+                }
+
+                for (const specifier of node.specifiers) {
+                    // default import: import axios from "axios"
+                    if (specifier.type === "ImportDefaultSpecifier") {
+                        axiosLocalNames.add(specifier.local.name);
+                        continue;
+                    }
+
+                    // namespace import: import * as axios from "axios"
+                    if (specifier.type === "ImportNamespaceSpecifier") {
+                        axiosLocalNames.add(specifier.local.name);
+                        continue;
+                    }
+
+                    // named import: import { Axios } from "axios" (rare)
+                    if (specifier.type === "ImportSpecifier") {
+                        axiosLocalNames.add(specifier.local.name);
+                    }
+                }
+
+                context.report({
+                    data: { api: "axios" },
+                    messageId: "noDirectNetworking",
+                    node: node.source,
+                });
+            },
+            CallExpression(node) {
+                const callee = node.callee;
+
+                // fetch(...)
+                if (callee.type === "Identifier" && callee.name === "fetch") {
+                    if (!hasLocalBinding("fetch", node)) {
+                        context.report({
+                            data: { api: "fetch" },
+                            messageId: "noDirectNetworking",
+                            node: callee,
+                        });
+                    }
+                    return;
+                }
+
+                // axios(...)
+                if (callee.type === "Identifier") {
+                    if (axiosLocalNames.has(callee.name)) {
+                        context.report({
+                            data: { api: "axios" },
+                            messageId: "noDirectNetworking",
+                            node: callee,
+                        });
+                    }
+                    return;
+                }
+
+                // axios.get(...)
+                if (callee.type === "MemberExpression" && !callee.computed) {
+                    if (
+                        callee.object.type === "Identifier" &&
+                        axiosLocalNames.has(callee.object.name)
+                    ) {
+                        context.report({
+                            data: { api: "axios" },
+                            messageId: "noDirectNetworking",
+                            node: callee,
+                        });
+                    }
+                }
+            },
+        };
+    },
+};
+
+/**
+ * ESLint rule forbidding ipcRenderer usage in renderer application code.
+ *
+ * @remarks
+ * Renderer IPC must flow through the preload bridge (`window.electronAPI`) and
+ * the service wrappers in `src/services/*`. Direct ipcRenderer usage creates
+ * parallel codepaths that bypass validation, readiness checks, and error
+ * normalization.
+ */
+const rendererNoIpcRendererUsageRule = {
+    meta: {
+        docs: {
+            description:
+                "Disallow ipcRenderer usage in src/*; use the preload bridge and services instead.",
+            recommended: false,
+        },
+        messages: {
+            noIpcRenderer:
+                "Do not use ipcRenderer in renderer code. Use window.electronAPI via src/services/* instead.",
+        },
+        schema: [],
+        type: "problem",
+    },
+    create(context) {
+        const sourceCode = context.sourceCode ?? context.getSourceCode();
+        const rawFilename = context.getFilename();
+        const normalizedFilename = normalizePath(rawFilename);
+
+        if (
+            normalizedFilename === "<input>" ||
+            !normalizedFilename.startsWith(`${NORMALIZED_SRC_DIR}/`) ||
+            normalizedFilename.includes("/src/test/")
+        ) {
+            return {};
+        }
+
+        /** @type {Set<string>} */
+        const electronModuleBindings = new Set();
+
+        function hasLocalBinding(name, node) {
+            let scope = sourceCode.getScope(node);
+            while (scope) {
+                const variable = scope.set.get(name);
+                if (variable && variable.defs.length > 0) {
+                    return true;
+                }
+                scope = scope.upper;
+            }
+            return false;
+        }
+
+        /**
+         * @param {import("@typescript-eslint/utils").TSESTree.Node} node
+         */
+        function report(node) {
+            context.report({
+                messageId: "noIpcRenderer",
+                node,
+            });
+        }
+
+        /**
+         * @param {import("@typescript-eslint/utils").TSESTree.Expression} expression
+         */
+        function isRequireElectronCall(expression) {
+            return (
+                expression.type === "CallExpression" &&
+                expression.callee.type === "Identifier" &&
+                expression.callee.name === "require" &&
+                expression.arguments.length === 1 &&
+                expression.arguments[0]?.type === "Literal" &&
+                expression.arguments[0].value === "electron"
+            );
+        }
+
+        /**
+         * @param {import("@typescript-eslint/utils").TSESTree.MemberExpression} member
+         */
+        function isPropertyNamed(member, name) {
+            if (member.computed) {
+                return (
+                    member.property.type === "Literal" &&
+                    member.property.value === name
+                );
+            }
+
+            return (
+                member.property.type === "Identifier" &&
+                member.property.name === name
+            );
+        }
+
+        return {
+            ImportDeclaration(node) {
+                if (
+                    node.source.type !== "Literal" ||
+                    typeof node.source.value !== "string"
+                ) {
+                    return;
+                }
+
+                const moduleName = node.source.value;
+
+                if (moduleName !== "electron") {
+                    return;
+                }
+
+                for (const specifier of node.specifiers) {
+                    if (specifier.type === "ImportSpecifier") {
+                        const importedName =
+                            specifier.imported.type === "Identifier"
+                                ? specifier.imported.name
+                                : typeof specifier.imported.value === "string"
+                                  ? specifier.imported.value
+                                  : null;
+
+                        if (importedName === "ipcRenderer") {
+                            report(specifier);
+                        }
+                        continue;
+                    }
+
+                    // Track default/namespace imports for later member checks
+                    // like `electron.ipcRenderer`.
+                    if (
+                        specifier.type === "ImportDefaultSpecifier" ||
+                        specifier.type === "ImportNamespaceSpecifier"
+                    ) {
+                        electronModuleBindings.add(specifier.local.name);
+                    }
+                }
+            },
+            VariableDeclarator(node) {
+                if (!node.init || node.id.type !== "Identifier") {
+                    return;
+                }
+
+                if (!isRequireElectronCall(node.init)) {
+                    return;
+                }
+
+                electronModuleBindings.add(node.id.name);
+            },
+            CallExpression(node) {
+                // const { ipcRenderer } = require("electron")
+                if (
+                    node.callee.type !== "Identifier" ||
+                    node.callee.name !== "require" ||
+                    node.arguments.length !== 1
+                ) {
+                    return;
+                }
+
+                const [first] = node.arguments;
+                if (
+                    !first ||
+                    first.type !== "Literal" ||
+                    first.value !== "electron"
+                ) {
+                    return;
+                }
+
+                const parent = node.parent;
+                if (
+                    parent &&
+                    parent.type === "VariableDeclarator" &&
+                    parent.id &&
+                    parent.id.type === "ObjectPattern" &&
+                    parent.id.properties.some(
+                        (property) =>
+                            property.type === "Property" &&
+                            !property.computed &&
+                            property.key.type === "Identifier" &&
+                            property.key.name === "ipcRenderer"
+                    )
+                ) {
+                    report(node);
+                }
+            },
+            MemberExpression(node) {
+                // ipcRenderer.invoke(...)
+                if (node.object.type === "Identifier") {
+                    if (
+                        node.object.name === "ipcRenderer" &&
+                        !hasLocalBinding("ipcRenderer", node)
+                    ) {
+                        report(node.object);
+                        return;
+                    }
+
+                    // electron.ipcRenderer (where `electron` came from
+                    // require/import)
+                    if (
+                        electronModuleBindings.has(node.object.name) &&
+                        isPropertyNamed(node, "ipcRenderer")
+                    ) {
+                        report(node.property);
+                        return;
+                    }
+                }
+
+                // require("electron").ipcRenderer
+                if (
+                    isPropertyNamed(node, "ipcRenderer") &&
+                    node.object.type === "CallExpression" &&
+                    isRequireElectronCall(node.object)
+                ) {
+                    report(node.property);
+                }
+            },
+        };
+    },
+};
+
 const FORBIDDEN_BROWSER_DIALOG_NAMES = new Set([
     "alert",
     "confirm",
@@ -929,6 +2467,249 @@ const rendererNoBrowserDialogsRule = {
                     messageId: "avoidBrowserDialog",
                     node,
                 });
+            },
+        };
+    },
+};
+
+/**
+ * ESLint rule enforcing that Electron IPC handlers are wrapped via
+ * `registerStandardizedIpcHandler` rather than directly invoking
+ * `withIpcHandler`/`withIpcHandlerValidation`.
+ *
+ * @remarks
+ * This is an explicit "no new codepaths" rule: the only module that should deal
+ * with response formatting, timing, and validation plumbing is
+ * `electron/services/ipc/utils.ts`.
+ */
+const electronNoDirectIpcHandlerWrappersRule = {
+    meta: {
+        docs: {
+            description:
+                "Disallow calling withIpcHandler/withIpcHandlerValidation outside the IPC utilities module.",
+            recommended: false,
+        },
+        messages: {
+            preferStandardRegistration:
+                "Do not call {{wrapper}} directly. Use registerStandardizedIpcHandler so IPC handling stays centralized and consistent.",
+        },
+        schema: [],
+        type: "problem",
+    },
+    create(context) {
+        const rawFilename = context.getFilename();
+        const normalizedFilename = normalizePath(rawFilename);
+
+        if (
+            normalizedFilename === "<input>" ||
+            (!normalizedFilename.startsWith(`${NORMALIZED_ELECTRON_DIR}/`) &&
+                normalizedFilename !== NORMALIZED_ELECTRON_DIR) ||
+            normalizedFilename.includes("/electron/test/") ||
+            normalizedFilename.includes("/electron/benchmarks/")
+        ) {
+            return {};
+        }
+
+        // Allow the canonical IPC utility module.
+        if (normalizedFilename.endsWith("/electron/services/ipc/utils.ts")) {
+            return {};
+        }
+
+        const forbiddenImportedNames = new Set([
+            "withIpcHandler",
+            "withIpcHandlerValidation",
+        ]);
+
+        /** @type {Set<string>} */
+        const forbiddenLocalIdentifiers = new Set();
+
+        /**
+         * Reports a direct wrapper call.
+         *
+         * @param {import("@typescript-eslint/utils").TSESTree.Node} node
+         * @param {string} wrapper
+         */
+        function report(node, wrapper) {
+            context.report({
+                data: { wrapper },
+                messageId: "preferStandardRegistration",
+                node,
+            });
+        }
+
+        return {
+            ImportDeclaration(node) {
+                if (!node.source || node.source.type !== "Literal") {
+                    return;
+                }
+
+                for (const specifier of node.specifiers) {
+                    if (specifier.type !== "ImportSpecifier") {
+                        continue;
+                    }
+
+                    const importedName =
+                        specifier.imported.type === "Identifier"
+                            ? specifier.imported.name
+                            : typeof specifier.imported.value === "string"
+                              ? specifier.imported.value
+                              : null;
+
+                    if (!importedName) {
+                        continue;
+                    }
+
+                    if (!forbiddenImportedNames.has(importedName)) {
+                        continue;
+                    }
+
+                    forbiddenLocalIdentifiers.add(specifier.local.name);
+                }
+            },
+            CallExpression(node) {
+                const callee = node.callee;
+
+                if (callee.type === "Identifier") {
+                    if (
+                        forbiddenImportedNames.has(callee.name) ||
+                        forbiddenLocalIdentifiers.has(callee.name)
+                    ) {
+                        report(callee, callee.name);
+                    }
+                    return;
+                }
+
+                if (callee.type === "MemberExpression" && !callee.computed) {
+                    if (
+                        callee.property.type === "Identifier" &&
+                        forbiddenImportedNames.has(callee.property.name)
+                    ) {
+                        report(callee.property, callee.property.name);
+                    }
+                }
+            },
+        };
+    },
+};
+
+/**
+ * ESLint rule enforcing a single renderer bridge-readiness codepath.
+ *
+ * @remarks
+ * Renderer code should not call `waitForElectronBridge` directly. Instead it
+ * should use `getIpcServiceHelpers` (which calls into the readiness utilities)
+ * so initialization, retry/backoff, and diagnostics stay consistent.
+ */
+const rendererNoDirectBridgeReadinessRule = {
+    meta: {
+        docs: {
+            description:
+                "Disallow calling waitForElectronBridge outside the renderer IPC helper utilities.",
+            recommended: false,
+        },
+        messages: {
+            preferServiceHelpers:
+                "Do not call {{callee}} directly. Use getIpcServiceHelpers / createIpcServiceHelpers so bridge readiness stays centralized.",
+        },
+        schema: [],
+        type: "problem",
+    },
+    create(context) {
+        const rawFilename = context.getFilename();
+        const normalizedFilename = normalizePath(rawFilename);
+
+        if (
+            normalizedFilename === "<input>" ||
+            !normalizedFilename.startsWith(`${NORMALIZED_SRC_DIR}/`) ||
+            normalizedFilename.includes("/src/test/")
+        ) {
+            return {};
+        }
+
+        // Allow the utilities that implement the canonical readiness codepath.
+        if (
+            normalizedFilename.includes("/src/services/utils/") ||
+            normalizedFilename.endsWith(
+                "/src/services/utils/createIpcServiceHelpers.ts"
+            )
+        ) {
+            return {};
+        }
+
+        /** @type {Set<string>} */
+        const waitForElectronBridgeLocals = new Set();
+        /** @type {Set<string>} */
+        const notReadyErrorLocals = new Set();
+
+        function report(node, callee) {
+            context.report({
+                data: { callee },
+                messageId: "preferServiceHelpers",
+                node,
+            });
+        }
+
+        return {
+            ImportDeclaration(node) {
+                for (const specifier of node.specifiers) {
+                    if (specifier.type !== "ImportSpecifier") {
+                        continue;
+                    }
+
+                    const importedName =
+                        specifier.imported.type === "Identifier"
+                            ? specifier.imported.name
+                            : typeof specifier.imported.value === "string"
+                              ? specifier.imported.value
+                              : null;
+
+                    if (!importedName) {
+                        continue;
+                    }
+
+                    if (importedName === "waitForElectronBridge") {
+                        waitForElectronBridgeLocals.add(specifier.local.name);
+                    }
+
+                    if (importedName === "ElectronBridgeNotReadyError") {
+                        notReadyErrorLocals.add(specifier.local.name);
+                    }
+                }
+            },
+            CallExpression(node) {
+                const callee = node.callee;
+                if (callee.type === "Identifier") {
+                    if (callee.name === "waitForElectronBridge") {
+                        report(callee, "waitForElectronBridge");
+                        return;
+                    }
+
+                    if (waitForElectronBridgeLocals.has(callee.name)) {
+                        report(callee, callee.name);
+                    }
+                }
+
+                if (callee.type === "MemberExpression" && !callee.computed) {
+                    if (
+                        callee.property.type === "Identifier" &&
+                        callee.property.name === "waitForElectronBridge"
+                    ) {
+                        report(callee.property, "waitForElectronBridge");
+                    }
+                }
+            },
+            NewExpression(node) {
+                const callee = node.callee;
+                if (callee.type === "Identifier") {
+                    if (callee.name === "ElectronBridgeNotReadyError") {
+                        report(callee, "ElectronBridgeNotReadyError");
+                        return;
+                    }
+
+                    if (notReadyErrorLocals.has(callee.name)) {
+                        report(callee, callee.name);
+                    }
+                }
             },
         };
     },
@@ -1212,8 +2993,8 @@ const noDeprecatedExportsRule = {
         /**
          * Retrieves the closest JSDoc comment associated with a node.
          *
-         * @param {import("@typescript-eslint/utils").TSESTree.Node} node - Node
-         *   to inspect.
+         * @param {import("@typescript-eslint/utils").TSESTree.Node | null | undefined} node
+         *   - Node to inspect.
          *
          * @returns {import("@typescript-eslint/utils").TSESTree.BlockComment | null}
          */
@@ -1308,18 +3089,189 @@ const noDeprecatedExportsRule = {
     },
 };
 
+const noLocalRecordGuardsRule = {
+    meta: {
+        type: "problem",
+        docs: {
+            description:
+                "Disallow local record-guard helper declarations (use shared type helpers instead)",
+            recommended: true,
+        },
+        messages: {
+            noLocalRecordGuards:
+                "Do not declare a local '{{name}}' helper. Import 'isRecord' and/or 'ensureRecordLike' from '@shared/utils/typeHelpers' instead.",
+        },
+        schema: [],
+    },
+    create(context) {
+        const normalizedFilename = normalizePath(context.getFilename());
+
+        // Allow declarations inside the canonical shared helper modules.
+        if (
+            normalizedFilename.endsWith("/shared/utils/typeHelpers.ts") ||
+            normalizedFilename.endsWith("/shared/utils/typeGuards.ts")
+        ) {
+            return {};
+        }
+
+        // Ignore tests and generated artifacts.
+        if (
+            normalizedFilename.includes("/test/") ||
+            normalizedFilename.includes("/tests/") ||
+            normalizedFilename.includes("/electron/test/") ||
+            normalizedFilename.includes("/src/test/") ||
+            normalizedFilename.includes("/shared/test/") ||
+            normalizedFilename.endsWith(".test.ts") ||
+            normalizedFilename.endsWith(".test.tsx") ||
+            normalizedFilename.endsWith(".spec.ts") ||
+            normalizedFilename.endsWith(".spec.tsx")
+        ) {
+            return {};
+        }
+
+        const bannedNames = new Set([
+            "isObjectRecord",
+            "toRecord",
+            "asRecord",
+            "isRecordLike",
+        ]);
+
+        /** @param {import("estree").Identifier} identifier */
+        const reportIdentifier = (identifier) => {
+            if (!bannedNames.has(identifier.name)) {
+                return;
+            }
+
+            context.report({
+                node: identifier,
+                messageId: "noLocalRecordGuards",
+                data: {
+                    name: identifier.name,
+                },
+            });
+        };
+
+        return {
+            FunctionDeclaration(node) {
+                if (node.id?.type === "Identifier") {
+                    reportIdentifier(node.id);
+                }
+            },
+            VariableDeclarator(node) {
+                if (node.id?.type === "Identifier") {
+                    reportIdentifier(node.id);
+                }
+            },
+        };
+    },
+};
+
+const noLocalErrorNormalizersRule = {
+    meta: {
+        type: "problem",
+        docs: {
+            description:
+                "Disallow local error-normalizer helper declarations (use shared errorHandling utilities instead)",
+            recommended: true,
+        },
+        messages: {
+            noLocalErrorNormalizers:
+                "Do not declare a local '{{name}}' helper. Import it from '@shared/utils/errorHandling' instead.",
+        },
+        schema: [],
+    },
+    create(context) {
+        const normalizedFilename = normalizePath(context.getFilename());
+
+        // Allow declarations inside the canonical shared helper module.
+        if (normalizedFilename.endsWith("/shared/utils/errorHandling.ts")) {
+            return {};
+        }
+
+        // Ignore tests and generated artifacts.
+        if (
+            normalizedFilename.includes("/test/") ||
+            normalizedFilename.includes("/tests/") ||
+            normalizedFilename.includes("/electron/test/") ||
+            normalizedFilename.includes("/src/test/") ||
+            normalizedFilename.includes("/shared/test/") ||
+            normalizedFilename.endsWith(".test.ts") ||
+            normalizedFilename.endsWith(".test.tsx") ||
+            normalizedFilename.endsWith(".spec.ts") ||
+            normalizedFilename.endsWith(".spec.tsx")
+        ) {
+            return {};
+        }
+
+        const bannedNames = new Set(["ensureError", "normalizeError"]);
+
+        /** @param {import("estree").Identifier} identifier */
+        const reportIdentifier = (identifier) => {
+            if (!bannedNames.has(identifier.name)) {
+                return;
+            }
+
+            context.report({
+                node: identifier,
+                messageId: "noLocalErrorNormalizers",
+                data: {
+                    name: identifier.name,
+                },
+            });
+        };
+
+        return {
+            FunctionDeclaration(node) {
+                if (node.id?.type === "Identifier") {
+                    reportIdentifier(node.id);
+                }
+            },
+            VariableDeclarator(node) {
+                if (node.id?.type === "Identifier") {
+                    reportIdentifier(node.id);
+                }
+            },
+        };
+    },
+};
+
 const uptimeWatcherPlugin = {
     rules: {
         "monitor-fallback-consistency": monitorFallbackConsistencyRule,
         "electron-no-console": electronNoConsoleRule,
+        "electron-no-direct-ipc-handle": electronNoDirectIpcHandleRule,
+        "electron-no-direct-ipcMain-import": electronNoDirectIpcMainImportRule,
+        "electron-no-inline-ipc-channel-literal":
+            electronNoInlineIpcChannelLiteralRule,
+        "electron-preload-no-inline-ipc-channel-constant":
+            electronPreloadNoInlineIpcChannelConstantRule,
+        "electron-no-inline-ipc-channel-type-argument":
+            electronNoInlineIpcChannelTypeArgumentRule,
+        "electron-preload-no-direct-ipcRenderer-usage":
+            electronPreloadNoDirectIpcRendererUsageRule,
+        "no-inline-ipc-channel-type-literals":
+            noInlineIpcChannelTypeLiteralsRule,
+        "electron-no-direct-ipc-handler-wrappers":
+            electronNoDirectIpcHandlerWrappersRule,
         "electron-no-renderer-import": electronNoRendererImportRule,
         "renderer-no-electron-import": rendererNoElectronImportRule,
         "renderer-no-browser-dialogs": rendererNoBrowserDialogsRule,
+        "renderer-no-direct-preload-bridge": rendererNoDirectPreloadBridgeRule,
+        "renderer-no-preload-bridge-writes": rendererNoPreloadBridgeWritesRule,
+        "renderer-no-direct-electron-log": rendererNoDirectElectronLogRule,
+        "renderer-no-import-internal-service-utils":
+            rendererNoImportInternalServiceUtilsRule,
+        "renderer-no-direct-networking": rendererNoDirectNetworkingRule,
+        "renderer-no-ipcRenderer-usage": rendererNoIpcRendererUsageRule,
+        "renderer-no-direct-bridge-readiness":
+            rendererNoDirectBridgeReadinessRule,
         "tsdoc-no-console-example": tsdocNoConsoleExampleRule,
         "shared-no-outside-imports": sharedNoOutsideImportsRule,
         "prefer-shared-alias": preferSharedAliasRule,
         "prefer-app-alias": preferAppAliasRule,
         "no-deprecated-exports": noDeprecatedExportsRule,
+        "no-local-record-guards": noLocalRecordGuardsRule,
+        "no-local-error-normalizers": noLocalErrorNormalizersRule,
     },
 };
 

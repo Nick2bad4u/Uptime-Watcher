@@ -19,8 +19,10 @@ import type {
     VoidIpcInvokeChannel,
 } from "@shared/types/ipc";
 import type { IpcRendererEvent } from "electron";
+import type { UnknownRecord } from "type-fest";
 
 import { createIpcCorrelationEnvelope } from "@shared/types/ipc";
+import { DIAGNOSTICS_CHANNELS } from "@shared/types/preload";
 import { generateCorrelationId } from "@shared/utils/correlation";
 import { ipcRenderer } from "electron";
 
@@ -36,19 +38,23 @@ import {
  */
 export type IpcResponse<T = unknown> = SharedIpcResponse<T>;
 
-const DIAGNOSTICS_CHANNEL = "diagnostics-verify-ipc-handler" as const;
+const DIAGNOSTICS_CHANNEL = DIAGNOSTICS_CHANNELS.verifyIpcHandler;
 
-const globalProcess =
-    typeof globalThis === "object" && "process" in globalThis
-        ? (globalThis as { process: NodeJS.Process }).process
+const globalProcessCandidate: unknown = Reflect.get(
+    globalThis,
+    "process"
+) as unknown;
+const globalEnvCandidate: unknown =
+    typeof globalProcessCandidate === "object" &&
+    globalProcessCandidate !== null
+        ? (Reflect.get(globalProcessCandidate, "env") as unknown)
         : undefined;
 
-const globalEnv = globalProcess?.env;
-
 function shouldAllowDiagnosticsFallback(): boolean {
-    const overrideFlag = (globalThis as Record<string, unknown>)[
+    const overrideFlag: unknown = Reflect.get(
+        globalThis,
         "__UPTIME_ALLOW_IPC_DIAGNOSTICS_FALLBACK__"
-    ];
+    );
 
     if (overrideFlag === false) {
         return false;
@@ -58,7 +64,16 @@ function shouldAllowDiagnosticsFallback(): boolean {
         return true;
     }
 
-    return Boolean(globalEnv?.["VITEST"]) || globalEnv?.["NODE_ENV"] === "test";
+    const vitestFlag: unknown =
+        typeof globalEnvCandidate === "object" && globalEnvCandidate !== null
+            ? (Reflect.get(globalEnvCandidate, "VITEST") as unknown)
+            : undefined;
+    const nodeEnv: unknown =
+        typeof globalEnvCandidate === "object" && globalEnvCandidate !== null
+            ? (Reflect.get(globalEnvCandidate, "NODE_ENV") as unknown)
+            : undefined;
+
+    return Boolean(vitestFlag) || nodeEnv === "test";
 }
 
 interface HandlerVerificationResponse {
@@ -104,13 +119,13 @@ export class IpcError extends Error {
      * Optional structured metadata that provides additional IPC failure
      * context.
      */
-    public readonly details: Readonly<Record<string, unknown>> | undefined;
+    public readonly details: Readonly<UnknownRecord> | undefined;
 
     public constructor(
         message: string,
         channel: string,
         originalError?: Error,
-        details?: Record<string, unknown>
+        details?: UnknownRecord
     ) {
         super(message, { cause: originalError });
         this.name = "IpcError";
@@ -128,12 +143,12 @@ export class IpcError extends Error {
  * @returns True if value is a valid IPC response
  */
 function isIpcResponse(value: unknown): value is IpcResponse {
-    return (
-        typeof value === "object" &&
-        value !== null &&
-        "success" in value &&
-        typeof (value as { success: unknown }).success === "boolean"
-    );
+    if (typeof value !== "object" || value === null) {
+        return false;
+    }
+
+    const success: unknown = Reflect.get(value, "success") as unknown;
+    return typeof success === "boolean";
 }
 
 /**
@@ -196,17 +211,22 @@ function isHandlerVerificationResponse(
         return false;
     }
 
-    const candidate = value as Partial<HandlerVerificationResponse>;
+    // We need a minimal structural read of unknown object properties.
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Guarded by the runtime object/null check above.
+    const record = value as Record<string, unknown>;
+
+    const { availableChannels, channel, registered } = record;
+
     if (
-        typeof candidate.channel !== "string" ||
-        typeof candidate.registered !== "boolean" ||
-        !Array.isArray(candidate.availableChannels)
+        typeof channel !== "string" ||
+        typeof registered !== "boolean" ||
+        !Array.isArray(availableChannels)
     ) {
         return false;
     }
 
-    return candidate.availableChannels.every(
-        (channel) => typeof channel === "string"
+    return availableChannels.every(
+        (availableChannel) => typeof availableChannel === "string"
     );
 }
 

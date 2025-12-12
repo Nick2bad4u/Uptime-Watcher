@@ -3,7 +3,7 @@ schema: "../../../config/schemas/doc-frontmatter.schema.json"
 title: "ADR-003: Comprehensive Error Handling Strategy"
 summary: "Establishes a comprehensive multi-layer error handling strategy with shared utilities, store-safe patterns, and production-grade resilience."
 created: "2025-08-05"
-last_reviewed: "2025-11-17"
+last_reviewed: "2025-12-11"
 category: "guide"
 author: "Nick2bad4u"
 tags:
@@ -205,6 +205,8 @@ There are two supported patterns for constructing this context:
    additional side effects (for example in the store module’s comments) so
    future maintainers understand why the factory is not used.
 
+3. **Store-owned error slice** – **deprecated**. Stores must not introduce local `lastError` / `isLoading` state as an alternative to the global `useErrorStore`. This repository standardizes on ErrorStore-backed contexts (`createStoreErrorHandler` or a documented inline context) so errors and loading state have a single, consistent source of truth.
+
 **Guidelines:**
 
 - Prefer `createStoreErrorHandler()` for standard operations that only need to
@@ -212,6 +214,9 @@ There are two supported patterns for constructing this context:
 - Use inline `ErrorHandlingFrontendStore` contexts when you need to coordinate
   error handling with extra behavior (rollback, cross-slice updates, telemetry
   tweaks).
+- Prefer the global error store for all domain stores. If a UI surface needs a
+  specialized error presentation, derive it from the global error store rather
+  than introducing a second store-local error source.
 - Keep error-handling logic close to the store module that owns the state,
   while centralizing shared mechanisms in `@shared/utils/errorHandling` and
   `src/stores/utils/storeErrorHandling.ts`.

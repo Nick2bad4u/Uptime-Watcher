@@ -3,7 +3,7 @@ schema: "../../config/schemas/doc-frontmatter.schema.json"
 title: "API & IPC Documentation"
 summary: "Comprehensive reference for Uptime Watcher's IPC communication and API surface."
 created: "2025-09-22"
-last_reviewed: "2025-11-17"
+last_reviewed: "2025-12-11"
 category: "guide"
 author: "Nick2bad4u"
 tags:
@@ -982,13 +982,17 @@ contextBridge.exposeInMainWorld("electronAPI", electronAPI);
 All IPC handlers include input validation:
 
 ```typescript
-// Backend handler with validation
-ipcService.registerStandardizedIpcHandler(
- "add-site",
- async (site: Site) => {
-  return await uptimeOrchestrator.addSite(site);
- },
- SiteHandlerValidators.addSite
+// Backend handler with validation (electron/services/ipc/handlers/siteHandlers.ts)
+import { SITES_CHANNELS } from "@shared/types/preload";
+
+import { registerStandardizedIpcHandler } from "./utils";
+import { SiteHandlerValidators } from "./validators";
+
+registerStandardizedIpcHandler(
+ SITES_CHANNELS.addSite,
+ withIgnoredIpcEvent((site) => uptimeOrchestrator.addSite(site)),
+ SiteHandlerValidators.addSite,
+ registeredHandlers
 );
 ```
 
@@ -1007,26 +1011,31 @@ export interface NewFeatureData {
 ### 2\. Create IPC Handler
 
 ```typescript
-// electron/services/ipc/IpcService.ts
-ipcService.registerStandardizedIpcHandler(
- "create-feature",
- async (data: NewFeatureData) => {
-  return await featureManager.create(data);
- },
- isNewFeatureData
+// electron/services/ipc/handlers/featureHandlers.ts (conceptual)
+import { FEATURE_CHANNELS } from "@shared/types/preload";
+
+import { registerStandardizedIpcHandler } from "../utils";
+
+registerStandardizedIpcHandler(
+ FEATURE_CHANNELS.createFeature,
+ withIgnoredIpcEvent((data: NewFeatureData) => featureManager.create(data)),
+ isNewFeatureData,
+ registeredHandlers
 );
 ```
 
 ### 3\. Expose in Preload
 
 ```typescript
-// electron/preload.ts
-const electronAPI = {
- // ... existing APIs
- feature: {
-  create: (data: NewFeatureData) => ipcRenderer.invoke("create-feature", data),
- },
-};
+// electron/preload/domains/featureApi.ts (conceptual)
+import { FEATURE_CHANNELS } from "@shared/types/preload";
+import { createTypedInvoker } from "./core/bridgeFactory";
+
+export function createFeatureApi() {
+ return {
+  create: createTypedInvoker(FEATURE_CHANNELS.createFeature),
+ };
+}
 ```
 
 ### 4\. Use in Frontend

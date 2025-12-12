@@ -9,10 +9,10 @@ import type { StatusUpdateManager } from "../../../stores/sites/utils/statusUpda
 import { createMockFunction } from "../../utils/mockFactories";
 
 const LISTENER_NAMES = [
-    "monitor-status-changed",
-    "monitor-check-completed",
-    "monitoring-started",
-    "monitoring-stopped",
+    "monitor:status-changed",
+    "monitor:check-completed",
+    "monitoring:started",
+    "monitoring:stopped",
 ];
 
 const buildSite = (identifier: string): Site => ({

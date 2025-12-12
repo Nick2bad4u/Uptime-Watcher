@@ -3,20 +3,14 @@ import type { ValidationResult } from "@shared/types/validation";
 /**
  * Operational slice containing async monitor type actions.
  */
-import { isMonitorTypeConfig } from "@shared/types/monitorTypes";
 import { withErrorHandling } from "@shared/utils/errorHandling";
-import { isRecord as isSharedRecord } from "@shared/utils/typeHelpers";
 
 import type { MonitorTypesStoreGetter, MonitorTypesStoreSetter } from "./state";
 import type { MonitorTypesStore } from "./types";
 
-import { logger } from "../../services/logger";
 import { MonitorTypesService } from "../../services/MonitorTypesService";
 import { logStoreAction } from "../utils";
-
-const isUnknownRecord = (
-    candidate: unknown
-): candidate is Record<string, unknown> => isSharedRecord(candidate);
+import { createStoreErrorHandler } from "../utils/storeErrorHandling";
 
 /**
  * Creates the operational slice wiring monitor type service calls.
@@ -32,12 +26,6 @@ export const createMonitorTypesOperationsSlice = (
     | "refreshMonitorTypes"
     | "validateMonitorData"
 > => ({
-    // MonitorTypesStore wires its error handling inline by passing the
-    // store's own clearError/setError/setLoading actions to
-    // withErrorHandling. This is an intentional use of the inline
-    // ErrorHandlingFrontendStore pattern described in ADR-003 ("Store Error
-    // Handling Contexts") so that monitor-type operations can reuse their
-    // local error state rather than going through createStoreErrorHandler.
     formatMonitorDetail: async (type, details) =>
         withErrorHandling(
             async () => {
@@ -65,11 +53,10 @@ export const createMonitorTypesOperationsSlice = (
 
                 return result;
             },
-            {
-                clearError: getState().clearError,
-                setError: getState().setError,
-                setLoading: getState().setLoading,
-            }
+            createStoreErrorHandler(
+                "monitor-types",
+                "monitorTypes.formatMonitorDetail"
+            )
         ),
     formatMonitorTitleSuffix: async (type, monitor) =>
         withErrorHandling(
@@ -107,16 +94,15 @@ export const createMonitorTypesOperationsSlice = (
 
                 return result;
             },
-            {
-                clearError: getState().clearError,
-                setError: getState().setError,
-                setLoading: getState().setLoading,
-            }
+            createStoreErrorHandler(
+                "monitor-types",
+                "monitorTypes.formatMonitorTitleSuffix"
+            )
         ),
     loadMonitorTypes: async (): Promise<void> => {
         const state = getState();
 
-        if (state.isLoaded && !state.lastError) {
+        if (state.isLoaded) {
             return;
         }
 
@@ -124,62 +110,30 @@ export const createMonitorTypesOperationsSlice = (
             async () => {
                 logStoreAction("MonitorTypesStore", "loadMonitorTypes", {});
 
-                const rawConfigs = await MonitorTypesService.getMonitorTypes();
-                const configsArray = Array.isArray(rawConfigs)
-                    ? (rawConfigs as unknown[])
-                    : [];
-
-                const validConfigs: MonitorTypesStore["monitorTypes"] = [];
-                const invalidConfigs: Array<{
-                    index: number;
-                    kind: string;
-                }> = [];
-
-                configsArray.forEach((candidate, index) => {
-                    if (isMonitorTypeConfig(candidate)) {
-                        validConfigs.push(candidate);
-                    } else {
-                        const kind = isUnknownRecord(candidate)
-                            ? `keys:${Object.keys(candidate).join(",")}`
-                            : `type:${typeof candidate}`;
-
-                        invalidConfigs.push({ index, kind });
-                    }
-                });
-
-                if (invalidConfigs.length > 0) {
-                    logger.error(
-                        "MonitorTypesStore dropped invalid monitor type configs",
-                        undefined,
-                        {
-                            invalidCount: invalidConfigs.length,
-                            samples: invalidConfigs.slice(0, 3),
-                        }
-                    );
-                }
+                // MonitorTypesService already validates the payload via shared
+                // Zod schemas (validateMonitorTypeConfigArray). The store
+                // intentionally trusts the service boundary to avoid
+                // duplicating validation logic and creating diverging
+                // codepaths.
+                const configs = await MonitorTypesService.getMonitorTypes();
 
                 const fieldMap: MonitorTypesStore["fieldConfigs"] = {};
-                for (const config of validConfigs) {
+                for (const config of configs) {
                     fieldMap[config.type] = config.fields;
                 }
 
                 setState({
                     fieldConfigs: fieldMap,
                     isLoaded: true,
-                    monitorTypes: validConfigs,
+                    monitorTypes: configs,
                 });
 
                 logStoreAction("MonitorTypesStore", "loadMonitorTypes", {
-                    invalidCount: invalidConfigs.length,
                     success: true,
-                    typesCount: validConfigs.length,
+                    typesCount: configs.length,
                 });
             },
-            {
-                clearError: getState().clearError,
-                setError: getState().setError,
-                setLoading: getState().setLoading,
-            }
+            createStoreErrorHandler("monitor-types", "monitorTypes.loadTypes")
         );
     },
     refreshMonitorTypes: async (): Promise<void> => {
@@ -227,10 +181,9 @@ export const createMonitorTypesOperationsSlice = (
 
                 return normalizedResult;
             },
-            {
-                clearError: getState().clearError,
-                setError: getState().setError,
-                setLoading: getState().setLoading,
-            }
+            createStoreErrorHandler(
+                "monitor-types",
+                "monitorTypes.validateMonitorData"
+            )
         ),
 });

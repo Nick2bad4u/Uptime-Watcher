@@ -299,7 +299,7 @@ dashboards and alerting pipelines can treat store logs uniformly:
 
 ## Related documentation
 
-- `docs/TSDoc/stores/sites.md` – API-level documentation for the sites store.
+- `docs/Architecture/Stores/sites.md` – API-level documentation for the sites store.
 - `docs/Architecture/README.md` – architectural overview, including the
   "State synchronization pipeline (sites & cache)" subsection.
 - `docs/Guides/ZUSTAND_STORE_PATTERN_GUIDE.md` – decision guide for store

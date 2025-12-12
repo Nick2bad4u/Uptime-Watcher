@@ -3,7 +3,7 @@ schema: "../../../config/schemas/doc-frontmatter.schema.json"
 title: "IPC Handler Template"
 summary: "Provides a template for implementing new IPC handlers aligned with the central IpcService, validation, and error-handling patterns."
 created: "2025-08-05"
-last_reviewed: "2025-11-17"
+last_reviewed: "2025-12-11"
 category: "guide"
 author: "Nick2bad4u"
 tags:
@@ -34,9 +34,11 @@ tags:
 ```text
 electron/services/ipc/
 ├── IpcService.ts           # Main IPC service
-├── types.ts               # IPC type definitions
 ├── utils.ts               # IPC utility functions
-└── validators.ts          # Validation functions
+├── types.ts               # IPC type definitions
+├── validators.ts          # Validation functions
+└── handlers/              # Domain-specific handler modules
+  └── *.ts
 ```
 
 ## Handler Implementation Template
@@ -54,8 +56,11 @@ electron/services/ipc/
  * @public
  */
 
-import type { IpcServiceDependencies } from "../IpcService";
+import type { IpcInvokeChannel } from "@shared/types/ipc";
+import { EXAMPLE_CHANNELS } from "@shared/types/preload";
 import { logger } from "../../utils/logger";
+
+import { registerStandardizedIpcHandler } from "../utils";
 
 // Import validation functions from validators.ts
 import {
@@ -75,110 +80,116 @@ import {
  * @example
  *
  * ```typescript
- * registerExampleHandlers(ipcService, {
- *  exampleManager: managerInstance,
- *  eventBus: eventBusInstance,
+ * registerExampleHandlers({
+ *  exampleManager,
+ *  registeredHandlers,
  * });
  * ```
  *
- * @param ipcService - The IPC service instance for handler registration
- * @param dependencies - Service dependencies needed for operations
- *
  * @public
  */
-export function registerExampleHandlers(
- ipcService: any, // Use actual IpcService type
- dependencies: IpcServiceDependencies
-): void {
- const { exampleManager } = dependencies;
+export function registerExampleHandlers(deps: {
+  registeredHandlers: Set<IpcInvokeChannel>;
+  exampleManager: ExampleManager;
+}): void {
+ const { exampleManager, registeredHandlers } = deps;
 
  // GET operations (no parameters)
- ipcService.registerStandardizedIpcHandler(
-  "get-examples",
+ registerStandardizedIpcHandler(
+  EXAMPLE_CHANNELS.getExamples,
   async (): Promise<Example[]> => {
    logger.debug("[IPC] Getting all examples");
    const examples = await exampleManager.getAllExamples();
    return examples;
-  }
-  // No validation needed for parameterless operations
+  },
+  null,
+  registeredHandlers
  );
 
  // GET operations (with parameters)
- ipcService.registerStandardizedIpcHandler(
-  "get-example-by-id",
+ registerStandardizedIpcHandler(
+  EXAMPLE_CHANNELS.getExampleById,
   async (params: ExampleIdParams): Promise<Example | undefined> => {
    logger.debug(`[IPC] Getting example by ID: ${params.id}`);
    const example = await exampleManager.getExampleById(params.id);
    return example;
   },
-  isExampleIdParams
+  isExampleIdParams,
+  registeredHandlers
  );
 
  // CREATE operations
- ipcService.registerStandardizedIpcHandler(
-  "create-example",
+ registerStandardizedIpcHandler(
+  EXAMPLE_CHANNELS.createExample,
   async (params: ExampleCreateData): Promise<Example> => {
    logger.debug(`[IPC] Creating example: ${params.name}`);
    const example = await exampleManager.createExample(params);
    return example;
   },
-  isExampleCreateData
+  isExampleCreateData,
+  registeredHandlers
  );
 
  // UPDATE operations
- ipcService.registerStandardizedIpcHandler(
-  "update-example",
+ registerStandardizedIpcHandler(
+  EXAMPLE_CHANNELS.updateExample,
   async (params: ExampleUpdateParams): Promise<void> => {
    logger.debug(`[IPC] Updating example: ${params.id}`);
    await exampleManager.updateExample(params.id, params.updates);
   },
-  isExampleUpdateParams
+  isExampleUpdateParams,
+  registeredHandlers
  );
 
  // DELETE operations
- ipcService.registerStandardizedIpcHandler(
-  "delete-example",
+ registerStandardizedIpcHandler(
+  EXAMPLE_CHANNELS.deleteExample,
   async (params: ExampleIdParams): Promise<void> => {
    logger.debug(`[IPC] Deleting example: ${params.id}`);
    await exampleManager.deleteExample(params.id);
   },
-  isExampleIdParams
+  isExampleIdParams,
+  registeredHandlers
  );
 
  // BULK operations
- ipcService.registerStandardizedIpcHandler(
-  "bulk-create-examples",
+ registerStandardizedIpcHandler(
+  EXAMPLE_CHANNELS.bulkCreateExamples,
   async (params: ExampleBulkCreateData): Promise<Example[]> => {
    logger.debug(`[IPC] Bulk creating ${params.examples.length} examples`);
    const examples = await exampleManager.bulkCreateExamples(params.examples);
    return examples;
   },
-  isExampleBulkCreateData
+  isExampleBulkCreateData,
+  registeredHandlers
  );
 
  // UTILITY operations
- ipcService.registerStandardizedIpcHandler(
-  "validate-example-data",
+ registerStandardizedIpcHandler(
+  EXAMPLE_CHANNELS.validateExampleData,
   async (params: ExampleValidationData): Promise<ValidationResult> => {
    logger.debug("[IPC] Validating example data");
    const result = await exampleManager.validateExampleData(params);
    return result;
   },
-  isExampleValidationData
+  isExampleValidationData,
+  registeredHandlers
  );
 
  // EXPORT/IMPORT operations
- ipcService.registerStandardizedIpcHandler(
-  "export-example-data",
+ registerStandardizedIpcHandler(
+  EXAMPLE_CHANNELS.exportExampleData,
   async (): Promise<ExportData> => {
    logger.debug("[IPC] Exporting example data");
    const exportData = await exampleManager.exportExamples();
    return exportData;
-  }
+  },
+  null,
+  registeredHandlers
  );
 
- ipcService.registerStandardizedIpcHandler(
-  "import-example-data",
+ registerStandardizedIpcHandler(
+  EXAMPLE_CHANNELS.importExampleData,
   async (params: ExampleImportData): Promise<ImportResult> => {
    logger.debug(
     `[IPC] Importing example data: ${params.examples.length} items`
@@ -186,7 +197,8 @@ export function registerExampleHandlers(
    const result = await exampleManager.importExamples(params.examples);
    return result;
   },
-  isExampleImportData
+  isExampleImportData,
+  registeredHandlers
  );
 
  logger.info("[IPC] Example handlers registered successfully");
@@ -456,49 +468,29 @@ export function isExampleImportData(data: unknown): data is ExampleImportData {
 
 ## Preload API Extension Template
 
-Add to your preload script:
+Add to your preload domain module (preferred):
 
 ```typescript
-// In preload.ts, add to electronAPI object
-const electronAPI = {
- // ... existing API
+// electron/preload/domains/exampleApi.ts
+import { EXAMPLE_CHANNELS } from "@shared/types/preload";
 
- example: {
-  // GET operations
-  getAll: (): Promise<Example[]> => ipcRenderer.invoke("get-examples"),
+import { createTypedInvoker } from "../core/bridgeFactory";
 
-  getById: (id: string): Promise<Example | undefined> =>
-   ipcRenderer.invoke("get-example-by-id", { id }),
+export function createExampleApi() {
+ return {
+  getAll: createTypedInvoker(EXAMPLE_CHANNELS.getExamples),
+  getById: createTypedInvoker(EXAMPLE_CHANNELS.getExampleById),
+  create: createTypedInvoker(EXAMPLE_CHANNELS.createExample),
+  bulkCreate: createTypedInvoker(EXAMPLE_CHANNELS.bulkCreateExamples),
+  update: createTypedInvoker(EXAMPLE_CHANNELS.updateExample),
+  delete: createTypedInvoker(EXAMPLE_CHANNELS.deleteExample),
+  validateData: createTypedInvoker(EXAMPLE_CHANNELS.validateExampleData),
+  exportData: createTypedInvoker(EXAMPLE_CHANNELS.exportExampleData),
+  importData: createTypedInvoker(EXAMPLE_CHANNELS.importExampleData),
+ };
+}
 
-  // CREATE operations
-  create: (data: ExampleCreateData): Promise<Example> =>
-   ipcRenderer.invoke("create-example", data),
-
-  bulkCreate: (examples: ExampleCreateData[]): Promise<Example[]> =>
-   ipcRenderer.invoke("bulk-create-examples", { examples }),
-
-  // UPDATE operations
-  update: (id: string, updates: Partial<ExampleCreateData>): Promise<void> =>
-   ipcRenderer.invoke("update-example", { id, updates }),
-
-  // DELETE operations
-  delete: (id: string): Promise<void> =>
-   ipcRenderer.invoke("delete-example", { id }),
-
-  // UTILITY operations
-  validateData: (data: ExampleValidationData): Promise<ValidationResult> =>
-   ipcRenderer.invoke("validate-example-data", data),
-
-  // EXPORT/IMPORT operations
-  exportData: (): Promise<ExportData> =>
-   ipcRenderer.invoke("export-example-data"),
-
-  importData: (data: ExampleImportData): Promise<ImportResult> =>
-   ipcRenderer.invoke("import-example-data", data),
- },
-
- // ... existing API
-};
+// then expose createExampleApi() from electron/preload.ts on window.electronAPI
 ```
 
 ## Type Definitions Template
@@ -589,12 +581,16 @@ Create test file: `exampleHandlers.test.ts`
 ```typescript
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { registerExampleHandlers } from "../exampleHandlers";
-import type { IpcServiceDependencies } from "../../IpcService";
+import { EXAMPLE_CHANNELS } from "@shared/types/preload";
+
+import * as ipcUtils from "../../utils";
 
 describe("Example IPC Handlers", () => {
- let mockIpcService: any;
- let mockExampleManager: any;
- let dependencies: IpcServiceDependencies;
+ let mockExampleManager: Record<string, unknown>;
+ let registeredHandlers: Set<string>;
+ let registerHandlerSpy: ReturnType<
+  typeof vi.spyOn<typeof ipcUtils, "registerStandardizedIpcHandler">
+ >;
 
  beforeEach(() => {
   mockExampleManager = {
@@ -609,33 +605,28 @@ describe("Example IPC Handlers", () => {
    importExamples: vi.fn(),
   };
 
-  mockIpcService = {
-   registerStandardizedIpcHandler: vi.fn(),
-  };
-
-  dependencies = {
-   exampleManager: mockExampleManager,
-   // ... other dependencies
-  } as IpcServiceDependencies;
+  registeredHandlers = new Set();
+  registerHandlerSpy = vi.spyOn(ipcUtils, "registerStandardizedIpcHandler");
  });
 
  it("should register all example handlers", () => {
-  registerExampleHandlers(mockIpcService, dependencies);
+  registerExampleHandlers({
+   exampleManager: mockExampleManager,
+   registeredHandlers,
+  });
 
-  expect(mockIpcService.registerStandardizedIpcHandler).toHaveBeenCalledWith(
-   "get-examples",
-   expect.any(Function)
-  );
-
-  expect(mockIpcService.registerStandardizedIpcHandler).toHaveBeenCalledWith(
-   "create-example",
+  expect(ipcUtils.registerStandardizedIpcHandler).toHaveBeenCalledWith(
+   EXAMPLE_CHANNELS.getExamples,
    expect.any(Function),
-   expect.any(Function)
+   null,
+   expect.any(Set)
   );
 
-  // Verify all handlers are registered
-  expect(mockIpcService.registerStandardizedIpcHandler).toHaveBeenCalledTimes(
-   8
+  expect(ipcUtils.registerStandardizedIpcHandler).toHaveBeenCalledWith(
+   EXAMPLE_CHANNELS.createExample,
+   expect.any(Function),
+   expect.any(Function),
+   expect.any(Set)
   );
  });
 
@@ -643,13 +634,20 @@ describe("Example IPC Handlers", () => {
   const mockExamples = [{ id: "1", name: "Test" }];
   mockExampleManager.getAllExamples.mockResolvedValue(mockExamples);
 
-  registerExampleHandlers(mockIpcService, dependencies);
+  registerExampleHandlers({
+   exampleManager: mockExampleManager,
+   registeredHandlers,
+  });
 
   // Get the registered handler
   const getAllHandler =
-   mockIpcService.registerStandardizedIpcHandler.mock.calls.find(
-    (call) => call[0] === "get-examples"
-   )[1];
+    registerHandlerSpy.mock.calls.find(
+     (call) => call[0] === EXAMPLE_CHANNELS.getExamples
+    )?.[1];
+
+    if (!getAllHandler) {
+    throw new Error("Failed to locate getExamples handler registration");
+    }
 
   const result = await getAllHandler();
   expect(result).toBe(mockExamples);

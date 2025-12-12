@@ -42,11 +42,44 @@ const resetSitesStoreState = (): void => {
 };
 
 vi.mock("../../stores/error/useErrorStore", () => ({
-    useErrorStore: () => ({
-        clearError: vi.fn(),
-        isLoading: false,
-        lastError: null,
-    }),
+    useErrorStore: (() => {
+        const state = {
+            clearAllErrors: vi.fn(),
+            clearError: vi.fn(),
+            clearStoreError: vi.fn(),
+            getOperationLoading: vi.fn(() => false),
+            getStoreError: vi.fn(() => undefined),
+            isLoading: false,
+            lastError: undefined,
+            operationLoading: {},
+            setError: vi.fn(),
+            setLoading: vi.fn(),
+            setOperationLoading: vi.fn(),
+            setStoreError: vi.fn(),
+            storeErrors: {},
+        };
+
+        const store = ((selector?: (candidate: typeof state) => unknown) =>
+            typeof selector === "function"
+                ? selector(state)
+                : state) as unknown as ((
+            selector?: (candidate: typeof state) => unknown
+        ) => unknown) & {
+            getState: () => typeof state;
+            setState: (partial: Partial<typeof state>) => void;
+            subscribe: () => () => void;
+        };
+
+        store.getState = () => state;
+        store.setState = (partial) => {
+            Object.assign(state, partial);
+        };
+        store.subscribe = () => () => {
+            // no-op
+        };
+
+        return store;
+    })(),
 }));
 
 // Mock the hooks

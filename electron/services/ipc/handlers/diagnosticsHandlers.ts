@@ -6,6 +6,7 @@ import type {
 } from "@shared/types/ipc";
 import type { UnknownRecord } from "type-fest";
 
+import { DIAGNOSTICS_CHANNELS } from "@shared/types/preload";
 import { generateCorrelationId } from "@shared/utils/correlation";
 import {
     normalizeLogValue,
@@ -54,14 +55,6 @@ const isPreloadGuardDiagnosticsReport = (
 export interface DiagnosticsHandlersDependencies {
     readonly eventEmitter: TypedEventBus<UptimeEvents>;
     readonly registeredHandlers: Set<IpcInvokeChannel>;
-    readonly reportChannel: Extract<
-        IpcInvokeChannel,
-        "diagnostics-report-preload-guard"
-    >;
-    readonly verifyChannel: Extract<
-        IpcInvokeChannel,
-        "diagnostics-verify-ipc-handler"
-    >;
 }
 
 const normalizeDiagnosticsReportPayload = (
@@ -128,11 +121,9 @@ const normalizeDiagnosticsReportPayload = (
 export function registerDiagnosticsHandlers({
     eventEmitter,
     registeredHandlers,
-    reportChannel,
-    verifyChannel,
 }: DiagnosticsHandlersDependencies): void {
-    registerStandardizedIpcHandler<"diagnostics-verify-ipc-handler">(
-        verifyChannel,
+    registerStandardizedIpcHandler(
+        DIAGNOSTICS_CHANNELS.verifyIpcHandler,
         withIgnoredIpcEvent((channelRaw) => {
             if (typeof channelRaw !== "string") {
                 throw new TypeError("Channel name must be a non-empty string");
@@ -177,8 +168,8 @@ export function registerDiagnosticsHandlers({
         registeredHandlers
     );
 
-    registerStandardizedIpcHandler<"diagnostics-report-preload-guard">(
-        reportChannel,
+    registerStandardizedIpcHandler(
+        DIAGNOSTICS_CHANNELS.reportPreloadGuard,
         withIgnoredIpcEvent((reportCandidate): undefined => {
             if (!isPreloadGuardDiagnosticsReport(reportCandidate)) {
                 throw new TypeError(

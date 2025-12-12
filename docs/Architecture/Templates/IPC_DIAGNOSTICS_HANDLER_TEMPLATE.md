@@ -3,7 +3,7 @@ schema: "../../../config/schemas/doc-frontmatter.schema.json"
 title: "IPC Diagnostics Handler Template"
 summary: "Pattern for diagnostics/report IPC handlers with validation, redaction, and typed responses."
 created: "2025-12-04"
-last_reviewed: "2025-12-04"
+last_reviewed: "2025-12-11"
 category: "guide"
 author: "Nick2bad4u"
 tags:
@@ -27,7 +27,9 @@ tags:
 
 ## Purpose
 
-Provide a safe, repeatable pattern for diagnostics/report IPC handlers (e.g., `diagnostics-report-preload-guard`) that validates payloads, redacts sensitive data, and returns typed results.
+Provide a safe, repeatable pattern for diagnostics/report IPC handlers (for
+example the preload guard reporting flow) that validates payloads, redacts
+sensitive data, and returns typed results.
 
 ## Implementation Steps
 
@@ -48,7 +50,7 @@ Provide a safe, repeatable pattern for diagnostics/report IPC handlers (e.g., `d
    - Expose typed API with request/response types; ensure payload validation before forwarding to main.
 
 5. **Correlation & Payload Limits**
-   - Every `ipcRenderer.invoke` automatically sends a correlation envelope; `registerStandardizedIpcHandler` extracts it, so avoid baking correlation IDs into payload schemas.
+   - Every typed bridge invocation (via `createTypedInvoker`) automatically sends a correlation envelope; `registerStandardizedIpcHandler` extracts it, so avoid baking correlation IDs into payload schemas.
    - Enforce `MAX_DIAGNOSTICS_METADATA_BYTES` and `MAX_DIAGNOSTICS_PAYLOAD_PREVIEW_BYTES` before logging or returning payload previews. Flag truncation in the response/logs.
 
 6. **Logging & Telemetry**
@@ -62,7 +64,7 @@ Provide a safe, repeatable pattern for diagnostics/report IPC handlers (e.g., `d
 ## Example Skeleton
 
 ```typescript
-// types/diagnostics.ts
+// shared/types/diagnostics.ts
 export const diagnosticsReportSchema = z.object({
     report: z.string().max(10_000),
     context: z.record(z.string(), z.string()).optional(),
@@ -73,23 +75,35 @@ export interface DiagnosticsResult {
     redactions: string[];
 }
 
-// main
+// shared/types/preload.ts
+// Add (or reuse) a DIAGNOSTICS_CHANNELS mapping entry:
+//   reportPreloadGuard: "diagnostics-report-preload-guard"
+
+// main (electron/services/ipc/handlers/diagnosticsHandlers.ts)
+import { DIAGNOSTICS_CHANNELS } from "@shared/types/preload";
+import { registerStandardizedIpcHandler } from "../utils";
+
 registerStandardizedIpcHandler(
-    "diagnostics-report-preload-guard",
+    DIAGNOSTICS_CHANNELS.reportPreloadGuard,
     async (payload: DiagnosticsReport): Promise<DiagnosticsResult> => {
         const redactions = redactSecrets(payload.report);
         return { status: "ok", redactions };
     },
-    (payload): payload is DiagnosticsReport => diagnosticsReportSchema.safeParse(payload).success
+   (payload): payload is DiagnosticsReport =>
+      diagnosticsReportSchema.safeParse(payload).success,
+    registeredHandlers
 );
 
-// preload
-contextBridge.exposeInMainWorld("electronAPI", {
-    diagnostics: {
-        submitPreloadGuardReport: (payload: DiagnosticsReport) =>
-            ipcRenderer.invoke("diagnostics-report-preload-guard", payload),
-    },
-});
+// preload (electron/preload/domains/diagnosticsApi.ts)
+import { DIAGNOSTICS_CHANNELS } from "@shared/types/preload";
+import { createTypedInvoker } from "../core/bridgeFactory";
+
+const submitPreloadGuardReport = createTypedInvoker(
+    DIAGNOSTICS_CHANNELS.reportPreloadGuard
+);
+
+// then expose submitPreloadGuardReport via contextBridge, following the
+// existing preload bridge structure.
 ```
 
 ## Checklist

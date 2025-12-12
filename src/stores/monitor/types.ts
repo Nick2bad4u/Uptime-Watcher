@@ -10,8 +10,6 @@ import type { MonitorTypeConfig } from "@shared/types/monitorTypes";
 import type { ValidationResult } from "@shared/types/validation";
 import type { Simplify } from "type-fest";
 
-import type { BaseStore } from "../types";
-
 /**
  * Monitor Types store actions interface.
  *
@@ -51,5 +49,5 @@ export interface MonitorTypesState {
  * @public
  */
 export type MonitorTypesStore = Simplify<
-    BaseStore & MonitorTypesActions & MonitorTypesState
+    MonitorTypesActions & MonitorTypesState
 >;

@@ -15,6 +15,7 @@ vi.mock("../../../stores/utils", () => ({
 }));
 
 import { useMonitorTypesStore } from "../../../stores/monitor/useMonitorTypesStore";
+import { useErrorStore } from "../../../stores/error/useErrorStore";
 import { createMonitorTypeConfig } from "../../utils/createMonitorTypeConfig";
 
 // Mock the electron API
@@ -74,6 +75,19 @@ describe(useMonitorTypesStore, () => {
     beforeEach(() => {
         vi.clearAllMocks();
 
+        useErrorStore.setState({
+            isLoading: false,
+            lastError: undefined,
+            operationLoading: {},
+            storeErrors: {},
+        });
+
+        useMonitorTypesStore.setState({
+            fieldConfigs: {},
+            isLoaded: false,
+            monitorTypes: [],
+        });
+
         // Ensure electronAPI is properly set (protect against global state pollution)
         if (!globalThis.window) {
             globalThis.window = {} as never;
@@ -92,8 +106,9 @@ describe(useMonitorTypesStore, () => {
         expect(result.current.monitorTypes).toEqual([]);
         expect(result.current.fieldConfigs).toEqual({});
         expect(result.current.isLoaded).toBeFalsy();
-        expect(result.current.isLoading).toBeFalsy();
-        expect(result.current.lastError).toBeUndefined();
+        expect(useErrorStore.getState().getStoreError("monitor-types")).toBe(
+            undefined
+        );
     });
 
     it("should load monitor types successfully", async ({ task, annotate }) => {
@@ -136,33 +151,35 @@ describe(useMonitorTypesStore, () => {
         ]);
     });
 
-    it("should handle basic store actions", async ({ task, annotate }) => {
+    it("should record load failures in ErrorStore", async ({
+        task,
+        annotate,
+    }) => {
         await annotate(`Testing: ${task.name}`, "functional");
         await annotate("Component: useMonitorTypesStore", "component");
         await annotate("Category: Store", "category");
         await annotate("Type: Business Logic", "type");
 
+        mockElectronAPI.monitorTypes.getMonitorTypes.mockRejectedValueOnce(
+            new Error("Backend unavailable")
+        );
+
         const { result } = renderHook(() => useMonitorTypesStore());
 
-        act(() => {
-            result.current.setError("Test error");
+        await act(async () => {
+            await expect(
+                result.current.loadMonitorTypes()
+            ).rejects.toThrowError("Backend unavailable");
         });
-        expect(result.current.lastError).toBe("Test error");
 
-        act(() => {
-            result.current.clearError();
-        });
-        expect(result.current.lastError).toBeUndefined();
-
-        act(() => {
-            result.current.setLoading(true);
-        });
-        expect(result.current.isLoading).toBeTruthy();
-
-        act(() => {
-            result.current.setLoading(false);
-        });
-        expect(result.current.isLoading).toBeFalsy();
+        expect(useErrorStore.getState().getStoreError("monitor-types")).toBe(
+            "Backend unavailable"
+        );
+        expect(
+            useErrorStore
+                .getState()
+                .getOperationLoading("monitorTypes.loadTypes")
+        ).toBeFalsy();
     });
 
     it("should refresh monitor types", async ({ task, annotate }) => {
@@ -317,7 +334,9 @@ describe(useMonitorTypesStore, () => {
         }).rejects.toThrowError("Formatting failed");
 
         // Error should be set in store state
-        expect(result.current.lastError).toBe("Formatting failed");
+        expect(useErrorStore.getState().getStoreError("monitor-types")).toBe(
+            "Formatting failed"
+        );
     });
 
     describe("IPC Response Handling", () => {
@@ -427,7 +446,9 @@ describe(useMonitorTypesStore, () => {
             }).rejects.toThrowError("Backend unavailable");
 
             // Error should be set in store state
-            expect(result.current.lastError).toBe("Backend unavailable");
+            expect(
+                useErrorStore.getState().getStoreError("monitor-types")
+            ).toBe("Backend unavailable");
         });
     });
 });

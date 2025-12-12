@@ -9,7 +9,9 @@
 
 import type { PreloadGuardDiagnosticsReport } from "@shared/types/ipc";
 import type { Logger } from "@shared/utils/logger/interfaces";
+import type { UnknownRecord } from "type-fest";
 
+import { DIAGNOSTICS_CHANNELS } from "@shared/types/preload";
 import {
     buildErrorLogArguments,
     buildLogArguments,
@@ -19,7 +21,7 @@ import log from "electron-log/renderer";
 
 const PRELOAD_PREFIX = "PRELOAD";
 const DIAGNOSTICS_PREFIX = "PRELOAD:DIAGNOSTICS";
-const DIAGNOSTICS_CHANNEL = "diagnostics-report-preload-guard" as const;
+const DIAGNOSTICS_CHANNEL = DIAGNOSTICS_CHANNELS.reportPreloadGuard;
 const PAYLOAD_PREVIEW_LIMIT = 512;
 
 const safeInvoke = (
@@ -61,7 +63,7 @@ const formatFunctionPlaceholder = (name: string): string =>
 
 const formatBigintPlaceholder = (value: bigint): string => value.toString();
 
-const isPlainObject = (value: unknown): value is Record<string, unknown> =>
+const isPlainObject = (value: unknown): boolean =>
     typeof value === "object" && value !== null;
 
 const truncate = (value: string, limit: number): string =>
@@ -97,15 +99,15 @@ const serializeValue = (value: unknown): unknown => {
     }
 
     if (value instanceof Error) {
-        const { cause: errorCause } = value as { cause?: unknown };
+        const { cause: errorCause, message, name, stack } = value;
         return {
             cause:
                 errorCause === undefined
                     ? undefined
                     : serializeValue(errorCause),
-            message: value.message,
-            name: value.name,
-            stack: value.stack,
+            message,
+            name,
+            stack,
             type: "Error",
         };
     }
@@ -163,24 +165,25 @@ export const buildPayloadPreview = (
 export interface GuardFailureContext {
     readonly channel: string;
     readonly guard: string;
-    readonly metadata?: Record<string, unknown> | undefined;
-    readonly payloadPreview?: string | undefined;
-    readonly reason?: string | undefined;
-    readonly timestamp?: number | undefined;
+    readonly metadata?: UnknownRecord;
+    readonly payloadPreview?: string;
+    readonly reason?: string;
+    readonly timestamp?: number;
 }
 
 export const reportPreloadGuardFailure = async (
     context: GuardFailureContext
 ): Promise<void> => {
+    const { channel, guard, metadata, payloadPreview, reason, timestamp } =
+        context;
+
     const payload: PreloadGuardDiagnosticsReport = {
-        channel: context.channel,
-        guard: context.guard,
-        ...(context.metadata ? { metadata: context.metadata } : {}),
-        ...(context.payloadPreview
-            ? { payloadPreview: context.payloadPreview }
-            : {}),
-        ...(context.reason ? { reason: context.reason } : {}),
-        timestamp: context.timestamp ?? Date.now(),
+        channel,
+        guard,
+        ...(metadata ? { metadata } : {}),
+        ...(payloadPreview ? { payloadPreview } : {}),
+        ...(reason ? { reason } : {}),
+        timestamp: timestamp ?? Date.now(),
     };
 
     try {
@@ -188,7 +191,7 @@ export const reportPreloadGuardFailure = async (
     } catch (error) {
         preloadDiagnosticsLogger.warn(
             "[Diagnostics] Failed forwarding preload guard failure",
-            { channel: context.channel, guard: context.guard }
+            { channel, guard }
         );
         preloadDiagnosticsLogger.debug(
             "[Diagnostics] Forwarding failure details",

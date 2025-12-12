@@ -3,7 +3,7 @@ schema: "../../../config/schemas/doc-frontmatter.schema.json"
 title: "ADR-014: Logging, Telemetry, and Diagnostics"
 summary: "Standardizes log levels/fields, correlation IDs, diagnostics IPC flows, and privacy/redaction bounds."
 created: "2025-12-04"
-last_reviewed: "2025-12-05"
+last_reviewed: "2025-12-11"
 category: "guide"
 author: "Nick2bad4u"
 tags:
@@ -54,7 +54,7 @@ We need consistent logging and diagnostics with correlation IDs, structured fiel
 ## Implementation
 
 - Implemented shared logging-context helpers (`withLogContext`, structured severity, automatic correlation IDs, hashed identifiers, passive redaction of URLs/bearer tokens) consumed by both Electron and renderer loggers.
-- Introduced an IPC correlation envelope automatically appended to every `ipcRenderer.invoke` call; `registerStandardizedIpcHandler` extracts the ID, injects it into logs/metadata, and echoes it back to the renderer.
+- Introduced an IPC correlation envelope automatically appended to every typed preload invocation (`createTypedInvoker` internally uses `ipcRenderer.invoke`). `registerStandardizedIpcHandler` extracts the ID, injects it into logs/metadata, and echoes it back to the renderer.
 - Hardened diagnostics IPC handlers with payload byte limits (metadata/payload preview), automatic redaction, structured logging contexts, and a dedicated `diagnostics:report-created` event emitted through the typed event bus.
 - Added rotation defaults (5 MB per file) plus dev/prod log levels, now documented in `README`/guides alongside guidance for overriding via CLI flags.
 - Renderer/Electron tests cover the helper, sanitization behavior, payload truncation, and event emissions to prevent regressions.

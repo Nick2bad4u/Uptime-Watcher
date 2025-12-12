@@ -1,10 +1,10 @@
 ---
-schema: "../../config/schemas/doc-frontmatter.schema.json"
+schema: "../../../config/schemas/doc-frontmatter.schema.json"
 title: "Sites Store and State Sync"
 summary: "Overview of the sites store, status update handling, and state synchronization pipeline between Electron main, preload, and the renderer."
 created: "2025-12-07"
-last_reviewed: "2025-12-07"
-category: "reference"
+last_reviewed: "2025-12-11"
+category: "guide"
 author: "Nick2bad4u"
 tags:
   - "uptime-watcher"
@@ -16,7 +16,7 @@ tags:
 
 # Sites Store and State Sync
 
-This page provides a focused TSDoc-style overview of the renderer sites store
+This page provides a focused architecture reference for the renderer sites store
 and its interaction with the state synchronization pipeline. It complements the
 broader architecture description in
 [`docs/Architecture/README.md`](../../Architecture/README.md), which should be
@@ -96,7 +96,7 @@ Renderer and shared modules involved in site state management:
 
 - `StatusUpdateManager` in `statusUpdateHandler.ts` wires renderer events to
   incremental status updates:
-  - Subscribes to `monitor-status-changed` and
+  - Subscribes to `monitor:status-changed` and
     `monitor:check-completed` via `EventsService`.
   - Validates incoming payloads with
     `isEnrichedMonitorStatusChangedEventData`.

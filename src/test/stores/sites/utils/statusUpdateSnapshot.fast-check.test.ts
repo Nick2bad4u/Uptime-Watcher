@@ -25,7 +25,7 @@ import { MONITOR_STATUS_VALUES, STATUS_HISTORY_VALUES } from "@shared/types";
 import {
     applyStatusUpdateSnapshot,
     type StatusUpdateSnapshotPayload,
-} from "../../../../stores/sites/utils/statusUpdateHandler";
+} from "../../../../stores/sites/utils/statusUpdateSnapshot";
 
 import { logger } from "../../../../services/logger";
 import { isDevelopment } from "@shared/utils/environment";

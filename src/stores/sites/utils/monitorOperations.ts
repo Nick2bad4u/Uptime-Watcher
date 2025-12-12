@@ -25,6 +25,7 @@ import {
 import { DEFAULT_MONITOR_CONFIG as SHARED_MONITOR_CONFIG } from "@shared/types/monitorConfig";
 import { ERROR_CATALOG } from "@shared/utils/errorCatalog";
 import { ensureError } from "@shared/utils/errorHandling";
+import { validateMonitorType as isValidMonitorType } from "@shared/utils/validation";
 import {
     isNonEmptyString,
     isValidPort,
@@ -234,15 +235,19 @@ function getMonitorTypeDefaults(type: MonitorType): MonitorTypeDefaults {
 }
 
 /**
- * Validates and returns a monitor type or default
+ * Coerces an unknown monitor type into a valid {@link MonitorType}.
+ *
+ * @remarks
+ * Delegates membership checks to the canonical shared helper
+ * {@link validateMonitorType} and falls back to the first built-in base type
+ * when invalid.
  */
-function validateMonitorType(type: unknown): MonitorType {
-    /* eslint-disable @typescript-eslint/no-unsafe-type-assertion -- Type validation with runtime checks ensures safe assertions */
-    return typeof type === "string" &&
-        BASE_MONITOR_TYPES.includes(type as MonitorType)
-        ? (type as MonitorType)
-        : BASE_MONITOR_TYPES[0];
-    /* eslint-enable @typescript-eslint/no-unsafe-type-assertion -- Safe type assertion after runtime type validation */
+function resolveMonitorTypeOrDefault(type: unknown): MonitorType {
+    if (isValidMonitorType(type)) {
+        return type;
+    }
+
+    return BASE_MONITOR_TYPES[0];
 }
 
 /**
@@ -877,7 +882,7 @@ function applyTypeSpecificDefaults(
 export function normalizeMonitor(monitor: Partial<Monitor>): Monitor {
     // Validate input data
     validateMonitorInput(monitor);
-    const finalizedType = validateMonitorType(monitor.type);
+    const finalizedType = resolveMonitorTypeOrDefault(monitor.type);
 
     // Filter the monitor data to only include fields appropriate for this type
     const filteredMonitor = filterMonitorFieldsByType(monitor, finalizedType);

@@ -22,10 +22,10 @@ describe(deriveStatusSubscriptionHealth, () => {
             subscribed: true,
             success: true,
             listenerStates: [
-                { attached: true, name: "monitor-status-changed" },
-                { attached: true, name: "monitor-check-completed" },
-                { attached: true, name: "monitoring-started" },
-                { attached: true, name: "monitoring-stopped" },
+                { attached: true, name: "monitor:status-changed" },
+                { attached: true, name: "monitor:check-completed" },
+                { attached: true, name: "monitoring:started" },
+                { attached: true, name: "monitoring:stopped" },
             ],
         };
 
@@ -39,17 +39,17 @@ describe(deriveStatusSubscriptionHealth, () => {
 
     it("marks degraded when only some listeners attach", () => {
         const summary: StatusUpdateSubscriptionSummary = {
-            errors: ["monitoring-started: ipc failure"],
+            errors: ["monitoring:started: ipc failure"],
             expectedListeners: 4,
             listenersAttached: 1,
             message: "partial",
             subscribed: false,
             success: false,
             listenerStates: [
-                { attached: true, name: "monitor-status-changed" },
-                { attached: false, name: "monitor-check-completed" },
-                { attached: false, name: "monitoring-started" },
-                { attached: false, name: "monitoring-stopped" },
+                { attached: true, name: "monitor:status-changed" },
+                { attached: false, name: "monitor:check-completed" },
+                { attached: false, name: "monitoring:started" },
+                { attached: false, name: "monitoring:stopped" },
             ],
         };
 
@@ -58,7 +58,7 @@ describe(deriveStatusSubscriptionHealth, () => {
         expect(health.status).toBe("degraded");
         expect(health.isHealthy).toBeFalsy();
         expect(health.needsAttention).toBeTruthy();
-        expect(health.errors).toContain("monitoring-started: ipc failure");
+        expect(health.errors).toContain("monitoring:started: ipc failure");
     });
 
     it("marks failed when no listeners attach and errors exist", () => {
@@ -70,10 +70,10 @@ describe(deriveStatusSubscriptionHealth, () => {
             subscribed: false,
             success: false,
             listenerStates: [
-                { attached: false, name: "monitor-status-changed" },
-                { attached: false, name: "monitor-check-completed" },
-                { attached: false, name: "monitoring-started" },
-                { attached: false, name: "monitoring-stopped" },
+                { attached: false, name: "monitor:status-changed" },
+                { attached: false, name: "monitor:check-completed" },
+                { attached: false, name: "monitoring:started" },
+                { attached: false, name: "monitoring:stopped" },
             ],
         };
 

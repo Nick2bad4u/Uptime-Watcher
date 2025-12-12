@@ -39,6 +39,10 @@ handoffs:
    agent: BeastMode
    prompt: Review the recent work and ToDo list to ensure all tasks are complete. Follow the plan in .github/prompts/Review.prompt.md - If everything is complete, clear the todo list.
    send: false
+ - label: HandOff
+   agent: BeastMode
+   prompt: I'm going to start a new conversation with fresh context. Summarize this chat's context for the next AI agent to pick up where we left off. Include any relevant details, plans, and the current state of the codebase. Make sure the next agent has everything it needs to continue seamlessly.
+   send: false
  - label: Review Loop
    agent: BeastMode
    prompt: "As an autonomous agent, review my entire codebase for improvements, bugs, or issues. Use your best judgment to construct and execute a dynamic, iterative plan: categorize findings into high-priority bugs (e.g., security or crashes), medium-priority enhancements (e.g., performance or readability), and low-priority tweaks (e.g., style or minor optimizations). Each iteration of this prompt, focus on a different aspect or section of the code (e.g., rotate through modules, functions, tests, or architectural patterns). Even if this prompt repeats identically, prioritize novel discoveries, adapt based on prior reviews or new insights, and avoid rehashing the same points. For each issue, implement fixes directly by editing code, applying changes, etc. Summarize your current work including what you fixed this iteration."

@@ -44,6 +44,7 @@ import type { MonitorFieldDefinition } from "@shared/types";
 
 import { useCallback, useEffect } from "react";
 
+import { useErrorStore } from "../stores/error/useErrorStore";
 import { useMonitorTypesStore } from "../stores/monitor/useMonitorTypesStore";
 
 /**
@@ -79,20 +80,23 @@ export interface UseMonitorFieldsResult {
  * @see {@link useMonitorTypesStore} for the underlying registry.
  */
 export function useMonitorFields(): UseMonitorFieldsResult {
-    const { fieldConfigs, isLoaded, lastError, loadMonitorTypes } =
-        useMonitorTypesStore();
+    const monitorTypesError = useErrorStore(
+        useCallback((state) => state.storeErrors["monitor-types"], [])
+    );
+
+    const { fieldConfigs, isLoaded, loadMonitorTypes } = useMonitorTypesStore();
 
     useEffect(
         function loadMonitorFieldTypes() {
             // Load monitor types when hook is first used
-            if (!isLoaded && !lastError) {
+            if (!isLoaded && !monitorTypesError) {
                 void loadMonitorTypes();
             }
         },
         [
             isLoaded,
-            lastError,
             loadMonitorTypes,
+            monitorTypesError,
         ]
     );
 
@@ -122,7 +126,7 @@ export function useMonitorFields(): UseMonitorFieldsResult {
     );
 
     return {
-        error: lastError,
+        error: monitorTypesError,
         getFields,
         getRequiredFields,
         isFieldRequired,

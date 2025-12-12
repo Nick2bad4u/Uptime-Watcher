@@ -29,16 +29,6 @@ import { registerStateSyncHandlers } from "./handlers/stateSyncHandlers";
 import { registerSystemHandlers } from "./handlers/systemHandlers";
 import { getUpdateNotificationPreferencesChannel } from "./notificationChannelGuards";
 
-const DIAGNOSTICS_VERIFY_CHANNEL: Extract<
-    IpcInvokeChannel,
-    "diagnostics-verify-ipc-handler"
-> = "diagnostics-verify-ipc-handler";
-
-const DIAGNOSTICS_REPORT_CHANNEL: Extract<
-    IpcInvokeChannel,
-    "diagnostics-report-preload-guard"
-> = "diagnostics-report-preload-guard";
-
 const registeredNotificationChannel = getUpdateNotificationPreferencesChannel();
 
 /**
@@ -152,8 +142,6 @@ export class IpcService {
         registerDiagnosticsHandlers({
             eventEmitter: this.uptimeOrchestrator,
             registeredHandlers: this.registeredIpcHandlers,
-            reportChannel: DIAGNOSTICS_REPORT_CHANNEL,
-            verifyChannel: DIAGNOSTICS_VERIFY_CHANNEL,
         });
 
         this.ensureStateSyncListener();

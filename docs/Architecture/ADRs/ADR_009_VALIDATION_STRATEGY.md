@@ -3,7 +3,7 @@ schema: "../../../config/schemas/doc-frontmatter.schema.json"
 title: "ADR-009: Layered Validation Strategy with Zod"
 summary: "Establishes a multi-layered validation architecture using Zod schemas for IPC boundaries, business rules in managers, and persistence constraints in repositories."
 created: "2025-11-25"
-last_reviewed: "2025-11-25"
+last_reviewed: "2025-12-11"
 category: "guide"
 author: "Nick2bad4u"
 tags:
@@ -392,37 +392,50 @@ registerStandardizedIpcHandler(
 
 ```typescript
 // electron/services/ipc/utils.ts
-export function registerStandardizedIpcHandler<T, R>(
-    channel: string,
-    handler: (params: T) => Promise<R>,
-    validator: IpcParameterValidator,
-    registeredHandlers: Set<string>
+//
+// Key rules:
+// - channel name comes from a shared *_CHANNELS registry (shared/types/preload.ts)
+// - ipcMain.handle(...) is called only inside this centralized helper
+// - validators run at the IPC boundary
+import type { IpcInvokeChannel } from "@shared/types/ipc";
+import { SITES_CHANNELS } from "@shared/types/preload";
+
+export function registerStandardizedIpcHandler<TChannel extends IpcInvokeChannel>(
+    channelName: TChannel,
+    handler: StrictIpcInvokeHandler<TChannel>,
+    validateParams: IpcParameterValidator | null,
+    registeredHandlers: Set<IpcInvokeChannel>
 ): void {
-    if (registeredHandlers.has(channel)) {
-        throw new Error(`IPC handler already registered: ${channel}`);
+    // Prevent duplicate handler registration
+    if (registeredHandlers.has(channelName)) {
+        throw new Error(`Duplicate IPC handler: ${channelName}`);
     }
 
-    ipcMain.handle(channel, async (_event, ...args: unknown[]) => {
-        // Stage 1: Parameter validation
-        const validationErrors = validator(args);
-        if (validationErrors) {
-            throw new ValidationError(
-                `Invalid parameters for ${channel}`,
-                validationErrors
-            );
+    registeredHandlers.add(channelName);
+
+    ipcMain.handle(channelName, async (_event, ...rawArgs: unknown[]) => {
+        const { args, correlationId } = extractIpcCorrelationContext(rawArgs);
+
+        // Stage 1: validate boundary parameters
+        if (validateParams) {
+            const errors = validateParams(args);
+            if (errors) {
+                return createValidationErrorResponse(channelName, errors, correlationId);
+            }
         }
 
-        // Stage 2: Handler execution with schema validation inside
-        try {
-            return await handler(args as unknown as T);
-        } catch (error) {
-            logger.error(`IPC handler failed: ${channel}`, error);
-            throw error;
-        }
+        // Stage 2: execute handler and normalize errors
+        return executeIpcHandler(channelName, handler, args, correlationId);
     });
-
-    registeredHandlers.add(channel);
 }
+
+// Example usage (in a handler module):
+registerStandardizedIpcHandler(
+    SITES_CHANNELS.addSite,
+    withIgnoredIpcEvent((site) => uptimeOrchestrator.addSite(site)),
+    SiteHandlerValidators.addSite,
+    registeredHandlers
+);
 ```
 
 ## Manager Validation

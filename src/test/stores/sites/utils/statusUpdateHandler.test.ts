@@ -909,7 +909,7 @@ describe("StatusUpdateHandler", () => {
             await statusChangedCallback(invalidData);
             expect(logger.logger.warn).toHaveBeenCalledWith(
                 expect.stringContaining(
-                    "Invalid monitor status changed event data"
+                    "payload missing enriched monitor/site data; triggering full sync"
                 ),
                 invalidData
             );
@@ -1232,7 +1232,7 @@ describe("StatusUpdateHandler", () => {
             // Should have logged warning in development mode
             expect(logger.logger.warn).toHaveBeenCalledWith(
                 expect.stringContaining(
-                    "Invalid monitor status changed event data"
+                    "payload missing enriched monitor/site data; triggering full sync"
                 ),
                 invalidEvent
             );

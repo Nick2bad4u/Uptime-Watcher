@@ -69,6 +69,18 @@ export function isRecord(value: unknown): value is UnknownRecord {
 }
 
 /**
+ * Converts an unknown value into a record when it is record-like.
+ *
+ * @remarks
+ * Prefer this helper over ad-hoc local helpers like
+ * `isObjectRecord`/`toRecord`. This prevents AI-driven duplication of
+ * object-shape checks across the codebase.
+ */
+export function ensureRecordLike(value: unknown): undefined | UnknownRecord {
+    return isRecord(value) ? value : undefined;
+}
+
+/**
  * Safely extracts a property from an unknown object.
  *
  * @remarks

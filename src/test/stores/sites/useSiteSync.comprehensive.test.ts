@@ -19,9 +19,9 @@ import type { StatusUpdateManager } from "../../../stores/sites/utils/statusUpda
 import { createMockFunction } from "../../utils/mockFactories";
 
 const LISTENER_NAMES = [
-    "monitor-status-changed",
-    "monitoring-started",
-    "monitoring-stopped",
+    "monitor:status-changed",
+    "monitoring:started",
+    "monitoring:stopped",
 ];
 
 const buildListenerStates = (attachedCount: number) =>

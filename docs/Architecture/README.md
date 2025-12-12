@@ -61,12 +61,21 @@ docs/Architecture/
 │   ├── COMPONENT_PROPS_STANDARDS.md
 │   ├── DEVELOPMENT_PATTERNS_GUIDE.md
 │   └── SITE_LOADING_ORCHESTRATION.md
+├── Stores/                      # Store reference docs (renderer state)
+│   ├── README.md
+│   ├── alerts.md
+│   ├── confirm-dialog.md
+│   ├── error.md
+│   ├── monitor-types.md
+│   ├── settings.md
+│   ├── sites.md
+│   ├── ui.md
+│   └── updates.md
 ├── Templates/                   # Code templates for common patterns
 │   ├── EVENT_EMISSION_CHECKLIST.md
 │   ├── IPC_DIAGNOSTICS_HANDLER_TEMPLATE.md
 │   ├── IPC_HANDLER_TEMPLATE.md
 │   ├── REPOSITORY_TEMPLATE.md
-│   ├── REPOSITORY_TEMPLATE_CLEAN.md
 │   ├── SCHEDULER_JOB_TEMPLATE.md
 │   └── ZUSTAND_STORE_TEMPLATE.md
 ├── UsageGuides/                 # Onboarding & navigation guidance
@@ -489,13 +498,11 @@ Checklist for new events across main/renderer:
 - Renderer broadcast contract and preload validation
 - Logging/telemetry expectations and suppression rules
 
-### Template Backlog (TODO)
+### Template maintenance
 
-> TODO (Nick2bad4u): Add these templates/pattern snippets to keep new work consistent.
-
-- **IPC Diagnostics/Report Handler Template**: Added; extend as new diagnostics channels appear.
-- **Scheduler/Backoff Job Template**: Added; refine alongside ADR-011 implementation.
-- **Event Emission Checklist**: Added; keep synchronized with RendererEventPayloadMap changes.
+Templates are maintained alongside their corresponding ADRs and should be
+updated whenever architectural boundaries, contracts, or naming conventions
+change.
 
 ## 📚 Documentation Standards
 
@@ -615,7 +622,7 @@ Auto-generated reference documenting the authoritative list of IPC channels expo
 
 This subsection summarizes how site state synchronization works across main,
 preload, and renderer. It complements the detailed mutation and lifecycle
-guidance in `docs/TSDoc/stores/sites.md`.
+guidance in `docs/Architecture/Stores/sites.md`.
 
 **Main-process responsibilities**
 

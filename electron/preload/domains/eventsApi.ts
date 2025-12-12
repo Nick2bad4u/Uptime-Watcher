@@ -478,16 +478,18 @@ const subscribeWithGuard = <TPayload>(
                 }
             );
 
-            void reportPreloadGuardFailure({
+            const guardFailureContext = {
                 channel,
                 guard: guardName,
                 metadata: {
                     domain,
                     payloadType,
                 },
-                payloadPreview,
                 reason: options.reason ?? "payload-validation",
-            });
+                ...(payloadPreview ? { payloadPreview } : {}),
+            };
+
+            void reportPreloadGuardFailure(guardFailureContext);
             return;
         }
         callback(payload);
@@ -538,7 +540,11 @@ export function createEventsApi(): EventsApi {
                 managers.cacheInvalidated,
                 RENDERER_EVENT_CHANNELS.CACHE_INVALIDATED,
                 isCacheInvalidatedEventDataPayload,
-                callback
+                callback,
+                {
+                    guardName: "isCacheInvalidatedEventDataPayload",
+                    reason: RENDERER_EVENT_CHANNELS.CACHE_INVALIDATED,
+                }
             ),
         onHistoryLimitUpdated: (
             callback: (data: HistoryLimitUpdatedEventData) => void
@@ -550,7 +556,7 @@ export function createEventsApi(): EventsApi {
                 callback,
                 {
                     guardName: "isHistoryLimitUpdatedEventDataPayload",
-                    reason: "history-limit-updated",
+                    reason: RENDERER_EVENT_CHANNELS.SETTINGS_HISTORY_LIMIT_UPDATED,
                 }
             ),
         onMonitorCheckCompleted: (
@@ -563,7 +569,7 @@ export function createEventsApi(): EventsApi {
                 callback,
                 {
                     guardName: "isMonitorCheckCompletedEventDataPayload",
-                    reason: "monitor-check-completed",
+                    reason: RENDERER_EVENT_CHANNELS.MONITOR_CHECK_COMPLETED,
                 }
             ),
         onMonitorDown: (
@@ -573,7 +579,11 @@ export function createEventsApi(): EventsApi {
                 managers.monitorDown,
                 RENDERER_EVENT_CHANNELS.MONITOR_DOWN,
                 isMonitorDownEventDataPayload,
-                callback
+                callback,
+                {
+                    guardName: "isMonitorDownEventDataPayload",
+                    reason: RENDERER_EVENT_CHANNELS.MONITOR_DOWN,
+                }
             ),
         onMonitoringStarted: (
             callback: (data: MonitoringStartedEventDataPayload) => void
@@ -582,7 +592,11 @@ export function createEventsApi(): EventsApi {
                 managers.monitoringStarted,
                 RENDERER_EVENT_CHANNELS.MONITORING_STARTED,
                 isMonitoringStartedEventDataPayload,
-                callback
+                callback,
+                {
+                    guardName: "isMonitoringStartedEventDataPayload",
+                    reason: RENDERER_EVENT_CHANNELS.MONITORING_STARTED,
+                }
             ),
         onMonitoringStopped: (
             callback: (data: MonitoringStoppedEventDataPayload) => void
@@ -591,7 +605,11 @@ export function createEventsApi(): EventsApi {
                 managers.monitoringStopped,
                 RENDERER_EVENT_CHANNELS.MONITORING_STOPPED,
                 isMonitoringStoppedEventDataPayload,
-                callback
+                callback,
+                {
+                    guardName: "isMonitoringStoppedEventDataPayload",
+                    reason: RENDERER_EVENT_CHANNELS.MONITORING_STOPPED,
+                }
             ),
         onMonitorStatusChanged: (
             callback: (data: MonitorStatusChangedEventData) => void
@@ -600,7 +618,11 @@ export function createEventsApi(): EventsApi {
                 managers.monitorStatusChanged,
                 RENDERER_EVENT_CHANNELS.MONITOR_STATUS_CHANGED,
                 isMonitorStatusChangedEventData,
-                callback
+                callback,
+                {
+                    guardName: "isMonitorStatusChangedEventData",
+                    reason: RENDERER_EVENT_CHANNELS.MONITOR_STATUS_CHANGED,
+                }
             ),
         onMonitorUp: (
             callback: (data: MonitorUpEventData) => void
@@ -609,7 +631,11 @@ export function createEventsApi(): EventsApi {
                 managers.monitorUp,
                 RENDERER_EVENT_CHANNELS.MONITOR_UP,
                 isMonitorUpEventDataPayload,
-                callback
+                callback,
+                {
+                    guardName: "isMonitorUpEventDataPayload",
+                    reason: RENDERER_EVENT_CHANNELS.MONITOR_UP,
+                }
             ),
         onSiteAdded: (
             callback: (data: SiteAddedEventDataPayload) => void
@@ -621,7 +647,7 @@ export function createEventsApi(): EventsApi {
                 callback,
                 {
                     guardName: "isSiteAddedEventDataPayload",
-                    reason: "site-added",
+                    reason: RENDERER_EVENT_CHANNELS.SITE_ADDED,
                 }
             ),
         onSiteRemoved: (
@@ -634,7 +660,7 @@ export function createEventsApi(): EventsApi {
                 callback,
                 {
                     guardName: "isSiteRemovedEventDataPayload",
-                    reason: "site-removed",
+                    reason: RENDERER_EVENT_CHANNELS.SITE_REMOVED,
                 }
             ),
         onSiteUpdated: (
@@ -647,7 +673,7 @@ export function createEventsApi(): EventsApi {
                 callback,
                 {
                     guardName: "isSiteUpdatedEventDataPayload",
-                    reason: "site-updated",
+                    reason: RENDERER_EVENT_CHANNELS.SITE_UPDATED,
                 }
             ),
         onStateSyncEvent: (
@@ -660,7 +686,7 @@ export function createEventsApi(): EventsApi {
                 callback,
                 {
                     guardName: "isStateSyncEventDataPayload",
-                    reason: "state-sync-event",
+                    reason: RENDERER_EVENT_CHANNELS.STATE_SYNC,
                 }
             ),
         onTestEvent: (callback: (data: TestEventData) => void): (() => void) =>
@@ -668,7 +694,11 @@ export function createEventsApi(): EventsApi {
                 managers.testEvent,
                 RENDERER_EVENT_CHANNELS.TEST_EVENT,
                 isTestEventDataPayload,
-                callback
+                callback,
+                {
+                    guardName: "isTestEventDataPayload",
+                    reason: RENDERER_EVENT_CHANNELS.TEST_EVENT,
+                }
             ),
         onUpdateStatus: (
             callback: (data: UpdateStatusEventData) => void
@@ -677,7 +707,11 @@ export function createEventsApi(): EventsApi {
                 managers.updateStatus,
                 RENDERER_EVENT_CHANNELS.UPDATE_STATUS,
                 isUpdateStatusEventDataPayload,
-                callback
+                callback,
+                {
+                    guardName: "isUpdateStatusEventDataPayload",
+                    reason: RENDERER_EVENT_CHANNELS.UPDATE_STATUS,
+                }
             ),
         removeAllListeners: (): void => {
             for (const manager of Object.values(managers)) {

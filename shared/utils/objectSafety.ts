@@ -131,16 +131,28 @@ export function safeObjectOmit<
 
     const keysToOmit = new Set(keys);
 
-    // Type assertion is safe as we're creating an empty object to match the expected structure
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe cast for result object initialization with omitted key structure
-    const result = {} as Omit<T, K>;
+    // IMPORTANT: Use a null-prototype object and defineProperty to avoid
+    // prototype-pollution edge cases such as "__proto__".
+    //
+    // - Assigning `result["__proto__"] = value` on a normal object can mutate
+    //   the prototype instead of defining an own property.
+    // - `Object.defineProperty` on a null-prototype object always defines an
+    //   own property.
+    //
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe cast for null-prototype object used as a plain record
+    const result = Object.create(null) as Omit<T, K>;
 
     // Copy enumerable string/number properties
     for (const [key, value] of Object.entries(obj)) {
         // Type assertion is safe as we're checking string keys from Object.entries
         // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe cast for string key from Object.entries to generic key type
         if (!keysToOmit.has(key as K)) {
-            (result as Record<PropertyKey, unknown>)[key] = value;
+            Object.defineProperty(result, key, {
+                configurable: true,
+                enumerable: true,
+                value,
+                writable: true,
+            });
         }
     }
 
@@ -149,7 +161,12 @@ export function safeObjectOmit<
         // Type assertion is safe as we're checking symbol keys
         // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe cast for symbol key to generic key type for omit operation
         if (!keysToOmit.has(symbol as K)) {
-            (result as Record<PropertyKey, unknown>)[symbol] = obj[symbol];
+            Object.defineProperty(result, symbol, {
+                configurable: true,
+                enumerable: true,
+                value: obj[symbol],
+                writable: true,
+            });
         }
     }
 
@@ -181,13 +198,20 @@ export function safeObjectPick<
     T extends Record<PropertyKey, unknown>,
     K extends keyof T,
 >(obj: T, keys: readonly K[]): Pick<T, K> {
-    // Type assertion is safe as we're creating an empty object to match the expected structure
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe cast for empty object initialization with picked keys structure
-    const result = {} as Pick<T, K>;
+    // IMPORTANT: Use a null-prototype object and defineProperty to avoid
+    // prototype-pollution edge cases such as "__proto__".
+    //
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe cast for null-prototype object used as a plain record
+    const result = Object.create(null) as Pick<T, K>;
 
     for (const key of keys) {
         if (Object.hasOwn(obj, key)) {
-            result[key] = obj[key];
+            Object.defineProperty(result, key, {
+                configurable: true,
+                enumerable: true,
+                value: obj[key],
+                writable: true,
+            });
         }
     }
 

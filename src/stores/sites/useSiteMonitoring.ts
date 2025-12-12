@@ -13,15 +13,13 @@ import type { Monitor, Site, StatusUpdate } from "@shared/types";
 import { ensureError, withErrorHandling } from "@shared/utils/errorHandling";
 
 import type { OptimisticMonitoringLock } from "./utils/optimisticMonitoringLock";
+import type { StatusUpdateSnapshotPayload } from "./utils/statusUpdateSnapshot";
 
 import { logger } from "../../services/logger";
 import { MonitoringService } from "../../services/MonitoringService";
 import { logStoreAction } from "../utils";
 import { createStoreErrorHandler } from "../utils/storeErrorHandling";
-import {
-    applyStatusUpdateSnapshot,
-    type StatusUpdateSnapshotPayload,
-} from "./utils/statusUpdateHandler";
+import { applyStatusUpdateSnapshot } from "./utils/statusUpdateSnapshot";
 
 /**
  * Site monitoring actions interface for managing monitoring operations.

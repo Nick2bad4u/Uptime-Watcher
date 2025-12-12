@@ -300,7 +300,10 @@ export function toMonitorSnapshotOverlay(
         Partial<MonitorSnapshotOverlay> &
         UnknownRecord;
 
-    if (isStatusHistoryArray(history)) {
+    // Empty history arrays are treated as "no overlay" so that callers that
+    // occasionally omit history (or emit an empty array) do not accidentally
+    // erase already-populated history from canonical snapshots.
+    if (isStatusHistoryArray(history) && history.length > 0) {
         overlay.history = history;
     }
 

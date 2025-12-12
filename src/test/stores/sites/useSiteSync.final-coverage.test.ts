@@ -8,10 +8,10 @@ import type { Site } from "@shared/types";
 import type { StateSyncStatusSummary } from "@shared/types/stateSync";
 
 const LISTENER_NAMES = [
-    "monitor-status-changed",
-    "monitor-check-completed",
-    "monitoring-started",
-    "monitoring-stopped",
+    "monitor:status-changed",
+    "monitor:check-completed",
+    "monitoring:started",
+    "monitoring:stopped",
 ];
 
 const buildListenerStates = (attachedCount: number) =>

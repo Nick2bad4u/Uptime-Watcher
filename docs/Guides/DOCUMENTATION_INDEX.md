@@ -69,10 +69,24 @@ System design, patterns, and architectural decisions:
 
 #### Patterns & standards
 
-| Document                                                                                  | Purpose                  | Use When                      |
-| ----------------------------------------------------------------------------------------- | ------------------------ | ----------------------------- |
-| [DEVELOPMENT\_PATTERNS\_GUIDE.md](../Architecture/Patterns/DEVELOPMENT_PATTERNS_GUIDE.md) | Coding patterns overview | Understanding system patterns |
-| [TSDOC\_STANDARDS.md](../Architecture/TSDOC_STANDARDS.md)                                 | Documentation standards  | Writing code documentation    |
+| Document                                                                                  | Purpose                  | Use When                               |
+| ----------------------------------------------------------------------------------------- | ------------------------ | -------------------------------------- |
+| [DEVELOPMENT\_PATTERNS\_GUIDE.md](../Architecture/Patterns/DEVELOPMENT_PATTERNS_GUIDE.md) | Coding patterns overview | Understanding system patterns          |
+| [TSDOC\_STANDARDS.md](../Architecture/TSDOC_STANDARDS.md)                                 | Documentation standards  | Writing code documentation             |
+| [LINT\_GUARDRAILS\_AND\_CUSTOM\_RULES.md](./LINT_GUARDRAILS_AND_CUSTOM_RULES.md)          | Custom lint guardrails   | Fixing architecture lint rule failures |
+
+#### Store reference docs
+
+| Document                                                             | Purpose                              | Use When                                  |
+| -------------------------------------------------------------------- | ------------------------------------ | ----------------------------------------- |
+| [Stores/sites.md](../Architecture/Stores/sites.md)                   | Sites store + state sync reference   | Working on site mutations or state sync   |
+| [Stores/settings.md](../Architecture/Stores/settings.md)             | Settings store + history limit rules | Working on settings persistence + history |
+| [Stores/monitor-types.md](../Architecture/Stores/monitor-types.md)   | Monitor type config cache + helpers  | Working on monitor config/validation UI   |
+| [Stores/updates.md](../Architecture/Stores/updates.md)               | Update workflow state                | Working on update checks/install flow     |
+| [Stores/error.md](../Architecture/Stores/error.md)                   | Centralized error/loading state      | Standardizing error/loading handling      |
+| [Stores/alerts.md](../Architecture/Stores/alerts.md)                 | Alert/toast queue                    | Working on user-facing notifications      |
+| [Stores/ui.md](../Architecture/Stores/ui.md)                         | UI-only state                        | Working on view/panel toggles             |
+| [Stores/confirm-dialog.md](../Architecture/Stores/confirm-dialog.md) | Confirm dialog workflow              | Working on confirmation dialogs           |
 
 #### Templates
 

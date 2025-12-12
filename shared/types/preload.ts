@@ -188,6 +188,33 @@ export type NotificationsDomainBridge = DomainBridge<
 >;
 
 /**
+ * Mapping from diagnostics helper methods to IPC channels.
+ *
+ * @remarks
+ * These channels are used internally by the preload bridge guardrails to verify
+ * handler wiring and to report preload guard failures.
+ *
+ * @internal
+ */
+interface DiagnosticsChannelMap {
+    readonly reportPreloadGuard: "diagnostics-report-preload-guard";
+    readonly verifyIpcHandler: "diagnostics-verify-ipc-handler";
+}
+
+const DIAGNOSTICS_CHANNELS_DEFINITION: DiagnosticsChannelMap = {
+    reportPreloadGuard: "diagnostics-report-preload-guard",
+    verifyIpcHandler: "diagnostics-verify-ipc-handler",
+};
+
+/**
+ * Strongly typed channel mapping for diagnostics IPC interactions.
+ *
+ * @public
+ */
+export const DIAGNOSTICS_CHANNELS: DiagnosticsChannelMap =
+    DIAGNOSTICS_CHANNELS_DEFINITION;
+
+/**
  * Mapping from settings domain methods to IPC channels.
  *
  * @internal

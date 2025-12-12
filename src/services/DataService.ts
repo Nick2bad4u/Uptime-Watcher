@@ -34,9 +34,10 @@ import { validateServicePayload } from "./utils/validation";
  *
  * @remarks
  * This helper wraps the supplied asynchronous {@link handler} with
- * {@link withUtilityErrorHandling}, tagging log entries with a `"[DataService]
- * <operation>"` prefix. Errors are logged and then rethrown so that callers can
- * surface failures to the UI while still benefiting from structured telemetry.
+ * {@link withUtilityErrorHandling}, tagging log entries with a prefix. The
+ * prefix format is `"[DataService] <operation>"`. Errors are logged and then
+ * rethrown so that callers can surface failures to the UI while still
+ * benefiting from structured telemetry.
  *
  * @typeParam T - Result type returned by the wrapped handler.
  *

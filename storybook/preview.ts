@@ -5,6 +5,7 @@ import type { Decorator, Preview, ReactRenderer } from "@storybook/react";
 
 import { useMount } from "@app/hooks/useMount";
 import { themeManager } from "@app/theme/ThemeManager";
+import { ensureRecordLike } from "@shared/utils/typeHelpers";
 import { withThemeByClassName } from "@storybook/addon-themes";
 import { initialize, mswLoader } from "msw-storybook-addon";
 import { createElement, useEffect } from "react";
@@ -19,17 +20,6 @@ const storybookAccessibilityModeEnvKeys = [
     "VITE_STORYBOOK_A11Y_ASSERT_MODE",
     "STORYBOOK_A11Y_ASSERT_MODE",
 ] as const;
-
-const isObjectRecord = (value: unknown): value is Record<string, unknown> =>
-    typeof value === "object" && value !== null;
-
-const toRecord = (value: unknown): Record<string, unknown> | undefined => {
-    if (!isObjectRecord(value)) {
-        return undefined;
-    }
-
-    return value;
-};
 
 const normalizeAccessibilityTestMode = (
     value: unknown
@@ -72,15 +62,19 @@ const getProcessEnvRecord = (): Record<string, unknown> | undefined => {
         }
     ).process;
 
-    if (!isObjectRecord(processCandidate)) {
+    const processRecord = ensureRecordLike(processCandidate);
+
+    if (!processRecord) {
         return undefined;
     }
 
-    return toRecord(processCandidate.env);
+    return ensureRecordLike(processRecord["env"]);
 };
 
 const resolveStorybookAccessibilityMode = (): AccessibilityTestMode => {
-    const importMetaEnv = toRecord((import.meta as { env?: unknown }).env);
+    const importMetaEnv = ensureRecordLike(
+        (import.meta as { env?: unknown }).env
+    );
 
     const importMetaCandidate = readEnvVariable(importMetaEnv);
 

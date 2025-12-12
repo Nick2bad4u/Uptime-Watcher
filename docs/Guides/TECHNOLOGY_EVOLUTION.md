@@ -3,7 +3,7 @@ schema: "../../config/schemas/doc-frontmatter.schema.json"
 title: "Technology Evolution Guide"
 summary: "Chronological guide to Uptime Watcher's architectural evolution, migrations, and key technical decisions."
 created: "2025-08-05"
-last_reviewed: "2025-12-04"
+last_reviewed: "2025-12-11"
 category: "guide"
 author: "Nick2bad4u"
 tags:
@@ -131,6 +131,15 @@ Error Handling: Centralized error store with withErrorHandling utility
 #### Migration Implementation
 
 ##### Before (LowDB)
+
+> Note: The snippet below is presented as an _evolutionary milestone_.
+>
+> The current implementation standard is:
+>
+> - channel constants in `shared/types/preload.ts` (`*_CHANNELS`),
+> - domain handler modules under `electron/services/ipc/handlers/**`, and
+> - centralized registration via `registerStandardizedIpcHandler` in
+>   `electron/services/ipc/utils.ts`.
 
 ```typescript
 // Simple JSON-based storage
@@ -299,6 +308,11 @@ config that powers both the web preview and the Electron renderer bundle.
 
 ###### **Before (Basic Events)**:
 
+> Historical note: the snippet below shows the pre-bridge / pre-service era.
+> In the current architecture, renderer event subscriptions flow through the
+> preload events domain bridge and are consumed via `EventsService` in the
+> renderer.
+
 ```typescript
 // No type safety, manual IPC forwarding
 emitter.emit("site:updated", someData); // any type
@@ -415,6 +429,10 @@ await eventBus.emitTyped("sites:updated", { site });
 
 ###### **Before**: Untyped communication
 
+> Historical note: direct `ipcMain.handle("some-channel")` registrations are
+> now intentionally centralized in `electron/services/ipc/utils.ts` via
+> `registerStandardizedIpcHandler`.
+
 ```typescript
 // No type safety
 ipcMain.handle("create-site", async (event, data) => {
@@ -423,6 +441,16 @@ ipcMain.handle("create-site", async (event, data) => {
 ```
 
 ###### **After**: Fully typed with validation
+
+> Historical note: the class-shaped IPC service shown below reflects an
+> evolutionary milestone.
+>
+> The _current_ implementation standard is:
+>
+> - channel constants in `shared/types/preload.ts` (`*_CHANNELS`),
+> - domain handler modules under `electron/services/ipc/handlers/**`, and
+> - centralized registration via `registerStandardizedIpcHandler` in
+>   `electron/services/ipc/utils.ts`.
 
 ```typescript
 // Complete type safety with validation
@@ -445,7 +473,7 @@ export class IPCService {
  }
 }
 
-// Usage with type guards
+// Usage with type guards (historical milestone)
 ipcService.registerStandardizedIpcHandler(
  "add-site",
  async (data: SiteCreationData) => {
@@ -453,6 +481,18 @@ ipcService.registerStandardizedIpcHandler(
  },
  isSiteCreationData // Type guard ensures validation
 );
+
+// Current pattern (today)
+// - channel constants in shared/types/preload.ts
+// - handler modules under electron/services/ipc/handlers/**
+// - centralized registration via registerStandardizedIpcHandler
+//
+// registerStandardizedIpcHandler(
+//  SITES_CHANNELS.addSite,
+//  withIgnoredIpcEvent((site) => uptimeOrchestrator.addSite(site)),
+//  SiteHandlerValidators.addSite,
+//  registeredHandlers
+// );
 ```
 
 ### 🔍 Monitoring System Evolution

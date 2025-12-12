@@ -434,7 +434,9 @@ export function createValidationResponse(
  * @example
  *
  * ```typescript
- * const result = await withIpcHandler("get-sites", async () =>
+ * import { SITES_CHANNELS } from "@shared/types/preload";
+ *
+ * const result = await withIpcHandler(SITES_CHANNELS.getSites, async () =>
  *     this.uptimeOrchestrator.getSites());
  * ```
  *
@@ -470,8 +472,10 @@ export async function withIpcHandler<T>(
  * @example
  *
  * ```typescript
+ * import { SITES_CHANNELS } from "@shared/types/preload";
+ *
  * const result = await withIpcHandlerValidation(
- *     "add-site",
+ *     SITES_CHANNELS.addSite,
  *     async (site: Site) => this.uptimeOrchestrator.addSite(site),
  *     (params) => IpcValidators.requiredObject(params[0], "site"),
  *     [siteData]
@@ -554,8 +558,10 @@ export async function withIpcHandlerValidation<
  * @example
  *
  * ```typescript
+ * import { SITES_CHANNELS } from "@shared/types/preload";
+ *
  * registerStandardizedIpcHandler(
- *     "get-sites",
+ *     SITES_CHANNELS.getSites,
  *     async () => this.uptimeOrchestrator.getSites(),
  *     null,
  *     this.registeredIpcHandlers

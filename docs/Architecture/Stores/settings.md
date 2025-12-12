@@ -1,10 +1,10 @@
 ---
-schema: "../../config/schemas/doc-frontmatter.schema.json"
+schema: "../../../config/schemas/doc-frontmatter.schema.json"
 title: "Settings Store and History Limits"
 summary: "Overview of the settings store, history limit semantics, and how renderer consumers should interpret unlimited retention."
 created: "2025-12-10"
-last_reviewed: "2025-12-10"
-category: "reference"
+last_reviewed: "2025-12-11"
+category: "guide"
 author: "Nick2bad4u"
 tags:
   - "uptime-watcher"
@@ -73,14 +73,14 @@ respect the shared semantics:
   that should be replaced with some small default.
 - Avoid patterns such as `settings.historyLimit || 25` which silently
   override the intended meaning of `0`.
-- When a UI element needs its own *display* cap (for example, a dropdown of
-  how many records to show at once), compute that cap separately from the
+- When a UI element needs its own _display_ cap (for example, a dropdown of
+  the number of records to show at once), compute that cap separately from the
   backend history limit rather than overloading `historyLimit`.
 
 ### Example: History tab display limit
 
 `src/components/SiteDetails/tabs/HistoryTab.tsx` exposes a "Show" dropdown
-that lets the user choose how many records to display in the monitor history
+that lets the user choose the number of records to display in the monitor history
 view. The component now uses a small helper to interpret the backend
 history limit correctly:
 

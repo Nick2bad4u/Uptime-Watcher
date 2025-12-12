@@ -3,7 +3,7 @@ schema: "../../../config/schemas/doc-frontmatter.schema.json"
 title: "Development Patterns Guide"
 summary: "Documents the core architectural and development patterns used across Uptime Watcher, including repositories, events, state, IPC, and testing."
 created: "2025-08-05"
-last_reviewed: "2025-11-17"
+last_reviewed: "2025-12-11"
 category: "guide"
 author: "Nick2bad4u"
 tags:
@@ -701,32 +701,36 @@ Standardized IPC protocol using contextBridge with type safety, validation, and 
 ### Handler Registration Pattern
 
 ```typescript
-// 1\. Define validation functions
-export function isExampleParams(data: unknown): data is ExampleParams {
-    return typeof data === 'object' &&
-           data !== null &&
-           'field' in data &&
-           typeof (data as any).field === 'string';
-}
+// 1) Define a shared channel map in shared/types/preload.ts
+// export const EXAMPLE_CHANNELS = { ... } as const;
 
-// 2\. Register handlers by domain
-private registerExampleHandlers(deps: IpcServiceDependencies): void {
-    this.registerStandardizedIpcHandler(
-        'create-example',
-        async (params: ExampleParams) => {
-            const result = await deps.exampleManager.create(params);
-            return result;
-        },
-        isExampleParams
+// 2) Register handlers in a domain module under electron/services/ipc/handlers/**
+import type { IpcInvokeChannel } from "@shared/types/ipc";
+import { EXAMPLE_CHANNELS } from "@shared/types/preload";
+
+import { registerStandardizedIpcHandler } from "../utils";
+import { ExampleHandlerValidators } from "../validators";
+import { withIgnoredIpcEvent } from "./handlerShared";
+
+export function registerExampleHandlers({
+    registeredHandlers,
+    exampleManager,
+}: {
+    registeredHandlers: Set<IpcInvokeChannel>;
+    exampleManager: ExampleManager;
+}): void {
+    registerStandardizedIpcHandler(
+        EXAMPLE_CHANNELS.createExample,
+        withIgnoredIpcEvent((params) => exampleManager.create(params)),
+        ExampleHandlerValidators.createExample,
+        registeredHandlers
     );
 
-    this.registerStandardizedIpcHandler(
-        'get-examples',
-        async () => {
-            const results = await deps.exampleManager.getAll();
-            return results;
-        }
-        // No validation needed for parameterless operations
+    registerStandardizedIpcHandler(
+        EXAMPLE_CHANNELS.getExamples,
+        withIgnoredIpcEvent(() => exampleManager.getAll()),
+        null,
+        registeredHandlers
     );
 }
 ```
@@ -734,31 +738,22 @@ private registerExampleHandlers(deps: IpcServiceDependencies): void {
 ### Preload API Pattern
 
 ```typescript
-// preload.ts
-const electronAPI = {
- example: {
-  create: (params: ExampleParams): Promise<Example> =>
-   ipcRenderer.invoke("create-example", params),
-  getAll: (): Promise<Example[]> => ipcRenderer.invoke("get-examples"),
- },
- events: {
-  onExampleEvent: (callback: (data: ExampleEventData) => void) => {
-   const wrappedCallback = (_event: any, data: ExampleEventData) =>
-    callback(data);
-   ipcRenderer.on("example:event", wrappedCallback);
-   return () => ipcRenderer.off("example:event", wrappedCallback);
-  },
- },
-} as const;
+// electron/preload/domains/exampleApi.ts
+import { EXAMPLE_CHANNELS } from "@shared/types/preload";
 
-contextBridge.exposeInMainWorld("electronAPI", electronAPI);
+import { createTypedInvoker } from "../core/bridgeFactory";
 
-// types.d.ts
-declare global {
- interface Window {
-  electronAPI: typeof electronAPI;
- }
+export function createExampleApi() {
+    return {
+        create: createTypedInvoker(EXAMPLE_CHANNELS.createExample),
+        getAll: createTypedInvoker(EXAMPLE_CHANNELS.getExamples),
+    };
 }
+
+// Events are exposed via the preload events domain bridge:
+// - main emits renderer events with RENDERER_EVENT_CHANNELS.*
+// - preload validates and forwards via createEventManager + guards
+// - renderer subscribes via EventsService (no direct ipcRenderer usage)
 ```
 
 #### Sites domain contract highlights
@@ -766,7 +761,7 @@ declare global {
 - `remove-monitor` **must** resolve to the persisted `Site` snapshot provided by the orchestrator. Treat the payload as authoritative and feed it directly into `SiteService.removeMonitor` ➔ `applySavedSiteToStore`.
 - Cross-check the canonical implementation in [`SiteService.removeMonitor`](../../../src/services/SiteService.ts), which demonstrates validating the persisted snapshot with `validateSiteSnapshot` before mutating store state.
 - Avoid reconstructing monitor arrays in the renderer. Any transformation risks diverging from the validated schema maintained in [`@shared/validation/siteSchemas`](../../../shared/validation/siteSchemas.ts) and [`@shared/validation/monitorSchemas`](../../../shared/validation/monitorSchemas.ts).
-- Reference `docs/TSDoc/stores/sites.md` for the end-to-end mutation flow and optimistic update guidance.
+- Reference `docs/Architecture/Stores/sites.md` for the end-to-end mutation flow and optimistic update guidance.
 
 ### IPC Communication Usage Guidelines
 

@@ -3,7 +3,7 @@ schema: "../../config/schemas/doc-frontmatter.schema.json"
 title: "Error Handling Guide"
 summary: "Comprehensive overview of error handling patterns, stores, and utilities in Uptime Watcher."
 created: "2025-09-22"
-last_reviewed: "2025-11-17"
+last_reviewed: "2025-12-11"
 category: "guide"
 author: "Nick2bad4u"
 tags:
@@ -524,57 +524,34 @@ export class SiteService {
 ### IPC Error Handling
 
 ```typescript
-// IPC handler error handling
-export const setupSitesIpc = (
- ipcService: IpcService,
- siteService: SiteService
-) => {
- ipcService.registerStandardizedIpcHandler(
-  "add-site",
-  async (data: unknown) => {
-   return await withErrorHandling(
-    async () => {
-     // Validate input
-     const siteData = addSiteSchema.parse(data);
+// IPC handler error handling (current pattern)
+//
+// registerStandardizedIpcHandler provides:
+// - consistent error normalization + response formatting
+// - correlation id extraction
+// - optional parameter validation
+// - duplicate handler registration protection
+import type { IpcInvokeChannel } from "@shared/types/ipc";
+import { SITES_CHANNELS } from "@shared/types/preload";
 
-     // Process request
-     const site = await siteService.createSite(siteData);
+import type { UptimeOrchestrator } from "@electron/UptimeOrchestrator";
 
-     return {
-      success: true,
-      data: site,
-     };
-    },
-    {
-     logger,
-     operationName: "IPC add-site",
-    }
-   );
-  },
-  addSiteSchema
- );
+import { registerStandardizedIpcHandler } from "@electron/services/ipc/utils";
+import { SiteHandlerValidators } from "@electron/services/ipc/validators";
+import { withIgnoredIpcEvent } from "@electron/services/ipc/handlers/handlerShared";
 
- ipcService.registerStandardizedIpcHandler(
-  "remove-site",
-  async (data: unknown) => {
-   return await withErrorHandling(
-    async () => {
-     const { siteIdentifier } = deleteSiteSchema.parse(data);
-
-     await siteService.deleteSite(siteIdentifier);
-
-     return {
-      success: true,
-      data: null,
-     };
-    },
-    {
-     logger,
-     operationName: "IPC remove-site",
-    }
-   );
-  },
-  deleteSiteSchema
+export const registerSitesHandlers = ({
+ registeredHandlers,
+ uptimeOrchestrator,
+}: {
+ registeredHandlers: Set<IpcInvokeChannel>;
+ uptimeOrchestrator: UptimeOrchestrator;
+}) => {
+ registerStandardizedIpcHandler(
+  SITES_CHANNELS.addSite,
+  withIgnoredIpcEvent((site) => uptimeOrchestrator.addSite(site)),
+  SiteHandlerValidators.addSite,
+  registeredHandlers
  );
 };
 ```

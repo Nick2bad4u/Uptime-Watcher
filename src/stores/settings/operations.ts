@@ -200,24 +200,13 @@ export const createSettingsOperationsSlice = (
                         historyLimit: sanitizedLimit,
                     });
 
-                    const backendLimit: number =
+                    const persistedLimit =
                         await SettingsService.updateHistoryLimit(
                             sanitizedLimit
                         );
 
-                    const normalizedBackendLimit = ((): number => {
-                        try {
-                            return normalizeHistoryLimit(
-                                backendLimit,
-                                DEFAULT_HISTORY_LIMIT_RULES
-                            );
-                        } catch {
-                            return sanitizedLimit;
-                        }
-                    })();
-
                     getState().updateSettings({
-                        historyLimit: normalizedBackendLimit,
+                        historyLimit: persistedLimit,
                     });
                 },
                 {

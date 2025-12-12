@@ -3,7 +3,7 @@ schema: "../../config/schemas/doc-frontmatter.schema.json"
 title: "TSDoc Standardization Guide"
 summary: "Standardizes TSDoc usage patterns and inline code examples across the Uptime-Watcher codebase."
 created: "2025-08-05"
-last_reviewed: "2025-11-17"
+last_reviewed: "2025-12-11"
 category: "guide"
 author: "Nick2bad4u"
 tags:
@@ -470,38 +470,48 @@ tags:
  * @example
  *
  * ```typescript
+ * import { SITES_CHANNELS } from "@shared/types/preload";
+ * import { registerStandardizedIpcHandler } from "@electron/services/ipc/utils";
+ *
  * // Simple handler without parameters
- * ipcService.registerStandardizedIpcHandler("get-sites", async () => {
- *  const sites = await siteManager.getAllSites();
- *  return sites;
- * });
- * ```
- *
- * @example
- *
- * ```typescript
- * // Handler with validation
- * ipcService.registerStandardizedIpcHandler(
- *  "add-site",
- *  async (params: SiteCreationData) => {
- *   const site = await siteManager.createSite(params);
- *   return site;
+ * registerStandardizedIpcHandler(
+ *  SITES_CHANNELS.getSites,
+ *  async () => {
+ *   const sites = await siteManager.getSites();
+ *   return sites;
  *  },
- *  isSiteCreationData // Type guard function
+ *  null,
+ *  registeredHandlers
  * );
  * ```
  *
  * @example
  *
  * ```typescript
- * // Complex handler with error handling
- * ipcService.registerStandardizedIpcHandler(
- *  "update-site",
- *  async (identifier: string, updates: Partial<Site>) => {
- *   const result = await siteManager.updateSite(identifier, updates);
- *   return result;
- *  },
- *  validateSiteUpdate // Type guard function validating the updates object
+ * import { SITES_CHANNELS } from "@shared/types/preload";
+ * import { registerStandardizedIpcHandler } from "@electron/services/ipc/utils";
+ *
+ * // Handler with validation
+ * registerStandardizedIpcHandler(
+ *  SITES_CHANNELS.addSite,
+ *  async (siteData) => uptimeOrchestrator.addSite(siteData),
+ *  SiteHandlerValidators.addSite,
+ *  registeredHandlers
+ * );
+ * ```
+ *
+ * @example
+ *
+ * ```typescript
+ * import { SITES_CHANNELS } from "@shared/types/preload";
+ * import { registerStandardizedIpcHandler } from "@electron/services/ipc/utils";
+ *
+ * registerStandardizedIpcHandler(
+ *  SITES_CHANNELS.updateSite,
+ *  async (identifier: string, updates: Partial<Site>) =>
+ *   uptimeOrchestrator.updateSite(identifier, updates),
+ *  SiteHandlerValidators.updateSite,
+ *  registeredHandlers
  * );
  * ```
  *

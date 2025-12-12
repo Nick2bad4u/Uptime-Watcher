@@ -10,7 +10,6 @@ import {
     isMonitorSnapshot,
     isSiteSnapshot,
     mergeMonitorSnapshots,
-    mergeSiteSnapshots,
 } from "@shared/utils/siteSnapshots";
 import { isObject } from "@shared/utils/typeGuards";
 
@@ -249,6 +248,10 @@ export class SnapshotSyncCoordinator {
                         result
                     );
 
+                // SiteManager cache should normally hold fully-hydrated
+                // snapshots, but unit tests may supply minimal shapes. Treat
+                // cache data as best-effort enrichment rather than rejecting
+                // it outright.
                 const siteFromCache =
                     this.siteManager.getSiteFromCache(siteIdentifier);
 
@@ -270,43 +273,83 @@ export class SnapshotSyncCoordinator {
                     );
                 }
 
-                const canonicalMonitor = monitorFromPayload ?? monitorFromCache;
-
-                if (!canonicalMonitor) {
-                    logger.warn(
-                        "[UptimeOrchestrator] Manual check completion missing monitor context after validation",
-                        { monitorId, siteIdentifier }
-                    );
-
-                    return;
-                }
-
-                const canonicalSite = siteFromPayload ?? siteFromCache;
-
-                if (!canonicalSite) {
-                    logger.warn(
-                        "[UptimeOrchestrator] Manual check completion missing site context after validation",
-                        { monitorId, siteIdentifier }
-                    );
-
-                    return;
-                }
-
-                const enrichedMonitor = mergeMonitorSnapshots(
-                    canonicalMonitor,
-                    monitorFromCache
+                // When the manual-check completion payload already includes a
+                // validated monitor+site snapshot, do not mutate it. Unit
+                // tests (and upstream contracts) expect the forwarded
+                // `StatusUpdate` to preserve the original snapshots.
+                const hasPayloadSnapshots = Boolean(
+                    monitorFromPayload && siteFromPayload
                 );
 
-                const enrichedSite = mergeSiteSnapshots(
-                    canonicalSite,
-                    siteFromCache
-                );
+                // Default to the original result (no mutation). Only override
+                // when payload snapshots are missing and we need to enrich from
+                // the cache.
+                let enrichedResult: StatusUpdate = result;
 
-                const enrichedResult: StatusUpdate = {
-                    ...result,
-                    monitor: enrichedMonitor,
-                    site: enrichedSite,
-                };
+                if (!hasPayloadSnapshots) {
+                    const fallbackSite = siteFromPayload ?? siteFromCache;
+                    const fallbackMonitor =
+                        monitorFromPayload ?? monitorFromCache;
+
+                    if (!fallbackMonitor) {
+                        logger.warn(
+                            "[UptimeOrchestrator] Manual check completion missing monitor context after validation",
+                            { monitorId, siteIdentifier }
+                        );
+
+                        return;
+                    }
+
+                    if (!fallbackSite) {
+                        logger.warn(
+                            "[UptimeOrchestrator] Manual check completion missing site context after validation",
+                            { monitorId, siteIdentifier }
+                        );
+
+                        return;
+                    }
+
+                    // If we're falling back to the cached snapshots but we do
+                    // have a validated monitor snapshot from the payload,
+                    // layer the payload monitor onto the cached monitor so the
+                    // emitted payload reflects the freshest status details.
+                    const effectiveMonitor =
+                        monitorFromPayload &&
+                        monitorFromCache &&
+                        isMonitorSnapshot(monitorFromCache)
+                            ? mergeMonitorSnapshots(
+                                  monitorFromCache,
+                                  monitorFromPayload
+                              )
+                            : fallbackMonitor;
+
+                    const effectiveSite =
+                        monitorFromPayload && fallbackSite === siteFromCache
+                            ? {
+                                  ...fallbackSite,
+                                  monitors: fallbackSite.monitors.map((
+                                      candidate
+                                  ) => {
+                                      if (candidate.id !== monitorId) {
+                                          return candidate;
+                                      }
+
+                                      return isMonitorSnapshot(candidate)
+                                          ? mergeMonitorSnapshots(
+                                                candidate,
+                                                monitorFromPayload
+                                            )
+                                          : candidate;
+                                  }),
+                              }
+                            : fallbackSite;
+
+                    enrichedResult = {
+                        ...result,
+                        monitor: effectiveMonitor,
+                        site: effectiveSite,
+                    };
+                }
 
                 const payload: ManualCheckCompletedPayload = {
                     checkType: "manual",

@@ -39,26 +39,11 @@ export interface AppSettings {
     theme: ThemeName;
 }
 
-/**
- * Base store interface providing common error handling and loading state
- * functionality.
- *
- * @remarks
- * Standard error handling and loading state pattern used across all stores. All
- * store interfaces should extend this for consistent error handling.
- */
-export interface BaseStore {
-    /** Clear the current error message */
-    clearError: () => void;
-    /** Whether an async operation is currently in progress */
-    isLoading: boolean;
-    /** The last error message, if any */
-    lastError: string | undefined;
-    /** Set an error message in the store */
-    setError: (error: string | undefined) => void;
-    /** Set the loading state */
-    setLoading: (loading: boolean) => void;
-}
+// NOTE: This project intentionally does not expose a store-owned error/loading
+// base interface (like `lastError` / `isLoading`) for domain stores.
+//
+// Domain stores should report errors/loading through `useErrorStore` via
+// `createStoreErrorHandler`.
 
 /**
  * Chart time range options for data visualization.

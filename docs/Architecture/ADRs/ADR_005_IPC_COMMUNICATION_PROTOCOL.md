@@ -3,7 +3,7 @@ schema: "../../../config/schemas/doc-frontmatter.schema.json"
 title: "ADR-005: IPC Communication Protocol"
 summary: "Defines a standardized, type-safe IPC communication protocol using Electron's contextBridge with validation, error handling, and static guard rails."
 created: "2025-08-05"
-last_reviewed: "2025-11-17"
+last_reviewed: "2025-12-11"
 category: "guide"
 author: "Nick2bad4u"
 tags:
@@ -238,7 +238,7 @@ contextBridge.exposeInMainWorld("electronAPI", electronAPI);
 
 #### 2025-10-21 Contract Update
 
-The `remove-monitor` invoke channel now returns the persisted `Site` snapshot emitted by the main process. The generated preload bridge mirrors this contract (`sitesApi.removeMonitor(): Promise<Site>`), allowing the renderer to reconcile state without performing ad-hoc reconstruction. Always apply the returned entity via `SiteService.removeMonitor` ➔ `applySavedSiteToStore` and avoid synthesizing partial results locally. This keeps optimistic updates aligned with the authoritative orchestrator payload and matches the guidance in `docs/TSDoc/stores/sites.md`. For a canonical implementation, reference [`SiteService.removeMonitor`](../../../src/services/SiteService.ts), which validates the persisted snapshot with the shared guards before updating renderer state.
+The `remove-monitor` invoke channel now returns the persisted `Site` snapshot emitted by the main process. The generated preload bridge mirrors this contract (`sitesApi.removeMonitor(): Promise<Site>`), allowing the renderer to reconcile state without performing ad-hoc reconstruction. Always apply the returned entity via `SiteService.removeMonitor` ➔ `applySavedSiteToStore` and avoid synthesizing partial results locally. This keeps optimistic updates aligned with the authoritative orchestrator payload and matches the guidance in `docs/Architecture/Stores/sites.md`. For a canonical implementation, reference [`SiteService.removeMonitor`](../../../src/services/SiteService.ts), which validates the persisted snapshot with the shared guards before updating renderer state.
 
 #### 2025-10-26 Contract Update
 
@@ -280,6 +280,49 @@ The script (`scripts/architecture-static-guards.mjs`) performs the following che
 4. **Typed event usage** – Event names passed to `.emitTyped()`, `.onTyped()`, `.offTyped()`, and `.onceTyped()` in production Electron code must be declared in `electron/events/eventTypes.ts`. This prevents drift between the authoritative event catalogue and the actual event bus usage.
 
 These guard rails make the IPC protocol self-enforcing: new features that attempt to bypass the established patterns will fail fast during `lint:architecture`, rather than silently weakening the security or maintainability of the boundary.
+
+### 3.2 Preload Domain API Complexity (Thin vs Hardened)
+
+Preload domain modules under `electron/preload/domains/**` fall into two
+categories. Mixing these patterns without intention leads to duplicated
+validation logic and inconsistent boundary hardening.
+
+#### Thin invoker domains (default)
+
+Use a thin domain module when the API is primarily request/response IPC.
+
+- Implementation: compose typed methods with `createTypedInvoker(CHANNEL)`.
+- Avoid: bespoke retries, custom correlation IDs, ad-hoc logging per method.
+- Example: `electron/preload/domains/sitesApi.ts` (thin typed invokers)
+
+This keeps the preload surface area small and ensures shared behaviors (correlation
+envelopes, response normalization, and error formatting) remain centralized.
+
+#### Hardened boundary domains (special cases)
+
+Use a hardened domain module when the API:
+
+- registers long-lived event listeners / streaming handlers,
+
+- forwards payloads to renderer callbacks,
+
+- handles potentially sensitive/high-volume payloads, or
+
+- needs strict payload size enforcement and redaction.
+
+- Implementation: validate payloads before invoking renderer callbacks; attach structured log context; enforce size limits; ensure cleanup is deterministic.
+
+- Example: `electron/preload/domains/eventsApi.ts` (guards + telemetry around the renderer event bridge)
+
+#### Enforcement (guard rails)
+
+To keep this consistent and prevent new AI-driven codepaths:
+
+- Preload domains must not use `ipcRenderer` directly (core bridgeFactory owns it).
+- Preload domains must not define inline IPC channel string constants; they must import shared registries from `shared/types/preload.ts`.
+
+These invariants are enforced via the repository lint guard rails and the
+custom `uptime-watcher/*` ESLint rules.
 
 ### 4. Event Forwarding Protocol
 
@@ -350,8 +393,8 @@ sequenceDiagram
     API->>+Preload: Type-safe IPC call
     Note right of Preload: Channel: 'add-site'
 
-    Preload->>+IpcMain: ipcRenderer.invoke()
-    Note right of IpcMain: Crosses security boundary
+    Preload->>+IpcMain: createTypedInvoker() → (internal invoke)
+    Note right of IpcMain: Crosses security boundary (hidden behind the typed preload bridge)
 
     IpcMain->>+Service: Route to registered handler
     Service->>+Validator: Validate parameters
@@ -671,7 +714,10 @@ describe("Sites IPC Handlers", () => {
   );
   ipcService.setupHandlers();
 
-  const result = await ipcRenderer.invoke("add-site", siteData);
+    // In production, preload exposes a typed invoker (createTypedInvoker)
+    // for SITES_CHANNELS.addSite. Tests can call the invoker directly.
+    const invokeAddSite = createTypedInvoker(SITES_CHANNELS.addSite);
+    const result = await invokeAddSite(siteData);
   expect(result).toEqual(mockSite);
  });
 });
@@ -698,7 +744,10 @@ describe("Sites IPC Handlers", () => {
 
 ### 1. Handler Registration
 
-All IPC handlers must be registered through `IpcService.registerStandardizedIpcHandler()`.
+All IPC handlers must be registered through the centralized helper
+`registerStandardizedIpcHandler` (implemented in
+`electron/services/ipc/utils.ts`) and should be wired from domain handler
+modules under `electron/services/ipc/handlers/**`.
 
 ### 2. Type Definitions
 

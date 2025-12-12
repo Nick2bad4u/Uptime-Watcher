@@ -33,7 +33,9 @@
  * // In the preload layer, handlers return `IpcResponse<T>` instances, which
  * // are validated and unwrapped by the typed bridge factory before reaching
  * // `window.electronAPI`.
- * const rawResponse = await ipcRenderer.invoke("get-sites");
+ * // Avoid direct ipcRenderer usage in app code.
+ * // Preload should use: createTypedInvoker(SITES_CHANNELS.getSites)
+ * // Renderer should use: src/services/* wrappers.
  * if (isIpcResponse<Site[]>(rawResponse)) {
  *     const sites = extractIpcData<Site[]>(rawResponse);
  *     setSites(sites);

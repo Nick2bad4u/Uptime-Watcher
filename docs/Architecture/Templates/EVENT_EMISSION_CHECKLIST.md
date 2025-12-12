@@ -3,7 +3,7 @@ schema: "../../../config/schemas/doc-frontmatter.schema.json"
 title: "Event Emission Checklist"
 summary: "Checklist for defining and emitting typed events across main/renderer aligned with RendererEventPayloadMap."
 created: "2025-12-04"
-last_reviewed: "2025-12-04"
+last_reviewed: "2025-12-11"
 category: "guide"
 author: "Nick2bad4u"
 tags:
@@ -31,7 +31,7 @@ Use this checklist whenever adding or modifying events (main, renderer, or prelo
 ## Checklist
 
 - [ ] Channel name follows existing conventions (domain:action).
-- [ ] Payload type added to `RendererEventPayloadMap` (and Zod schema where applicable).
+- [ ] Payload type exists in `@shared/types/events` and is referenced by `RendererEventPayloadMap`.
 - [ ] CorrelationId and metadata included (`_meta` preserved on re-emit).
 - [ ] Validation at boundary (IPC handler or preload) before emission.
 - [ ] Renderer broadcast path defined (webContents.send + preload validation).
@@ -41,47 +41,28 @@ Use this checklist whenever adding or modifying events (main, renderer, or prelo
 ## Minimal Skeleton
 
 ```typescript
-// shared/types/events.ts
-export interface RendererEventPayloadMap {
-    "monitor:status-changed": MonitorStatusChangedEventData;
-    // new channel here
-    "notifications:sent": NotificationSentEventData;
-}
+import { RENDERER_EVENT_CHANNELS } from "@shared/ipc/rendererEvents";
+import type { RendererEventPayload } from "@shared/ipc/rendererEvents";
 
 // main (orchestrator / manager event bus)
-await eventBus.emitTyped("notifications:sent", {
-    notificationId,
-    siteIdentifier,
-    monitorId,
-    status,
+await eventBus.emitTyped("site:added", {
+    identifier: "example",
+    site,
+    source: "user",
     timestamp: Date.now(),
 });
 
-// main (ApplicationService → renderer event bridge)
-this.scopedSubscriptions.onTyped<UptimeEvents, "notifications:sent">(
-    orchestrator,
-    "notifications:sent",
-    (data) => {
-        const payload = this.stripOrchestratorPayloadMetadata(
-            "notifications:sent",
-            data
-        );
-
-        this.emitRendererEvent(
-            RENDERER_EVENT_CHANNELS.NOTIFICATIONS_SENT,
-            payload
-        );
-    }
+// main (renderer event bridge)
+rendererEventBridge.sendToRenderers(
+    RENDERER_EVENT_CHANNELS.SITE_ADDED,
+    payload satisfies RendererEventPayload<typeof RENDERER_EVENT_CHANNELS.SITE_ADDED>
 );
 
-// preload (events domain bridge – conceptual)
-ipcRenderer.on(
-    RENDERER_EVENT_CHANNELS.NOTIFICATIONS_SENT,
-    (_event, payload: NotificationSentEventData) => {
-        validateNotificationPayload(payload);
-        // Bridge forwards to window.electronAPI.events.onNotificationsSent
-        // via createEventManager/EventsDomainBridge; renderer code only sees
-        // typed subscription helpers (for example, EventsService.onNotificationsSent).
-    }
-);
+// preload
+// Use createEventManager(RENDERER_EVENT_CHANNELS.SITE_ADDED) + a guard, then
+// expose the subscription via the events domain bridge.
+
+// renderer
+// Subscribe via EventsService (which consumes the preload events bridge and
+// normalizes cleanup handlers).
 ```

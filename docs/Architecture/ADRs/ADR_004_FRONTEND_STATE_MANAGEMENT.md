@@ -3,7 +3,7 @@ schema: "../../../config/schemas/doc-frontmatter.schema.json"
 title: "ADR-004: Frontend State Management with Zustand"
 summary: "Defines the frontend state management strategy using Zustand with modular composition and selective persistence."
 created: "2025-08-05"
-last_reviewed: "2025-11-17"
+last_reviewed: "2025-12-11"
 category: "guide"
 author: "Nick2bad4u"
 tags:
@@ -64,15 +64,38 @@ export const useErrorStore = create<ErrorStore>()((set, get) => ({
  isLoading: false,
  lastError: undefined,
  storeErrors: {},
+ operationLoading: {},
 
  // Actions
- setError: (error: string | undefined) => {
-  logStoreAction("ErrorStore", "setError", { error });
-  set({ lastError: error });
+ setStoreError: (storeKey: string, error: string) => {
+  logStoreAction("ErrorStore", "setStoreError", { storeKey, error });
+  set((state) => ({
+   storeErrors: {
+    ...state.storeErrors,
+    [storeKey]: error,
+   },
+  }));
  },
- setLoading: (loading: boolean) => {
-  logStoreAction("ErrorStore", "setLoading", { loading });
-  set({ isLoading: loading });
+ clearStoreError: (storeKey: string) => {
+  logStoreAction("ErrorStore", "clearStoreError", { storeKey });
+  set((state) => ({
+   storeErrors: {
+    ...state.storeErrors,
+    [storeKey]: undefined,
+   },
+  }));
+ },
+ setOperationLoading: (operationName: string, loading: boolean) => {
+  logStoreAction("ErrorStore", "setOperationLoading", {
+   operationName,
+   loading,
+  });
+  set((state) => ({
+   operationLoading: {
+    ...state.operationLoading,
+    [operationName]: loading,
+   },
+  }));
  },
 }));
 ```
@@ -193,8 +216,13 @@ const performAction = async () => {
   const result = await SiteService.addSite(data);
   addSite(result); // Update store state
   return result;
- }, errorStore);
+ }, createStoreErrorHandler("sites", "addSite"));
 };
+
+**Guideline:** For most async store actions, prefer
+`withErrorHandling(..., createStoreErrorHandler(...))` (ADR-003). If the action
+needs extra side effects on failure (rollback, cross-slice coordination), use a
+documented inline `ErrorHandlingFrontendStore` context instead.
 ```
 
 ## Store Categories

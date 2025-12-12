@@ -29,6 +29,7 @@ const toStringRecord = (map: unknown): Record<string, string> => {
 
 const CHANNEL_MAPS: Record<string, Record<string, string>> = {
     DATA_CHANNELS: toStringRecord(preloadChannels.DATA_CHANNELS),
+    DIAGNOSTICS_CHANNELS: toStringRecord(preloadChannels.DIAGNOSTICS_CHANNELS),
     MONITORING_CHANNELS: toStringRecord(preloadChannels.MONITORING_CHANNELS),
     MONITOR_TYPES_CHANNELS: toStringRecord(
         preloadChannels.MONITOR_TYPES_CHANNELS

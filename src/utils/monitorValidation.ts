@@ -5,15 +5,12 @@
  * @public
  */
 
+import type { Monitor, MonitorType } from "@shared/types";
 import type { ValidationResult } from "@shared/types/validation";
 import type { Simplify, UnknownRecord } from "type-fest";
 
-import {
-    BASE_MONITOR_TYPES,
-    type Monitor,
-    type MonitorType,
-} from "@shared/types";
 import { withUtilityErrorHandling } from "@shared/utils/errorHandling";
+import { validateMonitorType } from "@shared/utils/validation";
 import {
     validateMonitorData as sharedValidateMonitorData,
     validateMonitorField as sharedValidateMonitorField,
@@ -39,13 +36,8 @@ import type {
 
 import { useMonitorTypesStore } from "../stores/monitor/useMonitorTypesStore";
 
-/**
- * Runtime set of all supported monitor type discriminants.
- */
-const MONITOR_TYPE_SET = new Set<string>(BASE_MONITOR_TYPES);
-
 const isKnownMonitorType = (value: string): value is MonitorType =>
-    MONITOR_TYPE_SET.has(value);
+    validateMonitorType(value);
 
 /**
  * Maps each monitor type to the specific renderer form data variant.

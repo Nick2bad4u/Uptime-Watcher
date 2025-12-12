@@ -6,14 +6,15 @@ summary: >-
   audits produced during the 2025 refactor, including the comprehensive file
   review tracker for future AI/context use.
 created: "2025-12-01"
-last_reviewed: "2025-12-01"
-category: "architecture"
+last_reviewed: "2025-12-12"
+category: "guide"
 author: "AI Pair"
 tags:
   - "typing"
   - "audit"
   - "architecture"
   - "history"
+
 ---
 
 # Typing Audit History

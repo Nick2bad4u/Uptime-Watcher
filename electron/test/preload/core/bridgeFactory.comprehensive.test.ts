@@ -20,6 +20,15 @@ import type {
     IpcInvokeChannel,
     IpcInvokeChannelParams,
 } from "@shared/types/ipc";
+import {
+    DATA_CHANNELS,
+    DIAGNOSTICS_CHANNELS,
+    MONITORING_CHANNELS,
+    MONITOR_TYPES_CHANNELS,
+    SETTINGS_CHANNELS,
+    SITES_CHANNELS,
+    STATE_SYNC_CHANNELS,
+} from "@shared/types/preload";
 import type { Site } from "@shared/types";
 
 const ipcRendererMock = vi.hoisted(() => ({
@@ -32,12 +41,11 @@ vi.mock("electron", () => ({
     ipcRenderer: ipcRendererMock,
 }));
 
-const formatDetailChannel = "format-monitor-detail" satisfies IpcInvokeChannel;
-const startMonitoringChannel = "start-monitoring" satisfies IpcInvokeChannel;
-const resetSettingsChannel = "reset-settings" satisfies IpcInvokeChannel;
-const ipcContext = expect.objectContaining({
-    __uptimeWatcherIpcContext: true,
-});
+const formatDetailChannel: IpcInvokeChannel =
+    MONITOR_TYPES_CHANNELS.formatMonitorDetail;
+const startMonitoringChannel: IpcInvokeChannel =
+    MONITORING_CHANNELS.startMonitoring;
+const resetSettingsChannel: IpcInvokeChannel = SETTINGS_CHANNELS.resetSettings;
 
 function createHandshakeSuccess(
     channel: string,
@@ -101,7 +109,7 @@ describe("bridgeFactory", function describeBridgeFactorySuite() {
 
             expect(ipcRenderer.invoke).toHaveBeenNthCalledWith(
                 1,
-                "diagnostics-verify-ipc-handler",
+                DIAGNOSTICS_CHANNELS.verifyIpcHandler,
                 formatDetailChannel
             );
             expect(ipcRenderer.invoke).toHaveBeenNthCalledWith(
@@ -109,7 +117,10 @@ describe("bridgeFactory", function describeBridgeFactorySuite() {
                 formatDetailChannel,
                 "http",
                 "status-page",
-                ipcContext
+                expect.objectContaining({
+                    __uptimeWatcherIpcContext: true,
+                    correlationId: expect.any(String),
+                })
             );
             expect(result).toBe("detail");
         });
@@ -167,8 +178,8 @@ describe("bridgeFactory", function describeBridgeFactorySuite() {
         });
 
         it("throws an IpcError when diagnostics reports an unregistered handler", async () => {
-            const missingChannel =
-                "request-full-sync" satisfies IpcInvokeChannel;
+            const missingChannel: IpcInvokeChannel =
+                STATE_SYNC_CHANNELS.requestFullSync;
 
             vi.mocked(ipcRenderer.invoke).mockResolvedValueOnce(
                 createHandshakeFailure(missingChannel)
@@ -182,7 +193,7 @@ describe("bridgeFactory", function describeBridgeFactorySuite() {
             });
 
             expect(ipcRenderer.invoke).toHaveBeenCalledWith(
-                "diagnostics-verify-ipc-handler",
+                DIAGNOSTICS_CHANNELS.verifyIpcHandler,
                 missingChannel
             );
         });
@@ -202,13 +213,16 @@ describe("bridgeFactory", function describeBridgeFactorySuite() {
             await expect(reset()).resolves.toBeUndefined();
             expect(ipcRenderer.invoke).toHaveBeenNthCalledWith(
                 1,
-                "diagnostics-verify-ipc-handler",
+                DIAGNOSTICS_CHANNELS.verifyIpcHandler,
                 resetSettingsChannel
             );
             expect(ipcRenderer.invoke).toHaveBeenNthCalledWith(
                 2,
                 resetSettingsChannel,
-                ipcContext
+                expect.objectContaining({
+                    __uptimeWatcherIpcContext: true,
+                    correlationId: expect.any(String),
+                })
             );
         });
 
@@ -251,9 +265,11 @@ describe("bridgeFactory", function describeBridgeFactorySuite() {
 
     describe("typed channel utility", () => {
         it("enforces parameter tuples at compile time", async () => {
-            const invoke = createTypedInvoker("remove-monitor");
+            const invoke = createTypedInvoker(SITES_CHANNELS.removeMonitor);
 
-            const args: IpcInvokeChannelParams<"remove-monitor"> = [
+            const args: IpcInvokeChannelParams<
+                typeof SITES_CHANNELS.removeMonitor
+            > = [
                 "site-1",
                 "monitor-1",
             ];
@@ -266,7 +282,9 @@ describe("bridgeFactory", function describeBridgeFactorySuite() {
             } satisfies Site;
 
             vi.mocked(ipcRenderer.invoke)
-                .mockResolvedValueOnce(createHandshakeSuccess("remove-monitor"))
+                .mockResolvedValueOnce(
+                    createHandshakeSuccess(SITES_CHANNELS.removeMonitor)
+                )
                 .mockResolvedValueOnce({
                     data: persistedSite,
                     success: true,
@@ -274,6 +292,22 @@ describe("bridgeFactory", function describeBridgeFactorySuite() {
 
             await expect(invoke(...args)).resolves.toEqual(persistedSite);
             expect(typeof invoke).toBe("function");
+
+            expect(ipcRenderer.invoke).toHaveBeenNthCalledWith(
+                1,
+                DIAGNOSTICS_CHANNELS.verifyIpcHandler,
+                SITES_CHANNELS.removeMonitor
+            );
+            expect(ipcRenderer.invoke).toHaveBeenNthCalledWith(
+                2,
+                SITES_CHANNELS.removeMonitor,
+                "site-1",
+                "monitor-1",
+                expect.objectContaining({
+                    __uptimeWatcherIpcContext: true,
+                    correlationId: expect.any(String),
+                })
+            );
         });
 
         it("rejects invalid channel usage", async () => {
@@ -300,13 +334,13 @@ describe("bridgeFactory", function describeBridgeFactorySuite() {
             const details = { context: "test" } as const;
             const error = new IpcError(
                 "message",
-                "export-data",
+                DATA_CHANNELS.exportData,
                 inner,
                 details
             );
 
             expect(error.message).toBe("message");
-            expect(error.channel).toBe("export-data");
+            expect(error.channel).toBe(DATA_CHANNELS.exportData);
             expect(error.originalError).toBe(inner);
             expect(error.details).toEqual(details);
             expect(error.details).not.toBe(details);

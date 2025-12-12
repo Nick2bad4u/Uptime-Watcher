@@ -16,10 +16,10 @@ const healthySummary: StatusUpdateSubscriptionSummary = {
     expectedListeners: 4,
     listenersAttached: 4,
     listenerStates: [
-        { attached: true, name: "monitor-status-changed" },
-        { attached: true, name: "monitor-check-completed" },
-        { attached: true, name: "monitoring-started" },
-        { attached: true, name: "monitoring-stopped" },
+        { attached: true, name: "monitor:status-changed" },
+        { attached: true, name: "monitor:check-completed" },
+        { attached: true, name: "monitoring:started" },
+        { attached: true, name: "monitoring:stopped" },
     ],
     message: "ok",
     subscribed: true,
@@ -31,10 +31,10 @@ const fallbackSummary: StatusUpdateSubscriptionSummary = {
     expectedListeners: 4,
     listenersAttached: 0,
     listenerStates: [
-        { attached: false, name: "monitor-status-changed" },
-        { attached: false, name: "monitor-check-completed" },
-        { attached: false, name: "monitoring-started" },
-        { attached: false, name: "monitoring-stopped" },
+        { attached: false, name: "monitor:status-changed" },
+        { attached: false, name: "monitor:check-completed" },
+        { attached: false, name: "monitoring:started" },
+        { attached: false, name: "monitoring:stopped" },
     ],
     message: "retry failed",
     subscribed: false,
@@ -56,7 +56,7 @@ const singleChannelSummary: StatusUpdateSubscriptionSummary = {
     ...healthySummary,
     expectedListeners: 1,
     listenersAttached: 1,
-    listenerStates: [{ attached: true, name: "monitor-status-changed" }],
+    listenerStates: [{ attached: true, name: "monitor:status-changed" }],
 };
 
 const mockStore = {

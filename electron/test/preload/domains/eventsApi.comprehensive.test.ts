@@ -447,7 +447,7 @@ describe("Events Domain API", () => {
                 expect.objectContaining({
                     channel: "monitor:status-changed",
                     guard: expect.stringContaining("isMonitor"),
-                    reason: "payload-validation",
+                    reason: "monitor:status-changed",
                 })
             );
         });
@@ -523,7 +523,7 @@ describe("Events Domain API", () => {
                 expect.objectContaining({
                     channel: "monitor:check-completed",
                     guard: "isMonitorCheckCompletedEventDataPayload",
-                    reason: "monitor-check-completed",
+                    reason: "monitor:check-completed",
                 })
             );
         });
@@ -586,7 +586,7 @@ describe("Events Domain API", () => {
                 expect.objectContaining({
                     channel: "settings:history-limit-updated",
                     guard: "isHistoryLimitUpdatedEventDataPayload",
-                    reason: "history-limit-updated",
+                    reason: "settings:history-limit-updated",
                 })
             );
         });
@@ -639,7 +639,7 @@ describe("Events Domain API", () => {
                 expect.objectContaining({
                     channel: "site:added",
                     guard: "isSiteAddedEventDataPayload",
-                    reason: "site-added",
+                    reason: "site:added",
                 })
             );
         });
@@ -689,7 +689,7 @@ describe("Events Domain API", () => {
                 expect.objectContaining({
                     channel: "site:removed",
                     guard: "isSiteRemovedEventDataPayload",
-                    reason: "site-removed",
+                    reason: "site:removed",
                 })
             );
         });
@@ -744,7 +744,7 @@ describe("Events Domain API", () => {
                 expect.objectContaining({
                     channel: "site:updated",
                     guard: "isSiteUpdatedEventDataPayload",
-                    reason: "site-updated",
+                    reason: "site:updated",
                 })
             );
         });

@@ -26,6 +26,7 @@ import type {
 import type { MonitorTypeConfig } from "@shared/types/monitorTypes";
 import type { ValidationResult } from "@shared/types/validation";
 import { useMonitorTypesStore } from "../../../stores/monitor/useMonitorTypesStore";
+import { useErrorStore } from "../../../stores/error/useErrorStore";
 
 // Store the original implementations to restore later
 const originalWithErrorHandling = vi.hoisted(() => vi.fn());
@@ -112,6 +113,13 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
         // Reset all mocks
         vi.clearAllMocks();
 
+        useErrorStore.setState({
+            isLoading: false,
+            lastError: undefined,
+            operationLoading: {},
+            storeErrors: {},
+        });
+
         // Set up default withErrorHandling behavior
         originalWithErrorHandling.mockImplementation(async (operation, store) => {
             try {
@@ -139,15 +147,10 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
         );
 
         // Reset Zustand store to initial state
-        const store = useMonitorTypesStore.getState();
-        store.clearError();
-        store.setLoading(false);
         useMonitorTypesStore.setState({
             monitorTypes: [],
             fieldConfigs: {},
             isLoaded: false,
-            isLoading: false,
-            lastError: undefined,
         });
     });
 
@@ -243,6 +246,7 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
             ];
 
             for (const invalidResponse of invalidResponses) {
+                useErrorStore.getState().clearStoreError("monitor-types");
                 mockElectronAPI.monitorTypes.getMonitorTypes.mockResolvedValueOnce(
                     invalidResponse
                 );
@@ -256,7 +260,9 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
                 });
 
                 expect(result.current.monitorTypes).toEqual([]);
-                expect(result.current.lastError).toContain("invalid payload");
+                expect(
+                    useErrorStore.getState().getStoreError("monitor-types")
+                ).toContain("invalid payload");
             }
 
             // Empty array is now considered a valid (though empty) result
@@ -273,7 +279,9 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
             });
 
             expect(emptyResult.current.monitorTypes).toEqual([]);
-            expect(emptyResult.current.lastError).toBeUndefined();
+            expect(useErrorStore.getState().getStoreError("monitor-types")).toBe(
+                undefined
+            );
         });
     });
 
@@ -338,7 +346,9 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
             });
 
             expect(result.current.monitorTypes).toEqual([]);
-            expect(result.current.lastError).toContain("invalid payload");
+            expect(useErrorStore.getState().getStoreError("monitor-types")).toContain(
+                "invalid payload"
+            );
         });
 
         it("should handle configs with complex field structures", async ({
@@ -483,8 +493,14 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
                     }
                 });
 
-                expect(result.current.lastError).toBe(String(errorType));
-                expect(result.current.isLoading).toBeFalsy();
+                expect(useErrorStore.getState().getStoreError("monitor-types")).toBe(
+                    String(errorType)
+                );
+                expect(
+                    useErrorStore
+                        .getState()
+                        .getOperationLoading("monitorTypes.loadTypes")
+                ).toBeFalsy();
             }
         });
 
@@ -505,8 +521,6 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
                     monitorTypes: [],
                     fieldConfigs: {},
                     isLoaded: false,
-                    isLoading: false,
-                    lastError: undefined,
                 });
             });
 
@@ -539,11 +553,17 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
                 await result.current.loadMonitorTypes();
             });
 
-            // Loading state should still be true since withErrorHandling didn't reset it
-            expect(result.current.isLoading).toBeTruthy();
+            // Operation loading should still be true since withErrorHandling didn't reset it
+            expect(
+                useErrorStore
+                    .getState()
+                    .getOperationLoading("monitorTypes.loadTypes")
+            ).toBeTruthy();
 
-            // The error should be set since our mock calls setError
-            expect(result.current.lastError).toBe("Operation failed");
+            // The store error should be set since our mock calls setError
+            expect(useErrorStore.getState().getStoreError("monitor-types")).toBe(
+                "Operation failed"
+            );
         });
     });
 
@@ -562,8 +582,6 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
             // Test direct state mutations
             act(() => {
                 useMonitorTypesStore.setState({
-                    isLoading: true,
-                    lastError: "Direct mutation error",
                     isLoaded: true,
                     monitorTypes: [
                         createMonitorTypeConfig({
@@ -578,8 +596,6 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
                 });
             });
 
-            expect(result.current.isLoading).toBeTruthy();
-            expect(result.current.lastError).toBe("Direct mutation error");
             expect(result.current.isLoaded).toBeTruthy();
             expect(result.current.monitorTypes).toHaveLength(1);
             expect(result.current.fieldConfigs).toHaveProperty("direct");
@@ -597,7 +613,6 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
             // Set up some initial state
             useMonitorTypesStore.setState({
                 isLoaded: true,
-                lastError: "test error",
                 fieldConfigs: {
                     test: [
                         {
@@ -640,20 +655,33 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
             await annotate("Category: Store", "category");
             await annotate("Type: Concurrency", "type");
 
-            const { result } = renderHook(() => useMonitorTypesStore());
+            renderHook(() => useMonitorTypesStore());
 
             // Simulate concurrent access sequentially to avoid overlapping act calls
             for (let index = 0; index < 10; index++) {
                 await act(async () => {
-                    result.current.setError(`Error ${index}`);
-                    result.current.setLoading(index % 2 === 0);
-                    result.current.clearError();
+                    useErrorStore
+                        .getState()
+                        .setStoreError("monitor-types", `Error ${index}`);
+                    useErrorStore
+                        .getState()
+                        .setOperationLoading(
+                            "monitorTypes.loadTypes",
+                            index % 2 === 0
+                        );
+                    useErrorStore.getState().clearStoreError("monitor-types");
                 });
             }
 
             // Final state should be consistent
-            expect(result.current.lastError).toBeUndefined();
-            expect(typeof result.current.isLoading).toBe("boolean");
+            expect(useErrorStore.getState().getStoreError("monitor-types")).toBe(
+                undefined
+            );
+            expect(
+                typeof useErrorStore
+                    .getState()
+                    .getOperationLoading("monitorTypes.loadTypes")
+            ).toBe("boolean");
         });
     });
 
@@ -836,7 +864,6 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
                 "MonitorTypesStore",
                 "loadMonitorTypes",
                 {
-                    invalidCount: 0,
                     success: true,
                     typesCount: 0,
                 }
@@ -1061,8 +1088,12 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
 
             // Modify state while operation is pending
             await act(async () => {
-                result.current.setError("Concurrent error");
-                result.current.setLoading(false);
+                useErrorStore
+                    .getState()
+                    .setStoreError("monitor-types", "Concurrent error");
+                useErrorStore
+                    .getState()
+                    .setOperationLoading("monitorTypes.loadTypes", false);
             });
 
             // Complete the operation
@@ -1122,8 +1153,6 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
                 monitorTypes: [],
                 fieldConfigs: {},
                 isLoaded: false,
-                isLoading: false,
-                lastError: undefined,
             });
 
             const state = useMonitorTypesStore.getState();
@@ -1165,12 +1194,10 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
                 monitorTypes: [],
                 fieldConfigs: {},
                 isLoaded: false,
-                isLoading: false,
-                lastError: "force reload",
             });
 
             // Clear the error to start fresh
-            result.current.clearError();
+            useErrorStore.getState().clearStoreError("monitor-types");
 
             // Test network timeouts
             await act(async () => {
@@ -1184,7 +1211,9 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
                 }
             });
 
-            expect(result.current.lastError).toBe("Network timeout");
+            expect(useErrorStore.getState().getStoreError("monitor-types")).toBe(
+                "Network timeout"
+            );
 
             // Test permission errors
             await act(async () => {
@@ -1198,7 +1227,9 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
                 }
             });
 
-            expect(result.current.lastError).toBe("Permission denied");
+            expect(useErrorStore.getState().getStoreError("monitor-types")).toBe(
+                "Permission denied"
+            );
 
             // Test service unavailable errors
             mockElectronAPI.monitorTypes.formatMonitorDetail.mockImplementation(async () => {
@@ -1213,7 +1244,9 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
                 }
             });
 
-            expect(result.current.lastError).toBe("Service unavailable");
+            expect(useErrorStore.getState().getStoreError("monitor-types")).toBe(
+                "Service unavailable"
+            );
 
             // Test corrupted response errors
             mockElectronAPI.monitorTypes.formatMonitorTitleSuffix.mockImplementation(async () => {
@@ -1230,7 +1263,9 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
                 }
             });
 
-            expect(result.current.lastError).toBe("Corrupted response");
+            expect(useErrorStore.getState().getStoreError("monitor-types")).toBe(
+                "Corrupted response"
+            );
         });
     });
 
@@ -1244,33 +1279,40 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
             await annotate("Category: Store", "category");
             await annotate("Type: State Subscriptions", "type");
 
-            const stateChanges: any[] = [];
+            const stateChanges: { storeErrors: Record<string, string | undefined> }[] = [];
 
-            // Subscribe to store changes
-            const unsubscribe = useMonitorTypesStore.subscribe((state) => {
-                stateChanges.push({ ...state });
+            // Subscribe to ErrorStore changes (source of truth for errors/loading)
+            const unsubscribe = useErrorStore.subscribe((state) => {
+                stateChanges.push({ storeErrors: { ...state.storeErrors } });
             });
-
-            const { result } = renderHook(() => useMonitorTypesStore());
 
             // Make changes and verify subscriptions fire
             act(() => {
-                result.current.setError("Test error");
+                useErrorStore.getState().setStoreError("monitor-types", "Test error");
             });
 
             act(() => {
-                result.current.setLoading(true);
+                useErrorStore
+                    .getState()
+                    .setOperationLoading("monitorTypes.loadTypes", true);
             });
 
             act(() => {
-                result.current.clearError();
+                useErrorStore.getState().clearStoreError("monitor-types");
             });
 
             // Verify state changes were captured
             expect(stateChanges.length).toBeGreaterThan(0);
-            expect(stateChanges.some((change) => change.lastError === "Test error")).toBeTruthy();
-            expect(stateChanges.some((change) => change.isLoading === true)).toBeTruthy();
-            expect(stateChanges.some((change) => change.lastError === undefined)).toBeTruthy();
+            expect(
+                stateChanges.some(
+                    (change) => change.storeErrors["monitor-types"] === "Test error"
+                )
+            ).toBeTruthy();
+            expect(
+                stateChanges.some(
+                    (change) => change.storeErrors["monitor-types"] === undefined
+                )
+            ).toBeTruthy();
 
             unsubscribe();
         });
@@ -1297,8 +1339,6 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
                 ],
                 fieldConfigs: { test: [] },
                 isLoaded: true,
-                isLoading: false,
-                lastError: undefined,
             };
 
             // Set test state
@@ -1319,8 +1359,6 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
                     monitorTypes: [],
                     fieldConfigs: {},
                     isLoaded: false,
-                    isLoading: false,
-                    lastError: undefined,
                 });
             });
 

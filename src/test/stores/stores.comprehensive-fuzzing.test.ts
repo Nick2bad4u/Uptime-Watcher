@@ -161,17 +161,19 @@ describe("Stores Comprehensive Fuzzing", () => {
             }
         });
 
-        test("should handle error states", () => {
+        test("should not expose store-owned error actions", () => {
             const { result, unmount } = renderHook(() =>
                 useMonitorTypesStore());
             try {
-                expect(typeof result.current.setError).toBe("function");
-                expect(typeof result.current.clearError).toBe("function");
-
-                act(() => {
-                    result.current.setError("test-error");
-                    result.current.clearError();
-                });
+                expect(
+                    (result.current as Record<string, unknown>)["setError"]
+                ).toBe(undefined);
+                expect(
+                    (result.current as Record<string, unknown>)["clearError"]
+                ).toBe(undefined);
+                expect(
+                    (result.current as Record<string, unknown>)["setLoading"]
+                ).toBe(undefined);
             } finally {
                 unmount();
             }

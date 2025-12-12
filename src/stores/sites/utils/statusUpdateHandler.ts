@@ -10,62 +10,21 @@
  * @public
  */
 import type { RendererEventPayloadMap } from "@shared/ipc/rendererEvents";
-import type { Monitor, Site, StatusUpdate } from "@shared/types";
-import type { MonitorStatusChangedEventData } from "@shared/types/events";
+import type { Site, StatusUpdate } from "@shared/types";
 
 import { isDevelopment } from "@shared/utils/environment";
 import { ensureError } from "@shared/utils/errorHandling";
 import { isEnrichedMonitorStatusChangedEventData } from "@shared/validation/monitorStatusEvents";
 
 import type { ListenerAttachmentState } from "../baseTypes";
+import type { MonitorStatusChangedEvent } from "./statusUpdateMerge";
 
-import { EventsService } from "../../../services/EventsService";
 import { logger } from "../../../services/logger";
-
-/**
- * Monitor status changed event data structure.
- *
- * @remarks
- * This represents the actual data structure sent from the backend when a
- * monitor's status changes. Includes the complete monitor and site objects with
- * updated history for efficient incremental updates.
- *
- * @internal
- */
-type MonitorStatusChangedEvent = MonitorStatusChangedEventData & {
-    /** Complete monitor snapshot with refreshed history. */
-    monitor: Monitor;
-    /** Site context required for notification workflows. */
-    site: Site;
-};
-
-/**
- * Minimal status update payload needed to perform an optimistic site merge.
- *
- * @remarks
- * Represents the subset of {@link StatusUpdate} fields consumed by
- * {@link applyStatusUpdateSnapshot}. Site and monitor snapshots are optional to
- * accommodate legacy IPC payloads that lacked enriched data, while still
- * allowing current callers to provide the full structure.
- */
-export type StatusUpdateSnapshotPayload = Partial<
-    Omit<StatusUpdate, "monitorId" | "siteIdentifier" | "status" | "timestamp">
-> &
-    Pick<StatusUpdate, "monitorId" | "siteIdentifier" | "status" | "timestamp">;
-
-type StatusUpdateSnapshotContext = Required<
-    Pick<StatusUpdate, "monitor" | "site">
->;
-
-const hasSnapshotContext = (
-    payload: StatusUpdateSnapshotPayload
-): payload is StatusUpdateSnapshotContext & StatusUpdateSnapshotPayload =>
-    Boolean(
-        "monitor" in payload &&
-        "site" in payload &&
-        payload["monitor"] &&
-        payload["site"]
-    );
+import {
+    createInitialListenerStates,
+    createStatusUpdateListenerDescriptors,
+} from "./statusUpdateListeners";
+import { mergeMonitorStatusChange } from "./statusUpdateMerge";
 
 /**
  * Configuration options for status update handler operations.
@@ -112,97 +71,6 @@ export interface StatusUpdateHandlerOptions {
      */
     setSites: (sites: Site[]) => void;
 }
-
-function mergeMonitorStatusChange(
-    sites: Site[],
-    event: MonitorStatusChangedEvent
-): Site[] {
-    return sites.map((site) => {
-        if (site.identifier !== event.siteIdentifier) {
-            return site;
-        }
-
-        const monitorExists = site.monitors.some(
-            (monitor) => monitor.id === event.monitorId
-        );
-
-        if (!monitorExists && isDevelopment()) {
-            logger.debug(
-                `Monitor ${event.monitorId} not found in site ${event.siteIdentifier}`
-            );
-        }
-
-        const updatedMonitors = site.monitors.map((monitor) => {
-            if (monitor.id !== event.monitorId) {
-                return monitor;
-            }
-
-            const mergedHistory =
-                event.monitor.history.length === 0 && monitor.history.length > 0
-                    ? monitor.history
-                    : event.monitor.history;
-
-            return {
-                ...event.monitor,
-                history: mergedHistory,
-            };
-        });
-
-        return {
-            ...site,
-            monitors: updatedMonitors,
-        };
-    });
-}
-
-/**
- * Apply a status update snapshot to the provided site collection.
- *
- * @remarks
- * Converts a {@link StatusUpdate} containing full monitor and site snapshots
- * into the enriched monitor status change structure consumed by the
- * orchestrated status update handler. This enables optimistic UI updates when
- * manual checks return immediately from IPC invocations.
- *
- * @param sites - Current site collection from the store.
- * @param statusUpdate - Snapshot emitted from manual check operations.
- *
- * @returns Updated site collection reflecting the provided status update.
- */
-export const applyStatusUpdateSnapshot = (
-    sites: Site[],
-    statusUpdate: StatusUpdateSnapshotPayload
-): Site[] => {
-    if (!hasSnapshotContext(statusUpdate)) {
-        if (isDevelopment()) {
-            logger.debug(
-                "[StatusUpdateHandler] Received status update without site or monitor context; skipping optimistic merge",
-                {
-                    monitorId: statusUpdate.monitorId,
-                    siteIdentifier: statusUpdate.siteIdentifier,
-                }
-            );
-        }
-
-        return sites;
-    }
-
-    const parsedTimestamp = Date.parse(statusUpdate.timestamp);
-    const timestamp = Number.isFinite(parsedTimestamp)
-        ? new Date(parsedTimestamp).toISOString()
-        : new Date().toISOString();
-
-    const { monitor, site } = statusUpdate;
-
-    const event: MonitorStatusChangedEvent = {
-        ...statusUpdate,
-        monitor,
-        site,
-        timestamp,
-    };
-
-    return mergeMonitorStatusChange(sites, event);
-};
 
 /**
  * Result returned when attempting to subscribe to status updates.
@@ -439,130 +307,20 @@ export class StatusUpdateManager {
             label: string;
             register: () => Promise<() => void>;
             scope: string;
-        }> = [
-            {
-                label: "monitor-status-changed",
-                register: () =>
-                    EventsService.onMonitorStatusChanged((data: unknown) => {
-                        void (async (): Promise<void> => {
-                            try {
-                                if (this.isMonitorStatusChangedEvent(data)) {
-                                    logger.debug(
-                                        "Processing valid monitor status change event"
-                                    );
-                                    await this.handleIncrementalStatusUpdate(
-                                        data
-                                    );
-                                } else {
-                                    // Invalid data structure - trigger full sync as fallback
-                                    if (isDevelopment()) {
-                                        logger.warn(
-                                            "Invalid monitor status changed event data, triggering full sync",
-                                            data
-                                        );
-                                        logger.debug(
-                                            "Event failed type guard, triggering full sync"
-                                        );
-                                    }
-                                    await this.fullResyncSites();
-                                }
-                            } catch (error) {
-                                // Log error but don't throw - event handling should continue
-                                logger.error(
-                                    "Monitor status update processing failed",
-                                    ensureError(error)
-                                );
-                            }
-                        })();
-                    }),
-                scope: "monitor-status-changed",
+        }> = createStatusUpdateListenerDescriptors({
+            handleMonitoringStarted: (event) => {
+                this.handleMonitoringLifecycleEvent("started", event);
             },
-            {
-                label: "monitor-check-completed",
-                register: () =>
-                    EventsService.onMonitorCheckCompleted((
-                        event: RendererEventPayloadMap["monitor:check-completed"]
-                    ) => {
-                        void (async (): Promise<void> => {
-                            try {
-                                if (
-                                    this.isMonitorStatusChangedEvent(
-                                        event.result
-                                    )
-                                ) {
-                                    logger.debug(
-                                        "Processing manual monitor check completion event"
-                                    );
-                                    await this.handleIncrementalStatusUpdate(
-                                        event.result
-                                    );
-                                } else {
-                                    if (isDevelopment()) {
-                                        logger.warn(
-                                            "Manual check completion payload missing enriched monitor/site data, triggering full sync",
-                                            event
-                                        );
-                                    }
-                                    await this.fullResyncSites();
-                                }
-                            } catch (error) {
-                                logger.error(
-                                    "Manual monitor check completion processing failed",
-                                    ensureError(error)
-                                );
-                            }
-                        })();
-                    }),
-                scope: "monitor-check-completed",
+            handleMonitoringStopped: (event) => {
+                this.handleMonitoringLifecycleEvent("stopped", event);
             },
-            {
-                label: "monitoring-started",
-                register: () =>
-                    EventsService.onMonitoringStarted((
-                        event: RendererEventPayloadMap["monitoring:started"]
-                    ) => {
-                        try {
-                            this.handleMonitoringLifecycleEvent(
-                                "started",
-                                event
-                            );
-                        } catch (error) {
-                            logger.error(
-                                "Error while processing monitoring started lifecycle event",
-                                ensureError(error)
-                            );
-                        }
-                    }),
-                scope: "monitoring-started",
+            processStatusUpdateCandidate: (candidate, source) => {
+                void this.processStatusUpdateCandidate(candidate, source);
             },
-            {
-                label: "monitoring-stopped",
-                register: () =>
-                    EventsService.onMonitoringStopped((
-                        event: RendererEventPayloadMap["monitoring:stopped"]
-                    ) => {
-                        try {
-                            this.handleMonitoringLifecycleEvent(
-                                "stopped",
-                                event
-                            );
-                        } catch (error) {
-                            logger.error(
-                                "Error while processing monitoring stopped lifecycle event",
-                                ensureError(error)
-                            );
-                        }
-                    }),
-                scope: "monitoring-stopped",
-            },
-        ];
+        });
 
-        let listenerStates: ListenerAttachmentState[] = listenerDescriptors.map(
-            ({ label }) => ({
-                attached: false,
-                name: label,
-            })
-        );
+        let listenerStates: ListenerAttachmentState[] =
+            createInitialListenerStates(listenerDescriptors);
 
         /* eslint-disable no-await-in-loop -- Event listeners must be attached sequentially to preserve registration order */
         for (const [
@@ -577,16 +335,10 @@ export class StatusUpdateManager {
                 const cleanup = await register();
                 this.cleanupFunctions.push(cleanup);
                 listenersAttached += 1;
-                const state = listenerStates[index];
-                if (state) {
-                    listenerStates = listenerStates.map((
-                        listenerState,
-                        listenerIndex
-                    ) =>
-                        listenerIndex === index
-                            ? { ...listenerState, attached: true }
-                            : listenerState);
-                }
+                listenerStates = listenerStates.map((listenerState, idx) =>
+                    idx === index
+                        ? { ...listenerState, attached: true }
+                        : listenerState);
             } catch (error) {
                 const normalizedError = ensureError(error);
                 errors.push(`${scope}: ${normalizedError.message}`);
@@ -613,6 +365,50 @@ export class StatusUpdateManager {
                 !encounteredListenerFailure &&
                 listenersAttached === expectedListeners,
         } satisfies StatusUpdateSubscriptionResult;
+    }
+
+    /**
+     * Process an unknown candidate payload that may represent an enriched
+     * monitor status change.
+     *
+     * @remarks
+     * This method centralizes:
+     *
+     * - Type guard checks
+     * - Development diagnostics
+     * - Fallback to full resync when payloads are incomplete
+     * - Error containment so listener callbacks never throw
+     */
+    private async processStatusUpdateCandidate(
+        candidate: unknown,
+        source: string
+    ): Promise<void> {
+        try {
+            if (this.isMonitorStatusChangedEvent(candidate)) {
+                if (isDevelopment()) {
+                    logger.debug(
+                        `[StatusUpdateHandler] Processing status update candidate from ${source}`
+                    );
+                }
+
+                await this.handleIncrementalStatusUpdate(candidate);
+                return;
+            }
+
+            if (isDevelopment()) {
+                logger.warn(
+                    `[StatusUpdateHandler] ${source} payload missing enriched monitor/site data; triggering full sync`,
+                    candidate
+                );
+            }
+
+            await this.fullResyncSites();
+        } catch (error) {
+            logger.error(
+                `[StatusUpdateHandler] ${source} processing failed`,
+                ensureError(error)
+            );
+        }
     }
 
     /**

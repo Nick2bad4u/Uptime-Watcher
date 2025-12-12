@@ -22,12 +22,10 @@ export type MonitorTypesStoreGetter = StoreApi<MonitorTypesStore>["getState"];
  */
 export const initialMonitorTypesState: Pick<
     MonitorTypesStore,
-    "fieldConfigs" | "isLoaded" | "isLoading" | "lastError" | "monitorTypes"
+    "fieldConfigs" | "isLoaded" | "monitorTypes"
 > = {
     fieldConfigs: {},
     isLoaded: false,
-    isLoading: false,
-    lastError: undefined,
     monitorTypes: [],
 };
 
@@ -35,31 +33,14 @@ export const initialMonitorTypesState: Pick<
  * Creates the basic state slice including field lookups and base store helpers.
  */
 export const createMonitorTypesStateSlice = (
-    setState: MonitorTypesStoreSetter,
+    _setState: MonitorTypesStoreSetter,
     getState: MonitorTypesStoreGetter
 ): Pick<
     MonitorTypesStore,
-    | "clearError"
-    | "fieldConfigs"
-    | "getFieldConfig"
-    | "isLoaded"
-    | "isLoading"
-    | "lastError"
-    | "monitorTypes"
-    | "setError"
-    | "setLoading"
+    "fieldConfigs" | "getFieldConfig" | "isLoaded" | "monitorTypes"
 > => ({
     ...initialMonitorTypesState,
-    clearError: (): void => {
-        setState({ lastError: undefined });
-    },
     getFieldConfig: (
         type: MonitorType
     ): MonitorTypeConfig["fields"] | undefined => getState().fieldConfigs[type],
-    setError: (error: string | undefined): void => {
-        setState({ lastError: error });
-    },
-    setLoading: (loading: boolean): void => {
-        setState({ isLoading: loading });
-    },
 });
