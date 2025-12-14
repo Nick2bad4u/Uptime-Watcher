@@ -38,7 +38,7 @@
         ".*\\.spec\\.[tj]sx?$",
         ".*\\.stories\\.[tj]sx?$",
         "^tailwindcss$",
-        "^tailwind-scrollbar-hide$",
+        "^tailwind-scrollbar-hide(/v4)?$",
         "^tw-animate-css$"
     ],
     "detectiveOptions": {

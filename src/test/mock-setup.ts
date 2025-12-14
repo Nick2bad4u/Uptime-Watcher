@@ -199,6 +199,19 @@ const defaultFullSyncResult: StateSyncFullSyncResult = {
 
 const mockElectronAPI: ElectronAPI = {
     cloud: {
+        clearEncryptionKey: vi.fn<ElectronAPI["cloud"]["clearEncryptionKey"]>(
+            async () => ({
+                provider: null,
+                configured: false,
+                connected: false,
+                backupsEnabled: false,
+                syncEnabled: false,
+                encryptionLocked: false,
+                encryptionMode: "none",
+                lastBackupAt: null,
+                lastSyncAt: null,
+            })
+        ),
         configureFilesystemProvider: vi.fn<
             ElectronAPI["cloud"]["configureFilesystemProvider"]
         >(async () => ({
@@ -207,11 +220,53 @@ const mockElectronAPI: ElectronAPI = {
             connected: true,
             backupsEnabled: true,
             syncEnabled: false,
+            encryptionLocked: false,
+            encryptionMode: "none",
             lastBackupAt: null,
+            lastSyncAt: null,
             providerDetails: {
                 kind: "filesystem",
                 baseDirectory: "C:/mock/cloud",
             },
+        })),
+        connectDropbox: vi.fn<ElectronAPI["cloud"]["connectDropbox"]>(
+            async () => ({
+                provider: "dropbox",
+                configured: true,
+                connected: true,
+                backupsEnabled: true,
+                syncEnabled: false,
+                encryptionLocked: false,
+                encryptionMode: "none",
+                lastBackupAt: null,
+                lastSyncAt: null,
+                providerDetails: {
+                    kind: "dropbox",
+                    accountLabel: "mock@example.com",
+                },
+            })
+        ),
+        disconnect: vi.fn<ElectronAPI["cloud"]["disconnect"]>(async () => ({
+            provider: null,
+            configured: false,
+            connected: false,
+            backupsEnabled: false,
+            syncEnabled: false,
+            encryptionLocked: false,
+            encryptionMode: "none",
+            lastBackupAt: null,
+            lastSyncAt: null,
+        })),
+        enableSync: vi.fn<ElectronAPI["cloud"]["enableSync"]>(async () => ({
+            provider: null,
+            configured: false,
+            connected: false,
+            backupsEnabled: false,
+            syncEnabled: true,
+            encryptionLocked: false,
+            encryptionMode: "none",
+            lastBackupAt: null,
+            lastSyncAt: null,
         })),
         getStatus: vi.fn<ElectronAPI["cloud"]["getStatus"]>(async () => ({
             provider: null,
@@ -219,9 +274,48 @@ const mockElectronAPI: ElectronAPI = {
             connected: false,
             backupsEnabled: false,
             syncEnabled: false,
+            encryptionLocked: false,
+            encryptionMode: "none",
             lastBackupAt: null,
+            lastSyncAt: null,
         })),
         listBackups: vi.fn<ElectronAPI["cloud"]["listBackups"]>(async () => []),
+        migrateBackups: vi.fn<ElectronAPI["cloud"]["migrateBackups"]>(
+            async () => ({
+                completedAt: Date.now(),
+                deleteSource: false,
+                failures: [],
+                migrated: 0,
+                processed: 0,
+                skipped: 0,
+                startedAt: Date.now(),
+                target: "encrypted",
+            })
+        ),
+        previewResetRemoteSyncState: vi.fn<
+            ElectronAPI["cloud"]["previewResetRemoteSyncState"]
+        >(async () => ({
+            deviceIds: [],
+            fetchedAt: Date.now(),
+            operationDeviceIds: [],
+            operationObjectCount: 0,
+            otherObjectCount: 0,
+            perDevice: [],
+            snapshotObjectCount: 0,
+            syncObjectCount: 0,
+        })),
+        requestSyncNow: vi.fn<ElectronAPI["cloud"]["requestSyncNow"]>(
+            async () => undefined
+        ),
+        resetRemoteSyncState: vi.fn<
+            ElectronAPI["cloud"]["resetRemoteSyncState"]
+        >(async () => ({
+            completedAt: Date.now(),
+            deletedObjects: 0,
+            failedDeletions: [],
+            resetAt: Date.now(),
+            startedAt: Date.now(),
+        })),
         restoreBackup: vi.fn<ElectronAPI["cloud"]["restoreBackup"]>(
             async () => ({
                 metadata: {
@@ -237,6 +331,23 @@ const mockElectronAPI: ElectronAPI = {
                 restoredAt: Date.now(),
             })
         ),
+        setEncryptionPassphrase: vi.fn<
+            ElectronAPI["cloud"]["setEncryptionPassphrase"]
+        >(async () => ({
+            provider: "dropbox",
+            configured: true,
+            connected: true,
+            backupsEnabled: true,
+            syncEnabled: true,
+            encryptionLocked: false,
+            encryptionMode: "passphrase",
+            lastBackupAt: null,
+            lastSyncAt: null,
+            providerDetails: {
+                kind: "dropbox",
+                accountLabel: "mock@example.com",
+            },
+        })),
         uploadLatestBackup: vi.fn<ElectronAPI["cloud"]["uploadLatestBackup"]>(
             async () => ({
                 encrypted: false,

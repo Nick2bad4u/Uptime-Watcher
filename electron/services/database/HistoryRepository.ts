@@ -638,7 +638,7 @@ export class HistoryRepository {
         // Prune history for each monitor
         for (const row of monitorRows) {
             // Validate monitor ID is a positive number before using it
-            const monitorId = row.id;
+            const monitorId = Number(row.id);
             if (Number.isFinite(monitorId) && monitorId > 0) {
                 pruneHistoryForMonitor(db, String(monitorId), limit);
             }

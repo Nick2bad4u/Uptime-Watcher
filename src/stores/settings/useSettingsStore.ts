@@ -44,7 +44,11 @@ import type { SettingsStore } from "./types";
 
 import { syncSettingsAfterRehydration } from "./hydration";
 import { createSettingsOperationsSlice } from "./operations";
-import { createSettingsStateSlice } from "./state";
+import { createSettingsStateSlice, normalizeAppSettings } from "./state";
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+    return typeof value === "object" && value !== null;
+}
 
 /**
  * Zustand store for managing application settings with persistence.
@@ -127,6 +131,29 @@ export const useSettingsStore: UseBoundStore<
             ...createSettingsOperationsSlice(set, get),
         }),
         {
+            merge: (persistedState, currentState) => {
+                // Zustand's default merge is shallow, which can replace the
+                // entire `settings` object with an older partial shape.
+                // That breaks invariants (e.g. arrays becoming `undefined`).
+                if (!isRecord(persistedState)) {
+                    return currentState;
+                }
+
+                const base = persistedState as Partial<SettingsStore>;
+                const settingsCandidate = persistedState["settings"];
+                const persistedSettings = isRecord(settingsCandidate)
+                    ? (settingsCandidate as Partial<AppSettings>)
+                    : {};
+
+                return {
+                    ...currentState,
+                    ...base,
+                    settings: normalizeAppSettings({
+                        ...currentState.settings,
+                        ...persistedSettings,
+                    }),
+                };
+            },
             name: "uptime-watcher-settings",
             // After rehydration, sync critical settings from backend
             onRehydrateStorage: () => syncSettingsAfterRehydration,

@@ -278,8 +278,8 @@ export function pruneHistoryForMonitor(
             // Convert numeric IDs to ensure type safety and validate they are
             // numbers
             const excessIds = excess
-                .map((row) => row.id)
-                .filter((id) => Number.isFinite(id) && id > 0);
+                .map((row) => Number(row.id))
+                .filter((id): id is number => Number.isFinite(id) && id > 0);
 
             if (excessIds.length > 0) {
                 // Use parameterized query to avoid SQL injection
