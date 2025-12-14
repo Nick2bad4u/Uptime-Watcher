@@ -25,7 +25,7 @@ import {
 import { stringifyJsonValueStable } from "@shared/utils/canonicalJson";
 import { applyCloudSyncOperationsToState } from "@shared/utils/cloudSyncState";
 
-import type { CloudStorageProvider } from "../cloud/providers/CloudStorageProvider";
+import type { CloudStorageProvider } from "../cloud/providers/CloudStorageProvider.types";
 
 import { ProviderCloudSyncTransport } from "./ProviderCloudSyncTransport";
 

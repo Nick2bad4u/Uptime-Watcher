@@ -5,6 +5,9 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { CloudStatusSummary } from "@shared/types/cloud";
+import type { CloudBackupMigrationResult } from "@shared/types/cloudBackupMigration";
+import type { CloudSyncResetPreview } from "@shared/types/cloudSyncResetPreview";
+import type { CloudSyncResetResult } from "@shared/types/cloudSyncReset";
 
 import { CloudService } from "../../services/CloudService";
 
@@ -77,9 +80,24 @@ describe("CloudService", () => {
 
         mockElectronAPI.cloud.getStatus.mockResolvedValue(defaultStatus);
         mockElectronAPI.cloud.disconnect.mockResolvedValue(defaultStatus);
+        mockElectronAPI.cloud.connectDropbox.mockResolvedValue({
+            ...defaultStatus,
+            provider: "dropbox",
+            connected: true,
+        });
         mockElectronAPI.cloud.enableSync.mockResolvedValue({
             ...defaultStatus,
             syncEnabled: true,
+        });
+        mockElectronAPI.cloud.clearEncryptionKey.mockResolvedValue({
+            ...defaultStatus,
+            encryptionLocked: false,
+            encryptionMode: "none",
+        });
+        mockElectronAPI.cloud.setEncryptionPassphrase.mockResolvedValue({
+            ...defaultStatus,
+            encryptionLocked: false,
+            encryptionMode: "passphrase",
         });
         mockElectronAPI.cloud.configureFilesystemProvider.mockResolvedValue({
             provider: "filesystem",
@@ -98,6 +116,50 @@ describe("CloudService", () => {
         });
         mockElectronAPI.cloud.listBackups.mockResolvedValue([]);
         mockElectronAPI.cloud.requestSyncNow.mockResolvedValue(undefined);
+        const migrationResult: CloudBackupMigrationResult = {
+            completedAt: 10,
+            deleteSource: false,
+            failures: [],
+            migrated: 1,
+            processed: 1,
+            skipped: 0,
+            startedAt: 1,
+            target: "encrypted",
+        };
+        mockElectronAPI.cloud.migrateBackups.mockResolvedValue(migrationResult);
+
+        const preview: CloudSyncResetPreview = {
+            deviceIds: ["device-a"],
+            fetchedAt: 1,
+            latestSnapshotKey: "sync/snapshots/latest",
+            operationDeviceIds: ["device-a"],
+            operationObjectCount: 1,
+            otherObjectCount: 0,
+            perDevice: [
+                {
+                    deviceId: "device-a",
+                    newestCreatedAtEpochMs: 10,
+                    oldestCreatedAtEpochMs: 10,
+                    operationObjectCount: 1,
+                },
+            ],
+            resetAt: undefined,
+            snapshotObjectCount: 1,
+            syncObjectCount: 2,
+        };
+        mockElectronAPI.cloud.previewResetRemoteSyncState.mockResolvedValue(
+            preview
+        );
+
+        const resetResult: CloudSyncResetResult = {
+            completedAt: 10,
+            deletedObjects: 2,
+            failedDeletions: [],
+            resetAt: 123,
+            seededSnapshotKey: "sync/snapshots/new",
+            startedAt: 1,
+        };
+        mockElectronAPI.cloud.resetRemoteSyncState.mockResolvedValue(resetResult);
         mockElectronAPI.cloud.uploadLatestBackup.mockResolvedValue({
             encrypted: false,
             fileName: "uptime-watcher-backup-1.sqlite",
@@ -202,6 +264,64 @@ describe("CloudService", () => {
     it("rejects empty restore key", async () => {
         await expect(CloudService.restoreBackup("")).rejects.toThrowError(
             TypeError
+        );
+    });
+
+    it("connects Dropbox", async () => {
+        const status = await CloudService.connectDropbox();
+        expect(status.provider).toBe("dropbox");
+        expect(mockElectronAPI.cloud.connectDropbox).toHaveBeenCalledTimes(1);
+    });
+
+    it("clears encryption key", async () => {
+        const status = await CloudService.clearEncryptionKey();
+        expect(status.encryptionMode).toBe("none");
+        expect(mockElectronAPI.cloud.clearEncryptionKey).toHaveBeenCalledTimes(
+            1
+        );
+    });
+
+    it("sets encryption passphrase", async () => {
+        const status = await CloudService.setEncryptionPassphrase("pass");
+        expect(status.encryptionMode).toBe("passphrase");
+        expect(mockElectronAPI.cloud.setEncryptionPassphrase).toHaveBeenCalledWith(
+            "pass"
+        );
+        expect(mockLogger.info).toHaveBeenCalled();
+    });
+
+    it("rejects empty encryption passphrase", async () => {
+        await expect(CloudService.setEncryptionPassphrase(" ")).rejects.toThrow(
+            TypeError
+        );
+    });
+
+    it("migrates backups", async () => {
+        const result = await CloudService.migrateBackups({
+            deleteSource: false,
+            target: "encrypted",
+        });
+
+        expect(result.target).toBe("encrypted");
+        expect(mockElectronAPI.cloud.migrateBackups).toHaveBeenCalledWith({
+            deleteSource: false,
+            target: "encrypted",
+        });
+    });
+
+    it("previews remote sync reset", async () => {
+        const preview = await CloudService.previewResetRemoteSyncState();
+        expect(preview.syncObjectCount).toBeGreaterThanOrEqual(0);
+        expect(
+            mockElectronAPI.cloud.previewResetRemoteSyncState
+        ).toHaveBeenCalledTimes(1);
+    });
+
+    it("resets remote sync state", async () => {
+        const result = await CloudService.resetRemoteSyncState();
+        expect(result.resetAt).toBe(123);
+        expect(mockElectronAPI.cloud.resetRemoteSyncState).toHaveBeenCalledTimes(
+            1
         );
     });
 });

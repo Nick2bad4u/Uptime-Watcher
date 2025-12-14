@@ -4,7 +4,7 @@ import type { SerializedDatabaseBackupMetadata } from "@shared/types/databaseBac
 import type {
     CloudObjectEntry,
     CloudStorageProvider,
-} from "./CloudStorageProvider";
+} from "./CloudStorageProvider.types";
 
 import {
     decryptBuffer,

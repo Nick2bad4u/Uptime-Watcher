@@ -11,7 +11,7 @@ import path from "node:path";
 import type {
     CloudObjectEntry,
     CloudStorageProvider,
-} from "./CloudStorageProvider";
+} from "./CloudStorageProvider.types";
 
 import {
     parseCloudBackupMetadataFile,

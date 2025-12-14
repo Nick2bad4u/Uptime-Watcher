@@ -1,7 +1,7 @@
 import type { CloudSyncManifest } from "@shared/types/cloudSyncManifest";
 import type { CloudSyncResetPreview } from "@shared/types/cloudSyncResetPreview";
 
-import type { CloudObjectEntry } from "../providers/CloudStorageProvider";
+import type { CloudObjectEntry } from "../providers/CloudStorageProvider.types";
 
 interface PreviewDevice {
     deviceId: string;

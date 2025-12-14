@@ -18,7 +18,20 @@ const DROPBOX_TOKEN_ENDPOINT =
 
 const DEFAULT_TIMEOUT_MS = 5 * 60_000;
 
+const LOOPBACK_HOST = "127.0.0.1" as const;
+const LOOPBACK_PATH = "/oauth2/callback" as const;
+
+/**
+ * Default loopback port used for Dropbox OAuth.
+ *
+ * @remarks
+ * Using a fixed port allows the Dropbox console to be configured with a single
+ * redirect URI.
+ */
+export const DEFAULT_DROPBOX_LOOPBACK_PORT = 53682;
+
 const DROPBOX_SCOPES = [
+    "account_info.read",
     "files.content.read",
     "files.content.write",
     "files.metadata.read",
@@ -42,6 +55,8 @@ export class DropboxAuthFlow {
     private readonly appKey: string;
 
     private readonly httpClient: AxiosInstance;
+
+    private readonly loopbackPort: number;
 
     public async connect(args?: {
         timeoutMs?: number;
@@ -77,7 +92,7 @@ export class DropboxAuthFlow {
             }
 
             server.on("error", handleListenError);
-            server.listen(0, "127.0.0.1", () => {
+            server.listen(this.loopbackPort, LOOPBACK_HOST, () => {
                 server.off("error", handleListenError);
                 resolve();
             });
@@ -95,7 +110,7 @@ export class DropboxAuthFlow {
             throw new Error("Dropbox OAuth server address unavailable");
         }
 
-        const redirectUri = `http://127.0.0.1:${address.port}/oauth2/callback`;
+        const redirectUri = `http://${LOOPBACK_HOST}:${address.port}${LOOPBACK_PATH}`;
 
         const authorizeUrl = new URL(DROPBOX_AUTHORIZE_URL);
         authorizeUrl.searchParams.set("client_id", this.appKey);
@@ -147,7 +162,7 @@ export class DropboxAuthFlow {
                         `http://${request.headers.host ?? "127.0.0.1"}`
                     );
 
-                    if (requestUrl.pathname !== "/oauth2/callback") {
+                    if (requestUrl.pathname !== LOOPBACK_PATH) {
                         response.writeHead(404);
                         response.end();
                         server.once("request", handleRequest);
@@ -258,9 +273,14 @@ export class DropboxAuthFlow {
         };
     }
 
-    public constructor(args: { appKey: string; httpClient?: AxiosInstance }) {
+    public constructor(args: {
+        appKey: string;
+        httpClient?: AxiosInstance;
+        loopbackPort?: number;
+    }) {
         this.appKey = args.appKey;
         this.httpClient = args.httpClient ?? axios.create();
+        this.loopbackPort = args.loopbackPort ?? DEFAULT_DROPBOX_LOOPBACK_PORT;
     }
 }
 

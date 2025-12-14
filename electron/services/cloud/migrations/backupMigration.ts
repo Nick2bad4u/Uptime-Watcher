@@ -5,7 +5,7 @@ import type {
 
 import { ensureError } from "@shared/utils/errorHandling";
 
-import type { CloudStorageProvider } from "../providers/CloudStorageProvider";
+import type { CloudStorageProvider } from "../providers/CloudStorageProvider.types";
 
 import { decryptBuffer, encryptBuffer } from "../crypto/cloudCrypto";
 

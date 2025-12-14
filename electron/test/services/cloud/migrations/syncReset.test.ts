@@ -8,7 +8,7 @@ import { CLOUD_SYNC_MANIFEST_VERSION } from "@shared/types/cloudSyncManifest";
 import { CLOUD_SYNC_SCHEMA_VERSION } from "@shared/types/cloudSync";
 
 import { resetProviderCloudSyncState } from "@electron/services/cloud/migrations/syncReset";
-import type { CloudStorageProvider } from "@electron/services/cloud/providers/CloudStorageProvider";
+import type { CloudStorageProvider } from "@electron/services/cloud/providers/CloudStorageProvider.types";
 import type {
     CloudSyncEngine,
     SyncEngineResult,

@@ -34,7 +34,7 @@ import type {
     DatabaseRestorePayload,
 } from "../database/utils/databaseBackup";
 import type { CloudSyncEngine } from "../sync/SyncEngine";
-import type { CloudStorageProvider } from "./providers/CloudStorageProvider";
+import type { CloudStorageProvider } from "./providers/CloudStorageProvider.types";
 
 import { readProcessEnv } from "../../utils/environment";
 import { logger } from "../../utils/logger";

@@ -132,6 +132,9 @@ vi.mock("electron", () => ({
     contextBridge: {
         exposeInMainWorld: vi.fn(),
     },
+    shell: {
+        openExternal: vi.fn(() => Promise.resolve(true)),
+    },
 }));
 
 // Mock node-sqlite3-wasm with comprehensive Database interface

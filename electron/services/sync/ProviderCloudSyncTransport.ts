@@ -18,8 +18,8 @@ import { isRecord } from "@shared/utils/typeHelpers";
 import type {
     CloudObjectEntry,
     CloudStorageProvider,
-} from "../cloud/providers/CloudStorageProvider";
-import type { CloudSyncTransport } from "./CloudSyncTransport";
+} from "../cloud/providers/CloudStorageProvider.types";
+import type { CloudSyncTransport } from "./CloudSyncTransport.types";
 
 const MANIFEST_KEY = "manifest.json" as const;
 const OPS_PREFIX = "sync/devices" as const;

@@ -12,7 +12,7 @@ import { EncryptedSyncCloudStorageProvider } from "@electron/services/cloud/prov
 import type {
     CloudObjectEntry,
     CloudStorageProvider,
-} from "@electron/services/cloud/providers/CloudStorageProvider";
+} from "@electron/services/cloud/providers/CloudStorageProvider.types";
 
 class InMemoryProvider implements CloudStorageProvider {
     public readonly kind = "filesystem" as const;

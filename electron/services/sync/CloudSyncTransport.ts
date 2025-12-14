@@ -1,48 +1,15 @@
-import type { CloudSyncOperation } from "@shared/types/cloudSync";
-import type { CloudSyncManifest } from "@shared/types/cloudSyncManifest";
-import type { CloudSyncSnapshot } from "@shared/types/cloudSyncSnapshot";
-
-import type {
-    CloudObjectEntry,
-    CloudStorageProvider,
-} from "../cloud/providers/CloudStorageProvider";
-
 /**
- * Provider-backed transport for ADR-016 sync.
+ * Back-compat wrapper for sync transport type exports.
+ *
+ * @remarks
+ * The canonical definitions live in `CloudSyncTransport.types.ts`.
  */
-export interface CloudSyncTransport {
-    /** Appends operations to the per-device op log. */
-    appendOperations: (
-        deviceId: string,
-        operations: readonly CloudSyncOperation[]
-    ) => Promise<CloudObjectEntry>;
 
-    /** Deletes an object by key. */
-    deleteObject: (key: string) => Promise<void>;
+/** Runtime marker to ensure this wrapper participates in coverage. */
+export const CLOUD_SYNC_TRANSPORT_TYPES_WRAPPER =
+    "cloud-sync-transport-types-wrapper" as const;
 
-    /** Lists all op log objects for all devices. */
-    listOperationObjects: () => Promise<CloudObjectEntry[]>;
-
-    /** Reads the remote manifest (or null if missing). */
-    readManifest: () => Promise<CloudSyncManifest | null>;
-
-    /** Downloads and parses operations from a single op log object. */
-    readOperationsObject: (key: string) => Promise<CloudSyncOperation[]>;
-
-    /** Reads a snapshot by key. */
-    readSnapshot: (key: string) => Promise<CloudSyncSnapshot>;
-
-    /** Writes the remote manifest (atomic overwrite). */
-    writeManifest: (manifest: CloudSyncManifest) => Promise<void>;
-
-    /** Writes a snapshot under the standard snapshots prefix. */
-    writeSnapshot: (snapshot: CloudSyncSnapshot) => Promise<CloudObjectEntry>;
-}
-
-/**
- * Factory for provider-backed sync transports.
- */
-export interface CloudSyncTransportFactory {
-    /** Creates a transport wrapper for the given provider. */
-    create: (provider: CloudStorageProvider) => CloudSyncTransport;
-}
+export type {
+    CloudSyncTransport,
+    CloudSyncTransportFactory,
+} from "./CloudSyncTransport.types";

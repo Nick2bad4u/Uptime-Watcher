@@ -235,6 +235,10 @@ ADRs document the key architectural decisions made during development, their con
 - Provider abstraction + filesystem provider for development/integration
 - Main-process sync engine integration and background polling
 
+Related guide:
+
+- [Dropbox Cloud Sync Setup](../Guides/CLOUD_SYNC_DROPBOX_SETUP.md)
+
 ### [ADR-016: Multi-Device Sync Data Model](./ADRs/ADR_016_MULTI_DEVICE_SYNC_MODEL.md)
 
 **Status: Accepted (implemented)** - Deterministic operation-log + snapshot sync model.

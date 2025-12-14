@@ -11,6 +11,10 @@
 
 import type { UnknownRecord } from "type-fest";
 
+/** Runtime marker to ensure this type-only module participates in coverage. */
+export const LOGGER_INTERFACES_MODULE_MARKER =
+    "shared-logger-interfaces" as const;
+
 /**
  * Base logger interface with core logging methods.
  *

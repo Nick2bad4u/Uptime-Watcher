@@ -3,7 +3,7 @@ schema: "../../config/schemas/doc-frontmatter.schema.json"
 title: "API & IPC Documentation"
 summary: "Comprehensive reference for Uptime Watcher's IPC communication and API surface."
 created: "2025-09-22"
-last_reviewed: "2025-12-11"
+last_reviewed: "2025-12-14"
 category: "guide"
 author: "Nick2bad4u"
 tags:
@@ -19,10 +19,37 @@ tags:
 ## Table of Contents
 
 1. [📋 Overview](#-overview)
+2. [☁️ Cloud Sync & Backups IPC](#️-cloud-sync--backups-ipc)
 
 ## 📋 Overview
 
 Uptime Watcher uses type-safe IPC (Inter-Process Communication) between the Electron main process and React renderer, along with an event-driven architecture for internal communication.
+
+## ☁️ Cloud Sync & Backups IPC
+
+The cloud domain exposes request/response IPC operations used by the Cloud Sync
+and Remote Backups UI.
+
+Canonical source of truth:
+
+- IPC map: `shared/types/ipc.ts`
+- Preload channel definitions: `shared/types/preload.ts`
+- Renderer wrapper: `src/services/CloudService.ts`
+- Renderer store: `src/stores/cloud/useCloudStore.ts`
+
+Important channels:
+
+- `cloud-connect-dropbox`
+- `cloud-get-status`
+- `cloud-enable-sync`
+- `cloud-list-backups`
+- `cloud-upload-latest-backup`
+- `cloud-restore-backup`
+- `cloud-set-encryption-passphrase`
+- `cloud-clear-encryption-key`
+- `cloud-migrate-backups`
+- `cloud-preview-reset-remote-sync`
+- `cloud-reset-remote-sync`
 
 ### Store Integration with Event Listeners (Zustand example)
 

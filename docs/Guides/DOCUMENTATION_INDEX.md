@@ -3,7 +3,7 @@ schema: "../../config/schemas/doc-frontmatter.schema.json"
 title: "Documentation Index"
 summary: "Navigation hub and master index for all Uptime Watcher documentation, organized by topic and audience."
 created: "2025-08-05"
-last_reviewed: "2025-12-12"
+last_reviewed: "2025-12-14"
 category: "guide"
 author: "Nick2bad4u"
 tags:
@@ -11,6 +11,7 @@ tags:
   - "documentation"
   - "index"
   - "navigation"
+
 ---
 
 # 📚 Documentation Index
@@ -36,6 +37,10 @@ tags:
 - **[API Documentation](./API_DOCUMENTATION.md)** - IPC interfaces and communication patterns
 - **[Troubleshooting Guide](./TROUBLESHOOTING.md)** - Common issues and solutions
 - **[Testing Guide](../Guides/TESTING.md)** - Testing setup and practices
+
+### Cloud sync + backups
+
+- **[Dropbox Cloud Sync Setup](./CLOUD_SYNC_DROPBOX_SETUP.md)** - Configure the Dropbox OAuth app and connect from the UI
 
 ## � Documentation structure
 

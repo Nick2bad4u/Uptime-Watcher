@@ -147,8 +147,17 @@ function applyOperation(
         existingDeletion !== undefined &&
         compareCloudSyncWriteKey(existingDeletion, write) < 0;
 
+    if (shouldResurrect) {
+        state[operation.entityType][operation.entityId] = {
+            entityId: entity.entityId,
+            entityType: entity.entityType,
+            fields: nextFields,
+        };
+        return;
+    }
+
     state[operation.entityType][operation.entityId] =
-        shouldResurrect || existingDeletion === undefined
+        existingDeletion === undefined
             ? {
                   ...entity,
                   fields: nextFields,

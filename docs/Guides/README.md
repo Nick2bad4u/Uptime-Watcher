@@ -3,7 +3,7 @@ schema: "../../config/schemas/doc-frontmatter.schema.json"
 title: "Guides Documentation"
 summary: "Overview of the docs/Guides directory, its structure, and how to navigate and contribute to Uptime Watcher guides."
 created: "2025-09-18"
-last_reviewed: "2025-11-17"
+last_reviewed: "2025-12-14"
 category: "guide"
 author: "Nick2bad4u"
 tags:
@@ -23,6 +23,7 @@ This directory contains comprehensive guides for developers, contributors, and u
 docs/Guides/
 ├── README.md                              # This file
 ├── API_DOCUMENTATION.md                   # IPC interfaces and communication patterns
+├── CLOUD_SYNC_DROPBOX_SETUP.md             # Dropbox OAuth + setup guide (no backend)
 ├── DEVELOPER_QUICK_START.md               # Fast developer setup guide
 ├── DOCUMENTATION_INDEX.md                 # Complete documentation navigation hub
 ├── DOCUSAURUS_SETUP_GUIDE.md              # Documentation site setup

@@ -3,7 +3,7 @@ import type { CloudSyncResetResult } from "@shared/types/cloudSyncReset";
 import { ensureError } from "@shared/utils/errorHandling";
 
 import type { CloudSyncEngine } from "../../sync/SyncEngine";
-import type { CloudStorageProvider } from "../providers/CloudStorageProvider";
+import type { CloudStorageProvider } from "../providers/CloudStorageProvider.types";
 
 import { ProviderCloudSyncTransport } from "../../sync/ProviderCloudSyncTransport";
 

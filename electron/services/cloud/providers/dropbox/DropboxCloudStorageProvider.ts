@@ -8,7 +8,7 @@ import * as z from "zod";
 import type {
     CloudObjectEntry,
     CloudStorageProvider,
-} from "../CloudStorageProvider";
+} from "../CloudStorageProvider.types";
 import type { DropboxTokenManager } from "./DropboxTokenManager";
 
 import {

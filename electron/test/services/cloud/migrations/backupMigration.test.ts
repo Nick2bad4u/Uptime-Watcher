@@ -17,7 +17,7 @@ import { migrateProviderBackups } from "@electron/services/cloud/migrations/back
 import type {
     CloudObjectEntry,
     CloudStorageProvider,
-} from "@electron/services/cloud/providers/CloudStorageProvider";
+} from "@electron/services/cloud/providers/CloudStorageProvider.types";
 
 class InMemoryBackupProvider implements CloudStorageProvider {
     public readonly kind = "filesystem" as const;

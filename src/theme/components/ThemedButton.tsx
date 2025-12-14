@@ -81,6 +81,8 @@ import { CSS_CLASSES } from "./types";
 export type ThemedButtonProperties = ComponentProperties<
     StandardButtonProperties,
     Readonly<{
+        /** Optional test id forwarded to the underlying <button>. */
+        readonly "data-testid"?: string;
         /** Click handler for the button */
         onClick?: EventHandlers.ClickWithEvent<HTMLButtonElement>;
         /** Size variant for the button */
@@ -123,6 +125,7 @@ const DEFAULT_THEMED_BOX_STYLE: CSSProperties = {};
  */
 const ThemedButtonComponent = ({
     "aria-label": ariaLabel,
+    "data-testid": dataTestId,
     children,
     className = "",
     disabled = false,
@@ -205,9 +208,10 @@ const ThemedButtonComponent = ({
             aria-label={ariaLabel}
             className={classNames}
             data-testid={
-                ariaLabel
+                dataTestId ??
+                (ariaLabel
                     ? `button-${ariaLabel.toLowerCase().replaceAll(/\s+/gv, "-")}`
-                    : undefined
+                    : undefined)
             }
             disabled={disabled || loading}
             onClick={handleClick}
