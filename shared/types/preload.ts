@@ -252,19 +252,38 @@ export type SettingsDomainBridge = DomainBridge<typeof SETTINGS_CHANNELS>;
  * @internal
  */
 interface CloudChannelMap {
-    readonly configureFilesystemProvider:
-        "cloud-configure-filesystem-provider";
+    readonly clearEncryptionKey: "cloud-clear-encryption-key";
+    readonly configureFilesystemProvider: "cloud-configure-filesystem-provider";
+    readonly connectDropbox: "cloud-connect-dropbox";
+    readonly disconnect: "cloud-disconnect";
+    readonly enableSync: "cloud-enable-sync";
     readonly getStatus: "cloud-get-status";
     readonly listBackups: "cloud-list-backups";
+    readonly migrateBackups: "cloud-migrate-backups";
+    readonly previewResetRemoteSyncState: "cloud-preview-reset-remote-sync";
+    readonly requestSyncNow: "cloud-request-sync-now";
+    readonly resetRemoteSyncState: "cloud-reset-remote-sync";
     readonly restoreBackup: "cloud-restore-backup";
+
+    readonly setEncryptionPassphrase: "cloud-set-encryption-passphrase";
     readonly uploadLatestBackup: "cloud-upload-latest-backup";
 }
 
 const CLOUD_CHANNELS_DEFINITION: CloudChannelMap = {
+    clearEncryptionKey: "cloud-clear-encryption-key",
     configureFilesystemProvider: "cloud-configure-filesystem-provider",
+    connectDropbox: "cloud-connect-dropbox",
+    disconnect: "cloud-disconnect",
+    enableSync: "cloud-enable-sync",
     getStatus: "cloud-get-status",
     listBackups: "cloud-list-backups",
+    migrateBackups: "cloud-migrate-backups",
+    previewResetRemoteSyncState: "cloud-preview-reset-remote-sync",
+    requestSyncNow: "cloud-request-sync-now",
+    resetRemoteSyncState: "cloud-reset-remote-sync",
     restoreBackup: "cloud-restore-backup",
+    // eslint-disable-next-line sonarjs/no-hardcoded-passwords -- IPC channel name, not a secret.
+    setEncryptionPassphrase: "cloud-set-encryption-passphrase",
     uploadLatestBackup: "cloud-upload-latest-backup",
 };
 

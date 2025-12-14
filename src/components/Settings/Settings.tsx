@@ -63,6 +63,7 @@ import { waitForAnimation } from "../../utils/time/waitForAnimation";
 import { playInAppAlertTone } from "../Alerts/alertCoordinator";
 import { ErrorAlert } from "../common/ErrorAlert/ErrorAlert";
 import { GalaxyBackground } from "../common/GalaxyBackground/GalaxyBackground";
+import { CloudSettingsSection } from "./CloudSettingsSection";
 import {
     ApplicationSection,
     type BackupSummary,
@@ -1026,6 +1027,8 @@ export const Settings = ({
                         />
 
                         <NotificationSection {...notificationSectionProps} />
+
+                        <CloudSettingsSection />
 
                         <ApplicationSection
                             autoStartControl={autoStartControl}

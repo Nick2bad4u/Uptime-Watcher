@@ -20,6 +20,7 @@ const BASE_ERROR_MESSAGE =
  * Electron bridge domains exposed by the preload script.
  */
 export type ElectronBridgeDomain =
+    | "cloud"
     | "data"
     | "events"
     | "monitoring"
@@ -34,7 +35,7 @@ export type ElectronBridgeDomain =
  * Contract describing the expected shape of a preload domain.
  */
 export interface ElectronBridgeContract {
-    /** Domain name expected on {@link window.electronAPI}. */
+    /** Domain name expected on `window.electronAPI`. */
     readonly domain: ElectronBridgeDomain;
     /** Optional list of method names that must be exposed as functions. */
     readonly methods?: readonly string[];

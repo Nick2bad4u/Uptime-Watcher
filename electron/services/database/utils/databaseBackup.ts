@@ -170,9 +170,14 @@ export function validateDatabaseBackupPayload(
         );
     }
 
-    if (metadata.schemaVersion !== DATABASE_SCHEMA_VERSION) {
+    // Schema version compatibility policy:
+    // - Older backups are allowed to exist and be transported (downloaded/uploaded).
+    // - Applying/restoring a backup is responsible for enforcing strict
+    //   compatibility.
+    // This keeps remote backup history usable across app upgrades.
+    if (metadata.schemaVersion > DATABASE_SCHEMA_VERSION) {
         throw new Error(
-            `Backup schema version ${metadata.schemaVersion} is incompatible with current version ${DATABASE_SCHEMA_VERSION}`
+            `Backup schema version ${metadata.schemaVersion} is newer than current version ${DATABASE_SCHEMA_VERSION}`
         );
     }
 

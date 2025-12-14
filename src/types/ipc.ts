@@ -49,6 +49,7 @@
  * @packageDocumentation
  */
 
+import type { SerializedDatabaseBackupMetadata as SharedSerializedDatabaseBackupMetadata } from "@shared/types/databaseBackup";
 import type {
     IpcResponse,
     IpcDiagnosticsChannel as SharedIpcDiagnosticsChannel,
@@ -60,7 +61,6 @@ import type {
     IpcInvokeChannelResult as SharedIpcInvokeChannelResult,
     IpcValidationResponse as SharedIpcValidationResponse,
     PreloadGuardDiagnosticsReport as SharedPreloadGuardDiagnosticsReport,
-    SerializedDatabaseBackupMetadata as SharedSerializedDatabaseBackupMetadata,
     SerializedDatabaseBackupResult as SharedSerializedDatabaseBackupResult,
     SerializedDatabaseRestorePayload as SharedSerializedDatabaseRestorePayload,
     SerializedDatabaseRestoreResult as SharedSerializedDatabaseRestoreResult,

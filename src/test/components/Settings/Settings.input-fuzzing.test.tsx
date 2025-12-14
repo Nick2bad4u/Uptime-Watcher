@@ -341,6 +341,11 @@ vi.mock("../../../components/shared/SettingItem", () => ({
     )),
 }));
 
+// Cloud sync is tested separately; exclude it from notification fuzz scenarios.
+vi.mock("../../../components/Settings/CloudSettingsSection", () => ({
+    CloudSettingsSection: (): null => null,
+}));
+
 vi.mock("../../../utils/icons", () => {
     const Icon = () => <span data-testid="app-icon" />;
     return {
@@ -362,6 +367,7 @@ vi.mock("../../../utils/icons", () => {
             ui: {
                 bell: Icon,
                 close: Icon,
+                cloud: Icon,
                 database: Icon,
                 home: Icon,
             },

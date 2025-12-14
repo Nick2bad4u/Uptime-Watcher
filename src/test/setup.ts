@@ -20,6 +20,8 @@ import EventEmitter from "node:events";
 
 import "./mock-setup";
 
+import { useErrorStore } from "../stores/error/useErrorStore";
+
 // Stub problematic aria-query literal-role metadata to avoid SyntaxError
 // crashes originating from third-party role maps while keeping matchers
 // available. Vitest hoists vi.mock calls, so these apply before consumers are
@@ -155,6 +157,13 @@ if (typeof window !== "undefined" && typeof window.open === "function") {
 
 beforeEach(() => {
     windowOpenSpy?.mockClear();
+
+    // ErrorStore is global Zustand state used by multiple UI layers. Reset it
+    // between tests to prevent cross-suite contamination.
+    useErrorStore.setState({
+        operationLoading: {},
+        storeErrors: {},
+    });
 });
 
 /**

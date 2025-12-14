@@ -1,6 +1,7 @@
 import type { Database } from "node-sqlite3-wasm";
 
 import { LOG_TEMPLATES } from "@shared/utils/logTemplates";
+import { safeStringify } from "@shared/utils/stringConversion";
 
 import { logger } from "../../../utils/logger";
 import { getRegisteredMonitorTypes } from "../../monitoring/MonitorTypeRegistry";
@@ -41,7 +42,7 @@ const SCHEMA_QUERIES = {
     CREATE_TABLE_HISTORY: `
             CREATE TABLE IF NOT EXISTS history (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                monitor_id INTEGER NOT NULL,
+                monitor_id TEXT NOT NULL,
                 timestamp INTEGER,
                 status TEXT,
                 responseTime INTEGER,
@@ -75,7 +76,7 @@ const SCHEMA_QUERIES = {
     ROLLBACK: "ROLLBACK",
 } as const;
 
-export const DATABASE_SCHEMA_VERSION = 1;
+export const DATABASE_SCHEMA_VERSION = 2;
 
 /**
  * Ensures the SQLite user_version matches the application schema version.
@@ -84,6 +85,216 @@ const hasUserVersionProperty = (
     value: unknown
 ): value is { user_version?: unknown } =>
     typeof value === "object" && value !== null && "user_version" in value;
+
+/**
+ * Validates a generated SQL schema string before execution.
+ *
+ * @remarks
+ * Performs validation checks to ensure the schema is a non-empty string,
+ * contains the required table definition, and does not include placeholder
+ * values that indicate generation errors.
+ *
+ * @param schema - The generated SQL schema string to validate.
+ *
+ * @throws {@link Error} When schema validation fails.
+ */
+function validateGeneratedSchema(schema: string): void {
+    if (!schema || typeof schema !== "string") {
+        throw new Error("Generated schema is empty or invalid");
+    }
+    if (!schema.includes("CREATE TABLE IF NOT EXISTS monitors")) {
+        throw new Error(
+            "Generated schema missing required monitors table definition"
+        );
+    }
+    if (schema.includes("undefined") || schema.includes("null")) {
+        throw new Error("Generated schema contains undefined or null values");
+    }
+}
+
+type SqliteBindValue = bigint | null | number | string | Uint8Array;
+
+// eslint-disable-next-line sonarjs/function-return-type -- SQLite bind values legitimately vary by column type.
+function toSqliteBindValue(value: unknown): SqliteBindValue {
+    if (value === undefined || value === null) {
+        return null;
+    }
+
+    if (typeof value === "string" || typeof value === "number") {
+        return value;
+    }
+
+    if (typeof value === "bigint") {
+        return value;
+    }
+
+    if (typeof value === "boolean") {
+        return value ? 1 : 0;
+    }
+
+    if (value instanceof Uint8Array) {
+        return value;
+    }
+
+    return safeStringify(value);
+}
+
+function createMigrationIndexes(database: Database): void {
+    database
+        .prepare(SCHEMA_QUERIES.CREATE_INDEX_MONITORS_SITE_IDENTIFIER)
+        .run();
+    database.prepare(SCHEMA_QUERIES.CREATE_INDEX_MONITORS_TYPE).run();
+    database.prepare(SCHEMA_QUERIES.CREATE_INDEX_HISTORY_MONITOR_ID).run();
+    database.prepare(SCHEMA_QUERIES.CREATE_INDEX_HISTORY_TIMESTAMP).run();
+}
+
+function copyMonitorsFromVersion1(database: Database): void {
+    const legacyMonitorRows = database
+        .prepare("SELECT * FROM monitors_v1")
+        .all() as Array<Record<string, unknown>>;
+
+    if (legacyMonitorRows.length === 0) {
+        return;
+    }
+
+    const columnRows = database
+        .prepare("PRAGMA table_info(monitors_v1)")
+        .all() as Array<{ name?: unknown }>;
+    const legacyColumns = columnRows
+        .map((row) => row.name)
+        .filter((name): name is string => typeof name === "string");
+
+    const copyColumns = legacyColumns.filter((col) => col !== "id");
+    const insertColumns = ["id", ...copyColumns];
+    const insertPlaceholders = insertColumns.map(() => "?").join(", ");
+
+    // eslint-disable-next-line sql-template/no-unsafe-query -- Column list derived from PRAGMA table_info
+    const insertSql = `INSERT INTO monitors (${insertColumns.join(", ")}) VALUES (${insertPlaceholders})`;
+    const insertStatement = database.prepare(insertSql);
+
+    const mapInsert = database.prepare(
+        "INSERT INTO monitor_id_map (old_id, new_id) VALUES (?, ?)"
+    );
+
+    for (const row of legacyMonitorRows) {
+        const oldId = row["id"];
+        if (typeof oldId !== "number") {
+            throw new TypeError("Unexpected monitor id type during migration");
+        }
+
+        const newId = globalThis.crypto.randomUUID();
+
+        const values: SqliteBindValue[] = [
+            newId,
+            ...copyColumns.map((column) => toSqliteBindValue(row[column])),
+        ];
+
+        insertStatement.run(values);
+        mapInsert.run([oldId, newId]);
+    }
+}
+
+function copyHistoryFromVersion1(database: Database): void {
+    const legacyHistoryRows = database
+        .prepare(
+            "SELECT id, monitor_id, timestamp, status, responseTime, details FROM history_v1"
+        )
+        .all() as Array<Record<string, unknown>>;
+
+    if (legacyHistoryRows.length === 0) {
+        return;
+    }
+
+    const historyInsert = database.prepare(
+        "INSERT INTO history (id, monitor_id, timestamp, status, responseTime, details) VALUES (?, ?, ?, ?, ?, ?)"
+    );
+    const mapper = database.prepare(
+        "SELECT new_id as newId FROM monitor_id_map WHERE old_id = ?"
+    );
+
+    for (const row of legacyHistoryRows) {
+        const oldMonitorId = row["monitor_id"];
+        if (typeof oldMonitorId === "number") {
+            const mappingCandidate: unknown = mapper.get([oldMonitorId]);
+            const newIdCandidate: unknown =
+                typeof mappingCandidate === "object" &&
+                mappingCandidate !== null &&
+                "newId" in mappingCandidate
+                    ? Reflect.get(mappingCandidate, "newId")
+                    : undefined;
+
+            if (typeof newIdCandidate === "string") {
+                historyInsert.run([
+                    toSqliteBindValue(row["id"]),
+                    newIdCandidate,
+                    toSqliteBindValue(row["timestamp"]),
+                    toSqliteBindValue(row["status"]),
+                    toSqliteBindValue(row["responseTime"]),
+                    toSqliteBindValue(row["details"]),
+                ]);
+            }
+        }
+    }
+}
+
+/**
+ * Migrates schema version 1 to version 2.
+ *
+ * @remarks
+ * Version 2 makes monitor identifiers stable across devices by switching the
+ * `monitors.id` primary key from INTEGER AUTOINCREMENT to TEXT (UUID).
+ *
+ * The `history.monitor_id` foreign key is migrated from INTEGER to TEXT and
+ * remapped to the new UUID monitor ids.
+ */
+function migrateSchemaToVersion2(database: Database): void {
+    logger.warn("[DatabaseSchema] Running schema migration to v2");
+
+    if (typeof globalThis.crypto.randomUUID !== "function") {
+        throw new TypeError(
+            "crypto.randomUUID is unavailable; cannot migrate monitor ids"
+        );
+    }
+
+    database.prepare("PRAGMA foreign_keys = OFF").run();
+    database.prepare(SCHEMA_QUERIES.BEGIN_TRANSACTION).run();
+
+    try {
+        database.prepare("ALTER TABLE monitors RENAME TO monitors_v1").run();
+        database.prepare("ALTER TABLE history RENAME TO history_v1").run();
+
+        // Recreate monitors/history tables with the new schema.
+        const dynamicMonitorSchema = generateMonitorTableSchema();
+        validateGeneratedSchema(dynamicMonitorSchema);
+        database.prepare(dynamicMonitorSchema).run();
+        database.prepare(SCHEMA_QUERIES.CREATE_TABLE_HISTORY).run();
+
+        // Create a temp mapping table for history remapping.
+        database
+            .prepare(
+                "CREATE TEMP TABLE monitor_id_map (old_id INTEGER PRIMARY KEY, new_id TEXT NOT NULL)"
+            )
+            .run();
+
+        copyMonitorsFromVersion1(database);
+        copyHistoryFromVersion1(database);
+
+        database.prepare("DROP TABLE monitors_v1").run();
+        database.prepare("DROP TABLE history_v1").run();
+
+        // Recreate indexes for the new tables.
+        createMigrationIndexes(database);
+
+        database.prepare(SCHEMA_QUERIES.COMMIT).run();
+        database.prepare("PRAGMA foreign_keys = ON").run();
+        logger.info("[DatabaseSchema] Migration v1 -> v2 complete");
+    } catch (error) {
+        database.prepare(SCHEMA_QUERIES.ROLLBACK).run();
+        database.prepare("PRAGMA foreign_keys = ON").run();
+        logger.error("[DatabaseSchema] Migration v1 -> v2 failed", error);
+        throw error;
+    }
+}
 
 /**
  * Ensures the PRAGMA user_version reflects the currently deployed schema.
@@ -101,6 +312,17 @@ export function synchronizeDatabaseSchemaVersion(database: Database): void {
         return;
     }
 
+    if (currentVersion > DATABASE_SCHEMA_VERSION) {
+        logger.warn(
+            `[DatabaseSchema] Database schema version ${currentVersion} is newer than app schema ${DATABASE_SCHEMA_VERSION}. Continuing without migration.`
+        );
+        return;
+    }
+
+    if (currentVersion === 1) {
+        migrateSchemaToVersion2(database);
+    }
+
     if (currentVersion === 0) {
         logger.info(
             `[DatabaseSchema] Initializing schema user_version to ${DATABASE_SCHEMA_VERSION}`
@@ -112,36 +334,6 @@ export function synchronizeDatabaseSchemaVersion(database: Database): void {
     }
 
     database.prepare(`PRAGMA user_version = ${DATABASE_SCHEMA_VERSION}`).run();
-}
-
-/**
- * Validates a generated SQL schema string before execution.
- *
- * @remarks
- * Performs validation checks to ensure the schema is a non-empty string,
- * contains the required table definition, and does not include placeholder
- * values that indicate generation errors. Prevents runtime failures from
- * malformed SQL.
- *
- * @param schema - The generated SQL schema string to validate.
- *
- * @throws {@link Error} When schema validation fails due to missing or invalid
- *   content.
- *
- * @internal
- */
-function validateGeneratedSchema(schema: string): void {
-    if (!schema || typeof schema !== "string") {
-        throw new Error("Generated schema is empty or invalid");
-    }
-    if (!schema.includes("CREATE TABLE IF NOT EXISTS monitors")) {
-        throw new Error(
-            "Generated schema missing required monitors table definition"
-        );
-    }
-    if (schema.includes("undefined") || schema.includes("null")) {
-        throw new Error("Generated schema contains undefined or null values");
-    }
 }
 
 /**

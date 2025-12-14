@@ -21,7 +21,7 @@
  * @author AI Assistant
  */
 
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { test as fcTest } from "@fast-check/vitest";
 import * as fc from "fast-check";
 
@@ -46,15 +46,30 @@ vi.mock("electron-log/renderer", () => ({
     },
 }));
 
-import { logger } from "../../services/logger";
-import log from "electron-log/renderer";
+type ElectronLogRenderer = (typeof import("electron-log/renderer"))["default"];
 
-// Get mocked functions
-const mockLog = vi.mocked(log);
-const mockDebug = mockLog.debug;
-const mockInfo = mockLog.info;
-const mockWarn = mockLog.warn;
-const mockError = mockLog.error;
+let logger: (typeof import("../../services/logger"))["logger"];
+let mockLog: ElectronLogRenderer;
+let mockDebug: ReturnType<typeof vi.fn>;
+let mockInfo: ReturnType<typeof vi.fn>;
+let mockWarn: ReturnType<typeof vi.fn>;
+let mockError: ReturnType<typeof vi.fn>;
+
+beforeAll(async () => {
+    // Other suites can import the logger early. Reset the module cache and
+    // import logger after our electron-log mock is registered.
+    vi.resetModules();
+
+    const logModule = await import("electron-log/renderer");
+    mockLog = vi.mocked(logModule.default);
+    mockDebug = mockLog.debug as unknown as ReturnType<typeof vi.fn>;
+    mockInfo = mockLog.info as unknown as ReturnType<typeof vi.fn>;
+    mockWarn = mockLog.warn as unknown as ReturnType<typeof vi.fn>;
+    mockError = mockLog.error as unknown as ReturnType<typeof vi.fn>;
+
+    const loggerModule = await import("../../services/logger");
+    logger = loggerModule.logger;
+});
 
 // Property-based test arbitraries for logger service
 const arbitraries = {

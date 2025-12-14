@@ -75,8 +75,8 @@ System design, patterns, and architectural decisions:
 | [ADR\_012\_NOTIFICATIONS\_AND\_ALERTING.md](../Architecture/ADRs/ADR_012_NOTIFICATIONS_AND_ALERTING.md)                          | Notifications policy                        | 📝 Draft    |
 | [ADR\_013\_DATA\_PORTABILITY\_AND\_BACKUP.md](../Architecture/ADRs/ADR_013_DATA_PORTABILITY_AND_BACKUP.md)                       | Data portability + backup/restore           | ✅ Accepted  |
 | [ADR\_014\_LOGGING\_TELEMETRY\_AND\_DIAGNOSTICS.md](../Architecture/ADRs/ADR_014_LOGGING_TELEMETRY_AND_DIAGNOSTICS.md)           | Logging + diagnostics                       | ✅ Accepted  |
-| [ADR\_015\_CLOUD\_SYNC\_AND\_REMOTE\_BACKUP.md](../Architecture/ADRs/ADR_015_CLOUD_SYNC_AND_REMOTE_BACKUP.md)                    | Cloud sync + remote backups                 | 📝 Draft    |
-| [ADR\_016\_MULTI\_DEVICE\_SYNC\_MODEL.md](../Architecture/ADRs/ADR_016_MULTI_DEVICE_SYNC_MODEL.md)                               | True multi-device sync model                | 📝 Draft    |
+| [ADR\_015\_CLOUD\_SYNC\_AND\_REMOTE\_BACKUP.md](../Architecture/ADRs/ADR_015_CLOUD_SYNC_AND_REMOTE_BACKUP.md)                    | Cloud sync + remote backups                 | ✅ Accepted  |
+| [ADR\_016\_MULTI\_DEVICE\_SYNC\_MODEL.md](../Architecture/ADRs/ADR_016_MULTI_DEVICE_SYNC_MODEL.md)                               | True multi-device sync model                | ✅ Accepted  |
 | [ADR\_017\_EXTERNAL\_ALERT\_INTEGRATIONS.md](../Architecture/ADRs/ADR_017_EXTERNAL_ALERT_INTEGRATIONS.md)                        | Slack/Discord/webhook alerts                | 💡 Proposed |
 | [ADR\_018\_MAINTENANCE\_WINDOWS\_AND\_SILENCING.md](../Architecture/ADRs/ADR_018_MAINTENANCE_WINDOWS_AND_SILENCING.md)           | Maintenance windows + silence rules         | 💡 Proposed |
 | [ADR\_019\_TEMPLATES\_AND\_BULK\_OPERATIONS.md](../Architecture/ADRs/ADR_019_TEMPLATES_AND_BULK_OPERATIONS.md)                   | Templates + bulk import/export              | 💡 Proposed |

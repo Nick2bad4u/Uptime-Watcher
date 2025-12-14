@@ -6,6 +6,17 @@ import type {
     Site,
     StatusUpdate,
 } from "@shared/types";
+import type {
+    CloudBackupEntry,
+    CloudFilesystemProviderConfig,
+    CloudStatusSummary,
+} from "@shared/types/cloud";
+import type {
+    CloudBackupMigrationRequest,
+    CloudBackupMigrationResult,
+} from "@shared/types/cloudBackupMigration";
+import type { CloudSyncResetResult } from "@shared/types/cloudSyncReset";
+import type { CloudSyncResetPreview } from "@shared/types/cloudSyncResetPreview";
 import type { StateSyncEventData } from "@shared/types/events";
 import type {
     SerializedDatabaseBackupResult,
@@ -22,6 +33,8 @@ import type { ValidationResult } from "@shared/types/validation";
 import type { ElectronAPI } from "../types/electron-api";
 
 interface ElectronMockState {
+    cloudBackups: CloudBackupEntry[];
+    cloudFilesystemBaseDirectory: null | string;
     historyLimit: number;
     monitorTypes: MonitorTypeConfig[];
     sites: Site[];
@@ -38,9 +51,47 @@ const clone = <Value>(value: Value): Value => {
 };
 
 const mockState: ElectronMockState = {
+    cloudBackups: [],
+    cloudFilesystemBaseDirectory: null,
     historyLimit: DEFAULT_HISTORY_LIMIT,
     monitorTypes: [],
     sites: [],
+};
+
+const getCloudStatus = (): CloudStatusSummary => {
+    const baseDirectory = mockState.cloudFilesystemBaseDirectory;
+    const connected =
+        typeof baseDirectory === "string" && baseDirectory.length > 0;
+
+    if (!connected) {
+        return {
+            backupsEnabled: false,
+            configured: false,
+            connected: false,
+            encryptionLocked: false,
+            encryptionMode: "none",
+            lastBackupAt: null,
+            lastSyncAt: null,
+            provider: null,
+            syncEnabled: false,
+        };
+    }
+
+    return {
+        backupsEnabled: true,
+        configured: true,
+        connected: true,
+        encryptionLocked: false,
+        encryptionMode: "none",
+        lastBackupAt: mockState.cloudBackups[0]?.metadata.createdAt ?? null,
+        lastSyncAt: null,
+        provider: "filesystem",
+        providerDetails: {
+            baseDirectory,
+            kind: "filesystem",
+        },
+        syncEnabled: false,
+    };
 };
 
 const noop = (): void => {
@@ -122,6 +173,151 @@ const stateSyncBase: StateSyncDomainBridge = {
 };
 
 const electronAPIMockDefinition = {
+    cloud: {
+        clearEncryptionKey: async (): Promise<CloudStatusSummary> =>
+            getCloudStatus(),
+        configureFilesystemProvider: async (
+            config: CloudFilesystemProviderConfig
+        ): Promise<CloudStatusSummary> => {
+            mockState.cloudFilesystemBaseDirectory = config.baseDirectory;
+            return getCloudStatus();
+        },
+        connectDropbox: async (): Promise<CloudStatusSummary> =>
+            getCloudStatus(),
+        disconnect: async (): Promise<CloudStatusSummary> => {
+            mockState.cloudFilesystemBaseDirectory = null;
+            return getCloudStatus();
+        },
+        enableSync: async (): Promise<CloudStatusSummary> => getCloudStatus(),
+        getStatus: async (): Promise<CloudStatusSummary> => getCloudStatus(),
+        listBackups: async (): Promise<CloudBackupEntry[]> =>
+            clone(mockState.cloudBackups),
+        migrateBackups: async (
+            config: CloudBackupMigrationRequest
+        ): Promise<CloudBackupMigrationResult> => {
+            const startedAt = Date.now();
+            const targetEncrypted = config.target === "encrypted";
+
+            const failures: CloudBackupMigrationResult["failures"] = [];
+            let migrated = 0;
+            let skipped = 0;
+            let processedCount = 0;
+
+            const nextBackups: CloudBackupEntry[] = [];
+            for (const entry of mockState.cloudBackups) {
+                processedCount += 1;
+                if (entry.encrypted === targetEncrypted) {
+                    skipped += 1;
+                    nextBackups.push(entry);
+                } else {
+                    const nextFileName = targetEncrypted
+                        ? `${entry.fileName}.enc`
+                        : entry.fileName.replace(/\.enc$/v, "");
+                    const nextKey = targetEncrypted
+                        ? `${entry.key}.enc`
+                        : entry.key.replace(/\.enc$/v, "");
+
+                    const migratedEntry: CloudBackupEntry = {
+                        ...entry,
+                        encrypted: targetEncrypted,
+                        fileName: nextFileName,
+                        key: nextKey,
+                    };
+
+                    migrated += 1;
+                    nextBackups.push(migratedEntry);
+
+                    if (!config.deleteSource) {
+                        nextBackups.push(entry);
+                    }
+                }
+            }
+
+            mockState.cloudBackups = nextBackups;
+
+            return {
+                completedAt: Date.now(),
+                deleteSource: config.deleteSource,
+                failures,
+                migrated,
+                processed: processedCount,
+                skipped,
+                startedAt,
+                target: config.target,
+            };
+        },
+        previewResetRemoteSyncState:
+            async (): Promise<CloudSyncResetPreview> => ({
+                deviceIds: [],
+                fetchedAt: Date.now(),
+                operationDeviceIds: [],
+                operationObjectCount: 0,
+                otherObjectCount: 0,
+                perDevice: [],
+                snapshotObjectCount: 0,
+                syncObjectCount: 0,
+            }),
+        requestSyncNow: async (): Promise<void> => {
+            // noop
+        },
+        resetRemoteSyncState: async (): Promise<CloudSyncResetResult> => {
+            const startedAt = Date.now();
+            return {
+                completedAt: Date.now(),
+                deletedObjects: 0,
+                failedDeletions: [],
+                resetAt: Date.now(),
+                startedAt,
+            };
+        },
+        restoreBackup: async (
+            key: string
+        ): Promise<SerializedDatabaseRestoreResult> => {
+            const entry = mockState.cloudBackups.find(
+                (candidate) => candidate.key === key
+            );
+
+            const createdAt = entry?.metadata.createdAt ?? Date.now();
+
+            return {
+                metadata: {
+                    appVersion: "storybook-mock",
+                    checksum: `mock-restore-checksum-${createdAt}`,
+                    createdAt,
+                    originalPath: "C:/mock/uptime-watcher.sqlite",
+                    retentionHintDays: 30,
+                    schemaVersion: 1,
+                    sizeBytes: 0,
+                },
+                preRestoreFileName: "uptime-watcher.sqlite",
+                restoredAt: Date.now(),
+            };
+        },
+        setEncryptionPassphrase: async (
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Storybook mock only; never log or persist passphrases.
+            _passphrase: string
+        ): Promise<CloudStatusSummary> => getCloudStatus(),
+        uploadLatestBackup: async (): Promise<CloudBackupEntry> => {
+            const createdAt = Date.now();
+            const entry: CloudBackupEntry = {
+                encrypted: false,
+                fileName: `uptime-watcher-backup-${createdAt}.sqlite`,
+                key: `backups/${createdAt}.sqlite`,
+                metadata: {
+                    appVersion: "storybook-mock",
+                    checksum: `mock-checksum-${createdAt}`,
+                    createdAt,
+                    originalPath: "C:/mock/uptime-watcher.sqlite",
+                    retentionHintDays: 30,
+                    schemaVersion: 1,
+                    sizeBytes: 0,
+                },
+            };
+
+            mockState.cloudBackups = [entry, ...mockState.cloudBackups];
+            return clone(entry);
+        },
+    },
     data: {
         downloadSqliteBackup:
             async (): Promise<SerializedDatabaseBackupResult> => ({

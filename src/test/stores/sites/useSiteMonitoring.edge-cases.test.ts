@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi, type Mock } from "vitest";
 
 import type { Site, StatusUpdate } from "@shared/types";
-import type { StatusUpdateSnapshotPayload } from "../../../stores/sites/utils/statusUpdateHandler";
+import type { StatusUpdateSnapshotPayload } from "../../../stores/sites/utils/statusUpdateSnapshot";
 
 import {
     createSiteMonitoringActions,

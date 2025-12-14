@@ -34,6 +34,13 @@ vi.mock("../../../stores/settings/useSettingsStore", () => ({
     useSettingsStore: vi.fn(),
 }));
 
+// Cloud settings integration triggers side-effectful store operations and IPC
+// calls. This suite focuses on the baseline Settings UI; CloudSettingsSection
+// has its own dedicated tests.
+vi.mock("../../../components/Settings/CloudSettingsSection", () => ({
+    CloudSettingsSection: (): null => null,
+}));
+
 const createDefaultDownloadBackup = () =>
     vi.fn(async () => createSerializedBackupResult());
 

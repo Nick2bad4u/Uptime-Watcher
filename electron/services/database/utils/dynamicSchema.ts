@@ -95,6 +95,11 @@ function convertLastCheckedField(lastChecked: unknown): null | number {
  */
 const STANDARD_FIELD_MAPPINGS: FieldMapping[] = [
     {
+        dbField: "id",
+        defaultValue: "",
+        sourceField: "id",
+    },
+    {
         dbField: "active_operations",
         defaultValue: "[]",
         sourceField: "activeOperations",
@@ -568,7 +573,7 @@ function mapStandardFields(monitor: UnknownRecord, row: UnknownRecord): void {
  */
 export function generateMonitorTableSchema(): string {
     const staticFields = `
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        id TEXT PRIMARY KEY,
         site_identifier TEXT NOT NULL,
         type TEXT NOT NULL,
         enabled BOOLEAN NOT NULL DEFAULT 1,
@@ -615,6 +620,7 @@ ${staticFields}${dynamicFields ? `,\n${dynamicFields}` : ""}
  */
 export function generateSqlParameters(): SqlParameters {
     const staticColumns = [
+        "id",
         "site_identifier",
         "type",
         "enabled",

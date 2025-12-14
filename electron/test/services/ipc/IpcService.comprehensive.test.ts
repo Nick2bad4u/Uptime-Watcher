@@ -15,6 +15,7 @@ import type { UptimeOrchestrator } from "../../../UptimeOrchestrator";
 import type { AutoUpdaterService } from "../../../services/updater/AutoUpdaterService";
 import type { NotificationService } from "../../../services/notifications/NotificationService";
 import { CloudService } from "../../../services/cloud/CloudService";
+import { InMemorySecretStore } from "../../utils/InMemorySecretStore";
 import type {
     Monitor,
     MonitoringStartSummary,
@@ -308,6 +309,18 @@ describe("IpcService - Comprehensive Coverage", () => {
             settings: {
                 get: vi.fn(),
                 set: vi.fn(),
+            },
+            secretStore: new InMemorySecretStore(),
+            syncEngine: {
+                syncNow: vi.fn().mockResolvedValue({
+                    appliedRemoteOperations: 0,
+                    emittedLocalOperations: 0,
+                    localOperationsUploaded: 0,
+                    mergedEntities: 0,
+                    snapshotKey: null,
+                    wroteManifest: false,
+                    wroteSnapshot: false,
+                }),
             },
         });
 

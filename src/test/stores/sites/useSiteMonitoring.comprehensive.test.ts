@@ -11,7 +11,7 @@ import {
     sampleOne,
     siteNameArbitrary,
 } from "@shared/test/arbitraries/siteArbitraries";
-import type { StatusUpdateSnapshotPayload } from "../../../stores/sites/utils/statusUpdateHandler";
+import type { StatusUpdateSnapshotPayload } from "../../../stores/sites/utils/statusUpdateSnapshot";
 import { createMockFunction } from "../../utils/mockFactories";
 
 // Mock electron API

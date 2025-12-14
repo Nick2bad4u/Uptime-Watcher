@@ -1,21 +1,11 @@
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-vi.mock("@shared/utils/environment", () => ({
-    isDevelopment: vi.fn(() => true),
-}));
+import {
+    resetProcessSnapshotOverrideForTesting,
+    setProcessSnapshotOverrideForTesting,
+} from "@shared/utils/environment";
 
-vi.mock("../../services/logger", () => ({
-    logger: {
-        debug: vi.fn(),
-        error: vi.fn(),
-        info: vi.fn(),
-        warn: vi.fn(),
-    },
-}));
-
-import { isDevelopment } from "@shared/utils/environment";
-
-import { logger } from "../../services/logger";
+import { logger } from "@app/services/logger";
 import {
     createPersistConfig,
     debounce,
@@ -61,8 +51,28 @@ describe("src/stores/utils", () => {
     });
 
     describe(logStoreAction, () => {
+        beforeEach(() => {
+            setProcessSnapshotOverrideForTesting({
+                env: {
+                    NODE_ENV: "development",
+                },
+            });
+
+            vi.spyOn(logger, "info").mockImplementation(() => undefined);
+        });
+
+        afterEach(() => {
+            resetProcessSnapshotOverrideForTesting();
+
+            vi.restoreAllMocks();
+        });
+
         it("does not log when not in development", () => {
-            vi.mocked(isDevelopment).mockReturnValue(false);
+            setProcessSnapshotOverrideForTesting({
+                env: {
+                    NODE_ENV: "production",
+                },
+            });
 
             logStoreAction("Store", "action", { ok: true });
 
@@ -70,8 +80,6 @@ describe("src/stores/utils", () => {
         });
 
         it("logs when in development", () => {
-            vi.mocked(isDevelopment).mockReturnValue(true);
-
             logStoreAction("Store", "action", { ok: true });
 
             expect(logger.info).toHaveBeenCalledWith("[Store] action", {
@@ -80,8 +88,6 @@ describe("src/stores/utils", () => {
         });
 
         it("logs without metadata when undefined", () => {
-            vi.mocked(isDevelopment).mockReturnValue(true);
-
             logStoreAction("Store", "action");
 
             expect(logger.info).toHaveBeenCalledWith("[Store] action");

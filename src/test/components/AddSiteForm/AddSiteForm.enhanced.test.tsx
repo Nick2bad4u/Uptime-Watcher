@@ -41,7 +41,7 @@ const mockUseDynamicHelpText = vi.mocked(useDynamicHelpText);
 vi.mocked(useDelayedButtonLoading);
 
 // Mock data
-const mockMonitorTypes = [
+const mockMonitorTypes = vi.hoisted(() => [
     {
         type: "http",
         displayName: "HTTP",
@@ -136,7 +136,7 @@ const mockMonitorTypes = [
             },
         ],
     },
-];
+]);
 
 // Helper function to create consistent mock return values
 const createMockFormState = (
@@ -208,38 +208,114 @@ vi.mock("../../../components/SiteDetails/useAddSiteForm", () => ({
     useAddSiteForm: vi.fn(() => createMockFormState()),
 }));
 
-vi.mock("../../../stores/error/useErrorStore", () => ({
-    useErrorStore: vi.fn(() => ({
+vi.mock("../../../stores/error/useErrorStore", () => {
+    const state = {
+        clearAllErrors: vi.fn(),
+        clearAllLoading: vi.fn(),
         clearError: vi.fn(),
+        clearOperationLoading: vi.fn(),
+        clearStoreError: vi.fn(),
+        getOperationLoading: vi.fn(() => false),
+        getStoreError: vi.fn(() => undefined),
+        lastError: undefined,
+        operationLoading: {},
         setError: vi.fn(),
-        getError: vi.fn(() => null),
-        lasterror: undefined,
-    })),
-}));
+        setOperationLoading: vi.fn(),
+        setStoreError: vi.fn(),
+        storeErrors: {},
+    };
+
+    const useErrorStore = vi.fn((
+        selector?: (candidate: typeof state) => unknown
+    ) => (typeof selector === "function" ? selector(state) : state));
+
+    return { useErrorStore };
+});
 
 vi.mock("../../../stores/sites/useSitesStore", () => ({
     useSitesStore: vi.fn(() => ({
-        sites: mockSites,
-        selectedSiteIdentifier: null,
-        isLoading: false,
-        addSite: vi.fn(),
-        updateSite: vi.fn(),
+        addMonitorToSite: vi.fn().mockResolvedValue(undefined),
+        clearError: vi.fn(),
+        createSite: vi.fn().mockResolvedValue(undefined),
         deleteSite: vi.fn(),
+        error: undefined,
+        isLoading: false,
+        sites: mockSites,
+        updateSite: vi.fn(),
     })),
 }));
 
-vi.mock("../../../stores/monitor/useMonitorTypesStore", () => ({
-    useMonitorTypesStore: vi.fn(() => ({
+vi.mock("../../../stores/monitor/useMonitorTypesStore", () => {
+    const state = {
+        fieldConfigs: new Map(),
+        formatMonitorDetail: vi.fn(async () => ""),
+        formatMonitorTitleSuffix: vi.fn(async () => ""),
+        getFieldConfig: vi.fn(() => undefined),
         isLoaded: true,
-        lastError: undefined,
+        loadMonitorTypes: vi.fn(async () => undefined),
         monitorTypes: mockMonitorTypes,
-        loadMonitorTypes: vi.fn(),
-        clearError: vi.fn(),
-        validateMonitorData: vi.fn(),
-        formatMonitorDetail: vi.fn(),
-        getMonitorDetailsByType: vi.fn(),
-        formatDisplayValue: vi.fn(),
-        generateMonitorTitleSuffix: vi.fn(),
+        refreshMonitorTypes: vi.fn(async () => undefined),
+        validateMonitorData: vi.fn(async () => ({ isValid: true })),
+    };
+
+    const useMonitorTypesStore = ((
+        selector?: (value: typeof state) => unknown
+    ) =>
+        selector
+            ? selector(state)
+            : state) as unknown as typeof import("../../../stores/monitor/useMonitorTypesStore").useMonitorTypesStore;
+
+    (useMonitorTypesStore as any).getState = () => state;
+    (useMonitorTypesStore as any).setState = (partial: unknown) => {
+        if (partial && typeof partial === "object") {
+            Object.assign(state, partial);
+        }
+    };
+
+    return {
+        useMonitorTypesStore,
+    };
+});
+
+vi.mock("@app/hooks/useMonitorFields", () => ({
+    useMonitorFields: vi.fn(() => ({
+        error: undefined,
+        getFields: (monitorType: string) => {
+            switch (monitorType) {
+                case "http": {
+                    return [
+                        {
+                            label: "URL",
+                            name: "url",
+                            required: true,
+                            type: "url",
+                        },
+                        {
+                            label: "Timeout",
+                            max: 120_000,
+                            min: 1000,
+                            name: "timeout",
+                            required: false,
+                            type: "number",
+                        },
+                    ];
+                }
+                case "ping": {
+                    return [
+                        {
+                            label: "Host",
+                            name: "host",
+                            required: true,
+                            type: "text",
+                        },
+                    ];
+                }
+                default: {
+                    return [];
+                }
+            }
+        },
+        isLoaded: true,
     })),
 }));
 

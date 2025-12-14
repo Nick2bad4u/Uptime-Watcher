@@ -38,8 +38,6 @@ export const prepareMonitorTypesStore = (
     useMonitorTypesStore.setState({
         fieldConfigs: createFieldConfigMap(monitorTypes),
         isLoaded: true,
-        isLoading: false,
-        lastError: undefined,
         monitorTypes,
     });
 };

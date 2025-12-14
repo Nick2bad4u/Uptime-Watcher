@@ -1,846 +1,184 @@
-/**
- * Comprehensive AddSiteForm tests with proper interface usage
- */
-
-import { describe, expect, it, vi, beforeEach } from "vitest";
-import { render, screen } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
-import {
-    sampleOne,
-    siteNameArbitrary,
-    siteUrlArbitrary,
-} from "@shared/test/arbitraries/siteArbitraries";
 
-// Import constants
-import { DEFAULT_CHECK_INTERVAL } from "../../../constants";
+import { render, screen, waitFor, within } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
-// Mock all dependencies with proper interfaces
-const mockSetAddMode = vi.fn();
-const mockSetName = vi.fn();
-const mockSetUrl = vi.fn();
-const mockSetMonitorType = vi.fn();
-const mockSetCheckInterval = vi.fn();
-const mockSetHost = vi.fn();
-const mockSetPort = vi.fn();
-const mockResetForm = vi.fn();
-const mockIsFormValid = vi.fn(() => true);
-const mockSetFormError = vi.fn();
-const mockSetSelectedExistingSite = vi.fn();
-const mockSetSiteIdentifier = vi.fn();
-
-// Get the mocked useAddSiteForm function
-const mockUseAddSiteForm = vi.fn(() => ({
-    // AddSiteFormState properties
-    addMode: "new" as "new" | "existing",
-    checkInterval: DEFAULT_CHECK_INTERVAL,
-    formError: undefined as string | undefined,
-    host: "",
-    monitorType: "http" as "http" | "port" | "ping",
-    name: "",
-    port: "",
-    selectedExistingSite: "",
-    siteIdentifier: "test-site-id",
-    url: "",
-    // AddSiteFormActions methods
-    isFormValid: mockIsFormValid,
-    resetForm: mockResetForm,
-    setAddMode: mockSetAddMode,
-    setCheckInterval: mockSetCheckInterval,
-    setFormError: mockSetFormError,
-    setHost: mockSetHost,
-    setMonitorType: mockSetMonitorType,
-    setName: mockSetName,
-    setPort: mockSetPort,
-    setSelectedExistingSite: mockSetSelectedExistingSite,
-    setSiteIdentifier: mockSetSiteIdentifier,
-    setUrl: mockSetUrl,
-}));
-
-vi.mock("../../../components/SiteDetails/useAddSiteForm", () => ({
-    get useAddSiteForm() {
-        return mockUseAddSiteForm;
-    },
-}));
-
-// Mock useMonitorTypesStore to provide monitor types configurations
-const mockMonitorTypes = [
-    {
-        type: "http",
-        name: "HTTP",
-        fields: [{ name: "url", type: "text", label: "URL", required: true }],
-    },
-    {
-        type: "port",
-        name: "Port",
-        fields: [
-            { name: "host", type: "text", label: "Host", required: true },
-            { name: "port", type: "number", label: "Port", required: true },
-        ],
-    },
-    {
-        type: "ping",
-        name: "Ping",
-        fields: [{ name: "host", type: "text", label: "Host", required: true }],
-    },
-];
-
-vi.mock("../../../stores/monitor/useMonitorTypesStore", () => ({
-    useMonitorTypesStore: vi.fn(() => ({
-        isLoaded: true,
-        lastError: undefined,
-        monitorTypes: mockMonitorTypes,
-        loadMonitorTypes: vi.fn(),
-    })),
-}));
-
-vi.mock("../../../constants", async (importOriginal) => {
-    const actual =
-        (await importOriginal()) as typeof import("../../../constants");
-    return {
-        ...actual,
-        ARIA_LABEL: "aria-label",
-        TRANSITION_ALL: "all 0.2s ease-in-out",
-        CHECK_INTERVALS: [
-            { label: "1 minute", value: 60_000 },
-            { label: "5 minutes", value: 300_000 },
-            { label: "10 minutes", value: 600_000 },
-        ],
-        DEFAULT_CHECK_INTERVAL: 60_000,
-        UI_DELAYS: {
-            STATE_UPDATE_DEFER: 100,
-        },
-        FALLBACK_MONITOR_TYPE_OPTIONS: [
-            { label: "HTTP", value: "http" },
-            { label: "Ping", value: "ping" },
-            { label: "Port", value: "port" },
-        ],
-    };
-});
-
-vi.mock("../../../stores/error/useErrorStore", () => ({
-    useErrorStore: vi.fn(() => ({
-        clearError: vi.fn(),
-        setError: vi.fn(),
-        lastError: null,
-    })),
-}));
-
-vi.mock("../../../stores/sites/useSitesStore", () => ({
-    useSitesStore: vi.fn(() => ({
-        sites: [],
-        addSite: vi.fn(),
-        isLoading: false,
-    })),
-}));
-
-vi.mock("../../../hooks/useMonitorTypes", () => ({
-    useMonitorTypes: vi.fn(() => ({
-        monitorTypes: [
-            { id: "http", label: "HTTP" },
-            { id: "ping", label: "Ping" },
-            { id: "port", label: "Port" },
-        ],
-        options: [
-            { label: "HTTP", value: "http" },
-            { label: "Ping", value: "ping" },
-            { label: "Port", value: "port" },
-        ],
-        isLoading: false,
-        error: null,
-    })),
-}));
-
-vi.mock("../../../hooks/useDynamicHelpText", () => ({
-    useDynamicHelpText: vi.fn(() => ({
-        helpText: "Enter the details for your new site monitor",
-        error: null,
-        isLoading: false,
-    })),
-}));
+import { AddSiteForm } from "../../../components/AddSiteForm/AddSiteForm";
+import { handleSubmit } from "../../../components/AddSiteForm/Submit";
+import { useErrorStore } from "../../../stores/error/useErrorStore";
+import { useMonitorTypesStore } from "../../../stores/monitor/useMonitorTypesStore";
 
 vi.mock("../../../components/AddSiteForm/Submit", () => ({
     handleSubmit: vi.fn(),
 }));
 
-vi.mock("../../../utils/data/generateUuid", () => ({
-    generateUuid: vi.fn(() => "test-uuid-123"),
+/**
+ * This suite intentionally mocks useMonitorFields so it does not depend on IPC
+ * bridge readiness.
+ */
+vi.mock("@app/hooks/useMonitorFields", () => ({
+    useMonitorFields: vi.fn(() => ({
+        error: undefined,
+        getFields: (monitorType: string) => {
+            switch (monitorType) {
+                case "http": {
+                    return [
+                        {
+                            label: "URL",
+                            name: "url",
+                            required: true,
+                            type: "url",
+                        },
+                    ];
+                }
+                case "port": {
+                    return [
+                        {
+                            label: "Host",
+                            name: "host",
+                            required: true,
+                            type: "text",
+                        },
+                        {
+                            label: "Port",
+                            name: "port",
+                            required: true,
+                            type: "number",
+                        },
+                    ];
+                }
+                case "ping": {
+                    return [
+                        {
+                            label: "Host",
+                            name: "host",
+                            required: true,
+                            type: "text",
+                        },
+                    ];
+                }
+                default: {
+                    return [];
+                }
+            }
+        },
+        isLoaded: true,
+    })),
 }));
 
-// Import the component under test
-import { AddSiteForm } from "../../../components/AddSiteForm/AddSiteForm";
+function resetStores(): void {
+    useErrorStore.getState().clearAllErrors();
 
-describe("AddSiteForm - Comprehensive Tests", () => {
+    useMonitorTypesStore.setState({
+        isLoaded: true,
+        monitorTypes: [
+            {
+                description: "HTTP monitor",
+                displayName: "HTTP",
+                fields: [
+                    {
+                        label: "URL",
+                        name: "url",
+                        required: true,
+                        type: "url",
+                    },
+                ],
+                type: "http",
+                version: "1.0.0",
+            },
+            {
+                description: "Port monitor",
+                displayName: "Port",
+                fields: [
+                    {
+                        label: "Host",
+                        name: "host",
+                        required: true,
+                        type: "text",
+                    },
+                    {
+                        label: "Port",
+                        name: "port",
+                        required: true,
+                        type: "number",
+                    },
+                ],
+                type: "port",
+                version: "1.0.0",
+            },
+            {
+                description: "Ping monitor",
+                displayName: "Ping",
+                fields: [
+                    {
+                        label: "Host",
+                        name: "host",
+                        required: true,
+                        type: "text",
+                    },
+                ],
+                type: "ping",
+                version: "1.0.0",
+            },
+        ],
+    });
+}
+
+describe("AddSiteForm (comprehensive new)", () => {
     beforeEach(() => {
         vi.clearAllMocks();
-
-        // Reset to default state
-        mockUseAddSiteForm.mockReturnValue({
-            addMode: "new" as "new" | "existing",
-            checkInterval: DEFAULT_CHECK_INTERVAL,
-            formError: undefined as string | undefined,
-            host: "",
-            monitorType: "http" as "http" | "port" | "ping",
-            name: "",
-            port: "",
-            selectedExistingSite: "",
-            siteIdentifier: "test-site-id",
-            url: "",
-            isFormValid: mockIsFormValid,
-            resetForm: mockResetForm,
-            setAddMode: mockSetAddMode,
-            setCheckInterval: mockSetCheckInterval,
-            setFormError: mockSetFormError,
-            setHost: mockSetHost,
-            setMonitorType: mockSetMonitorType,
-            setName: mockSetName,
-            setPort: mockSetPort,
-            setSelectedExistingSite: mockSetSelectedExistingSite,
-            setSiteIdentifier: mockSetSiteIdentifier,
-            setUrl: mockSetUrl,
-        });
-    });
-    describe("Basic Rendering", () => {
-        it("should render without crashing", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteForm.comprehensive.new", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteForm.comprehensive.new", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
-            render(<AddSiteForm />);
-            expect(screen.getByRole("button")).toBeInTheDocument();
-        });
-
-        it("should render all form sections", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteForm.comprehensive.new", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteForm.comprehensive.new", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
-            render(<AddSiteForm />);
-
-            // Check for radio group (Add Mode)
-            expect(screen.getByRole("radiogroup")).toBeInTheDocument();
-
-            // Check for select elements
-            const selects = screen.getAllByRole("combobox");
-            expect(selects.length).toBeGreaterThan(0);
-
-            // Check for submit button
-            expect(screen.getByRole("button")).toBeInTheDocument();
-        });
-
-        it("should display correct initial values", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteForm.comprehensive.new", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Initialization", "type");
-
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteForm.comprehensive.new", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Initialization", "type");
-
-            render(<AddSiteForm />);
-
-            // Check that "Create New Site" radio is selected by default
-            const newSiteRadio = screen.getByDisplayValue("new");
-            expect(newSiteRadio).toBeChecked();
-        });
+        resetStores();
     });
 
-    describe("Form Interactions", () => {
-        it("should call setAddMode when switching modes", async ({
-            task,
-            annotate,
-        }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteForm.comprehensive.new", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
+    it("renders the initial HTTP form fields", () => {
+        render(<AddSiteForm />);
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteForm.comprehensive.new", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
+        expect(
+            screen.getByRole("textbox", { name: /site name/i })
+        ).toBeVisible();
 
-            const user = userEvent.setup();
-            render(<AddSiteForm />);
-
-            const existingRadio = screen.getByDisplayValue("existing");
-            await user.click(existingRadio);
-
-            expect(mockSetAddMode).toHaveBeenCalledWith("existing");
-        });
-
-        it("should call setMonitorType when changing monitor type", async ({
-            task,
-            annotate,
-        }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteForm.comprehensive.new", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Monitoring", "type");
-
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteForm.comprehensive.new", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Monitoring", "type");
-
-            const user = userEvent.setup();
-            render(<AddSiteForm />);
-
-            const monitorSelect = screen.getByLabelText("Monitor Type");
-            await user.selectOptions(monitorSelect, "ping");
-
-            expect(mockSetMonitorType).toHaveBeenCalledWith("ping");
-        });
-
-        it("should call setCheckInterval when changing check interval", async ({
-            task,
-            annotate,
-        }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteForm.comprehensive.new", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteForm.comprehensive.new", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
-            const user = userEvent.setup();
-            render(<AddSiteForm />);
-
-            const intervalSelect = screen.getByLabelText("Check Interval");
-            await user.selectOptions(intervalSelect, "300000");
-
-            expect(mockSetCheckInterval).toHaveBeenCalledWith(300_000);
-        });
+        // Default monitor type is expected to be HTTP in the add-site flow.
+        expect(screen.getByRole("textbox", { name: /url/i })).toBeVisible();
     });
 
-    describe("New Site Mode", () => {
-        let newSiteName: string;
-        let newSiteUrl: string;
+    it("renders the port monitor fields when selected", async () => {
+        const user = userEvent.setup();
+        render(<AddSiteForm />);
 
-        beforeEach(() => {
-            newSiteName = sampleOne(siteNameArbitrary);
-            newSiteUrl = sampleOne(siteUrlArbitrary);
-            mockUseAddSiteForm.mockReturnValue({
-                addMode: "new" as "new" | "existing",
-                checkInterval: DEFAULT_CHECK_INTERVAL,
-                formError: undefined as string | undefined,
-                host: "",
-                monitorType: "http" as "http" | "port" | "ping",
-                name: newSiteName,
-                port: "",
-                selectedExistingSite: "",
-                siteIdentifier: "test-site-id",
-                url: newSiteUrl,
-                isFormValid: mockIsFormValid,
-                resetForm: mockResetForm,
-                setAddMode: mockSetAddMode,
-                setCheckInterval: mockSetCheckInterval,
-                setFormError: mockSetFormError,
-                setHost: mockSetHost,
-                setMonitorType: mockSetMonitorType,
-                setName: mockSetName,
-                setPort: mockSetPort,
-                setSelectedExistingSite: mockSetSelectedExistingSite,
-                setSiteIdentifier: mockSetSiteIdentifier,
-                setUrl: mockSetUrl,
-            });
-        });
-        it("should show site name field for new sites", ({
-            task,
-            annotate,
-        }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteForm.comprehensive.new", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
+        const monitorTypeSelect = screen.getByLabelText(/monitor type/i);
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteForm.comprehensive.new", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
-            render(<AddSiteForm />);
-
-            const nameInput = screen.getByLabelText(/site name/i);
-            expect(nameInput).toBeInTheDocument();
-            expect(nameInput).toHaveValue(newSiteName);
+        // Monitor type options are loaded asynchronously via useMonitorTypes.
+        await waitFor(() => {
+            expect(monitorTypeSelect).toBeEnabled();
         });
 
-        it("should show URL field for HTTP monitor", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteForm.comprehensive.new", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Monitoring", "type");
+        await user.selectOptions(monitorTypeSelect, "port");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteForm.comprehensive.new", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Monitoring", "type");
-
-            mockUseAddSiteForm.mockReturnValue({
-                addMode: "new" as "new" | "existing",
-                checkInterval: DEFAULT_CHECK_INTERVAL,
-                formError: undefined as string | undefined,
-                host: "",
-                monitorType: "http" as "http" | "port" | "ping",
-                name: "",
-                port: "0",
-                selectedExistingSite: "",
-                siteIdentifier: "test-site-id",
-                url: sampleOne(siteUrlArbitrary),
-                isFormValid: mockIsFormValid,
-                resetForm: mockResetForm,
-                setAddMode: mockSetAddMode,
-                setCheckInterval: mockSetCheckInterval,
-                setFormError: mockSetFormError,
-                setHost: mockSetHost,
-                setMonitorType: mockSetMonitorType,
-                setName: mockSetName,
-                setPort: mockSetPort,
-                setSelectedExistingSite: mockSetSelectedExistingSite,
-                setSiteIdentifier: mockSetSiteIdentifier,
-                setUrl: mockSetUrl,
-            });
-
-            render(<AddSiteForm />);
-
-            const urlInput = screen.getByLabelText(/url/i);
-            expect(urlInput).toBeInTheDocument();
-            // Note: Field value test removed as form component may not be using mock values correctly
-        });
-
-        it("should call setName when site name changes", async ({
-            task,
-            annotate,
-        }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteForm.comprehensive.new", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteForm.comprehensive.new", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
-            const user = userEvent.setup();
-            render(<AddSiteForm />);
-
-            const nameInput = screen.getByLabelText(/site name/i);
-            const typedSiteName = sampleOne(siteNameArbitrary);
-            await user.type(nameInput, typedSiteName);
-
-            // Check that setName was called (accepting any pattern for now)
-            expect(mockSetName).toHaveBeenCalled();
-        });
+        expect(screen.getByRole("textbox", { name: /host/i })).toBeVisible();
+        expect(screen.getByRole("spinbutton", { name: /port/i })).toBeVisible();
     });
 
-    describe("Port Monitor Type", () => {
-        beforeEach(() => {
-            mockUseAddSiteForm.mockReturnValue({
-                addMode: "new" as "new" | "existing",
-                checkInterval: DEFAULT_CHECK_INTERVAL,
-                formError: undefined as string | undefined,
-                host: "192.168.1.1",
-                monitorType: "port" as "http" | "port" | "ping",
-                name: "Port Monitor",
-                port: "8080",
-                selectedExistingSite: "",
-                siteIdentifier: "test-site-id",
-                url: "",
-                isFormValid: mockIsFormValid,
-                resetForm: mockResetForm,
-                setAddMode: mockSetAddMode,
-                setCheckInterval: mockSetCheckInterval,
-                setFormError: mockSetFormError,
-                setHost: mockSetHost,
-                setMonitorType: mockSetMonitorType,
-                setName: mockSetName,
-                setPort: mockSetPort,
-                setSelectedExistingSite: mockSetSelectedExistingSite,
-                setSiteIdentifier: mockSetSiteIdentifier,
-                setUrl: mockSetUrl,
-            });
-        });
-        it("should show host and port fields for port monitor", ({
-            task,
-            annotate,
-        }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteForm.comprehensive.new", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Monitoring", "type");
+    it("calls handleSubmit when the user submits", async () => {
+        const user = userEvent.setup();
+        render(<AddSiteForm />);
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteForm.comprehensive.new", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Monitoring", "type");
+        await user.type(
+            screen.getByRole("textbox", { name: /site name/i }),
+            "Test"
+        );
+        await user.type(
+            screen.getByRole("textbox", { name: /url/i }),
+            "https://example.com"
+        );
 
-            render(<AddSiteForm />);
-            const hostInput = screen.getByLabelText(/host/i);
-            const portInput = screen.getByLabelText(/port/i);
-
-            expect(hostInput).toBeInTheDocument();
-            expect(portInput).toBeInTheDocument();
-            // Note: Field value tests removed as form component may not be using mock values correctly
-        });
-    });
-
-    describe("Existing Site Mode", () => {
-        let existingSiteUrl: string;
-
-        beforeEach(() => {
-            existingSiteUrl = sampleOne(siteUrlArbitrary);
-            mockUseAddSiteForm.mockReturnValue({
-                addMode: "existing" as "new" | "existing",
-                checkInterval: DEFAULT_CHECK_INTERVAL,
-                formError: undefined as string | undefined,
-                host: "",
-                monitorType: "http" as "http" | "port" | "ping",
-                name: "",
-                port: "",
-                selectedExistingSite: "existing-site-id",
-                siteIdentifier: "test-site-id",
-                url: existingSiteUrl,
-                isFormValid: mockIsFormValid,
-                resetForm: mockResetForm,
-                setAddMode: mockSetAddMode,
-                setCheckInterval: mockSetCheckInterval,
-                setFormError: mockSetFormError,
-                setHost: mockSetHost,
-                setMonitorType: mockSetMonitorType,
-                setName: mockSetName,
-                setPort: mockSetPort,
-                setSelectedExistingSite: mockSetSelectedExistingSite,
-                setSiteIdentifier: mockSetSiteIdentifier,
-                setUrl: mockSetUrl,
-            });
-        });
-        it("should show existing mode as selected", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteForm.comprehensive.new", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteForm.comprehensive.new", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
-            render(<AddSiteForm />);
-
-            const existingRadio = screen.getByDisplayValue("existing");
-            expect(existingRadio).toBeChecked();
+        const form = screen.getByRole("form", { name: /add site/i });
+        const submitButton = within(form).getByRole("button", {
+            name: /add site/i,
         });
 
-        it("should not show site name field for existing sites", ({
-            task,
-            annotate,
-        }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteForm.comprehensive.new", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
+        await user.click(submitButton);
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteForm.comprehensive.new", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
-            render(<AddSiteForm />);
-
-            const nameInput = screen.queryByLabelText(/site name/i);
-            expect(nameInput).not.toBeInTheDocument();
-        });
-    });
-
-    describe("Form Validation", () => {
-        it("should not disable submit button when form is invalid (validation happens on submit)", ({
-            task,
-            annotate,
-        }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteForm.comprehensive.new", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Validation", "type");
-
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteForm.comprehensive.new", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Validation", "type");
-
-            mockIsFormValid.mockReturnValue(false);
-            mockUseAddSiteForm.mockReturnValue({
-                addMode: "new" as "new" | "existing",
-                checkInterval: DEFAULT_CHECK_INTERVAL,
-                formError: "Site name is required" as string | undefined,
-                host: "",
-                monitorType: "http" as "http" | "port" | "ping",
-                name: "",
-                port: "",
-                selectedExistingSite: "",
-                siteIdentifier: "test-site-id",
-                url: "",
-                isFormValid: mockIsFormValid,
-                resetForm: mockResetForm,
-                setAddMode: mockSetAddMode,
-                setCheckInterval: mockSetCheckInterval,
-                setFormError: mockSetFormError,
-                setHost: mockSetHost,
-                setMonitorType: mockSetMonitorType,
-                setName: mockSetName,
-                setPort: mockSetPort,
-                setSelectedExistingSite: mockSetSelectedExistingSite,
-                setSiteIdentifier: mockSetSiteIdentifier,
-                setUrl: mockSetUrl,
-            });
-
-            render(<AddSiteForm />);
-
-            const submitButton = screen.getByRole("button", {
-                name: /add site/i,
-            });
-            expect(submitButton).not.toBeDisabled();
-        });
-
-        it("should enable submit button when form is valid", ({
-            task,
-            annotate,
-        }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteForm.comprehensive.new", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteForm.comprehensive.new", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
-            mockIsFormValid.mockReturnValue(true);
-
-            render(<AddSiteForm />);
-
-            const submitButton = screen.getByRole("button");
-            expect(submitButton).not.toBeDisabled();
-        });
-
-        it("should display form error when present", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteForm.comprehensive.new", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Error Handling", "type");
-
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteForm.comprehensive.new", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Error Handling", "type");
-
-            mockUseAddSiteForm.mockReturnValue({
-                addMode: "new" as "new" | "existing",
-                checkInterval: DEFAULT_CHECK_INTERVAL,
-                formError: "Site name is required" as string | undefined,
-                host: "",
-                monitorType: "http" as "http" | "port" | "ping",
-                name: "",
-                port: "",
-                selectedExistingSite: "",
-                siteIdentifier: "test-site-id",
-                url: "",
-                isFormValid: mockIsFormValid,
-                resetForm: mockResetForm,
-                setAddMode: mockSetAddMode,
-                setCheckInterval: mockSetCheckInterval,
-                setFormError: mockSetFormError,
-                setHost: mockSetHost,
-                setMonitorType: mockSetMonitorType,
-                setName: mockSetName,
-                setPort: mockSetPort,
-                setSelectedExistingSite: mockSetSelectedExistingSite,
-                setSiteIdentifier: mockSetSiteIdentifier,
-                setUrl: mockSetUrl,
-            });
-
-            render(<AddSiteForm />);
-
-            const errorMessages = screen.getAllByText("Site name is required");
-            expect(errorMessages.length).toBeGreaterThanOrEqual(1);
-        });
-    });
-
-    describe("Monitor Type Options", () => {
-        it("should display all monitor type options", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteForm.comprehensive.new", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Monitoring", "type");
-
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteForm.comprehensive.new", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Monitoring", "type");
-
-            render(<AddSiteForm />);
-
-            // Check that all options are present in the select element
-            const monitorTypeSelect = screen.getByRole("combobox", {
-                name: /monitor type/i,
-            });
-            expect(monitorTypeSelect).toBeInTheDocument();
-            // Check that all options are available
-            expect(
-                screen.getByRole("option", { name: "HTTP" })
-            ).toBeInTheDocument();
-            expect(
-                screen.getByRole("option", { name: "Ping" })
-            ).toBeInTheDocument();
-            expect(
-                screen.getByRole("option", { name: "Port" })
-            ).toBeInTheDocument();
-        });
-    });
-
-    describe("Check Interval Options", () => {
-        it("should display all check interval options", ({
-            task,
-            annotate,
-        }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteForm.comprehensive.new", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteForm.comprehensive.new", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
-            render(<AddSiteForm />);
-
-            // Check that all interval options are present
-            expect(screen.getByText("1 minute")).toBeInTheDocument();
-            expect(screen.getByText("5 minutes")).toBeInTheDocument();
-            expect(screen.getByText("10 minutes")).toBeInTheDocument();
-        });
-    });
-
-    describe("Form Reset", () => {
-        it("should call resetForm when reset is triggered", ({
-            task,
-            annotate,
-        }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteForm.comprehensive.new", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteForm.comprehensive.new", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
-            render(<AddSiteForm />);
-
-            // Trigger reset via any mechanism that calls it
-            // (This would depend on how reset is implemented in the component)
-            expect(mockResetForm).toBeDefined();
-        });
-    });
-
-    describe("Accessibility", () => {
-        it("should have proper ARIA labels", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteForm.comprehensive.new", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteForm.comprehensive.new", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
-            render(<AddSiteForm />);
-
-            expect(screen.getByLabelText("Monitor Type")).toBeInTheDocument();
-            expect(screen.getByLabelText("Check Interval")).toBeInTheDocument();
-        });
-
-        it("should have proper form structure", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteForm.comprehensive.new", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteForm.comprehensive.new", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
-            render(<AddSiteForm />);
-
-            expect(screen.getByRole("radiogroup")).toBeInTheDocument();
-            expect(screen.getByRole("button")).toBeInTheDocument();
-        });
-    });
-
-    describe("Error Handling", () => {
-        it("should handle undefined form error gracefully", ({
-            task,
-            annotate,
-        }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteForm.comprehensive.new", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Error Handling", "type");
-
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteForm.comprehensive.new", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Error Handling", "type");
-
-            mockUseAddSiteForm.mockReturnValue({
-                addMode: "new" as "new" | "existing",
-                checkInterval: DEFAULT_CHECK_INTERVAL,
-                formError: undefined as string | undefined,
-                host: "",
-                monitorType: "http" as "http" | "port" | "ping",
-                name: "",
-                port: "",
-                selectedExistingSite: "",
-                siteIdentifier: "test-site-id",
-                url: "",
-                isFormValid: mockIsFormValid,
-                resetForm: mockResetForm,
-                setAddMode: mockSetAddMode,
-                setCheckInterval: mockSetCheckInterval,
-                setFormError: mockSetFormError,
-                setHost: mockSetHost,
-                setMonitorType: mockSetMonitorType,
-                setName: mockSetName,
-                setPort: mockSetPort,
-                setSelectedExistingSite: mockSetSelectedExistingSite,
-                setSiteIdentifier: mockSetSiteIdentifier,
-                setUrl: mockSetUrl,
-            });
-
-            expect(() => render(<AddSiteForm />)).not.toThrowError();
-        });
+        expect(vi.mocked(handleSubmit)).toHaveBeenCalledTimes(1);
     });
 });

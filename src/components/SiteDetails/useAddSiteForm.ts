@@ -216,6 +216,16 @@ export type UseAddSiteFormReturn = Simplify<
     AddSiteFormActions & AddSiteFormState
 >;
 
+/**
+ * Extended return type that also exposes monitor-field load state.
+ */
+export type UseAddSiteFormReturnWithMonitorFields = UseAddSiteFormReturn & {
+    /** Error message if monitor field configurations failed to load. */
+    monitorFieldsError?: string | undefined;
+    /** Whether monitor field configurations are loaded. */
+    monitorFieldsLoaded: boolean;
+};
+
 // Helper functions for add site form logic (reduces function length by
 // composition)
 interface MonitorFieldValues {
@@ -533,7 +543,7 @@ const trimLeadingWhitespace = (value: string): string => value.trimStart();
  * @returns The complete {@link UseAddSiteFormReturn} object consumed by
  *   AddSiteForm.
  */
-export function useAddSiteForm(): UseAddSiteFormReturn {
+export function useAddSiteForm(): UseAddSiteFormReturnWithMonitorFields {
     // Form field state
     const [url, setUrl] = useState("");
     const [baselineUrl, setBaselineUrl] = useState("");
@@ -641,7 +651,11 @@ export function useAddSiteForm(): UseAddSiteFormReturn {
     const [formError, setFormError] = useState<string | undefined>();
 
     // Use monitor fields hook for dynamic validation
-    const { getFields } = useMonitorFields();
+    const {
+        error: monitorFieldsError,
+        getFields,
+        isLoaded: monitorFieldsLoaded,
+    } = useMonitorFields();
 
     // Reset fields when monitor type changes - using useEffect to avoid render-time setState
     useEffect(
@@ -832,6 +846,8 @@ export function useAddSiteForm(): UseAddSiteFormReturn {
         maxPongDelayMs,
         maxReplicationLagSeconds,
         maxResponseTime,
+        monitorFieldsError,
+        monitorFieldsLoaded,
         monitorType,
         name,
         port,

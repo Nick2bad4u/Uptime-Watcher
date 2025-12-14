@@ -30,47 +30,33 @@ const payloadArbitrary = fc.oneof(
     fc.constant(null)
 );
 
-// Mock the logger
-vi.mock("../../../services/logger", () => ({
-    logger: {
-        info: vi.fn(),
-        error: vi.fn(),
-        debug: vi.fn(),
-        warn: vi.fn(),
-        app: {
-            started: vi.fn(),
-            error: vi.fn(),
-        },
-        site: {
-            error: vi.fn(),
-            info: vi.fn(),
-        },
-        user: {
-            action: vi.fn(),
-        },
-        system: {
-            error: vi.fn(),
-            info: vi.fn(),
-        },
-    },
-}));
-
-// Mock environment functions
-vi.mock("../../../../shared/utils/environment", () => ({
-    isDevelopment: vi.fn(),
-}));
-
 import { logStoreAction } from "../../../stores/utils";
-import { isDevelopment } from "../../../../shared/utils/environment";
-import { logger } from "../../../services/logger";
+import {
+    resetProcessSnapshotOverrideForTesting,
+    setProcessSnapshotOverrideForTesting,
+} from "@shared/utils/environment";
+import { logger } from "@app/services/logger";
 
-// Get the mocked versions
-const mockIsDevelopment = vi.mocked(isDevelopment);
 const mockLogger = vi.mocked(logger);
 
 describe("Store Utils", () => {
     beforeEach(() => {
         vi.clearAllMocks();
+
+        vi.spyOn(logger, "info").mockImplementation(() => undefined);
+
+        // Default to development mode (logStoreAction should log).
+        setProcessSnapshotOverrideForTesting({
+            env: {
+                NODE_ENV: "development",
+            },
+        });
+    });
+
+    afterEach(() => {
+        resetProcessSnapshotOverrideForTesting();
+
+        vi.restoreAllMocks();
     });
 
     describe(logStoreAction, () => {
@@ -82,8 +68,6 @@ describe("Store Utils", () => {
             await annotate("Component: utils", "component");
             await annotate("Category: Store", "category");
             await annotate("Type: Data Loading", "type");
-
-            mockIsDevelopment.mockReturnValue(true);
 
             logStoreAction("TestStore", "testAction");
 
@@ -100,8 +84,6 @@ describe("Store Utils", () => {
             await annotate("Component: utils", "component");
             await annotate("Category: Store", "category");
             await annotate("Type: Data Loading", "type");
-
-            mockIsDevelopment.mockReturnValue(true);
             const payload = { test: "data" };
 
             logStoreAction("TestStore", "testAction", payload);
@@ -121,7 +103,11 @@ describe("Store Utils", () => {
             await annotate("Category: Store", "category");
             await annotate("Type: Business Logic", "type");
 
-            mockIsDevelopment.mockReturnValue(false);
+            setProcessSnapshotOverrideForTesting({
+                env: {
+                    NODE_ENV: "production",
+                },
+            });
 
             logStoreAction("TestStore", "testAction");
 
@@ -137,7 +123,11 @@ describe("Store Utils", () => {
             await annotate("Category: Store", "category");
             await annotate("Type: Data Loading", "type");
 
-            mockIsDevelopment.mockReturnValue(false);
+            setProcessSnapshotOverrideForTesting({
+                env: {
+                    NODE_ENV: "production",
+                },
+            });
             const payload = { test: "data" };
 
             logStoreAction("TestStore", "testAction", payload);
@@ -154,8 +144,6 @@ describe("Store Utils", () => {
             await annotate("Category: Store", "category");
             await annotate("Type: Data Loading", "type");
 
-            mockIsDevelopment.mockReturnValue(true);
-
             logStoreAction("TestStore", "testAction", undefined);
 
             expect(mockLogger.info).toHaveBeenCalledWith(
@@ -168,8 +156,6 @@ describe("Store Utils", () => {
             await annotate("Component: utils", "component");
             await annotate("Category: Store", "category");
             await annotate("Type: Data Loading", "type");
-
-            mockIsDevelopment.mockReturnValue(true);
 
             logStoreAction("TestStore", "testAction", null);
 
@@ -185,8 +171,6 @@ describe("Store Utils", () => {
             await annotate("Category: Store", "category");
             await annotate("Type: Data Loading", "type");
 
-            mockIsDevelopment.mockReturnValue(true);
-
             logStoreAction("TestStore", "testAction", "");
 
             expect(mockLogger.info).toHaveBeenCalledWith(
@@ -200,8 +184,6 @@ describe("Store Utils", () => {
             await annotate("Component: utils", "component");
             await annotate("Category: Store", "category");
             await annotate("Type: Data Loading", "type");
-
-            mockIsDevelopment.mockReturnValue(true);
 
             logStoreAction("TestStore", "testAction", 42);
 
@@ -217,8 +199,6 @@ describe("Store Utils", () => {
             await annotate("Category: Store", "category");
             await annotate("Type: Data Loading", "type");
 
-            mockIsDevelopment.mockReturnValue(true);
-
             logStoreAction("TestStore", "testAction", true);
 
             expect(mockLogger.info).toHaveBeenCalledWith(
@@ -231,7 +211,6 @@ describe("Store Utils", () => {
             test.prop([storeNameArbitrary, actionNameArbitrary])(
                 "should format log message correctly for any valid store and action names in development",
                 (storeName, actionName) => {
-                    mockIsDevelopment.mockReturnValue(true);
                     vi.clearAllMocks();
 
                     logStoreAction(storeName, actionName);
@@ -251,7 +230,6 @@ describe("Store Utils", () => {
                 actionName,
                 payload
             ) => {
-                mockIsDevelopment.mockReturnValue(true);
                 vi.clearAllMocks();
 
                 logStoreAction(storeName, actionName, payload);
@@ -271,7 +249,11 @@ describe("Store Utils", () => {
                 actionName,
                 payload
             ) => {
-                mockIsDevelopment.mockReturnValue(false);
+                setProcessSnapshotOverrideForTesting({
+                    env: {
+                        NODE_ENV: "production",
+                    },
+                });
                 vi.clearAllMocks();
 
                 logStoreAction(storeName, actionName, payload);
@@ -282,7 +264,6 @@ describe("Store Utils", () => {
             test.prop([storeNameArbitrary, actionNameArbitrary])(
                 "should handle undefined payload consistently",
                 (storeName, actionName) => {
-                    mockIsDevelopment.mockReturnValue(true);
                     vi.clearAllMocks();
 
                     logStoreAction(storeName, actionName, undefined);

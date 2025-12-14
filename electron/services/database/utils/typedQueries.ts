@@ -126,11 +126,11 @@ export interface CountResult {
 }
 
 /**
- * Database result shape containing only an auto-generated numeric ID.
+ * Database result shape containing only an identifier.
  */
 export interface IdOnlyResult {
-    /** Auto-generated primary key identifier. */
-    id: number;
+    /** Primary key identifier (numeric or text). */
+    id: number | string;
 }
 
 const isValidCountResult = (
@@ -236,6 +236,11 @@ export function queryForIds(
 
         const candidateId = row["id"];
         if (typeof candidateId === "number" && Number.isFinite(candidateId)) {
+            validRows.push({ id: candidateId });
+            return;
+        }
+
+        if (typeof candidateId === "string" && candidateId.length > 0) {
             validRows.push({ id: candidateId });
         }
     });

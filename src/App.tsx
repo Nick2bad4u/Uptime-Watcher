@@ -35,6 +35,7 @@ import {
 import { StatusAlertToaster } from "./components/Alerts/StatusAlertToaster";
 import { ConfirmDialog } from "./components/common/ConfirmDialog/ConfirmDialog";
 import { ErrorAlert } from "./components/common/ErrorAlert/ErrorAlert";
+import { PromptDialog } from "./components/common/PromptDialog/PromptDialog";
 import { DashboardOverview } from "./components/Dashboard/Overview/DashboardOverview";
 import { SiteList } from "./components/Dashboard/SiteList/SiteList";
 import { Header } from "./components/Header/Header";
@@ -57,6 +58,7 @@ import { useErrorStore } from "./stores/error/useErrorStore";
 import { useSettingsStore } from "./stores/settings/useSettingsStore";
 import { useSitesStore } from "./stores/sites/useSitesStore";
 import { useConfirmDialogVisibility } from "./stores/ui/useConfirmDialogStore";
+import { usePromptDialogVisibility } from "./stores/ui/usePromptDialogStore";
 import { useUIStore } from "./stores/ui/useUiStore";
 import { useUpdatesStore } from "./stores/updates/useUpdatesStore";
 import { ThemedBox } from "./theme/components/ThemedBox";
@@ -212,6 +214,9 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
 
     const { cancel: closeConfirmDialog, isOpen: isConfirmDialogOpen } =
         useConfirmDialogVisibility();
+
+    const { cancel: closePromptDialog, isOpen: isPromptDialogOpen } =
+        usePromptDialogVisibility();
 
     // Updates store
     const {
@@ -928,6 +933,11 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
     const modalConfigs = useMemo(
         () => [
             {
+                isOpen: isPromptDialogOpen,
+                onClose: closePromptDialog,
+                priority: 5,
+            },
+            {
                 isOpen: isConfirmDialogOpen,
                 onClose: closeConfirmDialog,
                 priority: 4,
@@ -950,10 +960,12 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
         ],
         [
             closeConfirmDialog,
+            closePromptDialog,
             handleCloseAddSiteModal,
             handleCloseSettings,
             handleCloseSiteDetails,
             isConfirmDialogOpen,
+            isPromptDialogOpen,
             showAddSiteModal,
             showSettings,
             showSiteDetails,
@@ -1093,6 +1105,7 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
                     isSidebarOpen={isSidebarOpen}
                     toggleSidebar={toggleSidebar}
                 >
+                    <PromptDialog />
                     <ConfirmDialog />
                     <StatusAlertToaster />
                     <div

@@ -824,6 +824,7 @@ describe("ServiceContainer - Comprehensive Coverage", () => {
 
             expect(status).toEqual({
                 AutoUpdaterService: false,
+                CloudService: false,
                 ConfigurationManager: false,
                 DatabaseManager: false,
                 DatabaseService: false,

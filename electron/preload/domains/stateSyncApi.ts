@@ -113,7 +113,9 @@ export const stateSyncApi: StateSyncApiInterface = {
                         domain: "stateSyncApi",
                         payloadType,
                     },
-                    payloadPreview,
+                    ...(typeof payloadPreview === "string"
+                        ? { payloadPreview }
+                        : {}),
                     reason: "payload-validation",
                 });
                 return;

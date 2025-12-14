@@ -1,8 +1,7 @@
 import type { PersistOptions } from "zustand/middleware";
 
+import { logger } from "@app/services/logger";
 import { isDevelopment } from "@shared/utils/environment";
-
-import { logger } from "../services/logger";
 
 /**
  * Store utility helpers.

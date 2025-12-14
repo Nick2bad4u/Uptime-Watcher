@@ -39,17 +39,19 @@ import {
     ORIGINAL_METADATA_PROPERTY_KEY,
 } from "../utils/eventMetadataForwarding";
 import { logger } from "../utils/logger";
+import { CloudService } from "./cloud/CloudService";
+import { CloudSyncScheduler } from "./cloud/CloudSyncScheduler";
 import { DatabaseService } from "./database/DatabaseService";
 import { HistoryRepository } from "./database/HistoryRepository";
 import { MonitorRepository } from "./database/MonitorRepository";
 import { SettingsRepository } from "./database/SettingsRepository";
 import { SiteRepository } from "./database/SiteRepository";
-import { CloudService } from "./cloud/CloudService";
 import { RendererEventBridge } from "./events/RendererEventBridge";
 import { IpcService } from "./ipc/IpcService";
 import { EnhancedMonitoringServiceFactory } from "./monitoring/EnhancedMonitoringServiceFactory";
 import { MonitorOperationRegistry } from "./monitoring/MonitorOperationRegistry";
 import { NotificationService } from "./notifications/NotificationService";
+import { SyncEngine } from "./sync/SyncEngine";
 import { AutoUpdaterService } from "./updater/AutoUpdaterService";
 import { WindowService } from "./window/WindowService";
 
@@ -307,6 +309,10 @@ export class ServiceContainer {
     /** Cloud backup/sync service singleton. */
     private cloudService?: CloudService;
 
+    private cloudSyncScheduler?: CloudSyncScheduler;
+
+    private syncEngine?: SyncEngine;
+
     /**
      * Singleton instance of {@link SettingsRepository}.
      *
@@ -386,6 +392,13 @@ export class ServiceContainer {
         );
         await this.getUptimeOrchestrator().initialize();
         this.getIpcService().setupHandlers();
+
+        // Start background cloud sync polling after IPC is ready.
+        await this.tryInitializeService(
+            this.getCloudSyncScheduler(),
+            "CloudSyncScheduler"
+        );
+
         logger.info("[ServiceContainer] All services initialized successfully");
     }
 
@@ -414,6 +427,21 @@ export class ServiceContainer {
                 serviceName
             );
         }
+    }
+
+    /** Gets the {@link CloudSyncScheduler} singleton. */
+    public getCloudSyncScheduler(): CloudSyncScheduler {
+        if (!this.cloudSyncScheduler) {
+            this.cloudSyncScheduler = new CloudSyncScheduler({
+                cloudService: this.getCloudService(),
+            });
+
+            if (this.config.enableDebugLogging) {
+                logger.debug("[ServiceContainer] Created CloudSyncScheduler");
+            }
+        }
+
+        return this.cloudSyncScheduler;
     }
 
     /**
@@ -649,6 +677,7 @@ export class ServiceContainer {
             this.cloudService = new CloudService({
                 orchestrator: this.getUptimeOrchestrator(),
                 settings: this.getSettingsRepository(),
+                syncEngine: this.getSyncEngine(),
             });
 
             if (this.config.enableDebugLogging) {
@@ -657,6 +686,24 @@ export class ServiceContainer {
         }
 
         return this.cloudService;
+    }
+
+    /**
+     * Gets the {@link SyncEngine} singleton.
+     */
+    public getSyncEngine(): SyncEngine {
+        if (!this.syncEngine) {
+            this.syncEngine = new SyncEngine({
+                orchestrator: this.getUptimeOrchestrator(),
+                settings: this.getSettingsRepository(),
+            });
+
+            if (this.config.enableDebugLogging) {
+                logger.debug("[ServiceContainer] Created SyncEngine");
+            }
+        }
+
+        return this.syncEngine;
     }
 
     /**

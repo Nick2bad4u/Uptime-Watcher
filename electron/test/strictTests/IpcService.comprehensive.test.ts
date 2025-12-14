@@ -16,6 +16,7 @@ import type { UptimeOrchestrator } from "../../../electron/UptimeOrchestrator";
 import type { AutoUpdaterService } from "../../../electron/services/updater/AutoUpdaterService";
 import type { NotificationService } from "../../../electron/services/notifications/NotificationService";
 import { CloudService } from "../../../electron/services/cloud/CloudService";
+import { InMemorySecretStore } from "./utils/InMemorySecretStore";
 import { STATE_SYNC_SOURCE } from "@shared/types/stateSync";
 import {
     BASE_MONITOR_TYPES,
@@ -295,6 +296,18 @@ describe("IpcService - Comprehensive Coverage", () => {
             settings: {
                 get: vi.fn(),
                 set: vi.fn(),
+            },
+            secretStore: new InMemorySecretStore(),
+            syncEngine: {
+                syncNow: vi.fn().mockResolvedValue({
+                    appliedRemoteOperations: 0,
+                    emittedLocalOperations: 0,
+                    localOperationsUploaded: 0,
+                    mergedEntities: 0,
+                    snapshotKey: null,
+                    wroteManifest: false,
+                    wroteSnapshot: false,
+                }),
             },
         });
 

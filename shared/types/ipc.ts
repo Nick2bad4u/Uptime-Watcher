@@ -15,6 +15,19 @@ import type {
     Site,
     StatusUpdate,
 } from "@shared/types";
+import type {
+    CloudBackupEntry,
+    CloudEnableSyncConfig,
+    CloudFilesystemProviderConfig,
+    CloudStatusSummary,
+} from "@shared/types/cloud";
+import type {
+    CloudBackupMigrationRequest,
+    CloudBackupMigrationResult,
+} from "@shared/types/cloudBackupMigration";
+import type { CloudSyncResetResult } from "@shared/types/cloudSyncReset";
+import type { CloudSyncResetPreview } from "@shared/types/cloudSyncResetPreview";
+import type { SerializedDatabaseBackupMetadata } from "@shared/types/databaseBackup";
 import type { CorrelationId } from "@shared/types/events";
 import type { MonitorTypeConfig } from "@shared/types/monitorTypes";
 import type { NotificationPreferenceUpdate } from "@shared/types/notifications";
@@ -23,11 +36,6 @@ import type {
     StateSyncStatusSummary,
 } from "@shared/types/stateSync";
 import type { ValidationResult } from "@shared/types/validation";
-import type {
-    CloudBackupEntry,
-    CloudFilesystemProviderConfig,
-    CloudStatusSummary,
-} from "@shared/types/cloud";
 import type { ExclusifyUnion, Simplify, UnknownRecord } from "type-fest";
 
 import { isRecord } from "@shared/utils/typeHelpers";
@@ -98,16 +106,6 @@ export interface IpcValidationResponse extends IpcResponse<ValidationResult> {
  *
  * @public
  */
-export interface SerializedDatabaseBackupMetadata {
-    appVersion: string;
-    checksum: string;
-    createdAt: number;
-    originalPath: string;
-    retentionHintDays: number;
-    schemaVersion: number;
-    sizeBytes: number;
-}
-
 /**
  * Renderer-safe structure representing a completed database backup.
  */
@@ -233,8 +231,24 @@ export interface IpcInvokeChannelMap {
         params: readonly [siteIdentifier: string, monitorId: string];
         result: StatusUpdate | undefined;
     };
+    "cloud-clear-encryption-key": {
+        params: readonly [];
+        result: CloudStatusSummary;
+    };
     "cloud-configure-filesystem-provider": {
         params: readonly [config: CloudFilesystemProviderConfig];
+        result: CloudStatusSummary;
+    };
+    "cloud-connect-dropbox": {
+        params: readonly [];
+        result: CloudStatusSummary;
+    };
+    "cloud-disconnect": {
+        params: readonly [];
+        result: CloudStatusSummary;
+    };
+    "cloud-enable-sync": {
+        params: readonly [config: CloudEnableSyncConfig];
         result: CloudStatusSummary;
     };
     "cloud-get-status": {
@@ -245,9 +259,29 @@ export interface IpcInvokeChannelMap {
         params: readonly [];
         result: CloudBackupEntry[];
     };
+    "cloud-migrate-backups": {
+        params: readonly [config: CloudBackupMigrationRequest];
+        result: CloudBackupMigrationResult;
+    };
+    "cloud-preview-reset-remote-sync": {
+        params: readonly [];
+        result: CloudSyncResetPreview;
+    };
+    "cloud-request-sync-now": {
+        params: readonly [];
+        result: undefined;
+    };
+    "cloud-reset-remote-sync": {
+        params: readonly [];
+        result: CloudSyncResetResult;
+    };
     "cloud-restore-backup": {
         params: readonly [key: string];
         result: SerializedDatabaseRestoreResult;
+    };
+    "cloud-set-encryption-passphrase": {
+        params: readonly [passphrase: string];
+        result: CloudStatusSummary;
     };
     "cloud-upload-latest-backup": {
         params: readonly [];

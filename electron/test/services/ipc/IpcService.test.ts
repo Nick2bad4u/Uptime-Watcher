@@ -10,6 +10,7 @@ import {
     resetDiagnosticsMetrics,
 } from "../../../services/ipc/diagnosticsMetrics";
 import { CloudService } from "../../../services/cloud/CloudService";
+import { InMemorySecretStore } from "../../utils/InMemorySecretStore";
 
 // Use vi.hoisted to fix hoisting issues with mocks
 const mockNotificationService = {
@@ -182,12 +183,26 @@ describe(IpcService, () => {
         resetDiagnosticsMetrics();
         mockNotificationService.updateConfig.mockReset();
 
+        const syncEngine = {
+            syncNow: async (_provider: unknown) => ({
+                appliedRemoteOperations: 0,
+                emittedLocalOperations: 0,
+                localOperationsUploaded: 0,
+                mergedEntities: 0,
+                snapshotKey: null,
+                wroteManifest: false,
+                wroteSnapshot: false,
+            }),
+        };
+
         cloudService = new CloudService({
             orchestrator: mockUptimeOrchestrator as any,
             settings: {
                 get: vi.fn(),
                 set: vi.fn(),
             },
+            secretStore: new InMemorySecretStore(),
+            syncEngine,
         });
 
         ipcService = new IpcService(

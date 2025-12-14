@@ -112,7 +112,8 @@ const arbitraries = {
             identifier: fc.string({ minLength: 1, maxLength: 50 }),
             name: fc.string({ minLength: 1, maxLength: 100 }),
             monitoring: fc.boolean(),
-            monitors: fc.array(arbitraries.monitor, {
+            monitors: fc.uniqueArray(arbitraries.monitor, {
+                selector: (monitor) => monitor.id,
                 minLength: 0,
                 maxLength: 5,
             }),

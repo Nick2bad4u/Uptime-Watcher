@@ -16,6 +16,7 @@ import {
     BsActivity,
     BsCheckCircle,
     BsClockHistory,
+    BsCloud,
     BsCollectionPlay,
     BsExclamationTriangle,
     BsGearFill,
@@ -134,6 +135,7 @@ export const AppIcons: {
         readonly analytics: IconType;
         readonly bell: IconType;
         readonly close: IconType;
+        readonly cloud: IconType;
         readonly collapse: IconType;
         readonly database: IconType;
         readonly expand: IconType;
@@ -216,6 +218,7 @@ export const AppIcons: {
         analytics: HiOutlineChartBar,
         bell: HiOutlineBellAlert,
         close: FiX,
+        cloud: BsCloud,
         collapse: HiMiniChevronUp,
         database: VscDatabase,
         expand: HiMiniChevronDown,

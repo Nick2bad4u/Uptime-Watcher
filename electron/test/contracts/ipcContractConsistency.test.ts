@@ -28,6 +28,7 @@ const toStringRecord = (map: unknown): Record<string, string> => {
 };
 
 const CHANNEL_MAPS: Record<string, Record<string, string>> = {
+    CLOUD_CHANNELS: toStringRecord(preloadChannels.CLOUD_CHANNELS),
     DATA_CHANNELS: toStringRecord(preloadChannels.DATA_CHANNELS),
     DIAGNOSTICS_CHANNELS: toStringRecord(preloadChannels.DIAGNOSTICS_CHANNELS),
     MONITORING_CHANNELS: toStringRecord(preloadChannels.MONITORING_CHANNELS),

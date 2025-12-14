@@ -198,6 +198,62 @@ const defaultFullSyncResult: StateSyncFullSyncResult = {
 };
 
 const mockElectronAPI: ElectronAPI = {
+    cloud: {
+        configureFilesystemProvider: vi.fn<
+            ElectronAPI["cloud"]["configureFilesystemProvider"]
+        >(async () => ({
+            provider: "filesystem",
+            configured: true,
+            connected: true,
+            backupsEnabled: true,
+            syncEnabled: false,
+            lastBackupAt: null,
+            providerDetails: {
+                kind: "filesystem",
+                baseDirectory: "C:/mock/cloud",
+            },
+        })),
+        getStatus: vi.fn<ElectronAPI["cloud"]["getStatus"]>(async () => ({
+            provider: null,
+            configured: false,
+            connected: false,
+            backupsEnabled: false,
+            syncEnabled: false,
+            lastBackupAt: null,
+        })),
+        listBackups: vi.fn<ElectronAPI["cloud"]["listBackups"]>(async () => []),
+        restoreBackup: vi.fn<ElectronAPI["cloud"]["restoreBackup"]>(
+            async () => ({
+                metadata: {
+                    appVersion: "0.0.0-test",
+                    checksum: "mock-restore-checksum",
+                    createdAt: Date.now(),
+                    originalPath: "restore.db",
+                    retentionHintDays: 30,
+                    schemaVersion: 1,
+                    sizeBytes: 8,
+                },
+                preRestoreFileName: "pre-restore.db",
+                restoredAt: Date.now(),
+            })
+        ),
+        uploadLatestBackup: vi.fn<ElectronAPI["cloud"]["uploadLatestBackup"]>(
+            async () => ({
+                encrypted: false,
+                fileName: "uptime-watcher-backup-1.sqlite",
+                key: "backups/2025/12/uptime-watcher-backup-1.sqlite",
+                metadata: {
+                    appVersion: "0.0.0-test",
+                    checksum: "mock-checksum",
+                    createdAt: Date.now(),
+                    originalPath: "/tmp/backup.db",
+                    retentionHintDays: 30,
+                    schemaVersion: 1,
+                    sizeBytes: 8,
+                },
+            })
+        ),
+    },
     data: {
         downloadSqliteBackup: vi.fn<
             ElectronAPI["data"]["downloadSqliteBackup"]

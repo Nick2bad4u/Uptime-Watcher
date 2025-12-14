@@ -54,6 +54,8 @@ docs/Architecture/
 │   ├── ADR_012_NOTIFICATIONS_AND_ALERTING.md
 │   ├── ADR_013_DATA_PORTABILITY_AND_BACKUP.md
 │   ├── ADR_014_LOGGING_TELEMETRY_AND_DIAGNOSTICS.md
+│   ├── ADR_015_CLOUD_SYNC_AND_REMOTE_BACKUP.md
+│   ├── ADR_016_MULTI_DEVICE_SYNC_MODEL.md
 │   └── ARCHITECTURE_DIAGRAM.md
 ├── generated/                   # Auto-generated reference artifacts
 │   └── IPC_CHANNEL_INVENTORY.md
@@ -113,6 +115,8 @@ flowchart TD
     ADRs --> ADR12["ADR-012 Notifications & Alerting"]
     ADRs --> ADR13["ADR-013 Data Portability & Backup"]
     ADRs --> ADR14["ADR-014 Logging & Diagnostics"]
+    ADRs --> ADR15["ADR-015 Cloud Sync & Remote Backup"]
+    ADRs --> ADR16["ADR-016 Multi-Device Sync Model"]
 
     Patterns --> PatternGuide["Development Patterns Guide"]
     Patterns --> ComponentProps["Component Props Standards"]
@@ -131,7 +135,7 @@ flowchart TD
 
     class Docs hub;
     class ADRs,Patterns,Templates,Standards,UsageGuides,Generated section;
-    class ADR1,ADR2,ADR3,ADR4,ADR5,ADR6,ADR7,ADR8,ADR9,ADR10,ADR11,ADR12,ADR13,ADR14,PatternGuide,ComponentProps,SiteLoading,InitImport,RepoTemplate,RepoTemplateClean,StoreTemplate,IPCTemplate,IPCDiagnosticsTemplate,SchedulerTemplate,EventChecklist,TsdocStandards,QuickStart,IPCInventory file;
+    class ADR1,ADR2,ADR3,ADR4,ADR5,ADR6,ADR7,ADR8,ADR9,ADR10,ADR11,ADR12,ADR13,ADR14,ADR15,ADR16,PatternGuide,ComponentProps,SiteLoading,InitImport,RepoTemplate,RepoTemplateClean,StoreTemplate,IPCTemplate,IPCDiagnosticsTemplate,SchedulerTemplate,EventChecklist,TsdocStandards,QuickStart,IPCInventory file;
 ```
 
 ## 🏗️ Architecture Decision Records (ADRs)
@@ -222,6 +226,22 @@ ADRs document the key architectural decisions made during development, their con
 - Separate Vitest configs for frontend, electron, shared, and Storybook runner
 - Playwright E2E coverage and property-based testing guidance
 - Coverage strategy and mocking guidance to keep suites reliable and fast
+
+### [ADR-015: Cloud Sync and Remote Backup Providers](./ADRs/ADR_015_CLOUD_SYNC_AND_REMOTE_BACKUP.md)
+
+**Status: Accepted (MVP implemented)** - Provider-backed remote backup and true multi-device sync integration.
+
+- Dropbox OAuth PKCE + token refresh + encrypted token storage (safeStorage)
+- Provider abstraction + filesystem provider for development/integration
+- Main-process sync engine integration and background polling
+
+### [ADR-016: Multi-Device Sync Data Model](./ADRs/ADR_016_MULTI_DEVICE_SYNC_MODEL.md)
+
+**Status: Accepted (implemented)** - Deterministic operation-log + snapshot sync model.
+
+- Canonical sync domain state (sites/monitors/settings)
+- Deterministic merge rules and convergence guarantees
+- Property and integration tests for determinism and multi-device convergence
 
 ## Additional ADRs (Draft)
 

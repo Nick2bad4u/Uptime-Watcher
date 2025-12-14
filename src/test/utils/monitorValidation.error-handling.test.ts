@@ -55,11 +55,6 @@ const resolveValidationResult = (
 const createMockMonitorTypesStoreState = (
     overrides: Partial<MonitorTypesStoreState> = {}
 ): MonitorTypesStoreState => ({
-    clearError: vi.fn(),
-    isLoading: false,
-    lastError: undefined,
-    setError: vi.fn(),
-    setLoading: vi.fn(),
     formatMonitorDetail: vi.fn(async () => ""),
     formatMonitorTitleSuffix: vi.fn(async () => ""),
     getFieldConfig: vi.fn(),

@@ -32,6 +32,7 @@
  * @public
  */
 
+import { ensureError } from "@shared/utils/errorHandling";
 import { create, type StoreApi, type UseBoundStore } from "zustand";
 
 import type { ErrorStore } from "./types";
@@ -85,9 +86,17 @@ export const useErrorStore: UseBoundStore<StoreApi<ErrorStore>> =
             return loading[operation] ?? false;
         },
         getStoreError: (store: string): string | undefined => {
-            const errors = get().storeErrors;
+            const raw = get().storeErrors[store] as unknown;
 
-            return errors[store];
+            if (typeof raw === "string") {
+                return raw;
+            }
+
+            if (raw) {
+                return ensureError(raw).message;
+            }
+
+            return undefined;
         },
         // State
         isLoading: false,

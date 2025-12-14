@@ -10,7 +10,7 @@
  * `src/stores/sites/utils/statusUpdateHandler.ts`.
  */
 
-import { describe, expect, it, vi, beforeEach } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { test } from "@fast-check/vitest";
 import * as fc from "fast-check";
 
@@ -28,11 +28,11 @@ import {
 } from "../../../../stores/sites/utils/statusUpdateSnapshot";
 
 import { logger } from "../../../../services/logger";
-import { isDevelopment } from "@shared/utils/environment";
 
-vi.mock("@shared/utils/environment", () => ({
-    isDevelopment: vi.fn(() => false),
-}));
+import {
+    resetProcessSnapshotOverrideForTesting,
+    setProcessSnapshotOverrideForTesting,
+} from "@shared/utils/environment";
 
 vi.mock("../../../../services/logger", () => ({
     logger: {
@@ -43,7 +43,6 @@ vi.mock("../../../../services/logger", () => ({
     },
 }));
 
-const mockedIsDevelopment = vi.mocked(isDevelopment);
 const mockedLogger = vi.mocked(logger);
 
 type MonitorHistoryEntry = Required<Monitor>["history"][number];
@@ -97,11 +96,23 @@ const ensureSite = (site: Site | undefined): Site => {
 describe(applyStatusUpdateSnapshot, () => {
     beforeEach(() => {
         vi.clearAllMocks();
-        mockedIsDevelopment.mockReturnValue(false);
+        setProcessSnapshotOverrideForTesting({
+            env: {
+                NODE_ENV: "test",
+            },
+        });
+    });
+
+    afterEach(() => {
+        resetProcessSnapshotOverrideForTesting();
     });
 
     it("returns the original sites array when snapshot lacks contextual site data", () => {
-        mockedIsDevelopment.mockReturnValue(true);
+        setProcessSnapshotOverrideForTesting({
+            env: {
+                NODE_ENV: "development",
+            },
+        });
 
         const sites = [
             createSite("site-a", [createMonitor({ id: "monitor-a" })]),

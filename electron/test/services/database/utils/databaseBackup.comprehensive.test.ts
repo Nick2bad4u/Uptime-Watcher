@@ -13,24 +13,6 @@ vi.mock("../../../../../electron/utils/logger", () => ({
     },
 }));
 
-// Mock node:fs module
-vi.mock("node:fs", async () => {
-    const actual = await vi.importActual<typeof import("node:fs")>("node:fs");
-
-    return {
-        ...actual,
-        default: actual,
-        existsSync: actual.existsSync.bind(actual),
-        readdirSync: actual.readdirSync.bind(actual),
-        statSync: actual.statSync.bind(actual),
-        readFileSync: actual.readFileSync.bind(actual),
-        promises: {
-            ...actual.promises,
-            readFile: vi.fn(),
-        },
-    };
-});
-
 // Import after mocking
 import {
     createDatabaseBackup,
@@ -40,8 +22,7 @@ import { BACKUP_DB_FILE_NAME } from "../../../../../electron/constants";
 import { logger } from "../../../../../electron/utils/logger";
 import { promises as fs } from "node:fs";
 
-// Get the mocked function
-const mockReadFile = vi.mocked(fs.readFile);
+let mockReadFile: ReturnType<typeof vi.spyOn>;
 
 describe("databaseBackup.ts - Comprehensive Coverage", () => {
     const testDbPath = "/test/path/database.sqlite";
@@ -49,11 +30,14 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
 
     beforeEach(() => {
         vi.clearAllMocks();
+
+        // Spy (and restore) instead of module-mocking node:fs to avoid leaking
+        // a mocked fs implementation into unrelated suites.
+        mockReadFile = vi.spyOn(fs, "readFile");
     });
 
     afterEach(() => {
-        vi.clearAllMocks();
-        vi.resetAllMocks();
+        vi.restoreAllMocks();
     });
     describe("createDatabaseBackup - Success scenarios", () => {
         it("should create database backup with default filename", async ({

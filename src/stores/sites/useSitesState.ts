@@ -6,7 +6,7 @@
  */
 
 import type { Monitor, Site } from "@shared/types";
-import type { SerializedDatabaseBackupMetadata } from "@shared/types/ipc";
+import type { SerializedDatabaseBackupMetadata } from "@shared/types/databaseBackup";
 import type { SiteSyncDelta } from "@shared/types/stateSync";
 import type { Simplify } from "type-fest";
 

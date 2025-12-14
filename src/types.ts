@@ -8,6 +8,7 @@
 
 import type { EventsDomainBridge } from "@shared/types/eventsBridge";
 import type {
+    CloudDomainBridge,
     ElectronBridgeApi,
     SystemDomainBridge,
 } from "@shared/types/preload";
@@ -20,7 +21,9 @@ type RendererSystemApi = SystemDomainBridge;
 export type ElectronAPI = ElectronBridgeApi<
     EventsDomainBridge,
     RendererSystemApi
->;
+> & {
+    readonly cloud: CloudDomainBridge;
+};
 
 declare global {
     interface Window {

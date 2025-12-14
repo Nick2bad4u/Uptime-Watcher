@@ -5,10 +5,8 @@
  * @packageDocumentation
  */
 
-import type {
-    SerializedDatabaseBackupMetadata,
-    SerializedDatabaseBackupResult,
-} from "@shared/types/ipc";
+import type { SerializedDatabaseBackupMetadata } from "@shared/types/databaseBackup";
+import type { SerializedDatabaseBackupResult } from "@shared/types/ipc";
 
 import { isRecord as isSharedRecord } from "@shared/utils/typeHelpers";
 

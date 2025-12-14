@@ -160,6 +160,7 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
             maxPongDelayMs,
             maxReplicationLagSeconds,
             maxResponseTime,
+            monitorFieldsError,
             monitorType,
             name,
             port,
@@ -641,7 +642,8 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
             []
         );
 
-        const resolvedErrorMessage = formError ?? lastError ?? "";
+        const resolvedErrorMessage =
+            formError ?? monitorFieldsError ?? lastError ?? "";
         const shouldRenderErrorAlert = resolvedErrorMessage.length > 0;
         return (
             <SurfaceContainer

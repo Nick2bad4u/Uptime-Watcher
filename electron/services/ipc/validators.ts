@@ -38,10 +38,19 @@ interface DataHandlerValidatorsInterface {
  * Interface for cloud handler validators.
  */
 interface CloudHandlerValidatorsInterface {
+    clearEncryptionKey: IpcParameterValidator;
     configureFilesystemProvider: IpcParameterValidator;
+    connectDropbox: IpcParameterValidator; // Added connectDropbox validator
+    disconnect: IpcParameterValidator;
+    enableSync: IpcParameterValidator;
     getStatus: IpcParameterValidator;
     listBackups: IpcParameterValidator;
+    migrateBackups: IpcParameterValidator;
+    previewResetRemoteSyncState: IpcParameterValidator;
+    requestSyncNow: IpcParameterValidator;
+    resetRemoteSyncState: IpcParameterValidator;
     restoreBackup: IpcParameterValidator;
+    setEncryptionPassphrase: IpcParameterValidator;
     uploadLatestBackup: IpcParameterValidator;
 }
 
@@ -207,6 +216,75 @@ function validateCloudFilesystemProviderConfig(
     );
     if (baseDirectoryError) {
         errors.push(baseDirectoryError);
+    }
+
+    return errors.length > 0 ? errors : null;
+}
+
+function validateCloudEnableSyncConfig(
+    params: readonly unknown[]
+): null | string[] {
+    const errors: string[] = [];
+
+    if (params.length !== 1) {
+        errors.push("Expected exactly 1 parameter");
+    }
+
+    const [config] = params;
+    const objectError = IpcValidators.requiredObject(config, "config");
+    if (objectError) {
+        errors.push(objectError);
+        return errors;
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- config validated as object
+    const record = config as Record<string, unknown>;
+    const { enabled } = record;
+    if (typeof enabled !== "boolean") {
+        errors.push("enabled must be a boolean");
+    }
+
+    return errors.length > 0 ? errors : null;
+}
+
+function validateCloudBackupMigrationRequest(
+    params: readonly unknown[]
+): null | string[] {
+    const errors: string[] = [];
+
+    if (params.length !== 1) {
+        errors.push("Expected exactly 1 parameter");
+    }
+
+    const [config] = params;
+    const objectError = IpcValidators.requiredObject(config, "config");
+    if (objectError) {
+        errors.push(objectError);
+        return errors;
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- config validated as object
+    const record = config as Record<string, unknown>;
+
+    const { deleteSource, limit, target } = record;
+    if (typeof deleteSource !== "boolean") {
+        errors.push("deleteSource must be a boolean");
+    }
+
+    if (target !== "plaintext" && target !== "encrypted") {
+        errors.push("target must be 'plaintext' or 'encrypted'");
+    }
+
+    if (limit !== undefined) {
+        const limitError = IpcValidators.requiredNumber(limit, "limit");
+        if (limitError) {
+            errors.push(limitError);
+        } else if (
+            typeof limit === "number" &&
+            (!Number.isInteger(limit) || limit <= 0)
+        ) {
+            errors.push("limit must be a positive integer");
+        }
     }
 
     return errors.length > 0 ? errors : null;
@@ -665,10 +743,19 @@ export const DataHandlerValidators: DataHandlerValidatorsInterface = {
  * Parameter validators for cloud IPC handlers.
  */
 export const CloudHandlerValidators: CloudHandlerValidatorsInterface = {
+    clearEncryptionKey: createNoParamsValidator(),
     configureFilesystemProvider: validateCloudFilesystemProviderConfig,
+    connectDropbox: createNoParamsValidator(), // Added connectDropbox validator implementation
+    disconnect: createNoParamsValidator(),
+    enableSync: validateCloudEnableSyncConfig,
     getStatus: createNoParamsValidator(),
     listBackups: createNoParamsValidator(),
+    migrateBackups: validateCloudBackupMigrationRequest,
+    previewResetRemoteSyncState: createNoParamsValidator(),
+    requestSyncNow: createNoParamsValidator(),
+    resetRemoteSyncState: createNoParamsValidator(),
     restoreBackup: createSingleStringValidator("key"),
+    setEncryptionPassphrase: createSingleStringValidator("passphrase"),
     uploadLatestBackup: createNoParamsValidator(),
 } as const;
 

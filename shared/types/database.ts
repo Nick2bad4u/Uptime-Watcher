@@ -96,9 +96,13 @@ export interface MonitorRow extends BaseRow {
      */
     host?: string;
     /**
-     * Unique monitor ID (autoincrement).
+     * Unique monitor ID.
+     *
+     * @remarks
+     * Schema versions may use numeric autoincrement ids or stable text ids
+     * depending on migration level.
      */
-    id?: number;
+    id?: number | string;
     /**
      * Timestamp (epoch ms) of the last check.
      */

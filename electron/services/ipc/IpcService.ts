@@ -13,12 +13,12 @@ import { ipcMain } from "electron";
 
 import type { UptimeEvents } from "../../events/eventTypes";
 import type { UptimeOrchestrator } from "../../UptimeOrchestrator";
+import type { CloudService } from "../cloud/CloudService";
 import type { NotificationService } from "../notifications/NotificationService";
 import type { AutoUpdaterService } from "../updater/AutoUpdaterService";
 
 import { ScopedSubscriptionManager } from "../../events/ScopedSubscriptionManager";
 import { logger } from "../../utils/logger";
-import type { CloudService } from "../cloud/CloudService";
 import { registerCloudHandlers } from "./handlers/cloudHandlers";
 import { registerDataHandlers } from "./handlers/dataHandlers";
 import { registerDiagnosticsHandlers } from "./handlers/diagnosticsHandlers";

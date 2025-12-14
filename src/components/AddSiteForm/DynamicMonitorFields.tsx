@@ -14,13 +14,19 @@
 
 import type { JSX } from "react/jsx-runtime";
 
+import { logger } from "@app/services/logger";
 import { memo, type NamedExoticComponent, useCallback, useEffect } from "react";
 
-import { logger } from "../../services/logger";
+import type { ErrorStore } from "../../stores/error/types";
+
+import { useErrorStore } from "../../stores/error/useErrorStore";
 import { useMonitorTypesStore } from "../../stores/monitor/useMonitorTypesStore";
 import { ThemedText } from "../../theme/components/ThemedText";
 import { ErrorAlert } from "../common/ErrorAlert/ErrorAlert";
 import { DynamicField } from "./DynamicField";
+
+const selectMonitorTypesError = (state: ErrorStore): string | undefined =>
+    state.getStoreError("monitor-types");
 
 /**
  * Props for the {@link DynamicMonitorFields} component.
@@ -82,7 +88,9 @@ export const DynamicMonitorFields: NamedExoticComponent<DynamicMonitorFieldsProp
         onChange,
         values,
     }: DynamicMonitorFieldsProperties): JSX.Element {
-        const { isLoaded, lastError, loadMonitorTypes, monitorTypes } =
+        const monitorTypesError = useErrorStore(selectMonitorTypesError);
+
+        const { isLoaded, loadMonitorTypes, monitorTypes } =
             useMonitorTypesStore();
 
         // Find the config for the current monitor type
@@ -91,14 +99,14 @@ export const DynamicMonitorFields: NamedExoticComponent<DynamicMonitorFieldsProp
         // Load monitor types when component mounts
         useEffect(
             function loadMonitorTypesOnMount() {
-                if (!isLoaded && !lastError) {
+                if (!isLoaded && !monitorTypesError) {
                     void loadMonitorTypes();
                 }
             },
             [
                 isLoaded,
-                lastError,
                 loadMonitorTypes,
+                monitorTypesError,
             ]
         );
 
@@ -121,10 +129,10 @@ export const DynamicMonitorFields: NamedExoticComponent<DynamicMonitorFieldsProp
             );
         }
 
-        if (lastError) {
+        if (monitorTypesError) {
             return (
                 <ErrorAlert
-                    message={`Error loading monitor fields: ${lastError}`}
+                    message={`Error loading monitor fields: ${monitorTypesError}`}
                     variant="error"
                 />
             );

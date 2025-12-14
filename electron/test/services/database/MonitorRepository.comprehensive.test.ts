@@ -95,8 +95,8 @@ describe("MonitorRepository - Comprehensive Coverage", () => {
 
             // Mock the insertWithReturning calls for each monitor
             mockDatabase.get
-                .mockReturnValueOnce({ id: 1 })
-                .mockReturnValueOnce({ id: 2 });
+                .mockReturnValueOnce({ id: "temp-1" })
+                .mockReturnValueOnce({ id: "temp-2" });
 
             const result = await repository.bulkCreate(
                 siteIdentifier,
@@ -192,7 +192,7 @@ describe("MonitorRepository - Comprehensive Coverage", () => {
 
             const siteIdentifier = "site-123";
             const monitor: Site["monitors"][0] = {
-                id: "",
+                id: "monitor-123",
                 type: "http",
                 url: "https://example.com",
                 checkInterval: 60_000,
@@ -204,11 +204,11 @@ describe("MonitorRepository - Comprehensive Coverage", () => {
                 history: [],
             };
 
-            mockDatabase.get.mockReturnValue({ id: 123 });
+            mockDatabase.get.mockReturnValue({ id: "monitor-123" });
 
             const result = await repository.create(siteIdentifier, monitor);
 
-            expect(result).toBe("123");
+            expect(result).toBe("monitor-123");
             expect(mockDatabaseService.executeTransaction).toHaveBeenCalled();
         });
         it("should handle port monitor creation", async ({
@@ -222,7 +222,7 @@ describe("MonitorRepository - Comprehensive Coverage", () => {
 
             const siteIdentifier = "site-123";
             const monitor: Site["monitors"][0] = {
-                id: "",
+                id: "monitor-456",
                 type: "port",
                 host: "localhost",
                 port: 8080,
@@ -235,11 +235,11 @@ describe("MonitorRepository - Comprehensive Coverage", () => {
                 history: [],
             };
 
-            mockDatabase.get.mockReturnValue({ id: 456 });
+            mockDatabase.get.mockReturnValue({ id: "monitor-456" });
 
             const result = await repository.create(siteIdentifier, monitor);
 
-            expect(result).toBe("456");
+            expect(result).toBe("monitor-456");
         });
         it("should handle creation errors", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
@@ -253,7 +253,7 @@ describe("MonitorRepository - Comprehensive Coverage", () => {
 
             await expect(
                 repository.create("site-123", {
-                    id: "",
+                    id: "monitor-err",
                     type: "http",
                     url: "https://example.com",
                     checkInterval: 60_000,
@@ -496,7 +496,7 @@ describe("MonitorRepository - Comprehensive Coverage", () => {
 
             // Test with minimal monitor data
             const monitor: Site["monitors"][0] = {
-                id: "",
+                id: "monitor-789",
                 type: "http",
                 url: "",
                 checkInterval: 0,
@@ -508,10 +508,10 @@ describe("MonitorRepository - Comprehensive Coverage", () => {
                 history: [],
             };
 
-            mockDatabase.get.mockReturnValue({ id: 789 });
+            mockDatabase.get.mockReturnValue({ id: "monitor-789" });
 
             const result = await repository.create("site-123", monitor);
-            expect(result).toBe("789");
+            expect(result).toBe("monitor-789");
         });
         it("should handle database connection errors", async ({
             task,
@@ -607,7 +607,7 @@ describe("MonitorRepository - Comprehensive Coverage", () => {
             await annotate("Type: Constructor", "type");
 
             // This tests the internal method through the public interface
-            mockDatabase.get.mockReturnValue({ id: 999 });
+            mockDatabase.get.mockReturnValue({ id: "monitor-temp-id" });
 
             await repository.create("site-123", {
                 id: "monitor-temp-id",
@@ -676,9 +676,9 @@ describe("MonitorRepository - Comprehensive Coverage", () => {
 
             // Mock the get calls for each monitor creation
             mockDatabase.get
-                .mockReturnValueOnce({ id: 100 })
-                .mockReturnValueOnce({ id: 200 })
-                .mockReturnValueOnce({ id: 300 });
+                .mockReturnValueOnce({ id: "http-temp" })
+                .mockReturnValueOnce({ id: "ping-temp" })
+                .mockReturnValueOnce({ id: "port-temp" });
 
             const result = await repository.bulkCreate(
                 "mixed-site",
