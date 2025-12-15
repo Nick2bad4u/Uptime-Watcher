@@ -7,14 +7,288 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
+[[218c045](https://github.com/Nick2bad4u/Uptime-Watcher/commit/218c0451e0318787a104845d97037ccb7c1cdd50)...
+[218c045](https://github.com/Nick2bad4u/Uptime-Watcher/commit/218c0451e0318787a104845d97037ccb7c1cdd50)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/218c0451e0318787a104845d97037ccb7c1cdd50...218c0451e0318787a104845d97037ccb7c1cdd50))
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 19.6.0 [`(218c045)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/218c0451e0318787a104845d97037ccb7c1cdd50)
+
+
+
+
+
+
+## [19.6.0] - 2025-12-15
+
+
 [[0872f2d](https://github.com/Nick2bad4u/Uptime-Watcher/commit/0872f2dbcca4e243d719cf0bea9adeaad93e74ac)...
-[0872f2d](https://github.com/Nick2bad4u/Uptime-Watcher/commit/0872f2dbcca4e243d719cf0bea9adeaad93e74ac)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/0872f2dbcca4e243d719cf0bea9adeaad93e74ac...0872f2dbcca4e243d719cf0bea9adeaad93e74ac))
+[1570ad4](https://github.com/Nick2bad4u/Uptime-Watcher/commit/1570ad477286705b78440c5d7594839521ec36ff)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/0872f2dbcca4e243d719cf0bea9adeaad93e74ac...1570ad477286705b78440c5d7594839521ec36ff))
+
+
+### ✨ Features
+
+- ✨ [feat] Implement backup deletion functionality in CloudService and useCloudStore
+ - Added `deleteBackup` method to `CloudServiceContract` for removing backups by key.
+ - Implemented `deleteBackup` in `CloudService` to handle backup deletion logic.
+ - Updated `useCloudStore` to include `deleteBackup` action, managing loading state and updating backups list.
+ - Introduced `deletingBackupKey` state to track the key of the backup being deleted.
+ - Enhanced error handling during backup deletion process.
+
+📝 [test] Add comprehensive tests for backup deletion functionality
+ - Created tests for `BackupMigrationPanel` to ensure UI reflects backup migration status correctly.
+ - Developed tests for `SyncMaintenancePanel` to validate sync reset operations and diagnostics copying.
+ - Added tests for `PromptDialog` to cover user interaction scenarios.
+ - Implemented comprehensive tests for `useCloudStore` to verify backup deletion and related state updates.
+
+🎨 [style] Refactor CloudService and useCloudStore for improved readability
+ - Cleaned up async/await usage in `CloudService` methods for consistency.
+ - Enhanced code formatting and structure in `useCloudStore` for better maintainability.
+ - Adjusted test files for consistent formatting and improved clarity.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(1570ad4)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/1570ad477286705b78440c5d7594839521ec36ff)
+
+
+- ✨ [feat] Enhance cloud sync and backup functionality
+ - 📝 Update documentation to include Dropbox Cloud Sync setup guide
+ - 📝 Add Cloud Sync & Backups IPC section in API documentation
+ - 🛠️ Refactor CloudStorageProvider imports to use types file
+ - 🛠️ Implement new loopback port for Dropbox OAuth in DropboxAuthFlow
+ - 🛠️ Update CloudService tests to cover new backup migration and sync reset features
+ - 🛠️ Add data-testid prop to ThemedButton for improved testing
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(4c095b4)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/4c095b44d6aabb93eb7c6ac6b1cc4c0d4234f842)
+
+
+- ✨ [feat] Implement cloud backup functionality and related tests
+ - 🛠️ [fix] Add cloud-related methods to ElectronAPI interface
+ - 🔧 [build] Mock cloud settings in tests to isolate functionality
+ - 🧪 [test] Create comprehensive tests for CloudService, covering initialization, status retrieval, sync enabling, and backup management
+ - 🧹 [chore] Refactor logger tests to improve clarity and ensure proper mocking
+ - 📝 [docs] Update comments and documentation for clarity on cloud sync operations
+ - 🎨 [style] Enhance icon imports to include cloud-related icons for UI consistency
+ - 🚜 [refactor] Clean up unused mock functions and streamline test setup for better maintainability
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(9caec2f)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/9caec2fba80fe0d0988a45a3edb56be43eb0cd1d)
+
+
+- ✨ [feat] Integrate cloud backup and synchronization features
+ - 🆕 Added `cloudApi` to the Electron preload script to expose cloud functionalities to the renderer process.
+ - 🛠️ Introduced `CloudService` in the service container to manage cloud-related operations.
+ - 🔌 Updated `IpcService` to register cloud IPC handlers for backup and synchronization tasks.
+ - 📦 Created validators for cloud IPC handlers to ensure correct parameter types and structures.
+ - 🌐 Enhanced `WindowService` to restrict navigation and handle external links securely.
+ - 📝 Updated documentation to reflect changes in cloud backup and restore processes.
+ - 🧪 Added comprehensive tests for `IpcService` to cover new cloud functionalities.
+ - 🧪 Updated tests for `useMonitorFields` to ensure error handling integrates with the new cloud features.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(52929fc)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/52929fca10ff7305605e42ab521eb02b59fd1c90)
+
+
+- ✨ [feat] Update Storybook and enhance HistoryTab functionality
+ - 🔧 [build] Upgrade Storybook addons to version 10.1.6 for improved accessibility and performance
+ - 🛠️ [fix] Refactor HistoryTab component to resolve backend history limit and improve dropdown options
+ - 📝 [docs] Add detailed comments and JSDoc annotations for clarity on history limit handling
+ - 🎨 [style] Enhance HistoryTab story with interactive tests for filtering and adjusting visible history count
+
+✨ [feat] Improve DataService and MonitoringService documentation
+ - 📝 [docs] Add comprehensive JSDoc comments to DataService methods for better understanding of data operations
+ - 📝 [docs] Enhance MonitoringService documentation to clarify monitoring operations and error handling
+
+🧪 [test] Expand SettingsService tests for history limit handling
+ - 🧪 [test] Add tests for various history limit scenarios, including edge cases and non-integer values
+ - 🧪 [test] Update test messages to reflect changes in history limit rejection handling
+
+🎨 [style] Refactor Storybook stories for better structure and readability
+ - 🎨 [style] Wrap SiteTableRow stories in a semantic table structure to avoid hydration issues
+ - 🎨 [style] Improve Settings story with interactive tests for history limit control
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(ceaa0d3)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ceaa0d368d4785d8b8ad9e2b856b221a7769c94d)
+
+
+
+### 🛠️ Bug Fixes
+
+- 🛠️ [fix] Refactor error handling in useMonitorTypesStore and related tests
+ - 🧪 [test] Integrate useErrorStore for error management in useMonitorTypesStore tests
+ - 🔧 [build] Update tests to check error states using useErrorStore instead of local state
+ - 🧪 [test] Ensure loading states are managed through useErrorStore
+ - 🧪 [test] Modify tests to validate error messages from useErrorStore
+ - 🧪 [test] Adjust test descriptions for clarity on error handling
+ - 🧪 [test] Remove redundant error handling methods from useMonitorTypesStore
+ - 🧪 [test] Ensure comprehensive coverage of error handling scenarios
+
+🎨 [style] Update event listener names in site sync tests
+ - 🔧 [build] Change listener names to use a consistent naming convention
+
+📝 [docs] Improve IPC usage documentation in ipc.ts
+ - 🔧 [build] Clarify usage of ipcRenderer and suggest using typed invokers
+
+🚜 [refactor] Clean up monitorValidation utility
+ - 🔧 [build] Remove unused constants and streamline validation logic
+
+🧹 [chore] Optimize Storybook preview setup
+ - 🔧 [build] Refactor environment variable handling for better type safety
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(85d4258)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/85d425825adb858da3603c6bcb52d23475566174)
+
 
 
 ### 📦 Dependencies
 
 - [dependency] Update version 19.5.0 [`(0872f2d)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/0872f2dbcca4e243d719cf0bea9adeaad93e74ac)
+
+
+
+### 🎨 Styling
+
+- 🎨 [style] Apply consistent formatting across the codebase
+
+This commit introduces a large-scale, automated code formatting pass to enhance consistency and readability across the entire project.
+
+🎨 [style] Implements widespread code formatting adjustments.
+ - Removes redundant trailing parentheses from multi-line arrow functions, array literals, method calls, and object instantiations. This affects a significant number of files, particularly within benchmarks and the Electron application source.
+ - Standardizes multi-line array and object initializations to improve visual structure.
+
+📝 [docs] Simplifies JSDoc type definitions.
+ - Converts multi-line JSDoc type definitions into concise single-line formats in linting configurations (`.remarkrc.mjs`, `uptime-watcher.mjs`) for improved clarity.
+
+🧹 [chore] Performs minor configuration and file cleanup.
+ - Adds a trailing newline to `.codecov.yml` for consistency.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(814e408)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/814e408a876eae39dac2cf6736fb0a6fa93bc310)
+
+
+
+### 🧹 Chores
+
+- Update changelogs for v19.5.0 [skip ci] [`(1acf5ee)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/1acf5eebdeb26b53ec4acb4b2283cbe075d21aae)
+
+
+
+### 🔧 Build System
+
+- 🔧 [build] Update tailwind-scrollbar-hide regex for version compatibility
+🛠️ [fix] Ensure monitor ID is a number in pruneHistoryForMonitor function
+🛠️ [fix] Improve type safety in pruneHistoryForMonitor by converting IDs to numbers
+✨ [feat] Synchronize notification preferences with destructured settings
+🛠️ [fix] Enhance settings merging logic to prevent data loss during rehydration
+🧪 [test] Add mock implementations for cloud API methods in tests
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(79029c3)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/79029c3a9eefb2cbd7e245ea72cd0fe7ffa92643)
+
+
+- 🔧 [build] Update dependencies in package.json
+
+ - 🔄 Upgrade react from ^19.2.1 to ^19.2.3 for improved performance and bug fixes
+ - 🔄 Upgrade react-dom from ^19.2.1 to ^19.2.3 for better compatibility
+ - 🔄 Upgrade @eslint/js from ^9.39.1 to ^9.39.2 for linting improvements
+ - 🔄 Upgrade @html-eslint/eslint-plugin and @html-eslint/parser from ^0.50.0 to ^0.51.0 for enhanced HTML linting
+ - 🔄 Upgrade @storybook/addon-a11y from ^10.1.7 to ^10.1.8 for accessibility improvements
+ - 🔄 Upgrade all Storybook addons from ^10.1.7 to ^10.1.8 for consistency and new features
+ - 🔄 Upgrade @types/node from ^25.0.0 to ^25.0.2 for type definitions updates
+ - 🔄 Upgrade electron from ^39.2.6 to ^39.2.7 for security patches
+ - 🔄 Upgrade eslint from ^9.39.1 to ^9.39.2 for linting enhancements
+ - 🔄 Upgrade eslint-plugin-storybook from ^10.1.7 to ^10.1.8 for better Storybook integration
+ - 🔄 Upgrade eslint-plugin-testing-library from ^7.13.5 to ^7.13.6 for testing improvements
+ - 🔄 Upgrade knip from ^5.73.3 to ^5.73.4 for dependency analysis updates
+ - 🔄 Upgrade markdown-to-jsx from ^9.3.4 to ^9.3.5 for JSX parsing improvements
+ - 🔄 Upgrade storybook from ^10.1.7 to ^10.1.8 for overall enhancements
+ - 🔄 Upgrade typedoc-plugin-dt-links from ^2.0.32 to ^2.0.33 for documentation improvements
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(9ecc82a)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/9ecc82acfaa81e2b3a3a1c150ba343456fb6c82a)
+
+
+- 🔧 [build] Update dependencies in package.json
+ - 📦 Upgrade `@storybook/addon-a11y`, `@storybook/addon-docs`, `@storybook/addon-links`, `@storybook/addon-themes`, `@storybook/addon-vitest`, `@storybook/builder-vite`, `@storybook/react`, and `@storybook/react-vite` to version `10.1.7` for improved features and bug fixes.
+ - 📦 Upgrade `@tailwindcss/postcss` and `tailwindcss` to version `4.1.18` for better compatibility and performance.
+ - 📦 Upgrade `eslint-plugin-storybook` to version `10.1.7` for enhanced linting capabilities.
+ - 📦 Upgrade `knip` to version `5.73.3` for improved code analysis.
+ - 📦 Upgrade `storybook` to version `10.1.7` for the latest enhancements.
+
+📝 [docs] Improve documentation in DataService.ts
+ - 📜 Refactor comments in `DataService.ts` to enhance clarity and readability regarding error handling and telemetry.
+
+📝 [docs] Clarify validation error messages in validation.ts
+ - 📜 Update comments in `validation.ts` to improve the explanation of error message formats for better understanding.
+
+🎨 [style] Clean up whitespace in vitest.setup.ts
+ - ✨ Remove unnecessary whitespace in `vitest.setup.ts` to maintain code style consistency.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(39a9b2b)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/39a9b2b979da0e91d1cb23efb4149c05bf76c731)
+
+
+- 🔧 [build] Update BeastMode agent prompts and ESLint configuration
+ - 📝 Update BeastMode agent prompt to enhance code review process with dynamic categorization of findings
+ - 🔧 Refactor ESLint configuration for improved readability and organization
+ - 🔧 Add new ESLint rule to enforce no string style prop in React components
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(39fe66f)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/39fe66f87b061301cb67850c8c1bc643ad5fd6ad)
+
+
+- 🔧 [build] Refactor Knip configuration to simplify dependency ignore patterns
+ - Consolidated ignore patterns for various dependencies using wildcards for better maintainability
+ - Cleared out unnecessary entries in the ignoreUnresolved array for cleaner configuration
+📝 [docs] Update ESLint configuration comment for clarity
+ - Added clarification to the "prettier/prettier" rule to indicate usage in Prettier directly for reduced noise in AI
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(6fee1f8)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/6fee1f850712770d13ed4d8940de7cae221f7036)
+
+
+- 🔧 [build] Update package.json and dependencies
+ - 🛠️ Remove unused `storybook:test-server` script from package.json
+ - 🔄 Update test scripts to replace `test:storybook:runner` with `test:playwright`
+ - 🔄 Update `markdown-to-jsx` dependency from `^9.3.3` to `^9.3.4`
+ - 🧹 Remove `start-server-and-test` dependency from package.json
+
+🛠️ [fix] Adjust TypeScript configuration for Playwright
+ - 🔄 Change `skipLibCheck` from `false` to `true` in `playwright/tsconfig.json` for improved type checking
+
+🚜 [refactor] Modify environment comprehensive coverage test
+ - 🔄 Change type of `originalProcess` from `typeof globalThis.process` to `any` to avoid type conflicts with Node's evolving Process type
+
+🎨 [style] Reorganize imports in HistoryTab component
+ - 🔄 Move import of `DEFAULT_HISTORY_LIMIT_RULES` to the correct position in `HistoryTab.tsx`
+
+📝 [docs] Improve documentation in DataService
+ - 🔄 Enhance comments in `DataService.ts` for clarity on error handling and logging
+
+📝 [docs] Clarify validation error message formatting
+ - 🔄 Update comments in `validation.ts` to improve readability of error message patterns
+
+🧪 [test] Update HistoryTab stories for better readability
+ - 🔄 Refactor test assertions in `HistoryTab.stories.tsx` to use `void expect(...)` for clarity
+
+🧪 [test] Refactor Settings stories to improve test assertions
+ - 🔄 Update assertions in `Settings.stories.tsx` to use `void expect(...)` for consistency
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(19c593f)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/19c593f58f2fea257d4b605649a34af6265a5ac9)
+
+
+- 🔧 [build] Update monitoring services and validation logic
+
+ - ✨ [feat] Enhance `HttpJsonMonitor` by adding a missing import for `isRecord`.
+ - 🛠️ [fix] Improve timeout resolution in `MonitorScheduler` to ensure `timeoutMs` is finite and greater than zero.
+ - ⚡ [perf] Normalize retry attempts in `performPingCheckWithRetry` to ensure valid values are used and improve error handling.
+ - 🛠️ [fix] Refactor `createAbortableOperation` in `abortUtils` to streamline abort handling during sleep operations.
+ - 📝 [docs] Update comments in `monitorStatusEvents` for clarity and consistency.
+ - 🧹 [chore] Modify `sonar-project.properties` to include additional test directories and improve duplication and security exclusions.
+ - 🎨 [style] Adjust `StatusAlertToast` to return structured timestamp data for better readability.
+ - 🚜 [refactor] Consolidate state management in `useSiteDetails` to track user edits more effectively across multiple monitors.
+ - 🛠️ [fix] Update `DataService` to utilize a new validation helper for consistent error handling.
+ - 🛠️ [fix] Modify `EventsService` to log active monitors instead of paused ones for better clarity.
+ - 🛠️ [fix] Update `MonitorTypesService` to use the new validation helper for payload validation.
+ - 🛠️ [fix] Simplify `NotificationPreferenceService` by removing unnecessary bridge checks and directly using the API.
+ - 🎨 [style] Improve logging messages in `SettingsService` for better clarity on history limit updates.
+ - ✨ [feat] Introduce a new utility file for shared validation helpers to streamline service validations.
+ - 🧪 [test] Update tests for `NotificationPreferenceService` to reflect changes in error handling and improve coverage.
+ - 🧪 [test] Refactor tests in `useTheme` to simplify mock implementations and improve readability.
+ - 🧪 [test] Enhance tests for `pingRetry` utilities to ensure proper routing and error handling.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(214bb42)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/214bb42c802dcc4caf5872e3f78f6f0b37194789)
 
 
 
@@ -24,9 +298,9 @@ All notable changes to this project will be documented in this file.
 ## [19.5.0] - 2025-12-09
 
 
-[[e113a1e](https://github.com/Nick2bad4u/Uptime-Watcher/commit/e113a1ea1763692f1325d8ea91700f48cf173faf)...
+[[4beb588](https://github.com/Nick2bad4u/Uptime-Watcher/commit/4beb5888dee79fa257d481c7ed8421a73cb81266)...
 [ef1fdb8](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ef1fdb85322390fd105b7634adeb37176b6d15ca)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/e113a1ea1763692f1325d8ea91700f48cf173faf...ef1fdb85322390fd105b7634adeb37176b6d15ca))
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/4beb5888dee79fa257d481c7ed8421a73cb81266...ef1fdb85322390fd105b7634adeb37176b6d15ca))
 
 
 ### 📦 Dependencies
@@ -38,6 +312,38 @@ All notable changes to this project will be documented in this file.
 ### 👷 CI/CD
 
 - Update Build.yml [`(ef1fdb8)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ef1fdb85322390fd105b7634adeb37176b6d15ca)
+
+
+
+### 🔧 Build System
+
+- 🔧 [build] Update dependencies and package manager version
+ - Updated "@eslint-react/eslint-plugin" from "^2.3.12" to "^2.3.13"
+ - Updated "@storybook/addon-a11y" from "^10.1.4" to "^10.1.5"
+ - Updated Storybook related packages from "^10.1.4" to "^10.1.5"
+ - Updated "eslint-plugin-react-dom" from "^2.3.12" to "^2.3.13"
+ - Updated "eslint-plugin-react-hooks-extra" from "^2.3.12" to "^2.3.13"
+ - Updated "eslint-plugin-react-naming-convention" from "^2.3.12" to "^2.3.13"
+ - Updated "eslint-plugin-react-web-api" from "^2.3.12" to "^2.3.13"
+ - Updated "eslint-plugin-storybook" from "^10.1.4" to "^10.1.5"
+ - Updated "knip" from "^5.72.0" to "^5.73.0"
+ - Updated "markdown-to-jsx" from "^9.3.2" to "^9.3.3"
+ - Updated "storybook" from "^10.1.4" to "^10.1.5"
+ - Updated package manager from "npm@11.6.4" to "npm@11.7.0"
+
+🛠️ [fix] Improve error handling in various components
+ - Replaced manual error handling with `ensureError` utility in `App.tsx`, `alertCoordinator.ts`, and `hydration.ts` for better consistency and readability
+ - Ensured all caught errors are normalized to `Error` instances
+
+🚜 [refactor] Consolidate type checking utility functions
+ - Removed redundant `isRecord` function in `loggingContext.ts`, `monitorStatusEvents.ts`, `operations.ts`, `fileDownload.ts`, `operationHelpers.ts`, and `ipc.ts`
+ - Replaced with shared `isRecord` utility from `typeHelpers.ts` to promote code reuse
+
+🎨 [style] Clean up code formatting and comments
+ - Removed unnecessary public tag in `useThemeStyles.ts`
+ - Adjusted comments in `useTheme.ts` for clarity on parameter descriptions
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(4beb588)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/4beb5888dee79fa257d481c7ed8421a73cb81266)
 
 
 
