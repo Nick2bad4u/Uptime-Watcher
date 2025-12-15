@@ -86,6 +86,13 @@ export function registerCloudHandlers({
     );
 
     registerStandardizedIpcHandler(
+        CLOUD_CHANNELS.deleteBackup,
+        withIgnoredIpcEvent((key: string) => cloudService.deleteBackup(key)),
+        CloudHandlerValidators.deleteBackup,
+        registeredHandlers
+    );
+
+    registerStandardizedIpcHandler(
         CLOUD_CHANNELS.migrateBackups,
         withIgnoredIpcEvent((config) => cloudService.migrateBackups(config)),
         CloudHandlerValidators.migrateBackups,

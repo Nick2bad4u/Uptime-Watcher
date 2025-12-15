@@ -34,7 +34,7 @@ function describeValue(v: unknown): string {
             return v.name ? `[Function ${v.name}]` : "[Function anonymous]";
         }
 
-        /* v8 ignore next -- all JS values should match one of the cases above */
+        /* V8 ignore next -- all JS values should match one of the cases above */
         return "<unknown>";
     } catch {
         return "<unserializable>";

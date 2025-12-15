@@ -7,7 +7,7 @@ import type { JSX } from "react/jsx-runtime";
 
 import {
     type ChangeEvent,
-    type MouseEvent,
+    type MouseEvent as ReactMouseEvent,
     type ReactNode,
     type RefObject,
     useCallback,
@@ -56,11 +56,7 @@ const SettingsSection = ({
                 >
                     {title}
                 </ThemedText>
-                <ThemedText
-                    className="settings-section__description"
-                    size="xs"
-                    variant="secondary"
-                >
+                <ThemedText size="sm" variant="secondary">
                     {description}
                 </ThemedText>
             </div>
@@ -196,6 +192,7 @@ export const NotificationSection = ({
 
 interface CloudSectionProperties {
     readonly backups: readonly CloudBackupEntry[];
+    readonly deletingBackupKey: null | string;
     readonly icon: IconType;
     readonly isClearingEncryptionKey: boolean;
     readonly isConnectingDropbox: boolean;
@@ -212,6 +209,7 @@ interface CloudSectionProperties {
     readonly lastRemoteSyncResetResult: CloudSyncResetResult | null;
     readonly onClearEncryptionKey: () => void;
     readonly onConnectDropbox: () => void;
+    readonly onDeleteBackup: (key: string) => void;
     readonly onDisconnect: () => void;
     readonly onEncryptBackupsDeleteOriginals: () => void;
     readonly onEncryptBackupsKeepOriginals: () => void;
@@ -437,12 +435,12 @@ function formatOptionalTimestamp(value: null | number): string {
 interface RemoteBackupsPanelProperties {
     readonly backups: readonly CloudBackupEntry[];
     readonly connected: boolean;
+    readonly deletingBackupKey: null | string;
     readonly isListingBackups: boolean;
     readonly isUploadingBackup: boolean;
+    readonly onDeleteBackupClick: (key: string) => void;
     readonly onListBackups: () => void;
-    readonly onRestoreBackupClick: (
-        event: MouseEvent<HTMLButtonElement>
-    ) => void;
+    readonly onRestoreBackupClick: (key: string) => void;
     readonly onUploadLatestBackup: () => void;
     readonly restoringBackupKey: null | string;
 }
@@ -450,13 +448,35 @@ interface RemoteBackupsPanelProperties {
 const RemoteBackupsPanel = ({
     backups,
     connected,
+    deletingBackupKey,
     isListingBackups,
     isUploadingBackup,
+    onDeleteBackupClick,
     onListBackups,
     onRestoreBackupClick,
     onUploadLatestBackup,
     restoringBackupKey,
 }: RemoteBackupsPanelProperties): JSX.Element => {
+    const handleRestoreClick = useCallback(
+        (event: ReactMouseEvent<HTMLButtonElement>): void => {
+            const key = event.currentTarget.dataset["backupKey"];
+            if (key) {
+                onRestoreBackupClick(key);
+            }
+        },
+        [onRestoreBackupClick]
+    );
+
+    const handleDeleteClick = useCallback(
+        (event: ReactMouseEvent<HTMLButtonElement>): void => {
+            const key = event.currentTarget.dataset["backupKey"];
+            if (key) {
+                onDeleteBackupClick(key);
+            }
+        },
+        [onDeleteBackupClick]
+    );
+
     const content =
         backups.length === 0 ? (
             <ThemedText size="sm" variant="tertiary">
@@ -490,20 +510,37 @@ const RemoteBackupsPanel = ({
                                 </div>
                             </div>
 
-                            <ThemedButton
-                                data-backup-key={backup.key}
-                                disabled={
-                                    !connected ||
-                                    restoringBackupKey === backup.key
-                                }
-                                onClick={onRestoreBackupClick}
-                                size="sm"
-                                variant="secondary"
-                            >
-                                {restoringBackupKey === backup.key
-                                    ? "Restoring…"
-                                    : "Restore"}
-                            </ThemedButton>
+                            <div className="flex flex-wrap gap-2">
+                                <ThemedButton
+                                    data-backup-key={backup.key}
+                                    disabled={
+                                        !connected ||
+                                        restoringBackupKey === backup.key
+                                    }
+                                    onClick={handleRestoreClick}
+                                    size="sm"
+                                    variant="secondary"
+                                >
+                                    {restoringBackupKey === backup.key
+                                        ? "Restoring…"
+                                        : "Restore"}
+                                </ThemedButton>
+
+                                <ThemedButton
+                                    data-backup-key={backup.key}
+                                    disabled={
+                                        !connected ||
+                                        deletingBackupKey === backup.key
+                                    }
+                                    onClick={handleDeleteClick}
+                                    size="sm"
+                                    variant="error"
+                                >
+                                    {deletingBackupKey === backup.key
+                                        ? "Deleting…"
+                                        : "Delete"}
+                                </ThemedButton>
+                            </div>
                         </li>
                     );
                 })}
@@ -546,6 +583,7 @@ const RemoteBackupsPanel = ({
 
 export const CloudSection = ({
     backups,
+    deletingBackupKey,
     icon,
     isClearingEncryptionKey,
     isConnectingDropbox,
@@ -562,6 +600,7 @@ export const CloudSection = ({
     lastRemoteSyncResetResult,
     onClearEncryptionKey,
     onConnectDropbox,
+    onDeleteBackup,
     onDisconnect,
     onEncryptBackupsDeleteOriginals,
     onEncryptBackupsKeepOriginals,
@@ -611,11 +650,8 @@ export const CloudSection = ({
     const showLockEncryptionButton = encryptionMode === "passphrase";
 
     const handleRestoreButtonClick = useCallback(
-        (event: MouseEvent<HTMLButtonElement>): void => {
-            const key = event.currentTarget.dataset["backupKey"];
-            if (key) {
-                onRestoreBackup(key);
-            }
+        (key: string): void => {
+            onRestoreBackup(key);
         },
         [onRestoreBackup]
     );
@@ -663,85 +699,117 @@ export const CloudSection = ({
             testId="settings-section-cloud"
             title="Cloud Sync & Backup"
         >
-            <div className="settings-toggle-stack">
+            <div className="space-y-3">
                 {status?.lastError ? (
                     <ErrorAlert message={status.lastError} variant="error" />
                 ) : null}
 
-                <SettingItem
-                    control={statusControl}
-                    description="Current cloud provider connection status."
-                    title="Status"
-                />
+                <div className="rounded-lg border border-zinc-800 bg-zinc-900/40 p-4">
+                    <ThemedText size="sm" variant="secondary" weight="medium">
+                        Connection & Status
+                    </ThemedText>
 
-                <SettingItem
-                    control={lastSyncControl}
-                    description="Last completed sync time (based on this device)."
-                    title="Last Sync"
-                />
+                    <div className="settings-toggle-stack mt-3">
+                        <SettingItem
+                            control={statusControl}
+                            description="Current cloud provider connection status."
+                            title="Status"
+                        />
 
-                <SettingItem
-                    control={lastBackupControl}
-                    description="Last completed remote backup upload time (based on this device)."
-                    title="Last Backup"
-                />
+                        <SettingItem
+                            control={lastSyncControl}
+                            description="Last completed sync time (based on this device)."
+                            title="Last Sync"
+                        />
 
-                <CloudConnectionActions
-                    configured={configured}
-                    connected={connected}
-                    isConnectingDropbox={isConnectingDropbox}
-                    isDisconnecting={isDisconnecting}
-                    isRefreshingStatus={isRefreshingStatus}
-                    onConnectDropbox={onConnectDropbox}
-                    onDisconnect={onDisconnect}
-                    onRefreshStatus={onRefreshStatus}
-                />
+                        <SettingItem
+                            control={lastBackupControl}
+                            description="Last completed remote backup upload time (based on this device)."
+                            title="Last Backup"
+                        />
+                    </div>
 
-                <SettingItem
-                    control={syncEnabledControl}
-                    description="When enabled, configuration changes are merged across devices."
-                    title="Enable Sync"
-                />
+                    <div className="mt-3">
+                        <CloudConnectionActions
+                            configured={configured}
+                            connected={connected}
+                            isConnectingDropbox={isConnectingDropbox}
+                            isDisconnecting={isDisconnecting}
+                            isRefreshingStatus={isRefreshingStatus}
+                            onConnectDropbox={onConnectDropbox}
+                            onDisconnect={onDisconnect}
+                            onRefreshStatus={onRefreshStatus}
+                        />
+                    </div>
+                </div>
 
-                <SettingItem
-                    control={encryptionStatusControl}
-                    description="Optional client-side encryption for new cloud sync artifacts and backups."
-                    title="Encryption"
-                />
+                <div className="rounded-lg border border-zinc-800 bg-zinc-900/40 p-4">
+                    <ThemedText size="sm" variant="secondary" weight="medium">
+                        Sync
+                    </ThemedText>
 
-                <div className="flex flex-wrap gap-2">
-                    <ThemedButton
-                        disabled={!connected || isSettingEncryptionPassphrase}
-                        onClick={onSetEncryptionPassphrase}
-                        size="sm"
-                        variant="secondary"
-                    >
-                        {encryptionActionLabel}
-                    </ThemedButton>
+                    <div className="settings-toggle-stack mt-3">
+                        <SettingItem
+                            control={syncEnabledControl}
+                            description="When enabled, configuration changes are merged across devices."
+                            title="Enable Sync"
+                        />
+                    </div>
 
-                    {showLockEncryptionButton ? (
+                    <div className="mt-3">
+                        <CloudSyncActions
+                            connected={connected}
+                            isRequestingSyncNow={isRequestingSyncNow}
+                            onRequestSyncNow={onRequestSyncNow}
+                        />
+                    </div>
+                </div>
+
+                <div className="rounded-lg border border-zinc-800 bg-zinc-900/40 p-4">
+                    <ThemedText size="sm" variant="secondary" weight="medium">
+                        Encryption
+                    </ThemedText>
+
+                    <div className="settings-toggle-stack mt-3">
+                        <SettingItem
+                            control={encryptionStatusControl}
+                            description="Optional client-side encryption for new cloud sync artifacts and backups."
+                            title="Status"
+                        />
+                    </div>
+
+                    <div className="mt-3 flex flex-wrap gap-2">
                         <ThemedButton
-                            disabled={isClearingEncryptionKey}
-                            onClick={onClearEncryptionKey}
+                            disabled={
+                                !connected || isSettingEncryptionPassphrase
+                            }
+                            onClick={onSetEncryptionPassphrase}
                             size="sm"
                             variant="secondary"
                         >
-                            {lockEncryptionLabel}
+                            {encryptionActionLabel}
                         </ThemedButton>
-                    ) : null}
-                </div>
 
-                <CloudSyncActions
-                    connected={connected}
-                    isRequestingSyncNow={isRequestingSyncNow}
-                    onRequestSyncNow={onRequestSyncNow}
-                />
+                        {showLockEncryptionButton ? (
+                            <ThemedButton
+                                disabled={isClearingEncryptionKey}
+                                onClick={onClearEncryptionKey}
+                                size="sm"
+                                variant="secondary"
+                            >
+                                {lockEncryptionLabel}
+                            </ThemedButton>
+                        ) : null}
+                    </div>
+                </div>
 
                 <RemoteBackupsPanel
                     backups={backups}
                     connected={connected}
+                    deletingBackupKey={deletingBackupKey}
                     isListingBackups={isListingBackups}
                     isUploadingBackup={isUploadingBackup}
+                    onDeleteBackupClick={onDeleteBackup}
                     onListBackups={onListBackups}
                     onRestoreBackupClick={handleRestoreButtonClick}
                     onUploadLatestBackup={onUploadLatestBackup}
@@ -809,12 +877,7 @@ export const ApplicationSection = ({
         title="Application"
     >
         <div className="settings-field">
-            <ThemedText
-                className="settings-field__label"
-                size="sm"
-                variant="secondary"
-                weight="medium"
-            >
+            <ThemedText size="sm" weight="medium">
                 Theme
             </ThemedText>
             <ThemedSelect

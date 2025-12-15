@@ -42,6 +42,7 @@ interface CloudServiceContract {
         config: CloudFilesystemProviderConfig
     ) => Promise<CloudStatusSummary>;
     connectDropbox: () => Promise<CloudStatusSummary>;
+    deleteBackup: (key: string) => Promise<CloudBackupEntry[]>;
     disconnect: () => Promise<CloudStatusSummary>;
     enableSync: (config: CloudEnableSyncConfig) => Promise<CloudStatusSummary>;
     getStatus: () => Promise<CloudStatusSummary>;
@@ -72,6 +73,7 @@ const { ensureInitialized, wrap } = ((): ReturnType<
                         "clearEncryptionKey",
                         "connectDropbox",
                         "configureFilesystemProvider",
+                        "deleteBackup",
                         "disconnect",
                         "enableSync",
                         "getStatus",
@@ -98,41 +100,42 @@ const { ensureInitialized, wrap } = ((): ReturnType<
  * @public
  */
 export const CloudService: CloudServiceContract = {
-    clearEncryptionKey: wrap("clearEncryptionKey", async (api) =>
+    clearEncryptionKey: wrap("clearEncryptionKey", (api) =>
         api.cloud.clearEncryptionKey()),
 
-    configureFilesystemProvider: wrap("configureFilesystemProvider", async (
+    configureFilesystemProvider: wrap("configureFilesystemProvider", (
         api,
         config
     ) => api.cloud.configureFilesystemProvider(config)),
 
-    connectDropbox: wrap("connectDropbox", async (api) =>
-        api.cloud.connectDropbox()),
+    connectDropbox: wrap("connectDropbox", (api) => api.cloud.connectDropbox()),
 
-    disconnect: wrap("disconnect", async (api) => api.cloud.disconnect()),
+    deleteBackup: wrap("deleteBackup", (api, key) =>
+        api.cloud.deleteBackup(key)),
 
-    enableSync: wrap("enableSync", async (api, config) =>
+    disconnect: wrap("disconnect", (api) => api.cloud.disconnect()),
+
+    enableSync: wrap("enableSync", (api, config) =>
         // eslint-disable-next-line n/no-sync -- "Sync" is part of the feature name, not a Node.js sync API.
         api.cloud.enableSync(config)),
 
-    getStatus: wrap("getStatus", async (api) => api.cloud.getStatus()),
+    getStatus: wrap("getStatus", (api) => api.cloud.getStatus()),
 
     initialize: ensureInitialized,
 
-    listBackups: wrap("listBackups", async (api) => api.cloud.listBackups()),
+    listBackups: wrap("listBackups", (api) => api.cloud.listBackups()),
 
-    migrateBackups: wrap("migrateBackups", async (api, config) =>
+    migrateBackups: wrap("migrateBackups", (api, config) =>
         api.cloud.migrateBackups(config)),
 
-    previewResetRemoteSyncState: wrap("previewResetRemoteSyncState", async (
-        api
-    ) => api.cloud.previewResetRemoteSyncState()),
+    previewResetRemoteSyncState: wrap("previewResetRemoteSyncState", (api) =>
+        api.cloud.previewResetRemoteSyncState()),
 
     requestSyncNow: wrap("requestSyncNow", async (api) => {
         await api.cloud.requestSyncNow();
     }),
 
-    resetRemoteSyncState: wrap("resetRemoteSyncState", async (api) =>
+    resetRemoteSyncState: wrap("resetRemoteSyncState", (api) =>
         api.cloud.resetRemoteSyncState()),
 
     restoreBackup: wrap("restoreBackup", async (api, key) => {
@@ -165,6 +168,6 @@ export const CloudService: CloudServiceContract = {
         return result;
     }),
 
-    uploadLatestBackup: wrap("uploadLatestBackup", async (api) =>
+    uploadLatestBackup: wrap("uploadLatestBackup", (api) =>
         api.cloud.uploadLatestBackup()),
 };

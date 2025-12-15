@@ -243,6 +243,10 @@ export interface IpcInvokeChannelMap {
         params: readonly [];
         result: CloudStatusSummary;
     };
+    "cloud-delete-backup": {
+        params: readonly [key: string];
+        result: CloudBackupEntry[];
+    };
     "cloud-disconnect": {
         params: readonly [];
         result: CloudStatusSummary;

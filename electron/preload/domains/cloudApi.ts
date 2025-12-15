@@ -23,6 +23,7 @@ export interface CloudApiInterface extends CloudDomainBridge {
     clearEncryptionKey: CloudDomainBridge["clearEncryptionKey"];
     configureFilesystemProvider: CloudDomainBridge["configureFilesystemProvider"];
     connectDropbox: CloudDomainBridge["connectDropbox"];
+    deleteBackup: CloudDomainBridge["deleteBackup"];
     disconnect: CloudDomainBridge["disconnect"];
     enableSync: CloudDomainBridge["enableSync"];
     getStatus: CloudDomainBridge["getStatus"];
@@ -47,6 +48,7 @@ export const cloudApi: CloudApiInterface = {
         CLOUD_CHANNELS.configureFilesystemProvider
     ),
     connectDropbox: createTypedInvoker(CLOUD_CHANNELS.connectDropbox),
+    deleteBackup: createTypedInvoker(CLOUD_CHANNELS.deleteBackup),
     disconnect: createTypedInvoker(CLOUD_CHANNELS.disconnect),
     enableSync: createTypedInvoker(CLOUD_CHANNELS.enableSync),
     getStatus: createTypedInvoker(CLOUD_CHANNELS.getStatus),

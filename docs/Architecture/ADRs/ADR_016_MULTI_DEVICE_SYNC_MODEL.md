@@ -3,7 +3,7 @@ schema: "../../../config/schemas/doc-frontmatter.schema.json"
 title: "ADR-016: Multi-Device Sync Data Model"
 summary: "Defines the canonical sync model, conflict detection/merge rules, and payload boundaries for true multi-device sync without syncing raw SQLite files."
 created: "2025-12-12"
-last_reviewed: "2025-12-13"
+last_reviewed: "2025-12-14"
 category: "guide"
 author: "Nick2bad4u"
 tags:
@@ -32,15 +32,17 @@ tags:
 
 ## Status
 
-Accepted (implemented)
+Accepted (implemented — complete)
 
-> **Implementation status (as of 2025-12-13)**
+> **Implementation status (as of 2025-12-14)**
 >
 > - ✅ Canonical sync domain types implemented under:
 >   - `shared/types/cloudSync*.ts`
 >   - `shared/types/cloudSyncDomain.ts`
 > - ✅ Deterministic merge implementation:
 >   - `shared/utils/cloudSyncState.ts`
+>   - (Final hardening) delete tombstones are compared against the latest known
+>     entity write so the merge is order-independent and idempotent.
 > - ✅ Provider-backed transport:
 >   - `electron/services/sync/ProviderCloudSyncTransport.ts`
 > - ✅ Main sync engine (emit ops, compact snapshot, write manifest):

@@ -2,7 +2,7 @@ import type { CloudBackupEntry } from "@shared/types/cloud";
 import type { SerializedDatabaseBackupMetadata } from "@shared/types/databaseBackup";
 
 import { ensureError } from "@shared/utils/errorHandling";
-import axios, { type AxiosInstance } from "axios";
+import axios, { type AxiosInstance, type AxiosResponse } from "axios";
 import * as z from "zod";
 
 import type {
@@ -20,73 +20,205 @@ import { withDropboxRetry } from "./dropboxRetry";
 const DROPBOX_API = "https://api.dropboxapi.com" as const;
 const DROPBOX_CONTENT = "https://content.dropboxapi.com" as const;
 
+/**
+ * All objects for Uptime Watcher are stored underneath this folder.
+ *
+ * @remarks
+ * If you configure the Dropbox app as an "App folder" (recommended), Dropbox
+ * already sandboxes the app under the app folder. We still create a subfolder
+ * to keep object paths predictable and portable across providers.
+ */
 const APP_ROOT_DIRECTORY_NAME = "uptime-watcher" as const;
+
 const BACKUPS_PREFIX = "backups/" as const;
 
-interface DropboxFileEntry {
-    ".tag": "file";
-    path_display: string;
-    server_modified: string;
-    size: number;
-}
-
-const dropboxFileEntrySchema: z.ZodType<DropboxFileEntry> = z.looseObject({
+const dropboxFileEntrySchema = z.looseObject({
     ".tag": z.literal("file"),
-    path_display: z.string(),
-    server_modified: z.string(),
-    size: z.number().nonnegative(),
+    path_display: z.string().min(1),
+    server_modified: z.string().min(1),
+    size: z.number().int().nonnegative(),
 });
 
-const dropboxListFolderResponseSchema = z.looseObject({
-    cursor: z.string().optional(),
-    entries: z.array(z.unknown()).optional(),
-    has_more: z.boolean().optional(),
+const dropboxListFolderResponseSchema = z
+    .object({
+        cursor: z.string().optional(),
+        entries: z.array(z.unknown()).default([]),
+        has_more: z.boolean().default(false),
+    })
+    .strict();
+
+const dropboxUploadResponseSchema = z.looseObject({
+    path_display: z.string().min(1),
+    server_modified: z.string().min(1),
+    size: z.number().int().nonnegative(),
 });
 
 const dropboxCurrentAccountSchema = z.looseObject({
-    email: z.string().optional(),
+    email: z.string().min(1).optional(),
     name: z
         .looseObject({
-            display_name: z.string().optional(),
+            display_name: z.string().min(1).optional(),
         })
         .optional(),
 });
 
 function normalizeKey(key: string): string {
-    return key.replaceAll("\\", "/");
+    // Normalize to POSIX-style keys.
+    let normalized = key.replaceAll("\\", "/").trim();
+
+    // Drop leading slashes to prevent accidental double-slash paths.
+    normalized = normalized.replace(/^\/+/v, "");
+
+    // Collapse duplicate separators.
+    normalized = normalized.replaceAll(/\/+/gv, "/");
+
+    // Disallow traversal segments.
+    if (normalized.split("/").includes("..")) {
+        throw new Error("Invalid Dropbox key (path traversal segment)");
+    }
+
+    return normalized;
 }
 
 function toDropboxPath(key: string): string {
     const normalized = normalizeKey(key);
-    if (normalized.length === 0) {
-        return `/${APP_ROOT_DIRECTORY_NAME}`;
-    }
 
-    return `/${APP_ROOT_DIRECTORY_NAME}/${normalized}`;
+    return normalized.length === 0
+        ? `/${APP_ROOT_DIRECTORY_NAME}`
+        : `/${APP_ROOT_DIRECTORY_NAME}/${normalized}`;
 }
 
-function fromDropboxPath(dropboxPath: string): string {
-    const normalized = dropboxPath.replaceAll("\\", "/");
+function fromDropboxPathOrNull(pathDisplay: string): null | string {
+    const normalized = pathDisplay.replaceAll("\\", "/");
     const prefix = `/${APP_ROOT_DIRECTORY_NAME}/`;
+
     if (normalized === `/${APP_ROOT_DIRECTORY_NAME}`) {
         return "";
     }
 
     if (!normalized.startsWith(prefix)) {
-        throw new Error("Unexpected Dropbox path outside app root");
+        return null;
     }
 
-    return normalized.slice(prefix.length);
+    return normalizeKey(normalized.slice(prefix.length));
+}
+
+function tryParseDropboxErrorSummary(data: unknown): string | undefined {
+    if (!data) {
+        return undefined;
+    }
+
+    if (typeof data === "object") {
+        const maybeSummary = (data as { error_summary?: unknown })
+            .error_summary;
+        if (
+            typeof maybeSummary === "string" &&
+            maybeSummary.trim().length > 0
+        ) {
+            return maybeSummary;
+        }
+    }
+
+    if (typeof data === "string") {
+        const trimmed = data.trim();
+        if (!trimmed) {
+            return undefined;
+        }
+
+        try {
+            const parsed: unknown = JSON.parse(trimmed);
+            return tryParseDropboxErrorSummary(parsed);
+        } catch {
+            return undefined;
+        }
+    }
+
+    // Axios returns ArrayBuffer for errors when responseType is "arraybuffer".
+    if (data instanceof ArrayBuffer) {
+        const text = Buffer.from(new Uint8Array(data)).toString("utf8").trim();
+        if (!text) {
+            return undefined;
+        }
+
+        try {
+            const parsed: unknown = JSON.parse(text);
+            return tryParseDropboxErrorSummary(parsed);
+        } catch {
+            return undefined;
+        }
+    }
+
+    if (Buffer.isBuffer(data)) {
+        const text = data.toString("utf8").trim();
+        if (!text) {
+            return undefined;
+        }
+
+        try {
+            const parsed: unknown = JSON.parse(text);
+            return tryParseDropboxErrorSummary(parsed);
+        } catch {
+            return undefined;
+        }
+    }
+
+    return undefined;
+}
+
+function describeDropboxAxiosErrorRich(error: unknown): string | undefined {
+    if (!axios.isAxiosError(error)) {
+        return undefined;
+    }
+
+    const status = error.response?.status;
+    const summary = tryParseDropboxErrorSummary(error.response?.data);
+
+    if (typeof summary === "string" && summary.trim().length > 0) {
+        return typeof status === "number"
+            ? `HTTP ${status}: ${summary}`
+            : summary;
+    }
+
+    if (typeof status === "number") {
+        return `HTTP ${status}: ${error.message}`;
+    }
+
+    return error.message;
+}
+
+function isDropboxNotFoundError(error: unknown): boolean {
+    if (!axios.isAxiosError(error)) {
+        return false;
+    }
+
+    if (error.response?.status !== 409) {
+        return false;
+    }
+
+    const summary = tryParseDropboxErrorSummary(error.response.data);
+    return (
+        typeof summary === "string" &&
+        summary.toLowerCase().includes("not_found")
+    );
+}
+
+function createENOENT(message: string): NodeJS.ErrnoException {
+    const error = new Error(message) as NodeJS.ErrnoException;
+    error.code = "ENOENT";
+    return error;
 }
 
 function backupMetadataKeyForBackupKey(backupKey: string): string {
     return `${backupKey}.metadata.json`;
 }
 
-// Backup metadata parsing/serialization is shared across providers.
-
 /**
- * Dropbox-backed cloud provider.
+ * Dropbox-backed {@link CloudStorageProvider}.
+ *
+ * @remarks
+ * Uses Dropbox API + Content endpoints with OAuth tokens managed by
+ * {@link DropboxTokenManager}. All app objects are stored under
+ * `/${APP_ROOT_DIRECTORY_NAME}/`.
  */
 export class DropboxCloudStorageProvider implements CloudStorageProvider {
     public readonly kind = "dropbox" as const;
@@ -108,6 +240,7 @@ export class DropboxCloudStorageProvider implements CloudStorageProvider {
                         {
                             headers: {
                                 Authorization: `Bearer ${token}`,
+                                "Content-Type": "application/json",
                             },
                         }
                     ),
@@ -119,12 +252,9 @@ export class DropboxCloudStorageProvider implements CloudStorageProvider {
         }
     }
 
-    /**
-     * Returns a human-friendly account label (email or display name) when
-     * available.
-     */
     public async getAccountLabel(): Promise<string | undefined> {
         const token = await this.tokenManager.getAccessToken();
+
         const response = await withDropboxRetry({
             fn: async () =>
                 this.httpApi.post(
@@ -133,10 +263,19 @@ export class DropboxCloudStorageProvider implements CloudStorageProvider {
                     {
                         headers: {
                             Authorization: `Bearer ${token}`,
+                            "Content-Type": "application/json",
                         },
                     }
                 ),
             operationName: "users/get_current_account",
+        }).catch((error: unknown) => {
+            const described = describeDropboxAxiosErrorRich(error);
+            if (described) {
+                throw new Error(
+                    `Dropbox get_current_account failed: ${described}`
+                );
+            }
+            throw ensureError(error);
         });
 
         const parsed = dropboxCurrentAccountSchema.parse(
@@ -146,13 +285,14 @@ export class DropboxCloudStorageProvider implements CloudStorageProvider {
     }
 
     public async listObjects(prefix: string): Promise<CloudObjectEntry[]> {
-        const normalizedPrefix = normalizeKey(prefix);
         const token = await this.tokenManager.getAccessToken();
+        const normalizedPrefix = normalizeKey(prefix);
 
-        const results: CloudObjectEntry[] = [];
+        const rootPath = toDropboxPath("");
 
-        let hasMore = true;
+        const entries: unknown[] = [];
         let cursor: string | undefined = undefined;
+        let hasMore = true;
 
         while (hasMore) {
             const endpoint = cursor
@@ -165,75 +305,73 @@ export class DropboxCloudStorageProvider implements CloudStorageProvider {
                       include_deleted: false,
                       include_has_explicit_shared_members: false,
                       include_media_info: false,
-                      path: toDropboxPath(""),
+                      include_mounted_folders: true,
+                      include_non_downloadable_files: false,
+                      path: rootPath,
                       recursive: true,
                   };
 
-            // eslint-disable-next-line no-await-in-loop -- Pagination must be sequential.
-            const response = await withDropboxRetry({
-                fn: async () =>
-                    this.httpApi.post(endpoint, payload, {
-                        headers: {
-                            Authorization: `Bearer ${token}`,
-                            "Content-Type": "application/json",
-                        },
-                    }),
-                operationName: cursor
-                    ? "files/list_folder/continue"
-                    : "files/list_folder",
-            });
+            const currentCursor = cursor;
 
-            const parsed = dropboxListFolderResponseSchema.parse(
-                response.data as unknown
-            );
-
-            for (const entryCandidate of parsed.entries ?? []) {
-                const fileEntry =
-                    dropboxFileEntrySchema.safeParse(entryCandidate);
-                if (fileEntry.success) {
-                    const key = fromDropboxPath(fileEntry.data.path_display);
-                    if (key.startsWith(normalizedPrefix)) {
-                        results.push({
-                            key,
-                            lastModifiedAt: Date.parse(
-                                fileEntry.data.server_modified
-                            ),
-                            sizeBytes: fileEntry.data.size,
-                        });
+            try {
+                // eslint-disable-next-line no-await-in-loop -- Pagination must be sequential.
+                const response = await withDropboxRetry<AxiosResponse<unknown>>(
+                    {
+                        fn: async () =>
+                            this.httpApi.post(endpoint, payload, {
+                                headers: {
+                                    Authorization: `Bearer ${token}`,
+                                    "Content-Type": "application/json",
+                                },
+                            }),
+                        operationName: currentCursor
+                            ? "files/list_folder/continue"
+                            : "files/list_folder",
                     }
-                }
-            }
+                );
 
-            const { cursor: nextCursor, has_more: nextHasMore } = parsed;
-            cursor = nextCursor;
-            hasMore = nextHasMore ?? false;
+                const parsed = dropboxListFolderResponseSchema.parse(
+                    response.data
+                );
+
+                entries.push(...parsed.entries);
+
+                const { cursor: nextCursor, has_more: nextHasMore } = parsed;
+                cursor = nextCursor;
+                hasMore = nextHasMore;
+            } catch (error) {
+                // The app root folder may not exist until the first upload.
+                if (!currentCursor && isDropboxNotFoundError(error)) {
+                    break;
+                }
+
+                throw ensureError(error);
+            }
         }
 
-        results.sort((a, b) => a.key.localeCompare(b.key));
-        return results;
-    }
+        const objects: CloudObjectEntry[] = [];
 
-    public async downloadObject(key: string): Promise<Buffer> {
-        const token = await this.tokenManager.getAccessToken();
-        const response = await withDropboxRetry({
-            fn: async () =>
-                this.httpContent.post<ArrayBuffer>(
-                    `${DROPBOX_CONTENT}/2/files/download`,
-                    null,
-                    {
-                        headers: {
-                            Authorization: `Bearer ${token}`,
-                            "Dropbox-API-Arg": JSON.stringify({
-                                path: toDropboxPath(key),
-                            }),
-                        },
-                        responseType: "arraybuffer",
-                    }
-                ),
-            operationName: "files/download",
-        });
+        for (const entry of entries) {
+            const parsed = dropboxFileEntrySchema.safeParse(entry);
 
-        return Buffer.from(response.data);
+            if (parsed.success) {
+                const key = fromDropboxPathOrNull(parsed.data.path_display);
+                const matchesPrefix =
+                    key !== null &&
+                    key !== "" &&
+                    (!normalizedPrefix || key.startsWith(normalizedPrefix));
+
+                if (matchesPrefix) {
+                    objects.push({
+                        key,
+                        lastModifiedAt: Date.parse(parsed.data.server_modified),
+                        sizeBytes: parsed.data.size,
+                    });
+                }
+            }
+        }
+
+        return objects;
     }
 
     public async uploadObject(args: {
@@ -242,11 +380,8 @@ export class DropboxCloudStorageProvider implements CloudStorageProvider {
         overwrite?: boolean;
     }): Promise<CloudObjectEntry> {
         const token = await this.tokenManager.getAccessToken();
-        const overwrite = args.overwrite ?? false;
 
-        const mode = overwrite ? "overwrite" : "add";
-
-        const uploadResponse = await withDropboxRetry({
+        const response = await withDropboxRetry({
             fn: async () =>
                 this.httpContent.post(
                     `${DROPBOX_CONTENT}/2/files/upload`,
@@ -257,10 +392,10 @@ export class DropboxCloudStorageProvider implements CloudStorageProvider {
                             "Content-Type": "application/octet-stream",
                             "Dropbox-API-Arg": JSON.stringify({
                                 autorename: false,
-                                mode,
+                                mode: args.overwrite ? "overwrite" : "add",
                                 mute: true,
                                 path: toDropboxPath(args.key),
-                                strict_conflict: true,
+                                strict_conflict: false,
                             }),
                         },
                     }
@@ -268,19 +403,60 @@ export class DropboxCloudStorageProvider implements CloudStorageProvider {
             operationName: "files/upload",
         });
 
-        const uploadData = dropboxFileEntrySchema.parse(
-            uploadResponse.data as unknown
+        const uploadData = dropboxUploadResponseSchema.parse(
+            response.data as unknown
         );
+        const storedKey = fromDropboxPathOrNull(uploadData.path_display);
+        if (!storedKey) {
+            throw new Error("Dropbox returned an unexpected upload path");
+        }
 
         return {
-            key: fromDropboxPath(uploadData.path_display),
+            key: storedKey,
             lastModifiedAt: Date.parse(uploadData.server_modified),
             sizeBytes: uploadData.size,
         };
     }
 
+    public async downloadObject(key: string): Promise<Buffer> {
+        const token = await this.tokenManager.getAccessToken();
+
+        const response = await withDropboxRetry({
+            fn: async () =>
+                this.httpContent.post<ArrayBuffer>(
+                    `${DROPBOX_CONTENT}/2/files/download`,
+                    undefined,
+                    {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                            "Content-Type": "application/octet-stream",
+                            "Dropbox-API-Arg": JSON.stringify({
+                                path: toDropboxPath(key),
+                            }),
+                        },
+                        responseType: "arraybuffer",
+                    }
+                ),
+            operationName: "files/download",
+        }).catch((error: unknown) => {
+            if (isDropboxNotFoundError(error)) {
+                throw createENOENT(`Dropbox object not found: ${key}`);
+            }
+
+            const described = describeDropboxAxiosErrorRich(error);
+            if (described) {
+                throw new Error(`Dropbox download failed: ${described}`);
+            }
+
+            throw ensureError(error);
+        });
+
+        return Buffer.from(response.data);
+    }
+
     public async deleteObject(key: string): Promise<void> {
         const token = await this.tokenManager.getAccessToken();
+
         await withDropboxRetry({
             fn: async () =>
                 this.httpApi.post(
@@ -294,7 +470,43 @@ export class DropboxCloudStorageProvider implements CloudStorageProvider {
                     }
                 ),
             operationName: "files/delete_v2",
+        }).catch((error: unknown) => {
+            // Contract: deleting a missing object is a no-op.
+            if (isDropboxNotFoundError(error)) {
+                return;
+            }
+
+            const described = describeDropboxAxiosErrorRich(error);
+            if (described) {
+                throw new Error(`Dropbox delete failed: ${described}`);
+            }
+
+            throw ensureError(error);
         });
+    }
+
+    public async listBackups(): Promise<CloudBackupEntry[]> {
+        const objects = await this.listObjects(BACKUPS_PREFIX);
+        const metadataObjects = objects.filter((object) =>
+            object.key.endsWith(".metadata.json"));
+
+        const results = await Promise.allSettled(
+            metadataObjects.map(async (object) => {
+                const raw = await this.downloadObject(object.key);
+                const parsed: unknown = JSON.parse(raw.toString("utf8"));
+                return parseCloudBackupMetadataFile(parsed);
+            })
+        );
+
+        const backups = results
+            .filter(
+                (result): result is PromiseFulfilledResult<CloudBackupEntry> =>
+                    result.status === "fulfilled"
+            )
+            .map((result) => result.value);
+
+        backups.sort((a, b) => b.metadata.createdAt - a.metadata.createdAt);
+        return backups;
     }
 
     public async uploadBackup(args: {
@@ -303,60 +515,49 @@ export class DropboxCloudStorageProvider implements CloudStorageProvider {
         fileName: string;
         metadata: SerializedDatabaseBackupMetadata;
     }): Promise<CloudBackupEntry> {
-        const key = `${BACKUPS_PREFIX}${args.fileName}`;
-        const metadataKey = backupMetadataKeyForBackupKey(key);
+        const backupKey = `${BACKUPS_PREFIX}${args.fileName}`;
 
-        const entry: CloudBackupEntry = {
-            encrypted: args.encrypted,
-            fileName: args.fileName,
-            key,
-            metadata: args.metadata,
-        };
+        await this.uploadObject({
+            buffer: args.buffer,
+            key: backupKey,
+            overwrite: true,
+        });
 
-        await this.uploadObject({ buffer: args.buffer, key, overwrite: true });
+        const metadataKey = backupMetadataKeyForBackupKey(backupKey);
         await this.uploadObject({
             buffer: Buffer.from(
-                serializeCloudBackupMetadataFile(entry),
+                serializeCloudBackupMetadataFile({
+                    encrypted: args.encrypted,
+                    fileName: args.fileName,
+                    key: backupKey,
+                    metadata: args.metadata,
+                }),
                 "utf8"
             ),
             key: metadataKey,
             overwrite: true,
         });
 
-        return entry;
-    }
-
-    public async listBackups(): Promise<CloudBackupEntry[]> {
-        const objects = await this.listObjects(BACKUPS_PREFIX);
-        const metadataObjects = objects.filter((object) =>
-            object.key.endsWith(".metadata.json"));
-
-        const backups = await Promise.all(
-            metadataObjects.map(async (object) => {
-                const raw = await this.downloadObject(object.key);
-                const parsed: unknown = JSON.parse(raw.toString("utf8"));
-                return parseCloudBackupMetadataFile(parsed);
-            })
-        );
-
-        backups.sort((a, b) => b.metadata.createdAt - a.metadata.createdAt);
-        return backups;
+        return {
+            encrypted: args.encrypted,
+            fileName: args.fileName,
+            key: backupKey,
+            metadata: args.metadata,
+        };
     }
 
     public async downloadBackup(
         key: string
     ): Promise<{ buffer: Buffer; entry: CloudBackupEntry }> {
-        try {
-            const buffer = await this.downloadObject(key);
-            const metadataKey = backupMetadataKeyForBackupKey(key);
-            const raw = await this.downloadObject(metadataKey);
-            const parsed: unknown = JSON.parse(raw.toString("utf8"));
-            const entry = parseCloudBackupMetadataFile(parsed);
+        const buffer = await this.downloadObject(key);
+        const metadataKey = backupMetadataKeyForBackupKey(key);
+        const raw = await this.downloadObject(metadataKey);
+        const parsed: unknown = JSON.parse(raw.toString("utf8"));
 
-            return { buffer, entry };
-        } catch (error) {
-            throw ensureError(error);
-        }
+        return {
+            buffer,
+            entry: parseCloudBackupMetadataFile(parsed),
+        };
     }
 
     public constructor(args: {

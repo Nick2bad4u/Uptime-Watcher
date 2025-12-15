@@ -50,6 +50,7 @@ import {
 import { migrateProviderBackups } from "./migrations/backupMigration";
 import { resetProviderCloudSyncState } from "./migrations/syncReset";
 import { buildCloudSyncResetPreview } from "./migrations/syncResetPreview";
+import { backupMetadataKeyForBackupKey } from "./providers/CloudBackupMetadataFile";
 import { DropboxAuthFlow } from "./providers/dropbox/DropboxAuthFlow";
 import { DropboxCloudStorageProvider } from "./providers/dropbox/DropboxCloudStorageProvider";
 import { DropboxTokenManager } from "./providers/dropbox/DropboxTokenManager";
@@ -75,6 +76,39 @@ const SETTINGS_KEY_PROVIDER = "cloud.provider" as const;
 const SETTINGS_KEY_FILESYSTEM_BASE_DIRECTORY =
     "cloud.filesystem.baseDirectory" as const;
 const SETTINGS_KEY_DROPBOX_TOKENS = "cloud.dropbox.tokens" as const;
+
+function isENOENT(error: unknown): boolean {
+    return (
+        typeof error === "object" &&
+        error !== null &&
+        "code" in error &&
+        (error as { code?: unknown }).code === "ENOENT"
+    );
+}
+
+async function ignoreENOENT(fn: () => Promise<void>): Promise<void> {
+    try {
+        await fn();
+    } catch (error) {
+        if (isENOENT(error)) {
+            return;
+        }
+        throw ensureError(error);
+    }
+}
+
+/**
+ * Default Dropbox OAuth app key (client_id) shipped with the app.
+ *
+ * @remarks
+ * This is **not** a secret. Desktop apps using OAuth + PKCE are public clients
+ * and cannot keep an app secret confidential. The app key identifies the
+ * Dropbox OAuth application.
+ *
+ * Developers can override the key for local testing/builds via
+ * `UPTIME_WATCHER_DROPBOX_APP_KEY`.
+ */
+const DEFAULT_DROPBOX_APP_KEY = "c6wroqtgxztzq9t" as const;
 const SETTINGS_KEY_LAST_BACKUP_AT = "cloud.lastBackupAt" as const;
 const SETTINGS_KEY_LAST_SYNC_AT = "cloud.lastSyncAt" as const;
 const SETTINGS_KEY_LAST_ERROR = "cloud.lastError" as const;
@@ -185,12 +219,12 @@ export class CloudService {
     /** Disconnects from the configured provider and clears persisted config. */
     public async disconnect(): Promise<CloudStatusSummary> {
         return this.runCloudOperation("disconnect", async () => {
-            await Promise.all([
-                this.settings.set(SETTINGS_KEY_PROVIDER, ""),
-                this.settings.set(SETTINGS_KEY_FILESYSTEM_BASE_DIRECTORY, ""),
-                this.secretStore.deleteSecret(SETTINGS_KEY_DROPBOX_TOKENS),
-                clearLastError(this.settings),
-            ]);
+            // NOTE: Do not run these in parallel.
+            // Some settings adapters are transaction-backed and parallel writes can
+            // trigger nested-transaction warnings.
+            await this.settings.set(SETTINGS_KEY_PROVIDER, "");
+            await this.settings.set(SETTINGS_KEY_FILESYSTEM_BASE_DIRECTORY, "");
+            await this.secretStore.deleteSecret(SETTINGS_KEY_DROPBOX_TOKENS);
 
             logger.info("[CloudService] Disconnected cloud provider");
             return this.buildStatusSummary();
@@ -460,7 +494,7 @@ export class CloudService {
      */
     public async connectDropbox(): Promise<CloudStatusSummary> {
         return this.runCloudOperation("connectDropbox", async () => {
-            const appKey = this.getDropboxAppKeyOrThrow();
+            const appKey = this.getDropboxAppKey();
             const authFlow = new DropboxAuthFlow({ appKey });
             const tokens = await authFlow.connect();
 
@@ -473,6 +507,31 @@ export class CloudService {
             await tokenManager.storeTokens(tokens);
             await this.settings.set(SETTINGS_KEY_PROVIDER, "dropbox");
             await this.settings.set(SETTINGS_KEY_FILESYSTEM_BASE_DIRECTORY, "");
+
+            // Verify the connection immediately so the UI doesn't end up in a
+            // confusing "configured but down" state.
+            try {
+                const provider = new DropboxCloudStorageProvider({
+                    tokenManager,
+                });
+                await provider.getAccountLabel();
+            } catch (error) {
+                // Roll back any partial config so the user can retry cleanly.
+                await this.settings.set(SETTINGS_KEY_PROVIDER, "");
+                await this.settings.set(
+                    SETTINGS_KEY_FILESYSTEM_BASE_DIRECTORY,
+                    ""
+                );
+                await this.secretStore.deleteSecret(
+                    SETTINGS_KEY_DROPBOX_TOKENS
+                );
+
+                const resolved = ensureError(error);
+                throw new Error(
+                    `Dropbox connection verification failed: ${resolved.message}`,
+                    { cause: error }
+                );
+            }
 
             logger.info("[CloudService] Connected Dropbox provider");
             return this.buildStatusSummary();
@@ -616,6 +675,19 @@ export class CloudService {
         });
     }
 
+    /** Deletes the specified remote backup and its metadata sidecar. */
+    public async deleteBackup(key: string): Promise<CloudBackupEntry[]> {
+        return this.runCloudOperation("deleteBackup", async () => {
+            const provider = await this.resolveProviderOrThrow();
+            const metadataKey = backupMetadataKeyForBackupKey(key);
+
+            await ignoreENOENT(() => provider.deleteObject(key));
+            await ignoreENOENT(() => provider.deleteObject(metadataKey));
+
+            return provider.listBackups();
+        });
+    }
+
     private async resolveProviderOrThrow(args?: {
         requireEncryptionUnlocked?: boolean;
     }): Promise<CloudStorageProvider> {
@@ -669,10 +741,7 @@ export class CloudService {
         }
 
         if (providerKind === "dropbox") {
-            const appKey = this.getDropboxAppKeyMaybe();
-            if (!appKey) {
-                return null;
-            }
+            const appKey = this.getDropboxAppKey();
 
             const tokenManager = new DropboxTokenManager({
                 appKey,
@@ -837,9 +906,22 @@ export class CloudService {
         syncEnabled: boolean;
     }): Promise<CloudStatusSummary> {
         const provider = await this.resolveProviderOrNull();
-        const connected = provider
-            ? await provider.isConnected().catch(() => false)
-            : false;
+        let connected = false;
+        let connectionError: string | undefined = undefined;
+        let accountLabel: string | undefined = undefined;
+
+        if (provider && provider instanceof DropboxCloudStorageProvider) {
+            try {
+                accountLabel = await provider.getAccountLabel();
+                connected = true;
+            } catch (error) {
+                connected = false;
+                connectionError = ensureError(error).message;
+            }
+        } else if (provider) {
+            // Fallback for unexpected provider implementation.
+            connected = await provider.isConnected().catch(() => false);
+        }
 
         const encryptionMode =
             connected && provider
@@ -848,10 +930,7 @@ export class CloudService {
         const encryptionLocked =
             encryptionMode === "passphrase" && !args.localEncryptionKey;
 
-        const accountLabel =
-            connected && provider instanceof DropboxCloudStorageProvider
-                ? await provider.getAccountLabel().catch(() => {})
-                : undefined;
+        const lastError = args.lastError ?? connectionError;
 
         return {
             backupsEnabled: connected,
@@ -860,7 +939,7 @@ export class CloudService {
             encryptionLocked,
             encryptionMode,
             lastBackupAt: args.lastBackupAt,
-            ...(args.lastError ? { lastError: args.lastError } : {}),
+            ...(lastError ? { lastError } : {}),
             lastSyncAt: args.lastSyncAt,
             provider: "dropbox",
             providerDetails: {
@@ -979,22 +1058,15 @@ export class CloudService {
         };
     }
 
-    private getDropboxAppKeyMaybe(): string | undefined {
+    private getDropboxAppKeyOverrideMaybe(): string | undefined {
         const value = readProcessEnv("UPTIME_WATCHER_DROPBOX_APP_KEY");
         return typeof value === "string" && value.trim().length > 0
             ? value.trim()
             : undefined;
     }
 
-    private getDropboxAppKeyOrThrow(): string {
-        const appKey = this.getDropboxAppKeyMaybe();
-        if (!appKey) {
-            throw new Error(
-                "Dropbox provider requires UPTIME_WATCHER_DROPBOX_APP_KEY to be set"
-            );
-        }
-
-        return appKey;
+    private getDropboxAppKey(): string {
+        return this.getDropboxAppKeyOverrideMaybe() ?? DEFAULT_DROPBOX_APP_KEY;
     }
 
     public constructor(args: {

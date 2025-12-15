@@ -20,8 +20,11 @@ export interface CloudStoreState {
         baseDirectory: string;
     }) => Promise<void>;
     connectDropbox: () => Promise<void>;
+    deleteBackup: (key: string) => Promise<void>;
+    deletingBackupKey: null | string;
     disconnect: () => Promise<void>;
     isClearingEncryptionKey: boolean;
+    isConfiguringFilesystemProvider: boolean;
     isConnectingDropbox: boolean;
     isDisconnecting: boolean;
     isListingBackups: boolean;
@@ -31,6 +34,7 @@ export interface CloudStoreState {
     isRequestingSyncNow: boolean;
     isResettingRemoteSyncState: boolean;
     isSettingEncryptionPassphrase: boolean;
+    isSettingSyncEnabled: boolean;
     isUploadingBackup: boolean;
     lastBackupMigrationResult: CloudBackupMigrationResult | null;
     lastRemoteSyncResetResult: CloudSyncResetResult | null;
@@ -56,7 +60,6 @@ export interface CloudStoreState {
 export const useCloudStore: UseBoundStore<StoreApi<CloudStoreState>> =
     create<CloudStoreState>()((set, get) => ({
         backups: [],
-
         clearEncryptionKey: async (): Promise<void> => {
             set({ isClearingEncryptionKey: true });
 
@@ -72,18 +75,30 @@ export const useCloudStore: UseBoundStore<StoreApi<CloudStoreState>> =
                 set({ isClearingEncryptionKey: false });
             }
         },
+
         configureFilesystemProvider: async (args: {
             baseDirectory: string;
-        }): Promise<void> =>
-            withErrorHandling(
-                async () => {
-                    const status =
-                        await CloudService.configureFilesystemProvider(args);
-                    set({ status });
-                },
-                createStoreErrorHandler("cloud", "configureFilesystemProvider")
-            ),
+        }): Promise<void> => {
+            set({ isConfiguringFilesystemProvider: true });
 
+            try {
+                await withErrorHandling(
+                    async () => {
+                        const status =
+                            await CloudService.configureFilesystemProvider(
+                                args
+                            );
+                        set({ status });
+                    },
+                    createStoreErrorHandler(
+                        "cloud",
+                        "configureFilesystemProvider"
+                    )
+                );
+            } finally {
+                set({ isConfiguringFilesystemProvider: false });
+            }
+        },
         connectDropbox: async (): Promise<void> => {
             set({ isConnectingDropbox: true });
 
@@ -99,6 +114,23 @@ export const useCloudStore: UseBoundStore<StoreApi<CloudStoreState>> =
                 set({ isConnectingDropbox: false });
             }
         },
+
+        deleteBackup: async (key: string): Promise<void> => {
+            set({ deletingBackupKey: key });
+            try {
+                await withErrorHandling(
+                    async () => {
+                        const backups = await CloudService.deleteBackup(key);
+                        set({ backups });
+                    },
+                    createStoreErrorHandler("cloud", "deleteBackup")
+                );
+            } finally {
+                set({ deletingBackupKey: null });
+            }
+        },
+
+        deletingBackupKey: null,
 
         disconnect: async (): Promise<void> => {
             set({ isDisconnecting: true });
@@ -118,6 +150,8 @@ export const useCloudStore: UseBoundStore<StoreApi<CloudStoreState>> =
 
         isClearingEncryptionKey: false,
 
+        isConfiguringFilesystemProvider: false,
+
         isConnectingDropbox: false,
 
         isDisconnecting: false,
@@ -130,6 +164,7 @@ export const useCloudStore: UseBoundStore<StoreApi<CloudStoreState>> =
         isRequestingSyncNow: false,
         isResettingRemoteSyncState: false,
         isSettingEncryptionPassphrase: false,
+        isSettingSyncEnabled: false,
         isUploadingBackup: false,
         lastBackupMigrationResult: null,
         lastRemoteSyncResetResult: null,
@@ -316,14 +351,22 @@ export const useCloudStore: UseBoundStore<StoreApi<CloudStoreState>> =
         },
 
         setSyncEnabled: async (enabled: boolean): Promise<void> => {
-            await withErrorHandling(
-                async () => {
-                    // eslint-disable-next-line n/no-sync -- Domain-level "enable sync" call, not a Node.js sync filesystem API.
-                    const status = await CloudService.enableSync({ enabled });
-                    set({ status });
-                },
-                createStoreErrorHandler("cloud", "setSyncEnabled")
-            );
+            set({ isSettingSyncEnabled: true });
+
+            try {
+                await withErrorHandling(
+                    async () => {
+                        // eslint-disable-next-line n/no-sync -- Domain-level "enable sync" call, not a Node.js sync filesystem API.
+                        const status = await CloudService.enableSync({
+                            enabled,
+                        });
+                        set({ status });
+                    },
+                    createStoreErrorHandler("cloud", "setSyncEnabled")
+                );
+            } finally {
+                set({ isSettingSyncEnabled: false });
+            }
         },
         status: null,
 

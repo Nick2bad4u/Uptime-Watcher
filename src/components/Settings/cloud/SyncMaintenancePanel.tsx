@@ -74,13 +74,13 @@ function buildPreviewViewModel(
     }
 
     const previewText =
-        `Remote sync objects: ${preview.syncObjectCount} ` +
-        `(ops: ${preview.operationObjectCount}, snapshots: ${preview.snapshotObjectCount}, other: ${preview.otherObjectCount}).`;
+        `Sync history files: ${preview.syncObjectCount} ` +
+        `(snapshots: ${preview.snapshotObjectCount}, changes: ${preview.operationObjectCount}, other: ${preview.otherObjectCount}).`;
 
     const deviceText =
         preview.deviceIds.length === 0
-            ? "Known devices: none"
-            : `Known devices (${preview.deviceIds.length}): ${preview.deviceIds.join(", ")}`;
+            ? "Devices: none"
+            : `Devices (${preview.deviceIds.length}): ${preview.deviceIds.join(", ")}`;
 
     const manifestSet = new Set(preview.deviceIds);
     const opsSet = new Set(preview.operationDeviceIds);
@@ -92,10 +92,13 @@ function buildPreviewViewModel(
         (id) => !manifestSet.has(id)
     );
 
-    const mismatchText =
-        devicesOnlyInManifest.length > 0 || devicesOnlyInOps.length > 0
-            ? `Device mismatch: manifest-only [${devicesOnlyInManifest.join(", ") || "—"}], ops-only [${devicesOnlyInOps.join(", ") || "—"}].`
-            : null;
+    let mismatchText: null | string = null;
+    if (
+        preview.operationObjectCount > 0 &&
+        (devicesOnlyInManifest.length > 0 || devicesOnlyInOps.length > 0)
+    ) {
+        mismatchText = `Device mismatch: manifest-only [${devicesOnlyInManifest.join(", ") || "—"}], ops-only [${devicesOnlyInOps.join(", ") || "—"}].`;
+    }
 
     const otherObjectsText =
         preview.otherObjectCount > 0
@@ -254,6 +257,14 @@ export const SyncMaintenancePanel = ({
                 <ThemedText size="xs" variant="tertiary">
                     {previewView.previewText}
                 </ThemedText>
+
+                {preview?.operationObjectCount === 0 ? (
+                    <ThemedText className="mt-1" size="xs" variant="tertiary">
+                        No change history has been uploaded yet. This is normal
+                        on the first device until you make changes with Sync
+                        enabled.
+                    </ThemedText>
+                ) : null}
 
                 {previewView.deviceText ? (
                     <ThemedText className="mt-1" size="xs" variant="tertiary">

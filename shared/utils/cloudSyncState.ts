@@ -77,6 +77,20 @@ function shouldReplaceWrite(
     return compareCloudSyncWriteKey(current, incoming) < 0;
 }
 
+function getLatestEntityWrite(
+    entity: CloudSyncEntityState
+): CloudSyncWriteKey | undefined {
+    let latest = entity.deleted;
+
+    for (const fieldValue of Object.values(entity.fields)) {
+        if (!latest || compareCloudSyncWriteKey(latest, fieldValue.write) < 0) {
+            latest = fieldValue.write;
+        }
+    }
+
+    return latest;
+}
+
 function upsertEntity(
     state: Mutable<
         Record<CloudSyncEntityType, Record<string, CloudSyncEntityState>>
@@ -112,7 +126,9 @@ function applyOperation(
     );
 
     if (operation.kind === "delete-entity") {
-        if (shouldReplaceWrite(entity.deleted, write)) {
+        const latestEntityWrite = getLatestEntityWrite(entity);
+
+        if (shouldReplaceWrite(latestEntityWrite, write)) {
             state[operation.entityType][operation.entityId] = {
                 ...entity,
                 deleted: write,

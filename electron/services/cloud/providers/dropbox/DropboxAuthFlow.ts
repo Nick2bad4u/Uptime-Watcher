@@ -28,7 +28,7 @@ const LOOPBACK_PATH = "/oauth2/callback" as const;
  * Using a fixed port allows the Dropbox console to be configured with a single
  * redirect URI.
  */
-export const DEFAULT_DROPBOX_LOOPBACK_PORT = 53682;
+export const DEFAULT_DROPBOX_LOOPBACK_PORT = 53_682;
 
 const DROPBOX_SCOPES = [
     "account_info.read",

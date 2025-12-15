@@ -159,7 +159,9 @@ describe("CloudService", () => {
             seededSnapshotKey: "sync/snapshots/new",
             startedAt: 1,
         };
-        mockElectronAPI.cloud.resetRemoteSyncState.mockResolvedValue(resetResult);
+        mockElectronAPI.cloud.resetRemoteSyncState.mockResolvedValue(
+            resetResult
+        );
         mockElectronAPI.cloud.uploadLatestBackup.mockResolvedValue({
             encrypted: false,
             fileName: "uptime-watcher-backup-1.sqlite",
@@ -284,16 +286,16 @@ describe("CloudService", () => {
     it("sets encryption passphrase", async () => {
         const status = await CloudService.setEncryptionPassphrase("pass");
         expect(status.encryptionMode).toBe("passphrase");
-        expect(mockElectronAPI.cloud.setEncryptionPassphrase).toHaveBeenCalledWith(
-            "pass"
-        );
+        expect(
+            mockElectronAPI.cloud.setEncryptionPassphrase
+        ).toHaveBeenCalledWith("pass");
         expect(mockLogger.info).toHaveBeenCalled();
     });
 
     it("rejects empty encryption passphrase", async () => {
-        await expect(CloudService.setEncryptionPassphrase(" ")).rejects.toThrow(
-            TypeError
-        );
+        await expect(
+            CloudService.setEncryptionPassphrase(" ")
+        ).rejects.toThrowError(TypeError);
     });
 
     it("migrates backups", async () => {
@@ -320,8 +322,8 @@ describe("CloudService", () => {
     it("resets remote sync state", async () => {
         const result = await CloudService.resetRemoteSyncState();
         expect(result.resetAt).toBe(123);
-        expect(mockElectronAPI.cloud.resetRemoteSyncState).toHaveBeenCalledTimes(
-            1
-        );
+        expect(
+            mockElectronAPI.cloud.resetRemoteSyncState
+        ).toHaveBeenCalledTimes(1);
     });
 });

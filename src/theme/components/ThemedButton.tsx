@@ -125,9 +125,9 @@ const DEFAULT_THEMED_BOX_STYLE: CSSProperties = {};
  */
 const ThemedButtonComponent = ({
     "aria-label": ariaLabel,
-    "data-testid": dataTestId,
     children,
     className = "",
+    "data-testid": dataTestId,
     disabled = false,
     fullWidth = false,
     icon,

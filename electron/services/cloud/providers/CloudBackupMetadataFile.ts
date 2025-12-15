@@ -108,3 +108,14 @@ export function serializeCloudBackupMetadataFile(
         metadata: entry.metadata,
     });
 }
+
+/**
+ * Returns the canonical metadata sidecar key for a backup object key.
+ *
+ * @remarks
+ * Backups are stored as a binary object under `backups/<...>`. Their metadata
+ * is stored next to the binary object using the `.metadata.json` suffix.
+ */
+export function backupMetadataKeyForBackupKey(backupKey: string): string {
+    return `${backupKey}.metadata.json`;
+}

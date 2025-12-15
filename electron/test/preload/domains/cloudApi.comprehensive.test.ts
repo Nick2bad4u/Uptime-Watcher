@@ -130,11 +130,26 @@ describe("cloudApi", () => {
     it("requests sync now", async () => {
         vi.mocked(ipcRenderer.invoke).mockResolvedValueOnce({
             success: true,
+            data: null,
         });
 
         await expect(cloudApi.requestSyncNow()).resolves.toBeUndefined();
         expect(ipcRenderer.invoke).toHaveBeenCalledWith(
             CLOUD_CHANNELS.requestSyncNow,
+            ipcContext
+        );
+    });
+
+    it("deletes a backup", async () => {
+        vi.mocked(ipcRenderer.invoke).mockResolvedValueOnce({
+            success: true,
+            data: [],
+        });
+
+        await expect(cloudApi.deleteBackup("backups/a")).resolves.toEqual([]);
+        expect(ipcRenderer.invoke).toHaveBeenCalledWith(
+            CLOUD_CHANNELS.deleteBackup,
+            "backups/a",
             ipcContext
         );
     });

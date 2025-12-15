@@ -3,7 +3,7 @@ schema: "../../../config/schemas/doc-frontmatter.schema.json"
 title: "ADR-015: Cloud Sync and Remote Backup Providers"
 summary: "Defines an opt-in cloud sync + remote backup architecture using provider-backed storage (Dropbox/Google Drive/WebDAV), secure auth, and validated payloads."
 created: "2025-12-12"
-last_reviewed: "2025-12-13"
+last_reviewed: "2025-12-14"
 category: "guide"
 author: "Nick2bad4u"
 tags:
@@ -30,18 +30,18 @@ tags:
 7. [Consequences](#consequences)
 8. [Implementation plan](#implementation-plan)
 9. [Testing & Validation](#testing--validation)
-10. [Open questions](#open-questions)
+10. [Future enhancements (non-blocking)](#future-enhancements-non-blocking)
 11. [Related ADRs](#related-adrs)
 12. [Review](#review)
 
 ## Status
 
-Accepted (MVP implemented)
+Accepted (implemented — complete)
 
-> **Implementation status (as of 2025-12-13)**
+> **Implementation status (as of 2025-12-14)**
 >
 > - ✅ Provider-backed object store abstraction implemented via
->   `electron/services/cloud/providers/CloudStorageProvider.ts`.
+>   `electron/services/cloud/providers/CloudStorageProvider.types.ts`.
 > - ✅ Dropbox provider implemented (OAuth PKCE + token refresh + account label)
 >   under `electron/services/cloud/providers/dropbox/`.
 > - ✅ Filesystem provider implemented (sandboxed under `uptime-watcher/`)
@@ -285,31 +285,29 @@ Where not supported:
 - fall back to compare-by-hash for immutable keys
 - avoid overwriting mutable keys except `manifest.json`
 
-### IPC surface (initial sketch)
+### IPC surface (implemented)
 
 All IPC endpoints are request/response style and validated.
 
-Proposed renderer-facing service methods:
+Implemented channels (see `shared/types/ipc.ts` for the canonical map):
 
-- `CloudService.getStatus()`
-- `CloudService.connect({ provider })`
-- `CloudService.disconnect()`
-- `CloudService.uploadBackup({ encrypted: boolean })`
-- `CloudService.listBackups()`
-- `CloudService.downloadBackup({ key })`
-- `CloudService.restoreBackup({ key })` (delegates to ADR-013 restore pipeline)
+- `cloud-get-status`
+- `cloud-connect-dropbox`
+- `cloud-configure-filesystem-provider`
+- `cloud-disconnect`
+- `cloud-enable-sync`
+- `cloud-request-sync-now`
+- `cloud-list-backups`
+- `cloud-upload-latest-backup`
+- `cloud-restore-backup`
+- `cloud-set-encryption-passphrase`
+- `cloud-clear-encryption-key`
+- `cloud-migrate-backups`
+- `cloud-preview-reset-remote-sync`
+- `cloud-reset-remote-sync`
 
-Sync controls (see ADR-016):
-
-- `CloudService.enableSync({ enabled })`
-- `CloudService.requestSyncNow()`
-
-Events:
-
-- `cloud:sync-status-changed`
-- `cloud:backup-status-changed`
-
-Renderer must treat events as informational and re-query status when needed.
+Note: The MVP does not rely on event-driven cloud status notifications; the
+renderer explicitly re-queries status/backups after user-initiated actions.
 
 ## Security & privacy
 
@@ -409,12 +407,11 @@ UI surface:
   - connect/disconnect
   - upload backup then restore
 
-## Open questions
+## Future enhancements (non-blocking)
 
-1. Do we enforce encryption by default for all providers, or allow plaintext
-   for the backup-only MVP?
-2. How do we model multiple provider connections (support >1 account) in V2?
-3. What is the minimum acceptable conflict UI for V1 sync?
+1. Enforce encryption by default once the encryption UX is mature.
+2. Support multiple provider connections (multiple accounts) in a future version.
+3. Add conflict surfacing UI for high-risk last-write-wins collisions.
 
 ## Related ADRs
 

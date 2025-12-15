@@ -22,6 +22,14 @@ const selectBackups = (state: CloudStoreState): CloudStoreState["backups"] =>
 const selectStatus = (state: CloudStoreState): CloudStoreState["status"] =>
     state.status;
 
+const selectDeleteBackup = (
+    state: CloudStoreState
+): CloudStoreState["deleteBackup"] => state.deleteBackup;
+
+const selectDeletingBackupKey = (
+    state: CloudStoreState
+): CloudStoreState["deletingBackupKey"] => state.deletingBackupKey;
+
 const selectRefreshStatus = (
     state: CloudStoreState
 ): CloudStoreState["refreshStatus"] => state.refreshStatus;
@@ -74,6 +82,10 @@ const selectIsListingBackups = (
 const selectIsRefreshingStatus = (
     state: CloudStoreState
 ): CloudStoreState["isRefreshingStatus"] => state.isRefreshingStatus;
+
+const selectIsSettingSyncEnabled = (
+    state: CloudStoreState
+): CloudStoreState["isSettingSyncEnabled"] => state.isSettingSyncEnabled;
 const selectIsRequestingSyncNow = (
     state: CloudStoreState
 ): CloudStoreState["isRequestingSyncNow"] => state.isRequestingSyncNow;
@@ -133,6 +145,8 @@ export const CloudSettingsSection = (): JSX.Element => {
     const requestPrompt = usePromptDialog();
 
     const backups = useCloudStore(selectBackups);
+    const deleteBackup = useCloudStore(selectDeleteBackup);
+    const deletingBackupKey = useCloudStore(selectDeletingBackupKey);
     const status = useCloudStore(selectStatus);
 
     const refreshStatus = useCloudStore(selectRefreshStatus);
@@ -159,6 +173,7 @@ export const CloudSettingsSection = (): JSX.Element => {
     const isDisconnecting = useCloudStore(selectIsDisconnecting);
     const isListingBackups = useCloudStore(selectIsListingBackups);
     const isRefreshingStatus = useCloudStore(selectIsRefreshingStatus);
+    const isSettingSyncEnabled = useCloudStore(selectIsSettingSyncEnabled);
     const isRequestingSyncNow = useCloudStore(selectIsRequestingSyncNow);
     const isUploadingBackup = useCloudStore(selectIsUploadingBackup);
     const restoringBackupKey = useCloudStore(selectRestoringBackupKey);
@@ -186,29 +201,46 @@ export const CloudSettingsSection = (): JSX.Element => {
         selectIsRefreshingRemoteSyncResetPreview
     );
 
+    const fireAndForget = useCallback((
+        action: () => Promise<unknown>
+    ): void => {
+        void (async (): Promise<void> => {
+            try {
+                await action();
+            } catch {
+                // Errors are already routed through the shared error handling.
+            }
+        })();
+    }, []);
+
     useEffect(
         function refreshCloudStatusOnMount(): void {
-            void refreshStatus();
+            fireAndForget(refreshStatus);
         },
-        [refreshStatus]
+        [fireAndForget, refreshStatus]
     );
 
     useEffect(
-        function loadCloudBackupsWhenConnected(): void {
+        function loadCloudBackupsWhenConnectedEffect(): void {
             if (status?.connected) {
-                void listBackups();
-            }
-        },
-        [listBackups, status?.connected]
-    );
-
-    useEffect(
-        function refreshRemoteSyncPreviewWhenConnected(): void {
-            if (status?.connected && status.syncEnabled) {
-                void refreshRemoteSyncResetPreview();
+                fireAndForget(listBackups);
             }
         },
         [
+            fireAndForget,
+            listBackups,
+            status?.connected,
+        ]
+    );
+
+    useEffect(
+        function refreshRemoteSyncPreviewWhenConnectedEffect(): void {
+            if (status?.connected && status.syncEnabled) {
+                fireAndForget(refreshRemoteSyncResetPreview);
+            }
+        },
+        [
+            fireAndForget,
             refreshRemoteSyncResetPreview,
             status?.connected,
             status?.syncEnabled,
@@ -216,8 +248,8 @@ export const CloudSettingsSection = (): JSX.Element => {
     );
 
     const handleConnectDropbox = useCallback((): void => {
-        void connectDropbox();
-    }, [connectDropbox]);
+        fireAndForget(connectDropbox);
+    }, [connectDropbox, fireAndForget]);
 
     const confirmDisconnect = useCallback(
         async function confirmDisconnect(): Promise<void> {
@@ -240,32 +272,32 @@ export const CloudSettingsSection = (): JSX.Element => {
 
     const handleDisconnect = useCallback(
         function handleDisconnect(): void {
-            void confirmDisconnect();
+            fireAndForget(confirmDisconnect);
         },
-        [confirmDisconnect]
+        [confirmDisconnect, fireAndForget]
     );
 
     const handleRefreshStatus = useCallback((): void => {
-        void refreshStatus();
-    }, [refreshStatus]);
+        fireAndForget(refreshStatus);
+    }, [fireAndForget, refreshStatus]);
 
     const handleListBackups = useCallback((): void => {
-        void listBackups();
-    }, [listBackups]);
+        fireAndForget(listBackups);
+    }, [fireAndForget, listBackups]);
 
     const handleRequestSyncNow = useCallback((): void => {
-        void requestSyncNow();
-    }, [requestSyncNow]);
+        fireAndForget(requestSyncNow);
+    }, [fireAndForget, requestSyncNow]);
 
     const handleUploadLatestBackup = useCallback((): void => {
-        void uploadLatestBackup();
-    }, [uploadLatestBackup]);
+        fireAndForget(uploadLatestBackup);
+    }, [fireAndForget, uploadLatestBackup]);
 
     const handleSyncEnabledChange = useCallback(
         (event: ChangeEvent<HTMLInputElement>): void => {
-            void setSyncEnabled(event.target.checked);
+            fireAndForget(() => setSyncEnabled(event.target.checked));
         },
-        [setSyncEnabled]
+        [fireAndForget, setSyncEnabled]
     );
 
     const confirmRestoreBackup = useCallback(
@@ -294,14 +326,45 @@ export const CloudSettingsSection = (): JSX.Element => {
 
     const handleRestoreBackup = useCallback(
         function handleRestoreBackup(key: string): void {
-            void confirmRestoreBackup(key);
+            fireAndForget(() => confirmRestoreBackup(key));
         },
-        [confirmRestoreBackup]
+        [confirmRestoreBackup, fireAndForget]
+    );
+
+    const confirmDeleteBackup = useCallback(
+        async function confirmDeleteBackup(key: string): Promise<void> {
+            const entry = backups.find((backup) => backup.key === key);
+
+            const confirmed = await requestConfirmation({
+                confirmLabel: "Delete",
+                message: `Delete remote backup '${entry?.fileName ?? key}'? This cannot be undone.`,
+                title: "Delete Remote Backup",
+                tone: "danger",
+            });
+
+            if (!confirmed) {
+                return;
+            }
+
+            await deleteBackup(key);
+        },
+        [
+            backups,
+            deleteBackup,
+            requestConfirmation,
+        ]
+    );
+
+    const handleDeleteBackup = useCallback(
+        (key: string): void => {
+            fireAndForget(() => confirmDeleteBackup(key));
+        },
+        [confirmDeleteBackup, fireAndForget]
     );
 
     const handleSetEncryptionPassphrase = useCallback(
         function handleSetEncryptionPassphrase(): void {
-            void (async function promptForPassphrase(): Promise<void> {
+            fireAndForget(async () => {
                 const encryptionMode = status?.encryptionMode ?? "none";
                 const result = await requestPrompt({
                     confirmLabel:
@@ -323,9 +386,10 @@ export const CloudSettingsSection = (): JSX.Element => {
                 }
 
                 await setEncryptionPassphrase(result);
-            })();
+            });
         },
         [
+            fireAndForget,
             requestPrompt,
             setEncryptionPassphrase,
             status?.encryptionMode,
@@ -334,7 +398,7 @@ export const CloudSettingsSection = (): JSX.Element => {
 
     const handleClearEncryptionKey = useCallback(
         function handleClearEncryptionKey(): void {
-            void (async function confirmClear(): Promise<void> {
+            fireAndForget(async () => {
                 const confirmed = await requestConfirmation({
                     confirmLabel: "Clear key",
                     message:
@@ -348,9 +412,13 @@ export const CloudSettingsSection = (): JSX.Element => {
                 }
 
                 await clearEncryptionKey();
-            })();
+            });
         },
-        [clearEncryptionKey, requestConfirmation]
+        [
+            clearEncryptionKey,
+            fireAndForget,
+            requestConfirmation,
+        ]
     );
 
     const confirmEncryptBackups = useCallback(
@@ -394,16 +462,16 @@ export const CloudSettingsSection = (): JSX.Element => {
 
     const handleEncryptBackupsKeepOriginals = useCallback(
         function handleEncryptBackupsKeepOriginals(): void {
-            void confirmEncryptBackups({ deleteSource: false });
+            fireAndForget(() => confirmEncryptBackups({ deleteSource: false }));
         },
-        [confirmEncryptBackups]
+        [confirmEncryptBackups, fireAndForget]
     );
 
     const handleEncryptBackupsDeleteOriginals = useCallback(
         function handleEncryptBackupsDeleteOriginals(): void {
-            void confirmEncryptBackups({ deleteSource: true });
+            fireAndForget(() => confirmEncryptBackups({ deleteSource: true }));
         },
-        [confirmEncryptBackups]
+        [confirmEncryptBackups, fireAndForget]
     );
 
     const confirmResetRemoteSyncState = useCallback(
@@ -457,16 +525,16 @@ export const CloudSettingsSection = (): JSX.Element => {
 
     const handleResetRemoteSyncState = useCallback(
         function handleResetRemoteSyncState(): void {
-            void confirmResetRemoteSyncState();
+            fireAndForget(confirmResetRemoteSyncState);
         },
-        [confirmResetRemoteSyncState]
+        [confirmResetRemoteSyncState, fireAndForget]
     );
 
     const handleRefreshRemoteSyncResetPreview = useCallback(
         function handleRefreshRemoteSyncResetPreview(): void {
-            void refreshRemoteSyncResetPreview();
+            fireAndForget(refreshRemoteSyncResetPreview);
         },
-        [refreshRemoteSyncResetPreview]
+        [fireAndForget, refreshRemoteSyncResetPreview]
     );
 
     const syncEnabled = status?.syncEnabled ?? false;
@@ -478,7 +546,7 @@ export const CloudSettingsSection = (): JSX.Element => {
                 <ThemedCheckbox
                     aria-label="Enable cloud sync"
                     checked={syncEnabled}
-                    disabled={!connected}
+                    disabled={!connected || isSettingSyncEnabled}
                     onChange={handleSyncEnabledChange}
                 />
                 <ThemedText size="sm" variant="secondary">
@@ -489,6 +557,7 @@ export const CloudSettingsSection = (): JSX.Element => {
         [
             connected,
             handleSyncEnabledChange,
+            isSettingSyncEnabled,
             syncEnabled,
         ]
     );
@@ -496,6 +565,7 @@ export const CloudSettingsSection = (): JSX.Element => {
     return (
         <CloudSection
             backups={backups}
+            deletingBackupKey={deletingBackupKey}
             icon={AppIcons.ui.cloud}
             isClearingEncryptionKey={isClearingEncryptionKey}
             isConnectingDropbox={isConnectingDropbox}
@@ -514,6 +584,7 @@ export const CloudSettingsSection = (): JSX.Element => {
             lastRemoteSyncResetResult={lastRemoteSyncResetResult}
             onClearEncryptionKey={handleClearEncryptionKey}
             onConnectDropbox={handleConnectDropbox}
+            onDeleteBackup={handleDeleteBackup}
             onDisconnect={handleDisconnect}
             onEncryptBackupsDeleteOriginals={
                 handleEncryptBackupsDeleteOriginals

@@ -40,7 +40,8 @@ interface DataHandlerValidatorsInterface {
 interface CloudHandlerValidatorsInterface {
     clearEncryptionKey: IpcParameterValidator;
     configureFilesystemProvider: IpcParameterValidator;
-    connectDropbox: IpcParameterValidator; // Added connectDropbox validator
+    connectDropbox: IpcParameterValidator;
+    deleteBackup: IpcParameterValidator;
     disconnect: IpcParameterValidator;
     enableSync: IpcParameterValidator;
     getStatus: IpcParameterValidator;
@@ -746,6 +747,7 @@ export const CloudHandlerValidators: CloudHandlerValidatorsInterface = {
     clearEncryptionKey: createNoParamsValidator(),
     configureFilesystemProvider: validateCloudFilesystemProviderConfig,
     connectDropbox: createNoParamsValidator(), // Added connectDropbox validator implementation
+    deleteBackup: createSingleStringValidator("key"),
     disconnect: createNoParamsValidator(),
     enableSync: validateCloudEnableSyncConfig,
     getStatus: createNoParamsValidator(),
