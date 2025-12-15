@@ -114,7 +114,7 @@ jobs:
 
         steps:
             - name: Harden the runner (Audit all outbound calls)
-              uses: step-security/harden-runner@df199fb7be9f65074067a9eb93f12bb4c5547cf2 # v2.13.3
+              uses: step-security/harden-runner@20cf305ff2072d973412fa9b1e3a4f227bda3c76 # v2.14.0
               with:
                   egress-policy: audit
 
@@ -126,7 +126,7 @@ jobs:
 
             # Initializes the CodeQL tools for scanning.
             - name: Initialize CodeQL
-              uses: github/codeql-action/init@0499de31b99561a6d14a36a5f662c2a54f91beee # v3.29.5
+              uses: github/codeql-action/init@1b168cd39490f61582a9beae412bb7057a6b2c4e # v3.29.5
               with:
                   languages: ${{ matrix.language }}
                   source-root: .
@@ -182,6 +182,6 @@ jobs:
             # 📚 See https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idstepsrun
 
             - name: Perform CodeQL Analysis
-              uses: github/codeql-action/analyze@0499de31b99561a6d14a36a5f662c2a54f91beee # v3.29.5
+              uses: github/codeql-action/analyze@1b168cd39490f61582a9beae412bb7057a6b2c4e # v3.29.5
               with:
                   category: "/language:${{matrix.language}}"
