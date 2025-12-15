@@ -251,13 +251,9 @@ jobs:
               shell: bash
               run: |
                   # NOTE: This repo requires --force due to known peer-dependency conflicts.
-                  # For macOS universal builds, omit optional deps so @electron/universal doesn't
-                  # attempt to merge optional native ws accelerators.
-                  if [[ "${{ matrix.os }}" == "macos-latest" ]]; then
-                    npm install --force --omit=optional --no-audit --no-fund
-                  else
-                    npm install --force --no-audit --no-fund
-                  fi
+                  # Do NOT use --omit=optional: Rollup/Vite depends on optional native packages
+                  # (e.g. @rollup/rollup-darwin-*) on macOS.
+                  npm install --force --no-audit --no-fund
 
             - name: Build Vite Frontend and Electron Backend
               id: build_vite_electron
