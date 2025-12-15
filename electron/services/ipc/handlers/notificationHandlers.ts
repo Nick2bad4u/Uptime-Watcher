@@ -1,9 +1,9 @@
 import type { IpcInvokeChannel } from "@shared/types/ipc";
 
+import { NOTIFICATION_CHANNELS } from "@shared/types/preload";
 import { parseNotificationPreferenceUpdate } from "@shared/validation/notifications";
 
 import type { NotificationService } from "../../notifications/NotificationService";
-import type { UPDATE_NOTIFICATION_PREFERENCES_CHANNEL } from "../notificationChannelGuards";
 
 import { registerStandardizedIpcHandler } from "../utils";
 import { NotificationHandlerValidators } from "../validators";
@@ -33,7 +33,6 @@ const normalizeNotificationPreferenceUpdate = (
 export interface NotificationHandlersDependencies {
     readonly notificationService: NotificationService;
     readonly registeredHandlers: Set<IpcInvokeChannel>;
-    readonly updatePreferencesChannel: typeof UPDATE_NOTIFICATION_PREFERENCES_CHANNEL;
 }
 
 /**
@@ -42,10 +41,9 @@ export interface NotificationHandlersDependencies {
 export function registerNotificationHandlers({
     notificationService,
     registeredHandlers,
-    updatePreferencesChannel,
 }: NotificationHandlersDependencies): void {
     registerStandardizedIpcHandler(
-        updatePreferencesChannel,
+        NOTIFICATION_CHANNELS.updatePreferences,
         withIgnoredIpcEvent((payload): undefined => {
             const preferences = normalizeNotificationPreferenceUpdate(payload);
             notificationService.updateConfig(preferences);

@@ -29,9 +29,6 @@ import { registerSettingsHandlers } from "./handlers/settingsHandlers";
 import { registerSiteHandlers } from "./handlers/siteHandlers";
 import { registerStateSyncHandlers } from "./handlers/stateSyncHandlers";
 import { registerSystemHandlers } from "./handlers/systemHandlers";
-import { getUpdateNotificationPreferencesChannel } from "./notificationChannelGuards";
-
-const registeredNotificationChannel = getUpdateNotificationPreferencesChannel();
 
 /**
  * Centralizes registration and lifecycle management of Electron IPC handlers.
@@ -133,7 +130,6 @@ export class IpcService {
         registerNotificationHandlers({
             notificationService: this.notificationService,
             registeredHandlers: this.registeredIpcHandlers,
-            updatePreferencesChannel: registeredNotificationChannel,
         });
 
         registerSystemHandlers({

@@ -36,6 +36,7 @@ const mockedUseAlertStore = vi.mocked(useAlertStore);
 
 describe(StatusAlertToaster, () => {
     const dismissAlert = vi.fn();
+    const dismissToast = vi.fn();
     const baseAlert: StatusAlert = {
         id: "alert-1",
         monitorId: "monitor-1",
@@ -51,19 +52,18 @@ describe(StatusAlertToaster, () => {
         vi.clearAllMocks();
         const mockState: AlertStore = {
             alerts: [],
+            toasts: [],
             clearAlerts: vi.fn(),
+            clearToasts: vi.fn(),
             dismissAlert,
-            enqueueAlert: vi.fn().mockImplementation((input) => ({
-                ...baseAlert,
-                ...input,
-                id: input.id ?? baseAlert.id,
-                timestamp: input.timestamp ?? baseAlert.timestamp,
-            })),
+            dismissToast,
+            enqueueAlert: vi.fn(),
+            enqueueToast: vi.fn(),
         } as AlertStore;
 
-        mockedUseAlertStore.mockImplementation(((
-            selector: (state: AlertStore) => unknown
-        ) => selector(mockState)) as any);
+        mockedUseAlertStore.mockImplementation(
+            <T,>(selector: (state: AlertStore) => T): T => selector(mockState)
+        );
     });
 
     it("does not render when there are no alerts", () => {
@@ -77,15 +77,20 @@ describe(StatusAlertToaster, () => {
             { ...baseAlert, id: "alert-2", timestamp: baseAlert.timestamp + 1 },
         ];
 
-        mockedUseAlertStore.mockImplementation(((
-            selector: (state: AlertStore) => unknown
-        ) =>
-            selector({
-                alerts,
-                clearAlerts: vi.fn(),
-                dismissAlert,
-                enqueueAlert: vi.fn(),
-            } as AlertStore)) as any);
+        const mockState: AlertStore = {
+            alerts,
+            toasts: [],
+            clearAlerts: vi.fn(),
+            clearToasts: vi.fn(),
+            dismissAlert,
+            dismissToast,
+            enqueueAlert: vi.fn(),
+            enqueueToast: vi.fn(),
+        };
+
+        mockedUseAlertStore.mockImplementation(
+            <T,>(selector: (state: AlertStore) => T): T => selector(mockState)
+        );
 
         render(<StatusAlertToaster />);
 

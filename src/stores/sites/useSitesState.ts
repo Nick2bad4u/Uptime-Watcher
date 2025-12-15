@@ -99,6 +99,15 @@ export interface SitesState {
     selectedSiteIdentifier: Site["identifier"] | undefined;
     /** Array of monitored sites */
     sites: Site[];
+    /**
+     * Monotonic counter incremented whenever the `sites` collection changes.
+     *
+     * @remarks
+     * Used to detect and prevent stale full-sync responses from overwriting
+     * newer local mutations (e.g., user creates a site while an initial sync is
+     * still in-flight).
+     */
+    sitesRevision: number;
     /** Latest status update subscription diagnostics. */
     statusSubscriptionSummary: StatusUpdateSubscriptionSummary | undefined;
 }
@@ -216,7 +225,10 @@ export const createSitesStateActions = (
     return {
         addSite: (site: Site): void => {
             logStoreAction("SitesStore", "addSite", { site });
-            set((state) => ({ sites: [...state.sites, site] }));
+            set((state) => ({
+                sites: [...state.sites, site],
+                sitesRevision: state.sitesRevision + 1,
+            }));
         },
         clearOptimisticMonitoringLocks: (
             siteIdentifier: Site["identifier"],
@@ -343,6 +355,7 @@ export const createSitesStateActions = (
                     sites: state.sites.filter(
                         (site) => site.identifier !== identifier
                     ),
+                    sitesRevision: state.sitesRevision + 1,
                 };
             });
         },
@@ -458,14 +471,21 @@ export const createSitesStateActions = (
             }
 
             set((state) => {
+                const {
+                    optimisticMonitoringLocks:
+                        optimisticMonitoringLocksFromState,
+                    selectedMonitorIds,
+                    selectedSiteIdentifier,
+                    sitesRevision,
+                } = state;
                 const validIdentifiers = new Set<Site["identifier"]>(
                     sitesForState.map((site) => site.identifier)
                 );
 
                 const nextSelectedSiteIdentifier =
-                    state.selectedSiteIdentifier !== undefined &&
-                    validIdentifiers.has(state.selectedSiteIdentifier)
-                        ? state.selectedSiteIdentifier
+                    selectedSiteIdentifier !== undefined &&
+                    validIdentifiers.has(selectedSiteIdentifier)
+                        ? selectedSiteIdentifier
                         : undefined;
 
                 const siteLookup = new Map<Site["identifier"], Site>(
@@ -477,7 +497,7 @@ export const createSitesStateActions = (
                 const nextSelectedMonitorIds: SitesState["selectedMonitorIds"] =
                     {};
                 for (const [siteId, monitorId] of collectSelectedMonitorEntries(
-                    state.selectedMonitorIds
+                    selectedMonitorIds
                 )) {
                     if (validIdentifiers.has(siteId)) {
                         const candidateSite = siteLookup.get(siteId);
@@ -491,7 +511,8 @@ export const createSitesStateActions = (
                     }
                 }
 
-                let { optimisticMonitoringLocks } = state;
+                let optimisticMonitoringLocks =
+                    optimisticMonitoringLocksFromState;
                 if (expiredLockKeys.length > 0) {
                     optimisticMonitoringLocks = {
                         ...optimisticMonitoringLocks,
@@ -512,6 +533,7 @@ export const createSitesStateActions = (
                     selectedMonitorIds: nextSelectedMonitorIds,
                     selectedSiteIdentifier: nextSelectedSiteIdentifier,
                     sites: sitesForState,
+                    sitesRevision: sitesRevision + 1,
                 };
             });
         },
@@ -541,5 +563,6 @@ export const initialSitesState: SitesState = {
     selectedMonitorIds: {},
     selectedSiteIdentifier: undefined,
     sites: [],
+    sitesRevision: 0,
     statusSubscriptionSummary: undefined,
 };

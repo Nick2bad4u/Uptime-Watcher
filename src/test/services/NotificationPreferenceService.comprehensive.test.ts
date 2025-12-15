@@ -129,4 +129,17 @@ describe("NotificationPreferenceService", () => {
         ).rejects.toThrowError();
         expect(ensureInitializedMock).toHaveBeenCalledTimes(1);
     });
+
+    it("rejects invalid preference payloads with a descriptive error", async () => {
+        const invalidPreferences = {
+            systemNotificationsEnabled: "yes",
+            systemNotificationsSoundEnabled: false,
+        } as unknown as NotificationPreferenceUpdate;
+
+        await expect(
+            NotificationPreferenceService.updatePreferences(invalidPreferences)
+        ).rejects.toThrowError(/Invalid notification preferences:/v);
+
+        expect(ensureInitializedMock).toHaveBeenCalledTimes(1);
+    });
 });

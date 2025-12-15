@@ -132,6 +132,11 @@ vi.mock("electron", () => ({
     contextBridge: {
         exposeInMainWorld: vi.fn(),
     },
+    safeStorage: {
+        decryptString: vi.fn((value) => Buffer.from(value).toString("utf8")),
+        encryptString: vi.fn((value) => Buffer.from(String(value), "utf8")),
+        isEncryptionAvailable: vi.fn(() => true),
+    },
     shell: {
         openExternal: vi.fn(() => Promise.resolve(true)),
     },

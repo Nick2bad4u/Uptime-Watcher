@@ -481,7 +481,6 @@ describe("useSiteSync", () => {
             await annotate("Component: useSiteSync", "component");
             await annotate("Category: Store", "category");
             await annotate("Type: Event Processing", "type");
-
             let eventHandler: any;
             mockStateSyncService.onStateSyncEvent.mockImplementation(async (
                 handler
@@ -573,6 +572,7 @@ describe("useSiteSync", () => {
                 },
                 selectedSiteIdentifier: "site-1",
                 sites: [],
+                sitesRevision: 0,
                 statusSubscriptionSummary: undefined,
                 lastBackupMetadata: undefined,
                 lastSyncDelta: undefined,

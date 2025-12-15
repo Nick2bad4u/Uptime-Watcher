@@ -163,10 +163,16 @@ export interface SiteSyncActions {
 export interface SiteSyncDependencies {
     /** Function to get current sites from the store */
     getSites: () => Site[];
+
+    /** Returns the current sites revision counter. */
+    getSitesRevision: () => number;
+
     /** Optional callback to receive diffed site synchronization events */
     onSiteDelta?: (delta: SiteSyncDelta) => void;
+
     /** Function to update sites in the store */
     setSites: (sites: Site[]) => void;
+
     /** Function to persist subscription diagnostics */
     setStatusSubscriptionSummary: (
         summary: StatusUpdateSubscriptionSummary | undefined

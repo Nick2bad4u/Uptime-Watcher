@@ -1,5 +1,3 @@
-import type { AxiosInstance } from "axios";
-
 import { describe, expect, it, vi } from "vitest";
 
 import { DropboxTokenManager } from "@electron/services/cloud/providers/dropbox/DropboxTokenManager";
@@ -11,13 +9,9 @@ describe(DropboxTokenManager, () => {
         vi.setSystemTime(new Date("2025-01-01T00:00:00.000Z"));
 
         const secretStore = new InMemorySecretStore();
-        const http: Pick<AxiosInstance, "post"> = {
-            post: vi.fn(),
-        };
 
         const manager = new DropboxTokenManager({
             appKey: "app-key",
-            http: http as AxiosInstance,
             secretStore,
             tokenStorageKey: "cloud.dropbox.tokens",
         });
@@ -29,7 +23,6 @@ describe(DropboxTokenManager, () => {
         });
 
         await expect(manager.getAccessToken()).resolves.toBe("access");
-        expect(http.post).not.toHaveBeenCalled();
 
         vi.useRealTimers();
     });
@@ -39,20 +32,28 @@ describe(DropboxTokenManager, () => {
         vi.setSystemTime(new Date("2025-01-01T00:00:00.000Z"));
 
         const secretStore = new InMemorySecretStore();
-        const http: Pick<AxiosInstance, "post"> = {
-            post: vi.fn().mockResolvedValue({
-                data: {
-                    access_token: "new-access",
-                    expires_in: 3600,
-                },
-            }),
-        };
+
+        const refreshAccessToken = vi.fn(async () => undefined);
+        const getAccessToken = vi.fn(() => "new-access");
+        const getAccessTokenExpiresAt = vi.fn(
+            () => new Date(Date.now() + 3_600_000)
+        );
 
         const manager = new DropboxTokenManager({
             appKey: "app-key",
-            http: http as AxiosInstance,
             secretStore,
             tokenStorageKey: "cloud.dropbox.tokens",
+            authFactory: () =>
+                ({
+                    getAccessToken,
+                    getAccessTokenExpiresAt,
+                    getRefreshToken: () => "refresh",
+                    refreshAccessToken,
+                    setAccessToken: () => {},
+                    setAccessTokenExpiresAt: () => {},
+                    setClientId: () => {},
+                    setRefreshToken: () => {},
+                }) as never,
         });
 
         await manager.storeTokens({
@@ -62,7 +63,7 @@ describe(DropboxTokenManager, () => {
         });
 
         await expect(manager.getAccessToken()).resolves.toBe("new-access");
-        expect(http.post).toHaveBeenCalledTimes(1);
+        expect(refreshAccessToken).toHaveBeenCalledTimes(1);
 
         const stored = await manager.getStoredTokens();
         expect(stored?.accessToken).toBe("new-access");

@@ -246,6 +246,10 @@ const mockElectronAPI: ElectronAPI = {
                 },
             })
         ),
+
+        deleteBackup: vi.fn<ElectronAPI["cloud"]["deleteBackup"]>(
+            async () => []
+        ),
         disconnect: vi.fn<ElectronAPI["cloud"]["disconnect"]>(async () => ({
             provider: null,
             configured: false,

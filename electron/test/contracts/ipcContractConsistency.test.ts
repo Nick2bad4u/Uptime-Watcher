@@ -35,6 +35,9 @@ const CHANNEL_MAPS: Record<string, Record<string, string>> = {
     MONITOR_TYPES_CHANNELS: toStringRecord(
         preloadChannels.MONITOR_TYPES_CHANNELS
     ),
+    NOTIFICATION_CHANNELS: toStringRecord(
+        preloadChannels.NOTIFICATION_CHANNELS
+    ),
     SETTINGS_CHANNELS: toStringRecord(preloadChannels.SETTINGS_CHANNELS),
     SITES_CHANNELS: toStringRecord(preloadChannels.SITES_CHANNELS),
     STATE_SYNC_CHANNELS: toStringRecord(preloadChannels.STATE_SYNC_CHANNELS),

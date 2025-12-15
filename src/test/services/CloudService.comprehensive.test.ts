@@ -37,6 +37,7 @@ const mockElectronAPI = vi.hoisted(() => ({
         clearEncryptionKey: vi.fn(),
         configureFilesystemProvider: vi.fn(),
         connectDropbox: vi.fn(),
+        deleteBackup: vi.fn(),
         disconnect: vi.fn(),
         enableSync: vi.fn(),
         getStatus: vi.fn(),

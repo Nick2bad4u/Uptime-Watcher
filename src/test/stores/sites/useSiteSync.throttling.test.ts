@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi, type Mock } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { Site } from "@shared/types";
 
@@ -63,7 +63,10 @@ vi.mock("../../../stores/sites/utils/statusUpdateHandler", () => ({
     StatusUpdateManager: statusUpdateManagerConstructor,
 }));
 
-import { createSiteSyncActions } from "../../../stores/sites/useSiteSync";
+import {
+    createSiteSyncActions,
+    type SiteSyncDependencies,
+} from "../../../stores/sites/useSiteSync";
 
 const buildSite = (identifier: string): Site => ({
     identifier,
@@ -73,17 +76,13 @@ const buildSite = (identifier: string): Site => ({
 });
 
 describe("useSiteSync throttling and edge cases", () => {
-    let deps: {
-        getSites: Mock<() => Site[]>;
-        setSites: Mock<(sites: Site[]) => void>;
-        setStatusSubscriptionSummary: Mock<(summary: unknown) => void>;
-        onSiteDelta: Mock<(delta: unknown) => void>;
-    };
+    let deps: SiteSyncDependencies;
 
     beforeEach(() => {
         vi.clearAllMocks();
         deps = {
             getSites: vi.fn(() => []),
+            getSitesRevision: vi.fn(() => 0),
             onSiteDelta: vi.fn(),
             setSites: vi.fn(),
             setStatusSubscriptionSummary: vi.fn(),

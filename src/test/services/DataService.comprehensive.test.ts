@@ -317,6 +317,19 @@ describe("DataService", () => {
                 DataService.restoreSqliteBackup(createMockRestorePayload())
             ).rejects.toThrowError("Bridge init failed");
         });
+
+        it("should normalize backend errors via ensureError", async () => {
+            const backendError = "Backend restore failed";
+            mockElectronAPI.data.restoreSqliteBackup.mockRejectedValueOnce(
+                backendError
+            );
+
+            await expect(
+                DataService.restoreSqliteBackup(createMockRestorePayload())
+            ).rejects.toBe(backendError);
+
+            expect(mockEnsureError).toHaveBeenCalledWith(backendError);
+        });
     });
 
     describe("exportData", () => {
@@ -387,6 +400,16 @@ describe("DataService", () => {
 
             expect(result).toBe(largeData);
             expect(result.length).toBeGreaterThan(10_000);
+        });
+
+        it("throws TypeError when backend returns non-string payload", async () => {
+            mockElectronAPI.data.exportData.mockResolvedValueOnce(
+                123 as unknown as string
+            );
+
+            await expect(DataService.exportData()).rejects.toThrowError(
+                "Export data payload must be a string"
+            );
         });
     });
 
@@ -492,6 +515,16 @@ describe("DataService", () => {
                 complexData
             );
             expect(result).toBeTruthy();
+        });
+
+        it("throws TypeError when backend returns non-boolean result", async () => {
+            mockElectronAPI.data.importData.mockResolvedValueOnce(
+                "yes" as unknown as boolean
+            );
+
+            await expect(DataService.importData("{}")).rejects.toThrowError(
+                "Import data response must be a boolean"
+            );
         });
     });
 

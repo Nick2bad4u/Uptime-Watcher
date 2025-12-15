@@ -4,6 +4,7 @@ import {
     useCallback,
     useEffect,
     useMemo,
+    useState,
 } from "react";
 
 import { useConfirmDialog } from "../../hooks/ui/useConfirmDialog";
@@ -12,7 +13,9 @@ import {
     type CloudStoreState,
     useCloudStore,
 } from "../../stores/cloud/useCloudStore";
+import { ThemedButton } from "../../theme/components/ThemedButton";
 import { ThemedCheckbox } from "../../theme/components/ThemedCheckbox";
+import { ThemedInput } from "../../theme/components/ThemedInput";
 import { ThemedText } from "../../theme/components/ThemedText";
 import { AppIcons } from "../../utils/icons";
 import { CloudSection } from "./SettingsSections";
@@ -70,6 +73,11 @@ const selectResetRemoteSyncState = (
     state: CloudStoreState
 ): CloudStoreState["resetRemoteSyncState"] => state.resetRemoteSyncState;
 
+const selectConfigureFilesystemProvider = (
+    state: CloudStoreState
+): CloudStoreState["configureFilesystemProvider"] =>
+    state.configureFilesystemProvider;
+
 const selectIsConnectingDropbox = (
     state: CloudStoreState
 ): CloudStoreState["isConnectingDropbox"] => state.isConnectingDropbox;
@@ -112,6 +120,11 @@ const selectIsResettingRemoteSyncState = (
     state: CloudStoreState
 ): CloudStoreState["isResettingRemoteSyncState"] =>
     state.isResettingRemoteSyncState;
+
+const selectIsConfiguringFilesystemProvider = (
+    state: CloudStoreState
+): CloudStoreState["isConfiguringFilesystemProvider"] =>
+    state.isConfiguringFilesystemProvider;
 
 const selectLastBackupMigrationResult = (
     state: CloudStoreState
@@ -165,6 +178,9 @@ export const CloudSettingsSection = (): JSX.Element => {
 
     const migrateBackups = useCloudStore(selectMigrateBackups);
     const resetRemoteSyncState = useCloudStore(selectResetRemoteSyncState);
+    const configureFilesystemProvider = useCloudStore(
+        selectConfigureFilesystemProvider
+    );
     const refreshRemoteSyncResetPreview = useCloudStore(
         selectRefreshRemoteSyncResetPreview
     );
@@ -189,6 +205,9 @@ export const CloudSettingsSection = (): JSX.Element => {
     const isResettingRemoteSyncState = useCloudStore(
         selectIsResettingRemoteSyncState
     );
+    const isConfiguringFilesystemProvider = useCloudStore(
+        selectIsConfiguringFilesystemProvider
+    );
     const lastBackupMigrationResult = useCloudStore(
         selectLastBackupMigrationResult
     );
@@ -200,6 +219,8 @@ export const CloudSettingsSection = (): JSX.Element => {
     const isRefreshingRemoteSyncResetPreview = useCloudStore(
         selectIsRefreshingRemoteSyncResetPreview
     );
+
+    const [filesystemBaseDirectory, setFilesystemBaseDirectory] = useState("");
 
     const fireAndForget = useCallback((
         action: () => Promise<unknown>
@@ -537,6 +558,28 @@ export const CloudSettingsSection = (): JSX.Element => {
         [fireAndForget, refreshRemoteSyncResetPreview]
     );
 
+    const handleFilesystemBaseDirectoryChange = useCallback((
+        event: ChangeEvent<HTMLInputElement>
+    ): void => {
+        setFilesystemBaseDirectory(event.target.value);
+    }, []);
+
+    const handleConfigureFilesystemProvider = useCallback((): void => {
+        const baseDirectory = filesystemBaseDirectory.trim();
+        if (!baseDirectory) {
+            return;
+        }
+
+        fireAndForget(async () => {
+            await configureFilesystemProvider({ baseDirectory });
+            setFilesystemBaseDirectory("");
+        });
+    }, [
+        configureFilesystemProvider,
+        filesystemBaseDirectory,
+        fireAndForget,
+    ]);
+
     const syncEnabled = status?.syncEnabled ?? false;
     const connected = status?.connected ?? false;
 
@@ -563,47 +606,88 @@ export const CloudSettingsSection = (): JSX.Element => {
     );
 
     return (
-        <CloudSection
-            backups={backups}
-            deletingBackupKey={deletingBackupKey}
-            icon={AppIcons.ui.cloud}
-            isClearingEncryptionKey={isClearingEncryptionKey}
-            isConnectingDropbox={isConnectingDropbox}
-            isDisconnecting={isDisconnecting}
-            isListingBackups={isListingBackups}
-            isMigratingBackups={isMigratingBackups}
-            isRefreshingRemoteSyncResetPreview={
-                isRefreshingRemoteSyncResetPreview
-            }
-            isRefreshingStatus={isRefreshingStatus}
-            isRequestingSyncNow={isRequestingSyncNow}
-            isResettingRemoteSyncState={isResettingRemoteSyncState}
-            isSettingEncryptionPassphrase={isSettingEncryptionPassphrase}
-            isUploadingBackup={isUploadingBackup}
-            lastBackupMigrationResult={lastBackupMigrationResult}
-            lastRemoteSyncResetResult={lastRemoteSyncResetResult}
-            onClearEncryptionKey={handleClearEncryptionKey}
-            onConnectDropbox={handleConnectDropbox}
-            onDeleteBackup={handleDeleteBackup}
-            onDisconnect={handleDisconnect}
-            onEncryptBackupsDeleteOriginals={
-                handleEncryptBackupsDeleteOriginals
-            }
-            onEncryptBackupsKeepOriginals={handleEncryptBackupsKeepOriginals}
-            onListBackups={handleListBackups}
-            onRefreshRemoteSyncResetPreview={
-                handleRefreshRemoteSyncResetPreview
-            }
-            onRefreshStatus={handleRefreshStatus}
-            onRequestSyncNow={handleRequestSyncNow}
-            onResetRemoteSyncState={handleResetRemoteSyncState}
-            onRestoreBackup={handleRestoreBackup}
-            onSetEncryptionPassphrase={handleSetEncryptionPassphrase}
-            onUploadLatestBackup={handleUploadLatestBackup}
-            remoteSyncResetPreview={remoteSyncResetPreview}
-            restoringBackupKey={restoringBackupKey}
-            status={status}
-            syncEnabledControl={syncEnabledControl}
-        />
+        <>
+            {import.meta.env.DEV ? (
+                <div className="mb-4 rounded-lg border border-zinc-800 bg-zinc-900/40 p-4">
+                    <ThemedText size="sm" variant="secondary" weight="medium">
+                        Filesystem provider (dev-only)
+                    </ThemedText>
+                    <ThemedText className="mt-1" size="xs" variant="tertiary">
+                        Configure the local filesystem cloud provider by
+                        specifying a base directory path. This panel is only
+                        available in dev builds.
+                    </ThemedText>
+
+                    <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-center">
+                        <div className="flex-1">
+                            <ThemedInput
+                                aria-label="Filesystem provider base directory"
+                                onChange={handleFilesystemBaseDirectoryChange}
+                                placeholder="C:\\Path\\To\\CloudStorage"
+                                value={filesystemBaseDirectory}
+                            />
+                        </div>
+                        <ThemedButton
+                            disabled={
+                                isConfiguringFilesystemProvider ||
+                                filesystemBaseDirectory.trim().length === 0
+                            }
+                            onClick={handleConfigureFilesystemProvider}
+                            size="sm"
+                            variant="secondary"
+                        >
+                            {isConfiguringFilesystemProvider
+                                ? "Configuring…"
+                                : "Use folder"}
+                        </ThemedButton>
+                    </div>
+                </div>
+            ) : null}
+
+            <CloudSection
+                backups={backups}
+                deletingBackupKey={deletingBackupKey}
+                icon={AppIcons.ui.cloud}
+                isClearingEncryptionKey={isClearingEncryptionKey}
+                isConnectingDropbox={isConnectingDropbox}
+                isDisconnecting={isDisconnecting}
+                isListingBackups={isListingBackups}
+                isMigratingBackups={isMigratingBackups}
+                isRefreshingRemoteSyncResetPreview={
+                    isRefreshingRemoteSyncResetPreview
+                }
+                isRefreshingStatus={isRefreshingStatus}
+                isRequestingSyncNow={isRequestingSyncNow}
+                isResettingRemoteSyncState={isResettingRemoteSyncState}
+                isSettingEncryptionPassphrase={isSettingEncryptionPassphrase}
+                isUploadingBackup={isUploadingBackup}
+                lastBackupMigrationResult={lastBackupMigrationResult}
+                lastRemoteSyncResetResult={lastRemoteSyncResetResult}
+                onClearEncryptionKey={handleClearEncryptionKey}
+                onConnectDropbox={handleConnectDropbox}
+                onDeleteBackup={handleDeleteBackup}
+                onDisconnect={handleDisconnect}
+                onEncryptBackupsDeleteOriginals={
+                    handleEncryptBackupsDeleteOriginals
+                }
+                onEncryptBackupsKeepOriginals={
+                    handleEncryptBackupsKeepOriginals
+                }
+                onListBackups={handleListBackups}
+                onRefreshRemoteSyncResetPreview={
+                    handleRefreshRemoteSyncResetPreview
+                }
+                onRefreshStatus={handleRefreshStatus}
+                onRequestSyncNow={handleRequestSyncNow}
+                onResetRemoteSyncState={handleResetRemoteSyncState}
+                onRestoreBackup={handleRestoreBackup}
+                onSetEncryptionPassphrase={handleSetEncryptionPassphrase}
+                onUploadLatestBackup={handleUploadLatestBackup}
+                remoteSyncResetPreview={remoteSyncResetPreview}
+                restoringBackupKey={restoringBackupKey}
+                status={status}
+                syncEnabledControl={syncEnabledControl}
+            />
+        </>
     );
 };

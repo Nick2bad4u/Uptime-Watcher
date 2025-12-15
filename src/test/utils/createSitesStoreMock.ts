@@ -137,6 +137,7 @@ export const createSitesStoreMock = (
         selectedMonitorIds: {},
         selectedSiteIdentifier: undefined,
         sites: [],
+        sitesRevision: 0,
         statusSubscriptionSummary: undefined,
     };
 

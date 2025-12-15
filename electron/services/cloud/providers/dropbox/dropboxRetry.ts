@@ -1,5 +1,6 @@
 import { ensureError } from "@shared/utils/errorHandling";
 import axios from "axios";
+import { DropboxResponseError } from "dropbox";
 import { randomInt } from "node:crypto";
 
 import { logger } from "../../../../utils/logger";
@@ -7,6 +8,10 @@ import { logger } from "../../../../utils/logger";
 const DEFAULT_INITIAL_DELAY_MS = 500;
 const DEFAULT_MAX_DELAY_MS = 10_000;
 const DEFAULT_MAX_ATTEMPTS = 4;
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+    return typeof value === "object" && value !== null && !Array.isArray(value);
+}
 
 function parseRetryAfterMs(value: unknown): number | undefined {
     if (typeof value !== "string") {
@@ -33,6 +38,31 @@ function parseRetryAfterMs(value: unknown): number | undefined {
     return undefined;
 }
 
+function readHeaderValue(headers: unknown, headerName: string): unknown {
+    if (!headers || typeof headers !== "object") {
+        return undefined;
+    }
+
+    // node-fetch Headers
+    if (isRecord(headers)) {
+        const maybeGet = headers["get"];
+        if (typeof maybeGet === "function") {
+            return Reflect.apply(maybeGet, headers, [headerName]);
+        }
+    }
+
+    if (!isRecord(headers)) {
+        return undefined;
+    }
+
+    const record = headers;
+    return (
+        record[headerName] ??
+        record[headerName.toLowerCase()] ??
+        record[headerName.toUpperCase()]
+    );
+}
+
 function computeBackoffDelayMs(args: {
     attemptIndex: number;
     initialDelayMs: number;
@@ -52,17 +82,65 @@ async function sleep(delayMs: number): Promise<void> {
     });
 }
 
-function isRetryableAxiosError(error: unknown): null | {
+function extractRetryableHttpFailure(error: unknown): null | {
     retryAfterMs?: number;
     status?: number;
 } {
+    if (error instanceof DropboxResponseError) {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- Dropbox SDK types `headers` as `any`.
+        const { headers, status } = error;
+        const retryAfterMs = parseRetryAfterMs(
+            readHeaderValue(headers, "retry-after")
+        );
+
+        if (status === 429) {
+            return {
+                status,
+                ...(retryAfterMs === undefined ? {} : { retryAfterMs }),
+            };
+        }
+
+        if (
+            status === 500 ||
+            status === 502 ||
+            status === 503 ||
+            status === 504
+        ) {
+            return {
+                status,
+                ...(retryAfterMs === undefined ? {} : { retryAfterMs }),
+            };
+        }
+
+        return null;
+    }
+
     if (!axios.isAxiosError(error)) {
+        // node-fetch / undici-style network errors.
+        if (error instanceof Error) {
+            if (
+                typeof error.name === "string" &&
+                error.name.toLowerCase().includes("fetch")
+            ) {
+                return {};
+            }
+
+            const message = error.message.toLowerCase();
+            if (
+                message.includes("econn") ||
+                message.includes("timeout") ||
+                message.includes("socket")
+            ) {
+                return {};
+            }
+        }
+
         return null;
     }
 
     const status = error.response?.status;
     const retryAfterMs = parseRetryAfterMs(
-        error.response?.headers["retry-after"]
+        readHeaderValue(error.response?.headers, "retry-after")
     );
 
     // Dropbox uses standard HTTP status codes.
@@ -110,7 +188,7 @@ export async function withDropboxRetry<T>(args: {
             return await args.fn();
         } catch (error) {
             attempt += 1;
-            const retryable = isRetryableAxiosError(error);
+            const retryable = extractRetryableHttpFailure(error);
 
             if (!retryable || attempt >= maxAttempts) {
                 throw ensureError(error);

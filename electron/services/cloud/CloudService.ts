@@ -24,7 +24,7 @@ import {
     parseCloudSyncManifest,
 } from "@shared/types/cloudSyncManifest";
 import { ensureError } from "@shared/utils/errorHandling";
-import axios from "axios";
+import { safeStorage } from "electron";
 import { promises as fs } from "node:fs";
 import path from "node:path";
 
@@ -57,6 +57,8 @@ import { DropboxTokenManager } from "./providers/dropbox/DropboxTokenManager";
 import { EncryptedSyncCloudStorageProvider } from "./providers/EncryptedSyncCloudStorageProvider";
 import { FilesystemCloudStorageProvider } from "./providers/FilesystemCloudStorageProvider";
 import {
+    EphemeralSecretStore,
+    FallbackSecretStore,
     SafeStorageSecretStore,
     type SecretStore,
 } from "./secrets/SecretStore";
@@ -219,6 +221,19 @@ export class CloudService {
     /** Disconnects from the configured provider and clears persisted config. */
     public async disconnect(): Promise<CloudStatusSummary> {
         return this.runCloudOperation("disconnect", async () => {
+            const provider = await this.settings.get(SETTINGS_KEY_PROVIDER);
+
+            if (provider === "dropbox") {
+                const appKey = this.getDropboxAppKey();
+                const tokenManager = new DropboxTokenManager({
+                    appKey,
+                    secretStore: this.secretStore,
+                    tokenStorageKey: SETTINGS_KEY_DROPBOX_TOKENS,
+                });
+
+                await tokenManager.revokeStoredTokens().catch(() => {});
+            }
+
             // NOTE: Do not run these in parallel.
             // Some settings adapters are transaction-backed and parallel writes can
             // trigger nested-transaction warnings.
@@ -780,11 +795,6 @@ export class CloudService {
                 return null;
             }
 
-            // Dropbox returns 409 for missing paths.
-            if (axios.isAxiosError(error) && error.response?.status === 409) {
-                return null;
-            }
-
             throw ensureError(error);
         }
     }
@@ -1078,8 +1088,22 @@ export class CloudService {
         this.orchestrator = args.orchestrator;
         this.settings = args.settings;
         this.syncEngine = args.syncEngine;
-        this.secretStore =
-            args.secretStore ??
-            new SafeStorageSecretStore({ settings: args.settings });
+        if (args.secretStore) {
+            this.secretStore = args.secretStore;
+        } else {
+            const persistent = new SafeStorageSecretStore({
+                settings: args.settings,
+            });
+
+            // SafeStorage can be unavailable on some Linux environments without
+            // a keyring. Fall back to an in-memory store to keep the app usable
+            // (but secrets won't persist across restarts).
+            this.secretStore = safeStorage.isEncryptionAvailable()
+                ? persistent
+                : new FallbackSecretStore({
+                      fallback: new EphemeralSecretStore(),
+                      primary: persistent,
+                  });
+        }
     }
 }

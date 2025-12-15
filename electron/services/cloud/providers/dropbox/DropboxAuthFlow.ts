@@ -1,5 +1,5 @@
 import { ensureError } from "@shared/utils/errorHandling";
-import axios, { type AxiosInstance } from "axios";
+import { DropboxAuth } from "dropbox";
 import { shell } from "electron";
 import crypto from "node:crypto";
 import http from "node:http";
@@ -7,18 +7,13 @@ import * as z from "zod";
 
 import type { DropboxTokens } from "./DropboxTokens";
 
-import { createPkcePair } from "./DropboxPkce";
-
-/* eslint-disable @microsoft/sdl/no-insecure-url -- OAuth loopback redirects require http://127.0.0.1; https would require local certificates. */
-
-const DROPBOX_AUTHORIZE_URL =
-    "https://www.dropbox.com/oauth2/authorize" as const;
-const DROPBOX_TOKEN_ENDPOINT =
-    "https://api.dropboxapi.com/oauth2/token" as const;
+/* eslint-disable @microsoft/sdl/no-insecure-url -- OAuth loopback redirects require http://localhost; https would require local certificates. */
 
 const DEFAULT_TIMEOUT_MS = 5 * 60_000;
 
-const LOOPBACK_HOST = "127.0.0.1" as const;
+const LOOPBACK_IP_HOST_4 = "127.0.0.1" as const;
+const LOOPBACK_IP_HOST_6 = "::1" as const;
+const LOOPBACK_REDIRECT_HOST = "localhost" as const;
 const LOOPBACK_PATH = "/oauth2/callback" as const;
 
 /**
@@ -35,7 +30,6 @@ const DROPBOX_SCOPES = [
     "files.content.read",
     "files.content.write",
     "files.metadata.read",
-    "files.metadata.write",
 ] as const;
 
 const dropboxTokenExchangeResponseSchema = z.looseObject({
@@ -48,124 +42,277 @@ function createRandomState(): string {
     return crypto.randomBytes(16).toString("hex");
 }
 
+function handleUnexpectedOAuthRuntimeError(error: unknown): void {
+    // Should never be used; replaced before listeners are registered.
+    throw new Error(
+        `Unexpected OAuth runtime error handler invocation: ${String(error)}`
+    );
+}
+
+function handleUnexpectedOAuthRequest(
+    request: http.IncomingMessage,
+    response: http.ServerResponse
+): void {
+    // Should never be used; replaced before listeners are registered.
+    const url = request.url ?? "";
+    response.writeHead(500, {
+        "Content-Type": "text/plain; charset=utf-8",
+    });
+    response.end(`Unexpected OAuth request handler invocation: ${url}`);
+}
+
+type DropboxAuthClient = Pick<
+    DropboxAuth,
+    "getAccessTokenFromCode" | "getAuthenticationUrl" | "setClientId"
+>;
+
+type DropboxOAuthCallback = Readonly<{ code: string; state: string }>;
+
 /**
- * Performs a system-browser OAuth PKCE flow for Dropbox.
+ * Performs a system-browser OAuth Authorization Code + PKCE flow for Dropbox.
  */
 export class DropboxAuthFlow {
     private readonly appKey: string;
 
-    private readonly httpClient: AxiosInstance;
-
     private readonly loopbackPort: number;
+
+    private readonly authFactory: () => DropboxAuthClient;
 
     public async connect(args?: {
         timeoutMs?: number;
     }): Promise<DropboxTokens> {
         const timeoutMs = args?.timeoutMs ?? DEFAULT_TIMEOUT_MS;
-        const { codeChallenge, codeVerifier } = createPkcePair();
         const state = createRandomState();
 
+        const auth = this.authFactory();
+        auth.setClientId(this.appKey);
+
         const { code, redirectUri } = await this.acquireAuthorizationCode({
-            codeChallenge,
+            auth,
             state,
             timeoutMs,
         });
 
         return this.fetchTokensForAuthorizationCode({
+            auth,
             code,
-            codeVerifier,
             redirectUri,
         });
     }
 
     private async acquireAuthorizationCode(args: {
-        codeChallenge: string;
+        auth: DropboxAuthClient;
         state: string;
         timeoutMs: number;
     }): Promise<{ code: string; redirectUri: string }> {
-        const server = http.createServer();
+        const { listenHosts, redirectHost } =
+            this.getLoopbackHostsAndRedirectHost();
 
-        const listenPromise = new Promise<void>((resolve, reject) => {
-            function handleListenError(error: unknown): void {
-                server.off("error", handleListenError);
-                reject(ensureError(error));
+        const servers = listenHosts.map(() => http.createServer());
+
+        try {
+            const port = await this.listenOnLoopback({
+                hosts: listenHosts,
+                servers,
+            });
+
+            const redirectUri = `http://${redirectHost}:${port}${LOOPBACK_PATH}`;
+            const authorizeUrl = String(
+                await args.auth.getAuthenticationUrl(
+                    redirectUri,
+                    args.state,
+                    "code",
+                    "offline",
+                    Array.from(DROPBOX_SCOPES),
+                    "none",
+                    true
+                )
+            );
+
+            const callbackPromise = this.waitForOAuthCallback({
+                servers,
+                timeoutMs: args.timeoutMs,
+            });
+
+            await shell.openExternal(authorizeUrl);
+
+            const callback = await callbackPromise;
+            if (callback.state !== args.state) {
+                throw new Error("Dropbox OAuth state mismatch");
             }
 
-            server.on("error", handleListenError);
-            server.listen(this.loopbackPort, LOOPBACK_HOST, () => {
-                server.off("error", handleListenError);
-                resolve();
-            });
+            return { code: callback.code, redirectUri };
+        } catch (error: unknown) {
+            const resolved = ensureError(error);
+
+            if (this.loopbackPort !== 0 && resolved.message.includes("EADDR")) {
+                throw new Error(
+                    "Dropbox OAuth loopback server failed to start on both IPv4 and IPv6. " +
+                        "Ensure IPv6 is enabled or change the configured redirect URI to use 127.0.0.1.",
+                    { cause: error }
+                );
+            }
+
+            throw resolved;
+        } finally {
+            await this.closeServers(servers);
+        }
+    }
+
+    private async closeServers(servers: readonly http.Server[]): Promise<void> {
+        await Promise.all(
+            servers.map(
+                (server) =>
+                    new Promise<void>((resolve) => {
+                        server.close(() => {
+                            resolve();
+                        });
+                    })
+            )
+        );
+    }
+
+    private async fetchTokensForAuthorizationCode(args: {
+        auth: DropboxAuthClient;
+        code: string;
+        redirectUri: string;
+    }): Promise<DropboxTokens> {
+        const response = await args.auth.getAccessTokenFromCode(
+            args.redirectUri,
+            args.code
+        );
+
+        const parsed = dropboxTokenExchangeResponseSchema.parse(
+            (response as { result?: unknown }).result
+        );
+
+        return {
+            accessToken: parsed.access_token,
+            expiresAtEpochMs: Date.now() + parsed.expires_in * 1000,
+            refreshToken: parsed.refresh_token,
+        };
+    }
+
+    private async listenOnLoopback(args: {
+        hosts: readonly string[];
+        servers: readonly http.Server[];
+    }): Promise<number> {
+        const { loopbackPort } = this;
+
+        await Promise.all(
+            args.servers.map(
+                (server, index) =>
+                    new Promise<void>((resolve, reject) => {
+                        const host = args.hosts[index];
+
+                        const handleListenError = (error: unknown): void => {
+                            server.off("error", handleListenError);
+                            reject(ensureError(error));
+                        };
+
+                        server.on("error", handleListenError);
+                        server.listen(loopbackPort, host, () => {
+                            server.off("error", handleListenError);
+                            resolve();
+                        });
+                    })
+            )
+        );
+
+        const ports = args.servers.map((server) => {
+            const address = server.address();
+            if (!address || typeof address === "string") {
+                throw new TypeError("Dropbox OAuth server address unavailable");
+            }
+            return address.port;
         });
 
-        await listenPromise;
-
-        const address = server.address();
-        if (!address || typeof address === "string") {
-            await new Promise<void>((resolve) => {
-                server.close(() => {
-                    resolve();
-                });
-            });
-            throw new Error("Dropbox OAuth server address unavailable");
+        const [firstPort] = ports;
+        if (typeof firstPort !== "number") {
+            throw new TypeError("Dropbox OAuth server address unavailable");
         }
 
-        const redirectUri = `http://${LOOPBACK_HOST}:${address.port}${LOOPBACK_PATH}`;
+        if (ports.some((candidate) => candidate !== firstPort)) {
+            throw new Error(
+                "Dropbox OAuth loopback listeners did not share a port"
+            );
+        }
 
-        const authorizeUrl = new URL(DROPBOX_AUTHORIZE_URL);
-        authorizeUrl.searchParams.set("client_id", this.appKey);
-        authorizeUrl.searchParams.set("response_type", "code");
-        authorizeUrl.searchParams.set("redirect_uri", redirectUri);
-        authorizeUrl.searchParams.set("state", args.state);
-        authorizeUrl.searchParams.set("code_challenge", args.codeChallenge);
-        authorizeUrl.searchParams.set("code_challenge_method", "S256");
-        authorizeUrl.searchParams.set("token_access_type", "offline");
-        authorizeUrl.searchParams.set("scope", DROPBOX_SCOPES.join(" "));
+        return firstPort;
+    }
 
-        const codePromise = new Promise<{ code: string; state: string }>((
-            resolve,
-            reject
-        ) => {
+    private async waitForOAuthCallback(args: {
+        servers: readonly http.Server[];
+        timeoutMs: number;
+    }): Promise<DropboxOAuthCallback> {
+        return new Promise<DropboxOAuthCallback>((resolve, reject) => {
             let settled = false;
-
             let timeoutId: NodeJS.Timeout | null = null;
 
+            let handleRuntimeError: (error: unknown) => void =
+                handleUnexpectedOAuthRuntimeError;
+            let handleRequest: (
+                request: http.IncomingMessage,
+                response: http.ServerResponse
+            ) => void = handleUnexpectedOAuthRequest;
+
             function cleanup(): void {
+                if (timeoutId) {
+                    clearTimeout(timeoutId);
+                    timeoutId = null;
+                }
+
+                for (const server of args.servers) {
+                    server.off("request", handleRequest);
+                    server.off("error", handleRuntimeError);
+                }
+            }
+
+            const fail = (error: unknown): void => {
                 if (settled) {
                     return;
                 }
 
                 settled = true;
-                if (timeoutId) {
-                    clearTimeout(timeoutId);
-                    timeoutId = null;
-                }
-            }
-
-            timeoutId = setTimeout(() => {
-                cleanup();
-                reject(new Error("Dropbox OAuth timed out"));
-            }, args.timeoutMs);
-
-            function handleRuntimeError(error: unknown): void {
                 cleanup();
                 reject(ensureError(error));
+            };
+
+            const succeed = (result: DropboxOAuthCallback): void => {
+                if (settled) {
+                    return;
+                }
+
+                settled = true;
+                cleanup();
+                resolve(result);
+            };
+
+            function handleRuntimeErrorImpl(error: unknown): void {
+                fail(error);
             }
 
-            function handleRequest(
+            function handleRequestImpl(
                 request: http.IncomingMessage,
                 response: http.ServerResponse
             ): void {
+                if (settled) {
+                    response.writeHead(410, {
+                        "Content-Type": "text/plain; charset=utf-8",
+                    });
+                    response.end("Request already handled");
+                    return;
+                }
+
                 try {
                     const requestUrl = new URL(
                         request.url ?? "/",
-                        `http://${request.headers.host ?? "127.0.0.1"}`
+                        `http://${request.headers.host ?? LOOPBACK_IP_HOST_4}`
                     );
 
                     if (requestUrl.pathname !== LOOPBACK_PATH) {
                         response.writeHead(404);
                         response.end();
-                        server.once("request", handleRequest);
                         return;
                     }
 
@@ -179,8 +326,7 @@ export class DropboxAuthFlow {
                             "Content-Type": "text/plain; charset=utf-8",
                         });
                         response.end(`OAuth error: ${errorDescription}`);
-                        cleanup();
-                        reject(
+                        fail(
                             new Error(
                                 `Dropbox OAuth error: ${errorDescription}`
                             )
@@ -193,8 +339,7 @@ export class DropboxAuthFlow {
                             "Content-Type": "text/plain; charset=utf-8",
                         });
                         response.end("Missing code/state");
-                        cleanup();
-                        reject(
+                        fail(
                             new Error(
                                 "Dropbox OAuth callback missing code/state"
                             )
@@ -209,78 +354,57 @@ export class DropboxAuthFlow {
                         "<html><body><h1>Connected</h1><p>You can close this tab and return to Uptime Watcher.</p></body></html>"
                     );
 
-                    cleanup();
-                    resolve({ code, state });
+                    succeed({ code, state });
                 } catch (error) {
-                    cleanup();
-                    reject(ensureError(error));
+                    fail(error);
                 }
             }
 
-            server.once("request", handleRequest);
-            server.once("error", handleRuntimeError);
-        });
+            handleRuntimeError = handleRuntimeErrorImpl;
+            handleRequest = handleRequestImpl;
 
-        try {
-            await shell.openExternal(authorizeUrl.toString());
+            timeoutId = setTimeout(() => {
+                fail(new Error("Dropbox OAuth timed out"));
+            }, args.timeoutMs);
 
-            const { code, state } = await codePromise;
-            if (state !== args.state) {
-                throw new Error("Dropbox OAuth state mismatch");
+            for (const server of args.servers) {
+                server.on("request", handleRequest);
+                server.on("error", handleRuntimeError);
             }
-
-            return { code, redirectUri };
-        } finally {
-            await new Promise<void>((resolve) => {
-                server.close(() => {
-                    resolve();
-                });
-            });
-        }
+        });
     }
 
-    private async fetchTokensForAuthorizationCode(args: {
-        code: string;
-        codeVerifier: string;
-        redirectUri: string;
-    }): Promise<DropboxTokens> {
-        const body = new URLSearchParams({
-            client_id: this.appKey,
-            code: args.code,
-            code_verifier: args.codeVerifier,
-            grant_type: "authorization_code",
-            redirect_uri: args.redirectUri,
-        });
-
-        const response = await this.httpClient.post(
-            DROPBOX_TOKEN_ENDPOINT,
-            body,
-            {
-                headers: {
-                    "Content-Type": "application/x-www-form-urlencoded",
-                },
-            }
-        );
-
-        const parsed = dropboxTokenExchangeResponseSchema.parse(
-            response.data as unknown
-        );
+    private getLoopbackHostsAndRedirectHost(): {
+        listenHosts: readonly string[];
+        redirectHost: string;
+    } {
+        if (this.loopbackPort !== 0) {
+            return {
+                listenHosts: [LOOPBACK_IP_HOST_4, LOOPBACK_IP_HOST_6],
+                redirectHost: LOOPBACK_REDIRECT_HOST,
+            };
+        }
 
         return {
-            accessToken: parsed.access_token,
-            expiresAtEpochMs: Date.now() + parsed.expires_in * 1000,
-            refreshToken: parsed.refresh_token,
+            listenHosts: [LOOPBACK_IP_HOST_4],
+            redirectHost: LOOPBACK_IP_HOST_4,
         };
     }
 
     public constructor(args: {
         appKey: string;
-        httpClient?: AxiosInstance;
+        authFactory?: () => DropboxAuthClient;
         loopbackPort?: number;
     }) {
         this.appKey = args.appKey;
-        this.httpClient = args.httpClient ?? axios.create();
         this.loopbackPort = args.loopbackPort ?? DEFAULT_DROPBOX_LOOPBACK_PORT;
+
+        this.authFactory =
+            args.authFactory ??
+            ((): DropboxAuthClient =>
+                new DropboxAuth({
+                    clientId: args.appKey,
+                }));
     }
 }
 

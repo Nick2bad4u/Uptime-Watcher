@@ -59,16 +59,18 @@ The app uses a fixed loopback redirect so that the Dropbox console can be config
 
 Add the following redirect URI:
 
-- `http://127.0.0.1:53682/oauth2/callback`
+- `http://localhost:53682/oauth2/callback`
 
 No webhook URI is required.
 
 ### 127.0.0.1 vs localhost
 
-Use **`127.0.0.1`**.
+Use **`localhost`**.
 
-`localhost` can resolve to IPv6 (`::1`) on some systems, which can break loopback redirect matching.
-The app uses `127.0.0.1` in code and the Dropbox console should match it exactly.
+Dropbox allows non-HTTPS redirect URIs only for localhost loopback redirects.
+To make this reliable across environments (where `localhost` may resolve to
+`127.0.0.1` or `::1`), the app binds the loopback callback server to **both**
+IPv4 and IPv6 loopback addresses.
 
 ### Scopes / permissions
 
@@ -76,7 +78,6 @@ The app needs the following scopes:
 
 - `account_info.read` (to show the connected account label)
 - `files.metadata.read`
-- `files.metadata.write`
 - `files.content.read`
 - `files.content.write`
 
@@ -86,6 +87,12 @@ Using a **Scoped app folder** is recommended so access is limited to the app’s
 >
 > If you change scopes after users already connected, they must **Disconnect** and
 > **Connect Dropbox** again to get a token with the new scopes.
+
+### Disconnect behavior (token revocation)
+
+When the user clicks **Disconnect**, the app attempts to revoke the current
+Dropbox access token via `auth/token/revoke` (best-effort), and then deletes the
+locally stored tokens.
 
 ## Runtime configuration
 

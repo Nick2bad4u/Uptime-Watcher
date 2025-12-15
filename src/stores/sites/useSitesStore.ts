@@ -80,6 +80,7 @@ export const useSitesStore: UseBoundStore<StoreApi<SitesStore>> =
         // Create sync actions (needed by other modules)
         const syncActions = createSiteSyncActions({
             getSites,
+            getSitesRevision: () => get().sitesRevision,
             onSiteDelta: stateActions.recordSiteSyncDelta,
             setSites: stateActions.setSites,
             setStatusSubscriptionSummary:

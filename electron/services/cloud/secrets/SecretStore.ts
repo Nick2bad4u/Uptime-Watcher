@@ -21,6 +21,75 @@ export interface SecretStore {
 }
 
 /**
+ * Simple in-memory {@link SecretStore}.
+ *
+ * @remarks
+ * This store is **not persisted** and is intended as a fallback for
+ * environments where Electron {@link safeStorage} encryption is unavailable.
+ */
+export class EphemeralSecretStore implements SecretStore {
+    private readonly values = new Map<string, string>();
+
+    public async deleteSecret(key: string): Promise<void> {
+        this.values.delete(key);
+        await Promise.resolve();
+    }
+
+    public async getSecret(key: string): Promise<string | undefined> {
+        await Promise.resolve();
+        return this.values.get(key);
+    }
+
+    public async setSecret(key: string, value: string): Promise<void> {
+        this.values.set(key, value);
+        await Promise.resolve();
+    }
+}
+
+/**
+ * {@link SecretStore} that falls back to a secondary store if the primary fails.
+ */
+export class FallbackSecretStore implements SecretStore {
+    private readonly primary: SecretStore;
+
+    private readonly fallback: SecretStore;
+
+    public async deleteSecret(key: string): Promise<void> {
+        await this.primary.deleteSecret(key).catch(() => {});
+        await this.fallback.deleteSecret(key).catch(() => {});
+    }
+
+    public async getSecret(key: string): Promise<string | undefined> {
+        try {
+            const value = await this.primary.getSecret(key);
+            if (typeof value === "string") {
+                return value;
+            }
+        } catch {
+            // Ignore
+        }
+
+        return this.fallback.getSecret(key);
+    }
+
+    public async setSecret(key: string, value: string): Promise<void> {
+        try {
+            await this.primary.setSecret(key, value);
+            return;
+        } catch {
+            // Ignore
+        }
+
+        await this.fallback.setSecret(key, value);
+    }
+
+    public constructor(args: { fallback: SecretStore; primary: SecretStore }) {
+        this.primary = args.primary;
+        this.fallback = args.fallback;
+    }
+}
+
+/**
  * Simple {@link SecretStore} implementation that encrypts secrets using
  * Electron's {@link safeStorage} and persists them via the provided settings
  * adapter.
@@ -42,7 +111,9 @@ export class SafeStorageSecretStore implements SecretStore {
         }
 
         if (!safeStorage.isEncryptionAvailable()) {
-            throw new Error("Electron safeStorage encryption is not available");
+            throw new Error(
+                "Secure storage is not available on this system (Electron safeStorage)."
+            );
         }
 
         try {
@@ -56,7 +127,9 @@ export class SafeStorageSecretStore implements SecretStore {
 
     public async setSecret(key: string, value: string): Promise<void> {
         if (!safeStorage.isEncryptionAvailable()) {
-            throw new Error("Electron safeStorage encryption is not available");
+            throw new Error(
+                "Secure storage is not available on this system (Electron safeStorage)."
+            );
         }
 
         const encrypted = safeStorage.encryptString(value);

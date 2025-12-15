@@ -240,14 +240,11 @@ describe("IPC Response Handling Regression Tests", () => {
 
             // Create a minimal deps object for testing
             const mockDeps = {
-                setSites: vi.fn(),
-                getSites: vi.fn().mockReturnValue([]),
-                setStatusSubscriptionSummary: vi.fn(),
+                getSites: vi.fn(() => []),
+                getSitesRevision: vi.fn(() => 0),
                 onSiteDelta: vi.fn(),
-                addSite: vi.fn(),
-                updateSite: vi.fn(),
-                deleteSite: vi.fn(),
-                updateSiteStatus: vi.fn(),
+                setSites: vi.fn(),
+                setStatusSubscriptionSummary: vi.fn(),
             };
 
             const syncActions = createSiteSyncActions(mockDeps);

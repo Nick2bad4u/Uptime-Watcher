@@ -184,6 +184,13 @@ const electronAPIMockDefinition = {
         },
         connectDropbox: async (): Promise<CloudStatusSummary> =>
             getCloudStatus(),
+
+        deleteBackup: async (key: string): Promise<CloudBackupEntry[]> => {
+            mockState.cloudBackups = mockState.cloudBackups.filter(
+                (entry) => entry.key !== key
+            );
+            return clone(mockState.cloudBackups);
+        },
         disconnect: async (): Promise<CloudStatusSummary> => {
             mockState.cloudFilesystemBaseDirectory = null;
             return getCloudStatus();

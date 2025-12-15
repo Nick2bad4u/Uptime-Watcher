@@ -14,14 +14,31 @@ import { tagElectronAppCoverage } from "../utils/coverage";
 import {
     closeModal,
     fillAddSiteForm,
-    removeAllSites,
     getSiteCardLocator,
     submitAddSiteForm,
     resetApplicationState,
     ensureCardLayout,
     WAIT_TIMEOUTS,
+    openAddSiteModal,
 } from "../utils/ui-helpers";
 import { DEFAULT_TEST_SITE_URL, generateSiteName } from "../utils/testData";
+
+function delayMs(ms: number): Promise<void> {
+    return new Promise((resolve) => {
+        setTimeout(resolve, ms);
+    });
+}
+
+async function bestEffort(args: {
+    label: string;
+    timeoutMs: number;
+    work: Promise<unknown>;
+}): Promise<void> {
+    await Promise.race([
+        args.work.catch(() => undefined),
+        delayMs(args.timeoutMs),
+    ]);
+}
 
 test.describe(
     "dashboard empty state - modern ui",
@@ -33,6 +50,7 @@ test.describe(
         ],
     },
     () => {
+        test.describe.configure({ timeout: WAIT_TIMEOUTS.VERY_LONG });
         let electronApp: ElectronApplication;
         let page: Page;
 
@@ -45,12 +63,19 @@ test.describe(
 
         test.afterEach(async () => {
             if (page) {
-                await closeModal(page).catch(() => undefined);
-                await removeAllSites(page).catch(() => undefined);
+                await bestEffort({
+                    label: "close modal",
+                    timeoutMs: 5_000,
+                    work: closeModal(page),
+                });
             }
 
             if (electronApp) {
-                await electronApp.close();
+                await bestEffort({
+                    label: "close electron app",
+                    timeoutMs: 10_000,
+                    work: electronApp.close(),
+                });
             }
         });
 
@@ -68,15 +93,7 @@ test.describe(
                     emptyState.getByText("No sites are being monitored")
                 ).toBeVisible();
 
-                const addSiteButton = page
-                    .getByRole("banner")
-                    .getByRole("button", { name: "Add new site" });
-                await addSiteButton.click();
-
-                const dialog = page.getByRole("dialog");
-                await expect(dialog).toBeVisible({
-                    timeout: WAIT_TIMEOUTS.MEDIUM,
-                });
+                await openAddSiteModal(page);
 
                 const siteName = generateSiteName("Empty State Demo");
                 await fillAddSiteForm(page, {

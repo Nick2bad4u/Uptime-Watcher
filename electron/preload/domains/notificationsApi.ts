@@ -10,7 +10,8 @@
 
 import type { NotificationPreferenceUpdate } from "@shared/types/notifications";
 
-import { UPDATE_NOTIFICATION_PREFERENCES_CHANNEL } from "../../services/ipc/notificationChannelGuards";
+import { NOTIFICATION_CHANNELS } from "@shared/types/preload";
+
 import { createVoidInvoker } from "../core/bridgeFactory";
 
 /**
@@ -36,7 +37,7 @@ export interface NotificationsApiInterface {
  */
 export const notificationsApi: NotificationsApiInterface = {
     updatePreferences: createVoidInvoker(
-        UPDATE_NOTIFICATION_PREFERENCES_CHANNEL
+        NOTIFICATION_CHANNELS.updatePreferences
     ),
 } as const;
 

@@ -47,6 +47,7 @@ describe("useSitesState", () => {
         selectedMonitorIds: {},
         selectedSiteIdentifier: undefined,
         sites: [],
+        sitesRevision: 0,
         statusSubscriptionSummary: undefined,
         ...overrides,
     });
@@ -126,6 +127,7 @@ describe("useSitesState", () => {
                 selectedMonitorIds: {},
                 selectedSiteIdentifier: undefined,
                 sites: [],
+                sitesRevision: 0,
                 statusSubscriptionSummary: undefined,
             });
         });
@@ -177,6 +179,7 @@ describe("useSitesState", () => {
                     selectedMonitorIds: {},
                     selectedSiteIdentifier: undefined,
                     sites: newSites,
+                    sitesRevision: 1,
                 });
             }
         });
@@ -251,6 +254,7 @@ describe("useSitesState", () => {
                     selectedMonitorIds: { "site-c": "mon-c1" },
                     selectedSiteIdentifier: undefined,
                     sites: newSites,
+                    sitesRevision: 1,
                 });
             }
         });
@@ -475,6 +479,7 @@ describe("useSitesState", () => {
                     selectedMonitorIds: {},
                     selectedSiteIdentifier: undefined,
                     sites: [],
+                    sitesRevision: 0,
                     lastBackupMetadata: undefined,
                     statusSubscriptionSummary: undefined,
                 });

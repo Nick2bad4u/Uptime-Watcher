@@ -1,9 +1,9 @@
 import type { CloudBackupEntry } from "@shared/types/cloud";
 import type { SerializedDatabaseBackupMetadata } from "@shared/types/databaseBackup";
+import type { DropboxResponse, files, users } from "dropbox";
 
 import { ensureError } from "@shared/utils/errorHandling";
-import axios, { type AxiosInstance, type AxiosResponse } from "axios";
-import * as z from "zod";
+import { Dropbox, DropboxResponseError } from "dropbox";
 
 import type {
     CloudObjectEntry,
@@ -12,13 +12,11 @@ import type {
 import type { DropboxTokenManager } from "./DropboxTokenManager";
 
 import {
+    backupMetadataKeyForBackupKey,
     parseCloudBackupMetadataFile,
     serializeCloudBackupMetadataFile,
 } from "../CloudBackupMetadataFile";
 import { withDropboxRetry } from "./dropboxRetry";
-
-const DROPBOX_API = "https://api.dropboxapi.com" as const;
-const DROPBOX_CONTENT = "https://content.dropboxapi.com" as const;
 
 /**
  * All objects for Uptime Watcher are stored underneath this folder.
@@ -32,35 +30,23 @@ const APP_ROOT_DIRECTORY_NAME = "uptime-watcher" as const;
 
 const BACKUPS_PREFIX = "backups/" as const;
 
-const dropboxFileEntrySchema = z.looseObject({
-    ".tag": z.literal("file"),
-    path_display: z.string().min(1),
-    server_modified: z.string().min(1),
-    size: z.number().int().nonnegative(),
-});
+type DropboxSdkClient = Pick<
+    Dropbox,
+    | "authTokenRevoke"
+    | "filesDeleteV2"
+    | "filesDownload"
+    | "filesListFolder"
+    | "filesListFolderContinue"
+    | "filesUpload"
+    | "usersGetCurrentAccount"
+>;
 
-const dropboxListFolderResponseSchema = z
-    .object({
-        cursor: z.string().optional(),
-        entries: z.array(z.unknown()).default([]),
-        has_more: z.boolean().default(false),
-    })
-    .strict();
+type DropboxListFolderResponse = DropboxResponse<files.ListFolderResult>;
+type DropboxCurrentAccountResponse = DropboxResponse<users.FullAccount>;
 
-const dropboxUploadResponseSchema = z.looseObject({
-    path_display: z.string().min(1),
-    server_modified: z.string().min(1),
-    size: z.number().int().nonnegative(),
-});
-
-const dropboxCurrentAccountSchema = z.looseObject({
-    email: z.string().min(1).optional(),
-    name: z
-        .looseObject({
-            display_name: z.string().min(1).optional(),
-        })
-        .optional(),
-});
+function isRecord(value: unknown): value is Record<string, unknown> {
+    return typeof value === "object" && value !== null && !Array.isArray(value);
+}
 
 function normalizeKey(key: string): string {
     // Normalize to POSIX-style keys.
@@ -165,41 +151,67 @@ function tryParseDropboxErrorSummary(data: unknown): string | undefined {
     return undefined;
 }
 
-function describeDropboxAxiosErrorRich(error: unknown): string | undefined {
-    if (!axios.isAxiosError(error)) {
+function describeDropboxSdkErrorRich(error: unknown): string | undefined {
+    if (!(error instanceof DropboxResponseError)) {
         return undefined;
     }
 
-    const status = error.response?.status;
-    const summary = tryParseDropboxErrorSummary(error.response?.data);
-
+    const summary = tryParseDropboxErrorSummary(error.error);
     if (typeof summary === "string" && summary.trim().length > 0) {
-        return typeof status === "number"
-            ? `HTTP ${status}: ${summary}`
-            : summary;
+        return `HTTP ${error.status}: ${summary}`;
     }
 
-    if (typeof status === "number") {
-        return `HTTP ${status}: ${error.message}`;
+    return `HTTP ${error.status}`;
+}
+
+function hasNotFoundTag(value: unknown, visited: WeakSet<object>): boolean {
+    if (typeof value !== "object" || value === null) {
+        return false;
     }
 
-    return error.message;
+    if (visited.has(value)) {
+        return false;
+    }
+    visited.add(value);
+
+    if (!isRecord(value)) {
+        return false;
+    }
+
+    const record = value;
+    if (record[".tag"] === "not_found") {
+        return true;
+    }
+
+    for (const next of Object.values(record)) {
+        if (Array.isArray(next)) {
+            for (const item of next) {
+                if (hasNotFoundTag(item, visited)) {
+                    return true;
+                }
+            }
+        } else if (
+            typeof next === "object" &&
+            next !== null &&
+            hasNotFoundTag(next, visited)
+        ) {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 function isDropboxNotFoundError(error: unknown): boolean {
-    if (!axios.isAxiosError(error)) {
+    if (!(error instanceof DropboxResponseError)) {
         return false;
     }
 
-    if (error.response?.status !== 409) {
+    if (error.status !== 409) {
         return false;
     }
 
-    const summary = tryParseDropboxErrorSummary(error.response.data);
-    return (
-        typeof summary === "string" &&
-        summary.toLowerCase().includes("not_found")
-    );
+    return hasNotFoundTag(error.error, new WeakSet());
 }
 
 function createENOENT(message: string): NodeJS.ErrnoException {
@@ -208,8 +220,41 @@ function createENOENT(message: string): NodeJS.ErrnoException {
     return error;
 }
 
-function backupMetadataKeyForBackupKey(backupKey: string): string {
-    return `${backupKey}.metadata.json`;
+async function convertDropboxDownloadedResultToBuffer(
+    result: unknown
+): Promise<Buffer> {
+    if (typeof result !== "object" || result === null) {
+        throw new Error("Dropbox download result is not an object");
+    }
+
+    if (!isRecord(result)) {
+        throw new TypeError("Dropbox download result is not an object record");
+    }
+
+    const record = result;
+
+    const maybeBinary = record["fileBinary"];
+    if (Buffer.isBuffer(maybeBinary)) {
+        return maybeBinary;
+    }
+
+    if (maybeBinary instanceof Uint8Array) {
+        return Buffer.from(maybeBinary);
+    }
+
+    if (maybeBinary instanceof ArrayBuffer) {
+        return Buffer.from(new Uint8Array(maybeBinary));
+    }
+
+    const maybeBlob = record["fileBlob"];
+    if (maybeBlob instanceof Blob) {
+        const arrayBuffer = await maybeBlob.arrayBuffer();
+        return Buffer.from(new Uint8Array(arrayBuffer));
+    }
+
+    throw new Error(
+        "Dropbox download did not include fileBinary/fileBlob content"
+    );
 }
 
 /**
@@ -223,27 +268,22 @@ function backupMetadataKeyForBackupKey(backupKey: string): string {
 export class DropboxCloudStorageProvider implements CloudStorageProvider {
     public readonly kind = "dropbox" as const;
 
-    private readonly httpApi: AxiosInstance;
-
-    private readonly httpContent: AxiosInstance;
-
     private readonly tokenManager: DropboxTokenManager;
+
+    private readonly clientFactory: (accessToken: string) => DropboxSdkClient;
+
+    private async createClient(): Promise<DropboxSdkClient> {
+        const token = await this.tokenManager.getAccessToken();
+        return this.clientFactory(token);
+    }
 
     public async isConnected(): Promise<boolean> {
         try {
-            const token = await this.tokenManager.getAccessToken();
+            const client = await this.createClient();
             await withDropboxRetry({
-                fn: async () =>
-                    this.httpApi.post(
-                        `${DROPBOX_API}/2/users/get_current_account`,
-                        null,
-                        {
-                            headers: {
-                                Authorization: `Bearer ${token}`,
-                                "Content-Type": "application/json",
-                            },
-                        }
-                    ),
+                fn: async () => {
+                    await client.usersGetCurrentAccount();
+                },
                 operationName: "users/get_current_account (connectivity)",
             });
             return true;
@@ -253,23 +293,13 @@ export class DropboxCloudStorageProvider implements CloudStorageProvider {
     }
 
     public async getAccountLabel(): Promise<string | undefined> {
-        const token = await this.tokenManager.getAccessToken();
+        const client = await this.createClient();
 
-        const response = await withDropboxRetry({
-            fn: async () =>
-                this.httpApi.post(
-                    `${DROPBOX_API}/2/users/get_current_account`,
-                    null,
-                    {
-                        headers: {
-                            Authorization: `Bearer ${token}`,
-                            "Content-Type": "application/json",
-                        },
-                    }
-                ),
+        const response: DropboxCurrentAccountResponse = await withDropboxRetry({
+            fn: async () => client.usersGetCurrentAccount(),
             operationName: "users/get_current_account",
         }).catch((error: unknown) => {
-            const described = describeDropboxAxiosErrorRich(error);
+            const described = describeDropboxSdkErrorRich(error);
             if (described) {
                 throw new Error(
                     `Dropbox get_current_account failed: ${described}`
@@ -278,100 +308,113 @@ export class DropboxCloudStorageProvider implements CloudStorageProvider {
             throw ensureError(error);
         });
 
-        const parsed = dropboxCurrentAccountSchema.parse(
-            response.data as unknown
-        );
-        return parsed.email ?? parsed.name?.display_name;
+        const account = response.result;
+
+        const email =
+            account.email.trim().length > 0 ? account.email : undefined;
+
+        const displayName =
+            account.name.display_name.trim().length > 0
+                ? account.name.display_name
+                : undefined;
+
+        return email ?? displayName;
     }
 
     public async listObjects(prefix: string): Promise<CloudObjectEntry[]> {
-        const token = await this.tokenManager.getAccessToken();
+        const client = await this.createClient();
         const normalizedPrefix = normalizeKey(prefix);
 
         const rootPath = toDropboxPath("");
 
-        const entries: unknown[] = [];
+        const objects: CloudObjectEntry[] = [];
         let cursor: string | undefined = undefined;
         let hasMore = true;
 
         while (hasMore) {
-            const endpoint = cursor
-                ? `${DROPBOX_API}/2/files/list_folder/continue`
-                : `${DROPBOX_API}/2/files/list_folder`;
+            const currentCursor: string | undefined = cursor;
 
-            const payload = cursor
-                ? { cursor }
-                : {
-                      include_deleted: false,
-                      include_has_explicit_shared_members: false,
-                      include_media_info: false,
-                      include_mounted_folders: true,
-                      include_non_downloadable_files: false,
-                      path: rootPath,
-                      recursive: true,
-                  };
-
-            const currentCursor = cursor;
-
-            try {
+            const response: DropboxListFolderResponse | null =
                 // eslint-disable-next-line no-await-in-loop -- Pagination must be sequential.
-                const response = await withDropboxRetry<AxiosResponse<unknown>>(
-                    {
-                        fn: async () =>
-                            this.httpApi.post(endpoint, payload, {
-                                headers: {
-                                    Authorization: `Bearer ${token}`,
-                                    "Content-Type": "application/json",
-                                },
-                            }),
-                        operationName: currentCursor
-                            ? "files/list_folder/continue"
-                            : "files/list_folder",
+                await this.fetchListFolderPage({
+                    client,
+                    cursor: currentCursor,
+                    rootPath,
+                }).catch((error: unknown) => {
+                    // The app root folder may not exist until the first upload.
+                    if (!currentCursor && isDropboxNotFoundError(error)) {
+                        return null;
                     }
-                );
 
-                const parsed = dropboxListFolderResponseSchema.parse(
-                    response.data
-                );
+                    throw ensureError(error);
+                });
 
-                entries.push(...parsed.entries);
-
-                const { cursor: nextCursor, has_more: nextHasMore } = parsed;
-                cursor = nextCursor;
-                hasMore = nextHasMore;
-            } catch (error) {
-                // The app root folder may not exist until the first upload.
-                if (!currentCursor && isDropboxNotFoundError(error)) {
-                    break;
-                }
-
-                throw ensureError(error);
+            if (!response) {
+                break;
             }
-        }
 
-        const objects: CloudObjectEntry[] = [];
+            const { result } = response;
+            const nextCursor: string = result.cursor;
+            const { entries, has_more: nextHasMore } = result;
 
-        for (const entry of entries) {
-            const parsed = dropboxFileEntrySchema.safeParse(entry);
+            for (const entry of entries) {
+                if (
+                    entry[".tag"] === "file" &&
+                    typeof entry.path_display === "string"
+                ) {
+                    const key = fromDropboxPathOrNull(entry.path_display);
 
-            if (parsed.success) {
-                const key = fromDropboxPathOrNull(parsed.data.path_display);
-                const matchesPrefix =
-                    key !== null &&
-                    key !== "" &&
-                    (!normalizedPrefix || key.startsWith(normalizedPrefix));
+                    const matchesPrefix =
+                        typeof key === "string" &&
+                        key.length > 0 &&
+                        (!normalizedPrefix || key.startsWith(normalizedPrefix));
 
-                if (matchesPrefix) {
-                    objects.push({
-                        key,
-                        lastModifiedAt: Date.parse(parsed.data.server_modified),
-                        sizeBytes: parsed.data.size,
-                    });
+                    if (matchesPrefix) {
+                        objects.push({
+                            key,
+                            lastModifiedAt: Date.parse(entry.server_modified),
+                            sizeBytes: entry.size,
+                        });
+                    }
                 }
             }
+
+            cursor = nextCursor;
+            hasMore = nextHasMore;
         }
 
         return objects;
+    }
+
+    private async fetchListFolderPage(args: {
+        client: DropboxSdkClient;
+        cursor: string | undefined;
+        rootPath: string;
+    }): Promise<DropboxListFolderResponse> {
+        const { client, cursor, rootPath } = args;
+        if (cursor) {
+            return withDropboxRetry<DropboxListFolderResponse>({
+                fn: async () =>
+                    client.filesListFolderContinue({
+                        cursor,
+                    }),
+                operationName: "files/list_folder/continue",
+            });
+        }
+
+        return withDropboxRetry<DropboxListFolderResponse>({
+            fn: async () =>
+                client.filesListFolder({
+                    include_deleted: false,
+                    include_has_explicit_shared_members: false,
+                    include_media_info: false,
+                    include_mounted_folders: true,
+                    include_non_downloadable_files: false,
+                    path: rootPath,
+                    recursive: true,
+                }),
+            operationName: "files/list_folder",
+        });
     }
 
     public async uploadObject(args: {
@@ -379,35 +422,47 @@ export class DropboxCloudStorageProvider implements CloudStorageProvider {
         key: string;
         overwrite?: boolean;
     }): Promise<CloudObjectEntry> {
-        const token = await this.tokenManager.getAccessToken();
+        const client = await this.createClient();
 
         const response = await withDropboxRetry({
             fn: async () =>
-                this.httpContent.post(
-                    `${DROPBOX_CONTENT}/2/files/upload`,
-                    args.buffer,
-                    {
-                        headers: {
-                            Authorization: `Bearer ${token}`,
-                            "Content-Type": "application/octet-stream",
-                            "Dropbox-API-Arg": JSON.stringify({
-                                autorename: false,
-                                mode: args.overwrite ? "overwrite" : "add",
-                                mute: true,
-                                path: toDropboxPath(args.key),
-                                strict_conflict: false,
-                            }),
-                        },
-                    }
-                ),
+                client.filesUpload({
+                    autorename: false,
+                    contents: args.buffer,
+                    mode: args.overwrite
+                        ? { ".tag": "overwrite" }
+                        : { ".tag": "add" },
+                    mute: true,
+                    path: toDropboxPath(args.key),
+                    strict_conflict: false,
+                }),
             operationName: "files/upload",
+        }).catch((error: unknown) => {
+            const described = describeDropboxSdkErrorRich(error);
+            if (described) {
+                throw new Error(`Dropbox upload failed: ${described}`);
+            }
+            throw ensureError(error);
         });
 
-        const uploadData = dropboxUploadResponseSchema.parse(
-            response.data as unknown
-        );
+        const uploadData = response.result as {
+            path_display?: unknown;
+            server_modified?: unknown;
+            size?: unknown;
+        };
+
+        if (
+            typeof uploadData.path_display !== "string" ||
+            typeof uploadData.server_modified !== "string" ||
+            typeof uploadData.size !== "number"
+        ) {
+            throw new TypeError(
+                "Dropbox returned an unexpected upload response"
+            );
+        }
+
         const storedKey = fromDropboxPathOrNull(uploadData.path_display);
-        if (!storedKey) {
+        if (storedKey === null) {
             throw new Error("Dropbox returned an unexpected upload path");
         }
 
@@ -419,31 +474,17 @@ export class DropboxCloudStorageProvider implements CloudStorageProvider {
     }
 
     public async downloadObject(key: string): Promise<Buffer> {
-        const token = await this.tokenManager.getAccessToken();
+        const client = await this.createClient();
 
         const response = await withDropboxRetry({
-            fn: async () =>
-                this.httpContent.post<ArrayBuffer>(
-                    `${DROPBOX_CONTENT}/2/files/download`,
-                    undefined,
-                    {
-                        headers: {
-                            Authorization: `Bearer ${token}`,
-                            "Content-Type": "application/octet-stream",
-                            "Dropbox-API-Arg": JSON.stringify({
-                                path: toDropboxPath(key),
-                            }),
-                        },
-                        responseType: "arraybuffer",
-                    }
-                ),
+            fn: async () => client.filesDownload({ path: toDropboxPath(key) }),
             operationName: "files/download",
         }).catch((error: unknown) => {
             if (isDropboxNotFoundError(error)) {
                 throw createENOENT(`Dropbox object not found: ${key}`);
             }
 
-            const described = describeDropboxAxiosErrorRich(error);
+            const described = describeDropboxSdkErrorRich(error);
             if (described) {
                 throw new Error(`Dropbox download failed: ${described}`);
             }
@@ -451,24 +492,14 @@ export class DropboxCloudStorageProvider implements CloudStorageProvider {
             throw ensureError(error);
         });
 
-        return Buffer.from(response.data);
+        return convertDropboxDownloadedResultToBuffer(response.result);
     }
 
     public async deleteObject(key: string): Promise<void> {
-        const token = await this.tokenManager.getAccessToken();
+        const client = await this.createClient();
 
         await withDropboxRetry({
-            fn: async () =>
-                this.httpApi.post(
-                    `${DROPBOX_API}/2/files/delete_v2`,
-                    { path: toDropboxPath(key) },
-                    {
-                        headers: {
-                            Authorization: `Bearer ${token}`,
-                            "Content-Type": "application/json",
-                        },
-                    }
-                ),
+            fn: async () => client.filesDeleteV2({ path: toDropboxPath(key) }),
             operationName: "files/delete_v2",
         }).catch((error: unknown) => {
             // Contract: deleting a missing object is a no-op.
@@ -476,7 +507,7 @@ export class DropboxCloudStorageProvider implements CloudStorageProvider {
                 return;
             }
 
-            const described = describeDropboxAxiosErrorRich(error);
+            const described = describeDropboxSdkErrorRich(error);
             if (described) {
                 throw new Error(`Dropbox delete failed: ${described}`);
             }
@@ -561,12 +592,13 @@ export class DropboxCloudStorageProvider implements CloudStorageProvider {
     }
 
     public constructor(args: {
-        httpApi?: AxiosInstance;
-        httpContent?: AxiosInstance;
+        clientFactory?: (accessToken: string) => DropboxSdkClient;
         tokenManager: DropboxTokenManager;
     }) {
         this.tokenManager = args.tokenManager;
-        this.httpApi = args.httpApi ?? axios.create();
-        this.httpContent = args.httpContent ?? axios.create();
+
+        this.clientFactory =
+            args.clientFactory ??
+            ((accessToken): DropboxSdkClient => new Dropbox({ accessToken }));
     }
 }

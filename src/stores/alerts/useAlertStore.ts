@@ -15,6 +15,11 @@ import { create, type StoreApi, type UseBoundStore } from "zustand";
 /** Maximum number of alerts retained in memory. */
 export const MAX_ALERT_QUEUE_LENGTH = 20;
 
+/** Maximum number of generic toasts retained in memory. */
+export const MAX_TOAST_QUEUE_LENGTH = 20;
+
+const DEFAULT_TOAST_TTL_MS = 5000;
+
 /**
  * Generates monotonically increasing fallback counters without using top-level
  * mutable state.
@@ -77,6 +82,31 @@ export interface StatusAlert {
     readonly timestamp: number;
 }
 
+/**
+ * Toast variant.
+ */
+export type ToastVariant = "error" | "info" | "success";
+
+/**
+ * Generic, user-facing toast message.
+ */
+export interface AppToast {
+    readonly createdAtEpochMs: number;
+    readonly id: string;
+    readonly message?: string;
+    readonly title: string;
+    readonly ttlMs: number;
+    readonly variant: ToastVariant;
+}
+
+/** Input shape for enqueuing generic toasts. */
+export interface AppToastInput {
+    readonly message?: string;
+    readonly title: string;
+    readonly ttlMs?: number;
+    readonly variant: ToastVariant;
+}
+
 /** Input shape for enqueuing alerts. */
 export type StatusAlertInput = Omit<StatusAlert, "id" | "timestamp"> & {
     /**
@@ -95,13 +125,21 @@ export interface AlertStore {
     readonly alerts: StatusAlert[];
     /** Removes all queued alerts. */
     readonly clearAlerts: () => void;
+    /** Removes all queued toasts. */
+    readonly clearToasts: () => void;
     /** Removes a specific alert by identifier. */
     readonly dismissAlert: (id: string) => void;
+    /** Removes a specific toast by identifier. */
+    readonly dismissToast: (id: string) => void;
     /**
      * Enqueues a new alert and trims the queue to {@link MAX_ALERT_QUEUE_LENGTH}
      * items.
      */
     readonly enqueueAlert: (input: StatusAlertInput) => StatusAlert;
+    /** Enqueues a transient toast message. */
+    readonly enqueueToast: (input: AppToastInput) => AppToast;
+    /** Ordered queue of transient toasts (newest first). */
+    readonly toasts: AppToast[];
 }
 
 /** Convenience type exposing the Zustand store hook. */
@@ -209,9 +247,17 @@ export const useAlertStore: AlertStoreHook = create<AlertStore>()((set) => ({
     clearAlerts: (): void => {
         set({ alerts: [] });
     },
+    clearToasts: (): void => {
+        set({ toasts: [] });
+    },
     dismissAlert: (id: string): void => {
         set((state) => ({
             alerts: state.alerts.filter((alert) => alert.id !== id),
+        }));
+    },
+    dismissToast: (id: string): void => {
+        set((state) => ({
+            toasts: state.toasts.filter((toast) => toast.id !== id),
         }));
     },
     enqueueAlert: (input: StatusAlertInput): StatusAlert => {
@@ -237,4 +283,36 @@ export const useAlertStore: AlertStoreHook = create<AlertStore>()((set) => ({
 
         return alert;
     },
+    enqueueToast: (input: AppToastInput): AppToast => {
+        const toastId = generateAlertId();
+        const ttlMs =
+            typeof input.ttlMs === "number" && input.ttlMs > 0
+                ? input.ttlMs
+                : DEFAULT_TOAST_TTL_MS;
+
+        const baseToast = {
+            createdAtEpochMs: Date.now(),
+            id: toastId,
+            title: input.title,
+            ttlMs,
+            variant: input.variant,
+        } as const;
+
+        const toast: AppToast =
+            typeof input.message === "string"
+                ? { ...baseToast, message: input.message }
+                : baseToast;
+
+        set((state) => {
+            const nextToasts = [toast, ...state.toasts];
+            if (nextToasts.length > MAX_TOAST_QUEUE_LENGTH) {
+                nextToasts.length = MAX_TOAST_QUEUE_LENGTH;
+            }
+            return { toasts: nextToasts };
+        });
+
+        return toast;
+    },
+
+    toasts: [],
 }));

@@ -6,11 +6,9 @@
  * avoid collisions in CI and parallel test workers.
  */
 
-import type { AxiosInstance } from "axios";
-
 import http from "node:http";
 
-import { describe, expect, it, vi, type Mock } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 const openExternalMock = vi.hoisted(() => vi.fn(async (_url: string) => true));
 
@@ -50,39 +48,94 @@ describe(DropboxAuthFlow, () => {
         vi.useFakeTimers();
         vi.setSystemTime(new Date("2025-01-01T00:00:00.000Z"));
 
-        const httpClient: Pick<AxiosInstance, "post"> = {
-            post: vi.fn().mockResolvedValue({
-                data: {
-                    access_token: "access",
-                    expires_in: 3600,
-                    refresh_token: "refresh",
-                },
-            }),
+        let capturedRedirectUri: string | undefined;
+        let capturedState: string | undefined;
+
+        const auth = {
+            setClientId: vi.fn(),
+            getAuthenticationUrl: vi
+                .fn<
+                    (
+                        redirectUri: string,
+                        state?: string,
+                        authType?: "token" | "code",
+                        tokenAccessType?:
+                            | null
+                            | "legacy"
+                            | "offline"
+                            | "online",
+                        scope?: string[],
+                        includeGrantedScopes?: "none" | "user" | "team",
+                        usePKCE?: boolean
+                    ) => Promise<string>
+                >()
+                .mockImplementation(async (
+                    redirectUri,
+                    state,
+                    authType,
+                    tokenAccessType,
+                    scope,
+                    includeGrantedScopes,
+                    usePKCE
+                ) => {
+                    capturedRedirectUri = redirectUri;
+                    capturedState = state;
+
+                    expect(authType).toBe("code");
+                    expect(tokenAccessType).toBe("offline");
+                    expect(includeGrantedScopes).toBe("none");
+                    expect(usePKCE).toBeTruthy();
+
+                    const scopeString = (scope ?? []).join(" ");
+                    expect(scopeString).toContain("account_info.read");
+                    expect(scopeString).toContain("files.content.read");
+                    expect(scopeString).toContain("files.content.write");
+                    expect(scopeString).toContain("files.metadata.read");
+
+                    // Return an arbitrary URL; the flow only passes it to
+                    // shell.openExternal.
+                    return `https://www.dropbox.com/oauth2/authorize?redirect_uri=${encodeURIComponent(
+                        redirectUri
+                    )}&state=${encodeURIComponent(state ?? "")}`;
+                }),
+            getAccessTokenFromCode: vi
+                .fn<
+                    (
+                        redirectUri: string,
+                        code: string
+                    ) => Promise<{
+                        result: {
+                            access_token: string;
+                            expires_in: number;
+                            refresh_token: string;
+                        };
+                    }>
+                >()
+                .mockImplementation(async (redirectUri, code) => {
+                    expect(redirectUri).toBe(capturedRedirectUri);
+                    expect(code).toBe("auth-code");
+
+                    return {
+                        result: {
+                            access_token: "access",
+                            expires_in: 3600,
+                            refresh_token: "refresh",
+                        },
+                    };
+                }),
         };
 
         openExternalMock.mockImplementation(async (url: string) => {
-            const authorizeUrl = new URL(url);
-            const state = authorizeUrl.searchParams.get("state");
-            const redirectUri = authorizeUrl.searchParams.get("redirect_uri");
+            expect(url).toContain("dropbox.com/oauth2/authorize");
 
-            expect(authorizeUrl.searchParams.get("client_id")).toBe("app-key");
-            expect(authorizeUrl.searchParams.get("response_type")).toBe("code");
-            expect(authorizeUrl.searchParams.get("token_access_type")).toBe(
-                "offline"
-            );
-
-            const scope = authorizeUrl.searchParams.get("scope") ?? "";
-            expect(scope).toContain("account_info.read");
-            expect(scope).toContain("files.content.read");
-
-            expect(state).toBeTruthy();
-            expect(redirectUri).toMatch(
+            expect(capturedState).toBeTruthy();
+            expect(capturedRedirectUri).toMatch(
                 /^http:\/\/127\.0\.0\.1:\d+\/oauth2\/callback$/v
             );
 
-            const callbackUrl = new URL(redirectUri!);
+            const callbackUrl = new URL(capturedRedirectUri!);
             callbackUrl.searchParams.set("code", "auth-code");
-            callbackUrl.searchParams.set("state", state!);
+            callbackUrl.searchParams.set("state", capturedState!);
 
             await httpGet(callbackUrl.toString());
 
@@ -91,7 +144,7 @@ describe(DropboxAuthFlow, () => {
 
         const flow = new DropboxAuthFlow({
             appKey: "app-key",
-            httpClient: httpClient as AxiosInstance,
+            authFactory: () => auth as never,
             loopbackPort: 0,
         });
 
@@ -101,26 +154,24 @@ describe(DropboxAuthFlow, () => {
         expect(tokens.refreshToken).toBe("refresh");
         expect(tokens.expiresAtEpochMs).toBeGreaterThan(Date.now());
 
-        expect(httpClient.post).toHaveBeenCalledTimes(1);
-        const postMock = httpClient.post as unknown as Mock;
-        const [tokenUrl, body] = postMock.mock.calls[0] ?? [];
-        expect(String(tokenUrl)).toContain("/oauth2/token");
-
-        const params = body as URLSearchParams;
-        expect(params.get("client_id")).toBe("app-key");
-        expect(params.get("code")).toBe("auth-code");
-        expect(params.get("grant_type")).toBe("authorization_code");
-        expect(params.get("redirect_uri")).toMatch(
-            /^http:\/\/127\.0\.0\.1:\d+\/oauth2\/callback$/v
-        );
-        expect(params.get("code_verifier")).toBeTruthy();
+        expect(auth.getAccessTokenFromCode).toHaveBeenCalledTimes(1);
 
         vi.useRealTimers();
     });
 
     it("rejects when the callback includes an error_description", async () => {
-        const httpClient: Pick<AxiosInstance, "post"> = {
-            post: vi.fn(),
+        const auth = {
+            setClientId: vi.fn(),
+            getAuthenticationUrl: vi.fn(async (
+                redirectUri: string,
+                state?: string
+            ) => {
+                const url = new URL("https://example.test");
+                url.searchParams.set("redirect_uri", redirectUri);
+                url.searchParams.set("state", state ?? "");
+                return url.toString();
+            }),
+            getAccessTokenFromCode: vi.fn(),
         };
 
         openExternalMock.mockImplementation(async (url: string) => {
@@ -138,19 +189,29 @@ describe(DropboxAuthFlow, () => {
 
         const flow = new DropboxAuthFlow({
             appKey: "app-key",
-            httpClient: httpClient as AxiosInstance,
+            authFactory: () => auth as never,
             loopbackPort: 0,
         });
 
         await expect(flow.connect({ timeoutMs: 5000 })).rejects.toThrowError(
             "Dropbox OAuth error: denied"
         );
-        expect(httpClient.post).not.toHaveBeenCalled();
+        expect(auth.getAccessTokenFromCode).not.toHaveBeenCalled();
     });
 
     it("rejects when the callback state does not match", async () => {
-        const httpClient: Pick<AxiosInstance, "post"> = {
-            post: vi.fn(),
+        const auth = {
+            setClientId: vi.fn(),
+            getAuthenticationUrl: vi.fn(async (
+                redirectUri: string,
+                state?: string
+            ) => {
+                const url = new URL("https://example.test");
+                url.searchParams.set("redirect_uri", redirectUri);
+                url.searchParams.set("state", state ?? "");
+                return url.toString();
+            }),
+            getAccessTokenFromCode: vi.fn(),
         };
 
         openExternalMock.mockImplementation(async (url: string) => {
@@ -167,13 +228,13 @@ describe(DropboxAuthFlow, () => {
 
         const flow = new DropboxAuthFlow({
             appKey: "app-key",
-            httpClient: httpClient as AxiosInstance,
+            authFactory: () => auth as never,
             loopbackPort: 0,
         });
 
         await expect(flow.connect({ timeoutMs: 5000 })).rejects.toThrowError(
             "Dropbox OAuth state mismatch"
         );
-        expect(httpClient.post).not.toHaveBeenCalled();
+        expect(auth.getAccessTokenFromCode).not.toHaveBeenCalled();
     });
 });

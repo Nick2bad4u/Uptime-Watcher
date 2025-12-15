@@ -171,6 +171,7 @@ const createMockSitesStore = (
     selectedMonitorIds: {},
     selectedSiteIdentifier: undefined,
     sites: [],
+    sitesRevision: 0,
     statusSubscriptionSummary: undefined,
     lastBackupMetadata: undefined,
     lastSyncDelta: undefined,

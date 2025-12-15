@@ -174,6 +174,7 @@ const createMockSitesStoreState = (sites: Site[]): SitesStore => {
         lastBackupMetadata: createSerializedBackupResult().metadata,
         lastSyncDelta: undefined,
         sites,
+        sitesRevision: 0,
     };
 };
 

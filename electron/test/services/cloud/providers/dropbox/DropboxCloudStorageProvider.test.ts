@@ -1,5 +1,3 @@
-import type { AxiosInstance } from "axios";
-
 import { describe, expect, it, vi } from "vitest";
 
 import { DropboxCloudStorageProvider } from "@electron/services/cloud/providers/dropbox/DropboxCloudStorageProvider";
@@ -10,42 +8,38 @@ describe(DropboxCloudStorageProvider, () => {
             getAccessToken: vi.fn().mockResolvedValue("token"),
         };
 
-        const httpApi: Pick<AxiosInstance, "post"> = {
-            post: vi.fn().mockImplementation(async (url: string) => {
-                if (url.endsWith("/2/files/list_folder")) {
-                    return {
-                        data: {
-                            entries: [
-                                {
-                                    ".tag": "file",
-                                    path_display:
-                                        "/uptime-watcher/sync/a.ndjson",
-                                    server_modified: "2025-01-01T00:00:00Z",
-                                    size: 10,
-                                },
-                                {
-                                    ".tag": "file",
-                                    path_display:
-                                        "/uptime-watcher/backups/b.sqlite",
-                                    server_modified: "2025-01-01T00:00:00Z",
-                                    size: 20,
-                                },
-                            ],
-                            has_more: false,
-                        },
-                    };
-                }
-
-                if (url.endsWith("/2/users/get_current_account")) {
-                    return { data: {} };
-                }
-
-                throw new Error(`Unexpected URL: ${url}`);
-            }),
-        };
+        const filesListFolder = vi.fn().mockResolvedValue({
+            result: {
+                cursor: "cursor",
+                entries: [
+                    {
+                        ".tag": "file",
+                        path_display: "/uptime-watcher/sync/a.ndjson",
+                        server_modified: "2025-01-01T00:00:00Z",
+                        size: 10,
+                    },
+                    {
+                        ".tag": "file",
+                        path_display: "/uptime-watcher/backups/b.sqlite",
+                        server_modified: "2025-01-01T00:00:00Z",
+                        size: 20,
+                    },
+                ],
+                has_more: false,
+            },
+        });
 
         const provider = new DropboxCloudStorageProvider({
-            httpApi: httpApi as AxiosInstance,
+            clientFactory: () =>
+                ({
+                    filesListFolder,
+                    filesListFolderContinue: vi.fn(),
+                    filesUpload: vi.fn(),
+                    filesDownload: vi.fn(),
+                    filesDeleteV2: vi.fn(),
+                    usersGetCurrentAccount: vi.fn(),
+                    authTokenRevoke: vi.fn(),
+                }) as never,
             tokenManager: tokenManager as never,
         });
 
@@ -60,19 +54,26 @@ describe(DropboxCloudStorageProvider, () => {
             getAccessToken: vi.fn().mockResolvedValue("token"),
         };
 
-        const httpContent: Pick<AxiosInstance, "post"> = {
-            post: vi.fn().mockResolvedValue({
-                data: {
-                    ".tag": "file",
-                    path_display: "/uptime-watcher/sync/foo.txt",
-                    server_modified: "2025-01-01T00:00:00Z",
-                    size: 3,
-                },
-            }),
-        };
+        const filesUpload = vi.fn().mockResolvedValue({
+            result: {
+                ".tag": "file",
+                path_display: "/uptime-watcher/sync/foo.txt",
+                server_modified: "2025-01-01T00:00:00Z",
+                size: 3,
+            },
+        });
 
         const provider = new DropboxCloudStorageProvider({
-            httpContent: httpContent as AxiosInstance,
+            clientFactory: () =>
+                ({
+                    filesListFolder: vi.fn(),
+                    filesListFolderContinue: vi.fn(),
+                    filesUpload,
+                    filesDownload: vi.fn(),
+                    filesDeleteV2: vi.fn(),
+                    usersGetCurrentAccount: vi.fn(),
+                    authTokenRevoke: vi.fn(),
+                }) as never,
             tokenManager: tokenManager as never,
         });
 
@@ -84,20 +85,13 @@ describe(DropboxCloudStorageProvider, () => {
 
         expect(entry.key).toBe("sync/foo.txt");
         expect(entry.sizeBytes).toBe(3);
-        expect(httpContent.post).toHaveBeenCalledTimes(1);
 
-        const call = (
-            httpContent.post as unknown as { mock: { calls: unknown[] } }
-        ).mock.calls[0] as [
-            string,
-            Buffer,
-            { headers?: Record<string, string> },
-        ];
+        expect(filesUpload).toHaveBeenCalledTimes(1);
 
-        const headers = call[2].headers ?? {};
-        const arg = headers["Dropbox-API-Arg"];
-        expect(arg).toBeTypeOf("string");
-        const parsed = JSON.parse(arg as string) as { mode?: string };
-        expect(parsed.mode).toBe("overwrite");
+        const call = filesUpload.mock.calls[0]?.[0] as {
+            mode?: { ".tag"?: string };
+        };
+
+        expect(call.mode?.[".tag"]).toBe("overwrite");
     });
 });

@@ -21,6 +21,7 @@ export const WAIT_TIMEOUTS = {
     SHORT: 2000,
     MEDIUM: 5000,
     LONG: 20000,
+    VERY_LONG: 60000,
     MODAL_ANIMATION: 1000,
     APP_INITIALIZATION: 30000, // Increased from 15000 to 30000 for complex database loading
 } as const;
@@ -30,21 +31,7 @@ export const WAIT_TIMEOUTS = {
  */
 const UI_STABILIZATION_DELAYS = {
     /** Header buttons animate for a few frames when the modal toggles. */
-    ADD_SITE_BUTTON_MS: 150,
-} as const;
-
-/**
- * Selectors for common UI elements in the application.
- */
-export const UI_SELECTORS = {
-    APP_CONTAINER: '[data-testid="app-container"]',
-    DASHBOARD_CONTAINER: '[data-testid="site-list"]',
-    ADD_SITE_BUTTON: 'button[aria-label="Add new site"]',
-    MODAL_OVERLAY: ".modal-overlay",
-    MODAL_DIALOG: '.modal-overlay dialog, .modal-overlay [role="dialog"]', // Look for dialog within overlay
-    SETTINGS_BUTTON: 'button[aria-label="Settings"]',
-    THEME_TOGGLE: 'button[aria-label="Toggle theme"]',
-    CLOSE_MODAL_BUTTON: 'button[aria-label="Close modal"]',
+    ADD_SITE_BUTTON_MS: 500,
 } as const;
 
 /**
@@ -592,18 +579,20 @@ export async function getAddSiteFormElements(page: Page): Promise<{
     submitButton: Locator;
 }> {
     // Ensure modal is open first
-    await expect(page.getByRole("dialog")).toBeVisible();
+    const dialog = page.getByRole("dialog");
+    await expect(dialog).toBeVisible();
 
-    const siteNameInput = page
-        .getByLabel(/Site Name/i)
-        .or(page.getByPlaceholder(/Website/i));
-    const siteUrlInput = page
+    // Prefer specific labels. Avoid ambiguous `.or(...)` unions here: if both
+    // sides match, Playwright can act on the wrong element depending on DOM
+    // order.
+    const siteNameInput = dialog.getByLabel(/Site Name/i);
+    const siteUrlInput = dialog
         .getByLabel(/URL/i)
-        .or(page.getByRole("textbox", { name: /url/i }));
-    const monitorTypeSelect = page.getByLabel(/Monitor Type/i);
-    const submitButton = page.getByRole("button", {
-        name: /Add Site|Create|Submit/i,
-    });
+        .or(dialog.getByRole("textbox", { name: /url/i }));
+    const monitorTypeSelect = dialog.getByLabel(/Monitor Type/i);
+    const submitButton = dialog
+        .getByTestId("add-site-submit")
+        .or(dialog.getByRole("button", { name: /Add Site|Create|Submit/i }));
 
     return {
         siteNameInput,
@@ -635,7 +624,9 @@ export async function fillAddSiteForm(
     }
 ): Promise<void> {
     const formElements = await getAddSiteFormElements(page);
-    const modalForm = page.getByRole("form", { name: /Add Site Form/i });
+    const modalForm = page
+        .getByRole("dialog")
+        .getByRole("form", { name: /Add Site Form/i });
 
     // Fill site name
     await formElements.siteNameInput.fill(siteData.name);
@@ -685,26 +676,16 @@ export async function fillAddSiteForm(
  */
 export async function submitAddSiteForm(page: Page): Promise<void> {
     const formElements = await getAddSiteFormElements(page);
-    const nameValue = await formElements.siteNameInput.inputValue();
-    console.log(
-        `[Playwright] Site name input before submit: ${nameValue ?? "<empty>"}`
-    );
 
     // Click submit button
     await formElements.submitButton.click();
 
-    // Wait for modal to close (indicates success). Some flows may keep the
-    // dialog mounted briefly for exit animations, so treat visibility timeouts
-    // as non-fatal once the subsequent card/monitor assertions succeed.
-    await page
-        .getByTestId("add-site-modal")
-        .waitFor({ state: "hidden", timeout: WAIT_TIMEOUTS.LONG })
-        .catch((error) => {
-            console.warn(
-                "[Playwright] Add site modal did not fully hide within the expected time; continuing after submit",
-                error
-            );
-        });
+    // Wait for modal to close (indicates success). If it doesn't close, the
+    // submission failed and tests should fail immediately.
+    await page.getByTestId("add-site-modal").waitFor({
+        state: "hidden",
+        timeout: WAIT_TIMEOUTS.LONG,
+    });
 }
 
 /**

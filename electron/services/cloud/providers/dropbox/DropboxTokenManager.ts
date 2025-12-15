@@ -1,23 +1,23 @@
-import axios, { type AxiosInstance } from "axios";
-import * as z from "zod";
+import { Dropbox, DropboxAuth } from "dropbox";
 
 import type { SecretStore } from "../../secrets/SecretStore";
 
 import { withDropboxRetry } from "./dropboxRetry";
 import { type DropboxTokens, parseDropboxTokens } from "./DropboxTokens";
 
-const DROPBOX_TOKEN_ENDPOINT =
-    "https://api.dropboxapi.com/oauth2/token" as const;
-
 const TOKEN_REFRESH_SAFETY_WINDOW_MS = 60_000;
-
-const dropboxRefreshResponseSchema = z.looseObject({
-    access_token: z.string().min(1),
-    expires_in: z.number().positive(),
-});
 
 function nowEpochMs(): number {
     return Date.now();
+}
+
+function isThenable(value: unknown): value is PromiseLike<unknown> {
+    return (
+        typeof value === "object" &&
+        value !== null &&
+        "then" in value &&
+        typeof (value as { then?: unknown }).then === "function"
+    );
 }
 
 /**
@@ -26,11 +26,27 @@ function nowEpochMs(): number {
 export class DropboxTokenManager {
     private readonly appKey: string;
 
-    private readonly http: AxiosInstance;
-
     private readonly secretStore: SecretStore;
 
     private readonly tokenStorageKey: string;
+
+    private readonly authFactory: (tokens: DropboxTokens) => Pick<
+        Omit<DropboxAuth, "refreshAccessToken"> & {
+            refreshAccessToken: () => unknown;
+        },
+        | "getAccessToken"
+        | "getAccessTokenExpiresAt"
+        | "getRefreshToken"
+        | "refreshAccessToken"
+        | "setAccessToken"
+        | "setAccessTokenExpiresAt"
+        | "setClientId"
+        | "setRefreshToken"
+    >;
+
+    private readonly clientFactory: (
+        accessToken: string
+    ) => Pick<Dropbox, "authTokenRevoke">;
 
     public async getStoredTokens(): Promise<DropboxTokens | undefined> {
         const raw = await this.secretStore.getSecret(this.tokenStorageKey);
@@ -70,42 +86,112 @@ export class DropboxTokenManager {
     }
 
     public async refreshTokens(tokens: DropboxTokens): Promise<DropboxTokens> {
-        const body = new URLSearchParams({
-            client_id: this.appKey,
-            grant_type: "refresh_token",
-            refresh_token: tokens.refreshToken,
-        });
+        const auth = this.authFactory(tokens);
 
-        const response = await withDropboxRetry({
-            fn: async () =>
-                this.http.post(DROPBOX_TOKEN_ENDPOINT, body, {
-                    headers: {
-                        "Content-Type": "application/x-www-form-urlencoded",
-                    },
-                }),
+        await withDropboxRetry({
+            fn: async () => {
+                // Dropbox SDK types currently declare refreshAccessToken(): void,
+                // but the implementation returns a Promise. Treat the return as
+                // unknown and await if it is thenable.
+                const maybePromise = auth.refreshAccessToken();
+                if (isThenable(maybePromise)) {
+                    await maybePromise;
+                }
+            },
             operationName: "oauth2/token refresh",
         });
 
-        const parsed = dropboxRefreshResponseSchema.parse(
-            response.data as unknown
-        );
+        const accessToken = auth.getAccessToken();
+        const expiresAt = auth.getAccessTokenExpiresAt();
+
+        if (!accessToken || typeof accessToken !== "string") {
+            throw new Error("Dropbox refresh did not return an access token");
+        }
+
+        if (
+            !(expiresAt instanceof Date) ||
+            !Number.isFinite(expiresAt.getTime())
+        ) {
+            throw new TypeError(
+                "Dropbox refresh did not return a valid access token expiration"
+            );
+        }
 
         return {
-            accessToken: parsed.access_token,
-            expiresAtEpochMs: nowEpochMs() + parsed.expires_in * 1000,
+            accessToken,
+            expiresAtEpochMs: expiresAt.getTime(),
             refreshToken: tokens.refreshToken,
         };
     }
 
+    /**
+     * Revokes the currently stored access token (and corresponding refresh
+     * token) via Dropbox's `/2/auth/token/revoke` endpoint.
+     *
+     * @remarks
+     * This is best-effort. Disconnect should still succeed even if the network
+     * is unavailable.
+     */
+    public async revokeStoredTokens(): Promise<void> {
+        const tokens = await this.getStoredTokens();
+        if (!tokens) {
+            return;
+        }
+
+        try {
+            const accessToken = await this.getAccessToken();
+            const client = this.clientFactory(accessToken);
+            await withDropboxRetry({
+                fn: async () => {
+                    await client.authTokenRevoke();
+                },
+                operationName: "auth/token/revoke",
+            });
+        } catch {
+            // Best-effort: ignore token revoke failures.
+        }
+    }
+
     public constructor(args: {
         appKey: string;
-        http?: AxiosInstance;
+        authFactory?: (
+            tokens: DropboxTokens
+        ) => Pick<
+            DropboxAuth,
+            | "getAccessToken"
+            | "getAccessTokenExpiresAt"
+            | "getRefreshToken"
+            | "refreshAccessToken"
+            | "setAccessToken"
+            | "setAccessTokenExpiresAt"
+            | "setClientId"
+            | "setRefreshToken"
+        >;
+        clientFactory?: (
+            accessToken: string
+        ) => Pick<Dropbox, "authTokenRevoke">;
         secretStore: SecretStore;
         tokenStorageKey: string;
     }) {
         this.appKey = args.appKey;
         this.secretStore = args.secretStore;
         this.tokenStorageKey = args.tokenStorageKey;
-        this.http = args.http ?? axios.create();
+
+        this.authFactory =
+            args.authFactory ??
+            ((tokens): DropboxAuth =>
+                new DropboxAuth({
+                    accessToken: tokens.accessToken,
+                    accessTokenExpiresAt: new Date(tokens.expiresAtEpochMs),
+                    clientId: this.appKey,
+                    refreshToken: tokens.refreshToken,
+                }));
+
+        this.clientFactory =
+            args.clientFactory ??
+            ((accessToken): Dropbox =>
+                new Dropbox({
+                    accessToken,
+                }));
     }
 }

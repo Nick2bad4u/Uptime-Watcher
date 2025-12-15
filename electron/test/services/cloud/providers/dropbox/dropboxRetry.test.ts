@@ -1,4 +1,5 @@
 import { AxiosError, type AxiosResponse } from "axios";
+import { DropboxResponseError } from "dropbox";
 import { describe, expect, it, vi } from "vitest";
 
 import { withDropboxRetry } from "@electron/services/cloud/providers/dropbox/dropboxRetry";
@@ -93,6 +94,37 @@ describe(withDropboxRetry, () => {
         ).rejects.toBeInstanceOf(Error);
 
         expect(fn).toHaveBeenCalledTimes(1);
+
+        vi.useRealTimers();
+    });
+
+    it("retries on DropboxResponseError 429", async () => {
+        vi.useFakeTimers();
+
+        const error = new DropboxResponseError(
+            429,
+            { "retry-after": "1" },
+            {
+                error_summary: "rate_limit/..",
+            }
+        );
+
+        const fn = vi
+            .fn<() => Promise<string>>()
+            .mockRejectedValueOnce(error)
+            .mockResolvedValueOnce("ok");
+
+        const promise = withDropboxRetry({
+            fn,
+            operationName: "test",
+            maxAttempts: 3,
+            initialDelayMs: 10,
+            maxDelayMs: 50,
+        });
+
+        await vi.advanceTimersByTimeAsync(1000);
+        await expect(promise).resolves.toBe("ok");
+        expect(fn).toHaveBeenCalledTimes(2);
 
         vi.useRealTimers();
     });
