@@ -188,7 +188,14 @@ function parseNumberSetting(value: string | undefined): null | number {
  * Coordinates cloud provider configuration and remote backup operations.
  *
  * @remarks
- * This initial implementation supports a filesystem-backed provider only.
+ * This service supports multiple provider backends:
+ *
+ * - **Dropbox** (OAuth 2.0 Authorization Code + PKCE, loopback redirect)
+ * - **Filesystem** (user-selected base directory; useful for development or
+ *   delegating sync to a third-party sync client)
+ *
+ * Provider OAuth tokens and other secrets are stored via the {@link SecretStore}
+ * abstraction and must never be exposed to the renderer.
  */
 export class CloudService {
     private readonly orchestrator: UptimeOrchestrator;

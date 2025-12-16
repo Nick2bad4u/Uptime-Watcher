@@ -36,7 +36,7 @@ interface SettingsSectionProperties {
     readonly title: string;
 }
 
-const SettingsSection = ({
+export const SettingsSection = ({
     children,
     description,
     icon: SectionIcon,

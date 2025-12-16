@@ -1,4 +1,7 @@
-import type { NotificationPreferenceUpdate } from "@shared/types/notifications";
+import type {
+    AppNotificationRequest,
+    NotificationPreferenceUpdate,
+} from "@shared/types/notifications";
 
 import * as z from "zod";
 
@@ -42,3 +45,31 @@ export const parseNotificationPreferenceUpdate = (
     // safe to treat as the canonical NotificationPreferenceUpdate here.
     return parsed as NotificationPreferenceUpdate;
 };
+
+/**
+ * Canonical schema for generic app notification requests exchanged over IPC.
+ */
+export const appNotificationRequestSchema: z.ZodType<AppNotificationRequest> =
+    z
+        .object({
+            body: z.string().min(1).max(500).optional(),
+            title: z.string().min(1).max(120),
+        })
+        .strict();
+
+/**
+ * Validates a generic app notification request payload against the shared
+ * schema.
+ */
+export const validateAppNotificationRequest = (
+    value: unknown
+): ReturnType<typeof appNotificationRequestSchema.safeParse> =>
+    appNotificationRequestSchema.safeParse(value);
+
+/**
+ * Extracts a typed generic app notification request or throws with Zod issues
+ * attached.
+ */
+export const parseAppNotificationRequest = (
+    value: unknown
+): AppNotificationRequest => appNotificationRequestSchema.parse(value);

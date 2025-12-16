@@ -4,7 +4,6 @@ import {
     useCallback,
     useEffect,
     useMemo,
-    useState,
 } from "react";
 
 import { useConfirmDialog } from "../../hooks/ui/useConfirmDialog";
@@ -13,12 +12,10 @@ import {
     type CloudStoreState,
     useCloudStore,
 } from "../../stores/cloud/useCloudStore";
-import { ThemedButton } from "../../theme/components/ThemedButton";
 import { ThemedCheckbox } from "../../theme/components/ThemedCheckbox";
-import { ThemedInput } from "../../theme/components/ThemedInput";
 import { ThemedText } from "../../theme/components/ThemedText";
 import { AppIcons } from "../../utils/icons";
-import { CloudSection } from "./SettingsSections";
+import { CloudSection } from "./cloud/CloudSection";
 
 const selectBackups = (state: CloudStoreState): CloudStoreState["backups"] =>
     state.backups;
@@ -219,8 +216,6 @@ export const CloudSettingsSection = (): JSX.Element => {
     const isRefreshingRemoteSyncResetPreview = useCloudStore(
         selectIsRefreshingRemoteSyncResetPreview
     );
-
-    const [filesystemBaseDirectory, setFilesystemBaseDirectory] = useState("");
 
     const fireAndForget = useCallback((
         action: () => Promise<unknown>
@@ -558,27 +553,19 @@ export const CloudSettingsSection = (): JSX.Element => {
         [fireAndForget, refreshRemoteSyncResetPreview]
     );
 
-    const handleFilesystemBaseDirectoryChange = useCallback((
-        event: ChangeEvent<HTMLInputElement>
-    ): void => {
-        setFilesystemBaseDirectory(event.target.value);
-    }, []);
+    const handleConfigureFilesystemProvider = useCallback(
+        (baseDirectory: string): void => {
+            const trimmed = baseDirectory.trim();
+            if (!trimmed) {
+                return;
+            }
 
-    const handleConfigureFilesystemProvider = useCallback((): void => {
-        const baseDirectory = filesystemBaseDirectory.trim();
-        if (!baseDirectory) {
-            return;
-        }
-
-        fireAndForget(async () => {
-            await configureFilesystemProvider({ baseDirectory });
-            setFilesystemBaseDirectory("");
-        });
-    }, [
-        configureFilesystemProvider,
-        filesystemBaseDirectory,
-        fireAndForget,
-    ]);
+            fireAndForget(() =>
+                configureFilesystemProvider({ baseDirectory: trimmed })
+            );
+        },
+        [configureFilesystemProvider, fireAndForget]
+    );
 
     const syncEnabled = status?.syncEnabled ?? false;
     const connected = status?.connected ?? false;
@@ -606,49 +593,14 @@ export const CloudSettingsSection = (): JSX.Element => {
     );
 
     return (
-        <>
-            {import.meta.env.DEV ? (
-                <div className="mb-4 rounded-lg border border-zinc-800 bg-zinc-900/40 p-4">
-                    <ThemedText size="sm" variant="secondary" weight="medium">
-                        Filesystem provider (dev-only)
-                    </ThemedText>
-                    <ThemedText className="mt-1" size="xs" variant="tertiary">
-                        Configure the local filesystem cloud provider by
-                        specifying a base directory path. This panel is only
-                        available in dev builds.
-                    </ThemedText>
-
-                    <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-center">
-                        <div className="flex-1">
-                            <ThemedInput
-                                aria-label="Filesystem provider base directory"
-                                onChange={handleFilesystemBaseDirectoryChange}
-                                placeholder="C:\\Path\\To\\CloudStorage"
-                                value={filesystemBaseDirectory}
-                            />
-                        </div>
-                        <ThemedButton
-                            disabled={
-                                isConfiguringFilesystemProvider ||
-                                filesystemBaseDirectory.trim().length === 0
-                            }
-                            onClick={handleConfigureFilesystemProvider}
-                            size="sm"
-                            variant="secondary"
-                        >
-                            {isConfiguringFilesystemProvider
-                                ? "Configuring…"
-                                : "Use folder"}
-                        </ThemedButton>
-                    </div>
-                </div>
-            ) : null}
-
-            <CloudSection
+        <CloudSection
                 backups={backups}
                 deletingBackupKey={deletingBackupKey}
                 icon={AppIcons.ui.cloud}
                 isClearingEncryptionKey={isClearingEncryptionKey}
+                isConfiguringFilesystemProvider={
+                    isConfiguringFilesystemProvider
+                }
                 isConnectingDropbox={isConnectingDropbox}
                 isDisconnecting={isDisconnecting}
                 isListingBackups={isListingBackups}
@@ -664,6 +616,9 @@ export const CloudSettingsSection = (): JSX.Element => {
                 lastBackupMigrationResult={lastBackupMigrationResult}
                 lastRemoteSyncResetResult={lastRemoteSyncResetResult}
                 onClearEncryptionKey={handleClearEncryptionKey}
+                onConfigureFilesystemProvider={
+                    handleConfigureFilesystemProvider
+                }
                 onConnectDropbox={handleConnectDropbox}
                 onDeleteBackup={handleDeleteBackup}
                 onDisconnect={handleDisconnect}
@@ -688,6 +643,5 @@ export const CloudSettingsSection = (): JSX.Element => {
                 status={status}
                 syncEnabledControl={syncEnabledControl}
             />
-        </>
     );
 };

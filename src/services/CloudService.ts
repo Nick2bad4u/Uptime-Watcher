@@ -8,8 +8,13 @@
  * preload bridge directly.
  *
  * The initial implementation supports a filesystem-backed provider owned by
- * Electron main. This enables users to point Uptime Watcher at an existing
- * synced folder (Dropbox/Google Drive/etc.) without embedding OAuth flows.
+ * Electron main as well as a first-class Dropbox provider.
+ *
+ * - **Dropbox** uses OAuth 2.0 Authorization Code + PKCE and runs entirely in
+ *   Electron main (system browser + loopback redirect). No OAuth tokens are
+ *   ever exposed to the renderer.
+ * - **Filesystem** allows users to point Uptime Watcher at an existing synced
+ *   folder (Dropbox/Google Drive/etc.) without embedding OAuth flows.
  *
  * @packageDocumentation
  */

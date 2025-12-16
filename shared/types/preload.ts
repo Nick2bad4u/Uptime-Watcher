@@ -163,10 +163,12 @@ export type MonitorTypesDomainBridge = DomainBridge<
  * @internal
  */
 interface NotificationsChannelMap {
+    readonly notifyAppEvent: "notify-app-event";
     readonly updatePreferences: "update-notification-preferences";
 }
 
 const NOTIFICATION_CHANNELS_DEFINITION: NotificationsChannelMap = {
+    notifyAppEvent: "notify-app-event",
     updatePreferences: "update-notification-preferences",
 };
 

@@ -19,6 +19,8 @@ import type { CloudSyncResetResult } from "@shared/types/cloudSyncReset";
 
 import type { CloudStoreState } from "../../../stores/cloud/useCloudStore";
 
+import { useAlertStore } from "../../../stores/alerts/useAlertStore";
+
 const cloudServiceMock = vi.hoisted(() => ({
     CloudService: {
         clearEncryptionKey: vi.fn<() => Promise<CloudStatusSummary>>(),
@@ -103,6 +105,8 @@ describe(useCloudStore, () => {
     beforeEach(() => {
         vi.clearAllMocks();
 
+        useAlertStore.getState().clearToasts();
+
         // Reset store to a stable baseline.
         useCloudStore.setState(
             {
@@ -144,6 +148,10 @@ describe(useCloudStore, () => {
         const promise = useCloudStore.getState().connectDropbox();
         expect(useCloudStore.getState().isConnectingDropbox).toBeTruthy();
 
+        const [startedToast] = useAlertStore.getState().toasts;
+        expect(startedToast?.variant).toBe("info");
+        expect(startedToast?.title).toBe("Connecting Dropbox");
+
         deferred.resolve({
             ...baseStatus,
             provider: "dropbox",
@@ -153,6 +161,25 @@ describe(useCloudStore, () => {
 
         expect(useCloudStore.getState().isConnectingDropbox).toBeFalsy();
         expect(useCloudStore.getState().status?.provider).toBe("dropbox");
+
+        const [toast] = useAlertStore.getState().toasts;
+        expect(toast?.variant).toBe("success");
+        expect(toast?.title).toBe("Dropbox connected");
+    });
+
+    it("connectDropbox enqueues an error toast on failure", async () => {
+        cloudServiceMock.CloudService.connectDropbox.mockRejectedValue(
+            new Error("boom")
+        );
+
+        await expect(useCloudStore.getState().connectDropbox()).rejects.toThrowError(
+            "boom"
+        );
+
+        const [toast] = useAlertStore.getState().toasts;
+        expect(toast?.variant).toBe("error");
+        expect(toast?.title).toBe("Failed to connect Dropbox");
+        expect(toast?.message).toContain("boom");
     });
 
     it("disconnect clears backups and updates status", async () => {
@@ -282,6 +309,10 @@ describe(useCloudStore, () => {
         );
         expect(useCloudStore.getState().status?.lastSyncAt).toBe(123);
         expect(useCloudStore.getState().isRequestingSyncNow).toBeFalsy();
+
+            const [toast] = useAlertStore.getState().toasts;
+            expect(toast?.variant).toBe("success");
+            expect(toast?.title).toBe("Sync complete");
     });
 
     it("uploadLatestBackup refreshes status and backups, and tolerates listBackups failures", async () => {
@@ -328,6 +359,10 @@ describe(useCloudStore, () => {
             "existing.sqlite"
         );
         expect(useCloudStore.getState().isUploadingBackup).toBeFalsy();
+
+            const [toast] = useAlertStore.getState().toasts;
+            expect(toast?.variant).toBe("success");
+            expect(toast?.title).toBe("Backup uploaded");
     });
 
     it("restoreBackup tracks restoringBackupKey and refreshes state", async () => {
@@ -358,6 +393,10 @@ describe(useCloudStore, () => {
             cloudServiceMock.CloudService.restoreBackup
         ).toHaveBeenCalledWith("backups/1.sqlite");
         expect(cloudServiceMock.CloudService.getStatus).toHaveBeenCalled();
+
+            const [toast] = useAlertStore.getState().toasts;
+            expect(toast?.variant).toBe("success");
+            expect(toast?.title).toBe("Backup restored");
     });
 
     it("setEncryptionPassphrase toggles busy flag and updates status", async () => {
@@ -420,7 +459,10 @@ describe(useCloudStore, () => {
             target: "encrypted",
         };
 
-        cloudServiceMock.CloudService.migrateBackups.mockResolvedValue(result);
+        const deferred = createDeferred<CloudBackupMigrationResult>();
+        cloudServiceMock.CloudService.migrateBackups.mockReturnValue(
+            deferred.promise
+        );
         cloudServiceMock.CloudService.getStatus.mockResolvedValue({
             ...baseStatus,
             connected: true,
@@ -428,10 +470,17 @@ describe(useCloudStore, () => {
         });
         cloudServiceMock.CloudService.listBackups.mockResolvedValue([]);
 
-        await useCloudStore.getState().migrateBackups({
+        const promise = useCloudStore.getState().migrateBackups({
             deleteSource: false,
             target: "encrypted",
         });
+
+        const [startedToast] = useAlertStore.getState().toasts;
+        expect(startedToast?.variant).toBe("info");
+        expect(startedToast?.title).toBe("Migrating backups");
+
+        deferred.resolve(result);
+        await promise;
 
         expect(useCloudStore.getState().isMigratingBackups).toBeFalsy();
         expect(useCloudStore.getState().lastBackupMigrationResult).toEqual(
@@ -443,6 +492,10 @@ describe(useCloudStore, () => {
             deleteSource: false,
             target: "encrypted",
         });
+
+        const [toast] = useAlertStore.getState().toasts;
+        expect(toast?.variant).toBe("success");
+        expect(toast?.title).toBe("Backups encrypted");
     });
 
     it("refreshRemoteSyncResetPreview stores preview and returns it", async () => {
@@ -506,8 +559,9 @@ describe(useCloudStore, () => {
             },
         });
 
-        cloudServiceMock.CloudService.resetRemoteSyncState.mockResolvedValue(
-            result
+        const deferred = createDeferred<CloudSyncResetResult>();
+        cloudServiceMock.CloudService.resetRemoteSyncState.mockReturnValue(
+            deferred.promise
         );
         cloudServiceMock.CloudService.getStatus.mockResolvedValue({
             ...baseStatus,
@@ -516,12 +570,23 @@ describe(useCloudStore, () => {
         });
         cloudServiceMock.CloudService.listBackups.mockResolvedValue([]);
 
-        await useCloudStore.getState().resetRemoteSyncState();
+        const promise = useCloudStore.getState().resetRemoteSyncState();
+
+        const [startedToast] = useAlertStore.getState().toasts;
+        expect(startedToast?.variant).toBe("info");
+        expect(startedToast?.title).toBe("Resetting remote sync");
+
+        deferred.resolve(result);
+        await promise;
 
         expect(useCloudStore.getState().remoteSyncResetPreview).toBeNull();
         expect(useCloudStore.getState().lastRemoteSyncResetResult).toEqual(
             result
         );
         expect(useCloudStore.getState().isResettingRemoteSyncState).toBeFalsy();
+
+        const [toast] = useAlertStore.getState().toasts;
+        expect(toast?.variant).toBe("success");
+        expect(toast?.title).toBe("Remote sync reset");
     });
 });

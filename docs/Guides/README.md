@@ -24,6 +24,9 @@ docs/Guides/
 ├── README.md                              # This file
 ├── API_DOCUMENTATION.md                   # IPC interfaces and communication patterns
 ├── CLOUD_SYNC_DROPBOX_SETUP.md             # Dropbox OAuth + setup guide (no backend)
+├── CLOUD_SYNC_GOOGLE_DRIVE_SETUP.md        # Google Drive provider planning guide (coming soon)
+├── CLOUD_SYNC_ONEDRIVE_SETUP.md            # OneDrive provider planning guide (coming soon)
+├── CLOUD_PROVIDER_IMPLEMENTATION_GUIDE.md  # Developer guide for adding providers
 ├── DEVELOPER_QUICK_START.md               # Fast developer setup guide
 ├── DOCUMENTATION_INDEX.md                 # Complete documentation navigation hub
 ├── DOCUSAURUS_SETUP_GUIDE.md              # Documentation site setup

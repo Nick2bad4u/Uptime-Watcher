@@ -8,7 +8,10 @@
 
 /* eslint-disable ex/no-unhandled -- Preload bridges propagate errors to the caller */
 
-import type { NotificationPreferenceUpdate } from "@shared/types/notifications";
+import type {
+    AppNotificationRequest,
+    NotificationPreferenceUpdate,
+} from "@shared/types/notifications";
 
 import { NOTIFICATION_CHANNELS } from "@shared/types/preload";
 
@@ -20,6 +23,15 @@ import { createVoidInvoker } from "../core/bridgeFactory";
  * @public
  */
 export interface NotificationsApiInterface {
+    /**
+     * Requests a generic app notification from the main process.
+     *
+     * @remarks
+     * Intended for user-initiated operations (e.g. cloud backup/sync actions).
+     * The main process applies user preferences and platform support checks.
+     */
+    notifyAppEvent: (request: AppNotificationRequest) => Promise<void>;
+
     /**
      * Updates the system notification preferences stored in the main process.
      *
@@ -36,6 +48,7 @@ export interface NotificationsApiInterface {
  * @public
  */
 export const notificationsApi: NotificationsApiInterface = {
+    notifyAppEvent: createVoidInvoker(NOTIFICATION_CHANNELS.notifyAppEvent),
     updatePreferences: createVoidInvoker(
         NOTIFICATION_CHANNELS.updatePreferences
     ),

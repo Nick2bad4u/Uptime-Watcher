@@ -6,8 +6,11 @@
  * level that is safe to share across the renderer, preload, and Electron main
  * process.
  *
- * The initial implementation supports a filesystem-backed provider (useful for
- * development and for targeting synced folders such as Dropbox/Drive).
+ * The current implementation supports:
+ *
+ * - a filesystem-backed provider (useful for development and for targeting
+ *   synced folders such as Dropbox/Drive)
+ * - a first-class Dropbox provider (OAuth + PKCE handled in Electron main)
  *
  * Provider-specific OAuth tokens and secrets must never appear in this module.
  */

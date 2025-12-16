@@ -14,6 +14,7 @@ import { InMemorySecretStore } from "../../utils/InMemorySecretStore";
 
 // Use vi.hoisted to fix hoisting issues with mocks
 const mockNotificationService = {
+    notifyAppEvent: vi.fn(),
     updateConfig: vi.fn(),
 };
 
@@ -378,6 +379,25 @@ describe(IpcService, () => {
                 enabled: false,
                 mutedSiteNotificationIdentifiers: [],
                 playSound: true,
+            });
+
+            const appNotifyHandlerEntry = mockIpcMain.handle.mock.calls.find(
+                ([channel]) => channel === "notify-app-event"
+            );
+
+            expect(appNotifyHandlerEntry).toBeDefined();
+
+            const appNotifyHandler = appNotifyHandlerEntry?.[1];
+            expect(typeof appNotifyHandler).toBe("function");
+
+            await (appNotifyHandler as any)(undefined, {
+                title: "Backup uploaded",
+                body: "backup.sqlite",
+            });
+
+            expect(mockNotificationService.notifyAppEvent).toHaveBeenCalledWith({
+                title: "Backup uploaded",
+                body: "backup.sqlite",
             });
         });
         it("should setup data handlers", async ({ task, annotate }) => {

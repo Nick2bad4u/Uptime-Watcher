@@ -1,7 +1,10 @@
 import type { IpcInvokeChannel } from "@shared/types/ipc";
 
 import { NOTIFICATION_CHANNELS } from "@shared/types/preload";
-import { parseNotificationPreferenceUpdate } from "@shared/validation/notifications";
+import {
+    parseAppNotificationRequest,
+    parseNotificationPreferenceUpdate,
+} from "@shared/validation/notifications";
 
 import type { NotificationService } from "../../notifications/NotificationService";
 
@@ -42,6 +45,17 @@ export function registerNotificationHandlers({
     notificationService,
     registeredHandlers,
 }: NotificationHandlersDependencies): void {
+    registerStandardizedIpcHandler(
+        NOTIFICATION_CHANNELS.notifyAppEvent,
+        withIgnoredIpcEvent((payload): undefined => {
+            const request = parseAppNotificationRequest(payload);
+            notificationService.notifyAppEvent(request);
+            return undefined;
+        }),
+        NotificationHandlerValidators.notifyAppEvent,
+        registeredHandlers
+    );
+
     registerStandardizedIpcHandler(
         NOTIFICATION_CHANNELS.updatePreferences,
         withIgnoredIpcEvent((payload): undefined => {

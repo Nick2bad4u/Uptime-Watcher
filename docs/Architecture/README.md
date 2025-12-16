@@ -3,7 +3,7 @@ schema: "../../config/schemas/doc-frontmatter.schema.json"
 title: "Architecture Documentation Index"
 summary: ">-"
 created: "2025-08-05"
-last_reviewed: "2025-12-04"
+last_reviewed: "2025-12-15"
 category: "guide"
 author: "Nick2bad4u"
 tags:
@@ -56,6 +56,11 @@ docs/Architecture/
 │   ├── ADR_014_LOGGING_TELEMETRY_AND_DIAGNOSTICS.md
 │   ├── ADR_015_CLOUD_SYNC_AND_REMOTE_BACKUP.md
 │   ├── ADR_016_MULTI_DEVICE_SYNC_MODEL.md
+│   ├── ADR_017_EXTERNAL_ALERT_INTEGRATIONS.md
+│   ├── ADR_018_MAINTENANCE_WINDOWS_AND_SILENCING.md
+│   ├── ADR_019_TEMPLATES_AND_BULK_OPERATIONS.md
+│   ├── ADR_020_SUPPORT_DIAGNOSTICS_BUNDLE.md
+│   ├── ADR_021_CLOUD_PROVIDER_SELECTION_AND_SETTINGS_UI.md
 │   └── ARCHITECTURE_DIAGRAM.md
 ├── generated/                   # Auto-generated reference artifacts
 │   └── IPC_CHANNEL_INVENTORY.md
@@ -117,6 +122,11 @@ flowchart TD
     ADRs --> ADR14["ADR-014 Logging & Diagnostics"]
     ADRs --> ADR15["ADR-015 Cloud Sync & Remote Backup"]
     ADRs --> ADR16["ADR-016 Multi-Device Sync Model"]
+    ADRs --> ADR17["ADR-017 External Alert Integrations"]
+    ADRs --> ADR18["ADR-018 Maintenance Windows & Silencing"]
+    ADRs --> ADR19["ADR-019 Templates & Bulk Operations"]
+    ADRs --> ADR20["ADR-020 Support Diagnostics Bundle"]
+    ADRs --> ADR21["ADR-021 Cloud Provider Selection UI"]
 
     Patterns --> PatternGuide["Development Patterns Guide"]
     Patterns --> ComponentProps["Component Props Standards"]
@@ -135,7 +145,7 @@ flowchart TD
 
     class Docs hub;
     class ADRs,Patterns,Templates,Standards,UsageGuides,Generated section;
-    class ADR1,ADR2,ADR3,ADR4,ADR5,ADR6,ADR7,ADR8,ADR9,ADR10,ADR11,ADR12,ADR13,ADR14,ADR15,ADR16,PatternGuide,ComponentProps,SiteLoading,InitImport,RepoTemplate,RepoTemplateClean,StoreTemplate,IPCTemplate,IPCDiagnosticsTemplate,SchedulerTemplate,EventChecklist,TsdocStandards,QuickStart,IPCInventory file;
+    class ADR1,ADR2,ADR3,ADR4,ADR5,ADR6,ADR7,ADR8,ADR9,ADR10,ADR11,ADR12,ADR13,ADR14,ADR15,ADR16,ADR17,ADR18,ADR19,ADR20,ADR21,PatternGuide,ComponentProps,SiteLoading,InitImport,RepoTemplate,RepoTemplateClean,StoreTemplate,IPCTemplate,IPCDiagnosticsTemplate,SchedulerTemplate,EventChecklist,TsdocStandards,QuickStart,IPCInventory file;
 ```
 
 ## 🏗️ Architecture Decision Records (ADRs)

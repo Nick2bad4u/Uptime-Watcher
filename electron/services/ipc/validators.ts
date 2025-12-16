@@ -13,7 +13,10 @@
  */
 
 import { isRecord } from "@shared/utils/typeHelpers";
-import { validateNotificationPreferenceUpdate } from "@shared/validation/notifications";
+import {
+    validateAppNotificationRequest,
+    validateNotificationPreferenceUpdate,
+} from "@shared/validation/notifications";
 
 import type { IpcParameterValidator } from "./types";
 
@@ -91,6 +94,7 @@ interface MonitorTypeHandlerValidatorsInterface {
  * Interface for notification handler validators.
  */
 interface NotificationHandlerValidatorsInterface {
+    notifyAppEvent: IpcParameterValidator;
     updatePreferences: IpcParameterValidator;
 }
 
@@ -412,6 +416,25 @@ function validateNotificationPreferences(
     }
 
     const validationResult = validateNotificationPreferenceUpdate(preferences);
+    if (validationResult.success) {
+        return null;
+    }
+
+    return validationResult.error.issues.map((issue) => issue.message);
+}
+
+function validateNotifyAppEvent(params: readonly unknown[]): null | string[] {
+    if (params.length !== 1) {
+        return ["Expected exactly 1 parameter"];
+    }
+
+    const [request] = params;
+    const objectError = IpcValidators.requiredObject(request, "request");
+    if (objectError) {
+        return [objectError];
+    }
+
+    const validationResult = validateAppNotificationRequest(request);
     if (validationResult.success) {
         return null;
     }
@@ -746,7 +769,7 @@ export const DataHandlerValidators: DataHandlerValidatorsInterface = {
 export const CloudHandlerValidators: CloudHandlerValidatorsInterface = {
     clearEncryptionKey: createNoParamsValidator(),
     configureFilesystemProvider: validateCloudFilesystemProviderConfig,
-    connectDropbox: createNoParamsValidator(), // Added connectDropbox validator implementation
+    connectDropbox: createNoParamsValidator(),
     deleteBackup: createSingleStringValidator("key"),
     disconnect: createNoParamsValidator(),
     enableSync: validateCloudEnableSyncConfig,
@@ -854,6 +877,7 @@ export const MonitorTypeHandlerValidators: MonitorTypeHandlerValidatorsInterface
  */
 export const NotificationHandlerValidators: NotificationHandlerValidatorsInterface =
     {
+        notifyAppEvent: validateNotifyAppEvent,
         updatePreferences: validateNotificationPreferences,
     } as const;
 

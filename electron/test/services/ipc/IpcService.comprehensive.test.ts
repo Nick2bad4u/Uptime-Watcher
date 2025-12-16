@@ -299,6 +299,7 @@ describe("IpcService - Comprehensive Coverage", () => {
         } as unknown as AutoUpdaterService;
 
         const notificationServiceMock = {
+            notifyAppEvent: vi.fn(),
             updateConfig: vi.fn(),
         };
         mockNotificationService =

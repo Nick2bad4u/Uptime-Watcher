@@ -1,4 +1,5 @@
 import type { Monitor, Site } from "@shared/types";
+import type { AppNotificationRequest } from "@shared/types/notifications";
 
 import { Notification } from "electron";
 
@@ -200,6 +201,41 @@ export class NotificationService {
             body: this.composeUpBody(context),
             title: `${site.name} monitor restored`,
             urgency: "normal",
+        });
+    }
+
+    /**
+     * Dispatches a generic system notification for user-initiated app events.
+     *
+     * @remarks
+     * This is intentionally separate from outage/restore notifications:
+     *
+     * - It does not participate in per-site muting.
+     * - It does not use the outage cooldown logic.
+     * - It still respects the global notification enablement and platform
+     *   support checks.
+     */
+    public notifyAppEvent(request: AppNotificationRequest): void {
+        if (!this.shouldGenerateNotification(true)) {
+            return;
+        }
+
+        const title = request.title.trim();
+        if (title.length === 0) {
+            return;
+        }
+
+        const body = typeof request.body === "string" ? request.body : undefined;
+
+        const notification = new Notification({
+            ...(body === undefined ? {} : { body }),
+            silent: !this.config.playSound,
+            title,
+        });
+
+        notification.show();
+        logger.debug("[NotificationService] Dispatched app notification", {
+            title,
         });
     }
 
