@@ -42,6 +42,62 @@ describe("cloudApi", () => {
         );
     });
 
+    it("connects Dropbox", async () => {
+        vi.mocked(ipcRenderer.invoke).mockResolvedValueOnce({
+            success: true,
+            data: {
+                provider: "dropbox",
+                configured: true,
+                connected: true,
+                backupsEnabled: true,
+                encryptionLocked: false,
+                encryptionMode: "none",
+                syncEnabled: false,
+                lastBackupAt: null,
+                lastSyncAt: null,
+                providerDetails: {
+                    kind: "dropbox",
+                    accountLabel: "me@example.com",
+                },
+            },
+        });
+
+        const result = await cloudApi.connectDropbox();
+        expect(result.provider).toBe("dropbox");
+        expect(ipcRenderer.invoke).toHaveBeenCalledWith(
+            CLOUD_CHANNELS.connectDropbox,
+            ipcContext
+        );
+    });
+
+    it("connects Google Drive", async () => {
+        vi.mocked(ipcRenderer.invoke).mockResolvedValueOnce({
+            success: true,
+            data: {
+                provider: "google-drive",
+                configured: true,
+                connected: true,
+                backupsEnabled: true,
+                encryptionLocked: false,
+                encryptionMode: "none",
+                syncEnabled: false,
+                lastBackupAt: null,
+                lastSyncAt: null,
+                providerDetails: {
+                    kind: "google-drive",
+                    accountLabel: "me@example.com",
+                },
+            },
+        });
+
+        const result = await cloudApi.connectGoogleDrive();
+        expect(result.provider).toBe("google-drive");
+        expect(ipcRenderer.invoke).toHaveBeenCalledWith(
+            CLOUD_CHANNELS.connectGoogleDrive,
+            ipcContext
+        );
+    });
+
     it("enables sync", async () => {
         vi.mocked(ipcRenderer.invoke).mockResolvedValueOnce({
             success: true,

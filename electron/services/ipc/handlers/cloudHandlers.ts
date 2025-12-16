@@ -79,6 +79,13 @@ export function registerCloudHandlers({
     );
 
     registerStandardizedIpcHandler(
+        CLOUD_CHANNELS.connectGoogleDrive,
+        withIgnoredIpcEvent(() => cloudService.connectGoogleDrive()),
+        CloudHandlerValidators.connectGoogleDrive,
+        registeredHandlers
+    );
+
+    registerStandardizedIpcHandler(
         CLOUD_CHANNELS.listBackups,
         withIgnoredIpcEvent(() => cloudService.listBackups()),
         CloudHandlerValidators.listBackups,

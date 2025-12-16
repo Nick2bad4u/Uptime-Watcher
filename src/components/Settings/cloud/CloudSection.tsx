@@ -104,6 +104,7 @@ export interface CloudSectionProperties {
     readonly isClearingEncryptionKey: boolean;
     readonly isConfiguringFilesystemProvider: boolean;
     readonly isConnectingDropbox: boolean;
+    readonly isConnectingGoogleDrive: boolean;
     readonly isDisconnecting: boolean;
     readonly isListingBackups: boolean;
     readonly isMigratingBackups: boolean;
@@ -118,6 +119,7 @@ export interface CloudSectionProperties {
     readonly onClearEncryptionKey: () => void;
     readonly onConfigureFilesystemProvider: (baseDirectory: string) => void;
     readonly onConnectDropbox: () => void;
+    readonly onConnectGoogleDrive: () => void;
     readonly onDeleteBackup: (key: string) => void;
     readonly onDisconnect: () => void;
     readonly onEncryptBackupsDeleteOriginals: () => void;
@@ -143,6 +145,7 @@ export const CloudSection = ({
     isClearingEncryptionKey,
     isConfiguringFilesystemProvider,
     isConnectingDropbox,
+    isConnectingGoogleDrive,
     isDisconnecting,
     isListingBackups,
     isMigratingBackups,
@@ -157,6 +160,7 @@ export const CloudSection = ({
     onClearEncryptionKey,
     onConfigureFilesystemProvider,
     onConnectDropbox,
+    onConnectGoogleDrive,
     onDeleteBackup,
     onDisconnect,
     onEncryptBackupsDeleteOriginals,
@@ -261,10 +265,12 @@ export const CloudSection = ({
                         isConfiguringFilesystemProvider
                     }
                     isConnectingDropbox={isConnectingDropbox}
+                    isConnectingGoogleDrive={isConnectingGoogleDrive}
                     isDisconnecting={isDisconnecting}
                     isRefreshingStatus={isRefreshingStatus}
                     onConfigureFilesystemProvider={onConfigureFilesystemProvider}
                     onConnectDropbox={onConnectDropbox}
+                    onConnectGoogleDrive={onConnectGoogleDrive}
                     onDisconnect={onDisconnect}
                     onRefreshStatus={onRefreshStatus}
                     status={status}

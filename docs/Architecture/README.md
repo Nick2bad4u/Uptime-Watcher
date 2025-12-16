@@ -61,6 +61,17 @@ docs/Architecture/
 │   ├── ADR_019_TEMPLATES_AND_BULK_OPERATIONS.md
 │   ├── ADR_020_SUPPORT_DIAGNOSTICS_BUNDLE.md
 │   ├── ADR_021_CLOUD_PROVIDER_SELECTION_AND_SETTINGS_UI.md
+│   ├── ADR_022_OAUTH_LOOPBACK_REDIRECT_AND_CALLBACK_ROUTING.md
+│   ├── ADR_023_SECRET_STORAGE_AND_ENCRYPTION_POLICY.md
+│   ├── ADR_024_CLOUD_PROVIDER_SWITCHING_AND_MIGRATION_POLICY.md
+│   ├── ADR_025_RELEASE_ASSET_NAMING_AND_UPLOAD_STRATEGY.md
+│   ├── ADR_026_ELECTRON_SECURITY_MODEL_AND_RENDERER_ISOLATION.md
+│   ├── ADR_027_AUTO_UPDATE_STRATEGY_AND_RELEASE_CHANNELS.md
+│   ├── ADR_028_DATABASE_SCHEMA_VERSIONING_AND_MIGRATIONS.md
+│   ├── ADR_029_BACKUP_FORMAT_ENCRYPTION_AND_COMPATIBILITY_POLICY.md
+│   ├── ADR_030_APP_CONFIGURATION_AND_SETTINGS_PERSISTENCE_MODEL.md
+│   ├── ADR_031_PACKAGING_SIGNING_AND_NOTARIZATION_POLICY.md
+│   ├── ADR_032_SUPPORT_AND_DIAGNOSTICS_DATA_POLICY.md
 │   └── ARCHITECTURE_DIAGRAM.md
 ├── generated/                   # Auto-generated reference artifacts
 │   └── IPC_CHANNEL_INVENTORY.md
@@ -127,6 +138,17 @@ flowchart TD
     ADRs --> ADR19["ADR-019 Templates & Bulk Operations"]
     ADRs --> ADR20["ADR-020 Support Diagnostics Bundle"]
     ADRs --> ADR21["ADR-021 Cloud Provider Selection UI"]
+    ADRs --> ADR22["ADR-022 OAuth Loopback Redirect"]
+    ADRs --> ADR23["ADR-023 Secret Storage Policy"]
+    ADRs --> ADR24["ADR-024 Provider Switching Policy"]
+    ADRs --> ADR25["ADR-025 Release Asset Upload Strategy"]
+    ADRs --> ADR26["ADR-026 Electron Security Model"]
+    ADRs --> ADR27["ADR-027 Auto-Update Strategy"]
+    ADRs --> ADR28["ADR-028 DB Schema Migrations"]
+    ADRs --> ADR29["ADR-029 Backup Format & Encryption"]
+    ADRs --> ADR30["ADR-030 App Configuration Model"]
+    ADRs --> ADR31["ADR-031 Packaging & Signing"]
+    ADRs --> ADR32["ADR-032 Support Diagnostics Data Policy"]
 
     Patterns --> PatternGuide["Development Patterns Guide"]
     Patterns --> ComponentProps["Component Props Standards"]
@@ -145,7 +167,7 @@ flowchart TD
 
     class Docs hub;
     class ADRs,Patterns,Templates,Standards,UsageGuides,Generated section;
-    class ADR1,ADR2,ADR3,ADR4,ADR5,ADR6,ADR7,ADR8,ADR9,ADR10,ADR11,ADR12,ADR13,ADR14,ADR15,ADR16,ADR17,ADR18,ADR19,ADR20,ADR21,PatternGuide,ComponentProps,SiteLoading,InitImport,RepoTemplate,RepoTemplateClean,StoreTemplate,IPCTemplate,IPCDiagnosticsTemplate,SchedulerTemplate,EventChecklist,TsdocStandards,QuickStart,IPCInventory file;
+    class ADR1,ADR2,ADR3,ADR4,ADR5,ADR6,ADR7,ADR8,ADR9,ADR10,ADR11,ADR12,ADR13,ADR14,ADR15,ADR16,ADR17,ADR18,ADR19,ADR20,ADR21,ADR22,ADR23,ADR24,ADR25,ADR26,ADR27,ADR28,ADR29,ADR30,ADR31,ADR32,PatternGuide,ComponentProps,SiteLoading,InitImport,RepoTemplate,RepoTemplateClean,StoreTemplate,IPCTemplate,IPCDiagnosticsTemplate,SchedulerTemplate,EventChecklist,TsdocStandards,QuickStart,IPCInventory file;
 ```
 
 ## 🏗️ Architecture Decision Records (ADRs)

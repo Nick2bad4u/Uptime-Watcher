@@ -3,7 +3,7 @@ schema: "../../../config/schemas/doc-frontmatter.schema.json"
 title: "ADR-011: Scheduler and Backoff Strategy"
 summary: "Defines monitor scheduling cadence, jitter/backoff, timeout defaults, and integration of manual checks with the scheduler."
 created: "2025-12-04"
-last_reviewed: "2025-12-04"
+last_reviewed: "2025-12-15"
 category: "guide"
 author: "Nick2bad4u"
 tags:
@@ -31,9 +31,9 @@ tags:
 
 ## Status
 
-Draft
+✅ Accepted
 
-> **Implementation Status**
+> **Implementation status**
 >
 > - The centralized scheduler is implemented via `MonitorScheduler` in
 >   `electron/services/monitoring/MonitorScheduler.ts`, which owns

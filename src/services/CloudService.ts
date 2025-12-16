@@ -8,7 +8,7 @@
  * preload bridge directly.
  *
  * The initial implementation supports a filesystem-backed provider owned by
- * Electron main as well as a first-class Dropbox provider.
+ * Electron main as well as first-class Dropbox and Google Drive providers.
  *
  * - **Dropbox** uses OAuth 2.0 Authorization Code + PKCE and runs entirely in
  *   Electron main (system browser + loopback redirect). No OAuth tokens are
@@ -47,6 +47,7 @@ interface CloudServiceContract {
         config: CloudFilesystemProviderConfig
     ) => Promise<CloudStatusSummary>;
     connectDropbox: () => Promise<CloudStatusSummary>;
+    connectGoogleDrive: () => Promise<CloudStatusSummary>;
     deleteBackup: (key: string) => Promise<CloudBackupEntry[]>;
     disconnect: () => Promise<CloudStatusSummary>;
     enableSync: (config: CloudEnableSyncConfig) => Promise<CloudStatusSummary>;
@@ -77,6 +78,7 @@ const { ensureInitialized, wrap } = ((): ReturnType<
                     methods: [
                         "clearEncryptionKey",
                         "connectDropbox",
+                        "connectGoogleDrive",
                         "configureFilesystemProvider",
                         "deleteBackup",
                         "disconnect",
@@ -114,6 +116,9 @@ export const CloudService: CloudServiceContract = {
     ) => api.cloud.configureFilesystemProvider(config)),
 
     connectDropbox: wrap("connectDropbox", (api) => api.cloud.connectDropbox()),
+
+    connectGoogleDrive: wrap("connectGoogleDrive", (api) =>
+        api.cloud.connectGoogleDrive()),
 
     deleteBackup: wrap("deleteBackup", (api, key) =>
         api.cloud.deleteBackup(key)),

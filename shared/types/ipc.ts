@@ -246,6 +246,10 @@ export interface IpcInvokeChannelMap {
         params: readonly [];
         result: CloudStatusSummary;
     };
+    "cloud-connect-google-drive": {
+        params: readonly [];
+        result: CloudStatusSummary;
+    };
     "cloud-delete-backup": {
         params: readonly [key: string];
         result: CloudBackupEntry[];

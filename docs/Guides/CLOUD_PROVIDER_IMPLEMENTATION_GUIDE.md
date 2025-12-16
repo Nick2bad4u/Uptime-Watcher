@@ -1,9 +1,9 @@
 ---
 schema: "../../config/schemas/doc-frontmatter.schema.json"
 title: "Cloud Provider Implementation Guide"
-summary: "Developer guide for adding new Cloud Sync / Remote Backup providers (Google Drive, OneDrive, etc.) safely and consistently."
+summary: "Developer guide for adding new Cloud Sync / Remote Backup providers (e.g. Google Drive) safely and consistently."
 created: 2025-12-15
-last_reviewed: 2025-12-15
+last_reviewed: 2025-12-16
 category: "guide"
 author: "Nick2bad4u"
 tags:
@@ -20,7 +20,7 @@ tags:
 
 # Cloud Provider Implementation Guide
 
-This guide explains how to add a new cloud provider (e.g. Google Drive, OneDrive) to Uptime Watcher.
+This guide explains how to add a new cloud provider (e.g. Google Drive) to Uptime Watcher.
 
 ## Goals
 
@@ -57,7 +57,7 @@ This guide explains how to add a new cloud provider (e.g. Google Drive, OneDrive
 ### 1) Define provider types (shared)
 
 - Update `shared/types/cloud.ts`
-  - add provider kind (e.g. `"google-drive"`, `"onedrive"`)
+  - add provider kind (e.g. `"google-drive"`)
   - add a **safe** `providerDetails` union variant (account label, folder, etc.)
 
 ### 2) Main-process provider implementation

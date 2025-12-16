@@ -44,6 +44,7 @@ interface CloudHandlerValidatorsInterface {
     clearEncryptionKey: IpcParameterValidator;
     configureFilesystemProvider: IpcParameterValidator;
     connectDropbox: IpcParameterValidator;
+    connectGoogleDrive: IpcParameterValidator;
     deleteBackup: IpcParameterValidator;
     disconnect: IpcParameterValidator;
     enableSync: IpcParameterValidator;
@@ -770,6 +771,7 @@ export const CloudHandlerValidators: CloudHandlerValidatorsInterface = {
     clearEncryptionKey: createNoParamsValidator(),
     configureFilesystemProvider: validateCloudFilesystemProviderConfig,
     connectDropbox: createNoParamsValidator(),
+    connectGoogleDrive: createNoParamsValidator(),
     deleteBackup: createSingleStringValidator("key"),
     disconnect: createNoParamsValidator(),
     enableSync: validateCloudEnableSyncConfig,

@@ -37,6 +37,7 @@ const mockElectronAPI = vi.hoisted(() => ({
         clearEncryptionKey: vi.fn(),
         configureFilesystemProvider: vi.fn(),
         connectDropbox: vi.fn(),
+        connectGoogleDrive: vi.fn(),
         deleteBackup: vi.fn(),
         disconnect: vi.fn(),
         enableSync: vi.fn(),
@@ -85,6 +86,17 @@ describe("CloudService", () => {
             ...defaultStatus,
             provider: "dropbox",
             connected: true,
+        });
+        mockElectronAPI.cloud.connectGoogleDrive.mockResolvedValue({
+            ...defaultStatus,
+            provider: "google-drive",
+            connected: true,
+            configured: true,
+            backupsEnabled: true,
+            providerDetails: {
+                kind: "google-drive",
+                accountLabel: "me@example.com",
+            },
         });
         mockElectronAPI.cloud.enableSync.mockResolvedValue({
             ...defaultStatus,
@@ -216,6 +228,14 @@ describe("CloudService", () => {
         const status = await CloudService.disconnect();
         expect(status.provider).toBeNull();
         expect(mockElectronAPI.cloud.disconnect).toHaveBeenCalledTimes(1);
+    });
+
+    it("connects Google Drive", async () => {
+        const status = await CloudService.connectGoogleDrive();
+        expect(status.provider).toBe("google-drive");
+        expect(mockElectronAPI.cloud.connectGoogleDrive).toHaveBeenCalledTimes(
+            1
+        );
     });
 
     it("enables sync", async () => {

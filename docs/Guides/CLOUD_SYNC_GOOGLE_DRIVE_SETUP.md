@@ -1,9 +1,9 @@
 ---
 schema: "../../config/schemas/doc-frontmatter.schema.json"
-title: "Google Drive Cloud Sync Setup (Planned)"
-summary: "Planning guide for adding Google Drive as a first-class Cloud Sync provider (OAuth 2.0 + PKCE + loopback redirect, no backend server)."
+title: "Google Drive Cloud Sync Setup"
+summary: "Setup guide for using Google Drive as a first-class Cloud Sync provider (OAuth 2.0 + PKCE + loopback redirect, no backend server)."
 created: 2025-12-15
-last_reviewed: 2025-12-15
+last_reviewed: 2025-12-16
 category: "guide"
 author: "Nick2bad4u"
 tags:
@@ -13,18 +13,17 @@ tags:
   - google-drive
   - oauth
   - pkce
-  - roadmap
 ---
 
-# Google Drive Cloud Sync Setup (Planned)
+# Google Drive Cloud Sync Setup
 
-This document is a **pre-implementation** guide to prepare the project for a first-class **Google Drive** cloud provider.
+This document explains how to configure Google OAuth credentials so Uptime Watcher can use **Google Drive** as a first-class cloud provider.
 
 ## Status
 
-Not yet implemented.
+Implemented.
 
-The Settings UI includes a **Google Drive (soon)** provider tab (see ADR-021).
+Google Drive uses **Google Drive appDataFolder** so backups and sync artifacts are stored in the app’s private storage area (not a user-visible folder).
 
 ## Design constraints (must not regress)
 
@@ -45,43 +44,63 @@ The Settings UI includes a **Google Drive (soon)** provider tab (see ADR-021).
 
 ## Planned environment variables
 
-These are placeholders to keep naming consistent across providers:
+These are read from `process.env` in the Electron main process:
 
 - `UPTIME_WATCHER_GOOGLE_CLIENT_ID`
 - `UPTIME_WATCHER_GOOGLE_CLIENT_SECRET` (optional; if used, treat as non-secret)
 
 ### Example: local development configuration
 
-Add the values to your local config source (for example `node.config.json` in the repo root) so the Electron main process can read them at runtime.
+The Electron main process reads these from `process.env`.
 
-```json
-{
-  "UPTIME_WATCHER_GOOGLE_CLIENT_ID": "YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com",
-  "UPTIME_WATCHER_GOOGLE_CLIENT_SECRET": "OPTIONAL_CLIENT_SECRET"
-}
+Set environment variables in your shell before starting the app.
+
+PowerShell:
+
+```powershell
+$env:UPTIME_WATCHER_GOOGLE_CLIENT_ID = "YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com"
+$env:UPTIME_WATCHER_GOOGLE_CLIENT_SECRET = "OPTIONAL_CLIENT_SECRET"
+npm run dev
+```
+
+bash/zsh:
+
+```bash
+export UPTIME_WATCHER_GOOGLE_CLIENT_ID="YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com"
+export UPTIME_WATCHER_GOOGLE_CLIENT_SECRET="OPTIONAL_CLIENT_SECRET"
+npm run dev
 ```
 
 ## Redirect URI strategy
 
-The Dropbox provider uses a loopback redirect on a fixed port.
+Uptime Watcher uses a loopback HTTP server bound to the loopback interfaces.
 
-For consistency across providers, we intend to:
+### Redirect URI values
 
-- reuse the same loopback server/port where possible, and
-- use **provider-specific paths** (e.g. `/oauth2/callback?provider=google-drive` or `/oauth2/google/callback`).
-
-The final URI must be aligned with the Google OAuth client configuration.
-
-### Example: redirect URI values (illustrative)
-
-The Dropbox provider currently uses a fixed loopback port. If we keep the same port for Google Drive, the Google OAuth app configuration will need to allow something like:
+Configure the following **Authorized redirect URIs** in your Google OAuth client:
 
 ```text
-http://127.0.0.1:53682/oauth2/callback
-http://localhost:53682/oauth2/callback
+http://127.0.0.1:53682
 ```
 
-Exact URIs may change if we introduce provider-specific callback paths.
+Uptime Watcher currently uses the loopback IP redirect format recommended for native/desktop apps:
+
+- `http://127.0.0.1:53682`
+
+Google’s native app documentation also allows `http://[::1]:port` and notes that `localhost` may work but can be less reliable in some firewall environments.
+
+## Scopes
+
+Uptime Watcher requests the following scopes:
+
+- `https://www.googleapis.com/auth/drive.appdata` (store data in `appDataFolder`)
+- `openid`, `email`, `profile` (used to fetch and display the connected account label)
+
+## Storage behavior
+
+- All objects are stored under Google Drive `appDataFolder`.
+- Uptime Watcher creates an internal root folder named `uptime-watcher/` under `appDataFolder`.
+- Backup metadata is stored alongside backups as `*.metadata.json` sidecar files.
 
 ## Related references
 

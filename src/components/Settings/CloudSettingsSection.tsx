@@ -36,6 +36,10 @@ const selectRefreshStatus = (
 const selectConnectDropbox = (
     state: CloudStoreState
 ): CloudStoreState["connectDropbox"] => state.connectDropbox;
+
+const selectConnectGoogleDrive = (
+    state: CloudStoreState
+): CloudStoreState["connectGoogleDrive"] => state.connectGoogleDrive;
 const selectDisconnect = (
     state: CloudStoreState
 ): CloudStoreState["disconnect"] => state.disconnect;
@@ -78,6 +82,10 @@ const selectConfigureFilesystemProvider = (
 const selectIsConnectingDropbox = (
     state: CloudStoreState
 ): CloudStoreState["isConnectingDropbox"] => state.isConnectingDropbox;
+
+const selectIsConnectingGoogleDrive = (
+    state: CloudStoreState
+): CloudStoreState["isConnectingGoogleDrive"] => state.isConnectingGoogleDrive;
 const selectIsDisconnecting = (
     state: CloudStoreState
 ): CloudStoreState["isDisconnecting"] => state.isDisconnecting;
@@ -160,7 +168,11 @@ export const CloudSettingsSection = (): JSX.Element => {
     const status = useCloudStore(selectStatus);
 
     const refreshStatus = useCloudStore(selectRefreshStatus);
+    const configureFilesystemProvider = useCloudStore(
+        selectConfigureFilesystemProvider
+    );
     const connectDropbox = useCloudStore(selectConnectDropbox);
+    const connectGoogleDrive = useCloudStore(selectConnectGoogleDrive);
     const disconnect = useCloudStore(selectDisconnect);
     const setSyncEnabled = useCloudStore(selectSetSyncEnabled);
     const requestSyncNow = useCloudStore(selectRequestSyncNow);
@@ -175,14 +187,12 @@ export const CloudSettingsSection = (): JSX.Element => {
 
     const migrateBackups = useCloudStore(selectMigrateBackups);
     const resetRemoteSyncState = useCloudStore(selectResetRemoteSyncState);
-    const configureFilesystemProvider = useCloudStore(
-        selectConfigureFilesystemProvider
-    );
     const refreshRemoteSyncResetPreview = useCloudStore(
         selectRefreshRemoteSyncResetPreview
     );
 
     const isConnectingDropbox = useCloudStore(selectIsConnectingDropbox);
+    const isConnectingGoogleDrive = useCloudStore(selectIsConnectingGoogleDrive);
     const isDisconnecting = useCloudStore(selectIsDisconnecting);
     const isListingBackups = useCloudStore(selectIsListingBackups);
     const isRefreshingStatus = useCloudStore(selectIsRefreshingStatus);
@@ -217,9 +227,7 @@ export const CloudSettingsSection = (): JSX.Element => {
         selectIsRefreshingRemoteSyncResetPreview
     );
 
-    const fireAndForget = useCallback((
-        action: () => Promise<unknown>
-    ): void => {
+    const fireAndForget = useCallback((action: () => Promise<unknown>): void => {
         void (async (): Promise<void> => {
             try {
                 await action();
@@ -267,6 +275,9 @@ export const CloudSettingsSection = (): JSX.Element => {
         fireAndForget(connectDropbox);
     }, [connectDropbox, fireAndForget]);
 
+    const handleConnectGoogleDrive = useCallback((): void => {
+        fireAndForget(connectGoogleDrive);
+    }, [connectGoogleDrive, fireAndForget]);
     const confirmDisconnect = useCallback(
         async function confirmDisconnect(): Promise<void> {
             const confirmed = await requestConfirmation({
@@ -594,54 +605,50 @@ export const CloudSettingsSection = (): JSX.Element => {
 
     return (
         <CloudSection
-                backups={backups}
-                deletingBackupKey={deletingBackupKey}
-                icon={AppIcons.ui.cloud}
-                isClearingEncryptionKey={isClearingEncryptionKey}
-                isConfiguringFilesystemProvider={
-                    isConfiguringFilesystemProvider
-                }
-                isConnectingDropbox={isConnectingDropbox}
-                isDisconnecting={isDisconnecting}
-                isListingBackups={isListingBackups}
-                isMigratingBackups={isMigratingBackups}
-                isRefreshingRemoteSyncResetPreview={
-                    isRefreshingRemoteSyncResetPreview
-                }
-                isRefreshingStatus={isRefreshingStatus}
-                isRequestingSyncNow={isRequestingSyncNow}
-                isResettingRemoteSyncState={isResettingRemoteSyncState}
-                isSettingEncryptionPassphrase={isSettingEncryptionPassphrase}
-                isUploadingBackup={isUploadingBackup}
-                lastBackupMigrationResult={lastBackupMigrationResult}
-                lastRemoteSyncResetResult={lastRemoteSyncResetResult}
-                onClearEncryptionKey={handleClearEncryptionKey}
-                onConfigureFilesystemProvider={
-                    handleConfigureFilesystemProvider
-                }
-                onConnectDropbox={handleConnectDropbox}
-                onDeleteBackup={handleDeleteBackup}
-                onDisconnect={handleDisconnect}
-                onEncryptBackupsDeleteOriginals={
-                    handleEncryptBackupsDeleteOriginals
-                }
-                onEncryptBackupsKeepOriginals={
-                    handleEncryptBackupsKeepOriginals
-                }
-                onListBackups={handleListBackups}
-                onRefreshRemoteSyncResetPreview={
-                    handleRefreshRemoteSyncResetPreview
-                }
-                onRefreshStatus={handleRefreshStatus}
-                onRequestSyncNow={handleRequestSyncNow}
-                onResetRemoteSyncState={handleResetRemoteSyncState}
-                onRestoreBackup={handleRestoreBackup}
-                onSetEncryptionPassphrase={handleSetEncryptionPassphrase}
-                onUploadLatestBackup={handleUploadLatestBackup}
-                remoteSyncResetPreview={remoteSyncResetPreview}
-                restoringBackupKey={restoringBackupKey}
-                status={status}
-                syncEnabledControl={syncEnabledControl}
-            />
+            backups={backups}
+            deletingBackupKey={deletingBackupKey}
+            icon={AppIcons.ui.cloud}
+            isClearingEncryptionKey={isClearingEncryptionKey}
+            isConfiguringFilesystemProvider={isConfiguringFilesystemProvider}
+            isConnectingDropbox={isConnectingDropbox}
+            isConnectingGoogleDrive={isConnectingGoogleDrive}
+            isDisconnecting={isDisconnecting}
+            isListingBackups={isListingBackups}
+            isMigratingBackups={isMigratingBackups}
+            isRefreshingRemoteSyncResetPreview={
+                isRefreshingRemoteSyncResetPreview
+            }
+            isRefreshingStatus={isRefreshingStatus}
+            isRequestingSyncNow={isRequestingSyncNow}
+            isResettingRemoteSyncState={isResettingRemoteSyncState}
+            isSettingEncryptionPassphrase={isSettingEncryptionPassphrase}
+            isUploadingBackup={isUploadingBackup}
+            lastBackupMigrationResult={lastBackupMigrationResult}
+            lastRemoteSyncResetResult={lastRemoteSyncResetResult}
+            onClearEncryptionKey={handleClearEncryptionKey}
+            onConfigureFilesystemProvider={handleConfigureFilesystemProvider}
+            onConnectDropbox={handleConnectDropbox}
+            onConnectGoogleDrive={handleConnectGoogleDrive}
+            onDeleteBackup={handleDeleteBackup}
+            onDisconnect={handleDisconnect}
+            onEncryptBackupsDeleteOriginals={
+                handleEncryptBackupsDeleteOriginals
+            }
+            onEncryptBackupsKeepOriginals={handleEncryptBackupsKeepOriginals}
+            onListBackups={handleListBackups}
+            onRefreshRemoteSyncResetPreview={
+                handleRefreshRemoteSyncResetPreview
+            }
+            onRefreshStatus={handleRefreshStatus}
+            onRequestSyncNow={handleRequestSyncNow}
+            onResetRemoteSyncState={handleResetRemoteSyncState}
+            onRestoreBackup={handleRestoreBackup}
+            onSetEncryptionPassphrase={handleSetEncryptionPassphrase}
+            onUploadLatestBackup={handleUploadLatestBackup}
+            remoteSyncResetPreview={remoteSyncResetPreview}
+            restoringBackupKey={restoringBackupKey}
+            status={status}
+            syncEnabledControl={syncEnabledControl}
+        />
     );
 };

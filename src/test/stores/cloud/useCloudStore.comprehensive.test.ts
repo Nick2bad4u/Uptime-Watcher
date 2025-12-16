@@ -29,6 +29,7 @@ const cloudServiceMock = vi.hoisted(() => ({
                 (args: { baseDirectory: string }) => Promise<CloudStatusSummary>
             >(),
         connectDropbox: vi.fn<() => Promise<CloudStatusSummary>>(),
+        connectGoogleDrive: vi.fn<() => Promise<CloudStatusSummary>>(),
         disconnect: vi.fn<() => Promise<CloudStatusSummary>>(),
         enableSync:
             vi.fn<
@@ -120,6 +121,7 @@ describe(useCloudStore, () => {
                 isConfiguringFilesystemProvider: false,
                 isClearingEncryptionKey: false,
                 isConnectingDropbox: false,
+                isConnectingGoogleDrive: false,
                 isDisconnecting: false,
                 isListingBackups: false,
                 isMigratingBackups: false,
@@ -167,6 +169,41 @@ describe(useCloudStore, () => {
         expect(toast?.title).toBe("Dropbox connected");
     });
 
+    it("connectGoogleDrive toggles busy flag and updates status", async () => {
+        const deferred = createDeferred<CloudStatusSummary>();
+        cloudServiceMock.CloudService.connectGoogleDrive.mockReturnValue(
+            deferred.promise
+        );
+
+        const promise = useCloudStore.getState().connectGoogleDrive();
+        expect(useCloudStore.getState().isConnectingGoogleDrive).toBeTruthy();
+
+        const [startedToast] = useAlertStore.getState().toasts;
+        expect(startedToast?.variant).toBe("info");
+        expect(startedToast?.title).toBe("Connecting Google Drive");
+
+        deferred.resolve({
+            ...baseStatus,
+            provider: "google-drive",
+            connected: true,
+            configured: true,
+            backupsEnabled: true,
+            providerDetails: {
+                kind: "google-drive",
+                accountLabel: "me@example.com",
+            },
+        });
+        await promise;
+
+        expect(useCloudStore.getState().isConnectingGoogleDrive).toBeFalsy();
+        expect(useCloudStore.getState().status?.provider).toBe("google-drive");
+
+        const [toast] = useAlertStore.getState().toasts;
+        expect(toast?.variant).toBe("success");
+        expect(toast?.title).toBe("Google Drive connected");
+        expect(toast?.message).toContain("me@example.com");
+    });
+
     it("connectDropbox enqueues an error toast on failure", async () => {
         cloudServiceMock.CloudService.connectDropbox.mockRejectedValue(
             new Error("boom")
@@ -179,6 +216,21 @@ describe(useCloudStore, () => {
         const [toast] = useAlertStore.getState().toasts;
         expect(toast?.variant).toBe("error");
         expect(toast?.title).toBe("Failed to connect Dropbox");
+        expect(toast?.message).toContain("boom");
+    });
+
+    it("connectGoogleDrive enqueues an error toast on failure", async () => {
+        cloudServiceMock.CloudService.connectGoogleDrive.mockRejectedValue(
+            new Error("boom")
+        );
+
+        await expect(
+            useCloudStore.getState().connectGoogleDrive()
+        ).rejects.toThrowError("boom");
+
+        const [toast] = useAlertStore.getState().toasts;
+        expect(toast?.variant).toBe("error");
+        expect(toast?.title).toBe("Failed to connect Google Drive");
         expect(toast?.message).toContain("boom");
     });
 

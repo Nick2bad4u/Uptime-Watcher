@@ -1,3 +1,5 @@
+
+
 import type {
     CloudBackupEntry,
     CloudEnableSyncConfig,
@@ -56,6 +58,10 @@ import { DropboxCloudStorageProvider } from "./providers/dropbox/DropboxCloudSto
 import { DropboxTokenManager } from "./providers/dropbox/DropboxTokenManager";
 import { EncryptedSyncCloudStorageProvider } from "./providers/EncryptedSyncCloudStorageProvider";
 import { FilesystemCloudStorageProvider } from "./providers/FilesystemCloudStorageProvider";
+import { fetchGoogleAccountLabel } from "./providers/googleDrive/fetchGoogleAccountLabel";
+import { GoogleDriveAuthFlow } from "./providers/googleDrive/GoogleDriveAuthFlow";
+import { GoogleDriveCloudStorageProvider } from "./providers/googleDrive/GoogleDriveCloudStorageProvider";
+import { GoogleDriveTokenManager } from "./providers/googleDrive/GoogleDriveTokenManager";
 import {
     EphemeralSecretStore,
     FallbackSecretStore,
@@ -78,6 +84,9 @@ const SETTINGS_KEY_PROVIDER = "cloud.provider" as const;
 const SETTINGS_KEY_FILESYSTEM_BASE_DIRECTORY =
     "cloud.filesystem.baseDirectory" as const;
 const SETTINGS_KEY_DROPBOX_TOKENS = "cloud.dropbox.tokens" as const;
+const SETTINGS_KEY_GOOGLE_DRIVE_TOKENS = "cloud.googleDrive.tokens" as const;
+const SETTINGS_KEY_GOOGLE_DRIVE_ACCOUNT_LABEL =
+    "cloud.googleDrive.accountLabel" as const;
 
 function isENOENT(error: unknown): boolean {
     return (
@@ -99,6 +108,8 @@ async function ignoreENOENT(fn: () => Promise<void>): Promise<void> {
     }
 }
 
+
+
 /**
  * Default Dropbox OAuth app key (client_id) shipped with the app.
  *
@@ -111,6 +122,15 @@ async function ignoreENOENT(fn: () => Promise<void>): Promise<void> {
  * `UPTIME_WATCHER_DROPBOX_APP_KEY`.
  */
 const DEFAULT_DROPBOX_APP_KEY = "c6wroqtgxztzq9t" as const;
+
+type CloudStatusCommonArgs = Readonly<{
+    lastBackupAt: null | number;
+    lastError: string | undefined;
+    lastSyncAt: null | number;
+    localEncryptionKey: string | undefined;
+    localEncryptionMode: CloudEncryptionMode;
+    syncEnabled: boolean;
+}>;
 const SETTINGS_KEY_LAST_BACKUP_AT = "cloud.lastBackupAt" as const;
 const SETTINGS_KEY_LAST_SYNC_AT = "cloud.lastSyncAt" as const;
 const SETTINGS_KEY_LAST_ERROR = "cloud.lastError" as const;
@@ -241,12 +261,33 @@ export class CloudService {
                 await tokenManager.revokeStoredTokens().catch(() => {});
             }
 
+            if (provider === "google-drive") {
+                const clientId = readProcessEnv("UPTIME_WATCHER_GOOGLE_CLIENT_ID");
+                const clientSecret = readProcessEnv(
+                    "UPTIME_WATCHER_GOOGLE_CLIENT_SECRET"
+                );
+
+                if (clientId) {
+                    const tokenManager = new GoogleDriveTokenManager({
+                        clientId,
+                        ...(clientSecret ? { clientSecret } : {}),
+                        secretStore: this.secretStore,
+                        storageKey: SETTINGS_KEY_GOOGLE_DRIVE_TOKENS,
+                    });
+
+                    await tokenManager.revoke().catch(() => {});
+                }
+
+                await this.settings.set(SETTINGS_KEY_GOOGLE_DRIVE_ACCOUNT_LABEL, "");
+            }
+
             // NOTE: Do not run these in parallel.
             // Some settings adapters are transaction-backed and parallel writes can
             // trigger nested-transaction warnings.
             await this.settings.set(SETTINGS_KEY_PROVIDER, "");
             await this.settings.set(SETTINGS_KEY_FILESYSTEM_BASE_DIRECTORY, "");
             await this.secretStore.deleteSecret(SETTINGS_KEY_DROPBOX_TOKENS);
+            await this.secretStore.deleteSecret(SETTINGS_KEY_GOOGLE_DRIVE_TOKENS);
 
             logger.info("[CloudService] Disconnected cloud provider");
             return this.buildStatusSummary();
@@ -560,6 +601,56 @@ export class CloudService {
         });
     }
 
+    public async connectGoogleDrive(): Promise<CloudStatusSummary> {
+        return this.runCloudOperation("connectGoogleDrive", async () => {
+            const clientId = readProcessEnv("UPTIME_WATCHER_GOOGLE_CLIENT_ID");
+            const clientSecret = readProcessEnv(
+                "UPTIME_WATCHER_GOOGLE_CLIENT_SECRET"
+            );
+
+            if (!clientId) {
+                throw new Error("UPTIME_WATCHER_GOOGLE_CLIENT_ID is not set.");
+            }
+
+            const tokenManager = new GoogleDriveTokenManager({
+                clientId,
+                ...(clientSecret ? { clientSecret } : {}),
+                secretStore: this.secretStore,
+                storageKey: SETTINGS_KEY_GOOGLE_DRIVE_TOKENS,
+            });
+
+            const authFlow = new GoogleDriveAuthFlow({
+                clientId,
+                ...(clientSecret ? { clientSecret } : {}),
+            });
+            const auth = await authFlow.run();
+
+            await tokenManager.setTokens({
+                accessToken: auth.accessToken,
+                expiresAt: auth.expiresAt,
+                refreshToken: auth.refreshToken,
+                scope: auth.scope,
+                tokenType: auth.tokenType,
+            });
+
+            const accountLabel = await fetchGoogleAccountLabel(auth.accessToken);
+            if (accountLabel) {
+                await this.settings.set(
+                    SETTINGS_KEY_GOOGLE_DRIVE_ACCOUNT_LABEL,
+                    accountLabel
+                );
+            }
+
+            await this.settings.set(SETTINGS_KEY_FILESYSTEM_BASE_DIRECTORY, "");
+            await this.secretStore.deleteSecret(SETTINGS_KEY_DROPBOX_TOKENS);
+
+            await this.settings.set(SETTINGS_KEY_PROVIDER, "google-drive");
+
+            logger.info("[CloudService] Connected Google Drive provider");
+            return this.buildStatusSummary();
+        });
+    }
+
     /** Lists all backups stored in the configured provider. */
     public async listBackups(): Promise<CloudBackupEntry[]> {
         return this.runCloudOperation("listBackups", async () => {
@@ -782,6 +873,35 @@ export class CloudService {
             return new DropboxCloudStorageProvider({ tokenManager });
         }
 
+        if (providerKind === "google-drive") {
+            const clientId = readProcessEnv("UPTIME_WATCHER_GOOGLE_CLIENT_ID");
+            const clientSecret = readProcessEnv(
+                "UPTIME_WATCHER_GOOGLE_CLIENT_SECRET"
+            );
+
+            if (!clientId) {
+                return null;
+            }
+
+            const tokenManager = new GoogleDriveTokenManager({
+                clientId,
+                ...(clientSecret ? { clientSecret } : {}),
+                secretStore: this.secretStore,
+                storageKey: SETTINGS_KEY_GOOGLE_DRIVE_TOKENS,
+            });
+
+            const connected = await tokenManager.isConnected().catch(() => false);
+            if (!connected) {
+                return null;
+            }
+
+            return new GoogleDriveCloudStorageProvider({
+                clientId,
+                ...(clientSecret ? { clientSecret } : {}),
+                tokenManager,
+            });
+        }
+
         return null;
     }
 
@@ -908,20 +1028,18 @@ export class CloudService {
             case "filesystem": {
                 return this.buildFilesystemStatus(common);
             }
+            case "google-drive": {
+                return this.buildGoogleDriveStatus(common);
+            }
             default: {
                 return this.buildUnsupportedProviderStatus(common);
             }
         }
     }
 
-    private async buildDropboxStatus(args: {
-        lastBackupAt: null | number;
-        lastError: string | undefined;
-        lastSyncAt: null | number;
-        localEncryptionKey: string | undefined;
-        localEncryptionMode: CloudEncryptionMode;
-        syncEnabled: boolean;
-    }): Promise<CloudStatusSummary> {
+    private async buildDropboxStatus(
+        args: CloudStatusCommonArgs
+    ): Promise<CloudStatusSummary> {
         const provider = await this.resolveProviderOrNull();
         let connected = false;
         let connectionError: string | undefined = undefined;
@@ -967,14 +1085,45 @@ export class CloudService {
         };
     }
 
-    private async buildFilesystemStatus(args: {
-        lastBackupAt: null | number;
-        lastError: string | undefined;
-        lastSyncAt: null | number;
-        localEncryptionKey: string | undefined;
-        localEncryptionMode: CloudEncryptionMode;
-        syncEnabled: boolean;
-    }): Promise<CloudStatusSummary> {
+    private async buildGoogleDriveStatus(
+        args: CloudStatusCommonArgs
+    ): Promise<CloudStatusSummary> {
+        const provider = await this.resolveProviderOrNull();
+        const connected = provider ? await provider.isConnected().catch(() => false) : false;
+
+        const encryptionMode =
+            connected && provider
+                ? await this.getEffectiveEncryptionMode(provider)
+                : args.localEncryptionMode;
+        const encryptionLocked =
+            encryptionMode === "passphrase" && !args.localEncryptionKey;
+
+        const accountLabel =
+            (await this.settings.get(SETTINGS_KEY_GOOGLE_DRIVE_ACCOUNT_LABEL)) ??
+            undefined;
+
+        return {
+            backupsEnabled: connected,
+            configured: true,
+            connected,
+            encryptionLocked,
+            encryptionMode,
+            lastBackupAt: args.lastBackupAt,
+            ...(args.lastError ? { lastError: args.lastError } : {}),
+            lastSyncAt: args.lastSyncAt,
+            provider: "google-drive",
+            providerDetails: {
+                kind: "google-drive",
+                ...(accountLabel ? { accountLabel } : {}),
+            },
+            syncEnabled: args.syncEnabled,
+        };
+    }
+
+
+    private async buildFilesystemStatus(
+        args: CloudStatusCommonArgs
+    ): Promise<CloudStatusSummary> {
         const baseDirectory =
             (await this.settings.get(SETTINGS_KEY_FILESYSTEM_BASE_DIRECTORY)) ??
             "";
@@ -1027,14 +1176,7 @@ export class CloudService {
         };
     }
 
-    private buildUnconfiguredStatus(args: {
-        lastBackupAt: null | number;
-        lastError: string | undefined;
-        lastSyncAt: null | number;
-        localEncryptionKey: string | undefined;
-        localEncryptionMode: CloudEncryptionMode;
-        syncEnabled: boolean;
-    }): CloudStatusSummary {
+    private buildUnconfiguredStatus(args: CloudStatusCommonArgs): CloudStatusSummary {
         return {
             backupsEnabled: false,
             configured: false,
@@ -1051,14 +1193,9 @@ export class CloudService {
         };
     }
 
-    private buildUnsupportedProviderStatus(args: {
-        lastBackupAt: null | number;
-        lastError: string | undefined;
-        lastSyncAt: null | number;
-        localEncryptionKey: string | undefined;
-        localEncryptionMode: CloudEncryptionMode;
-        syncEnabled: boolean;
-    }): CloudStatusSummary {
+    private buildUnsupportedProviderStatus(
+        args: CloudStatusCommonArgs
+    ): CloudStatusSummary {
         return {
             backupsEnabled: false,
             configured: true,

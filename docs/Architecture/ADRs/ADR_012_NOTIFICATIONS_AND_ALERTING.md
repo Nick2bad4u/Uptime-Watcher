@@ -3,7 +3,7 @@ schema: "../../../config/schemas/doc-frontmatter.schema.json"
 title: "ADR-012: Notifications and Alerting Policy"
 summary: "Defines desktop/sound notification rules, throttling, suppression, and reliability expectations for outage/restore signals."
 created: "2025-12-04"
-last_reviewed: "2025-12-04"
+last_reviewed: "2025-12-15"
 category: "guide"
 author: "Nick2bad4u"
 tags:
@@ -31,7 +31,7 @@ tags:
 
 ## Status
 
-Draft
+✅ Accepted
 
 > **Implementation Status**
 >

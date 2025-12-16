@@ -94,12 +94,14 @@ export interface CloudStoreState {
         baseDirectory: string;
     }) => Promise<void>;
     connectDropbox: () => Promise<void>;
+    connectGoogleDrive: () => Promise<void>;
     deleteBackup: (key: string) => Promise<void>;
     deletingBackupKey: null | string;
     disconnect: () => Promise<void>;
     isClearingEncryptionKey: boolean;
     isConfiguringFilesystemProvider: boolean;
     isConnectingDropbox: boolean;
+    isConnectingGoogleDrive: boolean;
     isDisconnecting: boolean;
     isListingBackups: boolean;
     isMigratingBackups: boolean;
@@ -224,6 +226,57 @@ export const useCloudStore: UseBoundStore<StoreApi<CloudStoreState>> =
             }
         },
 
+        connectGoogleDrive: async (): Promise<void> => {
+            set({ isConnectingGoogleDrive: true });
+            const startedToastId = enqueueCloudOperationStartedToast({
+                message: "Waiting for authorization in your browser.",
+                title: "Connecting Google Drive",
+            });
+
+            try {
+                const nextStatus = await withErrorHandling(
+                    async () => {
+                        const status = await CloudService.connectGoogleDrive();
+                        set({ status });
+                        return status;
+                    },
+                    createStoreErrorHandler("cloud", "connectGoogleDrive")
+                );
+
+                const { providerDetails } = nextStatus;
+                const accountLabel =
+                    providerDetails?.kind === "google-drive"
+                        ? providerDetails.accountLabel
+                        : undefined;
+
+                enqueueCloudToast({
+                    message: accountLabel
+                        ? `Connected as ${accountLabel}`
+                        : undefined,
+                    title: "Google Drive connected",
+                    variant: "success",
+                });
+
+                void dispatchSystemNotificationIfEnabled({
+                    body: accountLabel
+                        ? `Connected as ${accountLabel}`
+                        : undefined,
+                    title: "Google Drive connected",
+                });
+            } catch (error) {
+                enqueueCloudErrorToast("Failed to connect Google Drive", error);
+
+                void dispatchSystemNotificationIfEnabled({
+                    body: ensureError(error).message,
+                    title: "Failed to connect Google Drive",
+                });
+                throw ensureError(error);
+            } finally {
+                dismissToastSafely(startedToastId);
+                set({ isConnectingGoogleDrive: false });
+            }
+        },
+
         deleteBackup: async (key: string): Promise<void> => {
             set({ deletingBackupKey: key });
             try {
@@ -262,6 +315,7 @@ export const useCloudStore: UseBoundStore<StoreApi<CloudStoreState>> =
         isConfiguringFilesystemProvider: false,
 
         isConnectingDropbox: false,
+        isConnectingGoogleDrive: false,
 
         isDisconnecting: false,
 

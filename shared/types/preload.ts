@@ -257,6 +257,7 @@ interface CloudChannelMap {
     readonly clearEncryptionKey: "cloud-clear-encryption-key";
     readonly configureFilesystemProvider: "cloud-configure-filesystem-provider";
     readonly connectDropbox: "cloud-connect-dropbox";
+    readonly connectGoogleDrive: "cloud-connect-google-drive";
     readonly deleteBackup: "cloud-delete-backup";
     readonly disconnect: "cloud-disconnect";
     readonly enableSync: "cloud-enable-sync";
@@ -276,6 +277,7 @@ const CLOUD_CHANNELS_DEFINITION: CloudChannelMap = {
     clearEncryptionKey: "cloud-clear-encryption-key",
     configureFilesystemProvider: "cloud-configure-filesystem-provider",
     connectDropbox: "cloud-connect-dropbox",
+    connectGoogleDrive: "cloud-connect-google-drive",
     deleteBackup: "cloud-delete-backup",
     disconnect: "cloud-disconnect",
     enableSync: "cloud-enable-sync",

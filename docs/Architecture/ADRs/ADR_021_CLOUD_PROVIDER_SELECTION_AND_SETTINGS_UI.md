@@ -1,9 +1,9 @@
 ---
 schema: "../../../config/schemas/doc-frontmatter.schema.json"
 title: "ADR-021: Cloud Provider Selection and Settings UI"
-summary: "Defines a provider-tabbed Cloud settings UX, enforces a single active provider at a time, and documents a roadmap for Google Drive and OneDrive providers."
+summary: "Defines a provider-tabbed Cloud settings UX, enforces a single active provider at a time, and documents a roadmap for the Google Drive provider."
 created: "2025-12-15"
-last_reviewed: "2025-12-15"
+last_reviewed: "2025-12-16"
 category: "guide"
 author: "Nick2bad4u"
 tags:
@@ -17,7 +17,6 @@ tags:
   - "oauth"
   - "dropbox"
   - "google-drive"
-  - "onedrive"
 ---
 
 # ADR-021: Cloud Provider Selection and Settings UI
@@ -46,7 +45,7 @@ Accepted (implemented — initial UI refactor complete)
 
 Cloud Sync / Remote Backups were introduced in ADR-015 and the merge model in ADR-016.
 
-As additional providers are added (Google Drive and OneDrive), the Settings UI must:
+As additional providers are added (e.g. Google Drive), the Settings UI must:
 
 - Scale without becoming a long, confusing list of controls.
 - Make the currently active provider obvious.
@@ -68,8 +67,7 @@ As additional providers are added (Google Drive and OneDrive), the Settings UI m
 The Cloud settings section exposes providers using a single tabbed selector:
 
 - Dropbox
-- Google Drive (coming soon)
-- OneDrive (coming soon)
+- Google Drive
 - WebDAV (coming soon)
 - Local folder (filesystem provider)
 
@@ -116,7 +114,7 @@ The Cloud settings section is organized into stable groups that do not multiply 
 - Tokens stored via main-process secret storage.
 - Provider details expose a safe account label to the renderer.
 
-### Google Drive + OneDrive (planned)
+### Google Drive (implemented)
 
 For each provider we will add:
 
@@ -127,7 +125,7 @@ For each provider we will add:
 
 Implementation notes:
 
-- Google Drive and OneDrive must follow the same security properties as Dropbox:
+- Google Drive must follow the same security properties as Dropbox:
   - system browser OAuth
   - PKCE
   - no embedded auth webviews
@@ -135,7 +133,7 @@ Implementation notes:
 
 ## Why only one provider at a time
 
-Supporting multiple providers simultaneously (e.g. Dropbox + OneDrive) is not “just add another remote.”
+Supporting multiple providers simultaneously (e.g. Dropbox + Google Drive) is not “just add another remote.”
 
 It introduces non-trivial questions:
 
@@ -184,7 +182,7 @@ Provider setup UI is validated indirectly through store/service tests and static
 
 - **Pro**: Settings stays readable and scalable as providers are added.
 - **Pro**: Clear constraints around “one provider at a time” reduce user confusion and correctness risk.
-- **Con**: Users cannot enable redundant remotes (e.g. Dropbox + OneDrive) until an explicit multi-provider design exists.
+- **Con**: Users cannot enable redundant remotes (e.g. Dropbox + Google Drive) until an explicit multi-provider design exists.
 
 ## Related ADRs
 

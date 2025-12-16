@@ -5,9 +5,11 @@ import type { JSX } from "react/jsx-runtime";
 
 import {
     type ChangeEvent,
+    type KeyboardEvent as ReactKeyboardEvent,
     type MouseEvent as ReactMouseEvent,
     useCallback,
     useMemo,
+    useRef,
     useState,
 } from "react";
 
@@ -23,7 +25,6 @@ type CloudProviderTabKey =
     | "dropbox"
     | "filesystem"
     | "google-drive"
-    | "onedrive"
     | "webdav";
 
 interface CloudProviderTabDefinition {
@@ -47,16 +48,10 @@ const CLOUD_PROVIDER_TABS: readonly CloudProviderTabDefinition[] = [
         label: "Local folder",
     },
     {
-        description: "Planned provider integration.",
-        isAvailable: false,
+        description: "Stores app data in Google Drive appDataFolder.",
+        isAvailable: true,
         key: "google-drive",
         label: "Google Drive",
-    },
-    {
-        description: "Planned provider integration.",
-        isAvailable: false,
-        key: "onedrive",
-        label: "OneDrive",
     },
     {
         description: "Planned provider integration.",
@@ -97,7 +92,12 @@ function resolveProviderLabel(status: CloudStatusSummary | null): string {
     }
 
     if (provider === "google-drive") {
-        return "Google Drive";
+        const accountLabel =
+            status?.providerDetails?.kind === "google-drive"
+                ? status.providerDetails.accountLabel
+                : undefined;
+
+        return accountLabel ? `Google Drive (${accountLabel})` : "Google Drive";
     }
 
     if (provider === "webdav") {
@@ -160,6 +160,10 @@ const ProviderTabList = ({
     onSelect,
     selectedKey,
 }: ProviderTabListProperties): JSX.Element => {
+    const buttonByKeyRef = useRef(
+        new Map<CloudProviderTabKey, HTMLButtonElement>()
+    );
+
     const handleTabClick = useCallback(
         (event: ReactMouseEvent<HTMLButtonElement>): void => {
             const rawKey = event.currentTarget.dataset["providerKey"];
@@ -177,24 +181,90 @@ const ProviderTabList = ({
         [onSelect]
     );
 
+    const handleKeyDown = useCallback(
+        (event: ReactKeyboardEvent<HTMLButtonElement>): void => {
+            const keys = CLOUD_PROVIDER_TABS.map((tab) => tab.key);
+            const currentIndex = keys.indexOf(selectedKey);
+            if (currentIndex === -1) {
+                return;
+            }
+
+            let nextKey: CloudProviderTabKey = selectedKey;
+            switch (event.key) {
+                case "ArrowLeft": {
+                    const nextIndex =
+                        (currentIndex - 1 + keys.length) % keys.length;
+                    nextKey = keys[nextIndex];
+                    break;
+                }
+                case "ArrowRight": {
+                    const nextIndex = (currentIndex + 1) % keys.length;
+                    nextKey = keys[nextIndex];
+                    break;
+                }
+                case "End": {
+                    nextKey = keys.at(-1) ?? selectedKey;
+                    break;
+                }
+                case "Home": {
+                    nextKey = keys[0] ?? selectedKey;
+                    break;
+                }
+                default: {
+                    return;
+                }
+            }
+
+            event.preventDefault();
+            onSelect(nextKey);
+
+            // Ensure focus follows selection for roving-tabindex behavior.
+            queueMicrotask(() => {
+                buttonByKeyRef.current.get(nextKey)?.focus();
+            });
+        },
+        [onSelect, selectedKey]
+    );
+
+    const handleButtonRef = useCallback((element: HTMLButtonElement | null) => {
+        if (!element) {
+            return;
+        }
+
+        const rawKey = element.dataset["providerKey"];
+        if (!rawKey) {
+            return;
+        }
+
+        const match = CLOUD_PROVIDER_TABS.find((tab) => tab.key === rawKey);
+        if (!match) {
+            return;
+        }
+
+        buttonByKeyRef.current.set(match.key, element);
+    }, []);
+
     return (
-        <div aria-label={ariaLabel} className="flex flex-wrap gap-2" role="tablist">
+        <div
+            aria-label={ariaLabel}
+            aria-orientation="horizontal"
+            className="flex flex-wrap gap-2"
+            role="tablist"
+        >
             {CLOUD_PROVIDER_TABS.map((tab) => {
                 const isSelected = tab.key === selectedKey;
-                const isAriaDisabled = !tab.isAvailable;
 
                 const variantClass = isSelected
                     ? "themed-button--primary"
                     : "themed-button--secondary";
 
-                const stateClass = isAriaDisabled
-                    ? "opacity-60"
-                    : "hover:opacity-95";
+                const stateClass = tab.isAvailable
+                    ? "hover:opacity-95"
+                    : "opacity-70";
 
                 return (
                     <button
                         aria-controls={`cloud-provider-panel-${tab.key}`}
-                        aria-disabled={isAriaDisabled}
                         aria-selected={isSelected}
                         className={[
                             "themed-button themed-button--size-sm",
@@ -205,8 +275,11 @@ const ProviderTabList = ({
                         id={`cloud-provider-tab-${tab.key}`}
                         key={tab.key}
                         onClick={handleTabClick}
+                        onKeyDown={handleKeyDown}
+                        ref={handleButtonRef}
                         role="tab"
                         tabIndex={isSelected ? 0 : -1}
+                        title={tab.isAvailable ? undefined : "Coming soon"}
                         type="button"
                     >
                         {tab.label}
@@ -226,13 +299,168 @@ interface ProviderPanelProperties {
     readonly filesystemConfiguredBaseDirectory: null | string;
     readonly isConfiguringFilesystemProvider: boolean;
     readonly isConnectingDropbox: boolean;
+    readonly isConnectingGoogleDrive: boolean;
     readonly onConfigureFilesystemProviderClick: () => void;
     readonly onConnectDropbox: () => void;
+    readonly onConnectGoogleDrive: () => void;
     readonly onFilesystemBaseDirectoryChange: (
         event: ChangeEvent<HTMLInputElement>
     ) => void;
     readonly providerSetupLocked: boolean;
     readonly selectedProviderTab: CloudProviderTabKey;
+}
+
+function resolveConnectActionLabel(args: {
+    configured: boolean;
+    isConnecting: boolean;
+    providerLabel: string;
+}): string {
+    if (args.isConnecting) {
+        return "Connecting…";
+    }
+
+    return args.configured
+        ? `Reconnect ${args.providerLabel}`
+        : `Connect ${args.providerLabel}`;
+}
+
+function renderUnavailableProviderPanel(args: {
+    blockedCallout: JSX.Element | null;
+    tab: CloudProviderTabDefinition;
+}): JSX.Element {
+    return (
+        <div
+            aria-labelledby={`cloud-provider-tab-${args.tab.key}`}
+            className="mt-3"
+            id={`cloud-provider-panel-${args.tab.key}`}
+            role="tabpanel"
+        >
+            {args.blockedCallout}
+
+            <div className="mt-3 rounded-md border border-zinc-800 bg-zinc-950/40 p-3">
+                <ThemedText size="sm" weight="medium">
+                    {args.tab.label} integration is coming soon
+                </ThemedText>
+                <ThemedText className="mt-1" size="xs" variant="secondary">
+                    {args.tab.description}
+                </ThemedText>
+            </div>
+        </div>
+    );
+}
+
+function renderOAuthProviderPanel(args: {
+    blockedCallout: JSX.Element | null;
+    configured: boolean;
+    connected: boolean;
+    description: string;
+    isConnecting: boolean;
+    onConnect: () => void;
+    providerKey: "dropbox" | "google-drive";
+    providerLabel: string;
+    providerSetupLocked: boolean;
+}): JSX.Element {
+    const connectLabel = resolveConnectActionLabel({
+        configured: args.configured,
+        isConnecting: args.isConnecting,
+        providerLabel: args.providerLabel,
+    });
+
+    const handleConnectClick = args.onConnect;
+
+    return (
+        <div
+            aria-labelledby={`cloud-provider-tab-${args.providerKey}`}
+            className="mt-3"
+            id={`cloud-provider-panel-${args.providerKey}`}
+            role="tabpanel"
+        >
+            {args.blockedCallout}
+
+            <ThemedText className="mt-1" size="xs" variant="secondary">
+                {args.description}
+            </ThemedText>
+
+            {args.connected ? null : (
+                <div className="mt-3 flex flex-wrap gap-2">
+                    <ThemedButton
+                        disabled={args.providerSetupLocked || args.isConnecting}
+                        onClick={handleConnectClick}
+                        size="sm"
+                        variant="primary"
+                    >
+                        {connectLabel}
+                    </ThemedButton>
+                </div>
+            )}
+        </div>
+    );
+}
+
+function renderFilesystemProviderPanel(args: {
+    blockedCallout: JSX.Element | null;
+    connected: boolean;
+    filesystemBaseDirectory: string;
+    filesystemConfiguredBaseDirectory: null | string;
+    isConfiguringFilesystemProvider: boolean;
+    onConfigureFilesystemProviderClick: () => void;
+    onFilesystemBaseDirectoryChange: (event: ChangeEvent<HTMLInputElement>) => void;
+    providerSetupLocked: boolean;
+}): JSX.Element {
+    const handleFilesystemBaseDirectoryChange =
+        args.onFilesystemBaseDirectoryChange;
+    const handleConfigureFilesystemProviderClick =
+        args.onConfigureFilesystemProviderClick;
+
+    return (
+        <div
+            aria-labelledby="cloud-provider-tab-filesystem"
+            className="mt-3"
+            id="cloud-provider-panel-filesystem"
+            role="tabpanel"
+        >
+            {args.blockedCallout}
+
+            <ThemedText className="mt-1" size="xs" variant="secondary">
+                Configure a local folder. This is useful if you want to manage syncing
+                externally (e.g. Dropbox/Drive client).
+            </ThemedText>
+
+            {args.filesystemConfiguredBaseDirectory ? (
+                <ThemedText className="mt-2" size="xs" variant="tertiary">
+                    Current folder: {args.filesystemConfiguredBaseDirectory}
+                </ThemedText>
+            ) : null}
+
+            {args.connected ? null : (
+                <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-center">
+                    <div className="flex-1">
+                        <ThemedInput
+                            aria-label="Local folder base directory"
+                            disabled={args.providerSetupLocked}
+                            onChange={handleFilesystemBaseDirectoryChange}
+                            placeholder="C:\\Path\\To\\CloudStorage"
+                            value={args.filesystemBaseDirectory}
+                        />
+                    </div>
+                    <ThemedButton
+                        disabled={
+                            args.providerSetupLocked ||
+                            args.isConfiguringFilesystemProvider ||
+                            args.filesystemBaseDirectory.trim().length === 0
+                        }
+                        onClick={handleConfigureFilesystemProviderClick}
+                        size="sm"
+                        variant="secondary"
+                    >
+                        {args.isConfiguringFilesystemProvider
+                            ? "Configuring…"
+                            : "Use folder"}
+                    </ThemedButton>
+                </div>
+            )}
+        </div>
+    );
 }
 
 const ProviderPanel = ({
@@ -243,12 +471,19 @@ const ProviderPanel = ({
     filesystemConfiguredBaseDirectory,
     isConfiguringFilesystemProvider,
     isConnectingDropbox,
+    isConnectingGoogleDrive,
     onConfigureFilesystemProviderClick,
     onConnectDropbox,
+    onConnectGoogleDrive,
     onFilesystemBaseDirectoryChange,
     providerSetupLocked,
     selectedProviderTab,
 }: ProviderPanelProperties): JSX.Element => {
+    const isSelectedProviderActive =
+        activeProviderTab !== null && activeProviderTab === selectedProviderTab;
+    const configuredForSelectedProvider = configured && isSelectedProviderActive;
+    const connectedForSelectedProvider = connected && isSelectedProviderActive;
+
     const providerBlockMessage =
         providerSetupLocked && activeProviderTab
             ? `Currently configured provider is ${resolveCloudProviderTabLabel(activeProviderTab)}. Disconnect or clear configuration before switching providers.`
@@ -262,137 +497,77 @@ const ProviderPanel = ({
         </div>
     ) : null;
 
-    const tab = CLOUD_PROVIDER_TABS.find((entry) => entry.key === selectedProviderTab);
+    const tab = CLOUD_PROVIDER_TABS.find(
+        (entry) => entry.key === selectedProviderTab
+    );
     if (!tab) {
         return <div />;
     }
 
     if (!tab.isAvailable) {
-        return (
-            <div
-                aria-labelledby={`cloud-provider-tab-${tab.key}`}
-                className="mt-3"
-                id={`cloud-provider-panel-${tab.key}`}
-                role="tabpanel"
-            >
-                {blockedCallout}
+        return renderUnavailableProviderPanel({ blockedCallout, tab });
+    }
 
-                <div className="mt-3 rounded-md border border-zinc-800 bg-zinc-950/40 p-3">
-                    <ThemedText size="sm" weight="medium">
-                        {tab.label} integration is coming soon
-                    </ThemedText>
-                    <ThemedText className="mt-1" size="xs" variant="secondary">
-                        {tab.description}
+    switch (selectedProviderTab) {
+        case "dropbox": {
+            return renderOAuthProviderPanel({
+                blockedCallout,
+                configured: configuredForSelectedProvider,
+                connected: connectedForSelectedProvider,
+                description:
+                    "Dropbox uses OAuth in your default browser. Tokens are stored in the main process and never exposed to the renderer.",
+                isConnecting: isConnectingDropbox,
+                onConnect: onConnectDropbox,
+                providerKey: "dropbox",
+                providerLabel: "Dropbox",
+                providerSetupLocked,
+            });
+        }
+        case "filesystem": {
+            return renderFilesystemProviderPanel({
+                blockedCallout,
+                connected: connectedForSelectedProvider,
+                filesystemBaseDirectory,
+                filesystemConfiguredBaseDirectory,
+                isConfiguringFilesystemProvider,
+                onConfigureFilesystemProviderClick,
+                onFilesystemBaseDirectoryChange,
+                providerSetupLocked,
+            });
+        }
+        case "google-drive": {
+            return renderOAuthProviderPanel({
+                blockedCallout,
+                configured: configuredForSelectedProvider,
+                connected: connectedForSelectedProvider,
+                description:
+                    "Google Drive uses OAuth in your default browser. Tokens are stored in the main process and never exposed to the renderer. Uptime Watcher stores files in the app data folder (private to the app).",
+                isConnecting: isConnectingGoogleDrive,
+                onConnect: onConnectGoogleDrive,
+                providerKey: "google-drive",
+                providerLabel: "Google Drive",
+                providerSetupLocked,
+            });
+        }
+        case "webdav": {
+            return renderUnavailableProviderPanel({ blockedCallout, tab });
+        }
+        default: {
+            return (
+                <div
+                    aria-labelledby={`cloud-provider-tab-${tab.key}`}
+                    className="mt-3"
+                    id={`cloud-provider-panel-${tab.key}`}
+                    role="tabpanel"
+                >
+                    {blockedCallout}
+                    <ThemedText size="sm" variant="secondary">
+                        Provider setup is not available yet.
                     </ThemedText>
                 </div>
-            </div>
-        );
-    }
-
-    if (selectedProviderTab === "dropbox") {
-        let connectLabel = "Connect Dropbox";
-        if (configured) {
-            connectLabel = "Reconnect Dropbox";
+            );
         }
-        if (isConnectingDropbox) {
-            connectLabel = "Connecting…";
-        }
-
-        return (
-            <div
-                aria-labelledby="cloud-provider-tab-dropbox"
-                className="mt-3"
-                id="cloud-provider-panel-dropbox"
-                role="tabpanel"
-            >
-                {blockedCallout}
-
-                <ThemedText className="mt-1" size="xs" variant="secondary">
-                    Dropbox uses OAuth in your default browser. Tokens are stored in the
-                    main process and never exposed to the renderer.
-                </ThemedText>
-
-                {connected ? null : (
-                    <div className="mt-3 flex flex-wrap gap-2">
-                        <ThemedButton
-                            disabled={providerSetupLocked || isConnectingDropbox}
-                            onClick={onConnectDropbox}
-                            size="sm"
-                            variant="primary"
-                        >
-                            {connectLabel}
-                        </ThemedButton>
-                    </div>
-                )}
-            </div>
-        );
     }
-
-    if (selectedProviderTab === "filesystem") {
-        return (
-            <div
-                aria-labelledby="cloud-provider-tab-filesystem"
-                className="mt-3"
-                id="cloud-provider-panel-filesystem"
-                role="tabpanel"
-            >
-                {blockedCallout}
-
-                <ThemedText className="mt-1" size="xs" variant="secondary">
-                    Configure a local folder. This is useful if you want to manage syncing
-                    externally (e.g. Dropbox/Drive client).
-                </ThemedText>
-
-                {filesystemConfiguredBaseDirectory ? (
-                    <ThemedText className="mt-2" size="xs" variant="tertiary">
-                        Current folder: {filesystemConfiguredBaseDirectory}
-                    </ThemedText>
-                ) : null}
-
-                {connected ? null : (
-                    <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-center">
-                        <div className="flex-1">
-                            <ThemedInput
-                                aria-label="Local folder base directory"
-                                disabled={providerSetupLocked}
-                                onChange={onFilesystemBaseDirectoryChange}
-                                placeholder="C:\\Path\\To\\CloudStorage"
-                                value={filesystemBaseDirectory}
-                            />
-                        </div>
-                        <ThemedButton
-                            disabled={
-                                providerSetupLocked ||
-                                isConfiguringFilesystemProvider ||
-                                filesystemBaseDirectory.trim().length === 0
-                            }
-                            onClick={onConfigureFilesystemProviderClick}
-                            size="sm"
-                            variant="secondary"
-                        >
-                            {isConfiguringFilesystemProvider
-                                ? "Configuring…"
-                                : "Use folder"}
-                        </ThemedButton>
-                    </div>
-                )}
-            </div>
-        );
-    }
-
-    return (
-        <div
-            aria-labelledby={`cloud-provider-tab-${tab.key}`}
-            className="mt-3"
-            id={`cloud-provider-panel-${tab.key}`}
-            role="tabpanel"
-        >
-            {blockedCallout}
-            <ThemedText size="sm" variant="secondary">
-                Provider setup is not available yet.
-            </ThemedText>
-        </div>
-    );
 };
 
 /**
@@ -401,10 +576,12 @@ const ProviderPanel = ({
 export interface CloudProviderSetupPanelProperties {
     readonly isConfiguringFilesystemProvider: boolean;
     readonly isConnectingDropbox: boolean;
+    readonly isConnectingGoogleDrive: boolean;
     readonly isDisconnecting: boolean;
     readonly isRefreshingStatus: boolean;
     readonly onConfigureFilesystemProvider: (baseDirectory: string) => void;
     readonly onConnectDropbox: () => void;
+    readonly onConnectGoogleDrive: () => void;
     readonly onDisconnect: () => void;
     readonly onRefreshStatus: () => void;
     readonly status: CloudStatusSummary | null;
@@ -413,10 +590,12 @@ export interface CloudProviderSetupPanelProperties {
 export const CloudProviderSetupPanel = ({
     isConfiguringFilesystemProvider,
     isConnectingDropbox,
+    isConnectingGoogleDrive,
     isDisconnecting,
     isRefreshingStatus,
     onConfigureFilesystemProvider,
     onConnectDropbox,
+    onConnectGoogleDrive,
     onDisconnect,
     onRefreshStatus,
     status,
@@ -539,10 +718,12 @@ export const CloudProviderSetupPanel = ({
                         isConfiguringFilesystemProvider
                     }
                     isConnectingDropbox={isConnectingDropbox}
+                    isConnectingGoogleDrive={isConnectingGoogleDrive}
                     onConfigureFilesystemProviderClick={
                         handleConfigureFilesystemProviderClick
                     }
                     onConnectDropbox={onConnectDropbox}
+                    onConnectGoogleDrive={onConnectGoogleDrive}
                     onFilesystemBaseDirectoryChange={
                         handleFilesystemDirectoryChange
                     }
