@@ -7,13 +7,13 @@ last_reviewed: "2025-12-12"
 category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "uptime-watcher"
-  - "architecture"
-  - "adr"
-  - "backup"
-  - "restore"
-  - "data-portability"
-  - "sqlite"
+ - "uptime-watcher"
+ - "architecture"
+ - "adr"
+ - "backup"
+ - "restore"
+ - "data-portability"
+ - "sqlite"
 ---
 
 # ADR-013: Data Portability & Backup/Restore

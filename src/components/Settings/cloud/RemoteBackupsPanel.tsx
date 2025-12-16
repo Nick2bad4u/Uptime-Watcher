@@ -1,10 +1,7 @@
 import type { CloudBackupEntry } from "@shared/types/cloud";
 import type { JSX } from "react/jsx-runtime";
 
-import {
-    type MouseEvent as ReactMouseEvent,
-    useCallback,
-} from "react";
+import { type MouseEvent as ReactMouseEvent, useCallback } from "react";
 
 import { ThemedButton } from "../../../theme/components/ThemedButton";
 import { ThemedText } from "../../../theme/components/ThemedText";
@@ -14,7 +11,13 @@ function formatBytes(bytes: number): string {
         return "0 B";
     }
 
-    const units = ["B", "KB", "MB", "GB", "TB"] as const;
+    const units = [
+        "B",
+        "KB",
+        "MB",
+        "GB",
+        "TB",
+    ] as const;
     const exponent = Math.min(
         units.length - 1,
         Math.floor(Math.log(bytes) / Math.log(1024))
@@ -99,7 +102,8 @@ export const RemoteBackupsPanel = ({
                                     {backup.fileName}
                                 </div>
                                 <div className="text-xs text-zinc-400">
-                                    {createdAt} · {formatBytes(backup.metadata.sizeBytes)}
+                                    {createdAt} ·{" "}
+                                    {formatBytes(backup.metadata.sizeBytes)}
                                     {encryptionSuffix}
                                 </div>
                             </div>
@@ -107,7 +111,10 @@ export const RemoteBackupsPanel = ({
                             <div className="flex flex-wrap gap-2">
                                 <ThemedButton
                                     data-backup-key={backup.key}
-                                    disabled={!connected || restoringBackupKey === backup.key}
+                                    disabled={
+                                        !connected ||
+                                        restoringBackupKey === backup.key
+                                    }
                                     onClick={handleRestoreClick}
                                     size="sm"
                                     variant="secondary"
@@ -119,7 +126,10 @@ export const RemoteBackupsPanel = ({
 
                                 <ThemedButton
                                     data-backup-key={backup.key}
-                                    disabled={!connected || deletingBackupKey === backup.key}
+                                    disabled={
+                                        !connected ||
+                                        deletingBackupKey === backup.key
+                                    }
                                     onClick={handleDeleteClick}
                                     size="sm"
                                     variant="error"

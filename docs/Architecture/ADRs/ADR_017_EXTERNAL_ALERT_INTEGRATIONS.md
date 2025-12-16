@@ -7,13 +7,13 @@ last_reviewed: "2025-12-12"
 category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "uptime-watcher"
-  - "architecture"
-  - "adr"
-  - "notifications"
-  - "integrations"
-  - "webhooks"
-  - "security"
+ - "uptime-watcher"
+ - "architecture"
+ - "adr"
+ - "notifications"
+ - "integrations"
+ - "webhooks"
+ - "security"
 ---
 
 # ADR-017: External Alert Integrations (Webhooks)

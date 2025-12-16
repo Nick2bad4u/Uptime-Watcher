@@ -28,11 +28,12 @@ export interface GoogleDriveAuthResult {
 }
 
 /**
- * Performs Google OAuth 2.0 Authorization Code + PKCE using the system browser and
- * a loopback IP redirect.
+ * Performs Google OAuth 2.0 Authorization Code + PKCE using the system browser
+ * and a loopback IP redirect.
  *
  * @remarks
- * Google’s native/desktop guidance recommends `http://127.0.0.1:port`.
+ * Google’s native/desktop guidance supports loopback redirects using localhost
+ * (and allows an optional path component).
  */
 export class GoogleDriveAuthFlow {
     private readonly clientId: string;
@@ -51,7 +52,10 @@ export class GoogleDriveAuthFlow {
             );
 
             authorizationUrl.searchParams.set("client_id", this.clientId);
-            authorizationUrl.searchParams.set("redirect_uri", server.redirectUri);
+            authorizationUrl.searchParams.set(
+                "redirect_uri",
+                server.redirectUri
+            );
             authorizationUrl.searchParams.set("response_type", "code");
             authorizationUrl.searchParams.set(
                 "scope",
@@ -64,7 +68,10 @@ export class GoogleDriveAuthFlow {
                 ].join(" ")
             );
             authorizationUrl.searchParams.set("state", state);
-            authorizationUrl.searchParams.set("code_challenge", pkce.codeChallenge);
+            authorizationUrl.searchParams.set(
+                "code_challenge",
+                pkce.codeChallenge
+            );
             authorizationUrl.searchParams.set(
                 "code_challenge_method",
                 pkce.codeChallengeMethod

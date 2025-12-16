@@ -7,11 +7,11 @@ last_reviewed: "2025-12-04"
 category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "uptime-watcher"
-  - "development"
-  - "setup"
-  - "quick-start"
-  - "architecture"
+ - "uptime-watcher"
+ - "development"
+ - "setup"
+ - "quick-start"
+ - "architecture"
 ---
 
 # 🚀 Developer Quick Start Guide

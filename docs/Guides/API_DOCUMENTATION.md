@@ -7,11 +7,11 @@ last_reviewed: "2025-12-14"
 category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "uptime-watcher"
-  - "ipc"
-  - "api"
-  - "electron"
-  - "events"
+ - "uptime-watcher"
+ - "ipc"
+ - "api"
+ - "electron"
+ - "events"
 ---
 
 # 📡 API & IPC Documentation
@@ -69,53 +69,57 @@ import { EventsService } from "../services/EventsService";
 import { useSitesStore } from "../stores/useSitesStore";
 
 export function useSiteLifecycleEvents(): void {
-  const addSite = useSitesStore((state) => state.addSite);
-  const updateSite = useSitesStore((state) => state.updateSite);
-  const removeSite = useSitesStore((state) => state.removeSite);
+ const addSite = useSitesStore((state) => state.addSite);
+ const updateSite = useSitesStore((state) => state.updateSite);
+ const removeSite = useSitesStore((state) => state.removeSite);
 
-  useEffect(() => {
-    const disposers: Array<() => void> = [];
-    let cancelled = false;
+ useEffect(() => {
+  const disposers: Array<() => void> = [];
+  let cancelled = false;
 
-    void EventsService.initialize()
-      .then(async () => {
-        if (cancelled) {
-          return;
-        }
+  void EventsService.initialize()
+   .then(async () => {
+    if (cancelled) {
+     return;
+    }
 
-        disposers.push(
-          await EventsService.onSiteAdded(({ site }) => {
-            addSite(site);
-          }),
-          await EventsService.onSiteUpdated(({ site }) => {
-            updateSite(site.identifier, site);
-          }),
-          await EventsService.onSiteRemoved(({ siteIdentifier }) => {
-            removeSite(siteIdentifier);
-          })
-        );
-      })
-      .catch((error) => {
-        console.error("Failed to subscribe to site events", error);
-      });
+    disposers.push(
+     await EventsService.onSiteAdded(({ site }) => {
+      addSite(site);
+     }),
+     await EventsService.onSiteUpdated(({ site }) => {
+      updateSite(site.identifier, site);
+     }),
+     await EventsService.onSiteRemoved(({ siteIdentifier }) => {
+      removeSite(siteIdentifier);
+     })
+    );
+   })
+   .catch((error) => {
+    console.error("Failed to subscribe to site events", error);
+   });
 
-    return () => {
-      cancelled = true;
-      disposers.splice(0).forEach((dispose) => {
-        try {
-          dispose();
-        } catch (error) {
-          console.error("Failed to dispose site event handler", error);
-        }
-      });
-    };
-  }, [addSite, updateSite, removeSite]);
+  return () => {
+   cancelled = true;
+   disposers.splice(0).forEach((dispose) => {
+    try {
+     dispose();
+    } catch (error) {
+     console.error("Failed to dispose site event handler", error);
+    }
+   });
+  };
+ }, [
+  addSite,
+  updateSite,
+  removeSite,
+ ]);
 }
 ```
 
 ```typescript
 if (result) {
-  console.log(`Manual check completed at ${new Date(result.timestamp)}`);
+ console.log(`Manual check completed at ${new Date(result.timestamp)}`);
 }
 ```
 
@@ -709,9 +713,9 @@ import { SiteService } from "../services/SiteService";
 import { StateSyncService } from "../services/StateSyncService";
 // Zustand store with comprehensive IPC and event integration
 export const useSitesStore = create<SitesStore>()((set, get) => ({
-  sites: [],
-  isLoading: false,
-  lastSyncTime: null,
+ sites: [],
+ isLoading: false,
+ lastSyncTime: null,
  // State actions
  setSites: (sites: Site[]) => set({ sites }),
  addSite: (site: Site) =>
@@ -723,7 +727,7 @@ export const useSitesStore = create<SitesStore>()((set, get) => ({
  fetchSites: async () => {
   set({ isLoading: true });
   try {
-  const sites = await SiteService.getSites();
+   const sites = await SiteService.getSites();
    set({ sites, lastSyncTime: Date.now() });
   } catch (error) {
    console.error("Failed to fetch sites:", error);
@@ -753,23 +757,21 @@ export const useSiteEventListeners = () => {
   let disposed = false;
 
   const setup = async () => {
-   const cleanup = await StateSyncService.onStateSyncEvent(
-    (event) => {
-     if (disposed) {
-      return;
-     }
-
-     switch (event.action) {
-      case "bulk-sync":
-       syncFromBackend();
-       break;
-      case "update":
-      case "delete":
-       useSitesStore.getState().setSites(event.sites);
-       break;
-     }
+   const cleanup = await StateSyncService.onStateSyncEvent((event) => {
+    if (disposed) {
+     return;
     }
-   );
+
+    switch (event.action) {
+     case "bulk-sync":
+      syncFromBackend();
+      break;
+     case "update":
+     case "delete":
+      useSitesStore.getState().setSites(event.sites);
+      break;
+    }
+   });
 
    return cleanup;
   };
@@ -919,22 +921,22 @@ type MonitorConfig =
  | WebsocketKeepaliveMonitorConfig;
 ```
 
-| Monitor type (`type` field) | Configuration interface           | Key fields                                                                                                      |
-| --------------------------- | --------------------------------- | --------------------------------------------------------------------------------------------------------------- |
-| `http`                      | `HttpMonitorConfig`               | `url`, `method`, `expectedStatusCodes`, optional `auth`/`headers`/`requestBody`                                 |
-| `http-status`               | `HttpStatusMonitorConfig`         | `url`, `expectedStatusCode`                                                                                     |
-| `http-header`               | `HttpHeaderMonitorConfig`         | `url`, `headerName`, `expectedHeaderValue`                                                                      |
-| `http-keyword`              | `HttpKeywordMonitorConfig`        | `url`, `bodyKeyword`                                                                                            |
-| `http-json`                 | `HttpJsonMonitorConfig`           | `url`, `jsonPath`, `expectedJsonValue`                                                                          |
-| `http-latency`              | `HttpLatencyMonitorConfig`        | `url`, `maxResponseTime`                                                                                        |
-| `ping`                      | `PingMonitorConfig`               | `host`, `packetCount`, `packetSize`, optional `maxPacketLoss`                                                   |
-| `port`                      | `PortMonitorConfig`               | `host`, `port`, optional `protocol.expectedResponse`/`useTls`                                                   |
-| `dns`                       | `Monitor` domain fields           | `host`, `recordType`, optional `expectedValue`                                                                  |
-| `ssl`                       | `SslMonitorConfig`                | `host`, `port`, `certificateWarningDays`                                                                        |
-| `cdn-edge-consistency`      | `CdnEdgeConsistencyMonitorConfig` | `baselineUrl`, `edgeLocations` (newline or comma separated list)                                                |
-| `replication`               | `ReplicationMonitorConfig`        | `primaryStatusUrl`, `replicaStatusUrl`, `replicationTimestampField`, `maxReplicationLagSeconds`                 |
-| `server-heartbeat`          | `ServerHeartbeatMonitorConfig`    | `url`, `heartbeatStatusField`, `heartbeatExpectedStatus`, `heartbeatTimestampField`, `heartbeatMaxDriftSeconds` |
-| `websocket-keepalive`       | `WebsocketKeepaliveMonitorConfig` | `url`, `maxPongDelayMs`                                                                                         |
+| Monitor type (`type` field) | Configuration interface | Key fields |
+| --- | --- | --- |
+| `http` | `HttpMonitorConfig` | `url`, `method`, `expectedStatusCodes`, optional `auth`/`headers`/`requestBody` |
+| `http-status` | `HttpStatusMonitorConfig` | `url`, `expectedStatusCode` |
+| `http-header` | `HttpHeaderMonitorConfig` | `url`, `headerName`, `expectedHeaderValue` |
+| `http-keyword` | `HttpKeywordMonitorConfig` | `url`, `bodyKeyword` |
+| `http-json` | `HttpJsonMonitorConfig` | `url`, `jsonPath`, `expectedJsonValue` |
+| `http-latency` | `HttpLatencyMonitorConfig` | `url`, `maxResponseTime` |
+| `ping` | `PingMonitorConfig` | `host`, `packetCount`, `packetSize`, optional `maxPacketLoss` |
+| `port` | `PortMonitorConfig` | `host`, `port`, optional `protocol.expectedResponse`/`useTls` |
+| `dns` | `Monitor` domain fields | `host`, `recordType`, optional `expectedValue` |
+| `ssl` | `SslMonitorConfig` | `host`, `port`, `certificateWarningDays` |
+| `cdn-edge-consistency` | `CdnEdgeConsistencyMonitorConfig` | `baselineUrl`, `edgeLocations` (newline or comma separated list) |
+| `replication` | `ReplicationMonitorConfig` | `primaryStatusUrl`, `replicaStatusUrl`, `replicationTimestampField`, `maxReplicationLagSeconds` |
+| `server-heartbeat` | `ServerHeartbeatMonitorConfig` | `url`, `heartbeatStatusField`, `heartbeatExpectedStatus`, `heartbeatTimestampField`, `heartbeatMaxDriftSeconds` |
+| `websocket-keepalive` | `WebsocketKeepaliveMonitorConfig` | `url`, `maxPongDelayMs` |
 
 All configuration interfaces also inherit scheduling, retry, and timeout controls from `BaseMonitorConfig`, ensuring consistent behaviour across the monitoring pipeline.
 
@@ -989,16 +991,19 @@ import { stateSyncApi } from "./preload/domains/stateSyncApi";
 import { systemApi } from "./preload/domains/systemApi";
 import { createEventsApi } from "./preload/domains/eventsApi";
 
-const electronAPI: ElectronBridgeApi<ReturnType<typeof createEventsApi>, typeof systemApi> = {
-  data: dataApi,
-  events: createEventsApi(),
-  monitoring: monitoringApi,
-  monitorTypes: monitorTypesApi,
-  notifications: notificationsApi,
-  settings: settingsApi,
-  sites: sitesApi,
-  stateSync: stateSyncApi,
-  system: systemApi,
+const electronAPI: ElectronBridgeApi<
+ ReturnType<typeof createEventsApi>,
+ typeof systemApi
+> = {
+ data: dataApi,
+ events: createEventsApi(),
+ monitoring: monitoringApi,
+ monitorTypes: monitorTypesApi,
+ notifications: notificationsApi,
+ settings: settingsApi,
+ sites: sitesApi,
+ stateSync: stateSyncApi,
+ system: systemApi,
 } as const;
 
 contextBridge.exposeInMainWorld("electronAPI", electronAPI);

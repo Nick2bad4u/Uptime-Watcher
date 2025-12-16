@@ -8,6 +8,7 @@ tags:
   - documentation
   - docusaurus
 ---
+
 {/* eslint-disable no-unused-vars,@eslint-community/eslint-comments/disable-enable-pair -- Link component is consumed by MDX JSX later in this file */}
 {/* @ts-expect-error -- Link is used in the MDX JSX later in this file */}
 import Link from '@docusaurus/Link';
@@ -41,8 +42,8 @@ The relevant commands live in `package.json`:
 {
   "scripts": {
     "build:eslint-inspector": "npx @eslint/config-inspector build --outDir \"docs/docusaurus/static/eslint-inspector\" --base \"/Uptime-Watcher/eslint-inspector/\"",
-    "build:eslint-inspector:local": "npm run build:eslint-inspector"
-  }
+    "build:eslint-inspector:local": "npm run build:eslint-inspector",
+  },
 }
 ```
 
@@ -139,6 +140,7 @@ dependency update:
 That is it — the inspector will reflect the new configuration.
 
 For more detail, see the full
+
 <Link to="/ESLINT-INSPECTOR-DEPLOYMENT-SUMMARY">
   ESLint Config Inspector Deployment - Implementation Summary
 </Link>

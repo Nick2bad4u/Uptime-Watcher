@@ -7,12 +7,12 @@ last_reviewed: "2025-11-17"
 category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "uptime-watcher"
-  - "documentation"
-  - "style-guide"
-  - "markdown"
+ - "uptime-watcher"
+ - "documentation"
+ - "style-guide"
+ - "markdown"
 topics:
-  - "documentation"
+ - "documentation"
 ---
 
 # Documentation Style Guide
@@ -42,13 +42,13 @@ Each file should start with:
 schema: "../../config/schemas/doc-frontmatter.schema.json"
 title: "Human-friendly document title"
 summary: "One-line description used in indexes and search."
-created: "YYYY-MM-DD"        # usually taken from `git log --diff-filter=A`
-last_reviewed: "YYYY-MM-DD"  # last date the content was reviewed/updated
-category: "guide"            # coarse type; currently always "guide" for Guides
+created: "YYYY-MM-DD" # usually taken from `git log --diff-filter=A`
+last_reviewed: "YYYY-MM-DD" # last date the content was reviewed/updated
+category: "guide" # coarse type; currently always "guide" for Guides
 author: "GitHub username or name"
 tags:
-    - "keyword-one"
-    - "keyword-two"
+ - "keyword-one"
+ - "keyword-two"
 ---
 ```
 
@@ -97,12 +97,12 @@ When editing existing docs, do not reintroduce these fields.
 We may introduce additional optional metadata fields over time. If you use them, keep names and shapes consistent:
 
 ```yaml
-status: "active"        # or "draft" | "deprecated"
+status: "active" # or "draft" | "deprecated"
 topics:
-    - "monitoring"       # higher-level areas than tags
-    - "architecture"
+ - "monitoring" # higher-level areas than tags
+ - "architecture"
 audience:
-    - "frontend"         # "backend" | "full-stack" | "ai-assistant" etc.
+ - "frontend" # "backend" | "full-stack" | "ai-assistant" etc.
 ```
 
 These are not required today but give us room to express intent (for example, marking a doc as deprecated, or indicating it is primarily for backend engineers).
@@ -210,11 +210,11 @@ circuit-breaker-implementation-plan.md
 
 </div>
 
-| Feature    | Description                     | Status |
-| ---------- | ------------------------------- | ------ |
-| Monitoring | Real-time uptime tracking       | ✅     |
-| Alerts     | Desktop notifications           | ✅     |
-| Analytics  | Historical data visualization   | 🚧     |
+| Feature | Description | Status |
+| --- | --- | --- |
+| Monitoring | Real-time uptime tracking | ✅ |
+| Alerts | Desktop notifications | ✅ |
+| Analytics | Historical data visualization | 🚧 |
 ```
 
 ### Code Blocks

@@ -7,10 +7,10 @@ last_reviewed: 2025-12-14
 category: "guide"
 author: "Nick2bad4u"
 tags:
-  - cloud
-  - sync
-  - backups
-  - dropbox
+ - cloud
+ - sync
+ - backups
+ - dropbox
 ---
 
 # Dropbox Cloud Sync Setup

@@ -7,11 +7,11 @@ last_reviewed: "2025-11-17"
 category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "uptime-watcher"
-  - "type-fest"
-  - "typescript"
-  - "types"
-  - "patterns"
+ - "uptime-watcher"
+ - "type-fest"
+ - "typescript"
+ - "types"
+ - "patterns"
 ---
 
 # Type-fest Integration Patterns

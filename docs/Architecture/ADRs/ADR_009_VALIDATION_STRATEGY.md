@@ -7,12 +7,12 @@ last_reviewed: "2025-12-11"
 category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "uptime-watcher"
-  - "architecture"
-  - "adr"
-  - "validation"
-  - "zod"
-  - "type-safety"
+ - "uptime-watcher"
+ - "architecture"
+ - "adr"
+ - "validation"
+ - "zod"
+ - "type-safety"
 ---
 
 # ADR-009: Layered Validation Strategy with Zod
@@ -209,52 +209,76 @@ All Zod schemas live in `shared/validation/schemas.ts` for cross-process consist
 import * as z from "zod";
 
 // Base monitor schema shared by all monitor types
-export const baseMonitorSchema = z.object({
-    id: z.string().min(1, "Monitor ID is required"),
-    type: z.enum([
-        "http", "http-header", "http-keyword", "http-json",
-        "http-status", "http-latency", "port", "ping",
-        "dns", "ssl", "cdn-edge-consistency", "replication",
-        "server-heartbeat", "websocket-keepalive",
-    ]),
-    status: z.enum(["up", "down", "degraded", "pending", "paused"]),
-    monitoring: z.boolean(),
-    checkInterval: z.number().min(5000).max(2592000000),
-    timeout: z.number().min(1000).max(300000),
-    retryAttempts: z.number().min(0).max(10),
-    responseTime: z.number().min(-1),
-    history: z.array(statusHistorySchema),
-    activeOperations: z.array(z.string()).optional(),
-    lastChecked: z.date().optional(),
-}).strict();
+export const baseMonitorSchema = z
+ .object({
+  id: z.string().min(1, "Monitor ID is required"),
+  type: z.enum([
+   "http",
+   "http-header",
+   "http-keyword",
+   "http-json",
+   "http-status",
+   "http-latency",
+   "port",
+   "ping",
+   "dns",
+   "ssl",
+   "cdn-edge-consistency",
+   "replication",
+   "server-heartbeat",
+   "websocket-keepalive",
+  ]),
+  status: z.enum([
+   "up",
+   "down",
+   "degraded",
+   "pending",
+   "paused",
+  ]),
+  monitoring: z.boolean(),
+  checkInterval: z.number().min(5000).max(2592000000),
+  timeout: z.number().min(1000).max(300000),
+  retryAttempts: z.number().min(0).max(10),
+  responseTime: z.number().min(-1),
+  history: z.array(statusHistorySchema),
+  activeOperations: z.array(z.string()).optional(),
+  lastChecked: z.date().optional(),
+ })
+ .strict();
 
 // Type-specific schemas extend base
-export const httpMonitorSchema = baseMonitorSchema.extend({
-    type: z.literal("http"),
-    url: httpUrlSchema,
-}).strict();
+export const httpMonitorSchema = baseMonitorSchema
+ .extend({
+  type: z.literal("http"),
+  url: httpUrlSchema,
+ })
+ .strict();
 
-export const portMonitorSchema = baseMonitorSchema.extend({
-    type: z.literal("port"),
-    host: hostValidationSchema,
-    port: z.number().refine(isValidPort, "Must be valid port (1-65535)"),
-}).strict();
+export const portMonitorSchema = baseMonitorSchema
+ .extend({
+  type: z.literal("port"),
+  host: hostValidationSchema,
+  port: z.number().refine(isValidPort, "Must be valid port (1-65535)"),
+ })
+ .strict();
 
 // Discriminated union for all monitor types
 export const monitorSchema = z.discriminatedUnion("type", [
-    httpMonitorSchema,
-    httpHeaderMonitorSchema,
-    httpKeywordMonitorSchema,
-    // ... all monitor types
+ httpMonitorSchema,
+ httpHeaderMonitorSchema,
+ httpKeywordMonitorSchema,
+ // ... all monitor types
 ]);
 
 // Site schema containing monitors
-export const siteSchema = z.object({
-    identifier: z.string().min(1).max(100),
-    name: z.string().min(1).max(200),
-    monitoring: z.boolean(),
-    monitors: z.array(monitorSchema).min(1),
-}).strict();
+export const siteSchema = z
+ .object({
+  identifier: z.string().min(1).max(100),
+  name: z.string().min(1).max(200),
+  monitoring: z.boolean(),
+  monitors: z.array(monitorSchema).min(1),
+ })
+ .strict();
 ```
 
 ### Schema Composition Pattern
@@ -327,17 +351,17 @@ graph TB
 
 ```typescript
 export interface ValidationResult {
-    success: boolean;
-    data?: unknown;
-    errors: string[];
-    warnings: string[];
-    metadata: {
-        monitorType?: string;
-        fieldName?: string;
-        siteIdentifier?: string;
-        monitorCount?: number;
-        validatedDataSize?: number;
-    };
+ success: boolean;
+ data?: unknown;
+ errors: string[];
+ warnings: string[];
+ metadata: {
+  monitorType?: string;
+  fieldName?: string;
+  siteIdentifier?: string;
+  monitorCount?: number;
+  validatedDataSize?: number;
+ };
 }
 ```
 
@@ -352,39 +376,39 @@ IPC handlers use a two-stage validation approach:
 
 // Stage 1: Parameter count and basic type validation
 export const SiteHandlerValidators: SiteHandlerValidatorsInterface = {
-    addSite: createParamValidator(1, [
-        (value) => IpcValidators.requiredObject(value, "site data"),
-    ]),
+ addSite: createParamValidator(1, [
+  (value) => IpcValidators.requiredObject(value, "site data"),
+ ]),
 
-    removeSite: createParamValidator(1, [
-        (value) => IpcValidators.requiredString(value, "site identifier"),
-    ]),
+ removeSite: createParamValidator(1, [
+  (value) => IpcValidators.requiredString(value, "site identifier"),
+ ]),
 
-    getSites: createNoParamsValidator(),
+ getSites: createNoParamsValidator(),
 
-    updateSite: createParamValidator(1, [
-        (value) => IpcValidators.requiredObject(value, "site update data"),
-    ]),
+ updateSite: createParamValidator(1, [
+  (value) => IpcValidators.requiredObject(value, "site update data"),
+ ]),
 };
 
 // Stage 2: Schema validation in handler
 registerStandardizedIpcHandler(
-    SITES_CHANNELS.addSite,
-    async (...args: unknown[]) => {
-        const siteData = args[0];
-        const parseResult = siteSchema.safeParse(siteData);
+ SITES_CHANNELS.addSite,
+ async (...args: unknown[]) => {
+  const siteData = args[0];
+  const parseResult = siteSchema.safeParse(siteData);
 
-        if (!parseResult.success) {
-            throw new ValidationError(
-                "Invalid site data",
-                parseResult.error.issues.map(formatZodIssue)
-            );
-        }
+  if (!parseResult.success) {
+   throw new ValidationError(
+    "Invalid site data",
+    parseResult.error.issues.map(formatZodIssue)
+   );
+  }
 
-        return orchestrator.addSite(parseResult.data);
-    },
-    SiteHandlerValidators.addSite,
-    registeredIpcHandlers
+  return orchestrator.addSite(parseResult.data);
+ },
+ SiteHandlerValidators.addSite,
+ registeredIpcHandlers
 );
 ```
 
@@ -400,41 +424,43 @@ registerStandardizedIpcHandler(
 import type { IpcInvokeChannel } from "@shared/types/ipc";
 import { SITES_CHANNELS } from "@shared/types/preload";
 
-export function registerStandardizedIpcHandler<TChannel extends IpcInvokeChannel>(
-    channelName: TChannel,
-    handler: StrictIpcInvokeHandler<TChannel>,
-    validateParams: IpcParameterValidator | null,
-    registeredHandlers: Set<IpcInvokeChannel>
+export function registerStandardizedIpcHandler<
+ TChannel extends IpcInvokeChannel,
+>(
+ channelName: TChannel,
+ handler: StrictIpcInvokeHandler<TChannel>,
+ validateParams: IpcParameterValidator | null,
+ registeredHandlers: Set<IpcInvokeChannel>
 ): void {
-    // Prevent duplicate handler registration
-    if (registeredHandlers.has(channelName)) {
-        throw new Error(`Duplicate IPC handler: ${channelName}`);
-    }
+ // Prevent duplicate handler registration
+ if (registeredHandlers.has(channelName)) {
+  throw new Error(`Duplicate IPC handler: ${channelName}`);
+ }
 
-    registeredHandlers.add(channelName);
+ registeredHandlers.add(channelName);
 
-    ipcMain.handle(channelName, async (_event, ...rawArgs: unknown[]) => {
-        const { args, correlationId } = extractIpcCorrelationContext(rawArgs);
+ ipcMain.handle(channelName, async (_event, ...rawArgs: unknown[]) => {
+  const { args, correlationId } = extractIpcCorrelationContext(rawArgs);
 
-        // Stage 1: validate boundary parameters
-        if (validateParams) {
-            const errors = validateParams(args);
-            if (errors) {
-                return createValidationErrorResponse(channelName, errors, correlationId);
-            }
-        }
+  // Stage 1: validate boundary parameters
+  if (validateParams) {
+   const errors = validateParams(args);
+   if (errors) {
+    return createValidationErrorResponse(channelName, errors, correlationId);
+   }
+  }
 
-        // Stage 2: execute handler and normalize errors
-        return executeIpcHandler(channelName, handler, args, correlationId);
-    });
+  // Stage 2: execute handler and normalize errors
+  return executeIpcHandler(channelName, handler, args, correlationId);
+ });
 }
 
 // Example usage (in a handler module):
 registerStandardizedIpcHandler(
-    SITES_CHANNELS.addSite,
-    withIgnoredIpcEvent((site) => uptimeOrchestrator.addSite(site)),
-    SiteHandlerValidators.addSite,
-    registeredHandlers
+ SITES_CHANNELS.addSite,
+ withIgnoredIpcEvent((site) => uptimeOrchestrator.addSite(site)),
+ SiteHandlerValidators.addSite,
+ registeredHandlers
 );
 ```
 
@@ -447,42 +473,42 @@ Managers validate domain-specific rules after IPC schema validation:
 ```typescript
 // electron/managers/SiteManager.ts
 export class SiteManager {
-    async addSite(site: Site): Promise<Site> {
-        // Business rule: Site identifier must be unique
-        const existing = await this.siteRepository.findByIdentifier(site.identifier);
-        if (existing) {
-            throw new ApplicationError({
-                code: "DUPLICATE_SITE_IDENTIFIER",
-                message: `Site with identifier '${site.identifier}' already exists`,
-                operation: "SiteManager.addSite",
-                details: { identifier: site.identifier },
-            });
-        }
+ async addSite(site: Site): Promise<Site> {
+  // Business rule: Site identifier must be unique
+  const existing = await this.siteRepository.findByIdentifier(site.identifier);
+  if (existing) {
+   throw new ApplicationError({
+    code: "DUPLICATE_SITE_IDENTIFIER",
+    message: `Site with identifier '${site.identifier}' already exists`,
+    operation: "SiteManager.addSite",
+    details: { identifier: site.identifier },
+   });
+  }
 
-        // Business rule: At least one monitor required
-        if (site.monitors.length === 0) {
-            throw new ApplicationError({
-                code: "NO_MONITORS",
-                message: "Site must have at least one monitor",
-                operation: "SiteManager.addSite",
-                details: { siteIdentifier: site.identifier },
-            });
-        }
+  // Business rule: At least one monitor required
+  if (site.monitors.length === 0) {
+   throw new ApplicationError({
+    code: "NO_MONITORS",
+    message: "Site must have at least one monitor",
+    operation: "SiteManager.addSite",
+    details: { siteIdentifier: site.identifier },
+   });
+  }
 
-        // Business rule: Monitor IDs must be unique within site
-        const monitorIds = site.monitors.map((m) => m.id);
-        const uniqueIds = new Set(monitorIds);
-        if (uniqueIds.size !== monitorIds.length) {
-            throw new ApplicationError({
-                code: "DUPLICATE_MONITOR_ID",
-                message: "Monitor IDs must be unique within a site",
-                operation: "SiteManager.addSite",
-                details: { siteIdentifier: site.identifier },
-            });
-        }
+  // Business rule: Monitor IDs must be unique within site
+  const monitorIds = site.monitors.map((m) => m.id);
+  const uniqueIds = new Set(monitorIds);
+  if (uniqueIds.size !== monitorIds.length) {
+   throw new ApplicationError({
+    code: "DUPLICATE_MONITOR_ID",
+    message: "Monitor IDs must be unique within a site",
+    operation: "SiteManager.addSite",
+    details: { siteIdentifier: site.identifier },
+   });
+  }
 
-        return this.siteRepository.create(site);
-    }
+  return this.siteRepository.create(site);
+ }
 }
 ```
 
@@ -491,36 +517,36 @@ export class SiteManager {
 ```typescript
 // shared/utils/errorHandling.ts
 export interface ApplicationErrorOptions {
-    /** Machine-readable error code */
-    code: string;
+ /** Machine-readable error code */
+ code: string;
 
-    /** Human-readable error message */
-    message: string;
+ /** Human-readable error message */
+ message: string;
 
-    /** Operation that failed */
-    operation: string;
+ /** Operation that failed */
+ operation: string;
 
-    /** Additional context for debugging */
-    details?: Record<string, unknown>;
+ /** Additional context for debugging */
+ details?: Record<string, unknown>;
 
-    /** Original error if wrapping */
-    cause?: Error;
+ /** Original error if wrapping */
+ cause?: Error;
 }
 
 export class ApplicationError extends Error {
-    public readonly code: string;
-    public readonly operation: string;
-    public readonly details?: Record<string, unknown>;
-    public readonly cause?: Error;
+ public readonly code: string;
+ public readonly operation: string;
+ public readonly details?: Record<string, unknown>;
+ public readonly cause?: Error;
 
-    constructor(options: ApplicationErrorOptions) {
-        super(options.message);
-        this.name = "ApplicationError";
-        this.code = options.code;
-        this.operation = options.operation;
-        this.details = options.details;
-        this.cause = options.cause;
-    }
+ constructor(options: ApplicationErrorOptions) {
+  super(options.message);
+  this.name = "ApplicationError";
+  this.code = options.code;
+  this.operation = options.operation;
+  this.details = options.details;
+  this.cause = options.cause;
+ }
 }
 ```
 
@@ -533,30 +559,30 @@ Repositories normalize data before persistence:
 ```typescript
 // electron/services/database/SiteRepository.ts
 export class SiteRepository {
-    public async create(site: Site): Promise<Site> {
-        return withDatabaseOperation(async () => {
-            return this.databaseService.executeTransaction((db) => {
-                // Normalize before persistence
-                const normalizedSite = this.normalizeSite(site);
+ public async create(site: Site): Promise<Site> {
+  return withDatabaseOperation(async () => {
+   return this.databaseService.executeTransaction((db) => {
+    // Normalize before persistence
+    const normalizedSite = this.normalizeSite(site);
 
-                this.createInternal(db, normalizedSite);
-                return Promise.resolve(normalizedSite);
-            });
-        }, "SiteRepository.create");
-    }
+    this.createInternal(db, normalizedSite);
+    return Promise.resolve(normalizedSite);
+   });
+  }, "SiteRepository.create");
+ }
 
-    private normalizeSite(site: Site): Site {
-        return {
-            ...site,
-            identifier: site.identifier.trim(),
-            name: site.name.trim(),
-            monitors: site.monitors.map((monitor) => ({
-                ...monitor,
-                id: monitor.id.trim(),
-                url: monitor.url?.trim().toLowerCase(),
-            })),
-        };
-    }
+ private normalizeSite(site: Site): Site {
+  return {
+   ...site,
+   identifier: site.identifier.trim(),
+   name: site.name.trim(),
+   monitors: site.monitors.map((monitor) => ({
+    ...monitor,
+    id: monitor.id.trim(),
+    url: monitor.url?.trim().toLowerCase(),
+   })),
+  };
+ }
 }
 ```
 
@@ -620,10 +646,12 @@ CREATE UNIQUE INDEX IF NOT EXISTS idx_monitors_site_id
 
    ```typescript
    // shared/validation/schemas.ts
-   export const newDataSchema = z.object({
-       field: z.string().min(1),
-       count: z.number().positive(),
-   }).strict();
+   export const newDataSchema = z
+    .object({
+     field: z.string().min(1),
+     count: z.number().positive(),
+    })
+    .strict();
    ```
 
 2. **Add IPC Validator**
@@ -631,9 +659,9 @@ CREATE UNIQUE INDEX IF NOT EXISTS idx_monitors_site_id
    ```typescript
    // electron/services/ipc/validators.ts
    export const NewHandlerValidators = {
-       createNew: createParamValidator(1, [
-           (value) => IpcValidators.requiredObject(value, "new data"),
-       ]),
+    createNew: createParamValidator(1, [
+     (value) => IpcValidators.requiredObject(value, "new data"),
+    ]),
    };
    ```
 

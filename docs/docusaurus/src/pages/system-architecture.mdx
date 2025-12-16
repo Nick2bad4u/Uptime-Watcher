@@ -2,6 +2,7 @@
 title: System Architecture Overview
 description: Comprehensive system architecture and component relationships
 ---
+
 {/* eslint-disable no-unused-vars,@eslint-community/eslint-comments/disable-enable-pair -- Layout component consumed by MDX JSX */}
 import Layout from '@theme/Layout';
 import Mermaid from '@theme/Mermaid';
@@ -346,12 +347,12 @@ export default function SystemArchitecture() {
     class Writer,DbTx,Repos,Scheduler,CheckerStart persistence
     class SitesCache,EventBus events
     class RendererBridge,EventsAPI,SiteStore frontend
+
 `} />
 
                         ## UI Component Composition
 
                         The React shell in `src/App.tsx` wraps the application with error handling and theme context before rendering the header, dashboard, overlays, and modal surfaces. The diagram below maps the concrete components sourced from `src/components/**` so new contributors can trace the composition quickly.
-
 
 <Mermaid value={`flowchart LR
     %% Application shell composition
@@ -442,13 +443,12 @@ export default function SystemArchitecture() {
     class AppRoot root
     class ErrorBoundary,ThemeProvider,Header,SiteList,AddSiteModal,SettingsModal,SiteDetailsModal,LoadingOverlay,ErrorAlert,UpdateNotice component
     class HeaderStack,Dashboard,ModalLayer,Overlays,Shell,SiteCardStack,AddSiteFormStack,SiteDetailsStack section
-`} />
 
+`} />
 
                         ## UI-State Integration Map
 
                         UI components consume shared Zustand stores and renderer services instead of talking to Electron directly. This view shows which surfaces subscribe to each store and which services bridge to `electronAPI` IPC channels, based on hooks in `src/hooks/site` and the store modules under `src/stores/**`.
-
 
 <Mermaid value={`flowchart LR
     subgraph UI["UI Components"]
@@ -475,13 +475,14 @@ export default function SystemArchitecture() {
 
     subgraph Services["Renderer Services"]
         SiteSvc[SiteService
+
 (electronAPI.sites)]
-        MonitoringSvc[MonitoringService
+MonitoringSvc[MonitoringService
 (monitoring IPC)]
-        EventsSvc[EventsService
+EventsSvc[EventsService
 (electronAPI.events)]
-        ChartConfigSvc[ChartConfigService]
-    end
+ChartConfigSvc[ChartConfigService]
+end
 
     Header --> SitesStore
     Header --> UIStore
@@ -522,8 +523,8 @@ export default function SystemArchitecture() {
     class Header,SiteList,SiteCard,AddSiteModal,SettingsPanel,SiteDetailsView,UpdateNotice,ErrorBanner ui
     class SitesStore,UIStore,SettingsStore,ErrorStore,UpdatesStore,ThemeHook,SiteHook,SiteDetailsHook store
     class SiteSvc,MonitoringSvc,EventsSvc,ChartConfigSvc service
-`} />
 
+`} />
 
                         ---
 
@@ -534,4 +535,5 @@ export default function SystemArchitecture() {
             </div>
         </Layout>
     );
+
 }

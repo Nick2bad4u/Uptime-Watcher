@@ -62,8 +62,8 @@ describe(GoogleDriveTokenManager, () => {
 
         const raw = await secretStore.getSecret("cloud.googleDrive.tokens");
         expect(raw).toBeTruthy();
-        expect(raw).not.toContain("\"scope\"");
-        expect(raw).not.toContain("\"tokenType\"");
+        expect(raw).not.toContain('"scope"');
+        expect(raw).not.toContain('"tokenType"');
 
         expect(axiosPost).toHaveBeenCalledWith(
             "https://oauth2.googleapis.com/token",

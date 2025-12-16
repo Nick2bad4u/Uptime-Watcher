@@ -5,7 +5,10 @@ import type { drive_v3 } from "googleapis";
 import { google } from "googleapis";
 import { Readable } from "node:stream";
 
-import type { CloudObjectEntry, CloudStorageProvider } from "../CloudStorageProvider.types";
+import type {
+    CloudObjectEntry,
+    CloudStorageProvider,
+} from "../CloudStorageProvider.types";
 import type { GoogleDriveTokenManager } from "./GoogleDriveTokenManager";
 
 import {
@@ -127,7 +130,10 @@ export class GoogleDriveCloudStorageProvider implements CloudStorageProvider {
 
         const backups = await Promise.all(
             metadataKeys.map(async (metadataKey) => {
-                const metadataFile = await this.findFileByKey(drive, metadataKey);
+                const metadataFile = await this.findFileByKey(
+                    drive,
+                    metadataKey
+                );
                 if (!metadataFile) {
                     return null;
                 }
@@ -137,13 +143,15 @@ export class GoogleDriveCloudStorageProvider implements CloudStorageProvider {
                     { responseType: "stream" }
                 );
 
-                    const buffer = await convertStreamToBuffer(response.data);
+                const buffer = await convertStreamToBuffer(response.data);
                 const parsed = JSON.parse(buffer.toString("utf8")) as unknown;
                 return parseCloudBackupMetadataFile(parsed);
             })
         );
 
-        return backups.filter((entry): entry is CloudBackupEntry => entry !== null);
+        return backups.filter(
+            (entry): entry is CloudBackupEntry => entry !== null
+        );
     }
 
     public async listObjects(prefix: string): Promise<CloudObjectEntry[]> {
@@ -200,7 +208,10 @@ export class GoogleDriveCloudStorageProvider implements CloudStorageProvider {
         });
 
         await this.uploadObject({
-            buffer: Buffer.from(serializeCloudBackupMetadataFile(entry), "utf8"),
+            buffer: Buffer.from(
+                serializeCloudBackupMetadataFile(entry),
+                "utf8"
+            ),
             key: backupMetadataKeyForBackupKey(backupKey),
             overwrite: true,
         });
@@ -226,7 +237,9 @@ export class GoogleDriveCloudStorageProvider implements CloudStorageProvider {
         });
 
         if (existing && args.overwrite === false) {
-            throw new Error(`Google Drive object already exists: ${normalizedKey}`);
+            throw new Error(
+                `Google Drive object already exists: ${normalizedKey}`
+            );
         }
 
         const media = {
@@ -337,7 +350,9 @@ export class GoogleDriveCloudStorageProvider implements CloudStorageProvider {
 
                 const { id } = created.data;
                 if (!id) {
-                    throw new Error("Google Drive folder create returned no id");
+                    throw new Error(
+                        "Google Drive folder create returned no id"
+                    );
                 }
 
                 parentId = id;

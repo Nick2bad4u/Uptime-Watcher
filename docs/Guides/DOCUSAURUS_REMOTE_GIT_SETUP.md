@@ -7,12 +7,12 @@ last_reviewed: "2025-11-23"
 category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "uptime-watcher"
-  - "documentation"
-  - "docusaurus"
-  - "markdown"
+ - "uptime-watcher"
+ - "documentation"
+ - "docusaurus"
+ - "markdown"
 topics:
-  - "documentation"
+ - "documentation"
 ---
 
 # Git Subtree Setup Instructions

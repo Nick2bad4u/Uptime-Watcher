@@ -192,7 +192,9 @@ export const CloudSettingsSection = (): JSX.Element => {
     );
 
     const isConnectingDropbox = useCloudStore(selectIsConnectingDropbox);
-    const isConnectingGoogleDrive = useCloudStore(selectIsConnectingGoogleDrive);
+    const isConnectingGoogleDrive = useCloudStore(
+        selectIsConnectingGoogleDrive
+    );
     const isDisconnecting = useCloudStore(selectIsDisconnecting);
     const isListingBackups = useCloudStore(selectIsListingBackups);
     const isRefreshingStatus = useCloudStore(selectIsRefreshingStatus);
@@ -227,7 +229,9 @@ export const CloudSettingsSection = (): JSX.Element => {
         selectIsRefreshingRemoteSyncResetPreview
     );
 
-    const fireAndForget = useCallback((action: () => Promise<unknown>): void => {
+    const fireAndForget = useCallback((
+        action: () => Promise<unknown>
+    ): void => {
         void (async (): Promise<void> => {
             try {
                 await action();
@@ -572,8 +576,7 @@ export const CloudSettingsSection = (): JSX.Element => {
             }
 
             fireAndForget(() =>
-                configureFilesystemProvider({ baseDirectory: trimmed })
-            );
+                configureFilesystemProvider({ baseDirectory: trimmed }));
         },
         [configureFilesystemProvider, fireAndForget]
     );

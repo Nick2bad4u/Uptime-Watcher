@@ -151,23 +151,19 @@ The IPC contract + static guard approach has concrete benefits:
 If you are adding a new IPC feature, the safe workflow looks like:
 
 1. **Define types first**
-
    - Add or extend shared types in `shared/types/ipc.ts` and related domain
      types.
 
 2. **Wire Electron handlers**
-
    - Implement handlers in `electron/services/ipc/IpcService.ts` or a
      domain-specific coordinator.
    - Emit typed events via the TypedEventBus where appropriate.
 
 3. **Expose preload APIs**
-
    - Add domain functions under `electron/preload/domains/*Api.ts` that
      call the new channel.
 
 4. **Consume from renderer services**
-
    - Call the preload APIs from `src/services/*Service.ts`.
    - Keep components and stores IPC-free.
 

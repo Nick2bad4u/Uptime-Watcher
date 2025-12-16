@@ -7,12 +7,12 @@ last_reviewed: "2025-11-25"
 category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "uptime-watcher"
-  - "architecture"
-  - "adr"
-  - "dependency-injection"
-  - "service-container"
-  - "electron"
+ - "uptime-watcher"
+ - "architecture"
+ - "adr"
+ - "dependency-injection"
+ - "service-container"
+ - "electron"
 ---
 
 # ADR-007: Service Container and Dependency Injection Pattern
@@ -150,24 +150,24 @@ graph TB
 
 ```typescript
 export class ServiceContainer {
-    private static instance: ServiceContainer | undefined;
+ private static instance: ServiceContainer | undefined;
 
-    public static getInstance(config?: ServiceContainerConfig): ServiceContainer {
-        ServiceContainer.instance ??= new ServiceContainer(config ?? {});
-        return ServiceContainer.instance;
-    }
+ public static getInstance(config?: ServiceContainerConfig): ServiceContainer {
+  ServiceContainer.instance ??= new ServiceContainer(config ?? {});
+  return ServiceContainer.instance;
+ }
 
-    public static getExistingInstance(): ServiceContainer | undefined {
-        return ServiceContainer.instance;
-    }
+ public static getExistingInstance(): ServiceContainer | undefined {
+  return ServiceContainer.instance;
+ }
 
-    public static resetForTesting(): void {
-        ServiceContainer.instance = undefined;
-    }
+ public static resetForTesting(): void {
+  ServiceContainer.instance = undefined;
+ }
 
-    private constructor(config: ServiceContainerConfig = {}) {
-        this.config = config;
-    }
+ private constructor(config: ServiceContainerConfig = {}) {
+  this.config = config;
+ }
 }
 ```
 
@@ -240,25 +240,34 @@ To avoid circular dependencies between managers, the container provides operatio
 
 ```typescript
 const monitoringOperations: IMonitoringOperations = {
-    setHistoryLimit: async (limit: number): Promise<void> => {
-        const databaseManager = this.getDatabaseManager();
-        await databaseManager.setHistoryLimit(limit);
-    },
+ setHistoryLimit: async (limit: number): Promise<void> => {
+  const databaseManager = this.getDatabaseManager();
+  await databaseManager.setHistoryLimit(limit);
+ },
 
-    setupNewMonitors: async (site: Site, newMonitorIds: string[]): Promise<void> => {
-        const monitorManager = this.getMonitorManager();
-        return monitorManager.setupNewMonitors(site, newMonitorIds);
-    },
+ setupNewMonitors: async (
+  site: Site,
+  newMonitorIds: string[]
+ ): Promise<void> => {
+  const monitorManager = this.getMonitorManager();
+  return monitorManager.setupNewMonitors(site, newMonitorIds);
+ },
 
-    startMonitoringForSite: async (identifier: string, monitorId: string): Promise<boolean> => {
-        const monitorManager = this.getMonitorManager();
-        return monitorManager.startMonitoringForSite(identifier, monitorId);
-    },
+ startMonitoringForSite: async (
+  identifier: string,
+  monitorId: string
+ ): Promise<boolean> => {
+  const monitorManager = this.getMonitorManager();
+  return monitorManager.startMonitoringForSite(identifier, monitorId);
+ },
 
-    stopMonitoringForSite: async (identifier: string, monitorId: string): Promise<boolean> => {
-        const monitorManager = this.getMonitorManager();
-        return monitorManager.stopMonitoringForSite(identifier, monitorId);
-    },
+ stopMonitoringForSite: async (
+  identifier: string,
+  monitorId: string
+ ): Promise<boolean> => {
+  const monitorManager = this.getMonitorManager();
+  return monitorManager.stopMonitoringForSite(identifier, monitorId);
+ },
 };
 ```
 
@@ -495,29 +504,29 @@ The container forwards these events from manager buses to the orchestrator:
 
 ```typescript
 const eventsToForward = [
-    // Monitor events
-    "monitor:status-changed",
-    "monitor:up",
-    "monitor:down",
-    "internal:monitor:started",
-    "internal:monitor:stopped",
-    "internal:monitor:manual-check-completed",
-    "internal:monitor:site-setup-completed",
+ // Monitor events
+ "monitor:status-changed",
+ "monitor:up",
+ "monitor:down",
+ "internal:monitor:started",
+ "internal:monitor:stopped",
+ "internal:monitor:manual-check-completed",
+ "internal:monitor:site-setup-completed",
 
-    // Site events
-    "internal:site:added",
-    "internal:site:removed",
-    "internal:site:updated",
-    "sites:state-synchronized",
+ // Site events
+ "internal:site:added",
+ "internal:site:removed",
+ "internal:site:updated",
+ "sites:state-synchronized",
 
-    // Database events
-    "internal:database:data-imported",
-    "internal:database:history-limit-updated",
-    "internal:database:sites-refreshed",
-    "internal:database:update-sites-cache-requested",
+ // Database events
+ "internal:database:data-imported",
+ "internal:database:history-limit-updated",
+ "internal:database:sites-refreshed",
+ "internal:database:update-sites-cache-requested",
 
-    // System events
-    "system:error",
+ // System events
+ "system:error",
 ] as const;
 ```
 
@@ -608,16 +617,19 @@ Use operation interfaces instead of direct manager references:
 ```typescript
 // ❌ Bad - direct circular reference
 class SiteManager {
-    constructor(private monitorManager: MonitorManager) {}
+ constructor(private monitorManager: MonitorManager) {}
 }
 
 // ✅ Good - operation interface
 interface IMonitoringOperations {
-    startMonitoringForSite: (identifier: string, monitorId: string) => Promise<boolean>;
+ startMonitoringForSite: (
+  identifier: string,
+  monitorId: string
+ ) => Promise<boolean>;
 }
 
 class SiteManager {
-    constructor(private monitoringOperations: IMonitoringOperations) {}
+ constructor(private monitoringOperations: IMonitoringOperations) {}
 }
 ```
 
@@ -627,12 +639,12 @@ class SiteManager {
 
 ```typescript
 beforeEach(() => {
-    // Reset singleton for clean test state
-    ServiceContainer.resetForTesting();
+ // Reset singleton for clean test state
+ ServiceContainer.resetForTesting();
 });
 
 afterEach(() => {
-    ServiceContainer.resetForTesting();
+ ServiceContainer.resetForTesting();
 });
 ```
 
@@ -641,11 +653,11 @@ afterEach(() => {
 ```typescript
 // Create container with test configuration
 const container = ServiceContainer.getInstance({
-    enableDebugLogging: true,
-    notificationConfig: {
-        showDownAlerts: false,
-        showUpAlerts: false,
-    },
+ enableDebugLogging: true,
+ notificationConfig: {
+  showDownAlerts: false,
+  showUpAlerts: false,
+ },
 });
 ```
 
@@ -653,13 +665,13 @@ const container = ServiceContainer.getInstance({
 
 ```typescript
 it("should initialize all services in correct order", async () => {
-    const container = ServiceContainer.getInstance();
-    await container.initialize();
+ const container = ServiceContainer.getInstance();
+ await container.initialize();
 
-    const status = container.getInitializationStatus();
-    expect(status.DatabaseService).toBe(true);
-    expect(status.SiteManager).toBe(true);
-    expect(status.UptimeOrchestrator).toBe(true);
+ const status = container.getInitializationStatus();
+ expect(status.DatabaseService).toBe(true);
+ expect(status.SiteManager).toBe(true);
+ expect(status.UptimeOrchestrator).toBe(true);
 });
 ```
 

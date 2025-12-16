@@ -7,11 +7,11 @@ last_reviewed: "2025-12-12"
 category: "guide"
 author: "Uptime Watcher Team"
 tags:
-  - "linting"
-  - "eslint"
-  - "architecture"
-  - "guardrails"
-  - "ai-agent"
+ - "linting"
+ - "eslint"
+ - "architecture"
+ - "guardrails"
+ - "ai-agent"
 ---
 
 # Lint guardrails and custom ESLint rules
@@ -77,10 +77,10 @@ registration or invocation.
 import { SITES_CHANNELS } from "@shared/types/preload";
 
 registerStandardizedIpcHandler(
-  SITES_CHANNELS.addSite,
-  handler,
-  validator,
-  registeredHandlers
+ SITES_CHANNELS.addSite,
+ handler,
+ validator,
+ registeredHandlers
 );
 ```
 
@@ -99,8 +99,7 @@ Examples that are not allowed:
 **Fix:** reference the canonical channel constant and let types infer:
 
 ```ts
-import { UPDATE_NOTIFICATION_PREFERENCES_CHANNEL } from
-  "@electron/services/ipc/notificationChannelGuards";
+import { UPDATE_NOTIFICATION_PREFERENCES_CHANNEL } from "@electron/services/ipc/notificationChannelGuards";
 
 type UpdatePreferencesChannel = typeof UPDATE_NOTIFICATION_PREFERENCES_CHANNEL;
 ```

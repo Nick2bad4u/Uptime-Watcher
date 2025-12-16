@@ -2,19 +2,18 @@
 schema: "../../config/schemas/doc-frontmatter.schema.json"
 title: "Typing Audit History"
 summary: >-
-  Consolidated record of the Electron, renderer, Zustand, and repo-wide typing
-  audits produced during the 2025 refactor, including the comprehensive file
-  review tracker for future AI/context use.
+ Consolidated record of the Electron, renderer, Zustand, and repo-wide typing
+ audits produced during the 2025 refactor, including the comprehensive file
+ review tracker for future AI/context use.
 created: "2025-12-01"
 last_reviewed: "2025-12-12"
 category: "guide"
 author: "AI Pair"
 tags:
-  - "typing"
-  - "audit"
-  - "architecture"
-  - "history"
-
+ - "typing"
+ - "audit"
+ - "architecture"
+ - "history"
 ---
 
 # Typing Audit History

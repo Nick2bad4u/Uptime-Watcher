@@ -7,10 +7,10 @@ last_reviewed: "2025-12-11"
 category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "uptime-watcher"
-  - "architecture"
-  - "patterns"
-  - "guidelines"
+ - "uptime-watcher"
+ - "architecture"
+ - "patterns"
+ - "guidelines"
 ---
 
 # Development Patterns Guide
@@ -246,15 +246,15 @@ import { LOG_TEMPLATES } from "@shared/utils/logTemplates";
 const FALLBACK_RESULT: Result = { success: false } as Result;
 
 export async function invokeOperation(): Promise<Result> {
-    return withUtilityErrorHandling(
-        async () => {
-            // ...operation logic
-            return await performOperation();
-        },
-        LOG_TEMPLATES.utilities.OPERATION_FAILED,
-        FALLBACK_RESULT,
-        false
-    );
+ return withUtilityErrorHandling(
+  async () => {
+   // ...operation logic
+   return await performOperation();
+  },
+  LOG_TEMPLATES.utilities.OPERATION_FAILED,
+  FALLBACK_RESULT,
+  false
+ );
 }
 ```
 
@@ -454,18 +454,18 @@ patterns are used when wiring store actions to `withErrorHandling()`:
 
    // Inside a store module
    const initializeSettings = async (): Promise<void> => {
-      await withErrorHandling(
-       async () => {
-          const historyLimit = await SettingsService.getHistoryLimit();
-          setState({
-           settings: normalizeAppSettings({
-              ...getState().settings,
-              historyLimit,
-           }),
-          });
-       },
-       createStoreErrorHandler("settings", "initializeSettings")
-      );
+    await withErrorHandling(
+     async () => {
+      const historyLimit = await SettingsService.getHistoryLimit();
+      setState({
+       settings: normalizeAppSettings({
+        ...getState().settings,
+        historyLimit,
+       }),
+      });
+     },
+     createStoreErrorHandler("settings", "initializeSettings")
+    );
    };
    ```
 
@@ -482,29 +482,25 @@ patterns are used when wiring store actions to `withErrorHandling()`:
 
    ```typescript
    await withErrorHandling(
-      async () => {
-       const sanitizedLimit = normalizeHistoryLimit(limit, RULES);
-       getState().updateSettings({ historyLimit: sanitizedLimit });
-       const backendLimit = await SettingsService.updateHistoryLimit(
-          sanitizedLimit
-       );
-       // ...apply normalized backendLimit...
-      },
-      {
-       clearError: () => useErrorStore.getState().clearStoreError("settings"),
-       setError: (error) => {
-          const errorStore = useErrorStore.getState();
-          errorStore.setStoreError("settings", error);
-          // Revert optimistic update on failure
-          getState().updateSettings({
-           historyLimit: currentSettings.historyLimit,
-          });
-       },
-       setLoading: (loading) =>
-          useErrorStore
-           .getState()
-           .setOperationLoading("updateHistoryLimit", loading),
-      }
+    async () => {
+     const sanitizedLimit = normalizeHistoryLimit(limit, RULES);
+     getState().updateSettings({ historyLimit: sanitizedLimit });
+     const backendLimit = await SettingsService.updateHistoryLimit(sanitizedLimit);
+     // ...apply normalized backendLimit...
+    },
+    {
+     clearError: () => useErrorStore.getState().clearStoreError("settings"),
+     setError: (error) => {
+      const errorStore = useErrorStore.getState();
+      errorStore.setStoreError("settings", error);
+      // Revert optimistic update on failure
+      getState().updateSettings({
+       historyLimit: currentSettings.historyLimit,
+      });
+     },
+     setLoading: (loading) =>
+      useErrorStore.getState().setOperationLoading("updateHistoryLimit", loading),
+    }
    );
    ```
 
@@ -713,25 +709,25 @@ import { ExampleHandlerValidators } from "../validators";
 import { withIgnoredIpcEvent } from "./handlerShared";
 
 export function registerExampleHandlers({
-    registeredHandlers,
-    exampleManager,
+ registeredHandlers,
+ exampleManager,
 }: {
-    registeredHandlers: Set<IpcInvokeChannel>;
-    exampleManager: ExampleManager;
+ registeredHandlers: Set<IpcInvokeChannel>;
+ exampleManager: ExampleManager;
 }): void {
-    registerStandardizedIpcHandler(
-        EXAMPLE_CHANNELS.createExample,
-        withIgnoredIpcEvent((params) => exampleManager.create(params)),
-        ExampleHandlerValidators.createExample,
-        registeredHandlers
-    );
+ registerStandardizedIpcHandler(
+  EXAMPLE_CHANNELS.createExample,
+  withIgnoredIpcEvent((params) => exampleManager.create(params)),
+  ExampleHandlerValidators.createExample,
+  registeredHandlers
+ );
 
-    registerStandardizedIpcHandler(
-        EXAMPLE_CHANNELS.getExamples,
-        withIgnoredIpcEvent(() => exampleManager.getAll()),
-        null,
-        registeredHandlers
-    );
+ registerStandardizedIpcHandler(
+  EXAMPLE_CHANNELS.getExamples,
+  withIgnoredIpcEvent(() => exampleManager.getAll()),
+  null,
+  registeredHandlers
+ );
 }
 ```
 
@@ -744,10 +740,10 @@ import { EXAMPLE_CHANNELS } from "@shared/types/preload";
 import { createTypedInvoker } from "../core/bridgeFactory";
 
 export function createExampleApi() {
-    return {
-        create: createTypedInvoker(EXAMPLE_CHANNELS.createExample),
-        getAll: createTypedInvoker(EXAMPLE_CHANNELS.getExamples),
-    };
+ return {
+  create: createTypedInvoker(EXAMPLE_CHANNELS.createExample),
+  getAll: createTypedInvoker(EXAMPLE_CHANNELS.getExamples),
+ };
 }
 
 // Events are exposed via the preload events domain bridge:
@@ -1310,19 +1306,16 @@ The site mutation pipeline enforces a strict layering contract that keeps the da
 ### Layer Responsibilities
 
 - **SiteManager**
-
   - Protects domain invariants (e.g., cannot remove the final monitor from a site).
   - Performs structured validation with [`ERROR_CATALOG`](../../../shared/utils/errorCatalog.ts) for consistent messaging.
   - Emits fully populated events with timestamps and updated field metadata.
 
 - **SiteWriterService**
-
   - Owns transactional boundaries via `DatabaseService.executeTransaction`.
   - Applies monitor updates through `updateMonitorsPreservingHistory` so historical rows remain attached to surviving monitors.
   - Writes sanitized copies into the shared `StandardizedCache` instance.
 
 - **Repositories**
-
   - Contain only synchronous `*_Internal` helpers that assume an active transaction.
   - Never call `getDatabase()` directly inside internal helpers; transaction management is delegated to the caller.
 

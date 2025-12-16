@@ -305,7 +305,7 @@
     "lint:publint": "publint",
     "lint:quick": "cross-env NODE_OPTIONS=--max_old_space_size=16384 npm run lint:js && npm run lint:ts && npm run lint:prettier",
     "lint:remark": "npm run remark:check",
-    "lint:remark:fix": "remark --rc-path .remarkrc.mjs --silently-ignore --ignore-path .remarkignore --frail --quiet --output -- \"*.{md,mdx}\" \"docs/**/*.{md,mdx}\" \"src/**/*.{md,mdx}\" \"electron/**/*.{md,mdx}\" \"shared/**/*.{md,mdx}\"",
+    "lint:remark:fix": "prettier --log-level warn --ignore-path config/tools/prettierignore.remark --cache --cache-location=.cache/.prettier-cache --cache-strategy=content --no-error-on-unmatched-pattern --write \"*.{md,mdx}\" \"docs/**/*.{md,mdx}\" \"src/**/*.{md,mdx}\" \"electron/**/*.{md,mdx}\" \"shared/**/*.{md,mdx}\" && remark --rc-path .remarkrc.mjs --silently-ignore --ignore-path .remarkignore --frail --quiet --output -- \"*.{md,mdx}\" \"docs/**/*.{md,mdx}\" \"src/**/*.{md,mdx}\" \"electron/**/*.{md,mdx}\" \"shared/**/*.{md,mdx}\"",
     "lint:resolve-audit": "resolve-audit --skip-dev",
     "lint:sarif:format": "cross-env NODE_OPTIONS=--max_old_space_size=16384 eslint --cache --cache-strategy content --cache-location .cache/.eslintcache --format @microsoft/eslint-formatter-sarif -o ESLintReport.sarif",
     "lint:secrets": "detect-secrets scan",
@@ -1204,6 +1204,10 @@
   "peerDependencies": {
     "react-scan": "^0.4.3"
   },
+  "optionalDependencies": {
+    "bufferutil": "^4.0.9",
+    "utf-8-validate": "^6.0.5"
+  },
   "bundleDependencies": [
     "node-sqlite3-wasm"
   ],
@@ -1415,9 +1419,5 @@
       "public"
     ]
   },
-  "readme": "README.md",
-  "optionalDependencies": {
-    "bufferutil": "^4.0.9",
-    "utf-8-validate": "^6.0.5"
-  }
+  "readme": "README.md"
 }

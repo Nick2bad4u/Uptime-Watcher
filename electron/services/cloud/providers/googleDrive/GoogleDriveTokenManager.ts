@@ -14,13 +14,15 @@ export interface GoogleDriveTokens {
     tokenType?: string | undefined;
 }
 
-const googleTokenSchema: z.ZodType<GoogleDriveTokens> = z.object({
-    accessToken: z.string().min(1),
-    expiresAt: z.number().int().nonnegative(),
-    refreshToken: z.string().min(1),
-    scope: z.string().optional(),
-    tokenType: z.string().optional(),
-}).strict();
+const googleTokenSchema: z.ZodType<GoogleDriveTokens> = z
+    .object({
+        accessToken: z.string().min(1),
+        expiresAt: z.number().int().nonnegative(),
+        refreshToken: z.string().min(1),
+        scope: z.string().optional(),
+        tokenType: z.string().optional(),
+    })
+    .strict();
 
 const googleTokenResponseSchema = z.looseObject({
     access_token: z.string().min(1),
@@ -61,7 +63,10 @@ export class GoogleDriveTokenManager {
     }
 
     public async setTokens(tokens: GoogleDriveTokens): Promise<void> {
-        await this.secretStore.setSecret(this.storageKey, JSON.stringify(tokens));
+        await this.secretStore.setSecret(
+            this.storageKey,
+            JSON.stringify(tokens)
+        );
     }
 
     public async isConnected(): Promise<boolean> {
@@ -93,15 +98,17 @@ export class GoogleDriveTokenManager {
             expiresAt: now + (refreshed.expires_in ?? 3600) * 1000,
             refreshToken: refreshed.refresh_token ?? tokens.refreshToken,
             ...(nextScope === undefined ? {} : { scope: nextScope }),
-            ...(nextTokenType === undefined ? {} : { tokenType: nextTokenType }),
+            ...(nextTokenType === undefined
+                ? {}
+                : { tokenType: nextTokenType }),
         });
 
         return refreshed.access_token;
     }
 
-    private async refresh(refreshToken: string): Promise<
-        z.infer<typeof googleTokenResponseSchema>
-    > {
+    private async refresh(
+        refreshToken: string
+    ): Promise<z.infer<typeof googleTokenResponseSchema>> {
         const body = new URLSearchParams({
             client_id: this.clientId,
             grant_type: "refresh_token",

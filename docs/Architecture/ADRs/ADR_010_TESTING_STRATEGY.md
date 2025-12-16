@@ -7,13 +7,13 @@ last_reviewed: "2025-12-04"
 category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "uptime-watcher"
-  - "architecture"
-  - "adr"
-  - "testing"
-  - "vitest"
-  - "playwright"
-  - "storybook"
+ - "uptime-watcher"
+ - "architecture"
+ - "adr"
+ - "testing"
+ - "vitest"
+ - "playwright"
+ - "storybook"
 ---
 
 # ADR-010: Multi-Configuration Testing Strategy
@@ -129,29 +129,28 @@ graph TB
 ```typescript
 // Merges with vite.config.ts for React/DOM testing
 export default defineConfig((configEnv) =>
-    mergeConfig(
-        viteConfig(configEnv),
-        defineConfig({
-            cacheDir: "./.cache/vitest/",
-            test: {
-                name: { color: "cyan", label: "Frontend" },
-                environment: "jsdom",
-                setupFiles: ["src/test/setup.ts"],
-                include: ["src/**/*.{test,spec}.{ts,tsx}"],
-                coverage: {
-                    provider: "v8",
-                    reportsDirectory: "./coverage",
-                    thresholds: {
-                        branches: 90,
-                        functions: 90,
-                        lines: 90,
-                        statements: 90,
-                    },
-                },
-            },
-        })
-    )
-);
+ mergeConfig(
+  viteConfig(configEnv),
+  defineConfig({
+   cacheDir: "./.cache/vitest/",
+   test: {
+    name: { color: "cyan", label: "Frontend" },
+    environment: "jsdom",
+    setupFiles: ["src/test/setup.ts"],
+    include: ["src/**/*.{test,spec}.{ts,tsx}"],
+    coverage: {
+     provider: "v8",
+     reportsDirectory: "./coverage",
+     thresholds: {
+      branches: 90,
+      functions: 90,
+      lines: 90,
+      statements: 90,
+     },
+    },
+   },
+  })
+ ));
 ```
 
 <!-- remark-ignore-start -->
@@ -163,34 +162,34 @@ export default defineConfig((configEnv) =>
 ```typescript
 // Standalone config for Electron main process
 export default defineConfig({
-    cacheDir: "./.cache/vitest/.vitest-backend",
-    test: {
-        name: { color: "magenta", label: "Backend" },
-        environment: "node",
-        setupFiles: ["electron/test/setup.ts"],
-        include: [
-            "electron/**/*.{test,spec}.{ts,tsx}",
-            "tests/strictTests/electron/**/*.{test,spec}.{ts,tsx}",
-        ],
-        coverage: {
-            provider: "v8",
-            reportsDirectory: "./coverage/electron",
-            include: ["electron/**/*.{ts,tsx}"],
-            thresholds: {
-                branches: 90,
-                functions: 90,
-                lines: 90,
-                statements: 90,
-            },
-        },
-        pool: "threads",
-        poolOptions: {
-            threads: {
-                maxThreads: process.env.CI ? 1 : 16,
-                singleThread: Boolean(process.env.CI),
-            },
-        },
-    },
+ cacheDir: "./.cache/vitest/.vitest-backend",
+ test: {
+  name: { color: "magenta", label: "Backend" },
+  environment: "node",
+  setupFiles: ["electron/test/setup.ts"],
+  include: [
+   "electron/**/*.{test,spec}.{ts,tsx}",
+   "tests/strictTests/electron/**/*.{test,spec}.{ts,tsx}",
+  ],
+  coverage: {
+   provider: "v8",
+   reportsDirectory: "./coverage/electron",
+   include: ["electron/**/*.{ts,tsx}"],
+   thresholds: {
+    branches: 90,
+    functions: 90,
+    lines: 90,
+    statements: 90,
+   },
+  },
+  pool: "threads",
+  poolOptions: {
+   threads: {
+    maxThreads: process.env.CI ? 1 : 16,
+    singleThread: Boolean(process.env.CI),
+   },
+  },
+ },
 });
 ```
 
@@ -199,27 +198,27 @@ export default defineConfig({
 ```typescript
 // Cross-process utilities testing
 export default defineConfig({
-    cacheDir: "./.cache/vitest/.vitest-shared",
-    test: {
-        name: { color: "yellow", label: "Shared" },
-        environment: "node",
-        setupFiles: ["shared/test/setup.ts"],
-        include: [
-            "shared/**/*.{test,spec}.{ts,tsx}",
-            "tests/strictTests/shared/**/*.{test,spec}.{ts,tsx}",
-        ],
-        coverage: {
-            provider: "v8",
-            reportsDirectory: "./coverage/shared",
-            include: ["shared/**/*.{ts,tsx}"],
-            thresholds: {
-                branches: 90,
-                functions: 95,
-                lines: 95,
-                statements: 95,
-            },
-        },
-    },
+ cacheDir: "./.cache/vitest/.vitest-shared",
+ test: {
+  name: { color: "yellow", label: "Shared" },
+  environment: "node",
+  setupFiles: ["shared/test/setup.ts"],
+  include: [
+   "shared/**/*.{test,spec}.{ts,tsx}",
+   "tests/strictTests/shared/**/*.{test,spec}.{ts,tsx}",
+  ],
+  coverage: {
+   provider: "v8",
+   reportsDirectory: "./coverage/shared",
+   include: ["shared/**/*.{ts,tsx}"],
+   thresholds: {
+    branches: 90,
+    functions: 95,
+    lines: 95,
+    statements: 95,
+   },
+  },
+ },
 });
 ```
 
@@ -350,48 +349,48 @@ The frontend setup provides comprehensive ElectronAPI mocking:
 ```typescript
 // src/test/setup.ts
 const mockElectronAPI = {
-    sites: {
-        addSite: vi.fn(),
-        getSites: vi.fn().mockResolvedValue([]),
-        removeSite: vi.fn(),
-        updateSite: vi.fn(),
-    },
-    monitoring: {
-        startMonitoring: vi.fn(),
-        stopMonitoring: vi.fn(),
-        checkSiteNow: vi.fn(),
-    },
-    events: {
-        onMonitorStatusChanged: vi.fn((callback) => {
-            // Return cleanup function
-            return vi.fn();
-        }),
-        onSiteAdded: vi.fn((callback) => vi.fn()),
-        onSiteRemoved: vi.fn((callback) => vi.fn()),
-    },
-    settings: {
-        getHistoryLimit: vi.fn().mockResolvedValue(100),
-        updateHistoryLimit: vi.fn(),
-    },
-    monitorTypes: {
-        getMonitorTypes: vi.fn().mockResolvedValue([]),
-        formatMonitorDetail: vi.fn(),
-        formatMonitorTitleSuffix: vi.fn(),
-        validateMonitorData: vi.fn(),
-    },
-    data: {
-        exportData: vi.fn(),
-        importData: vi.fn(),
-    },
-    system: {
-        openExternal: vi.fn(),
-    },
+ sites: {
+  addSite: vi.fn(),
+  getSites: vi.fn().mockResolvedValue([]),
+  removeSite: vi.fn(),
+  updateSite: vi.fn(),
+ },
+ monitoring: {
+  startMonitoring: vi.fn(),
+  stopMonitoring: vi.fn(),
+  checkSiteNow: vi.fn(),
+ },
+ events: {
+  onMonitorStatusChanged: vi.fn((callback) => {
+   // Return cleanup function
+   return vi.fn();
+  }),
+  onSiteAdded: vi.fn((callback) => vi.fn()),
+  onSiteRemoved: vi.fn((callback) => vi.fn()),
+ },
+ settings: {
+  getHistoryLimit: vi.fn().mockResolvedValue(100),
+  updateHistoryLimit: vi.fn(),
+ },
+ monitorTypes: {
+  getMonitorTypes: vi.fn().mockResolvedValue([]),
+  formatMonitorDetail: vi.fn(),
+  formatMonitorTitleSuffix: vi.fn(),
+  validateMonitorData: vi.fn(),
+ },
+ data: {
+  exportData: vi.fn(),
+  importData: vi.fn(),
+ },
+ system: {
+  openExternal: vi.fn(),
+ },
 };
 
 Object.defineProperty(window, "electronAPI", {
-    value: mockElectronAPI,
-    writable: true,
-    configurable: true,
+ value: mockElectronAPI,
+ writable: true,
+ configurable: true,
 });
 ```
 
@@ -402,24 +401,24 @@ Backend tests mock the database layer:
 ```typescript
 // electron/test/setup.ts
 vi.mock("../services/database/DatabaseService", () => ({
-    DatabaseService: {
-        getInstance: vi.fn(() => ({
-            initialize: vi.fn(),
-            getDatabase: vi.fn(() => mockDatabase),
-            executeTransaction: vi.fn((callback) => callback(mockDatabase)),
-            close: vi.fn(),
-        })),
-    },
+ DatabaseService: {
+  getInstance: vi.fn(() => ({
+   initialize: vi.fn(),
+   getDatabase: vi.fn(() => mockDatabase),
+   executeTransaction: vi.fn((callback) => callback(mockDatabase)),
+   close: vi.fn(),
+  })),
+ },
 }));
 
 const mockDatabase = {
-    run: vi.fn(),
-    all: vi.fn().mockReturnValue([]),
-    get: vi.fn(),
-    prepare: vi.fn(() => ({
-        run: vi.fn(),
-        finalize: vi.fn(),
-    })),
+ run: vi.fn(),
+ all: vi.fn().mockReturnValue([]),
+ get: vi.fn(),
+ prepare: vi.fn(() => ({
+  run: vi.fn(),
+  finalize: vi.fn(),
+ })),
 };
 ```
 
@@ -428,16 +427,16 @@ const mockDatabase = {
 ```typescript
 // Consistent mock reset in beforeEach
 beforeEach(() => {
-    vi.clearAllMocks();
-    vi.resetModules();
+ vi.clearAllMocks();
+ vi.resetModules();
 
-    // Reset specific mocks to default state
-    mockElectronAPI.sites.getSites.mockResolvedValue([]);
-    mockElectronAPI.settings.getHistoryLimit.mockResolvedValue(100);
+ // Reset specific mocks to default state
+ mockElectronAPI.sites.getSites.mockResolvedValue([]);
+ mockElectronAPI.settings.getHistoryLimit.mockResolvedValue(100);
 });
 
 afterEach(() => {
-    vi.restoreAllMocks();
+ vi.restoreAllMocks();
 });
 ```
 
@@ -450,13 +449,13 @@ afterEach(() => {
 import fc from "fast-check";
 
 fc.configureGlobal({
-    numRuns: 10,              // Base number of test runs
-    verbose: 2,               // Most verbose output
-    endOnFailure: true,       // Stop on first failure
-    timeout: 3000,            // Per-case timeout (ms)
-    interruptAfterTimeLimit: 5 * 60 * 1000,  // 5 minute cap
-    maxSkipsPerRun: 100,      // Tolerance for filters
-    markInterruptAsFailure: true,
+ numRuns: 10, // Base number of test runs
+ verbose: 2, // Most verbose output
+ endOnFailure: true, // Stop on first failure
+ timeout: 3000, // Per-case timeout (ms)
+ interruptAfterTimeLimit: 5 * 60 * 1000, // 5 minute cap
+ maxSkipsPerRun: 100, // Tolerance for filters
+ markInterruptAsFailure: true,
 });
 ```
 
@@ -466,31 +465,23 @@ fc.configureGlobal({
 import fc from "fast-check";
 
 describe("Site validation", () => {
-    it("should accept valid site names", () => {
-        fc.assert(
-            fc.property(
-                fc.string({ minLength: 1, maxLength: 200 }),
-                (name) => {
-                    const result = validateSiteName(name.trim());
-                    return name.trim().length > 0
-                        ? result.success
-                        : !result.success;
-                }
-            )
-        );
-    });
+ it("should accept valid site names", () => {
+  fc.assert(
+   fc.property(fc.string({ minLength: 1, maxLength: 200 }), (name) => {
+    const result = validateSiteName(name.trim());
+    return name.trim().length > 0 ? result.success : !result.success;
+   })
+  );
+ });
 
-    it("should reject empty identifiers", () => {
-        fc.assert(
-            fc.property(
-                fc.string({ maxLength: 0 }),
-                (identifier) => {
-                    const result = validateSiteIdentifier(identifier);
-                    return !result.success;
-                }
-            )
-        );
-    });
+ it("should reject empty identifiers", () => {
+  fc.assert(
+   fc.property(fc.string({ maxLength: 0 }), (identifier) => {
+    const result = validateSiteIdentifier(identifier);
+    return !result.success;
+   })
+  );
+ });
 });
 ```
 
@@ -501,45 +492,45 @@ describe("Site validation", () => {
 ```typescript
 // playwright.config.ts
 export default defineConfig({
-    testDir: "./playwright/tests",
-    outputDir: "playwright/test-results/",
+ testDir: "./playwright/tests",
+ outputDir: "playwright/test-results/",
 
-    globalSetup: "./playwright/fixtures/global-setup.ts",
-    globalTeardown: "./playwright/fixtures/global-teardown.ts",
+ globalSetup: "./playwright/fixtures/global-setup.ts",
+ globalTeardown: "./playwright/fixtures/global-teardown.ts",
 
-    projects: [
-        {
-            name: "electron-main",
-            testMatch: "**/main-process.*.playwright.test.ts",
-            fullyParallel: false,
-        },
-        {
-            name: "electron-renderer",
-            testMatch: "**/renderer-process.*.playwright.test.ts",
-            fullyParallel: false,
-        },
-        {
-            name: "electron-e2e",
-            testMatch: "**/app-launch.*.playwright.test.ts",
-            fullyParallel: false,
-        },
-        {
-            name: "ui-tests",
-            testMatch: "**/ui-*.playwright.test.ts",
-            fullyParallel: false,
-        },
-    ],
+ projects: [
+  {
+   name: "electron-main",
+   testMatch: "**/main-process.*.playwright.test.ts",
+   fullyParallel: false,
+  },
+  {
+   name: "electron-renderer",
+   testMatch: "**/renderer-process.*.playwright.test.ts",
+   fullyParallel: false,
+  },
+  {
+   name: "electron-e2e",
+   testMatch: "**/app-launch.*.playwright.test.ts",
+   fullyParallel: false,
+  },
+  {
+   name: "ui-tests",
+   testMatch: "**/ui-*.playwright.test.ts",
+   fullyParallel: false,
+  },
+ ],
 
-    use: {
-        trace: "on-first-retry",
-        screenshot: "only-on-failure",
-        video: "retain-on-failure",
-    },
+ use: {
+  trace: "on-first-retry",
+  screenshot: "only-on-failure",
+  video: "retain-on-failure",
+ },
 
-    reporter: [
-        ["html", { outputFolder: "playwright/reports/html" }],
-        ["json", { outputFile: "playwright/reports/results.json" }],
-    ],
+ reporter: [
+  ["html", { outputFolder: "playwright/reports/html" }],
+  ["json", { outputFile: "playwright/reports/results.json" }],
+ ],
 });
 ```
 

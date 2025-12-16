@@ -7,15 +7,15 @@ last_reviewed: "2025-11-17"
 category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "uptime-watcher"
-  - "eslint"
-  - "config-inspector"
-  - "docusaurus"
+ - "uptime-watcher"
+ - "eslint"
+ - "config-inspector"
+ - "docusaurus"
 topics:
-  - "documentation"
-  - "docusaurus"
-  - "eslint"
-  - "config-inspector"
+ - "documentation"
+ - "docusaurus"
+ - "eslint"
+ - "config-inspector"
 ---
 
 # ESLint Config Inspector Deployment - Implementation Summary
@@ -30,7 +30,6 @@ Deploy a static build of `npx @eslint/config-inspector@latest` to an existing Do
 
 - **Purpose**: Automated ESLint Config Inspector static build generation and deployment
 - **Features**:
-
   - ES modules compliant with proper imports (`node:` prefix)
   - Comprehensive error handling with descriptive messages
   - Static file generation using `npx @eslint/config-inspector build`
@@ -42,7 +41,6 @@ Deploy a static build of `npx @eslint/config-inspector@latest` to an existing Do
 ### 2. **Docusaurus Integration**
 
 - **Configuration Updates**:
-
   - Added ESLint Config navbar link to `docs/docusaurus/docusaurus.config.ts`
   - Link positioned on left side of navbar: `{ to: '/Uptime-Watcher/eslint-inspector/', label: 'ESLint Config', position: 'left' }`
   - Proper baseUrl configuration for GitHub Pages deployment
@@ -61,7 +59,6 @@ Deploy a static build of `npx @eslint/config-inspector@latest` to an existing Do
 
 - **Output Directory**: `docs/docusaurus/static/eslint-inspector/`
 - **Generated Content**:
-
   - Complete ESLint Config Inspector SPA
   - 42 configuration items detected and processed
   - 1943 ESLint rules loaded and organized
@@ -72,7 +69,6 @@ Deploy a static build of `npx @eslint/config-inspector@latest` to an existing Do
 
 - **Created**: `scripts/verify-eslint-inspector.mjs`
 - **Validation Checks**:
-
   - Static directory existence and file integrity
   - Built site integration verification
   - Configuration file validation

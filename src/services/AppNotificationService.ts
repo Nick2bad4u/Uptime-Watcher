@@ -20,7 +20,9 @@ import { validateAppNotificationRequest } from "@shared/validation/notifications
 
 import { getIpcServiceHelpers } from "./utils/createIpcServiceHelpers";
 
-const { ensureInitialized, wrap } = ((): ReturnType<typeof getIpcServiceHelpers> => {
+const { ensureInitialized, wrap } = ((): ReturnType<
+    typeof getIpcServiceHelpers
+> => {
     try {
         return getIpcServiceHelpers("AppNotificationService", {
             bridgeContracts: [
@@ -58,9 +60,10 @@ interface AppNotificationServiceContract {
 export const AppNotificationService: AppNotificationServiceContract = {
     initialize: ensureInitialized,
 
-    notifyAppEvent: wrap(
-        "notifyAppEvent",
-        async (api, request: AppNotificationRequest) => {
+    notifyAppEvent: wrap("notifyAppEvent", async (
+        api,
+        request: AppNotificationRequest
+    ) => {
         const validation = validateAppNotificationRequest(request);
         if (!validation.success) {
             const issues = validation.error.issues
@@ -72,6 +75,5 @@ export const AppNotificationService: AppNotificationServiceContract = {
         }
 
         await api.notifications.notifyAppEvent(validation.data);
-        }
-    ),
+    }),
 };

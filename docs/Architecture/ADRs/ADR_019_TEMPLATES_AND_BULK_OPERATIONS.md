@@ -7,14 +7,14 @@ last_reviewed: "2025-12-12"
 category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "uptime-watcher"
-  - "architecture"
-  - "adr"
-  - "templates"
-  - "import"
-  - "export"
-  - "bulk"
-  - "validation"
+ - "uptime-watcher"
+ - "architecture"
+ - "adr"
+ - "templates"
+ - "import"
+ - "export"
+ - "bulk"
+ - "validation"
 ---
 
 # ADR-019: Templates and Bulk Operations

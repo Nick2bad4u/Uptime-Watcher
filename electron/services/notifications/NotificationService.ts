@@ -212,8 +212,8 @@ export class NotificationService {
      *
      * - It does not participate in per-site muting.
      * - It does not use the outage cooldown logic.
-     * - It still respects the global notification enablement and platform
-     *   support checks.
+     * - It still respects the global notification enablement and platform support
+     *   checks.
      */
     public notifyAppEvent(request: AppNotificationRequest): void {
         if (!this.shouldGenerateNotification(true)) {
@@ -225,7 +225,8 @@ export class NotificationService {
             return;
         }
 
-        const body = typeof request.body === "string" ? request.body : undefined;
+        const body =
+            typeof request.body === "string" ? request.body : undefined;
 
         const notification = new Notification({
             ...(body === undefined ? {} : { body }),

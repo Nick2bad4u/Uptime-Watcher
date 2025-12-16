@@ -7,15 +7,15 @@ last_reviewed: 2025-12-16
 category: "guide"
 author: "Nick2bad4u"
 tags:
-  - cloud
-  - sync
-  - backups
-  - architecture
-  - ipc
-  - zod
-  - oauth
-  - pkce
-  - providers
+ - cloud
+ - sync
+ - backups
+ - architecture
+ - ipc
+ - zod
+ - oauth
+ - pkce
+ - providers
 ---
 
 # Cloud Provider Implementation Guide

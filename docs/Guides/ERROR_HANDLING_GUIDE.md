@@ -7,11 +7,11 @@ last_reviewed: "2025-12-11"
 category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "uptime-watcher"
-  - "error-handling"
-  - "zustand"
-  - "validation"
-  - "testing"
+ - "uptime-watcher"
+ - "error-handling"
+ - "zustand"
+ - "validation"
+ - "testing"
 ---
 
 # Error Handling Guide
@@ -34,7 +34,7 @@ The application uses a **multi-layered error handling approach** with:
 
 At a high level, error handling is layered as follows:
 
-- **Shared layer (`shared/**`)**
+- \*\*Shared layer (`shared/**`)\*\*
   - Core primitives live in `shared/utils/errorHandling.ts`:
     - `ApplicationError` models domain-aware failures with metadata.
     - `withErrorHandling()` and `withUtilityErrorHandling()` wrap async
@@ -44,13 +44,13 @@ At a high level, error handling is layered as follows:
   - JSON and object safety helpers (`jsonSafety`, `objectSafety`) provide
     defensive parsing/iteration that callers can compose with the wrappers
     above.
-- **Backend/Electron layer (`electron/**`)**
+- \*\*Backend/Electron layer (`electron/**`)\*\*
   - Services and repositories wrap long-running work with
     `withErrorHandling()` and `withDatabaseOperation()`, emitting typed
     events via `TypedEventBus` on failures.
   - IPC handlers rely on shared validation and surface sanitised error
     responses to the preload bridge.
-- **Renderer layer (`src/**`)**
+- \*\*Renderer layer (`src/**`)\*\*
   - Zustand stores use `withErrorHandling()` together with
     `createStoreErrorHandler()` to wire loading/error state into
     `useErrorStore` while keeping store logic free of manual try/catch.
@@ -147,8 +147,7 @@ const handleMultipleOperations = async () => {
 const MyComponent = () => {
  const sitesError = useErrorStore((state) => state.getStoreError("sites"));
  const settingsError = useErrorStore((state) =>
-  state.getStoreError("settings")
- );
+  state.getStoreError("settings"));
 
  return (
   <div>
@@ -415,8 +414,7 @@ const MyComponent = () => {
  const globalError = useErrorStore((state) => state.lastError);
  const sitesError = useErrorStore((state) => state.getStoreError("sites"));
  const isLoading = useErrorStore((state) =>
-  state.getOperationLoading("createSite")
- );
+  state.getOperationLoading("createSite"));
 
  const handleAction = useCallback(async () => {
   try {
@@ -605,11 +603,11 @@ export const useMonitorEventIntegration = () => {
   const setupEventListeners = async () => {
    try {
     // Success events
-    const successCleanup = await EventsService.onMonitorCheckCompleted(
-     (data) => {
-      sitesStore.updateMonitorResult(data.monitor.siteIdentifier, data.result);
-     }
-    );
+    const successCleanup = await EventsService.onMonitorCheckCompleted((
+     data
+    ) => {
+     sitesStore.updateMonitorResult(data.monitor.siteIdentifier, data.result);
+    });
     cleanupFunctions.push(successCleanup);
 
     // Error events

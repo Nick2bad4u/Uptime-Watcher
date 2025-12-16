@@ -7,14 +7,14 @@ last_reviewed: "2025-12-15"
 category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "uptime-watcher"
-  - "architecture"
-  - "adr"
-  - "support"
-  - "diagnostics"
-  - "privacy"
-  - "logging"
-  - "security"
+ - "uptime-watcher"
+ - "architecture"
+ - "adr"
+ - "support"
+ - "diagnostics"
+ - "privacy"
+ - "logging"
+ - "security"
 ---
 
 # ADR-032: Support and Diagnostics Data Policy

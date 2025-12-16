@@ -18,7 +18,6 @@ const googleApisMocks = vi.hoisted(() => {
     return { driveFactory, driveStub };
 });
 
-
 vi.mock("googleapis", () => ({
     google: {
         auth: {
@@ -48,7 +47,9 @@ describe(GoogleDriveCloudStorageProvider, () => {
         googleApisMocks.driveStub.files.list
             .mockResolvedValueOnce({ data: { files: [] } })
             // 2) listFolderRecursive for created folder => empty
-            .mockResolvedValueOnce({ data: { files: [], nextPageToken: null } });
+            .mockResolvedValueOnce({
+                data: { files: [], nextPageToken: null },
+            });
 
         googleApisMocks.driveStub.files.create.mockResolvedValueOnce({
             data: { id: "root-id" },

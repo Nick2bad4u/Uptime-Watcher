@@ -7,12 +7,12 @@ last_reviewed: "2025-11-25"
 category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "uptime-watcher"
-  - "architecture"
-  - "adr"
-  - "monitor-types"
-  - "plugin-architecture"
-  - "extensibility"
+ - "uptime-watcher"
+ - "architecture"
+ - "adr"
+ - "monitor-types"
+ - "plugin-architecture"
+ - "extensibility"
 ---
 
 # ADR-008: Monitor Type Registry and Plugin Architecture
@@ -175,29 +175,29 @@ Each monitor type provides a comprehensive configuration object:
 
 ```typescript
 export interface BaseMonitorConfig {
-    /** Unique identifier for the monitor type */
-    readonly type: string;
+ /** Unique identifier for the monitor type */
+ readonly type: string;
 
-    /** Human-readable display name for UI */
-    readonly displayName: string;
+ /** Human-readable display name for UI */
+ readonly displayName: string;
 
-    /** Description of what this monitor checks */
-    readonly description: string;
+ /** Description of what this monitor checks */
+ readonly description: string;
 
-    /** Field definitions for dynamic form generation */
-    readonly fields: MonitorFieldDefinition[];
+ /** Field definitions for dynamic form generation */
+ readonly fields: MonitorFieldDefinition[];
 
-    /** Zod validation schema for this monitor type */
-    readonly validationSchema: z.ZodType;
+ /** Zod validation schema for this monitor type */
+ readonly validationSchema: z.ZodType;
 
-    /** Factory function to create monitor service instances */
-    readonly serviceFactory: () => IMonitorService;
+ /** Factory function to create monitor service instances */
+ readonly serviceFactory: () => IMonitorService;
 
-    /** UI display configuration */
-    readonly uiConfig?: MonitorUIConfig;
+ /** UI display configuration */
+ readonly uiConfig?: MonitorUIConfig;
 
-    /** Version of the monitor implementation */
-    readonly version: string;
+ /** Version of the monitor implementation */
+ readonly version: string;
 }
 ```
 
@@ -209,23 +209,25 @@ The registry uses a Map for O(1) lookup performance:
 const monitorTypes = new Map<string, BaseMonitorConfig>();
 
 export function registerMonitorType(config: BaseMonitorConfig): void {
-    monitorTypes.set(config.type, config);
+ monitorTypes.set(config.type, config);
 }
 
-export function getMonitorTypeConfig(type: string): BaseMonitorConfig | undefined {
-    return monitorTypes.get(type);
+export function getMonitorTypeConfig(
+ type: string
+): BaseMonitorConfig | undefined {
+ return monitorTypes.get(type);
 }
 
 export function isValidMonitorType(type: string): boolean {
-    return monitorTypes.has(type);
+ return monitorTypes.has(type);
 }
 
 export function getAllMonitorTypeConfigs(): BaseMonitorConfig[] {
-    return Array.from(monitorTypes.values());
+ return Array.from(monitorTypes.values());
 }
 
 export function getRegisteredMonitorTypes(): readonly string[] {
-    return Array.from(monitorTypes.keys());
+ return Array.from(monitorTypes.keys());
 }
 ```
 
@@ -233,45 +235,47 @@ export function getRegisteredMonitorTypes(): readonly string[] {
 
 ```typescript
 registerMonitorType({
-    type: "http",
-    displayName: "HTTP (Website/API)",
-    description: "Monitors HTTP/HTTPS endpoints for availability and response time",
-    version: "1.0.0",
+ type: "http",
+ displayName: "HTTP (Website/API)",
+ description:
+  "Monitors HTTP/HTTPS endpoints for availability and response time",
+ version: "1.0.0",
 
-    fields: [
-        {
-            name: "url",
-            label: "Website URL",
-            type: "url",
-            placeholder: "https://example.com",
-            required: true,
-            helpText: "Enter the full URL including http:// or https://",
-        },
-    ],
+ fields: [
+  {
+   name: "url",
+   label: "Website URL",
+   type: "url",
+   placeholder: "https://example.com",
+   required: true,
+   helpText: "Enter the full URL including http:// or https://",
+  },
+ ],
 
-    validationSchema: monitorSchemas.http,
+ validationSchema: monitorSchemas.http,
 
-    serviceFactory: () => new HttpMonitor(),
+ serviceFactory: () => new HttpMonitor(),
 
-    uiConfig: {
-        display: {
-            showAdvancedMetrics: true,
-            showUrl: true,
-        },
-        detailFormats: {
-            analyticsLabel: "HTTP Response Time",
-            historyDetail: (details: string) => `Response Code: ${details}`,
-        },
-        formatDetail: (details: string) => `Response Code: ${details}`,
-        formatTitleSuffix: (monitor: Monitor) =>
-            monitor.url ? ` (${monitor.url})` : "",
-        helpTexts: {
-            primary: "Enter the full URL including http:// or https://",
-            secondary: "The monitor will check this URL according to your monitoring interval",
-        },
-        supportsAdvancedAnalytics: true,
-        supportsResponseTime: true,
-    },
+ uiConfig: {
+  display: {
+   showAdvancedMetrics: true,
+   showUrl: true,
+  },
+  detailFormats: {
+   analyticsLabel: "HTTP Response Time",
+   historyDetail: (details: string) => `Response Code: ${details}`,
+  },
+  formatDetail: (details: string) => `Response Code: ${details}`,
+  formatTitleSuffix: (monitor: Monitor) =>
+   monitor.url ? ` (${monitor.url})` : "",
+  helpTexts: {
+   primary: "Enter the full URL including http:// or https://",
+   secondary:
+    "The monitor will check this URL according to your monitoring interval",
+  },
+  supportsAdvancedAnalytics: true,
+  supportsResponseTime: true,
+ },
 });
 ```
 
@@ -371,32 +375,32 @@ Each monitor type defines fields for dynamic form generation:
 
 ```typescript
 interface MonitorFieldDefinition {
-    /** Field identifier matching monitor property name */
-    name: string;
+ /** Field identifier matching monitor property name */
+ name: string;
 
-    /** Human-readable label for the form field */
-    label: string;
+ /** Human-readable label for the form field */
+ label: string;
 
-    /** Field input type */
-    type: "text" | "url" | "number" | "select";
+ /** Field input type */
+ type: "text" | "url" | "number" | "select";
 
-    /** Placeholder text for empty fields */
-    placeholder?: string;
+ /** Placeholder text for empty fields */
+ placeholder?: string;
 
-    /** Whether the field is required */
-    required: boolean;
+ /** Whether the field is required */
+ required: boolean;
 
-    /** Help text displayed near the field */
-    helpText?: string;
+ /** Help text displayed near the field */
+ helpText?: string;
 
-    /** For number fields: minimum value */
-    min?: number;
+ /** For number fields: minimum value */
+ min?: number;
 
-    /** For number fields: maximum value */
-    max?: number;
+ /** For number fields: maximum value */
+ max?: number;
 
-    /** For select fields: available options */
-    options?: Array<{ label: string; value: string }>;
+ /** For select fields: available options */
+ options?: Array<{ label: string; value: string }>;
 }
 ```
 
@@ -406,34 +410,34 @@ Display preferences and formatters for the frontend:
 
 ```typescript
 interface MonitorUIConfig {
-    /** Display preferences */
-    display?: {
-        showAdvancedMetrics?: boolean;
-        showUrl?: boolean;
-        showPort?: boolean;
-    };
+ /** Display preferences */
+ display?: {
+  showAdvancedMetrics?: boolean;
+  showUrl?: boolean;
+  showPort?: boolean;
+ };
 
-    /** Detail label formatters */
-    detailFormats?: {
-        analyticsLabel?: string;
-        historyDetail?: (details: string) => string;
-    };
+ /** Detail label formatters */
+ detailFormats?: {
+  analyticsLabel?: string;
+  historyDetail?: (details: string) => string;
+ };
 
-    /** Format function for history detail column */
-    formatDetail?: (details: string) => string;
+ /** Format function for history detail column */
+ formatDetail?: (details: string) => string;
 
-    /** Format function for chart title suffix */
-    formatTitleSuffix?: (monitor: Monitor) => string;
+ /** Format function for chart title suffix */
+ formatTitleSuffix?: (monitor: Monitor) => string;
 
-    /** Help text for form fields */
-    helpTexts?: {
-        primary?: string;
-        secondary?: string;
-    };
+ /** Help text for form fields */
+ helpTexts?: {
+  primary?: string;
+  secondary?: string;
+ };
 
-    /** Feature support flags */
-    supportsAdvancedAnalytics?: boolean;
-    supportsResponseTime?: boolean;
+ /** Feature support flags */
+ supportsAdvancedAnalytics?: boolean;
+ supportsResponseTime?: boolean;
 }
 ```
 
@@ -513,20 +517,20 @@ flowchart TB
 
 ```typescript
 export interface MigrationRule {
-    /** Source version for the migration */
-    fromVersion: string;
+ /** Source version for the migration */
+ fromVersion: string;
 
-    /** Target version for the migration */
-    toVersion: string;
+ /** Target version for the migration */
+ toVersion: string;
 
-    /** Human-readable description */
-    description: string;
+ /** Human-readable description */
+ description: string;
 
-    /** Whether migration may require user intervention */
-    isBreaking: boolean;
+ /** Whether migration may require user intervention */
+ isBreaking: boolean;
 
-    /** Transformation function */
-    transform: (data: UnknownRecord) => Promise<UnknownRecord>;
+ /** Transformation function */
+ transform: (data: UnknownRecord) => Promise<UnknownRecord>;
 }
 ```
 
@@ -535,27 +539,22 @@ export interface MigrationRule {
 ```typescript
 // Register migration
 migrationRegistry.registerMigration("http", {
-    fromVersion: "1.0.0",
-    toVersion: "1.1.0",
-    description: "Add timeout field with default value",
-    isBreaking: false,
-    transform: async (data) => ({
-        ...data,
-        timeout: data.timeout ?? 30000,
-    }),
+ fromVersion: "1.0.0",
+ toVersion: "1.1.0",
+ description: "Add timeout field with default value",
+ isBreaking: false,
+ transform: async (data) => ({
+  ...data,
+  timeout: data.timeout ?? 30000,
+ }),
 });
 
 // Apply migration
-const result = await migrateMonitorType(
-    "http",
-    "1.0.0",
-    "1.1.0",
-    monitorData
-);
+const result = await migrateMonitorType("http", "1.0.0", "1.1.0", monitorData);
 
 if (result.success) {
-    console.log("Applied migrations:", result.appliedMigrations);
-    return result.data;
+ console.log("Applied migrations:", result.appliedMigrations);
+ return result.data;
 }
 ```
 
@@ -569,13 +568,13 @@ channel map:
 ```typescript
 // electron/services/ipc/handlers/monitorTypeHandlers.ts
 registerStandardizedIpcHandler(
-    MONITOR_TYPES_CHANNELS.getMonitorTypes,
-    withIgnoredIpcEvent(() => {
-        const configs = getAllMonitorTypeConfigs();
-        return configs.map((config) => serializeMonitorTypeConfig(config));
-    }),
-    MonitorTypeHandlerValidators.getMonitorTypes,
-    registeredHandlers
+ MONITOR_TYPES_CHANNELS.getMonitorTypes,
+ withIgnoredIpcEvent(() => {
+  const configs = getAllMonitorTypeConfigs();
+  return configs.map((config) => serializeMonitorTypeConfig(config));
+ }),
+ MonitorTypeHandlerValidators.getMonitorTypes,
+ registeredHandlers
 );
 ```
 
@@ -589,63 +588,59 @@ The renderer talks to the monitor-type registry exclusively through the
 ```typescript
 // src/services/MonitorTypesService.ts
 export const MonitorTypesService = {
-    formatMonitorDetail: wrap(
-        "formatMonitorDetail",
-        async (api, type: string, details: string): Promise<string> => {
-            const result = await api.monitorTypes.formatMonitorDetail(
-                type,
-                details
-            );
-            if (typeof result !== "string") {
-                throw new TypeError(
-                    "formatMonitorDetail must return a formatted string"
-                );
-            }
-            return result;
-        }
-    ),
+ formatMonitorDetail: wrap("formatMonitorDetail", async (
+  api,
+  type: string,
+  details: string
+ ): Promise<string> => {
+  const result = await api.monitorTypes.formatMonitorDetail(type, details);
+  if (typeof result !== "string") {
+   throw new TypeError("formatMonitorDetail must return a formatted string");
+  }
+  return result;
+ }),
 
-    formatMonitorTitleSuffix: wrap(
-        "formatMonitorTitleSuffix",
-        async (api, type: string, monitor: Monitor): Promise<string> => {
-            const result =
-                await api.monitorTypes.formatMonitorTitleSuffix(type, monitor);
-            if (typeof result !== "string") {
-                throw new TypeError(
-                    "formatMonitorTitleSuffix must return a formatted string"
-                );
-            }
-            return result;
-        }
-    ),
+ formatMonitorTitleSuffix: wrap("formatMonitorTitleSuffix", async (
+  api,
+  type: string,
+  monitor: Monitor
+ ): Promise<string> => {
+  const result = await api.monitorTypes.formatMonitorTitleSuffix(type, monitor);
+  if (typeof result !== "string") {
+   throw new TypeError(
+    "formatMonitorTitleSuffix must return a formatted string"
+   );
+  }
+  return result;
+ }),
 
-    getMonitorTypes: wrap(
-        "getMonitorTypes",
-        async (api): Promise<MonitorTypeConfig[]> =>
-            validateServicePayload(
-                validateMonitorTypeConfigArray,
-                await api.monitorTypes.getMonitorTypes(),
-                {
-                    operation: "getMonitorTypes",
-                    serviceName: "MonitorTypesService",
-                }
-            )
-    ),
+ getMonitorTypes: wrap(
+  "getMonitorTypes",
+  async (api): Promise<MonitorTypeConfig[]> =>
+   validateServicePayload(
+    validateMonitorTypeConfigArray,
+    await api.monitorTypes.getMonitorTypes(),
+    {
+     operation: "getMonitorTypes",
+     serviceName: "MonitorTypesService",
+    }
+   )
+ ),
 
-    initialize: ensureInitialized,
+ initialize: ensureInitialized,
 
-    validateMonitorData: wrap(
-        "validateMonitorData",
-        async (api, type: string, data: unknown): Promise<ValidationResult> =>
-            validateServicePayload(
-                validateValidationResult,
-                await api.monitorTypes.validateMonitorData(type, data),
-                {
-                    operation: "validateMonitorData",
-                    serviceName: "MonitorTypesService",
-                }
-            )
-    ),
+ validateMonitorData: wrap(
+  "validateMonitorData",
+  async (api, type: string, data: unknown): Promise<ValidationResult> =>
+   validateServicePayload(
+    validateValidationResult,
+    await api.monitorTypes.validateMonitorData(type, data),
+    {
+     operation: "validateMonitorData",
+     serviceName: "MonitorTypesService",
+    }
+   )
+ ),
 } satisfies MonitorTypesServiceContract;
 ```
 
@@ -656,73 +651,71 @@ a dedicated store and exposes helpers for consumer components:
 
 ```typescript
 // src/stores/monitor/useMonitorTypesStore.ts
-export const useMonitorTypesStore = create<MonitorTypesStore>()(
-    (set, get) => ({
-        monitorTypes: [],
-        isLoaded: false,
-        isLoading: false,
-        lastError: undefined,
+export const useMonitorTypesStore = create<MonitorTypesStore>()((set, get) => ({
+ monitorTypes: [],
+ isLoaded: false,
+ isLoading: false,
+ lastError: undefined,
 
-        loadMonitorTypes: async (): Promise<void> => {
-            if (get().isLoaded && !get().lastError) return;
+ loadMonitorTypes: async (): Promise<void> => {
+  if (get().isLoaded && !get().lastError) return;
 
-            set({ isLoading: true, lastError: undefined });
-            try {
-                const rawConfigs = await MonitorTypesService.getMonitorTypes();
-                const configsArray = Array.isArray(rawConfigs)
-                    ? (rawConfigs as unknown[])
-                    : [];
+  set({ isLoading: true, lastError: undefined });
+  try {
+   const rawConfigs = await MonitorTypesService.getMonitorTypes();
+   const configsArray = Array.isArray(rawConfigs)
+    ? (rawConfigs as unknown[])
+    : [];
 
-                const validConfigs: MonitorTypeConfig[] = [];
-                // ...validation and logging elided for brevity
+   const validConfigs: MonitorTypeConfig[] = [];
+   // ...validation and logging elided for brevity
 
-                set({
-                    isLoaded: true,
-                    isLoading: false,
-                    lastError: undefined,
-                    monitorTypes: validConfigs,
-                });
-            } catch (error) {
-                const normalized = ensureError(error);
-                set({
-                    isLoaded: false,
-                    isLoading: false,
-                    lastError: normalized.message,
-                });
-            }
-        },
-    })
-);
+   set({
+    isLoaded: true,
+    isLoading: false,
+    lastError: undefined,
+    monitorTypes: validConfigs,
+   });
+  } catch (error) {
+   const normalized = ensureError(error);
+   set({
+    isLoaded: false,
+    isLoading: false,
+    lastError: normalized.message,
+   });
+  }
+ },
+}));
 
 // src/utils/monitorTypeHelper.ts
 export async function getAvailableMonitorTypes(): Promise<MonitorTypeConfig[]> {
-    const cacheKey = CacheKeys.config.byName("all-monitor-types");
-    const cached = AppCaches.monitorTypes.get(cacheKey) as
-        | MonitorTypeConfig[]
-        | undefined;
-    if (cached) return cached;
+ const cacheKey = CacheKeys.config.byName("all-monitor-types");
+ const cached = AppCaches.monitorTypes.get(cacheKey) as
+  | MonitorTypeConfig[]
+  | undefined;
+ if (cached) return cached;
 
-    const types = await withUtilityErrorHandling(
-        async () => {
-            const store = useMonitorTypesStore.getState();
-            if (!store.isLoaded) {
-                await store.loadMonitorTypes();
-            }
-            return useMonitorTypesStore.getState().monitorTypes;
-        },
-        "Fetch monitor types from backend",
-        [] as MonitorTypeConfig[]
-    );
+ const types = await withUtilityErrorHandling(
+  async () => {
+   const store = useMonitorTypesStore.getState();
+   if (!store.isLoaded) {
+    await store.loadMonitorTypes();
+   }
+   return useMonitorTypesStore.getState().monitorTypes;
+  },
+  "Fetch monitor types from backend",
+  [] as MonitorTypeConfig[]
+ );
 
-    AppCaches.monitorTypes.set(cacheKey, types);
-    return types;
+ AppCaches.monitorTypes.set(cacheKey, types);
+ return types;
 }
 
 export async function getMonitorTypeConfig(
-    type: string
+ type: string
 ): Promise<MonitorTypeConfig | undefined> {
-    const configs = await getAvailableMonitorTypes();
-    return configs.find((config) => config.type === type);
+ const configs = await getAvailableMonitorTypes();
+ return configs.find((config) => config.type === type);
 }
 ```
 
@@ -759,9 +752,9 @@ export async function getMonitorTypeConfig(
    ```typescript
    // electron/services/monitoring/MyNewMonitor.ts
    export class MyNewMonitor implements IMonitorService {
-       async check(config: Monitor): Promise<MonitorCheckResult> {
-           // Implementation
-       }
+    async check(config: Monitor): Promise<MonitorCheckResult> {
+     // Implementation
+    }
    }
    ```
 
@@ -769,10 +762,12 @@ export async function getMonitorTypeConfig(
 
    ```typescript
    // shared/validation/schemas.ts
-   export const myNewMonitorSchema = baseMonitorSchema.extend({
-       type: z.literal("my-new-type"),
-       customField: z.string().min(1),
-   }).strict();
+   export const myNewMonitorSchema = baseMonitorSchema
+    .extend({
+     type: z.literal("my-new-type"),
+     customField: z.string().min(1),
+    })
+    .strict();
    ```
 
 3. **Register the Monitor Type**
@@ -780,25 +775,25 @@ export async function getMonitorTypeConfig(
    ```typescript
    // electron/services/monitoring/MonitorTypeRegistry.ts
    registerMonitorType({
-       type: "my-new-type",
-       displayName: "My New Monitor",
-       description: "Monitors something new",
-       version: "1.0.0",
-       fields: [
-           {
-               name: "customField",
-               label: "Custom Field",
-               type: "text",
-               required: true,
-               helpText: "Enter the custom value",
-           },
-       ],
-       validationSchema: monitorSchemas["my-new-type"],
-       serviceFactory: () => new MyNewMonitor(),
-       uiConfig: {
-           display: { showAdvancedMetrics: true },
-           supportsResponseTime: true,
-       },
+    type: "my-new-type",
+    displayName: "My New Monitor",
+    description: "Monitors something new",
+    version: "1.0.0",
+    fields: [
+     {
+      name: "customField",
+      label: "Custom Field",
+      type: "text",
+      required: true,
+      helpText: "Enter the custom value",
+     },
+    ],
+    validationSchema: monitorSchemas["my-new-type"],
+    serviceFactory: () => new MyNewMonitor(),
+    uiConfig: {
+     display: { showAdvancedMetrics: true },
+     supportsResponseTime: true,
+    },
    });
 
    // Set version
@@ -810,10 +805,10 @@ export async function getMonitorTypeConfig(
    ```typescript
    // shared/types.ts
    export type MonitorType =
-       | "http"
-       | "port"
-       // ... existing types
-       | "my-new-type";
+    | "http"
+    | "port"
+    // ... existing types
+    | "my-new-type";
    ```
 
 ### Adding a Migration
@@ -821,14 +816,14 @@ export async function getMonitorTypeConfig(
 ```typescript
 // Register migration for type evolution
 migrationRegistry.registerMigration("my-type", {
-    fromVersion: "1.0.0",
-    toVersion: "1.1.0",
-    description: "Add new optional field with default",
-    isBreaking: false,
-    transform: async (data) => ({
-        ...data,
-        newField: data.newField ?? "default-value",
-    }),
+ fromVersion: "1.0.0",
+ toVersion: "1.1.0",
+ description: "Add new optional field with default",
+ isBreaking: false,
+ transform: async (data) => ({
+  ...data,
+  newField: data.newField ?? "default-value",
+ }),
 });
 ```
 

@@ -7,14 +7,14 @@ last_reviewed: "2025-12-15"
 category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "uptime-watcher"
-  - "architecture"
-  - "adr"
-  - "electron"
-  - "security"
-  - "preload"
-  - "ipc"
-  - "csp"
+ - "uptime-watcher"
+ - "architecture"
+ - "adr"
+ - "electron"
+ - "security"
+ - "preload"
+ - "ipc"
+ - "csp"
 ---
 
 # ADR-026: Electron Security Model and Renderer Isolation

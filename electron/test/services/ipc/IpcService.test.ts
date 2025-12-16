@@ -395,10 +395,12 @@ describe(IpcService, () => {
                 body: "backup.sqlite",
             });
 
-            expect(mockNotificationService.notifyAppEvent).toHaveBeenCalledWith({
-                title: "Backup uploaded",
-                body: "backup.sqlite",
-            });
+            expect(mockNotificationService.notifyAppEvent).toHaveBeenCalledWith(
+                {
+                    title: "Backup uploaded",
+                    body: "backup.sqlite",
+                }
+            );
         });
         it("should setup data handlers", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");

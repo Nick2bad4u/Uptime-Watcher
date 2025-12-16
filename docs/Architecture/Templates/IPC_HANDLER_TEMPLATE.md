@@ -7,11 +7,11 @@ last_reviewed: "2025-12-11"
 category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "uptime-watcher"
-  - "architecture"
-  - "template"
-  - "ipc"
-  - "electron"
+ - "uptime-watcher"
+ - "architecture"
+ - "template"
+ - "ipc"
+ - "electron"
 ---
 
 # IPC Handler Template
@@ -49,9 +49,9 @@ electron/services/ipc/
  * IPC handlers for [DOMAIN] operations.
  *
  * @remarks
- * Provides type-safe IPC communication for [DOMAIN] management between the main
- * process and renderer process. All handlers use standardized validation and
- * error handling patterns.
+ *   Provides type-safe IPC communication for [DOMAIN] management between the main
+ *   process and renderer process. All handlers use standardized validation and
+ *   error handling patterns.
  *
  * @public
  */
@@ -73,24 +73,23 @@ import {
  * Registers all [DOMAIN]-related IPC handlers.
  *
  * @remarks
- * This function registers all IPC handlers for [DOMAIN] operations using the
- * standardized registration pattern. Each handler includes proper validation
- * and error handling.
+ *   This function registers all IPC handlers for [DOMAIN] operations using the
+ *   standardized registration pattern. Each handler includes proper validation
+ *   and error handling.
  *
  * @example
- *
- * ```typescript
- * registerExampleHandlers({
- *  exampleManager,
- *  registeredHandlers,
- * });
- * ```
+ *  ```typescript
+ *  registerExampleHandlers({
+ *   exampleManager,
+ *   registeredHandlers,
+ *  });
+ *  ```;
  *
  * @public
  */
 export function registerExampleHandlers(deps: {
-  registeredHandlers: Set<IpcInvokeChannel>;
-  exampleManager: ExampleManager;
+ registeredHandlers: Set<IpcInvokeChannel>;
+ exampleManager: ExampleManager;
 }): void {
  const { exampleManager, registeredHandlers } = deps;
 
@@ -215,9 +214,9 @@ Add validation functions to `validators.ts` or import them from `../validation/e
  * Validation functions for [DOMAIN] IPC operations.
  *
  * @remarks
- * Provides type-safe validation for all IPC parameters related to [DOMAIN]
- * operations. Each validation function ensures data integrity and type safety
- * before operations are performed.
+ *   Provides type-safe validation for all IPC parameters related to [DOMAIN]
+ *   operations. Each validation function ensures data integrity and type safety
+ *   before operations are performed.
  *
  * @public
  */
@@ -290,13 +289,12 @@ export interface ExampleImportData {
  * Validates example ID parameters.
  *
  * @example
- *
- * ```typescript
- * if (isExampleIdParams(params)) {
- *  // params is now typed as ExampleIdParams
- *  console.log(params.id);
- * }
- * ```
+ *  ```typescript
+ *  if (isExampleIdParams(params)) {
+ *   // params is now typed as ExampleIdParams
+ *   console.log(params.id);
+ *  }
+ *  ```;
  *
  * @param data - Unknown data to validate
  *
@@ -640,14 +638,13 @@ describe("Example IPC Handlers", () => {
   });
 
   // Get the registered handler
-  const getAllHandler =
-    registerHandlerSpy.mock.calls.find(
-     (call) => call[0] === EXAMPLE_CHANNELS.getExamples
-    )?.[1];
+  const getAllHandler = registerHandlerSpy.mock.calls.find(
+   (call) => call[0] === EXAMPLE_CHANNELS.getExamples
+  )?.[1];
 
-    if (!getAllHandler) {
-    throw new Error("Failed to locate getExamples handler registration");
-    }
+  if (!getAllHandler) {
+   throw new Error("Failed to locate getExamples handler registration");
+  }
 
   const result = await getAllHandler();
   expect(result).toBe(mockExamples);

@@ -7,11 +7,11 @@ last_reviewed: "2025-12-04"
 category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "uptime-watcher"
-  - "testing"
-  - "vitest"
-  - "coverage"
-  - "ci"
+ - "uptime-watcher"
+ - "testing"
+ - "vitest"
+ - "coverage"
+ - "ci"
 ---
 
 # Testing and Coverage Setup
@@ -70,12 +70,10 @@ The project has three separate Vitest configurations:
 - **Reporters**: text, json, lcov, html
 
 - **Environments**:
-
   - jsdom (for React component testing with full DOM simulation)
   - node (for Electron backend and shared utilities)
 
 - **Coverage Flags**:
-
   - `frontend` - React/src code coverage
   - `electron` - Electron/backend code coverage
   - `shared` - Shared utilities coverage

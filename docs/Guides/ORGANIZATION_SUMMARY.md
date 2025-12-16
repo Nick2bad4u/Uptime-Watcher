@@ -7,10 +7,10 @@ last_reviewed: "2025-11-17"
 category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "uptime-watcher"
-  - "documentation"
-  - "organization"
-  - "archive"
+ - "uptime-watcher"
+ - "documentation"
+ - "organization"
+ - "archive"
 ---
 
 # 📁 Documentation Organization Summary

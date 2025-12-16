@@ -209,9 +209,9 @@ describe(useCloudStore, () => {
             new Error("boom")
         );
 
-        await expect(useCloudStore.getState().connectDropbox()).rejects.toThrowError(
-            "boom"
-        );
+        await expect(
+            useCloudStore.getState().connectDropbox()
+        ).rejects.toThrowError("boom");
 
         const [toast] = useAlertStore.getState().toasts;
         expect(toast?.variant).toBe("error");
@@ -362,9 +362,9 @@ describe(useCloudStore, () => {
         expect(useCloudStore.getState().status?.lastSyncAt).toBe(123);
         expect(useCloudStore.getState().isRequestingSyncNow).toBeFalsy();
 
-            const [toast] = useAlertStore.getState().toasts;
-            expect(toast?.variant).toBe("success");
-            expect(toast?.title).toBe("Sync complete");
+        const [toast] = useAlertStore.getState().toasts;
+        expect(toast?.variant).toBe("success");
+        expect(toast?.title).toBe("Sync complete");
     });
 
     it("uploadLatestBackup refreshes status and backups, and tolerates listBackups failures", async () => {
@@ -412,9 +412,9 @@ describe(useCloudStore, () => {
         );
         expect(useCloudStore.getState().isUploadingBackup).toBeFalsy();
 
-            const [toast] = useAlertStore.getState().toasts;
-            expect(toast?.variant).toBe("success");
-            expect(toast?.title).toBe("Backup uploaded");
+        const [toast] = useAlertStore.getState().toasts;
+        expect(toast?.variant).toBe("success");
+        expect(toast?.title).toBe("Backup uploaded");
     });
 
     it("restoreBackup tracks restoringBackupKey and refreshes state", async () => {
@@ -446,9 +446,9 @@ describe(useCloudStore, () => {
         ).toHaveBeenCalledWith("backups/1.sqlite");
         expect(cloudServiceMock.CloudService.getStatus).toHaveBeenCalled();
 
-            const [toast] = useAlertStore.getState().toasts;
-            expect(toast?.variant).toBe("success");
-            expect(toast?.title).toBe("Backup restored");
+        const [toast] = useAlertStore.getState().toasts;
+        expect(toast?.variant).toBe("success");
+        expect(toast?.title).toBe("Backup restored");
     });
 
     it("setEncryptionPassphrase toggles busy flag and updates status", async () => {

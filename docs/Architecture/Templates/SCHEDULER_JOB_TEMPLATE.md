@@ -7,13 +7,13 @@ last_reviewed: "2025-12-04"
 category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "uptime-watcher"
-  - "architecture"
-  - "template"
-  - "scheduler"
-  - "backoff"
-  - "monitoring"
-  - "timeouts"
+ - "uptime-watcher"
+ - "architecture"
+ - "template"
+ - "scheduler"
+ - "backoff"
+ - "monitoring"
+ - "timeouts"
 ---
 
 # Scheduler Job Template
@@ -35,16 +35,16 @@ Define a consistent job shape and helper flow for monitor scheduling that aligns
 
 ```typescript
 interface MonitorJob {
-    monitorId: string;
-    siteIdentifier: string;
-    scheduledAt: number;
-    deadline: number;
-    backoffState: {
-        attempt: number;
-        nextDelayMs: number;
-    };
-    correlationId: string;
-    priority: "scheduled" | "manual";
+ monitorId: string;
+ siteIdentifier: string;
+ scheduledAt: number;
+ deadline: number;
+ backoffState: {
+  attempt: number;
+  nextDelayMs: number;
+ };
+ correlationId: string;
+ priority: "scheduled" | "manual";
 }
 ```
 

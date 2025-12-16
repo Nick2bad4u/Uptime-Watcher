@@ -7,11 +7,11 @@ last_reviewed: "2025-11-17"
 category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "uptime-watcher"
-  - "architecture"
-  - "template"
-  - "repository"
-  - "database"
+ - "uptime-watcher"
+ - "architecture"
+ - "template"
+ - "repository"
+ - "database"
 ---
 
 # Repository Template
@@ -91,10 +91,9 @@ export class ExampleRepository {
   * Constructs a new ExampleRepository instance.
   *
   * @example
-  *
-  * ```typescript
-  * const repo = new ExampleRepository({ databaseService });
-  * ```
+  *  ```typescript
+  *  const repo = new ExampleRepository({ databaseService });
+  *  ```;
   *
   * @param dependencies - The required dependencies for entity operations.
   */
@@ -106,14 +105,13 @@ export class ExampleRepository {
   * Creates a new entity in the database.
   *
   * @example
-  *
-  * ```typescript
-  * await repo.create({
-  *  id: "123",
-  *  name: "Example",
-  *  createdAt: Date.now(),
-  * });
-  * ```
+  *  ```typescript
+  *  await repo.create({
+  *   id: "123",
+  *   name: "Example",
+  *   createdAt: Date.now(),
+  *  });
+  *  ```;
   *
   * @param data - The entity data to create.
   *
@@ -136,8 +134,8 @@ export class ExampleRepository {
   * Creates a new entity within an existing transaction context.
   *
   * @remarks
-  * - Must be called within an active transaction context.
-  * - Applies data validation and normalization.
+  *   - Must be called within an active transaction context.
+  *   - Applies data validation and normalization.
   *
   * @param db - The database connection (must be within an active transaction).
   * @param data - The entity data to create.
@@ -155,10 +153,9 @@ export class ExampleRepository {
   * Retrieves all entity records from the database.
   *
   * @example
-  *
-  * ```typescript
-  * const examples = await repo.findAll();
-  * ```
+  *  ```typescript
+  *  const examples = await repo.findAll();
+  *  ```;
   *
   * @returns Promise resolving to an array of all entity data.
   *
@@ -175,10 +172,9 @@ export class ExampleRepository {
   * Finds an entity by its unique identifier.
   *
   * @example
-  *
-  * ```typescript
-  * const example = await repo.findById("123");
-  * ```
+  *  ```typescript
+  *  const example = await repo.findById("123");
+  *  ```;
   *
   * @param id - The unique identifier to search for.
   *
@@ -201,10 +197,9 @@ export class ExampleRepository {
   * Updates an existing entity in the database.
   *
   * @example
-  *
-  * ```typescript
-  * await repo.update("123", { name: "Updated Name" });
-  * ```
+  *  ```typescript
+  *  await repo.update("123", { name: "Updated Name" });
+  *  ```;
   *
   * @param id - The unique identifier of the entity to update.
   * @param data - The updated entity data.
@@ -229,7 +224,7 @@ export class ExampleRepository {
   * Updates an existing entity within an existing transaction context.
   *
   * @remarks
-  * Must be called within an active transaction context.
+  *   Must be called within an active transaction context.
   *
   * @param db - The database connection (must be within an active transaction).
   * @param id - The unique identifier of the entity to update.
@@ -257,10 +252,9 @@ export class ExampleRepository {
   * Deletes an entity by its unique identifier.
   *
   * @example
-  *
-  * ```typescript
-  * await repo.deleteById("123");
-  * ```
+  *  ```typescript
+  *  await repo.deleteById("123");
+  *  ```;
   *
   * @param id - The unique identifier of the entity to delete.
   *
@@ -281,7 +275,7 @@ export class ExampleRepository {
   * Deletes an entity within an existing transaction context.
   *
   * @remarks
-  * Must be called within an active transaction context.
+  *   Must be called within an active transaction context.
   *
   * @param db - The database connection (must be within an active transaction).
   * @param id - The unique identifier of the entity to delete.
@@ -295,13 +289,12 @@ export class ExampleRepository {
   * Deletes all entity records from the database.
   *
   * @remarks
-  * **WARNING**: This operation is irreversible and will delete all entity data.
+  *   **WARNING**: This operation is irreversible and will delete all entity data.
   *
   * @example
-  *
-  * ```typescript
-  * await repo.deleteAll();
-  * ```
+  *  ```typescript
+  *  await repo.deleteAll();
+  *  ```;
   *
   * @returns Promise that resolves when all records are deleted.
   *
@@ -320,8 +313,8 @@ export class ExampleRepository {
   * Deletes all entity records within an existing transaction context.
   *
   * @remarks
-  * - Must be called within an active transaction context.
-  * - This operation is destructive and irreversible.
+  *   - Must be called within an active transaction context.
+  *   - This operation is destructive and irreversible.
   *
   * @param db - Database connection (must be within active transaction).
   */
@@ -334,10 +327,9 @@ export class ExampleRepository {
   * Bulk inserts multiple entity records into the database.
   *
   * @example
-  *
-  * ```typescript
-  * await repo.bulkInsert([record1, record2, record3]);
-  * ```
+  *  ```typescript
+  *  await repo.bulkInsert([record1, record2, record3]);
+  *  ```;
   *
   * @param records - Array of entity data to insert.
   *
@@ -362,8 +354,8 @@ export class ExampleRepository {
   * Bulk inserts multiple entity records within an existing transaction context.
   *
   * @remarks
-  * - Must be called within an active transaction context.
-  * - Uses prepared statements for performance.
+  *   - Must be called within an active transaction context.
+  *   - Uses prepared statements for performance.
   *
   * @param db - The database connection (must be within an active transaction).
   * @param records - Array of entity data to insert.
@@ -391,8 +383,8 @@ export class ExampleRepository {
   * Gets the database instance for internal operations.
   *
   * @remarks
-  * Used for read operations and internal methods that don't require
-  * transactions.
+  *   Used for read operations and internal methods that don't require
+  *   transactions.
   *
   * @returns Database connection from the DatabaseService.
   */

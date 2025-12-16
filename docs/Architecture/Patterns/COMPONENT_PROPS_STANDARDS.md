@@ -7,11 +7,11 @@ last_reviewed: "2025-11-17"
 category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "uptime-watcher"
-  - "architecture"
-  - "react"
-  - "components"
-  - "props"
+ - "uptime-watcher"
+ - "architecture"
+ - "react"
+ - "components"
+ - "props"
 ---
 
 # Component Props Standards
@@ -270,7 +270,8 @@ export interface VariantComponentProperties {
 ```typescript
 // ✅ Preferred (composition)
 export interface ButtonProperties
- extends CoreComponentProperties,
+ extends
+  CoreComponentProperties,
   AccessibilityProperties,
   StylingProperties,
   StateProperties {
@@ -318,14 +319,13 @@ export interface ComponentProperties {
   * Primary action handler for the component.
   *
   * @remarks
-  * Called when user interacts with the component. Should handle any necessary
-  * validation or state updates.
+  *   Called when user interacts with the component. Should handle any necessary
+  *   validation or state updates.
   *
   * @example
-  *
-  * ```tsx
-  * <Component onClick={() => console.log("Clicked!")} />;
-  * ```
+  *  ```tsx
+  *  <Component onClick={() => console.log("Clicked!")} />;
+  *  ```;
   */
  readonly onClick?: () => void;
 
@@ -348,26 +348,28 @@ export interface ComponentProperties {
  * Button component with theming, states, and accessibility support.
  *
  * @remarks
- * Provides a comprehensive button implementation with various visual variants,
- * sizes, loading states, and full accessibility support.
+ *   Provides a comprehensive button implementation with various visual variants,
+ *   sizes, loading states, and full accessibility support.
  *
- * @example Basic usage:
+ * @example
+ *  Basic usage:
  *
- * ```tsx
- * <Button onClick={handleClick}>Click me</Button>;
- * ```
+ *  ```tsx
+ *  <Button onClick={handleClick}>Click me</Button>;
+ *  ```
  *
- * @example With loading state:
+ * @example
+ *  With loading state:
  *
- * ```tsx
- * <Button
- *  onClick={handleSubmit}
- *  loading={isSubmitting}
- *  disabled={!isValid}
- * >
- *  Submit Form
- * </Button>;
- * ```
+ *  ```tsx
+ *  <Button
+ *   onClick={handleSubmit}
+ *   loading={isSubmitting}
+ *   disabled={!isValid}
+ *  >
+ *   Submit Form
+ *  </Button>;
+ *  ```
  *
  * @public
  */
@@ -385,13 +387,12 @@ export interface ComponentProperties {
  * [Component] - [brief description]
  *
  * @remarks
- * [Detailed description of component purpose and features]
+ *   [Detailed description of component purpose and features]
  *
  * @example
- *
- * ```tsx
- * <ComponentName prop="value" />;
- * ```
+ *  ```tsx
+ *  <ComponentName prop="value" />;
+ *  ```;
  */
 
 import React from "react";
@@ -400,8 +401,7 @@ import React from "react";
  * Properties for the [Component] component.
  */
 export interface ComponentNameProperties
- extends CoreComponentProperties,
-  AccessibilityProperties {
+ extends CoreComponentProperties, AccessibilityProperties {
  /** Component-specific props */
  readonly specificProp?: string;
  /** Event handlers */
@@ -415,23 +415,21 @@ export interface ComponentNameProperties
  *
  * @returns JSX element
  */
-export const ComponentName: React.FC<ComponentNameProperties> = React.memo(
- ({
-  className,
-  disabled = false,
-  children,
-  specificProp,
-  onClick,
-  ...accessibilityProps
- }) => {
-  // Component implementation
-  return (
-   <div className={className} {...accessibilityProps}>
-    {children}
-   </div>
-  );
- }
-);
+export const ComponentName: React.FC<ComponentNameProperties> = React.memo(({
+ className,
+ disabled = false,
+ children,
+ specificProp,
+ onClick,
+ ...accessibilityProps
+}) => {
+ // Component implementation
+ return (
+  <div className={className} {...accessibilityProps}>
+   {children}
+  </div>
+ );
+});
 
 ComponentName.displayName = "ComponentName";
 
@@ -448,8 +446,7 @@ export default ComponentName;
 import React, { useCallback } from "react";
 
 export interface FormComponentProperties
- extends FormFieldBaseProperties,
-  CoreComponentProperties {
+ extends FormFieldBaseProperties, CoreComponentProperties {
  /** Current value */
  readonly value: string;
  /** Change handler */
@@ -458,49 +455,47 @@ export interface FormComponentProperties
  readonly placeholder?: string;
 }
 
-export const FormComponent: React.FC<FormComponentProperties> = React.memo(
- ({
-  id,
-  label,
-  value,
-  onChange,
-  required = false,
-  error,
-  helpText,
-  placeholder,
-  disabled = false,
-  className,
- }) => {
-  const handleChange = useCallback(
-   (event: React.ChangeEvent<HTMLInputElement>) => {
-    onChange(event.target.value);
-   },
-   [onChange]
-  );
+export const FormComponent: React.FC<FormComponentProperties> = React.memo(({
+ id,
+ label,
+ value,
+ onChange,
+ required = false,
+ error,
+ helpText,
+ placeholder,
+ disabled = false,
+ className,
+}) => {
+ const handleChange = useCallback(
+  (event: React.ChangeEvent<HTMLInputElement>) => {
+   onChange(event.target.value);
+  },
+  [onChange]
+ );
 
-  return (
-   <BaseFormField
-    id={id}
-    label={label}
-    required={required}
-    error={error}
-    helpText={helpText}
-   >
-    {(ariaProps) => (
-     <input
-      {...ariaProps}
-      type="text"
-      value={value}
-      onChange={handleChange}
-      placeholder={placeholder}
-      disabled={disabled}
-      className={className}
-     />
-    )}
-   </BaseFormField>
-  );
- }
-);
+ return (
+  <BaseFormField
+   id={id}
+   label={label}
+   required={required}
+   error={error}
+   helpText={helpText}
+  >
+   {(ariaProps) => (
+    <input
+     {...ariaProps}
+     type="text"
+     value={value}
+     onChange={handleChange}
+     placeholder={placeholder}
+     disabled={disabled}
+     className={className}
+    />
+   )}
+  </BaseFormField>
+ );
+});
 
 FormComponent.displayName = "FormComponent";
 

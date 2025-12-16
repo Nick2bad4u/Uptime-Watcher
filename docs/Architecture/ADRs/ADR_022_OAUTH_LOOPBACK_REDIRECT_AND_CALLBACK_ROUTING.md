@@ -1,21 +1,21 @@
 ---
 schema: "../../../config/schemas/doc-frontmatter.schema.json"
 title: "ADR-022: OAuth Loopback Redirect and Callback Routing"
-summary: "Defines OAuth 2.0 + PKCE loopback redirect behavior for cloud providers, including callback validation and when provider-specific redirect URI shapes are required (Dropbox vs Google Drive)."
+summary: "Standardizes OAuth 2.0 + PKCE loopback redirect behavior for cloud providers, including redirect URI strategy and callback validation."
 created: "2025-12-15"
 last_reviewed: "2025-12-16"
 category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "uptime-watcher"
-  - "architecture"
-  - "adr"
-  - "oauth"
-  - "pkce"
-  - "security"
-  - "cloud"
-  - "dropbox"
-  - "google-drive"
+ - "uptime-watcher"
+ - "architecture"
+ - "adr"
+ - "oauth"
+ - "pkce"
+ - "security"
+ - "cloud"
+ - "dropbox"
+ - "google-drive"
 ---
 
 # ADR-022: OAuth Loopback Redirect and Callback Routing
@@ -48,18 +48,16 @@ We must standardize loopback redirect behavior across providers to avoid:
 
 ## Decision
 
-### 1) Prefer a shared port; allow provider-specific redirect URIs
+### 1) One loopback redirect shape across providers
 
-We keep a consistent _port_ for simplicity, but we do **not** force a single redirect URI shape across providers.
+All cloud providers use:
 
-Provider requirements differ:
+- a fixed loopback port (`53682`), and
+- a single callback path: `/oauth2/callback`
 
-- **Dropbox**: uses a loopback HTTP server with a stable path (`/oauth2/callback`) because the Dropbox app registration expects an exact redirect URI string.
-- **Google Drive**: follows Google’s native/desktop guidance for loopback redirects:
-  - `http://127.0.0.1:port` (no explicit path)
-  - callbacks arrive at `/`
+This keeps provider configuration consistent and reduces setup friction.
 
-This avoids `redirect_uri_mismatch` errors and aligns with Google’s documented best practices.
+Google’s native/desktop OAuth documentation allows a loopback redirect to include an optional path component, so `/oauth2/callback` remains compatible.
 
 ### 2) Loopback server binding + callback validation
 
@@ -115,7 +113,7 @@ Cons:
 
 ## References
 
-- Google: [OAuth 2.0 for iOS & Desktop Apps (loopback IP redirect)](https://developers.google.com/identity/protocols/oauth2/native-app#redirect-uri_loopback)
+- Google: [OAuth 2.0 for iOS & Desktop Apps (loopback redirects)](https://developers.google.com/identity/protocols/oauth2/native-app#redirect-uri_loopback)
 
 ## Consequences
 

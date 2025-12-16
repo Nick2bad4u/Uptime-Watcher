@@ -7,13 +7,13 @@ last_reviewed: "2025-11-17"
 category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "uptime-watcher"
-  - "consistency"
-  - "architecture"
-  - "standards"
+ - "uptime-watcher"
+ - "consistency"
+ - "architecture"
+ - "standards"
 topics:
-  - "architecture"
-  - "consistency"
+ - "architecture"
+ - "consistency"
 ---
 
 # Uptime Watcher Consistency Guide
@@ -82,14 +82,14 @@ import { withErrorHandling } from "@shared/utils/errorHandling";
 
 const correlationId = generateCorrelationId();
 return withErrorHandling(
-    async () => {
-        // Operations with correlation tracking
-    },
-    {
-        logger,
-        operationName: "SomeService.operationWithCorrelation",
-        correlationId,
-    }
+ async () => {
+  // Operations with correlation tracking
+ },
+ {
+  logger,
+  operationName: "SomeService.operationWithCorrelation",
+  correlationId,
+ }
 );
 ```
 
@@ -229,19 +229,19 @@ export class HttpMonitor implements IMonitorService {
 Use comprehensive TSDoc comments following the project standards:
 
 ````typescript
+
 /**
  * Performs HTTP health check for monitoring endpoints.
  *
  * @remarks
- * Uses Axios with custom interceptors for timing and retry logic. All requests
- * support cancellation via AbortSignal.
+ *   Uses Axios with custom interceptors for timing and retry logic. All requests
+ *   support cancellation via AbortSignal.
  *
  * @example
- *
- * ```typescript
- * const result = await httpMonitor.check(monitor);
- * logger.info(`Check result: ${result.status}`);
- * ```
+ *  ```typescript
+ *  const result = await httpMonitor.check(monitor);
+ *  logger.info(`Check result: ${result.status}`);
+ *  ```
  *
  * @param monitor - Monitor configuration
  * @param signal - Optional cancellation signal
@@ -257,24 +257,23 @@ Use comprehensive TSDoc comments following the project standards:
 **Always use logger in JSDoc examples**, never console:
 
 ````typescript
+
 // ✅ Correct - JSDoc with logger
 /**
  * @example
- *
- * ```typescript
- * const result = await service.performOperation();
- * logger.info(`Operation completed: ${result.status}`);
- * ```
+ *  ```typescript
+ *  const result = await service.performOperation();
+ *  logger.info(`Operation completed: ${result.status}`);
+ *  ```
  */
 
 // ❌ Incorrect - JSDoc with console
 /**
  * @example
- *
- * ```typescript
- * const result = await service.performOperation();
- * console.log(`Operation completed: ${result.status}`);
- * ```
+ *  ```typescript
+ *  const result = await service.performOperation();
+ *  console.log(`Operation completed: ${result.status}`);
+ *  ```
  */
 ````
 

@@ -7,10 +7,10 @@ last_reviewed: "2025-11-15"
 category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "testing"
-  - "playwright"
-  - "codegen"
-  - "uptime-watcher"
+ - "testing"
+ - "playwright"
+ - "codegen"
+ - "uptime-watcher"
 ---
 
 # 🎭 **Using the Codegen Template with Recorded Tests**
@@ -140,11 +140,10 @@ Always use proper paths for screenshots:
 
 
 
-Always use proper paths for screenshots:```typescript
-// ✅ Good - saves to playwright test-results directory
-await page.screenshot({ path: "playwright/test-results/screenshots/my-screenshot.png" });
 
-// ❌ Bad - saves to project root
+
+
+Always use proper paths for screenshots:```typescript// ✅ Good - saves to playwright test-results directoryawait page.screenshot({ path: "playwright/test-results/screenshots/my-screenshot.png" });// ❌ Bad - saves to project root
 await page.screenshot({ path: "my-screenshot.png" });
 ````
 

@@ -7,13 +7,13 @@ last_reviewed: "2025-12-12"
 category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "uptime-watcher"
-  - "architecture"
-  - "adr"
-  - "monitoring"
-  - "scheduler"
-  - "maintenance"
-  - "notifications"
+ - "uptime-watcher"
+ - "architecture"
+ - "adr"
+ - "monitoring"
+ - "scheduler"
+ - "maintenance"
+ - "notifications"
 ---
 
 # ADR-018: Maintenance Windows and Scheduled Silencing

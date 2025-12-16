@@ -7,12 +7,12 @@ last_reviewed: "2025-12-11"
 category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "uptime-watcher"
-  - "architecture"
-  - "adr"
-  - "zustand"
-  - "state-management"
-  - "frontend"
+ - "uptime-watcher"
+ - "architecture"
+ - "adr"
+ - "zustand"
+ - "state-management"
+ - "frontend"
 ---
 
 # ADR-004: Frontend State Management with Zustand
@@ -470,8 +470,7 @@ const sitesWithMonitorCount = useSitesStore((state) =>
  state.sites.map((site) => ({
   ...site,
   monitorCount: site.monitors.length,
- }))
-);
+ })));
 ```
 
 ## Integration with IPC

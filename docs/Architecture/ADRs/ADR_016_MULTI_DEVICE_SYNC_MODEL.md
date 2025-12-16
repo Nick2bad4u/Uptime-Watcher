@@ -7,13 +7,13 @@ last_reviewed: "2025-12-14"
 category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "uptime-watcher"
-  - "architecture"
-  - "adr"
-  - "sync"
-  - "conflict-resolution"
-  - "offline-first"
-  - "sqlite"
+ - "uptime-watcher"
+ - "architecture"
+ - "adr"
+ - "sync"
+ - "conflict-resolution"
+ - "offline-first"
+ - "sqlite"
 ---
 
 # ADR-016: Multi-Device Sync Data Model

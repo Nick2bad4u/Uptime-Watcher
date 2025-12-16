@@ -7,12 +7,12 @@ last_reviewed: "2025-12-11"
 category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "uptime-watcher"
-  - "architecture"
-  - "adr"
-  - "ipc"
-  - "electron"
-  - "communication"
+ - "uptime-watcher"
+ - "architecture"
+ - "adr"
+ - "ipc"
+ - "electron"
+ - "communication"
 ---
 
 # ADR-005: IPC Communication Protocol
@@ -262,7 +262,7 @@ The script (`scripts/architecture-static-guards.mjs`) performs the following che
 
    Any other usage is flagged as a violation to prevent ad-hoc handlers that bypass validation, logging, or standardized response formatting.
 
-2. **No direct `ipcRenderer` imports in `src/**`** – Renderer code may not import `ipcRenderer` directly from the `electron` package (excluding tests). All renderer IPC goes through the typed preload bridge (`window.electronAPI`) and domain-specific renderer services (for example `SiteService`, `SettingsService`). This guarantees that:
+2. **No direct `ipcRenderer` imports in `src/**`** – Renderer code may not import `ipcRenderer`directly from the`electron` package (excluding tests). All renderer IPC goes through the typed preload bridge (`window.electronAPI`) and domain-specific renderer services (for example `SiteService`, `SettingsService`). This guarantees that:
    - Renderer code never crosses the security boundary directly.
    - All IPC calls benefit from the shared `IpcResponse` validation and error handling implemented in the preload layer.
 
@@ -714,10 +714,10 @@ describe("Sites IPC Handlers", () => {
   );
   ipcService.setupHandlers();
 
-    // In production, preload exposes a typed invoker (createTypedInvoker)
-    // for SITES_CHANNELS.addSite. Tests can call the invoker directly.
-    const invokeAddSite = createTypedInvoker(SITES_CHANNELS.addSite);
-    const result = await invokeAddSite(siteData);
+  // In production, preload exposes a typed invoker (createTypedInvoker)
+  // for SITES_CHANNELS.addSite. Tests can call the invoker directly.
+  const invokeAddSite = createTypedInvoker(SITES_CHANNELS.addSite);
+  const result = await invokeAddSite(siteData);
   expect(result).toEqual(mockSite);
  });
 });

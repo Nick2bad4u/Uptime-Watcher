@@ -7,13 +7,13 @@ last_reviewed: "2025-12-11"
 category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "uptime-watcher"
-  - "architecture"
-  - "adr"
-  - "logging"
-  - "telemetry"
-  - "diagnostics"
-  - "privacy"
+ - "uptime-watcher"
+ - "architecture"
+ - "adr"
+ - "logging"
+ - "telemetry"
+ - "diagnostics"
+ - "privacy"
 ---
 
 # ADR-014: Logging, Telemetry, and Diagnostics

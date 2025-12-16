@@ -7,11 +7,11 @@ last_reviewed: "2025-11-17"
 category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "uptime-watcher"
-  - "events"
-  - "TypedEventBus"
-  - "ipc"
-  - "realtime"
+ - "uptime-watcher"
+ - "events"
+ - "TypedEventBus"
+ - "ipc"
+ - "realtime"
 ---
 
 # Event System Guide

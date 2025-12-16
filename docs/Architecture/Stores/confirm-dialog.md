@@ -7,9 +7,9 @@ last_reviewed: "2025-12-12"
 category: "guide"
 author: "Uptime Watcher Team"
 tags:
-  - stores
-  - ui
-  - dialogs
+ - stores
+ - ui
+ - dialogs
 ---
 
 # Confirm dialog store

@@ -7,16 +7,16 @@ last_reviewed: "2025-11-22"
 category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "uptime-watcher"
-  - "sites"
-  - "stores"
-  - "monitoring"
-  - "state-sync"
-  - "ipc"
+ - "uptime-watcher"
+ - "sites"
+ - "stores"
+ - "monitoring"
+ - "state-sync"
+ - "ipc"
 topics:
-  - "renderer"
-  - "monitoring"
-  - "state-sync"
+ - "renderer"
+ - "monitoring"
+ - "state-sync"
 status: "active"
 ---
 
@@ -65,26 +65,26 @@ Representative implementation from `createSiteOperationsActions`:
 
 ```typescript
 const savedSite = await withSiteOperationReturning(
-    "addMonitorToSite",
-    async () => {
-        const site = getSiteByIdentifier(siteIdentifier, deps);
+ "addMonitorToSite",
+ async () => {
+  const site = getSiteByIdentifier(siteIdentifier, deps);
 
-        const normalizedMonitor = normalizeMonitorOrThrow(
-            monitor,
-            "Failed to normalize monitor before adding to site"
-        );
+  const normalizedMonitor = normalizeMonitorOrThrow(
+   monitor,
+   "Failed to normalize monitor before adding to site"
+  );
 
-        const updatedMonitors = [...site.monitors, normalizedMonitor];
+  const updatedMonitors = [...site.monitors, normalizedMonitor];
 
-        return deps.services.site.updateSite(siteIdentifier, {
-            monitors: updatedMonitors,
-        });
-    },
-    deps,
-    {
-        telemetry: { monitor, siteIdentifier },
-        syncAfter: false,
-    }
+  return deps.services.site.updateSite(siteIdentifier, {
+   monitors: updatedMonitors,
+  });
+ },
+ deps,
+ {
+  telemetry: { monitor, siteIdentifier },
+  syncAfter: false,
+ }
 );
 
 applySavedSiteToStore(savedSite, deps);

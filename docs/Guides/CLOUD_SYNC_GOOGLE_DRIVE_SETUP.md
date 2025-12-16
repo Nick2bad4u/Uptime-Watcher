@@ -7,12 +7,12 @@ last_reviewed: 2025-12-16
 category: "guide"
 author: "Nick2bad4u"
 tags:
-  - cloud
-  - sync
-  - backups
-  - google-drive
-  - oauth
-  - pkce
+ - cloud
+ - sync
+ - backups
+ - google-drive
+ - oauth
+ - pkce
 ---
 
 # Google Drive Cloud Sync Setup
@@ -80,14 +80,16 @@ Uptime Watcher uses a loopback HTTP server bound to the loopback interfaces.
 Configure the following **Authorized redirect URIs** in your Google OAuth client:
 
 ```text
-http://127.0.0.1:53682
+http://localhost:53682/oauth2/callback
 ```
 
-Uptime Watcher currently uses the loopback IP redirect format recommended for native/desktop apps:
+Uptime Watcher uses a stable callback path because some providers require an exact redirect URI string.
 
-- `http://127.0.0.1:53682`
+If you need an additional fallback for unusual `localhost` resolution environments, you can also register:
 
-Google’s native app documentation also allows `http://[::1]:port` and notes that `localhost` may work but can be less reliable in some firewall environments.
+```text
+http://127.0.0.1:53682/oauth2/callback
+```
 
 ## Scopes
 

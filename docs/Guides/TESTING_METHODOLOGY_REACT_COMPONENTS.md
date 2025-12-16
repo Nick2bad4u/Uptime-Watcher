@@ -7,11 +7,11 @@ last_reviewed: "2025-12-04"
 category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "uptime-watcher"
-  - "react"
-  - "testing"
-  - "vitest"
-  - "rtl"
+ - "uptime-watcher"
+ - "react"
+ - "testing"
+ - "vitest"
+ - "rtl"
 ---
 
 # React Component Testing Methodology

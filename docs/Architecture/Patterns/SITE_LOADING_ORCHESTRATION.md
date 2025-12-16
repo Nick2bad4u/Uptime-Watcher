@@ -7,11 +7,11 @@ last_reviewed: "2025-11-17"
 category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "uptime-watcher"
-  - "architecture"
-  - "site-loading"
-  - "monitoring"
-  - "orchestration"
+ - "uptime-watcher"
+ - "architecture"
+ - "site-loading"
+ - "monitoring"
+ - "orchestration"
 ---
 
 # Site Loading & Monitoring Orchestration

@@ -1,5 +1,3 @@
-
-
 import type {
     CloudBackupEntry,
     CloudEnableSyncConfig,
@@ -107,8 +105,6 @@ async function ignoreENOENT(fn: () => Promise<void>): Promise<void> {
         throw ensureError(error);
     }
 }
-
-
 
 /**
  * Default Dropbox OAuth app key (client_id) shipped with the app.
@@ -262,7 +258,9 @@ export class CloudService {
             }
 
             if (provider === "google-drive") {
-                const clientId = readProcessEnv("UPTIME_WATCHER_GOOGLE_CLIENT_ID");
+                const clientId = readProcessEnv(
+                    "UPTIME_WATCHER_GOOGLE_CLIENT_ID"
+                );
                 const clientSecret = readProcessEnv(
                     "UPTIME_WATCHER_GOOGLE_CLIENT_SECRET"
                 );
@@ -278,7 +276,10 @@ export class CloudService {
                     await tokenManager.revoke().catch(() => {});
                 }
 
-                await this.settings.set(SETTINGS_KEY_GOOGLE_DRIVE_ACCOUNT_LABEL, "");
+                await this.settings.set(
+                    SETTINGS_KEY_GOOGLE_DRIVE_ACCOUNT_LABEL,
+                    ""
+                );
             }
 
             // NOTE: Do not run these in parallel.
@@ -287,7 +288,9 @@ export class CloudService {
             await this.settings.set(SETTINGS_KEY_PROVIDER, "");
             await this.settings.set(SETTINGS_KEY_FILESYSTEM_BASE_DIRECTORY, "");
             await this.secretStore.deleteSecret(SETTINGS_KEY_DROPBOX_TOKENS);
-            await this.secretStore.deleteSecret(SETTINGS_KEY_GOOGLE_DRIVE_TOKENS);
+            await this.secretStore.deleteSecret(
+                SETTINGS_KEY_GOOGLE_DRIVE_TOKENS
+            );
 
             logger.info("[CloudService] Disconnected cloud provider");
             return this.buildStatusSummary();
@@ -633,7 +636,9 @@ export class CloudService {
                 tokenType: auth.tokenType,
             });
 
-            const accountLabel = await fetchGoogleAccountLabel(auth.accessToken);
+            const accountLabel = await fetchGoogleAccountLabel(
+                auth.accessToken
+            );
             if (accountLabel) {
                 await this.settings.set(
                     SETTINGS_KEY_GOOGLE_DRIVE_ACCOUNT_LABEL,
@@ -890,7 +895,9 @@ export class CloudService {
                 storageKey: SETTINGS_KEY_GOOGLE_DRIVE_TOKENS,
             });
 
-            const connected = await tokenManager.isConnected().catch(() => false);
+            const connected = await tokenManager
+                .isConnected()
+                .catch(() => false);
             if (!connected) {
                 return null;
             }
@@ -1089,7 +1096,9 @@ export class CloudService {
         args: CloudStatusCommonArgs
     ): Promise<CloudStatusSummary> {
         const provider = await this.resolveProviderOrNull();
-        const connected = provider ? await provider.isConnected().catch(() => false) : false;
+        const connected = provider
+            ? await provider.isConnected().catch(() => false)
+            : false;
 
         const encryptionMode =
             connected && provider
@@ -1099,8 +1108,9 @@ export class CloudService {
             encryptionMode === "passphrase" && !args.localEncryptionKey;
 
         const accountLabel =
-            (await this.settings.get(SETTINGS_KEY_GOOGLE_DRIVE_ACCOUNT_LABEL)) ??
-            undefined;
+            (await this.settings.get(
+                SETTINGS_KEY_GOOGLE_DRIVE_ACCOUNT_LABEL
+            )) ?? undefined;
 
         return {
             backupsEnabled: connected,
@@ -1119,7 +1129,6 @@ export class CloudService {
             syncEnabled: args.syncEnabled,
         };
     }
-
 
     private async buildFilesystemStatus(
         args: CloudStatusCommonArgs
@@ -1176,7 +1185,9 @@ export class CloudService {
         };
     }
 
-    private buildUnconfiguredStatus(args: CloudStatusCommonArgs): CloudStatusSummary {
+    private buildUnconfiguredStatus(
+        args: CloudStatusCommonArgs
+    ): CloudStatusSummary {
         return {
             backupsEnabled: false,
             configured: false,

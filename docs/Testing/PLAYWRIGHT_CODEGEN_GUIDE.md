@@ -7,10 +7,10 @@ last_reviewed: "2025-11-17"
 category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "testing"
-  - "playwright"
-  - "codegen"
-  - "uptime-watcher"
+ - "testing"
+ - "playwright"
+ - "codegen"
+ - "uptime-watcher"
 ---
 
 # 🎭 **Playwright Codegen Setup Guide for Uptime-Watcher**

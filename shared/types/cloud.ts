@@ -8,10 +8,10 @@
  *
  * The current implementation supports:
  *
- * - a filesystem-backed provider (useful for development and for targeting
- *   synced folders such as Dropbox/Drive)
- * - a first-class Dropbox provider (OAuth + PKCE handled in Electron main)
- * - a first-class Google Drive provider (OAuth + PKCE handled in Electron main)
+ * - A filesystem-backed provider (useful for development and for targeting synced
+ *   folders such as Dropbox/Drive)
+ * - A first-class Dropbox provider (OAuth + PKCE handled in Electron main)
+ * - A first-class Google Drive provider (OAuth + PKCE handled in Electron main)
  *
  * Provider-specific OAuth tokens and secrets must never appear in this module.
  */

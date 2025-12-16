@@ -182,14 +182,17 @@ export const CloudSection = ({
     const connected = status?.connected ?? false;
 
     const lastSyncLabel = formatOptionalTimestamp(status?.lastSyncAt ?? null);
-    const lastBackupLabel = formatOptionalTimestamp(status?.lastBackupAt ?? null);
+    const lastBackupLabel = formatOptionalTimestamp(
+        status?.lastBackupAt ?? null
+    );
 
     const encryptionMode = status?.encryptionMode ?? "none";
     const encryptionLocked = status?.encryptionLocked ?? false;
     const syncEnabled = status?.syncEnabled ?? false;
 
-    const plaintextBackupCount = backups.filter((backup) => !backup.encrypted)
-        .length;
+    const plaintextBackupCount = backups.filter(
+        (backup) => !backup.encrypted
+    ).length;
 
     const encryptionLabel = resolveEncryptionStatusLabel({
         locked: encryptionLocked,
@@ -268,7 +271,9 @@ export const CloudSection = ({
                     isConnectingGoogleDrive={isConnectingGoogleDrive}
                     isDisconnecting={isDisconnecting}
                     isRefreshingStatus={isRefreshingStatus}
-                    onConfigureFilesystemProvider={onConfigureFilesystemProvider}
+                    onConfigureFilesystemProvider={
+                        onConfigureFilesystemProvider
+                    }
                     onConnectDropbox={onConnectDropbox}
                     onConnectGoogleDrive={onConnectGoogleDrive}
                     onDisconnect={onDisconnect}
@@ -336,7 +341,9 @@ export const CloudSection = ({
 
                     <div className="mt-3 flex flex-wrap gap-2">
                         <ThemedButton
-                            disabled={!connected || isSettingEncryptionPassphrase}
+                            disabled={
+                                !connected || isSettingEncryptionPassphrase
+                            }
                             onClick={onSetEncryptionPassphrase}
                             size="sm"
                             variant="secondary"
@@ -379,7 +386,9 @@ export const CloudSection = ({
                     onEncryptBackupsDeleteOriginals={
                         onEncryptBackupsDeleteOriginals
                     }
-                    onEncryptBackupsKeepOriginals={onEncryptBackupsKeepOriginals}
+                    onEncryptBackupsKeepOriginals={
+                        onEncryptBackupsKeepOriginals
+                    }
                     plaintextBackupCount={plaintextBackupCount}
                 />
 

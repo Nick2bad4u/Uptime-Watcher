@@ -7,10 +7,10 @@ last_reviewed: "2025-12-04"
 category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "uptime-watcher"
-  - "testing"
-  - "vitest"
-  - "playwright"
+ - "uptime-watcher"
+ - "testing"
+ - "vitest"
+ - "playwright"
 ---
 
 # Testing documentation

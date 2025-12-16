@@ -7,11 +7,11 @@ last_reviewed: "2025-12-11"
 category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "uptime-watcher"
-  - "architecture"
-  - "adr"
-  - "error-handling"
-  - "resilience"
+ - "uptime-watcher"
+ - "architecture"
+ - "adr"
+ - "error-handling"
+ - "resilience"
 ---
 
 # ADR-003: Comprehensive Error Handling Strategy
@@ -132,31 +132,31 @@ There are two supported patterns for constructing this context:
    ```typescript
    // src/stores/utils/storeErrorHandling.ts
    export function createStoreErrorHandler(
-      storeKey: string,
-      operationName: string
+    storeKey: string,
+    operationName: string
    ): ErrorHandlingFrontendStore {
-      const errorStore = useErrorStore.getState();
+    const errorStore = useErrorStore.getState();
 
-      return {
-       clearError: () => errorStore.clearStoreError(storeKey),
-       setError: (error) => errorStore.setStoreError(storeKey, error),
-       setLoading: (loading) =>
-          errorStore.setOperationLoading(operationName, loading),
-      };
+    return {
+     clearError: () => errorStore.clearStoreError(storeKey),
+     setError: (error) => errorStore.setStoreError(storeKey, error),
+     setLoading: (loading) =>
+      errorStore.setOperationLoading(operationName, loading),
+    };
    }
 
    // Example: settings initialization
    const result = await withErrorHandling(
-      async () => {
-       const historyLimit = await SettingsService.getHistoryLimit();
-       // ...update store state...
-       return {
-          message: "Successfully loaded settings",
-          settingsLoaded: true,
-          success: true,
-       } as const;
-      },
-      createStoreErrorHandler("settings", "initializeSettings")
+    async () => {
+     const historyLimit = await SettingsService.getHistoryLimit();
+     // ...update store state...
+     return {
+      message: "Successfully loaded settings",
+      settingsLoaded: true,
+      success: true,
+     } as const;
+    },
+    createStoreErrorHandler("settings", "initializeSettings")
    );
    ```
 
@@ -172,32 +172,28 @@ There are two supported patterns for constructing this context:
    ```typescript
    // Example: revert historyLimit on failure while preserving user-facing error
    await withErrorHandling(
-      async () => {
-       const sanitizedLimit = normalizeHistoryLimit(limit, RULES);
-       getState().updateSettings({ historyLimit: sanitizedLimit });
-       const backendLimit = await SettingsService.updateHistoryLimit(
-          sanitizedLimit
-       );
-       // ...normalize and apply backendLimit...
-      },
-      {
-       clearError: () => {
-          useErrorStore.getState().clearStoreError("settings");
-       },
-       setError: (error) => {
-          const errorStore = useErrorStore.getState();
-          errorStore.setStoreError("settings", error);
-          // Revert historyLimit when persistence fails
-          getState().updateSettings({
-           historyLimit: currentSettings.historyLimit,
-          });
-       },
-       setLoading: (loading) => {
-          useErrorStore
-           .getState()
-           .setOperationLoading("updateHistoryLimit", loading);
-       },
-      }
+    async () => {
+     const sanitizedLimit = normalizeHistoryLimit(limit, RULES);
+     getState().updateSettings({ historyLimit: sanitizedLimit });
+     const backendLimit = await SettingsService.updateHistoryLimit(sanitizedLimit);
+     // ...normalize and apply backendLimit...
+    },
+    {
+     clearError: () => {
+      useErrorStore.getState().clearStoreError("settings");
+     },
+     setError: (error) => {
+      const errorStore = useErrorStore.getState();
+      errorStore.setStoreError("settings", error);
+      // Revert historyLimit when persistence fails
+      getState().updateSettings({
+       historyLimit: currentSettings.historyLimit,
+      });
+     },
+     setLoading: (loading) => {
+      useErrorStore.getState().setOperationLoading("updateHistoryLimit", loading);
+     },
+    }
    );
    ```
 

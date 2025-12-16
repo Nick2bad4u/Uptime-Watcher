@@ -21,11 +21,7 @@ import { SettingItem } from "../../shared/SettingItem";
 
 type ConnectionSiteStatus = "down" | "pending" | "up";
 
-type CloudProviderTabKey =
-    | "dropbox"
-    | "filesystem"
-    | "google-drive"
-    | "webdav";
+type CloudProviderTabKey = "dropbox" | "filesystem" | "google-drive" | "webdav";
 
 interface CloudProviderTabDefinition {
     readonly description: string;
@@ -194,12 +190,12 @@ const ProviderTabList = ({
                 case "ArrowLeft": {
                     const nextIndex =
                         (currentIndex - 1 + keys.length) % keys.length;
-                    nextKey = keys[nextIndex];
+                    nextKey = keys[nextIndex] ?? selectedKey;
                     break;
                 }
                 case "ArrowRight": {
                     const nextIndex = (currentIndex + 1) % keys.length;
-                    nextKey = keys[nextIndex];
+                    nextKey = keys[nextIndex] ?? selectedKey;
                     break;
                 }
                 case "End": {
@@ -404,7 +400,9 @@ function renderFilesystemProviderPanel(args: {
     filesystemConfiguredBaseDirectory: null | string;
     isConfiguringFilesystemProvider: boolean;
     onConfigureFilesystemProviderClick: () => void;
-    onFilesystemBaseDirectoryChange: (event: ChangeEvent<HTMLInputElement>) => void;
+    onFilesystemBaseDirectoryChange: (
+        event: ChangeEvent<HTMLInputElement>
+    ) => void;
     providerSetupLocked: boolean;
 }): JSX.Element {
     const handleFilesystemBaseDirectoryChange =
@@ -422,8 +420,8 @@ function renderFilesystemProviderPanel(args: {
             {args.blockedCallout}
 
             <ThemedText className="mt-1" size="xs" variant="secondary">
-                Configure a local folder. This is useful if you want to manage syncing
-                externally (e.g. Dropbox/Drive client).
+                Configure a local folder. This is useful if you want to manage
+                syncing externally (e.g. Dropbox/Drive client).
             </ThemedText>
 
             {args.filesystemConfiguredBaseDirectory ? (
@@ -481,7 +479,8 @@ const ProviderPanel = ({
 }: ProviderPanelProperties): JSX.Element => {
     const isSelectedProviderActive =
         activeProviderTab !== null && activeProviderTab === selectedProviderTab;
-    const configuredForSelectedProvider = configured && isSelectedProviderActive;
+    const configuredForSelectedProvider =
+        configured && isSelectedProviderActive;
     const connectedForSelectedProvider = connected && isSelectedProviderActive;
 
     const providerBlockMessage =
@@ -626,12 +625,11 @@ export const CloudProviderSetupPanel = ({
             ? status.providerDetails.baseDirectory
             : null;
 
-    const handleFilesystemDirectoryChange = useCallback(
-        (event: ChangeEvent<HTMLInputElement>): void => {
-            setFilesystemBaseDirectory(event.target.value);
-        },
-        []
-    );
+    const handleFilesystemDirectoryChange = useCallback((
+        event: ChangeEvent<HTMLInputElement>
+    ): void => {
+        setFilesystemBaseDirectory(event.target.value);
+    }, []);
 
     const handleConfigureFilesystemProviderClick = useCallback((): void => {
         const trimmed = filesystemBaseDirectory.trim();
@@ -643,12 +641,11 @@ export const CloudProviderSetupPanel = ({
         setFilesystemBaseDirectory("");
     }, [filesystemBaseDirectory, onConfigureFilesystemProvider]);
 
-    const handleProviderTabSelect = useCallback(
-        (key: CloudProviderTabKey): void => {
-            setUserSelectedProviderTab(key);
-        },
-        []
-    );
+    const handleProviderTabSelect = useCallback((
+        key: CloudProviderTabKey
+    ): void => {
+        setUserSelectedProviderTab(key);
+    }, []);
 
     const providerStatusControl = useMemo(
         (): JSX.Element => (

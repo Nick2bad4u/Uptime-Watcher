@@ -7,13 +7,13 @@ last_reviewed: "2025-12-11"
 category: "guide"
 author: "Nick2bad4u"
 tags:
-    - "uptime-watcher"
-    - "architecture"
-    - "template"
-    - "ipc"
-    - "diagnostics"
-    - "validation"
-    - "privacy"
+ - "uptime-watcher"
+ - "architecture"
+ - "template"
+ - "ipc"
+ - "diagnostics"
+ - "validation"
+ - "privacy"
 ---
 
 # IPC Diagnostics Handler Template
@@ -66,13 +66,13 @@ sensitive data, and returns typed results.
 ```typescript
 // shared/types/diagnostics.ts
 export const diagnosticsReportSchema = z.object({
-    report: z.string().max(10_000),
-    context: z.record(z.string(), z.string()).optional(),
+ report: z.string().max(10_000),
+ context: z.record(z.string(), z.string()).optional(),
 });
 export type DiagnosticsReport = z.infer<typeof diagnosticsReportSchema>;
 export interface DiagnosticsResult {
-    status: "ok" | "rejected";
-    redactions: string[];
+ status: "ok" | "rejected";
+ redactions: string[];
 }
 
 // shared/types/preload.ts
@@ -84,14 +84,14 @@ import { DIAGNOSTICS_CHANNELS } from "@shared/types/preload";
 import { registerStandardizedIpcHandler } from "../utils";
 
 registerStandardizedIpcHandler(
-    DIAGNOSTICS_CHANNELS.reportPreloadGuard,
-    async (payload: DiagnosticsReport): Promise<DiagnosticsResult> => {
-        const redactions = redactSecrets(payload.report);
-        return { status: "ok", redactions };
-    },
-   (payload): payload is DiagnosticsReport =>
-      diagnosticsReportSchema.safeParse(payload).success,
-    registeredHandlers
+ DIAGNOSTICS_CHANNELS.reportPreloadGuard,
+ async (payload: DiagnosticsReport): Promise<DiagnosticsResult> => {
+  const redactions = redactSecrets(payload.report);
+  return { status: "ok", redactions };
+ },
+ (payload): payload is DiagnosticsReport =>
+  diagnosticsReportSchema.safeParse(payload).success,
+ registeredHandlers
 );
 
 // preload (electron/preload/domains/diagnosticsApi.ts)
@@ -99,7 +99,7 @@ import { DIAGNOSTICS_CHANNELS } from "@shared/types/preload";
 import { createTypedInvoker } from "../core/bridgeFactory";
 
 const submitPreloadGuardReport = createTypedInvoker(
-    DIAGNOSTICS_CHANNELS.reportPreloadGuard
+ DIAGNOSTICS_CHANNELS.reportPreloadGuard
 );
 
 // then expose submitPreloadGuardReport via contextBridge, following the

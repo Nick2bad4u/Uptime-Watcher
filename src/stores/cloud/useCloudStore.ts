@@ -192,7 +192,7 @@ export const useCloudStore: UseBoundStore<StoreApi<CloudStoreState>> =
                     createStoreErrorHandler("cloud", "connectDropbox")
                 );
 
-                const {providerDetails} = nextStatus;
+                const { providerDetails } = nextStatus;
                 const accountLabel =
                     providerDetails?.kind === "dropbox"
                         ? providerDetails.accountLabel
@@ -393,7 +393,9 @@ export const useCloudStore: UseBoundStore<StoreApi<CloudStoreState>> =
                     `Migrated ${migrationResult.migrated}/${migrationResult.processed}`,
                 ];
                 if (migrationResult.failures.length > 0) {
-                    messageParts.push(`${migrationResult.failures.length} failed`);
+                    messageParts.push(
+                        `${migrationResult.failures.length} failed`
+                    );
                 }
 
                 enqueueCloudToast({
@@ -517,7 +519,8 @@ export const useCloudStore: UseBoundStore<StoreApi<CloudStoreState>> =
             try {
                 const resetResult = await withErrorHandling(
                     async () => {
-                        const result = await CloudService.resetRemoteSyncState();
+                        const result =
+                            await CloudService.resetRemoteSyncState();
 
                         const [status, backups] = await Promise.all([
                             CloudService.getStatus(),
@@ -581,7 +584,8 @@ export const useCloudStore: UseBoundStore<StoreApi<CloudStoreState>> =
 
             try {
                 const entryName =
-                    get().backups.find((backup) => backup.key === key)?.fileName ?? key;
+                    get().backups.find((backup) => backup.key === key)
+                        ?.fileName ?? key;
 
                 const startedToastId = enqueueCloudOperationStartedToast({
                     message: `Restoring ${entryName}`,
@@ -590,19 +594,19 @@ export const useCloudStore: UseBoundStore<StoreApi<CloudStoreState>> =
 
                 try {
                     await withErrorHandling(
-                    async () => {
-                        await CloudService.restoreBackup(key);
+                        async () => {
+                            await CloudService.restoreBackup(key);
 
-                        const [status, backups] = await Promise.all([
-                            CloudService.getStatus(),
-                            CloudService.listBackups().catch(
-                                () => get().backups
-                            ),
-                        ]);
-                        set({ backups, status });
-                    },
-                    createStoreErrorHandler("cloud", "restoreBackup")
-                );
+                            const [status, backups] = await Promise.all([
+                                CloudService.getStatus(),
+                                CloudService.listBackups().catch(
+                                    () => get().backups
+                                ),
+                            ]);
+                            set({ backups, status });
+                        },
+                        createStoreErrorHandler("cloud", "restoreBackup")
+                    );
                 } finally {
                     dismissToastSafely(startedToastId);
                 }

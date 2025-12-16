@@ -7,10 +7,10 @@ last_reviewed: "2025-11-17"
 category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "uptime-watcher"
-  - "architecture"
-  - "diagram"
-  - "overview"
+ - "uptime-watcher"
+ - "architecture"
+ - "diagram"
+ - "overview"
 ---
 
 # Uptime Watcher Architecture Diagram

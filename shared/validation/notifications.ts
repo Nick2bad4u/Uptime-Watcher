@@ -49,13 +49,12 @@ export const parseNotificationPreferenceUpdate = (
 /**
  * Canonical schema for generic app notification requests exchanged over IPC.
  */
-export const appNotificationRequestSchema: z.ZodType<AppNotificationRequest> =
-    z
-        .object({
-            body: z.string().min(1).max(500).optional(),
-            title: z.string().min(1).max(120),
-        })
-        .strict();
+export const appNotificationRequestSchema: z.ZodType<AppNotificationRequest> = z
+    .object({
+        body: z.string().min(1).max(500).optional(),
+        title: z.string().min(1).max(120),
+    })
+    .strict();
 
 /**
  * Validates a generic app notification request payload against the shared

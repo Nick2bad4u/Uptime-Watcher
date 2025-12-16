@@ -7,11 +7,11 @@ last_reviewed: "2025-11-17"
 category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "uptime-watcher"
-  - "docusaurus"
-  - "typedoc"
-  - "documentation"
-  - "github-pages"
+ - "uptime-watcher"
+ - "docusaurus"
+ - "typedoc"
+ - "documentation"
+ - "github-pages"
 ---
 
 # Docusaurus Documentation Setup Guide

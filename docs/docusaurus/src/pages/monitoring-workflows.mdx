@@ -2,6 +2,7 @@
 title: Monitoring Workflows
 description: Detailed monitoring workflows and processes for Uptime Watcher
 ---
+
 {/* eslint-disable no-unused-vars,@eslint-community/eslint-comments/disable-enable-pair -- Layout component consumed by MDX JSX */}
 import Layout from '@theme/Layout';
 import Mermaid from '@theme/Mermaid';
@@ -226,6 +227,7 @@ The current architecture centers on a single standardized cache inside Electron 
     Targets --> MonitorMgr
 
     Store --> UI
+
 `} />
 
 During normal operation the renderer requests an initial snapshot through `StateSyncService.requestFullSync()`, then stays synchronized through `state-sync-event` broadcasts. When an invalid payload is detected, the new automatic recovery flow triggers a guarded full sync and replays a synthetic bulk update so stores never diverge from Electron state.
@@ -293,6 +295,7 @@ This sequence illustrates how a scheduled monitor run traverses the enhanced mon
     Preload->>Renderer: window.electronAPI.events.dispatch(channel, payload)
     Renderer->>Stores: apply typed update & append history
     Stores->>UI: Re-render dashboards
+
 `} />
 
 ---
@@ -303,5 +306,6 @@ These workflow diagrams provide detailed insights into how Uptime Watcher proces
         </div>
       </div>
     </Layout>
-  );
+
+);
 }

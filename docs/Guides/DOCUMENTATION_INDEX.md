@@ -7,11 +7,10 @@ last_reviewed: "2025-12-14"
 category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "uptime-watcher"
-  - "documentation"
-  - "index"
-  - "navigation"
-
+ - "uptime-watcher"
+ - "documentation"
+ - "index"
+ - "navigation"
 ---
 
 # 📚 Documentation Index

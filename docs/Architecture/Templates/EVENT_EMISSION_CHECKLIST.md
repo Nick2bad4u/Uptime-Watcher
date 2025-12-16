@@ -7,13 +7,13 @@ last_reviewed: "2025-12-11"
 category: "guide"
 author: "Nick2bad4u"
 tags:
-    - "uptime-watcher"
-    - "architecture"
-    - "template"
-    - "events"
-    - "ipc"
-    - "typed-event-bus"
-    - "renderer"
+ - "uptime-watcher"
+ - "architecture"
+ - "template"
+ - "events"
+ - "ipc"
+ - "typed-event-bus"
+ - "renderer"
 ---
 
 # Event Emission Checklist
@@ -46,16 +46,18 @@ import type { RendererEventPayload } from "@shared/ipc/rendererEvents";
 
 // main (orchestrator / manager event bus)
 await eventBus.emitTyped("site:added", {
-    identifier: "example",
-    site,
-    source: "user",
-    timestamp: Date.now(),
+ identifier: "example",
+ site,
+ source: "user",
+ timestamp: Date.now(),
 });
 
 // main (renderer event bridge)
 rendererEventBridge.sendToRenderers(
-    RENDERER_EVENT_CHANNELS.SITE_ADDED,
-    payload satisfies RendererEventPayload<typeof RENDERER_EVENT_CHANNELS.SITE_ADDED>
+ RENDERER_EVENT_CHANNELS.SITE_ADDED,
+ payload satisfies RendererEventPayload<
+  typeof RENDERER_EVENT_CHANNELS.SITE_ADDED
+ >
 );
 
 // preload

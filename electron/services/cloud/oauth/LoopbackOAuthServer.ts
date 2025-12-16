@@ -1,4 +1,4 @@
-/* eslint-disable @microsoft/sdl/no-insecure-url -- OAuth loopback redirects require http://127.0.0.1; https would require local certificates. */
+/* eslint-disable @microsoft/sdl/no-insecure-url -- OAuth loopback redirects require http://localhost; https would require local certificates. */
 
 import type { IncomingMessage, Server, ServerResponse } from "node:http";
 
@@ -19,13 +19,14 @@ export const DEFAULT_OAUTH_LOOPBACK_PORT = 53_682;
  * Default path for all OAuth loopback callbacks.
  *
  * @remarks
- * For Google OAuth native/desktop apps, the recommended loopback redirect URI
- * is `http://127.0.0.1:port` (no explicit path), which results in callbacks to
- * `/`.
+ * Google’s native/desktop OAuth guidance allows a loopback redirect to include
+ * an optional path component (for example `/oauth2redirect`). We keep a stable
+ * path here because some providers (e.g. Dropbox) require an exact redirect URI
+ * to be registered.
  *
  * @see https://developers.google.com/identity/protocols/oauth2/native-app#redirect-uri_loopback
  */
-export const DEFAULT_OAUTH_LOOPBACK_PATH = "/";
+export const DEFAULT_OAUTH_LOOPBACK_PATH = "/oauth2/callback";
 
 const LOOPBACK_HOSTS = ["127.0.0.1", "::1"] as const;
 
@@ -131,20 +132,21 @@ export async function startLoopbackOAuthServer(args?: {
     readonly redirectHost?: string;
 }): Promise<LoopbackOAuthServer> {
     const port = args?.port ?? DEFAULT_OAUTH_LOOPBACK_PORT;
-    const redirectHost = args?.redirectHost ?? "127.0.0.1";
+    const redirectHost = args?.redirectHost ?? "localhost";
 
-    const redirectUri = `http://${redirectHost}:${port}`;
+    const redirectUri = `http://${redirectHost}:${port}${DEFAULT_OAUTH_LOOPBACK_PATH}`;
 
     let resolved = false;
     let resolvePromise: ((value: LoopbackOAuthCallback) => void) | null = null;
     let rejectPromise: ((error: unknown) => void) | null = null;
 
-    const callbackPromise = new Promise<LoopbackOAuthCallback>(
-        (resolve, reject) => {
-            resolvePromise = resolve;
-            rejectPromise = reject;
-        }
-    );
+    const callbackPromise = new Promise<LoopbackOAuthCallback>((
+        resolve,
+        reject
+    ) => {
+        resolvePromise = resolve;
+        rejectPromise = reject;
+    });
 
     const servers = LOOPBACK_HOSTS.map((host) => {
         const server = createServer((request, response) => {
@@ -206,7 +208,9 @@ export async function startLoopbackOAuthServer(args?: {
 
     return {
         close: async (): Promise<void> => {
-            await Promise.all(servers.map(({ server }) => closeHttpServer(server)));
+            await Promise.all(
+                servers.map(({ server }) => closeHttpServer(server))
+            );
         },
         redirectUri,
         waitForCallback: async ({

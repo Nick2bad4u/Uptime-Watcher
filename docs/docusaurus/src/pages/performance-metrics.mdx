@@ -2,6 +2,7 @@
 title: Performance Metrics Overview
 description: Performance analysis and optimization strategies for Uptime Watcher
 ---
+
 {/* eslint-disable no-unused-vars,@eslint-community/eslint-comments/disable-enable-pair -- Layout component consumed by MDX JSX */}
 import Layout from '@theme/Layout';
 import Mermaid from '@theme/Mermaid';
@@ -207,13 +208,15 @@ This diagram illustrates memory usage patterns and optimization strategies:
 
 This chart shows comparative performance across different scenarios:
 
-<Mermaid value={`xychart-beta
+<Mermaid
+  value={`xychart-beta
     title "Response Time Performance (ms)"
     x-axis [1-site, 5-sites, 10-sites, 25-sites, 50-sites, 100-sites]
     y-axis "Response Time (ms)" 0 --> 1000
     line [50, 75, 120, 200, 350, 680]
     line [45, 65, 95, 150, 280, 520]
-    line [40, 55, 80, 125, 240, 450]`} />
+    line [40, 55, 80, 125, 240, 450]`}
+/>
 
 ## System Resource Utilization
 
@@ -359,5 +362,6 @@ These performance metrics and visualizations help identify optimization opportun
         </div>
       </div>
     </Layout>
-  );
+
+);
 }

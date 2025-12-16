@@ -7,11 +7,11 @@ last_reviewed: "2025-11-23"
 category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "uptime-watcher"
-  - "architecture"
-  - "initialization"
-  - "data-import"
-  - "site-lifecycle"
+ - "uptime-watcher"
+ - "architecture"
+ - "initialization"
+ - "data-import"
+ - "site-lifecycle"
 ---
 
 # Initialization & Data Import Orchestration
@@ -110,10 +110,10 @@ event, it emits a second `database:transaction-completed` event:
 
 ```ts
 await this.emitTyped("database:transaction-completed", {
-    duration: 0,
-    operation: "initialize",
-    success: true,
-    timestamp: Date.now(),
+ duration: 0,
+ operation: "initialize",
+ success: true,
+ timestamp: Date.now(),
 });
 ```
 
@@ -141,7 +141,6 @@ an effect via the `initializeApp` callback:
    `useSettingsStore.getState()`.
 
 3. Sequentially initializes:
-
    - **Settings store** via `initializeSettings`.
    - **Notification bridge** via `NotificationPreferenceService.initialize()`
      (with warnings logged on failure).
@@ -149,7 +148,6 @@ an effect via the `initializeApp` callback:
    - **Sites store** via `initializeSites`.
 
 4. Establishes cache synchronization and event subscriptions:
-
    - Calls `setupCacheSync()` to wire backend state-sync events into renderer
      stores.
    - Subscribes to backend sync events via `sitesStore.subscribeToSyncEvents()`.
@@ -210,7 +208,6 @@ command-pattern implementation in
    normalized logging and error reporting.
 
 2. Constructs an `ImportDataCommand` with:
-
    - The current `siteCache`.
    - The `ConfigurationManager` (for validation rules).
    - The `TypedEventBus<UptimeEvents>`.
@@ -219,7 +216,6 @@ command-pattern implementation in
      `DatabaseManager.setHistoryLimit`.
 
 3. Executes the command, which:
-
    - Parses the JSON payload into `settings` and `sites`.
    - Validates site identifiers and configuration via
      `ConfigurationManager.validateSiteConfiguration`.
@@ -237,9 +233,9 @@ command-pattern implementation in
 
    ```ts
    await this.eventEmitter.emitTyped("internal:database:data-imported", {
-       operation: "data-imported",
-       success: false,
-       timestamp: Date.now(),
+    operation: "data-imported",
+    success: false,
+    timestamp: Date.now(),
    });
    ```
 
@@ -285,7 +281,6 @@ initialization and import orchestration described above.
    delegates submission to `handleSubmit` in `Submit.tsx`.
 
 2. **Monitor validation & creation** – `handleSubmit`:
-
    - Normalizes raw form data via `buildMonitorFormData`.
    - Validates monitor-type-specific fields using
      `validateMonitorFormData(monitorType, formData)`.
@@ -295,7 +290,6 @@ initialization and import orchestration described above.
      and attaches `id`, `checkInterval`, and `activeOperations`.
 
 3. **Store & IPC integration** – Depending on `addMode`:
-
    - For `"new"`, `handleSubmit` calls `createSite` on `useSitesStore` with:
 
      ```ts
@@ -310,7 +304,6 @@ initialization and import orchestration described above.
      typed IPC to invoke `UptimeOrchestrator.addSite()` in the main process.
 
 4. **Main-process orchestration** – `UptimeOrchestrator.addSite`:
-
    - Adds the site via `SiteManager.addSite`.
    - Calls `MonitorManager.setupSiteForMonitoring` for the new site.
    - On failure during monitoring setup, attempts to remove the site and logs
@@ -318,7 +311,6 @@ initialization and import orchestration described above.
 
 5. **Events & sync** – `SiteManager` emits internal site events that are
    forwarded by `UptimeOrchestrator` to public renderer events:
-
    - `internal:site:added` → forwarded as `site:added` with
      `source: SITE_ADDED_SOURCE.USER`.
    - Cache updates trigger `sites:state-synchronized` events carrying sanitized

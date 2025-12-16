@@ -7,11 +7,11 @@ last_reviewed: "2025-11-17"
 category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "uptime-watcher"
-  - "storybook"
-  - "vitest"
-  - "playwright"
-  - "testing"
+ - "uptime-watcher"
+ - "storybook"
+ - "vitest"
+ - "playwright"
+ - "testing"
 ---
 
 # Storybook Vitest Component Testing
@@ -145,8 +145,7 @@ const meta: Meta<typeof DeviceStatusCard> = {
   msw: {
    handlers: [
     http.get("/api/devices/42/status", () =>
-     HttpResponse.json({ uptimePercentage: 99.9 })
-    ),
+     HttpResponse.json({ uptimePercentage: 99.9 })),
    ],
   },
  },

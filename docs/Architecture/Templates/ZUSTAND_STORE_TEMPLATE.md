@@ -7,11 +7,11 @@ last_reviewed: "2025-11-17"
 category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "uptime-watcher"
-  - "architecture"
-  - "template"
-  - "zustand"
-  - "state-management"
+ - "uptime-watcher"
+ - "architecture"
+ - "template"
+ - "zustand"
+ - "state-management"
 ---
 
 # Zustand Store Template
@@ -43,27 +43,26 @@ For stores with straightforward state that don't require modular composition:
  * [DESCRIPTION] store for managing [DOMAIN] state and interactions.
  *
  * @remarks
- * This store manages [DESCRIPTION OF WHAT IT MANAGES]. It uses Zustand
- * [with/without] persistence to [PERSISTENCE DESCRIPTION IF APPLICABLE].
+ *   This store manages [DESCRIPTION OF WHAT IT MANAGES]. It uses Zustand
+ *   [with/without] persistence to [PERSISTENCE DESCRIPTION IF APPLICABLE].
  *
- * The store follows the application's modular architecture by [ARCHITECTURE
- * NOTES].
+ *   The store follows the application's modular architecture by [ARCHITECTURE
+ *   NOTES].
  *
  * @example
+ *  ```typescript
+ *  import { useExampleStore } from "./stores/useExampleStore";
  *
- * ```typescript
- * import { useExampleStore } from "./stores/useExampleStore";
+ *  function MyComponent() {
+ *   const { exampleValue, setExampleValue } = useExampleStore();
  *
- * function MyComponent() {
- *  const { exampleValue, setExampleValue } = useExampleStore();
- *
- *  return (
- *   <button onClick={() => setExampleValue("new value")}>
- *    Update Example
- *   </button>
- *  );
- * }
- * ```
+ *   return (
+ *    <button onClick={() => setExampleValue("new value")}>
+ *     Update Example
+ *    </button>
+ *   );
+ *  }
+ *  ```;
  *
  * @public
  */
@@ -86,8 +85,8 @@ import { logStoreAction } from "../utils";
  * Interface defining the state shape for the Example store.
  *
  * @remarks
- * Contains all state properties managed by this store. Separating state from
- * actions improves maintainability.
+ *   Contains all state properties managed by this store. Separating state from
+ *   actions improves maintainability.
  *
  * @public
  */
@@ -108,8 +107,8 @@ export interface ExampleState {
  * Interface defining the actions available in the Example store.
  *
  * @remarks
- * Contains all action methods that can modify the store state. Actions should
- * be descriptive and follow async/sync patterns consistently.
+ *   Contains all action methods that can modify the store state. Actions should
+ *   be descriptive and follow async/sync patterns consistently.
  *
  * @public
  */
@@ -161,7 +160,7 @@ const buildErrorHandler = (operation: string) =>
  * Example store for managing [DOMAIN] state and interactions.
  *
  * @remarks
- * [DETAILED DESCRIPTION OF STORE PURPOSE AND USAGE]
+ *   [DETAILED DESCRIPTION OF STORE PURPOSE AND USAGE]
  *
  * @public
  */
@@ -292,8 +291,8 @@ export const useExampleStore = create<ExampleStore>()(
     * Partialize function for selective state persistence.
     *
     * @remarks
-    * Only persists user preferences and settings. Transient state like loading
-    * states, selected items, and data arrays are excluded.
+    *   Only persists user preferences and settings. Transient state like loading
+    *   states, selected items, and data arrays are excluded.
     *
     * @param state - Current store state
     *
@@ -323,13 +322,13 @@ For stores with complex state that benefit from modular composition:
  * Complex store composed of multiple modules for [DOMAIN] management.
  *
  * @remarks
- * This store uses a modular composition pattern to separate concerns:
+ *   This store uses a modular composition pattern to separate concerns:
  *
- * - `useExampleState`: Core state management and data manipulation
- * - `useExampleOperations`: CRUD operations for items
- * - `useExampleSync`: Backend synchronization and data consistency
+ *   - `useExampleState`: Core state management and data manipulation
+ *   - `useExampleOperations`: CRUD operations for items
+ *   - `useExampleSync`: Backend synchronization and data consistency
  *
- * Each module is independently testable and has clear responsibilities.
+ *   Each module is independently testable and has clear responsibilities.
  *
  * @public
  */
@@ -348,10 +347,10 @@ import { createExampleSyncActions } from "./useExampleSync";
  * Main example store combining all functionality.
  *
  * @remarks
- * Creates a Zustand store that composes multiple action modules to provide a
- * complete interface for example management. The store uses dependency
- * injection to share common functions between modules while maintaining clear
- * boundaries.
+ *   Creates a Zustand store that composes multiple action modules to provide a
+ *   complete interface for example management. The store uses dependency
+ *   injection to share common functions between modules while maintaining clear
+ *   boundaries.
  *
  * @returns Complete example store with all actions and state
  *
@@ -407,9 +406,9 @@ For individual modules used in complex stores:
  * State management module for Example store.
  *
  * @remarks
- * Handles core state mutations and basic data operations. This module is
- * composed into the main store and provides the foundational state management
- * capabilities.
+ *   Handles core state mutations and basic data operations. This module is
+ *   composed into the main store and provides the foundational state management
+ *   capabilities.
  *
  * @public
  */
@@ -496,8 +495,7 @@ export function createExampleStateActions(
    logStoreAction("ExampleStore", "updateItem", { id, updates });
    set((state) => ({
     items: state.items.map((item) =>
-     item.id === id ? { ...item, ...updates } : item
-    ),
+     item.id === id ? { ...item, ...updates } : item),
     lastUpdated: Date.now(),
    }));
   },

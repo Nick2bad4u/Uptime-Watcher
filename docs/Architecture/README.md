@@ -7,12 +7,12 @@ last_reviewed: "2025-12-15"
 category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "uptime-watcher"
-  - "architecture"
-  - "adr"
-  - "patterns"
-  - "templates"
-  - "standards"
+ - "uptime-watcher"
+ - "architecture"
+ - "adr"
+ - "patterns"
+ - "templates"
+ - "standards"
 ---
 
 # Architecture Documentation Index

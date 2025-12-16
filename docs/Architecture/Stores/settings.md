@@ -7,11 +7,11 @@ last_reviewed: "2025-12-11"
 category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "uptime-watcher"
-  - "stores"
-  - "settings"
-  - "history-limit"
-  - "configuration"
+ - "uptime-watcher"
+ - "stores"
+ - "settings"
+ - "history-limit"
+ - "configuration"
 ---
 
 # Settings Store and History Limits
@@ -88,27 +88,27 @@ history limit correctly:
 import { DEFAULT_HISTORY_LIMIT_RULES } from "@shared/constants/history";
 
 const resolveBackendHistoryLimit = (
-    rawLimit: number | undefined,
-    historyLength: number
+ rawLimit: number | undefined,
+ historyLength: number
 ): number => {
-    if (rawLimit === 0) {
-        // Unlimited retention – cap UI at the number of available records.
-        return historyLength > 0
-            ? historyLength
-            : DEFAULT_HISTORY_LIMIT_RULES.defaultLimit;
-    }
+ if (rawLimit === 0) {
+  // Unlimited retention – cap UI at the number of available records.
+  return historyLength > 0
+   ? historyLength
+   : DEFAULT_HISTORY_LIMIT_RULES.defaultLimit;
+ }
 
-    if (typeof rawLimit !== "number" || Number.isNaN(rawLimit)) {
-        return DEFAULT_HISTORY_LIMIT_RULES.defaultLimit;
-    }
+ if (typeof rawLimit !== "number" || Number.isNaN(rawLimit)) {
+  return DEFAULT_HISTORY_LIMIT_RULES.defaultLimit;
+ }
 
-    const normalized = Math.floor(rawLimit);
+ const normalized = Math.floor(rawLimit);
 
-    if (normalized <= 0) {
-        return DEFAULT_HISTORY_LIMIT_RULES.minLimit;
-    }
+ if (normalized <= 0) {
+  return DEFAULT_HISTORY_LIMIT_RULES.minLimit;
+ }
 
-    return normalized;
+ return normalized;
 };
 ```
 

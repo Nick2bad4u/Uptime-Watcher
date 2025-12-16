@@ -7,11 +7,11 @@ last_reviewed: "2025-12-11"
 category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "uptime-watcher"
-  - "architecture"
-  - "evolution"
-  - "migrations"
-  - "history"
+ - "uptime-watcher"
+ - "architecture"
+ - "evolution"
+ - "migrations"
+ - "history"
 ---
 
 # 🔄 Technology Evolution Guide
@@ -238,8 +238,7 @@ export const createSitesStateActions = (
   const updatedSite = await SiteService.updateSite(siteIdentifier, updates);
   set((state) => ({
    sites: state.sites.map((site) =>
-    site.identifier === siteIdentifier ? updatedSite : site
-   ),
+    site.identifier === siteIdentifier ? updatedSite : site),
   }));
  },
 });

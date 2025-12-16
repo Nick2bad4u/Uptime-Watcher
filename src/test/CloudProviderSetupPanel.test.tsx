@@ -48,7 +48,9 @@ describe(CloudProviderSetupPanel, () => {
     it("shows Dropbox + Google Drive + Local folder tabs", () => {
         renderPanel();
 
-        expect(screen.getByRole("tab", { name: "Dropbox" })).toBeInTheDocument();
+        expect(
+            screen.getByRole("tab", { name: "Dropbox" })
+        ).toBeInTheDocument();
         expect(
             screen.getByRole("tab", { name: "Google Drive" })
         ).toBeInTheDocument();
@@ -89,7 +91,9 @@ describe(CloudProviderSetupPanel, () => {
         expect(
             screen.getByText("Google Drive (me@example.com)")
         ).toBeInTheDocument();
-        expect(screen.getByRole("button", { name: "Disconnect" })).toBeEnabled();
+        expect(
+            screen.getByRole("button", { name: "Disconnect" })
+        ).toBeEnabled();
     });
 
     it("locks provider switching when already configured", () => {

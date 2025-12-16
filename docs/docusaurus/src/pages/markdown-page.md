@@ -7,13 +7,13 @@ last_reviewed: "2025-11-17"
 category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "uptime-watcher"
-  - "docusaurus"
-  - "markdown"
-  - "example"
+ - "uptime-watcher"
+ - "docusaurus"
+ - "markdown"
+ - "example"
 topics:
-  - "documentation"
-  - "docusaurus"
+ - "documentation"
+ - "docusaurus"
 description: "Simple standalone markdown page demonstrating that Docusaurus can render pages without React components."
 ---
 

@@ -7,11 +7,11 @@ last_reviewed: "2025-12-04"
 category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "uptime-watcher"
-  - "environment"
-  - "setup"
-  - "development"
-  - "configuration"
+ - "uptime-watcher"
+ - "environment"
+ - "setup"
+ - "development"
+ - "configuration"
 ---
 
 # 🛠️ Environment Setup Guide
@@ -435,8 +435,8 @@ services:
    - .:/app
    - /app/node_modules
   ports:
-     - "5173:5173"
-     - "9229:9229"
+   - "5173:5173"
+   - "9229:9229"
   environment:
    - NODE_ENV=development
 ```

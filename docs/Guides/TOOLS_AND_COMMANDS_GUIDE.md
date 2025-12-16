@@ -7,11 +7,11 @@ last_reviewed: "2025-12-12"
 category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "uptime-watcher"
-  - "tools"
-  - "commands"
-  - "ai-agent"
-  - "workflow"
+ - "uptime-watcher"
+ - "tools"
+ - "commands"
+ - "ai-agent"
+ - "workflow"
 ---
 
 # Tools and commands guide

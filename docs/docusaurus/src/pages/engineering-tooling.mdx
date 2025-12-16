@@ -2,6 +2,7 @@
 title: Engineering Tooling Pipelines
 description: Diagrams for linting, type-checking, documentation, and site builds
 ---
+
 {/* eslint-disable no-unused-vars,@eslint-community/eslint-comments/disable-enable-pair -- Layout component consumed by MDX JSX */}
 import Layout from '@theme/Layout';
 import Mermaid from '@theme/Mermaid';
@@ -120,6 +121,7 @@ This topology shows how `package.json` scripts fan out into ESLint, Stylelint, P
     class lint,lintAll,lintCI,lintQuick,lintPrettier,lintPrettierFix,lintCSS,lintCSSDocs,lintRemark,lintRemarkFix,lintMadge,lintAction,lintCommit,lintComplexity,lintKnip,lintDepcheck cli
     class ESLintRunner,StylelintRunner,PrettierRunner,RemarkRunner,Madge,Actionlint,Commitlint,Complexity,Knip,Depcheck,Yamllint,Grype runner
     class ESLintConfig,ESLintCache,StylelintConfig,StylelintDocsConfig,StylelintCache,PrettierConfig,PrettierCache,RemarkConfig config
+
 ` } />
 
 With these diagrams you can quickly trace the exact scripts and configuration files responsible for quality gates, documentation output, and the Docusaurus website lifecycle. Keep them handy when extending tooling or triaging CI issues.
@@ -184,6 +186,7 @@ With these diagrams you can quickly trace the exact scripts and configuration fi
     class checkTypes,checkAll,checkAllAll,checkPlaywright script
     class tsApp,tsElectron,tsShared,tsTestFrontend,tsTestElectron,tsTestShared,tsBenchmarks,tsConfigs,tsPlaywright,tsStorybook tsconfig
     class dtsOut,tsbuildInfo,diagnostics artifact
+
 `} />
 
 ## Documentation & Content Toolchain
@@ -216,6 +219,7 @@ Uptime Watcher’s documentation stack combines Markdown/MDX linting, TypeDoc AP
 
     class DocsSrc,Guides,TSDoc,ApiMarkdown content
     class RemarkLint,PrettierDocs,TypedocCmd,TypedocConfig,TypedocTSConfig,TypedocPlugins,DocsReviewed tooling
+
 `} />
 
 ## Docusaurus Site Architecture
@@ -250,6 +254,7 @@ The following diagram maps the Docusaurus site located in `docs/docusaurus`. It 
         class DocusaurusRoot root
         class ConfigTS,Sidebars,ThemeOverrides,Deployment,BaseUrl,MarkdownPipeline,FutureFlags,ThemeConfig,CodeBlocks,CustomPages,ClientModules,staticAssets config
         class LiveCode,MermaidPlugin,ZoomPlugin,LLMSPlugin,BuildArtifacts plugin
+
 `} />
 
 ## Docusaurus Build & TypeDoc Pipeline
@@ -277,6 +282,7 @@ The following diagram maps the Docusaurus site located in `docs/docusaurus`. It 
     Docusaurus-->>Dev: Build summary + sitemap
 
     Note over TypeDoc,Docusaurus: Build steps reuse HEADLESS env when running on CI
+
 `} />
 
 ## Quality Gate Orchestrator (Bonus)
@@ -312,6 +318,7 @@ Beyond linting/type-checking, `npm run quality` is the umbrella command CI uses 
     class quality gate
     class lintAll,testAllCoverage,docusaurusCheck,depScan gate
     class lint,lintRemark,lintMadge,typeCheckAll,knip,frontendCov,electronCov,sharedCov,storybookCov,typedocRefresh,docusaurusBuildCheck,grypeScan,depcheckScan child
+
 `} />
 
 ---
@@ -322,5 +329,6 @@ With these diagrams you can quickly trace the exact scripts and configuration fi
         </div>
       </div>
     </Layout>
-  );
+
+);
 }

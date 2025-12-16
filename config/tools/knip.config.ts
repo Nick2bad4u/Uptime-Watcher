@@ -93,7 +93,6 @@ const knipConfig: KnipConfig = {
         "@vitest.*",
         "async",
         "babel-plugin-react-compiler",
-        "bufferutil",
         "chartjs-adapter-date-fns",
         "chartjs-plugin-zoom",
         "cli-table3",
@@ -128,10 +127,12 @@ const knipConfig: KnipConfig = {
         "tw-animate-css",
         "type.*",
         "unified",
-        "utf-8-validate",
         "vite.*",
         "ws",
         "zod-fast-check",
+        // False-positive: used by the Electron Google Drive provider, but Knip
+        // does not currently detect it as a referenced dependency.
+        "googleapis",
     ],
     ignoreExportsUsedInFile: {
         interface: true,

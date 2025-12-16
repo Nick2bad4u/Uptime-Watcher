@@ -2,6 +2,7 @@
 title: Testing Architecture & Quality Gates
 description: Deep dive into automated testing pipelines for Uptime Watcher
 ---
+
 {/* eslint-disable no-unused-vars,@eslint-community/eslint-comments/disable-enable-pair -- Layout component consumed by MDX JSX */}
 import Layout from '@theme/Layout';
 import Mermaid from '@theme/Mermaid';
@@ -134,7 +135,8 @@ The first diagram connects the NPM scripts, Vitest projects, Storybook runner, a
     class RunnerSuites setup
     class GlobalSetup,GlobalTeardown,ElectronHelpers,PWTests setup
     class tsFrontend,tsElectron,tsShared,tsPlaywright,TsDeps,TsDeps2,TsDeps3,TsDeps4 type
-  `} />
+
+`} />
 
 ## Property & Fuzz Validation Pipelines
 
@@ -170,6 +172,7 @@ Shared and Electron tests use `@fast-check/vitest` (see `shared/test/setup.ts`, 
     class Arbitraries stage
     class ErrorFuzz,SiteStatusFuzz,ConversionFuzz fuzz
     class Validators,Sanitizers,Invariants,DerivedStats,CoreUtils,LoggerGuards,EnhancedCheckerProp,MonitorRegistryProp,ElectronMocks,EventBusChecks util
+
 `} />
 
 ## Playwright & Electron End-to-End Flow
@@ -204,6 +207,7 @@ Playwright projects exercise the packaged Electron app. Global setup builds the 
 
     Note over Fixture,App: HEADLESS=true ensures WindowService skips show()
     Note over Test,Report: Traces stored in playwright/test-results + html-report
+
 `} />
 
 ## Coverage & Quality Gates
@@ -229,5 +233,6 @@ By following the diagrams and commands above, contributors can reason about wher
         </div>
       </div>
     </Layout>
-  );
+
+);
 }

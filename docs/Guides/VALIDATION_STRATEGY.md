@@ -7,11 +7,11 @@ last_reviewed: "2025-11-16"
 category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "uptime-watcher"
-  - "validation"
-  - "ipc"
-  - "managers"
-  - "repositories"
+ - "uptime-watcher"
+ - "validation"
+ - "ipc"
+ - "managers"
+ - "repositories"
 ---
 
 # Validation Strategy
@@ -67,21 +67,26 @@ When adding a new monitor type:
    import { MIN_MONITOR_CHECK_INTERVAL_MS } from "@shared/constants/monitoring";
 
    export const MonitorConfigSchema = z.object({
-       id: z.string().min(1, "Monitor ID is required"),
-       url: z.string().url(),
-       // Align interval bounds with the shared monitoring constants
-       interval: z
-           .number()
-           .min(
-               MIN_MONITOR_CHECK_INTERVAL_MS,
-               "Check interval must be at least 5 seconds"
-           )
-           .max(2_592_000_000, "Check interval cannot exceed 30 days"),
-       // In practice the real implementation uses a richer union of
-       // monitor types; this example focuses on the layered validation
-       // pattern rather than enumerating every supported variant.
-       type: z.enum(["http", "port", "ping", "dns"]),
-       enabled: z.boolean().default(true),
+    id: z.string().min(1, "Monitor ID is required"),
+    url: z.string().url(),
+    // Align interval bounds with the shared monitoring constants
+    interval: z
+     .number()
+     .min(
+      MIN_MONITOR_CHECK_INTERVAL_MS,
+      "Check interval must be at least 5 seconds"
+     )
+     .max(2_592_000_000, "Check interval cannot exceed 30 days"),
+    // In practice the real implementation uses a richer union of
+    // monitor types; this example focuses on the layered validation
+    // pattern rather than enumerating every supported variant.
+    type: z.enum([
+     "http",
+     "port",
+     "ping",
+     "dns",
+    ]),
+    enabled: z.boolean().default(true),
    });
    ```
 
@@ -92,19 +97,19 @@ When adding a new monitor type:
    import { ApplicationError } from "@shared/errors";
 
    class MonitorManager {
-       async createMonitor(config: MonitorConfig): Promise<Monitor> {
-           // Business rule validation
-           if (config.type === "tcp" && config.interval < 10000) {
-               throw new ApplicationError({
-                   code: "INVALID_MONITOR_CONFIG",
-                   message: "TCP monitors require minimum 10-second interval",
-                   operation: "MonitorManager.createMonitor",
-                   details: { interval: config.interval, minimumInterval: 10000 },
-               });
-           }
+    async createMonitor(config: MonitorConfig): Promise<Monitor> {
+     // Business rule validation
+     if (config.type === "tcp" && config.interval < 10000) {
+      throw new ApplicationError({
+       code: "INVALID_MONITOR_CONFIG",
+       message: "TCP monitors require minimum 10-second interval",
+       operation: "MonitorManager.createMonitor",
+       details: { interval: config.interval, minimumInterval: 10000 },
+      });
+     }
 
-           return await this.repository.create(config);
-       }
+     return await this.repository.create(config);
+    }
    }
    ```
 
@@ -113,29 +118,29 @@ When adding a new monitor type:
    ```typescript
    // electron/services/database/MonitorRepository.ts
    class MonitorRepository {
-       async create(config: MonitorConfig): Promise<Monitor> {
-           return await this.db.executeTransaction(async (tx) => {
-               // Normalize data before persistence
-               const normalized = {
-                   ...config,
-                   url: config.url.trim().toLowerCase(),
-                   createdAt: Date.now(),
-               };
+    async create(config: MonitorConfig): Promise<Monitor> {
+     return await this.db.executeTransaction(async (tx) => {
+      // Normalize data before persistence
+      const normalized = {
+       ...config,
+       url: config.url.trim().toLowerCase(),
+       createdAt: Date.now(),
+      };
 
-               return await tx.run(
-                   `INSERT INTO monitors (id, url, interval, type, enabled, createdAt)
+      return await tx.run(
+       `INSERT INTO monitors (id, url, interval, type, enabled, createdAt)
                     VALUES (?, ?, ?, ?, ?, ?)`,
-                   [
-                       normalized.id,
-                       normalized.url,
-                       normalized.interval,
-                       normalized.type,
-                       normalized.enabled ? 1 : 0,
-                       normalized.createdAt,
-                   ]
-               );
-           });
-       }
+       [
+        normalized.id,
+        normalized.url,
+        normalized.interval,
+        normalized.type,
+        normalized.enabled ? 1 : 0,
+        normalized.createdAt,
+       ]
+      );
+     });
+    }
    }
    ```
 
@@ -144,29 +149,29 @@ When adding a new monitor type:
    ```typescript
    // tests/MonitorValidation.test.ts
    describe("Monitor Validation", () => {
-       describe("IPC Schema Validation", () => {
-           it("should reject invalid interval", () => {
-               const invalid = { interval: 1000 }; // Too short
-               expect(() => MonitorConfigSchema.parse(invalid)).toThrow();
-           });
-       });
+    describe("IPC Schema Validation", () => {
+     it("should reject invalid interval", () => {
+      const invalid = { interval: 1000 }; // Too short
+      expect(() => MonitorConfigSchema.parse(invalid)).toThrow();
+     });
+    });
 
-       describe("Manager Business Rules", () => {
-           it("should enforce TCP minimum interval", async () => {
-               const config = { type: "tcp", interval: 5000 };
-               await expect(monitorManager.createMonitor(config)).rejects.toThrow(
-                   ApplicationError
-               );
-           });
-       });
+    describe("Manager Business Rules", () => {
+     it("should enforce TCP minimum interval", async () => {
+      const config = { type: "tcp", interval: 5000 };
+      await expect(monitorManager.createMonitor(config)).rejects.toThrow(
+       ApplicationError
+      );
+     });
+    });
 
-       describe("Repository Persistence", () => {
-           it("should normalize URLs before saving", async () => {
-               const config = { url: " HTTPS://EXAMPLE.COM " };
-               const saved = await repository.create(config);
-               expect(saved.url).toBe("https://example.com");
-           });
-       });
+    describe("Repository Persistence", () => {
+     it("should normalize URLs before saving", async () => {
+      const config = { url: " HTTPS://EXAMPLE.COM " };
+      const saved = await repository.create(config);
+      expect(saved.url).toBe("https://example.com");
+     });
+    });
    });
    ```
 

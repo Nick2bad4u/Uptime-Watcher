@@ -7,11 +7,11 @@ last_reviewed: "2025-11-17"
 category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "uptime-watcher"
-  - "architecture"
-  - "adr"
-  - "cache"
-  - "configuration"
+ - "uptime-watcher"
+ - "architecture"
+ - "adr"
+ - "cache"
+ - "configuration"
 ---
 
 # ADR-006: Standardized Cache Configuration
@@ -167,9 +167,9 @@ export const CACHE_CONFIG = Object.freeze({
    temporary: (operation: string): string => `temporary-${operation}`,
    sites: (suffix?: string): string => (suffix ? `sites-${suffix}` : "sites"),
    monitors: (suffix?: string): string =>
-      suffix ? `monitors-${suffix}` : "monitors",
+    suffix ? `monitors-${suffix}` : "monitors",
    settings: (suffix?: string): string =>
-      suffix ? `settings-${suffix}` : "settings",
+    suffix ? `settings-${suffix}` : "settings",
   } as const);
   ```
 

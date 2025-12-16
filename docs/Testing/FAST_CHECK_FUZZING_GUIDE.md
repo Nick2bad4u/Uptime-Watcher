@@ -7,10 +7,10 @@ last_reviewed: "2025-11-15"
 category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "testing"
-  - "fast-check"
-  - "fuzzing"
-  - "uptime-watcher"
+ - "testing"
+ - "fast-check"
+ - "fuzzing"
+ - "uptime-watcher"
 ---
 
 # Fast-Check Fuzzing Coverage Guide

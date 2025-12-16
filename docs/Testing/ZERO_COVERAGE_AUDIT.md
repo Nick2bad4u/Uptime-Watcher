@@ -7,10 +7,10 @@ last_reviewed: "2025-11-17"
 category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "testing"
-  - "coverage"
-  - "vitest"
-  - "uptime-watcher"
+ - "testing"
+ - "coverage"
+ - "vitest"
+ - "uptime-watcher"
 ---
 
 # Zero coverage audit workflow
