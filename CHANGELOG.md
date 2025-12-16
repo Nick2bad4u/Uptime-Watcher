@@ -4,17 +4,145 @@
 
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
+## [19.9.0] - 2025-12-16
 
 
-[[218c045](https://github.com/Nick2bad4u/Uptime-Watcher/commit/218c0451e0318787a104845d97037ccb7c1cdd50)...
-[218c045](https://github.com/Nick2bad4u/Uptime-Watcher/commit/218c0451e0318787a104845d97037ccb7c1cdd50)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/218c0451e0318787a104845d97037ccb7c1cdd50...218c0451e0318787a104845d97037ccb7c1cdd50))
+[[9e65fbd](https://github.com/Nick2bad4u/Uptime-Watcher/commit/9e65fbd1936df6529d3c38eecfb425df3a23fd09)...
+[a1686c1](https://github.com/Nick2bad4u/Uptime-Watcher/commit/a1686c1b2a0f7a096f134526ca5cb134d5299e1e)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/9e65fbd1936df6529d3c38eecfb425df3a23fd09...a1686c1b2a0f7a096f134526ca5cb134d5299e1e))
+
+
+### 🧹 Chores
+
+- *(release)* V19.9.0 [skip ci] [`(a1686c1)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/a1686c1b2a0f7a096f134526ca5cb134d5299e1e)
+
+
+
+
+
+
+## [19.8.0] - 2025-12-15
+
+
+[[975b230](https://github.com/Nick2bad4u/Uptime-Watcher/commit/975b230b42a4816a7acf4714d19829bf94d3eff8)...
+[5f59126](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5f591268ac0418c63dde992d45afbbb5e9c70111)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/975b230b42a4816a7acf4714d19829bf94d3eff8...5f591268ac0418c63dde992d45afbbb5e9c70111))
+
+
+### ✨ Features
+
+- ✨ [feat] Implement Cloud Sync & Backup Settings Section
+ - Introduced `CloudSection` component to manage cloud sync and backup settings.
+ - Added functionality to display connection status, last sync, and backup timestamps.
+ - Implemented encryption status and actions for managing encryption settings.
+ - Integrated `RemoteBackupsPanel` for listing and managing remote backups.
+ - Included `BackupMigrationPanel` for migrating backups between formats.
+ - Added `SyncMaintenancePanel` for resetting sync state and managing sync settings.
+ - Enhanced user feedback with error alerts and configuration hints.
+
+✨ [feat] Create Remote Backups Panel
+ - Developed `RemoteBackupsPanel` to display and manage remote backups.
+ - Implemented functionality for restoring and deleting backups with appropriate UI feedback.
+ - Added buttons for refreshing the backup list and uploading the latest backup.
+
+✨ [feat] Add App Notification Service
+ - Created `AppNotificationService` for dispatching system notifications.
+ - Ensured notifications are user-initiated and provide immediate feedback.
+
+🛠️ [fix] Enhance Cloud Service with Dropbox Integration
+ - Updated `CloudService` documentation to reflect the addition of Dropbox provider support.
+ - Ensured OAuth 2.0 integration for secure Dropbox connections.
+
+⚡ [perf] Improve Cloud Store with Notification Handling
+ - Integrated `AppNotificationService` into `useCloudStore` for better user feedback during cloud operations.
+ - Added toast notifications for various cloud operations, including connecting to Dropbox, syncing, and backup migrations.
+
+🧪 [test] Expand Cloud Store Tests
+ - Added comprehensive tests for cloud store operations, including success and error scenarios for Dropbox connections and backup management.
+ - Verified toast notifications are correctly triggered for cloud operations.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(748d654)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/748d65478619de60127944145e33c18d943a3dc8)
+
+
+
+### 🧹 Chores
+
+- *(release)* V19.8.0 [skip ci] [`(5f59126)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5f591268ac0418c63dde992d45afbbb5e9c70111)
+
+
+
+### 🔧 Build System
+
+- 🔧 [build] Update npm install command in CI workflow
+
+ - Remove optional dependencies omission for macOS builds to ensure compatibility with Rollup/Vite.
+ - Simplify npm install command by consolidating conditions for macOS and other OS environments.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(975b230)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/975b230b42a4816a7acf4714d19829bf94d3eff8)
+
+
+
+
+
+
+## [19.7.0] - 2025-12-15
+
+
+[[9ea2112](https://github.com/Nick2bad4u/Uptime-Watcher/commit/9ea2112b5cea87f1163261bb4881577951b49bbe)...
+[7856903](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7856903f6a348b4df87657b73a654cc39e5ac941)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/9ea2112b5cea87f1163261bb4881577951b49bbe...7856903f6a348b4df87657b73a654cc39e5ac941))
+
+
+### ✨ Features
+
+- ✨ [feat] Implement generic toast notifications system
+ - Introduced `AppToastToast` component for rendering toast notifications with customizable tones (error, info, success).
+ - Integrated toast auto-dismiss functionality based on a specified time-to-live (TTL).
+ - Enhanced `StatusAlertToaster` to include rendering of toast notifications alongside status alerts.
+ - Updated `useAlertStore` to manage a queue of toast notifications, including enqueueing and dismissing toasts.
+ - Added types for toast notifications, including `AppToast` and `AppToastInput`, to ensure type safety.
+ - Implemented logic to limit the number of toasts retained in memory to a maximum defined length.
+
+🧪 [test] Add tests for toast notifications functionality
+ - Created tests for `StatusAlertToaster` to verify rendering of toast notifications.
+ - Mocked `useAlertStore` to simulate different states of alerts and toasts for comprehensive testing.
+ - Ensured that toast notifications are correctly dismissed and that the state updates as expected.
+
+📝 [docs] Update documentation for toast notifications
+ - Documented the new `AppToastToast` component and its properties.
+ - Updated the `useAlertStore` documentation to include new methods for managing toast notifications.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(9ea2112)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/9ea2112b5cea87f1163261bb4881577951b49bbe)
+
 
 
 ### 📦 Dependencies
 
 - [dependency] Update version 19.6.0 [`(218c045)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/218c0451e0318787a104845d97037ccb7c1cdd50)
+
+
+
+### 🧹 Chores
+
+- *(release)* V19.7.0 [skip ci] [`(7856903)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7856903f6a348b4df87657b73a654cc39e5ac941)
+
+
+- Update changelogs for v19.6.0 [skip ci] [`(64fc064)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/64fc064055975eff556981bdcd34148599ff0ba3)
+
+
+
+### 🔧 Build System
+
+- 🔧 [build] Update GitHub Actions workflow and package dependencies
+
+ - 🛠️ [fix] Prevent changelog-only commits from re-triggering releases by ignoring CHANGELOG.md files in src, shared, and electron directories.
+ - 🔧 [build] Enhance version bumping process by committing and pushing version changes to the repository.
+ - 🔧 [build] Update Node.js environment setup to use version 24.
+ - 🔧 [build] Modify npm install commands to handle peer-dependency conflicts and improve installation process.
+ - 🔧 [build] Refactor Electron build commands to prevent publishing during builds.
+ - 🧹 [chore] Move bufferutil and utf-8-validate to optionalDependencies in package.json and package-lock.json for better dependency management.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(416e44c)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/416e44c7d40fb96ed53829fea1c906560a9b26fb)
 
 
 
