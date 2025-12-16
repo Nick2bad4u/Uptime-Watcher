@@ -1,5 +1,5 @@
 ---
-title: '@virtual'
+title: "@virtual"
 ---
 
 <!-- prettier-ignore-start -->
@@ -23,16 +23,16 @@ In the code sample below, `Child.render()` overrides the virtual member `Base.re
 
 ```ts
 class Base {
-  /** @virtual */
-  public render(): void {}
+ /** @abstract */
+ public render(): void {}
 
-  /** @sealed */
-  public initialize(): void {}
+ /** @sealed */
+ public initialize(): void {}
 }
 
 class Child extends Base {
-  /** @override */
-  public render(): void;
+ /** @override */
+ public render(): void;
 }
 ```
 

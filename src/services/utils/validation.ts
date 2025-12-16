@@ -77,8 +77,8 @@ const stringifyDiagnostics = (
  *   returned invalid payload: <issues>"`.
  *
  * In both cases, the original error (validator exception or Zod error) is
- * attached via {@link Error.cause}. Callers are expected to allow these errors
- * to propagate into the existing error-handling helpers such as
+ * attached via `Error.cause`. Callers are expected to allow these errors to
+ * propagate into the existing error-handling helpers such as
  * `withUtilityErrorHandling`.
  *
  * @param validator - Function returning a `safeParse`-style result.

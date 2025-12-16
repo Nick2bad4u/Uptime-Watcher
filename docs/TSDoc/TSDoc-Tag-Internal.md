@@ -1,5 +1,5 @@
 ---
-title: '@internal'
+title: "@internal"
 ---
 
 <!-- prettier-ignore-start -->
@@ -20,19 +20,21 @@ consume internal API items, e.g. because the packages are components of the same
 ```ts
 /**
  * Represents a book in the catalog.
+ *
  * @public
  */
 export class Book {
-  /**
-   * The title of the book.
-   * @internal
-   */
-  public get _title(): string;
+ /**
+  * The title of the book.
+  *
+  * @internal
+  */
+ public get _title(): string;
 
-  /**
-   * The author of the book.
-   */
-  public get author(): string;
+ /**
+  * The author of the book.
+  */
+ public get author(): string;
 }
 ```
 

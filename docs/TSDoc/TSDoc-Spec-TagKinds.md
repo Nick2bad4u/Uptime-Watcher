@@ -25,24 +25,27 @@ appearing prior to the first block tag is interpreted as the special
 
 **Examples of block tags:**
 
-``` ts
+````ts
+
 /**
  * This is the special summary section.
  *
  * @remarks
- * This is a standalone block.
+ *   This is a standalone block.
  *
- * @example Logging a warning
- * ```ts
- * logger.warn('Something happened');
- * ```
+ * @example
+ *  Logging a warning
+ *  ```ts
+ *  logger.warn('Something happened');
+ *  ```
  *
- * @example Logging an error
- * ```ts
- * logger.error('Something happened');
- * ```
+ * @example
+ *  Logging an error
+ *  ```ts
+ *  logger.error('Something happened');
+ *  ```
  */
-```
+````
 
 ## Modifier tags
 
@@ -57,12 +60,12 @@ bottom of the doc comment.
 
 **Examples of modifier tags:**
 
-``` ts
+```ts
 /**
  * This is the special summary section.
  *
  * @remarks
- * This is a standalone block.
+ *   This is a standalone block.
  *
  * @public @sealed
  */
@@ -78,7 +81,7 @@ and `@inheritDoc` tags are examples of inline tags.
 
 **Examples of inline tags:**
 
-``` ts
+```ts
 class Book {
   /**
    * Writes the book information into a JSON file.

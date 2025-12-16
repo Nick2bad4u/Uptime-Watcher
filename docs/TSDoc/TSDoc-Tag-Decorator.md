@@ -1,5 +1,5 @@
 ---
-title: '@decorator'
+title: "@decorator"
 ---
 
 <!-- prettier-ignore-start -->
@@ -20,14 +20,15 @@ in a doc comment.
 
 ```ts
 class Book {
-  /**
-   * The title of the book.
-   * @decorator `@jsonSerialized`
-   * @decorator `@jsonFormat(JsonFormats.Url)`
-   */
-  @jsonSerialized
-  @jsonFormat(JsonFormats.Url)
-  public website: string;
+ /**
+  * The title of the book.
+  *
+  * @decorator `@jsonSerialized`
+  * @decorator `@jsonFormat(JsonFormats.Url)`
+  */
+ @jsonSerialized
+ @jsonFormat(JsonFormats.Url)
+ public website: string;
 }
 ```
 

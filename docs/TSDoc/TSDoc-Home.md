@@ -3,23 +3,25 @@ TSDoc is a proposal to standardize the doc comments used in
 tools can extract content without getting confused by each other's
 markup. The TSDoc notation looks pretty familiar:
 
-``` typescript
+```typescript
 export class Statistics {
-  /**
-   * Returns the average of two numbers.
-   *
-   * @remarks
-   * This method is part of the {@link core-library#Statistics | Statistics subsystem}.
-   *
-   * @param x - The first input number
-   * @param y - The second input number
-   * @returns The arithmetic mean of `x` and `y`
-   *
-   * @beta
-   */
-  public static getAverage(x: number, y: number): number {
-    return (x + y) / 2.0;
-  }
+ /**
+  * Returns the average of two numbers.
+  *
+  * @remarks
+  *   This method is part of the
+  *   {@link core-library#Statistics | Statistics subsystem}.
+  *
+  * @param x - The first input number
+  * @param y - The second input number
+  *
+  * @returns The arithmetic mean of `x` and `y`
+  *
+  * @beta
+  */
+ public static getAverage(x: number, y: number): number {
+  return (x + y) / 2.0;
+ }
 }
 ```
 
@@ -62,21 +64,22 @@ extensions. This can lead to frustrating incompatibilities.
 
 Consider a hypothetical input:
 
-``` typescript
+````typescript
+
 /**
- * @returns true if the specified tag is surrounded with `{`
- * and `}` characters.
- *
  * @example
- * Prints "true" for `{@link}` but "false" for `@internal`:
- * ```ts
- * console.log(isInlineTag('{@link}'));
- * console.log(isInlineTag('@internal'));
- * ```
+ *  Prints "true" for `{@link}` but "false" for `@internal`:
+ *  ```ts
+ *  console.log(isInlineTag('{@link}'));
+ *  console.log(isInlineTag('@internal'));
+ *  ```
+ *
+ * @returns True if the specified tag is surrounded with `{` and `}` characters.
+ *
  * @see {@link http://example.com/@internal | the @internal tag}
  */
 declare function isInlineTag(tagName: string): boolean;
-```
+````
 
 Is this `isInlineTag()` function marked as `@internal`? Well, API
 Extractor would say "no," because it recognizes many
@@ -96,17 +99,17 @@ content or build output, incorrect parsing can become a serious concern.
 TSDoc aims to standardize the doc comment grammar, while carefully
 balancing several competing design requirements:
 
-1.  **Extensibility:** Tools must be able to define their own custom
-    tags to represent domain-specific metadata in a natural way.
-2.  **Interoperability:** Custom tags must not prevent other tools from
-    correctly analyzing the comment. In order words, custom tags must
-    use established syntax patterns that can be safely recognized and
-    discarded during parsing.
-3.  **Familiar syntax:** As much as possible, TSDoc should preserve the
-    familiar style of JSDoc/Markdown. This also maximizes the likelihood
-    that older comments will parse correctly as TSDoc.
+1. **Extensibility:** Tools must be able to define their own custom
+   tags to represent domain-specific metadata in a natural way.
+2. **Interoperability:** Custom tags must not prevent other tools from
+   correctly analyzing the comment. In order words, custom tags must
+   use established syntax patterns that can be safely recognized and
+   discarded during parsing.
+3. **Familiar syntax:** As much as possible, TSDoc should preserve the
+   familiar style of JSDoc/Markdown. This also maximizes the likelihood
+   that older comments will parse correctly as TSDoc.
 
-***Why can't JSDoc be the standard?*** The JSDoc grammar is not
+**_Why can't JSDoc be the standard?_** The JSDoc grammar is not
 rigorously specified, but rather inferred from the behavior of a
 particular implementation. The majority of the standard JSDoc tags are
 preoccupied with providing type annotations for plain JavaScript, which

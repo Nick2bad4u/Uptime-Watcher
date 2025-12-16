@@ -17,6 +17,17 @@
     "overrides": [
         {
             "files": [
+                "*.md",
+                "*.mdx",
+                "docs/**/*.md",
+                "docs/**/*.mdx"
+            ],
+            "options": {
+                "endOfLine": "lf"
+            }
+        },
+        {
+            "files": [
                 "*.js",
                 "*.jsx",
                 "*.ts",

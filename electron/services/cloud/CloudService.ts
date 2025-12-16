@@ -47,6 +47,14 @@ import {
     generateEncryptionSalt,
     verifyKeyCheckBase64,
 } from "./crypto/cloudCrypto";
+import {
+    buildDropboxStatus,
+    buildFilesystemStatus,
+    buildGoogleDriveStatus,
+    buildUnconfiguredStatus,
+    buildUnsupportedProviderStatus,
+    type CloudStatusCommonArgs,
+} from "./internal/CloudStatusBuilders";
 import { migrateProviderBackups } from "./migrations/backupMigration";
 import { resetProviderCloudSyncState } from "./migrations/syncReset";
 import { buildCloudSyncResetPreview } from "./migrations/syncResetPreview";
@@ -119,14 +127,6 @@ async function ignoreENOENT(fn: () => Promise<void>): Promise<void> {
  */
 const DEFAULT_DROPBOX_APP_KEY = "c6wroqtgxztzq9t" as const;
 
-type CloudStatusCommonArgs = Readonly<{
-    lastBackupAt: null | number;
-    lastError: string | undefined;
-    lastSyncAt: null | number;
-    localEncryptionKey: string | undefined;
-    localEncryptionMode: CloudEncryptionMode;
-    syncEnabled: boolean;
-}>;
 const SETTINGS_KEY_LAST_BACKUP_AT = "cloud.lastBackupAt" as const;
 const SETTINGS_KEY_LAST_SYNC_AT = "cloud.lastSyncAt" as const;
 const SETTINGS_KEY_LAST_ERROR = "cloud.lastError" as const;
@@ -1015,7 +1015,7 @@ export class CloudService {
             SECRET_KEY_ENCRYPTION_DERIVED_KEY
         );
 
-        const common = {
+        const common: CloudStatusCommonArgs = {
             lastBackupAt,
             lastError,
             lastSyncAt,
@@ -1025,202 +1025,37 @@ export class CloudService {
         };
 
         if (!providerKind) {
-            return this.buildUnconfiguredStatus(common);
+            return buildUnconfiguredStatus(common);
         }
+
+        const deps = {
+            getEffectiveEncryptionMode: (provider: CloudStorageProvider) =>
+                this.getEffectiveEncryptionMode(provider),
+            resolveProviderOrNull: () => this.resolveProviderOrNull(),
+        } as const;
 
         switch (providerKind) {
             case "dropbox": {
-                return this.buildDropboxStatus(common);
+                return buildDropboxStatus({ common, deps });
             }
             case "filesystem": {
-                return this.buildFilesystemStatus(common);
+                const baseDirectory =
+                    (await this.settings.get(
+                        SETTINGS_KEY_FILESYSTEM_BASE_DIRECTORY
+                    )) ?? "";
+                return buildFilesystemStatus({ baseDirectory, common, deps });
             }
             case "google-drive": {
-                return this.buildGoogleDriveStatus(common);
+                const accountLabel =
+                    (await this.settings.get(
+                        SETTINGS_KEY_GOOGLE_DRIVE_ACCOUNT_LABEL
+                    )) ?? undefined;
+                return buildGoogleDriveStatus({ accountLabel, common, deps });
             }
             default: {
-                return this.buildUnsupportedProviderStatus(common);
+                return buildUnsupportedProviderStatus(common);
             }
         }
-    }
-
-    private async buildDropboxStatus(
-        args: CloudStatusCommonArgs
-    ): Promise<CloudStatusSummary> {
-        const provider = await this.resolveProviderOrNull();
-        let connected = false;
-        let connectionError: string | undefined = undefined;
-        let accountLabel: string | undefined = undefined;
-
-        if (provider && provider instanceof DropboxCloudStorageProvider) {
-            try {
-                accountLabel = await provider.getAccountLabel();
-                connected = true;
-            } catch (error) {
-                connected = false;
-                connectionError = ensureError(error).message;
-            }
-        } else if (provider) {
-            // Fallback for unexpected provider implementation.
-            connected = await provider.isConnected().catch(() => false);
-        }
-
-        const encryptionMode =
-            connected && provider
-                ? await this.getEffectiveEncryptionMode(provider)
-                : args.localEncryptionMode;
-        const encryptionLocked =
-            encryptionMode === "passphrase" && !args.localEncryptionKey;
-
-        const lastError = args.lastError ?? connectionError;
-
-        return {
-            backupsEnabled: connected,
-            configured: true,
-            connected,
-            encryptionLocked,
-            encryptionMode,
-            lastBackupAt: args.lastBackupAt,
-            ...(lastError ? { lastError } : {}),
-            lastSyncAt: args.lastSyncAt,
-            provider: "dropbox",
-            providerDetails: {
-                kind: "dropbox",
-                ...(accountLabel ? { accountLabel } : {}),
-            },
-            syncEnabled: args.syncEnabled,
-        };
-    }
-
-    private async buildGoogleDriveStatus(
-        args: CloudStatusCommonArgs
-    ): Promise<CloudStatusSummary> {
-        const provider = await this.resolveProviderOrNull();
-        const connected = provider
-            ? await provider.isConnected().catch(() => false)
-            : false;
-
-        const encryptionMode =
-            connected && provider
-                ? await this.getEffectiveEncryptionMode(provider)
-                : args.localEncryptionMode;
-        const encryptionLocked =
-            encryptionMode === "passphrase" && !args.localEncryptionKey;
-
-        const accountLabel =
-            (await this.settings.get(
-                SETTINGS_KEY_GOOGLE_DRIVE_ACCOUNT_LABEL
-            )) ?? undefined;
-
-        return {
-            backupsEnabled: connected,
-            configured: true,
-            connected,
-            encryptionLocked,
-            encryptionMode,
-            lastBackupAt: args.lastBackupAt,
-            ...(args.lastError ? { lastError: args.lastError } : {}),
-            lastSyncAt: args.lastSyncAt,
-            provider: "google-drive",
-            providerDetails: {
-                kind: "google-drive",
-                ...(accountLabel ? { accountLabel } : {}),
-            },
-            syncEnabled: args.syncEnabled,
-        };
-    }
-
-    private async buildFilesystemStatus(
-        args: CloudStatusCommonArgs
-    ): Promise<CloudStatusSummary> {
-        const baseDirectory =
-            (await this.settings.get(SETTINGS_KEY_FILESYSTEM_BASE_DIRECTORY)) ??
-            "";
-
-        if (baseDirectory.length === 0) {
-            return {
-                backupsEnabled: false,
-                configured: false,
-                connected: false,
-                encryptionLocked:
-                    args.localEncryptionMode === "passphrase" &&
-                    !args.localEncryptionKey,
-                encryptionMode: args.localEncryptionMode,
-                lastBackupAt: args.lastBackupAt,
-                ...(args.lastError ? { lastError: args.lastError } : {}),
-                lastSyncAt: args.lastSyncAt,
-                provider: "filesystem",
-                providerDetails: {
-                    baseDirectory,
-                    kind: "filesystem",
-                },
-                syncEnabled: args.syncEnabled,
-            };
-        }
-
-        const provider = new FilesystemCloudStorageProvider({ baseDirectory });
-        const connected = await provider.isConnected().catch(() => false);
-
-        const encryptionMode = connected
-            ? await this.getEffectiveEncryptionMode(provider)
-            : args.localEncryptionMode;
-        const encryptionLocked =
-            encryptionMode === "passphrase" && !args.localEncryptionKey;
-
-        return {
-            backupsEnabled: connected,
-            configured: true,
-            connected,
-            encryptionLocked,
-            encryptionMode,
-            lastBackupAt: args.lastBackupAt,
-            ...(args.lastError ? { lastError: args.lastError } : {}),
-            lastSyncAt: args.lastSyncAt,
-            provider: "filesystem",
-            providerDetails: {
-                baseDirectory,
-                kind: "filesystem",
-            },
-            syncEnabled: args.syncEnabled,
-        };
-    }
-
-    private buildUnconfiguredStatus(
-        args: CloudStatusCommonArgs
-    ): CloudStatusSummary {
-        return {
-            backupsEnabled: false,
-            configured: false,
-            connected: false,
-            encryptionLocked:
-                args.localEncryptionMode === "passphrase" &&
-                !args.localEncryptionKey,
-            encryptionMode: args.localEncryptionMode,
-            lastBackupAt: args.lastBackupAt,
-            ...(args.lastError ? { lastError: args.lastError } : {}),
-            lastSyncAt: args.lastSyncAt,
-            provider: null,
-            syncEnabled: args.syncEnabled,
-        };
-    }
-
-    private buildUnsupportedProviderStatus(
-        args: CloudStatusCommonArgs
-    ): CloudStatusSummary {
-        return {
-            backupsEnabled: false,
-            configured: true,
-            connected: false,
-            encryptionLocked:
-                args.localEncryptionMode === "passphrase" &&
-                !args.localEncryptionKey,
-            encryptionMode: args.localEncryptionMode,
-            lastBackupAt: args.lastBackupAt,
-            ...(args.lastError ? { lastError: args.lastError } : {}),
-            lastSyncAt: args.lastSyncAt,
-            provider: null,
-            syncEnabled: args.syncEnabled,
-        };
     }
 
     private getDropboxAppKeyOverrideMaybe(): string | undefined {
