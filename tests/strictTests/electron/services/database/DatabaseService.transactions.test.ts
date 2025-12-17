@@ -172,7 +172,7 @@ describe("databaseService strict coverage", () => {
 
         expect(logger.error).toHaveBeenCalledWith(
             LOG_TEMPLATES.errors.DATABASE_SCHEMA_FAILED,
-            expect.objectContaining({ error: expect.any(Error) })
+            expect.any(Error)
         );
         expect(createDatabaseSchemaMock).not.toHaveBeenCalled();
     });
@@ -221,7 +221,7 @@ describe("databaseService strict coverage", () => {
 
         expect(logger.error).toHaveBeenCalledWith(
             LOG_TEMPLATES.errors.DATABASE_CLOSE_FAILED,
-            expect.objectContaining({ error: closeError })
+            closeError
         );
     });
 

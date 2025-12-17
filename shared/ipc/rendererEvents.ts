@@ -19,7 +19,14 @@ import type {
 export type RendererEvent = SharedRendererEvent;
 /** IPC channel names used for renderer-directed events. */
 export type RendererEventChannel = SharedRendererEventChannel;
-/** Mapping of renderer event channels to their payload contracts. */
+
+/**
+ * Mapping of renderer event channels to their payload contracts.
+ *
+ * @remarks
+ * The IPC artifact generator resolves this symbol via ts-morph. It may be a
+ * type alias (preferred) or an interface.
+ */
 export type RendererEventPayloadMap = SharedRendererEventPayloadMap;
 
 /**

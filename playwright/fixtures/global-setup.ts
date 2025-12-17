@@ -12,6 +12,19 @@ import type { FullConfig } from "@playwright/test";
 import { execSync } from "node:child_process";
 import path from "node:path";
 
+function withMaxOldSpaceSize(
+    nodeOptions: string | undefined,
+    sizeMb: number
+): string {
+    const trimmed = (nodeOptions ?? "").trim();
+    const stripped = trimmed
+        ? trimmed.replace(/--max_old_space_size=\d+/gu, "").trim()
+        : "";
+    const maxOldSpaceFlag = `--max_old_space_size=${sizeMb}`;
+
+    return stripped ? `${stripped} ${maxOldSpaceFlag}` : maxOldSpaceFlag;
+}
+
 /**
  * Builds the Electron entrypoints and primes shared environment flags so
  * Playwright can launch the renderer in headless mode.
@@ -43,7 +56,16 @@ async function globalSetup(_config: FullConfig): Promise<void> {
             execSync(buildCommand, {
                 stdio: "inherit",
                 cwd: path.resolve(__dirname, "../.."),
-                env: { ...process.env, HEADLESS: "true" },
+                env: {
+                    ...process.env,
+                    HEADLESS: "true",
+                    // Playwright builds can be memory-intensive (Vite + sourcemaps + stats).
+                    // Ensure we have enough heap for CI/local runs.
+                    NODE_OPTIONS: withMaxOldSpaceSize(
+                        process.env["NODE_OPTIONS"],
+                        16_384
+                    ),
+                },
             });
             console.log("✅ Electron app built successfully");
         } catch (error) {

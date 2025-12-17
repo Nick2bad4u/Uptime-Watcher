@@ -77,7 +77,7 @@ npm run check:ipc      # Verifies generated artifacts match committed output
    npm run check:ipc
    ```
    The command should exit cleanly without creating diffs.
-6. **Run the default test/lint tasks** (`npm run lint:all`, `npm run test`) when touching contracts that affect runtime behavior.
+6. **Run the default test/lint tasks** (`npm run lint:all:fix`, `npm run test`) when touching contracts that affect runtime behavior.
 
 ---
 

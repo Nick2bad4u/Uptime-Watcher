@@ -88,7 +88,7 @@ export class IpcService {
             onError: (error) => {
                 logger.error(
                     "[IpcService] Failed to dispose event subscription",
-                    { error: ensureError(error) }
+                    ensureError(error)
                 );
             },
             suppressErrors: true,

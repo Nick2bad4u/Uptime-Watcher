@@ -8,6 +8,7 @@
 
 import type { SettingsRow as DatabaseSettingsRow } from "@shared/types/database";
 
+import { ensureError } from "@shared/utils/errorHandling";
 import { LOG_TEMPLATES } from "@shared/utils/logTemplates";
 import { safeStringify } from "@shared/utils/stringConversion";
 import { isNonEmptyString } from "@shared/validation/validatorUtils";
@@ -85,12 +86,16 @@ export function rowToSetting(row: DatabaseSettingsRow): SettingRow {
             key,
             value: value ? safeStringify(value) : "",
         };
-    } catch (error) {
-        logger.error(LOG_TEMPLATES.errors.SETTINGS_MAPPER_FAILED, {
-            error,
-            functionName: "rowToSetting",
-            row,
-        });
+    } catch (error: unknown) {
+        const normalizedError = ensureError(error);
+        logger.error(
+            LOG_TEMPLATES.errors.SETTINGS_MAPPER_FAILED,
+            normalizedError,
+            {
+                functionName: "rowToSetting",
+                row,
+            }
+        );
         throw error;
     }
 }

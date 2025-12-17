@@ -845,8 +845,8 @@ describe(OverviewTab, () => {
 
             expect(loggerMock.warn).toHaveBeenCalledWith(
                 "Failed to format interval option",
+                formattingError,
                 expect.objectContaining({
-                    error: formattingError,
                     intervalOption: expect.objectContaining({
                         label: "Custom (45 seconds)",
                         value: 45_000,

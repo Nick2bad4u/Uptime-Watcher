@@ -530,7 +530,7 @@ describe(ApplicationService, () => {
 
             expect(mockLogger.error).toHaveBeenCalledWith(
                 "APPLICATION_CLEANUP_ERROR",
-                expect.objectContaining({ error })
+                error
             );
         });
 

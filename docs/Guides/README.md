@@ -21,6 +21,7 @@ This directory contains comprehensive guides for developers, contributors, and u
 
 ```text
 docs/Guides/
+├── ADR_IMPLEMENTATION_PUNCHLIST.md         # Consolidated ADR follow-ups / proposed work
 ├── README.md                              # This file
 ├── API_DOCUMENTATION.md                   # IPC interfaces and communication patterns
 ├── CLOUD_SYNC_DROPBOX_SETUP.md             # Dropbox OAuth + setup guide (no backend)
@@ -39,7 +40,8 @@ docs/Guides/
 ├── TESTING_METHODOLOGY_REACT_COMPONENTS.md # React component testing
 ├── VITE_PERFORMANCE.md                    # Build optimization guide
 ├── NEW_MONITOR_TYPE_IMPLEMENTATION.md     # Adding new monitor types
-└── ORGANIZATION_SUMMARY.md                # Documentation cleanup summary
+├── ORGANIZATION_SUMMARY.md                # Documentation cleanup summary
+└── LINT_GUARDRAILS_AND_CUSTOM_RULES.md    # Custom lint rules + AI guardrails
 ```
 
 ## 🚀 Getting started

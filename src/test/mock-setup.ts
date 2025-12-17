@@ -247,6 +247,24 @@ const mockElectronAPI: ElectronAPI = {
             })
         ),
 
+        connectGoogleDrive: vi.fn<ElectronAPI["cloud"]["connectGoogleDrive"]>(
+            async () => ({
+                provider: "google-drive",
+                configured: true,
+                connected: true,
+                backupsEnabled: true,
+                syncEnabled: false,
+                encryptionLocked: false,
+                encryptionMode: "none",
+                lastBackupAt: null,
+                lastSyncAt: null,
+                providerDetails: {
+                    kind: "google-drive",
+                    accountLabel: "mock@example.com",
+                },
+            })
+        ),
+
         deleteBackup: vi.fn<ElectronAPI["cloud"]["deleteBackup"]>(
             async () => []
         ),
@@ -452,6 +470,11 @@ const mockElectronAPI: ElectronAPI = {
         ),
     },
     notifications: {
+        notifyAppEvent: vi.fn<ElectronAPI["notifications"]["notifyAppEvent"]>(
+            async () => {
+                /* noop */
+            }
+        ),
         updatePreferences: vi.fn<
             ElectronAPI["notifications"]["updatePreferences"]
         >(async () => {

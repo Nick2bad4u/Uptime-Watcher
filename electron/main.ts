@@ -27,6 +27,7 @@ import * as path from "node:path";
 import { isDev } from "./electronUtils";
 import { ApplicationService } from "./services/application/ApplicationService";
 import { ServiceContainer } from "./services/ServiceContainer";
+import { readProcessEnv } from "./utils/environment";
 import { logger } from "./utils/logger";
 
 /**
@@ -46,8 +47,7 @@ const USER_DATA_ENV_KEYS = [
  */
 const resolveUserDataOverride = (): string | undefined => {
     for (const key of USER_DATA_ENV_KEYS) {
-        // eslint-disable-next-line n/no-process-env -- intentionally reading environment variables during startup configuration
-        const candidate = process.env[key];
+        const candidate = readProcessEnv(key);
         if (typeof candidate === "string" && candidate.trim().length > 0) {
             return candidate;
         }
@@ -202,7 +202,7 @@ log.transports.console.format = LOG_CONSOLE_FORMAT;
 // Only enable remote debugging if not running in headless mode (tests)
 if (
     (isDev() || process.argv.includes("--enable-mcp-debugging")) &&
-    !process.env["HEADLESS"]
+    !readProcessEnv("HEADLESS")
 ) {
     try {
         app.commandLine.appendSwitch("remote-debugging-port", "9223");

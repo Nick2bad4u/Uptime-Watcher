@@ -29,10 +29,7 @@ export const readProcessEnv = (key: string): string | undefined => {
     } catch (error: unknown) {
         const normalized = ensureError(error);
 
-        logger.error("[Env] Failed to read process env", {
-            error: normalized,
-            key,
-        });
+        logger.error("[Env] Failed to read process env", normalized, { key });
         return undefined;
     }
 };

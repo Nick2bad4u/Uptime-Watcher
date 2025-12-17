@@ -191,7 +191,7 @@ export class ApplicationService {
                 onError: (error) => {
                     logger.error(
                         "[ApplicationService] Failed to dispose event subscription",
-                        { error: ensureError(error) }
+                        ensureError(error)
                     );
                 },
                 suppressErrors: true,
@@ -231,17 +231,19 @@ export class ApplicationService {
                         this.serviceContainer.getDatabaseService().close();
                     }
                 } catch (error) {
-                    logger.error(LOG_TEMPLATES.errors.DATABASE_CLOSE_FAILED, {
-                        error: ensureError(error),
-                    });
+                    logger.error(
+                        LOG_TEMPLATES.errors.DATABASE_CLOSE_FAILED,
+                        ensureError(error)
+                    );
                 }
             }
 
             logger.info(LOG_TEMPLATES.services.APPLICATION_CLEANUP_COMPLETE);
         } catch (error) {
-            logger.error(LOG_TEMPLATES.errors.APPLICATION_CLEANUP_ERROR, {
-                error: ensureError(error),
-            });
+            logger.error(
+                LOG_TEMPLATES.errors.APPLICATION_CLEANUP_ERROR,
+                ensureError(error)
+            );
             // Re-throw errors after logging (project standard)
             throw error;
         }
@@ -795,7 +797,7 @@ export class ApplicationService {
                     logger.error(
                         LOG_TEMPLATES.errors
                             .APPLICATION_FORWARD_CACHE_INVALIDATION_ERROR,
-                        error
+                        ensureError(error)
                     );
                 }
             }

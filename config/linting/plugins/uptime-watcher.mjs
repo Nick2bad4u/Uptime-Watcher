@@ -2349,6 +2349,12 @@ const FORBIDDEN_BROWSER_DIALOG_NAMES = new Set([
     "prompt",
 ]);
 
+const FORBIDDEN_WINDOW_OPEN_OBJECTS = new Set([
+    "window",
+    "globalThis",
+    "global",
+]);
+
 /**
  * ESLint rule discouraging usage of native browser dialogs in favour of the
  * dedicated confirmation dialog infrastructure.
@@ -2465,6 +2471,119 @@ const rendererNoBrowserDialogsRule = {
                 context.report({
                     data: { dialog },
                     messageId: "avoidBrowserDialog",
+                    node,
+                });
+            },
+        };
+    },
+};
+
+/**
+ * ESLint rule forbidding `window.open` usage in renderer code.
+ *
+ * @remarks
+ * Renderer code should not bypass the main-process boundary for external
+ * navigation. Use `SystemService.openExternal()` so URL validation and OS
+ * integration remain centralized.
+ */
+const rendererNoWindowOpenRule = {
+    meta: {
+        docs: {
+            description:
+                "Disallow window.open in renderer code so external navigation stays behind the main-process boundary",
+            recommended: false,
+        },
+        messages: {
+            avoidWindowOpen:
+                "Do not use window.open in renderer code. Use SystemService.openExternal() instead.",
+        },
+        schema: [],
+        type: "problem",
+    },
+    create(context) {
+        const rawFilename = context.getFilename();
+        const normalizedFilename = normalizePath(rawFilename);
+        const sourceCode = context.sourceCode ?? context.getSourceCode();
+
+        if (
+            normalizedFilename === "<input>" ||
+            !normalizedFilename.startsWith(`${NORMALIZED_SRC_DIR}/`) ||
+            normalizedFilename.includes("/src/test/")
+        ) {
+            return {};
+        }
+
+        function hasLocalBinding(name, node) {
+            let scope = sourceCode.getScope(node);
+            while (scope) {
+                const variable = scope.set.get(name);
+                if (variable && variable.defs.length > 0) {
+                    return true;
+                }
+                scope = scope.upper;
+            }
+            return false;
+        }
+
+        function unwrapChain(expression) {
+            return expression.type === "ChainExpression"
+                ? unwrapChain(expression.expression)
+                : expression;
+        }
+
+        function getMemberPropertyName(memberExpression) {
+            if (memberExpression.computed) {
+                if (
+                    memberExpression.property.type === "Literal" &&
+                    typeof memberExpression.property.value === "string"
+                ) {
+                    return memberExpression.property.value;
+                }
+                return null;
+            }
+
+            if (memberExpression.property.type === "Identifier") {
+                return memberExpression.property.name;
+            }
+
+            return null;
+        }
+
+        function isForbiddenWindowOpenCallee(callee, node) {
+            const unwrapped = unwrapChain(callee);
+
+            if (unwrapped.type === "Identifier") {
+                if (unwrapped.name === "open" && !hasLocalBinding("open", node)) {
+                    return true;
+                }
+                return false;
+            }
+
+            if (unwrapped.type !== "MemberExpression") {
+                return false;
+            }
+
+            const propertyName = getMemberPropertyName(unwrapped);
+            if (propertyName !== "open") {
+                return false;
+            }
+
+            const object = unwrapChain(unwrapped.object);
+            if (object.type === "Identifier") {
+                return FORBIDDEN_WINDOW_OPEN_OBJECTS.has(object.name);
+            }
+
+            return false;
+        }
+
+        return {
+            CallExpression(node) {
+                if (!isForbiddenWindowOpenCallee(node.callee, node)) {
+                    return;
+                }
+
+                context.report({
+                    messageId: "avoidWindowOpen",
                     node,
                 });
             },
@@ -3235,10 +3354,606 @@ const noLocalErrorNormalizersRule = {
     },
 };
 
+/**
+ * ESLint rule preventing a common logging footgun:
+ *
+ * `logger.error(message, { error: ensureError(error) })`
+ *
+ * should instead be:
+ *
+ * `logger.error(message, ensureError(error), { ...context })`
+ *
+ * @remarks
+ * The shared logger supports a dedicated error argument so stack/cause are
+ * consistently formatted. Nesting an `Error` under `{ error: ... }` typically
+ * loses stack/cause formatting and encourages inconsistent patterns.
+ */
+const loggerNoErrorInContextRule = {
+    meta: {
+        docs: {
+            description:
+                "Disallow passing Error objects via { error: ... } context to logger.error/warn; pass as the dedicated error argument instead",
+            recommended: false,
+        },
+        messages: {
+            avoidErrorContext:
+                "Do not pass Error objects via { error: ... } when calling logger. Pass the Error as the dedicated error argument instead.",
+        },
+        schema: [],
+        type: "problem",
+    },
+    create(context) {
+        const normalizedFilename = normalizePath(context.getFilename());
+
+        if (
+            normalizedFilename === "<input>" ||
+            (!normalizedFilename.startsWith(`${NORMALIZED_ELECTRON_DIR}/`) &&
+                !normalizedFilename.startsWith(`${NORMALIZED_SRC_DIR}/`) &&
+                !normalizedFilename.startsWith(`${NORMALIZED_SHARED_DIR}/`)) ||
+            normalizedFilename.includes("/test/") ||
+            normalizedFilename.includes("/tests/")
+        ) {
+            return {};
+        }
+
+        const loggerObjectNames = new Set(["logger", "baseLogger"]);
+        const loggerMethodNames = new Set(["error", "warn"]);
+        const suspiciousErrorIdentifiers = new Set([
+            "error",
+            "err",
+            "ensuredError",
+            "normalizedError",
+            "wrappedError",
+            "loggingError",
+        ]);
+
+        function isEnsureErrorCall(node) {
+            if (!node || node.type !== "CallExpression") {
+                return false;
+            }
+
+            if (node.callee.type === "Identifier") {
+                return node.callee.name === "ensureError";
+            }
+
+            return false;
+        }
+
+        function isSuspiciousErrorValue(node) {
+            if (!node) {
+                return false;
+            }
+
+            if (isEnsureErrorCall(node)) {
+                return true;
+            }
+
+            if (
+                node.type === "NewExpression" &&
+                node.callee.type === "Identifier" &&
+                node.callee.name === "Error"
+            ) {
+                return true;
+            }
+
+            if (node.type === "Identifier") {
+                return suspiciousErrorIdentifiers.has(node.name);
+            }
+
+            return false;
+        }
+
+        function isLoggerErrorOrWarnCall(callee) {
+            if (!callee || callee.type !== "MemberExpression") {
+                return false;
+            }
+
+            if (callee.object.type !== "Identifier") {
+                return false;
+            }
+
+            if (!loggerObjectNames.has(callee.object.name)) {
+                return false;
+            }
+
+            if (callee.property.type !== "Identifier") {
+                return false;
+            }
+
+            return loggerMethodNames.has(callee.property.name);
+        }
+
+        function getErrorPropertyFromObjectExpression(objectExpression) {
+            for (const property of objectExpression.properties) {
+                if (property.type !== "Property") {
+                    continue;
+                }
+
+                if (property.computed) {
+                    continue;
+                }
+
+                if (property.key.type !== "Identifier") {
+                    continue;
+                }
+
+                if (property.key.name !== "error") {
+                    continue;
+                }
+
+                return property;
+            }
+
+            return null;
+        }
+
+        return {
+            CallExpression(node) {
+                if (!isLoggerErrorOrWarnCall(node.callee)) {
+                    return;
+                }
+
+                for (const arg of node.arguments ?? []) {
+                    if (!arg || arg.type !== "ObjectExpression") {
+                        continue;
+                    }
+
+                    const errorProperty = getErrorPropertyFromObjectExpression(
+                        arg
+                    );
+                    if (!errorProperty) {
+                        continue;
+                    }
+
+                    if (isSuspiciousErrorValue(errorProperty.value)) {
+                        context.report({
+                            messageId: "avoidErrorContext",
+                            node: errorProperty,
+                        });
+                    }
+                }
+            },
+        };
+    },
+};
+
+/**
+ * ESLint rule ensuring Zustand store busy flags are not left stuck `true`.
+ *
+ * @remarks
+ * This rule is intentionally narrow:
+ * - It only targets `src/stores/**` (non-test) files.
+ * - It only triggers on direct `set({ isX: true })` calls inside store actions.
+ * - It requires a corresponding `set({ isX: false })` to appear inside a
+ *   `finally` block in the same function.
+ *
+ * This avoids false positives for stores using different loading patterns
+ * (e.g., operation maps) while still preventing the most common AI-agent bug:
+ * setting a busy flag but forgetting to reset it.
+ */
+const storeActionsRequireFinallyResetRule = {
+    meta: {
+        docs: {
+            description:
+                "Require store busy flags (isX) set to true to be reset to false in a finally block",
+            recommended: false,
+        },
+        messages: {
+            missingFinallyReset:
+                "Busy flag '{{flag}}' is set to true but is not reset to false inside a finally block in this action.",
+        },
+        schema: [],
+        type: "problem",
+    },
+    create(context) {
+        const normalizedFilename = normalizePath(context.getFilename());
+
+        if (
+            normalizedFilename === "<input>" ||
+            !normalizedFilename.startsWith(`${NORMALIZED_SRC_DIR}/stores/`) ||
+            normalizedFilename.includes("/src/test/") ||
+            normalizedFilename.includes("/test/") ||
+            normalizedFilename.includes("/tests/") ||
+            normalizedFilename.endsWith(".test.ts") ||
+            normalizedFilename.endsWith(".test.tsx") ||
+            normalizedFilename.endsWith(".spec.ts") ||
+            normalizedFilename.endsWith(".spec.tsx")
+        ) {
+            return {};
+        }
+
+        const sourceCode = context.sourceCode ?? context.getSourceCode();
+        const visitorKeys = sourceCode.visitorKeys;
+
+        /**
+         * Extracts an object literal from a set() argument.
+         *
+         * Supports:
+         * - set({ ... })
+         * - set(() => ({ ... }))
+         */
+        function getSetObjectExpression(argument) {
+            if (!argument) {
+                return null;
+            }
+
+            if (argument.type === "ObjectExpression") {
+                return argument;
+            }
+
+            if (argument.type === "ArrowFunctionExpression") {
+                if (argument.body?.type === "ObjectExpression") {
+                    return argument.body;
+                }
+
+                if (argument.body?.type === "BlockStatement") {
+                    for (const statement of argument.body.body) {
+                        if (statement.type !== "ReturnStatement") {
+                            continue;
+                        }
+
+                        if (
+                            statement.argument &&
+                            statement.argument.type === "ObjectExpression"
+                        ) {
+                            return statement.argument;
+                        }
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        function getBooleanLiteralValue(node) {
+            if (!node) {
+                return null;
+            }
+
+            if (node.type === "Literal" && typeof node.value === "boolean") {
+                return node.value;
+            }
+
+            return null;
+        }
+
+        function getPropertyName(property) {
+            if (property.computed) {
+                return null;
+            }
+
+            if (property.key.type === "Identifier") {
+                return property.key.name;
+            }
+
+            if (
+                property.key.type === "Literal" &&
+                typeof property.key.value === "string"
+            ) {
+                return property.key.value;
+            }
+
+            return null;
+        }
+
+        function isSetCall(node) {
+            return (
+                node.type === "CallExpression" &&
+                node.callee.type === "Identifier" &&
+                node.callee.name === "set"
+            );
+        }
+
+        function walk(node, state) {
+            if (!node || typeof node !== "object") {
+                return;
+            }
+
+            // Do not traverse into nested functions; each action function is
+            // analyzed independently.
+            if (
+                state.root !== node &&
+                (node.type === "FunctionDeclaration" ||
+                    node.type === "FunctionExpression" ||
+                    node.type === "ArrowFunctionExpression")
+            ) {
+                return;
+            }
+
+            if (node.type === "TryStatement") {
+                walk(node.block, state);
+                if (node.handler) {
+                    walk(node.handler, state);
+                }
+                if (node.finalizer) {
+                    walk(node.finalizer, { ...state, inFinally: true });
+                }
+                return;
+            }
+
+            if (isSetCall(node)) {
+                const objectExpression = getSetObjectExpression(
+                    node.arguments?.[0]
+                );
+
+                if (objectExpression) {
+                    for (const property of objectExpression.properties) {
+                        if (property.type !== "Property") {
+                            continue;
+                        }
+
+                        const name = getPropertyName(property);
+                        if (!name || !name.startsWith("is")) {
+                            continue;
+                        }
+
+                        const value = getBooleanLiteralValue(property.value);
+                        if (value === true) {
+                            if (!state.flagsSet.has(name)) {
+                                state.flagsSet.set(name, node);
+                            }
+                        }
+
+                        if (state.inFinally && value === false) {
+                            state.flagsResetInFinally.add(name);
+                        }
+                    }
+                }
+            }
+
+            const keys = visitorKeys[node.type] ?? [];
+            for (const key of keys) {
+                const value = node[key];
+                if (!value) {
+                    continue;
+                }
+                if (Array.isArray(value)) {
+                    for (const child of value) {
+                        walk(child, state);
+                    }
+                    continue;
+                }
+                walk(value, state);
+            }
+        }
+
+        function analyzeFunction(node) {
+            if (!node.body) {
+                return;
+            }
+
+            const state = {
+                flagsResetInFinally: new Set(),
+                flagsSet: new Map(),
+                inFinally: false,
+                root: node,
+            };
+
+            walk(node.body, state);
+
+            for (const [flag, reportNode] of state.flagsSet.entries()) {
+                if (!state.flagsResetInFinally.has(flag)) {
+                    context.report({
+                        data: { flag },
+                        messageId: "missingFinallyReset",
+                        node: reportNode,
+                    });
+                }
+            }
+        }
+
+        return {
+            FunctionDeclaration: analyzeFunction,
+            FunctionExpression: analyzeFunction,
+            ArrowFunctionExpression: analyzeFunction,
+        };
+    },
+};
+
+/**
+ * ESLint rule requiring Electron runtime code to use the centralized
+ * `readProcessEnv()` helper instead of direct `process.env` reads.
+ *
+ * @remarks
+ * This is primarily an AI guardrail: scattered env access tends to create
+ * inconsistent parsing/validation and makes it easy to forget redaction or
+ * default behavior.
+ */
+const electronPreferReadProcessEnvRule = {
+    meta: {
+        type: "problem",
+        docs: {
+            description:
+                "Prefer readProcessEnv() over direct process.env access in Electron runtime code",
+            recommended: false,
+        },
+        messages: {
+            preferReadProcessEnv:
+                "Use readProcessEnv()/readBooleanEnv()/readNumberEnv() from electron/utils/environment instead of direct process.env access.",
+        },
+        schema: [],
+    },
+    create(context) {
+        const normalizedFilename = normalizePath(context.getFilename());
+
+        if (!normalizedFilename.includes("/electron/")) {
+            return {};
+        }
+
+        // Allow centralized env helper to read process.env.
+        if (normalizedFilename.endsWith("/electron/utils/environment.ts")) {
+            return {};
+        }
+
+        // Ignore tests and test utilities.
+        if (
+            normalizedFilename.includes("/test/") ||
+            normalizedFilename.includes("/tests/") ||
+            normalizedFilename.includes("/electron/test/") ||
+            normalizedFilename.endsWith(".test.ts") ||
+            normalizedFilename.endsWith(".test.tsx") ||
+            normalizedFilename.endsWith(".spec.ts") ||
+            normalizedFilename.endsWith(".spec.tsx")
+        ) {
+            return {};
+        }
+
+        const bannedPattern = /\bprocess\s*\.\s*env\b/gu;
+
+        return {
+            Program(node) {
+                const text = context.getSourceCode().getText();
+                if (!bannedPattern.test(text)) {
+                    return;
+                }
+
+                context.report({
+                    node,
+                    messageId: "preferReadProcessEnv",
+                });
+            },
+        };
+    },
+};
+
+/**
+ * ESLint rule requiring standardized IPC handlers to include a validator.
+ *
+ * @remarks
+ * Uptime Watcher deliberately uses request/response IPC with Zod validators.
+ * When AI edits add new IPC handlers, a common failure mode is to register a
+ * handler without validation.
+ */
+const electronIpcHandlerRequireValidatorRule = {
+    meta: {
+        type: "problem",
+        docs: {
+            description:
+                "Require registerStandardizedIpcHandler calls to include a validator argument",
+            recommended: false,
+        },
+        messages: {
+            missingValidator:
+                "registerStandardizedIpcHandler must include a validator (third argument). Add the shared Zod validator for this channel.",
+        },
+        schema: [],
+    },
+    create(context) {
+        const normalizedFilename = normalizePath(context.getFilename());
+
+        if (!normalizedFilename.includes("/electron/services/ipc/handlers/")) {
+            return {};
+        }
+
+        if (
+            normalizedFilename.includes("/test/") ||
+            normalizedFilename.includes("/tests/") ||
+            normalizedFilename.includes("/electron/test/") ||
+            normalizedFilename.endsWith(".test.ts") ||
+            normalizedFilename.endsWith(".test.tsx") ||
+            normalizedFilename.endsWith(".spec.ts") ||
+            normalizedFilename.endsWith(".spec.tsx")
+        ) {
+            return {};
+        }
+
+        const isMissingValidatorArg = (arg) => {
+            if (!arg) {
+                return true;
+            }
+
+            // `null` validator is never valid.
+            if (arg.type === "Literal" && arg.value === null) {
+                return true;
+            }
+
+            if (arg.type === "Identifier" && arg.name === "undefined") {
+                return true;
+            }
+
+            return false;
+        };
+
+        return {
+            CallExpression(node) {
+                if (node.callee?.type !== "Identifier") {
+                    return;
+                }
+
+                if (node.callee.name !== "registerStandardizedIpcHandler") {
+                    return;
+                }
+
+                const validatorArg = node.arguments?.[2];
+                if (isMissingValidatorArg(validatorArg)) {
+                    context.report({
+                        node: node.callee,
+                        messageId: "missingValidator",
+                    });
+                }
+            },
+        };
+    },
+};
+
+const noOneDriveRule = {
+    meta: {
+        type: "problem",
+        docs: {
+            description:
+                "Disallow any OneDrive-related identifiers/strings to prevent reintroducing a removed provider",
+            recommended: false,
+        },
+        messages: {
+            noOneDrive:
+                "OneDrive integration is intentionally not supported in this repository. Remove this reference.",
+        },
+        schema: [],
+    },
+    create(context) {
+        const normalizedFilename = normalizePath(context.getFilename());
+
+        // Ignore tests to avoid creating busywork when describing legacy state.
+        if (
+            normalizedFilename.includes("/test/") ||
+            normalizedFilename.includes("/tests/") ||
+            normalizedFilename.includes("/electron/test/") ||
+            normalizedFilename.includes("/src/test/") ||
+            normalizedFilename.includes("/shared/test/") ||
+            normalizedFilename.endsWith(".test.ts") ||
+            normalizedFilename.endsWith(".test.tsx") ||
+            normalizedFilename.endsWith(".spec.ts") ||
+            normalizedFilename.endsWith(".spec.tsx")
+        ) {
+            return {};
+        }
+
+        const bannedPattern = /\bonedrive\b|\bone\s*drive\b/iu;
+
+        return {
+            Program(node) {
+                const sourceCode = context.getSourceCode();
+                const text = sourceCode.getText();
+                if (!bannedPattern.test(text)) {
+                    return;
+                }
+
+                context.report({
+                    node,
+                    messageId: "noOneDrive",
+                });
+            },
+        };
+    },
+};
+
 const uptimeWatcherPlugin = {
     rules: {
         "monitor-fallback-consistency": monitorFallbackConsistencyRule,
         "electron-no-console": electronNoConsoleRule,
+        "electron-prefer-readProcessEnv": electronPreferReadProcessEnvRule,
+        "electron-ipc-handler-require-validator":
+            electronIpcHandlerRequireValidatorRule,
         "electron-no-direct-ipc-handle": electronNoDirectIpcHandleRule,
         "electron-no-direct-ipcMain-import": electronNoDirectIpcMainImportRule,
         "electron-no-inline-ipc-channel-literal":
@@ -3256,6 +3971,7 @@ const uptimeWatcherPlugin = {
         "electron-no-renderer-import": electronNoRendererImportRule,
         "renderer-no-electron-import": rendererNoElectronImportRule,
         "renderer-no-browser-dialogs": rendererNoBrowserDialogsRule,
+        "renderer-no-window-open": rendererNoWindowOpenRule,
         "renderer-no-direct-preload-bridge": rendererNoDirectPreloadBridgeRule,
         "renderer-no-preload-bridge-writes": rendererNoPreloadBridgeWritesRule,
         "renderer-no-direct-electron-log": rendererNoDirectElectronLogRule,
@@ -3272,6 +3988,10 @@ const uptimeWatcherPlugin = {
         "no-deprecated-exports": noDeprecatedExportsRule,
         "no-local-record-guards": noLocalRecordGuardsRule,
         "no-local-error-normalizers": noLocalErrorNormalizersRule,
+        "logger-no-error-in-context": loggerNoErrorInContextRule,
+        "store-actions-require-finally-reset":
+            storeActionsRequireFinallyResetRule,
+        "no-onedrive": noOneDriveRule,
     },
 };
 

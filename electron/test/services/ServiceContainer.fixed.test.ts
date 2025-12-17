@@ -375,14 +375,12 @@ describe("ServiceContainer - Fixed Tests", () => {
             container = ServiceContainer.getInstance(mockConfig);
 
             // Create all services first to get their instances
-            const databaseManager = container.getDatabaseManager();
             const orchestrator = container.getUptimeOrchestrator();
             const ipcService = container.getIpcService();
 
             await container.initialize();
 
             // Verify initialization calls were made on the actual instances
-            expect(databaseManager.initialize).toHaveBeenCalled();
             expect(orchestrator.initialize).toHaveBeenCalled();
             expect(ipcService.setupHandlers).toHaveBeenCalled();
         });

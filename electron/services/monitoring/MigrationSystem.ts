@@ -10,7 +10,7 @@
  * @public
  */
 
-import { withErrorHandling } from "@shared/utils/errorHandling";
+import { ensureError, withErrorHandling } from "@shared/utils/errorHandling";
 import {
     interpolateLogTemplate,
     LOG_TEMPLATES,
@@ -258,21 +258,18 @@ class MigrationOrchestrator {
                                 `Applied breaking migration: ${migration.description}`
                             );
                         }
-                    } catch (error) {
+                    } catch (error: unknown) {
+                        const normalizedError = ensureError(error);
                         // Preserve error context for better debugging
-                        const errorDetails =
-                            error instanceof Error
-                                ? error.message
-                                : String(error);
+                        const errorDetails = normalizedError.message;
                         const errorMessage = `Migration failed: ${migration.description}`;
 
                         errors.push(`${errorMessage} - ${errorDetails}`);
-                        logger.error(errorMessage, {
+                        logger.error(errorMessage, normalizedError, {
                             currentData: JSON.stringify(currentData).slice(
                                 0,
                                 MAX_LOG_DATA_LENGTH
                             ), // Truncate for logging
-                            error,
                             migration: {
                                 description: migration.description,
                                 fromVersion: migration.fromVersion,

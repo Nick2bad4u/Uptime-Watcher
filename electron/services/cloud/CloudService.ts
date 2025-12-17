@@ -8,6 +8,7 @@ import type {
     CloudBackupMigrationRequest,
     CloudBackupMigrationResult,
 } from "@shared/types/cloudBackupMigration";
+import type { CloudSyncManifest } from "@shared/types/cloudSyncManifest";
 import type { CloudSyncResetResult } from "@shared/types/cloudSyncReset";
 import type { CloudSyncResetPreview } from "@shared/types/cloudSyncResetPreview";
 import type { SerializedDatabaseBackupMetadata } from "@shared/types/databaseBackup";
@@ -18,11 +19,6 @@ import {
     type CloudEncryptionConfigPassphrase,
     type CloudEncryptionMode,
 } from "@shared/types/cloudEncryption";
-import { CLOUD_SYNC_SCHEMA_VERSION } from "@shared/types/cloudSync";
-import {
-    CLOUD_SYNC_MANIFEST_VERSION,
-    parseCloudSyncManifest,
-} from "@shared/types/cloudSyncManifest";
 import { ensureError } from "@shared/utils/errorHandling";
 import { safeStorage } from "electron";
 import { promises as fs } from "node:fs";
@@ -34,6 +30,7 @@ import type {
     DatabaseRestorePayload,
 } from "../database/utils/databaseBackup";
 import type { CloudSyncEngine } from "../sync/SyncEngine";
+import type { CloudSettingsAdapter } from "./CloudService.types";
 import type { CloudStorageProvider } from "./providers/CloudStorageProvider.types";
 
 import { readProcessEnv } from "../../utils/environment";
@@ -55,6 +52,7 @@ import {
     buildUnsupportedProviderStatus,
     type CloudStatusCommonArgs,
 } from "./internal/CloudStatusBuilders";
+import { resolveCloudProviderOrNull } from "./internal/resolveCloudProviderOrNull";
 import { migrateProviderBackups } from "./migrations/backupMigration";
 import { resetProviderCloudSyncState } from "./migrations/syncReset";
 import { buildCloudSyncResetPreview } from "./migrations/syncResetPreview";
@@ -63,10 +61,8 @@ import { DropboxAuthFlow } from "./providers/dropbox/DropboxAuthFlow";
 import { DropboxCloudStorageProvider } from "./providers/dropbox/DropboxCloudStorageProvider";
 import { DropboxTokenManager } from "./providers/dropbox/DropboxTokenManager";
 import { EncryptedSyncCloudStorageProvider } from "./providers/EncryptedSyncCloudStorageProvider";
-import { FilesystemCloudStorageProvider } from "./providers/FilesystemCloudStorageProvider";
 import { fetchGoogleAccountLabel } from "./providers/googleDrive/fetchGoogleAccountLabel";
 import { GoogleDriveAuthFlow } from "./providers/googleDrive/GoogleDriveAuthFlow";
-import { GoogleDriveCloudStorageProvider } from "./providers/googleDrive/GoogleDriveCloudStorageProvider";
 import { GoogleDriveTokenManager } from "./providers/googleDrive/GoogleDriveTokenManager";
 import {
     EphemeralSecretStore,
@@ -74,17 +70,6 @@ import {
     SafeStorageSecretStore,
     type SecretStore,
 } from "./secrets/SecretStore";
-
-/**
- * Minimal adapter describing how cloud configuration is persisted.
- *
- * @remarks
- * Production uses {@link SettingsRepository}. Tests may supply a fake.
- */
-export interface CloudSettingsAdapter {
-    get: (key: string) => Promise<string | undefined>;
-    set: (key: string, value: string) => Promise<void>;
-}
 
 const SETTINGS_KEY_PROVIDER = "cloud.provider" as const;
 const SETTINGS_KEY_FILESYSTEM_BASE_DIRECTORY =
@@ -136,8 +121,6 @@ const SETTINGS_KEY_ENCRYPTION_MODE = "cloud.encryption.mode" as const;
 const SETTINGS_KEY_ENCRYPTION_SALT = "cloud.encryption.salt" as const;
 
 const SECRET_KEY_ENCRYPTION_DERIVED_KEY = "cloud.encryption.key.v1" as const;
-
-const MANIFEST_KEY = "manifest.json" as const;
 
 function parseEncryptionMode(value: string | undefined): CloudEncryptionMode {
     return value === "passphrase" ? "passphrase" : "none";
@@ -345,7 +328,12 @@ export class CloudService {
                 requireEncryptionUnlocked: false,
             });
 
-            const manifest = await this.readRemoteManifest(provider);
+            const transport = ProviderCloudSyncTransport.create(provider);
+            const manifest: CloudSyncManifest | null = await transport
+                .readManifest()
+                .catch((error: unknown) => {
+                    throw ensureError(error);
+                });
             const remoteEncryption = manifest?.encryption;
 
             if (remoteEncryption?.mode === "passphrase") {
@@ -389,23 +377,12 @@ export class CloudService {
                 saltBase64: encodeBase64(salt),
             };
 
-            const nextManifest = {
-                ...(manifest ?? {
-                    devices: {},
-                    manifestVersion: CLOUD_SYNC_MANIFEST_VERSION,
-                    syncSchemaVersion: CLOUD_SYNC_SCHEMA_VERSION,
-                }),
+            const nextManifest: CloudSyncManifest = {
+                ...(manifest ?? ProviderCloudSyncTransport.createEmptyManifest()),
                 encryption: encryptionConfig,
             };
 
-            await provider.uploadObject({
-                buffer: Buffer.from(
-                    JSON.stringify(nextManifest, null, 2),
-                    "utf8"
-                ),
-                key: MANIFEST_KEY,
-                overwrite: true,
-            });
+            await transport.writeManifest(nextManifest);
 
             await Promise.all([
                 this.settings.set(SETTINGS_KEY_ENCRYPTION_MODE, "passphrase"),
@@ -844,93 +821,17 @@ export class CloudService {
     }
 
     private async resolveProviderOrNull(): Promise<CloudStorageProvider | null> {
-        const providerKind = await this.settings.get(SETTINGS_KEY_PROVIDER);
-
-        if (providerKind === "filesystem") {
-            const baseDirectory = await this.settings.get(
-                SETTINGS_KEY_FILESYSTEM_BASE_DIRECTORY
-            );
-
-            if (!baseDirectory) {
-                return null;
-            }
-
-            return new FilesystemCloudStorageProvider({ baseDirectory });
-        }
-
-        if (providerKind === "dropbox") {
-            const appKey = this.getDropboxAppKey();
-
-            const tokenManager = new DropboxTokenManager({
-                appKey,
-                secretStore: this.secretStore,
-                tokenStorageKey: SETTINGS_KEY_DROPBOX_TOKENS,
-            });
-
-            const storedTokens = await tokenManager
-                .getStoredTokens()
-                .catch(() => {});
-
-            if (!storedTokens) {
-                return null;
-            }
-
-            return new DropboxCloudStorageProvider({ tokenManager });
-        }
-
-        if (providerKind === "google-drive") {
-            const clientId = readProcessEnv("UPTIME_WATCHER_GOOGLE_CLIENT_ID");
-            const clientSecret = readProcessEnv(
-                "UPTIME_WATCHER_GOOGLE_CLIENT_SECRET"
-            );
-
-            if (!clientId) {
-                return null;
-            }
-
-            const tokenManager = new GoogleDriveTokenManager({
-                clientId,
-                ...(clientSecret ? { clientSecret } : {}),
-                secretStore: this.secretStore,
-                storageKey: SETTINGS_KEY_GOOGLE_DRIVE_TOKENS,
-            });
-
-            const connected = await tokenManager
-                .isConnected()
-                .catch(() => false);
-            if (!connected) {
-                return null;
-            }
-
-            return new GoogleDriveCloudStorageProvider({
-                clientId,
-                ...(clientSecret ? { clientSecret } : {}),
-                tokenManager,
-            });
-        }
-
-        return null;
-    }
-
-    private async readRemoteManifest(
-        provider: CloudStorageProvider
-    ): Promise<null | ReturnType<typeof parseCloudSyncManifest>> {
-        try {
-            const raw = await provider.downloadObject(MANIFEST_KEY);
-            const parsed: unknown = JSON.parse(raw.toString("utf8"));
-            return parseCloudSyncManifest(parsed);
-        } catch (error: unknown) {
-            if (
-                typeof error === "object" &&
-                error !== null &&
-                "code" in error &&
-                (error as { code?: unknown }).code === "ENOENT"
-            ) {
-                return null;
-            }
-
-            throw ensureError(error);
-        }
+        return resolveCloudProviderOrNull({
+            getDropboxAppKey: () => this.getDropboxAppKey(),
+            keys: {
+                dropboxTokens: SETTINGS_KEY_DROPBOX_TOKENS,
+                filesystemBaseDirectory: SETTINGS_KEY_FILESYSTEM_BASE_DIRECTORY,
+                googleDriveTokens: SETTINGS_KEY_GOOGLE_DRIVE_TOKENS,
+                provider: SETTINGS_KEY_PROVIDER,
+            },
+            secretStore: this.secretStore,
+            settings: this.settings,
+        });
     }
 
     private async getEncryptionKeyMaybe(): Promise<
@@ -980,7 +881,8 @@ export class CloudService {
         );
 
         try {
-            const manifest = await this.readRemoteManifest(provider);
+            const transport = ProviderCloudSyncTransport.create(provider);
+            const manifest = await transport.readManifest();
             const remoteMode = manifest?.encryption?.mode;
             return remoteMode === "passphrase" ? "passphrase" : localMode;
         } catch (error) {

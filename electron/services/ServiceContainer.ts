@@ -37,6 +37,7 @@ import { UptimeOrchestrator } from "../UptimeOrchestrator";
 import {
     FORWARDED_METADATA_PROPERTY_KEY,
     ORIGINAL_METADATA_PROPERTY_KEY,
+    stripForwardedEventMetadata,
 } from "../utils/eventMetadataForwarding";
 import { logger } from "../utils/logger";
 import { CloudService } from "./cloud/CloudService";
@@ -342,6 +343,16 @@ export class ServiceContainer {
     private uptimeOrchestrator?: UptimeOrchestrator;
 
     /**
+     * Cached initialization promise for idempotent startup.
+     *
+     * @remarks
+     * `initialize()` may be called multiple times (e.g., tests or re-entrant
+     * app bootstrap). We treat initialization as idempotent and re-use the
+     * same in-flight promise.
+     */
+    private initializationPromise: Promise<void> | undefined;
+
+    /**
      * Singleton instance of {@link WindowService}.
      *
      * @internal
@@ -374,32 +385,48 @@ export class ServiceContainer {
      * Initializes all core services and orchestrators in dependency order.
      */
     public async initialize(): Promise<void> {
-        logger.info("[ServiceContainer] Initializing services");
-        this.getDatabaseService().initialize();
-        await this.tryInitializeService(
-            this.getConfigurationManager(),
-            "ConfigurationManager"
-        );
-        this.getHistoryRepository();
-        this.getMonitorRepository();
-        this.getSettingsRepository();
-        this.getSiteRepository();
-        await this.getDatabaseManager().initialize();
-        await this.tryInitializeService(this.getSiteManager(), "SiteManager");
-        await this.tryInitializeService(
-            this.getMonitorManager(),
-            "MonitorManager"
-        );
-        await this.getUptimeOrchestrator().initialize();
-        this.getIpcService().setupHandlers();
+        if (this.initializationPromise) {
+            await this.initializationPromise;
+            return;
+        }
 
-        // Start background cloud sync polling after IPC is ready.
-        await this.tryInitializeService(
-            this.getCloudSyncScheduler(),
-            "CloudSyncScheduler"
-        );
+        const promise = (async (): Promise<void> => {
+            logger.info("[ServiceContainer] Initializing services");
+            this.getDatabaseService().initialize();
+            await this.tryInitializeService(
+                this.getConfigurationManager(),
+                "ConfigurationManager"
+            );
+            this.getHistoryRepository();
+            this.getMonitorRepository();
+            this.getSettingsRepository();
+            this.getSiteRepository();
 
-        logger.info("[ServiceContainer] All services initialized successfully");
+            // UptimeOrchestrator is responsible for initializing the stateful
+            // managers it coordinates (DatabaseManager/SiteManager/etc.).
+            await this.getUptimeOrchestrator().initialize();
+            this.getIpcService().setupHandlers();
+
+            // Start background cloud sync polling after IPC is ready.
+            await this.tryInitializeService(
+                this.getCloudSyncScheduler(),
+                "CloudSyncScheduler"
+            );
+
+            logger.info(
+                "[ServiceContainer] All services initialized successfully"
+            );
+        })();
+
+        this.initializationPromise = promise;
+
+        try {
+            await promise;
+        } catch (error) {
+            // Allow retry after a failed initialization attempt.
+            this.initializationPromise = undefined;
+            throw error;
+        }
     }
 
     /**
@@ -1219,30 +1246,29 @@ export class ServiceContainer {
         }
 
         if (Array.isArray(payloadWithMeta)) {
-            const clonedArray = Array.from(payloadWithMeta);
-            this.applyForwardingMetadata(clonedArray, forwarded, original);
+            const stripped = stripForwardedEventMetadata(payloadWithMeta);
+            if (!Array.isArray(stripped)) {
+                throw new TypeError(
+                    "Unexpected non-array payload after metadata stripping"
+                );
+            }
+
+            this.applyForwardingMetadata(stripped, forwarded, original);
             // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- The metadata reattachment preserves the runtime payload shape.
-            return clonedArray as unknown as UptimeEvents[EventName];
+            return stripped as unknown as UptimeEvents[EventName];
         }
 
-        const clone: Record<string, unknown> = { ...payloadWithMeta };
-
-        if (Reflect.has(clone, FORWARDED_METADATA_PROPERTY_KEY)) {
-            Reflect.deleteProperty(clone, FORWARDED_METADATA_PROPERTY_KEY);
+        const stripped = stripForwardedEventMetadata(payloadWithMeta);
+        if (Array.isArray(stripped)) {
+            throw new TypeError(
+                "Unexpected array payload after metadata stripping"
+            );
         }
 
-        if (Reflect.has(clone, ORIGINAL_METADATA_PROPERTY_KEY)) {
-            Reflect.deleteProperty(clone, ORIGINAL_METADATA_PROPERTY_KEY);
-        }
-
-        if (Reflect.has(clone, ORIGINAL_METADATA_SYMBOL)) {
-            Reflect.deleteProperty(clone, ORIGINAL_METADATA_SYMBOL);
-        }
-
-        this.applyForwardingMetadata(clone, forwarded, original);
+        this.applyForwardingMetadata(stripped, forwarded, original);
 
         // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- After metadata removal, the clone matches the event payload contract.
-        return clone as unknown as UptimeEvents[EventName];
+        return stripped as unknown as UptimeEvents[EventName];
     }
 
     /**

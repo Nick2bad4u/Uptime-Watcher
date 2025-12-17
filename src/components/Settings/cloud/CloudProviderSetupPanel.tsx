@@ -377,6 +377,13 @@ function renderOAuthProviderPanel(args: {
                 {args.description}
             </ThemedText>
 
+            {args.connected ? (
+                <ThemedText className="mt-2" size="xs" variant="tertiary">
+                    Connected. To switch accounts or providers, disconnect
+                    above and connect again.
+                </ThemedText>
+            ) : null}
+
             {args.connected ? null : (
                 <div className="mt-3 flex flex-wrap gap-2">
                     <ThemedButton
@@ -420,13 +427,21 @@ function renderFilesystemProviderPanel(args: {
             {args.blockedCallout}
 
             <ThemedText className="mt-1" size="xs" variant="secondary">
-                Configure a local folder. This is useful if you want to manage
-                syncing externally (e.g. Dropbox/Drive client).
+                Configure a local folder. If you already use Dropbox/Google
+                Drive/iCloud/SyncThing, point this at a folder inside your sync
+                directory and let your existing sync client do the rest.
             </ThemedText>
 
             {args.filesystemConfiguredBaseDirectory ? (
                 <ThemedText className="mt-2" size="xs" variant="tertiary">
                     Current folder: {args.filesystemConfiguredBaseDirectory}
+                </ThemedText>
+            ) : null}
+
+            {args.connected ? (
+                <ThemedText className="mt-2" size="xs" variant="tertiary">
+                    To use a different folder, clear configuration above and
+                    set it again.
                 </ThemedText>
             ) : null}
 
@@ -437,7 +452,7 @@ function renderFilesystemProviderPanel(args: {
                             aria-label="Local folder base directory"
                             disabled={args.providerSetupLocked}
                             onChange={handleFilesystemBaseDirectoryChange}
-                            placeholder="C:\\Path\\To\\CloudStorage"
+                            placeholder="Path to folder (e.g. C:\\Users\\You\\Dropbox\\UptimeWatcher)"
                             value={args.filesystemBaseDirectory}
                         />
                     </div>
@@ -514,7 +529,7 @@ const ProviderPanel = ({
                 configured: configuredForSelectedProvider,
                 connected: connectedForSelectedProvider,
                 description:
-                    "Dropbox uses OAuth in your default browser. Tokens are stored in the main process and never exposed to the renderer.",
+                    "Opens your default browser to authorize Dropbox access (OAuth + PKCE). Uptime Watcher stores an encrypted token on this device (no password is stored).",
                 isConnecting: isConnectingDropbox,
                 onConnect: onConnectDropbox,
                 providerKey: "dropbox",
@@ -540,7 +555,7 @@ const ProviderPanel = ({
                 configured: configuredForSelectedProvider,
                 connected: connectedForSelectedProvider,
                 description:
-                    "Google Drive uses OAuth in your default browser. Tokens are stored in the main process and never exposed to the renderer. Uptime Watcher stores files in the app data folder (private to the app).",
+                    "Opens your default browser to authorize Google Drive access (OAuth + PKCE). Data is stored in Drive’s app data area (appDataFolder), so it won’t appear in your normal Drive folders.",
                 isConnecting: isConnectingGoogleDrive,
                 onConnect: onConnectGoogleDrive,
                 providerKey: "google-drive",

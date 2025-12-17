@@ -387,7 +387,7 @@ describe(ScreenshotThumbnail, () => {
             expect(preventDefaultSpy).toHaveBeenCalled();
         });
 
-        it("should fallback to window.open when SystemService rejects", async ({
+        it("should not fall back to window.open when SystemService rejects", async ({
             task,
             annotate,
         }) => {
@@ -411,14 +411,13 @@ describe(ScreenshotThumbnail, () => {
             const link = screen.getByRole("link");
             await user.click(link);
 
-            // Verify window.open was called with the correct parameters (due to fallback)
             await waitFor(() => {
-                expect(mockWindowOpen).toHaveBeenCalledWith(
-                    defaultProps.url,
-                    "_blank",
-                    "noopener,noreferrer"
+                expect(mockSystemService.openExternal).toHaveBeenCalledWith(
+                    defaultProps.url
                 );
             });
+
+            expect(mockWindowOpen).not.toHaveBeenCalled();
         });
     });
 
@@ -1121,7 +1120,7 @@ describe(ScreenshotThumbnail, () => {
             expect(mockWindowOpen).not.toHaveBeenCalled();
         });
 
-        it("should fallback to window.open when SystemService rejects (type guard)", async ({
+        it("should not fall back to window.open when SystemService rejects (type guard)", async ({
             task,
             annotate,
         }) => {
@@ -1147,12 +1146,12 @@ describe(ScreenshotThumbnail, () => {
             await user.click(link);
 
             await waitFor(() => {
-                expect(mockWindowOpen).toHaveBeenCalledWith(
-                    defaultProps.url,
-                    "_blank",
-                    "noopener,noreferrer"
+                expect(mockSystemService.openExternal).toHaveBeenCalledWith(
+                    defaultProps.url
                 );
             });
+
+            expect(mockWindowOpen).not.toHaveBeenCalled();
         });
     });
 

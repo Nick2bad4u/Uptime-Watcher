@@ -184,7 +184,33 @@ export function isValidNumeric(
     value: unknown,
     options?: Parameters<typeof validator.isFloat>[1]
 ): value is string {
-    return typeof value === "string" && validator.isFloat(value, options);
+    if (typeof value !== "string") {
+        return false;
+    }
+
+    // `validator.isFloat` is permissive enough to accept some malformed
+    // scientific-notation strings like "e8". We require a stricter syntactic
+    // form first to avoid treating such values as valid numeric input.
+    //
+    // Supported forms:
+    // - "123"
+    // - "123.45" / "123." / ".5"
+    // - "1e10" / "1E10" / "1.5e-10"
+
+    // eslint-disable-next-line security/detect-unsafe-regex, regexp/require-unicode-sets-regexp -- Linear-time numeric grammar; intentionally ASCII-only.
+    const numericPattern = /^[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:e[+-]?\d+)?$/iu;
+
+    if (!numericPattern.test(value)) {
+        return false;
+    }
+
+    // Guard against inputs that would parse to Infinity.
+    const parsed = Number(value);
+    if (!Number.isFinite(parsed)) {
+        return false;
+    }
+
+    return validator.isFloat(value, options);
 }
 
 /**

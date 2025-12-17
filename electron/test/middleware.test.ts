@@ -194,9 +194,11 @@ describe("middleware.ts", () => {
             await mw("eventE", asEventPayload({ x: 1 }), next);
             expect(logger.error).toHaveBeenCalledWith(
                 expect.stringContaining("Error in event 'eventE': fail"),
+                error,
                 expect.objectContaining({
                     data: { x: 1 },
                     event: "eventE",
+                    serializedData: expect.any(String),
                 })
             );
             expect(onError).toHaveBeenCalledWith(error, {

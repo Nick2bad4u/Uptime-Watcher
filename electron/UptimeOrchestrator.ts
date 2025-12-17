@@ -198,6 +198,17 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
     /** Coordinator for snapshot/state synchronization and cache-related flows. */
     private readonly snapshotSyncCoordinator: SnapshotSyncCoordinator;
 
+    /**
+     * Cached initialization promise for idempotent startup.
+     *
+     * @remarks
+     * `initialize()` can be invoked multiple times (tests, re-entrant startup).
+     * We treat initialization as idempotent by reusing the first in-flight
+     * promise. If initialization fails, the promise is cleared so callers may
+     * retry.
+     */
+    private initializationPromise: Promise<void> | undefined;
+
     /** Event handler for sites cache update requests */
     private readonly handleUpdateSitesCacheRequestedEvent = (
         data: UpdateSitesCacheRequestData
@@ -722,34 +733,56 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
      * @throws When validation of initialized managers fails
      */
     public async initialize(): Promise<void> {
+        if (this.initializationPromise) {
+            await this.initializationPromise;
+            return;
+        }
+
+        const promise = (async (): Promise<void> => {
+            try {
+                logger.info(
+                    "[UptimeOrchestrator] Starting initialization..."
+                );
+
+                // Step 1: Initialize database first (required by other managers)
+                await this.databaseManager.initialize();
+                logger.info(
+                    "[UptimeOrchestrator] Database manager initialized"
+                );
+
+                // Step 2: Initialize site manager (loads sites from database)
+                await this.siteManager.initialize();
+                logger.info("[UptimeOrchestrator] Site manager initialized");
+
+                // Step 3: Resume monitoring for sites that were monitoring before app restart
+                await this.monitoringLifecycleCoordinator.resumePersistentMonitoring();
+                logger.info(
+                    "[UptimeOrchestrator] Persistent monitoring resumed"
+                );
+
+                // Step 4: Validate that managers are properly initialized
+                this.validateInitialization();
+
+                logger.info(
+                    "[UptimeOrchestrator] Initialization completed successfully"
+                );
+            } catch (error) {
+                throw this.createContextualError({
+                    cause: error,
+                    code: "ORCHESTRATOR_INITIALIZE_FAILED",
+                    message: "Failed to initialize orchestrator",
+                    operation: "orchestrator.initialize",
+                });
+            }
+        })();
+
+        this.initializationPromise = promise;
+
         try {
-            logger.info("[UptimeOrchestrator] Starting initialization...");
-
-            // Step 1: Initialize database first (required by other managers)
-            await this.databaseManager.initialize();
-            logger.info("[UptimeOrchestrator] Database manager initialized");
-
-            // Step 2: Initialize site manager (loads sites from database)
-            await this.siteManager.initialize();
-            logger.info("[UptimeOrchestrator] Site manager initialized");
-
-            // Step 3: Resume monitoring for sites that were monitoring before app restart
-            await this.monitoringLifecycleCoordinator.resumePersistentMonitoring();
-            logger.info("[UptimeOrchestrator] Persistent monitoring resumed");
-
-            // Step 4: Validate that managers are properly initialized
-            this.validateInitialization();
-
-            logger.info(
-                "[UptimeOrchestrator] Initialization completed successfully"
-            );
+            await promise;
         } catch (error) {
-            throw this.createContextualError({
-                cause: error,
-                code: "ORCHESTRATOR_INITIALIZE_FAILED",
-                message: "Failed to initialize orchestrator",
-                operation: "orchestrator.initialize",
-            });
+            this.initializationPromise = undefined;
+            throw error;
         }
     }
 

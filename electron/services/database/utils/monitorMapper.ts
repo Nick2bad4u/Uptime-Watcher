@@ -13,6 +13,7 @@ import type { Monitor, Site } from "@shared/types";
 import type { MonitorRow as DatabaseMonitorRow } from "@shared/types/database";
 import type { UnknownRecord } from "type-fest";
 
+import { ensureError } from "@shared/utils/errorHandling";
 import { LOG_TEMPLATES } from "@shared/utils/logTemplates";
 import {
     isValidIdentifierArray,
@@ -167,10 +168,10 @@ function parseActiveOperations(row: DatabaseMonitorRow): string[] {
             parsed,
         });
         return [];
-    } catch (error) {
+    } catch (error: unknown) {
         logger.warn(
             LOG_TEMPLATES.warnings.MONITOR_ACTIVE_OPERATIONS_PARSE_FAILED,
-            error
+            ensureError(error)
         );
         return [];
     }
@@ -240,12 +241,16 @@ export function buildMonitorParameters(
             return value as DbValue;
         });
         /* eslint-enable @typescript-eslint/no-unsafe-type-assertion, sonarjs/function-return-type -- Re-enable rules after database value mapping with appropriate type conversion */
-    } catch (error) {
-        logger.error(LOG_TEMPLATES.errors.MONITOR_MAPPER_FAILED, {
-            error,
-            monitor,
-            siteIdentifier,
-        });
+    } catch (error: unknown) {
+        const normalizedError = ensureError(error);
+        logger.error(
+            LOG_TEMPLATES.errors.MONITOR_MAPPER_FAILED,
+            normalizedError,
+            {
+                monitor,
+                siteIdentifier,
+            }
+        );
         throw error;
     }
 }
@@ -323,11 +328,15 @@ export function rowToMonitor(row: DatabaseMonitorRow): Site["monitors"][0] {
         copyDynamicFields(monitor, dynamicMonitor);
 
         return monitor;
-    } catch (error) {
-        logger.error(LOG_TEMPLATES.errors.MONITOR_MAPPER_FAILED, {
-            error,
-            row,
-        });
+    } catch (error: unknown) {
+        const normalizedError = ensureError(error);
+        logger.error(
+            LOG_TEMPLATES.errors.MONITOR_MAPPER_FAILED,
+            normalizedError,
+            {
+                row,
+            }
+        );
         throw error;
     }
 }

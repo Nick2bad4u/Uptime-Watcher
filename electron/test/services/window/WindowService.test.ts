@@ -886,9 +886,7 @@ describe(WindowService, () => {
             expect(logger.warn).toHaveBeenCalledWith(
                 "[WindowService] Failed to attach security header middleware",
                 expect.objectContaining({
-                    error: expect.objectContaining({
-                        message: "session unavailable",
-                    }),
+                    message: "session unavailable",
                 })
             );
         });

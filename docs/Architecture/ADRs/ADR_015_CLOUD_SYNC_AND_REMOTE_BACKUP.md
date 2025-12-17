@@ -44,6 +44,9 @@ Accepted (implemented — complete)
 >   `electron/services/cloud/providers/CloudStorageProvider.types.ts`.
 > - ✅ Dropbox provider implemented (OAuth PKCE + token refresh + account label)
 >   under `electron/services/cloud/providers/dropbox/`.
+> - ✅ Google Drive provider implemented (OAuth PKCE + token refresh + hidden
+>   `appDataFolder` storage) under
+>   `electron/services/cloud/providers/googleDrive/`.
 > - ✅ Filesystem provider implemented (sandboxed under `uptime-watcher/`)
 >   under `electron/services/cloud/providers/FilesystemCloudStorageProvider.ts`.
 > - ✅ Cloud orchestration implemented in
@@ -125,7 +128,7 @@ In code this is split into:
 Initial target providers:
 
 - **Dropbox** (MVP)
-- **Google Drive** (follow-up)
+- **Google Drive** (MVP parity)
 - **WebDAV** (power-user follow-up)
 
 ### 3) Storage layout (provider folder convention)

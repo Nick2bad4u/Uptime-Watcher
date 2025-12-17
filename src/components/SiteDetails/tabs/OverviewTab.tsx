@@ -48,8 +48,7 @@ const formatIntervalOption = (
         return { label, value };
     } catch (error) {
         const ensuredError = ensureError(error);
-        logger.warn("Failed to format interval option", {
-            error: ensuredError,
+        logger.warn("Failed to format interval option", ensuredError, {
             intervalOption,
         });
         const fallbackLabel = getIntervalLabel(value);

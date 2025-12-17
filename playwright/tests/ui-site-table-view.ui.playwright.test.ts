@@ -156,17 +156,18 @@ test.describe(
                 const firstSiteName = createdSites[0];
                 assertSiteName(firstSiteName);
 
-                const triggerButton = table
-                    .getByRole("button")
-                    .filter({ hasText: firstSiteName })
-                    .first();
-                await expect(triggerButton).toBeVisible({
+                // NOTE: The site trigger cell renders a marquee component.
+                // Depending on timing, Playwright's "stable" checks can be
+                // tripped by ongoing animations. The <tr> has a stable
+                // aria-label and click handler, so we click the row instead.
+                const rowTrigger = table.getByRole("row", {
+                    name: `Open details for ${firstSiteName}`,
+                });
+                await expect(rowTrigger).toBeVisible({
                     timeout: WAIT_TIMEOUTS.MEDIUM,
                 });
-                await triggerButton.scrollIntoViewIfNeeded();
-                await triggerButton.click({
-                    timeout: WAIT_TIMEOUTS.LONG,
-                });
+                await rowTrigger.scrollIntoViewIfNeeded();
+                await rowTrigger.dispatchEvent("click");
 
                 const siteDetailsModal = page.getByTestId("site-details-modal");
                 await expect(siteDetailsModal).toBeVisible({

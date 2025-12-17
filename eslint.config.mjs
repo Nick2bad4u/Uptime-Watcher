@@ -290,6 +290,17 @@ export default /** @type {EslintConfig} */ [
         },
     },
     {
+        files: ["electron/services/ipc/handlers/**/*.{ts,tsx}"],
+        ignores: ["electron/test/**/*"],
+        name: "Electron IPC Handler Validation Guardrails",
+        plugins: {
+            "uptime-watcher": uptimeWatcherPlugin,
+        },
+        rules: {
+            "uptime-watcher/electron-ipc-handler-require-validator": "error",
+        },
+    },
+    {
         files: ["electron/**/*.{ts,tsx}"],
         ignores: ["electron/test/**/*"],
         name: "Electron Logger Enforcement",
@@ -305,6 +316,7 @@ export default /** @type {EslintConfig} */ [
             "uptime-watcher/electron-no-inline-ipc-channel-type-argument":
                 "error",
             "uptime-watcher/electron-no-renderer-import": "error",
+            "uptime-watcher/electron-prefer-readProcessEnv": "error",
             "uptime-watcher/electron-preload-no-direct-ipcRenderer-usage":
                 "error",
             "uptime-watcher/electron-preload-no-inline-ipc-channel-constant":
@@ -375,6 +387,7 @@ export default /** @type {EslintConfig} */ [
             "uptime-watcher/renderer-no-import-internal-service-utils": "error",
             "uptime-watcher/renderer-no-ipcRenderer-usage": "error",
             "uptime-watcher/renderer-no-preload-bridge-writes": "error",
+            "uptime-watcher/renderer-no-window-open": "error",
         },
     },
     {
@@ -383,6 +396,7 @@ export default /** @type {EslintConfig} */ [
             "shared/**/*.{ts,tsx}",
             "src/**/*.{ts,tsx}",
             "storybook/**/*.{ts,tsx}",
+            "scripts/**/*.{ts,tsx,js,jsx,mts,mjs,cjs,cts}",
         ],
         ignores: [
             "electron/test/**/*",
@@ -394,9 +408,11 @@ export default /** @type {EslintConfig} */ [
             "uptime-watcher": uptimeWatcherPlugin,
         },
         rules: {
+            "uptime-watcher/logger-no-error-in-context": "error",
             "uptime-watcher/no-deprecated-exports": "error",
             "uptime-watcher/no-local-error-normalizers": "error",
             "uptime-watcher/no-local-record-guards": "error",
+            "uptime-watcher/no-onedrive": "error",
             "uptime-watcher/prefer-app-alias": "error",
         },
     },
@@ -9614,5 +9630,54 @@ export default /** @type {EslintConfig} */ [
             "write-good-comments/write-good-comments": "off", // Too strict
         },
     }, // eslint-config-prettier MUST be last to override conflicting rules
+    {
+        files: [
+            "electron/**/*.{ts,tsx}",
+            "shared/**/*.{ts,tsx}",
+            "src/**/*.{ts,tsx}",
+        ],
+        ignores: [
+            "electron/test/**",
+            "shared/test/**",
+            "src/test/**",
+            "tests/**",
+            "**/*.test.{ts,tsx}",
+            "**/*.spec.{ts,tsx}",
+            "benchmarks/**",
+            "scripts/**",
+            "storybook/**",
+            "docs/**",
+        ],
+        name: "AI Agent Guardrails (production)",
+        plugins: {
+            "@typescript-eslint": tseslint,
+            canonical: pluginCanonical,
+        },
+        rules: {
+            // Encourage consistent typing; allow tests to be pragmatic.
+            "@typescript-eslint/no-explicit-any": "error",
+            // Prevent accidental barrel layers and cross-module drift.
+            "canonical/no-re-export": "error",
+        },
+    },
+    {
+        files: [
+            "electron/test/**/*.{ts,tsx}",
+            "shared/test/**/*.{ts,tsx}",
+            "src/test/**/*.{ts,tsx}",
+            "tests/**/*.{ts,tsx}",
+            "**/*.test.{ts,tsx}",
+            "**/*.spec.{ts,tsx}",
+        ],
+        name: "AI Agent Guardrails (tests)",
+        plugins: {
+            "@typescript-eslint": tseslint,
+            canonical: pluginCanonical,
+        },
+        rules: {
+            "@typescript-eslint/no-explicit-any": "off",
+            "canonical/no-re-export": "off",
+        },
+    },
     eslintConfigPrettier,
 ];

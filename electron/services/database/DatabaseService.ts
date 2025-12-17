@@ -245,10 +245,11 @@ export class DatabaseService {
                 this.db.close();
                 this.db = undefined;
                 logger.info(LOG_TEMPLATES.services.DATABASE_CONNECTION_CLOSED);
-            } catch (error) {
-                logger.error(LOG_TEMPLATES.errors.DATABASE_CLOSE_FAILED, {
-                    error: ensureError(error),
-                });
+            } catch (error: unknown) {
+                logger.error(
+                    LOG_TEMPLATES.errors.DATABASE_CLOSE_FAILED,
+                    ensureError(error)
+                );
                 throw error;
             }
         }
@@ -338,7 +339,7 @@ export class DatabaseService {
 
                 logger.info(LOG_TEMPLATES.services.DATABASE_INITIALIZED);
                 return this.db;
-            } catch (error) {
+            } catch (error: unknown) {
                 if (
                     this.isDatabaseLockedError(error) &&
                     attempt < DATABASE_INITIALIZATION_MAX_ATTEMPTS
@@ -346,9 +347,10 @@ export class DatabaseService {
                     this.handleDatabaseLockedError(dbPath, attempt, error);
                 } else {
                     this.closeDatabaseSilently();
-                    logger.error(LOG_TEMPLATES.errors.DATABASE_SCHEMA_FAILED, {
-                        error: ensureError(error),
-                    });
+                    logger.error(
+                        LOG_TEMPLATES.errors.DATABASE_SCHEMA_FAILED,
+                        ensureError(error)
+                    );
                     throw error;
                 }
             }

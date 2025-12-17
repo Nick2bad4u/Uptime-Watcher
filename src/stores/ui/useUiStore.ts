@@ -169,9 +169,9 @@ export const useUIStore: UIStoreWithPersist = create<UIStore>()(
 
                         logger.error(
                             "Failed to open external URL via SystemService",
+                            normalizedError,
                             {
                                 context,
-                                error: normalizedError,
                                 url: urlForMessage,
                             }
                         );
@@ -189,14 +189,6 @@ export const useUIStore: UIStoreWithPersist = create<UIStore>()(
                             error: normalizedError.message,
                             url: urlForMessage,
                         });
-
-                        if (typeof window !== "undefined") {
-                            window.open(
-                                requestedUrl,
-                                "_blank",
-                                "noopener,noreferrer"
-                            );
-                        }
 
                         useErrorStore
                             .getState()

@@ -13,6 +13,7 @@
 
 import type { MonitorType } from "@shared/types";
 
+import { ensureError } from "@shared/utils/errorHandling";
 import {
     interpolateLogTemplate,
     LOG_TEMPLATES,
@@ -230,16 +231,15 @@ export function getMonitorWithResult(
         try {
             instance.updateConfig(config);
             // ConfigurationApplied remains true
-        } catch (error) {
-            const normalizedError =
-                error instanceof Error ? error : new Error(String(error));
+        } catch (error: unknown) {
+            const normalizedError = ensureError(error);
 
             logger.error(
                 interpolateLogTemplate(
                     LOG_TEMPLATES.warnings.MONITOR_CONFIG_UPDATE_FAILED_TYPE,
                     { type }
                 ),
-                { error: normalizedError }
+                normalizedError
             );
 
             // eslint-disable-next-line ex/use-error-cause -- MonitorConfigurationError forwards the cause to Error via its constructor
@@ -339,11 +339,11 @@ export function updateMonitorConfig(config: MonitorServiceConfig): void {
     for (const instance of serviceInstances.values()) {
         try {
             instance.updateConfig(config);
-        } catch (error) {
+        } catch (error: unknown) {
             // Log and continue; do not throw from config update
             logger.warn(
                 LOG_TEMPLATES.warnings.MONITOR_CONFIG_UPDATE_FAILED_INSTANCE,
-                { error }
+                ensureError(error)
             );
         }
     }

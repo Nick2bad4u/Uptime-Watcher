@@ -201,7 +201,9 @@ public getSiteManager(): SiteManager {
 
 ### 3. Explicit Initialization Sequence
 
-The `initialize()` method ensures services are created and initialized in the correct order:
+The `initialize()` method ensures services are created and initialized in the correct order.
+
+It is also **idempotent**: repeated calls reuse the same in-flight promise.
 
 ```typescript
 public async initialize(): Promise<void> {
@@ -217,18 +219,14 @@ public async initialize(): Promise<void> {
     this.getSettingsRepository();
     this.getSiteRepository();
 
-    // Phase 3: Database manager (depends on repositories)
-    await this.getDatabaseManager().initialize();
-
-    // Phase 4: Domain managers (depend on database manager)
-    await this.tryInitializeService(this.getSiteManager(), "SiteManager");
-    await this.tryInitializeService(this.getMonitorManager(), "MonitorManager");
-
-    // Phase 5: Orchestrator (coordinates managers)
+    // Phase 3: Orchestrator (initializes the managers it coordinates)
     await this.getUptimeOrchestrator().initialize();
 
-    // Phase 6: IPC handlers (expose orchestrator to renderer)
+    // Phase 4: IPC handlers (expose orchestrator to renderer)
     this.getIpcService().setupHandlers();
+
+    // Phase 5: Background schedulers (depend on IPC readiness)
+    await this.tryInitializeService(this.getCloudSyncScheduler(), "CloudSyncScheduler");
 
     logger.info("[ServiceContainer] All services initialized successfully");
 }

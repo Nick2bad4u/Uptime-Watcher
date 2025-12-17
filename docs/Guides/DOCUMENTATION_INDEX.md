@@ -107,6 +107,7 @@ System design, patterns, and architectural decisions:
 | [DEVELOPMENT\_PATTERNS\_GUIDE.md](../Architecture/Patterns/DEVELOPMENT_PATTERNS_GUIDE.md) | Coding patterns overview | Understanding system patterns          |
 | [TSDOC\_STANDARDS.md](../Architecture/TSDOC_STANDARDS.md)                                 | Documentation standards  | Writing code documentation             |
 | [LINT\_GUARDRAILS\_AND\_CUSTOM\_RULES.md](./LINT_GUARDRAILS_AND_CUSTOM_RULES.md)          | Custom lint guardrails   | Fixing architecture lint rule failures |
+| [ADR\_IMPLEMENTATION\_PUNCHLIST.md](./ADR_IMPLEMENTATION_PUNCHLIST.md)                    | ADR follow-up backlog    | Planning and tracking ADR work         |
 
 #### Store reference docs
 

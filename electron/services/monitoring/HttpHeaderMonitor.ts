@@ -6,6 +6,7 @@
 
 import type { Monitor } from "@shared/types";
 
+import { ensureError } from "@shared/utils/errorHandling";
 import { isRecord as isSharedRecord } from "@shared/utils/typeHelpers";
 
 import type { MonitorServiceConfig } from "./types";
@@ -73,10 +74,11 @@ function resolveHeaderValue(headers: unknown, name: string): null | string {
 
     try {
         return JSON.stringify(rawValue);
-    } catch (error) {
-        logger.warn("[HttpHeaderMonitor] Unable to serialise header value", {
-            error,
-        });
+    } catch (error: unknown) {
+        logger.warn(
+            "[HttpHeaderMonitor] Unable to serialise header value",
+            ensureError(error)
+        );
         return "[unserializable]";
     }
 }

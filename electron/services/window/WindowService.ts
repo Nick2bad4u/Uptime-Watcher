@@ -36,7 +36,7 @@
 import type { Event, HandlerDetails } from "electron";
 
 import { getNodeEnv } from "@shared/utils/environment";
-import { withErrorHandling } from "@shared/utils/errorHandling";
+import { ensureError, withErrorHandling } from "@shared/utils/errorHandling";
 import { getErrorMessage } from "@shared/utils/errorUtils";
 import { BrowserWindow, shell } from "electron";
 // eslint-disable-next-line unicorn/import-style -- Need namespace import for path operations
@@ -501,10 +501,10 @@ export class WindowService {
                         responseHeaders: headers,
                     });
                 });
-            } catch (error) {
+            } catch (error: unknown) {
                 logger.warn(
                     "[WindowService] Failed to attach security header middleware",
-                    { error }
+                    ensureError(error)
                 );
             }
         } else {
@@ -571,7 +571,7 @@ export class WindowService {
      * Load the appropriate content based on the current environment.
      *
      * @remarks
-     * Handles environment-specific content loading with comprehensive error
+                    ensureError(error)
      * handling:
      *
      * **Development Mode:**

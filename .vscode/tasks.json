@@ -6,7 +6,7 @@
             "group": "build",
             "icon": {
                 "color": "terminal.ansiGreen",
-                "id": "debug-start"
+                "id": "play"
             },
             "isBackground": true,
             "label": "Start Vite Dev Server",
@@ -38,7 +38,7 @@
                     "regexp": "^(?:\\x1b\\[[0-9;]*m)*(?:\\[.*?\\]\\s*)?(?:File:\\s*)?((?:[A-Za-z]:[\\\\/]|[\\\\/])?[^:\\r\\n]+?):(\\d+):(\\d+)(?::\\s*(?:(error|warning|info)))?[:\\s-]*(.*)$",
                     "severity": 4
                 },
-                "severity": "error"
+                "source": "vite"
             },
             "promptOnClose": false,
             "runOptions": {
@@ -55,7 +55,7 @@
                 "color": "terminal.ansiBlue",
                 "id": "package"
             },
-            "isBackground": false,
+            "isBackground": true,
             "label": "Build Application",
             "presentation": {
                 "clear": false,
@@ -80,7 +80,7 @@
                     "regexp": "^(?:\\x1b\\[[0-9;]*m)*(?:\\[.*?\\]\\s*)?(?:File:\\s*)?((?:[A-Za-z]:[\\\\/]|[\\\\/])?[^:\\r\\n]+?):(\\d+):(\\d+)(?::\\s*(?:(error|warning|info)))?[:\\s-]*(.*)$",
                     "severity": 4
                 },
-                "severity": "error"
+                "source": "vite"
             },
             "promptOnClose": false,
             "runOptions": {
@@ -95,8 +95,9 @@
             "group": "build",
             "icon": {
                 "color": "terminal.ansiYellow",
-                "id": "package"
+                "id": "cloud-download"
             },
+            "isBackground": true,
             "label": "Install Dependencies (UpdateDeps)",
             "options": {
                 "cwd": "${workspaceFolder}"
@@ -122,58 +123,13 @@
             "type": "npm"
         },
         {
-            "detail": "Lints all source files using ESLint.",
-            "group": "test",
-            "icon": {
-                "color": "terminal.ansiYellow",
-                "id": "search"
-            },
-            "label": "Lint",
-            "presentation": {
-                "clear": true,
-                "close": false,
-                "echo": true,
-                "focus": false,
-                "group": "lint-basic",
-                "panel": "shared",
-                "preserveTerminalName": false,
-                "reveal": "silent",
-                "revealProblems": "onProblem",
-                "showReuseMessage": false
-            },
-            "problemMatcher": {
-                "applyTo": "allDocuments",
-                "owner": "eslint",
-                "pattern": [
-                    {
-                        "file": 1,
-                        "regexp": "^([^\\s].*?)$"
-                    },
-                    {
-                        "code": 5,
-                        "column": 2,
-                        "line": 1,
-                        "loop": true,
-                        "message": 4,
-                        "regexp": "^\\s+(\\d+):(\\d+)\\s+(error|warning|info)\\s+(.+?)\\s{2,}(.*)$",
-                        "severity": 3
-                    }
-                ]
-            },
-            "runOptions": {
-                "instanceLimit": 1,
-                "instancePolicy": "terminateOldest"
-            },
-            "script": "lint:fix",
-            "type": "npm"
-        },
-        {
             "detail": "Lints all CSS and style files using Stylelint.",
             "group": "test",
             "icon": {
                 "color": "terminal.ansiMagenta",
-                "id": "symbol-color"
+                "id": "paintcan"
             },
+            "isBackground": true,
             "label": "Lint:CSS:Fix",
             "presentation": {
                 "clear": true,
@@ -198,7 +154,8 @@
                     "message": 4,
                     "regexp": "^(?:\\x1b\\[[0-9;]*m)*\\s*(.+?):(\\d+):(\\d+)\\s*(?:\\x1b\\[[0-9;]*m)*[✖×](?:\\x1b\\[[0-9;]*m)*\\s+(.+?)\\s{2,}(.*)$"
                 },
-                "severity": "error"
+                "severity": "error",
+                "source": "stylelint"
             },
             "runOptions": {
                 "instanceLimit": 1,
@@ -214,6 +171,7 @@
                 "color": "terminal.ansiCyan",
                 "id": "check-all"
             },
+            "isBackground": true,
             "label": "Type-check:All",
             "presentation": {
                 "clear": true,
@@ -239,7 +197,7 @@
                     "regexp": "^(?:\\x1b\\[[0-9;]*m)*(.+?)\\((\\d+),(\\d+)\\):\\s+(error|warning|info)\\s+(TS\\d+):\\s*(.*)$",
                     "severity": 4
                 },
-                "severity": "error"
+                "source": "typescript"
             },
             "runOptions": {
                 "instanceLimit": 1,
@@ -255,6 +213,7 @@
                 "color": "terminal.ansiMagenta",
                 "id": "tools"
             },
+            "isBackground": true,
             "label": "Lint:Fix",
             "presentation": {
                 "clear": true,
@@ -274,7 +233,7 @@
                 "pattern": [
                     {
                         "file": 1,
-                        "regexp": "^([^\\s].*?)$"
+                        "regexp": "^(?:\\x1b\\[[0-9;]*m)*(.+?\\.(?:ts|tsx|js|jsx|mts|cts|mjs|cjs))(?:\\x1b\\[[0-9;]*m)*$"
                     },
                     {
                         "code": 5,
@@ -285,7 +244,8 @@
                         "regexp": "^\\s+(\\d+):(\\d+)\\s+(error|warning|info)\\s+(.+?)\\s{2,}(.*)$",
                         "severity": 3
                     }
-                ]
+                ],
+                "source": "eslint"
             },
             "runOptions": {
                 "instanceLimit": 1,
@@ -295,12 +255,13 @@
             "type": "npm"
         },
         {
-            "detail": "Runs the test suite using Vitest.",
+            "detail": "Runs the test suite's for Src, Shared, and Electron using Vitest.",
             "group": "test",
             "icon": {
                 "color": "terminal.ansiGreen",
                 "id": "beaker"
             },
+            "isBackground": true,
             "label": "Test",
             "presentation": {
                 "clear": true,
@@ -329,7 +290,8 @@
                         "regexp": "^(?:\\x1b\\[[0-9;]*m)*\\s*at\\s+(?:.+?\\s+\\()?(?:\\x1b\\[[0-9;]*m)*((?:[A-Za-z]:[\\\\/]|[\\\\/])?[^:\\r\\n()]+?):(\\d+):(\\d+)\\)?"
                     }
                 ],
-                "severity": "error"
+                "severity": "error",
+                "source": "vitest"
             },
             "runOptions": {
                 "instanceLimit": 1,
@@ -345,6 +307,7 @@
                 "color": "terminal.ansiGreen",
                 "id": "beaker-stop"
             },
+            "isBackground": true,
             "label": "Test:Playwright",
             "presentation": {
                 "clear": true,
@@ -368,7 +331,8 @@
                     "message": 4,
                     "regexp": "^(?:\\x1b\\[[0-9;]*m)*\\s*(?:\\d+\\)\\s*)?((?:[A-Za-z]:[\\\\/]|[\\\\/])?[^:\\r\\n]+?):(\\d+):(\\d+)\\s+[›▶]\\s+(.*)$"
                 },
-                "severity": "error"
+                "severity": "error",
+                "source": "playwright"
             },
             "runOptions": {
                 "instanceLimit": 1,
@@ -378,12 +342,13 @@
             "type": "npm"
         },
         {
-            "detail": "Runs the test suite with coverage reporting using Vitest.",
+            "detail": "Runs the front-end (src folder) test suite with front-end (src folder) only coverage reported using Vitest.",
             "group": "test",
             "icon": {
                 "color": "terminal.ansiRed",
                 "id": "graph"
             },
+            "isBackground": true,
             "label": "Test:Coverage",
             "presentation": {
                 "clear": true,
@@ -412,7 +377,8 @@
                         "regexp": "^(?:\\x1b\\[[0-9;]*m)*\\s*at\\s+(?:.+?\\s+\\()?(?:\\x1b\\[[0-9;]*m)*((?:[A-Za-z]:[\\\\/]|[\\\\/])?[^:\\r\\n()]+?):(\\d+):(\\d+)\\)?"
                     }
                 ],
-                "severity": "error"
+                "severity": "error",
+                "source": "vitest"
             },
             "runOptions": {
                 "instanceLimit": 1,
@@ -422,12 +388,151 @@
             "type": "npm"
         },
         {
+            "detail": "Runs the shared folder test suite with shared folder only coverage reported using Vitest.",
+            "group": "test",
+            "icon": {
+                "color": "terminal.ansiRed",
+                "id": "graph"
+            },
+            "isBackground": true,
+            "label": "Test:Shared:Coverage",
+            "presentation": {
+                "clear": true,
+                "close": false,
+                "echo": true,
+                "focus": false,
+                "group": "test-coverage",
+                "panel": "shared",
+                "preserveTerminalName": false,
+                "reveal": "silent",
+                "revealProblems": "onProblem",
+                "showReuseMessage": false
+            },
+            "problemMatcher": {
+                "applyTo": "allDocuments",
+                "owner": "vitest",
+                "pattern": [
+                    {
+                        "message": 1,
+                        "regexp": "^(?:\\x1b\\[[0-9;]*m)*\\s*(?:AssertionError|Error|RangeError|ReferenceError|TypeError|SyntaxError|AggregateError):\\s*(?:\\x1b\\[[0-9;]*m)*(.*)$"
+                    },
+                    {
+                        "column": 3,
+                        "file": 1,
+                        "line": 2,
+                        "regexp": "^(?:\\x1b\\[[0-9;]*m)*\\s*at\\s+(?:.+?\\s+\\()?(?:\\x1b\\[[0-9;]*m)*((?:[A-Za-z]:[\\\\/]|[\\\\/])?[^:\\r\\n()]+?):(\\d+):(\\d+)\\)?"
+                    }
+                ],
+                "severity": "error",
+                "source": "vitest"
+            },
+            "runOptions": {
+                "instanceLimit": 1,
+                "instancePolicy": "terminateOldest"
+            },
+            "script": "test:shared:coverage",
+            "type": "npm"
+        },
+        {
+            "detail": "Runs the electron folder test suite with electron folder only coverage reported using Vitest.",
+            "group": "test",
+            "icon": {
+                "color": "terminal.ansiRed",
+                "id": "graph"
+            },
+            "isBackground": true,
+            "label": "Test:Electron:Coverage",
+            "presentation": {
+                "clear": true,
+                "close": false,
+                "echo": true,
+                "focus": false,
+                "group": "test-coverage",
+                "panel": "shared",
+                "preserveTerminalName": false,
+                "reveal": "silent",
+                "revealProblems": "onProblem",
+                "showReuseMessage": false
+            },
+            "problemMatcher": {
+                "applyTo": "allDocuments",
+                "owner": "vitest",
+                "pattern": [
+                    {
+                        "message": 1,
+                        "regexp": "^(?:\\x1b\\[[0-9;]*m)*\\s*(?:AssertionError|Error|RangeError|ReferenceError|TypeError|SyntaxError|AggregateError):\\s*(?:\\x1b\\[[0-9;]*m)*(.*)$"
+                    },
+                    {
+                        "column": 3,
+                        "file": 1,
+                        "line": 2,
+                        "regexp": "^(?:\\x1b\\[[0-9;]*m)*\\s*at\\s+(?:.+?\\s+\\()?(?:\\x1b\\[[0-9;]*m)*((?:[A-Za-z]:[\\\\/]|[\\\\/])?[^:\\r\\n()]+?):(\\d+):(\\d+)\\)?"
+                    }
+                ],
+                "severity": "error",
+                "source": "vitest"
+            },
+            "runOptions": {
+                "instanceLimit": 1,
+                "instancePolicy": "terminateOldest"
+            },
+            "script": "test:electron:coverage",
+            "type": "npm"
+        },
+        {
+            "detail": "Runs the Storybook test suite with coverage via Vitest",
+            "group": "test",
+            "icon": {
+                "color": "terminal.ansiRed",
+                "id": "graph"
+            },
+            "isBackground": true,
+            "label": "Test:Storybook:Coverage",
+            "presentation": {
+                "clear": true,
+                "close": false,
+                "echo": true,
+                "focus": false,
+                "group": "test-coverage",
+                "panel": "shared",
+                "preserveTerminalName": false,
+                "reveal": "silent",
+                "revealProblems": "onProblem",
+                "showReuseMessage": false
+            },
+            "problemMatcher": {
+                "applyTo": "allDocuments",
+                "owner": "vitest",
+                "pattern": [
+                    {
+                        "message": 1,
+                        "regexp": "^(?:\\x1b\\[[0-9;]*m)*\\s*(?:AssertionError|Error|RangeError|ReferenceError|TypeError|SyntaxError|AggregateError):\\s*(?:\\x1b\\[[0-9;]*m)*(.*)$"
+                    },
+                    {
+                        "column": 3,
+                        "file": 1,
+                        "line": 2,
+                        "regexp": "^(?:\\x1b\\[[0-9;]*m)*\\s*at\\s+(?:.+?\\s+\\()?(?:\\x1b\\[[0-9;]*m)*((?:[A-Za-z]:[\\\\/]|[\\\\/])?[^:\\r\\n()]+?):(\\d+):(\\d+)\\)?"
+                    }
+                ],
+                "severity": "error",
+                "source": "vitest"
+            },
+            "runOptions": {
+                "instanceLimit": 1,
+                "instancePolicy": "terminateOldest"
+            },
+            "script": "test:storybook:coverage",
+            "type": "npm"
+        },
+        {
             "detail": "Runs all linters: TypeScript type-checking, ESLint, Stylelint, Madge, and Knip.",
             "group": "test",
             "icon": {
                 "color": "terminal.ansiYellow",
                 "id": "checklist"
             },
+            "isBackground": true,
             "label": "Lint:All:Fix",
             "presentation": {
                 "clear": true,
@@ -443,6 +548,7 @@
             },
             "problemMatcher": [
                 {
+                    "applyTo": "allDocuments",
                     "owner": "typescript",
                     "pattern": {
                         "code": 5,
@@ -453,14 +559,15 @@
                         "regexp": "^(?:\\x1b\\[[0-9;]*m)*(.+?)\\((\\d+),(\\d+)\\):\\s+(error|warning|info)\\s+(TS\\d+):\\s*(.*)$",
                         "severity": 4
                     },
-                    "severity": "error"
+                    "source": "typescript"
                 },
                 {
+                    "applyTo": "allDocuments",
                     "owner": "eslint",
                     "pattern": [
                         {
                             "file": 1,
-                            "regexp": "^([^\\s].*?)$"
+                            "regexp": "^(?:\\x1b\\[[0-9;]*m)*(.+?\\.(?:ts|tsx|js|jsx|mts|cts|mjs|cjs))(?:\\x1b\\[[0-9;]*m)*$"
                         },
                         {
                             "code": 5,
@@ -471,9 +578,11 @@
                             "regexp": "^\\s+(\\d+):(\\d+)\\s+(error|warning|info)\\s+(.+?)\\s{2,}(.*)$",
                             "severity": 3
                         }
-                    ]
+                    ],
+                    "source": "eslint"
                 },
                 {
+                    "applyTo": "allDocuments",
                     "owner": "stylelint",
                     "pattern": {
                         "code": 5,
@@ -483,9 +592,11 @@
                         "message": 4,
                         "regexp": "^(?:\\x1b\\[[0-9;]*m)*\\s*(.+?):(\\d+):(\\d+)\\s*(?:\\x1b\\[[0-9;]*m)*[✖×](?:\\x1b\\[[0-9;]*m)*\\s+(.+?)\\s{2,}(.*)$"
                     },
-                    "severity": "error"
+                    "severity": "error",
+                    "source": "stylelint"
                 },
                 {
+                    "applyTo": "allDocuments",
                     "owner": "remark",
                     "pattern": {
                         "code": 7,
@@ -497,9 +608,10 @@
                         "regexp": "^(?:\\x1b\\[[0-9;]*m)*\\s*(.+?):(\\d+):(\\d+)(?:-(\\d+))?\\s+(warning|error)\\s+(.+?)\\s{2,}(.*)$",
                         "severity": 5
                     },
-                    "severity": "warning"
+                    "source": "remark"
                 },
                 {
+                    "applyTo": "allDocuments",
                     "owner": "knip",
                     "pattern": {
                         "column": 3,
@@ -508,15 +620,8 @@
                         "message": 4,
                         "regexp": "^(?:\\x1b\\[[0-9;]*m)*(.+?):(\\d+):(\\d+)\\s+(.*)$"
                     },
-                    "severity": "warning"
-                },
-                {
-                    "owner": "madge",
-                    "pattern": {
-                        "message": 1,
-                        "regexp": "^(?:\\x1b\\[[0-9;]*m)*\\s*(.+?)\\s*$"
-                    },
-                    "severity": "error"
+                    "severity": "warning",
+                    "source": "knip"
                 }
             ],
             "runOptions": {
@@ -533,6 +638,7 @@
                 "color": "terminal.ansiBlue",
                 "id": "bug"
             },
+            "isBackground": true,
             "label": "Build Electron Main (Dev)",
             "presentation": {
                 "clear": false,
@@ -558,13 +664,55 @@
                     "regexp": "^(?:\\x1b\\[[0-9;]*m)*(.+?)\\((\\d+),(\\d+)\\):\\s+(error|warning|info)\\s+(TS\\d+):\\s*(.*)$",
                     "severity": 4
                 },
-                "severity": "error"
+                "source": "typescript"
             },
             "runOptions": {
                 "instanceLimit": 1,
                 "instancePolicy": "terminateOldest"
             },
             "script": "build:electron",
+            "type": "npm"
+        },
+        {
+            "detail": "Builds the Shared folder for debugging (tsconfig.shared.json).",
+            "group": "build",
+            "icon": {
+                "color": "terminal.ansiBlue",
+                "id": "library"
+            },
+            "isBackground": true,
+            "label": "Build Shared (Dev)",
+            "presentation": {
+                "clear": false,
+                "close": false,
+                "echo": true,
+                "focus": false,
+                "group": "electron-build",
+                "panel": "shared",
+                "preserveTerminalName": false,
+                "reveal": "always",
+                "revealProblems": "onProblem",
+                "showReuseMessage": false
+            },
+            "problemMatcher": {
+                "applyTo": "allDocuments",
+                "owner": "typescript",
+                "pattern": {
+                    "code": 5,
+                    "column": 3,
+                    "file": 1,
+                    "line": 2,
+                    "message": 6,
+                    "regexp": "^(?:\\x1b\\[[0-9;]*m)*(.+?)\\((\\d+),(\\d+)\\):\\s+(error|warning|info)\\s+(TS\\d+):\\s*(.*)$",
+                    "severity": 4
+                },
+                "source": "typescript"
+            },
+            "runOptions": {
+                "instanceLimit": 1,
+                "instancePolicy": "terminateOldest"
+            },
+            "script": "build:shared",
             "type": "npm"
         }
     ],

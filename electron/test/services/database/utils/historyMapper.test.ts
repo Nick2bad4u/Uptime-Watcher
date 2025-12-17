@@ -687,8 +687,8 @@ describe("historyMapper utilities", () => {
             expect(() => rowToHistoryEntry(row)).toThrowError();
             expect(logger.error).toHaveBeenCalledWith(
                 "[HistoryMapper] Failed to map database row to history entry",
+                expect.any(Error),
                 expect.objectContaining({
-                    error: expect.any(Error),
                     row,
                     status: "up",
                     responseTime: 150,

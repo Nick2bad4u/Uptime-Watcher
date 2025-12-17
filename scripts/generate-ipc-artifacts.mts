@@ -4,7 +4,10 @@ import { createHash } from "node:crypto";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import prettier from "prettier";
-import type { JSDoc } from "ts-morph";
+import type {
+    JSDoc,
+    PropertySignature as TsMorphPropertySignature,
+} from "ts-morph";
 import {
     Node,
     Project,
@@ -73,23 +76,26 @@ const rendererChannelEntries = rendererChannelsDeclaration
         };
     });
 
-const payloadInterface = rendererEventsSource.getInterfaceOrThrow(
-    "RendererEventPayloadMap"
-);
+const payloadSchemaDeclaration =
+    rendererEventsSource.getInterface("RendererEventPayloadMap") ??
+    rendererEventsSource.getTypeAliasOrThrow("RendererEventPayloadMap");
 
 const payloadPropertyMap = new Map<string, { description: string }>();
 
-for (const property of payloadInterface.getProperties()) {
-    const propertySignature = property as PropertySignature;
-    const nameNode = propertySignature.getNameNode();
-    const channelName = Node.isStringLiteral(nameNode)
-        ? nameNode.getLiteralText()
-        : propertySignature.getName();
+// NOTE: `InterfaceDeclaration#getProperties()` only returns properties declared
+// directly on the interface, not inherited ones. We want the full schema, so we
+// read from the type's symbol properties and extract their declarations.
+for (const property of payloadSchemaDeclaration.getType().getProperties()) {
+    const channelName = property.getName();
     if (!channelName) {
         continue;
     }
-    const description = propertySignature
-        .getJsDocs()
+
+    const description = property
+        .getDeclarations()
+        .filter((declaration): declaration is TsMorphPropertySignature =>
+            Node.isPropertySignature(declaration))
+        .flatMap((signature) => signature.getJsDocs())
         .map((doc: JSDoc) => doc.getDescription().trim())
         .filter(Boolean)
         .join("\n");

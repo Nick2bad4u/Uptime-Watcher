@@ -128,12 +128,11 @@ describe("pingErrorHandling", () => {
 
             handlePingCheckError(error, context);
 
-            expect(mockLogger.error).toHaveBeenCalledWith("Ping check failed", {
-                error: "Network unreachable",
-                host: "test.example.com",
-                timeout: 10_000,
-                maxRetries: 5,
-            });
+            expect(mockLogger.error).toHaveBeenCalledWith(
+                "Ping check failed",
+                error,
+                context
+            );
         });
         it("should always return status 'down'", () => {
             const testCases = [
@@ -243,10 +242,8 @@ describe("pingErrorHandling", () => {
                 });
                 expect(mockLogger.error).toHaveBeenCalledWith(
                     "Ping check failed",
-                    {
-                        error: "Test error",
-                        ...context,
-                    }
+                    error,
+                    context
                 );
             }
         });
@@ -342,7 +339,8 @@ describe("pingErrorHandling", () => {
             expect(result.status).toBe("down");
             expect(mockLogger.error).toHaveBeenCalledWith(
                 "Ping check failed",
-                expect.objectContaining(minimalContext)
+                error,
+                minimalContext
             );
         });
         it("should handle edge case context values", async ({
@@ -366,7 +364,8 @@ describe("pingErrorHandling", () => {
 
             expect(mockLogger.error).toHaveBeenCalledWith(
                 "Ping check failed",
-                expect.objectContaining(edgeCaseContext)
+                error,
+                edgeCaseContext
             );
         });
     });

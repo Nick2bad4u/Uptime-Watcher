@@ -12,6 +12,8 @@
  * @see {@link handlePingCheckError}
  */
 
+import { ensureError } from "@shared/utils/errorHandling";
+
 import type { MonitorCheckResult } from "../types";
 
 import { logger } from "../../../utils/logger";
@@ -52,12 +54,10 @@ export function handlePingCheckError(
     error: unknown,
     context: PingOperationContext
 ): MonitorCheckResult {
-    const errorMessage = error instanceof Error ? error.message : String(error);
+    const normalizedError = ensureError(error);
+    const errorMessage = normalizedError.message;
 
-    logger.error("Ping check failed", {
-        error: errorMessage,
-        ...context,
-    });
+    logger.error("Ping check failed", normalizedError, context);
 
     // Return standardized error result
     return {

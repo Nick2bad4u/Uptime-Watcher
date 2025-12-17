@@ -9,6 +9,7 @@
 import type { SiteRow as DatabaseSiteRow } from "@shared/types/database";
 
 import { isValidSiteRow as isValidDatabaseSiteRow } from "@shared/types/database";
+import { ensureError } from "@shared/utils/errorHandling";
 import { LOG_TEMPLATES } from "@shared/utils/logTemplates";
 import { safeStringify } from "@shared/utils/stringConversion";
 
@@ -86,12 +87,10 @@ export function rowToSite(row: DatabaseSiteRow): SiteRow {
         }
 
         return site;
-    } catch (error) {
-        const errorType =
-            error instanceof Error ? error.constructor.name : "Unknown";
-        logger.error(LOG_TEMPLATES.errors.SITE_MAPPER_FAILED, {
-            error,
-            errorType,
+    } catch (error: unknown) {
+        const normalizedError = ensureError(error);
+        logger.error(LOG_TEMPLATES.errors.SITE_MAPPER_FAILED, normalizedError, {
+            errorType: normalizedError.constructor.name,
             functionName: "rowToSite",
             row,
         });

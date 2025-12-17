@@ -5,6 +5,7 @@ import {
     useEffect,
     useMemo,
 } from "react";
+import { useShallow } from "zustand/react/shallow";
 
 import { useConfirmDialog } from "../../hooks/ui/useConfirmDialog";
 import { usePromptDialog } from "../../hooks/ui/usePromptDialog";
@@ -17,144 +18,6 @@ import { ThemedText } from "../../theme/components/ThemedText";
 import { AppIcons } from "../../utils/icons";
 import { CloudSection } from "./cloud/CloudSection";
 
-const selectBackups = (state: CloudStoreState): CloudStoreState["backups"] =>
-    state.backups;
-const selectStatus = (state: CloudStoreState): CloudStoreState["status"] =>
-    state.status;
-
-const selectDeleteBackup = (
-    state: CloudStoreState
-): CloudStoreState["deleteBackup"] => state.deleteBackup;
-
-const selectDeletingBackupKey = (
-    state: CloudStoreState
-): CloudStoreState["deletingBackupKey"] => state.deletingBackupKey;
-
-const selectRefreshStatus = (
-    state: CloudStoreState
-): CloudStoreState["refreshStatus"] => state.refreshStatus;
-const selectConnectDropbox = (
-    state: CloudStoreState
-): CloudStoreState["connectDropbox"] => state.connectDropbox;
-
-const selectConnectGoogleDrive = (
-    state: CloudStoreState
-): CloudStoreState["connectGoogleDrive"] => state.connectGoogleDrive;
-const selectDisconnect = (
-    state: CloudStoreState
-): CloudStoreState["disconnect"] => state.disconnect;
-const selectSetSyncEnabled = (
-    state: CloudStoreState
-): CloudStoreState["setSyncEnabled"] => state.setSyncEnabled;
-const selectRequestSyncNow = (
-    state: CloudStoreState
-): CloudStoreState["requestSyncNow"] => state.requestSyncNow;
-const selectListBackups = (
-    state: CloudStoreState
-): CloudStoreState["listBackups"] => state.listBackups;
-const selectUploadLatestBackup = (
-    state: CloudStoreState
-): CloudStoreState["uploadLatestBackup"] => state.uploadLatestBackup;
-const selectRestoreBackup = (
-    state: CloudStoreState
-): CloudStoreState["restoreBackup"] => state.restoreBackup;
-
-const selectSetEncryptionPassphrase = (
-    state: CloudStoreState
-): CloudStoreState["setEncryptionPassphrase"] => state.setEncryptionPassphrase;
-const selectClearEncryptionKey = (
-    state: CloudStoreState
-): CloudStoreState["clearEncryptionKey"] => state.clearEncryptionKey;
-
-const selectMigrateBackups = (
-    state: CloudStoreState
-): CloudStoreState["migrateBackups"] => state.migrateBackups;
-
-const selectResetRemoteSyncState = (
-    state: CloudStoreState
-): CloudStoreState["resetRemoteSyncState"] => state.resetRemoteSyncState;
-
-const selectConfigureFilesystemProvider = (
-    state: CloudStoreState
-): CloudStoreState["configureFilesystemProvider"] =>
-    state.configureFilesystemProvider;
-
-const selectIsConnectingDropbox = (
-    state: CloudStoreState
-): CloudStoreState["isConnectingDropbox"] => state.isConnectingDropbox;
-
-const selectIsConnectingGoogleDrive = (
-    state: CloudStoreState
-): CloudStoreState["isConnectingGoogleDrive"] => state.isConnectingGoogleDrive;
-const selectIsDisconnecting = (
-    state: CloudStoreState
-): CloudStoreState["isDisconnecting"] => state.isDisconnecting;
-const selectIsListingBackups = (
-    state: CloudStoreState
-): CloudStoreState["isListingBackups"] => state.isListingBackups;
-const selectIsRefreshingStatus = (
-    state: CloudStoreState
-): CloudStoreState["isRefreshingStatus"] => state.isRefreshingStatus;
-
-const selectIsSettingSyncEnabled = (
-    state: CloudStoreState
-): CloudStoreState["isSettingSyncEnabled"] => state.isSettingSyncEnabled;
-const selectIsRequestingSyncNow = (
-    state: CloudStoreState
-): CloudStoreState["isRequestingSyncNow"] => state.isRequestingSyncNow;
-const selectIsUploadingBackup = (
-    state: CloudStoreState
-): CloudStoreState["isUploadingBackup"] => state.isUploadingBackup;
-const selectRestoringBackupKey = (
-    state: CloudStoreState
-): CloudStoreState["restoringBackupKey"] => state.restoringBackupKey;
-
-const selectIsSettingEncryptionPassphrase = (
-    state: CloudStoreState
-): CloudStoreState["isSettingEncryptionPassphrase"] =>
-    state.isSettingEncryptionPassphrase;
-const selectIsClearingEncryptionKey = (
-    state: CloudStoreState
-): CloudStoreState["isClearingEncryptionKey"] => state.isClearingEncryptionKey;
-
-const selectIsMigratingBackups = (
-    state: CloudStoreState
-): CloudStoreState["isMigratingBackups"] => state.isMigratingBackups;
-
-const selectIsResettingRemoteSyncState = (
-    state: CloudStoreState
-): CloudStoreState["isResettingRemoteSyncState"] =>
-    state.isResettingRemoteSyncState;
-
-const selectIsConfiguringFilesystemProvider = (
-    state: CloudStoreState
-): CloudStoreState["isConfiguringFilesystemProvider"] =>
-    state.isConfiguringFilesystemProvider;
-
-const selectLastBackupMigrationResult = (
-    state: CloudStoreState
-): CloudStoreState["lastBackupMigrationResult"] =>
-    state.lastBackupMigrationResult;
-
-const selectLastRemoteSyncResetResult = (
-    state: CloudStoreState
-): CloudStoreState["lastRemoteSyncResetResult"] =>
-    state.lastRemoteSyncResetResult;
-
-const selectRemoteSyncResetPreview = (
-    state: CloudStoreState
-): CloudStoreState["remoteSyncResetPreview"] => state.remoteSyncResetPreview;
-
-const selectRefreshRemoteSyncResetPreview = (
-    state: CloudStoreState
-): CloudStoreState["refreshRemoteSyncResetPreview"] =>
-    state.refreshRemoteSyncResetPreview;
-
-const selectIsRefreshingRemoteSyncResetPreview = (
-    state: CloudStoreState
-): CloudStoreState["isRefreshingRemoteSyncResetPreview"] =>
-    state.isRefreshingRemoteSyncResetPreview;
-
 /**
  * Wiring component for the "Cloud Sync & Backup" settings section.
  */
@@ -162,71 +25,94 @@ export const CloudSettingsSection = (): JSX.Element => {
     const requestConfirmation = useConfirmDialog();
     const requestPrompt = usePromptDialog();
 
-    const backups = useCloudStore(selectBackups);
-    const deleteBackup = useCloudStore(selectDeleteBackup);
-    const deletingBackupKey = useCloudStore(selectDeletingBackupKey);
-    const status = useCloudStore(selectStatus);
-
-    const refreshStatus = useCloudStore(selectRefreshStatus);
-    const configureFilesystemProvider = useCloudStore(
-        selectConfigureFilesystemProvider
-    );
-    const connectDropbox = useCloudStore(selectConnectDropbox);
-    const connectGoogleDrive = useCloudStore(selectConnectGoogleDrive);
-    const disconnect = useCloudStore(selectDisconnect);
-    const setSyncEnabled = useCloudStore(selectSetSyncEnabled);
-    const requestSyncNow = useCloudStore(selectRequestSyncNow);
-    const listBackups = useCloudStore(selectListBackups);
-    const uploadLatestBackup = useCloudStore(selectUploadLatestBackup);
-    const restoreBackup = useCloudStore(selectRestoreBackup);
-
-    const setEncryptionPassphrase = useCloudStore(
-        selectSetEncryptionPassphrase
-    );
-    const clearEncryptionKey = useCloudStore(selectClearEncryptionKey);
-
-    const migrateBackups = useCloudStore(selectMigrateBackups);
-    const resetRemoteSyncState = useCloudStore(selectResetRemoteSyncState);
-    const refreshRemoteSyncResetPreview = useCloudStore(
-        selectRefreshRemoteSyncResetPreview
-    );
-
-    const isConnectingDropbox = useCloudStore(selectIsConnectingDropbox);
-    const isConnectingGoogleDrive = useCloudStore(
-        selectIsConnectingGoogleDrive
-    );
-    const isDisconnecting = useCloudStore(selectIsDisconnecting);
-    const isListingBackups = useCloudStore(selectIsListingBackups);
-    const isRefreshingStatus = useCloudStore(selectIsRefreshingStatus);
-    const isSettingSyncEnabled = useCloudStore(selectIsSettingSyncEnabled);
-    const isRequestingSyncNow = useCloudStore(selectIsRequestingSyncNow);
-    const isUploadingBackup = useCloudStore(selectIsUploadingBackup);
-    const restoringBackupKey = useCloudStore(selectRestoringBackupKey);
-
-    const isSettingEncryptionPassphrase = useCloudStore(
-        selectIsSettingEncryptionPassphrase
-    );
-    const isClearingEncryptionKey = useCloudStore(
-        selectIsClearingEncryptionKey
-    );
-
-    const isMigratingBackups = useCloudStore(selectIsMigratingBackups);
-    const isResettingRemoteSyncState = useCloudStore(
-        selectIsResettingRemoteSyncState
-    );
-    const isConfiguringFilesystemProvider = useCloudStore(
-        selectIsConfiguringFilesystemProvider
-    );
-    const lastBackupMigrationResult = useCloudStore(
-        selectLastBackupMigrationResult
-    );
-    const lastRemoteSyncResetResult = useCloudStore(
-        selectLastRemoteSyncResetResult
-    );
-
-    const remoteSyncResetPreview = useCloudStore(selectRemoteSyncResetPreview);
-    const isRefreshingRemoteSyncResetPreview = useCloudStore(
-        selectIsRefreshingRemoteSyncResetPreview
+    const {
+        backups,
+        clearEncryptionKey,
+        configureFilesystemProvider,
+        connectDropbox,
+        connectGoogleDrive,
+        deleteBackup,
+        deletingBackupKey,
+        disconnect,
+        isClearingEncryptionKey,
+        isConfiguringFilesystemProvider,
+        isConnectingDropbox,
+        isConnectingGoogleDrive,
+        isDisconnecting,
+        isListingBackups,
+        isMigratingBackups,
+        isRefreshingRemoteSyncResetPreview,
+        isRefreshingStatus,
+        isRequestingSyncNow,
+        isResettingRemoteSyncState,
+        isSettingEncryptionPassphrase,
+        isSettingSyncEnabled,
+        isUploadingBackup,
+        lastBackupMigrationResult,
+        lastRemoteSyncResetResult,
+        listBackups,
+        migrateBackups,
+        refreshRemoteSyncResetPreview,
+        refreshStatus,
+        remoteSyncResetPreview,
+        requestSyncNow,
+        resetRemoteSyncState,
+        restoreBackup,
+        restoringBackupKey,
+        setEncryptionPassphrase,
+        setSyncEnabled,
+        status,
+        uploadLatestBackup,
+    } = useCloudStore(
+        useShallow(
+            useCallback(
+                (state: CloudStoreState) => ({
+                    backups: state.backups,
+                    clearEncryptionKey: state.clearEncryptionKey,
+                    configureFilesystemProvider:
+                        state.configureFilesystemProvider,
+                    connectDropbox: state.connectDropbox,
+                    connectGoogleDrive: state.connectGoogleDrive,
+                    deleteBackup: state.deleteBackup,
+                    deletingBackupKey: state.deletingBackupKey,
+                    disconnect: state.disconnect,
+                    isClearingEncryptionKey: state.isClearingEncryptionKey,
+                    isConfiguringFilesystemProvider:
+                        state.isConfiguringFilesystemProvider,
+                    isConnectingDropbox: state.isConnectingDropbox,
+                    isConnectingGoogleDrive: state.isConnectingGoogleDrive,
+                    isDisconnecting: state.isDisconnecting,
+                    isListingBackups: state.isListingBackups,
+                    isMigratingBackups: state.isMigratingBackups,
+                    isRefreshingRemoteSyncResetPreview:
+                        state.isRefreshingRemoteSyncResetPreview,
+                    isRefreshingStatus: state.isRefreshingStatus,
+                    isRequestingSyncNow: state.isRequestingSyncNow,
+                    isResettingRemoteSyncState: state.isResettingRemoteSyncState,
+                    isSettingEncryptionPassphrase:
+                        state.isSettingEncryptionPassphrase,
+                    isSettingSyncEnabled: state.isSettingSyncEnabled,
+                    isUploadingBackup: state.isUploadingBackup,
+                    lastBackupMigrationResult: state.lastBackupMigrationResult,
+                    lastRemoteSyncResetResult: state.lastRemoteSyncResetResult,
+                    listBackups: state.listBackups,
+                    migrateBackups: state.migrateBackups,
+                    refreshRemoteSyncResetPreview:
+                        state.refreshRemoteSyncResetPreview,
+                    refreshStatus: state.refreshStatus,
+                    remoteSyncResetPreview: state.remoteSyncResetPreview,
+                    requestSyncNow: state.requestSyncNow,
+                    resetRemoteSyncState: state.resetRemoteSyncState,
+                    restoreBackup: state.restoreBackup,
+                    restoringBackupKey: state.restoringBackupKey,
+                    setEncryptionPassphrase: state.setEncryptionPassphrase,
+                    setSyncEnabled: state.setSyncEnabled,
+                    status: state.status,
+                    uploadLatestBackup: state.uploadLatestBackup,
+                }),
+                []
+            )
+        )
     );
 
     const fireAndForget = useCallback((

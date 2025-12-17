@@ -6,6 +6,7 @@
 
 import type { Monitor } from "@shared/types";
 
+import { ensureError } from "@shared/utils/errorHandling";
 import { isRecord } from "@shared/utils/typeHelpers";
 
 import type { MonitorServiceConfig } from "./types";
@@ -26,10 +27,6 @@ function getTrimmedString(value: unknown): null | string {
 
     const trimmed = value.trim();
     return trimmed.length === 0 ? null : trimmed;
-}
-
-function toError(value: unknown): Error {
-    return value instanceof Error ? value : new Error(String(value));
 }
 
 function extractValueAtPath(payload: unknown, path: string): unknown {
@@ -95,9 +92,10 @@ function stringifyValue(value: unknown): string {
 
     try {
         return JSON.stringify(value);
-    } catch (error) {
+    } catch (error: unknown) {
+        const normalizedError = ensureError(error);
         logger.warn("[HttpJsonMonitor] Failed to serialise JSON value", {
-            error,
+            message: normalizedError.message,
         });
         return "[unserializable]";
     }
@@ -113,11 +111,12 @@ function parsePayload(
                 payload: JSON.parse(data),
             };
         } catch (error) {
+            const normalizedError = ensureError(error);
             logger.warn("[HttpJsonMonitor] Failed to parse JSON payload", {
-                error,
+                message: normalizedError.message,
             });
             return {
-                error: toError(error),
+                error: normalizedError,
                 ok: false,
             };
         }

@@ -707,7 +707,10 @@ export async function openSiteDetails(
 
     if (cardVisible) {
         try {
-            await siteCard.click({ timeout: WAIT_TIMEOUTS.MEDIUM });
+            await siteCard.click({
+                timeout: WAIT_TIMEOUTS.MEDIUM,
+                noWaitAfter: true,
+            });
         } catch (error) {
             console.warn(
                 "Site card interaction failed; falling back to sidebar navigation",

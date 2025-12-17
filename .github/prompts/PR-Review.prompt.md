@@ -27,7 +27,7 @@ Checklist to run for every PR (minimal)
 1. Build and typecheck
    - Run: `npm ci` then `npm run type-check:all` and `npm run build` (or `npm run build` for combined build). Note failures.
 2. Lint
-   - Run: `npm run lint` (or `npm run lint:all`) and list errors/warnings. If lint passes, state so.
+   - Run: `npm run lint` (or `npm run lint:all:fix`) and list errors/warnings. If lint passes, state so.
 3. Tests
    - Run: `npm run test:all` or targeted vitest command for the changed area. Report failures.
 4. Security and dependency checks
@@ -58,7 +58,7 @@ How to present findings (structured output)
 - Final checklist for the author: items to complete before re-review.
 
 Examples of useful checks to include in a review
-- Did any `tsconfig`/`eslint`/`vitest` configs change? If so, call out risk and suggest running `npm run lint:all` and `npm run test:all` locally.
+- Did any `tsconfig`/`eslint`/`vitest` configs change? If so, call out risk and suggest running `npm run lint:all:fix` and `npm run test:all` locally.
 - If package.json changed, check for dependency pinning/unpinning and ask for a changelog entry.
 - Database migrations: ensure any schema changes include a migration script and backwards-compatible code paths.
 - Benchmarks: changes under `benchmarks/` should not affect production code; ensure they are excluded from runtime and linting only when intentional.

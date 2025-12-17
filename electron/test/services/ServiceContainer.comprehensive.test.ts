@@ -762,9 +762,6 @@ describe("ServiceContainer - Comprehensive Coverage", () => {
                 container.getDatabaseService().initialize
             ).toHaveBeenCalled();
             expect(
-                container.getDatabaseManager().initialize
-            ).toHaveBeenCalled();
-            expect(
                 container.getUptimeOrchestrator().initialize
             ).toHaveBeenCalled();
             expect(container.getIpcService().setupHandlers).toHaveBeenCalled();
@@ -1387,8 +1384,9 @@ describe("ServiceContainer - Comprehensive Coverage", () => {
 
             // Should handle multiple calls gracefully
             expect(
-                container.getDatabaseManager().initialize
-            ).toHaveBeenCalledTimes(2);
+                container.getUptimeOrchestrator().initialize
+            ).toHaveBeenCalledTimes(1);
+            expect(container.getIpcService().setupHandlers).toHaveBeenCalledTimes(1);
         });
 
         it("should handle service creation order independence", async ({

@@ -10,6 +10,7 @@
  */
 
 import { isDevelopment } from "@shared/utils/environment";
+import { ensureError } from "@shared/utils/errorHandling";
 
 import type { EventKey, EventMiddleware, TypedEventMap } from "./TypedEventBus";
 
@@ -394,14 +395,13 @@ export function createErrorHandlingMiddleware<
             try {
                 await proceed();
             } catch (error: unknown) {
-                const normalizedError =
-                    error instanceof Error ? error : new Error(String(error));
+                const normalizedError = ensureError(error);
 
                 baseLogger.error(
                     `[EventBus] Error in event '${typedEvent}': ${normalizedError.message}`,
+                    normalizedError,
                     {
                         data: formatLoggableData(typedData),
-                        error: normalizedError,
                         event: typedEvent,
                         serializedData: safeSerialize(data),
                     }
@@ -655,13 +655,12 @@ export function createValidationMiddleware<
 
                 await proceed();
             } catch (error: unknown) {
-                const normalizedError =
-                    error instanceof Error ? error : new Error(String(error));
+                const normalizedError = ensureError(error);
                 baseLogger.error(
                     `[EventBus] Validator threw error for event '${event}'`,
+                    normalizedError,
                     {
                         data: formatLoggableData(data),
-                        error: normalizedError,
                         event,
                         serializedData: safeSerialize(data),
                     }

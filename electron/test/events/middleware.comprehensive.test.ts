@@ -245,10 +245,11 @@ describe("middleware.ts - Additional Coverage", () => {
                 expect.stringContaining(
                     "Validator threw error for event 'test:event'"
                 ),
+                expect.any(Error),
                 expect.objectContaining({
                     event: "test:event",
                     data: { data: "test" },
-                    error: expect.any(Error),
+                    serializedData: expect.any(String),
                 })
             );
             expect(next).not.toHaveBeenCalled();
@@ -653,9 +654,10 @@ describe("middleware.ts - Additional Coverage", () => {
                 expect.stringContaining(
                     "[EventBus] Error in event 'test:event': String error"
                 ),
+                expect.any(Error),
                 expect.objectContaining({
-                    error: expect.any(Error),
                     event: "test:event",
+                    serializedData: expect.any(String),
                 })
             );
         });
@@ -684,10 +686,13 @@ describe("middleware.ts - Additional Coverage", () => {
 
             expect(mockLogger.error).toHaveBeenCalledWith(
                 "[EventBus] Error in event 'test:event': Test error",
+                expect.any(Error),
                 expect.objectContaining({
                     event: "test:event",
                     data: expect.stringContaining("Unserializable object"),
-                    error: expect.any(Error),
+                    serializedData: expect.stringContaining(
+                        "Unserializable object"
+                    ),
                 })
             );
         });

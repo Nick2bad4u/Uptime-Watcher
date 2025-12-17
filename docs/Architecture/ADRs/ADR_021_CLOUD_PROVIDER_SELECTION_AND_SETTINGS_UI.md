@@ -1,7 +1,7 @@
 ---
 schema: "../../../config/schemas/doc-frontmatter.schema.json"
 title: "ADR-021: Cloud Provider Selection and Settings UI"
-summary: "Defines a provider-tabbed Cloud settings UX, enforces a single active provider at a time, and documents a roadmap for the Google Drive provider."
+summary: "Defines a provider-tabbed Cloud settings UX, enforces a single active provider at a time, and documents a roadmap for future providers (e.g. WebDAV)."
 created: "2025-12-15"
 last_reviewed: "2025-12-16"
 category: "guide"
@@ -169,6 +169,7 @@ Key main-process modules:
 
 - Orchestration: `electron/services/cloud/CloudService.ts`
 - Provider: `electron/services/cloud/providers/dropbox/*`
+- Provider: `electron/services/cloud/providers/googleDrive/*`
 
 ## Testing & validation
 

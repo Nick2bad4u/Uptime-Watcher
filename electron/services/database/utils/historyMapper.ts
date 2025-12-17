@@ -14,6 +14,7 @@
 import type { StatusHistory } from "@shared/types";
 import type { HistoryRow as DatabaseHistoryRow } from "@shared/types/database";
 
+import { ensureError } from "@shared/utils/errorHandling";
 import { LOG_TEMPLATES } from "@shared/utils/logTemplates";
 
 import { logger } from "../../../utils/logger";
@@ -193,9 +194,9 @@ export function rowToHistoryEntry(row: DatabaseHistoryRow): StatusHistory {
             status: validateStatus(row.status),
             timestamp: safeNumber(row.timestamp, Date.now()),
         };
-    } catch (error) {
-        logger.error(LOG_TEMPLATES.errors.HISTORY_MAPPER_FAILED, {
-            error,
+    } catch (error: unknown) {
+        const normalizedError = ensureError(error);
+        logger.error(LOG_TEMPLATES.errors.HISTORY_MAPPER_FAILED, normalizedError, {
             responseTime: row.responseTime,
             row,
             status: row.status,

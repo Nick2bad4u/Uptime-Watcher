@@ -3,7 +3,7 @@ schema: "../config/schemas/doc-frontmatter.schema.json"
 title: "Uptime Watcher Consistency Guide"
 summary: "Architectural patterns, conventions, and standards for consistency across the Uptime Watcher codebase."
 created: "2025-11-15"
-last_reviewed: "2025-11-17"
+last_reviewed: "2025-12-16"
 category: "guide"
 author: "Nick2bad4u"
 tags:
@@ -35,9 +35,16 @@ This document outlines the architectural patterns, conventions, and standards fo
 
 ## Error Handling Standards
 
-### 1. Use withErrorHandling for All Service Operations
+### 1. Prefer withErrorHandling at service boundaries
 
-**Pattern**: All service methods that can fail should use the standardized `withErrorHandling()` utility.
+**Pattern**: Service _entrypoints_ (public methods and other boundary-facing
+operations) should prefer standardized wrappers like `withErrorHandling()`.
+
+> Internal helpers may still use local `try/catch` when they are on the hot
+> path, when they need to return partial results instead of throwing, or when
+> wrapping every inner call would reduce readability. In those cases, catch
+> blocks must still normalize errors with `ensureError()` and log using the
+> standard logger.
 
 ```typescript
 // ✅ Correct - Using withErrorHandling with backend context
@@ -66,11 +73,11 @@ public async migrateData(): Promise<void> {
 }
 ```
 
-**Files Using This Pattern**:
+**Representative files using this pattern**:
 
 - `electron/services/monitoring/MigrationSystem.ts`
 - `electron/services/window/WindowService.ts`
-- All service classes in `electron/services/`
+- Service entrypoints under `electron/services/` and `electron/utils/` where standardized wrappers improve diagnostics
 
 ### 2. Error Context and Correlation
 
@@ -104,7 +111,7 @@ return withErrorHandling(
 import { logger } from "@electron/utils/logger";
 
 logger.info("Service started successfully");
-logger.error("Failed to connect to database", { error: err.message });
+logger.error("Failed to connect to database", err);
 logger.debug("Debug information", { data: someData });
 
 // ❌ Incorrect - Using console

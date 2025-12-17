@@ -185,6 +185,9 @@ const electronAPIMockDefinition = {
         connectDropbox: async (): Promise<CloudStatusSummary> =>
             getCloudStatus(),
 
+        connectGoogleDrive: async (): Promise<CloudStatusSummary> =>
+            getCloudStatus(),
+
         deleteBackup: async (key: string): Promise<CloudBackupEntry[]> => {
             mockState.cloudBackups = mockState.cloudBackups.filter(
                 (entry) => entry.key !== key
@@ -620,6 +623,9 @@ const electronAPIMockDefinition = {
         }),
     },
     notifications: {
+        notifyAppEvent: async (): Promise<void> => {
+            /* Storybook mock: no-op */
+        },
         updatePreferences: async (): Promise<void> => {
             /* Storybook mock: no-op */
         },

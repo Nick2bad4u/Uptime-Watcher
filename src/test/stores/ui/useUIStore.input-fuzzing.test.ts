@@ -663,8 +663,9 @@ describe("UI Store - Property-Based Fuzzing Tests", () => {
             expect(mockOpenExternal).toHaveBeenCalledWith(url);
             expect(mockLogger.error).toHaveBeenCalledWith(
                 "Failed to open external URL via SystemService",
+                failure,
                 expect.objectContaining({
-                    error: failure,
+                    context: undefined,
                     url,
                 })
             );
