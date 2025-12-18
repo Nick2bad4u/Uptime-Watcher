@@ -117,7 +117,7 @@ describe("cloudSyncState", () => {
 
         const entity = state.site["site-1"];
         expect(entity?.deleted).toBeDefined();
-        expect(entity?.fields["monitoring"]?.value).toBeTruthy();
+        expect(entity?.fields["monitoring"]?.value).toBeFalsy();
     });
 
     it("resurrects an entity when a newer write arrives after deletion", () => {

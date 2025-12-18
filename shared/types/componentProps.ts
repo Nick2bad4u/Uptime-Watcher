@@ -327,6 +327,14 @@ export interface StandardButtonProperties
     readonly title?: string;
     /** HTML button type */
     readonly type?: "button" | "reset" | "submit";
+    /**
+     * Optional string value assigned to the underlying HTML button.
+     *
+     * @remarks
+     * This is useful when a shared click handler needs to identify which button
+     * was clicked without relying on `data-*` attributes.
+     */
+    readonly value?: string;
 }
 
 /**

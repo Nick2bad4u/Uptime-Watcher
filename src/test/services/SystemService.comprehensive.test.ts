@@ -170,7 +170,6 @@ describe("SystemService", () => {
                 "http://localhost:3000/status",
                 "https://example.com/path?query=value&other=test",
                 "https://example.com/path#fragment",
-                "https://user:pass@example.com:8080/path",
             ];
 
             for (const url of urls) {
@@ -195,6 +194,8 @@ describe("SystemService", () => {
                 // eslint-disable-next-line no-script-url -- intentionally verifying script protocol rejection
                 "javascript:alert('xss')",
                 "https://example.com/path with spaces",
+                // Disallow embedded credentials in URLs.
+                "https://user:pass@example.com:8080/path",
             ];
 
             for (const url of invalidUrls) {

@@ -34,4 +34,29 @@ describe("logging context helpers", () => {
         expect(sanitizedString).not.toContain("token=abc");
         expect(sanitizedString).not.toMatch(/bearer\s+secret/i);
     });
+
+    it("redacts secrets in object metadata fields", () => {
+        const input = {
+            access_token: "abc",
+            accessToken: "def",
+            refresh_token: "ghi",
+            clientSecret: "jkl",
+            nested: {
+                Authorization: "Bearer should-not-leak",
+                password: "p@ssw0rd",
+            },
+        };
+
+        const sanitized = normalizeLogValue(input);
+        expect(sanitized).toEqual({
+            access_token: "[redacted]",
+            accessToken: "[redacted]",
+            refresh_token: "[redacted]",
+            clientSecret: "[redacted]",
+            nested: {
+                Authorization: "[redacted]",
+                password: "[redacted]",
+            },
+        });
+    });
 });

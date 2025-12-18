@@ -37,15 +37,13 @@ export const syncSettingsAfterRehydration = (
         !hasOwn(settings, "systemNotificationsEnabled") ||
         !hasOwn(settings, "systemNotificationsSoundEnabled");
 
-    logger.info("[SettingsHydration] sync invoked", {
+    logger.debug("[SettingsHydration] sync invoked", {
         matchesDefaults: undefined,
         requiresNormalization,
     });
 
     if (requiresNormalization) {
-        logger.info("[SettingsHydration] applying normalization update", {
-            normalizedSettings,
-        });
+        logger.debug("[SettingsHydration] applying normalization update");
         state.updateSettings(normalizedSettings);
     }
 
@@ -63,7 +61,7 @@ export const syncSettingsAfterRehydration = (
             defaultSettings.systemNotificationsSoundEnabled &&
         normalizedSettings.theme === defaultSettings.theme;
 
-    logger.info("[SettingsHydration] post-normalization status", {
+    logger.debug("[SettingsHydration] post-normalization status", {
         matchesDefaults,
     });
 
@@ -83,20 +81,18 @@ export const syncSettingsAfterRehydration = (
                     "[SettingsHydration] fetching history limit for sync"
                 );
                 const historyLimit = await SettingsService.getHistoryLimit();
-                logger.info(
-                    "[SettingsHydration] applying backend history limit",
-                    { historyLimit }
-                );
+                logger.debug("[SettingsHydration] applying backend history limit", {
+                    historyLimit,
+                });
                 state.updateSettings({ historyLimit });
             } catch (error) {
                 logger.warn(
                     "Failed to sync settings after rehydration:",
                     ensureError(error)
                 );
-                logger.info(
-                    "[SettingsHydration] applying fallback history limit",
-                    { historyLimit: defaultSettings.historyLimit }
-                );
+                logger.debug("[SettingsHydration] applying fallback history limit", {
+                    historyLimit: defaultSettings.historyLimit,
+                });
                 state.updateSettings({
                     historyLimit: defaultSettings.historyLimit,
                 });

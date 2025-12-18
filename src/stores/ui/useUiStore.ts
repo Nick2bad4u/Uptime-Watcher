@@ -33,6 +33,7 @@
 import type { Site } from "@shared/types";
 
 import { ensureError } from "@shared/utils/errorHandling";
+import { getSafeUrlForLogging } from "@shared/utils/urlSafety";
 import { isValidUrl } from "@shared/validation/validatorUtils";
 import { create, type StoreApi, type UseBoundStore } from "zustand";
 import { persist, type PersistOptions } from "zustand/middleware";
@@ -130,11 +131,13 @@ export const useUIStore: UIStoreWithPersist = create<UIStore>()(
                 url: string,
                 context?: { siteName?: string }
             ): void => {
-                logStoreAction("UIStore", "openExternal", { context, url });
+                logStoreAction("UIStore", "openExternal", { context });
 
                 const requestedUrl = url;
-                const urlForMessage: string = url;
-                const isSafeUrl = isValidUrl(requestedUrl);
+                const urlForMessage = getSafeUrlForLogging(url);
+                const isSafeUrl = isValidUrl(requestedUrl, {
+                    disallowAuth: true,
+                });
 
                 if (!isSafeUrl) {
                     logger.warn(
@@ -149,7 +152,7 @@ export const useUIStore: UIStoreWithPersist = create<UIStore>()(
                         .getState()
                         .setStoreError(
                             "system-open-external",
-                            `Unable to open external link (${urlForMessage}): URL must start with http(s)://`
+                            `Unable to open external link (${urlForMessage}): URL must be a valid http(s) URL`
                         );
 
                     return;

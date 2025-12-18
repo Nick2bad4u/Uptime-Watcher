@@ -32,6 +32,9 @@ interface AutomationProcess {
     readonly env?: Record<string, string | undefined>;
 }
 
+const isObjectLike = (value: unknown): value is object =>
+    (typeof value === "object" && value !== null) || typeof value === "function";
+
 function isPlaywrightAutomationFlagSet(
     processContext?: AutomationProcess
 ): boolean {
@@ -46,19 +49,75 @@ function isPlaywrightAutomationFlagSet(
     );
 }
 
-const automationProcess = (
-    globalThis as typeof globalThis & {
-        process?: AutomationProcess;
+/**
+ * Deep-freeze an API object graph before exposing it to the renderer.
+ *
+ * @remarks
+ * `contextBridge.exposeInMainWorld` already prevents direct prototype access
+ * from the renderer, but freezing the object graph provides an additional
+ * guardrail against accidental mutation (and makes tampering easier to detect
+ * in tests).
+ */
+function deepFreezeInPlace(root: unknown): void {
+    if (!isObjectLike(root)) {
+        return;
     }
-).process;
 
-const automationFlag = isPlaywrightAutomationFlagSet(automationProcess);
+    const seen = new WeakSet<object>();
+    const stack: object[] = [root];
+
+    while (stack.length > 0) {
+        const current = stack.pop();
+
+        if (current && !seen.has(current)) {
+            seen.add(current);
+
+            for (const key of Reflect.ownKeys(current)) {
+                const descriptor = Object.getOwnPropertyDescriptor(
+                    current,
+                    key
+                );
+                const value: unknown = descriptor?.value;
+
+                if (isObjectLike(value)) {
+                    stack.push(value);
+                }
+            }
+
+            Object.freeze(current);
+        }
+    }
+}
+
+function toAutomationProcess(value: unknown): AutomationProcess | undefined {
+    if (!isObjectLike(value)) {
+        return undefined;
+    }
+
+    const envCandidate: unknown = Reflect.get(value, "env");
+    if (!isObjectLike(envCandidate)) {
+        return {};
+    }
+
+    const env: Record<string, string | undefined> = {};
+    for (const key of Object.keys(envCandidate)) {
+        const entry: unknown = Reflect.get(envCandidate, key);
+        if (typeof entry === "string") {
+            env[key] = entry;
+        } else if (entry === undefined) {
+            env[key] = undefined;
+        }
+    }
+
+    return { env };
+}
+
+const automationFlag = isPlaywrightAutomationFlagSet(
+    toAutomationProcess(Reflect.get(globalThis, "process"))
+);
 
 if (automationFlag) {
-    const automationTarget = globalThis as typeof globalThis & {
-        playwrightAutomation?: boolean;
-    };
-    automationTarget.playwrightAutomation = true;
+    Reflect.set(globalThis, "playwrightAutomation", true);
 
     contextBridge.exposeInMainWorld("playwrightAutomation", true);
 }
@@ -85,4 +144,5 @@ const electronAPI: ElectronAPI = {
 };
 
 // Expose the modular API to the renderer process
+deepFreezeInPlace(electronAPI);
 contextBridge.exposeInMainWorld("electronAPI", electronAPI);

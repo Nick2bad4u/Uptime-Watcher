@@ -61,6 +61,12 @@ Add the following redirect URI:
 
 - `http://localhost:53682/oauth2/callback`
 
+> Important
+>
+> Dropbox requires an **exact string match** for the redirect URI.
+> If you only configure `http://127.0.0.1:53682/oauth2/callback`, Dropbox will
+> reject the request because the app submits `http://localhost:53682/oauth2/callback`.
+
 No webhook URI is required.
 
 ### 127.0.0.1 vs localhost
@@ -71,6 +77,24 @@ Dropbox allows non-HTTPS redirect URIs only for localhost loopback redirects.
 To make this reliable across environments (where `localhost` may resolve to
 `127.0.0.1` or `::1`), the app binds the loopback callback server to **both**
 IPv4 and IPv6 loopback addresses.
+
+If you want an extra safety net in the Dropbox console, you may register both
+values:
+
+- `http://localhost:53682/oauth2/callback`
+- `http://127.0.0.1:53682/oauth2/callback`
+
+The app still uses the `localhost` redirect URI.
+
+### Troubleshooting: invalid\_redirect\_uri
+
+If your browser shows an error like:
+
+`https://www.dropbox.com/oauth2/authorize_error?error_name=invalid_redirect_uri`
+
+Open your Dropbox app’s **Redirect URIs** list and confirm it contains:
+
+- `http://localhost:53682/oauth2/callback`
 
 ### Scopes / permissions
 

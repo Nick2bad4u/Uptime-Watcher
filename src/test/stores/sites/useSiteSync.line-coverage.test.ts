@@ -134,6 +134,11 @@ describe("useSiteSync - Line Coverage Completion", () => {
         };
 
         syncActions = createSiteSyncActions(mockDeps);
+
+        // `useSiteSync` stores the StatusUpdateManager in a module-level
+        // singleton. Reset it between tests to avoid mock leakage.
+        syncActions.unsubscribeFromStatusUpdates();
+        vi.clearAllMocks();
     });
 
     describe("Lines 224-230: getSyncStatus error handling", () => {
@@ -179,6 +184,81 @@ describe("useSiteSync - Line Coverage Completion", () => {
     });
 
     describe("Line 262: Logger error in subscribeToStatusUpdates", () => {
+        it("returns fallback diagnostics when called without prior subscription", async () => {
+            const result = await syncActions.retryStatusSubscription();
+
+            expect(result.success).toBeFalsy();
+            expect(result.subscribed).toBeFalsy();
+            expect(result.errors).toContain(
+                "Retry attempted without previously registered callback"
+            );
+            expect(mockDeps.setStatusSubscriptionSummary).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    expectedListeners: LISTENER_NAMES.length,
+                    listenersAttached: 0,
+                    success: false,
+                })
+            );
+        });
+
+        it("clears previous diagnostics before re-subscribing", async () => {
+            const statusUpdateHandlerModule =
+                await import("../../../stores/sites/utils/statusUpdateHandler");
+            const StatusUpdateManagerMock = vi.mocked(
+                statusUpdateHandlerModule.StatusUpdateManager
+            );
+
+            StatusUpdateManagerMock.mockReset();
+            const unsubscribeSpies: Mock<() => void>[] = [];
+            StatusUpdateManagerMock.mockImplementation(
+                function StatusUpdateManagerRetryMock() {
+                    const unsubscribe = createMockFunction<() => void>();
+                    unsubscribeSpies.push(unsubscribe);
+                    return {
+                        getExpectedListenerCount: vi.fn(
+                            () => LISTENER_NAMES.length
+                        ),
+                        subscribe: vi.fn(async () => ({
+                            errors: [],
+                            expectedListeners: LISTENER_NAMES.length,
+                            listenersAttached: LISTENER_NAMES.length,
+                            listenerStates: buildListenerStates(
+                                LISTENER_NAMES.length
+                            ),
+                            success: true,
+                        })),
+                        unsubscribe,
+                    } as unknown as StatusUpdateManager;
+                }
+            );
+
+            const callback = vi.fn();
+            await syncActions.subscribeToStatusUpdates(callback);
+
+            mockDeps.setStatusSubscriptionSummary.mockClear();
+
+            const retryResult = await syncActions.retryStatusSubscription();
+
+            expect(retryResult.success).toBeTruthy();
+            expect(retryResult.subscribed).toBeTruthy();
+            expect(StatusUpdateManagerMock.mock.instances.length).toBeGreaterThanOrEqual(
+                2
+            );
+            expect(unsubscribeSpies[0]).toHaveBeenCalledTimes(1);
+            expect(mockDeps.setStatusSubscriptionSummary).toHaveBeenNthCalledWith(
+                1,
+                undefined
+            );
+            expect(mockDeps.setStatusSubscriptionSummary).toHaveBeenNthCalledWith(
+                2,
+                expect.objectContaining({
+                    expectedListeners: LISTENER_NAMES.length,
+                    listenersAttached: LISTENER_NAMES.length,
+                    success: true,
+                })
+            );
+        });
+
         it("should log error when StatusUpdateManager.subscribe throws", async ({
             task,
             annotate,
@@ -190,90 +270,6 @@ describe("useSiteSync - Line Coverage Completion", () => {
 
             const mockCallback = vi.fn();
             const testError = new Error("Subscribe failed");
-
-            describe("retryStatusSubscription", () => {
-                it("returns fallback diagnostics when called without prior subscription", async () => {
-                    const result = await syncActions.retryStatusSubscription();
-
-                    expect(result.success).toBeFalsy();
-                    expect(result.subscribed).toBeFalsy();
-                    expect(result.errors).toContain(
-                        "Retry attempted without previously registered callback"
-                    );
-                    expect(
-                        mockDeps.setStatusSubscriptionSummary
-                    ).toHaveBeenCalledWith(
-                        expect.objectContaining({
-                            expectedListeners: LISTENER_NAMES.length,
-                            listenersAttached: 0,
-                            success: false,
-                        })
-                    );
-                });
-            });
-
-            describe("retryStatusSubscription success path", () => {
-                it("clears previous diagnostics before re-subscribing", async () => {
-                    const statusUpdateHandlerModule =
-                        await import("../../../stores/sites/utils/statusUpdateHandler");
-                    const StatusUpdateManagerMock = vi.mocked(
-                        statusUpdateHandlerModule.StatusUpdateManager
-                    );
-
-                    StatusUpdateManagerMock.mockReset();
-                    const unsubscribeSpies: Mock<() => void>[] = [];
-                    StatusUpdateManagerMock.mockImplementation(
-                        function StatusUpdateManagerRetryMock() {
-                            const unsubscribe =
-                                createMockFunction<() => void>();
-                            unsubscribeSpies.push(unsubscribe);
-                            return {
-                                getExpectedListenerCount: vi.fn(
-                                    () => LISTENER_NAMES.length
-                                ),
-                                subscribe: vi.fn(async () => ({
-                                    errors: [],
-                                    expectedListeners: LISTENER_NAMES.length,
-                                    listenersAttached: LISTENER_NAMES.length,
-                                    listenerStates: buildListenerStates(
-                                        LISTENER_NAMES.length
-                                    ),
-                                    success: true,
-                                })),
-                                unsubscribe,
-                            } as unknown as StatusUpdateManager;
-                        }
-                    );
-
-                    const callback = vi.fn();
-                    await syncActions.subscribeToStatusUpdates(callback);
-
-                    mockDeps.setStatusSubscriptionSummary.mockClear();
-
-                    const retryResult =
-                        await syncActions.retryStatusSubscription();
-
-                    expect(retryResult.success).toBeTruthy();
-                    expect(retryResult.subscribed).toBeTruthy();
-                    expect(
-                        StatusUpdateManagerMock.mock.instances.length
-                    ).toBeGreaterThanOrEqual(2);
-                    expect(unsubscribeSpies[0]).toHaveBeenCalledTimes(1);
-                    expect(
-                        mockDeps.setStatusSubscriptionSummary
-                    ).toHaveBeenNthCalledWith(1, undefined);
-                    expect(
-                        mockDeps.setStatusSubscriptionSummary
-                    ).toHaveBeenNthCalledWith(
-                        2,
-                        expect.objectContaining({
-                            expectedListeners: LISTENER_NAMES.length,
-                            listenersAttached: LISTENER_NAMES.length,
-                            success: true,
-                        })
-                    );
-                });
-            });
 
             // Mock StatusUpdateManager to throw during subscribe
             const statusUpdateHandlerModule =

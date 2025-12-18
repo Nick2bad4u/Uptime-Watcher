@@ -175,6 +175,37 @@ describe("WebsocketKeepaliveMonitor service", () => {
         expect(result.status).toBe("down");
         expect(result.details).toContain("handshake failed");
     });
+
+    it("does not create a socket when the AbortSignal is already aborted", async () => {
+        const monitor = createMonitor();
+        const controller = new AbortController();
+        controller.abort();
+
+        const result = await service.check(monitor, controller.signal);
+
+        expect(socketInstances).toHaveLength(0);
+        expect(result.status).toBe("down");
+        expect(result.details ?? result.error).toContain("aborted");
+    });
+
+    it("terminates the socket when aborted during the check", async () => {
+        const monitor = createMonitor();
+        const controller = new AbortController();
+
+        const checkPromise = service.check(monitor, controller.signal);
+        const socket = socketInstances.at(-1);
+        expect(socket).toBeDefined();
+
+        socket!.readyState = socketReadyState.OPEN;
+        socket!.emit("open");
+
+        controller.abort();
+
+        const result = await checkPromise;
+        expect(result.status).toBe("down");
+        expect(result.details ?? result.error).toContain("aborted");
+        expect(socket!.terminate).toHaveBeenCalled();
+    });
 });
 
 /* eslint-enable unicorn/prefer-event-target */

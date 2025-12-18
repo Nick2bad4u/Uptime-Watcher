@@ -18,6 +18,8 @@ vi.mock("node-sqlite3-wasm", () => {
             exec: vi.fn(),
             close: vi.fn(),
             run: vi.fn(),
+            get: vi.fn(),
+            all: vi.fn(),
             prepare: vi.fn(() => ({
                 run: vi.fn(),
                 get: vi.fn(),

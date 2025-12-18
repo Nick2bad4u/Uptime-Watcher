@@ -29,6 +29,8 @@ vi.mock("electron", () => {
             send: vi.fn(),
             setWindowOpenHandler: vi.fn(),
             session: {
+                setPermissionCheckHandler: vi.fn(),
+                setPermissionRequestHandler: vi.fn(),
                 webRequest: {
                     onHeadersReceived: vi.fn(),
                 },
@@ -190,6 +192,13 @@ describe(WindowService, () => {
 
             const window = windowService.createMainWindow();
 
+            expect(
+                window.webContents.session.setPermissionCheckHandler
+            ).toHaveBeenCalledWith(expect.any(Function));
+            expect(
+                window.webContents.session.setPermissionRequestHandler
+            ).toHaveBeenCalledWith(expect.any(Function));
+
             expect(BrowserWindow).toHaveBeenCalledWith({
                 height: 800,
                 minHeight: 600,
@@ -202,7 +211,7 @@ describe(WindowService, () => {
                     nodeIntegrationInSubFrames: false,
                     nodeIntegrationInWorker: false,
                     preload: expect.any(String),
-                    sandbox: false,
+                    sandbox: true,
                     webSecurity: true,
                     webviewTag: false,
                     allowRunningInsecureContent: false,

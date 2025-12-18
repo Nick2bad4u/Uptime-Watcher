@@ -436,11 +436,24 @@ describe("IpcService - Comprehensive Coverage", () => {
             expect(handleCall).toBeDefined();
 
             const handler = handleCall![1];
+            const mockMonitor: Monitor = {
+                checkInterval: 5000,
+                history: [],
+                id: "monitor-1",
+                monitoring: true,
+                responseTime: -1,
+                retryAttempts: 0,
+                status: "pending",
+                timeout: 1000,
+                type: "http",
+                url: "https://example.com",
+            };
+
             const mockSite: Site = {
                 identifier: "new-site",
                 name: "New Site",
                 monitoring: true,
-                monitors: [],
+                monitors: [mockMonitor],
             };
 
             const result = await handler(mockIpcEvent, mockSite);

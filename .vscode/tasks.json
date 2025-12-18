@@ -5,7 +5,7 @@
             "detail": "Starts the Vite development server for the application.",
             "group": "build",
             "icon": {
-                "color": "terminal.ansiGreen",
+                "color": "terminal.ansiCyan",
                 "id": "play"
             },
             "isBackground": true,
@@ -129,7 +129,7 @@
                 "color": "terminal.ansiMagenta",
                 "id": "paintcan"
             },
-            "isBackground": true,
+            "isBackground": false,
             "label": "Lint:CSS:Fix",
             "presentation": {
                 "clear": true,
@@ -171,7 +171,7 @@
                 "color": "terminal.ansiCyan",
                 "id": "check-all"
             },
-            "isBackground": true,
+            "isBackground": false,
             "label": "Type-check:All",
             "presentation": {
                 "clear": true,
@@ -213,7 +213,7 @@
                 "color": "terminal.ansiMagenta",
                 "id": "tools"
             },
-            "isBackground": true,
+            "isBackground": false,
             "label": "Lint:Fix",
             "presentation": {
                 "clear": true,
@@ -261,7 +261,7 @@
                 "color": "terminal.ansiGreen",
                 "id": "beaker"
             },
-            "isBackground": true,
+            "isBackground": false,
             "label": "Test",
             "presentation": {
                 "clear": true,
@@ -305,9 +305,9 @@
             "group": "test",
             "icon": {
                 "color": "terminal.ansiGreen",
-                "id": "beaker-stop"
+                "id": "browser"
             },
-            "isBackground": true,
+            "isBackground": false,
             "label": "Test:Playwright",
             "presentation": {
                 "clear": true,
@@ -348,7 +348,7 @@
                 "color": "terminal.ansiRed",
                 "id": "graph"
             },
-            "isBackground": true,
+            "isBackground": false,
             "label": "Test:Coverage",
             "presentation": {
                 "clear": true,
@@ -392,9 +392,9 @@
             "group": "test",
             "icon": {
                 "color": "terminal.ansiRed",
-                "id": "graph"
+                "id": "library"
             },
-            "isBackground": true,
+            "isBackground": false,
             "label": "Test:Shared:Coverage",
             "presentation": {
                 "clear": true,
@@ -438,9 +438,9 @@
             "group": "test",
             "icon": {
                 "color": "terminal.ansiRed",
-                "id": "graph"
+                "id": "bug"
             },
-            "isBackground": true,
+            "isBackground": false,
             "label": "Test:Electron:Coverage",
             "presentation": {
                 "clear": true,
@@ -484,9 +484,9 @@
             "group": "test",
             "icon": {
                 "color": "terminal.ansiRed",
-                "id": "graph"
+                "id": "book"
             },
-            "isBackground": true,
+            "isBackground": false,
             "label": "Test:Storybook:Coverage",
             "presentation": {
                 "clear": true,
@@ -532,7 +532,7 @@
                 "color": "terminal.ansiYellow",
                 "id": "checklist"
             },
-            "isBackground": true,
+            "isBackground": false,
             "label": "Lint:All:Fix",
             "presentation": {
                 "clear": true,

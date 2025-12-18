@@ -3,9 +3,18 @@ import os from "node:os";
 import path from "node:path";
 
 import { FilesystemCloudStorageProvider } from "@electron/services/cloud/providers/FilesystemCloudStorageProvider";
+import { CLOUD_SYNC_SCHEMA_VERSION } from "@shared/types/cloudSync";
 import { SyncEngine } from "@electron/services/sync/SyncEngine";
 import type { Monitor, Site } from "@shared/types";
+import {
+    DEFAULT_CHECK_INTERVAL,
+    DEFAULT_REQUEST_TIMEOUT,
+} from "@electron/constants";
 import { describe, expect, it, vi } from "vitest";
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+    return typeof value === "object" && value !== null && !Array.isArray(value);
+}
 
 /* eslint-disable unicorn/numeric-separators-style -- Test constants like 1_000 / 60_000 don't match the project's strict grouping rule; readability here is preferred. */
 
@@ -185,6 +194,492 @@ describe("SyncEngine (ADR-016)", () => {
             );
         } finally {
             vi.useRealTimers();
+            await fs.rm(baseDirectory, { force: true, recursive: true });
+        }
+    });
+
+    it("rebuilds from ops when snapshot is unreadable (ignores compaction)", async () => {
+        vi.useFakeTimers();
+
+        const baseDirectory = await fs.mkdtemp(
+            path.join(os.tmpdir(), "uptime-watcher-sync-")
+        );
+
+        try {
+            const provider = new FilesystemCloudStorageProvider({
+                baseDirectory,
+            });
+
+            const remoteDeviceId = "remote-device";
+            const snapshotKey = `sync/snapshots/${CLOUD_SYNC_SCHEMA_VERSION}/1.json`;
+
+            // Write an unreadable snapshot (invalid JSON), but mark operations
+            // as compacted in the manifest. Without the snapshot-trust guard,
+            // SyncEngine would drop opId 0 and lose state.
+            await provider.uploadObject({
+                buffer: Buffer.from("{", "utf8"),
+                key: snapshotKey,
+                overwrite: true,
+            });
+
+            const monitorId = globalThis.crypto.randomUUID();
+            const opObjectKey =
+                "sync/devices/remote-device/ops/2-0-9.ndjson";
+            const ops = [
+                {
+                    deviceId: remoteDeviceId,
+                    entityId: "example.com",
+                    entityType: "site",
+                    field: "name",
+                    kind: "set-field",
+                    opId: 0,
+                    syncSchemaVersion: CLOUD_SYNC_SCHEMA_VERSION,
+                    timestamp: 1,
+                    value: "Remote Name",
+                },
+                {
+                    deviceId: remoteDeviceId,
+                    entityId: "example.com",
+                    entityType: "site",
+                    field: "monitoring",
+                    kind: "set-field",
+                    opId: 1,
+                    syncSchemaVersion: CLOUD_SYNC_SCHEMA_VERSION,
+                    timestamp: 1,
+                    value: true,
+                },
+                {
+                    deviceId: remoteDeviceId,
+                    entityId: "example.com",
+                    entityType: "site",
+                    field: "isEnabled",
+                    kind: "set-field",
+                    opId: 2,
+                    syncSchemaVersion: CLOUD_SYNC_SCHEMA_VERSION,
+                    timestamp: 1,
+                    value: true,
+                },
+                {
+                    deviceId: remoteDeviceId,
+                    entityId: monitorId,
+                    entityType: "monitor",
+                    field: "siteIdentifier",
+                    kind: "set-field",
+                    opId: 3,
+                    syncSchemaVersion: CLOUD_SYNC_SCHEMA_VERSION,
+                    timestamp: 1,
+                    value: "example.com",
+                },
+                {
+                    deviceId: remoteDeviceId,
+                    entityId: monitorId,
+                    entityType: "monitor",
+                    field: "type",
+                    kind: "set-field",
+                    opId: 4,
+                    syncSchemaVersion: CLOUD_SYNC_SCHEMA_VERSION,
+                    timestamp: 1,
+                    value: "http",
+                },
+                {
+                    deviceId: remoteDeviceId,
+                    entityId: monitorId,
+                    entityType: "monitor",
+                    field: "url",
+                    kind: "set-field",
+                    opId: 5,
+                    syncSchemaVersion: CLOUD_SYNC_SCHEMA_VERSION,
+                    timestamp: 1,
+                    value: "https://example.com",
+                },
+                {
+                    deviceId: remoteDeviceId,
+                    entityId: monitorId,
+                    entityType: "monitor",
+                    field: "monitoring",
+                    kind: "set-field",
+                    opId: 6,
+                    syncSchemaVersion: CLOUD_SYNC_SCHEMA_VERSION,
+                    timestamp: 1,
+                    value: true,
+                },
+                {
+                    deviceId: remoteDeviceId,
+                    entityId: monitorId,
+                    entityType: "monitor",
+                    field: "checkInterval",
+                    kind: "set-field",
+                    opId: 7,
+                    syncSchemaVersion: CLOUD_SYNC_SCHEMA_VERSION,
+                    timestamp: 1,
+                    value: 60_000,
+                },
+                {
+                    deviceId: remoteDeviceId,
+                    entityId: monitorId,
+                    entityType: "monitor",
+                    field: "retryAttempts",
+                    kind: "set-field",
+                    opId: 8,
+                    syncSchemaVersion: CLOUD_SYNC_SCHEMA_VERSION,
+                    timestamp: 1,
+                    value: 1,
+                },
+                {
+                    deviceId: remoteDeviceId,
+                    entityId: monitorId,
+                    entityType: "monitor",
+                    field: "timeout",
+                    kind: "set-field",
+                    opId: 9,
+                    syncSchemaVersion: CLOUD_SYNC_SCHEMA_VERSION,
+                    timestamp: 1,
+                    value: 10_000,
+                },
+            ];
+
+            await provider.uploadObject({
+                buffer: Buffer.from(
+                    `${ops.map((op) => JSON.stringify(op)).join("\n")}\n`,
+                    "utf8"
+                ),
+                key: opObjectKey,
+                overwrite: true,
+            });
+
+            await provider.uploadObject({
+                buffer: Buffer.from(
+                    JSON.stringify({
+                        devices: {
+                            [remoteDeviceId]: {
+                                compactedUpToOpId: 9,
+                                lastSeenAt: 1,
+                            },
+                        },
+                        latestSnapshotKey: snapshotKey,
+                        manifestVersion: 1,
+                        syncSchemaVersion: CLOUD_SYNC_SCHEMA_VERSION,
+                    }),
+                    "utf8"
+                ),
+                key: "manifest.json",
+                overwrite: true,
+            });
+
+            const orchestrator = new InMemoryOrchestrator([]);
+            const settings = new InMemorySettingsAdapter();
+            const engine = new SyncEngine({
+                orchestrator,
+                settings,
+            });
+
+            await engine.syncNow(provider);
+
+            const sites = await orchestrator.getSites();
+            expect(sites).toHaveLength(1);
+            expect(sites[0]?.identifier).toBe("example.com");
+            expect(sites[0]?.name).toBe("Remote Name");
+        } finally {
+            vi.useRealTimers();
+            await fs.rm(baseDirectory, { force: true, recursive: true });
+        }
+    });
+
+    it("fills missing monitor defaults when writing snapshots", async () => {
+        const baseDirectory = await fs.mkdtemp(
+            path.join(os.tmpdir(), "uptime-watcher-sync-defaults-")
+        );
+
+        try {
+            const provider = new FilesystemCloudStorageProvider({
+                baseDirectory,
+            });
+
+            const remoteDeviceId = "remote";
+            const siteId = "example.com";
+            const monitorId = globalThis.crypto.randomUUID();
+
+            const opsKey = "sync/devices/remote/ops/2-0-4.ndjson";
+            const ops = [
+                {
+                    deviceId: remoteDeviceId,
+                    entityId: siteId,
+                    entityType: "site",
+                    field: "monitoring",
+                    kind: "set-field",
+                    opId: 0,
+                    syncSchemaVersion: CLOUD_SYNC_SCHEMA_VERSION,
+                    timestamp: 1,
+                    value: true,
+                },
+                {
+                    deviceId: remoteDeviceId,
+                    entityId: siteId,
+                    entityType: "site",
+                    field: "name",
+                    kind: "set-field",
+                    opId: 1,
+                    syncSchemaVersion: CLOUD_SYNC_SCHEMA_VERSION,
+                    timestamp: 1,
+                    value: "Example",
+                },
+                {
+                    deviceId: remoteDeviceId,
+                    entityId: monitorId,
+                    entityType: "monitor",
+                    field: "siteIdentifier",
+                    kind: "set-field",
+                    opId: 2,
+                    syncSchemaVersion: CLOUD_SYNC_SCHEMA_VERSION,
+                    timestamp: 1,
+                    value: siteId,
+                },
+                {
+                    deviceId: remoteDeviceId,
+                    entityId: monitorId,
+                    entityType: "monitor",
+                    field: "type",
+                    kind: "set-field",
+                    opId: 3,
+                    syncSchemaVersion: CLOUD_SYNC_SCHEMA_VERSION,
+                    timestamp: 1,
+                    value: "http",
+                },
+                {
+                    deviceId: remoteDeviceId,
+                    entityId: monitorId,
+                    entityType: "monitor",
+                    field: "url",
+                    kind: "set-field",
+                    opId: 4,
+                    syncSchemaVersion: CLOUD_SYNC_SCHEMA_VERSION,
+                    timestamp: 1,
+                    value: "https://example.com",
+                },
+            ];
+
+            await provider.uploadObject({
+                buffer: Buffer.from(
+                    `${ops.map((op) => JSON.stringify(op)).join("\n")}\n`,
+                    "utf8"
+                ),
+                key: opsKey,
+                overwrite: true,
+            });
+
+            const orchestrator = new InMemoryOrchestrator([]);
+            const settings = new InMemorySettingsAdapter();
+            const engine = new SyncEngine({ orchestrator, settings });
+
+            await engine.syncNow(provider);
+
+            const snapshotEntries = await provider.listObjects(
+                `sync/snapshots/${CLOUD_SYNC_SCHEMA_VERSION}/`
+            );
+            expect(snapshotEntries.length).toBeGreaterThan(0);
+
+            const snapshotKey = snapshotEntries.find((entry) =>
+                entry.key.endsWith(".json")
+            )?.key;
+            expect(snapshotKey).toBeTruthy();
+
+            const snapshotRaw = Buffer.from(
+                await provider.downloadObject(snapshotKey!)
+            ).toString("utf8");
+            const snapshotJson: unknown = JSON.parse(snapshotRaw);
+
+            // Verify that defaults are present in the snapshot state for the
+            // monitor entry.
+            if (!isRecord(snapshotJson)) {
+                throw new TypeError("Expected snapshot JSON object");
+            }
+
+            const state = snapshotJson["state"];
+            if (!isRecord(state)) {
+                throw new TypeError("Expected snapshot state object");
+            }
+
+            const monitor = state["monitor"];
+            if (!isRecord(monitor)) {
+                throw new TypeError("Expected snapshot monitor object");
+            }
+
+            const monitorState = monitor[monitorId];
+            if (!isRecord(monitorState)) {
+                throw new TypeError("Expected snapshot monitor state object");
+            }
+
+                const fields = monitorState["fields"];
+                if (!isRecord(fields)) {
+                    throw new TypeError("Expected snapshot monitor fields object");
+                }
+
+                const checkIntervalField = fields["checkInterval"];
+                const retryAttemptsField = fields["retryAttempts"];
+                const timeoutField = fields["timeout"];
+                const monitoringField = fields["monitoring"];
+
+                if (
+                    !isRecord(checkIntervalField) ||
+                    !isRecord(retryAttemptsField) ||
+                    !isRecord(timeoutField) ||
+                    !isRecord(monitoringField)
+                ) {
+                    throw new TypeError("Expected snapshot monitor field entries");
+                }
+
+                expect(checkIntervalField["value"]).toBe(DEFAULT_CHECK_INTERVAL);
+                expect(retryAttemptsField["value"]).toBe(3);
+                expect(timeoutField["value"]).toBe(DEFAULT_REQUEST_TIMEOUT);
+                expect(monitoringField["value"]).toBeTruthy();
+        } finally {
+            await fs.rm(baseDirectory, { force: true, recursive: true });
+        }
+    });
+
+    it("does not crash sync when applying a remote site fails", async () => {
+        const baseDirectory = await fs.mkdtemp(
+            path.join(os.tmpdir(), "uptime-watcher-sync-invalid-")
+        );
+
+        try {
+            const provider = new FilesystemCloudStorageProvider({ baseDirectory });
+
+            const siteId = "example.com";
+            const monitorId = globalThis.crypto.randomUUID();
+
+            // Create remote ops defining a valid http monitor/site. We then force
+            // orchestrator.addSite to throw to emulate a validation failure.
+            const opsKey = `sync/devices/remote/ops/${Date.now()}-0-9.ndjson`;
+            const ops = [
+                {
+                    deviceId: "remote",
+                    entityId: siteId,
+                    entityType: "site",
+                    field: "name",
+                    kind: "set-field",
+                    opId: 0,
+                    syncSchemaVersion: CLOUD_SYNC_SCHEMA_VERSION,
+                    timestamp: 1,
+                    value: siteId,
+                },
+                {
+                    deviceId: "remote",
+                    entityId: siteId,
+                    entityType: "site",
+                    field: "monitoring",
+                    kind: "set-field",
+                    opId: 1,
+                    syncSchemaVersion: CLOUD_SYNC_SCHEMA_VERSION,
+                    timestamp: 1,
+                    value: true,
+                },
+                {
+                    deviceId: "remote",
+                    entityId: siteId,
+                    entityType: "site",
+                    field: "isEnabled",
+                    kind: "set-field",
+                    opId: 2,
+                    syncSchemaVersion: CLOUD_SYNC_SCHEMA_VERSION,
+                    timestamp: 1,
+                    value: true,
+                },
+                {
+                    deviceId: "remote",
+                    entityId: monitorId,
+                    entityType: "monitor",
+                    field: "siteIdentifier",
+                    kind: "set-field",
+                    opId: 3,
+                    syncSchemaVersion: CLOUD_SYNC_SCHEMA_VERSION,
+                    timestamp: 1,
+                    value: siteId,
+                },
+                {
+                    deviceId: "remote",
+                    entityId: monitorId,
+                    entityType: "monitor",
+                    field: "type",
+                    kind: "set-field",
+                    opId: 4,
+                    syncSchemaVersion: CLOUD_SYNC_SCHEMA_VERSION,
+                    timestamp: 1,
+                    value: "http",
+                },
+                {
+                    deviceId: "remote",
+                    entityId: monitorId,
+                    entityType: "monitor",
+                    field: "url",
+                    kind: "set-field",
+                    opId: 5,
+                    syncSchemaVersion: CLOUD_SYNC_SCHEMA_VERSION,
+                    timestamp: 1,
+                    value: "https://example.com",
+                },
+                {
+                    deviceId: "remote",
+                    entityId: monitorId,
+                    entityType: "monitor",
+                    field: "monitoring",
+                    kind: "set-field",
+                    opId: 6,
+                    syncSchemaVersion: CLOUD_SYNC_SCHEMA_VERSION,
+                    timestamp: 1,
+                    value: true,
+                },
+                {
+                    deviceId: "remote",
+                    entityId: monitorId,
+                    entityType: "monitor",
+                    field: "checkInterval",
+                    kind: "set-field",
+                    opId: 7,
+                    syncSchemaVersion: CLOUD_SYNC_SCHEMA_VERSION,
+                    timestamp: 1,
+                    value: 60_000,
+                },
+                {
+                    deviceId: "remote",
+                    entityId: monitorId,
+                    entityType: "monitor",
+                    field: "retryAttempts",
+                    kind: "set-field",
+                    opId: 8,
+                    syncSchemaVersion: CLOUD_SYNC_SCHEMA_VERSION,
+                    timestamp: 1,
+                    value: 1,
+                },
+                {
+                    deviceId: "remote",
+                    entityId: monitorId,
+                    entityType: "monitor",
+                    field: "timeout",
+                    kind: "set-field",
+                    opId: 9,
+                    syncSchemaVersion: CLOUD_SYNC_SCHEMA_VERSION,
+                    timestamp: 1,
+                    value: 10_000,
+                },
+            ];
+
+            await provider.uploadObject({
+                buffer: Buffer.from(`${ops.map((op) => JSON.stringify(op)).join("\n")}\n`, "utf8"),
+                key: opsKey,
+                overwrite: true,
+            });
+
+            const orchestrator = new InMemoryOrchestrator([]);
+            vi.spyOn(orchestrator, "addSite").mockRejectedValueOnce(
+                new Error("Site validation failed")
+            );
+            const settings = new InMemorySettingsAdapter();
+            const engine = new SyncEngine({ orchestrator, settings });
+
+            await expect(engine.syncNow(provider)).resolves.toBeTruthy();
+            expect(orchestrator.addSite).toHaveBeenCalledTimes(1);
+        } finally {
             await fs.rm(baseDirectory, { force: true, recursive: true });
         }
     });

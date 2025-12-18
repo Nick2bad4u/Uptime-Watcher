@@ -2,6 +2,8 @@
 
 import type { IncomingMessage, Server, ServerResponse } from "node:http";
 
+import { ensureError } from "@shared/utils/errorHandling";
+import { isRecord } from "@shared/utils/typeHelpers";
 import { randomBytes } from "node:crypto";
 import { once } from "node:events";
 import { createServer } from "node:http";
@@ -29,6 +31,33 @@ export const DEFAULT_OAUTH_LOOPBACK_PORT = 53_682;
 export const DEFAULT_OAUTH_LOOPBACK_PATH = "/oauth2/callback";
 
 const LOOPBACK_HOSTS = ["127.0.0.1", "::1"] as const;
+
+function escapeHtml(value: string): string {
+    return value
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#39;");
+}
+
+function assertSafeRedirectHost(redirectHost: string): void {
+    // The redirect host is interpolated into the redirect URI.
+    // Restrict it to typical loopback values to avoid accidental exposure.
+    switch (redirectHost) {
+        case "127.0.0.1":
+        case "[::1]":
+        case "localhost": {
+            return;
+        }
+
+        default: {
+            throw new Error(
+                `Invalid redirectHost '${redirectHost}'. Expected one of: localhost, 127.0.0.1, [::1].`
+            );
+        }
+    }
+}
 
 async function closeHttpServer(server: Server): Promise<void> {
     return new Promise<void>((resolve, reject) => {
@@ -87,8 +116,21 @@ function writeHtml(
 ): void {
     response.statusCode = args.statusCode;
     response.setHeader("Content-Type", "text/html; charset=utf-8");
+
+    // Defensive security headers for the browser page.
+    response.setHeader("Cache-Control", "no-store");
+    response.setHeader("X-Content-Type-Options", "nosniff");
+    response.setHeader("Referrer-Policy", "no-referrer");
+    response.setHeader(
+        "Content-Security-Policy",
+        "default-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'"
+    );
+
+    const title = escapeHtml(args.title);
+    const body = escapeHtml(args.body);
+
     response.end(
-        `<!doctype html><html><head><meta charset="utf-8" /><title>${args.title}</title></head><body><h2>${args.title}</h2><p>${args.body}</p></body></html>`
+        `<!doctype html><html><head><meta charset="utf-8" /><title>${title}</title></head><body><h2>${title}</h2><p>${body}</p></body></html>`
     );
 }
 
@@ -134,6 +176,10 @@ export async function startLoopbackOAuthServer(args?: {
     const port = args?.port ?? DEFAULT_OAUTH_LOOPBACK_PORT;
     const redirectHost = args?.redirectHost ?? "localhost";
 
+    assertSafeRedirectHost(redirectHost);
+
+    const requiresIpv6 = redirectHost === "[::1]";
+
     const redirectUri = `http://${redirectHost}:${port}${DEFAULT_OAUTH_LOOPBACK_PATH}`;
 
     let resolved = false;
@@ -150,6 +196,15 @@ export async function startLoopbackOAuthServer(args?: {
 
     const servers = LOOPBACK_HOSTS.map((host) => {
         const server = createServer((request, response) => {
+            if (request.method && request.method !== "GET") {
+                writeHtml(response, {
+                    body: "Method not allowed.",
+                    statusCode: 405,
+                    title: "Uptime Watcher OAuth",
+                });
+                return;
+            }
+
             const parsed = parseCallback(request);
 
             if (!parsed.pathOk) {
@@ -200,16 +255,46 @@ export async function startLoopbackOAuthServer(args?: {
         return { host, server };
     });
 
+    // Listen on both IPv4 and IPv6 loopback when possible.
+    // Some environments may not have ::1 configured; in that case we proceed
+    // with IPv4 only.
     await Promise.all(
         servers.map(async ({ host, server }) => {
-            await listenHttpServer(server, { host, port });
+            try {
+                await listenHttpServer(server, { host, port });
+            } catch (error: unknown) {
+                const normalizedError = ensureError(error);
+                const code = isRecord(error) ? error["code"] : undefined;
+
+                if (host === "::1" && code === "EADDRNOTAVAIL") {
+                    if (requiresIpv6) {
+                        await closeHttpServer(server).catch(() => {});
+                        throw new Error(
+                            "IPv6 loopback (::1) is not available but redirectHost is set to [::1]",
+                            { cause: error }
+                        );
+                    }
+
+                    await closeHttpServer(server).catch(() => {});
+                    return;
+                }
+
+                await closeHttpServer(server).catch(() => {});
+                throw normalizedError;
+            }
         })
     );
 
     return {
         close: async (): Promise<void> => {
             await Promise.all(
-                servers.map(({ server }) => closeHttpServer(server))
+                servers.map(async ({ server }) => {
+                    if (!server.listening) {
+                        return;
+                    }
+
+                    await closeHttpServer(server).catch(() => {});
+                })
             );
         },
         redirectUri,

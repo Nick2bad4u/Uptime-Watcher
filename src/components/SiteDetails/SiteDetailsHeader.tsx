@@ -294,7 +294,11 @@ function useSiteDetailsHeaderModel(
             return "";
         }
 
-        return isValidUrl(selectedMonitorUrl) ? selectedMonitorUrl : "";
+        return isValidUrl(selectedMonitorUrl, {
+            disallowAuth: true,
+        })
+            ? selectedMonitorUrl
+            : "";
     }, [hasHttpMonitorUrl, selectedMonitorUrl]);
 
     return useMemo(() => {
@@ -372,7 +376,11 @@ export const SiteDetailsHeader: NamedExoticComponent<SiteDetailsHeaderProperties
         } = useSiteDetailsHeaderModel(site, selectedMonitor);
 
         const isMonitorUrlValid = useMemo(
-            () => hasHttpMonitorUrl && isValidUrl(selectedMonitorUrl),
+            () =>
+                hasHttpMonitorUrl &&
+                isValidUrl(selectedMonitorUrl, {
+                    disallowAuth: true,
+                }),
             [hasHttpMonitorUrl, selectedMonitorUrl]
         );
 

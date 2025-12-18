@@ -91,6 +91,11 @@ export interface MonitorRow extends BaseRow {
      * Expected HTTP status code for status monitors.
      */
     expected_status_code?: number;
+
+    /**
+     * Whether HTTP-based monitors should follow redirects (1) or not (0).
+     */
+    follow_redirects?: number;
     /**
      * Hostname or IP address being monitored.
      */

@@ -29,9 +29,34 @@ function assertSubpath(root: string, candidate: string): void {
     const normalizedRoot = path.resolve(root);
     const normalizedCandidate = path.resolve(candidate);
 
-    if (!normalizedCandidate.startsWith(`${normalizedRoot}${path.sep}`)) {
+    const relative = path.relative(normalizedRoot, normalizedCandidate);
+
+    if (relative.length === 0) {
+        return;
+    }
+
+    // `path.relative` returns an absolute path when drives differ on Windows.
+    if (
+        path.isAbsolute(relative) ||
+        relative === ".." ||
+        relative.startsWith(`..${path.sep}`)
+    ) {
         throw new Error("Invalid key path (path traversal)");
     }
+}
+
+function hasAsciiControlCharacters(value: string): boolean {
+    for (const char of value) {
+        const codePoint = char.codePointAt(0);
+        if (
+            codePoint !== undefined &&
+            (codePoint < 0x20 || codePoint === 0x7f)
+        ) {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 function toPosixKey(root: string, absolutePath: string): string {
@@ -42,7 +67,12 @@ async function toCloudObjectEntry(
     key: string,
     absolutePath: string
 ): Promise<CloudObjectEntry> {
-    const stat = await fs.stat(absolutePath);
+    const stat = await fs.lstat(absolutePath);
+
+    if (stat.isSymbolicLink()) {
+        throw new Error(`Refusing to read cloud object via symlink: ${key}`);
+    }
+
     return {
         key,
         lastModifiedAt: stat.mtimeMs,
@@ -65,6 +95,147 @@ export class FilesystemCloudStorageProvider implements CloudStorageProvider {
 
     private readonly appRoot: string;
 
+    private appRootRealPath: null | string = null;
+
+    private static normalizeKey(rawKey: string): string {
+        const normalized = rawKey.replaceAll("\\", "/");
+
+        // Collapse redundant slashes deterministically without regex.
+        let collapsed = normalized;
+        while (collapsed.includes("//")) {
+            collapsed = collapsed.replaceAll("//", "/");
+        }
+
+        return collapsed;
+    }
+
+    private static assertSafeKey(key: string): void {
+        if (typeof key !== "string" || key.trim().length === 0) {
+            throw new Error("Invalid key (must be a non-empty string)");
+        }
+
+        if (hasAsciiControlCharacters(key)) {
+            throw new Error("Invalid key path (control characters are not allowed)");
+        }
+
+        // Defensive checks:
+        // - no absolute keys
+        // - no drive/namespace tokens
+        // - no null byte
+        if (key.startsWith("/")) {
+            throw new Error("Invalid key path (absolute keys are not allowed)");
+        }
+
+        if (key.includes("\0")) {
+            throw new Error("Invalid key path (null byte)");
+        }
+
+        // Disallow Windows drive letters / NT namespaces in keys.
+        // The provider keys are logical object identifiers, not OS paths.
+        if (key.includes(":")) {
+            throw new Error("Invalid key path (drive tokens are not allowed)");
+        }
+
+        const segments = key.split("/");
+        if (
+            segments.some(
+                (segment) =>
+                    segment.length === 0 ||
+                    segment === "." ||
+                    segment === ".."
+            )
+        ) {
+            throw new Error("Invalid key path (path traversal)");
+        }
+    }
+
+    private async getAppRootRealPath(): Promise<string> {
+        if (this.appRootRealPath) {
+            return this.appRootRealPath;
+        }
+
+        await this.ensureAppRoot();
+        this.appRootRealPath = await fs.realpath(this.appRoot);
+        return this.appRootRealPath;
+    }
+
+    private async assertNoSymlinkPathComponents(
+        root: string,
+        absolutePath: string
+    ): Promise<void> {
+        const relative = path.relative(root, absolutePath);
+
+        if (relative.length === 0) {
+            // Root itself.
+            return;
+        }
+
+        const segments = relative.split(path.sep).filter(Boolean);
+        let cursor = root;
+
+        // Check every existing component; refuse to traverse through symlinks
+        // (including Windows junctions).
+        for (const segment of segments) {
+            cursor = path.join(cursor, segment);
+            // eslint-disable-next-line no-await-in-loop -- must validate each path component sequentially to avoid TOCTOU issues
+            const stat = await fs.lstat(cursor).catch(() => null);
+
+            // Component doesn't exist yet (e.g., upload). That is fine.
+            if (stat?.isSymbolicLink()) {
+                throw new Error(
+                    `Refusing to access cloud object through symlinked path component: ${segment}`
+                );
+            }
+        }
+    }
+
+    private async ensureSafeDirectory(absoluteDirectory: string): Promise<void> {
+        const root = await this.getAppRootRealPath();
+        const resolved = path.resolve(absoluteDirectory);
+        assertSubpath(root, resolved);
+
+        const relative = path.relative(root, resolved);
+        const segments = relative
+            .split(path.sep)
+            .filter((segment) => segment.length > 0);
+
+        let cursor = root;
+        for (const segment of segments) {
+            cursor = path.join(cursor, segment);
+
+            // eslint-disable-next-line no-await-in-loop -- must create/check each segment sequentially to prevent symlink races
+            const stat = await fs.lstat(cursor).catch(() => null);
+            if (stat) {
+                if (stat.isSymbolicLink()) {
+                    throw new Error(
+                        `Refusing to create cloud directory through symlinked path component: ${segment}`
+                    );
+                }
+
+                if (!stat.isDirectory()) {
+                    throw new Error(
+                        `Expected directory but found non-directory entry at '${cursor}'`
+                    );
+                }
+            } else {
+                // eslint-disable-next-line no-await-in-loop -- mkdir must be sequential with the lstat above
+                await fs.mkdir(cursor).catch((error: unknown) => {
+                    const code = isUnknownRecord(error)
+                        ? error["code"]
+                        : undefined;
+
+                    if (code === "EEXIST") {
+                        return;
+                    }
+
+                    throw error;
+                });
+
+                // Directory created.
+            }
+        }
+    }
+
     public async isConnected(): Promise<boolean> {
         try {
             await this.ensureAppRoot();
@@ -76,8 +247,10 @@ export class FilesystemCloudStorageProvider implements CloudStorageProvider {
     }
 
     public async listObjects(prefix: string): Promise<CloudObjectEntry[]> {
-        await this.ensureAppRoot();
-        const normalizedPrefix = prefix.replaceAll("\\", "/");
+        const root = await this.getAppRootRealPath();
+        const normalizedPrefix = FilesystemCloudStorageProvider.normalizeKey(
+            prefix
+        );
         const results: CloudObjectEntry[] = [];
 
         const walk = async (directory: string): Promise<void> => {
@@ -88,9 +261,29 @@ export class FilesystemCloudStorageProvider implements CloudStorageProvider {
                 return;
             }
 
-            const subdirs = entries
+            const candidateSubdirs = entries
                 .filter((entry) => entry.isDirectory())
                 .map((entry) => path.join(directory, entry.name));
+
+            const subdirCandidates = await Promise.all(
+                candidateSubdirs.map(async (absolutePath) => {
+                    const stat = await fs.lstat(absolutePath).catch(() => null);
+
+                    if (!stat) {
+                        return null;
+                    }
+
+                    if (stat.isSymbolicLink()) {
+                        return null;
+                    }
+
+                    return stat.isDirectory() ? absolutePath : null;
+                })
+            );
+
+            const subdirs = subdirCandidates.filter(
+                (value): value is string => value !== null
+            );
 
             const filePaths = entries
                 .filter((entry) => entry.isFile())
@@ -98,12 +291,16 @@ export class FilesystemCloudStorageProvider implements CloudStorageProvider {
 
             const fileEntries = await Promise.all(
                 filePaths.map(async (absolute) => {
-                    const key = toPosixKey(this.appRoot, absolute);
+                    const key = toPosixKey(root, absolute);
                     if (!key.startsWith(normalizedPrefix)) {
                         return null;
                     }
 
-                    return toCloudObjectEntry(key, absolute);
+                    try {
+                        return await toCloudObjectEntry(key, absolute);
+                    } catch {
+                        return null;
+                    }
                 })
             );
 
@@ -116,7 +313,7 @@ export class FilesystemCloudStorageProvider implements CloudStorageProvider {
             await Promise.all(subdirs.map((dir) => walk(dir)));
         };
 
-        await walk(this.appRoot);
+        await walk(root);
 
         results.sort((a, b) => a.key.localeCompare(b.key));
         return results;
@@ -124,8 +321,8 @@ export class FilesystemCloudStorageProvider implements CloudStorageProvider {
 
     public async downloadObject(key: string): Promise<Buffer> {
         await this.ensureAppRoot();
-        const normalizedKey = key.replaceAll("\\", "/");
-        const absolute = this.resolveKeyPath(normalizedKey);
+        const normalizedKey = FilesystemCloudStorageProvider.normalizeKey(key);
+        const absolute = await this.resolveKeyPath(normalizedKey);
         return fs.readFile(absolute);
     }
 
@@ -135,11 +332,17 @@ export class FilesystemCloudStorageProvider implements CloudStorageProvider {
         overwrite?: boolean;
     }): Promise<CloudObjectEntry> {
         await this.ensureAppRoot();
-        const key = args.key.replaceAll("\\", "/");
+        const key = FilesystemCloudStorageProvider.normalizeKey(args.key);
         const overwrite = args.overwrite ?? false;
 
-        const targetPath = this.resolveKeyPath(key);
-        await fs.mkdir(path.dirname(targetPath), { recursive: true });
+        const targetPath = await this.resolveKeyPath(key);
+        await this.ensureSafeDirectory(path.dirname(targetPath));
+
+        // Refuse to overwrite/replace symlinks.
+        const targetStat = await fs.lstat(targetPath).catch(() => null);
+        if (targetStat?.isSymbolicLink()) {
+            throw new Error(`Refusing to write cloud object via symlink: ${key}`);
+        }
 
         const tempPath = `${targetPath}.tmp-${crypto.randomUUID()}`;
         const backupPath = `${targetPath}.bak-${crypto.randomUUID()}`;
@@ -155,9 +358,7 @@ export class FilesystemCloudStorageProvider implements CloudStorageProvider {
                     : undefined;
 
                 if (code === "ENOENT") {
-                    await fs.mkdir(path.dirname(targetPath), {
-                        recursive: true,
-                    });
+                    await this.ensureSafeDirectory(path.dirname(targetPath));
                     await fs.rename(tempPath, targetPath);
                     return;
                 }
@@ -168,8 +369,8 @@ export class FilesystemCloudStorageProvider implements CloudStorageProvider {
 
         try {
             const targetExists = await fs
-                .stat(targetPath)
-                .then((stat) => stat.isFile())
+                .lstat(targetPath)
+                .then((stat) => stat.isFile() && !stat.isSymbolicLink())
                 .catch(() => false);
 
             if (!overwrite) {
@@ -206,8 +407,22 @@ export class FilesystemCloudStorageProvider implements CloudStorageProvider {
 
     public async deleteObject(key: string): Promise<void> {
         await this.ensureAppRoot();
-        const normalizedKey = key.replaceAll("\\", "/");
-        const absolute = this.resolveKeyPath(normalizedKey);
+        const normalizedKey = FilesystemCloudStorageProvider.normalizeKey(key);
+        const absolute = await this.resolveKeyPath(normalizedKey);
+
+        const stat = await fs.lstat(absolute).catch(() => null);
+        if (!stat) {
+            return;
+        }
+
+        if (stat.isSymbolicLink()) {
+            throw new Error(`Refusing to delete cloud object via symlink: ${key}`);
+        }
+
+        if (!stat.isFile()) {
+            throw new Error(`Cloud object is not a file: ${key}`);
+        }
+
         await fs.rm(absolute, { force: true });
     }
 
@@ -245,12 +460,20 @@ export class FilesystemCloudStorageProvider implements CloudStorageProvider {
         const metadataObjects = objects.filter((object) =>
             object.key.endsWith(".metadata.json"));
 
-        const backups = await Promise.all(
+        const backupCandidates = await Promise.all(
             metadataObjects.map(async (object) => {
-                const raw = await this.downloadObject(object.key);
-                const parsed: unknown = JSON.parse(raw.toString("utf8"));
-                return parseCloudBackupMetadataFile(parsed);
+                try {
+                    const raw = await this.downloadObject(object.key);
+                    const parsed: unknown = JSON.parse(raw.toString("utf8"));
+                    return parseCloudBackupMetadataFile(parsed);
+                } catch {
+                    return null;
+                }
             })
+        );
+
+        const backups = backupCandidates.filter(
+            (entry): entry is CloudBackupEntry => entry !== null
         );
 
         backups.sort((a, b) => b.metadata.createdAt - a.metadata.createdAt);
@@ -275,13 +498,14 @@ export class FilesystemCloudStorageProvider implements CloudStorageProvider {
         await fs.mkdir(this.appRoot, { recursive: true });
     }
 
-    private resolveKeyPath(key: string): string {
-        const normalizedKey = key.replaceAll("\\", "/");
-        const absolutePath = path.resolve(
-            this.appRoot,
-            ...normalizedKey.split("/")
-        );
-        assertSubpath(this.appRoot, absolutePath);
+    private async resolveKeyPath(key: string): Promise<string> {
+        const normalizedKey = FilesystemCloudStorageProvider.normalizeKey(key);
+        FilesystemCloudStorageProvider.assertSafeKey(normalizedKey);
+
+        const root = await this.getAppRootRealPath();
+        const absolutePath = path.resolve(root, ...normalizedKey.split("/"));
+        assertSubpath(root, absolutePath);
+        await this.assertNoSymlinkPathComponents(root, absolutePath);
         return absolutePath;
     }
 

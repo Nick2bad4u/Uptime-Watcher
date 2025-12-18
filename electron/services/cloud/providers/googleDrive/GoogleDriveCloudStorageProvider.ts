@@ -25,6 +25,12 @@ function normalizeKey(key: string): string {
     return key.replaceAll("\\", "/").replace(/^\/+/v, "");
 }
 
+function createErrnoError(message: string, code: string): NodeJS.ErrnoException {
+    const error = new Error(message) as NodeJS.ErrnoException;
+    error.code = code;
+    return error;
+}
+
 function ensureTrailingSlash(prefix: string): string {
     const normalized = normalizeKey(prefix);
     if (!normalized) {
@@ -237,8 +243,9 @@ export class GoogleDriveCloudStorageProvider implements CloudStorageProvider {
         });
 
         if (existing && args.overwrite === false) {
-            throw new Error(
-                `Google Drive object already exists: ${normalizedKey}`
+            throw createErrnoError(
+                `Google Drive object already exists: ${normalizedKey}`,
+                "EEXIST"
             );
         }
 

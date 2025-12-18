@@ -2,6 +2,7 @@ import type { Database } from "node-sqlite3-wasm";
 
 import { LOG_TEMPLATES } from "@shared/utils/logTemplates";
 import { safeStringify } from "@shared/utils/stringConversion";
+import { isRecord } from "@shared/utils/typeHelpers";
 
 import { logger } from "../../../utils/logger";
 import { getRegisteredMonitorTypes } from "../../monitoring/MonitorTypeRegistry";
@@ -76,7 +77,53 @@ const SCHEMA_QUERIES = {
     ROLLBACK: "ROLLBACK",
 } as const;
 
-export const DATABASE_SCHEMA_VERSION = 2;
+export const DATABASE_SCHEMA_VERSION = 3;
+
+interface TableInfoRow {
+    readonly name?: unknown;
+    readonly type?: unknown;
+}
+
+function isTableInfoRow(value: unknown): value is TableInfoRow {
+    return isRecord(value);
+}
+
+function listTableInfo(database: Database, tableName: string): TableInfoRow[] {
+    try {
+        // Table name is a hard-coded internal constant from this module.
+        const rows = database.all(`PRAGMA table_info(${tableName})`) as unknown;
+
+        if (!Array.isArray(rows)) {
+            return [];
+        }
+
+        return rows.filter(isTableInfoRow);
+    } catch {
+        return [];
+    }
+}
+
+function getColumnType(
+    database: Database,
+    tableName: string,
+    columnName: string
+): string | undefined {
+    for (const row of listTableInfo(database, tableName)) {
+        if (row.name === columnName && typeof row.type === "string") {
+            return row.type;
+        }
+    }
+
+    return undefined;
+}
+
+function hasColumn(
+    database: Database,
+    tableName: string,
+    columnName: string
+): boolean {
+    return getColumnType(database, tableName, columnName) !== undefined;
+}
 
 /**
  * Ensures the SQLite user_version matches the application schema version.
@@ -140,26 +187,24 @@ function toSqliteBindValue(value: unknown): SqliteBindValue {
 }
 
 function createMigrationIndexes(database: Database): void {
-    database
-        .prepare(SCHEMA_QUERIES.CREATE_INDEX_MONITORS_SITE_IDENTIFIER)
-        .run();
-    database.prepare(SCHEMA_QUERIES.CREATE_INDEX_MONITORS_TYPE).run();
-    database.prepare(SCHEMA_QUERIES.CREATE_INDEX_HISTORY_MONITOR_ID).run();
-    database.prepare(SCHEMA_QUERIES.CREATE_INDEX_HISTORY_TIMESTAMP).run();
+    database.run(SCHEMA_QUERIES.CREATE_INDEX_MONITORS_SITE_IDENTIFIER);
+    database.run(SCHEMA_QUERIES.CREATE_INDEX_MONITORS_TYPE);
+    database.run(SCHEMA_QUERIES.CREATE_INDEX_HISTORY_MONITOR_ID);
+    database.run(SCHEMA_QUERIES.CREATE_INDEX_HISTORY_TIMESTAMP);
 }
 
 function copyMonitorsFromVersion1(database: Database): void {
-    const legacyMonitorRows = database
-        .prepare("SELECT * FROM monitors_v1")
-        .all() as Array<Record<string, unknown>>;
+    const legacyMonitorRows = database.all(
+        "SELECT * FROM monitors_v1"
+    ) as Array<Record<string, unknown>>;
 
     if (legacyMonitorRows.length === 0) {
         return;
     }
 
-    const columnRows = database
-        .prepare("PRAGMA table_info(monitors_v1)")
-        .all() as Array<{ name?: unknown }>;
+    const columnRows = database.all(
+        "PRAGMA table_info(monitors_v1)"
+    ) as Array<{ name?: unknown }>;
     const legacyColumns = columnRows
         .map((row) => row.name)
         .filter((name): name is string => typeof name === "string");
@@ -168,7 +213,7 @@ function copyMonitorsFromVersion1(database: Database): void {
     const insertColumns = ["id", ...copyColumns];
     const insertPlaceholders = insertColumns.map(() => "?").join(", ");
 
-    // eslint-disable-next-line sql-template/no-unsafe-query -- Column list derived from PRAGMA table_info
+    // eslint-disable-next-line sql-template/no-unsafe-query -- Columns are derived from PRAGMA table_info(monitors_v1) and are not user-controlled.
     const insertSql = `INSERT INTO monitors (${insertColumns.join(", ")}) VALUES (${insertPlaceholders})`;
     const insertStatement = database.prepare(insertSql);
 
@@ -176,30 +221,37 @@ function copyMonitorsFromVersion1(database: Database): void {
         "INSERT INTO monitor_id_map (old_id, new_id) VALUES (?, ?)"
     );
 
-    for (const row of legacyMonitorRows) {
-        const oldId = row["id"];
-        if (typeof oldId !== "number") {
-            throw new TypeError("Unexpected monitor id type during migration");
+    try {
+        for (const row of legacyMonitorRows) {
+            const oldId = row["id"];
+            if (typeof oldId !== "number") {
+                throw new TypeError(
+                    "Unexpected monitor id type during migration"
+                );
+            }
+
+            const newId = globalThis.crypto.randomUUID();
+
+            const values: SqliteBindValue[] = [
+                newId,
+                ...copyColumns.map((column) =>
+                    toSqliteBindValue(row[column])
+                ),
+            ];
+
+            insertStatement.run(values);
+            mapInsert.run([oldId, newId]);
         }
-
-        const newId = globalThis.crypto.randomUUID();
-
-        const values: SqliteBindValue[] = [
-            newId,
-            ...copyColumns.map((column) => toSqliteBindValue(row[column])),
-        ];
-
-        insertStatement.run(values);
-        mapInsert.run([oldId, newId]);
+    } finally {
+        insertStatement.finalize();
+        mapInsert.finalize();
     }
 }
 
 function copyHistoryFromVersion1(database: Database): void {
-    const legacyHistoryRows = database
-        .prepare(
-            "SELECT id, monitor_id, timestamp, status, responseTime, details FROM history_v1"
-        )
-        .all() as Array<Record<string, unknown>>;
+    const legacyHistoryRows = database.all(
+        "SELECT id, monitor_id, timestamp, status, responseTime, details FROM history_v1"
+    ) as Array<Record<string, unknown>>;
 
     if (legacyHistoryRows.length === 0) {
         return;
@@ -212,28 +264,33 @@ function copyHistoryFromVersion1(database: Database): void {
         "SELECT new_id as newId FROM monitor_id_map WHERE old_id = ?"
     );
 
-    for (const row of legacyHistoryRows) {
-        const oldMonitorId = row["monitor_id"];
-        if (typeof oldMonitorId === "number") {
-            const mappingCandidate: unknown = mapper.get([oldMonitorId]);
-            const newIdCandidate: unknown =
-                typeof mappingCandidate === "object" &&
-                mappingCandidate !== null &&
-                "newId" in mappingCandidate
-                    ? Reflect.get(mappingCandidate, "newId")
-                    : undefined;
+    try {
+        for (const row of legacyHistoryRows) {
+            const oldMonitorId = row["monitor_id"];
+            if (typeof oldMonitorId === "number") {
+                const mappingCandidate: unknown = mapper.get([oldMonitorId]);
+                const newIdCandidate: unknown =
+                    typeof mappingCandidate === "object" &&
+                    mappingCandidate !== null &&
+                    "newId" in mappingCandidate
+                        ? Reflect.get(mappingCandidate, "newId")
+                        : undefined;
 
-            if (typeof newIdCandidate === "string") {
-                historyInsert.run([
-                    toSqliteBindValue(row["id"]),
-                    newIdCandidate,
-                    toSqliteBindValue(row["timestamp"]),
-                    toSqliteBindValue(row["status"]),
-                    toSqliteBindValue(row["responseTime"]),
-                    toSqliteBindValue(row["details"]),
-                ]);
+                if (typeof newIdCandidate === "string") {
+                    historyInsert.run([
+                        toSqliteBindValue(row["id"]),
+                        newIdCandidate,
+                        toSqliteBindValue(row["timestamp"]),
+                        toSqliteBindValue(row["status"]),
+                        toSqliteBindValue(row["responseTime"]),
+                        toSqliteBindValue(row["details"]),
+                    ]);
+                }
             }
         }
+    } finally {
+        historyInsert.finalize();
+        mapper.finalize();
     }
 }
 
@@ -256,42 +313,71 @@ function migrateSchemaToVersion2(database: Database): void {
         );
     }
 
-    database.prepare("PRAGMA foreign_keys = OFF").run();
-    database.prepare(SCHEMA_QUERIES.BEGIN_TRANSACTION).run();
+    database.run("PRAGMA foreign_keys = OFF");
+    database.run(SCHEMA_QUERIES.BEGIN_TRANSACTION);
 
     try {
-        database.prepare("ALTER TABLE monitors RENAME TO monitors_v1").run();
-        database.prepare("ALTER TABLE history RENAME TO history_v1").run();
+        database.run("ALTER TABLE monitors RENAME TO monitors_v1");
+        database.run("ALTER TABLE history RENAME TO history_v1");
 
         // Recreate monitors/history tables with the new schema.
         const dynamicMonitorSchema = generateMonitorTableSchema();
         validateGeneratedSchema(dynamicMonitorSchema);
-        database.prepare(dynamicMonitorSchema).run();
-        database.prepare(SCHEMA_QUERIES.CREATE_TABLE_HISTORY).run();
+        database.run(dynamicMonitorSchema);
+        database.run(SCHEMA_QUERIES.CREATE_TABLE_HISTORY);
 
         // Create a temp mapping table for history remapping.
-        database
-            .prepare(
-                "CREATE TEMP TABLE monitor_id_map (old_id INTEGER PRIMARY KEY, new_id TEXT NOT NULL)"
-            )
-            .run();
+        database.run(
+            "CREATE TEMP TABLE monitor_id_map (old_id INTEGER PRIMARY KEY, new_id TEXT NOT NULL)"
+        );
 
         copyMonitorsFromVersion1(database);
         copyHistoryFromVersion1(database);
 
-        database.prepare("DROP TABLE monitors_v1").run();
-        database.prepare("DROP TABLE history_v1").run();
+        database.run("DROP TABLE monitors_v1");
+        database.run("DROP TABLE history_v1");
 
         // Recreate indexes for the new tables.
         createMigrationIndexes(database);
 
-        database.prepare(SCHEMA_QUERIES.COMMIT).run();
-        database.prepare("PRAGMA foreign_keys = ON").run();
+        database.run(SCHEMA_QUERIES.COMMIT);
+        database.run("PRAGMA foreign_keys = ON");
         logger.info("[DatabaseSchema] Migration v1 -> v2 complete");
     } catch (error) {
-        database.prepare(SCHEMA_QUERIES.ROLLBACK).run();
-        database.prepare("PRAGMA foreign_keys = ON").run();
+        database.run(SCHEMA_QUERIES.ROLLBACK);
+        database.run("PRAGMA foreign_keys = ON");
         logger.error("[DatabaseSchema] Migration v1 -> v2 failed", error);
+        throw error;
+    }
+}
+
+/**
+ * Migrates schema version 2 to version 3.
+ *
+ * @remarks
+ * Version 3 introduces the `monitors.follow_redirects` column so HTTP-based
+ * monitors can persist redirect preferences.
+ */
+function migrateSchemaToVersion3(database: Database): void {
+    logger.warn("[DatabaseSchema] Running schema migration to v3");
+
+    if (hasColumn(database, "monitors", "follow_redirects")) {
+        logger.info(
+            "[DatabaseSchema] Migration v2 -> v3 skipped (follow_redirects already present)"
+        );
+        return;
+    }
+
+    database.run(SCHEMA_QUERIES.BEGIN_TRANSACTION);
+    try {
+        database.run(
+            "ALTER TABLE monitors ADD COLUMN follow_redirects INTEGER NOT NULL DEFAULT 1"
+        );
+        database.run(SCHEMA_QUERIES.COMMIT);
+        logger.info("[DatabaseSchema] Migration v2 -> v3 complete");
+    } catch (error) {
+        database.run(SCHEMA_QUERIES.ROLLBACK);
+        logger.error("[DatabaseSchema] Migration v2 -> v3 failed", error);
         throw error;
     }
 }
@@ -300,14 +386,24 @@ function migrateSchemaToVersion2(database: Database): void {
  * Ensures the PRAGMA user_version reflects the currently deployed schema.
  */
 export function synchronizeDatabaseSchemaVersion(database: Database): void {
-    const pragmaResult: unknown = database.prepare("PRAGMA user_version").get();
+    const pragmaResult: unknown = database.get("PRAGMA user_version");
 
     const userVersionValue = hasUserVersionProperty(pragmaResult)
         ? pragmaResult.user_version
         : undefined;
 
-    const currentVersion =
+    let currentVersion =
         typeof userVersionValue === "number" ? userVersionValue : 0;
+
+    // Older builds may not have set PRAGMA user_version. Detect the legacy
+    // v1 schema shape (INTEGER primary key) and upgrade through the normal
+    // migration path.
+    if (currentVersion === 0) {
+        const idType = getColumnType(database, "monitors", "id");
+        if (typeof idType === "string" && idType.toUpperCase() === "INTEGER") {
+            currentVersion = 1;
+        }
+    }
     if (currentVersion === DATABASE_SCHEMA_VERSION) {
         return;
     }
@@ -319,8 +415,15 @@ export function synchronizeDatabaseSchemaVersion(database: Database): void {
         return;
     }
 
-    if (currentVersion === 1) {
+    let workingVersion = currentVersion;
+
+    if (workingVersion === 1) {
         migrateSchemaToVersion2(database);
+        workingVersion = 2;
+    }
+
+    if (workingVersion === 2) {
+        migrateSchemaToVersion3(database);
     }
 
     if (currentVersion === 0) {
@@ -333,7 +436,7 @@ export function synchronizeDatabaseSchemaVersion(database: Database): void {
         );
     }
 
-    database.prepare(`PRAGMA user_version = ${DATABASE_SCHEMA_VERSION}`).run();
+    database.run(`PRAGMA user_version = ${DATABASE_SCHEMA_VERSION}`);
 }
 
 /**

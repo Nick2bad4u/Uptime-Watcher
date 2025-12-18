@@ -14,7 +14,7 @@ import type { UnknownRecord } from "type-fest";
 
 import { isIpcCorrelationEnvelope } from "@shared/types/ipc";
 import { MONITOR_TYPES_CHANNELS } from "@shared/types/preload";
-import { withLogContext } from "@shared/utils/loggingContext";
+import { normalizeLogValue, withLogContext } from "@shared/utils/loggingContext";
 import {
     isNonEmptyString,
     isValidUrl,
@@ -30,11 +30,36 @@ import type {
 import { isDev } from "../../electronUtils";
 import { generateCorrelationId } from "../../utils/correlation";
 import { logger } from "../../utils/logger";
+import { getUtfByteLength, truncateUtfString } from "./diagnosticsLimits";
 
 const HIGH_FREQUENCY_OPERATIONS = new Set<string>([
     MONITOR_TYPES_CHANNELS.formatMonitorDetail,
     MONITOR_TYPES_CHANNELS.getMonitorTypes,
 ]);
+
+/**
+ * Maximum byte length accepted for URL parameters passed through IPC.
+ *
+ * @remarks
+ * This is a defense-in-depth limit to prevent accidental or malicious oversized
+ * payloads (e.g. multi-megabyte strings) from forcing expensive parsing or
+ * logging work at IPC boundaries.
+ */
+const MAX_IPC_URL_UTF_BYTES = 32_768;
+
+/** Maximum bytes allowed for IPC error messages returned to the renderer. */
+const MAX_IPC_ERROR_MESSAGE_UTF_BYTES = 4096;
+
+const normalizeIpcErrorMessage = (message: string): string => {
+    // Truncate first to cap redaction work for huge messages.
+    const preview = truncateUtfString(
+        message,
+        MAX_IPC_ERROR_MESSAGE_UTF_BYTES
+    ).value;
+
+    const normalized = normalizeLogValue(preview);
+    return typeof normalized === "string" ? normalized : preview;
+};
 
 /**
  * Structured metadata describing IPC handler execution characteristics.
@@ -187,8 +212,9 @@ async function executeIpcHandler<T>(
         };
     } catch (error) {
         const duration = Date.now() - startTime;
-        const errorMessage =
+        const rawErrorMessage =
             error instanceof Error ? error.message : String(error);
+        const errorMessage = normalizeIpcErrorMessage(rawErrorMessage);
 
         logger.error(
             `[IpcHandler] Failed ${channelName}`,
@@ -305,7 +331,22 @@ export const IpcValidators = {
      * @returns Error message or null if valid
      */
     requiredUrl: (value: unknown, paramName: string): null | string => {
-        if (!isValidUrl(value)) {
+        if (typeof value === "string") {
+            const byteLength = getUtfByteLength(value);
+            if (byteLength > MAX_IPC_URL_UTF_BYTES) {
+                return `${paramName} must not exceed ${MAX_IPC_URL_UTF_BYTES} bytes`;
+            }
+
+            if (/[\r\n]/v.test(value)) {
+                return `${paramName} must not contain newlines`;
+            }
+        }
+
+        if (
+            !isValidUrl(value, {
+                disallowAuth: true,
+            })
+        ) {
             return `${paramName} must be a valid http(s) URL`;
         }
 
@@ -608,7 +649,39 @@ export function registerStandardizedIpcHandler<
         ipcMain.handle(channelName, async (_event, ...rawArgs: unknown[]) => {
             const { args, correlationId } =
                 extractIpcCorrelationContext(rawArgs);
-            assertChannelParams(channelName, args, handler);
+
+            const correlationMetadata =
+                correlationId === undefined ? {} : { correlationId };
+
+            try {
+                assertChannelParams(channelName, args, handler);
+            } catch (error: unknown) {
+                const message =
+                    error instanceof Error
+                        ? error.message
+                        : `Invalid IPC parameters for ${channelName}`;
+
+                logger.warn(
+                    "[IpcHandler] Rejected IPC invocation due to invalid parameter shape",
+                    withLogContext({
+                        channel: channelName,
+                        ...correlationMetadata,
+                        event: "ipc:handler:validation-failed",
+                        severity: "warn",
+                    }),
+                    {
+                        error: message,
+                        paramCount: args.length,
+                    }
+                );
+
+                return createErrorResponse(message, {
+                    handler: channelName,
+                    ...correlationMetadata,
+                    paramCount: args.length,
+                });
+            }
+
             const baseMetadata = {
                 paramCount: args.length,
             } satisfies IpcHandlerMetadata;

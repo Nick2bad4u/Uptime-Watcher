@@ -1,7 +1,10 @@
 import type { IpcInvokeChannel } from "@shared/types/ipc";
 
 import { SYSTEM_CHANNELS } from "@shared/types/preload";
+import { ensureError } from "@shared/utils/errorHandling";
 import { LOG_TEMPLATES } from "@shared/utils/logTemplates";
+import { getSafeUrlForLogging } from "@shared/utils/urlSafety";
+import { isValidUrl } from "@shared/validation/validatorUtils";
 import { shell } from "electron";
 
 import type { AutoUpdaterService } from "../../updater/AutoUpdaterService";
@@ -29,7 +32,35 @@ export function registerSystemHandlers({
     registerStandardizedIpcHandler(
         SYSTEM_CHANNELS.openExternal,
         withIgnoredIpcEvent(async (url) => {
-            await shell.openExternal(url);
+            const urlForLog = getSafeUrlForLogging(url);
+
+            if (
+                !isValidUrl(url, {
+                    disallowAuth: true,
+                })
+            ) {
+                throw new TypeError(
+                    `Rejected unsafe openExternal URL: ${urlForLog}`
+                );
+            }
+
+            try {
+                await shell.openExternal(url);
+            } catch (error: unknown) {
+                const resolved = ensureError(error);
+                const { code } = resolved as Error & { code?: unknown };
+                const codeSuffix =
+                    typeof code === "string" && code.length > 0
+                        ? ` (${code})`
+                        : "";
+
+                // Do not allow errors to echo the full URL (queries may include
+                // tokens); keep logs and renderer error messages redacted.
+                throw new Error(
+                    `Failed to open external URL: ${urlForLog}${codeSuffix}`,
+                    { cause: error }
+                );
+            }
             return true;
         }),
         SystemHandlerValidators.openExternal,

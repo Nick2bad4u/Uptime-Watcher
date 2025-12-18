@@ -415,6 +415,7 @@ describe("TypeGuards Fuzzing Tests", () => {
                     const isValidFalse =
                         typeof value !== "number" ||
                         Number.isNaN(value) ||
+                        !Number.isFinite(value) ||
                         (value as number) <= 0;
                     expect(isValidFalse).toBeTruthy();
                 }

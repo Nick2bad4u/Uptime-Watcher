@@ -52,6 +52,7 @@ import {
     buildUnsupportedProviderStatus,
     type CloudStatusCommonArgs,
 } from "./internal/CloudStatusBuilders";
+import { resolveGoogleDriveOAuthConfig } from "./internal/googleOAuthConfig";
 import { resolveCloudProviderOrNull } from "./internal/resolveCloudProviderOrNull";
 import { migrateProviderBackups } from "./migrations/backupMigration";
 import { resetProviderCloudSyncState } from "./migrations/syncReset";
@@ -88,6 +89,20 @@ function isENOENT(error: unknown): boolean {
     );
 }
 
+function hasAsciiControlCharacters(value: string): boolean {
+    for (const char of value) {
+        const codePoint = char.codePointAt(0);
+        if (
+            codePoint !== undefined &&
+            (codePoint < 0x20 || codePoint === 0x7f)
+        ) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 async function ignoreENOENT(fn: () => Promise<void>): Promise<void> {
     try {
         await fn();
@@ -121,6 +136,65 @@ const SETTINGS_KEY_ENCRYPTION_MODE = "cloud.encryption.mode" as const;
 const SETTINGS_KEY_ENCRYPTION_SALT = "cloud.encryption.salt" as const;
 
 const SECRET_KEY_ENCRYPTION_DERIVED_KEY = "cloud.encryption.key.v1" as const;
+
+const BACKUP_KEY_PREFIX = "backups/" as const;
+
+const MAX_BACKUP_KEY_BYTES = 2048;
+
+function normalizeCloudKey(rawKey: string): string {
+    const normalized = rawKey.trim().replaceAll("\\", "/");
+
+    // Collapse redundant slashes deterministically without regex.
+    let collapsed = normalized;
+    while (collapsed.includes("//")) {
+        collapsed = collapsed.replaceAll("//", "/");
+    }
+
+    return collapsed;
+}
+
+function assertBackupObjectKey(rawKey: string): string {
+    if (typeof rawKey !== "string" || rawKey.trim().length === 0) {
+        throw new Error("Backup key must be a non-empty string");
+    }
+
+    const key = normalizeCloudKey(rawKey);
+
+    if (Buffer.byteLength(key, "utf8") > MAX_BACKUP_KEY_BYTES) {
+        throw new Error(`Backup key must not exceed ${MAX_BACKUP_KEY_BYTES} bytes`);
+    }
+
+    if (!key.startsWith(BACKUP_KEY_PREFIX)) {
+        throw new Error("Backup key must start with 'backups/'");
+    }
+
+    if (key === BACKUP_KEY_PREFIX || key.endsWith("/")) {
+        throw new Error("Backup key must reference a backup object key");
+    }
+
+    if (key.endsWith(".metadata.json")) {
+        throw new Error("Backup key must reference the backup object, not metadata");
+    }
+
+    if (hasAsciiControlCharacters(key)) {
+        throw new Error("Backup key must not contain control characters");
+    }
+
+    if (key.startsWith("/") || key.includes(":") || key.includes("://")) {
+        throw new Error("Backup key must be a relative provider key");
+    }
+
+    const segments = key.split("/");
+    if (segments.some((segment) => segment.length === 0)) {
+        throw new Error("Backup key must not contain empty path segments");
+    }
+
+    if (segments.some((segment) => segment === "." || segment === "..")) {
+        throw new Error("Backup key must not contain path traversal segments");
+    }
+
+    return key;
+}
 
 function parseEncryptionMode(value: string | undefined): CloudEncryptionMode {
     return value === "passphrase" ? "passphrase" : "none";
@@ -241,23 +315,17 @@ export class CloudService {
             }
 
             if (provider === "google-drive") {
-                const clientId = readProcessEnv(
-                    "UPTIME_WATCHER_GOOGLE_CLIENT_ID"
-                );
-                const clientSecret = readProcessEnv(
-                    "UPTIME_WATCHER_GOOGLE_CLIENT_SECRET"
-                );
+                const { clientId, clientSecret } =
+                    resolveGoogleDriveOAuthConfig();
 
-                if (clientId) {
-                    const tokenManager = new GoogleDriveTokenManager({
-                        clientId,
-                        ...(clientSecret ? { clientSecret } : {}),
-                        secretStore: this.secretStore,
-                        storageKey: SETTINGS_KEY_GOOGLE_DRIVE_TOKENS,
-                    });
+                const tokenManager = new GoogleDriveTokenManager({
+                    clientId,
+                    ...(clientSecret ? { clientSecret } : {}),
+                    secretStore: this.secretStore,
+                    storageKey: SETTINGS_KEY_GOOGLE_DRIVE_TOKENS,
+                });
 
-                    await tokenManager.revoke().catch(() => {});
-                }
+                await tokenManager.revoke().catch(() => {});
 
                 await this.settings.set(
                     SETTINGS_KEY_GOOGLE_DRIVE_ACCOUNT_LABEL,
@@ -265,15 +333,15 @@ export class CloudService {
                 );
             }
 
-            // NOTE: Do not run these in parallel.
-            // Some settings adapters are transaction-backed and parallel writes can
-            // trigger nested-transaction warnings.
+            // Do not run these in parallel; settings are transaction-backed.
             await this.settings.set(SETTINGS_KEY_PROVIDER, "");
             await this.settings.set(SETTINGS_KEY_FILESYSTEM_BASE_DIRECTORY, "");
+            await this.settings.set(SETTINGS_KEY_ENCRYPTION_MODE, "");
+            await this.settings.set(SETTINGS_KEY_ENCRYPTION_SALT, "");
+
             await this.secretStore.deleteSecret(SETTINGS_KEY_DROPBOX_TOKENS);
-            await this.secretStore.deleteSecret(
-                SETTINGS_KEY_GOOGLE_DRIVE_TOKENS
-            );
+            await this.secretStore.deleteSecret(SETTINGS_KEY_GOOGLE_DRIVE_TOKENS);
+            await this.secretStore.deleteSecret(SECRET_KEY_ENCRYPTION_DERIVED_KEY);
 
             logger.info("[CloudService] Disconnected cloud provider");
             return this.buildStatusSummary();
@@ -349,20 +417,38 @@ export class CloudService {
                     throw new Error("Incorrect encryption passphrase");
                 }
 
-                await Promise.all([
-                    this.settings.set(
-                        SETTINGS_KEY_ENCRYPTION_MODE,
-                        "passphrase"
-                    ),
-                    this.settings.set(
-                        SETTINGS_KEY_ENCRYPTION_SALT,
-                        remoteEncryption.saltBase64
-                    ),
-                    this.secretStore.setSecret(
-                        SECRET_KEY_ENCRYPTION_DERIVED_KEY,
-                        encodeBase64(key)
-                    ),
-                ]);
+                // Backfill `enabledAt` for older manifests so we can enforce a
+                // stable "encryption boundary" going forward.
+                if (manifest && remoteEncryption.enabledAt === undefined) {
+                    const enabledAt = Date.now();
+                    const nextManifest: CloudSyncManifest = {
+                        ...manifest,
+                        encryption: {
+                            ...remoteEncryption,
+                            enabledAt,
+                        },
+                    };
+
+                    await transport.writeManifest(nextManifest).catch(() => {});
+                }
+
+                // NOTE: Do not run settings writes in parallel.
+                // Some settings adapters are transaction-backed and parallel
+                // writes can trigger nested-transaction warnings.
+                await this.settings.set(
+                    SETTINGS_KEY_ENCRYPTION_MODE,
+                    "passphrase"
+                );
+                await this.settings.set(
+                    SETTINGS_KEY_ENCRYPTION_SALT,
+                    remoteEncryption.saltBase64
+                );
+                await this.secretStore.setSecret(
+                    SECRET_KEY_ENCRYPTION_DERIVED_KEY,
+                    encodeBase64(key)
+                );
+
+                key.fill(0);
 
                 return this.buildStatusSummary();
             }
@@ -371,6 +457,7 @@ export class CloudService {
             const key = await derivePassphraseKey({ passphrase, salt });
             const encryptionConfig: CloudEncryptionConfigPassphrase = {
                 configVersion: CLOUD_ENCRYPTION_CONFIG_VERSION,
+                enabledAt: Date.now(),
                 kdf: "scrypt",
                 keyCheckBase64: createKeyCheckBase64(key),
                 mode: "passphrase",
@@ -384,17 +471,18 @@ export class CloudService {
 
             await transport.writeManifest(nextManifest);
 
-            await Promise.all([
-                this.settings.set(SETTINGS_KEY_ENCRYPTION_MODE, "passphrase"),
-                this.settings.set(
-                    SETTINGS_KEY_ENCRYPTION_SALT,
-                    encodeBase64(salt)
-                ),
-                this.secretStore.setSecret(
-                    SECRET_KEY_ENCRYPTION_DERIVED_KEY,
-                    encodeBase64(key)
-                ),
-            ]);
+            // NOTE: Do not run settings writes in parallel.
+            await this.settings.set(SETTINGS_KEY_ENCRYPTION_MODE, "passphrase");
+            await this.settings.set(
+                SETTINGS_KEY_ENCRYPTION_SALT,
+                encodeBase64(salt)
+            );
+            await this.secretStore.setSecret(
+                SECRET_KEY_ENCRYPTION_DERIVED_KEY,
+                encodeBase64(key)
+            );
+
+            key.fill(0);
 
             return this.buildStatusSummary();
         });
@@ -497,13 +585,42 @@ export class CloudService {
         return this.runCloudOperation(
             "configureFilesystemProvider",
             async () => {
-                const resolved = path.resolve(config.baseDirectory);
+                if (hasAsciiControlCharacters(config.baseDirectory)) {
+                    throw new Error(
+                        "Filesystem base directory must not contain control characters"
+                    );
+                }
 
-                if (!path.isAbsolute(resolved)) {
+                const deviceCheck = config.baseDirectory.replaceAll("/", "\\");
+                if (
+                    deviceCheck.startsWith("\\\\?\\") ||
+                    deviceCheck.startsWith("\\\\.\\")
+                ) {
+                    throw new Error(
+                        String.raw`Filesystem base directory must not use Windows device namespace paths (\\?\ or \\.\)`
+                    );
+                }
+
+                const baseDirectory = config.baseDirectory.trim();
+                if (baseDirectory.length === 0) {
+                    throw new Error("Filesystem base directory must not be empty");
+                }
+
+                if (baseDirectory.includes("\0")) {
+                    throw new Error(
+                        "Filesystem base directory must not contain a null byte"
+                    );
+                }
+
+                // Validate the user-supplied path, not the resolved one.
+                // `path.resolve(relative)` always yields an absolute path.
+                if (!path.isAbsolute(baseDirectory)) {
                     throw new Error(
                         `Filesystem base directory must be absolute. Received '${config.baseDirectory}'`
                     );
                 }
+
+                const resolved = path.resolve(baseDirectory);
 
                 await fs.mkdir(resolved, { recursive: true }); // eslint-disable-line security/detect-non-literal-fs-filename -- Dynamic but validated path supplied by the user.
                 const stat = await fs.stat(resolved); // eslint-disable-line security/detect-non-literal-fs-filename -- Dynamic but validated path supplied by the user.
@@ -513,10 +630,12 @@ export class CloudService {
                     );
                 }
 
+                const canonical = await fs.realpath(resolved); // eslint-disable-line security/detect-non-literal-fs-filename -- Dynamic but validated path supplied by the user.
+
                 await this.settings.set(SETTINGS_KEY_PROVIDER, "filesystem");
                 await this.settings.set(
                     SETTINGS_KEY_FILESYSTEM_BASE_DIRECTORY,
-                    resolved
+                    canonical
                 );
 
                 await this.secretStore.deleteSecret(
@@ -524,7 +643,7 @@ export class CloudService {
                 );
 
                 logger.info("[CloudService] Configured filesystem provider", {
-                    baseDirectory: resolved,
+                    baseDirectory: canonical,
                 });
 
                 return this.buildStatusSummary();
@@ -583,14 +702,7 @@ export class CloudService {
 
     public async connectGoogleDrive(): Promise<CloudStatusSummary> {
         return this.runCloudOperation("connectGoogleDrive", async () => {
-            const clientId = readProcessEnv("UPTIME_WATCHER_GOOGLE_CLIENT_ID");
-            const clientSecret = readProcessEnv(
-                "UPTIME_WATCHER_GOOGLE_CLIENT_SECRET"
-            );
-
-            if (!clientId) {
-                throw new Error("UPTIME_WATCHER_GOOGLE_CLIENT_ID is not set.");
-            }
+            const { clientId, clientSecret } = resolveGoogleDriveOAuthConfig();
 
             const tokenManager = new GoogleDriveTokenManager({
                 clientId,
@@ -749,7 +861,8 @@ export class CloudService {
     ): Promise<SerializedDatabaseRestoreResult> {
         return this.runCloudOperation("restoreBackup", async () => {
             const provider = await this.resolveProviderOrThrow();
-            const downloaded = await provider.downloadBackup(key);
+            const normalizedKey = assertBackupObjectKey(key);
+            const downloaded = await provider.downloadBackup(normalizedKey);
 
             const buffer = downloaded.entry.encrypted
                 ? await this.decryptBackupOrThrow(downloaded.buffer)
@@ -774,9 +887,10 @@ export class CloudService {
     public async deleteBackup(key: string): Promise<CloudBackupEntry[]> {
         return this.runCloudOperation("deleteBackup", async () => {
             const provider = await this.resolveProviderOrThrow();
-            const metadataKey = backupMetadataKeyForBackupKey(key);
+            const normalizedKey = assertBackupObjectKey(key);
+            const metadataKey = backupMetadataKeyForBackupKey(normalizedKey);
 
-            await ignoreENOENT(() => provider.deleteObject(key));
+            await ignoreENOENT(() => provider.deleteObject(normalizedKey));
             await ignoreENOENT(() => provider.deleteObject(metadataKey));
 
             return provider.listBackups();
@@ -814,9 +928,29 @@ export class CloudService {
             return provider;
         }
 
+        const key = decodeBase64(rawKey);
+        let encryptionEnabledAt: number | undefined = undefined;
+
+        try {
+            const transport = ProviderCloudSyncTransport.create(provider);
+            const manifest = await transport.readManifest();
+            const encryption = manifest?.encryption;
+            if (
+                encryption?.mode === "passphrase" &&
+                typeof encryption.enabledAt === "number"
+            ) {
+                encryptionEnabledAt = encryption.enabledAt;
+            }
+        } catch {
+            encryptionEnabledAt = undefined;
+        }
+
         return new EncryptedSyncCloudStorageProvider({
+            ...(encryptionEnabledAt === undefined
+                ? {}
+                : { encryptionEnabledAt }),
             inner: provider,
-            key: decodeBase64(rawKey),
+            key,
         });
     }
 

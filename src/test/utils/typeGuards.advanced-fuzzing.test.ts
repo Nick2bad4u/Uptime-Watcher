@@ -630,7 +630,9 @@ describe("Type Guards Advanced Fuzzing Tests", () => {
                 expect(isString(value)).toBe(typeof value === "string");
 
                 // Number consistency
-                expect(isNumber(value)).toBe(typeof value === "number");
+                expect(isNumber(value)).toBe(
+                    typeof value === "number" && !Number.isNaN(value)
+                );
 
                 // Boolean consistency
                 expect(isBoolean(value)).toBe(typeof value === "boolean");

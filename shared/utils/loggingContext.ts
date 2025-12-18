@@ -53,11 +53,52 @@ const SECRET_QUERY_KEYS = new Set([
     "apikey",
     "auth",
     "auth_token",
+    "client_secret",
+    "code",
+    "code_challenge",
+    "code_verifier",
+    "id_token",
     "password",
+    "refresh_token",
+    "state",
     "token",
 ]);
 
+const SECRET_METADATA_KEYS = new Set([
+    "accesstoken",
+    "apikey",
+    "auth",
+    "authorization",
+    "authtoken",
+    "bearer",
+    "clientsecret",
+    "code",
+    "codechallenge",
+    "codeverifier",
+    "cookie",
+    "csrftoken",
+    "idtoken",
+    "password",
+    "refreshtoken",
+    "secret",
+    "session",
+    "sessionid",
+    "setcookie",
+    "state",
+    "token",
+    "xcsrftoken",
+    "xsrftoken",
+]);
+
 const SECRET_PLACEHOLDER = "[redacted]" as const;
+
+const toCanonicalSecretKey = (key: string): string =>
+    // Do not use the `v` flag here; it is not available across all Electron
+    // targets we ship. The `u` flag is sufficient for this ASCII-only filter.
+    key.toLowerCase().replaceAll(/[^a-z0-9]/gv, "");
+
+const isSecretMetadataKey = (key: string): boolean =>
+    SECRET_METADATA_KEYS.has(toCanonicalSecretKey(key));
 
 const SECRET_FIELD_PATTERNS = [
     /bearer\s+[-\w.~+/]+=*/giu, // eslint-disable-line regexp/require-unicode-sets-regexp -- The `v` flag is not yet supported across all Electron targets we ship, so we rely on the `u` flag here.
@@ -131,7 +172,11 @@ export const normalizeLogValue = (value: unknown): unknown => {
     if (isRecord(value)) {
         const sanitizedRecord: Record<string, unknown> = {};
         for (const [key, entry] of Object.entries(value)) {
-            sanitizedRecord[key] = normalizeLogValue(entry);
+            if (isSecretMetadataKey(key)) {
+                sanitizedRecord[key] = SECRET_PLACEHOLDER;
+            } else {
+                sanitizedRecord[key] = normalizeLogValue(entry);
+            }
         }
         return sanitizedRecord;
     }

@@ -11,6 +11,7 @@
  */
 
 import { ensureError } from "@shared/utils/errorHandling";
+import { getSafeUrlForLogging } from "@shared/utils/urlSafety";
 import { isValidUrl } from "@shared/validation/validatorUtils";
 
 import { logger } from "./logger";
@@ -83,8 +84,10 @@ export const SystemService: SystemServiceContract = {
         url: string
     ): Promise<boolean> => {
         const requestedUrl = url;
-        const urlForMessage: string = url;
-        const isSafeUrl = isValidUrl(requestedUrl);
+        const urlForMessage = getSafeUrlForLogging(url);
+        const isSafeUrl = isValidUrl(requestedUrl, {
+            disallowAuth: true,
+        });
 
         if (!isSafeUrl) {
             const error = new TypeError(

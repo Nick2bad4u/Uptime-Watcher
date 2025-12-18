@@ -1,4 +1,5 @@
 import { ensureError } from "@shared/utils/errorHandling";
+import { getSafeUrlForLogging } from "@shared/utils/urlSafety";
 import { DropboxAuth } from "dropbox";
 import { shell } from "electron";
 import crypto from "node:crypto";
@@ -69,6 +70,33 @@ type DropboxAuthClient = Pick<
 type DropboxOAuthCallback = Readonly<{ code: string; state: string }>;
 
 /**
+ * Best-effort close for loopback OAuth servers.
+ *
+ * @remarks
+ * Node will throw `ERR_SERVER_NOT_RUNNING` if `close()` is called on a server
+ * that never successfully started listening. Cleanup must never mask the
+ * original OAuth error.
+ */
+async function closeServerSafely(server: http.Server): Promise<void> {
+    return new Promise((resolve) => {
+        try {
+            server.close(() => {
+                resolve();
+            });
+        } catch (error: unknown) {
+            const resolved = ensureError(error);
+            const { code } = resolved as Error & { code?: unknown };
+            if (code === "ERR_SERVER_NOT_RUNNING") {
+                resolve();
+                return;
+            }
+
+            resolve();
+        }
+    });
+}
+
+/**
  * Performs a system-browser OAuth Authorization Code + PKCE flow for Dropbox.
  */
 export class DropboxAuthFlow {
@@ -129,12 +157,38 @@ export class DropboxAuthFlow {
                 )
             );
 
+            const authorizeUrlForLog = getSafeUrlForLogging(authorizeUrl);
+            const parsedAuthorizeUrl = new URL(authorizeUrl);
+            if (
+                parsedAuthorizeUrl.protocol !== "https:" ||
+                parsedAuthorizeUrl.username.length > 0 ||
+                parsedAuthorizeUrl.password.length > 0
+            ) {
+                throw new Error(
+                    `Refusing to open unexpected Dropbox OAuth URL: ${authorizeUrlForLog}`
+                );
+            }
+
             const callbackPromise = this.waitForOAuthCallback({
                 servers,
                 timeoutMs: args.timeoutMs,
             });
 
-            await shell.openExternal(authorizeUrl);
+            try {
+                await shell.openExternal(authorizeUrl);
+            } catch (error: unknown) {
+                const resolved = ensureError(error);
+                const {code} = (resolved as Error & { code?: unknown });
+                const codeSuffix =
+                    typeof code === "string" && code.length > 0
+                        ? ` (${code})`
+                        : "";
+
+                throw new Error(
+                    `Failed to open Dropbox OAuth URL: ${authorizeUrlForLog}${codeSuffix}`,
+                    { cause: error }
+                );
+            }
 
             const callback = await callbackPromise;
             if (callback.state !== args.state) {
@@ -160,16 +214,7 @@ export class DropboxAuthFlow {
     }
 
     private async closeServers(servers: readonly http.Server[]): Promise<void> {
-        await Promise.all(
-            servers.map(
-                (server) =>
-                    new Promise<void>((resolve) => {
-                        server.close(() => {
-                            resolve();
-                        });
-                    })
-            )
-        );
+        await Promise.all(servers.map(closeServerSafely));
     }
 
     private async fetchTokensForAuthorizationCode(args: {

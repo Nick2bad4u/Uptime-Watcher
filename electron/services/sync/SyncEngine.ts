@@ -1,11 +1,16 @@
 import type { Monitor, Site } from "@shared/types";
 import type { CloudSyncManifest } from "@shared/types/cloudSyncManifest";
 import type { CloudSyncSnapshot } from "@shared/types/cloudSyncSnapshot";
-import type { CloudSyncState } from "@shared/types/cloudSyncState";
+import type {
+    CloudSyncEntityState,
+    CloudSyncFieldValue,
+    CloudSyncState,
+} from "@shared/types/cloudSyncState";
 
 import {
     CLOUD_SYNC_SCHEMA_VERSION,
     type CloudSyncOperation,
+    type CloudSyncWriteKey,
     type JsonValue,
     jsonValueSchema,
 } from "@shared/types/cloudSync";
@@ -27,6 +32,8 @@ import { applyCloudSyncOperationsToState } from "@shared/utils/cloudSyncState";
 
 import type { CloudStorageProvider } from "../cloud/providers/CloudStorageProvider.types";
 
+import { DEFAULT_CHECK_INTERVAL, DEFAULT_REQUEST_TIMEOUT } from "../../constants";
+import { logger } from "../../utils/logger";
 import { ProviderCloudSyncTransport } from "./ProviderCloudSyncTransport";
 
 /**
@@ -69,6 +76,178 @@ export interface SyncEngineResult {
     mergedEntities: number;
     /** Snapshot key written during this run (if any). */
     snapshotKey: null | string;
+}
+
+const OPS_OBJECT_SUFFIX = ".ndjson" as const;
+
+// Keep aligned with renderer defaults (src/utils/fallbacks.ts).
+const DEFAULT_RETRY_ATTEMPTS = 3;
+
+const DEFAULT_WRITE_KEY: CloudSyncWriteKey = {
+    deviceId: "__defaults",
+    opId: 0,
+    timestamp: 0,
+};
+
+function isFiniteNumber(value: unknown): value is number {
+    return typeof value === "number" && Number.isFinite(value);
+}
+
+function isBoolean(value: unknown): value is boolean {
+    return typeof value === "boolean";
+}
+
+function isNonEmptyString(value: unknown): value is string {
+    return typeof value === "string" && value.trim().length > 0;
+}
+
+function normalizeCloudSyncFieldValue<T extends CloudSyncFieldValue["value"]>(args: {
+    current: CloudSyncFieldValue | undefined;
+    defaultValue: T;
+    isValid: (value: unknown) => value is T;
+}): CloudSyncFieldValue {
+    const { current, defaultValue, isValid } = args;
+    const write = current?.write ?? DEFAULT_WRITE_KEY;
+    const currentValue = current?.value;
+
+    return {
+        value: isValid(currentValue) ? currentValue : defaultValue,
+        write,
+    };
+}
+
+/**
+ * Stabilizes merged sync state by filling required default fields that may be
+ * missing from remote operations.
+ *
+ * @remarks
+ * Cloud sync operations may only record "changed" fields. If default monitor
+ * fields were never explicitly written (e.g. checkInterval/timeout), other
+ * devices can observe partial configs that fail validation.
+ */
+function normalizeCloudSyncState(state: CloudSyncState): CloudSyncState {
+    const nextSite: Record<string, CloudSyncEntityState> = {};
+    for (const [siteId, entity] of Object.entries(state.site)) {
+        const fields: Record<string, CloudSyncFieldValue> = {
+            ...entity.fields,
+        };
+
+        fields["monitoring"] = normalizeCloudSyncFieldValue({
+            current: fields["monitoring"],
+            defaultValue: true,
+            isValid: isBoolean,
+        });
+
+        fields["name"] = normalizeCloudSyncFieldValue({
+            current: fields["name"],
+            defaultValue: siteId,
+            isValid: isNonEmptyString,
+        });
+
+        nextSite[siteId] = {
+            ...(entity),
+            fields,
+        };
+    }
+
+    const nextMonitor: Record<string, CloudSyncEntityState> = {};
+    for (const [monitorId, entity] of Object.entries(state.monitor)) {
+        const fields: Record<string, CloudSyncFieldValue> = {
+            ...entity.fields,
+        };
+
+        fields["monitoring"] = normalizeCloudSyncFieldValue({
+            current: fields["monitoring"],
+            defaultValue: true,
+            isValid: isBoolean,
+        });
+        fields["checkInterval"] = normalizeCloudSyncFieldValue({
+            current: fields["checkInterval"],
+            defaultValue: DEFAULT_CHECK_INTERVAL,
+            isValid: isFiniteNumber,
+        });
+        fields["retryAttempts"] = normalizeCloudSyncFieldValue({
+            current: fields["retryAttempts"],
+            defaultValue: DEFAULT_RETRY_ATTEMPTS,
+            isValid: isFiniteNumber,
+        });
+        fields["timeout"] = normalizeCloudSyncFieldValue({
+            current: fields["timeout"],
+            defaultValue: DEFAULT_REQUEST_TIMEOUT,
+            isValid: isFiniteNumber,
+        });
+
+        nextMonitor[monitorId] = {
+            ...(entity),
+            fields,
+        };
+    }
+
+    return {
+        ...state,
+        monitor: nextMonitor,
+        site: nextSite,
+    };
+}
+
+function parseOpsObjectKeyMetadata(key: string):
+    | null
+    | Readonly<{
+          createdAt: number;
+          deviceId: string;
+          lastOpId: number;
+      }> {
+    const segments = key.split("/");
+    // Expected: sync/devices/<deviceId>/ops/<createdAt>-<firstOpId>-<lastOpId>.ndjson
+    if (segments.length !== 5) {
+        return null;
+    }
+
+    const [syncSegment, devicesSegment, deviceId, opsSegment, fileName] =
+        segments;
+
+    if (
+        syncSegment !== "sync" ||
+        devicesSegment !== "devices" ||
+        opsSegment !== "ops" ||
+        !deviceId ||
+        !fileName
+    ) {
+        return null;
+    }
+
+    if (!fileName.endsWith(OPS_OBJECT_SUFFIX)) {
+        return null;
+    }
+
+    const stem = fileName.slice(0, -OPS_OBJECT_SUFFIX.length);
+    const parts = stem.split("-");
+    if (parts.length !== 3) {
+        return null;
+    }
+
+    const [createdAtRaw, , lastOpIdRaw] = parts;
+    if (!createdAtRaw || !lastOpIdRaw) {
+        return null;
+    }
+
+    const createdAt = Number(createdAtRaw);
+    const lastOpId = Number(lastOpIdRaw);
+
+    if (
+        !Number.isSafeInteger(createdAt) ||
+        createdAt < 0 ||
+        !Number.isSafeInteger(lastOpId) ||
+        lastOpId < 0
+    ) {
+        return null;
+    }
+
+    return {
+        createdAt,
+        deviceId,
+        lastOpId,
+    };
 }
 
 /**
@@ -255,7 +434,10 @@ function buildDesiredSitesFromSyncState(
                     typeof monitoringValue === "boolean"
                         ? monitoringValue
                         : true,
-                name: typeof nameValue === "string" ? nameValue : siteId,
+                name:
+                    typeof nameValue === "string" && nameValue.trim().length > 0
+                        ? nameValue
+                        : siteId,
             });
 
             if (parsed.success) {
@@ -279,6 +461,21 @@ function buildDesiredMonitorsFromSyncState(
                 if (field !== "id" && fieldValue.value !== null) {
                     candidate[field] = fieldValue.value;
                 }
+            }
+
+            // Stabilize required baseline fields that may not be present in
+            // remote operations.
+            if (!isBoolean(candidate["monitoring"])) {
+                candidate["monitoring"] = true;
+            }
+            if (!isFiniteNumber(candidate["checkInterval"])) {
+                candidate["checkInterval"] = DEFAULT_CHECK_INTERVAL;
+            }
+            if (!isFiniteNumber(candidate["retryAttempts"])) {
+                candidate["retryAttempts"] = DEFAULT_RETRY_ATTEMPTS;
+            }
+            if (!isFiniteNumber(candidate["timeout"])) {
+                candidate["timeout"] = DEFAULT_REQUEST_TIMEOUT;
             }
 
             const parsed = cloudSyncMonitorConfigSchema.safeParse(candidate);
@@ -523,29 +720,24 @@ export class SyncEngine {
             manifestCandidate ??
             ProviderCloudSyncTransport.createEmptyManifest();
         const previousSnapshotKey = remoteManifest.latestSnapshotKey;
-        const snapshotState = await this.loadSnapshotState(
-            transport,
-            remoteManifest
-        );
+        const { snapshotState, snapshotTrusted } =
+            await this.loadSnapshotState(transport, remoteManifest);
 
         const resetAt = remoteManifest.resetAt ?? 0;
-        const opsKeyPatternWithCreatedAt =
-            // eslint-disable-next-line regexp/require-unicode-sets-regexp -- This pattern does not require Unicode sets; /v is optional.
-            /^sync\/devices\/[^/]+\/ops\/(?<createdAt>\d+)-\d+-\d+\.ndjson$/u;
-
         const allOpObjects = await transport.listOperationObjects();
         const opObjects =
             resetAt > 0
                 ? allOpObjects.filter((entry) => {
-                      const match = opsKeyPatternWithCreatedAt.exec(entry.key);
-                      const createdAtString = match?.groups?.["createdAt"];
-                      const createdAt = createdAtString
-                          ? Number(createdAtString)
-                          : Number.NaN;
-                      return Number.isFinite(createdAt) && createdAt >= resetAt;
+                      const metadata = parseOpsObjectKeyMetadata(entry.key);
+                      return (
+                          metadata !== null && metadata.createdAt >= resetAt
+                      );
                   })
                 : allOpObjects;
-        const compacted = remoteManifest.devices;
+        // If we fail to load the snapshot, we must not apply remote compaction
+        // filtering. Otherwise we would drop compacted operations and lose
+        // state.
+        const compacted = snapshotTrusted ? remoteManifest.devices : {};
 
         const operationsByObject = await Promise.all(
             opObjects.map((entry) => transport.readOperationsObject(entry.key))
@@ -561,15 +753,19 @@ export class SyncEngine {
             remoteOps
         );
 
-        const snapshot = buildDefaultSnapshot(mergedState);
+        const normalizedMergedState = normalizeCloudSyncState(mergedState);
+
+        const snapshot = buildDefaultSnapshot(normalizedMergedState);
         const snapshotEntry = await transport.writeSnapshot(snapshot);
 
         const maxOps = getMaxOpIdByDevice(remoteOps);
         const nextManifest: CloudSyncManifest = {
             ...remoteManifest,
-            devices: {
-                ...remoteManifest.devices,
-            },
+            devices: snapshotTrusted
+                ? {
+                      ...remoteManifest.devices,
+                  }
+                : {},
             lastCompactionAt: snapshot.createdAt,
             latestSnapshotKey: snapshotEntry.key,
         };
@@ -601,10 +797,6 @@ export class SyncEngine {
         // plaintext sync artifacts exist; the first encrypted compaction should
         // remove the old plaintext snapshot/ops.
 
-        const opsKeyPattern =
-            // eslint-disable-next-line regexp/require-unicode-sets-regexp -- This pattern does not require Unicode sets; /v is optional.
-            /^sync\/devices\/(?<device>[^/]+)\/ops\/\d+-\d+-(?<lastOpId>\d+)\.ndjson$/u;
-
         async function safeDelete(key: string): Promise<void> {
             try {
                 await transport.deleteObject(key);
@@ -615,19 +807,14 @@ export class SyncEngine {
 
         const deletions: Array<Promise<void>> = [];
         for (const entry of opObjects) {
-            const match = opsKeyPattern.exec(entry.key);
-            const device = match?.groups?.["device"];
-            const lastOpIdString = match?.groups?.["lastOpId"];
-
-            if (device && lastOpIdString) {
-                const lastOpId = Number(lastOpIdString);
+            const metadata = parseOpsObjectKeyMetadata(entry.key);
+            if (metadata) {
                 const compactedUpTo =
-                    nextManifest.devices[device]?.compactedUpToOpId;
+                    nextManifest.devices[metadata.deviceId]?.compactedUpToOpId;
 
                 if (
-                    Number.isFinite(lastOpId) &&
                     compactedUpTo !== undefined &&
-                    lastOpId <= compactedUpTo
+                    metadata.lastOpId <= compactedUpTo
                 ) {
                     deletions.push(safeDelete(entry.key));
                 }
@@ -641,7 +828,7 @@ export class SyncEngine {
         await Promise.all(deletions);
 
         const appliedBaseline = await this.applyMergedState(
-            mergedState,
+            normalizedMergedState,
             allSettings
         );
 
@@ -651,8 +838,8 @@ export class SyncEngine {
             appliedRemoteOperations: remoteOps.length,
             emittedLocalOperations: localOps.length,
             mergedEntities:
-                Object.keys(mergedState.site).length +
-                Object.keys(mergedState.monitor).length,
+                Object.keys(normalizedMergedState.site).length +
+                Object.keys(normalizedMergedState.monitor).length,
             snapshotKey: snapshotEntry.key,
         };
     }
@@ -662,12 +849,10 @@ export class SyncEngine {
         existingSettings: Record<string, string>
     ): Promise<CloudSyncBaseline> {
         const desiredSites = buildDesiredSitesFromSyncState(state.site);
-        const desiredMonitors = buildDesiredMonitorsFromSyncState(
-            state.monitor
-        );
-        const desiredSettings = buildDesiredSettingsFromSyncState(
-            state.settings
-        );
+        const desiredMonitors = buildDesiredMonitorsFromSyncState(state.monitor);
+        const desiredSettings = buildDesiredSettingsFromSyncState(state.settings);
+
+        const desiredSiteIdentifiers = new Set(Object.keys(desiredSites));
 
         await this.applySettings(existingSettings, desiredSettings);
 
@@ -677,39 +862,28 @@ export class SyncEngine {
         );
 
         const desiredSitesWithMonitors: Record<string, Site> = {};
+
         for (const [identifier, siteConfig] of Object.entries(desiredSites)) {
-            const monitors = Object.values(desiredMonitors)
-                .filter((monitor) => monitor.siteIdentifier === identifier)
-                .map((monitorConfig) =>
-                    this.mergeMonitorConfig(
-                        currentSitesMap.get(identifier)?.monitors ?? [],
+            const existingMonitors =
+                currentSitesMap.get(identifier)?.monitors ?? [];
+
+            const mergedMonitors: Monitor[] = [];
+            for (const monitorConfig of Object.values(desiredMonitors)) {
+                if (monitorConfig.siteIdentifier === identifier) {
+                    const merged = this.mergeMonitorConfig(
+                        existingMonitors,
                         monitorConfig
-                    ));
+                    );
+                    mergedMonitors.push(merged);
+                }
+            }
 
             desiredSitesWithMonitors[identifier] = {
                 identifier,
                 monitoring: siteConfig.monitoring,
-                monitors,
+                monitors: mergedMonitors,
                 name: siteConfig.name,
             };
-        }
-
-        // Create any missing sites for orphaned monitors.
-        for (const monitorConfig of Object.values(desiredMonitors)) {
-            if (!(monitorConfig.siteIdentifier in desiredSitesWithMonitors)) {
-                desiredSitesWithMonitors[monitorConfig.siteIdentifier] = {
-                    identifier: monitorConfig.siteIdentifier,
-                    monitoring: true,
-                    monitors: [
-                        this.mergeMonitorConfig(
-                            currentSitesMap.get(monitorConfig.siteIdentifier)
-                                ?.monitors ?? [],
-                            monitorConfig
-                        ),
-                    ],
-                    name: monitorConfig.siteIdentifier,
-                };
-            }
         }
 
         /* eslint-disable no-await-in-loop -- Site lifecycle changes must be applied sequentially to avoid overlapping monitor start/stop operations */
@@ -717,20 +891,46 @@ export class SyncEngine {
             desiredSitesWithMonitors
         )) {
             const existing = currentSitesMap.get(identifier);
-            if (existing) {
-                await this.orchestrator.updateSite(identifier, {
-                    monitoring: site.monitoring,
-                    monitors: site.monitors,
-                    name: site.name,
-                });
-            } else {
-                await this.orchestrator.addSite(site);
+
+            try {
+                if (existing) {
+                    await this.orchestrator.updateSite(identifier, {
+                        monitoring: site.monitoring,
+                        monitors: site.monitors,
+                        name: site.name,
+                    });
+                } else {
+                    await this.orchestrator.addSite(site);
+                }
+            } catch (error) {
+                logger.warn(
+                    "[SyncEngine] Failed to apply remote site during sync",
+                    {
+                        message:
+                            error instanceof Error ? error.message : String(error),
+                        monitorCount: site.monitors.length,
+                        siteIdentifier: identifier,
+                    }
+                );
             }
         }
 
         for (const existing of currentSites) {
-            if (!(existing.identifier in desiredSitesWithMonitors)) {
-                await this.orchestrator.removeSite(existing.identifier);
+            if (!desiredSiteIdentifiers.has(existing.identifier)) {
+                try {
+                    await this.orchestrator.removeSite(existing.identifier);
+                } catch (error) {
+                    logger.warn(
+                        "[SyncEngine] Failed to remove local site during sync",
+                        {
+                            message:
+                                error instanceof Error
+                                    ? error.message
+                                    : String(error),
+                            siteIdentifier: existing.identifier,
+                        }
+                    );
+                }
             }
         }
         /* eslint-enable no-await-in-loop -- Sequential site lifecycle updates complete */
@@ -774,18 +974,27 @@ export class SyncEngine {
     private async loadSnapshotState(
         transport: ProviderCloudSyncTransport,
         manifest: CloudSyncManifest
-    ): Promise<CloudSyncState> {
+    ): Promise<Readonly<{ snapshotState: CloudSyncState; snapshotTrusted: boolean }>> {
         if (!manifest.latestSnapshotKey) {
-            return EMPTY_STATE;
+            return {
+                snapshotState: EMPTY_STATE,
+                snapshotTrusted: false,
+            };
         }
 
         try {
             const snapshot = await transport.readSnapshot(
                 manifest.latestSnapshotKey
             );
-            return snapshot.state;
+            return {
+                snapshotState: snapshot.state,
+                snapshotTrusted: true,
+            };
         } catch {
-            return EMPTY_STATE;
+            return {
+                snapshotState: EMPTY_STATE,
+                snapshotTrusted: false,
+            };
         }
     }
 

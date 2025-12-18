@@ -13,6 +13,7 @@ import {
     type CloudSyncSnapshot,
     parseCloudSyncSnapshot,
 } from "@shared/types/cloudSyncSnapshot";
+import { ensureError } from "@shared/utils/errorHandling";
 import { isRecord } from "@shared/utils/typeHelpers";
 
 import type {
@@ -21,8 +22,150 @@ import type {
 } from "../cloud/providers/CloudStorageProvider.types";
 import type { CloudSyncTransport } from "./CloudSyncTransport.types";
 
+import { readNumberEnv } from "../../utils/environment";
+
 const MANIFEST_KEY = "manifest.json" as const;
 const OPS_PREFIX = "sync/devices" as const;
+
+const DEFAULT_MAX_OPS_OBJECT_BYTES = 5 * 1024 * 1024; // 5 MiB
+const DEFAULT_MAX_OPS_OBJECT_LINES = 50_000;
+const DEFAULT_MAX_OPS_LINE_CHARS = 256_000;
+
+const DEFAULT_MAX_SNAPSHOT_BYTES = 25 * 1024 * 1024; // 25 MiB
+const DEFAULT_MAX_MANIFEST_BYTES = 256 * 1024; // 256 KiB
+
+const MAX_DEVICE_ID_BYTES = 256;
+
+const OPS_FILE_SUFFIX = ".ndjson" as const;
+
+function isNonNegativeSafeInteger(candidate: number): boolean {
+    return Number.isSafeInteger(candidate) && candidate >= 0;
+}
+
+function isAsciiDigits(value: string): boolean {
+    if (value.length === 0) {
+        return false;
+    }
+
+    for (const char of value) {
+        const codePoint = char.codePointAt(0);
+        if (codePoint === undefined || codePoint < 48 || codePoint > 57) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+function parseOpsObjectFileName(fileName: string):
+    | null
+    | Readonly<{
+          createdAt: number;
+          firstOpId: number;
+          lastOpId: number;
+      }> {
+    if (!fileName.endsWith(OPS_FILE_SUFFIX)) {
+        return null;
+    }
+
+    const stem = fileName.slice(0, -OPS_FILE_SUFFIX.length);
+    const parts = stem.split("-");
+    if (parts.length !== 3) {
+        return null;
+    }
+
+    const [createdAtRaw, firstOpIdRaw, lastOpIdRaw] = parts;
+    if (
+        createdAtRaw === undefined ||
+        firstOpIdRaw === undefined ||
+        lastOpIdRaw === undefined
+    ) {
+        return null;
+    }
+
+    if (
+        !isAsciiDigits(createdAtRaw) ||
+        !isAsciiDigits(firstOpIdRaw) ||
+        !isAsciiDigits(lastOpIdRaw)
+    ) {
+        return null;
+    }
+
+    const createdAt = Number(createdAtRaw);
+    const firstOpId = Number(firstOpIdRaw);
+    const lastOpId = Number(lastOpIdRaw);
+
+    if (
+        !isNonNegativeSafeInteger(createdAt) ||
+        !isNonNegativeSafeInteger(firstOpId) ||
+        !isNonNegativeSafeInteger(lastOpId) ||
+        lastOpId < firstOpId
+    ) {
+        return null;
+    }
+
+    return {
+        createdAt,
+        firstOpId,
+        lastOpId,
+    };
+}
+
+function getMaxOpsObjectBytes(): number {
+    return readNumberEnv(
+        "UW_CLOUD_SYNC_MAX_OPS_OBJECT_BYTES",
+        DEFAULT_MAX_OPS_OBJECT_BYTES
+    );
+}
+
+function getMaxOpsObjectLines(): number {
+    return readNumberEnv(
+        "UW_CLOUD_SYNC_MAX_OPS_OBJECT_LINES",
+        DEFAULT_MAX_OPS_OBJECT_LINES
+    );
+}
+
+function getMaxOpsLineChars(): number {
+    return readNumberEnv(
+        "UW_CLOUD_SYNC_MAX_OPS_LINE_CHARS",
+        DEFAULT_MAX_OPS_LINE_CHARS
+    );
+}
+
+function getMaxSnapshotBytes(): number {
+    return readNumberEnv(
+        "UW_CLOUD_SYNC_MAX_SNAPSHOT_BYTES",
+        DEFAULT_MAX_SNAPSHOT_BYTES
+    );
+}
+
+function getMaxManifestBytes(): number {
+    return readNumberEnv(
+        "UW_CLOUD_SYNC_MAX_MANIFEST_BYTES",
+        DEFAULT_MAX_MANIFEST_BYTES
+    );
+}
+
+function isProviderNotFoundError(error: unknown, key: string): boolean {
+    if (isRecord(error)) {
+        const { code } = error;
+        if (code === "ENOENT") {
+            return true;
+        }
+    }
+
+    if (error instanceof Error) {
+        const message = error.message.toLowerCase();
+        const lowerKey = key.toLowerCase();
+
+        // GoogleDriveCloudStorageProvider throws: "Google Drive object not found: <key>"
+        if (message.includes("object not found") && message.includes(lowerKey)) {
+            return true;
+        }
+    }
+
+    return false;
+}
 
 function getSnapshotsPrefix(): string {
     return `sync/snapshots/${CLOUD_SYNC_SCHEMA_VERSION}`;
@@ -40,13 +183,190 @@ function toNdjson(operations: readonly CloudSyncOperation[]): string {
     return `${operations.map((op) => JSON.stringify(op)).join("\n")}\n`;
 }
 
-function parseNdjsonOperations(raw: string): CloudSyncOperation[] {
-    const lines = raw
-        .split(/\r?\n/v)
-        .map((line) => line.trim())
-        .filter((line) => line.length > 0);
+function hasAsciiControlCharacters(value: string): boolean {
+    for (const char of value) {
+        const codePoint = char.codePointAt(0);
+        if (
+            codePoint !== undefined &&
+            (codePoint < 0x20 || codePoint === 0x7f)
+        ) {
+            return true;
+        }
+    }
 
-    return lines.map((line) => parseCloudSyncOperation(JSON.parse(line)));
+    return false;
+}
+
+function assertValidDeviceId(deviceId: string): void {
+    if (typeof deviceId !== "string" || deviceId.trim().length === 0) {
+        throw new Error("deviceId must be a non-empty string");
+    }
+
+    if (Buffer.byteLength(deviceId, "utf8") > MAX_DEVICE_ID_BYTES) {
+        throw new Error(`deviceId must not exceed ${MAX_DEVICE_ID_BYTES} bytes`);
+    }
+
+    if (hasAsciiControlCharacters(deviceId)) {
+        throw new Error("deviceId must not contain control characters");
+    }
+
+    // Device IDs must be a single key segment.
+    if (deviceId.includes("/") || deviceId.includes("\\")) {
+        throw new Error("deviceId must not contain path separators");
+    }
+
+    if (deviceId === "." || deviceId === "..") {
+        throw new Error("deviceId must not be a traversal segment");
+    }
+}
+
+function assertSafeProviderKey(key: string): void {
+    if (typeof key !== "string" || key.trim().length === 0) {
+        throw new Error("Key must be a non-empty string");
+    }
+
+    // Provider keys are always POSIX-style.
+    if (key.includes("\\")) {
+        throw new Error("Invalid key: backslashes are not allowed");
+    }
+
+    if (hasAsciiControlCharacters(key)) {
+        throw new Error("Invalid key: control characters are not allowed");
+    }
+
+    if (key.startsWith("/")) {
+        throw new Error("Invalid key: absolute keys are not allowed");
+    }
+
+    const segments = key.split("/");
+    if (
+        segments.some(
+            (segment) => segment.length === 0 || segment === "." || segment === ".."
+        )
+    ) {
+        throw new Error("Invalid key: traversal segments are not allowed");
+    }
+}
+
+function assertOpsObjectKey(key: string): void {
+    assertSafeProviderKey(key);
+
+    const segments = key.split("/");
+    // Expected: sync/devices/<deviceId>/ops/<file>.ndjson
+    if (segments.length !== 5) {
+        throw new Error(
+            `Invalid sync operations object key (expected ${OPS_PREFIX}/<deviceId>/ops/<file>.ndjson): ${key}`
+        );
+    }
+
+    const [syncSegment, devicesSegment, deviceIdSegment, opsSegment, fileName] =
+        segments;
+
+    if (!syncSegment || !devicesSegment || !deviceIdSegment || !opsSegment || !fileName) {
+        throw new Error(
+            `Invalid sync operations object key (expected ${OPS_PREFIX}/<deviceId>/ops/<file>.ndjson): ${key}`
+        );
+    }
+
+    if (syncSegment !== "sync" || devicesSegment !== "devices") {
+        throw new Error(
+            `Invalid sync operations object key (expected ${OPS_PREFIX}/...): ${key}`
+        );
+    }
+
+    if (opsSegment !== "ops") {
+        throw new Error(
+            `Invalid sync operations object key (expected ops segment): ${key}`
+        );
+    }
+
+    assertValidDeviceId(deviceIdSegment);
+
+    const parsedFileName = parseOpsObjectFileName(fileName);
+    if (!parsedFileName) {
+        throw new Error(
+            `Invalid sync operations object key (expected <createdAt>-<firstOpId>-<lastOpId>${OPS_FILE_SUFFIX}): ${key}`
+        );
+    }
+}
+
+function isValidOpsObjectKey(key: string): boolean {
+    try {
+        assertOpsObjectKey(key);
+        return true;
+    } catch {
+        return false;
+    }
+}
+
+function assertSnapshotKey(key: string): void {
+    assertSafeProviderKey(key);
+
+    const segments = key.split("/");
+    // Expected: sync/snapshots/<schemaVersion>/<createdAt>.json
+    if (segments.length !== 4) {
+        throw new Error(`Invalid snapshot key: ${key}`);
+    }
+
+    const [syncSegment, snapshotsSegment, schemaSegment, fileName] = segments;
+    if (syncSegment !== "sync" || snapshotsSegment !== "snapshots") {
+        throw new Error(`Invalid snapshot key: ${key}`);
+    }
+
+    const expectedSchemaSegment = String(CLOUD_SYNC_SCHEMA_VERSION);
+    if (schemaSegment !== expectedSchemaSegment) {
+        throw new Error(`Invalid snapshot key: ${key}`);
+    }
+
+    if (!fileName?.endsWith(".json")) {
+        throw new Error(`Invalid snapshot key: ${key}`);
+    }
+
+    const stem = fileName.slice(0, -".json".length);
+    if (!isAsciiDigits(stem)) {
+        throw new Error(`Invalid snapshot key: ${key}`);
+    }
+}
+
+function parseNdjsonOperations(args: {
+    key: string;
+    maxLineChars: number;
+    maxLines: number;
+    raw: string;
+}): CloudSyncOperation[] {
+    const { key, maxLineChars, maxLines, raw } = args;
+    const lines = raw.split(/\r?\n/u);
+    const operations: CloudSyncOperation[] = [];
+
+    for (const [index, candidate] of lines.entries()) {
+        const line = typeof candidate === "string" ? candidate.trim() : "";
+        if (line.length > 0) {
+            if (line.length > maxLineChars) {
+                throw new Error(
+                    `Cloud sync operation line exceeds max length (${maxLineChars} chars) in ${key} at line ${index + 1}`
+                );
+            }
+
+            if (operations.length >= maxLines) {
+                throw new Error(
+                    `Cloud sync operation object exceeds max operation count (${maxLines}) in ${key}`
+                );
+            }
+
+            try {
+                const parsed: unknown = JSON.parse(line);
+                operations.push(parseCloudSyncOperation(parsed));
+            } catch (error: unknown) {
+                const normalized = ensureError(error);
+                throw new Error(
+                    `Failed to parse cloud sync operation in ${key} at line ${index + 1}: ${normalized.message}`,
+                    { cause: error }
+                );
+            }
+        }
+    }
+
+    return operations;
 }
 
 function createEmptyManifest(): CloudSyncManifest {
@@ -108,6 +428,8 @@ export class ProviderCloudSyncTransport implements CloudSyncTransport {
             throw new Error("appendOperations requires at least one operation");
         }
 
+        assertValidDeviceId(deviceId);
+
         const createdAt = Date.now();
         const firstOpId = operations[0]?.opId ?? 0;
         const lastOpId = operations.at(-1)?.opId ?? firstOpId;
@@ -120,22 +442,59 @@ export class ProviderCloudSyncTransport implements CloudSyncTransport {
     }
 
     public async deleteObject(key: string): Promise<void> {
-        await this.provider.deleteObject(key);
+        // Defense-in-depth: refuse to delete arbitrary provider keys.
+        if (key === MANIFEST_KEY) {
+            await this.provider.deleteObject(key);
+            return;
+        }
+
+        if (key.endsWith(OPS_FILE_SUFFIX)) {
+            assertOpsObjectKey(key);
+            await this.provider.deleteObject(key);
+            return;
+        }
+
+        if (key.endsWith(".json")) {
+            assertSnapshotKey(key);
+            await this.provider.deleteObject(key);
+            return;
+        }
+
+        throw new Error(`Refusing to delete unexpected sync key: ${key}`);
     }
 
     public async listOperationObjects(): Promise<CloudObjectEntry[]> {
         const objects = await this.provider.listObjects(`${OPS_PREFIX}/`);
-        return objects.filter((entry) => entry.key.endsWith(".ndjson"));
+        return objects.filter((entry) => isValidOpsObjectKey(entry.key));
     }
 
     public async readManifest(): Promise<CloudSyncManifest | null> {
         try {
-            const raw = decodeUtf8(
-                await this.provider.downloadObject(MANIFEST_KEY)
-            );
+            const buffer = await this.provider.downloadObject(MANIFEST_KEY);
+            const maxBytes = getMaxManifestBytes();
+            if (buffer.byteLength > maxBytes) {
+                throw new Error(
+                    `Cloud sync manifest exceeds size limit (${maxBytes} bytes)`
+                );
+            }
+
+            const raw = decodeUtf8(buffer);
             return parseCloudSyncManifest(JSON.parse(raw));
         } catch (error) {
-            if (isRecord(error) && error["code"] === "ENOENT") {
+            if (isProviderNotFoundError(error, MANIFEST_KEY)) {
+                return null;
+            }
+
+            // Treat an invalid/corrupt manifest as "missing" so sync can
+            // recover by rebuilding remote state.
+            if (
+                error instanceof SyntaxError ||
+                (error instanceof Error &&
+                    (error.name === "ZodError" ||
+                        error.message.includes(
+                            "Cloud sync manifest exceeds size limit"
+                        )))
+            ) {
                 return null;
             }
 
@@ -146,12 +505,37 @@ export class ProviderCloudSyncTransport implements CloudSyncTransport {
     public async readOperationsObject(
         key: string
     ): Promise<CloudSyncOperation[]> {
-        const raw = decodeUtf8(await this.provider.downloadObject(key));
-        return parseNdjsonOperations(raw);
+        assertOpsObjectKey(key);
+
+        const buffer = await this.provider.downloadObject(key);
+
+        const maxBytes = getMaxOpsObjectBytes();
+        if (buffer.byteLength > maxBytes) {
+            throw new Error(
+                `Cloud sync operation object '${key}' exceeds size limit (${maxBytes} bytes)`
+            );
+        }
+
+        const raw = decodeUtf8(buffer);
+        return parseNdjsonOperations({
+            key,
+            maxLineChars: getMaxOpsLineChars(),
+            maxLines: getMaxOpsObjectLines(),
+            raw,
+        });
     }
 
     public async readSnapshot(key: string): Promise<CloudSyncSnapshot> {
-        const raw = decodeUtf8(await this.provider.downloadObject(key));
+        assertSnapshotKey(key);
+        const buffer = await this.provider.downloadObject(key);
+        const maxBytes = getMaxSnapshotBytes();
+        if (buffer.byteLength > maxBytes) {
+            throw new Error(
+                `Cloud sync snapshot '${key}' exceeds size limit (${maxBytes} bytes)`
+            );
+        }
+
+        const raw = decodeUtf8(buffer);
         return parseCloudSyncSnapshot(JSON.parse(raw));
     }
 

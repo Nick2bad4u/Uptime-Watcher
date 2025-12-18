@@ -42,18 +42,24 @@ Google Drive uses **Google Drive appDataFolder** so backups and sync artifacts a
 >
 > Treat any Google OAuth client secret as _non-confidential_ for a desktop app. The app should be designed as a **public client** (PKCE). Never rely on a client secret staying secret.
 
-## Planned environment variables
+## Environment variables (optional override)
 
-These are read from `process.env` in the Electron main process:
+The app ships with a default Google OAuth client id and end users do not need to
+configure anything.
+
+These variables are still read from `process.env` in the Electron main process
+and take precedence when set:
 
 - `UPTIME_WATCHER_GOOGLE_CLIENT_ID`
-- `UPTIME_WATCHER_GOOGLE_CLIENT_SECRET` (optional; if used, treat as non-secret)
+- `UPTIME_WATCHER_GOOGLE_CLIENT_SECRET` (optional; only needed for custom OAuth
+  apps depending on how they are configured)
 
-### Example: local development configuration
+### Example: local development override
 
 The Electron main process reads these from `process.env`.
 
-Set environment variables in your shell before starting the app.
+Set environment variables in your shell before starting the app (only needed if
+you want to use a different Google OAuth app).
 
 PowerShell:
 

@@ -160,6 +160,24 @@ const DEFAULT_MAX_BODY_LENGTH = readNumberEnv(
     8 * 1024
 ); // 8KB request body cap
 
+const DEFAULT_AGENT_MAX_SOCKETS = readNumberEnv("UW_HTTP_MAX_SOCKETS", 32);
+const DEFAULT_AGENT_MAX_FREE_SOCKETS = readNumberEnv(
+    "UW_HTTP_MAX_FREE_SOCKETS",
+    8
+);
+const DEFAULT_AGENT_KEEP_ALIVE_MSECS = readNumberEnv(
+    "UW_HTTP_KEEP_ALIVE_MSECS",
+    1000
+);
+
+function normalizePositiveInteger(value: number, fallback: number): number {
+    if (!Number.isFinite(value) || value <= 0) {
+        return fallback;
+    }
+
+    return Math.trunc(value);
+}
+
 /**
  * Creates a hardened Axios HTTP client instance suitable for monitor services.
  *
@@ -182,8 +200,32 @@ export function createHttpClient(config: MonitorServiceConfig): AxiosInstance {
     const createConfig: AxiosRequestConfig = {
         headers,
         // Connection pooling for better performance
-        httpAgent: new http.Agent({ keepAlive: true }),
-        httpsAgent: new https.Agent({ keepAlive: true }),
+        httpAgent: new http.Agent({
+            keepAlive: true,
+            keepAliveMsecs: normalizePositiveInteger(
+                DEFAULT_AGENT_KEEP_ALIVE_MSECS,
+                1000
+            ),
+            maxFreeSockets: normalizePositiveInteger(
+                DEFAULT_AGENT_MAX_FREE_SOCKETS,
+                8
+            ),
+            maxSockets: normalizePositiveInteger(DEFAULT_AGENT_MAX_SOCKETS, 32),
+            scheduling: "lifo",
+        }),
+        httpsAgent: new https.Agent({
+            keepAlive: true,
+            keepAliveMsecs: normalizePositiveInteger(
+                DEFAULT_AGENT_KEEP_ALIVE_MSECS,
+                1000
+            ),
+            maxFreeSockets: normalizePositiveInteger(
+                DEFAULT_AGENT_MAX_FREE_SOCKETS,
+                8
+            ),
+            maxSockets: normalizePositiveInteger(DEFAULT_AGENT_MAX_SOCKETS, 32),
+            scheduling: "lifo",
+        }),
         maxBodyLength: DEFAULT_MAX_BODY_LENGTH, // Bounded request size
         maxContentLength: DEFAULT_MAX_CONTENT_LENGTH, // Bounded response size
         maxRedirects: DEFAULT_MAX_REDIRECTS,

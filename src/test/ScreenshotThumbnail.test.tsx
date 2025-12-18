@@ -21,10 +21,14 @@ import {
 } from "../components/SiteDetails/ScreenshotThumbnail";
 import { logger } from "../services/logger";
 import {
-    sampleOne,
     siteNameArbitrary,
     siteUrlArbitrary,
 } from "@shared/test/arbitraries/siteArbitraries";
+import {
+    getSafeUrlForLogging,
+    isPrivateNetworkHostname,
+} from "@shared/utils/urlSafety";
+import { isValidUrl } from "@shared/validation/validatorUtils";
 
 // Mock the logger
 vi.mock("../services/logger", () => {
@@ -101,16 +105,17 @@ const createMockBoundingClientRect = (overrides = {}) => ({
 });
 
 describe(ScreenshotThumbnail, () => {
-    const screenshotThumbnailPropsArbitrary =
-        fc.record<ScreenshotThumbnailProperties>({
-            siteName: siteNameArbitrary,
-            url: siteUrlArbitrary,
-        });
+    const DEFAULT_THUMBNAIL_SITE_NAME = "Example Site";
+    const DEFAULT_THUMBNAIL_URL = "https://example.com";
 
     const createThumbnailProps = (
         overrides: Partial<ScreenshotThumbnailProperties> = {}
     ): ScreenshotThumbnailProperties => ({
-        ...sampleOne(screenshotThumbnailPropsArbitrary),
+        // Avoid flakiness: many tests below expect an <img> to render.
+        // That requires a valid, public URL (the component intentionally
+        // suppresses previews for private-network hostnames).
+        siteName: DEFAULT_THUMBNAIL_SITE_NAME,
+        url: DEFAULT_THUMBNAIL_URL,
         ...overrides,
     });
 
@@ -265,12 +270,30 @@ describe(ScreenshotThumbnail, () => {
                     url
                 ) => {
                     const trimmedUrl = url.trim();
+
+                    const isUrlValid = isValidUrl(trimmedUrl, {
+                        disallowAuth: true,
+                    });
+
+                    const isUrlSafeForScreenshot = (() => {
+                        if (!isUrlValid) {
+                            return false;
+                        }
+
+                        try {
+                            const parsed = new URL(trimmedUrl);
+                            return !isPrivateNetworkHostname(parsed.hostname);
+                        } catch {
+                            return false;
+                        }
+                    })();
+
                     render(
                         <ScreenshotThumbnail siteName={siteName} url={url} />
                     );
 
                     const expectedAriaLabel =
-                        trimmedUrl.length > 0
+                        isUrlValid
                             ? `Open ${trimmedUrl} in browser`
                             : "Open in browser";
                     const links = screen.queryAllByRole("link");
@@ -284,18 +307,20 @@ describe(ScreenshotThumbnail, () => {
                     ).toBeTruthy();
 
                     const images = screen.queryAllByRole("img");
-                    expect(images.length).toBeGreaterThan(0);
                     const matchingImage = images.find(
                         (element) =>
                             element.getAttribute("alt") ===
                             `Screenshot of ${siteName}`
                     );
-                    expect(matchingImage).toBeDefined();
-                    if (matchingImage) {
+
+                    if (isUrlSafeForScreenshot) {
+                        expect(matchingImage).toBeDefined();
                         expect(matchingImage).toHaveAttribute(
                             "src",
                             `https://api.microlink.io/?url=${encodeURIComponent(trimmedUrl)}&screenshot=true&meta=false&embed=screenshot.url&colorScheme=auto`
                         );
+                    } else {
+                        expect(matchingImage).toBeUndefined();
                     }
 
                     const captionElements = Array.from(
@@ -350,7 +375,7 @@ describe(ScreenshotThumbnail, () => {
                     "External URL opened",
                     {
                         siteName: defaultProps.siteName,
-                        url: defaultProps.url,
+                        url: getSafeUrlForLogging(defaultProps.url),
                     }
                 );
             });

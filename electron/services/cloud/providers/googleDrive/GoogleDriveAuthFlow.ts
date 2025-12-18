@@ -1,3 +1,5 @@
+import { ensureError } from "@shared/utils/errorHandling";
+import { getSafeUrlForLogging } from "@shared/utils/urlSafety";
 import axios from "axios";
 import { shell } from "electron";
 import * as z from "zod";
@@ -80,7 +82,35 @@ export class GoogleDriveAuthFlow {
             authorizationUrl.searchParams.set("prompt", "consent");
             authorizationUrl.searchParams.set("include_granted_scopes", "true");
 
-            await shell.openExternal(authorizationUrl.toString());
+            const authorizeUrl = authorizationUrl.toString();
+            const urlForLog = getSafeUrlForLogging(authorizeUrl);
+
+            // Defensive: avoid opening unexpected schemes or credential-bearing URLs.
+            if (
+                authorizationUrl.protocol !== "https:" ||
+                authorizationUrl.username.length > 0 ||
+                authorizationUrl.password.length > 0
+            ) {
+                throw new Error(
+                    `Refusing to open unexpected Google OAuth URL: ${urlForLog}`
+                );
+            }
+
+            try {
+                await shell.openExternal(authorizeUrl);
+            } catch (error: unknown) {
+                const resolved = ensureError(error);
+                const {code} = (resolved as Error & { code?: unknown });
+                const codeSuffix =
+                    typeof code === "string" && code.length > 0
+                        ? ` (${code})`
+                        : "";
+
+                throw new Error(
+                    `Failed to open Google OAuth URL: ${urlForLog}${codeSuffix}`,
+                    { cause: error }
+                );
+            }
 
             const callback = await server.waitForCallback({
                 expectedState: state,

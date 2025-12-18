@@ -379,6 +379,50 @@ export class DatabaseService {
         }
 
         try {
+            // WAL improves concurrent read/write behavior and generally
+            // reduces "database is locked" frequency for desktop apps.
+            db.get("PRAGMA journal_mode = WAL");
+        } catch (error) {
+            if (this.isDatabaseLockedError(error)) {
+                // Escalate to the caller so initialization retries with the
+                // lock recovery flow (busy_timeout + artifact relocation).
+                throw error;
+            }
+            logger.warn(
+                "[DatabaseService] Failed to apply PRAGMA journal_mode",
+                {
+                    message: ensureError(error).message,
+                }
+            );
+        }
+
+        try {
+            // NORMAL is the typical performance/safety trade-off for WAL mode.
+            db.get("PRAGMA synchronous = NORMAL");
+        } catch (error) {
+            if (this.isDatabaseLockedError(error)) {
+                throw error;
+            }
+            logger.warn(
+                "[DatabaseService] Failed to apply PRAGMA synchronous",
+                {
+                    message: ensureError(error).message,
+                }
+            );
+        }
+
+        try {
+            db.get("PRAGMA temp_store = MEMORY");
+        } catch (error) {
+            logger.warn(
+                "[DatabaseService] Failed to apply PRAGMA temp_store",
+                {
+                    message: ensureError(error).message,
+                }
+            );
+        }
+
+        try {
             db.run("PRAGMA foreign_keys = ON");
         } catch (error) {
             logger.warn(

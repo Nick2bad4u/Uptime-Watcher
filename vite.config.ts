@@ -168,11 +168,12 @@ const getWasmSourcePath = (): string => {
  * Vite configuration for Uptime Watcher Electron app.
  */
 
-export default defineConfig(({ mode }) => {
+export default defineConfig(({ command, mode }) => {
     // Prefer Vite's provided mode over raw NODE_ENV for consistency.
     const codecovToken = getEnvironmentVariable("CODECOV_TOKEN");
     const isTestMode = mode === "test";
     const isDev = mode === "development";
+    const isBuild = command === "build";
     const wasmSourcePath = getWasmSourcePath();
 
     return {
@@ -351,6 +352,12 @@ export default defineConfig(({ mode }) => {
                                     "es-set-tostringtag",
                                     "get-intrinsic",
                                 ],
+                                output: {
+                                    // Reduce memory pressure from sourcemap generation. We still
+                                    // get file-backed sourcemaps for debugging, but avoid embedding
+                                    // sourcesContent for every module.
+                                    sourcemapExcludeSources: true,
+                                },
                             },
                             sourcemap: true, // Enable sourcemaps for main process
                             target: VITE_BUILD_TARGET, // Ensure CSS Modules compatibility
@@ -389,6 +396,7 @@ export default defineConfig(({ mode }) => {
                                 output: {
                                     // Ensure preload scripts are not code-split for nodeIntegration: false compatibility
                                     inlineDynamicImports: true,
+                                    sourcemapExcludeSources: true,
                                 },
                             },
                             sourcemap: true, // Enable sourcemaps for preload script
@@ -464,41 +472,47 @@ export default defineConfig(({ mode }) => {
                   ]
                 : []),
             devtoolsJson({ normalizeForWindowsContainer: true }),
-            // Bundle analysis tools - both provide different perspectives
-            visualizer({
-                brotliSize: true,
-                emitFile: true,
-                exclude: [
-                    { file: "node_modules/**" },
-                    { file: "**/*.test.*" },
-                    { file: "**/*.spec.*" },
-                ],
-                filename: "build-stats.html",
-                gzipSize: true,
-                include: [
-                    { file: "**/*.ts" },
-                    { file: "**/*.tsx" },
-                    { file: "**/*.js" },
-                    { file: "**/*.jsx" },
-                    { file: "**/*.mjs" },
-                    { file: "**/*.cjs" },
-                ],
-                open: false,
-                projectRoot: normalizePath(path.resolve(dirname)),
-                sourcemap: true,
-                template: "treemap",
-                title: "Electron React Bundle Stats",
-            }) as PluginOption,
-            analyzer({
-                analyzerMode: "static", // Generate static HTML report
-                brotliOptions: {}, // Use default brotli options
-                defaultSizes: "gzip", // Show gzipped sizes by default
-                fileName: "bundle-analysis", // Different from visualizer
-                gzipOptions: {}, // Use default gzip options
-                openAnalyzer: false, // Don't auto-open (you have visualizer for that)
-                reportTitle: "Uptime Watcher Bundle Analysis",
-                summary: true, // Show summary in console
-            }),
+            // Bundle analysis tools are build-only. Running them during `vite serve`
+            // (especially alongside vite-plugin-electron's internal watch builds)
+            // can cause significant memory pressure on Windows.
+            ...(isBuild
+                ? [
+                      visualizer({
+                          brotliSize: true,
+                          emitFile: true,
+                          exclude: [
+                              { file: "node_modules/**" },
+                              { file: "**/*.test.*" },
+                              { file: "**/*.spec.*" },
+                          ],
+                          filename: "build-stats.html",
+                          gzipSize: true,
+                          include: [
+                              { file: "**/*.ts" },
+                              { file: "**/*.tsx" },
+                              { file: "**/*.js" },
+                              { file: "**/*.jsx" },
+                              { file: "**/*.mjs" },
+                              { file: "**/*.cjs" },
+                          ],
+                          open: false,
+                          projectRoot: normalizePath(path.resolve(dirname)),
+                          sourcemap: true,
+                          template: "treemap",
+                          title: "Electron React Bundle Stats",
+                      }) as PluginOption,
+                      analyzer({
+                          analyzerMode: "static", // Generate static HTML report
+                          brotliOptions: {}, // Use default brotli options
+                          defaultSizes: "gzip", // Show gzipped sizes by default
+                          fileName: "bundle-analysis", // Different from visualizer
+                          gzipOptions: {}, // Use default gzip options
+                          openAnalyzer: false, // Don't auto-open (you have visualizer for that)
+                          reportTitle: "Uptime Watcher Bundle Analysis",
+                          summary: true, // Show summary in console
+                      }),
+                  ]
+                : []),
             viteStaticCopy({
                 // Use writeBundle hook for better integration with build process
                 hook: "writeBundle",
@@ -654,13 +668,18 @@ export default defineConfig(({ mode }) => {
                     reloadPageOnChange: false, // Don't reload entire page for WASM changes
                 },
             }),
-            // Put the Codecov vite plugin after all other plugins
-            codecovVitePlugin({
-                bundleName: "uptime-watcher",
-                enableBundleAnalysis: Boolean(codecovToken),
-                ...(codecovToken ? { uploadToken: codecovToken } : {}),
-                telemetry: false, // Disable telemetry for faster builds
-            }),
+            // Codecov bundle upload is build-only; exclude from `vite serve` to
+            // reduce memory usage and startup time.
+            ...(isBuild
+                ? [
+                      codecovVitePlugin({
+                          bundleName: "uptime-watcher",
+                          enableBundleAnalysis: Boolean(codecovToken),
+                          ...(codecovToken ? { uploadToken: codecovToken } : {}),
+                          telemetry: false, // Disable telemetry for faster builds
+                      }),
+                  ]
+                : []),
         ],
         preview: {
             open: false, // Don't auto-open browser (Electron only)

@@ -169,4 +169,50 @@ describe(EncryptedSyncCloudStorageProvider, () => {
         );
         expect(read.toString("utf8")).toBe("x");
     });
+
+    it("allows legacy plaintext sync objects created before enabledAt", async () => {
+        const inner = new InMemoryProvider();
+        const key = await derivePassphraseKey({
+            passphrase: "secret",
+            salt: generateEncryptionSalt(),
+        });
+
+        inner.objects.set(
+            "sync/devices/a/ops/10-1-1.ndjson",
+            Buffer.from("x")
+        );
+
+        const provider = new EncryptedSyncCloudStorageProvider({
+            inner,
+            key,
+            encryptionEnabledAt: 20,
+        });
+
+        await expect(
+            provider.downloadObject("sync/devices/a/ops/10-1-1.ndjson")
+        ).resolves.toEqual(Buffer.from("x"));
+    });
+
+    it("rejects plaintext sync objects created at/after enabledAt", async () => {
+        const inner = new InMemoryProvider();
+        const key = await derivePassphraseKey({
+            passphrase: "secret",
+            salt: generateEncryptionSalt(),
+        });
+
+        inner.objects.set(
+            "sync/devices/a/ops/30-1-1.ndjson",
+            Buffer.from("x")
+        );
+
+        const provider = new EncryptedSyncCloudStorageProvider({
+            inner,
+            key,
+            encryptionEnabledAt: 20,
+        });
+
+        await expect(
+            provider.downloadObject("sync/devices/a/ops/30-1-1.ndjson")
+        ).rejects.toThrowError(/refusing to read unencrypted sync object/i);
+    });
 });

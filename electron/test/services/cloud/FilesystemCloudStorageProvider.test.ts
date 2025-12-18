@@ -66,4 +66,18 @@ describe("FilesystemCloudStorageProvider", () => {
         expect(downloaded.entry.key).toBe(entry.key);
         expect(downloaded.buffer.toString("utf8")).toBe("hello");
     });
+
+    it("allows keys with segments that start with '..' but are not traversal", async () => {
+        const provider = new FilesystemCloudStorageProvider({ baseDirectory });
+
+        await provider.uploadObject({
+            buffer: Buffer.from("payload"),
+            key: "sync/..foo/payload.txt",
+            overwrite: true,
+        });
+
+        await expect(provider.downloadObject("sync/..foo/payload.txt")).resolves.toEqual(
+            Buffer.from("payload")
+        );
+    });
 });

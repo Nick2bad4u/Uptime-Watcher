@@ -7,12 +7,30 @@
  */
 
 import type { ExclusifyUnion } from "type-fest";
-import type { ZodError } from "zod";
+import type { ZodError, ZodType } from "zod";
 
 import type { Site } from "../types";
 
 import { siteSchema } from "./siteSchemas";
 import { statusUpdateSchema } from "./statusUpdateSchemas";
+
+/**
+ * Canonical schema for site update payloads.
+ *
+ * @remarks
+ * Site identifiers are treated as immutable (primary key). Updates may only
+ * modify the remaining fields, and unknown keys are rejected.
+ */
+type SiteUpdateBase = Omit<Site, "identifier">;
+
+type SiteUpdate = {
+    readonly [Key in keyof SiteUpdateBase]?: SiteUpdateBase[Key] | undefined;
+};
+
+const siteUpdateSchema: ZodType<SiteUpdate> = siteSchema
+    .omit({ identifier: true })
+    .partial()
+    .strict();
 /**
  * Validates an unknown payload against the canonical {@link Site} schema.
  *
@@ -25,6 +43,14 @@ export type SiteSnapshotParseResult = ReturnType<typeof siteSchema.safeParse>;
 
 export const validateSiteSnapshot = (value: unknown): SiteSnapshotParseResult =>
     siteSchema.safeParse(value);
+
+/**
+ * Validates an unknown payload against the canonical site update schema.
+ */
+export type SiteUpdateParseResult = ReturnType<typeof siteUpdateSchema.safeParse>;
+
+export const validateSiteUpdate = (value: unknown): SiteUpdateParseResult =>
+    siteUpdateSchema.safeParse(value);
 
 /**
  * Validates an unknown payload against the canonical {@link StatusUpdate}

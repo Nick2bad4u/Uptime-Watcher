@@ -104,6 +104,11 @@ export class WebsocketKeepaliveMonitor implements IMonitorService {
         const started = performance.now();
 
         return new Promise<MonitorCheckResult>((resolve, reject) => {
+            if (signal?.aborted) {
+                reject(new Error("Operation was aborted"));
+                return;
+            }
+
             const socket = new NodeWebSocket(url, {
                 handshakeTimeout: timeout,
             });
@@ -241,6 +246,11 @@ export class WebsocketKeepaliveMonitor implements IMonitorService {
 
             if (signal) {
                 const abortHandler = (): void => {
+                    try {
+                        socket.terminate();
+                    } catch {
+                        // Ignore termination errors
+                    }
                     rejectOnce(new Error("Operation was aborted"));
                 };
                 signal.addEventListener("abort", abortHandler, {
@@ -253,10 +263,30 @@ export class WebsocketKeepaliveMonitor implements IMonitorService {
 
             cleanupCallbacks.push(() => {
                 socket.removeAllListeners();
-                if (socket.readyState === NodeWebSocket.OPEN) {
-                    socket.close();
-                } else if (socket.readyState === NodeWebSocket.CONNECTING) {
-                    socket.terminate();
+
+                switch (socket.readyState) {
+                    case NodeWebSocket.CLOSED: {
+                        // No-op.
+                        break;
+                    }
+
+                    case NodeWebSocket.CLOSING:
+                    case NodeWebSocket.CONNECTING: {
+                        socket.terminate();
+                        break;
+                    }
+
+                    case NodeWebSocket.OPEN: {
+                        socket.close();
+                        break;
+                    }
+
+                        default: {
+                        // Exhaustiveness guard (should be unreachable).
+                        throw new Error(
+                            `Unexpected WebSocket readyState: ${String(socket.readyState)}`
+                        );
+                        }
                 }
             });
 

@@ -117,6 +117,7 @@ export type BaseMonitorSchemaType = MonitorSchema<{
  * @public
  */
 export type HttpMonitorSchemaType = MonitorSchema<{
+    followRedirects: z.ZodOptional<z.ZodBoolean>;
     type: z.ZodLiteral<"http">;
     url: z.ZodString;
 }>;
@@ -128,6 +129,7 @@ export type HttpMonitorSchemaType = MonitorSchema<{
  */
 export type HttpHeaderMonitorSchemaType = MonitorSchema<{
     expectedHeaderValue: z.ZodString;
+    followRedirects: z.ZodOptional<z.ZodBoolean>;
     headerName: z.ZodString;
     type: z.ZodLiteral<"http-header">;
     url: z.ZodString;
@@ -140,6 +142,7 @@ export type HttpHeaderMonitorSchemaType = MonitorSchema<{
  */
 export type HttpJsonMonitorSchemaType = MonitorSchema<{
     expectedJsonValue: z.ZodString;
+    followRedirects: z.ZodOptional<z.ZodBoolean>;
     jsonPath: z.ZodString;
     type: z.ZodLiteral<"http-json">;
     url: z.ZodString;
@@ -152,6 +155,7 @@ export type HttpJsonMonitorSchemaType = MonitorSchema<{
  */
 export type HttpKeywordMonitorSchemaType = MonitorSchema<{
     bodyKeyword: z.ZodString;
+    followRedirects: z.ZodOptional<z.ZodBoolean>;
     type: z.ZodLiteral<"http-keyword">;
     url: z.ZodString;
 }>;
@@ -162,6 +166,7 @@ export type HttpKeywordMonitorSchemaType = MonitorSchema<{
  * @public
  */
 export type HttpLatencyMonitorSchemaType = MonitorSchema<{
+    followRedirects: z.ZodOptional<z.ZodBoolean>;
     maxResponseTime: z.ZodNumber;
     type: z.ZodLiteral<"http-latency">;
     url: z.ZodString;
@@ -174,6 +179,7 @@ export type HttpLatencyMonitorSchemaType = MonitorSchema<{
  */
 export type HttpStatusMonitorSchemaType = MonitorSchema<{
     expectedStatusCode: z.ZodNumber;
+    followRedirects: z.ZodOptional<z.ZodBoolean>;
     type: z.ZodLiteral<"http-status">;
     url: z.ZodString;
 }>;

@@ -61,6 +61,7 @@ vi.mock("../../../services/SystemService", () => ({
     },
 }));
 import { isValidUrl } from "@shared/validation/validatorUtils";
+import { getSafeUrlForLogging } from "@shared/utils/urlSafety";
 
 import { SystemService } from "../../../services/SystemService";
 import { useUIStore } from "../../../stores/ui/useUiStore";
@@ -567,7 +568,9 @@ describe("UI Store - Property-Based Fuzzing Tests", () => {
             // Act
             useUIStore.getState().openExternal(url);
 
-            const allowed = isValidUrl(url);
+            const allowed = isValidUrl(url, {
+                disallowAuth: true,
+            });
 
             if (allowed) {
                 expect(mockOpenExternal).toHaveBeenCalledWith(url);
@@ -576,7 +579,7 @@ describe("UI Store - Property-Based Fuzzing Tests", () => {
                 expect(mockOpenExternal).not.toHaveBeenCalled();
                 expect(mockErrorStore.setStoreError).toHaveBeenCalledWith(
                     "system-open-external",
-                    expect.stringContaining("URL must start with http(s)://")
+                    expect.stringContaining("URL must be a valid http(s) URL")
                 );
             }
         });
@@ -591,7 +594,9 @@ describe("UI Store - Property-Based Fuzzing Tests", () => {
                 // Act
                 useUIStore.getState().openExternal(url, { siteName });
 
-                const allowed = isValidUrl(url);
+                    const allowed = isValidUrl(url, {
+                        disallowAuth: true,
+                    });
 
                 if (allowed) {
                     expect(mockOpenExternal).toHaveBeenCalledWith(url);
@@ -601,7 +606,7 @@ describe("UI Store - Property-Based Fuzzing Tests", () => {
                     expect(mockErrorStore.setStoreError).toHaveBeenCalledWith(
                         "system-open-external",
                         expect.stringContaining(
-                            "URL must start with http(s)://"
+                            "URL must be a valid http(s) URL"
                         )
                     );
                 }
@@ -618,7 +623,11 @@ describe("UI Store - Property-Based Fuzzing Tests", () => {
             // Act
             for (const url of urls) useUIStore.getState().openExternal(url);
 
-            const validUrls = urls.filter((url) => isValidUrl(url));
+            const validUrls = urls.filter((url) =>
+                isValidUrl(url, {
+                    disallowAuth: true,
+                })
+            );
             const invalidUrls = urls.length - validUrls.length;
 
             expect(mockOpenExternal).toHaveBeenCalledTimes(validUrls.length);
@@ -637,6 +646,7 @@ describe("UI Store - Property-Based Fuzzing Tests", () => {
 
         it("should log user action after successful external navigation", async () => {
             const url = "https://example.com";
+            const urlForLog = getSafeUrlForLogging(url);
 
             mockLogger.user.action.mockClear();
 
@@ -646,12 +656,13 @@ describe("UI Store - Property-Based Fuzzing Tests", () => {
 
             expect(mockLogger.user.action).toHaveBeenCalledWith(
                 "External URL opened",
-                expect.objectContaining({ url })
+                expect.objectContaining({ url: urlForLog })
             );
         });
 
         it("should log and surface errors when SystemService.openExternal fails", async () => {
             const url = "https://example.com";
+            const urlForLog = getSafeUrlForLogging(url);
             const failure = new Error("IPC failure");
 
             mockOpenExternal.mockRejectedValueOnce(failure);
@@ -666,14 +677,14 @@ describe("UI Store - Property-Based Fuzzing Tests", () => {
                 failure,
                 expect.objectContaining({
                     context: undefined,
-                    url,
+                    url: urlForLog,
                 })
             );
             expect(mockLogger.user.action).toHaveBeenCalledWith(
                 "External URL failed",
                 expect.objectContaining({
                     error: failure.message,
-                    url,
+                    url: urlForLog,
                 })
             );
             expect(mockLogger.user.action).not.toHaveBeenCalledWith(

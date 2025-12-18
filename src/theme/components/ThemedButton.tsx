@@ -139,6 +139,7 @@ const ThemedButtonComponent = ({
     style = DEFAULT_THEMED_BOX_STYLE,
     title,
     type: providedType,
+    value,
     variant = "primary",
 }: ThemedButtonProperties): JSX.Element => {
     const overrideTypeProps =
@@ -210,7 +211,7 @@ const ThemedButtonComponent = ({
             data-testid={
                 dataTestId ??
                 (ariaLabel
-                    ? `button-${ariaLabel.toLowerCase().replaceAll(/\s+/gv, "-")}`
+                    ? `button-${ariaLabel.toLowerCase().replaceAll(/\s+/gu, "-")}`
                     : undefined)
             }
             disabled={disabled || loading}
@@ -218,6 +219,7 @@ const ThemedButtonComponent = ({
             style={style}
             title={title}
             type="button"
+            value={value}
             {...overrideTypeProps}
         >
             {renderContent()}

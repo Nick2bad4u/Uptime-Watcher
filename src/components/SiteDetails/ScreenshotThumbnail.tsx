@@ -6,6 +6,8 @@
  * React portals for the overlay positioning.
  */
 
+import { isPrivateNetworkHostname } from "@shared/utils/urlSafety";
+import { isValidUrl } from "@shared/validation/validatorUtils";
 import {
     type JSX,
     type MouseEvent,
@@ -85,6 +87,27 @@ export const ScreenshotThumbnail = ({
         [url]
     );
 
+    const isUrlValid = useMemo(
+        () =>
+            isValidUrl(safeUrl, {
+                disallowAuth: true,
+            }),
+        [safeUrl]
+    );
+
+    const isUrlSafeForScreenshot = useMemo(() => {
+        if (!isUrlValid) {
+            return false;
+        }
+
+        try {
+            const parsed = new URL(safeUrl);
+            return !isPrivateNetworkHostname(parsed.hostname);
+        } catch {
+            return false;
+        }
+    }, [isUrlValid, safeUrl]);
+
     const safeSiteName = useMemo(
         () => (typeof siteName === "string" ? siteName : "Unknown Site"),
         [siteName]
@@ -92,15 +115,15 @@ export const ScreenshotThumbnail = ({
 
     const screenshotUrl = useMemo(
         () =>
-            safeUrl
+            isUrlSafeForScreenshot
                 ? `https://api.microlink.io/?url=${encodeURIComponent(safeUrl)}&screenshot=true&meta=false&embed=screenshot.url&colorScheme=auto`
                 : undefined,
-        [safeUrl]
+        [isUrlSafeForScreenshot, safeUrl]
     );
 
     const ariaLabel = useMemo(
-        () => (safeUrl ? `Open ${safeUrl} in browser` : "Open in browser"),
-        [safeUrl]
+        () => (isUrlValid ? `Open ${safeUrl} in browser` : "Open in browser"),
+        [isUrlValid, safeUrl]
     );
 
     // Memoized style objects to prevent unnecessary re-renders
@@ -146,9 +169,15 @@ export const ScreenshotThumbnail = ({
     const handleClick = useCallback(
         (event: MouseEvent) => {
             event.preventDefault();
+
+            if (!isUrlValid) {
+                return;
+            }
+
             openExternal(safeUrl, { siteName: safeSiteName });
         },
         [
+            isUrlValid,
             openExternal,
             safeSiteName,
             safeUrl,
@@ -213,14 +242,16 @@ export const ScreenshotThumbnail = ({
             <a
                 aria-label={ariaLabel}
                 className="site-details-thumbnail-link"
-                href={safeUrl || "#"}
+                href={isUrlValid ? safeUrl : "#"}
                 onBlur={handleBlur}
                 onClick={handleClick}
                 onFocus={handleFocus}
                 onMouseEnter={handleMouseEnter}
                 onMouseLeave={handleMouseLeave}
                 ref={linkReference}
+                rel="noopener noreferrer"
                 tabIndex={0}
+                target="_blank"
             >
                 {screenshotUrl ? (
                     <img

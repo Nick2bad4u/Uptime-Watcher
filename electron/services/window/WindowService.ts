@@ -38,6 +38,8 @@ import type { Event, HandlerDetails } from "electron";
 import { getNodeEnv } from "@shared/utils/environment";
 import { ensureError, withErrorHandling } from "@shared/utils/errorHandling";
 import { getErrorMessage } from "@shared/utils/errorUtils";
+import { getSafeUrlForLogging } from "@shared/utils/urlSafety";
+import { isValidUrl } from "@shared/validation/validatorUtils";
 import { BrowserWindow, shell } from "electron";
 // eslint-disable-next-line unicorn/import-style -- Need namespace import for path operations
 import * as path from "node:path";
@@ -158,31 +160,127 @@ export class WindowService {
         targetUrl: string,
         context: string
     ): Promise<void> {
+        const urlForLog = getSafeUrlForLogging(targetUrl);
+
         try {
             const parsed = new URL(targetUrl);
-            const isHttp =
-                parsed.protocol === "http:" || parsed.protocol === "https:";
-            const isMailTo = parsed.protocol === "mailto:";
+            const {
+                password,
+                pathname,
+                protocol,
+                username,
+            } = parsed;
+            const isHttp = protocol === "http:" || protocol === "https:";
+            const isMailTo = protocol === "mailto:";
+
+            if (username.length > 0 || password.length > 0) {
+                logger.warn(
+                    "[WindowService] Blocked credential-bearing external navigation",
+                    {
+                        context,
+                        protocol,
+                        url: urlForLog,
+                    }
+                );
+                return;
+            }
 
             if (!isHttp && !isMailTo) {
                 logger.warn(
                     "[WindowService] Blocked external navigation to non-http(s)/mailto URL",
                     {
                         context,
-                        protocol: parsed.protocol,
-                        url: targetUrl,
+                        protocol,
+                        url: urlForLog,
                     }
                 );
                 return;
             }
 
-            await shell.openExternal(targetUrl);
-        } catch {
+            if (isMailTo) {
+                const mailTarget = pathname.trim();
+                if (mailTarget.length === 0 || /[\r\n]/v.test(mailTarget)) {
+                    logger.warn(
+                        "[WindowService] Blocked invalid mailto external navigation",
+                        {
+                            context,
+                            protocol,
+                            url: urlForLog,
+                        }
+                    );
+                    return;
+                }
+
+                try {
+                    await shell.openExternal(targetUrl);
+                } catch (error: unknown) {
+                    const resolved = ensureError(error);
+                    const {code} = (resolved as Error & { code?: unknown });
+
+                    logger.warn(
+                        "[WindowService] Failed to open mailto external navigation",
+                        {
+                            context,
+                            errorName: resolved.name,
+                            protocol,
+                            url: urlForLog,
+                            ...(typeof code === "string" && code.length > 0
+                                ? { errorCode: code }
+                                : {}),
+                        }
+                    );
+                }
+                return;
+            }
+
+            if (
+                !isValidUrl(targetUrl, {
+                    disallowAuth: true,
+                })
+            ) {
+                logger.warn(
+                    "[WindowService] Blocked invalid http(s) external navigation",
+                    {
+                        context,
+                        protocol,
+                        url: urlForLog,
+                    }
+                );
+                return;
+            }
+
+            try {
+                await shell.openExternal(targetUrl);
+            } catch (error: unknown) {
+                const resolved = ensureError(error);
+                const {code} = (resolved as Error & { code?: unknown });
+
+                logger.warn(
+                    "[WindowService] Failed to open http(s) external navigation",
+                    {
+                        context,
+                        errorName: resolved.name,
+                        protocol,
+                        url: urlForLog,
+                        ...(typeof code === "string" && code.length > 0
+                            ? { errorCode: code }
+                            : {}),
+                    }
+                );
+            }
+        } catch (error: unknown) {
+            const resolved = ensureError(error);
+            const {code} = (resolved as Error & { code?: unknown });
+
             logger.warn(
                 "[WindowService] Blocked external navigation due to invalid URL",
                 {
                     context,
-                    url: targetUrl,
+                    errorName: resolved.name,
+                    url: urlForLog,
+                    ...(typeof code === "string" && code.length > 0
+                        ? { errorCode: code }
+                        : {}),
                 }
             );
         }
@@ -470,17 +568,75 @@ export class WindowService {
                 nodeIntegrationInSubFrames: false,
                 nodeIntegrationInWorker: false,
                 preload: this.getPreloadPath(), // Safe IPC bridge
-                sandbox: false, // Preload is currently compiled as CJS and relies on require(); enabling sandbox would break it.
+                // Security: enable Chromium sandbox for renderer hardening.
+                // Preload scripts still retain Node access when sandboxed.
+                sandbox: true,
                 webSecurity: true,
                 webviewTag: false,
             },
             width: 1200,
         });
 
+        // Deny all permission requests by default.
+        // This prevents unexpected permission prompts and reduces the attack
+        // surface for compromised renderer content.
+        try {
+            const { session } = this.mainWindow.webContents;
+
+            session.setPermissionCheckHandler(() => false);
+            session.setPermissionRequestHandler(
+                (_webContents, _permission, callback) => {
+                    const denyPermission = false;
+                    callback(denyPermission);
+                }
+            );
+
+            // Extra hardening (Electron APIs differ slightly across versions).
+            if (typeof session.setDevicePermissionHandler === "function") {
+                session.setDevicePermissionHandler(() => false);
+            }
+
+            if (typeof session.setDisplayMediaRequestHandler === "function") {
+                session.setDisplayMediaRequestHandler(
+                    (_request, callback) => {
+                        const denyResponse = {};
+                        callback(denyResponse);
+                    }
+                );
+            }
+        } catch (error: unknown) {
+            logger.warn(
+                "[WindowService] Failed to attach permission handlers",
+                ensureError(error)
+            );
+        }
+
         // Enhance security headers for all responses loaded in the window
         // Only apply security headers in production to avoid DevTools conflicts
         const isProduction = !isDev();
         if (isProduction) {
+            // A production-only CSP header provides a much stronger baseline
+            // than relying on a static HTML meta tag (which must often remain
+            // relaxed for Vite dev mode/HMR).
+            //
+            // Keep this policy intentionally conservative. If a new renderer
+            // feature requires expanding it, do so intentionally and with a
+            // targeted allow-list.
+            const productionCsp = [
+                "default-src 'self'",
+                "base-uri 'none'",
+                "form-action 'none'",
+                "frame-ancestors 'none'",
+                "object-src 'none'",
+                "script-src 'self'",
+                "style-src 'self' 'unsafe-inline'",
+                "img-src 'self' data: blob: https://api.microlink.io",
+                "font-src 'self' data:",
+                "connect-src 'self'",
+                "worker-src 'self' blob:",
+                "media-src 'self' blob:",
+            ].join("; ");
+
             try {
                 const sess = this.mainWindow.webContents.session;
                 sess.webRequest.onHeadersReceived((details, callback) => {
@@ -495,6 +651,7 @@ export class WindowService {
                     headers["Permissions-Policy"] = [
                         "camera=(), microphone=(), geolocation=(), fullscreen=()",
                     ];
+                    headers["Content-Security-Policy"] = [productionCsp];
 
                     callback({
                         cancel: false,

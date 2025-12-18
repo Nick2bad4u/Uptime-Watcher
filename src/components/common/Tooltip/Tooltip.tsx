@@ -428,8 +428,17 @@ export const Tooltip: NamedExoticComponent<TooltipProperties> = memo(
                 applyTooltipPosition();
             };
 
+            const scrollListenerOptions = {
+                capture: true,
+                passive: true,
+            } as const;
+
             window.addEventListener("resize", handleReposition);
-            window.addEventListener("scroll", handleReposition, true);
+            window.addEventListener(
+                "scroll",
+                handleReposition,
+                scrollListenerOptions
+            );
 
             const tooltipNode = tooltipRef.current;
             const triggerNode = containerRef.current;
@@ -451,7 +460,11 @@ export const Tooltip: NamedExoticComponent<TooltipProperties> = memo(
 
             return (): void => {
                 window.removeEventListener("resize", handleReposition);
-                window.removeEventListener("scroll", handleReposition, true);
+                window.removeEventListener(
+                    "scroll",
+                    handleReposition,
+                    scrollListenerOptions
+                );
 
                 resizeObserver?.disconnect();
             };

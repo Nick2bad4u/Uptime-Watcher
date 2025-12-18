@@ -38,6 +38,26 @@ import {
 } from "../utils/typeGuards";
 
 /**
+ * Options for {@link isValidUrl}.
+ *
+ * @remarks
+ * `validator.js` uses snake_case options (e.g. `disallow_auth`). This codebase
+ * enforces camelCase identifiers, so we also accept `disallowAuth` and map it
+ * to the underlying validator option.
+ */
+export type UrlValidationOptions = Omit<validator.IsURLOptions, "disallow_auth"> &
+    {
+        /**
+         * Validator.js option (kept for backwards compatibility).
+         */
+
+        readonly disallow_auth?: boolean;
+
+        /** Lint-friendly alias for validator's `disallow_auth`. */
+        readonly disallowAuth?: boolean;
+    };
+
+/**
  * Validates that a value is a non-empty string.
  *
  * @example
@@ -309,24 +329,31 @@ export function isValidPort(value: unknown): boolean {
  */
 export function isValidUrl(
     value: unknown,
-    options?: Parameters<typeof validator.isURL>[1]
+    options: UrlValidationOptions = {}
 ): value is string {
     if (typeof value !== "string") {
         return false;
     }
 
+    const {
+
+        disallow_auth: disallowAuthLegacy,
+        disallowAuth,
+        ...restOptions
+    } = options;
+
     const urlOptions = {
         allow_protocol_relative_urls: false,
         allow_trailing_dot: false,
         allow_underscores: false,
-        disallow_auth: false,
+        disallow_auth: disallowAuth ?? disallowAuthLegacy ?? false,
         protocols: ["http", "https"],
         require_host: true,
         require_port: false,
         require_protocol: true,
         require_tld: false,
         require_valid_protocol: true,
-        ...options,
+        ...restOptions,
     } satisfies Parameters<typeof validator.isURL>[1];
 
     if (value.includes("'") || value.includes("`")) {
@@ -341,7 +368,9 @@ export function isValidUrl(
         return false;
     }
 
-    const allowedProtocols = urlOptions.protocols ?? [];
+    const allowedProtocols: readonly string[] = Array.isArray(urlOptions.protocols)
+        ? urlOptions.protocols
+        : [];
 
     const requiresAuthorityDelimiter = allowedProtocols.some((protocol) => {
         const normalizedProtocol = protocol.toLowerCase();

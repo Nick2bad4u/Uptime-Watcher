@@ -459,7 +459,7 @@ const RemoteBackupsPanel = ({
 }: RemoteBackupsPanelProperties): JSX.Element => {
     const handleRestoreClick = useCallback(
         (event: ReactMouseEvent<HTMLButtonElement>): void => {
-            const key = event.currentTarget.dataset["backupKey"];
+            const key = event.currentTarget.value;
             if (key) {
                 onRestoreBackupClick(key);
             }
@@ -469,7 +469,7 @@ const RemoteBackupsPanel = ({
 
     const handleDeleteClick = useCallback(
         (event: ReactMouseEvent<HTMLButtonElement>): void => {
-            const key = event.currentTarget.dataset["backupKey"];
+            const key = event.currentTarget.value;
             if (key) {
                 onDeleteBackupClick(key);
             }
@@ -512,13 +512,13 @@ const RemoteBackupsPanel = ({
 
                             <div className="flex flex-wrap gap-2">
                                 <ThemedButton
-                                    data-backup-key={backup.key}
                                     disabled={
                                         !connected ||
                                         restoringBackupKey === backup.key
                                     }
                                     onClick={handleRestoreClick}
                                     size="sm"
+                                    value={backup.key}
                                     variant="secondary"
                                 >
                                     {restoringBackupKey === backup.key
@@ -527,13 +527,13 @@ const RemoteBackupsPanel = ({
                                 </ThemedButton>
 
                                 <ThemedButton
-                                    data-backup-key={backup.key}
                                     disabled={
                                         !connected ||
                                         deletingBackupKey === backup.key
                                     }
                                     onClick={handleDeleteClick}
                                     size="sm"
+                                    value={backup.key}
                                     variant="error"
                                 >
                                     {deletingBackupKey === backup.key

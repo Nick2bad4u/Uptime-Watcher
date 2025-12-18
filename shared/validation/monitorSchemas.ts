@@ -20,7 +20,6 @@ import type { ValidationResult } from "@shared/types/validation";
 import type { Jsonify, UnknownRecord } from "type-fest";
 
 import { MIN_MONITOR_CHECK_INTERVAL_MS } from "@shared/constants/monitoring";
-import validator from "validator";
 import * as z from "zod";
 
 import {
@@ -152,23 +151,45 @@ export const baseMonitorSchema: BaseMonitorSchemaType = z
  * Reusable HTTP URL validation schema for multiple monitor types.
  *
  * @remarks
- * Validates using {@link validator.isURL} with strict HTTP/HTTPS requirements to
- * prevent protocol-relative, underscored, or credential-bearing URLs.
+ * Validates using WHATWG URL parsing plus {@link isValidHost}.
+ *
+ * This intentionally allows valid URL path characters (including quotes)
+ * while enforcing strict host validation (FQDN with TLD, IP literals, or
+ * `localhost`).
  */
+function tryParseUrl(candidate: string): undefined | URL {
+    try {
+        return new URL(candidate);
+    } catch {
+        return undefined;
+    }
+}
+
+function isUrlWithAllowedProtocols(
+    candidate: string,
+    protocols: readonly string[]
+): boolean {
+    if (typeof candidate !== "string" || candidate.trim().length === 0) {
+        return false;
+    }
+
+
+        const parsed = tryParseUrl(candidate);
+
+    if (!parsed) {
+        return false;
+    }
+
+    const scheme = parsed.protocol.replace(":", "").toLowerCase();
+    if (!protocols.includes(scheme)) {
+        return false;
+    }
+
+    return isValidHost(parsed.hostname);
+}
+
 const httpUrlSchema = z.string().refine(
-    (val) =>
-        // Use validator.js for robust URL validation
-        validator.isURL(val, {
-            allow_protocol_relative_urls: false,
-            allow_trailing_dot: false,
-            allow_underscores: false,
-            disallow_auth: false,
-            protocols: ["http", "https"],
-            require_host: true,
-            require_protocol: true,
-            require_tld: true,
-            validate_length: true,
-        }),
+    (val): boolean => isUrlWithAllowedProtocols(val, ["http", "https"]),
     "Must be a valid HTTP or HTTPS URL"
 );
 
@@ -180,18 +201,7 @@ const httpUrlSchema = z.string().refine(
  * {@link validator.isURL} for RFC-compliant validation.
  */
 const websocketUrlSchema = z.string().refine(
-    (val) =>
-        validator.isURL(val, {
-            allow_protocol_relative_urls: false,
-            allow_trailing_dot: false,
-            allow_underscores: false,
-            disallow_auth: false,
-            protocols: ["ws", "wss"],
-            require_host: true,
-            require_protocol: true,
-            require_tld: true,
-            validate_length: true,
-        }),
+    (val): boolean => isUrlWithAllowedProtocols(val, ["ws", "wss"]),
     "Must be a valid WebSocket URL (ws:// or wss://)"
 );
 
@@ -369,17 +379,7 @@ const edgeLocationListSchema = z
         }
 
         return entries.every((entry) =>
-            validator.isURL(entry, {
-                allow_protocol_relative_urls: false,
-                allow_trailing_dot: false,
-                allow_underscores: false,
-                disallow_auth: false,
-                protocols: ["http", "https"],
-                require_host: true,
-                require_protocol: true,
-                require_tld: true,
-                validate_length: true,
-            }));
+            isUrlWithAllowedProtocols(entry, ["http", "https"]));
     }, "Edge endpoints must be valid HTTP or HTTPS URLs separated by commas or new lines");
 
 /**
@@ -391,6 +391,7 @@ const edgeLocationListSchema = z
  */
 export const httpMonitorSchema: HttpMonitorSchemaType = baseMonitorSchema
     .extend({
+        followRedirects: z.boolean().optional(),
         type: z.literal("http"),
         url: httpUrlSchema,
     })
@@ -407,6 +408,7 @@ export const httpHeaderMonitorSchema: HttpHeaderMonitorSchemaType =
     baseMonitorSchema
         .extend({
             expectedHeaderValue: httpHeaderValueSchema,
+            followRedirects: z.boolean().optional(),
             headerName: httpHeaderNameSchema,
             type: z.literal("http-header"),
             url: httpUrlSchema,
@@ -430,6 +432,7 @@ export const httpKeywordMonitorSchema: HttpKeywordMonitorSchemaType =
                 .refine((keyword) => keyword.trim().length > 0, {
                     message: "Keyword is required",
                 }),
+            followRedirects: z.boolean().optional(),
             type: z.literal("http-keyword"),
             url: httpUrlSchema,
         })
@@ -455,6 +458,7 @@ export const httpJsonMonitorSchema: HttpJsonMonitorSchemaType =
                 .refine((value) => value.trim().length > 0, {
                     message: "Expected JSON value is required",
                 }),
+            followRedirects: z.boolean().optional(),
             jsonPath: jsonPathSchema,
             type: z.literal("http-json"),
             url: httpUrlSchema,
@@ -476,6 +480,7 @@ export const httpStatusMonitorSchema: HttpStatusMonitorSchemaType =
                 .int("Status code must be an integer")
                 .min(100, "Status code must be between 100 and 599")
                 .max(599, "Status code must be between 100 and 599"),
+            followRedirects: z.boolean().optional(),
             type: z.literal("http-status"),
             url: httpUrlSchema,
         })
@@ -490,6 +495,7 @@ export const httpStatusMonitorSchema: HttpStatusMonitorSchemaType =
 export const httpLatencyMonitorSchema: HttpLatencyMonitorSchemaType =
     baseMonitorSchema
         .extend({
+            followRedirects: z.boolean().optional(),
             maxResponseTime: z
                 .number()
                 .min(1, "Maximum response time must be at least 1 millisecond")

@@ -13,12 +13,12 @@ import type { CloudSettingsAdapter } from "../CloudService.types";
 import type { CloudStorageProvider } from "../providers/CloudStorageProvider.types";
 import type { SecretStore } from "../secrets/SecretStore";
 
-import { readProcessEnv } from "../../../utils/environment";
 import { DropboxCloudStorageProvider } from "../providers/dropbox/DropboxCloudStorageProvider";
 import { DropboxTokenManager } from "../providers/dropbox/DropboxTokenManager";
 import { FilesystemCloudStorageProvider } from "../providers/FilesystemCloudStorageProvider";
 import { GoogleDriveCloudStorageProvider } from "../providers/googleDrive/GoogleDriveCloudStorageProvider";
 import { GoogleDriveTokenManager } from "../providers/googleDrive/GoogleDriveTokenManager";
+import { resolveGoogleDriveOAuthConfig } from "./googleOAuthConfig";
 
 /**
  * Setting keys required to resolve a provider.
@@ -77,14 +77,7 @@ export async function resolveCloudProviderOrNull(args: {
         }
 
         case "google-drive": {
-            const clientId = readProcessEnv("UPTIME_WATCHER_GOOGLE_CLIENT_ID");
-            const clientSecret = readProcessEnv(
-                "UPTIME_WATCHER_GOOGLE_CLIENT_SECRET"
-            );
-
-            if (!clientId) {
-                return null;
-            }
+            const { clientId, clientSecret } = resolveGoogleDriveOAuthConfig();
 
             const tokenManager = new GoogleDriveTokenManager({
                 clientId,

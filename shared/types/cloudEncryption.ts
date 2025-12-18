@@ -35,6 +35,15 @@ export interface CloudEncryptionConfigNone extends CloudEncryptionConfigBase {
  *   validate a passphrase without revealing secrets.
  */
 export interface CloudEncryptionConfigPassphrase extends CloudEncryptionConfigBase {
+    /**
+     * Epoch timestamp (ms) when passphrase encryption was enabled for sync.
+     *
+     * @remarks
+     * This value is non-secret and is used as a migration boundary: legacy
+     * plaintext artifacts created before this time may still be readable, but
+     * artifacts created at/after this time must be encrypted.
+     */
+    readonly enabledAt?: number | undefined;
     readonly kdf: "scrypt";
     readonly keyCheckBase64: string;
     readonly mode: "passphrase";
@@ -56,6 +65,7 @@ const cloudEncryptionConfigSchemaInternal = z.discriminatedUnion("mode", [
     z
         .object({
             configVersion: z.literal(CLOUD_ENCRYPTION_CONFIG_VERSION),
+            enabledAt: z.number().int().nonnegative().optional(),
             kdf: z.literal("scrypt"),
             keyCheckBase64: z.string().min(1),
             mode: z.literal("passphrase"),

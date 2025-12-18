@@ -46,7 +46,8 @@
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}",
             "env": {
-                "NODE_ENV": "development"
+                "NODE_ENV": "development",
+                "NODE_OPTIONS": "--max_old_space_size=8192"
             },
             "experimentalNetworking": "auto",
             "name": "🚀 Start Development Mode",
@@ -72,6 +73,10 @@
             "autoAttachChildProcesses": true,
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}",
+            "env": {
+                "NODE_ENV": "development",
+                "NODE_OPTIONS": "--max_old_space_size=8192"
+            },
             "experimentalNetworking": "auto",
             "name": "🔧 Vite Dev Server",
             "nodeVersionHint": 24,
@@ -97,7 +102,8 @@
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}",
             "env": {
-                "NODE_ENV": "development"
+                "NODE_ENV": "development",
+                "NODE_OPTIONS": "--max_old_space_size=8192"
             },
             "experimentalNetworking": "auto",
             "name": "🔄 Vite + Electron Dev",
@@ -128,7 +134,8 @@
             "cwd": "${workspaceFolder}",
             "env": {
                 "ELECTRON_IS_DEV": "true",
-                "NODE_ENV": "development"
+                "NODE_ENV": "development",
+                "NODE_OPTIONS": "--max_old_space_size=8192"
             },
             "experimentalNetworking": "auto",
             "name": "🐛 Debug Electron Main",

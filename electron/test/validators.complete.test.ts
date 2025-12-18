@@ -19,6 +19,7 @@ import {
     SiteHandlerValidators,
     MonitoringHandlerValidators,
     DataHandlerValidators,
+    CloudHandlerValidators,
     MonitorTypeHandlerValidators,
     SettingsHandlerValidators,
     StateSyncHandlerValidators,
@@ -36,6 +37,30 @@ function isValidationSuccess(result: null | string[]): boolean {
  */
 function isValidationFailure(result: null | string[]): boolean {
     return Array.isArray(result) && result.length > 0;
+}
+
+function createValidHttpMonitor(): Record<string, unknown> {
+    return {
+        checkInterval: 5000,
+        history: [],
+        id: "monitor-1",
+        monitoring: true,
+        responseTime: -1,
+        retryAttempts: 0,
+        status: "pending",
+        timeout: 1000,
+        type: "http",
+        url: "https://example.com",
+    };
+}
+
+function createValidSite(): Record<string, unknown> {
+    return {
+        identifier: "site-1",
+        monitoring: true,
+        monitors: [createValidHttpMonitor()],
+        name: "Test Site",
+    };
 }
 
 describe("IPC Validators - Exported Validator Groups", () => {
@@ -82,10 +107,7 @@ describe("IPC Validators - Exported Validator Groups", () => {
                 await annotate("Category: Core", "category");
                 await annotate("Type: Business Logic", "type");
 
-                const siteObject = {
-                    name: "Test Site",
-                    url: "https://example.com",
-                };
+                const siteObject = createValidSite();
                 const result = SiteHandlerValidators.addSite([siteObject]);
 
                 expect(isValidationSuccess(result)).toBeTruthy();
@@ -774,6 +796,189 @@ describe("IPC Validators - Exported Validator Groups", () => {
                 expect(isValidationFailure(result)).toBeTruthy();
             });
         });
+
+        describe("restoreSqliteBackup validator", () => {
+            it("should return null for a valid restore payload", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: validators.complete", "component");
+                await annotate("Category: Core", "category");
+                await annotate("Type: Business Logic", "type");
+
+                const payload = {
+                    buffer: new ArrayBuffer(64),
+                    fileName: "restore.sqlite",
+                };
+
+                const result = DataHandlerValidators.restoreSqliteBackup([
+                    payload,
+                ]);
+                expect(isValidationSuccess(result)).toBeTruthy();
+            });
+
+            it("should reject empty restore buffers", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: validators.complete", "component");
+                await annotate("Category: Core", "category");
+                await annotate("Type: Error Handling", "type");
+
+                const payload = {
+                    buffer: new ArrayBuffer(0),
+                    fileName: "restore.sqlite",
+                };
+
+                const result = DataHandlerValidators.restoreSqliteBackup([
+                    payload,
+                ]);
+                expect(isValidationFailure(result)).toBeTruthy();
+            });
+        });
+    });
+
+    describe("CloudHandlerValidators", () => {
+        it("should have all required validator properties", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validators.complete", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
+            expect(CloudHandlerValidators).toHaveProperty("deleteBackup");
+            expect(CloudHandlerValidators).toHaveProperty(
+                "configureFilesystemProvider"
+            );
+            expect(CloudHandlerValidators).toHaveProperty("restoreBackup");
+            expect(CloudHandlerValidators).toHaveProperty(
+                "setEncryptionPassphrase"
+            );
+        });
+
+        describe("configureFilesystemProvider validator", () => {
+            it("accepts absolute baseDirectory paths", async ({ task, annotate }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: validators.complete", "component");
+                await annotate("Category: Core", "category");
+                await annotate("Type: Business Logic", "type");
+
+                const result = CloudHandlerValidators.configureFilesystemProvider([
+                    { baseDirectory: "C:/Backups" },
+                ]);
+                expect(isValidationSuccess(result)).toBeTruthy();
+            });
+
+            it("rejects relative baseDirectory paths", async ({ task, annotate }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: validators.complete", "component");
+                await annotate("Category: Core", "category");
+                await annotate("Type: Error Handling", "type");
+
+                const result = CloudHandlerValidators.configureFilesystemProvider([
+                    { baseDirectory: "Backups" },
+                ]);
+                expect(isValidationFailure(result)).toBeTruthy();
+            });
+
+            it("rejects control characters in baseDirectory", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: validators.complete", "component");
+                await annotate("Category: Core", "category");
+                await annotate("Type: Error Handling", "type");
+
+                const result = CloudHandlerValidators.configureFilesystemProvider([
+                    { baseDirectory: "C:/Backups\n" },
+                ]);
+                expect(isValidationFailure(result)).toBeTruthy();
+            });
+
+            it("rejects Windows device namespace baseDirectory paths", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: validators.complete", "component");
+                await annotate("Category: Core", "category");
+                await annotate("Type: Error Handling", "type");
+
+                const result = CloudHandlerValidators.configureFilesystemProvider([
+                    { baseDirectory: String.raw`\\?\C:\Backups` },
+                ]);
+                expect(isValidationFailure(result)).toBeTruthy();
+            });
+        });
+
+        describe("deleteBackup validator", () => {
+            it("accepts valid backup object keys", async ({ task, annotate }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: validators.complete", "component");
+                await annotate("Category: Core", "category");
+                await annotate("Type: Business Logic", "type");
+
+                const result = CloudHandlerValidators.deleteBackup([
+                    "backups/backup.sqlite",
+                ]);
+                expect(isValidationSuccess(result)).toBeTruthy();
+            });
+
+            it("rejects path traversal segments", async ({ task, annotate }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: validators.complete", "component");
+                await annotate("Category: Core", "category");
+                await annotate("Type: Error Handling", "type");
+
+                const result = CloudHandlerValidators.deleteBackup([
+                    "backups/../evil.sqlite",
+                ]);
+                expect(isValidationFailure(result)).toBeTruthy();
+            });
+
+            it("rejects metadata keys", async ({ task, annotate }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: validators.complete", "component");
+                await annotate("Category: Core", "category");
+                await annotate("Type: Error Handling", "type");
+
+                const result = CloudHandlerValidators.deleteBackup([
+                    "backups/backup.metadata.json",
+                ]);
+                expect(isValidationFailure(result)).toBeTruthy();
+            });
+        });
+
+        describe("setEncryptionPassphrase validator", () => {
+            it("accepts a small passphrase", async ({ task, annotate }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: validators.complete", "component");
+                await annotate("Category: Core", "category");
+                await annotate("Type: Business Logic", "type");
+
+                const result = CloudHandlerValidators.setEncryptionPassphrase([
+                    "correct horse battery staple",
+                ]);
+                expect(isValidationSuccess(result)).toBeTruthy();
+            });
+
+            it("rejects an oversized passphrase", async ({ task, annotate }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: validators.complete", "component");
+                await annotate("Category: Core", "category");
+                await annotate("Type: Error Handling", "type");
+
+                const result = CloudHandlerValidators.setEncryptionPassphrase([
+                    "x".repeat(2000),
+                ]);
+                expect(isValidationFailure(result)).toBeTruthy();
+            });
+        });
     });
 
     describe("SettingsHandlerValidators", () => {
@@ -1342,7 +1547,8 @@ describe("IPC Validators - Edge Cases and Error Handling", () => {
             await annotate("Type: Business Logic", "type");
 
             const complexSite = {
-                name: "Complex Site",
+                ...createValidSite(),
+                // Extra keys should be rejected by strict schema validation.
                 config: {
                     nested: {
                         deep: "value",
@@ -1350,7 +1556,7 @@ describe("IPC Validators - Edge Cases and Error Handling", () => {
                 },
             };
             const result = SiteHandlerValidators.addSite([complexSite]);
-            expect(isValidationSuccess(result)).toBeTruthy();
+            expect(isValidationFailure(result)).toBeTruthy();
         });
 
         it("should handle arrays as objects", async ({ task, annotate }) => {
@@ -1378,11 +1584,11 @@ describe("IPC Validators - Edge Cases and Error Handling", () => {
             await annotate("Type: Business Logic", "type");
 
             const objWithFunction = {
-                name: "Site",
+                ...createValidSite(),
                 callback: () => console.log("test"),
             };
             const result = SiteHandlerValidators.addSite([objWithFunction]);
-            expect(isValidationSuccess(result)).toBeTruthy();
+            expect(isValidationFailure(result)).toBeTruthy();
         });
     });
 
@@ -1494,7 +1700,7 @@ describe("IPC Validators - Edge Cases and Error Handling", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Validation", "type");
 
-            const validObjects = [
+            const invalidObjects = [
                 {},
                 { simple: "value" },
                 { nested: { deep: { value: "test" } } },
@@ -1518,10 +1724,15 @@ describe("IPC Validators - Edge Cases and Error Handling", () => {
                 new Set(),
             ];
 
-            for (const obj of validObjects) {
+            for (const obj of invalidObjects) {
                 const result = SiteHandlerValidators.addSite([obj]);
-                expect(isValidationSuccess(result)).toBeTruthy();
+                expect(isValidationFailure(result)).toBeTruthy();
             }
+
+            const validSiteResult = SiteHandlerValidators.addSite([
+                createValidSite(),
+            ]);
+            expect(isValidationSuccess(validSiteResult)).toBeTruthy();
         });
 
         it("should reject primitive types for object parameters", async ({

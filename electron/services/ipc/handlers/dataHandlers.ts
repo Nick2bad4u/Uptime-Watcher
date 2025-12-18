@@ -48,13 +48,20 @@ export function registerDataHandlers({
         withIgnoredIpcEvent(async () => {
             const result = await uptimeOrchestrator.downloadBackup();
             validateDatabaseBackupPayload(result);
-            const bufferView = globalThis["Uint8Array"].from(result.buffer);
-            const arrayBuffer = bufferView.buffer;
+            const { buffer, fileName, metadata } = result;
+            const underlyingBuffer = buffer.buffer;
+            const arrayBuffer: ArrayBuffer =
+                underlyingBuffer instanceof ArrayBuffer
+                    ? underlyingBuffer.slice(
+                          buffer.byteOffset,
+                          buffer.byteOffset + buffer.byteLength
+                      )
+                    : globalThis["Uint8Array"].from(buffer).buffer;
 
             return {
                 buffer: arrayBuffer,
-                fileName: result.fileName,
-                metadata: result.metadata,
+                fileName,
+                metadata,
             } satisfies SerializedDatabaseBackupResult;
         }),
         DataHandlerValidators.downloadSqliteBackup,

@@ -250,7 +250,7 @@ export function createHttpMonitorService<
                     `[${behavior.scope}] Checking URL: ${url} with timeout: ${timeout}ms`
                 );
             }
-            const response = await this.makeRequest(url, timeout, signal);
+            const response = await this.makeRequest(monitor, url, timeout, signal);
             const responseTime = response.responseTime ?? 0;
 
             if (isDev()) {
@@ -281,6 +281,7 @@ export function createHttpMonitorService<
         }
 
         private async makeRequest(
+            monitor: MonitorByType<TType>,
             url: string,
             timeout: number,
             signal?: AbortSignal
@@ -290,9 +291,13 @@ export function createHttpMonitorService<
                 signals.push(signal);
             }
 
+            const shouldFollowRedirects =
+                Reflect.get(monitor, "followRedirects") !== false;
+
             return this.axiosInstance.get(url, {
                 signal: AbortSignal.any(signals),
                 timeout,
+                ...(!shouldFollowRedirects && { maxRedirects: 0 }),
             });
         }
 

@@ -250,6 +250,8 @@ export interface Monitor {
     expectedStatusCode?: number | undefined;
     /** Expected value for DNS record verification */
     expectedValue?: string | undefined; // Added for DNS monitoring
+    /** Whether HTTP monitors should follow redirects (best-effort). */
+    followRedirects?: boolean | undefined;
     /** HTTP header name to inspect */
     headerName?: string | undefined;
     /** Expected status string returned by heartbeat endpoints */

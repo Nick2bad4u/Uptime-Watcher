@@ -43,6 +43,7 @@ function copyDynamicFields(
         "checkInterval",
         "createdAt",
         "enabled",
+        "followRedirects",
         "history",
         "id",
         "lastChecked",
@@ -121,6 +122,9 @@ function createBaseMonitor(dynamicMonitor: Monitor): Site["monitors"][0] {
     return {
         activeOperations: dynamicMonitor.activeOperations ?? [],
         checkInterval: safeInteger(dynamicMonitor.checkInterval, 300_000, 5000),
+        ...(typeof dynamicMonitor.followRedirects === "boolean" && {
+            followRedirects: dynamicMonitor.followRedirects,
+        }),
         history: [], // History will be loaded separately
         id: dynamicMonitor.id || "-1",
         monitoring: dynamicMonitor.monitoring,
