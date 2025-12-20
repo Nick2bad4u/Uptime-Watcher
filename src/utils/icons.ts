@@ -64,6 +64,7 @@ import {
     RiPlayCircleFill,
     RiStackLine,
 } from "react-icons/ri";
+import { SiDropbox, SiGoogledrive } from "react-icons/si";
 import {
     TbLayoutCards,
     TbLayoutGrid,
@@ -91,6 +92,10 @@ export const AppIcons: {
         readonly refreshAlt: IconType;
         readonly remove: IconType;
         readonly upload: IconType;
+    };
+    readonly brands: {
+        readonly dropbox: IconType;
+        readonly googleDrive: IconType;
     };
     readonly layout: {
         readonly cards: IconType;
@@ -162,6 +167,12 @@ export const AppIcons: {
         refreshAlt: TbRefresh,
         remove: FiTrash2,
         upload: FiUpload,
+    },
+
+    /** Provider / brand icons */
+    brands: {
+        dropbox: SiDropbox,
+        googleDrive: SiGoogledrive,
     },
 
     /** Layout and view icons */

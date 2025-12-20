@@ -155,6 +155,38 @@ function parseCallback(request: IncomingMessage): {
     };
 }
 
+function normalizeRedirectPath(path: string): string {
+    if (path === "" || path === "/") {
+        return "/";
+    }
+
+    return path.startsWith("/") ? path : `/${path}`;
+}
+
+function parseCallbackWithExpectedPath(
+    request: IncomingMessage,
+    expectedPath: string
+): {
+    readonly code: null | string;
+    readonly error: null | string;
+    readonly pathOk: boolean;
+    readonly state: null | string;
+} {
+    const url = new URL(request.url ?? "/", "http://localhost");
+    const pathOk = url.pathname === expectedPath;
+
+    const code = url.searchParams.get("code");
+    const state = url.searchParams.get("state");
+    const error = url.searchParams.get("error");
+
+    return {
+        code,
+        error,
+        pathOk,
+        state,
+    };
+}
+
 /**
  * Generates a cryptographically strong OAuth state value.
  */
@@ -172,15 +204,30 @@ export function createOAuthState(): string {
 export async function startLoopbackOAuthServer(args?: {
     readonly port?: number;
     readonly redirectHost?: string;
+    /**
+     * Optional path portion of the redirect URI.
+     *
+     * @remarks
+     * Some providers (e.g. Google) recommend loopback redirect URIs without an
+     * explicit path (e.g. `http://127.0.0.1:{port}`). Others require a fixed
+     * callback path. This option supports both patterns.
+     */
+    readonly redirectPath?: string;
 }): Promise<LoopbackOAuthServer> {
     const port = args?.port ?? DEFAULT_OAUTH_LOOPBACK_PORT;
     const redirectHost = args?.redirectHost ?? "localhost";
+    const redirectPathRaw = args?.redirectPath;
+    const expectedPath = normalizeRedirectPath(
+        redirectPathRaw ?? DEFAULT_OAUTH_LOOPBACK_PATH
+    );
+    const omitPath = redirectPathRaw !== undefined && expectedPath === "/";
 
     assertSafeRedirectHost(redirectHost);
 
     const requiresIpv6 = redirectHost === "[::1]";
 
-    const redirectUri = `http://${redirectHost}:${port}${DEFAULT_OAUTH_LOOPBACK_PATH}`;
+    const origin = `http://${redirectHost}:${port}`;
+    const redirectUri = omitPath ? origin : `${origin}${expectedPath}`;
 
     let resolved = false;
     let resolvePromise: ((value: LoopbackOAuthCallback) => void) | null = null;
@@ -205,7 +252,10 @@ export async function startLoopbackOAuthServer(args?: {
                 return;
             }
 
-            const parsed = parseCallback(request);
+            const parsed =
+                redirectPathRaw === undefined
+                    ? parseCallback(request)
+                    : parseCallbackWithExpectedPath(request, expectedPath);
 
             if (!parsed.pathOk) {
                 writeHtml(response, {

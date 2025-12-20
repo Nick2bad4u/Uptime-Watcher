@@ -1246,7 +1246,7 @@ export default /** @type {EslintConfig} */ [
             //     {
             //         allowedFunctionNames: ["t", "translate", "i18n"],
             //         ignoreStrings: ["OK", "Cancel"],
-            //         ignorePatterns: [/^[\s\d\-:]+$/v], // Ignore dates, times, numbers
+            //         ignorePatterns: [/^[\s\d\-:]+$/u], // Ignore dates, times, numbers
             //     },
             // ],
             // Tailwind CSS Plugin Rules (tailwind/*)
@@ -2652,7 +2652,7 @@ export default /** @type {EslintConfig} */ [
             //     {
             //         allowedFunctionNames: ["t", "translate", "i18n"],
             //         ignoreStrings: ["OK", "Cancel"],
-            //         ignorePatterns: [/^[\s\d\-:]+$/v], // Ignore dates, times, numbers
+            //         ignorePatterns: [/^[\s\d\-:]+$/u], // Ignore dates, times, numbers
             //     },
             // ],
         },

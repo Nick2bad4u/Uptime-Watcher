@@ -28,6 +28,8 @@ import * as z from "zod";
  */
 export const CLOUD_SYNC_SCHEMA_VERSION = 1 as const;
 
+const MAX_SAFE_INT = Number.MAX_SAFE_INTEGER;
+
 /**
  * JSON value type that is safe to serialize across processes/providers.
  *
@@ -101,8 +103,8 @@ export interface CloudSyncWriteKey {
 const cloudSyncWriteKeySchemaInternal: z.ZodType<CloudSyncWriteKey> = z
     .object({
         deviceId: z.string().min(1),
-        opId: z.number().int().nonnegative(),
-        timestamp: z.number().int().nonnegative(),
+        opId: z.number().int().nonnegative().max(MAX_SAFE_INT),
+        timestamp: z.number().int().nonnegative().max(MAX_SAFE_INT),
     })
     .strict();
 
@@ -153,9 +155,9 @@ const setFieldOperationSchema = z
         entityType: cloudSyncEntityTypeSchemaInternal,
         field: z.string().min(1),
         kind: z.literal("set-field"),
-        opId: z.number().int().nonnegative(),
+        opId: z.number().int().nonnegative().max(MAX_SAFE_INT),
         syncSchemaVersion: z.literal(CLOUD_SYNC_SCHEMA_VERSION),
-        timestamp: z.number().int().nonnegative(),
+        timestamp: z.number().int().nonnegative().max(MAX_SAFE_INT),
         value: jsonValueSchemaInternal,
     })
     .strict() satisfies z.ZodType<CloudSyncSetFieldOperation>;
@@ -166,9 +168,9 @@ const deleteEntityOperationSchema = z
         entityId: z.string().min(1),
         entityType: cloudSyncEntityTypeSchemaInternal,
         kind: z.literal("delete-entity"),
-        opId: z.number().int().nonnegative(),
+        opId: z.number().int().nonnegative().max(MAX_SAFE_INT),
         syncSchemaVersion: z.literal(CLOUD_SYNC_SCHEMA_VERSION),
-        timestamp: z.number().int().nonnegative(),
+        timestamp: z.number().int().nonnegative().max(MAX_SAFE_INT),
     })
     .strict() satisfies z.ZodType<CloudSyncDeleteEntityOperation>;
 

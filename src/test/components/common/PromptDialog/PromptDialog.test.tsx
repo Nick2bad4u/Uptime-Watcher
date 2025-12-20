@@ -69,7 +69,9 @@ describe(PromptDialog, () => {
         const confirmButton = screen.getByTestId("prompt-dialog-confirm");
         expect(confirmButton).toBeDisabled();
 
-        const input = screen.getByLabelText("Prompt title");
+        const input = screen.getByLabelText("Prompt title", {
+            selector: "input",
+        });
         expect(input).toHaveAttribute("placeholder", "Type here");
     });
 
@@ -85,7 +87,9 @@ describe(PromptDialog, () => {
 
         render(<PromptDialog />);
 
-        const input = screen.getByLabelText("Prompt title");
+        const input = screen.getByLabelText("Prompt title", {
+            selector: "input",
+        });
         fireEvent.change(input, { target: { value: "new value" } });
 
         expect(promptControls.setValue).toHaveBeenCalledTimes(1);

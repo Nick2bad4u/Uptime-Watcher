@@ -114,7 +114,7 @@ describe("Comprehensive Validation Module Fast-Check Tests", () => {
             it.prop([
                 fc.string({ minLength: 1, maxLength: 50 }).filter((s) => {
                     // Must contain at least one alphanumeric character when hyphens/underscores are removed
-                    const cleanedValue = s.replaceAll(/[_\-]/gv, "");
+                    const cleanedValue = s.replaceAll(/[_-]/gu, "");
                     return (
                         cleanedValue.length > 0 &&
                         /^[\dA-Za-z]+$/.test(cleanedValue) &&
@@ -150,7 +150,7 @@ describe("Comprehensive Validation Module Fast-Check Tests", () => {
             it.prop([
                 fc.array(
                     fc.string({ minLength: 1, maxLength: 20 }).filter((s) => {
-                        const cleanedValue = s.replaceAll(/[_\-]/gv, "");
+                        const cleanedValue = s.replaceAll(/[_-]/gu, "");
                         return (
                             cleanedValue.length > 0 &&
                             /^[\dA-Za-z]+$/.test(cleanedValue) &&

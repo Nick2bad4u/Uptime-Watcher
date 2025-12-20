@@ -1,6 +1,7 @@
 /* eslint-disable react/no-multi-comp -- Provider setup UI uses small, tightly-scoped local components for clarity. */
 
 import type { CloudStatusSummary } from "@shared/types/cloud";
+import type { IconType } from "react-icons";
 import type { JSX } from "react/jsx-runtime";
 
 import {
@@ -17,6 +18,8 @@ import { StatusIndicator } from "../../../theme/components/StatusIndicator";
 import { ThemedButton } from "../../../theme/components/ThemedButton";
 import { ThemedInput } from "../../../theme/components/ThemedInput";
 import { ThemedText } from "../../../theme/components/ThemedText";
+import { AppIcons } from "../../../utils/icons";
+import { ErrorAlert } from "../../common/ErrorAlert/ErrorAlert";
 import { SettingItem } from "../../shared/SettingItem";
 
 type ConnectionSiteStatus = "down" | "pending" | "up";
@@ -25,6 +28,7 @@ type CloudProviderTabKey = "dropbox" | "filesystem" | "google-drive" | "webdav";
 
 interface CloudProviderTabDefinition {
     readonly description: string;
+    readonly icon: IconType;
     readonly isAvailable: boolean;
     readonly key: CloudProviderTabKey;
     readonly label: string;
@@ -33,24 +37,28 @@ interface CloudProviderTabDefinition {
 const CLOUD_PROVIDER_TABS: readonly CloudProviderTabDefinition[] = [
     {
         description: "OAuth + PKCE via system browser.",
+        icon: AppIcons.brands.dropbox,
         isAvailable: true,
         key: "dropbox",
         label: "Dropbox",
     },
     {
         description: "Pick a local folder (bring your own sync client).",
+        icon: AppIcons.ui.database,
         isAvailable: true,
         key: "filesystem",
         label: "Local folder",
     },
     {
         description: "Stores app data in Google Drive appDataFolder.",
+        icon: AppIcons.brands.googleDrive,
         isAvailable: true,
         key: "google-drive",
         label: "Google Drive",
     },
     {
         description: "Planned provider integration.",
+        icon: AppIcons.ui.cloud,
         isAvailable: false,
         key: "webdav",
         label: "WebDAV",
@@ -128,6 +136,109 @@ function resolveCloudProviderTabLabel(key: CloudProviderTabKey): string {
     return CLOUD_PROVIDER_TABS.find((entry) => entry.key === key)?.label ?? key;
 }
 
+function buildDisconnectProviderFirstMessage(args: {
+    activeProvider: CloudProviderTabKey;
+    targetProvider: CloudProviderTabKey;
+}): string {
+    const activeLabel = resolveCloudProviderTabLabel(args.activeProvider);
+    const targetLabel = resolveCloudProviderTabLabel(args.targetProvider);
+
+    return `Disconnect ${activeLabel} before setting up ${targetLabel}.`;
+}
+
+function buildProviderSwitchLockedMessage(activeProvider: CloudProviderTabKey): string {
+    const activeLabel = resolveCloudProviderTabLabel(activeProvider);
+    return `Provider switching is locked while ${activeLabel} is configured. Disconnect to switch providers.`;
+}
+
+function resolveFilesystemConfiguredBaseDirectory(
+    status: CloudStatusSummary | null
+): null | string {
+    if (status?.providerDetails?.kind === "filesystem") {
+        return status.providerDetails.baseDirectory;
+    }
+
+    return null;
+}
+
+interface ProviderLockNoticeProperties {
+    readonly attemptMessage: null | string;
+    readonly infoMessage: null | string;
+    readonly onDismissAttempt: () => void;
+}
+
+const ProviderLockNotice = ({
+    attemptMessage,
+    infoMessage,
+    onDismissAttempt,
+}: ProviderLockNoticeProperties): JSX.Element | null => {
+    const handleDismissAttempt = useCallback((): void => {
+        onDismissAttempt();
+    }, [onDismissAttempt]);
+
+    if (attemptMessage) {
+        return (
+            <ErrorAlert
+                message={attemptMessage}
+                onDismiss={handleDismissAttempt}
+                variant="warning"
+            />
+        );
+    }
+
+    if (infoMessage) {
+        return <ErrorAlert message={infoMessage} variant="info" />;
+    }
+
+    return null;
+};
+
+interface DisconnectControlProperties {
+    readonly configured: boolean;
+    readonly connected: boolean;
+    readonly isDisconnecting: boolean;
+    readonly onDisconnect: () => void;
+}
+
+const DisconnectControl = ({
+    configured,
+    connected,
+    isDisconnecting,
+    onDisconnect,
+}: DisconnectControlProperties): JSX.Element | null => {
+    const handleDisconnectClick = useCallback((): void => {
+        onDisconnect();
+    }, [onDisconnect]);
+
+    if (connected) {
+        return (
+            <ThemedButton
+                disabled={isDisconnecting}
+                onClick={handleDisconnectClick}
+                size="sm"
+                variant="error"
+            >
+                {isDisconnecting ? "Disconnecting…" : "Disconnect"}
+            </ThemedButton>
+        );
+    }
+
+    if (configured) {
+        return (
+            <ThemedButton
+                disabled={isDisconnecting}
+                onClick={handleDisconnectClick}
+                size="sm"
+                variant="secondary"
+            >
+                {isDisconnecting ? "Clearing…" : "Clear configuration"}
+            </ThemedButton>
+        );
+    }
+
+    return null;
+};
+
 interface CloudProviderStatusControlProperties {
     readonly providerLabel: string;
     readonly status: ConnectionSiteStatus;
@@ -147,12 +258,44 @@ const CloudProviderStatusControl = ({
 
 interface ProviderTabListProperties {
     readonly ariaLabel: string;
+    readonly lockedKey: CloudProviderTabKey | null;
+    readonly onAttemptLockedSelect: (key: CloudProviderTabKey) => void;
     readonly onSelect: (key: CloudProviderTabKey) => void;
     readonly selectedKey: CloudProviderTabKey;
 }
 
+function resolveProviderTabStateClass(args: {
+    isAvailable: boolean;
+    isLocked: boolean;
+}): string {
+    if (!args.isAvailable) {
+        return "opacity-70";
+    }
+
+    return args.isLocked
+        ? "opacity-70 cursor-not-allowed"
+        : "hover:opacity-95";
+}
+
+function resolveProviderTabTitle(args: {
+    isAvailable: boolean;
+    isLocked: boolean;
+}): string | undefined {
+    if (!args.isAvailable) {
+        return "Coming soon";
+    }
+
+    if (args.isLocked) {
+        return "Disconnect the current provider before switching";
+    }
+
+    return undefined;
+}
+
 const ProviderTabList = ({
     ariaLabel,
+    lockedKey,
+    onAttemptLockedSelect,
     onSelect,
     selectedKey,
 }: ProviderTabListProperties): JSX.Element => {
@@ -172,9 +315,17 @@ const ProviderTabList = ({
                 return;
             }
 
+            if (lockedKey && match.key !== lockedKey) {
+                onAttemptLockedSelect(match.key);
+                queueMicrotask(() => {
+                    buttonByKeyRef.current.get(lockedKey)?.focus();
+                });
+                return;
+            }
+
             onSelect(match.key);
         },
-        [onSelect]
+        [lockedKey, onAttemptLockedSelect, onSelect]
     );
 
     const handleKeyDown = useCallback(
@@ -211,6 +362,12 @@ const ProviderTabList = ({
                 }
             }
 
+            if (lockedKey && nextKey !== lockedKey) {
+                event.preventDefault();
+                onAttemptLockedSelect(nextKey);
+                return;
+            }
+
             event.preventDefault();
             onSelect(nextKey);
 
@@ -219,7 +376,7 @@ const ProviderTabList = ({
                 buttonByKeyRef.current.get(nextKey)?.focus();
             });
         },
-        [onSelect, selectedKey]
+        [lockedKey, onAttemptLockedSelect, onSelect, selectedKey]
     );
 
     const handleButtonRef = useCallback((element: HTMLButtonElement | null) => {
@@ -249,18 +406,26 @@ const ProviderTabList = ({
         >
             {CLOUD_PROVIDER_TABS.map((tab) => {
                 const isSelected = tab.key === selectedKey;
+                const isLocked = lockedKey !== null && tab.key !== lockedKey;
 
                 const variantClass = isSelected
                     ? "themed-button--primary"
                     : "themed-button--secondary";
 
-                const stateClass = tab.isAvailable
-                    ? "hover:opacity-95"
-                    : "opacity-70";
+                const stateClass = resolveProviderTabStateClass({
+                    isAvailable: tab.isAvailable,
+                    isLocked,
+                });
+
+                const title = resolveProviderTabTitle({
+                    isAvailable: tab.isAvailable,
+                    isLocked,
+                });
 
                 return (
                     <button
                         aria-controls={`cloud-provider-panel-${tab.key}`}
+                        aria-disabled={isLocked || !tab.isAvailable}
                         aria-selected={isSelected}
                         className={[
                             "themed-button themed-button--size-sm",
@@ -275,9 +440,10 @@ const ProviderTabList = ({
                         ref={handleButtonRef}
                         role="tab"
                         tabIndex={isSelected ? 0 : -1}
-                        title={tab.isAvailable ? undefined : "Coming soon"}
+                        title={title}
                         type="button"
                     >
+                        <tab.icon aria-hidden="true" size={16} />
                         {tab.label}
                         {tab.isAvailable ? null : " (soon)"}
                     </button>
@@ -296,6 +462,7 @@ interface ProviderPanelProperties {
     readonly isConfiguringFilesystemProvider: boolean;
     readonly isConnectingDropbox: boolean;
     readonly isConnectingGoogleDrive: boolean;
+    readonly onAttemptLockedAction: () => void;
     readonly onConfigureFilesystemProviderClick: () => void;
     readonly onConnectDropbox: () => void;
     readonly onConnectGoogleDrive: () => void;
@@ -351,6 +518,7 @@ function renderOAuthProviderPanel(args: {
     connected: boolean;
     description: string;
     isConnecting: boolean;
+    readonly onAttemptLockedAction: () => void;
     onConnect: () => void;
     providerKey: "dropbox" | "google-drive";
     providerLabel: string;
@@ -362,7 +530,12 @@ function renderOAuthProviderPanel(args: {
         providerLabel: args.providerLabel,
     });
 
-    const handleConnectClick = args.onConnect;
+    const handleConnectClick = args.providerSetupLocked
+        ? args.onAttemptLockedAction
+        : args.onConnect;
+
+    const isSoftDisabled = args.providerSetupLocked;
+    const ariaDisabled = isSoftDisabled || args.isConnecting;
 
     return (
         <div
@@ -387,7 +560,9 @@ function renderOAuthProviderPanel(args: {
             {args.connected ? null : (
                 <div className="mt-3 flex flex-wrap gap-2">
                     <ThemedButton
-                        disabled={args.providerSetupLocked || args.isConnecting}
+                        aria-disabled={ariaDisabled}
+                        className={isSoftDisabled ? "themed-button--loading" : ""}
+                        disabled={args.isConnecting}
                         onClick={handleConnectClick}
                         size="sm"
                         variant="primary"
@@ -406,6 +581,7 @@ function renderFilesystemProviderPanel(args: {
     filesystemBaseDirectory: string;
     filesystemConfiguredBaseDirectory: null | string;
     isConfiguringFilesystemProvider: boolean;
+    readonly onAttemptLockedAction: () => void;
     onConfigureFilesystemProviderClick: () => void;
     onFilesystemBaseDirectoryChange: (
         event: ChangeEvent<HTMLInputElement>
@@ -415,7 +591,15 @@ function renderFilesystemProviderPanel(args: {
     const handleFilesystemBaseDirectoryChange =
         args.onFilesystemBaseDirectoryChange;
     const handleConfigureFilesystemProviderClick =
-        args.onConfigureFilesystemProviderClick;
+        args.providerSetupLocked
+            ? args.onAttemptLockedAction
+            : args.onConfigureFilesystemProviderClick;
+
+    const isSoftDisabled = args.providerSetupLocked;
+    const ariaDisabled =
+        isSoftDisabled ||
+        args.isConfiguringFilesystemProvider ||
+        args.filesystemBaseDirectory.trim().length === 0;
 
     return (
         <div
@@ -457,8 +641,9 @@ function renderFilesystemProviderPanel(args: {
                         />
                     </div>
                     <ThemedButton
+                        aria-disabled={ariaDisabled}
+                        className={isSoftDisabled ? "themed-button--loading" : ""}
                         disabled={
-                            args.providerSetupLocked ||
                             args.isConfiguringFilesystemProvider ||
                             args.filesystemBaseDirectory.trim().length === 0
                         }
@@ -485,6 +670,7 @@ const ProviderPanel = ({
     isConfiguringFilesystemProvider,
     isConnectingDropbox,
     isConnectingGoogleDrive,
+    onAttemptLockedAction,
     onConfigureFilesystemProviderClick,
     onConnectDropbox,
     onConnectGoogleDrive,
@@ -531,6 +717,7 @@ const ProviderPanel = ({
                 description:
                     "Opens your default browser to authorize Dropbox access (OAuth + PKCE). Uptime Watcher stores an encrypted token on this device (no password is stored).",
                 isConnecting: isConnectingDropbox,
+                onAttemptLockedAction,
                 onConnect: onConnectDropbox,
                 providerKey: "dropbox",
                 providerLabel: "Dropbox",
@@ -544,6 +731,7 @@ const ProviderPanel = ({
                 filesystemBaseDirectory,
                 filesystemConfiguredBaseDirectory,
                 isConfiguringFilesystemProvider,
+                onAttemptLockedAction,
                 onConfigureFilesystemProviderClick,
                 onFilesystemBaseDirectoryChange,
                 providerSetupLocked,
@@ -557,6 +745,7 @@ const ProviderPanel = ({
                 description:
                     "Opens your default browser to authorize Google Drive access (OAuth + PKCE). Data is stored in Drive’s app data area (appDataFolder), so it won’t appear in your normal Drive folders.",
                 isConnecting: isConnectingGoogleDrive,
+                onAttemptLockedAction,
                 onConnect: onConnectGoogleDrive,
                 providerKey: "google-drive",
                 providerLabel: "Google Drive",
@@ -625,20 +814,29 @@ export const CloudProviderSetupPanel = ({
     const [userSelectedProviderTab, setUserSelectedProviderTab] =
         useState<CloudProviderTabKey | null>(null);
 
-    const selectedProviderTab: CloudProviderTabKey =
-        userSelectedProviderTab ?? activeProviderTab ?? "dropbox";
+    const lockedProviderTab = configured ? activeProviderTab : null;
 
-    const providerSetupLocked =
-        configured &&
-        activeProviderTab !== null &&
-        activeProviderTab !== selectedProviderTab;
+    const [lockedProviderAttemptTab, setLockedProviderAttemptTab] =
+        useState<CloudProviderTabKey | null>(null);
+
+    const selectedProviderTab: CloudProviderTabKey =
+        lockedProviderTab ?? userSelectedProviderTab ?? "dropbox";
+
+    const handleAttemptLockedProviderSelect = useCallback(
+        (targetKey: CloudProviderTabKey): void => {
+            if (!lockedProviderTab) {
+                return;
+            }
+
+            setLockedProviderAttemptTab(targetKey);
+        },
+        [lockedProviderTab]
+    );
 
     const [filesystemBaseDirectory, setFilesystemBaseDirectory] = useState("");
 
     const filesystemConfiguredBaseDirectory =
-        status?.providerDetails?.kind === "filesystem"
-            ? status.providerDetails.baseDirectory
-            : null;
+        resolveFilesystemConfiguredBaseDirectory(status);
 
     const handleFilesystemDirectoryChange = useCallback((
         event: ChangeEvent<HTMLInputElement>
@@ -659,8 +857,21 @@ export const CloudProviderSetupPanel = ({
     const handleProviderTabSelect = useCallback((
         key: CloudProviderTabKey
     ): void => {
+        setLockedProviderAttemptTab(null);
         setUserSelectedProviderTab(key);
     }, []);
+
+    const lockedProviderAttemptMessage =
+        lockedProviderTab && lockedProviderAttemptTab
+            ? buildDisconnectProviderFirstMessage({
+                  activeProvider: lockedProviderTab,
+                  targetProvider: lockedProviderAttemptTab,
+              })
+            : null;
+
+    const lockedProviderInfoMessage = lockedProviderTab
+        ? buildProviderSwitchLockedMessage(lockedProviderTab)
+        : null;
 
     const providerStatusControl = useMemo(
         (): JSX.Element => (
@@ -672,31 +883,11 @@ export const CloudProviderSetupPanel = ({
         [connectionSiteStatus, providerLabel]
     );
 
-    let disconnectControl: JSX.Element | null = null;
-    if (connected) {
-        disconnectControl = (
-            <ThemedButton
-                disabled={isDisconnecting}
-                onClick={onDisconnect}
-                size="sm"
-                variant="error"
-            >
-                {isDisconnecting ? "Disconnecting…" : "Disconnect"}
-            </ThemedButton>
-        );
-    } else if (configured) {
-        disconnectControl = (
-            <ThemedButton
-                disabled={isDisconnecting}
-                onClick={onDisconnect}
-                size="sm"
-                variant="secondary"
-            >
-                {isDisconnecting ? "Clearing…" : "Clear configuration"}
-            </ThemedButton>
-        );
-    }
+    const onDismiss = useCallback((): void => {
+        setLockedProviderAttemptTab(null);
+    }, []);
 
+    const onAttemptLockedAction = useCallback((): void => {}, []);
     return (
         <div className="rounded-lg border border-zinc-800 bg-zinc-900/40 p-4">
             <ThemedText size="sm" variant="secondary" weight="medium">
@@ -714,8 +905,16 @@ export const CloudProviderSetupPanel = ({
             <div className="mt-3 flex flex-col gap-3">
                 <ProviderTabList
                     ariaLabel="Cloud providers"
+                    lockedKey={lockedProviderTab}
+                    onAttemptLockedSelect={handleAttemptLockedProviderSelect}
                     onSelect={handleProviderTabSelect}
                     selectedKey={selectedProviderTab}
+                />
+
+                <ProviderLockNotice
+                    attemptMessage={lockedProviderAttemptMessage}
+                    infoMessage={lockedProviderInfoMessage}
+                    onDismissAttempt={onDismiss}
                 />
 
                 <ProviderPanel
@@ -731,6 +930,7 @@ export const CloudProviderSetupPanel = ({
                     }
                     isConnectingDropbox={isConnectingDropbox}
                     isConnectingGoogleDrive={isConnectingGoogleDrive}
+                    onAttemptLockedAction={onAttemptLockedAction}
                     onConfigureFilesystemProviderClick={
                         handleConfigureFilesystemProviderClick
                     }
@@ -739,7 +939,7 @@ export const CloudProviderSetupPanel = ({
                     onFilesystemBaseDirectoryChange={
                         handleFilesystemDirectoryChange
                     }
-                    providerSetupLocked={providerSetupLocked}
+                    providerSetupLocked={false}
                     selectedProviderTab={selectedProviderTab}
                 />
 
@@ -753,7 +953,12 @@ export const CloudProviderSetupPanel = ({
                         {isRefreshingStatus ? "Refreshing…" : "Refresh status"}
                     </ThemedButton>
 
-                    {disconnectControl}
+                    <DisconnectControl
+                        configured={configured}
+                        connected={connected}
+                        isDisconnecting={isDisconnecting}
+                        onDisconnect={onDisconnect}
+                    />
                 </div>
             </div>
         </div>

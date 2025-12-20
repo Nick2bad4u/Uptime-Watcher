@@ -18,6 +18,14 @@ vi.mock("../../../../utils/time", () => ({
 
 import { SyncMaintenancePanel } from "../../../../components/Settings/cloud/SyncMaintenancePanel";
 
+const writeClipboardTextMock = vi.hoisted(() => vi.fn(async (_text: string) => {}));
+
+vi.mock("../../../../services/SystemService", () => ({
+    SystemService: {
+        writeClipboardText: writeClipboardTextMock,
+    },
+}));
+
 function createPreview(
     overrides: Partial<CloudSyncResetPreview> = {}
 ): CloudSyncResetPreview {
@@ -135,10 +143,7 @@ describe(SyncMaintenancePanel, () => {
     });
 
     it("copies diagnostics and shows success", async () => {
-        const writeText = vi.fn(async (_text: string) => {});
-        (globalThis as any).navigator = {
-            clipboard: { writeText },
-        };
+        writeClipboardTextMock.mockResolvedValueOnce(undefined);
 
         const preview = createPreview({ otherObjectCount: 0 });
         const lastResult: CloudSyncResetResult = {
@@ -173,8 +178,8 @@ describe(SyncMaintenancePanel, () => {
             screen.findByText("Copied diagnostics to clipboard.")
         ).resolves.toBeInTheDocument();
 
-        expect(writeText).toHaveBeenCalledTimes(1);
-        const payload = writeText.mock.calls[0]?.[0];
+        expect(writeClipboardTextMock).toHaveBeenCalledTimes(1);
+        const payload = writeClipboardTextMock.mock.calls[0]?.[0];
         expect(payload).toContain(
             "Uptime-Watcher Cloud Sync Reset Diagnostics"
         );
@@ -183,12 +188,9 @@ describe(SyncMaintenancePanel, () => {
     });
 
     it("shows an error message when clipboard copy fails", async () => {
-        const writeText = vi.fn(async () => {
-            throw new Error("clipboard denied");
-        });
-        (globalThis as any).navigator = {
-            clipboard: { writeText },
-        };
+        writeClipboardTextMock.mockRejectedValueOnce(
+            new Error("clipboard denied")
+        );
 
         render(
             <SyncMaintenancePanel

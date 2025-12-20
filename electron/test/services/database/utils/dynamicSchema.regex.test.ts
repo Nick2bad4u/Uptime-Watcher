@@ -3,8 +3,8 @@
  *
  * Targets specific regex patterns in toSnakeCase function (lines 438-439):
  *
- * - Line 438: .replace(/^[A-Z]/v, (match) => match.toLowerCase())
- * - Line 439: .replaceAll(/[A-Z]/gv, (match) => `_${match.toLowerCase()}`)
+ * - Line 438: .replace(/^[A-Z]/u, (match) => match.toLowerCase())
+ * - Line 439: .replaceAll(/[A-Z]/gu, (match) => `_${match.toLowerCase()}`)
  *
  * These tests ensure that mutations to these specific regex patterns would be
  * caught by the test suite.
@@ -81,7 +81,7 @@ describe("DynamicSchema Regex Mutations", () => {
             expect(columnNames).toContain("max_retry_count");
             expect(columnNames).toContain("enable_http_logging");
 
-            // These assertions would fail if the first regex /^[A-Z]/v is mutated
+            // These assertions would fail if the first regex /^[A-Z]/u is mutated
             // Verify the conversion didn't leave any uppercase letters at the start
             for (const field of fieldDefinitions) {
                 expect(field.columnName).not.toMatch(/^[A-Z]/);
@@ -104,7 +104,7 @@ describe("DynamicSchema Regex Mutations", () => {
             );
 
             // Verify that each camelCase segment was properly converted
-            // These assertions would fail if the second regex /[A-Z]/gv is mutated
+            // These assertions would fail if the second regex /[A-Z]/gu is mutated
             expect(columnNames).toContain("some_url_endpoint");
             expect(columnNames).not.toContain("someUrl");
             expect(columnNames).not.toContain("urlEndpoint");

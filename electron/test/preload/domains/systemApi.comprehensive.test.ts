@@ -88,4 +88,22 @@ describe("systemApi", () => {
             ipcContext
         );
     });
+
+    it("invokes write-clipboard-text via invoke", async () => {
+        vi.mocked(ipcRenderer.invoke).mockResolvedValueOnce({
+            success: true,
+            data: true,
+        });
+
+        const result = await systemApi.writeClipboardText(
+            "hello clipboard"
+        );
+
+        expect(result).toBeTruthy();
+        expect(ipcRenderer.invoke).toHaveBeenCalledWith(
+            SYSTEM_CHANNELS.writeClipboardText,
+            "hello clipboard",
+            ipcContext
+        );
+    });
 });

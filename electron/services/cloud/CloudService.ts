@@ -52,7 +52,10 @@ import {
     buildUnsupportedProviderStatus,
     type CloudStatusCommonArgs,
 } from "./internal/CloudStatusBuilders";
-import { resolveGoogleDriveOAuthConfig } from "./internal/googleOAuthConfig";
+import {
+    DEFAULT_GOOGLE_DRIVE_CLIENT_ID,
+    resolveGoogleDriveOAuthConfig,
+} from "./internal/googleOAuthConfig";
 import { resolveCloudProviderOrNull } from "./internal/resolveCloudProviderOrNull";
 import { migrateProviderBackups } from "./migrations/backupMigration";
 import { resetProviderCloudSyncState } from "./migrations/syncReset";
@@ -703,6 +706,15 @@ export class CloudService {
     public async connectGoogleDrive(): Promise<CloudStatusSummary> {
         return this.runCloudOperation("connectGoogleDrive", async () => {
             const { clientId, clientSecret } = resolveGoogleDriveOAuthConfig();
+
+            logger.info("[CloudService] Google Drive OAuth config selected", {
+                clientIdSource:
+                    clientId === DEFAULT_GOOGLE_DRIVE_CLIENT_ID
+                        ? "default"
+                        : "env",
+                clientIdSuffix: clientId.slice(-8),
+                hasClientSecret: Boolean(clientSecret),
+            });
 
             const tokenManager = new GoogleDriveTokenManager({
                 clientId,

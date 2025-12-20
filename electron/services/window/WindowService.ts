@@ -38,7 +38,10 @@ import type { Event, HandlerDetails } from "electron";
 import { getNodeEnv } from "@shared/utils/environment";
 import { ensureError, withErrorHandling } from "@shared/utils/errorHandling";
 import { getErrorMessage } from "@shared/utils/errorUtils";
-import { getSafeUrlForLogging } from "@shared/utils/urlSafety";
+import {
+    getSafeUrlForLogging,
+    isAllowedExternalOpenUrl,
+} from "@shared/utils/urlSafety";
 import { isValidUrl } from "@shared/validation/validatorUtils";
 import { BrowserWindow, shell } from "electron";
 // eslint-disable-next-line unicorn/import-style -- Need namespace import for path operations
@@ -162,6 +165,17 @@ export class WindowService {
     ): Promise<void> {
         const urlForLog = getSafeUrlForLogging(targetUrl);
 
+        if (!isAllowedExternalOpenUrl(targetUrl)) {
+            logger.warn(
+                "[WindowService] Blocked external navigation to disallowed URL",
+                {
+                    context,
+                    url: urlForLog,
+                }
+            );
+            return;
+        }
+
         try {
             const parsed = new URL(targetUrl);
             const {
@@ -199,7 +213,7 @@ export class WindowService {
 
             if (isMailTo) {
                 const mailTarget = pathname.trim();
-                if (mailTarget.length === 0 || /[\r\n]/v.test(mailTarget)) {
+                if (mailTarget.length === 0 || /[\r\n]/.test(mailTarget)) {
                     logger.warn(
                         "[WindowService] Blocked invalid mailto external navigation",
                         {
@@ -215,7 +229,7 @@ export class WindowService {
                     await shell.openExternal(targetUrl);
                 } catch (error: unknown) {
                     const resolved = ensureError(error);
-                    const {code} = (resolved as Error & { code?: unknown });
+                    const { code } = resolved as Error & { code?: unknown };
 
                     logger.warn(
                         "[WindowService] Failed to open mailto external navigation",
@@ -253,7 +267,7 @@ export class WindowService {
                 await shell.openExternal(targetUrl);
             } catch (error: unknown) {
                 const resolved = ensureError(error);
-                const {code} = (resolved as Error & { code?: unknown });
+                const { code } = resolved as Error & { code?: unknown };
 
                 logger.warn(
                     "[WindowService] Failed to open http(s) external navigation",
@@ -270,7 +284,7 @@ export class WindowService {
             }
         } catch (error: unknown) {
             const resolved = ensureError(error);
-            const {code} = (resolved as Error & { code?: unknown });
+            const { code } = resolved as Error & { code?: unknown };
 
             logger.warn(
                 "[WindowService] Blocked external navigation due to invalid URL",

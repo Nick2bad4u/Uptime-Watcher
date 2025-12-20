@@ -4,6 +4,7 @@ import type { JSX } from "react";
 
 import { useCallback, useState } from "react";
 
+import { SystemService } from "../../../services/SystemService";
 import { ThemedButton } from "../../../theme/components/ThemedButton";
 import { ThemedText } from "../../../theme/components/ThemedText";
 import { formatFullTimestamp } from "../../../utils/time";
@@ -115,7 +116,7 @@ function buildPreviewViewModel(
 }
 
 async function copyTextToClipboard(text: string): Promise<void> {
-    await navigator.clipboard.writeText(text);
+    await SystemService.writeClipboardText(text);
 }
 
 /**
@@ -323,44 +324,65 @@ export const SyncMaintenancePanel = ({
                 ) : null}
             </div>
 
-            <div className="mt-3 flex flex-wrap gap-2">
-                <ThemedButton
-                    disabled={!connected || isRefreshingPreview}
-                    onClick={onRefreshPreview}
-                    size="sm"
-                    variant="secondary"
-                >
-                    {isRefreshingPreview ? "Refreshing…" : "Refresh preview"}
-                </ThemedButton>
+            <div className="mt-3 rounded-md border border-zinc-800 bg-zinc-950/20 p-3">
+                <ThemedText size="xs" variant="secondary" weight="medium">
+                    Tools
+                </ThemedText>
 
-                <ThemedButton
-                    disabled={!hasPreview}
-                    onClick={handleCopyDiagnostics}
-                    size="sm"
-                    variant="secondary"
-                >
-                    Copy diagnostics
-                </ThemedButton>
+                <div className="mt-2 flex flex-wrap gap-2">
+                    <ThemedButton
+                        disabled={!connected || isRefreshingPreview}
+                        onClick={onRefreshPreview}
+                        size="sm"
+                        variant="secondary"
+                    >
+                        {isRefreshingPreview
+                            ? "Refreshing…"
+                            : "Refresh preview"}
+                    </ThemedButton>
 
-                <ThemedButton
-                    disabled={!canReset || isResetting}
-                    onClick={onResetRemoteSyncState}
-                    size="sm"
-                    variant="error"
-                >
-                    {isResetting ? "Resetting…" : "Reset remote sync"}
-                </ThemedButton>
+                    <ThemedButton
+                        disabled={!hasPreview}
+                        onClick={handleCopyDiagnostics}
+                        size="sm"
+                        variant="secondary"
+                    >
+                        Copy diagnostics
+                    </ThemedButton>
+                </div>
+
+                {copyResult ? (
+                    <div className="mt-2">
+                        <ThemedText size="xs" variant="tertiary">
+                            {copyResult.kind === "success"
+                                ? "Copied diagnostics to clipboard."
+                                : `Failed to copy diagnostics: ${copyResult.message}`}
+                        </ThemedText>
+                    </div>
+                ) : null}
             </div>
 
-            {copyResult ? (
-                <div className="mt-2">
-                    <ThemedText size="xs" variant="tertiary">
-                        {copyResult.kind === "success"
-                            ? "Copied diagnostics to clipboard."
-                            : `Failed to copy diagnostics: ${copyResult.message}`}
-                    </ThemedText>
+            <div className="border-error-default bg-error-muted/20 mt-3 rounded-md border p-3">
+                <ThemedText size="xs" variant="secondary" weight="medium">
+                    Danger zone
+                </ThemedText>
+
+                <ThemedText className="mt-1" size="xs" variant="tertiary">
+                    Resetting remote sync deletes remote history and re-seeds from
+                    this device. Other devices may need to resync.
+                </ThemedText>
+
+                <div className="mt-2 flex flex-wrap gap-2">
+                    <ThemedButton
+                        disabled={!canReset || isResetting}
+                        onClick={onResetRemoteSyncState}
+                        size="sm"
+                        variant="error"
+                    >
+                        {isResetting ? "Resetting…" : "Reset remote sync"}
+                    </ThemedButton>
                 </div>
-            ) : null}
+            </div>
         </div>
     );
 };

@@ -88,19 +88,31 @@ describe(StatusAlertToast, () => {
         vi.useRealTimers();
     });
 
-    it("renders alert content and dismisses on button click", () => {
+    it("renders alert content and dismisses on toast click", () => {
         const onDismiss = vi.fn();
         const alert = createAlert({ previousStatus: "up" });
 
         render(<StatusAlertToast alert={alert} onDismiss={onDismiss} />);
 
         expect(
-            screen.getByRole("button", { name: "Dismiss alert" })
+            screen.getByRole("button", { name: /down for primary http/i })
         ).toBeInTheDocument();
         expect(screen.getByText(/primary http/i)).toBeInTheDocument();
 
-        fireEvent.click(screen.getByRole("button", { name: "Dismiss alert" }));
+        fireEvent.click(screen.getByTestId("status-alert-alert-1"));
         expect(onDismiss).toHaveBeenCalledWith("alert-1");
+        expect(onDismiss).toHaveBeenCalledTimes(1);
+    });
+
+    it("dismisses when clicking the toast body", () => {
+        const onDismiss = vi.fn();
+        const alert = createAlert();
+
+        render(<StatusAlertToast alert={alert} onDismiss={onDismiss} />);
+
+        fireEvent.click(screen.getByTestId("status-alert-alert-1"));
+        expect(onDismiss).toHaveBeenCalledWith("alert-1");
+        expect(onDismiss).toHaveBeenCalledTimes(1);
     });
 
     it("auto-dismisses after timeout", () => {
@@ -142,7 +154,7 @@ describe(StatusAlertToaster, () => {
         });
 
         render(<StatusAlertToaster />);
-        expect(screen.getAllByRole("status")).toHaveLength(2);
+        expect(screen.getAllByTestId(/status-alert-/)).toHaveLength(2);
     });
 
     it("renders alerts produced from status updates when in-app alerts are enabled", () => {
@@ -154,7 +166,7 @@ describe(StatusAlertToaster, () => {
         render(<StatusAlertToaster />);
 
         expect(
-            screen.getByRole("status", {
+            screen.getByRole("button", {
                 name: /down for http/i,
             })
         ).toBeInTheDocument();

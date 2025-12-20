@@ -122,6 +122,7 @@ export function validateMonitorUrl(monitor: Monitor): null | string {
 export function withFallback<T>(value: null | T | undefined, fallback: T): T {
     return value ?? fallback;
 }
+
 const URL_LIST_SEPARATOR = /\r?\n|,/v;
 
 /**

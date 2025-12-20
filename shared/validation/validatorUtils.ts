@@ -126,7 +126,8 @@ export function isValidIdentifier(value: unknown): value is string {
     }
 
     // Allow alphanumeric characters, hyphens, and underscores
-    const cleanedValue = value.replaceAll(/[_\-]/gv, "");
+    // eslint-disable-next-line regexp/require-unicode-sets-regexp -- The `v` flag is not consistently supported across our Electron/TypeScript toolchain; `u` is sufficient for this ASCII-only filter.
+    const cleanedValue = value.replaceAll(/[_-]/gu, "");
 
     // Must have at least one alphanumeric character remaining
 
@@ -360,7 +361,8 @@ export function isValidUrl(
         return false;
     }
 
-    if (/^[a-z][a-z\d+\-.]*:\/\/$/iv.test(value)) {
+    // eslint-disable-next-line regexp/require-unicode-sets-regexp -- The `v` flag is not consistently supported across our Electron/TypeScript toolchain; `u` is sufficient for this ASCII-only scheme check.
+    if (/^[a-z][\d+.a-z-]*:\/\/$/iu.test(value)) {
         return false;
     }
 

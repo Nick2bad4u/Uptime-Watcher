@@ -1,5 +1,8 @@
 import { ensureError } from "@shared/utils/errorHandling";
-import { getSafeUrlForLogging } from "@shared/utils/urlSafety";
+import {
+    getSafeUrlForLogging,
+    isAllowedExternalOpenUrl,
+} from "@shared/utils/urlSafety";
 import { DropboxAuth } from "dropbox";
 import { shell } from "electron";
 import crypto from "node:crypto";
@@ -166,6 +169,12 @@ export class DropboxAuthFlow {
             ) {
                 throw new Error(
                     `Refusing to open unexpected Dropbox OAuth URL: ${authorizeUrlForLog}`
+                );
+            }
+
+            if (!isAllowedExternalOpenUrl(authorizeUrl)) {
+                throw new Error(
+                    `Refusing to open disallowed Dropbox OAuth URL: ${authorizeUrlForLog}`
                 );
             }
 

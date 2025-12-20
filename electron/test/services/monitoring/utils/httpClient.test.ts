@@ -402,9 +402,7 @@ describe("HTTP Client Utils", () => {
             } as any;
 
             // Test error handler modifies the error object with response time
-            await expect(async () => {
-                await responseErrorHandler(error);
-            }).rejects.toThrowError();
+            await expect(responseErrorHandler(error)).rejects.toThrowError();
 
             // The error should have been modified with response time
             expect(error.responseTime).toBe(750); // 1750 - 1000

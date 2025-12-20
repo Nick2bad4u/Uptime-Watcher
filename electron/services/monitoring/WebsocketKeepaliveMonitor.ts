@@ -59,7 +59,8 @@ export class WebsocketKeepaliveMonitor implements IMonitorService {
             );
         }
 
-        if (!/^wss?:\/\//iv.test(urlCandidate)) {
+        // eslint-disable-next-line regexp/require-unicode-sets-regexp -- The `v` flag is not consistently supported across our Electron/TypeScript toolchain; `u` is sufficient for this ASCII-only prefix check.
+        if (!/^wss?:\/\//iu.test(urlCandidate)) {
             return createMonitorErrorResult(
                 "WebSocket URL must start with ws:// or wss://",
                 0

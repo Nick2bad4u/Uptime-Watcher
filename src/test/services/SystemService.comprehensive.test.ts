@@ -40,6 +40,7 @@ const mockElectronAPI = vi.hoisted(() => ({
     system: {
         openExternal: vi.fn(),
         quitAndInstall: vi.fn(),
+        writeClipboardText: vi.fn(),
     },
 }));
 
@@ -69,6 +70,7 @@ describe("SystemService", () => {
         mockWaitForElectronBridge.mockResolvedValue(undefined);
         mockElectronAPI.system.openExternal.mockResolvedValue(true);
         mockElectronAPI.system.quitAndInstall.mockResolvedValue(true);
+        mockElectronAPI.system.writeClipboardText.mockResolvedValue(true);
 
         // Set up global window.electronAPI mock
         (globalThis as any).window = {
@@ -288,6 +290,21 @@ describe("SystemService", () => {
             await expect(SystemService.quitAndInstall()).rejects.toThrowError(
                 "Updater blew up"
             );
+        });
+    });
+
+    describe("writeClipboardText", () => {
+        it("should write clipboard text successfully", async () => {
+            await expect(
+                SystemService.writeClipboardText("hello")
+            ).resolves.toBeUndefined();
+            expect(mockWaitForElectronBridge).toHaveBeenCalledTimes(1);
+            expect(
+                mockElectronAPI.system.writeClipboardText
+            ).toHaveBeenCalledTimes(1);
+            expect(
+                mockElectronAPI.system.writeClipboardText
+            ).toHaveBeenCalledWith("hello");
         });
     });
 

@@ -112,11 +112,13 @@ export const StatusAlertToast = ({
     }, [alert.id, onDismiss]);
 
     return (
-        <output
+        <button
             aria-label={`${currentLabel} for ${alert.monitorName}`}
             className={`status-alert status-alert--tone-${tone}`}
             data-alert-id={alert.id}
             data-testid={`status-alert-${alert.id}`}
+            onClick={handleDismiss}
+            type="button"
         >
             <div className="status-alert__indicator">
                 <StatusIndicator
@@ -149,14 +151,9 @@ export const StatusAlertToast = ({
                     <span>Site: {alert.siteIdentifier}</span>
                 </footer>
             </div>
-            <button
-                aria-label="Dismiss alert"
-                className="status-alert__dismiss"
-                onClick={handleDismiss}
-                type="button"
-            >
+            <span aria-hidden="true" className="status-alert__dismissIcon">
                 <CloseIcon aria-hidden="true" size={16} />
-            </button>
-        </output>
+            </span>
+        </button>
     );
 };

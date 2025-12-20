@@ -5,7 +5,8 @@
  */
 
 const PLAYWRIGHT_FLAG = "PLAYWRIGHT_TEST" as const;
-const PLAYWRIGHT_UA_PATTERN = /playwright|pw-test|pwtest/iv;
+// eslint-disable-next-line regexp/require-unicode-sets-regexp -- The `v` flag is not consistently supported across our Electron/TypeScript toolchain; `u` is sufficient for this ASCII-only user-agent probe.
+const PLAYWRIGHT_UA_PATTERN = /playwright|pw-test|pwtest/iu;
 
 /**
  * Minimal process shape used for environment probing.

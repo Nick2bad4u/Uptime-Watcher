@@ -140,6 +140,20 @@ describe("ProviderCloudSyncTransport.readOperationsObject limits", () => {
         ).rejects.toThrowError(/backslashes/i);
     });
 
+    it("rejects operations keys containing ':' tokens", async () => {
+        const provider = createProvider({
+            downloadObject: async () => Buffer.from("{}\n", "utf8"),
+        });
+
+        const transport = ProviderCloudSyncTransport.create(provider);
+
+        await expect(
+            transport.readOperationsObject(
+                "sync/devices/a:evil/ops/1-1-1.ndjson"
+            )
+        ).rejects.toThrowError(/tokens are not allowed|must not contain/i);
+    });
+
     it("rejects appendOperations when deviceId contains path separators", async () => {
         const provider = createProvider({
             uploadObject: async () => ({
@@ -165,6 +179,33 @@ describe("ProviderCloudSyncTransport.readOperationsObject limits", () => {
         await expect(
             transport.appendOperations("a/b", [operation])
         ).rejects.toThrowError(/path separators/i);
+    });
+
+    it("rejects appendOperations when deviceId contains ':'", async () => {
+        const provider = createProvider({
+            uploadObject: async () => ({
+                key: "x",
+                lastModifiedAt: Date.now(),
+                sizeBytes: 1,
+            }),
+        });
+
+        const transport = ProviderCloudSyncTransport.create(provider);
+        const operation: CloudSyncOperation = {
+            deviceId: "a",
+            entityId: "e",
+            entityType: "site",
+            field: "x",
+            kind: "set-field",
+            opId: 1,
+            syncSchemaVersion: 1,
+            timestamp: 1,
+            value: true,
+        };
+
+        await expect(
+            transport.appendOperations("a:bad", [operation])
+        ).rejects.toThrowError(/must not contain ':'/i);
     });
 });
 

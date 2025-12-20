@@ -1,6 +1,6 @@
 import type { CorrelationId } from "@shared/types/events";
 
-const HEX_STRING_PATTERN = /^[a-f0-9]{16}$/v;
+const HEX_STRING_PATTERN = /^[\da-f]{16}$/;
 
 const resolveWebCrypto = (): Crypto | null => {
     const candidate = Reflect.get(globalThis, "crypto") as Crypto | undefined;

@@ -436,7 +436,9 @@ function getSqlTypeFromFieldType(fieldType: string): string {
  * @internal
  */
 function toSnakeCase(str: string): string {
-    if (!str || typeof str !== "string") return str;
+    if (!str || typeof str !== "string") {
+        return str;
+    }
 
     // Handle leading uppercase to avoid leading underscore
     return str
@@ -539,7 +541,7 @@ function mapStandardFields(monitor: UnknownRecord, row: UnknownRecord): void {
     }
 
     // Process all other standard field mappings with enhanced error handling
-    for (const mapping of STANDARD_FIELD_MAPPINGS) {
+        for (const mapping of STANDARD_FIELD_MAPPINGS) {
         if (monitor[mapping.sourceField] !== undefined) {
             const result = processFieldMapping(mapping, monitor);
             if (result.success) {

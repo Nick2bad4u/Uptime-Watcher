@@ -1,4 +1,9 @@
-import { type JSX, useCallback, useEffect, useMemo } from "react";
+import {
+    type JSX,
+    useCallback,
+    useEffect,
+    useMemo,
+} from "react";
 
 import type { AppToast } from "../../stores/alerts/useAlertStore";
 
@@ -79,11 +84,13 @@ export const AppToastToast = (props: AppToastToastProperties): JSX.Element => {
     );
 
     return (
-        <output
+        <button
             aria-label={toast.title}
             className={`status-alert status-alert--tone-${tone}`}
             data-alert-id={toast.id}
             data-testid={`app-toast-${toast.id}`}
+            onClick={handleDismiss}
+            type="button"
         >
             <div className="status-alert__content">
                 <header className="status-alert__header">
@@ -100,14 +107,9 @@ export const AppToastToast = (props: AppToastToastProperties): JSX.Element => {
                     <p className="status-alert__message">{toast.message}</p>
                 ) : null}
             </div>
-            <button
-                aria-label="Dismiss notification"
-                className="status-alert__dismiss"
-                onClick={handleDismiss}
-                type="button"
-            >
+            <span aria-hidden="true" className="status-alert__dismissIcon">
                 <CloseIcon aria-hidden="true" size={16} />
-            </button>
-        </output>
+            </span>
+        </button>
     );
 };

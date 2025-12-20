@@ -13,6 +13,7 @@
  */
 
 import { isRecord } from "@shared/utils/typeHelpers";
+import { isAllowedExternalOpenUrl } from "@shared/utils/urlSafety";
 import {
     validateSiteSnapshot,
     validateSiteUpdate,
@@ -132,6 +133,7 @@ interface SystemHandlerValidatorsInterface {
     quitAndInstall: IpcParameterValidator;
     reportPreloadGuard: IpcParameterValidator;
     verifyIpcHandler: IpcParameterValidator;
+    writeClipboardText: IpcParameterValidator;
 }
 
 type ParameterValueValidator = (value: unknown) => null | string;
@@ -167,6 +169,12 @@ const MAX_BACKUP_KEY_BYTES: number = 2048;
 
 /** Maximum byte budget accepted for encryption passphrases. */
 const MAX_ENCRYPTION_PASSPHRASE_BYTES: number = 1024;
+
+/** Maximum byte budget accepted for clipboard payloads transported over IPC. */
+const MAX_CLIPBOARD_TEXT_BYTES: number = 5 * 1024 * 1024;
+
+/** Maximum byte budget accepted for user-supplied restore filenames. */
+const MAX_RESTORE_FILE_NAME_BYTES: number = 512;
 
 /** Maximum byte budget accepted for filesystem provider base directories. */
 const MAX_FILESYSTEM_BASE_DIRECTORY_BYTES: number = 4096;
@@ -606,6 +614,59 @@ function validateNotifyAppEvent(params: readonly unknown[]): null | string[] {
     return validationResult.error.issues.map((issue) => issue.message);
 }
 
+function validateRestoreBufferCandidate(candidate: unknown): string[] {
+    if (!(candidate instanceof ArrayBuffer)) {
+        return ["payload.buffer must be an ArrayBuffer"];
+    }
+
+    if (candidate.byteLength === 0) {
+        return ["payload.buffer must not be empty"];
+    }
+
+    if (candidate.byteLength > DEFAULT_MAX_BACKUP_SIZE_BYTES) {
+        return [
+            `payload.buffer exceeds maximum allowed ${DEFAULT_MAX_BACKUP_SIZE_BYTES} bytes`,
+        ];
+    }
+
+    return [];
+}
+
+function validateRestoreFileNameCandidate(candidate: unknown): string[] {
+    const requiredError = IpcValidators.requiredString(candidate, "fileName");
+    if (requiredError) {
+        return [requiredError];
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- validated as non-empty string above
+    const fileName = (candidate as string).trim();
+    if (fileName.length === 0) {
+        return ["fileName must not be blank"];
+    }
+
+    const errors: string[] = [];
+
+    if (getUtfByteLength(fileName) > MAX_RESTORE_FILE_NAME_BYTES) {
+        errors.push(`fileName must not exceed ${MAX_RESTORE_FILE_NAME_BYTES} bytes`);
+    }
+
+    if (hasAsciiControlCharacters(fileName)) {
+        errors.push("fileName must not contain control characters");
+    }
+
+    if (fileName === "." || fileName === "..") {
+        errors.push("fileName must be a valid file name");
+    }
+
+    // `fileName` is intended for UI/logging only; it should be a base name, not
+    // a path.
+    if (fileName.includes("/") || fileName.includes("\\")) {
+        errors.push("fileName must not contain path separators");
+    }
+
+    return errors;
+}
+
 function validateRestorePayload(params: readonly unknown[]): null | string[] {
     const errors: string[] = [];
 
@@ -622,28 +683,11 @@ function validateRestorePayload(params: readonly unknown[]): null | string[] {
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- payload validated as object above
     const record = payload as Record<string, unknown>;
-    const bufferCandidate = record["buffer"];
-    if (bufferCandidate instanceof ArrayBuffer) {
-        if (bufferCandidate.byteLength === 0) {
-            errors.push("payload.buffer must not be empty");
-        } else if (bufferCandidate.byteLength > DEFAULT_MAX_BACKUP_SIZE_BYTES) {
-            errors.push(
-                `payload.buffer exceeds maximum allowed ${DEFAULT_MAX_BACKUP_SIZE_BYTES} bytes`
-            );
-        }
-    } else {
-        errors.push("payload.buffer must be an ArrayBuffer");
-    }
+    errors.push(...validateRestoreBufferCandidate(record["buffer"]));
 
     const fileNameValue = record["fileName"];
     if (fileNameValue !== undefined) {
-        const fileNameError = IpcValidators.requiredString(
-            fileNameValue,
-            "fileName"
-        );
-        if (fileNameError) {
-            errors.push(fileNameError);
-        }
+        errors.push(...validateRestoreFileNameCandidate(fileNameValue));
     }
 
     return errors.length > 0 ? errors : null;
@@ -719,6 +763,25 @@ function createSingleStringValidator(paramName: string): IpcParameterValidator {
     ]);
 }
 
+function createClipboardTextValidator(): IpcParameterValidator {
+    return createParamValidator(1, [
+        (value): null | string => {
+            const error = IpcValidators.requiredString(value, "text");
+            if (error) {
+                return error;
+            }
+
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- validated above
+            const text = value as string;
+            if (getUtfByteLength(text) > MAX_CLIPBOARD_TEXT_BYTES) {
+                return `text must not exceed ${MAX_CLIPBOARD_TEXT_BYTES} bytes`;
+            }
+
+            return null;
+        },
+    ]);
+}
+
 function createBackupKeyValidator(paramName: string): IpcParameterValidator {
     return createParamValidator(1, [
         (value): null | string => {
@@ -747,6 +810,12 @@ function createBackupKeyValidator(paramName: string): IpcParameterValidator {
                 return `${paramName} must reference a backup object key`;
             }
 
+            // Defense-in-depth: provider keys are logical identifiers, not OS
+            // paths or URLs. CloudService asserts the same invariants.
+            if (key.startsWith("/") || key.includes(":") || key.includes("://")) {
+                return `${paramName} must be a relative provider key`;
+            }
+
             const segments = key.split("/");
             if (segments.some((segment) => segment.length === 0)) {
                 return `${paramName} must not contain empty path segments`;
@@ -769,21 +838,22 @@ function createBackupKeyValidator(paramName: string): IpcParameterValidator {
     ]);
 }
 
-/**
- * Helper function to create validators for handlers expecting a single URL
- * parameter.
- *
- * @param paramName - Name of the parameter for error messages
- *
- * @returns A validator function that validates a single URL parameter
- */
-function createSingleUrlValidator(paramName: string): IpcParameterValidator {
+function createSingleExternalOpenUrlValidator(paramName: string): IpcParameterValidator {
     return createParamValidator(1, [
-        (
-            value
-        ):
-            | null
-            | string => IpcValidators.requiredUrl(value, paramName),
+        (value): null | string => {
+            const error = IpcValidators.requiredUrl(value, paramName);
+            if (error !== null) {
+                return error;
+            }
+
+            if (typeof value !== "string") {
+                return `${paramName} must be a string`;
+            }
+
+            return isAllowedExternalOpenUrl(value)
+                ? null
+                : `${paramName} must be an http(s) or mailto URL`;
+        },
     ]);
 }
 
@@ -1198,7 +1268,7 @@ export const SystemHandlerValidators: SystemHandlerValidatorsInterface = {
      * @remarks
      * Expects exactly one http(s) URL parameter (the destination to open).
      */
-    openExternal: createSingleUrlValidator("url"),
+    openExternal: createSingleExternalOpenUrlValidator("url"),
     /**
      * Validates parameters for the "quit-and-install" IPC handler.
      *
@@ -1214,4 +1284,5 @@ export const SystemHandlerValidators: SystemHandlerValidatorsInterface = {
      * Expects the target channel name as a single non-empty string.
      */
     verifyIpcHandler: createSingleStringValidator("channelName"),
+    writeClipboardText: createClipboardTextValidator(),
 } as const;

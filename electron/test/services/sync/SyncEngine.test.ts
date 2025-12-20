@@ -537,6 +537,150 @@ describe("SyncEngine (ADR-016)", () => {
         }
     });
 
+    it("drops invalid remote monitors/sites from the snapshot state", async () => {
+        const baseDirectory = await fs.mkdtemp(
+            path.join(os.tmpdir(), "uptime-watcher-sync-sanitize-")
+        );
+
+        try {
+            const provider = new FilesystemCloudStorageProvider({
+                baseDirectory,
+            });
+
+            const remoteDeviceId = "remote";
+            const siteId = "invalid.example";
+            const monitorId = globalThis.crypto.randomUUID();
+
+            // Build a remote monitor that will pass CloudSyncMonitorConfig
+            // parsing but will fail strict monitor validation because it's
+            // missing an HTTP URL.
+            const opsKey = "sync/devices/remote/ops/2-0-6.ndjson";
+            const ops = [
+                {
+                    deviceId: remoteDeviceId,
+                    entityId: siteId,
+                    entityType: "site",
+                    field: "monitoring",
+                    kind: "set-field",
+                    opId: 0,
+                    syncSchemaVersion: CLOUD_SYNC_SCHEMA_VERSION,
+                    timestamp: 1,
+                    value: true,
+                },
+                {
+                    deviceId: remoteDeviceId,
+                    entityId: siteId,
+                    entityType: "site",
+                    field: "name",
+                    kind: "set-field",
+                    opId: 1,
+                    syncSchemaVersion: CLOUD_SYNC_SCHEMA_VERSION,
+                    timestamp: 1,
+                    value: "Invalid Site",
+                },
+                {
+                    deviceId: remoteDeviceId,
+                    entityId: monitorId,
+                    entityType: "monitor",
+                    field: "siteIdentifier",
+                    kind: "set-field",
+                    opId: 2,
+                    syncSchemaVersion: CLOUD_SYNC_SCHEMA_VERSION,
+                    timestamp: 1,
+                    value: siteId,
+                },
+                {
+                    deviceId: remoteDeviceId,
+                    entityId: monitorId,
+                    entityType: "monitor",
+                    field: "type",
+                    kind: "set-field",
+                    opId: 3,
+                    syncSchemaVersion: CLOUD_SYNC_SCHEMA_VERSION,
+                    timestamp: 1,
+                    value: "http",
+                },
+                {
+                    deviceId: remoteDeviceId,
+                    entityId: monitorId,
+                    entityType: "monitor",
+                    field: "monitoring",
+                    kind: "set-field",
+                    opId: 4,
+                    syncSchemaVersion: CLOUD_SYNC_SCHEMA_VERSION,
+                    timestamp: 1,
+                    value: true,
+                },
+                {
+                    deviceId: remoteDeviceId,
+                    entityId: monitorId,
+                    entityType: "monitor",
+                    field: "checkInterval",
+                    kind: "set-field",
+                    opId: 5,
+                    syncSchemaVersion: CLOUD_SYNC_SCHEMA_VERSION,
+                    timestamp: 1,
+                    value: 60_000,
+                },
+                {
+                    deviceId: remoteDeviceId,
+                    entityId: monitorId,
+                    entityType: "monitor",
+                    field: "retryAttempts",
+                    kind: "set-field",
+                    opId: 6,
+                    syncSchemaVersion: CLOUD_SYNC_SCHEMA_VERSION,
+                    timestamp: 1,
+                    value: 1,
+                },
+                // Timeout is omitted on purpose; normalizeCloudSyncState will
+                // fill it, but URL will still be missing.
+            ];
+
+            await provider.uploadObject({
+                buffer: Buffer.from(
+                    `${ops.map((op) => JSON.stringify(op)).join("\n")}\n`,
+                    "utf8"
+                ),
+                key: opsKey,
+                overwrite: true,
+            });
+
+            const orchestrator = new InMemoryOrchestrator([]);
+            const settings = new InMemorySettingsAdapter();
+            const engine = new SyncEngine({ orchestrator, settings });
+
+            const result = await engine.syncNow(provider);
+            expect(result.snapshotKey).toBeTruthy();
+
+            const snapshotRaw = Buffer.from(
+                await provider.downloadObject(result.snapshotKey!)
+            ).toString("utf8");
+            const snapshotJson: unknown = JSON.parse(snapshotRaw);
+
+            if (!isRecord(snapshotJson)) {
+                throw new TypeError("Expected snapshot JSON object");
+            }
+
+            const state = snapshotJson["state"];
+            if (!isRecord(state)) {
+                throw new TypeError("Expected snapshot state object");
+            }
+
+            const monitorState = state["monitor"];
+            const siteState = state["site"];
+
+            if (!isRecord(monitorState) || !isRecord(siteState)) {
+                throw new TypeError("Expected snapshot monitor/site objects");
+            }
+
+            expect(siteState[siteId]).toBeUndefined();
+            expect(monitorState[monitorId]).toBeUndefined();
+        } finally {
+            await fs.rm(baseDirectory, { force: true, recursive: true });
+        }
+    });
+
     it("does not crash sync when applying a remote site fails", async () => {
         const baseDirectory = await fs.mkdtemp(
             path.join(os.tmpdir(), "uptime-watcher-sync-invalid-")
@@ -680,6 +824,170 @@ describe("SyncEngine (ADR-016)", () => {
             await expect(engine.syncNow(provider)).resolves.toBeTruthy();
             expect(orchestrator.addSite).toHaveBeenCalledTimes(1);
         } finally {
+            await fs.rm(baseDirectory, { force: true, recursive: true });
+        }
+    });
+
+    it("advances nextOpId from remote manifest compaction metadata", async () => {
+        const baseDirectory = await fs.mkdtemp(
+            path.join(os.tmpdir(), "uptime-watcher-sync-nextOpId-")
+        );
+
+        try {
+            const provider = new FilesystemCloudStorageProvider({
+                baseDirectory,
+            });
+
+            await provider.uploadObject({
+                buffer: Buffer.from(
+                    JSON.stringify({
+                        devices: {
+                            "device-a": {
+                                compactedUpToOpId: 10,
+                                lastSeenAt: 1,
+                            },
+                        },
+                        manifestVersion: 1,
+                        syncSchemaVersion: CLOUD_SYNC_SCHEMA_VERSION,
+                    }),
+                    "utf8"
+                ),
+                key: "manifest.json",
+                overwrite: true,
+            });
+
+            const orchestrator = new InMemoryOrchestrator([]);
+            const settings = new InMemorySettingsAdapter();
+            await settings.set("cloud.sync.deviceId", "device-a");
+            await settings.set("cloud.sync.nextOpId", "0");
+
+            const engine = new SyncEngine({ orchestrator, settings });
+            await engine.syncNow(provider);
+
+            await expect(settings.get("cloud.sync.nextOpId")).resolves.toBe(
+                "11"
+            );
+        } finally {
+            await fs.rm(baseDirectory, { force: true, recursive: true });
+        }
+    });
+
+    it("regenerates an invalid stored deviceId instead of crashing sync", async () => {
+        const baseDirectory = await fs.mkdtemp(
+            path.join(os.tmpdir(), "uptime-watcher-sync-deviceId-")
+        );
+
+        try {
+            const provider = new FilesystemCloudStorageProvider({
+                baseDirectory,
+            });
+
+            const orchestrator = new InMemoryOrchestrator([]);
+            const settings = new InMemorySettingsAdapter();
+            await settings.set("cloud.sync.deviceId", " bad ");
+
+            const engine = new SyncEngine({ orchestrator, settings });
+            await expect(engine.syncNow(provider)).resolves.toBeTruthy();
+
+            const stored = await settings.get("cloud.sync.deviceId");
+            expect(stored).toBeTypeOf("string");
+            expect(stored).not.toBe(" bad ");
+            expect(stored?.trim()).toBe(stored);
+        } finally {
+            await fs.rm(baseDirectory, { force: true, recursive: true });
+        }
+    });
+
+    it("ensures op object keys use createdAt >= resetAt", async () => {
+        vi.useFakeTimers();
+
+        const baseDirectory = await fs.mkdtemp(
+            path.join(os.tmpdir(), "uptime-watcher-sync-resetAt-")
+        );
+
+        try {
+            const provider = new FilesystemCloudStorageProvider({
+                baseDirectory,
+            });
+
+            const uploadedKeys: string[] = [];
+            const recordingProvider: FilesystemCloudStorageProvider & {
+                uploadObject: FilesystemCloudStorageProvider["uploadObject"];
+            } = provider;
+
+            const providerWithRecording = {
+                deleteObject: async (key: string) =>
+                    await recordingProvider.deleteObject(key),
+                downloadBackup: async (...args: Parameters<FilesystemCloudStorageProvider["downloadBackup"]>) =>
+                    await recordingProvider.downloadBackup(...args),
+                downloadObject: async (key: string) =>
+                    await recordingProvider.downloadObject(key),
+                isConnected: async () => await recordingProvider.isConnected(),
+                kind: recordingProvider.kind,
+                listBackups: async (...args: Parameters<FilesystemCloudStorageProvider["listBackups"]>) =>
+                    await recordingProvider.listBackups(...args),
+                listObjects: async (prefix: string) =>
+                    await recordingProvider.listObjects(prefix),
+                uploadBackup: async (...args: Parameters<FilesystemCloudStorageProvider["uploadBackup"]>) =>
+                    await recordingProvider.uploadBackup(...args),
+                uploadObject: async (args: Parameters<FilesystemCloudStorageProvider["uploadObject"]>[0]) => {
+                    uploadedKeys.push(args.key);
+                    return await recordingProvider.uploadObject(args);
+                },
+            };
+
+            // Remote manifest indicates history reset at t=2000.
+            await provider.uploadObject({
+                buffer: Buffer.from(
+                    JSON.stringify({
+                        devices: {},
+                        manifestVersion: 1,
+                        resetAt: 2_000,
+                        syncSchemaVersion: CLOUD_SYNC_SCHEMA_VERSION,
+                    }),
+                    "utf8"
+                ),
+                key: "manifest.json",
+                overwrite: true,
+            });
+
+            const site: Site = {
+                identifier: "example.com",
+                monitoring: true,
+                monitors: [
+                    createMonitor({
+                        id: "monitor-1",
+                        monitoring: true,
+                        type: "http",
+                        url: "https://example.com",
+                    }),
+                ],
+                name: "Example",
+            };
+
+            const orchestrator = new InMemoryOrchestrator([site]);
+            const settings = new InMemorySettingsAdapter();
+            await settings.set("cloud.sync.deviceId", "device-a");
+            await settings.set("cloud.sync.nextOpId", "0");
+
+            const engine = new SyncEngine({ orchestrator, settings });
+
+            // Simulate local clock behind resetAt.
+            vi.setSystemTime(new Date(1_000));
+            await engine.syncNow(providerWithRecording as any);
+
+            const opKey = uploadedKeys.find((key) =>
+                key.startsWith("sync/devices/device-a/ops/")
+            );
+            expect(opKey).toBeTruthy();
+
+            const fileName = opKey!.split("/").at(-1);
+            expect(fileName).toBeTruthy();
+
+            const createdAtRaw = fileName!.split("-")[0];
+            expect(Number(createdAtRaw)).toBeGreaterThanOrEqual(2_000);
+        } finally {
+            vi.useRealTimers();
             await fs.rm(baseDirectory, { force: true, recursive: true });
         }
     });

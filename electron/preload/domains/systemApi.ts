@@ -50,6 +50,15 @@ export const systemApi: SystemApiInterface = {
      * want to install an available update.
      */
     quitAndInstall: createTypedInvoker(SYSTEM_CHANNELS.quitAndInstall),
+
+    /**
+     * Writes the provided string to the OS clipboard.
+     *
+     * @remarks
+     * Uses Electron's main-process clipboard API to avoid browser clipboard
+     * permission issues in hardened Electron contexts.
+     */
+    writeClipboardText: createTypedInvoker(SYSTEM_CHANNELS.writeClipboardText),
 } as const;
 
 /**

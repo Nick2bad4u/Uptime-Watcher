@@ -29,18 +29,37 @@ export const DEFAULT_GOOGLE_DRIVE_CLIENT_ID =
     "847007675136-epa37blmge6np9k2g6fr73sbu0sr2i5j.apps.googleusercontent.com" as const;
 
 /**
+ * Default Google OAuth client secret shipped with the app.
+ *
+ * @remarks
+ * Desktop apps are **public clients**; this value is not confidential once the
+ * app is distributed. It exists solely so the bundled OAuth client works for
+ * end users without requiring environment variables.
+ */
+export const DEFAULT_GOOGLE_DRIVE_CLIENT_SECRET =
+    "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" as const;
+
+/**
  * Resolves the Google Drive OAuth configuration.
  *
  * @remarks
  * Environment variable overrides are supported for local development and CI.
  */
 export function resolveGoogleDriveOAuthConfig(): GoogleDriveOAuthConfig {
-    const clientId =
-        readProcessEnv("UPTIME_WATCHER_GOOGLE_CLIENT_ID") ??
-        DEFAULT_GOOGLE_DRIVE_CLIENT_ID;
+    const envClientId = readProcessEnv("UPTIME_WATCHER_GOOGLE_CLIENT_ID");
+    const envClientSecret = readProcessEnv(
+        "UPTIME_WATCHER_GOOGLE_CLIENT_SECRET"
+    );
 
+    const clientId = envClientId ?? DEFAULT_GOOGLE_DRIVE_CLIENT_ID;
+
+    // Only use the bundled secret for the bundled client id. If someone
+    // overrides the client id (custom OAuth app) but doesn't provide a matching
+    // secret, we must not send the bundled secret (it would cause
+    // invalid_client).
     const clientSecret =
-        readProcessEnv("UPTIME_WATCHER_GOOGLE_CLIENT_SECRET") ?? undefined;
+        envClientSecret ??
+        (envClientId ? undefined : DEFAULT_GOOGLE_DRIVE_CLIENT_SECRET);
 
     return {
         clientId,

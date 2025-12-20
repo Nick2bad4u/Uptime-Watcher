@@ -29,7 +29,7 @@ Google Drive uses **Google Drive appDataFolder** so backups and sync artifacts a
 
 - **System browser OAuth** only (no embedded auth webviews).
 - **OAuth 2.0 Authorization Code + PKCE**.
-- **Loopback redirect** (local HTTP server bound to localhost) — no backend service.
+- **Loopback redirect** (local HTTP server bound to a loopback interface) — no backend service.
 - **No secrets in the renderer**. Tokens and refresh tokens live in Electron main and are stored via the existing `SecretStore` abstraction.
 
 ## What you will need (as the app maintainer)
@@ -44,15 +44,15 @@ Google Drive uses **Google Drive appDataFolder** so backups and sync artifacts a
 
 ## Environment variables (optional override)
 
-The app ships with a default Google OAuth client id and end users do not need to
-configure anything.
+The app ships with a default Google OAuth client id (and its associated client
+secret) and end users do not need to configure anything.
 
 These variables are still read from `process.env` in the Electron main process
 and take precedence when set:
 
 - `UPTIME_WATCHER_GOOGLE_CLIENT_ID`
-- `UPTIME_WATCHER_GOOGLE_CLIENT_SECRET` (optional; only needed for custom OAuth
-  apps depending on how they are configured)
+- `UPTIME_WATCHER_GOOGLE_CLIENT_SECRET` (optional override; if you override the
+  client id and your OAuth app requires a secret, you must override this too)
 
 ### Example: local development override
 
@@ -79,23 +79,27 @@ npm run dev
 
 ## Redirect URI strategy
 
-Uptime Watcher uses a loopback HTTP server bound to the loopback interfaces.
+Uptime Watcher uses a loopback HTTP server bound to a loopback interface.
 
 ### Redirect URI values
 
-Configure the following **Authorized redirect URIs** in your Google OAuth client:
+For **Google Drive**, Uptime Watcher uses a **pathless** loopback redirect URI (per Google’s native-app guidance):
 
 ```text
-http://localhost:53682/oauth2/callback
+http://127.0.0.1:53682
 ```
 
-Uptime Watcher uses a stable callback path because some providers require an exact redirect URI string.
-
-If you need an additional fallback for unusual `localhost` resolution environments, you can also register:
-
-```text
-http://127.0.0.1:53682/oauth2/callback
-```
+> Note
+>
+> Whether you must explicitly configure “Authorized redirect URIs” depends on the
+> **OAuth client type**:
+>
+> - **Desktop app** clients typically accept loopback redirects without listing
+>   a fixed redirect URI.
+> - **Web application** clients typically require an exact redirect URI string.
+>
+> If you use a web client anyway, you must configure an exact redirect URI that
+> matches what the app uses.
 
 ## Scopes
 

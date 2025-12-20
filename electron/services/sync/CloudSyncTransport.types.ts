@@ -14,7 +14,8 @@ export interface CloudSyncTransport {
     /** Appends operations to the per-device op log. */
     appendOperations: (
         deviceId: string,
-        operations: readonly CloudSyncOperation[]
+        operations: readonly CloudSyncOperation[],
+        createdAtEpochMs?: number
     ) => Promise<CloudObjectEntry>;
 
     /** Deletes an object by key. */

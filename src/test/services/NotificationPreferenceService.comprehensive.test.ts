@@ -138,7 +138,7 @@ describe("NotificationPreferenceService", () => {
 
         await expect(
             NotificationPreferenceService.updatePreferences(invalidPreferences)
-        ).rejects.toThrowError(/Invalid notification preferences:/v);
+        ).rejects.toThrowError(/Invalid notification preferences:/u);
 
         expect(ensureInitializedMock).toHaveBeenCalledTimes(1);
     });

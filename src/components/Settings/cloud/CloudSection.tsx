@@ -14,8 +14,8 @@ import { SettingItem } from "../../shared/SettingItem";
 import { SettingsSection } from "../SettingsSections";
 import { BackupMigrationPanel } from "./BackupMigrationPanel";
 import { CloudProviderSetupPanel } from "./CloudProviderSetupPanel";
+import { CloudSyncMaintenanceControl } from "./CloudSyncMaintenanceControl";
 import { RemoteBackupsPanel } from "./RemoteBackupsPanel";
-import { SyncMaintenancePanel } from "./SyncMaintenancePanel";
 
 function formatOptionalTimestamp(value: null | number): string {
     if (value === null) {
@@ -377,22 +377,24 @@ export const CloudSection = ({
                     restoringBackupKey={restoringBackupKey}
                 />
 
-                <BackupMigrationPanel
-                    connected={connected}
-                    encryptionLocked={encryptionLocked}
-                    encryptionMode={encryptionMode}
-                    isMigratingBackups={isMigratingBackups}
-                    lastResult={lastBackupMigrationResult}
-                    onEncryptBackupsDeleteOriginals={
-                        onEncryptBackupsDeleteOriginals
-                    }
-                    onEncryptBackupsKeepOriginals={
-                        onEncryptBackupsKeepOriginals
-                    }
-                    plaintextBackupCount={plaintextBackupCount}
-                />
+                {plaintextBackupCount > 0 ? (
+                    <BackupMigrationPanel
+                        connected={connected}
+                        encryptionLocked={encryptionLocked}
+                        encryptionMode={encryptionMode}
+                        isMigratingBackups={isMigratingBackups}
+                        lastResult={lastBackupMigrationResult}
+                        onEncryptBackupsDeleteOriginals={
+                            onEncryptBackupsDeleteOriginals
+                        }
+                        onEncryptBackupsKeepOriginals={
+                            onEncryptBackupsKeepOriginals
+                        }
+                        plaintextBackupCount={plaintextBackupCount}
+                    />
+                ) : null}
 
-                <SyncMaintenancePanel
+                <CloudSyncMaintenanceControl
                     connected={connected}
                     encryptionLocked={encryptionLocked}
                     encryptionMode={encryptionMode}

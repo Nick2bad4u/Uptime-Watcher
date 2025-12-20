@@ -337,7 +337,8 @@ export const IpcValidators = {
                 return `${paramName} must not exceed ${MAX_IPC_URL_UTF_BYTES} bytes`;
             }
 
-            if (/[\r\n]/v.test(value)) {
+                // eslint-disable-next-line regexp/require-unicode-sets-regexp -- The `v` flag is not consistently supported across our TypeScript/Electron toolchain; `u` is sufficient for this ASCII-only newline check.
+                if (/[\n\r]/u.test(value)) {
                 return `${paramName} must not contain newlines`;
             }
         }

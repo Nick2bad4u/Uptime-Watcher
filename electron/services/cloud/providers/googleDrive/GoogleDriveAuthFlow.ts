@@ -1,5 +1,8 @@
 import { ensureError } from "@shared/utils/errorHandling";
-import { getSafeUrlForLogging } from "@shared/utils/urlSafety";
+import {
+    getSafeUrlForLogging,
+    isAllowedExternalOpenUrl,
+} from "@shared/utils/urlSafety";
 import axios from "axios";
 import { shell } from "electron";
 import * as z from "zod";
@@ -18,6 +21,30 @@ const googleTokenResponseSchema = z.looseObject({
     token_type: z.string().optional(),
 });
 
+function isPlainObject(value: unknown): value is Record<string, unknown> {
+    return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function tryParseJsonRecord(text: string): null | Record<string, unknown> {
+    try {
+        const parsed: unknown = JSON.parse(text);
+        return isPlainObject(parsed) ? parsed : null;
+    } catch {
+        return null;
+    }
+}
+
+function getErrorCodeSuffix(error: unknown): string {
+    const resolved = ensureError(error);
+
+    if (!isPlainObject(resolved) || !("code" in resolved)) {
+        return "";
+    }
+
+    const { code } = resolved;
+    return typeof code === "string" && code.length > 0 ? ` (${code})` : "";
+}
+
 /**
  * Result of a successful Google Drive OAuth connect flow.
  */
@@ -34,8 +61,8 @@ export interface GoogleDriveAuthResult {
  * and a loopback IP redirect.
  *
  * @remarks
- * Google’s native/desktop guidance supports loopback redirects using localhost
- * (and allows an optional path component).
+ * Google’s native/desktop guidance recommends loopback redirects using a
+ * loopback IP address (e.g. `http://127.0.0.1:{port}`) with PKCE.
  */
 export class GoogleDriveAuthFlow {
     private readonly clientId: string;
@@ -43,7 +70,10 @@ export class GoogleDriveAuthFlow {
     private readonly clientSecret: string | undefined;
 
     public async run(): Promise<GoogleDriveAuthResult> {
-        const server = await startLoopbackOAuthServer();
+        const server = await startLoopbackOAuthServer({
+            redirectHost: "127.0.0.1",
+            redirectPath: "",
+        });
 
         try {
             const pkce = createPkcePair();
@@ -96,15 +126,16 @@ export class GoogleDriveAuthFlow {
                 );
             }
 
+            if (!isAllowedExternalOpenUrl(authorizeUrl)) {
+                throw new Error(
+                    `Refusing to open disallowed Google OAuth URL: ${urlForLog}`
+                );
+            }
+
             try {
                 await shell.openExternal(authorizeUrl);
             } catch (error: unknown) {
-                const resolved = ensureError(error);
-                const {code} = (resolved as Error & { code?: unknown });
-                const codeSuffix =
-                    typeof code === "string" && code.length > 0
-                        ? ` (${code})`
-                        : "";
+                const codeSuffix = getErrorCodeSuffix(error);
 
                 throw new Error(
                     `Failed to open Google OAuth URL: ${urlForLog}${codeSuffix}`,
@@ -160,17 +191,64 @@ export class GoogleDriveAuthFlow {
             body.set("client_secret", this.clientSecret);
         }
 
-        const response = await axios.post(
-            "https://oauth2.googleapis.com/token",
-            body.toString(),
-            {
-                headers: {
-                    "Content-Type": "application/x-www-form-urlencoded",
-                },
-            }
-        );
+        try {
+            const response = await axios.post(
+                "https://oauth2.googleapis.com/token",
+                body.toString(),
+                {
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded",
+                    },
+                }
+            );
 
-        return googleTokenResponseSchema.parse(response.data);
+            return googleTokenResponseSchema.parse(response.data);
+        } catch (error: unknown) {
+            if (axios.isAxiosError(error)) {
+                const status = error.response?.status;
+                const data: unknown = error.response?.data;
+
+                let parsed: null | Record<string, unknown> = null;
+                if (isPlainObject(data)) {
+                    parsed = data;
+                } else if (typeof data === "string") {
+                    parsed = tryParseJsonRecord(data);
+                }
+
+                const {
+                    error: rawError,
+                    error_description: rawErrorDescription,
+                } = parsed ?? {};
+                const errorName =
+                    typeof rawError === "string" ? rawError : undefined;
+                const errorDescription =
+                    typeof rawErrorDescription === "string"
+                        ? rawErrorDescription
+                        : undefined;
+
+                if (errorName) {
+                    const prefix = `Google OAuth token exchange failed (${status ?? "unknown"}): ${errorName}`;
+                    const message = errorDescription
+                        ? `${prefix} - ${errorDescription}`
+                        : prefix;
+                    throw new Error(message, { cause: error });
+                }
+
+                let fallbackBody: string | undefined = undefined;
+                if (typeof data === "string") {
+                    fallbackBody = data.slice(0, 500);
+                } else if (data instanceof Uint8Array) {
+                    fallbackBody = Buffer.from(data)
+                        .toString("utf8")
+                        .slice(0, 500);
+                }
+
+                const message = `Google OAuth token exchange failed (${status ?? "unknown"}): ${fallbackBody ?? error.message}`;
+                throw new Error(message, { cause: error });
+            }
+
+            throw error;
+        }
     }
 
     public constructor(args: { clientId: string; clientSecret?: string }) {

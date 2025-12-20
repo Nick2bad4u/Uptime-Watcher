@@ -418,6 +418,10 @@ export interface IpcInvokeChannelMap {
         params: readonly [monitorType: string, data: unknown];
         result: ValidationResult;
     };
+    "write-clipboard-text": {
+        params: readonly [text: string];
+        result: boolean;
+    };
 }
 
 /**

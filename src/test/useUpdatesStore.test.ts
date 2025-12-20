@@ -22,6 +22,7 @@ const mockElectronAPIQuitAndInstall = vi.fn();
 const createSystemMock = () => ({
     openExternal: vi.fn(),
     quitAndInstall: mockElectronAPIQuitAndInstall,
+    writeClipboardText: vi.fn().mockResolvedValue(true),
 });
 
 // Helper to setup electronAPI mock

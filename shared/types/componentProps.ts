@@ -52,6 +52,8 @@ export interface CoreComponentProperties {
 export interface AccessibilityProperties {
     /** ARIA described-by reference for additional descriptions */
     readonly "aria-describedby"?: string;
+    /** ARIA disabled state for interactive controls that are visually disabled */
+    readonly "aria-disabled"?: boolean;
     /** ARIA label for screen readers */
     readonly "aria-label"?: string;
     /** ARIA labelledby reference for complex labeling */
@@ -321,6 +323,14 @@ export interface StandardButtonProperties
         IconProperties,
         StateProperties,
         StylingProperties {
+    /**
+     * Optional form id to associate the button with an external <form>.
+     *
+     * @remarks
+     * This enables submit/reset buttons to live outside the form element (e.g.
+     * in a dialog footer) while still triggering form submission.
+     */
+    readonly form?: string;
     /** Click handler for button interactions */
     readonly onClick?: ClickHandler;
     /** Tooltip text for hover states */

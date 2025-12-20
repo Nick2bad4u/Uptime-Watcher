@@ -36,6 +36,9 @@ const DEFAULT_MAX_MANIFEST_BYTES = 256 * 1024; // 256 KiB
 
 const MAX_DEVICE_ID_BYTES = 256;
 
+/** Maximum byte budget accepted for provider object keys handled by sync. */
+const MAX_SYNC_KEY_BYTES = 2048;
+
 const OPS_FILE_SUFFIX = ".ndjson" as const;
 
 function isNonNegativeSafeInteger(candidate: number): boolean {
@@ -198,8 +201,19 @@ function hasAsciiControlCharacters(value: string): boolean {
 }
 
 function assertValidDeviceId(deviceId: string): void {
-    if (typeof deviceId !== "string" || deviceId.trim().length === 0) {
+    if (typeof deviceId !== "string") {
+        throw new TypeError("deviceId must be a non-empty string");
+    }
+
+    const trimmed = deviceId.trim();
+    if (trimmed.length === 0) {
         throw new Error("deviceId must be a non-empty string");
+    }
+
+    if (trimmed !== deviceId) {
+        throw new Error(
+            "deviceId must not contain leading or trailing whitespace"
+        );
     }
 
     if (Buffer.byteLength(deviceId, "utf8") > MAX_DEVICE_ID_BYTES) {
@@ -215,6 +229,12 @@ function assertValidDeviceId(deviceId: string): void {
         throw new Error("deviceId must not contain path separators");
     }
 
+    // Device IDs are used in provider object keys; reject colon tokens to avoid
+    // ambiguity across providers and to match other key policies.
+    if (deviceId.includes(":")) {
+        throw new Error("deviceId must not contain ':'");
+    }
+
     if (deviceId === "." || deviceId === "..") {
         throw new Error("deviceId must not be a traversal segment");
     }
@@ -223,6 +243,10 @@ function assertValidDeviceId(deviceId: string): void {
 function assertSafeProviderKey(key: string): void {
     if (typeof key !== "string" || key.trim().length === 0) {
         throw new Error("Key must be a non-empty string");
+    }
+
+    if (Buffer.byteLength(key, "utf8") > MAX_SYNC_KEY_BYTES) {
+        throw new Error(`Invalid key: exceeds ${MAX_SYNC_KEY_BYTES} bytes`);
     }
 
     // Provider keys are always POSIX-style.
@@ -236,6 +260,15 @@ function assertSafeProviderKey(key: string): void {
 
     if (key.startsWith("/")) {
         throw new Error("Invalid key: absolute keys are not allowed");
+    }
+
+    // Treat provider keys as logical identifiers, not OS paths or URLs.
+    if (key.includes("://")) {
+        throw new Error("Invalid key: URL-like keys are not allowed");
+    }
+
+    if (key.includes(":")) {
+        throw new Error("Invalid key: ':' tokens are not allowed");
     }
 
     const segments = key.split("/");
@@ -335,7 +368,7 @@ function parseNdjsonOperations(args: {
     raw: string;
 }): CloudSyncOperation[] {
     const { key, maxLineChars, maxLines, raw } = args;
-    const lines = raw.split(/\r?\n/u);
+    const lines = raw.split(/\r?\n/v);
     const operations: CloudSyncOperation[] = [];
 
     for (const [index, candidate] of lines.entries()) {
@@ -422,7 +455,8 @@ export class ProviderCloudSyncTransport implements CloudSyncTransport {
 
     public async appendOperations(
         deviceId: string,
-        operations: readonly CloudSyncOperation[]
+        operations: readonly CloudSyncOperation[],
+        createdAtEpochMs?: number
     ): Promise<CloudObjectEntry> {
         if (operations.length === 0) {
             throw new Error("appendOperations requires at least one operation");
@@ -430,7 +464,12 @@ export class ProviderCloudSyncTransport implements CloudSyncTransport {
 
         assertValidDeviceId(deviceId);
 
-        const createdAt = Date.now();
+        const createdAtCandidate = createdAtEpochMs ?? Date.now();
+        if (!Number.isSafeInteger(createdAtCandidate) || createdAtCandidate < 0) {
+            throw new Error("createdAtEpochMs must be a non-negative safe integer");
+        }
+
+        const createdAt = createdAtCandidate;
         const firstOpId = operations[0]?.opId ?? 0;
         const lastOpId = operations.at(-1)?.opId ?? firstOpId;
 

@@ -52,7 +52,7 @@ describe(assertNever, () => {
 
         expect(() =>
             assertNever(Symbol("x") as unknown as never, "sym")).toThrowError(
-            /\[sym\] Reached unreachable code with value: Symbol\(x\)/v
+              /\[sym\] Reached unreachable code with value: Symbol\(x\)/u
         );
     });
 

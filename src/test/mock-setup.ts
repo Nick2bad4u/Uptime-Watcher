@@ -641,6 +641,9 @@ const mockElectronAPI: ElectronAPI = {
         quitAndInstall: vi.fn<ElectronAPI["system"]["quitAndInstall"]>(
             async () => true
         ),
+        writeClipboardText: vi.fn<ElectronAPI["system"]["writeClipboardText"]>(
+            async (_text: string) => true
+        ),
     },
 };
 

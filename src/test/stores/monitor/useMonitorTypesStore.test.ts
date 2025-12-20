@@ -326,12 +326,11 @@ describe(useMonitorTypesStore, () => {
 
         const { result } = renderHook(() => useMonitorTypesStore());
 
-        // Since withErrorHandling re-throws errors, we expect the function to throw
-        await expect(async () => {
-            await act(async () => {
-                await result.current.formatMonitorDetail("http", "Raw detail");
-            });
-        }).rejects.toThrowError("Formatting failed");
+        await act(async () => {
+            await expect(
+                result.current.formatMonitorDetail("http", "Raw detail")
+            ).rejects.toThrowError("Formatting failed");
+        });
 
         // Error should be set in store state
         expect(useErrorStore.getState().getStoreError("monitor-types")).toBe(
@@ -436,14 +435,13 @@ describe(useMonitorTypesStore, () => {
 
             const { result } = renderHook(() => useMonitorTypesStore());
 
-            // Since withErrorHandling re-throws errors, we expect the function to throw
-            await expect(async () => {
-                await act(async () => {
-                    await result.current.validateMonitorData("http", {
+            await act(async () => {
+                await expect(
+                    result.current.validateMonitorData("http", {
                         url: "https://example.com",
-                    });
-                });
-            }).rejects.toThrowError("Backend unavailable");
+                    })
+                ).rejects.toThrowError("Backend unavailable");
+            });
 
             // Error should be set in store state
             expect(

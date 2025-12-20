@@ -56,8 +56,8 @@ export const SiteCardStatus: NamedExoticComponent<SiteCardStatusProperties> =
         const statusLabel = useMemo(() => {
             const normalizedSegments = safeMonitorId
                 .trim()
-                .replaceAll(/[\p{Dash_Punctuation}_]+/gv, " ")
-                .split(/\s+/v)
+                .replaceAll(/[\p{Dash_Punctuation}_]+/gu, " ")
+                .split(/\s+/)
                 .filter(Boolean)
                 .map((segment) => toTitleCase(segment));
 

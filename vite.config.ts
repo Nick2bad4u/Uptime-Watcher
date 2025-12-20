@@ -878,13 +878,17 @@ export default defineConfig(({ command, mode }) => {
                     statements: 89,
                 },
             },
-            css: {
-                exclude: [],
-                include: [/.+/u],
-                modules: {
-                    classNameStrategy: "stable",
-                },
-            },
+            // Disable CSS handling inside Vitest's JSDOM environment.
+            //
+            // Why:
+            // - JSDOM's CSS engine is not Chromium; it routes parsing through css-tree.
+            // - Modern CSS used by the app (e.g. color-mix(), advanced gradients)
+            //   can trigger css-tree's safety bailout:
+            //   "[csstree-match] BREAK after 15000 iterations".
+            //
+            // This is noisy and does not reflect real app behavior (Electron/Chromium).
+            // We validate real CSS rendering/behavior via Playwright instead.
+            css: false,
             dangerouslyIgnoreUnhandledErrors: false,
             deps: {
                 optimizer: {

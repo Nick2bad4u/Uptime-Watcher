@@ -396,6 +396,7 @@ const mockElectronAPI: {
     system: {
         openExternal: AnyMock;
         quitAndInstall: AnyMock;
+        writeClipboardText: AnyMock;
     };
 } = {
     data: {
@@ -599,6 +600,7 @@ const mockElectronAPI: {
     system: {
         openExternal: vi.fn().mockResolvedValue(true),
         quitAndInstall: vi.fn().mockResolvedValue(true),
+        writeClipboardText: vi.fn().mockResolvedValue(true),
     },
 };
 

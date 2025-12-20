@@ -207,14 +207,20 @@ const arbitraryPartialMonitor = (): fc.Arbitrary<Partial<Monitor>> =>
             lastChecked: fc.date(),
         })
         .map((fullMonitor) => {
+            const fullMonitorTyped: Monitor = fullMonitor;
+
             // Create a partial by randomly selecting which properties to include
             const partial: Partial<Monitor> = {};
-            const keys = Object.keys(fullMonitor) as (keyof Monitor)[];
+            const keys = Object.keys(fullMonitorTyped) as (keyof Monitor)[];
+
+            const copyField = <K extends keyof Monitor>(key: K): void => {
+                partial[key] = fullMonitorTyped[key];
+            };
 
             for (const key of keys) {
                 if (Math.random() > 0.5) {
                     // Randomly include ~50% of properties
-                    (partial as any)[key] = fullMonitor[key];
+                        copyField(key);
                 }
             }
 

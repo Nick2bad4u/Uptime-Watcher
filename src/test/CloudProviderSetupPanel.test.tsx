@@ -117,15 +117,27 @@ describe(CloudProviderSetupPanel, () => {
 
         fireEvent.click(screen.getByRole("tab", { name: "Google Drive" }));
 
+        expect(screen.getByRole("alert")).toBeInTheDocument();
+
         expect(
             screen.getByText(
-                "Currently configured provider is Dropbox. Disconnect or clear configuration before switching providers."
+                "Disconnect Dropbox before setting up Google Drive."
             )
         ).toBeInTheDocument();
 
-        const connectButton = screen.getByRole("button", {
-            name: "Connect Google Drive",
-        });
-        expect(connectButton).toBeDisabled();
+        // Still locked to Dropbox.
+        expect(
+            screen.getByRole("tab", {
+                name: "Dropbox",
+                selected: true,
+            })
+        ).toBeInTheDocument();
+
+        expect(
+            screen.queryByRole("button", {
+                name: "Connect Google Drive",
+            })
+        ).not.toBeInTheDocument();
+
     });
 });

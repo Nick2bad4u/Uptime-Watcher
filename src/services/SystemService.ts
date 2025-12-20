@@ -11,8 +11,10 @@
  */
 
 import { ensureError } from "@shared/utils/errorHandling";
-import { getSafeUrlForLogging } from "@shared/utils/urlSafety";
+import { getSafeUrlForLogging, isAllowedExternalOpenUrl } from "@shared/utils/urlSafety";
 import { isValidUrl } from "@shared/validation/validatorUtils";
+
+import type { ElectronAPI } from "../types";
 
 import { logger } from "./logger";
 import { getIpcServiceHelpers } from "./utils/createIpcServiceHelpers";
@@ -25,7 +27,11 @@ const { ensureInitialized, wrap } = ((): ReturnType<
             bridgeContracts: [
                 {
                     domain: "system",
-                    methods: ["openExternal", "quitAndInstall"],
+                    methods: [
+                        "openExternal",
+                        "quitAndInstall",
+                        "writeClipboardText",
+                    ],
                 },
             ],
         });
@@ -38,6 +44,7 @@ interface SystemServiceContract {
     initialize: () => Promise<void>;
     openExternal: (url: string) => Promise<boolean>;
     quitAndInstall: () => Promise<void>;
+    writeClipboardText: (text: string) => Promise<void>;
 }
 
 /**
@@ -101,6 +108,18 @@ export const SystemService: SystemServiceContract = {
             throw error;
         }
 
+        if (!isAllowedExternalOpenUrl(requestedUrl)) {
+            const error = new TypeError(
+                `Blocked external URL provided to SystemService.openExternal: ${urlForMessage}`
+            );
+
+            logger.error("Rejected blocked URL for external navigation", error, {
+                url: urlForMessage,
+            });
+
+            throw error;
+        }
+
         const opened = await api.system.openExternal(requestedUrl);
 
         if (typeof opened !== "boolean") {
@@ -140,6 +159,31 @@ export const SystemService: SystemServiceContract = {
             throw new Error(
                 "Electron declined to execute quitAndInstall request"
             );
+        }
+    }),
+
+    /**
+     * Writes text to the OS clipboard.
+     *
+     * @remarks
+     * Uses the Electron main-process clipboard API via IPC to avoid
+     * `navigator.clipboard` permission failures in Electron (common when the
+     * renderer is not treated as a secure browsing context).
+     */
+    writeClipboardText: wrap("writeClipboardText", async (
+        api: ElectronAPI,
+        text: string
+    ): Promise<void> => {
+        const result = await api.system.writeClipboardText(text);
+
+        if (typeof result !== "boolean") {
+            throw new TypeError(
+                `Invalid response received from writeClipboardText: ${typeof result}`
+            );
+        }
+
+        if (!result) {
+            throw new Error("Electron declined to write clipboard text");
         }
     }),
 };

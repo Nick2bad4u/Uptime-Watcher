@@ -161,6 +161,14 @@
     }
 }
 
+.modal-shell--size-sm {
+    inline-size: min(94vi, 34rem);
+}
+
+.modal-shell--size-lg {
+    inline-size: min(98vi, 60rem);
+}
+
 .modal-shell--closing {
     animation: modal-shell-exit 0.3s cubic-bezier(0.4, 0, 1, 1) forwards;
 }
@@ -312,6 +320,17 @@
     overscroll-behavior: contain;
     scroll-behavior: smooth;
     scrollbar-gutter: stable both-edges;
+}
+
+.modal-shell__footer {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    border-block-start: 1px solid
+        color-mix(in srgb, var(--color-border-secondary) 55%, transparent);
+    gap: 0.75rem;
+    inline-size: 100%;
+    padding-block-start: clamp(0.9rem, 0.7rem + 0.6vi, 1.2rem);
 }
 
 .modal-shell--form {

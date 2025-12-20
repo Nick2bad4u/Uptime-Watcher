@@ -594,14 +594,14 @@ describe(useMonitorTypesStore, () => {
             const { result } = renderHook(() => useMonitorTypesStore());
 
             // Since withErrorHandling re-throws errors, we expect the function to throw
-            await expect(async () => {
-                await act(async () => {
-                    await result.current.formatMonitorDetail(
+            await act(async () => {
+                await expect(
+                    result.current.formatMonitorDetail(
                         "http",
                         "Response time: 150ms"
-                    );
-                });
-            }).rejects.toThrowError(); // Should throw an error due to unexpected null response
+                    )
+                ).rejects.toThrowError(); // Should throw an error due to unexpected null response
+            });
         });
     });
 
@@ -697,14 +697,11 @@ describe(useMonitorTypesStore, () => {
             const { result } = renderHook(() => useMonitorTypesStore());
 
             // Since withErrorHandling re-throws errors, we expect the function to throw
-            await expect(async () => {
-                await act(async () => {
-                    await result.current.formatMonitorTitleSuffix(
-                        "http",
-                        mockMonitor
-                    );
-                });
-            }).rejects.toThrowError(); // Should throw an error due to unexpected null response
+            await act(async () => {
+                await expect(
+                    result.current.formatMonitorTitleSuffix("http", mockMonitor)
+                ).rejects.toThrowError(); // Should throw an error due to unexpected null response
+            });
         });
     });
 

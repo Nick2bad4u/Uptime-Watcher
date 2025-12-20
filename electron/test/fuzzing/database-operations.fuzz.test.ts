@@ -327,6 +327,7 @@ describe("Database Operations Fuzzing Tests", () => {
             await fc.assert(
                 fc.asyncProperty(
                     fc.record({
+                        id: fc.string({ minLength: 1, maxLength: 64 }),
                         type: fc.constant("http"),
                         url: fc.string({ minLength: 1, maxLength: 200 }),
                         checkInterval: fc.integer({ min: 1000, max: 300_000 }),
@@ -346,15 +347,15 @@ describe("Database Operations Fuzzing Tests", () => {
                         mockDatabaseService.executeTransaction.mockImplementation(
                             async (callback: any) => await callback(mockDb)
                         );
-                        mockDb.run.mockReturnValue({ lastInsertRowid: 1 });
+                        // MonitorRepository uses INSERT ... RETURNING via db.get
+                        // (insertWithReturning). Ensure the mock returns an id.
+                        mockDb.get.mockReturnValue({ id: monitorData.id });
 
-                        // Should not throw for valid-looking data
-                        await expect(async () => {
-                            await monitorRepository.create(
-                                siteIdentifier,
-                                monitorData
-                            );
-                        }).not.toThrowError();
+                        const createdId = await monitorRepository.create(
+                            siteIdentifier,
+                            monitorData
+                        );
+                        expect(createdId).toBeTypeOf("string");
 
                         expect(
                             mockDatabaseService.executeTransaction

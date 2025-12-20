@@ -523,7 +523,7 @@ describe("Comprehensive Database Operations Fuzzing", () => {
     describe("Transaction Safety Testing", () => {
         fcTest.prop([transactionOperations])(
             "Transaction operations should maintain ACID properties",
-            (operations) => {
+            async (operations) => {
                 // Mock transaction function that should handle all operations safely
                 const mockTransaction = async (ops: typeof operations) => {
                     // Simulate transaction processing
@@ -547,14 +547,16 @@ describe("Comprehensive Database Operations Fuzzing", () => {
                 };
 
                 // Property: Transaction function should never throw with valid structure
-                expect(
-                    async () =>
-                        await measureDbOperation(
-                            mockTransaction,
-                            "transaction",
-                            operations
-                        )
-                ).not.toThrowError();
+                await expect(
+                    measureDbOperation(
+                        mockTransaction,
+                        "transaction",
+                        operations
+                    )
+                ).resolves.toEqual({
+                    affectedRows: operations.length,
+                    success: true,
+                });
             }
         );
 

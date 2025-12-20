@@ -393,11 +393,13 @@ export type StateSyncApiSurface = StateSyncDomainBridge & {
 interface SystemChannelMap {
     readonly openExternal: "open-external";
     readonly quitAndInstall: "quit-and-install";
+    readonly writeClipboardText: "write-clipboard-text";
 }
 
 const SYSTEM_CHANNELS_DEFINITION: SystemChannelMap = {
     openExternal: "open-external",
     quitAndInstall: "quit-and-install",
+    writeClipboardText: "write-clipboard-text",
 };
 
 /**

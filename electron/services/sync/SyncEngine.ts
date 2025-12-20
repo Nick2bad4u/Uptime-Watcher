@@ -1,6 +1,5 @@
 import type { Monitor, Site } from "@shared/types";
 import type { CloudSyncManifest } from "@shared/types/cloudSyncManifest";
-import type { CloudSyncSnapshot } from "@shared/types/cloudSyncSnapshot";
 import type {
     CloudSyncEntityState,
     CloudSyncFieldValue,
@@ -29,12 +28,16 @@ import {
 } from "@shared/types/cloudSyncDomain";
 import { stringifyJsonValueStable } from "@shared/utils/canonicalJson";
 import { applyCloudSyncOperationsToState } from "@shared/utils/cloudSyncState";
+import { validateMonitorData } from "@shared/validation/monitorSchemas";
+import { validateSiteData } from "@shared/validation/siteSchemas";
 
 import type { CloudStorageProvider } from "../cloud/providers/CloudStorageProvider.types";
 
 import { DEFAULT_CHECK_INTERVAL, DEFAULT_REQUEST_TIMEOUT } from "../../constants";
 import { logger } from "../../utils/logger";
 import { ProviderCloudSyncTransport } from "./ProviderCloudSyncTransport";
+import { parseOpsObjectKeyMetadata } from "./syncEngineKeyUtils";
+import { isValidPersistedDeviceId, mapWithConcurrency } from "./syncEngineUtils";
 
 /**
  * Orchestrator facade used by {@link SyncEngine} to apply merged domain state.
@@ -78,10 +81,11 @@ export interface SyncEngineResult {
     snapshotKey: null | string;
 }
 
-const OPS_OBJECT_SUFFIX = ".ndjson" as const;
-
 // Keep aligned with renderer defaults (src/utils/fallbacks.ts).
 const DEFAULT_RETRY_ATTEMPTS = 3;
+
+/** Concurrency used when downloading remote operation log objects. */
+const DEFAULT_OPS_OBJECT_READ_CONCURRENCY = 4;
 
 const DEFAULT_WRITE_KEY: CloudSyncWriteKey = {
     deviceId: "__defaults",
@@ -187,66 +191,6 @@ function normalizeCloudSyncState(state: CloudSyncState): CloudSyncState {
         ...state,
         monitor: nextMonitor,
         site: nextSite,
-    };
-}
-
-function parseOpsObjectKeyMetadata(key: string):
-    | null
-    | Readonly<{
-          createdAt: number;
-          deviceId: string;
-          lastOpId: number;
-      }> {
-    const segments = key.split("/");
-    // Expected: sync/devices/<deviceId>/ops/<createdAt>-<firstOpId>-<lastOpId>.ndjson
-    if (segments.length !== 5) {
-        return null;
-    }
-
-    const [syncSegment, devicesSegment, deviceId, opsSegment, fileName] =
-        segments;
-
-    if (
-        syncSegment !== "sync" ||
-        devicesSegment !== "devices" ||
-        opsSegment !== "ops" ||
-        !deviceId ||
-        !fileName
-    ) {
-        return null;
-    }
-
-    if (!fileName.endsWith(OPS_OBJECT_SUFFIX)) {
-        return null;
-    }
-
-    const stem = fileName.slice(0, -OPS_OBJECT_SUFFIX.length);
-    const parts = stem.split("-");
-    if (parts.length !== 3) {
-        return null;
-    }
-
-    const [createdAtRaw, , lastOpIdRaw] = parts;
-    if (!createdAtRaw || !lastOpIdRaw) {
-        return null;
-    }
-
-    const createdAt = Number(createdAtRaw);
-    const lastOpId = Number(lastOpIdRaw);
-
-    if (
-        !Number.isSafeInteger(createdAt) ||
-        createdAt < 0 ||
-        !Number.isSafeInteger(lastOpId) ||
-        lastOpId < 0
-    ) {
-        return null;
-    }
-
-    return {
-        createdAt,
-        deviceId,
-        lastOpId,
     };
 }
 
@@ -667,11 +611,6 @@ function getMaxOpIdByDevice(
     return result;
 }
 
-function buildDefaultSnapshot(state: CloudSyncState): CloudSyncSnapshot {
-    const createdAt = Date.now();
-    return ProviderCloudSyncTransport.createSnapshot(createdAt, state);
-}
-
 /**
  * Sync engine implementing ADR-016 (operation log + snapshots).
  */
@@ -686,7 +625,40 @@ export class SyncEngine {
         const transport = ProviderCloudSyncTransport.create(provider);
 
         const deviceId = await this.getOrCreateDeviceId();
-        const nextOpId = await this.getNextOpId();
+
+        // Read the remote manifest first so we can advance nextOpId if the
+        // local settings have been reset but the deviceId is still present.
+        //
+        // Without this, we can accidentally reuse old opIds which may be
+        // treated as already-compacted and dropped by other devices.
+        const manifestCandidate = await transport.readManifest();
+        const remoteManifest =
+            manifestCandidate ??
+            ProviderCloudSyncTransport.createEmptyManifest();
+
+        const resetAt = remoteManifest.resetAt ?? 0;
+        // Ensure any locally-emitted sync objects use a createdAt >= resetAt.
+        // This prevents a device with a skewed clock from writing op objects
+        // that other devices ignore due to `manifest.resetAt` filtering.
+        const now = Math.max(Date.now(), resetAt);
+
+        let nextOpId = await this.getNextOpId();
+        const compactedUpToLocal =
+            remoteManifest.devices[deviceId]?.compactedUpToOpId;
+        if (
+            typeof compactedUpToLocal === "number" &&
+            Number.isSafeInteger(compactedUpToLocal) &&
+            compactedUpToLocal >= -1
+        ) {
+            const minimumNext = compactedUpToLocal + 1;
+            if (minimumNext > nextOpId) {
+                nextOpId = minimumNext;
+                await this.settings.set(
+                    SETTINGS_KEY_NEXT_OP_ID,
+                    String(nextOpId)
+                );
+            }
+        }
 
         const [sites, allSettings] = await Promise.all([
             this.orchestrator.getSites(),
@@ -696,7 +668,6 @@ export class SyncEngine {
         const current = buildCanonicalLocalState(sites, allSettings);
 
         const baseline = await this.getBaseline();
-        const now = Date.now();
 
         const { nextOpId: updatedOpId, operations: localOps } =
             buildLocalOperations({
@@ -708,22 +679,17 @@ export class SyncEngine {
             });
 
         if (localOps.length > 0) {
-            await transport.appendOperations(deviceId, localOps);
+            await transport.appendOperations(deviceId, localOps, now);
             await this.settings.set(
                 SETTINGS_KEY_NEXT_OP_ID,
                 String(updatedOpId)
             );
         }
 
-        const manifestCandidate = await transport.readManifest();
-        const remoteManifest =
-            manifestCandidate ??
-            ProviderCloudSyncTransport.createEmptyManifest();
         const previousSnapshotKey = remoteManifest.latestSnapshotKey;
         const { snapshotState, snapshotTrusted } =
             await this.loadSnapshotState(transport, remoteManifest);
 
-        const resetAt = remoteManifest.resetAt ?? 0;
         const allOpObjects = await transport.listOperationObjects();
         const opObjects =
             resetAt > 0
@@ -739,9 +705,39 @@ export class SyncEngine {
         // state.
         const compacted = snapshotTrusted ? remoteManifest.devices : {};
 
-        const operationsByObject = await Promise.all(
-            opObjects.map((entry) => transport.readOperationsObject(entry.key))
-        );
+        const opObjectsToRead = snapshotTrusted
+            ? opObjects.filter((entry) => {
+                  const metadata = parseOpsObjectKeyMetadata(entry.key);
+                  if (!metadata) {
+                      return true;
+                  }
+
+                  const compactedUpTo = compacted[metadata.deviceId]?.compactedUpToOpId;
+                  return !(compactedUpTo !== undefined && metadata.lastOpId <= compactedUpTo);
+              })
+            : opObjects;
+
+        const operationsByObject = await mapWithConcurrency({
+            concurrency: DEFAULT_OPS_OBJECT_READ_CONCURRENCY,
+            items: opObjectsToRead,
+            task: async (entry) => {
+                try {
+                    return await transport.readOperationsObject(entry.key);
+                } catch (error) {
+                    logger.warn(
+                        "[SyncEngine] Failed to read remote operations object; skipping",
+                        {
+                            key: entry.key,
+                            message:
+                                error instanceof Error
+                                    ? error.message
+                                    : String(error),
+                        }
+                    );
+                    return [];
+                }
+            },
+        });
 
         const remoteOps = operationsByObject.flat().filter((op) => {
             const compactedUpTo = compacted[op.deviceId]?.compactedUpToOpId;
@@ -755,7 +751,15 @@ export class SyncEngine {
 
         const normalizedMergedState = normalizeCloudSyncState(mergedState);
 
-        const snapshot = buildDefaultSnapshot(normalizedMergedState);
+        const sanitizedMergedState = this.buildSanitizedMergedStateForApplication({
+            localSites: sites,
+            state: normalizedMergedState,
+        });
+
+        const snapshot = ProviderCloudSyncTransport.createSnapshot(
+            now,
+            sanitizedMergedState
+        );
         const snapshotEntry = await transport.writeSnapshot(snapshot);
 
         const maxOps = getMaxOpIdByDevice(remoteOps);
@@ -828,7 +832,7 @@ export class SyncEngine {
         await Promise.all(deletions);
 
         const appliedBaseline = await this.applyMergedState(
-            normalizedMergedState,
+            sanitizedMergedState,
             allSettings
         );
 
@@ -838,8 +842,8 @@ export class SyncEngine {
             appliedRemoteOperations: remoteOps.length,
             emittedLocalOperations: localOps.length,
             mergedEntities:
-                Object.keys(normalizedMergedState.site).length +
-                Object.keys(normalizedMergedState.monitor).length,
+                Object.keys(sanitizedMergedState.site).length +
+                Object.keys(sanitizedMergedState.monitor).length,
             snapshotKey: snapshotEntry.key,
         };
     }
@@ -945,7 +949,7 @@ export class SyncEngine {
         };
     }
 
-    private async applySettings(
+private async applySettings(
         existing: Record<string, string>,
         desired: CloudSyncSettingsConfig
     ): Promise<void> {
@@ -1000,8 +1004,17 @@ export class SyncEngine {
 
     private async getOrCreateDeviceId(): Promise<string> {
         const existing = await this.settings.get(SETTINGS_KEY_DEVICE_ID);
-        if (existing && existing.trim().length > 0) {
+        if (existing && isValidPersistedDeviceId(existing)) {
             return existing;
+        }
+
+        if (existing && existing.trim().length > 0) {
+            logger.warn(
+                "[SyncEngine] Stored deviceId is invalid; generating a new one",
+                {
+                    storedLength: existing.length,
+                }
+            );
         }
 
         if (typeof globalThis.crypto.randomUUID !== "function") {
@@ -1035,11 +1048,170 @@ export class SyncEngine {
         );
     }
 
+    /**
+        * Removes invalid sites/monitors from a merged sync state before we compact
+        * (write a snapshot) and apply the configuration to the local orchestrator.
+     *
+     * @remarks
+     * Remote operation streams may materialize into partial or legacy
+     * configurations (e.g. an HTTP monitor without a URL). The orchestrator
+     * performs strict validation and will reject these payloads.
+     *
+     * We proactively validate the merged state using the shared schemas and
+     * drop invalid entities so that:
+     *
+     * - The first sync attempt doesn't fail intermittently.
+     * - The written snapshot becomes a "healed" baseline for future devices.
+     *
+     * This method is intentionally conservative: it never fabricates new
+     * field-level writes (which could violate LWW semantics); it only drops
+     * entities that cannot be applied safely.
+     */
+    private buildSanitizedMergedStateForApplication(args: {
+        localSites: Site[];
+        state: CloudSyncState;
+    }): CloudSyncState {
+        const { localSites, state } = args;
+
+        const desiredSites = buildDesiredSitesFromSyncState(state.site);
+        const desiredMonitors = buildDesiredMonitorsFromSyncState(state.monitor);
+
+        const localMonitorsBySite = new Map<string, Monitor[]>();
+        for (const site of localSites) {
+            localMonitorsBySite.set(site.identifier, site.monitors);
+        }
+
+        const mergedValidMonitorsById = new Map<string, Monitor>();
+
+        for (const [monitorId, monitorConfig] of Object.entries(
+            desiredMonitors
+        )) {
+            const { siteIdentifier } = monitorConfig;
+
+            if (siteIdentifier in desiredSites) {
+                const existingMonitors =
+                    localMonitorsBySite.get(siteIdentifier) ?? [];
+
+                const merged = this.mergeMonitorConfig(
+                    existingMonitors,
+                    monitorConfig
+                );
+
+                const validation = validateMonitorData(merged.type, merged);
+                if (validation.success) {
+                    mergedValidMonitorsById.set(monitorId, merged);
+                } else {
+                    logger.warn(
+                        "[SyncEngine] Dropping invalid monitor from merged state",
+                        {
+                            errorCount: validation.errors.length,
+                            errors: validation.errors.slice(0, 3),
+                            monitorId,
+                            monitorType: monitorConfig.type,
+                            siteIdentifier,
+                            warningCount: validation.warnings?.length ?? 0,
+                            warnings: validation.warnings?.slice(0, 3) ?? [],
+                        }
+                    );
+                }
+            } else {
+                logger.warn(
+                    "[SyncEngine] Dropping orphan monitor from merged state",
+                    {
+                        monitorId,
+                        monitorType: monitorConfig.type,
+                        reason: "Unknown site identifier",
+                        siteIdentifier,
+                    }
+                );
+            }
+        }
+
+        const monitorIdsBySite = new Map<string, string[]>();
+        for (const [monitorId, monitorConfig] of Object.entries(
+            desiredMonitors
+        )) {
+            const { siteIdentifier } = monitorConfig;
+
+            if (
+                mergedValidMonitorsById.has(monitorId) &&
+                siteIdentifier in desiredSites
+            ) {
+                const current = monitorIdsBySite.get(siteIdentifier) ?? [];
+                monitorIdsBySite.set(siteIdentifier, [...current, monitorId]);
+            }
+        }
+
+        const keepSiteIds = new Set<string>();
+        const keepMonitorIds = new Set<string>();
+
+        for (const [siteId, siteConfig] of Object.entries(desiredSites)) {
+            const monitorIds = monitorIdsBySite.get(siteId) ?? [];
+            const monitors = monitorIds
+                .map((monitorId) => mergedValidMonitorsById.get(monitorId))
+                .filter((monitor): monitor is Monitor => monitor !== undefined);
+
+            const siteCandidate: Site = {
+                identifier: siteId,
+                monitoring: siteConfig.monitoring,
+                monitors,
+                name: siteConfig.name,
+            };
+
+            const validation = validateSiteData(siteCandidate);
+            if (validation.success) {
+                keepSiteIds.add(siteId);
+                for (const monitorId of monitorIds) {
+                    keepMonitorIds.add(monitorId);
+                }
+            } else {
+                logger.warn(
+                    "[SyncEngine] Dropping invalid site from merged state",
+                    {
+                        errorCount: validation.errors.length,
+                        errors: validation.errors.slice(0, 3),
+                        monitorCount: monitors.length,
+                        siteIdentifier: siteId,
+                        warningCount: validation.warnings?.length ?? 0,
+                        warnings: validation.warnings?.slice(0, 3) ?? [],
+                    }
+                );
+            }
+        }
+
+        const nextSite: Record<string, CloudSyncEntityState> = {};
+        for (const [siteId, entity] of Object.entries(state.site)) {
+            if (entity.deleted !== undefined || keepSiteIds.has(siteId)) {
+                nextSite[siteId] = entity;
+            }
+        }
+
+        const nextMonitor: Record<string, CloudSyncEntityState> = {};
+        for (const [monitorId, entity] of Object.entries(state.monitor)) {
+            if (entity.deleted !== undefined || keepMonitorIds.has(monitorId)) {
+                nextMonitor[monitorId] = entity;
+            }
+        }
+
+        return {
+            ...state,
+            monitor: nextMonitor,
+            site: nextSite,
+        };
+    }
+
     private mergeMonitorConfig(
         existingMonitors: Monitor[],
         config: CloudSyncMonitorConfig
     ): Monitor {
         const existing = existingMonitors.find((m) => m.id === config.id);
+
+        // `siteIdentifier` is a cloud-sync routing field (monitors are stored
+        // inside their parent site locally). It must never be passed into the
+        // orchestrator, because strict monitor validation rejects unknown keys.
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars, sonarjs/no-unused-vars -- Omit cloud-only routing field.
+        const { siteIdentifier: _, ...monitorFields } = config;
+
         const base: Monitor = existing ?? {
             checkInterval: config.checkInterval,
             history: [],
@@ -1054,7 +1226,7 @@ export class SyncEngine {
 
         return {
             ...base,
-            ...config,
+            ...monitorFields,
             history: base.history,
             lastChecked: base.lastChecked,
             responseTime: base.responseTime,

@@ -124,11 +124,13 @@ const DEFAULT_THEMED_BOX_STYLE: CSSProperties = {};
  * @public
  */
 const ThemedButtonComponent = ({
+    "aria-disabled": ariaDisabled,
     "aria-label": ariaLabel,
     children,
     className = "",
     "data-testid": dataTestId,
     disabled = false,
+    form,
     fullWidth = false,
     icon,
     iconColor,
@@ -206,15 +208,19 @@ const ThemedButtonComponent = ({
 
     return (
         <button
+            aria-disabled={ariaDisabled}
             aria-label={ariaLabel}
             className={classNames}
             data-testid={
                 dataTestId ??
                 (ariaLabel
-                    ? `button-${ariaLabel.toLowerCase().replaceAll(/\s+/gu, "-")}`
+                    ? `button-${ariaLabel
+                          .toLowerCase()
+                          .replaceAll(/\s+/g, "-")}`
                     : undefined)
             }
             disabled={disabled || loading}
+            form={form}
             onClick={handleClick}
             style={style}
             title={title}

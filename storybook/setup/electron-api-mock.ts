@@ -1,5 +1,5 @@
 // eslint-disable-next-line @eslint-community/eslint-comments/disable-enable-pair -- Context: Storybook mock for Electron API
-/* eslint-disable @typescript-eslint/require-await, @typescript-eslint/no-unsafe-type-assertion, @typescript-eslint/no-unnecessary-type-parameters, @typescript-eslint/no-unnecessary-condition, sonarjs/pseudo-random -- Disable Strict Rules */
+/* eslint-disable @typescript-eslint/require-await, @typescript-eslint/no-unsafe-type-assertion, @typescript-eslint/no-unnecessary-type-parameters, sonarjs/pseudo-random -- Disable Strict Rules */
 import type {
     MonitoringStartSummary,
     MonitoringStopSummary,
@@ -222,10 +222,12 @@ const electronAPIMockDefinition = {
                 } else {
                     const nextFileName = targetEncrypted
                         ? `${entry.fileName}.enc`
-                        : entry.fileName.replace(/\.enc$/v, "");
+                        // eslint-disable-next-line regexp/require-unicode-sets-regexp -- We intentionally avoid the `/v` flag (toolchain compatibility); `/u` is sufficient for this ASCII-only suffix replacement.
+                        : entry.fileName.replace(/\.enc$/u, "");
                     const nextKey = targetEncrypted
                         ? `${entry.key}.enc`
-                        : entry.key.replace(/\.enc$/v, "");
+                        // eslint-disable-next-line regexp/require-unicode-sets-regexp -- We intentionally avoid the `/v` flag (toolchain compatibility); `/u` is sufficient for this ASCII-only suffix replacement.
+                        : entry.key.replace(/\.enc$/u, "");
 
                     const migratedEntry: CloudBackupEntry = {
                         ...entry,
@@ -702,6 +704,8 @@ const electronAPIMockDefinition = {
         openExternal: async (url: string): Promise<boolean> =>
             typeof url === "string" && url.length > 0,
         quitAndInstall: async (): Promise<boolean> => true,
+        writeClipboardText: async (text: string): Promise<boolean> =>
+            typeof text === "string",
     },
 } as ElectronAPI;
 
@@ -731,8 +735,12 @@ export const setMockHistoryLimit = (historyLimit: number): void => {
 };
 
 export const installElectronAPIMock = (): ElectronAPI => {
-    if (typeof window !== "undefined" && !window.electronAPI) {
-        window.electronAPI = electronAPIMock;
+    if (typeof window !== "undefined") {
+        const windowRecord = window as unknown as {
+            electronAPI?: ElectronAPI;
+        };
+
+        windowRecord.electronAPI ??= electronAPIMock;
     }
     return electronAPIMock;
 };

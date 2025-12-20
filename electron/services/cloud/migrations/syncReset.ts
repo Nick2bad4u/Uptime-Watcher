@@ -12,6 +12,49 @@ interface DeletionFailure {
     message: string;
 }
 
+function hasAsciiControlCharacters(value: string): boolean {
+    for (const char of value) {
+        const codePoint = char.codePointAt(0);
+        if (
+            codePoint !== undefined &&
+            (codePoint < 0x20 || codePoint === 0x7f)
+        ) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+function isSafeSyncDeletionKey(key: string): boolean {
+    if (key.length === 0) {
+        return false;
+    }
+
+    // Only delete objects under the sync/ prefix.
+    if (!key.startsWith("sync/")) {
+        return false;
+    }
+
+    // Provider keys should be POSIX-style.
+    if (key.includes("\\")) {
+        return false;
+    }
+
+    if (key.startsWith("/")) {
+        return false;
+    }
+
+    if (hasAsciiControlCharacters(key)) {
+        return false;
+    }
+
+    const segments = key.split("/");
+    return !segments.some(
+        (segment) => segment.length === 0 || segment === "." || segment === ".."
+    );
+}
+
 async function deleteObjectsBestEffort(args: {
     concurrency: number;
     keys: readonly string[];
@@ -75,7 +118,9 @@ export async function resetProviderCloudSyncState(args: {
     const resetAt = Date.now();
 
     const syncObjects = await provider.listObjects("sync/");
-    const keysToDelete = syncObjects.map((entry) => entry.key);
+    const keysToDelete = syncObjects
+        .map((entry) => entry.key)
+        .filter(isSafeSyncDeletionKey);
 
     const deletionResult = await deleteObjectsBestEffort({
         concurrency: 4,

@@ -3,9 +3,9 @@ import type { IpcInvokeChannel } from "@shared/types/ipc";
 import { SYSTEM_CHANNELS } from "@shared/types/preload";
 import { ensureError } from "@shared/utils/errorHandling";
 import { LOG_TEMPLATES } from "@shared/utils/logTemplates";
-import { getSafeUrlForLogging } from "@shared/utils/urlSafety";
+import { getSafeUrlForLogging, isAllowedExternalOpenUrl } from "@shared/utils/urlSafety";
 import { isValidUrl } from "@shared/validation/validatorUtils";
-import { shell } from "electron";
+import { clipboard, shell  } from "electron";
 
 import type { AutoUpdaterService } from "../../updater/AutoUpdaterService";
 
@@ -44,6 +44,12 @@ export function registerSystemHandlers({
                 );
             }
 
+            if (!isAllowedExternalOpenUrl(url)) {
+                throw new Error(
+                    `Blocked external URL: ${getSafeUrlForLogging(url)}`
+                );
+            }
+
             try {
                 await shell.openExternal(url);
             } catch (error: unknown) {
@@ -75,6 +81,23 @@ export function registerSystemHandlers({
             return true;
         }),
         SystemHandlerValidators.quitAndInstall,
+        registeredHandlers
+    );
+
+    registerStandardizedIpcHandler(
+        SYSTEM_CHANNELS.writeClipboardText,
+        withIgnoredIpcEvent((text: string) => {
+            try {
+                clipboard.writeText(text);
+            } catch (error: unknown) {
+                throw new Error("Failed to write clipboard text", {
+                    cause: error,
+                });
+            }
+
+            return true;
+        }),
+        SystemHandlerValidators.writeClipboardText,
         registeredHandlers
     );
 }

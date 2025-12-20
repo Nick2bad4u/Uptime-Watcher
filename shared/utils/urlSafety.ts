@@ -50,7 +50,8 @@ function toIpvOctets(
     }
 
     // Guard against cases like "1..1.1" where `Number("")` would become 0.
-    if (parts.some((part) => part.length === 0 || !/^\d{1,3}$/v.test(part))) {
+    // eslint-disable-next-line regexp/require-unicode-sets-regexp -- The `v` flag is not consistently supported across our TypeScript/Electron toolchain; `u` is sufficient for this ASCII-only numeric check.
+    if (parts.some((part) => part.length === 0 || !/^\d{1,3}$/u.test(part))) {
         return null;
     }
 
@@ -124,8 +125,61 @@ function isPrivateIpvFourOctets(
     return false;
 }
 
+/**
+ * Returns true when a URL is safe to open via `shell.openExternal`.
+ *
+ * @remarks
+ * Intentionally strict:
+ * - Allows only `http:`, `https:`, and `mailto:`.
+ * - Rejects credentials (username/password).
+ * - Rejects CR/LF characters to prevent URL injection tricks.
+ *
+ * This should be used on both sides of IPC (renderer + main) as defense in
+ * depth.
+ */
+export function isAllowedExternalOpenUrl(rawUrl: string): boolean {
+    if (rawUrl.length === 0) {
+        return false;
+    }
+
+    // eslint-disable-next-line regexp/require-unicode-sets-regexp -- The `v` flag is not consistently supported across our TypeScript/Electron toolchain; `u` is sufficient for this ASCII-only CR/LF check.
+    if (/[\n\r]/u.test(rawUrl)) {
+        return false;
+    }
+
+    const parsed = ((): null | URL => {
+        try {
+            return new URL(rawUrl);
+        } catch {
+            return null;
+        }
+    })();
+
+    if (!parsed) {
+        return false;
+    }
+
+    if (parsed.username.length > 0 || parsed.password.length > 0) {
+        return false;
+    }
+
+    switch (parsed.protocol) {
+        case "http:":
+        case "https:": {
+            return parsed.hostname.length > 0;
+        }
+        case "mailto:": {
+            return parsed.pathname.length > 0;
+        }
+        default: {
+            return false;
+        }
+    }
+}
+
 function parseIpvSixHextet(value: string): null | number {
-    if (!/^[\da-f]{1,4}$/v.test(value)) {
+    // eslint-disable-next-line regexp/require-unicode-sets-regexp -- The `v` flag is not consistently supported across our TypeScript/Electron toolchain; `u` is sufficient for this ASCII-only hex check.
+    if (!/^[\da-f]{1,4}$/iu.test(value)) {
         return null;
     }
 
@@ -190,7 +244,8 @@ function isPrivateIpv6(hostname: string): boolean {
     }
 
     // Link-local fe80::/10 (fe80..febf)
-    if (/^fe[89ab]/v.test(normalized)) {
+    // eslint-disable-next-line regexp/require-unicode-sets-regexp -- The `v` flag is not consistently supported across our TypeScript/Electron toolchain; `u` is sufficient for this ASCII-only prefix check.
+    if (/^fe[89ab]/u.test(normalized)) {
         return true;
     }
 

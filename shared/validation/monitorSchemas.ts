@@ -370,7 +370,7 @@ const edgeLocationListSchema = z
     .min(1, "At least one edge endpoint is required")
     .refine((value) => {
         const entries = value
-            .split(/[\r\n,]+/v)
+            .split(/[\n\r,]+/)
             .map((entry) => entry.trim())
             .filter((entry) => entry.length > 0);
 

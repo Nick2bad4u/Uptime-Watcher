@@ -219,6 +219,7 @@ const ThemedBoxComponent = ({
     surface = "base",
     tabIndex,
     variant = "primary",
+    ...restProps
 }: ThemedBoxProperties): ReactElement => {
     const classNames = [
         CSS_CLASSES.THEMED_BOX,
@@ -247,6 +248,7 @@ const ThemedBoxComponent = ({
 
     // Base props for all element types
     const baseProps = {
+        ...restProps,
         className: classNames,
         "data-testid": dataTestId,
         onMouseEnter,
