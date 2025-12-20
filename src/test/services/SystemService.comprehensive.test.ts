@@ -172,6 +172,7 @@ describe("SystemService", () => {
                 "http://localhost:3000/status",
                 "https://example.com/path?query=value&other=test",
                 "https://example.com/path#fragment",
+                "mailto:test@example.com",
             ];
 
             for (const url of urls) {

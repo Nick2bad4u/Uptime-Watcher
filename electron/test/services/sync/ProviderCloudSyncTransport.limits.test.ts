@@ -106,9 +106,7 @@ describe("ProviderCloudSyncTransport.readOperationsObject limits", () => {
         const transport = ProviderCloudSyncTransport.create(provider);
 
         await expect(
-            transport.readOperationsObject(
-                "sync/devices/a/ops/../evil.ndjson"
-            )
+            transport.readOperationsObject("sync/devices/a/ops/../evil.ndjson")
         ).rejects.toThrowError(/invalid/i);
     });
 

@@ -9,6 +9,50 @@
  * @packageDocumentation
  */
 
+import { isValidUrl } from "@shared/validation/validatorUtils";
+
+/**
+ * Result of validating and normalizing a URL intended for external opening.
+ *
+ * @public
+ */
+export type ExternalOpenUrlValidationResult =
+    | {
+          /** The trimmed, normalized URL string safe to pass to `openExternal`. */
+          readonly normalizedUrl: string;
+          readonly ok: true;
+          /** A redacted representation safe for logs and user-facing errors. */
+          readonly safeUrlForLogging: string;
+      }
+    | {
+          readonly ok: false;
+          /**
+           * A short message fragment starting with "must" suitable for
+           * prefixing with a field name (e.g. "url").
+           */
+          readonly reason: string;
+          /** A redacted representation safe for logs and user-facing errors. */
+          readonly safeUrlForLogging: string;
+      };
+
+/**
+ * Validates and normalizes a URL intended to be opened via `shell.openExternal`.
+ *
+ * @remarks
+ * This helper is used at multiple trust boundaries (renderer input, IPC
+ * validators, and main-process handlers). Keeping the policy here prevents
+ * subtle inconsistencies (e.g. allowing `mailto:` in one layer but rejecting it
+ * in another).
+ *
+ * Policy:
+ * - Allows only `http:`, `https:`, and `mailto:`.
+ * - Rejects credentials.
+ * - Rejects CR/LF characters.
+ * - For `http(s)` additionally applies stricter URL validation
+ *   ({@link isValidUrl}) with credentials disallowed.
+ *
+ * @param rawUrl - Untrusted URL candidate.
+ */
 /**
  * Removes sensitive URL parts so log lines don't leak credentials or tokens.
  *
@@ -130,6 +174,7 @@ function isPrivateIpvFourOctets(
  *
  * @remarks
  * Intentionally strict:
+ *
  * - Allows only `http:`, `https:`, and `mailto:`.
  * - Rejects credentials (username/password).
  * - Rejects CR/LF characters to prevent URL injection tricks.
@@ -175,6 +220,78 @@ export function isAllowedExternalOpenUrl(rawUrl: string): boolean {
             return false;
         }
     }
+}
+
+/**
+ * Validates and normalizes a URL intended to be opened via `shell.openExternal`.
+ *
+ * @remarks
+ * This helper is used at multiple trust boundaries (renderer input, IPC
+ * validators, and main-process handlers). Keeping the policy here prevents
+ * subtle inconsistencies (e.g. allowing `mailto:` in one layer but rejecting it
+ * in another).
+ */
+export function validateExternalOpenUrlCandidate(
+    rawUrl: unknown
+): ExternalOpenUrlValidationResult {
+    const safeUrlForLogging =
+        typeof rawUrl === "string" ? getSafeUrlForLogging(rawUrl.trim()) : "";
+
+    if (typeof rawUrl !== "string") {
+        return {
+            ok: false,
+            reason: "must be a string",
+            safeUrlForLogging,
+        };
+    }
+
+    const normalizedUrl = rawUrl.trim();
+
+    if (normalizedUrl.length === 0) {
+        return {
+            ok: false,
+            reason: "must be a non-empty string",
+            safeUrlForLogging,
+        };
+    }
+
+    // eslint-disable-next-line regexp/require-unicode-sets-regexp -- The `v` flag is not consistently supported across our TypeScript/Electron toolchain; `u` is sufficient for this ASCII-only newline check.
+    if (/[\n\r]/u.test(normalizedUrl)) {
+        return {
+            ok: false,
+            reason: "must not contain newlines",
+            safeUrlForLogging,
+        };
+    }
+
+    // For hierarchical URLs, enforce the stricter validator.js checks.
+    if (
+        (normalizedUrl.startsWith("http:") ||
+            normalizedUrl.startsWith("https:")) &&
+        !isValidUrl(normalizedUrl, {
+            disallowAuth: true,
+        })
+    ) {
+        return {
+            ok: false,
+            reason: "must be a valid http(s) URL",
+            safeUrlForLogging,
+        };
+    }
+
+    if (!isAllowedExternalOpenUrl(normalizedUrl)) {
+        return {
+            ok: false,
+            reason: "must be an http(s) or mailto URL",
+            safeUrlForLogging,
+        };
+    }
+
+    return {
+        normalizedUrl,
+        ok: true,
+        safeUrlForLogging,
+    };
 }
 
 function parseIpvSixHextet(value: string): null | number {
@@ -229,7 +346,12 @@ function parseIpvFourFromMappedIpvSix(
     const third = Math.floor(low / 256);
     const fourth = low % 256;
 
-    return [first, second, third, fourth];
+    return [
+        first,
+        second,
+        third,
+        fourth,
+    ];
 }
 
 function isPrivateIpv6(hostname: string): boolean {
@@ -296,7 +418,10 @@ export function isPrivateNetworkHostname(hostname: string): boolean {
     // Single-label hostnames are overwhelmingly internal/intranet identifiers.
     // We treat them as private to avoid leaking local hostnames to third-party
     // services.
-    if (!withoutTrailingDot.includes(".") && !withoutTrailingDot.includes(":")) {
+    if (
+        !withoutTrailingDot.includes(".") &&
+        !withoutTrailingDot.includes(":")
+    ) {
         return true;
     }
 

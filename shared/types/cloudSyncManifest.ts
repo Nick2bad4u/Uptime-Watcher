@@ -24,7 +24,12 @@ const cloudSyncManifestSchemaInternal = z
     .object({
         devices: z.record(z.string().min(1), deviceCompactionSchema),
         encryption: cloudEncryptionConfigSchema.optional(),
-        lastCompactionAt: z.number().int().nonnegative().max(MAX_SAFE_INT).optional(),
+        lastCompactionAt: z
+            .number()
+            .int()
+            .nonnegative()
+            .max(MAX_SAFE_INT)
+            .optional(),
         latestSnapshotKey: z.string().min(1).optional(),
         manifestVersion: z.literal(CLOUD_SYNC_MANIFEST_VERSION),
         resetAt: z.number().int().nonnegative().max(MAX_SAFE_INT).optional(),

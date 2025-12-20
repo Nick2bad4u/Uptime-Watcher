@@ -8,23 +8,27 @@ const OPS_OBJECT_SUFFIX = ".ndjson" as const;
  * Parses metadata from a validated operation object key.
  *
  * @remarks
- * Expected format: `sync/devices/<deviceId>/ops/<createdAt>-<firstOpId>-<lastOpId>.ndjson`
+ * Expected format:
+ * `sync/devices/<deviceId>/ops/<createdAt>-<firstOpId>-<lastOpId>.ndjson`
  */
-export function parseOpsObjectKeyMetadata(key: string):
-    | null
-    | Readonly<{
-          createdAt: number;
-          deviceId: string;
-          lastOpId: number;
-      }> {
+export function parseOpsObjectKeyMetadata(key: string): null | Readonly<{
+    createdAt: number;
+    deviceId: string;
+    lastOpId: number;
+}> {
     const segments = key.split("/");
     // Expected: sync/devices/<deviceId>/ops/<createdAt>-<firstOpId>-<lastOpId>.ndjson
     if (segments.length !== 5) {
         return null;
     }
 
-    const [syncSegment, devicesSegment, deviceId, opsSegment, fileName] =
-        segments;
+    const [
+        syncSegment,
+        devicesSegment,
+        deviceId,
+        opsSegment,
+        fileName,
+    ] = segments;
 
     if (
         syncSegment !== "sync" ||
@@ -46,7 +50,11 @@ export function parseOpsObjectKeyMetadata(key: string):
         return null;
     }
 
-    const [createdAtRaw, , lastOpIdRaw] = parts;
+    const [
+        createdAtRaw,
+        ,
+        lastOpIdRaw,
+    ] = parts;
     if (!createdAtRaw || !lastOpIdRaw) {
         return null;
     }

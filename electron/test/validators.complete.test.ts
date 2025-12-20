@@ -23,6 +23,7 @@ import {
     MonitorTypeHandlerValidators,
     SettingsHandlerValidators,
     StateSyncHandlerValidators,
+    SystemHandlerValidators,
 } from "../services/ipc/validators";
 
 /**
@@ -858,7 +859,10 @@ describe("IPC Validators - Exported Validator Groups", () => {
                 expect(isValidationFailure(result)).toBeTruthy();
             });
 
-            it("rejects overly long restore fileName", async ({ task, annotate }) => {
+            it("rejects overly long restore fileName", async ({
+                task,
+                annotate,
+            }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: validators.complete", "component");
                 await annotate("Category: Core", "category");
@@ -918,27 +922,35 @@ describe("IPC Validators - Exported Validator Groups", () => {
         });
 
         describe("configureFilesystemProvider validator", () => {
-            it("accepts absolute baseDirectory paths", async ({ task, annotate }) => {
+            it("accepts absolute baseDirectory paths", async ({
+                task,
+                annotate,
+            }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: validators.complete", "component");
                 await annotate("Category: Core", "category");
                 await annotate("Type: Business Logic", "type");
 
-                const result = CloudHandlerValidators.configureFilesystemProvider([
-                    { baseDirectory: "C:/Backups" },
-                ]);
+                const result =
+                    CloudHandlerValidators.configureFilesystemProvider([
+                        { baseDirectory: "C:/Backups" },
+                    ]);
                 expect(isValidationSuccess(result)).toBeTruthy();
             });
 
-            it("rejects relative baseDirectory paths", async ({ task, annotate }) => {
+            it("rejects relative baseDirectory paths", async ({
+                task,
+                annotate,
+            }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: validators.complete", "component");
                 await annotate("Category: Core", "category");
                 await annotate("Type: Error Handling", "type");
 
-                const result = CloudHandlerValidators.configureFilesystemProvider([
-                    { baseDirectory: "Backups" },
-                ]);
+                const result =
+                    CloudHandlerValidators.configureFilesystemProvider([
+                        { baseDirectory: "Backups" },
+                    ]);
                 expect(isValidationFailure(result)).toBeTruthy();
             });
 
@@ -951,9 +963,10 @@ describe("IPC Validators - Exported Validator Groups", () => {
                 await annotate("Category: Core", "category");
                 await annotate("Type: Error Handling", "type");
 
-                const result = CloudHandlerValidators.configureFilesystemProvider([
-                    { baseDirectory: "C:/Backups\n" },
-                ]);
+                const result =
+                    CloudHandlerValidators.configureFilesystemProvider([
+                        { baseDirectory: "C:/Backups\n" },
+                    ]);
                 expect(isValidationFailure(result)).toBeTruthy();
             });
 
@@ -966,15 +979,19 @@ describe("IPC Validators - Exported Validator Groups", () => {
                 await annotate("Category: Core", "category");
                 await annotate("Type: Error Handling", "type");
 
-                const result = CloudHandlerValidators.configureFilesystemProvider([
-                    { baseDirectory: String.raw`\\?\C:\Backups` },
-                ]);
+                const result =
+                    CloudHandlerValidators.configureFilesystemProvider([
+                        { baseDirectory: String.raw`\\?\C:\Backups` },
+                    ]);
                 expect(isValidationFailure(result)).toBeTruthy();
             });
         });
 
         describe("deleteBackup validator", () => {
-            it("accepts valid backup object keys", async ({ task, annotate }) => {
+            it("accepts valid backup object keys", async ({
+                task,
+                annotate,
+            }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: validators.complete", "component");
                 await annotate("Category: Core", "category");
@@ -986,7 +1003,10 @@ describe("IPC Validators - Exported Validator Groups", () => {
                 expect(isValidationSuccess(result)).toBeTruthy();
             });
 
-            it("rejects path traversal segments", async ({ task, annotate }) => {
+            it("rejects path traversal segments", async ({
+                task,
+                annotate,
+            }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: validators.complete", "component");
                 await annotate("Category: Core", "category");
@@ -1036,7 +1056,10 @@ describe("IPC Validators - Exported Validator Groups", () => {
                 expect(isValidationSuccess(result)).toBeTruthy();
             });
 
-            it("rejects an oversized passphrase", async ({ task, annotate }) => {
+            it("rejects an oversized passphrase", async ({
+                task,
+                annotate,
+            }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: validators.complete", "component");
                 await annotate("Category: Core", "category");
@@ -1494,6 +1517,63 @@ describe("IPC Validators - Exported Validator Groups", () => {
                 ]);
                 expect(isValidationFailure(result)).toBeTruthy();
             });
+        });
+    });
+
+    describe("SystemHandlerValidators", () => {
+        it("should have all required validator properties", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validators.complete", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
+            expect(SystemHandlerValidators).toHaveProperty("openExternal");
+            expect(SystemHandlerValidators).toHaveProperty("quitAndInstall");
+            expect(SystemHandlerValidators).toHaveProperty(
+                "writeClipboardText"
+            );
+        });
+
+        it("accepts https URLs", async ({ task, annotate }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validators.complete", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Validation", "type");
+
+            const result = SystemHandlerValidators.openExternal([
+                "https://example.com/path?q=1",
+            ]);
+
+            expect(isValidationSuccess(result)).toBeTruthy();
+        });
+
+        it("accepts mailto URLs", async ({ task, annotate }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validators.complete", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Validation", "type");
+
+            const result = SystemHandlerValidators.openExternal([
+                "mailto:test@example.com",
+            ]);
+
+            expect(isValidationSuccess(result)).toBeTruthy();
+        });
+
+        it("rejects file URLs", async ({ task, annotate }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validators.complete", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Error Handling", "type");
+
+            const result = SystemHandlerValidators.openExternal([
+                "file:///C:/Windows/System32",
+            ]);
+
+            expect(isValidationFailure(result)).toBeTruthy();
         });
     });
 });

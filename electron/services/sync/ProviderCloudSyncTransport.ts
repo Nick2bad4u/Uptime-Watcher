@@ -60,13 +60,11 @@ function isAsciiDigits(value: string): boolean {
     return true;
 }
 
-function parseOpsObjectFileName(fileName: string):
-    | null
-    | Readonly<{
-          createdAt: number;
-          firstOpId: number;
-          lastOpId: number;
-      }> {
+function parseOpsObjectFileName(fileName: string): null | Readonly<{
+    createdAt: number;
+    firstOpId: number;
+    lastOpId: number;
+}> {
     if (!fileName.endsWith(OPS_FILE_SUFFIX)) {
         return null;
     }
@@ -77,7 +75,11 @@ function parseOpsObjectFileName(fileName: string):
         return null;
     }
 
-    const [createdAtRaw, firstOpIdRaw, lastOpIdRaw] = parts;
+    const [
+        createdAtRaw,
+        firstOpIdRaw,
+        lastOpIdRaw,
+    ] = parts;
     if (
         createdAtRaw === undefined ||
         firstOpIdRaw === undefined ||
@@ -162,7 +164,10 @@ function isProviderNotFoundError(error: unknown, key: string): boolean {
         const lowerKey = key.toLowerCase();
 
         // GoogleDriveCloudStorageProvider throws: "Google Drive object not found: <key>"
-        if (message.includes("object not found") && message.includes(lowerKey)) {
+        if (
+            message.includes("object not found") &&
+            message.includes(lowerKey)
+        ) {
             return true;
         }
     }
@@ -217,7 +222,9 @@ function assertValidDeviceId(deviceId: string): void {
     }
 
     if (Buffer.byteLength(deviceId, "utf8") > MAX_DEVICE_ID_BYTES) {
-        throw new Error(`deviceId must not exceed ${MAX_DEVICE_ID_BYTES} bytes`);
+        throw new Error(
+            `deviceId must not exceed ${MAX_DEVICE_ID_BYTES} bytes`
+        );
     }
 
     if (hasAsciiControlCharacters(deviceId)) {
@@ -274,7 +281,8 @@ function assertSafeProviderKey(key: string): void {
     const segments = key.split("/");
     if (
         segments.some(
-            (segment) => segment.length === 0 || segment === "." || segment === ".."
+            (segment) =>
+                segment.length === 0 || segment === "." || segment === ".."
         )
     ) {
         throw new Error("Invalid key: traversal segments are not allowed");
@@ -292,10 +300,21 @@ function assertOpsObjectKey(key: string): void {
         );
     }
 
-    const [syncSegment, devicesSegment, deviceIdSegment, opsSegment, fileName] =
-        segments;
+    const [
+        syncSegment,
+        devicesSegment,
+        deviceIdSegment,
+        opsSegment,
+        fileName,
+    ] = segments;
 
-    if (!syncSegment || !devicesSegment || !deviceIdSegment || !opsSegment || !fileName) {
+    if (
+        !syncSegment ||
+        !devicesSegment ||
+        !deviceIdSegment ||
+        !opsSegment ||
+        !fileName
+    ) {
         throw new Error(
             `Invalid sync operations object key (expected ${OPS_PREFIX}/<deviceId>/ops/<file>.ndjson): ${key}`
         );
@@ -341,7 +360,12 @@ function assertSnapshotKey(key: string): void {
         throw new Error(`Invalid snapshot key: ${key}`);
     }
 
-    const [syncSegment, snapshotsSegment, schemaSegment, fileName] = segments;
+    const [
+        syncSegment,
+        snapshotsSegment,
+        schemaSegment,
+        fileName,
+    ] = segments;
     if (syncSegment !== "sync" || snapshotsSegment !== "snapshots") {
         throw new Error(`Invalid snapshot key: ${key}`);
     }
@@ -465,8 +489,13 @@ export class ProviderCloudSyncTransport implements CloudSyncTransport {
         assertValidDeviceId(deviceId);
 
         const createdAtCandidate = createdAtEpochMs ?? Date.now();
-        if (!Number.isSafeInteger(createdAtCandidate) || createdAtCandidate < 0) {
-            throw new Error("createdAtEpochMs must be a non-negative safe integer");
+        if (
+            !Number.isSafeInteger(createdAtCandidate) ||
+            createdAtCandidate < 0
+        ) {
+            throw new Error(
+                "createdAtEpochMs must be a non-negative safe integer"
+            );
         }
 
         const createdAt = createdAtCandidate;

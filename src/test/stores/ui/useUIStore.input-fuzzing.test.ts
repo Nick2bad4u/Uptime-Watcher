@@ -27,6 +27,10 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { test as fcTest } from "@fast-check/vitest";
 import * as fc from "fast-check";
+import {
+    getSafeUrlForLogging,
+    validateExternalOpenUrlCandidate,
+} from "@shared/utils/urlSafety";
 
 const mockErrorStore = vi.hoisted(() => ({
     clearStoreError: vi.fn(),
@@ -60,8 +64,6 @@ vi.mock("../../../services/SystemService", () => ({
         openExternal: vi.fn().mockResolvedValue(true),
     },
 }));
-import { isValidUrl } from "@shared/validation/validatorUtils";
-import { getSafeUrlForLogging } from "@shared/utils/urlSafety";
 
 import { SystemService } from "../../../services/SystemService";
 import { useUIStore } from "../../../stores/ui/useUiStore";
@@ -568,18 +570,18 @@ describe("UI Store - Property-Based Fuzzing Tests", () => {
             // Act
             useUIStore.getState().openExternal(url);
 
-            const allowed = isValidUrl(url, {
-                disallowAuth: true,
-            });
+            const validation = validateExternalOpenUrlCandidate(url);
 
-            if (allowed) {
-                expect(mockOpenExternal).toHaveBeenCalledWith(url);
+            if (validation.ok === true) {
+                expect(mockOpenExternal).toHaveBeenCalledWith(
+                    validation.normalizedUrl
+                );
                 expect(mockErrorStore.setStoreError).not.toHaveBeenCalled();
             } else {
                 expect(mockOpenExternal).not.toHaveBeenCalled();
                 expect(mockErrorStore.setStoreError).toHaveBeenCalledWith(
                     "system-open-external",
-                    expect.stringContaining("URL must be a valid http(s) URL")
+                    expect.stringContaining(validation.reason)
                 );
             }
         });
@@ -594,20 +596,18 @@ describe("UI Store - Property-Based Fuzzing Tests", () => {
                 // Act
                 useUIStore.getState().openExternal(url, { siteName });
 
-                    const allowed = isValidUrl(url, {
-                        disallowAuth: true,
-                    });
+                const validation = validateExternalOpenUrlCandidate(url);
 
-                if (allowed) {
-                    expect(mockOpenExternal).toHaveBeenCalledWith(url);
+                if (validation.ok === true) {
+                    expect(mockOpenExternal).toHaveBeenCalledWith(
+                        validation.normalizedUrl
+                    );
                     expect(mockErrorStore.setStoreError).not.toHaveBeenCalled();
                 } else {
                     expect(mockOpenExternal).not.toHaveBeenCalled();
                     expect(mockErrorStore.setStoreError).toHaveBeenCalledWith(
                         "system-open-external",
-                        expect.stringContaining(
-                            "URL must be a valid http(s) URL"
-                        )
+                        expect.stringContaining(validation.reason)
                     );
                 }
             }
@@ -623,15 +623,21 @@ describe("UI Store - Property-Based Fuzzing Tests", () => {
             // Act
             for (const url of urls) useUIStore.getState().openExternal(url);
 
-            const validUrls = urls.filter((url) =>
-                isValidUrl(url, {
-                    disallowAuth: true,
-                })
-            );
-            const invalidUrls = urls.length - validUrls.length;
+            const normalizedValidUrls = urls.flatMap((candidate) => {
+                const validationResult = validateExternalOpenUrlCandidate(
+                    candidate
+                );
+                return validationResult.ok
+                    ? [validationResult.normalizedUrl]
+                    : [];
+            });
 
-            expect(mockOpenExternal).toHaveBeenCalledTimes(validUrls.length);
-            for (const url of validUrls) {
+            const invalidUrls = urls.length - normalizedValidUrls.length;
+
+            expect(mockOpenExternal).toHaveBeenCalledTimes(
+                normalizedValidUrls.length
+            );
+            for (const url of normalizedValidUrls) {
                 expect(mockOpenExternal).toHaveBeenCalledWith(url);
             }
 
@@ -910,7 +916,15 @@ describe("UI Store - Property-Based Fuzzing Tests", () => {
                 finalSite!.identifier
             );
 
-            const validUrls = urls.filter((url) => isValidUrl(url));
+            const validUrls = urls.flatMap((candidate) => {
+                const validationResult = validateExternalOpenUrlCandidate(
+                    candidate
+                );
+                return validationResult.ok
+                    ? [validationResult.normalizedUrl]
+                    : [];
+            });
+
             const invalidCount = urls.length - validUrls.length;
 
             expect(mockOpenExternal).toHaveBeenCalledTimes(validUrls.length);

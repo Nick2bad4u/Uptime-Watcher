@@ -14,7 +14,11 @@ import type { UnknownRecord } from "type-fest";
 
 import { isIpcCorrelationEnvelope } from "@shared/types/ipc";
 import { MONITOR_TYPES_CHANNELS } from "@shared/types/preload";
-import { normalizeLogValue, withLogContext } from "@shared/utils/loggingContext";
+import {
+    normalizeLogValue,
+    withLogContext,
+} from "@shared/utils/loggingContext";
+import { validateExternalOpenUrlCandidate } from "@shared/utils/urlSafety";
 import {
     isNonEmptyString,
     isValidUrl,
@@ -275,6 +279,39 @@ export const IpcValidators = {
     },
 
     /**
+     * Validates a required URL parameter intended for opening via
+     * `shell.openExternal`.
+     *
+     * @remarks
+     * This differs from {@link requiredUrl} by allowing `mailto:` in addition
+     * to `http:` and `https:`. It also enforces the same defense-in-depth size
+     * and newline constraints used by {@link requiredUrl}.
+     */
+    requiredExternalOpenUrl: (
+        value: unknown,
+        paramName: string
+    ): null | string => {
+        if (typeof value === "string") {
+            const byteLength = getUtfByteLength(value);
+            if (byteLength > MAX_IPC_URL_UTF_BYTES) {
+                return `${paramName} must not exceed ${MAX_IPC_URL_UTF_BYTES} bytes`;
+            }
+
+            // eslint-disable-next-line regexp/require-unicode-sets-regexp -- The `v` flag is not consistently supported across our TypeScript/Electron toolchain; `u` is sufficient for this ASCII-only newline check.
+            if (/[\n\r]/u.test(value)) {
+                return `${paramName} must not contain newlines`;
+            }
+        }
+
+        const validation = validateExternalOpenUrlCandidate(value);
+        if ("reason" in validation) {
+            return `${paramName} ${validation.reason}`;
+        }
+
+        return null;
+    },
+
+    /**
      * Validates a required number parameter.
      *
      * @param value - Value to validate
@@ -307,7 +344,6 @@ export const IpcValidators = {
         }
         return null;
     },
-
     /**
      * Validates a required string parameter using validator.
      *
@@ -322,6 +358,7 @@ export const IpcValidators = {
         }
         return null;
     },
+
     /**
      * Validates a required URL parameter restricted to safe protocols.
      *
@@ -337,8 +374,8 @@ export const IpcValidators = {
                 return `${paramName} must not exceed ${MAX_IPC_URL_UTF_BYTES} bytes`;
             }
 
-                // eslint-disable-next-line regexp/require-unicode-sets-regexp -- The `v` flag is not consistently supported across our TypeScript/Electron toolchain; `u` is sufficient for this ASCII-only newline check.
-                if (/[\n\r]/u.test(value)) {
+            // eslint-disable-next-line regexp/require-unicode-sets-regexp -- The `v` flag is not consistently supported across our TypeScript/Electron toolchain; `u` is sufficient for this ASCII-only newline check.
+            if (/[\n\r]/u.test(value)) {
                 return `${paramName} must not contain newlines`;
             }
         }

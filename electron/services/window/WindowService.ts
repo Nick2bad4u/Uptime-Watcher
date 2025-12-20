@@ -178,12 +178,7 @@ export class WindowService {
 
         try {
             const parsed = new URL(targetUrl);
-            const {
-                password,
-                pathname,
-                protocol,
-                username,
-            } = parsed;
+            const { password, pathname, protocol, username } = parsed;
             const isHttp = protocol === "http:" || protocol === "https:";
             const isMailTo = protocol === "mailto:";
 
@@ -213,7 +208,7 @@ export class WindowService {
 
             if (isMailTo) {
                 const mailTarget = pathname.trim();
-                if (mailTarget.length === 0 || /[\r\n]/.test(mailTarget)) {
+                if (mailTarget.length === 0 || /[\n\r]/v.test(mailTarget)) {
                     logger.warn(
                         "[WindowService] Blocked invalid mailto external navigation",
                         {
@@ -598,12 +593,14 @@ export class WindowService {
             const { session } = this.mainWindow.webContents;
 
             session.setPermissionCheckHandler(() => false);
-            session.setPermissionRequestHandler(
-                (_webContents, _permission, callback) => {
-                    const denyPermission = false;
-                    callback(denyPermission);
-                }
-            );
+            session.setPermissionRequestHandler((
+                _webContents,
+                _permission,
+                callback
+            ) => {
+                const denyPermission = false;
+                callback(denyPermission);
+            });
 
             // Extra hardening (Electron APIs differ slightly across versions).
             if (typeof session.setDevicePermissionHandler === "function") {
@@ -611,12 +608,10 @@ export class WindowService {
             }
 
             if (typeof session.setDisplayMediaRequestHandler === "function") {
-                session.setDisplayMediaRequestHandler(
-                    (_request, callback) => {
-                        const denyResponse = {};
-                        callback(denyResponse);
-                    }
-                );
+                session.setDisplayMediaRequestHandler((_request, callback) => {
+                    const denyResponse = {};
+                    callback(denyResponse);
+                });
             }
         } catch (error: unknown) {
             logger.warn(
@@ -742,8 +737,11 @@ export class WindowService {
      * Load the appropriate content based on the current environment.
      *
      * @remarks
-                    ensureError(error)
-     * handling:
+     * ```
+     * ensureError(error);
+     * ```
+     *
+     * Handling:
      *
      * **Development Mode:**
      *

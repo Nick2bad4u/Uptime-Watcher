@@ -30,8 +30,9 @@ export function hasAsciiControlCharacters(value: string): boolean {
  * Validates the persisted sync deviceId.
  *
  * @remarks
- * deviceId is embedded into provider object keys (`sync/devices/<deviceId>/...`)
- * so it must be a single key segment and avoid control characters.
+ * DeviceId is embedded into provider object keys
+ * (`sync/devices/<deviceId>/...`) so it must be a single key segment and avoid
+ * control characters.
  */
 export function isValidPersistedDeviceId(candidate: string): boolean {
     if (candidate.trim().length === 0) {

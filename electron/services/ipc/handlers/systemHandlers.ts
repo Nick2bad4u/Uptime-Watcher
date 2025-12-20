@@ -3,8 +3,10 @@ import type { IpcInvokeChannel } from "@shared/types/ipc";
 import { SYSTEM_CHANNELS } from "@shared/types/preload";
 import { ensureError } from "@shared/utils/errorHandling";
 import { LOG_TEMPLATES } from "@shared/utils/logTemplates";
-import { getSafeUrlForLogging, isAllowedExternalOpenUrl } from "@shared/utils/urlSafety";
-import { isValidUrl } from "@shared/validation/validatorUtils";
+import {
+    getSafeUrlForLogging,
+    validateExternalOpenUrlCandidate,
+} from "@shared/utils/urlSafety";
 import { clipboard, shell  } from "electron";
 
 import type { AutoUpdaterService } from "../../updater/AutoUpdaterService";
@@ -29,29 +31,23 @@ export function registerSystemHandlers({
     autoUpdaterService,
     registeredHandlers,
 }: SystemHandlersDependencies): void {
+
     registerStandardizedIpcHandler(
         SYSTEM_CHANNELS.openExternal,
         withIgnoredIpcEvent(async (url) => {
-            const urlForLog = getSafeUrlForLogging(url);
+            const validation = validateExternalOpenUrlCandidate(url);
+            const urlForLog = getSafeUrlForLogging(
+                typeof url === "string" ? url.trim() : ""
+            );
 
-            if (
-                !isValidUrl(url, {
-                    disallowAuth: true,
-                })
-            ) {
+            if ("reason" in validation) {
                 throw new TypeError(
-                    `Rejected unsafe openExternal URL: ${urlForLog}`
-                );
-            }
-
-            if (!isAllowedExternalOpenUrl(url)) {
-                throw new Error(
-                    `Blocked external URL: ${getSafeUrlForLogging(url)}`
+                    `Rejected unsafe openExternal URL: ${validation.safeUrlForLogging} (url ${validation.reason})`
                 );
             }
 
             try {
-                await shell.openExternal(url);
+                await shell.openExternal(validation.normalizedUrl);
             } catch (error: unknown) {
                 const resolved = ensureError(error);
                 const { code } = resolved as Error & { code?: unknown };

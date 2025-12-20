@@ -13,7 +13,6 @@
  */
 
 import { isRecord } from "@shared/utils/typeHelpers";
-import { isAllowedExternalOpenUrl } from "@shared/utils/urlSafety";
 import {
     validateSiteSnapshot,
     validateSiteUpdate,
@@ -192,7 +191,11 @@ function isAbsoluteFilesystemPath(value: string): boolean {
 
     // Windows drive paths (C:\ or C:/)
     if (value.length >= 3) {
-        const [firstChar, secondChar, thirdChar] = value;
+        const [
+            firstChar,
+            secondChar,
+            thirdChar,
+        ] = value;
         if (secondChar !== ":" || firstChar === undefined) {
             return false;
         }
@@ -280,7 +283,9 @@ function validateSitePayload(params: readonly unknown[]): null | string[] {
     return formatZodIssues(result.error.issues);
 }
 
-function validateSiteUpdatePayload(params: readonly unknown[]): null | string[] {
+function validateSiteUpdatePayload(
+    params: readonly unknown[]
+): null | string[] {
     const errors: string[] = [];
 
     const [identifierCandidate, updatesCandidate] = params;
@@ -306,7 +311,10 @@ function validateSiteUpdatePayload(params: readonly unknown[]): null | string[] 
         return errors;
     }
 
-    if (isRecord(updatesCandidate) && Object.keys(updatesCandidate).length === 0) {
+    if (
+        isRecord(updatesCandidate) &&
+        Object.keys(updatesCandidate).length === 0
+    ) {
         errors.push("updates must not be empty");
     }
 
@@ -371,8 +379,7 @@ function validateCloudFilesystemProviderConfig(
     }
 
     if (
-        getUtfByteLength(baseDirectoryRaw) >
-        MAX_FILESYSTEM_BASE_DIRECTORY_BYTES
+        getUtfByteLength(baseDirectoryRaw) > MAX_FILESYSTEM_BASE_DIRECTORY_BYTES
     ) {
         errors.push(
             `baseDirectory must not exceed ${MAX_FILESYSTEM_BASE_DIRECTORY_BYTES} bytes`
@@ -647,7 +654,9 @@ function validateRestoreFileNameCandidate(candidate: unknown): string[] {
     const errors: string[] = [];
 
     if (getUtfByteLength(fileName) > MAX_RESTORE_FILE_NAME_BYTES) {
-        errors.push(`fileName must not exceed ${MAX_RESTORE_FILE_NAME_BYTES} bytes`);
+        errors.push(
+            `fileName must not exceed ${MAX_RESTORE_FILE_NAME_BYTES} bytes`
+        );
     }
 
     if (hasAsciiControlCharacters(fileName)) {
@@ -693,7 +702,9 @@ function validateRestorePayload(params: readonly unknown[]): null | string[] {
     return errors.length > 0 ? errors : null;
 }
 
-function validateImportDataPayload(params: readonly unknown[]): null | string[] {
+function validateImportDataPayload(
+    params: readonly unknown[]
+): null | string[] {
     const errors: string[] = [];
 
     if (params.length !== 1) {
@@ -765,7 +776,11 @@ function createSingleStringValidator(paramName: string): IpcParameterValidator {
 
 function createClipboardTextValidator(): IpcParameterValidator {
     return createParamValidator(1, [
-        (value): null | string => {
+        (
+            value
+        ):
+            | null
+            | string => {
             const error = IpcValidators.requiredString(value, "text");
             if (error) {
                 return error;
@@ -784,7 +799,11 @@ function createClipboardTextValidator(): IpcParameterValidator {
 
 function createBackupKeyValidator(paramName: string): IpcParameterValidator {
     return createParamValidator(1, [
-        (value): null | string => {
+        (
+            value
+        ):
+            | null
+            | string => {
             const error = IpcValidators.requiredString(value, paramName);
             if (error) {
                 return error;
@@ -812,7 +831,11 @@ function createBackupKeyValidator(paramName: string): IpcParameterValidator {
 
             // Defense-in-depth: provider keys are logical identifiers, not OS
             // paths or URLs. CloudService asserts the same invariants.
-            if (key.startsWith("/") || key.includes(":") || key.includes("://")) {
+            if (
+                key.startsWith("/") ||
+                key.includes(":") ||
+                key.includes("://")
+            ) {
                 return `${paramName} must be a relative provider key`;
             }
 
@@ -822,9 +845,7 @@ function createBackupKeyValidator(paramName: string): IpcParameterValidator {
             }
 
             if (
-                segments.some(
-                    (segment) => segment === "." || segment === ".."
-                )
+                segments.some((segment) => segment === "." || segment === "..")
             ) {
                 return `${paramName} must not contain path traversal segments`;
             }
@@ -838,22 +859,15 @@ function createBackupKeyValidator(paramName: string): IpcParameterValidator {
     ]);
 }
 
-function createSingleExternalOpenUrlValidator(paramName: string): IpcParameterValidator {
+function createSingleExternalOpenUrlValidator(
+    paramName: string
+): IpcParameterValidator {
     return createParamValidator(1, [
-        (value): null | string => {
-            const error = IpcValidators.requiredUrl(value, paramName);
-            if (error !== null) {
-                return error;
-            }
-
-            if (typeof value !== "string") {
-                return `${paramName} must be a string`;
-            }
-
-            return isAllowedExternalOpenUrl(value)
-                ? null
-                : `${paramName} must be an http(s) or mailto URL`;
-        },
+        (
+            value
+        ):
+            | null
+            | string => IpcValidators.requiredExternalOpenUrl(value, paramName),
     ]);
 }
 

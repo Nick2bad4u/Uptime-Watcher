@@ -33,8 +33,10 @@
 import type { Site } from "@shared/types";
 
 import { ensureError } from "@shared/utils/errorHandling";
-import { getSafeUrlForLogging } from "@shared/utils/urlSafety";
-import { isValidUrl } from "@shared/validation/validatorUtils";
+import {
+    getSafeUrlForLogging,
+    validateExternalOpenUrlCandidate,
+} from "@shared/utils/urlSafety";
 import { create, type StoreApi, type UseBoundStore } from "zustand";
 import { persist, type PersistOptions } from "zustand/middleware";
 
@@ -135,15 +137,17 @@ export const useUIStore: UIStoreWithPersist = create<UIStore>()(
 
                 const requestedUrl = url;
                 const urlForMessage = getSafeUrlForLogging(url);
-                const isSafeUrl = isValidUrl(requestedUrl, {
-                    disallowAuth: true,
-                });
 
-                if (!isSafeUrl) {
+                const validation = validateExternalOpenUrlCandidate(
+                    requestedUrl
+                );
+
+                if ("reason" in validation) {
                     logger.warn(
                         "Blocked attempt to open invalid external URL",
                         {
                             context,
+                            reason: validation.reason,
                             url: urlForMessage,
                         }
                     );
@@ -152,7 +156,7 @@ export const useUIStore: UIStoreWithPersist = create<UIStore>()(
                         .getState()
                         .setStoreError(
                             "system-open-external",
-                            `Unable to open external link (${urlForMessage}): URL must be a valid http(s) URL`
+                            `Unable to open external link (${urlForMessage}): URL ${validation.reason}`
                         );
 
                     return;
@@ -160,7 +164,9 @@ export const useUIStore: UIStoreWithPersist = create<UIStore>()(
 
                 void (async (): Promise<void> => {
                     try {
-                        await SystemService.openExternal(requestedUrl);
+                        await SystemService.openExternal(
+                            validation.normalizedUrl
+                        );
                         logger.user.action("External URL opened", {
                             url: urlForMessage,
                             ...(context?.siteName

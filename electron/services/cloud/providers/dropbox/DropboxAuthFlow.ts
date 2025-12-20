@@ -187,7 +187,7 @@ export class DropboxAuthFlow {
                 await shell.openExternal(authorizeUrl);
             } catch (error: unknown) {
                 const resolved = ensureError(error);
-                const {code} = (resolved as Error & { code?: unknown });
+                const { code } = resolved as Error & { code?: unknown };
                 const codeSuffix =
                     typeof code === "string" && code.length > 0
                         ? ` (${code})`

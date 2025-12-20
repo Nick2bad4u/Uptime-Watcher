@@ -223,8 +223,7 @@ describe("SyncEngine (ADR-016)", () => {
             });
 
             const monitorId = globalThis.crypto.randomUUID();
-            const opObjectKey =
-                "sync/devices/remote-device/ops/2-0-9.ndjson";
+            const opObjectKey = "sync/devices/remote-device/ops/2-0-9.ndjson";
             const ops = [
                 {
                     deviceId: remoteDeviceId,
@@ -479,8 +478,7 @@ describe("SyncEngine (ADR-016)", () => {
             expect(snapshotEntries.length).toBeGreaterThan(0);
 
             const snapshotKey = snapshotEntries.find((entry) =>
-                entry.key.endsWith(".json")
-            )?.key;
+                entry.key.endsWith(".json"))?.key;
             expect(snapshotKey).toBeTruthy();
 
             const snapshotRaw = Buffer.from(
@@ -509,29 +507,29 @@ describe("SyncEngine (ADR-016)", () => {
                 throw new TypeError("Expected snapshot monitor state object");
             }
 
-                const fields = monitorState["fields"];
-                if (!isRecord(fields)) {
-                    throw new TypeError("Expected snapshot monitor fields object");
-                }
+            const fields = monitorState["fields"];
+            if (!isRecord(fields)) {
+                throw new TypeError("Expected snapshot monitor fields object");
+            }
 
-                const checkIntervalField = fields["checkInterval"];
-                const retryAttemptsField = fields["retryAttempts"];
-                const timeoutField = fields["timeout"];
-                const monitoringField = fields["monitoring"];
+            const checkIntervalField = fields["checkInterval"];
+            const retryAttemptsField = fields["retryAttempts"];
+            const timeoutField = fields["timeout"];
+            const monitoringField = fields["monitoring"];
 
-                if (
-                    !isRecord(checkIntervalField) ||
-                    !isRecord(retryAttemptsField) ||
-                    !isRecord(timeoutField) ||
-                    !isRecord(monitoringField)
-                ) {
-                    throw new TypeError("Expected snapshot monitor field entries");
-                }
+            if (
+                !isRecord(checkIntervalField) ||
+                !isRecord(retryAttemptsField) ||
+                !isRecord(timeoutField) ||
+                !isRecord(monitoringField)
+            ) {
+                throw new TypeError("Expected snapshot monitor field entries");
+            }
 
-                expect(checkIntervalField["value"]).toBe(DEFAULT_CHECK_INTERVAL);
-                expect(retryAttemptsField["value"]).toBe(3);
-                expect(timeoutField["value"]).toBe(DEFAULT_REQUEST_TIMEOUT);
-                expect(monitoringField["value"]).toBeTruthy();
+            expect(checkIntervalField["value"]).toBe(DEFAULT_CHECK_INTERVAL);
+            expect(retryAttemptsField["value"]).toBe(3);
+            expect(timeoutField["value"]).toBe(DEFAULT_REQUEST_TIMEOUT);
+            expect(monitoringField["value"]).toBeTruthy();
         } finally {
             await fs.rm(baseDirectory, { force: true, recursive: true });
         }
@@ -687,7 +685,9 @@ describe("SyncEngine (ADR-016)", () => {
         );
 
         try {
-            const provider = new FilesystemCloudStorageProvider({ baseDirectory });
+            const provider = new FilesystemCloudStorageProvider({
+                baseDirectory,
+            });
 
             const siteId = "example.com";
             const monitorId = globalThis.crypto.randomUUID();
@@ -809,7 +809,10 @@ describe("SyncEngine (ADR-016)", () => {
             ];
 
             await provider.uploadObject({
-                buffer: Buffer.from(`${ops.map((op) => JSON.stringify(op)).join("\n")}\n`, "utf8"),
+                buffer: Buffer.from(
+                    `${ops.map((op) => JSON.stringify(op)).join("\n")}\n`,
+                    "utf8"
+                ),
                 key: opsKey,
                 overwrite: true,
             });
@@ -918,19 +921,32 @@ describe("SyncEngine (ADR-016)", () => {
             const providerWithRecording = {
                 deleteObject: async (key: string) =>
                     await recordingProvider.deleteObject(key),
-                downloadBackup: async (...args: Parameters<FilesystemCloudStorageProvider["downloadBackup"]>) =>
-                    await recordingProvider.downloadBackup(...args),
+                downloadBackup: async (
+                    ...args: Parameters<
+                        FilesystemCloudStorageProvider["downloadBackup"]
+                    >
+                ) => await recordingProvider.downloadBackup(...args),
                 downloadObject: async (key: string) =>
                     await recordingProvider.downloadObject(key),
                 isConnected: async () => await recordingProvider.isConnected(),
                 kind: recordingProvider.kind,
-                listBackups: async (...args: Parameters<FilesystemCloudStorageProvider["listBackups"]>) =>
-                    await recordingProvider.listBackups(...args),
+                listBackups: async (
+                    ...args: Parameters<
+                        FilesystemCloudStorageProvider["listBackups"]
+                    >
+                ) => await recordingProvider.listBackups(...args),
                 listObjects: async (prefix: string) =>
                     await recordingProvider.listObjects(prefix),
-                uploadBackup: async (...args: Parameters<FilesystemCloudStorageProvider["uploadBackup"]>) =>
-                    await recordingProvider.uploadBackup(...args),
-                uploadObject: async (args: Parameters<FilesystemCloudStorageProvider["uploadObject"]>[0]) => {
+                uploadBackup: async (
+                    ...args: Parameters<
+                        FilesystemCloudStorageProvider["uploadBackup"]
+                    >
+                ) => await recordingProvider.uploadBackup(...args),
+                uploadObject: async (
+                    args: Parameters<
+                        FilesystemCloudStorageProvider["uploadObject"]
+                    >[0]
+                ) => {
                     uploadedKeys.push(args.key);
                     return await recordingProvider.uploadObject(args);
                 },
@@ -977,8 +993,7 @@ describe("SyncEngine (ADR-016)", () => {
             await engine.syncNow(providerWithRecording as any);
 
             const opKey = uploadedKeys.find((key) =>
-                key.startsWith("sync/devices/device-a/ops/")
-            );
+                key.startsWith("sync/devices/device-a/ops/"));
             expect(opKey).toBeTruthy();
 
             const fileName = opKey!.split("/").at(-1);

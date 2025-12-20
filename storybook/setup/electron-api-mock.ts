@@ -222,12 +222,12 @@ const electronAPIMockDefinition = {
                 } else {
                     const nextFileName = targetEncrypted
                         ? `${entry.fileName}.enc`
-                        // eslint-disable-next-line regexp/require-unicode-sets-regexp -- We intentionally avoid the `/v` flag (toolchain compatibility); `/u` is sufficient for this ASCII-only suffix replacement.
-                        : entry.fileName.replace(/\.enc$/u, "");
+                        : // eslint-disable-next-line regexp/require-unicode-sets-regexp -- We intentionally avoid the `/v` flag (toolchain compatibility); `/u` is sufficient for this ASCII-only suffix replacement.
+                          entry.fileName.replace(/\.enc$/u, "");
                     const nextKey = targetEncrypted
                         ? `${entry.key}.enc`
-                        // eslint-disable-next-line regexp/require-unicode-sets-regexp -- We intentionally avoid the `/v` flag (toolchain compatibility); `/u` is sufficient for this ASCII-only suffix replacement.
-                        : entry.key.replace(/\.enc$/u, "");
+                        : // eslint-disable-next-line regexp/require-unicode-sets-regexp -- We intentionally avoid the `/v` flag (toolchain compatibility); `/u` is sufficient for this ASCII-only suffix replacement.
+                          entry.key.replace(/\.enc$/u, "");
 
                     const migratedEntry: CloudBackupEntry = {
                         ...entry,

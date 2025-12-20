@@ -4,7 +4,11 @@
 
 import { describe, expect, it } from "vitest";
 
-import { isAllowedExternalOpenUrl, isPrivateNetworkHostname } from "../../utils/urlSafety";
+import {
+    isAllowedExternalOpenUrl,
+    isPrivateNetworkHostname,
+    validateExternalOpenUrlCandidate,
+} from "../../utils/urlSafety";
 
 describe("urlSafety", () => {
     describe(isPrivateNetworkHostname, () => {
@@ -101,6 +105,42 @@ describe("urlSafety", () => {
                 .toBeFalsy();
             expect(isAllowedExternalOpenUrl("https://example.com\rInjected"))
                 .toBeFalsy();
+        });
+    });
+
+    describe(validateExternalOpenUrlCandidate, () => {
+        it("accepts https and mailto", () => {
+            expect(
+                validateExternalOpenUrlCandidate("https://example.com").ok
+            ).toBeTruthy();
+            expect(
+                validateExternalOpenUrlCandidate("mailto:test@example.com").ok
+            ).toBeTruthy();
+        });
+
+        it("rejects javascript/file URLs", () => {
+            expect(
+                validateExternalOpenUrlCandidate(
+                    "file:///C:/Windows/System32"
+                ).ok
+            ).toBeFalsy();
+            // eslint-disable-next-line no-script-url -- intentional test case
+            expect(validateExternalOpenUrlCandidate("javascript:alert(1)").ok)
+                .toBeFalsy();
+        });
+
+        it("rejects http(s) URLs containing credentials", () => {
+            const result = validateExternalOpenUrlCandidate(
+                "https://user:pass@example.com"
+            );
+            expect(result.ok).toBeFalsy();
+        });
+
+        it("rejects URLs containing CR/LF", () => {
+            const result = validateExternalOpenUrlCandidate(
+                "https://example.com\nInjected"
+            );
+            expect(result.ok).toBeFalsy();
         });
     });
 });

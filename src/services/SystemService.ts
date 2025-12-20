@@ -11,8 +11,10 @@
  */
 
 import { ensureError } from "@shared/utils/errorHandling";
-import { getSafeUrlForLogging, isAllowedExternalOpenUrl } from "@shared/utils/urlSafety";
-import { isValidUrl } from "@shared/validation/validatorUtils";
+import {
+    getSafeUrlForLogging,
+    validateExternalOpenUrlCandidate,
+} from "@shared/utils/urlSafety";
 
 import type { ElectronAPI } from "../types";
 
@@ -90,37 +92,23 @@ export const SystemService: SystemServiceContract = {
         api,
         url: string
     ): Promise<boolean> => {
-        const requestedUrl = url;
+        const validation = validateExternalOpenUrlCandidate(url);
         const urlForMessage = getSafeUrlForLogging(url);
-        const isSafeUrl = isValidUrl(requestedUrl, {
-            disallowAuth: true,
-        });
 
-        if (!isSafeUrl) {
+            if ("reason" in validation) {
             const error = new TypeError(
-                `Invalid URL provided to SystemService.openExternal: ${urlForMessage}`
+                `Invalid URL provided to SystemService.openExternal: ${validation.safeUrlForLogging}`
             );
 
             logger.error("Rejected unsafe URL for external navigation", error, {
-                url: urlForMessage,
+                reason: validation.reason,
+                url: validation.safeUrlForLogging,
             });
 
             throw error;
         }
 
-        if (!isAllowedExternalOpenUrl(requestedUrl)) {
-            const error = new TypeError(
-                `Blocked external URL provided to SystemService.openExternal: ${urlForMessage}`
-            );
-
-            logger.error("Rejected blocked URL for external navigation", error, {
-                url: urlForMessage,
-            });
-
-            throw error;
-        }
-
-        const opened = await api.system.openExternal(requestedUrl);
+        const opened = await api.system.openExternal(validation.normalizedUrl);
 
         if (typeof opened !== "boolean") {
             throw new TypeError(

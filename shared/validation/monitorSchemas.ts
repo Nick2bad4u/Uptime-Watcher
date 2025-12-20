@@ -153,8 +153,8 @@ export const baseMonitorSchema: BaseMonitorSchemaType = z
  * @remarks
  * Validates using WHATWG URL parsing plus {@link isValidHost}.
  *
- * This intentionally allows valid URL path characters (including quotes)
- * while enforcing strict host validation (FQDN with TLD, IP literals, or
+ * This intentionally allows valid URL path characters (including quotes) while
+ * enforcing strict host validation (FQDN with TLD, IP literals, or
  * `localhost`).
  */
 function tryParseUrl(candidate: string): undefined | URL {
@@ -173,8 +173,7 @@ function isUrlWithAllowedProtocols(
         return false;
     }
 
-
-        const parsed = tryParseUrl(candidate);
+    const parsed = tryParseUrl(candidate);
 
     if (!parsed) {
         return false;
@@ -188,10 +187,12 @@ function isUrlWithAllowedProtocols(
     return isValidHost(parsed.hostname);
 }
 
-const httpUrlSchema = z.string().refine(
-    (val): boolean => isUrlWithAllowedProtocols(val, ["http", "https"]),
-    "Must be a valid HTTP or HTTPS URL"
-);
+const httpUrlSchema = z
+    .string()
+    .refine(
+        (val): boolean => isUrlWithAllowedProtocols(val, ["http", "https"]),
+        "Must be a valid HTTP or HTTPS URL"
+    );
 
 /**
  * Reusable WebSocket URL validation schema for multiple monitor types.
@@ -200,10 +201,12 @@ const httpUrlSchema = z.string().refine(
  * Restricts URLs to `ws://` or `wss://` protocols and leverages
  * {@link validator.isURL} for RFC-compliant validation.
  */
-const websocketUrlSchema = z.string().refine(
-    (val): boolean => isUrlWithAllowedProtocols(val, ["ws", "wss"]),
-    "Must be a valid WebSocket URL (ws:// or wss://)"
-);
+const websocketUrlSchema = z
+    .string()
+    .refine(
+        (val): boolean => isUrlWithAllowedProtocols(val, ["ws", "wss"]),
+        "Must be a valid WebSocket URL (ws:// or wss://)"
+    );
 
 /**
  * RFC 7230 token characters permitted within HTTP header names.
@@ -370,7 +373,7 @@ const edgeLocationListSchema = z
     .min(1, "At least one edge endpoint is required")
     .refine((value) => {
         const entries = value
-            .split(/[\n\r,]+/)
+            .split(/[\n\r,]+/v)
             .map((entry) => entry.trim())
             .filter((entry) => entry.length > 0);
 
