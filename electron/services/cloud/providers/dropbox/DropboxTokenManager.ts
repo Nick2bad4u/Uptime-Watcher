@@ -1,3 +1,4 @@
+import { tryParseJsonRecord } from "@shared/utils/jsonSafety";
 import { Dropbox, DropboxAuth } from "dropbox";
 
 import type { SecretStore } from "../../secrets/SecretStore";
@@ -54,8 +55,16 @@ export class DropboxTokenManager {
             return undefined;
         }
 
-        const parsed: unknown = JSON.parse(raw);
-        return parseDropboxTokens(parsed);
+        const parsed = tryParseJsonRecord(raw);
+        if (!parsed) {
+            return undefined;
+        }
+
+        try {
+            return parseDropboxTokens(parsed);
+        } catch {
+            return undefined;
+        }
     }
 
     public async clearTokens(): Promise<void> {

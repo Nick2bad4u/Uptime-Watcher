@@ -13,7 +13,6 @@ import type { UptimeOrchestrator } from "../../../UptimeOrchestrator";
 import { logger } from "../../../utils/logger";
 import { registerStandardizedIpcHandler } from "../utils";
 import { SiteHandlerValidators } from "../validators";
-import { withIgnoredIpcEvent } from "./handlerShared";
 
 /**
  * Dependencies required to register site CRUD IPC handlers.
@@ -32,14 +31,14 @@ export function registerSiteHandlers({
 }: SiteHandlersDependencies): void {
     registerStandardizedIpcHandler(
         SITES_CHANNELS.addSite,
-        withIgnoredIpcEvent((site) => uptimeOrchestrator.addSite(site)),
+        (site) => uptimeOrchestrator.addSite(site),
         SiteHandlerValidators.addSite,
         registeredHandlers
     );
 
     registerStandardizedIpcHandler(
         SITES_CHANNELS.deleteAllSites,
-        withIgnoredIpcEvent(async () => {
+        async () => {
             logger.info(
                 LOG_TEMPLATES.services.IPC_DELETE_ALL_SITES_HANDLER_CALLED
             );
@@ -54,22 +53,21 @@ export function registerSiteHandlers({
             );
 
             return deletedCount;
-        }),
+        },
         SiteHandlerValidators.deleteAllSites,
         registeredHandlers
     );
 
     registerStandardizedIpcHandler(
         SITES_CHANNELS.removeSite,
-        withIgnoredIpcEvent((siteIdentifier) =>
-            uptimeOrchestrator.removeSite(siteIdentifier)),
+        (siteIdentifier) => uptimeOrchestrator.removeSite(siteIdentifier),
         SiteHandlerValidators.removeSite,
         registeredHandlers
     );
 
     registerStandardizedIpcHandler(
         SITES_CHANNELS.getSites,
-        withIgnoredIpcEvent(async () => {
+        async () => {
             const sites = await uptimeOrchestrator.getSites();
             const snapshot = deriveSiteSnapshot(sites);
 
@@ -91,28 +89,24 @@ export function registerSiteHandlers({
                     }
                 );
             }
-
             return snapshot.sanitizedSites.map((site) => structuredClone(site));
-        }),
+        },
         SiteHandlerValidators.getSites,
         registeredHandlers
     );
 
     registerStandardizedIpcHandler(
         SITES_CHANNELS.updateSite,
-        withIgnoredIpcEvent((siteIdentifier, updates) =>
-            uptimeOrchestrator.updateSite(siteIdentifier, updates)),
+        (siteIdentifier, updates) =>
+            uptimeOrchestrator.updateSite(siteIdentifier, updates),
         SiteHandlerValidators.updateSite,
         registeredHandlers
     );
 
     registerStandardizedIpcHandler(
         SITES_CHANNELS.removeMonitor,
-        withIgnoredIpcEvent((siteIdentifier, monitorIdentifier) =>
-            uptimeOrchestrator.removeMonitor(
-                siteIdentifier,
-                monitorIdentifier
-            )),
+        (siteIdentifier, monitorIdentifier) =>
+            uptimeOrchestrator.removeMonitor(siteIdentifier, monitorIdentifier),
         SiteHandlerValidators.removeMonitor,
         registeredHandlers
     );

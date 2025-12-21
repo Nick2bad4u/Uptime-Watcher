@@ -19,7 +19,9 @@ import {
     type CloudEncryptionConfigPassphrase,
     type CloudEncryptionMode,
 } from "@shared/types/cloudEncryption";
+import { tryGetErrorCode } from "@shared/utils/errorCodes";
 import { ensureError } from "@shared/utils/errorHandling";
+import { hasAsciiControlCharacters } from "@shared/utils/stringSafety";
 import { safeStorage } from "electron";
 import { promises as fs } from "node:fs";
 import path from "node:path";
@@ -83,34 +85,11 @@ const SETTINGS_KEY_GOOGLE_DRIVE_TOKENS = "cloud.googleDrive.tokens" as const;
 const SETTINGS_KEY_GOOGLE_DRIVE_ACCOUNT_LABEL =
     "cloud.googleDrive.accountLabel" as const;
 
-function isENOENT(error: unknown): boolean {
-    return (
-        typeof error === "object" &&
-        error !== null &&
-        "code" in error &&
-        (error as { code?: unknown }).code === "ENOENT"
-    );
-}
-
-function hasAsciiControlCharacters(value: string): boolean {
-    for (const char of value) {
-        const codePoint = char.codePointAt(0);
-        if (
-            codePoint !== undefined &&
-            (codePoint < 0x20 || codePoint === 0x7f)
-        ) {
-            return true;
-        }
-    }
-
-    return false;
-}
-
 async function ignoreENOENT(fn: () => Promise<void>): Promise<void> {
     try {
         await fn();
     } catch (error) {
-        if (isENOENT(error)) {
+        if (tryGetErrorCode(error) === "ENOENT") {
             return;
         }
         throw ensureError(error);
@@ -164,7 +143,9 @@ function assertBackupObjectKey(rawKey: string): string {
     const key = normalizeCloudKey(rawKey);
 
     if (Buffer.byteLength(key, "utf8") > MAX_BACKUP_KEY_BYTES) {
-        throw new Error(`Backup key must not exceed ${MAX_BACKUP_KEY_BYTES} bytes`);
+        throw new Error(
+            `Backup key must not exceed ${MAX_BACKUP_KEY_BYTES} bytes`
+        );
     }
 
     if (!key.startsWith(BACKUP_KEY_PREFIX)) {
@@ -176,7 +157,9 @@ function assertBackupObjectKey(rawKey: string): string {
     }
 
     if (key.endsWith(".metadata.json")) {
-        throw new Error("Backup key must reference the backup object, not metadata");
+        throw new Error(
+            "Backup key must reference the backup object, not metadata"
+        );
     }
 
     if (hasAsciiControlCharacters(key)) {
@@ -343,8 +326,12 @@ export class CloudService {
             await this.settings.set(SETTINGS_KEY_ENCRYPTION_SALT, "");
 
             await this.secretStore.deleteSecret(SETTINGS_KEY_DROPBOX_TOKENS);
-            await this.secretStore.deleteSecret(SETTINGS_KEY_GOOGLE_DRIVE_TOKENS);
-            await this.secretStore.deleteSecret(SECRET_KEY_ENCRYPTION_DERIVED_KEY);
+            await this.secretStore.deleteSecret(
+                SETTINGS_KEY_GOOGLE_DRIVE_TOKENS
+            );
+            await this.secretStore.deleteSecret(
+                SECRET_KEY_ENCRYPTION_DERIVED_KEY
+            );
 
             logger.info("[CloudService] Disconnected cloud provider");
             return this.buildStatusSummary();
@@ -468,7 +455,8 @@ export class CloudService {
             };
 
             const nextManifest: CloudSyncManifest = {
-                ...(manifest ?? ProviderCloudSyncTransport.createEmptyManifest()),
+                ...(manifest ??
+                    ProviderCloudSyncTransport.createEmptyManifest()),
                 encryption: encryptionConfig,
             };
 
@@ -606,7 +594,9 @@ export class CloudService {
 
                 const baseDirectory = config.baseDirectory.trim();
                 if (baseDirectory.length === 0) {
-                    throw new Error("Filesystem base directory must not be empty");
+                    throw new Error(
+                        "Filesystem base directory must not be empty"
+                    );
                 }
 
                 if (baseDirectory.includes("\0")) {

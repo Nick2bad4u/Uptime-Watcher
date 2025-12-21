@@ -1,20 +1,16 @@
 import type { IpcInvokeChannel } from "@shared/types/ipc";
 
+import { getElectronErrorCodeSuffix } from "@electron/services/shell/openExternalUtils";
 import { SYSTEM_CHANNELS } from "@shared/types/preload";
-import { ensureError } from "@shared/utils/errorHandling";
 import { LOG_TEMPLATES } from "@shared/utils/logTemplates";
-import {
-    getSafeUrlForLogging,
-    validateExternalOpenUrlCandidate,
-} from "@shared/utils/urlSafety";
-import { clipboard, shell  } from "electron";
+import { validateExternalOpenUrlCandidate } from "@shared/utils/urlSafety";
+import { clipboard, shell } from "electron";
 
 import type { AutoUpdaterService } from "../../updater/AutoUpdaterService";
 
 import { logger } from "../../../utils/logger";
 import { registerStandardizedIpcHandler } from "../utils";
 import { SystemHandlerValidators } from "../validators";
-import { withIgnoredIpcEvent } from "./handlerShared";
 
 /**
  * Dependencies required to register system-level IPC handlers.
@@ -31,58 +27,52 @@ export function registerSystemHandlers({
     autoUpdaterService,
     registeredHandlers,
 }: SystemHandlersDependencies): void {
-
     registerStandardizedIpcHandler(
         SYSTEM_CHANNELS.openExternal,
-        withIgnoredIpcEvent(async (url) => {
+        async (url) => {
             const validation = validateExternalOpenUrlCandidate(url);
-            const urlForLog = getSafeUrlForLogging(
-                typeof url === "string" ? url.trim() : ""
-            );
 
             if ("reason" in validation) {
+                const { reason, safeUrlForLogging } = validation;
                 throw new TypeError(
-                    `Rejected unsafe openExternal URL: ${validation.safeUrlForLogging} (url ${validation.reason})`
+                    `Rejected unsafe openExternal URL: ${safeUrlForLogging} (reason ${reason})`
                 );
             }
 
+            const { normalizedUrl, safeUrlForLogging } = validation;
+
             try {
-                await shell.openExternal(validation.normalizedUrl);
+                await shell.openExternal(normalizedUrl);
             } catch (error: unknown) {
-                const resolved = ensureError(error);
-                const { code } = resolved as Error & { code?: unknown };
-                const codeSuffix =
-                    typeof code === "string" && code.length > 0
-                        ? ` (${code})`
-                        : "";
+                const codeSuffix = getElectronErrorCodeSuffix(error);
 
                 // Do not allow errors to echo the full URL (queries may include
                 // tokens); keep logs and renderer error messages redacted.
                 throw new Error(
-                    `Failed to open external URL: ${urlForLog}${codeSuffix}`,
+                    `Failed to open external URL: ${safeUrlForLogging}${codeSuffix}`,
                     { cause: error }
                 );
             }
             return true;
-        }),
+        },
         SystemHandlerValidators.openExternal,
         registeredHandlers
     );
 
     registerStandardizedIpcHandler(
         SYSTEM_CHANNELS.quitAndInstall,
-        withIgnoredIpcEvent(() => {
+        () => {
             logger.info(LOG_TEMPLATES.services.UPDATER_QUIT_INSTALL);
             autoUpdaterService.quitAndInstall();
             return true;
-        }),
+        },
         SystemHandlerValidators.quitAndInstall,
         registeredHandlers
     );
 
     registerStandardizedIpcHandler(
         SYSTEM_CHANNELS.writeClipboardText,
-        withIgnoredIpcEvent((text: string) => {
+        (text: string) => {
             try {
                 clipboard.writeText(text);
             } catch (error: unknown) {
@@ -92,7 +82,7 @@ export function registerSystemHandlers({
             }
 
             return true;
-        }),
+        },
         SystemHandlerValidators.writeClipboardText,
         registeredHandlers
     );

@@ -85,7 +85,7 @@ export function hasValidHost(
     return (
         isNonEmptyString(monitor.host) &&
         (isValidFQDN(monitor.host, { require_tld: false }) ||
-            // eslint-disable-next-line regexp/require-unicode-sets-regexp -- The `v` flag is not consistently supported across our Electron/TypeScript toolchain; `u` preserves the intended ASCII-only hostname character set.
+             
             /^[\w.-]+$/u.test(monitor.host))
     );
 }

@@ -126,7 +126,7 @@ export function isValidIdentifier(value: unknown): value is string {
     }
 
     // Allow alphanumeric characters, hyphens, and underscores
-    // eslint-disable-next-line regexp/require-unicode-sets-regexp -- The `v` flag is not consistently supported across our Electron/TypeScript toolchain; `u` is sufficient for this ASCII-only filter.
+     
     const cleanedValue = value.replaceAll(/[_-]/gu, "");
 
     // Must have at least one alphanumeric character remaining
@@ -218,7 +218,7 @@ export function isValidNumeric(
     // - "123.45" / "123." / ".5"
     // - "1e10" / "1E10" / "1.5e-10"
 
-    // eslint-disable-next-line security/detect-unsafe-regex, regexp/require-unicode-sets-regexp -- Linear-time numeric grammar; intentionally ASCII-only.
+    // eslint-disable-next-line security/detect-unsafe-regex -- Linear-time numeric grammar; intentionally ASCII-only.
     const numericPattern = /^[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:e[+-]?\d+)?$/iu;
 
     if (!numericPattern.test(value)) {
@@ -361,7 +361,7 @@ export function isValidUrl(
         return false;
     }
 
-    // eslint-disable-next-line regexp/require-unicode-sets-regexp -- The `v` flag is not consistently supported across our Electron/TypeScript toolchain; `u` is sufficient for this ASCII-only scheme check.
+     
     if (/^[a-z][\d+.a-z-]*:\/\/$/iu.test(value)) {
         return false;
     }

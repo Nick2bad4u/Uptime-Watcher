@@ -51,6 +51,15 @@ const HIGH_FREQUENCY_OPERATIONS = new Set<string>([
  */
 const MAX_IPC_URL_UTF_BYTES = 32_768;
 
+function validateIpcUrlStringGuards(
+    value: string,
+    paramName: string
+): null | string {
+    return /[\n\r]/u.test(value)
+        ? `${paramName} must not contain newlines`
+        : null;
+}
+
 /** Maximum bytes allowed for IPC error messages returned to the renderer. */
 const MAX_IPC_ERROR_MESSAGE_UTF_BYTES = 4096;
 
@@ -297,9 +306,9 @@ export const IpcValidators = {
                 return `${paramName} must not exceed ${MAX_IPC_URL_UTF_BYTES} bytes`;
             }
 
-            // eslint-disable-next-line regexp/require-unicode-sets-regexp -- The `v` flag is not consistently supported across our TypeScript/Electron toolchain; `u` is sufficient for this ASCII-only newline check.
-            if (/[\n\r]/u.test(value)) {
-                return `${paramName} must not contain newlines`;
+            const guardError = validateIpcUrlStringGuards(value, paramName);
+            if (guardError) {
+                return guardError;
             }
         }
 
@@ -374,9 +383,9 @@ export const IpcValidators = {
                 return `${paramName} must not exceed ${MAX_IPC_URL_UTF_BYTES} bytes`;
             }
 
-            // eslint-disable-next-line regexp/require-unicode-sets-regexp -- The `v` flag is not consistently supported across our TypeScript/Electron toolchain; `u` is sufficient for this ASCII-only newline check.
-            if (/[\n\r]/u.test(value)) {
-                return `${paramName} must not contain newlines`;
+            const guardError = validateIpcUrlStringGuards(value, paramName);
+            if (guardError) {
+                return guardError;
             }
         }
 
@@ -391,6 +400,26 @@ export const IpcValidators = {
         return null;
     },
 } as const;
+
+/**
+ * Converts an {@link ArrayBufferView} into a standalone {@link ArrayBuffer}
+ * containing exactly the view's bytes.
+ *
+ * @remarks
+ * Useful for IPC payloads when you want to send a plain ArrayBuffer to the
+ * renderer without leaking extra bytes from a larger underlying buffer.
+ */
+export function toClonedArrayBuffer(view: ArrayBufferView): ArrayBuffer {
+    const { buffer, byteLength, byteOffset } = view;
+
+    if (buffer instanceof ArrayBuffer) {
+        return buffer.slice(byteOffset, byteOffset + byteLength);
+    }
+
+    const out = new ArrayBuffer(byteLength);
+    new Uint8Array(out).set(new Uint8Array(buffer, byteOffset, byteLength));
+    return out;
+}
 
 /**
  * Creates a standardized error response.

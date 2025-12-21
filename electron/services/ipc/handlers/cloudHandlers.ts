@@ -7,7 +7,6 @@ import type { CloudService } from "../../cloud/CloudService";
 
 import { registerStandardizedIpcHandler } from "../utils";
 import { CloudHandlerValidators } from "../validators";
-import { withIgnoredIpcEvent } from "./handlerShared";
 
 /**
  * Dependencies required for registering cloud IPC handlers.
@@ -26,120 +25,116 @@ export function registerCloudHandlers({
 }: CloudHandlersDependencies): void {
     registerStandardizedIpcHandler(
         CLOUD_CHANNELS.clearEncryptionKey,
-        withIgnoredIpcEvent(() => cloudService.clearEncryptionKey()),
+        () => cloudService.clearEncryptionKey(),
         CloudHandlerValidators.clearEncryptionKey,
         registeredHandlers
     );
 
     registerStandardizedIpcHandler(
         CLOUD_CHANNELS.disconnect,
-        withIgnoredIpcEvent(() => cloudService.disconnect()),
+        () => cloudService.disconnect(),
         CloudHandlerValidators.disconnect,
         registeredHandlers
     );
 
     registerStandardizedIpcHandler(
         CLOUD_CHANNELS.enableSync,
-        withIgnoredIpcEvent(
-            // eslint-disable-next-line n/no-sync -- "Sync" is part of the feature name, not a Node.js sync API.
-            (config: CloudEnableSyncConfig) => cloudService.enableSync(config)
-        ),
+        // eslint-disable-next-line n/no-sync -- "Sync" is part of the feature name, not a Node.js sync API.
+        (config: CloudEnableSyncConfig) => cloudService.enableSync(config),
         CloudHandlerValidators.enableSync,
         registeredHandlers
     );
 
     registerStandardizedIpcHandler(
         CLOUD_CHANNELS.getStatus,
-        withIgnoredIpcEvent(() => cloudService.getStatus()),
+        () => cloudService.getStatus(),
         CloudHandlerValidators.getStatus,
         registeredHandlers
     );
 
     registerStandardizedIpcHandler(
         CLOUD_CHANNELS.configureFilesystemProvider,
-        withIgnoredIpcEvent((config) =>
-            cloudService.configureFilesystemProvider(config)),
+        (config) => cloudService.configureFilesystemProvider(config),
         CloudHandlerValidators.configureFilesystemProvider,
         registeredHandlers
     );
 
     registerStandardizedIpcHandler(
         CLOUD_CHANNELS.setEncryptionPassphrase,
-        withIgnoredIpcEvent((passphrase) =>
-            cloudService.setEncryptionPassphrase(passphrase)),
+        (passphrase) => cloudService.setEncryptionPassphrase(passphrase),
         CloudHandlerValidators.setEncryptionPassphrase,
         registeredHandlers
     );
 
     registerStandardizedIpcHandler(
         CLOUD_CHANNELS.connectDropbox,
-        withIgnoredIpcEvent(() => cloudService.connectDropbox()),
+        () => cloudService.connectDropbox(),
         CloudHandlerValidators.connectDropbox,
         registeredHandlers
     );
 
     registerStandardizedIpcHandler(
         CLOUD_CHANNELS.connectGoogleDrive,
-        withIgnoredIpcEvent(() => cloudService.connectGoogleDrive()),
+        () => cloudService.connectGoogleDrive(),
         CloudHandlerValidators.connectGoogleDrive,
         registeredHandlers
     );
 
     registerStandardizedIpcHandler(
         CLOUD_CHANNELS.listBackups,
-        withIgnoredIpcEvent(() => cloudService.listBackups()),
+        () => cloudService.listBackups(),
         CloudHandlerValidators.listBackups,
         registeredHandlers
     );
 
     registerStandardizedIpcHandler(
         CLOUD_CHANNELS.deleteBackup,
-        withIgnoredIpcEvent((key: string) => cloudService.deleteBackup(key)),
+        (key: string) => cloudService.deleteBackup(key),
         CloudHandlerValidators.deleteBackup,
         registeredHandlers
     );
 
     registerStandardizedIpcHandler(
         CLOUD_CHANNELS.migrateBackups,
-        withIgnoredIpcEvent((config) => cloudService.migrateBackups(config)),
+        (config) => cloudService.migrateBackups(config),
         CloudHandlerValidators.migrateBackups,
         registeredHandlers
     );
 
     registerStandardizedIpcHandler(
         CLOUD_CHANNELS.previewResetRemoteSyncState,
-        withIgnoredIpcEvent(() => cloudService.previewResetRemoteSyncState()),
+        () => cloudService.previewResetRemoteSyncState(),
         CloudHandlerValidators.previewResetRemoteSyncState,
         registeredHandlers
     );
 
     registerStandardizedIpcHandler(
         CLOUD_CHANNELS.resetRemoteSyncState,
-        withIgnoredIpcEvent(() => cloudService.resetRemoteSyncState()),
+        () => cloudService.resetRemoteSyncState(),
         CloudHandlerValidators.resetRemoteSyncState,
         registeredHandlers
     );
 
     registerStandardizedIpcHandler(
         CLOUD_CHANNELS.uploadLatestBackup,
-        withIgnoredIpcEvent(() => cloudService.uploadLatestBackup()),
+        () => cloudService.uploadLatestBackup(),
         CloudHandlerValidators.uploadLatestBackup,
         registeredHandlers
     );
 
     registerStandardizedIpcHandler(
         CLOUD_CHANNELS.restoreBackup,
-        withIgnoredIpcEvent((key) => cloudService.restoreBackup(key)),
+        (key) => cloudService.restoreBackup(key),
         CloudHandlerValidators.restoreBackup,
         registeredHandlers
     );
 
     registerStandardizedIpcHandler(
         CLOUD_CHANNELS.requestSyncNow,
-        withIgnoredIpcEvent(async (): Promise<undefined> => {
+        async (): Promise<undefined> => {
             await cloudService.requestSyncNow();
             return undefined;
-        }),
+        },
         CloudHandlerValidators.requestSyncNow,
         registeredHandlers
     );

@@ -23,6 +23,12 @@ import type {
 import type { CloudSyncTransport } from "./CloudSyncTransport.types";
 
 import { readNumberEnv } from "../../utils/environment";
+import { parseOpsObjectFileNameMetadata } from "./syncEngineKeyUtils";
+import {
+    getPersistedDeviceIdValidationError,
+    hasAsciiControlCharacters,
+    isAsciiDigits,
+} from "./syncEngineUtils";
 
 const MANIFEST_KEY = "manifest.json" as const;
 const OPS_PREFIX = "sync/devices" as const;
@@ -34,87 +40,10 @@ const DEFAULT_MAX_OPS_LINE_CHARS = 256_000;
 const DEFAULT_MAX_SNAPSHOT_BYTES = 25 * 1024 * 1024; // 25 MiB
 const DEFAULT_MAX_MANIFEST_BYTES = 256 * 1024; // 256 KiB
 
-const MAX_DEVICE_ID_BYTES = 256;
-
 /** Maximum byte budget accepted for provider object keys handled by sync. */
 const MAX_SYNC_KEY_BYTES = 2048;
 
 const OPS_FILE_SUFFIX = ".ndjson" as const;
-
-function isNonNegativeSafeInteger(candidate: number): boolean {
-    return Number.isSafeInteger(candidate) && candidate >= 0;
-}
-
-function isAsciiDigits(value: string): boolean {
-    if (value.length === 0) {
-        return false;
-    }
-
-    for (const char of value) {
-        const codePoint = char.codePointAt(0);
-        if (codePoint === undefined || codePoint < 48 || codePoint > 57) {
-            return false;
-        }
-    }
-
-    return true;
-}
-
-function parseOpsObjectFileName(fileName: string): null | Readonly<{
-    createdAt: number;
-    firstOpId: number;
-    lastOpId: number;
-}> {
-    if (!fileName.endsWith(OPS_FILE_SUFFIX)) {
-        return null;
-    }
-
-    const stem = fileName.slice(0, -OPS_FILE_SUFFIX.length);
-    const parts = stem.split("-");
-    if (parts.length !== 3) {
-        return null;
-    }
-
-    const [
-        createdAtRaw,
-        firstOpIdRaw,
-        lastOpIdRaw,
-    ] = parts;
-    if (
-        createdAtRaw === undefined ||
-        firstOpIdRaw === undefined ||
-        lastOpIdRaw === undefined
-    ) {
-        return null;
-    }
-
-    if (
-        !isAsciiDigits(createdAtRaw) ||
-        !isAsciiDigits(firstOpIdRaw) ||
-        !isAsciiDigits(lastOpIdRaw)
-    ) {
-        return null;
-    }
-
-    const createdAt = Number(createdAtRaw);
-    const firstOpId = Number(firstOpIdRaw);
-    const lastOpId = Number(lastOpIdRaw);
-
-    if (
-        !isNonNegativeSafeInteger(createdAt) ||
-        !isNonNegativeSafeInteger(firstOpId) ||
-        !isNonNegativeSafeInteger(lastOpId) ||
-        lastOpId < firstOpId
-    ) {
-        return null;
-    }
-
-    return {
-        createdAt,
-        firstOpId,
-        lastOpId,
-    };
-}
 
 function getMaxOpsObjectBytes(): number {
     return readNumberEnv(
@@ -191,59 +120,16 @@ function toNdjson(operations: readonly CloudSyncOperation[]): string {
     return `${operations.map((op) => JSON.stringify(op)).join("\n")}\n`;
 }
 
-function hasAsciiControlCharacters(value: string): boolean {
-    for (const char of value) {
-        const codePoint = char.codePointAt(0);
-        if (
-            codePoint !== undefined &&
-            (codePoint < 0x20 || codePoint === 0x7f)
-        ) {
-            return true;
-        }
-    }
-
-    return false;
-}
-
 function assertValidDeviceId(deviceId: string): void {
+    // Keep the historical TypeError for non-string values (even though call
+    // sites are typed as string).
     if (typeof deviceId !== "string") {
         throw new TypeError("deviceId must be a non-empty string");
     }
 
-    const trimmed = deviceId.trim();
-    if (trimmed.length === 0) {
-        throw new Error("deviceId must be a non-empty string");
-    }
-
-    if (trimmed !== deviceId) {
-        throw new Error(
-            "deviceId must not contain leading or trailing whitespace"
-        );
-    }
-
-    if (Buffer.byteLength(deviceId, "utf8") > MAX_DEVICE_ID_BYTES) {
-        throw new Error(
-            `deviceId must not exceed ${MAX_DEVICE_ID_BYTES} bytes`
-        );
-    }
-
-    if (hasAsciiControlCharacters(deviceId)) {
-        throw new Error("deviceId must not contain control characters");
-    }
-
-    // Device IDs must be a single key segment.
-    if (deviceId.includes("/") || deviceId.includes("\\")) {
-        throw new Error("deviceId must not contain path separators");
-    }
-
-    // Device IDs are used in provider object keys; reject colon tokens to avoid
-    // ambiguity across providers and to match other key policies.
-    if (deviceId.includes(":")) {
-        throw new Error("deviceId must not contain ':'");
-    }
-
-    if (deviceId === "." || deviceId === "..") {
-        throw new Error("deviceId must not be a traversal segment");
+    const error = getPersistedDeviceIdValidationError(deviceId);
+    if (error !== null) {
+        throw new Error(error);
     }
 }
 
@@ -334,7 +220,7 @@ function assertOpsObjectKey(key: string): void {
 
     assertValidDeviceId(deviceIdSegment);
 
-    const parsedFileName = parseOpsObjectFileName(fileName);
+    const parsedFileName = parseOpsObjectFileNameMetadata(fileName);
     if (!parsedFileName) {
         throw new Error(
             `Invalid sync operations object key (expected <createdAt>-<firstOpId>-<lastOpId>${OPS_FILE_SUFFIX}): ${key}`
@@ -392,7 +278,7 @@ function parseNdjsonOperations(args: {
     raw: string;
 }): CloudSyncOperation[] {
     const { key, maxLineChars, maxLines, raw } = args;
-    const lines = raw.split(/\r?\n/v);
+    const lines = raw.split(/\r?\n/u);
     const operations: CloudSyncOperation[] = [];
 
     for (const [index, candidate] of lines.entries()) {

@@ -16,6 +16,7 @@ import {
     buildErrorLogArguments,
     buildLogArguments,
 } from "@shared/utils/logger/common";
+import { isObject } from "@shared/utils/typeGuards";
 import { ipcRenderer } from "electron";
 import log from "electron-log/renderer";
 
@@ -62,9 +63,6 @@ const formatFunctionPlaceholder = (name: string): string =>
     `[Function ${name.length > 0 ? name : "anonymous"}]`;
 
 const formatBigintPlaceholder = (value: bigint): string => value.toString();
-
-const isPlainObject = (value: unknown): boolean =>
-    typeof value === "object" && value !== null;
 
 const truncate = (value: string, limit: number): string =>
     value.length > limit ? `${value.slice(0, limit)}…` : value;
@@ -147,7 +145,7 @@ export const buildPayloadPreview = (
         return "null";
     }
 
-    if (Array.isArray(payload) || isPlainObject(payload)) {
+    if (Array.isArray(payload) || isObject(payload)) {
         const serialized = safeStringify(payload);
         if (serialized === undefined) {
             return undefined;

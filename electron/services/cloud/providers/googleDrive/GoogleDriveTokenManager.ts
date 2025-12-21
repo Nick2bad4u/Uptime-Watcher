@@ -1,3 +1,4 @@
+import { tryParseJsonRecord } from "@shared/utils/jsonSafety";
 import axios from "axios";
 import * as z from "zod";
 
@@ -54,8 +55,12 @@ export class GoogleDriveTokenManager {
             return undefined;
         }
 
+        const parsed = tryParseJsonRecord(raw);
+        if (!parsed) {
+            return undefined;
+        }
+
         try {
-            const parsed = JSON.parse(raw) as unknown;
             return googleTokenSchema.parse(parsed);
         } catch {
             return undefined;

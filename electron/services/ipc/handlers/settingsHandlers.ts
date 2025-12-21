@@ -6,7 +6,6 @@ import type { UptimeOrchestrator } from "../../../UptimeOrchestrator";
 
 import { registerStandardizedIpcHandler } from "../utils";
 import { SettingsHandlerValidators } from "../validators";
-import { withIgnoredIpcEvent } from "./handlerShared";
 
 /**
  * Dependencies required to register settings IPC handlers.
@@ -25,27 +24,27 @@ export function registerSettingsHandlers({
 }: SettingsHandlersDependencies): void {
     registerStandardizedIpcHandler(
         SETTINGS_CHANNELS.updateHistoryLimit,
-        withIgnoredIpcEvent(async (historyLimit) => {
+        async (historyLimit) => {
             await uptimeOrchestrator.setHistoryLimit(historyLimit);
             return uptimeOrchestrator.getHistoryLimit();
-        }),
+        },
         SettingsHandlerValidators.updateHistoryLimit,
         registeredHandlers
     );
 
     registerStandardizedIpcHandler(
         SETTINGS_CHANNELS.getHistoryLimit,
-        withIgnoredIpcEvent(() => uptimeOrchestrator.getHistoryLimit()),
+        () => uptimeOrchestrator.getHistoryLimit(),
         SettingsHandlerValidators.getHistoryLimit,
         registeredHandlers
     );
 
     registerStandardizedIpcHandler(
         SETTINGS_CHANNELS.resetSettings,
-        withIgnoredIpcEvent(async (): Promise<undefined> => {
+        async (): Promise<undefined> => {
             await uptimeOrchestrator.resetSettings();
             return undefined;
-        }),
+        },
         SettingsHandlerValidators.resetSettings,
         registeredHandlers
     );

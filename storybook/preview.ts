@@ -244,9 +244,9 @@ const preview: Preview = {
         },
         controls: {
             matchers: {
-                // eslint-disable-next-line regexp/require-unicode-sets-regexp -- The `v` flag is not consistently supported across our Electron/TypeScript toolchain; `u` is sufficient for these ASCII-only matcher patterns.
+                 
                 color: /(?<property>background|color)$/iu,
-                // eslint-disable-next-line regexp/require-unicode-sets-regexp -- The `v` flag is not consistently supported across our Electron/TypeScript toolchain; `u` is sufficient for these ASCII-only matcher patterns.
+                 
                 date: /(?<date>date)$/iu,
             },
         },

@@ -10,7 +10,6 @@ import type { NotificationService } from "../../notifications/NotificationServic
 
 import { registerStandardizedIpcHandler } from "../utils";
 import { NotificationHandlerValidators } from "../validators";
-import { withIgnoredIpcEvent } from "./handlerShared";
 
 interface NormalizedNotificationPreferences {
     readonly enabled: boolean;
@@ -47,22 +46,22 @@ export function registerNotificationHandlers({
 }: NotificationHandlersDependencies): void {
     registerStandardizedIpcHandler(
         NOTIFICATION_CHANNELS.notifyAppEvent,
-        withIgnoredIpcEvent((payload): undefined => {
+           (payload): undefined => {
             const request = parseAppNotificationRequest(payload);
             notificationService.notifyAppEvent(request);
             return undefined;
-        }),
+           },
         NotificationHandlerValidators.notifyAppEvent,
         registeredHandlers
     );
 
     registerStandardizedIpcHandler(
         NOTIFICATION_CHANNELS.updatePreferences,
-        withIgnoredIpcEvent((payload): undefined => {
+           (payload): undefined => {
             const preferences = normalizeNotificationPreferenceUpdate(payload);
             notificationService.updateConfig(preferences);
             return undefined;
-        }),
+           },
         NotificationHandlerValidators.updatePreferences,
         registeredHandlers
     );

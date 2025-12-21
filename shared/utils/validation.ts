@@ -459,7 +459,7 @@ function validateCdnEdgeConsistencyMonitorFields(
     }
 
     const entries = monitor.edgeLocations
-        .split(/\r?\n|,/)
+        .split(/\r?\n|,/u)
         .map((entry) => entry.trim())
         .filter((entry) => entry.length > 0);
 

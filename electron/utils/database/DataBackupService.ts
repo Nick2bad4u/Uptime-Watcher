@@ -29,7 +29,7 @@ const RESTORE_TEMP_PREFIX = "uptime-watcher-restore-";
 const ROLLBACK_TEMP_PREFIX = "uptime-watcher-rollback-";
 
 const UNSAFE_FILENAME_PATTERN =
-    // eslint-disable-next-line regexp/require-unicode-sets-regexp -- Node 20's `v` flag is not yet universally supported across all runtime targets we ship.
+     
     /[^\p{L}\p{N}._-]/gu;
 
 const createSanitizedFileName = (fileName: string): string =>

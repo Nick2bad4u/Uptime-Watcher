@@ -1,8 +1,6 @@
+import { getElectronErrorCodeSuffix } from "@electron/services/shell/openExternalUtils";
+import { tryGetErrorCode } from "@shared/utils/errorCodes";
 import { ensureError } from "@shared/utils/errorHandling";
-import {
-    getSafeUrlForLogging,
-    isAllowedExternalOpenUrl,
-} from "@shared/utils/urlSafety";
 import { DropboxAuth } from "dropbox";
 import { shell } from "electron";
 import crypto from "node:crypto";
@@ -10,6 +8,8 @@ import http from "node:http";
 import * as z from "zod";
 
 import type { DropboxTokens } from "./DropboxTokens";
+
+import { validateOAuthAuthorizeUrl } from "../oauthAuthorizeUrl";
 
 /* eslint-disable @microsoft/sdl/no-insecure-url -- OAuth loopback redirects require http://localhost; https would require local certificates. */
 
@@ -87,9 +87,7 @@ async function closeServerSafely(server: http.Server): Promise<void> {
                 resolve();
             });
         } catch (error: unknown) {
-            const resolved = ensureError(error);
-            const { code } = resolved as Error & { code?: unknown };
-            if (code === "ERR_SERVER_NOT_RUNNING") {
+            if (tryGetErrorCode(error) === "ERR_SERVER_NOT_RUNNING") {
                 resolve();
                 return;
             }
@@ -160,23 +158,11 @@ export class DropboxAuthFlow {
                 )
             );
 
-            const authorizeUrlForLog = getSafeUrlForLogging(authorizeUrl);
-            const parsedAuthorizeUrl = new URL(authorizeUrl);
-            if (
-                parsedAuthorizeUrl.protocol !== "https:" ||
-                parsedAuthorizeUrl.username.length > 0 ||
-                parsedAuthorizeUrl.password.length > 0
-            ) {
-                throw new Error(
-                    `Refusing to open unexpected Dropbox OAuth URL: ${authorizeUrlForLog}`
-                );
-            }
-
-            if (!isAllowedExternalOpenUrl(authorizeUrl)) {
-                throw new Error(
-                    `Refusing to open disallowed Dropbox OAuth URL: ${authorizeUrlForLog}`
-                );
-            }
+            const { normalizedUrl, urlForLog: authorizeUrlForLog } =
+                validateOAuthAuthorizeUrl({
+                    providerName: "Dropbox",
+                    url: authorizeUrl,
+                });
 
             const callbackPromise = this.waitForOAuthCallback({
                 servers,
@@ -184,14 +170,9 @@ export class DropboxAuthFlow {
             });
 
             try {
-                await shell.openExternal(authorizeUrl);
+                await shell.openExternal(normalizedUrl);
             } catch (error: unknown) {
-                const resolved = ensureError(error);
-                const { code } = resolved as Error & { code?: unknown };
-                const codeSuffix =
-                    typeof code === "string" && code.length > 0
-                        ? ` (${code})`
-                        : "";
+                const codeSuffix = getElectronErrorCodeSuffix(error);
 
                 throw new Error(
                     `Failed to open Dropbox OAuth URL: ${authorizeUrlForLog}${codeSuffix}`,

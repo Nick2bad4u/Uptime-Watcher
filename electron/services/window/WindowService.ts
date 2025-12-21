@@ -36,13 +36,10 @@
 import type { Event, HandlerDetails } from "electron";
 
 import { getNodeEnv } from "@shared/utils/environment";
+import { tryGetErrorCode } from "@shared/utils/errorCodes";
 import { ensureError, withErrorHandling } from "@shared/utils/errorHandling";
 import { getErrorMessage } from "@shared/utils/errorUtils";
-import {
-    getSafeUrlForLogging,
-    isAllowedExternalOpenUrl,
-} from "@shared/utils/urlSafety";
-import { isValidUrl } from "@shared/validation/validatorUtils";
+import { validateExternalOpenUrlCandidate } from "@shared/utils/urlSafety";
 import { BrowserWindow, shell } from "electron";
 // eslint-disable-next-line unicorn/import-style -- Need namespace import for path operations
 import * as path from "node:path";
@@ -84,6 +81,9 @@ export class WindowService {
 
     /** Reference to the main application window (null if not created) */
     private mainWindow: BrowserWindow | null = null;
+
+    /** Tracks whether production security headers were attached. */
+    private hasAttachedProductionSecurityHeaders = false;
 
     private readonly handleWindowOpen = (
         details: HandlerDetails
@@ -163,135 +163,31 @@ export class WindowService {
         targetUrl: string,
         context: string
     ): Promise<void> {
-        const urlForLog = getSafeUrlForLogging(targetUrl);
+        const validation = validateExternalOpenUrlCandidate(targetUrl);
 
-        if (!isAllowedExternalOpenUrl(targetUrl)) {
-            logger.warn(
-                "[WindowService] Blocked external navigation to disallowed URL",
-                {
-                    context,
-                    url: urlForLog,
-                }
-            );
+        if ("reason" in validation) {
+            logger.warn("[WindowService] Blocked external navigation", {
+                context,
+                reason: validation.reason,
+                url: validation.safeUrlForLogging,
+            });
             return;
         }
 
         try {
-            const parsed = new URL(targetUrl);
-            const { password, pathname, protocol, username } = parsed;
-            const isHttp = protocol === "http:" || protocol === "https:";
-            const isMailTo = protocol === "mailto:";
-
-            if (username.length > 0 || password.length > 0) {
-                logger.warn(
-                    "[WindowService] Blocked credential-bearing external navigation",
-                    {
-                        context,
-                        protocol,
-                        url: urlForLog,
-                    }
-                );
-                return;
-            }
-
-            if (!isHttp && !isMailTo) {
-                logger.warn(
-                    "[WindowService] Blocked external navigation to non-http(s)/mailto URL",
-                    {
-                        context,
-                        protocol,
-                        url: urlForLog,
-                    }
-                );
-                return;
-            }
-
-            if (isMailTo) {
-                const mailTarget = pathname.trim();
-                if (mailTarget.length === 0 || /[\n\r]/v.test(mailTarget)) {
-                    logger.warn(
-                        "[WindowService] Blocked invalid mailto external navigation",
-                        {
-                            context,
-                            protocol,
-                            url: urlForLog,
-                        }
-                    );
-                    return;
-                }
-
-                try {
-                    await shell.openExternal(targetUrl);
-                } catch (error: unknown) {
-                    const resolved = ensureError(error);
-                    const { code } = resolved as Error & { code?: unknown };
-
-                    logger.warn(
-                        "[WindowService] Failed to open mailto external navigation",
-                        {
-                            context,
-                            errorName: resolved.name,
-                            protocol,
-                            url: urlForLog,
-                            ...(typeof code === "string" && code.length > 0
-                                ? { errorCode: code }
-                                : {}),
-                        }
-                    );
-                }
-                return;
-            }
-
-            if (
-                !isValidUrl(targetUrl, {
-                    disallowAuth: true,
-                })
-            ) {
-                logger.warn(
-                    "[WindowService] Blocked invalid http(s) external navigation",
-                    {
-                        context,
-                        protocol,
-                        url: urlForLog,
-                    }
-                );
-                return;
-            }
-
-            try {
-                await shell.openExternal(targetUrl);
-            } catch (error: unknown) {
-                const resolved = ensureError(error);
-                const { code } = resolved as Error & { code?: unknown };
-
-                logger.warn(
-                    "[WindowService] Failed to open http(s) external navigation",
-                    {
-                        context,
-                        errorName: resolved.name,
-                        protocol,
-                        url: urlForLog,
-                        ...(typeof code === "string" && code.length > 0
-                            ? { errorCode: code }
-                            : {}),
-                    }
-                );
-            }
+            await shell.openExternal(validation.normalizedUrl);
         } catch (error: unknown) {
             const resolved = ensureError(error);
-            const { code } = resolved as Error & { code?: unknown };
+            const code = tryGetErrorCode(error);
 
-            logger.warn(
-                "[WindowService] Blocked external navigation due to invalid URL",
-                {
-                    context,
-                    errorName: resolved.name,
-                    url: urlForLog,
-                    ...(typeof code === "string" && code.length > 0
-                        ? { errorCode: code }
-                        : {}),
-                }
-            );
+            logger.warn("[WindowService] Failed to open external navigation", {
+                context,
+                errorName: resolved.name,
+                url: validation.safeUrlForLogging,
+                ...(typeof code === "string" && code.length > 0
+                    ? { errorCode: code }
+                    : {}),
+            });
         }
     }
 
@@ -593,14 +489,12 @@ export class WindowService {
             const { session } = this.mainWindow.webContents;
 
             session.setPermissionCheckHandler(() => false);
-            session.setPermissionRequestHandler((
-                _webContents,
-                _permission,
-                callback
-            ) => {
-                const denyPermission = false;
-                callback(denyPermission);
-            });
+            session.setPermissionRequestHandler(
+                (_webContents, _permission, callback) => {
+                    const denyPermission = false;
+                    callback(denyPermission);
+                }
+            );
 
             // Extra hardening (Electron APIs differ slightly across versions).
             if (typeof session.setDevicePermissionHandler === "function") {
@@ -623,7 +517,7 @@ export class WindowService {
         // Enhance security headers for all responses loaded in the window
         // Only apply security headers in production to avoid DevTools conflicts
         const isProduction = !isDev();
-        if (isProduction) {
+        if (isProduction && !this.hasAttachedProductionSecurityHeaders) {
             // A production-only CSP header provides a much stronger baseline
             // than relying on a static HTML meta tag (which must often remain
             // relaxed for Vite dev mode/HMR).
@@ -667,6 +561,8 @@ export class WindowService {
                         responseHeaders: headers,
                     });
                 });
+
+                this.hasAttachedProductionSecurityHeaders = true;
             } catch (error: unknown) {
                 logger.warn(
                     "[WindowService] Failed to attach security header middleware",

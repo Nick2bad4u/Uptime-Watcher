@@ -20,6 +20,7 @@ import type { ValidationResult } from "@shared/types/validation";
 import type { Jsonify, UnknownRecord } from "type-fest";
 
 import { MIN_MONITOR_CHECK_INTERVAL_MS } from "@shared/constants/monitoring";
+import { formatZodIssues } from "@shared/utils/zodIssueFormatting";
 import * as z from "zod";
 
 import {
@@ -373,7 +374,7 @@ const edgeLocationListSchema = z
     .min(1, "At least one edge endpoint is required")
     .refine((value) => {
         const entries = value
-            .split(/[\n\r,]+/v)
+            .split(/[\n\r,]+/u)
             .map((entry) => entry.trim())
             .filter((entry) => entry.length > 0);
 
@@ -1066,7 +1067,7 @@ export function validateMonitorField(
         };
     } catch (error) {
         if (error instanceof z.ZodError) {
-            const errors = error.issues.map((issue) => issue.message);
+            const errors = formatZodIssues(error.issues, { includePath: false });
 
             return {
                 errors,

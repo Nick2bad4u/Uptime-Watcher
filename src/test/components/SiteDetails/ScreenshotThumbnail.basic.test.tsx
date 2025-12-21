@@ -15,11 +15,6 @@ import {
     ScreenshotThumbnail,
     type ScreenshotThumbnailProperties,
 } from "../../../components/SiteDetails/ScreenshotThumbnail";
-import {
-    sampleOne,
-    siteNameArbitrary,
-    siteUrlArbitrary,
-} from "@shared/test/arbitraries/siteArbitraries";
 
 // Mock state for UI store
 let mockUIState = {
@@ -105,8 +100,10 @@ Object.defineProperty(window, "innerHeight", {
 const createThumbnailProps = (
     overrides: Partial<ScreenshotThumbnailProperties> = {}
 ): ScreenshotThumbnailProperties => ({
-    siteName: sampleOne(siteNameArbitrary),
-    url: sampleOne(siteUrlArbitrary),
+    // Keep these tests deterministic: using random arbitraries can generate
+    // private-network URLs which intentionally disable screenshots.
+    siteName: "Example Site",
+    url: "https://example.com",
     ...overrides,
 });
 

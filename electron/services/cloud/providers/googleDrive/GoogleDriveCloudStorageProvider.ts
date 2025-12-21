@@ -13,8 +13,9 @@ import type { GoogleDriveTokenManager } from "./GoogleDriveTokenManager";
 
 import {
     backupMetadataKeyForBackupKey,
-    parseCloudBackupMetadataFile,
+    parseCloudBackupMetadataFileBuffer,
     serializeCloudBackupMetadataFile,
+    tryParseCloudBackupMetadataFileBuffer,
 } from "../CloudBackupMetadataFile";
 
 const GOOGLE_FOLDER_MIME_TYPE = "application/vnd.google-apps.folder";
@@ -22,10 +23,13 @@ const APP_ROOT_FOLDER_NAME = "uptime-watcher";
 const BACKUPS_PREFIX = "backups/";
 
 function normalizeKey(key: string): string {
-    return key.replaceAll("\\", "/").replace(/^\/+/v, "");
+    return key.replaceAll("\\", "/").replace(/^\/+/u, "");
 }
 
-function createErrnoError(message: string, code: string): NodeJS.ErrnoException {
+function createErrnoError(
+    message: string,
+    code: string
+): NodeJS.ErrnoException {
     const error = new Error(message) as NodeJS.ErrnoException;
     error.code = code;
     return error;
@@ -103,8 +107,7 @@ export class GoogleDriveCloudStorageProvider implements CloudStorageProvider {
 
         const metadataKey = backupMetadataKeyForBackupKey(normalizedKey);
         const metadataBuffer = await this.downloadObject(metadataKey);
-        const parsed = JSON.parse(metadataBuffer.toString("utf8")) as unknown;
-        const entry = parseCloudBackupMetadataFile(parsed);
+        const entry = parseCloudBackupMetadataFileBuffer(metadataBuffer);
 
         return { buffer, entry };
     }
@@ -136,22 +139,25 @@ export class GoogleDriveCloudStorageProvider implements CloudStorageProvider {
 
         const backups = await Promise.all(
             metadataKeys.map(async (metadataKey) => {
-                const metadataFile = await this.findFileByKey(
-                    drive,
-                    metadataKey
-                );
-                if (!metadataFile) {
+                try {
+                    const metadataFile = await this.findFileByKey(
+                        drive,
+                        metadataKey
+                    );
+                    if (!metadataFile) {
+                        return null;
+                    }
+
+                    const response = await drive.files.get(
+                        { alt: "media", fileId: metadataFile.id },
+                        { responseType: "stream" }
+                    );
+
+                    const buffer = await convertStreamToBuffer(response.data);
+                    return tryParseCloudBackupMetadataFileBuffer(buffer);
+                } catch {
                     return null;
                 }
-
-                const response = await drive.files.get(
-                    { alt: "media", fileId: metadataFile.id },
-                    { responseType: "stream" }
-                );
-
-                const buffer = await convertStreamToBuffer(response.data);
-                const parsed = JSON.parse(buffer.toString("utf8")) as unknown;
-                return parseCloudBackupMetadataFile(parsed);
             })
         );
 

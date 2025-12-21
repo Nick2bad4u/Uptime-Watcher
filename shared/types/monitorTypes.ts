@@ -7,7 +7,8 @@
  */
 
 import type { MonitorFieldDefinition } from "@shared/types";
-import type { UnknownRecord } from "type-fest";
+
+import { isObject } from "@shared/utils/typeGuards";
 
 /**
  * Shared representation of a monitor type configuration used by frontend and
@@ -168,18 +169,6 @@ const isAllowedFieldType = (
     typeof candidate === "string" && ALLOWED_FIELD_TYPES.has(candidate);
 
 /**
- * Determines whether a candidate is a plain object with string keys.
- *
- * @param candidate - Value to evaluate.
- *
- * @returns `true` when the candidate is a non-null object without an array tag.
- */
-const isPlainObject = (candidate: unknown): candidate is UnknownRecord =>
-    typeof candidate === "object" &&
-    candidate !== null &&
-    !Array.isArray(candidate);
-
-/**
  * Checks whether a value is an optional string.
  *
  * @param value - Value to check.
@@ -229,7 +218,7 @@ const isNonEmptyString = (value: unknown): value is string =>
 const isValidMonitorFieldOption = (
     value: unknown
 ): value is { label: string; value: string } => {
-    if (!isPlainObject(value)) {
+    if (!isObject(value)) {
         return false;
     }
 
@@ -273,7 +262,7 @@ const isValidDetailFormats = (
         return true;
     }
 
-    if (!isPlainObject(candidate)) {
+    if (!isObject(candidate)) {
         return false;
     }
 
@@ -296,7 +285,7 @@ const isValidDisplayConfig = (
         return true;
     }
 
-    if (!isPlainObject(candidate)) {
+    if (!isObject(candidate)) {
         return false;
     }
 
@@ -319,7 +308,7 @@ const isValidHelpTexts = (
         return true;
     }
 
-    if (!isPlainObject(candidate)) {
+    if (!isObject(candidate)) {
         return false;
     }
 
@@ -342,7 +331,7 @@ const isValidMonitorTypeUiConfig = (
         return true;
     }
 
-    if (!isPlainObject(candidate)) {
+    if (!isObject(candidate)) {
         return false;
     }
 
@@ -378,7 +367,7 @@ const isValidMonitorTypeUiConfig = (
 export function isMonitorFieldDefinition(
     candidate: unknown
 ): candidate is MonitorFieldDefinition {
-    if (!isPlainObject(candidate)) {
+    if (!isObject(candidate)) {
         return false;
     }
 
@@ -437,7 +426,7 @@ export function isMonitorFieldDefinition(
 export function isMonitorTypeConfig(
     candidate: unknown
 ): candidate is MonitorTypeConfig {
-    if (!isPlainObject(candidate)) {
+    if (!isObject(candidate)) {
         return false;
     }
 

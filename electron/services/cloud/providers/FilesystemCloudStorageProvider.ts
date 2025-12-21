@@ -3,7 +3,9 @@
 import type { CloudBackupEntry } from "@shared/types/cloud";
 import type { SerializedDatabaseBackupMetadata } from "@shared/types/databaseBackup";
 
+import { tryGetErrorCode } from "@shared/utils/errorCodes";
 import { ensureError } from "@shared/utils/errorHandling";
+import { hasAsciiControlCharacters } from "@shared/utils/stringSafety";
 import crypto from "node:crypto";
 import fs from "node:fs/promises";
 import path from "node:path";
@@ -14,16 +16,13 @@ import type {
 } from "./CloudStorageProvider.types";
 
 import {
-    parseCloudBackupMetadataFile,
+    parseCloudBackupMetadataFileBuffer,
     serializeCloudBackupMetadataFile,
+    tryParseCloudBackupMetadataFileBuffer,
 } from "./CloudBackupMetadataFile";
 
 const APP_ROOT_DIRECTORY_NAME = "uptime-watcher" as const;
 const BACKUPS_PREFIX = "backups/" as const;
-
-function isUnknownRecord(value: unknown): value is Record<string, unknown> {
-    return typeof value === "object" && value !== null;
-}
 
 function assertSubpath(root: string, candidate: string): void {
     const normalizedRoot = path.resolve(root);
@@ -43,20 +42,6 @@ function assertSubpath(root: string, candidate: string): void {
     ) {
         throw new Error("Invalid key path (path traversal)");
     }
-}
-
-function hasAsciiControlCharacters(value: string): boolean {
-    for (const char of value) {
-        const codePoint = char.codePointAt(0);
-        if (
-            codePoint !== undefined &&
-            (codePoint < 0x20 || codePoint === 0x7f)
-        ) {
-            return true;
-        }
-    }
-
-    return false;
 }
 
 function toPosixKey(root: string, absolutePath: string): string {
@@ -115,7 +100,9 @@ export class FilesystemCloudStorageProvider implements CloudStorageProvider {
         }
 
         if (hasAsciiControlCharacters(key)) {
-            throw new Error("Invalid key path (control characters are not allowed)");
+            throw new Error(
+                "Invalid key path (control characters are not allowed)"
+            );
         }
 
         // Defensive checks:
@@ -140,9 +127,7 @@ export class FilesystemCloudStorageProvider implements CloudStorageProvider {
         if (
             segments.some(
                 (segment) =>
-                    segment.length === 0 ||
-                    segment === "." ||
-                    segment === ".."
+                    segment.length === 0 || segment === "." || segment === ".."
             )
         ) {
             throw new Error("Invalid key path (path traversal)");
@@ -189,7 +174,9 @@ export class FilesystemCloudStorageProvider implements CloudStorageProvider {
         }
     }
 
-    private async ensureSafeDirectory(absoluteDirectory: string): Promise<void> {
+    private async ensureSafeDirectory(
+        absoluteDirectory: string
+    ): Promise<void> {
         const root = await this.getAppRootRealPath();
         const resolved = path.resolve(absoluteDirectory);
         assertSubpath(root, resolved);
@@ -220,9 +207,7 @@ export class FilesystemCloudStorageProvider implements CloudStorageProvider {
             } else {
                 // eslint-disable-next-line no-await-in-loop -- mkdir must be sequential with the lstat above
                 await fs.mkdir(cursor).catch((error: unknown) => {
-                    const code = isUnknownRecord(error)
-                        ? error["code"]
-                        : undefined;
+                    const code = tryGetErrorCode(error);
 
                     if (code === "EEXIST") {
                         return;
@@ -248,9 +233,8 @@ export class FilesystemCloudStorageProvider implements CloudStorageProvider {
 
     public async listObjects(prefix: string): Promise<CloudObjectEntry[]> {
         const root = await this.getAppRootRealPath();
-        const normalizedPrefix = FilesystemCloudStorageProvider.normalizeKey(
-            prefix
-        );
+        const normalizedPrefix =
+            FilesystemCloudStorageProvider.normalizeKey(prefix);
         const results: CloudObjectEntry[] = [];
 
         const walk = async (directory: string): Promise<void> => {
@@ -341,7 +325,9 @@ export class FilesystemCloudStorageProvider implements CloudStorageProvider {
         // Refuse to overwrite/replace symlinks.
         const targetStat = await fs.lstat(targetPath).catch(() => null);
         if (targetStat?.isSymbolicLink()) {
-            throw new Error(`Refusing to write cloud object via symlink: ${key}`);
+            throw new Error(
+                `Refusing to write cloud object via symlink: ${key}`
+            );
         }
 
         const tempPath = `${targetPath}.tmp-${crypto.randomUUID()}`;
@@ -353,9 +339,7 @@ export class FilesystemCloudStorageProvider implements CloudStorageProvider {
             try {
                 await fs.rename(tempPath, targetPath);
             } catch (error) {
-                const code = isUnknownRecord(error)
-                    ? (error as { code?: unknown }).code
-                    : undefined;
+                const code = tryGetErrorCode(error);
 
                 if (code === "ENOENT") {
                     await this.ensureSafeDirectory(path.dirname(targetPath));
@@ -416,7 +400,9 @@ export class FilesystemCloudStorageProvider implements CloudStorageProvider {
         }
 
         if (stat.isSymbolicLink()) {
-            throw new Error(`Refusing to delete cloud object via symlink: ${key}`);
+            throw new Error(
+                `Refusing to delete cloud object via symlink: ${key}`
+            );
         }
 
         if (!stat.isFile()) {
@@ -458,14 +444,14 @@ export class FilesystemCloudStorageProvider implements CloudStorageProvider {
     public async listBackups(): Promise<CloudBackupEntry[]> {
         const objects = await this.listObjects(BACKUPS_PREFIX);
         const metadataObjects = objects.filter((object) =>
-            object.key.endsWith(".metadata.json"));
+            object.key.endsWith(".metadata.json")
+        );
 
         const backupCandidates = await Promise.all(
             metadataObjects.map(async (object) => {
                 try {
                     const raw = await this.downloadObject(object.key);
-                    const parsed: unknown = JSON.parse(raw.toString("utf8"));
-                    return parseCloudBackupMetadataFile(parsed);
+                    return tryParseCloudBackupMetadataFileBuffer(raw);
                 } catch {
                     return null;
                 }
@@ -486,11 +472,10 @@ export class FilesystemCloudStorageProvider implements CloudStorageProvider {
         const buffer = await this.downloadObject(key);
         const metadataKey = backupMetadataKeyForBackupKey(key);
         const raw = await this.downloadObject(metadataKey);
-        const parsed: unknown = JSON.parse(raw.toString("utf8"));
 
         return {
             buffer,
-            entry: parseCloudBackupMetadataFile(parsed),
+            entry: parseCloudBackupMetadataFileBuffer(raw),
         };
     }
 

@@ -359,10 +359,10 @@ export async function checkConnectivity(
 ): Promise<MonitorCheckResult> {
     const opts = { ...DEFAULT_OPTIONS, ...options };
     const startTime = performance.now();
-    // eslint-disable-next-line regexp/require-unicode-sets-regexp -- The `v` flag is not consistently supported across our Electron/TypeScript toolchain; `u` is sufficient for this ASCII-only protocol prefix.
+     
     const cleanHost = host.replace(/^https?:\/\//iu, "");
 
-    // eslint-disable-next-line regexp/require-unicode-sets-regexp -- The `v` flag is not consistently supported across our Electron/TypeScript toolchain; `u` is sufficient for this ASCII-only protocol prefix.
+     
     if (/^https?:\/\//iu.test(host)) {
         return checkHttpConnectivity(host, opts.timeout);
     }

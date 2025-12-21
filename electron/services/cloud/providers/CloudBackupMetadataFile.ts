@@ -1,14 +1,13 @@
 import type { CloudBackupEntry } from "@shared/types/cloud";
 import type { SerializedDatabaseBackupMetadata } from "@shared/types/databaseBackup";
 
-function isUnknownRecord(value: unknown): value is Record<string, unknown> {
-    return typeof value === "object" && value !== null;
-}
+import { tryParseJsonRecord } from "@shared/utils/jsonSafety";
+import { isObject } from "@shared/utils/typeGuards";
 
 function parseSerializedDatabaseBackupMetadata(
     candidate: unknown
 ): SerializedDatabaseBackupMetadata {
-    if (!isUnknownRecord(candidate)) {
+    if (!isObject(candidate)) {
         throw new TypeError("Backup metadata has invalid 'metadata'");
     }
 
@@ -69,7 +68,7 @@ function parseSerializedDatabaseBackupMetadata(
 export function parseCloudBackupMetadataFile(
     candidate: unknown
 ): CloudBackupEntry {
-    if (!isUnknownRecord(candidate)) {
+    if (!isObject(candidate)) {
         throw new TypeError("Backup metadata file is not an object");
     }
 
@@ -93,6 +92,42 @@ export function parseCloudBackupMetadataFile(
         key,
         metadata: parseSerializedDatabaseBackupMetadata(metadata),
     };
+}
+
+/**
+ * Parses a provider-stored backup metadata buffer.
+ *
+ * @remarks
+ * This is the strict variant used by `downloadBackup()` implementations. It
+ * preserves the existing semantics of throwing on invalid JSON.
+ */
+export function parseCloudBackupMetadataFileBuffer(
+    buffer: Buffer
+): CloudBackupEntry {
+    const parsed: unknown = JSON.parse(buffer.toString("utf8"));
+    return parseCloudBackupMetadataFile(parsed);
+}
+
+/**
+ * Best-effort parsing for provider-stored backup metadata buffers.
+ *
+ * @remarks
+ * Used by provider `listBackups()` implementations so a single corrupted
+ * metadata file doesn't prevent showing the rest of the backups.
+ */
+export function tryParseCloudBackupMetadataFileBuffer(
+    buffer: Buffer
+): CloudBackupEntry | null {
+    const parsed = tryParseJsonRecord(buffer.toString("utf8"));
+    if (!parsed) {
+        return null;
+    }
+
+    try {
+        return parseCloudBackupMetadataFile(parsed);
+    } catch {
+        return null;
+    }
 }
 
 /**

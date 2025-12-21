@@ -123,7 +123,7 @@ export function withFallback<T>(value: null | T | undefined, fallback: T): T {
     return value ?? fallback;
 }
 
-const URL_LIST_SEPARATOR = /\r?\n|,/v;
+const URL_LIST_SEPARATOR = /\r?\n|,/u;
 
 /**
  * Parses a monitor URL list from a comma and/or newline separated string into a

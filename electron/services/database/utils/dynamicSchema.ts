@@ -442,8 +442,8 @@ function toSnakeCase(str: string): string {
 
     // Handle leading uppercase to avoid leading underscore
     return str
-        .replace(/^[A-Z]/v, (match) => match.toLowerCase())
-        .replaceAll(/[A-Z]/gv, (letter) => `_${letter.toLowerCase()}`);
+        .replace(/^[A-Z]/u, (match) => match.toLowerCase())
+        .replaceAll(/[A-Z]/gu, (letter) => `_${letter.toLowerCase()}`);
 }
 
 /**

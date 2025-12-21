@@ -268,7 +268,6 @@ if (!process.env["RECHECK_JAR"]) {
             return undefined;
         }
     })();
-
     if (resolvedRecheckJarPath) {
         process.env["RECHECK_JAR"] = path.normalize(resolvedRecheckJarPath);
     }
@@ -2443,7 +2442,9 @@ export default /** @type {EslintConfig} */ [
             "regexp/prefer-regexp-test": "warn",
             "regexp/prefer-result-array-groups": "warn",
             "regexp/require-unicode-regexp": "warn",
-            "regexp/require-unicode-sets-regexp": "warn",
+            // Conflicts with our runtime safety policy (we forbid /v) and
+            // produces contradictory guidance alongside `uptime-watcher/no-regexp-v-flag`.
+            "regexp/require-unicode-sets-regexp": "off",
             "regexp/sort-alternatives": "warn",
             "regexp/sort-character-class-elements": "off",
             "regexp/unicode-escape": "warn",
@@ -4020,7 +4021,7 @@ export default /** @type {EslintConfig} */ [
             "regexp/prefer-result-array-groups": "warn",
             "regexp/prefer-star-quantifier": "warn",
             "regexp/require-unicode-regexp": "warn",
-            "regexp/require-unicode-sets-regexp": "warn",
+            "regexp/require-unicode-sets-regexp": "off",
             "regexp/sort-alternatives": "warn",
             "regexp/sort-character-class-elements": "off",
             "regexp/unicode-escape": "warn",
@@ -5417,7 +5418,7 @@ export default /** @type {EslintConfig} */ [
             "regexp/prefer-regexp-test": "warn",
             "regexp/prefer-result-array-groups": "warn",
             "regexp/require-unicode-regexp": "warn",
-            "regexp/require-unicode-sets-regexp": "warn",
+            "regexp/require-unicode-sets-regexp": "off",
             "regexp/sort-alternatives": "warn",
             "regexp/sort-character-class-elements": "off",
             "regexp/unicode-escape": "warn",
@@ -7024,7 +7025,7 @@ export default /** @type {EslintConfig} */ [
             "regexp/prefer-result-array-groups": "warn",
             "regexp/prefer-star-quantifier": "warn",
             "regexp/require-unicode-regexp": "warn",
-            "regexp/require-unicode-sets-regexp": "warn",
+            "regexp/require-unicode-sets-regexp": "off",
             "regexp/sort-alternatives": "warn",
             "regexp/sort-character-class-elements": "off",
             "regexp/unicode-escape": "warn",
@@ -8625,7 +8626,7 @@ export default /** @type {EslintConfig} */ [
             "regexp/prefer-regexp-test": "warn",
             "regexp/prefer-result-array-groups": "warn",
             "regexp/require-unicode-regexp": "warn",
-            "regexp/require-unicode-sets-regexp": "warn",
+            "regexp/require-unicode-sets-regexp": "off",
             "regexp/sort-alternatives": "warn",
             "regexp/sort-character-class-elements": "off",
             "regexp/unicode-escape": "warn",
@@ -9535,6 +9536,151 @@ export default /** @type {EslintConfig} */ [
         name: "Vscode Files - Disables",
         rules: {
             "jsonc/array-bracket-newline": "off",
+        },
+    },
+    {
+        files: ["electron/services/sync/**/*.{ts,tsx}"],
+        ignores: ["electron/services/sync/syncEngineUtils.ts"],
+        name: "Cloud Sync Drift Guards",
+        rules: {
+            "uptime-watcher/no-local-identifiers": [
+                "error",
+                {
+                    banned: [
+                        {
+                            kinds: ["function"],
+                            message:
+                                "Use isAsciiDigits from electron/services/sync/syncEngineUtils.ts (avoid duplicated validation policies).",
+                            name: "isAsciiDigits",
+                        },
+                        {
+                            kinds: ["function"],
+                            message:
+                                "Use hasAsciiControlCharacters from shared/utils/stringSafety.ts (avoid duplicated validation policies).",
+                            name: "hasAsciiControlCharacters",
+                        },
+                    ],
+                },
+            ],
+        },
+    },
+    {
+        files: ["electron/services/cloud/providers/**/*.{ts,tsx}"],
+        name: "Cloud Providers Drift Guards",
+        rules: {
+            "uptime-watcher/no-call-identifiers": [
+                "error",
+                {
+                    banned: [
+                        {
+                            message:
+                                "Use validateOAuthAuthorizeUrl (OAuth flows) or validateExternalOpenUrlCandidate (general external navigation) instead of calling isAllowedExternalOpenUrl directly.",
+                            name: "isAllowedExternalOpenUrl",
+                        },
+                    ],
+                },
+            ],
+            "uptime-watcher/no-local-identifiers": [
+                "error",
+                {
+                    banned: [
+                        {
+                            kinds: ["function"],
+                            message:
+                                "Use tryParseJsonRecord from shared/utils/jsonSafety.ts instead of defining local JSON parsing helpers.",
+                            name: "tryParseJsonRecord",
+                        },
+                        {
+                            kinds: ["function"],
+                            message:
+                                "Use isObject from shared/utils/typeGuards.ts instead of defining local isPlainObject helpers.",
+                            name: "isPlainObject",
+                        },
+                    ],
+                },
+            ],
+        },
+    },
+    {
+        files: ["shared/types/**/*.{ts,tsx}"],
+        name: "Shared Types Drift Guards",
+        rules: {
+            "uptime-watcher/no-local-identifiers": [
+                "error",
+                {
+                    banned: [
+                        {
+                            kinds: ["variable"],
+                            message:
+                                "Use isObject from shared/utils/typeGuards.ts instead of defining local isPlainObject helpers.",
+                            name: "isPlainObject",
+                        },
+                    ],
+                },
+            ],
+        },
+    },
+    {
+        files: ["electron/preload/**/*.{ts,tsx}"],
+        name: "Preload Drift Guards",
+        rules: {
+            "uptime-watcher/no-local-identifiers": [
+                "error",
+                {
+                    banned: [
+                        {
+                            kinds: ["variable"],
+                            message:
+                                "Use isObject from shared/utils/typeGuards.ts instead of defining local isPlainObject helpers.",
+                            name: "isPlainObject",
+                        },
+                    ],
+                },
+            ],
+        },
+    },
+    {
+        files: ["electron/services/**/*.{ts,tsx}"],
+        ignores: ["electron/services/sync/syncEngineUtils.ts"],
+        name: "String Safety Drift Guards",
+        rules: {
+            "uptime-watcher/no-local-identifiers": [
+                "error",
+                {
+                    banned: [
+                        {
+                            kinds: ["function"],
+                            message:
+                                "Use hasAsciiControlCharacters from shared/utils/stringSafety.ts instead of defining local implementations.",
+                            name: "hasAsciiControlCharacters",
+                        },
+                    ],
+                },
+            ],
+        },
+    },
+    {
+        files: ["electron/services/**/*.{ts,tsx}"],
+        ignores: ["electron/services/shell/openExternalUtils.ts"],
+        name: "Electron Error Formatting Drift Guards",
+        rules: {
+            "no-restricted-syntax": [
+                "error",
+                {
+                    message:
+                        "Use getElectronErrorCodeSuffix from electron/services/shell/openExternalUtils.ts instead of ad-hoc error code suffix formatting.",
+                    selector:
+                        "ConditionalExpression:has(TemplateLiteral:has(Identifier[name='code']):has(TemplateElement[value.raw=' ('])):has(Literal[value=''])",
+                },
+            ],
+            "uptime-watcher/prefer-try-get-error-code": "error",
+        },
+    },
+    {
+        files: ["**/*.{ts,tsx}"],
+        name: "Regex Drift Guards",
+        rules: {
+            "uptime-watcher/no-regexp-v-flag": "error",
         },
     },
     // ═══════════════════════════════════════════════════════════════════════════════

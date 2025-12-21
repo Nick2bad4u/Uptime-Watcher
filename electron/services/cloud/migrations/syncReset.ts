@@ -1,6 +1,7 @@
 import type { CloudSyncResetResult } from "@shared/types/cloudSyncReset";
 
 import { ensureError } from "@shared/utils/errorHandling";
+import { hasAsciiControlCharacters } from "@shared/utils/stringSafety";
 
 import type { CloudSyncEngine } from "../../sync/SyncEngine";
 import type { CloudStorageProvider } from "../providers/CloudStorageProvider.types";
@@ -10,20 +11,6 @@ import { ProviderCloudSyncTransport } from "../../sync/ProviderCloudSyncTranspor
 interface DeletionFailure {
     key: string;
     message: string;
-}
-
-function hasAsciiControlCharacters(value: string): boolean {
-    for (const char of value) {
-        const codePoint = char.codePointAt(0);
-        if (
-            codePoint !== undefined &&
-            (codePoint < 0x20 || codePoint === 0x7f)
-        ) {
-            return true;
-        }
-    }
-
-    return false;
 }
 
 function isSafeSyncDeletionKey(key: string): boolean {

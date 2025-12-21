@@ -94,7 +94,7 @@ function toIpvOctets(
     }
 
     // Guard against cases like "1..1.1" where `Number("")` would become 0.
-    // eslint-disable-next-line regexp/require-unicode-sets-regexp -- The `v` flag is not consistently supported across our TypeScript/Electron toolchain; `u` is sufficient for this ASCII-only numeric check.
+     
     if (parts.some((part) => part.length === 0 || !/^\d{1,3}$/u.test(part))) {
         return null;
     }
@@ -187,7 +187,7 @@ export function isAllowedExternalOpenUrl(rawUrl: string): boolean {
         return false;
     }
 
-    // eslint-disable-next-line regexp/require-unicode-sets-regexp -- The `v` flag is not consistently supported across our TypeScript/Electron toolchain; `u` is sufficient for this ASCII-only CR/LF check.
+     
     if (/[\n\r]/u.test(rawUrl)) {
         return false;
     }
@@ -255,7 +255,7 @@ export function validateExternalOpenUrlCandidate(
         };
     }
 
-    // eslint-disable-next-line regexp/require-unicode-sets-regexp -- The `v` flag is not consistently supported across our TypeScript/Electron toolchain; `u` is sufficient for this ASCII-only newline check.
+     
     if (/[\n\r]/u.test(normalizedUrl)) {
         return {
             ok: false,
@@ -295,7 +295,7 @@ export function validateExternalOpenUrlCandidate(
 }
 
 function parseIpvSixHextet(value: string): null | number {
-    // eslint-disable-next-line regexp/require-unicode-sets-regexp -- The `v` flag is not consistently supported across our TypeScript/Electron toolchain; `u` is sufficient for this ASCII-only hex check.
+     
     if (!/^[\da-f]{1,4}$/iu.test(value)) {
         return null;
     }
@@ -366,7 +366,7 @@ function isPrivateIpv6(hostname: string): boolean {
     }
 
     // Link-local fe80::/10 (fe80..febf)
-    // eslint-disable-next-line regexp/require-unicode-sets-regexp -- The `v` flag is not consistently supported across our TypeScript/Electron toolchain; `u` is sufficient for this ASCII-only prefix check.
+     
     if (/^fe[89ab]/u.test(normalized)) {
         return true;
     }

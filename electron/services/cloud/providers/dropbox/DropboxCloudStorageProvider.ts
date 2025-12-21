@@ -3,6 +3,7 @@ import type { SerializedDatabaseBackupMetadata } from "@shared/types/databaseBac
 import type { DropboxResponse, files, users } from "dropbox";
 
 import { ensureError } from "@shared/utils/errorHandling";
+import { tryParseJsonRecord } from "@shared/utils/jsonSafety";
 import { Dropbox, DropboxResponseError } from "dropbox";
 
 import type {
@@ -13,8 +14,9 @@ import type { DropboxTokenManager } from "./DropboxTokenManager";
 
 import {
     backupMetadataKeyForBackupKey,
-    parseCloudBackupMetadataFile,
+    parseCloudBackupMetadataFileBuffer,
     serializeCloudBackupMetadataFile,
+    tryParseCloudBackupMetadataFileBuffer,
 } from "../CloudBackupMetadataFile";
 import { withDropboxRetry } from "./dropboxRetry";
 
@@ -53,10 +55,10 @@ function normalizeKey(key: string): string {
     let normalized = key.replaceAll("\\", "/").trim();
 
     // Drop leading slashes to prevent accidental double-slash paths.
-    normalized = normalized.replace(/^\/+/v, "");
+    normalized = normalized.replace(/^\/+/u, "");
 
     // Collapse duplicate separators.
-    normalized = normalized.replaceAll(/\/+/gv, "/");
+    normalized = normalized.replaceAll(/\/+/gu, "/");
 
     // Disallow traversal segments.
     if (normalized.split("/").includes("..")) {
@@ -111,12 +113,12 @@ function tryParseDropboxErrorSummary(data: unknown): string | undefined {
             return undefined;
         }
 
-        try {
-            const parsed: unknown = JSON.parse(trimmed);
-            return tryParseDropboxErrorSummary(parsed);
-        } catch {
+        const parsed = tryParseJsonRecord(trimmed);
+        if (!parsed) {
             return undefined;
         }
+
+        return tryParseDropboxErrorSummary(parsed);
     }
 
     // Axios returns ArrayBuffer for errors when responseType is "arraybuffer".
@@ -126,12 +128,12 @@ function tryParseDropboxErrorSummary(data: unknown): string | undefined {
             return undefined;
         }
 
-        try {
-            const parsed: unknown = JSON.parse(text);
-            return tryParseDropboxErrorSummary(parsed);
-        } catch {
+        const parsed = tryParseJsonRecord(text);
+        if (!parsed) {
             return undefined;
         }
+
+        return tryParseDropboxErrorSummary(parsed);
     }
 
     if (Buffer.isBuffer(data)) {
@@ -140,12 +142,12 @@ function tryParseDropboxErrorSummary(data: unknown): string | undefined {
             return undefined;
         }
 
-        try {
-            const parsed: unknown = JSON.parse(text);
-            return tryParseDropboxErrorSummary(parsed);
-        } catch {
+        const parsed = tryParseJsonRecord(text);
+        if (!parsed) {
             return undefined;
         }
+
+        return tryParseDropboxErrorSummary(parsed);
     }
 
     return undefined;
@@ -519,22 +521,23 @@ export class DropboxCloudStorageProvider implements CloudStorageProvider {
     public async listBackups(): Promise<CloudBackupEntry[]> {
         const objects = await this.listObjects(BACKUPS_PREFIX);
         const metadataObjects = objects.filter((object) =>
-            object.key.endsWith(".metadata.json"));
+            object.key.endsWith(".metadata.json")
+        );
 
-        const results = await Promise.allSettled(
+        const backupCandidates = await Promise.all(
             metadataObjects.map(async (object) => {
-                const raw = await this.downloadObject(object.key);
-                const parsed: unknown = JSON.parse(raw.toString("utf8"));
-                return parseCloudBackupMetadataFile(parsed);
+                try {
+                    const raw = await this.downloadObject(object.key);
+                    return tryParseCloudBackupMetadataFileBuffer(raw);
+                } catch {
+                    return null;
+                }
             })
         );
 
-        const backups = results
-            .filter(
-                (result): result is PromiseFulfilledResult<CloudBackupEntry> =>
-                    result.status === "fulfilled"
-            )
-            .map((result) => result.value);
+        const backups = backupCandidates.filter(
+            (entry): entry is CloudBackupEntry => entry !== null
+        );
 
         backups.sort((a, b) => b.metadata.createdAt - a.metadata.createdAt);
         return backups;
@@ -583,11 +586,10 @@ export class DropboxCloudStorageProvider implements CloudStorageProvider {
         const buffer = await this.downloadObject(key);
         const metadataKey = backupMetadataKeyForBackupKey(key);
         const raw = await this.downloadObject(metadataKey);
-        const parsed: unknown = JSON.parse(raw.toString("utf8"));
 
         return {
             buffer,
-            entry: parseCloudBackupMetadataFile(parsed),
+            entry: parseCloudBackupMetadataFileBuffer(raw),
         };
     }
 

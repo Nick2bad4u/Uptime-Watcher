@@ -12,7 +12,6 @@ import type { UptimeOrchestrator } from "../../../UptimeOrchestrator";
 import { logger } from "../../../utils/logger";
 import { registerStandardizedIpcHandler } from "../utils";
 import { StateSyncHandlerValidators } from "../validators";
-import { withIgnoredIpcEvent } from "./handlerShared";
 
 /**
  * Dependencies required to register state synchronization IPC handlers.
@@ -35,7 +34,7 @@ export function registerStateSyncHandlers({
 }: StateSyncHandlersDependencies): void {
     registerStandardizedIpcHandler(
         STATE_SYNC_CHANNELS.requestFullSync,
-        withIgnoredIpcEvent(async () => {
+        async () => {
             const sites = await uptimeOrchestrator.getSites();
             const timestamp = Date.now();
 
@@ -69,14 +68,14 @@ export function registerStateSyncHandlers({
                 source: STATE_SYNC_SOURCE.DATABASE,
                 synchronized: true,
             } satisfies StateSyncFullSyncResult;
-        }),
+        },
         StateSyncHandlerValidators.requestFullSync,
         registeredHandlers
     );
 
     registerStandardizedIpcHandler(
         STATE_SYNC_CHANNELS.getSyncStatus,
-        withIgnoredIpcEvent(() => {
+        () => {
             const currentStatus = getStateSyncStatus();
             const cachedSiteCount = uptimeOrchestrator.getCachedSiteCount();
             const hasTrustedDatabaseSummary =
@@ -113,7 +112,7 @@ export function registerStateSyncHandlers({
 
             setStateSyncStatus(summary);
             return summary;
-        }),
+        },
         StateSyncHandlerValidators.getSyncStatus,
         registeredHandlers
     );

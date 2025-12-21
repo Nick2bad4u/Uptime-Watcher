@@ -91,4 +91,34 @@ describe(GoogleDriveTokenManager, () => {
         await expect(manager.revoke()).resolves.toBeUndefined();
         await expect(manager.getTokens()).resolves.toBeUndefined();
     });
+
+    it("treats invalid stored JSON as disconnected", async () => {
+        const secretStore = new InMemorySecretStore();
+        const manager = new GoogleDriveTokenManager({
+            clientId: "client-id",
+            secretStore,
+            storageKey: "cloud.googleDrive.tokens",
+        });
+
+        await secretStore.setSecret("cloud.googleDrive.tokens", "not-json");
+
+        await expect(manager.getTokens()).resolves.toBeUndefined();
+        await expect(manager.isConnected()).resolves.toBeFalsy();
+    });
+
+    it("treats invalid stored token shape as disconnected", async () => {
+        const secretStore = new InMemorySecretStore();
+        const manager = new GoogleDriveTokenManager({
+            clientId: "client-id",
+            secretStore,
+            storageKey: "cloud.googleDrive.tokens",
+        });
+
+        await secretStore.setSecret(
+            "cloud.googleDrive.tokens",
+            JSON.stringify({ accessToken: "", expiresAt: -1, refreshToken: "" })
+        );
+
+        await expect(manager.getTokens()).resolves.toBeUndefined();
+    });
 });

@@ -72,4 +72,38 @@ describe(DropboxTokenManager, () => {
 
         vi.useRealTimers();
     });
+
+    it("treats invalid stored JSON as disconnected", async () => {
+        const secretStore = new InMemorySecretStore();
+
+        const manager = new DropboxTokenManager({
+            appKey: "app-key",
+            secretStore,
+            tokenStorageKey: "cloud.dropbox.tokens",
+        });
+
+        await secretStore.setSecret("cloud.dropbox.tokens", "not-json");
+
+        await expect(manager.getStoredTokens()).resolves.toBeUndefined();
+        await expect(manager.getAccessToken()).rejects.toThrowError(
+            /Dropbox is not connected/iu
+        );
+    });
+
+    it("treats invalid stored token shape as disconnected", async () => {
+        const secretStore = new InMemorySecretStore();
+
+        const manager = new DropboxTokenManager({
+            appKey: "app-key",
+            secretStore,
+            tokenStorageKey: "cloud.dropbox.tokens",
+        });
+
+        await secretStore.setSecret(
+            "cloud.dropbox.tokens",
+            JSON.stringify({ accessToken: "", expiresAtEpochMs: -1 })
+        );
+
+        await expect(manager.getStoredTokens()).resolves.toBeUndefined();
+    });
 });
