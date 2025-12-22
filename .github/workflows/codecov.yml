@@ -24,7 +24,7 @@ jobs:
 
         steps:
             - name: Harden the runner (Audit all outbound calls)
-              uses: step-security/harden-runner@df199fb7be9f65074067a9eb93f12bb4c5547cf2 # v2.13.3
+              uses: step-security/harden-runner@20cf305ff2072d973412fa9b1e3a4f227bda3c76 # v2.14.0
               with:
                   egress-policy: audit
 
@@ -117,7 +117,7 @@ jobs:
             # Upload frontend coverage to Codecov
             - name: Upload frontend coverage to Codecov
               id: upload-frontend-coverage
-              uses: codecov/codecov-action@5a1091511ad55cbe89839c7260b706298ca349f7 # v5.5.1
+              uses: codecov/codecov-action@671740ac38dd9b0130fbe1cec585b89eea48d3de # v5.5.2
               with:
                   token: ${{ secrets.CODECOV_TOKEN }}
                   slug: Nick2bad4u/Uptime-Watcher
@@ -136,7 +136,7 @@ jobs:
             # Upload electron coverage to Codecov
             - name: Upload electron coverage to Codecov
               id: upload-electron-coverage
-              uses: codecov/codecov-action@5a1091511ad55cbe89839c7260b706298ca349f7 # v5.5.1
+              uses: codecov/codecov-action@671740ac38dd9b0130fbe1cec585b89eea48d3de # v5.5.2
               with:
                   token: ${{ secrets.CODECOV_TOKEN }}
                   slug: Nick2bad4u/Uptime-Watcher
@@ -155,7 +155,7 @@ jobs:
             # Upload shared coverage to Codecov
             - name: Upload shared coverage to Codecov
               id: upload-shared-coverage
-              uses: codecov/codecov-action@5a1091511ad55cbe89839c7260b706298ca349f7 # v5.5.1
+              uses: codecov/codecov-action@671740ac38dd9b0130fbe1cec585b89eea48d3de # v5.5.2
               with:
                   token: ${{ secrets.CODECOV_TOKEN }}
                   slug: Nick2bad4u/Uptime-Watcher
@@ -174,7 +174,7 @@ jobs:
             # Upload test results
             - name: Upload frontend test results to Codecov
               id: upload-frontend-test-results
-              uses: codecov/test-results-action@47f89e9acb64b76debcd5ea40642d25a4adced9f # v1.1.1
+              uses: codecov/test-results-action@0fa95f0e1eeaafde2c782583b36b28ad0d8c77d3 # v1.2.1
               with:
                   files: ./coverage/frontend-test-report.junit.xml
                   token: ${{ secrets.CODECOV_TOKEN }}
@@ -188,7 +188,7 @@ jobs:
 
             - name: Upload electron test results to Codecov
               id: upload-electron-test-results
-              uses: codecov/test-results-action@47f89e9acb64b76debcd5ea40642d25a4adced9f # v1.1.1
+              uses: codecov/test-results-action@0fa95f0e1eeaafde2c782583b36b28ad0d8c77d3 # v1.2.1
               with:
                   files: ./coverage/electron/electron-test-report.junit.xml
                   token: ${{ secrets.CODECOV_TOKEN }}
@@ -202,7 +202,7 @@ jobs:
 
             - name: Upload shared test results to Codecov
               id: upload-shared-test-results
-              uses: codecov/test-results-action@47f89e9acb64b76debcd5ea40642d25a4adced9f # v1.1.1
+              uses: codecov/test-results-action@0fa95f0e1eeaafde2c782583b36b28ad0d8c77d3 # v1.2.1
               with:
                   files: ./coverage/shared/shared-test-report.junit.xml
                   token: ${{ secrets.CODECOV_TOKEN }}

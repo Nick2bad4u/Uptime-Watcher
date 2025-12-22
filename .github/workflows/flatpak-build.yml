@@ -20,7 +20,7 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - name: Harden the runner (Audit all outbound calls)
-              uses: step-security/harden-runner@df199fb7be9f65074067a9eb93f12bb4c5547cf2 # v2.13.3
+              uses: step-security/harden-runner@20cf305ff2072d973412fa9b1e3a4f227bda3c76 # v2.14.0
               with:
                   egress-policy: audit
 
@@ -28,7 +28,7 @@ jobs:
               uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
 
             - name: Cache Flatpak runtimes and SDKs
-              uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+              uses: actions/cache@9255dc7a253b0ccc959486e2bca901246202afeb # v5.0.1
               with:
                   path: |
                       /var/lib/flatpak
@@ -83,7 +83,7 @@ jobs:
                   cache: "npm"
 
             - name: Cache build artifacts and dependencies
-              uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+              uses: actions/cache@9255dc7a253b0ccc959486e2bca901246202afeb # v5.0.1
               with:
                   path: |
                       node_modules
@@ -167,7 +167,7 @@ jobs:
 
             # Optionally, upload the FlatPak bundle as an artifact
             - name: Upload FlatPak bundle
-              uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
+              uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
               with:
                   name: flatpak-bundle
                   path: ./Uptime-Watcher.flatpak

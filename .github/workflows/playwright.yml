@@ -23,7 +23,7 @@ jobs:
         steps:
             # Harden the runner (audit all outbound calls)
             - name: Harden the runner (Audit all outbound calls)
-              uses: step-security/harden-runner@df199fb7be9f65074067a9eb93f12bb4c5547cf2 # v2.13.3
+              uses: step-security/harden-runner@20cf305ff2072d973412fa9b1e3a4f227bda3c76 # v2.14.0
               with:
                   egress-policy: audit
 
@@ -39,7 +39,7 @@ jobs:
                   cache: "npm"
 
             - name: Cache NPM
-              uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+              uses: actions/cache@9255dc7a253b0ccc959486e2bca901246202afeb # v5.0.1
               with:
                   path: ~/.npm
                   key: npm-${{ hashFiles('**/package-lock.json') }}
@@ -96,7 +96,7 @@ jobs:
             # For organization-wide consistency, document and update artifact retention policy in your repository’s CI/CD guidelines.
             - name: Upload Playwright report
               if: ${{ !cancelled() }}
-              uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
+              uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
               with:
                   name: playwright-report
                   path: playwright-report/
