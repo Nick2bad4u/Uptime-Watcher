@@ -61,7 +61,7 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - name: Harden Runner
-              uses: step-security/harden-runner@df199fb7be9f65074067a9eb93f12bb4c5547cf2 # v2.13.3
+              uses: step-security/harden-runner@20cf305ff2072d973412fa9b1e3a4f227bda3c76 # v2.14.0
               with:
                   egress-policy: audit
 
@@ -72,7 +72,7 @@ jobs:
                   fetch-depth: 0
 
             - name: Lint Code Base
-              uses: super-linter/super-linter@502f4fe48a81a392756e173e39a861f8c8efe056 # v8.3.0
+              uses: super-linter/super-linter@47984f49b4e87383eed97890fe2dca6063bbd9c3 # v8.3.1
               # checkov:skip=skip-check:CKV2_GHA_1
               env:
                   DEFAULT_BRANCH: "main"
