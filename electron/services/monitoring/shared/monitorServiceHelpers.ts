@@ -5,6 +5,13 @@
 
 import type { Monitor } from "@shared/types";
 
+import {
+    isValidFQDN,
+    isValidHost,
+    isValidPort,
+    isValidUrl,
+} from "@shared/validation/validatorUtils";
+
 import type { NormalizedMonitorConfig as NormalizedMonitorConfigType } from "../createMonitorConfig";
 import type { MonitorCheckResult } from "../types";
 
@@ -58,13 +65,34 @@ export function createMonitorErrorResult(
  * @returns Error message if validation fails, null if valid
  */
 export function validateMonitorHost(monitor: Monitor): null | string {
-    if (
-        !monitor.host ||
-        typeof monitor.host !== "string" ||
-        monitor.host.trim() === ""
-    ) {
+    const rawHost = monitor.host;
+    if (typeof rawHost !== "string") {
         return "Monitor missing valid host";
     }
+
+    const host = rawHost.trim();
+    if (host.length === 0) {
+        return "Monitor missing valid host";
+    }
+
+    // Prefer validator.js-backed host checks over hand-rolled heuristics.
+    // We allow:
+    // - IP literals
+    // - localhost
+    // - FQDNs (including intranet-style single-label names)
+    // This is intentionally more permissive than `isValidHost` alone.
+    const hostLooksValid =
+        isValidHost(host) ||
+        isValidFQDN(host, {
+            "allow_trailing_dot": true,
+            "allow_underscores": true,
+            "require_tld": false,
+        });
+
+    if (!hostLooksValid) {
+        return "Monitor missing valid host";
+    }
+
     return null;
 }
 
@@ -81,12 +109,7 @@ export function validateMonitorHostAndPort(monitor: Monitor): null | string {
         return hostError.replace("host", "host or port");
     }
 
-    if (
-        !monitor.port ||
-        typeof monitor.port !== "number" ||
-        monitor.port <= 0 ||
-        monitor.port > 65_535
-    ) {
+    if (!isValidPort(monitor.port)) {
         return "Monitor missing valid host or port";
     }
     return null;
@@ -100,13 +123,38 @@ export function validateMonitorHostAndPort(monitor: Monitor): null | string {
  * @returns Error message if validation fails, null if valid
  */
 export function validateMonitorUrl(monitor: Monitor): null | string {
+    const rawUrl = monitor.url;
+    if (typeof rawUrl !== "string") {
+        return "Monitor missing or invalid URL";
+    }
+
+    const url = rawUrl.trim();
+    if (url.length === 0) {
+        return "Monitor missing or invalid URL";
+    }
+
+    // Align with the monitor URL schema policy:
+    // - validator.js-backed syntax validation
+    // - allow single quotes in path
+    // - parse with WHATWG URL and validate hostname semantics
     if (
-        !monitor.url ||
-        typeof monitor.url !== "string" ||
-        monitor.url.trim() === ""
+        !isValidUrl(url, {
+            allowSingleQuotes: true,
+            "require_tld": false,
+        })
     ) {
         return "Monitor missing or invalid URL";
     }
+
+    try {
+        const parsed = new URL(url);
+        if (!isValidHost(parsed.hostname)) {
+            return "Monitor missing or invalid URL";
+        }
+    } catch {
+        return "Monitor missing or invalid URL";
+    }
+
     return null;
 }
 

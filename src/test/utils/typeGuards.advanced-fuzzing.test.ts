@@ -41,9 +41,9 @@ import {
 } from "@shared/utils/typeGuards";
 import {
     validateMonitorType,
-    validateSite,
-    getMonitorValidationErrors,
 } from "@shared/utils/validation";
+import { getMonitorValidationErrors } from "@shared/validation/monitorSchemas";
+import { validateSiteData } from "@shared/validation/siteSchemas";
 
 describe("Type Guards Advanced Fuzzing Tests", () => {
     describe("Basic Type Guards - Comprehensive Input Coverage", () => {
@@ -477,7 +477,7 @@ describe("Type Guards Advanced Fuzzing Tests", () => {
         ])("validateSite should handle various site object structures", (
             siteObject
         ) => {
-            const result = validateSite(siteObject as any);
+                const result = validateSiteData(siteObject as any).success;
 
             // Result should always be a boolean
             expect(typeof result).toBe("boolean");
@@ -507,7 +507,7 @@ describe("Type Guards Advanced Fuzzing Tests", () => {
                 fc.constant(undefined)
             ),
         ])("validateSite should reject invalid site objects", (invalidSite) => {
-            const result = validateSite(invalidSite as any);
+                const result = validateSiteData(invalidSite as any).success;
 
             // Should handle any input gracefully
             expect(typeof result).toBe("boolean");

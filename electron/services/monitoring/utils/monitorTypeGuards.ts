@@ -12,6 +12,8 @@ import type { Site } from "@shared/types";
 import {
     isNonEmptyString,
     isValidFQDN,
+    isValidHost,
+    isValidPort,
     isValidUrl,
 } from "@shared/validation/validatorUtils";
 
@@ -81,13 +83,23 @@ export function extractMonitorConfig(
 export function hasValidHost(
     monitor: Site["monitors"][0]
 ): monitor is Site["monitors"][0] & { host: string } {
-    // Allow hostnames that are either FQDNs or could be valid IPs/hostnames
-    return (
-        isNonEmptyString(monitor.host) &&
-        (isValidFQDN(monitor.host, { require_tld: false }) ||
-             
-            /^[\w.-]+$/u.test(monitor.host))
-    );
+    if (!isNonEmptyString(monitor.host)) {
+        return false;
+    }
+
+    // Prefer the canonical host validator (IP/FQDN-with-TLD/localhost).
+    if (isValidHost(monitor.host)) {
+        return true;
+    }
+
+    // Some monitoring operations may still want to accept intranet-style
+    // single-label hostnames or trailing-dot hostnames. Use validator.js FQDN
+    // validation with a permissive config instead of a hand-rolled regex.
+    return isValidFQDN(monitor.host, {
+        "allow_trailing_dot": true,
+        "allow_underscores": true,
+        "require_tld": false,
+    });
 }
 
 /**
@@ -100,11 +112,7 @@ export function hasValidHost(
 export function hasValidPort(
     monitor: Site["monitors"][0]
 ): monitor is Site["monitors"][0] & { port: number } {
-    return (
-        typeof monitor.port === "number" &&
-        monitor.port >= 1 &&
-        monitor.port <= 65_535
-    );
+    return isValidPort(monitor.port);
 }
 
 /**

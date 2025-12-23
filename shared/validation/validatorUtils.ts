@@ -47,12 +47,18 @@ import {
  */
 export type UrlValidationOptions = Omit<validator.IsURLOptions, "disallow_auth"> &
     {
+        /** Allow backticks in the URL string (disabled by default). */
+        readonly allowBackticks?: boolean;
         /**
-         * Validator.js option (kept for backwards compatibility).
+         * Allow single quotes in the URL string.
+         *
+         * @remarks
+         * The default validation policy is intentionally strict for URLs that
+         * may be embedded into logs or UI attributes. Some internal-only URLs
+         * (for example monitor endpoints) may legitimately include quotes in
+         * the path component.
          */
-
-        readonly disallow_auth?: boolean;
-
+        readonly allowSingleQuotes?: boolean;
         /** Lint-friendly alias for validator's `disallow_auth`. */
         readonly disallowAuth?: boolean;
     };
@@ -103,6 +109,23 @@ export function isValidFQDN(
 }
 
 /**
+ * Validates that a value is a SemVer 2.0.0 string.
+ *
+ * @remarks
+ * Wrapper around validator.js `isSemVer`. Keeping this in a shared module
+ * avoids scattering direct `validator/*` imports across the codebase.
+ *
+ * @param value - Value to validate.
+ *
+ * @returns True if the value is a valid semantic version.
+ *
+ * @public
+ */
+export function isValidSemVer(value: unknown): value is string {
+    return typeof value === "string" && validator.isSemVer(value);
+}
+
+/**
  * Validates that a value is a valid identifier (alphanumeric with
  * hyphens/underscores).
  *
@@ -126,7 +149,7 @@ export function isValidIdentifier(value: unknown): value is string {
     }
 
     // Allow alphanumeric characters, hyphens, and underscores
-     
+
     const cleanedValue = value.replaceAll(/[_-]/gu, "");
 
     // Must have at least one alphanumeric character remaining
@@ -311,6 +334,109 @@ export function isValidPort(value: unknown): boolean {
     return false;
 }
 
+type ValidatorIsUrlOptions = NonNullable<Parameters<typeof validator.isURL>[1]>;
+
+const buildValidatorUrlOptions = (
+    options: UrlValidationOptions
+): {
+    readonly allowBackticks: boolean;
+    readonly allowSingleQuotes: boolean;
+    readonly urlOptions: ValidatorIsUrlOptions;
+} => {
+    const {
+        allowBackticks = false,
+        allowSingleQuotes = false,
+        disallowAuth,
+        ...restOptions
+    } = options;
+
+    const urlOptions = {
+        allow_protocol_relative_urls: false,
+        allow_trailing_dot: false,
+        allow_underscores: false,
+        disallow_auth: disallowAuth ?? false,
+        protocols: ["http", "https"],
+        require_host: true,
+        require_port: false,
+        require_protocol: true,
+        require_tld: false,
+        require_valid_protocol: true,
+        ...restOptions,
+    } satisfies ValidatorIsUrlOptions;
+
+    return {
+        allowBackticks,
+        allowSingleQuotes,
+        urlOptions,
+    };
+};
+
+const hasDisallowedUrlCharacters = (
+    value: string,
+    allowSingleQuotes: boolean,
+    allowBackticks: boolean
+): boolean => {
+    if (!allowSingleQuotes && value.includes("'")) {
+        return true;
+    }
+
+    if (!allowBackticks && value.includes("`")) {
+        return true;
+    }
+
+    return false;
+};
+
+const isSchemeOnlyUrl = (value: string): boolean =>
+    /^[a-z][\d+.a-z-]*:\/\/$/iu.test(value);
+
+const hasMissingProtocolDelimiter = (
+    value: string,
+    requireProtocol: boolean
+): boolean => requireProtocol && !value.includes("://");
+
+const hasHttpAuthorityDelimiterIssue = (
+    value: string,
+    protocols: readonly string[]
+): boolean => {
+    const requiresAuthorityDelimiter = protocols.some((protocol) => {
+        const normalizedProtocol = protocol.toLowerCase();
+        return normalizedProtocol === "http" || normalizedProtocol === "https";
+    });
+
+    if (!requiresAuthorityDelimiter) {
+        return false;
+    }
+
+    const normalizedValue = value.toLowerCase();
+
+    if (normalizedValue.startsWith("http:") && normalizedValue.slice(5, 7) !== "//") {
+        return true;
+    }
+
+    if (normalizedValue.startsWith("https:") && normalizedValue.slice(6, 8) !== "//") {
+        return true;
+    }
+
+    return false;
+};
+
+const hasNestedHttpSchemeAfterFirstDelimiter = (value: string): boolean => {
+    const firstSchemeSeparator = value.indexOf("://");
+    if (firstSchemeSeparator === -1) {
+        return false;
+    }
+
+    // Reject URLs that end with a bare scheme delimiter. These are commonly
+    // produced by malformed concatenation and are almost never intentional.
+    if (value.endsWith("://")) {
+        return true;
+    }
+
+    const remainder = value.slice(firstSchemeSeparator + 3).toLowerCase();
+    return remainder.startsWith("http://") || remainder.startsWith("https://");
+};
+
 /**
  * Validates that a value is a valid URL.
  *
@@ -336,86 +462,68 @@ export function isValidUrl(
         return false;
     }
 
-    const {
+    const { allowBackticks, allowSingleQuotes, urlOptions } =
+        buildValidatorUrlOptions(options);
 
-        disallow_auth: disallowAuthLegacy,
-        disallowAuth,
-        ...restOptions
-    } = options;
-
-    const urlOptions = {
-        allow_protocol_relative_urls: false,
-        allow_trailing_dot: false,
-        allow_underscores: false,
-        disallow_auth: disallowAuth ?? disallowAuthLegacy ?? false,
-        protocols: ["http", "https"],
-        require_host: true,
-        require_port: false,
-        require_protocol: true,
-        require_tld: false,
-        require_valid_protocol: true,
-        ...restOptions,
-    } satisfies Parameters<typeof validator.isURL>[1];
-
-    if (value.includes("'") || value.includes("`")) {
+    if (hasDisallowedUrlCharacters(value, allowSingleQuotes, allowBackticks)) {
         return false;
     }
 
-     
-    if (/^[a-z][\d+.a-z-]*:\/\/$/iu.test(value)) {
+    if (isSchemeOnlyUrl(value)) {
         return false;
     }
 
-    if (urlOptions.require_protocol && !value.includes("://")) {
+    if (hasMissingProtocolDelimiter(value, urlOptions.require_protocol ?? false)) {
         return false;
     }
 
-    const allowedProtocols: readonly string[] = Array.isArray(urlOptions.protocols)
+    const allowedProtocols = Array.isArray(urlOptions.protocols)
         ? urlOptions.protocols
         : [];
 
-    const requiresAuthorityDelimiter = allowedProtocols.some((protocol) => {
-        const normalizedProtocol = protocol.toLowerCase();
-        return normalizedProtocol === "http" || normalizedProtocol === "https";
-    });
-
-    if (requiresAuthorityDelimiter) {
-        const normalizedValue = value.toLowerCase();
-
-        const hasMissingAuthoritySlashes = (scheme: string): boolean => {
-            if (!normalizedValue.startsWith(scheme)) {
-                return false;
-            }
-
-            const firstCharacter = normalizedValue.charAt(scheme.length);
-            const secondCharacter = normalizedValue.charAt(scheme.length + 1);
-            return firstCharacter !== "/" || secondCharacter !== "/";
-        };
-
-        if (hasMissingAuthoritySlashes("http:")) {
-            return false;
-        }
-
-        if (hasMissingAuthoritySlashes("https:")) {
-            return false;
-        }
+    if (hasHttpAuthorityDelimiterIssue(value, allowedProtocols)) {
+        return false;
     }
 
-    const firstSchemeSeparator = value.indexOf("://");
-    if (firstSchemeSeparator !== -1) {
-        const remainder = value.slice(firstSchemeSeparator + 3).toLowerCase();
-        if (
-            (remainder.startsWith("http:") && remainder.slice(5, 7) === "//") ||
-            (remainder.startsWith("https:") && remainder.slice(6, 8) === "//")
-        ) {
-            return false;
-        }
-        if (value.endsWith("://")) {
-            return false;
-        }
+    if (hasNestedHttpSchemeAfterFirstDelimiter(value)) {
+        return false;
     }
 
     return validator.isURL(value, urlOptions);
+}
+
+/**
+ * Validates that a value is a lowercase hexadecimal string of an exact length.
+ *
+ * @remarks
+ * `validator.isHexadecimal` accepts both uppercase and lowercase characters.
+ * For IDs that must be canonicalized (like correlation IDs), we enforce a
+ * lowercase-only policy.
+ *
+ * @param value - Value to validate.
+ * @param length - Required string length.
+ *
+ * @returns True when the value is lowercase hex and matches the exact length.
+ *
+ * @public
+ */
+export function isValidLowercaseHexString(
+    value: unknown,
+    length: number
+): value is string {
+    if (typeof value !== "string") {
+        return false;
+    }
+
+    if (value.length !== length) {
+        return false;
+    }
+
+    if (value !== value.toLowerCase()) {
+        return false;
+    }
+
+    return validator.isHexadecimal(value);
 }
 
 /**

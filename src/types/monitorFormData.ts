@@ -11,6 +11,12 @@
 import type { SetOptional, Simplify, UnknownRecord } from "type-fest";
 
 import { isNonEmptyString } from "@shared/utils/typeGuards";
+import {
+    isValidFQDN,
+    isValidHost,
+    isValidPort,
+    isValidUrl,
+} from "@shared/validation/validatorUtils";
 
 import type { RequireAllOrNoneFields } from "./typeUtils";
 
@@ -422,7 +428,10 @@ export function isHttpFormData(
     return (
         data.type === "http" &&
         typeof data.url === "string" &&
-        data.url.trim() !== ""
+        isValidUrl(data.url.trim(), {
+            allowSingleQuotes: true,
+            "require_tld": false,
+        })
     );
 }
 
@@ -441,7 +450,10 @@ export function isHttpHeaderFormData(
     return (
         data.type === "http-header" &&
         typeof data.url === "string" &&
-        data.url.trim() !== "" &&
+        isValidUrl(data.url.trim(), {
+            allowSingleQuotes: true,
+            "require_tld": false,
+        }) &&
         typeof data.headerName === "string" &&
         data.headerName.trim() !== "" &&
         typeof data.expectedHeaderValue === "string" &&
@@ -464,7 +476,10 @@ export function isHttpJsonFormData(
     return (
         data.type === "http-json" &&
         typeof data.url === "string" &&
-        data.url.trim() !== "" &&
+        isValidUrl(data.url.trim(), {
+            allowSingleQuotes: true,
+            "require_tld": false,
+        }) &&
         typeof data.jsonPath === "string" &&
         data.jsonPath.trim() !== "" &&
         typeof data.expectedJsonValue === "string" &&
@@ -487,7 +502,10 @@ export function isHttpKeywordFormData(
     return (
         data.type === "http-keyword" &&
         typeof data.url === "string" &&
-        data.url.trim() !== "" &&
+        isValidUrl(data.url.trim(), {
+            allowSingleQuotes: true,
+            "require_tld": false,
+        }) &&
         typeof data.bodyKeyword === "string" &&
         data.bodyKeyword.trim() !== ""
     );
@@ -508,7 +526,10 @@ export function isHttpStatusFormData(
     return (
         data.type === "http-status" &&
         typeof data.url === "string" &&
-        data.url.trim() !== "" &&
+        isValidUrl(data.url.trim(), {
+            allowSingleQuotes: true,
+            "require_tld": false,
+        }) &&
         typeof data.expectedStatusCode === "number" &&
         Number.isInteger(data.expectedStatusCode) &&
         data.expectedStatusCode >= 100 &&
@@ -531,7 +552,10 @@ export function isHttpLatencyFormData(
     return (
         data.type === "http-latency" &&
         typeof data.url === "string" &&
-        data.url.trim() !== "" &&
+        isValidUrl(data.url.trim(), {
+            allowSingleQuotes: true,
+            "require_tld": false,
+        }) &&
         typeof data.maxResponseTime === "number" &&
         Number.isFinite(data.maxResponseTime) &&
         data.maxResponseTime > 0
@@ -550,10 +574,18 @@ export function isHttpLatencyFormData(
 export function isDnsFormData(
     data: Partial<MonitorFormData>
 ): data is DnsFormData {
+    const hostCandidate: unknown = (data as UnknownRecord)["host"];
+    const host = isNonEmptyString(hostCandidate) ? hostCandidate.trim() : "";
+
     return (
         data.type === "dns" &&
-        typeof data.host === "string" &&
-        data.host.trim() !== "" &&
+        host.length > 0 &&
+        (isValidHost(host) ||
+            isValidFQDN(host, {
+                "allow_trailing_dot": true,
+                "allow_underscores": true,
+                "require_tld": false,
+            })) &&
         typeof data.recordType === "string" &&
         data.recordType.trim() !== ""
     );
@@ -571,10 +603,18 @@ export function isDnsFormData(
 export function isPingFormData(
     data: Partial<MonitorFormData>
 ): data is PingFormData {
+    const hostCandidate: unknown = (data as UnknownRecord)["host"];
+    const host = isNonEmptyString(hostCandidate) ? hostCandidate.trim() : "";
+
     return (
         data.type === "ping" &&
-        typeof data.host === "string" &&
-        data.host.trim() !== ""
+        host.length > 0 &&
+        (isValidHost(host) ||
+            isValidFQDN(host, {
+                "allow_trailing_dot": true,
+                "allow_underscores": true,
+                "require_tld": false,
+            }))
     );
 }
 
@@ -590,13 +630,20 @@ export function isPingFormData(
 export function isPortFormData(
     data: Partial<MonitorFormData>
 ): data is PortFormData {
+    const hostCandidate: unknown = (data as UnknownRecord)["host"];
+    const host = isNonEmptyString(hostCandidate) ? hostCandidate.trim() : "";
+
     return (
         data.type === "port" &&
-        typeof data.host === "string" &&
-        data.host.trim() !== "" &&
+        host.length > 0 &&
+        (isValidHost(host) ||
+            isValidFQDN(host, {
+                "allow_trailing_dot": true,
+                "allow_underscores": true,
+                "require_tld": false,
+            })) &&
         typeof data.port === "number" &&
-        data.port > 0 &&
-        data.port <= 65_535
+        isValidPort(data.port)
     );
 }
 
@@ -612,13 +659,20 @@ export function isPortFormData(
 export function isSslFormData(
     data: Partial<MonitorFormData>
 ): data is SslFormData {
+    const hostCandidate: unknown = (data as UnknownRecord)["host"];
+    const host = isNonEmptyString(hostCandidate) ? hostCandidate.trim() : "";
+
     return (
         data.type === "ssl" &&
-        typeof data.host === "string" &&
-        data.host.trim() !== "" &&
+        host.length > 0 &&
+        (isValidHost(host) ||
+            isValidFQDN(host, {
+                "allow_trailing_dot": true,
+                "allow_underscores": true,
+                "require_tld": false,
+            })) &&
         typeof data.port === "number" &&
-        data.port > 0 &&
-        data.port <= 65_535 &&
+        isValidPort(data.port) &&
         typeof data.certificateWarningDays === "number" &&
         data.certificateWarningDays >= 1 &&
         data.certificateWarningDays <= 365
@@ -641,7 +695,10 @@ export function isCdnEdgeConsistencyFormData(
     return (
         data.type === "cdn-edge-consistency" &&
         typeof data.baselineUrl === "string" &&
-        data.baselineUrl.trim() !== "" &&
+        isValidUrl(data.baselineUrl.trim(), {
+            allowSingleQuotes: true,
+            "require_tld": false,
+        }) &&
         typeof data.edgeLocations === "string" &&
         data.edgeLocations.trim() !== ""
     );
@@ -661,8 +718,16 @@ export function isReplicationFormData(
 ): data is ReplicationFormData {
     return (
         data.type === "replication" &&
-        isNonEmptyString(data.primaryStatusUrl) &&
-        isNonEmptyString(data.replicaStatusUrl) &&
+        typeof data.primaryStatusUrl === "string" &&
+        isValidUrl(data.primaryStatusUrl.trim(), {
+            allowSingleQuotes: true,
+            "require_tld": false,
+        }) &&
+        typeof data.replicaStatusUrl === "string" &&
+        isValidUrl(data.replicaStatusUrl.trim(), {
+            allowSingleQuotes: true,
+            "require_tld": false,
+        }) &&
         isNonEmptyString(data.replicationTimestampField) &&
         typeof data.maxReplicationLagSeconds === "number" &&
         Number.isFinite(data.maxReplicationLagSeconds)
@@ -684,7 +749,11 @@ export function isServerHeartbeatFormData(
 ): data is ServerHeartbeatFormData {
     return (
         data.type === "server-heartbeat" &&
-        isNonEmptyString(data.url) &&
+        typeof data.url === "string" &&
+        isValidUrl(data.url.trim(), {
+            allowSingleQuotes: true,
+            "require_tld": false,
+        }) &&
         isNonEmptyString(data.heartbeatStatusField) &&
         isNonEmptyString(data.heartbeatTimestampField) &&
         isNonEmptyString(data.heartbeatExpectedStatus) &&
@@ -709,7 +778,11 @@ export function isWebsocketKeepaliveFormData(
     return (
         data.type === "websocket-keepalive" &&
         typeof data.url === "string" &&
-        data.url.trim() !== "" &&
+        isValidUrl(data.url.trim(), {
+            allowSingleQuotes: true,
+            protocols: ["ws", "wss"],
+            "require_tld": false,
+        }) &&
         typeof data.maxPongDelayMs === "number" &&
         Number.isFinite(data.maxPongDelayMs)
     );

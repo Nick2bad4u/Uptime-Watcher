@@ -48,21 +48,16 @@ export class WebsocketKeepaliveMonitor implements IMonitorService {
             );
         }
 
-        const urlCandidate = Reflect.get(monitor, "url");
+        const rawUrlCandidate = Reflect.get(monitor, "url");
+        const urlCandidate =
+            typeof rawUrlCandidate === "string" ? rawUrlCandidate.trim() : null;
+
         if (
             typeof urlCandidate !== "string" ||
             !isValidUrl(urlCandidate, { protocols: ["ws", "wss"] })
         ) {
             return createMonitorErrorResult(
                 "WebSocket keepalive monitor requires a valid ws:// or wss:// URL",
-                0
-            );
-        }
-
-         
-        if (!/^wss?:\/\//iu.test(urlCandidate)) {
-            return createMonitorErrorResult(
-                "WebSocket URL must start with ws:// or wss://",
                 0
             );
         }
@@ -76,7 +71,7 @@ export class WebsocketKeepaliveMonitor implements IMonitorService {
             return await withOperationalHooks(
                 () =>
                     this.performKeepaliveCheck(
-                        urlCandidate.trim(),
+                        urlCandidate,
                         timeout,
                         maxPongDelayMs,
                         signal

@@ -20,11 +20,27 @@
  * @packageDocumentation
  */
 
+import { isValidUrl } from "@shared/validation/validatorUtils";
 import * as dns from "node:dns/promises";
 import * as net from "node:net";
 import { performance } from "node:perf_hooks";
 
 import type { MonitorCheckResult } from "../types";
+
+const stripHttpScheme = (value: string): string => {
+    const normalized = value.trim();
+    const lower = normalized.toLowerCase();
+
+    if (lower.startsWith("https://")) {
+        return normalized.slice("https://".length);
+    }
+
+    if (lower.startsWith("https://")) {
+        return normalized.slice("https://".length);
+    }
+
+    return normalized;
+};
 
 /**
  * Clears a timeout if the provided handle has been set.
@@ -359,13 +375,14 @@ export async function checkConnectivity(
 ): Promise<MonitorCheckResult> {
     const opts = { ...DEFAULT_OPTIONS, ...options };
     const startTime = performance.now();
-     
-    const cleanHost = host.replace(/^https?:\/\//iu, "");
 
-     
-    if (/^https?:\/\//iu.test(host)) {
-        return checkHttpConnectivity(host, opts.timeout);
+    const normalizedHost: string = host.trim();
+
+    if (isValidUrl(normalizedHost)) {
+        return checkHttpConnectivity(normalizedHost, opts.timeout);
     }
+
+    const cleanHost: string = stripHttpScheme(normalizedHost);
 
     if (opts.method === "tcp" || opts.method === "http") {
         try {
@@ -380,7 +397,7 @@ export async function checkConnectivity(
             }
         } catch (error) {
             return {
-                details: `Connectivity check failed for ${host}`,
+                details: `Connectivity check failed for ${String(normalizedHost)}`,
                 error: error instanceof Error ? error.message : String(error),
                 responseTime: Math.round(performance.now() - startTime),
                 status: "down",
@@ -401,7 +418,7 @@ export async function checkConnectivity(
     }
 
     return {
-        details: `Failed to connect to ${host}`,
+        details: `Failed to connect to ${String(normalizedHost)}`,
         error: "Host unreachable - all connectivity checks failed",
         responseTime: Math.round(performance.now() - startTime),
         status: "down",

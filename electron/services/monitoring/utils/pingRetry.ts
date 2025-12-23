@@ -49,6 +49,8 @@
  * @see {@link checkHttpConnectivity} - HTTP/HTTPS connectivity checking
  */
 
+import { isValidUrl } from "@shared/validation/validatorUtils";
+
 import type { MonitorCheckResult } from "../types";
 
 import { RETRY_BACKOFF } from "../../../constants";
@@ -92,8 +94,7 @@ export async function performSinglePingCheck(
 ): Promise<MonitorCheckResult> {
     try {
         // Determine check type based on host format
-         
-        const isHttpUrl = /^https?:\/\//iu.test(host);
+        const isHttpUrl = isValidUrl(host);
 
         // Use native connectivity check instead of ping package
         return isHttpUrl

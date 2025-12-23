@@ -24,7 +24,6 @@ import * as siteStatus from "../utils/siteStatus";
 import * as stringConversion from "../utils/stringConversion";
 import * as guardUtils from "../utils/typeGuards";
 import * as helperUtils from "../utils/typeHelpers";
-import * as validationUtils from "../utils/validation";
 import * as monitorSchemas from "../validation/monitorSchemas";
 import * as siteSchemas from "../validation/siteSchemas";
 import * as statusUpdateSchemas from "../validation/statusUpdateSchemas";
@@ -443,15 +442,6 @@ describe("Final 90% Function Coverage Push", () => {
             func("Custom error message");
         });
 
-        // Validation utils
-        testModuleFunctions("validationUtils", validationUtils, (func) => {
-            func("http");
-            func("port");
-            func("ping");
-            func({ type: "http", url: "https://example.com" });
-            func({ identifier: "test", name: "test", monitors: [] });
-        });
-
         expect(true).toBeTruthy();
     });
 
@@ -641,7 +631,6 @@ describe("Final 90% Function Coverage Push", () => {
             stringConversion,
             guardUtils,
             helperUtils,
-            validationUtils,
             schemas,
             validatorUtilsModule,
         ];

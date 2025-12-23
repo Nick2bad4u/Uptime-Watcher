@@ -16,7 +16,7 @@
 import { describe, expect } from "vitest";
 import fc from "fast-check";
 import { test as fcTest } from "@fast-check/vitest";
-import { validateMonitorType, validateSite } from "../../utils/validation";
+import { validateMonitorType } from "../../utils/validation";
 import {
     validateMonitorData,
     validateMonitorField,
@@ -103,11 +103,11 @@ describe("Validation Utils Comprehensive Fuzzing Tests", () => {
         );
     });
 
-    describe(validateSite, () => {
+    describe(validateSiteData, () => {
         fcTest.prop([malformedSiteArbitrary])(
             "should handle malformed site objects gracefully",
             (site) => {
-                const result = validateSite(site as any);
+                const result = validateSiteData(site as any).success;
 
                 expect(typeof result).toBe("boolean");
 
@@ -126,7 +126,7 @@ describe("Validation Utils Comprehensive Fuzzing Tests", () => {
             "should never throw an error for any input",
             (input) => {
                 expect(() => {
-                    validateSite(input as any);
+                    validateSiteData(input as any);
                 }).not.toThrowError();
             }
         );
@@ -250,7 +250,6 @@ describe("Validation Utils Comprehensive Fuzzing Tests", () => {
             ),
         ])("should handle special object types", (specialObject) => {
             expect(() => {
-                validateSite(specialObject as any);
                 validateSiteData(specialObject as any);
                 validateMonitorData("http", specialObject as any);
             }).not.toThrowError();
@@ -291,7 +290,6 @@ describe("Validation Utils Comprehensive Fuzzing Tests", () => {
             };
 
             expect(() => {
-                validateSite(testObject as any);
                 validateSiteData(testObject as any);
             }).not.toThrowError();
         });

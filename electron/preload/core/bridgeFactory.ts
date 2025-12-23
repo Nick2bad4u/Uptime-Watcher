@@ -307,6 +307,39 @@ async function verifyChannelOrThrow(channel: string): Promise<void> {
 }
 
 /**
+ * Invokes an IPC channel with a correlation envelope and normalizes failures
+ * into {@link IpcError}.
+ *
+ * @remarks
+ * This helper exists to keep {@link createTypedInvoker} and
+ * {@link createVoidInvoker} perfectly aligned, reducing the risk that one code
+ * path diverges from the other (e.g., correlation IDs added to one but not the
+ * other).
+ */
+async function invokeWithValidation<T>(
+    channel: string,
+    invoke: (correlationId: ReturnType<typeof generateCorrelationId>) =>
+        Promise<unknown>,
+    validate: (response: unknown) => T
+): Promise<T> {
+    await verifyChannelOrThrow(channel);
+
+    try {
+        const correlationId = generateCorrelationId();
+        const response = await invoke(correlationId);
+        return validate(response);
+    } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        // eslint-disable-next-line ex/use-error-cause -- Using custom IpcError class with cause handling
+        throw new IpcError(
+            `IPC call failed for channel '${channel}': ${errorMessage}`,
+            channel,
+            error instanceof Error ? error : undefined
+        );
+    }
+}
+
+/**
  * Creates a typed IPC invoker function
  *
  * @param channel - The IPC channel name
@@ -321,27 +354,16 @@ export function createTypedInvoker<TChannel extends IpcInvokeChannel>(
     return async function invokeTypedChannel(
         ...args: IpcInvokeChannelParams<TChannel>
     ): Promise<IpcInvokeChannelResult<TChannel>> {
-        await verifyChannelOrThrow(channel);
-        try {
-            const correlationId = generateCorrelationId();
-            const response: unknown = await ipcRenderer.invoke(
-                channel,
-                ...args,
-                createIpcCorrelationEnvelope(correlationId)
-            );
-            return validateIpcResponse<IpcInvokeChannelResult<TChannel>>(
-                response
-            );
-        } catch (error) {
-            const errorMessage =
-                error instanceof Error ? error.message : String(error);
-            // eslint-disable-next-line ex/use-error-cause -- Using custom IpcError class with cause handling
-            throw new IpcError(
-                `IPC call failed for channel '${channel}': ${errorMessage}`,
-                channel,
-                error instanceof Error ? error : undefined
-            );
-        }
+        return invokeWithValidation(
+            channel,
+            (correlationId) =>
+                ipcRenderer.invoke(
+                    channel,
+                    ...args,
+                    createIpcCorrelationEnvelope(correlationId)
+                ),
+            (response) => validateIpcResponse<IpcInvokeChannelResult<TChannel>>(response)
+        );
     };
 }
 
@@ -359,25 +381,19 @@ export function createVoidInvoker<TChannel extends VoidIpcInvokeChannel>(
     return async function invokeVoidChannel(
         ...args: IpcInvokeChannelParams<TChannel>
     ): Promise<void> {
-        await verifyChannelOrThrow(channel);
-        try {
-            const correlationId = generateCorrelationId();
-            const response: unknown = await ipcRenderer.invoke(
-                channel,
-                ...args,
-                createIpcCorrelationEnvelope(correlationId)
-            );
-            validateVoidIpcResponse(response);
-        } catch (error) {
-            const errorMessage =
-                error instanceof Error ? error.message : String(error);
-            // eslint-disable-next-line ex/use-error-cause -- Using custom IpcError class with cause handling
-            throw new IpcError(
-                `IPC call failed for channel '${channel}': ${errorMessage}`,
-                channel,
-                error instanceof Error ? error : undefined
-            );
-        }
+        await invokeWithValidation(
+            channel,
+            (correlationId) =>
+                ipcRenderer.invoke(
+                    channel,
+                    ...args,
+                    createIpcCorrelationEnvelope(correlationId)
+                ),
+            (response) => {
+                validateVoidIpcResponse(response);
+
+            }
+        );
     };
 }
 
@@ -393,26 +409,27 @@ export function createEventManager(channel: string): {
     once: (callback: EventCallback) => void;
     removeAll: () => void;
 } {
+    const createSafeEventCallback =
+        (callback: EventCallback) =>
+        (_event: IpcRendererEvent, ...args: unknown[]): void => {
+            try {
+                // eslint-disable-next-line n/callback-return -- Event handler callback, no return needed
+                callback(...args);
+            } catch (error) {
+                // Log callback errors but don't propagate them to prevent event system crashes
+                preloadLogger.warn("Event callback error", {
+                    channel,
+                    error,
+                });
+            }
+        };
+
     return {
         /**
          * Add an event listener
          */
         on: (callback: EventCallback): RemoveListener => {
-            const handleEventCallback = (
-                _event: IpcRendererEvent,
-                ...args: unknown[]
-            ): void => {
-                try {
-                    // eslint-disable-next-line n/callback-return -- Event handler callback, no return needed
-                    callback(...args);
-                } catch (error) {
-                    // Log callback errors but don't propagate them to prevent event system crashes
-                    preloadLogger.warn("Event callback error", {
-                        channel,
-                        error,
-                    });
-                }
-            };
+            const handleEventCallback = createSafeEventCallback(callback);
             ipcRenderer.on(channel, handleEventCallback);
             return (): void => {
                 ipcRenderer.removeListener(channel, handleEventCallback);
@@ -423,18 +440,7 @@ export function createEventManager(channel: string): {
          * Add a one-time event listener
          */
         once: (callback: EventCallback): void => {
-            ipcRenderer.once(channel, (_event, ...args: unknown[]) => {
-                try {
-                    // eslint-disable-next-line n/callback-return -- Event handler callback, no return needed
-                    callback(...args);
-                } catch (error) {
-                    // Log callback errors but don't propagate them to prevent event system crashes
-                    preloadLogger.warn("Event callback error", {
-                        channel,
-                        error,
-                    });
-                }
-            });
+            ipcRenderer.once(channel, createSafeEventCallback(callback));
         },
 
         /**

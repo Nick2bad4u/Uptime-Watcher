@@ -2,9 +2,11 @@ import type { SiteSchemaType } from "@shared/types/schemaTypes";
 import type { ValidationResult } from "@shared/types/validation";
 import type { Jsonify } from "type-fest";
 
+import { formatZodIssues } from "@shared/utils/zodIssueFormatting";
 import * as z from "zod";
 
 import { monitorSchema } from "./monitorSchemas";
+import { siteIdentifierSchema, siteNameSchema } from "./siteFieldSchemas";
 
 /**
  * Zod schema for site data.
@@ -14,18 +16,12 @@ import { monitorSchema } from "./monitorSchemas";
  */
 export const siteSchema: SiteSchemaType = z
     .object({
-        identifier: z
-            .string()
-            .min(1, "Site identifier is required")
-            .max(100, "Site identifier too long"),
+        identifier: siteIdentifierSchema,
         monitoring: z.boolean(),
         monitors: z
             .array(monitorSchema)
             .min(1, "At least one monitor is required"),
-        name: z
-            .string()
-            .min(1, "Site name is required")
-            .max(200, "Site name too long"),
+        name: siteNameSchema,
     })
     .strict();
 
@@ -65,9 +61,7 @@ export function validateSiteData(data: unknown): ValidationResult {
         };
     } catch (error) {
         if (error instanceof z.ZodError) {
-            const errors = error.issues.map(
-                (issue) => `${issue.path.join(".")}: ${issue.message}`
-            );
+            const errors = formatZodIssues(error.issues);
 
             return {
                 errors,

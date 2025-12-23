@@ -86,7 +86,7 @@ async function deleteObjectsBestEffort(args: {
  * current device.
  *
  * @remarks
- * - This does **not** require perfect deletion of legacy objects because
+ * - This does **not** require perfect deletion of older objects because
  *   `manifest.resetAt` ensures older operation objects are ignored.
  * - The remote encryption config (if present) is preserved.
  */

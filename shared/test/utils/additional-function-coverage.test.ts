@@ -1,7 +1,15 @@
 import { describe, it, expect } from "vitest";
 import * as objectSafety from "../../utils/objectSafety";
 import * as guardUtils from "../../utils/typeGuards";
-import * as validation from "../../utils/validation";
+import { getMonitorValidationErrors } from "../../validation/monitorSchemas";
+import { validateSiteData } from "../../validation/siteSchemas";
+import { validateMonitorType } from "../../utils/validation";
+
+const validation = {
+    getMonitorValidationErrors,
+    validateMonitorType,
+    validateSite: (site: unknown) => validateSiteData(site as any).success,
+};
 import * as siteStatus from "../../utils/siteStatus";
 import * as errorHandling from "../../utils/errorHandling";
 import * as errorCatalog from "../../utils/errorCatalog";

@@ -291,9 +291,9 @@ export class SyncEngine {
         // compacted operation objects to keep remote storage bounded.
         //
         // @remarks
-        // This is especially important when enabling encryption after legacy
+        // This is especially important when enabling encryption after older
         // plaintext sync artifacts exist; the first encrypted compaction should
-        // remove the old plaintext snapshot/ops.
+        // remove the previous plaintext snapshot/ops.
 
         async function safeDelete(key: string): Promise<void> {
             try {
@@ -556,7 +556,7 @@ export class SyncEngine {
      * orchestrator.
      *
      * @remarks
-     * Remote operation streams may materialize into partial or legacy
+    * Remote operation streams may materialize into partial or outdated
      * configurations (e.g. an HTTP monitor without a URL). The orchestrator
      * performs strict validation and will reject these payloads.
      *

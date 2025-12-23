@@ -1,7 +1,6 @@
 import * as objectSafety from "../../utils/objectSafety";
 // eslint-disable-next-line unicorn/no-keyword-prefix -- keeping readable namespace
 import * as typeGuards from "../../utils/typeGuards";
-import * as validation from "../../utils/validation";
 import * as siteStatus from "../../utils/siteStatus";
 import * as errorCatalog from "../../utils/errorCatalog";
 import * as environment from "../../utils/environment";
@@ -11,7 +10,17 @@ import * as typeHelpers from "../../utils/typeHelpers";
 import * as jsonSafety from "../../utils/jsonSafety";
 import * as stringConversion from "../../utils/stringConversion";
 
+import { getMonitorValidationErrors } from "../../validation/monitorSchemas";
+import { validateSiteData } from "../../validation/siteSchemas";
+import { validateMonitorType } from "../../utils/validation";
+
 import { describe, expect } from "vitest";
+
+const validation = {
+    getMonitorValidationErrors,
+    validateMonitorType,
+    validateSite: (site: unknown) => validateSiteData(site as any).success,
+};
 
 describe("Simple Function Coverage Tests", () => {
     describe("objectSafety functions", () => {

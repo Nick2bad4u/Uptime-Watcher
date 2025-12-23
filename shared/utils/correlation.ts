@@ -1,6 +1,6 @@
 import type { CorrelationId } from "@shared/types/events";
 
-const HEX_STRING_PATTERN = /^[\da-f]{16}$/u;
+import { isValidLowercaseHexString } from "@shared/validation/validatorUtils";
 
 const resolveWebCrypto = (): Crypto | null => {
     const candidate = Reflect.get(globalThis, "crypto") as Crypto | undefined;
@@ -30,7 +30,7 @@ const convertBytesToHex = (bytes: Uint8Array): string => {
 };
 
 export const isCorrelationId = (value: unknown): value is CorrelationId =>
-    typeof value === "string" && HEX_STRING_PATTERN.test(value);
+    isValidLowercaseHexString(value, 16);
 
 export const generateCorrelationId = (): CorrelationId => {
     let attempts = 0;

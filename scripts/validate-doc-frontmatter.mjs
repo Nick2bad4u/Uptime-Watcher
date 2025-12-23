@@ -15,8 +15,7 @@
  *   `tags`, `title`
  * - Allowed keys only (no deprecated/unknown fields)
  * - Basic type and format checks (arrays vs strings, date formats, enums)
- * - `schema` value points at the doc-frontmatter schema file (legacy `$schema`
- *   still accepted)
+ * - `schema` value points at the doc-frontmatter schema file
  */
 
 import { readFile, readdir } from "node:fs/promises";
@@ -439,16 +438,11 @@ function validateAgainstSchema(schema, data, filePath) {
     }
 
     // Additional check for schema reference to catch path mistakes.
-    const schemaRef =
-        typeof data["schema"] === "string"
-            ? data["schema"]
-            : typeof data["$schema"] === "string"
-              ? data["$schema"]
-              : null;
+    const schemaRef = typeof data["schema"] === "string" ? data["schema"] : null;
 
     if (schemaRef === null) {
         errors.push(
-            "Front matter must include a string 'schema' property (or legacy '$schema') pointing to config/schemas/doc-frontmatter.schema.json."
+            "Front matter must include a string 'schema' property pointing to config/schemas/doc-frontmatter.schema.json."
         );
     } else if (
         !schemaRef.endsWith("config/schemas/doc-frontmatter.schema.json")

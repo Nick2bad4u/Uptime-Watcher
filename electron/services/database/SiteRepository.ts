@@ -52,6 +52,10 @@ import type { DatabaseService } from "./DatabaseService";
 
 import { logger } from "../../utils/logger";
 import { withDatabaseOperation } from "../../utils/operationalHooks";
+import {
+    assertValidSiteIdentifier,
+    isValidSiteIdentifier,
+} from "./utils/identifierValidation";
 import { rowsToSites, rowToSite, type SiteRow } from "./utils/siteMapper";
 import { querySiteRow, querySiteRows } from "./utils/typedQueries";
 
@@ -205,6 +209,9 @@ export class SiteRepository {
      * @throws Error When the database operation fails.
      */
     public async delete(identifier: string): Promise<boolean> {
+        if (!isValidSiteIdentifier(identifier)) {
+            return false;
+        }
         return withDatabaseOperation(
             () =>
                 this.databaseService.executeTransaction((db) =>
@@ -260,6 +267,9 @@ export class SiteRepository {
      * @throws Error When the database operation fails.
      */
     public async exists(identifier: string): Promise<boolean> {
+        if (!isValidSiteIdentifier(identifier)) {
+            return false;
+        }
         return this.runSiteReadOperation(
             "site-exists",
             (db) => this.findByIdentifierInternal(db, identifier) !== undefined,
@@ -327,6 +337,9 @@ export class SiteRepository {
     public async findByIdentifier(
         identifier: string
     ): Promise<SiteRow | undefined> {
+        if (!isValidSiteIdentifier(identifier)) {
+            return undefined;
+        }
         return this.runSiteReadOperation(
             "site-lookup",
             (db) => this.findByIdentifierInternal(db, identifier),
@@ -360,6 +373,7 @@ export class SiteRepository {
     public async upsert(
         site: Pick<SiteRow, SiteRowUpsertFields>
     ): Promise<void> {
+        assertValidSiteIdentifier(site.identifier, "SiteRepository.upsert");
         return withDatabaseOperation(
             () =>
                 this.databaseService.executeTransaction((db) => {
@@ -499,6 +513,10 @@ export class SiteRepository {
 
         try {
             for (const site of sites) {
+                assertValidSiteIdentifier(
+                    site.identifier,
+                    "SiteRepository.bulkInsertInternal"
+                );
                 // Apply consistent data normalization
                 const name = site.name ?? SITE_DEFAULTS.NAME;
                 const monitoring = site.monitoring ?? SITE_DEFAULTS.MONITORING;
@@ -551,6 +569,9 @@ export class SiteRepository {
      * @throws Error When database operations fail.
      */
     private deleteInternal(db: Database, identifier: string): boolean {
+        if (!isValidSiteIdentifier(identifier)) {
+            return false;
+        }
         try {
             const result = db.run(SITE_QUERIES.DELETE_BY_ID, [identifier]);
             const deleted = result.changes > 0;
@@ -592,6 +613,7 @@ export class SiteRepository {
     ): void {
         // Apply consistent data normalization
         const { identifier } = site;
+        assertValidSiteIdentifier(identifier, "SiteRepository.upsertInternal");
         const name = site.name ?? SITE_DEFAULTS.NAME;
         const monitoring = site.monitoring ?? SITE_DEFAULTS.MONITORING;
         const monitoringValue = monitoring ? 1 : 0;
@@ -645,6 +667,9 @@ export class SiteRepository {
         db: Database,
         identifier: string
     ): SiteRow | undefined {
+        if (!isValidSiteIdentifier(identifier)) {
+            return undefined;
+        }
         try {
             const siteRow = querySiteRow(db, SITE_QUERIES.SELECT_BY_ID, [
                 identifier,

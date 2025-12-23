@@ -57,7 +57,7 @@ const isTestMode = (): boolean =>
  * Primary Storybook configuration for the React/Vite renderer.
  *
  * @remarks
- * This config is shared between the modern `storybook/` layout and the legacy
+    * This config is shared between the modern `storybook/` layout and the previous
  * `.storybook` shim to keep addons and Vite settings aligned.
  */
 const config: StorybookConfig = {

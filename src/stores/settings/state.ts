@@ -18,13 +18,6 @@ import { logStoreAction } from "../utils";
 const DEFAULT_SETTINGS_HISTORY_LIMIT = DEFAULT_HISTORY_LIMIT;
 const DEFAULT_IN_APP_ALERT_VOLUME = 1;
 
-interface LegacySettingsSnapshot {
-    /** Legacy desktop notification toggle persisted before alert split */
-    notifications?: boolean;
-    /** Legacy shared sound toggle persisted before alert split */
-    soundAlerts?: boolean;
-}
-
 /**
  * Default application settings applied during initialization.
  */
@@ -83,19 +76,17 @@ const clampInAppAlertVolume = (
  * {@link AppSettings} structure.
  *
  * @remarks
- * Handles migration from legacy fields (`notifications`, `soundAlerts`) by
- * mapping them to the new alert-specific toggles. Missing properties are filled
- * with {@link defaultSettings} to guarantee a fully-populated settings object.
+ * Missing properties are filled with {@link defaultSettings} to guarantee a
+ * fully-populated settings object.
  *
- * @param candidate - Partial settings snapshot, potentially containing legacy
- *   fields.
+ * @param candidate - Partial settings snapshot.
  *
  * @returns A fully normalized settings object.
  */
 export const normalizeAppSettings = (
-    candidate: LegacySettingsSnapshot & Partial<AppSettings> = {}
+    candidate: Partial<AppSettings> = {}
 ): AppSettings => {
-    const { notifications, soundAlerts, ...rest } = candidate;
+    const rest = candidate;
 
     const merged: AppSettings = {
         ...defaultSettings,
@@ -106,25 +97,6 @@ export const normalizeAppSettings = (
         rest.inAppAlertVolume,
         merged.inAppAlertVolume
     );
-
-    const hasExplicitSystemNotificationOverride = Object.hasOwn(
-        rest,
-        "systemNotificationsEnabled"
-    );
-
-    if (notifications !== undefined && !hasExplicitSystemNotificationOverride) {
-        merged.systemNotificationsEnabled = notifications;
-    }
-
-    if (soundAlerts !== undefined) {
-        const soundPreference = soundAlerts;
-        if (!Object.hasOwn(rest, "inAppAlertsSoundEnabled")) {
-            merged.inAppAlertsSoundEnabled = soundPreference;
-        }
-        if (!Object.hasOwn(rest, "systemNotificationsSoundEnabled")) {
-            merged.systemNotificationsSoundEnabled = soundPreference;
-        }
-    }
 
     return merged;
 };

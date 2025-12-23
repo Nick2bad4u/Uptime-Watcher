@@ -27,7 +27,6 @@ import {
     type StatusUpdateSnapshotPayload,
 } from "../../../../stores/sites/utils/statusUpdateSnapshot";
 
-import { logger } from "../../../../services/logger";
 
 import {
     resetProcessSnapshotOverrideForTesting,
@@ -42,8 +41,6 @@ vi.mock("../../../../services/logger", () => ({
         warn: vi.fn(),
     },
 }));
-
-const mockedLogger = vi.mocked(logger);
 
 type MonitorHistoryEntry = Required<Monitor>["history"][number];
 
@@ -107,38 +104,6 @@ describe(applyStatusUpdateSnapshot, () => {
         resetProcessSnapshotOverrideForTesting();
     });
 
-    it("returns the original sites array when snapshot lacks contextual site data", () => {
-        setProcessSnapshotOverrideForTesting({
-            env: {
-                NODE_ENV: "development",
-            },
-        });
-
-        const sites = [
-            createSite("site-a", [createMonitor({ id: "monitor-a" })]),
-        ];
-
-        const payload: StatusUpdateSnapshotPayload = {
-            monitorId: "monitor-a",
-            siteIdentifier: "site-a",
-            status: "down",
-            timestamp: "2024-01-01T00:00:00.000Z",
-        };
-
-        const result = applyStatusUpdateSnapshot(sites, payload);
-
-        expect(result).toBe(sites);
-        expect(mockedLogger.debug).toHaveBeenCalledWith(
-            expect.stringContaining(
-                "status update without site or monitor context"
-            ),
-            expect.objectContaining({
-                monitorId: payload.monitorId,
-                siteIdentifier: payload.siteIdentifier,
-            })
-        );
-    });
-
     it("falls back to the existing monitor history when the snapshot omits history records", () => {
         const existingHistory = [
             createHistoryEntry("up", 0),
@@ -155,6 +120,7 @@ describe(applyStatusUpdateSnapshot, () => {
         const payload: StatusUpdateSnapshotPayload = {
             monitor: createMonitor({ id: monitor.id, history: [] }),
             monitorId: monitor.id,
+            responseTime: 0,
             site: createSite("site-history", [monitor]),
             siteIdentifier: "site-history",
             status: "down",
@@ -186,6 +152,7 @@ describe(applyStatusUpdateSnapshot, () => {
                 status: "down",
             }),
             monitorId: monitor.id,
+            responseTime: 0,
             site: createSite("site-new-history", [monitor]),
             siteIdentifier: "site-new-history",
             status: "down",
@@ -257,6 +224,7 @@ describe(applyStatusUpdateSnapshot, () => {
                 status: nextStatus,
             }),
             monitorId,
+            responseTime: 0,
             site: createSite(siteIdentifier, [
                 targetMonitor,
                 siblingMonitor,

@@ -46,8 +46,8 @@ import {
 
 import {
     validateMonitorType,
-    getMonitorValidationErrors,
 } from "@shared/utils/validation";
+import { getMonitorValidationErrors } from "@shared/validation/monitorSchemas";
 
 import {
     parseUptimeValue,
@@ -1080,6 +1080,9 @@ describe("Comprehensive Validation Function Fuzzing", () => {
                 id: `test-${Math.random().toString(36).slice(2)}`,
                 type: monitorType,
                 status: "up" as const,
+                monitoring: true,
+                responseTime: -1,
+                history: [],
                 checkInterval: 30_000,
                 timeout: 5000,
                 retryAttempts: 3,
@@ -1087,6 +1090,12 @@ describe("Comprehensive Validation Function Fuzzing", () => {
                     ? { url: "https://example.com" }
                     : {}),
                 ...(monitorType === "ping" ? { host: "example.com" } : {}),
+                ...(monitorType === "port"
+                    ? { host: "example.com", port: 443 }
+                    : {}),
+                ...(monitorType === "dns"
+                    ? { host: "example.com", recordType: "A" as const }
+                    : {}),
             };
 
             // Test composite validation

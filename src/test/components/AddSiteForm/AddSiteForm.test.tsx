@@ -68,7 +68,7 @@ vi.mock("../../../components/SiteDetails/useAddSiteForm", () => ({
         setSiteIdentifier: vi.fn(),
         setUrl: vi.fn(),
 
-        // Legacy properties kept for backwards compatibility with older tests
+        // Previous properties kept for backwards compatibility with older tests
         formData: {
             siteName: "",
             url: "",

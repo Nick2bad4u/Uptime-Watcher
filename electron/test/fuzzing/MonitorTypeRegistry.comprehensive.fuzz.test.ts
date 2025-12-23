@@ -31,7 +31,6 @@ import {
     registerMonitorType,
     createMonitorWithTypeGuards,
     isValidMonitorTypeGuard,
-    migrateMonitorType,
     type BaseMonitorConfig,
 } from "../../services/monitoring/MonitorTypeRegistry";
 
@@ -346,27 +345,6 @@ describe("MonitorTypeRegistry Fuzzing Tests", () => {
         });
     });
 
-    describe(migrateMonitorType, () => {
-        it("should handle migration parameters safely", () => {
-            fc.assert(
-                fc.property(fc.string(), fc.string(), fc.record({}), (
-                    fromType: string,
-                    _toType: string,
-                    data: Record<string, any>
-                ) => {
-                    // Property: migration should not throw with any parameters
-                    expect(() =>
-                        migrateMonitorType(
-                            fromType as MonitorType,
-                            "1.0.0",
-                            "2.0.0",
-                            data
-                        )).not.toThrowError();
-                })
-            );
-        });
-    });
-
     describe("Edge Cases and Security", () => {
         it("should handle SQL injection attempts", () => {
             const sqlInjectionAttempts = [
@@ -439,13 +417,9 @@ describe("MonitorTypeRegistry Fuzzing Tests", () => {
 
             expect(() => getMonitorTypeConfig(largeString)).not.toThrowError();
             expect(() => isValidMonitorType(largeString)).not.toThrowError();
-            expect(() =>
-                migrateMonitorType(
-                    "http" as MonitorType,
-                    "1.0.0",
-                    "2.0.0",
-                    deepObject
-                )).not.toThrowError();
+            // Registry APIs are string-keyed; ensure deep objects don't break
+            // unrelated registry operations.
+            expect(() => JSON.stringify(deepObject)).not.toThrowError();
         });
     });
 

@@ -858,9 +858,25 @@ describe("Events Domain API", () => {
             ] as const;
             const MIN_ISO_TIMESTAMP_MS = -8_640_000_000_000_000 + 1;
             const MAX_ISO_TIMESTAMP_MS = 8_640_000_000_000_000 - 1;
+            const nonWhitespaceString = (constraints?: {
+                readonly maxLength?: number;
+                readonly minLength?: number;
+            }) =>
+                (() => {
+                    const minLength = constraints?.minLength ?? 1;
+                    const maxLength = constraints?.maxLength ?? Math.max(32, minLength);
+
+                    return fc
+                        .string({
+                            maxLength,
+                            minLength,
+                        })
+                        .filter((value) => /\S/u.test(value));
+                })();
+
             const monitorFixtureArbitrary = fc
                 .record({
-                    id: fc.string({ minLength: 1 }),
+                    id: nonWhitespaceString({ maxLength: 200, minLength: 1 }),
                     monitoring: fc.boolean(),
                     responseTime: fc.nat({ max: 10_000 }),
                     status: fc.constantFrom(...statusValues),
@@ -874,9 +890,9 @@ describe("Events Domain API", () => {
                     }));
 
             const siteOverrideArbitrary = fc.record({
-                identifier: fc.string({ minLength: 1 }),
+                identifier: nonWhitespaceString({ maxLength: 100, minLength: 1 }),
                 monitoring: fc.boolean(),
-                name: fc.option(fc.string({ minLength: 1 }), {
+                name: fc.option(nonWhitespaceString({ maxLength: 200, minLength: 1 }), {
                     nil: undefined,
                 }),
             });

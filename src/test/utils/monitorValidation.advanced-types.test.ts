@@ -22,10 +22,19 @@ vi.mock("@shared/utils/errorHandling", () => ({
     withUtilityErrorHandling: vi.fn(),
 }));
 
-vi.mock("@shared/validation/monitorSchemas", () => ({
-    validateMonitorData: vi.fn(),
-    validateMonitorField: vi.fn(),
-}));
+vi.mock(
+    "@shared/validation/monitorSchemas",
+    async (importOriginal): Promise<unknown> => {
+        const actual =
+            (await importOriginal()) as typeof import("@shared/validation/monitorSchemas");
+
+        return {
+            ...actual,
+            validateMonitorData: vi.fn(),
+            validateMonitorField: vi.fn(),
+        };
+    }
+);
 
 import {
     validateMonitorFormData,

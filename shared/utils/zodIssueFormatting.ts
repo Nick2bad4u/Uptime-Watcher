@@ -19,7 +19,14 @@ export type ZodIssuePathPart = number | string | symbol;
  */
 export interface ZodIssueLike {
     message: string;
-    path: readonly ZodIssuePathPart[];
+    /**
+     * Path segments pointing to the offending value.
+     *
+     * @remarks
+     * This is optional to allow callers to reuse the formatter with
+     * "Zod-like" issue objects that only provide a message.
+     */
+    path?: readonly ZodIssuePathPart[];
 }
 
 /**
@@ -59,7 +66,7 @@ export function formatZodIssues(
     }
 
     return issues.map((issue) => {
-        const renderedPath = issue.path.map(String).join(pathSeparator);
+        const renderedPath = (issue.path ?? []).map(String).join(pathSeparator);
 
         return renderedPath.length > 0
             ? `${renderedPath}: ${issue.message}`

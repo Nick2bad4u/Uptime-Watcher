@@ -1084,10 +1084,17 @@ describe("Shared Safe Conversions - Backend Coverage", () => {
                     );
                     const floatResult = safeParseFloat(input, defaultFloat);
 
-                    if (typeof input === "number" && !Number.isFinite(input)) {
+                    if (
+                        typeof input === "number" &&
+                        (input === Infinity || input === -Infinity)
+                    ) {
                         // These functions preserve infinity when input is an infinite number
                         expect(Number.isFinite(numConvResult)).toBeFalsy();
                         expect(Number.isFinite(floatResult)).toBeFalsy();
+                    } else {
+                        // NaN (and all other non-infinite inputs) must not leak through.
+                        expect(Number.isFinite(numConvResult)).toBeTruthy();
+                        expect(Number.isFinite(floatResult)).toBeTruthy();
                     }
 
                     // Functions that should always return finite numbers

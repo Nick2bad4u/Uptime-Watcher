@@ -93,33 +93,29 @@ function buildBackupMetadata(
 }
 
 function normalizeBackupArgs(
-    params: CreateDatabaseBackupParams,
-    legacyFileName?: string
+    params: CreateDatabaseBackupParams
 ): CreateDatabaseBackupArgs {
-    if (typeof params === "string") {
-        if (legacyFileName) {
-            return {
-                dbPath: params,
-                fileName: legacyFileName,
-            };
-        }
+    const normalized: CreateDatabaseBackupArgs =
+        typeof params === "string" ? { dbPath: params } : params;
 
-        return { dbPath: params };
+    if (
+        typeof normalized.fileName === "string" &&
+        normalized.fileName.trim().length === 0
+    ) {
+        return { dbPath: normalized.dbPath };
     }
 
-    return params;
+    return normalized;
 }
 
 /**
  * Creates a byte-for-byte copy of the SQLite database for download/export.
  */
 export async function createDatabaseBackup(
-    params: CreateDatabaseBackupParams,
-    legacyFileName?: string
+    params: CreateDatabaseBackupParams
 ): Promise<DatabaseBackupResult> {
     const { dbPath, fileName = BACKUP_DB_FILE_NAME } = normalizeBackupArgs(
-        params,
-        legacyFileName
+        params
     );
     try {
         // DbPath originates from app-controlled directories (userData, temporary

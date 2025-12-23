@@ -23,6 +23,11 @@ import {
     validateAppNotificationRequest,
     validateNotificationPreferenceUpdate,
 } from "@shared/validation/notifications";
+import {
+    SITE_IDENTIFIER_MAX_LENGTH,
+    SITE_IDENTIFIER_REQUIRED_MESSAGE,
+    SITE_IDENTIFIER_TOO_LONG_MESSAGE,
+} from "@shared/validation/siteFieldConstants";
 
 import type { IpcParameterValidator } from "./types";
 
@@ -275,6 +280,46 @@ function createNoParamsValidator(): IpcParameterValidator {
     return createParamValidator(0);
 }
 
+const validateSiteIdentifierCandidate = (
+    value: unknown,
+    paramName: string
+): ParameterValueValidationResult => {
+    if (typeof value !== "string") {
+        return toValidationResult(IpcValidators.requiredString(value, paramName));
+    }
+
+    if (value.trim().length === 0) {
+        return [SITE_IDENTIFIER_REQUIRED_MESSAGE];
+    }
+
+    if (value.length > SITE_IDENTIFIER_MAX_LENGTH) {
+        return [SITE_IDENTIFIER_TOO_LONG_MESSAGE];
+    }
+
+    return null;
+};
+
+function createSiteIdentifierValidator(paramName: string): IpcParameterValidator {
+    return createParamValidator(1, [
+        (value): ParameterValueValidationResult =>
+            validateSiteIdentifierCandidate(value, paramName),
+    ]);
+}
+
+function createSiteIdentifierAndMonitorIdValidator(
+    siteParamName: string,
+    monitorParamName: string
+): IpcParameterValidator {
+    return createParamValidator(2, [
+        (value): ParameterValueValidationResult =>
+            validateSiteIdentifierCandidate(value, siteParamName),
+        (value): ParameterValueValidationResult =>
+            toValidationResult(
+                IpcValidators.requiredString(value, monitorParamName)
+            ),
+    ]);
+}
+
 const validateSitePayload: IpcParameterValidator = createParamValidator(
     1,
     [
@@ -290,9 +335,7 @@ const validateSiteUpdatePayload: IpcParameterValidator = createParamValidator(
     2,
     [
         (identifierCandidate): ParameterValueValidationResult =>
-            toValidationResult(
-                IpcValidators.requiredString(identifierCandidate, "identifier")
-            ),
+            validateSiteIdentifierCandidate(identifierCandidate, "identifier"),
         (updatesCandidate): ParameterValueValidationResult => {
             const objectError = IpcValidators.requiredObject(
                 updatesCandidate,
@@ -956,7 +999,10 @@ export const SiteHandlerValidators: SiteHandlerValidatorsInterface = {
      * @remarks
      * Expects two parameters: site identifier and monitor ID (both strings).
      */
-    removeMonitor: createTwoStringValidator("siteIdentifier", "monitorId"),
+    removeMonitor: createSiteIdentifierAndMonitorIdValidator(
+        "siteIdentifier",
+        "monitorId"
+    ),
 
     /**
      * Validates parameters for the "remove-site" IPC handler.
@@ -964,7 +1010,7 @@ export const SiteHandlerValidators: SiteHandlerValidatorsInterface = {
      * @remarks
      * Expects a single parameter: the site identifier (string).
      */
-    removeSite: createSingleStringValidator("identifier"),
+    removeSite: createSiteIdentifierValidator("identifier"),
 
     /**
      * Validates parameters for the "update-site" IPC handler.
@@ -992,7 +1038,10 @@ export const MonitoringHandlerValidators: MonitoringHandlerValidatorsInterface =
          * Expects two parameters: site identifier and monitor ID (both
          * strings).
          */
-        checkSiteNow: createTwoStringValidator("identifier", "monitorId"),
+        checkSiteNow: createSiteIdentifierAndMonitorIdValidator(
+            "identifier",
+            "monitorId"
+        ),
 
         /**
          * Validates parameters for the "start-monitoring" IPC handler.
@@ -1010,7 +1059,7 @@ export const MonitoringHandlerValidators: MonitoringHandlerValidatorsInterface =
          * Expects two parameters: site identifier (string) and monitor ID
          * (string).
          */
-        startMonitoringForMonitor: createTwoStringValidator(
+        startMonitoringForMonitor: createSiteIdentifierAndMonitorIdValidator(
             "identifier",
             "monitorId"
         ),
@@ -1021,7 +1070,7 @@ export const MonitoringHandlerValidators: MonitoringHandlerValidatorsInterface =
          * @remarks
          * Expects one parameter: site identifier (string).
          */
-        startMonitoringForSite: createSingleStringValidator("identifier"),
+        startMonitoringForSite: createSiteIdentifierValidator("identifier"),
 
         /**
          * Validates parameters for the "stop-monitoring" IPC handler.
@@ -1039,7 +1088,7 @@ export const MonitoringHandlerValidators: MonitoringHandlerValidatorsInterface =
          * Expects two parameters: site identifier (string) and monitor ID
          * (string).
          */
-        stopMonitoringForMonitor: createTwoStringValidator(
+        stopMonitoringForMonitor: createSiteIdentifierAndMonitorIdValidator(
             "identifier",
             "monitorId"
         ),
@@ -1050,7 +1099,7 @@ export const MonitoringHandlerValidators: MonitoringHandlerValidatorsInterface =
          * @remarks
          * Expects one parameter: site identifier (string).
          */
-        stopMonitoringForSite: createSingleStringValidator("identifier"),
+        stopMonitoringForSite: createSiteIdentifierValidator("identifier"),
     } as const;
 
 /**

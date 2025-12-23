@@ -33,6 +33,10 @@ import {
     validateSiteData,
     type Site,
 } from "../../validation/siteSchemas";
+import {
+    isValidHost,
+    isValidUrl,
+} from "../../validation/validatorUtils";
 
 const MAX_MONITOR_CHECK_INTERVAL_MS = 30 * 24 * 60 * 60 * 1000;
 const MIN_TIMEOUT_MS = 1e3;
@@ -118,7 +122,22 @@ const baseMonitorArbitrary = fc.record({
 
 const httpUrlArbitrary = fc
     .webUrl()
-    .filter((url) => url.startsWith("http://") || url.startsWith("https://"));
+    .filter((url) => url.startsWith("http://") || url.startsWith("https://"))
+    .filter((url) =>
+        isValidUrl(url, {
+            allowSingleQuotes: true,
+            protocols: ["http", "https"],
+            "require_tld": false,
+        })
+    )
+    .filter((url) => {
+        try {
+            const parsed = new URL(url);
+            return isValidHost(parsed.hostname);
+        } catch {
+            return false;
+        }
+    });
 
 const pingMonitorArbitrary: fc.Arbitrary<PingMonitor> = fc
     .tuple(baseMonitorArbitrary, hostArbitrary)

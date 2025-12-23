@@ -61,7 +61,6 @@ describe(DropboxAuthFlow, () => {
                         authType?: "token" | "code",
                         tokenAccessType?:
                             | null
-                            | "legacy"
                             | "offline"
                             | "online",
                         scope?: string[],

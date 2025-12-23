@@ -10,7 +10,6 @@ import {
     getRegisteredMonitorTypes,
     isValidMonitorType,
     isValidMonitorTypeGuard,
-    migrateMonitorType,
 } from "../../../services/monitoring/MonitorTypeRegistry";
 
 const monitorFixtures: Record<MonitorType, Partial<Monitor>> = {
@@ -178,28 +177,4 @@ describe("MonitorTypeRegistry runtime coverage", () => {
         expect(remaining.size).toBe(0);
     });
 
-    it("reports migration errors for invalid types and handles version bumps", async () => {
-        const invalidResult = await migrateMonitorType(
-            "http" as MonitorType,
-            "1.0.0",
-            "1.0.0"
-        );
-        expect(invalidResult.success).toBeTruthy();
-
-        const placeholder = await migrateMonitorType(
-            "http" as MonitorType,
-            "1.0.0",
-            "1.1.0"
-        );
-        expect(placeholder.success).toBeTruthy();
-        expect(placeholder.appliedMigrations).toContain("http_1.0.0_to_1.1.0");
-
-        const validationFailure = await migrateMonitorType(
-            "not-a-type" as unknown as MonitorType,
-            "1.0.0",
-            "1.1.0"
-        );
-        expect(validationFailure.success).toBeFalsy();
-        expect(validationFailure.errors[0]).toMatch(/Invalid monitor type/);
-    });
 });

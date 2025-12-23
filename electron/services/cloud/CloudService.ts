@@ -407,21 +407,6 @@ export class CloudService {
                     throw new Error("Incorrect encryption passphrase");
                 }
 
-                // Backfill `enabledAt` for older manifests so we can enforce a
-                // stable "encryption boundary" going forward.
-                if (manifest && remoteEncryption.enabledAt === undefined) {
-                    const enabledAt = Date.now();
-                    const nextManifest: CloudSyncManifest = {
-                        ...manifest,
-                        encryption: {
-                            ...remoteEncryption,
-                            enabledAt,
-                        },
-                    };
-
-                    await transport.writeManifest(nextManifest).catch(() => {});
-                }
-
                 // NOTE: Do not run settings writes in parallel.
                 // Some settings adapters are transaction-backed and parallel
                 // writes can trigger nested-transaction warnings.
@@ -447,7 +432,6 @@ export class CloudService {
             const key = await derivePassphraseKey({ passphrase, salt });
             const encryptionConfig: CloudEncryptionConfigPassphrase = {
                 configVersion: CLOUD_ENCRYPTION_CONFIG_VERSION,
-                enabledAt: Date.now(),
                 kdf: "scrypt",
                 keyCheckBase64: createKeyCheckBase64(key),
                 mode: "passphrase",
@@ -931,26 +915,8 @@ export class CloudService {
         }
 
         const key = decodeBase64(rawKey);
-        let encryptionEnabledAt: number | undefined = undefined;
-
-        try {
-            const transport = ProviderCloudSyncTransport.create(provider);
-            const manifest = await transport.readManifest();
-            const encryption = manifest?.encryption;
-            if (
-                encryption?.mode === "passphrase" &&
-                typeof encryption.enabledAt === "number"
-            ) {
-                encryptionEnabledAt = encryption.enabledAt;
-            }
-        } catch {
-            encryptionEnabledAt = undefined;
-        }
 
         return new EncryptedSyncCloudStorageProvider({
-            ...(encryptionEnabledAt === undefined
-                ? {}
-                : { encryptionEnabledAt }),
             inner: provider,
             key,
         });

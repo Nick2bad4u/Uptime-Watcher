@@ -574,7 +574,7 @@ export class DatabaseManager {
         const historyRules =
             this.configurationManager.getHistoryRetentionRules();
 
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- Configuration manager may temporarily return undefined during legacy migrations; surface an explicit error for diagnostics.
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- Configuration manager may temporarily return undefined during development-time schema transitions; surface an explicit error for diagnostics.
         if (!historyRules) {
             throw new TypeError(
                 "[DatabaseManager.setHistoryLimit] History retention rules are not configured"

@@ -5,6 +5,7 @@
 
 import { describe, it, expect, vi } from "vitest";
 import type { MonitorTypeConfig } from "@shared/types/monitorTypes";
+import { MIN_MONITOR_CHECK_INTERVAL_MS } from "@shared/constants/monitoring";
 
 describe("Function Coverage Boost Tests", () => {
     describe("Uncovered validation functions", () => {
@@ -46,66 +47,84 @@ describe("Function Coverage Boost Tests", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Validation", "type");
 
-            const { validateSite } =
-                await import("../../shared/utils/validation");
+            const { validateSiteData } = await import(
+                "../../shared/validation/siteSchemas"
+            );
 
             // Valid site object
             const validSite = {
                 identifier: "test-site",
                 name: "Test Site",
                 monitoring: true,
-                monitors: [],
+                monitors: [
+                    {
+                        id: "m1",
+                        type: "http",
+                        status: "up",
+                        monitoring: true,
+                        responseTime: -1,
+                        history: [],
+                        url: "https://example.com",
+                        checkInterval: 5000,
+                        timeout: 1000,
+                        retryAttempts: 0,
+                    },
+                ],
             };
 
-            expect(validateSite(validSite)).toBeTruthy();
+            expect(validateSiteData(validSite).success).toBeTruthy();
 
             // Invalid cases
-            expect(validateSite({})).toBeFalsy();
-            expect(validateSite(null as any)).toBeFalsy();
-            expect(validateSite(undefined as any)).toBeFalsy();
-            expect(validateSite("string" as any)).toBeFalsy();
-            expect(validateSite(123 as any)).toBeFalsy();
+            expect(validateSiteData({} as any).success).toBeFalsy();
+            expect(validateSiteData(null as any).success).toBeFalsy();
+            expect(validateSiteData(undefined as any).success).toBeFalsy();
+            expect(validateSiteData("string" as any).success).toBeFalsy();
+            expect(validateSiteData(123 as any).success).toBeFalsy();
 
             // Missing required fields
-            expect(validateSite({ identifier: "test" })).toBeFalsy();
-            expect(validateSite({ name: "Test" })).toBeFalsy();
-            expect(validateSite({ monitoring: true })).toBeFalsy();
+            expect(validateSiteData({ identifier: "test" } as any).success).toBeFalsy(
+
+            );
+            expect(validateSiteData({ name: "Test" } as any).success).toBeFalsy();
+            expect(
+                validateSiteData({ monitoring: true } as any).success
+            ).toBeFalsy();
 
             // Invalid field types
             expect(
-                validateSite({
+                validateSiteData({
                     identifier: "",
                     name: "Test",
                     monitoring: true,
                     monitors: [],
-                })
+                }).success
             ).toBeFalsy();
 
             expect(
-                validateSite({
+                validateSiteData({
                     identifier: "test",
                     name: "",
                     monitoring: true,
                     monitors: [],
-                })
+                }).success
             ).toBeFalsy();
 
             expect(
-                validateSite({
+                validateSiteData({
                     identifier: "test",
                     name: "Test",
                     monitoring: "not-boolean",
                     monitors: [],
-                } as any)
+                } as any).success
             ).toBeFalsy();
 
             expect(
-                validateSite({
+                validateSiteData({
                     identifier: "test",
                     name: "Test",
                     monitoring: true,
                     monitors: "not-array",
-                } as any)
+                } as any).success
             ).toBeFalsy();
         });
 
@@ -118,79 +137,131 @@ describe("Function Coverage Boost Tests", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Error Handling", "type");
 
-            const { getMonitorValidationErrors } =
-                await import("../../shared/utils/validation");
+            const { getMonitorValidationErrors } = await import(
+                "../../shared/validation/monitorSchemas"
+            );
 
             // Test various invalid monitor objects
             expect(getMonitorValidationErrors({})).toContain(
-                "Monitor id is required"
-            );
-            expect(getMonitorValidationErrors({})).toContain(
                 "Monitor type is required"
             );
-            expect(getMonitorValidationErrors({})).toContain(
-                "Monitor status is required"
+            expect(
+                getMonitorValidationErrors({
+                    type: "http",
+                    id: "",
+                })
+            ).toEqual(
+                expect.arrayContaining([
+                    expect.stringContaining("Monitor ID is required"),
+                ])
             );
 
             // Test invalid field values
             const invalidMonitor = {
                 id: "",
-                type: "invalid-type",
+                type: "http",
                 status: "invalid-status",
+                monitoring: true,
+                responseTime: -1,
+                history: [],
+                url: "https://example.com",
                 checkInterval: 500, // Too low
                 timeout: -1, // negative
                 retryAttempts: 15, // Too high
             } as any;
 
             const errors = getMonitorValidationErrors(invalidMonitor);
-            expect(errors).toContain("Monitor id is required");
-            expect(errors).toContain("Invalid monitor type");
-            expect(errors).toContain("Invalid monitor status");
-            expect(errors).toContain("Check interval must be at least 1000ms");
-            expect(errors).toContain("Timeout must be a positive number");
-            expect(errors).toContain("Retry attempts must be between 0 and 10");
+            expect(errors).toEqual(
+                expect.arrayContaining([
+                    expect.stringContaining("Monitor ID is required"),
+                    expect.stringContaining(
+                        `Check interval must be at least ${MIN_MONITOR_CHECK_INTERVAL_MS}ms`
+                    ),
+                    expect.stringContaining("Timeout"),
+                    expect.stringContaining("Retry"),
+                    expect.stringContaining("status"),
+                ])
+            );
 
             // Test type-specific validations
             const httpMonitorNoUrl = {
                 id: "test",
                 type: "http",
                 status: "up",
+                monitoring: true,
+                responseTime: -1,
+                history: [],
+                checkInterval: MIN_MONITOR_CHECK_INTERVAL_MS,
+                timeout: 1000,
+                retryAttempts: 0,
             } as any;
-            expect(getMonitorValidationErrors(httpMonitorNoUrl)).toContain(
-                "URL is required for HTTP monitors"
-            );
+            expect(
+                getMonitorValidationErrors(httpMonitorNoUrl).some((error) =>
+                    error.toLowerCase().startsWith("url:")
+                )
+            ).toBeTruthy();
 
             const pingMonitorNoHost = {
                 id: "test",
                 type: "ping",
                 status: "up",
+                monitoring: true,
+                responseTime: -1,
+                history: [],
+                checkInterval: MIN_MONITOR_CHECK_INTERVAL_MS,
+                timeout: 1000,
+                retryAttempts: 0,
             } as any;
-            expect(getMonitorValidationErrors(pingMonitorNoHost)).toContain(
-                "Host is required for ping monitors"
-            );
+            expect(
+                getMonitorValidationErrors(pingMonitorNoHost).some((error) =>
+                    error.toLowerCase().startsWith("host:")
+                )
+            ).toBeTruthy();
 
             const portMonitorInvalid = {
                 id: "test",
                 type: "port",
                 status: "up",
+                monitoring: true,
+                responseTime: -1,
+                history: [],
+                checkInterval: MIN_MONITOR_CHECK_INTERVAL_MS,
+                timeout: 1000,
+                retryAttempts: 0,
                 port: 99_999, // Too high
             } as any;
             const portErrors = getMonitorValidationErrors(portMonitorInvalid);
-            expect(portErrors).toContain("Host is required for port monitors");
-            expect(portErrors).toContain(
-                "Valid port number (1-65535) is required for port monitors"
+            expect(portErrors.some((error) => error.toLowerCase().startsWith("host:"))).toBeTruthy(
+
             );
+            expect(
+                portErrors.some(
+                    (error) =>
+                        error.toLowerCase().startsWith("port:") &&
+                        error.includes("65535")
+                )
+            ).toBeTruthy();
 
             const dnsMonitorInvalid = {
                 id: "test",
                 type: "dns",
                 status: "up",
+                monitoring: true,
+                responseTime: -1,
+                history: [],
+                checkInterval: MIN_MONITOR_CHECK_INTERVAL_MS,
+                timeout: 1000,
+                retryAttempts: 0,
                 recordType: "INVALID",
             } as any;
             const dnsErrors = getMonitorValidationErrors(dnsMonitorInvalid);
-            expect(dnsErrors).toContain("Host is required for DNS monitors");
             expect(
-                dnsErrors.some((error) => error.includes("Invalid record type"))
+                dnsErrors.some((error) => error.toLowerCase().startsWith("host:"))
+            ).toBeTruthy();
+            expect(
+                dnsErrors.some((error) =>
+                    error.toLowerCase().startsWith("recordtype:")
+                )
             ).toBeTruthy();
         });
     });

@@ -84,6 +84,10 @@ describe("Final Function Coverage Push", () => {
         annotate("Type: Validation", "type");
 
         const validation = await import("../../shared/utils/validation");
+        const monitorSchemas = await import(
+            "../../shared/validation/monitorSchemas"
+        );
+        const siteSchemas = await import("../../shared/validation/siteSchemas");
 
         // Test validateMonitorType
         expect(validation.validateMonitorType("http")).toBeTruthy();
@@ -101,7 +105,7 @@ describe("Final Function Coverage Push", () => {
             timeout: 5000,
             retryAttempts: 3,
         };
-        const errors1 = validation.getMonitorValidationErrors(validMonitor);
+        const errors1 = monitorSchemas.getMonitorValidationErrors(validMonitor);
         expect(Array.isArray(errors1)).toBeTruthy();
 
         const invalidMonitor = {
@@ -110,7 +114,7 @@ describe("Final Function Coverage Push", () => {
             timeout: -1,
             retryAttempts: -1,
         };
-        const errors2 = validation.getMonitorValidationErrors(invalidMonitor);
+        const errors2 = monitorSchemas.getMonitorValidationErrors(invalidMonitor);
         expect(Array.isArray(errors2)).toBeTruthy();
 
         // Test validateSite
@@ -119,13 +123,13 @@ describe("Final Function Coverage Push", () => {
             url: "https://example.com",
             monitors: [],
         };
-        const siteResult = validation.validateSite(validSite);
+        const siteResult = siteSchemas.validateSiteData(validSite).success;
         expect(
             typeof siteResult === "boolean" || typeof siteResult === "object"
         ).toBeTruthy();
 
         const invalidSite = {};
-        const siteResult2 = validation.validateSite(invalidSite);
+        const siteResult2 = siteSchemas.validateSiteData(invalidSite).success;
         expect(
             typeof siteResult2 === "boolean" || typeof siteResult2 === "object"
         ).toBeTruthy();

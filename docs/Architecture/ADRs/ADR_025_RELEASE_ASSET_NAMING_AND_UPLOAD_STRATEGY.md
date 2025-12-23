@@ -87,7 +87,7 @@ Pros:
 
 Cons:
 
-- may remove legacy update flows
+- may remove older update flows
 
 ## Consequences
 

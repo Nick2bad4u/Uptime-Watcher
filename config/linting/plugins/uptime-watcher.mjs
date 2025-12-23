@@ -4196,7 +4196,7 @@ const noOneDriveRule = {
     create(context) {
         const normalizedFilename = normalizePath(context.getFilename());
 
-        // Ignore tests to avoid creating busywork when describing legacy state.
+        // Ignore tests to avoid creating busywork when describing previous state.
         if (
             normalizedFilename.includes("/test/") ||
             normalizedFilename.includes("/tests/") ||

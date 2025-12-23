@@ -56,6 +56,21 @@ vi.mock("@shared/validation/validatorUtils", () => ({
     isNonEmptyString: vi.fn(
         (value) => typeof value === "string" && value.trim().length > 0
     ),
+    isValidLowercaseHexString: vi.fn((value, length) => {
+        if (typeof value !== "string") {
+            return false;
+        }
+
+        if (typeof length !== "number" || !Number.isFinite(length)) {
+            return false;
+        }
+
+        if (value.length !== length) {
+            return false;
+        }
+
+        return /^[\da-f]+$/u.test(value);
+    }),
     isValidUrl: vi.fn(
         (value) =>
             typeof value === "string" && /^(?:https?:\/\/)[^\s]+$/u.test(value)

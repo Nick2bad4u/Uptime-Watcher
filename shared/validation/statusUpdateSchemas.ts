@@ -6,7 +6,9 @@ import type {
 
 import * as z from "zod";
 
+import { monitorIdSchema } from "./monitorFieldSchemas";
 import { monitorSchema } from "./monitorSchemas";
+import { siteIdentifierSchema } from "./siteFieldSchemas";
 import { siteSchema } from "./siteSchemas";
 import { monitorStatusEnumValues } from "./statusValidationPrimitives";
 
@@ -49,17 +51,44 @@ const createStatusUpdateSchema = (): StatusUpdateSchema =>
         .object({
             details: z.string().optional(),
             monitor: monitorSchema,
-            monitorId: z.string().min(1, "Monitor identifier is required"),
+            monitorId: monitorIdSchema,
             previousStatus: z.enum(monitorStatusEnumValues).optional(),
             responseTime: z.number().optional(),
             site: siteSchema,
-            siteIdentifier: z
-                .string()
-                .min(1, "Site identifier is required for status updates"),
+            siteIdentifier: siteIdentifierSchema,
             status: z.enum(monitorStatusEnumValues),
             timestamp: isoTimestampSchema,
         })
-        .strict();
+        .strict()
+        .superRefine((value, context) => {
+            if (value.monitorId !== value.monitor.id) {
+                context.addIssue({
+                    code: "custom",
+                    message: "monitorId must match monitor.id",
+                    path: ["monitorId"],
+                });
+            }
+
+            if (value.siteIdentifier !== value.site.identifier) {
+                context.addIssue({
+                    code: "custom",
+                    message: "siteIdentifier must match site.identifier",
+                    path: ["siteIdentifier"],
+                });
+            }
+
+            const isMonitorPresentInSite = value.site.monitors.some(
+                (monitor) => monitor.id === value.monitorId
+            );
+
+            if (!isMonitorPresentInSite) {
+                context.addIssue({
+                    code: "custom",
+                    message: "monitorId must reference a monitor in site.monitors",
+                    path: ["monitorId"],
+                });
+            }
+        });
 
 /**
  * Zod schema validating canonical status update payloads.

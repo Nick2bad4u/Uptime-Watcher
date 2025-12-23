@@ -23,10 +23,19 @@ vi.mock("../../stores/monitor/useMonitorTypesStore", () => {
     };
 });
 
-vi.mock("@shared/validation/monitorSchemas", () => ({
-    validateMonitorData: vi.fn(),
-    validateMonitorField: vi.fn(),
-}));
+vi.mock(
+    "@shared/validation/monitorSchemas",
+    async (importOriginal): Promise<unknown> => {
+        const actual =
+            (await importOriginal()) as typeof import("@shared/validation/monitorSchemas");
+
+        return {
+            ...actual,
+            validateMonitorData: vi.fn(),
+            validateMonitorField: vi.fn(),
+        };
+    }
+);
 
 import { useMonitorTypesStore } from "../../stores/monitor/useMonitorTypesStore";
 import {

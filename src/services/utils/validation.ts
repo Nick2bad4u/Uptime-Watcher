@@ -9,19 +9,44 @@
  * makes it easier to evolve diagnostics formatting over time.
  */
 
-interface ZodLikeIssue {
-    readonly message: string;
-}
+import { isObject } from "@shared/utils/typeGuards";
+import {
+    formatZodIssues,
+    type ZodIssueLike,
+    type ZodIssuePathPart,
+} from "@shared/utils/zodIssueFormatting";
 
-interface ZodLikeErrorShape {
-    readonly issues: readonly ZodLikeIssue[];
-}
-
-const hasIssueArray = (value: unknown): value is ZodLikeErrorShape =>
-    typeof value === "object" &&
-    value !== null &&
+const hasIssueArray = (
+    value: unknown
+): value is { readonly issues: unknown[] } =>
+    isObject(value) &&
     "issues" in value &&
     Array.isArray((value as { issues?: unknown }).issues);
+
+const normalizeZodIssueLikeArray = (issues: unknown[]): ZodIssueLike[] => {
+    const normalized: ZodIssueLike[] = [];
+
+    for (const issue of issues) {
+        if (isObject(issue)) {
+            const rawMessage = issue["message"];
+
+            if (typeof rawMessage === "string") {
+                const rawPath = issue["path"];
+                const path = Array.isArray(rawPath)
+                    ? (rawPath as readonly ZodIssuePathPart[])
+                    : undefined;
+
+                if (path) {
+                    normalized.push({ message: rawMessage, path });
+                } else {
+                    normalized.push({ message: rawMessage });
+                }
+            }
+        }
+    }
+
+    return normalized;
+};
 
 type SafeParseResult<T> =
     | { readonly data: T; readonly success: true }
@@ -111,9 +136,12 @@ export function validateServicePayload<T>(
     if (!parsed.success) {
         const errorForEnsure = (parsed as { readonly error: unknown }).error;
         const issues = hasIssueArray(errorForEnsure)
-            ? errorForEnsure.issues
+            ? normalizeZodIssueLikeArray(errorForEnsure.issues)
             : [];
-        const messages = issues.map((issue) => issue.message).join(", ");
+
+        const messages = formatZodIssues(issues, { includePath: false }).join(
+            ", "
+        );
         const diagnosticSuffix = stringifyDiagnostics(diagnostics);
 
         throw new Error(

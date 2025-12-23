@@ -95,7 +95,7 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
                 // requiring a real database.
                 createInternal: vi.fn().mockReturnValue("created-monitor-id"),
                 deleteAllInternal: vi.fn(),
-                // Legacy bulkCreate is kept for compatibility with older
+                // Previous bulkCreate is kept for compatibility with older
                 // tests but is no longer used by the service implementation.
                 bulkCreate: vi.fn().mockResolvedValue([]),
                 findBySiteIdentifier: vi.fn().mockResolvedValue([]),
@@ -1003,58 +1003,6 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             ).not.toHaveBeenCalled();
         });
 
-        it("should handle numeric monitor IDs correctly", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: DataImportExportService", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Monitoring", "type");
-
-            const { withDatabaseOperation } =
-                await import("../../../utils/operationalHooks");
-            const mockSites: ImportSite[] = [
-                {
-                    identifier: "test-site",
-                    monitors: [
-                        {
-                            type: "http" as const,
-                            url: "https://example.com",
-                            history: [
-                                {
-                                    status: "up" as const,
-                                    timestamp: 1000,
-                                    responseTime: 50,
-                                },
-                            ],
-                        },
-                    ] as any,
-                },
-            ];
-
-            // Simulate a numeric identifier being returned from the
-            // repository and ensure it is normalised to a string for
-            // history entries.
-            mockRepositories.monitor.createInternal.mockReturnValueOnce(
-                123 as unknown as string
-            );
-
-            (withDatabaseOperation as MockedFunction<any>).mockImplementation(
-                async (operation: any) => await operation()
-            );
-
-            await service.persistImportedData(mockSites, {});
-
-            expect(
-                mockRepositories.history.addEntryInternal
-            ).toHaveBeenCalledWith(
-                mockDatabase,
-                "123", // Should be converted to string
-                { status: "up", timestamp: 1000, responseTime: 50 },
-                ""
-            );
-        });
     });
 
     describe("Type Guard Function - isImportData", () => {

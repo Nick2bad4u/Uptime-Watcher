@@ -63,7 +63,7 @@ Examples:
 - `"sites"`
 - `"settings"`
 
-## Notes on legacy fields
+## Notes on older fields
 
 `isLoading` / `lastError` may exist for broader UI compatibility, but **domain
 stores must not add their own store-local equivalents**. Prefer the per-store

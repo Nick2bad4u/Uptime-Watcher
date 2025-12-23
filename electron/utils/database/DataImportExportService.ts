@@ -533,14 +533,15 @@ export class DataImportExportService {
                 originalMonitor.history.length > 0 &&
                 createdMonitor.id
             ) {
-                // Normalize the monitor identifier defensively in case
-                // legacy imports surface non-string identifiers.
-                // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-conversion -- Runtime safety for mixed identifier types
-                const monitorId = String(createdMonitor.id);
+                if (typeof createdMonitor.id !== "string") {
+                    throw new TypeError(
+                        "Imported monitor history cannot be applied because the created monitor identifier is not a string"
+                    );
+                }
 
                 this.importMonitorHistory(
                     historyRepositoryTransaction,
-                    monitorId,
+                    createdMonitor.id,
                     originalMonitor.history
                 );
             }

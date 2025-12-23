@@ -61,6 +61,12 @@ import { logger } from "../../utils/logger";
 import { withDatabaseOperation } from "../../utils/operationalHooks";
 import { generateSqlParameters, mapMonitorToRow } from "./utils/dynamicSchema";
 import {
+    assertValidMonitorId,
+    assertValidSiteIdentifier,
+    isValidMonitorId,
+    isValidSiteIdentifier,
+} from "./utils/identifierValidation";
+import {
     buildMonitorParameters,
     rowsToMonitors,
     rowToMonitorOrUndefined,
@@ -164,6 +170,8 @@ export class MonitorRepository {
         siteIdentifier: string,
         monitors: Array<Site["monitors"][0]>
     ): Promise<Array<Site["monitors"][0]>> {
+        assertValidSiteIdentifier(siteIdentifier, "MonitorRepository.bulkCreate");
+
         return withDatabaseOperation(
             async () => {
                 // Use executeTransaction for atomic bulk create operation
@@ -171,6 +179,17 @@ export class MonitorRepository {
 
                 await this.databaseService.executeTransaction((db) => {
                     for (const monitor of monitors) {
+                        if (typeof monitor.id !== "string") {
+                            throw new TypeError(
+                                "Monitor ID is required for bulk create"
+                            );
+                        }
+
+                        assertValidMonitorId(
+                            monitor.id,
+                            "MonitorRepository.bulkCreate"
+                        );
+
                         // Use the same dynamic schema insert strategy as the
                         // primary create path.
                         const { columns, placeholders } =
@@ -233,7 +252,11 @@ export class MonitorRepository {
      * @throws Error if the database operation fails
      */
     public async clearActiveOperations(monitorId: string): Promise<void> {
-        return withDatabaseOperation(
+        if (!isValidMonitorId(monitorId)) {
+            return;
+        }
+
+        await withDatabaseOperation(
             () =>
                 this.databaseService.executeTransaction((db) => {
                     this.clearActiveOperationsInternal(db, monitorId);
@@ -298,6 +321,10 @@ export class MonitorRepository {
      * @throws Error if the database operation fails.
      */
     public async delete(monitorId: string): Promise<boolean> {
+        if (!isValidMonitorId(monitorId)) {
+            return false;
+        }
+
         return withDatabaseOperation(
             () =>
                 this.databaseService.executeTransaction((db) => {
@@ -370,14 +397,19 @@ export class MonitorRepository {
      * @throws Error if the database operation fails.
      */
     public async deleteBySiteIdentifier(siteIdentifier: string): Promise<void> {
-        return withDatabaseOperation(
+        if (!isValidSiteIdentifier(siteIdentifier)) {
+            return;
+        }
+
+        await withDatabaseOperation(
             () =>
                 this.databaseService.executeTransaction((db) => {
                     this.deleteBySiteIdentifierInternal(db, siteIdentifier);
 
                     if (isDev()) {
                         logger.debug(
-                            `[MonitorRepository] Deleted all monitors for site: ${siteIdentifier}`
+                            "[MonitorRepository] Deleted all monitors for site",
+                            { siteIdentifier }
                         );
                     }
 
@@ -411,6 +443,10 @@ export class MonitorRepository {
     public async findByIdentifier(
         monitorId: string
     ): Promise<Site["monitors"][0] | undefined> {
+        if (!isValidMonitorId(monitorId)) {
+            return undefined;
+        }
+
         return withDatabaseOperation(
             () =>
                 Promise.resolve(
@@ -449,6 +485,10 @@ export class MonitorRepository {
     public async findBySiteIdentifier(
         siteIdentifier: string
     ): Promise<Site["monitors"]> {
+        if (!isValidSiteIdentifier(siteIdentifier)) {
+            return [];
+        }
+
         return withDatabaseOperation(
             () =>
                 Promise.resolve(
@@ -457,7 +497,9 @@ export class MonitorRepository {
                         siteIdentifier
                     )
                 ),
-            `find-monitors-by-site-${siteIdentifier}`
+            "find-monitors-by-site",
+            undefined,
+            { siteIdentifier }
         );
     }
 
@@ -510,7 +552,11 @@ export class MonitorRepository {
         monitorId: string,
         monitor: Partial<Site["monitors"][0]>
     ): Promise<void> {
-        return withDatabaseOperation(
+        if (!isValidMonitorId(monitorId)) {
+            return;
+        }
+
+        await withDatabaseOperation(
             () =>
                 this.databaseService.executeTransaction((db) => {
                     this.updateInternal(db, monitorId, monitor);
@@ -594,6 +640,10 @@ export class MonitorRepository {
         db: Database,
         siteIdentifier: string
     ): Site["monitors"] {
+        if (!isValidSiteIdentifier(siteIdentifier)) {
+            return [];
+        }
+
         const monitorRows = queryMonitorRows(
             db,
             MONITOR_QUERIES.SELECT_BY_SITE,
@@ -631,13 +681,18 @@ export class MonitorRepository {
         db: Database,
         monitorId: string
     ): void {
+        if (!isValidMonitorId(monitorId)) {
+            return;
+        }
+
         // Clear all active operations (internal call to avoid nested
         // transaction)
         this.updateInternal(db, monitorId, { activeOperations: [] });
 
         if (isDev()) {
             logger.debug(
-                `[MonitorRepository] Cleared all active operations for monitor ${monitorId}`
+                "[MonitorRepository] Cleared all active operations for monitor",
+                { monitorId }
             );
         }
     }
@@ -661,11 +716,15 @@ export class MonitorRepository {
         siteIdentifier: string,
         monitor: Site["monitors"][0]
     ): string {
-        if (!monitor.id || typeof monitor.id !== "string") {
+        assertValidSiteIdentifier(siteIdentifier, "MonitorRepository.createInternal");
+
+        if (typeof monitor.id !== "string") {
             throw new TypeError(
-                `Monitor id is required for stable persistence (site ${siteIdentifier})`
+                `Monitor ID is required for stable persistence (site ${siteIdentifier})`
             );
         }
+
+        assertValidMonitorId(monitor.id, "MonitorRepository.createInternal");
 
         // Generate dynamic SQL and parameters
         const { columns, placeholders } = generateSqlParameters();
@@ -741,6 +800,10 @@ export class MonitorRepository {
         db: Database,
         siteIdentifier: string
     ): void {
+        if (!isValidSiteIdentifier(siteIdentifier)) {
+            return;
+        }
+
         // Get all monitor IDs for this site
         const monitorRows = queryForIds(
             db,
@@ -770,6 +833,10 @@ export class MonitorRepository {
      * @returns True if deleted, false otherwise.
      */
     private deleteInternal(db: Database, monitorId: string): boolean {
+        if (!isValidMonitorId(monitorId)) {
+            return false;
+        }
+
         // Delete history first (foreign key constraint)
         db.run(MONITOR_QUERIES.DELETE_HISTORY_BY_MONITOR, [monitorId]);
 
@@ -797,6 +864,10 @@ export class MonitorRepository {
         monitorId: string,
         monitor: Partial<Site["monitors"][0]>
     ): void {
+        if (!isValidMonitorId(monitorId)) {
+            return;
+        }
+
         if (isDev()) {
             logger.debug(
                 `[MonitorRepository] updateInternal called with monitorId: ${monitorId}, monitor:`,
