@@ -318,8 +318,9 @@ async function verifyChannelOrThrow(channel: string): Promise<void> {
  */
 async function invokeWithValidation<T>(
     channel: string,
-    invoke: (correlationId: ReturnType<typeof generateCorrelationId>) =>
-        Promise<unknown>,
+    invoke: (
+        correlationId: ReturnType<typeof generateCorrelationId>
+    ) => Promise<unknown>,
     validate: (response: unknown) => T
 ): Promise<T> {
     await verifyChannelOrThrow(channel);
@@ -329,7 +330,8 @@ async function invokeWithValidation<T>(
         const response = await invoke(correlationId);
         return validate(response);
     } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : String(error);
+        const errorMessage =
+            error instanceof Error ? error.message : String(error);
         // eslint-disable-next-line ex/use-error-cause -- Using custom IpcError class with cause handling
         throw new IpcError(
             `IPC call failed for channel '${channel}': ${errorMessage}`,
@@ -362,7 +364,8 @@ export function createTypedInvoker<TChannel extends IpcInvokeChannel>(
                     ...args,
                     createIpcCorrelationEnvelope(correlationId)
                 ),
-            (response) => validateIpcResponse<IpcInvokeChannelResult<TChannel>>(response)
+            (response) =>
+                validateIpcResponse<IpcInvokeChannelResult<TChannel>>(response)
         );
     };
 }
@@ -391,7 +394,6 @@ export function createVoidInvoker<TChannel extends VoidIpcInvokeChannel>(
                 ),
             (response) => {
                 validateVoidIpcResponse(response);
-
             }
         );
     };

@@ -96,34 +96,40 @@ interface RadioOptionItemProperties {
     readonly selectedValue: string;
 }
 
-const RadioOptionItem = memo((
-    props: RadioOptionItemProperties
-): ReactElement => {
-    const { disabled, handleChange, name, option, required, selectedValue } =
-        props;
+const RadioOptionItem = memo(
+    (props: RadioOptionItemProperties): ReactElement => {
+        const {
+            disabled,
+            handleChange,
+            name,
+            option,
+            required,
+            selectedValue,
+        } = props;
 
-    const handleOptionChange = useCallback(
-        (event: ChangeEvent<HTMLInputElement>) => {
-            handleChange(event.target.value);
-        },
-        [handleChange]
-    );
+        const handleOptionChange = useCallback(
+            (event: ChangeEvent<HTMLInputElement>) => {
+                handleChange(event.target.value);
+            },
+            [handleChange]
+        );
 
-    return (
-        <label className="flex items-center gap-1" key={option.value}>
-            <input
-                checked={selectedValue === option.value}
-                disabled={disabled}
-                name={name}
-                onChange={handleOptionChange}
-                required={required}
-                type="radio"
-                value={option.value}
-            />
-            <ThemedText size="sm">{option.label}</ThemedText>
-        </label>
-    );
-});
+        return (
+            <label className="flex items-center gap-1" key={option.value}>
+                <input
+                    checked={selectedValue === option.value}
+                    disabled={disabled}
+                    name={name}
+                    onChange={handleOptionChange}
+                    required={required}
+                    type="radio"
+                    value={option.value}
+                />
+                <ThemedText size="sm">{option.label}</ThemedText>
+            </label>
+        );
+    }
+);
 
 RadioOptionItem.displayName = "RadioOptionItem";
 

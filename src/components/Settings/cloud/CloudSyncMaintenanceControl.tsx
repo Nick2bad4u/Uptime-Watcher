@@ -2,10 +2,7 @@ import type { CloudSyncResetResult } from "@shared/types/cloudSyncReset";
 import type { CloudSyncResetPreview } from "@shared/types/cloudSyncResetPreview";
 import type { JSX } from "react/jsx-runtime";
 
-import {
-    useCallback,
-    useState,
-} from "react";
+import { useCallback, useState } from "react";
 
 import { ThemedButton } from "../../../theme/components/ThemedButton";
 import { ThemedText } from "../../../theme/components/ThemedText";

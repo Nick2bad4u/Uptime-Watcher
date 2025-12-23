@@ -35,7 +35,7 @@
 
 import type { Event, HandlerDetails } from "electron";
 
-import { getNodeEnv } from "@shared/utils/environment";
+import { getNodeEnv, readBooleanEnv  } from "@shared/utils/environment";
 import { tryGetErrorCode } from "@shared/utils/errorCodes";
 import { ensureError, withErrorHandling } from "@shared/utils/errorHandling";
 import { getErrorMessage } from "@shared/utils/errorUtils";
@@ -46,7 +46,6 @@ import * as path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { isDev } from "../../electronUtils";
-import { readBooleanEnv } from "../../utils/environment";
 import { logger } from "../../utils/logger";
 
 // ESM equivalent of currentDirectory

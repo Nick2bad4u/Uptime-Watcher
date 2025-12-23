@@ -145,16 +145,17 @@ describe("typeGuards", () => {
         // Property-based testing for number validation
         test.prop({
             num: fc.float(),
-        })("should return true for any valid float (excluding NaN)", (
-            props
-        ) => {
-            // Skip NaN values since isNumber should reject them
-            if (Number.isNaN(props.num)) {
-                expect(isNumber(props.num)).toBeFalsy();
-            } else {
-                expect(isNumber(props.num)).toBeTruthy();
+        })(
+            "should return true for any valid float (excluding NaN)",
+            (props) => {
+                // Skip NaN values since isNumber should reject them
+                if (Number.isNaN(props.num)) {
+                    expect(isNumber(props.num)).toBeFalsy();
+                } else {
+                    expect(isNumber(props.num)).toBeTruthy();
+                }
             }
-        });
+        );
 
         test.prop({
             num: fc.integer(),
@@ -928,22 +929,24 @@ describe("typeGuards", () => {
         // Property-based testing for port validation
         test.prop({
             validPort: fc.integer({ min: 1, max: 65_535 }),
-        })("should return true for all valid port numbers (1-65535)", (
-            props
-        ) => {
-            expect(isValidPort(props.validPort)).toBeTruthy();
-        });
+        })(
+            "should return true for all valid port numbers (1-65535)",
+            (props) => {
+                expect(isValidPort(props.validPort)).toBeTruthy();
+            }
+        );
 
         test.prop({
             invalidPort: fc.oneof(
                 fc.integer({ max: 0 }), // <= 0
                 fc.integer({ min: 65_536 }) // > 65535
             ),
-        })("should return false for port numbers outside valid range", (
-            props
-        ) => {
-            expect(isValidPort(props.invalidPort)).toBeFalsy();
-        });
+        })(
+            "should return false for port numbers outside valid range",
+            (props) => {
+                expect(isValidPort(props.invalidPort)).toBeFalsy();
+            }
+        );
 
         test.prop({
             nonIntegerNumber: fc

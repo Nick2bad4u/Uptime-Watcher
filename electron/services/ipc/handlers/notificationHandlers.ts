@@ -46,22 +46,22 @@ export function registerNotificationHandlers({
 }: NotificationHandlersDependencies): void {
     registerStandardizedIpcHandler(
         NOTIFICATION_CHANNELS.notifyAppEvent,
-           (payload): undefined => {
+        (payload): undefined => {
             const request = parseAppNotificationRequest(payload);
             notificationService.notifyAppEvent(request);
             return undefined;
-           },
+        },
         NotificationHandlerValidators.notifyAppEvent,
         registeredHandlers
     );
 
     registerStandardizedIpcHandler(
         NOTIFICATION_CHANNELS.updatePreferences,
-           (payload): undefined => {
+        (payload): undefined => {
             const preferences = normalizeNotificationPreferenceUpdate(payload);
             notificationService.updateConfig(preferences);
             return undefined;
-           },
+        },
         NotificationHandlerValidators.updatePreferences,
         registeredHandlers
     );

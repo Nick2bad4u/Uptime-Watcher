@@ -53,7 +53,8 @@ describe("useSiteActions Hook", () => {
             await annotate("Type: Business Logic", "type");
 
             const { result } = renderHook(() =>
-                useSiteActions(mockSite, mockMonitor));
+                useSiteActions(mockSite, mockMonitor)
+            );
 
             expect(result.current).toHaveProperty("handleCardClick");
             expect(result.current).toHaveProperty("handleCheckNow");
@@ -73,7 +74,8 @@ describe("useSiteActions Hook", () => {
             await annotate("Type: Business Logic", "type");
 
             const { result } = renderHook(() =>
-                useSiteActions(mockSite, mockMonitor));
+                useSiteActions(mockSite, mockMonitor)
+            );
 
             expect(typeof result.current.handleCardClick).toBe("function");
             expect(typeof result.current.handleCheckNow).toBe("function");
@@ -101,7 +103,8 @@ describe("useSiteActions Hook", () => {
             await annotate("Type: Monitoring", "type");
 
             const { result } = renderHook(() =>
-                useSiteActions(mockSite, mockMonitor));
+                useSiteActions(mockSite, mockMonitor)
+            );
 
             await act(async () => {
                 result.current.handleStartMonitoring();
@@ -121,7 +124,8 @@ describe("useSiteActions Hook", () => {
             await annotate("Type: Monitoring", "type");
 
             const { result } = renderHook(() =>
-                useSiteActions(mockSite, undefined));
+                useSiteActions(mockSite, undefined)
+            );
 
             await act(async () => {
                 result.current.handleStartMonitoring();
@@ -141,7 +145,8 @@ describe("useSiteActions Hook", () => {
             await annotate("Type: Monitoring", "type");
 
             const { result } = renderHook(() =>
-                useSiteActions(mockSite, mockMonitor));
+                useSiteActions(mockSite, mockMonitor)
+            );
 
             await act(async () => {
                 result.current.handleStartSiteMonitoring();
@@ -163,7 +168,8 @@ describe("useSiteActions Hook", () => {
             await annotate("Type: Monitoring", "type");
 
             const { result } = renderHook(() =>
-                useSiteActions(mockSite, mockMonitor));
+                useSiteActions(mockSite, mockMonitor)
+            );
 
             await act(async () => {
                 result.current.handleStopMonitoring();
@@ -185,7 +191,8 @@ describe("useSiteActions Hook", () => {
             const disabledSite = createMockSite({ monitoring: false });
 
             const { result } = renderHook(() =>
-                useSiteActions(disabledSite, mockMonitor));
+                useSiteActions(disabledSite, mockMonitor)
+            );
 
             await act(async () => {
                 result.current.handleStopMonitoring();
@@ -202,7 +209,8 @@ describe("useSiteActions Hook", () => {
             await annotate("Type: Monitoring", "type");
 
             const { result } = renderHook(() =>
-                useSiteActions(mockSite, mockMonitor));
+                useSiteActions(mockSite, mockMonitor)
+            );
 
             await act(async () => {
                 result.current.handleStopSiteMonitoring();
@@ -221,7 +229,8 @@ describe("useSiteActions Hook", () => {
             await annotate("Type: Business Logic", "type");
 
             const { result } = renderHook(() =>
-                useSiteActions(mockSite, mockMonitor));
+                useSiteActions(mockSite, mockMonitor)
+            );
 
             await act(async () => {
                 result.current.handleCardClick();
@@ -241,7 +250,8 @@ describe("useSiteActions Hook", () => {
             await annotate("Type: Monitoring", "type");
 
             const { result } = renderHook(() =>
-                useSiteActions(mockSite, undefined));
+                useSiteActions(mockSite, undefined)
+            );
 
             await act(async () => {
                 result.current.handleCardClick();
@@ -260,7 +270,8 @@ describe("useSiteActions Hook", () => {
             await annotate("Type: Business Logic", "type");
 
             const { result } = renderHook(() =>
-                useSiteActions(mockSite, mockMonitor));
+                useSiteActions(mockSite, mockMonitor)
+            );
 
             await act(async () => {
                 result.current.handleCheckNow();
@@ -283,7 +294,8 @@ describe("useSiteActions Hook", () => {
             const httpsSite = createMockSite({ name: "HTTPS Site" });
 
             const { result } = renderHook(() =>
-                useSiteActions(httpsSite, httpMonitor));
+                useSiteActions(httpsSite, httpMonitor)
+            );
 
             await act(async () => {
                 result.current.handleCheckNow();
@@ -302,7 +314,8 @@ describe("useSiteActions Hook", () => {
             await annotate("Type: Error Handling", "type");
 
             const { result } = renderHook(() =>
-                useSiteActions(mockSite, mockMonitor));
+                useSiteActions(mockSite, mockMonitor)
+            );
 
             // Should not throw even if underlying services fail
             await act(async () => {
@@ -327,7 +340,8 @@ describe("useSiteActions Hook", () => {
             await annotate("Type: Business Logic", "type");
 
             const { result } = renderHook(() =>
-                useSiteActions(mockSite, undefined));
+                useSiteActions(mockSite, undefined)
+            );
 
             await act(async () => {
                 result.current.handleStartMonitoring();
@@ -351,7 +365,8 @@ describe("useSiteActions Hook", () => {
             await annotate("Type: Business Logic", "type");
 
             const { result, rerender } = renderHook(() =>
-                useSiteActions(mockSite, mockMonitor));
+                useSiteActions(mockSite, mockMonitor)
+            );
 
             const firstRender = result.current;
 
@@ -383,9 +398,11 @@ describe("useSiteActions Hook", () => {
             await annotate("Type: Business Logic", "type");
 
             const { result: result1 } = renderHook(() =>
-                useSiteActions(mockSite, mockMonitor));
+                useSiteActions(mockSite, mockMonitor)
+            );
             const { result: result2 } = renderHook(() =>
-                useSiteActions(mockSite, mockMonitor));
+                useSiteActions(mockSite, mockMonitor)
+            );
 
             // Each instance should have properly typed functions
             expect(typeof result1.current.handleStartMonitoring).toBe(
@@ -418,7 +435,8 @@ describe("useSiteActions Hook", () => {
 
             for (const site of sites) {
                 const { result } = renderHook(() =>
-                    useSiteActions(site, mockMonitor));
+                    useSiteActions(site, mockMonitor)
+                );
 
                 await act(async () => {
                     result.current.handleCheckNow();
@@ -444,7 +462,8 @@ describe("useSiteActions Hook", () => {
 
             for (const site of sites) {
                 const { result } = renderHook(() =>
-                    useSiteActions(site, mockMonitor));
+                    useSiteActions(site, mockMonitor)
+                );
 
                 await act(async () => {
                     result.current.handleStartSiteMonitoring();
@@ -469,7 +488,8 @@ describe("useSiteActions Hook", () => {
             await annotate("Type: Business Logic", "type");
 
             const { result } = renderHook(() =>
-                useSiteActions(mockSite, mockMonitor));
+                useSiteActions(mockSite, mockMonitor)
+            );
 
             // Make multiple rapid calls
             await act(async () => {
@@ -491,7 +511,8 @@ describe("useSiteActions Hook", () => {
             await annotate("Type: Business Logic", "type");
 
             const { result } = renderHook(() =>
-                useSiteActions(mockSite, mockMonitor));
+                useSiteActions(mockSite, mockMonitor)
+            );
 
             await act(async () => {
                 result.current.handleStartMonitoring();

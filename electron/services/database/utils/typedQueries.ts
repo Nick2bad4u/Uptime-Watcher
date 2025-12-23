@@ -87,7 +87,8 @@ function ensureValidRows<TRow extends object>(
     }
 
     return rows.map((row, index) =>
-        ensureValidRow(row, options, `${label ?? "row"} #${index}`));
+        ensureValidRow(row, options, `${label ?? "row"} #${index}`)
+    );
 }
 
 function normalizeMonitorRowSchema(row: UnknownRecord): void {

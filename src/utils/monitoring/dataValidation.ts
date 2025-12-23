@@ -54,7 +54,7 @@ import { logger } from "../../services/logger";
  */
 export const parseUptimeValue = (uptimeString: string): number => {
     // Remove any percent signs and whitespace
-     
+
     const cleanedUptime = uptimeString.replaceAll(/[\s%]/gu, "");
     const parsed = Number.parseFloat(cleanedUptime);
 

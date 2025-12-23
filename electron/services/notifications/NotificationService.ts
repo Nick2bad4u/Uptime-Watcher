@@ -1,12 +1,12 @@
 import type { Monitor, Site } from "@shared/types";
 import type { AppNotificationRequest } from "@shared/types/notifications";
 
+import { generateCorrelationId } from "@shared/utils/correlation";
 import { Notification } from "electron";
 
 import type { UptimeEvents } from "../../events/eventTypes";
 import type { TypedEventBus } from "../../events/TypedEventBus";
 
-import { generateCorrelationId } from "../../utils/correlation";
 import { logger } from "../../utils/logger";
 import { MIN_CHECK_INTERVAL } from "../monitoring/constants";
 

@@ -64,7 +64,8 @@ vi.mock("../../../stores/sites/utils/monitorOperations", () => ({
     updateMonitorInSite: vi.fn((site, monitorId, updates) => ({
         ...site,
         monitors: site.monitors.map((m: any) =>
-            m.id === monitorId ? { ...m, ...updates } : m),
+            m.id === monitorId ? { ...m, ...updates } : m
+        ),
     })),
 }));
 
@@ -110,23 +111,22 @@ describe(createSiteOperationsActions, () => {
             true
         );
 
-        mockElectronAPI.sites.removeMonitor.mockImplementation(async (
-            siteIdentifier: string,
-            monitorId: string
-        ) => {
-            const sitesSnapshot = mockDeps?.getSites?.() ?? [mockSite];
-            const targetSite =
-                sitesSnapshot.find(
-                    (site) => site.identifier === siteIdentifier
-                ) ?? mockSite;
+        mockElectronAPI.sites.removeMonitor.mockImplementation(
+            async (siteIdentifier: string, monitorId: string) => {
+                const sitesSnapshot = mockDeps?.getSites?.() ?? [mockSite];
+                const targetSite =
+                    sitesSnapshot.find(
+                        (site) => site.identifier === siteIdentifier
+                    ) ?? mockSite;
 
-            return {
-                ...targetSite,
-                monitors: targetSite.monitors.filter(
-                    (monitor) => monitor.id !== monitorId
-                ),
-            } satisfies Site;
-        });
+                return {
+                    ...targetSite,
+                    monitors: targetSite.monitors.filter(
+                        (monitor) => monitor.id !== monitorId
+                    ),
+                } satisfies Site;
+            }
+        );
 
         mockMonitor = {
             checkInterval: 60_000,
@@ -148,35 +148,41 @@ describe(createSiteOperationsActions, () => {
             name: "Test Site",
         };
 
-        mockElectronAPI.sites.updateSite.mockImplementation(async (
-            identifier: string,
-            updates: Partial<Site>
-        ) => ({
-            ...mockSite,
-            ...updates,
-            identifier,
-        }));
+        mockElectronAPI.sites.updateSite.mockImplementation(
+            async (identifier: string, updates: Partial<Site>) => ({
+                ...mockSite,
+                ...updates,
+                identifier,
+            })
+        );
 
         const dataService = {
             downloadSqliteBackup: vi.fn(async () =>
-                mockElectronAPI.data.downloadSqliteBackup()),
+                mockElectronAPI.data.downloadSqliteBackup()
+            ),
             restoreSqliteBackup: vi.fn(async (payload) =>
-                mockElectronAPI.data.restoreSqliteBackup(payload)),
+                mockElectronAPI.data.restoreSqliteBackup(payload)
+            ),
         };
 
         const siteService = {
             addSite: vi.fn(async (site: Site) =>
-                mockElectronAPI.sites.addSite(site)),
+                mockElectronAPI.sites.addSite(site)
+            ),
             getSites: vi.fn(async () => mockElectronAPI.sites.getSites()),
-            removeMonitor: vi.fn(async (
-                siteIdentifier: string,
-                monitorId: string
-            ) =>
-                mockElectronAPI.sites.removeMonitor(siteIdentifier, monitorId)),
+            removeMonitor: vi.fn(
+                async (siteIdentifier: string, monitorId: string) =>
+                    mockElectronAPI.sites.removeMonitor(
+                        siteIdentifier,
+                        monitorId
+                    )
+            ),
             removeSite: vi.fn(async (identifier: string) =>
-                mockElectronAPI.sites.removeSite(identifier)),
+                mockElectronAPI.sites.removeSite(identifier)
+            ),
             updateSite: vi.fn(async (identifier: string, updates: unknown) =>
-                mockElectronAPI.sites.updateSite(identifier, updates)),
+                mockElectronAPI.sites.updateSite(identifier, updates)
+            ),
         };
 
         mockDeps = {

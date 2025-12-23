@@ -669,198 +669,206 @@ describe("Shared Safe Conversions - Backend Coverage", () => {
 
         test("should handle integer parsing correctly", () => {
             fc.assert(
-                fc.property(fc.anything(), fc.integer(), (
-                    input,
-                    defaultVal
-                ) => {
-                    const result = safeParseInt(input, defaultVal);
+                fc.property(
+                    fc.anything(),
+                    fc.integer(),
+                    (input, defaultVal) => {
+                        const result = safeParseInt(input, defaultVal);
 
-                    expect(typeof result).toBe("number");
-                    expect(Number.isInteger(result)).toBeTruthy();
-                    expect(Number.isNaN(result)).toBeFalsy();
+                        expect(typeof result).toBe("number");
+                        expect(Number.isInteger(result)).toBeTruthy();
+                        expect(Number.isNaN(result)).toBeFalsy();
 
-                    if (typeof input === "number" && !Number.isNaN(input)) {
-                        if (Number.isFinite(input)) {
-                            expect(result).toBe(Math.floor(input));
+                        if (typeof input === "number" && !Number.isNaN(input)) {
+                            if (Number.isFinite(input)) {
+                                expect(result).toBe(Math.floor(input));
+                            } else {
+                                expect(result).toBe(defaultVal);
+                            }
+                        } else if (typeof input === "string") {
+                            const parsed = Number.parseInt(input, 10);
+                            if (Number.isNaN(parsed)) {
+                                expect(result).toBe(defaultVal);
+                            } else {
+                                expect(result).toBe(parsed);
+                            }
                         } else {
-                            expect(result).toBe(defaultVal);
+                            const fallbackDefault = Math.min(
+                                Number.isFinite(defaultVal)
+                                    ? defaultVal
+                                    : MIN_TIMEOUT_MILLISECONDS,
+                                MAX_TIMEOUT_MILLISECONDS
+                            );
+                            expect(result).toBe(fallbackDefault);
                         }
-                    } else if (typeof input === "string") {
-                        const parsed = Number.parseInt(input, 10);
-                        if (Number.isNaN(parsed)) {
-                            expect(result).toBe(defaultVal);
-                        } else {
-                            expect(result).toBe(parsed);
-                        }
-                    } else {
-                        const fallbackDefault = Math.min(
-                            Number.isFinite(defaultVal)
-                                ? defaultVal
-                                : MIN_TIMEOUT_MILLISECONDS,
-                            MAX_TIMEOUT_MILLISECONDS
-                        );
-                        expect(result).toBe(fallbackDefault);
                     }
-                })
+                )
             );
         });
 
         test("should validate percentages within range", () => {
             fc.assert(
-                fc.property(fc.float(), fc.float({ min: 0, max: 100 }), (
-                    input,
-                    defaultVal
-                ) => {
-                    const result = safeParsePercentage(input, defaultVal);
+                fc.property(
+                    fc.float(),
+                    fc.float({ min: 0, max: 100 }),
+                    (input, defaultVal) => {
+                        const result = safeParsePercentage(input, defaultVal);
 
-                    expect(typeof result).toBe("number");
-                    expect(result).toBeGreaterThanOrEqual(0);
-                    expect(result).toBeLessThanOrEqual(100);
+                        expect(typeof result).toBe("number");
+                        expect(result).toBeGreaterThanOrEqual(0);
+                        expect(result).toBeLessThanOrEqual(100);
 
-                    // The function applies safeParseFloat then clamps with Math.max(0, Math.min(100, parsed))
-                    // safeParseFloat returns the input number as-is for number types (excluding NaN)
-                    if (typeof input === "number" && !Number.isNaN(input)) {
-                        // For any valid number (finite or infinite), clamp to [0, 100]
-                        const expectedResult = Math.max(
-                            0,
-                            Math.min(100, input)
-                        );
-                        expect(result).toBe(expectedResult);
-                    } else if (
-                        typeof input === "number" &&
-                        Number.isNaN(input)
-                    ) {
-                        // NaN uses clamped default value
-                        const expectedDefault = Math.max(
-                            0,
-                            Math.min(100, defaultVal)
-                        );
-                        expect(result).toBe(expectedDefault);
-                    } else if (typeof input === "string") {
-                        const parsed = Number.parseFloat(input);
-                        if (Number.isNaN(parsed)) {
-                            // Invalid string uses clamped default
+                        // The function applies safeParseFloat then clamps with Math.max(0, Math.min(100, parsed))
+                        // safeParseFloat returns the input number as-is for number types (excluding NaN)
+                        if (typeof input === "number" && !Number.isNaN(input)) {
+                            // For any valid number (finite or infinite), clamp to [0, 100]
+                            const expectedResult = Math.max(
+                                0,
+                                Math.min(100, input)
+                            );
+                            expect(result).toBe(expectedResult);
+                        } else if (
+                            typeof input === "number" &&
+                            Number.isNaN(input)
+                        ) {
+                            // NaN uses clamped default value
                             const expectedDefault = Math.max(
                                 0,
                                 Math.min(100, defaultVal)
                             );
                             expect(result).toBe(expectedDefault);
+                        } else if (typeof input === "string") {
+                            const parsed = Number.parseFloat(input);
+                            if (Number.isNaN(parsed)) {
+                                // Invalid string uses clamped default
+                                const expectedDefault = Math.max(
+                                    0,
+                                    Math.min(100, defaultVal)
+                                );
+                                expect(result).toBe(expectedDefault);
+                            } else {
+                                // Valid string number gets clamped
+                                const expectedResult = Math.max(
+                                    0,
+                                    Math.min(100, parsed)
+                                );
+                                expect(result).toBe(expectedResult);
+                            }
                         } else {
-                            // Valid string number gets clamped
-                            const expectedResult = Math.max(
+                            // Non-number, non-string uses clamped default
+                            const expectedDefault = Math.max(
                                 0,
-                                Math.min(100, parsed)
+                                Math.min(100, defaultVal)
                             );
-                            expect(result).toBe(expectedResult);
+                            expect(result).toBe(expectedDefault);
                         }
-                    } else {
-                        // Non-number, non-string uses clamped default
-                        const expectedDefault = Math.max(
-                            0,
-                            Math.min(100, defaultVal)
-                        );
-                        expect(result).toBe(expectedDefault);
                     }
-                })
+                )
             );
         });
 
         test("should validate port numbers correctly", () => {
             fc.assert(
-                fc.property(fc.float(), fc.integer({ min: 1, max: 65_535 }), (
-                    input,
-                    defaultVal
-                ) => {
-                    const result = safeParsePort(input, defaultVal);
+                fc.property(
+                    fc.float(),
+                    fc.integer({ min: 1, max: 65_535 }),
+                    (input, defaultVal) => {
+                        const result = safeParsePort(input, defaultVal);
 
-                    expect(typeof result).toBe("number");
-                    expect(result).toBeGreaterThanOrEqual(1);
-                    expect(result).toBeLessThanOrEqual(65_535);
-                    expect(Number.isInteger(result)).toBeTruthy();
+                        expect(typeof result).toBe("number");
+                        expect(result).toBeGreaterThanOrEqual(1);
+                        expect(result).toBeLessThanOrEqual(65_535);
+                        expect(Number.isInteger(result)).toBeTruthy();
 
-                    const intValue =
-                        typeof input === "number"
-                            ? Math.floor(input)
-                            : typeof input === "string"
-                              ? Number.parseInt(input, 10)
-                              : Number.NaN;
+                        const intValue =
+                            typeof input === "number"
+                                ? Math.floor(input)
+                                : typeof input === "string"
+                                  ? Number.parseInt(input, 10)
+                                  : Number.NaN;
 
-                    if (
-                        !Number.isNaN(intValue) &&
-                        intValue >= 1 &&
-                        intValue <= 65_535
-                    ) {
-                        expect(result).toBe(intValue);
-                    } else {
-                        expect(result).toBe(defaultVal);
+                        if (
+                            !Number.isNaN(intValue) &&
+                            intValue >= 1 &&
+                            intValue <= 65_535
+                        ) {
+                            expect(result).toBe(intValue);
+                        } else {
+                            expect(result).toBe(defaultVal);
+                        }
                     }
-                })
+                )
             );
         });
 
         test("should validate positive integers", () => {
             fc.assert(
-                fc.property(fc.float(), fc.integer({ min: 1 }), (
-                    input,
-                    defaultVal
-                ) => {
-                    const result = safeParsePositiveInt(input, defaultVal);
+                fc.property(
+                    fc.float(),
+                    fc.integer({ min: 1 }),
+                    (input, defaultVal) => {
+                        const result = safeParsePositiveInt(input, defaultVal);
 
-                    expect(typeof result).toBe("number");
-                    expect(result).toBeGreaterThan(0);
-                    expect(Number.isInteger(result)).toBeTruthy();
+                        expect(typeof result).toBe("number");
+                        expect(result).toBeGreaterThan(0);
+                        expect(Number.isInteger(result)).toBeTruthy();
 
-                    const intValue =
-                        typeof input === "number"
-                            ? Math.floor(input)
-                            : typeof input === "string"
-                              ? Number.parseInt(input, 10)
-                              : Number.NaN;
+                        const intValue =
+                            typeof input === "number"
+                                ? Math.floor(input)
+                                : typeof input === "string"
+                                  ? Number.parseInt(input, 10)
+                                  : Number.NaN;
 
-                    if (
-                        !Number.isNaN(intValue) &&
-                        Number.isFinite(intValue) &&
-                        intValue > 0
-                    ) {
-                        expect(result).toBe(intValue);
-                    } else {
-                        expect(result).toBe(defaultVal);
+                        if (
+                            !Number.isNaN(intValue) &&
+                            Number.isFinite(intValue) &&
+                            intValue > 0
+                        ) {
+                            expect(result).toBe(intValue);
+                        } else {
+                            expect(result).toBe(defaultVal);
+                        }
                     }
-                })
+                )
             );
         });
 
         test("should validate retry attempts range", () => {
             fc.assert(
-                fc.property(fc.float(), fc.integer({ min: 0, max: 10 }), (
-                    input,
-                    defaultVal
-                ) => {
-                    const result = safeParseRetryAttempts(input, defaultVal);
+                fc.property(
+                    fc.float(),
+                    fc.integer({ min: 0, max: 10 }),
+                    (input, defaultVal) => {
+                        const result = safeParseRetryAttempts(
+                            input,
+                            defaultVal
+                        );
 
-                    expect(typeof result).toBe("number");
-                    expect(result).toBeGreaterThanOrEqual(0); // Changed from 1 to 0 based on implementation
-                    expect(result).toBeLessThanOrEqual(10);
-                    expect(Number.isInteger(result)).toBeTruthy();
+                        expect(typeof result).toBe("number");
+                        expect(result).toBeGreaterThanOrEqual(0); // Changed from 1 to 0 based on implementation
+                        expect(result).toBeLessThanOrEqual(10);
+                        expect(Number.isInteger(result)).toBeTruthy();
 
-                    const intValue =
-                        typeof input === "number"
-                            ? Math.floor(input)
-                            : typeof input === "string"
-                              ? Number.parseInt(input, 10)
-                              : Number.NaN;
+                        const intValue =
+                            typeof input === "number"
+                                ? Math.floor(input)
+                                : typeof input === "string"
+                                  ? Number.parseInt(input, 10)
+                                  : Number.NaN;
 
-                    if (
-                        !Number.isNaN(intValue) &&
-                        intValue >= 0 &&
-                        intValue <= 10
-                    ) {
-                        // Changed from >=1 to >=0
-                        expect(result).toBe(intValue);
-                    } else {
-                        expect(result).toBe(defaultVal);
+                        if (
+                            !Number.isNaN(intValue) &&
+                            intValue >= 0 &&
+                            intValue <= 10
+                        ) {
+                            // Changed from >=1 to >=0
+                            expect(result).toBe(intValue);
+                        } else {
+                            expect(result).toBe(defaultVal);
+                        }
                     }
-                })
+                )
             );
         });
 
@@ -970,52 +978,35 @@ describe("Shared Safe Conversions - Backend Coverage", () => {
                     (edgeCase, fallback) => {
                         // All safe conversion functions should handle these gracefully
                         expect(() =>
-                            safeNumberConversion(
-                                edgeCase,
-                                fallback
-                            )).not.toThrowError();
+                            safeNumberConversion(edgeCase, fallback)
+                        ).not.toThrowError();
                         expect(() =>
-                            safeParseFloat(
-                                edgeCase,
-                                fallback
-                            )).not.toThrowError();
+                            safeParseFloat(edgeCase, fallback)
+                        ).not.toThrowError();
                         expect(() =>
-                            safeParseInt(
-                                edgeCase,
-                                Math.floor(fallback)
-                            )).not.toThrowError();
+                            safeParseInt(edgeCase, Math.floor(fallback))
+                        ).not.toThrowError();
                         expect(() =>
-                            safeParseCheckInterval(
-                                edgeCase,
-                                60_000
-                            )).not.toThrowError();
+                            safeParseCheckInterval(edgeCase, 60_000)
+                        ).not.toThrowError();
                         expect(() =>
-                            safeParsePercentage(
-                                edgeCase,
-                                50
-                            )).not.toThrowError();
+                            safeParsePercentage(edgeCase, 50)
+                        ).not.toThrowError();
                         expect(() =>
-                            safeParsePort(edgeCase, 8080)).not.toThrowError();
+                            safeParsePort(edgeCase, 8080)
+                        ).not.toThrowError();
                         expect(() =>
-                            safeParsePositiveInt(
-                                edgeCase,
-                                1
-                            )).not.toThrowError();
+                            safeParsePositiveInt(edgeCase, 1)
+                        ).not.toThrowError();
                         expect(() =>
-                            safeParseRetryAttempts(
-                                edgeCase,
-                                3
-                            )).not.toThrowError();
+                            safeParseRetryAttempts(edgeCase, 3)
+                        ).not.toThrowError();
                         expect(() =>
-                            safeParseTimeout(
-                                edgeCase,
-                                5000
-                            )).not.toThrowError();
+                            safeParseTimeout(edgeCase, 5000)
+                        ).not.toThrowError();
                         expect(() =>
-                            safeParseTimestamp(
-                                edgeCase,
-                                Date.now()
-                            )).not.toThrowError();
+                            safeParseTimestamp(edgeCase, Date.now())
+                        ).not.toThrowError();
                     }
                 )
             );

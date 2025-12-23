@@ -578,10 +578,7 @@
     },
     "searchInComments": true,
     "searchInDocuments": true,
-    "sort": [
-        "source-order",
-        "alphabetical"
-    ],
+    "sort": ["source-order", "alphabetical"],
     "strikeDeprecatedPageTitles": true,
     "treatWarningsAsErrors": false,
     "tsconfig": "tsconfig.typedoc.json",

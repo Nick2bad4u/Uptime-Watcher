@@ -11,7 +11,8 @@ const withDatabaseOperationMock = vi.hoisted(() =>
             _eventEmitter?: unknown,
             _context?: unknown
         ) => await operation()
-    ));
+    )
+);
 
 const loggerMock = vi.hoisted(() => ({
     debug: vi.fn(),
@@ -66,9 +67,9 @@ describe("MonitorRepository simple orchestration", () => {
             getDatabase: vi.fn(() => mockDb),
         };
 
-        withDatabaseOperationMock.mockImplementation(async <T>(
-            operation: () => Promise<T>
-        ) => operation());
+        withDatabaseOperationMock.mockImplementation(
+            async <T>(operation: () => Promise<T>) => operation()
+        );
     });
 
     afterEach(() => {

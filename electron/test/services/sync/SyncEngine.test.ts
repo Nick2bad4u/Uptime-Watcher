@@ -478,7 +478,8 @@ describe("SyncEngine (ADR-016)", () => {
             expect(snapshotEntries.length).toBeGreaterThan(0);
 
             const snapshotKey = snapshotEntries.find((entry) =>
-                entry.key.endsWith(".json"))?.key;
+                entry.key.endsWith(".json")
+            )?.key;
             expect(snapshotKey).toBeTruthy();
 
             const snapshotRaw = Buffer.from(
@@ -993,7 +994,8 @@ describe("SyncEngine (ADR-016)", () => {
             await engine.syncNow(providerWithRecording as any);
 
             const opKey = uploadedKeys.find((key) =>
-                key.startsWith("sync/devices/device-a/ops/"));
+                key.startsWith("sync/devices/device-a/ops/")
+            );
             expect(opKey).toBeTruthy();
 
             const fileName = opKey!.split("/").at(-1);

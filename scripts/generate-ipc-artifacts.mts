@@ -94,7 +94,8 @@ for (const property of payloadSchemaDeclaration.getType().getProperties()) {
     const description = property
         .getDeclarations()
         .filter((declaration): declaration is TsMorphPropertySignature =>
-            Node.isPropertySignature(declaration))
+            Node.isPropertySignature(declaration)
+        )
         .flatMap((signature) => signature.getJsDocs())
         .map((doc: JSDoc) => doc.getDescription().trim())
         .filter(Boolean)
@@ -119,7 +120,8 @@ function splitSegments(input: string): string[] {
         .map((segment) =>
             segment.length === 0
                 ? segment
-                : segment[0]!.toUpperCase() + segment.slice(1));
+                : segment[0]!.toUpperCase() + segment.slice(1)
+        );
 }
 
 const prefixExclusions = new Set(["settings"]);

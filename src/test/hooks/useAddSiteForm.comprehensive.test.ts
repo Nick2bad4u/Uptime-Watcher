@@ -1217,21 +1217,22 @@ describe("useAddSiteForm Hook - Comprehensive Coverage", () => {
             fc
                 .string({ minLength: 1, maxLength: 100 })
                 .filter((s) => s.trim().length > 0),
-        ])("should handle various site name inputs correctly", async (
-            testName
-        ) => {
-            const { result } = renderHook(() => useAddSiteForm());
+        ])(
+            "should handle various site name inputs correctly",
+            async (testName) => {
+                const { result } = renderHook(() => useAddSiteForm());
 
-            act(() => {
-                result.current.setName(testName);
-            });
+                act(() => {
+                    result.current.setName(testName);
+                });
 
-            // Leading whitespace is normalized by the hook; trailing
-            // whitespace and the rest of the string are preserved.
-            expect(result.current.name).toBe(testName.trimStart());
-            expect(testName.trim().length).toBeGreaterThan(0);
-            expect(testName.length).toBeLessThanOrEqual(100);
-        });
+                // Leading whitespace is normalized by the hook; trailing
+                // whitespace and the rest of the string are preserved.
+                expect(result.current.name).toBe(testName.trimStart());
+                expect(testName.trim().length).toBeGreaterThan(0);
+                expect(testName.length).toBeLessThanOrEqual(100);
+            }
+        );
 
         test.prop([
             fc.constantFrom(
@@ -1240,68 +1241,70 @@ describe("useAddSiteForm Hook - Comprehensive Coverage", () => {
                 "ping",
                 "dns"
             ) as fc.Arbitrary<MonitorType>,
-        ])("should handle monitor type changes correctly", async (
-            monitorType
-        ) => {
-            mockGetFields.mockImplementation((type: MonitorType) => {
-                switch (type) {
-                    case "http": {
-                        return [{ name: "url", required: true }];
+        ])(
+            "should handle monitor type changes correctly",
+            async (monitorType) => {
+                mockGetFields.mockImplementation((type: MonitorType) => {
+                    switch (type) {
+                        case "http": {
+                            return [{ name: "url", required: true }];
+                        }
+                        case "port": {
+                            return [
+                                { name: "host", required: true },
+                                { name: "port", required: true },
+                            ];
+                        }
+                        case "ping": {
+                            return [{ name: "host", required: true }];
+                        }
+                        case "dns": {
+                            return [{ name: "host", required: true }];
+                        }
+                        default: {
+                            return [];
+                        }
                     }
-                    case "port": {
-                        return [
-                            { name: "host", required: true },
-                            { name: "port", required: true },
-                        ];
-                    }
-                    case "ping": {
-                        return [{ name: "host", required: true }];
-                    }
-                    case "dns": {
-                        return [{ name: "host", required: true }];
-                    }
-                    default: {
-                        return [];
-                    }
-                }
-            });
+                });
 
-            const { result } = renderHook(() => useAddSiteForm());
+                const { result } = renderHook(() => useAddSiteForm());
 
-            act(() => {
-                result.current.setMonitorType(monitorType);
-            });
+                act(() => {
+                    result.current.setMonitorType(monitorType);
+                });
 
-            expect(result.current.monitorType).toBe(monitorType);
-            expect([
-                "http",
-                "port",
-                "ping",
-                "tcp",
-                "dns",
-            ]).toContain(monitorType);
-        });
+                expect(result.current.monitorType).toBe(monitorType);
+                expect([
+                    "http",
+                    "port",
+                    "ping",
+                    "tcp",
+                    "dns",
+                ]).toContain(monitorType);
+            }
+        );
 
         test.prop([
             fc.constantFrom(60_000, 300_000, 600_000, 1_800_000, 3_600_000),
-        ])("should handle check interval changes correctly", async (
-            interval
-        ) => {
-            const { result } = renderHook(() => useAddSiteForm());
+        ])(
+            "should handle check interval changes correctly",
+            async (interval) => {
+                const { result } = renderHook(() => useAddSiteForm());
 
-            act(() => {
-                result.current.setCheckInterval(interval);
-            });
+                act(() => {
+                    result.current.setCheckInterval(interval);
+                });
 
-            expect(result.current.checkInterval).toBe(interval);
-            expect([
-                60_000,
-                300_000,
-                600_000,
-                1_800_000,
-                3_600_000,
-            ]).toContain(interval);
-        });
+                expect(result.current.checkInterval).toBe(interval);
+                expect([
+                    60_000,
+                    300_000,
+                    600_000,
+                    1_800_000,
+                    3_600_000,
+                ]).toContain(interval);
+            }
+        );
 
         test.prop([fc.constantFrom("new", "existing")])(
             "should handle add mode changes correctly",
@@ -1343,97 +1346,98 @@ describe("useAddSiteForm Hook - Comprehensive Coverage", () => {
                 "port",
                 "ping"
             ) as fc.Arbitrary<MonitorType>,
-        ])("should handle complex form state updates correctly", async (
-            monitorType
-        ) => {
-            const { result } = renderHook(() => useAddSiteForm());
+        ])(
+            "should handle complex form state updates correctly",
+            async (monitorType) => {
+                const { result } = renderHook(() => useAddSiteForm());
 
-            // Generate appropriate test data for the monitor type
-            const testName = `Test Site ${Math.random().toString(36).slice(2, 8)}`;
-            let testUrl = "";
-            let testHost = "";
-            let testPort = "";
+                // Generate appropriate test data for the monitor type
+                const testName = `Test Site ${Math.random().toString(36).slice(2, 8)}`;
+                let testUrl = "";
+                let testHost = "";
+                let testPort = "";
 
-            // Generate fields appropriate for each monitor type
-            switch (monitorType) {
-                case "http": {
-                    testUrl = "https://example.com";
-                    break;
+                // Generate fields appropriate for each monitor type
+                switch (monitorType) {
+                    case "http": {
+                        testUrl = "https://example.com";
+                        break;
+                    }
+                    case "port": {
+                        testHost = "example.com";
+                        testPort = "8080";
+                        break;
+                    }
+                    case "ping": {
+                        testHost = "example.com";
+                        break;
+                    }
+                    default: {
+                        break;
+                    }
                 }
-                case "port": {
-                    testHost = "example.com";
-                    testPort = "8080";
-                    break;
+
+                act(() => {
+                    // Set monitor type first to establish field requirements
+                    result.current.setMonitorType(monitorType);
+
+                    // Then set appropriate fields for this monitor type
+                    if (monitorType === "http" && testUrl) {
+                        result.current.setUrl(testUrl);
+                    }
+                    if (
+                        (monitorType === "port" || monitorType === "ping") &&
+                        testHost
+                    ) {
+                        result.current.setHost(testHost);
+                    }
+                    if (monitorType === "port" && testPort) {
+                        result.current.setPort(testPort);
+                    }
+
+                    result.current.setName(testName);
+                });
+
+                // Verify state matches expectations based on monitor type
+                expect(result.current.name).toBe(testName);
+                expect(result.current.monitorType).toBe(monitorType);
+
+                switch (monitorType) {
+                    case "http": {
+                        expect(result.current.url).toBe(testUrl);
+                        expect(result.current.host).toBe(""); // Should be empty for HTTP
+                        expect(result.current.port).toBe(""); // Should be empty for HTTP
+                        break;
+                    }
+                    case "port": {
+                        expect(result.current.url).toBe(""); // Should be empty for port
+                        expect(result.current.host).toBe(testHost);
+                        expect(result.current.port).toBe(testPort);
+                        break;
+                    }
+                    case "ping": {
+                        expect(result.current.url).toBe(""); // Should be empty for ping
+                        expect(result.current.host).toBe(testHost);
+                        expect(result.current.port).toBe(""); // Should be empty for ping
+                        break;
+                    }
+                    default: {
+                        break;
+                    }
                 }
-                case "ping": {
-                    testHost = "example.com";
-                    break;
-                }
-                default: {
-                    break;
+
+                // Verify field characteristics
+                expect(testName.trim().length).toBeGreaterThan(0);
+
+                if (monitorType === "http") {
+                    expect(testUrl).toMatch(/^https?:\/\//);
+                } else if (monitorType === "port") {
+                    const portNum = Number.parseInt(testPort, 10);
+                    expect(portNum).toBeGreaterThanOrEqual(1);
+                    expect(portNum).toBeLessThanOrEqual(65_535);
                 }
             }
-
-            act(() => {
-                // Set monitor type first to establish field requirements
-                result.current.setMonitorType(monitorType);
-
-                // Then set appropriate fields for this monitor type
-                if (monitorType === "http" && testUrl) {
-                    result.current.setUrl(testUrl);
-                }
-                if (
-                    (monitorType === "port" || monitorType === "ping") &&
-                    testHost
-                ) {
-                    result.current.setHost(testHost);
-                }
-                if (monitorType === "port" && testPort) {
-                    result.current.setPort(testPort);
-                }
-
-                result.current.setName(testName);
-            });
-
-            // Verify state matches expectations based on monitor type
-            expect(result.current.name).toBe(testName);
-            expect(result.current.monitorType).toBe(monitorType);
-
-            switch (monitorType) {
-                case "http": {
-                    expect(result.current.url).toBe(testUrl);
-                    expect(result.current.host).toBe(""); // Should be empty for HTTP
-                    expect(result.current.port).toBe(""); // Should be empty for HTTP
-                    break;
-                }
-                case "port": {
-                    expect(result.current.url).toBe(""); // Should be empty for port
-                    expect(result.current.host).toBe(testHost);
-                    expect(result.current.port).toBe(testPort);
-                    break;
-                }
-                case "ping": {
-                    expect(result.current.url).toBe(""); // Should be empty for ping
-                    expect(result.current.host).toBe(testHost);
-                    expect(result.current.port).toBe(""); // Should be empty for ping
-                    break;
-                }
-                default: {
-                    break;
-                }
-            }
-
-            // Verify field characteristics
-            expect(testName.trim().length).toBeGreaterThan(0);
-
-            if (monitorType === "http") {
-                expect(testUrl).toMatch(/^https?:\/\//);
-            } else if (monitorType === "port") {
-                const portNum = Number.parseInt(testPort, 10);
-                expect(portNum).toBeGreaterThanOrEqual(1);
-                expect(portNum).toBeLessThanOrEqual(65_535);
-            }
-        });
+        );
 
         test.prop([fc.integer({ min: 1, max: 20 })])(
             "should handle rapid state updates consistently",
@@ -1466,30 +1470,31 @@ describe("useAddSiteForm Hook - Comprehensive Coverage", () => {
                 fc.constant("\t\n"),
                 fc.string().filter((s) => s.trim().length === 0)
             ),
-        ])("should handle empty and whitespace inputs appropriately", async (
-            emptyInput
-        ) => {
-            const { result } = renderHook(() => useAddSiteForm());
+        ])(
+            "should handle empty and whitespace inputs appropriately",
+            async (emptyInput) => {
+                const { result } = renderHook(() => useAddSiteForm());
 
-            await act(async () => {
-                // Set monitor type to http so url field is used (port monitors don't use url field)
-                result.current.setMonitorType("http");
-                result.current.setName(emptyInput);
-                result.current.setUrl(emptyInput);
-                result.current.setHost(emptyInput);
-            });
+                await act(async () => {
+                    // Set monitor type to http so url field is used (port monitors don't use url field)
+                    result.current.setMonitorType("http");
+                    result.current.setName(emptyInput);
+                    result.current.setUrl(emptyInput);
+                    result.current.setHost(emptyInput);
+                });
 
-            // The hook normalizes leading whitespace in the site name
-            // (via trimStart) while preserving the raw URL value; actual
-            // validation is handled separately.
-            expect(result.current.name).toBe(emptyInput.trimStart());
-            expect(result.current.url).toBe(emptyInput);
-            // Host field is not used by http monitors, so it gets reset to ""
-            expect(result.current.host).toBe("");
+                // The hook normalizes leading whitespace in the site name
+                // (via trimStart) while preserving the raw URL value; actual
+                // validation is handled separately.
+                expect(result.current.name).toBe(emptyInput.trimStart());
+                expect(result.current.url).toBe(emptyInput);
+                // Host field is not used by http monitors, so it gets reset to ""
+                expect(result.current.host).toBe("");
 
-            // Verify input characteristics
-            expect(emptyInput.trim()).toHaveLength(0);
-        });
+                // Verify input characteristics
+                expect(emptyInput.trim()).toHaveLength(0);
+            }
+        );
 
         test.prop([fc.string({ minLength: 1000, maxLength: 10_000 })])(
             "should handle very long inputs without performance issues",
@@ -1522,92 +1527,94 @@ describe("useAddSiteForm Hook - Comprehensive Coverage", () => {
                 }),
                 { minLength: 1, maxLength: 10 }
             ),
-        ])("should handle sequential field updates correctly", async (
-            fieldUpdates
-        ) => {
-            const { result } = renderHook(() => useAddSiteForm());
-            const expectedValues: Record<string, string> = {};
+        ])(
+            "should handle sequential field updates correctly",
+            async (fieldUpdates) => {
+                const { result } = renderHook(() => useAddSiteForm());
+                const expectedValues: Record<string, string> = {};
 
-            // Determine the appropriate monitor type based on field updates
-            const hasHostOrPort = fieldUpdates.some(
-                (u) => u.field === "host" || u.field === "port"
-            );
-            const hasUrl = fieldUpdates.some((u) => u.field === "url");
+                // Determine the appropriate monitor type based on field updates
+                const hasHostOrPort = fieldUpdates.some(
+                    (u) => u.field === "host" || u.field === "port"
+                );
+                const hasUrl = fieldUpdates.some((u) => u.field === "url");
 
-            // Set monitor type first to ensure fields are accessible
-            if (hasHostOrPort && !hasUrl) {
-                await act(async () => {
-                    result.current.setMonitorType("port");
-                });
-            } else if (hasUrl && !hasHostOrPort) {
-                await act(async () => {
-                    result.current.setMonitorType("http");
-                });
-            } else if (hasUrl && hasHostOrPort) {
-                // If both types of fields, use http as default and only test compatible fields
-                await act(async () => {
-                    result.current.setMonitorType("http");
-                });
-            }
-
-            for (const update of fieldUpdates) {
-                // Only update expectedValues for fields compatible with current monitor type
-                const currentMonitorType = result.current.monitorType;
-                const shouldUpdate =
-                    (update.field === "url" && currentMonitorType === "http") ||
-                    (update.field === "host" &&
-                        currentMonitorType === "port") ||
-                    (update.field === "port" &&
-                        currentMonitorType === "port") ||
-                    update.field === "name"; // name is always valid
-
-                if (shouldUpdate) {
-                    const normalizedValue =
-                        update.field === "name"
-                            ? update.value.trimStart()
-                            : update.value;
-                    expectedValues[update.field] = normalizedValue;
-
+                // Set monitor type first to ensure fields are accessible
+                if (hasHostOrPort && !hasUrl) {
                     await act(async () => {
-                        switch (update.field) {
-                            case "name": {
-                                result.current.setName(update.value);
-                                break;
-                            }
-                            case "url": {
-                                result.current.setUrl(update.value);
-                                break;
-                            }
-                            case "host": {
-                                result.current.setHost(update.value);
-                                break;
-                            }
-                            case "port": {
-                                result.current.setPort(update.value);
-                                break;
-                            }
-                        }
+                        result.current.setMonitorType("port");
+                    });
+                } else if (hasUrl && !hasHostOrPort) {
+                    await act(async () => {
+                        result.current.setMonitorType("http");
+                    });
+                } else if (hasUrl && hasHostOrPort) {
+                    // If both types of fields, use http as default and only test compatible fields
+                    await act(async () => {
+                        result.current.setMonitorType("http");
                     });
                 }
-            }
 
-            // Verify final state matches expected values for compatible fields only
-            if (expectedValues["name"] !== undefined) {
-                expect(result.current.name).toBe(expectedValues["name"]);
-            }
-            if (expectedValues["url"] !== undefined) {
-                expect(result.current.url).toBe(expectedValues["url"]);
-            }
-            if (expectedValues["host"] !== undefined) {
-                expect(result.current.host).toBe(expectedValues["host"]);
-            }
-            if (expectedValues["port"] !== undefined) {
-                expect(result.current.port).toBe(expectedValues["port"]);
-            }
+                for (const update of fieldUpdates) {
+                    // Only update expectedValues for fields compatible with current monitor type
+                    const currentMonitorType = result.current.monitorType;
+                    const shouldUpdate =
+                        (update.field === "url" &&
+                            currentMonitorType === "http") ||
+                        (update.field === "host" &&
+                            currentMonitorType === "port") ||
+                        (update.field === "port" &&
+                            currentMonitorType === "port") ||
+                        update.field === "name"; // name is always valid
 
-            expect(Array.isArray(fieldUpdates)).toBeTruthy();
-            expect(fieldUpdates.length).toBeGreaterThanOrEqual(1);
-            expect(fieldUpdates.length).toBeLessThanOrEqual(10);
-        });
+                    if (shouldUpdate) {
+                        const normalizedValue =
+                            update.field === "name"
+                                ? update.value.trimStart()
+                                : update.value;
+                        expectedValues[update.field] = normalizedValue;
+
+                        await act(async () => {
+                            switch (update.field) {
+                                case "name": {
+                                    result.current.setName(update.value);
+                                    break;
+                                }
+                                case "url": {
+                                    result.current.setUrl(update.value);
+                                    break;
+                                }
+                                case "host": {
+                                    result.current.setHost(update.value);
+                                    break;
+                                }
+                                case "port": {
+                                    result.current.setPort(update.value);
+                                    break;
+                                }
+                            }
+                        });
+                    }
+                }
+
+                // Verify final state matches expected values for compatible fields only
+                if (expectedValues["name"] !== undefined) {
+                    expect(result.current.name).toBe(expectedValues["name"]);
+                }
+                if (expectedValues["url"] !== undefined) {
+                    expect(result.current.url).toBe(expectedValues["url"]);
+                }
+                if (expectedValues["host"] !== undefined) {
+                    expect(result.current.host).toBe(expectedValues["host"]);
+                }
+                if (expectedValues["port"] !== undefined) {
+                    expect(result.current.port).toBe(expectedValues["port"]);
+                }
+
+                expect(Array.isArray(fieldUpdates)).toBeTruthy();
+                expect(fieldUpdates.length).toBeGreaterThanOrEqual(1);
+                expect(fieldUpdates.length).toBeLessThanOrEqual(10);
+            }
+        );
     });
 });

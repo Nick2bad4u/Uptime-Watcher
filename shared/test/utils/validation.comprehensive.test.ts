@@ -103,7 +103,9 @@ describe("Canonical validation (Zod)", () => {
         if (!result.success) {
             expect(result.errors.length).toBeGreaterThan(0);
             expect(
-                result.errors.some((error) => error.includes("Monitor ID is required"))
+                result.errors.some((error) =>
+                    error.includes("Monitor ID is required")
+                )
             ).toBeTruthy();
         }
     });

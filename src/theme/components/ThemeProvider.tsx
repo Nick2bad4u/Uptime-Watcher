@@ -53,7 +53,8 @@ const ThemeProviderComponent = ({
         : [children];
 
     const validChildren = rawChildren.filter((child): child is ReactElement =>
-        isValidElement(child));
+        isValidElement(child)
+    );
 
     if (validChildren.length === 0) {
         return null;

@@ -11,6 +11,7 @@
 
 import type { BrowserWindow } from "electron";
 
+import { readProcessEnv } from "@shared/utils/environment";
 import { ensureError } from "@shared/utils/errorHandling";
 import { app } from "electron";
 import debug from "electron-debug";
@@ -27,7 +28,6 @@ import * as path from "node:path";
 import { isDev } from "./electronUtils";
 import { ApplicationService } from "./services/application/ApplicationService";
 import { ServiceContainer } from "./services/ServiceContainer";
-import { readProcessEnv } from "./utils/environment";
 import { logger } from "./utils/logger";
 
 /**

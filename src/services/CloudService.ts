@@ -108,26 +108,30 @@ const { ensureInitialized, wrap } = ((): ReturnType<
  */
 export const CloudService: CloudServiceContract = {
     clearEncryptionKey: wrap("clearEncryptionKey", (api) =>
-        api.cloud.clearEncryptionKey()),
+        api.cloud.clearEncryptionKey()
+    ),
 
-    configureFilesystemProvider: wrap("configureFilesystemProvider", (
-        api,
-        config
-    ) => api.cloud.configureFilesystemProvider(config)),
+    configureFilesystemProvider: wrap(
+        "configureFilesystemProvider",
+        (api, config) => api.cloud.configureFilesystemProvider(config)
+    ),
 
     connectDropbox: wrap("connectDropbox", (api) => api.cloud.connectDropbox()),
 
     connectGoogleDrive: wrap("connectGoogleDrive", (api) =>
-        api.cloud.connectGoogleDrive()),
+        api.cloud.connectGoogleDrive()
+    ),
 
     deleteBackup: wrap("deleteBackup", (api, key) =>
-        api.cloud.deleteBackup(key)),
+        api.cloud.deleteBackup(key)
+    ),
 
     disconnect: wrap("disconnect", (api) => api.cloud.disconnect()),
 
     enableSync: wrap("enableSync", (api, config) =>
         // eslint-disable-next-line n/no-sync -- "Sync" is part of the feature name, not a Node.js sync API.
-        api.cloud.enableSync(config)),
+        api.cloud.enableSync(config)
+    ),
 
     getStatus: wrap("getStatus", (api) => api.cloud.getStatus()),
 
@@ -136,17 +140,20 @@ export const CloudService: CloudServiceContract = {
     listBackups: wrap("listBackups", (api) => api.cloud.listBackups()),
 
     migrateBackups: wrap("migrateBackups", (api, config) =>
-        api.cloud.migrateBackups(config)),
+        api.cloud.migrateBackups(config)
+    ),
 
     previewResetRemoteSyncState: wrap("previewResetRemoteSyncState", (api) =>
-        api.cloud.previewResetRemoteSyncState()),
+        api.cloud.previewResetRemoteSyncState()
+    ),
 
     requestSyncNow: wrap("requestSyncNow", async (api) => {
         await api.cloud.requestSyncNow();
     }),
 
     resetRemoteSyncState: wrap("resetRemoteSyncState", (api) =>
-        api.cloud.resetRemoteSyncState()),
+        api.cloud.resetRemoteSyncState()
+    ),
 
     restoreBackup: wrap("restoreBackup", async (api, key) => {
         if (typeof key !== "string" || key.length === 0) {
@@ -161,23 +168,27 @@ export const CloudService: CloudServiceContract = {
         return result;
     }),
 
-    setEncryptionPassphrase: wrap("setEncryptionPassphrase", async (
-        api,
-        passphrase
-    ) => {
-        if (typeof passphrase !== "string" || passphrase.trim().length === 0) {
-            throw new TypeError("Passphrase must be a non-empty string");
-        }
+    setEncryptionPassphrase: wrap(
+        "setEncryptionPassphrase",
+        async (api, passphrase) => {
+            if (
+                typeof passphrase !== "string" ||
+                passphrase.trim().length === 0
+            ) {
+                throw new TypeError("Passphrase must be a non-empty string");
+            }
 
-        // Never log the passphrase.
-        const result = await api.cloud.setEncryptionPassphrase(passphrase);
-        logger.info("Cloud encryption passphrase updated", {
-            encryptionLocked: result.encryptionLocked,
-            encryptionMode: result.encryptionMode,
-        });
-        return result;
-    }),
+            // Never log the passphrase.
+            const result = await api.cloud.setEncryptionPassphrase(passphrase);
+            logger.info("Cloud encryption passphrase updated", {
+                encryptionLocked: result.encryptionLocked,
+                encryptionMode: result.encryptionMode,
+            });
+            return result;
+        }
+    ),
 
     uploadLatestBackup: wrap("uploadLatestBackup", (api) =>
-        api.cloud.uploadLatestBackup()),
+        api.cloud.uploadLatestBackup()
+    ),
 };

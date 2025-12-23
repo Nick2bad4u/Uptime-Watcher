@@ -243,42 +243,46 @@ describe("TypedEventBus Fuzzing Tests", () => {
                             index,
                             config,
                         ] of middlewareConfigs.entries()) {
-                            eventBus.registerMiddleware(async (
-                                _eventName,
-                                _data,
-                                next
-                            ) => {
-                                executionOrder.push(
-                                    `middleware-${index}-start`
-                                );
+                            eventBus.registerMiddleware(
+                                async (_eventName, _data, next) => {
+                                    executionOrder.push(
+                                        `middleware-${index}-start`
+                                    );
 
-                                switch (config.behavior) {
-                                    case "delay": {
-                                        await new Promise((resolve) =>
-                                            setTimeout(resolve, config.delay));
-                                        break;
+                                    switch (config.behavior) {
+                                        case "delay": {
+                                            await new Promise((resolve) =>
+                                                setTimeout(
+                                                    resolve,
+                                                    config.delay
+                                                )
+                                            );
+                                            break;
+                                        }
+                                        case "throw": {
+                                            throw new Error(
+                                                `Middleware ${index} error`
+                                            );
+                                        }
+                                        case "async-throw": {
+                                            await Promise.reject(
+                                                new Error(
+                                                    `Async middleware ${index} error`
+                                                )
+                                            );
+                                            break;
+                                        }
                                     }
-                                    case "throw": {
-                                        throw new Error(
-                                            `Middleware ${index} error`
-                                        );
+
+                                    if (config.shouldCallNext) {
+                                        await next();
                                     }
-                                    case "async-throw": {
-                                        await Promise.reject(
-                                            new Error(
-                                                `Async middleware ${index} error`
-                                            )
-                                        );
-                                        break;
-                                    }
+
+                                    executionOrder.push(
+                                        `middleware-${index}-end`
+                                    );
                                 }
-
-                                if (config.shouldCallNext) {
-                                    await next();
-                                }
-
-                                executionOrder.push(`middleware-${index}-end`);
-                            });
+                            );
                         }
 
                         const receivedEvents: any[] = [];
@@ -318,46 +322,47 @@ describe("TypedEventBus Fuzzing Tests", () => {
 
         it("should handle middleware registration limits", async () => {
             await fc.assert(
-                fc.asyncProperty(fc.integer({ min: 1, max: 50 }), async (
-                    middlewareCount
-                ) => {
-                    const busWithLimit = new TypedEventBus<TestEvents>(
-                        "test-bus",
-                        {
-                            maxMiddleware: 5,
+                fc.asyncProperty(
+                    fc.integer({ min: 1, max: 50 }),
+                    async (middlewareCount) => {
+                        const busWithLimit = new TypedEventBus<TestEvents>(
+                            "test-bus",
+                            {
+                                maxMiddleware: 5,
+                            }
+                        );
+
+                        let registeredCount = 0;
+                        let threwError = false;
+
+                        try {
+                            for (let i = 0; i < middlewareCount; i++) {
+                                busWithLimit.registerMiddleware(
+                                    async (_eventName, _data, next) => {
+                                        await next();
+                                    }
+                                );
+                                registeredCount++;
+                            }
+                        } catch (error) {
+                            threwError = true;
                         }
-                    );
 
-                    let registeredCount = 0;
-                    let threwError = false;
-
-                    try {
-                        for (let i = 0; i < middlewareCount; i++) {
-                            busWithLimit.registerMiddleware(async (
-                                _eventName,
-                                _data,
-                                next
-                            ) => {
-                                await next();
-                            });
-                            registeredCount++;
+                        if (middlewareCount <= 5) {
+                            expect(threwError).toBeFalsy();
+                            expect(registeredCount).toBe(middlewareCount);
+                        } else {
+                            expect(threwError).toBeTruthy();
+                            expect(registeredCount).toBeLessThan(
+                                middlewareCount
+                            );
                         }
-                    } catch (error) {
-                        threwError = true;
-                    }
 
-                    if (middlewareCount <= 5) {
-                        expect(threwError).toBeFalsy();
-                        expect(registeredCount).toBe(middlewareCount);
-                    } else {
-                        expect(threwError).toBeTruthy();
-                        expect(registeredCount).toBeLessThan(middlewareCount);
+                        // Clean up the test bus after each iteration
+                        busWithLimit.removeAllListeners();
+                        busWithLimit.clearMiddleware();
                     }
-
-                    // Clean up the test bus after each iteration
-                    busWithLimit.removeAllListeners();
-                    busWithLimit.clearMiddleware();
-                }),
+                ),
                 { numRuns: 20 }
             );
         });
@@ -409,7 +414,8 @@ describe("TypedEventBus Fuzzing Tests", () => {
                                 setTimeout(
                                     () => reject(new Error("Timeout")),
                                     5000
-                                )),
+                                )
+                            ),
                         ]);
 
                         const duration = Date.now() - startTime;
@@ -595,7 +601,8 @@ describe("TypedEventBus Fuzzing Tests", () => {
                                                             )
                                                         ),
                                                     50
-                                                ));
+                                                )
+                                            );
                                             break;
                                         }
                                     }

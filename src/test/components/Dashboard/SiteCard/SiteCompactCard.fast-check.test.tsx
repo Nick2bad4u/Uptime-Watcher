@@ -418,56 +418,57 @@ describe("SiteCompactCard", () => {
     fcTest.prop(
         [fc.array(fc.boolean(), { minLength: 1, maxLength: 5 }), fc.boolean()],
         { numRuns: 15 }
-    )("renders runtime summary based on monitor state", (
-        monitoringFlags,
-        isMonitoring
-    ) => {
-        const monitors = monitoringFlags.map((monitoring, index) =>
-            createMonitor({
-                id: `monitor-${index}`,
-                monitoring,
-                status: monitoring ? "up" : "paused",
-            }));
-        const latestSite = createSite({
-            monitors,
-        });
-        const monitor = monitors[0]!;
-        const scenario = createUseSiteScenario({
-            latestSite,
-            monitor,
-            isMonitoring,
-            status: "up",
-        });
+    )(
+        "renders runtime summary based on monitor state",
+        (monitoringFlags, isMonitoring) => {
+            const monitors = monitoringFlags.map((monitoring, index) =>
+                createMonitor({
+                    id: `monitor-${index}`,
+                    monitoring,
+                    status: monitoring ? "up" : "paused",
+                })
+            );
+            const latestSite = createSite({
+                monitors,
+            });
+            const monitor = monitors[0]!;
+            const scenario = createUseSiteScenario({
+                latestSite,
+                monitor,
+                isMonitoring,
+                status: "up",
+            });
 
-        mockUseSite.mockReturnValue(scenario.result);
+            mockUseSite.mockReturnValue(scenario.result);
 
-        const view = render(<SiteCompactCard site={scenario.site} />);
+            const view = render(<SiteCompactCard site={scenario.site} />);
 
-        try {
-            const { runningCount, totalCount, allRunning } =
-                getMonitorRuntimeSummary(latestSite.monitors);
-            const runningMetricContainer = screen
-                .getByText("Running")
-                .closest(".site-card__compact-metric");
+            try {
+                const { runningCount, totalCount, allRunning } =
+                    getMonitorRuntimeSummary(latestSite.monitors);
+                const runningMetricContainer = screen
+                    .getByText("Running")
+                    .closest(".site-card__compact-metric");
 
-            expect(runningMetricContainer).not.toBeNull();
+                expect(runningMetricContainer).not.toBeNull();
 
-            if (!(runningMetricContainer instanceof HTMLElement)) {
-                throw new TypeError(
-                    "Expected running metric container to be an HTMLElement"
-                );
+                if (!(runningMetricContainer instanceof HTMLElement)) {
+                    throw new TypeError(
+                        "Expected running metric container to be an HTMLElement"
+                    );
+                }
+
+                expect(
+                    within(runningMetricContainer).getByText(
+                        `${runningCount}/${totalCount}`
+                    )
+                ).toBeInTheDocument();
+
+                const lastActionCall = ActionButtonGroupMock.mock.lastCall?.[0];
+                expect(lastActionCall?.allMonitorsRunning).toBe(allRunning);
+            } finally {
+                view.unmount();
             }
-
-            expect(
-                within(runningMetricContainer).getByText(
-                    `${runningCount}/${totalCount}`
-                )
-            ).toBeInTheDocument();
-
-            const lastActionCall = ActionButtonGroupMock.mock.lastCall?.[0];
-            expect(lastActionCall?.allMonitorsRunning).toBe(allRunning);
-        } finally {
-            view.unmount();
         }
-    });
+    );
 });

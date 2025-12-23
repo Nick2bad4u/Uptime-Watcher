@@ -716,9 +716,11 @@ describe("Time Utilities", () => {
             // These should not throw errors
             expect(() => formatDuration(largeNumber)).not.toThrowError();
             expect(() =>
-                formatIntervalDuration(largeNumber)).not.toThrowError();
+                formatIntervalDuration(largeNumber)
+            ).not.toThrowError();
             expect(() =>
-                formatResponseDuration(largeNumber)).not.toThrowError();
+                formatResponseDuration(largeNumber)
+            ).not.toThrowError();
             expect(() => formatResponseTime(largeNumber)).not.toThrowError();
         });
 
@@ -880,9 +882,8 @@ describe("Time Utilities", () => {
 
                     // Property: Should not throw and produce valid date string
                     expect(() =>
-                        new Date(
-                            timestamp
-                        ).toLocaleString()).not.toThrowError();
+                        new Date(timestamp).toLocaleString()
+                    ).not.toThrowError();
                     expect(result).toBe(new Date(timestamp).toLocaleString());
                 }
             );
@@ -893,15 +894,16 @@ describe("Time Utilities", () => {
                     fc.constant(Infinity),
                     fc.constant(-Infinity)
                 ),
-            ])("should handle special timestamp values gracefully", (
-                timestamp
-            ) => {
-                const result = formatFullTimestamp(timestamp);
+            ])(
+                "should handle special timestamp values gracefully",
+                (timestamp) => {
+                    const result = formatFullTimestamp(timestamp);
 
-                // Property: Should not throw with special values
-                expect(typeof result).toBe("string");
-                expect(result.length).toBeGreaterThan(0);
-            });
+                    // Property: Should not throw with special values
+                    expect(typeof result).toBe("string");
+                    expect(result.length).toBeGreaterThan(0);
+                }
+            );
         });
 
         describe("formatIntervalDuration property tests", () => {
@@ -1087,14 +1089,15 @@ describe("Time Utilities", () => {
                 }
             );
 
-            test.prop([fc.constant(0)])("should handle zero correctly", (
-                time
-            ) => {
-                const result = formatResponseTime(time);
+            test.prop([fc.constant(0)])(
+                "should handle zero correctly",
+                (time) => {
+                    const result = formatResponseTime(time);
 
-                // Property: Zero should be formatted as 0ms, not fallback
-                expect(result).toBe("0ms");
-            });
+                    // Property: Zero should be formatted as 0ms, not fallback
+                    expect(result).toBe("0ms");
+                }
+            );
         });
 
         describe("formatRetryAttemptsText property tests", () => {
@@ -1168,14 +1171,15 @@ describe("Time Utilities", () => {
                 fc.record({
                     value: fc.integer({ min: 1000, max: 3_600_000 }),
                 }),
-            ])("should format value when no label provided in object", (
-                interval
-            ) => {
-                const result = getIntervalLabel(interval);
-                const expected = formatIntervalDuration(interval.value);
+            ])(
+                "should format value when no label provided in object",
+                (interval) => {
+                    const result = getIntervalLabel(interval);
+                    const expected = formatIntervalDuration(interval.value);
 
-                expect(result).toBe(expected);
-            });
+                    expect(result).toBe(expected);
+                }
+            );
         });
 
         describe("Cross-function property tests", () => {

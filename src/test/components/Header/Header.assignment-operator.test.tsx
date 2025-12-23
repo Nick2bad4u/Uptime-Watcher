@@ -183,12 +183,12 @@ describe("Header Assignment Operator Mutations", () => {
         vi.clearAllMocks();
 
         const uiStoreState = createMockUiStoreState();
-        mockUseUIStore.mockImplementation(<Result,>(
-            selector?: (state: UIStore) => Result
-        ) =>
-            typeof selector === "function"
-                ? selector(uiStoreState)
-                : (uiStoreState as unknown as Result));
+        mockUseUIStore.mockImplementation(
+            <Result,>(selector?: (state: UIStore) => Result) =>
+                typeof selector === "function"
+                    ? selector(uiStoreState)
+                    : (uiStoreState as unknown as Result)
+        );
 
         // Mock theme hooks with proper types
         mockUseTheme.mockReturnValue({
@@ -319,12 +319,12 @@ describe("Header Assignment Operator Mutations", () => {
             sitesWithPausedMonitors
         );
 
-        mockUseSitesStore.mockImplementation((
-            selector?: (state: SitesStore) => unknown
-        ) =>
-            typeof selector === "function"
-                ? selector(mockStoreState)
-                : mockStoreState);
+        mockUseSitesStore.mockImplementation(
+            (selector?: (state: SitesStore) => unknown) =>
+                typeof selector === "function"
+                    ? selector(mockStoreState)
+                    : mockStoreState
+        );
 
         const { container } = render(<Header />);
 
@@ -429,12 +429,12 @@ describe("Header Assignment Operator Mutations", () => {
             sitesWithPendingMonitors
         );
 
-        mockUseSitesStore.mockImplementation((
-            selector?: (state: SitesStore) => unknown
-        ) =>
-            typeof selector === "function"
-                ? selector(mockStoreState)
-                : mockStoreState);
+        mockUseSitesStore.mockImplementation(
+            (selector?: (state: SitesStore) => unknown) =>
+                typeof selector === "function"
+                    ? selector(mockStoreState)
+                    : mockStoreState
+        );
 
         const { container } = render(<Header />);
 
@@ -540,12 +540,12 @@ describe("Header Assignment Operator Mutations", () => {
 
         const mockStoreState = createMockSitesStoreState(sitesWithMixedStatus);
 
-        mockUseSitesStore.mockImplementation((
-            selector?: (state: SitesStore) => unknown
-        ) =>
-            typeof selector === "function"
-                ? selector(mockStoreState)
-                : mockStoreState);
+        mockUseSitesStore.mockImplementation(
+            (selector?: (state: SitesStore) => unknown) =>
+                typeof selector === "function"
+                    ? selector(mockStoreState)
+                    : mockStoreState
+        );
 
         const { container } = render(<Header />);
 

@@ -53,12 +53,15 @@ vi.mock("../../services/logger", () => ({
 // Mock ensureError & withUtilityErrorHandling from shared utils
 const mockEnsureError = vi.hoisted(() => vi.fn((error) => error));
 const mockWithUtilityErrorHandling = vi.hoisted(() =>
-    vi.fn(<T>(
-        operation: () => Promise<T>,
-        _operationName: string,
-        _fallbackValue?: T,
-        _shouldThrow?: boolean
-    ) => operation()));
+    vi.fn(
+        <T>(
+            operation: () => Promise<T>,
+            _operationName: string,
+            _fallbackValue?: T,
+            _shouldThrow?: boolean
+        ) => operation()
+    )
+);
 
 vi.mock("../../../shared/utils/errorHandling", async () => {
     const actual = await vi.importActual<
@@ -116,12 +119,15 @@ function createMockRestorePayload(): SerializedDatabaseRestorePayload {
 function createMockDataApi() {
     return {
         downloadSqliteBackup: vi.fn(() =>
-            Promise.resolve(createMockBackupResult())),
+            Promise.resolve(createMockBackupResult())
+        ),
         exportData: vi.fn(() =>
-            Promise.resolve('{"sites":[],"monitors":[],"settings":{}}')),
+            Promise.resolve('{"sites":[],"monitors":[],"settings":{}}')
+        ),
         importData: vi.fn(() => Promise.resolve(true)),
         restoreSqliteBackup: vi.fn(() =>
-            Promise.resolve(createMockRestoreResult())),
+            Promise.resolve(createMockRestoreResult())
+        ),
     };
 }
 

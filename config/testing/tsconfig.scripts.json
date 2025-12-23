@@ -51,9 +51,7 @@
         "strictNullChecks": true,
         "strictPropertyInitialization": true,
         "tsBuildInfoFile": "./.cache/tsconfig.scripts.tsbuildinfo",
-        "types": [
-            "node"
-        ],
+        "types": ["node"],
         "useDefineForClassFields": true,
         "useUnknownInCatchVariables": true
     },

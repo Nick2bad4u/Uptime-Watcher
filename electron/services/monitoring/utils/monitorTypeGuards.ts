@@ -96,9 +96,9 @@ export function hasValidHost(
     // single-label hostnames or trailing-dot hostnames. Use validator.js FQDN
     // validation with a permissive config instead of a hand-rolled regex.
     return isValidFQDN(monitor.host, {
-        "allow_trailing_dot": true,
-        "allow_underscores": true,
-        "require_tld": false,
+        allow_trailing_dot: true,
+        allow_underscores: true,
+        require_tld: false,
     });
 }
 

@@ -338,7 +338,8 @@ export class StatusUpdateManager {
                 listenerStates = listenerStates.map((listenerState, idx) =>
                     idx === index
                         ? { ...listenerState, attached: true }
-                        : listenerState);
+                        : listenerState
+                );
             } catch (error) {
                 const normalizedError = ensureError(error);
                 errors.push(`${scope}: ${normalizedError.message}`);

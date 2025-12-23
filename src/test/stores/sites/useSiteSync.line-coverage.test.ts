@@ -45,11 +45,13 @@ vi.mock("../../../stores/utils", () => ({
 
 vi.mock("../../../../shared/utils/errorHandling", () => ({
     ensureError: vi.fn((error) =>
-        error instanceof Error ? error : new Error(String(error))),
+        error instanceof Error ? error : new Error(String(error))
+    ),
     withErrorHandling: vi.fn(async (operation) => await operation()),
     withUtilityErrorHandling: vi.fn(),
     convertError: vi.fn((error) =>
-        error instanceof Error ? error : new Error(String(error))),
+        error instanceof Error ? error : new Error(String(error))
+    ),
 }));
 
 vi.mock("../../../stores/sites/utils/statusUpdateHandler", () => ({
@@ -241,15 +243,16 @@ describe("useSiteSync - Line Coverage Completion", () => {
 
             expect(retryResult.success).toBeTruthy();
             expect(retryResult.subscribed).toBeTruthy();
-            expect(StatusUpdateManagerMock.mock.instances.length).toBeGreaterThanOrEqual(
-                2
-            );
+            expect(
+                StatusUpdateManagerMock.mock.instances.length
+            ).toBeGreaterThanOrEqual(2);
             expect(unsubscribeSpies[0]).toHaveBeenCalledTimes(1);
-            expect(mockDeps.setStatusSubscriptionSummary).toHaveBeenNthCalledWith(
-                1,
-                undefined
-            );
-            expect(mockDeps.setStatusSubscriptionSummary).toHaveBeenNthCalledWith(
+            expect(
+                mockDeps.setStatusSubscriptionSummary
+            ).toHaveBeenNthCalledWith(1, undefined);
+            expect(
+                mockDeps.setStatusSubscriptionSummary
+            ).toHaveBeenNthCalledWith(
                 2,
                 expect.objectContaining({
                     expectedListeners: LISTENER_NAMES.length,
@@ -320,12 +323,12 @@ describe("useSiteSync - Line Coverage Completion", () => {
             await annotate("Type: Data Deletion", "type");
 
             let eventHandler: any;
-            mockStateSyncService.onStateSyncEvent.mockImplementation(async (
-                handler
-            ) => {
-                eventHandler = handler;
-                return vi.fn();
-            });
+            mockStateSyncService.onStateSyncEvent.mockImplementation(
+                async (handler) => {
+                    eventHandler = handler;
+                    return vi.fn();
+                }
+            );
 
             syncActions.subscribeToSyncEvents();
 
@@ -354,12 +357,12 @@ describe("useSiteSync - Line Coverage Completion", () => {
             await annotate("Type: Data Update", "type");
 
             let eventHandler: any;
-            mockStateSyncService.onStateSyncEvent.mockImplementation(async (
-                handler
-            ) => {
-                eventHandler = handler;
-                return vi.fn();
-            });
+            mockStateSyncService.onStateSyncEvent.mockImplementation(
+                async (handler) => {
+                    eventHandler = handler;
+                    return vi.fn();
+                }
+            );
 
             syncActions.subscribeToSyncEvents();
 
@@ -401,12 +404,12 @@ describe("useSiteSync - Line Coverage Completion", () => {
             await annotate("Type: Error Handling", "type");
 
             let eventHandler: any;
-            mockStateSyncService.onStateSyncEvent.mockImplementation(async (
-                handler
-            ) => {
-                eventHandler = handler;
-                return vi.fn();
-            });
+            mockStateSyncService.onStateSyncEvent.mockImplementation(
+                async (handler) => {
+                    eventHandler = handler;
+                    return vi.fn();
+                }
+            );
 
             syncActions.subscribeToSyncEvents();
 
@@ -446,22 +449,22 @@ describe("useSiteSync - Line Coverage Completion", () => {
             );
 
             // Mock withErrorHandling to call the handlers
-            vi.mocked(withErrorHandling).mockImplementationOnce(async (
-                operation,
-                handlers
-            ) => {
-                // Call all the handlers to cover lines 335-341
-                const frontendHandlers = handlers as any;
-                if (frontendHandlers?.clearError) frontendHandlers.clearError();
-                if (frontendHandlers?.setError)
-                    frontendHandlers.setError(new Error("test"));
-                if (frontendHandlers?.setLoading)
-                    frontendHandlers.setLoading(true);
-                if (frontendHandlers?.setLoading)
-                    frontendHandlers.setLoading(false);
+            vi.mocked(withErrorHandling).mockImplementationOnce(
+                async (operation, handlers) => {
+                    // Call all the handlers to cover lines 335-341
+                    const frontendHandlers = handlers as any;
+                    if (frontendHandlers?.clearError)
+                        frontendHandlers.clearError();
+                    if (frontendHandlers?.setError)
+                        frontendHandlers.setError(new Error("test"));
+                    if (frontendHandlers?.setLoading)
+                        frontendHandlers.setLoading(true);
+                    if (frontendHandlers?.setLoading)
+                        frontendHandlers.setLoading(false);
 
-                return await operation();
-            });
+                    return await operation();
+                }
+            );
 
             const fullSyncResult = {
                 completedAt: Date.now(),
@@ -504,12 +507,12 @@ describe("useSiteSync - Line Coverage Completion", () => {
             await annotate("Type: Business Logic", "type");
 
             let eventHandler: any;
-            mockStateSyncService.onStateSyncEvent.mockImplementation(async (
-                handler
-            ) => {
-                eventHandler = handler;
-                return vi.fn();
-            });
+            mockStateSyncService.onStateSyncEvent.mockImplementation(
+                async (handler) => {
+                    eventHandler = handler;
+                    return vi.fn();
+                }
+            );
 
             syncActions.subscribeToSyncEvents();
 

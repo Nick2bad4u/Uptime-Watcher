@@ -43,7 +43,8 @@ function resolveArgToFiles(rawArg) {
     const matches = fs.globSync(pattern);
 
     return matches.filter((/** @type {string} */ file) =>
-        file.toLowerCase().endsWith(".md"));
+        file.toLowerCase().endsWith(".md")
+    );
 }
 
 /**

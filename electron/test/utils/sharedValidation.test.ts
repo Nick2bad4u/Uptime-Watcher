@@ -161,9 +161,9 @@ describe("Shared Validation - Backend Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(validateSiteData(null as unknown as Partial<Site>).success).toBeFalsy(
-
-            );
+            expect(
+                validateSiteData(null as unknown as Partial<Site>).success
+            ).toBeFalsy();
             expect(
                 validateSiteData(undefined as unknown as Partial<Site>).success
             ).toBeFalsy();

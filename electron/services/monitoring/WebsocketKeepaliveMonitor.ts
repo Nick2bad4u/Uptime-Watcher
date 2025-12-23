@@ -277,12 +277,12 @@ export class WebsocketKeepaliveMonitor implements IMonitorService {
                         break;
                     }
 
-                        default: {
+                    default: {
                         // Exhaustiveness guard (should be unreachable).
                         throw new Error(
                             `Unexpected WebSocket readyState: ${String(socket.readyState)}`
                         );
-                        }
+                    }
                 }
             });
 

@@ -86,7 +86,8 @@ describe("Shared Error Handling and Safety Performance", () => {
                       name: error.name,
                       stack: error.stack ?? "",
                   }
-                : error);
+                : error
+        );
 
         const complexObjects = [
             { timestamp: Date.now(), data: testObjects },

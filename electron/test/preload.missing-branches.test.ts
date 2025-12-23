@@ -173,9 +173,8 @@ describe("preload.ts - Missing Branch Coverage", () => {
         it("should handle removeAllListeners errors", async () => {
             // RemoveAllListeners should not throw
             expect(() =>
-                exposedAPI.events.removeAllListeners(
-                    "test-channel"
-                )).not.toThrowError();
+                exposedAPI.events.removeAllListeners("test-channel")
+            ).not.toThrowError();
         });
     });
     describe("Parameter Validation", () => {
@@ -305,20 +304,20 @@ describe("preload.ts - Missing Branch Coverage", () => {
             });
             // Should handle callback errors gracefully
             expect(() =>
-                exposedAPI.events.onTestEvent(
-                    errorCallback
-                )).not.toThrowError();
+                exposedAPI.events.onTestEvent(errorCallback)
+            ).not.toThrowError();
         });
         it("should handle invalid event names", async () => {
             // Test with various invalid event names - test removeAllListeners with invalid channels
             expect(() =>
-                exposedAPI.events.removeAllListeners("")).not.toThrowError();
+                exposedAPI.events.removeAllListeners("")
+            ).not.toThrowError();
             expect(() =>
-                exposedAPI.events.removeAllListeners(null)).not.toThrowError();
+                exposedAPI.events.removeAllListeners(null)
+            ).not.toThrowError();
             expect(() =>
-                exposedAPI.events.removeAllListeners(
-                    undefined
-                )).not.toThrowError();
+                exposedAPI.events.removeAllListeners(undefined)
+            ).not.toThrowError();
         });
         it("should handle rapid event registration/removal", async () => {
             // Rapid event operations
@@ -337,25 +336,26 @@ describe("preload.ts - Missing Branch Coverage", () => {
 
             // Test various event listener methods
             expect(() =>
-                exposedAPI.events.onUpdateStatus(callback)).not.toThrowError();
+                exposedAPI.events.onUpdateStatus(callback)
+            ).not.toThrowError();
             expect(() =>
-                exposedAPI.events.onMonitorUp(callback)).not.toThrowError();
+                exposedAPI.events.onMonitorUp(callback)
+            ).not.toThrowError();
             expect(() =>
-                exposedAPI.events.onMonitorDown(callback)).not.toThrowError();
+                exposedAPI.events.onMonitorDown(callback)
+            ).not.toThrowError();
             expect(() =>
-                exposedAPI.events.onTestEvent(callback)).not.toThrowError();
+                exposedAPI.events.onTestEvent(callback)
+            ).not.toThrowError();
             expect(() =>
-                exposedAPI.events.onCacheInvalidated(
-                    callback
-                )).not.toThrowError();
+                exposedAPI.events.onCacheInvalidated(callback)
+            ).not.toThrowError();
             expect(() =>
-                exposedAPI.events.onMonitoringStarted(
-                    callback
-                )).not.toThrowError();
+                exposedAPI.events.onMonitoringStarted(callback)
+            ).not.toThrowError();
             expect(() =>
-                exposedAPI.events.onMonitoringStopped(
-                    callback
-                )).not.toThrowError();
+                exposedAPI.events.onMonitoringStopped(callback)
+            ).not.toThrowError();
         });
     });
     describe("Memory Management", () => {

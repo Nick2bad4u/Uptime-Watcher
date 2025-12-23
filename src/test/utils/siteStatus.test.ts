@@ -507,14 +507,16 @@ describe("siteStatus Property-based Tests", () => {
             (site) => {
                 // Property: All status functions should handle any valid input without throwing
                 expect(() =>
-                    calculateSiteMonitoringStatus(site)).not.toThrowError();
+                    calculateSiteMonitoringStatus(site)
+                ).not.toThrowError();
                 expect(() => calculateSiteStatus(site)).not.toThrowError();
                 expect(() => getSiteDisplayStatus(site)).not.toThrowError();
                 expect(() => getSiteStatusDescription(site)).not.toThrowError();
 
                 const displayStatus = getSiteDisplayStatus(site);
                 expect(() =>
-                    getSiteStatusVariant(displayStatus)).not.toThrowError();
+                    getSiteStatusVariant(displayStatus)
+                ).not.toThrowError();
             }
         );
     });

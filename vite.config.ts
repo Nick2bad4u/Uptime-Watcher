@@ -675,7 +675,9 @@ export default defineConfig(({ command, mode }) => {
                       codecovVitePlugin({
                           bundleName: "uptime-watcher",
                           enableBundleAnalysis: Boolean(codecovToken),
-                          ...(codecovToken ? { uploadToken: codecovToken } : {}),
+                          ...(codecovToken
+                              ? { uploadToken: codecovToken }
+                              : {}),
                           telemetry: false, // Disable telemetry for faster builds
                       }),
                   ]

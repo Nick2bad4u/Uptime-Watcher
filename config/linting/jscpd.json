@@ -64,14 +64,7 @@
     "noSymlinks": false,
     "output": "./reports/jscpd/",
     "pattern": "**/*",
-    "reporters": [
-        "html",
-        "markdown",
-        "json",
-        "console",
-        "xml",
-        "csv"
-    ],
+    "reporters": ["html", "markdown", "json", "console", "xml", "csv"],
     "reportersOptions": {
         "badge": {
             "color": "purple",

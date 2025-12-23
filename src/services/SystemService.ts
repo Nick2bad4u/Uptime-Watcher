@@ -88,42 +88,48 @@ export const SystemService: SystemServiceContract = {
      * @throws If the electron API is unavailable, the underlying operation
      *   fails, or Electron declines to open the target URL.
      */
-    openExternal: wrap("openExternal", async (
-        api,
-        url: string
-    ): Promise<boolean> => {
-        const validation = validateExternalOpenUrlCandidate(url);
-        const urlForMessage = getSafeUrlForLogging(url);
+    openExternal: wrap(
+        "openExternal",
+        async (api, url: string): Promise<boolean> => {
+            const validation = validateExternalOpenUrlCandidate(url);
+            const urlForMessage = getSafeUrlForLogging(url);
 
             if ("reason" in validation) {
-            const error = new TypeError(
-                `Invalid URL provided to SystemService.openExternal: ${validation.safeUrlForLogging}`
+                const error = new TypeError(
+                    `Invalid URL provided to SystemService.openExternal: ${validation.safeUrlForLogging}`
+                );
+
+                logger.error(
+                    "Rejected unsafe URL for external navigation",
+                    error,
+                    {
+                        reason: validation.reason,
+                        url: validation.safeUrlForLogging,
+                    }
+                );
+
+                throw error;
+            }
+
+            const opened = await api.system.openExternal(
+                validation.normalizedUrl
             );
 
-            logger.error("Rejected unsafe URL for external navigation", error, {
-                reason: validation.reason,
-                url: validation.safeUrlForLogging,
-            });
+            if (typeof opened !== "boolean") {
+                throw new TypeError(
+                    `Electron declined to open external URL: ${urlForMessage} (received ${typeof opened})`
+                );
+            }
 
-            throw error;
+            if (!opened) {
+                throw new Error(
+                    `Electron declined to open external URL: ${urlForMessage}`
+                );
+            }
+
+            return opened;
         }
-
-        const opened = await api.system.openExternal(validation.normalizedUrl);
-
-        if (typeof opened !== "boolean") {
-            throw new TypeError(
-                `Electron declined to open external URL: ${urlForMessage} (received ${typeof opened})`
-            );
-        }
-
-        if (!opened) {
-            throw new Error(
-                `Electron declined to open external URL: ${urlForMessage}`
-            );
-        }
-
-        return opened;
-    }),
+    ),
 
     /**
      * Quits the application and installs a pending update.
@@ -158,20 +164,20 @@ export const SystemService: SystemServiceContract = {
      * `navigator.clipboard` permission failures in Electron (common when the
      * renderer is not treated as a secure browsing context).
      */
-    writeClipboardText: wrap("writeClipboardText", async (
-        api: ElectronAPI,
-        text: string
-    ): Promise<void> => {
-        const result = await api.system.writeClipboardText(text);
+    writeClipboardText: wrap(
+        "writeClipboardText",
+        async (api: ElectronAPI, text: string): Promise<void> => {
+            const result = await api.system.writeClipboardText(text);
 
-        if (typeof result !== "boolean") {
-            throw new TypeError(
-                `Invalid response received from writeClipboardText: ${typeof result}`
-            );
-        }
+            if (typeof result !== "boolean") {
+                throw new TypeError(
+                    `Invalid response received from writeClipboardText: ${typeof result}`
+                );
+            }
 
-        if (!result) {
-            throw new Error("Electron declined to write clipboard text");
+            if (!result) {
+                throw new Error("Electron declined to write clipboard text");
+            }
         }
-    }),
+    ),
 };

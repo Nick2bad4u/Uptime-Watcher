@@ -147,7 +147,8 @@ const handleMultipleOperations = async () => {
 const MyComponent = () => {
  const sitesError = useErrorStore((state) => state.getStoreError("sites"));
  const settingsError = useErrorStore((state) =>
-  state.getStoreError("settings"));
+  state.getStoreError("settings")
+ );
 
  return (
   <div>
@@ -414,7 +415,8 @@ const MyComponent = () => {
  const globalError = useErrorStore((state) => state.lastError);
  const sitesError = useErrorStore((state) => state.getStoreError("sites"));
  const isLoading = useErrorStore((state) =>
-  state.getOperationLoading("createSite"));
+  state.getOperationLoading("createSite")
+ );
 
  const handleAction = useCallback(async () => {
   try {
@@ -603,11 +605,11 @@ export const useMonitorEventIntegration = () => {
   const setupEventListeners = async () => {
    try {
     // Success events
-    const successCleanup = await EventsService.onMonitorCheckCompleted((
-     data
-    ) => {
-     sitesStore.updateMonitorResult(data.monitor.siteIdentifier, data.result);
-    });
+    const successCleanup = await EventsService.onMonitorCheckCompleted(
+     (data) => {
+      sitesStore.updateMonitorResult(data.monitor.siteIdentifier, data.result);
+     }
+    );
     cleanupFunctions.push(successCleanup);
 
     // Error events

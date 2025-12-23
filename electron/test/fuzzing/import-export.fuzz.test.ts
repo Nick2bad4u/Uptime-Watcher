@@ -76,7 +76,8 @@ describe("Data Import/Export Service Fuzzing Tests", () => {
                     const adapter: Record<string, any> = {};
                     for (const [key, factory] of Object.entries(builders)) {
                         adapter[key] = vi.fn((...args: unknown[]) =>
-                            factory(db, ...args));
+                            factory(db, ...args)
+                        );
                     }
                     return adapter;
                 });
@@ -380,7 +381,8 @@ describe("Data Import/Export Service Fuzzing Tests", () => {
 
                         // Should produce valid JSON
                         expect(() =>
-                            JSON.parse(exportedJson)).not.toThrowError();
+                            JSON.parse(exportedJson)
+                        ).not.toThrowError();
 
                         const parsed = JSON.parse(exportedJson);
 
@@ -403,9 +405,8 @@ describe("Data Import/Export Service Fuzzing Tests", () => {
 
                         // ExportedAt should be valid ISO date
                         expect(() =>
-                            new Date(
-                                parsed.exportedAt
-                            ).toISOString()).not.toThrowError();
+                            new Date(parsed.exportedAt).toISOString()
+                        ).not.toThrowError();
                     }
                 ),
                 { numRuns: 25 }

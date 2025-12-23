@@ -12,11 +12,11 @@ import type {
 } from "../CloudStorageProvider.types";
 import type { DropboxTokenManager } from "./DropboxTokenManager";
 
+import { listBackupsFromMetadataObjects } from "../cloudBackupListing";
 import {
     backupMetadataKeyForBackupKey,
     parseCloudBackupMetadataFileBuffer,
     serializeCloudBackupMetadataFile,
-    tryParseCloudBackupMetadataFileBuffer,
 } from "../CloudBackupMetadataFile";
 import { withDropboxRetry } from "./dropboxRetry";
 
@@ -520,27 +520,10 @@ export class DropboxCloudStorageProvider implements CloudStorageProvider {
 
     public async listBackups(): Promise<CloudBackupEntry[]> {
         const objects = await this.listObjects(BACKUPS_PREFIX);
-        const metadataObjects = objects.filter((object) =>
-            object.key.endsWith(".metadata.json")
-        );
-
-        const backupCandidates = await Promise.all(
-            metadataObjects.map(async (object) => {
-                try {
-                    const raw = await this.downloadObject(object.key);
-                    return tryParseCloudBackupMetadataFileBuffer(raw);
-                } catch {
-                    return null;
-                }
-            })
-        );
-
-        const backups = backupCandidates.filter(
-            (entry): entry is CloudBackupEntry => entry !== null
-        );
-
-        backups.sort((a, b) => b.metadata.createdAt - a.metadata.createdAt);
-        return backups;
+        return listBackupsFromMetadataObjects({
+            downloadObjectBuffer: async (key) => this.downloadObject(key),
+            objects,
+        });
     }
 
     public async uploadBackup(args: {

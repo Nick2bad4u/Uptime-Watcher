@@ -145,7 +145,8 @@ const meta: Meta<typeof DeviceStatusCard> = {
   msw: {
    handlers: [
     http.get("/api/devices/42/status", () =>
-     HttpResponse.json({ uptimePercentage: 99.9 })),
+     HttpResponse.json({ uptimePercentage: 99.9 })
+    ),
    ],
   },
  },

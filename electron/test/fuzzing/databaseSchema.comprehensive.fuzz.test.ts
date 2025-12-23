@@ -205,14 +205,14 @@ describe("DatabaseSchema Comprehensive Fuzzing Tests", () => {
                         // Add delay to test async behavior
                         if (delayMs > 0) {
                             await new Promise((resolve) =>
-                                setTimeout(resolve, delayMs));
+                                setTimeout(resolve, delayMs)
+                            );
                         }
 
                         if (shouldSucceed) {
                             expect(() =>
-                                createDatabaseTables(
-                                    testDb
-                                )).not.toThrowError();
+                                createDatabaseTables(testDb)
+                            ).not.toThrowError();
                             expect(runSpy).toHaveBeenCalled();
                             // Verify all required tables are created
                             expect(runSpy).toHaveBeenCalledWith(
@@ -247,9 +247,8 @@ describe("DatabaseSchema Comprehensive Fuzzing Tests", () => {
                             );
                         } else {
                             expect(() =>
-                                createDatabaseTables(testDb)).toThrowError(
-                                "SQL execution failed"
-                            );
+                                createDatabaseTables(testDb)
+                            ).toThrowError("SQL execution failed");
                         }
                     }
                 )
@@ -330,9 +329,8 @@ describe("DatabaseSchema Comprehensive Fuzzing Tests", () => {
 
                         if (shouldFail) {
                             expect(() =>
-                                createDatabaseIndexes(testDb)).toThrowError(
-                                errorType
-                            );
+                                createDatabaseIndexes(testDb)
+                            ).toThrowError(errorType);
                         } else {
                             // Execute multiple times to test idempotency
                             for (let i = 0; i < indexCount; i++) {
@@ -434,7 +432,8 @@ describe("DatabaseSchema Comprehensive Fuzzing Tests", () => {
 
                         // Should not throw even if registry fails (graceful degradation)
                         expect(() =>
-                            setupMonitorTypeValidation()).not.toThrowError();
+                            setupMonitorTypeValidation()
+                        ).not.toThrowError();
 
                         if (!shouldThrow) {
                             expect(
@@ -466,7 +465,8 @@ describe("DatabaseSchema Comprehensive Fuzzing Tests", () => {
 
                         // Should handle any input gracefully
                         expect(() =>
-                            setupMonitorTypeValidation()).not.toThrowError();
+                            setupMonitorTypeValidation()
+                        ).not.toThrowError();
 
                         expect(getRegisteredMonitorTypes).toHaveBeenCalled();
                     }
@@ -572,24 +572,21 @@ describe("DatabaseSchema Comprehensive Fuzzing Tests", () => {
 
                             if (failAt === "none") {
                                 expect(() =>
-                                    createDatabaseSchema(
-                                        testDb
-                                    )).not.toThrowError();
+                                    createDatabaseSchema(testDb)
+                                ).not.toThrowError();
                                 // Verify transaction was committed
                                 expect(runSpy).toHaveBeenCalledWith("COMMIT");
                             } else if (failAt === "validation") {
                                 // For validation case, the function should NOT throw since setupMonitorTypeValidation catches errors
                                 expect(() =>
-                                    createDatabaseSchema(
-                                        testDb
-                                    )).not.toThrowError();
+                                    createDatabaseSchema(testDb)
+                                ).not.toThrowError();
                                 // Verify transaction was committed (no rollback)
                                 expect(runSpy).toHaveBeenCalledWith("COMMIT");
                             } else {
                                 expect(() =>
-                                    createDatabaseSchema(
-                                        testDb
-                                    )).toThrowError();
+                                    createDatabaseSchema(testDb)
+                                ).toThrowError();
 
                                 // Only verify rollback was called if transaction was actually started
                                 // (i.e., if BEGIN succeeded but something else failed)
@@ -797,14 +794,12 @@ describe("DatabaseSchema Comprehensive Fuzzing Tests", () => {
                             for (let i = 0; i < executionCount; i++) {
                                 if (schemaVariant === "valid") {
                                     expect(() =>
-                                        createDatabaseTables(
-                                            testDb
-                                        )).not.toThrowError();
+                                        createDatabaseTables(testDb)
+                                    ).not.toThrowError();
                                 } else {
                                     expect(() =>
-                                        createDatabaseTables(
-                                            testDb
-                                        )).toThrowError();
+                                        createDatabaseTables(testDb)
+                                    ).toThrowError();
                                 }
                             }
                         } finally {
@@ -955,7 +950,8 @@ describe("DatabaseSchema Comprehensive Fuzzing Tests", () => {
 
                         // Schema creation should work regardless of external Unicode data
                         expect(() =>
-                            createDatabaseSchema(testDb)).not.toThrowError();
+                            createDatabaseSchema(testDb)
+                        ).not.toThrowError();
 
                         // Verify SQL commands don't contain external data
                         const allCalls = runSpy.mock.calls.flat();

@@ -30,7 +30,8 @@ const buildPayloadPreviewMock = vi.hoisted(() =>
         } catch {
             return undefined;
         }
-    }));
+    })
+);
 
 vi.mock("electron", () => ({
     ipcRenderer: mockIpcRenderer,
@@ -864,7 +865,8 @@ describe("Events Domain API", () => {
             }) =>
                 (() => {
                     const minLength = constraints?.minLength ?? 1;
-                    const maxLength = constraints?.maxLength ?? Math.max(32, minLength);
+                    const maxLength =
+                        constraints?.maxLength ?? Math.max(32, minLength);
 
                     return fc
                         .string({
@@ -887,14 +889,21 @@ describe("Events Domain API", () => {
                         monitoring: overrides.monitoring,
                         responseTime: overrides.responseTime,
                         status: overrides.status,
-                    }));
+                    })
+                );
 
             const siteOverrideArbitrary = fc.record({
-                identifier: nonWhitespaceString({ maxLength: 100, minLength: 1 }),
-                monitoring: fc.boolean(),
-                name: fc.option(nonWhitespaceString({ maxLength: 200, minLength: 1 }), {
-                    nil: undefined,
+                identifier: nonWhitespaceString({
+                    maxLength: 100,
+                    minLength: 1,
                 }),
+                monitoring: fc.boolean(),
+                name: fc.option(
+                    nonWhitespaceString({ maxLength: 200, minLength: 1 }),
+                    {
+                        nil: undefined,
+                    }
+                ),
             });
 
             const statusUpdateArbitrary = fc
@@ -911,47 +920,49 @@ describe("Events Domain API", () => {
                     fc.constantFrom(...statusValues),
                     fc.date()
                 )
-                .map(([
-                    monitor,
-                    siteOverrides,
-                    details,
-                    previousStatus,
-                    responseTime,
-                    status,
-                    timestampValue,
-                ]) => {
-                    const normalizedTime = (() => {
-                        const time = timestampValue.getTime();
-                        if (Number.isNaN(time)) {
-                            return 0;
-                        }
-                        return Math.max(
-                            MIN_ISO_TIMESTAMP_MS,
-                            Math.min(MAX_ISO_TIMESTAMP_MS, time)
-                        );
-                    })();
-
-                    const site = createSiteFixture({
-                        identifier: siteOverrides.identifier,
-                        monitoring: siteOverrides.monitoring,
-                        ...(siteOverrides.name === undefined
-                            ? {}
-                            : { name: siteOverrides.name }),
-                        monitors: [monitor],
-                    });
-
-                    return {
-                        details: details ?? "",
+                .map(
+                    ([
                         monitor,
-                        monitorId: monitor.id,
-                        previousStatus: previousStatus ?? status,
-                        responseTime: responseTime ?? 0,
-                        site,
-                        siteIdentifier: site.identifier,
+                        siteOverrides,
+                        details,
+                        previousStatus,
+                        responseTime,
                         status,
-                        timestamp: new Date(normalizedTime).toISOString(),
-                    } satisfies MonitorStatusChangedEventData;
-                });
+                        timestampValue,
+                    ]) => {
+                        const normalizedTime = (() => {
+                            const time = timestampValue.getTime();
+                            if (Number.isNaN(time)) {
+                                return 0;
+                            }
+                            return Math.max(
+                                MIN_ISO_TIMESTAMP_MS,
+                                Math.min(MAX_ISO_TIMESTAMP_MS, time)
+                            );
+                        })();
+
+                        const site = createSiteFixture({
+                            identifier: siteOverrides.identifier,
+                            monitoring: siteOverrides.monitoring,
+                            ...(siteOverrides.name === undefined
+                                ? {}
+                                : { name: siteOverrides.name }),
+                            monitors: [monitor],
+                        });
+
+                        return {
+                            details: details ?? "",
+                            monitor,
+                            monitorId: monitor.id,
+                            previousStatus: previousStatus ?? status,
+                            responseTime: responseTime ?? 0,
+                            site,
+                            siteIdentifier: site.identifier,
+                            status,
+                            timestamp: new Date(normalizedTime).toISOString(),
+                        } satisfies MonitorStatusChangedEventData;
+                    }
+                );
 
             fc.assert(
                 fc.property(statusUpdateArbitrary, (eventData) => {
@@ -1287,11 +1298,11 @@ describe("Events Domain API", () => {
                     expect(typeof data.siteIdentifier).toBe("string");
                     expect(data.status).toBe("up");
                 }),
-                api.onMonitorStatusChanged((
-                    data: MonitorStatusChangedEventData
-                ) => {
-                    expect(typeof data.siteIdentifier).toBe("string");
-                }),
+                api.onMonitorStatusChanged(
+                    (data: MonitorStatusChangedEventData) => {
+                        expect(typeof data.siteIdentifier).toBe("string");
+                    }
+                ),
                 api.onTestEvent((data: TestEventData) => {
                     expect(typeof data["message"]).toBe("string");
                 }),

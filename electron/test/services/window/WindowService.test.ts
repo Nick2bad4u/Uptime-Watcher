@@ -72,9 +72,18 @@ vi.mock("../../../electronUtils", () => ({
 }));
 
 // Mock shared utils
-vi.mock("../../../../shared/utils/environment", () => ({
-    getNodeEnv: vi.fn(() => "test"),
-}));
+vi.mock("../../../../shared/utils/environment", async () => {
+    const actual =
+        await vi.importActual<typeof import("../../../../shared/utils/environment")>(
+            "../../../../shared/utils/environment"
+        );
+
+    return {
+        ...actual,
+        // Override the environment classifier for deterministic tests.
+        getNodeEnv: vi.fn(() => "test"),
+    };
+});
 
 // Mock node modules
 vi.mock("node:path", () => ({

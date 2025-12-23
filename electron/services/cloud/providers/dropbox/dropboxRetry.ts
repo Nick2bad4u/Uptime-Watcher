@@ -144,14 +144,13 @@ function extractRetryableHttpFailure(error: unknown): null | {
     );
 
     // Dropbox uses standard HTTP status codes.
-    if (status === 429) {
-        return {
-            status,
-            ...(retryAfterMs === undefined ? {} : { retryAfterMs }),
-        };
-    }
-
-    if (status === 500 || status === 502 || status === 503 || status === 504) {
+    if (
+        status === 429 ||
+        status === 500 ||
+        status === 502 ||
+        status === 503 ||
+        status === 504
+    ) {
         return {
             status,
             ...(retryAfterMs === undefined ? {} : { retryAfterMs }),

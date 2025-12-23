@@ -26,7 +26,8 @@ const THRESHOLD = Number(process.env["PLAYWRIGHT_COVERAGE_THRESHOLD"] ?? "100");
 async function loadCoverageFragments(): Promise<string[]> {
     try {
         return (await readdir(NYC_OUTPUT_DIR)).filter((file) =>
-            file.endsWith(".json"));
+            file.endsWith(".json")
+        );
     } catch {
         return [];
     }

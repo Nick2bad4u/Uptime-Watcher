@@ -81,30 +81,51 @@ describe("urlSafety", () => {
 
     describe(isAllowedExternalOpenUrl, () => {
         it("allows http/https and mailto", () => {
-            expect(isAllowedExternalOpenUrl("https://example.com")).toBeTruthy();
-            expect(isAllowedExternalOpenUrl("http://example.com/path?q=1")).toBeTruthy();
-            expect(isAllowedExternalOpenUrl("mailto:test@example.com")).toBeTruthy();
+            expect(
+                isAllowedExternalOpenUrl("https://example.com")
+            ).toBeTruthy();
+            expect(
+                isAllowedExternalOpenUrl("http://example.com/path?q=1")
+            ).toBeTruthy();
+            expect(
+                isAllowedExternalOpenUrl("mailto:test@example.com")
+            ).toBeTruthy();
         });
 
         it("blocks non-web protocols", () => {
-            expect(isAllowedExternalOpenUrl("file:///C:/Windows/System32")).toBeFalsy();
-            const scriptUrl = ["java", "script:", "alert(1)"].join("");
+            expect(
+                isAllowedExternalOpenUrl("file:///C:/Windows/System32")
+            ).toBeFalsy();
+            const scriptUrl = [
+                "java",
+                "script:",
+                "alert(1)",
+            ].join("");
             expect(isAllowedExternalOpenUrl(scriptUrl)).toBeFalsy();
-            expect(isAllowedExternalOpenUrl("data:text/html;base64,PGgxPkhlbGxvPC9oMT4=")).toBeFalsy();
+            expect(
+                isAllowedExternalOpenUrl(
+                    "data:text/html;base64,PGgxPkhlbGxvPC9oMT4="
+                )
+            ).toBeFalsy();
             expect(isAllowedExternalOpenUrl("about:blank")).toBeFalsy();
         });
 
         it("blocks URLs with credentials", () => {
-            expect(isAllowedExternalOpenUrl("https://user:pass@example.com")).toBeFalsy();
-            expect(isAllowedExternalOpenUrl("http://user@example.com"))
-                .toBeFalsy();
+            expect(
+                isAllowedExternalOpenUrl("https://user:pass@example.com")
+            ).toBeFalsy();
+            expect(
+                isAllowedExternalOpenUrl("http://user@example.com")
+            ).toBeFalsy();
         });
 
         it("blocks URLs containing CR/LF", () => {
-            expect(isAllowedExternalOpenUrl("https://example.com\nInjected"))
-                .toBeFalsy();
-            expect(isAllowedExternalOpenUrl("https://example.com\rInjected"))
-                .toBeFalsy();
+            expect(
+                isAllowedExternalOpenUrl("https://example.com\nInjected")
+            ).toBeFalsy();
+            expect(
+                isAllowedExternalOpenUrl("https://example.com\rInjected")
+            ).toBeFalsy();
         });
     });
 
@@ -120,13 +141,14 @@ describe("urlSafety", () => {
 
         it("rejects javascript/file URLs", () => {
             expect(
-                validateExternalOpenUrlCandidate(
-                    "file:///C:/Windows/System32"
-                ).ok
+                validateExternalOpenUrlCandidate("file:///C:/Windows/System32")
+                    .ok
             ).toBeFalsy();
-            // eslint-disable-next-line no-script-url -- intentional test case
-            expect(validateExternalOpenUrlCandidate("javascript:alert(1)").ok)
-                .toBeFalsy();
+
+            expect(
+                // eslint-disable-next-line no-script-url -- Intentional unit test coverage for script URL rejection.
+                validateExternalOpenUrlCandidate("javascript:alert(1)").ok
+            ).toBeFalsy();
         });
 
         it("rejects http(s) URLs containing credentials", () => {

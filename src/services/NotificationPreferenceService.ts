@@ -60,22 +60,25 @@ interface NotificationPreferenceServiceContract {
 export const NotificationPreferenceService: NotificationPreferenceServiceContract =
     {
         initialize: ensureInitialized,
-        updatePreferences: wrap("updatePreferences", async (
-            api,
-            preferences: NotificationPreferenceUpdate
-        ) => {
-            const validation =
-                validateNotificationPreferenceUpdate(preferences);
+        updatePreferences: wrap(
+            "updatePreferences",
+            async (api, preferences: NotificationPreferenceUpdate) => {
+                const validation =
+                    validateNotificationPreferenceUpdate(preferences);
 
-            if (!validation.success) {
-                const issues = validation.error.issues
-                    .map(({ message }) => message)
-                    .join(", ");
-                throw new Error(`Invalid notification preferences: ${issues}`, {
-                    cause: validation.error,
-                });
+                if (!validation.success) {
+                    const issues = validation.error.issues
+                        .map(({ message }) => message)
+                        .join(", ");
+                    throw new Error(
+                        `Invalid notification preferences: ${issues}`,
+                        {
+                            cause: validation.error,
+                        }
+                    );
+                }
+
+                await api.notifications.updatePreferences(validation.data);
             }
-
-            await api.notifications.updatePreferences(validation.data);
-        }),
+        ),
     };

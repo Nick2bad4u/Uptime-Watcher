@@ -84,9 +84,9 @@ export function validateMonitorHost(monitor: Monitor): null | string {
     const hostLooksValid =
         isValidHost(host) ||
         isValidFQDN(host, {
-            "allow_trailing_dot": true,
-            "allow_underscores": true,
-            "require_tld": false,
+            allow_trailing_dot: true,
+            allow_underscores: true,
+            require_tld: false,
         });
 
     if (!hostLooksValid) {
@@ -140,7 +140,7 @@ export function validateMonitorUrl(monitor: Monitor): null | string {
     if (
         !isValidUrl(url, {
             allowSingleQuotes: true,
-            "require_tld": false,
+            require_tld: false,
         })
     ) {
         return "Monitor missing or invalid URL";

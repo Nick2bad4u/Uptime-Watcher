@@ -368,8 +368,8 @@ export const SyncMaintenancePanel = ({
                 </ThemedText>
 
                 <ThemedText className="mt-1" size="xs" variant="tertiary">
-                    Resetting remote sync deletes remote history and re-seeds from
-                    this device. Other devices may need to resync.
+                    Resetting remote sync deletes remote history and re-seeds
+                    from this device. Other devices may need to resync.
                 </ThemedText>
 
                 <div className="mt-2 flex flex-wrap gap-2">

@@ -206,9 +206,3 @@ export type MonitorConfiguration = Simplify<
         type: MonitorType;
     }
 >;
-
-/**
- * Deprecated: Use {@link MonitorServiceConfig}. Retained for backward-compatible
- * test helpers.
- */
-export type MonitorConfig = MonitorServiceConfig;

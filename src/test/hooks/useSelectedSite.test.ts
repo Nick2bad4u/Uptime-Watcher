@@ -150,7 +150,8 @@ describe(useSelectedSite, () => {
             await annotate("Type: Business Logic", "type");
 
             mockUseUIStore.mockImplementation((selector: any) =>
-                selector({ selectedSiteIdentifier: "site-1" }));
+                selector({ selectedSiteIdentifier: "site-1" })
+            );
             mockUseSitesStore.mockReturnValue(mockSites);
 
             renderHook(() => useSelectedSite());
@@ -169,7 +170,8 @@ describe(useSelectedSite, () => {
 
             mockUseUIStore.mockReturnValue("site-1");
             mockUseSitesStore.mockImplementation((selector: any) =>
-                selector({ sites: mockSites }));
+                selector({ sites: mockSites })
+            );
 
             renderHook(() => useSelectedSite());
 
@@ -415,7 +417,8 @@ describe(useSelectedSite, () => {
             const updatedSites = mockSites.map((site) =>
                 site.identifier === "site-1"
                     ? { ...site, name: "Updated Test Site 1" }
-                    : site);
+                    : site
+            );
             mockUseSitesStore.mockReturnValue(updatedSites);
             rerender();
             expect(result.current?.name).toBe("Updated Test Site 1");

@@ -830,43 +830,44 @@ describe("AddSiteForm Comprehensive Tests", () => {
                 numRuns: 5,
                 timeout: 20_000,
             }
-        )("should handle corporate service monitoring scenarios", async (
-            scenario
-        ) => {
-            const siteName = `${scenario.company} ${scenario.service} (${scenario.environment})`;
-            const url = `https://${scenario.service.toLowerCase()}.${scenario.company.toLowerCase()}.com`;
+        )(
+            "should handle corporate service monitoring scenarios",
+            async (scenario) => {
+                const siteName = `${scenario.company} ${scenario.service} (${scenario.environment})`;
+                const url = `https://${scenario.service.toLowerCase()}.${scenario.company.toLowerCase()}.com`;
 
-            await renderForm();
+                await renderForm();
 
-            // Verify corporate scenario characteristics
-            expect([
-                "GitHub",
-                "Google",
-                "Microsoft",
-                "Amazon",
-                "Meta",
-                "Netflix",
-                "Apple",
-            ]).toContain(scenario.company);
-            expect([
-                "API",
-                "CDN",
-                "Auth",
-                "Database",
-                "Cache",
-                "Queue",
-                "Storage",
-            ]).toContain(scenario.service);
-            expect([
-                "prod",
-                "staging",
-                "dev",
-                "test",
-            ]).toContain(scenario.environment);
+                // Verify corporate scenario characteristics
+                expect([
+                    "GitHub",
+                    "Google",
+                    "Microsoft",
+                    "Amazon",
+                    "Meta",
+                    "Netflix",
+                    "Apple",
+                ]).toContain(scenario.company);
+                expect([
+                    "API",
+                    "CDN",
+                    "Auth",
+                    "Database",
+                    "Cache",
+                    "Queue",
+                    "Storage",
+                ]).toContain(scenario.service);
+                expect([
+                    "prod",
+                    "staging",
+                    "dev",
+                    "test",
+                ]).toContain(scenario.environment);
 
-            expect(siteName.length).toBeGreaterThan(10);
-            expect(url).toMatch(/^https:\/\//);
-        });
+                expect(siteName.length).toBeGreaterThan(10);
+                expect(url).toMatch(/^https:\/\//);
+            }
+        );
 
         test.prop(
             [
@@ -923,32 +924,33 @@ describe("AddSiteForm Comprehensive Tests", () => {
                 numRuns: 10,
                 timeout: 20_000,
             }
-        )("should handle multiple monitoring configurations", async (
-            monitorConfigs
-        ) => {
-            await renderForm();
+        )(
+            "should handle multiple monitoring configurations",
+            async (monitorConfigs) => {
+                await renderForm();
 
-            // Verify multiple configurations
-            expect(Array.isArray(monitorConfigs)).toBeTruthy();
-            expect(monitorConfigs.length).toBeGreaterThanOrEqual(1);
-            expect(monitorConfigs.length).toBeLessThanOrEqual(5);
+                // Verify multiple configurations
+                expect(Array.isArray(monitorConfigs)).toBeTruthy();
+                expect(monitorConfigs.length).toBeGreaterThanOrEqual(1);
+                expect(monitorConfigs.length).toBeLessThanOrEqual(5);
 
-            for (const config of monitorConfigs) {
-                expect(config.name.length).toBeGreaterThanOrEqual(3);
-                expect(config.name.length).toBeLessThanOrEqual(30);
-                expect([
-                    "high",
-                    "medium",
-                    "low",
-                ]).toContain(config.priority);
-                expect([
-                    "1min",
-                    "5min",
-                    "15min",
-                    "30min",
-                ]).toContain(config.frequency);
+                for (const config of monitorConfigs) {
+                    expect(config.name.length).toBeGreaterThanOrEqual(3);
+                    expect(config.name.length).toBeLessThanOrEqual(30);
+                    expect([
+                        "high",
+                        "medium",
+                        "low",
+                    ]).toContain(config.priority);
+                    expect([
+                        "1min",
+                        "5min",
+                        "15min",
+                        "30min",
+                    ]).toContain(config.frequency);
+                }
             }
-        });
+        );
 
         test.prop(
             [
@@ -976,37 +978,38 @@ describe("AddSiteForm Comprehensive Tests", () => {
                 numRuns: 2,
                 timeout: 15_000,
             }
-        )("should handle different user personas and scenarios", async (
-            persona
-        ) => {
-            await renderForm();
+        )(
+            "should handle different user personas and scenarios",
+            async (persona) => {
+                await renderForm();
 
-            // Verify persona characteristics
-            expect([
-                "developer",
-                "admin",
-                "manager",
-                "support",
-            ]).toContain(persona.userType);
-            expect([
-                "beginner",
-                "intermediate",
-                "expert",
-            ]).toContain(persona.experience);
-            expect([
-                "low",
-                "normal",
-                "high",
-                "critical",
-            ]).toContain(persona.urgency);
+                // Verify persona characteristics
+                expect([
+                    "developer",
+                    "admin",
+                    "manager",
+                    "support",
+                ]).toContain(persona.userType);
+                expect([
+                    "beginner",
+                    "intermediate",
+                    "expert",
+                ]).toContain(persona.experience);
+                expect([
+                    "low",
+                    "normal",
+                    "high",
+                    "critical",
+                ]).toContain(persona.urgency);
 
-            // Form should be accessible regardless of user persona
-            const forms = screen.getAllByRole("form", {
-                name: /add site form/i,
-            });
-            const form = forms[0];
-            expect(form).toBeInTheDocument();
-        });
+                // Form should be accessible regardless of user persona
+                const forms = screen.getAllByRole("form", {
+                    name: /add site form/i,
+                });
+                const form = forms[0];
+                expect(form).toBeInTheDocument();
+            }
+        );
 
         test.prop(
             [
@@ -1030,27 +1033,28 @@ describe("AddSiteForm Comprehensive Tests", () => {
                 numRuns: 10,
                 timeout: 20_000,
             }
-        )("should handle international and scheduling scenarios", async (
-            schedule
-        ) => {
-            await renderForm();
+        )(
+            "should handle international and scheduling scenarios",
+            async (schedule) => {
+                await renderForm();
 
-            // Verify international characteristics
-            const validTimeZones = [
-                "America/New_York",
-                "America/Los_Angeles",
-                "Europe/London",
-                "Europe/Paris",
-                "Asia/Tokyo",
-                "Australia/Sydney",
-            ];
-            expect(validTimeZones).toContain(schedule.timeZone);
-            expect(schedule.workingHours.start).toBeGreaterThanOrEqual(0);
-            expect(schedule.workingHours.start).toBeLessThanOrEqual(23);
-            expect(schedule.workingHours.end).toBeGreaterThanOrEqual(0);
-            expect(schedule.workingHours.end).toBeLessThanOrEqual(23);
-            expect(typeof schedule.weekends).toBe("boolean");
-        });
+                // Verify international characteristics
+                const validTimeZones = [
+                    "America/New_York",
+                    "America/Los_Angeles",
+                    "Europe/London",
+                    "Europe/Paris",
+                    "Asia/Tokyo",
+                    "Australia/Sydney",
+                ];
+                expect(validTimeZones).toContain(schedule.timeZone);
+                expect(schedule.workingHours.start).toBeGreaterThanOrEqual(0);
+                expect(schedule.workingHours.start).toBeLessThanOrEqual(23);
+                expect(schedule.workingHours.end).toBeGreaterThanOrEqual(0);
+                expect(schedule.workingHours.end).toBeLessThanOrEqual(23);
+                expect(typeof schedule.weekends).toBe("boolean");
+            }
+        );
 
         test.prop(
             [
@@ -1097,58 +1101,59 @@ describe("AddSiteForm Comprehensive Tests", () => {
                 numRuns: 10,
                 timeout: 20_000,
             }
-        )("should handle different website categories and features", async (
-            website
-        ) => {
-            await renderForm();
+        )(
+            "should handle different website categories and features",
+            async (website) => {
+                await renderForm();
 
-            // Verify website category characteristics
-            expect([
-                "ecommerce",
-                "saas",
-                "blog",
-                "portfolio",
-            ]).toContain(website.type);
+                // Verify website category characteristics
+                expect([
+                    "ecommerce",
+                    "saas",
+                    "blog",
+                    "portfolio",
+                ]).toContain(website.type);
 
-            switch (website.type) {
-                case "ecommerce": {
-                    expect([
-                        "cart",
-                        "checkout",
-                        "payment",
-                        "inventory",
-                    ]).toContain(website.features);
-                    break;
-                }
-                case "saas": {
-                    expect([
-                        "auth",
-                        "dashboard",
-                        "api",
-                        "billing",
-                    ]).toContain(website.features);
-                    break;
-                }
-                case "blog": {
-                    expect([
-                        "posts",
-                        "comments",
-                        "rss",
-                        "search",
-                    ]).toContain(website.features);
-                    break;
-                }
-                case "portfolio": {
-                    expect([
-                        "gallery",
-                        "contact",
-                        "resume",
-                        "projects",
-                    ]).toContain(website.features);
-                    break;
+                switch (website.type) {
+                    case "ecommerce": {
+                        expect([
+                            "cart",
+                            "checkout",
+                            "payment",
+                            "inventory",
+                        ]).toContain(website.features);
+                        break;
+                    }
+                    case "saas": {
+                        expect([
+                            "auth",
+                            "dashboard",
+                            "api",
+                            "billing",
+                        ]).toContain(website.features);
+                        break;
+                    }
+                    case "blog": {
+                        expect([
+                            "posts",
+                            "comments",
+                            "rss",
+                            "search",
+                        ]).toContain(website.features);
+                        break;
+                    }
+                    case "portfolio": {
+                        expect([
+                            "gallery",
+                            "contact",
+                            "resume",
+                            "projects",
+                        ]).toContain(website.features);
+                        break;
+                    }
                 }
             }
-        });
+        );
 
         test.prop(
             [
@@ -1175,34 +1180,35 @@ describe("AddSiteForm Comprehensive Tests", () => {
                 numRuns: 10,
                 timeout: 20_000,
             }
-        )("should handle business context and compliance requirements", async (
-            business
-        ) => {
-            await renderForm();
+        )(
+            "should handle business context and compliance requirements",
+            async (business) => {
+                await renderForm();
 
-            // Verify business characteristics
-            expect([
-                "startup",
-                "small",
-                "medium",
-                "enterprise",
-            ]).toContain(business.businessSize);
-            expect([
-                "free",
-                "basic",
-                "professional",
-                "enterprise",
-            ]).toContain(business.budget);
-            expect(business.compliance.length).toBeLessThanOrEqual(3);
-
-            for (const requirement of business.compliance) {
+                // Verify business characteristics
                 expect([
-                    "GDPR",
-                    "HIPAA",
-                    "SOX",
-                    "PCI-DSS",
-                ]).toContain(requirement);
+                    "startup",
+                    "small",
+                    "medium",
+                    "enterprise",
+                ]).toContain(business.businessSize);
+                expect([
+                    "free",
+                    "basic",
+                    "professional",
+                    "enterprise",
+                ]).toContain(business.budget);
+                expect(business.compliance.length).toBeLessThanOrEqual(3);
+
+                for (const requirement of business.compliance) {
+                    expect([
+                        "GDPR",
+                        "HIPAA",
+                        "SOX",
+                        "PCI-DSS",
+                    ]).toContain(requirement);
+                }
             }
-        });
+        );
     });
 });

@@ -1,9 +1,4 @@
-import {
-    type JSX,
-    useCallback,
-    useEffect,
-    useMemo,
-} from "react";
+import { type JSX, useCallback, useEffect, useMemo } from "react";
 
 import type { AppToast } from "../../stores/alerts/useAlertStore";
 

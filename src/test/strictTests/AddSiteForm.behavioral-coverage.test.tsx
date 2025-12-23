@@ -496,7 +496,8 @@ describe("AddSiteForm behavioral coverage", () => {
             createFormState({
                 addMode: "existing",
                 selectedExistingSite: "site-1",
-            }));
+            })
+        );
         render(<AddSiteForm />);
 
         const existingSiteSelect = selectFieldProps.get("selectedSite");
@@ -545,7 +546,8 @@ describe("AddSiteForm behavioral coverage", () => {
             expect(loggerErrorMock).toHaveBeenCalledWith(
                 "Form submission failed:",
                 expect.objectContaining({ message: "network failure" })
-            ));
+            )
+        );
     });
 
     it("displays errors and clears them via alert dismiss", () => {
@@ -560,7 +562,8 @@ describe("AddSiteForm behavioral coverage", () => {
             createFormState({
                 formError: "validation failed",
                 setFormError: setFormErrorSpy,
-            }));
+            })
+        );
 
         render(<AddSiteForm />);
         expect(errorAlertProps).toBeDefined();

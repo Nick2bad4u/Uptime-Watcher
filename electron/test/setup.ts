@@ -171,39 +171,36 @@ const createFsMock = async (
     const actual =
         await vi.importActual<typeof import("node:fs")>(moduleSpecifier);
 
-    const readFileSyncMock = vi.fn((
-        ...args: Parameters<typeof actual.readFileSync>
-    ) => actual.readFileSync(...args)) as unknown as typeof actual.readFileSync;
+    const readFileSyncMock = vi.fn(
+        (...args: Parameters<typeof actual.readFileSync>) =>
+            actual.readFileSync(...args)
+    ) as unknown as typeof actual.readFileSync;
 
-    const readFilePromiseMock = vi.fn((
-        ...args: Parameters<typeof actual.promises.readFile>
-    ) =>
-        actual.promises.readFile(
-            ...args
-        )) as unknown as typeof actual.promises.readFile;
+    const readFilePromiseMock = vi.fn(
+        (...args: Parameters<typeof actual.promises.readFile>) =>
+            actual.promises.readFile(...args)
+    ) as unknown as typeof actual.promises.readFile;
 
-    const accessPromiseMock = vi.fn((
-        ...args: Parameters<typeof actual.promises.access>
-    ) =>
-        actual.promises.access(
-            ...args
-        )) as unknown as typeof actual.promises.access;
+    const accessPromiseMock = vi.fn(
+        (...args: Parameters<typeof actual.promises.access>) =>
+            actual.promises.access(...args)
+    ) as unknown as typeof actual.promises.access;
 
-    const writeFilePromiseMock = vi.fn(async (
-        ...args: Parameters<typeof actual.promises.writeFile>
-    ) => {
-        // No-op to avoid mutating the real filesystem during tests
-        void args;
-        return undefined;
-    }) as unknown as typeof actual.promises.writeFile;
+    const writeFilePromiseMock = vi.fn(
+        async (...args: Parameters<typeof actual.promises.writeFile>) => {
+            // No-op to avoid mutating the real filesystem during tests
+            void args;
+            return undefined;
+        }
+    ) as unknown as typeof actual.promises.writeFile;
 
-    const mkdirPromiseMock = vi.fn(async (
-        ...args: Parameters<typeof actual.promises.mkdir>
-    ) => {
-        // No-op to avoid mutating the real filesystem during tests
-        void args;
-        return undefined;
-    }) as unknown as typeof actual.promises.mkdir;
+    const mkdirPromiseMock = vi.fn(
+        async (...args: Parameters<typeof actual.promises.mkdir>) => {
+            // No-op to avoid mutating the real filesystem during tests
+            void args;
+            return undefined;
+        }
+    ) as unknown as typeof actual.promises.mkdir;
 
     return {
         ...actual,
@@ -265,112 +262,111 @@ vi.mock("../services/monitoring/MonitorScheduler", () => {
             monitorId: string
         ) => Promise<void> | void;
 
-        public readonly setCheckCallback = vi.fn((
-            callback: (
-                siteIdentifier: string,
-                monitorId: string
-            ) => Promise<void> | void
-        ) => {
-            this.onCheckCallback = callback;
-        });
-
-        public readonly startMonitor = vi.fn((
-            siteIdentifier: string,
-            monitor: { id?: string | null }
-        ) => {
-            if (!monitor?.id) {
-                return false;
+        public readonly setCheckCallback = vi.fn(
+            (
+                callback: (
+                    siteIdentifier: string,
+                    monitorId: string
+                ) => Promise<void> | void
+            ) => {
+                this.onCheckCallback = callback;
             }
+        );
 
-            const key = this.createIntervalKey(siteIdentifier, monitor.id);
-            this.intervals.set(key, Symbol("interval"));
-            this.triggerImmediateCheck(siteIdentifier, monitor.id);
-            return true;
-        });
-
-        public readonly stopMonitor = vi.fn((
-            siteIdentifier: string,
-            monitorId: string
-        ) => {
-            const key = this.createIntervalKey(siteIdentifier, monitorId);
-            return this.intervals.delete(key);
-        });
-
-        public readonly startSite = vi.fn((site: {
-            identifier?: string;
-            id?: string;
-            monitors?: {
-                id?: string | null;
-                monitoring?: boolean | null;
-            }[];
-        }) => {
-            if (!site?.monitors?.length) {
-                return;
-            }
-
-            const siteIdentifier = site.identifier ?? site.id ?? "";
-            for (const monitor of site.monitors) {
-                if (monitor?.id && monitor.monitoring !== false) {
-                    this.startMonitor(siteIdentifier, monitor);
+        public readonly startMonitor = vi.fn(
+            (siteIdentifier: string, monitor: { id?: string | null }) => {
+                if (!monitor?.id) {
+                    return false;
                 }
-            }
-        });
 
-        public readonly stopSite = vi.fn((
-            siteIdentifier: string,
-            monitors?: { id?: string | null }[]
-        ) => {
-            if (monitors?.length) {
-                for (const monitor of monitors) {
-                    if (monitor?.id) {
-                        this.stopMonitor(siteIdentifier, monitor.id);
+                const key = this.createIntervalKey(siteIdentifier, monitor.id);
+                this.intervals.set(key, Symbol("interval"));
+                this.triggerImmediateCheck(siteIdentifier, monitor.id);
+                return true;
+            }
+        );
+
+        public readonly stopMonitor = vi.fn(
+            (siteIdentifier: string, monitorId: string) => {
+                const key = this.createIntervalKey(siteIdentifier, monitorId);
+                return this.intervals.delete(key);
+            }
+        );
+
+        public readonly startSite = vi.fn(
+            (site: {
+                identifier?: string;
+                id?: string;
+                monitors?: {
+                    id?: string | null;
+                    monitoring?: boolean | null;
+                }[];
+            }) => {
+                if (!site?.monitors?.length) {
+                    return;
+                }
+
+                const siteIdentifier = site.identifier ?? site.id ?? "";
+                for (const monitor of site.monitors) {
+                    if (monitor?.id && monitor.monitoring !== false) {
+                        this.startMonitor(siteIdentifier, monitor);
                     }
                 }
-                return;
             }
+        );
 
-            for (const key of Array.from(this.intervals.keys())) {
-                if (key.startsWith(`${siteIdentifier}|`)) {
-                    this.intervals.delete(key);
+        public readonly stopSite = vi.fn(
+            (siteIdentifier: string, monitors?: { id?: string | null }[]) => {
+                if (monitors?.length) {
+                    for (const monitor of monitors) {
+                        if (monitor?.id) {
+                            this.stopMonitor(siteIdentifier, monitor.id);
+                        }
+                    }
+                    return;
+                }
+
+                for (const key of Array.from(this.intervals.keys())) {
+                    if (key.startsWith(`${siteIdentifier}|`)) {
+                        this.intervals.delete(key);
+                    }
                 }
             }
-        });
+        );
 
         public readonly stopAll = vi.fn(() => {
             this.intervals.clear();
         });
 
-        public readonly restartMonitor = vi.fn((
-            siteIdentifier: string,
-            monitor: { id?: string | null }
-        ) => {
-            if (!monitor?.id) {
-                return false;
+        public readonly restartMonitor = vi.fn(
+            (siteIdentifier: string, monitor: { id?: string | null }) => {
+                if (!monitor?.id) {
+                    return false;
+                }
+
+                this.stopMonitor(siteIdentifier, monitor.id);
+                return this.startMonitor(siteIdentifier, monitor);
             }
+        );
 
-            this.stopMonitor(siteIdentifier, monitor.id);
-            return this.startMonitor(siteIdentifier, monitor);
-        });
-
-        public readonly isMonitoring = vi.fn((
-            siteIdentifier: string,
-            monitorId: string
-        ) => {
-            const key = this.createIntervalKey(siteIdentifier, monitorId);
-            return this.intervals.has(key);
-        });
+        public readonly isMonitoring = vi.fn(
+            (siteIdentifier: string, monitorId: string) => {
+                const key = this.createIntervalKey(siteIdentifier, monitorId);
+                return this.intervals.has(key);
+            }
+        );
 
         public readonly getActiveCount = vi.fn(() => this.intervals.size);
 
         public readonly getActiveMonitors = vi.fn(() =>
-            Array.from(this.intervals.keys()));
+            Array.from(this.intervals.keys())
+        );
 
-        public readonly performImmediateCheck = vi.fn(async (
-            siteIdentifier: string,
-            monitorId: string
-        ) => {
-            this.triggerImmediateCheck(siteIdentifier, monitorId);
-        });
+        public readonly performImmediateCheck = vi.fn(
+            async (siteIdentifier: string, monitorId: string) => {
+                this.triggerImmediateCheck(siteIdentifier, monitorId);
+            }
+        );
 
         private createIntervalKey(
             siteIdentifier: string,
@@ -408,7 +404,8 @@ vi.mock("../services/monitoring/MonitoringService", () => ({
                 status: "up" as const,
                 responseTime: 100,
                 timestamp: new Date(),
-            })),
+            })
+        ),
     })),
 }));
 

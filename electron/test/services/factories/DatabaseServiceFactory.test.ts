@@ -144,9 +144,11 @@ describe(DatabaseServiceFactory, () => {
             // checking that services can be created successfully
             expect(() => factory.createBackupService()).not.toThrowError();
             expect(() =>
-                factory.createImportExportService()).not.toThrowError();
+                factory.createImportExportService()
+            ).not.toThrowError();
             expect(() =>
-                factory.createSiteRepositoryService()).not.toThrowError();
+                factory.createSiteRepositoryService()
+            ).not.toThrowError();
         });
     });
 

@@ -58,7 +58,8 @@ class MockSiteMonitor {
 
         // Simulate HTTP request
         await new Promise((resolve) =>
-            setTimeout(resolve, Math.random() * 100));
+            setTimeout(resolve, Math.random() * 100)
+        );
 
         const endTime = Date.now();
         const responseTime = endTime - startTime;
@@ -96,7 +97,8 @@ class MockSiteMonitor {
 
     async performBulkHealthChecks(siteIdentifiers: string[]) {
         const promises = siteIdentifiers.map((siteIdentifier) =>
-            this.performHealthCheck(siteIdentifier));
+            this.performHealthCheck(siteIdentifier)
+        );
         return Promise.all(promises);
     }
 

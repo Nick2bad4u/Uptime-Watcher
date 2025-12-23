@@ -9,26 +9,15 @@
         "isolatedDeclarations": false,
         "outDir": "../../.cache/builds/test/electron",
         "paths": {
-            "@app/*": [
-                "src/*"
-            ],
-            "@assets/*": [
-                "assets/*"
-            ],
-            "@electron/*": [
-                "electron/*"
-            ],
-            "@shared/*": [
-                "shared/*"
-            ]
+            "@app/*": ["src/*"],
+            "@assets/*": ["assets/*"],
+            "@electron/*": ["electron/*"],
+            "@shared/*": ["shared/*"]
         },
         "rootDir": "../..",
         "tsBuildInfoFile": "../../.cache/tsconfig.electron.test.tsbuildinfo"
     },
-    "exclude": [
-        "node_modules",
-        "../../.cache/builds/test/electron"
-    ],
+    "exclude": ["node_modules", "../../.cache/builds/test/electron"],
     "extends": "../../tsconfig.json",
     "include": [
         "../../electron/**/*.spec.ts",

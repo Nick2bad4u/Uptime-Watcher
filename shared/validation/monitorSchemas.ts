@@ -155,8 +155,8 @@ export const baseMonitorSchema: BaseMonitorSchemaType = z
  * Reusable URL validation helper restricted to a specific set of protocols.
  *
  * @remarks
- * The primary syntax validation uses {@link isValidUrl} (validator.js backed)
- * so we avoid hand-rolled URL parsing heuristics.
+ * The primary syntax validation uses {@link isValidUrl} (validator.js backed) so
+ * we avoid hand-rolled URL parsing heuristics.
  *
  * We still parse the URL using WHATWG {@link URL} to extract the hostname and
  * apply {@link isValidHost} so host semantics (FQDN with TLD, IP literals, or
@@ -182,7 +182,7 @@ function isUrlWithAllowedProtocols(
             protocols: Array.from(protocols),
             // Hostname semantics are enforced by `isValidHost` below (which
             // requires a TLD for FQDNs but still allows `localhost`).
-            "require_tld": false,
+            require_tld: false,
         })
     ) {
         return false;
@@ -221,7 +221,10 @@ const createProtocolUrlSchema = (
 ): z.ZodString =>
     z
         .string()
-        .refine((value): boolean => isUrlWithAllowedProtocols(value, protocols), message);
+        .refine(
+            (value): boolean => isUrlWithAllowedProtocols(value, protocols),
+            message
+        );
 
 const httpUrlSchema = createProtocolUrlSchema(
     ["http", "https"],
@@ -233,7 +236,6 @@ const httpUrlSchema = createProtocolUrlSchema(
  *
  * @remarks
  * Restricts URLs to `ws://` or `wss://` protocols.
- *
  * @remarks
  * Uses WHATWG {@link URL} parsing plus {@link isValidHost} (same strategy as
  * {@link httpUrlSchema}) so host validation is consistent across monitor types.
@@ -417,7 +419,8 @@ const edgeLocationListSchema = z
         }
 
         return entries.every((entry) =>
-            isUrlWithAllowedProtocols(entry, ["http", "https"]));
+            isUrlWithAllowedProtocols(entry, ["http", "https"])
+        );
     }, "Edge endpoints must be valid HTTP or HTTPS URLs separated by commas or new lines");
 
 /**
@@ -1133,7 +1136,9 @@ export function validateMonitorField(
         };
     } catch (error) {
         if (error instanceof z.ZodError) {
-            const errors = formatZodIssues(error.issues, { includePath: false });
+            const errors = formatZodIssues(error.issues, {
+                includePath: false,
+            });
 
             return {
                 errors,

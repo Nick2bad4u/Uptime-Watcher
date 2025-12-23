@@ -47,9 +47,8 @@ describe("Function Coverage Boost Tests", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Validation", "type");
 
-            const { validateSiteData } = await import(
-                "../../shared/validation/siteSchemas"
-            );
+            const { validateSiteData } =
+                await import("../../shared/validation/siteSchemas");
 
             // Valid site object
             const validSite = {
@@ -82,10 +81,12 @@ describe("Function Coverage Boost Tests", () => {
             expect(validateSiteData(123 as any).success).toBeFalsy();
 
             // Missing required fields
-            expect(validateSiteData({ identifier: "test" } as any).success).toBeFalsy(
-
-            );
-            expect(validateSiteData({ name: "Test" } as any).success).toBeFalsy();
+            expect(
+                validateSiteData({ identifier: "test" } as any).success
+            ).toBeFalsy();
+            expect(
+                validateSiteData({ name: "Test" } as any).success
+            ).toBeFalsy();
             expect(
                 validateSiteData({ monitoring: true } as any).success
             ).toBeFalsy();
@@ -137,9 +138,8 @@ describe("Function Coverage Boost Tests", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Error Handling", "type");
 
-            const { getMonitorValidationErrors } = await import(
-                "../../shared/validation/monitorSchemas"
-            );
+            const { getMonitorValidationErrors } =
+                await import("../../shared/validation/monitorSchemas");
 
             // Test various invalid monitor objects
             expect(getMonitorValidationErrors({})).toContain(
@@ -231,9 +231,11 @@ describe("Function Coverage Boost Tests", () => {
                 port: 99_999, // Too high
             } as any;
             const portErrors = getMonitorValidationErrors(portMonitorInvalid);
-            expect(portErrors.some((error) => error.toLowerCase().startsWith("host:"))).toBeTruthy(
-
-            );
+            expect(
+                portErrors.some((error) =>
+                    error.toLowerCase().startsWith("host:")
+                )
+            ).toBeTruthy();
             expect(
                 portErrors.some(
                     (error) =>
@@ -256,7 +258,9 @@ describe("Function Coverage Boost Tests", () => {
             } as any;
             const dnsErrors = getMonitorValidationErrors(dnsMonitorInvalid);
             expect(
-                dnsErrors.some((error) => error.toLowerCase().startsWith("host:"))
+                dnsErrors.some((error) =>
+                    error.toLowerCase().startsWith("host:")
+                )
             ).toBeTruthy();
             expect(
                 dnsErrors.some((error) =>
@@ -507,17 +511,19 @@ describe("Function Coverage Boost Tests", () => {
             }));
 
             vi.doMock("@shared/utils/errorHandling", () => ({
-                withUtilityErrorHandling: vi.fn(async <T>(
-                    operation: () => Promise<T>,
-                    _context: string,
-                    fallback: T
-                ) => {
-                    try {
-                        return await operation();
-                    } catch {
-                        return fallback;
+                withUtilityErrorHandling: vi.fn(
+                    async <T>(
+                        operation: () => Promise<T>,
+                        _context: string,
+                        fallback: T
+                    ) => {
+                        try {
+                            return await operation();
+                        } catch {
+                            return fallback;
+                        }
                     }
-                }),
+                ),
             }));
 
             vi.doMock("../stores/monitor/useMonitorTypesStore", () => {

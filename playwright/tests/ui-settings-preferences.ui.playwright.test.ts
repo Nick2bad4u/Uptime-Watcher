@@ -66,10 +66,8 @@ async function selectAlternateOption(
 ): Promise<void> {
     const initialValue = await locator.inputValue();
     const availableValues = await locator.evaluate((element) =>
-        Array.from(
-            element.querySelectorAll("option"),
-            (option) => option.value
-        ));
+        Array.from(element.querySelectorAll("option"), (option) => option.value)
+    );
 
     expect(availableValues.length).toBeGreaterThan(1);
 
@@ -108,9 +106,9 @@ async function waitForThemeApplication(
     await page.waitForFunction(
         (targetTheme) => {
             const root = document.documentElement;
-            const themeClasses = Array.from(document.body.classList).filter((
-                className
-            ) => className.startsWith("theme-"));
+            const themeClasses = Array.from(document.body.classList).filter(
+                (className) => className.startsWith("theme-")
+            );
 
             if (themeClasses.length === 0) {
                 return false;
@@ -244,7 +242,8 @@ test.describe(
                     Array.from(
                         element.querySelectorAll("option"),
                         (option) => option.value
-                    ));
+                    )
+                );
                 expect(themeOptions.length).toBeGreaterThan(1);
 
                 const alternateTheme = resolveAlternateTheme(

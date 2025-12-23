@@ -244,9 +244,8 @@ const preview: Preview = {
         },
         controls: {
             matchers: {
-                 
                 color: /(?<property>background|color)$/iu,
-                 
+
                 date: /(?<date>date)$/iu,
             },
         },

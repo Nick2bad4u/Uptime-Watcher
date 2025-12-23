@@ -87,7 +87,8 @@ describe("monitorValidation functions - Additional Coverage", () => {
             expect(result.success).toBeFalsy();
             expect(
                 result.errors.some((error) =>
-                    error.includes("Host is required"))
+                    error.includes("Host is required")
+                )
             ).toBeTruthy();
         });
 
@@ -113,7 +114,8 @@ describe("monitorValidation functions - Additional Coverage", () => {
             expect(result.success).toBeFalsy();
             expect(
                 result.errors.some((error) =>
-                    error.includes("Host is required"))
+                    error.includes("Host is required")
+                )
             ).toBeTruthy();
         });
 
@@ -138,7 +140,8 @@ describe("monitorValidation functions - Additional Coverage", () => {
             expect(result.success).toBeFalsy();
             expect(
                 result.errors.some((error) =>
-                    error.includes("Record type is required"))
+                    error.includes("Record type is required")
+                )
             ).toBeTruthy();
         });
 
@@ -164,7 +167,8 @@ describe("monitorValidation functions - Additional Coverage", () => {
             expect(result.success).toBeFalsy();
             expect(
                 result.errors.some((error) =>
-                    error.includes("Record type is required"))
+                    error.includes("Record type is required")
+                )
             ).toBeTruthy();
         });
 
@@ -263,7 +267,8 @@ describe("monitorValidation functions - Additional Coverage", () => {
             expect(result.success).toBeFalsy();
             expect(
                 result.errors.some((error) =>
-                    error.includes("Host is required"))
+                    error.includes("Host is required")
+                )
             ).toBeTruthy();
         });
 
@@ -289,7 +294,8 @@ describe("monitorValidation functions - Additional Coverage", () => {
             expect(result.success).toBeFalsy();
             expect(
                 result.errors.some((error) =>
-                    error.includes("Host is required"))
+                    error.includes("Host is required")
+                )
             ).toBeTruthy();
         });
 
@@ -314,7 +320,8 @@ describe("monitorValidation functions - Additional Coverage", () => {
             expect(result.success).toBeFalsy();
             expect(
                 result.errors.some((error) =>
-                    error.includes("Port is required"))
+                    error.includes("Port is required")
+                )
             ).toBeTruthy();
         });
 
@@ -340,7 +347,8 @@ describe("monitorValidation functions - Additional Coverage", () => {
             expect(result.success).toBeFalsy();
             expect(
                 result.errors.some((error) =>
-                    error.includes("Port is required"))
+                    error.includes("Port is required")
+                )
             ).toBeTruthy();
         });
     });
@@ -391,7 +399,8 @@ describe("monitorValidation functions - Additional Coverage", () => {
             expect(result.success).toBeFalsy();
             expect(
                 result.errors.some((error) =>
-                    error.includes("Host is required"))
+                    error.includes("Host is required")
+                )
             ).toBeTruthy();
         });
 
@@ -416,7 +425,8 @@ describe("monitorValidation functions - Additional Coverage", () => {
             expect(result.success).toBeFalsy();
             expect(
                 result.errors.some((error) =>
-                    error.includes("Host is required"))
+                    error.includes("Host is required")
+                )
             ).toBeTruthy();
         });
     });

@@ -74,37 +74,39 @@ describeFn("AbortUtils Comprehensive Fuzzing Tests", () => {
         testProp([
             fc.array(fc.boolean(), { maxLength: 3 }),
             fc.oneof(fc.integer({ min: 1, max: 100 }), fc.constant(undefined)),
-        ])("should combine multiple signal states correctly", (
-            signalStates,
-            timeout
-        ) => {
-            const controllers = signalStates.map(() => new AbortController());
+        ])(
+            "should combine multiple signal states correctly",
+            (signalStates, timeout) => {
+                const controllers = signalStates.map(
+                    () => new AbortController()
+                );
 
-            for (const [index, shouldAbort] of signalStates.entries()) {
-                if (shouldAbort && controllers[index]) {
-                    controllers[index].abort("Test abort");
+                for (const [index, shouldAbort] of signalStates.entries()) {
+                    if (shouldAbort && controllers[index]) {
+                        controllers[index].abort("Test abort");
+                    }
+                }
+
+                const additionalSignals = controllers.map((c) => c.signal);
+                const combined = createCombinedAbortSignal({
+                    additionalSignals,
+                    ...(timeout !== undefined && { timeoutMs: timeout }),
+                });
+
+                expect(combined).toBeInstanceOf(AbortSignal);
+
+                const hasAbortedSignal = signalStates.some(Boolean);
+                if (hasAbortedSignal) {
+                    expect(combined.aborted).toBeTruthy();
+                }
+
+                for (const controller of controllers) {
+                    if (!controller.signal.aborted) {
+                        controller.abort("Cleanup");
+                    }
                 }
             }
-
-            const additionalSignals = controllers.map((c) => c.signal);
-            const combined = createCombinedAbortSignal({
-                additionalSignals,
-                ...(timeout !== undefined && { timeoutMs: timeout }),
-            });
-
-            expect(combined).toBeInstanceOf(AbortSignal);
-
-            const hasAbortedSignal = signalStates.some(Boolean);
-            if (hasAbortedSignal) {
-                expect(combined.aborted).toBeTruthy();
-            }
-
-            for (const controller of controllers) {
-                if (!controller.signal.aborted) {
-                    controller.abort("Cleanup");
-                }
-            }
-        });
+        );
     });
 
     describeFn("sleep", () => {

@@ -5,15 +5,15 @@ import type { MonitorType } from "../../../shared/types";
 function buildPlaywrightEnv(
     overrides: Record<string, string> = {}
 ): Record<string, string> {
-    const baseEnv = Object.entries(process.env).reduce<Record<string, string>>((
-        accumulator,
-        [key, value]
-    ) => {
-        if (typeof value === "string") {
-            accumulator[key] = value;
-        }
-        return accumulator;
-    }, {});
+    const baseEnv = Object.entries(process.env).reduce<Record<string, string>>(
+        (accumulator, [key, value]) => {
+            if (typeof value === "string") {
+                accumulator[key] = value;
+            }
+            return accumulator;
+        },
+        {}
+    );
 
     return { ...baseEnv, ...overrides };
 }

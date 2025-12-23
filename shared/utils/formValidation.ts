@@ -10,7 +10,11 @@
  * @packageDocumentation
  */
 
-import { isValidInteger, isValidPort as isValidPortValue, isValidUrl } from "../validation/validatorUtils";
+import {
+    isValidInteger,
+    isValidPort as isValidPortValue,
+    isValidUrl,
+} from "../validation/validatorUtils";
 
 /**
  * Validates that a string field is not empty after trimming.

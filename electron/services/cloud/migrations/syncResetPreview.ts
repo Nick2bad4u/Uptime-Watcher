@@ -11,7 +11,6 @@ interface PreviewDevice {
 }
 
 const opsKeyPattern =
-     
     /^sync\/devices\/(?<deviceId>[^/]+)\/ops\/(?<createdAtEpochMs>\d+)-\d+-\d+\.ndjson$/u;
 
 /**

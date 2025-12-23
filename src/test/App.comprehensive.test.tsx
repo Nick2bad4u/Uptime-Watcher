@@ -214,7 +214,8 @@ describe("App Component - Comprehensive Coverage", () => {
         const baseTheme = isDark ? darkTheme : lightTheme;
         const currentTheme = cloneTheme(baseTheme);
         const mockGetColor = vi.fn((path: string) =>
-            getThemeColorByPath(currentTheme, path));
+            getThemeColorByPath(currentTheme, path)
+        );
         const mockGetStatusColor = vi.fn(
             (status: keyof typeof currentTheme.colors.status) =>
                 currentTheme.colors.status[status] ??
@@ -302,15 +303,18 @@ describe("App Component - Comprehensive Coverage", () => {
                 ? (selector as (state: typeof defaultSettingsStore) => unknown)(
                       defaultSettingsStore
                   )
-                : defaultSettingsStore);
+                : defaultSettingsStore
+        );
         mockUseSitesStore.mockImplementation((selector: any) =>
             typeof selector === "function"
                 ? selector(defaultSitesStore)
-                : defaultSitesStore);
+                : defaultSitesStore
+        );
         mockUseUIStore.mockImplementation((selector: any) =>
             typeof selector === "function"
                 ? selector(defaultUIStore)
-                : defaultUIStore);
+                : defaultUIStore
+        );
         mockUseUpdatesStore.mockImplementation(() => defaultUpdatesStore);
         mockUseTheme.mockReturnValue(createMockTheme());
 

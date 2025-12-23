@@ -84,9 +84,8 @@ describe("Final Function Coverage Push", () => {
         annotate("Type: Validation", "type");
 
         const validation = await import("../../shared/utils/validation");
-        const monitorSchemas = await import(
-            "../../shared/validation/monitorSchemas"
-        );
+        const monitorSchemas =
+            await import("../../shared/validation/monitorSchemas");
         const siteSchemas = await import("../../shared/validation/siteSchemas");
 
         // Test validateMonitorType
@@ -114,7 +113,8 @@ describe("Final Function Coverage Push", () => {
             timeout: -1,
             retryAttempts: -1,
         };
-        const errors2 = monitorSchemas.getMonitorValidationErrors(invalidMonitor);
+        const errors2 =
+            monitorSchemas.getMonitorValidationErrors(invalidMonitor);
         expect(Array.isArray(errors2)).toBeTruthy();
 
         // Test validateSite

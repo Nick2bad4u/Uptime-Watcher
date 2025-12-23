@@ -80,7 +80,7 @@ describe("Targeted Coverage for Missing Branches", () => {
             // Test that imports handle errors gracefully
             try {
                 const correlationModule =
-                    await import("../utils/correlation.js");
+                    await import("@shared/utils/correlation");
                 expect(correlationModule.generateCorrelationId).toBeDefined();
 
                 // Test with various edge cases

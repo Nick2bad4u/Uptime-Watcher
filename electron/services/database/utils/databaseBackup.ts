@@ -114,9 +114,8 @@ function normalizeBackupArgs(
 export async function createDatabaseBackup(
     params: CreateDatabaseBackupParams
 ): Promise<DatabaseBackupResult> {
-    const { dbPath, fileName = BACKUP_DB_FILE_NAME } = normalizeBackupArgs(
-        params
-    );
+    const { dbPath, fileName = BACKUP_DB_FILE_NAME } =
+        normalizeBackupArgs(params);
     try {
         // DbPath originates from app-controlled directories (userData, temporary
         // folders). Inline lint suppression documents the trusted origin.

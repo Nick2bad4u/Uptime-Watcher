@@ -3,8 +3,8 @@
  *
  * @remarks
  * These constants exist so multiple layers (Zod schemas, IPC parameter
- * validators) can share identical constraints and
- * messages without importing the full schema graph.
+ * validators) can share identical constraints and messages without importing
+ * the full schema graph.
  */
 
 export const SITE_IDENTIFIER_MAX_LENGTH = 100;

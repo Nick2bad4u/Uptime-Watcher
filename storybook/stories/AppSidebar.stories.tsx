@@ -45,16 +45,19 @@ const sampleSites = [
 const withSidebarLayout: Decorator = (StoryComponent, context) => {
     const args = context.args as Partial<AppSidebarStoryArgs> | undefined;
     const requestedOpen = args?.isSidebarOpen ?? true;
-    const [sidebarOpen, dispatchSidebarOpen] = useReducer((
-        current: boolean,
-        action: { open: boolean; type: "set" } | { type: "toggle" }
-    ): boolean => {
-        if (action.type === "toggle") {
-            return !current;
-        }
+    const [sidebarOpen, dispatchSidebarOpen] = useReducer(
+        (
+            current: boolean,
+            action: { open: boolean; type: "set" } | { type: "toggle" }
+        ): boolean => {
+            if (action.type === "toggle") {
+                return !current;
+            }
 
-        return action.open;
-    }, requestedOpen);
+            return action.open;
+        },
+        requestedOpen
+    );
 
     useEffect(
         function syncSidebarOpen(): void {

@@ -49,7 +49,8 @@ const mockEventBus = vi.hoisted(() =>
         (emitter as any).busId = name || "test-bus";
         (emitter as any).destroy = vi.fn();
         return emitter;
-    }));
+    })
+);
 
 // Mock all dependencies with vi.hoisted for proper hoisting
 vi.mock("../../managers/SiteManager", () => ({

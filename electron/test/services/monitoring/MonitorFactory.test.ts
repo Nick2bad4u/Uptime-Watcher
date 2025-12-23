@@ -63,7 +63,8 @@ describe("MonitorFactory - Fixed", () => {
             await annotate("Type: Monitoring", "type");
 
             expect(() =>
-                getMonitor("invalid" as any, mockMonitorConfig)).toThrowError();
+                getMonitor("invalid" as any, mockMonitorConfig)
+            ).toThrowError();
         });
 
         it("should get monitor with configuration", async ({

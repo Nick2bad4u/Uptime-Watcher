@@ -84,7 +84,8 @@ const createStatusUpdateSchema = (): StatusUpdateSchema =>
             if (!isMonitorPresentInSite) {
                 context.addIssue({
                     code: "custom",
-                    message: "monitorId must reference a monitor in site.monitors",
+                    message:
+                        "monitorId must reference a monitor in site.monitors",
                     path: ["monitorId"],
                 });
             }

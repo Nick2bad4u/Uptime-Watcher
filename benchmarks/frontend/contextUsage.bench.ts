@@ -775,7 +775,8 @@ describe("React Context Performance", () => {
                         deep: {
                             value: Math.random(),
                             array: Array.from({ length: 5 }, () =>
-                                Math.random()),
+                                Math.random()
+                            ),
                         },
                     },
                 })),
@@ -1142,12 +1143,14 @@ describe("React Context Performance", () => {
                             usersByTeam: teams.map((team: any) => ({
                                 ...team,
                                 users: users.filter((user: any) =>
-                                    team.members.includes(user.id)),
+                                    team.members.includes(user.id)
+                                ),
                             })),
                             projectWorkload: users.map((user: any) => ({
                                 userId: user.id,
                                 projectCount: projects.filter((project: any) =>
-                                    project.assignees.includes(user.id)).length,
+                                    project.assignees.includes(user.id)
+                                ).length,
                             })),
                         };
                     };
@@ -1163,12 +1166,14 @@ describe("React Context Performance", () => {
                         // Compute team efficiency
                         const teamEfficiency = teams.map((team: any) => {
                             const teamUsers = users.filter((user: any) =>
-                                team.members.includes(user.id));
-                            const teamProjects = projects.filter((
-                                project: any
-                            ) =>
-                                project.assignees.some((assignee: number) =>
-                                    team.members.includes(assignee)));
+                                team.members.includes(user.id)
+                            );
+                            const teamProjects = projects.filter(
+                                (project: any) =>
+                                    project.assignees.some((assignee: number) =>
+                                        team.members.includes(assignee)
+                                    )
+                            );
 
                             return {
                                 teamId: team.id,

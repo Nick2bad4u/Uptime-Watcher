@@ -78,12 +78,12 @@ export function registerSiteHandlers({
                     undefined,
                     {
                         duplicateCount: snapshot.duplicates.length,
-                        duplicates: snapshot.duplicates.map((
-                            entry: DuplicateSiteIdentifier
-                        ) => ({
-                            identifier: entry.identifier,
-                            occurrences: entry.occurrences,
-                        })),
+                        duplicates: snapshot.duplicates.map(
+                            (entry: DuplicateSiteIdentifier) => ({
+                                identifier: entry.identifier,
+                                occurrences: entry.occurrences,
+                            })
+                        ),
                         originalSites: sites.length,
                         sanitizedSites: snapshot.sanitizedSites.length,
                     }

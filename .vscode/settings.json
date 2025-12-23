@@ -90,9 +90,7 @@
         "vue-ts",
         "tailwindcss"
     ],
-    "eslint.workingDirectories": [
-        "."
-    ],
+    "eslint.workingDirectories": ["."],
     "files.exclude": {
         "**/.cache/**": true,
         "**/.husky/**": true,
@@ -180,14 +178,10 @@
     "stylelint.enable": true,
     "stylelint.reportInvalidScopeDisables": true,
     "stylelint.reportNeedlessDisables": true,
-    "stylelint.snippet": [
-        "css",
-        "postcss",
-        "scss"
-    ],
-    "stylelint.validate": [
-        "css",
-        "postcss",
-        "scss"
-    ]
+    "stylelint.snippet": ["css",
+"postcss",
+"scss"],
+    "stylelint.validate": ["css",
+"postcss",
+"scss"]
 }

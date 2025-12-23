@@ -14,6 +14,7 @@ import type { UnknownRecord } from "type-fest";
 
 import { isIpcCorrelationEnvelope } from "@shared/types/ipc";
 import { MONITOR_TYPES_CHANNELS } from "@shared/types/preload";
+import { generateCorrelationId } from "@shared/utils/correlation";
 import {
     normalizeLogValue,
     withLogContext,
@@ -32,7 +33,6 @@ import type {
 } from "./types";
 
 import { isDev } from "../../electronUtils";
-import { generateCorrelationId } from "../../utils/correlation";
 import { logger } from "../../utils/logger";
 import { getUtfByteLength, truncateUtfString } from "./diagnosticsLimits";
 
@@ -59,6 +59,22 @@ function validateIpcUrlStringGuards(
         ? `${paramName} must not contain newlines`
         : null;
 }
+
+const validateIpcUrlPayloadGuards = (
+    value: unknown,
+    paramName: string
+): null | string => {
+    if (typeof value !== "string") {
+        return null;
+    }
+
+    const byteLength = getUtfByteLength(value);
+    if (byteLength > MAX_IPC_URL_UTF_BYTES) {
+        return `${paramName} must not exceed ${MAX_IPC_URL_UTF_BYTES} bytes`;
+    }
+
+    return validateIpcUrlStringGuards(value, paramName);
+};
 
 /** Maximum bytes allowed for IPC error messages returned to the renderer. */
 const MAX_IPC_ERROR_MESSAGE_UTF_BYTES = 4096;
@@ -292,24 +308,17 @@ export const IpcValidators = {
      * `shell.openExternal`.
      *
      * @remarks
-     * This differs from {@link requiredUrl} by allowing `mailto:` in addition
-     * to `http:` and `https:`. It also enforces the same defense-in-depth size
-     * and newline constraints used by {@link requiredUrl}.
+     * This differs from {@link requiredUrl} by allowing `mailto:` in addition to
+     * `http:` and `https:`. It also enforces the same defense-in-depth size and
+     * newline constraints used by {@link requiredUrl}.
      */
     requiredExternalOpenUrl: (
         value: unknown,
         paramName: string
     ): null | string => {
-        if (typeof value === "string") {
-            const byteLength = getUtfByteLength(value);
-            if (byteLength > MAX_IPC_URL_UTF_BYTES) {
-                return `${paramName} must not exceed ${MAX_IPC_URL_UTF_BYTES} bytes`;
-            }
-
-            const guardError = validateIpcUrlStringGuards(value, paramName);
-            if (guardError) {
-                return guardError;
-            }
+        const guardError = validateIpcUrlPayloadGuards(value, paramName);
+        if (guardError) {
+            return guardError;
         }
 
         const validation = validateExternalOpenUrlCandidate(value);
@@ -377,16 +386,9 @@ export const IpcValidators = {
      * @returns Error message or null if valid
      */
     requiredUrl: (value: unknown, paramName: string): null | string => {
-        if (typeof value === "string") {
-            const byteLength = getUtfByteLength(value);
-            if (byteLength > MAX_IPC_URL_UTF_BYTES) {
-                return `${paramName} must not exceed ${MAX_IPC_URL_UTF_BYTES} bytes`;
-            }
-
-            const guardError = validateIpcUrlStringGuards(value, paramName);
-            if (guardError) {
-                return guardError;
-            }
+        const guardError = validateIpcUrlPayloadGuards(value, paramName);
+        if (guardError) {
+            return guardError;
         }
 
         if (
@@ -545,7 +547,8 @@ export function createValidationResponse(
  * import { SITES_CHANNELS } from "@shared/types/preload";
  *
  * const result = await withIpcHandler(SITES_CHANNELS.getSites, async () =>
- *     this.uptimeOrchestrator.getSites());
+ *     this.uptimeOrchestrator.getSites()
+ * );
  * ```
  *
  * @param channelName - Name of the IPC channel

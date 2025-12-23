@@ -817,11 +817,12 @@ import { ReusableButton } from "../common/ReusableButton/ReusableButton";
 import type { EventHandlers } from "shared/types/componentProps";
 
 // In parent component
-const handleStartMonitoring = useCallback<EventHandlers.ClickHandler>((
- event
-) => {
- // Handle start monitoring logic
-}, []);
+const handleStartMonitoring = useCallback<EventHandlers.ClickHandler>(
+ (event) => {
+  // Handle start monitoring logic
+ },
+ []
+);
 
 <ReusableButton
  identifier="start-monitoring-btn"
@@ -1123,11 +1124,11 @@ export const useMonitorEventIntegration = () => {
    const initializeEventListeners = async () => {
     try {
      // Monitor status change events
-     const statusCleanup = await EventsService.onMonitorStatusChanged((
-      data
-     ) => {
-      sitesStore.updateMonitorStatus(data.siteIdentifier, data.monitor);
-     });
+     const statusCleanup = await EventsService.onMonitorStatusChanged(
+      (data) => {
+       sitesStore.updateMonitorStatus(data.siteIdentifier, data.monitor);
+      }
+     );
      cleanupFunctions.push(statusCleanup);
 
      // Monitor up/down events

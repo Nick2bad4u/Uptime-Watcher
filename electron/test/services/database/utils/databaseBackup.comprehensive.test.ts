@@ -408,12 +408,10 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
                 const longFileName = `very-long-filename-${"x".repeat(1000)}.sqlite`;
                 mockReadFile.mockResolvedValue(testBuffer);
 
-                const result = await createDatabaseBackup(
-                    {
-                        dbPath: testDbPath,
-                        fileName: longFileName,
-                    }
-                );
+                const result = await createDatabaseBackup({
+                    dbPath: testDbPath,
+                    fileName: longFileName,
+                });
 
                 expect(result.fileName).toBe(longFileName);
             });

@@ -550,51 +550,48 @@ export const SiteDetailsHeader: NamedExoticComponent<SiteDetailsHeaderProperties
                     </div>
                     {!isHeaderCollapsed && headerMeta.length > 0 ? (
                         <ul className="site-details-header-meta">
-                            {headerMeta.map(({
-                                key,
-                                label,
-                                tooltip,
-                                value,
-                            }) => {
-                                const valueContent = (
-                                    <span className="site-details-header-meta-value">
-                                        {value}
-                                    </span>
-                                );
+                            {headerMeta.map(
+                                ({ key, label, tooltip, value }) => {
+                                    const valueContent = (
+                                        <span className="site-details-header-meta-value">
+                                            {value}
+                                        </span>
+                                    );
 
-                                return (
-                                    <li
-                                        className="site-details-header-meta-item"
-                                        key={key}
-                                    >
-                                        <ThemedText
-                                            className="site-details-header-meta-label"
-                                            size="xs"
-                                            variant="secondary"
-                                            weight="medium"
+                                    return (
+                                        <li
+                                            className="site-details-header-meta-item"
+                                            key={key}
                                         >
-                                            {label}
-                                        </ThemedText>
-                                        {tooltip ? (
-                                            <Tooltip
-                                                content={tooltip}
-                                                position="bottom"
+                                            <ThemedText
+                                                className="site-details-header-meta-label"
+                                                size="xs"
+                                                variant="secondary"
+                                                weight="medium"
                                             >
-                                                {(triggerProps) => (
-                                                    <span
-                                                        {...triggerProps}
-                                                        className="site-details-header-meta-value-wrapper"
-                                                    >
-                                                        {valueContent}
-                                                    </span>
-                                                )}
-                                            </Tooltip>
-                                        ) : (
-                                            valueContent
-                                        )}
-                                    </li>
-                                );
-                            })}
+                                                {label}
+                                            </ThemedText>
+                                            {tooltip ? (
+                                                <Tooltip
+                                                    content={tooltip}
+                                                    position="bottom"
+                                                >
+                                                    {(triggerProps) => (
+                                                        <span
+                                                            {...triggerProps}
+                                                            className="site-details-header-meta-value-wrapper"
+                                                        >
+                                                            {valueContent}
+                                                        </span>
+                                                    )}
+                                                </Tooltip>
+                                            ) : (
+                                                valueContent
+                                            )}
+                                        </li>
+                                    );
+                                }
+                            )}
                         </ul>
                     ) : null}
                 </div>

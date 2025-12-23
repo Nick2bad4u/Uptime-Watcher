@@ -205,7 +205,8 @@ export async function createAbortableOperation<T>(
     }
 }
 
-const createSleepAbortHandler = (
+const createSleepAbortHandler =
+    (
         timeoutId: ReturnType<typeof setTimeout>,
         reject: (error: Error) => void
     ): (() => void) =>

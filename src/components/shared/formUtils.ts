@@ -113,9 +113,10 @@ export function createTypedInputHandler<T>(
  * @example
  *
  * ```tsx
- * const handleTimeoutChange = createSelectChangeHandler(setTimeout, (
- *     value
- * ) => parseInt(value, 10));
+ * const handleTimeoutChange = createSelectChangeHandler(
+ *     setTimeout,
+ *     (value) => parseInt(value, 10)
+ * );
  * ```
  *
  * @param setValue - State setter function
@@ -175,21 +176,24 @@ export const validationPatterns = {
     /**
      * Validates that a number is within a specified range
      */
-    numberInRange: (min: number, max: number): ((value: number) => boolean) =>
+    numberInRange:
+        (min: number, max: number): ((value: number) => boolean) =>
         (value: number): boolean =>
             value >= min && value <= max,
 
     /**
      * Validates that a value is one of the allowed numbers
      */
-    oneOfNumbers: (allowedValues: number[]): ((value: number) => boolean) =>
+    oneOfNumbers:
+        (allowedValues: number[]): ((value: number) => boolean) =>
         (value: number): boolean =>
             allowedValues.includes(value),
 
     /**
      * Validates that a value is one of the allowed options
      */
-    oneOfStrings: (allowedValues: string[]): ((value: string) => boolean) =>
+    oneOfStrings:
+        (allowedValues: string[]): ((value: string) => boolean) =>
         (value: string): boolean =>
             allowedValues.includes(value),
 } as const;

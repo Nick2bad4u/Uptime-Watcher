@@ -28,9 +28,7 @@ import { SiteLoadingError } from "./interfaces";
 const RESTORE_TEMP_PREFIX = "uptime-watcher-restore-";
 const ROLLBACK_TEMP_PREFIX = "uptime-watcher-rollback-";
 
-const UNSAFE_FILENAME_PATTERN =
-     
-    /[^\p{L}\p{N}._-]/gu;
+const UNSAFE_FILENAME_PATTERN = /[^\p{L}\p{N}._-]/gu;
 
 const createSanitizedFileName = (fileName: string): string =>
     path.basename(fileName).replaceAll(UNSAFE_FILENAME_PATTERN, "_");

@@ -588,31 +588,32 @@ The renderer talks to the monitor-type registry exclusively through the
 ```typescript
 // src/services/MonitorTypesService.ts
 export const MonitorTypesService = {
- formatMonitorDetail: wrap("formatMonitorDetail", async (
-  api,
-  type: string,
-  details: string
- ): Promise<string> => {
-  const result = await api.monitorTypes.formatMonitorDetail(type, details);
-  if (typeof result !== "string") {
-   throw new TypeError("formatMonitorDetail must return a formatted string");
+ formatMonitorDetail: wrap(
+  "formatMonitorDetail",
+  async (api, type: string, details: string): Promise<string> => {
+   const result = await api.monitorTypes.formatMonitorDetail(type, details);
+   if (typeof result !== "string") {
+    throw new TypeError("formatMonitorDetail must return a formatted string");
+   }
+   return result;
   }
-  return result;
- }),
+ ),
 
- formatMonitorTitleSuffix: wrap("formatMonitorTitleSuffix", async (
-  api,
-  type: string,
-  monitor: Monitor
- ): Promise<string> => {
-  const result = await api.monitorTypes.formatMonitorTitleSuffix(type, monitor);
-  if (typeof result !== "string") {
-   throw new TypeError(
-    "formatMonitorTitleSuffix must return a formatted string"
+ formatMonitorTitleSuffix: wrap(
+  "formatMonitorTitleSuffix",
+  async (api, type: string, monitor: Monitor): Promise<string> => {
+   const result = await api.monitorTypes.formatMonitorTitleSuffix(
+    type,
+    monitor
    );
+   if (typeof result !== "string") {
+    throw new TypeError(
+     "formatMonitorTitleSuffix must return a formatted string"
+    );
+   }
+   return result;
   }
-  return result;
- }),
+ ),
 
  getMonitorTypes: wrap(
   "getMonitorTypes",

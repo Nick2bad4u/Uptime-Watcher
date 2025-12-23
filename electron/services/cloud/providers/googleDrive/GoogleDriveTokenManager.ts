@@ -4,6 +4,8 @@ import * as z from "zod";
 
 import type { SecretStore } from "../../secrets/SecretStore";
 
+import { googleTokenResponseSchema } from "./googleDriveTokenSchemas";
+
 /**
  * Persisted Google Drive OAuth tokens.
  */
@@ -24,14 +26,6 @@ const googleTokenSchema: z.ZodType<GoogleDriveTokens> = z
         tokenType: z.string().optional(),
     })
     .strict();
-
-const googleTokenResponseSchema = z.looseObject({
-    access_token: z.string().min(1),
-    expires_in: z.number().int().positive().optional(),
-    refresh_token: z.string().min(1).optional(),
-    scope: z.string().optional(),
-    token_type: z.string().optional(),
-});
 
 /**
  * Manages OAuth tokens for Google Drive.

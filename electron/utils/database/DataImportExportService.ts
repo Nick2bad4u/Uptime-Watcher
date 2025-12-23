@@ -246,54 +246,52 @@ export class DataImportExportService {
     ): Promise<void> {
         const safeSettings = settings ?? {};
         const normalizedSites = sites.map((site) =>
-            this.normalizeImportSite(site));
+            this.normalizeImportSite(site)
+        );
         return withDatabaseOperation(
             async () => {
                 // Use executeTransaction for atomic multi-table operation
-                await this.withImportTransactionAdapters(({
-                    historyTx,
-                    monitorTx,
-                    settingsTx,
-                    siteTx,
-                }) => {
-                    siteTx.deleteAll();
-                    settingsTx.deleteAll();
-                    monitorTx.deleteAll();
-                    historyTx.deleteAll();
+                await this.withImportTransactionAdapters(
+                    ({ historyTx, monitorTx, settingsTx, siteTx }) => {
+                        siteTx.deleteAll();
+                        settingsTx.deleteAll();
+                        monitorTx.deleteAll();
+                        historyTx.deleteAll();
 
-                    // Import sites using bulk insert
-                    const siteRows = normalizedSites.map((site) => {
-                        const monitoring = site.monitoring ?? true;
+                        // Import sites using bulk insert
+                        const siteRows = normalizedSites.map((site) => {
+                            const monitoring = site.monitoring ?? true;
 
-                        const row: {
-                            identifier: string;
-                            monitoring: boolean;
-                            name?: string;
-                        } = {
-                            identifier: site.identifier,
-                            monitoring,
-                        };
+                            const row: {
+                                identifier: string;
+                                monitoring: boolean;
+                                name?: string;
+                            } = {
+                                identifier: site.identifier,
+                                monitoring,
+                            };
 
-                        if (site.name) {
-                            row.name = site.name;
-                        }
+                            if (site.name) {
+                                row.name = site.name;
+                            }
 
-                        return row;
-                    });
-                    siteTx.bulkInsert(siteRows);
+                            return row;
+                        });
+                        siteTx.bulkInsert(siteRows);
 
-                    // Import monitors and history as part of the same
-                    // transaction so monitor creation, history entries,
-                    // and settings updates share a single atomic
-                    // boundary.
-                    this.importMonitorsWithHistory(
-                        historyTx,
-                        monitorTx,
-                        normalizedSites
-                    );
+                        // Import monitors and history as part of the same
+                        // transaction so monitor creation, history entries,
+                        // and settings updates share a single atomic
+                        // boundary.
+                        this.importMonitorsWithHistory(
+                            historyTx,
+                            monitorTx,
+                            normalizedSites
+                        );
 
-                    settingsTx.bulkInsert(safeSettings);
-                });
+                        settingsTx.bulkInsert(safeSettings);
+                    }
+                );
 
                 this.logger.info(
                     `Successfully imported ${normalizedSites.length} sites and ${Object.keys(safeSettings).length} settings`
@@ -441,7 +439,8 @@ export class DataImportExportService {
 
         if (Array.isArray(site.monitors) && site.monitors.length > 0) {
             normalizedSite.monitors = site.monitors.map((monitor) =>
-                this.normalizeImportedMonitor(site.identifier, monitor));
+                this.normalizeImportedMonitor(site.identifier, monitor)
+            );
         }
 
         return normalizedSite;

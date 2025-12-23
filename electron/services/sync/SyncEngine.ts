@@ -9,9 +9,7 @@ import type {
     CloudSyncState,
 } from "@shared/types/cloudSyncState";
 
-import {
-    CLOUD_SYNC_SCHEMA_VERSION,
-} from "@shared/types/cloudSync";
+import { CLOUD_SYNC_SCHEMA_VERSION } from "@shared/types/cloudSync";
 import {
     CLOUD_SYNC_BASELINE_VERSION,
     type CloudSyncBaseline,
@@ -556,7 +554,7 @@ export class SyncEngine {
      * orchestrator.
      *
      * @remarks
-    * Remote operation streams may materialize into partial or outdated
+     * Remote operation streams may materialize into partial or outdated
      * configurations (e.g. an HTTP monitor without a URL). The orchestrator
      * performs strict validation and will reject these payloads.
      *

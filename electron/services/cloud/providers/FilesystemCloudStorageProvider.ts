@@ -15,10 +15,10 @@ import type {
     CloudStorageProvider,
 } from "./CloudStorageProvider.types";
 
+import { listBackupsFromMetadataObjects } from "./cloudBackupListing";
 import {
     parseCloudBackupMetadataFileBuffer,
     serializeCloudBackupMetadataFile,
-    tryParseCloudBackupMetadataFileBuffer,
 } from "./CloudBackupMetadataFile";
 
 const APP_ROOT_DIRECTORY_NAME = "uptime-watcher" as const;
@@ -443,27 +443,10 @@ export class FilesystemCloudStorageProvider implements CloudStorageProvider {
 
     public async listBackups(): Promise<CloudBackupEntry[]> {
         const objects = await this.listObjects(BACKUPS_PREFIX);
-        const metadataObjects = objects.filter((object) =>
-            object.key.endsWith(".metadata.json")
-        );
-
-        const backupCandidates = await Promise.all(
-            metadataObjects.map(async (object) => {
-                try {
-                    const raw = await this.downloadObject(object.key);
-                    return tryParseCloudBackupMetadataFileBuffer(raw);
-                } catch {
-                    return null;
-                }
-            })
-        );
-
-        const backups = backupCandidates.filter(
-            (entry): entry is CloudBackupEntry => entry !== null
-        );
-
-        backups.sort((a, b) => b.metadata.createdAt - a.metadata.createdAt);
-        return backups;
+        return listBackupsFromMetadataObjects({
+            downloadObjectBuffer: async (key) => this.downloadObject(key),
+            objects,
+        });
     }
 
     public async downloadBackup(

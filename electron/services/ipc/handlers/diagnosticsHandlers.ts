@@ -194,7 +194,9 @@ export function registerDiagnosticsHandlers({
                 ...(report.payloadPreview === undefined
                     ? {}
                     : { payloadPreview: report.payloadPreview }),
-                ...(report.reason === undefined ? {} : { reason: report.reason }),
+                ...(report.reason === undefined
+                    ? {}
+                    : { reason: report.reason }),
                 timestamp: report.timestamp,
             };
 

@@ -89,20 +89,23 @@ function processImports(content) {
     ];
 
     importPatterns.forEach((pattern) => {
-        updated = updated.replace(pattern, (
-            /** @type {any} */ match,
-            /** @type {any} */ prefix,
-            /** @type {any} */ importPath,
-            /** @type {any} */ suffix
-        ) => {
-            const newPath = updateImportPath(importPath);
-            if (newPath !== importPath) {
-                changeCount++;
-                log.info(`  Updated: "${importPath}" → "${newPath}"`);
-                return prefix + newPath + suffix;
+        updated = updated.replace(
+            pattern,
+            (
+                /** @type {any} */ match,
+                /** @type {any} */ prefix,
+                /** @type {any} */ importPath,
+                /** @type {any} */ suffix
+            ) => {
+                const newPath = updateImportPath(importPath);
+                if (newPath !== importPath) {
+                    changeCount++;
+                    log.info(`  Updated: "${importPath}" → "${newPath}"`);
+                    return prefix + newPath + suffix;
+                }
+                return match;
             }
-            return match;
-        });
+        );
     });
 
     log.info(`Updated ${changeCount} import statements`);

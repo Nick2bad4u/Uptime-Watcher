@@ -285,22 +285,18 @@ describe("Interfaces Coverage Tests", () => {
             await annotate("Type: Business Logic", "type");
 
             const asyncLogger = {
-                debug: vi.fn(async (
-                    _message: string,
-                    ..._args: unknown[]
-                ) => {}),
-                info: vi.fn(async (
-                    _message: string,
-                    ..._args: unknown[]
-                ) => {}),
-                warn: vi.fn(async (
-                    _message: string,
-                    ..._args: unknown[]
-                ) => {}),
-                error: vi.fn(async (
-                    _message: string,
-                    ..._args: unknown[]
-                ) => {}),
+                debug: vi.fn(
+                    async (_message: string, ..._args: unknown[]) => {}
+                ),
+                info: vi.fn(
+                    async (_message: string, ..._args: unknown[]) => {}
+                ),
+                warn: vi.fn(
+                    async (_message: string, ..._args: unknown[]) => {}
+                ),
+                error: vi.fn(
+                    async (_message: string, ..._args: unknown[]) => {}
+                ),
             };
 
             await asyncLogger.debug("async debug");

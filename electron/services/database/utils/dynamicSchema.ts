@@ -541,7 +541,7 @@ function mapStandardFields(monitor: UnknownRecord, row: UnknownRecord): void {
     }
 
     // Process all other standard field mappings with enhanced error handling
-        for (const mapping of STANDARD_FIELD_MAPPINGS) {
+    for (const mapping of STANDARD_FIELD_MAPPINGS) {
         if (monitor[mapping.sourceField] !== undefined) {
             const result = processFieldMapping(mapping, monitor);
             if (result.success) {

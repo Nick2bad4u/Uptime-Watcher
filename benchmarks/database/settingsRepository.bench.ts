@@ -252,7 +252,8 @@ class MockSettingsRepository {
                 setting.value,
                 setting.type || "string",
                 setting.category || "general"
-            ));
+            )
+        );
     }
 
     reset(category?: string) {
@@ -279,18 +280,20 @@ class MockSettingsRepository {
     }
 
     import(settingsData: any) {
-        const settings = Object.entries(settingsData).map(([
-            key,
-            data,
-        ]: [
-            string,
-            any,
-        ]) => ({
-            key,
-            value: data.value,
-            type: data.type || "string",
-            category: data.category || "general",
-        }));
+        const settings = Object.entries(settingsData).map(
+            ([
+                key,
+                data,
+            ]: [
+                string,
+                any,
+            ]) => ({
+                key,
+                value: data.value,
+                type: data.type || "string",
+                category: data.category || "general",
+            })
+        );
         return this.bulkUpdate(settings);
     }
 

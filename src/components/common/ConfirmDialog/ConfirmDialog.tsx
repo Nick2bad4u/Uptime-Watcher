@@ -9,11 +9,7 @@
 
 import type { JSX } from "react/jsx-runtime";
 
-import {
-    memo,
-    type NamedExoticComponent,
-    useId,
-} from "react";
+import { memo, type NamedExoticComponent, useId } from "react";
 
 import { useConfirmDialogControls } from "../../../stores/ui/useConfirmDialogStore";
 import { ThemedButton } from "../../../theme/components/ThemedButton";

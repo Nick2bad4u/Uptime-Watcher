@@ -98,7 +98,8 @@ describe(useConfirmDialogStore, () => {
 
     it("provides memoized confirm dialog controls", () => {
         const { result, rerender } = renderHook(() =>
-            useConfirmDialogControls());
+            useConfirmDialogControls()
+        );
         const initialControls = result.current;
 
         expect(initialControls.request).toBeNull();
@@ -138,7 +139,8 @@ describe(useConfirmDialogStore, () => {
 
     it("exposes visibility helpers that track store state", () => {
         const { result, rerender } = renderHook(() =>
-            useConfirmDialogVisibility());
+            useConfirmDialogVisibility()
+        );
 
         expect(result.current.isOpen).toBeFalsy();
 
@@ -245,23 +247,25 @@ describe(useConfirmDialogStore, () => {
 
     fcTest.prop([
         fc.array(confirmDialogOptionsArb, { minLength: 2, maxLength: 5 }),
-    ])("cancels previous confirmations when a new dialog is requested", async (
-        requests
-    ) => {
-        resetConfirmDialogState();
+    ])(
+        "cancels previous confirmations when a new dialog is requested",
+        async (requests) => {
+            resetConfirmDialogState();
 
-        const confirmations = requests.map((request) =>
-            requestConfirmation(buildConfirmDialogOptions(request)));
+            const confirmations = requests.map((request) =>
+                requestConfirmation(buildConfirmDialogOptions(request))
+            );
 
-        for (let index = 0; index < confirmations.length - 1; index += 1) {
-            await expect(confirmations[index]).resolves.toBeFalsy();
+            for (let index = 0; index < confirmations.length - 1; index += 1) {
+                await expect(confirmations[index]).resolves.toBeFalsy();
+            }
+
+            useConfirmDialogStore.getState().confirm();
+
+            await expect(confirmations.at(-1)).resolves.toBeTruthy();
+            expect(useConfirmDialogStore.getState().request).toBeNull();
         }
-
-        useConfirmDialogStore.getState().confirm();
-
-        await expect(confirmations.at(-1)).resolves.toBeTruthy();
-        expect(useConfirmDialogStore.getState().request).toBeNull();
-    });
+    );
 
     it("exposes Playwright automation helpers on the global scope", async () => {
         const automationTarget = globalThis as typeof globalThis & {

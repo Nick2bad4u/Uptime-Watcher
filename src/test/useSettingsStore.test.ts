@@ -52,7 +52,8 @@ vi.mock("../stores/utils", () => ({
         asyncFn().catch((error: Error) => {
             handlers.setError(error);
             throw error;
-        })),
+        })
+    ),
 }));
 
 // Mock useErrorStore

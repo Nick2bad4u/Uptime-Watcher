@@ -143,8 +143,10 @@ Always use proper paths for screenshots:
 
 
 
-Always use proper paths for screenshots:```typescript// ✅ Good - saves to playwright test-results directoryawait page.screenshot({ path: "playwright/test-results/screenshots/my-screenshot.png" });// ❌ Bad - saves to project root
-await page.screenshot({ path: "my-screenshot.png" });
+
+
+
+Always use proper paths for screenshots:```typescript// ✅ Good - saves to playwright test-results directoryawait page.screenshot({ path: "playwright/test-results/screenshots/my-screenshot.png" });// ❌ Bad - saves to project rootawait page.screenshot({ path: "my-screenshot.png" });
 ````
 
 ## **�🚨 Troubleshooting**

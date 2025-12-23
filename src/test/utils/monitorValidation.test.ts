@@ -115,27 +115,29 @@ describe("Monitor Validation Utilities", () => {
         vi.mocked(useMonitorTypesStore.getState).mockReturnValue(mockStore);
 
         // Setup default mocks with correct signature
-        vi.mocked(withUtilityErrorHandling).mockImplementation(async (
-            operation,
-            operationName,
-            fallbackValue,
-            shouldThrow = false
-        ) => {
-            try {
-                return await operation();
-            } catch (error) {
-                if (shouldThrow) {
-                    throw error;
+        vi.mocked(withUtilityErrorHandling).mockImplementation(
+            async (
+                operation,
+                operationName,
+                fallbackValue,
+                shouldThrow = false
+            ) => {
+                try {
+                    return await operation();
+                } catch (error) {
+                    if (shouldThrow) {
+                        throw error;
+                    }
+                    if (fallbackValue === undefined) {
+                        throw new Error(
+                            `${operationName} failed and no fallback value provided`,
+                            { cause: error }
+                        );
+                    }
+                    return fallbackValue;
                 }
-                if (fallbackValue === undefined) {
-                    throw new Error(
-                        `${operationName} failed and no fallback value provided`,
-                        { cause: error }
-                    );
-                }
-                return fallbackValue;
             }
-        });
+        );
     });
 
     afterEach(() => {
@@ -1763,24 +1765,26 @@ describe("Monitor Validation Utilities", () => {
                     timeout: fc.integer({ min: 1000, max: 30_000 }),
                     retryAttempts: fc.integer({ min: 1, max: 10 }),
                 }),
-            ])("should create monitor objects with valid base properties", (
-                monitorType,
-                baseData
-            ) => {
-                const result = createMonitorObject(
-                    monitorType as MonitorType,
-                    baseData as any
-                );
+            ])(
+                "should create monitor objects with valid base properties",
+                (monitorType, baseData) => {
+                    const result = createMonitorObject(
+                        monitorType as MonitorType,
+                        baseData as any
+                    );
 
-                expect(result.type).toBe(monitorType);
-                expect(result.monitoring).toBe(baseData.monitoring);
-                expect(result["checkInterval"]).toBe(baseData.checkInterval);
-                expect(result.timeout).toBe(baseData.timeout);
-                expect(result.retryAttempts).toBe(baseData.retryAttempts);
-                expect(result.responseTime).toBe(-1); // Default value
-                expect(result.status).toBe("pending"); // Default value
-                expect(result.history).toEqual([]); // Default value
-            });
+                    expect(result.type).toBe(monitorType);
+                    expect(result.monitoring).toBe(baseData.monitoring);
+                    expect(result["checkInterval"]).toBe(
+                        baseData.checkInterval
+                    );
+                    expect(result.timeout).toBe(baseData.timeout);
+                    expect(result.retryAttempts).toBe(baseData.retryAttempts);
+                    expect(result.responseTime).toBe(-1); // Default value
+                    expect(result.status).toBe("pending"); // Default value
+                    expect(result.history).toEqual([]); // Default value
+                }
+            );
 
             test.prop([
                 fc.record({
@@ -1806,15 +1810,16 @@ describe("Monitor Validation Utilities", () => {
                     timeout: fc.integer({ min: 1000, max: 30_000 }),
                     retryAttempts: fc.integer({ min: 1, max: 10 }),
                 }),
-            ])("should create port monitor objects with host and port", (
-                portData
-            ) => {
-                const result = createMonitorObject("port", portData as any);
+            ])(
+                "should create port monitor objects with host and port",
+                (portData) => {
+                    const result = createMonitorObject("port", portData as any);
 
-                expect(result.type).toBe("port");
-                expect(result["host"]).toBe(portData.host);
-                expect(result["port"]).toBe(portData.port);
-            });
+                    expect(result.type).toBe("port");
+                    expect(result["host"]).toBe(portData.host);
+                    expect(result["port"]).toBe(portData.port);
+                }
+            );
 
             test.prop([
                 fc.constantFrom("http", "port", "dns", "ping"),
@@ -1822,24 +1827,24 @@ describe("Monitor Validation Utilities", () => {
                     monitoring: fc.boolean(),
                     checkInterval: fc.integer({ min: 5000, max: 300_000 }),
                 }),
-            ])("should preserve monitor type regardless of input data", (
-                monitorType,
-                inputData
-            ) => {
-                // Add a different type in the input to test type preservation
-                const dataWithWrongType = {
-                    ...inputData,
-                    type: "wrong-type",
-                } as any;
+            ])(
+                "should preserve monitor type regardless of input data",
+                (monitorType, inputData) => {
+                    // Add a different type in the input to test type preservation
+                    const dataWithWrongType = {
+                        ...inputData,
+                        type: "wrong-type",
+                    } as any;
 
-                const result = createMonitorObject(
-                    monitorType as MonitorType,
-                    dataWithWrongType
-                );
+                    const result = createMonitorObject(
+                        monitorType as MonitorType,
+                        dataWithWrongType
+                    );
 
-                // Should preserve the passed type parameter, not the type in data
-                expect(result.type).toBe(monitorType);
-            });
+                    // Should preserve the passed type parameter, not the type in data
+                    expect(result.type).toBe(monitorType);
+                }
+            );
         });
 
         describe("validateMonitorData property tests", () => {
@@ -1849,35 +1854,37 @@ describe("Monitor Validation Utilities", () => {
                     monitoring: fc.boolean(),
                     checkInterval: fc.integer({ min: 5000, max: 300_000 }),
                 }),
-            ])("should call validation with correct parameters", async (
-                monitorType,
-                monitorData
-            ) => {
-                // Setup basic mock
-                const mockResult = {
-                    data: undefined,
-                    errors: [],
-                    metadata: {},
-                    success: true,
-                    warnings: [],
-                };
+            ])(
+                "should call validation with correct parameters",
+                async (monitorType, monitorData) => {
+                    // Setup basic mock
+                    const mockResult = {
+                        data: undefined,
+                        errors: [],
+                        metadata: {},
+                        success: true,
+                        warnings: [],
+                    };
 
-                // Update the store mock to return the specific result for this test
-                const mockStore = createMockStore({
-                    validateMonitorData: vi.fn().mockResolvedValue(mockResult),
-                });
-                vi.mocked(useMonitorTypesStore.getState).mockReturnValue(
-                    mockStore
-                );
+                    // Update the store mock to return the specific result for this test
+                    const mockStore = createMockStore({
+                        validateMonitorData: vi
+                            .fn()
+                            .mockResolvedValue(mockResult),
+                    });
+                    vi.mocked(useMonitorTypesStore.getState).mockReturnValue(
+                        mockStore
+                    );
 
-                await validateMonitorData(
-                    monitorType as MonitorType,
-                    monitorData as any
-                );
+                    await validateMonitorData(
+                        monitorType as MonitorType,
+                        monitorData as any
+                    );
 
-                // Verify the function was called (don't check exact parameters due to complexity)
-                expect(mockStore.validateMonitorData).toHaveBeenCalled();
-            });
+                    // Verify the function was called (don't check exact parameters due to complexity)
+                    expect(mockStore.validateMonitorData).toHaveBeenCalled();
+                }
+            );
         });
 
         describe("validateMonitorFormData property tests", () => {

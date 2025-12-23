@@ -72,22 +72,23 @@ describe("monitor identifier fallbacks (strict coverage)", () => {
             await import("@app/utils/fallbacks");
 
         await assertProperty(
-            fc.property(portMonitorHostArbitrary, fallbackLabelArbitrary, (
-                host,
-                siteFallback
-            ) => {
-                const monitor = createMonitor({
-                    type: "port",
-                    host,
-                });
+            fc.property(
+                portMonitorHostArbitrary,
+                fallbackLabelArbitrary,
+                (host, siteFallback) => {
+                    const monitor = createMonitor({
+                        type: "port",
+                        host,
+                    });
 
-                const result = getMonitorDisplayIdentifier(
-                    monitor,
-                    siteFallback
-                );
+                    const result = getMonitorDisplayIdentifier(
+                        monitor,
+                        siteFallback
+                    );
 
-                expect(result).toBe(host);
-            })
+                    expect(result).toBe(host);
+                }
+            )
         );
     });
 

@@ -351,7 +351,8 @@ describe("Backend Validation Fuzzing Tests", () => {
                                 ];
 
                                 return patterns.some((pattern) =>
-                                    pattern.test(str));
+                                    pattern.test(str)
+                                );
                             };
 
                             const result = containsSqlInjection(input);

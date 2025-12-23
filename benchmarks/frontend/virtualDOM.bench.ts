@@ -1099,7 +1099,8 @@ describe("React Virtual DOM Performance", () => {
                         },
                         item.label
                     )
-                ));
+                )
+            );
 
             return vdom.createElement("ul", { className: "list" }, ...items);
         });

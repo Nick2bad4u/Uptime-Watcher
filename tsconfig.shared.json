@@ -5,18 +5,10 @@
         "incremental": true,
         "outDir": ".cache/builds/app",
         "paths": {
-            "@app/*": [
-                "src/*"
-            ],
-            "@assets/*": [
-                "assets/*"
-            ],
-            "@electron/*": [
-                "electron/*"
-            ],
-            "@shared/*": [
-                "shared/*"
-            ]
+            "@app/*": ["src/*"],
+            "@assets/*": ["assets/*"],
+            "@electron/*": ["electron/*"],
+            "@shared/*": ["shared/*"]
         },
         "tsBuildInfoFile": "./.cache/tsconfig.shared.tsbuildinfo"
     },
@@ -29,7 +21,5 @@
         "src/**/*"
     ],
     "extends": "./tsconfig.json",
-    "include": [
-        "shared/**/*"
-    ]
+    "include": ["shared/**/*"]
 }

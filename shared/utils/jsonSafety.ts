@@ -8,6 +8,7 @@
 import type { Jsonifiable, JsonValue } from "type-fest";
 
 import { ensureError } from "@shared/utils/errorHandling";
+import { collectOwnPropertyValuesSafely } from "@shared/utils/objectIntrospection";
 import { isObject } from "@shared/utils/typeGuards";
 
 /**
@@ -89,22 +90,7 @@ function safeOperation<T>(
     }
 }
 
-const collectObjectValues = (value: object): readonly unknown[] => {
-    if (Array.isArray(value)) {
-        return value;
-    }
-
-    const values: unknown[] = [];
-    for (const key of Reflect.ownKeys(value)) {
-        try {
-            values.push(Reflect.get(value, key));
-        } catch {
-            values.push(undefined);
-        }
-    }
-
-    return values;
-};
+const collectObjectValues = collectOwnPropertyValuesSafely;
 
 const hasDescriptorValue = (
     descriptor: PropertyDescriptor | undefined

@@ -10,16 +10,9 @@
         "outDir": "../../.cache/builds/test/shared",
         "rootDir": "../..",
         "tsBuildInfoFile": "../../.cache/tsconfig.shared.test.tsbuildinfo",
-        "types": [
-            "node",
-            "vitest/globals"
-        ]
+        "types": ["node", "vitest/globals"]
     },
-    "exclude": [
-        "../../node_modules",
-        "../../electron/**/*",
-        "../../src/**/*"
-    ],
+    "exclude": ["../../node_modules", "../../electron/**/*", "../../src/**/*"],
     "extends": "../../tsconfig.shared.json",
     "include": [
         "../../shared/**/*.spec.ts",

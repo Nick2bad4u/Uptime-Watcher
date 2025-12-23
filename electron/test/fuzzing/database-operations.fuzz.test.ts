@@ -261,73 +261,76 @@ describe("Database Operations Fuzzing Tests", () => {
 
         it("rolls back bulk inserts when a statement fails mid-transaction", async () => {
             await fc.assert(
-                fc.asyncProperty(SITE_ROWS_ARBITRARY, fc.nat(), async (
-                    sites: SiteRow[],
-                    failureSeed: number
-                ) => {
-                    const failureIndex = failureSeed % (sites.length + 1);
+                fc.asyncProperty(
+                    SITE_ROWS_ARBITRARY,
+                    fc.nat(),
+                    async (sites: SiteRow[], failureSeed: number) => {
+                        const failureIndex = failureSeed % (sites.length + 1);
 
-                    const preparedStatements: PreparedStatementMock[] = [];
+                        const preparedStatements: PreparedStatementMock[] = [];
 
-                    mockDatabaseService.executeTransaction.mockClear();
-                    mockDb.prepare.mockReset();
+                        mockDatabaseService.executeTransaction.mockClear();
+                        mockDb.prepare.mockReset();
 
-                    mockDatabaseService.executeTransaction.mockImplementation(
-                        async (callback: any) => await callback(mockDb)
-                    );
-
-                    mockDb.prepare.mockImplementation(() => {
-                        let invocationCount = 0;
-
-                        const statement: PreparedStatementMock = {
-                            finalize: vi.fn(),
-                            run: vi.fn(() => {
-                                const shouldFail =
-                                    failureIndex < sites.length &&
-                                    invocationCount === failureIndex;
-
-                                invocationCount += 1;
-
-                                if (shouldFail) {
-                                    throw SIMULATED_TRANSACTION_FAILURE;
-                                }
-
-                                return { changes: 1 };
-                            }),
-                        };
-
-                        preparedStatements.push(statement);
-                        return statement;
-                    });
-
-                    const resultPromise = siteRepository.bulkInsert(sites);
-
-                    const expectedAttempts =
-                        failureIndex < sites.length ? 3 : 1;
-
-                    await (failureIndex < sites.length
-                        ? expect(resultPromise).rejects.toThrowError(
-                              SIMULATED_TRANSACTION_FAILURE
-                          )
-                        : expect(resultPromise).resolves.toBeUndefined());
-
-                    expect(
-                        mockDatabaseService.executeTransaction
-                    ).toHaveBeenCalledTimes(expectedAttempts);
-                    expect(preparedStatements).toHaveLength(expectedAttempts);
-
-                    const expectedRuns =
-                        failureIndex < sites.length
-                            ? failureIndex + 1
-                            : sites.length;
-
-                    for (const statement of preparedStatements) {
-                        expect(statement.finalize).toHaveBeenCalledTimes(1);
-                        expect(statement.run).toHaveBeenCalledTimes(
-                            expectedRuns
+                        mockDatabaseService.executeTransaction.mockImplementation(
+                            async (callback: any) => await callback(mockDb)
                         );
+
+                        mockDb.prepare.mockImplementation(() => {
+                            let invocationCount = 0;
+
+                            const statement: PreparedStatementMock = {
+                                finalize: vi.fn(),
+                                run: vi.fn(() => {
+                                    const shouldFail =
+                                        failureIndex < sites.length &&
+                                        invocationCount === failureIndex;
+
+                                    invocationCount += 1;
+
+                                    if (shouldFail) {
+                                        throw SIMULATED_TRANSACTION_FAILURE;
+                                    }
+
+                                    return { changes: 1 };
+                                }),
+                            };
+
+                            preparedStatements.push(statement);
+                            return statement;
+                        });
+
+                        const resultPromise = siteRepository.bulkInsert(sites);
+
+                        const expectedAttempts =
+                            failureIndex < sites.length ? 3 : 1;
+
+                        await (failureIndex < sites.length
+                            ? expect(resultPromise).rejects.toThrowError(
+                                  SIMULATED_TRANSACTION_FAILURE
+                              )
+                            : expect(resultPromise).resolves.toBeUndefined());
+
+                        expect(
+                            mockDatabaseService.executeTransaction
+                        ).toHaveBeenCalledTimes(expectedAttempts);
+                        expect(preparedStatements).toHaveLength(
+                            expectedAttempts
+                        );
+
+                        const expectedRuns =
+                            failureIndex < sites.length
+                                ? failureIndex + 1
+                                : sites.length;
+
+                        for (const statement of preparedStatements) {
+                            expect(statement.finalize).toHaveBeenCalledTimes(1);
+                            expect(statement.run).toHaveBeenCalledTimes(
+                                expectedRuns
+                            );
+                        }
                     }
-                }),
+                ),
                 { numRuns: 25 }
             );
         });
@@ -360,7 +363,11 @@ describe("Database Operations Fuzzing Tests", () => {
                     fc
                         .string({ minLength: 1, maxLength: 100 })
                         .filter((value) => /\S/u.test(value)),
-                    async (monitorId: string, monitorData: any, siteIdentifier: string) => {
+                    async (
+                        monitorId: string,
+                        monitorData: any,
+                        siteIdentifier: string
+                    ) => {
                         mockDatabaseService.executeTransaction.mockImplementation(
                             async (callback: any) => await callback(mockDb)
                         );
@@ -371,7 +378,9 @@ describe("Database Operations Fuzzing Tests", () => {
                             id: monitorId,
                         };
 
-                        mockDb.get.mockReturnValue({ id: normalizedMonitorData.id });
+                        mockDb.get.mockReturnValue({
+                            id: normalizedMonitorData.id,
+                        });
 
                         const createdId = await monitorRepository.create(
                             siteIdentifier,
@@ -415,25 +424,26 @@ describe("Database Operations Fuzzing Tests", () => {
 
         it("should handle findBySiteIdentifier operations", async () => {
             await fc.assert(
-                fc.asyncProperty(fc.string(), async (
-                    siteIdentifier: string
-                ) => {
-                    mockDatabaseService.executeTransaction.mockImplementation(
-                        async (callback: any) => await callback(mockDb)
-                    );
-                    mockDb.all.mockReturnValue([]);
+                fc.asyncProperty(
+                    fc.string(),
+                    async (siteIdentifier: string) => {
+                        mockDatabaseService.executeTransaction.mockImplementation(
+                            async (callback: any) => await callback(mockDb)
+                        );
+                        mockDb.all.mockReturnValue([]);
 
-                    // Should handle any site identifier gracefully
-                    try {
-                        const result =
-                            await monitorRepository.findBySiteIdentifier(
-                                siteIdentifier
-                            );
-                        expect(Array.isArray(result)).toBeTruthy();
-                    } catch (error) {
-                        // Method may throw for invalid identifiers, which is acceptable
+                        // Should handle any site identifier gracefully
+                        try {
+                            const result =
+                                await monitorRepository.findBySiteIdentifier(
+                                    siteIdentifier
+                                );
+                            expect(Array.isArray(result)).toBeTruthy();
+                        } catch (error) {
+                            // Method may throw for invalid identifiers, which is acceptable
+                        }
                     }
-                }),
+                ),
                 { numRuns: 20 }
             );
         });
@@ -452,7 +462,8 @@ describe("Database Operations Fuzzing Tests", () => {
                         mockDb.run.mockReturnValue({ changes: 0 });
 
                         // Should return boolean and not throw
-                        const result = await monitorRepository.delete(monitorId);
+                        const result =
+                            await monitorRepository.delete(monitorId);
                         expect(typeof result).toBe("boolean");
                         expect(
                             mockDatabaseService.executeTransaction

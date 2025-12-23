@@ -222,12 +222,10 @@ const electronAPIMockDefinition = {
                 } else {
                     const nextFileName = targetEncrypted
                         ? `${entry.fileName}.enc`
-                        :  
-                          entry.fileName.replace(/\.enc$/u, "");
+                        : entry.fileName.replace(/\.enc$/u, "");
                     const nextKey = targetEncrypted
                         ? `${entry.key}.enc`
-                        :  
-                          entry.key.replace(/\.enc$/u, "");
+                        : entry.key.replace(/\.enc$/u, "");
 
                     const migratedEntry: CloudBackupEntry = {
                         ...entry,
@@ -428,23 +426,25 @@ const electronAPIMockDefinition = {
             const previousStatus = monitor.status;
             const timestamp = new Date().toISOString();
 
-            const updatedSite = applySiteMutation(siteIdentifier, (
-                current
-            ) => ({
-                ...current,
-                monitors: current.monitors.map((candidate) =>
-                    candidate.id === monitorId
-                        ? {
-                              ...candidate,
-                              lastChecked: new Date(),
-                              responseTime: Math.max(
-                                  10,
-                                  Math.round(Math.random() * 250)
-                              ),
-                              status: "up",
-                          }
-                        : candidate),
-            }));
+            const updatedSite = applySiteMutation(
+                siteIdentifier,
+                (current) => ({
+                    ...current,
+                    monitors: current.monitors.map((candidate) =>
+                        candidate.id === monitorId
+                            ? {
+                                  ...candidate,
+                                  lastChecked: new Date(),
+                                  responseTime: Math.max(
+                                      10,
+                                      Math.round(Math.random() * 250)
+                                  ),
+                                  status: "up",
+                              }
+                            : candidate
+                    ),
+                })
+            );
 
             const resultingMonitor = updatedSite.monitors.find(
                 (candidate) => candidate.id === monitorId
@@ -523,7 +523,8 @@ const electronAPIMockDefinition = {
                               ...monitor,
                               monitoring: true,
                           }
-                        : monitor),
+                        : monitor
+                ),
             }));
             return true;
         },
@@ -584,7 +585,8 @@ const electronAPIMockDefinition = {
                               ...monitor,
                               monitoring: false,
                           }
-                        : monitor),
+                        : monitor
+                ),
             }));
             return true;
         },

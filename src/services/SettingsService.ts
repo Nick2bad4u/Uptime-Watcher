@@ -209,54 +209,57 @@ export const SettingsService: SettingsServiceContract = {
      *   example, exceeding the configured maximum). Also throws if the electron
      *   API is unavailable or the backend operation fails fatally.
      */
-    updateHistoryLimit: wrap("updateHistoryLimit", async (
-        api,
-        limit: number
-    ): Promise<number> => {
-        const historyRules = DEFAULT_HISTORY_LIMIT_RULES;
-        let sanitizedRequestLimit: number | undefined = undefined;
-        let requestNormalizationError: Error | undefined = undefined;
+    updateHistoryLimit: wrap(
+        "updateHistoryLimit",
+        async (api, limit: number): Promise<number> => {
+            const historyRules = DEFAULT_HISTORY_LIMIT_RULES;
+            let sanitizedRequestLimit: number | undefined = undefined;
+            let requestNormalizationError: Error | undefined = undefined;
 
-        try {
-            sanitizedRequestLimit = normalizeHistoryLimit(limit, historyRules);
-        } catch (error: unknown) {
-            requestNormalizationError = ensureError(error);
-        }
+            try {
+                sanitizedRequestLimit = normalizeHistoryLimit(
+                    limit,
+                    historyRules
+                );
+            } catch (error: unknown) {
+                requestNormalizationError = ensureError(error);
+            }
 
-        const updatedLimit = await api.settings.updateHistoryLimit(limit);
+            const updatedLimit = await api.settings.updateHistoryLimit(limit);
 
-        try {
-            return normalizeHistoryLimit(updatedLimit, historyRules);
-        } catch (error: unknown) {
-            const normalizedError = ensureError(error);
+            try {
+                return normalizeHistoryLimit(updatedLimit, historyRules);
+            } catch (error: unknown) {
+                const normalizedError = ensureError(error);
 
-            if (sanitizedRequestLimit === undefined) {
+                if (sanitizedRequestLimit === undefined) {
+                    logger.warn(
+                        "History limit update rejected: requested limit could not be normalised",
+                        {
+                            error: normalizedError.message,
+                            receivedValue: updatedLimit,
+                            requestedLimit: limit,
+                        }
+                    );
+
+                    throw normalizeHistoryLimitError(
+                        normalizedError,
+                        requestNormalizationError
+                    );
+                }
+
                 logger.warn(
-                    "History limit update rejected: requested limit could not be normalised",
+                    "Received invalid history limit from backend; falling back to requested value",
                     {
                         error: normalizedError.message,
                         receivedValue: updatedLimit,
                         requestedLimit: limit,
+                        sanitizedLimit: sanitizedRequestLimit,
                     }
                 );
 
-                throw normalizeHistoryLimitError(
-                    normalizedError,
-                    requestNormalizationError
-                );
+                return sanitizedRequestLimit;
             }
-
-            logger.warn(
-                "Received invalid history limit from backend; falling back to requested value",
-                {
-                    error: normalizedError.message,
-                    receivedValue: updatedLimit,
-                    requestedLimit: limit,
-                    sanitizedLimit: sanitizedRequestLimit,
-                }
-            );
-
-            return sanitizedRequestLimit;
         }
-    }),
+    ),
 };

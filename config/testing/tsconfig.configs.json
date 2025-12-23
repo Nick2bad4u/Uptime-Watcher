@@ -10,15 +10,9 @@
         "noEmit": false,
         "outDir": "../../.cache/builds/configs",
         "paths": {
-            "@app/*": [
-                ".cache/builds/app/types/src/*"
-            ],
-            "@electron/*": [
-                ".cache/builds/app/types/electron/*"
-            ],
-            "@shared/*": [
-                ".cache/builds/app/types/shared/*"
-            ]
+            "@app/*": [".cache/builds/app/types/src/*"],
+            "@electron/*": [".cache/builds/app/types/electron/*"],
+            "@shared/*": [".cache/builds/app/types/shared/*"]
         },
         "rootDir": "../..",
         "tsBuildInfoFile": "../../.cache/tsconfig.configs.tsbuildinfo"

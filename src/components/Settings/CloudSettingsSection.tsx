@@ -88,7 +88,8 @@ export const CloudSettingsSection = (): JSX.Element => {
                         state.isRefreshingRemoteSyncResetPreview,
                     isRefreshingStatus: state.isRefreshingStatus,
                     isRequestingSyncNow: state.isRequestingSyncNow,
-                    isResettingRemoteSyncState: state.isResettingRemoteSyncState,
+                    isResettingRemoteSyncState:
+                        state.isResettingRemoteSyncState,
                     isSettingEncryptionPassphrase:
                         state.isSettingEncryptionPassphrase,
                     isSettingSyncEnabled: state.isSettingSyncEnabled,
@@ -115,17 +116,18 @@ export const CloudSettingsSection = (): JSX.Element => {
         )
     );
 
-    const fireAndForget = useCallback((
-        action: () => Promise<unknown>
-    ): void => {
-        void (async (): Promise<void> => {
-            try {
-                await action();
-            } catch {
-                // Errors are already routed through the shared error handling.
-            }
-        })();
-    }, []);
+    const fireAndForget = useCallback(
+        (action: () => Promise<unknown>): void => {
+            void (async (): Promise<void> => {
+                try {
+                    await action();
+                } catch {
+                    // Errors are already routed through the shared error handling.
+                }
+            })();
+        },
+        []
+    );
 
     useEffect(
         function refreshCloudStatusOnMount(): void {
@@ -462,7 +464,8 @@ export const CloudSettingsSection = (): JSX.Element => {
             }
 
             fireAndForget(() =>
-                configureFilesystemProvider({ baseDirectory: trimmed }));
+                configureFilesystemProvider({ baseDirectory: trimmed })
+            );
         },
         [configureFilesystemProvider, fireAndForget]
     );

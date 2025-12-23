@@ -101,7 +101,8 @@ const createRepositoryBundle = (
                 identifier: site.identifier,
                 monitoring: site.monitoring,
                 name: site.name,
-            }))),
+            }))
+        ),
         findByIdentifier: vi.fn(async (identifier: string) => {
             const site = sites.get(identifier);
             if (!site) {

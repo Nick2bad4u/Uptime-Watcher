@@ -182,37 +182,37 @@ describe("ErrorHandling Fuzzing - Line 141", () => {
                 fc.integer()
             ),
             fc.string({ minLength: 1, maxLength: 100 }),
-        ])("should use default message when operationName is invalid", async (
-            invalidOperationName,
-            errorMessage
-        ) => {
-            const consoleErrorSpy = vi
-                .spyOn(console, "error")
-                .mockImplementation(() => {});
+        ])(
+            "should use default message when operationName is invalid",
+            async (invalidOperationName, errorMessage) => {
+                const consoleErrorSpy = vi
+                    .spyOn(console, "error")
+                    .mockImplementation(() => {});
 
-            const context: ErrorHandlingBackendContext = {
-                logger: {} as any, // Empty object to avoid "in" operator error
-                operationName: invalidOperationName as any,
-            };
+                const context: ErrorHandlingBackendContext = {
+                    logger: {} as any, // Empty object to avoid "in" operator error
+                    operationName: invalidOperationName as any,
+                };
 
-            const failingOperation = async () => {
-                throw new Error(errorMessage);
-            };
+                const failingOperation = async () => {
+                    throw new Error(errorMessage);
+                };
 
-            await expect(
-                withErrorHandling(failingOperation, context)
-            ).rejects.toThrowError(errorMessage);
+                await expect(
+                    withErrorHandling(failingOperation, context)
+                ).rejects.toThrowError(errorMessage);
 
-            // Should call console.error with default message when operationName is falsy
-            const expectedMessage = invalidOperationName
-                ? `Failed to ${invalidOperationName}`
-                : "Async operation failed";
-            expect(consoleErrorSpy).toHaveBeenCalledWith(
-                expectedMessage,
-                expect.any(Error)
-            );
+                // Should call console.error with default message when operationName is falsy
+                const expectedMessage = invalidOperationName
+                    ? `Failed to ${invalidOperationName}`
+                    : "Async operation failed";
+                expect(consoleErrorSpy).toHaveBeenCalledWith(
+                    expectedMessage,
+                    expect.any(Error)
+                );
 
-            consoleErrorSpy.mockRestore();
-        });
+                consoleErrorSpy.mockRestore();
+            }
+        );
     });
 });

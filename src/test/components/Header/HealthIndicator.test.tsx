@@ -12,7 +12,8 @@ import { HealthIndicator } from "../../../components/Header/HealthIndicator";
 describe(HealthIndicator, () => {
     it("renders uptime percentage with color tokens from the availability helper", () => {
         const getAvailabilityColor = vi.fn((percentage: number) =>
-            percentage >= 99 ? "health-success" : "health-warning");
+            percentage >= 99 ? "health-success" : "health-warning"
+        );
 
         render(
             <HealthIndicator
@@ -46,7 +47,8 @@ describe(HealthIndicator, () => {
 
     it("updates indicator styling when the uptime percentage changes", () => {
         const getAvailabilityColor = vi.fn((percentage: number) =>
-            percentage >= 95 ? "health-success" : "health-critical");
+            percentage >= 95 ? "health-success" : "health-critical"
+        );
 
         const { rerender } = render(
             <HealthIndicator

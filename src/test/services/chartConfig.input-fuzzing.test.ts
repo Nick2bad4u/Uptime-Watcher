@@ -217,9 +217,8 @@ describe("ChartConfigService - Property-Based Fuzzing Tests", () => {
             (totalChecks) => {
                 // Act & Assert - should not throw
                 expect(() =>
-                    chartConfig.getDoughnutChartConfig(
-                        totalChecks
-                    )).not.toThrowError();
+                    chartConfig.getDoughnutChartConfig(totalChecks)
+                ).not.toThrowError();
 
                 const config = chartConfig.getDoughnutChartConfig(totalChecks);
                 expect(config).toBeDefined();
@@ -231,9 +230,8 @@ describe("ChartConfigService - Property-Based Fuzzing Tests", () => {
             (totalChecks) => {
                 // Act & Assert - should not throw with large values
                 expect(() =>
-                    chartConfig.getDoughnutChartConfig(
-                        totalChecks
-                    )).not.toThrowError();
+                    chartConfig.getDoughnutChartConfig(totalChecks)
+                ).not.toThrowError();
 
                 const config = chartConfig.getDoughnutChartConfig(totalChecks);
                 expect(config).toBeDefined();
@@ -334,9 +332,8 @@ describe("ChartConfigService - Property-Based Fuzzing Tests", () => {
             (extremeValue) => {
                 // Act & Assert - should not crash with extreme values
                 expect(() =>
-                    chartConfig.getDoughnutChartConfig(
-                        extremeValue
-                    )).not.toThrowError();
+                    chartConfig.getDoughnutChartConfig(extremeValue)
+                ).not.toThrowError();
             }
         );
 
@@ -350,7 +347,8 @@ describe("ChartConfigService - Property-Based Fuzzing Tests", () => {
                 // Act & Assert - should not crash
                 expect(() => service.getLineChartConfig()).not.toThrowError();
                 expect(() =>
-                    service.getDoughnutChartConfig(0)).not.toThrowError();
+                    service.getDoughnutChartConfig(0)
+                ).not.toThrowError();
                 expect(() => service.getBarChartConfig()).not.toThrowError();
             }
         );

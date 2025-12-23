@@ -45,6 +45,42 @@ function buildLastErrorSpread(lastError: string | undefined): {
     return lastError ? { lastError } : {};
 }
 
+type CloudStatusBuildOverrides = Readonly<{
+    backupsEnabled: boolean;
+    configured: boolean;
+    connected: boolean;
+    encryptionMode: CloudEncryptionMode;
+    lastError?: string;
+    provider: CloudStatusSummary["provider"];
+    providerDetails?: CloudStatusSummary["providerDetails"];
+}>;
+
+const buildCloudStatusSummary = (
+    common: CloudStatusCommonArgs,
+    overrides: CloudStatusBuildOverrides
+): CloudStatusSummary => {
+    const encryptionLocked =
+        overrides.encryptionMode === "passphrase" && !common.localEncryptionKey;
+
+    const lastError = overrides.lastError ?? common.lastError;
+
+    return {
+        backupsEnabled: overrides.backupsEnabled,
+        configured: overrides.configured,
+        connected: overrides.connected,
+        encryptionLocked,
+        encryptionMode: overrides.encryptionMode,
+        lastBackupAt: common.lastBackupAt,
+        ...buildLastErrorSpread(lastError),
+        lastSyncAt: common.lastSyncAt,
+        provider: overrides.provider,
+        ...(overrides.providerDetails
+            ? { providerDetails: overrides.providerDetails }
+            : {}),
+        syncEnabled: common.syncEnabled,
+    };
+};
+
 /**
  * Builds a {@link CloudStatusSummary} for the Dropbox provider.
  *
@@ -164,24 +200,17 @@ export async function buildFilesystemStatus(args: {
     const { baseDirectory, common, deps } = args;
 
     if (baseDirectory.length === 0) {
-        return {
+        return buildCloudStatusSummary(common, {
             backupsEnabled: false,
             configured: false,
             connected: false,
-            encryptionLocked:
-                common.localEncryptionMode === "passphrase" &&
-                !common.localEncryptionKey,
             encryptionMode: common.localEncryptionMode,
-            lastBackupAt: common.lastBackupAt,
-            ...buildLastErrorSpread(common.lastError),
-            lastSyncAt: common.lastSyncAt,
             provider: "filesystem",
             providerDetails: {
                 baseDirectory,
                 kind: "filesystem",
             },
-            syncEnabled: common.syncEnabled,
-        };
+        });
     }
 
     const provider = new FilesystemCloudStorageProvider({ baseDirectory });
@@ -191,25 +220,17 @@ export async function buildFilesystemStatus(args: {
         ? await deps.getEffectiveEncryptionMode(provider)
         : common.localEncryptionMode;
 
-    const encryptionLocked =
-        encryptionMode === "passphrase" && !common.localEncryptionKey;
-
-    return {
+    return buildCloudStatusSummary(common, {
         backupsEnabled: connected,
         configured: true,
         connected,
-        encryptionLocked,
         encryptionMode,
-        lastBackupAt: common.lastBackupAt,
-        ...buildLastErrorSpread(common.lastError),
-        lastSyncAt: common.lastSyncAt,
         provider: "filesystem",
         providerDetails: {
             baseDirectory,
             kind: "filesystem",
         },
-        syncEnabled: common.syncEnabled,
-    };
+    });
 }
 
 /**
@@ -218,20 +239,13 @@ export async function buildFilesystemStatus(args: {
 export function buildUnconfiguredStatus(
     common: CloudStatusCommonArgs
 ): CloudStatusSummary {
-    return {
+    return buildCloudStatusSummary(common, {
         backupsEnabled: false,
         configured: false,
         connected: false,
-        encryptionLocked:
-            common.localEncryptionMode === "passphrase" &&
-            !common.localEncryptionKey,
         encryptionMode: common.localEncryptionMode,
-        lastBackupAt: common.lastBackupAt,
-        ...buildLastErrorSpread(common.lastError),
-        lastSyncAt: common.lastSyncAt,
         provider: null,
-        syncEnabled: common.syncEnabled,
-    };
+    });
 }
 
 /**
@@ -241,18 +255,11 @@ export function buildUnconfiguredStatus(
 export function buildUnsupportedProviderStatus(
     common: CloudStatusCommonArgs
 ): CloudStatusSummary {
-    return {
+    return buildCloudStatusSummary(common, {
         backupsEnabled: false,
         configured: true,
         connected: false,
-        encryptionLocked:
-            common.localEncryptionMode === "passphrase" &&
-            !common.localEncryptionKey,
         encryptionMode: common.localEncryptionMode,
-        lastBackupAt: common.lastBackupAt,
-        ...buildLastErrorSpread(common.lastError),
-        lastSyncAt: common.lastSyncAt,
         provider: null,
-        syncEnabled: common.syncEnabled,
-    };
+    });
 }

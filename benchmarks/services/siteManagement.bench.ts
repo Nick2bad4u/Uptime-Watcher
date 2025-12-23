@@ -221,7 +221,8 @@ class MockSiteRepository {
 
             if (filter.tags && filter.tags.length > 0) {
                 const hasTag = filter.tags.some((tag) =>
-                    site.tags.includes(tag));
+                    site.tags.includes(tag)
+                );
                 if (!hasTag) return false;
             }
 
@@ -231,7 +232,8 @@ class MockSiteRepository {
                     site.name.toLowerCase().includes(searchLower) ||
                     site.url.toLowerCase().includes(searchLower) ||
                     site.tags.some((tag) =>
-                        tag.toLowerCase().includes(searchLower));
+                        tag.toLowerCase().includes(searchLower)
+                    );
                 if (!matchesSearch) return false;
             }
 
@@ -739,15 +741,15 @@ describe("Site Management Service Performance", () => {
         () => {
             service = new MockSiteManagementService();
             const sites = createBulkSites(30);
-            Promise.all(sites.map((site) => service.createSite(site))).then((
-                createdSites
-            ) => {
-                const updates = createdSites.slice(0, 10).map((site) => ({
-                    id: site.id,
-                    data: { isActive: false, tags: ["bulk-updated"] },
-                }));
-                service.bulkUpdateSites(updates);
-            });
+            Promise.all(sites.map((site) => service.createSite(site))).then(
+                (createdSites) => {
+                    const updates = createdSites.slice(0, 10).map((site) => ({
+                        id: site.id,
+                        data: { isActive: false, tags: ["bulk-updated"] },
+                    }));
+                    service.bulkUpdateSites(updates);
+                }
+            );
         },
         { warmupIterations: 5, iterations: 200 }
     );
@@ -757,17 +759,19 @@ describe("Site Management Service Performance", () => {
         () => {
             service = new MockSiteManagementService();
             const sites = createBulkSites(40);
-            Promise.all(sites.map((site) => service.createSite(site))).then((
-                createdSites
-            ) => {
-                // Update some sites to online status
-                const statusUpdates = createdSites
-                    .slice(0, 20)
-                    .map((site) => service.updateSiteStatus(site.id, "online"));
-                Promise.all(statusUpdates).then(() => {
-                    service.getSitesByStatus("online");
-                });
-            });
+            Promise.all(sites.map((site) => service.createSite(site))).then(
+                (createdSites) => {
+                    // Update some sites to online status
+                    const statusUpdates = createdSites
+                        .slice(0, 20)
+                        .map((site) =>
+                            service.updateSiteStatus(site.id, "online")
+                        );
+                    Promise.all(statusUpdates).then(() => {
+                        service.getSitesByStatus("online");
+                    });
+                }
+            );
         },
         { warmupIterations: 5, iterations: 400 }
     );

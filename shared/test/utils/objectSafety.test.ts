@@ -55,7 +55,8 @@ describe("shared/utils/objectSafety Function Coverage Validation", () => {
                 objectSafetyModule.safeObjectIteration(
                     null,
                     (k, v) => `${k}:${v}`
-                )).not.toThrowError();
+                )
+            ).not.toThrowError();
 
             // Test safeObjectOmit function
             const omitResult = objectSafetyModule.safeObjectOmit(testObj, [
@@ -151,12 +152,12 @@ describe("shared/utils/objectSafety Function Coverage Validation", () => {
 
                         // Should not throw
                         expect(() => {
-                            objectSafetyModule.safeObjectIteration(obj, (
-                                key,
-                                value
-                            ) => {
-                                collected.push([key, value]);
-                            });
+                            objectSafetyModule.safeObjectIteration(
+                                obj,
+                                (key, value) => {
+                                    collected.push([key, value]);
+                                }
+                            );
                         }).not.toThrowError();
 
                         // Should collect all enumerable string keys
@@ -182,12 +183,12 @@ describe("shared/utils/objectSafety Function Coverage Validation", () => {
 
                         // Should not throw, but also should not iterate
                         expect(() => {
-                            objectSafetyModule.safeObjectIteration(nonObject, (
-                                key,
-                                value
-                            ) => {
-                                collected.push([key, value]);
-                            });
+                            objectSafetyModule.safeObjectIteration(
+                                nonObject,
+                                (key, value) => {
+                                    collected.push([key, value]);
+                                }
+                            );
                         }).not.toThrowError();
 
                         expect(collected).toHaveLength(0);

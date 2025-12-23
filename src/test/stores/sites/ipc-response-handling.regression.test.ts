@@ -95,7 +95,8 @@ vi.mock("../../../services/logger", () => ({
 // Mock error handling utilities
 vi.mock("../../../../shared/utils/errorHandling", () => ({
     ensureError: vi.fn((error) =>
-        error instanceof Error ? error : new Error(String(error))),
+        error instanceof Error ? error : new Error(String(error))
+    ),
 }));
 
 // Mock DataService to prevent actual backend calls

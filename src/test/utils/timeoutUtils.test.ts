@@ -792,11 +792,12 @@ describe("Timeout Utilities", () => {
                     min: TIMEOUT_CONSTRAINTS_MS.MIN,
                     max: TIMEOUT_CONSTRAINTS_MS.MAX,
                 }),
-            ])("should return true for all values within valid range", (
-                timeoutMs
-            ) => {
-                expect(isValidTimeoutMs(timeoutMs)).toBeTruthy();
-            });
+            ])(
+                "should return true for all values within valid range",
+                (timeoutMs) => {
+                    expect(isValidTimeoutMs(timeoutMs)).toBeTruthy();
+                }
+            );
 
             test.prop([fc.integer({ max: TIMEOUT_CONSTRAINTS_MS.MIN - 1 })])(
                 "should return false for values below minimum",
@@ -832,11 +833,12 @@ describe("Timeout Utilities", () => {
                     min: TIMEOUT_CONSTRAINTS.MIN,
                     max: TIMEOUT_CONSTRAINTS.MAX,
                 }),
-            ])("should return true for all values within valid range", (
-                timeoutSeconds
-            ) => {
-                expect(isValidTimeoutSeconds(timeoutSeconds)).toBeTruthy();
-            });
+            ])(
+                "should return true for all values within valid range",
+                (timeoutSeconds) => {
+                    expect(isValidTimeoutSeconds(timeoutSeconds)).toBeTruthy();
+                }
+            );
 
             test.prop([
                 fc.float({
@@ -844,11 +846,12 @@ describe("Timeout Utilities", () => {
                     max: Math.fround(TIMEOUT_CONSTRAINTS.MAX),
                     noNaN: true,
                 }),
-            ])("should handle fractional seconds within range", (
-                timeoutSeconds
-            ) => {
-                expect(isValidTimeoutSeconds(timeoutSeconds)).toBeTruthy();
-            });
+            ])(
+                "should handle fractional seconds within range",
+                (timeoutSeconds) => {
+                    expect(isValidTimeoutSeconds(timeoutSeconds)).toBeTruthy();
+                }
+            );
 
             test.prop([
                 fc.oneof(
@@ -857,11 +860,12 @@ describe("Timeout Utilities", () => {
                         max: Math.fround(TIMEOUT_CONSTRAINTS.MIN - 0.1),
                     })
                 ),
-            ])("should return false for values below minimum", (
-                timeoutSeconds
-            ) => {
-                expect(isValidTimeoutSeconds(timeoutSeconds)).toBeFalsy();
-            });
+            ])(
+                "should return false for values below minimum",
+                (timeoutSeconds) => {
+                    expect(isValidTimeoutSeconds(timeoutSeconds)).toBeFalsy();
+                }
+            );
 
             test.prop([
                 fc.oneof(
@@ -870,11 +874,12 @@ describe("Timeout Utilities", () => {
                         min: Math.fround(TIMEOUT_CONSTRAINTS.MAX + 0.1),
                     })
                 ),
-            ])("should return false for values above maximum", (
-                timeoutSeconds
-            ) => {
-                expect(isValidTimeoutSeconds(timeoutSeconds)).toBeFalsy();
-            });
+            ])(
+                "should return false for values above maximum",
+                (timeoutSeconds) => {
+                    expect(isValidTimeoutSeconds(timeoutSeconds)).toBeFalsy();
+                }
+            );
         });
 
         describe("getTimeoutSeconds property tests", () => {
@@ -928,41 +933,44 @@ describe("Timeout Utilities", () => {
                     min: TIMEOUT_CONSTRAINTS_MS.MIN,
                     max: TIMEOUT_CONSTRAINTS_MS.MAX,
                 }),
-            ])("valid ms values should remain valid after clamping", (
-                validMs
-            ) => {
-                const clamped = clampTimeoutMs(validMs);
+            ])(
+                "valid ms values should remain valid after clamping",
+                (validMs) => {
+                    const clamped = clampTimeoutMs(validMs);
 
-                // Property: Valid inputs should be unchanged by clamping
-                expect(clamped).toBe(validMs);
-                expect(isValidTimeoutMs(clamped)).toBeTruthy();
-            });
+                    // Property: Valid inputs should be unchanged by clamping
+                    expect(clamped).toBe(validMs);
+                    expect(isValidTimeoutMs(clamped)).toBeTruthy();
+                }
+            );
 
             test.prop([
                 fc.integer({
                     min: TIMEOUT_CONSTRAINTS.MIN,
                     max: TIMEOUT_CONSTRAINTS.MAX,
                 }),
-            ])("valid second values should remain valid after clamping", (
-                validSeconds
-            ) => {
-                const clamped = clampTimeoutSeconds(validSeconds);
+            ])(
+                "valid second values should remain valid after clamping",
+                (validSeconds) => {
+                    const clamped = clampTimeoutSeconds(validSeconds);
 
-                // Property: Valid inputs should be unchanged by clamping
-                expect(clamped).toBe(validSeconds);
-                expect(isValidTimeoutSeconds(clamped)).toBeTruthy();
-            });
+                    // Property: Valid inputs should be unchanged by clamping
+                    expect(clamped).toBe(validSeconds);
+                    expect(isValidTimeoutSeconds(clamped)).toBeTruthy();
+                }
+            );
 
-            test.prop([fc.integer()])("clamped values should always be valid", (
-                input
-            ) => {
-                const clampedMs = clampTimeoutMs(input);
-                const clampedSeconds = clampTimeoutSeconds(input);
+            test.prop([fc.integer()])(
+                "clamped values should always be valid",
+                (input) => {
+                    const clampedMs = clampTimeoutMs(input);
+                    const clampedSeconds = clampTimeoutSeconds(input);
 
-                // Property: Clamping should always produce valid values
-                expect(isValidTimeoutMs(clampedMs)).toBeTruthy();
-                expect(isValidTimeoutSeconds(clampedSeconds)).toBeTruthy();
-            });
+                    // Property: Clamping should always produce valid values
+                    expect(isValidTimeoutMs(clampedMs)).toBeTruthy();
+                    expect(isValidTimeoutSeconds(clampedSeconds)).toBeTruthy();
+                }
+            );
         });
     });
 });

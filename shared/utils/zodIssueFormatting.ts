@@ -23,8 +23,8 @@ export interface ZodIssueLike {
      * Path segments pointing to the offending value.
      *
      * @remarks
-     * This is optional to allow callers to reuse the formatter with
-     * "Zod-like" issue objects that only provide a message.
+     * This is optional to allow callers to reuse the formatter with "Zod-like"
+     * issue objects that only provide a message.
      */
     path?: readonly ZodIssuePathPart[];
 }

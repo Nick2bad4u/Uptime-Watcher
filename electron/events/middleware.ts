@@ -11,6 +11,7 @@
 
 import { isDevelopment } from "@shared/utils/environment";
 import { ensureError } from "@shared/utils/errorHandling";
+import { collectOwnPropertyValuesSafely } from "@shared/utils/objectIntrospection";
 
 import type { EventKey, EventMiddleware, TypedEventMap } from "./TypedEventBus";
 
@@ -31,22 +32,7 @@ type CloneableValue = object;
 const isCloneableValue = (value: unknown): value is CloneableValue =>
     typeof value === "object" && value !== null;
 
-const collectCloneableEntries = (value: CloneableValue): readonly unknown[] => {
-    if (Array.isArray(value)) {
-        return value;
-    }
-
-    const values: unknown[] = [];
-    for (const key of Reflect.ownKeys(value)) {
-        try {
-            values.push(Reflect.get(value, key));
-        } catch {
-            values.push(undefined);
-        }
-    }
-
-    return values;
-};
+const collectCloneableEntries = collectOwnPropertyValuesSafely;
 
 const hasCircularReference = (
     value: CloneableValue,

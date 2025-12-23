@@ -374,7 +374,8 @@ describe("abortUtils.ts - Comprehensive Fast-Check Tests", () => {
                                 setTimeout(
                                     () => resolve(result),
                                     operationDelay
-                                ));
+                                )
+                            );
 
                             const promise = raceWithAbort(
                                 operation,
@@ -404,7 +405,8 @@ describe("abortUtils.ts - Comprehensive Fast-Check Tests", () => {
                                 setTimeout(
                                     () => resolve("success"),
                                     operationDelay
-                                ));
+                                )
+                            );
 
                             const promise = raceWithAbort(
                                 operation,
@@ -432,7 +434,8 @@ describe("abortUtils.ts - Comprehensive Fast-Check Tests", () => {
                             controller.abort(reason);
 
                             const operation = new Promise((resolve) =>
-                                setTimeout(() => resolve("success"), 1000));
+                                setTimeout(() => resolve("success"), 1000)
+                            );
 
                             await expect(
                                 raceWithAbort(operation, controller.signal)
@@ -508,15 +511,16 @@ describe("abortUtils.ts - Comprehensive Fast-Check Tests", () => {
 
         it("should handle null/undefined options properly", () => {
             fc.assert(
-                fc.property(fc.oneof(fc.constant(undefined), fc.record({})), (
-                    options
-                ) => {
-                    expect(() => {
-                        createCombinedAbortSignal(
-                            options as CombineSignalsOptions | undefined
-                        );
-                    }).not.toThrowError();
-                })
+                fc.property(
+                    fc.oneof(fc.constant(undefined), fc.record({})),
+                    (options) => {
+                        expect(() => {
+                            createCombinedAbortSignal(
+                                options as CombineSignalsOptions | undefined
+                            );
+                        }).not.toThrowError();
+                    }
+                )
             );
         });
 

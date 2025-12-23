@@ -176,5 +176,4 @@ describe("MonitorTypeRegistry runtime coverage", () => {
 
         expect(remaining.size).toBe(0);
     });
-
 });

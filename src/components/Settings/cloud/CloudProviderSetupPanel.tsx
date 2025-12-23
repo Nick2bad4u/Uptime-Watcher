@@ -146,7 +146,9 @@ function buildDisconnectProviderFirstMessage(args: {
     return `Disconnect ${activeLabel} before setting up ${targetLabel}.`;
 }
 
-function buildProviderSwitchLockedMessage(activeProvider: CloudProviderTabKey): string {
+function buildProviderSwitchLockedMessage(
+    activeProvider: CloudProviderTabKey
+): string {
     const activeLabel = resolveCloudProviderTabLabel(activeProvider);
     return `Provider switching is locked while ${activeLabel} is configured. Disconnect to switch providers.`;
 }
@@ -272,9 +274,7 @@ function resolveProviderTabStateClass(args: {
         return "opacity-70";
     }
 
-    return args.isLocked
-        ? "opacity-70 cursor-not-allowed"
-        : "hover:opacity-95";
+    return args.isLocked ? "opacity-70 cursor-not-allowed" : "hover:opacity-95";
 }
 
 function resolveProviderTabTitle(args: {
@@ -325,7 +325,11 @@ const ProviderTabList = ({
 
             onSelect(match.key);
         },
-        [lockedKey, onAttemptLockedSelect, onSelect]
+        [
+            lockedKey,
+            onAttemptLockedSelect,
+            onSelect,
+        ]
     );
 
     const handleKeyDown = useCallback(
@@ -376,7 +380,12 @@ const ProviderTabList = ({
                 buttonByKeyRef.current.get(nextKey)?.focus();
             });
         },
-        [lockedKey, onAttemptLockedSelect, onSelect, selectedKey]
+        [
+            lockedKey,
+            onAttemptLockedSelect,
+            onSelect,
+            selectedKey,
+        ]
     );
 
     const handleButtonRef = useCallback((element: HTMLButtonElement | null) => {
@@ -552,8 +561,8 @@ function renderOAuthProviderPanel(args: {
 
             {args.connected ? (
                 <ThemedText className="mt-2" size="xs" variant="tertiary">
-                    Connected. To switch accounts or providers, disconnect
-                    above and connect again.
+                    Connected. To switch accounts or providers, disconnect above
+                    and connect again.
                 </ThemedText>
             ) : null}
 
@@ -561,7 +570,9 @@ function renderOAuthProviderPanel(args: {
                 <div className="mt-3 flex flex-wrap gap-2">
                     <ThemedButton
                         aria-disabled={ariaDisabled}
-                        className={isSoftDisabled ? "themed-button--loading" : ""}
+                        className={
+                            isSoftDisabled ? "themed-button--loading" : ""
+                        }
                         disabled={args.isConnecting}
                         onClick={handleConnectClick}
                         size="sm"
@@ -590,10 +601,9 @@ function renderFilesystemProviderPanel(args: {
 }): JSX.Element {
     const handleFilesystemBaseDirectoryChange =
         args.onFilesystemBaseDirectoryChange;
-    const handleConfigureFilesystemProviderClick =
-        args.providerSetupLocked
-            ? args.onAttemptLockedAction
-            : args.onConfigureFilesystemProviderClick;
+    const handleConfigureFilesystemProviderClick = args.providerSetupLocked
+        ? args.onAttemptLockedAction
+        : args.onConfigureFilesystemProviderClick;
 
     const isSoftDisabled = args.providerSetupLocked;
     const ariaDisabled =
@@ -624,8 +634,8 @@ function renderFilesystemProviderPanel(args: {
 
             {args.connected ? (
                 <ThemedText className="mt-2" size="xs" variant="tertiary">
-                    To use a different folder, clear configuration above and
-                    set it again.
+                    To use a different folder, clear configuration above and set
+                    it again.
                 </ThemedText>
             ) : null}
 
@@ -642,7 +652,9 @@ function renderFilesystemProviderPanel(args: {
                     </div>
                     <ThemedButton
                         aria-disabled={ariaDisabled}
-                        className={isSoftDisabled ? "themed-button--loading" : ""}
+                        className={
+                            isSoftDisabled ? "themed-button--loading" : ""
+                        }
                         disabled={
                             args.isConfiguringFilesystemProvider ||
                             args.filesystemBaseDirectory.trim().length === 0
@@ -838,11 +850,12 @@ export const CloudProviderSetupPanel = ({
     const filesystemConfiguredBaseDirectory =
         resolveFilesystemConfiguredBaseDirectory(status);
 
-    const handleFilesystemDirectoryChange = useCallback((
-        event: ChangeEvent<HTMLInputElement>
-    ): void => {
-        setFilesystemBaseDirectory(event.target.value);
-    }, []);
+    const handleFilesystemDirectoryChange = useCallback(
+        (event: ChangeEvent<HTMLInputElement>): void => {
+            setFilesystemBaseDirectory(event.target.value);
+        },
+        []
+    );
 
     const handleConfigureFilesystemProviderClick = useCallback((): void => {
         const trimmed = filesystemBaseDirectory.trim();
@@ -854,12 +867,13 @@ export const CloudProviderSetupPanel = ({
         setFilesystemBaseDirectory("");
     }, [filesystemBaseDirectory, onConfigureFilesystemProvider]);
 
-    const handleProviderTabSelect = useCallback((
-        key: CloudProviderTabKey
-    ): void => {
-        setLockedProviderAttemptTab(null);
-        setUserSelectedProviderTab(key);
-    }, []);
+    const handleProviderTabSelect = useCallback(
+        (key: CloudProviderTabKey): void => {
+            setLockedProviderAttemptTab(null);
+            setUserSelectedProviderTab(key);
+        },
+        []
+    );
 
     const lockedProviderAttemptMessage =
         lockedProviderTab && lockedProviderAttemptTab

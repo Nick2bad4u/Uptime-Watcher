@@ -177,7 +177,8 @@ describe("DatabaseService Coverage Tests", () => {
             const instance = DatabaseService.getInstance();
             await instance.executeTransaction(() =>
                 // Mock transaction operation
-                Promise.resolve("success"));
+                Promise.resolve("success")
+            );
             expect(true).toBeTruthy();
         } catch (error) {
             // Transaction might fail in test environment
@@ -354,11 +355,13 @@ describe("DatabaseService Coverage Tests", () => {
                             } else if (errorOnConnect) {
                                 // Error scenarios
                                 expect(() =>
-                                    instance.getDatabase()).toThrowError();
+                                    instance.getDatabase()
+                                ).toThrowError();
                             } else if (!initialized) {
                                 // Uninitialized state
                                 expect(() =>
-                                    instance.getDatabase()).toThrowError();
+                                    instance.getDatabase()
+                                ).toThrowError();
                             }
                         } catch (error) {
                             expect(error).toBeInstanceOf(Error);

@@ -49,7 +49,8 @@ const remarkRequireSnippets = (options = {}) => {
         );
 
         const entry = entries.find((candidate) =>
-            normalized.endsWith(normalizePath(candidate.pattern)));
+            normalized.endsWith(normalizePath(candidate.pattern))
+        );
 
         if (!entry) {
             return;

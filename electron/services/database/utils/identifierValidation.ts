@@ -28,8 +28,7 @@ export function isValidSiteIdentifier(identifier: string): boolean {
 }
 
 /**
- * Returns whether a monitor identifier is acceptable for repository
- * operations.
+ * Returns whether a monitor identifier is acceptable for repository operations.
  */
 export function isValidMonitorId(monitorId: string): boolean {
     return monitorId.trim().length > 0 && !hasAsciiControlCharacters(monitorId);
@@ -51,7 +50,9 @@ export function assertValidSiteIdentifier(
     }
 
     if (identifier.length > SITE_IDENTIFIER_MAX_LENGTH) {
-        throw new RangeError(`[${context}] ${SITE_IDENTIFIER_TOO_LONG_MESSAGE}`);
+        throw new RangeError(
+            `[${context}] ${SITE_IDENTIFIER_TOO_LONG_MESSAGE}`
+        );
     }
 
     if (hasAsciiControlCharacters(identifier)) {

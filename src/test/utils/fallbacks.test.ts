@@ -64,7 +64,8 @@ vi.mock("../../services/logger", () => ({
 // Mock the error handling utilities
 vi.mock("@shared/utils/errorHandling", () => ({
     ensureError: vi.fn((error) =>
-        error instanceof Error ? error : new Error(String(error))),
+        error instanceof Error ? error : new Error(String(error))
+    ),
     withUtilityErrorHandling: vi.fn((operation) => operation()),
 }));
 
@@ -563,25 +564,25 @@ describe("Fallback Utilities", () => {
             test.prop([
                 fc.string().filter((s) => s.trim().length > 0),
                 fc.anything(),
-            ])("should return fallback value when operation throws", async (
-                operationName,
-                fallbackValue
-            ) => {
-                const logger = await import("../../services/logger");
-                const operation = vi.fn().mockImplementation(() => {
-                    throw new Error("Test error");
-                });
+            ])(
+                "should return fallback value when operation throws",
+                async (operationName, fallbackValue) => {
+                    const logger = await import("../../services/logger");
+                    const operation = vi.fn().mockImplementation(() => {
+                        throw new Error("Test error");
+                    });
 
-                const result = withSyncErrorHandling(
-                    operation,
-                    operationName,
-                    fallbackValue
-                );
+                    const result = withSyncErrorHandling(
+                        operation,
+                        operationName,
+                        fallbackValue
+                    );
 
-                expect(result).toBe(fallbackValue);
-                expect(operation).toHaveBeenCalledTimes(1);
-                expect(logger.logger.error).toHaveBeenCalled();
-            });
+                    expect(result).toBe(fallbackValue);
+                    expect(operation).toHaveBeenCalledTimes(1);
+                    expect(logger.logger.error).toHaveBeenCalled();
+                }
+            );
 
             test.prop([
                 fc.oneof(
@@ -591,24 +592,24 @@ describe("Fallback Utilities", () => {
                     fc.constant({})
                 ),
                 fc.anything(),
-            ])("should handle operations throwing various error types", async (
-                errorToThrow,
-                fallbackValue
-            ) => {
-                const logger = await import("../../services/logger");
-                const operation = vi.fn().mockImplementation(() => {
-                    throw errorToThrow;
-                });
+            ])(
+                "should handle operations throwing various error types",
+                async (errorToThrow, fallbackValue) => {
+                    const logger = await import("../../services/logger");
+                    const operation = vi.fn().mockImplementation(() => {
+                        throw errorToThrow;
+                    });
 
-                const result = withSyncErrorHandling(
-                    operation,
-                    "test operation",
-                    fallbackValue
-                );
+                    const result = withSyncErrorHandling(
+                        operation,
+                        "test operation",
+                        fallbackValue
+                    );
 
-                expect(result).toBe(fallbackValue);
-                expect(logger.logger.error).toHaveBeenCalled();
-            });
+                    expect(result).toBe(fallbackValue);
+                    expect(logger.logger.error).toHaveBeenCalled();
+                }
+            );
         });
     });
 
@@ -684,22 +685,22 @@ describe("Fallback Utilities", () => {
             test.prop([
                 fc.oneof(fc.constant(null), fc.constant(undefined)),
                 fc.anything(),
-            ])("should always return fallback for null or undefined values", (
-                nullOrUndef,
-                fallback
-            ) => {
-                expect(withFallback(nullOrUndef, fallback)).toBe(fallback);
-            });
+            ])(
+                "should always return fallback for null or undefined values",
+                (nullOrUndef, fallback) => {
+                    expect(withFallback(nullOrUndef, fallback)).toBe(fallback);
+                }
+            );
 
             test.prop([
                 fc.anything().filter((v) => v !== null && v !== undefined),
                 fc.anything(),
-            ])("should return original value when not null or undefined", (
-                value,
-                fallback
-            ) => {
-                expect(withFallback(value, fallback)).toBe(value);
-            });
+            ])(
+                "should return original value when not null or undefined",
+                (value, fallback) => {
+                    expect(withFallback(value, fallback)).toBe(value);
+                }
+            );
 
             test.prop([
                 fc.oneof(
@@ -713,14 +714,14 @@ describe("Fallback Utilities", () => {
                     fc.object()
                 ),
                 fc.anything(),
-            ])("should preserve falsy but defined values", (
-                falsyValue,
-                fallback
-            ) => {
-                // Skip null/undefined as they should use fallback
-                fc.pre(falsyValue !== null && falsyValue !== undefined);
-                expect(withFallback(falsyValue, fallback)).toBe(falsyValue);
-            });
+            ])(
+                "should preserve falsy but defined values",
+                (falsyValue, fallback) => {
+                    // Skip null/undefined as they should use fallback
+                    fc.pre(falsyValue !== null && falsyValue !== undefined);
+                    expect(withFallback(falsyValue, fallback)).toBe(falsyValue);
+                }
+            );
         });
     });
 
@@ -1242,38 +1243,47 @@ describe("Fallback Utilities", () => {
             test.prop([
                 createMonitorArbitrary("http"),
                 fc.string().filter((s) => s.trim().length > 0),
-            ])("should prefer URL over fallback for HTTP monitors with URL", (
-                monitor,
-                fallback
-            ) => {
-                fc.pre(Boolean(monitor.url));
-                const result = getMonitorDisplayIdentifier(monitor, fallback);
-                expect(result).toBe(monitor.url);
-            });
+            ])(
+                "should prefer URL over fallback for HTTP monitors with URL",
+                (monitor, fallback) => {
+                    fc.pre(Boolean(monitor.url));
+                    const result = getMonitorDisplayIdentifier(
+                        monitor,
+                        fallback
+                    );
+                    expect(result).toBe(monitor.url);
+                }
+            );
 
             test.prop([
                 createMonitorArbitrary("port"),
                 fc.string().filter((s) => s.trim().length > 0),
-            ])("should create host:port identifier for port monitors", (
-                monitor,
-                fallback
-            ) => {
-                fc.pre(Boolean(monitor.host) && Boolean(monitor.port));
-                const result = getMonitorDisplayIdentifier(monitor, fallback);
-                expect(result).toBe(`${monitor.host}:${monitor.port}`);
-            });
+            ])(
+                "should create host:port identifier for port monitors",
+                (monitor, fallback) => {
+                    fc.pre(Boolean(monitor.host) && Boolean(monitor.port));
+                    const result = getMonitorDisplayIdentifier(
+                        monitor,
+                        fallback
+                    );
+                    expect(result).toBe(`${monitor.host}:${monitor.port}`);
+                }
+            );
 
             test.prop([
                 createMonitorArbitrary("ping"),
                 fc.string().filter((s) => s.trim().length > 0),
-            ])("should use host for ping monitors with host", (
-                monitor,
-                fallback
-            ) => {
-                fc.pre(Boolean(monitor.host));
-                const result = getMonitorDisplayIdentifier(monitor, fallback);
-                expect(result).toBe(monitor.host);
-            });
+            ])(
+                "should use host for ping monitors with host",
+                (monitor, fallback) => {
+                    fc.pre(Boolean(monitor.host));
+                    const result = getMonitorDisplayIdentifier(
+                        monitor,
+                        fallback
+                    );
+                    expect(result).toBe(monitor.host);
+                }
+            );
 
             test.prop([
                 fc.record({
@@ -1537,12 +1547,15 @@ describe("Fallback Utilities", () => {
                     fc.constant(undefined),
                     fc.constant("")
                 ),
-            ])("should return default label for invalid inputs", (
-                invalidInput
-            ) => {
-                const result = getMonitorTypeDisplayLabel(invalidInput as any);
-                expect(result).toBe("Monitor Configuration");
-            });
+            ])(
+                "should return default label for invalid inputs",
+                (invalidInput) => {
+                    const result = getMonitorTypeDisplayLabel(
+                        invalidInput as any
+                    );
+                    expect(result).toBe("Monitor Configuration");
+                }
+            );
 
             test.prop([
                 fc
@@ -1778,17 +1791,17 @@ describe("Fallback Utilities", () => {
             test.prop([
                 fc.string().filter((s) => s.length > 0),
                 fc.integer({ min: 1, max: 20 }),
-            ])("should preserve start of string when truncating", (
-                text,
-                maxLength
-            ) => {
-                const result = truncateForLogging(text, maxLength);
-                if (text.length <= maxLength) {
-                    expect(result).toBe(text);
-                } else {
-                    expect(result).toBe(text.slice(0, maxLength));
+            ])(
+                "should preserve start of string when truncating",
+                (text, maxLength) => {
+                    const result = truncateForLogging(text, maxLength);
+                    if (text.length <= maxLength) {
+                        expect(result).toBe(text);
+                    } else {
+                        expect(result).toBe(text.slice(0, maxLength));
+                    }
                 }
-            });
+            );
 
             test.prop([fc.string()])(
                 "should return original string when shorter than default max",
@@ -1806,14 +1819,14 @@ describe("Fallback Utilities", () => {
             test.prop([
                 fc.string({ minLength: 100 }),
                 fc.integer({ min: 10, max: 50 }),
-            ])("should truncate long strings to specified length", (
-                longText,
-                maxLength
-            ) => {
-                const result = truncateForLogging(longText, maxLength);
-                expect(result).toHaveLength(maxLength);
-                expect(result).toBe(longText.slice(0, maxLength));
-            });
+            ])(
+                "should truncate long strings to specified length",
+                (longText, maxLength) => {
+                    const result = truncateForLogging(longText, maxLength);
+                    expect(result).toHaveLength(maxLength);
+                    expect(result).toBe(longText.slice(0, maxLength));
+                }
+            );
 
             test.prop([fc.integer({ min: 0, max: 10 })])(
                 "should handle zero and small maxLength values",

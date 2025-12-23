@@ -66,7 +66,8 @@ vi.mock("../../../stores/utils", () => ({
 vi.mock("../../../../shared/utils/errorHandling", () => ({
     withErrorHandling: vi.fn(),
     ensureError: vi.fn((error) =>
-        error instanceof Error ? error : new Error(String(error))),
+        error instanceof Error ? error : new Error(String(error))
+    ),
 }));
 
 // Import mocked modules to get references
@@ -113,34 +114,32 @@ describe("useSettingsStore Branch Coverage Tests", () => {
         mockElectronAPI.settings.getHistoryLimit.mockResolvedValue(1000);
         mockElectronAPI.settings.updateHistoryLimit.mockResolvedValue(1000);
 
-        mockSafeExtractIpcData.mockImplementation((
-            response: any,
-            fallback: any
-        ) => {
-            try {
-                return response?.data ?? fallback;
-            } catch {
-                return fallback;
+        mockSafeExtractIpcData.mockImplementation(
+            (response: any, fallback: any) => {
+                try {
+                    return response?.data ?? fallback;
+                } catch {
+                    return fallback;
+                }
             }
-        });
+        );
 
         // Setup withErrorHandling to execute function properly
-        mockWithErrorHandling.mockImplementation(async (
-            fn: any,
-            handlers: any
-        ) => {
-            try {
-                handlers?.setLoading?.(true);
-                handlers?.clearError?.();
-                return await fn();
-            } catch (error: unknown) {
-                handlers?.setLoading?.(false);
-                handlers?.setError?.(error);
-                throw error;
-            } finally {
-                handlers?.setLoading?.(false);
+        mockWithErrorHandling.mockImplementation(
+            async (fn: any, handlers: any) => {
+                try {
+                    handlers?.setLoading?.(true);
+                    handlers?.clearError?.();
+                    return await fn();
+                } catch (error: unknown) {
+                    handlers?.setLoading?.(false);
+                    handlers?.setError?.(error);
+                    throw error;
+                } finally {
+                    handlers?.setLoading?.(false);
+                }
             }
-        });
+        );
     });
 
     describe("syncSettingsAfterRehydration branches", () => {

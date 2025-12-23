@@ -815,23 +815,24 @@ describe("monitorTypeHelper", () => {
                     }),
                     { minLength: 0, maxLength: 3 }
                 ),
-            ])("should return cached monitor types when available", async (
-                cachedTypes
-            ) => {
-                // Setup cache to return data
-                vi.mocked(AppCaches.monitorTypes.get).mockReturnValueOnce(
-                    cachedTypes as any
-                );
-                vi.mocked(AppCaches.monitorTypes.set).mockImplementation(
-                    () => {}
-                );
+            ])(
+                "should return cached monitor types when available",
+                async (cachedTypes) => {
+                    // Setup cache to return data
+                    vi.mocked(AppCaches.monitorTypes.get).mockReturnValueOnce(
+                        cachedTypes as any
+                    );
+                    vi.mocked(AppCaches.monitorTypes.set).mockImplementation(
+                        () => {}
+                    );
 
-                const result = await getAvailableMonitorTypes();
+                    const result = await getAvailableMonitorTypes();
 
-                expect(result).toEqual(cachedTypes);
-                // Should not call set since we used cached data
-                expect(AppCaches.monitorTypes.set).not.toHaveBeenCalled();
-            });
+                    expect(result).toEqual(cachedTypes);
+                    // Should not call set since we used cached data
+                    expect(AppCaches.monitorTypes.set).not.toHaveBeenCalled();
+                }
+            );
         });
 
         describe("getMonitorTypeConfig property tests", () => {
@@ -855,27 +856,28 @@ describe("monitorTypeHelper", () => {
                     { minLength: 1, maxLength: 5 }
                 ),
                 fc.integer({ min: 0, max: 4 }),
-            ])("should find monitor type config when type exists", async (
-                mockTypes,
-                targetIndex
-            ) => {
-                const targetType = mockTypes[targetIndex % mockTypes.length];
-                if (!targetType) {
-                    throw new Error("Expected target type to be defined");
+            ])(
+                "should find monitor type config when type exists",
+                async (mockTypes, targetIndex) => {
+                    const targetType =
+                        mockTypes[targetIndex % mockTypes.length];
+                    if (!targetType) {
+                        throw new Error("Expected target type to be defined");
+                    }
+
+                    // Setup mocks to return the mock types
+                    vi.mocked(AppCaches.monitorTypes.get).mockReturnValueOnce(
+                        mockTypes as any
+                    );
+
+                    const result = await getMonitorTypeConfig(targetType.type);
+                    const firstMatch = mockTypes.find(
+                        (type) => type.type === targetType.type
+                    );
+
+                    expect(result).toEqual(firstMatch);
                 }
-
-                // Setup mocks to return the mock types
-                vi.mocked(AppCaches.monitorTypes.get).mockReturnValueOnce(
-                    mockTypes as any
-                );
-
-                const result = await getMonitorTypeConfig(targetType.type);
-                const firstMatch = mockTypes.find(
-                    (type) => type.type === targetType.type
-                );
-
-                expect(result).toEqual(firstMatch);
-            });
+            );
 
             test.prop([
                 fc.array(
@@ -899,25 +901,25 @@ describe("monitorTypeHelper", () => {
                 fc
                     .string({ minLength: 1, maxLength: 30 })
                     .filter((_type) => true), // We'll filter in the test
-            ])("should return undefined when monitor type not found", async (
-                mockTypes,
-                searchType
-            ) => {
-                // Ensure searchType doesn't match any existing type
-                const usedTypes = new Set(mockTypes.map((t) => t.type));
-                if (usedTypes.has(searchType)) {
-                    return; // Skip this test case
+            ])(
+                "should return undefined when monitor type not found",
+                async (mockTypes, searchType) => {
+                    // Ensure searchType doesn't match any existing type
+                    const usedTypes = new Set(mockTypes.map((t) => t.type));
+                    if (usedTypes.has(searchType)) {
+                        return; // Skip this test case
+                    }
+
+                    // Setup mocks to return the mock types
+                    vi.mocked(AppCaches.monitorTypes.get).mockReturnValueOnce(
+                        mockTypes as any
+                    );
+
+                    const result = await getMonitorTypeConfig(searchType);
+
+                    expect(result).toBeUndefined();
                 }
-
-                // Setup mocks to return the mock types
-                vi.mocked(AppCaches.monitorTypes.get).mockReturnValueOnce(
-                    mockTypes as any
-                );
-
-                const result = await getMonitorTypeConfig(searchType);
-
-                expect(result).toBeUndefined();
-            });
+            );
         });
 
         describe("getMonitorTypeOptions property tests", () => {
@@ -940,28 +942,29 @@ describe("monitorTypeHelper", () => {
                     }),
                     { minLength: 1, maxLength: 5 }
                 ),
-            ])("should transform monitor types to option format", async (
-                mockTypes
-            ) => {
-                // Setup mocks to return the mock types
-                vi.mocked(AppCaches.monitorTypes.get).mockReturnValueOnce(
-                    mockTypes as any
-                );
+            ])(
+                "should transform monitor types to option format",
+                async (mockTypes) => {
+                    // Setup mocks to return the mock types
+                    vi.mocked(AppCaches.monitorTypes.get).mockReturnValueOnce(
+                        mockTypes as any
+                    );
 
-                const result = await getMonitorTypeOptions();
+                    const result = await getMonitorTypeOptions();
 
-                expect(result).toHaveLength(mockTypes.length);
-                for (const [index, option] of result.entries()) {
-                    const mockType = mockTypes[index];
-                    if (!mockType) {
-                        throw new Error(
-                            `Expected mockType at index ${index} to be defined`
-                        );
+                    expect(result).toHaveLength(mockTypes.length);
+                    for (const [index, option] of result.entries()) {
+                        const mockType = mockTypes[index];
+                        if (!mockType) {
+                            throw new Error(
+                                `Expected mockType at index ${index} to be defined`
+                            );
+                        }
+                        expect(option.label).toBe(mockType.displayName);
+                        expect(option.value).toBe(mockType.type);
                     }
-                    expect(option.label).toBe(mockType.displayName);
-                    expect(option.value).toBe(mockType.type);
                 }
-            });
+            );
 
             test.prop([fc.constantFrom(0, 1, 2, 3)])(
                 "should return empty array when no monitor types available",

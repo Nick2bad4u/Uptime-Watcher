@@ -35,11 +35,12 @@ describe("jsonSafety property tests", () => {
             expect(decoded).toEqual(normalizedSample);
         });
 
-        test.prop([fc.anything()])("never throws for arbitrary values", (
-            sample
-        ) => {
-            expect(() => stringifyUnsafe(sample)).not.toThrowError();
-        });
+        test.prop([fc.anything()])(
+            "never throws for arbitrary values",
+            (sample) => {
+                expect(() => stringifyUnsafe(sample)).not.toThrowError();
+            }
+        );
 
         it("returns an error payload for unserializable inputs", () => {
             const result = safeJsonStringify(
@@ -144,15 +145,17 @@ describe("jsonSafety property tests", () => {
     });
 
     describe(safeJsonStringifyWithFallback, () => {
-        test.prop([fc.jsonValue(), fc.string()])("stringifies valid payloads", (
-            sample,
-            fallback
-        ) => {
-            const json = stringifyUnsafeWithFallback(sample, fallback);
-            const serializedSample = JSON.stringify(sample);
-            const normalizedSample = JSON.parse(serializedSample) as JsonValue;
-            expect(JSON.parse(json)).toEqual(normalizedSample);
-        });
+        test.prop([fc.jsonValue(), fc.string()])(
+            "stringifies valid payloads",
+            (sample, fallback) => {
+                const json = stringifyUnsafeWithFallback(sample, fallback);
+                const serializedSample = JSON.stringify(sample);
+                const normalizedSample = JSON.parse(
+                    serializedSample
+                ) as JsonValue;
+                expect(JSON.parse(json)).toEqual(normalizedSample);
+            }
+        );
 
         it("returns fallback for values JSON cannot serialize", () => {
             const fallback = '{"ok":false}';

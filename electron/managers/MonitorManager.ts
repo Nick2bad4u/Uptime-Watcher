@@ -335,10 +335,12 @@ export class MonitorManager {
             this.createEnhancedLifecycleConfig(),
             identifier,
             monitorId,
-            this.createMonitorActionDelegate(identifier, monitorId, (
-                recursiveId,
-                recursiveMonitorId
-            ) => this.startMonitoringForSite(recursiveId, recursiveMonitorId))
+            this.createMonitorActionDelegate(
+                identifier,
+                monitorId,
+                (recursiveId, recursiveMonitorId) =>
+                    this.startMonitoringForSite(recursiveId, recursiveMonitorId)
+            )
         );
 
         if (result) {
@@ -418,10 +420,12 @@ export class MonitorManager {
             this.createEnhancedLifecycleConfig(),
             identifier,
             monitorId,
-            this.createMonitorActionDelegate(identifier, monitorId, (
-                recursiveId,
-                recursiveMonitorId
-            ) => this.stopMonitoringForSite(recursiveId, recursiveMonitorId))
+            this.createMonitorActionDelegate(
+                identifier,
+                monitorId,
+                (recursiveId, recursiveMonitorId) =>
+                    this.stopMonitoringForSite(recursiveId, recursiveMonitorId)
+            )
         );
 
         if (result) {

@@ -195,13 +195,15 @@ describe("Application Constants", () => {
             await annotate("Type: Business Logic", "type");
 
             const lowercaseMonoFonts = FONT_FAMILY_MONO.map((f) =>
-                f.toLowerCase());
+                f.toLowerCase()
+            );
             expect(
                 lowercaseMonoFonts.some((f) => f.includes("mono"))
             ).toBeTruthy();
 
             const lowercaseSansFonts = FONT_FAMILY_SANS.map((f) =>
-                f.toLowerCase());
+                f.toLowerCase()
+            );
             expect(
                 lowercaseSansFonts.some(
                     (f) => f.includes("inter") || f.includes("system")
@@ -404,7 +406,8 @@ describe("Application Constants", () => {
             await annotate("Type: Configuration", "type");
 
             const unlimitedOption = HISTORY_LIMIT_OPTIONS.find((opt) =>
-                opt.label.toLowerCase().includes("unlimited"));
+                opt.label.toLowerCase().includes("unlimited")
+            );
             expect(unlimitedOption).toBeDefined();
             expect(unlimitedOption?.value).toBe(0);
         });

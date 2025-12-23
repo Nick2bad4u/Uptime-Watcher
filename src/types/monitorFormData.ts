@@ -791,8 +791,7 @@ export function isWebsocketKeepaliveFormData(
 /**
  * Registry of type-specific validation functions.
  *
- * @remarks
- * Non-exported helper powering {@link isValidMonitorFormData}. Extend this map
+    * When true, prefix each message with a rendered path (e.g. `foo.bar: ...`).
  * whenever a new monitor type is introduced.
  *
  * @internal

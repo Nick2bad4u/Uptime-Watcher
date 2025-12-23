@@ -179,7 +179,8 @@ describe("Chart Utils Property-Based Tests", () => {
                     minLength: 1,
                     maxLength: 3,
                 })
-                .map((parts) => `${base}.${parts.join(".")}`)),
+                .map((parts) => `${base}.${parts.join(".")}`)
+        ),
         // Invalid paths
         fc.oneof(
             fc.constant(""),

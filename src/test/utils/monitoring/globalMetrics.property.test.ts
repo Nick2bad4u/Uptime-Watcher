@@ -54,7 +54,8 @@ const monitorArbitrary: fc.Arbitrary<CompleteMonitor> =
             // not required because aggregation logic never relies on IDs.
             id: "monitor-property",
             ...overrides,
-        }));
+        })
+    );
 
 /**
  * Arbitrary producing complete site instances with up to five monitors each.
@@ -65,7 +66,8 @@ const siteArbitrary: fc.Arbitrary<CompleteSite> = fc
         createMockSite({
             identifier: "site-property",
             monitors,
-        }));
+        })
+    );
 
 describe("calculateGlobalMonitoringMetrics (property-based)", () => {
     test.prop([fc.array(siteArbitrary, { maxLength: 4 })])(

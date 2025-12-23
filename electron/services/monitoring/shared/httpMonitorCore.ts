@@ -177,7 +177,8 @@ export function createHttpMonitorService<
             };
 
             return rateLimiter.schedule(url, () =>
-                this.performCheckWithRetry(retryParams));
+                this.performCheckWithRetry(retryParams)
+            );
         }
 
         private async performCheckWithRetry(params: {
@@ -250,7 +251,12 @@ export function createHttpMonitorService<
                     `[${behavior.scope}] Checking URL: ${url} with timeout: ${timeout}ms`
                 );
             }
-            const response = await this.makeRequest(monitor, url, timeout, signal);
+            const response = await this.makeRequest(
+                monitor,
+                url,
+                timeout,
+                signal
+            );
             const responseTime = response.responseTime ?? 0;
 
             if (isDev()) {

@@ -114,7 +114,8 @@ describe("useDynamicHelpText Hook", () => {
             });
 
             const { result } = renderHook(() =>
-                useDynamicHelpText("http" as any));
+                useDynamicHelpText("http" as any)
+            );
 
             await waitFor(() => {
                 expect(result.current.isLoading).toBeFalsy();
@@ -160,7 +161,8 @@ describe("useDynamicHelpText Hook", () => {
             vi.mocked(getMonitorHelpTexts).mockRejectedValue("String error");
 
             const { result } = renderHook(() =>
-                useDynamicHelpText("port" as any));
+                useDynamicHelpText("port" as any)
+            );
 
             await waitFor(() => {
                 expect(result.current.isLoading).toBeFalsy();
@@ -318,7 +320,8 @@ describe("useDynamicHelpText Hook", () => {
             vi.mocked(getMonitorHelpTexts).mockReturnValue(pendingPromise);
 
             const { result, unmount } = renderHook(() =>
-                useDynamicHelpText("http"));
+                useDynamicHelpText("http")
+            );
 
             // Should be loading
             expect(result.current.isLoading).toBeTruthy();
@@ -394,29 +397,31 @@ describe("useDynamicHelpText Hook", () => {
     describe("Different monitor types", () => {
         const monitorTypes: MonitorType[] = ["http", "port"];
 
-        it.each(monitorTypes)("should handle %s monitor type", async (
-            monitorType
-        ) => {
-            const expectedHelp = {
-                primary: `${monitorType.toUpperCase()} primary help`,
-                secondary: `${monitorType.toUpperCase()} secondary help`,
-            };
-            vi.mocked(getMonitorHelpTexts).mockResolvedValue(expectedHelp);
+        it.each(monitorTypes)(
+            "should handle %s monitor type",
+            async (monitorType) => {
+                const expectedHelp = {
+                    primary: `${monitorType.toUpperCase()} primary help`,
+                    secondary: `${monitorType.toUpperCase()} secondary help`,
+                };
+                vi.mocked(getMonitorHelpTexts).mockResolvedValue(expectedHelp);
 
-            const { result } = renderHook(() =>
-                useDynamicHelpText(monitorType));
+                const { result } = renderHook(() =>
+                    useDynamicHelpText(monitorType)
+                );
 
-            await waitFor(() => {
-                expect(result.current.isLoading).toBeFalsy();
-            });
+                await waitFor(() => {
+                    expect(result.current.isLoading).toBeFalsy();
+                });
 
-            expect(result.current.primary).toBe(expectedHelp.primary);
-            expect(result.current.secondary).toBe(expectedHelp.secondary);
-            expect(vi.mocked(getMonitorHelpTexts)).toHaveBeenCalledWith(
-                monitorType,
-                expect.any(AbortSignal)
-            );
-        });
+                expect(result.current.primary).toBe(expectedHelp.primary);
+                expect(result.current.secondary).toBe(expectedHelp.secondary);
+                expect(vi.mocked(getMonitorHelpTexts)).toHaveBeenCalledWith(
+                    monitorType,
+                    expect.any(AbortSignal)
+                );
+            }
+        );
     });
 
     describe("State transitions", () => {

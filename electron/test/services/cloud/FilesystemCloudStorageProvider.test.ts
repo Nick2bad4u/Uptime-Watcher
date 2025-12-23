@@ -76,8 +76,8 @@ describe("FilesystemCloudStorageProvider", () => {
             overwrite: true,
         });
 
-        await expect(provider.downloadObject("sync/..foo/payload.txt")).resolves.toEqual(
-            Buffer.from("payload")
-        );
+        await expect(
+            provider.downloadObject("sync/..foo/payload.txt")
+        ).resolves.toEqual(Buffer.from("payload"));
     });
 });

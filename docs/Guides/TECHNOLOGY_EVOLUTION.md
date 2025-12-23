@@ -238,7 +238,8 @@ export const createSitesStateActions = (
   const updatedSite = await SiteService.updateSite(siteIdentifier, updates);
   set((state) => ({
    sites: state.sites.map((site) =>
-    site.identifier === siteIdentifier ? updatedSite : site),
+    site.identifier === siteIdentifier ? updatedSite : site
+   ),
   }));
  },
 });

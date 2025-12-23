@@ -222,17 +222,15 @@ vi.mock("../../../../utils/duration", () => ({
 }));
 
 vi.mock("../../../../utils/errorHandling", () => ({
-    withUtilityErrorHandling: vi.fn().mockImplementation(async (
-        fn,
-        _desc,
-        fallback
-    ) => {
-        try {
-            return await fn();
-        } catch {
-            return fallback;
-        }
-    }),
+    withUtilityErrorHandling: vi
+        .fn()
+        .mockImplementation(async (fn, _desc, fallback) => {
+            try {
+                return await fn();
+            } catch {
+                return fallback;
+            }
+        }),
 }));
 
 describe(SettingsTab, () => {

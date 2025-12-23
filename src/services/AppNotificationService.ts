@@ -60,20 +60,20 @@ interface AppNotificationServiceContract {
 export const AppNotificationService: AppNotificationServiceContract = {
     initialize: ensureInitialized,
 
-    notifyAppEvent: wrap("notifyAppEvent", async (
-        api,
-        request: AppNotificationRequest
-    ) => {
-        const validation = validateAppNotificationRequest(request);
-        if (!validation.success) {
-            const issues = validation.error.issues
-                .map(({ message }) => message)
-                .join(", ");
-            throw new Error(`Invalid app notification request: ${issues}`, {
-                cause: validation.error,
-            });
-        }
+    notifyAppEvent: wrap(
+        "notifyAppEvent",
+        async (api, request: AppNotificationRequest) => {
+            const validation = validateAppNotificationRequest(request);
+            if (!validation.success) {
+                const issues = validation.error.issues
+                    .map(({ message }) => message)
+                    .join(", ");
+                throw new Error(`Invalid app notification request: ${issues}`, {
+                    cause: validation.error,
+                });
+            }
 
-        await api.notifications.notifyAppEvent(validation.data);
-    }),
+            await api.notifications.notifyAppEvent(validation.data);
+        }
+    ),
 };

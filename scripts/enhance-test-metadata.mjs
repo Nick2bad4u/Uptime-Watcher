@@ -404,39 +404,34 @@ function processTestFile(filePath) {
             // Add metadata to test functions without parameters
             const testPattern =
                 /(?<temp3>it|test)\s*\(\s*["'`](?<temp2>[^"'`]+)["'`]\s*,\s*(?<temp1>async\s*)?\(\s*\)\s*=>\s*{/g;
-            newContent = newContent.replaceAll(testPattern, (
-                _match,
-                testType,
-                testName,
-                async
-            ) => {
-                // ✨ Use cached metadata generator
-                const metadata = getCachedMetadata(filePath, testName);
-                return `${testType}("${testName}", ${async || ""}({ task, annotate }) => {\n${metadata}\n`;
-            });
+            newContent = newContent.replaceAll(
+                testPattern,
+                (_match, testType, testName, async) => {
+                    // ✨ Use cached metadata generator
+                    const metadata = getCachedMetadata(filePath, testName);
+                    return `${testType}("${testName}", ${async || ""}({ task, annotate }) => {\n${metadata}\n`;
+                }
+            );
 
             // Add metadata to test functions with existing parameters
             const testWithParamsPattern =
                 /(?<temp4>it|test)\s*\(\s*["'`](?<temp3>[^"'`]+)["'`]\s*,\s*(?<temp2>async\s*)?\(\s*{(?<temp1>[^}]*)}\s*\)\s*=>\s*{/g;
-            newContent = newContent.replaceAll(testWithParamsPattern, (
-                _match,
-                testType,
-                testName,
-                async,
-                existingParams
-            ) => {
-                // Parse existing parameters and add task/annotate if not present
-                const params = existingParams
-                    .split(",")
-                    .map((/** @type {string} */ p) => p.trim())
-                    .filter(Boolean);
-                if (!params.includes("task")) params.push("task");
-                if (!params.includes("annotate")) params.push("annotate");
+            newContent = newContent.replaceAll(
+                testWithParamsPattern,
+                (_match, testType, testName, async, existingParams) => {
+                    // Parse existing parameters and add task/annotate if not present
+                    const params = existingParams
+                        .split(",")
+                        .map((/** @type {string} */ p) => p.trim())
+                        .filter(Boolean);
+                    if (!params.includes("task")) params.push("task");
+                    if (!params.includes("annotate")) params.push("annotate");
 
-                // ✨ Use cached metadata generator
-                const metadata = getCachedMetadata(filePath, testName);
-                return `${testType}("${testName}", ${async || ""}({ ${params.join(", ")} }) => {\n${metadata}\n`;
-            });
+                    // ✨ Use cached metadata generator
+                    const metadata = getCachedMetadata(filePath, testName);
+                    return `${testType}("${testName}", ${async || ""}({ ${params.join(", ")} }) => {\n${metadata}\n`;
+                }
+            );
 
             // Check if changes were made
             if (newContent !== content) {

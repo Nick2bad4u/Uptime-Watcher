@@ -1,9 +1,10 @@
+import type * as z from "zod";
+
 import { getElectronErrorCodeSuffix } from "@electron/services/shell/openExternalUtils";
 import { tryParseJsonRecord } from "@shared/utils/jsonSafety";
 import { isObject } from "@shared/utils/typeGuards";
 import axios from "axios";
 import { shell } from "electron";
-import * as z from "zod";
 
 import {
     createOAuthState,
@@ -11,14 +12,7 @@ import {
 } from "../../oauth/LoopbackOAuthServer";
 import { createPkcePair } from "../../oauth/pkce";
 import { validateOAuthAuthorizeUrl } from "../oauthAuthorizeUrl";
-
-const googleTokenResponseSchema = z.looseObject({
-    access_token: z.string().min(1),
-    expires_in: z.number().int().positive().optional(),
-    refresh_token: z.string().min(1).optional(),
-    scope: z.string().optional(),
-    token_type: z.string().optional(),
-});
+import { googleTokenResponseSchema } from "./googleDriveTokenSchemas";
 
 /**
  * Result of a successful Google Drive OAuth connect flow.

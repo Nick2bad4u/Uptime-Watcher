@@ -347,18 +347,17 @@ beforeAll(() => {
             }
         );
 
-        public readonly readAsText: FileReader["readAsText"] = vi.fn(async (
-            blob: Blob,
-            encoding = "utf8"
-        ) => {
-            this.readyState = MockFileReader.LOADING;
-            this.emitProgressEvent("loadstart");
-            const buffer = await blob.arrayBuffer();
-            this.result = new TextDecoder(encoding).decode(buffer);
-            this.readyState = MockFileReader.DONE;
-            this.emitProgressEvent("load");
-            this.emitProgressEvent("loadend");
-        });
+        public readonly readAsText: FileReader["readAsText"] = vi.fn(
+            async (blob: Blob, encoding = "utf8") => {
+                this.readyState = MockFileReader.LOADING;
+                this.emitProgressEvent("loadstart");
+                const buffer = await blob.arrayBuffer();
+                this.result = new TextDecoder(encoding).decode(buffer);
+                this.readyState = MockFileReader.DONE;
+                this.emitProgressEvent("load");
+                this.emitProgressEvent("loadend");
+            }
+        );
 
         private emitProgressEvent(
             type: "abort" | "load" | "loadend" | "loadstart"

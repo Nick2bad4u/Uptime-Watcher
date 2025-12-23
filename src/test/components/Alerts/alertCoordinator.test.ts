@@ -194,18 +194,18 @@ describe("alertCoordinator", () => {
             },
         }));
 
-        const existingAlerts = Array.from({ length: MAX_ALERT_QUEUE_LENGTH }, (
-            _,
-            index
-        ) => ({
-            id: `existing-${index}`,
-            monitorId: `monitor-${index}`,
-            monitorName: `Monitor ${index}`,
-            siteIdentifier: `site-${index}`,
-            siteName: `Site ${index}`,
-            status: STATUS_KIND.UP,
-            timestamp: Date.now(),
-        }));
+        const existingAlerts = Array.from(
+            { length: MAX_ALERT_QUEUE_LENGTH },
+            (_, index) => ({
+                id: `existing-${index}`,
+                monitorId: `monitor-${index}`,
+                monitorName: `Monitor ${index}`,
+                siteIdentifier: `site-${index}`,
+                siteName: `Site ${index}`,
+                status: STATUS_KIND.UP,
+                timestamp: Date.now(),
+            })
+        );
 
         useAlertStore.setState((state) => ({
             ...state,

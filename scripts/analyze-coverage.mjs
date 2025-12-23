@@ -160,7 +160,8 @@ for (const [filePath, data] of Object.entries(coverageData)) {
     // Calculate branch coverage
     const totalBranches = Object.keys(branches).length;
     const coveredBranches = Object.values(branches).filter((element) =>
-        isBranchCovered(element)).length;
+        isBranchCovered(element)
+    ).length;
     const branchCoverage =
         totalBranches > 0 ? (coveredBranches / totalBranches) * 100 : 100;
 

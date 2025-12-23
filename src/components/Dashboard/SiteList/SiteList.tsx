@@ -183,7 +183,8 @@ export const SiteList = (): JSX.Element => {
                                 presentation={cardPresentation}
                                 site={site}
                             />
-                        ))}
+                        )
+                    )}
                 </div>
             )}
         </div>

@@ -44,12 +44,13 @@ const mockHistoryRepositoryBase = {
     createTransactionAdapter: vi.fn(),
 };
 
-mockHistoryRepositoryBase.createTransactionAdapter.mockImplementation((
-    db: Database
-) => ({
-    pruneAllHistory: vi.fn((limit: number) =>
-        mockHistoryRepositoryBase.pruneAllHistoryInternal(db, limit)),
-}));
+mockHistoryRepositoryBase.createTransactionAdapter.mockImplementation(
+    (db: Database) => ({
+        pruneAllHistory: vi.fn((limit: number) =>
+            mockHistoryRepositoryBase.pruneAllHistoryInternal(db, limit)
+        ),
+    })
+);
 
 const mockHistoryRepository =
     mockHistoryRepositoryBase as unknown as HistoryRepository;
@@ -60,12 +61,13 @@ const mockSettingsRepositoryBase = {
     createTransactionAdapter: vi.fn(),
 };
 
-mockSettingsRepositoryBase.createTransactionAdapter.mockImplementation((
-    db: Database
-) => ({
-    set: vi.fn((key: string, value: string) =>
-        mockSettingsRepositoryBase.setInternal(db, key, value)),
-}));
+mockSettingsRepositoryBase.createTransactionAdapter.mockImplementation(
+    (db: Database) => ({
+        set: vi.fn((key: string, value: string) =>
+            mockSettingsRepositoryBase.setInternal(db, key, value)
+        ),
+    })
+);
 
 const mockSettingsRepository =
     mockSettingsRepositoryBase as unknown as SettingsRepository;
@@ -88,19 +90,21 @@ describe("historyLimitManager", () => {
     beforeEach(() => {
         vi.clearAllMocks();
 
-        mockHistoryRepositoryBase.createTransactionAdapter.mockImplementation((
-            db: Database
-        ) => ({
-            pruneAllHistory: vi.fn((limit: number) =>
-                mockHistoryRepositoryBase.pruneAllHistoryInternal(db, limit)),
-        }));
+        mockHistoryRepositoryBase.createTransactionAdapter.mockImplementation(
+            (db: Database) => ({
+                pruneAllHistory: vi.fn((limit: number) =>
+                    mockHistoryRepositoryBase.pruneAllHistoryInternal(db, limit)
+                ),
+            })
+        );
 
-        mockSettingsRepositoryBase.createTransactionAdapter.mockImplementation((
-            db: Database
-        ) => ({
-            set: vi.fn((key: string, value: string) =>
-                mockSettingsRepositoryBase.setInternal(db, key, value)),
-        }));
+        mockSettingsRepositoryBase.createTransactionAdapter.mockImplementation(
+            (db: Database) => ({
+                set: vi.fn((key: string, value: string) =>
+                    mockSettingsRepositoryBase.setInternal(db, key, value)
+                ),
+            })
+        );
     });
 
     afterEach(() => {

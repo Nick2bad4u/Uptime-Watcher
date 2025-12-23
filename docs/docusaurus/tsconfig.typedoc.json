@@ -33,18 +33,10 @@
         "noEmit": false,
         "outDir": "../../.cache/builds/docusaurus/typedoc",
         "paths": {
-            "@app/*": [
-                "../../src/*"
-            ],
-            "@assets/*": [
-                "../../assets/*"
-            ],
-            "@electron/*": [
-                "../../electron/*"
-            ],
-            "@shared/*": [
-                "../../shared/*"
-            ]
+            "@app/*": ["../../src/*"],
+            "@assets/*": ["../../assets/*"],
+            "@electron/*": ["../../electron/*"],
+            "@shared/*": ["../../shared/*"]
         },
         "resolveJsonModule": true,
         "skipLibCheck": true,
@@ -52,9 +44,7 @@
         "strict": true,
         "target": "ESNext",
         "tsBuildInfoFile": "../../.cache/typedoc.tsbuildinfo",
-        "types": [
-            "vite/client"
-        ]
+        "types": ["vite/client"]
     },
     "exclude": [
         "../../node_modules/**",

@@ -652,7 +652,8 @@ class MockApiService {
             // Authorization
             if (route.permissions.length > 0 && request.metadata.user) {
                 const hasPermission = route.permissions.some((permission) =>
-                    request.metadata.user.permissions.includes(permission));
+                    request.metadata.user.permissions.includes(permission)
+                );
 
                 if (!hasPermission) {
                     response.status = 403;
@@ -1083,12 +1084,14 @@ describe("API Service Performance", () => {
         "POST request with body",
         () => {
             service = new MockApiService();
-            service.registerRoute("POST", "/api/data", async (
-                req: ApiRequest
-            ) => ({
-                received: req.body,
-                processed: true,
-            }));
+            service.registerRoute(
+                "POST",
+                "/api/data",
+                async (req: ApiRequest) => ({
+                    received: req.body,
+                    processed: true,
+                })
+            );
 
             service.processRequest("POST", "/api/data", {
                 body: { name: "Test", value: 123, active: true },
@@ -1151,7 +1154,8 @@ describe("API Service Performance", () => {
             const requests = Array.from({ length: 5 }, () =>
                 service.processRequest("GET", "/api/limited", {
                     ip: "192.168.1.1",
-                }));
+                })
+            );
 
             Promise.all(requests);
         },
@@ -1276,7 +1280,8 @@ describe("API Service Performance", () => {
                         name: "Test API Key",
                         userId: user.id,
                         permissions: ["api:read", "api:write"],
-                    }))
+                    })
+                )
                 .then((apiKey) => {
                     service.registerRoute(
                         "GET",
@@ -1439,7 +1444,8 @@ describe("API Service Performance", () => {
 
             // Process multiple requests
             const requests = Array.from({ length: 10 }, () =>
-                service.processRequest("GET", "/api/metrics-test"));
+                service.processRequest("GET", "/api/metrics-test")
+            );
 
             Promise.all(requests).then(() => {
                 service.getMetrics();

@@ -283,7 +283,8 @@ const createAvailabilityColors = () => ({
               ? "Great"
               : value >= 90
                 ? "Fair"
-                : "Poor"),
+                : "Poor"
+    ),
 });
 
 let availabilityColorsMock: ReturnType<typeof createAvailabilityColors>;

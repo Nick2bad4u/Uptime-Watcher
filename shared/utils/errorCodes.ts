@@ -10,7 +10,7 @@ import { isObject } from "@shared/utils/typeGuards";
  * For example, instead of writing:
  *
  * ```ts
- * (error as { code?: unknown }).code
+ * (error as { code?: unknown }).code;
  * ```
  */
 export function tryGetErrorCode(error: unknown): string | undefined {

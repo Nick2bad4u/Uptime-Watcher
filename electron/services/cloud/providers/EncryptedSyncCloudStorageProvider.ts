@@ -15,7 +15,6 @@ import {
 const SYNC_PREFIX = "sync/" as const;
 const MANIFEST_KEY = "manifest.json" as const;
 
-
 function shouldEncryptSyncObject(key: string): boolean {
     if (key === MANIFEST_KEY) {
         return false;
@@ -55,9 +54,7 @@ export class EncryptedSyncCloudStorageProvider implements CloudStorageProvider {
         }
 
         if (!isEncryptedPayload(buffer)) {
-            throw new Error(
-                "Refusing to read unencrypted sync object"
-            );
+            throw new Error("Refusing to read unencrypted sync object");
         }
 
         return decryptBuffer({ ciphertext: buffer, key: this.key });
@@ -104,10 +101,7 @@ export class EncryptedSyncCloudStorageProvider implements CloudStorageProvider {
         });
     }
 
-    public constructor(args: {
-        inner: CloudStorageProvider;
-        key: Buffer;
-    }) {
+    public constructor(args: { inner: CloudStorageProvider; key: Buffer }) {
         this.inner = args.inner;
         this.key = args.key;
     }

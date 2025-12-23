@@ -842,3 +842,4 @@ codeql-agent-results/
 .gemini/
 gha-creds-*.json
 assets/prettier-plugin-multiline-arrays/
+.jscpd/

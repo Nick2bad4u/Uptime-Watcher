@@ -135,13 +135,6 @@ export const SERVICE_LOGS = {
     /** IPC service cleanup */
     IPC_SERVICE_CLEANUP: "[IpcService] Cleaning up IPC handlers",
 
-    /** Migration system */
-    MIGRATION_APPLYING:
-        "Applying migration: {monitorType} {fromVersion} -> {toVersion}",
-
-    MIGRATION_REGISTERED:
-        "Registered migration for {monitorType}: {fromVersion} → {toVersion}",
-
     /** Monitor manager applying intervals */
     MONITOR_MANAGER_APPLYING_INTERVALS:
         "[MonitorManager] Completed applying default intervals for site: {identifier}",

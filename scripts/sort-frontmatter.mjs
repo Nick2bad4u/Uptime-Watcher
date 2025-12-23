@@ -138,7 +138,8 @@ function reorderBlocks(blocks) {
 
     // 2. Remaining keys in alphabetical order (using toSorted)
     const remainingKeys = Array.from(byKey.keys()).toSorted((a, b) =>
-        a.localeCompare(b));
+        a.localeCompare(b)
+    );
     for (const key of remainingKeys) {
         const block = byKey.get(key);
         if (block) {

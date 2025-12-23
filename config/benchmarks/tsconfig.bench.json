@@ -15,15 +15,9 @@
         "noUnusedParameters": false,
         "outDir": "../../.cache/builds/test/bench",
         "paths": {
-            "@app/*": [
-                "src/*"
-            ],
-            "@electron/*": [
-                "electron/*"
-            ],
-            "@shared/*": [
-                "shared/*"
-            ]
+            "@app/*": ["src/*"],
+            "@electron/*": ["electron/*"],
+            "@shared/*": ["shared/*"]
         },
         "rootDir": "../..",
         "strictNullChecks": false,

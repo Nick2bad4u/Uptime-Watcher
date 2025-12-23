@@ -27,7 +27,8 @@ describe("Complete 100% Coverage - Final Tests", () => {
             const weirdObject = {
                 valueOf: vi.fn(() =>
                     // This is designed to test the default case in the switch
-                    Symbol("test")),
+                    Symbol("test")
+                ),
                 toString: vi.fn(() => "[Weird Object]"),
             };
 

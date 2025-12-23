@@ -63,7 +63,8 @@ export const RecentDowntime: Story = {
                       responseTime: 350 + index * 15,
                       status: index === 2 ? "degraded" : "down",
                   }
-                : entry),
+                : entry
+        ),
         title: "Incident Recovery",
     },
 };

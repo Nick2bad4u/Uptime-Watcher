@@ -43,12 +43,12 @@ test.describe(
                 expect(electronApp).toBeTruthy();
 
                 // Get app info
-                const isPackaged = await electronApp.evaluate(async ({
-                    app,
-                }) => {
-                    // This runs in Electron's main process
-                    return app.isPackaged;
-                });
+                const isPackaged = await electronApp.evaluate(
+                    async ({ app }) => {
+                        // This runs in Electron's main process
+                        return app.isPackaged;
+                    }
+                );
 
                 // Should not be packaged in development/test mode
                 expect(isPackaged).toBe(false);
@@ -122,11 +122,11 @@ test.describe(
                     return app.getName();
                 });
 
-                const appVersion = await electronApp.evaluate(async ({
-                    app,
-                }) => {
-                    return app.getVersion();
-                });
+                const appVersion = await electronApp.evaluate(
+                    async ({ app }) => {
+                        return app.getVersion();
+                    }
+                );
 
                 // Verify app metadata
                 // In development mode, app name defaults to "Electron" unless explicitly set

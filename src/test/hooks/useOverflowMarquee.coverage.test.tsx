@@ -80,7 +80,8 @@ describe(useOverflowMarquee, () => {
         setDimensions(element, { clientWidth: 200, scrollWidth: 200 });
 
         const { result } = renderHook(() =>
-            useOverflowMarquee({ ref: { current: element } }));
+            useOverflowMarquee({ ref: { current: element } })
+        );
 
         await waitFor(() => {
             expect(result.current.isOverflowing).toBeFalsy();
@@ -94,18 +95,18 @@ describe(useOverflowMarquee, () => {
         let resizeListener: ((event: Event) => void) | null = null;
 
         const addEventListenerSpy = vi.spyOn(window, "addEventListener");
-        addEventListenerSpy.mockImplementation((
-            type,
-            listener: EventListenerOrEventListenerObject
-        ): void => {
-            if (type === "resize" && typeof listener === "function") {
-                resizeListener = listener as (event: Event) => void;
+        addEventListenerSpy.mockImplementation(
+            (type, listener: EventListenerOrEventListenerObject): void => {
+                if (type === "resize" && typeof listener === "function") {
+                    resizeListener = listener as (event: Event) => void;
+                }
             }
-        });
+        );
         const removeEventListenerSpy = vi.spyOn(window, "removeEventListener");
 
         const { result, unmount } = renderHook(() =>
-            useOverflowMarquee({ ref: { current: element } }));
+            useOverflowMarquee({ ref: { current: element } })
+        );
 
         await waitFor(() => {
             expect(result.current.isOverflowing).toBeTruthy();

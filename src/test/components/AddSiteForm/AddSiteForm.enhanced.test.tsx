@@ -225,9 +225,10 @@ vi.mock("../../../stores/error/useErrorStore", () => {
         storeErrors: {},
     };
 
-    const useErrorStore = vi.fn((
-        selector?: (candidate: typeof state) => unknown
-    ) => (typeof selector === "function" ? selector(state) : state));
+    const useErrorStore = vi.fn(
+        (selector?: (candidate: typeof state) => unknown) =>
+            typeof selector === "function" ? selector(state) : state
+    );
 
     return { useErrorStore };
 });
@@ -1731,7 +1732,8 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
                 screen.getByText((content, _element) =>
                     content.includes(
                         "Enter the URL of the site you want to monitor"
-                    ))
+                    )
+                )
             ).toBeInTheDocument();
         });
 
@@ -2148,23 +2150,23 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 
-            const largeMonitorTypesList = Array.from({ length: 100 }, (
-                _,
-                i
-            ) => ({
-                type: `monitor${i}`,
-                displayName: `Monitor Type ${i}`,
-                description: `Monitor Type ${i} description`,
-                version: "1.0.0",
-                fields: [
-                    {
-                        name: `field${i}`,
-                        type: "text",
-                        required: false,
-                        label: `Field ${i}`,
-                    },
-                ],
-            }));
+            const largeMonitorTypesList = Array.from(
+                { length: 100 },
+                (_, i) => ({
+                    type: `monitor${i}`,
+                    displayName: `Monitor Type ${i}`,
+                    description: `Monitor Type ${i} description`,
+                    version: "1.0.0",
+                    fields: [
+                        {
+                            name: `field${i}`,
+                            type: "text",
+                            required: false,
+                            label: `Field ${i}`,
+                        },
+                    ],
+                })
+            );
 
             mockUseMonitorTypes.mockReturnValue({
                 options: largeMonitorTypesList.map((type) => ({

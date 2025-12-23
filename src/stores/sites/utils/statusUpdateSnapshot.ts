@@ -13,7 +13,7 @@ import {
  * update to the site store.
  *
  * @remarks
- * This payload is intentionally *not* typed as {@link StatusUpdate} because the
+ * This payload is intentionally _not_ typed as {@link StatusUpdate} because the
  * shared {@link StatusUpdate} type intersects an index signature, which causes
  * strict TS configs (e.g. `noPropertyAccessFromIndexSignature`) and some lint
  * rules to fight normal property access.

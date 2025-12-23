@@ -139,54 +139,63 @@ describe("Form Utilities", () => {
 
             test.prop([
                 fc.constantFrom("true", "false", "1", "0", "yes", "no"),
-            ])("should handle boolean-like string conversions", (
-                booleanLikeValue
-            ) => {
-                const setValue = vi.fn();
-                const converter = (value: string) =>
-                    value === "true" || value === "1" || value === "yes";
-                const handler = createSelectChangeHandler(setValue, converter);
+            ])(
+                "should handle boolean-like string conversions",
+                (booleanLikeValue) => {
+                    const setValue = vi.fn();
+                    const converter = (value: string) =>
+                        value === "true" || value === "1" || value === "yes";
+                    const handler = createSelectChangeHandler(
+                        setValue,
+                        converter
+                    );
 
-                const mockEvent = {
-                    target: { value: booleanLikeValue },
-                } as React.ChangeEvent<HTMLSelectElement>;
+                    const mockEvent = {
+                        target: { value: booleanLikeValue },
+                    } as React.ChangeEvent<HTMLSelectElement>;
 
-                handler(mockEvent);
+                    handler(mockEvent);
 
-                const expectedBoolean = [
-                    "true",
-                    "1",
-                    "yes",
-                ].includes(booleanLikeValue);
-                expect(setValue).toHaveBeenCalledWith(expectedBoolean);
-            });
+                    const expectedBoolean = [
+                        "true",
+                        "1",
+                        "yes",
+                    ].includes(booleanLikeValue);
+                    expect(setValue).toHaveBeenCalledWith(expectedBoolean);
+                }
+            );
 
             test.prop([
                 fc.string().filter((s) => !/^\d+$/.test(s) && s.length > 0),
-            ])("should handle non-numeric strings in numeric conversion", (
-                nonNumericValue
-            ) => {
-                const setValue = vi.fn();
-                const converter = (value: string) => Number.parseInt(value, 10);
-                const handler = createSelectChangeHandler(setValue, converter);
+            ])(
+                "should handle non-numeric strings in numeric conversion",
+                (nonNumericValue) => {
+                    const setValue = vi.fn();
+                    const converter = (value: string) =>
+                        Number.parseInt(value, 10);
+                    const handler = createSelectChangeHandler(
+                        setValue,
+                        converter
+                    );
 
-                const mockEvent = {
-                    target: { value: nonNumericValue },
-                } as React.ChangeEvent<HTMLSelectElement>;
+                    const mockEvent = {
+                        target: { value: nonNumericValue },
+                    } as React.ChangeEvent<HTMLSelectElement>;
 
-                handler(mockEvent);
+                    handler(mockEvent);
 
-                const convertedValue = Number.parseInt(nonNumericValue, 10);
-                expect(setValue).toHaveBeenCalledWith(convertedValue);
+                    const convertedValue = Number.parseInt(nonNumericValue, 10);
+                    expect(setValue).toHaveBeenCalledWith(convertedValue);
 
-                // Allow leading whitespace before optional sign/digit for numeric conversions
-                const trimmedValue = nonNumericValue.replace(/^\s+/, "");
-                const numericPattern = /^[+-]?\d/;
+                    // Allow leading whitespace before optional sign/digit for numeric conversions
+                    const trimmedValue = nonNumericValue.replace(/^\s+/, "");
+                    const numericPattern = /^[+-]?\d/;
 
-                if (!numericPattern.test(trimmedValue)) {
-                    expect(Number.isNaN(convertedValue)).toBeTruthy();
+                    if (!numericPattern.test(trimmedValue)) {
+                        expect(Number.isNaN(convertedValue)).toBeTruthy();
+                    }
                 }
-            });
+            );
         });
 
         describe("Checkbox Handler with Various States", () => {
@@ -244,12 +253,14 @@ describe("Form Utilities", () => {
                     fc.constant(""),
                     fc.string().filter((s) => s.trim().length === 0)
                 ),
-            ])("should reject empty and whitespace-only strings", (
-                emptyString
-            ) => {
-                const isValid = validationPatterns.nonEmptyString(emptyString);
-                expect(isValid).toBeFalsy();
-            });
+            ])(
+                "should reject empty and whitespace-only strings",
+                (emptyString) => {
+                    const isValid =
+                        validationPatterns.nonEmptyString(emptyString);
+                    expect(isValid).toBeFalsy();
+                }
+            );
 
             test.prop([fc.integer({ min: 1, max: 65_535 })])(
                 "should validate port number ranges correctly",
@@ -295,18 +306,19 @@ describe("Form Utilities", () => {
                             60_000,
                         ].includes(n)
                 ),
-            ])("should reject non-allowed check intervals", (
-                disallowedInterval
-            ) => {
-                const validator = validationPatterns.oneOfNumbers([
-                    5000,
-                    10_000,
-                    30_000,
-                    60_000,
-                ]);
-                const isValid = validator(disallowedInterval);
-                expect(isValid).toBeFalsy();
-            });
+            ])(
+                "should reject non-allowed check intervals",
+                (disallowedInterval) => {
+                    const validator = validationPatterns.oneOfNumbers([
+                        5000,
+                        10_000,
+                        30_000,
+                        60_000,
+                    ]);
+                    const isValid = validator(disallowedInterval);
+                    expect(isValid).toBeFalsy();
+                }
+            );
 
             test.prop([fc.constantFrom("http", "port", "ping")])(
                 "should validate allowed monitor types",
@@ -388,22 +400,23 @@ describe("Form Utilities", () => {
                         .string()
                         .filter((s) => s.trim().length === 0 && s.length > 0)
                 ),
-            ])("should handle whitespace and empty inputs consistently", (
-                whitespaceInput
-            ) => {
-                const setValue = vi.fn();
-                const handler = createStringInputHandler(setValue);
+            ])(
+                "should handle whitespace and empty inputs consistently",
+                (whitespaceInput) => {
+                    const setValue = vi.fn();
+                    const handler = createStringInputHandler(setValue);
 
-                const mockEvent = {
-                    target: { value: whitespaceInput },
-                } as React.ChangeEvent<HTMLInputElement>;
+                    const mockEvent = {
+                        target: { value: whitespaceInput },
+                    } as React.ChangeEvent<HTMLInputElement>;
 
-                handler(mockEvent);
-                expect(setValue).toHaveBeenCalledWith(whitespaceInput);
+                    handler(mockEvent);
+                    expect(setValue).toHaveBeenCalledWith(whitespaceInput);
 
-                // Verify whitespace properties
-                expect(whitespaceInput.trim()).toHaveLength(0);
-            });
+                    // Verify whitespace properties
+                    expect(whitespaceInput.trim()).toHaveLength(0);
+                }
+            );
 
             test.prop([fc.string({ minLength: 1000, maxLength: 5000 })])(
                 "should handle very long input strings",
@@ -432,29 +445,30 @@ describe("Form Utilities", () => {
                             s.includes("'") ||
                             s.includes('"')
                     ),
-            ])("should handle HTML-like characters in inputs", (
-                htmlLikeInput
-            ) => {
-                const setValue = vi.fn();
-                const handler = createStringInputHandler(setValue);
+            ])(
+                "should handle HTML-like characters in inputs",
+                (htmlLikeInput) => {
+                    const setValue = vi.fn();
+                    const handler = createStringInputHandler(setValue);
 
-                const mockEvent = {
-                    target: { value: htmlLikeInput },
-                } as React.ChangeEvent<HTMLInputElement>;
+                    const mockEvent = {
+                        target: { value: htmlLikeInput },
+                    } as React.ChangeEvent<HTMLInputElement>;
 
-                handler(mockEvent);
-                expect(setValue).toHaveBeenCalledWith(htmlLikeInput);
+                    handler(mockEvent);
+                    expect(setValue).toHaveBeenCalledWith(htmlLikeInput);
 
-                // Verify it contains HTML-like characters
-                const hasHtmlChars = [
-                    "<",
-                    ">",
-                    "&",
-                    "'",
-                    '"',
-                ].some((char) => htmlLikeInput.includes(char));
-                expect(hasHtmlChars).toBeTruthy();
-            });
+                    // Verify it contains HTML-like characters
+                    const hasHtmlChars = [
+                        "<",
+                        ">",
+                        "&",
+                        "'",
+                        '"',
+                    ].some((char) => htmlLikeInput.includes(char));
+                    expect(hasHtmlChars).toBeTruthy();
+                }
+            );
         });
     });
 
@@ -1171,7 +1185,8 @@ describe("Form Utilities", () => {
                 validationPatterns.nonEmptyString
             );
             const ageHandler = createSelectChangeHandler(setAge, (value) =>
-                Number.parseInt(value, 10));
+                Number.parseInt(value, 10)
+            );
             const activeHandler = createCheckboxChangeHandler(setActive);
 
             // Test name input
@@ -1441,22 +1456,24 @@ describe("Form Utilities", () => {
         });
 
         // Test with different types
-        test.prop([fc.string()])("should work with boolean conversion", (
-            stringValue
-        ) => {
-            const setValue = vi.fn();
-            const converter = (value: string) => value.toLowerCase() === "true";
-            const handler = createTypedInputHandler(setValue, converter);
+        test.prop([fc.string()])(
+            "should work with boolean conversion",
+            (stringValue) => {
+                const setValue = vi.fn();
+                const converter = (value: string) =>
+                    value.toLowerCase() === "true";
+                const handler = createTypedInputHandler(setValue, converter);
 
-            const mockEvent = {
-                target: { value: stringValue },
-            } as React.ChangeEvent<HTMLInputElement>;
+                const mockEvent = {
+                    target: { value: stringValue },
+                } as React.ChangeEvent<HTMLInputElement>;
 
-            handler(mockEvent);
-            expect(setValue).toHaveBeenCalledWith(
-                stringValue.toLowerCase() === "true"
-            );
-        });
+                handler(mockEvent);
+                expect(setValue).toHaveBeenCalledWith(
+                    stringValue.toLowerCase() === "true"
+                );
+            }
+        );
 
         test.prop([fc.float({ min: 0, max: 100 })])(
             "should work with float conversion",

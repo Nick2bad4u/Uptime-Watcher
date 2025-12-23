@@ -178,6 +178,61 @@ export function getEnvironment(): string {
 }
 
 /**
+ * Reads an environment variable from `process.env`.
+ *
+ * @remarks
+ * This is a thin alias of {@link getEnvVar} provided for historical naming
+ * consistency across the Electron and renderer layers.
+ */
+export function readProcessEnv(key: string): string | undefined {
+    const value = getEnvVar(key);
+    return typeof value === "string" && value.length > 0 ? value : undefined;
+}
+
+/**
+ * Reads a boolean environment variable.
+ *
+ * @remarks
+ * Matches the previous Electron-only semantics:
+ * - missing/invalid: returns `defaultValue`
+ * - "true"/"1"/"yes": returns true
+ */
+export function readBooleanEnv(key: string, defaultValue = false): boolean {
+    const value = readProcessEnv(key);
+    if (value === undefined) {
+        return defaultValue;
+    }
+
+    switch (value.toLowerCase()) {
+        case "1":
+        case "true":
+        case "yes": {
+            return true;
+        }
+        default: {
+            return false;
+        }
+    }
+}
+
+/**
+ * Reads a numeric environment variable.
+ *
+ * @remarks
+ * Matches the previous Electron-only semantics:
+ * - missing/invalid: returns `defaultValue`
+ */
+export function readNumberEnv(key: string, defaultValue: number): number {
+    const value = readProcessEnv(key);
+    if (value === undefined) {
+        return defaultValue;
+    }
+
+    const parsed = Number.parseInt(value, 10);
+    return Number.isFinite(parsed) && parsed > 0 ? parsed : defaultValue;
+}
+
+/**
  * Returns NODE_ENV with a development-friendly fallback.
  */
 export function getNodeEnv(): string {

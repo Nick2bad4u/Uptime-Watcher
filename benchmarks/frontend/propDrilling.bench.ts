@@ -371,9 +371,9 @@ class MockPropDrillingSystem {
             const parentProps = component.parent
                 ? Object.keys(component.parent.props)
                 : [];
-            const duplicatedProps = Object.keys(component.props).filter((
-                prop
-            ) => parentProps.includes(prop)).length;
+            const duplicatedProps = Object.keys(component.props).filter(
+                (prop) => parentProps.includes(prop)
+            ).length;
 
             const propTransferCount = this.propTransfers.filter(
                 (transfer) => transfer.target === component.id
@@ -633,13 +633,13 @@ describe("React Prop Drilling Performance", () => {
 
                 // Add some child-specific props that will be inherited
                 if (Math.random() > 0.5) {
-                    childProps.dataItems = Array.from({ length: 5 }, (
-                        _,
-                        j
-                    ) => ({
-                        id: j,
-                        value: Math.random(),
-                    }));
+                    childProps.dataItems = Array.from(
+                        { length: 5 },
+                        (_, j) => ({
+                            id: j,
+                            value: Math.random(),
+                        })
+                    );
                 }
 
                 const child = system.createComponent(
@@ -816,7 +816,8 @@ describe("React Prop Drilling Performance", () => {
                 () => Math.random() > 0.7
             );
             const memoizedComponents = componentsToMemoize.map((c) =>
-                system.memoizeComponent(c));
+                system.memoizeComponent(c)
+            );
 
             memoizationResults.push(...memoizedComponents);
         }

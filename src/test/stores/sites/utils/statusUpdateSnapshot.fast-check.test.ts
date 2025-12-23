@@ -27,7 +27,6 @@ import {
     type StatusUpdateSnapshotPayload,
 } from "../../../../stores/sites/utils/statusUpdateSnapshot";
 
-
 import {
     resetProcessSnapshotOverrideForTesting,
     setProcessSnapshotOverrideForTesting,
@@ -174,7 +173,8 @@ describe(applyStatusUpdateSnapshot, () => {
             maxLength: 5,
         })
         .map((statuses) =>
-            statuses.map((status, index) => createHistoryEntry(status, index)));
+            statuses.map((status, index) => createHistoryEntry(status, index))
+        );
 
     const snapshotHistoryEntries = fc
         .array(fc.constantFrom<StatusHistoryStatus>(...STATUS_HISTORY_VALUES), {
@@ -182,7 +182,9 @@ describe(applyStatusUpdateSnapshot, () => {
         })
         .map((statuses) =>
             statuses.map((status, index) =>
-                createHistoryEntry(status, index + 10)));
+                createHistoryEntry(status, index + 10)
+            )
+        );
 
     test.prop([
         fc
@@ -196,60 +198,63 @@ describe(applyStatusUpdateSnapshot, () => {
         historyEntries,
         snapshotHistoryEntries,
         fc.constantFrom<MonitorStatus>(...MONITOR_STATUS_VALUES),
-    ])("applies snapshot data without disturbing unaffected monitors", (
-        siteIdentifier,
-        monitorId,
-        existingHistory,
-        snapshotHistory,
-        nextStatus
-    ) => {
-        const targetMonitor = createMonitor({
-            history: existingHistory,
-            id: monitorId,
-            status: "up",
-        });
-        const siblingMonitor = createMonitor({
-            id: `${monitorId}-sibling`,
-            status: "up",
-        });
-
-        const site = createSite(siteIdentifier, [
-            targetMonitor,
-            siblingMonitor,
-        ]);
-        const payload: StatusUpdateSnapshotPayload = {
-            monitor: createMonitor({
-                history: snapshotHistory,
-                id: monitorId,
-                status: nextStatus,
-            }),
+    ])(
+        "applies snapshot data without disturbing unaffected monitors",
+        (
+            siteIdentifier,
             monitorId,
-            responseTime: 0,
-            site: createSite(siteIdentifier, [
+            existingHistory,
+            snapshotHistory,
+            nextStatus
+        ) => {
+            const targetMonitor = createMonitor({
+                history: existingHistory,
+                id: monitorId,
+                status: "up",
+            });
+            const siblingMonitor = createMonitor({
+                id: `${monitorId}-sibling`,
+                status: "up",
+            });
+
+            const site = createSite(siteIdentifier, [
                 targetMonitor,
                 siblingMonitor,
-            ]),
-            siteIdentifier,
-            status: nextStatus,
-            timestamp: new Date("2024-05-05T12:00:00.000Z").toISOString(),
-        };
+            ]);
+            const payload: StatusUpdateSnapshotPayload = {
+                monitor: createMonitor({
+                    history: snapshotHistory,
+                    id: monitorId,
+                    status: nextStatus,
+                }),
+                monitorId,
+                responseTime: 0,
+                site: createSite(siteIdentifier, [
+                    targetMonitor,
+                    siblingMonitor,
+                ]),
+                siteIdentifier,
+                status: nextStatus,
+                timestamp: new Date("2024-05-05T12:00:00.000Z").toISOString(),
+            };
 
-        const [updatedSite] = applyStatusUpdateSnapshot([site], payload);
-        const resolvedSite = ensureSite(updatedSite);
-        const updatedMonitor = resolvedSite.monitors.find(
-            ({ id }) => id === monitorId
-        );
-        const untouchedMonitor = resolvedSite.monitors.find(
-            ({ id }) => id === siblingMonitor.id
-        );
+            const [updatedSite] = applyStatusUpdateSnapshot([site], payload);
+            const resolvedSite = ensureSite(updatedSite);
+            const updatedMonitor = resolvedSite.monitors.find(
+                ({ id }) => id === monitorId
+            );
+            const untouchedMonitor = resolvedSite.monitors.find(
+                ({ id }) => id === siblingMonitor.id
+            );
 
-        expect(updatedMonitor?.status).toBe(nextStatus);
+            expect(updatedMonitor?.status).toBe(nextStatus);
 
-        const expectedHistory =
-            snapshotHistory.length === 0 && existingHistory.length > 0
-                ? existingHistory
-                : snapshotHistory;
-        expect(updatedMonitor?.history).toEqual(expectedHistory);
-        expect(untouchedMonitor).toBe(siblingMonitor);
-    });
+            const expectedHistory =
+                snapshotHistory.length === 0 && existingHistory.length > 0
+                    ? existingHistory
+                    : snapshotHistory;
+            expect(updatedMonitor?.history).toEqual(expectedHistory);
+            expect(untouchedMonitor).toBe(siblingMonitor);
+        }
+    );
 });

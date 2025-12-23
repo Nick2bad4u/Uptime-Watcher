@@ -73,6 +73,117 @@ export type MonitorActionDelegate = (
     monitorId?: string
 ) => Promise<boolean>;
 
+type MonitorToggleKind = "start" | "stop";
+
+const toggleSingleMonitorEnhanced = async (args: {
+    readonly applyMonitorState: EnhancedLifecycleHost["applyMonitorState"];
+    readonly config: EnhancedLifecycleConfig;
+    readonly identifier: string;
+    readonly kind: MonitorToggleKind;
+    readonly monitor: Monitor;
+    readonly monitorId: string;
+    readonly services: EnhancedLifecycleHost["services"];
+    readonly site: Site;
+}): Promise<boolean> => {
+    const {
+        applyMonitorState,
+        config,
+        identifier,
+        kind,
+        monitor,
+        monitorId,
+        services,
+        site,
+    } = args;
+
+    const checkerResult =
+        kind === "start"
+            ? await services.checker.startMonitoring(identifier, monitorId)
+            : await services.checker.stopMonitoring(identifier, monitorId);
+
+    if (!checkerResult) {
+        return false;
+    }
+
+    const status =
+        kind === "start" ? MONITOR_STATUS.PENDING : MONITOR_STATUS.PAUSED;
+    await applyMonitorState(
+        site,
+        monitor,
+        {
+            activeOperations: [],
+            monitoring: kind === "start",
+            status,
+        },
+        status
+    );
+
+    config.logger.debug(
+        `${kind === "start" ? "Started" : "Stopped"} monitoring for ${identifier}:${monitorId} (enhanced)`
+    );
+
+    return kind === "start"
+        ? config.monitorScheduler.startMonitor(identifier, monitor)
+        : config.monitorScheduler.stopMonitor(identifier, monitorId);
+};
+
+const getSiteOrWarn = (
+    config: EnhancedLifecycleConfig,
+    identifier: string
+): null | Site => {
+    const site = config.sites.get(identifier);
+    if (!site) {
+        config.logger.warn(`Site not found: ${identifier}`);
+        return null;
+    }
+
+    return site;
+};
+
+const getMonitorOrWarn = (
+    config: EnhancedLifecycleConfig,
+    site: Site,
+    identifier: string,
+    monitorId: string
+): Monitor | null => {
+    const monitor = site.monitors.find(
+        (candidate) => candidate.id === monitorId
+    );
+    if (!monitor) {
+        config.logger.warn(
+            `Monitor ${monitorId} not found in site ${identifier}`
+        );
+        return null;
+    }
+
+    return monitor;
+};
+
+const getMonitorsWithIds = (
+    site: Site,
+    options?: { requireMonitoring?: boolean }
+): ReadonlyArray<Monitor & { id: string }> => {
+    const { requireMonitoring = false } = options ?? {};
+
+    const rawMonitors = (
+        Array.isArray(site.monitors) ? site.monitors : []
+    ) as Array<Monitor | undefined>;
+
+    return rawMonitors.filter(
+        (candidate): candidate is Monitor & { id: string } => {
+            if (!candidate) {
+                return false;
+            }
+
+            if (typeof candidate.id !== "string" || candidate.id.length === 0) {
+                return false;
+            }
+
+            return requireMonitoring ? candidate.monitoring : true;
+        }
+    );
+};
+
 /**
  * Starts monitoring across all sites using the enhanced services.
  */
@@ -377,6 +488,50 @@ export async function stopAllMonitoringEnhancedFlow(params: {
     return summary;
 }
 
+const runEnhancedLifecycleBatch = async <TAcc>(args: {
+    readonly actionLabel: "start" | "stop";
+    readonly combine: (acc: TAcc, success: boolean) => TAcc;
+    readonly config: EnhancedLifecycleConfig;
+    readonly fallback: (monitorId: string) => Promise<boolean>;
+    readonly host: EnhancedLifecycleHost;
+    readonly identifier: string;
+    readonly initial: TAcc;
+    readonly monitorAction: MonitorActionDelegate | undefined;
+    readonly monitors: ReadonlyArray<Monitor & { id: string }>;
+}): Promise<TAcc> => {
+    const {
+        actionLabel,
+        combine,
+        config,
+        fallback,
+        host,
+        identifier,
+        initial,
+        monitorAction,
+        monitors,
+    } = args;
+
+    let acc = initial;
+
+    await host.runSequentially(monitors, async (monitorWithId) => {
+        try {
+            const result = monitorAction
+                ? await monitorAction(identifier, monitorWithId.id)
+                : await fallback(monitorWithId.id);
+
+            acc = combine(acc, result);
+        } catch (error) {
+            config.logger.error(
+                `Enhanced ${actionLabel} failed for ${identifier}:${monitorWithId.id}`,
+                error
+            );
+            acc = combine(acc, false);
+        }
+    });
+
+    return acc;
+};
+
 /**
  * Starts monitoring for a specific site or monitor using the enhanced services.
  */
@@ -393,22 +548,16 @@ export async function startMonitoringForSiteEnhancedFlow(params: {
     monitorId?: string;
 }): Promise<boolean> {
     const { config, host, identifier, monitorAction, monitorId } = params;
-    const { applyMonitorState, runSequentially, services } = host;
+    const { applyMonitorState, services } = host;
 
-    const site = config.sites.get(identifier);
+    const site = getSiteOrWarn(config, identifier);
     if (!site) {
-        config.logger.warn(`Site not found: ${identifier}`);
         return false;
     }
 
     if (monitorId) {
-        const monitor = site.monitors.find(
-            (candidate) => candidate.id === monitorId
-        );
+        const monitor = getMonitorOrWarn(config, site, identifier, monitorId);
         if (!monitor) {
-            config.logger.warn(
-                `Monitor ${monitorId} not found in site ${identifier}`
-            );
             return false;
         }
 
@@ -424,30 +573,16 @@ export async function startMonitoringForSiteEnhancedFlow(params: {
         }
 
         try {
-            const result = await services.checker.startMonitoring(
+            return await toggleSingleMonitorEnhanced({
+                applyMonitorState,
+                config,
                 identifier,
-                monitorId
-            );
-
-            if (!result) {
-                return false;
-            }
-
-            await applyMonitorState(
-                site,
+                kind: "start",
                 monitor,
-                {
-                    activeOperations: [],
-                    monitoring: true,
-                    status: MONITOR_STATUS.PENDING,
-                },
-                MONITOR_STATUS.PENDING
-            );
-
-            config.logger.debug(
-                `Started monitoring for ${identifier}:${monitorId} (enhanced)`
-            );
-            return config.monitorScheduler.startMonitor(identifier, monitor);
+                monitorId,
+                services,
+                site,
+            });
         } catch (error) {
             config.logger.error(
                 `Enhanced start failed for ${identifier}:${monitorId}`,
@@ -457,43 +592,24 @@ export async function startMonitoringForSiteEnhancedFlow(params: {
         }
     }
 
-    const rawMonitors = (
-        Array.isArray(site.monitors) ? site.monitors : []
-    ) as Array<Monitor | undefined>;
-    const validMonitors = rawMonitors.filter((
-        candidate
-    ): candidate is Monitor & { id: string } => {
-        if (!candidate) {
-            return false;
-        }
-
-        return typeof candidate.id === "string" && candidate.id.length > 0;
+    const validMonitors = getMonitorsWithIds(site);
+    return runEnhancedLifecycleBatch<boolean>({
+        actionLabel: "start",
+        combine: (acc, success) => acc || success,
+        config,
+        fallback: async (targetMonitorId) =>
+            startMonitoringForSiteEnhancedFlow({
+                config,
+                host,
+                identifier,
+                monitorId: targetMonitorId,
+            }),
+        host,
+        identifier,
+        initial: false,
+        monitorAction,
+        monitors: validMonitors,
     });
-    let hasSuccessfulStart = false;
-
-    await runSequentially(validMonitors, async (monitorWithId) => {
-        try {
-            const result = monitorAction
-                ? await monitorAction(identifier, monitorWithId.id)
-                : await startMonitoringForSiteEnhancedFlow({
-                      config,
-                      host,
-                      identifier,
-                      monitorId: monitorWithId.id,
-                  });
-
-            if (result) {
-                hasSuccessfulStart = true;
-            }
-        } catch (error) {
-            config.logger.error(
-                `Enhanced start failed for ${identifier}:${monitorWithId.id}`,
-                error
-            );
-        }
-    });
-
-    return hasSuccessfulStart;
 }
 
 /**
@@ -512,50 +628,30 @@ export async function stopMonitoringForSiteEnhancedFlow(params: {
     monitorId?: string;
 }): Promise<boolean> {
     const { config, host, identifier, monitorAction, monitorId } = params;
-    const { applyMonitorState, runSequentially, services } = host;
+    const { applyMonitorState, services } = host;
 
-    const site = config.sites.get(identifier);
+    const site = getSiteOrWarn(config, identifier);
     if (!site) {
-        config.logger.warn(`Site not found: ${identifier}`);
         return false;
     }
 
     if (monitorId) {
-        const monitor = site.monitors.find(
-            (candidate) => candidate.id === monitorId
-        );
+        const monitor = getMonitorOrWarn(config, site, identifier, monitorId);
         if (!monitor) {
-            config.logger.warn(
-                `Monitor ${monitorId} not found in site ${identifier}`
-            );
             return false;
         }
 
         try {
-            const result = await services.checker.stopMonitoring(
+            return await toggleSingleMonitorEnhanced({
+                applyMonitorState,
+                config,
                 identifier,
-                monitorId
-            );
-
-            if (!result) {
-                return false;
-            }
-
-            await applyMonitorState(
-                site,
+                kind: "stop",
                 monitor,
-                {
-                    activeOperations: [],
-                    monitoring: false,
-                    status: MONITOR_STATUS.PAUSED,
-                },
-                MONITOR_STATUS.PAUSED
-            );
-
-            config.logger.debug(
-                `Stopped monitoring for ${identifier}:${monitorId} (enhanced)`
-            );
-            return config.monitorScheduler.stopMonitor(identifier, monitorId);
+                monitorId,
+                services,
+                site,
+            });
         } catch (error) {
             config.logger.error(
                 `Enhanced stop failed for ${identifier}:${monitorId}`,
@@ -565,46 +661,22 @@ export async function stopMonitoringForSiteEnhancedFlow(params: {
         }
     }
 
-    const rawMonitors = (
-        Array.isArray(site.monitors) ? site.monitors : []
-    ) as Array<Monitor | undefined>;
-    const validMonitors = rawMonitors.filter((
-        candidate
-    ): candidate is Monitor & { id: string } => {
-        if (!candidate) {
-            return false;
-        }
-
-        return (
-            typeof candidate.id === "string" &&
-            candidate.id.length > 0 &&
-            candidate.monitoring
-        );
+    const validMonitors = getMonitorsWithIds(site, { requireMonitoring: true });
+    return runEnhancedLifecycleBatch<boolean>({
+        actionLabel: "stop",
+        combine: (acc, success) => acc && success,
+        config,
+        fallback: async (targetMonitorId) =>
+            stopMonitoringForSiteEnhancedFlow({
+                config,
+                host,
+                identifier,
+                monitorId: targetMonitorId,
+            }),
+        host,
+        identifier,
+        initial: true,
+        monitorAction,
+        monitors: validMonitors,
     });
-    let allStoppedSuccessfully = true;
-
-    await runSequentially(validMonitors, async (monitorWithId) => {
-        try {
-            const result = monitorAction
-                ? await monitorAction(identifier, monitorWithId.id)
-                : await stopMonitoringForSiteEnhancedFlow({
-                      config,
-                      host,
-                      identifier,
-                      monitorId: monitorWithId.id,
-                  });
-
-            if (!result) {
-                allStoppedSuccessfully = false;
-            }
-        } catch (error) {
-            config.logger.error(
-                `Enhanced stop failed for ${identifier}:${monitorWithId.id}`,
-                error
-            );
-            allStoppedSuccessfully = false;
-        }
-    });
-
-    return allStoppedSuccessfully;
 }

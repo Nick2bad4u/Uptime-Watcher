@@ -71,7 +71,8 @@ vi.mock("ws", async () => {
 
 vi.mock("../../../utils/operationalHooks", () => ({
     withOperationalHooks: vi.fn(async (operation: () => Promise<unknown>) =>
-        operation()),
+        operation()
+    ),
 }));
 
 import { WebsocketKeepaliveMonitor } from "../../../services/monitoring/WebsocketKeepaliveMonitor";

@@ -13,6 +13,7 @@ import {
     type CloudSyncSnapshot,
     parseCloudSyncSnapshot,
 } from "@shared/types/cloudSyncSnapshot";
+import { readNumberEnv } from "@shared/utils/environment";
 import { ensureError } from "@shared/utils/errorHandling";
 import { isRecord } from "@shared/utils/typeHelpers";
 
@@ -22,7 +23,6 @@ import type {
 } from "../cloud/providers/CloudStorageProvider.types";
 import type { CloudSyncTransport } from "./CloudSyncTransport.types";
 
-import { readNumberEnv } from "../../utils/environment";
 import { parseOpsObjectFileNameMetadata } from "./syncEngineKeyUtils";
 import {
     getPersistedDeviceIdValidationError,

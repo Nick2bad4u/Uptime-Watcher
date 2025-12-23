@@ -158,6 +158,28 @@ function toValidationResult(
     return typeof error === "string" ? [error] : error;
 }
 
+type RequiredRecordResult =
+    | { readonly error: ParameterValueValidationResult; readonly ok: false }
+    | { readonly ok: true; readonly record: Record<string, unknown> };
+
+const isRequiredRecordError = (
+    result: RequiredRecordResult
+): result is Extract<RequiredRecordResult, { readonly ok: false }> =>
+    !result.ok;
+
+const requireRecordParam = (
+    value: unknown,
+    paramName: string
+): RequiredRecordResult => {
+    const objectError = IpcValidators.requiredObject(value, paramName);
+    if (objectError) {
+        return { error: toValidationResult(objectError), ok: false };
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- validated as object above
+    return { ok: true, record: value as Record<string, unknown> };
+};
+
 interface CreateParamValidatorOptions {
     /**
      * When true, do not run per-parameter validators when the parameter count
@@ -285,7 +307,9 @@ const validateSiteIdentifierCandidate = (
     paramName: string
 ): ParameterValueValidationResult => {
     if (typeof value !== "string") {
-        return toValidationResult(IpcValidators.requiredString(value, paramName));
+        return toValidationResult(
+            IpcValidators.requiredString(value, paramName)
+        );
     }
 
     if (value.trim().length === 0) {
@@ -299,7 +323,9 @@ const validateSiteIdentifierCandidate = (
     return null;
 };
 
-function createSiteIdentifierValidator(paramName: string): IpcParameterValidator {
+function createSiteIdentifierValidator(
+    paramName: string
+): IpcParameterValidator {
     return createParamValidator(1, [
         (value): ParameterValueValidationResult =>
             validateSiteIdentifierCandidate(value, paramName),
@@ -380,13 +406,12 @@ function createSingleNumberValidator(paramName: string): IpcParameterValidator {
 const validateCloudFilesystemProviderConfig: IpcParameterValidator =
     createParamValidator(1, [
         (config): ParameterValueValidationResult => {
-            const objectError = IpcValidators.requiredObject(config, "config");
-            if (objectError) {
-                return toValidationResult(objectError);
+            const recordResult = requireRecordParam(config, "config");
+            if (isRequiredRecordError(recordResult)) {
+                return recordResult.error;
             }
 
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- config validated as object
-            const record = config as Record<string, unknown>;
+            const { record } = recordResult;
             const baseDirectoryError = IpcValidators.requiredString(
                 record["baseDirectory"],
                 "baseDirectory"
@@ -437,13 +462,12 @@ const validateCloudFilesystemProviderConfig: IpcParameterValidator =
 const validateCloudEnableSyncConfig: IpcParameterValidator =
     createParamValidator(1, [
         (config): ParameterValueValidationResult => {
-            const objectError = IpcValidators.requiredObject(config, "config");
-            if (objectError) {
-                return toValidationResult(objectError);
+            const recordResult = requireRecordParam(config, "config");
+            if (isRequiredRecordError(recordResult)) {
+                return recordResult.error;
             }
 
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- config validated as object
-            const record = config as Record<string, unknown>;
+            const { record } = recordResult;
             const { enabled } = record;
             return typeof enabled === "boolean"
                 ? null
@@ -456,13 +480,12 @@ const validateCloudBackupMigrationRequest: IpcParameterValidator =
         (config): ParameterValueValidationResult => {
             const errors: string[] = [];
 
-            const objectError = IpcValidators.requiredObject(config, "config");
-            if (objectError) {
-                return toValidationResult(objectError);
+            const recordResult = requireRecordParam(config, "config");
+            if (isRequiredRecordError(recordResult)) {
+                return recordResult.error;
             }
 
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- config validated as object
-            const record = config as Record<string, unknown>;
+            const { record } = recordResult;
 
             const { deleteSource, limit, target } = record;
             if (typeof deleteSource !== "boolean") {

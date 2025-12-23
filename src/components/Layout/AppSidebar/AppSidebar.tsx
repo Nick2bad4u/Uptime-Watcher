@@ -97,7 +97,8 @@ export const AppSidebar: NamedExoticComponent = memo(function AppSidebar() {
 
         const normalizedQuery = query.trim().toLowerCase();
         return sites.filter((site) =>
-            site.name.toLowerCase().includes(normalizedQuery));
+            site.name.toLowerCase().includes(normalizedQuery)
+        );
     }, [query, sites]);
 
     // Automatically select the first site to keep the detail pane populated on
@@ -115,11 +116,12 @@ export const AppSidebar: NamedExoticComponent = memo(function AppSidebar() {
         ]
     );
 
-    const handleSearchChange = useCallback((
-        event: ChangeEvent<HTMLInputElement>
-    ) => {
-        setQuery(event.target.value);
-    }, []);
+    const handleSearchChange = useCallback(
+        (event: ChangeEvent<HTMLInputElement>) => {
+            setQuery(event.target.value);
+        },
+        []
+    );
 
     const handleAddSite = useCallback(() => {
         setShowAddSiteModal(true);

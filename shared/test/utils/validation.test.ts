@@ -94,9 +94,9 @@ describe("Shared Validation - Backend Coverage", () => {
             };
 
             const errors = getMonitorValidationErrors(monitor);
-            expect(errors.some((e) => e.toLowerCase().startsWith("host:"))).toBeFalsy(
-
-            );
+            expect(
+                errors.some((e) => e.toLowerCase().startsWith("host:"))
+            ).toBeFalsy();
             expect(
                 errors.some(
                     (e) =>

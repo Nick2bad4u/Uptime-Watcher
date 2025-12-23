@@ -153,22 +153,21 @@ export class SiteWriterService {
                 };
 
                 // Use executeTransaction for atomic multi-step operation
-                await this.withSiteMonitorTransaction(({
-                    monitorTx,
-                    siteTx,
-                }) => {
-                    siteTx.upsert(site);
+                await this.withSiteMonitorTransaction(
+                    ({ monitorTx, siteTx }) => {
+                        siteTx.upsert(site);
 
-                    monitorTx.deleteBySiteIdentifier(site.identifier);
+                        monitorTx.deleteBySiteIdentifier(site.identifier);
 
-                    for (const monitor of site.monitors) {
-                        const newId = monitorTx.create(
-                            site.identifier,
-                            monitor
-                        );
-                        monitor.id = newId;
+                        for (const monitor of site.monitors) {
+                            const newId = monitorTx.create(
+                                site.identifier,
+                                monitor
+                            );
+                            monitor.id = newId;
+                        }
                     }
-                });
+                );
 
                 this.logger.info(
                     `Site created successfully in database: ${site.identifier} (${site.name || "unnamed"})`
@@ -232,15 +231,14 @@ export class SiteWriterService {
                 this.logger.info(`Removing site: ${identifier}`);
 
                 // Use executeTransaction for atomic multi-table deletion and capture result
-                const deletionResult = await this.withSiteMonitorTransaction(({
-                    monitorTx,
-                    siteTx,
-                }) =>
-                    deleteSiteWithAdapters({
-                        identifier,
-                        monitorAdapter: monitorTx,
-                        siteAdapter: siteTx,
-                    }));
+                const deletionResult = await this.withSiteMonitorTransaction(
+                    ({ monitorTx, siteTx }) =>
+                        deleteSiteWithAdapters({
+                            identifier,
+                            monitorAdapter: monitorTx,
+                            siteAdapter: siteTx,
+                        })
+                );
 
                 // Only remove from cache if database deletion was successful
                 let removed = false;
@@ -310,13 +308,12 @@ export class SiteWriterService {
 
         return withDatabaseOperation(
             async () => {
-                await this.withSiteMonitorTransaction(({
-                    monitorTx,
-                    siteTx,
-                }) => {
-                    monitorTx.deleteAll();
-                    siteTx.deleteAll();
-                });
+                await this.withSiteMonitorTransaction(
+                    ({ monitorTx, siteTx }) => {
+                        monitorTx.deleteAll();
+                        siteTx.deleteAll();
+                    }
+                );
 
                 sitesCache.clear();
 
@@ -468,20 +465,19 @@ export class SiteWriterService {
                 };
 
                 // Use executeTransaction for atomic multi-step operation
-                await this.withSiteMonitorTransaction(({
-                    monitorTx,
-                    siteTx,
-                }) => {
-                    siteTx.upsert(updatedSite);
+                await this.withSiteMonitorTransaction(
+                    ({ monitorTx, siteTx }) => {
+                        siteTx.upsert(updatedSite);
 
-                    if (updates.monitors) {
-                        this.updateMonitorsPreservingHistory(
-                            monitorTx,
-                            identifier,
-                            normalizedMonitors
-                        );
+                        if (updates.monitors) {
+                            this.updateMonitorsPreservingHistory(
+                                monitorTx,
+                                identifier,
+                                normalizedMonitors
+                            );
+                        }
                     }
-                });
+                );
 
                 // Update cache only after successful transaction
                 sitesCache.set(identifier, updatedSite);
@@ -607,7 +603,8 @@ export class SiteWriterService {
         const existingMap = new Map<string, Monitor>(
             (options.existingMonitors ?? [])
                 .filter((monitor): monitor is Monitor & { id: string } =>
-                    Boolean(monitor.id))
+                    Boolean(monitor.id)
+                )
                 .map((monitor) => [monitor.id, monitor])
         );
 
@@ -616,7 +613,8 @@ export class SiteWriterService {
                 monitor,
                 monitor.id ? existingMap.get(monitor.id) : undefined,
                 options.siteIdentifier
-            ));
+            )
+        );
     }
 
     private normalizeMonitorConfiguration(

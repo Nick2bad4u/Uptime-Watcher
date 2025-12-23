@@ -42,7 +42,8 @@ describe("useMount - 100% Coverage Tests", () => {
 
             // First render - should execute mount callback
             const { rerender } = renderHook(() =>
-                useMount(mountCallback, unmountCallback));
+                useMount(mountCallback, unmountCallback)
+            );
 
             expect(mountCallback).toHaveBeenCalledTimes(1);
 
@@ -75,7 +76,8 @@ describe("useMount - 100% Coverage Tests", () => {
             const unmountCallback = vi.fn();
 
             const { unmount } = renderHook(() =>
-                useMount(asyncMountCallback, unmountCallback));
+                useMount(asyncMountCallback, unmountCallback)
+            );
 
             // Wait for async error handling
             await new Promise((resolve) => setTimeout(resolve, 10));
@@ -133,7 +135,8 @@ describe("useMount - 100% Coverage Tests", () => {
             const unmountCallback = vi.fn();
 
             const { unmount } = renderHook(() =>
-                useMount(mountCallback, unmountCallback));
+                useMount(mountCallback, unmountCallback)
+            );
 
             expect(mountCallback).toHaveBeenCalledTimes(1);
 

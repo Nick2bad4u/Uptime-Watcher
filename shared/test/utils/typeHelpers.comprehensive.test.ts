@@ -235,13 +235,11 @@ describe("Shared Type Helpers", () => {
             const isStringValidator = (val: unknown): val is string =>
                 typeof val === "string";
             expect(() =>
-                validateAndConvert(123, isStringValidator)).toThrowError(
-                "Type validation failed"
-            );
+                validateAndConvert(123, isStringValidator)
+            ).toThrowError("Type validation failed");
             expect(() =>
-                validateAndConvert(null, isStringValidator)).toThrowError(
-                "Type validation failed"
-            );
+                validateAndConvert(null, isStringValidator)
+            ).toThrowError("Type validation failed");
         });
 
         it("should throw with custom error message", async ({
@@ -255,11 +253,8 @@ describe("Shared Type Helpers", () => {
             const isStringValidator = (val: unknown): val is string =>
                 typeof val === "string";
             expect(() =>
-                validateAndConvert(
-                    123,
-                    isStringValidator,
-                    "Custom error"
-                )).toThrowError("Custom error");
+                validateAndConvert(123, isStringValidator, "Custom error")
+            ).toThrowError("Custom error");
         });
     });
 

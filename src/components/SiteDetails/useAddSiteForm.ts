@@ -579,7 +579,8 @@ export function useAddSiteForm(): UseAddSiteFormReturnWithMonitorFields {
     const [monitorType, setMonitorType] = useState<MonitorType>("http");
     const [checkInterval, setCheckInterval] = useState(DEFAULT_CHECK_INTERVAL);
     const [siteIdentifier, setSiteIdentifier] = useState<string>(() =>
-        generateUuid()); // Lazy initialization
+        generateUuid()
+    ); // Lazy initialization
 
     const setSanitizedName = useCallback(
         (value: string): void => {

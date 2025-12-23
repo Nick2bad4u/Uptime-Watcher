@@ -39,9 +39,7 @@ import {
     hasProperty,
     hasProperties,
 } from "@shared/utils/typeGuards";
-import {
-    validateMonitorType,
-} from "@shared/utils/validation";
+import { validateMonitorType } from "@shared/utils/validation";
 import { getMonitorValidationErrors } from "@shared/validation/monitorSchemas";
 import { validateSiteData } from "@shared/validation/siteSchemas";
 
@@ -206,15 +204,16 @@ describe("Type Guards Advanced Fuzzing Tests", () => {
                 fc.string(),
                 fc.constant(null)
             ),
-        ])("isFiniteNumber should correctly validate finite numbers", (
-            value
-        ) => {
-            const result = isFiniteNumber(value);
-            const expectedResult =
-                typeof value === "number" && Number.isFinite(value);
+        ])(
+            "isFiniteNumber should correctly validate finite numbers",
+            (value) => {
+                const result = isFiniteNumber(value);
+                const expectedResult =
+                    typeof value === "number" && Number.isFinite(value);
 
-            expect(result).toBe(expectedResult);
-        });
+                expect(result).toBe(expectedResult);
+            }
+        );
 
         // Test isPositiveNumber with boundary values
         fcTest.prop([
@@ -232,17 +231,18 @@ describe("Type Guards Advanced Fuzzing Tests", () => {
                 fc.constant(Number.NaN),
                 fc.string()
             ),
-        ])("isPositiveNumber should validate positive numbers correctly", (
-            value
-        ) => {
-            const result = isPositiveNumber(value);
-            const expectedResult =
-                typeof value === "number" &&
-                Number.isFinite(value) &&
-                value > 0;
+        ])(
+            "isPositiveNumber should validate positive numbers correctly",
+            (value) => {
+                const result = isPositiveNumber(value);
+                const expectedResult =
+                    typeof value === "number" &&
+                    Number.isFinite(value) &&
+                    value > 0;
 
-            expect(result).toBe(expectedResult);
-        });
+                expect(result).toBe(expectedResult);
+            }
+        );
 
         // Test isNonNegativeNumber with boundary values
         fcTest.prop([
@@ -302,18 +302,19 @@ describe("Type Guards Advanced Fuzzing Tests", () => {
                 fc.string(),
                 fc.constant(null)
             ),
-        ])("isValidTimestamp should validate timestamp values correctly", (
-            value
-        ) => {
-            const result = isValidTimestamp(value);
-            const expectedResult =
-                typeof value === "number" &&
-                !Number.isNaN(value) &&
-                value > 0 &&
-                value <= Date.now() + 86_400_000;
+        ])(
+            "isValidTimestamp should validate timestamp values correctly",
+            (value) => {
+                const result = isValidTimestamp(value);
+                const expectedResult =
+                    typeof value === "number" &&
+                    !Number.isNaN(value) &&
+                    value > 0 &&
+                    value <= Date.now() + 86_400_000;
 
-            expect(result).toBe(expectedResult);
-        });
+                expect(result).toBe(expectedResult);
+            }
+        );
     });
 
     describe("Object Property Validation", () => {
@@ -328,19 +329,19 @@ describe("Type Guards Advanced Fuzzing Tests", () => {
                 objectProp: fc.object(),
             }),
             fc.string(),
-        ])("hasProperty should correctly detect property existence", (
-            obj,
-            propName
-        ) => {
-            const result = hasProperty(obj, propName);
-            const expectedResult =
-                typeof obj === "object" &&
-                obj !== null &&
-                !Array.isArray(obj) &&
-                Object.hasOwn(obj, propName);
+        ])(
+            "hasProperty should correctly detect property existence",
+            (obj, propName) => {
+                const result = hasProperty(obj, propName);
+                const expectedResult =
+                    typeof obj === "object" &&
+                    obj !== null &&
+                    !Array.isArray(obj) &&
+                    Object.hasOwn(obj, propName);
 
-            expect(result).toBe(expectedResult);
-        });
+                expect(result).toBe(expectedResult);
+            }
+        );
 
         // Test hasProperty with non-objects
         fcTest.prop([
@@ -353,17 +354,17 @@ describe("Type Guards Advanced Fuzzing Tests", () => {
                 fc.array(fc.anything())
             ),
             fc.string(),
-        ])("hasProperty should handle non-object inputs gracefully", (
-            value,
-            propName
-        ) => {
-            const result = hasProperty(value, propName);
-            // HasProperty only returns true for objects that actually have the property
-            // It should return false for non-objects (including null/undefined)
-            const expectedResult = false;
+        ])(
+            "hasProperty should handle non-object inputs gracefully",
+            (value, propName) => {
+                const result = hasProperty(value, propName);
+                // HasProperty only returns true for objects that actually have the property
+                // It should return false for non-objects (including null/undefined)
+                const expectedResult = false;
 
-            expect(result).toBe(expectedResult);
-        });
+                expect(result).toBe(expectedResult);
+            }
+        );
 
         // Test hasProperties with property arrays
         fcTest.prop([
@@ -373,16 +374,17 @@ describe("Type Guards Advanced Fuzzing Tests", () => {
                 c: fc.boolean(),
             }),
             fc.array(fc.string(), { maxLength: 10 }),
-        ])("hasProperties should validate multiple properties correctly", (
-            obj,
-            properties
-        ) => {
-            const result = hasProperties(obj, properties);
-            const expectedResult = properties.every((prop) =>
-                Object.hasOwn(obj, prop));
+        ])(
+            "hasProperties should validate multiple properties correctly",
+            (obj, properties) => {
+                const result = hasProperties(obj, properties);
+                const expectedResult = properties.every((prop) =>
+                    Object.hasOwn(obj, prop)
+                );
 
-            expect(result).toBe(expectedResult);
-        });
+                expect(result).toBe(expectedResult);
+            }
+        );
 
         // Test isNonNullObject with various object types
         fcTest.prop([
@@ -397,17 +399,18 @@ describe("Type Guards Advanced Fuzzing Tests", () => {
                 fc.constant(null),
                 fc.constant(undefined)
             ),
-        ])("isNonNullObject should correctly identify non-null objects", (
-            value
-        ) => {
-            const result = isNonNullObject(value);
-            const expectedResult =
-                typeof value === "object" &&
-                value !== null &&
-                !Array.isArray(value);
+        ])(
+            "isNonNullObject should correctly identify non-null objects",
+            (value) => {
+                const result = isNonNullObject(value);
+                const expectedResult =
+                    typeof value === "object" &&
+                    value !== null &&
+                    !Array.isArray(value);
 
-            expect(result).toBe(expectedResult);
-        });
+                expect(result).toBe(expectedResult);
+            }
+        );
     });
 
     describe("Monitor Type Validation", () => {
@@ -421,21 +424,24 @@ describe("Type Guards Advanced Fuzzing Tests", () => {
                 fc.constant(null),
                 fc.constant(undefined)
             ),
-        ])("validateMonitorType should validate monitor types correctly", (
-            monitorType
-        ) => {
-            const result = validateMonitorType(monitorType);
-            const validTypes = [
-                "http",
-                "ping",
-                "port",
-                "dns",
-                "ssl",
-            ];
-            const expectedResult = validTypes.includes(monitorType as string);
+        ])(
+            "validateMonitorType should validate monitor types correctly",
+            (monitorType) => {
+                const result = validateMonitorType(monitorType);
+                const validTypes = [
+                    "http",
+                    "ping",
+                    "port",
+                    "dns",
+                    "ssl",
+                ];
+                const expectedResult = validTypes.includes(
+                    monitorType as string
+                );
 
-            expect(result).toBe(expectedResult);
-        });
+                expect(result).toBe(expectedResult);
+            }
+        );
 
         // Test with case variations
         fcTest.prop([
@@ -445,15 +451,16 @@ describe("Type Guards Advanced Fuzzing Tests", () => {
                 fc.constantFrom("PORT", "Port", "pOrT"),
                 fc.constantFrom("DNS", "Dns", "dNs")
             ),
-        ])("validateMonitorType should handle case variations", (
-            monitorType
-        ) => {
-            const result = validateMonitorType(monitorType);
+        ])(
+            "validateMonitorType should handle case variations",
+            (monitorType) => {
+                const result = validateMonitorType(monitorType);
 
-            // Depending on implementation, this might be case-sensitive or insensitive
-            // The test verifies consistent behavior
-            expect(typeof result).toBe("boolean");
-        });
+                // Depending on implementation, this might be case-sensitive or insensitive
+                // The test verifies consistent behavior
+                expect(typeof result).toBe("boolean");
+            }
+        );
     });
 
     describe("Site Validation", () => {
@@ -474,20 +481,21 @@ describe("Type Guards Advanced Fuzzing Tests", () => {
                     fc.constant(null)
                 ),
             }),
-        ])("validateSite should handle various site object structures", (
-            siteObject
-        ) => {
+        ])(
+            "validateSite should handle various site object structures",
+            (siteObject) => {
                 const result = validateSiteData(siteObject as any).success;
 
-            // Result should always be a boolean
-            expect(typeof result).toBe("boolean");
+                // Result should always be a boolean
+                expect(typeof result).toBe("boolean");
 
-            // If validation passes, the object should have required properties
-            if (result) {
-                expect(siteObject).toHaveProperty("name");
-                expect(siteObject).toHaveProperty("url");
+                // If validation passes, the object should have required properties
+                if (result) {
+                    expect(siteObject).toHaveProperty("name");
+                    expect(siteObject).toHaveProperty("url");
+                }
             }
-        });
+        );
 
         // Test with malformed site objects
         fcTest.prop([
@@ -507,7 +515,7 @@ describe("Type Guards Advanced Fuzzing Tests", () => {
                 fc.constant(undefined)
             ),
         ])("validateSite should reject invalid site objects", (invalidSite) => {
-                const result = validateSiteData(invalidSite as any).success;
+            const result = validateSiteData(invalidSite as any).success;
 
             // Should handle any input gracefully
             expect(typeof result).toBe("boolean");
@@ -571,54 +579,63 @@ describe("Type Guards Advanced Fuzzing Tests", () => {
                 timeout: fc.integer({ min: -1000, max: 1_000_000 }),
                 interval: fc.integer({ min: -1000, max: 10_000_000 }),
             }),
-        ])("getMonitorValidationErrors should handle extreme numeric values", (
-            extremeConfig
-        ) => {
-            const result = getMonitorValidationErrors(extremeConfig as any);
+        ])(
+            "getMonitorValidationErrors should handle extreme numeric values",
+            (extremeConfig) => {
+                const result = getMonitorValidationErrors(extremeConfig as any);
 
-            expect(Array.isArray(result)).toBeTruthy();
+                expect(Array.isArray(result)).toBeTruthy();
 
-            // Check for invalid monitor type first
-            const validTypes = new Set([
-                "http",
-                "port",
-                "ping",
-                "dns",
-            ]);
-            if (!extremeConfig.type || !validTypes.has(extremeConfig.type)) {
-                // Accept either "Monitor type is required" for empty/falsy types
-                // or "unknown monitor type" for invalid but non-empty types
-                expect(
-                    result.some(
-                        (error) =>
-                            error.toLowerCase().includes("monitor type") ||
-                            error.toLowerCase().includes("unknown monitor type")
-                    )
-                ).toBeTruthy();
-                return; // Don't check other validations for invalid monitor types
+                // Check for invalid monitor type first
+                const validTypes = new Set([
+                    "http",
+                    "port",
+                    "ping",
+                    "dns",
+                ]);
+                if (
+                    !extremeConfig.type ||
+                    !validTypes.has(extremeConfig.type)
+                ) {
+                    // Accept either "Monitor type is required" for empty/falsy types
+                    // or "unknown monitor type" for invalid but non-empty types
+                    expect(
+                        result.some(
+                            (error) =>
+                                error.toLowerCase().includes("monitor type") ||
+                                error
+                                    .toLowerCase()
+                                    .includes("unknown monitor type")
+                        )
+                    ).toBeTruthy();
+                    return; // Don't check other validations for invalid monitor types
+                }
+
+                // Should include errors for out-of-range values only for appropriate monitor types
+                if (
+                    extremeConfig.type === "port" &&
+                    (extremeConfig.port < 1 || extremeConfig.port > 65_535)
+                ) {
+                    expect(
+                        result.some((error) =>
+                            error.toLowerCase().includes("port")
+                        )
+                    ).toBeTruthy();
+                }
+
+                // Check for invalid timeout only if monitor type is valid and uses timeout validation
+                if (
+                    validTypes.has(extremeConfig.type) &&
+                    extremeConfig.timeout < 0
+                ) {
+                    expect(
+                        result.some((error) =>
+                            error.toLowerCase().includes("timeout")
+                        )
+                    ).toBeTruthy();
+                }
             }
-
-            // Should include errors for out-of-range values only for appropriate monitor types
-            if (
-                extremeConfig.type === "port" &&
-                (extremeConfig.port < 1 || extremeConfig.port > 65_535)
-            ) {
-                expect(
-                    result.some((error) => error.toLowerCase().includes("port"))
-                ).toBeTruthy();
-            }
-
-            // Check for invalid timeout only if monitor type is valid and uses timeout validation
-            if (
-                validTypes.has(extremeConfig.type) &&
-                extremeConfig.timeout < 0
-            ) {
-                expect(
-                    result.some((error) =>
-                        error.toLowerCase().includes("timeout"))
-                ).toBeTruthy();
-            }
-        });
+        );
     });
 
     describe("Integration and Performance Tests", () => {
@@ -646,31 +663,35 @@ describe("Type Guards Advanced Fuzzing Tests", () => {
         fcTest.prop([fc.integer({ min: 100, max: 1000 })])(
             "type guards should handle large datasets efficiently",
             (datasetSize) => {
-                const mixedDataset = Array.from({ length: datasetSize }, (
-                    _,
-                    i
-                ) => {
-                    const types = [
-                        `string-${i}`,
-                        i,
-                        i % 2 === 0,
-                        { id: i },
-                        [i],
-                        () => i,
-                        new Date(),
-                        null,
-                    ];
-                    return types[i % types.length];
-                });
+                const mixedDataset = Array.from(
+                    { length: datasetSize },
+                    (_, i) => {
+                        const types = [
+                            `string-${i}`,
+                            i,
+                            i % 2 === 0,
+                            { id: i },
+                            [i],
+                            () => i,
+                            new Date(),
+                            null,
+                        ];
+                        return types[i % types.length];
+                    }
+                );
 
                 const stringCount = mixedDataset.filter((element) =>
-                    isString(element)).length;
+                    isString(element)
+                ).length;
                 const numberCount = mixedDataset.filter((element) =>
-                    isNumber(element)).length;
+                    isNumber(element)
+                ).length;
                 const booleanCount = mixedDataset.filter((element) =>
-                    isBoolean(element)).length;
+                    isBoolean(element)
+                ).length;
                 const objectCount = mixedDataset.filter((element) =>
-                    isObject(element)).length;
+                    isObject(element)
+                ).length;
 
                 // Verify counts are reasonable
                 expect(
@@ -698,17 +719,18 @@ describe("Type Guards Advanced Fuzzing Tests", () => {
                     ),
                 })
             ),
-        ])("type guards should handle objects with custom conversion methods", (
-            objectWithConversions
-        ) => {
-            // Should not throw and should return consistent results
-            const isObjectResult = isObject(objectWithConversions);
-            expect(typeof isObjectResult).toBe("boolean");
-            expect(isObjectResult).toBeTruthy(); // Should be true for objects
+        ])(
+            "type guards should handle objects with custom conversion methods",
+            (objectWithConversions) => {
+                // Should not throw and should return consistent results
+                const isObjectResult = isObject(objectWithConversions);
+                expect(typeof isObjectResult).toBe("boolean");
+                expect(isObjectResult).toBeTruthy(); // Should be true for objects
 
-            const isStringResult = isString(objectWithConversions);
-            expect(typeof isStringResult).toBe("boolean");
-            expect(isStringResult).toBeFalsy(); // Should be false for objects
-        });
+                const isStringResult = isString(objectWithConversions);
+                expect(typeof isStringResult).toBe("boolean");
+                expect(isStringResult).toBeFalsy(); // Should be false for objects
+            }
+        );
     });
 });

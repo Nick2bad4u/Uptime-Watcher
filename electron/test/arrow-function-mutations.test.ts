@@ -197,7 +197,8 @@ describe("Backend Arrow Function Mutation Tests", () => {
             const filterCallback = (op: string) => op !== result.operationId;
 
             const filteredOperations = operations.filter((op: string) =>
-                filterCallback(op));
+                filterCallback(op)
+            );
 
             expect(filteredOperations).toEqual([
                 "op1",
@@ -229,7 +230,8 @@ describe("Backend Arrow Function Mutation Tests", () => {
             const filterCallbackMutated = (): undefined => undefined;
 
             const filteredOperations = operations.filter(() =>
-                filterCallbackMutated());
+                filterCallbackMutated()
+            );
 
             // Undefined is falsy, so all items are filtered out
             expect(filteredOperations).toEqual([]);
@@ -303,7 +305,8 @@ describe("Backend Arrow Function Mutation Tests", () => {
                 monitor.monitoring;
 
             const activeMonitors = monitors.filter((monitor) =>
-                filterCallback(monitor));
+                filterCallback(monitor)
+            );
 
             expect(activeMonitors).toHaveLength(2);
             expect(activeMonitors.every((m) => m.monitoring)).toBeTruthy();
@@ -334,7 +337,8 @@ describe("Backend Arrow Function Mutation Tests", () => {
                 result.status === "fulfilled" && result.value?.success === true;
 
             const successResults = results.filter((result) =>
-                filterCallback(result));
+                filterCallback(result)
+            );
 
             expect(successResults).toHaveLength(2);
             expect(

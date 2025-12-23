@@ -13,10 +13,10 @@ import {
  * Canonical validation schema for a site identifier.
  *
  * @remarks
- * This schema is intentionally kept free of dependencies on the full site schema
- * (and therefore monitor schemas) so it can be imported in low-level contexts
- * such as IPC parameter validators and runtime guards without pulling in heavy
- * schema graphs.
+ * This schema is intentionally kept free of dependencies on the full site
+ * schema (and therefore monitor schemas) so it can be imported in low-level
+ * contexts such as IPC parameter validators and runtime guards without pulling
+ * in heavy schema graphs.
  */
 export const siteIdentifierSchema: z.ZodString = z
     .string()

@@ -5,18 +5,10 @@
         "incremental": true,
         "outDir": ".cache/builds/app",
         "paths": {
-            "@app/*": [
-                "src/*"
-            ],
-            "@assets/*": [
-                "assets/*"
-            ],
-            "@electron/*": [
-                "electron/*"
-            ],
-            "@shared/*": [
-                "shared/*"
-            ]
+            "@app/*": ["src/*"],
+            "@assets/*": ["assets/*"],
+            "@electron/*": ["electron/*"],
+            "@shared/*": ["shared/*"]
         },
         "tsBuildInfoFile": "./.cache/tsconfig.electron.tsbuildinfo"
     },
@@ -31,11 +23,7 @@
         "**/scripts/**"
     ],
     "extends": "./tsconfig.json",
-    "include": [
-        "electron/**/*",
-        "vite/client",
-        "vitest.electron.config.ts"
-    ],
+    "include": ["electron/**/*", "vite/client", "vitest.electron.config.ts"],
     "references": [
         {
             "path": "./tsconfig.shared.json"

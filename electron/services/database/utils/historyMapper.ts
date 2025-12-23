@@ -196,12 +196,16 @@ export function rowToHistoryEntry(row: DatabaseHistoryRow): StatusHistory {
         };
     } catch (error: unknown) {
         const normalizedError = ensureError(error);
-        logger.error(LOG_TEMPLATES.errors.HISTORY_MAPPER_FAILED, normalizedError, {
-            responseTime: row.responseTime,
-            row,
-            status: row.status,
-            timestamp: row.timestamp,
-        });
+        logger.error(
+            LOG_TEMPLATES.errors.HISTORY_MAPPER_FAILED,
+            normalizedError,
+            {
+                responseTime: row.responseTime,
+                row,
+                status: row.status,
+                timestamp: row.timestamp,
+            }
+        );
         throw error;
     }
 }

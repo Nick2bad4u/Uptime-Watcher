@@ -391,13 +391,13 @@ describe("IPC Communication Performance", () => {
                 }));
             });
 
-            const batchData: BatchCreatePayload = Array.from({ length: 50 }, (
-                _,
-                i
-            ) => ({
-                name: `Item ${i}`,
-                url: `https://item-${i}.example.com`,
-            }));
+            const batchData: BatchCreatePayload = Array.from(
+                { length: 50 },
+                (_, i) => ({
+                    name: `Item ${i}`,
+                    url: `https://item-${i}.example.com`,
+                })
+            );
 
             await ipcService.invoke("batch-create", batchData);
         },

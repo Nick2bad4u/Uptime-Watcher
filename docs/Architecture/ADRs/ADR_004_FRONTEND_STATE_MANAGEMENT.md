@@ -470,7 +470,8 @@ const sitesWithMonitorCount = useSitesStore((state) =>
  state.sites.map((site) => ({
   ...site,
   monitorCount: site.monitors.length,
- })));
+ }))
+);
 ```
 
 ## Integration with IPC

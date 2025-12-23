@@ -43,32 +43,34 @@ vi.mock("../../../utils/monitorValidation", () => ({
 
 // Mock the error handling utility
 vi.mock("../../../utils/errorHandling", () => ({
-    withUtilityErrorHandling: vi.fn(async (
-        fn,
-        operationName,
-        fallbackValue = undefined,
-        shouldThrow = false
-    ) => {
-        try {
-            return await fn();
-        } catch (error) {
-            // Mock the logging behavior but don't actually log
-            // console.log(`${operationName} failed`, error);
+    withUtilityErrorHandling: vi.fn(
+        async (
+            fn,
+            operationName,
+            fallbackValue = undefined,
+            shouldThrow = false
+        ) => {
+            try {
+                return await fn();
+            } catch (error) {
+                // Mock the logging behavior but don't actually log
+                // console.log(`${operationName} failed`, error);
 
-            if (shouldThrow) {
-                throw error;
+                if (shouldThrow) {
+                    throw error;
+                }
+
+                if (fallbackValue === undefined) {
+                    throw new Error(
+                        `${operationName} failed and no fallback value provided`,
+                        { cause: error }
+                    );
+                }
+
+                return fallbackValue;
             }
-
-            if (fallbackValue === undefined) {
-                throw new Error(
-                    `${operationName} failed and no fallback value provided`,
-                    { cause: error }
-                );
-            }
-
-            return fallbackValue;
         }
-    }),
+    ),
 }));
 
 // Mock the fallbacks

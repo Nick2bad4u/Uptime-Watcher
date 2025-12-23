@@ -237,10 +237,7 @@
                 "indentWidth": 2,
                 "lineWidth": 100
             },
-            "includes": [
-                "*.md",
-                "*.mdx"
-            ]
+            "includes": ["*.md", "*.mdx"]
         },
         {
             "includes": [
@@ -275,18 +272,13 @@
             "formatter": {
                 "enabled": false
             },
-            "includes": [
-                "**/node_modules/**",
-                "**/dist/**"
-            ],
+            "includes": ["**/node_modules/**", "**/dist/**"],
             "linter": {
                 "enabled": false
             }
         },
         {
-            "includes": [
-                "electron/**/*.ts"
-            ],
+            "includes": ["electron/**/*.ts"],
             "javascript": {
                 "globals": [
                     "app",
@@ -304,21 +296,13 @@
             }
         },
         {
-            "includes": [
-                "src/**/*.{ts,tsx}"
-            ],
+            "includes": ["src/**/*.{ts,tsx}"],
             "javascript": {
-                "globals": [
-                    "React",
-                    "JSX"
-                ]
+                "globals": ["React", "JSX"]
             }
         },
         {
-            "includes": [
-                ".vscode/**/*.json",
-                "**/.vscode/**/*.json"
-            ],
+            "includes": [".vscode/**/*.json", "**/.vscode/**/*.json"],
             "json": {
                 "parser": {
                     "allowComments": true,

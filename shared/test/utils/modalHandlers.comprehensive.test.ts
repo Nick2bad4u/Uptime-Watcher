@@ -34,7 +34,8 @@ describe("Modal Handler Utilities - Comprehensive Coverage", () => {
             const setShowModal = vi.fn() as StateSetter<boolean>;
 
             const { result, rerender } = renderHook(() =>
-                useModalCloseHandler(setShowModal));
+                useModalCloseHandler(setShowModal)
+            );
 
             const firstHandler = result.current;
 
@@ -135,7 +136,8 @@ describe("Modal Handler Utilities - Comprehensive Coverage", () => {
             ];
 
             const { unmount } = renderHook(() =>
-                useEscapeKeyModalHandler(modalConfigs));
+                useEscapeKeyModalHandler(modalConfigs)
+            );
 
             unmount();
 
@@ -356,7 +358,8 @@ describe("Modal Handler Utilities - Comprehensive Coverage", () => {
             const setShowModal = vi.fn();
 
             const { result, rerender } = renderHook(() =>
-                useModalToggleHandler(setShowModal as StateSetter<boolean>));
+                useModalToggleHandler(setShowModal as StateSetter<boolean>)
+            );
 
             const firstHandler = result.current;
 
@@ -418,7 +421,8 @@ describe("Modal Handler Utilities - Comprehensive Coverage", () => {
             const setShowModal = vi.fn() as StateSetter<boolean>;
 
             const { result, rerender } = renderHook(() =>
-                useModalOpenHandler(setShowModal));
+                useModalOpenHandler(setShowModal)
+            );
 
             const firstHandler = result.current;
 
@@ -590,7 +594,8 @@ describe("Modal Handler Utilities - Comprehensive Coverage", () => {
             const setShowModal = vi.fn() as StateSetter<boolean>;
 
             const { result } = renderHook(() =>
-                useModalHandlersWithCallbacks(setShowModal));
+                useModalHandlersWithCallbacks(setShowModal)
+            );
 
             expect(typeof result.current.open).toBe("function");
             expect(typeof result.current.close).toBe("function");
@@ -609,7 +614,8 @@ describe("Modal Handler Utilities - Comprehensive Coverage", () => {
             const onOpen = vi.fn();
 
             const { result } = renderHook(() =>
-                useModalHandlersWithCallbacks(setShowModal, onOpen));
+                useModalHandlersWithCallbacks(setShowModal, onOpen)
+            );
 
             act(() => {
                 result.current.open();
@@ -632,11 +638,8 @@ describe("Modal Handler Utilities - Comprehensive Coverage", () => {
             const onClose = vi.fn();
 
             const { result } = renderHook(() =>
-                useModalHandlersWithCallbacks(
-                    setShowModal,
-                    undefined,
-                    onClose
-                ));
+                useModalHandlersWithCallbacks(setShowModal, undefined, onClose)
+            );
 
             act(() => {
                 result.current.close();
@@ -655,7 +658,8 @@ describe("Modal Handler Utilities - Comprehensive Coverage", () => {
             const setShowModal = vi.fn() as StateSetter<boolean>;
 
             const { result } = renderHook(() =>
-                useModalHandlersWithCallbacks(setShowModal));
+                useModalHandlersWithCallbacks(setShowModal)
+            );
 
             act(() => {
                 result.current.open();
@@ -681,7 +685,8 @@ describe("Modal Handler Utilities - Comprehensive Coverage", () => {
             const onClose = vi.fn();
 
             const { result, rerender } = renderHook(() =>
-                useModalHandlersWithCallbacks(setShowModal, onOpen, onClose));
+                useModalHandlersWithCallbacks(setShowModal, onOpen, onClose)
+            );
 
             const firstOpen = result.current.open;
             const firstClose = result.current.close;

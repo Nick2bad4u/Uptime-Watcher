@@ -160,7 +160,8 @@ describe(ScreenshotThumbnail, () => {
 
         // Mock getBoundingClientRect
         Element.prototype.getBoundingClientRect = vi.fn(() =>
-            createMockBoundingClientRect());
+            createMockBoundingClientRect()
+        );
     });
 
     afterEach(() => {
@@ -265,77 +266,83 @@ describe(ScreenshotThumbnail, () => {
          */
         it("renders snapshot details for any site name and URL", async () => {
             await fc.assert(
-                fc.asyncProperty(siteNameArbitrary, siteUrlArbitrary, async (
-                    siteName,
-                    url
-                ) => {
-                    const trimmedUrl = url.trim();
+                fc.asyncProperty(
+                    siteNameArbitrary,
+                    siteUrlArbitrary,
+                    async (siteName, url) => {
+                        const trimmedUrl = url.trim();
 
-                    const isUrlValid = isValidUrl(trimmedUrl, {
-                        disallowAuth: true,
-                    });
+                        const isUrlValid = isValidUrl(trimmedUrl, {
+                            disallowAuth: true,
+                        });
 
-                    const isUrlSafeForScreenshot = (() => {
-                        if (!isUrlValid) {
-                            return false;
-                        }
+                        const isUrlSafeForScreenshot = (() => {
+                            if (!isUrlValid) {
+                                return false;
+                            }
 
-                        try {
-                            const parsed = new URL(trimmedUrl);
-                            return !isPrivateNetworkHostname(parsed.hostname);
-                        } catch {
-                            return false;
-                        }
-                    })();
+                            try {
+                                const parsed = new URL(trimmedUrl);
+                                return !isPrivateNetworkHostname(
+                                    parsed.hostname
+                                );
+                            } catch {
+                                return false;
+                            }
+                        })();
 
-                    render(
-                        <ScreenshotThumbnail siteName={siteName} url={url} />
-                    );
+                        render(
+                            <ScreenshotThumbnail
+                                siteName={siteName}
+                                url={url}
+                            />
+                        );
 
-                    const expectedAriaLabel =
-                        isUrlValid
+                        const expectedAriaLabel = isUrlValid
                             ? `Open ${trimmedUrl} in browser`
                             : "Open in browser";
-                    const links = screen.queryAllByRole("link");
-                    expect(links.length).toBeGreaterThan(0);
-                    expect(
-                        links.some(
-                            (linkElement) =>
-                                linkElement.getAttribute("aria-label") ===
-                                expectedAriaLabel
-                        )
-                    ).toBeTruthy();
+                        const links = screen.queryAllByRole("link");
+                        expect(links.length).toBeGreaterThan(0);
+                        expect(
+                            links.some(
+                                (linkElement) =>
+                                    linkElement.getAttribute("aria-label") ===
+                                    expectedAriaLabel
+                            )
+                        ).toBeTruthy();
 
-                    const images = screen.queryAllByRole("img");
-                    const matchingImage = images.find(
-                        (element) =>
-                            element.getAttribute("alt") ===
-                            `Screenshot of ${siteName}`
-                    );
-
-                    if (isUrlSafeForScreenshot) {
-                        expect(matchingImage).toBeDefined();
-                        expect(matchingImage).toHaveAttribute(
-                            "src",
-                            `https://api.microlink.io/?url=${encodeURIComponent(trimmedUrl)}&screenshot=true&meta=false&embed=screenshot.url&colorScheme=auto`
-                        );
-                    } else {
-                        expect(matchingImage).toBeUndefined();
-                    }
-
-                    const captionElements = Array.from(
-                        document.querySelectorAll(
-                            ".site-details-thumbnail-caption"
-                        )
-                    );
-                    expect(captionElements.length).toBeGreaterThan(0);
-                    expect(
-                        captionElements.some(
+                        const images = screen.queryAllByRole("img");
+                        const matchingImage = images.find(
                             (element) =>
-                                element.textContent === `Preview: ${siteName}`
-                        )
-                    ).toBeTruthy();
-                }),
+                                element.getAttribute("alt") ===
+                                `Screenshot of ${siteName}`
+                        );
+
+                        if (isUrlSafeForScreenshot) {
+                            expect(matchingImage).toBeDefined();
+                            expect(matchingImage).toHaveAttribute(
+                                "src",
+                                `https://api.microlink.io/?url=${encodeURIComponent(trimmedUrl)}&screenshot=true&meta=false&embed=screenshot.url&colorScheme=auto`
+                            );
+                        } else {
+                            expect(matchingImage).toBeUndefined();
+                        }
+
+                        const captionElements = Array.from(
+                            document.querySelectorAll(
+                                ".site-details-thumbnail-caption"
+                            )
+                        );
+                        expect(captionElements.length).toBeGreaterThan(0);
+                        expect(
+                            captionElements.some(
+                                (element) =>
+                                    element.textContent ===
+                                    `Preview: ${siteName}`
+                            )
+                        ).toBeTruthy();
+                    }
+                ),
                 {
                     numRuns: 30,
                 }
@@ -1217,9 +1224,8 @@ describe(ScreenshotThumbnail, () => {
 
             // The cleanup should happen through the useEffect cleanup
             expect(() =>
-                screen.queryByAltText(
-                    `Screenshot of ${props.siteName}`
-                )).not.toThrowError();
+                screen.queryByAltText(`Screenshot of ${props.siteName}`)
+            ).not.toThrowError();
 
             clearTimeoutSpy.mockRestore();
             vi.useRealTimers();
@@ -1689,7 +1695,8 @@ describe(ScreenshotThumbnail, () => {
 
             // Restore defaults
             Element.prototype.getBoundingClientRect = vi.fn(() =>
-                createMockBoundingClientRect());
+                createMockBoundingClientRect()
+            );
         });
 
         it("should handle all event combinations that can clear timeouts", ({

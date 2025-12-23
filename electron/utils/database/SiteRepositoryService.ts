@@ -217,7 +217,8 @@ export class SiteRepositoryService {
 
             // Build sites in parallel since each site operation is independent
             const sitePromises = siteRows.map(async (siteRow) =>
-                this.buildSiteWithMonitorsAndHistory(siteRow));
+                this.buildSiteWithMonitorsAndHistory(siteRow)
+            );
 
             return await Promise.all(sitePromises);
         } catch (error) {

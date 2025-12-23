@@ -15,13 +15,12 @@
 
 import type { AxiosInstance, AxiosRequestConfig } from "axios";
 
+import { readNumberEnv } from "@shared/utils/environment";
 import axios from "axios";
 import * as http from "node:http";
 import * as https from "node:https";
 
 import type { MonitorServiceConfig } from "../types";
-
-import { readNumberEnv } from "../../../utils/environment";
 
 /**
  * Ensures an unknown value is an Error instance.

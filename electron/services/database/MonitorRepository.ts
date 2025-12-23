@@ -170,7 +170,10 @@ export class MonitorRepository {
         siteIdentifier: string,
         monitors: Array<Site["monitors"][0]>
     ): Promise<Array<Site["monitors"][0]>> {
-        assertValidSiteIdentifier(siteIdentifier, "MonitorRepository.bulkCreate");
+        assertValidSiteIdentifier(
+            siteIdentifier,
+            "MonitorRepository.bulkCreate"
+        );
 
         return withDatabaseOperation(
             async () => {
@@ -295,7 +298,8 @@ export class MonitorRepository {
                 this.databaseService.executeTransaction((db) =>
                     Promise.resolve(
                         this.createInternal(db, siteIdentifier, monitor)
-                    )),
+                    )
+                ),
             "monitor-create",
             undefined,
             { siteIdentifier, type: monitor.type }
@@ -716,7 +720,10 @@ export class MonitorRepository {
         siteIdentifier: string,
         monitor: Site["monitors"][0]
     ): string {
-        assertValidSiteIdentifier(siteIdentifier, "MonitorRepository.createInternal");
+        assertValidSiteIdentifier(
+            siteIdentifier,
+            "MonitorRepository.createInternal"
+        );
 
         if (typeof monitor.id !== "string") {
             throw new TypeError(

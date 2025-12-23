@@ -121,10 +121,8 @@ const selectStageMetadata = (
     return telemetry.pending;
 };
 
-const createTelemetryEmitter = (
-        operationName: string,
-        telemetry: NormalizedTelemetry
-    ) =>
+const createTelemetryEmitter =
+    (operationName: string, telemetry: NormalizedTelemetry) =>
     (stage: OperationStage, additional: UnknownRecord): void => {
         const payload: Record<string, unknown> = {
             ...telemetry.base,
@@ -256,7 +254,8 @@ export const applySavedSiteToStore = (
         ? currentSites.map((existingSite) =>
               existingSite.identifier === savedSite.identifier
                   ? savedSite
-                  : existingSite)
+                  : existingSite
+          )
         : [...currentSites, savedSite];
 
     try {

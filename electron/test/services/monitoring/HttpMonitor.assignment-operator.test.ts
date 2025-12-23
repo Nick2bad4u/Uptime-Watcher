@@ -275,7 +275,8 @@ describe("HttpMonitor Active Counter Assignment Operations", () => {
                 ...monitor,
                 url: `https://example${i}.com`,
                 id: `test-monitor-${i}`,
-            }));
+            })
+        );
 
         const results = await Promise.all(promises);
 

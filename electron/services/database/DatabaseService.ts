@@ -414,12 +414,9 @@ export class DatabaseService {
         try {
             db.get("PRAGMA temp_store = MEMORY");
         } catch (error) {
-            logger.warn(
-                "[DatabaseService] Failed to apply PRAGMA temp_store",
-                {
-                    message: ensureError(error).message,
-                }
-            );
+            logger.warn("[DatabaseService] Failed to apply PRAGMA temp_store", {
+                message: ensureError(error).message,
+            });
         }
 
         try {

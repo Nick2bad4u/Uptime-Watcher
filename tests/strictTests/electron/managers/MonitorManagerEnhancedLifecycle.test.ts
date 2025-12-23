@@ -121,7 +121,8 @@ function createLifecycleHarness(sites: Site[]): LifecycleTestHarness {
 
     const sitesCache = {
         get: vi.fn((identifier: string) =>
-            sites.find((site) => site.identifier === identifier)),
+            sites.find((site) => site.identifier === identifier)
+        ),
         getAll: vi.fn(() => sites),
     } as const;
 

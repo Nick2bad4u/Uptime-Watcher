@@ -87,7 +87,8 @@ describe("Service Edge Cases - Missing Branch Coverage", () => {
                 Promise.resolve("success"),
                 Promise.reject(new Error("async error")),
                 new Promise((resolve) =>
-                    setTimeout(() => resolve("delayed"), 1)),
+                    setTimeout(() => resolve("delayed"), 1)
+                ),
                 Promise.resolve(null),
                 Promise.resolve(undefined),
             ];
@@ -267,7 +268,8 @@ describe("Service Edge Cases - Missing Branch Coverage", () => {
                         setTimeout(
                             () => resolve(`result-${i}`),
                             Math.random() * 10
-                        ))
+                        )
+                    )
             );
 
             const results = await Promise.all(operations);
@@ -361,10 +363,12 @@ describe("Service Edge Cases - Missing Branch Coverage", () => {
             const timeoutOperations = [
                 new Promise((resolve) => setTimeout(() => resolve("fast"), 1)),
                 new Promise((resolve) =>
-                    setTimeout(() => resolve("medium"), 5)),
+                    setTimeout(() => resolve("medium"), 5)
+                ),
                 new Promise((resolve) => setTimeout(() => resolve("slow"), 10)),
                 new Promise((_, reject) =>
-                    setTimeout(() => reject(new Error("timeout")), 15)),
+                    setTimeout(() => reject(new Error("timeout")), 15)
+                ),
             ];
 
             // Test with different timeout strategies

@@ -3,12 +3,7 @@
         "browserName": "chromium",
         "isolated": true
     },
-    "capabilities": [
-        "tabs",
-        "install",
-        "pdf",
-        "vision"
-    ],
+    "capabilities": ["tabs", "install", "pdf", "vision"],
     "imageResponses": "allow",
     "outputDir": "./playwright-mcp/"
 }

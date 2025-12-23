@@ -21,12 +21,7 @@
         "isolatedDeclarations": true,
         "isolatedModules": true,
         "jsx": "react-jsx",
-        "lib": [
-            "DOM",
-            "DOM.Iterable",
-            "ES6",
-            "ESNext"
-        ],
+        "lib": ["DOM", "DOM.Iterable", "ES6", "ESNext"],
         "module": "ESNext",
         "moduleDetection": "auto",
         "moduleResolution": "bundler",
@@ -44,15 +39,9 @@
         "noUnusedParameters": true,
         "outDir": "../../.cache/builds/docusaurus/site",
         "paths": {
-            "@docusaurus/*": [
-                "./.docusaurus/docusaurus/*"
-            ],
-            "@site/*": [
-                "./*"
-            ],
-            "@theme/*": [
-                "./.docusaurus/theme/*"
-            ]
+            "@docusaurus/*": ["./.docusaurus/docusaurus/*"],
+            "@site/*": ["./*"],
+            "@theme/*": ["./.docusaurus/theme/*"]
         },
         "pretty": true,
         "resolveJsonModule": true,

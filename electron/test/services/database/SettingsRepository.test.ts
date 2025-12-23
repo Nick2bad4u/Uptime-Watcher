@@ -392,10 +392,8 @@ describe(SettingsRepository, () => {
                 mockDatabase.prepare = vi.fn().mockReturnValue(mockStatement);
 
                 expect(() =>
-                    repository.bulkInsertInternal(
-                        mockDatabase,
-                        settings
-                    )).toThrowError("Statement error");
+                    repository.bulkInsertInternal(mockDatabase, settings)
+                ).toThrowError("Statement error");
                 expect(mockStatement.finalize).toHaveBeenCalled();
             });
         });

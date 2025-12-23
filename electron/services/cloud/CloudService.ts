@@ -19,6 +19,7 @@ import {
     type CloudEncryptionConfigPassphrase,
     type CloudEncryptionMode,
 } from "@shared/types/cloudEncryption";
+import { readProcessEnv } from "@shared/utils/environment";
 import { tryGetErrorCode } from "@shared/utils/errorCodes";
 import { ensureError } from "@shared/utils/errorHandling";
 import { hasAsciiControlCharacters } from "@shared/utils/stringSafety";
@@ -35,7 +36,6 @@ import type { CloudSyncEngine } from "../sync/SyncEngine";
 import type { CloudSettingsAdapter } from "./CloudService.types";
 import type { CloudStorageProvider } from "./providers/CloudStorageProvider.types";
 
-import { readProcessEnv } from "../../utils/environment";
 import { logger } from "../../utils/logger";
 import { ProviderCloudSyncTransport } from "../sync/ProviderCloudSyncTransport";
 import {

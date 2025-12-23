@@ -217,7 +217,8 @@ describe("Native Connectivity with Degraded State", () => {
             mockDns.resolve4.mockImplementation(
                 () =>
                     new Promise((resolve) =>
-                        setTimeout(() => resolve(["192.168.1.1"]), 2000))
+                        setTimeout(() => resolve(["192.168.1.1"]), 2000)
+                    )
             );
             // Act
             const result = await checkConnectivity("slow-dns.example.com", {

@@ -44,17 +44,19 @@ describe("getMonitorValidationErrors (canonical Zod)", () => {
     });
 
     it("requires a non-empty monitor type", () => {
-        expect(getMonitorValidationErrors({})).toEqual(["Monitor type is required"]);
+        expect(getMonitorValidationErrors({})).toEqual([
+            "Monitor type is required",
+        ]);
         expect(getMonitorValidationErrors({ type: "   " })).toEqual([
             "Monitor type is required",
         ]);
     });
 
     it("surfaces required monitor ID errors", () => {
-           const errors = getMonitorValidationErrors({ type: "http", id: "" });
-        expect(errors.some((error) => error.includes("Monitor ID is required"))).toBeTruthy(
-
-        );
+        const errors = getMonitorValidationErrors({ type: "http", id: "" });
+        expect(
+            errors.some((error) => error.includes("Monitor ID is required"))
+        ).toBeTruthy();
     });
 
     it("validates check interval minimum using shared constant", () => {
@@ -95,9 +97,9 @@ describe("getMonitorValidationErrors (canonical Zod)", () => {
             retryAttempts: 0,
         });
 
-        expect(errors.some((error) => error.toLowerCase().includes("port"))).toBeTruthy(
-
-        );
+        expect(
+            errors.some((error) => error.toLowerCase().includes("port"))
+        ).toBeTruthy();
     });
 });
 

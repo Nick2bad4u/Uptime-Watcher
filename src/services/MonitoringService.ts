@@ -217,53 +217,56 @@ export const MonitoringService: MonitoringServiceContract = {
      * @throws {@link Error} When the backend returns an invalid status update
      *   payload or the IPC bridge encounters an unexpected error.
      */
-    checkSiteNow: wrap("checkSiteNow", async (
-        api,
-        siteIdentifier: string,
-        monitorId: string
-    ): Promise<StatusUpdate | undefined> => {
-        const rawStatusUpdate = await api.monitoring.checkSiteNow(
-            siteIdentifier,
-            monitorId
-        );
-
-        if (rawStatusUpdate === undefined) {
-            return undefined;
-        }
-
-        const validationResult = validateStatusUpdate(rawStatusUpdate);
-
-        if (!validationResult.success) {
-            return logInvalidStatusUpdateAndThrow(validationResult.error, {
-                monitorId,
+    checkSiteNow: wrap(
+        "checkSiteNow",
+        async (
+            api,
+            siteIdentifier: string,
+            monitorId: string
+        ): Promise<StatusUpdate | undefined> => {
+            const rawStatusUpdate = await api.monitoring.checkSiteNow(
                 siteIdentifier,
-            });
+                monitorId
+            );
+
+            if (rawStatusUpdate === undefined) {
+                return undefined;
+            }
+
+            const validationResult = validateStatusUpdate(rawStatusUpdate);
+
+            if (!validationResult.success) {
+                return logInvalidStatusUpdateAndThrow(validationResult.error, {
+                    monitorId,
+                    siteIdentifier,
+                });
+            }
+
+            const { data } = validationResult;
+            const normalizedUpdate: StatusUpdate = {
+                monitor: data.monitor,
+                monitorId: data.monitorId,
+                site: data.site,
+                siteIdentifier: data.siteIdentifier,
+                status: data.status,
+                timestamp: data.timestamp,
+            };
+
+            if (data.details !== undefined) {
+                normalizedUpdate.details = data.details;
+            }
+
+            if (data.previousStatus !== undefined) {
+                normalizedUpdate.previousStatus = data.previousStatus;
+            }
+
+            if (data.responseTime !== undefined) {
+                normalizedUpdate.responseTime = data.responseTime;
+            }
+
+            return normalizedUpdate;
         }
-
-        const { data } = validationResult;
-        const normalizedUpdate: StatusUpdate = {
-            monitor: data.monitor,
-            monitorId: data.monitorId,
-            site: data.site,
-            siteIdentifier: data.siteIdentifier,
-            status: data.status,
-            timestamp: data.timestamp,
-        };
-
-        if (data.details !== undefined) {
-            normalizedUpdate.details = data.details;
-        }
-
-        if (data.previousStatus !== undefined) {
-            normalizedUpdate.previousStatus = data.previousStatus;
-        }
-
-        if (data.responseTime !== undefined) {
-            normalizedUpdate.responseTime = data.responseTime;
-        }
-
-        return normalizedUpdate;
-    }),
+    ),
     /**
      * Ensures the preload bridge is ready before invoking monitoring APIs.
      *
@@ -295,36 +298,38 @@ export const MonitoringService: MonitoringServiceContract = {
      * @throws {@link Error} When the backend declines to start global
      *   monitoring or no eligible monitors are available.
      */
-    startMonitoring: wrap("startMonitoring", async (
-        api
-    ): Promise<MonitoringStartSummary> => {
-        const summary = await api.monitoring.startMonitoring();
+    startMonitoring: wrap(
+        "startMonitoring",
+        async (api): Promise<MonitoringStartSummary> => {
+            const summary = await api.monitoring.startMonitoring();
 
-        if (summary.partialFailures) {
-            logger.warn(
-                "[MonitoringService] Global monitoring start completed with partial failures",
-                summary
-            );
+            if (summary.partialFailures) {
+                logger.warn(
+                    "[MonitoringService] Global monitoring start completed with partial failures",
+                    summary
+                );
+            }
+
+            if (!summary.isMonitoring) {
+                const message =
+                    summary.attempted === 0
+                        ? "No eligible monitors were available to start. Configure at least one monitor and try again."
+                        : `Failed to start monitoring across all sites: ${summary.succeeded}/${summary.attempted} monitors activated.`;
+
+                logger.error(
+                    "[MonitoringService] Global monitoring start failed",
+                    summary
+                );
+
+                const error = new Error(message);
+                (error as Error & { summary?: typeof summary }).summary =
+                    summary;
+                throw error;
+            }
+
+            return { ...summary };
         }
-
-        if (!summary.isMonitoring) {
-            const message =
-                summary.attempted === 0
-                    ? "No eligible monitors were available to start. Configure at least one monitor and try again."
-                    : `Failed to start monitoring across all sites: ${summary.succeeded}/${summary.attempted} monitors activated.`;
-
-            logger.error(
-                "[MonitoringService] Global monitoring start failed",
-                summary
-            );
-
-            const error = new Error(message);
-            (error as Error & { summary?: typeof summary }).summary = summary;
-            throw error;
-        }
-
-        return { ...summary };
-    }),
+    ),
     /**
      * Starts monitoring for a single monitor within a site.
      *
@@ -336,22 +341,25 @@ export const MonitoringService: MonitoringServiceContract = {
      * @throws {@link Error} When the backend reports failure for the targeted
      *   monitor.
      */
-    startMonitoringForMonitor: wrap("startMonitoringForMonitor", async (
-        api,
-        siteIdentifier: string,
-        monitorId: string
-    ): Promise<void> => {
-        const success = await api.monitoring.startMonitoringForMonitor(
-            siteIdentifier,
-            monitorId
-        );
-
-        if (!success) {
-            throw new Error(
-                `Failed to start monitoring for monitor ${monitorId} of site ${siteIdentifier}: Backend operation failed`
+    startMonitoringForMonitor: wrap(
+        "startMonitoringForMonitor",
+        async (
+            api,
+            siteIdentifier: string,
+            monitorId: string
+        ): Promise<void> => {
+            const success = await api.monitoring.startMonitoringForMonitor(
+                siteIdentifier,
+                monitorId
             );
+
+            if (!success) {
+                throw new Error(
+                    `Failed to start monitoring for monitor ${monitorId} of site ${siteIdentifier}: Backend operation failed`
+                );
+            }
         }
-    }),
+    ),
     /**
      * Starts monitoring for every monitor within the specified site.
      *
@@ -362,19 +370,19 @@ export const MonitoringService: MonitoringServiceContract = {
      *
      * @throws {@link Error} When the backend declines the request.
      */
-    startMonitoringForSite: wrap("startMonitoringForSite", async (
-        api,
-        siteIdentifier: string
-    ): Promise<void> => {
-        const success =
-            await api.monitoring.startMonitoringForSite(siteIdentifier);
+    startMonitoringForSite: wrap(
+        "startMonitoringForSite",
+        async (api, siteIdentifier: string): Promise<void> => {
+            const success =
+                await api.monitoring.startMonitoringForSite(siteIdentifier);
 
-        if (!success) {
-            throw new Error(
-                `Failed to start monitoring for site ${siteIdentifier}: Backend operation failed`
-            );
+            if (!success) {
+                throw new Error(
+                    `Failed to start monitoring for site ${siteIdentifier}: Backend operation failed`
+                );
+            }
         }
-    }),
+    ),
     /**
      * Stops monitoring across all configured sites.
      *
@@ -392,36 +400,38 @@ export const MonitoringService: MonitoringServiceContract = {
      * @throws {@link Error} When the backend declines to stop global monitoring
      *   or no running monitors can be located.
      */
-    stopMonitoring: wrap("stopMonitoring", async (
-        api
-    ): Promise<MonitoringStopSummary> => {
-        const summary = await api.monitoring.stopMonitoring();
+    stopMonitoring: wrap(
+        "stopMonitoring",
+        async (api): Promise<MonitoringStopSummary> => {
+            const summary = await api.monitoring.stopMonitoring();
 
-        if (summary.partialFailures) {
-            logger.warn(
-                "[MonitoringService] Global monitoring stop completed with partial failures",
-                summary
-            );
+            if (summary.partialFailures) {
+                logger.warn(
+                    "[MonitoringService] Global monitoring stop completed with partial failures",
+                    summary
+                );
+            }
+
+            if (summary.isMonitoring) {
+                const message =
+                    summary.attempted === 0
+                        ? "Monitoring remained active because no running monitors were located."
+                        : `Failed to stop monitoring across all sites: ${summary.failed}/${summary.attempted} monitors remained active.`;
+
+                logger.error(
+                    "[MonitoringService] Global monitoring stop failed",
+                    summary
+                );
+
+                const error = new Error(message);
+                (error as Error & { summary?: typeof summary }).summary =
+                    summary;
+                throw error;
+            }
+
+            return { ...summary };
         }
-
-        if (summary.isMonitoring) {
-            const message =
-                summary.attempted === 0
-                    ? "Monitoring remained active because no running monitors were located."
-                    : `Failed to stop monitoring across all sites: ${summary.failed}/${summary.attempted} monitors remained active.`;
-
-            logger.error(
-                "[MonitoringService] Global monitoring stop failed",
-                summary
-            );
-
-            const error = new Error(message);
-            (error as Error & { summary?: typeof summary }).summary = summary;
-            throw error;
-        }
-
-        return { ...summary };
-    }),
+    ),
     /**
      * Stops monitoring for a specific monitor within a site.
      *
@@ -433,22 +443,25 @@ export const MonitoringService: MonitoringServiceContract = {
      * @throws {@link Error} When the backend reports failure for the targeted
      *   monitor.
      */
-    stopMonitoringForMonitor: wrap("stopMonitoringForMonitor", async (
-        api,
-        siteIdentifier: string,
-        monitorId: string
-    ): Promise<void> => {
-        const success = await api.monitoring.stopMonitoringForMonitor(
-            siteIdentifier,
-            monitorId
-        );
-
-        if (!success) {
-            throw new Error(
-                `Failed to stop monitoring for monitor ${monitorId} of site ${siteIdentifier}: Backend operation failed`
+    stopMonitoringForMonitor: wrap(
+        "stopMonitoringForMonitor",
+        async (
+            api,
+            siteIdentifier: string,
+            monitorId: string
+        ): Promise<void> => {
+            const success = await api.monitoring.stopMonitoringForMonitor(
+                siteIdentifier,
+                monitorId
             );
+
+            if (!success) {
+                throw new Error(
+                    `Failed to stop monitoring for monitor ${monitorId} of site ${siteIdentifier}: Backend operation failed`
+                );
+            }
         }
-    }),
+    ),
     /**
      * Stops monitoring for every monitor belonging to the specified site.
      *
@@ -459,17 +472,17 @@ export const MonitoringService: MonitoringServiceContract = {
      *
      * @throws {@link Error} When the backend declines the request.
      */
-    stopMonitoringForSite: wrap("stopMonitoringForSite", async (
-        api,
-        siteIdentifier: string
-    ): Promise<void> => {
-        const success =
-            await api.monitoring.stopMonitoringForSite(siteIdentifier);
+    stopMonitoringForSite: wrap(
+        "stopMonitoringForSite",
+        async (api, siteIdentifier: string): Promise<void> => {
+            const success =
+                await api.monitoring.stopMonitoringForSite(siteIdentifier);
 
-        if (!success) {
-            throw new Error(
-                `Failed to stop monitoring for site ${siteIdentifier}: Backend operation failed`
-            );
+            if (!success) {
+                throw new Error(
+                    `Failed to stop monitoring for site ${siteIdentifier}: Backend operation failed`
+                );
+            }
         }
-    }),
+    ),
 };

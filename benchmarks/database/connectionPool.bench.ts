@@ -164,7 +164,8 @@ class MockConnectionPool {
 
     async executeParallel(queries: { sql: string; params?: any[] }[]) {
         const promises = queries.map((query) =>
-            this.executeQuery(query.sql, query.params));
+            this.executeQuery(query.sql, query.params)
+        );
         return Promise.all(promises);
     }
 

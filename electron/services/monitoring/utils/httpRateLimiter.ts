@@ -8,7 +8,8 @@
  * that multiple monitor services can coordinate their traffic shaping.
  */
 
-import { readNumberEnv } from "../../../utils/environment";
+import { readNumberEnv } from "@shared/utils/environment";
+
 import { logger } from "../../../utils/logger";
 
 /**

@@ -100,9 +100,7 @@ export const PromptDialog: NamedExoticComponent = memo(
                         onChange={handleChange}
                         type={type}
                         value={value}
-                        {...(placeholder === undefined
-                            ? {}
-                            : { placeholder })}
+                        {...(placeholder === undefined ? {} : { placeholder })}
                     />
                 </form>
             </Modal>

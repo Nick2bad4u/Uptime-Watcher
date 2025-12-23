@@ -75,30 +75,5 @@ export const MONITOR_TIMEOUT_BUFFER_MS = 5000;
  */
 export const SECONDS_TO_MS_MULTIPLIER = 1000;
 
-/**
- * Maximum number of migration steps allowed in a migration path.
- *
- * @remarks
- * Used to prevent excessive migration chains that may indicate design issues or
- * migration loops. Helps ensure database migrations remain manageable and
- * safe.
- *
- * @defaultValue 100
- *
- * @public
- */
-export const MAX_MIGRATION_STEPS = 100;
-
-/**
- * Maximum length of data content to include in migration error logs, in
- * characters.
- *
- * @remarks
- * Used to prevent log pollution while preserving debugging context. Limits the
- * amount of data included in error logs for failed migrations.
- *
- * @defaultValue 500
- *
- * @public
- */
-export const MAX_LOG_DATA_LENGTH = 500;
+// Note: migration-related constants were intentionally removed. Development
+// builds do not support migration chains; state is reset instead.

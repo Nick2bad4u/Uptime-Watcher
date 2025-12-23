@@ -87,7 +87,8 @@ export function collectDuplicateSiteIdentifiers(
         .filter((entry): entry is IdentifierCountEntry => entry[1] > 1)
         .map(([identifier, occurrences]) => ({ identifier, occurrences }))
         .toSorted((left, right) =>
-            left.identifier.localeCompare(right.identifier));
+            left.identifier.localeCompare(right.identifier)
+        );
 }
 
 /**

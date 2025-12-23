@@ -102,15 +102,16 @@ describe("Database & Repository - 100% Fast-Check Fuzzing Coverage", () => {
     });
 
     describe("Site Repository Fuzzing", () => {
-        fcTest.prop([arbitrarySiteRow])("should handle site data structures", (
-            siteData
-        ) => {
-            // Test that site data structure is valid
-            expect(typeof siteData.identifier).toBe("string");
-            expect(typeof siteData.name).toBe("string");
-            expect(typeof siteData.monitoring).toBe("boolean");
-            expect(siteData.name.length).toBeGreaterThan(0);
-        });
+        fcTest.prop([arbitrarySiteRow])(
+            "should handle site data structures",
+            (siteData) => {
+                // Test that site data structure is valid
+                expect(typeof siteData.identifier).toBe("string");
+                expect(typeof siteData.name).toBe("string");
+                expect(typeof siteData.monitoring).toBe("boolean");
+                expect(siteData.name.length).toBeGreaterThan(0);
+            }
+        );
 
         fcTest.prop([fc.array(arbitrarySiteRow, { maxLength: 10 })])(
             "should handle bulk site operations",
@@ -127,16 +128,17 @@ describe("Database & Repository - 100% Fast-Check Fuzzing Coverage", () => {
             }
         );
 
-        fcTest.prop([arbitraryId])("should handle site identifiers", (
-            identifier
-        ) => {
-            expect(typeof identifier).toBe("string");
-            expect(identifier.length).toBeGreaterThan(0);
+        fcTest.prop([arbitraryId])(
+            "should handle site identifiers",
+            (identifier) => {
+                expect(typeof identifier).toBe("string");
+                expect(identifier.length).toBeGreaterThan(0);
 
-            // Validate UUID format (basic check)
-            const uuidRegex = /^[\da-f]{8}(?:-[\da-f]{4}){3}-[\da-f]{12}$/i;
-            expect(uuidRegex.test(identifier)).toBeTruthy();
-        });
+                // Validate UUID format (basic check)
+                const uuidRegex = /^[\da-f]{8}(?:-[\da-f]{4}){3}-[\da-f]{12}$/i;
+                expect(uuidRegex.test(identifier)).toBeTruthy();
+            }
+        );
     });
 
     describe("Monitor Repository Fuzzing", () => {
@@ -290,25 +292,28 @@ describe("Database & Repository - 100% Fast-Check Fuzzing Coverage", () => {
     });
 
     describe("Settings Repository Fuzzing", () => {
-        fcTest.prop([arbitrarySettings])("should handle settings structures", (
-            settings
-        ) => {
-            expect([
-                "light",
-                "dark",
-                "system",
-            ]).toContain(settings.theme);
-            expect(typeof settings.autoStart).toBe("boolean");
-            expect(typeof settings.historyLimit).toBe("number");
-            expect(typeof settings.minimizeToTray).toBe("boolean");
-            expect(typeof settings.inAppAlertsEnabled).toBe("boolean");
-            expect(typeof settings.inAppAlertsSoundEnabled).toBe("boolean");
-            expect(typeof settings.systemNotificationsEnabled).toBe("boolean");
-            expect(typeof settings.systemNotificationsSoundEnabled).toBe(
-                "boolean"
-            );
-            expect(settings.historyLimit).toBeGreaterThan(0);
-        });
+        fcTest.prop([arbitrarySettings])(
+            "should handle settings structures",
+            (settings) => {
+                expect([
+                    "light",
+                    "dark",
+                    "system",
+                ]).toContain(settings.theme);
+                expect(typeof settings.autoStart).toBe("boolean");
+                expect(typeof settings.historyLimit).toBe("number");
+                expect(typeof settings.minimizeToTray).toBe("boolean");
+                expect(typeof settings.inAppAlertsEnabled).toBe("boolean");
+                expect(typeof settings.inAppAlertsSoundEnabled).toBe("boolean");
+                expect(typeof settings.systemNotificationsEnabled).toBe(
+                    "boolean"
+                );
+                expect(typeof settings.systemNotificationsSoundEnabled).toBe(
+                    "boolean"
+                );
+                expect(settings.historyLimit).toBeGreaterThan(0);
+            }
+        );
 
         fcTest.prop([fc.string(), fc.anything()])(
             "should handle key-value pairs",
@@ -411,34 +416,36 @@ describe("Database & Repository - 100% Fast-Check Fuzzing Coverage", () => {
             }
         );
 
-        fcTest.prop([fc.string()])("should handle string sanitization", (
-            input
-        ) => {
-            expect(typeof input).toBe("string");
+        fcTest.prop([fc.string()])(
+            "should handle string sanitization",
+            (input) => {
+                expect(typeof input).toBe("string");
 
-            // Test basic sanitization patterns
-            const trimmed = input.trim();
-            const hasContent = trimmed.length > 0;
+                // Test basic sanitization patterns
+                const trimmed = input.trim();
+                const hasContent = trimmed.length > 0;
 
-            expect(typeof trimmed).toBe("string");
-            expect(typeof hasContent).toBe("boolean");
-        });
+                expect(typeof trimmed).toBe("string");
+                expect(typeof hasContent).toBe("boolean");
+            }
+        );
 
-        fcTest.prop([fc.integer()])("should handle numeric validation", (
-            input
-        ) => {
-            expect(typeof input).toBe("number");
-            expect(Number.isFinite(input)).toBeTruthy();
+        fcTest.prop([fc.integer()])(
+            "should handle numeric validation",
+            (input) => {
+                expect(typeof input).toBe("number");
+                expect(Number.isFinite(input)).toBeTruthy();
 
-            // Test numeric bounds checking
-            const isPositive = input > 0;
-            const isWithinBounds =
-                input >= Number.MIN_SAFE_INTEGER &&
-                input <= Number.MAX_SAFE_INTEGER;
+                // Test numeric bounds checking
+                const isPositive = input > 0;
+                const isWithinBounds =
+                    input >= Number.MIN_SAFE_INTEGER &&
+                    input <= Number.MAX_SAFE_INTEGER;
 
-            expect(typeof isPositive).toBe("boolean");
-            expect(isWithinBounds).toBeTruthy();
-        });
+                expect(typeof isPositive).toBe("boolean");
+                expect(isWithinBounds).toBeTruthy();
+            }
+        );
     });
 
     describe("Database Backup and Recovery", () => {

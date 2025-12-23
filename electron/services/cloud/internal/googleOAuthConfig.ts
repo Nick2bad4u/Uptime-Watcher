@@ -9,7 +9,7 @@
  * Environment variables still take precedence for development overrides.
  */
 
-import { readProcessEnv } from "@electron/utils/environment";
+import { readProcessEnv } from "@shared/utils/environment";
 
 /**
  * Resolved Google Drive OAuth client configuration.

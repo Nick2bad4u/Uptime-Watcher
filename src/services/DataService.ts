@@ -136,7 +136,8 @@ export const DataService: DataServiceContract = {
             } catch (error: unknown) {
                 throw ensureError(error);
             }
-        })),
+        })
+    ),
 
     /**
      * Exports all application data as a serialized JSON string.
@@ -165,7 +166,8 @@ export const DataService: DataServiceContract = {
             }
 
             return payload;
-        })),
+        })
+    ),
 
     /**
      * Imports a JSON data snapshot previously produced by
@@ -192,7 +194,8 @@ export const DataService: DataServiceContract = {
             }
 
             return result;
-        })),
+        })
+    ),
 
     /**
      * Ensures that the preload bridge for the `data` domain is initialized

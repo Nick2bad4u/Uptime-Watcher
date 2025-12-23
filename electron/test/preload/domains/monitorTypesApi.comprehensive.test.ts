@@ -319,7 +319,8 @@ describe("Monitor Types Domain API", () => {
             );
 
             const promises = Array.from({ length: 5 }, () =>
-                api.getMonitorTypes());
+                api.getMonitorTypes()
+            );
             const results = await Promise.all(promises);
 
             expect(mockIpcRenderer.invoke).toHaveBeenCalledTimes(5);
@@ -446,7 +447,8 @@ describe("Monitor Types Domain API", () => {
                         );
 
                         const promises = Array.from({ length: callCount }, () =>
-                            api.getMonitorTypes());
+                            api.getMonitorTypes()
+                        );
 
                         const results = await Promise.all(promises);
                         expect(mockIpcRenderer.invoke).toHaveBeenCalledTimes(
@@ -683,7 +685,8 @@ describe("Monitor Types Domain API", () => {
 
             // Multiple concurrent calls with large data
             const promises = Array.from({ length: 5 }, () =>
-                api.getMonitorTypes());
+                api.getMonitorTypes()
+            );
             const results = await Promise.all(promises);
 
             for (const result of results) {
@@ -784,7 +787,8 @@ describe("Monitor Types Domain API", () => {
             // Simulate burst of concurrent requests
             const burstSize = 20;
             const promises = Array.from({ length: burstSize }, () =>
-                api.getMonitorTypes());
+                api.getMonitorTypes()
+            );
 
             const start = Date.now();
             const results = await Promise.all(promises);

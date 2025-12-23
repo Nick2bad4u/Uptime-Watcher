@@ -2553,7 +2553,10 @@ const rendererNoWindowOpenRule = {
             const unwrapped = unwrapChain(callee);
 
             if (unwrapped.type === "Identifier") {
-                if (unwrapped.name === "open" && !hasLocalBinding("open", node)) {
+                if (
+                    unwrapped.name === "open" &&
+                    !hasLocalBinding("open", node)
+                ) {
                     return true;
                 }
                 return false;
@@ -3436,14 +3439,15 @@ const noLocalIdentifiersRule = {
             },
         ],
         messages: {
-            banned:
-                "Local definition of '{{name}}' is not allowed. {{details}}",
+            banned: "Local definition of '{{name}}' is not allowed. {{details}}",
         },
     },
     create(context) {
         const option = context.options?.[0];
         const banned = Array.isArray(option?.banned) ? option.banned : [];
-        const bannedByName = new Map(banned.map((entry) => [entry.name, entry]));
+        const bannedByName = new Map(
+            banned.map((entry) => [entry.name, entry])
+        );
 
         const shouldReport = (entry, kind) => {
             const kinds = entry.kinds;
@@ -3539,7 +3543,9 @@ const noCallIdentifiersRule = {
     create(context) {
         const option = context.options?.[0];
         const banned = Array.isArray(option?.banned) ? option.banned : [];
-        const bannedByName = new Map(banned.map((entry) => [entry.name, entry]));
+        const bannedByName = new Map(
+            banned.map((entry) => [entry.name, entry])
+        );
 
         return {
             CallExpression(node) {
@@ -3554,7 +3560,8 @@ const noCallIdentifiersRule = {
                 }
 
                 const details =
-                    typeof entry.message === "string" && entry.message.length > 0
+                    typeof entry.message === "string" &&
+                    entry.message.length > 0
                         ? entry.message
                         : "Use the centralized helper instead.";
 
@@ -3610,8 +3617,7 @@ const preferTryGetErrorCodeRule = {
         },
         schema: [],
         messages: {
-            prefer:
-                "Use tryGetErrorCode() from shared/utils/errorCodes.ts instead of asserting a `{ code?: unknown }` type.",
+            prefer: "Use tryGetErrorCode() from shared/utils/errorCodes.ts instead of asserting a `{ code?: unknown }` type.",
         },
     },
     create(context) {
@@ -3642,7 +3648,7 @@ const preferTryGetErrorCodeRule = {
  *
  * `logger.error(message, { error: ensureError(error) })`
  *
- * should instead be:
+ * Should instead be:
  *
  * `logger.error(message, ensureError(error), { ...context })`
  *
@@ -3781,9 +3787,8 @@ const loggerNoErrorInContextRule = {
                         continue;
                     }
 
-                    const errorProperty = getErrorPropertyFromObjectExpression(
-                        arg
-                    );
+                    const errorProperty =
+                        getErrorPropertyFromObjectExpression(arg);
                     if (!errorProperty) {
                         continue;
                     }
@@ -3805,6 +3810,7 @@ const loggerNoErrorInContextRule = {
  *
  * @remarks
  * This rule is intentionally narrow:
+ *
  * - It only targets `src/stores/**` (non-test) files.
  * - It only triggers on direct `set({ isX: true })` calls inside store actions.
  * - It requires a corresponding `set({ isX: false })` to appear inside a
@@ -3852,8 +3858,9 @@ const storeActionsRequireFinallyResetRule = {
          * Extracts an object literal from a set() argument.
          *
          * Supports:
-         * - set({ ... })
-         * - set(() => ({ ... }))
+         *
+         * - Set({ ... })
+         * - Set(() => ({ ... }))
          */
         function getSetObjectExpression(argument) {
             if (!argument) {

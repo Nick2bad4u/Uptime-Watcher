@@ -18,7 +18,9 @@ vi.mock("../../../../utils/time", () => ({
 
 import { SyncMaintenancePanel } from "../../../../components/Settings/cloud/SyncMaintenancePanel";
 
-const writeClipboardTextMock = vi.hoisted(() => vi.fn(async (_text: string) => {}));
+const writeClipboardTextMock = vi.hoisted(() =>
+    vi.fn(async (_text: string) => {})
+);
 
 vi.mock("../../../../services/SystemService", () => ({
     SystemService: {

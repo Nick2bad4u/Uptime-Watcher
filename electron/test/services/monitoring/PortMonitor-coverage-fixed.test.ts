@@ -875,7 +875,8 @@ describe("PortMonitor Coverage Tests", () => {
             await annotate("Type: Business Logic", "type");
 
             const promises = Array.from({ length: 5 }, () =>
-                portMonitor.check(validPortMonitor));
+                portMonitor.check(validPortMonitor)
+            );
 
             const results = await Promise.all(promises);
 

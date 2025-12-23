@@ -84,7 +84,23 @@ import importZod from "eslint-plugin-import-zod";
 import istanbul from "eslint-plugin-istanbul";
 // eslint-disable-next-line import-x/no-named-as-default -- required
 import jsdoc from "eslint-plugin-jsdoc";
-import eslintPluginJsonSchemaValidator from "eslint-plugin-json-schema-validator";
+// NOTE: eslint-plugin-json-schema-validator may attempt to fetch remote schemas
+// at lint time. That makes linting flaky/offline-hostile.
+// Keep it opt-in via UW_ENABLE_JSON_SCHEMA_VALIDATION=1.
+const enableJsonSchemaValidation =
+    process.env.UW_ENABLE_JSON_SCHEMA_VALIDATION === "1";
+
+const eslintPluginJsonSchemaValidator = enableJsonSchemaValidation
+    ? (await import("eslint-plugin-json-schema-validator")).default
+    : undefined;
+
+const jsonSchemaValidatorPlugins = enableJsonSchemaValidation
+    ? { "json-schema-validator": eslintPluginJsonSchemaValidator }
+    : {};
+
+const jsonSchemaValidatorRules = enableJsonSchemaValidation
+    ? { "json-schema-validator/no-invalid": "error" }
+    : {};
 import eslintPluginJsonc from "eslint-plugin-jsonc";
 import jsxA11y from "eslint-plugin-jsx-a11y";
 // @ts-expect-error -- No Types for this Package
@@ -563,11 +579,11 @@ export default /** @type {EslintConfig} */ [
         },
         name: "YAML/YML - **/*.{YAML,YML}",
         plugins: {
-            "json-schema-validator": eslintPluginJsonSchemaValidator,
+            ...jsonSchemaValidatorPlugins,
             yml: eslintPluginYml,
         },
         rules: {
-            "json-schema-validator/no-invalid": "error",
+            ...jsonSchemaValidatorRules,
             "yml/block-mapping": "warn",
             "yml/block-mapping-colon-indicator-newline": "error",
             "yml/block-mapping-question-indicator-newline": "error",
@@ -992,7 +1008,7 @@ export default /** @type {EslintConfig} */ [
         plugins: {
             eslintPluginJsonc: eslintPluginJsonc,
             json: json,
-            "json-schema-validator": eslintPluginJsonSchemaValidator,
+            ...jsonSchemaValidatorPlugins,
             "no-secrets": noSecrets,
         },
         // ═══════════════════════════════════════════════════════════════════════════════
@@ -1105,11 +1121,12 @@ export default /** @type {EslintConfig} */ [
         name: "JSON - **/*.JSON",
         plugins: {
             json: json,
-            "json-schema-validator": eslintPluginJsonSchemaValidator,
+            ...jsonSchemaValidatorPlugins,
             "no-secrets": noSecrets,
         },
         rules: {
             ...json.configs.recommended.rules,
+            ...jsonSchemaValidatorRules,
             "json/sort-keys": ["warn"],
             "json/top-level-interop": "warn",
             "no-secrets/no-pattern-match": "off",
@@ -1130,11 +1147,12 @@ export default /** @type {EslintConfig} */ [
         name: "JSON5 - **/*.JSON5",
         plugins: {
             json: json,
-            "json-schema-validator": eslintPluginJsonSchemaValidator,
+            ...jsonSchemaValidatorPlugins,
             "no-secrets": noSecrets,
         },
         rules: {
             ...json.configs.recommended.rules,
+            ...jsonSchemaValidatorRules,
             "no-secrets/no-pattern-match": "off",
             "no-secrets/no-secrets": [
                 "error",

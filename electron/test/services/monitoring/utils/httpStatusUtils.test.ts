@@ -343,7 +343,8 @@ describe("HTTP Status Utils", () => {
 
             const testStatus = 404;
             const results = Array.from({ length: 100 }, () =>
-                determineMonitorStatus(testStatus));
+                determineMonitorStatus(testStatus)
+            );
 
             // All results should be identical
             expect(new Set(results).size).toBe(1);

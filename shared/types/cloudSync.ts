@@ -51,7 +51,8 @@ const jsonValueSchemaInternal: z.ZodType<JsonValue> = z.lazy(() =>
         z.null(),
         z.array(jsonValueSchemaInternal),
         z.record(z.string(), jsonValueSchemaInternal),
-    ]));
+    ])
+);
 
 /**
  * Zod schema validating {@link JsonValue}.

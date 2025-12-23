@@ -111,7 +111,6 @@ function validateGeneratedSchema(schema: string): void {
     }
 }
 
-
 /**
  * Ensures the PRAGMA user_version reflects the currently deployed schema.
  */

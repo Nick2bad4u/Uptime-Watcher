@@ -1274,36 +1274,35 @@ describe("Electron Preload Script", () => {
                 );
 
                 // Mock ipcRenderer.invoke for system API
-                const mockInvoke = vi.fn(async (
-                    channel: string,
-                    ...args: unknown[]
-                ) => {
-                    if (channel === "diagnostics-verify-ipc-handler") {
-                        const targetChannel = args[0];
+                const mockInvoke = vi.fn(
+                    async (channel: string, ...args: unknown[]) => {
+                        if (channel === "diagnostics-verify-ipc-handler") {
+                            const targetChannel = args[0];
 
-                        return {
-                            success: true,
-                            data: {
-                                availableChannels: [
-                                    "diagnostics-verify-ipc-handler",
-                                    targetChannel,
-                                ],
-                                channel: targetChannel,
-                                registered: true,
-                            },
-                        };
+                            return {
+                                success: true,
+                                data: {
+                                    availableChannels: [
+                                        "diagnostics-verify-ipc-handler",
+                                        targetChannel,
+                                    ],
+                                    channel: targetChannel,
+                                    registered: true,
+                                },
+                            };
+                        }
+
+                        if (channel === "quit-and-install") {
+                            return {
+                                success: true,
+                                data: true,
+                                metadata: { handler: channel },
+                            };
+                        }
+
+                        return { success: true, data: true };
                     }
-
-                    if (channel === "quit-and-install") {
-                        return {
-                            success: true,
-                            data: true,
-                            metadata: { handler: channel },
-                        };
-                    }
-
-                    return { success: true, data: true };
-                });
+                );
                 mockIpcRenderer.invoke = mockInvoke;
 
                 await import("../preload");

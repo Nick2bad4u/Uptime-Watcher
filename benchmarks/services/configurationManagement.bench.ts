@@ -409,7 +409,8 @@ class MockConfigurationManagementService {
                     configurations.length > 0
                         ? Math.max(
                               ...configurations.map((c) =>
-                                  c.lastModified.getTime())
+                                  c.lastModified.getTime()
+                              )
                           )
                         : Date.now(),
             },
@@ -808,7 +809,8 @@ describe("Configuration Management Service Performance", () => {
             const config = createTestConfiguration();
             Promise.all(
                 Object.entries(config).map(([key, value]) =>
-                    service.set(key, value))
+                    service.set(key, value)
+                )
             ).then(() => {
                 service.getGroup("monitoring");
             });
@@ -836,7 +838,8 @@ describe("Configuration Management Service Performance", () => {
             const config = createTestConfiguration();
             Promise.all(
                 Object.entries(config).map(([key, value]) =>
-                    service.set(key, value))
+                    service.set(key, value)
+                )
             ).then(() => {
                 service.getAll();
             });
@@ -851,7 +854,8 @@ describe("Configuration Management Service Performance", () => {
             const config = createTestConfiguration();
             Promise.all(
                 Object.entries(config).map(([key, value]) =>
-                    service.set(key, value))
+                    service.set(key, value)
+                )
             ).then(() => {
                 service.validate();
             });
@@ -892,7 +896,8 @@ describe("Configuration Management Service Performance", () => {
             const config = createTestConfiguration();
             Promise.all(
                 Object.entries(config).map(([key, value]) =>
-                    service.set(key, value))
+                    service.set(key, value)
+                )
             ).then(() => {
                 service.createBackup("Performance test backup");
             });
@@ -907,7 +912,8 @@ describe("Configuration Management Service Performance", () => {
             const config = createTestConfiguration();
             Promise.all(
                 Object.entries(config).map(([key, value]) =>
-                    service.set(key, value))
+                    service.set(key, value)
+                )
             ).then(() => {
                 service.createBackup("Test backup").then((backup) => {
                     // Modify some settings
@@ -943,7 +949,8 @@ describe("Configuration Management Service Performance", () => {
             const largeConfig = createLargeConfiguration(50);
 
             const operations = Object.entries(largeConfig).map(([key, value]) =>
-                service.set(key, value));
+                service.set(key, value)
+            );
 
             Promise.all(operations).then(() => {
                 service.getAll();
@@ -1005,7 +1012,8 @@ describe("Configuration Management Service Performance", () => {
             service.set("cached.test", "test value").then(() => {
                 // Multiple cache hits
                 const promises = Array.from({ length: 20 }, () =>
-                    service.get("cached.test", true));
+                    service.get("cached.test", true)
+                );
                 Promise.all(promises);
             });
         },
@@ -1019,7 +1027,8 @@ describe("Configuration Management Service Performance", () => {
             const config = createTestConfiguration();
             Promise.all(
                 Object.entries(config).map(([key, value]) =>
-                    service.set(key, value))
+                    service.set(key, value)
+                )
             ).then(() => {
                 service.getStats();
             });
@@ -1034,7 +1043,8 @@ describe("Configuration Management Service Performance", () => {
             const config = createTestConfiguration();
             Promise.all(
                 Object.entries(config).map(([key, value]) =>
-                    service.set(key, value))
+                    service.set(key, value)
+                )
             ).then(() => {
                 service.clearCache();
                 service.resetService();

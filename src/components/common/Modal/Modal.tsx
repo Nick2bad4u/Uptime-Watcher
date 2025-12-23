@@ -85,8 +85,10 @@ export interface ModalProperties {
     /** Optional test id for the modal shell. */
     readonly modalTestId?: string;
 
-    /** Called when the modal requests to close (Escape, overlay click, close
-button). */
+    /**
+     * Called when the modal requests to close (Escape, overlay click, close
+     * button).
+     */
     readonly onRequestClose: () => void;
 
     /** Optional test id for the overlay. */
@@ -497,7 +499,9 @@ export const Modal = ({
 
                 <div className={bodyClassNames}>{children}</div>
 
-                {footer ? <div className="modal-shell__footer">{footer}</div> : null}
+                {footer ? (
+                    <div className="modal-shell__footer">{footer}</div>
+                ) : null}
             </dialog>
         </div>,
         portalRoot

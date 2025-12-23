@@ -137,7 +137,8 @@ export const createSiteOperationsActions = (
                     normalizeMonitorOrThrow(
                         monitor,
                         "Failed to normalize monitor during site creation"
-                    ));
+                    )
+                );
 
                 // Construct a complete Site object
                 const completeSite: Site = {
@@ -184,7 +185,8 @@ export const createSiteOperationsActions = (
             async () => {
                 try {
                     const backupResult = await handleSQLiteBackupDownload(() =>
-                        deps.services.data.downloadSqliteBackup());
+                        deps.services.data.downloadSqliteBackup()
+                    );
                     deps.setLastBackupMetadata(backupResult.metadata);
                     return backupResult;
                 } catch (error) {

@@ -183,10 +183,11 @@ export function createStatusIdentifier<T extends string>(
     statusText: T
 ): StatusIdentifier<T> {
     // Simple camelCase conversion avoiding complex regex patterns
-        const words = statusText.toLowerCase().split(/[\s_-]+/u);
+    const words = statusText.toLowerCase().split(/[\s_-]+/u);
     const camelCased = words
         .map((word, index) =>
-            index === 0 ? word : word.charAt(0).toUpperCase() + word.slice(1))
+            index === 0 ? word : word.charAt(0).toUpperCase() + word.slice(1)
+        )
         .join("");
 
     /* eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Type-fest CamelCase utility ensures correct transformation */

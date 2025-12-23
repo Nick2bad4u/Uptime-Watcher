@@ -187,7 +187,8 @@ describe("useTheme Hooks - Working Tests", () => {
             await annotate("Type: Business Logic", "type");
 
             const { result } = renderHook(() =>
-                useThemeValue((theme) => theme.colors));
+                useThemeValue((theme) => theme.colors)
+            );
 
             expect(result.current).toBeDefined();
             expect(typeof result.current).toBe("object");
@@ -203,7 +204,8 @@ describe("useTheme Hooks - Working Tests", () => {
             await annotate("Type: Business Logic", "type");
 
             const { result } = renderHook(() =>
-                useThemeValue((theme) => theme.colors?.primary));
+                useThemeValue((theme) => theme.colors?.primary)
+            );
 
             // The selector returns the colors.primary which could be undefined, so test appropriately
             expect(result.current).toBeDefined();

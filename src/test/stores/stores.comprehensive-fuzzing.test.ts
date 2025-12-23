@@ -50,7 +50,8 @@ describe("Stores Comprehensive Fuzzing", () => {
             "should handle settings updates",
             (partialSettings) => {
                 const { result, unmount } = renderHook(() =>
-                    useSettingsStore());
+                    useSettingsStore()
+                );
 
                 try {
                     expect(typeof result.current.updateSettings).toBe(
@@ -86,21 +87,22 @@ describe("Stores Comprehensive Fuzzing", () => {
             }
         });
 
-        fcTest.prop([fc.string()])("should handle error setting", (
-            errorMessage
-        ) => {
-            const { result, unmount } = renderHook(() => useErrorStore());
-            try {
-                expect(typeof result.current.setError).toBe("function");
-                expect(() => {
-                    act(() => {
-                        result.current.setError(errorMessage);
-                    });
-                }).not.toThrowError();
-            } finally {
-                unmount();
+        fcTest.prop([fc.string()])(
+            "should handle error setting",
+            (errorMessage) => {
+                const { result, unmount } = renderHook(() => useErrorStore());
+                try {
+                    expect(typeof result.current.setError).toBe("function");
+                    expect(() => {
+                        act(() => {
+                            result.current.setError(errorMessage);
+                        });
+                    }).not.toThrowError();
+                } finally {
+                    unmount();
+                }
             }
-        });
+        );
 
         test("should handle error clearing", () => {
             const { result, unmount } = renderHook(() => useErrorStore());
@@ -152,7 +154,8 @@ describe("Stores Comprehensive Fuzzing", () => {
     describe("Monitor Types Store", () => {
         test("should have monitor types store available", () => {
             const { result, unmount } = renderHook(() =>
-                useMonitorTypesStore());
+                useMonitorTypesStore()
+            );
             try {
                 expect(result.current).toBeDefined();
                 expect(Array.isArray(result.current.monitorTypes)).toBeTruthy();
@@ -163,7 +166,8 @@ describe("Stores Comprehensive Fuzzing", () => {
 
         test("should not expose store-owned error actions", () => {
             const { result, unmount } = renderHook(() =>
-                useMonitorTypesStore());
+                useMonitorTypesStore()
+            );
             try {
                 expect(
                     (result.current as Record<string, unknown>)["setError"]

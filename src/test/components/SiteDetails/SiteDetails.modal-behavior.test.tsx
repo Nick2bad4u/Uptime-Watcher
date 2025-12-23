@@ -386,6 +386,7 @@ describe(SiteDetails, () => {
 
         props.handleSaveInterval();
         await waitFor(() =>
-            expect(handleSaveInterval).toHaveBeenCalledTimes(1));
+            expect(handleSaveInterval).toHaveBeenCalledTimes(1)
+        );
     });
 });

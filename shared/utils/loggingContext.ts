@@ -96,15 +96,15 @@ const toCanonicalSecretKey = (key: string): string =>
     // Do not use the `v` flag here; it is not available across all Electron
     // targets we ship. This is an ASCII-only filter, so no Unicode flags are
     // required.
-         
-        key.toLowerCase().replaceAll(/[^\da-z]/gu, "");
+
+    key.toLowerCase().replaceAll(/[^\da-z]/gu, "");
 
 const isSecretMetadataKey = (key: string): boolean =>
     SECRET_METADATA_KEYS.has(toCanonicalSecretKey(key));
 
 const SECRET_FIELD_PATTERNS = [
-    /bearer\s+[-\w.~+/]+=*/giu,  
-    /api[_-]?key=[a-z0-9]+/giu,  
+    /bearer\s+[-\w.~+/]+=*/giu,
+    /api[_-]?key=[a-z0-9]+/giu,
 ];
 
 const maskBearerTokens = (value: string): string => {

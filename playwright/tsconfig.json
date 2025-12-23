@@ -16,30 +16,14 @@
         "noEmit": false,
         "outDir": "../.cache/builds/test/playwright",
         "paths": {
-            "@/*": [
-                ".cache/builds/app/types/src/*"
-            ],
-            "@/electron/*": [
-                ".cache/builds/app/types/electron/*"
-            ],
-            "@/playwright/*": [
-                "playwright/*"
-            ],
-            "@/shared/*": [
-                ".cache/builds/app/types/shared/*"
-            ],
-            "@app/*": [
-                ".cache/builds/app/types/src/*"
-            ],
-            "@assets/*": [
-                "assets/*"
-            ],
-            "@electron/*": [
-                ".cache/builds/app/types/electron/*"
-            ],
-            "@shared/*": [
-                ".cache/builds/app/types/shared/*"
-            ]
+            "@/*": [".cache/builds/app/types/src/*"],
+            "@/electron/*": [".cache/builds/app/types/electron/*"],
+            "@/playwright/*": ["playwright/*"],
+            "@/shared/*": [".cache/builds/app/types/shared/*"],
+            "@app/*": [".cache/builds/app/types/src/*"],
+            "@assets/*": ["assets/*"],
+            "@electron/*": [".cache/builds/app/types/electron/*"],
+            "@shared/*": [".cache/builds/app/types/shared/*"]
         },
         "pretty": true,
         "resolveJsonModule": true,
@@ -48,10 +32,7 @@
         "strict": true,
         "target": "ES2024",
         "tsBuildInfoFile": "../.cache/tsconfig.playwright.tsbuildinfo",
-        "types": [
-            "@playwright/test",
-            "node"
-        ]
+        "types": ["@playwright/test", "node"]
     },
     "exclude": [
         "coverage",

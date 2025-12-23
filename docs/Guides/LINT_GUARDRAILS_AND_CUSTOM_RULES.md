@@ -149,9 +149,9 @@ Examples that are not allowed:
 **Fix:** reference the canonical channel constant and let types infer:
 
 ```ts
-import { UPDATE_NOTIFICATION_PREFERENCES_CHANNEL } from "@electron/services/ipc/notificationChannelGuards";
+import { NOTIFICATION_CHANNELS } from "@shared/types/preload";
 
-type UpdatePreferencesChannel = typeof UPDATE_NOTIFICATION_PREFERENCES_CHANNEL;
+type UpdatePreferencesChannel = typeof NOTIFICATION_CHANNELS.updatePreferences;
 ```
 
 ### `uptime-watcher/renderer-no-direct-preload-bridge`
