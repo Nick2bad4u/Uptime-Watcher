@@ -40,8 +40,8 @@ import {
     DEFAULT_HISTORY_LIMIT_RULES,
     normalizeHistoryLimit,
 } from "@shared/constants/history";
+import { getUnknownErrorMessage } from "@shared/utils/errorCatalog";
 import { ensureError } from "@shared/utils/errorHandling";
-import { getErrorMessage } from "@shared/utils/errorUtils";
 
 import type { UptimeEvents } from "../../events/eventTypes";
 import type { TypedEventBus } from "../../events/TypedEventBus";
@@ -93,7 +93,7 @@ export class SiteLoadingOrchestrator {
             };
         } catch (error) {
             return {
-                message: `Failed to load sites: ${getErrorMessage(error)}`,
+                message: `Failed to load sites: ${getUnknownErrorMessage(error)}`,
                 sitesLoaded: 0,
                 success: false,
             };
@@ -223,7 +223,7 @@ export class SiteRepositoryService {
             return await Promise.all(sitePromises);
         } catch (error) {
             const normalizedError = ensureError(error);
-            const message = `Failed to fetch sites from database: ${getErrorMessage(normalizedError)}`;
+            const message = `Failed to fetch sites from database: ${getUnknownErrorMessage(normalizedError)}`;
             this.logger.error(message, normalizedError);
             throw new SiteLoadingError(message, { cause: normalizedError });
         }
@@ -261,7 +261,7 @@ export class SiteRepositoryService {
             return await this.buildSiteWithMonitorsAndHistory(siteRow);
         } catch (error) {
             const normalizedError = ensureError(error);
-            const message = `Failed to fetch site ${identifier} from database: ${getErrorMessage(normalizedError)}`;
+            const message = `Failed to fetch site ${identifier} from database: ${getUnknownErrorMessage(normalizedError)}`;
             this.logger.error(message, normalizedError);
             throw new SiteLoadingError(message, { cause: normalizedError });
         }
@@ -285,7 +285,7 @@ export class SiteRepositoryService {
             this.logger.info(`Loaded ${sites.length} sites into cache`);
         } catch (error) {
             const normalizedError = ensureError(error);
-            const message = `Failed to load sites into cache: ${getErrorMessage(error)}`;
+            const message = `Failed to load sites into cache: ${getUnknownErrorMessage(error)}`;
             this.logger.error(message, error);
 
             // Emit typed error event

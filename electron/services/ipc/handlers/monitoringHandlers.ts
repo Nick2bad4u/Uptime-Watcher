@@ -4,7 +4,7 @@ import { MONITORING_CHANNELS } from "@shared/types/preload";
 
 import type { UptimeOrchestrator } from "../../../UptimeOrchestrator";
 
-import { registerStandardizedIpcHandler } from "../utils";
+import { createStandardizedIpcRegistrar } from "../utils";
 import { MonitoringHandlerValidators } from "../validators";
 
 /**
@@ -22,66 +22,61 @@ export function registerMonitoringHandlers({
     registeredHandlers,
     uptimeOrchestrator,
 }: MonitoringHandlersDependencies): void {
-    registerStandardizedIpcHandler(
+    const register = createStandardizedIpcRegistrar(registeredHandlers);
+
+    register(
         MONITORING_CHANNELS.startMonitoring,
         () => uptimeOrchestrator.startMonitoring(),
-        MonitoringHandlerValidators.startMonitoring,
-        registeredHandlers
+        MonitoringHandlerValidators.startMonitoring
     );
 
-    registerStandardizedIpcHandler(
+    register(
         MONITORING_CHANNELS.stopMonitoring,
         () => uptimeOrchestrator.stopMonitoring(),
-        MonitoringHandlerValidators.stopMonitoring,
-        registeredHandlers
+        MonitoringHandlerValidators.stopMonitoring
     );
 
-    registerStandardizedIpcHandler(
+    register(
         MONITORING_CHANNELS.startMonitoringForSite,
         (siteIdentifier) =>
             uptimeOrchestrator.startMonitoringForSite(siteIdentifier),
-        MonitoringHandlerValidators.startMonitoringForSite,
-        registeredHandlers
+        MonitoringHandlerValidators.startMonitoringForSite
     );
 
-    registerStandardizedIpcHandler(
+    register(
         MONITORING_CHANNELS.startMonitoringForMonitor,
         (siteIdentifier, monitorIdentifier) =>
             uptimeOrchestrator.startMonitoringForSite(
                 siteIdentifier,
                 monitorIdentifier
             ),
-        MonitoringHandlerValidators.startMonitoringForMonitor,
-        registeredHandlers
+        MonitoringHandlerValidators.startMonitoringForMonitor
     );
 
-    registerStandardizedIpcHandler(
+    register(
         MONITORING_CHANNELS.stopMonitoringForSite,
         (siteIdentifier) =>
             uptimeOrchestrator.stopMonitoringForSite(siteIdentifier),
-        MonitoringHandlerValidators.stopMonitoringForSite,
-        registeredHandlers
+        MonitoringHandlerValidators.stopMonitoringForSite
     );
 
-    registerStandardizedIpcHandler(
+    register(
         MONITORING_CHANNELS.stopMonitoringForMonitor,
         (siteIdentifier, monitorIdentifier) =>
             uptimeOrchestrator.stopMonitoringForSite(
                 siteIdentifier,
                 monitorIdentifier
             ),
-        MonitoringHandlerValidators.stopMonitoringForMonitor,
-        registeredHandlers
+        MonitoringHandlerValidators.stopMonitoringForMonitor
     );
 
-    registerStandardizedIpcHandler(
+    register(
         MONITORING_CHANNELS.checkSiteNow,
         (siteIdentifier, monitorIdentifier) =>
             uptimeOrchestrator.checkSiteManually(
                 siteIdentifier,
                 monitorIdentifier
             ),
-        MonitoringHandlerValidators.checkSiteNow,
-        registeredHandlers
+        MonitoringHandlerValidators.checkSiteNow
     );
 }

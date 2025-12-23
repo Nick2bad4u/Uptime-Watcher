@@ -1,9 +1,7 @@
 import type { IpcInvokeChannel } from "@shared/types/ipc";
-import type { DuplicateSiteIdentifier } from "@shared/validation/siteIntegrity";
 
 import { SITES_CHANNELS } from "@shared/types/preload";
 import {
-    interpolateLogTemplate,
     LOG_TEMPLATES,
 } from "@shared/utils/logTemplates";
 import { deriveSiteSnapshot } from "@shared/utils/siteSnapshots";
@@ -11,7 +9,7 @@ import { deriveSiteSnapshot } from "@shared/utils/siteSnapshots";
 import type { UptimeOrchestrator } from "../../../UptimeOrchestrator";
 
 import { logger } from "../../../utils/logger";
-import { registerStandardizedIpcHandler } from "../utils";
+import { createStandardizedIpcRegistrar } from "../utils";
 import { SiteHandlerValidators } from "../validators";
 
 /**
@@ -29,43 +27,15 @@ export function registerSiteHandlers({
     registeredHandlers,
     uptimeOrchestrator,
 }: SiteHandlersDependencies): void {
-    registerStandardizedIpcHandler(
+    const register = createStandardizedIpcRegistrar(registeredHandlers);
+
+    register(
         SITES_CHANNELS.addSite,
         (site) => uptimeOrchestrator.addSite(site),
-        SiteHandlerValidators.addSite,
-        registeredHandlers
+        SiteHandlerValidators.addSite
     );
 
-    registerStandardizedIpcHandler(
-        SITES_CHANNELS.deleteAllSites,
-        async () => {
-            logger.info(
-                LOG_TEMPLATES.services.IPC_DELETE_ALL_SITES_HANDLER_CALLED
-            );
-
-            const deletedCount = await uptimeOrchestrator.deleteAllSites();
-
-            logger.info(
-                interpolateLogTemplate(
-                    LOG_TEMPLATES.services.IPC_DELETE_ALL_SITES_COMPLETED,
-                    { deletedCount }
-                )
-            );
-
-            return deletedCount;
-        },
-        SiteHandlerValidators.deleteAllSites,
-        registeredHandlers
-    );
-
-    registerStandardizedIpcHandler(
-        SITES_CHANNELS.removeSite,
-        (siteIdentifier) => uptimeOrchestrator.removeSite(siteIdentifier),
-        SiteHandlerValidators.removeSite,
-        registeredHandlers
-    );
-
-    registerStandardizedIpcHandler(
+    register(
         SITES_CHANNELS.getSites,
         async () => {
             const sites = await uptimeOrchestrator.getSites();
@@ -78,36 +48,41 @@ export function registerSiteHandlers({
                     undefined,
                     {
                         duplicateCount: snapshot.duplicates.length,
-                        duplicates: snapshot.duplicates.map(
-                            (entry: DuplicateSiteIdentifier) => ({
-                                identifier: entry.identifier,
-                                occurrences: entry.occurrences,
-                            })
-                        ),
+                        duplicates: snapshot.duplicates,
                         originalSites: sites.length,
                         sanitizedSites: snapshot.sanitizedSites.length,
                     }
                 );
             }
-            return snapshot.sanitizedSites.map((site) => structuredClone(site));
+
+            return snapshot.sanitizedSites;
         },
-        SiteHandlerValidators.getSites,
-        registeredHandlers
+        SiteHandlerValidators.getSites
     );
 
-    registerStandardizedIpcHandler(
+    register(
         SITES_CHANNELS.updateSite,
-        (siteIdentifier, updates) =>
-            uptimeOrchestrator.updateSite(siteIdentifier, updates),
-        SiteHandlerValidators.updateSite,
-        registeredHandlers
+        (identifier, updates) =>
+            uptimeOrchestrator.updateSite(identifier, updates),
+        SiteHandlerValidators.updateSite
     );
 
-    registerStandardizedIpcHandler(
+    register(
+        SITES_CHANNELS.removeSite,
+        (identifier) => uptimeOrchestrator.removeSite(identifier),
+        SiteHandlerValidators.removeSite
+    );
+
+    register(
         SITES_CHANNELS.removeMonitor,
-        (siteIdentifier, monitorIdentifier) =>
-            uptimeOrchestrator.removeMonitor(siteIdentifier, monitorIdentifier),
-        SiteHandlerValidators.removeMonitor,
-        registeredHandlers
+        (siteIdentifier, monitorId) =>
+            uptimeOrchestrator.removeMonitor(siteIdentifier, monitorId),
+        SiteHandlerValidators.removeMonitor
+    );
+
+    register(
+        SITES_CHANNELS.deleteAllSites,
+        () => uptimeOrchestrator.deleteAllSites(),
+        null
     );
 }

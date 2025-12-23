@@ -5,7 +5,7 @@ import { CLOUD_CHANNELS } from "@shared/types/preload";
 
 import type { CloudService } from "../../cloud/CloudService";
 
-import { registerStandardizedIpcHandler } from "../utils";
+import { createStandardizedIpcRegistrar } from "../utils";
 import { CloudHandlerValidators } from "../validators";
 
 /**
@@ -23,119 +23,105 @@ export function registerCloudHandlers({
     cloudService,
     registeredHandlers,
 }: CloudHandlersDependencies): void {
-    registerStandardizedIpcHandler(
+    const register = createStandardizedIpcRegistrar(registeredHandlers);
+
+    register(
         CLOUD_CHANNELS.clearEncryptionKey,
         () => cloudService.clearEncryptionKey(),
-        CloudHandlerValidators.clearEncryptionKey,
-        registeredHandlers
+        CloudHandlerValidators.clearEncryptionKey
     );
 
-    registerStandardizedIpcHandler(
+    register(
         CLOUD_CHANNELS.disconnect,
         () => cloudService.disconnect(),
-        CloudHandlerValidators.disconnect,
-        registeredHandlers
+        CloudHandlerValidators.disconnect
     );
 
-    registerStandardizedIpcHandler(
+    register(
         CLOUD_CHANNELS.enableSync,
         // eslint-disable-next-line n/no-sync -- "Sync" is part of the feature name, not a Node.js sync API.
         (config: CloudEnableSyncConfig) => cloudService.enableSync(config),
-        CloudHandlerValidators.enableSync,
-        registeredHandlers
+        CloudHandlerValidators.enableSync
     );
 
-    registerStandardizedIpcHandler(
+    register(
         CLOUD_CHANNELS.getStatus,
         () => cloudService.getStatus(),
-        CloudHandlerValidators.getStatus,
-        registeredHandlers
+        CloudHandlerValidators.getStatus
     );
 
-    registerStandardizedIpcHandler(
+    register(
         CLOUD_CHANNELS.configureFilesystemProvider,
         (config) => cloudService.configureFilesystemProvider(config),
-        CloudHandlerValidators.configureFilesystemProvider,
-        registeredHandlers
+        CloudHandlerValidators.configureFilesystemProvider
     );
 
-    registerStandardizedIpcHandler(
+    register(
         CLOUD_CHANNELS.setEncryptionPassphrase,
         (passphrase) => cloudService.setEncryptionPassphrase(passphrase),
-        CloudHandlerValidators.setEncryptionPassphrase,
-        registeredHandlers
+        CloudHandlerValidators.setEncryptionPassphrase
     );
 
-    registerStandardizedIpcHandler(
+    register(
         CLOUD_CHANNELS.connectDropbox,
         () => cloudService.connectDropbox(),
-        CloudHandlerValidators.connectDropbox,
-        registeredHandlers
+        CloudHandlerValidators.connectDropbox
     );
 
-    registerStandardizedIpcHandler(
+    register(
         CLOUD_CHANNELS.connectGoogleDrive,
         () => cloudService.connectGoogleDrive(),
-        CloudHandlerValidators.connectGoogleDrive,
-        registeredHandlers
+        CloudHandlerValidators.connectGoogleDrive
     );
 
-    registerStandardizedIpcHandler(
+    register(
         CLOUD_CHANNELS.listBackups,
         () => cloudService.listBackups(),
-        CloudHandlerValidators.listBackups,
-        registeredHandlers
+        CloudHandlerValidators.listBackups
     );
 
-    registerStandardizedIpcHandler(
+    register(
         CLOUD_CHANNELS.deleteBackup,
         (key: string) => cloudService.deleteBackup(key),
-        CloudHandlerValidators.deleteBackup,
-        registeredHandlers
+        CloudHandlerValidators.deleteBackup
     );
 
-    registerStandardizedIpcHandler(
+    register(
         CLOUD_CHANNELS.migrateBackups,
         (config) => cloudService.migrateBackups(config),
-        CloudHandlerValidators.migrateBackups,
-        registeredHandlers
+        CloudHandlerValidators.migrateBackups
     );
 
-    registerStandardizedIpcHandler(
+    register(
         CLOUD_CHANNELS.previewResetRemoteSyncState,
         () => cloudService.previewResetRemoteSyncState(),
-        CloudHandlerValidators.previewResetRemoteSyncState,
-        registeredHandlers
+        CloudHandlerValidators.previewResetRemoteSyncState
     );
 
-    registerStandardizedIpcHandler(
+    register(
         CLOUD_CHANNELS.resetRemoteSyncState,
         () => cloudService.resetRemoteSyncState(),
-        CloudHandlerValidators.resetRemoteSyncState,
-        registeredHandlers
+        CloudHandlerValidators.resetRemoteSyncState
     );
 
-    registerStandardizedIpcHandler(
+    register(
         CLOUD_CHANNELS.uploadLatestBackup,
         () => cloudService.uploadLatestBackup(),
-        CloudHandlerValidators.uploadLatestBackup,
-        registeredHandlers
+        CloudHandlerValidators.uploadLatestBackup
     );
 
-    registerStandardizedIpcHandler(
+    register(
         CLOUD_CHANNELS.restoreBackup,
         (key) => cloudService.restoreBackup(key),
-        CloudHandlerValidators.restoreBackup,
-        registeredHandlers
+        CloudHandlerValidators.restoreBackup
     );
 
-    registerStandardizedIpcHandler(
+    register(
         CLOUD_CHANNELS.requestSyncNow,
         async (): Promise<undefined> => {
             await cloudService.requestSyncNow();
             return undefined;
         },
-        CloudHandlerValidators.requestSyncNow,
-        registeredHandlers
+        CloudHandlerValidators.requestSyncNow
     );
 }

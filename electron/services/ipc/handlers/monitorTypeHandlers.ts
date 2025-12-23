@@ -12,10 +12,7 @@ import {
     getAllMonitorTypeConfigs,
     getMonitorTypeConfig,
 } from "../../monitoring/MonitorTypeRegistry";
-import {
-    createValidationResponse,
-    registerStandardizedIpcHandler,
-} from "../utils";
+import { createStandardizedIpcRegistrar, createValidationResponse } from "../utils";
 import { MonitorTypeHandlerValidators } from "../validators";
 
 type BaseMonitorUiConfig = ReturnType<
@@ -255,17 +252,18 @@ export interface MonitorTypeHandlersDependencies {
 export function registerMonitorTypeHandlers({
     registeredHandlers,
 }: MonitorTypeHandlersDependencies): void {
-    registerStandardizedIpcHandler(
+    const register = createStandardizedIpcRegistrar(registeredHandlers);
+
+    register(
         MONITOR_TYPES_CHANNELS.getMonitorTypes,
         () => {
             const configs = getAllMonitorTypeConfigs();
             return configs.map((config) => serializeMonitorTypeConfig(config));
         },
-        MonitorTypeHandlerValidators.getMonitorTypes,
-        registeredHandlers
+        MonitorTypeHandlerValidators.getMonitorTypes
     );
 
-    registerStandardizedIpcHandler(
+    register(
         MONITOR_TYPES_CHANNELS.formatMonitorDetail,
         (monitorType, details) => {
             const config = getMonitorTypeConfig(monitorType.trim());
@@ -283,11 +281,10 @@ export function registerMonitorTypeHandlers({
 
             return details;
         },
-        MonitorTypeHandlerValidators.formatMonitorDetail,
-        registeredHandlers
+        MonitorTypeHandlerValidators.formatMonitorDetail
     );
 
-    registerStandardizedIpcHandler(
+    register(
         MONITOR_TYPES_CHANNELS.formatMonitorTitleSuffix,
         (monitorType, monitor) => {
             const config = getMonitorTypeConfig(monitorType.trim());
@@ -304,11 +301,10 @@ export function registerMonitorTypeHandlers({
 
             return "";
         },
-        MonitorTypeHandlerValidators.formatMonitorTitleSuffix,
-        registeredHandlers
+        MonitorTypeHandlerValidators.formatMonitorTitleSuffix
     );
 
-    registerStandardizedIpcHandler(
+    register(
         MONITOR_TYPES_CHANNELS.validateMonitorData,
         (monitorType, data) => {
             const result = validateMonitorData(monitorType.trim(), data);
@@ -324,7 +320,6 @@ export function registerMonitorTypeHandlers({
                 metadata
             );
         },
-        MonitorTypeHandlerValidators.validateMonitorData,
-        registeredHandlers
+        MonitorTypeHandlerValidators.validateMonitorData
     );
 }

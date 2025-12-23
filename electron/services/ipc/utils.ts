@@ -34,7 +34,7 @@ import type {
 
 import { isDev } from "../../electronUtils";
 import { logger } from "../../utils/logger";
-import { getUtfByteLength, truncateUtfString } from "./diagnosticsLimits";
+import { truncateUtfString } from "./diagnosticsLimits";
 
 const HIGH_FREQUENCY_OPERATIONS = new Set<string>([
     MONITOR_TYPES_CHANNELS.formatMonitorDetail,
@@ -68,7 +68,8 @@ const validateIpcUrlPayloadGuards = (
         return null;
     }
 
-    const byteLength = getUtfByteLength(value);
+    const {byteLength} = new TextEncoder().encode(value);
+
     if (byteLength > MAX_IPC_URL_UTF_BYTES) {
         return `${paramName} must not exceed ${MAX_IPC_URL_UTF_BYTES} bytes`;
     }
@@ -144,6 +145,15 @@ type StrictIpcInvokeHandler<TChannel extends IpcInvokeChannel> = (
 ) =>
     | IpcInvokeChannelResult<TChannel>
     | Promise<IpcInvokeChannelResult<TChannel>>;
+
+/**
+ * Curried registrar type for standardized IPC handlers.
+ */
+export type StandardizedIpcRegistrar = <TChannel extends IpcInvokeChannel>(
+    channelName: TChannel,
+    handler: StrictIpcInvokeHandler<TChannel>,
+    validateParams?: IpcParameterValidator | null
+) => void;
 
 function assertChannelParams<TChannel extends IpcInvokeChannel>(
     channelName: TChannel,
@@ -800,4 +810,28 @@ export function registerStandardizedIpcHandler<
 
         throw error;
     }
+}
+
+/**
+ * Creates a typed registrar for {@link registerStandardizedIpcHandler}.
+ *
+ * @remarks
+ * Handler modules typically register multiple channels. Currying the shared
+ * `registeredHandlers` set avoids repeating it for every registration call.
+ */
+export function createStandardizedIpcRegistrar(
+    registeredHandlers: Set<IpcInvokeChannel>
+): StandardizedIpcRegistrar {
+    return function register<TChannel extends IpcInvokeChannel>(
+        channelName: TChannel,
+        handler: StrictIpcInvokeHandler<TChannel>,
+        validateParams: IpcParameterValidator | null = null
+    ): void {
+        registerStandardizedIpcHandler(
+            channelName,
+            handler,
+            validateParams,
+            registeredHandlers
+        );
+    };
 }

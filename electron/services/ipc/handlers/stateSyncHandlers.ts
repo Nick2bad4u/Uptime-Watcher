@@ -10,7 +10,7 @@ import { STATE_SYNC_ACTION, STATE_SYNC_SOURCE } from "@shared/types/stateSync";
 import type { UptimeOrchestrator } from "../../../UptimeOrchestrator";
 
 import { logger } from "../../../utils/logger";
-import { registerStandardizedIpcHandler } from "../utils";
+import { createStandardizedIpcRegistrar } from "../utils";
 import { StateSyncHandlerValidators } from "../validators";
 
 /**
@@ -32,7 +32,9 @@ export function registerStateSyncHandlers({
     setStateSyncStatus,
     uptimeOrchestrator,
 }: StateSyncHandlersDependencies): void {
-    registerStandardizedIpcHandler(
+    const register = createStandardizedIpcRegistrar(registeredHandlers);
+
+    register(
         STATE_SYNC_CHANNELS.requestFullSync,
         async () => {
             const sites = await uptimeOrchestrator.getSites();
@@ -70,11 +72,10 @@ export function registerStateSyncHandlers({
                 synchronized: true,
             } satisfies StateSyncFullSyncResult;
         },
-        StateSyncHandlerValidators.requestFullSync,
-        registeredHandlers
+        StateSyncHandlerValidators.requestFullSync
     );
 
-    registerStandardizedIpcHandler(
+    register(
         STATE_SYNC_CHANNELS.getSyncStatus,
         () => {
             const currentStatus = getStateSyncStatus();
@@ -114,7 +115,6 @@ export function registerStateSyncHandlers({
             setStateSyncStatus(summary);
             return summary;
         },
-        StateSyncHandlerValidators.getSyncStatus,
-        registeredHandlers
+        StateSyncHandlerValidators.getSyncStatus
     );
 }

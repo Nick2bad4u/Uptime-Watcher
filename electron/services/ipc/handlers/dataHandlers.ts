@@ -9,7 +9,7 @@ import { DATA_CHANNELS } from "@shared/types/preload";
 import type { UptimeOrchestrator } from "../../../UptimeOrchestrator";
 
 import { validateDatabaseBackupPayload } from "../../database/utils/databaseBackup";
-import { registerStandardizedIpcHandler, toClonedArrayBuffer } from "../utils";
+import { createStandardizedIpcRegistrar, toClonedArrayBuffer } from "../utils";
 import { DataHandlerValidators } from "../validators";
 
 /**
@@ -27,21 +27,21 @@ export function registerDataHandlers({
     registeredHandlers,
     uptimeOrchestrator,
 }: DataHandlersDependencies): void {
-    registerStandardizedIpcHandler(
+    const register = createStandardizedIpcRegistrar(registeredHandlers);
+
+    register(
         DATA_CHANNELS.exportData,
         () => uptimeOrchestrator.exportData(),
-        DataHandlerValidators.exportData,
-        registeredHandlers
+        DataHandlerValidators.exportData
     );
 
-    registerStandardizedIpcHandler(
+    register(
         DATA_CHANNELS.importData,
         (serializedBackup) => uptimeOrchestrator.importData(serializedBackup),
-        DataHandlerValidators.importData,
-        registeredHandlers
+        DataHandlerValidators.importData
     );
 
-    registerStandardizedIpcHandler(
+    register(
         DATA_CHANNELS.downloadSqliteBackup,
         async () => {
             const result = await uptimeOrchestrator.downloadBackup();
@@ -55,11 +55,10 @@ export function registerDataHandlers({
                 metadata,
             } satisfies SerializedDatabaseBackupResult;
         },
-        DataHandlerValidators.downloadSqliteBackup,
-        registeredHandlers
+        DataHandlerValidators.downloadSqliteBackup
     );
 
-    registerStandardizedIpcHandler(
+    register(
         DATA_CHANNELS.restoreSqliteBackup,
         async (payload) => {
             const buffer = Buffer.from(payload.buffer);
@@ -75,7 +74,6 @@ export function registerDataHandlers({
                 restoredAt: summary.restoredAt,
             } satisfies SerializedDatabaseRestoreResult;
         },
-        DataHandlerValidators.restoreSqliteBackup,
-        registeredHandlers
+        DataHandlerValidators.restoreSqliteBackup
     );
 }

@@ -8,6 +8,7 @@ import { SystemService } from "../../../services/SystemService";
 import { ThemedButton } from "../../../theme/components/ThemedButton";
 import { ThemedText } from "../../../theme/components/ThemedText";
 import { formatFullTimestamp } from "../../../utils/time";
+import { getUserFacingErrorDetail } from "../../../utils/userFacingErrors";
 
 function resolveSyncResetStatusText(args: {
     connected: boolean;
@@ -219,9 +220,10 @@ export const SyncMaintenancePanel = ({
                 await copyTextToClipboard(text);
                 setCopyResult({ kind: "success" });
             } catch (error) {
-                const message =
-                    error instanceof Error ? error.message : "Unknown error";
-                setCopyResult({ kind: "error", message });
+                setCopyResult({
+                    kind: "error",
+                    message: getUserFacingErrorDetail(error),
+                });
             }
         },
         [lastResult, preview]

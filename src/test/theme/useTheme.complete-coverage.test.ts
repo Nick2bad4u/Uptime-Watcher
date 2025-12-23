@@ -1,9 +1,5 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
 import { renderHook, act } from "@testing-library/react";
-
-// Unmock the theme module to test the actual implementation
-vi.unmock("../../theme/useTheme");
-
 import {
     useTheme,
     useAvailabilityColors,
@@ -54,7 +50,7 @@ describe("useTheme - Complete Coverage", () => {
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: useTheme.complete-coverage",
+                "Component: useTheme.complete-coverage-fixed",
                 "component"
             );
             await annotate("Category: Core", "category");
@@ -81,7 +77,7 @@ describe("useTheme - Complete Coverage", () => {
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: useTheme.complete-coverage",
+                "Component: useTheme.complete-coverage-fixed",
                 "component"
             );
             await annotate("Category: Core", "category");
@@ -104,7 +100,7 @@ describe("useTheme - Complete Coverage", () => {
         it("should handle theme toggling", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: useTheme.complete-coverage",
+                "Component: useTheme.complete-coverage-fixed",
                 "component"
             );
             await annotate("Category: Core", "category");
@@ -127,7 +123,7 @@ describe("useTheme - Complete Coverage", () => {
         it("should handle color retrieval", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: useTheme.complete-coverage",
+                "Component: useTheme.complete-coverage-fixed",
                 "component"
             );
             await annotate("Category: Core", "category");
@@ -145,7 +141,7 @@ describe("useTheme - Complete Coverage", () => {
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: useTheme.complete-coverage",
+                "Component: useTheme.complete-coverage-fixed",
                 "component"
             );
             await annotate("Category: Core", "category");
@@ -163,7 +159,7 @@ describe("useTheme - Complete Coverage", () => {
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: useTheme.complete-coverage",
+                "Component: useTheme.complete-coverage-fixed",
                 "component"
             );
             await annotate("Category: Core", "category");
@@ -181,7 +177,7 @@ describe("useTheme - Complete Coverage", () => {
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: useTheme.complete-coverage",
+                "Component: useTheme.complete-coverage-fixed",
                 "component"
             );
             await annotate("Category: Core", "category");
@@ -206,7 +202,7 @@ describe("useTheme - Complete Coverage", () => {
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: useTheme.complete-coverage",
+                "Component: useTheme.complete-coverage-fixed",
                 "component"
             );
             await annotate("Category: Core", "category");
@@ -225,7 +221,7 @@ describe("useTheme - Complete Coverage", () => {
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: useTheme.complete-coverage",
+                "Component: useTheme.complete-coverage-fixed",
                 "component"
             );
             await annotate("Category: Core", "category");
@@ -248,7 +244,7 @@ describe("useTheme - Complete Coverage", () => {
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: useTheme.complete-coverage",
+                "Component: useTheme.complete-coverage-fixed",
                 "component"
             );
             await annotate("Category: Core", "category");
@@ -275,7 +271,7 @@ describe("useTheme - Complete Coverage", () => {
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: useTheme.complete-coverage",
+                "Component: useTheme.complete-coverage-fixed",
                 "component"
             );
             await annotate("Category: Core", "category");
@@ -293,7 +289,7 @@ describe("useTheme - Complete Coverage", () => {
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: useTheme.complete-coverage",
+                "Component: useTheme.complete-coverage-fixed",
                 "component"
             );
             await annotate("Category: Core", "category");
@@ -338,7 +334,7 @@ describe("useTheme - Complete Coverage", () => {
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: useTheme.complete-coverage",
+                "Component: useTheme.complete-coverage-fixed",
                 "component"
             );
             await annotate("Category: Core", "category");
@@ -359,7 +355,7 @@ describe("useTheme - Complete Coverage", () => {
         it("should return status color object", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: useTheme.complete-coverage",
+                "Component: useTheme.complete-coverage-fixed",
                 "component"
             );
             await annotate("Category: Core", "category");
@@ -386,7 +382,7 @@ describe("useTheme - Complete Coverage", () => {
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: useTheme.complete-coverage",
+                "Component: useTheme.complete-coverage-fixed",
                 "component"
             );
             await annotate("Category: Core", "category");
@@ -408,7 +404,7 @@ describe("useTheme - Complete Coverage", () => {
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: useTheme.complete-coverage",
+                "Component: useTheme.complete-coverage-fixed",
                 "component"
             );
             await annotate("Category: Core", "category");
@@ -432,7 +428,7 @@ describe("useTheme - Complete Coverage", () => {
         it("should handle color path retrieval", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: useTheme.complete-coverage",
+                "Component: useTheme.complete-coverage-fixed",
                 "component"
             );
             await annotate("Category: Core", "category");
@@ -452,7 +448,7 @@ describe("useTheme - Complete Coverage", () => {
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: useTheme.complete-coverage",
+                "Component: useTheme.complete-coverage-fixed",
                 "component"
             );
             await annotate("Category: Core", "category");
@@ -471,7 +467,7 @@ describe("useTheme - Complete Coverage", () => {
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: useTheme.complete-coverage",
+                "Component: useTheme.complete-coverage-fixed",
                 "component"
             );
             await annotate("Category: Core", "category");
@@ -488,7 +484,7 @@ describe("useTheme - Complete Coverage", () => {
         it("should handle complex selectors", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: useTheme.complete-coverage",
+                "Component: useTheme.complete-coverage-fixed",
                 "component"
             );
             await annotate("Category: Core", "category");
@@ -507,7 +503,7 @@ describe("useTheme - Complete Coverage", () => {
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: useTheme.complete-coverage",
+                "Component: useTheme.complete-coverage-fixed",
                 "component"
             );
             await annotate("Category: Core", "category");
@@ -528,7 +524,7 @@ describe("useTheme - Complete Coverage", () => {
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: useTheme.complete-coverage",
+                "Component: useTheme.complete-coverage-fixed",
                 "component"
             );
             await annotate("Category: Core", "category");
@@ -556,7 +552,7 @@ describe("useTheme - Complete Coverage", () => {
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: useTheme.complete-coverage",
+                "Component: useTheme.complete-coverage-fixed",
                 "component"
             );
             await annotate("Category: Core", "category");
@@ -595,7 +591,7 @@ describe("useTheme - Complete Coverage", () => {
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: useTheme.complete-coverage",
+                "Component: useTheme.complete-coverage-fixed",
                 "component"
             );
             await annotate("Category: Core", "category");
@@ -620,7 +616,7 @@ describe("useTheme - Complete Coverage", () => {
         it("should handle invalid color paths", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: useTheme.complete-coverage",
+                "Component: useTheme.complete-coverage-fixed",
                 "component"
             );
             await annotate("Category: Core", "category");
@@ -640,7 +636,7 @@ describe("useTheme - Complete Coverage", () => {
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: useTheme.complete-coverage",
+                "Component: useTheme.complete-coverage-fixed",
                 "component"
             );
             await annotate("Category: Core", "category");

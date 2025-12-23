@@ -6,25 +6,26 @@
  * description of an unknown error value.
  *
  * We intentionally keep this logic separate from logging helpers:
- * - logging should prefer {@link ensureError} and structured metadata
+ *
+ * - Logging should prefer {@link ensureError} and structured metadata
  * - UI messages should prioritize the best available human message and fall
- *   back to `String(error)` to preserve existing branch-coverage semantics
- *   (e.g. `[object Object]`).
+ *   back to a stable catalog message.
  *
  * @packageDocumentation
  */
 
+import { ERROR_CATALOG } from "@shared/utils/errorCatalog";
 import { isRecord } from "@shared/utils/typeHelpers";
 
 /**
  * Extracts a user-facing error detail from an unknown thrown value.
  *
  * @remarks
- * Semantics are intentionally conservative to preserve existing behavior in UI
- * tests:
+ * Semantics are intentionally conservative:
+ *
  * - {@link Error} values return `error.message`.
  * - Plain objects with a string `message` property return that message.
- * - Everything else falls back to `String(error)`.
+ * - Everything else falls back to {@link ERROR_CATALOG.system.UNKNOWN_ERROR}.
  */
 export function getUserFacingErrorDetail(error: unknown): string {
     if (error instanceof Error) {
@@ -38,5 +39,13 @@ export function getUserFacingErrorDetail(error: unknown): string {
         }
     }
 
-    return String(error);
+    if (typeof error === "string") {
+        return error;
+    }
+
+    if (typeof error === "number" || typeof error === "bigint") {
+        return String(error);
+    }
+
+    return ERROR_CATALOG.system.UNKNOWN_ERROR;
 }

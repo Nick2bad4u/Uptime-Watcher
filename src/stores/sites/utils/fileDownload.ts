@@ -8,6 +8,7 @@
 import type { SerializedDatabaseBackupMetadata } from "@shared/types/databaseBackup";
 import type { SerializedDatabaseBackupResult } from "@shared/types/ipc";
 
+import { ensureError } from "@shared/utils/errorHandling";
 import { isRecord as isSharedRecord } from "@shared/utils/typeHelpers";
 
 import { logger } from "../../../services/logger";
@@ -145,9 +146,7 @@ function tryFallbackDownload(
     } catch (fallbackError) {
         logger.error(
             "File download failed: both primary and fallback methods failed",
-            fallbackError instanceof Error
-                ? fallbackError
-                : new Error(String(fallbackError))
+            ensureError(fallbackError)
         );
         throw new Error("File download failed", { cause: fallbackError });
     }
@@ -173,7 +172,7 @@ function handleDownloadError(
     mimeType: string
 ): void {
     if (!(error instanceof Error)) {
-        logger.error("File download failed", new Error(String(error)));
+        logger.error("File download failed", ensureError(error));
         throw new Error("File download failed");
     }
 

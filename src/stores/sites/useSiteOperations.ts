@@ -18,7 +18,6 @@ import type {
 import { DEFAULT_SITE_NAME } from "@shared/constants/sites";
 import { ERROR_CATALOG } from "@shared/utils/errorCatalog";
 import { ensureError } from "@shared/utils/errorHandling";
-import { getErrorMessage } from "@shared/utils/errorUtils";
 
 import type { BaseSiteOperations } from "./baseTypes";
 import type { SiteOperationsDependencies } from "./types";
@@ -160,7 +159,7 @@ const normalizeMonitorOrThrow = (
         const safeError = ensureError(error);
         logger.error(contextMessage, safeError);
         throw new Error(
-            `Monitor normalization failed: ${getErrorMessage(safeError)}`,
+            `Monitor normalization failed: ${safeError.message}`,
             { cause: error }
         );
     }

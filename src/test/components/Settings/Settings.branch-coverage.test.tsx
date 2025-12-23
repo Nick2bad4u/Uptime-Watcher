@@ -784,7 +784,7 @@ describe("Settings - Branch Coverage Tests", () => {
 
             await waitFor(() => {
                 expect(mockErrorStore.setError).toHaveBeenCalledWith(
-                    "Failed to download SQLite backup: [object Object]"
+                    "Failed to download SQLite backup: Unknown error"
                 );
             });
         });

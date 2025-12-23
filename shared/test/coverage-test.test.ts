@@ -16,7 +16,7 @@ describe("Fixed Coverage Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: coverage-test-fixed", "component");
+            await annotate("Component: coverage-test", "component");
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -29,7 +29,7 @@ describe("Fixed Coverage Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: coverage-test-fixed", "component");
+            await annotate("Component: coverage-test", "component");
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -51,7 +51,7 @@ describe("Fixed Coverage Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: coverage-test-fixed", "component");
+            await annotate("Component: coverage-test", "component");
             await annotate("Category: Shared", "category");
             await annotate("Type: Error Handling", "type");
 
@@ -68,7 +68,7 @@ describe("Fixed Coverage Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: coverage-test-fixed", "component");
+            await annotate("Component: coverage-test", "component");
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -90,7 +90,7 @@ describe("Fixed Coverage Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: coverage-test-fixed", "component");
+            await annotate("Component: coverage-test", "component");
             await annotate("Category: Shared", "category");
             await annotate("Type: Data Retrieval", "type");
 
@@ -116,7 +116,7 @@ describe("Fixed Coverage Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: coverage-test-fixed", "component");
+            await annotate("Component: coverage-test", "component");
             await annotate("Category: Shared", "category");
             await annotate("Type: Error Handling", "type");
 
@@ -175,7 +175,7 @@ describe("Fixed Coverage Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: coverage-test-fixed", "component");
+            await annotate("Component: coverage-test", "component");
             await annotate("Category: Shared", "category");
             await annotate("Type: Error Handling", "type");
 

@@ -4,7 +4,7 @@ import { SETTINGS_CHANNELS } from "@shared/types/preload";
 
 import type { UptimeOrchestrator } from "../../../UptimeOrchestrator";
 
-import { registerStandardizedIpcHandler } from "../utils";
+import { createStandardizedIpcRegistrar } from "../utils";
 import { SettingsHandlerValidators } from "../validators";
 
 /**
@@ -22,30 +22,29 @@ export function registerSettingsHandlers({
     registeredHandlers,
     uptimeOrchestrator,
 }: SettingsHandlersDependencies): void {
-    registerStandardizedIpcHandler(
+    const register = createStandardizedIpcRegistrar(registeredHandlers);
+
+    register(
         SETTINGS_CHANNELS.updateHistoryLimit,
         async (historyLimit) => {
             await uptimeOrchestrator.setHistoryLimit(historyLimit);
             return uptimeOrchestrator.getHistoryLimit();
         },
-        SettingsHandlerValidators.updateHistoryLimit,
-        registeredHandlers
+        SettingsHandlerValidators.updateHistoryLimit
     );
 
-    registerStandardizedIpcHandler(
+    register(
         SETTINGS_CHANNELS.getHistoryLimit,
         () => uptimeOrchestrator.getHistoryLimit(),
-        SettingsHandlerValidators.getHistoryLimit,
-        registeredHandlers
+        SettingsHandlerValidators.getHistoryLimit
     );
 
-    registerStandardizedIpcHandler(
+    register(
         SETTINGS_CHANNELS.resetSettings,
         async (): Promise<undefined> => {
             await uptimeOrchestrator.resetSettings();
             return undefined;
         },
-        SettingsHandlerValidators.resetSettings,
-        registeredHandlers
+        SettingsHandlerValidators.resetSettings
     );
 }

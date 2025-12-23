@@ -2,14 +2,12 @@ import type { IpcInvokeChannel } from "@shared/types/ipc";
 
 import { getElectronErrorCodeSuffix } from "@electron/services/shell/openExternalUtils";
 import { SYSTEM_CHANNELS } from "@shared/types/preload";
-import { LOG_TEMPLATES } from "@shared/utils/logTemplates";
 import { validateExternalOpenUrlCandidate } from "@shared/utils/urlSafety";
 import { clipboard, shell } from "electron";
 
 import type { AutoUpdaterService } from "../../updater/AutoUpdaterService";
 
-import { logger } from "../../../utils/logger";
-import { registerStandardizedIpcHandler } from "../utils";
+import { createStandardizedIpcRegistrar } from "../utils";
 import { SystemHandlerValidators } from "../validators";
 
 /**
@@ -27,9 +25,11 @@ export function registerSystemHandlers({
     autoUpdaterService,
     registeredHandlers,
 }: SystemHandlersDependencies): void {
-    registerStandardizedIpcHandler(
+    const register = createStandardizedIpcRegistrar(registeredHandlers);
+
+    register(
         SYSTEM_CHANNELS.openExternal,
-        async (url) => {
+        async (url): Promise<boolean> => {
             const validation = validateExternalOpenUrlCandidate(url);
 
             if ("reason" in validation) {
@@ -53,37 +53,27 @@ export function registerSystemHandlers({
                     { cause: error }
                 );
             }
+
             return true;
         },
-        SystemHandlerValidators.openExternal,
-        registeredHandlers
+        SystemHandlerValidators.openExternal
     );
 
-    registerStandardizedIpcHandler(
+    register(
+        SYSTEM_CHANNELS.writeClipboardText,
+        (text): boolean => {
+            clipboard.writeText(text);
+            return true;
+        },
+        SystemHandlerValidators.writeClipboardText
+    );
+
+    register(
         SYSTEM_CHANNELS.quitAndInstall,
-        () => {
-            logger.info(LOG_TEMPLATES.services.UPDATER_QUIT_INSTALL);
+        (): boolean => {
             autoUpdaterService.quitAndInstall();
             return true;
         },
-        SystemHandlerValidators.quitAndInstall,
-        registeredHandlers
-    );
-
-    registerStandardizedIpcHandler(
-        SYSTEM_CHANNELS.writeClipboardText,
-        (text: string) => {
-            try {
-                clipboard.writeText(text);
-            } catch (error: unknown) {
-                throw new Error("Failed to write clipboard text", {
-                    cause: error,
-                });
-            }
-
-            return true;
-        },
-        SystemHandlerValidators.writeClipboardText,
-        registeredHandlers
+        SystemHandlerValidators.quitAndInstall
     );
 }

@@ -35,10 +35,10 @@
 
 import type { Event, HandlerDetails } from "electron";
 
-import { getNodeEnv, readBooleanEnv  } from "@shared/utils/environment";
+import { getNodeEnv, readBooleanEnv } from "@shared/utils/environment";
+import { getUnknownErrorMessage } from "@shared/utils/errorCatalog";
 import { tryGetErrorCode } from "@shared/utils/errorCodes";
 import { ensureError, withErrorHandling } from "@shared/utils/errorHandling";
-import { getErrorMessage } from "@shared/utils/errorUtils";
 import { validateExternalOpenUrlCandidate } from "@shared/utils/urlSafety";
 import { BrowserWindow, shell } from "electron";
 // eslint-disable-next-line unicorn/import-style -- Need namespace import for path operations
@@ -342,7 +342,7 @@ export class WindowService {
                     !(error instanceof Error && error.name === "AbortError")
                 ) {
                     logger.debug(
-                        `[WindowService] Vite server not ready (attempt ${attempt + 1}/${MAX_RETRIES}): ${getErrorMessage(error)}`
+                        `[WindowService] Vite server not ready (attempt ${attempt + 1}/${MAX_RETRIES}): ${getUnknownErrorMessage(error)}`
                     );
                 }
             }

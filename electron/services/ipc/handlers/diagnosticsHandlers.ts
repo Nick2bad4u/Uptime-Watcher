@@ -29,7 +29,7 @@ import {
     recordPreloadGuardFailure,
     recordSuccessfulHandlerCheck,
 } from "../diagnosticsMetrics";
-import { registerStandardizedIpcHandler } from "../utils";
+import { createStandardizedIpcRegistrar } from "../utils";
 import { SystemHandlerValidators } from "../validators";
 
 const isUnknownRecord = (value: unknown): value is UnknownRecord =>
@@ -121,7 +121,9 @@ export function registerDiagnosticsHandlers({
     eventEmitter,
     registeredHandlers,
 }: DiagnosticsHandlersDependencies): void {
-    registerStandardizedIpcHandler(
+    const register = createStandardizedIpcRegistrar(registeredHandlers);
+
+    register(
         DIAGNOSTICS_CHANNELS.verifyIpcHandler,
         (channelRaw) => {
             if (typeof channelRaw !== "string") {
@@ -162,11 +164,10 @@ export function registerDiagnosticsHandlers({
                 registered: isRegistered,
             };
         },
-        SystemHandlerValidators.verifyIpcHandler,
-        registeredHandlers
+        SystemHandlerValidators.verifyIpcHandler
     );
 
-    registerStandardizedIpcHandler(
+    register(
         DIAGNOSTICS_CHANNELS.reportPreloadGuard,
         (reportCandidate): undefined => {
             if (!isPreloadGuardDiagnosticsReport(reportCandidate)) {
@@ -228,8 +229,7 @@ export function registerDiagnosticsHandlers({
 
             return undefined;
         },
-        SystemHandlerValidators.reportPreloadGuard,
-        registeredHandlers
+        SystemHandlerValidators.reportPreloadGuard
     );
 }
 
