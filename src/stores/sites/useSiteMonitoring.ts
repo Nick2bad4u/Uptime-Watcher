@@ -432,6 +432,37 @@ export const createSiteMonitoringActions = (
         // StatusUpdateManager will propagate the authoritative update
     };
 
+    const runMonitoringLifecycleAction = (
+        actionName: MonitoringActionName,
+        siteIdentifier: string,
+        monitoring: boolean,
+        operation: () => Promise<void>,
+        monitorId?: string
+    ): Promise<void> => {
+        logStoreAction(
+            "SitesStore",
+            actionName,
+            buildMonitoringLogPayload(siteIdentifier, monitorId, {
+                status: "pending",
+            })
+        );
+
+        return trackStorePromise(
+            withErrorHandling(
+                async (): Promise<void> => {
+                    await executeMonitoringOperation(
+                        actionName,
+                        siteIdentifier,
+                        monitoring,
+                        operation,
+                        monitorId
+                    );
+                },
+                createStoreErrorHandler("sites-monitoring", actionName)
+            )
+        );
+    };
+
     return {
         checkSiteNow: (
             siteIdentifier: string,
@@ -480,121 +511,45 @@ export const createSiteMonitoringActions = (
                 )
             );
         },
-        startSiteMonitoring: (siteIdentifier: string): Promise<void> => {
-            logStoreAction("SitesStore", "startSiteMonitoring", {
+        startSiteMonitoring: (siteIdentifier: string): Promise<void> => runMonitoringLifecycleAction(
+                "startSiteMonitoring",
                 siteIdentifier,
-                status: "pending",
-            });
-
-            return trackStorePromise(
-                withErrorHandling(
-                    async (): Promise<void> => {
-                        await executeMonitoringOperation(
-                            "startSiteMonitoring",
-                            siteIdentifier,
-                            true,
-                            () =>
-                                monitoringService.startMonitoringForSite(
-                                    siteIdentifier
-                                )
-                        );
-                    },
-                    createStoreErrorHandler(
-                        "sites-monitoring",
-                        "startSiteMonitoring"
-                    )
-                )
-            );
-        },
+                true,
+                () => monitoringService.startMonitoringForSite(siteIdentifier)
+            ),
         startSiteMonitorMonitoring: (
             siteIdentifier: string,
             monitorId: string
-        ): Promise<void> => {
-            logStoreAction("SitesStore", "startSiteMonitorMonitoring", {
-                monitorId,
+        ): Promise<void> => runMonitoringLifecycleAction(
+                "startSiteMonitorMonitoring",
                 siteIdentifier,
-                status: "pending",
-            });
-
-            return trackStorePromise(
-                withErrorHandling(
-                    async (): Promise<void> => {
-                        await executeMonitoringOperation(
-                            "startSiteMonitorMonitoring",
-                            siteIdentifier,
-                            true,
-                            () =>
-                                monitoringService.startMonitoringForMonitor(
-                                    siteIdentifier,
-                                    monitorId
-                                ),
-                            monitorId
-                        );
-                    },
-                    createStoreErrorHandler(
-                        "sites-monitoring",
-                        "startSiteMonitorMonitoring"
-                    )
-                )
-            );
-        },
-        stopSiteMonitoring: (siteIdentifier: string): Promise<void> => {
-            logStoreAction("SitesStore", "stopSiteMonitoring", {
+                true,
+                () =>
+                    monitoringService.startMonitoringForMonitor(
+                        siteIdentifier,
+                        monitorId
+                    ),
+                monitorId
+            ),
+        stopSiteMonitoring: (siteIdentifier: string): Promise<void> => runMonitoringLifecycleAction(
+                "stopSiteMonitoring",
                 siteIdentifier,
-                status: "pending",
-            });
-
-            return trackStorePromise(
-                withErrorHandling(
-                    async (): Promise<void> => {
-                        await executeMonitoringOperation(
-                            "stopSiteMonitoring",
-                            siteIdentifier,
-                            false,
-                            () =>
-                                monitoringService.stopMonitoringForSite(
-                                    siteIdentifier
-                                )
-                        );
-                    },
-                    createStoreErrorHandler(
-                        "sites-monitoring",
-                        "stopSiteMonitoring"
-                    )
-                )
-            );
-        },
+                false,
+                () => monitoringService.stopMonitoringForSite(siteIdentifier)
+            ),
         stopSiteMonitorMonitoring: (
             siteIdentifier: string,
             monitorId: string
-        ): Promise<void> => {
-            logStoreAction("SitesStore", "stopSiteMonitorMonitoring", {
-                monitorId,
+        ): Promise<void> => runMonitoringLifecycleAction(
+                "stopSiteMonitorMonitoring",
                 siteIdentifier,
-                status: "pending",
-            });
-
-            return trackStorePromise(
-                withErrorHandling(
-                    async (): Promise<void> => {
-                        await executeMonitoringOperation(
-                            "stopSiteMonitorMonitoring",
-                            siteIdentifier,
-                            false,
-                            () =>
-                                monitoringService.stopMonitoringForMonitor(
-                                    siteIdentifier,
-                                    monitorId
-                                ),
-                            monitorId
-                        );
-                    },
-                    createStoreErrorHandler(
-                        "sites-monitoring",
-                        "stopSiteMonitorMonitoring"
-                    )
-                )
-            );
-        },
+                false,
+                () =>
+                    monitoringService.stopMonitoringForMonitor(
+                        siteIdentifier,
+                        monitorId
+                    ),
+                monitorId
+            ),
     };
 };

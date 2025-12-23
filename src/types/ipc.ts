@@ -65,36 +65,12 @@ import type {
     SerializedDatabaseRestorePayload as SharedSerializedDatabaseRestorePayload,
     SerializedDatabaseRestoreResult as SharedSerializedDatabaseRestoreResult,
 } from "@shared/types/ipc";
-import type { Exact, UnknownRecord } from "type-fest";
 
-import { ERROR_CATALOG } from "@shared/utils/errorCatalog";
-import { isRecord as isSharedRecord } from "@shared/utils/typeHelpers";
-
-const IPC_RESPONSE_KEYS = new Set<string>([
-    "data",
-    "error",
-    "metadata",
-    "success",
-    "warnings",
-]);
-
-const isRecord = (value: unknown): value is UnknownRecord =>
-    isSharedRecord(value);
-
-const hasOnlyResponseKeys = (record: UnknownRecord): boolean =>
-    Object.keys(record).every((key) => IPC_RESPONSE_KEYS.has(key));
-
-/** Standard renderer-side view of a validated IPC response envelope. */
-export type RendererIpcResponse<TData> = Exact<
-    IpcResponse<TData>,
-    {
-        data?: TData;
-        error?: string;
-        metadata?: UnknownRecord;
-        success: boolean;
-        warnings?: readonly string[];
-    }
->;
+import {
+    extractIpcResponseData,
+    isIpcResponseEnvelope,
+    safeExtractIpcResponseData,
+} from "@shared/utils/ipcResponse";
 
 /** Renderer-facing IPC diagnostics channels. */
 export type IpcDiagnosticsChannel = SharedIpcDiagnosticsChannel;
@@ -141,12 +117,8 @@ export type SerializedDatabaseRestoreResult =
 // eslint-disable-next-line etc/no-misused-generics -- Type parameter must be explicitly provided for type guard
 export function isIpcResponse<T>(
     value: unknown
-): value is RendererIpcResponse<T> {
-    if (!isRecord(value) || typeof value["success"] !== "boolean") {
-        return false;
-    }
-
-    return hasOnlyResponseKeys(value);
+): value is IpcResponse<T> {
+    return isIpcResponseEnvelope(value);
 }
 
 /**
@@ -162,18 +134,7 @@ export function isIpcResponse<T>(
  */
 // eslint-disable-next-line etc/no-misused-generics, @typescript-eslint/no-unnecessary-type-parameters -- Type parameter must be explicitly provided for type assertion
 export function extractIpcData<T>(response: unknown): T {
-    if (!isIpcResponse<T>(response)) {
-        throw new Error(ERROR_CATALOG.ipc.INVALID_RESPONSE_FORMAT);
-    }
-
-    if (!response.success) {
-        throw new Error(
-            response.error ?? ERROR_CATALOG.ipc.IPC_OPERATION_FAILED
-        );
-    }
-
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Type T is provided by caller who knows the expected response data type
-    return response.data as T;
+    return extractIpcResponseData<T>(response, { requireData: false });
 }
 
 /**
@@ -187,9 +148,5 @@ export function extractIpcData<T>(response: unknown): T {
  * @public
  */
 export function safeExtractIpcData<T>(response: unknown, fallback: T): T {
-    try {
-        return extractIpcData<T>(response);
-    } catch {
-        return fallback;
-    }
+    return safeExtractIpcResponseData<T>(response, fallback);
 }

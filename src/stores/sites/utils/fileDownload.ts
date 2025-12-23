@@ -14,6 +14,52 @@ import { logger } from "../../../services/logger";
 import { isPlaywrightAutomation } from "../../../utils/environment";
 
 /**
+ * Creates an object URL for the provided blob and guarantees cleanup.
+ */
+function withObjectUrl(blob: Blob, run: (objectURL: string) => void): void {
+    const objectURL = URL.createObjectURL(blob);
+    try {
+        run(objectURL);
+    } finally {
+        URL.revokeObjectURL(objectURL);
+    }
+}
+
+function createDownloadAnchor(objectURL: string, fileName: string): HTMLAnchorElement {
+    const anchor = document.createElement("a");
+    anchor.href = objectURL;
+    anchor.download = fileName;
+    return anchor;
+}
+
+function clickDownloadAnchor(anchor: HTMLAnchorElement, attachToDom: boolean): void {
+    if (!attachToDom) {
+        anchor.click();
+        return;
+    }
+
+    anchor.style.display = "none";
+
+    const { body } = document;
+    try {
+        body.append(anchor);
+        anchor.click();
+        anchor.remove();
+    } catch (domError) {
+        const error = domError instanceof Error ? domError : new Error(String(domError));
+
+        // For appendChild errors, re-throw to trigger proper fallback mechanism.
+        if (error.message.includes("appendChild")) {
+            throw error;
+        }
+
+        // For other DOM errors, use simple fallback.
+        logger.warn("DOM manipulation failed, using fallback click", error);
+        anchor.click();
+    }
+}
+
+/**
  * Options for downloading a file in the browser.
  *
  * @remarks
@@ -51,45 +97,11 @@ function createAndTriggerDownload(
     mimeType: string
 ): void {
     const blob = new Blob([buffer], { type: mimeType });
-    let objectURL: string | undefined = undefined;
 
-    try {
-        objectURL = URL.createObjectURL(blob);
-        const anchor = document.createElement("a");
-        anchor.href = objectURL;
-        anchor.download = fileName;
-        anchor.style.display = "none";
-
-        // Safe DOM manipulation
-        const { body } = document;
-        // No need to check if body exists; it's always present in browser
-        // environments
-        try {
-            body.append(anchor);
-            anchor.click();
-            anchor.remove();
-        } catch (domError) {
-            // For appendChild errors, re-throw to trigger proper fallback
-            // mechanism
-            const error =
-                domError instanceof Error
-                    ? domError
-                    : new Error(String(domError));
-
-            if (error.message.includes("appendChild")) {
-                throw error;
-            }
-
-            // For other DOM errors, use simple fallback
-            logger.warn("DOM manipulation failed, using fallback click", error);
-            anchor.click();
-        }
-    } finally {
-        // Clean up object URL only if it was created
-        if (objectURL) {
-            URL.revokeObjectURL(objectURL);
-        }
-    }
+    withObjectUrl(blob, (objectURL) => {
+        const anchor = createDownloadAnchor(objectURL, fileName);
+        clickDownloadAnchor(anchor, true);
+    });
 }
 
 /**
@@ -359,37 +371,25 @@ export async function handleSQLiteBackupDownload(
         type: "application/x-sqlite3",
     });
 
-    // Create object URL
-    // URL.createObjectURL is always available in modern browsers
-    const objectURL = URL.createObjectURL(blob);
+    withObjectUrl(blob, (objectURL) => {
+        const anchor = createDownloadAnchor(objectURL, normalizedFileName);
 
-    try {
-        // Create anchor element for download
-        const anchor = document.createElement("a");
-        anchor.href = objectURL;
-        anchor.download = normalizedFileName;
-
-        // Trigger download
         try {
-            anchor.click();
+            clickDownloadAnchor(anchor, false);
         } catch (clickError) {
-            // Log the click error for debugging and add context
             logger.error(
                 "Failed to trigger download click",
                 clickError instanceof Error
                     ? clickError
                     : new Error(String(clickError))
             );
-            // Re-throw with more context
+
             throw new Error(
                 `Download trigger failed: ${clickError instanceof Error ? clickError.message : String(clickError)}`,
                 { cause: clickError }
             );
         }
-    } finally {
-        // Clean up object URL
-        URL.revokeObjectURL(objectURL);
-    }
+    });
 
     return backupResult;
 }

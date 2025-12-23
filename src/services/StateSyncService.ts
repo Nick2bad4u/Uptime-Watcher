@@ -31,26 +31,19 @@ import { logger } from "./logger";
 import { resolveCleanupHandler } from "./utils/cleanupHandlers";
 import { getIpcServiceHelpers } from "./utils/createIpcServiceHelpers";
 
-const { ensureInitialized, wrap } = ((): ReturnType<
-    typeof getIpcServiceHelpers
-> => {
-    try {
-        return getIpcServiceHelpers("StateSyncService", {
-            bridgeContracts: [
-                {
-                    domain: "stateSync",
-                    methods: [
-                        "getSyncStatus",
-                        "onStateSyncEvent",
-                        "requestFullSync",
-                    ],
-                },
+// eslint-disable-next-line ex/no-unhandled -- Module-level initialization should fail fast when preload wiring is invalid.
+const { ensureInitialized, wrap } = getIpcServiceHelpers("StateSyncService", {
+    bridgeContracts: [
+        {
+            domain: "stateSync",
+            methods: [
+                "getSyncStatus",
+                "onStateSyncEvent",
+                "requestFullSync",
             ],
-        });
-    } catch (error: unknown) {
-        throw ensureError(error);
-    }
-})();
+        },
+    ],
+});
 
 /**
  * Contract for renderer-facing state synchronization operations.

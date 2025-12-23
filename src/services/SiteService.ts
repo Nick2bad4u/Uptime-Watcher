@@ -10,7 +10,6 @@
 import type { Site } from "@shared/types";
 import type { ZodError } from "zod";
 
-import { ensureError } from "@shared/utils/errorHandling";
 import {
     validateSiteSnapshot,
     validateSiteSnapshots,
@@ -19,29 +18,22 @@ import {
 import { logger } from "./logger";
 import { getIpcServiceHelpers } from "./utils/createIpcServiceHelpers";
 
-const { ensureInitialized, wrap } = ((): ReturnType<
-    typeof getIpcServiceHelpers
-> => {
-    try {
-        return getIpcServiceHelpers("SiteService", {
-            bridgeContracts: [
-                {
-                    domain: "sites",
-                    methods: [
-                        "addSite",
-                        "deleteAllSites",
-                        "getSites",
-                        "removeMonitor",
-                        "removeSite",
-                        "updateSite",
-                    ],
-                },
+// eslint-disable-next-line ex/no-unhandled -- Module-level initialization should fail fast when preload wiring is invalid.
+const { ensureInitialized, wrap } = getIpcServiceHelpers("SiteService", {
+    bridgeContracts: [
+        {
+            domain: "sites",
+            methods: [
+                "addSite",
+                "deleteAllSites",
+                "getSites",
+                "removeMonitor",
+                "removeSite",
+                "updateSite",
             ],
-        });
-    } catch (error) {
-        throw ensureError(error);
-    }
-})();
+        },
+    ],
+});
 
 const logInvalidSnapshotAndThrow = (
     logMessage: string,

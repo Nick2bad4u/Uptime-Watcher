@@ -171,8 +171,7 @@ export const createSettingsOperationsSlice = (
                 } as const;
 
                 logStoreAction("SettingsStore", "initializeSettings", {
-                    error:
-                        error instanceof Error ? error.message : String(error),
+                    error: ensureError(error).message,
                     message: fallbackResult.message,
                     settingsLoaded: fallbackResult.settingsLoaded,
                     success: fallbackResult.success,

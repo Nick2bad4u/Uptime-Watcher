@@ -24,6 +24,10 @@ import type { UnknownRecord } from "type-fest";
 import { createIpcCorrelationEnvelope } from "@shared/types/ipc";
 import { DIAGNOSTICS_CHANNELS } from "@shared/types/preload";
 import { generateCorrelationId } from "@shared/utils/correlation";
+import {
+    extractIpcResponseData,
+    validateVoidIpcResponse,
+} from "@shared/utils/ipcResponse";
 import { ipcRenderer } from "electron";
 
 import {
@@ -142,67 +146,7 @@ export class IpcError extends Error {
  *
  * @returns True if value is a valid IPC response
  */
-function isIpcResponse(value: unknown): value is IpcResponse {
-    if (typeof value !== "object" || value === null) {
-        return false;
-    }
 
-    const success: unknown = Reflect.get(value, "success") as unknown;
-    return typeof success === "boolean";
-}
-
-/**
- * Validates and extracts data from IPC response with proper error handling
- *
- * @param response - Raw IPC response from main process
- *
- * @returns Validated data from the response
- *
- * @throws Error if response is invalid or operation failed
- */
-// eslint-disable-next-line etc/no-misused-generics, @typescript-eslint/no-unnecessary-type-parameters -- Type parameter T is provided by caller for return type
-function validateIpcResponse<T>(response: unknown): T {
-    if (!isIpcResponse(response)) {
-        throw new Error(
-            "Invalid IPC response format - missing required properties"
-        );
-    }
-
-    if (!response.success) {
-        throw new Error(
-            response.error ?? "IPC operation failed without error message"
-        );
-    }
-
-    if (response.data === undefined) {
-        throw new Error("IPC response missing data field");
-    }
-
-    // Type assertion is necessary here as we cannot validate the actual data type
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- IPC response validation ensures structure but not data type
-    return response.data as T;
-}
-
-/**
- * Validates IPC response for void operations
- *
- * @param response - Raw IPC response from main process
- *
- * @throws Error if response is invalid or operation failed
- */
-function validateVoidIpcResponse(response: unknown): void {
-    if (!isIpcResponse(response)) {
-        throw new Error(
-            "Invalid IPC response format - missing required properties"
-        );
-    }
-
-    if (!response.success) {
-        throw new Error(
-            response.error ?? "IPC operation failed without error message"
-        );
-    }
-}
 
 function isHandlerVerificationResponse(
     value: unknown
@@ -251,7 +195,7 @@ async function verifyChannelOrThrow(channel: string): Promise<void> {
                 );
 
                 const verificationResult =
-                    validateIpcResponse<HandlerVerificationResponse>(
+                    extractIpcResponseData<HandlerVerificationResponse>(
                         rawResponse
                     );
 
@@ -365,7 +309,9 @@ export function createTypedInvoker<TChannel extends IpcInvokeChannel>(
                     createIpcCorrelationEnvelope(correlationId)
                 ),
             (response) =>
-                validateIpcResponse<IpcInvokeChannelResult<TChannel>>(response)
+                extractIpcResponseData<IpcInvokeChannelResult<TChannel>>(
+                    response
+                )
         );
     };
 }

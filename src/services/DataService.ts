@@ -73,27 +73,20 @@ interface DataServiceContract {
     ) => Promise<SerializedDatabaseRestoreResult>;
 }
 
-const { ensureInitialized, wrap } = ((): ReturnType<
-    typeof getIpcServiceHelpers
-> => {
-    try {
-        return getIpcServiceHelpers("DataService", {
-            bridgeContracts: [
-                {
-                    domain: "data",
-                    methods: [
-                        "downloadSqliteBackup",
-                        "exportData",
-                        "importData",
-                        "restoreSqliteBackup",
-                    ],
-                },
+// eslint-disable-next-line ex/no-unhandled -- Module-level initialization should fail fast when preload wiring is invalid.
+const { ensureInitialized, wrap } = getIpcServiceHelpers("DataService", {
+    bridgeContracts: [
+        {
+            domain: "data",
+            methods: [
+                "downloadSqliteBackup",
+                "exportData",
+                "importData",
+                "restoreSqliteBackup",
             ],
-        });
-    } catch (error: unknown) {
-        throw ensureError(error);
-    }
-})();
+        },
+    ],
+});
 
 /**
  * Facade for data export, import, and backup operations.

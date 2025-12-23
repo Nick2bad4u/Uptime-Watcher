@@ -24,6 +24,8 @@ import { updateMonitorInSite } from "./monitorOperations";
 
 type OperationStage = "failure" | "pending" | "success";
 
+const SITE_NOT_FOUND_MESSAGE = ERROR_CATALOG.sites.NOT_FOUND as string;
+
 /**
  * Stage-specific telemetry configuration for store operation logging.
  */
@@ -317,7 +319,7 @@ export const updateMonitorAndSave = async (
     } catch (error) {
         if (
             error instanceof Error &&
-            error.message.includes(ERROR_CATALOG.sites.NOT_FOUND as string)
+            error.message === SITE_NOT_FOUND_MESSAGE
         ) {
             logger.error(
                 `Failed to find site with identifier ${siteIdentifier}:`,

@@ -24,27 +24,20 @@ import {
 import { getIpcServiceHelpers } from "./utils/createIpcServiceHelpers";
 import { validateServicePayload } from "./utils/validation";
 
-const { ensureInitialized, wrap } = ((): ReturnType<
-    typeof getIpcServiceHelpers
-> => {
-    try {
-        return getIpcServiceHelpers("MonitorTypesService", {
-            bridgeContracts: [
-                {
-                    domain: "monitorTypes",
-                    methods: [
-                        "formatMonitorDetail",
-                        "formatMonitorTitleSuffix",
-                        "getMonitorTypes",
-                        "validateMonitorData",
-                    ],
-                },
+// eslint-disable-next-line ex/no-unhandled -- Module-level initialization should fail fast when preload wiring is invalid.
+const { ensureInitialized, wrap } = getIpcServiceHelpers("MonitorTypesService", {
+    bridgeContracts: [
+        {
+            domain: "monitorTypes",
+            methods: [
+                "formatMonitorDetail",
+                "formatMonitorTitleSuffix",
+                "getMonitorTypes",
+                "validateMonitorData",
             ],
-        });
-    } catch (error: unknown) {
-        throw ensureError(error);
-    }
-})();
+        },
+    ],
+});
 
 interface MonitorTypesServiceContract {
     formatMonitorDetail: (type: string, details: string) => Promise<string>;

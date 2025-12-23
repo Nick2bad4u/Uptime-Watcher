@@ -2,9 +2,9 @@
  * Coverage tests for IPC helper initialization error paths.
  *
  * @remarks
- * Several renderer services wrap `getIpcServiceHelpers` in a try/catch IIFE.
- * Those catch blocks are intentionally hard to hit in normal runtime, but they
- * still need coverage because they are part of our defensive error handling.
+ * Renderer services initialize IPC helpers at module load time. Those error
+ * paths are intentionally hard to hit in normal runtime, but they still need
+ * coverage because they are part of our defensive error handling.
  */
 
 import { describe, expect, it, vi } from "vitest";

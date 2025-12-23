@@ -23,6 +23,7 @@ import { logger } from "../../../services/logger";
 import {
     createInitialListenerStates,
     createStatusUpdateListenerDescriptors,
+    type StatusUpdateListenerDescriptor,
 } from "./statusUpdateListeners";
 import { mergeMonitorStatusChange } from "./statusUpdateMerge";
 
@@ -263,7 +264,21 @@ export class StatusUpdateManager {
                 "Failed to apply incremental status update, falling back to full sync",
                 ensureError(error)
             );
+            await this.attemptFullResync("incremental status update failure");
+        }
+    }
+
+    /**
+     * Attempts a full resync and guarantees the caller never throws.
+     */
+    private async attemptFullResync(reason: string): Promise<void> {
+        try {
             await this.fullResyncSites();
+        } catch (error) {
+            logger.error(
+                `[StatusUpdateHandler] Full sync fallback failed (${reason})`,
+                ensureError(error)
+            );
         }
     }
 
@@ -295,19 +310,19 @@ export class StatusUpdateManager {
         try {
             await this.fullResyncSites();
         } catch (error) {
-            const normalizedError = ensureError(error);
-            errors.push(`initial-sync: ${normalizedError.message}`);
+            const normalizedError = this.recordSubscriptionError(
+                errors,
+                "initial-sync",
+                error
+            );
             logger.error(
                 "Initial full sync on status update handler subscribe failed",
                 normalizedError
             );
         }
 
-        const listenerDescriptors: Array<{
-            label: string;
-            register: () => Promise<() => void>;
-            scope: string;
-        }> = createStatusUpdateListenerDescriptors({
+        const listenerDescriptors: StatusUpdateListenerDescriptor[] =
+            createStatusUpdateListenerDescriptors({
             handleMonitoringStarted: (event) => {
                 this.handleMonitoringLifecycleEvent("started", event);
             },
@@ -341,8 +356,11 @@ export class StatusUpdateManager {
                         : listenerState
                 );
             } catch (error) {
-                const normalizedError = ensureError(error);
-                errors.push(`${scope}: ${normalizedError.message}`);
+                const normalizedError = this.recordSubscriptionError(
+                    errors,
+                    scope,
+                    error
+                );
                 logger.error(
                     `Failed to register ${scope} listener`,
                     normalizedError
@@ -368,7 +386,7 @@ export class StatusUpdateManager {
         } satisfies StatusUpdateSubscriptionResult;
     }
 
-    /**
+/**
      * Process an unknown candidate payload that may represent an enriched
      * monitor status change.
      *
@@ -403,13 +421,30 @@ export class StatusUpdateManager {
                 );
             }
 
-            await this.fullResyncSites();
+            await this.attemptFullResync(`${source} invalid payload`);
         } catch (error) {
             logger.error(
                 `[StatusUpdateHandler] ${source} processing failed`,
                 ensureError(error)
             );
         }
+    }
+
+    /**
+     * Records a subscription-related error in a consistent format.
+     *
+     * @remarks
+     * The returned error instance is the normalized Error so callers can reuse
+     * it for structured logging.
+     */
+    private recordSubscriptionError(
+        errors: string[],
+        scope: string,
+        error: unknown
+    ): Error {
+        const normalized = ensureError(error);
+        errors.push(`${scope}: ${normalized.message}`);
+        return normalized;
     }
 
     /**

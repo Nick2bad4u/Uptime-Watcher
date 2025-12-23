@@ -60,6 +60,7 @@ import { isThemeName, type ThemeName } from "../../theme/types";
 import { useTheme } from "../../theme/useTheme";
 import { AppIcons } from "../../utils/icons";
 import { waitForAnimation } from "../../utils/time/waitForAnimation";
+import { getUserFacingErrorDetail } from "../../utils/userFacingErrors";
 import { playInAppAlertTone } from "../Alerts/alertCoordinator";
 import { ErrorAlert } from "../common/ErrorAlert/ErrorAlert";
 import { GalaxyBackground } from "../common/GalaxyBackground/GalaxyBackground";
@@ -743,8 +744,6 @@ export const Settings = ({
         ]
     );
 
-    // Manual Sync Now handler (moved from Header)
-    /* eslint-disable @typescript-eslint/no-unsafe-type-assertion -- Safe: Error message extraction with runtime validation */
     const handleSyncNow = useCallback(async () => {
         setSyncSuccess(false);
         try {
@@ -757,11 +756,7 @@ export const Settings = ({
                 ensureError(error)
             );
             setError(
-                `Failed to sync data: ${
-                    error && typeof error === "object" && "message" in error
-                        ? (error as { message?: string }).message
-                        : String(error)
-                }`
+                `Failed to sync data: ${getUserFacingErrorDetail(error)}`
             );
         }
     }, [fullResyncSites, setError]);
@@ -781,11 +776,7 @@ export const Settings = ({
                 ensureError(error)
             );
             setError(
-                `Failed to download SQLite backup: ${
-                    error && typeof error === "object" && "message" in error
-                        ? (error as { message?: string }).message
-                        : String(error)
-                }`
+                `Failed to download SQLite backup: ${getUserFacingErrorDetail(error)}`
             );
         }
     }, [
@@ -815,11 +806,7 @@ export const Settings = ({
                     ensureError(error)
                 );
                 setError(
-                    `Failed to restore SQLite backup: ${
-                        error && typeof error === "object" && "message" in error
-                            ? (error as { message?: string }).message
-                            : String(error)
-                    }`
+                    `Failed to restore SQLite backup: ${getUserFacingErrorDetail(error)}`
                 );
             }
         },
@@ -854,7 +841,6 @@ export const Settings = ({
         },
         [handleRestoreFileChange]
     );
-    /* eslint-enable @typescript-eslint/no-unsafe-type-assertion -- Re-enable after safe file system operations */
 
     // Click handlers for buttons
     const handleClose = useCallback(async () => {

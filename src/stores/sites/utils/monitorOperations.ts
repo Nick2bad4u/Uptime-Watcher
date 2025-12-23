@@ -1015,44 +1015,53 @@ export function updateMonitorInSite(
     monitorId: string,
     updates: Partial<Monitor>
 ): Site {
-    const monitorExists = site.monitors.some(
-        (monitor) => monitor.id === monitorId
-    );
-    if (!monitorExists) {
-        throw new Error(ERROR_CATALOG.monitors.NOT_FOUND);
+    // Updates may be contaminated; rely on normalizeMonitor for sanitation
+    // instead of pre-validating which could throw.
+    let monitorFound = false;
+    const updatedMonitors: Monitor[] = [];
+
+    for (const monitor of site.monitors) {
+        if (monitor.id === monitorId) {
+            monitorFound = true;
+
+            // Preserve the original monitor ID throughout the update process.
+            const originalId = monitor.id;
+            // Always work with a normalized baseline to avoid undefined fields lingering.
+            const baseline = normalizeMonitor(monitor);
+
+            try {
+                // Ignore any id field in updates to preserve original monitor identity.
+                const restUpdates = { ...updates };
+                delete (restUpdates as { id?: unknown }).id;
+
+                const merged: Partial<Monitor> = {
+                    ...baseline,
+                    ...restUpdates,
+                    id: originalId, // Use original ID, not the potentially changed baseline ID.
+                };
+
+                const normalized = normalizeMonitor(merged);
+                // Ensure the ID is definitely preserved after normalization.
+                normalized.id = originalId;
+                updatedMonitors.push(normalized);
+            } catch (error) {
+                // If updates are invalid, keep the baseline (already normalized)
+                // but preserve original ID.
+                logger.error(
+                    `Failed to update monitor ${monitorId}:`,
+                    ensureError(error)
+                );
+                baseline.id = originalId;
+                updatedMonitors.push(baseline);
+            }
+        } else {
+            updatedMonitors.push(monitor);
+        }
     }
 
-    // Updates may be contaminated; rely on normalizeMonitor for sanitation instead of pre-validating which could throw
-    const updatedMonitors = site.monitors.map((monitor) => {
-        if (monitor.id !== monitorId) return monitor;
-
-        // Preserve the original monitor ID throughout the update process
-        const originalId = monitor.id;
-        // Always work with a normalized baseline to avoid undefined fields lingering
-        const baseline = normalizeMonitor(monitor);
-        try {
-            // Ignore any id field in updates to preserve original monitor identity
-            const restUpdates = { ...updates };
-            delete (restUpdates as { id?: unknown }).id;
-            const merged: Partial<Monitor> = {
-                ...baseline,
-                ...restUpdates,
-                id: originalId, // Use original ID, not the potentially changed baseline ID
-            };
-            const normalized = normalizeMonitor(merged);
-            // Ensure the ID is definitely preserved after normalization
-            normalized.id = originalId;
-            return normalized;
-        } catch (error) {
-            // If updates are invalid, keep the baseline (already normalized) but preserve original ID
-            logger.error(
-                `Failed to update monitor ${monitorId}:`,
-                ensureError(error)
-            );
-            baseline.id = originalId; // Ensure original ID is preserved even in error case
-            return baseline;
-        }
-    });
+    if (!monitorFound) {
+        throw new Error(ERROR_CATALOG.monitors.NOT_FOUND);
+    }
 
     return { ...site, monitors: updatedMonitors };
 }

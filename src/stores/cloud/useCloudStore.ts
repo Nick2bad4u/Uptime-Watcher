@@ -134,7 +134,20 @@ export interface CloudStoreState {
 }
 
 export const useCloudStore: UseBoundStore<StoreApi<CloudStoreState>> =
-    create<CloudStoreState>()((set, get) => ({
+    create<CloudStoreState>()((set, get) => {
+        const listBackupsWithFallback = async (): Promise<CloudBackupEntry[]> => {
+            try {
+                return await CloudService.listBackups();
+            } catch (error: unknown) {
+                logger.debug(
+                    "[CloudStore] Failed to refresh backup list; using cached backups",
+                    ensureError(error)
+                );
+                return get().backups;
+            }
+        };
+
+        return {
         backups: [],
         clearEncryptionKey: async (): Promise<void> => {
             set({ isClearingEncryptionKey: true });
@@ -368,9 +381,7 @@ export const useCloudStore: UseBoundStore<StoreApi<CloudStoreState>> =
 
                         const [status, backups] = await Promise.all([
                             CloudService.getStatus(),
-                            CloudService.listBackups().catch(
-                                () => get().backups
-                            ),
+                            listBackupsWithFallback(),
                         ]);
 
                         set({
@@ -524,9 +535,7 @@ export const useCloudStore: UseBoundStore<StoreApi<CloudStoreState>> =
 
                         const [status, backups] = await Promise.all([
                             CloudService.getStatus(),
-                            CloudService.listBackups().catch(
-                                () => get().backups
-                            ),
+                            listBackupsWithFallback(),
                         ]);
 
                         set({
@@ -598,9 +607,7 @@ export const useCloudStore: UseBoundStore<StoreApi<CloudStoreState>> =
 
                             const [status, backups] = await Promise.all([
                                 CloudService.getStatus(),
-                                CloudService.listBackups().catch(
-                                    () => get().backups
-                                ),
+                                listBackupsWithFallback(),
                             ]);
                             set({ backups, status });
                         },
@@ -687,9 +694,7 @@ export const useCloudStore: UseBoundStore<StoreApi<CloudStoreState>> =
 
                         const [status, backups] = await Promise.all([
                             CloudService.getStatus(),
-                            CloudService.listBackups().catch(
-                                () => get().backups
-                            ),
+                            listBackupsWithFallback(),
                         ]);
 
                         set({ backups, status });
@@ -718,4 +723,5 @@ export const useCloudStore: UseBoundStore<StoreApi<CloudStoreState>> =
                 set({ isUploadingBackup: false });
             }
         },
-    }));
+        };
+    });
