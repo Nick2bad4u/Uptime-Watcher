@@ -34,6 +34,7 @@ import {
 import { withDatabaseOperation } from "../operationalHooks";
 import { SiteNotFoundError } from "./interfaces";
 import { deleteSiteWithAdapters } from "./siteDeletion";
+import { createSiteMonitorTransactionAdapters } from "./transactionAdapters";
 
 /**
  * Service responsible for writing site and monitor records to the database.
@@ -77,13 +78,9 @@ export class SiteWriterService {
             siteTx: SiteRepositoryTransactionAdapter;
         }) => Promise<T> | T
     ): Promise<T> {
-        return this.databaseService.executeTransaction(async (db) => {
-            const siteTx = this.repositories.site.createTransactionAdapter(db);
-            const monitorTx =
-                this.repositories.monitor.createTransactionAdapter(db);
-
-            return operation({ monitorTx, siteTx });
-        });
+        return this.databaseService.executeTransaction(async (db) => operation(
+                createSiteMonitorTransactionAdapters(db, this.repositories)
+            ));
     }
 
     /**

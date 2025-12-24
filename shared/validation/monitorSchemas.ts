@@ -341,17 +341,42 @@ const httpHeaderValueSchema = z
  * @returns `true` when the path is non-empty, contains no spaces, and does not
  *   use double dots; otherwise `false`.
  */
-const isValidJsonPath = (value: string): boolean => {
+type DotSeparatedPathValidationOptions = Readonly<{
+    /** When false, spaces are rejected anywhere in the path. */
+    allowSpaces: boolean;
+}>;
+
+/**
+ * Validates whether a string represents a dot-separated path.
+ *
+ * @remarks
+ * Used for monitor configurations that reference JSON object field paths.
+ *
+ * Rules:
+ * - Must be non-empty after trimming
+ * - Must not contain ".."
+ * - Must not contain empty segments
+ * - Optionally rejects spaces
+ */
+const isValidDotSeparatedPath = (
+    value: string,
+    options: DotSeparatedPathValidationOptions
+): boolean => {
     const trimmed = value.trim();
 
     if (trimmed.length === 0 || trimmed.includes("..")) {
         return false;
     }
 
-    return trimmed
-        .split(".")
-        .every((segment) => segment.length > 0 && !segment.includes(" "));
+    if (!options.allowSpaces && trimmed.includes(" ")) {
+        return false;
+    }
+
+    return trimmed.split(".").every((segment) => segment.length > 0);
 };
+
+const isValidJsonPath = (value: string): boolean =>
+    isValidDotSeparatedPath(value, { allowSpaces: false });
 
 /**
  * Shared schema validating JSON path configuration fields.
@@ -373,14 +398,8 @@ const jsonPathSchema = z
  * @returns `true` when the path is non-empty, has no empty segments, and does
  *   not contain double dots; otherwise `false`.
  */
-const isValidDotPath = (value: string): boolean => {
-    const trimmed = value.trim();
-    if (trimmed.length === 0 || trimmed.includes("..")) {
-        return false;
-    }
-
-    return trimmed.split(".").every((segment) => segment.length > 0);
-};
+const isValidDotPath = (value: string): boolean =>
+    isValidDotSeparatedPath(value, { allowSpaces: false });
 
 /**
  * Creates a dot-notation schema with a contextualized validation message.

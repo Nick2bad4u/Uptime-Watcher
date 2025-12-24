@@ -12,12 +12,11 @@ import type {
 } from "../CloudStorageProvider.types";
 import type { DropboxTokenManager } from "./DropboxTokenManager";
 
-import { listBackupsFromMetadataObjects } from "../cloudBackupListing";
 import {
-    backupMetadataKeyForBackupKey,
-    parseCloudBackupMetadataFileBuffer,
-    serializeCloudBackupMetadataFile,
-} from "../CloudBackupMetadataFile";
+    downloadBackupWithMetadata,
+    uploadBackupWithMetadata,
+} from "../cloudBackupIo";
+import { listBackupsFromMetadataObjects } from "../cloudBackupListing";
 import { withDropboxRetry } from "./dropboxRetry";
 
 /**
@@ -532,48 +531,20 @@ export class DropboxCloudStorageProvider implements CloudStorageProvider {
         fileName: string;
         metadata: SerializedDatabaseBackupMetadata;
     }): Promise<CloudBackupEntry> {
-        const backupKey = `${BACKUPS_PREFIX}${args.fileName}`;
-
-        await this.uploadObject({
-            buffer: args.buffer,
-            key: backupKey,
-            overwrite: true,
+        return uploadBackupWithMetadata({
+            ...args,
+            backupsPrefix: BACKUPS_PREFIX,
+            uploadObject: (uploadArgs) => this.uploadObject(uploadArgs),
         });
-
-        const metadataKey = backupMetadataKeyForBackupKey(backupKey);
-        await this.uploadObject({
-            buffer: Buffer.from(
-                serializeCloudBackupMetadataFile({
-                    encrypted: args.encrypted,
-                    fileName: args.fileName,
-                    key: backupKey,
-                    metadata: args.metadata,
-                }),
-                "utf8"
-            ),
-            key: metadataKey,
-            overwrite: true,
-        });
-
-        return {
-            encrypted: args.encrypted,
-            fileName: args.fileName,
-            key: backupKey,
-            metadata: args.metadata,
-        };
     }
 
     public async downloadBackup(
         key: string
     ): Promise<{ buffer: Buffer; entry: CloudBackupEntry }> {
-        const buffer = await this.downloadObject(key);
-        const metadataKey = backupMetadataKeyForBackupKey(key);
-        const raw = await this.downloadObject(metadataKey);
-
-        return {
-            buffer,
-            entry: parseCloudBackupMetadataFileBuffer(raw),
-        };
+        return downloadBackupWithMetadata({
+            downloadObject: (downloadKey) => this.downloadObject(downloadKey),
+            key,
+        });
     }
 
     public constructor(args: {

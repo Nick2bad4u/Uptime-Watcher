@@ -42,6 +42,7 @@ import { createMonitorConfig } from "../../services/monitoring/createMonitorConf
 import { toSerializedError } from "../errorSerialization";
 import { withDatabaseOperation } from "../operationalHooks";
 import { SiteLoadingError } from "./interfaces";
+import { createImportTransactionAdapters } from "./transactionAdapters";
 
 /**
  * Configuration for data import/export operations.
@@ -351,17 +352,9 @@ export class DataImportExportService {
             siteTx: SiteRepositoryTransactionAdapter;
         }) => Promise<T> | T
     ): Promise<T> {
-        return this.databaseService.executeTransaction(async (db) => {
-            const siteTx = this.repositories.site.createTransactionAdapter(db);
-            const monitorTx =
-                this.repositories.monitor.createTransactionAdapter(db);
-            const historyTx =
-                this.repositories.history.createTransactionAdapter(db);
-            const settingsTx =
-                this.repositories.settings.createTransactionAdapter(db);
-
-            return operation({ historyTx, monitorTx, settingsTx, siteTx });
-        });
+        return this.databaseService.executeTransaction(async (db) => operation(
+                createImportTransactionAdapters(db, this.repositories)
+            ));
     }
 
     /**

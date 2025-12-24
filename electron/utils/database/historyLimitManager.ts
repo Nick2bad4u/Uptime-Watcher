@@ -25,6 +25,7 @@ import type {
 } from "../../services/database/SettingsRepository";
 
 import { withDatabaseOperation } from "../operationalHooks";
+import { createHistorySettingsTransactionAdapters } from "./transactionAdapters";
 
 /**
  * Parameters for setting history limit
@@ -106,12 +107,9 @@ async function withHistorySettingsAdapters<T>(
         settingsTx: SettingsRepositoryTransactionAdapter;
     }) => Promise<T> | T
 ): Promise<T> {
-    return databaseService.executeTransaction(async (db) => {
-        const settingsTx = repositories.settings.createTransactionAdapter(db);
-        const historyTx = repositories.history.createTransactionAdapter(db);
-
-        return operation({ historyTx, settingsTx });
-    });
+    return databaseService.executeTransaction(async (db) => operation(
+            createHistorySettingsTransactionAdapters(db, repositories)
+        ));
 }
 
 /**

@@ -15,12 +15,11 @@ import type {
     CloudStorageProvider,
 } from "./CloudStorageProvider.types";
 
-import { listBackupsFromMetadataObjects } from "./cloudBackupListing";
 import {
-    backupMetadataKeyForBackupKey,
-    parseCloudBackupMetadataFileBuffer,
-    serializeCloudBackupMetadataFile,
-} from "./CloudBackupMetadataFile";
+    downloadBackupWithMetadata,
+    uploadBackupWithMetadata,
+} from "./cloudBackupIo";
+import { listBackupsFromMetadataObjects } from "./cloudBackupListing";
 
 const APP_ROOT_DIRECTORY_NAME = "uptime-watcher" as const;
 const BACKUPS_PREFIX = "backups/" as const;
@@ -415,27 +414,11 @@ export class FilesystemCloudStorageProvider implements CloudStorageProvider {
         fileName: string;
         metadata: SerializedDatabaseBackupMetadata;
     }): Promise<CloudBackupEntry> {
-        const key = `${BACKUPS_PREFIX}${args.fileName}`;
-        const metadataKey = backupMetadataKeyForBackupKey(key);
-
-        const entry: CloudBackupEntry = {
-            encrypted: args.encrypted,
-            fileName: args.fileName,
-            key,
-            metadata: args.metadata,
-        };
-
-        await this.uploadObject({ buffer: args.buffer, key, overwrite: true });
-        await this.uploadObject({
-            buffer: Buffer.from(
-                serializeCloudBackupMetadataFile(entry),
-                "utf8"
-            ),
-            key: metadataKey,
-            overwrite: true,
+        return uploadBackupWithMetadata({
+            ...args,
+            backupsPrefix: BACKUPS_PREFIX,
+            uploadObject: (uploadArgs) => this.uploadObject(uploadArgs),
         });
-
-        return entry;
     }
 
     public async listBackups(): Promise<CloudBackupEntry[]> {
@@ -449,14 +432,10 @@ export class FilesystemCloudStorageProvider implements CloudStorageProvider {
     public async downloadBackup(
         key: string
     ): Promise<{ buffer: Buffer; entry: CloudBackupEntry }> {
-        const buffer = await this.downloadObject(key);
-        const metadataKey = backupMetadataKeyForBackupKey(key);
-        const raw = await this.downloadObject(metadataKey);
-
-        return {
-            buffer,
-            entry: parseCloudBackupMetadataFileBuffer(raw),
-        };
+        return downloadBackupWithMetadata({
+            downloadObject: (downloadKey) => this.downloadObject(downloadKey),
+            key,
+        });
     }
 
     private async ensureAppRoot(): Promise<void> {

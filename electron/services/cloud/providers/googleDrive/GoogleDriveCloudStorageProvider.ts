@@ -12,11 +12,10 @@ import type {
 import type { GoogleDriveTokenManager } from "./GoogleDriveTokenManager";
 
 import {
-    backupMetadataKeyForBackupKey,
-    parseCloudBackupMetadataFileBuffer,
-    serializeCloudBackupMetadataFile,
-    tryParseCloudBackupMetadataFileBuffer,
-} from "../CloudBackupMetadataFile";
+    downloadBackupWithMetadata,
+    uploadBackupWithMetadata,
+} from "../cloudBackupIo";
+import { listBackupsFromMetadataObjects } from "../cloudBackupListing";
 
 const GOOGLE_FOLDER_MIME_TYPE = "application/vnd.google-apps.folder";
 const APP_ROOT_FOLDER_NAME = "uptime-watcher";
@@ -103,13 +102,10 @@ export class GoogleDriveCloudStorageProvider implements CloudStorageProvider {
         key: string
     ): Promise<{ buffer: Buffer; entry: CloudBackupEntry }> {
         const normalizedKey = normalizeKey(key);
-        const buffer = await this.downloadObject(normalizedKey);
-
-        const metadataKey = backupMetadataKeyForBackupKey(normalizedKey);
-        const metadataBuffer = await this.downloadObject(metadataKey);
-        const entry = parseCloudBackupMetadataFileBuffer(metadataBuffer);
-
-        return { buffer, entry };
+        return downloadBackupWithMetadata({
+            downloadObject: (downloadKey) => this.downloadObject(downloadKey),
+            key: normalizedKey,
+        });
     }
 
     public async downloadObject(key: string): Promise<Buffer> {
@@ -131,39 +127,10 @@ export class GoogleDriveCloudStorageProvider implements CloudStorageProvider {
 
     public async listBackups(): Promise<CloudBackupEntry[]> {
         const objects = await this.listObjects(BACKUPS_PREFIX);
-        const metadataKeys = objects
-            .map((entry) => entry.key)
-            .filter((key) => key.endsWith(".metadata.json"));
-
-        const drive = await this.getDriveClient();
-
-        const backups = await Promise.all(
-            metadataKeys.map(async (metadataKey) => {
-                try {
-                    const metadataFile = await this.findFileByKey(
-                        drive,
-                        metadataKey
-                    );
-                    if (!metadataFile) {
-                        return null;
-                    }
-
-                    const response = await drive.files.get(
-                        { alt: "media", fileId: metadataFile.id },
-                        { responseType: "stream" }
-                    );
-
-                    const buffer = await convertStreamToBuffer(response.data);
-                    return tryParseCloudBackupMetadataFileBuffer(buffer);
-                } catch {
-                    return null;
-                }
-            })
-        );
-
-        return backups.filter(
-            (entry): entry is CloudBackupEntry => entry !== null
-        );
+        return listBackupsFromMetadataObjects({
+            downloadObjectBuffer: async (key) => this.downloadObject(key),
+            objects,
+        });
     }
 
     public async listObjects(prefix: string): Promise<CloudObjectEntry[]> {
@@ -204,31 +171,11 @@ export class GoogleDriveCloudStorageProvider implements CloudStorageProvider {
         fileName: string;
         metadata: SerializedDatabaseBackupMetadata;
     }): Promise<CloudBackupEntry> {
-        const backupKey = `${BACKUPS_PREFIX}${args.fileName}`;
-
-        const entry: CloudBackupEntry = {
-            encrypted: args.encrypted,
-            fileName: args.fileName,
-            key: backupKey,
-            metadata: args.metadata,
-        };
-
-        await this.uploadObject({
-            buffer: args.buffer,
-            key: backupKey,
-            overwrite: true,
+        return uploadBackupWithMetadata({
+            ...args,
+            backupsPrefix: BACKUPS_PREFIX,
+            uploadObject: (uploadArgs) => this.uploadObject(uploadArgs),
         });
-
-        await this.uploadObject({
-            buffer: Buffer.from(
-                serializeCloudBackupMetadataFile(entry),
-                "utf8"
-            ),
-            key: backupMetadataKeyForBackupKey(backupKey),
-            overwrite: true,
-        });
-
-        return entry;
     }
 
     public async uploadObject(args: {
