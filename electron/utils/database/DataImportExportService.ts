@@ -16,6 +16,7 @@ import {
     safeJsonParse,
     safeJsonStringifyWithFallback,
 } from "@shared/utils/jsonSafety";
+import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 
 import type { UptimeEvents } from "../../events/eventTypes";
 import type { TypedEventBus } from "../../events/TypedEventBus";
@@ -312,7 +313,9 @@ export class DataImportExportService {
         context: string
     ): Promise<never> {
         const normalizedError =
-            error instanceof Error ? error : new Error(String(error));
+            error instanceof Error
+                ? error
+                : new Error(getUserFacingErrorDetail(error));
         const message = `${context}: ${normalizedError.message}`;
 
         this.logger.error(message, error);

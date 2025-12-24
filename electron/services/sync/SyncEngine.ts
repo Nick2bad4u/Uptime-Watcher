@@ -15,6 +15,7 @@ import {
     type CloudSyncBaseline,
 } from "@shared/types/cloudSyncBaseline";
 import { applyCloudSyncOperationsToState } from "@shared/utils/cloudSyncState";
+import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import { validateMonitorData } from "@shared/validation/monitorSchemas";
 import { validateSiteData } from "@shared/validation/siteSchemas";
 
@@ -219,10 +220,7 @@ export class SyncEngine {
                         "[SyncEngine] Failed to read remote operations object; skipping",
                         {
                             key: entry.key,
-                            message:
-                                error instanceof Error
-                                    ? error.message
-                                    : String(error),
+                            message: getUserFacingErrorDetail(error),
                         }
                     );
                     return [];
@@ -406,10 +404,7 @@ export class SyncEngine {
                 logger.warn(
                     "[SyncEngine] Failed to apply remote site during sync",
                     {
-                        message:
-                            error instanceof Error
-                                ? error.message
-                                : String(error),
+                        message: getUserFacingErrorDetail(error),
                         monitorCount: site.monitors.length,
                         siteIdentifier: identifier,
                     }
@@ -425,10 +420,7 @@ export class SyncEngine {
                     logger.warn(
                         "[SyncEngine] Failed to remove local site during sync",
                         {
-                            message:
-                                error instanceof Error
-                                    ? error.message
-                                    : String(error),
+                            message: getUserFacingErrorDetail(error),
                             siteIdentifier: existing.identifier,
                         }
                     );

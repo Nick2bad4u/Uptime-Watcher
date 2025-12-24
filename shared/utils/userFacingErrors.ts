@@ -1,30 +1,16 @@
-/**
- * User-facing error formatting helpers.
- *
- * @remarks
- * Renderer UI code frequently needs to surface a short, human-readable
- * description of an unknown error value.
- *
- * We intentionally keep this logic separate from logging helpers:
- *
- * - Logging should prefer {@link ensureError} and structured metadata
- * - UI messages should prioritize the best available human message and fall
- *   back to a stable catalog message.
- *
- * @packageDocumentation
- */
-
-import { ERROR_CATALOG } from "@shared/utils/errorCatalog";
-import { isRecord } from "@shared/utils/typeHelpers";
+import { ERROR_CATALOG } from "./errorCatalog";
+import { isRecord } from "./typeHelpers";
 
 /**
- * Extracts a user-facing error detail from an unknown thrown value.
+ * Extracts a short, user-facing error message from an unknown thrown value.
  *
  * @remarks
- * Semantics are intentionally conservative:
+ * Intended for UI strings and IPC error payloads where we want a stable message
+ * without leaking internal details.
  *
  * - {@link Error} values return `error.message`.
  * - Plain objects with a string `message` property return that message.
+ * - Strings and numbers are surfaced as-is.
  * - Everything else falls back to {@link ERROR_CATALOG.system.UNKNOWN_ERROR}.
  */
 export function getUserFacingErrorDetail(error: unknown): string {

@@ -17,6 +17,7 @@ import type {
 
 import { listBackupsFromMetadataObjects } from "./cloudBackupListing";
 import {
+    backupMetadataKeyForBackupKey,
     parseCloudBackupMetadataFileBuffer,
     serializeCloudBackupMetadataFile,
 } from "./CloudBackupMetadataFile";
@@ -63,10 +64,6 @@ async function toCloudObjectEntry(
         lastModifiedAt: stat.mtimeMs,
         sizeBytes: stat.size,
     };
-}
-
-function backupMetadataKeyForBackupKey(backupKey: string): string {
-    return `${backupKey}.metadata.json`;
 }
 
 /**

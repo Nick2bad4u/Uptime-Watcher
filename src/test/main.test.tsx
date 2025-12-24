@@ -1,204 +1,111 @@
 /**
- * Tests for React application entry point dependencies and structure. Validates
- * that main.tsx dependencies are properly available.
+ * Tests for the React application entrypoint (main.tsx).
+ *
+ * These tests intentionally validate observable behavior:
+ * - successful initialization renders via ReactDOM.createRoot
+ * - missing root element is caught and logged (module-level try/catch)
  */
 
-import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
-import { type ReactNode } from "react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-// Mock ReactDOM before importing main
 const mockRender = vi.fn();
 const mockCreateRoot = vi.fn(() => ({
     render: mockRender,
+    unmount: vi.fn(),
+}));
+
+const mockAppLogger = {
+    error: vi.fn(),
+};
+
+vi.mock("../services/logger", () => ({
+    logger: {
+        app: mockAppLogger,
+    },
 }));
 
 vi.mock("react-dom/client", () => ({
     createRoot: mockCreateRoot,
 }));
 
-// Mock React
-vi.mock("react", () => ({
-    default: {
-        StrictMode: ({ children }: { children: ReactNode }) => children,
-    },
-    StrictMode: ({ children }: { children: ReactNode }) => children,
-}));
-
-// Mock App component
 vi.mock("../App", () => ({
     App: () => "MockedApp",
 }));
 
-// Mock CSS imports
 vi.mock("../index.css", () => ({}));
 
-describe("Main Entry Point", () => {
-    let mockElement: HTMLElement;
-
+describe("main.tsx - Application Entry Point", () => {
     beforeEach(() => {
-        // Reset mocks
         vi.clearAllMocks();
 
-        // Create a mock element
-        mockElement = {
-            id: "root",
-            getAttribute: vi.fn(),
-            setAttribute: vi.fn(),
-        } as any;
+        // Fresh DOM for each test.
+        document.body.innerHTML = "";
 
-        // Mock document with getElementById
-        globalThis.document = {
-            getElementById: vi.fn().mockReturnValue(null),
-            createElement: vi.fn().mockReturnValue(mockElement),
-        } as any;
+        mockCreateRoot.mockClear();
+        mockRender.mockClear();
     });
 
     afterEach(() => {
-        // Clear modules to reset the main.tsx module state
+        // Ensure `../main` executes fresh per test.
         vi.resetModules();
     });
 
-    it("should have React available", async ({ task, annotate }) => {
-        annotate(`Testing: ${task.name}`, "functional");
-        annotate("Component: main", "component");
-        annotate("Category: Core", "category");
-        annotate("Type: Business Logic", "type");
-
-        annotate(`Testing: ${task.name}`, "functional");
-        annotate("Component: main", "component");
-        annotate("Category: Core", "category");
-        annotate("Type: Business Logic", "type");
-
-        const React = await import("react");
-        expect(React).toBeDefined();
-        expect(React.StrictMode).toBeDefined();
-    });
-
-    it("should have ReactDOM available", async ({ task, annotate }) => {
-        annotate(`Testing: ${task.name}`, "functional");
-        annotate("Component: main", "component");
-        annotate("Category: Core", "category");
-        annotate("Type: Business Logic", "type");
-
-        const ReactDOM = await import("react-dom/client");
-        expect(ReactDOM).toBeDefined();
-        expect(ReactDOM.createRoot).toBeDefined();
-    });
-
-    it("should have App component available", async ({ task, annotate }) => {
-        annotate(`Testing: ${task.name}`, "functional");
-        annotate("Component: main", "component");
-        annotate("Category: Core", "category");
-        annotate("Type: Business Logic", "type");
-
-        annotate(`Testing: ${task.name}`, "functional");
-        annotate("Component: main", "component");
-        annotate("Category: Core", "category");
-        annotate("Type: Business Logic", "type");
-
-        const AppModule = await import("../App");
-        expect(AppModule.App).toBeDefined();
-    });
-
-    it("should initialize app when root element exists", async ({
-        task,
-        annotate,
-    }) => {
+    it("initializes and renders when root exists", async ({ task, annotate }) => {
         annotate(`Testing: ${task.name}`, "functional");
         annotate("Component: main", "component");
         annotate("Category: Core", "category");
         annotate("Type: Initialization", "type");
 
-        annotate(`Testing: ${task.name}`, "functional");
-        annotate("Component: main", "component");
-        annotate("Category: Core", "category");
-        annotate("Type: Initialization", "type");
-
-        (document.getElementById as any).mockReturnValue(mockElement);
-
-        // Dynamically import main.tsx to trigger initialization
-        await import("../main");
-
-        expect(document.getElementById).toHaveBeenCalledWith("root");
-        expect(mockCreateRoot).toHaveBeenCalledWith(mockElement);
-        expect(mockRender).toHaveBeenCalled();
-    });
-
-    it("should handle error when root element not found", async ({
-        task,
-        annotate,
-    }) => {
-        annotate(`Testing: ${task.name}`, "functional");
-        annotate("Component: main", "component");
-        annotate("Category: Core", "category");
-        annotate("Type: Error Handling", "type");
-
-        annotate(`Testing: ${task.name}`, "functional");
-        annotate("Component: main", "component");
-        annotate("Category: Core", "category");
-        annotate("Type: Error Handling", "type");
-
-        // Ensure the root element lookup fails
-        (document.getElementById as any).mockReturnValue(null);
-
-        // Spy on the structured application logger to verify error handling
-        const { logger } = await import("../services/logger");
-        const loggerErrorSpy = vi.spyOn(logger.app, "error");
-
-        // The import should succeed but log an initialization error
-        await import("../main");
-
-        expect(loggerErrorSpy).toHaveBeenCalledWith(
-            "initializeApp",
-            expect.any(Error)
-        );
-
-        loggerErrorSpy.mockRestore();
-    });
-
-    it("should use getElementById for root element lookup", async ({
-        task,
-        annotate,
-    }) => {
-        annotate(`Testing: ${task.name}`, "functional");
-        annotate("Component: main", "component");
-        annotate("Category: Core", "category");
-        annotate("Type: Data Retrieval", "type");
-
-        annotate(`Testing: ${task.name}`, "functional");
-        annotate("Component: main", "component");
-        annotate("Category: Core", "category");
-        annotate("Type: Data Retrieval", "type");
-
-        (document.getElementById as any).mockReturnValue(mockElement);
+        const root = document.createElement("div");
+        root.id = "root";
+        document.body.append(root);
 
         await import("../main");
 
-        expect(document.getElementById).toHaveBeenCalledWith("root");
-        expect(document.getElementById).toHaveBeenCalledTimes(1);
-    });
-
-    it("should render App component within React.StrictMode", async ({
-        task,
-        annotate,
-    }) => {
-        annotate(`Testing: ${task.name}`, "functional");
-        annotate("Component: main", "component");
-        annotate("Category: Core", "category");
-        annotate("Type: Business Logic", "type");
-
-        annotate(`Testing: ${task.name}`, "functional");
-        annotate("Component: main", "component");
-        annotate("Category: Core", "category");
-        annotate("Type: Business Logic", "type");
-
-        (document.getElementById as any).mockReturnValue(mockElement);
-
-        await import("../main");
-
+        expect(mockCreateRoot).toHaveBeenCalledWith(root);
         expect(mockRender).toHaveBeenCalledTimes(1);
-        // The render call should include the App wrapped in StrictMode
-        const renderCall = mockRender.mock.calls[0]?.[0];
-        expect(renderCall).toBeDefined();
+        expect(mockAppLogger.error).not.toHaveBeenCalled();
+    });
+
+    it("logs an error when root element is missing", async ({ task, annotate }) => {
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: main", "component");
+        annotate("Category: Core", "category");
+        annotate("Type: Error Handling", "type");
+
+        document.body.innerHTML = "";
+
+        await import("../main");
+
+        expect(mockAppLogger.error).toHaveBeenCalledWith(
+            "initializeApp",
+            expect.objectContaining({
+                message: "Root element not found",
+            })
+        );
+    });
+
+    it("logs an error when createRoot throws", async ({ task, annotate }) => {
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: main", "component");
+        annotate("Category: Core", "category");
+        annotate("Type: Error Handling", "type");
+
+        const root = document.createElement("div");
+        root.id = "root";
+        document.body.append(root);
+
+        mockCreateRoot.mockImplementationOnce(() => {
+            throw new Error("ReactDOM createRoot failed");
+        });
+
+        await import("../main");
+
+        expect(mockAppLogger.error).toHaveBeenCalledWith(
+            "initializeApp",
+            expect.objectContaining({
+                message: expect.stringContaining("ReactDOM createRoot failed"),
+            })
+        );
     });
 });

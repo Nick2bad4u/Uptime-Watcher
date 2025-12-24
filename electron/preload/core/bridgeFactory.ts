@@ -28,6 +28,7 @@ import {
     extractIpcResponseData,
     validateVoidIpcResponse,
 } from "@shared/utils/ipcResponse";
+import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import { ipcRenderer } from "electron";
 
 import {
@@ -234,7 +235,7 @@ async function verifyChannelOrThrow(channel: string): Promise<void> {
                 // eslint-disable-next-line ex/use-error-cause -- IpcError constructor preserves original error via dedicated field
                 throw new IpcError(
                     `Failed verifying handler for channel '${channel}': ${
-                        error instanceof Error ? error.message : String(error)
+                        getUserFacingErrorDetail(error)
                     }`,
                     channel,
                     error instanceof Error ? error : undefined
@@ -274,8 +275,7 @@ async function invokeWithValidation<T>(
         const response = await invoke(correlationId);
         return validate(response);
     } catch (error) {
-        const errorMessage =
-            error instanceof Error ? error.message : String(error);
+        const errorMessage = getUserFacingErrorDetail(error);
         // eslint-disable-next-line ex/use-error-cause -- Using custom IpcError class with cause handling
         throw new IpcError(
             `IPC call failed for channel '${channel}': ${errorMessage}`,

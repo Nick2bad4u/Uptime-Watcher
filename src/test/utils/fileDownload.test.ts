@@ -1,6 +1,8 @@
 /**
- * Fixed tests for fileDownload utility to improve coverage Tests all edge
- * cases, error conditions, and function paths
+ * Tests for the file download utilities.
+ *
+ * Covers edge cases around DOM interactions, resource cleanup, and serialized
+ * SQLite backup download payload handling.
  */
 
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
@@ -25,7 +27,7 @@ const originalBlob = globalThis.Blob;
 const originalDocument = globalThis.document;
 const originalUrl = globalThis.URL;
 
-describe("File Download Utility - Fixed Coverage Tests", () => {
+describe("File Download Utility", () => {
     let mockAnchor: any;
 
     beforeEach(() => {

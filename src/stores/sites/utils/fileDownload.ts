@@ -10,6 +10,7 @@ import type { SerializedDatabaseBackupResult } from "@shared/types/ipc";
 
 import { ensureError } from "@shared/utils/errorHandling";
 import { isRecord as isSharedRecord } from "@shared/utils/typeHelpers";
+import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 
 import { logger } from "../../../services/logger";
 import { isPlaywrightAutomation } from "../../../utils/environment";
@@ -376,15 +377,18 @@ export async function handleSQLiteBackupDownload(
         try {
             clickDownloadAnchor(anchor, false);
         } catch (clickError) {
-            logger.error(
-                "Failed to trigger download click",
+            const normalizedClickError =
                 clickError instanceof Error
                     ? clickError
-                    : new Error(String(clickError))
+                    : new Error(getUserFacingErrorDetail(clickError));
+
+            logger.error(
+                "Failed to trigger download click",
+                normalizedClickError
             );
 
             throw new Error(
-                `Download trigger failed: ${clickError instanceof Error ? clickError.message : String(clickError)}`,
+                `Download trigger failed: ${getUserFacingErrorDetail(clickError)}`,
                 { cause: clickError }
             );
         }

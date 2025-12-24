@@ -2,13 +2,13 @@ import type { CloudSyncResetResult } from "@shared/types/cloudSyncReset";
 import type { CloudSyncResetPreview } from "@shared/types/cloudSyncResetPreview";
 import type { JSX } from "react";
 
+import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import { useCallback, useState } from "react";
 
 import { SystemService } from "../../../services/SystemService";
 import { ThemedButton } from "../../../theme/components/ThemedButton";
 import { ThemedText } from "../../../theme/components/ThemedText";
 import { formatFullTimestamp } from "../../../utils/time";
-import { getUserFacingErrorDetail } from "../../../utils/userFacingErrors";
 
 function resolveSyncResetStatusText(args: {
     connected: boolean;

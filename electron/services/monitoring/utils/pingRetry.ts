@@ -49,6 +49,7 @@
  * @see {@link checkHttpConnectivity} - HTTP/HTTPS connectivity checking
  */
 
+import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import { isValidUrl } from "@shared/validation/validatorUtils";
 
 import type { MonitorCheckResult } from "../types";
@@ -101,8 +102,7 @@ export async function performSinglePingCheck(
             ? await checkHttpConnectivity(host, timeout)
             : await checkConnectivity(host, { retries: 0, timeout });
     } catch (error) {
-        const errorMessage =
-            error instanceof Error ? error.message : String(error);
+        const errorMessage = getUserFacingErrorDetail(error);
 
         throw new Error(`Connectivity check failed: ${errorMessage}`, {
             cause: error,

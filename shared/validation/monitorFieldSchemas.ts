@@ -1,6 +1,7 @@
-import * as z from "zod";
+import type { ZodString } from "zod";
 
 import { MONITOR_ID_REQUIRED_MESSAGE } from "./monitorFieldConstants";
+import { createNonWhitespaceStringSchema } from "./stringSchemas";
 
 /**
  * Canonical validation schema for monitor identifiers.
@@ -10,6 +11,6 @@ import { MONITOR_ID_REQUIRED_MESSAGE } from "./monitorFieldConstants";
  * boundary validators without pulling in the entire monitor schema graph
  * (useful when tests mock monitorSchemas).
  */
-export const monitorIdSchema: z.ZodString = z
-    .string()
-    .regex(/\S/u, MONITOR_ID_REQUIRED_MESSAGE);
+export const monitorIdSchema: ZodString = createNonWhitespaceStringSchema({
+    requiredMessage: MONITOR_ID_REQUIRED_MESSAGE,
+});

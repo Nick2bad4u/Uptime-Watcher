@@ -1,4 +1,4 @@
-import * as z from "zod";
+import type { ZodString } from "zod";
 
 import {
     SITE_IDENTIFIER_MAX_LENGTH,
@@ -8,6 +8,7 @@ import {
     SITE_NAME_REQUIRED_MESSAGE,
     SITE_NAME_TOO_LONG_MESSAGE,
 } from "./siteFieldConstants";
+import { createNonWhitespaceStringSchema } from "./stringSchemas";
 
 /**
  * Canonical validation schema for a site identifier.
@@ -18,11 +19,11 @@ import {
  * contexts such as IPC parameter validators and runtime guards without pulling
  * in heavy schema graphs.
  */
-export const siteIdentifierSchema: z.ZodString = z
-    .string()
-    .max(SITE_IDENTIFIER_MAX_LENGTH, SITE_IDENTIFIER_TOO_LONG_MESSAGE)
-    // Reject whitespace-only identifiers without transforming user input.
-    .regex(/\S/u, SITE_IDENTIFIER_REQUIRED_MESSAGE);
+export const siteIdentifierSchema: ZodString = createNonWhitespaceStringSchema({
+    maxLength: SITE_IDENTIFIER_MAX_LENGTH,
+    maxLengthMessage: SITE_IDENTIFIER_TOO_LONG_MESSAGE,
+    requiredMessage: SITE_IDENTIFIER_REQUIRED_MESSAGE,
+});
 
 /**
  * Canonical validation schema for a user-visible site name.
@@ -30,8 +31,8 @@ export const siteIdentifierSchema: z.ZodString = z
  * @remarks
  * Like {@link siteIdentifierSchema}, this is a lightweight standalone schema.
  */
-export const siteNameSchema: z.ZodString = z
-    .string()
-    .max(SITE_NAME_MAX_LENGTH, SITE_NAME_TOO_LONG_MESSAGE)
-    // Reject whitespace-only names without transforming user input.
-    .regex(/\S/u, SITE_NAME_REQUIRED_MESSAGE);
+export const siteNameSchema: ZodString = createNonWhitespaceStringSchema({
+    maxLength: SITE_NAME_MAX_LENGTH,
+    maxLengthMessage: SITE_NAME_TOO_LONG_MESSAGE,
+    requiredMessage: SITE_NAME_REQUIRED_MESSAGE,
+});

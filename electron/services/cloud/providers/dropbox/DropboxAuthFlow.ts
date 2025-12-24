@@ -1,6 +1,7 @@
 import { getElectronErrorCodeSuffix } from "@electron/services/shell/openExternalUtils";
 import { tryGetErrorCode } from "@shared/utils/errorCodes";
 import { ensureError } from "@shared/utils/errorHandling";
+import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import { DropboxAuth } from "dropbox";
 import { shell } from "electron";
 import crypto from "node:crypto";
@@ -49,7 +50,7 @@ function createRandomState(): string {
 function handleUnexpectedOAuthRuntimeError(error: unknown): void {
     // Should never be used; replaced before listeners are registered.
     throw new Error(
-        `Unexpected OAuth runtime error handler invocation: ${String(error)}`
+        `Unexpected OAuth runtime error handler invocation: ${getUserFacingErrorDetail(error)}`
     );
 }
 

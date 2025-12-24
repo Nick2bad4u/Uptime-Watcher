@@ -19,6 +19,7 @@ import type { EventMetadata } from "@shared/types/events";
 import type { UnknownRecord } from "type-fest";
 
 import { ensureError } from "@shared/utils/errorHandling";
+import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 
 import type { UptimeEventName, UptimeEvents } from "../events/eventTypes";
 import type { EnhancedEventPayload, EventKey } from "../events/TypedEventBus";
@@ -896,10 +897,7 @@ export class ServiceContainer {
                         logger.error(
                             "[ServiceContainer] Failed to set history limit",
                             {
-                                error:
-                                    error instanceof Error
-                                        ? error.message
-                                        : String(error),
+                                error: getUserFacingErrorDetail(error),
                                 limit,
                             }
                         );

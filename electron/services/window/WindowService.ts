@@ -40,6 +40,7 @@ import { getUnknownErrorMessage } from "@shared/utils/errorCatalog";
 import { tryGetErrorCode } from "@shared/utils/errorCodes";
 import { ensureError, withErrorHandling } from "@shared/utils/errorHandling";
 import { validateExternalOpenUrlCandidate } from "@shared/utils/urlSafety";
+import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import { BrowserWindow, shell } from "electron";
 // eslint-disable-next-line unicorn/import-style -- Need namespace import for path operations
 import * as path from "node:path";
@@ -249,10 +250,7 @@ export class WindowService {
                             logger.warn(
                                 "[WindowService] Failed to open DevTools",
                                 {
-                                    error:
-                                        error instanceof Error
-                                            ? error.message
-                                            : String(error),
+                                    error: getUserFacingErrorDetail(error),
                                     windowState: targetWindow.isDestroyed()
                                         ? "destroyed"
                                         : "active",

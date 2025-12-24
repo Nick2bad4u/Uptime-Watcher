@@ -47,6 +47,7 @@
 import type { Database } from "node-sqlite3-wasm";
 
 import { DEFAULT_SITE_NAME } from "@shared/constants/sites";
+import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 
 import type { DatabaseService } from "./DatabaseService";
 
@@ -683,7 +684,9 @@ export class SiteRepository {
                 `[SiteRepository] Failed to find site: ${identifier}`,
                 error
             );
-            throw error instanceof Error ? error : new Error(String(error));
+            throw error instanceof Error
+                ? error
+                : new Error(getUserFacingErrorDetail(error));
         }
     }
 }

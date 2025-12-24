@@ -20,6 +20,7 @@
  * @packageDocumentation
  */
 
+import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import { isValidUrl } from "@shared/validation/validatorUtils";
 import * as dns from "node:dns/promises";
 import * as net from "node:net";
@@ -35,8 +36,8 @@ const stripHttpScheme = (value: string): string => {
         return normalized.slice("https://".length);
     }
 
-    if (lower.startsWith("https://")) {
-        return normalized.slice("https://".length);
+        if (lower.startsWith("https://")) {
+            return normalized.slice("https://".length);
     }
 
     return normalized;
@@ -332,7 +333,7 @@ export async function checkHttpConnectivity(
     } catch (error) {
         return {
             details: "HTTP request failed",
-            error: error instanceof Error ? error.message : String(error),
+            error: getUserFacingErrorDetail(error),
             responseTime: Math.round(performance.now() - startTime),
             status: "down",
         };
@@ -398,7 +399,7 @@ export async function checkConnectivity(
         } catch (error) {
             return {
                 details: `Connectivity check failed for ${String(normalizedHost)}`,
-                error: error instanceof Error ? error.message : String(error),
+                error: getUserFacingErrorDetail(error),
                 responseTime: Math.round(performance.now() - startTime),
                 status: "down",
             };
@@ -478,7 +479,7 @@ export async function checkConnectivityWithRetry(
         } catch (error) {
             const errorResult: MonitorCheckResult = {
                 details: `Check failed on attempt ${opts.retries - attemptsLeft + 2}`,
-                error: error instanceof Error ? error.message : String(error),
+                error: getUserFacingErrorDetail(error),
                 responseTime: opts.timeout,
                 status: "down",
             };

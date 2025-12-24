@@ -51,6 +51,7 @@ import type { Site } from "@shared/types";
 
 import { normalizeHistoryLimit } from "@shared/constants/history";
 import { ensureError, withErrorHandling } from "@shared/utils/errorHandling";
+import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 
 import type { UptimeEvents } from "../events/eventTypes";
 import type { TypedEventBus } from "../events/TypedEventBus";
@@ -728,7 +729,7 @@ export class DatabaseManager {
                     );
                     throw error instanceof Error
                         ? error
-                        : new Error(String(error));
+                        : new Error(getUserFacingErrorDetail(error));
                 }
 
                 return true;
@@ -755,7 +756,7 @@ export class DatabaseManager {
                     );
                     throw error instanceof Error
                         ? error
-                        : new Error(String(error));
+                        : new Error(getUserFacingErrorDetail(error));
                 }
 
                 return true;

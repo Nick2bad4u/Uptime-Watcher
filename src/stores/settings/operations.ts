@@ -6,6 +6,7 @@ import {
     normalizeHistoryLimit,
 } from "@shared/constants/history";
 import { ensureError, withErrorHandling } from "@shared/utils/errorHandling";
+import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 
 import type { SettingsStore } from "./types";
 
@@ -171,7 +172,7 @@ export const createSettingsOperationsSlice = (
                 } as const;
 
                 logStoreAction("SettingsStore", "initializeSettings", {
-                    error: ensureError(error).message,
+                    error: getUserFacingErrorDetail(error),
                     message: fallbackResult.message,
                     settingsLoaded: fallbackResult.settingsLoaded,
                     success: fallbackResult.success,

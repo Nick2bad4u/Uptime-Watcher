@@ -38,6 +38,7 @@ import type { ChangeEvent, MouseEvent, ReactElement } from "react";
 
 import { DEFAULT_HISTORY_LIMIT_RULES } from "@shared/constants/history";
 import { ensureError } from "@shared/utils/errorHandling";
+import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import { safeInteger } from "@shared/validation/validatorUtils";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
@@ -60,7 +61,6 @@ import { isThemeName, type ThemeName } from "../../theme/types";
 import { useTheme } from "../../theme/useTheme";
 import { AppIcons } from "../../utils/icons";
 import { waitForAnimation } from "../../utils/time/waitForAnimation";
-import { getUserFacingErrorDetail } from "../../utils/userFacingErrors";
 import { playInAppAlertTone } from "../Alerts/alertCoordinator";
 import { ErrorAlert } from "../common/ErrorAlert/ErrorAlert";
 import { GalaxyBackground } from "../common/GalaxyBackground/GalaxyBackground";

@@ -16,6 +16,7 @@ import {
     interpolateLogTemplate,
     LOG_TEMPLATES,
 } from "@shared/utils/logTemplates";
+import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 
 import type {
     IMonitorService,
@@ -226,10 +227,9 @@ export function createHttpMonitorService<
                         operationName,
                         ...(isDev() && {
                             onRetry: (attempt: number, error: Error): void => {
-                                const errorMessage =
-                                    error instanceof Error
-                                        ? error.message
-                                        : String(error);
+                                const errorMessage = getUserFacingErrorDetail(
+                                    error
+                                );
                                 logger.debug(
                                     `[${behavior.scope}] URL ${url} failed attempt ${attempt}/${totalAttempts}: ${errorMessage}`
                                 );

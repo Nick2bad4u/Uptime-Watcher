@@ -1,5 +1,8 @@
 /**
- * Fixed ServiceContainer comprehensive test - using hoisted mocking pattern
+ * ServiceContainer tests with hoisted mocks.
+ *
+ * These tests validate ServiceContainer wiring/creation paths in isolation by
+ * using Vitest hoisted mocks for all heavyweight dependencies.
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
@@ -269,7 +272,7 @@ import {
     type ServiceContainerConfig,
 } from "../../services/ServiceContainer";
 
-describe("ServiceContainer - Fixed Tests", () => {
+describe("ServiceContainer - Hoisted Mocks", () => {
     let container: ServiceContainer;
     let mockConfig: ServiceContainerConfig;
 

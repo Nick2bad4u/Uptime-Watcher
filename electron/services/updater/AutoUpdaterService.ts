@@ -4,6 +4,7 @@
  */
 
 import { UPDATE_STATUS, type UpdateStatus } from "@shared/types/events";
+import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import { autoUpdater } from "electron-updater";
 
 import { logger } from "../../utils/logger";
@@ -110,7 +111,7 @@ export class AutoUpdaterService {
     private readonly handleError = (error: Error): void => {
         logger.error("[AutoUpdaterService] Auto-updater error", error);
         this.notifyStatusChange({
-            error: error.message || String(error),
+            error: getUserFacingErrorDetail(error),
             status: UPDATE_STATUS.ERROR,
         });
     };
@@ -143,7 +144,7 @@ export class AutoUpdaterService {
                 error
             );
             this.notifyStatusChange({
-                error: error instanceof Error ? error.message : String(error),
+                error: getUserFacingErrorDetail(error),
                 status: UPDATE_STATUS.ERROR,
             });
         }

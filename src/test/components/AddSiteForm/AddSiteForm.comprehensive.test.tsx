@@ -1,557 +1,230 @@
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { type ReactNode } from "react";
+import "@testing-library/jest-dom";
+
+import { render, screen, waitFor, within } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
 import { AddSiteForm } from "../../../components/AddSiteForm/AddSiteForm";
-import {
-    sampleOne,
-    siteNameArbitrary,
-} from "@shared/test/arbitraries/siteArbitraries";
-
-// Mock external dependencies
-vi.mock("../../../constants", async (importOriginal) => {
-    const actual = await importOriginal<typeof import("../../../constants")>();
-    return {
-        ...actual,
-        CHECK_INTERVALS: [
-            { label: "1 minute", value: 60_000 },
-            { label: "5 minutes", value: 300_000 },
-            { label: "10 minutes", value: 600_000 },
-        ],
-    };
-});
-vi.mock("../../../hooks/useDynamicHelpText", () => ({
-    useDynamicHelpText: vi.fn(() => ({
-        helpText: "Default help text",
-        error: null,
-        isLoading: false,
-    })),
-}));
-
-vi.mock("../../../hooks/useMonitorTypes", () => ({
-    useMonitorTypes: vi.fn(() => ({
-        monitorTypes: [
-            { id: "http", label: "HTTP/HTTPS" },
-            { id: "port", label: "Port Check" },
-            { id: "ping", label: "Ping" },
-        ],
-        options: [
-            { label: "HTTP/HTTPS", value: "http" },
-            { label: "Port Check", value: "port" },
-            { label: "Ping", value: "ping" },
-        ],
-        isLoading: false,
-        error: null,
-        refreshMonitorTypes: vi.fn(),
-    })),
-}));
-
-vi.mock("../../../stores/error/useErrorStore", () => ({
-    useErrorStore: vi.fn(() => ({
-        clearError: vi.fn(),
-        setError: vi.fn(),
-        lastError: null,
-    })),
-}));
-
-const mockSiteName = sampleOne(siteNameArbitrary);
-
-vi.mock("../../../stores/sites/useSitesStore", () => ({
-    useSitesStore: vi.fn(() => ({
-        sites: [
-            {
-                id: "1",
-                identifier: "1",
-                url: "https://example.com",
-                name: mockSiteName,
-                monitors: [],
-            },
-        ],
-        addSite: vi.fn(),
-        addMonitorToSite: vi.fn(),
-        createSite: vi.fn(),
-        isLoading: false,
-    })),
-}));
-
-vi.mock("../../../components/SiteDetails/useAddSiteForm", () => ({
-    useAddSiteForm: vi.fn(() => ({
-        formData: {
-            siteName: "",
-            url: "",
-            monitor: {
-                id: "",
-                type: "http",
-                status: "active",
-                checkInterval: 60_000,
-                timeout: 5000,
-                retryAttempts: 3,
-                url: "",
-                host: "",
-                port: 80,
-            },
-        },
-        updateFormData: vi.fn(),
-        resetForm: vi.fn(),
-        isValid: true,
-        validationErrors: {},
-        // Add missing methods from the hook
-        monitorType: "http",
-        setMonitorType: vi.fn(),
-        checkInterval: 60_000,
-        setCheckInterval: vi.fn(),
-        addMode: "new",
-        setAddMode: vi.fn(),
-        selectedSite: null,
-        selectSite: vi.fn(),
-    })),
-}));
-
-vi.mock("../../../utils/data/generateUuid", () => ({
-    generateUuid: vi.fn(() => "test-uuid-123"),
-}));
+import { handleSubmit } from "../../../components/AddSiteForm/Submit";
+import { useErrorStore } from "../../../stores/error/useErrorStore";
+import { useMonitorTypesStore } from "../../../stores/monitor/useMonitorTypesStore";
 
 vi.mock("../../../components/AddSiteForm/Submit", () => ({
     handleSubmit: vi.fn(),
 }));
 
-// Mock FormFields components
-vi.mock("../../../components/AddSiteForm/FormFields", () => ({
-    RadioGroup: ({
-        label,
-        children,
-    }: {
-        label: string;
-        children: ReactNode;
-    }) => (
-        <div data-testid="radio-group">
-            <label>{label}</label>
-            {children}
-        </div>
-    ),
-    SelectField: ({
-        label,
-        value,
-        onChange,
-    }: {
-        label: string;
-        value: string;
-        onChange: (value: string) => void;
-    }) => (
-        <div data-testid="select-field">
-            <label>{label}</label>
-            <select value={value} onChange={(e) => onChange(e.target.value)}>
-                <option value="http">HTTP</option>
-                <option value="port">Port</option>
-                <option value="ping">Ping</option>
-            </select>
-        </div>
-    ),
-    TextField: ({
-        label,
-        value,
-        onChange,
-    }: {
-        label: string;
-        value: string;
-        onChange: (value: string) => void;
-    }) => (
-        <div data-testid="text-field">
-            <label>{label}</label>
-            <input value={value} onChange={(e) => onChange(e.target.value)} />
-        </div>
-    ),
+const monitorFieldErrorState = vi.hoisted(() => ({
+    shouldError: false,
 }));
 
-vi.mock("../../../components/AddSiteForm/DynamicMonitorFields", () => ({
-    DynamicMonitorFields: ({ monitorType }: { monitorType: string }) => (
-        <div data-testid="dynamic-monitor-fields">
-            Dynamic fields for {monitorType}
-        </div>
-    ),
+/**
+ * Mock monitor field configs so the suite is deterministic (no IPC).
+ */
+vi.mock("@app/hooks/useMonitorFields", () => ({
+    useMonitorFields: vi.fn(() => ({
+        error: monitorFieldErrorState.shouldError
+            ? "Failed to load monitor field configurations"
+            : undefined,
+        getFields: (monitorType: string) => {
+            if (monitorFieldErrorState.shouldError) {
+                return [];
+            }
+
+            switch (monitorType) {
+                case "http": {
+                    return [
+                        {
+                            label: "URL",
+                            name: "url",
+                            required: true,
+                            type: "url",
+                        },
+                    ];
+                }
+                case "port": {
+                    return [
+                        {
+                            label: "Host",
+                            name: "host",
+                            required: true,
+                            type: "text",
+                        },
+                        {
+                            label: "Port",
+                            name: "port",
+                            required: true,
+                            type: "number",
+                        },
+                    ];
+                }
+                case "ping": {
+                    return [
+                        {
+                            label: "Host",
+                            name: "host",
+                            required: true,
+                            type: "text",
+                        },
+                    ];
+                }
+                default: {
+                    return [];
+                }
+            }
+        },
+        isLoaded: true,
+    })),
 }));
 
-describe("AddSiteForm Component", () => {
+function resetStores(): void {
+    useErrorStore.getState().clearAllErrors();
+
+    useMonitorTypesStore.setState({
+        isLoaded: true,
+        monitorTypes: [
+            {
+                description: "HTTP monitor",
+                displayName: "HTTP",
+                fields: [
+                    {
+                        label: "URL",
+                        name: "url",
+                        required: true,
+                        type: "url",
+                    },
+                ],
+                type: "http",
+                version: "1.0.0",
+            },
+            {
+                description: "Port monitor",
+                displayName: "Port",
+                fields: [
+                    {
+                        label: "Host",
+                        name: "host",
+                        required: true,
+                        type: "text",
+                    },
+                    {
+                        label: "Port",
+                        name: "port",
+                        required: true,
+                        type: "number",
+                    },
+                ],
+                type: "port",
+                version: "1.0.0",
+            },
+            {
+                description: "Ping monitor",
+                displayName: "Ping",
+                fields: [
+                    {
+                        label: "Host",
+                        name: "host",
+                        required: true,
+                        type: "text",
+                    },
+                ],
+                type: "ping",
+                version: "1.0.0",
+            },
+        ],
+    });
+}
+
+describe("AddSiteForm (comprehensive)", () => {
     beforeEach(() => {
         vi.clearAllMocks();
+        monitorFieldErrorState.shouldError = false;
+        resetStores();
     });
 
-    describe("Basic Rendering", () => {
-        it("should render the form without errors", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteForm", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Error Handling", "type");
+    it("renders the initial HTTP form fields", ({ task, annotate }) => {
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: AddSiteForm", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Rendering", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteForm", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Error Handling", "type");
+        render(<AddSiteForm />);
 
-            render(<AddSiteForm />);
+        expect(
+            screen.getByRole("textbox", { name: /site name/i })
+        ).toBeVisible();
 
-            expect(document.querySelector(".themed-box")).toBeInTheDocument();
-            expect(screen.getByRole("radiogroup")).toBeInTheDocument();
-        });
-
-        it("should render all required form elements", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteForm", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteForm", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
-            render(<AddSiteForm />);
-
-            // Check for main form elements
-            expect(screen.getByRole("radiogroup")).toBeInTheDocument();
-            expect(
-                document.querySelectorAll(".themed-select")[0]
-            ).toBeInTheDocument();
-            expect(
-                screen.getByTestId("dynamic-monitor-fields")
-            ).toBeInTheDocument();
-        });
-
-        it("should render submit button", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteForm", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteForm", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
-            render(<AddSiteForm />);
-
-            const submitButton = document.querySelector(".themed-button");
-            expect(submitButton).toBeInTheDocument();
-        });
+        // Default monitor type is expected to be HTTP in the add-site flow.
+        expect(screen.getByRole("textbox", { name: /url/i })).toBeVisible();
     });
 
-    describe("Form Interaction", () => {
-        it("should handle form field changes", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteForm", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
+    it("renders an error alert when monitor fields fail to load", ({
+        task,
+        annotate,
+    }) => {
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: AddSiteForm", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Error Handling", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteForm", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
+        monitorFieldErrorState.shouldError = true;
 
-            render(<AddSiteForm />);
+        render(<AddSiteForm />);
 
-            const selectFields = screen.getAllByRole("combobox");
-            fireEvent.change(selectFields[0]!, { target: { value: "port" } });
-
-            // Verify the form field interaction
-            expect(selectFields[0]!).toBeInTheDocument();
-        });
-
-        it("should handle monitor type changes", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteForm", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Monitoring", "type");
-
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteForm", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Monitoring", "type");
-
-            render(<AddSiteForm />);
-
-            const dynamicFields = screen.getByTestId("dynamic-monitor-fields");
-            expect(dynamicFields).toHaveTextContent("Dynamic fields");
-        });
-
-        it("should handle form submission", async ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteForm", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteForm", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
-            const onSuccess = vi.fn();
-            render(<AddSiteForm onSuccess={onSuccess} />);
-
-            const submitButton = document.querySelector(".themed-button");
-            expect(submitButton).toBeInTheDocument();
-            fireEvent.click(submitButton!);
-
-            await waitFor(() => {
-                expect(submitButton).toBeInTheDocument();
-            });
-        });
+        expect(
+            screen.getByText(/failed to load monitor field configurations/i)
+        ).toBeVisible();
     });
 
-    describe("Props and Configuration", () => {
-        it("should handle onSuccess callback", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteForm", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
+    it("renders the port monitor fields when selected", async ({
+        task,
+        annotate,
+    }) => {
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: AddSiteForm", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Interaction", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteForm", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
+        const user = userEvent.setup();
+        render(<AddSiteForm />);
 
-            const onSuccess = vi.fn();
-            render(<AddSiteForm onSuccess={onSuccess} />);
+        const monitorTypeSelect = screen.getByLabelText(/monitor type/i);
 
-            expect(document.querySelector(".themed-box")).toBeInTheDocument();
+        // Monitor type options are loaded asynchronously via useMonitorTypes.
+        await waitFor(() => {
+            expect(monitorTypeSelect).toBeEnabled();
         });
 
-        it("should work without onSuccess callback", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteForm", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
+        await user.selectOptions(monitorTypeSelect, "port");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteForm", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
-            render(<AddSiteForm />);
-
-            expect(document.querySelector(".themed-box")).toBeInTheDocument();
-        });
+        expect(screen.getByRole("textbox", { name: /host/i })).toBeVisible();
+        expect(screen.getByRole("spinbutton", { name: /port/i })).toBeVisible();
     });
 
-    describe("State Management Integration", () => {
-        it("should integrate with error store", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteForm", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Error Handling", "type");
+    it("wires submit to handleSubmit", async ({ task, annotate }) => {
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: AddSiteForm", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Submission", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteForm", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Error Handling", "type");
+        const user = userEvent.setup();
+        render(<AddSiteForm />);
 
-            render(<AddSiteForm />);
+        await user.type(
+            screen.getByRole("textbox", { name: /site name/i }),
+            "Test"
+        );
+        await user.type(
+            screen.getByRole("textbox", { name: /url/i }),
+            "https://example.com"
+        );
 
-            // Test that error store integration works
-            expect(document.querySelector(".themed-box")).toBeInTheDocument();
+        const form = screen.getByRole("form", { name: /add site/i });
+        const submitButton = within(form).getByRole("button", {
+            name: /add site/i,
         });
 
-        it("should integrate with sites store", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteForm", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
+        await user.click(submitButton);
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteForm", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
-            render(<AddSiteForm />);
-
-            // Test that sites store integration works
-            expect(document.querySelector(".themed-box")).toBeInTheDocument();
-        });
-
-        it("should integrate with form hooks", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteForm", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteForm", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
-            render(<AddSiteForm />);
-
-            // Test that form hooks integration works
-            expect(document.querySelector(".themed-box")).toBeInTheDocument();
-        });
-    });
-
-    describe("Theme Integration", () => {
-        it("should apply theme styling", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteForm", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteForm", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
-            render(<AddSiteForm />);
-
-            const themedBox = document.querySelector(".themed-box");
-            expect(themedBox).toBeInTheDocument();
-
-            const themedButton = document.querySelector(".themed-button");
-            expect(themedButton).toBeInTheDocument();
-        });
-
-        it("should handle theme changes", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteForm", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteForm", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
-            render(<AddSiteForm />);
-
-            // Test theme integration
-            expect(
-                document.querySelectorAll(".themed-text")[0]
-            ).toBeInTheDocument();
-        });
-    });
-
-    describe("Error Handling", () => {
-        it("should handle component errors gracefully", ({
-            task,
-            annotate,
-        }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteForm", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Error Handling", "type");
-
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteForm", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Error Handling", "type");
-
-            // Test error boundaries and error handling
-            render(<AddSiteForm />);
-
-            expect(document.querySelector(".themed-box")).toBeInTheDocument();
-        });
-
-        it("should display validation errors", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteForm", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Error Handling", "type");
-
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteForm", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Error Handling", "type");
-
-            render(<AddSiteForm />);
-
-            // Test validation error display
-            expect(document.querySelector(".themed-box")).toBeInTheDocument();
-        });
-    });
-
-    describe("Accessibility", () => {
-        it("should have proper form labels", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteForm", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteForm", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
-            render(<AddSiteForm />);
-
-            // Check for accessibility labels
-            expect(screen.getByRole("radiogroup")).toBeInTheDocument();
-            expect(
-                document.querySelectorAll(".themed-select")[0]
-            ).toBeInTheDocument();
-        });
-
-        it("should support keyboard navigation", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteForm", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteForm", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
-            render(<AddSiteForm />);
-
-            const submitButton = document.querySelector(".themed-button");
-            expect(submitButton).toBeInTheDocument();
-        });
-    });
-
-    describe("Edge Cases", () => {
-        it("should handle empty form data", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteForm", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteForm", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
-            render(<AddSiteForm />);
-
-            expect(document.querySelector(".themed-box")).toBeInTheDocument();
-        });
-
-        it("should handle missing monitor types", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteForm", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Monitoring", "type");
-
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteForm", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Monitoring", "type");
-
-            render(<AddSiteForm />);
-
-            expect(
-                screen.getByTestId("dynamic-monitor-fields")
-            ).toBeInTheDocument();
-        });
-
-        it("should handle loading states", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteForm", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Data Loading", "type");
-
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteForm", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Data Loading", "type");
-
-            render(<AddSiteForm />);
-
-            expect(document.querySelector(".themed-box")).toBeInTheDocument();
-        });
+        expect(vi.mocked(handleSubmit)).toHaveBeenCalledTimes(1);
     });
 });

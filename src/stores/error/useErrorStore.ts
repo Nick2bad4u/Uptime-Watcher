@@ -32,7 +32,7 @@
  * @public
  */
 
-import { ensureError } from "@shared/utils/errorHandling";
+import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import { create, type StoreApi, type UseBoundStore } from "zustand";
 
 import type { ErrorStore } from "./types";
@@ -92,8 +92,8 @@ export const useErrorStore: UseBoundStore<StoreApi<ErrorStore>> =
                 return raw;
             }
 
-            if (raw) {
-                return ensureError(raw).message;
+            if (raw !== undefined && raw !== null) {
+                return getUserFacingErrorDetail(raw);
             }
 
             return undefined;

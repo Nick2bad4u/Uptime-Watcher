@@ -20,6 +20,7 @@ import {
     withLogContext,
 } from "@shared/utils/loggingContext";
 import { validateExternalOpenUrlCandidate } from "@shared/utils/urlSafety";
+import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import {
     isNonEmptyString,
     isValidUrl,
@@ -251,8 +252,7 @@ async function executeIpcHandler<T>(
         };
     } catch (error) {
         const duration = Date.now() - startTime;
-        const rawErrorMessage =
-            error instanceof Error ? error.message : String(error);
+        const rawErrorMessage = getUserFacingErrorDetail(error);
         const errorMessage = normalizeIpcErrorMessage(rawErrorMessage);
 
         logger.error(
@@ -796,7 +796,9 @@ export function registerStandardizedIpcHandler<
         registeredHandlers.delete(channelName);
 
         const error =
-            rawError instanceof Error ? rawError : new Error(String(rawError));
+            rawError instanceof Error
+                ? rawError
+                : new Error(getUserFacingErrorDetail(rawError));
 
         logger.error(
             `[IpcService] Failed to register IPC handler for channel '${channelName}'`,

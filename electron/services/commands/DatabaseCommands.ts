@@ -16,6 +16,7 @@ import type { Site } from "@shared/types";
 import { DEFAULT_SITE_NAME } from "@shared/constants/sites";
 import { SITE_ADDED_SOURCE } from "@shared/types/events";
 import { ensureError } from "@shared/utils/errorHandling";
+import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import { ensureUniqueSiteIdentifiers } from "@shared/validation/siteIntegrity";
 
 import type { UptimeEvents } from "../../events/eventTypes";
@@ -373,7 +374,9 @@ export class DatabaseCommandExecutor {
                 }
             } catch (error) {
                 errors.push(
-                    error instanceof Error ? error : new Error(String(error))
+                    error instanceof Error
+                        ? error
+                        : new Error(getUserFacingErrorDetail(error))
                 );
             }
         }

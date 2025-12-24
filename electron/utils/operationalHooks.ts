@@ -60,6 +60,7 @@
 
 import type { Tagged, UnknownRecord } from "type-fest";
 
+import { ensureError } from "@shared/utils/errorHandling";
 import * as z from "zod";
 
 import type { UptimeEvents } from "../events/eventTypes";
@@ -591,8 +592,7 @@ export async function withOperationalHooks<T>(
                 context
             );
         } catch (error) {
-            lastError =
-                error instanceof Error ? error : new Error(String(error));
+            lastError = ensureError(error);
 
             /* V8 ignore next 2 */ logger.debug(
                 `[OperationalHooks] ${operationName} failed on attempt ${attempt}/${maxRetries}`,
