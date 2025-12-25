@@ -5,7 +5,6 @@
  */
 
 import type { Site } from "@shared/types";
-import type { AxiosInstance } from "axios";
 
 import { ensureError } from "@shared/utils/errorHandling";
 
@@ -25,6 +24,7 @@ import {
     ensureMonitorType,
     type MonitorByType,
 } from "./monitorCoreHelpers";
+import { MonitorServiceAdapterBase } from "./monitorServiceAdapterBase";
 import { createMonitorErrorResult } from "./monitorServiceHelpers";
 import {
     createMonitorServiceRuntimeState,
@@ -106,10 +106,7 @@ export function createRemoteMonitorService<
 >(
     behavior: RemoteMonitorBehavior<TType, TContext>
 ): new (config?: MonitorServiceConfig) => IMonitorService {
-    return class RemoteMonitorServiceAdapter implements IMonitorService {
-        private axiosInstance: AxiosInstance;
-
-        private config: MonitorServiceConfig;
+    return class RemoteMonitorServiceAdapter extends MonitorServiceAdapterBase<TType> {
 
         public async check(
             monitor: Site["monitors"][0],
@@ -231,12 +228,11 @@ export function createRemoteMonitorService<
                 defaultTimeoutMs: DEFAULT_REQUEST_TIMEOUT,
             });
 
-            this.config = state.config;
-            this.axiosInstance = state.axiosInstance;
-        }
-
-        public getType(): Site["monitors"][0]["type"] {
-            return behavior.type;
+            super({
+                axiosInstance: state.axiosInstance,
+                config: state.config,
+                type: behavior.type,
+            });
         }
 
         public updateConfig(config: Partial<MonitorServiceConfig>): void {

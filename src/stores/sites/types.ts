@@ -27,6 +27,33 @@ import type {
 import type { SitesState as SitesStateShape } from "./useSitesState";
 
 /**
+ * Site monitoring actions exposed by the sites store.
+ *
+ * @remarks
+ * These method signatures are shared between the store contract and the
+ * monitoring action factory ({@link createSiteMonitoringActions}). Keeping the
+ * contract in one place prevents drift.
+ */
+export interface SiteMonitoringActions {
+    /** Check a site now */
+    checkSiteNow: (siteIdentifier: string, monitorId: string) => Promise<void>;
+    /** Start monitoring for all monitors of a site */
+    startSiteMonitoring: (siteIdentifier: string) => Promise<void>;
+    /** Start monitoring for a site monitor */
+    startSiteMonitorMonitoring: (
+        siteIdentifier: string,
+        monitorId: string
+    ) => Promise<void>;
+    /** Stop monitoring for all monitors of a site */
+    stopSiteMonitoring: (siteIdentifier: string) => Promise<void>;
+    /** Stop monitoring for a site monitor */
+    stopSiteMonitorMonitoring: (
+        siteIdentifier: string,
+        monitorId: string
+    ) => Promise<void>;
+}
+
+/**
  * Sites store actions interface for managing site operations.
  *
  * @remarks
@@ -35,7 +62,7 @@ import type { SitesState as SitesStateShape } from "./useSitesState";
  *
  * @public
  */
-export interface SitesActions {
+export interface SitesActions extends SiteMonitoringActions {
     /** Add a monitor to an existing site */
     addMonitorToSite: (
         siteIdentifier: string,
@@ -43,8 +70,6 @@ export interface SitesActions {
     ) => Promise<void>;
     /** Add a site to the store */
     addSite: (site: Site) => void;
-    /** Check a site now */
-    checkSiteNow: (siteIdentifier: string, monitorId: string) => Promise<void>;
     /** Create a new site */
     createSite: (siteData: {
         /** Unique site identifier used across layers */
@@ -128,20 +153,6 @@ export interface SitesActions {
     setStatusSubscriptionSummary: (
         summary: StatusUpdateSubscriptionSummary | undefined
     ) => void;
-    /** Start monitoring for all monitors of a site */
-    startSiteMonitoring: (siteIdentifier: string) => Promise<void>;
-    /** Start monitoring for a site monitor */
-    startSiteMonitorMonitoring: (
-        siteIdentifier: string,
-        monitorId: string
-    ) => Promise<void>;
-    /** Stop monitoring for all monitors of a site */
-    stopSiteMonitoring: (siteIdentifier: string) => Promise<void>;
-    /** Stop monitoring for a site monitor */
-    stopSiteMonitorMonitoring: (
-        siteIdentifier: string,
-        monitorId: string
-    ) => Promise<void>;
     /** Subscribe to status updates */
     subscribeToStatusUpdates: (
         callback?: (update: StatusUpdate) => void

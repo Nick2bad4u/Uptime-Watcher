@@ -10,7 +10,7 @@
  */
 
 import type { Site } from "@shared/types";
-import type { AxiosInstance, AxiosResponse } from "axios";
+import type { AxiosResponse } from "axios";
 
 import {
     interpolateLogTemplate,
@@ -41,6 +41,7 @@ import {
     ensureMonitorType,
     type MonitorByType,
 } from "./monitorCoreHelpers";
+import { MonitorServiceAdapterBase } from "./monitorServiceAdapterBase";
 import {
     createMonitorErrorResult,
     validateMonitorUrl,
@@ -129,10 +130,9 @@ export function createHttpMonitorService<
         url: string;
     }
 
-    return class HttpMonitorServiceAdapter implements IMonitorService {
-        private axiosInstance: AxiosInstance;
-
-        private config: MonitorServiceConfig;
+    return class HttpMonitorServiceAdapter
+        extends MonitorServiceAdapterBase<TType>
+        implements HttpMonitorServiceInstance {
 
         public async check(
             monitor: Site["monitors"][0],
@@ -306,24 +306,26 @@ export function createHttpMonitorService<
         }
 
         public constructor(config: MonitorServiceConfig = {}) {
-            this.config = {
+            const nextConfig: MonitorServiceConfig = {
                 timeout: DEFAULT_REQUEST_TIMEOUT,
                 userAgent: USER_AGENT,
                 ...config,
             };
 
-            this.axiosInstance = createHttpClient({
-                timeout: this.config.timeout ?? DEFAULT_REQUEST_TIMEOUT,
-                userAgent: this.config.userAgent ?? USER_AGENT,
+            const axiosInstance = createHttpClient({
+                timeout: nextConfig.timeout ?? DEFAULT_REQUEST_TIMEOUT,
+                userAgent: nextConfig.userAgent ?? USER_AGENT,
+            });
+
+            super({
+                axiosInstance,
+                config: nextConfig,
+                type: behavior.type,
             });
         }
 
         public getConfig(): MonitorServiceConfig {
             return { ...this.config };
-        }
-
-        public getType(): Site["monitors"][0]["type"] {
-            return behavior.type;
         }
 
         public updateConfig(config: Partial<MonitorServiceConfig>): void {

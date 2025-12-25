@@ -60,16 +60,11 @@ import type {
     EventHandlers,
 } from "@shared/types/componentProps";
 
-import {
-    type CSSProperties,
-    type JSX,
-    memo,
-    type NamedExoticComponent,
-    useMemo,
-} from "react";
+import { memo, type JSX, type NamedExoticComponent } from "react";
 
-import { ARIA_LABEL, TRANSITION_ALL } from "../../constants";
+import { ARIA_LABEL } from "../../constants";
 import { useTheme, useThemeClasses } from "../useTheme";
+import { useThemedControlStyles } from "./useThemedControlStyles";
 
 /**
  * Properties for the ThemedInput component.
@@ -148,26 +143,15 @@ const ThemedInputComponent = ({
     // warnings
     const inputValue = value ?? "";
 
-    const styles = useMemo(
-        (): CSSProperties => ({
-            ...getBackgroundClass("primary"),
-            ...getTextClass("primary"),
-            ...getBorderClass("primary"),
-            borderRadius: currentTheme.borderRadius.md,
-            borderStyle: "solid",
-            borderWidth: "1px",
-            fontSize: currentTheme.typography.fontSize.sm,
-            padding: `${currentTheme.spacing.sm} ${currentTheme.spacing.md}`,
-            transition: TRANSITION_ALL,
-            width: "100%",
-        }),
-        [
-            currentTheme,
-            getBackgroundClass,
-            getBorderClass,
-            getTextClass,
-        ]
-    );
+    const styles = useThemedControlStyles({
+        currentTheme,
+        disabled,
+        fluid: true,
+        getBackgroundClass,
+        getBorderClass,
+        getTextClass,
+        tone: "default",
+    });
     return (
         <input
             aria-describedby={ariaDescribedBy}

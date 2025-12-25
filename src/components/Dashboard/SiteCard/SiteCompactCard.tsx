@@ -18,12 +18,12 @@ import {
     getMonitorDisplayIdentifier,
     getMonitorTypeDisplayLabel,
 } from "../../../utils/fallbacks";
-import { getMonitorRuntimeSummary } from "../../../utils/monitoring/monitorRuntime";
 import { toSentenceCase } from "../../../utils/text/toSentenceCase";
 import {
     MarqueeText,
     type MarqueeTextProperties,
 } from "../../common/MarqueeText/MarqueeText";
+import { useDashboardSiteSummaryMeta } from "../shared/useDashboardSiteSummaryMeta";
 import { ActionButtonGroup } from "./components/ActionButtonGroup";
 import { MonitorSelector } from "./components/MonitorSelector";
 import "./SiteCompactCard.css";
@@ -60,11 +60,6 @@ export const SiteCompactCard: NamedExoticComponent<SiteCompactCardProperties> =
             uptime,
         } = useSite(site);
 
-        const marqueeDependencies = useMemo(
-            () => [latestSite.name, site.identifier],
-            [latestSite.name, site.identifier]
-        );
-
         const marqueeTextProps = useMemo<
             NonNullable<MarqueeTextProperties["textProps"]>
         >(
@@ -77,12 +72,14 @@ export const SiteCompactCard: NamedExoticComponent<SiteCompactCardProperties> =
 
         const {
             allRunning: allMonitorsRunning,
+            marqueeDependencies,
             runningCount: runningMonitors,
             totalCount: totalMonitors,
-        } = useMemo(
-            () => getMonitorRuntimeSummary(latestSite.monitors),
-            [latestSite.monitors]
-        );
+        } = useDashboardSiteSummaryMeta(useMemo(() => ({
+            latestSiteName: latestSite.name,
+            monitors: latestSite.monitors,
+            siteIdentifier: site.identifier,
+        }), [latestSite.monitors, latestSite.name, site.identifier]));
 
         const monitorSummary = useMemo(() => {
             if (!monitor) {

@@ -68,13 +68,9 @@ import {
 
 import type { UptimeEvents } from "../events/eventTypes";
 import type { TypedEventBus } from "../events/TypedEventBus";
-import type { DatabaseService } from "../services/database/DatabaseService";
-import type { HistoryRepository } from "../services/database/HistoryRepository";
-import type { MonitorRepository } from "../services/database/MonitorRepository";
-import type { SettingsRepository } from "../services/database/SettingsRepository";
-import type { SiteRepository } from "../services/database/SiteRepository";
 import type { MonitoringConfig } from "../utils/database/interfaces";
 import type { ConfigurationManager } from "./ConfigurationManager";
+import type { SiteManagerRepositories } from "./databaseRepositorySets";
 
 import { StandardizedCache } from "../utils/cache/StandardizedCache";
 import { LoggerAdapter } from "../utils/database/serviceFactory";
@@ -150,19 +146,19 @@ export interface SiteManagerDependencies {
     /** Configuration manager for business rules and validation. */
     configurationManager: ConfigurationManager;
     /** Database service for transaction management. */
-    databaseService: DatabaseService;
+    databaseService: SiteManagerRepositories["databaseService"];
     /** Event emitter for system-wide communication. */
     eventEmitter: TypedEventBus<UptimeEvents>;
     /** History repository for status history management. */
-    historyRepository: HistoryRepository;
+    historyRepository: SiteManagerRepositories["historyRepository"];
     /** Optional MonitorManager dependency for coordinated operations. */
     monitoringOperations?: IMonitoringOperations;
     /** Monitor repository for monitor-related operations. */
-    monitorRepository: MonitorRepository;
+    monitorRepository: SiteManagerRepositories["monitorRepository"];
     /** Settings repository for configuration management. */
-    settingsRepository: SettingsRepository;
+    settingsRepository: SiteManagerRepositories["settingsRepository"];
     /** Site repository for database operations. */
-    siteRepository: SiteRepository;
+    siteRepository: SiteManagerRepositories["siteRepository"];
 }
 
 interface UpdateSitesCacheOptions {
@@ -200,18 +196,7 @@ export class SiteManager {
     private readonly monitoringOperations: IMonitoringOperations | undefined;
 
     /** Collection of repository and service dependencies for data access */
-    private readonly repositories: {
-        /** Database service for transactional operations */
-        databaseService: DatabaseService;
-        /** Repository for managing status history records */
-        historyRepository: HistoryRepository;
-        /** Repository for managing monitor configuration and data */
-        monitorRepository: MonitorRepository;
-        /** Repository for managing application settings */
-        settingsRepository: SettingsRepository;
-        /** Repository for managing site configuration and data */
-        siteRepository: SiteRepository;
-    };
+    private readonly repositories: SiteManagerRepositories;
 
     /** Service for reading site data from repositories */
     private readonly siteRepositoryService: SiteRepositoryService;

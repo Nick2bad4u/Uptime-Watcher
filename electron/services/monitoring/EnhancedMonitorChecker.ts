@@ -44,13 +44,7 @@ import {
     LOG_TEMPLATES,
 } from "@shared/utils/logTemplates";
 
-import type { UptimeEvents } from "../../events/eventTypes";
-import type { TypedEventBus } from "../../events/TypedEventBus";
-import type { StandardizedCache } from "../../utils/cache/StandardizedCache";
-import type { HistoryRepository } from "../database/HistoryRepository";
-import type { MonitorRepository } from "../database/MonitorRepository";
-import type { SiteRepository } from "../database/SiteRepository";
-import type { MonitorOperationRegistry } from "./MonitorOperationRegistry";
+import type { EnhancedMonitoringDependencies } from "./EnhancedMonitoringDependencies";
 import type {
     MonitorStatusUpdateService,
     StatusUpdateMonitorCheckResult,
@@ -98,77 +92,8 @@ import {
  *
  * @public
  */
-export interface EnhancedMonitorCheckConfig {
-    /**
-     * Event emitter for system-wide communication and monitor event
-     * propagation.
-     *
-     * @remarks
-     * Used to emit monitor status changes, operation events, and other
-     * monitoring-related notifications throughout the application.
-     */
-    eventEmitter: TypedEventBus<UptimeEvents>;
-
-    /**
-     * Function to get the maximum number of history entries to keep for each
-     * monitor.
-     *
-     * @remarks
-     * This function provides the current history limit setting, which may
-     * change during runtime based on user configuration or system constraints.
-     *
-     * @returns The maximum number of status history entries to retain
-     */
-    getHistoryLimit: () => number;
-
-    /**
-     * Repository for history operations and status history management.
-     *
-     * @remarks
-     * Handles persistence and retrieval of monitor status history entries,
-     * including automatic pruning based on the configured history limit.
-     */
-    historyRepository: HistoryRepository;
-
-    /**
-     * Repository for monitor entity operations and status updates.
-     *
-     * @remarks
-     * Manages monitor entity persistence, updates monitor status and
-     * configuration, and handles monitor-related database operations.
-     */
-    monitorRepository: MonitorRepository;
-
-    /**
-     * Operation registry for correlation and race condition prevention.
-     *
-     * @remarks
-     * Tracks active monitor operations to prevent concurrent checks on the same
-     * monitor and provides operation correlation for debugging and state
-     * management.
-     */
-    operationRegistry: MonitorOperationRegistry;
-
-    /**
-     * Repository for site entity operations and site-monitor relationships.
-     *
-     * @remarks
-     * Handles site entity persistence and manages the relationship between
-     * sites and their associated monitors.
-     */
-    siteRepository: SiteRepository;
-
-    /**
-     * Sites cache for quick access to site and monitor data without database
-     * queries.
-     *
-     * @remarks
-     * Provides fast, in-memory access to site configurations and monitor
-     * definitions, reducing database load during frequent monitoring
-     * operations.
-     */
-    sites: StandardizedCache<Site>;
-
+export interface EnhancedMonitorCheckConfig
+    extends EnhancedMonitoringDependencies {
     /**
      * Status update service for safe concurrent status updates.
      *

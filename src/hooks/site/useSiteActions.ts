@@ -19,6 +19,22 @@ import { logger } from "../../services/logger";
 import { useSitesStore } from "../../stores/sites/useSitesStore";
 import { useUIStore } from "../../stores/ui/useUiStore";
 
+function runLoggedSiteOperation(args: {
+    readonly onSuccess: () => void;
+    readonly operation: () => Promise<void>;
+    readonly siteIdentifier: string;
+}): void {
+    // Fire-and-forget: actions may outlive the component that initiated them.
+    void (async (): Promise<void> => {
+        try {
+            await args.operation();
+            args.onSuccess();
+        } catch (error) {
+            logger.site.error(args.siteIdentifier, ensureError(error));
+        }
+    })();
+}
+
 /**
  * Result interface for the useSiteActions hook.
  *
@@ -146,19 +162,18 @@ export function useSiteActions(
             return;
         }
 
-        void (async (): Promise<void> => {
-            try {
-                await startSiteMonitorMonitoring(site.identifier, monitor.id);
-                logger.user.action("Started site monitoring", {
+        runLoggedSiteOperation({
+            onSuccess: () =>
+                { logger.user.action("Started site monitoring", {
                     monitorId: monitor.id,
                     monitorType: monitor.type,
                     siteIdentifier: site.identifier,
                     siteName: site.name,
-                });
-            } catch (error) {
-                logger.site.error(site.identifier, ensureError(error));
-            }
-        })();
+                }); },
+            operation: () =>
+                startSiteMonitorMonitoring(site.identifier, monitor.id),
+            siteIdentifier: site.identifier,
+        });
     }, [
         monitor,
         site.identifier,
@@ -180,19 +195,18 @@ export function useSiteActions(
             return;
         }
 
-        void (async (): Promise<void> => {
-            try {
-                await stopSiteMonitorMonitoring(site.identifier, monitor.id);
-                logger.user.action("Stopped site monitoring", {
+        runLoggedSiteOperation({
+            onSuccess: () =>
+                { logger.user.action("Stopped site monitoring", {
                     monitorId: monitor.id,
                     monitorType: monitor.type,
                     siteIdentifier: site.identifier,
                     siteName: site.name,
-                });
-            } catch (error) {
-                logger.site.error(site.identifier, ensureError(error));
-            }
-        })();
+                }); },
+            operation: () =>
+                stopSiteMonitorMonitoring(site.identifier, monitor.id),
+            siteIdentifier: site.identifier,
+        });
     }, [
         monitor,
         site.identifier,
@@ -202,18 +216,16 @@ export function useSiteActions(
 
     // Start monitoring for all monitors in the site with proper logging
     const handleStartSiteMonitoring = useCallback((): void => {
-        void (async (): Promise<void> => {
-            try {
-                await startSiteMonitoring(site.identifier);
-                logger.user.action("Started site-wide monitoring", {
+        runLoggedSiteOperation({
+            onSuccess: () =>
+                { logger.user.action("Started site-wide monitoring", {
                     monitorsCount: site.monitors.length,
                     siteIdentifier: site.identifier,
                     siteName: site.name,
-                });
-            } catch (error) {
-                logger.site.error(site.identifier, ensureError(error));
-            }
-        })();
+                }); },
+            operation: () => startSiteMonitoring(site.identifier),
+            siteIdentifier: site.identifier,
+        });
     }, [
         site.identifier,
         site.monitors.length,
@@ -223,18 +235,16 @@ export function useSiteActions(
 
     // Stop monitoring for all monitors in the site with proper logging
     const handleStopSiteMonitoring = useCallback((): void => {
-        void (async (): Promise<void> => {
-            try {
-                await stopSiteMonitoring(site.identifier);
-                logger.user.action("Stopped site-wide monitoring", {
+        runLoggedSiteOperation({
+            onSuccess: () =>
+                { logger.user.action("Stopped site-wide monitoring", {
                     monitorsCount: site.monitors.length,
                     siteIdentifier: site.identifier,
                     siteName: site.name,
-                });
-            } catch (error) {
-                logger.site.error(site.identifier, ensureError(error));
-            }
-        })();
+                }); },
+            operation: () => stopSiteMonitoring(site.identifier),
+            siteIdentifier: site.identifier,
+        });
     }, [
         site.identifier,
         site.monitors.length,

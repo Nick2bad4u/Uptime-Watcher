@@ -882,7 +882,9 @@ describe("Shared Safe Conversions - Backend Coverage", () => {
 
                         expect(typeof result).toBe("number");
                         if (Number.isFinite(result)) {
-                            expect(result).toBeGreaterThan(0); // Changed from >=1000 to >0 based on implementation
+                            expect(result).toBeGreaterThanOrEqual(
+                                MIN_TIMEOUT_MILLISECONDS
+                            );
                         }
 
                         const numValue =

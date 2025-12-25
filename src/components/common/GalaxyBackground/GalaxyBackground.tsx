@@ -87,6 +87,22 @@ function createAtmospherePlanetGradientIds(uniquePrefix: string): {
     };
 }
 
+function createPlanetHighlightGradient(args: {
+    readonly cx: string;
+    readonly cy: string;
+    readonly id: string;
+    readonly r: string;
+}): React.ReactElement {
+    const { cx, cy, id, r } = args;
+
+    return (
+        <radialGradient cx={cx} cy={cy} id={id} r={r}>
+            <stop offset="0%" stopColor="rgb(255 255 255)" />
+            <stop offset="100%" stopColor="rgb(255 255 255 / 0)" />
+        </radialGradient>
+    );
+}
+
 export const GalaxyBackground: React.FC<GalaxyBackgroundProperties> = ({
     className = "",
     isDark = true,
@@ -307,21 +323,12 @@ export const GalaxyBackground: React.FC<GalaxyBackgroundProperties> = ({
                                     stopColor="rgb(59 130 246 / 0.15)"
                                 />
                             </linearGradient>
-                            <radialGradient
-                                cx="0.25"
-                                cy="0.2"
-                                id={planetOneIds.highlight}
-                                r="0.5"
-                            >
-                                <stop
-                                    offset="0%"
-                                    stopColor="rgb(255 255 255)"
-                                />
-                                <stop
-                                    offset="100%"
-                                    stopColor="rgb(255 255 255 / 0)"
-                                />
-                            </radialGradient>
+                            {createPlanetHighlightGradient({
+                                cx: "0.25",
+                                cy: "0.2",
+                                id: planetOneIds.highlight,
+                                r: "0.5",
+                            })}
                         </defs>
                         <circle
                             cx="70"
@@ -485,21 +492,12 @@ export const GalaxyBackground: React.FC<GalaxyBackgroundProperties> = ({
                                     stopColor="rgb(255 255 255 / 0.08)"
                                 />
                             </linearGradient>
-                            <radialGradient
-                                cx="0.3"
-                                cy="0.25"
-                                id={planetTwoIds.highlight}
-                                r="0.5"
-                            >
-                                <stop
-                                    offset="0%"
-                                    stopColor="rgb(255 255 255)"
-                                />
-                                <stop
-                                    offset="100%"
-                                    stopColor="rgb(255 255 255 / 0)"
-                                />
-                            </radialGradient>
+                            {createPlanetHighlightGradient({
+                                cx: "0.3",
+                                cy: "0.25",
+                                id: planetTwoIds.highlight,
+                                r: "0.5",
+                            })}
                         </defs>
                         <circle
                             cx="60"
@@ -600,21 +598,12 @@ export const GalaxyBackground: React.FC<GalaxyBackgroundProperties> = ({
                                     stopColor="rgb(22 163 74)"
                                 />
                             </radialGradient>
-                            <radialGradient
-                                cx="0.25"
-                                cy="0.2"
-                                id={planetThreeIds.highlight}
-                                r="0.5"
-                            >
-                                <stop
-                                    offset="0%"
-                                    stopColor="rgb(255 255 255)"
-                                />
-                                <stop
-                                    offset="100%"
-                                    stopColor="rgb(255 255 255 / 0)"
-                                />
-                            </radialGradient>
+                                {createPlanetHighlightGradient({
+                                    cx: "0.25",
+                                    cy: "0.2",
+                                    id: planetThreeIds.highlight,
+                                    r: "0.5",
+                                })}
                             <radialGradient
                                 cx="0.5"
                                 cy="0.5"

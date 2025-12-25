@@ -12,6 +12,7 @@ import type { Monitor, Site, StatusUpdate } from "@shared/types";
 
 import { ensureError, withErrorHandling } from "@shared/utils/errorHandling";
 
+import type { SiteMonitoringActions } from "./types";
 import type { OptimisticMonitoringLock } from "./utils/optimisticMonitoringLock";
 import type { StatusUpdateSnapshotPayload } from "./utils/statusUpdateSnapshot";
 
@@ -20,35 +21,6 @@ import { MonitoringService } from "../../services/MonitoringService";
 import { logStoreAction } from "../utils";
 import { createStoreErrorHandler } from "../utils/storeErrorHandling";
 import { applyStatusUpdateSnapshot } from "./utils/statusUpdateSnapshot";
-
-/**
- * Site monitoring actions interface for managing monitoring operations.
- *
- * @remarks
- * Defines the contract for site monitoring functionality including manual
- * checks and monitoring lifecycle management for sites and individual
- * monitors.
- *
- * @public
- */
-export interface SiteMonitoringActions {
-    /** Check a site now */
-    checkSiteNow: (siteIdentifier: string, monitorId: string) => Promise<void>;
-    /** Start monitoring for all monitors of a site */
-    startSiteMonitoring: (siteIdentifier: string) => Promise<void>;
-    /** Start monitoring for a site monitor */
-    startSiteMonitorMonitoring: (
-        siteIdentifier: string,
-        monitorId: string
-    ) => Promise<void>;
-    /** Stop monitoring for all monitors of a site */
-    stopSiteMonitoring: (siteIdentifier: string) => Promise<void>;
-    /** Stop monitoring for a site monitor */
-    stopSiteMonitorMonitoring: (
-        siteIdentifier: string,
-        monitorId: string
-    ) => Promise<void>;
-}
 
 /**
  * External dependencies required for monitoring actions.

@@ -155,6 +155,25 @@ interface MonitorEditState {
     readonly userEditedTimeout?: number | undefined;
 }
 
+const DEFAULT_MONITOR_EDIT_STATE: MonitorEditState = {
+    intervalChanged: false,
+    retryAttemptsChanged: false,
+    timeoutChanged: false,
+};
+
+function updateMonitorEditStateById(args: {
+    readonly monitorId: string;
+    readonly previous: Record<string, MonitorEditState>;
+    readonly updater: (current: MonitorEditState) => MonitorEditState;
+}): Record<string, MonitorEditState> {
+    const current = args.previous[args.monitorId] ?? DEFAULT_MONITOR_EDIT_STATE;
+
+    return {
+        ...args.previous,
+        [args.monitorId]: args.updater(current),
+    };
+}
+
 /**
  * Executes a site-details operation and logs failures without rethrowing.
  *
@@ -303,11 +322,7 @@ export function useSiteDetails({
     const effectiveMonitorId = selectedMonitorId;
     const editStateForSelectedMonitor: MonitorEditState = (effectiveMonitorId
         ? monitorEditStateById[effectiveMonitorId]
-        : undefined) ?? {
-        intervalChanged: false,
-        retryAttemptsChanged: false,
-        timeoutChanged: false,
-    };
+        : undefined) ?? DEFAULT_MONITOR_EDIT_STATE;
 
     const {
         intervalChanged,
@@ -573,25 +588,18 @@ export function useSiteDetails({
                 e.target.value,
                 DEFAULT_CHECK_INTERVAL
             );
-            setMonitorEditStateById((previous) => {
-                const current: MonitorEditState = previous[
-                    selectedMonitorId
-                ] ?? {
-                    intervalChanged: false,
-                    retryAttemptsChanged: false,
-                    timeoutChanged: false,
-                };
-
-                return {
-                    ...previous,
-                    [selectedMonitorId]: {
+            setMonitorEditStateById((previous) =>
+                updateMonitorEditStateById({
+                    monitorId: selectedMonitorId,
+                    previous,
+                    updater: (current) => ({
                         ...current,
                         intervalChanged:
                             newInterval !== selectedMonitorCheckInterval,
                         userEditedCheckInterval: newInterval,
-                    },
-                };
-            });
+                    }),
+                })
+            );
         },
         [
             selectedMonitorCheckInterval,
@@ -624,22 +632,17 @@ export function useSiteDetails({
             selectedMonitorId,
             localCheckInterval
         );
-        setMonitorEditStateById((previous) => {
-            const current: MonitorEditState = previous[selectedMonitorId] ?? {
-                intervalChanged: false,
-                retryAttemptsChanged: false,
-                timeoutChanged: false,
-            };
-
-            return {
-                ...previous,
-                [selectedMonitorId]: {
+        setMonitorEditStateById((previous) =>
+            updateMonitorEditStateById({
+                monitorId: selectedMonitorId,
+                previous,
+                updater: (current) => ({
                     ...current,
                     intervalChanged: false,
                     userEditedCheckInterval: undefined,
-                },
-            };
-        });
+                }),
+            })
+        );
         logger.user.action("Updated check interval", {
             monitorId: selectedMonitorId,
             newInterval: localCheckInterval,
@@ -666,25 +669,18 @@ export function useSiteDetails({
             const currentTimeoutInSeconds = getTimeoutSeconds(
                 selectedMonitorTimeout
             );
-            setMonitorEditStateById((previous) => {
-                const current: MonitorEditState = previous[
-                    selectedMonitorId
-                ] ?? {
-                    intervalChanged: false,
-                    retryAttemptsChanged: false,
-                    timeoutChanged: false,
-                };
-
-                return {
-                    ...previous,
-                    [selectedMonitorId]: {
+            setMonitorEditStateById((previous) =>
+                updateMonitorEditStateById({
+                    monitorId: selectedMonitorId,
+                    previous,
+                    updater: (current) => ({
                         ...current,
                         timeoutChanged:
                             timeoutInSeconds !== currentTimeoutInSeconds,
                         userEditedTimeout: timeoutInSeconds,
-                    },
-                };
-            });
+                    }),
+                })
+            );
         },
         [
             selectedMonitorId,
@@ -718,22 +714,17 @@ export function useSiteDetails({
             selectedMonitorId,
             timeoutInMs
         );
-        setMonitorEditStateById((previous) => {
-            const current: MonitorEditState = previous[selectedMonitorId] ?? {
-                intervalChanged: false,
-                retryAttemptsChanged: false,
-                timeoutChanged: false,
-            };
-
-            return {
-                ...previous,
-                [selectedMonitorId]: {
+        setMonitorEditStateById((previous) =>
+            updateMonitorEditStateById({
+                monitorId: selectedMonitorId,
+                previous,
+                updater: (current) => ({
                     ...current,
                     timeoutChanged: false,
                     userEditedTimeout: undefined,
-                },
-            };
-        });
+                }),
+            })
+        );
         logger.user.action("Updated monitor timeout", {
             monitorId: selectedMonitorId,
             newTimeout: timeoutInMs,
@@ -753,25 +744,18 @@ export function useSiteDetails({
         (e: ChangeEvent<HTMLInputElement>): void => {
             const retryAttempts = safeInteger(e.target.value, 3);
             const currentRetryAttempts = selectedMonitorRetryAttempts ?? 0;
-            setMonitorEditStateById((previous) => {
-                const current: MonitorEditState = previous[
-                    selectedMonitorId
-                ] ?? {
-                    intervalChanged: false,
-                    retryAttemptsChanged: false,
-                    timeoutChanged: false,
-                };
-
-                return {
-                    ...previous,
-                    [selectedMonitorId]: {
+            setMonitorEditStateById((previous) =>
+                updateMonitorEditStateById({
+                    monitorId: selectedMonitorId,
+                    previous,
+                    updater: (current) => ({
                         ...current,
                         retryAttemptsChanged:
                             retryAttempts !== currentRetryAttempts,
                         userEditedRetryAttempts: retryAttempts,
-                    },
-                };
-            });
+                    }),
+                })
+            );
         },
         [
             selectedMonitorId,
@@ -806,22 +790,17 @@ export function useSiteDetails({
             selectedMonitorId,
             localRetryAttempts
         );
-        setMonitorEditStateById((previous) => {
-            const current: MonitorEditState = previous[selectedMonitorId] ?? {
-                intervalChanged: false,
-                retryAttemptsChanged: false,
-                timeoutChanged: false,
-            };
-
-            return {
-                ...previous,
-                [selectedMonitorId]: {
+        setMonitorEditStateById((previous) =>
+            updateMonitorEditStateById({
+                monitorId: selectedMonitorId,
+                previous,
+                updater: (current) => ({
                     ...current,
                     retryAttemptsChanged: false,
                     userEditedRetryAttempts: undefined,
-                },
-            };
-        });
+                }),
+            })
+        );
         logger.user.action("Updated monitor retry attempts", {
             monitorId: selectedMonitorId,
             newRetryAttempts: localRetryAttempts,

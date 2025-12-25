@@ -55,17 +55,13 @@ import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 
 import type { UptimeEvents } from "../events/eventTypes";
 import type { TypedEventBus } from "../events/TypedEventBus";
-import type { DatabaseService } from "../services/database/DatabaseService";
-import type { HistoryRepository } from "../services/database/HistoryRepository";
-import type { MonitorRepository } from "../services/database/MonitorRepository";
-import type { SettingsRepository } from "../services/database/SettingsRepository";
-import type { SiteRepository } from "../services/database/SiteRepository";
 import type {
     DatabaseBackupResult,
     DatabaseRestorePayload,
     DatabaseRestoreSummary,
 } from "../services/database/utils/databaseBackup";
 import type { ConfigurationManager } from "./ConfigurationManager";
+import type { DatabaseManagerRepositories } from "./databaseRepositorySets";
 
 import { DEFAULT_HISTORY_LIMIT } from "../constants";
 import {
@@ -99,18 +95,7 @@ export interface DatabaseManagerDependencies {
     /** The typed event emitter for system-wide coordination. */
     eventEmitter: TypedEventBus<UptimeEvents>;
     /** The set of repositories used for all database operations. */
-    repositories: {
-        /** The main database service. */
-        database: DatabaseService;
-        /** Repository for status history. */
-        history: HistoryRepository;
-        /** Repository for monitor data. */
-        monitor: MonitorRepository;
-        /** Repository for application settings. */
-        settings: SettingsRepository;
-        /** Repository for site data. */
-        site: SiteRepository;
-    };
+    repositories: DatabaseManagerRepositories;
 }
 
 /**

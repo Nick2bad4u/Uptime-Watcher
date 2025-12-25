@@ -67,6 +67,8 @@ export type FormSubmitProperties = Simplify<
     AddSiteFormState &
         Pick<AddSiteFormActions, "setFormError"> &
         StoreActions & {
+            /** Precomputed monitor validation field map. */
+            dynamicFieldValues?: MonitorValidationFields;
             /** UUID generator function for creating unique identifiers */
             generateUuid: () => string;
             /** Logger instance for debugging and error tracking */
@@ -529,6 +531,7 @@ export async function handleSubmit(
         certificateWarningDays,
         checkInterval,
         clearError,
+        dynamicFieldValues,
         edgeLocations,
         expectedHeaderValue,
         expectedJsonValue,
@@ -557,6 +560,50 @@ export async function handleSubmit(
         setFormError,
         url,
     } = properties;
+
+    const monitorValidationFields: MonitorValidationFields =
+        dynamicFieldValues ?? {
+
+                baselineUrl,
+                bodyKeyword,
+                certificateWarningDays,
+                edgeLocations
+            ,
+
+                expectedHeaderValue,
+                expectedJsonValue,
+                expectedStatusCode
+            ,
+
+                expectedValue,
+                headerName,
+                heartbeatExpectedStatus
+            ,
+
+                heartbeatMaxDriftSeconds,
+                heartbeatStatusField
+            ,
+
+                heartbeatTimestampField,
+                host,
+                jsonPath
+            ,
+
+                maxPongDelayMs
+            ,
+
+                maxReplicationLagSeconds,
+                maxResponseTime,
+                port,
+                primaryStatusUrl
+            ,
+
+                recordType,
+                replicaStatusUrl,
+                replicationTimestampField,
+                url
+            ,
+        };
 
     event.preventDefault();
     setFormError("");
@@ -620,32 +667,7 @@ export async function handleSubmit(
 
     // Collect asynchronous validation errors
     const validationErrors: string[] = [
-        ...(await validateMonitorType(monitorType, {
-            baselineUrl,
-            bodyKeyword,
-            certificateWarningDays,
-            edgeLocations,
-            expectedHeaderValue,
-            expectedJsonValue,
-            expectedStatusCode,
-            expectedValue,
-            headerName,
-            heartbeatExpectedStatus,
-            heartbeatMaxDriftSeconds,
-            heartbeatStatusField,
-            heartbeatTimestampField,
-            host,
-            jsonPath,
-            maxPongDelayMs,
-            maxReplicationLagSeconds,
-            maxResponseTime,
-            port,
-            primaryStatusUrl,
-            recordType,
-            replicaStatusUrl,
-            replicationTimestampField,
-            url,
-        })),
+        ...(await validateMonitorType(monitorType, monitorValidationFields)),
         ...(await validateCheckInterval(monitorType, checkInterval)),
     ];
     logger.debug("AddSiteForm validation results", {

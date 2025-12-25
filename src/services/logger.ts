@@ -144,21 +144,50 @@ const buildFinalArgs = (
         ? [logArgs[0], context, ...logArgs.slice(1)]
         : Array.from(logArgs);
 
-// Create base logger methods
-const baseLoggerMethods = {
-    // Debug level - for development debugging
-    debug: (message: string, ...args: unknown[]): void => {
-        const { context, remaining } = extractLogContext(args, "debug");
+type LogMethodName = "debug" | "error" | "info" | "silly" | "verbose" | "warn";
+
+const isInvoke = (value: unknown): value is (...arguments_: unknown[]) => void =>
+    typeof value === "function";
+
+const noopInvoke = (): void => {
+    // no-op
+};
+
+const getLogInvoke = (name: LogMethodName): ((...arguments_: unknown[]) => void) => {
+    const candidate = Reflect.get(log, name);
+    if (isInvoke(candidate)) {
+        return candidate;
+    }
+
+    // Some builds of electron-log/renderer may not expose silly/verbose.
+    const fallback = Reflect.get(log, "debug");
+    return isInvoke(fallback) ? fallback : noopInvoke;
+};
+
+type ExtractLogContextLevel = Parameters<typeof extractLogContext>[1];
+
+type StandardLogMethod = (message: string, ...args: unknown[]) => void;
+type ErrorLogMethod = (message: string, error?: unknown, ...args: unknown[]) => void;
+
+const createStandardLogMethod = (
+    invoke: (...arguments_: unknown[]) => void,
+    extractLevel: ExtractLogContextLevel
+): StandardLogMethod =>
+    (message: string, ...args: unknown[]): void => {
+        const { context, remaining } = extractLogContext(args, extractLevel);
         const logArgs = buildLogArguments(
             RENDERER_LOG_PREFIX,
             message,
             remaining
         );
         const finalArgs = buildFinalArgs(logArgs, context);
-        safeInvoke(log.debug.bind(log), finalArgs);
-    },
-    // Error level - errors that should be investigated
-    error: (message: string, error?: unknown, ...args: unknown[]): void => {
+        safeInvoke(invoke, finalArgs);
+    };
+
+const createErrorLogMethod = (
+    invoke: (...arguments_: unknown[]) => void
+): ErrorLogMethod =>
+    (message: string, error?: unknown, ...args: unknown[]): void => {
         const { context, remaining } = extractLogContext(args, "error");
         const logArgs = buildErrorLogArguments(
             RENDERER_LOG_PREFIX,
@@ -166,53 +195,19 @@ const baseLoggerMethods = {
             error,
             remaining
         );
-            const finalArgs = buildFinalArgs(logArgs, context);
-        safeInvoke(log.error.bind(log), finalArgs);
-    },
-    // Info level - general application flow
-    info: (message: string, ...args: unknown[]): void => {
-        const { context, remaining } = extractLogContext(args, "info");
-        const logArgs = buildLogArguments(
-            RENDERER_LOG_PREFIX,
-            message,
-            remaining
-        );
         const finalArgs = buildFinalArgs(logArgs, context);
-        safeInvoke(log.info.bind(log), finalArgs);
-    },
-    // Silly level - extremely detailed debugging
-    silly: (message: string, ...args: unknown[]): void => {
-        const { context, remaining } = extractLogContext(args, "debug");
-        const logArgs = buildLogArguments(
-            RENDERER_LOG_PREFIX,
-            message,
-            remaining
-        );
-        const finalArgs = buildFinalArgs(logArgs, context);
-        safeInvoke(log.silly.bind(log), finalArgs);
-    },
-    // Verbose level - very detailed debugging
-    verbose: (message: string, ...args: unknown[]): void => {
-        const { context, remaining } = extractLogContext(args, "debug");
-        const logArgs = buildLogArguments(
-            RENDERER_LOG_PREFIX,
-            message,
-            remaining
-        );
-        const finalArgs = buildFinalArgs(logArgs, context);
-        safeInvoke(log.verbose.bind(log), finalArgs);
-    },
-    // Warn level - potential issues needing attention
-    warn: (message: string, ...args: unknown[]): void => {
-        const { context, remaining } = extractLogContext(args, "warn");
-        const logArgs = buildLogArguments(
-            RENDERER_LOG_PREFIX,
-            message,
-            remaining
-        );
-        const finalArgs = buildFinalArgs(logArgs, context);
-        safeInvoke(log.warn.bind(log), finalArgs);
-    },
+        safeInvoke(invoke, finalArgs);
+    };
+
+// Create base logger methods
+const baseLoggerMethods = {
+    debug: createStandardLogMethod(getLogInvoke("debug"), "debug"),
+    error: createErrorLogMethod(getLogInvoke("error")),
+    info: createStandardLogMethod(getLogInvoke("info"), "info"),
+    // Preserve existing behavior: silly/verbose extract context using "debug".
+    silly: createStandardLogMethod(getLogInvoke("silly"), "debug"),
+    verbose: createStandardLogMethod(getLogInvoke("verbose"), "debug"),
+    warn: createStandardLogMethod(getLogInvoke("warn"), "warn"),
 };
 
 // Create logger with app context
