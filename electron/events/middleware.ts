@@ -12,6 +12,7 @@
 import { isDevelopment } from "@shared/utils/environment";
 import { ensureError } from "@shared/utils/errorHandling";
 import { collectOwnPropertyValuesSafely } from "@shared/utils/objectIntrospection";
+import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 
 import type { EventKey, EventMiddleware, TypedEventMap } from "./TypedEventBus";
 
@@ -140,8 +141,7 @@ function safeSerialize(data: unknown): string {
         try {
             return JSON.stringify(data);
         } catch (error) {
-            const message =
-                error instanceof Error ? error.message : String(error);
+            const message = getUserFacingErrorDetail(error);
             return `${NON_SERIALIZABLE_PLACEHOLDER}: ${message}`;
         }
     }

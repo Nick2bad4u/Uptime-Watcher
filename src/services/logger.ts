@@ -136,6 +136,14 @@ const safeInvoke = (
     }
 };
 
+const buildFinalArgs = (
+    logArgs: readonly unknown[],
+    context: unknown
+): readonly unknown[] =>
+    context
+        ? [logArgs[0], context, ...logArgs.slice(1)]
+        : Array.from(logArgs);
+
 // Create base logger methods
 const baseLoggerMethods = {
     // Debug level - for development debugging
@@ -146,13 +154,7 @@ const baseLoggerMethods = {
             message,
             remaining
         );
-        const finalArgs = context
-            ? [
-                  logArgs[0],
-                  context,
-                  ...logArgs.slice(1),
-              ]
-            : Array.from(logArgs);
+        const finalArgs = buildFinalArgs(logArgs, context);
         safeInvoke(log.debug.bind(log), finalArgs);
     },
     // Error level - errors that should be investigated
@@ -164,13 +166,7 @@ const baseLoggerMethods = {
             error,
             remaining
         );
-        const finalArgs = context
-            ? [
-                  logArgs[0],
-                  context,
-                  ...logArgs.slice(1),
-              ]
-            : Array.from(logArgs);
+            const finalArgs = buildFinalArgs(logArgs, context);
         safeInvoke(log.error.bind(log), finalArgs);
     },
     // Info level - general application flow
@@ -181,13 +177,7 @@ const baseLoggerMethods = {
             message,
             remaining
         );
-        const finalArgs = context
-            ? [
-                  logArgs[0],
-                  context,
-                  ...logArgs.slice(1),
-              ]
-            : Array.from(logArgs);
+        const finalArgs = buildFinalArgs(logArgs, context);
         safeInvoke(log.info.bind(log), finalArgs);
     },
     // Silly level - extremely detailed debugging
@@ -198,13 +188,7 @@ const baseLoggerMethods = {
             message,
             remaining
         );
-        const finalArgs = context
-            ? [
-                  logArgs[0],
-                  context,
-                  ...logArgs.slice(1),
-              ]
-            : Array.from(logArgs);
+        const finalArgs = buildFinalArgs(logArgs, context);
         safeInvoke(log.silly.bind(log), finalArgs);
     },
     // Verbose level - very detailed debugging
@@ -215,13 +199,7 @@ const baseLoggerMethods = {
             message,
             remaining
         );
-        const finalArgs = context
-            ? [
-                  logArgs[0],
-                  context,
-                  ...logArgs.slice(1),
-              ]
-            : Array.from(logArgs);
+        const finalArgs = buildFinalArgs(logArgs, context);
         safeInvoke(log.verbose.bind(log), finalArgs);
     },
     // Warn level - potential issues needing attention
@@ -232,13 +210,7 @@ const baseLoggerMethods = {
             message,
             remaining
         );
-        const finalArgs = context
-            ? [
-                  logArgs[0],
-                  context,
-                  ...logArgs.slice(1),
-              ]
-            : Array.from(logArgs);
+        const finalArgs = buildFinalArgs(logArgs, context);
         safeInvoke(log.warn.bind(log), finalArgs);
     },
 };

@@ -1,5 +1,3 @@
-import type { CloudBackupEntry } from "@shared/types/cloud";
-import type { SerializedDatabaseBackupMetadata } from "@shared/types/databaseBackup";
 import type { DropboxResponse, files, users } from "dropbox";
 
 import { ensureError } from "@shared/utils/errorHandling";
@@ -12,11 +10,8 @@ import type {
 } from "../CloudStorageProvider.types";
 import type { DropboxTokenManager } from "./DropboxTokenManager";
 
-import {
-    downloadBackupWithMetadata,
-    uploadBackupWithMetadata,
-} from "../cloudBackupIo";
-import { listBackupsFromMetadataObjects } from "../cloudBackupListing";
+import { normalizeCloudObjectKey } from "../../cloudKeyNormalization";
+import { BaseCloudStorageProvider } from "../BaseCloudStorageProvider";
 import { withDropboxRetry } from "./dropboxRetry";
 
 /**
@@ -50,21 +45,11 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 }
 
 function normalizeKey(key: string): string {
-    // Normalize to POSIX-style keys.
-    let normalized = key.replaceAll("\\", "/").trim();
-
-    // Drop leading slashes to prevent accidental double-slash paths.
-    normalized = normalized.replace(/^\/+/u, "");
-
-    // Collapse duplicate separators.
-    normalized = normalized.replaceAll(/\/+/gu, "/");
-
-    // Disallow traversal segments.
-    if (normalized.split("/").includes("..")) {
-        throw new Error("Invalid Dropbox key (path traversal segment)");
-    }
-
-    return normalized;
+    return normalizeCloudObjectKey(key, {
+        allowEmpty: true,
+        forbidTraversalSegments: true,
+        stripLeadingSlashes: true,
+    });
 }
 
 function toDropboxPath(key: string): string {
@@ -266,7 +251,10 @@ async function convertDropboxDownloadedResultToBuffer(
  * {@link DropboxTokenManager}. All app objects are stored under
  * `/${APP_ROOT_DIRECTORY_NAME}/`.
  */
-export class DropboxCloudStorageProvider implements CloudStorageProvider {
+export class DropboxCloudStorageProvider
+    extends BaseCloudStorageProvider
+    implements CloudStorageProvider
+{
     public readonly kind = "dropbox" as const;
 
     private readonly tokenManager: DropboxTokenManager;
@@ -517,40 +505,11 @@ export class DropboxCloudStorageProvider implements CloudStorageProvider {
         });
     }
 
-    public async listBackups(): Promise<CloudBackupEntry[]> {
-        const objects = await this.listObjects(BACKUPS_PREFIX);
-        return listBackupsFromMetadataObjects({
-            downloadObjectBuffer: async (key) => this.downloadObject(key),
-            objects,
-        });
-    }
-
-    public async uploadBackup(args: {
-        buffer: Buffer;
-        encrypted: boolean;
-        fileName: string;
-        metadata: SerializedDatabaseBackupMetadata;
-    }): Promise<CloudBackupEntry> {
-        return uploadBackupWithMetadata({
-            ...args,
-            backupsPrefix: BACKUPS_PREFIX,
-            uploadObject: (uploadArgs) => this.uploadObject(uploadArgs),
-        });
-    }
-
-    public async downloadBackup(
-        key: string
-    ): Promise<{ buffer: Buffer; entry: CloudBackupEntry }> {
-        return downloadBackupWithMetadata({
-            downloadObject: (downloadKey) => this.downloadObject(downloadKey),
-            key,
-        });
-    }
-
     public constructor(args: {
         clientFactory?: (accessToken: string) => DropboxSdkClient;
         tokenManager: DropboxTokenManager;
     }) {
+        super(BACKUPS_PREFIX);
         this.tokenManager = args.tokenManager;
 
         this.clientFactory =

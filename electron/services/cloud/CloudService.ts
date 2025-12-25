@@ -38,6 +38,7 @@ import type { CloudStorageProvider } from "./providers/CloudStorageProvider.type
 
 import { logger } from "../../utils/logger";
 import { ProviderCloudSyncTransport } from "../sync/ProviderCloudSyncTransport";
+import { normalizeCloudObjectKey } from "./cloudKeyNormalization";
 import {
     createKeyCheckBase64,
     decryptBuffer,
@@ -124,15 +125,15 @@ const BACKUP_KEY_PREFIX = "backups/" as const;
 const MAX_BACKUP_KEY_BYTES = 2048;
 
 function normalizeCloudKey(rawKey: string): string {
-    const normalized = rawKey.trim().replaceAll("\\", "/");
-
-    // Collapse redundant slashes deterministically without regex.
-    let collapsed = normalized;
-    while (collapsed.includes("//")) {
-        collapsed = collapsed.replaceAll("//", "/");
-    }
-
-    return collapsed;
+    return normalizeCloudObjectKey(rawKey, {
+        forbidAsciiControlCharacters: false,
+        // Preserve existing behavior: traversal segments are rejected later by
+        // assertBackupObjectKey.
+        forbidTraversalSegments: false,
+        // Preserve leading slashes so assertBackupObjectKey can reject absolute
+        // keys.
+        stripLeadingSlashes: false,
+    });
 }
 
 function assertBackupObjectKey(rawKey: string): string {

@@ -2,7 +2,6 @@
  * Segmented control allowing users to switch between site list layouts.
  */
 
-import type { IconType } from "react-icons";
 
 import {
     memo,
@@ -17,9 +16,10 @@ import type {
     SiteCardPresentation,
     SiteListLayoutMode,
 } from "../../../stores/ui/types";
+import type { ToggleGroupOption } from "./SiteListToggleGroup";
 
 import { AppIcons } from "../../../utils/icons";
-import { Tooltip } from "../../common/Tooltip/Tooltip";
+import { ToggleGroup } from "./SiteListToggleGroup";
 
 /**
  * Properties for {@link SiteListLayoutSelector}.
@@ -39,12 +39,7 @@ export interface SiteListLayoutSelectorProperties {
     readonly onPresentationChange: (presentation: SiteCardPresentation) => void;
 }
 
-interface LayoutOption {
-    readonly description: string;
-    readonly Icon: IconType;
-    readonly label: string;
-    readonly value: SiteListLayoutMode;
-}
+type LayoutOption = ToggleGroupOption<SiteListLayoutMode>;
 
 const LAYOUT_OPTIONS: readonly LayoutOption[] = [
     {
@@ -67,12 +62,7 @@ const LAYOUT_OPTIONS: readonly LayoutOption[] = [
     },
 ];
 
-interface PresentationOption {
-    readonly description: string;
-    readonly Icon: IconType;
-    readonly label: string;
-    readonly value: SiteCardPresentation;
-}
+type PresentationOption = ToggleGroupOption<SiteCardPresentation>;
 
 const PRESENTATION_OPTIONS: readonly PresentationOption[] = [
     {
@@ -89,12 +79,7 @@ const PRESENTATION_OPTIONS: readonly PresentationOption[] = [
     },
 ];
 
-interface DensityOption {
-    readonly description: string;
-    readonly Icon: IconType;
-    readonly label: string;
-    readonly value: InterfaceDensity;
-}
+type DensityOption = ToggleGroupOption<InterfaceDensity>;
 
 const DENSITY_OPTIONS: readonly DensityOption[] = [
     {
@@ -125,6 +110,18 @@ const isPresentationMode = (value: string): value is SiteCardPresentation =>
 
 const isDensityMode = (value: string): value is InterfaceDensity =>
     DENSITY_OPTIONS.some((option) => option.value === value);
+
+const getLayoutDataAttributes = (
+    value: SiteListLayoutMode
+): Record<string, string> => ({ "data-layout-mode": value });
+
+const getPresentationDataAttributes = (
+    value: SiteCardPresentation
+): Record<string, string> => ({ "data-presentation-mode": value });
+
+const getDensityDataAttributes = (value: InterfaceDensity): Record<string, string> => ({
+    "data-density-mode": value,
+});
 
 /**
  * Layout selector for the site list.
@@ -185,127 +182,51 @@ export const SiteListLayoutSelector: NamedExoticComponent<SiteListLayoutSelector
         );
 
         const layoutSegment = (
-            <div
-                aria-label="Card layout"
-                className="site-list__layout-options"
-                role="radiogroup"
-            >
-                {LAYOUT_OPTIONS.map((option) => {
-                    const { description, Icon, label, value } = option;
-                    const isActive = value === layout;
-                    return (
-                        <Tooltip
-                            content={description}
-                            key={value}
-                            position="bottom"
-                        >
-                            {(triggerProps) => (
-                                <button
-                                    aria-pressed={isActive}
-                                    className={
-                                        isActive
-                                            ? "site-list__layout-button site-list__layout-button--active"
-                                            : "site-list__layout-button"
-                                    }
-                                    data-layout-mode={value}
-                                    onClick={handleLayoutButtonClick}
-                                    type="button"
-                                    {...triggerProps}
-                                >
-                                    <Icon className="site-list__layout-icon" />
-                                    <span className="site-list__layout-label">
-                                        {label}
-                                    </span>
-                                </button>
-                            )}
-                        </Tooltip>
-                    );
-                })}
-            </div>
+            <ToggleGroup
+                ariaLabel="Card layout"
+                buttonClassName="site-list__layout-button"
+                buttonClassNameActive="site-list__layout-button--active"
+                containerClassName="site-list__layout-options"
+                getDataAttributes={getLayoutDataAttributes}
+                iconClassName="site-list__layout-icon"
+                labelClassName="site-list__layout-label"
+                onClick={handleLayoutButtonClick}
+                options={LAYOUT_OPTIONS}
+                selectedValue={layout}
+            />
         );
 
         let secondarySegment: null | ReactNode = null;
 
         if (layout === "card-large") {
             secondarySegment = (
-                <div
-                    aria-label="Large card presentation"
-                    className="site-list__presentation-toggle"
-                    role="radiogroup"
-                >
-                    {PRESENTATION_OPTIONS.map((option) => {
-                        const { description, Icon, label, value } = option;
-                        const isActive = value === cardPresentation;
-                        return (
-                            <Tooltip
-                                content={description}
-                                key={value}
-                                position="bottom"
-                            >
-                                {(triggerProps) => (
-                                    <button
-                                        aria-pressed={isActive}
-                                        className={
-                                            isActive
-                                                ? "site-list__presentation-button site-list__presentation-button--active"
-                                                : "site-list__presentation-button"
-                                        }
-                                        data-presentation-mode={value}
-                                        onClick={handlePresentationButtonClick}
-                                        type="button"
-                                        {...triggerProps}
-                                    >
-                                        <Icon className="site-list__presentation-icon" />
-                                        <span className="site-list__presentation-label">
-                                            {label}
-                                        </span>
-                                    </button>
-                                )}
-                            </Tooltip>
-                        );
-                    })}
-                </div>
+                <ToggleGroup
+                    ariaLabel="Large card presentation"
+                    buttonClassName="site-list__presentation-button"
+                    buttonClassNameActive="site-list__presentation-button--active"
+                    containerClassName="site-list__presentation-toggle"
+                    getDataAttributes={getPresentationDataAttributes}
+                    iconClassName="site-list__presentation-icon"
+                    labelClassName="site-list__presentation-label"
+                    onClick={handlePresentationButtonClick}
+                    options={PRESENTATION_OPTIONS}
+                    selectedValue={cardPresentation}
+                />
             );
         } else if (layout === "list") {
             secondarySegment = (
-                <div
-                    aria-label="List density"
-                    className="site-list__presentation-toggle"
-                    role="radiogroup"
-                >
-                    {DENSITY_OPTIONS.map((option) => {
-                        const { description, Icon, label, value } = option;
-                        const isActive = value === listDensity;
-
-                        return (
-                            <Tooltip
-                                content={description}
-                                key={value}
-                                position="bottom"
-                            >
-                                {(triggerProps) => (
-                                    <button
-                                        aria-pressed={isActive}
-                                        className={
-                                            isActive
-                                                ? "site-list__presentation-button site-list__presentation-button--active"
-                                                : "site-list__presentation-button"
-                                        }
-                                        data-density-mode={value}
-                                        onClick={handleDensityButtonClick}
-                                        type="button"
-                                        {...triggerProps}
-                                    >
-                                        <Icon className="site-list__presentation-icon" />
-                                        <span className="site-list__presentation-label">
-                                            {label}
-                                        </span>
-                                    </button>
-                                )}
-                            </Tooltip>
-                        );
-                    })}
-                </div>
+                <ToggleGroup
+                    ariaLabel="List density"
+                    buttonClassName="site-list__presentation-button"
+                    buttonClassNameActive="site-list__presentation-button--active"
+                    containerClassName="site-list__presentation-toggle"
+                    getDataAttributes={getDensityDataAttributes}
+                    iconClassName="site-list__presentation-icon"
+                    labelClassName="site-list__presentation-label"
+                    onClick={handleDensityButtonClick}
+                    options={DENSITY_OPTIONS}
+                    selectedValue={listDensity}
+                />
             );
         }
 

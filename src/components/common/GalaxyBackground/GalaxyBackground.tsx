@@ -63,6 +63,30 @@ const generateBoxShadow = (
     return value.slice(0, -2);
 };
 
+function createBandPlanetGradientIds(uniquePrefix: string, planetNumber: 1 | 2): {
+    readonly bands: string;
+    readonly core: string;
+    readonly highlight: string;
+} {
+    return {
+        bands: `${uniquePrefix}-planet${planetNumber}-bands`,
+        core: `${uniquePrefix}-planet${planetNumber}-core`,
+        highlight: `${uniquePrefix}-planet${planetNumber}-highlight`,
+    };
+}
+
+function createAtmospherePlanetGradientIds(uniquePrefix: string): {
+    readonly atmosphere: string;
+    readonly core: string;
+    readonly highlight: string;
+} {
+    return {
+        atmosphere: `${uniquePrefix}-planet3-atmosphere`,
+        core: `${uniquePrefix}-planet3-core`,
+        highlight: `${uniquePrefix}-planet3-highlight`,
+    };
+}
+
 export const GalaxyBackground: React.FC<GalaxyBackgroundProperties> = ({
     className = "",
     isDark = true,
@@ -71,29 +95,17 @@ export const GalaxyBackground: React.FC<GalaxyBackgroundProperties> = ({
     const uniquePrefix = useMemo(() => reactId.replaceAll(":", ""), [reactId]);
 
     const planetOneIds = useMemo(
-        () => ({
-            bands: `${uniquePrefix}-planet1-bands`,
-            core: `${uniquePrefix}-planet1-core`,
-            highlight: `${uniquePrefix}-planet1-highlight`,
-        }),
+        () => createBandPlanetGradientIds(uniquePrefix, 1),
         [uniquePrefix]
     );
 
     const planetTwoIds = useMemo(
-        () => ({
-            bands: `${uniquePrefix}-planet2-bands`,
-            core: `${uniquePrefix}-planet2-core`,
-            highlight: `${uniquePrefix}-planet2-highlight`,
-        }),
+        () => createBandPlanetGradientIds(uniquePrefix, 2),
         [uniquePrefix]
     );
 
     const planetThreeIds = useMemo(
-        () => ({
-            atmosphere: `${uniquePrefix}-planet3-atmosphere`,
-            core: `${uniquePrefix}-planet3-core`,
-            highlight: `${uniquePrefix}-planet3-highlight`,
-        }),
+        () => createAtmospherePlanetGradientIds(uniquePrefix),
         [uniquePrefix]
     );
 

@@ -662,6 +662,52 @@ export class DatabaseManager {
     }
 
     /**
+     * Emits a monitoring lifecycle request event for a site/monitor.
+     *
+     * @remarks
+     * Centralizes the request emission and error normalization so start/stop
+     * paths do not drift.
+     */
+    private async emitSiteMonitoringRequested(args: {
+        identifier: string;
+        kind: "start" | "stop";
+        monitorId: string;
+    }): Promise<void> {
+        try {
+            if (args.kind === "start") {
+                await this.eventEmitter.emitTyped(
+                    "internal:site:start-monitoring-requested",
+                    {
+                        identifier: args.identifier,
+                        monitorId: args.monitorId,
+                        operation: "start-monitoring-requested",
+                        timestamp: Date.now(),
+                    }
+                );
+                return;
+            }
+
+            await this.eventEmitter.emitTyped(
+                "internal:site:stop-monitoring-requested",
+                {
+                    identifier: args.identifier,
+                    monitorId: args.monitorId,
+                    operation: "stop-monitoring-requested",
+                    timestamp: Date.now(),
+                }
+            );
+        } catch (error) {
+            monitorLogger.error(
+                `[DatabaseManager] Failed to emit ${args.kind} monitoring requested event:`,
+                error
+            );
+            throw error instanceof Error
+                ? error
+                : new Error(getUserFacingErrorDetail(error));
+        }
+    }
+
+    /**
      * Loads sites from the database and updates the cache using atomic
      * replacement.
      *
@@ -710,27 +756,11 @@ export class DatabaseManager {
                 // First update the cache so monitoring can find the sites
                 await this.emitSitesCacheUpdateRequested();
 
-                // Then request monitoring start via events (with error
-                // handling)
-                try {
-                    await this.eventEmitter.emitTyped(
-                        "internal:site:start-monitoring-requested",
-                        {
-                            identifier,
-                            monitorId,
-                            operation: "start-monitoring-requested",
-                            timestamp: Date.now(),
-                        }
-                    );
-                } catch (error) {
-                    monitorLogger.error(
-                        "[DatabaseManager] Failed to emit start monitoring requested event:",
-                        error
-                    );
-                    throw error instanceof Error
-                        ? error
-                        : new Error(getUserFacingErrorDetail(error));
-                }
+                await this.emitSiteMonitoringRequested({
+                    identifier,
+                    kind: "start",
+                    monitorId,
+                });
 
                 return true;
             },
@@ -738,26 +768,11 @@ export class DatabaseManager {
                 identifier: string,
                 monitorId: string
             ): Promise<boolean> => {
-                // Request monitoring stop via events (with error handling)
-                try {
-                    await this.eventEmitter.emitTyped(
-                        "internal:site:stop-monitoring-requested",
-                        {
-                            identifier,
-                            monitorId,
-                            operation: "stop-monitoring-requested",
-                            timestamp: Date.now(),
-                        }
-                    );
-                } catch (error) {
-                    monitorLogger.error(
-                        "[DatabaseManager] Failed to emit stop monitoring requested event:",
-                        error
-                    );
-                    throw error instanceof Error
-                        ? error
-                        : new Error(getUserFacingErrorDetail(error));
-                }
+                await this.emitSiteMonitoringRequested({
+                    identifier,
+                    kind: "stop",
+                    monitorId,
+                });
 
                 return true;
             },

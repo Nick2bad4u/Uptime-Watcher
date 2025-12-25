@@ -17,6 +17,7 @@ import {
 } from "@shared/utils/logTemplates";
 
 import { monitorLogger as logger } from "../../utils/logger";
+import { mergeAbortSignals } from "./shared/abortSignalUtils";
 
 /**
  * Interface for monitor check operations.
@@ -191,21 +192,15 @@ export class MonitorOperationRegistry {
         const abortController = new AbortController();
         const { signal: baseSignal } = abortController;
 
-        // Create combined signal if additional signals or timeout provided
-        let signal = baseSignal;
-        if (options?.additionalSignals?.length ?? options?.timeoutMs) {
-            const signals = [signal];
-
-            if (options.additionalSignals?.length) {
-                signals.push(...options.additionalSignals);
-            }
-
-            if (options.timeoutMs) {
-                signals.push(AbortSignal.timeout(options.timeoutMs));
-            }
-
-            signal = AbortSignal.any(signals);
-        }
+        const signal = mergeAbortSignals({
+            baseSignal,
+            ...(options?.additionalSignals
+                ? { additionalSignals: options.additionalSignals }
+                : {}),
+            ...(typeof options?.timeoutMs === "number"
+                ? { timeoutMs: options.timeoutMs }
+                : {}),
+        });
 
         const operation: MonitorCheckOperation = {
             abortController,

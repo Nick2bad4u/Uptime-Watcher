@@ -36,6 +36,7 @@ import {
 import { AppIcons } from "../../../utils/icons";
 import { getMonitorTypeConfig } from "../../../utils/monitorTypeHelper";
 import { formatRetryAttemptsText, getIntervalLabel } from "../../../utils/time";
+import { SiteSettingsNumberField } from "./SiteSettingsNumberField";
 
 const WarningIcon = AppIcons.status.warning;
 const DurationIcon = AppIcons.metrics.time;
@@ -548,98 +549,38 @@ export const SettingsTab = ({
                     </div>
 
                     {/* Timeout Configuration */}
-                    <div className="site-settings-field">
-                        <ThemedText
-                            className="site-settings-field__label"
-                            size="sm"
-                            variant="secondary"
-                            weight="medium"
-                        >
-                            Timeout (seconds)
-                        </ThemedText>
-                        <div className="site-settings-field__controls">
-                            <ThemedInput
-                                className="flex-1"
-                                max={TIMEOUT_CONSTRAINTS.MAX}
-                                min={TIMEOUT_CONSTRAINTS.MIN}
-                                onChange={handleTimeoutChange}
-                                placeholder="Enter timeout in seconds"
-                                step={TIMEOUT_CONSTRAINTS.STEP}
-                                type="number"
-                                value={localTimeout}
-                            />
-                            <ThemedButton
-                                disabled={!timeoutChanged || !isTimeoutValid}
-                                icon={saveIconThree}
-                                onClick={handleSaveTimeoutClick}
-                                size="sm"
-                                variant={
-                                    timeoutChanged ? "primary" : "secondary"
-                                }
-                            >
-                                Save
-                            </ThemedButton>
-                        </div>
-                        <ThemedText size="xs" variant="tertiary">
-                            Request timeout: {localTimeout} seconds
-                        </ThemedText>
-                        {isTimeoutValid ? null : (
-                            <ThemedText size="xs" variant="error">
-                                Allowed range: {TIMEOUT_CONSTRAINTS.MIN}-
-                                {TIMEOUT_CONSTRAINTS.MAX} seconds.
-                            </ThemedText>
-                        )}
-                    </div>
+                    <SiteSettingsNumberField
+                        errorText={`Allowed range: ${TIMEOUT_CONSTRAINTS.MIN}-${TIMEOUT_CONSTRAINTS.MAX} seconds.`}
+                        helperText={`Request timeout: ${localTimeout} seconds`}
+                        isChanged={timeoutChanged}
+                        isValid={isTimeoutValid}
+                        label="Timeout (seconds)"
+                        max={TIMEOUT_CONSTRAINTS.MAX}
+                        min={TIMEOUT_CONSTRAINTS.MIN}
+                        onChange={handleTimeoutChange}
+                        onSave={handleSaveTimeoutClick}
+                        placeholder="Enter timeout in seconds"
+                        saveIcon={saveIconThree}
+                        step={TIMEOUT_CONSTRAINTS.STEP}
+                        value={localTimeout}
+                    />
 
                     {/* Retry Attempts Configuration */}
-                    <div className="site-settings-field">
-                        <ThemedText
-                            className="site-settings-field__label"
-                            size="sm"
-                            variant="secondary"
-                            weight="medium"
-                        >
-                            Retry Attempts
-                        </ThemedText>
-                        <div className="site-settings-field__controls">
-                            <ThemedInput
-                                className="flex-1"
-                                max={RETRY_CONSTRAINTS.MAX}
-                                min={RETRY_CONSTRAINTS.MIN}
-                                onChange={handleRetryAttemptsChange}
-                                placeholder="Enter retry attempts"
-                                step={RETRY_CONSTRAINTS.STEP}
-                                type="number"
-                                value={localRetryAttempts}
-                            />
-                            <ThemedButton
-                                disabled={
-                                    !retryAttemptsChanged ||
-                                    !isRetryAttemptsValid
-                                }
-                                icon={saveIconFour}
-                                onClick={handleSaveRetryAttemptsClick}
-                                size="sm"
-                                variant={
-                                    retryAttemptsChanged
-                                        ? "primary"
-                                        : "secondary"
-                                }
-                            >
-                                Save
-                            </ThemedButton>
-                        </div>
-                        <ThemedText size="xs" variant="tertiary">
-                            {formatRetryAttemptsText(localRetryAttempts)}
-                        </ThemedText>
-                        {isRetryAttemptsValid ? null : (
-                            <ThemedText size="xs" variant="error">
-                                Retry attempts must be between{" "}
-                                {RETRY_CONSTRAINTS.MIN} and{" "}
-                                {RETRY_CONSTRAINTS.MAX}.
-                            </ThemedText>
-                        )}
-                    </div>
+                    <SiteSettingsNumberField
+                        errorText={`Retry attempts must be between ${RETRY_CONSTRAINTS.MIN} and ${RETRY_CONSTRAINTS.MAX}.`}
+                        helperText={formatRetryAttemptsText(localRetryAttempts)}
+                        isChanged={retryAttemptsChanged}
+                        isValid={isRetryAttemptsValid}
+                        label="Retry Attempts"
+                        max={RETRY_CONSTRAINTS.MAX}
+                        min={RETRY_CONSTRAINTS.MIN}
+                        onChange={handleRetryAttemptsChange}
+                        onSave={handleSaveRetryAttemptsClick}
+                        placeholder="Enter retry attempts"
+                        saveIcon={saveIconFour}
+                        step={RETRY_CONSTRAINTS.STEP}
+                        value={localRetryAttempts}
+                    />
 
                     {/* Total monitoring time indicator */}
                     {localRetryAttempts > 0 && (

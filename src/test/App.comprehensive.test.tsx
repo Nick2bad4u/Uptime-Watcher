@@ -15,6 +15,7 @@ import {
 import "@testing-library/jest-dom";
 
 import { App } from "../App";
+import { UI_DELAYS } from "../constants";
 import { useErrorStore } from "../stores/error/useErrorStore";
 import { defaultSettings } from "../stores/settings/state";
 import { useSettingsStore } from "../stores/settings/useSettingsStore";
@@ -473,14 +474,15 @@ describe("App Component - Comprehensive Coverage", () => {
 
             await renderApp();
 
-            // Wait for loading overlay to appear (after 100ms delay)
+            // The overlay is intentionally delayed (UI_DELAYS.LOADING_OVERLAY) and
+            // gated behind initialization.
             await waitFor(
                 () => {
                     expect(
                         screen.getByLabelText("Loading application")
                     ).toBeInTheDocument();
                 },
-                { timeout: 200 }
+                { timeout: UI_DELAYS.LOADING_OVERLAY + 1500 }
             );
 
             expect(screen.getByText("Loading...")).toBeInTheDocument();

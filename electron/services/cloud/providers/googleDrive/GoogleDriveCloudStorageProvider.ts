@@ -1,5 +1,4 @@
-import type { CloudBackupEntry, CloudProviderKind } from "@shared/types/cloud";
-import type { SerializedDatabaseBackupMetadata } from "@shared/types/databaseBackup";
+import type { CloudProviderKind } from "@shared/types/cloud";
 import type { drive_v3 } from "googleapis";
 
 import { google } from "googleapis";
@@ -11,18 +10,19 @@ import type {
 } from "../CloudStorageProvider.types";
 import type { GoogleDriveTokenManager } from "./GoogleDriveTokenManager";
 
-import {
-    downloadBackupWithMetadata,
-    uploadBackupWithMetadata,
-} from "../cloudBackupIo";
-import { listBackupsFromMetadataObjects } from "../cloudBackupListing";
+import { normalizeCloudObjectKey } from "../../cloudKeyNormalization";
+import { BaseCloudStorageProvider } from "../BaseCloudStorageProvider";
 
 const GOOGLE_FOLDER_MIME_TYPE = "application/vnd.google-apps.folder";
 const APP_ROOT_FOLDER_NAME = "uptime-watcher";
 const BACKUPS_PREFIX = "backups/";
 
 function normalizeKey(key: string): string {
-    return key.replaceAll("\\", "/").replace(/^\/+/u, "");
+    return normalizeCloudObjectKey(key, {
+        allowEmpty: true,
+        forbidTraversalSegments: true,
+        stripLeadingSlashes: true,
+    });
 }
 
 function createErrnoError(
@@ -71,7 +71,10 @@ async function convertStreamToBuffer(
  * Google Drive-backed provider that stores all app artifacts in the Drive
  * `appDataFolder` space.
  */
-export class GoogleDriveCloudStorageProvider implements CloudStorageProvider {
+export class GoogleDriveCloudStorageProvider
+    extends BaseCloudStorageProvider
+    implements CloudStorageProvider
+{
     public readonly kind: CloudProviderKind = "google-drive";
 
     private readonly clientId: string;
@@ -98,16 +101,6 @@ export class GoogleDriveCloudStorageProvider implements CloudStorageProvider {
         await drive.files.delete({ fileId: existing.id });
     }
 
-    public async downloadBackup(
-        key: string
-    ): Promise<{ buffer: Buffer; entry: CloudBackupEntry }> {
-        const normalizedKey = normalizeKey(key);
-        return downloadBackupWithMetadata({
-            downloadObject: (downloadKey) => this.downloadObject(downloadKey),
-            key: normalizedKey,
-        });
-    }
-
     public async downloadObject(key: string): Promise<Buffer> {
         const normalized = normalizeKey(key);
         const drive = await this.getDriveClient();
@@ -123,14 +116,6 @@ export class GoogleDriveCloudStorageProvider implements CloudStorageProvider {
         );
 
         return convertStreamToBuffer(response.data);
-    }
-
-    public async listBackups(): Promise<CloudBackupEntry[]> {
-        const objects = await this.listObjects(BACKUPS_PREFIX);
-        return listBackupsFromMetadataObjects({
-            downloadObjectBuffer: async (key) => this.downloadObject(key),
-            objects,
-        });
     }
 
     public async listObjects(prefix: string): Promise<CloudObjectEntry[]> {
@@ -163,19 +148,6 @@ export class GoogleDriveCloudStorageProvider implements CloudStorageProvider {
         );
 
         return entries.toSorted((a, b) => a.key.localeCompare(b.key));
-    }
-
-    public async uploadBackup(args: {
-        buffer: Buffer;
-        encrypted: boolean;
-        fileName: string;
-        metadata: SerializedDatabaseBackupMetadata;
-    }): Promise<CloudBackupEntry> {
-        return uploadBackupWithMetadata({
-            ...args,
-            backupsPrefix: BACKUPS_PREFIX,
-            uploadObject: (uploadArgs) => this.uploadObject(uploadArgs),
-        });
     }
 
     public async uploadObject(args: {
@@ -460,6 +432,7 @@ export class GoogleDriveCloudStorageProvider implements CloudStorageProvider {
         clientSecret?: string;
         tokenManager: GoogleDriveTokenManager;
     }) {
+        super(BACKUPS_PREFIX);
         this.clientId = args.clientId;
         this.clientSecret = args.clientSecret;
         this.tokenManager = args.tokenManager;

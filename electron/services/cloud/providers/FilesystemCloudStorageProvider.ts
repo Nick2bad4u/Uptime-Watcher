@@ -1,8 +1,5 @@
 /* eslint-disable security/detect-non-literal-fs-filename -- This provider only operates on sandboxed paths under appRoot derived from validated keys. */
 
-import type { CloudBackupEntry } from "@shared/types/cloud";
-import type { SerializedDatabaseBackupMetadata } from "@shared/types/databaseBackup";
-
 import { tryGetErrorCode } from "@shared/utils/errorCodes";
 import { ensureError } from "@shared/utils/errorHandling";
 import { hasAsciiControlCharacters } from "@shared/utils/stringSafety";
@@ -15,11 +12,7 @@ import type {
     CloudStorageProvider,
 } from "./CloudStorageProvider.types";
 
-import {
-    downloadBackupWithMetadata,
-    uploadBackupWithMetadata,
-} from "./cloudBackupIo";
-import { listBackupsFromMetadataObjects } from "./cloudBackupListing";
+import { BaseCloudStorageProvider } from "./BaseCloudStorageProvider";
 
 const APP_ROOT_DIRECTORY_NAME = "uptime-watcher" as const;
 const BACKUPS_PREFIX = "backups/" as const;
@@ -71,7 +64,10 @@ async function toCloudObjectEntry(
  * @remarks
  * Primarily used for integration tests and as a development transport.
  */
-export class FilesystemCloudStorageProvider implements CloudStorageProvider {
+export class FilesystemCloudStorageProvider
+    extends BaseCloudStorageProvider
+    implements CloudStorageProvider
+{
     public readonly kind = "filesystem" as const;
 
     private readonly appRoot: string;
@@ -408,36 +404,6 @@ export class FilesystemCloudStorageProvider implements CloudStorageProvider {
         await fs.rm(absolute, { force: true });
     }
 
-    public async uploadBackup(args: {
-        buffer: Buffer;
-        encrypted: boolean;
-        fileName: string;
-        metadata: SerializedDatabaseBackupMetadata;
-    }): Promise<CloudBackupEntry> {
-        return uploadBackupWithMetadata({
-            ...args,
-            backupsPrefix: BACKUPS_PREFIX,
-            uploadObject: (uploadArgs) => this.uploadObject(uploadArgs),
-        });
-    }
-
-    public async listBackups(): Promise<CloudBackupEntry[]> {
-        const objects = await this.listObjects(BACKUPS_PREFIX);
-        return listBackupsFromMetadataObjects({
-            downloadObjectBuffer: async (key) => this.downloadObject(key),
-            objects,
-        });
-    }
-
-    public async downloadBackup(
-        key: string
-    ): Promise<{ buffer: Buffer; entry: CloudBackupEntry }> {
-        return downloadBackupWithMetadata({
-            downloadObject: (downloadKey) => this.downloadObject(downloadKey),
-            key,
-        });
-    }
-
     private async ensureAppRoot(): Promise<void> {
         await fs.mkdir(this.appRoot, { recursive: true });
     }
@@ -454,6 +420,7 @@ export class FilesystemCloudStorageProvider implements CloudStorageProvider {
     }
 
     public constructor(args: { baseDirectory: string }) {
+        super(BACKUPS_PREFIX);
         this.appRoot = path.resolve(
             args.baseDirectory,
             APP_ROOT_DIRECTORY_NAME

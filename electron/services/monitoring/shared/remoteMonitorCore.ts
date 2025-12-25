@@ -18,13 +18,18 @@ import type {
 import { DEFAULT_REQUEST_TIMEOUT } from "../../../constants";
 import { logger } from "../../../utils/logger";
 import { withOperationalHooks } from "../../../utils/operationalHooks";
-import { createHttpClient } from "../utils/httpClient";
+import { createTimeoutSignal } from "./abortSignalUtils";
 import {
+    buildMonitorExecutionBaseArgsWithOptionalSignal,
     deriveMonitorTiming,
     ensureMonitorType,
     type MonitorByType,
 } from "./monitorCoreHelpers";
 import { createMonitorErrorResult } from "./monitorServiceHelpers";
+import {
+    createMonitorServiceRuntimeState,
+    updateMonitorServiceRuntimeState,
+} from "./monitorServiceRuntimeState";
 
 /**
  * Narrowed monitor type helper keyed by monitor "type" literal.
@@ -52,8 +57,8 @@ export interface RemoteEndpointPayload {
 /**
  * Result produced while resolving monitor-specific configuration.
  */
-type RemoteMonitorConfigResult<TContext> =
-    | { context: TContext; kind: "context" }
+export type RemoteMonitorConfigResult<TContext> =
+    | { context: TContext; kind: "success"; }
     | { kind: "error"; message: string };
 
 /**
@@ -135,7 +140,11 @@ export function createRemoteMonitorService<
 
             try {
                 const executionArgs = {
-                    context: configuration.context,
+                        ...buildMonitorExecutionBaseArgsWithOptionalSignal({
+                        context: configuration.context,
+                        signal,
+                            timeout,
+                    }),
                     fetchEndpoint: (
                         url: string,
                         endpointTimeout: number,
@@ -146,8 +155,6 @@ export function createRemoteMonitorService<
                             endpointTimeout,
                             endpointSignal
                         ),
-                    timeout,
-                    ...(signal ? { signal } : {}),
                 } satisfies {
                     context: TContext;
                     fetchEndpoint: (
@@ -185,12 +192,8 @@ export function createRemoteMonitorService<
             timeout: number,
             signal?: AbortSignal
         ): Promise<RemoteEndpointPayload> {
-            const signals: AbortSignal[] = [AbortSignal.timeout(timeout)];
-            if (signal) {
-                signals.push(signal);
-            }
 
-            const combinedSignal = AbortSignal.any(signals);
+            const combinedSignal = createTimeoutSignal(timeout, signal);
 
             try {
                 const response = await this.axiosInstance.get<unknown>(url, {
@@ -223,11 +226,13 @@ export function createRemoteMonitorService<
         }
 
         public constructor(config: MonitorServiceConfig = {}) {
-            this.config = {
-                timeout: DEFAULT_REQUEST_TIMEOUT,
-                ...config,
-            };
-            this.axiosInstance = createHttpClient(this.config);
+            const state = createMonitorServiceRuntimeState({
+                config,
+                defaultTimeoutMs: DEFAULT_REQUEST_TIMEOUT,
+            });
+
+            this.config = state.config;
+            this.axiosInstance = state.axiosInstance;
         }
 
         public getType(): Site["monitors"][0]["type"] {
@@ -235,11 +240,14 @@ export function createRemoteMonitorService<
         }
 
         public updateConfig(config: Partial<MonitorServiceConfig>): void {
-            this.config = {
-                ...this.config,
-                ...config,
-            };
-            this.axiosInstance = createHttpClient(this.config);
+            const state = updateMonitorServiceRuntimeState({
+                currentConfig: this.config,
+                defaultTimeoutMs: DEFAULT_REQUEST_TIMEOUT,
+                update: config,
+            });
+
+            this.config = state.config;
+            this.axiosInstance = state.axiosInstance;
         }
     };
 }

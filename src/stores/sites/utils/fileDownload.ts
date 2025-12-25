@@ -48,7 +48,10 @@ function clickDownloadAnchor(anchor: HTMLAnchorElement, attachToDom: boolean): v
         anchor.click();
         anchor.remove();
     } catch (domError) {
-        const error = domError instanceof Error ? domError : new Error(String(domError));
+        const error =
+            domError instanceof Error
+                ? domError
+                : new Error(getUserFacingErrorDetail(domError));
 
         // For appendChild errors, re-throw to trigger proper fallback mechanism.
         if (error.message.includes("appendChild")) {

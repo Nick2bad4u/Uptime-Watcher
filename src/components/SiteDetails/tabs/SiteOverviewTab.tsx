@@ -26,6 +26,9 @@ import { ThemedProgress } from "../../../theme/components/ThemedProgress";
 import { ThemedText } from "../../../theme/components/ThemedText";
 import { useAvailabilityColors, useTheme } from "../../../theme/useTheme";
 import { formatDuration, formatResponseTime } from "../../../utils/time";
+import {
+    useResponseTimeColorFromThemeColors,
+} from "../utils/responseTimeColors";
 
 /**
  * Props for the SiteOverviewTab component
@@ -139,21 +142,8 @@ export const SiteOverviewTab = ({
     /**
      * Get response time color based on value
      */
-    const getResponseTimeColor = useCallback(
-        (responseTime: number): string => {
-            if (responseTime <= 200) {
-                return currentTheme.colors.success;
-            }
-            if (responseTime <= 1000) {
-                return currentTheme.colors.warning;
-            }
-            return currentTheme.colors.error;
-        },
-        [
-            currentTheme.colors.error,
-            currentTheme.colors.success,
-            currentTheme.colors.warning,
-        ]
+    const getResponseTimeColor = useResponseTimeColorFromThemeColors(
+        currentTheme.colors
     );
 
     // Icon colors configuration

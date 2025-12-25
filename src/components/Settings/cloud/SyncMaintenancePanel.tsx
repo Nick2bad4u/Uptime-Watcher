@@ -9,6 +9,7 @@ import { SystemService } from "../../../services/SystemService";
 import { ThemedButton } from "../../../theme/components/ThemedButton";
 import { ThemedText } from "../../../theme/components/ThemedText";
 import { formatFullTimestamp } from "../../../utils/time";
+import { SyncMaintenanceCard } from "./SyncMaintenanceCard";
 
 function resolveSyncResetStatusText(args: {
     connected: boolean;
@@ -237,16 +238,7 @@ export const SyncMaintenancePanel = ({
     );
 
     return (
-        <div className="rounded-lg border border-zinc-800 bg-zinc-900/40 p-4">
-            <div className="mb-2 flex items-center justify-between gap-2">
-                <ThemedText size="sm" variant="secondary" weight="medium">
-                    Sync Maintenance
-                </ThemedText>
-            </div>
-
-            <ThemedText size="sm" variant="tertiary">
-                {statusText}
-            </ThemedText>
+        <SyncMaintenanceCard description={statusText}>
 
             {summary ? (
                 <div className="mt-2">
@@ -385,6 +377,6 @@ export const SyncMaintenancePanel = ({
                     </ThemedButton>
                 </div>
             </div>
-        </div>
+        </SyncMaintenanceCard>
     );
 };

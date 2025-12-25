@@ -7,6 +7,7 @@ import type { Site } from "@shared/types";
 import type { MonitorServiceConfig } from "../types";
 
 import { DEFAULT_REQUEST_TIMEOUT } from "../../../constants";
+import { withOptionalAbortSignal } from "./abortSignalUtils";
 import { createMonitorConfig } from "./monitorServiceHelpers";
 
 /**
@@ -56,4 +57,50 @@ export function deriveMonitorTiming<
         retryAttempts: normalized.retryAttempts,
         timeout: normalized.timeout,
     };
+}
+
+/**
+ * Base execution args shared by monitor core implementations.
+ */
+export type MonitorExecutionBaseArgs<TContext> = Readonly<{
+    context: TContext;
+    signal?: AbortSignal;
+    timeout: number;
+}>;
+
+/**
+ * Creates the base args object passed through monitor core layers.
+ */
+export function buildMonitorExecutionBaseArgs<TContext>(args: {
+    context: TContext;
+    signal?: AbortSignal;
+    timeout: number;
+}): MonitorExecutionBaseArgs<TContext> {
+    return {
+        context: args.context,
+        timeout: args.timeout,
+        ...withOptionalAbortSignal(args.signal),
+    };
+}
+
+/**
+ * Convenience wrapper around {@link buildMonitorExecutionBaseArgs} that accepts
+ * a `signal` typed as `AbortSignal | undefined`.
+ *
+ * @remarks
+ * With `exactOptionalPropertyTypes`, passing `{ signal }` where `signal` is
+ * `AbortSignal | undefined` is not assignable to `{ signal?: AbortSignal }`.
+ * This helper avoids repeating `{ ...withOptionalAbortSignal(signal) }` at
+ * call sites.
+ */
+export function buildMonitorExecutionBaseArgsWithOptionalSignal<TContext>(args: {
+    context: TContext;
+    signal: AbortSignal | undefined;
+    timeout: number;
+}): MonitorExecutionBaseArgs<TContext> {
+    return buildMonitorExecutionBaseArgs({
+        context: args.context,
+        timeout: args.timeout,
+        ...withOptionalAbortSignal(args.signal),
+    });
 }

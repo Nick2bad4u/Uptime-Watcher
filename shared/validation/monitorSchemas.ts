@@ -30,7 +30,7 @@ import {
     monitorStatusEnumValues,
     statusHistoryEnumValues,
 } from "./statusValidationPrimitives";
-import { isValidHost, isValidPort, isValidUrl } from "./validatorUtils";
+import { isValidHost, isValidPort } from "./validatorUtils";
 
 /**
  * Zod schema for status history entries.
@@ -176,18 +176,6 @@ function isUrlWithAllowedProtocols(
         return false;
     }
 
-    if (
-        !isValidUrl(candidate, {
-            allowSingleQuotes: true,
-            protocols: Array.from(protocols),
-            // Hostname semantics are enforced by `isValidHost` below (which
-            // requires a TLD for FQDNs but still allows `localhost`).
-            require_tld: false,
-        })
-    ) {
-        return false;
-    }
-
     const parsed = ((): null | URL => {
         try {
             return new URL(candidate);
@@ -230,7 +218,6 @@ const httpUrlSchema = createProtocolUrlSchema(
     ["http", "https"],
     "Must be a valid HTTP or HTTPS URL"
 );
-
 /**
  * Reusable WebSocket URL validation schema for multiple monitor types.
  *

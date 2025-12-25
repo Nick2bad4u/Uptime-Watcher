@@ -25,6 +25,7 @@ import type {
 import { DEFAULT_REQUEST_TIMEOUT } from "../../constants";
 import { logger } from "../../utils/logger";
 import { withOperationalHooks } from "../../utils/operationalHooks";
+import { createTimeoutSignal } from "./shared/abortSignalUtils";
 import {
     createMonitorConfig,
     createMonitorErrorResult,
@@ -223,12 +224,7 @@ export class CdnEdgeConsistencyMonitor implements IMonitorService {
         timeout: number,
         signal?: AbortSignal
     ): Promise<EndpointResult> {
-        const signals: AbortSignal[] = [AbortSignal.timeout(timeout)];
-        if (signal) {
-            signals.push(signal);
-        }
-
-        const combinedSignal = AbortSignal.any(signals);
+        const combinedSignal = createTimeoutSignal(timeout, signal);
 
         try {
             const response = await this.axiosInstance.get<ArrayBuffer>(url, {

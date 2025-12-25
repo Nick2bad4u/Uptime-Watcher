@@ -18,7 +18,6 @@ describe("EnhancedMonitorChecker Coverage Tests", () => {
     let mockMonitorRepository: any;
     let mockHistoryRepository: any;
     let mockOperationRegistry: any;
-    let mockMonitorFactory: any;
     let mockTimeoutManager: any;
     let mockStatusUpdateService: any;
 
@@ -68,10 +67,6 @@ describe("EnhancedMonitorChecker Coverage Tests", () => {
             cancelOperations: vi.fn().mockReturnValue(undefined),
         };
 
-        mockMonitorFactory = {
-            getMonitor: vi.fn(),
-        };
-
         mockTimeoutManager = {
             createTimeout: vi.fn(),
             scheduleTimeout: vi.fn(),
@@ -95,19 +90,14 @@ describe("EnhancedMonitorChecker Coverage Tests", () => {
             timeoutManager: mockTimeoutManager,
         });
 
-        // Replace the actual monitor instances with mocks
-        (enhancedChecker as any).httpMonitor = {
-            check: vi.fn(),
-        };
-        (enhancedChecker as any).pingMonitor = {
-            check: vi.fn(),
-        };
-        (enhancedChecker as any).portMonitor = {
-            check: vi.fn(),
-        };
-        (enhancedChecker as any).dnsMonitor = {
-            check: vi.fn(),
-        };
+        // Replace monitor service implementations with deterministic mocks.
+        const servicesByType = (enhancedChecker as any)
+            .servicesByType as Map<string, any>;
+
+        servicesByType.set("http", { check: vi.fn() });
+        servicesByType.set("ping", { check: vi.fn() });
+        servicesByType.set("port", { check: vi.fn() });
+        servicesByType.set("dns", { check: vi.fn() });
     });
 
     describe("Constructor and Initialization", () => {
@@ -191,9 +181,9 @@ describe("EnhancedMonitorChecker Coverage Tests", () => {
             };
 
             // Mock the HTTP monitor's check method directly
-            (enhancedChecker as any).httpMonitor.check.mockResolvedValue(
-                mockCheckResult
-            );
+            (enhancedChecker as any).servicesByType
+                .get("http")
+                .check.mockResolvedValue(mockCheckResult);
 
             const result = await enhancedChecker.checkMonitor(
                 mockSite,
@@ -258,9 +248,9 @@ describe("EnhancedMonitorChecker Coverage Tests", () => {
             };
 
             // Mock the HTTP monitor's check method directly
-            (enhancedChecker as any).httpMonitor.check.mockResolvedValue(
-                mockCheckResult
-            );
+            (enhancedChecker as any).servicesByType
+                .get("http")
+                .check.mockResolvedValue(mockCheckResult);
 
             const result = await enhancedChecker.checkMonitor(
                 mockSite,
@@ -284,14 +274,9 @@ describe("EnhancedMonitorChecker Coverage Tests", () => {
             await annotate("Category: Service", "category");
             await annotate("Type: Monitoring", "type");
 
-            const operationId = "op-123";
-            mockOperationRegistry.initiateCheck.mockReturnValue(operationId);
-            mockOperationRegistry.validateOperation.mockReturnValue(true);
-
-            const mockMonitorService = {
+            (enhancedChecker as any).servicesByType.set("http", {
                 check: vi.fn().mockResolvedValue(null),
-            };
-            mockMonitorFactory.getMonitor.mockReturnValue(mockMonitorService);
+            });
 
             const result = await enhancedChecker.checkMonitor(
                 mockSite,
@@ -299,7 +284,8 @@ describe("EnhancedMonitorChecker Coverage Tests", () => {
                 true
             );
 
-            expect(result).toBeUndefined();
+            expect(result).toBeDefined();
+            expect(result?.status).toBe("down");
         });
 
         it("should handle status update service throwing error", async ({
@@ -315,17 +301,17 @@ describe("EnhancedMonitorChecker Coverage Tests", () => {
             await annotate("Type: Error Handling", "type");
 
             const operationId = "op-123";
-            mockOperationRegistry.initiateCheck.mockReturnValue(operationId);
-            mockOperationRegistry.validateOperation.mockReturnValue(true);
+            mockOperationRegistry.initiateCheck.mockReturnValue({
+                operationId,
+                signal: new AbortController().signal,
+            });
 
-            const mockMonitorService = {
+            (enhancedChecker as any).servicesByType.set("http", {
                 check: vi.fn().mockResolvedValue({
-                    success: true,
                     status: "up",
                     responseTime: 200,
                 }),
-            };
-            mockMonitorFactory.getMonitor.mockReturnValue(mockMonitorService);
+            });
             mockStatusUpdateService.updateMonitorStatus.mockRejectedValue(
                 new Error("Update failed")
             );
@@ -333,7 +319,7 @@ describe("EnhancedMonitorChecker Coverage Tests", () => {
             const result = await enhancedChecker.checkMonitor(
                 mockSite,
                 "monitor-1",
-                true
+                false
             );
 
             expect(result).toBeUndefined();
@@ -644,10 +630,8 @@ describe("EnhancedMonitorChecker Coverage Tests", () => {
             await annotate("Category: Service", "category");
             await annotate("Type: Monitoring", "type");
 
-            const operationId = "op-123";
-            mockOperationRegistry.initiateCheck.mockReturnValue(operationId);
-            mockOperationRegistry.validateOperation.mockReturnValue(true);
-            mockMonitorFactory.getMonitor.mockReturnValue(null);
+            // Simulate missing service wiring.
+            (enhancedChecker as any).servicesByType.delete("http");
 
             const mockSite: Site = {
                 identifier: "test-site",
@@ -676,7 +660,8 @@ describe("EnhancedMonitorChecker Coverage Tests", () => {
                 true
             );
 
-            expect(result).toBeUndefined();
+            expect(result).toBeDefined();
+            expect(result?.status).toBe("down");
         });
 
         it("should handle unsupported monitor type when correlated flag is false", async ({
@@ -692,11 +677,28 @@ describe("EnhancedMonitorChecker Coverage Tests", () => {
             await annotate("Type: Monitoring", "type");
 
             const operationId = "op-456";
-            mockOperationRegistry.initiateCheck.mockReturnValue(operationId);
-            mockOperationRegistry.validateOperation.mockReturnValue(true);
+            mockOperationRegistry.initiateCheck.mockReturnValue({
+                operationId,
+                signal: new AbortController().signal,
+            });
 
-            // Simulate the factory not supporting this monitor type.
-            mockMonitorFactory.getMonitor.mockReturnValue(null);
+            mockStatusUpdateService.updateMonitorStatus.mockResolvedValue(true);
+            mockMonitorRepository.findByIdentifier.mockResolvedValue({
+                id: "monitor-1",
+                type: "dns",
+                host: "example.com",
+                status: "down",
+                lastChecked: new Date(),
+                checkInterval: 30_000,
+                history: [],
+                monitoring: true,
+                responseTime: 0,
+                retryAttempts: 3,
+                timeout: 10_000,
+            });
+
+            // Simulate missing service wiring for this monitor type.
+            (enhancedChecker as any).servicesByType.delete("dns");
 
             const mockSite: Site = {
                 identifier: "test-site",
@@ -725,7 +727,8 @@ describe("EnhancedMonitorChecker Coverage Tests", () => {
                 false
             );
 
-            expect(result).toBeUndefined();
+            expect(result).toBeDefined();
+            expect(result?.status).toBe("down");
         });
     });
 });

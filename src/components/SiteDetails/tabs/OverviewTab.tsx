@@ -31,6 +31,9 @@ import { useAvailabilityColors, useTheme } from "../../../theme/useTheme";
 import { AppIcons } from "../../../utils/icons";
 import { parseUptimeValue } from "../../../utils/monitoring/dataValidation";
 import { getIntervalLabel } from "../../../utils/time";
+import {
+    useResponseTimeColorFromThemeColors,
+} from "../utils/responseTimeColors";
 
 const RefreshIcon = AppIcons.actions.refresh;
 const RemoveIcon = AppIcons.actions.remove;
@@ -156,21 +159,8 @@ export const OverviewTab = ({
     /**
      * Get response time color based on value
      */
-    const getResponseTimeColor = useCallback(
-        (responseTime: number): string => {
-            if (responseTime <= 200) {
-                return currentTheme.colors.success;
-            }
-            if (responseTime <= 1000) {
-                return currentTheme.colors.warning;
-            }
-            return currentTheme.colors.error;
-        },
-        [
-            currentTheme.colors.error,
-            currentTheme.colors.success,
-            currentTheme.colors.warning,
-        ]
+    const getResponseTimeColor = useResponseTimeColorFromThemeColors(
+        currentTheme.colors
     );
 
     // Icon colors configuration

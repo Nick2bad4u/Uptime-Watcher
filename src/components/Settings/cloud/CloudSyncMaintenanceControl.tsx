@@ -5,8 +5,8 @@ import type { JSX } from "react/jsx-runtime";
 import { useCallback, useState } from "react";
 
 import { ThemedButton } from "../../../theme/components/ThemedButton";
-import { ThemedText } from "../../../theme/components/ThemedText";
 import { Modal } from "../../common/Modal/Modal";
+import { SyncMaintenanceCard } from "./SyncMaintenanceCard";
 import { SyncMaintenancePanel } from "./SyncMaintenancePanel";
 
 /**
@@ -61,18 +61,9 @@ export const CloudSyncMaintenanceControl = ({
 
     return (
         <>
-            <div className="rounded-lg border border-zinc-800 bg-zinc-900/40 p-4">
-                <div className="mb-2 flex items-center justify-between gap-2">
-                    <ThemedText size="sm" variant="secondary" weight="medium">
-                        Sync Maintenance
-                    </ThemedText>
-                </div>
-
-                <ThemedText size="sm" variant="tertiary">
-                    Advanced tools for diagnosing and resetting remote sync
-                    history.
-                </ThemedText>
-
+            <SyncMaintenanceCard
+                description="Advanced tools for diagnosing and resetting remote sync history."
+            >
                 <div className="mt-3 flex flex-wrap gap-2">
                     <ThemedButton
                         data-testid="cloud-sync-maintenance-open"
@@ -83,7 +74,7 @@ export const CloudSyncMaintenanceControl = ({
                         Open sync maintenance
                     </ThemedButton>
                 </div>
-            </div>
+            </SyncMaintenanceCard>
 
             <Modal
                 accent="warning"
