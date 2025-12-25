@@ -11,7 +11,7 @@
 
 import type { LiteralUnion, Simplify, UnknownRecord } from "type-fest";
 
-import type { MonitorConfig } from "./monitorConfig";
+import type { Monitor } from "../types";
 import type { MonitorTypeConfig } from "./monitorTypes";
 import type { BaseValidationResult } from "./validation";
 
@@ -85,7 +85,7 @@ export interface MonitorCheckResult {
  */
 export interface MonitorData {
     /** Monitor configuration */
-    config?: MonitorConfig;
+    config?: Monitor;
     /** Last check result */
     lastResult?: MonitorCheckResult;
     /** Status information */

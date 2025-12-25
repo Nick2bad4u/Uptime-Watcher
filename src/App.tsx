@@ -1105,8 +1105,6 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
                     isSidebarOpen={isSidebarOpen}
                     toggleSidebar={toggleSidebar}
                 >
-                    <PromptDialog />
-                    <ConfirmDialog />
                     <StatusAlertToaster />
                     <div
                         className={`app-shell ${isDark ? "app-shell--dark" : "app-shell--light"} ${isSidebarOpen ? "app-shell--sidebar-open" : "app-shell--sidebar-closed"}`}
@@ -1181,6 +1179,15 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
                     ) : null}
 
                     {siteDetailsJSX}
+
+                    {/*
+                     * Keep the global prompt/confirm dialogs at the end of the
+                     * React tree so their portals are appended last in
+                     * document.body. This guarantees they stack above other
+                     * modals like SiteDetails.
+                     */}
+                    <PromptDialog />
+                    <ConfirmDialog />
                 </SidebarLayoutProvider>
             </ThemeProvider>
         </ErrorBoundary>

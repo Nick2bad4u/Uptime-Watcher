@@ -60,12 +60,12 @@ describe(MonitorRepository, () => {
 
             const mockMonitors = [
                 {
-                    monitor_id: "mon1",
+                    id: "mon1",
                     site_identifier: "site1",
-                    monitor_type: "http",
+                    type: "http",
                     url: "https://example.com",
-                    interval_ms: 60_000,
-                    timeout_ms: 5000,
+                    check_interval: 60_000,
+                    timeout: 5000,
                     enabled: 1,
                 },
             ];
@@ -105,8 +105,8 @@ describe(MonitorRepository, () => {
             await annotate("Type: Data Retrieval", "type");
 
             const mockMonitor = {
-                monitor_id: "mon1",
-                monitor_type: "http",
+                id: "mon1",
+                type: "http",
                 site_identifier: "site-01",
                 url: "https://example.com",
             };
@@ -143,7 +143,7 @@ describe(MonitorRepository, () => {
             await annotate("Category: Service", "category");
             await annotate("Type: Monitoring", "type");
 
-            const mockIds = [{ monitor_id: "mon1" }, { monitor_id: "mon2" }];
+            const mockIds = [{ id: "mon1" }, { id: "mon2" }];
             const mockDb = mockDatabaseService.getDatabase();
             mockDb.all.mockReturnValue(mockIds);
 

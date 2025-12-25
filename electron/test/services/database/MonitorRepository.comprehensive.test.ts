@@ -566,13 +566,15 @@ describe("MonitorRepository - Comprehensive Coverage", () => {
                 site_identifier: "large-site",
                 type: "http",
                 url: `https://example${i}.com`,
-                checkInterval: 60_000,
+                enabled: 1,
+                check_interval: 60_000,
                 timeout: 5000,
-                retryAttempts: 3,
-                monitoring: 1,
+                retry_attempts: 3,
                 status: "pending",
-                responseTime: 100,
-                lastChecked: Date.now(),
+                response_time: 100,
+                last_checked: Date.now(),
+                created_at: Date.now(),
+                updated_at: Date.now(),
             }));
 
             mockDatabase.all.mockReturnValue(largeDataset);

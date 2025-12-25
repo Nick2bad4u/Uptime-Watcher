@@ -227,7 +227,6 @@ export function buildMonitorParameters(
         const monitorWithMetadata = {
             ...monitor,
             createdAt: Date.now(),
-            enabled: monitor.monitoring,
             siteIdentifier,
             updatedAt: Date.now(),
         };

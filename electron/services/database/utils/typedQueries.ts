@@ -91,27 +91,6 @@ function ensureValidRows<TRow extends object>(
     );
 }
 
-function normalizeMonitorRowSchema(row: UnknownRecord): void {
-    if (row["id"] === undefined && row["monitor_id"] !== undefined) {
-        row["id"] = row["monitor_id"];
-    }
-
-    if (row["type"] === undefined && row["monitor_type"] !== undefined) {
-        row["type"] = row["monitor_type"];
-    }
-
-    if (row["timeout"] === undefined && row["timeout_ms"] !== undefined) {
-        row["timeout"] = row["timeout_ms"];
-    }
-
-    if (
-        row["check_interval"] === undefined &&
-        row["interval_ms"] !== undefined
-    ) {
-        row["check_interval"] = row["interval_ms"];
-    }
-}
-
 /**
  * Common database result shapes for type-safe queries.
  *
@@ -347,10 +326,7 @@ const HISTORY_ROW_VALIDATION: RowValidationOptions<HistoryRow> = {
 
 const MONITOR_ROW_VALIDATION: RowValidationOptions<MonitorRow> = {
     label: "MonitorRow",
-    validate: (row): row is EnforcedRow<MonitorRow> => {
-        normalizeMonitorRowSchema(row);
-        return isValidMonitorRow(row);
-    },
+    validate: (row): row is EnforcedRow<MonitorRow> => isValidMonitorRow(row),
 };
 
 const SETTINGS_ROW_VALIDATION: RowValidationOptions<SettingsRow> = {

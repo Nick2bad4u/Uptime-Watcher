@@ -225,22 +225,17 @@ export interface DatabaseFieldDefinition {
 }
 
 /**
- * Converts enabled/monitoring fields to a database-compatible integer value.
+ * Converts a monitor's {@link Monitor.monitoring} flag to the database integer
+ * representation.
  *
  * @remarks
- * Used internally to map boolean or truthy `enabled`/`monitoring` fields to
- * SQLite integer format (1 for true, 0 for false).
- *
- * @param monitor - Monitor object containing `enabled` and/or `monitoring`
- *   properties.
- *
- * @returns Database value: 1 for true, 0 for false.
+ * The database stores this as `enabled` (SQLite integer: 1/0). We intentionally
+ * do **not** accept legacy boolean aliases like `enabled` on monitor objects.
  *
  * @internal
  */
-function convertEnabledField(monitor: UnknownRecord): number {
-    const { enabled, monitoring } = monitor;
-    return monitoring === true || enabled === true ? 1 : 0;
+function convertMonitoringToDbEnabled(monitor: UnknownRecord): number {
+    return monitor["monitoring"] === true ? 1 : 0;
 }
 
 /**
@@ -531,13 +526,9 @@ function mapDynamicFields(monitor: UnknownRecord, row: UnknownRecord): void {
  * @internal
  */
 function mapStandardFields(monitor: UnknownRecord, row: UnknownRecord): void {
-    // Handle enabled/monitoring fields specially since they map to the same db
-    // field
-    if (
-        monitor["monitoring"] !== undefined ||
-        monitor["enabled"] !== undefined
-    ) {
-        row["enabled"] = convertEnabledField(monitor);
+    // Persist enabled state from the canonical monitor.monitoring boolean.
+    if (monitor["monitoring"] !== undefined) {
+        row["enabled"] = convertMonitoringToDbEnabled(monitor);
     }
 
     // Process all other standard field mappings with enhanced error handling
@@ -684,8 +675,10 @@ export function mapMonitorToRow(monitor: Monitor): MonitorRow {
  * Maps a database row to a monitor object, including dynamic fields.
  *
  * @remarks
- * Converts database values to JavaScript types. Maps `enabled` to both
- * `enabled` and `monitoring` for frontend compatibility.
+ * Converts database values to JavaScript types.
+ *
+ * The monitors table stores the monitoring state as the SQLite `enabled` column
+ * (1/0). This is mapped to {@link Monitor.monitoring}.
  *
  * @example
  *

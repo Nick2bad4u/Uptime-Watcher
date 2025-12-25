@@ -54,7 +54,7 @@ tags:
 
 Notes:
 
-- **\$schema**: Always points to `../../config/schemas/doc-frontmatter.schema.json` for files directly under `docs/Guides/` and `docs/Architecture/`. For files in subdirectories (for example, `docs/Architecture/ADRs/*`), adjust the relative path accordingly (for example, `../../../config/schemas/doc-frontmatter.schema.json`).
+- **schema**: Always points to `../../config/schemas/doc-frontmatter.schema.json` for files directly under `docs/Guides/` and `docs/Architecture/`. For files in subdirectories (for example, `docs/Architecture/ADRs/*`), adjust the relative path accordingly (for example, `../../../config/schemas/doc-frontmatter.schema.json`).
 
 - **title**: Matches the main H1 where practical but does not need to include emojis or decorative prefixes.
 

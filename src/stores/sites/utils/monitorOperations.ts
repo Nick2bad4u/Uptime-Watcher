@@ -22,7 +22,6 @@ import {
     type MonitorType,
     type Site,
 } from "@shared/types";
-import { DEFAULT_MONITOR_CONFIG as SHARED_MONITOR_CONFIG } from "@shared/types/monitorConfig";
 import { ERROR_CATALOG } from "@shared/utils/errorCatalog";
 import { ensureError } from "@shared/utils/errorHandling";
 import { validateMonitorType as isValidMonitorType } from "@shared/utils/validation";
@@ -46,10 +45,8 @@ const BASE_MONITOR_DEFAULTS = {
     status: DEFAULT_MONITOR_STATUS,
 } as const;
 
-function ensureNumberOrFallback(value: unknown, fallback: number): number {
-    return typeof value === "number" && Number.isFinite(value)
-        ? value
-        : fallback;
+function assertUnreachable(value: never): never {
+    throw new Error(`Unhandled monitor type: ${String(value)}`);
 }
 
 function ensureBooleanOrFallback(value: unknown, fallback: boolean): boolean {
@@ -69,169 +66,90 @@ function ensureTrimmedStringOrFallback(
     return fallback;
 }
 
-const HTTP_SHARED_DEFAULTS = SHARED_MONITOR_CONFIG.http;
-const HTTP_DEFAULT_URL = ensureTrimmedStringOrFallback(
-    HTTP_SHARED_DEFAULTS.url ?? "",
-    "https://example.com"
-);
+const DEFAULT_MONITOR_TIMEOUT_MS = 30_000;
+const DEFAULT_MONITOR_RETRY_ATTEMPTS = 3;
+const DEFAULT_MONITOR_MONITORING = true;
+const DEFAULT_SSL_WARNING_DAYS = 30;
 
-function hasSharedMonitorDefaults(
-    type: MonitorType
-): type is keyof typeof SHARED_MONITOR_CONFIG {
-    return Object.hasOwn(SHARED_MONITOR_CONFIG, type);
-}
+const HTTP_DEFAULT_URL = "https://example.com";
 
-function getSharedMonitorDefaults<T extends keyof typeof SHARED_MONITOR_CONFIG>(
-    type: T
-): (typeof SHARED_MONITOR_CONFIG)[T] | undefined {
-    if (Object.hasOwn(SHARED_MONITOR_CONFIG, type)) {
-        return SHARED_MONITOR_CONFIG[type];
-    }
+const HTTP_HEADER_DEFAULT_HEADER_NAME = "content-type";
+const HTTP_HEADER_DEFAULT_EXPECTED_VALUE = "application/json";
 
-    return undefined;
-}
+const HTTP_JSON_DEFAULT_PATH = "status";
+const HTTP_JSON_DEFAULT_EXPECTED_VALUE = "ok";
 
-const DEFAULT_SSL_WARNING_DAYS = ensureNumberOrFallback(
-    (
-        SHARED_MONITOR_CONFIG.ssl as
-            | undefined
-            | { certificateWarningDays?: number }
-    )?.certificateWarningDays,
-    30
-);
+const HTTP_LATENCY_DEFAULT_MAX_RESPONSE_MS = 2000;
 
-const DEFAULT_SHARED_CHECK_INTERVAL = ensureNumberOrFallback(
-    HTTP_SHARED_DEFAULTS.checkInterval,
-    DEFAULT_MONITOR_CHECK_INTERVAL_MS
-);
-const DEFAULT_SHARED_RETRY_ATTEMPTS = ensureNumberOrFallback(
-    HTTP_SHARED_DEFAULTS.retryAttempts,
-    3
-);
-const DEFAULT_SHARED_TIMEOUT = ensureNumberOrFallback(
-    HTTP_SHARED_DEFAULTS.timeout,
-    30_000
-);
-const DEFAULT_SHARED_ENABLED = ensureBooleanOrFallback(
-    HTTP_SHARED_DEFAULTS.enabled,
-    true
-);
+const WEBSOCKET_KEEPALIVE_DEFAULT_MAX_PONG_MS = 1500;
+const WEBSOCKET_KEEPALIVE_DEFAULT_URL = "wss://example.com/socket";
 
-const HTTP_HEADER_SHARED_DEFAULTS = getSharedMonitorDefaults("http-header");
-const HTTP_HEADER_DEFAULT_HEADER_NAME = ensureTrimmedStringOrFallback(
-    HTTP_HEADER_SHARED_DEFAULTS?.headerName,
-    "content-type"
-);
-const HTTP_HEADER_DEFAULT_EXPECTED_VALUE = ensureTrimmedStringOrFallback(
-    HTTP_HEADER_SHARED_DEFAULTS?.expectedHeaderValue,
-    "application/json"
-);
-const HTTP_JSON_SHARED_DEFAULTS = getSharedMonitorDefaults("http-json");
-const HTTP_JSON_DEFAULT_PATH = ensureTrimmedStringOrFallback(
-    HTTP_JSON_SHARED_DEFAULTS?.jsonPath,
-    "status"
-);
-const HTTP_JSON_DEFAULT_EXPECTED_VALUE = ensureTrimmedStringOrFallback(
-    HTTP_JSON_SHARED_DEFAULTS?.expectedJsonValue,
-    "ok"
-);
-const HTTP_LATENCY_SHARED_DEFAULTS = getSharedMonitorDefaults("http-latency");
-const HTTP_LATENCY_DEFAULT_MAX_RESPONSE_MS = ensureNumberOrFallback(
-    HTTP_LATENCY_SHARED_DEFAULTS?.maxResponseTime,
-    2000
-);
-const WEBSOCKET_KEEPALIVE_SHARED_DEFAULTS = getSharedMonitorDefaults(
-    "websocket-keepalive"
-);
-const WEBSOCKET_KEEPALIVE_DEFAULT_MAX_PONG_MS = ensureNumberOrFallback(
-    WEBSOCKET_KEEPALIVE_SHARED_DEFAULTS?.maxPongDelayMs,
-    1500
-);
-const WEBSOCKET_KEEPALIVE_DEFAULT_URL = ensureTrimmedStringOrFallback(
-    undefined,
-    "wss://example.com/socket"
-);
-const SERVER_HEARTBEAT_SHARED_DEFAULTS =
-    getSharedMonitorDefaults("server-heartbeat");
-const SERVER_HEARTBEAT_DEFAULT_URL = ensureTrimmedStringOrFallback(
-    undefined,
-    "https://example.com/heartbeat"
-);
-const SERVER_HEARTBEAT_DEFAULT_STATUS_FIELD = ensureTrimmedStringOrFallback(
-    SERVER_HEARTBEAT_SHARED_DEFAULTS?.heartbeatStatusField,
-    "status"
-);
-const SERVER_HEARTBEAT_DEFAULT_EXPECTED_STATUS = ensureTrimmedStringOrFallback(
-    SERVER_HEARTBEAT_SHARED_DEFAULTS?.heartbeatExpectedStatus,
-    "ok"
-);
-const SERVER_HEARTBEAT_DEFAULT_TIMESTAMP_FIELD = ensureTrimmedStringOrFallback(
-    SERVER_HEARTBEAT_SHARED_DEFAULTS?.heartbeatTimestampField,
-    "timestamp"
-);
-const SERVER_HEARTBEAT_DEFAULT_MAX_DRIFT_SECONDS = ensureNumberOrFallback(
-    SERVER_HEARTBEAT_SHARED_DEFAULTS?.heartbeatMaxDriftSeconds,
-    60
-);
-const REPLICATION_SHARED_DEFAULTS = getSharedMonitorDefaults("replication");
-const REPLICATION_DEFAULT_PRIMARY_URL = ensureTrimmedStringOrFallback(
-    REPLICATION_SHARED_DEFAULTS?.primaryStatusUrl,
-    "https://primary.example.com/status"
-);
-const REPLICATION_DEFAULT_REPLICA_URL = ensureTrimmedStringOrFallback(
-    REPLICATION_SHARED_DEFAULTS?.replicaStatusUrl,
-    "https://replica.example.com/status"
-);
-const REPLICATION_DEFAULT_TIMESTAMP_FIELD = ensureTrimmedStringOrFallback(
-    REPLICATION_SHARED_DEFAULTS?.replicationTimestampField,
-    "lastAppliedTimestamp"
-);
-const REPLICATION_DEFAULT_MAX_LAG_SECONDS = ensureNumberOrFallback(
-    REPLICATION_SHARED_DEFAULTS?.maxReplicationLagSeconds,
-    10
-);
-const CDN_EDGE_SHARED_DEFAULTS = getSharedMonitorDefaults(
-    "cdn-edge-consistency"
-);
-const CDN_EDGE_DEFAULT_BASELINE_URL = ensureTrimmedStringOrFallback(
-    CDN_EDGE_SHARED_DEFAULTS?.baselineUrl,
-    "https://origin.example.com/health"
-);
-const CDN_EDGE_DEFAULT_EDGE_LOCATIONS = ensureTrimmedStringOrFallback(
-    CDN_EDGE_SHARED_DEFAULTS?.edgeLocations,
-    "https://edge-1.example.com,https://edge-2.example.com"
-);
+const SERVER_HEARTBEAT_DEFAULT_URL = "https://example.com/heartbeat";
+const SERVER_HEARTBEAT_DEFAULT_STATUS_FIELD = "status";
+const SERVER_HEARTBEAT_DEFAULT_EXPECTED_STATUS = "ok";
+const SERVER_HEARTBEAT_DEFAULT_TIMESTAMP_FIELD = "timestamp";
+const SERVER_HEARTBEAT_DEFAULT_MAX_DRIFT_SECONDS = 60;
+
+const REPLICATION_DEFAULT_PRIMARY_URL = "https://primary.example.com/status";
+const REPLICATION_DEFAULT_REPLICA_URL = "https://replica.example.com/status";
+const REPLICATION_DEFAULT_TIMESTAMP_FIELD = "lastAppliedTimestamp";
+const REPLICATION_DEFAULT_MAX_LAG_SECONDS = 10;
+
+const CDN_EDGE_DEFAULT_BASELINE_URL = "https://origin.example.com/health";
+const CDN_EDGE_DEFAULT_EDGE_LOCATIONS =
+    "https://edge-1.example.com,https://edge-2.example.com";
 
 interface MonitorTypeDefaults {
     checkInterval: number;
-    enabled: boolean;
+    monitoring: boolean;
     retryAttempts: number;
     timeout: number;
 }
 
 function getMonitorTypeDefaults(type: MonitorType): MonitorTypeDefaults {
-    const sharedDefaults = hasSharedMonitorDefaults(type)
-        ? SHARED_MONITOR_CONFIG[type]
-        : undefined;
+    switch (type) {
+        case "cdn-edge-consistency":
+        case "dns":
+        case "http":
+        case "http-header":
+        case "http-json":
+        case "http-keyword":
+        case "http-latency":
+        case "http-status":
+        case "ping":
+        case "port":
+        case "ssl": {
+            return {
+                checkInterval: DEFAULT_MONITOR_CHECK_INTERVAL_MS,
+                monitoring: DEFAULT_MONITOR_MONITORING,
+                retryAttempts: DEFAULT_MONITOR_RETRY_ATTEMPTS,
+                timeout: DEFAULT_MONITOR_TIMEOUT_MS,
+            };
+        }
 
-    return {
-        checkInterval: ensureNumberOrFallback(
-            sharedDefaults?.checkInterval,
-            DEFAULT_SHARED_CHECK_INTERVAL
-        ),
-        enabled: ensureBooleanOrFallback(
-            sharedDefaults?.enabled,
-            DEFAULT_SHARED_ENABLED
-        ),
-        retryAttempts: ensureNumberOrFallback(
-            sharedDefaults?.retryAttempts,
-            DEFAULT_SHARED_RETRY_ATTEMPTS
-        ),
-        timeout: ensureNumberOrFallback(
-            sharedDefaults?.timeout,
-            DEFAULT_SHARED_TIMEOUT
-        ),
-    };
+        case "replication": {
+            return {
+                checkInterval: 120_000,
+                monitoring: DEFAULT_MONITOR_MONITORING,
+                retryAttempts: DEFAULT_MONITOR_RETRY_ATTEMPTS,
+                timeout: DEFAULT_MONITOR_TIMEOUT_MS,
+            };
+        }
+
+        case "server-heartbeat":
+        case "websocket-keepalive": {
+            return {
+                checkInterval: 60_000,
+                monitoring: DEFAULT_MONITOR_MONITORING,
+                retryAttempts: DEFAULT_MONITOR_RETRY_ATTEMPTS,
+                timeout: DEFAULT_MONITOR_TIMEOUT_MS,
+            };
+        }
+
+        default: {
+            return assertUnreachable(type);
+        }
+    }
 }
 
 /**
@@ -907,7 +825,10 @@ export function normalizeMonitor(monitor: Partial<Monitor>): Monitor {
             ? filteredMonitor.history
             : BASE_MONITOR_DEFAULTS.history,
         id: validId,
-        monitoring: filteredMonitor.monitoring ?? monitorTypeDefaults.enabled,
+        monitoring: ensureBooleanOrFallback(
+            filteredMonitor.monitoring,
+            monitorTypeDefaults.monitoring
+        ),
         responseTime:
             typeof filteredMonitor.responseTime === "number"
                 ? filteredMonitor.responseTime

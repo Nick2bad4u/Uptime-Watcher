@@ -10,7 +10,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { AxiosResponse } from "axios";
 
 import type { Site } from "@shared/types";
-import type { HttpMonitorConfig } from "@shared/types/monitorConfig";
 import type {
     MonitorCheckResult,
     MonitorServiceConfig,
@@ -78,17 +77,18 @@ describe("HttpMonitor - Comprehensive Coverage", () => {
     let httpMonitor: HttpMonitor;
     let mockAxiosInstance: any;
 
+    type HttpMonitorConfig = Site["monitors"][0] & { type: "http" };
+
     const createHttpMonitorConfig = (
         overrides: Partial<HttpMonitorConfig> = {}
     ): HttpMonitorConfig => ({
         checkInterval: 60_000,
-        enabled: true,
-        expectedStatusCodes: [200],
-        followRedirects: true,
+        history: [],
         id: "http-monitor-id",
-        method: "GET",
-        name: "HTTP Monitor",
+        monitoring: true,
+        responseTime: 0,
         retryAttempts: 3,
+        status: "pending",
         timeout: 5000,
         type: "http",
         url: "https://example.com",
@@ -336,7 +336,6 @@ describe("HttpMonitor - Comprehensive Coverage", () => {
                 monitoring: true,
                 responseTime: 0,
                 status: "pending" as const,
-                enabled: true,
             } as any;
 
             await expect(httpMonitor.check(monitor)).rejects.toThrowError(

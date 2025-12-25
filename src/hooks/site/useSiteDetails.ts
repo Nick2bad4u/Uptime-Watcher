@@ -414,6 +414,7 @@ export function useSiteDetails({
             confirmLabel: "Remove Site",
             details:
                 "This action permanently removes the site and its monitors.",
+            emphasisText: currentSite.name,
             message: `Are you sure you want to remove ${currentSite.name}?`,
             title: "Remove Site",
             tone: "danger",
@@ -457,6 +458,7 @@ export function useSiteDetails({
             cancelLabel: "Keep Monitor",
             confirmLabel: "Remove Monitor",
             details: `${currentSite.name} will no longer be monitored by "${monitorName}".`,
+            emphasisText: monitorName,
             message: `Remove the monitor "${monitorName}" from ${currentSite.name}?`,
             title: "Remove Monitor",
             tone: "danger",

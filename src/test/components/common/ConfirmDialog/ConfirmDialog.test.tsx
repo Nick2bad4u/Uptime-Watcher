@@ -8,6 +8,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 interface CapturedButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
     readonly "data-testid"?: string;
+    readonly icon?: ReactNode;
     readonly variant?: string;
 }
 
@@ -40,6 +41,7 @@ vi.mock("../../../../theme/components/ThemedText", () => ({
 vi.mock("../../../../theme/components/ThemedButton", () => ({
     ThemedButton: ({
         children,
+        icon,
         ...props
     }: {
         readonly children?: ReactNode;
@@ -47,6 +49,7 @@ vi.mock("../../../../theme/components/ThemedButton", () => ({
         buttonProps.push(props);
         return (
             <button type="button" {...props}>
+                {icon}
                 {children}
             </button>
         );

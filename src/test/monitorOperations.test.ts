@@ -13,7 +13,6 @@ import {
     DEFAULT_MONITOR_CHECK_INTERVAL_MS,
     MIN_MONITOR_CHECK_INTERVAL_MS,
 } from "@shared/constants/monitoring";
-import { DEFAULT_MONITOR_CONFIG as SHARED_MONITOR_CONFIG } from "@shared/types/monitorConfig";
 
 import {
     createDefaultMonitor,
@@ -34,7 +33,7 @@ const mockCrypto = {
     randomUUID: vi.fn().mockReturnValue(mockUUID),
 };
 
-const SHARED_HTTP_TIMEOUT = SHARED_MONITOR_CONFIG.http?.timeout ?? 30_000;
+const DEFAULT_HTTP_TIMEOUT = 30_000;
 
 const MONITOR_STATUS_VALUES = [
     STATUS_KIND.DEGRADED,
@@ -87,16 +86,14 @@ describe("monitorOperations", () => {
 
             expect(monitor).toEqual({
                 activeOperations: [],
-                checkInterval:
-                    SHARED_MONITOR_CONFIG.http?.checkInterval ??
-                    DEFAULT_MONITOR_CHECK_INTERVAL_MS,
+                checkInterval: DEFAULT_MONITOR_CHECK_INTERVAL_MS,
                 history: [],
                 id: mockUUID,
-                monitoring: SHARED_MONITOR_CONFIG.http?.enabled ?? true,
+                monitoring: true,
                 responseTime: -1,
-                retryAttempts: SHARED_MONITOR_CONFIG.http?.retryAttempts ?? 3,
+                retryAttempts: 3,
                 status: DEFAULT_MONITOR_STATUS,
-                timeout: SHARED_MONITOR_CONFIG.http?.timeout ?? 30_000,
+                timeout: DEFAULT_HTTP_TIMEOUT,
                 type: "http",
                 url: "https://example.com",
             });
@@ -169,7 +166,7 @@ describe("monitorOperations", () => {
                 responseTime: -1,
                 retryAttempts: 3,
                 status: "down",
-                timeout: SHARED_HTTP_TIMEOUT,
+                timeout: DEFAULT_HTTP_TIMEOUT,
                 type: "http",
                 url: "https://test.com",
             });
@@ -474,16 +471,14 @@ describe("monitorOperations", () => {
 
             expect(result).toEqual({
                 activeOperations: [],
-                checkInterval:
-                    SHARED_MONITOR_CONFIG.http?.checkInterval ??
-                    DEFAULT_MONITOR_CHECK_INTERVAL_MS,
+                checkInterval: DEFAULT_MONITOR_CHECK_INTERVAL_MS,
                 history: [],
                 id: mockUUID,
-                monitoring: SHARED_MONITOR_CONFIG.http?.enabled ?? true,
+                monitoring: true,
                 responseTime: -1,
-                retryAttempts: SHARED_MONITOR_CONFIG.http?.retryAttempts ?? 3,
+                retryAttempts: 3,
                 status: DEFAULT_MONITOR_STATUS,
-                timeout: SHARED_MONITOR_CONFIG.http?.timeout ?? 30_000,
+                timeout: DEFAULT_HTTP_TIMEOUT,
                 type: "http",
                 url: "https://example.com",
             });
@@ -652,7 +647,7 @@ describe("monitorOperations", () => {
                 responseTime: -1,
                 retryAttempts: 3,
                 status: "pending",
-                timeout: SHARED_HTTP_TIMEOUT,
+                timeout: DEFAULT_HTTP_TIMEOUT,
                 type: "http",
                 url: "https://example.com",
             });
@@ -686,7 +681,7 @@ describe("monitorOperations", () => {
                 responseTime: -1,
                 retryAttempts: 3,
                 status: "pending",
-                timeout: SHARED_HTTP_TIMEOUT,
+                timeout: DEFAULT_HTTP_TIMEOUT,
                 type: "port",
             });
         });
@@ -764,7 +759,7 @@ describe("monitorOperations", () => {
                     type: "http",
                     responseTime: -1,
                     checkInterval: 300_000,
-                    timeout: SHARED_HTTP_TIMEOUT,
+                    timeout: DEFAULT_HTTP_TIMEOUT,
                     retryAttempts: 3,
                 },
                 {
@@ -775,7 +770,7 @@ describe("monitorOperations", () => {
                     type: "port",
                     responseTime: -1,
                     checkInterval: 300_000,
-                    timeout: SHARED_HTTP_TIMEOUT,
+                    timeout: DEFAULT_HTTP_TIMEOUT,
                     retryAttempts: 3,
                 },
             ],
@@ -846,7 +841,7 @@ describe("monitorOperations", () => {
                     status: "up",
                     type: "http",
                     responseTime: -1,
-                    timeout: SHARED_HTTP_TIMEOUT,
+                    timeout: DEFAULT_HTTP_TIMEOUT,
                     retryAttempts: 3,
                 },
                 {
@@ -857,7 +852,7 @@ describe("monitorOperations", () => {
                     status: "down",
                     type: "port",
                     responseTime: -1,
-                    timeout: SHARED_HTTP_TIMEOUT,
+                    timeout: DEFAULT_HTTP_TIMEOUT,
                     retryAttempts: 3,
                 },
             ],
@@ -966,7 +961,7 @@ describe("monitorOperations", () => {
                     type: "http",
                     responseTime: -1,
                     checkInterval: 300_000,
-                    timeout: SHARED_HTTP_TIMEOUT,
+                    timeout: DEFAULT_HTTP_TIMEOUT,
                     retryAttempts: 3,
                 },
             ],
@@ -987,7 +982,7 @@ describe("monitorOperations", () => {
                 type: "port",
                 responseTime: -1,
                 checkInterval: 300_000,
-                timeout: SHARED_HTTP_TIMEOUT,
+                timeout: DEFAULT_HTTP_TIMEOUT,
                 retryAttempts: 3,
             };
 
@@ -1012,7 +1007,7 @@ describe("monitorOperations", () => {
                 type: "port",
                 responseTime: -1,
                 checkInterval: 300_000,
-                timeout: SHARED_HTTP_TIMEOUT,
+                timeout: DEFAULT_HTTP_TIMEOUT,
                 retryAttempts: 3,
             };
             const originalSite = { ...mockSite };
@@ -1042,7 +1037,7 @@ describe("monitorOperations", () => {
                 type: "http",
                 responseTime: -1,
                 checkInterval: 300_000,
-                timeout: SHARED_HTTP_TIMEOUT,
+                timeout: DEFAULT_HTTP_TIMEOUT,
                 retryAttempts: 3,
             };
 
@@ -1066,7 +1061,7 @@ describe("monitorOperations", () => {
                     type: "http",
                     responseTime: -1,
                     checkInterval: 300_000,
-                    timeout: SHARED_HTTP_TIMEOUT,
+                    timeout: DEFAULT_HTTP_TIMEOUT,
                     retryAttempts: 3,
                 },
                 {
@@ -1077,7 +1072,7 @@ describe("monitorOperations", () => {
                     type: "port",
                     responseTime: -1,
                     checkInterval: 300_000,
-                    timeout: SHARED_HTTP_TIMEOUT,
+                    timeout: DEFAULT_HTTP_TIMEOUT,
                     retryAttempts: 3,
                 },
             ],
@@ -1178,7 +1173,7 @@ describe("monitorOperations", () => {
                     type: "http",
                     responseTime: -1,
                     checkInterval: 300_000,
-                    timeout: SHARED_HTTP_TIMEOUT,
+                    timeout: DEFAULT_HTTP_TIMEOUT,
                     retryAttempts: 3,
                 },
             ],
@@ -1256,7 +1251,7 @@ describe("monitorOperations", () => {
             responseTime: -1,
             retryAttempts: 3,
             status: "up",
-            timeout: SHARED_HTTP_TIMEOUT,
+            timeout: DEFAULT_HTTP_TIMEOUT,
             type: "http",
         };
 
