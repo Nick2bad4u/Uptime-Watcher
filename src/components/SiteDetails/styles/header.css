@@ -15,6 +15,9 @@
     font-weight: var(--font-weight-semibold);
     letter-spacing: -0.02em;
     line-height: 1.25;
+    text-shadow:
+        0 1px 0 rgb(0 0 0 / 0.28),
+        0 4px 10px rgb(0 0 0 / 0.45);
 
     &::after {
         display: block;

@@ -67,12 +67,14 @@ const configureUserDataPath = (): void => {
     }
 
     try {
-        const resolvedPath = path.resolve(overridePath);
-        if (!path.isAbsolute(resolvedPath)) {
+        const trimmedOverridePath = overridePath.trim();
+        if (!path.isAbsolute(trimmedOverridePath)) {
             throw new Error(
                 `User data override path must be absolute. Received '${overridePath}'`
             );
         }
+
+        const resolvedPath = path.resolve(trimmedOverridePath);
 
         mkdirSync(resolvedPath, { recursive: true }); // eslint-disable-line security/detect-non-literal-fs-filename, n/no-sync -- Dynamic but validated path is required during early startup and sync IO guarantees the directory exists before Electron proceeds
         app.setPath("userData", resolvedPath);
@@ -205,6 +207,10 @@ if (
     !readProcessEnv("HEADLESS")
 ) {
     try {
+        // Security: bind the remote debugging interface to localhost.
+        // Without this, Chromium may listen on all interfaces, which could
+        // expose the DevTools protocol to other machines on the network.
+        app.commandLine.appendSwitch("remote-debugging-address", "127.0.0.1");
         app.commandLine.appendSwitch("remote-debugging-port", "9223");
         logger.info(
             "[Main] Remote debugging enabled on port 9223 (Electron MCP)"

@@ -36,6 +36,7 @@ const ListIcon = AppIcons.layout.listAlt;
 
 const RefreshIcon = AppIcons.actions.refresh;
 const RemoveIcon = AppIcons.actions.remove;
+const SaveIcon = AppIcons.actions.save;
 
 const formatIntervalOption = (
     intervalOption: number | { label?: string; value: number }
@@ -223,6 +224,7 @@ export const OverviewTab = ({
     const accessTimeIcon = useMemo(() => <TimeIcon />, []);
     const quickActionIcon = useMemo(() => <RefreshIcon />, []);
     const trashIcon = useMemo(() => <RemoveIcon />, []);
+    const saveIcon = useMemo(() => <SaveIcon className="h-4 w-4" />, []);
     return (
         <div className="space-y-6" data-testid="overview-tab">
             {/* Key Metrics Grid */}
@@ -250,7 +252,7 @@ export const OverviewTab = ({
                 >
                     <ThemedProgress
                         className="flex flex-col items-center"
-                        showLabel
+                        showLabel={false}
                         value={uptimeValue}
                         variant={progressVariant}
                     />
@@ -298,127 +300,135 @@ export const OverviewTab = ({
                 iconColor={iconColors.fastest}
                 title="Performance Overview"
             >
-                <div className="flex justify-center">
-                    <div className="grid grid-cols-2 gap-6">
-                        <div className="text-center">
-                            <ThemedText size="sm" variant="secondary">
-                                Fastest Response
-                            </ThemedText>
-                            <ThemedBadge
-                                className="ml-4"
-                                icon={boltIcon}
-                                iconColor={iconColors.fastest}
-                                variant="success"
-                            >
-                                {formatResponseTime(fastestResponse)}
-                            </ThemedBadge>
-                        </div>
-                        <div className="text-center">
-                            <ThemedText size="sm" variant="secondary">
-                                Slowest Response
-                            </ThemedText>
-                            <ThemedBadge
-                                className="ml-4"
-                                icon={accessTimeIcon}
-                                iconColor={iconColors.slowest}
-                                variant="warning"
-                            >
-                                {formatResponseTime(slowestResponse)}
-                            </ThemedBadge>
-                        </div>
+                <div className="grid gap-4 sm:grid-cols-2">
+                    <div className="flex items-center justify-between gap-3">
+                        <ThemedText size="sm" variant="secondary">
+                            Fastest Response
+                        </ThemedText>
+                        <ThemedBadge
+                            icon={boltIcon}
+                            iconColor={iconColors.fastest}
+                            size="sm"
+                            variant="success"
+                        >
+                            {formatResponseTime(fastestResponse)}
+                        </ThemedBadge>
+                    </div>
+
+                    <div className="flex items-center justify-between gap-3">
+                        <ThemedText size="sm" variant="secondary">
+                            Slowest Response
+                        </ThemedText>
+                        <ThemedBadge
+                            icon={accessTimeIcon}
+                            iconColor={iconColors.slowest}
+                            size="sm"
+                            variant="warning"
+                        >
+                            {formatResponseTime(slowestResponse)}
+                        </ThemedBadge>
                     </div>
                 </div>
             </ThemedCard>
 
             {/* Quick Actions */}
             <ThemedCard icon={quickActionIcon} title="Quick Actions">
-                <div className="flex flex-wrap items-center justify-between gap-4">
+                <div className="grid gap-4 md:grid-cols-12 md:items-end">
                     {/* Interval Control */}
-                    <div className="flex items-center gap-2">
-                        <ThemedText size="sm" variant="secondary">
-                            Interval:
-                        </ThemedText>
-                        <ThemedSelect
-                            disabled={isLoading}
-                            onChange={handleIntervalChange}
-                            value={localCheckInterval}
-                        >
-                            {CHECK_INTERVALS.map((intervalOption) => {
-                                const { label, value } =
-                                    formatIntervalOption(intervalOption);
-                                return (
-                                    <option key={value} value={value}>
-                                        {label}
-                                    </option>
-                                );
-                            })}
-                        </ThemedSelect>
-                        {intervalChanged ? (
-                            <ThemedButton
+                    <div className="md:col-span-5">
+                        <div className="flex flex-wrap items-center gap-2">
+                            <ThemedText size="sm" variant="secondary">
+                                Interval:
+                            </ThemedText>
+                            <ThemedSelect
                                 disabled={isLoading}
-                                onClick={handleSaveIntervalClick}
-                                size="xs"
-                                variant="primary"
+                                onChange={handleIntervalChange}
+                                value={localCheckInterval}
                             >
-                                Save
-                            </ThemedButton>
-                        ) : null}
+                                {CHECK_INTERVALS.map((intervalOption) => {
+                                    const { label, value } =
+                                        formatIntervalOption(intervalOption);
+                                    return (
+                                        <option key={value} value={value}>
+                                            {label}
+                                        </option>
+                                    );
+                                })}
+                            </ThemedSelect>
+                            {intervalChanged ? (
+                                <ThemedButton
+                                    disabled={isLoading}
+                                    icon={saveIcon}
+                                    onClick={handleSaveIntervalClick}
+                                    size="xs"
+                                    variant="primary"
+                                >
+                                    Save
+                                </ThemedButton>
+                            ) : null}
+                        </div>
                     </div>
 
                     {/* Timeout Control */}
-                    <div className="flex items-center gap-2">
-                        <ThemedText size="sm" variant="secondary">
-                            Timeout:
-                        </ThemedText>
-                        <ThemedInput
-                            aria-label="Monitor timeout in seconds"
-                            className="w-16 text-xs"
-                            disabled={isLoading}
-                            max={TIMEOUT_CONSTRAINTS.MAX}
-                            min={TIMEOUT_CONSTRAINTS.MIN}
-                            onChange={handleTimeoutChange}
-                            step={TIMEOUT_CONSTRAINTS.STEP}
-                            type="number"
-                            value={localTimeout}
-                        />
-                        <ThemedText size="xs" variant="secondary">
-                            s
-                        </ThemedText>
-                        {timeoutChanged ? (
-                            <ThemedButton
+                    <div className="md:col-span-4">
+                        <div className="flex flex-wrap items-center gap-2">
+                            <ThemedText size="sm" variant="secondary">
+                                Timeout:
+                            </ThemedText>
+                            <ThemedInput
+                                aria-label="Monitor timeout in seconds"
+                                className="w-16 text-xs"
                                 disabled={isLoading}
-                                onClick={handleSaveTimeoutClick}
-                                size="xs"
-                                variant="primary"
-                            >
-                                Save
-                            </ThemedButton>
-                        ) : null}
+                                max={TIMEOUT_CONSTRAINTS.MAX}
+                                min={TIMEOUT_CONSTRAINTS.MIN}
+                                onChange={handleTimeoutChange}
+                                step={TIMEOUT_CONSTRAINTS.STEP}
+                                type="number"
+                                value={localTimeout}
+                            />
+                            <ThemedText size="xs" variant="secondary">
+                                s
+                            </ThemedText>
+                            {timeoutChanged ? (
+                                <ThemedButton
+                                    disabled={isLoading}
+                                    icon={saveIcon}
+                                    onClick={handleSaveTimeoutClick}
+                                    size="xs"
+                                    variant="primary"
+                                >
+                                    Save
+                                </ThemedButton>
+                            ) : null}
+                        </div>
                     </div>
 
-                    {/* Check Now Button */}
-                    <ThemedButton
-                        aria-label="Check Now"
-                        className="flex items-center gap-1"
-                        disabled={isLoading}
-                        onClick={onCheckNow}
-                        size="sm"
-                        variant="secondary"
-                    >
-                        <RefreshIcon size={16} />
-                        <span className="text-xs">Check Now</span>
-                    </ThemedButton>
+                    {/* Actions */}
+                    <div className="md:col-span-3 md:flex md:justify-end">
+                        <div className="flex flex-wrap items-center gap-2 md:justify-end">
+                            <ThemedButton
+                                aria-label="Check Now"
+                                className="flex items-center gap-1"
+                                disabled={isLoading}
+                                onClick={onCheckNow}
+                                size="sm"
+                                variant="secondary"
+                            >
+                                <RefreshIcon size={16} />
+                                <span className="text-xs">Check Now</span>
+                            </ThemedButton>
 
-                    {/* Remove Monitor Button */}
-                    <ThemedButton
-                        disabled={isLoading}
-                        icon={trashIcon}
-                        onClick={handleRemoveClick}
-                        size="sm"
-                        variant="error"
-                    >
-                        Remove Monitor
-                    </ThemedButton>
+                            <ThemedButton
+                                disabled={isLoading}
+                                icon={trashIcon}
+                                onClick={handleRemoveClick}
+                                size="sm"
+                                variant="error"
+                            >
+                                Remove Monitor
+                            </ThemedButton>
+                        </div>
+                    </div>
                 </div>
             </ThemedCard>
         </div>

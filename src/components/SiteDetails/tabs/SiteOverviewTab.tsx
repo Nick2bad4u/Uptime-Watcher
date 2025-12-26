@@ -7,14 +7,18 @@
 import type { Monitor, Site } from "@shared/types";
 import type { JSX } from "react/jsx-runtime";
 
+import { ensureError } from "@shared/utils/errorHandling";
 import { getSiteDisplayStatus } from "@shared/utils/siteStatus";
 import { useCallback, useMemo } from "react";
 
+import { logger } from "../../../services/logger";
+import { SystemService } from "../../../services/SystemService";
 import { StatusIndicator } from "../../../theme/components/StatusIndicator";
 import { ThemedBadge } from "../../../theme/components/ThemedBadge";
 import { ThemedBox } from "../../../theme/components/ThemedBox";
 import { ThemedButton } from "../../../theme/components/ThemedButton";
 import { ThemedCard } from "../../../theme/components/ThemedCard";
+import { ThemedIconButton } from "../../../theme/components/ThemedIconButton";
 import { ThemedProgress } from "../../../theme/components/ThemedProgress";
 import { ThemedText } from "../../../theme/components/ThemedText";
 import { useAvailabilityColors, useTheme } from "../../../theme/useTheme";
@@ -191,8 +195,27 @@ export const SiteOverviewTab = ({
 
     const iconColors = getIconColors();
 
+    const siteIdentifier = site.identifier;
+    const siteName = site.name;
+
+    const siteIdentifierDisplay = useMemo(() => {
+        const id = siteIdentifier;
+        if (id.length <= 18) return id;
+        return `${id.slice(0, 8)}…${id.slice(-4)}`;
+    }, [siteIdentifier]);
+
+    const siteNameDisplay = useMemo(() => {
+        const name = siteName;
+        if (name.length <= 40) return name;
+        return `${name.slice(0, 28)}…${name.slice(-8)}`;
+    }, [siteName]);
+
     const ActionsIcon = AppIcons.settings.gear;
     const FactCheckIcon = AppIcons.metrics.uptime;
+    const ListIcon = AppIcons.layout.listAlt;
+    const LinkIcon = AppIcons.ui.link;
+    const DatabaseIcon = AppIcons.ui.database;
+    const CopyIcon = AppIcons.actions.copy;
     const MonitorIcon = AppIcons.ui.monitor;
     const SiteIcon = AppIcons.ui.site;
     const SpeedIcon = AppIcons.metrics.response;
@@ -220,6 +243,32 @@ export const SiteOverviewTab = ({
         void handleRemoveSite();
     }, [handleRemoveSite]);
 
+    const handleCopySiteIdentifierClick = useCallback(() => {
+        void (async (): Promise<void> => {
+            try {
+                await SystemService.writeClipboardText(siteIdentifier);
+            } catch (error: unknown) {
+                const ensuredError = ensureError(error);
+                logger.warn("Failed to copy site identifier", ensuredError, {
+                    siteIdentifier,
+                });
+            }
+        })();
+    }, [siteIdentifier]);
+
+    const handleCopySiteNameClick = useCallback(() => {
+        void (async (): Promise<void> => {
+            try {
+                await SystemService.writeClipboardText(siteName);
+            } catch (error: unknown) {
+                const ensuredError = ensureError(error);
+                logger.warn("Failed to copy site name", ensuredError, {
+                    siteName,
+                });
+            }
+        })();
+    }, [siteName]);
+
     const domainIcon = useMemo(() => <SiteIcon />, [SiteIcon]);
     const monitorHeartIcon = useMemo(() => <MonitorIcon />, [MonitorIcon]);
     const factCheckIcon = useMemo(() => <FactCheckIcon />, [FactCheckIcon]);
@@ -235,6 +284,40 @@ export const SiteOverviewTab = ({
     const actionsIcon = useMemo(
         () => <ActionsIcon color={iconColors.actions} />,
         [ActionsIcon, iconColors.actions]
+    );
+
+    const copyIcon = useMemo(
+        () => <CopyIcon className="h-4 w-4" />,
+        [CopyIcon]
+    );
+
+    const siteNameIcon = useMemo(
+        () => <SiteIcon className="h-5 w-5" />,
+        [SiteIcon]
+    );
+    const siteIdIcon = useMemo(
+        () => <DatabaseIcon className="h-4 w-4" />,
+        [DatabaseIcon]
+    );
+    const siteLinkIcon = useMemo(
+        () => <LinkIcon className="h-4 w-4" />,
+        [LinkIcon]
+    );
+    const monitorsCountIcon = useMemo(
+        () => <MonitorIcon className="h-4 w-4" />,
+        [MonitorIcon]
+    );
+    const monitorsTotalIcon = useMemo(
+        () => <ListIcon className="h-4 w-4" />,
+        [ListIcon]
+    );
+    const monitorsRunningIcon = useMemo(
+        () => <StartIcon className="h-4 w-4" />,
+        [StartIcon]
+    );
+    const monitorsStoppedIcon = useMemo(
+        () => <StopIcon className="h-4 w-4" />,
+        [StopIcon]
     );
 
     const stopSiteMonitoringIcon = useMemo(
@@ -294,7 +377,7 @@ export const SiteOverviewTab = ({
                 >
                     <ThemedProgress
                         className="flex flex-col items-center"
-                        showLabel
+                        showLabel={false}
                         value={uptime}
                         variant={uptimeVariant}
                     />
@@ -333,31 +416,69 @@ export const SiteOverviewTab = ({
 
             {/* Site Information */}
             <ThemedCard icon={siteIcon} title="Site Information">
-                <div className="space-y-4">
-                    <div className="space-y-2">
-                        <ThemedText
-                            className="text-center"
-                            size="xl"
-                            variant="primary"
-                            weight="bold"
-                        >
-                            {site.name}
-                        </ThemedText>
-
-                        <div className="flex flex-wrap items-center justify-center gap-4 text-sm">
-                            <ThemedText variant="secondary">
-                                <strong>ID:</strong> {site.identifier}
-                            </ThemedText>
-
-                            <ThemedText variant="secondary">
-                                <strong>Name:</strong> {site.name}
-                            </ThemedText>
-
-                            <ThemedText variant="secondary">
-                                <strong>Monitors:</strong>{" "}
-                                {site.monitors.length}
+                <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                    <div className="min-w-0">
+                        <div className="flex items-center gap-2">
+                            <span aria-hidden>{siteNameIcon}</span>
+                            <ThemedText
+                                className="truncate"
+                                size="xl"
+                                variant="primary"
+                                weight="bold"
+                            >
+                                {site.name}
                             </ThemedText>
                         </div>
+                    </div>
+
+                    <div className="flex flex-wrap items-center justify-start gap-2 md:justify-end">
+                        <div className="flex items-center gap-1">
+                            <ThemedBadge
+                                icon={siteIdIcon}
+                                size="sm"
+                                variant="secondary"
+                            >
+                                <span title={site.identifier}>
+                                    ID: {siteIdentifierDisplay}
+                                </span>
+                            </ThemedBadge>
+
+                            <ThemedIconButton
+                                aria-label="Copy site ID"
+                                icon={copyIcon}
+                                onClick={handleCopySiteIdentifierClick}
+                                size="xs"
+                                tooltip="Copy ID"
+                            />
+                        </div>
+
+                        <div className="flex items-center gap-1">
+                            <ThemedBadge
+                                icon={siteLinkIcon}
+                                size="sm"
+                                variant="secondary"
+                            >
+                                <span title={site.name}>
+                                    Name: {siteNameDisplay}
+                                </span>
+                            </ThemedBadge>
+
+                            <ThemedIconButton
+                                aria-label="Copy site name"
+                                icon={copyIcon}
+                                onClick={handleCopySiteNameClick}
+                                size="xs"
+                                tooltip="Copy name"
+                            />
+                        </div>
+
+                        <ThemedBadge
+                            icon={monitorsCountIcon}
+                            size="sm"
+                            variant="secondary"
+                        >
+                            Monitors: {site.monitors.length}
+                        </ThemedBadge>
                     </div>
                 </div>
             </ThemedCard>
@@ -375,19 +496,29 @@ export const SiteOverviewTab = ({
                         </ThemedText>
 
                         <div className="flex flex-wrap items-center gap-4 text-sm">
-                            <ThemedText variant="secondary">
-                                <strong>Total:</strong> {site.monitors.length}
-                            </ThemedText>
+                            <ThemedBadge
+                                icon={monitorsTotalIcon}
+                                size="sm"
+                                variant="secondary"
+                            >
+                                Total: {site.monitors.length}
+                            </ThemedBadge>
 
-                            <ThemedText variant="secondary">
-                                <strong>Running:</strong>{" "}
-                                {runningMonitors.length}
-                            </ThemedText>
+                            <ThemedBadge
+                                icon={monitorsRunningIcon}
+                                size="sm"
+                                variant="secondary"
+                            >
+                                Running: {runningMonitors.length}
+                            </ThemedBadge>
 
-                            <ThemedText variant="secondary">
-                                <strong>Stopped:</strong>{" "}
-                                {site.monitors.length - runningMonitors.length}
-                            </ThemedText>
+                            <ThemedBadge
+                                icon={monitorsStoppedIcon}
+                                size="sm"
+                                variant="secondary"
+                            >
+                                Stopped: {site.monitors.length - runningMonitors.length}
+                            </ThemedBadge>
                         </div>
                     </div>
 

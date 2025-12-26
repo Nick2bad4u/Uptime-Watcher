@@ -66,6 +66,22 @@ function handleUnexpectedOAuthRequest(
     response.end(`Unexpected OAuth request handler invocation: ${url}`);
 }
 
+function applyLoopbackResponseHeaders(
+    response: http.ServerResponse,
+    contentType: "text/html; charset=utf-8" | "text/plain; charset=utf-8"
+): void {
+    response.setHeader("Content-Type", contentType);
+
+    // Defensive security headers for the browser page.
+    response.setHeader("Cache-Control", "no-store");
+    response.setHeader("X-Content-Type-Options", "nosniff");
+    response.setHeader("Referrer-Policy", "no-referrer");
+    response.setHeader(
+        "Content-Security-Policy",
+        "default-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'"
+    );
+}
+
 type DropboxAuthClient = Pick<
     DropboxAuth,
     "getAccessTokenFromCode" | "getAuthenticationUrl" | "setClientId"
@@ -333,21 +349,47 @@ export class DropboxAuthFlow {
                 response: http.ServerResponse
             ): void {
                 if (settled) {
-                    response.writeHead(410, {
-                        "Content-Type": "text/plain; charset=utf-8",
-                    });
+                    response.statusCode = 410;
+                    applyLoopbackResponseHeaders(
+                        response,
+                        "text/plain; charset=utf-8"
+                    );
                     response.end("Request already handled");
                     return;
                 }
 
-                try {
-                    const requestUrl = new URL(
-                        request.url ?? "/",
-                        `http://${request.headers.host ?? LOOPBACK_IP_HOST_4}`
+                if (request.method && request.method !== "GET") {
+                    response.statusCode = 405;
+                    applyLoopbackResponseHeaders(
+                        response,
+                        "text/plain; charset=utf-8"
                     );
+                    response.end("Method not allowed");
+                    return;
+                }
+
+                try {
+                    const rawUrl = request.url ?? "/";
+                    // Only accept origin-form URIs (path + query) to avoid
+                    // ambiguous absolute-form requests.
+                    if (!rawUrl.startsWith("/")) {
+                        response.statusCode = 400;
+                        applyLoopbackResponseHeaders(
+                            response,
+                            "text/plain; charset=utf-8"
+                        );
+                        response.end("Bad request");
+                        return;
+                    }
+
+                    const requestUrl = new URL(rawUrl, "http://localhost");
 
                     if (requestUrl.pathname !== LOOPBACK_PATH) {
-                        response.writeHead(404);
+                        response.statusCode = 404;
+                        applyLoopbackResponseHeaders(
+                            response,
+                            "text/plain; charset=utf-8"
+                        );
                         response.end();
                         return;
                     }
@@ -358,9 +400,11 @@ export class DropboxAuthFlow {
                         requestUrl.searchParams.get("error_description");
 
                     if (errorDescription) {
-                        response.writeHead(400, {
-                            "Content-Type": "text/plain; charset=utf-8",
-                        });
+                        response.statusCode = 400;
+                        applyLoopbackResponseHeaders(
+                            response,
+                            "text/plain; charset=utf-8"
+                        );
                         response.end(`OAuth error: ${errorDescription}`);
                         fail(
                             new Error(
@@ -371,9 +415,11 @@ export class DropboxAuthFlow {
                     }
 
                     if (!code || !state) {
-                        response.writeHead(400, {
-                            "Content-Type": "text/plain; charset=utf-8",
-                        });
+                        response.statusCode = 400;
+                        applyLoopbackResponseHeaders(
+                            response,
+                            "text/plain; charset=utf-8"
+                        );
                         response.end("Missing code/state");
                         fail(
                             new Error(
@@ -382,10 +428,11 @@ export class DropboxAuthFlow {
                         );
                         return;
                     }
-
-                    response.writeHead(200, {
-                        "Content-Type": "text/html; charset=utf-8",
-                    });
+                    response.statusCode = 200;
+                    applyLoopbackResponseHeaders(
+                        response,
+                        "text/html; charset=utf-8"
+                    );
                     response.end(
                         "<html><body><h1>Connected</h1><p>You can close this tab and return to Uptime Watcher.</p></body></html>"
                     );
