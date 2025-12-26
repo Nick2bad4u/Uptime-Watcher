@@ -9,8 +9,6 @@ import type { ChartOptions } from "chart.js";
 import type { JSX } from "react/jsx-runtime";
 
 import { useCallback, useMemo } from "react";
-import { FiActivity, FiBarChart2, FiTrendingUp } from "react-icons/fi";
-import { MdAnalytics, MdPieChart, MdSpeed, MdTrendingUp } from "react-icons/md";
 
 import type { ChartTimeRange } from "../../../constants";
 import type { DowntimePeriod } from "../../../hooks/site/useSiteAnalytics";
@@ -29,6 +27,7 @@ import { ThemedCard } from "../../../theme/components/ThemedCard";
 import { ThemedProgress } from "../../../theme/components/ThemedProgress";
 import { ThemedText } from "../../../theme/components/ThemedText";
 import { useAvailabilityColors, useTheme } from "../../../theme/useTheme";
+import { AppIcons } from "../../../utils/icons";
 import { parseUptimeValue } from "../../../utils/monitoring/dataValidation";
 import { ConditionalResponseTime } from "../../common/MonitorUiComponents";
 import { ResponseTimeChart } from "../charts/ResponseTimeChart";
@@ -234,6 +233,11 @@ export const AnalyticsTab = ({
     };
 
     const iconColors = getIconColors();
+
+    const ActivityIcon = AppIcons.metrics.activity;
+    const AnalyticsIcon = AppIcons.ui.analytics;
+    const ResponseIcon = AppIcons.metrics.response;
+    const UptimeIcon = AppIcons.metrics.uptime;
     const variant = getVariant(uptimeValue);
     // Map variant to progress/badge variant - "danger" becomes "error" for UI
     // consistency
@@ -273,27 +277,27 @@ export const AnalyticsTab = ({
     ]);
 
     // Memoized icons to prevent unnecessary re-renders
-    const analyticsIcon = useMemo(() => <MdAnalytics />, []);
-    const trendingIcon = useMemo(() => <MdTrendingUp />, []);
-    const activityIcon = useMemo(() => <FiActivity />, []);
-    const trendingUpIcon = useMemo(() => <FiTrendingUp />, []);
+    const analyticsIcon = useMemo(() => <AnalyticsIcon />, [AnalyticsIcon]);
+    const trendingIcon = useMemo(() => <UptimeIcon />, [UptimeIcon]);
+    const activityIcon = useMemo(() => <ActivityIcon />, [ActivityIcon]);
+    const trendingUpIcon = useMemo(() => <UptimeIcon />, [UptimeIcon]);
 
     // Colored icons with dependencies on iconColors
     const speedIconColored = useMemo(
-        () => <MdSpeed color={iconColors.performance} />,
-        [iconColors.performance]
+        () => <ResponseIcon color={iconColors.performance} />,
+        [iconColors.performance, ResponseIcon]
     );
     const trendingUpIconColored = useMemo(
-        () => <FiTrendingUp color={iconColors.performance} />,
-        [iconColors.performance]
+        () => <UptimeIcon color={iconColors.performance} />,
+        [iconColors.performance, UptimeIcon]
     );
     const pieChartIconColored = useMemo(
-        () => <MdPieChart color={iconColors.uptime} />,
-        [iconColors.uptime]
+        () => <UptimeIcon color={iconColors.uptime} />,
+        [iconColors.uptime, UptimeIcon]
     );
     const barChartIconColored = useMemo(
-        () => <FiBarChart2 color={iconColors.charts} />,
-        [iconColors.charts]
+        () => <AnalyticsIcon color={iconColors.charts} />,
+        [AnalyticsIcon, iconColors.charts]
     );
 
     // Memoized style objects to prevent object recreation

@@ -501,7 +501,9 @@ describe("SiteOverviewTab - Complete Coverage", () => {
                 />
             );
 
-            const removeButton = screen.getByText("Remove Site");
+            const removeButton = screen.getByRole("button", {
+                name: "Remove Site",
+            });
             fireEvent.click(removeButton);
 
             await waitFor(() => {
@@ -522,11 +524,15 @@ describe("SiteOverviewTab - Complete Coverage", () => {
 
             render(<SiteOverviewTab {...defaultProps} isLoading={true} />);
 
-            const removeButton = screen.getByText("Remove Site");
+            const removeButton = screen.getByRole("button", {
+                name: "Remove Site",
+            });
             expect(removeButton).toBeDisabled();
 
             // Check if monitoring button is disabled (start or stop depending on state)
-            const monitoringButton = screen.getByText(/All Monitoring/);
+            const monitoringButton = screen.getByRole("button", {
+                name: /All Monitoring/u,
+            });
             expect(monitoringButton).toBeDisabled();
         });
     });
@@ -782,7 +788,9 @@ describe("SiteOverviewTab - Complete Coverage", () => {
             render(<SiteOverviewTab {...defaultProps} />);
 
             // Buttons should be focusable
-            const removeButton = screen.getByText("Remove Site");
+            const removeButton = screen.getByRole("button", {
+                name: "Remove Site",
+            });
             expect(removeButton).toBeInTheDocument();
 
             removeButton.focus();
@@ -895,7 +903,9 @@ describe("SiteOverviewTab - Complete Coverage", () => {
                 />
             );
 
-            const removeButton = screen.getByText("Remove Site");
+            const removeButton = screen.getByRole("button", {
+                name: "Remove Site",
+            });
             fireEvent.click(removeButton);
 
             await waitFor(() => {

@@ -117,6 +117,10 @@ const knipConfig: KnipConfig = {
         "postcss.*",
         "putout",
         "react-chartjs-2",
+        // False-positive: the project imports icons from deep entrypoints
+        // (e.g. `react-icons/fi`). Knip does not currently attribute those
+        // imports back to the top-level `react-icons` dependency.
+        "react-icons",
         "react-refresh",
         "remark.*",
         "secretlint",

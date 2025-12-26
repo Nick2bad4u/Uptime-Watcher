@@ -31,32 +31,6 @@ vi.mock("../../../../theme/useTheme", () => ({
     })),
 }));
 
-// Mock icon imports while merging with actual modules
-vi.mock("react-icons/fi", async () => {
-    const actual =
-        await vi.importActual<typeof import("react-icons/fi")>(
-            "react-icons/fi"
-        );
-
-    return {
-        ...actual,
-        FiFilter: () => <div data-testid="filter-icon">FiFilter</div>,
-        FiInbox: () => <div data-testid="inbox-icon">FiInbox</div>,
-    } satisfies typeof actual;
-});
-
-vi.mock("react-icons/md", async () => {
-    const actual =
-        await vi.importActual<typeof import("react-icons/md")>(
-            "react-icons/md"
-        );
-
-    return {
-        ...actual,
-        MdHistory: () => <div data-testid="history-icon">MdHistory</div>,
-    } satisfies typeof actual;
-});
-
 // Mock themed components
 vi.mock("../../../../theme/components", () => ({
     StatusIndicator: ({ children, ...props }: any) => (
@@ -319,7 +293,6 @@ describe(HistoryTab, () => {
             const monitor = createMockMonitor(0);
             render(<HistoryTab {...defaultProps} selectedMonitor={monitor} />);
 
-            expect(screen.getByTestId("inbox-icon")).toBeInTheDocument();
             expect(screen.getByText("No records found")).toBeInTheDocument();
         });
     });

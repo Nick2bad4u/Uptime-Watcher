@@ -58,9 +58,11 @@ export const ConfirmDialog: NamedExoticComponent = memo(
         const CancelIcon = AppIcons.ui.close;
         const ConfirmIcon =
             tone === "danger" ? AppIcons.actions.remove : AppIcons.status.upAlt;
+        const CalloutIconComponent = AppIcons.status.warning;
 
         const buttonIconSize = getIconSize("sm");
         const headerIconSize = getIconSize("md");
+        const calloutIconSize = getIconSize("sm");
 
         const cancelButtonIcon = useMemo(
             () => <CancelIcon aria-hidden size={buttonIconSize} />,
@@ -75,6 +77,11 @@ export const ConfirmDialog: NamedExoticComponent = memo(
         const headerIcon = useMemo(
             () => <HeaderIcon aria-hidden size={headerIconSize} />,
             [HeaderIcon, headerIconSize]
+        );
+
+        const calloutIcon = useMemo(
+            () => <CalloutIconComponent aria-hidden size={calloutIconSize} />,
+            [CalloutIconComponent, calloutIconSize]
         );
 
         if (!request) {
@@ -135,6 +142,20 @@ export const ConfirmDialog: NamedExoticComponent = memo(
                         {renderEmphasizedMessage(message, emphasisText)}
                     </ThemedText>
                 </div>
+
+                {tone === "danger" ? (
+                    <div className="confirm-dialog__callout" role="note">
+                        <span
+                            aria-hidden="true"
+                            className="confirm-dialog__callout-icon"
+                        >
+                            {calloutIcon}
+                        </span>
+                        <ThemedText size="sm" variant="warning" weight="semibold">
+                            This can’t be undone.
+                        </ThemedText>
+                    </div>
+                ) : null}
 
                 {details ? (
                     <ThemedText className="mt-3" size="sm" variant="info">

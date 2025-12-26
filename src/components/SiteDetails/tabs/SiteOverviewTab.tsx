@@ -9,13 +9,6 @@ import type { JSX } from "react/jsx-runtime";
 
 import { getSiteDisplayStatus } from "@shared/utils/siteStatus";
 import { useCallback, useMemo } from "react";
-import { FiPlay, FiSettings, FiSquare, FiTrash2 } from "react-icons/fi";
-import {
-    MdDomain,
-    MdMonitorHeart,
-    MdOutlineFactCheck,
-    MdSpeed,
-} from "react-icons/md";
 
 import { StatusIndicator } from "../../../theme/components/StatusIndicator";
 import { ThemedBadge } from "../../../theme/components/ThemedBadge";
@@ -25,6 +18,7 @@ import { ThemedCard } from "../../../theme/components/ThemedCard";
 import { ThemedProgress } from "../../../theme/components/ThemedProgress";
 import { ThemedText } from "../../../theme/components/ThemedText";
 import { useAvailabilityColors, useTheme } from "../../../theme/useTheme";
+import { AppIcons } from "../../../utils/icons";
 import { formatDuration, formatResponseTime } from "../../../utils/time";
 import {
     useResponseTimeColorFromThemeColors,
@@ -196,6 +190,15 @@ export const SiteOverviewTab = ({
     };
 
     const iconColors = getIconColors();
+
+    const ActionsIcon = AppIcons.settings.gear;
+    const FactCheckIcon = AppIcons.metrics.uptime;
+    const MonitorIcon = AppIcons.ui.monitor;
+    const SiteIcon = AppIcons.ui.site;
+    const SpeedIcon = AppIcons.metrics.response;
+    const StartIcon = AppIcons.actions.play;
+    const StopIcon = AppIcons.actions.stop;
+    const TrashIcon = AppIcons.actions.remove;
     const uptimeVariant = getUptimeVariant(uptime);
 
     // Memoize the response time text style to avoid inline object creation
@@ -217,21 +220,34 @@ export const SiteOverviewTab = ({
         void handleRemoveSite();
     }, [handleRemoveSite]);
 
-    const domainIcon = useMemo(() => <MdDomain />, []);
-    const monitorHeartIcon = useMemo(() => <MdMonitorHeart />, []);
-    const factCheckIcon = useMemo(() => <MdOutlineFactCheck />, []);
-    const speedIcon = useMemo(() => <MdSpeed />, []);
+    const domainIcon = useMemo(() => <SiteIcon />, [SiteIcon]);
+    const monitorHeartIcon = useMemo(() => <MonitorIcon />, [MonitorIcon]);
+    const factCheckIcon = useMemo(() => <FactCheckIcon />, [FactCheckIcon]);
+    const speedIcon = useMemo(() => <SpeedIcon />, [SpeedIcon]);
     const siteIcon = useMemo(
-        () => <MdDomain color={iconColors.site} />,
-        [iconColors.site]
+        () => <SiteIcon color={iconColors.site} />,
+        [iconColors.site, SiteIcon]
     );
     const monitorsIcon = useMemo(
-        () => <MdMonitorHeart color={iconColors.monitors} />,
-        [iconColors.monitors]
+        () => <MonitorIcon color={iconColors.monitors} />,
+        [iconColors.monitors, MonitorIcon]
     );
     const actionsIcon = useMemo(
-        () => <FiSettings color={iconColors.actions} />,
-        [iconColors.actions]
+        () => <ActionsIcon color={iconColors.actions} />,
+        [ActionsIcon, iconColors.actions]
+    );
+
+    const stopSiteMonitoringIcon = useMemo(
+        () => <StopIcon className="h-4 w-4" />,
+        [StopIcon]
+    );
+    const startSiteMonitoringIcon = useMemo(
+        () => <StartIcon className="h-4 w-4" />,
+        [StartIcon]
+    );
+    const removeSiteIcon = useMemo(
+        () => <TrashIcon className="h-4 w-4" />,
+        [TrashIcon]
     );
     return (
         <div className="space-y-6" data-testid="site-overview-tab">
@@ -441,22 +457,22 @@ export const SiteOverviewTab = ({
                         <ThemedButton
                             className="flex items-center gap-1"
                             disabled={isLoading}
+                            icon={stopSiteMonitoringIcon}
                             onClick={handleStopSiteMonitoringClick}
                             size="sm"
                             variant="error"
                         >
-                            <FiSquare className="h-4 w-4" />
                             Stop All Monitoring
                         </ThemedButton>
                     ) : (
                         <ThemedButton
                             className="flex items-center gap-1"
                             disabled={isLoading}
+                            icon={startSiteMonitoringIcon}
                             onClick={handleStartSiteMonitoringClick}
                             size="sm"
                             variant="success"
                         >
-                            <FiPlay className="h-4 w-4" />
                             Start All Monitoring
                         </ThemedButton>
                     )}
@@ -464,11 +480,11 @@ export const SiteOverviewTab = ({
                     <ThemedButton
                         className="flex items-center gap-1"
                         disabled={isLoading}
+                        icon={removeSiteIcon}
                         onClick={handleRemoveSiteClick}
                         size="sm"
                         variant="error"
                     >
-                        <FiTrash2 className="h-4 w-4" />
                         Remove Site
                     </ThemedButton>
                 </div>

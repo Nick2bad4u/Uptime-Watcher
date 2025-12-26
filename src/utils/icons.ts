@@ -21,6 +21,7 @@ import {
     BsExclamationTriangle,
     BsGearFill,
     BsGrid3X3Gap,
+    BsLightningCharge,
     BsList,
     BsMoonStars,
     BsPauseFill,
@@ -29,14 +30,21 @@ import {
     BsXCircle,
 } from "react-icons/bs";
 import {
+    FiCopy,
     FiDownload,
+    FiEdit,
     FiExternalLink,
+    FiFilter,
+    FiInbox,
     FiList,
     FiRefreshCw,
+    FiSave,
+    FiSquare,
     FiTrash2,
     FiUpload,
     FiX,
 } from "react-icons/fi";
+import { GoPulse } from "react-icons/go";
 import {
     HiMiniChevronDown,
     HiMiniChevronLeft,
@@ -52,10 +60,12 @@ import {
     HiOutlineCog6Tooth,
     HiOutlineHome,
     HiOutlineInformationCircle,
+    HiOutlineLockClosed,
+    HiOutlineLockOpen,
     HiOutlineSquares2X2,
     HiOutlineViewColumns,
 } from "react-icons/hi2";
-import { IoAdd } from "react-icons/io5";
+import { IoAdd, IoGlobeOutline } from "react-icons/io5";
 import { MdCheckCircle, MdError, MdWarning } from "react-icons/md";
 import {
     RiCheckboxCircleFill,
@@ -82,7 +92,10 @@ export const AppIcons: {
     readonly actions: {
         readonly add: IconType;
         readonly checkNow: IconType;
+        readonly copy: IconType;
         readonly download: IconType;
+        readonly edit: IconType;
+        readonly filter: IconType;
         readonly pause: IconType;
         readonly pauseFilled: IconType;
         readonly play: IconType;
@@ -91,6 +104,8 @@ export const AppIcons: {
         readonly refresh: IconType;
         readonly refreshAlt: IconType;
         readonly remove: IconType;
+        readonly save: IconType;
+        readonly stop: IconType;
         readonly upload: IconType;
     };
     readonly brands: {
@@ -112,6 +127,7 @@ export const AppIcons: {
         readonly activity: IconType;
         readonly incidents: IconType;
         readonly monitor: IconType;
+        readonly performance: IconType;
         readonly response: IconType;
         readonly time: IconType;
         readonly uptime: IconType;
@@ -147,17 +163,25 @@ export const AppIcons: {
         readonly external: IconType;
         readonly history: IconType;
         readonly home: IconType;
+        readonly inbox: IconType;
         readonly info: IconType;
         readonly link: IconType;
+        readonly lock: IconType;
+        readonly monitor: IconType;
         readonly sidebarCollapse: IconType;
         readonly sidebarExpand: IconType;
+        readonly site: IconType;
+        readonly unlock: IconType;
     };
 } = {
     /** Action icons */
     actions: {
         add: IoAdd,
         checkNow: HiOutlineArrowPath,
+        copy: FiCopy,
         download: FiDownload,
+        edit: FiEdit,
+        filter: FiFilter,
         pause: HiMiniPause,
         pauseFilled: RiPauseCircleFill,
         play: HiMiniPlay,
@@ -166,6 +190,8 @@ export const AppIcons: {
         refresh: FiRefreshCw,
         refreshAlt: TbRefresh,
         remove: FiTrash2,
+        save: FiSave,
+        stop: FiSquare,
         upload: FiUpload,
     },
 
@@ -193,6 +219,7 @@ export const AppIcons: {
         activity: BsActivity,
         incidents: RiErrorWarningFill,
         monitor: BiServer,
+        performance: BsLightningCharge,
         response: BsSpeedometer,
         time: BsClockHistory,
         uptime: BsCheckCircle,
@@ -236,10 +263,15 @@ export const AppIcons: {
         external: HiOutlineArrowTopRightOnSquare,
         history: HiOutlineClock,
         home: HiOutlineHome,
+        inbox: FiInbox,
         info: HiOutlineInformationCircle,
         link: FiExternalLink,
+        lock: HiOutlineLockClosed,
+        monitor: GoPulse,
         sidebarCollapse: HiMiniChevronLeft,
         sidebarExpand: HiMiniChevronRight,
+        site: IoGlobeOutline,
+        unlock: HiOutlineLockOpen,
     },
 } as const;
 

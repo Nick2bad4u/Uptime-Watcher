@@ -11,12 +11,14 @@ import {
     type NamedExoticComponent,
     useCallback,
     useId,
+    useMemo,
 } from "react";
 
 import { usePromptDialogControls } from "../../../stores/ui/usePromptDialogStore";
 import { ThemedButton } from "../../../theme/components/ThemedButton";
 import { ThemedInput } from "../../../theme/components/ThemedInput";
 import { ThemedText } from "../../../theme/components/ThemedText";
+import { AppIcons, getIconSize } from "../../../utils/icons";
 import { Modal } from "../Modal/Modal";
 
 export const PromptDialog: NamedExoticComponent = memo(
@@ -46,6 +48,28 @@ export const PromptDialog: NamedExoticComponent = memo(
             [confirm, value]
         );
 
+        const buttonIconSize = getIconSize("sm");
+        const headerIconSize = getIconSize("md");
+
+        const CancelIconComponent = AppIcons.ui.close;
+        const ConfirmIconComponent = AppIcons.status.upAlt;
+        const HeaderIconComponent = AppIcons.ui.info;
+
+        const cancelIcon = useMemo(
+            () => <CancelIconComponent aria-hidden size={buttonIconSize} />,
+            [buttonIconSize, CancelIconComponent]
+        );
+
+        const confirmIcon = useMemo(
+            () => <ConfirmIconComponent aria-hidden size={buttonIconSize} />,
+            [buttonIconSize, ConfirmIconComponent]
+        );
+
+        const headerIcon = useMemo(
+            () => <HeaderIconComponent aria-hidden size={headerIconSize} />,
+            [HeaderIconComponent, headerIconSize]
+        );
+
         if (!request) {
             return null;
         }
@@ -58,6 +82,7 @@ export const PromptDialog: NamedExoticComponent = memo(
             <>
                 <ThemedButton
                     data-testid="prompt-dialog-cancel"
+                    icon={cancelIcon}
                     onClick={cancel}
                     variant="secondary"
                 >
@@ -67,6 +92,7 @@ export const PromptDialog: NamedExoticComponent = memo(
                     data-testid="prompt-dialog-confirm"
                     disabled={isConfirmDisabled}
                     form={formId}
+                    icon={confirmIcon}
                     type="submit"
                     variant="primary"
                 >
@@ -81,6 +107,7 @@ export const PromptDialog: NamedExoticComponent = memo(
                 closeOnOverlayClick
                 escapePriority={150}
                 footer={footer}
+                headerIcon={headerIcon}
                 isBodyScrollable={false}
                 isOpen
                 modalTestId="prompt-dialog"

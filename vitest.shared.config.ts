@@ -182,6 +182,14 @@ const vitestConfig = defineConfig({
         includeTaskLocation: true, // Parity: enable task location annotations
         isolate: true,
         logHeapUsage: true,
+        // NOTE: Vitest v4 removed `test.poolOptions`. Use `maxWorkers` instead.
+        maxWorkers: Math.max(
+            1,
+            Number(
+                // eslint-disable-next-line n/no-process-env -- safe for test time use
+                process.env["MAX_THREADS"] ?? (process.env["CI"] ? "1" : "8")
+            )
+        ),
         name: {
             color: "yellow",
             label: "Shared",
@@ -190,23 +198,6 @@ const vitestConfig = defineConfig({
             json: "./coverage/shared/test-results.json",
         },
         pool: "threads", // Use worker threads
-        poolOptions: {
-            threads: {
-                isolate: true, // Isolate tests for better reliability
-                maxThreads: Math.max(
-                    1,
-                    Number(
-                        // eslint-disable-next-line n/no-process-env -- safe for test time use
-                        process.env["MAX_THREADS"] ??
-                            (process.env["CI"] ? "1" : "16")
-                    )
-                ), // 16 threads on local, 1 thread on CI by default
-                minThreads: 1, // Ensure at least one thread
-                singleThread: Boolean(process.env["CI"]), // Enable single-threading in CI
-                startupTimeout: 120_000, // Allow slower Windows environments to finish spinning up worker threads
-                useAtomics: true,
-            },
-        },
         printConsoleTrace: false,
         reporters: [
             "default",

@@ -28,7 +28,8 @@ import type { CoreComponentProperties } from "@shared/types/componentProps";
 import type { JSX } from "react/jsx-runtime";
 
 import { useCallback } from "react";
-import { FiAlertCircle, FiAlertTriangle, FiInfo, FiX } from "react-icons/fi";
+
+import { AppIcons } from "../../../utils/icons";
 
 /**
  * Props for the ErrorAlert component.
@@ -61,24 +62,26 @@ export type ErrorAlertVariant = "error" | "info" | "warning";
  * @internal
  */
 function getErrorIcon(variant: ErrorAlertVariant): JSX.Element {
-    const iconProps = {
-        className: "h-5 w-5 shrink-0",
-    };
+    const ErrorIcon = AppIcons.status.downFilled;
+    const InfoIcon = AppIcons.ui.info;
+    const WarningIcon = AppIcons.status.warning;
 
-    switch (variant) {
-        case "error": {
-            return <FiAlertCircle {...iconProps} />;
-        }
-        case "info": {
-            return <FiInfo {...iconProps} />;
-        }
-        case "warning": {
-            return <FiAlertTriangle {...iconProps} />;
-        }
-        default: {
-            return <FiAlertCircle {...iconProps} />;
-        }
+    const className = "h-5 w-5 shrink-0";
+
+    if (variant === "info") {
+        return <InfoIcon className={className} data-testid="info-icon" />;
     }
+
+    if (variant === "warning") {
+        return (
+            <WarningIcon
+                className={className}
+                data-testid="alert-triangle-icon"
+            />
+        );
+    }
+
+    return <ErrorIcon className={className} data-testid="alert-circle-icon" />;
 }
 
 /**
@@ -126,6 +129,8 @@ export const ErrorAlert = ({
         onDismiss?.();
     }, [onDismiss]);
 
+    const CloseIcon = AppIcons.ui.close;
+
     const variantClasses = getVariantClasses(variant);
     const icon = getErrorIcon(variant);
 
@@ -138,7 +143,7 @@ export const ErrorAlert = ({
             {icon}
 
             <div className="min-w-0 flex-1">
-                <p className="text-sm font-medium break-words">{message}</p>
+                <p className="text-sm font-medium wrap-break-word">{message}</p>
             </div>
 
             {onDismiss ? (
@@ -149,7 +154,7 @@ export const ErrorAlert = ({
                     title="Dismiss this error message"
                     type="button"
                 >
-                    <FiX className="h-4 w-4" />
+                    <CloseIcon className="h-4 w-4" />
                 </button>
             ) : null}
         </div>

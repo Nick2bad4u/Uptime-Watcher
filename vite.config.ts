@@ -950,6 +950,14 @@ export default defineConfig(({ command, mode }) => {
             includeTaskLocation: true,
             isolate: true,
             logHeapUsage: true,
+            // NOTE: Vitest v4 removed `test.poolOptions`. Use `maxWorkers` instead.
+            // On Windows, keeping this bounded avoids worker starvation/timeouts.
+            maxWorkers: Math.max(
+                1,
+                Number(
+                    process.env["MAX_THREADS"] ?? (process.env["CI"] ? "1" : "8")
+                )
+            ),
             name: {
                 color: "cyan",
                 label: "Frontend", // Simplified label to match vitest.config.ts
@@ -959,22 +967,6 @@ export default defineConfig(({ command, mode }) => {
             },
             // Modern performance optimizations - optimized for multi-project stability
             pool: "threads", // Use worker threads for better performance
-            poolOptions: {
-                threads: {
-                    isolate: true, // Isolate tests for better reliability
-                    maxThreads: Math.max(
-                        1,
-                        Number(
-                            process.env["MAX_THREADS"] ??
-                                (process.env["CI"] ? "1" : "16")
-                        )
-                    ), // 16 threads on local, 1 thread on CI by default
-                    minThreads: 1, // Ensure at least one thread
-                    singleThread: Boolean(process.env["CI"]), // Enable single-threading in CI
-                    startupTimeout: 120_000, // Vitest default (10s) is too aggressive on Windows with >700 suites
-                    useAtomics: true,
-                },
-            },
             printConsoleTrace: false, // Disable stack trace printing for cleaner output
             projects: [
                 "vitest.config.ts",

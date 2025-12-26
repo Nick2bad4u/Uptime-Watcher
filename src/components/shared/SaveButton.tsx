@@ -9,9 +9,9 @@
 import type { CoreComponentProperties } from "@shared/types/componentProps";
 
 import { type FC, useMemo } from "react";
-import { FiSave } from "react-icons/fi";
 
 import { ThemedButton } from "../../theme/components/ThemedButton";
+import { AppIcons, getIconSize } from "../../utils/icons";
 
 /**
  * Props for the SaveButton component
@@ -49,7 +49,31 @@ export const SaveButton: FC<SaveButtonProperties> = ({
     size = "sm",
     ...props
 }) => {
-    const saveIcon = useMemo(() => <FiSave />, []);
+    const SaveIcon = AppIcons.actions.save;
+    const iconSize = useMemo((): number => {
+        switch (size) {
+            case "lg": {
+                return getIconSize("lg");
+            }
+            case "md": {
+                return getIconSize("md");
+            }
+            case "sm": {
+                return getIconSize("sm");
+            }
+            case "xs": {
+                return getIconSize("xs");
+            }
+            default: {
+                return getIconSize("sm");
+            }
+        }
+    }, [size]);
+
+    const saveIcon = useMemo(
+        () => <SaveIcon aria-hidden size={iconSize} />,
+        [iconSize, SaveIcon]
+    );
 
     return (
         <ThemedButton

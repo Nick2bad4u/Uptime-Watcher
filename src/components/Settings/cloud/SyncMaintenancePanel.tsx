@@ -3,11 +3,12 @@ import type { CloudSyncResetPreview } from "@shared/types/cloudSyncResetPreview"
 import type { JSX } from "react";
 
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 
 import { SystemService } from "../../../services/SystemService";
 import { ThemedButton } from "../../../theme/components/ThemedButton";
 import { ThemedText } from "../../../theme/components/ThemedText";
+import { AppIcons, getIconSize } from "../../../utils/icons";
 import { formatFullTimestamp } from "../../../utils/time";
 import { SyncMaintenanceCard } from "./SyncMaintenanceCard";
 
@@ -163,6 +164,24 @@ export const SyncMaintenancePanel = ({
     syncEnabled,
 }: SyncMaintenancePanelProperties): JSX.Element => {
     const hasPreview = preview !== null;
+
+    const buttonIconSize = getIconSize("sm");
+    const CopyIcon = AppIcons.actions.copy;
+    const RefreshIcon = AppIcons.actions.refresh;
+    const ResetIcon = AppIcons.actions.refreshAlt;
+
+    const refreshIcon = useMemo(
+        () => <RefreshIcon aria-hidden size={buttonIconSize} />,
+        [buttonIconSize, RefreshIcon]
+    );
+    const copyIcon = useMemo(
+        () => <CopyIcon aria-hidden size={buttonIconSize} />,
+        [buttonIconSize, CopyIcon]
+    );
+    const resetIcon = useMemo(
+        () => <ResetIcon aria-hidden size={buttonIconSize} />,
+        [buttonIconSize, ResetIcon]
+    );
 
     const [copyResult, setCopyResult] = useState<
         | null
@@ -326,17 +345,18 @@ export const SyncMaintenancePanel = ({
                 <div className="mt-2 flex flex-wrap gap-2">
                     <ThemedButton
                         disabled={!connected || isRefreshingPreview}
+                        icon={refreshIcon}
+                        loading={isRefreshingPreview}
                         onClick={onRefreshPreview}
                         size="sm"
                         variant="secondary"
                     >
-                        {isRefreshingPreview
-                            ? "Refreshing…"
-                            : "Refresh preview"}
+                        Refresh preview
                     </ThemedButton>
 
                     <ThemedButton
                         disabled={!hasPreview}
+                        icon={copyIcon}
                         onClick={handleCopyDiagnostics}
                         size="sm"
                         variant="secondary"
@@ -369,11 +389,13 @@ export const SyncMaintenancePanel = ({
                 <div className="mt-2 flex flex-wrap gap-2">
                     <ThemedButton
                         disabled={!canReset || isResetting}
+                        icon={resetIcon}
+                        loading={isResetting}
                         onClick={onResetRemoteSyncState}
                         size="sm"
                         variant="error"
                     >
-                        {isResetting ? "Resetting…" : "Reset remote sync"}
+                        Reset remote sync
                     </ThemedButton>
                 </div>
             </div>

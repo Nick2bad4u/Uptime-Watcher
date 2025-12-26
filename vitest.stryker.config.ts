@@ -18,15 +18,9 @@ const config = defineConfig((configEnv) => {
             coverage: {
                 enabled: false,
             },
-            poolOptions: {
-                threads: {
-                    isolate: true,
-                    maxThreads: 1,
-                    minThreads: 1,
-                    singleThread: true,
-                    useAtomics: false,
-                },
-            },
+            // Vitest v4 removed `test.poolOptions`. For mutation runs we force single-worker execution.
+            fileParallelism: false,
+            maxWorkers: 1,
             reporters: ["default"],
             typecheck: {
                 enabled: false,

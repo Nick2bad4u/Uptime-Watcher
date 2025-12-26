@@ -35,8 +35,6 @@ import type { JSX } from "react/jsx-runtime";
 
 import { DEFAULT_HISTORY_LIMIT_RULES } from "@shared/constants/history";
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { FiFilter, FiInbox } from "react-icons/fi";
-import { MdHistory } from "react-icons/md";
 
 import type { InterfaceDensity } from "../../../stores/ui/types";
 
@@ -223,6 +221,10 @@ export const HistoryTab: NamedExoticComponent<HistoryTabProperties> = memo(
 
         const iconColors = getIconColors();
 
+        const FilterIcon = AppIcons.actions.filter;
+        const HistoryIcon = AppIcons.ui.history;
+        const InboxIcon = AppIcons.ui.inbox;
+
         const FilterAllIcon = AppIcons.ui.analytics;
 
         // Dropdown options: a curated set of record counts plus an "All"
@@ -369,12 +371,12 @@ export const HistoryTab: NamedExoticComponent<HistoryTabProperties> = memo(
         );
 
         const filterIcon = useMemo(
-            () => <FiFilter color={iconColors.filters} />,
-            [iconColors.filters]
+            () => <FilterIcon color={iconColors.filters} />,
+            [FilterIcon, iconColors.filters]
         );
         const historyIcon = useMemo(
-            () => <MdHistory color={iconColors.history} />,
-            [iconColors.history]
+            () => <HistoryIcon color={iconColors.history} />,
+            [HistoryIcon, iconColors.history]
         );
 
         const handleHistoryDensityChange = useCallback(
@@ -595,7 +597,7 @@ export const HistoryTab: NamedExoticComponent<HistoryTabProperties> = memo(
 
                         {filteredHistoryRecords.length === 0 && (
                             <div className="flex flex-col items-center justify-center py-12 text-center">
-                                <FiInbox className="mb-4 text-4xl opacity-50" />
+                                <InboxIcon className="mb-4 text-4xl opacity-50" />
                                 <ThemedText
                                     className="mb-2"
                                     size="lg"

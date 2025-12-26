@@ -1,12 +1,16 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { ThemedIconButton } from "@app/theme/components/ThemedIconButton";
-import { FiEdit, FiSettings, FiTrash2 } from "react-icons/fi";
+import { AppIcons } from "@app/utils/icons";
+
+const SettingsIcon = AppIcons.settings.gear;
+const TrashIcon = AppIcons.actions.remove;
+const EditIcon = AppIcons.actions.edit;
 
 const meta: Meta<typeof ThemedIconButton> = {
     component: ThemedIconButton,
     args: {
-        icon: <FiSettings />,
+        icon: <SettingsIcon />,
         tooltip: "Open settings",
     },
     argTypes: {
@@ -26,7 +30,7 @@ export const Default: Story = {};
 
 export const Danger: Story = {
     args: {
-        icon: <FiTrash2 />,
+        icon: <TrashIcon />,
         variant: "error",
         tooltip: "Delete monitor",
     },
@@ -34,7 +38,7 @@ export const Danger: Story = {
 
 export const Large: Story = {
     args: {
-        icon: <FiEdit />,
+        icon: <EditIcon />,
         size: "lg",
         tooltip: "Edit",
     },

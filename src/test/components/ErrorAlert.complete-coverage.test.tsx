@@ -9,46 +9,6 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { ErrorAlert } from "../../components/common/ErrorAlert/ErrorAlert";
 import type { ErrorAlertVariant } from "../../components/common/ErrorAlert/ErrorAlert";
 
-// Mock react-icons/fi while preserving untouched exports
-vi.mock("react-icons/fi", async () => {
-    const actual =
-        await vi.importActual<typeof import("react-icons/fi")>(
-            "react-icons/fi"
-        );
-
-    return {
-        ...actual,
-        FiAlertCircle: ({ className, ...props }: any) => (
-            <div
-                data-testid="alert-circle-icon"
-                className={className}
-                {...props}
-            >
-                alert-circle
-            </div>
-        ),
-        FiAlertTriangle: ({ className, ...props }: any) => (
-            <div
-                data-testid="alert-triangle-icon"
-                className={className}
-                {...props}
-            >
-                alert-triangle
-            </div>
-        ),
-        FiInfo: ({ className, ...props }: any) => (
-            <div data-testid="info-icon" className={className} {...props}>
-                info
-            </div>
-        ),
-        FiX: ({ className, ...props }: any) => (
-            <div data-testid="x-icon" className={className} {...props}>
-                x
-            </div>
-        ),
-    } satisfies typeof actual;
-});
-
 describe("ErrorAlert - Complete Coverage", () => {
     beforeEach(() => {
         vi.clearAllMocks();
@@ -382,7 +342,7 @@ describe("ErrorAlert - Complete Coverage", () => {
             expect(messageElement).toHaveClass(
                 "text-sm",
                 "font-medium",
-                "break-words"
+                "wrap-break-word"
             );
         });
 
@@ -406,7 +366,7 @@ describe("ErrorAlert - Complete Coverage", () => {
 
             const messageElement = screen.getByText(longMessage);
             expect(messageElement).toBeInTheDocument();
-            expect(messageElement).toHaveClass("break-words");
+            expect(messageElement).toHaveClass("wrap-break-word");
         });
 
         it("should handle empty message string", ({ task, annotate }) => {
@@ -424,8 +384,8 @@ describe("ErrorAlert - Complete Coverage", () => {
 
             // Find the specific message paragraph element, not by text content
             const alertElement = screen.getByRole("alert");
-            const messageElement = alertElement.querySelector(
-                "p.text-sm.font-medium.break-words"
+                const messageElement = alertElement.querySelector(
+                    "p.text-sm.font-medium.wrap-break-word"
             );
             expect(messageElement).toBeInTheDocument();
             expect(messageElement).toHaveTextContent("");
@@ -515,7 +475,6 @@ describe("ErrorAlert - Complete Coverage", () => {
             expect(
                 screen.queryByLabelText("Dismiss error")
             ).not.toBeInTheDocument();
-            expect(screen.queryByTestId("x-icon")).not.toBeInTheDocument();
         });
 
         it("should render dismiss button when onDismiss is provided", ({
@@ -544,7 +503,7 @@ describe("ErrorAlert - Complete Coverage", () => {
                 "title",
                 "Dismiss this error message"
             );
-            expect(screen.getByTestId("x-icon")).toBeInTheDocument();
+            expect(dismissButton.querySelector("svg")).not.toBeNull();
         });
 
         it("should call onDismiss when dismiss button is clicked", async ({
@@ -681,8 +640,10 @@ describe("ErrorAlert - Complete Coverage", () => {
                 <ErrorAlert message="Icon styling" onDismiss={mockDismiss} />
             );
 
-            const xIcon = screen.getByTestId("x-icon");
-            expect(xIcon).toHaveClass("h-4", "w-4");
+            const dismissButton = screen.getByLabelText("Dismiss error");
+            const svg = dismissButton.querySelector("svg");
+            expect(svg).not.toBeNull();
+            expect(svg).toHaveClass("h-4", "w-4");
         });
     });
 

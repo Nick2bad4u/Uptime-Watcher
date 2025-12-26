@@ -9,8 +9,6 @@ import type { ChangeEvent, JSX } from "react";
 
 import { withUtilityErrorHandling } from "@shared/utils/errorHandling";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { FiSave, FiTrash2 } from "react-icons/fi";
-import { MdDangerous, MdInfoOutline, MdSettings } from "react-icons/md";
 
 import {
     CHECK_INTERVALS,
@@ -33,7 +31,7 @@ import {
     getMonitorTypeDisplayLabel,
     UiDefaults,
 } from "../../../utils/fallbacks";
-import { AppIcons } from "../../../utils/icons";
+import { AppIcons, getIconSize } from "../../../utils/icons";
 import { getMonitorTypeConfig } from "../../../utils/monitorTypeHelper";
 import { formatRetryAttemptsText, getIntervalLabel } from "../../../utils/time";
 import { SiteSettingsNumberField } from "./SiteSettingsNumberField";
@@ -41,8 +39,14 @@ import { SiteSettingsNumberField } from "./SiteSettingsNumberField";
 const WarningIcon = AppIcons.status.warning;
 const DurationIcon = AppIcons.metrics.time;
 const IdentifierIcon = AppIcons.ui.link;
-const HistoryIcon = AppIcons.metrics.activity;
-const LastCheckedIcon = AppIcons.ui.history;
+const HistoryIcon = AppIcons.ui.history;
+const LastCheckedIcon = AppIcons.metrics.activity;
+
+const DangerZoneIcon = AppIcons.status.downFilled;
+const InfoIcon = AppIcons.ui.info;
+const SaveIcon = AppIcons.actions.save;
+const SettingsIcon = AppIcons.settings.gear;
+const TrashIcon = AppIcons.actions.remove;
 
 /**
  * Props for the SettingsTab component.
@@ -368,27 +372,32 @@ export const SettingsTab = ({
         void loggedHandleRemoveSite();
     }, [loggedHandleRemoveSite]);
 
+    const buttonIconSize = getIconSize("sm");
+
     const settingsIcon = useMemo(
-        () => <MdSettings color={iconColors.settings} />,
+        () => <SettingsIcon color={iconColors.settings} />,
         [iconColors.settings]
     );
-    const saveIcon = useMemo(() => <FiSave />, []);
+    const saveIcon = useMemo(
+        () => <SaveIcon aria-hidden size={buttonIconSize} />,
+        [buttonIconSize]
+    );
     const timerIcon = useMemo(
         () => <DurationIcon color={iconColors.timing} size={18} />,
         [iconColors.timing]
     );
-    const saveIconTwo = useMemo(() => <FiSave />, []);
-    const saveIconThree = useMemo(() => <FiSave />, []);
-    const saveIconFour = useMemo(() => <FiSave />, []);
     const infoIcon = useMemo(
-        () => <MdInfoOutline color={iconColors.info} />,
+        () => <InfoIcon color={iconColors.info} />,
         [iconColors.info]
     );
     const dangerIcon = useMemo(
-        () => <MdDangerous color={iconColors.danger} />,
+        () => <DangerZoneIcon color={iconColors.danger} />,
         [iconColors.danger]
     );
-    const trashIcon = useMemo(() => <FiTrash2 />, []);
+    const trashIcon = useMemo(
+        () => <TrashIcon aria-hidden size={buttonIconSize} />,
+        [buttonIconSize]
+    );
     const icon = useMemo(() => <WarningIcon />, []);
     return (
         <div className="space-y-6" data-testid="settings-tab">
@@ -532,7 +541,7 @@ export const SettingsTab = ({
                             </ThemedSelect>
                             <ThemedButton
                                 disabled={!intervalChanged}
-                                icon={saveIconTwo}
+                                icon={saveIcon}
                                 onClick={loggedHandleSaveInterval}
                                 size="sm"
                                 variant={
@@ -560,7 +569,7 @@ export const SettingsTab = ({
                         onChange={handleTimeoutChange}
                         onSave={handleSaveTimeoutClick}
                         placeholder="Enter timeout in seconds"
-                        saveIcon={saveIconThree}
+                        saveIcon={saveIcon}
                         step={TIMEOUT_CONSTRAINTS.STEP}
                         value={localTimeout}
                     />
@@ -577,7 +586,7 @@ export const SettingsTab = ({
                         onChange={handleRetryAttemptsChange}
                         onSave={handleSaveRetryAttemptsClick}
                         placeholder="Enter retry attempts"
-                        saveIcon={saveIconFour}
+                        saveIcon={saveIcon}
                         step={RETRY_CONSTRAINTS.STEP}
                         value={localRetryAttempts}
                     />

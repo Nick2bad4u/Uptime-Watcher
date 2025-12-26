@@ -9,13 +9,6 @@ import type { JSX } from "react/jsx-runtime";
 
 import { ensureError } from "@shared/utils/errorHandling";
 import { useCallback, useMemo } from "react";
-import { FaListOl } from "react-icons/fa";
-import {
-    MdAccessTime,
-    MdBolt,
-    MdOutlineFactCheck,
-    MdSpeed,
-} from "react-icons/md";
 
 import { CHECK_INTERVALS, TIMEOUT_CONSTRAINTS } from "../../../constants";
 import { logger } from "../../../services/logger";
@@ -34,6 +27,12 @@ import { getIntervalLabel } from "../../../utils/time";
 import {
     useResponseTimeColorFromThemeColors,
 } from "../utils/responseTimeColors";
+
+const MonitorIcon = AppIcons.metrics.monitor;
+const TimeIcon = AppIcons.metrics.time;
+const PerformanceIcon = AppIcons.metrics.performance;
+const ResponseIcon = AppIcons.metrics.response;
+const ListIcon = AppIcons.layout.listAlt;
 
 const RefreshIcon = AppIcons.actions.refresh;
 const RemoveIcon = AppIcons.actions.remove;
@@ -211,24 +210,18 @@ export const OverviewTab = ({
         selectedMonitor.url,
     ]);
 
-    const checkIcon = useMemo(() => <MdOutlineFactCheck />, []);
-    const timeIcon = useMemo(() => <MdAccessTime />, []);
-    const speedIcon = useMemo(() => <MdSpeed />, []);
+    const checkIcon = useMemo(() => <MonitorIcon />, []);
+    const timeIcon = useMemo(() => <TimeIcon />, []);
+    const speedIcon = useMemo(() => <ResponseIcon />, []);
     const responseTimeStyle = useMemo(
         () => ({ color: getResponseTimeColor(avgResponseTime) }),
         [avgResponseTime, getResponseTimeColor]
     );
-    const listIcon = useMemo(() => <FaListOl />, []);
-    const performanceIcon = useMemo(
-        () => <MdBolt color={iconColors.fastest} />,
-        [iconColors.fastest]
-    );
-    const boltIcon = useMemo(() => <MdBolt />, []);
-    const accessTimeIcon = useMemo(() => <MdAccessTime />, []);
-    const quickActionIcon = useMemo(
-        () => <MdBolt color={iconColors.quickAction} />,
-        [iconColors.quickAction]
-    );
+    const listIcon = useMemo(() => <ListIcon />, []);
+    const performanceIcon = useMemo(() => <PerformanceIcon />, []);
+    const boltIcon = useMemo(() => <PerformanceIcon />, []);
+    const accessTimeIcon = useMemo(() => <TimeIcon />, []);
+    const quickActionIcon = useMemo(() => <RefreshIcon />, []);
     const trashIcon = useMemo(() => <RemoveIcon />, []);
     return (
         <div className="space-y-6" data-testid="overview-tab">
@@ -300,7 +293,11 @@ export const OverviewTab = ({
             </div>
 
             {/* Performance Metrics */}
-            <ThemedCard icon={performanceIcon} title="Performance Overview">
+            <ThemedCard
+                icon={performanceIcon}
+                iconColor={iconColors.fastest}
+                title="Performance Overview"
+            >
                 <div className="flex justify-center">
                     <div className="grid grid-cols-2 gap-6">
                         <div className="text-center">

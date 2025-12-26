@@ -72,19 +72,6 @@ vi.mock("../../../theme/components/ThemedButton", () => ({
     ),
 }));
 
-// Mock React Icons
-vi.mock("react-icons/fi", async () => {
-    const actual =
-        await vi.importActual<typeof import("react-icons/fi")>(
-            "react-icons/fi"
-        );
-
-    return {
-        ...actual,
-        FiSave: () => <span data-testid="save-icon">💾</span>,
-    } satisfies typeof actual;
-});
-
 /**
  * Fast-check arbitraries for generating test data
  */
@@ -181,7 +168,13 @@ describe("SaveButton Component - Property-Based Fuzzing", () => {
                         ?.split(/\s+/)
                         .join(" ")
                         .trim();
-                    expect(normalizedText).toMatch(/💾\s*Save/); // Allow flexible whitespace
+
+                    // The icon is an SVG (no text), so only the label is
+                    // expected in textContent.
+                    expect(normalizedText).toMatch(/Save/);
+
+                    const icon = screen.getByTestId("button-icon");
+                    expect(icon.querySelector("svg")).not.toBeNull();
                 } finally {
                     // Clean up container
                     container.remove();
@@ -529,8 +522,7 @@ describe("SaveButton Component - Property-Based Fuzzing", () => {
                     const icon = screen.getByTestId("button-icon");
                     expect(icon).toBeInTheDocument();
 
-                    const saveIcon = screen.getByTestId("save-icon");
-                    expect(saveIcon).toBeInTheDocument();
+                    expect(icon.querySelector("svg")).not.toBeNull();
                 } finally {
                     // Clean up container
                     container.remove();
