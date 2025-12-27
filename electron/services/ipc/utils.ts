@@ -153,7 +153,9 @@ type StrictIpcInvokeHandler<TChannel extends IpcInvokeChannel> = (
 export type StandardizedIpcRegistrar = <TChannel extends IpcInvokeChannel>(
     channelName: TChannel,
     handler: StrictIpcInvokeHandler<TChannel>,
-    validateParams?: IpcParameterValidator | null
+    ...validatorArgs: ChannelParams<TChannel> extends readonly []
+        ? [validateParams?: IpcParameterValidator | null]
+        : [validateParams: IpcParameterValidator]
 ) => void;
 
 function assertChannelParams<TChannel extends IpcInvokeChannel>(
@@ -704,6 +706,25 @@ export function registerStandardizedIpcHandler<
     validateParams: IpcParameterValidator | null,
     registeredHandlers: Set<IpcInvokeChannel>
 ): void {
+    if (validateParams === null && handler.length > 0) {
+        const errorMessage =
+            `[IpcService] Missing validateParams for '${channelName}'. Handlers that accept parameters must provide runtime validation.`;
+
+        logger.error(
+            errorMessage,
+            withLogContext({
+                channel: channelName,
+                event: "ipc:handler:register",
+                severity: "error",
+            }),
+            {
+                channel: channelName,
+            }
+        );
+
+        throw new Error(errorMessage);
+    }
+
     if (registeredHandlers.has(channelName)) {
         const errorMessage = `[IpcService] Attempted to register duplicate IPC handler for channel '${channelName}'`;
 
@@ -775,20 +796,44 @@ export function registerStandardizedIpcHandler<
                           metadata: baseMetadata,
                       };
 
-            if (validateParams) {
-                return withIpcHandlerValidation(
+            if (validateParams === null) {
+                if (args.length > 0) {
+                    logger.warn(
+                        "[IpcHandler] Rejected IPC invocation with unexpected parameters",
+                        withLogContext({
+                            channel: channelName,
+                            ...correlationMetadata,
+                            event: "ipc:handler:unexpected-params",
+                            severity: "warn",
+                        }),
+                        {
+                            paramCount: args.length,
+                        }
+                    );
+
+                    return createErrorResponse(
+                        `Unexpected IPC parameters for ${channelName}. This channel does not accept any parameters.`,
+                        {
+                            handler: channelName,
+                            ...correlationMetadata,
+                            paramCount: args.length,
+                        }
+                    );
+                }
+
+                return withIpcHandler(
                     channelName,
-                    (...validatedParams: ChannelParams<TChannel>) =>
-                        handler(...validatedParams),
-                    validateParams,
-                    args,
+                    () => handler(...args),
                     handlerOptions
                 );
             }
 
-            return withIpcHandler(
+            return withIpcHandlerValidation(
                 channelName,
-                () => handler(...args),
+                (...validatedParams: ChannelParams<TChannel>) =>
+                    handler(...validatedParams),
+                validateParams,
+                args,
                 handlerOptions
             );
         });
@@ -827,8 +872,12 @@ export function createStandardizedIpcRegistrar(
     return function register<TChannel extends IpcInvokeChannel>(
         channelName: TChannel,
         handler: StrictIpcInvokeHandler<TChannel>,
-        validateParams: IpcParameterValidator | null = null
+        ...validatorArgs: ChannelParams<TChannel> extends readonly []
+            ? [validateParams?: IpcParameterValidator | null]
+            : [validateParams: IpcParameterValidator]
     ): void {
+        const validateParams = validatorArgs[0] ?? null;
+
         registerStandardizedIpcHandler(
             channelName,
             handler,

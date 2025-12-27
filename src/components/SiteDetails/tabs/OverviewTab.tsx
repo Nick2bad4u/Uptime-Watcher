@@ -35,6 +35,7 @@ const ResponseIcon = AppIcons.metrics.response;
 const ListIcon = AppIcons.layout.listAlt;
 
 const RefreshIcon = AppIcons.actions.refresh;
+const CheckNowIcon = AppIcons.actions.checkNow;
 const RemoveIcon = AppIcons.actions.remove;
 const SaveIcon = AppIcons.actions.save;
 
@@ -223,6 +224,10 @@ export const OverviewTab = ({
     const boltIcon = useMemo(() => <PerformanceIcon />, []);
     const accessTimeIcon = useMemo(() => <TimeIcon />, []);
     const quickActionIcon = useMemo(() => <RefreshIcon />, []);
+    const checkNowIcon = useMemo(
+        () => <CheckNowIcon className="h-4 w-4" />,
+        []
+    );
     const trashIcon = useMemo(() => <RemoveIcon />, []);
     const saveIcon = useMemo(() => <SaveIcon className="h-4 w-4" />, []);
     return (
@@ -333,14 +338,18 @@ export const OverviewTab = ({
 
             {/* Quick Actions */}
             <ThemedCard icon={quickActionIcon} title="Quick Actions">
-                <div className="grid gap-4 md:grid-cols-12 md:items-end">
+                <div className="grid gap-4 md:grid-cols-3 md:items-end">
                     {/* Interval Control */}
-                    <div className="md:col-span-5">
-                        <div className="flex flex-wrap items-center gap-2">
+                    <div className="flex flex-col gap-2">
+                        <div className="flex items-center gap-2">
+                            <TimeIcon className="h-4 w-4 opacity-80" />
                             <ThemedText size="sm" variant="secondary">
-                                Interval:
+                                Interval
                             </ThemedText>
+                        </div>
+                        <div className="flex items-center gap-2">
                             <ThemedSelect
+                                className="min-w-0 flex-1"
                                 disabled={isLoading}
                                 onChange={handleIntervalChange}
                                 value={localCheckInterval}
@@ -370,14 +379,18 @@ export const OverviewTab = ({
                     </div>
 
                     {/* Timeout Control */}
-                    <div className="md:col-span-4">
-                        <div className="flex flex-wrap items-center gap-2">
+                    <div className="flex flex-col gap-2">
+                        <div className="flex items-center gap-2">
+                            <TimeIcon className="h-4 w-4 opacity-80" />
                             <ThemedText size="sm" variant="secondary">
-                                Timeout:
+                                Timeout
                             </ThemedText>
+                        </div>
+
+                        <div className="flex items-center gap-2">
                             <ThemedInput
                                 aria-label="Monitor timeout in seconds"
-                                className="w-16 text-xs"
+                                className="w-24 text-xs"
                                 disabled={isLoading}
                                 max={TIMEOUT_CONSTRAINTS.MAX}
                                 min={TIMEOUT_CONSTRAINTS.MIN}
@@ -404,30 +417,27 @@ export const OverviewTab = ({
                     </div>
 
                     {/* Actions */}
-                    <div className="md:col-span-3 md:flex md:justify-end">
-                        <div className="flex flex-wrap items-center gap-2 md:justify-end">
-                            <ThemedButton
-                                aria-label="Check Now"
-                                className="flex items-center gap-1"
-                                disabled={isLoading}
-                                onClick={onCheckNow}
-                                size="sm"
-                                variant="secondary"
-                            >
-                                <RefreshIcon size={16} />
-                                <span className="text-xs">Check Now</span>
-                            </ThemedButton>
+                    <div className="flex flex-col gap-2 md:items-end">
+                        <ThemedButton
+                            aria-label="Check Now"
+                            disabled={isLoading}
+                            icon={checkNowIcon}
+                            onClick={onCheckNow}
+                            size="sm"
+                            variant="secondary"
+                        >
+                            Check Now
+                        </ThemedButton>
 
-                            <ThemedButton
-                                disabled={isLoading}
-                                icon={trashIcon}
-                                onClick={handleRemoveClick}
-                                size="sm"
-                                variant="error"
-                            >
-                                Remove Monitor
-                            </ThemedButton>
-                        </div>
+                        <ThemedButton
+                            disabled={isLoading}
+                            icon={trashIcon}
+                            onClick={handleRemoveClick}
+                            size="sm"
+                            variant="error"
+                        >
+                            Remove Monitor
+                        </ThemedButton>
                     </div>
                 </div>
             </ThemedCard>

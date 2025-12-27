@@ -90,6 +90,8 @@ export const AppSidebar: NamedExoticComponent = memo(function AppSidebar() {
 
     const [query, setQuery] = useState<string>("");
 
+    const SearchIcon = AppIcons.actions.search;
+
     const filteredSites = useMemo((): readonly Site[] => {
         if (query.trim().length === 0) {
             return sites;
@@ -207,6 +209,13 @@ export const AppSidebar: NamedExoticComponent = memo(function AppSidebar() {
         ? "Collapse navigation sidebar"
         : "Expand navigation sidebar";
 
+    const content = useMemo(() => (<div className="app-sidebar__logo-tooltip">
+                                <img
+                                    alt="Uptime Watcher mascot"
+                                    className="app-sidebar__logo-tooltip-image"
+                                    src={MascotLogo}
+                                />
+                            </div>), []);
     return (
         <aside
             aria-label="Site navigation"
@@ -231,13 +240,27 @@ export const AppSidebar: NamedExoticComponent = memo(function AppSidebar() {
                             </button>
                         )}
                     </Tooltip>
-                    <div aria-hidden="true" className="app-sidebar__brand-logo">
-                        <img
-                            alt="Uptime Watcher mascot"
-                            className="app-sidebar__brand-logo-image"
-                            src={MascotLogo}
-                        />
-                    </div>
+
+                    <Tooltip
+                        content={
+                            content
+                        }
+                        maxWidth={280}
+                        position="bottom"
+                    >
+                        {(triggerProps) => (
+                            <div
+                                {...triggerProps}
+                                className="app-sidebar__brand-logo"
+                            >
+                                <img
+                                    alt="Uptime Watcher mascot"
+                                    className="app-sidebar__brand-logo-image"
+                                    src={MascotLogo}
+                                />
+                            </div>
+                        )}
+                    </Tooltip>
                     <div className="app-sidebar__brand-copy">
                         <ThemedText
                             className="app-sidebar__brand-title"
@@ -262,6 +285,9 @@ export const AppSidebar: NamedExoticComponent = memo(function AppSidebar() {
                         htmlFor="sidebar-search"
                     >
                         <span className="sr-only">Search monitored sites</span>
+                        <span aria-hidden className="app-sidebar__search-icon">
+                            <SearchIcon size={16} />
+                        </span>
                         <input
                             autoComplete="off"
                             className="app-sidebar__search-input"
@@ -355,7 +381,7 @@ export const AppSidebar: NamedExoticComponent = memo(function AppSidebar() {
                     <Tooltip
                         content="Add a new site"
                         position="right"
-                        wrapMode="block"
+                        wrapMode="inline"
                     >
                         {(triggerProps) => (
                             <button

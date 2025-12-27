@@ -1067,7 +1067,7 @@ describe(SettingsTab, () => {
             const timeoutInput = screen.getByDisplayValue("30");
             expect(timeoutInput).toBeInTheDocument();
             expect(
-                screen.getByText("Request timeout: 30 seconds")
+                screen.getByText(/Currently:\s*30s\./u)
             ).toBeInTheDocument();
         });
 
@@ -1106,10 +1106,12 @@ describe(SettingsTab, () => {
 
             render(<SettingsTab {...baseProps} />);
 
-            expect(screen.getByText("Site Name")).toBeInTheDocument();
-            expect(screen.getByText("Check Interval")).toBeInTheDocument();
-            expect(screen.getByText("Timeout (seconds)")).toBeInTheDocument();
-            expect(screen.getByText("Retry Attempts")).toBeInTheDocument();
+            expect(screen.getByText(/^site name$/i)).toBeInTheDocument();
+            expect(screen.getByText(/^check interval$/i)).toBeInTheDocument();
+            expect(
+                screen.getByText(/^timeout \(seconds\)$/i)
+            ).toBeInTheDocument();
+            expect(screen.getByText(/^retry attempts$/i)).toBeInTheDocument();
         });
 
         it("should have proper input constraints", ({ task, annotate }) => {

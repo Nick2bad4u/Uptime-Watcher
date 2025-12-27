@@ -39,6 +39,7 @@ import {
     FiList,
     FiRefreshCw,
     FiSave,
+    FiSearch,
     FiSquare,
     FiTrash2,
     FiUpload,
@@ -105,6 +106,7 @@ export const AppIcons: {
         readonly refreshAlt: IconType;
         readonly remove: IconType;
         readonly save: IconType;
+        readonly search: IconType;
         readonly stop: IconType;
         readonly upload: IconType;
     };
@@ -191,6 +193,7 @@ export const AppIcons: {
         refreshAlt: TbRefresh,
         remove: FiTrash2,
         save: FiSave,
+        search: FiSearch,
         stop: FiSquare,
         upload: FiUpload,
     },

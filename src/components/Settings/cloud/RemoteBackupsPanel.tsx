@@ -63,6 +63,7 @@ export const RemoteBackupsPanel = ({
     const buttonIconSize = getIconSize("sm");
 
     const DeleteIcon = AppIcons.actions.remove;
+    const CloudIcon = AppIcons.ui.cloud;
     const RefreshIcon = AppIcons.actions.refresh;
     const RestoreIcon = AppIcons.actions.download;
     const UploadIcon = AppIcons.actions.upload;
@@ -82,6 +83,11 @@ export const RemoteBackupsPanel = ({
     const uploadIcon = useMemo(
         () => <UploadIcon aria-hidden size={buttonIconSize} />,
         [buttonIconSize, UploadIcon]
+    );
+
+    const panelIcon = useMemo(
+        () => <CloudIcon aria-hidden className="h-5 w-5" />,
+        [CloudIcon]
     );
 
     const handleRestoreClick = useCallback(
@@ -177,9 +183,14 @@ export const RemoteBackupsPanel = ({
     return (
         <div className="rounded-lg border border-zinc-800 bg-zinc-900/40 p-4">
             <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-                <ThemedText size="sm" variant="secondary" weight="medium">
-                    Remote Backups
-                </ThemedText>
+                <div className="flex items-center gap-2">
+                    <span aria-hidden className="text-sky-400">
+                        {panelIcon}
+                    </span>
+                    <ThemedText size="sm" variant="secondary" weight="medium">
+                        Remote Backups
+                    </ThemedText>
+                </div>
 
                 <div className="flex flex-wrap gap-2">
                     <ThemedButton

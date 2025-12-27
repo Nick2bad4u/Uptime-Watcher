@@ -279,14 +279,14 @@ describe("SettingsTab arithmetic mutations", () => {
 
             render(<SettingsTab {...props} />);
 
-            // Should display "Monitor checks every 60 seconds"
+            // Should display "Currently: 60s."
             expect(
-                screen.getByText(/Monitor checks every 60 seconds/)
+                screen.getByText(/Currently:\s*60s\./u)
             ).toBeInTheDocument();
 
             // Mutation (/ 1000 -> * 1000) would yield 60,000,000 which would be incorrect
             expect(
-                screen.queryByText(/Monitor checks every 60{7} seconds/)
+                screen.queryByText(/Currently:\s*60{7}s/u)
             ).not.toBeInTheDocument();
         });
 
@@ -297,14 +297,14 @@ describe("SettingsTab arithmetic mutations", () => {
             };
             render(<SettingsTab {...props} />);
 
-            // Should display "Monitor checks every 1 seconds" (Math.round(0.5) = 1)
+            // Should display "Currently: 1s." (Math.round(0.5) = 1)
             expect(
-                screen.getByText(/Monitor checks every 1 seconds/)
+                screen.getByText(/Currently:\s*1s\./u)
             ).toBeInTheDocument();
 
             // Mutation (/ 1000 -> * 1000) would yield 500,000 which would be incorrect
             expect(
-                screen.queryByText(/Monitor checks every 50{5} seconds/)
+                screen.queryByText(/Currently:\s*50{5}s/u)
             ).not.toBeInTheDocument();
         });
     });
@@ -321,7 +321,7 @@ describe("SettingsTab arithmetic mutations", () => {
 
             // Should display "4 attempts" (3 + 1 = 4) - target the specific span with just the attempts text
             expect(
-                screen.getByText("4 attempts + backoff")
+                screen.getByText(/\b4 attempts \+ backoff\./u)
             ).toBeInTheDocument();
 
             // Mutation (+ 1 -> - 1) would yield 2 attempts which would be incorrect
@@ -480,14 +480,14 @@ describe("SettingsTab arithmetic mutations", () => {
 
             render(<SettingsTab {...props} />);
 
-            // Check interval display: Math.round(30000 / 1000) = 30 seconds
-            expect(
-                screen.getByText(/Monitor checks every 30 seconds/)
-            ).toBeInTheDocument();
+                // Should display "Currently: 30s."
+                expect(
+                    screen.getByText(/Currently:\s*30s\./u)
+                ).toBeInTheDocument();
 
             // Check retry attempts display: 2 + 1 = 3 attempts - target the specific span
             expect(
-                screen.getByText("3 attempts + backoff")
+                screen.getByText(/\b3 attempts \+ backoff\./u)
             ).toBeInTheDocument();
 
             // Check max duration calculation appears (calculateMaxDuration with all its arithmetic)

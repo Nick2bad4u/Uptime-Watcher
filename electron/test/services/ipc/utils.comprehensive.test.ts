@@ -1586,15 +1586,78 @@ describe("IPC Utils - Comprehensive Coverage", () => {
                 expect(handleCall).toBeDefined();
 
                 const registeredFunction = handleCall![1];
+
+                // ValidateParams === null means: no-arg channel only.
+                const result = await registeredFunction({} as any);
+
+                expect(mockHandler).toHaveBeenCalledWith();
+                expect(result.success).toBeTruthy();
+                expect(result.data).toBe("execution test");
+            });
+
+            it("should reject unexpected args when validateParams is null", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "regression");
+                await annotate("Component: utils", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Validation", "type");
+
+                const mockHandler = vi.fn().mockResolvedValue("execution test");
+                const registeredHandlers = new Set<TestChannel>();
+
+                registerStandardizedIpcHandler(
+                    CHANNELS_FOR_TESTS.execution,
+                    mockHandler,
+                    null,
+                    registeredHandlers
+                );
+
+                const handleCall = vi
+                    .mocked(ipcMain.handle)
+                    .mock.calls.find(
+                        (call) => call[0] === CHANNELS_FOR_TESTS.execution
+                    );
+                expect(handleCall).toBeDefined();
+
+                const registeredFunction = handleCall![1];
                 const result = await registeredFunction(
                     {} as any,
                     "arg1",
                     "arg2"
                 );
 
-                expect(mockHandler).toHaveBeenCalledWith("arg1", "arg2");
-                expect(result.success).toBeTruthy();
-                expect(result.data).toBe("execution test");
+                expect(mockHandler).not.toHaveBeenCalled();
+                expect(result.success).toBeFalsy();
+                expect(result.error).toContain(
+                    "Unexpected IPC parameters"
+                );
+            });
+
+            it("should throw when handler expects params but validateParams is null", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "regression");
+                await annotate("Component: utils", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Validation", "type");
+
+                const registeredHandlers = new Set<TestChannel>();
+
+                // Function length must be > 0 to trigger the guard.
+                const paramHandler = async (_value: string) =>
+                    "param handler";
+
+                expect(() =>
+                    registerStandardizedIpcHandler(
+                        CHANNELS_FOR_TESTS.validatedExecution,
+                        paramHandler as never,
+                        null,
+                        registeredHandlers
+                    )
+                ).toThrowError(/Missing validateParams/u);
             });
 
             it("should execute registered handler with validation", async ({

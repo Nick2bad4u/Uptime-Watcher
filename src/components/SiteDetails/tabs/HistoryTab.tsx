@@ -31,6 +31,7 @@ import type {
     NamedExoticComponent,
     ReactElement,
 } from "react";
+import type { IconType } from "react-icons";
 import type { JSX } from "react/jsx-runtime";
 
 import { DEFAULT_HISTORY_LIMIT_RULES } from "@shared/constants/history";
@@ -74,6 +75,54 @@ const HISTORY_DENSITY_LABELS: Record<InterfaceDensity, string> = {
     compact: "Compact",
     cozy: "Cozy",
 };
+
+const HISTORY_DENSITY_ICONS: Record<InterfaceDensity, IconType> = {
+    comfortable: AppIcons.layout.cards,
+    compact: AppIcons.layout.list,
+    cozy: AppIcons.layout.compact,
+};
+
+function extractHttpStatusCode(details: string): null | number {
+    const trimmed = details.trim();
+    if (trimmed.length === 0) return null;
+
+    const candidateRegex = /\b(?<statusCode>[1-5]\d{2})\b/u;
+    const hasHttpContext = /\bcode\b|\bhttp\b|\bstatus\b/iu.test(trimmed);
+
+    if (hasHttpContext) {
+        const match = candidateRegex.exec(trimmed);
+        const raw = match?.groups?.["statusCode"];
+        return raw ? Number(raw) : null;
+    }
+
+    // Also accept strings like "200 OK" or "404 Not Found".
+    const beginsWithCode = /^(?<statusCode>[1-5]\d{2})\b/u.exec(trimmed);
+    const raw = beginsWithCode?.groups?.["statusCode"];
+    return raw ? Number(raw) : null;
+}
+
+function getHttpStatusIcon(code: number): IconType | null {
+    if (!Number.isFinite(code)) return null;
+
+    if (code >= 200 && code <= 299) {
+        return AppIcons.status.up;
+    }
+
+    if (code >= 300 && code <= 399) {
+        return AppIcons.actions.refreshAlt;
+    }
+
+    if (code >= 400 && code <= 499) {
+        return AppIcons.status.warning;
+    }
+
+    if (code >= 500 && code <= 599) {
+        return AppIcons.status.downFilled;
+    }
+
+    return null;
+}
+
 type HistoryRowStyle = CSSProperties & {
     "--surface-order"?: number;
 };
@@ -323,11 +372,25 @@ export const HistoryTab: NamedExoticComponent<HistoryTabProperties> = memo(
                 return null;
             }
 
-            return (
-                <DetailLabel
-                    details={record.details}
-                    monitorType={selectedMonitor.type}
+            const statusCode = extractHttpStatusCode(record.details);
+            const StatusCodeIcon =
+                statusCode === null ? null : getHttpStatusIcon(statusCode);
+
+            const statusIconNode = StatusCodeIcon ? (
+                <StatusCodeIcon
+                    aria-hidden="true"
+                    className="h-4 w-4"
                 />
+            ) : null;
+
+            return (
+                <div className="flex items-center gap-2">
+                    {statusIconNode}
+                    <DetailLabel
+                        details={record.details}
+                        monitorType={selectedMonitor.type}
+                    />
+                </div>
             );
         }
 
@@ -403,13 +466,42 @@ export const HistoryTab: NamedExoticComponent<HistoryTabProperties> = memo(
             [handleHistoryDensityChange]
         );
 
+        const densityIconNodes = useMemo(() => {
+            const ComfortableDensityIcon = HISTORY_DENSITY_ICONS.comfortable;
+            const CozyDensityIcon = HISTORY_DENSITY_ICONS.cozy;
+            const CompactDensityIcon = HISTORY_DENSITY_ICONS.compact;
+
+            return {
+                comfortable: (
+                    <ComfortableDensityIcon
+                        aria-hidden
+                        className="h-4 w-4"
+                    />
+                ),
+                compact: (
+                    <CompactDensityIcon
+                        aria-hidden
+                        className="h-4 w-4"
+                    />
+                ),
+                cozy: (
+                    <CozyDensityIcon
+                        aria-hidden
+                        className="h-4 w-4"
+                    />
+                ),
+            } satisfies Record<InterfaceDensity, ReactElement>;
+        }, []);
+
         const densityButtons = useMemo(
             () =>
                 HISTORY_DENSITY_OPTIONS.map((density) => {
                     const isActive = historyDensity === density;
+                    const densityIcon = densityIconNodes[density];
 
                     return (
                         <ThemedButton
+                            icon={densityIcon}
                             key={density}
                             onClick={createDensityHandler(density)}
                             size="xs"
@@ -419,7 +511,7 @@ export const HistoryTab: NamedExoticComponent<HistoryTabProperties> = memo(
                         </ThemedButton>
                     );
                 }),
-            [createDensityHandler, historyDensity]
+            [createDensityHandler, densityIconNodes, historyDensity]
         );
 
         const historyTabClassName = `space-y-6 history-tab history-tab--${historyDensity} density--${historyDensity}`;
@@ -552,7 +644,7 @@ export const HistoryTab: NamedExoticComponent<HistoryTabProperties> = memo(
                                                     size="xs"
                                                     variant="secondary"
                                                 >
-                                                    Record #
+                                                    Check #
                                                     {historyLength -
                                                         selectedMonitor.history.findIndex(
                                                             (r) =>

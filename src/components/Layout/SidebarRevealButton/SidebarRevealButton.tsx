@@ -49,9 +49,6 @@ export const SidebarRevealButton: NamedExoticComponent = memo(
                         >
                             <RevealIcon size={18} />
                         </span>
-                        <span className="sidebar-reveal-button__label">
-                            Open Sidebar
-                        </span>
                     </button>
                 )}
             </Tooltip>

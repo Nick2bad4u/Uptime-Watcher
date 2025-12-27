@@ -17,6 +17,8 @@ export interface SettingItemProperties extends CoreComponentProperties {
     readonly description?: string;
     /** Whether the setting is disabled */
     readonly disabled?: boolean;
+    /** Optional leading icon for the setting title */
+    readonly icon?: ReactNode;
     /** Title of the setting */
     readonly title: string;
 }
@@ -48,15 +50,27 @@ export const SettingItem: FC<SettingItemProperties> = ({
     control,
     description,
     disabled = false,
+    icon,
     title,
 }) => (
     <div
         className={`setting-item ${disabled ? "disabled" : ""} ${className}`.trim()}
     >
         <div className="setting-info">
-            <ThemedText className="setting-title" size="sm" weight="medium">
-                {title}
-            </ThemedText>
+            <div className="setting-title-row">
+                {icon ? (
+                    <span aria-hidden className="setting-item__icon">
+                        {icon}
+                    </span>
+                ) : null}
+                <ThemedText
+                    className="setting-title"
+                    size="sm"
+                    weight="medium"
+                >
+                    {title}
+                </ThemedText>
+            </div>
             {description ? (
                 <ThemedText
                     className="setting-description"

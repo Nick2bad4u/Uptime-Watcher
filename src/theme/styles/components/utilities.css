@@ -199,6 +199,19 @@
     letter-spacing: 0.02em;
 }
 
+.setting-title-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.setting-item__icon {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+}
+
 .setting-description {
     line-height: 1.5;
 }

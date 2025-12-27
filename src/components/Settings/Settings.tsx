@@ -1003,19 +1003,6 @@ export const Settings = ({
                     ) : null}
 
                     <div className="settings-modal__sections">
-                        <MonitoringSection
-                            currentHistoryLimit={currentHistoryLimit}
-                            icon={MonitoringIcon}
-                            isLoading={isLoading}
-                            onHistoryLimitChange={
-                                handleHistoryLimitSelectChange
-                            }
-                        />
-
-                        <NotificationSection {...notificationSectionProps} />
-
-                        <CloudSettingsSection />
-
                         <ApplicationSection
                             autoStartControl={autoStartControl}
                             availableThemes={availableThemes}
@@ -1025,6 +1012,19 @@ export const Settings = ({
                             minimizeToTrayControl={minimizeToTrayControl}
                             onThemeChange={handleThemeSelectChange}
                         />
+
+                        <NotificationSection {...notificationSectionProps} />
+
+                        <MonitoringSection
+                            currentHistoryLimit={currentHistoryLimit}
+                            icon={MonitoringIcon}
+                            isLoading={isLoading}
+                            onHistoryLimitChange={
+                                handleHistoryLimitSelectChange
+                            }
+                        />
+
+                        <CloudSettingsSection />
 
                         <MaintenanceSection
                             backupSummary={backupSummary}
@@ -1043,20 +1043,6 @@ export const Settings = ({
                             uploadButtonIcon={uploadButtonIcon}
                         />
                     </div>
-
-                    <footer className="settings-modal__footer">
-                        <div className="settings-modal__footer-actions">
-                            <ThemedButton
-                                data-testid="settings-close"
-                                disabled={isLoading}
-                                onClick={handleCloseButtonClick}
-                                size="sm"
-                                variant="secondary"
-                            >
-                                Close
-                            </ThemedButton>
-                        </div>
-                    </footer>
                 </div>
             </ThemedBox>
         </div>

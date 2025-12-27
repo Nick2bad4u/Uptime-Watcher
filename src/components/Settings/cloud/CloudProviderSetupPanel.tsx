@@ -546,6 +546,19 @@ function renderOAuthProviderPanel(args: {
     const isSoftDisabled = args.providerSetupLocked;
     const ariaDisabled = isSoftDisabled || args.isConnecting;
 
+    const ProviderIcon =
+        args.providerKey === "dropbox"
+            ? AppIcons.brands.dropbox
+            : AppIcons.brands.googleDrive;
+    const ConnectedIcon = AppIcons.status.upFilled;
+
+    const providerIconNode = (
+        <ProviderIcon aria-hidden className="h-4 w-4" />
+    );
+    const connectedIconNode = (
+        <ConnectedIcon aria-hidden className="h-4 w-4" />
+    );
+
     return (
         <div
             aria-labelledby={`cloud-provider-tab-${args.providerKey}`}
@@ -555,15 +568,25 @@ function renderOAuthProviderPanel(args: {
         >
             {args.blockedCallout}
 
-            <ThemedText className="mt-1" size="xs" variant="secondary">
+            <ThemedText
+                as="p"
+                className="mt-1"
+                size="xs"
+                variant="secondary"
+            >
                 {args.description}
             </ThemedText>
 
             {args.connected ? (
-                <ThemedText className="mt-2" size="xs" variant="tertiary">
-                    Connected. To switch accounts or providers, disconnect above
-                    and connect again.
-                </ThemedText>
+                <div className="mt-2 flex items-start gap-2">
+                    <span aria-hidden className="text-emerald-400">
+                        {connectedIconNode}
+                    </span>
+                    <ThemedText as="p" size="xs" variant="tertiary">
+                        Connected. To switch accounts or providers, disconnect
+                        above and connect again.
+                    </ThemedText>
+                </div>
             ) : null}
 
             {args.connected ? null : (
@@ -574,6 +597,7 @@ function renderOAuthProviderPanel(args: {
                             isSoftDisabled ? "themed-button--loading" : ""
                         }
                         disabled={args.isConnecting}
+                        icon={providerIconNode}
                         onClick={handleConnectClick}
                         size="sm"
                         variant="primary"

@@ -38,9 +38,14 @@ import { SiteSettingsNumberField } from "./SiteSettingsNumberField";
 
 const WarningIcon = AppIcons.status.warning;
 const DurationIcon = AppIcons.metrics.time;
+const BellIcon = AppIcons.ui.bell;
 const IdentifierIcon = AppIcons.ui.link;
 const HistoryIcon = AppIcons.ui.history;
+const LockIcon = AppIcons.ui.lock;
 const LastCheckedIcon = AppIcons.metrics.activity;
+const RetryIcon = AppIcons.actions.refreshAlt;
+const SiteIcon = AppIcons.ui.site;
+const UnlockIcon = AppIcons.ui.unlock;
 
 const DangerZoneIcon = AppIcons.status.downFilled;
 const InfoIcon = AppIcons.ui.info;
@@ -373,6 +378,7 @@ export const SettingsTab = ({
     }, [loggedHandleRemoveSite]);
 
     const buttonIconSize = getIconSize("sm");
+    const fieldIconSize = getIconSize("xs");
 
     const settingsIcon = useMemo(
         () => <SettingsIcon color={iconColors.settings} />,
@@ -386,6 +392,10 @@ export const SettingsTab = ({
         () => <DurationIcon color={iconColors.timing} size={18} />,
         [iconColors.timing]
     );
+    const notificationsIcon = useMemo(
+        () => <BellIcon color={iconColors.info} size={18} />,
+        [iconColors.info]
+    );
     const infoIcon = useMemo(
         () => <InfoIcon color={iconColors.info} />,
         [iconColors.info]
@@ -398,7 +408,52 @@ export const SettingsTab = ({
         () => <TrashIcon aria-hidden size={buttonIconSize} />,
         [buttonIconSize]
     );
-    const icon = useMemo(() => <WarningIcon />, []);
+
+    const muteToggleIcon = useMemo(() => {
+        const IconComponent = isSiteMuted ? UnlockIcon : LockIcon;
+        return <IconComponent aria-hidden size={buttonIconSize} />;
+    }, [buttonIconSize, isSiteMuted]);
+
+    const nameLabelIcon = useMemo(
+        () => <SiteIcon aria-hidden size={fieldIconSize} />,
+        [fieldIconSize]
+    );
+    const identifierLabelIcon = useMemo(
+        () => <IdentifierIcon aria-hidden size={fieldIconSize} />,
+        [fieldIconSize]
+    );
+    const intervalLabelIcon = useMemo(
+        () => <DurationIcon aria-hidden size={fieldIconSize} />,
+        [fieldIconSize]
+    );
+    const timeoutLabelIcon = useMemo(
+        () => <DurationIcon aria-hidden size={fieldIconSize} />,
+        [fieldIconSize]
+    );
+    const retryLabelIcon = useMemo(
+        () => <RetryIcon aria-hidden size={fieldIconSize} />,
+        [fieldIconSize]
+    );
+
+    const timeoutFieldLabel = useMemo(
+        () => (
+            <span className="inline-flex items-center gap-2">
+                {timeoutLabelIcon}
+                Timeout (seconds)
+            </span>
+        ),
+        [timeoutLabelIcon]
+    );
+
+    const retryAttemptsFieldLabel = useMemo(
+        () => (
+            <span className="inline-flex items-center gap-2">
+                {retryLabelIcon}
+                Retry attempts
+            </span>
+        ),
+        [retryLabelIcon]
+    );
     return (
         <div className="space-y-6" data-testid="settings-tab">
             {/* Site Configuration */}
@@ -412,7 +467,10 @@ export const SettingsTab = ({
                             variant="secondary"
                             weight="medium"
                         >
-                            Site Name
+                            <span className="inline-flex items-center gap-2">
+                                {nameLabelIcon}
+                                Site name
+                            </span>
                         </ThemedText>
                         <div className="site-settings-field__controls">
                             <ThemedInput
@@ -460,7 +518,10 @@ export const SettingsTab = ({
                             variant="secondary"
                             weight="medium"
                         >
-                            {identifierLabel}
+                            <span className="inline-flex items-center gap-2">
+                                {identifierLabelIcon}
+                                {identifierLabel}
+                            </span>
                         </ThemedText>
                         <ThemedInput
                             className="opacity-70"
@@ -472,7 +533,7 @@ export const SettingsTab = ({
                             )}
                         />
                         <ThemedText size="xs" variant="tertiary">
-                            Identifier cannot be changed
+                            This identifier is generated and cannot be edited.
                         </ThemedText>
                     </div>
                 </div>
@@ -480,29 +541,29 @@ export const SettingsTab = ({
 
             <ThemedCard
                 className="site-settings-section"
-                icon={dangerIcon}
+                icon={notificationsIcon}
                 title="Notifications"
             >
                 <div className="site-settings-field">
                     <ThemedText className="mb-2" size="sm" variant="secondary">
-                        System notifications for this site
+                        System notifications
                     </ThemedText>
                     <ThemedText className="mb-4" size="xs" variant="tertiary">
                         {isSiteMuted
-                            ? "System notifications are muted for this site, even when global notifications are enabled."
-                            : "System notifications will follow your global notification settings for this site."}
+                            ? "Notifications for this site are muted. This overrides global notification settings."
+                            : "This site follows your global notification settings."}
                     </ThemedText>
                     <ThemedButton
                         className="site-settings-field__cta"
-                        icon={icon}
+                        icon={muteToggleIcon}
                         loading={isLoading}
                         onClick={handleToggleSiteMute}
                         size="sm"
                         variant={isSiteMuted ? "secondary" : "primary"}
                     >
                         {isSiteMuted
-                            ? "Unmute system notifications"
-                            : "Mute system notifications"}
+                            ? "Unmute notifications for this site"
+                            : "Mute notifications for this site"}
                     </ThemedButton>
                 </div>
             </ThemedCard>
@@ -518,7 +579,10 @@ export const SettingsTab = ({
                             variant="secondary"
                             weight="medium"
                         >
-                            Check Interval
+                            <span className="inline-flex items-center gap-2">
+                                {intervalLabelIcon}
+                                Check interval
+                            </span>
                         </ThemedText>
                         <div className="site-settings-field__controls">
                             <ThemedSelect
@@ -552,18 +616,18 @@ export const SettingsTab = ({
                             </ThemedButton>
                         </div>
                         <ThemedText size="xs" variant="tertiary">
-                            Monitor checks every{" "}
-                            {Math.round(localCheckInterval / 1000)} seconds
+                            How often Uptime Watcher runs a check for this monitor.
+                            Currently: {Math.round(localCheckInterval / 1000)}s.
                         </ThemedText>
                     </div>
 
                     {/* Timeout Configuration */}
                     <SiteSettingsNumberField
                         errorText={`Allowed range: ${TIMEOUT_CONSTRAINTS.MIN}-${TIMEOUT_CONSTRAINTS.MAX} seconds.`}
-                        helperText={`Request timeout: ${localTimeout} seconds`}
+                        helperText={`Maximum time to wait per attempt before it is treated as failed. Currently: ${localTimeout}s.`}
                         isChanged={timeoutChanged}
                         isValid={isTimeoutValid}
-                        label="Timeout (seconds)"
+                        label={timeoutFieldLabel}
                         max={TIMEOUT_CONSTRAINTS.MAX}
                         min={TIMEOUT_CONSTRAINTS.MIN}
                         onChange={handleTimeoutChange}
@@ -577,10 +641,10 @@ export const SettingsTab = ({
                     {/* Retry Attempts Configuration */}
                     <SiteSettingsNumberField
                         errorText={`Retry attempts must be between ${RETRY_CONSTRAINTS.MIN} and ${RETRY_CONSTRAINTS.MAX}.`}
-                        helperText={formatRetryAttemptsText(localRetryAttempts)}
+                        helperText={`${formatRetryAttemptsText(localRetryAttempts)}. Retries delay downtime detection but reduce false positives.`}
                         isChanged={retryAttemptsChanged}
                         isValid={isRetryAttemptsValid}
-                        label="Retry Attempts"
+                        label={retryAttemptsFieldLabel}
                         max={RETRY_CONSTRAINTS.MAX}
                         min={RETRY_CONSTRAINTS.MIN}
                         onChange={handleRetryAttemptsChange}

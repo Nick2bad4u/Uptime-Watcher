@@ -409,7 +409,8 @@ describe(AnalyticsTab, () => {
         expect(screen.getByText("2 incidents")).toBeInTheDocument();
         expect(screen.getByText("540s")).toBeInTheDocument();
         expect(screen.getByText("52")).toBeInTheDocument();
-        expect(screen.getByText("Up: 49 / Down: 3")).toBeInTheDocument();
+        expect(screen.getByText(/Up:\s*49/u)).toBeInTheDocument();
+        expect(screen.getByText(/Down:\s*3/u)).toBeInTheDocument();
 
         const p50Element = screen
             .getAllByText("80 ms")

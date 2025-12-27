@@ -304,12 +304,25 @@ export const Tooltip: NamedExoticComponent<TooltipProperties> = memo(
         );
 
         const applyTooltipPosition = useCallback((): void => {
-            const triggerNode = containerRef.current;
+            const containerNode = containerRef.current;
             const tooltipNode = tooltipRef.current;
 
-            if (!triggerNode || !tooltipNode) {
+            if (!containerNode || !tooltipNode) {
                 return;
             }
+
+            // Some call sites use wrapMode="block" which makes the container
+            // stretch to full width. In those cases we still want the tooltip
+            // anchored to the actual trigger element (typically the first child
+            // rendered by the render-prop).
+            const firstChild = containerNode.firstElementChild;
+            const triggerNode =
+                firstChild instanceof HTMLElement &&
+                (firstChild.tagName === "BUTTON" ||
+                    firstChild.tagName === "INPUT" ||
+                    firstChild.tagName === "A")
+                    ? firstChild
+                    : containerNode;
 
             const triggerRect = triggerNode.getBoundingClientRect();
             const tooltipRect = tooltipNode.getBoundingClientRect();
