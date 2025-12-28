@@ -49,7 +49,11 @@ function isAbsoluteFilesystemPath(value: string): boolean {
 
     // Windows drive paths (C:\ or C:/)
     if (value.length >= 3) {
-        const [firstChar, secondChar, thirdChar] = value;
+        const [
+            firstChar,
+            secondChar,
+            thirdChar,
+        ] = value;
         if (secondChar !== ":" || firstChar === undefined) {
             return false;
         }
@@ -131,5 +135,8 @@ export function isFilesystemBaseDirectoryValid(
         readonly maxBytes?: number;
     } = {}
 ): boolean {
-    return validateFilesystemBaseDirectoryCandidate(candidate, options).length === 0;
+    return (
+        validateFilesystemBaseDirectoryCandidate(candidate, options).length ===
+        0
+    );
 }

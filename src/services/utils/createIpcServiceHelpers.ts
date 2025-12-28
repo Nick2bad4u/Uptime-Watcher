@@ -6,6 +6,7 @@
  * renderer services that call {@link window.electronAPI}.
  *
  * Concurrency semantics:
+ *
  * - Concurrent calls share a single in-flight initialization promise.
  * - Once the in-flight promise settles, the cached promise is cleared so
  *   sequential calls re-validate the bridge.
@@ -292,8 +293,11 @@ export function getIpcServiceHelpers(
             ensuredError
         );
 
-        throw new Error(`[${serviceName}] Failed to create IPC service helpers`, {
-            cause: error,
-        });
+        throw new Error(
+            `[${serviceName}] Failed to create IPC service helpers`,
+            {
+                cause: error,
+            }
+        );
     }
 }

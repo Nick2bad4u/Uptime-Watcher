@@ -72,7 +72,6 @@ function computeBackoffDelayMs(args: {
     return Math.max(1, capped + randomInt(-jitterRange, jitterRange + 1));
 }
 
-
 function extractRetryableHttpFailure(error: unknown): null | {
     retryAfterMs?: number;
     status?: number;

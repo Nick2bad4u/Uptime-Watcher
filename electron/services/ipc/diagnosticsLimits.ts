@@ -1,6 +1,7 @@
 import { getUtfByteLength as getSharedUtfByteLength } from "@shared/utils/utfByteLength";
 
-const textEncoder = typeof TextEncoder === "undefined" ? null : new TextEncoder();
+const textEncoder =
+    typeof TextEncoder === "undefined" ? null : new TextEncoder();
 
 export const MAX_DIAGNOSTICS_METADATA_BYTES = 2048;
 export const MAX_DIAGNOSTICS_PAYLOAD_PREVIEW_BYTES = 4096;
@@ -13,8 +14,6 @@ export const MAX_DIAGNOSTICS_PAYLOAD_PREVIEW_BYTES = 4096;
  */
 export const getUtfByteLength = (value: string): number =>
     getSharedUtfByteLength(value);
-
-
 
 export const truncateUtfString = (
     value: string,

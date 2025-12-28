@@ -241,9 +241,10 @@ export async function buildFilesystemStatus(args: {
         ? await provider.isConnected().catch(() => false)
         : false;
 
-    const encryptionMode = connected && provider
-        ? await deps.getEffectiveEncryptionMode(provider)
-        : common.localEncryptionMode;
+    const encryptionMode =
+        connected && provider
+            ? await deps.getEffectiveEncryptionMode(provider)
+            : common.localEncryptionMode;
 
     return buildCloudStatusSummary(common, {
         backupsEnabled: connected,

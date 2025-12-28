@@ -27,14 +27,20 @@ function withObjectUrl(blob: Blob, run: (objectURL: string) => void): void {
     }
 }
 
-function createDownloadAnchor(objectURL: string, fileName: string): HTMLAnchorElement {
+function createDownloadAnchor(
+    objectURL: string,
+    fileName: string
+): HTMLAnchorElement {
     const anchor = document.createElement("a");
     anchor.href = objectURL;
     anchor.download = fileName;
     return anchor;
 }
 
-function clickDownloadAnchor(anchor: HTMLAnchorElement, attachToDom: boolean): void {
+function clickDownloadAnchor(
+    anchor: HTMLAnchorElement,
+    attachToDom: boolean
+): void {
     if (!attachToDom) {
         anchor.click();
         return;

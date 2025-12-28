@@ -431,9 +431,9 @@ const validateCloudFilesystemProviderConfig: IpcParameterValidator =
                         );
                         break;
                     }
-                        default: {
-                            break;
-                        }
+                    default: {
+                        break;
+                    }
                 }
             }
 

@@ -190,8 +190,7 @@ const serializeValue = (value: unknown): unknown => {
             preview[key] = record[key];
         }
 
-        preview["previewTruncatedKeys"] =
-            keys.length - MAX_PREVIEW_OBJECT_KEYS;
+        preview["previewTruncatedKeys"] = keys.length - MAX_PREVIEW_OBJECT_KEYS;
         return preview;
     }
 

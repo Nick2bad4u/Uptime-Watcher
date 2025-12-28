@@ -18,7 +18,6 @@ const MAX_EXTERNAL_OPEN_URL_BYTES = 4096;
 
 const SAFE_URL_SUSPECT_SEGMENT_MIN_LENGTH = 32;
 
-
 /**
  * Result of validating and normalizing a URL intended for external opening.
  *
@@ -85,22 +84,22 @@ export function getSafeUrlForLogging(rawUrl: string): string {
 
         // For non-hierarchical schemes (e.g., mailto:, file:), WHATWG URL
         // reports origin as the string "null".
-            if (url.origin === "null") {
-                return `${url.protocol}[redacted]`;
-            }
+        if (url.origin === "null") {
+            return `${url.protocol}[redacted]`;
+        }
 
-            // Remove query strings and hashes to avoid logging secrets.
-            // Additionally, redact suspiciously-long path segments (tokens, IDs).
-            const safePath = url.pathname
-                .split("/")
-                .map((segment) =>
-                    segment.length >= SAFE_URL_SUSPECT_SEGMENT_MIN_LENGTH
-                        ? "[redacted]"
-                        : segment
-                )
-                .join("/");
+        // Remove query strings and hashes to avoid logging secrets.
+        // Additionally, redact suspiciously-long path segments (tokens, IDs).
+        const safePath = url.pathname
+            .split("/")
+            .map((segment) =>
+                segment.length >= SAFE_URL_SUSPECT_SEGMENT_MIN_LENGTH
+                    ? "[redacted]"
+                    : segment
+            )
+            .join("/");
 
-            return `${url.origin}${safePath}`;
+        return `${url.origin}${safePath}`;
     } catch {
         return "[unparseable-url]";
     }

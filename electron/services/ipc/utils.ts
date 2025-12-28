@@ -708,8 +708,7 @@ export function registerStandardizedIpcHandler<
     registeredHandlers: Set<IpcInvokeChannel>
 ): void {
     if (validateParams === null && handler.length > 0) {
-        const errorMessage =
-            `[IpcService] Missing validateParams for '${channelName}'. Handlers that accept parameters must provide runtime validation.`;
+        const errorMessage = `[IpcService] Missing validateParams for '${channelName}'. Handlers that accept parameters must provide runtime validation.`;
 
         logger.error(
             errorMessage,

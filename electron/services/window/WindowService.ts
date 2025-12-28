@@ -370,8 +370,8 @@ export class WindowService {
                 logger.debug(
                     `[WindowService] Waiting ${Math.round(totalDelay)}ms before retry ${attempt + 2}/${MAX_RETRIES}`
                 );
-                    // eslint-disable-next-line no-await-in-loop -- Sequential retry delay required
-                    await sleep(totalDelay);
+                // eslint-disable-next-line no-await-in-loop -- Sequential retry delay required
+                await sleep(totalDelay);
             }
         }
 

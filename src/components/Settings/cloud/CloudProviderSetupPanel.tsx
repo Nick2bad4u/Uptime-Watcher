@@ -584,12 +584,7 @@ const OAuthProviderPanel = ({
         >
             {children}
 
-            <ThemedText
-                as="p"
-                className="mt-1"
-                size="xs"
-                variant="secondary"
-            >
+            <ThemedText as="p" className="mt-1" size="xs" variant="secondary">
                 {description}
             </ThemedText>
 
@@ -624,7 +619,7 @@ const OAuthProviderPanel = ({
             )}
         </div>
     );
-}
+};
 
 function renderFilesystemProviderPanel(args: {
     blockedCallout: JSX.Element | null;

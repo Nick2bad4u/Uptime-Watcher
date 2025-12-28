@@ -46,7 +46,6 @@ const DEFAULT_MAX_MANIFEST_BYTES = 256 * 1024; // 256 KiB
 /** Maximum byte budget accepted for provider object keys handled by sync. */
 const MAX_SYNC_KEY_BYTES = 2048;
 
-
 function getMaxOpsObjectBytes(): number {
     return readNumberEnv(
         "UW_CLOUD_SYNC_MAX_OPS_OBJECT_BYTES",

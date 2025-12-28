@@ -18,7 +18,10 @@ const noop = (): void => {};
  * - Defensive against `matchMedia` throwing
  */
 export function getPrefersDarkMode(): boolean {
-    if (typeof window === "undefined" || typeof window.matchMedia !== "function") {
+    if (
+        typeof window === "undefined" ||
+        typeof window.matchMedia !== "function"
+    ) {
         return false;
     }
 
@@ -43,7 +46,10 @@ export function getPrefersDarkMode(): boolean {
 export function subscribePrefersDarkModeChange(
     onChange: (isDarkMode: boolean) => void
 ): () => void {
-    if (typeof window === "undefined" || typeof window.matchMedia !== "function") {
+    if (
+        typeof window === "undefined" ||
+        typeof window.matchMedia !== "function"
+    ) {
         return noop;
     }
 

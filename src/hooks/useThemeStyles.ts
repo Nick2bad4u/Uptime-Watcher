@@ -311,9 +311,8 @@ export function useThemeStyles(isCollapsed = false): ThemeStyles {
     // Set up media query listener for theme changes
     useMount(
         useCallback(() => {
-            cleanupRef.current = subscribePrefersDarkModeChange(
-                handleThemeChange
-            );
+            cleanupRef.current =
+                subscribePrefersDarkModeChange(handleThemeChange);
         }, [handleThemeChange]),
         useCallback(() => {
             cleanupRef.current?.();

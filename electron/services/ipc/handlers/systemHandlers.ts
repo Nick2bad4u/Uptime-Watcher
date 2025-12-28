@@ -65,12 +65,9 @@ export function registerSystemHandlers({
                 const codeSuffix = getElectronErrorCodeSuffix(error);
 
                 // Never include clipboard contents in thrown errors/logs.
-                throw new Error(
-                    `Failed to write clipboard text${codeSuffix}`,
-                    {
-                        cause: error,
-                    }
-                );
+                throw new Error(`Failed to write clipboard text${codeSuffix}`, {
+                    cause: error,
+                });
             }
         },
         SystemHandlerValidators.writeClipboardText

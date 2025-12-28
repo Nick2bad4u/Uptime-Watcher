@@ -9,7 +9,8 @@
 /**
  * Returns the UTF-8 encoded byte length of a string.
  */
-const textEncoder = typeof TextEncoder === "undefined" ? null : new TextEncoder();
+const textEncoder =
+    typeof TextEncoder === "undefined" ? null : new TextEncoder();
 
 /**
  * Returns the UTF-8 encoded byte length of a string.

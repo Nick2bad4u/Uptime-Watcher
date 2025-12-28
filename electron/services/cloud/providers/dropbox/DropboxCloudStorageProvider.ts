@@ -481,7 +481,9 @@ export class DropboxCloudStorageProvider
 
         const response = await withDropboxRetry({
             fn: async () =>
-                client.filesDownload({ path: toDropboxObjectPath(normalizedKey) }),
+                client.filesDownload({
+                    path: toDropboxObjectPath(normalizedKey),
+                }),
             operationName: "files/download",
         }).catch((error: unknown) => {
             if (isDropboxNotFoundError(error)) {
@@ -509,7 +511,9 @@ export class DropboxCloudStorageProvider
 
         await withDropboxRetry({
             fn: async () =>
-                client.filesDeleteV2({ path: toDropboxObjectPath(normalizedKey) }),
+                client.filesDeleteV2({
+                    path: toDropboxObjectPath(normalizedKey),
+                }),
             operationName: "files/delete_v2",
         }).catch((error: unknown) => {
             // Contract: deleting a missing object is a no-op.

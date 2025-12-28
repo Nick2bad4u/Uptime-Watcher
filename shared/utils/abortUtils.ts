@@ -307,8 +307,8 @@ export async function sleep(ms: number, signal?: AbortSignal): Promise<void> {
 }
 
 /**
- * Promise-based sleep helper with {@link AbortSignal} support that does not
- * keep the Node.js event loop alive.
+ * Promise-based sleep helper with {@link AbortSignal} support that does not keep
+ * the Node.js event loop alive.
  *
  * @remarks
  * This behaves like {@link sleep}, but when running in Node.js / Electron it

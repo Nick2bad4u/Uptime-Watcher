@@ -395,7 +395,8 @@ export class FilesystemCloudStorageProvider
     }
 
     private async resolveKeyPath(key: string): Promise<string> {
-        const normalizedKey = FilesystemCloudStorageProvider.normalizeObjectKey(key);
+        const normalizedKey =
+            FilesystemCloudStorageProvider.normalizeObjectKey(key);
 
         const root = await this.getAppRootRealPath();
         const absolutePath = path.resolve(root, ...normalizedKey.split("/"));

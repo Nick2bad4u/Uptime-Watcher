@@ -414,39 +414,39 @@ export class CloudService {
 
             if (remoteEncryption?.mode === "passphrase") {
                 const salt = decodeBase64(remoteEncryption.saltBase64);
-                    const tryDeriveKey = async (
-                        candidatePassphrase: string
-                    ): Promise<Buffer | null> => {
-                        const candidateKey = await derivePassphraseKey({
-                            passphrase: candidatePassphrase,
-                            salt,
-                        });
+                const tryDeriveKey = async (
+                    candidatePassphrase: string
+                ): Promise<Buffer | null> => {
+                    const candidateKey = await derivePassphraseKey({
+                        passphrase: candidatePassphrase,
+                        salt,
+                    });
 
-                        const valid = verifyKeyCheckBase64({
-                            key: candidateKey,
-                            keyCheckBase64: remoteEncryption.keyCheckBase64,
-                        });
+                    const valid = verifyKeyCheckBase64({
+                        key: candidateKey,
+                        keyCheckBase64: remoteEncryption.keyCheckBase64,
+                    });
 
-                        if (valid) {
-                            return candidateKey;
-                        }
-
-                        candidateKey.fill(0);
-                        return null;
-                    };
-
-                    // At most two candidates (raw + trimmed); avoid `no-await-in-loop`.
-                    const [primaryCandidate, secondaryCandidate] =
-                        passphraseCandidates;
-
-                    let derivedKey = await tryDeriveKey(primaryCandidate);
-                    if (!derivedKey && secondaryCandidate) {
-                        derivedKey = await tryDeriveKey(secondaryCandidate);
+                    if (valid) {
+                        return candidateKey;
                     }
 
-                    if (!derivedKey) {
-                        throw new Error("Incorrect encryption passphrase");
-                    }
+                    candidateKey.fill(0);
+                    return null;
+                };
+
+                // At most two candidates (raw + trimmed); avoid `no-await-in-loop`.
+                const [primaryCandidate, secondaryCandidate] =
+                    passphraseCandidates;
+
+                let derivedKey = await tryDeriveKey(primaryCandidate);
+                if (!derivedKey && secondaryCandidate) {
+                    derivedKey = await tryDeriveKey(secondaryCandidate);
+                }
+
+                if (!derivedKey) {
+                    throw new Error("Incorrect encryption passphrase");
+                }
 
                 // NOTE: Do not run settings writes in parallel.
                 // Some settings adapters are transaction-backed and parallel
@@ -612,9 +612,7 @@ export class CloudService {
                 if (issues.length > 0) {
                     const [issue] = issues;
                     if (!issue) {
-                        throw new Error(
-                            "Filesystem base directory is invalid"
-                        );
+                        throw new Error("Filesystem base directory is invalid");
                     }
                     const candidate = config.baseDirectory;
 
@@ -680,10 +678,10 @@ export class CloudService {
 
                 const canonical = await fs.realpath(resolved); // eslint-disable-line security/detect-non-literal-fs-filename -- Dynamic but validated path supplied by the user.
 
-                const canonicalIssues = validateFilesystemBaseDirectoryCandidate(
-                    canonical,
-                    { maxBytes: MAX_FILESYSTEM_BASE_DIRECTORY_BYTES }
-                );
+                const canonicalIssues =
+                    validateFilesystemBaseDirectoryCandidate(canonical, {
+                        maxBytes: MAX_FILESYSTEM_BASE_DIRECTORY_BYTES,
+                    });
                 if (canonicalIssues.length > 0) {
                     throw new Error(
                         "Filesystem base directory resolved to an invalid canonical path"

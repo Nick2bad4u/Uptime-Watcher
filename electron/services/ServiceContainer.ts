@@ -129,7 +129,6 @@ function isPromiseLike(value: unknown): value is PromiseLike<unknown> {
     return typeof then === "function";
 }
 
-
 /**
  * Configuration options for {@link ServiceContainer}.
  *

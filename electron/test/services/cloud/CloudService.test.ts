@@ -298,9 +298,7 @@ describe("CloudService", () => {
         await cloudService.configureFilesystemProvider({ baseDirectory });
 
         await expect(
-            cloudService.setEncryptionPassphrase(
-                "correct horse battery staple"
-            )
+            cloudService.setEncryptionPassphrase("correct horse battery staple")
         ).resolves.toBeTruthy();
 
         await expect(
