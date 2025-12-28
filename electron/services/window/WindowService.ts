@@ -101,6 +101,15 @@ export class WindowService {
         void this.openExternalIfSafe(url, "will-navigate");
     };
 
+    private readonly handleWillRedirect = (event: Event, url: string): void => {
+        if (this.isAllowedNavigationTarget(url)) {
+            return;
+        }
+
+        event.preventDefault();
+        void this.openExternalIfSafe(url, "will-redirect");
+    };
+
     /**
      * Named event handler for ready-to-show event
      */
@@ -721,6 +730,12 @@ export class WindowService {
             this.handleWillNavigate
         );
 
+        // Block top-level redirects away from the app origin.
+        this.mainWindow.webContents.on(
+            "will-redirect",
+            this.handleWillRedirect
+        );
+
         this.mainWindow.on("closed", this.handleClosed);
     }
 
@@ -751,6 +766,11 @@ export class WindowService {
         this.mainWindow.webContents.removeListener(
             "will-navigate",
             this.handleWillNavigate
+        );
+
+        this.mainWindow.webContents.removeListener(
+            "will-redirect",
+            this.handleWillRedirect
         );
 
         this.mainWindow.removeListener("closed", this.handleClosed);

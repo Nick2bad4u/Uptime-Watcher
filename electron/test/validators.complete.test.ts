@@ -859,6 +859,26 @@ describe("IPC Validators - Exported Validator Groups", () => {
                 expect(isValidationFailure(result)).toBeTruthy();
             });
 
+            it("rejects restore fileName with leading/trailing whitespace", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: validators.complete", "component");
+                await annotate("Category: Core", "category");
+                await annotate("Type: Error Handling", "type");
+
+                const payload = {
+                    buffer: new ArrayBuffer(64),
+                    fileName: " restore.sqlite",
+                };
+
+                const result = DataHandlerValidators.restoreSqliteBackup([
+                    payload,
+                ]);
+                expect(isValidationFailure(result)).toBeTruthy();
+            });
+
             it("rejects overly long restore fileName", async ({
                 task,
                 annotate,
@@ -985,6 +1005,22 @@ describe("IPC Validators - Exported Validator Groups", () => {
                     ]);
                 expect(isValidationFailure(result)).toBeTruthy();
             });
+
+            it("rejects leading/trailing whitespace in baseDirectory", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: validators.complete", "component");
+                await annotate("Category: Core", "category");
+                await annotate("Type: Error Handling", "type");
+
+                const result =
+                    CloudHandlerValidators.configureFilesystemProvider([
+                        { baseDirectory: " C:/Backups" },
+                    ]);
+                expect(isValidationFailure(result)).toBeTruthy();
+            });
         });
 
         describe("deleteBackup validator", () => {
@@ -1067,6 +1103,21 @@ describe("IPC Validators - Exported Validator Groups", () => {
 
                 const result = CloudHandlerValidators.setEncryptionPassphrase([
                     "x".repeat(2000),
+                ]);
+                expect(isValidationFailure(result)).toBeTruthy();
+            });
+
+            it("rejects passphrases with control characters", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: validators.complete", "component");
+                await annotate("Category: Core", "category");
+                await annotate("Type: Error Handling", "type");
+
+                const result = CloudHandlerValidators.setEncryptionPassphrase([
+                    "secret\npassphrase",
                 ]);
                 expect(isValidationFailure(result)).toBeTruthy();
             });

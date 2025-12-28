@@ -116,3 +116,40 @@ export function normalizeCloudObjectKey(
 
     return normalized;
 }
+
+/**
+ * Normalizes a provider object key with the default sandbox rules used across
+ * built-in providers.
+ *
+ * @remarks
+ * This is the common configuration used by Dropbox + Google Drive providers:
+ * - trim
+ * - normalize Windows separators
+ * - strip leading slashes
+ * - reject ASCII control characters
+ * - reject traversal segments
+ *
+ * Providers may still apply additional constraints (prefixing, max sizes, etc).
+ */
+export function normalizeProviderObjectKey(rawKey: string): string {
+    return normalizeCloudObjectKey(rawKey, {
+        allowEmpty: true,
+        forbidAsciiControlCharacters: true,
+        forbidTraversalSegments: true,
+        stripLeadingSlashes: true,
+    });
+}
+
+/**
+ * Asserts that a normalized key can be used as an object key (i.e. refers to an
+ * actual object rather than a directory/prefix).
+ */
+export function assertCloudObjectKey(key: string): void {
+    if (key.length === 0) {
+        throw new Error("Cloud key cannot be empty");
+    }
+
+    if (key.endsWith("/")) {
+        throw new Error("Cloud key must not end with '/'");
+    }
+}

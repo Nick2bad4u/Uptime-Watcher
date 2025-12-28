@@ -428,6 +428,12 @@ const validateCloudFilesystemProviderConfig: IpcParameterValidator =
             }
 
             const errors: string[] = [];
+
+            if (baseDirectoryRaw !== baseDirectory) {
+                errors.push(
+                    "baseDirectory must not have leading or trailing whitespace"
+                );
+            }
             if (
                 getUtfByteLength(baseDirectoryRaw) >
                 MAX_FILESYSTEM_BASE_DIRECTORY_BYTES
@@ -441,6 +447,10 @@ const validateCloudFilesystemProviderConfig: IpcParameterValidator =
                 errors.push(
                     "baseDirectory must not contain control characters"
                 );
+            }
+
+            if (baseDirectoryRaw.includes("\0")) {
+                errors.push("baseDirectory must not contain a null byte");
             }
 
             if (isWindowsDeviceNamespacePath(baseDirectoryRaw)) {
@@ -689,12 +699,17 @@ function validateRestoreFileNameCandidate(candidate: unknown): string[] {
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- validated as non-empty string above
-    const fileName = (candidate as string).trim();
+    const rawFileName = candidate as string;
+    const fileName = rawFileName.trim();
     if (fileName.length === 0) {
         return ["fileName must not be blank"];
     }
 
     const errors: string[] = [];
+
+    if (rawFileName !== fileName) {
+        errors.push("fileName must not have leading or trailing whitespace");
+    }
 
     if (getUtfByteLength(fileName) > MAX_RESTORE_FILE_NAME_BYTES) {
         errors.push(
@@ -785,6 +800,16 @@ const validateEncryptionPassphrasePayload: IpcParameterValidator =
             ) {
                 errors.push(
                     `passphrase must not exceed ${MAX_ENCRYPTION_PASSPHRASE_BYTES} bytes`
+                );
+            }
+
+            if (hasAsciiControlCharacters(passphrase)) {
+                errors.push("passphrase must not contain control characters");
+            }
+
+            if (passphrase.trim().length < 8) {
+                errors.push(
+                    "passphrase must be at least 8 characters (after trimming)"
                 );
             }
 

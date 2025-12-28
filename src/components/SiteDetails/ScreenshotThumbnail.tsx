@@ -19,6 +19,7 @@ import {
 import { createPortal } from "react-dom";
 
 import { useMount } from "../../hooks/useMount";
+import { selectOpenExternal } from "../../stores/ui/selectors";
 import { useUIStore } from "../../stores/ui/useUiStore";
 import { useTheme } from "../../theme/useTheme";
 
@@ -58,7 +59,7 @@ export const ScreenshotThumbnail = ({
     const linkReference = useRef<HTMLAnchorElement>(null);
     const timeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
     const { themeName } = useTheme();
-    const { openExternal } = useUIStore();
+    const openExternal = useUIStore(selectOpenExternal);
 
     // Set portal container after component mounts to avoid SSR issues
     useMount(

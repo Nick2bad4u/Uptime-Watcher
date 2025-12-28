@@ -23,7 +23,10 @@ import type {
 } from "../cloud/providers/CloudStorageProvider.types";
 import type { CloudSyncTransport } from "./CloudSyncTransport.types";
 
-import { parseOpsObjectFileNameMetadata } from "./syncEngineKeyUtils";
+import {
+    OPS_OBJECT_SUFFIX,
+    parseOpsObjectFileNameMetadata,
+} from "./syncEngineKeyUtils";
 import {
     getPersistedDeviceIdValidationError,
     hasAsciiControlCharacters,
@@ -43,7 +46,6 @@ const DEFAULT_MAX_MANIFEST_BYTES = 256 * 1024; // 256 KiB
 /** Maximum byte budget accepted for provider object keys handled by sync. */
 const MAX_SYNC_KEY_BYTES = 2048;
 
-const OPS_FILE_SUFFIX = ".ndjson" as const;
 
 function getMaxOpsObjectBytes(): number {
     return readNumberEnv(
@@ -223,7 +225,7 @@ function assertOpsObjectKey(key: string): void {
     const parsedFileName = parseOpsObjectFileNameMetadata(fileName);
     if (!parsedFileName) {
         throw new Error(
-            `Invalid sync operations object key (expected <createdAt>-<firstOpId>-<lastOpId>${OPS_FILE_SUFFIX}): ${key}`
+            `Invalid sync operations object key (expected <createdAt>-<firstOpId>-<lastOpId>${OPS_OBJECT_SUFFIX}): ${key}`
         );
     }
 }
@@ -332,7 +334,7 @@ function createOpsKey(
     firstOpId: number,
     lastOpId: number
 ): string {
-    return `${OPS_PREFIX}/${deviceId}/ops/${createdAt}-${firstOpId}-${lastOpId}.ndjson`;
+    return `${OPS_PREFIX}/${deviceId}/ops/${createdAt}-${firstOpId}-${lastOpId}${OPS_OBJECT_SUFFIX}`;
 }
 
 /**
@@ -402,7 +404,7 @@ export class ProviderCloudSyncTransport implements CloudSyncTransport {
             return;
         }
 
-        if (key.endsWith(OPS_FILE_SUFFIX)) {
+        if (key.endsWith(OPS_OBJECT_SUFFIX)) {
             assertOpsObjectKey(key);
             await this.provider.deleteObject(key);
             return;

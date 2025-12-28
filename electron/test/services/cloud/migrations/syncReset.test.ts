@@ -104,8 +104,11 @@ class InMemoryProvider implements CloudStorageProvider {
 describe(resetProviderCloudSyncState, () => {
     it("deletes sync objects and writes manifest.resetAt while preserving encryption config", async () => {
         const provider = new InMemoryProvider();
+        const deleteSpy = vi.spyOn(provider, "deleteObject");
+
         provider.seedObject("sync/devices/a/ops/1-1-1.ndjson", "{}");
         provider.seedObject("sync/snapshots/1/1.json", "{}");
+        provider.seedObject("sync/other.bin", "{}");
 
         const encryption: CloudEncryptionConfigPassphrase = {
             configVersion: CLOUD_ENCRYPTION_CONFIG_VERSION,
@@ -142,6 +145,16 @@ describe(resetProviderCloudSyncState, () => {
         expect(result.deletedObjects).toBe(2);
         expect(result.failedDeletions).toEqual([]);
         expect(result.seededSnapshotKey).toBe("sync/snapshots/2/2.json");
+
+        expect(deleteSpy.mock.calls.map(([key]) => key).toSorted()).toEqual(
+            [
+                "sync/devices/a/ops/1-1-1.ndjson",
+                "sync/snapshots/1/1.json",
+            ].toSorted()
+        );
+
+        // Unknown extensions are ignored during cleanup.
+        await expect(provider.downloadObject("sync/other.bin")).resolves.toBeTruthy();
 
         expect(syncEngine.syncNow).toHaveBeenCalledTimes(1);
         expect(syncEngine.syncNow).toHaveBeenCalledWith(provider);

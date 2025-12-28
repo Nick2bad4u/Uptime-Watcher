@@ -205,9 +205,13 @@ export const SiteCard: NamedExoticComponent<SiteCardProperties> = memo(
         const avgResponseDisplay =
             checkCount === 0 ? "—" : `${averageResponseTime} ms`;
         const checksDisplay = checkCount.toLocaleString();
-        const lastCheckTimestamp = monitor
-            ? getLatestHistoryTimestamp(monitor.history)
-            : undefined;
+        const lastCheckTimestamp = useMemo(
+            () =>
+                monitor
+                    ? getLatestHistoryTimestamp(monitor.history)
+                    : undefined,
+            [monitor]
+        );
         const lastCheckLabel = lastCheckTimestamp
             ? formatRelativeTimestamp(lastCheckTimestamp)
             : "No data";

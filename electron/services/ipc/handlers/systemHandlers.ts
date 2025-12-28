@@ -1,9 +1,9 @@
 import type { IpcInvokeChannel } from "@shared/types/ipc";
 
-import { getElectronErrorCodeSuffix } from "@electron/services/shell/openExternalUtils";
+import { openExternalOrThrow } from "@electron/services/shell/openExternalUtils";
 import { SYSTEM_CHANNELS } from "@shared/types/preload";
 import { validateExternalOpenUrlCandidate } from "@shared/utils/urlSafety";
-import { clipboard, shell } from "electron";
+import { clipboard } from "electron";
 
 import type { AutoUpdaterService } from "../../updater/AutoUpdaterService";
 
@@ -41,18 +41,11 @@ export function registerSystemHandlers({
 
             const { normalizedUrl, safeUrlForLogging } = validation;
 
-            try {
-                await shell.openExternal(normalizedUrl);
-            } catch (error: unknown) {
-                const codeSuffix = getElectronErrorCodeSuffix(error);
-
-                // Do not allow errors to echo the full URL (queries may include
-                // tokens); keep logs and renderer error messages redacted.
-                throw new Error(
-                    `Failed to open external URL: ${safeUrlForLogging}${codeSuffix}`,
-                    { cause: error }
-                );
-            }
+            await openExternalOrThrow({
+                failureMessagePrefix: "Failed to open external URL",
+                normalizedUrl,
+                safeUrlForLogging,
+            });
 
             return true;
         },

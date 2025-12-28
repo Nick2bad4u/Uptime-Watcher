@@ -105,10 +105,18 @@ vi.mock("../../../stores/monitor/useMonitorTypesStore", () => ({
 }));
 
 vi.mock("../../../stores/error/useErrorStore", () => ({
-    useErrorStore: vi.fn(() => ({
-        formError: undefined,
-        clearError: vi.fn(),
-    })),
+    useErrorStore: vi.fn(
+        (selector?: (state: { clearError: () => void; isLoading: boolean; lastError: string | undefined; formError?: unknown }) => unknown) => {
+            const state = {
+                clearError: vi.fn(),
+                formError: undefined,
+                isLoading: false,
+                lastError: undefined,
+            };
+
+            return typeof selector === "function" ? selector(state) : state;
+        }
+    ),
 }));
 
 // Mock form hook to return functions we can control
@@ -500,11 +508,24 @@ describe("AddSiteForm Uncovered Lines Coverage", () => {
         annotate("Category: Component", "category");
         annotate("Type: Error Handling", "type");
 
-        // First set a form error to trigger the ErrorAlert component
-        vi.mocked(useErrorStore).mockReturnValue({
-            lastError: "Test error",
-            clearError: mockClearError,
-        });
+        const selectorAwareImplementation = (
+            selector?: (state: unknown) => unknown
+        ) => {
+            const state = {
+                clearError: mockClearError,
+                formError: undefined,
+                isLoading: false,
+                lastError: "Test error",
+            };
+
+            return typeof selector === "function" ? selector(state) : state;
+        };
+
+        // AddSiteForm reads from the error store multiple times via selectors.
+        vi.mocked(useErrorStore)
+            .mockImplementationOnce(selectorAwareImplementation as never)
+            .mockImplementationOnce(selectorAwareImplementation as never)
+            .mockImplementationOnce(selectorAwareImplementation as never);
 
         render(<AddSiteForm onSuccess={mockOnSuccess} />);
 

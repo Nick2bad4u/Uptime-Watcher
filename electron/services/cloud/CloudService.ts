@@ -374,14 +374,27 @@ export class CloudService {
         passphrase: string
     ): Promise<CloudStatusSummary> {
         return this.runCloudOperation("setEncryptionPassphrase", async () => {
-            if (
-                typeof passphrase !== "string" ||
-                passphrase.trim().length < 8
-            ) {
+            if (typeof passphrase !== "string") {
+                throw new TypeError("Passphrase must be a string");
+            }
+
+            if (hasAsciiControlCharacters(passphrase)) {
+                throw new Error(
+                    "Passphrase must not contain control characters"
+                );
+            }
+
+            const trimmedPassphrase = passphrase.trim();
+            if (trimmedPassphrase.length < 8) {
                 throw new Error(
                     "Passphrase must be at least 8 characters (after trimming)"
                 );
             }
+
+            const passphraseCandidates: readonly [string, string?] =
+                passphrase === trimmedPassphrase
+                    ? [passphrase]
+                    : [passphrase, trimmedPassphrase];
 
             const provider = await this.resolveProviderOrThrow({
                 requireEncryptionUnlocked: false,
@@ -397,16 +410,39 @@ export class CloudService {
 
             if (remoteEncryption?.mode === "passphrase") {
                 const salt = decodeBase64(remoteEncryption.saltBase64);
-                const key = await derivePassphraseKey({ passphrase, salt });
+                    const tryDeriveKey = async (
+                        candidatePassphrase: string
+                    ): Promise<Buffer | null> => {
+                        const candidateKey = await derivePassphraseKey({
+                            passphrase: candidatePassphrase,
+                            salt,
+                        });
 
-                const valid = verifyKeyCheckBase64({
-                    key,
-                    keyCheckBase64: remoteEncryption.keyCheckBase64,
-                });
+                        const valid = verifyKeyCheckBase64({
+                            key: candidateKey,
+                            keyCheckBase64: remoteEncryption.keyCheckBase64,
+                        });
 
-                if (!valid) {
-                    throw new Error("Incorrect encryption passphrase");
-                }
+                        if (valid) {
+                            return candidateKey;
+                        }
+
+                        candidateKey.fill(0);
+                        return null;
+                    };
+
+                    // At most two candidates (raw + trimmed); avoid `no-await-in-loop`.
+                    const [primaryCandidate, secondaryCandidate] =
+                        passphraseCandidates;
+
+                    let derivedKey = await tryDeriveKey(primaryCandidate);
+                    if (!derivedKey && secondaryCandidate) {
+                        derivedKey = await tryDeriveKey(secondaryCandidate);
+                    }
+
+                    if (!derivedKey) {
+                        throw new Error("Incorrect encryption passphrase");
+                    }
 
                 // NOTE: Do not run settings writes in parallel.
                 // Some settings adapters are transaction-backed and parallel
@@ -421,16 +457,19 @@ export class CloudService {
                 );
                 await this.secretStore.setSecret(
                     SECRET_KEY_ENCRYPTION_DERIVED_KEY,
-                    encodeBase64(key)
+                    encodeBase64(derivedKey)
                 );
 
-                key.fill(0);
+                derivedKey.fill(0);
 
                 return this.buildStatusSummary();
             }
 
             const salt = generateEncryptionSalt();
-            const key = await derivePassphraseKey({ passphrase, salt });
+            const key = await derivePassphraseKey({
+                passphrase: trimmedPassphrase,
+                salt,
+            });
             const encryptionConfig: CloudEncryptionConfigPassphrase = {
                 configVersion: CLOUD_ENCRYPTION_CONFIG_VERSION,
                 kdf: "scrypt",
@@ -581,6 +620,12 @@ export class CloudService {
                 if (baseDirectory.length === 0) {
                     throw new Error(
                         "Filesystem base directory must not be empty"
+                    );
+                }
+
+                if (config.baseDirectory !== baseDirectory) {
+                    throw new Error(
+                        "Filesystem base directory must not have leading or trailing whitespace"
                     );
                 }
 

@@ -205,6 +205,65 @@ describe("ProviderCloudSyncTransport.readOperationsObject limits", () => {
             transport.appendOperations("a:bad", [operation])
         ).rejects.toThrowError(/must not contain ':'/i);
     });
+
+    it("parses operation objects with CRLF newlines", async () => {
+        const operationLine = JSON.stringify({
+            deviceId: "a",
+            entityId: "e",
+            entityType: "site",
+            field: "x",
+            kind: "set-field",
+            opId: 1,
+            syncSchemaVersion: CLOUD_SYNC_SCHEMA_VERSION,
+            timestamp: 1,
+            value: true,
+        } satisfies CloudSyncOperation);
+
+        const provider = createProvider({
+            downloadObject: async () => Buffer.from(`${operationLine}\r\n`, "utf8"),
+        });
+
+        const transport = ProviderCloudSyncTransport.create(provider);
+
+        await expect(
+            transport.readOperationsObject("sync/devices/a/ops/1-1-1.ndjson")
+        ).resolves.toHaveLength(1);
+    });
+
+    it("parses operation objects without a trailing newline", async () => {
+        const operationLine = JSON.stringify({
+            deviceId: "a",
+            entityId: "e",
+            entityType: "site",
+            field: "x",
+            kind: "set-field",
+            opId: 1,
+            syncSchemaVersion: CLOUD_SYNC_SCHEMA_VERSION,
+            timestamp: 1,
+            value: true,
+        } satisfies CloudSyncOperation);
+
+        const provider = createProvider({
+            downloadObject: async () => Buffer.from(operationLine, "utf8"),
+        });
+
+        const transport = ProviderCloudSyncTransport.create(provider);
+        await expect(
+            transport.readOperationsObject("sync/devices/a/ops/1-1-1.ndjson")
+        ).resolves.toHaveLength(1);
+    });
+
+    it("preserves error line numbering when blank lines precede invalid JSON", async () => {
+        const provider = createProvider({
+            downloadObject: async () => Buffer.from("\n{not-json}\n", "utf8"),
+        });
+
+        const transport = ProviderCloudSyncTransport.create(provider);
+
+        await expect(
+            transport.readOperationsObject("sync/devices/a/ops/1-1-1.ndjson")
+        ).rejects.toThrowError(/at line 2:/i);
+    });
 });
 
 describe("ProviderCloudSyncTransport snapshot key validation", () => {

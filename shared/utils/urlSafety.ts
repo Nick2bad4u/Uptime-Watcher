@@ -9,7 +9,17 @@
  * @packageDocumentation
  */
 
+import { hasAsciiControlCharacters } from "@shared/utils/stringSafety";
 import { isValidUrl } from "@shared/validation/validatorUtils";
+
+/** Maximum accepted UTF-8 byte budget for user-supplied external-open URLs. */
+const MAX_EXTERNAL_OPEN_URL_BYTES = 4096;
+
+const SAFE_URL_SUSPECT_SEGMENT_MIN_LENGTH = 32;
+
+function getUtfByteLength(value: string): number {
+    return new TextEncoder().encode(value).length;
+}
 
 /**
  * Result of validating and normalizing a URL intended for external opening.
@@ -77,11 +87,22 @@ export function getSafeUrlForLogging(rawUrl: string): string {
 
         // For non-hierarchical schemes (e.g., mailto:, file:), WHATWG URL
         // reports origin as the string "null".
-        if (url.origin === "null") {
-            return `${url.protocol}${url.pathname}`;
-        }
+            if (url.origin === "null") {
+                return `${url.protocol}[redacted]`;
+            }
 
-        return `${url.origin}${url.pathname}`;
+            // Remove query strings and hashes to avoid logging secrets.
+            // Additionally, redact suspiciously-long path segments (tokens, IDs).
+            const safePath = url.pathname
+                .split("/")
+                .map((segment) =>
+                    segment.length >= SAFE_URL_SUSPECT_SEGMENT_MIN_LENGTH
+                        ? "[redacted]"
+                        : segment
+                )
+                .join("/");
+
+            return `${url.origin}${safePath}`;
     } catch {
         return "[unparseable-url]";
     }
@@ -189,6 +210,15 @@ export function isAllowedExternalOpenUrl(rawUrl: string): boolean {
         return false;
     }
 
+    if (getUtfByteLength(rawUrl) > MAX_EXTERNAL_OPEN_URL_BYTES) {
+        return false;
+    }
+
+    // Reject ASCII control characters (including NUL) defensively.
+    if (hasAsciiControlCharacters(rawUrl)) {
+        return false;
+    }
+
     if (/[\n\r]/u.test(rawUrl)) {
         return false;
     }
@@ -236,8 +266,7 @@ export function isAllowedExternalOpenUrl(rawUrl: string): boolean {
 export function validateExternalOpenUrlCandidate(
     rawUrl: unknown
 ): ExternalOpenUrlValidationResult {
-    const safeUrlForLogging =
-        typeof rawUrl === "string" ? getSafeUrlForLogging(rawUrl.trim()) : "";
+    let safeUrlForLogging = "";
 
     if (typeof rawUrl !== "string") {
         return {
@@ -249,6 +278,15 @@ export function validateExternalOpenUrlCandidate(
 
     const normalizedUrl = rawUrl.trim();
 
+    if (
+        normalizedUrl.length > 0 &&
+        getUtfByteLength(normalizedUrl) <= MAX_EXTERNAL_OPEN_URL_BYTES &&
+        !/[\n\r]/u.test(normalizedUrl) &&
+        !hasAsciiControlCharacters(normalizedUrl)
+    ) {
+        safeUrlForLogging = getSafeUrlForLogging(normalizedUrl);
+    }
+
     if (normalizedUrl.length === 0) {
         return {
             ok: false,
@@ -257,10 +295,26 @@ export function validateExternalOpenUrlCandidate(
         };
     }
 
+    if (getUtfByteLength(normalizedUrl) > MAX_EXTERNAL_OPEN_URL_BYTES) {
+        return {
+            ok: false,
+            reason: `must not exceed ${MAX_EXTERNAL_OPEN_URL_BYTES} bytes`,
+            safeUrlForLogging,
+        };
+    }
+
     if (/[\n\r]/u.test(normalizedUrl)) {
         return {
             ok: false,
             reason: "must not contain newlines",
+            safeUrlForLogging,
+        };
+    }
+
+    if (hasAsciiControlCharacters(normalizedUrl)) {
+        return {
+            ok: false,
+            reason: "must not contain control characters",
             safeUrlForLogging,
         };
     }

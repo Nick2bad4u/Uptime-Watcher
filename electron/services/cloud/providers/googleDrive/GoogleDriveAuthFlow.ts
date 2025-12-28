@@ -1,10 +1,9 @@
 import type * as z from "zod";
 
-import { getElectronErrorCodeSuffix } from "@electron/services/shell/openExternalUtils";
+import { openExternalOrThrow } from "@electron/services/shell/openExternalUtils";
 import { tryParseJsonRecord } from "@shared/utils/jsonSafety";
 import { isObject } from "@shared/utils/typeGuards";
 import axios from "axios";
-import { shell } from "electron";
 
 import {
     createOAuthState,
@@ -88,16 +87,11 @@ export class GoogleDriveAuthFlow {
                 url: authorizeUrl,
             });
 
-            try {
-                await shell.openExternal(normalizedUrl);
-            } catch (error: unknown) {
-                const codeSuffix = getElectronErrorCodeSuffix(error);
-
-                throw new Error(
-                    `Failed to open Google OAuth URL: ${urlForLog}${codeSuffix}`,
-                    { cause: error }
-                );
-            }
+            await openExternalOrThrow({
+                failureMessagePrefix: "Failed to open Google OAuth URL",
+                normalizedUrl,
+                safeUrlForLogging: urlForLog,
+            });
 
             const callback = await server.waitForCallback({
                 expectedState: state,

@@ -58,9 +58,13 @@ const mockOpenExternal = vi.fn();
 
 // Mock useUIStore hook
 vi.mock("../stores/ui/useUiStore", () => ({
-    useUIStore: () => ({
-        openExternal: mockOpenExternal,
-    }),
+    useUIStore: (selector?: (state: { openExternal: typeof mockOpenExternal }) => unknown) => {
+        const state = {
+            openExternal: mockOpenExternal,
+        };
+
+        return typeof selector === "function" ? selector(state) : state;
+    },
 }));
 
 // Mock useMount hook

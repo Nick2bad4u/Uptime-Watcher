@@ -88,6 +88,9 @@ export interface SyncEngineResult {
 /** Concurrency used when downloading remote operation log objects. */
 const DEFAULT_OPS_OBJECT_READ_CONCURRENCY = 4;
 
+/** Concurrency cap used when deleting compacted remote sync objects. */
+const DEFAULT_SYNC_CLEANUP_DELETE_CONCURRENCY = 4;
+
 /**
  * Narrow interface for components that can perform a sync cycle.
  */
@@ -291,15 +294,7 @@ export class SyncEngine {
         // plaintext sync artifacts exist; the first encrypted compaction should
         // remove the previous plaintext snapshot/ops.
 
-        async function safeDelete(key: string): Promise<void> {
-            try {
-                await transport.deleteObject(key);
-            } catch {
-                // Best-effort cleanup.
-            }
-        }
-
-        const deletions: Array<Promise<void>> = [];
+        const keysToDelete: string[] = [];
         for (const entry of opObjects) {
             const metadata = parseOpsObjectKeyMetadata(entry.key);
             if (metadata) {
@@ -310,16 +305,28 @@ export class SyncEngine {
                     compactedUpTo !== undefined &&
                     metadata.lastOpId <= compactedUpTo
                 ) {
-                    deletions.push(safeDelete(entry.key));
+                    keysToDelete.push(entry.key);
                 }
             }
         }
 
         if (previousSnapshotKey && previousSnapshotKey !== snapshotEntry.key) {
-            deletions.push(safeDelete(previousSnapshotKey));
+            keysToDelete.push(previousSnapshotKey);
         }
 
-        await Promise.all(deletions);
+        await mapWithConcurrency({
+            concurrency: DEFAULT_SYNC_CLEANUP_DELETE_CONCURRENCY,
+            items: keysToDelete,
+            task: async (keyToDelete) => {
+                try {
+                    await transport.deleteObject(keyToDelete);
+                    return true;
+                } catch {
+                    // Best-effort cleanup.
+                    return false;
+                }
+            },
+        });
 
         const appliedBaseline = await this.applyMergedState(
             sanitizedMergedState,
@@ -486,7 +493,14 @@ export class SyncEngine {
                 snapshotState: snapshot.state,
                 snapshotTrusted: true,
             };
-        } catch {
+        } catch (error) {
+            logger.warn(
+                "[SyncEngine] Failed to load remote snapshot; rebuilding from operation log",
+                {
+                    key: manifest.latestSnapshotKey,
+                    message: getUserFacingErrorDetail(error),
+                }
+            );
             return {
                 snapshotState: EMPTY_STATE,
                 snapshotTrusted: false,

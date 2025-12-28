@@ -10,6 +10,7 @@ import {
     DEFAULT_CHECK_INTERVAL,
     DEFAULT_REQUEST_TIMEOUT,
 } from "@electron/constants";
+import { logger } from "@electron/utils/logger";
 import { describe, expect, it, vi } from "vitest";
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -210,6 +211,8 @@ describe("SyncEngine (ADR-016)", () => {
                 baseDirectory,
             });
 
+            const warnSpy = vi.spyOn(logger, "warn");
+
             const remoteDeviceId = "remote-device";
             const snapshotKey = `sync/snapshots/${CLOUD_SYNC_SCHEMA_VERSION}/1.json`;
 
@@ -373,6 +376,13 @@ describe("SyncEngine (ADR-016)", () => {
             });
 
             await engine.syncNow(provider);
+
+            expect(warnSpy).toHaveBeenCalledWith(
+                expect.stringContaining("Failed to load remote snapshot"),
+                expect.objectContaining({
+                    key: snapshotKey,
+                })
+            );
 
             const sites = await orchestrator.getSites();
             expect(sites).toHaveLength(1);

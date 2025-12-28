@@ -10,7 +10,10 @@ import type {
 } from "../CloudStorageProvider.types";
 import type { DropboxTokenManager } from "./DropboxTokenManager";
 
-import { normalizeCloudObjectKey } from "../../cloudKeyNormalization";
+import {
+    assertCloudObjectKey,
+    normalizeProviderObjectKey,
+} from "../../cloudKeyNormalization";
 import { BaseCloudStorageProvider } from "../BaseCloudStorageProvider";
 import { withDropboxRetry } from "./dropboxRetry";
 
@@ -45,11 +48,13 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 }
 
 function normalizeKey(key: string): string {
-    return normalizeCloudObjectKey(key, {
-        allowEmpty: true,
-        forbidTraversalSegments: true,
-        stripLeadingSlashes: true,
-    });
+    return normalizeProviderObjectKey(key);
+}
+
+function toDropboxObjectPath(key: string): string {
+    const normalized = normalizeKey(key);
+    assertCloudObjectKey(normalized);
+    return `/${APP_ROOT_DIRECTORY_NAME}/${normalized}`;
 }
 
 function toDropboxPath(key: string): string {
@@ -72,7 +77,11 @@ function fromDropboxPathOrNull(pathDisplay: string): null | string {
         return null;
     }
 
-    return normalizeKey(normalized.slice(prefix.length));
+    try {
+        return normalizeKey(normalized.slice(prefix.length));
+    } catch {
+        return null;
+    }
 }
 
 function tryParseDropboxErrorSummary(data: unknown): string | undefined {
@@ -413,6 +422,11 @@ export class DropboxCloudStorageProvider
     }): Promise<CloudObjectEntry> {
         const client = await this.createClient();
 
+        // Normalize and validate eagerly so we fail fast with consistent error
+        // messages (instead of relying on Dropbox API errors).
+        const normalizedKey = normalizeKey(args.key);
+        assertCloudObjectKey(normalizedKey);
+
         const response = await withDropboxRetry({
             fn: async () =>
                 client.filesUpload({
@@ -422,7 +436,7 @@ export class DropboxCloudStorageProvider
                         ? { ".tag": "overwrite" }
                         : { ".tag": "add" },
                     mute: true,
-                    path: toDropboxPath(args.key),
+                    path: toDropboxObjectPath(normalizedKey),
                     strict_conflict: false,
                 }),
             operationName: "files/upload",
@@ -465,12 +479,18 @@ export class DropboxCloudStorageProvider
     public async downloadObject(key: string): Promise<Buffer> {
         const client = await this.createClient();
 
+        const normalizedKey = normalizeKey(key);
+        assertCloudObjectKey(normalizedKey);
+
         const response = await withDropboxRetry({
-            fn: async () => client.filesDownload({ path: toDropboxPath(key) }),
+            fn: async () =>
+                client.filesDownload({ path: toDropboxObjectPath(normalizedKey) }),
             operationName: "files/download",
         }).catch((error: unknown) => {
             if (isDropboxNotFoundError(error)) {
-                throw createENOENT(`Dropbox object not found: ${key}`);
+                throw createENOENT(
+                    `Dropbox object not found: ${normalizedKey}`
+                );
             }
 
             const described = describeDropboxSdkErrorRich(error);
@@ -487,8 +507,12 @@ export class DropboxCloudStorageProvider
     public async deleteObject(key: string): Promise<void> {
         const client = await this.createClient();
 
+        const normalizedKey = normalizeKey(key);
+        assertCloudObjectKey(normalizedKey);
+
         await withDropboxRetry({
-            fn: async () => client.filesDeleteV2({ path: toDropboxPath(key) }),
+            fn: async () =>
+                client.filesDeleteV2({ path: toDropboxObjectPath(normalizedKey) }),
             operationName: "files/delete_v2",
         }).catch((error: unknown) => {
             // Contract: deleting a missing object is a no-op.

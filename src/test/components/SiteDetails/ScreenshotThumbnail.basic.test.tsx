@@ -28,9 +28,15 @@ let mockThemeState = {
 
 // Mock stores and hooks
 vi.mock("../../../stores/ui/useUiStore", () => ({
-    useUIStore: vi.fn(() => ({
-        openExternal: mockUIState.openExternal,
-    })),
+    useUIStore: vi.fn(
+        (selector?: (state: typeof mockUIState) => unknown) => {
+            const state = {
+                openExternal: mockUIState.openExternal,
+            };
+
+            return typeof selector === "function" ? selector(state) : state;
+        }
+    ),
 }));
 
 vi.mock("../../../theme/useTheme", () => ({

@@ -10,7 +10,11 @@ import type {
 } from "../CloudStorageProvider.types";
 import type { GoogleDriveTokenManager } from "./GoogleDriveTokenManager";
 
-import { normalizeCloudObjectKey } from "../../cloudKeyNormalization";
+import {
+    assertCloudObjectKey,
+    normalizeCloudObjectKey,
+    normalizeProviderObjectKey,
+} from "../../cloudKeyNormalization";
 import { BaseCloudStorageProvider } from "../BaseCloudStorageProvider";
 
 const GOOGLE_FOLDER_MIME_TYPE = "application/vnd.google-apps.folder";
@@ -18,11 +22,34 @@ const APP_ROOT_FOLDER_NAME = "uptime-watcher";
 const BACKUPS_PREFIX = "backups/";
 
 function normalizeKey(key: string): string {
-    return normalizeCloudObjectKey(key, {
-        allowEmpty: true,
+    return normalizeProviderObjectKey(key);
+}
+
+function normalizeDriveNameSegment(candidate: string): null | string {
+    if (candidate.length === 0) {
+        return null;
+    }
+
+    if (candidate !== candidate.trim()) {
+        return null;
+    }
+
+    if (candidate.includes("/") || candidate.includes("\\")) {
+        return null;
+    }
+
+    // Reuse the shared control character detector via normalization.
+    // Keep `trim: false` semantics by checking above.
+    const normalized = normalizeCloudObjectKey(candidate, {
+        allowEmpty: false,
+        forbidAsciiControlCharacters: true,
         forbidTraversalSegments: true,
-        stripLeadingSlashes: true,
+        normalizeSeparators: false,
+        stripLeadingSlashes: false,
+        trim: false,
     });
+
+    return normalized.length > 0 ? normalized : null;
 }
 
 function createErrnoError(
@@ -44,9 +71,13 @@ function ensureTrailingSlash(prefix: string): string {
 
 function splitKey(key: string): { dirSegments: string[]; fileName: string } {
     const normalized = normalizeKey(key);
+
+    assertCloudObjectKey(normalized);
+
     const parts = normalized.split("/").filter((part) => part.length > 0);
 
     const fileName = parts.at(-1);
+    // `assertCloudObjectKey` guarantees non-empty.
     if (!fileName) {
         throw new Error("Cloud key cannot be empty");
     }
@@ -383,6 +414,35 @@ export class GoogleDriveCloudStorageProvider
     ): Promise<CloudObjectEntry[]> {
         const entries: CloudObjectEntry[] = [];
 
+        const processFile = async (file: drive_v3.Schema$File): Promise<void> => {
+            if (!file.id || !file.name) {
+                return;
+            }
+
+            const safeSegment = normalizeDriveNameSegment(file.name);
+            if (!safeSegment) {
+                return;
+            }
+
+            if (file.mimeType === GOOGLE_FOLDER_MIME_TYPE) {
+                const nested = await this.listFolderRecursive(
+                    drive,
+                    file.id,
+                    `${prefix}${safeSegment}/`
+                );
+                entries.push(...nested);
+                return;
+            }
+
+            const key = normalizeKey(`${prefix}${safeSegment}`);
+            const sizeBytes = Number(file.size ?? 0);
+            const lastModifiedAt = file.modifiedTime
+                ? new Date(file.modifiedTime).getTime()
+                : 0;
+
+            entries.push({ key, lastModifiedAt, sizeBytes });
+        };
+
         let pageToken: null | string = null;
 
         do {
@@ -402,25 +462,8 @@ export class GoogleDriveCloudStorageProvider
             pageToken = response.data.nextPageToken ?? null;
 
             for (const file of response.data.files ?? []) {
-                if (!file.id || !file.name) {
-                    // Skip invalid entries.
-                } else if (file.mimeType === GOOGLE_FOLDER_MIME_TYPE) {
-                    // eslint-disable-next-line no-await-in-loop -- Recursive listing is sequential by folder.
-                    const nested = await this.listFolderRecursive(
-                        drive,
-                        file.id,
-                        `${prefix}${file.name}/`
-                    );
-                    entries.push(...nested);
-                } else {
-                    const key = `${prefix}${file.name}`;
-                    const sizeBytes = Number(file.size ?? 0);
-                    const lastModifiedAt = file.modifiedTime
-                        ? new Date(file.modifiedTime).getTime()
-                        : 0;
-
-                    entries.push({ key, lastModifiedAt, sizeBytes });
-                }
+                // eslint-disable-next-line no-await-in-loop -- Recursive listing is sequential by folder.
+                await processFile(file);
             }
         } while (pageToken);
 

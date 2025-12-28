@@ -84,7 +84,10 @@ vi.mock("../../stores/sites/useSitesStore", () => ({
 const useErrorStoreMock = vi.fn();
 
 vi.mock("../../stores/error/useErrorStore", () => ({
-    useErrorStore: () => useErrorStoreMock(),
+    useErrorStore: (selector?: (state: unknown) => unknown) => {
+        const state = useErrorStoreMock();
+        return typeof selector === "function" ? selector(state) : state;
+    },
 }));
 
 const useMonitorTypesMock = vi.fn();

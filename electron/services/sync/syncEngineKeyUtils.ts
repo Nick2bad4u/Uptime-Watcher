@@ -4,7 +4,7 @@
 
 import { isAsciiDigits, isValidPersistedDeviceId } from "./syncEngineUtils";
 
-const OPS_OBJECT_SUFFIX = ".ndjson" as const;
+export const OPS_OBJECT_SUFFIX = ".ndjson" as const;
 
 /**
  * Parsed metadata from an ops object filename.

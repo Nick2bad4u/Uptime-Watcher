@@ -1,9 +1,8 @@
-import { getElectronErrorCodeSuffix } from "@electron/services/shell/openExternalUtils";
+import { openExternalOrThrow } from "@electron/services/shell/openExternalUtils";
 import { tryGetErrorCode } from "@shared/utils/errorCodes";
 import { ensureError } from "@shared/utils/errorHandling";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import { DropboxAuth } from "dropbox";
-import { shell } from "electron";
 import crypto from "node:crypto";
 import http from "node:http";
 import * as z from "zod";
@@ -186,16 +185,11 @@ export class DropboxAuthFlow {
                 timeoutMs: args.timeoutMs,
             });
 
-            try {
-                await shell.openExternal(normalizedUrl);
-            } catch (error: unknown) {
-                const codeSuffix = getElectronErrorCodeSuffix(error);
-
-                throw new Error(
-                    `Failed to open Dropbox OAuth URL: ${authorizeUrlForLog}${codeSuffix}`,
-                    { cause: error }
-                );
-            }
+            await openExternalOrThrow({
+                failureMessagePrefix: "Failed to open Dropbox OAuth URL",
+                normalizedUrl,
+                safeUrlForLogging: authorizeUrlForLog,
+            });
 
             const callback = await callbackPromise;
             if (callback.state !== args.state) {

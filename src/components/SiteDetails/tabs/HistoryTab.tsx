@@ -359,12 +359,25 @@ export const HistoryTab: NamedExoticComponent<HistoryTabProperties> = memo(
             ]
         );
 
-        const filteredHistoryRecords = selectedMonitor.history
-            .filter(
-                (record: StatusHistory) =>
-                    historyFilter === "all" || record.status === historyFilter
-            )
-            .slice(0, safeHistoryLimit);
+        const recordIndexByTimestamp = useMemo(() => {
+            const map = new Map<number, number>();
+            for (const [index, record] of selectedMonitor.history.entries()) {
+                map.set(record.timestamp, index);
+            }
+            return map;
+        }, [selectedMonitor.history]);
+
+        const filteredHistoryRecords = useMemo(
+            () =>
+                selectedMonitor.history
+                    .filter(
+                        (record: StatusHistory) =>
+                            historyFilter === "all" ||
+                            record.status === historyFilter
+                    )
+                    .slice(0, safeHistoryLimit),
+            [historyFilter, safeHistoryLimit, selectedMonitor.history]
+        );
 
         // Helper to render details with label using dynamic formatting
         function renderDetails(record: StatusHistory): null | ReactElement {
@@ -609,6 +622,16 @@ export const HistoryTab: NamedExoticComponent<HistoryTabProperties> = memo(
                                 | undefined;
                             const resolvedStatus: SiteStatus =
                                 rawStatus ?? "unknown";
+
+                            const recordIndex = recordIndexByTimestamp.get(
+                                record.timestamp
+                            );
+                            const resolvedIndex =
+                                recordIndex ??
+                                Math.min(historyLength - 1, index);
+                            const recordSequenceNumber =
+                                historyLength - resolvedIndex;
+
                             const StatusIconComponent =
                                 getStatusIconComponent(resolvedStatus);
                             const statusLabel =
@@ -644,13 +667,8 @@ export const HistoryTab: NamedExoticComponent<HistoryTabProperties> = memo(
                                                     size="xs"
                                                     variant="secondary"
                                                 >
-                                                    Check #
-                                                    {historyLength -
-                                                        selectedMonitor.history.findIndex(
-                                                            (r) =>
-                                                                r.timestamp ===
-                                                                record.timestamp
-                                                        )}
+                                                    Record #
+                                                    {recordSequenceNumber}
                                                 </ThemedText>
                                             </div>
                                         </div>

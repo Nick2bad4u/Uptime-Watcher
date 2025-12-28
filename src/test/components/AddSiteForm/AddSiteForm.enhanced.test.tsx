@@ -217,6 +217,7 @@ vi.mock("../../../stores/error/useErrorStore", () => {
         clearStoreError: vi.fn(),
         getOperationLoading: vi.fn(() => false),
         getStoreError: vi.fn(() => undefined),
+        isLoading: false,
         lastError: undefined,
         operationLoading: {},
         setError: vi.fn(),
@@ -234,16 +235,18 @@ vi.mock("../../../stores/error/useErrorStore", () => {
 });
 
 vi.mock("../../../stores/sites/useSitesStore", () => ({
-    useSitesStore: vi.fn(() => ({
-        addMonitorToSite: vi.fn().mockResolvedValue(undefined),
-        clearError: vi.fn(),
-        createSite: vi.fn().mockResolvedValue(undefined),
-        deleteSite: vi.fn(),
-        error: undefined,
-        isLoading: false,
-        sites: mockSites,
-        updateSite: vi.fn(),
-    })),
+    useSitesStore: vi.fn(
+        (selector?: (candidate: unknown) => unknown) => {
+            const state = {
+                addMonitorToSite: vi.fn().mockResolvedValue(undefined),
+                createSite: vi.fn().mockResolvedValue(undefined),
+                isLoading: false,
+                sites: mockSites,
+            };
+
+            return typeof selector === "function" ? selector(state) : state;
+        }
+    ),
 }));
 
 vi.mock("../../../stores/monitor/useMonitorTypesStore", () => {
@@ -1137,11 +1140,20 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
             );
 
             // Mock the error store to show loading state
-            mockUseErrorStore.mockReturnValue({
-                clearError: vi.fn(),
-                isLoading: true, // Form is submitting
-                lastError: undefined,
-            });
+            mockUseErrorStore.mockImplementation(
+                ((selector?: (state: unknown) => unknown) => {
+                    const state = {
+                        clearError: vi.fn(),
+                        getStoreError: vi.fn(() => undefined),
+                        isLoading: true,
+                        lastError: undefined,
+                    };
+
+                    return typeof selector === "function"
+                        ? selector(state)
+                        : state;
+                }) as never
+            );
 
             renderAddSiteForm();
             const submitButton = screen.getByRole("button", {
@@ -1221,11 +1233,20 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
             mockUseAddSiteForm.mockReturnValue(mockFormActions);
 
             // Mock the error store to show no loading state
-            mockUseErrorStore.mockReturnValue({
-                clearError: vi.fn(),
-                isLoading: false, // Not loading
-                lastError: undefined,
-            });
+            mockUseErrorStore.mockImplementation(
+                ((selector?: (state: unknown) => unknown) => {
+                    const state = {
+                        clearError: vi.fn(),
+                        getStoreError: vi.fn(() => undefined),
+                        isLoading: false,
+                        lastError: undefined,
+                    };
+
+                    return typeof selector === "function"
+                        ? selector(state)
+                        : state;
+                }) as never
+            );
 
             renderAddSiteForm();
             const submitButton = screen.getByRole("button", {
@@ -1359,12 +1380,21 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
             // ErrorAlert expects a string message, not an object
             const errorMessage = "Form submission failed";
 
-            mockUseErrorStore.mockReturnValue({
-                clearError: vi.fn(),
-                setError: vi.fn(),
-                isLoading: false,
-                lastError: errorMessage, // String message as expected by ErrorAlert
-            });
+            mockUseErrorStore.mockImplementation(
+                ((selector?: (state: unknown) => unknown) => {
+                    const state = {
+                        clearError: vi.fn(),
+                        getStoreError: vi.fn(() => undefined),
+                        isLoading: false,
+                        lastError: errorMessage,
+                        setError: vi.fn(),
+                    };
+
+                    return typeof selector === "function"
+                        ? selector(state)
+                        : state;
+                }) as never
+            );
 
             // Verify form renders and error is displayed
             const { getForm } = renderAddSiteForm();
@@ -1385,12 +1415,21 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
 
             const clearError = vi.fn();
 
-            mockUseErrorStore.mockReturnValue({
-                clearError,
-                setError: vi.fn(),
-                getError: vi.fn(() => null),
-                lasterror: undefined,
-            });
+            mockUseErrorStore.mockImplementation(
+                ((selector?: (state: unknown) => unknown) => {
+                    const state = {
+                        clearError,
+                        getStoreError: vi.fn(() => undefined),
+                        isLoading: false,
+                        lastError: undefined,
+                        setError: vi.fn(),
+                    };
+
+                    return typeof selector === "function"
+                        ? selector(state)
+                        : state;
+                }) as never
+            );
 
             mockUseAddSiteForm.mockReturnValue(
                 createMockFormState({

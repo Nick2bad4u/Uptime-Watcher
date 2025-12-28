@@ -9,7 +9,17 @@ import { useDelayedButtonLoading } from "../../hooks/useDelayedButtonLoading";
 import { useDynamicHelpText } from "../../hooks/useDynamicHelpText";
 import { useMonitorTypes } from "../../hooks/useMonitorTypes";
 import { logger } from "../../services/logger";
+import {
+    selectClearError,
+    selectErrorIsLoading,
+    selectLastError,
+} from "../../stores/error/selectors";
 import { useErrorStore } from "../../stores/error/useErrorStore";
+import {
+    selectAddMonitorToSite,
+    selectCreateSite,
+    selectSites,
+} from "../../stores/sites/selectors";
 import { useSitesStore } from "../../stores/sites/useSitesStore";
 import { ThemedButton } from "../../theme/components/ThemedButton";
 import { ThemedText } from "../../theme/components/ThemedText";
@@ -127,9 +137,15 @@ const MonitorConfigIcon = AppIcons.metrics.monitor;
 
 export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
     function AddSiteForm({ onSuccess }: AddSiteFormProperties) {
-        // Combine store calls to avoid duplicates and improve performance
-        const { clearError, isLoading, lastError } = useErrorStore();
-        const { addMonitorToSite, createSite, sites } = useSitesStore();
+        // Subscribe only to the fields we actually use, otherwise this form
+        // rerenders on unrelated store updates.
+        const clearError = useErrorStore(selectClearError);
+        const isLoading = useErrorStore(selectErrorIsLoading);
+        const lastError = useErrorStore(selectLastError);
+
+        const addMonitorToSite = useSitesStore(selectAddMonitorToSite);
+        const createSite = useSitesStore(selectCreateSite);
+        const sites = useSitesStore(selectSites);
 
         // Load monitor types from backend
         const {

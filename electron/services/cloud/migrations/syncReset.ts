@@ -1,7 +1,6 @@
 import type { CloudSyncResetResult } from "@shared/types/cloudSyncReset";
 
 import { ensureError } from "@shared/utils/errorHandling";
-import { hasAsciiControlCharacters } from "@shared/utils/stringSafety";
 
 import type { CloudSyncEngine } from "../../sync/SyncEngine";
 import type { CloudStorageProvider } from "../providers/CloudStorageProvider.types";
@@ -13,44 +12,26 @@ interface DeletionFailure {
     message: string;
 }
 
-function isSafeSyncDeletionKey(key: string): boolean {
-    if (key.length === 0) {
-        return false;
-    }
+function shouldIgnoreDeletionErrorDuringSyncReset(error: unknown): boolean {
+    const { message } = ensureError(error);
 
-    // Only delete objects under the sync/ prefix.
-    if (!key.startsWith("sync/")) {
-        return false;
-    }
-
-    // Provider keys should be POSIX-style.
-    if (key.includes("\\")) {
-        return false;
-    }
-
-    if (key.startsWith("/")) {
-        return false;
-    }
-
-    if (hasAsciiControlCharacters(key)) {
-        return false;
-    }
-
-    const segments = key.split("/");
-    return !segments.some(
-        (segment) => segment.length === 0 || segment === "." || segment === ".."
+    return (
+        message.startsWith("Refusing to delete unexpected sync key") ||
+        message.startsWith("Invalid key") ||
+        message.startsWith("Invalid snapshot key") ||
+        message.startsWith("Invalid sync operations object key")
     );
 }
 
 async function deleteObjectsBestEffort(args: {
     concurrency: number;
     keys: readonly string[];
-    provider: CloudStorageProvider;
+    transport: ProviderCloudSyncTransport;
 }): Promise<{ deleted: number; failures: DeletionFailure[] }> {
     const failures: DeletionFailure[] = [];
     let deleted = 0;
 
-    const { concurrency, keys, provider } = args;
+    const { concurrency, keys, transport } = args;
     const workerCount = Math.max(1, Math.min(concurrency, keys.length));
     let index = 0;
 
@@ -65,13 +46,15 @@ async function deleteObjectsBestEffort(args: {
 
             try {
                 // eslint-disable-next-line no-await-in-loop -- Worker loop performs sequential deletes to avoid provider rate limits.
-                await provider.deleteObject(key);
+                await transport.deleteObject(key);
                 deleted += 1;
             } catch (error) {
-                failures.push({
-                    key,
-                    message: ensureError(error).message,
-                });
+                if (!shouldIgnoreDeletionErrorDuringSyncReset(error)) {
+                    failures.push({
+                        key,
+                        message: ensureError(error).message,
+                    });
+                }
             }
         }
     });
@@ -105,14 +88,12 @@ export async function resetProviderCloudSyncState(args: {
     const resetAt = Date.now();
 
     const syncObjects = await provider.listObjects("sync/");
-    const keysToDelete = syncObjects
-        .map((entry) => entry.key)
-        .filter(isSafeSyncDeletionKey);
+    const keysToDelete = syncObjects.map((entry) => entry.key);
 
     const deletionResult = await deleteObjectsBestEffort({
         concurrency: 4,
         keys: keysToDelete,
-        provider,
+        transport,
     });
 
     const nextManifest = {
