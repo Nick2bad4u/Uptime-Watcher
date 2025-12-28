@@ -57,7 +57,7 @@ import type {
     RefAttributes,
 } from "react";
 
-import { forwardRef, memo } from "react";
+import { forwardRef, memo, useMemo } from "react";
 
 import { ARIA_LABEL } from "../../constants";
 import { useTheme, useThemeClasses } from "../useTheme";
@@ -130,16 +130,29 @@ const ForwardedSelect = forwardRef<HTMLSelectElement, ThemedSelectProperties>(
 
         const selectValue = value ?? "";
 
-        const styles = useThemedControlStyles({
-            currentTheme,
-            cursor: "pointer",
-            disabled,
-            fluid,
-            getBackgroundClass,
-            getBorderClass,
-            getTextClass,
-            tone,
-        });
+        const controlStyleArgs = useMemo(
+            () => ({
+                currentTheme,
+                cursor: "pointer" as const,
+                disabled,
+                fluid,
+                getBackgroundClass,
+                getBorderClass,
+                getTextClass,
+                tone,
+            }),
+            [
+                currentTheme,
+                disabled,
+                fluid,
+                getBackgroundClass,
+                getBorderClass,
+                getTextClass,
+                tone,
+            ]
+        );
+
+        const styles = useThemedControlStyles(controlStyleArgs);
 
         return (
             <select

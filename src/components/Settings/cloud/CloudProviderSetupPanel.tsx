@@ -8,6 +8,7 @@ import {
     type ChangeEvent,
     type KeyboardEvent as ReactKeyboardEvent,
     type MouseEvent as ReactMouseEvent,
+    type ReactNode,
     useCallback,
     useMemo,
     useRef,
@@ -521,52 +522,67 @@ function renderUnavailableProviderPanel(args: {
     );
 }
 
-function renderOAuthProviderPanel(args: {
-    blockedCallout: JSX.Element | null;
-    configured: boolean;
-    connected: boolean;
-    description: string;
-    isConnecting: boolean;
+interface OAuthProviderPanelProperties {
+    readonly children?: ReactNode;
+    readonly configured: boolean;
+    readonly connected: boolean;
+    readonly description: string;
+    readonly isConnecting: boolean;
     readonly onAttemptLockedAction: () => void;
-    onConnect: () => void;
-    providerKey: "dropbox" | "google-drive";
-    providerLabel: string;
-    providerSetupLocked: boolean;
-}): JSX.Element {
+    readonly onConnect: () => void;
+    readonly providerKey: "dropbox" | "google-drive";
+    readonly providerLabel: string;
+    readonly providerSetupLocked: boolean;
+}
+
+const OAuthProviderPanel = ({
+    children,
+    configured,
+    connected,
+    description,
+    isConnecting,
+    onAttemptLockedAction,
+    onConnect,
+    providerKey,
+    providerLabel,
+    providerSetupLocked,
+}: OAuthProviderPanelProperties): JSX.Element => {
     const connectLabel = resolveConnectActionLabel({
-        configured: args.configured,
-        isConnecting: args.isConnecting,
-        providerLabel: args.providerLabel,
+        configured,
+        isConnecting,
+        providerLabel,
     });
 
-    const handleConnectClick = args.providerSetupLocked
-        ? args.onAttemptLockedAction
-        : args.onConnect;
+    const handleConnectClick = providerSetupLocked
+        ? onAttemptLockedAction
+        : onConnect;
 
-    const isSoftDisabled = args.providerSetupLocked;
-    const ariaDisabled = isSoftDisabled || args.isConnecting;
+    const isSoftDisabled = providerSetupLocked;
+    const ariaDisabled = isSoftDisabled || isConnecting;
 
     const ProviderIcon =
-        args.providerKey === "dropbox"
+        providerKey === "dropbox"
             ? AppIcons.brands.dropbox
             : AppIcons.brands.googleDrive;
     const ConnectedIcon = AppIcons.status.upFilled;
 
-    const providerIconNode = (
-        <ProviderIcon aria-hidden className="h-4 w-4" />
+    const providerIconNode = useMemo(
+        () => <ProviderIcon aria-hidden className="h-4 w-4" />,
+        [ProviderIcon]
     );
-    const connectedIconNode = (
-        <ConnectedIcon aria-hidden className="h-4 w-4" />
+    const connectedIconNode = useMemo(
+        () => <ConnectedIcon aria-hidden className="h-4 w-4" />,
+        [ConnectedIcon]
     );
 
     return (
         <div
-            aria-labelledby={`cloud-provider-tab-${args.providerKey}`}
+            aria-labelledby={`cloud-provider-tab-${providerKey}`}
             className="mt-3"
-            id={`cloud-provider-panel-${args.providerKey}`}
+            id={`cloud-provider-panel-${providerKey}`}
             role="tabpanel"
         >
-            {args.blockedCallout}
+            {children}
 
             <ThemedText
                 as="p"
@@ -574,10 +590,10 @@ function renderOAuthProviderPanel(args: {
                 size="xs"
                 variant="secondary"
             >
-                {args.description}
+                {description}
             </ThemedText>
 
-            {args.connected ? (
+            {connected ? (
                 <div className="mt-2 flex items-start gap-2">
                     <span aria-hidden className="text-emerald-400">
                         {connectedIconNode}
@@ -589,14 +605,14 @@ function renderOAuthProviderPanel(args: {
                 </div>
             ) : null}
 
-            {args.connected ? null : (
+            {connected ? null : (
                 <div className="mt-3 flex flex-wrap gap-2">
                     <ThemedButton
                         aria-disabled={ariaDisabled}
                         className={
                             isSoftDisabled ? "themed-button--loading" : ""
                         }
-                        disabled={args.isConnecting}
+                        disabled={isConnecting}
                         icon={providerIconNode}
                         onClick={handleConnectClick}
                         size="sm"
@@ -746,19 +762,21 @@ const ProviderPanel = ({
 
     switch (selectedProviderTab) {
         case "dropbox": {
-            return renderOAuthProviderPanel({
-                blockedCallout,
-                configured: configuredForSelectedProvider,
-                connected: connectedForSelectedProvider,
-                description:
-                    "Opens your default browser to authorize Dropbox access (OAuth + PKCE). Uptime Watcher stores an encrypted token on this device (no password is stored).",
-                isConnecting: isConnectingDropbox,
-                onAttemptLockedAction,
-                onConnect: onConnectDropbox,
-                providerKey: "dropbox",
-                providerLabel: "Dropbox",
-                providerSetupLocked,
-            });
+            return (
+                <OAuthProviderPanel
+                    configured={configuredForSelectedProvider}
+                    connected={connectedForSelectedProvider}
+                    description="Opens your default browser to authorize Dropbox access (OAuth + PKCE). Uptime Watcher stores an encrypted token on this device (no password is stored)."
+                    isConnecting={isConnectingDropbox}
+                    onAttemptLockedAction={onAttemptLockedAction}
+                    onConnect={onConnectDropbox}
+                    providerKey="dropbox"
+                    providerLabel="Dropbox"
+                    providerSetupLocked={providerSetupLocked}
+                >
+                    {blockedCallout}
+                </OAuthProviderPanel>
+            );
         }
         case "filesystem": {
             return renderFilesystemProviderPanel({
@@ -774,19 +792,21 @@ const ProviderPanel = ({
             });
         }
         case "google-drive": {
-            return renderOAuthProviderPanel({
-                blockedCallout,
-                configured: configuredForSelectedProvider,
-                connected: connectedForSelectedProvider,
-                description:
-                    "Opens your default browser to authorize Google Drive access (OAuth + PKCE). Data is stored in Drive’s app data area (appDataFolder), so it won’t appear in your normal Drive folders.",
-                isConnecting: isConnectingGoogleDrive,
-                onAttemptLockedAction,
-                onConnect: onConnectGoogleDrive,
-                providerKey: "google-drive",
-                providerLabel: "Google Drive",
-                providerSetupLocked,
-            });
+            return (
+                <OAuthProviderPanel
+                    configured={configuredForSelectedProvider}
+                    connected={connectedForSelectedProvider}
+                    description="Opens your default browser to authorize Google Drive access (OAuth + PKCE). Data is stored in Drive’s app data area (appDataFolder), so it won’t appear in your normal Drive folders."
+                    isConnecting={isConnectingGoogleDrive}
+                    onAttemptLockedAction={onAttemptLockedAction}
+                    onConnect={onConnectGoogleDrive}
+                    providerKey="google-drive"
+                    providerLabel="Google Drive"
+                    providerSetupLocked={providerSetupLocked}
+                >
+                    {blockedCallout}
+                </OAuthProviderPanel>
+            );
         }
         case "webdav": {
             return renderUnavailableProviderPanel({ blockedCallout, tab });

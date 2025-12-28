@@ -60,7 +60,7 @@ import type {
     EventHandlers,
 } from "@shared/types/componentProps";
 
-import { memo, type JSX, type NamedExoticComponent } from "react";
+import { type JSX, memo, type NamedExoticComponent, useMemo } from "react";
 
 import { ARIA_LABEL } from "../../constants";
 import { useTheme, useThemeClasses } from "../useTheme";
@@ -143,15 +143,26 @@ const ThemedInputComponent = ({
     // warnings
     const inputValue = value ?? "";
 
-    const styles = useThemedControlStyles({
-        currentTheme,
-        disabled,
-        fluid: true,
-        getBackgroundClass,
-        getBorderClass,
-        getTextClass,
-        tone: "default",
-    });
+    const controlStyleArgs = useMemo(
+        () => ({
+            currentTheme,
+            disabled,
+            fluid: true,
+            getBackgroundClass,
+            getBorderClass,
+            getTextClass,
+            tone: "default" as const,
+        }),
+        [
+            currentTheme,
+            disabled,
+            getBackgroundClass,
+            getBorderClass,
+            getTextClass,
+        ]
+    );
+
+    const styles = useThemedControlStyles(controlStyleArgs);
     return (
         <input
             aria-describedby={ariaDescribedBy}
