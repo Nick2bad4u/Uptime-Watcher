@@ -34,7 +34,7 @@ type UpdateStatusPayload = RendererEventPayloadMap["update-status"];
  */
 export interface EventsDomainBridge {
     /**
-     * Payload for cache invalidation notifications.
+     * Subscribe to events emitted on the `cache:invalidated` channel.
      *
      * @param callback - Invoked with payloads emitted on the
      *   `cache:invalidated` channel.
@@ -46,7 +46,8 @@ export interface EventsDomainBridge {
     ) => () => void;
 
     /**
-     * Payload for database history retention updates.
+     * Subscribe to events emitted on the `settings:history-limit-updated`
+     * channel.
      *
      * @param callback - Invoked with payloads emitted on the
      *   `settings:history-limit-updated` channel.
@@ -58,7 +59,7 @@ export interface EventsDomainBridge {
     ) => () => void;
 
     /**
-     * Payload for monitor check completion events.
+     * Subscribe to events emitted on the `monitor:check-completed` channel.
      *
      * @param callback - Invoked with payloads emitted on the
      *   `monitor:check-completed` channel.
@@ -70,7 +71,7 @@ export interface EventsDomainBridge {
     ) => () => void;
 
     /**
-     * Payload for monitor down events.
+     * Subscribe to events emitted on the `monitor:down` channel.
      *
      * @param callback - Invoked with payloads emitted on the `monitor:down`
      *   channel.
@@ -82,7 +83,7 @@ export interface EventsDomainBridge {
     ) => () => void;
 
     /**
-     * Payload for monitoring started events.
+     * Subscribe to events emitted on the `monitoring:started` channel.
      *
      * @param callback - Invoked with payloads emitted on the
      *   `monitoring:started` channel.
@@ -94,7 +95,7 @@ export interface EventsDomainBridge {
     ) => () => void;
 
     /**
-     * Payload for monitoring stopped events.
+     * Subscribe to events emitted on the `monitoring:stopped` channel.
      *
      * @param callback - Invoked with payloads emitted on the
      *   `monitoring:stopped` channel.
@@ -106,7 +107,7 @@ export interface EventsDomainBridge {
     ) => () => void;
 
     /**
-     * Payload for monitor status change events.
+     * Subscribe to events emitted on the `monitor:status-changed` channel.
      *
      * @param callback - Invoked with payloads emitted on the
      *   `monitor:status-changed` channel.
@@ -118,7 +119,7 @@ export interface EventsDomainBridge {
     ) => () => void;
 
     /**
-     * Payload for monitor up events.
+     * Subscribe to events emitted on the `monitor:up` channel.
      *
      * @param callback - Invoked with payloads emitted on the `monitor:up`
      *   channel.
@@ -130,7 +131,7 @@ export interface EventsDomainBridge {
     ) => () => void;
 
     /**
-     * Payload for site added events.
+     * Subscribe to events emitted on the `site:added` channel.
      *
      * @param callback - Invoked with payloads emitted on the `site:added`
      *   channel.
@@ -142,7 +143,7 @@ export interface EventsDomainBridge {
     ) => () => void;
 
     /**
-     * Payload for site removed events.
+     * Subscribe to events emitted on the `site:removed` channel.
      *
      * @param callback - Invoked with payloads emitted on the `site:removed`
      *   channel.
@@ -154,7 +155,7 @@ export interface EventsDomainBridge {
     ) => () => void;
 
     /**
-     * Payload for site updated events.
+     * Subscribe to events emitted on the `site:updated` channel.
      *
      * @param callback - Invoked with payloads emitted on the `site:updated`
      *   channel.
@@ -166,7 +167,7 @@ export interface EventsDomainBridge {
     ) => () => void;
 
     /**
-     * Payload for full state synchronisation broadcasts.
+     * Subscribe to events emitted on the `state-sync-event` channel.
      *
      * @param callback - Invoked with payloads emitted on the `state-sync-event`
      *   channel.
@@ -178,7 +179,7 @@ export interface EventsDomainBridge {
     ) => () => void;
 
     /**
-     * Payload for development/test events.
+     * Subscribe to events emitted on the `test-event` channel.
      *
      * @param callback - Invoked with payloads emitted on the `test-event`
      *   channel.
@@ -190,7 +191,7 @@ export interface EventsDomainBridge {
     ) => () => void;
 
     /**
-     * Payload for auto-updater status notifications.
+     * Subscribe to events emitted on the `update-status` channel.
      *
      * @param callback - Invoked with payloads emitted on the `update-status`
      *   channel.

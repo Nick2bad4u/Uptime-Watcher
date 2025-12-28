@@ -113,6 +113,35 @@ describe("createIpcServiceHelpers", () => {
         });
     });
 
+    it("reuses a shared initialization promise across calls", async () => {
+        const { module, waitForElectronBridge } = await setupModule();
+
+        let resolveInit: (() => void) | undefined;
+        const pending = new Promise<undefined>((resolve) => {
+            resolveInit = (): void => {
+                resolve(undefined);
+            };
+        });
+
+        waitForElectronBridge.mockReturnValueOnce(pending);
+
+        const helpers = module.createIpcServiceHelpers("SitesService");
+
+        const first = helpers.ensureInitialized();
+        const second = helpers.ensureInitialized();
+
+        expect(second).toBe(first);
+        expect(waitForElectronBridge).toHaveBeenCalledTimes(1);
+
+        resolveInit?.();
+        await expect(first).resolves.toBeUndefined();
+
+        // After the in-flight promise is cleared, subsequent calls should
+        // re-validate the bridge.
+        await helpers.ensureInitialized();
+        expect(waitForElectronBridge).toHaveBeenCalledTimes(2);
+    });
+
     it("logs diagnostics and rethrows when the preload bridge never becomes ready", async () => {
         const {
             TestElectronBridgeNotReadyError,
@@ -214,7 +243,7 @@ describe("createIpcServiceHelpers", () => {
         await expect(wrapped()).rejects.toBe(failure);
 
         expect(electronLog.error).toHaveBeenCalledWith(
-            "[FallbackService] [FallbackService] synchronize failed:",
+            "[FallbackService] synchronize failed:",
             failure
         );
         expect(electronLog.debug).not.toHaveBeenCalled();

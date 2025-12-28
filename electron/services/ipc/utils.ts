@@ -21,6 +21,7 @@ import {
 } from "@shared/utils/loggingContext";
 import { validateExternalOpenUrlCandidate } from "@shared/utils/urlSafety";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
+import { getUtfByteLength } from "@shared/utils/utfByteLength";
 import {
     isNonEmptyString,
     isValidUrl,
@@ -69,7 +70,7 @@ const validateIpcUrlPayloadGuards = (
         return null;
     }
 
-    const {byteLength} = new TextEncoder().encode(value);
+    const byteLength = getUtfByteLength(value);
 
     if (byteLength > MAX_IPC_URL_UTF_BYTES) {
         return `${paramName} must not exceed ${MAX_IPC_URL_UTF_BYTES} bytes`;

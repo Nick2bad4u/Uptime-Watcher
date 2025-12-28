@@ -8,6 +8,7 @@
  * that multiple monitor services can coordinate their traffic shaping.
  */
 
+import { sleep } from "@shared/utils/abortUtils";
 import { readNumberEnv } from "@shared/utils/environment";
 
 import { logger } from "../../../utils/logger";
@@ -31,11 +32,6 @@ export class HttpRateLimiter {
      */
     public async schedule<T>(url: string, fn: () => Promise<T>): Promise<T> {
         const key = this.getKey(url);
-        const sleep = async (ms: number): Promise<void> =>
-            new Promise((resolve) => {
-                // eslint-disable-next-line clean-timer/assign-timer-id -- Timer completes when promise resolves
-                setTimeout(resolve, ms);
-            });
 
         const startTime = Date.now();
         let shouldContinue = true;

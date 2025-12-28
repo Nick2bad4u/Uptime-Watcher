@@ -2,6 +2,7 @@ import type { CloudStatusSummary } from "@shared/types/cloud";
 import type { CloudEncryptionMode } from "@shared/types/cloudEncryption";
 
 import { ensureError } from "@shared/utils/errorHandling";
+import { isFilesystemBaseDirectoryValid } from "@shared/validation/filesystemBaseDirectoryValidation";
 
 import type { CloudStorageProvider } from "../providers/CloudStorageProvider.types";
 
@@ -213,10 +214,34 @@ export async function buildFilesystemStatus(args: {
         });
     }
 
-    const provider = new FilesystemCloudStorageProvider({ baseDirectory });
-    const connected = await provider.isConnected().catch(() => false);
+    // Protect status reads against corrupted settings by treating invalid
+    // values as unconfigured instead of crashing.
+    if (!isFilesystemBaseDirectoryValid(baseDirectory)) {
+        return buildCloudStatusSummary(common, {
+            backupsEnabled: false,
+            configured: false,
+            connected: false,
+            encryptionMode: common.localEncryptionMode,
+            provider: "filesystem",
+            providerDetails: {
+                baseDirectory: "",
+                kind: "filesystem",
+            },
+        });
+    }
 
-    const encryptionMode = connected
+    let provider: FilesystemCloudStorageProvider | null = null;
+    try {
+        provider = new FilesystemCloudStorageProvider({ baseDirectory });
+    } catch {
+        // Treat invalid constructor inputs as disconnected.
+    }
+
+    const connected = provider
+        ? await provider.isConnected().catch(() => false)
+        : false;
+
+    const encryptionMode = connected && provider
         ? await deps.getEffectiveEncryptionMode(provider)
         : common.localEncryptionMode;
 

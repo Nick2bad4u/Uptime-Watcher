@@ -2,7 +2,6 @@
 
 import { tryGetErrorCode } from "@shared/utils/errorCodes";
 import { ensureError } from "@shared/utils/errorHandling";
-import { hasAsciiControlCharacters } from "@shared/utils/stringSafety";
 import crypto from "node:crypto";
 import fs from "node:fs/promises";
 import path from "node:path";
@@ -12,6 +11,11 @@ import type {
     CloudStorageProvider,
 } from "./CloudStorageProvider.types";
 
+import {
+    assertCloudObjectKey,
+    normalizeCloudObjectKey,
+    normalizeProviderObjectKey,
+} from "../cloudKeyNormalization";
 import { BaseCloudStorageProvider } from "./BaseCloudStorageProvider";
 
 const APP_ROOT_DIRECTORY_NAME = "uptime-watcher" as const;
@@ -74,56 +78,36 @@ export class FilesystemCloudStorageProvider
 
     private appRootRealPath: null | string = null;
 
-    private static normalizeKey(rawKey: string): string {
-        const normalized = rawKey.replaceAll("\\", "/");
-
-        // Collapse redundant slashes deterministically without regex.
-        let collapsed = normalized;
-        while (collapsed.includes("//")) {
-            collapsed = collapsed.replaceAll("//", "/");
-        }
-
-        return collapsed;
-    }
-
-    private static assertSafeKey(key: string): void {
-        if (typeof key !== "string" || key.trim().length === 0) {
-            throw new Error("Invalid key (must be a non-empty string)");
-        }
-
-        if (hasAsciiControlCharacters(key)) {
-            throw new Error(
-                "Invalid key path (control characters are not allowed)"
-            );
-        }
-
-        // Defensive checks:
-        // - no absolute keys
-        // - no drive/namespace tokens
-        // - no null byte
-        if (key.startsWith("/")) {
-            throw new Error("Invalid key path (absolute keys are not allowed)");
-        }
-
-        if (key.includes("\0")) {
-            throw new Error("Invalid key path (null byte)");
-        }
-
+    private static assertNoWindowsDriveTokens(key: string): void {
         // Disallow Windows drive letters / NT namespaces in keys.
         // The provider keys are logical object identifiers, not OS paths.
         if (key.includes(":")) {
             throw new Error("Invalid key path (drive tokens are not allowed)");
         }
+    }
 
-        const segments = key.split("/");
-        if (
-            segments.some(
-                (segment) =>
-                    segment.length === 0 || segment === "." || segment === ".."
-            )
-        ) {
-            throw new Error("Invalid key path (path traversal)");
+    private static normalizePrefix(rawPrefix: string): string {
+        const normalized = normalizeCloudObjectKey(rawPrefix, {
+            allowEmpty: true,
+            forbidAsciiControlCharacters: true,
+            forbidTraversalSegments: true,
+            stripLeadingSlashes: true,
+        });
+
+        FilesystemCloudStorageProvider.assertNoWindowsDriveTokens(normalized);
+
+        if (!normalized) {
+            return "";
         }
+
+        return normalized.endsWith("/") ? normalized : `${normalized}/`;
+    }
+
+    private static normalizeObjectKey(rawKey: string): string {
+        const normalized = normalizeProviderObjectKey(rawKey);
+        assertCloudObjectKey(normalized);
+        FilesystemCloudStorageProvider.assertNoWindowsDriveTokens(normalized);
+        return normalized;
     }
 
     private async getAppRootRealPath(): Promise<string> {
@@ -226,7 +210,7 @@ export class FilesystemCloudStorageProvider
     public async listObjects(prefix: string): Promise<CloudObjectEntry[]> {
         const root = await this.getAppRootRealPath();
         const normalizedPrefix =
-            FilesystemCloudStorageProvider.normalizeKey(prefix);
+            FilesystemCloudStorageProvider.normalizePrefix(prefix);
         const results: CloudObjectEntry[] = [];
 
         const walk = async (directory: string): Promise<void> => {
@@ -297,7 +281,8 @@ export class FilesystemCloudStorageProvider
 
     public async downloadObject(key: string): Promise<Buffer> {
         await this.ensureAppRoot();
-        const normalizedKey = FilesystemCloudStorageProvider.normalizeKey(key);
+        const normalizedKey =
+            FilesystemCloudStorageProvider.normalizeObjectKey(key);
         const absolute = await this.resolveKeyPath(normalizedKey);
         return fs.readFile(absolute);
     }
@@ -308,7 +293,7 @@ export class FilesystemCloudStorageProvider
         overwrite?: boolean;
     }): Promise<CloudObjectEntry> {
         await this.ensureAppRoot();
-        const key = FilesystemCloudStorageProvider.normalizeKey(args.key);
+        const key = FilesystemCloudStorageProvider.normalizeObjectKey(args.key);
         const overwrite = args.overwrite ?? false;
 
         const targetPath = await this.resolveKeyPath(key);
@@ -383,7 +368,8 @@ export class FilesystemCloudStorageProvider
 
     public async deleteObject(key: string): Promise<void> {
         await this.ensureAppRoot();
-        const normalizedKey = FilesystemCloudStorageProvider.normalizeKey(key);
+        const normalizedKey =
+            FilesystemCloudStorageProvider.normalizeObjectKey(key);
         const absolute = await this.resolveKeyPath(normalizedKey);
 
         const stat = await fs.lstat(absolute).catch(() => null);
@@ -409,8 +395,7 @@ export class FilesystemCloudStorageProvider
     }
 
     private async resolveKeyPath(key: string): Promise<string> {
-        const normalizedKey = FilesystemCloudStorageProvider.normalizeKey(key);
-        FilesystemCloudStorageProvider.assertSafeKey(normalizedKey);
+        const normalizedKey = FilesystemCloudStorageProvider.normalizeObjectKey(key);
 
         const root = await this.getAppRootRealPath();
         const absolutePath = path.resolve(root, ...normalizedKey.split("/"));

@@ -129,9 +129,6 @@ function isPromiseLike(value: unknown): value is PromiseLike<unknown> {
     return typeof then === "function";
 }
 
-function isNonNullObject(value: unknown): value is UnknownRecord {
-    return typeof value === "object" && value !== null;
-}
 
 /**
  * Configuration options for {@link ServiceContainer}.
@@ -463,7 +460,6 @@ export class ServiceContainer {
             this.cloudSyncScheduler = new CloudSyncScheduler({
                 cloudService: this.getCloudService(),
             });
-
             if (this.config.enableDebugLogging) {
                 logger.debug("[ServiceContainer] Created CloudSyncScheduler");
             }
@@ -1283,7 +1279,7 @@ export class ServiceContainer {
         payload: ForwardableEventPayload<EventName>
     ): payload is ForwardablePayloadWithMeta<EventName> {
         return (
-            isNonNullObject(payload) &&
+            typeof payload === "object" &&
             FORWARDED_METADATA_PROPERTY_KEY in payload
         );
     }

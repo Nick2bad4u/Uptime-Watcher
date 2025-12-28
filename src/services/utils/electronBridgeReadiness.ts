@@ -9,6 +9,8 @@
  * or when the application is executed outside an Electron environment.
  */
 
+import { sleep } from "@shared/utils/abortUtils";
+
 const DEFAULT_MAX_ATTEMPTS = 50;
 const DEFAULT_BASE_DELAY = 100;
 const MAX_DELAY = 2000;
@@ -85,14 +87,6 @@ export class ElectronBridgeNotReadyError extends Error {
 }
 
 type BridgeRoot = typeof window extends { electronAPI: infer T } ? T : unknown;
-
-const delay = async (duration: number): Promise<void> =>
-    new Promise((resolve) => {
-        const timerId = setTimeout(() => {
-            clearTimeout(timerId);
-            resolve();
-        }, duration);
-    });
 
 const getGlobalWindow = (): unknown => {
     if (typeof window !== "undefined") {
@@ -213,7 +207,7 @@ const pollBridgeReadiness = async (
         MAX_DELAY
     );
 
-    await delay(delayDuration);
+    await sleep(delayDuration);
 
     return pollBridgeReadiness(attempt + 1, maxAttempts, baseDelay, contracts);
 };

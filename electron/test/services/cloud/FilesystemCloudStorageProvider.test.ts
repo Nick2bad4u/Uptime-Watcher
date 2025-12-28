@@ -80,4 +80,42 @@ describe("FilesystemCloudStorageProvider", () => {
             provider.downloadObject("sync/..foo/payload.txt")
         ).resolves.toEqual(Buffer.from("payload"));
     });
+
+    it("normalizes object keys by trimming and stripping leading slashes", async () => {
+        const provider = new FilesystemCloudStorageProvider({ baseDirectory });
+
+        await provider.uploadObject({
+            buffer: Buffer.from("payload"),
+            key: "   /sync/trimmed/payload.txt   ",
+            overwrite: true,
+        });
+
+        await expect(
+            provider.downloadObject("sync/trimmed/payload.txt")
+        ).resolves.toEqual(Buffer.from("payload"));
+
+        // Normalization also applies on reads.
+        await expect(
+            provider.downloadObject("  /sync/trimmed/payload.txt ")
+        ).resolves.toEqual(Buffer.from("payload"));
+    });
+
+    it("treats non-empty prefixes as directory prefixes", async () => {
+        const provider = new FilesystemCloudStorageProvider({ baseDirectory });
+
+        await provider.uploadObject({
+            buffer: Buffer.from("a"),
+            key: "sync/file.txt",
+            overwrite: true,
+        });
+
+        await provider.uploadObject({
+            buffer: Buffer.from("b"),
+            key: "syncX/file.txt",
+            overwrite: true,
+        });
+
+        const entries = await provider.listObjects("sync");
+        expect(entries.map((entry) => entry.key)).toEqual(["sync/file.txt"]);
+    });
 });

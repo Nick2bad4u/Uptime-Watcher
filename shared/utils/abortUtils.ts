@@ -1,3 +1,5 @@
+import { ensureRecordLike } from "@shared/utils/typeHelpers";
+
 /**
  * Configuration for building a composite {@link AbortSignal}.
  *
@@ -205,15 +207,66 @@ export async function createAbortableOperation<T>(
     }
 }
 
-const createSleepAbortHandler =
-    (
-        timeoutId: ReturnType<typeof setTimeout>,
-        reject: (error: Error) => void
-    ): (() => void) =>
-    (): void => {
-        clearTimeout(timeoutId);
-        reject(new Error("Sleep was aborted"));
-    };
+function tryUnrefTimer(timeoutId: unknown): void {
+    const record = ensureRecordLike(timeoutId);
+    if (!record) {
+        return;
+    }
+
+    const { unref } = record;
+    if (typeof unref === "function") {
+        Reflect.apply(unref, record, []);
+    }
+}
+
+async function sleepInternal(
+    ms: number,
+    signal: AbortSignal | undefined,
+    unrefTimer: boolean
+): Promise<void> {
+    return new Promise((resolve, reject) => {
+        if (signal?.aborted) {
+            reject(new Error("Sleep was aborted"));
+            return;
+        }
+
+        // Handle negative or invalid values by resolving immediately.
+        if (!Number.isFinite(ms) || ms <= 0) {
+            resolve();
+            return;
+        }
+
+        const state: {
+            timeoutId?: ReturnType<typeof setTimeout>;
+        } = {};
+
+        const handleAbort = (): void => {
+            if (state.timeoutId !== undefined) {
+                clearTimeout(state.timeoutId);
+            }
+            signal?.removeEventListener("abort", handleAbort);
+            reject(new Error("Sleep was aborted"));
+        };
+
+        state.timeoutId = setTimeout(() => {
+            signal?.removeEventListener("abort", handleAbort);
+            resolve();
+        }, ms);
+
+        if (unrefTimer) {
+            tryUnrefTimer(state.timeoutId);
+        }
+
+        // Handle abort during sleep.
+        signal?.addEventListener("abort", handleAbort, { once: true });
+
+        // Close the short race where abort could happen after the initial
+        // check above but before the event handler registration.
+        if (signal?.aborted) {
+            handleAbort();
+        }
+    });
+}
 
 /**
  * Promise-based sleep helper with {@link AbortSignal} support.
@@ -250,29 +303,29 @@ const createSleepAbortHandler =
  * @public
  */
 export async function sleep(ms: number, signal?: AbortSignal): Promise<void> {
-    return new Promise((resolve, reject) => {
-        if (signal?.aborted) {
-            reject(new Error("Sleep was aborted"));
-            return;
-        }
+    return sleepInternal(ms, signal, false);
+}
 
-        // Handle negative or invalid values by resolving immediately
-        if (!Number.isFinite(ms) || ms <= 0) {
-            resolve();
-            return;
-        }
-
-        const timeoutId = setTimeout(() => {
-            resolve();
-        }, ms);
-
-        const handleAbort = createSleepAbortHandler(timeoutId, reject);
-
-        // Handle abort during sleep
-        if (signal) {
-            signal.addEventListener("abort", handleAbort, { once: true });
-        }
-    });
+/**
+ * Promise-based sleep helper with {@link AbortSignal} support that does not
+ * keep the Node.js event loop alive.
+ *
+ * @remarks
+ * This behaves like {@link sleep}, but when running in Node.js / Electron it
+ * will call `unref()` on the underlying timer handle when available.
+ *
+ * Prefer this for best-effort background waits (for example, retry delays)
+ * where you do not want the process to stay alive solely because a sleep is
+ * pending.
+ *
+ * @param ms - Delay duration in milliseconds.
+ * @param signal - Optional cancellation signal to observe.
+ */
+export async function sleepUnref(
+    ms: number,
+    signal?: AbortSignal
+): Promise<void> {
+    return sleepInternal(ms, signal, true);
 }
 
 /**

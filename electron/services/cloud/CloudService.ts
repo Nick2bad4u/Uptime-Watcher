@@ -23,6 +23,10 @@ import { readProcessEnv } from "@shared/utils/environment";
 import { tryGetErrorCode } from "@shared/utils/errorCodes";
 import { ensureError } from "@shared/utils/errorHandling";
 import { hasAsciiControlCharacters } from "@shared/utils/stringSafety";
+import {
+    MAX_FILESYSTEM_BASE_DIRECTORY_BYTES,
+    validateFilesystemBaseDirectoryCandidate,
+} from "@shared/validation/filesystemBaseDirectoryValidation";
 import { safeStorage } from "electron";
 import { promises as fs } from "node:fs";
 import path from "node:path";
@@ -600,49 +604,70 @@ export class CloudService {
         return this.runCloudOperation(
             "configureFilesystemProvider",
             async () => {
-                if (hasAsciiControlCharacters(config.baseDirectory)) {
-                    throw new Error(
-                        "Filesystem base directory must not contain control characters"
-                    );
+                const issues = validateFilesystemBaseDirectoryCandidate(
+                    config.baseDirectory,
+                    { maxBytes: MAX_FILESYSTEM_BASE_DIRECTORY_BYTES }
+                );
+
+                if (issues.length > 0) {
+                    const [issue] = issues;
+                    if (!issue) {
+                        throw new Error(
+                            "Filesystem base directory is invalid"
+                        );
+                    }
+                    const candidate = config.baseDirectory;
+
+                    switch (issue.code) {
+                        case "not-string": {
+                            throw new TypeError(
+                                "Filesystem base directory must be a string"
+                            );
+                        }
+                        case "empty": {
+                            throw new Error(
+                                "Filesystem base directory must not be empty"
+                            );
+                        }
+                        case "whitespace": {
+                            throw new Error(
+                                "Filesystem base directory must not have leading or trailing whitespace"
+                            );
+                        }
+                        case "too-large": {
+                            throw new Error(
+                                `Filesystem base directory must not exceed ${issue.maxBytes} bytes`
+                            );
+                        }
+                        case "control-chars": {
+                            throw new Error(
+                                "Filesystem base directory must not contain control characters"
+                            );
+                        }
+                        case "null-byte": {
+                            throw new Error(
+                                "Filesystem base directory must not contain a null byte"
+                            );
+                        }
+                        case "windows-device-namespace": {
+                            throw new Error(
+                                String.raw`Filesystem base directory must not use Windows device namespace paths (\\?\ or \\.\)`
+                            );
+                        }
+                        case "not-absolute": {
+                            throw new Error(
+                                `Filesystem base directory must be absolute. Received '${candidate}'`
+                            );
+                        }
+                        default: {
+                            throw new Error(
+                                "Filesystem base directory is invalid"
+                            );
+                        }
+                    }
                 }
 
-                const deviceCheck = config.baseDirectory.replaceAll("/", "\\");
-                if (
-                    deviceCheck.startsWith("\\\\?\\") ||
-                    deviceCheck.startsWith("\\\\.\\")
-                ) {
-                    throw new Error(
-                        String.raw`Filesystem base directory must not use Windows device namespace paths (\\?\ or \\.\)`
-                    );
-                }
-
-                const baseDirectory = config.baseDirectory.trim();
-                if (baseDirectory.length === 0) {
-                    throw new Error(
-                        "Filesystem base directory must not be empty"
-                    );
-                }
-
-                if (config.baseDirectory !== baseDirectory) {
-                    throw new Error(
-                        "Filesystem base directory must not have leading or trailing whitespace"
-                    );
-                }
-
-                if (baseDirectory.includes("\0")) {
-                    throw new Error(
-                        "Filesystem base directory must not contain a null byte"
-                    );
-                }
-
-                // Validate the user-supplied path, not the resolved one.
-                // `path.resolve(relative)` always yields an absolute path.
-                if (!path.isAbsolute(baseDirectory)) {
-                    throw new Error(
-                        `Filesystem base directory must be absolute. Received '${config.baseDirectory}'`
-                    );
-                }
-
+                const { baseDirectory } = config;
                 const resolved = path.resolve(baseDirectory);
 
                 await fs.mkdir(resolved, { recursive: true }); // eslint-disable-line security/detect-non-literal-fs-filename -- Dynamic but validated path supplied by the user.
@@ -654,6 +679,16 @@ export class CloudService {
                 }
 
                 const canonical = await fs.realpath(resolved); // eslint-disable-line security/detect-non-literal-fs-filename -- Dynamic but validated path supplied by the user.
+
+                const canonicalIssues = validateFilesystemBaseDirectoryCandidate(
+                    canonical,
+                    { maxBytes: MAX_FILESYSTEM_BASE_DIRECTORY_BYTES }
+                );
+                if (canonicalIssues.length > 0) {
+                    throw new Error(
+                        "Filesystem base directory resolved to an invalid canonical path"
+                    );
+                }
 
                 await this.settings.set(SETTINGS_KEY_PROVIDER, "filesystem");
                 await this.settings.set(

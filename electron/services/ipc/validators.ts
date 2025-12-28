@@ -16,6 +16,10 @@ import { hasAsciiControlCharacters } from "@shared/utils/stringSafety";
 import { isRecord } from "@shared/utils/typeHelpers";
 import { formatZodIssues } from "@shared/utils/zodIssueFormatting";
 import {
+    MAX_FILESYSTEM_BASE_DIRECTORY_BYTES,
+    validateFilesystemBaseDirectoryCandidate,
+} from "@shared/validation/filesystemBaseDirectoryValidation";
+import {
     validateSiteSnapshot,
     validateSiteUpdate,
 } from "@shared/validation/guards";
@@ -211,56 +215,8 @@ const MAX_CLIPBOARD_TEXT_BYTES: number = 5 * 1024 * 1024;
 /** Maximum byte budget accepted for user-supplied restore filenames. */
 const MAX_RESTORE_FILE_NAME_BYTES: number = 512;
 
-/** Maximum byte budget accepted for filesystem provider base directories. */
-const MAX_FILESYSTEM_BASE_DIRECTORY_BYTES: number = 4096;
-
-function isWindowsDeviceNamespacePath(value: string): boolean {
-    // Treat forward slashes as backslashes for this check.
-    const normalized = value.replaceAll("/", "\\");
-    return normalized.startsWith("\\\\?\\") || normalized.startsWith("\\\\.\\");
-}
-
-function isAbsoluteFilesystemPath(value: string): boolean {
-    if (isWindowsDeviceNamespacePath(value)) {
-        return true;
-    }
-
-    // POSIX absolute paths
-    if (value.startsWith("/")) {
-        return true;
-    }
-
-    // UNC paths (\\server\share or //server/share)
-    if (value.startsWith("\\\\") || value.startsWith("//")) {
-        return true;
-    }
-
-    // Windows drive paths (C:\ or C:/)
-    if (value.length >= 3) {
-        const [
-            firstChar,
-            secondChar,
-            thirdChar,
-        ] = value;
-        if (secondChar !== ":" || firstChar === undefined) {
-            return false;
-        }
-
-        const codePoint = firstChar.codePointAt(0);
-        const isAsciiLetter =
-            codePoint !== undefined &&
-            ((codePoint >= 65 && codePoint <= 90) ||
-                (codePoint >= 97 && codePoint <= 122));
-
-        if (!isAsciiLetter) {
-            return false;
-        }
-
-        return thirdChar === "\\" || thirdChar === "/";
-    }
-
-    return false;
-}
+// NOTE: filesystem path validation helpers are centralized in
+// @shared/validation/filesystemBaseDirectoryValidation.
 
 function createParamValidator(
     expectedCount: number,
@@ -422,47 +378,63 @@ const validateCloudFilesystemProviderConfig: IpcParameterValidator =
 
             // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- validated as string above
             const baseDirectoryRaw = record["baseDirectory"] as string;
-            const baseDirectory = baseDirectoryRaw.trim();
-            if (baseDirectory.length === 0) {
-                return toValidationResult("baseDirectory must not be empty");
-            }
+            const issues = validateFilesystemBaseDirectoryCandidate(
+                baseDirectoryRaw,
+                { maxBytes: MAX_FILESYSTEM_BASE_DIRECTORY_BYTES }
+            );
 
+            // Preserve the historical IPC error message wording + ordering.
             const errors: string[] = [];
-
-            if (baseDirectoryRaw !== baseDirectory) {
-                errors.push(
-                    "baseDirectory must not have leading or trailing whitespace"
-                );
-            }
-            if (
-                getUtfByteLength(baseDirectoryRaw) >
-                MAX_FILESYSTEM_BASE_DIRECTORY_BYTES
-            ) {
-                errors.push(
-                    `baseDirectory must not exceed ${MAX_FILESYSTEM_BASE_DIRECTORY_BYTES} bytes`
-                );
-            }
-
-            if (hasAsciiControlCharacters(baseDirectoryRaw)) {
-                errors.push(
-                    "baseDirectory must not contain control characters"
-                );
-            }
-
-            if (baseDirectoryRaw.includes("\0")) {
-                errors.push("baseDirectory must not contain a null byte");
-            }
-
-            if (isWindowsDeviceNamespacePath(baseDirectoryRaw)) {
-                errors.push(
-                    String.raw`baseDirectory must not use Windows device namespace paths (\\?\ or \\.\)`
-                );
-            }
-
-            if (!isAbsoluteFilesystemPath(baseDirectory)) {
-                errors.push(
-                    "baseDirectory must be an absolute path (e.g. C:/Backups or /home/user/backups)"
-                );
+            for (const issue of issues) {
+                switch (issue.code) {
+                    case "control-chars": {
+                        errors.push(
+                            "baseDirectory must not contain control characters"
+                        );
+                        break;
+                    }
+                    case "empty": {
+                        errors.push("baseDirectory must not be empty");
+                        break;
+                    }
+                    case "not-absolute": {
+                        errors.push(
+                            "baseDirectory must be an absolute path (e.g. C:/Backups or /home/user/backups)"
+                        );
+                        break;
+                    }
+                    case "not-string": {
+                        errors.push("baseDirectory must be a string");
+                        break;
+                    }
+                    case "null-byte": {
+                        errors.push(
+                            "baseDirectory must not contain a null byte"
+                        );
+                        break;
+                    }
+                    case "too-large": {
+                        errors.push(
+                            `baseDirectory must not exceed ${issue.maxBytes} bytes`
+                        );
+                        break;
+                    }
+                    case "whitespace": {
+                        errors.push(
+                            "baseDirectory must not have leading or trailing whitespace"
+                        );
+                        break;
+                    }
+                    case "windows-device-namespace": {
+                        errors.push(
+                            String.raw`baseDirectory must not use Windows device namespace paths (\\?\ or \\.\)`
+                        );
+                        break;
+                    }
+                        default: {
+                            break;
+                        }
+                }
             }
 
             return errors.length > 0 ? errors : null;

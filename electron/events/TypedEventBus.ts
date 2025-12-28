@@ -36,6 +36,7 @@ import {
     createTemplateLogger,
     LOG_TEMPLATES,
 } from "@shared/utils/logTemplates";
+import { isObject } from "@shared/utils/typeGuards";
 import { EventEmitter } from "node:events";
 
 import { logger as baseLogger } from "../utils/logger";
@@ -944,9 +945,7 @@ export class TypedEventBus<
     private isObjectPayload(
         value: EventPayloadValue
     ): value is NonArrayObjectPayload {
-        return (
-            typeof value === "object" && value !== null && !Array.isArray(value)
-        );
+        return isObject(value);
     }
 }
 

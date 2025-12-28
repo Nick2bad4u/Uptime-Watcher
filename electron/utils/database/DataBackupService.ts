@@ -28,6 +28,8 @@ import { SiteLoadingError } from "./interfaces";
 const RESTORE_TEMP_PREFIX = "uptime-watcher-restore-";
 const ROLLBACK_TEMP_PREFIX = "uptime-watcher-rollback-";
 
+const SQLITE_HEADER = Buffer.from("SQLite format 3\0", "ascii");
+
 const UNSAFE_FILENAME_PATTERN = /[^\p{L}\p{N}._-]/gu;
 
 const createSanitizedFileName = (fileName: string): string =>
@@ -89,20 +91,31 @@ export class DataBackupService {
         const buffer = Buffer.from(payload.buffer);
         const dbPath = path.join(app.getPath("userData"), DB_FILE_NAME);
         const timestamp = Date.now();
-        const tempDir = await this.createTempDirectory(RESTORE_TEMP_PREFIX);
-        const incomingFileName = payload.fileName?.trim();
-        const tempFileName =
-            incomingFileName && incomingFileName.length > 0
-                ? incomingFileName
-                : `restore-${timestamp}.sqlite`;
-        const safeTempFileName = createSanitizedFileName(tempFileName);
-        const tempFilePath = await this.writeFileWithinDirectory(
-            tempDir,
-            safeTempFileName,
-            buffer
-        );
+        let tempDir: string | undefined = undefined;
 
         try {
+            if (
+                buffer.length < SQLITE_HEADER.length ||
+                !buffer.subarray(0, SQLITE_HEADER.length).equals(SQLITE_HEADER)
+            ) {
+                throw new Error(
+                    "Restore payload is not a valid SQLite database file"
+                );
+            }
+
+            tempDir = await this.createTempDirectory(RESTORE_TEMP_PREFIX);
+            const incomingFileName = payload.fileName?.trim();
+            const tempFileName =
+                incomingFileName && incomingFileName.length > 0
+                    ? incomingFileName
+                    : `restore-${timestamp}.sqlite`;
+            const safeTempFileName = createSanitizedFileName(tempFileName);
+            const tempFilePath = await this.writeFileWithinDirectory(
+                tempDir,
+                safeTempFileName,
+                buffer
+            );
+
             const metadata = this.buildRestoreMetadata(
                 tempFilePath,
                 buffer,
@@ -169,7 +182,12 @@ export class DataBackupService {
             this.logger.error(message, normalizedError);
             throw normalizedError;
         } finally {
-            await this.removeDirectorySafe(tempDir, "restore-temp-directory");
+            if (tempDir) {
+                await this.removeDirectorySafe(
+                    tempDir,
+                    "restore-temp-directory"
+                );
+            }
         }
     }
 
@@ -199,8 +217,32 @@ export class DataBackupService {
         targetPath: string
     ): Promise<void> {
         this.databaseService.close();
-        await fs.copyFile(sourcePath, targetPath);
-        this.databaseService.initialize();
+
+        let copyError: Error | undefined = undefined;
+        try {
+            await fs.copyFile(sourcePath, targetPath);
+        } catch (error: unknown) {
+            copyError = ensureError(error);
+        }
+
+        try {
+            this.databaseService.initialize();
+        } catch (error: unknown) {
+            const initError = ensureError(error);
+
+            if (copyError) {
+                throw new Error(
+                    `Failed to restore database file (copy failed: ${copyError.message}; reinitialize failed: ${initError.message})`,
+                    { cause: error }
+                );
+            }
+
+            throw initError;
+        }
+
+        if (copyError) {
+            throw copyError;
+        }
     }
 
     private async createTempDirectory(prefix: string): Promise<string> {

@@ -1,17 +1,14 @@
+import { logger } from "@electron/utils/logger";
+import { sleepUnref } from "@shared/utils/abortUtils";
 import { ensureError } from "@shared/utils/errorHandling";
+import { isRecord } from "@shared/utils/typeHelpers";
 import axios from "axios";
 import { DropboxResponseError } from "dropbox";
 import { randomInt } from "node:crypto";
 
-import { logger } from "../../../../utils/logger";
-
 const DEFAULT_INITIAL_DELAY_MS = 500;
 const DEFAULT_MAX_DELAY_MS = 10_000;
 const DEFAULT_MAX_ATTEMPTS = 4;
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-    return typeof value === "object" && value !== null && !Array.isArray(value);
-}
 
 function parseRetryAfterMs(value: unknown): number | undefined {
     if (typeof value !== "string") {
@@ -75,12 +72,6 @@ function computeBackoffDelayMs(args: {
     return Math.max(1, capped + randomInt(-jitterRange, jitterRange + 1));
 }
 
-async function sleep(delayMs: number): Promise<void> {
-    await new Promise<void>((resolve) => {
-        const timer = setTimeout(resolve, delayMs);
-        timer.unref();
-    });
-}
 
 function extractRetryableHttpFailure(error: unknown): null | {
     retryAfterMs?: number;
@@ -212,7 +203,7 @@ export async function withDropboxRetry<T>(args: {
             });
 
             // eslint-disable-next-line no-await-in-loop -- Retry loop is intentionally sequential.
-            await sleep(delayMs);
+            await sleepUnref(delayMs);
         }
     }
 }

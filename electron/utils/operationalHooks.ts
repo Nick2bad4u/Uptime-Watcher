@@ -60,6 +60,7 @@
 
 import type { Tagged, UnknownRecord } from "type-fest";
 
+import { sleep } from "@shared/utils/abortUtils";
 import { ensureError } from "@shared/utils/errorHandling";
 import * as z from "zod";
 
@@ -247,9 +248,10 @@ function calculateDelay(
     backoff: "exponential" | "linear"
 ): number {
     if (backoff === "exponential") {
-        return initialDelay * 2 ** (attempt - 1);
+        // Attempt is 0-based (attempt=0 means first retry after initial failure)
+        return initialDelay * 2 ** attempt;
     }
-    return initialDelay * attempt;
+    return initialDelay * (attempt + 1);
 }
 
 /**
@@ -470,13 +472,7 @@ async function handleRetry<T>(
             }
         );
 
-        await new Promise<void>((resolve) => {
-            // Timer will complete when Promise resolves, cleanup not needed
-            // eslint-disable-next-line clean-timer/assign-timer-id -- Timer completes with Promise resolution
-            setTimeout(() => {
-                resolve();
-            }, delay);
-        });
+        await sleep(delay);
     }
 }
 

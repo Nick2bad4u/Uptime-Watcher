@@ -10,6 +10,7 @@
  */
 
 import { hasAsciiControlCharacters } from "@shared/utils/stringSafety";
+import { getUtfByteLength } from "@shared/utils/utfByteLength";
 import { isValidUrl } from "@shared/validation/validatorUtils";
 
 /** Maximum accepted UTF-8 byte budget for user-supplied external-open URLs. */
@@ -17,9 +18,6 @@ const MAX_EXTERNAL_OPEN_URL_BYTES = 4096;
 
 const SAFE_URL_SUSPECT_SEGMENT_MIN_LENGTH = 32;
 
-function getUtfByteLength(value: string): number {
-    return new TextEncoder().encode(value).length;
-}
 
 /**
  * Result of validating and normalizing a URL intended for external opening.

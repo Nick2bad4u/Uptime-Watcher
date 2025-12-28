@@ -1,6 +1,9 @@
 import type { IpcInvokeChannel } from "@shared/types/ipc";
 
-import { openExternalOrThrow } from "@electron/services/shell/openExternalUtils";
+import {
+    getElectronErrorCodeSuffix,
+    openExternalOrThrow,
+} from "@electron/services/shell/openExternalUtils";
 import { SYSTEM_CHANNELS } from "@shared/types/preload";
 import { validateExternalOpenUrlCandidate } from "@shared/utils/urlSafety";
 import { clipboard } from "electron";
@@ -55,8 +58,20 @@ export function registerSystemHandlers({
     register(
         SYSTEM_CHANNELS.writeClipboardText,
         (text): boolean => {
-            clipboard.writeText(text);
-            return true;
+            try {
+                clipboard.writeText(text);
+                return true;
+            } catch (error: unknown) {
+                const codeSuffix = getElectronErrorCodeSuffix(error);
+
+                // Never include clipboard contents in thrown errors/logs.
+                throw new Error(
+                    `Failed to write clipboard text${codeSuffix}`,
+                    {
+                        cause: error,
+                    }
+                );
+            }
         },
         SystemHandlerValidators.writeClipboardText
     );

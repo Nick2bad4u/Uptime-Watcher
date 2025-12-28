@@ -259,16 +259,13 @@ export function generateBackupFileName(
     return `${prefix}-${timestamp}.${extension}`;
 }
 
-const isRecord = (value: unknown): value is Record<string, unknown> =>
-    isSharedRecord(value);
-
 /**
  * Type guard ensuring a value matches {@link SerializedDatabaseBackupResult}.
  */
 function isSerializedDatabaseBackupResult(
     value: unknown
 ): value is SerializedDatabaseBackupResult {
-    if (!isRecord(value)) {
+    if (!isSharedRecord(value)) {
         return false;
     }
 
@@ -283,7 +280,7 @@ function isSerializedDatabaseBackupResult(
     }
 
     const metadataCandidate = value["metadata"];
-    if (!isRecord(metadataCandidate)) {
+    if (!isSharedRecord(metadataCandidate)) {
         return false;
     }
 

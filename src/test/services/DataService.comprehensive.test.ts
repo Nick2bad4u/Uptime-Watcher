@@ -594,7 +594,8 @@ describe("DataService", () => {
                 DataService.initialize(),
             ]);
 
-            expect(mockWaitForElectronBridge).toHaveBeenCalledTimes(3);
+            // Concurrent calls share the same in-flight initialization.
+            expect(mockWaitForElectronBridge).toHaveBeenCalledTimes(1);
         });
     });
 

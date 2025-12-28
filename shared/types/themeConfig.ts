@@ -17,6 +17,8 @@ import type {
     UnknownRecord,
 } from "type-fest";
 
+import { isObject } from "../utils/typeGuards";
+
 /**
  * Animation configuration interface.
  *
@@ -495,7 +497,7 @@ export type ThemeOverride = {
 export type DeepThemeOverride = PartialDeep<ThemeConfig>;
 
 const isMergeableObject = (value: unknown): value is UnknownRecord =>
-    typeof value === "object" && value !== null && !Array.isArray(value);
+    isObject(value);
 
 function deepMergeSection<TTarget>(
     target: TTarget,

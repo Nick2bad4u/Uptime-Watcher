@@ -2,6 +2,8 @@ import type { UnknownRecord } from "type-fest";
 
 import type { PortNumber } from "../types/units";
 
+import { isRecord } from "./typeHelpers";
+
 /**
  * Checks whether a value is a non-null object excluding arrays.
  *
@@ -14,7 +16,8 @@ import type { PortNumber } from "../types/units";
  * @returns `true` when the value is a non-null object; otherwise `false`.
  */
 export function isObject(value: unknown): value is UnknownRecord {
-    return typeof value === "object" && value !== null && !Array.isArray(value);
+    // Delegate to the canonical implementation to prevent semantic drift.
+    return isRecord(value);
 }
 
 /**

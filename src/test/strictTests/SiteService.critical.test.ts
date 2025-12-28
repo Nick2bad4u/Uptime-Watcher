@@ -577,7 +577,8 @@ describe("SiteService Critical Coverage Tests", () => {
             await Promise.all(promises);
 
             // Assert
-            expect(mockWaitForElectronBridge).toHaveBeenCalledTimes(3);
+            // Concurrent calls share a single in-flight initialization.
+            expect(mockWaitForElectronBridge).toHaveBeenCalledTimes(1);
             expect(
                 (globalThis as any).electronAPI.sites.removeMonitor
             ).toHaveBeenCalledTimes(3);

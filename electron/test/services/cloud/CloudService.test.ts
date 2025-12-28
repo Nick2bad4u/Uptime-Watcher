@@ -185,6 +185,49 @@ describe("CloudService", () => {
         );
     });
 
+    it("treats corrupted stored filesystem baseDirectory as unconfigured", async () => {
+        const settings = new Map<string, string>([
+            ["cloud.provider", "filesystem"],
+            // Invalid due to leading whitespace.
+            ["cloud.filesystem.baseDirectory", ` ${baseDirectory}`],
+        ]);
+
+        const syncEngine = {
+            syncNow: vi.fn().mockResolvedValue({
+                appliedRemoteOperations: 0,
+                emittedLocalOperations: 0,
+                mergedEntities: 0,
+                snapshotKey: null,
+            }),
+        };
+
+        const orchestrator = {
+            downloadBackup: vi.fn(),
+            restoreBackup: vi.fn(),
+        } as unknown as UptimeOrchestrator;
+
+        const cloudService = new CloudService({
+            orchestrator,
+            settings: {
+                get: async (key) => settings.get(key),
+                set: async (key, value) => {
+                    settings.set(key, value);
+                },
+            },
+            syncEngine,
+            secretStore: new InMemorySecretStore(),
+        });
+
+        const status = await cloudService.getStatus();
+        expect(status.provider).toBe("filesystem");
+        expect(status.configured).toBeFalsy();
+        expect(status.connected).toBeFalsy();
+
+        await expect(cloudService.listBackups()).rejects.toThrowError(
+            "Cloud provider is not configured"
+        );
+    });
+
     it("rejects encryption passphrases with control characters", async () => {
         const settings = new Map<string, string>();
         const syncEngine = {

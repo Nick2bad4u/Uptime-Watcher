@@ -2,6 +2,7 @@ import type { DropboxResponse, files, users } from "dropbox";
 
 import { ensureError } from "@shared/utils/errorHandling";
 import { tryParseJsonRecord } from "@shared/utils/jsonSafety";
+import { isRecord } from "@shared/utils/typeHelpers";
 import { Dropbox, DropboxResponseError } from "dropbox";
 
 import type {
@@ -42,10 +43,6 @@ type DropboxSdkClient = Pick<
 
 type DropboxListFolderResponse = DropboxResponse<files.ListFolderResult>;
 type DropboxCurrentAccountResponse = DropboxResponse<users.FullAccount>;
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-    return typeof value === "object" && value !== null && !Array.isArray(value);
-}
 
 function normalizeKey(key: string): string {
     return normalizeProviderObjectKey(key);

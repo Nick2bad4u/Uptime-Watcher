@@ -1,11 +1,20 @@
-const textEncoder =
-    typeof TextEncoder === "undefined" ? null : new TextEncoder();
+import { getUtfByteLength as getSharedUtfByteLength } from "@shared/utils/utfByteLength";
+
+const textEncoder = typeof TextEncoder === "undefined" ? null : new TextEncoder();
 
 export const MAX_DIAGNOSTICS_METADATA_BYTES = 2048;
 export const MAX_DIAGNOSTICS_PAYLOAD_PREVIEW_BYTES = 4096;
 
+/**
+ * Calculates the UTF-8 encoded byte length of a string.
+ *
+ * @remarks
+ * Delegates to the shared implementation to avoid policy drift.
+ */
 export const getUtfByteLength = (value: string): number =>
-    textEncoder ? textEncoder.encode(value).length : value.length * 2;
+    getSharedUtfByteLength(value);
+
+
 
 export const truncateUtfString = (
     value: string,

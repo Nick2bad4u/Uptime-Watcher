@@ -6,16 +6,13 @@ import { FilesystemCloudStorageProvider } from "@electron/services/cloud/provide
 import { CLOUD_SYNC_SCHEMA_VERSION } from "@shared/types/cloudSync";
 import { SyncEngine } from "@electron/services/sync/SyncEngine";
 import type { Monitor, Site } from "@shared/types";
+import { isRecord } from "@shared/utils/typeHelpers";
 import {
     DEFAULT_CHECK_INTERVAL,
     DEFAULT_REQUEST_TIMEOUT,
 } from "@electron/constants";
 import { logger } from "@electron/utils/logger";
 import { describe, expect, it, vi } from "vitest";
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-    return typeof value === "object" && value !== null && !Array.isArray(value);
-}
 
 /* eslint-disable unicorn/numeric-separators-style -- Test constants like 1_000 / 60_000 don't match the project's strict grouping rule; readability here is preferred. */
 

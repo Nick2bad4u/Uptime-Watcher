@@ -799,8 +799,8 @@ describe("EventsService", () => {
                 expect(typeof cleanup).toBe("function");
             }
 
-            // All should have called initialization
-            expect(mockWaitForElectronBridge).toHaveBeenCalledTimes(9);
+            // All should have shared the in-flight initialization
+            expect(mockWaitForElectronBridge).toHaveBeenCalledTimes(1);
         });
     });
 
@@ -907,7 +907,8 @@ describe("EventsService", () => {
                 EventsService.initialize(),
             ]);
 
-            expect(mockWaitForElectronBridge).toHaveBeenCalledTimes(3);
+            // Concurrent calls share the same in-flight initialization.
+            expect(mockWaitForElectronBridge).toHaveBeenCalledTimes(1);
         });
     });
 

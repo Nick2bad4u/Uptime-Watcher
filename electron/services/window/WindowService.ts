@@ -1,3 +1,4 @@
+import type { Event, HandlerDetails } from "electron";
 /**
  * Window management service for Electron application windows.
  *
@@ -33,8 +34,7 @@
  * @packageDocumentation
  */
 
-import type { Event, HandlerDetails } from "electron";
-
+import { sleep } from "@shared/utils/abortUtils";
 import { getNodeEnv, readBooleanEnv } from "@shared/utils/environment";
 import { getUnknownErrorMessage } from "@shared/utils/errorCatalog";
 import { tryGetErrorCode } from "@shared/utils/errorCodes";
@@ -370,8 +370,8 @@ export class WindowService {
                 logger.debug(
                     `[WindowService] Waiting ${Math.round(totalDelay)}ms before retry ${attempt + 2}/${MAX_RETRIES}`
                 );
-                // eslint-disable-next-line no-await-in-loop, no-promise-executor-return, clean-timer/assign-timer-id -- Sequential retry delay required, timer completes with Promise
-                await new Promise((resolve) => setTimeout(resolve, totalDelay));
+                    // eslint-disable-next-line no-await-in-loop -- Sequential retry delay required
+                    await sleep(totalDelay);
             }
         }
 

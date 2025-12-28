@@ -9,6 +9,8 @@
  * wrapping; those concerns are handled by {@link CloudService}.
  */
 
+import { isFilesystemBaseDirectoryValid } from "@shared/validation/filesystemBaseDirectoryValidation";
+
 import type { CloudSettingsAdapter } from "../CloudService.types";
 import type { CloudStorageProvider } from "../providers/CloudStorageProvider.types";
 import type { SecretStore } from "../secrets/SecretStore";
@@ -70,6 +72,10 @@ export async function resolveCloudProviderOrNull(args: {
                 keys.filesystemBaseDirectory
             );
             if (!baseDirectory) {
+                return null;
+            }
+
+            if (!isFilesystemBaseDirectoryValid(baseDirectory)) {
                 return null;
             }
 
