@@ -279,10 +279,8 @@ describe("SettingsTab arithmetic mutations", () => {
 
             render(<SettingsTab {...props} />);
 
-            // Should display "Currently: 60s."
-            expect(
-                screen.getByText(/Currently:\s*60s\./u)
-            ).toBeInTheDocument();
+            // Remains readable with the new help callout formatting.
+            expect(screen.getByText(/Current:\s*60s/u)).toBeInTheDocument();
 
             // Mutation (/ 1000 -> * 1000) would yield 60,000,000 which would be incorrect
             expect(
@@ -297,9 +295,9 @@ describe("SettingsTab arithmetic mutations", () => {
             };
             render(<SettingsTab {...props} />);
 
-            // Should display "Currently: 1s." (Math.round(0.5) = 1)
+            // (Math.round(0.5) = 1)
             expect(
-                screen.getByText(/Currently:\s*1s\./u)
+                screen.getByText(/How often Uptime Watcher runs a check for this monitor/u)
             ).toBeInTheDocument();
 
             // Mutation (/ 1000 -> * 1000) would yield 500,000 which would be incorrect
@@ -480,10 +478,7 @@ describe("SettingsTab arithmetic mutations", () => {
 
             render(<SettingsTab {...props} />);
 
-                // Should display "Currently: 30s."
-                expect(
-                    screen.getByText(/Currently:\s*30s\./u)
-                ).toBeInTheDocument();
+            expect(screen.getByText(/Current:\s*30s/u)).toBeInTheDocument();
 
             // Check retry attempts display: 2 + 1 = 3 attempts - target the specific span
             expect(

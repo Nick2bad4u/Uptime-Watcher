@@ -162,10 +162,10 @@ export const AnalyticsTab = ({
         (responseTime: number): string => {
             if (responseTime <= 100) {
                 return currentTheme.colors.success;
-            } // Green for excellent (≤100ms)
+            } // Green for excellent (Γëñ100ms)
             if (responseTime <= 500) {
                 return currentTheme.colors.warning;
-            } // Yellow for good (≤500ms)
+            } // Yellow for good (Γëñ500ms)
             return currentTheme.colors.error; // Red for poor (>500ms)
         },
         [
@@ -345,6 +345,19 @@ export const AnalyticsTab = ({
 
     return (
         <div className="space-y-6" data-testid="analytics-tab">
+            {totalChecks === 0 ? (
+                <ThemedCard
+                    icon={barChartIconColored}
+                    title="No analytics yet"
+                    variant="secondary"
+                >
+                    <ThemedText size="sm" variant="secondary">
+                        Run a check (or wait for scheduled checks) to populate uptime and
+                        response-time charts.
+                    </ThemedText>
+                </ThemedCard>
+            ) : null}
+
             {/* Time Range Selector */}
             <ThemedCard icon={timeRangeIcon} title="Analytics Time Range">
                 <div className="flex items-center justify-between">
@@ -354,13 +367,14 @@ export const AnalyticsTab = ({
                     <div className="flex gap-2">
                         {CHART_TIME_RANGES.map((range) => (
                             <ThemedButton
+                                aria-pressed={siteDetailsChartTimeRange === range}
                                 key={range}
                                 onClick={createTimeRangeHandler(range)}
                                 size="sm"
                                 variant={
                                     siteDetailsChartTimeRange === range
                                         ? "primary"
-                                        : "ghost"
+                                        : "secondary"
                                 }
                             >
                                 {range}

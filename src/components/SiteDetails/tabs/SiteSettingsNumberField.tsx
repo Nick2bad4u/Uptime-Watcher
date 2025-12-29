@@ -4,6 +4,7 @@ import { ThemedButton } from "../../../theme/components/ThemedButton";
 import { ThemedInput } from "../../../theme/components/ThemedInput";
 import { ThemedText } from "../../../theme/components/ThemedText";
 import { SiteSettingsFieldLabel } from "./SiteSettingsFieldLabel";
+import { SiteSettingsHelpText } from "./SiteSettingsHelpText";
 
 interface SiteSettingsNumberFieldProps {
     readonly errorText?: ReactNode;
@@ -70,9 +71,9 @@ export const SiteSettingsNumberField = ({
                     Save
                 </ThemedButton>
             </div>
-            <ThemedText size="xs" variant="tertiary">
-                {helperText}
-            </ThemedText>
+            <div className="mt-2">
+                <SiteSettingsHelpText>{helperText}</SiteSettingsHelpText>
+            </div>
             {errorNode}
         </div>
     );

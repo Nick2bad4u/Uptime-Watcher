@@ -553,19 +553,23 @@ private async handleSuccessfulCheck(
             timestamp: checkResult.timestamp.toISOString(),
         };
 
-        // Emit proper typed events like the traditional monitoring system
-        await this.config.eventEmitter.emitTyped(
-            "monitor:status-changed",
-            statusUpdate
-        );
+        const didStatusChange = statusUpdate.status !== statusUpdate.previousStatus;
 
-        // Emit monitor up/down events for status changes
-        await this.emitStatusChangeEvents(
-            site,
-            monitor,
-            freshMonitorWithHistory,
-            checkResult
-        );
+        // Emit proper typed events like the traditional monitoring system
+        if (didStatusChange) {
+            await this.config.eventEmitter.emitTyped(
+                "monitor:status-changed",
+                statusUpdate
+            );
+
+            // Emit monitor up/down events for status changes
+            await this.emitStatusChangeEvents(
+                site,
+                monitor,
+                freshMonitorWithHistory,
+                checkResult
+            );
+        }
 
         return statusUpdate;
     }
@@ -730,18 +734,23 @@ private async performDirectCheck(
                 monitor: freshMonitorWithHistory,
             };
 
+            const didStatusChange =
+                statusUpdate.status !== statusUpdate.previousStatus;
+
             // Emit proper typed events like the traditional monitoring system
-            await this.config.eventEmitter.emitTyped(
-                "monitor:status-changed",
-                statusUpdate
-            );
+            if (didStatusChange) {
+                await this.config.eventEmitter.emitTyped(
+                    "monitor:status-changed",
+                    statusUpdate
+                );
+            }
 
             // Emit monitor up/down events using the same canonical helper used
             // by correlated checks.
             //
             // Preserve existing behavior: manual checks on paused monitors do
             // not emit up/down events.
-            if (!isManualCheck || monitor.status !== "paused") {
+            if (didStatusChange && (!isManualCheck || monitor.status !== "paused")) {
                 await this.emitStatusChangeEvents(
                     site,
                     monitor,

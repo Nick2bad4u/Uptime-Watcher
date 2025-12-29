@@ -37,7 +37,14 @@
     align-items: center;
     gap: clamp(0.75rem, 0.625rem + 0.35vi, 1rem);
     overflow-inline: auto;
+    /*
+     * The tab buttons have a subtle "lift" transform on hover/focus.
+     * Because this element is a horizontal scroll container, browsers will
+     * clamp overflow on the block axis as well. Add a tiny padding so lifted
+     * buttons don't get clipped.
+     */
     overscroll-behavior: contain;
+    padding-block: 0.25rem;
     scrollbar-gutter: stable both-edges;
     scrollbar-width: thin;
 }

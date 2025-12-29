@@ -43,6 +43,12 @@ import {
 import { useConfirmDialog } from "../ui/useConfirmDialog";
 import { type SiteAnalytics, useSiteAnalytics } from "./useSiteAnalytics";
 
+const clampRetryAttempts = (retryAttempts: number): number =>
+    Math.min(
+        Math.max(RETRY_CONSTRAINTS.MIN, retryAttempts),
+        RETRY_CONSTRAINTS.MAX
+    );
+
 /**
  * Props for the useSiteDetails hook
  *
@@ -745,6 +751,7 @@ export function useSiteDetails({
     const handleRetryAttemptsChange = useCallback(
         (e: ChangeEvent<HTMLInputElement>): void => {
             const retryAttempts = safeInteger(e.target.value, 3);
+            const clampedRetryAttempts = clampRetryAttempts(retryAttempts);
             const currentRetryAttempts = selectedMonitorRetryAttempts ?? 0;
             setMonitorEditStateById((previous) =>
                 updateMonitorEditStateById({
@@ -753,8 +760,8 @@ export function useSiteDetails({
                     updater: (current) => ({
                         ...current,
                         retryAttemptsChanged:
-                            retryAttempts !== currentRetryAttempts,
-                        userEditedRetryAttempts: retryAttempts,
+                            clampedRetryAttempts !== currentRetryAttempts,
+                        userEditedRetryAttempts: clampedRetryAttempts,
                     }),
                 })
             );

@@ -25,7 +25,6 @@ import { ThemedInput } from "../../../theme/components/ThemedInput";
 import { ThemedSelect } from "../../../theme/components/ThemedSelect";
 import { ThemedText } from "../../../theme/components/ThemedText";
 import { useTheme } from "../../../theme/useTheme";
-import { calculateMaxDuration } from "../../../utils/duration";
 import {
     getMonitorDisplayIdentifier,
     getMonitorTypeDisplayLabel,
@@ -34,6 +33,7 @@ import {
 import { AppIcons, getIconSize } from "../../../utils/icons";
 import { getMonitorTypeConfig } from "../../../utils/monitorTypeHelper";
 import { formatRetryAttemptsText, getIntervalLabel } from "../../../utils/time";
+import { SiteSettingsHelpText } from "./SiteSettingsHelpText";
 import { SiteSettingsNumberField } from "./SiteSettingsNumberField";
 
 const WarningIcon = AppIcons.status.warning;
@@ -52,6 +52,54 @@ const InfoIcon = AppIcons.ui.info;
 const SaveIcon = AppIcons.actions.save;
 const SettingsIcon = AppIcons.settings.gear;
 const TrashIcon = AppIcons.actions.remove;
+
+const CHECK_INTERVAL_INFLIGHT_WARNING_SECONDS = 15;
+
+function formatSecondsWithMinutes(totalSeconds: number): string {
+    const safeSeconds = Number.isFinite(totalSeconds)
+        ? Math.max(0, Math.round(totalSeconds))
+        : 0;
+
+    if (safeSeconds < 60) {
+        return `${safeSeconds}s`;
+    }
+
+    const minutes = Math.floor(safeSeconds / 60);
+    const seconds = safeSeconds % 60;
+    return `${safeSeconds}s (${minutes}m ${seconds}s)`;
+}
+
+function calculateBackoffSeconds(retryAttempts: number): number {
+    if (retryAttempts <= 0) {
+        return 0;
+    }
+
+    let backoffSeconds = 0;
+    for (let i = 0; i < retryAttempts; i += 1) {
+        backoffSeconds += 2 ** i;
+    }
+
+    return backoffSeconds;
+}
+
+function calculateMaxCheckDurationSeconds(args: {
+    retryAttempts: number;
+    timeoutSeconds: number;
+}): {
+    readonly backoffSeconds: number;
+    readonly totalAttempts: number;
+    readonly totalSeconds: number;
+} {
+    const totalAttempts = args.retryAttempts + 1;
+    const backoffSeconds = calculateBackoffSeconds(args.retryAttempts);
+    const totalSeconds = args.timeoutSeconds * totalAttempts + backoffSeconds;
+
+    return {
+        backoffSeconds,
+        totalAttempts,
+        totalSeconds,
+    };
+}
 
 /**
  * Props for the SettingsTab component.
@@ -454,6 +502,32 @@ export const SettingsTab = ({
         ),
         [retryLabelIcon]
     );
+
+    const maxCheckDuration = useMemo(
+        () =>
+            calculateMaxCheckDurationSeconds({
+                retryAttempts: localRetryAttempts,
+                timeoutSeconds: localTimeout,
+            }),
+        [localRetryAttempts, localTimeout]
+    );
+
+    const maxDurationVariant = useMemo(() => {
+        if (maxCheckDuration.backoffSeconds >= 16 || maxCheckDuration.totalSeconds >= 180) {
+            return "error";
+        }
+
+        if (maxCheckDuration.backoffSeconds >= 8 || maxCheckDuration.totalSeconds >= 60) {
+            return "warning";
+        }
+
+        return "success";
+    }, [maxCheckDuration.backoffSeconds, maxCheckDuration.totalSeconds]);
+
+    const maxDurationLabel = useMemo(
+        () => formatSecondsWithMinutes(maxCheckDuration.totalSeconds),
+        [maxCheckDuration.totalSeconds]
+    );
     return (
         <div className="space-y-6" data-testid="settings-tab">
             {/* Site Configuration */}
@@ -532,9 +606,11 @@ export const SettingsTab = ({
                                 selectedMonitor
                             )}
                         />
-                        <ThemedText size="xs" variant="tertiary">
-                            This identifier is generated and cannot be edited.
-                        </ThemedText>
+                            <div className="mt-2">
+                                <SiteSettingsHelpText icon={InfoIcon}>
+                                    Generated when this site is created and cannot be changed.
+                                </SiteSettingsHelpText>
+                            </div>
                     </div>
                 </div>
             </ThemedCard>
@@ -548,11 +624,13 @@ export const SettingsTab = ({
                     <ThemedText className="mb-2" size="sm" variant="secondary">
                         System notifications
                     </ThemedText>
-                    <ThemedText className="mb-4" size="xs" variant="tertiary">
-                        {isSiteMuted
-                            ? "Notifications for this site are muted. This overrides global notification settings."
-                            : "This site follows your global notification settings."}
-                    </ThemedText>
+                    <div className="mb-4">
+                        <SiteSettingsHelpText icon={BellIcon}>
+                            {isSiteMuted
+                                ? "Notifications for this site are muted. This overrides global notification settings."
+                                : "This site follows your global notification settings."}
+                        </SiteSettingsHelpText>
+                    </div>
                     <ThemedButton
                         className="site-settings-field__cta"
                         icon={muteToggleIcon}
@@ -615,16 +693,49 @@ export const SettingsTab = ({
                                 Save
                             </ThemedButton>
                         </div>
-                        <ThemedText size="xs" variant="tertiary">
-                            How often Uptime Watcher runs a check for this monitor.
-                            Currently: {Math.round(localCheckInterval / 1000)}s.
-                        </ThemedText>
+                        <div className="mt-2">
+                            <SiteSettingsHelpText>
+                                How often Uptime Watcher runs a check for this monitor.
+                                <span className="ml-2 inline-flex items-center gap-1 font-medium">
+                                    <DurationIcon aria-hidden size={14} />
+                                    Current: {formatSecondsWithMinutes(
+                                        Math.round(localCheckInterval / 1000)
+                                    )}
+                                </span>
+                            </SiteSettingsHelpText>
+                        </div>
+
+                        {Math.round(localCheckInterval / 1000) <
+                        CHECK_INTERVAL_INFLIGHT_WARNING_SECONDS ? (
+                            <div className="mt-2">
+                                <SiteSettingsHelpText
+                                    icon={WarningIcon}
+                                    tone="warning"
+                                >
+                                    Intervals below {CHECK_INTERVAL_INFLIGHT_WARNING_SECONDS}s may
+                                    cause multiple in-flight checks if a request takes longer than
+                                    the interval. Not recommended.
+                                </SiteSettingsHelpText>
+                            </div>
+                        ) : null}
                     </div>
 
                     {/* Timeout Configuration */}
                     <SiteSettingsNumberField
                         errorText={`Allowed range: ${TIMEOUT_CONSTRAINTS.MIN}-${TIMEOUT_CONSTRAINTS.MAX} seconds.`}
-                        helperText={`Maximum time to wait per attempt before it is treated as failed. Currently: ${localTimeout}s.`}
+                        helperText={
+                            <>
+                                Maximum time to wait per attempt before it is treated as failed.
+                                <span className="ml-2 inline-flex items-center gap-1 font-medium">
+                                    <DurationIcon aria-hidden size={14} />
+                                    Current: {formatSecondsWithMinutes(localTimeout)}
+                                </span>
+                                <span className="ml-2 inline-flex items-center gap-1">
+                                    <DurationIcon aria-hidden size={14} />
+                                    Max: {formatSecondsWithMinutes(TIMEOUT_CONSTRAINTS.MAX)}
+                                </span>
+                            </>
+                        }
                         isChanged={timeoutChanged}
                         isValid={isTimeoutValid}
                         label={timeoutFieldLabel}
@@ -641,7 +752,15 @@ export const SettingsTab = ({
                     {/* Retry Attempts Configuration */}
                     <SiteSettingsNumberField
                         errorText={`Retry attempts must be between ${RETRY_CONSTRAINTS.MIN} and ${RETRY_CONSTRAINTS.MAX}.`}
-                        helperText={`${formatRetryAttemptsText(localRetryAttempts)}. Retries delay downtime detection but reduce false positives.`}
+                        helperText={
+                            <>
+                                {formatRetryAttemptsText(localRetryAttempts)}.
+                                <span className="ml-2">Range: 0–{RETRY_CONSTRAINTS.MAX}.</span>
+                                <span className="ml-2">
+                                    Values above {RETRY_CONSTRAINTS.MAX} are clamped.
+                                </span>
+                            </>
+                        }
                         isChanged={retryAttemptsChanged}
                         isValid={isRetryAttemptsValid}
                         label={retryAttemptsFieldLabel}
@@ -656,45 +775,73 @@ export const SettingsTab = ({
                     />
 
                     {/* Total monitoring time indicator */}
-                    {localRetryAttempts > 0 && (
+                    {localRetryAttempts > 0 ? (
                         <ThemedBox
                             className="site-settings-duration"
                             padding="md"
                             rounded="lg"
                             variant="tertiary"
                         >
-                            <div className="site-settings-duration__body">
-                                <span
-                                    aria-hidden="true"
-                                    className="site-settings-duration__icon"
-                                >
-                                    <DurationIcon size={18} />
-                                </span>
-                                <div className="site-settings-duration__content">
+                        <div className="site-settings-duration__body">
+                            <span
+                                aria-hidden="true"
+                                className="site-settings-duration__icon"
+                            >
+                                <DurationIcon size={18} />
+                            </span>
+                            <div className="site-settings-duration__content">
+                                <div className="flex flex-wrap items-center gap-2">
                                     <ThemedText
                                         size="sm"
-                                        variant="primary"
+                                        variant="secondary"
                                         weight="medium"
                                     >
-                                        Maximum check duration ~{" "}
-                                        {calculateMaxDuration(
-                                            localTimeout,
-                                            localRetryAttempts
-                                        )}
+                                        Maximum check duration
                                     </ThemedText>
-                                    <ThemedText
-                                        className="site-settings-duration__meta"
-                                        size="xs"
-                                        variant="secondary"
+                                    <ThemedBadge
+                                        className="shrink-0"
+                                        size="sm"
+                                        variant={maxDurationVariant}
                                     >
-                                        {localTimeout}s per attempt x{" "}
-                                        {localRetryAttempts + 1} attempts +{" "}
-                                        backoff delays
-                                    </ThemedText>
+                                        <span className="inline-flex items-center gap-1">
+                                            <DurationIcon aria-hidden size={14} />
+                                            ~ {maxDurationLabel}
+                                        </span>
+                                    </ThemedBadge>
+                                </div>
+                                <ThemedText
+                                    className="site-settings-duration__meta"
+                                    size="xs"
+                                    variant="secondary"
+                                >
+                                    <span className="inline-flex items-center gap-1">
+                                        <DurationIcon aria-hidden size={14} />
+                                        {formatSecondsWithMinutes(localTimeout)}
+                                    </span>
+                                    <span> per attempt</span>
+                                    <span className="mx-1">×</span>
+                                    <span className="inline-flex items-center gap-1">
+                                        <RetryIcon aria-hidden size={14} />
+                                        {maxCheckDuration.totalAttempts} attempts
+                                    </span>
+                                    <span className="mx-1">+</span>
+                                    <span className="inline-flex items-center gap-1">
+                                        <LastCheckedIcon aria-hidden size={14} />
+                                        {formatSecondsWithMinutes(
+                                            maxCheckDuration.backoffSeconds
+                                        )} backoff
+                                    </span>
+                                </ThemedText>
+                                <div className="mt-2">
+                                    <SiteSettingsHelpText icon={InfoIcon}>
+                                        This estimate updates automatically based on Timeout and
+                                        Retry attempts above.
+                                    </SiteSettingsHelpText>
                                 </div>
                             </div>
+                        </div>
                         </ThemedBox>
-                    )}
+                    ) : null}
                 </div>
             </ThemedCard>
 

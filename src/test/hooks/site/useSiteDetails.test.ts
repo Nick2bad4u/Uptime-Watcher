@@ -927,15 +927,15 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
                 result.current.handleRetryAttemptsChange(mockEvent);
             });
 
-            // Try to save the invalid retry attempts - should throw
             await act(async () => {
-                await expect(
-                    result.current.handleSaveRetryAttempts()
-                ).rejects.toThrowError();
+                await result.current.handleSaveRetryAttempts();
             });
 
-            // Should not call store method with invalid value
-            expect(mockUpdateMonitorRetryAttempts).not.toHaveBeenCalled();
+            expect(mockUpdateMonitorRetryAttempts).toHaveBeenCalledWith(
+                "site-1",
+                "monitor-1",
+                10 // Clamped value
+            );
         });
     });
 

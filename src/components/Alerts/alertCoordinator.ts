@@ -201,6 +201,25 @@ export const enqueueAlertFromStatusUpdate = (
         return undefined;
     }
 
+    // Status alerts are intended for *transitions* only. Some event sources
+    // can yield a status update payload where the status did not actually
+    // change (for example, a manual check when the monitor is already UP).
+    // Don't create misleading toasts like "is now Up (previously Up)".
+    if (
+        update.previousStatus !== undefined &&
+        update.previousStatus === update.status
+    ) {
+        logger.debug(
+            "Skipping in-app status alert because status did not change",
+            {
+                monitorId: update.monitorId,
+                siteIdentifier: update.siteIdentifier,
+                status: update.status,
+            }
+        );
+        return undefined;
+    }
+
     const alertStore = useAlertStore.getState();
     const alert = alertStore.enqueueAlert(mapStatusUpdateToAlert(update));
     logger.debug("Enqueued in-app status alert", { alertId: alert.id });

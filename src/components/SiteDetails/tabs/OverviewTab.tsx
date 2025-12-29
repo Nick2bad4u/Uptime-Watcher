@@ -306,7 +306,7 @@ export const OverviewTab = ({
                 title="Performance Overview"
             >
                 <div className="grid gap-4 sm:grid-cols-2">
-                    <div className="flex items-center justify-between gap-3">
+                    <div className="flex flex-wrap items-center gap-3">
                         <ThemedText size="sm" variant="secondary">
                             Fastest Response
                         </ThemedText>
@@ -320,7 +320,7 @@ export const OverviewTab = ({
                         </ThemedBadge>
                     </div>
 
-                    <div className="flex items-center justify-between gap-3">
+                    <div className="flex flex-wrap items-center gap-3">
                         <ThemedText size="sm" variant="secondary">
                             Slowest Response
                         </ThemedText>

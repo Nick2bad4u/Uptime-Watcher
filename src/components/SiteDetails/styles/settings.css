@@ -14,8 +14,37 @@
 
 .site-settings-field__label,
 .site-settings-info-item__label {
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    text-transform: none;
+}
+.site-settings-help {
+    display: flex;
+    align-items: center;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid
+        color-mix(in srgb, var(--color-text-secondary) 18%, transparent);
+    border-radius: 0.9rem;
+    background: color-mix(
+        in srgb,
+        var(--color-surface-secondary) 55%,
+        transparent
+    );
+    gap: 0.5rem;
+}
+
+.site-settings-help--warning {
+    border-color: color-mix(in srgb, var(--color-warning) 30%, transparent);
+    background: color-mix(in srgb, var(--color-warning) 10%, transparent);
+}
+
+.site-settings-help__icon {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    block-size: 1.25rem;
+    color: var(--color-text-secondary);
+    inline-size: 1.25rem;
 }
 
 .site-settings-field__controls {
@@ -94,7 +123,12 @@
 }
 
 .site-settings-duration__meta {
-    color: color-mix(in srgb, var(--color-text-secondary) 78%, transparent);
+    color: color-mix(
+        in srgb,
+        var(--color-text-primary) 80%,
+        var(--color-text-secondary)
+    );
+    font-weight: 500;
 }
 
 .site-settings-info-grid {

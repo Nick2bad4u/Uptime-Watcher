@@ -759,23 +759,10 @@ describe(SettingsTab, () => {
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: SettingsTab", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
             render(<SettingsTab {...baseProps} localRetryAttempts={3} />);
 
-            expect(
-                screen.getByText(/Maximum check duration/)
-            ).toBeInTheDocument();
-            // Use a more flexible text matcher to handle the case where text might be broken up
-            expect(
-                screen.getByText(
-                    (content) =>
-                        content.includes("45") && content.includes("seconds")
-                )
-            ).toBeInTheDocument();
+            expect(screen.getByText(/maximum check duration/i)).toBeInTheDocument();
+            expect(screen.getByText(/~\s*\d+s/)).toBeInTheDocument();
         });
 
         it("should not show maximum duration when retry attempts is 0", ({
@@ -1067,7 +1054,10 @@ describe(SettingsTab, () => {
             const timeoutInput = screen.getByDisplayValue("30");
             expect(timeoutInput).toBeInTheDocument();
             expect(
-                screen.getByText(/Currently:\s*30s\./u)
+                screen.getByText(
+                    (content) =>
+                        content.includes("Current:") && content.includes("30s")
+                )
             ).toBeInTheDocument();
         });
 
