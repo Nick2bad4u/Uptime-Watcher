@@ -175,7 +175,7 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
             jsonPath,
             maxPongDelayMs,
             maxReplicationLagSeconds,
-            maxResponseTime,
+            maxResponseTimeMs,
             monitorFieldsError,
             monitorType,
             name,
@@ -206,7 +206,7 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
             setJsonPath,
             setMaxPongDelayMs,
             setMaxReplicationLagSeconds,
-            setMaxResponseTime,
+            setMaxResponseTimeMs,
             setMonitorType,
             setName,
             setPort,
@@ -359,8 +359,8 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
                 maxReplicationLagSeconds: (value: number | string): void => {
                     setMaxReplicationLagSeconds(String(value));
                 },
-                maxResponseTime: (value: number | string): void => {
-                    setMaxResponseTime(String(value));
+                maxResponseTimeMs: (value: number | string): void => {
+                    setMaxResponseTimeMs(String(value));
                 },
                 port: (value: number | string): void => {
                     setPort(String(value));
@@ -399,7 +399,7 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
                 setJsonPath,
                 setMaxPongDelayMs,
                 setMaxReplicationLagSeconds,
-                setMaxResponseTime,
+                setMaxResponseTimeMs,
                 setPort,
                 setPrimaryStatusUrl,
                 setRecordType,
@@ -429,7 +429,7 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
                 jsonPath,
                 maxPongDelayMs,
                 maxReplicationLagSeconds,
-                maxResponseTime,
+                maxResponseTimeMs,
                 port,
                 primaryStatusUrl,
                 recordType,
@@ -455,7 +455,7 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
                 jsonPath,
                 maxPongDelayMs,
                 maxReplicationLagSeconds,
-                maxResponseTime,
+                maxResponseTimeMs,
                 port,
                 primaryStatusUrl,
                 recordType,
@@ -507,7 +507,7 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
                         logger,
                         maxPongDelayMs,
                         maxReplicationLagSeconds,
-                        maxResponseTime,
+                        maxResponseTimeMs,
                         monitorType,
                         name,
                         onSuccess: handleSuccess,
@@ -556,7 +556,7 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
                 jsonPath,
                 maxPongDelayMs,
                 maxReplicationLagSeconds,
-                maxResponseTime,
+                maxResponseTimeMs,
                 monitorType,
                 name,
                 port,

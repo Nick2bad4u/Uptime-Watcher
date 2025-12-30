@@ -280,7 +280,7 @@ interface FormStateReferences {
     setJsonPath: ReturnType<typeof vi.fn>;
     setMaxPongDelayMs: ReturnType<typeof vi.fn>;
     setMaxReplicationLagSeconds: ReturnType<typeof vi.fn>;
-    setMaxResponseTime: ReturnType<typeof vi.fn>;
+    setMaxResponseTimeMs: ReturnType<typeof vi.fn>;
     setMonitorType: ReturnType<typeof vi.fn>;
     setName: ReturnType<typeof vi.fn>;
     setPort: ReturnType<typeof vi.fn>;
@@ -323,7 +323,7 @@ const createFormState = (
         jsonPath: "",
         maxPongDelayMs: "",
         maxReplicationLagSeconds: "",
-        maxResponseTime: "",
+        maxResponseTimeMs: "",
         monitorType: "http",
         name: "My Site",
         port: "80",
@@ -353,7 +353,7 @@ const createFormState = (
         setJsonPath: defaultSetter(),
         setMaxPongDelayMs: defaultSetter(),
         setMaxReplicationLagSeconds: defaultSetter(),
-        setMaxResponseTime: defaultSetter(),
+        setMaxResponseTimeMs: defaultSetter(),
         setMonitorType: defaultSetter(),
         setName: defaultSetter(),
         setPort: defaultSetter(),

@@ -12,6 +12,7 @@
  * @see {@link IpcParameterValidator}
  */
 
+import { DEFAULT_MAX_BACKUP_SIZE_BYTES } from "@shared/constants/backup";
 import { hasAsciiControlCharacters } from "@shared/utils/stringSafety";
 import { isRecord } from "@shared/utils/typeHelpers";
 import { formatZodIssues } from "@shared/utils/zodIssueFormatting";
@@ -35,7 +36,6 @@ import {
 
 import type { IpcParameterValidator } from "./types";
 
-import { DEFAULT_MAX_BACKUP_SIZE_BYTES } from "../database/utils/backup/databaseBackup";
 import {
     getUtfByteLength,
     MAX_DIAGNOSTICS_METADATA_BYTES,

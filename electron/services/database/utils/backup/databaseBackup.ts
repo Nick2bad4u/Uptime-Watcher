@@ -1,3 +1,4 @@
+import { DEFAULT_MAX_BACKUP_SIZE_BYTES } from "@shared/constants/backup";
 import { ensureError } from "@shared/utils/errorHandling";
 import { app } from "electron";
 import { createHash } from "node:crypto";
@@ -8,7 +9,6 @@ import { logger } from "../../../../utils/logger";
 import { DATABASE_SCHEMA_VERSION } from "../schema/databaseSchema";
 
 export const DEFAULT_BACKUP_RETENTION_HINT_DAYS: number = 30;
-export const DEFAULT_MAX_BACKUP_SIZE_BYTES: number = 50 * 1024 * 1024;
 
 /**
  * Metadata describing a serialized SQLite backup artifact.

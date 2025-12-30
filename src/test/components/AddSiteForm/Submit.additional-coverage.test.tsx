@@ -206,7 +206,7 @@ describe("Submit.tsx - Additional Coverage Tests", () => {
             jsonPath: "",
             maxPongDelayMs: "",
             maxReplicationLagSeconds: "",
-            maxResponseTime: "",
+            maxResponseTimeMs: "",
             primaryStatusUrl: "",
             replicaStatusUrl: "",
             replicationTimestampField: "",

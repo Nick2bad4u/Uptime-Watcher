@@ -72,7 +72,7 @@ vi.mock("../../../components/SiteDetails/useAddSiteForm", () => ({
         setJsonPath: vi.fn(),
         setMaxPongDelayMs: vi.fn(),
         setMaxReplicationLagSeconds: vi.fn(),
-        setMaxResponseTime: vi.fn(),
+        setMaxResponseTimeMs: vi.fn(),
         setMonitorType: vi.fn(),
         setPort: vi.fn(),
         setPrimaryStatusUrl: vi.fn(),

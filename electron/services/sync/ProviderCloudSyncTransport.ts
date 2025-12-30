@@ -23,6 +23,8 @@ import type {
 } from "../cloud/providers/CloudStorageProvider.types";
 import type { CloudSyncTransport } from "./CloudSyncTransport.types";
 
+import { logger } from "../../utils/logger";
+import { CloudSyncCorruptRemoteObjectError } from "./cloudSyncTransportErrors";
 import {
     OPS_OBJECT_SUFFIX,
     parseOpsObjectFileNameMetadata,
@@ -103,6 +105,16 @@ function isProviderNotFoundError(error: unknown, key: string): boolean {
     }
 
     return false;
+}
+
+function isCloudSyncJsonValidationError(error: unknown): boolean {
+    const resolved = ensureError(error);
+    return resolved instanceof SyntaxError || resolved.name === "ZodError";
+}
+
+function isCloudSyncSizeLimitError(error: unknown): boolean {
+    const resolved = ensureError(error);
+    return resolved.message.includes("exceeds size limit");
 }
 
 function getSnapshotsPrefix(): string {
@@ -443,17 +455,26 @@ export class ProviderCloudSyncTransport implements CloudSyncTransport {
             // Treat an invalid/corrupt manifest as "missing" so sync can
             // recover by rebuilding remote state.
             if (
-                error instanceof SyntaxError ||
+                isCloudSyncJsonValidationError(error) ||
                 (error instanceof Error &&
-                    (error.name === "ZodError" ||
-                        error.message.includes(
-                            "Cloud sync manifest exceeds size limit"
-                        )))
+                    error.message.includes(
+                        "Cloud sync manifest exceeds size limit"
+                    ))
             ) {
+                const resolved = ensureError(error);
+                logger.warn(
+                    "[ProviderCloudSyncTransport] Remote manifest is invalid; treating as missing",
+                    {
+                        message: resolved.message,
+                        name: resolved.name,
+                    }
+                );
                 return null;
             }
 
-            throw error;
+            throw new Error("Failed to read cloud sync manifest", {
+                cause: error,
+            });
         }
     }
 
@@ -482,16 +503,37 @@ export class ProviderCloudSyncTransport implements CloudSyncTransport {
 
     public async readSnapshot(key: string): Promise<CloudSyncSnapshot> {
         assertSnapshotKey(key);
-        const buffer = await this.provider.downloadObject(key);
-        const maxBytes = getMaxSnapshotBytes();
-        if (buffer.byteLength > maxBytes) {
-            throw new Error(
-                `Cloud sync snapshot '${key}' exceeds size limit (${maxBytes} bytes)`
-            );
-        }
+        try {
+            const buffer = await this.provider.downloadObject(key);
+            const maxBytes = getMaxSnapshotBytes();
+            if (buffer.byteLength > maxBytes) {
+                throw new Error(
+                    `Cloud sync snapshot '${key}' exceeds size limit (${maxBytes} bytes)`
+                );
+            }
 
-        const raw = decodeUtf8(buffer);
-        return parseCloudSyncSnapshot(JSON.parse(raw));
+            const raw = decodeUtf8(buffer);
+            return parseCloudSyncSnapshot(JSON.parse(raw));
+        } catch (error) {
+            if (
+                isCloudSyncJsonValidationError(error) ||
+                isCloudSyncSizeLimitError(error)
+            ) {
+                const resolved = ensureError(error);
+                throw new CloudSyncCorruptRemoteObjectError(
+                    `Cloud sync snapshot '${key}' is corrupt or invalid: ${resolved.message}`,
+                    {
+                        cause: error,
+                        key,
+                        kind: "snapshot",
+                    }
+                );
+            }
+
+            throw new Error(`Failed to read cloud sync snapshot '${key}'`, {
+                cause: error,
+            });
+        }
     }
 
     public async writeManifest(manifest: CloudSyncManifest): Promise<void> {

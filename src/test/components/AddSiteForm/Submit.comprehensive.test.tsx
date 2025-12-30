@@ -201,7 +201,7 @@ describe("Submit.tsx - Comprehensive Coverage", () => {
             jsonPath: "",
             maxPongDelayMs: "",
             maxReplicationLagSeconds: "",
-            maxResponseTime: "",
+            maxResponseTimeMs: "",
             monitorType: "http",
             name: generatedName,
             port: "80",
@@ -839,7 +839,7 @@ describe("Submit.tsx - Comprehensive Coverage", () => {
             {
                 monitorType: "http-latency" as const,
                 overrides: {
-                    maxResponseTime: " 2500 ",
+                    maxResponseTimeMs: " 2500 ",
                     url: "https://latency.example.com",
                 },
                 expectation: {

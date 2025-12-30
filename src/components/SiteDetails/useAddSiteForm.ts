@@ -105,8 +105,8 @@ export interface AddSiteFormActions {
     setMaxPongDelayMs: (value: string) => void;
     /** Set max replication lag */
     setMaxReplicationLagSeconds: (value: string) => void;
-    /** Set latency max response time */
-    setMaxResponseTime: (value: string) => void;
+    /** Set latency maximum response time (milliseconds) */
+    setMaxResponseTimeMs: (value: string) => void;
     /** Set monitor type */
     setMonitorType: (value: MonitorType) => void;
     /** Set site name field value */
@@ -180,8 +180,8 @@ export interface AddSiteFormState {
     maxPongDelayMs: string;
     /** Maximum replication lag in seconds */
     maxReplicationLagSeconds: string;
-    /** Maximum response time for latency monitors */
-    maxResponseTime: string;
+    /** Maximum response time (milliseconds) for latency monitors */
+    maxResponseTimeMs: string;
     /** Selected monitor type */
     monitorType: MonitorType;
     /** Display name for the site */
@@ -247,6 +247,14 @@ interface MonitorFieldValues {
     jsonPath: string;
     maxPongDelayMs: string;
     maxReplicationLagSeconds: string;
+    /**
+     * Monitor-type field key (milliseconds).
+     *
+     * @remarks
+     * The monitor registry and dynamic validation use `maxResponseTime` as the
+     * canonical field name. The UI state uses `maxResponseTimeMs` for unit
+     * clarity and maps it into this key.
+     */
     maxResponseTime: string;
     port: string;
     primaryStatusUrl: string;
@@ -277,7 +285,7 @@ const resetFieldsForMonitorType = (
         setJsonPath: (value: string) => void;
         setMaxPongDelayMs: (value: string) => void;
         setMaxReplicationLagSeconds: (value: string) => void;
-        setMaxResponseTime: (value: string) => void;
+        setMaxResponseTimeMs: (value: string) => void;
         setPort: (value: string) => void;
         setPrimaryStatusUrl: (value: string) => void;
         setRecordType: (value: string) => void;
@@ -379,7 +387,7 @@ const resetFieldsForMonitorType = (
         {
             defaultValue: "2000",
             name: "maxResponseTime",
-            setter: setters.setMaxResponseTime,
+            setter: setters.setMaxResponseTimeMs,
             value: currentValues.maxResponseTime,
         },
         {
@@ -558,7 +566,7 @@ export function useAddSiteForm(): UseAddSiteFormReturnWithMonitorFields {
     const [expectedJsonValue, setExpectedJsonValue] = useState("");
     const [headerName, setHeaderName] = useState("");
     const [jsonPath, setJsonPath] = useState("");
-    const [maxResponseTime, setMaxResponseTime] = useState("2000");
+    const [maxResponseTimeMs, setMaxResponseTimeMs] = useState("2000");
     const [maxPongDelayMs, setMaxPongDelayMs] = useState("1500");
     const [maxReplicationLagSeconds, setMaxReplicationLagSeconds] =
         useState("10");
@@ -610,7 +618,7 @@ export function useAddSiteForm(): UseAddSiteFormReturnWithMonitorFields {
             jsonPath,
             maxPongDelayMs,
             maxReplicationLagSeconds,
-            maxResponseTime,
+            maxResponseTime: maxResponseTimeMs,
             port,
             primaryStatusUrl,
             recordType,
@@ -636,7 +644,7 @@ export function useAddSiteForm(): UseAddSiteFormReturnWithMonitorFields {
             jsonPath,
             maxPongDelayMs,
             maxReplicationLagSeconds,
-            maxResponseTime,
+            maxResponseTimeMs,
             port,
             primaryStatusUrl,
             recordType,
@@ -685,7 +693,7 @@ export function useAddSiteForm(): UseAddSiteFormReturnWithMonitorFields {
                 setJsonPath,
                 setMaxPongDelayMs,
                 setMaxReplicationLagSeconds,
-                setMaxResponseTime,
+                setMaxResponseTimeMs,
                 setPort,
                 setPrimaryStatusUrl,
                 setRecordType,
@@ -715,7 +723,7 @@ export function useAddSiteForm(): UseAddSiteFormReturnWithMonitorFields {
             setJsonPath,
             setMaxPongDelayMs,
             setMaxReplicationLagSeconds,
-            setMaxResponseTime,
+            setMaxResponseTimeMs,
             setPort,
             setPrimaryStatusUrl,
             setRecordType,
@@ -776,7 +784,7 @@ export function useAddSiteForm(): UseAddSiteFormReturnWithMonitorFields {
         setJsonPath("");
         setMaxPongDelayMs("1500");
         setMaxReplicationLagSeconds("10");
-        setMaxResponseTime("2000");
+        setMaxResponseTimeMs("2000");
         setCertificateWarningDays("30");
         setPrimaryStatusUrl("");
         setReplicaStatusUrl("");
@@ -813,7 +821,7 @@ export function useAddSiteForm(): UseAddSiteFormReturnWithMonitorFields {
         setJsonPath,
         setMaxPongDelayMs,
         setMaxReplicationLagSeconds,
-        setMaxResponseTime,
+        setMaxResponseTimeMs,
         setMonitorType,
         setPort,
         setPrimaryStatusUrl,
@@ -848,7 +856,7 @@ export function useAddSiteForm(): UseAddSiteFormReturnWithMonitorFields {
         jsonPath,
         maxPongDelayMs,
         maxReplicationLagSeconds,
-        maxResponseTime,
+        maxResponseTimeMs,
         monitorFieldsError,
         monitorFieldsLoaded,
         monitorType,
@@ -880,7 +888,7 @@ export function useAddSiteForm(): UseAddSiteFormReturnWithMonitorFields {
         setJsonPath,
         setMaxPongDelayMs,
         setMaxReplicationLagSeconds,
-        setMaxResponseTime,
+        setMaxResponseTimeMs,
         setMonitorType,
         setName: setSanitizedName,
         setPort,

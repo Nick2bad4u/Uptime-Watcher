@@ -111,7 +111,7 @@ interface MonitorValidationFields {
     jsonPath: string;
     maxPongDelayMs: string;
     maxReplicationLagSeconds: string;
-    maxResponseTime: string;
+    maxResponseTimeMs: string;
     port: string;
     primaryStatusUrl: string;
     recordType: string;
@@ -180,8 +180,8 @@ const monitorValidationBuilders: MonitorValidationBuilderMap = {
         bodyKeyword: toOptionalString(bodyKeyword),
         url: toOptionalString(url),
     }),
-    "http-latency": ({ maxResponseTime, url }): UnknownRecord => ({
-        maxResponseTime: parseOptionalInteger(maxResponseTime),
+    "http-latency": ({ maxResponseTimeMs, url }): UnknownRecord => ({
+        maxResponseTime: parseOptionalInteger(maxResponseTimeMs),
         url: toOptionalString(url),
     }),
     "http-status": ({ expectedStatusCode, url }): UnknownRecord => ({
@@ -300,7 +300,7 @@ const buildMonitorFormData = (
         maxReplicationLagSeconds: parseOptionalInteger(
             properties.maxReplicationLagSeconds
         ),
-        maxResponseTime: parseOptionalInteger(properties.maxResponseTime),
+        maxResponseTime: parseOptionalInteger(properties.maxResponseTimeMs),
         port: parseOptionalInteger(properties.port),
         primaryStatusUrl: toOptionalString(properties.primaryStatusUrl),
         recordType: trimmedRecordType || undefined,
@@ -547,7 +547,7 @@ export async function handleSubmit(
         logger,
         maxPongDelayMs,
         maxReplicationLagSeconds,
-        maxResponseTime,
+        maxResponseTimeMs,
         monitorType,
         name,
         onSuccess,
@@ -580,7 +580,7 @@ export async function handleSubmit(
             jsonPath,
             maxPongDelayMs,
             maxReplicationLagSeconds,
-            maxResponseTime,
+            maxResponseTimeMs,
             port,
             primaryStatusUrl,
             recordType,
@@ -615,7 +615,7 @@ export async function handleSubmit(
         hasMaxReplicationLagSeconds: Boolean(
             safeTrim(maxReplicationLagSeconds)
         ),
-        hasMaxResponseTime: Boolean(safeTrim(maxResponseTime)),
+        hasMaxResponseTime: Boolean(safeTrim(maxResponseTimeMs)),
         hasName: Boolean(safeTrim(name)),
         hasPort: Boolean(safeTrim(port)),
         hasPrimaryStatusUrl: Boolean(safeTrim(primaryStatusUrl)),
@@ -681,7 +681,7 @@ export async function handleSubmit(
                 headerName: truncateForLogging(headerName),
                 host: truncateForLogging(host),
                 jsonPath: truncateForLogging(jsonPath),
-                maxResponseTime: truncateForLogging(maxResponseTime),
+                maxResponseTimeMs: truncateForLogging(maxResponseTimeMs),
                 monitorType,
                 name: truncateForLogging(name),
                 port,
