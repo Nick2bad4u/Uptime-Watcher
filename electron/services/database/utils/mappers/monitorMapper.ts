@@ -20,14 +20,14 @@ import {
     safeInteger,
 } from "@shared/validation/validatorUtils";
 
-import type { DbValue } from "./valueConverters";
+import type { DbValue } from "../converters/valueConverters";
 
-import { logger } from "../../../utils/logger";
+import { logger } from "../../../../utils/logger";
 import {
     generateSqlParameters,
     mapMonitorToRow,
     mapRowToMonitor,
-} from "./dynamicSchema";
+} from "../schema/dynamicSchema";
 
 /**
  * Copies dynamic fields to monitor object.

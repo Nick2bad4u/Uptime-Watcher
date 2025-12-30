@@ -63,7 +63,7 @@ vi.mock("electron", () => ({
     },
 }));
 
-vi.mock("../../../services/database/utils/databaseBackup", () => ({
+vi.mock("../../../services/database/utils/backup/databaseBackup", () => ({
     createDatabaseBackup: vi.fn(),
     validateDatabaseBackupPayload: vi.fn(),
     DEFAULT_BACKUP_RETENTION_HINT_DAYS: 30,
@@ -95,8 +95,8 @@ import { app } from "electron";
 import {
     createDatabaseBackup,
     validateDatabaseBackupPayload,
-} from "../../../services/database/utils/databaseBackup";
-import type { DatabaseBackupResult } from "../../../services/database/utils/databaseBackup";
+} from "../../../services/database/utils/backup/databaseBackup";
+import type { DatabaseBackupResult } from "../../../services/database/utils/backup/databaseBackup";
 
 // Test utilities and mocks
 const createMockEventEmitter = () => ({

@@ -183,7 +183,7 @@ describe("Submit.tsx - Additional Coverage Tests", () => {
             addMode: "new",
             baselineUrl: generatedUrl,
             bodyKeyword: "",
-            checkInterval: 300_000,
+            checkIntervalMs: 300_000,
             expectedValue: "",
             formError: undefined,
             host: deriveHost(generatedUrl),

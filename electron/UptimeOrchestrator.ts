@@ -106,7 +106,7 @@ import type {
     DatabaseBackupResult,
     DatabaseRestorePayload,
     DatabaseRestoreSummary,
-} from "./services/database/utils/databaseBackup";
+} from "./services/database/utils/backup/databaseBackup";
 import type {
     IsMonitoringActiveRequestData,
     OrchestratorEvents,

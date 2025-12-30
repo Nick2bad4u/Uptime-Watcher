@@ -159,7 +159,7 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
             baselineUrl,
             bodyKeyword,
             certificateWarningDays,
-            checkInterval,
+            checkIntervalMs,
             edgeLocations,
             expectedHeaderValue,
             expectedJsonValue,
@@ -190,7 +190,7 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
             setBaselineUrl,
             setBodyKeyword,
             setCertificateWarningDays,
-            setCheckInterval,
+            setCheckIntervalMs,
             setEdgeLocations,
             setExpectedHeaderValue,
             setExpectedJsonValue,
@@ -288,10 +288,10 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
                 if (Number.isNaN(numericValue)) {
                     logger.error(`Invalid check interval value: ${value}`);
                 } else {
-                    setCheckInterval(numericValue);
+                    setCheckIntervalMs(numericValue);
                 }
             },
-            [setCheckInterval]
+            [setCheckIntervalMs]
         );
 
         // Combined success callback that resets form and calls prop callback
@@ -486,7 +486,7 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
                         baselineUrl,
                         bodyKeyword,
                         certificateWarningDays,
-                        checkInterval,
+                        checkIntervalMs,
                         clearError,
                         createSite,
                         dynamicFieldValues,
@@ -536,7 +536,7 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
                 baselineUrl,
                 bodyKeyword,
                 certificateWarningDays,
-                checkInterval,
+                checkIntervalMs,
                 clearError,
                 createSite,
                 dynamicFieldValues,
@@ -819,7 +819,7 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
                                 label="Check Interval"
                                 onChange={handleCheckIntervalChange}
                                 options={checkIntervalOptions}
-                                value={String(checkInterval)}
+                                value={String(checkIntervalMs)}
                             />
                         </div>
                     </section>

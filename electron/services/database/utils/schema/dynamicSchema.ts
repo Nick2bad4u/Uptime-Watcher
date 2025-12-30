@@ -16,8 +16,8 @@ import type { Simplify, UnknownRecord } from "type-fest";
 import { safeStringify } from "@shared/utils/stringConversion";
 import { isValidIdentifierArray } from "@shared/validation/validatorUtils";
 
-import { dbLogger } from "../../../utils/logger";
-import { getAllMonitorTypeConfigs } from "../../monitoring/MonitorTypeRegistry";
+import { dbLogger } from "../../../../utils/logger";
+import { getAllMonitorTypeConfigs } from "../../../monitoring/MonitorTypeRegistry";
 
 /**
  * Field mapping configuration for transforming monitor fields to database

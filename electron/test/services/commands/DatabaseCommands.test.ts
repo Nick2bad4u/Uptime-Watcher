@@ -12,7 +12,7 @@ import type { Site } from "@shared/types";
 import type { StandardizedCache } from "../../../utils/cache/StandardizedCache";
 import type { DatabaseServiceFactory } from "../../../services/factories/DatabaseServiceFactory";
 import type { ConfigurationManager } from "../../../managers/ConfigurationManager";
-import type { DatabaseRestorePayload } from "../../../services/database/utils/databaseBackup";
+import type { DatabaseRestorePayload } from "../../../services/database/utils/backup/databaseBackup";
 import { logger as backendLogger } from "../../../utils/logger";
 
 import {

@@ -16,11 +16,11 @@ import * as path from "node:path";
 
 import { DB_FILE_NAME } from "../../constants";
 import { logger } from "../../utils/logger";
-import { cleanupDatabaseLockArtifacts } from "./utils/databaseLockRecovery";
+import { cleanupDatabaseLockArtifacts } from "./utils/maintenance/databaseLockRecovery";
 import {
     createDatabaseSchema,
     synchronizeDatabaseSchemaVersion,
-} from "./utils/databaseSchema";
+} from "./utils/schema/databaseSchema";
 
 /**
  * Common SQL queries for database service operations.

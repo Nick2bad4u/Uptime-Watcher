@@ -54,29 +54,29 @@ import type { Database } from "node-sqlite3-wasm";
 import type { UnknownRecord } from "type-fest";
 
 import type { DatabaseService } from "./DatabaseService";
-import type { DbValue } from "./utils/valueConverters";
+import type { DbValue } from "./utils/converters/valueConverters";
 
 import { isDev } from "../../electronUtils";
 import { logger } from "../../utils/logger";
 import { withDatabaseOperation } from "../../utils/operationalHooks";
-import { generateSqlParameters, mapMonitorToRow } from "./utils/dynamicSchema";
-import {
-    assertValidMonitorId,
-    assertValidSiteIdentifier,
-    isValidMonitorId,
-    isValidSiteIdentifier,
-} from "./utils/identifierValidation";
 import {
     buildMonitorParameters,
     rowsToMonitors,
     rowToMonitorOrUndefined,
-} from "./utils/monitorMapper";
+} from "./utils/mappers/monitorMapper";
 import {
     insertWithReturning,
     queryForIds,
     queryMonitorRow,
     queryMonitorRows,
-} from "./utils/typedQueries";
+} from "./utils/queries/typedQueries";
+import { generateSqlParameters, mapMonitorToRow } from "./utils/schema/dynamicSchema";
+import {
+    assertValidMonitorId,
+    assertValidSiteIdentifier,
+    isValidMonitorId,
+    isValidSiteIdentifier,
+} from "./utils/validation/identifierValidation";
 
 /**
  * Repository dependencies for managing monitor data persistence.

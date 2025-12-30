@@ -8,7 +8,7 @@ import {
     createDatabaseIndexes,
     setupMonitorTypeValidation,
     createDatabaseSchema,
-} from "../../services/database/utils/databaseSchema";
+} from "../../services/database/utils/schema/databaseSchema";
 
 // Mock dependencies
 vi.mock("../../utils/logger", () => ({
@@ -40,7 +40,7 @@ vi.mock("../../monitoring/MonitorTypeRegistry", () => ({
     ]),
 }));
 
-vi.mock("../../services/database/utils/dynamicSchema", () => ({
+vi.mock("../../services/database/utils/schema/dynamicSchema", () => ({
     generateMonitorTableSchema: vi.fn(
         () => `
         CREATE TABLE IF NOT EXISTS monitors (

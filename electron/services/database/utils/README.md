@@ -35,3 +35,13 @@ Examples of cross-cutting utilities:
 - Keep these helpers **internal** to the database layer. Avoid importing them
   directly from IPC handlers or higher-level services unless there is a strong
   reason.
+
+## Current folder structure
+
+- `backup/` — database export/backup metadata and validation helpers
+- `converters/` — low-level DB value conversion utilities
+- `maintenance/` — lock recovery, pruning, and other maintenance routines
+- `mappers/` — row ↔ domain mapping helpers (e.g., `SiteRow` → `Site`)
+- `queries/` — typed query helpers and query builders
+- `schema/` — schema creation + dynamic monitor schema generation
+- `validation/` — repository boundary validation (identifier checks, etc.)

@@ -147,7 +147,7 @@ const createMockFormState = (
         addMode: "new" as const,
         bodyKeyword: "",
         certificateWarningDays: "30",
-        checkInterval: 60_000,
+        checkIntervalMs: 60_000,
         expectedHeaderValue: "",
         expectedJsonValue: "",
         expectedStatusCode: "200",
@@ -170,7 +170,7 @@ const createMockFormState = (
         setAddMode: vi.fn(),
         setBodyKeyword: vi.fn(),
         setCertificateWarningDays: vi.fn(),
-        setCheckInterval: vi.fn(),
+        setCheckIntervalMs: vi.fn(),
         setExpectedHeaderValue: vi.fn(),
         setExpectedJsonValue: vi.fn(),
         setExpectedStatusCode: vi.fn(),
@@ -663,7 +663,7 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
                 createMockFormState({
                     name: populatedName,
                     url: populatedUrl,
-                    checkInterval: 300_000, // 5 minutes in milliseconds
+                    checkIntervalMs: 300_000, // 5 minutes in milliseconds
                 })
             );
 
@@ -887,10 +887,10 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
-            const setCheckInterval = vi.fn();
+            const setCheckIntervalMs = vi.fn();
             mockUseAddSiteForm.mockReturnValue(
                 createMockFormState({
-                    setCheckInterval,
+                    setCheckIntervalMs,
                 })
             );
 
@@ -899,7 +899,7 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
                 name: /check interval/i,
             });
             await user.selectOptions(intervalInput, "300000"); // Milliseconds
-            expect(setCheckInterval).toHaveBeenCalled();
+            expect(setCheckIntervalMs).toHaveBeenCalled();
         });
 
         it("should handle timeout value changes", async ({
@@ -1225,7 +1225,7 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
                 name: validSiteName,
                 url: validUrl,
                 monitorType: "http",
-                checkInterval: 60_000,
+                checkIntervalMs: 60_000,
             });
 
             // Mock the isFormValid function to return true for valid form

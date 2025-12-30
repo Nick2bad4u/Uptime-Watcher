@@ -17,7 +17,7 @@
 
 import { describe, expect, it, vi, afterEach } from "vitest";
 import { fc } from "@fast-check/vitest";
-import { createDatabaseTables } from "../../../../services/database/utils/databaseSchema";
+import { createDatabaseTables } from "../../../../services/database/utils/schema/databaseSchema";
 
 describe("Database Schema", () => {
     const mockDatabase = {

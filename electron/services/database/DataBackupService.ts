@@ -23,7 +23,7 @@ import {
     type DatabaseRestoreResult,
     DEFAULT_BACKUP_RETENTION_HINT_DAYS,
     validateDatabaseBackupPayload,
-} from "./utils/databaseBackup";
+} from "./utils/backup/databaseBackup";
 
 const RESTORE_TEMP_PREFIX = "uptime-watcher-restore-";
 const ROLLBACK_TEMP_PREFIX = "uptime-watcher-rollback-";

@@ -15,7 +15,7 @@ import { describe, expect, it, vi } from "vitest";
 import {
     createDatabaseSchema,
     synchronizeDatabaseSchemaVersion,
-} from "../../../../services/database/utils/databaseSchema";
+} from "../../../../services/database/utils/schema/databaseSchema";
 
 describe("databaseSchema integration (node-sqlite3-wasm)", () => {
     it("creates schema and commits cleanly on a fresh database", async ({

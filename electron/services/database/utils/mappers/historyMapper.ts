@@ -17,7 +17,7 @@ import type { HistoryRow as DatabaseHistoryRow } from "@shared/types/database";
 import { ensureError } from "@shared/utils/errorHandling";
 import { LOG_TEMPLATES } from "@shared/utils/logTemplates";
 
-import { logger } from "../../../utils/logger";
+import { logger } from "../../../../utils/logger";
 
 /**
  * Represents a single row in the monitor history database table.

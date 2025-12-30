@@ -13,7 +13,7 @@ import { ensureError } from "@shared/utils/errorHandling";
 import { LOG_TEMPLATES } from "@shared/utils/logTemplates";
 import { safeStringify } from "@shared/utils/stringConversion";
 
-import { logger } from "../../../utils/logger";
+import { logger } from "../../../../utils/logger";
 
 /**
  * Site type for basic operations (without monitors).

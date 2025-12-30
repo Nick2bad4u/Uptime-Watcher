@@ -6,9 +6,9 @@ import {
     LOG_TEMPLATES,
 } from "@shared/utils/logTemplates";
 
-import { isDev } from "../../../electronUtils";
-import { logger } from "../../../utils/logger";
-import { queryForIds } from "./typedQueries";
+import { isDev } from "../../../../electronUtils";
+import { logger } from "../../../../utils/logger";
+import { queryForIds } from "../queries/typedQueries";
 
 /**
  * Utility functions for manipulating monitor history data in the database.

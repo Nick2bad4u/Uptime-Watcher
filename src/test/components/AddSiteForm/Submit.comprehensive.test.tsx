@@ -185,7 +185,7 @@ describe("Submit.tsx - Comprehensive Coverage", () => {
             baselineUrl: generatedUrl,
             bodyKeyword: "",
             certificateWarningDays: "30",
-            checkInterval: 300_000,
+            checkIntervalMs: 300_000,
             edgeLocations: "",
             expectedHeaderValue: "",
             expectedJsonValue: "",
@@ -449,7 +449,7 @@ describe("Submit.tsx - Comprehensive Coverage", () => {
                     siteName: nonBlankSiteNameArbitrary,
                     url: fc.webUrl(),
                     monitorType: fc.constantFrom("http", "port", "ping", "dns"),
-                    checkInterval: fc.constantFrom(
+                    checkIntervalMs: fc.constantFrom(
                         30_000,
                         60_000,
                         300_000,
@@ -466,7 +466,7 @@ describe("Submit.tsx - Comprehensive Coverage", () => {
                     name: formData.siteName,
                     url: formData.url,
                     monitorType: formData.monitorType,
-                    checkInterval: formData.checkInterval,
+                    checkIntervalMs: formData.checkIntervalMs,
                 });
 
                 // Mock successful validation
@@ -500,7 +500,7 @@ describe("Submit.tsx - Comprehensive Coverage", () => {
                     60_000,
                     300_000,
                     600_000,
-                ]).toContain(formData.checkInterval);
+                ]).toContain(formData.checkIntervalMs);
             },
             propertyTimeoutMs
         );

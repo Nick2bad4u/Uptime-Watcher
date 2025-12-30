@@ -35,7 +35,7 @@ const buildAddSiteFormState = (
         baselineUrl: "",
         bodyKeyword: "",
         certificateWarningDays: "30",
-        checkInterval: 60_000,
+        checkIntervalMs: 60_000,
         edgeLocations: "",
         expectedHeaderValue: "",
         expectedJsonValue: "",
@@ -66,7 +66,7 @@ const buildAddSiteFormState = (
         setBaselineUrl: vi.fn(),
         setBodyKeyword: vi.fn(),
         setCertificateWarningDays: vi.fn(),
-        setCheckInterval: vi.fn(),
+        setCheckIntervalMs: vi.fn(),
         setEdgeLocations: vi.fn(),
         setExpectedHeaderValue: vi.fn(),
         setExpectedJsonValue: vi.fn(),
@@ -668,10 +668,10 @@ describe("100% Coverage Edge Cases", () => {
 
         it("should handle check interval validation", () => {
             const mockUseAddSiteForm = vi.mocked(useAddSiteForm); // Updated: Removed require() and used direct import
-            const setCheckInterval = vi.fn();
+            const setCheckIntervalMs = vi.fn();
             mockUseAddSiteForm.mockReturnValue(
                 buildAddSiteFormState({
-                    setCheckInterval,
+                    setCheckIntervalMs,
                 })
             );
 
@@ -680,7 +680,7 @@ describe("100% Coverage Edge Cases", () => {
 
             // Test valid number
             fireEvent.change(select, { target: { value: "300000" } });
-            expect(setCheckInterval).toHaveBeenCalledWith(300_000);
+            expect(setCheckIntervalMs).toHaveBeenCalledWith(300_000);
 
             // Test invalid number - just verify the component handles it
             fireEvent.change(select, { target: { value: "invalid" } });

@@ -211,7 +211,7 @@ describe("AddSiteForm Comprehensive Tests", () => {
             resetForm: vi.fn(),
             setAddMode: vi.fn(),
             setBodyKeyword: vi.fn(),
-            setCheckInterval: vi.fn(),
+            setCheckIntervalMs: vi.fn(),
             setCertificateWarningDays: vi.fn(),
             setExpectedHeaderValue: vi.fn(),
             setExpectedJsonValue: vi.fn(),
@@ -236,7 +236,7 @@ describe("AddSiteForm Comprehensive Tests", () => {
             addMode: "new",
             bodyKeyword: "",
             certificateWarningDays: "30",
-            checkInterval: 60_000,
+            checkIntervalMs: 60_000,
             expectedHeaderValue: "",
             expectedJsonValue: "",
             expectedStatusCode: "200",
@@ -475,7 +475,7 @@ describe("AddSiteForm Comprehensive Tests", () => {
             expect(mockFormHook.setMonitorType).toHaveBeenCalledWith("port");
         });
 
-        it("calls setCheckInterval when check interval changes", async ({
+        it("calls setCheckIntervalMs when check interval changes", async ({
             task,
             annotate,
         }) => {
@@ -498,7 +498,7 @@ describe("AddSiteForm Comprehensive Tests", () => {
             });
             await user.selectOptions(checkIntervalSelect, "300000");
 
-            expect(mockFormHook.setCheckInterval).toHaveBeenCalledWith(300_000);
+            expect(mockFormHook.setCheckIntervalMs).toHaveBeenCalledWith(300_000);
         });
     });
 

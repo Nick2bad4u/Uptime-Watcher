@@ -6,8 +6,8 @@ import {
     LOG_TEMPLATES,
 } from "@shared/utils/logTemplates";
 
-import { logger } from "../../../utils/logger";
-import { rowToHistoryEntry } from "./historyMapper";
+import { logger } from "../../../../utils/logger";
+import { rowToHistoryEntry } from "../mappers/historyMapper";
 import {
     queryForCount,
     queryHistoryRow,

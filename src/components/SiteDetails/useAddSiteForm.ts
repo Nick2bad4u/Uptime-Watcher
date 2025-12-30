@@ -73,8 +73,8 @@ export interface AddSiteFormActions {
     setBodyKeyword: (value: string) => void;
     /** Set SSL certificate warning days */
     setCertificateWarningDays: (value: string) => void;
-    /** Set check interval */
-    setCheckInterval: (value: number) => void;
+    /** Set check interval (milliseconds) */
+    setCheckIntervalMs: (value: number) => void;
     /** Set CDN edge endpoint list */
     setEdgeLocations: (value: string) => void;
     /** Set expected header value */
@@ -149,7 +149,7 @@ export interface AddSiteFormState {
     /** SSL certificate warning days */
     certificateWarningDays: string;
     /** Check interval in milliseconds */
-    checkInterval: number;
+    checkIntervalMs: number;
     /** Edge endpoint list for CDN edge consistency monitors */
     edgeLocations: string;
     /** Expected HTTP header value for header monitors */
@@ -577,7 +577,9 @@ export function useAddSiteForm(): UseAddSiteFormReturnWithMonitorFields {
         useState("60");
     const [name, setName] = useState("");
     const [monitorType, setMonitorType] = useState<MonitorType>("http");
-    const [checkInterval, setCheckInterval] = useState(DEFAULT_CHECK_INTERVAL);
+    const [checkIntervalMs, setCheckIntervalMs] = useState(
+        DEFAULT_CHECK_INTERVAL
+    );
     const [siteIdentifier, setSiteIdentifier] = useState<string>(() =>
         generateUuid()
     ); // Lazy initialization
@@ -785,7 +787,7 @@ export function useAddSiteForm(): UseAddSiteFormReturnWithMonitorFields {
         setHeartbeatMaxDriftSeconds("60");
         setSanitizedName("");
         setMonitorType("http");
-        setCheckInterval(DEFAULT_CHECK_INTERVAL);
+        setCheckIntervalMs(DEFAULT_CHECK_INTERVAL);
         setSiteIdentifier(generateUuid());
         setAddMode("new");
         setSelectedExistingSite("");
@@ -795,7 +797,7 @@ export function useAddSiteForm(): UseAddSiteFormReturnWithMonitorFields {
         setBaselineUrl,
         setBodyKeyword,
         setCertificateWarningDays,
-        setCheckInterval,
+        setCheckIntervalMs,
         setEdgeLocations,
         setExpectedHeaderValue,
         setExpectedJsonValue,
@@ -829,7 +831,7 @@ export function useAddSiteForm(): UseAddSiteFormReturnWithMonitorFields {
         baselineUrl,
         bodyKeyword,
         certificateWarningDays,
-        checkInterval,
+        checkIntervalMs,
         edgeLocations,
         expectedHeaderValue,
         expectedJsonValue,
@@ -862,7 +864,7 @@ export function useAddSiteForm(): UseAddSiteFormReturnWithMonitorFields {
         setBaselineUrl,
         setBodyKeyword,
         setCertificateWarningDays,
-        setCheckInterval,
+        setCheckIntervalMs,
         setEdgeLocations,
         setExpectedHeaderValue,
         setExpectedJsonValue,

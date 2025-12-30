@@ -27,11 +27,11 @@ import {
     type MockedFunction,
 } from "vitest";
 import fc from "fast-check";
-import type { SiteRow } from "../../services/database/utils/siteMapper";
+import type { SiteRow } from "../../services/database/utils/mappers/siteMapper";
 import {
     isValidMonitorId,
     isValidSiteIdentifier,
-} from "../../services/database/utils/identifierValidation";
+} from "../../services/database/utils/validation/identifierValidation";
 import { HistoryRepository } from "../../services/database/HistoryRepository";
 import { MonitorRepository } from "../../services/database/MonitorRepository";
 import { SiteRepository } from "../../services/database/SiteRepository";

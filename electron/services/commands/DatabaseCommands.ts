@@ -28,7 +28,7 @@ import type {
     DatabaseBackupResult,
     DatabaseRestorePayload,
     DatabaseRestoreSummary,
-} from "../database/utils/databaseBackup";
+} from "../database/utils/backup/databaseBackup";
 import type { DatabaseServiceFactory } from "../factories/DatabaseServiceFactory";
 
 import { logger as backendLogger } from "../../utils/logger";

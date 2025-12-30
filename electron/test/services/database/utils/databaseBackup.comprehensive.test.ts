@@ -17,7 +17,7 @@ vi.mock("../../../../../electron/utils/logger", () => ({
 import {
     createDatabaseBackup,
     type DatabaseBackupResult,
-} from "../../../../../electron/services/database/utils/databaseBackup";
+} from "../../../../../electron/services/database/utils/backup/databaseBackup";
 import { BACKUP_DB_FILE_NAME } from "../../../../../electron/constants";
 import { logger } from "../../../../../electron/utils/logger";
 import { promises as fs } from "node:fs";

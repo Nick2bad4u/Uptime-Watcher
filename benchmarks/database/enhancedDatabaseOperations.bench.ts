@@ -6,7 +6,7 @@ import { HistoryRepository } from "../../electron/services/database/HistoryRepos
 import { MonitorRepository } from "../../electron/services/database/MonitorRepository";
 import { SiteRepository } from "../../electron/services/database/SiteRepository";
 import type { Monitor, Site, StatusHistory } from "../../shared/types";
-import type { SiteRow } from "../../electron/services/database/utils/siteMapper";
+import type { SiteRow } from "../../electron/services/database/utils/mappers/siteMapper";
 
 import { bench, describe, beforeAll, afterAll } from "vitest";
 

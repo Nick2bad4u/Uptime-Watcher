@@ -34,7 +34,7 @@ import { DEFAULT_CHECK_INTERVAL } from "../../../constants";
 // Mock state for the form
 let mockState = {
     addMode: "new" as "new" | "existing",
-    checkInterval: DEFAULT_CHECK_INTERVAL,
+    checkIntervalMs: DEFAULT_CHECK_INTERVAL,
     formError: undefined as string | undefined,
     host: "",
     monitorType: "http" as MonitorType,
@@ -58,8 +58,8 @@ const mockSetUrl = vi.fn((value: string) => {
 const mockSetMonitorType = vi.fn((value: MonitorType) => {
     mockState.monitorType = value;
 });
-const mockSetCheckInterval = vi.fn((value: number) => {
-    mockState.checkInterval = value;
+const mockSetCheckIntervalMs = vi.fn((value: number) => {
+    mockState.checkIntervalMs = value;
 });
 const mockSetHost = vi.fn((value: string) => {
     mockState.host = value;
@@ -70,7 +70,7 @@ const mockSetPort = vi.fn((value: string) => {
 const mockResetForm = vi.fn(() => {
     mockState = {
         addMode: "new",
-        checkInterval: DEFAULT_CHECK_INTERVAL,
+        checkIntervalMs: DEFAULT_CHECK_INTERVAL,
         formError: undefined,
         host: "",
         monitorType: "http",
@@ -100,7 +100,7 @@ const mockUseAddSiteForm = vi.fn(() => ({
     isFormValid: mockIsFormValid,
     resetForm: mockResetForm,
     setAddMode: mockSetAddMode,
-    setCheckInterval: mockSetCheckInterval,
+    setCheckIntervalMs: mockSetCheckIntervalMs,
     setFormError: mockSetFormError,
     setHost: mockSetHost,
     setMonitorType: mockSetMonitorType,
@@ -212,7 +212,7 @@ vi.mock("../../../components/AddSiteForm/SelectField", () => ({
             if (id === "monitorType") {
                 mockSetMonitorType(newValue);
             } else if (id === "checkInterval") {
-                mockSetCheckInterval(Number(newValue));
+                mockSetCheckIntervalMs(Number(newValue));
             }
 
             if (onChange) {
@@ -459,7 +459,7 @@ describe("AddSiteForm User Input Fuzzing", () => {
         // Reset mock state to default
         mockState = {
             addMode: "new",
-            checkInterval: DEFAULT_CHECK_INTERVAL,
+            checkIntervalMs: DEFAULT_CHECK_INTERVAL,
             formError: undefined,
             host: "",
             monitorType: "http",

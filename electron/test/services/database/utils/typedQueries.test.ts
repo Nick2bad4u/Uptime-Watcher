@@ -31,7 +31,7 @@ import {
     queryMonitorRows,
     type CountResult,
     type IdOnlyResult,
-} from "../../../../services/database/utils/typedQueries";
+} from "../../../../services/database/utils/queries/typedQueries";
 
 /**
  * Mock database implementation for testing

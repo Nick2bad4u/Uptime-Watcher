@@ -16,7 +16,7 @@ import {
     deleteAllHistory,
     deleteHistoryByMonitorId,
     pruneHistoryForMonitor,
-} from "../../../../services/database/utils/historyManipulation";
+} from "../../../../services/database/utils/maintenance/historyManipulation";
 
 // Mock dependencies
 vi.mock("../../../../electronUtils", () => ({

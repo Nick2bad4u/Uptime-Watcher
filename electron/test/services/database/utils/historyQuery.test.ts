@@ -15,9 +15,9 @@ import {
     findHistoryByMonitorId,
     getHistoryCount,
     getLatestHistoryEntry,
-} from "../../../../services/database/utils/historyQuery";
+} from "../../../../services/database/utils/queries/historyQuery";
 import { logger } from "../../../../utils/logger";
-import { rowToHistoryEntry } from "../../../../services/database/utils/historyMapper";
+import { rowToHistoryEntry } from "../../../../services/database/utils/mappers/historyMapper";
 
 // Mock dependencies
 vi.mock("../../../../utils/logger", () => ({
@@ -26,7 +26,7 @@ vi.mock("../../../../utils/logger", () => ({
     },
 }));
 
-vi.mock("../../../../services/database/utils/historyMapper", () => ({
+vi.mock("../../../../services/database/utils/mappers/historyMapper", () => ({
     rowToHistoryEntry: vi.fn(),
 }));
 
@@ -37,7 +37,6 @@ const TEST_TIMESTAMP_2 = 1_680_000_001_000;
 describe("historyQuery utilities", () => {
     let mockDb: Database;
     const mockMonitorId = "monitor-123";
-
     beforeEach(() => {
         vi.clearAllMocks();
 

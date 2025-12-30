@@ -85,7 +85,7 @@ describe("useAddSiteForm Hook - Comprehensive Coverage", () => {
             expect(result.current.port).toBe("");
             expect(result.current.name).toBe("");
             expect(result.current.monitorType).toBe("http");
-            expect(result.current.checkInterval).toBe(DEFAULT_CHECK_INTERVAL);
+            expect(result.current.checkIntervalMs).toBe(DEFAULT_CHECK_INTERVAL);
             expect(result.current.siteIdentifier).toBe("mock-uuid-12345");
             expect(result.current.addMode).toBe("new");
             expect(result.current.selectedExistingSite).toBe("");
@@ -200,10 +200,10 @@ describe("useAddSiteForm Hook - Comprehensive Coverage", () => {
             const { result } = renderHook(() => useAddSiteForm());
 
             act(() => {
-                result.current.setCheckInterval(60_000);
+                result.current.setCheckIntervalMs(60_000);
             });
 
-            expect(result.current.checkInterval).toBe(60_000);
+            expect(result.current.checkIntervalMs).toBe(60_000);
         });
 
         it("should update siteIdentifier correctly", async ({
@@ -825,7 +825,7 @@ describe("useAddSiteForm Hook - Comprehensive Coverage", () => {
                 result.current.setPort("8080");
                 result.current.setName("My Site");
                 result.current.setMonitorType("port");
-                result.current.setCheckInterval(60_000);
+                result.current.setCheckIntervalMs(60_000);
                 result.current.setSiteIdentifier("custom-id");
                 result.current.setAddMode("existing");
                 result.current.setSelectedExistingSite("existing-site");
@@ -842,7 +842,7 @@ describe("useAddSiteForm Hook - Comprehensive Coverage", () => {
             expect(result.current.port).toBe("");
             expect(result.current.name).toBe("");
             expect(result.current.monitorType).toBe("http");
-            expect(result.current.checkInterval).toBe(DEFAULT_CHECK_INTERVAL);
+            expect(result.current.checkIntervalMs).toBe(DEFAULT_CHECK_INTERVAL);
             expect(result.current.siteIdentifier).toBe("mock-uuid-12345");
             expect(result.current.addMode).toBe("new");
             expect(result.current.selectedExistingSite).toBe("");
@@ -1111,7 +1111,7 @@ describe("useAddSiteForm Hook - Comprehensive Coverage", () => {
 
             const stateProperties = [
                 "addMode",
-                "checkInterval",
+                "checkIntervalMs",
                 "formError",
                 "host",
                 "monitorType",
@@ -1142,7 +1142,7 @@ describe("useAddSiteForm Hook - Comprehensive Coverage", () => {
                 "isFormValid",
                 "resetForm",
                 "setAddMode",
-                "setCheckInterval",
+                "setCheckIntervalMs",
                 "setFormError",
                 "setHost",
                 "setMonitorType",
@@ -1292,10 +1292,10 @@ describe("useAddSiteForm Hook - Comprehensive Coverage", () => {
                 const { result } = renderHook(() => useAddSiteForm());
 
                 act(() => {
-                    result.current.setCheckInterval(interval);
+                    result.current.setCheckIntervalMs(interval);
                 });
 
-                expect(result.current.checkInterval).toBe(interval);
+                expect(result.current.checkIntervalMs).toBe(interval);
                 expect([
                     60_000,
                     300_000,

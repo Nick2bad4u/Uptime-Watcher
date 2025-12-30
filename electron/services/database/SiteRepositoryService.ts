@@ -51,7 +51,7 @@ import type { MonitoringConfig, SiteLoadingConfig } from "./interfaces";
 import type { MonitorRepository } from "./MonitorRepository";
 import type { SettingsRepository } from "./SettingsRepository";
 import type { SiteRepository } from "./SiteRepository";
-import type { SiteRow } from "./utils/siteMapper";
+import type { SiteRow } from "./utils/mappers/siteMapper";
 
 import { DEFAULT_SITE_NAME } from "../../constants";
 import { toSerializedError } from "../../utils/errorSerialization";

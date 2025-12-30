@@ -59,7 +59,7 @@ import type {
     DatabaseBackupResult,
     DatabaseRestorePayload,
     DatabaseRestoreSummary,
-} from "../services/database/utils/databaseBackup";
+} from "../services/database/utils/backup/databaseBackup";
 import type { ConfigurationManager } from "./ConfigurationManager";
 import type { DatabaseManagerRepositories } from "./databaseRepositorySets";
 

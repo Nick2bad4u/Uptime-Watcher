@@ -264,7 +264,7 @@ interface FormStateReferences {
     setBaselineUrl: ReturnType<typeof vi.fn>;
     setBodyKeyword: ReturnType<typeof vi.fn>;
     setCertificateWarningDays: ReturnType<typeof vi.fn>;
-    setCheckInterval: ReturnType<typeof vi.fn>;
+    setCheckIntervalMs: ReturnType<typeof vi.fn>;
     setEdgeLocations: ReturnType<typeof vi.fn>;
     setExpectedHeaderValue: ReturnType<typeof vi.fn>;
     setExpectedJsonValue: ReturnType<typeof vi.fn>;
@@ -306,7 +306,7 @@ const createFormState = (
         baselineUrl: "",
         bodyKeyword: "",
         certificateWarningDays: "",
-        checkInterval: 60_000,
+        checkIntervalMs: 60_000,
         edgeLocations: "",
         expectedHeaderValue: "",
         expectedJsonValue: "",
@@ -337,7 +337,7 @@ const createFormState = (
         setBaselineUrl: defaultSetter(),
         setBodyKeyword: defaultSetter(),
         setCertificateWarningDays: defaultSetter(),
-        setCheckInterval: defaultSetter(),
+        setCheckIntervalMs: defaultSetter(),
         setEdgeLocations: defaultSetter(),
         setExpectedHeaderValue: defaultSetter(),
         setExpectedJsonValue: defaultSetter(),
@@ -443,7 +443,7 @@ describe("AddSiteForm behavioral coverage", () => {
         const intervalSelect = selectFieldProps.get("checkInterval");
         expect(intervalSelect).toBeDefined();
         intervalSelect?.onChange("120000");
-        expect(formStateRefs.setCheckInterval).toHaveBeenCalledWith(120_000);
+        expect(formStateRefs.setCheckIntervalMs).toHaveBeenCalledWith(120_000);
 
         intervalSelect?.onChange("NaN-value");
         expect(loggerErrorMock).toHaveBeenCalledWith(

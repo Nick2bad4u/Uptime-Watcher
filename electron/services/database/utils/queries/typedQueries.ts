@@ -24,7 +24,7 @@ import {
 } from "@shared/types/database";
 import { isRecord as isSharedRecord } from "@shared/utils/typeHelpers";
 
-import type { DbValue } from "./valueConverters";
+import type { DbValue } from "../converters/valueConverters";
 
 /**
  * Validation options for typed database rows.

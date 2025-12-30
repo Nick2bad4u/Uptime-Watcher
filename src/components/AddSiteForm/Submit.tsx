@@ -274,7 +274,7 @@ const buildMonitorFormData = (
         certificateWarningDays: parseOptionalInteger(
             properties.certificateWarningDays
         ),
-        checkInterval: properties.checkInterval,
+        checkInterval: properties.checkIntervalMs,
         edgeLocations: toOptionalString(properties.edgeLocations),
         expectedHeaderValue: toOptionalString(properties.expectedHeaderValue),
         expectedJsonValue: toOptionalString(properties.expectedJsonValue),
@@ -327,14 +327,14 @@ const buildMonitorFormData = (
  * This ensures consistent monitor defaults and validation across the app.
  */
 function createMonitor(properties: FormSubmitProperties): Monitor {
-    const { checkInterval, generateUuid, monitorType } = properties;
+    const { checkIntervalMs, generateUuid, monitorType } = properties;
     const formData = buildMonitorFormData(properties);
     const baseMonitor = createMonitorObject(monitorType, formData);
 
     return {
         ...baseMonitor,
         activeOperations: [],
-        checkInterval,
+        checkInterval: checkIntervalMs,
         id: generateUuid(),
     };
 }
@@ -444,20 +444,20 @@ async function performSubmission(
 /**
  * Validates check interval configuration using shared schema.
  *
- * @param checkInterval - Check interval in milliseconds
+ * @param checkIntervalMs - Check interval in milliseconds
  *
  * @returns Promise resolving to array of validation error messages
  */
 async function validateCheckInterval(
     monitorType: MonitorType,
-    checkInterval: number
+    checkIntervalMs: number
 ): Promise<readonly string[]> {
     return withUtilityErrorHandling(
         async () => {
             const validationResult = await validateMonitorFieldClientSide(
                 monitorType,
                 "checkInterval",
-                checkInterval
+                checkIntervalMs
             );
             return validationResult.success ? [] : validationResult.errors;
         },
@@ -529,7 +529,7 @@ export async function handleSubmit(
         baselineUrl,
         bodyKeyword,
         certificateWarningDays,
-        checkInterval,
+        checkIntervalMs,
         clearError,
         dynamicFieldValues,
         edgeLocations,
@@ -563,46 +563,30 @@ export async function handleSubmit(
 
     const monitorValidationFields: MonitorValidationFields =
         dynamicFieldValues ?? {
-
-                baselineUrl,
-                bodyKeyword,
-                certificateWarningDays,
-                edgeLocations
-            ,
-
-                expectedHeaderValue,
-                expectedJsonValue,
-                expectedStatusCode
-            ,
-
-                expectedValue,
-                headerName,
-                heartbeatExpectedStatus
-            ,
-
-                heartbeatMaxDriftSeconds,
-                heartbeatStatusField
-            ,
-
-                heartbeatTimestampField,
-                host,
-                jsonPath
-            ,
-
-                maxPongDelayMs
-            ,
-
-                maxReplicationLagSeconds,
-                maxResponseTime,
-                port,
-                primaryStatusUrl
-            ,
-
-                recordType,
-                replicaStatusUrl,
-                replicationTimestampField,
-                url
-            ,
+            baselineUrl,
+            bodyKeyword,
+            certificateWarningDays,
+            edgeLocations,
+            expectedHeaderValue,
+            expectedJsonValue,
+            expectedStatusCode,
+            expectedValue,
+            headerName,
+            heartbeatExpectedStatus,
+            heartbeatMaxDriftSeconds,
+            heartbeatStatusField,
+            heartbeatTimestampField,
+            host,
+            jsonPath,
+            maxPongDelayMs,
+            maxReplicationLagSeconds,
+            maxResponseTime,
+            port,
+            primaryStatusUrl,
+            recordType,
+            replicaStatusUrl,
+            replicationTimestampField,
+            url,
         };
 
     event.preventDefault();
@@ -668,7 +652,7 @@ export async function handleSubmit(
     // Collect asynchronous validation errors
     const validationErrors: string[] = [
         ...(await validateMonitorType(monitorType, monitorValidationFields)),
-        ...(await validateCheckInterval(monitorType, checkInterval)),
+        ...(await validateCheckInterval(monitorType, checkIntervalMs)),
     ];
     logger.debug("AddSiteForm validation results", {
         addMode,
@@ -688,7 +672,7 @@ export async function handleSubmit(
                 certificateWarningDays: truncateForLogging(
                     certificateWarningDays
                 ),
-                checkInterval,
+                checkIntervalMs,
                 edgeLocations: truncateForLogging(edgeLocations),
                 expectedHeaderValue: truncateForLogging(expectedHeaderValue),
                 expectedJsonValue: truncateForLogging(expectedJsonValue),

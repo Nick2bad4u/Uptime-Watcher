@@ -25,7 +25,7 @@ import type {
     DatabaseBackupResult,
     DatabaseRestorePayload,
     DatabaseRestoreResult,
-} from "../database/utils/databaseBackup";
+} from "../database/utils/backup/databaseBackup";
 
 import { monitorLogger } from "../../utils/logger";
 import { DataBackupService } from "../database/DataBackupService";

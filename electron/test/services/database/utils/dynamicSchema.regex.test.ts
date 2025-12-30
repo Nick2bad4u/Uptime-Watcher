@@ -53,7 +53,7 @@ describe("DynamicSchema Regex Mutations", () => {
 
         // Import the function under test
         const module =
-            await import("../../../../services/database/utils/dynamicSchema");
+            await import("../../../../services/database/utils/schema/dynamicSchema");
         generateDatabaseFieldDefinitions =
             module.generateDatabaseFieldDefinitions;
     });

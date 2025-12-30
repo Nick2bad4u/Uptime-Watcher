@@ -35,7 +35,7 @@ import {
 
 import type { IpcParameterValidator } from "./types";
 
-import { DEFAULT_MAX_BACKUP_SIZE_BYTES } from "../database/utils/databaseBackup";
+import { DEFAULT_MAX_BACKUP_SIZE_BYTES } from "../database/utils/backup/databaseBackup";
 import {
     getUtfByteLength,
     MAX_DIAGNOSTICS_METADATA_BYTES,

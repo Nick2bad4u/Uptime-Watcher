@@ -47,12 +47,13 @@ vi.mock("../../../components/SiteDetails/useAddSiteForm", () => ({
         name: "", // non-null string so AddSiteForm's name.trim() guard is safe
         formError: undefined,
         siteIdentifier: "test-id",
+        checkIntervalMs: 60_000,
 
         // No-op action stubs used by internal handlers
         resetForm: vi.fn(),
         setAddMode: vi.fn(),
         setName: vi.fn(),
-        setCheckInterval: vi.fn(),
+        setCheckIntervalMs: vi.fn(),
         setBaselineUrl: vi.fn(),
         setBodyKeyword: vi.fn(),
         setCertificateWarningDays: vi.fn(),

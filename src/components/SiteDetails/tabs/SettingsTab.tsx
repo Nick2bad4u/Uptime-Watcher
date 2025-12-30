@@ -517,6 +517,36 @@ export const SettingsTab = ({
         () => formatSecondsWithMinutes(maxCheckDuration.totalSeconds),
         [maxCheckDuration.totalSeconds]
     );
+
+    const timeoutHelperText = useMemo(
+        () => (
+            <span>
+                Maximum time to wait per attempt before it is treated as failed.
+                <span className="ml-2 inline-flex items-center gap-1 font-medium">
+                    <DurationIcon aria-hidden size={14} />
+                    Current: {formatSecondsWithMinutes(localTimeoutSeconds)}
+                </span>
+                <span className="ml-2 inline-flex items-center gap-1">
+                    <DurationIcon aria-hidden size={14} />
+                    Max: {formatSecondsWithMinutes(TIMEOUT_CONSTRAINTS.MAX)}
+                </span>
+            </span>
+        ),
+        [localTimeoutSeconds]
+    );
+
+    const retryAttemptsHelperText = useMemo(
+        () => (
+            <span>
+                {formatRetryAttemptsText(localRetryAttempts)}.
+                <span className="ml-2">Range: 0–{RETRY_CONSTRAINTS.MAX}.</span>
+                <span className="ml-2">
+                    Values above {RETRY_CONSTRAINTS.MAX} are clamped.
+                </span>
+            </span>
+        ),
+        [localRetryAttempts]
+    );
     return (
         <div className="space-y-6" data-testid="settings-tab">
             {/* Site Configuration */}
@@ -712,19 +742,7 @@ export const SettingsTab = ({
                     {/* Timeout Configuration */}
                     <SiteSettingsNumberField
                         errorText={`Allowed range: ${TIMEOUT_CONSTRAINTS.MIN}-${TIMEOUT_CONSTRAINTS.MAX} seconds.`}
-                        helperText={
-                            <>
-                                Maximum time to wait per attempt before it is treated as failed.
-                                <span className="ml-2 inline-flex items-center gap-1 font-medium">
-                                    <DurationIcon aria-hidden size={14} />
-                                    Current: {formatSecondsWithMinutes(localTimeoutSeconds)}
-                                </span>
-                                <span className="ml-2 inline-flex items-center gap-1">
-                                    <DurationIcon aria-hidden size={14} />
-                                    Max: {formatSecondsWithMinutes(TIMEOUT_CONSTRAINTS.MAX)}
-                                </span>
-                            </>
-                        }
+                        helperText={timeoutHelperText}
                         isChanged={timeoutChanged}
                         isValid={isTimeoutValid}
                         label={timeoutFieldLabel}
@@ -741,15 +759,7 @@ export const SettingsTab = ({
                     {/* Retry Attempts Configuration */}
                     <SiteSettingsNumberField
                         errorText={`Retry attempts must be between ${RETRY_CONSTRAINTS.MIN} and ${RETRY_CONSTRAINTS.MAX}.`}
-                        helperText={
-                            <>
-                                {formatRetryAttemptsText(localRetryAttempts)}.
-                                <span className="ml-2">Range: 0–{RETRY_CONSTRAINTS.MAX}.</span>
-                                <span className="ml-2">
-                                    Values above {RETRY_CONSTRAINTS.MAX} are clamped.
-                                </span>
-                            </>
-                        }
+                        helperText={retryAttemptsHelperText}
                         isChanged={retryAttemptsChanged}
                         isValid={isRetryAttemptsValid}
                         label={retryAttemptsFieldLabel}

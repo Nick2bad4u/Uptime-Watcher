@@ -63,13 +63,13 @@ import {
     deleteAllHistory,
     deleteHistoryByMonitorId,
     pruneHistoryForMonitor,
-} from "./utils/historyManipulation";
+} from "./utils/maintenance/historyManipulation";
 import {
     findHistoryByMonitorId,
     getHistoryCount,
     getLatestHistoryEntry,
-} from "./utils/historyQuery";
-import { queryForIds } from "./utils/typedQueries";
+} from "./utils/queries/historyQuery";
+import { queryForIds } from "./utils/queries/typedQueries";
 
 /**
  * Defines the dependencies required by the {@link HistoryRepository} for

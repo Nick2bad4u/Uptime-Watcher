@@ -8,7 +8,7 @@ import { DATA_CHANNELS } from "@shared/types/preload";
 
 import type { UptimeOrchestrator } from "../../../UptimeOrchestrator";
 
-import { validateDatabaseBackupPayload } from "../../database/utils/databaseBackup";
+import { validateDatabaseBackupPayload } from "../../database/utils/backup/databaseBackup";
 import { createStandardizedIpcRegistrar, toClonedArrayBuffer } from "../utils";
 import { DataHandlerValidators } from "../validators";
 

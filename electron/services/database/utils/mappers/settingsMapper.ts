@@ -13,7 +13,7 @@ import { LOG_TEMPLATES } from "@shared/utils/logTemplates";
 import { safeStringify } from "@shared/utils/stringConversion";
 import { isNonEmptyString } from "@shared/validation/validatorUtils";
 
-import { logger } from "../../../utils/logger";
+import { logger } from "../../../../utils/logger";
 
 /**
  * Setting row type for database operations.

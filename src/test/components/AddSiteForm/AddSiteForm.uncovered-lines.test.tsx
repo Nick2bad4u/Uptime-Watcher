@@ -121,7 +121,7 @@ vi.mock("../../../stores/error/useErrorStore", () => ({
 
 // Mock form hook to return functions we can control
 const mockSetMonitorType = vi.fn();
-const mockSetCheckInterval = vi.fn();
+const mockSetCheckIntervalMs = vi.fn();
 const mockSetAddMode = vi.fn();
 const mockResetForm = vi.fn();
 const mockCreateSite = vi.fn();
@@ -142,8 +142,8 @@ vi.mock("../../../components/SiteDetails/useAddSiteForm", () => ({
         setUrl: vi.fn(),
         monitorType: "http",
         setMonitorType: mockSetMonitorType,
-        checkInterval: 60_000,
-        setCheckInterval: mockSetCheckInterval,
+        checkIntervalMs: 60_000,
+        setCheckIntervalMs: mockSetCheckIntervalMs,
         selectedExistingSite: "",
         setSelectedExistingSite: vi.fn(),
         host: "",

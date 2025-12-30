@@ -35,7 +35,7 @@ import type { UptimeOrchestrator } from "../../UptimeOrchestrator";
 import type {
     DatabaseBackupResult,
     DatabaseRestorePayload,
-} from "../database/utils/databaseBackup";
+} from "../database/utils/backup/databaseBackup";
 import type { CloudSyncEngine } from "../sync/SyncEngine";
 import type { CloudSettingsAdapter } from "./CloudService.types";
 import type { CloudStorageProvider } from "./providers/CloudStorageProvider.types";

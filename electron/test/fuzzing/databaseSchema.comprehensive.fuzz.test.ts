@@ -18,15 +18,15 @@ import {
     createDatabaseIndexes,
     setupMonitorTypeValidation,
     createDatabaseSchema,
-} from "../../services/database/utils/databaseSchema";
+} from "../../services/database/utils/schema/databaseSchema";
 
 // Import the function that needs to be mocked
 import { getRegisteredMonitorTypes } from "../../services/monitoring/MonitorTypeRegistry";
 
 // Mock setupMonitorTypeValidation function
-vi.mock("../../services/database/utils/databaseSchema", async () => {
+vi.mock("../../services/database/utils/schema/databaseSchema", async () => {
     const actual = (await vi.importActual(
-        "../../services/database/utils/databaseSchema"
+        "../../services/database/utils/schema/databaseSchema"
     )) as any;
     return {
         ...actual,
@@ -97,7 +97,7 @@ const { createDefaultMonitorTableSchema } = vi.hoisted(() => {
     };
 });
 
-vi.mock("../../services/database/utils/dynamicSchema", () => ({
+vi.mock("../../services/database/utils/schema/dynamicSchema", () => ({
     generateMonitorTableSchema: vi.fn(createDefaultMonitorTableSchema),
 }));
 
@@ -743,7 +743,7 @@ describe("DatabaseSchema Comprehensive Fuzzing Tests", () => {
                     }),
                     async ({ schemaVariant, executionCount }) => {
                         const { generateMonitorTableSchema } = vi.mocked(
-                            await import("../../services/database/utils/dynamicSchema")
+                            await import("../../services/database/utils/schema/dynamicSchema")
                         );
 
                         // Mock different schema generation scenarios

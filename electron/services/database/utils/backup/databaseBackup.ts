@@ -3,9 +3,9 @@ import { app } from "electron";
 import { createHash } from "node:crypto";
 import { promises as fs } from "node:fs";
 
-import { BACKUP_DB_FILE_NAME } from "../../../constants";
-import { logger } from "../../../utils/logger";
-import { DATABASE_SCHEMA_VERSION } from "./databaseSchema";
+import { BACKUP_DB_FILE_NAME } from "../../../../constants";
+import { logger } from "../../../../utils/logger";
+import { DATABASE_SCHEMA_VERSION } from "../schema/databaseSchema";
 
 export const DEFAULT_BACKUP_RETENTION_HINT_DAYS: number = 30;
 export const DEFAULT_MAX_BACKUP_SIZE_BYTES: number = 50 * 1024 * 1024;

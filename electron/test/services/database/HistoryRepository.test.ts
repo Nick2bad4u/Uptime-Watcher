@@ -27,15 +27,15 @@ import type { DatabaseService } from "../../../services/database/DatabaseService
 import type { StatusHistory } from "@shared/types";
 
 // Import mocked modules
-import * as historyManipulation from "../../../services/database/utils/historyManipulation";
-import * as historyQuery from "../../../services/database/utils/historyQuery";
+import * as historyManipulation from "../../../services/database/utils/maintenance/historyManipulation";
+import * as historyQuery from "../../../services/database/utils/queries/historyQuery";
 import * as operationalHooks from "../../../utils/operationalHooks";
 import * as logger from "../../../utils/logger";
 import * as electronUtils from "../../../electronUtils";
 
 // Mock the modules
-vi.mock("../../../services/database/utils/historyManipulation");
-vi.mock("../../../services/database/utils/historyQuery");
+vi.mock("../../../services/database/utils/maintenance/historyManipulation");
+vi.mock("../../../services/database/utils/queries/historyQuery");
 vi.mock("../../../utils/operationalHooks");
 vi.mock("../../../utils/logger");
 vi.mock("../../../electronUtils");
