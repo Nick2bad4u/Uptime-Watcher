@@ -298,14 +298,22 @@ function parseNdjsonOperations(args: {
         const line = typeof candidate === "string" ? candidate.trim() : "";
         if (line.length > 0) {
             if (line.length > maxLineChars) {
-                throw new Error(
-                    `Cloud sync operation line exceeds max length (${maxLineChars} chars) in ${key} at line ${index + 1}`
+                throw new CloudSyncCorruptRemoteObjectError(
+                    `Cloud sync operation line exceeds max length (${maxLineChars} chars) in ${key} at line ${index + 1}`,
+                    {
+                        key,
+                        kind: "operations",
+                    }
                 );
             }
 
             if (operations.length >= maxLines) {
-                throw new Error(
-                    `Cloud sync operation object exceeds max operation count (${maxLines}) in ${key}`
+                throw new CloudSyncCorruptRemoteObjectError(
+                    `Cloud sync operation object exceeds max operation count (${maxLines}) in ${key}`,
+                    {
+                        key,
+                        kind: "operations",
+                    }
                 );
             }
 
@@ -314,9 +322,13 @@ function parseNdjsonOperations(args: {
                 operations.push(parseCloudSyncOperation(parsed));
             } catch (error: unknown) {
                 const normalized = ensureError(error);
-                throw new Error(
+                throw new CloudSyncCorruptRemoteObjectError(
                     `Failed to parse cloud sync operation in ${key} at line ${index + 1}: ${normalized.message}`,
-                    { cause: error }
+                    {
+                        cause: error,
+                        key,
+                        kind: "operations",
+                    }
                 );
             }
         }
@@ -487,8 +499,12 @@ export class ProviderCloudSyncTransport implements CloudSyncTransport {
 
         const maxBytes = getMaxOpsObjectBytes();
         if (buffer.byteLength > maxBytes) {
-            throw new Error(
-                `Cloud sync operation object '${key}' exceeds size limit (${maxBytes} bytes)`
+            throw new CloudSyncCorruptRemoteObjectError(
+                `Cloud sync operation object '${key}' exceeds size limit (${maxBytes} bytes)`,
+                {
+                    key,
+                    kind: "operations",
+                }
             );
         }
 

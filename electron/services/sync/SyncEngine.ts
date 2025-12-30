@@ -544,7 +544,18 @@ export class SyncEngine {
             return createEmptyBaseline();
         }
 
-        return parseBaseline(raw);
+        const parsed = parseBaseline(raw);
+        if (parsed.recovered) {
+            logger.warn(
+                "[SyncEngine] Stored baseline is invalid; falling back to empty baseline",
+                {
+                    message: parsed.error,
+                    storedLength: raw.length,
+                }
+            );
+        }
+
+        return parsed.baseline;
     }
 
     private async setBaseline(baseline: CloudSyncBaseline): Promise<void> {

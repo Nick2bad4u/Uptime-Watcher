@@ -3,7 +3,7 @@ schema: "../../../config/schemas/doc-frontmatter.schema.json"
 title: "Boundary Validation Strategy"
 summary: "Standard pattern for parsing, validating, and transporting untrusted data across IPC and persistence boundaries."
 created: "2025-12-29"
-last_reviewed: "2025-12-29"
+last_reviewed: "2025-12-30"
 category: "guide"
 author: "GitHub Copilot"
 tags:
@@ -126,6 +126,50 @@ await eventEmitter.emitTyped("database:error", {
  timestamp: Date.now(),
 });
 ```
+
+## Strict vs best-effort parsing
+
+Not every boundary uses the same failure semantics.
+
+### Strict parsing (fail-fast)
+
+Use strict parsing when the caller _must_ have the data to proceed safely.
+
+Examples:
+
+- Downloading a specific cloud backup metadata sidecar for restore
+  (`parseCloudBackupMetadataFileBuffer` throws on invalid JSON)
+- Import flows where the user expects an error explaining why their file
+  cannot be imported
+
+### Best-effort parsing (skip/repair)
+
+Use best-effort parsing when failure should not block showing other valid
+items.
+
+Examples:
+
+- Listing multiple cloud backup metadata files where a single corrupt metadata file
+  should not hide other backups (`tryParseCloudBackupMetadataFileBuffer`)
+- Cloud sync manifest parsing where corruption is treated as "missing" and the
+  system rebuilds remote state from operation logs
+
+### Typed corruption errors
+
+When parsing failures indicate **corruption or incompatible remote state**
+(rather than transient network/provider failures), prefer throwing a typed
+error (e.g. a `*Corrupt*` error) so callers can implement consistent recovery
+behaviour.
+
+Example:
+
+- Cloud sync snapshot/operations objects throw a typed corruption error when
+  they exist but are invalid (size limit exceeded, invalid JSON, schema
+  mismatch). The sync engine can then reliably decide whether to rebuild state
+  from operation logs or surface an error.
+
+Guideline: **best-effort parsing must be observable** (log a warning with
+structured context), and strict parsing should produce a user-facing error.
 
 ## Common pitfalls to avoid
 

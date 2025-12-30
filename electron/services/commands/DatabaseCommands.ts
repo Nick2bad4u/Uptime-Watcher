@@ -13,11 +13,14 @@
 
 import type { Site } from "@shared/types";
 import type { ImportSite } from "@shared/validation/importExportSchemas";
+import type { JsonValue } from "type-fest";
 
 import { DEFAULT_SITE_NAME } from "@shared/constants/sites";
 import { SITE_ADDED_SOURCE } from "@shared/types/events";
 import { ensureError } from "@shared/utils/errorHandling";
+import { safeJsonParse } from "@shared/utils/jsonSafety";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
+import { validateImportData } from "@shared/validation/importExportSchemas";
 import { ensureUniqueSiteIdentifiers } from "@shared/validation/siteIntegrity";
 
 import type { UptimeEvents } from "../../events/eventTypes";
@@ -517,7 +520,8 @@ export class ExportDataCommand extends DatabaseCommand<string> {
  * Encapsulates the logic for importing data, updating the cache, and emitting a
  * success event. Also emits a `cache:invalidated` event so renderer caches can
  * resynchronize with freshly imported data. Rollback restores the previous
- * cache state. Validation checks for valid JSON and non-empty input.
+ * cache state. Validation checks for non-empty JSON plus schema compliance
+ * via the shared import/export Zod schemas.
  *
  * @public
  */
@@ -621,10 +625,22 @@ export class ImportDataCommand extends DatabaseCommand<boolean> {
             errors.push("Import data cannot be empty");
         }
 
-        try {
-            JSON.parse(this.data);
-        } catch {
+        const parseResult = safeJsonParse<JsonValue>(
+            this.data,
+            (value): value is JsonValue => value !== undefined
+        );
+
+        if (!parseResult.success || parseResult.data === undefined) {
             errors.push("Import data must be valid JSON");
+        } else {
+            const validation = validateImportData(parseResult.data);
+            // eslint-disable-next-line @typescript-eslint/no-unnecessary-boolean-literal-compare -- Literal comparison ensures stable narrowing under strict TS.
+            if (validation.ok === false) {
+                errors.push(
+                    validation.error.message,
+                    ...validation.error.issues.slice(0, 3)
+                );
+            }
         }
 
         // Use microtask to satisfy async requirement

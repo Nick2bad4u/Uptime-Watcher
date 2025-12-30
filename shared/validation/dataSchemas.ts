@@ -1,3 +1,4 @@
+import type { SerializedDatabaseBackupMetadata } from "@shared/types/databaseBackup";
 import type { SerializedDatabaseRestoreResult } from "@shared/types/ipc";
 import type { MonitorTypeConfig } from "@shared/types/monitorTypes";
 
@@ -9,15 +10,8 @@ const arrayBufferSchema: z.ZodType<ArrayBuffer> = z.custom<ArrayBuffer>(
     "Expected transferable ArrayBuffer"
 );
 
-export const serializedDatabaseBackupMetadataSchema: z.ZodType<{
-    appVersion: string;
-    checksum: string;
-    createdAt: number;
-    originalPath: string;
-    retentionHintDays: number;
-    schemaVersion: number;
-    sizeBytes: number;
-}> = z
+export const serializedDatabaseBackupMetadataSchema: z.ZodType<SerializedDatabaseBackupMetadata> =
+    z
     .object({
         appVersion: z.string().min(1),
         checksum: z.string().min(1),
@@ -95,6 +89,11 @@ export const validateSerializedDatabaseBackupResult = (
     value: unknown
 ): ReturnType<typeof serializedDatabaseBackupResultSchema.safeParse> =>
     serializedDatabaseBackupResultSchema.safeParse(value);
+
+export const validateSerializedDatabaseBackupMetadata = (
+    value: unknown
+): ReturnType<typeof serializedDatabaseBackupMetadataSchema.safeParse> =>
+    serializedDatabaseBackupMetadataSchema.safeParse(value);
 
 export const validateSerializedDatabaseRestorePayload = (
     value: unknown

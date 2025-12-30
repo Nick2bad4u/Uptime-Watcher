@@ -45,6 +45,7 @@ import {
     cloudSyncSiteConfigSchema,
 } from "@shared/types/cloudSyncDomain";
 import { stringifyJsonValueStable } from "@shared/utils/canonicalJson";
+import { ensureError } from "@shared/utils/errorHandling";
 
 import {
     DEFAULT_CHECK_INTERVAL,
@@ -462,6 +463,18 @@ export function stringifyBaseline(baseline: CloudSyncBaseline): string {
 }
 
 /**
+ * Result envelope for parsing a stored baseline.
+ */
+export interface ParsedBaselineResult {
+    /** Parsed baseline (or an empty baseline when recovery occurs). */
+    readonly baseline: CloudSyncBaseline;
+    /** Error message describing why parsing failed (only when recovered). */
+    readonly error?: string | undefined;
+    /** Indicates whether parsing failed and the empty baseline was used. */
+    readonly recovered: boolean;
+}
+
+/**
  * Parses a stored baseline snapshot.
  *
  * @remarks
@@ -469,11 +482,19 @@ export function stringifyBaseline(baseline: CloudSyncBaseline): string {
  *
  * @param raw - Stored baseline string.
  */
-export function parseBaseline(raw: string): CloudSyncBaseline {
+export function parseBaseline(raw: string): ParsedBaselineResult {
     try {
-        return parseCloudSyncBaseline(JSON.parse(raw));
-    } catch {
-        return createEmptyBaseline();
+        return {
+            baseline: parseCloudSyncBaseline(JSON.parse(raw)),
+            recovered: false,
+        };
+    } catch (error) {
+        const resolved = ensureError(error);
+        return {
+            baseline: createEmptyBaseline(),
+            error: resolved.message,
+            recovered: true,
+        };
     }
 }
 
