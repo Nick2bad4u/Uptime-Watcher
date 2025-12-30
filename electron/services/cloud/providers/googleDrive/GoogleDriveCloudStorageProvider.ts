@@ -1,6 +1,8 @@
 import type { CloudProviderKind } from "@shared/types/cloud";
 import type { drive_v3 } from "googleapis";
 
+import { tryGetErrorCode } from "@shared/utils/errorCodes";
+import { ensureError } from "@shared/utils/errorHandling";
 import { google } from "googleapis";
 import { Readable } from "node:stream";
 
@@ -22,6 +24,7 @@ import {
     parseGoogleDriveFileMetadata,
     parseGoogleDriveListResponse,
 } from "./googleDriveApiSchemas";
+import { tryDescribeGoogleDriveApiError } from "./googleDriveErrorSchemas";
 
 const GOOGLE_FOLDER_MIME_TYPE = "application/vnd.google-apps.folder";
 const APP_ROOT_FOLDER_NAME = "uptime-watcher";
@@ -60,11 +63,30 @@ function normalizeDriveNameSegment(candidate: string): null | string {
 
 function createErrnoError(
     message: string,
-    code: string
+    code: NodeJS.ErrnoException["code"],
+    options?: ErrorOptions
 ): NodeJS.ErrnoException {
-    const error = new Error(message) as NodeJS.ErrnoException;
+    const error = new Error(message, options) as NodeJS.ErrnoException;
     error.code = code;
     return error;
+}
+
+function tryGetGoogleDriveHttpStatus(error: unknown): number | undefined {
+    if (typeof error !== "object" || error === null) {
+        return undefined;
+    }
+
+    if (!("response" in error)) {
+        return undefined;
+    }
+
+    const {response} = (error as { response?: unknown });
+    if (typeof response !== "object" || response === null) {
+        return undefined;
+    }
+
+    const {status} = (response as { status?: unknown });
+    return typeof status === "number" ? status : undefined;
 }
 
 function ensureTrailingSlash(prefix: string): string {
@@ -128,63 +150,112 @@ export class GoogleDriveCloudStorageProvider
 
     public async deleteObject(key: string): Promise<void> {
         const normalized = normalizeKey(key);
-        const drive = await this.getDriveClient();
+        try {
+            const drive = await this.getDriveClient();
 
-        const existing = await this.findFileByKey(drive, normalized);
-        if (!existing) {
-            return;
+            const existing = await this.findFileByKey(drive, normalized);
+            if (!existing) {
+                return;
+            }
+
+            await drive.files.delete({ fileId: existing.id });
+        } catch (error) {
+            // Deleting a missing file should be idempotent.
+            if (tryGetGoogleDriveHttpStatus(error) === 404) {
+                return;
+            }
+
+            const detail = tryDescribeGoogleDriveApiError(error);
+            const suffix = detail ? `: ${detail}` : "";
+            throw new Error(
+                `Failed to delete Google Drive object '${normalized}'${suffix}`,
+                { cause: error }
+            );
         }
-
-        await drive.files.delete({ fileId: existing.id });
     }
 
     public async downloadObject(key: string): Promise<Buffer> {
         const normalized = normalizeKey(key);
-        const drive = await this.getDriveClient();
+        try {
+            const drive = await this.getDriveClient();
 
-        const existing = await this.findFileByKey(drive, normalized);
-        if (!existing) {
-            throw new Error(`Google Drive object not found: ${normalized}`);
+            const existing = await this.findFileByKey(drive, normalized);
+            if (!existing) {
+                throw createErrnoError(
+                    `Google Drive object not found: ${normalized}`,
+                    "ENOENT"
+                );
+            }
+
+            const response = await drive.files.get(
+                { alt: "media", fileId: existing.id },
+                { responseType: "stream" }
+            );
+
+
+            return await convertStreamToBuffer(response.data);
+        } catch (error) {
+            const code = tryGetErrorCode(error);
+            if (code === "ENOENT") {
+                throw ensureError(error);
+            }
+
+            if (tryGetGoogleDriveHttpStatus(error) === 404) {
+                throw createErrnoError(
+                    `Google Drive object not found: ${normalized}`,
+                    "ENOENT",
+                    { cause: error }
+                );
+            }
+
+            const detail = tryDescribeGoogleDriveApiError(error);
+            const suffix = detail ? `: ${detail}` : "";
+            throw new Error(
+                `Failed to download Google Drive object '${normalized}'${suffix}`,
+                { cause: error }
+            );
         }
-
-        const response = await drive.files.get(
-            { alt: "media", fileId: existing.id },
-            { responseType: "stream" }
-        );
-
-        return convertStreamToBuffer(response.data);
     }
 
     public async listObjects(prefix: string): Promise<CloudObjectEntry[]> {
         const normalizedPrefix = ensureTrailingSlash(prefix);
-        const drive = await this.getDriveClient();
+        try {
+            const drive = await this.getDriveClient();
 
-        const rootFolderId = await this.getOrCreateFolderId(drive, []);
+            const rootFolderId = await this.getOrCreateFolderId(drive, []);
 
-        // If a prefix is provided, attempt to resolve that folder first.
-        let startFolderId = rootFolderId;
-        let startPrefix = "";
-        if (normalizedPrefix) {
-            const parts = normalizedPrefix
-                .split("/")
-                .filter((part) => part.length > 0);
+            // If a prefix is provided, attempt to resolve that folder first.
+            let startFolderId = rootFolderId;
+            let startPrefix = "";
+            if (normalizedPrefix) {
+                const parts = normalizedPrefix
+                    .split("/")
+                    .filter((part) => part.length > 0);
 
-            const resolved = await this.resolveFolderId(drive, parts);
-            if (!resolved) {
-                return [];
+                const resolved = await this.resolveFolderId(drive, parts);
+                if (!resolved) {
+                    return [];
+                }
+
+                startFolderId = resolved;
+                startPrefix = normalizedPrefix;
             }
 
-            startFolderId = resolved;
-            startPrefix = normalizedPrefix;
+            const entries = await this.listFolderRecursive(
+                drive,
+                startFolderId,
+                startPrefix
+            );
+
+            return entries.toSorted((a, b) => a.key.localeCompare(b.key));
+        } catch (error) {
+            const detail = tryDescribeGoogleDriveApiError(error);
+            const suffix = detail ? `: ${detail}` : "";
+            throw new Error(
+                `Failed to list Google Drive objects for prefix '${normalizedPrefix}'${suffix}`,
+                { cause: error }
+            );
         }
-
-        const entries = await this.listFolderRecursive(
-            drive,
-            startFolderId,
-            startPrefix
-        );
-
-        return entries.toSorted((a, b) => a.key.localeCompare(b.key));
     }
 
     public async uploadObject(args: {
@@ -193,68 +264,83 @@ export class GoogleDriveCloudStorageProvider
         overwrite?: boolean;
     }): Promise<CloudObjectEntry> {
         const normalizedKey = normalizeKey(args.key);
-        const { dirSegments, fileName } = splitKey(normalizedKey);
-        const drive = await this.getDriveClient();
+        try {
+            const { dirSegments, fileName } = splitKey(normalizedKey);
+            const drive = await this.getDriveClient();
 
-        const parentId = await this.getOrCreateFolderId(drive, dirSegments);
+            const parentId = await this.getOrCreateFolderId(drive, dirSegments);
 
-        const existing = await this.findChildByName(drive, {
-            mimeType: undefined,
-            name: fileName,
-            parentId,
-        });
+            const existing = await this.findChildByName(drive, {
+                mimeType: undefined,
+                name: fileName,
+                parentId,
+            });
 
-        if (existing && args.overwrite === false) {
-            throw createErrnoError(
-                `Google Drive object already exists: ${normalizedKey}`,
-                "EEXIST"
+            if (existing && args.overwrite === false) {
+                throw createErrnoError(
+                    `Google Drive object already exists: ${normalizedKey}`,
+                    "EEXIST"
+                );
+            }
+
+            const media = {
+                body: Readable.from(args.buffer),
+                mimeType: "application/octet-stream",
+            };
+
+            let fileId: null | string = existing?.id ?? null;
+
+            if (fileId) {
+                await drive.files.update({
+                    fileId,
+                    media,
+                });
+            } else {
+                const created = await drive.files.create({
+                    fields: "id",
+                    media,
+                    requestBody: {
+                        name: fileName,
+                        parents: [parentId],
+                    },
+                });
+
+                fileId = parseGoogleDriveCreateResponse(created.data).id;
+            }
+
+            const metadata = await drive.files.get({
+                fields: "modifiedTime, size",
+                fileId,
+            });
+
+            const parsedMetadata = parseGoogleDriveFileMetadata(metadata.data);
+
+            const modifiedAt = parsedMetadata.modifiedTime
+                ? new Date(parsedMetadata.modifiedTime).getTime()
+                : Date.now();
+
+            const sizeFromApi = Number(parsedMetadata.size ?? 0);
+            const sizeBytes = sizeFromApi > 0 ? sizeFromApi : args.buffer.length;
+
+            return {
+                key: normalizedKey,
+                lastModifiedAt: modifiedAt,
+                sizeBytes,
+            };
+        } catch (error) {
+            // Preserve EEXIST semantic for callers.
+            const code = tryGetErrorCode(error);
+            if (code === "EEXIST") {
+                throw ensureError(error);
+            }
+
+            const detail = tryDescribeGoogleDriveApiError(error);
+            const suffix = detail ? `: ${detail}` : "";
+            throw new Error(
+                `Failed to upload Google Drive object '${normalizedKey}'${suffix}`,
+                { cause: error }
             );
         }
-
-        const media = {
-            body: Readable.from(args.buffer),
-            mimeType: "application/octet-stream",
-        };
-
-        let fileId: null | string = existing?.id ?? null;
-
-        if (fileId) {
-            await drive.files.update({
-                fileId,
-                media,
-            });
-        } else {
-            const created = await drive.files.create({
-                fields: "id",
-                media,
-                requestBody: {
-                    name: fileName,
-                    parents: [parentId],
-                },
-            });
-
-            fileId = parseGoogleDriveCreateResponse(created.data).id;
-        }
-
-        const metadata = await drive.files.get({
-            fields: "modifiedTime, size",
-            fileId,
-        });
-
-        const parsedMetadata = parseGoogleDriveFileMetadata(metadata.data);
-
-        const modifiedAt = parsedMetadata.modifiedTime
-            ? new Date(parsedMetadata.modifiedTime).getTime()
-            : Date.now();
-
-        const sizeFromApi = Number(parsedMetadata.size ?? 0);
-        const sizeBytes = sizeFromApi > 0 ? sizeFromApi : args.buffer.length;
-
-        return {
-            key: normalizedKey,
-            lastModifiedAt: modifiedAt,
-            sizeBytes,
-        };
     }
 
     private async getDriveClient(): Promise<drive_v3.Drive> {
@@ -314,7 +400,7 @@ export class GoogleDriveCloudStorageProvider
                     },
                 });
 
-                const {id} = parseGoogleDriveCreateResponse(created.data);
+                const { id } = parseGoogleDriveCreateResponse(created.data);
 
                 parentId = id;
                 this.folderCache.set(currentPath, id);

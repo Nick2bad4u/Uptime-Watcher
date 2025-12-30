@@ -1,7 +1,6 @@
 import type { DropboxResponse, files, users } from "dropbox";
 
 import { ensureError } from "@shared/utils/errorHandling";
-import { tryParseJsonRecord } from "@shared/utils/jsonSafety";
 import { isRecord } from "@shared/utils/typeHelpers";
 import { Dropbox, DropboxResponseError } from "dropbox";
 
@@ -17,6 +16,7 @@ import {
     normalizeProviderObjectKey,
 } from "../../cloudKeyNormalization";
 import { BaseCloudStorageProvider } from "../BaseCloudStorageProvider";
+import { tryParseDropboxErrorSummary } from "./dropboxErrorSchemas";
 import { withDropboxRetry } from "./dropboxRetry";
 import {
     parseDropboxCurrentAccount,
@@ -86,68 +86,6 @@ function fromDropboxPathOrNull(pathDisplay: string): null | string {
     } catch {
         return null;
     }
-}
-
-function tryParseDropboxErrorSummary(data: unknown): string | undefined {
-    if (!data) {
-        return undefined;
-    }
-
-    if (typeof data === "object") {
-        const maybeSummary = (data as { error_summary?: unknown })
-            .error_summary;
-        if (
-            typeof maybeSummary === "string" &&
-            maybeSummary.trim().length > 0
-        ) {
-            return maybeSummary;
-        }
-    }
-
-    if (typeof data === "string") {
-        const trimmed = data.trim();
-        if (!trimmed) {
-            return undefined;
-        }
-
-        const parsed = tryParseJsonRecord(trimmed);
-        if (!parsed) {
-            return undefined;
-        }
-
-        return tryParseDropboxErrorSummary(parsed);
-    }
-
-    // Axios returns ArrayBuffer for errors when responseType is "arraybuffer".
-    if (data instanceof ArrayBuffer) {
-        const text = Buffer.from(new Uint8Array(data)).toString("utf8").trim();
-        if (!text) {
-            return undefined;
-        }
-
-        const parsed = tryParseJsonRecord(text);
-        if (!parsed) {
-            return undefined;
-        }
-
-        return tryParseDropboxErrorSummary(parsed);
-    }
-
-    if (Buffer.isBuffer(data)) {
-        const text = data.toString("utf8").trim();
-        if (!text) {
-            return undefined;
-        }
-
-        const parsed = tryParseJsonRecord(text);
-        if (!parsed) {
-            return undefined;
-        }
-
-        return tryParseDropboxErrorSummary(parsed);
-    }
-
-    return undefined;
 }
 
 function describeDropboxSdkErrorRich(error: unknown): string | undefined {
