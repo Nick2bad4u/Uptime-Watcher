@@ -14,7 +14,6 @@ import type { MonitorRow } from "@shared/types/database";
 import type { Simplify, UnknownRecord } from "type-fest";
 
 import { safeStringify } from "@shared/utils/stringConversion";
-import { isValidIdentifierArray } from "@shared/validation/validatorUtils";
 
 import { dbLogger } from "../../../../utils/logger";
 import { getAllMonitorTypeConfigs } from "../../../monitoring/MonitorTypeRegistry";
@@ -691,21 +690,10 @@ export function mapMonitorToRow(monitor: Monitor): MonitorRow {
  * @returns Monitor object with all properties mapped.
  */
 export function mapRowToMonitor(row: MonitorRow): Monitor {
-    // Parse activeOperations safely
-    const activeOperations = ((): string[] => {
-        if (
-            !row.active_operations ||
-            typeof row.active_operations !== "string"
-        ) {
-            return [];
-        }
-        try {
-            const parsed: unknown = JSON.parse(row.active_operations);
-            return isValidIdentifierArray(parsed) ? parsed : [];
-        } catch {
-            return [];
-        }
-    })();
+    // ActiveOperations is parsed and validated at the repository mapping layer
+    // (monitorMapper) to ensure consistent logging and security validation.
+    // This schema mapper focuses on dynamic field mapping only.
+    const activeOperations: string[] = [];
 
     // Create the base monitor object with proper type safety
     /* eslint-disable @typescript-eslint/no-unsafe-type-assertion -- Type assertions are safe for database row to monitor object conversion with known schema */
