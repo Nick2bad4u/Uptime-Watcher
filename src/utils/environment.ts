@@ -43,7 +43,7 @@ export function readProcessEnv(key: string): string | undefined {
  */
 export function isPlaywrightAutomation(): boolean {
     const automationFlag = readProcessEnv(PLAYWRIGHT_FLAG);
-    if (automationFlag && automationFlag.toLowerCase() === "true") {
+    if (automationFlag?.toLowerCase() === "true") {
         return true;
     }
 

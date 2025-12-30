@@ -32,7 +32,7 @@ vi.mock("../../../../../electron/utils/operationalHooks", () => ({
     withDatabaseOperation: vi.fn(),
 }));
 
-import { initDatabase } from "../../../../../electron/utils/database/databaseInitializer";
+import { initDatabase } from "../../../../../electron/services/database/databaseInitializer";
 import { monitorLogger } from "../../../../../electron/utils/logger";
 import { withDatabaseOperation } from "../../../../../electron/utils/operationalHooks";
 import type { TypedEventBus } from "../../../../../electron/events/TypedEventBus";
@@ -167,7 +167,7 @@ describe("databaseInitializer", () => {
         );
         expect(monitorLogger.error).toHaveBeenCalledWith(
             "Failed to initialize database",
-            "load failure"
+            expect.objectContaining({ message: "load failure" })
         );
         expect(emitTyped).toHaveBeenCalledTimes(1);
 

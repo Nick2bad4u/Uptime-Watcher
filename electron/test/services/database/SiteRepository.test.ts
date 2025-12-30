@@ -89,7 +89,7 @@ describe(SiteRepository, () => {
         });
     });
 
-    describe("exportAll", () => {
+    describe("exportAllRows", () => {
         it("should return the same data set as findAll", async ({
             task,
             annotate,
@@ -111,7 +111,7 @@ describe(SiteRepository, () => {
 
             mockDb.all.mockReturnValueOnce(mockSites);
 
-            const exportAllResult = await repository.exportAll();
+            const exportAllResult = await repository.exportAllRows();
 
             expect(findAllResult).toEqual(exportAllResult);
             expect(mockDb.all).toHaveBeenCalledWith(

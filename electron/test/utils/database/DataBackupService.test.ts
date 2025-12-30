@@ -89,8 +89,8 @@ vi.mock("node-sqlite3-wasm", () => ({
 }));
 
 // Import after mocks are set up
-import { DataBackupService } from "../../../utils/database/DataBackupService";
-import { SiteLoadingError } from "../../../utils/database/interfaces";
+import { DataBackupService } from "../../../services/database/DataBackupService";
+import { SiteLoadingError } from "../../../services/database/interfaces";
 import { app } from "electron";
 import {
     createDatabaseBackup,

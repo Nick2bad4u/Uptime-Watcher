@@ -93,7 +93,7 @@ vi.mock("../../services/factories/DatabaseServiceFactory", () => ({
 }));
 
 // Mock SiteRepositoryService and SiteLoadingOrchestrator BEFORE importing DatabaseManager
-vi.mock("../../utils/database/SiteRepositoryService", () => ({
+vi.mock("../../services/database/SiteRepositoryService", () => ({
     SiteRepositoryService: vi.fn(function SiteRepositoryServiceMock() {
         return {
             getSitesFromDatabase: vi.fn().mockResolvedValue([]),
@@ -120,7 +120,7 @@ import { TypedEventBus } from "../../events/TypedEventBus";
 import type { UptimeEvents } from "../../events/eventTypes.js";
 
 // Mock DataImportExportService
-vi.mock("../../utils/database/DataImportExportService", () => ({
+vi.mock("../../services/database/DataImportExportService", () => ({
     DataImportExportService: vi.fn().mockImplementation(() => ({
         importDataFromJson: vi.fn(),
         persistImportedData: vi.fn(),
@@ -131,11 +131,11 @@ vi.mock("../../utils/database/DataImportExportService", () => ({
 }));
 
 // Import the mocked classes for use in tests
-import { SiteLoadingOrchestrator } from "../../utils/database/SiteRepositoryService";
-import { DataImportExportService } from "../../utils/database/DataImportExportService";
+import { SiteLoadingOrchestrator } from "../../services/database/SiteRepositoryService";
+import { DataImportExportService } from "../../services/database/DataImportExportService";
 
 // Mock serviceFactory
-vi.mock("../../utils/database/serviceFactory", () => ({
+vi.mock("../../services/database/serviceFactory", () => ({
     createSiteCache: vi.fn(() => {
         const store = new Map<string, Site>();
 
@@ -227,7 +227,7 @@ const mockSettingsRepository = {
     get: vi.fn(() => Promise.resolve(undefined)),
     upsert: vi.fn(() => Promise.resolve()),
     setInternal: vi.fn(),
-    exportAll: vi.fn(() => Promise.resolve([])),
+    exportAllRows: vi.fn(() => Promise.resolve([])),
 } as any;
 
 const mockSiteRepository = {
@@ -238,7 +238,7 @@ const mockSiteRepository = {
     deleteAll: vi.fn(() => Promise.resolve()),
     exists: vi.fn(() => Promise.resolve(false)),
     bulkInsert: vi.fn(() => Promise.resolve()),
-    exportAll: vi.fn(() => Promise.resolve([])),
+    exportAllRows: vi.fn(() => Promise.resolve([])),
     bulkInsertInternal: vi.fn(),
     deleteAllInternal: vi.fn(),
 } as any;

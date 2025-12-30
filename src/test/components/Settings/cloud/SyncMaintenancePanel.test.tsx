@@ -3,7 +3,12 @@
  */
 
 import { describe, expect, it, vi } from "vitest";
-import { fireEvent, render, screen } from "@testing-library/react";
+import {
+    fireEvent,
+    render,
+    screen,
+    within,
+} from "@testing-library/react";
 
 import "@testing-library/jest-dom";
 
@@ -97,7 +102,7 @@ describe(SyncMaintenancePanel, () => {
         ).toBeInTheDocument();
     });
 
-    it("renders preview viewmodel details including mismatch and per-device list", () => {
+    it("renders preview summary metrics and details", () => {
         const preview = createPreview();
 
         render(
@@ -115,13 +120,57 @@ describe(SyncMaintenancePanel, () => {
             />
         );
 
-        expect(
-            screen.getByText(
-                /Sync history files: 4 \(snapshots: 1, changes: 2, other: 1\)\./
-            )
-        ).toBeInTheDocument();
+        const syncHistoryMetric = screen
+            .getByText("Sync history files")
+            .closest(".settings-metric");
+        expect(syncHistoryMetric).not.toBeNull();
+        if (!(syncHistoryMetric instanceof HTMLElement)) {
+            throw new TypeError("Expected sync history metric to exist");
+        }
+        expect(within(syncHistoryMetric).getByText("4")).toBeInTheDocument();
 
-        expect(screen.getByText("Devices (1): device-a")).toBeInTheDocument();
+        const devicesMetric = screen.getByText("Devices").closest(".settings-metric");
+        expect(devicesMetric).not.toBeNull();
+        if (!(devicesMetric instanceof HTMLElement)) {
+            throw new TypeError("Expected devices metric to exist");
+        }
+        expect(within(devicesMetric).getByText("1")).toBeInTheDocument();
+
+        const objectsBreakdownMetric = screen
+            .getByText("Objects breakdown")
+            .closest(".settings-metric");
+        expect(objectsBreakdownMetric).not.toBeNull();
+        if (!(objectsBreakdownMetric instanceof HTMLElement)) {
+            throw new TypeError("Expected objects breakdown metric to exist");
+        }
+
+        const snapshotsBreakdown = within(objectsBreakdownMetric)
+            .getByText("Snapshots")
+            .closest(".settings-metric__breakdown-item");
+        expect(snapshotsBreakdown).not.toBeNull();
+        if (!(snapshotsBreakdown instanceof HTMLElement)) {
+            throw new TypeError("Expected snapshots breakdown item to exist");
+        }
+        expect(within(snapshotsBreakdown).getByText("1")).toBeInTheDocument();
+
+        const changesBreakdown = within(objectsBreakdownMetric)
+            .getByText("Changes")
+            .closest(".settings-metric__breakdown-item");
+        expect(changesBreakdown).not.toBeNull();
+        if (!(changesBreakdown instanceof HTMLElement)) {
+            throw new TypeError("Expected changes breakdown item to exist");
+        }
+        expect(within(changesBreakdown).getByText("2")).toBeInTheDocument();
+
+        const otherBreakdown = within(objectsBreakdownMetric)
+            .getByText("Other")
+            .closest(".settings-metric__breakdown-item");
+        expect(otherBreakdown).not.toBeNull();
+        if (!(otherBreakdown instanceof HTMLElement)) {
+            throw new TypeError("Expected other breakdown item to exist");
+        }
+        expect(within(otherBreakdown).getByText("1")).toBeInTheDocument();
+
         expect(
             screen.getByText(
                 "Device mismatch: manifest-only [—], ops-only [device-b]."
@@ -133,9 +182,11 @@ describe(SyncMaintenancePanel, () => {
             )
         ).toBeInTheDocument();
 
-        expect(
-            screen.getByText("Operation logs by device")
-        ).toBeInTheDocument();
+        // Device IDs are available under a details section.
+        expect(screen.getByText("View device IDs")).toBeInTheDocument();
+        expect(screen.getByText("device-a")).toBeInTheDocument();
+
+        expect(screen.getByText("Operation logs by device")).toBeInTheDocument();
         expect(
             screen.getByText(/device-a — 2 op object\(s\)/)
         ).toBeInTheDocument();

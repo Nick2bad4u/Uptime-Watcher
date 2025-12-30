@@ -12,8 +12,8 @@ import type { Site } from "@shared/types";
 
 import { ensureError } from "@shared/utils/errorHandling";
 
-import type { MonitorRepositoryTransactionAdapter } from "../../services/database/MonitorRepository";
-import type { SiteRepositoryTransactionAdapter } from "../../services/database/SiteRepository";
+import type { MonitorRepositoryTransactionAdapter } from "./MonitorRepository";
+import type { SiteRepositoryTransactionAdapter } from "./SiteRepository";
 
 /**
  * Options for performing an atomic site deletion using transaction adapters.

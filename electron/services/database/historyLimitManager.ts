@@ -14,17 +14,17 @@ import type { Logger } from "@shared/utils/logger/interfaces";
 
 import { normalizeHistoryLimit } from "@shared/constants/history";
 
-import type { DatabaseService } from "../../services/database/DatabaseService";
+import type { DatabaseService } from "./DatabaseService";
 import type {
     HistoryRepository,
     HistoryRepositoryTransactionAdapter,
-} from "../../services/database/HistoryRepository";
+} from "./HistoryRepository";
 import type {
     SettingsRepository,
     SettingsRepositoryTransactionAdapter,
-} from "../../services/database/SettingsRepository";
+} from "./SettingsRepository";
 
-import { withDatabaseOperation } from "../operationalHooks";
+import { withDatabaseOperation } from "../../utils/operationalHooks";
 import { createHistorySettingsTransactionAdapters } from "./transactionAdapters";
 
 /**
@@ -107,9 +107,9 @@ async function withHistorySettingsAdapters<T>(
         settingsTx: SettingsRepositoryTransactionAdapter;
     }) => Promise<T> | T
 ): Promise<T> {
-    return databaseService.executeTransaction(async (db) => operation(
-            createHistorySettingsTransactionAdapters(db, repositories)
-        ));
+    return databaseService.executeTransaction(async (db) =>
+        operation(createHistorySettingsTransactionAdapters(db, repositories))
+    );
 }
 
 /**

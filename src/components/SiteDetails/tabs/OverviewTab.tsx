@@ -86,10 +86,10 @@ export interface OverviewTabProperties {
     readonly intervalChanged: boolean;
     /** Whether any async operation is in progress */
     readonly isLoading: boolean;
-    /** Local state value for check interval */
-    readonly localCheckInterval: number;
-    /** Local state value for timeout */
-    readonly localTimeout: number;
+    /** Local state value for check interval in milliseconds */
+    readonly localCheckIntervalMs: number;
+    /** Local state value for timeout in seconds */
+    readonly localTimeoutSeconds: number;
     /** Handler for immediate check trigger */
     readonly onCheckNow: () => void;
     /** Currently selected monitor */
@@ -132,8 +132,8 @@ export const OverviewTab = ({
     handleTimeoutChange,
     intervalChanged,
     isLoading,
-    localCheckInterval,
-    localTimeout,
+    localCheckIntervalMs,
+    localTimeoutSeconds,
     onCheckNow,
     selectedMonitor,
     slowestResponse,
@@ -352,7 +352,7 @@ export const OverviewTab = ({
                                 className="min-w-0 flex-1"
                                 disabled={isLoading}
                                 onChange={handleIntervalChange}
-                                value={localCheckInterval}
+                                value={localCheckIntervalMs}
                             >
                                 {CHECK_INTERVALS.map((intervalOption) => {
                                     const { label, value } =
@@ -397,7 +397,7 @@ export const OverviewTab = ({
                                 onChange={handleTimeoutChange}
                                 step={TIMEOUT_CONSTRAINTS.STEP}
                                 type="number"
-                                value={localTimeout}
+                                value={localTimeoutSeconds}
                             />
                             <ThemedText size="xs" variant="secondary">
                                 s

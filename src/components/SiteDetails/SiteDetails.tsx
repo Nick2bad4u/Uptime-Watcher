@@ -172,10 +172,10 @@ export const SiteDetails = ({
         intervalChanged,
         isLoading,
         isMonitoring,
-        localCheckInterval,
+        localCheckIntervalMs,
         localName,
         localRetryAttempts,
-        localTimeout,
+        localTimeoutSeconds,
         retryAttemptsChanged,
         selectedMonitor,
         selectedMonitorId,
@@ -350,8 +350,8 @@ export const SiteDetails = ({
                 handleTimeoutChange={handleTimeoutChange}
                 intervalChanged={intervalChanged}
                 isLoading={isLoading}
-                localCheckInterval={localCheckInterval}
-                localTimeout={localTimeout}
+                localCheckIntervalMs={localCheckIntervalMs}
+                localTimeoutSeconds={localTimeoutSeconds}
                 onCheckNow={handleCheckNowClick}
                 selectedMonitor={selectedMonitor}
                 slowestResponse={analytics.slowestResponse}
@@ -417,10 +417,10 @@ export const SiteDetails = ({
                 hasUnsavedChanges={hasUnsavedChanges}
                 intervalChanged={intervalChanged}
                 isLoading={isLoading}
-                localCheckInterval={localCheckInterval}
+                localCheckIntervalMs={localCheckIntervalMs}
                 localName={localName}
                 localRetryAttempts={localRetryAttempts}
-                localTimeout={localTimeout}
+                localTimeoutSeconds={localTimeoutSeconds}
                 retryAttemptsChanged={retryAttemptsChanged}
                 selectedMonitor={selectedMonitor}
                 setLocalName={setLocalName}

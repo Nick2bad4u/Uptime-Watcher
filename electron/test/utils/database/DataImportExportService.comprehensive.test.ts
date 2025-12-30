@@ -24,12 +24,10 @@ import { MIN_MONITOR_CHECK_INTERVAL_MS } from "@shared/constants/monitoring";
 import type { Site } from "@shared/types";
 import type { Database } from "node-sqlite3-wasm";
 
-import { DataImportExportService } from "../../../utils/database/DataImportExportService";
-import type {
-    DataImportExportConfig,
-    ImportSite,
-} from "../../../utils/database/DataImportExportService";
-import { SiteLoadingError } from "../../../utils/database/interfaces";
+import { DataImportExportService } from "../../../services/database/DataImportExportService";
+import type { DataImportExportConfig } from "../../../services/database/DataImportExportService";
+import type { ImportSite } from "@shared/validation/importExportSchemas";
+import { DataImportExportError } from "../../../services/database/interfaces";
 
 // Mock all dependencies
 vi.mock("../../../../shared/utils/errorCatalog", () => ({
@@ -108,7 +106,7 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             site: {
                 deleteAllInternal: vi.fn(),
                 bulkInsertInternal: vi.fn(),
-                exportAll: vi.fn().mockResolvedValue([]),
+                exportAllRows: vi.fn().mockResolvedValue([]),
             },
         };
 
@@ -233,7 +231,7 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             ];
             const mockSettings = { theme: "dark", historyLimit: "1000" };
 
-            mockRepositories.site.exportAll.mockResolvedValue(mockSites);
+            mockRepositories.site.exportAllRows.mockResolvedValue(mockSites);
             mockRepositories.settings.getAll.mockResolvedValue(mockSettings);
             (
                 safeJsonStringifyWithFallback as MockedFunction<any>
@@ -241,7 +239,7 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
 
             const result = await service.exportAllData();
 
-            expect(mockRepositories.site.exportAll).toHaveBeenCalledTimes(1);
+            expect(mockRepositories.site.exportAllRows).toHaveBeenCalledTimes(1);
             expect(mockRepositories.settings.getAll).toHaveBeenCalledTimes(1);
             expect(safeJsonStringifyWithFallback).toHaveBeenCalledWith(
                 expect.objectContaining({
@@ -266,10 +264,10 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             await annotate("Type: Error Handling", "type");
 
             const exportError = new Error("Database export failed");
-            mockRepositories.site.exportAll.mockRejectedValue(exportError);
+            mockRepositories.site.exportAllRows.mockRejectedValue(exportError);
 
             await expect(service.exportAllData()).rejects.toThrowError(
-                SiteLoadingError
+                DataImportExportError
             );
             await expect(service.exportAllData()).rejects.toThrowError(
                 "Failed to export data: Database export failed"
@@ -303,10 +301,10 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             await annotate("Type: Error Handling", "type");
 
             const nonErrorObject = "String error message";
-            mockRepositories.site.exportAll.mockRejectedValue(nonErrorObject);
+            mockRepositories.site.exportAllRows.mockRejectedValue(nonErrorObject);
 
             await expect(service.exportAllData()).rejects.toThrowError(
-                SiteLoadingError
+                DataImportExportError
             );
 
             expect(mockLogger.error).toHaveBeenCalledWith(
@@ -336,11 +334,11 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             await annotate("Type: Error Handling", "type");
 
             const settingsError = new Error("Settings retrieval failed");
-            mockRepositories.site.exportAll.mockResolvedValue([]);
+            mockRepositories.site.exportAllRows.mockResolvedValue([]);
             mockRepositories.settings.getAll.mockRejectedValue(settingsError);
 
             await expect(service.exportAllData()).rejects.toThrowError(
-                SiteLoadingError
+                DataImportExportError
             );
 
             expect(mockLogger.error).toHaveBeenCalledWith(
@@ -407,7 +405,7 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
 
             await expect(
                 service.importDataFromJson(invalidJsonData)
-            ).rejects.toThrowError(SiteLoadingError);
+            ).rejects.toThrowError(DataImportExportError);
             await expect(
                 service.importDataFromJson(invalidJsonData)
             ).rejects.toThrowError("Failed to parse import data");
@@ -446,7 +444,7 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             });
 
             await expect(service.importDataFromJson("{}")).rejects.toThrowError(
-                SiteLoadingError
+                DataImportExportError
             );
 
             expect(mockEventEmitter.emitTyped).toHaveBeenCalledWith(
@@ -508,7 +506,7 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
 
             await expect(
                 service.importDataFromJson("invalid")
-            ).rejects.toThrowError(SiteLoadingError);
+            ).rejects.toThrowError(DataImportExportError);
 
             expect(mockLogger.error).toHaveBeenCalledWith(
                 "Failed to parse import data: String error",
@@ -1016,7 +1014,12 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
 
             const { safeJsonParse } = await import("@shared/utils/jsonSafety");
 
-            // The type guard is passed to safeJsonParse, so we test it indirectly
+            // The parse-time guard is passed to safeJsonParse.
+            //
+            // @remarks
+            // importDataFromJson intentionally accepts any JSON value at parse
+            // time and then performs strict shape validation via the shared
+            // Zod schemas.
             (safeJsonParse as MockedFunction<any>).mockImplementation(
                 (_jsonData: any, guardFunction: any) => {
                     // Test the type guard with valid data
@@ -1027,10 +1030,13 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
                     const invalidData = { notSites: "invalid" };
 
                     expect(guardFunction(validData)).toBeTruthy();
-                    expect(guardFunction(invalidData)).toBeFalsy();
-                    expect(guardFunction(null)).toBeFalsy();
-                    expect(guardFunction("string")).toBeFalsy();
-                    expect(guardFunction({})).toBeFalsy(); // No sites array
+                    // Parse-time guard is permissive; structural validation
+                    // happens after parsing.
+                    expect(guardFunction(invalidData)).toBeTruthy();
+                    expect(guardFunction(null)).toBeTruthy();
+                    expect(guardFunction("string")).toBeTruthy();
+                    expect(guardFunction({})).toBeTruthy();
+                    expect(guardFunction(undefined)).toBeFalsy();
 
                     return {
                         success: true,
@@ -1234,16 +1240,16 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             originalError.stack =
                 "Error: Original database error\n    at someFunction";
 
-            mockRepositories.site.exportAll.mockRejectedValue(originalError);
+            mockRepositories.site.exportAllRows.mockRejectedValue(originalError);
 
             try {
                 await service.exportAllData();
             } catch (error) {
-                expect(error).toBeInstanceOf(SiteLoadingError);
+                expect(error).toBeInstanceOf(DataImportExportError);
                 expect((error as Error).message).toContain(
                     "Failed to export data: Original database error"
                 );
-                // SiteLoadingError preserves stack trace but doesn't set cause property
+                // DataImportExportError preserves stack trace but doesn't set cause property
                 expect((error as Error).stack).toContain(
                     "Original database error"
                 );

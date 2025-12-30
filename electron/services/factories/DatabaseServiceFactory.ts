@@ -11,6 +11,7 @@
  */
 
 import type { Site } from "@shared/types";
+import type { ImportSite } from "@shared/validation/importExportSchemas";
 
 import type { UptimeEvents } from "../../events/eventTypes";
 import type { TypedEventBus } from "../../events/TypedEventBus";
@@ -26,14 +27,11 @@ import type {
     DatabaseRestoreResult,
 } from "../database/utils/databaseBackup";
 
-import { DataBackupService } from "../../utils/database/DataBackupService";
-import {
-    DataImportExportService,
-    type ImportSite,
-} from "../../utils/database/DataImportExportService";
-import { LoggerAdapter } from "../../utils/database/serviceFactory";
-import { SiteRepositoryService } from "../../utils/database/SiteRepositoryService";
 import { monitorLogger } from "../../utils/logger";
+import { DataBackupService } from "../database/DataBackupService";
+import { DataImportExportService } from "../database/DataImportExportService";
+import { LoggerAdapter } from "../database/serviceFactory";
+import { SiteRepositoryService } from "../database/SiteRepositoryService";
 
 /**
  * Defines the dependencies required by the {@link DatabaseServiceFactory} for

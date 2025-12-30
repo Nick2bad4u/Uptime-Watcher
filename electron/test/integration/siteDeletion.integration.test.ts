@@ -19,7 +19,7 @@ import type {
 import type { HistoryRepository } from "../../services/database/HistoryRepository";
 import type { SettingsRepository } from "../../services/database/SettingsRepository";
 import { StandardizedCache } from "../../utils/cache/StandardizedCache";
-import { SiteWriterService } from "../../utils/database/SiteWriterService";
+import { SiteWriterService } from "../../services/database/SiteWriterService";
 
 class FakeDatabaseService {
     public nestedTransactions = 0;

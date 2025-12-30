@@ -10,12 +10,11 @@
  */
 
 import type { Site } from "@shared/types";
+import type { Logger } from "@shared/utils/logger/interfaces";
 
 import { CACHE_CONFIG, CACHE_NAMES } from "@shared/constants/cacheConfig";
 
-import type { monitorLogger } from "../logger";
-
-import { StandardizedCache } from "../cache/StandardizedCache";
+import { StandardizedCache } from "../../utils/cache/StandardizedCache";
 
 /**
  * Adapter for the logger to implement Logger interface.
@@ -26,10 +25,10 @@ import { StandardizedCache } from "../cache/StandardizedCache";
  *
  * @see {@link Logger} for the interface this class implements
  */
-export class LoggerAdapter {
-    private readonly logger: typeof monitorLogger;
+export class LoggerAdapter implements Logger {
+    private readonly logger: Logger;
 
-    public constructor(logger: typeof monitorLogger) {
+    public constructor(logger: Logger) {
         this.logger = logger;
     }
 

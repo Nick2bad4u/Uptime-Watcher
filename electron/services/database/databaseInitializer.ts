@@ -13,11 +13,11 @@ import { ensureError } from "@shared/utils/errorHandling";
 
 import type { UptimeEvents } from "../../events/eventTypes";
 import type { TypedEventBus } from "../../events/TypedEventBus";
-import type { DatabaseService } from "../../services/database/DatabaseService";
+import type { DatabaseService } from "./DatabaseService";
 
-import { toSerializedError } from "../errorSerialization";
-import { monitorLogger as logger } from "../logger";
-import { withDatabaseOperation } from "../operationalHooks";
+import { toSerializedError } from "../../utils/errorSerialization";
+import { monitorLogger as logger } from "../../utils/logger";
+import { withDatabaseOperation } from "../../utils/operationalHooks";
 
 /**
  * Initialize the database and load sites.
@@ -45,7 +45,7 @@ export async function initDatabase(
         );
     } catch (error) {
         const normalizedError = ensureError(error);
-        logger.error("Failed to initialize database", error);
+        logger.error("Failed to initialize database", normalizedError);
         await eventEmitter.emitTyped("database:error", {
             details: "Failed to initialize database",
             error: toSerializedError(normalizedError),

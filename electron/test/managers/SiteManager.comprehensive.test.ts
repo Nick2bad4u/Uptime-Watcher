@@ -151,11 +151,11 @@ const repositoryMocks = vi.hoisted(() => {
     };
 });
 
-vi.mock("../../utils/database/serviceFactory", () => ({
+vi.mock("../../services/database/serviceFactory", () => ({
     LoggerAdapter: repositoryMocks.MockLoggerAdapter,
 }));
 
-vi.mock("../../utils/database/SiteRepositoryService", () => ({
+vi.mock("../../services/database/SiteRepositoryService", () => ({
     SiteRepositoryService: repositoryMocks.MockSiteRepositoryService,
 }));
 
@@ -177,7 +177,7 @@ const siteWriterMocks = vi.hoisted(() => {
     };
 });
 
-vi.mock("../../utils/database/SiteWriterService", () => ({
+vi.mock("../../services/database/SiteWriterService", () => ({
     SiteWriterService: siteWriterMocks.MockSiteWriterService,
 }));
 

@@ -20,8 +20,8 @@ import { MIN_MONITOR_CHECK_INTERVAL_MS } from "@shared/constants/monitoring";
 import type { MonitorRow } from "@shared/types/database";
 import type { Database } from "node-sqlite3-wasm";
 
-import { SiteWriterService } from "../../../utils/database/SiteWriterService";
-import { SiteNotFoundError } from "../../../utils/database/interfaces";
+import { SiteWriterService } from "../../../services/database/SiteWriterService";
+import { SiteNotFoundError } from "../../../services/database/interfaces";
 import type { StandardizedCache } from "../../../utils/cache/StandardizedCache";
 import type { DatabaseService } from "../../../services/database/DatabaseService";
 import type {
@@ -33,7 +33,7 @@ import type {
     SiteRepositoryTransactionAdapter,
 } from "../../../services/database/SiteRepository";
 import type { Logger } from "@shared/utils/logger/interfaces";
-import type { MonitoringConfig } from "../../../utils/database/interfaces";
+import type { MonitoringConfig } from "../../../services/database/interfaces";
 import { DEFAULT_REQUEST_TIMEOUT } from "../../../constants";
 
 // Helper function to create complete Monitor objects

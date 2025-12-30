@@ -77,7 +77,7 @@ export const CloudSyncMaintenanceControl = ({
             <SyncMaintenanceCard
                 description={description}
             >
-                <div className="mt-3 flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-2">
                     <ThemedButton
                         data-testid="cloud-sync-maintenance-open"
                         icon={openIcon}

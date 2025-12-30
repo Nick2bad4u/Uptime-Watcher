@@ -8,10 +8,10 @@ import type { Logger } from "@shared/utils/logger/interfaces";
 
 import type { UptimeEvents } from "../../events/eventTypes";
 import type { TypedEventBus } from "../../events/TypedEventBus";
-import type { HistoryRepository } from "../../services/database/HistoryRepository";
-import type { MonitorRepository } from "../../services/database/MonitorRepository";
-import type { SettingsRepository } from "../../services/database/SettingsRepository";
-import type { SiteRepository } from "../../services/database/SiteRepository";
+import type { HistoryRepository } from "./HistoryRepository";
+import type { MonitorRepository } from "./MonitorRepository";
+import type { SettingsRepository } from "./SettingsRepository";
+import type { SiteRepository } from "./SiteRepository";
 
 // Logger type available for internal use - external consumers should import
 // from ../interfaces
@@ -90,6 +90,35 @@ export class SiteLoadingError extends Error {
             options?.cause instanceof Error ? options.cause.stack : undefined;
         if (causeStack && this.stack) {
             // Preserve both stack traces for better debugging
+            this.stack = `${this.stack}\nCaused by: ${causeStack}`;
+        }
+    }
+}
+
+/**
+ * Custom error for import/export data operations.
+ *
+ * @remarks
+ * Used by {@link DataImportExportService} to surface errors related to JSON
+ * export, JSON import parsing, schema validation, and persistence workflows.
+ *
+ * Unlike {@link SiteLoadingError}, this error does not apply a site-loading
+ * specific prefix to the message.
+ */
+export class DataImportExportError extends Error {
+    /**
+     * Create a new DataImportExportError.
+     *
+     * @param message - Human-readable error message.
+     * @param options - Optional error options with causal metadata.
+     */
+    public constructor(message: string, options?: ErrorOptions) {
+        super(message, options);
+        this.name = "DataImportExportError";
+
+        const causeStack =
+            options?.cause instanceof Error ? options.cause.stack : undefined;
+        if (causeStack && this.stack) {
             this.stack = `${this.stack}\nCaused by: ${causeStack}`;
         }
     }

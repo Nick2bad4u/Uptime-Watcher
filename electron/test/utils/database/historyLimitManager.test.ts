@@ -28,7 +28,7 @@ import { DEFAULT_HISTORY_LIMIT_RULES } from "@shared/constants/history";
 import {
     setHistoryLimit,
     getHistoryLimit,
-} from "../../../utils/database/historyLimitManager";
+} from "../../../services/database/historyLimitManager";
 import type { HistoryRepository } from "../../../services/database/HistoryRepository";
 import type { SettingsRepository } from "../../../services/database/SettingsRepository";
 import type { DatabaseService } from "../../../services/database/DatabaseService";

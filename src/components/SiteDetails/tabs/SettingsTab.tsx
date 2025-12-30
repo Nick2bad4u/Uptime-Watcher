@@ -133,8 +133,8 @@ export interface SettingsTabProperties {
     readonly intervalChanged: boolean;
     /** Whether any async operation is in progress */
     readonly isLoading: boolean;
-    /** Local state value for check interval */
-    readonly localCheckInterval: number;
+    /** Local state value for check interval in milliseconds */
+    readonly localCheckIntervalMs: number;
     /** Local state value for site name */
     readonly localName: string;
     /** Local state value for retry attempts */
@@ -142,7 +142,7 @@ export interface SettingsTabProperties {
     /**
      * Local state value for timeout in seconds (converted to ms when saving)
      */
-    readonly localTimeout: number;
+    readonly localTimeoutSeconds: number;
     /** Whether the retry attempts have been changed */
     readonly retryAttemptsChanged: boolean;
     /** Currently selected monitor being configured */
@@ -260,10 +260,10 @@ export const SettingsTab = ({
     hasUnsavedChanges,
     intervalChanged,
     isLoading,
-    localCheckInterval,
+    localCheckIntervalMs,
     localName,
     localRetryAttempts,
-    localTimeout,
+    localTimeoutSeconds,
     retryAttemptsChanged,
     selectedMonitor,
     setLocalName,
@@ -275,28 +275,22 @@ export const SettingsTab = ({
     const trimmedSiteName = localName.trim();
     const isSiteNameValid = trimmedSiteName.length > 0;
     const isTimeoutValid =
-        localTimeout >= TIMEOUT_CONSTRAINTS.MIN &&
-        localTimeout <= TIMEOUT_CONSTRAINTS.MAX;
+        localTimeoutSeconds >= TIMEOUT_CONSTRAINTS.MIN &&
+        localTimeoutSeconds <= TIMEOUT_CONSTRAINTS.MAX;
     const isRetryAttemptsValid =
         localRetryAttempts >= RETRY_CONSTRAINTS.MIN &&
         localRetryAttempts <= RETRY_CONSTRAINTS.MAX;
 
-    // Icon colors configuration
-    const getIconColors = (): {
-        danger: string;
-        info: string;
-        monitoring: string;
-        settings: string;
-        timing: string;
-    } => ({
-        danger: currentTheme.colors.error,
-        info: currentTheme.colors.info,
-        monitoring: currentTheme.colors.primary[600],
-        settings: currentTheme.colors.primary[500],
-        timing: currentTheme.colors.warning,
-    });
-
-    const iconColors = getIconColors();
+    const iconColors = useMemo(
+        () => ({
+            danger: currentTheme.colors.error,
+            info: currentTheme.colors.info,
+            monitoring: currentTheme.colors.primary[600],
+            settings: currentTheme.colors.primary[500],
+            timing: currentTheme.colors.warning,
+        }),
+        [currentTheme.colors]
+    );
 
     const loggedHandleSaveName = useCallback(async () => {
         logger.user.action("Settings: Save site name initiated", {
@@ -305,12 +299,7 @@ export const SettingsTab = ({
             siteIdentifier: currentSite.identifier,
         });
         await handleSaveName();
-    }, [
-        currentSite.identifier,
-        currentSite.name,
-        handleSaveName,
-        trimmedSiteName,
-    ]);
+    }, [currentSite.identifier, currentSite.name, handleSaveName, trimmedSiteName]);
 
     const isSiteMuted = useMemo(
         () =>
@@ -344,7 +333,7 @@ export const SettingsTab = ({
     const loggedHandleSaveInterval = useCallback(() => {
         logger.user.action("Settings: Save check interval", {
             monitorId: selectedMonitor.id,
-            newInterval: localCheckInterval,
+            newInterval: localCheckIntervalMs,
             oldInterval: selectedMonitor.checkInterval,
             siteIdentifier: currentSite.identifier,
         });
@@ -352,7 +341,7 @@ export const SettingsTab = ({
     }, [
         currentSite.identifier,
         handleSaveInterval,
-        localCheckInterval,
+        localCheckIntervalMs,
         selectedMonitor.checkInterval,
         selectedMonitor.id,
     ]);
@@ -372,7 +361,7 @@ export const SettingsTab = ({
     const loggedHandleSaveTimeout = useCallback(async () => {
         logger.user.action("Settings: Save timeout", {
             monitorId: selectedMonitor.id,
-            newTimeout: localTimeout,
+            newTimeoutSeconds: localTimeoutSeconds,
             oldTimeout: selectedMonitor.timeout,
             siteIdentifier: currentSite.identifier,
         });
@@ -380,7 +369,7 @@ export const SettingsTab = ({
     }, [
         currentSite.identifier,
         handleSaveTimeout,
-        localTimeout,
+        localTimeoutSeconds,
         selectedMonitor.id,
         selectedMonitor.timeout,
     ]);
@@ -507,9 +496,9 @@ export const SettingsTab = ({
         () =>
             calculateMaxCheckDurationSeconds({
                 retryAttempts: localRetryAttempts,
-                timeoutSeconds: localTimeout,
+                timeoutSeconds: localTimeoutSeconds,
             }),
-        [localRetryAttempts, localTimeout]
+        [localRetryAttempts, localTimeoutSeconds]
     );
 
     const maxDurationVariant = useMemo(() => {
@@ -666,7 +655,7 @@ export const SettingsTab = ({
                             <ThemedSelect
                                 className="flex-1"
                                 onChange={handleIntervalChange}
-                                value={localCheckInterval}
+                                value={localCheckIntervalMs}
                             >
                                 {CHECK_INTERVALS.map((interval) => {
                                     const value =
@@ -699,13 +688,13 @@ export const SettingsTab = ({
                                 <span className="ml-2 inline-flex items-center gap-1 font-medium">
                                     <DurationIcon aria-hidden size={14} />
                                     Current: {formatSecondsWithMinutes(
-                                        Math.round(localCheckInterval / 1000)
+                                        Math.round(localCheckIntervalMs / 1000)
                                     )}
                                 </span>
                             </SiteSettingsHelpText>
                         </div>
 
-                        {Math.round(localCheckInterval / 1000) <
+                        {Math.round(localCheckIntervalMs / 1000) <
                         CHECK_INTERVAL_INFLIGHT_WARNING_SECONDS ? (
                             <div className="mt-2">
                                 <SiteSettingsHelpText
@@ -728,7 +717,7 @@ export const SettingsTab = ({
                                 Maximum time to wait per attempt before it is treated as failed.
                                 <span className="ml-2 inline-flex items-center gap-1 font-medium">
                                     <DurationIcon aria-hidden size={14} />
-                                    Current: {formatSecondsWithMinutes(localTimeout)}
+                                    Current: {formatSecondsWithMinutes(localTimeoutSeconds)}
                                 </span>
                                 <span className="ml-2 inline-flex items-center gap-1">
                                     <DurationIcon aria-hidden size={14} />
@@ -746,7 +735,7 @@ export const SettingsTab = ({
                         placeholder="Enter timeout in seconds"
                         saveIcon={saveIcon}
                         step={TIMEOUT_CONSTRAINTS.STEP}
-                        value={localTimeout}
+                        value={localTimeoutSeconds}
                     />
 
                     {/* Retry Attempts Configuration */}
@@ -816,7 +805,7 @@ export const SettingsTab = ({
                                 >
                                     <span className="inline-flex items-center gap-1">
                                         <DurationIcon aria-hidden size={14} />
-                                        {formatSecondsWithMinutes(localTimeout)}
+                                        {formatSecondsWithMinutes(localTimeoutSeconds)}
                                     </span>
                                     <span> per attempt</span>
                                     <span className="mx-1">×</span>

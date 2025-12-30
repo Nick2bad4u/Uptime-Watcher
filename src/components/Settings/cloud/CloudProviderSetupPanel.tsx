@@ -19,9 +19,9 @@ import { StatusIndicator } from "../../../theme/components/StatusIndicator";
 import { ThemedButton } from "../../../theme/components/ThemedButton";
 import { ThemedInput } from "../../../theme/components/ThemedInput";
 import { ThemedText } from "../../../theme/components/ThemedText";
-import { AppIcons } from "../../../utils/icons";
+import { AppIcons, getIconSize } from "../../../utils/icons";
 import { ErrorAlert } from "../../common/ErrorAlert/ErrorAlert";
-import { SettingItem } from "../../shared/SettingItem";
+import { Tooltip } from "../../common/Tooltip/Tooltip";
 
 type ConnectionSiteStatus = "down" | "pending" | "up";
 
@@ -117,24 +117,21 @@ function resolveActiveProviderTab(
 ): CloudProviderTabKey | null {
     const provider = status?.provider ?? null;
 
-    switch (provider) {
-        case "dropbox":
-        case "filesystem":
-        case "google-drive":
-        case "webdav": {
-            return provider;
-        }
-        case null: {
-            return null;
-        }
-        default: {
-            return null;
-        }
+    if (
+        provider === "dropbox" ||
+        provider === "filesystem" ||
+        provider === "google-drive" ||
+        provider === "webdav"
+    ) {
+        return provider;
     }
+
+    return null;
 }
 
-function resolveCloudProviderTabLabel(key: CloudProviderTabKey): string {
-    return CLOUD_PROVIDER_TABS.find((entry) => entry.key === key)?.label ?? key;
+function resolveCloudProviderTabLabel(tab: CloudProviderTabKey): string {
+    const match = CLOUD_PROVIDER_TABS.find((entry) => entry.key === tab);
+    return match ? match.label : tab;
 }
 
 function buildDisconnectProviderFirstMessage(args: {
@@ -510,8 +507,8 @@ function renderUnavailableProviderPanel(args: {
         >
             {args.blockedCallout}
 
-            <div className="mt-3 rounded-md border border-zinc-800 bg-zinc-950/40 p-3">
-                <ThemedText size="sm" weight="medium">
+            <div className="settings-subcard settings-subcard--compact mt-3">
+                <ThemedText as="p" size="sm" weight="medium">
                     {args.tab.label} integration is coming soon
                 </ThemedText>
                 <ThemedText className="mt-1" size="xs" variant="secondary">
@@ -565,6 +562,7 @@ const OAuthProviderPanel = ({
             ? AppIcons.brands.dropbox
             : AppIcons.brands.googleDrive;
     const ConnectedIcon = AppIcons.status.upFilled;
+    const InfoIcon = AppIcons.ui.info;
 
     const providerIconNode = useMemo(
         () => <ProviderIcon aria-hidden className="h-4 w-4" />,
@@ -573,6 +571,11 @@ const OAuthProviderPanel = ({
     const connectedIconNode = useMemo(
         () => <ConnectedIcon aria-hidden className="h-4 w-4" />,
         [ConnectedIcon]
+    );
+
+    const infoIconNode = useMemo(
+        () => <InfoIcon aria-hidden className="h-4 w-4" />,
+        [InfoIcon]
     );
 
     return (
@@ -584,21 +587,48 @@ const OAuthProviderPanel = ({
         >
             {children}
 
-            <ThemedText as="p" className="mt-1" size="xs" variant="secondary">
-                {description}
-            </ThemedText>
-
-            {connected ? (
-                <div className="mt-2 flex items-start gap-2">
-                    <span aria-hidden className="text-emerald-400">
-                        {connectedIconNode}
-                    </span>
-                    <ThemedText as="p" size="xs" variant="tertiary">
-                        Connected. To switch accounts or providers, disconnect
-                        above and connect again.
+            <div className="settings-subcard settings-subcard--compact mt-3">
+                <div className="settings-subcard__header">
+                    <ThemedText
+                        as="div"
+                        size="xs"
+                        variant="secondary"
+                        weight="medium"
+                    >
+                        Authorization
                     </ThemedText>
+
+                    <div className="settings-subcard__actions">
+                        <Tooltip content={description} maxWidth={520} position="top">
+                            {(trigger) => (
+                                <button
+                                    aria-label="Authorization details"
+                                    className="settings-provider__tooltip-button"
+                                    type="button"
+                                    {...trigger}
+                                >
+                                    {infoIconNode}
+                                </button>
+                            )}
+                        </Tooltip>
+                    </div>
                 </div>
-            ) : null}
+
+                {connected ? (
+                    <div className="settings-provider__connected-row">
+                        <span
+                            aria-hidden
+                            className="settings-provider__connected-icon settings-accent--success"
+                        >
+                            {connectedIconNode}
+                        </span>
+                        <ThemedText as="p" size="xs" variant="tertiary">
+                            Connected. To switch accounts or providers,
+                            disconnect above and connect again.
+                        </ThemedText>
+                    </div>
+                ) : null}
+            </div>
 
             {connected ? null : (
                 <div className="mt-3 flex flex-wrap gap-2">
@@ -655,24 +685,27 @@ function renderFilesystemProviderPanel(args: {
         >
             {args.blockedCallout}
 
-            <ThemedText className="mt-1" size="xs" variant="secondary">
-                Configure a local folder. If you already use Dropbox/Google
-                Drive/iCloud/SyncThing, point this at a folder inside your sync
-                directory and let your existing sync client do the rest.
-            </ThemedText>
-
-            {args.filesystemConfiguredBaseDirectory ? (
-                <ThemedText className="mt-2" size="xs" variant="tertiary">
-                    Current folder: {args.filesystemConfiguredBaseDirectory}
+            <div className="settings-subcard settings-subcard--compact settings-paragraph-stack mt-3">
+                <ThemedText as="p" size="xs" variant="secondary">
+                    Configure a local folder. If you already use Dropbox/Google
+                    Drive/iCloud/SyncThing, point this at a folder inside your
+                    sync directory and let your existing sync client do the
+                    rest.
                 </ThemedText>
-            ) : null}
 
-            {args.connected ? (
-                <ThemedText className="mt-2" size="xs" variant="tertiary">
-                    To use a different folder, clear configuration above and set
-                    it again.
-                </ThemedText>
-            ) : null}
+                {args.filesystemConfiguredBaseDirectory ? (
+                    <ThemedText as="p" size="xs" variant="tertiary">
+                        Current folder: {args.filesystemConfiguredBaseDirectory}
+                    </ThemedText>
+                ) : null}
+
+                {args.connected ? (
+                    <ThemedText as="p" size="xs" variant="tertiary">
+                        To use a different folder, clear configuration above
+                        and set it again.
+                    </ThemedText>
+                ) : null}
+            </div>
 
             {args.connected ? null : (
                 <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-center">
@@ -737,7 +770,7 @@ const ProviderPanel = ({
             : null;
 
     const blockedCallout = providerBlockMessage ? (
-        <div className="mt-3 rounded-md border border-zinc-800 bg-zinc-950/40 p-3">
+        <div className="settings-subcard settings-subcard--compact mt-3">
             <ThemedText size="xs" variant="secondary">
                 {providerBlockMessage}
             </ThemedText>
@@ -926,36 +959,90 @@ export const CloudProviderSetupPanel = ({
         ? buildProviderSwitchLockedMessage(lockedProviderTab)
         : null;
 
-    const providerStatusControl = useMemo(
-        (): JSX.Element => (
-            <CloudProviderStatusControl
-                providerLabel={providerLabel}
-                status={connectionSiteStatus}
-            />
-        ),
-        [connectionSiteStatus, providerLabel]
-    );
-
     const onDismiss = useCallback((): void => {
         setLockedProviderAttemptTab(null);
     }, []);
 
     const onAttemptLockedAction = useCallback((): void => {}, []);
-    return (
-        <div className="rounded-lg border border-zinc-800 bg-zinc-900/40 p-4">
-            <ThemedText size="sm" variant="secondary" weight="medium">
-                Provider
-            </ThemedText>
 
-            <div className="settings-toggle-stack mt-3">
-                <SettingItem
-                    control={providerStatusControl}
-                    description="Current cloud provider connection status."
-                    title="Status"
-                />
+    const ProviderIcon = AppIcons.ui.cloud;
+    const providerHeaderIcon = useMemo(
+        () => (
+            <ProviderIcon
+                aria-hidden
+                className="settings-accent--primary h-5 w-5"
+            />
+        ),
+        [ProviderIcon]
+    );
+
+    const providerStatusIconSize = getIconSize("sm");
+    return (
+        <div className="settings-subcard">
+            <div className="settings-subcard__header">
+                <div className="settings-subcard__title">
+                    {providerHeaderIcon}
+                    <ThemedText as="h4" size="sm" variant="secondary" weight="medium">
+                        Provider
+                    </ThemedText>
+                </div>
+
+                <div className="settings-subcard__actions">
+                    <ThemedButton
+                        disabled={isRefreshingStatus}
+                        onClick={onRefreshStatus}
+                        size="sm"
+                        variant="secondary"
+                    >
+                        {isRefreshingStatus ? "Refreshing…" : "Refresh status"}
+                    </ThemedButton>
+
+                    <DisconnectControl
+                        configured={configured}
+                        connected={connected}
+                        isDisconnecting={isDisconnecting}
+                        onDisconnect={onDisconnect}
+                    />
+                </div>
             </div>
 
-            <div className="mt-3 flex flex-col gap-3">
+            <div className="settings-item-stack mt-4">
+                <div className="setting-item">
+                    <div className="setting-info">
+                        <div className="setting-title-row">
+                            <span aria-hidden className="setting-item__icon">
+                                <ProviderIcon
+                                    aria-hidden
+                                    className="settings-accent--primary-muted"
+                                    size={providerStatusIconSize}
+                                />
+                            </span>
+                            <ThemedText
+                                className="setting-title"
+                                size="sm"
+                                weight="medium"
+                            >
+                                Status
+                            </ThemedText>
+                        </div>
+                        <ThemedText
+                            className="setting-description"
+                            size="xs"
+                            variant="tertiary"
+                        >
+                            Current cloud provider connection status.
+                        </ThemedText>
+                    </div>
+                    <div className="setting-control">
+                        <CloudProviderStatusControl
+                            providerLabel={providerLabel}
+                            status={connectionSiteStatus}
+                        />
+                    </div>
+                </div>
+            </div>
+
+            <div className="mt-4 flex flex-col gap-3">
                 <ProviderTabList
                     ariaLabel="Cloud providers"
                     lockedKey={lockedProviderTab}
@@ -995,24 +1082,6 @@ export const CloudProviderSetupPanel = ({
                     providerSetupLocked={false}
                     selectedProviderTab={selectedProviderTab}
                 />
-
-                <div className="flex flex-wrap gap-2">
-                    <ThemedButton
-                        disabled={isRefreshingStatus}
-                        onClick={onRefreshStatus}
-                        size="sm"
-                        variant="secondary"
-                    >
-                        {isRefreshingStatus ? "Refreshing…" : "Refresh status"}
-                    </ThemedButton>
-
-                    <DisconnectControl
-                        configured={configured}
-                        connected={connected}
-                        isDisconnecting={isDisconnecting}
-                        onDisconnect={onDisconnect}
-                    />
-                </div>
             </div>
         </div>
     );

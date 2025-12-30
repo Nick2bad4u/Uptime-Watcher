@@ -3,19 +3,19 @@ import type { Database } from "node-sqlite3-wasm";
 import type {
     HistoryRepository,
     HistoryRepositoryTransactionAdapter,
-} from "../../services/database/HistoryRepository";
+} from "./HistoryRepository";
 import type {
     MonitorRepository,
     MonitorRepositoryTransactionAdapter,
-} from "../../services/database/MonitorRepository";
+} from "./MonitorRepository";
 import type {
     SettingsRepository,
     SettingsRepositoryTransactionAdapter,
-} from "../../services/database/SettingsRepository";
+} from "./SettingsRepository";
 import type {
     SiteRepository,
     SiteRepositoryTransactionAdapter,
-} from "../../services/database/SiteRepository";
+} from "./SiteRepository";
 
 /**
  * Creates transaction-scoped site + monitor repository adapters.

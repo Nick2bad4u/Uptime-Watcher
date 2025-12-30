@@ -51,7 +51,7 @@ const mockSettingsRepository = {
     findByKey: vi.fn(() => Promise.resolve(undefined)),
     get: vi.fn(() => Promise.resolve(undefined)),
     upsert: vi.fn(() => Promise.resolve()),
-    exportAll: vi.fn(() => Promise.resolve([])),
+    exportAllRows: vi.fn(() => Promise.resolve([])),
 } as unknown as SettingsRepository;
 
 const mockSiteRepository = {
@@ -60,19 +60,19 @@ const mockSiteRepository = {
     upsert: vi.fn(() => Promise.resolve()),
     deleteAll: vi.fn(() => Promise.resolve()),
     bulkInsert: vi.fn(() => Promise.resolve()),
-    exportAll: vi.fn(() => Promise.resolve([])),
+    exportAllRows: vi.fn(() => Promise.resolve([])),
 } as unknown as SiteRepository;
 
 // Mock external modules
-vi.mock("../../utils/database/databaseInitializer", () => ({
+vi.mock("../../services/database/databaseInitializer", () => ({
     initDatabase: vi.fn(() => Promise.resolve()),
 }));
 
-vi.mock("../../utils/database/DataBackupService", () => ({
+vi.mock("../../services/database/DataBackupService", () => ({
     DataBackupService: vi.fn(),
 }));
 
-vi.mock("../../utils/database/DataImportExportService", () => ({
+vi.mock("../../services/database/DataImportExportService", () => ({
     DataImportExportService: vi.fn(),
 }));
 
@@ -92,14 +92,14 @@ const mockSiteLoadingOrchestrator = {
     ),
 };
 
-vi.mock("../../utils/database/SiteRepositoryService", () => ({
+vi.mock("../../services/database/SiteRepositoryService", () => ({
     SiteRepositoryService: vi.fn(() => mockSiteRepositoryService),
     SiteLoadingOrchestrator: vi.fn(function SiteLoadingOrchestratorMock() {
         return mockSiteLoadingOrchestrator;
     }),
 }));
 
-vi.mock("../../utils/database/historyLimitManager", () => ({
+vi.mock("../../services/database/historyLimitManager", () => ({
     setHistoryLimit: vi.fn(async (args: any) => {
         if (args && typeof args.setHistoryLimit === "function") {
             const normalizedLimit = normalizeHistoryLimit(
@@ -114,7 +114,7 @@ vi.mock("../../utils/database/historyLimitManager", () => ({
     getHistoryLimit: vi.fn(() => 500),
 }));
 
-vi.mock("../../utils/database/serviceFactory", () => ({
+vi.mock("../../services/database/serviceFactory", () => ({
     createSiteCache: vi.fn(() => {
         const store = new Map<string, Site>();
 
@@ -317,9 +317,9 @@ describe(DatabaseManager, () => {
 
             // Get references to the mocked modules
             const { LoggerAdapter } =
-                await import("../../utils/database/serviceFactory");
+                await import("../../services/database/serviceFactory");
             const { DataBackupService } =
-                await import("../../utils/database/DataBackupService");
+                await import("../../services/database/DataBackupService");
 
             // Setup mocks to return our mock instances
             vi.mocked(LoggerAdapter).mockReturnValue(mockLoggerAdapter as any);
@@ -386,9 +386,9 @@ describe(DatabaseManager, () => {
 
             // Get references to the mocked modules
             const { LoggerAdapter } =
-                await import("../../utils/database/serviceFactory");
+                await import("../../services/database/serviceFactory");
             const { DataImportExportService } =
-                await import("../../utils/database/DataImportExportService");
+                await import("../../services/database/DataImportExportService");
 
             // Setup mocks to return our mock instances
             vi.mocked(LoggerAdapter).mockReturnValue(mockLoggerAdapter as any);
@@ -452,9 +452,9 @@ describe(DatabaseManager, () => {
 
             // Get references to the mocked modules
             const { LoggerAdapter } =
-                await import("../../utils/database/serviceFactory");
+                await import("../../services/database/serviceFactory");
             const { DataImportExportService } =
-                await import("../../utils/database/DataImportExportService");
+                await import("../../services/database/DataImportExportService");
 
             // Setup mocks to return our mock instances
             vi.mocked(LoggerAdapter).mockReturnValue(mockLoggerAdapter as any);
@@ -502,9 +502,9 @@ describe(DatabaseManager, () => {
 
             // Get references to the mocked modules
             const { LoggerAdapter } =
-                await import("../../utils/database/serviceFactory");
+                await import("../../services/database/serviceFactory");
             const { DataImportExportService } =
-                await import("../../utils/database/DataImportExportService");
+                await import("../../services/database/DataImportExportService");
 
             // Setup mocks to return our mock instances
             vi.mocked(LoggerAdapter).mockReturnValue(mockLoggerAdapter as any);
@@ -539,7 +539,7 @@ describe(DatabaseManager, () => {
             await databaseManager.setHistoryLimit(500);
 
             const historyManager =
-                await import("../../utils/database/historyLimitManager");
+                await import("../../services/database/historyLimitManager");
             expect(historyManager.setHistoryLimit).toHaveBeenCalledWith(
                 expect.objectContaining({
                     limit: 500,
@@ -553,7 +553,7 @@ describe(DatabaseManager, () => {
 
         it("should handle setting history limit errors", async () => {
             const historyManager =
-                await import("../../utils/database/historyLimitManager");
+                await import("../../services/database/historyLimitManager");
             vi.mocked(historyManager.setHistoryLimit).mockRejectedValueOnce(
                 new Error("Set limit failed")
             );
@@ -570,7 +570,7 @@ describe(DatabaseManager, () => {
             // Note: We can't directly test this without exposing internals,
             // but we can verify the call was made correctly
             const historyManager =
-                await import("../../utils/database/historyLimitManager");
+                await import("../../services/database/historyLimitManager");
             expect(historyManager.setHistoryLimit).toHaveBeenCalledWith(
                 expect.objectContaining({
                     limit: 750,
@@ -645,7 +645,7 @@ describe(DatabaseManager, () => {
         it("should emit backup downloaded events with correct data", async () => {
             // Set up the mock to return proper data
             const { DataBackupService } =
-                await import("../../utils/database/DataBackupService");
+                await import("../../services/database/DataBackupService");
             const mockBackupService = {
                 downloadDatabaseBackup: vi.fn().mockResolvedValue({
                     buffer: Buffer.from("backup data"),
@@ -672,7 +672,7 @@ describe(DatabaseManager, () => {
         it("should emit data exported events with correct data", async () => {
             // Set up the mock to return proper data
             const { DataImportExportService } =
-                await import("../../utils/database/DataImportExportService");
+                await import("../../services/database/DataImportExportService");
             const mockExportService = {
                 exportAllData: vi
                     .fn()
@@ -706,7 +706,7 @@ describe(DatabaseManager, () => {
             await databaseManager.setHistoryLimit(500);
 
             const historyManager =
-                await import("../../utils/database/historyLimitManager");
+                await import("../../services/database/historyLimitManager");
             expect(historyManager.setHistoryLimit).toHaveBeenCalledWith(
                 expect.objectContaining({
                     limit: 500,
@@ -738,7 +738,7 @@ describe(DatabaseManager, () => {
             await databaseManager.setHistoryLimit(0);
 
             const historyManager =
-                await import("../../utils/database/historyLimitManager");
+                await import("../../services/database/historyLimitManager");
             expect(historyManager.setHistoryLimit).toHaveBeenCalledWith(
                 expect.objectContaining({
                     limit: 0,
@@ -748,7 +748,7 @@ describe(DatabaseManager, () => {
 
         it("should clamp negative history limit inputs to the unlimited sentinel", async () => {
             const historyManager =
-                await import("../../utils/database/historyLimitManager");
+                await import("../../services/database/historyLimitManager");
 
             await databaseManager.setHistoryLimit(-1);
 

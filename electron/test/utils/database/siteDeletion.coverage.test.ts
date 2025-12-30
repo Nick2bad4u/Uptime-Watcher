@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const modulePath = "../../../utils/database/siteDeletion";
+const modulePath = "../../../services/database/siteDeletion";
 const errorUtilsModulePath = "../../../../shared/utils/errorHandling";
 
 interface MonitorAdapterStub {

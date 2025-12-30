@@ -45,16 +45,16 @@ import { ensureError } from "@shared/utils/errorHandling";
 
 import type { UptimeEvents } from "../../events/eventTypes";
 import type { TypedEventBus } from "../../events/TypedEventBus";
-import type { HistoryRepository } from "../../services/database/HistoryRepository";
-import type { MonitorRepository } from "../../services/database/MonitorRepository";
-import type { SettingsRepository } from "../../services/database/SettingsRepository";
-import type { SiteRepository } from "../../services/database/SiteRepository";
-import type { SiteRow } from "../../services/database/utils/siteMapper";
-import type { StandardizedCache } from "../cache/StandardizedCache";
+import type { StandardizedCache } from "../../utils/cache/StandardizedCache";
+import type { HistoryRepository } from "./HistoryRepository";
 import type { MonitoringConfig, SiteLoadingConfig } from "./interfaces";
+import type { MonitorRepository } from "./MonitorRepository";
+import type { SettingsRepository } from "./SettingsRepository";
+import type { SiteRepository } from "./SiteRepository";
+import type { SiteRow } from "./utils/siteMapper";
 
 import { DEFAULT_SITE_NAME } from "../../constants";
-import { toSerializedError } from "../errorSerialization";
+import { toSerializedError } from "../../utils/errorSerialization";
 import { SiteLoadingError } from "./interfaces";
 
 /**

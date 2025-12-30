@@ -129,18 +129,28 @@ export const RemoteBackupsPanel = ({
 
                     return (
                         <li
-                            className="flex flex-col gap-2 rounded-md border border-zinc-800 bg-zinc-950/40 p-3 sm:flex-row sm:items-center sm:justify-between"
+                            className="settings-subcard settings-subcard--compact flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between"
                             key={backup.key}
                         >
                             <div className="min-w-0">
-                                <div className="truncate text-sm font-medium text-zinc-200">
+                                <ThemedText
+                                    as="div"
+                                    className="truncate"
+                                    size="sm"
+                                    weight="medium"
+                                >
                                     {backup.fileName}
-                                </div>
-                                <div className="text-xs text-zinc-400">
+                                </ThemedText>
+                                <ThemedText
+                                    as="div"
+                                    className="mt-0.5"
+                                    size="xs"
+                                    variant="tertiary"
+                                >
                                     {createdAt} ·{" "}
                                     {formatBytes(backup.metadata.sizeBytes)}
                                     {encryptionSuffix}
-                                </div>
+                                </ThemedText>
                             </div>
 
                             <div className="flex flex-wrap gap-2">
@@ -181,10 +191,10 @@ export const RemoteBackupsPanel = ({
         );
 
     return (
-        <div className="rounded-lg border border-zinc-800 bg-zinc-900/40 p-4">
+        <div className="settings-subcard">
             <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
                 <div className="flex items-center gap-2">
-                    <span aria-hidden className="text-sky-400">
+                    <span aria-hidden className="settings-accent--primary">
                         {panelIcon}
                     </span>
                     <ThemedText size="sm" variant="secondary" weight="medium">

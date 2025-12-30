@@ -287,7 +287,7 @@ describe("Site Repository Performance", () => {
             await repository.bulkInsert(testSites);
 
             // Benchmark export
-            await repository.exportAll();
+            await repository.exportAllRows();
         },
         { warmupIterations: 5, iterations: 10_000 }
     );
@@ -300,7 +300,7 @@ describe("Site Repository Performance", () => {
             await repository.bulkInsert(testSites);
 
             // Benchmark export
-            await repository.exportAll();
+            await repository.exportAllRows();
         },
         { warmupIterations: 3, iterations: 1000 }
     );
@@ -313,7 +313,7 @@ describe("Site Repository Performance", () => {
             await repository.bulkInsert(testSites);
 
             // Benchmark export
-            await repository.exportAll();
+            await repository.exportAllRows();
         },
         { warmupIterations: 2, iterations: 100 }
     );

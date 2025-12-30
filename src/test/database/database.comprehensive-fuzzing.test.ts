@@ -70,7 +70,7 @@ describe("Database & Repository - 100% Fast-Check Fuzzing Coverage", () => {
     describe("Database Module Imports", () => {
         test("should import database initializer", async () => {
             const { initDatabase } =
-                await import("../../../electron/utils/database/databaseInitializer");
+                await import("../../../electron/services/database/databaseInitializer");
             expect(typeof initDatabase).toBe("function");
         });
 
@@ -92,9 +92,9 @@ describe("Database & Repository - 100% Fast-Check Fuzzing Coverage", () => {
 
         test("should import data services", async () => {
             const { DataBackupService } =
-                await import("../../../electron/utils/database/DataBackupService");
+                await import("../../../electron/services/database/DataBackupService");
             const { DataImportExportService } =
-                await import("../../../electron/utils/database/DataImportExportService");
+                await import("../../../electron/services/database/DataImportExportService");
 
             expect(DataBackupService).toBeDefined();
             expect(DataImportExportService).toBeDefined();

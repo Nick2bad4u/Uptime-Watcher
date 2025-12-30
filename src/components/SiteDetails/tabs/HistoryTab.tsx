@@ -340,8 +340,7 @@ export const HistoryTab: NamedExoticComponent<HistoryTabProperties> = memo(
                 // Only log if monitor ID or type has changed (not just history
                 // length)
                 if (
-                    !lastLogged ||
-                    lastLogged.id !== currentMonitor.id ||
+                    lastLogged?.id !== currentMonitor.id ||
                     lastLogged.type !== currentMonitor.type
                 ) {
                     logger.user.action("History tab viewed", {

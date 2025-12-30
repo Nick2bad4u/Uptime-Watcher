@@ -10,9 +10,11 @@ import path from "node:path";
 
 import type { UptimeEvents } from "../../events/eventTypes";
 import type { TypedEventBus } from "../../events/TypedEventBus";
-import type { DatabaseService } from "../../services/database/DatabaseService";
+import type { DatabaseService } from "./DatabaseService";
 
 import { DB_FILE_NAME } from "../../constants";
+import { toSerializedError } from "../../utils/errorSerialization";
+import { SiteLoadingError } from "./interfaces";
 import {
     createDatabaseBackup,
     type DatabaseBackupMetadata,
@@ -21,9 +23,7 @@ import {
     type DatabaseRestoreResult,
     DEFAULT_BACKUP_RETENTION_HINT_DAYS,
     validateDatabaseBackupPayload,
-} from "../../services/database/utils/databaseBackup";
-import { toSerializedError } from "../errorSerialization";
-import { SiteLoadingError } from "./interfaces";
+} from "./utils/databaseBackup";
 
 const RESTORE_TEMP_PREFIX = "uptime-watcher-restore-";
 const ROLLBACK_TEMP_PREFIX = "uptime-watcher-rollback-";

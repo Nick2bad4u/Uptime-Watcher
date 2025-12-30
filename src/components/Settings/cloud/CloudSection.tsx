@@ -264,15 +264,30 @@ export const CloudSection = ({
     const UploadIcon = AppIcons.actions.upload;
 
     const connectionHeaderIcon = useMemo(
-        () => <CloudIcon aria-hidden className="h-5 w-5 text-sky-400" />,
+        () => (
+            <CloudIcon
+                aria-hidden
+                className="settings-accent--primary h-5 w-5"
+            />
+        ),
         [CloudIcon]
     );
     const syncHeaderIcon = useMemo(
-        () => <SyncIcon aria-hidden className="h-5 w-5 text-emerald-400" />,
+        () => (
+            <SyncIcon
+                aria-hidden
+                className="settings-accent--success h-5 w-5"
+            />
+        ),
         [SyncIcon]
     );
     const encryptionHeaderIcon = useMemo(
-        () => <LockIcon aria-hidden className="h-5 w-5 text-violet-400" />,
+        () => (
+            <LockIcon
+                aria-hidden
+                className="settings-accent--highlight h-5 w-5"
+            />
+        ),
         [LockIcon]
     );
 
@@ -280,7 +295,7 @@ export const CloudSection = ({
         () => (
             <TimeIcon
                 aria-hidden
-                className="text-sky-300"
+                className="settings-accent--primary-muted"
                 size={rowIconSize}
             />
         ),
@@ -290,7 +305,7 @@ export const CloudSection = ({
         () => (
             <UploadIcon
                 aria-hidden
-                className="text-sky-300"
+                className="settings-accent--primary-muted"
                 size={rowIconSize}
             />
         ),
@@ -300,7 +315,7 @@ export const CloudSection = ({
         () => (
             <SyncIcon
                 aria-hidden
-                className="text-emerald-300"
+                className="settings-accent--success-muted"
                 size={rowIconSize}
             />
         ),
@@ -310,7 +325,7 @@ export const CloudSection = ({
         () => (
             <LockIcon
                 aria-hidden
-                className="text-violet-300"
+                className="settings-accent--highlight-muted"
                 size={rowIconSize}
             />
         ),
@@ -363,7 +378,7 @@ export const CloudSection = ({
                     status={status}
                 />
 
-                <div className="rounded-lg border border-zinc-800 bg-zinc-900/40 p-4">
+                <div className="settings-subcard">
                     <div className="flex items-center gap-2">
                         {connectionHeaderIcon}
                         <ThemedText size="sm" variant="secondary" weight="medium">
@@ -371,7 +386,7 @@ export const CloudSection = ({
                         </ThemedText>
                     </div>
 
-                    <div className="settings-toggle-stack mt-3">
+                    <div className="settings-item-stack mt-4">
                         <SettingItem
                             control={lastSyncControl}
                             description="Last completed sync time (based on this device)."
@@ -388,7 +403,7 @@ export const CloudSection = ({
                     </div>
                 </div>
 
-                <div className="rounded-lg border border-zinc-800 bg-zinc-900/40 p-4">
+                <div className="settings-subcard">
                     <div className="flex items-center gap-2">
                         {syncHeaderIcon}
                         <ThemedText size="sm" variant="secondary" weight="medium">
@@ -396,7 +411,7 @@ export const CloudSection = ({
                         </ThemedText>
                     </div>
 
-                    <div className="settings-toggle-stack mt-3">
+                    <div className="settings-item-stack mt-4">
                         <SettingItem
                             control={syncEnabledControl}
                             description="When enabled, configuration changes are merged across devices."
@@ -418,7 +433,7 @@ export const CloudSection = ({
                     </div>
                 </div>
 
-                <div className="rounded-lg border border-zinc-800 bg-zinc-900/40 p-4">
+                <div className="settings-subcard">
                     <div className="flex items-center gap-2">
                         {encryptionHeaderIcon}
                         <ThemedText size="sm" variant="secondary" weight="medium">
@@ -426,7 +441,7 @@ export const CloudSection = ({
                         </ThemedText>
                     </div>
 
-                    <div className="settings-toggle-stack mt-3">
+                    <div className="settings-item-stack mt-4">
                         <SettingItem
                             control={encryptionStatusControl}
                             description="Optional client-side encryption for new cloud sync artifacts and backups."

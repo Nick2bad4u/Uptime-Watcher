@@ -270,9 +270,7 @@ export const StateSyncService: StateSyncServiceContract = {
                     }
 
                     if (
-                        pendingRecoveryExpectation &&
-                        parsedEvent.data.timestamp ===
-                            pendingRecoveryExpectation.expectedTimestamp
+                        parsedEvent.data.timestamp === pendingRecoveryExpectation?.expectedTimestamp
                     ) {
                         logger.info(
                             "[StateSyncService] Full sync recovery broadcast applied",

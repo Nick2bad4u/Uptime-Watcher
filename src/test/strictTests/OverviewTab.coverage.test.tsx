@@ -183,8 +183,8 @@ describe("OverviewTab coverage", () => {
                 handleTimeoutChange={handleTimeoutChange}
                 intervalChanged
                 isLoading={false}
-                localCheckInterval={60_000}
-                localTimeout={45}
+                localCheckIntervalMs={60_000}
+                localTimeoutSeconds={45}
                 onCheckNow={onCheckNow}
                 selectedMonitor={selectedMonitor}
                 slowestResponse={520}

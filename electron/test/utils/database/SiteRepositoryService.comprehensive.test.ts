@@ -23,13 +23,13 @@ import type { Logger } from "@shared/utils/logger/interfaces";
 import type {
     MonitoringConfig,
     SiteLoadingConfig,
-} from "../../../utils/database/interfaces";
+} from "../../../services/database/interfaces";
 
-import { SiteLoadingError } from "../../../utils/database/interfaces";
+import { SiteLoadingError } from "../../../services/database/interfaces";
 import {
     SiteLoadingOrchestrator,
     SiteRepositoryService,
-} from "../../../utils/database/SiteRepositoryService";
+} from "../../../services/database/SiteRepositoryService";
 
 // Mock constants
 vi.mock("../../../constants", () => ({

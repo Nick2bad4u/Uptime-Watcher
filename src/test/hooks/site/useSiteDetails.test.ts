@@ -316,8 +316,8 @@ describe("useSiteDetails Hook - Basic Coverage", () => {
                 useSiteDetails({ site: mockSite })
             );
 
-            expect(result.current.localCheckInterval).toBe(60_000);
-            expect(result.current.localTimeout).toBeDefined();
+            expect(result.current.localCheckIntervalMs).toBe(60_000);
+            expect(result.current.localTimeoutSeconds).toBeDefined();
             expect(result.current.localRetryAttempts).toBe(3);
         });
     });
@@ -1367,8 +1367,8 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
                 useSiteDetails({ site: mockSite })
             );
 
-            expect(result.current.localCheckInterval).toBe(60_000);
-            expect(result.current.localTimeout).toBe(10); // Should be 10 seconds (converted from 10,000ms)
+            expect(result.current.localCheckIntervalMs).toBe(60_000);
+            expect(result.current.localTimeoutSeconds).toBe(10); // Should be 10 seconds (converted from 10,000ms)
             expect(result.current.localRetryAttempts).toBe(3);
         });
 

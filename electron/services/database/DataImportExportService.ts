@@ -8,40 +8,47 @@
 
 import type { Site, StatusHistory } from "@shared/types";
 import type { Logger } from "@shared/utils/logger/interfaces";
-import type { Jsonifiable, JsonValue, UnknownRecord } from "type-fest";
+import type { Jsonifiable, JsonValue } from "type-fest";
 
 import { MIN_MONITOR_CHECK_INTERVAL_MS } from "@shared/constants/monitoring";
+import { DEFAULT_SITE_NAME } from "@shared/constants/sites";
 import { ERROR_CATALOG } from "@shared/utils/errorCatalog";
 import {
     safeJsonParse,
     safeJsonStringifyWithFallback,
 } from "@shared/utils/jsonSafety";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
+import {
+    type ExportData,
+    type ImportSite,
+    validateExportData,
+    validateImportData,
+} from "@shared/validation/importExportSchemas";
 
 import type { UptimeEvents } from "../../events/eventTypes";
 import type { TypedEventBus } from "../../events/TypedEventBus";
-import type { DatabaseService } from "../../services/database/DatabaseService";
+import type { DatabaseService } from "./DatabaseService";
 import type {
     HistoryRepository,
     HistoryRepositoryTransactionAdapter,
-} from "../../services/database/HistoryRepository";
+} from "./HistoryRepository";
 import type {
     MonitorRepository,
     MonitorRepositoryTransactionAdapter,
-} from "../../services/database/MonitorRepository";
+} from "./MonitorRepository";
 import type {
     SettingsRepository,
     SettingsRepositoryTransactionAdapter,
-} from "../../services/database/SettingsRepository";
+} from "./SettingsRepository";
 import type {
     SiteRepository,
     SiteRepositoryTransactionAdapter,
-} from "../../services/database/SiteRepository";
+} from "./SiteRepository";
 
-import { createMonitorConfig } from "../../services/monitoring/createMonitorConfig";
-import { toSerializedError } from "../errorSerialization";
-import { withDatabaseOperation } from "../operationalHooks";
-import { SiteLoadingError } from "./interfaces";
+import { toSerializedError } from "../../utils/errorSerialization";
+import { withDatabaseOperation } from "../../utils/operationalHooks";
+import { createMonitorConfig } from "../monitoring/createMonitorConfig";
+import { DataImportExportError } from "./interfaces";
 import { createImportTransactionAdapters } from "./transactionAdapters";
 
 /**
@@ -59,47 +66,25 @@ export interface DataImportExportConfig {
     };
 }
 
-/**
- * Type for imported site data structure.
- *
- * Represents the structure of site data during import operations.
- */
-export interface ImportSite {
-    identifier: string;
-    monitoring?: boolean;
-    monitors?: Site["monitors"];
-    name?: string;
-}
+const acceptAnyJsonValue = (value: unknown): value is JsonValue =>
+    value !== undefined;
 
-interface ImportDataPayload {
-    settings?: Record<string, string>;
-    sites: ImportSite[];
-}
-
-type ImportDataJsonPayload = ImportDataPayload & JsonValue;
+type ImportValidationResult = ReturnType<typeof validateImportData>;
+type ImportValidationFailureResult = Extract<
+    ImportValidationResult,
+    { ok: false }
+>;
 
 /**
- * Type guard for expected import data structure.
+ * Narrow helper for import schema validation.
  *
- * Validates that the provided object matches the expected structure for import
- * data containing sites and optional settings.
- *
- * @param obj - Object to validate
- *
- * @returns True if the object matches the expected import data structure
+ * @remarks
+ * We intentionally use an explicit type guard here because some build steps
+ * (tsc --build) have shown inconsistent narrowing with `if (!result.ok)`.
  */
-function isImportData(obj: unknown): obj is ImportDataPayload {
-    return (
-        typeof obj === "object" &&
-        obj !== null &&
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe: Type guard with runtime validation following
-        Array.isArray((obj as UnknownRecord)["sites"])
-    );
-}
-
-const isImportDataJsonPayload = (
-    value: unknown
-): value is ImportDataJsonPayload => isImportData(value);
+const isImportValidationFailure = (
+    result: ImportValidationResult
+): result is ImportValidationFailureResult => !result.ok;
 
 // eslint-disable-next-line sonarjs/function-return-type -- This helper intentionally returns the wide Jsonifiable union to normalize arbitrary inputs.
 const toJsonifiable = (value: unknown): Jsonifiable => {
@@ -173,16 +158,55 @@ export class DataImportExportService {
      */
     public async exportAllData(): Promise<string> {
         try {
-            // Export all sites and settings using repositories
-            const sites = await this.repositories.site.exportAll();
+            // Export full site shapes (sites + monitors + history) so imports
+            // can recreate a consistent domain graph.
+            const siteRows = await this.repositories.site.exportAllRows();
+
+            const sites = await Promise.all(
+                siteRows.map(async (siteRow) => {
+                    const monitors =
+                        await this.repositories.monitor.findBySiteIdentifier(
+                            siteRow.identifier
+                        );
+
+                    const monitorsWithHistory = await Promise.all(
+                        monitors.map(async (monitor) => {
+                            if (!monitor.id) {
+                                return monitor;
+                            }
+
+                            const history =
+                                await this.repositories.history.findByMonitorId(
+                                    monitor.id
+                                );
+
+                            return { ...monitor, history };
+                        })
+                    );
+
+                    return {
+                        identifier: siteRow.identifier,
+                        monitoring: siteRow.monitoring ?? true,
+                        monitors: monitorsWithHistory,
+                        name: siteRow.name ?? DEFAULT_SITE_NAME,
+                    } satisfies Site;
+                })
+            );
             const settings = await this.repositories.settings.getAll();
 
-            const exportPayload: unknown = {
+            const exportPayload: ExportData = {
                 exportedAt: new Date().toISOString(),
                 settings,
                 sites,
                 version: "1.0",
             };
+
+            if (!validateExportData(exportPayload)) {
+                this.logger.warn(
+                    "Export data payload did not match export schema; continuing with best-effort serialization.",
+                    { siteCount: sites.length }
+                );
+            }
 
             const exportData = toJsonifiable(exportPayload);
 
@@ -204,9 +228,9 @@ export class DataImportExportService {
         jsonData: string
     ): Promise<{ settings: Record<string, string>; sites: ImportSite[] }> {
         try {
-            const parseResult = safeJsonParse<ImportDataJsonPayload>(
+            const parseResult = safeJsonParse<JsonValue>(
                 jsonData,
-                isImportDataJsonPayload
+                acceptAnyJsonValue
             );
 
             if (!parseResult.success || parseResult.data === undefined) {
@@ -215,15 +239,14 @@ export class DataImportExportService {
                 );
             }
 
-            const dataCandidate = parseResult.data;
-
-            if (!isImportData(dataCandidate)) {
+            const validation = validateImportData(parseResult.data);
+            if (isImportValidationFailure(validation)) {
                 throw new Error(
-                    `${ERROR_CATALOG.database.IMPORT_DATA_INVALID}: Invalid import schema`
+                    `${ERROR_CATALOG.database.IMPORT_DATA_INVALID}: ${validation.error.message} (${validation.error.issues.slice(0, 3).join("; ")})`
                 );
             }
 
-            const validatedData: ImportDataPayload = dataCandidate;
+            const validatedData = validation.value;
 
             return {
                 settings: validatedData.settings ?? {},
@@ -331,7 +354,7 @@ export class DataImportExportService {
             }
         );
 
-        throw new SiteLoadingError(message, { cause: normalizedError });
+        throw new DataImportExportError(message, { cause: normalizedError });
     }
 
     /**
@@ -352,9 +375,9 @@ export class DataImportExportService {
             siteTx: SiteRepositoryTransactionAdapter;
         }) => Promise<T> | T
     ): Promise<T> {
-        return this.databaseService.executeTransaction(async (db) => operation(
-                createImportTransactionAdapters(db, this.repositories)
-            ));
+        return this.databaseService.executeTransaction(async (db) =>
+            operation(createImportTransactionAdapters(db, this.repositories))
+        );
     }
 
     /**
@@ -425,38 +448,49 @@ export class DataImportExportService {
      * adhere to runtime constraints.
      */
     private normalizeImportSite(site: ImportSite): ImportSite {
+        const identifier = site.identifier.trim();
+
         const normalizedMonitoring =
-            typeof site.monitoring === "boolean" ? site.monitoring : true;
+            typeof site.monitoring === "boolean" ? site.monitoring : undefined;
 
-        const normalizedSite: ImportSite = {
-            ...site,
+        const trimmedName = site.name?.trim();
+        const normalizedName =
+            trimmedName && trimmedName.length > 0 ? trimmedName : undefined;
+
+        const normalizedMonitors =
+            Array.isArray(site.monitors) && site.monitors.length > 0
+                ? site.monitors.map((monitor) =>
+                      this.normalizeImportedMonitor(identifier, monitor)
+                  )
+                : undefined;
+
+        return {
+            identifier,
             monitoring: normalizedMonitoring,
+            monitors: normalizedMonitors,
+            name: normalizedName,
         };
-
-        if (Array.isArray(site.monitors) && site.monitors.length > 0) {
-            normalizedSite.monitors = site.monitors.map((monitor) =>
-                this.normalizeImportedMonitor(site.identifier, monitor)
-            );
-        }
-
-        return normalizedSite;
     }
 
     /**
-     * Normalizes imported monitor configuration to meet minimum cadence
-     * requirements.
+     * Normalizes imported monitor configuration to ensure runtime invariants.
+     *
+     * @remarks
+     * Import payloads are trusted only after schema validation, but we still
+     * defensively normalize numeric fields to protect persistence and
+     * scheduling logic.
      */
     private normalizeImportedMonitor(
         siteIdentifier: string,
         monitor: Site["monitors"][0]
     ): Site["monitors"][0] {
-        const normalizedConfig = createMonitorConfig(monitor, {
-            checkInterval: MIN_MONITOR_CHECK_INTERVAL_MS,
-        });
+        const normalizedConfig = createMonitorConfig(monitor);
 
         const normalizedMonitor: Site["monitors"][0] = {
             ...monitor,
             checkInterval: normalizedConfig.checkInterval,
+            retryAttempts: normalizedConfig.retryAttempts,
+            timeout: normalizedConfig.timeout,
         };
 
         const originalInterval = monitor.checkInterval;
@@ -470,7 +504,7 @@ export class DataImportExportService {
             originalInterval !== normalizedMonitor.checkInterval
         ) {
             this.logger.warn(
-                "[DataImportExportService] Imported monitor missing valid checkInterval; defaulting to minimum",
+                "[DataImportExportService] Imported monitor missing valid checkInterval; defaulting to shared default",
                 {
                     monitorId: normalizedMonitor.id || "unknown-monitor",
                     siteIdentifier,

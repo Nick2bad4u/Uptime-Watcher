@@ -3,7 +3,7 @@ schema: "../../config/schemas/doc-frontmatter.schema.json"
 title: "Architecture Documentation Index"
 summary: ">-"
 created: "2025-08-05"
-last_reviewed: "2025-12-15"
+last_reviewed: "2025-12-29"
 category: "guide"
 author: "Nick2bad4u"
 tags:
@@ -344,22 +344,37 @@ End-to-end walkthrough of the main-process site loading pipeline:
 - Asynchronous `MonitoringConfig` guarantees (history limit, start/stop propagation)
 - Renderer synchronization (`sites:state-synchronized`) and background hydration logic
 
+### [Boundary Validation Strategy](./Patterns/BOUNDARY_VALIDATION_STRATEGY.md)
+
+Canonical pattern for handling untrusted data at boundaries:
+
+- Parse safely (`JsonValue`/`unknown`)
+- Validate via shared Zod schemas in `shared/validation/*`
+- Transform explicitly at layer boundaries (rows ↔ domain)
+- Emit typed diagnostics/events for failures
+
 ## 🧩 Recent Consistency Updates
 
 The following areas were recently clarified and brought into closer alignment
 with the implemented architecture:
 
+- **2025-12-29 consistency audit**: See the full categorized report and
+  roadmap in [`CONSISTENCY_AUDIT_2025_12_29.md`](./CONSISTENCY_AUDIT_2025_12_29.md).
+
 - **Event naming**: ADR-002 and ADR-005 now include an explicit public-event
   summary table and terminology notes that match the canonical
   `UptimeEvents`/`OrchestratorEvents` definitions in code.
+
 - **History limit behavior**: The history-limit propagation section and
   `SettingsService.updateHistoryLimit` documentation precisely describe how
   invalid user input and invalid backend responses are handled, including when
   a `TypeError` is surfaced versus when a sanitised fallback is used.
+
 - **Error model and helper usage**: The error handling guide and ADR-003 now
   share a single helper-selection model covering `withErrorHandling`,
   `withUtilityErrorHandling`, JSON/object safety helpers, and the
   renderer-specific wrappers in `src/utils/fallbacks.ts`.
+
 - **IPC validation contract**: Both request and response payloads must be
   validated on each side of the bridge. Monitor types now flow through the
   shared schema in `@shared/validation/dataSchemas.ts`, while the data backup

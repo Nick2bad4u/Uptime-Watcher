@@ -20,23 +20,31 @@ export const SyncMaintenanceCard = (props: {
     const MaintenanceIcon = AppIcons.actions.refreshAlt;
 
     return (
-        <div className="rounded-lg border border-zinc-800 bg-zinc-900/40 p-4">
-            <div className="mb-2 flex items-center justify-between gap-2">
-                <div className="flex items-center gap-2">
-                    <span aria-hidden className="text-amber-400">
+        <div className="settings-subcard">
+            <div className="settings-subcard__header">
+                <div className="settings-subcard__title">
+                    <span
+                        aria-hidden
+                        className="settings-maintenance__icon settings-accent--warning"
+                    >
                         <MaintenanceIcon className="h-5 w-5" />
                     </span>
-                    <ThemedText size="sm" variant="secondary" weight="medium">
+                    <ThemedText
+                        as="h4"
+                        size="md"
+                        variant="secondary"
+                        weight="semibold"
+                    >
                         Sync Maintenance
                     </ThemedText>
                 </div>
             </div>
 
-            <ThemedText size="sm" variant="tertiary">
+            <ThemedText as="p" size="sm" variant="tertiary">
                 {description}
             </ThemedText>
 
-            {children}
+            <div className="settings-maintenance__body">{children}</div>
         </div>
     );
 };

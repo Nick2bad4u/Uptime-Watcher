@@ -369,7 +369,6 @@ describe("Shared Database Types - Complete Coverage", () => {
                 host: "example.com",
                 port: 80,
                 enabled: 1,
-                monitoring: 1,
             };
 
             expect(isValidMonitorRow(validRow)).toBeTruthy();

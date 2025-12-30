@@ -119,14 +119,14 @@ export interface UseSiteDetailsResult {
     isLoading: boolean;
     /** Whether monitoring is currently active for any monitor in the site */
     isMonitoring: boolean;
-    /** Local copy of check interval for editing before saving */
-    localCheckInterval: number;
+    /** Local copy of check interval (milliseconds) for editing before saving */
+    localCheckIntervalMs: number;
     /** Local copy of site name for editing before saving */
     localName: string;
     /** Local copy of retry attempts for editing before saving */
     localRetryAttempts: number;
-    /** Local copy of timeout for editing before saving */
-    localTimeout: number;
+    /** Local copy of timeout (seconds) for editing before saving */
+    localTimeoutSeconds: number;
     /** Whether the retry attempts value has been modified but not saved */
     retryAttemptsChanged: boolean;
     /** The currently selected monitor object */
@@ -156,9 +156,9 @@ interface MonitorEditState {
     readonly intervalChanged: boolean;
     readonly retryAttemptsChanged: boolean;
     readonly timeoutChanged: boolean;
-    readonly userEditedCheckInterval?: number | undefined;
+    readonly userEditedCheckIntervalMs?: number | undefined;
     readonly userEditedRetryAttempts?: number | undefined;
-    readonly userEditedTimeout?: number | undefined;
+    readonly userEditedTimeoutSeconds?: number | undefined;
 }
 
 const DEFAULT_MONITOR_EDIT_STATE: MonitorEditState = {
@@ -334,19 +334,19 @@ export function useSiteDetails({
         intervalChanged,
         retryAttemptsChanged,
         timeoutChanged,
-        userEditedCheckInterval,
+        userEditedCheckIntervalMs,
         userEditedRetryAttempts,
-        userEditedTimeout,
+        userEditedTimeoutSeconds,
     } = editStateForSelectedMonitor;
 
-    const localCheckInterval =
-        userEditedCheckInterval ??
+    const localCheckIntervalMs =
+        userEditedCheckIntervalMs ??
         selectedMonitorCheckInterval ??
         DEFAULT_CHECK_INTERVAL;
 
     // Timeout state (stored in seconds for UI, converted to ms when saving)
-    const localTimeout =
-        userEditedTimeout ?? getTimeoutSeconds(selectedMonitorTimeout);
+    const localTimeoutSeconds =
+        userEditedTimeoutSeconds ?? getTimeoutSeconds(selectedMonitorTimeout);
 
     // Retry attempts state - track user edits separately from monitor defaults
     const localRetryAttempts =
@@ -604,7 +604,7 @@ export function useSiteDetails({
                         ...current,
                         intervalChanged:
                             newInterval !== selectedMonitorCheckInterval,
-                        userEditedCheckInterval: newInterval,
+                        userEditedCheckIntervalMs: newInterval,
                     }),
                 })
             );
@@ -624,7 +624,7 @@ export function useSiteDetails({
         const validationResult = await validateMonitorFieldClientSide(
             selectedMonitor?.type ?? "http",
             "checkInterval",
-            localCheckInterval
+            localCheckIntervalMs
         );
 
         if (!validationResult.success) {
@@ -638,7 +638,7 @@ export function useSiteDetails({
         await updateSiteCheckInterval(
             currentSite.identifier,
             selectedMonitorId,
-            localCheckInterval
+            localCheckIntervalMs
         );
         setMonitorEditStateById((previous) =>
             updateMonitorEditStateById({
@@ -647,19 +647,19 @@ export function useSiteDetails({
                 updater: (current) => ({
                     ...current,
                     intervalChanged: false,
-                    userEditedCheckInterval: undefined,
+                    userEditedCheckIntervalMs: undefined,
                 }),
             })
         );
         logger.user.action("Updated check interval", {
             monitorId: selectedMonitorId,
-            newInterval: localCheckInterval,
+            newInterval: localCheckIntervalMs,
             siteIdentifier: currentSite.identifier,
         });
     }, [
         clearError,
         currentSite.identifier,
-        localCheckInterval,
+        localCheckIntervalMs,
         selectedMonitor?.type,
         selectedMonitorId,
         setMonitorEditStateById,
@@ -685,7 +685,7 @@ export function useSiteDetails({
                         ...current,
                         timeoutChanged:
                             timeoutInSeconds !== currentTimeoutInSeconds,
-                        userEditedTimeout: timeoutInSeconds,
+                        userEditedTimeoutSeconds: timeoutInSeconds,
                     }),
                 })
             );
@@ -702,7 +702,7 @@ export function useSiteDetails({
         clearError();
 
         // Validate timeout using shared schema
-        const timeoutInMs = timeoutSecondsToMs(localTimeout);
+        const timeoutInMs = timeoutSecondsToMs(localTimeoutSeconds);
         const validationResult = await validateMonitorFieldClientSide(
             selectedMonitor?.type ?? "http",
             "timeout",
@@ -729,7 +729,7 @@ export function useSiteDetails({
                 updater: (current) => ({
                     ...current,
                     timeoutChanged: false,
-                    userEditedTimeout: undefined,
+                    userEditedTimeoutSeconds: undefined,
                 }),
             })
         );
@@ -741,7 +741,7 @@ export function useSiteDetails({
     }, [
         clearError,
         currentSite.identifier,
-        localTimeout,
+        localTimeoutSeconds,
         selectedMonitor?.type,
         selectedMonitorId,
         updateMonitorTimeout,
@@ -894,10 +894,10 @@ export function useSiteDetails({
         intervalChanged,
         isLoading,
         isMonitoring,
-        localCheckInterval,
+        localCheckIntervalMs,
         localName,
         localRetryAttempts,
-        localTimeout,
+        localTimeoutSeconds,
         retryAttemptsChanged,
         selectedMonitor,
         selectedMonitorId,

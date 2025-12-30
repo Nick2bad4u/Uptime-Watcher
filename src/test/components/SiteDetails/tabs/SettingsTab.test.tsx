@@ -282,8 +282,8 @@ describe(SettingsTab, () => {
             currentSite: baseMockSite,
             selectedMonitor: baseMockMonitor,
             localName: sampledSiteName,
-            localCheckInterval: 60_000,
-            localTimeout: 10,
+            localCheckIntervalMs: 60_000,
+            localTimeoutSeconds: 10,
             localRetryAttempts: 3,
             hasUnsavedChanges: false,
             intervalChanged: false,
@@ -1049,7 +1049,9 @@ describe(SettingsTab, () => {
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
-            render(<SettingsTab {...baseProps} localTimeout={30} />);
+            render(
+                <SettingsTab {...baseProps} localTimeoutSeconds={30} />
+            );
 
             const timeoutInput = screen.getByDisplayValue("30");
             expect(timeoutInput).toBeInTheDocument();

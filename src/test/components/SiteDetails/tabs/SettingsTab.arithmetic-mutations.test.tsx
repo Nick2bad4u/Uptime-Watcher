@@ -265,16 +265,18 @@ describe("SettingsTab arithmetic mutations", () => {
         selectedMonitor: mockMonitor,
         setLocalName: vi.fn(),
         timeoutChanged: false,
-        localCheckInterval: 60_000,
+        localCheckIntervalMs: 60_000,
         localRetryAttempts: 3,
-        localTimeout: 30,
+        localTimeoutSeconds: 30,
     };
 
-    describe("Line 466: Math.round(localCheckInterval / 1000) mutation", () => {
+    describe(
+        "Line 466: Math.round(localCheckIntervalMs / 1000) mutation",
+        () => {
         it("should correctly convert 60000ms to 60s (kills / -> * mutation)", () => {
             const props = {
                 ...defaultProps,
-                localCheckInterval: 60_000, // 60000ms should show as 60s
+                localCheckIntervalMs: 60_000, // 60000ms should show as 60s
             };
 
             render(<SettingsTab {...props} />);
@@ -291,7 +293,7 @@ describe("SettingsTab arithmetic mutations", () => {
         it("should handle sub-second intervals correctly", () => {
             const props = {
                 ...defaultProps,
-                localCheckInterval: 500, // 500ms should round to 1s
+                localCheckIntervalMs: 500, // 500ms should round to 1s
             };
             render(<SettingsTab {...props} />);
 
@@ -312,7 +314,7 @@ describe("SettingsTab arithmetic mutations", () => {
             const props = {
                 ...defaultProps,
                 localRetryAttempts: 3,
-                localTimeout: 30,
+                localTimeoutSeconds: 30,
             };
 
             render(<SettingsTab {...props} />);
@@ -332,7 +334,7 @@ describe("SettingsTab arithmetic mutations", () => {
             const props = {
                 ...defaultProps,
                 localRetryAttempts: 0,
-                localTimeout: 30,
+                localTimeoutSeconds: 30,
             };
 
             render(<SettingsTab {...props} />);
@@ -471,9 +473,9 @@ describe("SettingsTab arithmetic mutations", () => {
         it("should display all arithmetic calculations correctly in UI", () => {
             const props = {
                 ...defaultProps,
-                localCheckInterval: 30_000, // 30s
+                localCheckIntervalMs: 30_000, // 30s
                 localRetryAttempts: 2,
-                localTimeout: 10,
+                localTimeoutSeconds: 10,
             };
 
             render(<SettingsTab {...props} />);

@@ -15,23 +15,23 @@ import type { Logger } from "@shared/utils/logger/interfaces";
 
 import { MIN_MONITOR_CHECK_INTERVAL_MS } from "@shared/constants/monitoring";
 
-import type { DatabaseService } from "../../services/database/DatabaseService";
+import type { StandardizedCache } from "../../utils/cache/StandardizedCache";
+import type { DatabaseService } from "./DatabaseService";
+import type { MonitoringConfig, SiteWritingConfig } from "./interfaces";
 import type {
     MonitorRepository,
     MonitorRepositoryTransactionAdapter,
-} from "../../services/database/MonitorRepository";
+} from "./MonitorRepository";
 import type {
     SiteRepository,
     SiteRepositoryTransactionAdapter,
-} from "../../services/database/SiteRepository";
-import type { StandardizedCache } from "../cache/StandardizedCache";
-import type { MonitoringConfig, SiteWritingConfig } from "./interfaces";
+} from "./SiteRepository";
 
+import { withDatabaseOperation } from "../../utils/operationalHooks";
 import {
     createMonitorConfig,
     type NormalizedMonitorConfig,
-} from "../../services/monitoring/createMonitorConfig";
-import { withDatabaseOperation } from "../operationalHooks";
+} from "../monitoring/createMonitorConfig";
 import { SiteNotFoundError } from "./interfaces";
 import { deleteSiteWithAdapters } from "./siteDeletion";
 import { createSiteMonitorTransactionAdapters } from "./transactionAdapters";
@@ -78,9 +78,11 @@ export class SiteWriterService {
             siteTx: SiteRepositoryTransactionAdapter;
         }) => Promise<T> | T
     ): Promise<T> {
-        return this.databaseService.executeTransaction(async (db) => operation(
+        return this.databaseService.executeTransaction(async (db) =>
+            operation(
                 createSiteMonitorTransactionAdapters(db, this.repositories)
-            ));
+            )
+        );
     }
 
     /**

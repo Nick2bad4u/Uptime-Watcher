@@ -12,6 +12,7 @@
  */
 
 import type { Site } from "@shared/types";
+import type { ImportSite } from "@shared/validation/importExportSchemas";
 
 import { DEFAULT_SITE_NAME } from "@shared/constants/sites";
 import { SITE_ADDED_SOURCE } from "@shared/types/events";
@@ -23,7 +24,6 @@ import type { UptimeEvents } from "../../events/eventTypes";
 import type { EventKey, TypedEventBus } from "../../events/TypedEventBus";
 import type { ConfigurationManager } from "../../managers/ConfigurationManager";
 import type { StandardizedCache } from "../../utils/cache/StandardizedCache";
-import type { ImportSite } from "../../utils/database/DataImportExportService";
 import type {
     DatabaseBackupResult,
     DatabaseRestorePayload,

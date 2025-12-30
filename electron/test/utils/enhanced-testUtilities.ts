@@ -150,7 +150,7 @@ export function createMockRepository(): any {
         // Bulk operations
         bulkInsert: vi.fn().mockResolvedValue(undefined),
         deleteAll: vi.fn().mockResolvedValue(undefined),
-        exportAll: vi.fn().mockResolvedValue([]),
+        exportAllRows: vi.fn().mockResolvedValue([]),
         bulkInsertInternal: vi.fn(),
         deleteAllInternal: vi.fn(),
         deleteInternal: vi.fn(),

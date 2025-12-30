@@ -40,9 +40,11 @@ import {
     FiRefreshCw,
     FiSave,
     FiSearch,
+    FiSliders,
     FiSquare,
     FiTrash2,
     FiUpload,
+    FiVolume2,
     FiX,
 } from "react-icons/fi";
 import { GoPulse } from "react-icons/go";
@@ -173,7 +175,9 @@ export const AppIcons: {
         readonly sidebarCollapse: IconType;
         readonly sidebarExpand: IconType;
         readonly site: IconType;
+        readonly sliders: IconType;
         readonly unlock: IconType;
+        readonly volume: IconType;
     };
 } = {
     /** Action icons */
@@ -274,7 +278,9 @@ export const AppIcons: {
         sidebarCollapse: HiMiniChevronLeft,
         sidebarExpand: HiMiniChevronRight,
         site: IoGlobeOutline,
+        sliders: FiSliders,
         unlock: HiOutlineLockOpen,
+        volume: FiVolume2,
     },
 } as const;
 

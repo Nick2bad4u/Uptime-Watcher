@@ -68,14 +68,14 @@ import {
 
 import type { UptimeEvents } from "../events/eventTypes";
 import type { TypedEventBus } from "../events/TypedEventBus";
-import type { MonitoringConfig } from "../utils/database/interfaces";
+import type { MonitoringConfig } from "../services/database/interfaces";
 import type { ConfigurationManager } from "./ConfigurationManager";
 import type { SiteManagerRepositories } from "./databaseRepositorySets";
 
+import { LoggerAdapter } from "../services/database/serviceFactory";
+import { SiteRepositoryService } from "../services/database/SiteRepositoryService";
+import { SiteWriterService } from "../services/database/SiteWriterService";
 import { StandardizedCache } from "../utils/cache/StandardizedCache";
-import { LoggerAdapter } from "../utils/database/serviceFactory";
-import { SiteRepositoryService } from "../utils/database/SiteRepositoryService";
-import { SiteWriterService } from "../utils/database/SiteWriterService";
 import { logger } from "../utils/logger";
 
 /**

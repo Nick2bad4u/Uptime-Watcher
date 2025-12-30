@@ -1,7 +1,7 @@
 import type { CloudBackupMigrationResult } from "@shared/types/cloudBackupMigration";
 import type { JSX } from "react";
 
-import { useMemo } from 'react';
+import { useMemo } from "react";
 
 import { ThemedButton } from "../../../theme/components/ThemedButton";
 import { ThemedText } from "../../../theme/components/ThemedText";
@@ -104,10 +104,10 @@ export const BackupMigrationPanel = ({
     const lastSummary = resolveBackupMigrationLastSummary(lastResult);
 
     return (
-        <div className="rounded-lg border border-zinc-800 bg-zinc-900/40 p-4">
+        <div className="settings-subcard">
             <div className="mb-2 flex items-center justify-between gap-2">
                 <div className="flex items-center gap-2">
-                    <span aria-hidden className="text-violet-400">
+                    <span aria-hidden className="settings-accent--highlight">
                         {headerIcon}
                     </span>
                     <ThemedText size="sm" variant="secondary" weight="medium">
@@ -116,13 +116,13 @@ export const BackupMigrationPanel = ({
                 </div>
             </div>
 
-            <ThemedText size="sm" variant="tertiary">
+            <ThemedText as="p" size="sm" variant="tertiary">
                 {statusText}
             </ThemedText>
 
             {lastSummary ? (
                 <div className="mt-2">
-                    <ThemedText size="xs" variant="tertiary">
+                    <ThemedText as="p" size="xs" variant="tertiary">
                         {lastSummary}
                     </ThemedText>
                 </div>

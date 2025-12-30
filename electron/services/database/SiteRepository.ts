@@ -288,14 +288,14 @@ export class SiteRepository {
      * @example
      *
      * ```typescript
-     * const allSites = await repo.exportAll();
+     * const allSites = await repo.exportAllRows();
      * ```
      *
-     * @returns Promise resolving to an array of all site data.
+     * @returns Promise resolving to an array of all site rows.
      *
      * @throws Error When the database operation fails.
      */
-    public async exportAll(): Promise<SiteRow[]> {
+    public async exportAllRows(): Promise<SiteRow[]> {
         return this.runAllSitesOperation("site-export-all");
     }
 
@@ -303,8 +303,8 @@ export class SiteRepository {
      * Retrieves all sites from the database.
      *
      * @remarks
-     * Functionally identical to {@link exportAll}, but intended for general
-     * querying.
+     * Functionally identical to {@link exportAllRows}, but intended for
+     * general querying.
      *
      * @example
      *
@@ -312,7 +312,7 @@ export class SiteRepository {
      * const sites = await repo.findAll();
      * ```
      *
-     * @returns Promise resolving to an array of all site data.
+     * @returns Promise resolving to an array of all site rows.
      *
      * @throws Error When the database operation fails.
      */
