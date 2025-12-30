@@ -16,6 +16,12 @@ import {
     normalizeProviderObjectKey,
 } from "../../cloudKeyNormalization";
 import { BaseCloudStorageProvider } from "../BaseCloudStorageProvider";
+import {
+    type GoogleDriveListedFile,
+    parseGoogleDriveCreateResponse,
+    parseGoogleDriveFileMetadata,
+    parseGoogleDriveListResponse,
+} from "./googleDriveApiSchemas";
 
 const GOOGLE_FOLDER_MIME_TYPE = "application/vnd.google-apps.folder";
 const APP_ROOT_FOLDER_NAME = "uptime-watcher";
@@ -227,12 +233,7 @@ export class GoogleDriveCloudStorageProvider
                 },
             });
 
-            const { id } = created.data;
-            if (!id) {
-                throw new Error("Google Drive create returned no file id");
-            }
-
-            fileId = id;
+            fileId = parseGoogleDriveCreateResponse(created.data).id;
         }
 
         const metadata = await drive.files.get({
@@ -240,11 +241,13 @@ export class GoogleDriveCloudStorageProvider
             fileId,
         });
 
-        const modifiedAt = metadata.data.modifiedTime
-            ? new Date(metadata.data.modifiedTime).getTime()
+        const parsedMetadata = parseGoogleDriveFileMetadata(metadata.data);
+
+        const modifiedAt = parsedMetadata.modifiedTime
+            ? new Date(parsedMetadata.modifiedTime).getTime()
             : Date.now();
 
-        const sizeFromApi = Number(metadata.data.size ?? 0);
+        const sizeFromApi = Number(parsedMetadata.size ?? 0);
         const sizeBytes = sizeFromApi > 0 ? sizeFromApi : args.buffer.length;
 
         return {
@@ -311,12 +314,7 @@ export class GoogleDriveCloudStorageProvider
                     },
                 });
 
-                const { id } = created.data;
-                if (!id) {
-                    throw new Error(
-                        "Google Drive folder create returned no id"
-                    );
-                }
+                const {id} = parseGoogleDriveCreateResponse(created.data);
 
                 parentId = id;
                 this.folderCache.set(currentPath, id);
@@ -395,11 +393,12 @@ export class GoogleDriveCloudStorageProvider
             spaces: "appDataFolder",
         });
 
-        if (!response.data.files || response.data.files.length === 0) {
+        const parsedList = parseGoogleDriveListResponse(response.data);
+        if (parsedList.files.length === 0) {
             return null;
         }
 
-        const [first] = response.data.files;
+        const [first] = parsedList.files;
         if (!first?.id) {
             return null;
         }
@@ -414,7 +413,9 @@ export class GoogleDriveCloudStorageProvider
     ): Promise<CloudObjectEntry[]> {
         const entries: CloudObjectEntry[] = [];
 
-        const processFile = async (file: drive_v3.Schema$File): Promise<void> => {
+        const processFile = async (
+            file: GoogleDriveListedFile
+        ): Promise<void> => {
             if (!file.id || !file.name) {
                 return;
             }
@@ -459,9 +460,10 @@ export class GoogleDriveCloudStorageProvider
             // eslint-disable-next-line no-await-in-loop -- Drive pagination requests must be sequential.
             const response = await drive.files.list(params);
 
-            pageToken = response.data.nextPageToken ?? null;
+            const parsedList = parseGoogleDriveListResponse(response.data);
+            pageToken = parsedList.nextPageToken;
 
-            for (const file of response.data.files ?? []) {
+            for (const file of parsedList.files) {
                 // eslint-disable-next-line no-await-in-loop -- Recursive listing is sequential by folder.
                 await processFile(file);
             }

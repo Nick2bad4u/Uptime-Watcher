@@ -1,9 +1,11 @@
 import { tryParseJsonRecord } from "@shared/utils/jsonSafety";
+import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import axios from "axios";
 import * as z from "zod";
 
 import type { SecretStore } from "../../secrets/SecretStore";
 
+import { logger } from "../../../../utils/logger";
 import { googleTokenResponseSchema } from "./googleDriveTokenSchemas";
 
 /**
@@ -51,12 +53,47 @@ export class GoogleDriveTokenManager {
 
         const parsed = tryParseJsonRecord(raw);
         if (!parsed) {
+            logger.warn(
+                "[GoogleDriveTokenManager] Stored tokens were not valid JSON; clearing",
+                {
+                    storageKey: this.storageKey,
+                }
+            );
+            try {
+                await this.clear();
+            } catch (error) {
+                logger.warn(
+                    "[GoogleDriveTokenManager] Failed to clear invalid stored tokens",
+                    {
+                        message: getUserFacingErrorDetail(error),
+                        storageKey: this.storageKey,
+                    }
+                );
+            }
             return undefined;
         }
 
         try {
             return googleTokenSchema.parse(parsed);
-        } catch {
+        } catch (error) {
+            logger.warn(
+                "[GoogleDriveTokenManager] Stored tokens failed schema validation; clearing",
+                {
+                    message: getUserFacingErrorDetail(error),
+                    storageKey: this.storageKey,
+                }
+            );
+            try {
+                await this.clear();
+            } catch (clearError) {
+                logger.warn(
+                    "[GoogleDriveTokenManager] Failed to clear invalid stored tokens",
+                    {
+                        message: getUserFacingErrorDetail(clearError),
+                        storageKey: this.storageKey,
+                    }
+                );
+            }
             return undefined;
         }
     }

@@ -2,7 +2,6 @@ import type * as z from "zod";
 
 import { openExternalOrThrow } from "@electron/services/shell/openExternalUtils";
 import { tryParseJsonRecord } from "@shared/utils/jsonSafety";
-import { isObject } from "@shared/utils/typeGuards";
 import axios from "axios";
 
 import {
@@ -11,7 +10,10 @@ import {
 } from "../../oauth/LoopbackOAuthServer";
 import { createPkcePair } from "../../oauth/pkce";
 import { validateOAuthAuthorizeUrl } from "../oauthAuthorizeUrl";
-import { googleTokenResponseSchema } from "./googleDriveTokenSchemas";
+import {
+    googleTokenResponseSchema,
+    tryParseGoogleOAuthErrorResponse,
+} from "./googleDriveTokenSchemas";
 
 /**
  * Result of a successful Google Drive OAuth connect flow.
@@ -158,23 +160,14 @@ export class GoogleDriveAuthFlow {
                 const status = error.response?.status;
                 const data: unknown = error.response?.data;
 
-                let parsed: null | Record<string, unknown> = null;
-                if (isObject(data)) {
-                    parsed = data;
-                } else if (typeof data === "string") {
-                    parsed = tryParseJsonRecord(data);
-                }
+                const parsed =
+                    typeof data === "string"
+                        ? tryParseJsonRecord(data)
+                        : data;
 
-                const {
-                    error: rawError,
-                    error_description: rawErrorDescription,
-                } = parsed ?? {};
-                const errorName =
-                    typeof rawError === "string" ? rawError : undefined;
-                const errorDescription =
-                    typeof rawErrorDescription === "string"
-                        ? rawErrorDescription
-                        : undefined;
+                const oauthError = tryParseGoogleOAuthErrorResponse(parsed);
+                const errorName = oauthError?.error;
+                const errorDescription = oauthError?.error_description;
 
                 if (errorName) {
                     const prefix = `Google OAuth token exchange failed (${status ?? "unknown"}): ${errorName}`;

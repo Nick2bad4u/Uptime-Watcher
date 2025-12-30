@@ -11,12 +11,19 @@ import type {
 } from "../CloudStorageProvider.types";
 import type { DropboxTokenManager } from "./DropboxTokenManager";
 
+import { logger } from "../../../../utils/logger";
 import {
     assertCloudObjectKey,
     normalizeProviderObjectKey,
 } from "../../cloudKeyNormalization";
 import { BaseCloudStorageProvider } from "../BaseCloudStorageProvider";
 import { withDropboxRetry } from "./dropboxRetry";
+import {
+    parseDropboxCurrentAccount,
+    parseDropboxFilesDownloadResult,
+    parseDropboxFilesUploadResult,
+    tryParseDropboxListFolderFileEntry,
+} from "./dropboxSdkSchemas";
 
 /**
  * All objects for Uptime Watcher are stored underneath this folder.
@@ -215,17 +222,9 @@ function createENOENT(message: string): NodeJS.ErrnoException {
 async function convertDropboxDownloadedResultToBuffer(
     result: unknown
 ): Promise<Buffer> {
-    if (typeof result !== "object" || result === null) {
-        throw new Error("Dropbox download result is not an object");
-    }
+    const parsed = parseDropboxFilesDownloadResult(result);
 
-    if (!isRecord(result)) {
-        throw new TypeError("Dropbox download result is not an object record");
-    }
-
-    const record = result;
-
-    const maybeBinary = record["fileBinary"];
+    const maybeBinary = parsed.fileBinary;
     if (Buffer.isBuffer(maybeBinary)) {
         return maybeBinary;
     }
@@ -238,14 +237,14 @@ async function convertDropboxDownloadedResultToBuffer(
         return Buffer.from(new Uint8Array(maybeBinary));
     }
 
-    const maybeBlob = record["fileBlob"];
+    const maybeBlob = parsed.fileBlob;
     if (maybeBlob instanceof Blob) {
         const arrayBuffer = await maybeBlob.arrayBuffer();
         return Buffer.from(new Uint8Array(arrayBuffer));
     }
 
-    throw new Error(
-        "Dropbox download did not include fileBinary/fileBlob content"
+    throw new TypeError(
+        "Dropbox download did not include supported binary content"
     );
 }
 
@@ -303,17 +302,8 @@ export class DropboxCloudStorageProvider
             throw ensureError(error);
         });
 
-        const account = response.result;
-
-        const email =
-            account.email.trim().length > 0 ? account.email : undefined;
-
-        const displayName =
-            account.name.display_name.trim().length > 0
-                ? account.name.display_name
-                : undefined;
-
-        return email ?? displayName;
+        const account = parseDropboxCurrentAccount(response.result);
+        return account.email;
     }
 
     public async listObjects(prefix: string): Promise<CloudObjectEntry[]> {
@@ -352,26 +342,59 @@ export class DropboxCloudStorageProvider
             const nextCursor: string = result.cursor;
             const { entries, has_more: nextHasMore } = result;
 
-            for (const entry of entries) {
-                if (
-                    entry[".tag"] === "file" &&
-                    typeof entry.path_display === "string"
-                ) {
-                    const key = fromDropboxPathOrNull(entry.path_display);
+            let invalidEntryCount = 0;
 
-                    const matchesPrefix =
-                        typeof key === "string" &&
-                        key.length > 0 &&
-                        (!normalizedPrefix || key.startsWith(normalizedPrefix));
-
-                    if (matchesPrefix) {
-                        objects.push({
-                            key,
-                            lastModifiedAt: Date.parse(entry.server_modified),
-                            sizeBytes: entry.size,
-                        });
-                    }
+            const mapEntryToCloudObject = (entry: unknown): {
+                cloudObject: CloudObjectEntry | null;
+                isInvalid: boolean;
+            } => {
+                const parsed = tryParseDropboxListFolderFileEntry(entry);
+                if (!parsed) {
+                    return { cloudObject: null, isInvalid: true };
                 }
+
+                const key = fromDropboxPathOrNull(parsed.pathDisplay);
+                const matchesPrefix =
+                    typeof key === "string" &&
+                    key.length > 0 &&
+                    (!normalizedPrefix || key.startsWith(normalizedPrefix));
+
+                if (!matchesPrefix) {
+                    return { cloudObject: null, isInvalid: false };
+                }
+
+                const lastModifiedAt = Date.parse(parsed.serverModified);
+                if (!Number.isFinite(lastModifiedAt)) {
+                    return { cloudObject: null, isInvalid: true };
+                }
+
+                return {
+                    cloudObject: {
+                        key,
+                        lastModifiedAt,
+                        sizeBytes: parsed.sizeBytes,
+                    },
+                    isInvalid: false,
+                };
+            };
+
+            for (const entry of entries) {
+                const mapped = mapEntryToCloudObject(entry);
+                if (mapped.isInvalid) {
+                    invalidEntryCount += 1;
+                } else if (mapped.cloudObject) {
+                    objects.push(mapped.cloudObject);
+                }
+            }
+
+            if (invalidEntryCount > 0) {
+                logger.warn(
+                    "[DropboxCloudStorageProvider] Skipped invalid Dropbox list-folder entries",
+                    {
+                        invalidEntryCount,
+                        prefix: normalizedPrefix,
+                    }
+                );
             }
 
             cursor = nextCursor;
@@ -445,31 +468,24 @@ export class DropboxCloudStorageProvider
             throw ensureError(error);
         });
 
-        const uploadData = response.result as {
-            path_display?: unknown;
-            server_modified?: unknown;
-            size?: unknown;
-        };
+        const uploadData = parseDropboxFilesUploadResult(response.result);
 
-        if (
-            typeof uploadData.path_display !== "string" ||
-            typeof uploadData.server_modified !== "string" ||
-            typeof uploadData.size !== "number"
-        ) {
-            throw new TypeError(
-                "Dropbox returned an unexpected upload response"
-            );
-        }
-
-        const storedKey = fromDropboxPathOrNull(uploadData.path_display);
+        const storedKey = fromDropboxPathOrNull(uploadData.pathDisplay);
         if (storedKey === null) {
             throw new Error("Dropbox returned an unexpected upload path");
         }
 
+        const lastModifiedAt = Date.parse(uploadData.serverModified);
+        if (!Number.isFinite(lastModifiedAt)) {
+            throw new TypeError(
+                "Dropbox returned an unexpected server_modified timestamp"
+            );
+        }
+
         return {
             key: storedKey,
-            lastModifiedAt: Date.parse(uploadData.server_modified),
-            sizeBytes: uploadData.size,
+            lastModifiedAt,
+            sizeBytes: uploadData.sizeBytes,
         };
     }
 

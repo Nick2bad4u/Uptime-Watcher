@@ -1,8 +1,10 @@
 import { tryParseJsonRecord } from "@shared/utils/jsonSafety";
+import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import { Dropbox, DropboxAuth } from "dropbox";
 
 import type { SecretStore } from "../../secrets/SecretStore";
 
+import { logger } from "../../../../utils/logger";
 import { withDropboxRetry } from "./dropboxRetry";
 import { type DropboxTokens, parseDropboxTokens } from "./DropboxTokens";
 
@@ -57,12 +59,47 @@ export class DropboxTokenManager {
 
         const parsed = tryParseJsonRecord(raw);
         if (!parsed) {
+            logger.warn(
+                "[DropboxTokenManager] Stored tokens were not valid JSON; clearing",
+                {
+                    storageKey: this.tokenStorageKey,
+                }
+            );
+            try {
+                await this.clearTokens();
+            } catch (error) {
+                logger.warn(
+                    "[DropboxTokenManager] Failed to clear invalid stored tokens",
+                    {
+                        message: getUserFacingErrorDetail(error),
+                        storageKey: this.tokenStorageKey,
+                    }
+                );
+            }
             return undefined;
         }
 
         try {
             return parseDropboxTokens(parsed);
-        } catch {
+        } catch (error) {
+            logger.warn(
+                "[DropboxTokenManager] Stored tokens failed schema validation; clearing",
+                {
+                    message: getUserFacingErrorDetail(error),
+                    storageKey: this.tokenStorageKey,
+                }
+            );
+            try {
+                await this.clearTokens();
+            } catch (clearError) {
+                logger.warn(
+                    "[DropboxTokenManager] Failed to clear invalid stored tokens",
+                    {
+                        message: getUserFacingErrorDetail(clearError),
+                        storageKey: this.tokenStorageKey,
+                    }
+                );
+            }
             return undefined;
         }
     }

@@ -24,3 +24,27 @@ export const googleTokenResponseSchema: z.ZodType<GoogleTokenResponse> =
         scope: z.string().optional(),
         token_type: z.string().optional(),
     });
+
+/**
+ * Minimal error payload shape returned by Google's OAuth token endpoint.
+ */
+export interface GoogleOAuthErrorResponse {
+    readonly error: string;
+    readonly error_description?: string | undefined;
+}
+
+const googleOAuthErrorResponseSchema: z.ZodType<GoogleOAuthErrorResponse> =
+    z.looseObject({
+        error: z.string().min(1),
+        error_description: z.string().optional(),
+    });
+
+/**
+ * Best-effort parser for OAuth token exchange errors.
+ */
+export function tryParseGoogleOAuthErrorResponse(
+    value: unknown
+): GoogleOAuthErrorResponse | null {
+    const result = googleOAuthErrorResponseSchema.safeParse(value);
+    return result.success ? result.data : null;
+}
