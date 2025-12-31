@@ -16,6 +16,7 @@ import {
     normalizeProviderObjectKey,
 } from "../../cloudKeyNormalization";
 import { BaseCloudStorageProvider } from "../BaseCloudStorageProvider";
+import { CloudProviderOperationError } from "../cloudProviderErrors";
 import { tryParseDropboxErrorSummary } from "./dropboxErrorSchemas";
 import { withDropboxRetry } from "./dropboxRetry";
 import {
@@ -151,12 +152,6 @@ function isDropboxNotFoundError(error: unknown): boolean {
     return hasNotFoundTag(error.error, new WeakSet());
 }
 
-function createENOENT(message: string): NodeJS.ErrnoException {
-    const error = new Error(message) as NodeJS.ErrnoException;
-    error.code = "ENOENT";
-    return error;
-}
-
 async function convertDropboxDownloadedResultToBuffer(
     result: unknown
 ): Promise<Buffer> {
@@ -232,12 +227,15 @@ export class DropboxCloudStorageProvider
             operationName: "users/get_current_account",
         }).catch((error: unknown) => {
             const described = describeDropboxSdkErrorRich(error);
-            if (described) {
-                throw new Error(
-                    `Dropbox get_current_account failed: ${described}`
-                );
-            }
-            throw ensureError(error);
+            const detail = described ?? ensureError(error).message;
+            throw new CloudProviderOperationError(
+                `Dropbox get-account-label failed: ${detail}`,
+                {
+                    cause: error,
+                    operation: "getAccountLabel",
+                    providerKind: this.kind,
+                }
+            );
         });
 
         const account = parseDropboxCurrentAccount(response.result);
@@ -269,7 +267,17 @@ export class DropboxCloudStorageProvider
                         return null;
                     }
 
-                    throw ensureError(error);
+                    const described = describeDropboxSdkErrorRich(error);
+                    const detail = described ?? ensureError(error).message;
+                    throw new CloudProviderOperationError(
+                        `Dropbox listObjects failed: ${detail}`,
+                        {
+                            cause: error,
+                            operation: "listObjects",
+                            providerKind: this.kind,
+                            target: normalizedPrefix,
+                        }
+                    );
                 });
 
             if (!response) {
@@ -400,23 +408,41 @@ export class DropboxCloudStorageProvider
             operationName: "files/upload",
         }).catch((error: unknown) => {
             const described = describeDropboxSdkErrorRich(error);
-            if (described) {
-                throw new Error(`Dropbox upload failed: ${described}`);
-            }
-            throw ensureError(error);
+                const detail = described ?? ensureError(error).message;
+                throw new CloudProviderOperationError(
+                    `Dropbox upload failed: ${detail}`,
+                    {
+                        cause: error,
+                        operation: "uploadObject",
+                        providerKind: this.kind,
+                        target: normalizedKey,
+                    }
+                );
         });
 
         const uploadData = parseDropboxFilesUploadResult(response.result);
 
         const storedKey = fromDropboxPathOrNull(uploadData.pathDisplay);
         if (storedKey === null) {
-            throw new Error("Dropbox returned an unexpected upload path");
+            throw new CloudProviderOperationError(
+                "Dropbox returned an unexpected upload path",
+                {
+                    operation: "uploadObject",
+                    providerKind: this.kind,
+                    target: normalizedKey,
+                }
+            );
         }
 
         const lastModifiedAt = Date.parse(uploadData.serverModified);
         if (!Number.isFinite(lastModifiedAt)) {
-            throw new TypeError(
-                "Dropbox returned an unexpected server_modified timestamp"
+            throw new CloudProviderOperationError(
+                "Dropbox returned an unexpected server_modified timestamp",
+                {
+                    operation: "uploadObject",
+                    providerKind: this.kind,
+                    target: normalizedKey,
+                }
             );
         }
 
@@ -441,17 +467,28 @@ export class DropboxCloudStorageProvider
             operationName: "files/download",
         }).catch((error: unknown) => {
             if (isDropboxNotFoundError(error)) {
-                throw createENOENT(
-                    `Dropbox object not found: ${normalizedKey}`
-                );
+                    throw new CloudProviderOperationError(
+                        `Dropbox object not found: ${normalizedKey}`,
+                        {
+                            code: "ENOENT",
+                            operation: "downloadObject",
+                            providerKind: this.kind,
+                            target: normalizedKey,
+                        }
+                    );
             }
 
             const described = describeDropboxSdkErrorRich(error);
-            if (described) {
-                throw new Error(`Dropbox download failed: ${described}`);
-            }
-
-            throw ensureError(error);
+                const detail = described ?? ensureError(error).message;
+                throw new CloudProviderOperationError(
+                    `Dropbox download failed: ${detail}`,
+                    {
+                        cause: error,
+                        operation: "downloadObject",
+                        providerKind: this.kind,
+                        target: normalizedKey,
+                    }
+                );
         });
 
         return convertDropboxDownloadedResultToBuffer(response.result);
@@ -475,12 +512,17 @@ export class DropboxCloudStorageProvider
                 return;
             }
 
-            const described = describeDropboxSdkErrorRich(error);
-            if (described) {
-                throw new Error(`Dropbox delete failed: ${described}`);
-            }
-
-            throw ensureError(error);
+                const described = describeDropboxSdkErrorRich(error);
+                const detail = described ?? ensureError(error).message;
+                throw new CloudProviderOperationError(
+                    `Dropbox delete failed: ${detail}`,
+                    {
+                        cause: error,
+                        operation: "deleteObject",
+                        providerKind: this.kind,
+                        target: normalizedKey,
+                    }
+                );
         });
     }
 

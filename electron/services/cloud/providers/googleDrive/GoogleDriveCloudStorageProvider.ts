@@ -18,6 +18,7 @@ import {
     normalizeProviderObjectKey,
 } from "../../cloudKeyNormalization";
 import { BaseCloudStorageProvider } from "../BaseCloudStorageProvider";
+import { CloudProviderOperationError } from "../cloudProviderErrors";
 import {
     type GoogleDriveListedFile,
     parseGoogleDriveCreateResponse,
@@ -59,16 +60,6 @@ function normalizeDriveNameSegment(candidate: string): null | string {
     });
 
     return normalized.length > 0 ? normalized : null;
-}
-
-function createErrnoError(
-    message: string,
-    code: NodeJS.ErrnoException["code"],
-    options?: ErrorOptions
-): NodeJS.ErrnoException {
-    const error = new Error(message, options) as NodeJS.ErrnoException;
-    error.code = code;
-    return error;
 }
 
 function tryGetGoogleDriveHttpStatus(error: unknown): number | undefined {
@@ -167,9 +158,14 @@ export class GoogleDriveCloudStorageProvider
 
             const detail = tryDescribeGoogleDriveApiError(error);
             const suffix = detail ? `: ${detail}` : "";
-            throw new Error(
+            throw new CloudProviderOperationError(
                 `Failed to delete Google Drive object '${normalized}'${suffix}`,
-                { cause: error }
+                {
+                    cause: error,
+                    operation: "deleteObject",
+                    providerKind: this.kind,
+                    target: normalized,
+                }
             );
         }
     }
@@ -181,9 +177,14 @@ export class GoogleDriveCloudStorageProvider
 
             const existing = await this.findFileByKey(drive, normalized);
             if (!existing) {
-                throw createErrnoError(
+                throw new CloudProviderOperationError(
                     `Google Drive object not found: ${normalized}`,
-                    "ENOENT"
+                    {
+                        code: "ENOENT",
+                        operation: "downloadObject",
+                        providerKind: this.kind,
+                        target: normalized,
+                    }
                 );
             }
 
@@ -201,18 +202,28 @@ export class GoogleDriveCloudStorageProvider
             }
 
             if (tryGetGoogleDriveHttpStatus(error) === 404) {
-                throw createErrnoError(
+                throw new CloudProviderOperationError(
                     `Google Drive object not found: ${normalized}`,
-                    "ENOENT",
-                    { cause: error }
+                    {
+                        cause: error,
+                        code: "ENOENT",
+                        operation: "downloadObject",
+                        providerKind: this.kind,
+                        target: normalized,
+                    }
                 );
             }
 
             const detail = tryDescribeGoogleDriveApiError(error);
             const suffix = detail ? `: ${detail}` : "";
-            throw new Error(
+            throw new CloudProviderOperationError(
                 `Failed to download Google Drive object '${normalized}'${suffix}`,
-                { cause: error }
+                {
+                    cause: error,
+                    operation: "downloadObject",
+                    providerKind: this.kind,
+                    target: normalized,
+                }
             );
         }
     }
@@ -251,9 +262,14 @@ export class GoogleDriveCloudStorageProvider
         } catch (error) {
             const detail = tryDescribeGoogleDriveApiError(error);
             const suffix = detail ? `: ${detail}` : "";
-            throw new Error(
+            throw new CloudProviderOperationError(
                 `Failed to list Google Drive objects for prefix '${normalizedPrefix}'${suffix}`,
-                { cause: error }
+                {
+                    cause: error,
+                    operation: "listObjects",
+                    providerKind: this.kind,
+                    target: normalizedPrefix,
+                }
             );
         }
     }
@@ -277,9 +293,14 @@ export class GoogleDriveCloudStorageProvider
             });
 
             if (existing && args.overwrite === false) {
-                throw createErrnoError(
+                throw new CloudProviderOperationError(
                     `Google Drive object already exists: ${normalizedKey}`,
-                    "EEXIST"
+                    {
+                        code: "EEXIST",
+                        operation: "uploadObject",
+                        providerKind: this.kind,
+                        target: normalizedKey,
+                    }
                 );
             }
 
@@ -331,14 +352,30 @@ export class GoogleDriveCloudStorageProvider
             // Preserve EEXIST semantic for callers.
             const code = tryGetErrorCode(error);
             if (code === "EEXIST") {
-                throw ensureError(error);
+                const preserved = ensureError(error);
+                if (preserved instanceof CloudProviderOperationError) {
+                    throw preserved;
+                }
+
+                throw new CloudProviderOperationError(preserved.message, {
+                    cause: error,
+                    code: "EEXIST",
+                    operation: "uploadObject",
+                    providerKind: this.kind,
+                    target: normalizedKey,
+                });
             }
 
             const detail = tryDescribeGoogleDriveApiError(error);
             const suffix = detail ? `: ${detail}` : "";
-            throw new Error(
+            throw new CloudProviderOperationError(
                 `Failed to upload Google Drive object '${normalizedKey}'${suffix}`,
-                { cause: error }
+                {
+                    cause: error,
+                    operation: "uploadObject",
+                    providerKind: this.kind,
+                    target: normalizedKey,
+                }
             );
         }
     }
