@@ -131,7 +131,7 @@ jobs:
             # Node process (renderer + main + preload). With sourcemaps and build
             # plugins, the default ~2GB heap on GitHub runners (notably macOS
             # arm64) is easy to exceed.
-            NODE_OPTIONS: --max_old_space_size=4096
+            NODE_OPTIONS: --max_old_space_size=8192
         strategy:
             matrix:
                 os:
