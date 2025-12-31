@@ -1,3 +1,4 @@
+import { normalizePathSeparatorsToWindows } from "@shared/utils/pathSeparators";
 import { hasAsciiControlCharacters } from "@shared/utils/stringSafety";
 import { getUtfByteLength } from "@shared/utils/utfByteLength";
 
@@ -28,7 +29,7 @@ export type FilesystemBaseDirectoryValidationIssue =
 
 function isWindowsDeviceNamespacePath(value: string): boolean {
     // Treat forward slashes as backslashes for this check.
-    const normalized = value.replaceAll("/", "\\");
+    const normalized = normalizePathSeparatorsToWindows(value);
     return normalized.startsWith("\\\\?\\") || normalized.startsWith("\\\\.\\");
 }
 

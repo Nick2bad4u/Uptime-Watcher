@@ -24,3 +24,14 @@
 export function normalizePathSeparatorsToPosix(value: string): string {
     return value.replaceAll("\\", "/");
 }
+
+/**
+ * Converts POSIX path separators (`/`) to Windows separators (`\\`).
+ *
+ * @param value - Any string that may contain POSIX path separators.
+ *
+ * @returns The input string with all `/` replaced by `\\`.
+ */
+export function normalizePathSeparatorsToWindows(value: string): string {
+    return value.replaceAll("/", "\\");
+}

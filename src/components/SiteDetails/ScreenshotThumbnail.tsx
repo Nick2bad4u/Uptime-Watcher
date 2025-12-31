@@ -56,7 +56,7 @@ export const ScreenshotThumbnail = ({
     const [portalContainer, setPortalContainer] = useState<HTMLElement | null>(
         null
     );
-    const linkReference = useRef<HTMLAnchorElement>(null);
+    const linkRef = useRef<HTMLAnchorElement>(null);
     const timeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
     const { themeName } = useTheme();
     const openExternal = useUIStore(selectOpenExternal);
@@ -249,7 +249,7 @@ export const ScreenshotThumbnail = ({
                 onFocus={handleFocus}
                 onMouseEnter={handleMouseEnter}
                 onMouseLeave={handleMouseLeave}
-                ref={linkReference}
+                ref={linkRef}
                 rel="noopener noreferrer"
                 tabIndex={0}
                 target="_blank"
