@@ -7,6 +7,7 @@
  * database operations.
  */
 
+import { tryGetErrorCode } from "@shared/utils/errorCodes";
 import { ensureError } from "@shared/utils/errorHandling";
 import { LOG_TEMPLATES } from "@shared/utils/logTemplates";
 import { app } from "electron";
@@ -439,6 +440,11 @@ export class DatabaseService {
      * @returns `true` when the error indicates an outstanding lock.
      */
     private isDatabaseLockedError(error: unknown): boolean {
+        const code = tryGetErrorCode(error);
+        if (code === "SQLITE_BUSY" || code === "SQLITE_LOCKED") {
+            return true;
+        }
+
         const normalized = ensureError(error);
         const message = normalized.message.toLowerCase();
 

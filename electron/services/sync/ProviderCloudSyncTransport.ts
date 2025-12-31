@@ -448,10 +448,7 @@ export class ProviderCloudSyncTransport implements CloudSyncTransport {
             // recover by rebuilding remote state.
             if (
                 isCloudSyncJsonValidationError(error) ||
-                (error instanceof Error &&
-                    error.message.includes(
-                        "Cloud sync manifest exceeds size limit"
-                    ))
+                isCloudSyncSizeLimitError(error)
             ) {
                 const resolved = ensureError(error);
                 logger.warn(
