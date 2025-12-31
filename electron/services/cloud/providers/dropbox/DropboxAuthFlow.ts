@@ -200,7 +200,11 @@ export class DropboxAuthFlow {
         } catch (error: unknown) {
             const resolved = ensureError(error);
 
-            if (this.loopbackPort !== 0 && resolved.message.includes("EADDR")) {
+            const code = tryGetErrorCode(error);
+            const isAddressBindingError =
+                typeof code === "string" && code.startsWith("EADDR");
+
+            if (this.loopbackPort !== 0 && isAddressBindingError) {
                 throw new Error(
                     "Dropbox OAuth loopback server failed to start on both IPv4 and IPv6. " +
                         "Ensure IPv6 is enabled or change the configured redirect URI to use 127.0.0.1.",

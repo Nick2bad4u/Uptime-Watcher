@@ -12,6 +12,7 @@ import {
     queryForCount,
     queryHistoryRow,
     queryHistoryRows,
+    TypedQueryRowValidationError,
 } from "./typedQueries";
 
 /**
@@ -117,7 +118,10 @@ export function getHistoryCount(db: Database, monitorId: string): number {
 
         return result?.count ?? 0;
     } catch (error) {
-        if (error instanceof Error && error.message.includes("CountResult")) {
+        if (
+            error instanceof TypedQueryRowValidationError &&
+            error.label === "CountResult"
+        ) {
             const logWarnOrError =
                 typeof logger.warn === "function"
                     ? logger.warn.bind(logger)

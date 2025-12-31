@@ -41,6 +41,29 @@ export interface RowValidationOptions<TRow extends object> {
     readonly validate?: (row: UnknownRecord) => row is EnforcedRow<TRow>;
 }
 
+/**
+ * Error thrown when a typed query helper receives an unexpected row shape.
+ *
+ * @remarks
+ * This provides structured metadata (label/context) so callers don't need to
+ * parse error message strings (e.g. `.message.includes("CountResult")`).
+ */
+export class TypedQueryRowValidationError extends Error {
+    public readonly label?: string | undefined;
+
+    public readonly context?: string | undefined;
+
+    public constructor(
+        message: string,
+        args: { context?: string | undefined; label?: string | undefined; } = {}
+    ) {
+        super(message);
+        this.name = "TypedQueryRowValidationError";
+        this.label = args.label;
+        this.context = args.context;
+    }
+}
+
 function isUnknownRecord(value: unknown): value is UnknownRecord {
     return isSharedRecord(value);
 }
@@ -56,14 +79,22 @@ function ensureValidRow<TRow extends object>(
     context?: string
 ): TRow {
     if (!isUnknownRecord(row)) {
-        throw new Error(
-            `Expected ${describeRow(options?.label, context)} to be an object`
+        throw new TypedQueryRowValidationError(
+            `Expected ${describeRow(options?.label, context)} to be an object`,
+            {
+                context,
+                label: options?.label,
+            }
         );
     }
 
     if (options?.validate && !options.validate(row)) {
-        throw new Error(
-            `Row validation failed for ${describeRow(options.label, context)}`
+        throw new TypedQueryRowValidationError(
+            `Row validation failed for ${describeRow(options.label, context)}`,
+            {
+                context,
+                label: options.label,
+            }
         );
     }
 
