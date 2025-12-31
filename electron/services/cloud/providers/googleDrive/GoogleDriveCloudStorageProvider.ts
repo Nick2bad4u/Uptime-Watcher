@@ -3,6 +3,7 @@ import type { drive_v3 } from "googleapis";
 
 import { tryGetErrorCode } from "@shared/utils/errorCodes";
 import { ensureError } from "@shared/utils/errorHandling";
+import { normalizePathSeparatorsToPosix } from "@shared/utils/pathSeparators";
 import { google } from "googleapis";
 import { Readable } from "node:stream";
 
@@ -44,7 +45,7 @@ function normalizeDriveNameSegment(candidate: string): null | string {
         return null;
     }
 
-    if (candidate.includes("/") || candidate.includes("\\")) {
+    if (normalizePathSeparatorsToPosix(candidate).includes("/")) {
         return null;
     }
 

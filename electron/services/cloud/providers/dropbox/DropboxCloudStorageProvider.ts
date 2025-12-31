@@ -1,6 +1,7 @@
 import type { DropboxResponse, files, users } from "dropbox";
 
 import { ensureError } from "@shared/utils/errorHandling";
+import { normalizePathSeparatorsToPosix } from "@shared/utils/pathSeparators";
 import { isRecord } from "@shared/utils/typeHelpers";
 import { Dropbox, DropboxResponseError } from "dropbox";
 
@@ -71,7 +72,7 @@ function toDropboxPath(key: string): string {
 }
 
 function fromDropboxPathOrNull(pathDisplay: string): null | string {
-    const normalized = pathDisplay.replaceAll("\\", "/");
+    const normalized = normalizePathSeparatorsToPosix(pathDisplay);
     const prefix = `/${APP_ROOT_DIRECTORY_NAME}/`;
 
     if (normalized === `/${APP_ROOT_DIRECTORY_NAME}`) {

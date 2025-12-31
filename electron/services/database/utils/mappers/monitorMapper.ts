@@ -11,9 +11,10 @@
 
 import type { Monitor, Site } from "@shared/types";
 import type { MonitorRow as DatabaseMonitorRow } from "@shared/types/database";
-import type { UnknownRecord } from "type-fest";
+import type { JsonValue, UnknownRecord  } from "type-fest";
 
 import { ensureError } from "@shared/utils/errorHandling";
+import { safeJsonParse } from "@shared/utils/jsonSafety";
 import { LOG_TEMPLATES } from "@shared/utils/logTemplates";
 import {
     isValidIdentifierArray,
@@ -162,23 +163,31 @@ function parseActiveOperations(row: DatabaseMonitorRow): string[] {
         return [];
     }
 
-    try {
-        const parsed: unknown = JSON.parse(row.active_operations);
+    const parseResult = safeJsonParse<JsonValue[]>(
+        row.active_operations,
+        (value): value is JsonValue[] => Array.isArray(value)
+    );
 
-        if (isValidIdentifierArray(parsed)) {
-            return parsed;
-        }
-        logger.warn(LOG_TEMPLATES.warnings.MONITOR_ACTIVE_OPERATIONS_INVALID, {
-            parsed,
-        });
-        return [];
-    } catch (error: unknown) {
+    if (!parseResult.success || !parseResult.data) {
         logger.warn(
             LOG_TEMPLATES.warnings.MONITOR_ACTIVE_OPERATIONS_PARSE_FAILED,
-            ensureError(error)
+            {
+                message: parseResult.error ?? "Unknown JSON parsing error",
+            }
         );
         return [];
     }
+
+    const parsed = parseResult.data;
+
+    if (isValidIdentifierArray(parsed)) {
+        return parsed;
+    }
+
+    logger.warn(LOG_TEMPLATES.warnings.MONITOR_ACTIVE_OPERATIONS_INVALID, {
+        parsed,
+    });
+    return [];
 }
 
 /**

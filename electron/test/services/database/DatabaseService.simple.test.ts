@@ -5,6 +5,8 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
 import { fc } from "@fast-check/vitest";
 
+import { normalizePathSeparatorsToPosix } from "@shared/utils/pathSeparators";
+
 // Mock external dependencies
 vi.mock("electron", () => ({
     app: {
@@ -69,8 +71,7 @@ vi.mock("node:path", () => {
         resolve: vi.fn((...args: string[]) => args.join("/")),
         dirname: vi.fn(
             (target: string) =>
-                target
-                    .replaceAll("\\", "/")
+                normalizePathSeparatorsToPosix(target)
                     .split("/")
                     .slice(0, -1)
                     .join("/") || "."
@@ -78,7 +79,7 @@ vi.mock("node:path", () => {
         sep: "/",
         basename: vi.fn(
             (target: string) =>
-                target.replaceAll("\\", "/").split("/").pop() ?? ""
+                normalizePathSeparatorsToPosix(target).split("/").pop() ?? ""
         ),
     };
 

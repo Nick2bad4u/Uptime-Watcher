@@ -359,11 +359,10 @@ describe("TypeHelpers Complete Coverage Fuzzing Tests", () => {
         test.prop([fc.anything()])(
             "should work together in common patterns",
             (value) => {
-                // Pattern: Check if array, then access properties safely
+                // Pattern: Check if array, then access array properties
                 if (isArray(value)) {
                     expect(Array.isArray(value)).toBeTruthy();
-                    const length = safePropertyAccess(value, "length");
-                    expect(typeof length).toBe("number");
+                    expect(typeof value.length).toBe("number");
                 }
 
                 // Pattern: Check if record, then validate and convert

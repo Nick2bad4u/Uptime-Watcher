@@ -13,6 +13,7 @@
  */
 
 import { DEFAULT_MAX_BACKUP_SIZE_BYTES } from "@shared/constants/backup";
+import { normalizePathSeparatorsToPosix } from "@shared/utils/pathSeparators";
 import { hasAsciiControlCharacters } from "@shared/utils/stringSafety";
 import { isRecord } from "@shared/utils/typeHelpers";
 import { formatZodIssues } from "@shared/utils/zodIssueFormatting";
@@ -699,7 +700,7 @@ function validateRestoreFileNameCandidate(candidate: unknown): string[] {
 
     // `fileName` is intended for UI/logging only; it should be a base name, not
     // a path.
-    if (fileName.includes("/") || fileName.includes("\\")) {
+    if (normalizePathSeparatorsToPosix(fileName).includes("/")) {
         errors.push("fileName must not contain path separators");
     }
 
@@ -834,7 +835,7 @@ function createBackupKeyValidator(paramName: string): IpcParameterValidator {
             }
 
             // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- validated above
-            const key = (value as string).replaceAll("\\", "/").trim();
+            const key = normalizePathSeparatorsToPosix(value as string).trim();
 
             if (getUtfByteLength(key) > MAX_BACKUP_KEY_BYTES) {
                 return toValidationResult(

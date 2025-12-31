@@ -2,6 +2,7 @@
 
 import { tryGetErrorCode } from "@shared/utils/errorCodes";
 import { ensureError } from "@shared/utils/errorHandling";
+import { normalizePathSeparatorsToPosix } from "@shared/utils/pathSeparators";
 import crypto from "node:crypto";
 import fs from "node:fs/promises";
 import path from "node:path";
@@ -43,7 +44,7 @@ function assertSubpath(root: string, candidate: string): void {
 }
 
 function toPosixKey(root: string, absolutePath: string): string {
-    return path.relative(root, absolutePath).replaceAll("\\", "/");
+    return normalizePathSeparatorsToPosix(path.relative(root, absolutePath));
 }
 
 async function toCloudObjectEntry(

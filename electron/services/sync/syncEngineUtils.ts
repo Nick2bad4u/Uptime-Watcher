@@ -6,6 +6,7 @@
  * concurrency) used by {@link SyncEngine}.
  */
 
+import { normalizePathSeparatorsToPosix } from "@shared/utils/pathSeparators";
 import { hasAsciiControlCharacters as sharedHasAsciiControlCharacters } from "@shared/utils/stringSafety";
 
 /** Maximum byte budget accepted for persisted sync device IDs. */
@@ -82,7 +83,7 @@ export function getPersistedDeviceIdValidationError(
     }
 
     // Device IDs must be a single key segment.
-    if (candidate.includes("/") || candidate.includes("\\")) {
+    if (normalizePathSeparatorsToPosix(candidate).includes("/")) {
         return "deviceId must not contain path separators";
     }
 

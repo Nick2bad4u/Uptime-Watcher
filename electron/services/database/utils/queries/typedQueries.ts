@@ -464,9 +464,7 @@ export function querySiteRows(
     sql: string,
     params?: DbValue[]
 ): SiteRow[] {
-    const rows: unknown =
-        params === undefined ? db.all(sql) : db.all(sql, params);
-    return ensureValidRows<SiteRow>(rows, SITE_ROW_VALIDATION, "SiteRow");
+    return queryForRecords<SiteRow>(db, sql, params, SITE_ROW_VALIDATION);
 }
 
 /**
@@ -477,15 +475,5 @@ export function querySiteRow(
     sql: string,
     params?: DbValue[]
 ): null | SiteRow | undefined {
-    const row: unknown =
-        params === undefined ? db.get(sql) : db.get(sql, params);
-    if (row === undefined) {
-        return undefined;
-    }
-
-    if (row === null) {
-        return null;
-    }
-
-    return ensureValidRow(row, SITE_ROW_VALIDATION, "SiteRow");
+    return queryForSingleRecord<SiteRow>(db, sql, params, SITE_ROW_VALIDATION);
 }

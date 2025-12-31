@@ -115,7 +115,8 @@ describe(SiteRepository, () => {
 
             expect(findAllResult).toEqual(exportAllResult);
             expect(mockDb.all).toHaveBeenCalledWith(
-                expect.stringContaining("SELECT")
+                expect.stringContaining("SELECT"),
+                undefined
             );
         });
     });
@@ -551,7 +552,8 @@ describe(SiteRepository, () => {
 
                         expect(result).toEqual(mockSites);
                         expect(mockDatabase.all).toHaveBeenCalledWith(
-                            expect.stringContaining("SELECT")
+                            expect.stringContaining("SELECT"),
+                            undefined
                         );
                     }
                 )

@@ -1,3 +1,4 @@
+import { normalizePathSeparatorsToPosix } from "@shared/utils/pathSeparators";
 import { hasAsciiControlCharacters } from "@shared/utils/stringSafety";
 
 /**
@@ -83,7 +84,7 @@ export function normalizeCloudObjectKey(
     }
 
     if (normalizeSeparators) {
-        normalized = normalized.replaceAll("\\\\", "/");
+        normalized = normalizePathSeparatorsToPosix(normalized);
     }
 
     if (stripLeadingSlashes) {
