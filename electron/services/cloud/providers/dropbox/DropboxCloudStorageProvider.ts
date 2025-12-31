@@ -140,6 +140,40 @@ function hasNotFoundTag(value: unknown, visited: WeakSet<object>): boolean {
     return false;
 }
 
+function hasTag(value: unknown, tag: string, visited: WeakSet<object>): boolean {
+    if (typeof value !== "object" || value === null) {
+        return false;
+    }
+
+    if (visited.has(value)) {
+        return false;
+    }
+    visited.add(value);
+
+    if (!isRecord(value)) {
+        return false;
+    }
+
+    const record = value;
+    if (record[".tag"] === tag) {
+        return true;
+    }
+
+    for (const next of Object.values(record)) {
+        if (Array.isArray(next)) {
+            for (const item of next) {
+                if (hasTag(item, tag, visited)) {
+                    return true;
+                }
+            }
+        } else if (typeof next === "object" && next !== null && hasTag(next, tag, visited)) {
+                return true;
+            }
+    }
+
+    return false;
+}
+
 function isDropboxNotFoundError(error: unknown): boolean {
     if (!(error instanceof DropboxResponseError)) {
         return false;
@@ -150,6 +184,19 @@ function isDropboxNotFoundError(error: unknown): boolean {
     }
 
     return hasNotFoundTag(error.error, new WeakSet());
+}
+
+function isDropboxConflictError(error: unknown): boolean {
+    if (!(error instanceof DropboxResponseError)) {
+        return false;
+    }
+
+    if (error.status !== 409) {
+        return false;
+    }
+
+    // Best-effort: recursively scan Dropbox's tagged error payload.
+    return hasTag(error.error, "conflict", new WeakSet());
 }
 
 async function convertDropboxDownloadedResultToBuffer(
@@ -407,17 +454,31 @@ export class DropboxCloudStorageProvider
                 }),
             operationName: "files/upload",
         }).catch((error: unknown) => {
-            const described = describeDropboxSdkErrorRich(error);
-                const detail = described ?? ensureError(error).message;
+            // Contract: overwrite=false and existing object => EEXIST.
+            if (args.overwrite !== true && isDropboxConflictError(error)) {
                 throw new CloudProviderOperationError(
-                    `Dropbox upload failed: ${detail}`,
+                    `Dropbox object already exists: ${normalizedKey}`,
                     {
                         cause: error,
+                        code: "EEXIST",
                         operation: "uploadObject",
                         providerKind: this.kind,
                         target: normalizedKey,
                     }
                 );
+            }
+
+            const described = describeDropboxSdkErrorRich(error);
+            const detail = described ?? ensureError(error).message;
+            throw new CloudProviderOperationError(
+                `Dropbox upload failed: ${detail}`,
+                {
+                    cause: error,
+                    operation: "uploadObject",
+                    providerKind: this.kind,
+                    target: normalizedKey,
+                }
+            );
         });
 
         const uploadData = parseDropboxFilesUploadResult(response.result);
