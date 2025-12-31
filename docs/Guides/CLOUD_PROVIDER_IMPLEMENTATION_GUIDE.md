@@ -3,7 +3,7 @@ schema: "../../config/schemas/doc-frontmatter.schema.json"
 title: "Cloud Provider Implementation Guide"
 summary: "Developer guide for adding new Cloud Sync / Remote Backup providers (e.g. Google Drive) safely and consistently."
 created: 2025-12-15
-last_reviewed: 2025-12-16
+last_reviewed: 2025-12-30
 category: "guide"
 author: "Nick2bad4u"
 tags:
@@ -52,6 +52,41 @@ This guide explains how to add a new cloud provider (e.g. Google Drive) to Uptim
    - Provider setup belongs in the Provider tab panel
    - The rest of Cloud actions (sync, backups, advanced) should not multiply per provider
 
+5. **Provider boundary must be strict**
+   - Parse/validate all third-party API responses at the boundary (Zod schemas in the provider folder)
+   - Normalize and validate provider keys consistently (POSIX keys, no traversal)
+   - Emit consistent, typed operation errors (see below)
+
+## Provider boundary responsibilities (must-haves)
+
+### Runtime validation
+
+- Use **Zod** at the provider boundary to validate:
+  - third-party SDK payloads (Dropbox SDK)
+  - raw REST responses (Google Drive)
+  - error envelopes (best-effort extractors)
+
+This prevents “ad-hoc shape checks” drifting across providers.
+
+### Error model (typed, consistent)
+
+Providers must throw `CloudProviderOperationError` for operational failures so callers can stop doing string parsing.
+
+- Source: `electron/services/cloud/providers/cloudProviderErrors.ts`
+- Include:
+  - `providerKind`
+  - `operation` (e.g. `uploadObject`, `downloadObject`, `listBackups`)
+  - `target` when applicable (key/prefix/fileName)
+  - `code` when known (`ENOENT`, `EEXIST`, etc.)
+  - `cause` (preserve the original error)
+
+#### Required errno semantics
+
+- Missing remote object on download must surface as `code: "ENOENT"`.
+- Conflicting upload when `overwrite=false` must surface as `code: "EEXIST"`.
+
+Callers are allowed to branch on `error.code` and `isCloudProviderOperationError(error)`.
+
 ## Implementation checklist
 
 ### 1) Define provider types (shared)
@@ -64,7 +99,12 @@ This guide explains how to add a new cloud provider (e.g. Google Drive) to Uptim
 
 - Add provider module under:
   - `electron/services/cloud/providers/<provider>/...`
-- Implement/extend the provider interface used by `electron/services/cloud/CloudService.ts`.
+- Implement the provider interface used by `electron/services/cloud/CloudService.ts`.
+- Prefer extending `BaseCloudStorageProvider` to keep backup IO (`uploadBackup`, `downloadBackup`, `listBackups`) consistent.
+- Standardize errors:
+  - throw `CloudProviderOperationError` for operational failures
+  - preserve `ENOENT`/`EEXIST` semantics
+  - do not rely on message string matching in callers
 
 ### 3) OAuth flow
 

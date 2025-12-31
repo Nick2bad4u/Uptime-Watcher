@@ -68,6 +68,7 @@ import { migrateProviderBackups } from "./migrations/backupMigration";
 import { resetProviderCloudSyncState } from "./migrations/syncReset";
 import { buildCloudSyncResetPreview } from "./migrations/syncResetPreview";
 import { backupMetadataKeyForBackupKey } from "./providers/CloudBackupMetadataFile";
+import { isCloudProviderOperationError } from "./providers/cloudProviderErrors";
 import { DropboxAuthFlow } from "./providers/dropbox/DropboxAuthFlow";
 import { DropboxCloudStorageProvider } from "./providers/dropbox/DropboxCloudStorageProvider";
 import { DropboxTokenManager } from "./providers/dropbox/DropboxTokenManager";
@@ -281,9 +282,20 @@ export class CloudService {
         } catch (error: unknown) {
             const resolved = ensureError(error);
             await setLastError(this.settings, resolved.message);
+
+            const providerDetails = isCloudProviderOperationError(resolved)
+                ? {
+                      code: resolved.code,
+                      operation: resolved.operation,
+                      providerKind: resolved.providerKind,
+                      target: resolved.target,
+                  }
+                : undefined;
+
             logger.warn(`[CloudService] Operation '${operationName}' failed`, {
                 message: resolved.message,
                 name: resolved.name,
+                ...(providerDetails ? { providerDetails } : {}),
             });
             throw resolved;
         }

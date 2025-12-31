@@ -1,5 +1,8 @@
-import type { CloudBackupEntry } from "@shared/types/cloud";
+import type { CloudBackupEntry, CloudProviderKind } from "@shared/types/cloud";
 import type { SerializedDatabaseBackupMetadata } from "@shared/types/databaseBackup";
+
+import { tryGetErrorCode } from "@shared/utils/errorCodes";
+import { ensureError } from "@shared/utils/errorHandling";
 
 import type {
     CloudObjectEntry,
@@ -11,6 +14,7 @@ import {
     uploadBackupWithMetadata,
 } from "./cloudBackupIo";
 import { listBackupsFromMetadataObjects } from "./cloudBackupListing";
+import { CloudProviderOperationError } from "./cloudProviderErrors";
 
 /**
  * Base class implementing the shared backup IO surface for cloud providers.
@@ -30,18 +34,36 @@ export abstract class BaseCloudStorageProvider implements Pick<
     CloudStorageProvider,
     "downloadBackup" | "listBackups" | "uploadBackup"
 > {
+    /** Provider kind for error attribution and diagnostics. */
+    public abstract readonly kind: CloudProviderKind;
+
     protected readonly backupsPrefix: string;
 
     /**
      * Lists backups stored under this provider.
      */
     public async listBackups(): Promise<CloudBackupEntry[]> {
-        const objects = await this.listObjects(this.backupsPrefix);
+        try {
+            const objects = await this.listObjects(this.backupsPrefix);
 
-        return listBackupsFromMetadataObjects({
-            downloadObjectBuffer: (key) => this.downloadObject(key),
-            objects,
-        });
+            return await listBackupsFromMetadataObjects({
+                downloadObjectBuffer: (key) => this.downloadObject(key),
+                objects,
+            });
+        } catch (error) {
+            const code = tryGetErrorCode(error);
+            const normalized = ensureError(error);
+            throw new CloudProviderOperationError(
+                `Failed to list backups: ${normalized.message}`,
+                {
+                    cause: error,
+                    code,
+                    operation: "listBackups",
+                    providerKind: this.kind,
+                    target: this.backupsPrefix,
+                }
+            );
+        }
     }
 
     /**
@@ -53,11 +75,26 @@ export abstract class BaseCloudStorageProvider implements Pick<
         fileName: string;
         metadata: SerializedDatabaseBackupMetadata;
     }): Promise<CloudBackupEntry> {
-        return uploadBackupWithMetadata({
-            ...args,
-            backupsPrefix: this.backupsPrefix,
-            uploadObject: (uploadArgs) => this.uploadObject(uploadArgs),
-        });
+        try {
+            return await uploadBackupWithMetadata({
+                ...args,
+                backupsPrefix: this.backupsPrefix,
+                uploadObject: (uploadArgs) => this.uploadObject(uploadArgs),
+            });
+        } catch (error) {
+            const code = tryGetErrorCode(error);
+            const normalized = ensureError(error);
+            throw new CloudProviderOperationError(
+                `Failed to upload backup '${args.fileName}': ${normalized.message}`,
+                {
+                    cause: error,
+                    code,
+                    operation: "uploadBackup",
+                    providerKind: this.kind,
+                    target: args.fileName,
+                }
+            );
+        }
     }
 
     /**
@@ -66,10 +103,26 @@ export abstract class BaseCloudStorageProvider implements Pick<
     public async downloadBackup(
         key: string
     ): Promise<{ buffer: Buffer; entry: CloudBackupEntry }> {
-        return downloadBackupWithMetadata({
-            downloadObject: (downloadKey) => this.downloadObject(downloadKey),
-            key,
-        });
+        try {
+            return await downloadBackupWithMetadata({
+                downloadObject: (downloadKey) =>
+                    this.downloadObject(downloadKey),
+                key,
+            });
+        } catch (error) {
+            const code = tryGetErrorCode(error);
+            const normalized = ensureError(error);
+            throw new CloudProviderOperationError(
+                `Failed to download backup '${key}': ${normalized.message}`,
+                {
+                    cause: error,
+                    code,
+                    operation: "downloadBackup",
+                    providerKind: this.kind,
+                    target: key,
+                }
+            );
+        }
     }
 
     protected constructor(backupsPrefix: string) {

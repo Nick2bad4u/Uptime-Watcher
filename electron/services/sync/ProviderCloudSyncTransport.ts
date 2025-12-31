@@ -14,8 +14,8 @@ import {
     parseCloudSyncSnapshot,
 } from "@shared/types/cloudSyncSnapshot";
 import { readNumberEnv } from "@shared/utils/environment";
+import { tryGetErrorCode } from "@shared/utils/errorCodes";
 import { ensureError } from "@shared/utils/errorHandling";
-import { isRecord } from "@shared/utils/typeHelpers";
 
 import type {
     CloudObjectEntry,
@@ -83,28 +83,8 @@ function getMaxManifestBytes(): number {
     );
 }
 
-function isProviderNotFoundError(error: unknown, key: string): boolean {
-    if (isRecord(error)) {
-        const { code } = error;
-        if (code === "ENOENT") {
-            return true;
-        }
-    }
-
-    if (error instanceof Error) {
-        const message = error.message.toLowerCase();
-        const lowerKey = key.toLowerCase();
-
-        // GoogleDriveCloudStorageProvider throws: "Google Drive object not found: <key>"
-        if (
-            message.includes("object not found") &&
-            message.includes(lowerKey)
-        ) {
-            return true;
-        }
-    }
-
-    return false;
+function isProviderNotFoundError(error: unknown): boolean {
+    return tryGetErrorCode(error) === "ENOENT";
 }
 
 function isCloudSyncJsonValidationError(error: unknown): boolean {
@@ -460,7 +440,7 @@ export class ProviderCloudSyncTransport implements CloudSyncTransport {
             const raw = decodeUtf8(buffer);
             return parseCloudSyncManifest(JSON.parse(raw));
         } catch (error) {
-            if (isProviderNotFoundError(error, MANIFEST_KEY)) {
+            if (isProviderNotFoundError(error)) {
                 return null;
             }
 

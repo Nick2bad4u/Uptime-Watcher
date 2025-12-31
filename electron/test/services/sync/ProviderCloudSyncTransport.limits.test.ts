@@ -304,10 +304,14 @@ describe("ProviderCloudSyncTransport snapshot key validation", () => {
 });
 
 describe("ProviderCloudSyncTransport.readManifest provider not-found", () => {
-    it("treats Google Drive 'object not found' as missing manifest", async () => {
+    it("treats ENOENT as missing manifest", async () => {
         const provider = createProvider({
             downloadObject: async () => {
-                throw new Error("Google Drive object not found: manifest.json");
+                const error = new Error(
+                    "Google Drive object not found: manifest.json"
+                ) as NodeJS.ErrnoException;
+                error.code = "ENOENT";
+                throw error;
             },
         });
 

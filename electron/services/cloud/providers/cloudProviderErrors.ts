@@ -6,18 +6,25 @@ import type { CloudProviderKind } from "@shared/types/cloud";
 export type CloudProviderOperation =
     | "connect"
     | "deleteObject"
+    | "downloadBackup"
     | "downloadObject"
     | "getAccountLabel"
     | "getConnectionStatus"
+    | "isConnected"
+    | "listBackups"
     | "listObjects"
+    | "uploadBackup"
     | "uploadObject";
 
 /**
  * Options for {@link CloudProviderOperationError}.
  */
 export interface CloudProviderOperationErrorOptions extends ErrorOptions {
-    /** Optional Node-style error code to preserve errno semantics (e.g. ENOENT,
-EEXIST). */
+    /**
+     * Optional Node-style error code to preserve errno semantics.
+     *
+     * @example "ENOENT", "EEXIST"
+     */
     readonly code?: NodeJS.ErrnoException["code"] | undefined;
 
     /** Logical operation that failed. */
@@ -26,8 +33,12 @@ EEXIST). */
     /** Provider implementation that produced this failure. */
     readonly providerKind: CloudProviderKind;
 
-    /** Optional identifier involved in the operation (e.g. object key or
-prefix). */
+    /**
+     * Optional identifier involved in the operation.
+     *
+     * @remarks
+     * Typically an object key, backup fileName, or a prefix.
+     */
     readonly target?: string | undefined;
 }
 

@@ -1,6 +1,9 @@
 import type { CloudBackupEntry, CloudProviderKind } from "@shared/types/cloud";
 import type { SerializedDatabaseBackupMetadata } from "@shared/types/databaseBackup";
 
+import { tryGetErrorCode } from "@shared/utils/errorCodes";
+import { ensureError } from "@shared/utils/errorHandling";
+
 import type {
     CloudObjectEntry,
     CloudStorageProvider,
@@ -11,6 +14,7 @@ import {
     encryptBuffer,
     isEncryptedPayload,
 } from "../crypto/cloudCrypto";
+import { CloudProviderOperationError } from "./cloudProviderErrors";
 
 const SYNC_PREFIX = "sync/" as const;
 const MANIFEST_KEY = "manifest.json" as const;
@@ -47,17 +51,43 @@ export class EncryptedSyncCloudStorageProvider implements CloudStorageProvider {
     }
 
     public async downloadObject(key: string): Promise<Buffer> {
-        const buffer = await this.inner.downloadObject(key);
+        try {
+            const buffer = await this.inner.downloadObject(key);
 
-        if (!shouldEncryptSyncObject(key)) {
-            return buffer;
+            if (!shouldEncryptSyncObject(key)) {
+                return buffer;
+            }
+
+            if (!isEncryptedPayload(buffer)) {
+                throw new CloudProviderOperationError(
+                    "Refusing to read unencrypted sync object",
+                    {
+                        operation: "downloadObject",
+                        providerKind: this.kind,
+                        target: key,
+                    }
+                );
+            }
+
+            return decryptBuffer({ ciphertext: buffer, key: this.key });
+        } catch (error) {
+            if (error instanceof CloudProviderOperationError) {
+                throw error;
+            }
+
+            const code = tryGetErrorCode(error);
+            const normalized = ensureError(error);
+            throw new CloudProviderOperationError(
+                `Failed to download encrypted sync object '${key}': ${normalized.message}`,
+                {
+                    cause: error,
+                    code,
+                    operation: "downloadObject",
+                    providerKind: this.kind,
+                    target: key,
+                }
+            );
         }
-
-        if (!isEncryptedPayload(buffer)) {
-            throw new Error("Refusing to read unencrypted sync object");
-        }
-
-        return decryptBuffer({ ciphertext: buffer, key: this.key });
     }
 
     public async isConnected(): Promise<boolean> {
@@ -86,19 +116,38 @@ export class EncryptedSyncCloudStorageProvider implements CloudStorageProvider {
         key: string;
         overwrite?: boolean;
     }): Promise<CloudObjectEntry> {
-        if (!shouldEncryptSyncObject(args.key)) {
-            return this.inner.uploadObject(args);
+        try {
+            if (!shouldEncryptSyncObject(args.key)) {
+                return await this.inner.uploadObject(args);
+            }
+
+            const encryptedBuffer = encryptBuffer({
+                key: this.key,
+                plaintext: args.buffer,
+            });
+
+            return await this.inner.uploadObject({
+                ...args,
+                buffer: encryptedBuffer,
+            });
+        } catch (error) {
+            if (error instanceof CloudProviderOperationError) {
+                throw error;
+            }
+
+            const code = tryGetErrorCode(error);
+            const normalized = ensureError(error);
+            throw new CloudProviderOperationError(
+                `Failed to upload encrypted sync object '${args.key}': ${normalized.message}`,
+                {
+                    cause: error,
+                    code,
+                    operation: "uploadObject",
+                    providerKind: this.kind,
+                    target: args.key,
+                }
+            );
         }
-
-        const encryptedBuffer = encryptBuffer({
-            key: this.key,
-            plaintext: args.buffer,
-        });
-
-        return this.inner.uploadObject({
-            ...args,
-            buffer: encryptedBuffer,
-        });
     }
 
     public constructor(args: { inner: CloudStorageProvider; key: Buffer }) {
