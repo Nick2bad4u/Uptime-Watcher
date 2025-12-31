@@ -6,6 +6,7 @@ describe("FilesystemCloudStorageProvider", () => {
     let os: typeof import("node:os");
     let path: typeof import("node:path");
     let FilesystemCloudStorageProvider: (typeof import("../../../services/cloud/providers/FilesystemCloudStorageProvider"))["FilesystemCloudStorageProvider"];
+    let CloudProviderOperationError: (typeof import("../../../services/cloud/providers/cloudProviderErrors"))["CloudProviderOperationError"];
 
     beforeEach(async () => {
         // Electron tests globally mock fs/path. This suite needs real IO.
@@ -21,12 +22,15 @@ describe("FilesystemCloudStorageProvider", () => {
             await vi.importActual<typeof import("node:path")>("node:path");
         const providerModule =
             await import("../../../services/cloud/providers/FilesystemCloudStorageProvider");
+        const errorModule =
+            await import("../../../services/cloud/providers/cloudProviderErrors");
 
         fs = nodeFs.promises;
         os = nodeOs;
         path = nodePath;
         FilesystemCloudStorageProvider =
             providerModule.FilesystemCloudStorageProvider;
+        CloudProviderOperationError = errorModule.CloudProviderOperationError;
 
         baseDirectory = await fs.mkdtemp(path.join(os.tmpdir(), "uw-cloud-"));
     });
@@ -117,5 +121,49 @@ describe("FilesystemCloudStorageProvider", () => {
 
         const entries = await provider.listObjects("sync");
         expect(entries.map((entry) => entry.key)).toEqual(["sync/file.txt"]);
+    });
+
+    it("throws a typed ENOENT error when downloading a missing object", async () => {
+        const provider = new FilesystemCloudStorageProvider({ baseDirectory });
+
+        try {
+            await provider.downloadObject("sync/missing.txt");
+            throw new Error("Expected downloadObject to throw");
+        } catch (error: unknown) {
+            expect(error).toBeInstanceOf(CloudProviderOperationError);
+
+            const typed = error as InstanceType<typeof CloudProviderOperationError>;
+            expect(typed.code).toBe("ENOENT");
+            expect(typed.operation).toBe("downloadObject");
+            expect(typed.providerKind).toBe("filesystem");
+            expect(typed.target).toBe("sync/missing.txt");
+        }
+    });
+
+    it("throws a typed EEXIST error when overwrite is false and object exists", async () => {
+        const provider = new FilesystemCloudStorageProvider({ baseDirectory });
+
+        await provider.uploadObject({
+            buffer: Buffer.from("payload"),
+            key: "sync/existing.txt",
+            overwrite: true,
+        });
+
+        try {
+            await provider.uploadObject({
+                buffer: Buffer.from("next"),
+                key: "sync/existing.txt",
+                overwrite: false,
+            });
+            throw new Error("Expected uploadObject to throw");
+        } catch (error: unknown) {
+            expect(error).toBeInstanceOf(CloudProviderOperationError);
+
+            const typed = error as InstanceType<typeof CloudProviderOperationError>;
+            expect(typed.code).toBe("EEXIST");
+            expect(typed.operation).toBe("uploadObject");
+            expect(typed.providerKind).toBe("filesystem");
+            expect(typed.target).toBe("sync/existing.txt");
+        }
     });
 });

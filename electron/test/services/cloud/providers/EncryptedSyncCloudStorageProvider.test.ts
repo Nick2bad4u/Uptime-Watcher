@@ -9,6 +9,7 @@ import {
     isEncryptedPayload,
 } from "@electron/services/cloud/crypto/cloudCrypto";
 import { EncryptedSyncCloudStorageProvider } from "@electron/services/cloud/providers/EncryptedSyncCloudStorageProvider";
+import { CloudProviderOperationError } from "@electron/services/cloud/providers/cloudProviderErrors";
 import type {
     CloudObjectEntry,
     CloudStorageProvider,
@@ -165,8 +166,17 @@ describe(EncryptedSyncCloudStorageProvider, () => {
 
         const provider = new EncryptedSyncCloudStorageProvider({ inner, key });
 
-        await expect(
-            provider.downloadObject("sync/devices/a/ops/30-1-1.ndjson")
-        ).rejects.toThrowError(/refusing to read unencrypted sync object/i);
+        try {
+            await provider.downloadObject("sync/devices/a/ops/30-1-1.ndjson");
+            throw new Error("Expected downloadObject to throw");
+        } catch (error: unknown) {
+            expect(error).toBeInstanceOf(CloudProviderOperationError);
+
+            const typed = error as CloudProviderOperationError;
+            expect(typed.operation).toBe("downloadObject");
+            expect(typed.providerKind).toBe("filesystem");
+            expect(typed.target).toBe("sync/devices/a/ops/30-1-1.ndjson");
+            expect(typed.message).toMatch(/refusing to read unencrypted sync object/i);
+        }
     });
 });
