@@ -57,7 +57,7 @@ export const SiteCardStatus: NamedExoticComponent<SiteCardStatusProperties> =
             const normalizedSegments = safeMonitorId
                 .trim()
                 .replaceAll(/[\p{Dash_Punctuation}_]+/gu, " ")
-                .split(/\s+/)
+                .split(/\s+/u)
                 .filter(Boolean)
                 .map((segment) => toTitleCase(segment));
 

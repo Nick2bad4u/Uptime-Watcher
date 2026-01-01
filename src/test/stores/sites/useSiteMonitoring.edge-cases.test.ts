@@ -10,7 +10,9 @@ import {
 
 const ensureErrorMock = vi.hoisted(() =>
     vi.fn((error: unknown) =>
-        error instanceof Error ? error : new Error(String(error))));
+        error instanceof Error ? error : new Error(String(error))
+    )
+);
 
 vi.mock("@shared/utils/errorHandling", () => ({
     ensureError: ensureErrorMock,

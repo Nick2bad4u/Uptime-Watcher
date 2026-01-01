@@ -59,45 +59,43 @@ describe(DropboxAuthFlow, () => {
                         redirectUri: string,
                         state?: string,
                         authType?: "token" | "code",
-                        tokenAccessType?:
-                            | null
-                            | "legacy"
-                            | "offline"
-                            | "online",
+                        tokenAccessType?: null | "offline" | "online",
                         scope?: string[],
                         includeGrantedScopes?: "none" | "user" | "team",
                         usePKCE?: boolean
                     ) => Promise<string>
                 >()
-                .mockImplementation(async (
-                    redirectUri,
-                    state,
-                    authType,
-                    tokenAccessType,
-                    scope,
-                    includeGrantedScopes,
-                    usePKCE
-                ) => {
-                    capturedRedirectUri = redirectUri;
-                    capturedState = state;
+                .mockImplementation(
+                    async (
+                        redirectUri,
+                        state,
+                        authType,
+                        tokenAccessType,
+                        scope,
+                        includeGrantedScopes,
+                        usePKCE
+                    ) => {
+                        capturedRedirectUri = redirectUri;
+                        capturedState = state;
 
-                    expect(authType).toBe("code");
-                    expect(tokenAccessType).toBe("offline");
-                    expect(includeGrantedScopes).toBe("none");
-                    expect(usePKCE).toBeTruthy();
+                        expect(authType).toBe("code");
+                        expect(tokenAccessType).toBe("offline");
+                        expect(includeGrantedScopes).toBe("none");
+                        expect(usePKCE).toBeTruthy();
 
-                    const scopeString = (scope ?? []).join(" ");
-                    expect(scopeString).toContain("account_info.read");
-                    expect(scopeString).toContain("files.content.read");
-                    expect(scopeString).toContain("files.content.write");
-                    expect(scopeString).toContain("files.metadata.read");
+                        const scopeString = (scope ?? []).join(" ");
+                        expect(scopeString).toContain("account_info.read");
+                        expect(scopeString).toContain("files.content.read");
+                        expect(scopeString).toContain("files.content.write");
+                        expect(scopeString).toContain("files.metadata.read");
 
-                    // Return an arbitrary URL; the flow only passes it to
-                    // shell.openExternal.
-                    return `https://www.dropbox.com/oauth2/authorize?redirect_uri=${encodeURIComponent(
-                        redirectUri
-                    )}&state=${encodeURIComponent(state ?? "")}`;
-                }),
+                        // Return an arbitrary URL; the flow only passes it to
+                        // shell.openExternal.
+                        return `https://www.dropbox.com/oauth2/authorize?redirect_uri=${encodeURIComponent(
+                            redirectUri
+                        )}&state=${encodeURIComponent(state ?? "")}`;
+                    }
+                ),
             getAccessTokenFromCode: vi
                 .fn<
                     (
@@ -130,7 +128,7 @@ describe(DropboxAuthFlow, () => {
 
             expect(capturedState).toBeTruthy();
             expect(capturedRedirectUri).toMatch(
-                    /^http:\/\/127\.0\.0\.1:\d+\/oauth2\/callback$/u
+                /^http:\/\/127\.0\.0\.1:\d+\/oauth2\/callback$/u
             );
 
             const callbackUrl = new URL(capturedRedirectUri!);
@@ -162,15 +160,14 @@ describe(DropboxAuthFlow, () => {
     it("rejects when the callback includes an error_description", async () => {
         const auth = {
             setClientId: vi.fn(),
-            getAuthenticationUrl: vi.fn(async (
-                redirectUri: string,
-                state?: string
-            ) => {
-                const url = new URL("https://example.test");
-                url.searchParams.set("redirect_uri", redirectUri);
-                url.searchParams.set("state", state ?? "");
-                return url.toString();
-            }),
+            getAuthenticationUrl: vi.fn(
+                async (redirectUri: string, state?: string) => {
+                    const url = new URL("https://example.test");
+                    url.searchParams.set("redirect_uri", redirectUri);
+                    url.searchParams.set("state", state ?? "");
+                    return url.toString();
+                }
+            ),
             getAccessTokenFromCode: vi.fn(),
         };
 
@@ -202,15 +199,14 @@ describe(DropboxAuthFlow, () => {
     it("rejects when the callback state does not match", async () => {
         const auth = {
             setClientId: vi.fn(),
-            getAuthenticationUrl: vi.fn(async (
-                redirectUri: string,
-                state?: string
-            ) => {
-                const url = new URL("https://example.test");
-                url.searchParams.set("redirect_uri", redirectUri);
-                url.searchParams.set("state", state ?? "");
-                return url.toString();
-            }),
+            getAuthenticationUrl: vi.fn(
+                async (redirectUri: string, state?: string) => {
+                    const url = new URL("https://example.test");
+                    url.searchParams.set("redirect_uri", redirectUri);
+                    url.searchParams.set("state", state ?? "");
+                    return url.toString();
+                }
+            ),
             getAccessTokenFromCode: vi.fn(),
         };
 

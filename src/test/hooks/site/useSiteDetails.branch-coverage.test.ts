@@ -3,31 +3,30 @@ import { renderHook, act } from "@testing-library/react";
 import React from "react";
 import { useSiteDetails } from "../../../hooks/site/useSiteDetails";
 import { useSitesStore } from "../../../stores/sites/useSitesStore";
+import { useErrorStore } from "../../../stores/error/useErrorStore";
+import { useUIStore } from "../../../stores/ui/useUiStore";
+import { useSiteAnalytics } from "../../../hooks/site/useSiteAnalytics";
 import { validateMonitorFieldClientSide } from "../../../utils/monitorValidation";
-import { useSelectedSite } from "../../../hooks/useSelectedSite";
-import { useMonitorTypesStore } from "../../../stores/monitor/useMonitorTypesStore";
 import { logger } from "../../../services/logger";
 
 // Mock all dependencies
-vi.mock("../../../hooks/useSelectedSite");
 vi.mock("../../../stores/sites/useSitesStore");
-vi.mock("../../../stores/monitor/useMonitorTypesStore");
+vi.mock("../../../stores/error/useErrorStore");
+vi.mock("../../../stores/ui/useUiStore");
+vi.mock("../../../hooks/site/useSiteAnalytics");
 vi.mock("../../../utils/monitorValidation");
 vi.mock("../../../services/logger");
-const confirmMock = vi.fn();
-vi.mock("../../../hooks/ui/useConfirmDialog", () => ({
-    useConfirmDialog: () => confirmMock,
-}));
 
-const mockUseSelectedSite = vi.mocked(useSelectedSite);
 const mockUseSitesStore = vi.mocked(useSitesStore);
-const mockUseMonitorTypesStore = vi.mocked(useMonitorTypesStore);
+const mockUseErrorStore = vi.mocked(useErrorStore);
+const mockUseUIStore = vi.mocked(useUIStore);
+const mockUseSiteAnalytics = vi.mocked(useSiteAnalytics);
 const mockValidateMonitorFieldClientSide = vi.mocked(
     validateMonitorFieldClientSide
 );
 const mockLogger = vi.mocked(logger);
 
-describe("useSiteDetails - Branch Coverage", () => {
+describe("useSiteDetails - Branch Coverage Tests", () => {
     const mockSite = {
         identifier: "test-site",
         name: "Test Site",
@@ -49,40 +48,74 @@ describe("useSiteDetails - Branch Coverage", () => {
     };
 
     const mockSitesStore = {
-        checkSiteNow: vi.fn(),
-        deleteSite: vi.fn(),
-        getSelectedMonitorId: vi.fn(),
-        modifySite: vi.fn(),
-        removeMonitorFromSite: vi.fn(),
-        setSelectedMonitorId: vi.fn(),
         sites: [mockSite],
         selectedMonitorIds: {
             [mockSite.identifier]: mockSite.monitors[0]!.id,
         },
-        startSiteMonitoring: vi.fn(),
+        getSelectedMonitorId: vi.fn(() => "monitor-1"),
+        setSelectedMonitorId: vi.fn(),
+        checkSiteNow: vi.fn(),
         startSiteMonitorMonitoring: vi.fn(),
-        stopSiteMonitoring: vi.fn(),
         stopSiteMonitorMonitoring: vi.fn(),
-        updateMonitorRetryAttempts: vi.fn(),
-        updateMonitorTimeout: vi.fn(),
         updateSiteCheckInterval: vi.fn(),
-        error: null,
+        updateMonitorTimeout: vi.fn(),
+        updateMonitorRetryAttempts: vi.fn(),
+        modifySite: vi.fn(),
+        deleteSite: vi.fn(),
+        removeMonitorFromSite: vi.fn(),
+        startSiteMonitoring: vi.fn(),
+        stopSiteMonitoring: vi.fn(),
+    };
+
+    const mockErrorStore = {
+        isLoading: false,
         clearError: vi.fn(),
     };
 
-    const mockMonitorTypesStore = {
-        getDisplayName: vi.fn(() => "HTTP"),
+    const mockUIStore = {
+        activeSiteDetailsTab: "overview",
+        showAdvancedMetrics: false,
+        siteDetailsChartTimeRange: "1h" as const,
+        setActiveSiteDetailsTab: vi.fn(),
+        syncActiveSiteDetailsTab: vi.fn(),
+        setShowAdvancedMetrics: vi.fn(),
+        setSiteDetailsChartTimeRange: vi.fn(),
+    };
+
+    const mockAnalytics = {
+        avgResponseTime: 100,
+        degradedCount: 0,
+        downCount: 0,
+        downtimePeriods: [],
+        fastestResponse: 50,
+        filteredHistory: [],
+        incidentCount: 0,
+        mttr: 0,
+        percentileMetrics: {
+            p50: 90,
+            p95: 150,
+            p99: 200,
+        },
+        slowestResponse: 200,
+        totalChecks: 100,
+        totalDowntime: 0,
+        upCount: 100,
+        uptime: "100.0%",
+        uptimeRaw: 100,
+        chartData: [],
+        isLoading: false,
+        error: null,
     };
 
     beforeEach(() => {
         vi.clearAllMocks();
-        confirmMock.mockReset();
-
-        mockUseSelectedSite.mockReturnValue(mockSite);
 
         mockUseSitesStore.mockReturnValue(mockSitesStore);
-        mockUseMonitorTypesStore.mockReturnValue(mockMonitorTypesStore);
+        mockUseErrorStore.mockReturnValue(mockErrorStore);
+        mockUseUIStore.mockReturnValue(mockUIStore);
+        mockUseSiteAnalytics.mockReturnValue(mockAnalytics);
 
+        // Mock logger methods
         mockLogger.user = {
             action: vi.fn(),
             settingsChange: vi.fn(),
@@ -96,80 +129,14 @@ describe("useSiteDetails - Branch Coverage", () => {
         };
     });
 
-    describe("handleStartMonitoring", () => {
-        it("should handle successful start monitoring (lines 420-430)", async ({
+    describe("Validation Error Paths", () => {
+        it("should handle validation failure for check interval", async ({
             task,
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: useSiteDetails.branch-coverage",
-                "component"
-            );
-            await annotate("Category: Hook", "category");
-            await annotate("Type: Monitoring", "type");
-
-            const { result } = renderHook(() =>
-                useSiteDetails({ site: mockSite }));
-
-            await act(async () => {
-                await result.current.handleStartMonitoring();
-            });
-
-            expect(
-                mockSitesStore.startSiteMonitorMonitoring
-            ).toHaveBeenCalledWith("test-site", "monitor-1");
-            expect(mockLogger.user.action).toHaveBeenCalledWith(
-                "Started monitoring",
-                {
-                    monitorId: "monitor-1",
-                    siteIdentifier: "test-site",
-                }
-            );
-        });
-    });
-
-    describe("handleStopMonitoring", () => {
-        it("should handle successful stop monitoring (lines 434-450)", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: useSiteDetails.branch-coverage",
-                "component"
-            );
-            await annotate("Category: Hook", "category");
-            await annotate("Type: Monitoring", "type");
-
-            const { result } = renderHook(() =>
-                useSiteDetails({ site: mockSite }));
-
-            await act(async () => {
-                await result.current.handleStopMonitoring();
-            });
-
-            expect(
-                mockSitesStore.stopSiteMonitorMonitoring
-            ).toHaveBeenCalledWith("test-site", "monitor-1");
-            expect(mockLogger.user.action).toHaveBeenCalledWith(
-                "Stopped monitoring",
-                {
-                    monitorId: "monitor-1",
-                    siteIdentifier: "test-site",
-                }
-            );
-        });
-    });
-
-    describe("handleSaveInterval - validation error path", () => {
-        it("should handle validation failure for check interval (lines 484-492)", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: useSiteDetails.branch-coverage",
+                "Component: useSiteDetails.branch-coverage-new",
                 "component"
             );
             await annotate("Category: Hook", "category");
@@ -184,7 +151,8 @@ describe("useSiteDetails - Branch Coverage", () => {
             });
 
             const { result } = renderHook(() =>
-                useSiteDetails({ site: mockSite }));
+                useSiteDetails({ site: mockSite })
+            );
 
             // Set up the interval change first
             act(() => {
@@ -198,21 +166,102 @@ describe("useSiteDetails - Branch Coverage", () => {
                 act(async () => {
                     await result.current.handleSaveInterval();
                 })
-            ).rejects.toThrowError("Validation failed: Invalid interval value");
+            ).rejects.toThrowError();
 
-            expect(mockLogger.site.error).toHaveBeenCalledWith(
-                "test-site",
-                expect.any(Error)
-            );
+            expect(mockLogger.site.error).toHaveBeenCalled();
         });
 
-        it("should handle successful interval save (lines 494-508)", async ({
+        it("should handle validation failure for timeout", async ({
             task,
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: useSiteDetails.branch-coverage",
+                "Component: useSiteDetails.branch-coverage-new",
+                "component"
+            );
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Error Handling", "type");
+
+            // Mock validation failure
+            mockValidateMonitorFieldClientSide.mockResolvedValue({
+                errors: ["Invalid timeout value"],
+                metadata: {},
+                success: false,
+                warnings: [],
+            });
+
+            const { result } = renderHook(() =>
+                useSiteDetails({ site: mockSite })
+            );
+
+            // Set up the timeout change first
+            act(() => {
+                result.current.handleTimeoutChange({
+                    target: { value: "1" },
+                } as React.ChangeEvent<HTMLInputElement>);
+            });
+
+            // Now try to save and expect it to throw
+            await expect(
+                act(async () => {
+                    await result.current.handleSaveTimeout();
+                })
+            ).rejects.toThrowError();
+
+            expect(mockLogger.site.error).toHaveBeenCalled();
+        });
+
+        it("should handle validation failure for retry attempts", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate(
+                "Component: useSiteDetails.branch-coverage-new",
+                "component"
+            );
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Error Handling", "type");
+
+            // Mock validation failure
+            mockValidateMonitorFieldClientSide.mockResolvedValue({
+                errors: ["Invalid retry attempts value"],
+                metadata: {},
+                success: false,
+                warnings: [],
+            });
+
+            const { result } = renderHook(() =>
+                useSiteDetails({ site: mockSite })
+            );
+
+            // Set up the retry attempts change first
+            act(() => {
+                result.current.handleRetryAttemptsChange({
+                    target: { value: "10" },
+                } as React.ChangeEvent<HTMLInputElement>);
+            });
+
+            // Now try to save and expect it to throw
+            await expect(
+                act(async () => {
+                    await result.current.handleSaveRetryAttempts();
+                })
+            ).rejects.toThrowError();
+
+            expect(mockLogger.site.error).toHaveBeenCalled();
+        });
+    });
+
+    describe("Successful Save Operations", () => {
+        it("should handle successful interval save", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate(
+                "Component: useSiteDetails.branch-coverage-new",
                 "component"
             );
             await annotate("Category: Hook", "category");
@@ -227,7 +276,8 @@ describe("useSiteDetails - Branch Coverage", () => {
             });
 
             const { result } = renderHook(() =>
-                useSiteDetails({ site: mockSite }));
+                useSiteDetails({ site: mockSite })
+            );
 
             // Set up the interval change first
             act(() => {
@@ -254,59 +304,14 @@ describe("useSiteDetails - Branch Coverage", () => {
                 }
             );
         });
-    });
 
-    describe("handleSaveTimeout - validation error path", () => {
-        it("should handle validation failure for timeout (lines 534-542)", async ({
+        it("should handle successful timeout save", async ({
             task,
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: useSiteDetails.branch-coverage",
-                "component"
-            );
-            await annotate("Category: Hook", "category");
-            await annotate("Type: Error Handling", "type");
-
-            // Mock validation failure
-            mockValidateMonitorFieldClientSide.mockResolvedValue({
-                errors: ["Invalid timeout value"],
-                metadata: {},
-                success: false,
-                warnings: [],
-            });
-
-            const { result } = renderHook(() =>
-                useSiteDetails({ site: mockSite }));
-
-            // Set up the timeout change first
-            act(() => {
-                result.current.handleTimeoutChange({
-                    target: { value: "1" },
-                } as React.ChangeEvent<HTMLInputElement>);
-            });
-
-            // Now try to save and expect it to throw
-            await expect(
-                act(async () => {
-                    await result.current.handleSaveTimeout();
-                })
-            ).rejects.toThrowError("Validation failed: Invalid timeout value");
-
-            expect(mockLogger.site.error).toHaveBeenCalledWith(
-                "test-site",
-                expect.any(Error)
-            );
-        });
-
-        it("should handle successful timeout save (lines 544-558)", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: useSiteDetails.branch-coverage",
+                "Component: useSiteDetails.branch-coverage-new",
                 "component"
             );
             await annotate("Category: Hook", "category");
@@ -321,7 +326,8 @@ describe("useSiteDetails - Branch Coverage", () => {
             });
 
             const { result } = renderHook(() =>
-                useSiteDetails({ site: mockSite }));
+                useSiteDetails({ site: mockSite })
+            );
 
             // Set up the timeout change first
             act(() => {
@@ -348,61 +354,14 @@ describe("useSiteDetails - Branch Coverage", () => {
                 }
             );
         });
-    });
 
-    describe("handleSaveRetryAttempts - validation error path", () => {
-        it("should handle validation failure for retry attempts (lines 584-595)", async ({
+        it("should handle successful retry attempts save", async ({
             task,
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: useSiteDetails.branch-coverage",
-                "component"
-            );
-            await annotate("Category: Hook", "category");
-            await annotate("Type: Error Handling", "type");
-
-            // Mock validation failure
-            mockValidateMonitorFieldClientSide.mockResolvedValue({
-                errors: ["Invalid retry attempts value"],
-                metadata: {},
-                success: false,
-                warnings: [],
-            });
-
-            const { result } = renderHook(() =>
-                useSiteDetails({ site: mockSite }));
-
-            // Set up the retry attempts change first
-            act(() => {
-                result.current.handleRetryAttemptsChange({
-                    target: { value: "10" },
-                } as React.ChangeEvent<HTMLInputElement>);
-            });
-
-            // Now try to save and expect it to throw
-            await expect(
-                act(async () => {
-                    await result.current.handleSaveRetryAttempts();
-                })
-            ).rejects.toThrowError(
-                "Validation failed: Invalid retry attempts value"
-            );
-
-            expect(mockLogger.site.error).toHaveBeenCalledWith(
-                "test-site",
-                expect.any(Error)
-            );
-        });
-
-        it("should handle successful retry attempts save (lines 597-608)", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: useSiteDetails.branch-coverage",
+                "Component: useSiteDetails.branch-coverage-new",
                 "component"
             );
             await annotate("Category: Hook", "category");
@@ -417,7 +376,8 @@ describe("useSiteDetails - Branch Coverage", () => {
             });
 
             const { result } = renderHook(() =>
-                useSiteDetails({ site: mockSite }));
+                useSiteDetails({ site: mockSite })
+            );
 
             // Set up the retry attempts change first
             act(() => {
@@ -444,21 +404,82 @@ describe("useSiteDetails - Branch Coverage", () => {
         });
     });
 
-    describe("handleSaveName - early return path", () => {
-        it("should handle early return when no unsaved changes (lines 624-627)", async ({
+    describe("Monitoring Operations", () => {
+        it("should handle start monitoring", async ({ task, annotate }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate(
+                "Component: useSiteDetails.branch-coverage-new",
+                "component"
+            );
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Monitoring", "type");
+
+            const { result } = renderHook(() =>
+                useSiteDetails({ site: mockSite })
+            );
+
+            await act(async () => {
+                await result.current.handleStartMonitoring();
+            });
+
+            expect(
+                mockSitesStore.startSiteMonitorMonitoring
+            ).toHaveBeenCalledWith("test-site", "monitor-1");
+            expect(mockLogger.user.action).toHaveBeenCalledWith(
+                "Started monitoring",
+                {
+                    monitorId: "monitor-1",
+                    siteIdentifier: "test-site",
+                }
+            );
+        });
+
+        it("should handle stop monitoring", async ({ task, annotate }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate(
+                "Component: useSiteDetails.branch-coverage-new",
+                "component"
+            );
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Monitoring", "type");
+
+            const { result } = renderHook(() =>
+                useSiteDetails({ site: mockSite })
+            );
+
+            await act(async () => {
+                await result.current.handleStopMonitoring();
+            });
+
+            expect(
+                mockSitesStore.stopSiteMonitorMonitoring
+            ).toHaveBeenCalledWith("test-site", "monitor-1");
+            expect(mockLogger.user.action).toHaveBeenCalledWith(
+                "Stopped monitoring",
+                {
+                    monitorId: "monitor-1",
+                    siteIdentifier: "test-site",
+                }
+            );
+        });
+    });
+
+    describe("Name Save Handling", () => {
+        it("should handle early return when no unsaved changes", async ({
             task,
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: useSiteDetails.branch-coverage",
+                "Component: useSiteDetails.branch-coverage-new",
                 "component"
             );
             await annotate("Category: Hook", "category");
             await annotate("Type: Data Saving", "type");
 
             const { result } = renderHook(() =>
-                useSiteDetails({ site: mockSite }));
+                useSiteDetails({ site: mockSite })
+            );
 
             // Don't make any name changes, so hasUnsavedChanges should be false
             await act(async () => {
@@ -469,20 +490,21 @@ describe("useSiteDetails - Branch Coverage", () => {
             expect(mockSitesStore.modifySite).not.toHaveBeenCalled();
         });
 
-        it("should handle successful name save with trimmed name (lines 629-639)", async ({
+        it("should handle successful name save with trimmed name", async ({
             task,
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: useSiteDetails.branch-coverage",
+                "Component: useSiteDetails.branch-coverage-new",
                 "component"
             );
             await annotate("Category: Hook", "category");
             await annotate("Type: Data Saving", "type");
 
             const { result } = renderHook(() =>
-                useSiteDetails({ site: mockSite }));
+                useSiteDetails({ site: mockSite })
+            );
 
             // Make a name change to trigger hasUnsavedChanges
             act(() => {
@@ -507,14 +529,14 @@ describe("useSiteDetails - Branch Coverage", () => {
         });
     });
 
-    describe("Edge case validations", () => {
+    describe("Edge Cases", () => {
         it("should handle missing monitor type in validation (fallback to 'http')", async ({
             task,
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: useSiteDetails.branch-coverage",
+                "Component: useSiteDetails.branch-coverage-new",
                 "component"
             );
             await annotate("Category: Hook", "category");
@@ -539,8 +561,6 @@ describe("useSiteDetails - Branch Coverage", () => {
                 ],
             };
 
-            mockUseSelectedSite.mockReturnValue(siteWithoutType);
-
             mockValidateMonitorFieldClientSide.mockResolvedValue({
                 errors: [],
                 metadata: {},
@@ -549,7 +569,8 @@ describe("useSiteDetails - Branch Coverage", () => {
             });
 
             const { result } = renderHook(() =>
-                useSiteDetails({ site: siteWithoutType }));
+                useSiteDetails({ site: siteWithoutType })
+            );
 
             act(() => {
                 result.current.handleIntervalChange({

@@ -349,9 +349,8 @@ describe("SystemService", () => {
                 Array.from({ length: urls.length }).fill(true)
             );
 
-            expect(mockWaitForElectronBridge).toHaveBeenCalledTimes(
-                urls.length
-            );
+            // Concurrent calls share a single in-flight bridge readiness check.
+            expect(mockWaitForElectronBridge).toHaveBeenCalledTimes(1);
             expect(mockElectronAPI.system.openExternal).toHaveBeenCalledTimes(
                 urls.length
             );

@@ -91,7 +91,8 @@ class MockEventMiddleware {
 
         const middleware = this.middlewares[index];
         await middleware(context, () =>
-            this.executeMiddlewareChain(context, index + 1));
+            this.executeMiddlewareChain(context, index + 1)
+        );
     }
 
     private updateAverageTime(newTime: number): void {
@@ -190,7 +191,8 @@ class MockEventMiddleware {
                     if (attempts < maxRetries) {
                         // Exponential backoff
                         await new Promise((resolve) =>
-                            setTimeout(resolve, 2 ** attempts * 100));
+                            setTimeout(resolve, 2 ** attempts * 100)
+                        );
                     }
                 }
             }
@@ -422,17 +424,17 @@ describe("Event Middleware Performance", () => {
             middleware.use(middleware.createValidationMiddleware());
             middleware.use(middleware.createEnrichmentMiddleware());
 
-            const contexts: EventContext[] = Array.from({ length: 20 }, (
-                _,
-                i
-            ) => ({
-                id: `batch-${i}`,
-                type: "batch.event",
-                payload: { index: i },
-                timestamp: Date.now(),
-                correlationId: `batch-corr-${i}`,
-                metadata: {},
-            }));
+            const contexts: EventContext[] = Array.from(
+                { length: 20 },
+                (_, i) => ({
+                    id: `batch-${i}`,
+                    type: "batch.event",
+                    payload: { index: i },
+                    timestamp: Date.now(),
+                    correlationId: `batch-corr-${i}`,
+                    metadata: {},
+                })
+            );
 
             for (const context of contexts) {
                 await middleware.execute(context);

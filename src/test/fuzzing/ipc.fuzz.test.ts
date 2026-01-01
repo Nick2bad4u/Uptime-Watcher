@@ -116,26 +116,29 @@ describe("IPC Communication Fuzzing Tests", () => {
 
         it("should handle deeply nested and circular objects", () => {
             fc.assert(
-                fc.property(fc.boolean(), fc.object({ maxDepth: 5 }), (
-                    success: boolean,
-                    nestedData: object
-                ) => {
-                    const response = {
-                        success,
-                        data: nestedData,
-                        metadata: {
-                            nested: {
-                                deeply: {
-                                    nested: nestedData,
+                fc.property(
+                    fc.boolean(),
+                    fc.object({ maxDepth: 5 }),
+                    (success: boolean, nestedData: object) => {
+                        const response = {
+                            success,
+                            data: nestedData,
+                            metadata: {
+                                nested: {
+                                    deeply: {
+                                        nested: nestedData,
+                                    },
                                 },
                             },
-                        },
-                    };
+                        };
 
-                    expect(() => isIpcResponse(response)).not.toThrowError();
-                    const result = isIpcResponse(response);
-                    expect(result).toBeTruthy();
-                })
+                        expect(() =>
+                            isIpcResponse(response)
+                        ).not.toThrowError();
+                        const result = isIpcResponse(response);
+                        expect(result).toBeTruthy();
+                    }
+                )
             );
         });
     });
@@ -148,7 +151,8 @@ describe("IPC Communication Fuzzing Tests", () => {
                         // May throw or return data based on success flag
                         if ((input as { success: boolean }).success) {
                             expect(() =>
-                                extractIpcData(input)).not.toThrowError();
+                                extractIpcData(input)
+                            ).not.toThrowError();
                         } else {
                             expect(() => extractIpcData(input)).toThrowError();
                         }
@@ -210,7 +214,8 @@ describe("IPC Communication Fuzzing Tests", () => {
                         };
 
                         expect(() =>
-                            extractIpcData(response)).not.toThrowError();
+                            extractIpcData(response)
+                        ).not.toThrowError();
                         const result = extractIpcData(response);
                         expect(result).toBe(data);
                     }
@@ -222,16 +227,15 @@ describe("IPC Communication Fuzzing Tests", () => {
     describe("Safe IPC Data Extraction Fuzzing", () => {
         it("should never throw exceptions regardless of input", () => {
             fc.assert(
-                fc.property(fc.anything(), fc.anything(), (
-                    response: unknown,
-                    fallback: unknown
-                ) => {
-                    expect(() =>
-                        safeExtractIpcData(
-                            response,
-                            fallback
-                        )).not.toThrowError();
-                })
+                fc.property(
+                    fc.anything(),
+                    fc.anything(),
+                    (response: unknown, fallback: unknown) => {
+                        expect(() =>
+                            safeExtractIpcData(response, fallback)
+                        ).not.toThrowError();
+                    }
+                )
             );
         });
 
@@ -282,18 +286,19 @@ describe("IPC Communication Fuzzing Tests", () => {
 
         it("should return data for successful responses", () => {
             fc.assert(
-                fc.property(fc.anything(), fc.anything(), (
-                    data: unknown,
-                    fallback: unknown
-                ) => {
-                    const response = {
-                        success: true,
-                        data,
-                    };
+                fc.property(
+                    fc.anything(),
+                    fc.anything(),
+                    (data: unknown, fallback: unknown) => {
+                        const response = {
+                            success: true,
+                            data,
+                        };
 
-                    const result = safeExtractIpcData(response, fallback);
-                    expect(result).toBe(data);
-                })
+                        const result = safeExtractIpcData(response, fallback);
+                        expect(result).toBe(data);
+                    }
+                )
             );
         });
 
@@ -326,10 +331,8 @@ describe("IPC Communication Fuzzing Tests", () => {
 
                         // Should work regardless of type mismatch between data and fallback
                         expect(() =>
-                            safeExtractIpcData(
-                                response,
-                                fallback
-                            )).not.toThrowError();
+                            safeExtractIpcData(response, fallback)
+                        ).not.toThrowError();
                         const result = safeExtractIpcData(response, fallback);
                         expect(result).toBe(data);
                     }
@@ -358,15 +361,18 @@ describe("IPC Communication Fuzzing Tests", () => {
                         };
 
                         expect(() =>
-                            isIpcResponse(response)).not.toThrowError();
+                            isIpcResponse(response)
+                        ).not.toThrowError();
                         expect(isIpcResponse(response)).toBeTruthy();
 
                         if (success) {
                             expect(() =>
-                                extractIpcData(response)).not.toThrowError();
+                                extractIpcData(response)
+                            ).not.toThrowError();
                         } else {
                             expect(() =>
-                                extractIpcData(response)).toThrowError();
+                                extractIpcData(response)
+                            ).toThrowError();
                         }
                     }
                 )
@@ -417,11 +423,13 @@ describe("IPC Communication Fuzzing Tests", () => {
 
                     expect(() => isIpcResponse(response)).not.toThrowError();
                     expect(() =>
-                        safeExtractIpcData(response, {})).not.toThrowError();
+                        safeExtractIpcData(response, {})
+                    ).not.toThrowError();
 
                     if (success) {
                         expect(() =>
-                            extractIpcData(response)).not.toThrowError();
+                            extractIpcData(response)
+                        ).not.toThrowError();
                         const result = extractIpcData(response);
                         expect(result).toBe(maliciousData);
                     }

@@ -415,21 +415,23 @@ export interface ComponentNameProperties
  *
  * @returns JSX element
  */
-export const ComponentName: React.FC<ComponentNameProperties> = React.memo(({
- className,
- disabled = false,
- children,
- specificProp,
- onClick,
- ...accessibilityProps
-}) => {
- // Component implementation
- return (
-  <div className={className} {...accessibilityProps}>
-   {children}
-  </div>
- );
-});
+export const ComponentName: React.FC<ComponentNameProperties> = React.memo(
+ ({
+  className,
+  disabled = false,
+  children,
+  specificProp,
+  onClick,
+  ...accessibilityProps
+ }) => {
+  // Component implementation
+  return (
+   <div className={className} {...accessibilityProps}>
+    {children}
+   </div>
+  );
+ }
+);
 
 ComponentName.displayName = "ComponentName";
 
@@ -455,47 +457,49 @@ export interface FormComponentProperties
  readonly placeholder?: string;
 }
 
-export const FormComponent: React.FC<FormComponentProperties> = React.memo(({
- id,
- label,
- value,
- onChange,
- required = false,
- error,
- helpText,
- placeholder,
- disabled = false,
- className,
-}) => {
- const handleChange = useCallback(
-  (event: React.ChangeEvent<HTMLInputElement>) => {
-   onChange(event.target.value);
-  },
-  [onChange]
- );
+export const FormComponent: React.FC<FormComponentProperties> = React.memo(
+ ({
+  id,
+  label,
+  value,
+  onChange,
+  required = false,
+  error,
+  helpText,
+  placeholder,
+  disabled = false,
+  className,
+ }) => {
+  const handleChange = useCallback(
+   (event: React.ChangeEvent<HTMLInputElement>) => {
+    onChange(event.target.value);
+   },
+   [onChange]
+  );
 
- return (
-  <BaseFormField
-   id={id}
-   label={label}
-   required={required}
-   error={error}
-   helpText={helpText}
-  >
-   {(ariaProps) => (
-    <input
-     {...ariaProps}
-     type="text"
-     value={value}
-     onChange={handleChange}
-     placeholder={placeholder}
-     disabled={disabled}
-     className={className}
-    />
-   )}
-  </BaseFormField>
- );
-});
+  return (
+   <BaseFormField
+    id={id}
+    label={label}
+    required={required}
+    error={error}
+    helpText={helpText}
+   >
+    {(ariaProps) => (
+     <input
+      {...ariaProps}
+      type="text"
+      value={value}
+      onChange={handleChange}
+      placeholder={placeholder}
+      disabled={disabled}
+      className={className}
+     />
+    )}
+   </BaseFormField>
+  );
+ }
+);
 
 FormComponent.displayName = "FormComponent";
 

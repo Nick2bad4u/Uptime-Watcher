@@ -365,7 +365,7 @@ Prefer:
 
 ```ts
 import { bench, describe } from "vitest";
-import { parseConfigFast, parseConfigLegacy } from "../src/config";
+import { parseConfigFast, parseConfigBaseline } from "../src/config";
 
 const smallConfig = `{"feature": true, "threshold": 10}`;
 const largeConfig = JSON.stringify({
@@ -381,8 +381,8 @@ describe("parseConfig - small config", () => {
         parseConfigFast(smallConfig);
     });
 
-    bench("legacy", () => {
-        parseConfigLegacy(smallConfig);
+    bench("baseline", () => {
+        parseConfigBaseline(smallConfig);
     });
 });
 
@@ -391,8 +391,8 @@ describe("parseConfig - large config", () => {
         parseConfigFast(largeConfig);
     });
 
-    bench("legacy", () => {
-        parseConfigLegacy(largeConfig);
+    bench("baseline", () => {
+        parseConfigBaseline(largeConfig);
     });
 });
 ```
@@ -416,7 +416,7 @@ When comparing two implementations:
 -   Ensure both benchmarks:
     -   Use the **same inputs**, repeated in the same pattern.
     -   Run under the same configuration (warmup, iterations, etc).
--   Interpret results in terms of **relative difference** (e.g., “fastHash is ~2x faster than legacyHash”), not absolute numbers, which may vary between machines.
+-   Interpret results in terms of **relative difference** (e.g., “fastHash is ~2x faster than baselineHash”), not absolute numbers, which may vary between machines.
 
 ### 10.3 Performance Regressions
 

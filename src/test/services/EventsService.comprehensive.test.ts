@@ -107,9 +107,11 @@ function createMockEventApi() {
         onHistoryLimitUpdated: vi.fn(() => createEventCleanupFunction()),
         onMonitorDown: vi.fn(() => createEventCleanupFunction()),
         onMonitoringStarted: vi.fn((_handler: MonitoringStartedEventHandler) =>
-            createEventCleanupFunction()),
+            createEventCleanupFunction()
+        ),
         onMonitoringStopped: vi.fn((_handler: MonitoringStoppedEventHandler) =>
-            createEventCleanupFunction()),
+            createEventCleanupFunction()
+        ),
         onMonitorStatusChanged: vi.fn(() => createEventCleanupFunction()),
         onMonitorUp: vi.fn(() => createEventCleanupFunction()),
         onSiteAdded: vi.fn(() => createEventCleanupFunction()),
@@ -797,8 +799,8 @@ describe("EventsService", () => {
                 expect(typeof cleanup).toBe("function");
             }
 
-            // All should have called initialization
-            expect(mockWaitForElectronBridge).toHaveBeenCalledTimes(9);
+            // All should have shared the in-flight initialization
+            expect(mockWaitForElectronBridge).toHaveBeenCalledTimes(1);
         });
     });
 
@@ -905,7 +907,8 @@ describe("EventsService", () => {
                 EventsService.initialize(),
             ]);
 
-            expect(mockWaitForElectronBridge).toHaveBeenCalledTimes(3);
+            // Concurrent calls share the same in-flight initialization.
+            expect(mockWaitForElectronBridge).toHaveBeenCalledTimes(1);
         });
     });
 

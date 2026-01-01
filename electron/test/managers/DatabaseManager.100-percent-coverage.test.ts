@@ -83,7 +83,7 @@ vi.mock("../../services/commands/DatabaseCommands", () => ({
     ImportDataCommand: vi.fn(),
 }));
 
-vi.mock("../../utils/database/serviceFactory", () => ({
+vi.mock("../../services/database/serviceFactory", () => ({
     createSiteCache: vi.fn().mockReturnValue({
         set: vi.fn(),
         get: vi.fn(),
@@ -98,7 +98,7 @@ vi.mock("../../utils/database/serviceFactory", () => ({
     }),
 }));
 
-vi.mock("../../utils/database/SiteRepositoryService", () => ({
+vi.mock("../../services/database/SiteRepositoryService", () => ({
     SiteRepositoryService: vi.fn(function SiteRepositoryServiceMock() {
         return {
             getSitesFromDatabase: vi.fn().mockResolvedValue([]),
@@ -119,7 +119,7 @@ vi.mock("../../utils/database/SiteRepositoryService", () => ({
     }),
 }));
 
-vi.mock("../../utils/database/historyLimitManager", () => ({
+vi.mock("../../services/database/historyLimitManager", () => ({
     setHistoryLimit: vi.fn(async (args: any) => {
         if (args && typeof args.setHistoryLimit === "function") {
             const normalizedLimit = normalizeHistoryLimit(
@@ -225,7 +225,7 @@ describe("DatabaseManager - 100% Coverage", () => {
             set: vi.fn().mockResolvedValue(undefined),
             findByKey: vi.fn().mockResolvedValue(undefined),
             upsert: vi.fn().mockResolvedValue(undefined),
-            exportAll: vi.fn().mockResolvedValue([]),
+            exportAllRows: vi.fn().mockResolvedValue([]),
         } as unknown as SettingsRepository;
 
         mockSiteRepository = {
@@ -234,7 +234,7 @@ describe("DatabaseManager - 100% Coverage", () => {
             create: vi.fn().mockResolvedValue({ id: 1, identifier: "test" }),
             update: vi.fn().mockResolvedValue(undefined),
             delete: vi.fn().mockResolvedValue(undefined),
-            exportAll: vi.fn().mockResolvedValue([]),
+            exportAllRows: vi.fn().mockResolvedValue([]),
         } as unknown as SiteRepository;
 
         // Create mock command executor
@@ -767,7 +767,7 @@ describe("DatabaseManager - 100% Coverage", () => {
             // Arrange
             const newLimit = 1000;
             const { setHistoryLimit: mockSetHistoryLimit } =
-                await import("../../utils/database/historyLimitManager");
+                await import("../../services/database/historyLimitManager");
 
             // Act
             await databaseManager.setHistoryLimit(newLimit);

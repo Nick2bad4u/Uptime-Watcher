@@ -147,7 +147,7 @@ const createMockFormState = (
         addMode: "new" as const,
         bodyKeyword: "",
         certificateWarningDays: "30",
-        checkInterval: 60_000,
+        checkIntervalMs: 60_000,
         expectedHeaderValue: "",
         expectedJsonValue: "",
         expectedStatusCode: "200",
@@ -156,7 +156,7 @@ const createMockFormState = (
         headerName: "",
         host: "",
         jsonPath: "",
-        maxResponseTime: "2000",
+        maxResponseTimeMs: "2000",
         monitorType: "http" as const,
         name: "",
         port: "",
@@ -170,7 +170,7 @@ const createMockFormState = (
         setAddMode: vi.fn(),
         setBodyKeyword: vi.fn(),
         setCertificateWarningDays: vi.fn(),
-        setCheckInterval: vi.fn(),
+        setCheckIntervalMs: vi.fn(),
         setExpectedHeaderValue: vi.fn(),
         setExpectedJsonValue: vi.fn(),
         setExpectedStatusCode: vi.fn(),
@@ -179,7 +179,7 @@ const createMockFormState = (
         setHeaderName: vi.fn(),
         setHost: vi.fn(),
         setJsonPath: vi.fn(),
-        setMaxResponseTime: vi.fn(),
+        setMaxResponseTimeMs: vi.fn(),
         setMonitorType: vi.fn(),
         setName: vi.fn(),
         setPort: vi.fn(),
@@ -217,6 +217,7 @@ vi.mock("../../../stores/error/useErrorStore", () => {
         clearStoreError: vi.fn(),
         getOperationLoading: vi.fn(() => false),
         getStoreError: vi.fn(() => undefined),
+        isLoading: false,
         lastError: undefined,
         operationLoading: {},
         setError: vi.fn(),
@@ -225,24 +226,27 @@ vi.mock("../../../stores/error/useErrorStore", () => {
         storeErrors: {},
     };
 
-    const useErrorStore = vi.fn((
-        selector?: (candidate: typeof state) => unknown
-    ) => (typeof selector === "function" ? selector(state) : state));
+    const useErrorStore = vi.fn(
+        (selector?: (candidate: typeof state) => unknown) =>
+            typeof selector === "function" ? selector(state) : state
+    );
 
     return { useErrorStore };
 });
 
 vi.mock("../../../stores/sites/useSitesStore", () => ({
-    useSitesStore: vi.fn(() => ({
-        addMonitorToSite: vi.fn().mockResolvedValue(undefined),
-        clearError: vi.fn(),
-        createSite: vi.fn().mockResolvedValue(undefined),
-        deleteSite: vi.fn(),
-        error: undefined,
-        isLoading: false,
-        sites: mockSites,
-        updateSite: vi.fn(),
-    })),
+    useSitesStore: vi.fn(
+        (selector?: (candidate: unknown) => unknown) => {
+            const state = {
+                addMonitorToSite: vi.fn().mockResolvedValue(undefined),
+                createSite: vi.fn().mockResolvedValue(undefined),
+                isLoading: false,
+                sites: mockSites,
+            };
+
+            return typeof selector === "function" ? selector(state) : state;
+        }
+    ),
 }));
 
 vi.mock("../../../stores/monitor/useMonitorTypesStore", () => {
@@ -659,7 +663,7 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
                 createMockFormState({
                     name: populatedName,
                     url: populatedUrl,
-                    checkInterval: 300_000, // 5 minutes in milliseconds
+                    checkIntervalMs: 300_000, // 5 minutes in milliseconds
                 })
             );
 
@@ -883,10 +887,10 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
-            const setCheckInterval = vi.fn();
+            const setCheckIntervalMs = vi.fn();
             mockUseAddSiteForm.mockReturnValue(
                 createMockFormState({
-                    setCheckInterval,
+                    setCheckIntervalMs,
                 })
             );
 
@@ -895,7 +899,7 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
                 name: /check interval/i,
             });
             await user.selectOptions(intervalInput, "300000"); // Milliseconds
-            expect(setCheckInterval).toHaveBeenCalled();
+            expect(setCheckIntervalMs).toHaveBeenCalled();
         });
 
         it("should handle timeout value changes", async ({
@@ -1136,11 +1140,20 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
             );
 
             // Mock the error store to show loading state
-            mockUseErrorStore.mockReturnValue({
-                clearError: vi.fn(),
-                isLoading: true, // Form is submitting
-                lastError: undefined,
-            });
+            mockUseErrorStore.mockImplementation(
+                ((selector?: (state: unknown) => unknown) => {
+                    const state = {
+                        clearError: vi.fn(),
+                        getStoreError: vi.fn(() => undefined),
+                        isLoading: true,
+                        lastError: undefined,
+                    };
+
+                    return typeof selector === "function"
+                        ? selector(state)
+                        : state;
+                }) as never
+            );
 
             renderAddSiteForm();
             const submitButton = screen.getByRole("button", {
@@ -1212,7 +1225,7 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
                 name: validSiteName,
                 url: validUrl,
                 monitorType: "http",
-                checkInterval: 60_000,
+                checkIntervalMs: 60_000,
             });
 
             // Mock the isFormValid function to return true for valid form
@@ -1220,11 +1233,20 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
             mockUseAddSiteForm.mockReturnValue(mockFormActions);
 
             // Mock the error store to show no loading state
-            mockUseErrorStore.mockReturnValue({
-                clearError: vi.fn(),
-                isLoading: false, // Not loading
-                lastError: undefined,
-            });
+            mockUseErrorStore.mockImplementation(
+                ((selector?: (state: unknown) => unknown) => {
+                    const state = {
+                        clearError: vi.fn(),
+                        getStoreError: vi.fn(() => undefined),
+                        isLoading: false,
+                        lastError: undefined,
+                    };
+
+                    return typeof selector === "function"
+                        ? selector(state)
+                        : state;
+                }) as never
+            );
 
             renderAddSiteForm();
             const submitButton = screen.getByRole("button", {
@@ -1358,12 +1380,21 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
             // ErrorAlert expects a string message, not an object
             const errorMessage = "Form submission failed";
 
-            mockUseErrorStore.mockReturnValue({
-                clearError: vi.fn(),
-                setError: vi.fn(),
-                isLoading: false,
-                lastError: errorMessage, // String message as expected by ErrorAlert
-            });
+            mockUseErrorStore.mockImplementation(
+                ((selector?: (state: unknown) => unknown) => {
+                    const state = {
+                        clearError: vi.fn(),
+                        getStoreError: vi.fn(() => undefined),
+                        isLoading: false,
+                        lastError: errorMessage,
+                        setError: vi.fn(),
+                    };
+
+                    return typeof selector === "function"
+                        ? selector(state)
+                        : state;
+                }) as never
+            );
 
             // Verify form renders and error is displayed
             const { getForm } = renderAddSiteForm();
@@ -1384,12 +1415,21 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
 
             const clearError = vi.fn();
 
-            mockUseErrorStore.mockReturnValue({
-                clearError,
-                setError: vi.fn(),
-                getError: vi.fn(() => null),
-                lasterror: undefined,
-            });
+            mockUseErrorStore.mockImplementation(
+                ((selector?: (state: unknown) => unknown) => {
+                    const state = {
+                        clearError,
+                        getStoreError: vi.fn(() => undefined),
+                        isLoading: false,
+                        lastError: undefined,
+                        setError: vi.fn(),
+                    };
+
+                    return typeof selector === "function"
+                        ? selector(state)
+                        : state;
+                }) as never
+            );
 
             mockUseAddSiteForm.mockReturnValue(
                 createMockFormState({
@@ -1731,7 +1771,8 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
                 screen.getByText((content, _element) =>
                     content.includes(
                         "Enter the URL of the site you want to monitor"
-                    ))
+                    )
+                )
             ).toBeInTheDocument();
         });
 
@@ -2148,23 +2189,23 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 
-            const largeMonitorTypesList = Array.from({ length: 100 }, (
-                _,
-                i
-            ) => ({
-                type: `monitor${i}`,
-                displayName: `Monitor Type ${i}`,
-                description: `Monitor Type ${i} description`,
-                version: "1.0.0",
-                fields: [
-                    {
-                        name: `field${i}`,
-                        type: "text",
-                        required: false,
-                        label: `Field ${i}`,
-                    },
-                ],
-            }));
+            const largeMonitorTypesList = Array.from(
+                { length: 100 },
+                (_, i) => ({
+                    type: `monitor${i}`,
+                    displayName: `Monitor Type ${i}`,
+                    description: `Monitor Type ${i} description`,
+                    version: "1.0.0",
+                    fields: [
+                        {
+                            name: `field${i}`,
+                            type: "text",
+                            required: false,
+                            label: `Field ${i}`,
+                        },
+                    ],
+                })
+            );
 
             mockUseMonitorTypes.mockReturnValue({
                 options: largeMonitorTypesList.map((type) => ({

@@ -12,7 +12,7 @@ import {
     addStringField,
     convertDateForDb,
     safeNumberConvert,
-} from "../../../../services/database/utils/valueConverters";
+} from "../../../../services/database/utils/converters/valueConverters";
 
 describe("Value Converters Utility", () => {
     describe("DbValue Type", () => {

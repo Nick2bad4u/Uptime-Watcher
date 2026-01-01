@@ -11,7 +11,8 @@ import type { Site, StatusHistory } from "@shared/types";
 vi.mock("../../../services/monitoring/MonitorTypeRegistry", () => ({
     getRegisteredMonitorTypes: vi.fn(() => ["http", "port"]),
     isValidMonitorType: vi.fn((type: string) =>
-        ["http", "port"].includes(type)),
+        ["http", "port"].includes(type)
+    ),
     validateMonitorData: vi.fn((type: string, data: any) => {
         if (type === "http" && data.url && data.url.startsWith("https://")) {
             return {

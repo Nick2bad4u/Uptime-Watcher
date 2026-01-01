@@ -13,6 +13,7 @@ import {
     type MouseEvent,
     type NamedExoticComponent,
     useCallback,
+    useDeferredValue,
     useEffect,
     useMemo,
     useState,
@@ -22,6 +23,7 @@ import { useSitesStore } from "../../../stores/sites/useSitesStore";
 import { useUIStore } from "../../../stores/ui/useUiStore";
 import { ThemedText } from "../../../theme/components/ThemedText";
 import { useTheme } from "../../../theme/useTheme";
+import { scrollToSiteCard } from "../../../utils/dom/scrollToSiteCard";
 import { AppIcons } from "../../../utils/icons";
 import { Tooltip } from "../../common/Tooltip/Tooltip";
 import { useSidebarLayout } from "../SidebarLayoutContext";
@@ -89,16 +91,25 @@ export const AppSidebar: NamedExoticComponent = memo(function AppSidebar() {
     );
 
     const [query, setQuery] = useState<string>("");
+    const deferredQuery = useDeferredValue(query);
+
+    const SearchIcon = AppIcons.actions.search;
+
+    const sitesByIdentifier = useMemo(
+        () => new Map(sites.map((site) => [site.identifier, site] as const)),
+        [sites]
+    );
 
     const filteredSites = useMemo((): readonly Site[] => {
-        if (query.trim().length === 0) {
+        const normalizedQuery = deferredQuery.trim().toLowerCase();
+        if (normalizedQuery.length === 0) {
             return sites;
         }
 
-        const normalizedQuery = query.trim().toLowerCase();
         return sites.filter((site) =>
-            site.name.toLowerCase().includes(normalizedQuery));
-    }, [query, sites]);
+            site.name.toLowerCase().includes(normalizedQuery)
+        );
+    }, [deferredQuery, sites]);
 
     // Automatically select the first site to keep the detail pane populated on
     // first render.
@@ -115,19 +126,20 @@ export const AppSidebar: NamedExoticComponent = memo(function AppSidebar() {
         ]
     );
 
-    const handleSearchChange = useCallback((
-        event: ChangeEvent<HTMLInputElement>
-    ) => {
-        setQuery(event.target.value);
-    }, []);
-
-    const handleAddSite = useCallback(() => {
+    const handleAddSite = useCallback((): void => {
         setShowAddSiteModal(true);
     }, [setShowAddSiteModal]);
 
-    const handleOpenSettings = useCallback(() => {
+    const handleOpenSettings = useCallback((): void => {
         setShowSettings(true);
     }, [setShowSettings]);
+
+    const handleSearchChange = useCallback(
+        (event: ChangeEvent<HTMLInputElement>): void => {
+            setQuery(event.target.value);
+        },
+        []
+    );
 
     const handleSelectSite = useCallback(
         (event: MouseEvent<HTMLButtonElement>) => {
@@ -137,9 +149,7 @@ export const AppSidebar: NamedExoticComponent = memo(function AppSidebar() {
                 return;
             }
 
-            const siteToSelect = sites.find(
-                (site) => site.identifier === siteIdentifier
-            );
+            const siteToSelect = sitesByIdentifier.get(siteIdentifier);
             if (!siteToSelect) {
                 return;
             }
@@ -167,15 +177,7 @@ export const AppSidebar: NamedExoticComponent = memo(function AppSidebar() {
 
             // Scroll to the site card in the main content area
             requestAnimationFrame(() => {
-                const cardElement = document.querySelector(
-                    `[data-site-identifier="${siteIdentifier}"]`
-                );
-                if (cardElement) {
-                    cardElement.scrollIntoView({
-                        behavior: "smooth",
-                        block: "center",
-                    });
-                }
+                scrollToSiteCard(siteIdentifier);
             });
         },
         [
@@ -183,7 +185,7 @@ export const AppSidebar: NamedExoticComponent = memo(function AppSidebar() {
             selectSite,
             setSelectedMonitorId,
             setShowSiteDetails,
-            sites,
+            sitesByIdentifier,
             toggleSidebar,
         ]
     );
@@ -205,6 +207,18 @@ export const AppSidebar: NamedExoticComponent = memo(function AppSidebar() {
         ? "Collapse navigation sidebar"
         : "Expand navigation sidebar";
 
+    const logoTooltipContent = useMemo(
+        () => (
+            <div className="app-sidebar__logo-tooltip">
+                <img
+                    alt="Uptime Watcher mascot"
+                    className="app-sidebar__logo-tooltip-image"
+                    src={MascotLogo}
+                />
+            </div>
+        ),
+        []
+    );
     return (
         <aside
             aria-label="Site navigation"
@@ -229,13 +243,25 @@ export const AppSidebar: NamedExoticComponent = memo(function AppSidebar() {
                             </button>
                         )}
                     </Tooltip>
-                    <div aria-hidden="true" className="app-sidebar__brand-logo">
-                        <img
-                            alt="Uptime Watcher mascot"
-                            className="app-sidebar__brand-logo-image"
-                            src={MascotLogo}
-                        />
-                    </div>
+
+                    <Tooltip
+                        content={logoTooltipContent}
+                        maxWidth={280}
+                        position="bottom"
+                    >
+                        {(triggerProps) => (
+                            <div
+                                {...triggerProps}
+                                className="app-sidebar__brand-logo"
+                            >
+                                <img
+                                    alt="Uptime Watcher mascot"
+                                    className="app-sidebar__brand-logo-image"
+                                    src={MascotLogo}
+                                />
+                            </div>
+                        )}
+                    </Tooltip>
                     <div className="app-sidebar__brand-copy">
                         <ThemedText
                             className="app-sidebar__brand-title"
@@ -260,6 +286,9 @@ export const AppSidebar: NamedExoticComponent = memo(function AppSidebar() {
                         htmlFor="sidebar-search"
                     >
                         <span className="sr-only">Search monitored sites</span>
+                        <span aria-hidden className="app-sidebar__search-icon">
+                            <SearchIcon size={16} />
+                        </span>
                         <input
                             autoComplete="off"
                             className="app-sidebar__search-input"
@@ -292,9 +321,12 @@ export const AppSidebar: NamedExoticComponent = memo(function AppSidebar() {
                             const statusDescription =
                                 getSiteStatusDescription(site);
 
-                            const runningMonitors = site.monitors.filter(
-                                (monitor) => monitor.monitoring
-                            ).length;
+                            let runningMonitors = 0;
+                            for (const monitor of site.monitors) {
+                                if (monitor.monitoring) {
+                                    runningMonitors += 1;
+                                }
+                            }
                             const statusClass = STATUS_CLASS_MAP[status];
                             const StatusIcon = STATUS_ICON_MAP[status];
 
@@ -353,7 +385,7 @@ export const AppSidebar: NamedExoticComponent = memo(function AppSidebar() {
                     <Tooltip
                         content="Add a new site"
                         position="right"
-                        wrapMode="block"
+                        wrapMode="inline"
                     >
                         {(triggerProps) => (
                             <button

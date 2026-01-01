@@ -1091,9 +1091,7 @@ describe("Status Processing and Aggregation Benchmarks", () => {
                     );
                     await statusService.processBulkStatusUpdates(
                         bulkEntries,
-                        [
-                            3_600_000,
-                        ]
+                        [3_600_000]
                     );
                 }
             },

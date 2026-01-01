@@ -42,6 +42,10 @@ import type { CSSProperties } from "react";
 
 import { useCallback, useMemo, useRef, useState } from "react";
 
+import {
+    getPrefersDarkMode,
+    subscribePrefersDarkModeChange,
+} from "../theme/utils/systemTheme";
 import { useMount } from "./useMount";
 
 /**
@@ -291,74 +295,29 @@ function getUrlStyle(isDarkMode: boolean): CSSProperties {
  */
 export function useThemeStyles(isCollapsed = false): ThemeStyles {
     // Use state to track theme changes for reactivity
-    const [isDarkMode, setIsDarkMode] = useState(() => {
-        // SSR-safe initialization
-        if (
-            typeof window === "undefined" ||
-            typeof window.matchMedia !== "function"
-        ) {
-            return false; // Default to light mode for SSR
-        }
-        try {
-            return window.matchMedia("(prefers-color-scheme: dark)").matches;
-        } catch {
-            // Fallback if matchMedia throws an error
-            return false;
-        }
-    });
+    const [isDarkMode, setIsDarkMode] = useState(() => getPrefersDarkMode());
 
-    // Refs to store media query and handler for cleanup
-    const mediaQueryRef = useRef<MediaQueryList | null>(null);
+    const cleanupRef = useRef<(() => void) | null>(null);
 
     /**
      * Named event handler for media query changes.
      *
      * @internal
      */
-    const handleThemeChange = useCallback((e: MediaQueryListEvent): void => {
-        setIsDarkMode(e.matches);
+    const handleThemeChange = useCallback((isDark: boolean): void => {
+        setIsDarkMode(isDark);
     }, []);
 
     // Set up media query listener for theme changes
     useMount(
         useCallback(() => {
-            // Skip in SSR environments
-            if (
-                typeof window === "undefined" ||
-                typeof window.matchMedia !== "function"
-            ) {
-                return;
-            }
-
-            try {
-                const mediaQuery = window.matchMedia(
-                    "(prefers-color-scheme: dark)"
-                );
-
-                // Store reference for cleanup
-                mediaQueryRef.current = mediaQuery;
-
-                // eslint-disable-next-line listeners/no-missing-remove-event-listener -- Media query listener is cleaned up in unmount callback
-                mediaQuery.addEventListener("change", handleThemeChange);
-            } catch {
-                // Fallback if matchMedia throws an error
-                // No setup needed
-            }
+            cleanupRef.current =
+                subscribePrefersDarkModeChange(handleThemeChange);
         }, [handleThemeChange]),
         useCallback(() => {
-            // Cleanup media query listener on unmount
-            if (mediaQueryRef.current) {
-                try {
-                    mediaQueryRef.current.removeEventListener(
-                        "change",
-                        handleThemeChange
-                    );
-                } catch {
-                    // Ignore cleanup errors
-                }
-                mediaQueryRef.current = null;
-            }
-        }, [handleThemeChange])
+            cleanupRef.current?.();
+            cleanupRef.current = null;
+        }, [])
     );
 
     return useMemo<ThemeStyles>(

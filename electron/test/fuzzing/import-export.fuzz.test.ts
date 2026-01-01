@@ -19,7 +19,7 @@
 
 import { describe, expect, it, vi, beforeEach } from "vitest";
 import fc from "fast-check";
-import { DataImportExportService } from "../../utils/database/DataImportExportService";
+import { DataImportExportService } from "../../services/database/DataImportExportService";
 import type { Site } from "@shared/types";
 
 describe("Data Import/Export Service Fuzzing Tests", () => {
@@ -46,7 +46,9 @@ describe("Data Import/Export Service Fuzzing Tests", () => {
             },
             repositories: {
                 site: {
-                    exportAll: vi.fn().mockResolvedValue([]),
+                    exportAllRows: vi.fn().mockResolvedValue([]),
+                    findAll: vi.fn().mockResolvedValue([]),
+                    findByIdentifier: vi.fn().mockResolvedValue(undefined),
                     bulkInsertInternal: vi.fn(),
                     deleteAllInternal: vi.fn(),
                 },
@@ -57,10 +59,12 @@ describe("Data Import/Export Service Fuzzing Tests", () => {
                 },
                 monitor: {
                     bulkCreate: vi.fn().mockResolvedValue([]),
+                    findBySiteIdentifier: vi.fn().mockResolvedValue([]),
                     deleteAllInternal: vi.fn(),
                 },
                 history: {
                     deleteAllInternal: vi.fn(),
+                    findByMonitorId: vi.fn().mockResolvedValue([]),
                     addEntryInternal: vi.fn(),
                 },
             },
@@ -76,7 +80,8 @@ describe("Data Import/Export Service Fuzzing Tests", () => {
                     const adapter: Record<string, any> = {};
                     for (const [key, factory] of Object.entries(builders)) {
                         adapter[key] = vi.fn((...args: unknown[]) =>
-                            factory(db, ...args));
+                            factory(db, ...args)
+                        );
                     }
                     return adapter;
                 });
@@ -369,8 +374,43 @@ describe("Data Import/Export Service Fuzzing Tests", () => {
                         fc.string({ minLength: 0, maxLength: 200 })
                     ),
                     async (sites, settings) => {
-                        mockConfig.repositories.site.exportAll.mockResolvedValue(
-                            sites
+                        mockConfig.repositories.site.exportAllRows.mockResolvedValue(
+                            sites.map((site) => ({
+                                identifier: site.identifier,
+                                monitoring: site.monitoring,
+                                name: site.name,
+                            }))
+                        );
+
+                        mockConfig.repositories.monitor.findBySiteIdentifier.mockImplementation(
+                            async (identifier: string) => {
+                                const match = sites.find(
+                                    (site) => site.identifier === identifier
+                                );
+
+                                return match
+                                    ? match.monitors.map((monitor) => ({
+                                          ...monitor,
+                                          history: [],
+                                      }))
+                                    : [];
+                            }
+                        );
+
+                        mockConfig.repositories.history.findByMonitorId.mockImplementation(
+                            async (monitorId: string) => {
+                                for (const site of sites) {
+                                    const monitor = site.monitors.find(
+                                        (candidate) => candidate.id === monitorId
+                                    );
+
+                                    if (monitor) {
+                                        return monitor.history;
+                                    }
+                                }
+
+                                return [];
+                            }
                         );
                         mockConfig.repositories.settings.getAll.mockResolvedValue(
                             settings
@@ -380,7 +420,8 @@ describe("Data Import/Export Service Fuzzing Tests", () => {
 
                         // Should produce valid JSON
                         expect(() =>
-                            JSON.parse(exportedJson)).not.toThrowError();
+                            JSON.parse(exportedJson)
+                        ).not.toThrowError();
 
                         const parsed = JSON.parse(exportedJson);
 
@@ -403,9 +444,8 @@ describe("Data Import/Export Service Fuzzing Tests", () => {
 
                         // ExportedAt should be valid ISO date
                         expect(() =>
-                            new Date(
-                                parsed.exportedAt
-                            ).toISOString()).not.toThrowError();
+                            new Date(parsed.exportedAt).toISOString()
+                        ).not.toThrowError();
                     }
                 ),
                 { numRuns: 25 }

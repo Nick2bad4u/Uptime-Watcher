@@ -35,7 +35,8 @@ vi.mock("@shared/utils/errorHandling", () => ({
         }
     }),
     ensureError: vi.fn((error) =>
-        error instanceof Error ? error : new Error(String(error))),
+        error instanceof Error ? error : new Error(String(error))
+    ),
 }));
 
 vi.mock("../../../stores/utils", () => ({
@@ -968,7 +969,8 @@ describe(useMonitorTypesStore, () => {
             mockElectronAPI.monitorTypes.getMonitorTypes.mockImplementation(
                 () =>
                     new Promise((resolve) =>
-                        setTimeout(() => resolve(mockMonitorTypes), 100))
+                        setTimeout(() => resolve(mockMonitorTypes), 100)
+                    )
             );
 
             const { result } = renderHook(() => useMonitorTypesStore());
@@ -1034,7 +1036,8 @@ describe(useMonitorTypesStore, () => {
             await new Promise((resolve) => setTimeout(resolve, 100));
 
             const { result, unmount } = renderHook(() =>
-                useMonitorTypesStore());
+                useMonitorTypesStore()
+            );
 
             // Simple wait for hook to be ready
             await act(async () => {

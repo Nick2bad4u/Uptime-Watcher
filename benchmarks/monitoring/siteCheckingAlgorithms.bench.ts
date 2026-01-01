@@ -579,7 +579,8 @@ class MockSiteChecker {
         // Content validation
         if (request.expectedContent) {
             const contentValid = request.expectedContent.some((expected) =>
-                content.toLowerCase().includes(expected.toLowerCase()));
+                content.toLowerCase().includes(expected.toLowerCase())
+            );
 
             if (!contentValid) {
                 return {
@@ -997,7 +998,8 @@ class MockSSLValidator {
 class MockContentValidator {
     validate(content: string, expectedContent: string[]): boolean {
         return expectedContent.some((expected) =>
-            content.toLowerCase().includes(expected.toLowerCase()));
+            content.toLowerCase().includes(expected.toLowerCase())
+        );
     }
 }
 
@@ -1139,37 +1141,38 @@ describe("Site Checking Algorithms Performance", () => {
             },
         });
 
-        const requests: SiteCheckRequest[] = Array.from({ length: 100 }, (
-            _,
-            index
-        ) => ({
-            id: `check-${index}`,
-            url: `https://example${index % 10}.com/`,
-            method: "GET",
-            timeout: 3000,
-            retryCount: 1,
-            expectedStatus: [200],
-            checkType: "http",
-            priority: "normal",
-            metadata: {
-                siteIdentifier: `site-${index}`,
-                siteName: `Site ${index}`,
-                tags: [`tag${index % 5}`],
-                category: "web",
-                averageResponseTime: 500,
-                successRate: 0.95,
-                alertThresholds: {
-                    responseTime: 2000,
-                    downtime: 30_000,
-                    errorRate: 0.1,
-                    consecutiveFailures: 3,
+        const requests: SiteCheckRequest[] = Array.from(
+            { length: 100 },
+            (_, index) => ({
+                id: `check-${index}`,
+                url: `https://example${index % 10}.com/`,
+                method: "GET",
+                timeout: 3000,
+                retryCount: 1,
+                expectedStatus: [200],
+                checkType: "http",
+                priority: "normal",
+                metadata: {
+                    siteIdentifier: `site-${index}`,
+                    siteName: `Site ${index}`,
+                    tags: [`tag${index % 5}`],
+                    category: "web",
+                    averageResponseTime: 500,
+                    successRate: 0.95,
+                    alertThresholds: {
+                        responseTime: 2000,
+                        downtime: 30_000,
+                        errorRate: 0.1,
+                        consecutiveFailures: 3,
+                    },
                 },
-            },
-        }));
+            })
+        );
 
         // Perform individual checks
         const promises = requests.map((request) =>
-            checker.checkSite(checkerId, request));
+            checker.checkSite(checkerId, request)
+        );
 
         Promise.allSettled(promises);
         checker.reset();
@@ -1193,46 +1196,46 @@ describe("Site Checking Algorithms Performance", () => {
             },
         });
 
-        const requests: SiteCheckRequest[] = Array.from({ length: 200 }, (
-            _,
-            index
-        ) => ({
-            id: `batch-check-${index}`,
-            url: `https://site${index % 20}.example.com/api/health`,
-            method: "GET",
-            headers: {
-                "User-Agent": "UptimeWatcher/1.0",
-                Accept: "application/json",
-            },
-            timeout: 5000,
-            retryCount: 2,
-            expectedStatus: [200, 201],
-            expectedContent: [
-                "ok",
-                "healthy",
-                "status",
-            ],
-            checkType: "http",
-            priority: index % 4 === 0 ? "high" : "normal",
-            metadata: {
-                siteIdentifier: `batch-site-${index}`,
-                siteName: `Batch Site ${index}`,
-                tags: [
-                    `batch`,
-                    `api`,
-                    `category${index % 4}`,
-                ],
-                category: "api",
-                averageResponseTime: 300 + Math.random() * 400,
-                successRate: 0.92 + Math.random() * 0.07,
-                alertThresholds: {
-                    responseTime: 1500,
-                    downtime: 15_000,
-                    errorRate: 0.05,
-                    consecutiveFailures: 2,
+        const requests: SiteCheckRequest[] = Array.from(
+            { length: 200 },
+            (_, index) => ({
+                id: `batch-check-${index}`,
+                url: `https://site${index % 20}.example.com/api/health`,
+                method: "GET",
+                headers: {
+                    "User-Agent": "UptimeWatcher/1.0",
+                    Accept: "application/json",
                 },
-            },
-        }));
+                timeout: 5000,
+                retryCount: 2,
+                expectedStatus: [200, 201],
+                expectedContent: [
+                    "ok",
+                    "healthy",
+                    "status",
+                ],
+                checkType: "http",
+                priority: index % 4 === 0 ? "high" : "normal",
+                metadata: {
+                    siteIdentifier: `batch-site-${index}`,
+                    siteName: `Batch Site ${index}`,
+                    tags: [
+                        `batch`,
+                        `api`,
+                        `category${index % 4}`,
+                    ],
+                    category: "api",
+                    averageResponseTime: 300 + Math.random() * 400,
+                    successRate: 0.92 + Math.random() * 0.07,
+                    alertThresholds: {
+                        responseTime: 1500,
+                        downtime: 15_000,
+                        errorRate: 0.05,
+                        consecutiveFailures: 2,
+                    },
+                },
+            })
+        );
 
         checker.checkSitesBatch(checkerId, requests);
         checker.reset();
@@ -1263,39 +1266,40 @@ describe("Site Checking Algorithms Performance", () => {
             },
         });
 
-        const requests: SiteCheckRequest[] = Array.from({ length: 80 }, (
-            _,
-            index
-        ) => ({
-            id: `retry-check-${index}`,
-            url:
-                index % 5 === 0
-                    ? `https://unreliable${index}.com/` // Some unreliable sites
-                    : `https://reliable${index}.com/`,
-            method: "GET",
-            timeout: 4000,
-            retryCount: 3,
-            expectedStatus: [200],
-            checkType: "performance",
-            priority: index % 3 === 0 ? "high" : "normal",
-            metadata: {
-                siteIdentifier: `retry-site-${index}`,
-                siteName: `Retry Site ${index}`,
-                tags: [`retry`, `performance`],
-                category: "monitoring",
-                averageResponseTime: 600,
-                successRate: index % 5 === 0 ? 0.7 : 0.95, // Unreliable sites have lower success rate
-                alertThresholds: {
-                    responseTime: 3000,
-                    downtime: 60_000,
-                    errorRate: 0.15,
-                    consecutiveFailures: 4,
+        const requests: SiteCheckRequest[] = Array.from(
+            { length: 80 },
+            (_, index) => ({
+                id: `retry-check-${index}`,
+                url:
+                    index % 5 === 0
+                        ? `https://unreliable${index}.com/` // Some unreliable sites
+                        : `https://reliable${index}.com/`,
+                method: "GET",
+                timeout: 4000,
+                retryCount: 3,
+                expectedStatus: [200],
+                checkType: "performance",
+                priority: index % 3 === 0 ? "high" : "normal",
+                metadata: {
+                    siteIdentifier: `retry-site-${index}`,
+                    siteName: `Retry Site ${index}`,
+                    tags: [`retry`, `performance`],
+                    category: "monitoring",
+                    averageResponseTime: 600,
+                    successRate: index % 5 === 0 ? 0.7 : 0.95, // Unreliable sites have lower success rate
+                    alertThresholds: {
+                        responseTime: 3000,
+                        downtime: 60_000,
+                        errorRate: 0.15,
+                        consecutiveFailures: 4,
+                    },
                 },
-            },
-        }));
+            })
+        );
 
         const promises = requests.map((request) =>
-            checker.checkSiteWithRetries(checkerId, request));
+            checker.checkSiteWithRetries(checkerId, request)
+        );
 
         Promise.allSettled(promises);
         checker.reset();
@@ -1386,46 +1390,47 @@ describe("Site Checking Algorithms Performance", () => {
             },
         });
 
-        const requests: SiteCheckRequest[] = Array.from({ length: 25 }, (
-            _,
-            index
-        ) => ({
-            id: `monitor-${index}`,
-            url: `https://service${index}.monitor.com/health`,
-            method: "GET",
-            headers: {
-                Accept: "application/json",
-                "X-Monitor": "UptimeWatcher",
-            },
-            timeout: 4000,
-            retryCount: 1,
-            expectedStatus: [200],
-            expectedContent: [
-                "healthy",
-                "ok",
-                "running",
-            ],
-            checkType: "http",
-            priority: index < 5 ? "critical" : index < 15 ? "high" : "normal",
-            metadata: {
-                siteIdentifier: `monitor-service-${index}`,
-                siteName: `Monitor Service ${index}`,
-                tags: [
-                    `monitoring`,
-                    `service`,
-                    `tier${Math.floor(index / 5)}`,
-                ],
-                category: "service",
-                averageResponseTime: 150 + Math.random() * 200,
-                successRate: 0.995,
-                alertThresholds: {
-                    responseTime: 1000,
-                    downtime: 5000,
-                    errorRate: 0.01,
-                    consecutiveFailures: 1,
+        const requests: SiteCheckRequest[] = Array.from(
+            { length: 25 },
+            (_, index) => ({
+                id: `monitor-${index}`,
+                url: `https://service${index}.monitor.com/health`,
+                method: "GET",
+                headers: {
+                    Accept: "application/json",
+                    "X-Monitor": "UptimeWatcher",
                 },
-            },
-        }));
+                timeout: 4000,
+                retryCount: 1,
+                expectedStatus: [200],
+                expectedContent: [
+                    "healthy",
+                    "ok",
+                    "running",
+                ],
+                checkType: "http",
+                priority:
+                    index < 5 ? "critical" : index < 15 ? "high" : "normal",
+                metadata: {
+                    siteIdentifier: `monitor-service-${index}`,
+                    siteName: `Monitor Service ${index}`,
+                    tags: [
+                        `monitoring`,
+                        `service`,
+                        `tier${Math.floor(index / 5)}`,
+                    ],
+                    category: "service",
+                    averageResponseTime: 150 + Math.random() * 200,
+                    successRate: 0.995,
+                    alertThresholds: {
+                        responseTime: 1000,
+                        downtime: 5000,
+                        errorRate: 0.01,
+                        consecutiveFailures: 1,
+                    },
+                },
+            })
+        );
 
         // Simulate 10 seconds of continuous monitoring with 2-second intervals
         checker.startContinuousMonitoring(checkerId, requests, 2000, 10_000);
@@ -1451,44 +1456,45 @@ describe("Site Checking Algorithms Performance", () => {
             },
         });
 
-        const requests: SiteCheckRequest[] = Array.from({ length: 50 }, (
-            _,
-            index
-        ) => ({
-            id: `ssl-check-${index}`,
-            url: `https://secure${index}.example.org/`,
-            method: "HEAD", // Faster for SSL checks
-            timeout: 6000,
-            retryCount: 1,
-            expectedStatus: [
-                200,
-                301,
-                302,
-            ],
-            checkType: "ssl",
-            priority: "normal",
-            metadata: {
-                siteIdentifier: `ssl-site-${index}`,
-                siteName: `SSL Site ${index}`,
-                tags: [
-                    `ssl`,
-                    `security`,
-                    `certificate`,
+        const requests: SiteCheckRequest[] = Array.from(
+            { length: 50 },
+            (_, index) => ({
+                id: `ssl-check-${index}`,
+                url: `https://secure${index}.example.org/`,
+                method: "HEAD", // Faster for SSL checks
+                timeout: 6000,
+                retryCount: 1,
+                expectedStatus: [
+                    200,
+                    301,
+                    302,
                 ],
-                category: "security",
-                averageResponseTime: 800,
-                successRate: 0.99,
-                alertThresholds: {
-                    responseTime: 5000,
-                    downtime: 30_000,
-                    errorRate: 0.02,
-                    consecutiveFailures: 2,
+                checkType: "ssl",
+                priority: "normal",
+                metadata: {
+                    siteIdentifier: `ssl-site-${index}`,
+                    siteName: `SSL Site ${index}`,
+                    tags: [
+                        `ssl`,
+                        `security`,
+                        `certificate`,
+                    ],
+                    category: "security",
+                    averageResponseTime: 800,
+                    successRate: 0.99,
+                    alertThresholds: {
+                        responseTime: 5000,
+                        downtime: 30_000,
+                        errorRate: 0.02,
+                        consecutiveFailures: 2,
+                    },
                 },
-            },
-        }));
+            })
+        );
 
         const promises = requests.map((request) =>
-            checker.checkSite(checkerId, request));
+            checker.checkSite(checkerId, request)
+        );
 
         Promise.allSettled(promises);
         checker.reset();
@@ -1519,89 +1525,93 @@ describe("Site Checking Algorithms Performance", () => {
             "normal",
             "low",
         ];
-        const requests: SiteCheckRequest[] = Array.from({ length: 120 }, (
-            _,
-            index
-        ) => {
-            const priority = priorities[index % priorities.length];
-            const timeoutMultiplier =
-                priority === "critical"
-                    ? 1.5
-                    : priority === "high"
-                      ? 1.2
-                      : priority === "normal"
-                        ? 1
-                        : 0.8;
+        const requests: SiteCheckRequest[] = Array.from(
+            { length: 120 },
+            (_, index) => {
+                const priority = priorities[index % priorities.length];
+                const timeoutMultiplier =
+                    priority === "critical"
+                        ? 1.5
+                        : priority === "high"
+                          ? 1.2
+                          : priority === "normal"
+                            ? 1
+                            : 0.8;
 
-            return {
-                id: `priority-${priority}-${index}`,
-                url: `https://${priority}-site${index}.com/api/status`,
-                method: "GET",
-                headers: {
-                    Priority: priority,
-                    "X-Check-Type": "uptime",
-                },
-                timeout: Math.floor(3000 * timeoutMultiplier),
-                retryCount:
-                    priority === "critical" ? 3 : priority === "high" ? 2 : 1,
-                expectedStatus: [200],
-                checkType: "performance",
-                priority,
-                metadata: {
-                    siteIdentifier: `${priority}-${index}`,
-                    siteName: `${priority.charAt(0).toUpperCase() + priority.slice(1)} Site ${index}`,
-                    tags: [
-                        priority,
-                        "api",
-                        "status",
-                    ],
-                    category: "service",
-                    averageResponseTime: 400,
-                    successRate:
-                        priority === "critical"
-                            ? 0.999
-                            : priority === "high"
-                              ? 0.995
-                              : priority === "normal"
-                                ? 0.99
-                                : 0.95,
-                    alertThresholds: {
-                        responseTime:
-                            priority === "critical"
-                                ? 500
-                                : priority === "high"
-                                  ? 1000
-                                  : priority === "normal"
-                                    ? 2000
-                                    : 3000,
-                        downtime:
-                            priority === "critical"
-                                ? 5000
-                                : priority === "high"
-                                  ? 15_000
-                                  : priority === "normal"
-                                    ? 30_000
-                                    : 60_000,
-                        errorRate:
-                            priority === "critical"
-                                ? 0.001
-                                : priority === "high"
-                                  ? 0.005
-                                  : priority === "normal"
-                                    ? 0.01
-                                    : 0.05,
-                        consecutiveFailures:
-                            priority === "critical"
-                                ? 1
-                                : priority === "high"
-                                  ? 2
-                                  : priority === "normal"
-                                    ? 3
-                                    : 5,
+                return {
+                    id: `priority-${priority}-${index}`,
+                    url: `https://${priority}-site${index}.com/api/status`,
+                    method: "GET",
+                    headers: {
+                        Priority: priority,
+                        "X-Check-Type": "uptime",
                     },
-                },
-            };
-        });
+                    timeout: Math.floor(3000 * timeoutMultiplier),
+                    retryCount:
+                        priority === "critical"
+                            ? 3
+                            : priority === "high"
+                              ? 2
+                              : 1,
+                    expectedStatus: [200],
+                    checkType: "performance",
+                    priority,
+                    metadata: {
+                        siteIdentifier: `${priority}-${index}`,
+                        siteName: `${priority.charAt(0).toUpperCase() + priority.slice(1)} Site ${index}`,
+                        tags: [
+                            priority,
+                            "api",
+                            "status",
+                        ],
+                        category: "service",
+                        averageResponseTime: 400,
+                        successRate:
+                            priority === "critical"
+                                ? 0.999
+                                : priority === "high"
+                                  ? 0.995
+                                  : priority === "normal"
+                                    ? 0.99
+                                    : 0.95,
+                        alertThresholds: {
+                            responseTime:
+                                priority === "critical"
+                                    ? 500
+                                    : priority === "high"
+                                      ? 1000
+                                      : priority === "normal"
+                                        ? 2000
+                                        : 3000,
+                            downtime:
+                                priority === "critical"
+                                    ? 5000
+                                    : priority === "high"
+                                      ? 15_000
+                                      : priority === "normal"
+                                        ? 30_000
+                                        : 60_000,
+                            errorRate:
+                                priority === "critical"
+                                    ? 0.001
+                                    : priority === "high"
+                                      ? 0.005
+                                      : priority === "normal"
+                                        ? 0.01
+                                        : 0.05,
+                            consecutiveFailures:
+                                priority === "critical"
+                                    ? 1
+                                    : priority === "high"
+                                      ? 2
+                                      : priority === "normal"
+                                        ? 3
+                                        : 5,
+                        },
+                    },
+                };
+            }
+        );
 
         checker.checkSitesBatch(checkerId, requests);
         checker.reset();
@@ -1637,37 +1647,37 @@ describe("Site Checking Algorithms Performance", () => {
         const allResults: Promise<any>[] = [];
 
         checkerIds.forEach((checkerId, checkerIndex) => {
-            const requests: SiteCheckRequest[] = Array.from({ length: 40 }, (
-                _,
-                index
-            ) => ({
-                id: `analysis-${checkerId}-${index}`,
-                url: `https://analysis${index}.benchmark.com/`,
-                method: "GET",
-                timeout: 3000,
-                retryCount: 2,
-                expectedStatus: [200],
-                checkType: "performance",
-                priority: "normal",
-                metadata: {
-                    siteIdentifier: `analysis-${checkerId}-${index}`,
-                    siteName: `Analysis Site ${index}`,
-                    tags: [
-                        `analysis`,
-                        `benchmark`,
-                        `checker-${checkerIndex}`,
-                    ],
-                    category: "benchmark",
-                    averageResponseTime: 300 + checkerIndex * 100,
-                    successRate: 0.95 + checkerIndex * 0.01,
-                    alertThresholds: {
-                        responseTime: 2000,
-                        downtime: 20_000,
-                        errorRate: 0.05,
-                        consecutiveFailures: 3,
+            const requests: SiteCheckRequest[] = Array.from(
+                { length: 40 },
+                (_, index) => ({
+                    id: `analysis-${checkerId}-${index}`,
+                    url: `https://analysis${index}.benchmark.com/`,
+                    method: "GET",
+                    timeout: 3000,
+                    retryCount: 2,
+                    expectedStatus: [200],
+                    checkType: "performance",
+                    priority: "normal",
+                    metadata: {
+                        siteIdentifier: `analysis-${checkerId}-${index}`,
+                        siteName: `Analysis Site ${index}`,
+                        tags: [
+                            `analysis`,
+                            `benchmark`,
+                            `checker-${checkerIndex}`,
+                        ],
+                        category: "benchmark",
+                        averageResponseTime: 300 + checkerIndex * 100,
+                        successRate: 0.95 + checkerIndex * 0.01,
+                        alertThresholds: {
+                            responseTime: 2000,
+                            downtime: 20_000,
+                            errorRate: 0.05,
+                            consecutiveFailures: 3,
+                        },
                     },
-                },
-            }));
+                })
+            );
 
             allResults.push(checker.checkSitesBatch(checkerId, requests));
         });

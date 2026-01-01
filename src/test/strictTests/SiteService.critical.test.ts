@@ -530,7 +530,8 @@ describe("SiteService Critical Coverage Tests", () => {
             vi.mocked(
                 (globalThis as any).electronAPI.sites.removeMonitor
             ).mockImplementation(async (identifier: string) =>
-                createMockSiteSnapshot(identifier));
+                createMockSiteSnapshot(identifier)
+            );
 
             // Act
             for (const { siteIdentifier, monitorId } of operations) {
@@ -565,16 +566,19 @@ describe("SiteService Critical Coverage Tests", () => {
             vi.mocked(
                 (globalThis as any).electronAPI.sites.removeMonitor
             ).mockImplementation(async (identifier: string) =>
-                createMockSiteSnapshot(identifier));
+                createMockSiteSnapshot(identifier)
+            );
 
             // Act
             const promises = operations.map(({ siteIdentifier, monitorId }) =>
-                SiteService.removeMonitor(siteIdentifier, monitorId));
+                SiteService.removeMonitor(siteIdentifier, monitorId)
+            );
 
             await Promise.all(promises);
 
             // Assert
-            expect(mockWaitForElectronBridge).toHaveBeenCalledTimes(3);
+            // Concurrent calls share a single in-flight initialization.
+            expect(mockWaitForElectronBridge).toHaveBeenCalledTimes(1);
             expect(
                 (globalThis as any).electronAPI.sites.removeMonitor
             ).toHaveBeenCalledTimes(3);

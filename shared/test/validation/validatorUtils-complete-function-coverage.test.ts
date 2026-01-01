@@ -373,7 +373,8 @@ describe("ValidatorUtils - Complete Function Coverage", () => {
             ).toBeTruthy();
             expect(
                 validIds.every((id) =>
-                    validatorUtilsModule.isValidIdentifier(id))
+                    validatorUtilsModule.isValidIdentifier(id)
+                )
             ).toBeTruthy();
 
             // Test URL and host validation

@@ -194,7 +194,9 @@ const mockIsSiteStatus = vi.hoisted(() =>
             "down",
             "pending",
             "unknown",
-        ].includes(status)));
+        ].includes(status)
+    )
+);
 
 vi.mock("../../../shared/utils/typeHelpers", () => ({
     isSiteStatus: mockIsSiteStatus,
@@ -431,12 +433,12 @@ describe("Theme Hooks - Comprehensive Coverage", () => {
 
             let systemThemeChangeCallback: (isDark: boolean) => void = () => {};
 
-            mockThemeManager.onSystemThemeChange.mockImplementation((
-                callback: (isDark: boolean) => void
-            ) => {
-                systemThemeChangeCallback = callback;
-                return () => {}; // Cleanup function
-            });
+            mockThemeManager.onSystemThemeChange.mockImplementation(
+                (callback: (isDark: boolean) => void) => {
+                    systemThemeChangeCallback = callback;
+                    return () => {}; // Cleanup function
+                }
+            );
 
             const { result } = renderHook(() => useTheme());
 
@@ -822,7 +824,8 @@ describe("Theme Hooks - Comprehensive Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             const { result } = renderHook(() =>
-                useThemeValue((theme) => theme.isDark));
+                useThemeValue((theme) => theme.isDark)
+            );
 
             expect(result.current).toBeFalsy();
         });
@@ -837,7 +840,8 @@ describe("Theme Hooks - Comprehensive Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             const { result } = renderHook(() =>
-                useThemeValue((theme) => theme.name));
+                useThemeValue((theme) => theme.name)
+            );
 
             expect(result.current).toBe("light");
         });
@@ -852,7 +856,8 @@ describe("Theme Hooks - Comprehensive Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             const { result } = renderHook(() =>
-                useThemeValue((theme) => theme.colors.status.up));
+                useThemeValue((theme) => theme.colors.status.up)
+            );
 
             expect(result.current).toBe("#10b981");
         });
@@ -868,7 +873,8 @@ describe("Theme Hooks - Comprehensive Coverage", () => {
                     isDark: theme.isDark,
                     upColor: theme.colors.status.up,
                     bgColor: theme.colors.background.primary,
-                })));
+                }))
+            );
 
             expect(result.current).toEqual({
                 isDark: false,
@@ -890,9 +896,11 @@ describe("Theme Hooks - Comprehensive Coverage", () => {
 
             const { result: themeResult } = renderHook(() => useTheme());
             const { result: statusResult } = renderHook(() =>
-                useStatusColors());
+                useStatusColors()
+            );
             const { result: availabilityResult } = renderHook(() =>
-                useAvailabilityColors());
+                useAvailabilityColors()
+            );
 
             // All hooks should use the same theme data
             expect(themeResult.current.currentTheme.colors.status.up).toBe(
@@ -920,11 +928,14 @@ describe("Theme Hooks - Comprehensive Coverage", () => {
 
             await act(async () => {
                 expect(() =>
-                    result.current.setTheme("dark")).not.toThrowError();
+                    result.current.setTheme("dark")
+                ).not.toThrowError();
                 expect(() =>
-                    result.current.setTheme("light")).not.toThrowError();
+                    result.current.setTheme("light")
+                ).not.toThrowError();
                 expect(() =>
-                    result.current.setTheme("system")).not.toThrowError();
+                    result.current.setTheme("system")
+                ).not.toThrowError();
             });
         });
 

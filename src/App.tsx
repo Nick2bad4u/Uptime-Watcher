@@ -258,19 +258,19 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
     const updatesUpdateCountRef = useRef(0);
     const alertsUpdateCountRef = useRef(0);
     const subscribeToSettingsStore = useCallback((): void => {
-        settingsSubscriptionRef.current = useSettingsStore.subscribe((
-            state
-        ) => {
-            settingsUpdateCountRef.current += 1;
-            logger.info("[App:debug] settings store update", {
-                count: settingsUpdateCountRef.current,
-                historyLimit: state.settings.historyLimit,
-                systemNotificationsEnabled:
-                    state.settings.systemNotificationsEnabled,
-                systemNotificationsSoundEnabled:
-                    state.settings.systemNotificationsSoundEnabled,
-            });
-        });
+        settingsSubscriptionRef.current = useSettingsStore.subscribe(
+            (state) => {
+                settingsUpdateCountRef.current += 1;
+                logger.info("[App:debug] settings store update", {
+                    count: settingsUpdateCountRef.current,
+                    historyLimit: state.settings.historyLimit,
+                    systemNotificationsEnabled:
+                        state.settings.systemNotificationsEnabled,
+                    systemNotificationsSoundEnabled:
+                        state.settings.systemNotificationsSoundEnabled,
+                });
+            }
+        );
     }, []);
 
     const cleanupSettingsStoreSubscription = useCallback((): void => {
@@ -440,12 +440,12 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
 
             if (typeof subscribeToStatusUpdates === "function") {
                 logger.debug("[App:init] subscribing to status updates");
-                const subscriptionResult = (await subscribeToStatusUpdates((
-                    update: StatusUpdate
-                ) => {
-                    enqueueAlertFromStatusUpdate(update);
-                    logStatusUpdateDebugInfo(update);
-                })) as StatusUpdateSubscriptionSummary | undefined;
+                const subscriptionResult = (await subscribeToStatusUpdates(
+                    (update: StatusUpdate) => {
+                        enqueueAlertFromStatusUpdate(update);
+                        logStatusUpdateDebugInfo(update);
+                    }
+                )) as StatusUpdateSubscriptionSummary | undefined;
 
                 reportSubscriptionDiagnostics(subscriptionResult);
                 logger.debug(
@@ -686,13 +686,12 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
                 (() => void) | undefined
             > => {
                 try {
-                    const cleanup = await EventsService.onUpdateStatus(({
-                        error,
-                        status,
-                    }: UpdateStatusEventData) => {
-                        applyUpdateStatus(status);
-                        setUpdateError(error);
-                    });
+                    const cleanup = await EventsService.onUpdateStatus(
+                        ({ error, status }: UpdateStatusEventData) => {
+                            applyUpdateStatus(status);
+                            setUpdateError(error);
+                        }
+                    );
 
                     if (cleanupRequestedRef.current) {
                         cleanup();
@@ -749,14 +748,15 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
     // eslint-disable-next-line n/no-sync -- Function name contains 'sync' but is not a synchronous file operation
     useBackendFocusSync(false); // Set to true to enable focus-based backend sync
 
-    const handleSidebarBreakpointChange = useCallback((
-        event: MediaQueryListEvent
-    ): void => {
-        setIsCompactViewport(event.matches);
-        if (event.matches) {
-            setCompactSidebarOpen(false);
-        }
-    }, []);
+    const handleSidebarBreakpointChange = useCallback(
+        (event: MediaQueryListEvent): void => {
+            setIsCompactViewport(event.matches);
+            if (event.matches) {
+                setCompactSidebarOpen(false);
+            }
+        },
+        []
+    );
 
     const cleanupSidebarListener = useCallback(() => {
         const mediaQuery = sidebarMediaQueryRef.current;
@@ -1105,8 +1105,6 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
                     isSidebarOpen={isSidebarOpen}
                     toggleSidebar={toggleSidebar}
                 >
-                    <PromptDialog />
-                    <ConfirmDialog />
                     <StatusAlertToaster />
                     <div
                         className={`app-shell ${isDark ? "app-shell--dark" : "app-shell--light"} ${isSidebarOpen ? "app-shell--sidebar-open" : "app-shell--sidebar-closed"}`}
@@ -1181,6 +1179,15 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
                     ) : null}
 
                     {siteDetailsJSX}
+
+                    {/*
+                     * Keep the global prompt/confirm dialogs at the end of the
+                     * React tree so their portals are appended last in
+                     * document.body. This guarantees they stack above other
+                     * modals like SiteDetails.
+                     */}
+                    <PromptDialog />
+                    <ConfirmDialog />
                 </SidebarLayoutProvider>
             </ThemeProvider>
         </ErrorBoundary>

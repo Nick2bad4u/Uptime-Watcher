@@ -172,10 +172,10 @@ export const SiteDetails = ({
         intervalChanged,
         isLoading,
         isMonitoring,
-        localCheckInterval,
+        localCheckIntervalMs,
         localName,
         localRetryAttempts,
-        localTimeout,
+        localTimeoutSeconds,
         retryAttemptsChanged,
         selectedMonitor,
         selectedMonitorId,
@@ -229,96 +229,72 @@ export const SiteDetails = ({
         [analytics.filteredHistory, currentTheme]
     );
 
-    const barChartData = useMemo(() => {
-        // Build dynamic chart data based on which statuses exist
-        const chartLabels: string[] = [];
-        const chartData: number[] = [];
-        const chartBackgroundColors: string[] = [];
-        const chartBorderColors: string[] = [];
+    const statusDistribution = useMemo(() => {
+        const labels: string[] = [];
+        const data: number[] = [];
+        const backgroundColors: string[] = [];
+        const borderColors: string[] = [];
 
-        // Always include "Up" status
-        chartLabels.push("Up");
-        chartData.push(analytics.upCount);
-        chartBackgroundColors.push(currentTheme.colors.success);
-        chartBorderColors.push(currentTheme.colors.success);
+        labels.push("Up");
+        data.push(analytics.upCount);
+        backgroundColors.push(currentTheme.colors.success);
+        borderColors.push(currentTheme.colors.success);
 
-        // Include "Degraded" status if it exists
         if (analytics.degradedCount > 0) {
-            chartLabels.push("Degraded");
-            chartData.push(analytics.degradedCount);
-            chartBackgroundColors.push(currentTheme.colors.warning);
-            chartBorderColors.push(currentTheme.colors.warning);
+            labels.push("Degraded");
+            data.push(analytics.degradedCount);
+            backgroundColors.push(currentTheme.colors.warning);
+            borderColors.push(currentTheme.colors.warning);
         }
 
-        // Always include "Down" status
-        chartLabels.push("Down");
-        chartData.push(analytics.downCount);
-        chartBackgroundColors.push(currentTheme.colors.error);
-        chartBorderColors.push(currentTheme.colors.error);
+        labels.push("Down");
+        data.push(analytics.downCount);
+        backgroundColors.push(currentTheme.colors.error);
+        borderColors.push(currentTheme.colors.error);
 
         return {
+            backgroundColors,
+            borderColors,
+            data,
+            labels,
+        };
+    }, [
+        analytics.degradedCount,
+        analytics.downCount,
+        analytics.upCount,
+        currentTheme,
+    ]);
+
+    const barChartData = useMemo(
+        () => ({
             datasets: [
                 {
-                    backgroundColor: chartBackgroundColors,
-                    borderColor: chartBorderColors,
+                    backgroundColor: statusDistribution.backgroundColors,
+                    borderColor: statusDistribution.borderColors,
                     borderWidth: 1,
-                    data: chartData,
+                    data: statusDistribution.data,
                     label: "Status Distribution",
                 },
             ],
-            labels: chartLabels,
-        };
-    }, [
-        analytics.degradedCount,
-        analytics.downCount,
-        analytics.upCount,
-        currentTheme,
-    ]);
+            labels: statusDistribution.labels,
+        }),
+        [statusDistribution]
+    );
 
-    const doughnutChartData = useMemo(() => {
-        // Build dynamic chart data based on which statuses exist
-        const chartLabels: string[] = [];
-        const chartData: number[] = [];
-        const chartBackgroundColors: string[] = [];
-        const chartBorderColors: string[] = [];
-
-        // Always include "Up" status
-        chartLabels.push("Up");
-        chartData.push(analytics.upCount);
-        chartBackgroundColors.push(currentTheme.colors.success);
-        chartBorderColors.push(currentTheme.colors.success);
-
-        // Include "Degraded" status if it exists
-        if (analytics.degradedCount > 0) {
-            chartLabels.push("Degraded");
-            chartData.push(analytics.degradedCount);
-            chartBackgroundColors.push(currentTheme.colors.warning);
-            chartBorderColors.push(currentTheme.colors.warning);
-        }
-
-        // Always include "Down" status
-        chartLabels.push("Down");
-        chartData.push(analytics.downCount);
-        chartBackgroundColors.push(currentTheme.colors.error);
-        chartBorderColors.push(currentTheme.colors.error);
-
-        return {
+    const doughnutChartData = useMemo(
+        () => ({
             datasets: [
                 {
-                    backgroundColor: chartBackgroundColors,
-                    borderColor: chartBorderColors,
+                    backgroundColor: statusDistribution.backgroundColors,
+                    borderColor: statusDistribution.borderColors,
                     borderWidth: 1,
-                    data: chartData,
+                    data: statusDistribution.data,
                 },
             ],
-            labels: chartLabels,
-        };
-    }, [
-        analytics.degradedCount,
-        analytics.downCount,
-        analytics.upCount,
-        currentTheme,
-    ]);
+            labels: statusDistribution.labels,
+        }),
+        [statusDistribution]
+    );
 
     const handleCheckNowClick = useCallback(() => {
         void handleCheckNow();
@@ -374,8 +350,8 @@ export const SiteDetails = ({
                 handleTimeoutChange={handleTimeoutChange}
                 intervalChanged={intervalChanged}
                 isLoading={isLoading}
-                localCheckInterval={localCheckInterval}
-                localTimeout={localTimeout}
+                localCheckIntervalMs={localCheckIntervalMs}
+                localTimeoutSeconds={localTimeoutSeconds}
                 onCheckNow={handleCheckNowClick}
                 selectedMonitor={selectedMonitor}
                 slowestResponse={analytics.slowestResponse}
@@ -441,10 +417,10 @@ export const SiteDetails = ({
                 hasUnsavedChanges={hasUnsavedChanges}
                 intervalChanged={intervalChanged}
                 isLoading={isLoading}
-                localCheckInterval={localCheckInterval}
+                localCheckIntervalMs={localCheckIntervalMs}
                 localName={localName}
                 localRetryAttempts={localRetryAttempts}
-                localTimeout={localTimeout}
+                localTimeoutSeconds={localTimeoutSeconds}
                 retryAttemptsChanged={retryAttemptsChanged}
                 selectedMonitor={selectedMonitor}
                 setLocalName={setLocalName}

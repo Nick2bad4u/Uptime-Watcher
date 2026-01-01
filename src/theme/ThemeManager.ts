@@ -13,17 +13,17 @@
 /* eslint-disable @typescript-eslint/no-unnecessary-condition, sonarjs/different-types-comparison -- Defensive programming for test edge cases and cross-environment compatibility */
 // Defensive programming for test edge cases and cross-environment compatibility
 
+import { isRecord } from "@shared/utils/typeHelpers";
+
 import type { SystemThemePreference } from "./components/types";
 import type { Theme, ThemeName } from "./types";
 
 import { themes } from "./themes";
+import {
+    getPrefersDarkMode,
+    subscribePrefersDarkModeChange,
+} from "./utils/systemTheme";
 import { deepMergeTheme } from "./utils/themeMerging";
-
-const isObjectLike = (value: unknown): value is object =>
-    typeof value === "object" && value !== null;
-
-const isRecord = (value: unknown): value is Record<PropertyKey, unknown> =>
-    isObjectLike(value);
 
 type CssVariableKey = number | string;
 
@@ -158,12 +158,7 @@ export class ThemeManager {
      * @returns Dark if user prefers dark mode, "light" otherwise
      */
     public getSystemThemePreference(): SystemThemePreference {
-        if (typeof window !== "undefined" && window.matchMedia) {
-            return window.matchMedia("(prefers-color-scheme: dark)").matches
-                ? "dark"
-                : "light";
-        }
-        return "light";
+        return getPrefersDarkMode() ? "dark" : "light";
     }
 
     /**
@@ -215,21 +210,7 @@ export class ThemeManager {
     public onSystemThemeChange(
         callback: (isDark: boolean) => void
     ): () => void {
-        if (typeof window === "undefined") {
-            return () => {};
-        }
-
-        const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
-        const handler = (e: MediaQueryListEvent): void => {
-            callback(e.matches);
-        };
-
-        mediaQuery.addEventListener("change", handler);
-
-        // Return cleanup function
-        return () => {
-            mediaQuery.removeEventListener("change", handler);
-        };
+        return subscribePrefersDarkModeChange(callback);
     }
 
     /**
@@ -289,7 +270,7 @@ export class ThemeManager {
 
     private emitColorShades(
         categoryToken: string,
-        shades: Record<PropertyKey, unknown>,
+        shades: Record<string, unknown>,
         visitor: (property: string, value: string) => void
     ): void {
         for (const [shadeKey, nestedValue] of Object.entries(shades)) {

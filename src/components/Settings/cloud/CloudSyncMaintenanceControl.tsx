@@ -2,14 +2,12 @@ import type { CloudSyncResetResult } from "@shared/types/cloudSyncReset";
 import type { CloudSyncResetPreview } from "@shared/types/cloudSyncResetPreview";
 import type { JSX } from "react/jsx-runtime";
 
-import {
-    useCallback,
-    useState,
-} from "react";
+import { useCallback, useMemo, useState } from "react";
 
 import { ThemedButton } from "../../../theme/components/ThemedButton";
-import { ThemedText } from "../../../theme/components/ThemedText";
+import { AppIcons, getIconSize } from "../../../utils/icons";
 import { Modal } from "../../common/Modal/Modal";
+import { SyncMaintenanceCard } from "./SyncMaintenanceCard";
 import { SyncMaintenancePanel } from "./SyncMaintenancePanel";
 
 /**
@@ -44,6 +42,9 @@ export const CloudSyncMaintenanceControl = ({
     preview,
     syncEnabled,
 }: CloudSyncMaintenanceControlProperties): JSX.Element => {
+    const buttonIconSize = getIconSize("sm");
+    const OpenIcon = AppIcons.ui.expand;
+
     const [isOpen, setIsOpen] = useState(false);
 
     const handleOpen = useCallback((): void => {
@@ -62,23 +63,24 @@ export const CloudSyncMaintenanceControl = ({
         });
     }, []);
 
+    const description = (
+        useMemo(() => (<span>
+            Advanced tools for diagnosing and resetting remote sync history.
+        </span>), [])
+    );
+    const openIcon = useMemo(
+        () => <OpenIcon aria-hidden size={buttonIconSize} />,
+        [buttonIconSize, OpenIcon]
+    );
     return (
         <>
-            <div className="rounded-lg border border-zinc-800 bg-zinc-900/40 p-4">
-                <div className="mb-2 flex items-center justify-between gap-2">
-                    <ThemedText size="sm" variant="secondary" weight="medium">
-                        Sync Maintenance
-                    </ThemedText>
-                </div>
-
-                <ThemedText size="sm" variant="tertiary">
-                    Advanced tools for diagnosing and resetting remote sync
-                    history.
-                </ThemedText>
-
-                <div className="mt-3 flex flex-wrap gap-2">
+            <SyncMaintenanceCard
+                description={description}
+            >
+                <div className="flex flex-wrap gap-2">
                     <ThemedButton
                         data-testid="cloud-sync-maintenance-open"
+                        icon={openIcon}
                         onClick={handleOpen}
                         size="sm"
                         variant="secondary"
@@ -86,7 +88,7 @@ export const CloudSyncMaintenanceControl = ({
                         Open sync maintenance
                     </ThemedButton>
                 </div>
-            </div>
+            </SyncMaintenanceCard>
 
             <Modal
                 accent="warning"

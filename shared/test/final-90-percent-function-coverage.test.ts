@@ -8,8 +8,6 @@ import { describe, it, expect, vi } from "vitest";
 // Import all modules that contribute to function coverage
 import * as sharedTypes from "../types";
 import * as chartConfig from "../types/chartConfig";
-import * as formData from "../types/formData";
-import * as monitorConfig from "../types/monitorConfig";
 import * as themeConfig from "../types/themeConfig";
 import * as validation from "../types/validation";
 import * as cacheKeys from "../utils/cacheKeys";
@@ -24,7 +22,6 @@ import * as siteStatus from "../utils/siteStatus";
 import * as stringConversion from "../utils/stringConversion";
 import * as guardUtils from "../utils/typeGuards";
 import * as helperUtils from "../utils/typeHelpers";
-import * as validationUtils from "../utils/validation";
 import * as monitorSchemas from "../validation/monitorSchemas";
 import * as siteSchemas from "../validation/siteSchemas";
 import * as statusUpdateSchemas from "../validation/statusUpdateSchemas";
@@ -125,80 +122,6 @@ describe("Final 90% Function Coverage Push", () => {
         for (const funcName of functions) {
             try {
                 const func = (chartConfig as any)[funcName];
-                func();
-                func(null);
-                func(undefined);
-                func({});
-                func("test");
-                func(123);
-                func(true);
-                func([]);
-            } catch {
-                // Expected for some functions
-            }
-        }
-
-        expect(true).toBeTruthy();
-    });
-
-    it("should call ALL exported functions from formData", ({
-        task,
-        annotate,
-    }) => {
-        annotate(`Testing: ${task.name}`, "functional");
-        annotate("Component: final-90-percent-function-coverage", "component");
-        annotate("Category: Shared", "category");
-        annotate("Type: Export Operation", "type");
-
-        annotate(`Testing: ${task.name}`, "functional");
-        annotate("Component: final-90-percent-function-coverage", "component");
-        annotate("Category: Shared", "category");
-        annotate("Type: Export Operation", "type");
-
-        const functions = Object.keys(formData).filter(
-            (key) => typeof (formData as any)[key] === "function"
-        );
-
-        for (const funcName of functions) {
-            try {
-                const func = (formData as any)[funcName];
-                func();
-                func(null);
-                func(undefined);
-                func({});
-                func("test");
-                func(123);
-                func(true);
-                func([]);
-            } catch {
-                // Expected for some functions
-            }
-        }
-
-        expect(true).toBeTruthy();
-    });
-
-    it("should call ALL exported functions from monitorConfig", ({
-        task,
-        annotate,
-    }) => {
-        annotate(`Testing: ${task.name}`, "functional");
-        annotate("Component: final-90-percent-function-coverage", "component");
-        annotate("Category: Shared", "category");
-        annotate("Type: Export Operation", "type");
-
-        annotate(`Testing: ${task.name}`, "functional");
-        annotate("Component: final-90-percent-function-coverage", "component");
-        annotate("Category: Shared", "category");
-        annotate("Type: Export Operation", "type");
-
-        const functions = Object.keys(monitorConfig).filter(
-            (key) => typeof (monitorConfig as any)[key] === "function"
-        );
-
-        for (const funcName of functions) {
-            try {
-                const func = (monitorConfig as any)[funcName];
                 func();
                 func(null);
                 func(undefined);
@@ -443,15 +366,6 @@ describe("Final 90% Function Coverage Push", () => {
             func("Custom error message");
         });
 
-        // Validation utils
-        testModuleFunctions("validationUtils", validationUtils, (func) => {
-            func("http");
-            func("port");
-            func("ping");
-            func({ type: "http", url: "https://example.com" });
-            func({ identifier: "test", name: "test", monitors: [] });
-        });
-
         expect(true).toBeTruthy();
     });
 
@@ -625,8 +539,6 @@ describe("Final 90% Function Coverage Push", () => {
         const allModules = [
             sharedTypes,
             chartConfig,
-            formData,
-            monitorConfig,
             themeConfig,
             validation,
             cacheKeys,
@@ -641,7 +553,6 @@ describe("Final 90% Function Coverage Push", () => {
             stringConversion,
             guardUtils,
             helperUtils,
-            validationUtils,
             schemas,
             validatorUtilsModule,
         ];

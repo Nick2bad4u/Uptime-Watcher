@@ -21,6 +21,8 @@ import {
     type StatusHistoryStatus,
     type StatusUpdate,
 } from "@shared/types";
+import { createIpcCorrelationEnvelope } from "@shared/types/ipc";
+import { generateCorrelationId } from "@shared/utils/correlation";
 import type { IpcInvokeChannel, IpcInvokeChannelMap } from "../../types/ipc";
 
 // Define all mocks using vi.hoisted so they're available before vi.mock is hoisted
@@ -100,6 +102,15 @@ const asInvokeChannel = (channel: string): IpcInvokeChannel =>
     channel as IpcInvokeChannel;
 
 type GenericInvokeResult = IpcInvokeChannelMap[IpcInvokeChannel]["result"];
+
+const TEST_CORRELATION_ENVELOPE = createIpcCorrelationEnvelope(
+    generateCorrelationId()
+);
+
+type IpcValidatorParam = Parameters<typeof registerStandardizedIpcHandler>[2];
+type NonNullIpcValidator = Exclude<IpcValidatorParam, null>;
+
+const acceptAnyParamsValidator: NonNullIpcValidator = () => null;
 
 const registerTestHandler = (
     channel: string,
@@ -291,8 +302,13 @@ describe("IPC Communication - 100% Fast-Check Fuzzing Coverage", () => {
                         typeof data === "object" && data !== null
                 );
 
+                const validateParams: NonNullIpcValidator = (params) =>
+                    validator(params[0])
+                        ? null
+                        : ["Input must be a non-null object"];
+
                 const handlerSet = new Set<IpcInvokeChannel>();
-                registerTestHandler(channel, handler, null, handlerSet);
+                registerTestHandler(channel, handler, validateParams, handlerSet);
 
                 // Get the registered handler function
                 const registeredHandler = mockIpcMain.handle.mock.calls.find(
@@ -304,13 +320,19 @@ describe("IPC Communication - 100% Fast-Check Fuzzing Coverage", () => {
                 if (registeredHandler) {
                     try {
                         // Simulate IPC call
-                        const result = await registeredHandler({}, input);
+                        const result = await registeredHandler(
+                            {},
+                            input,
+                            TEST_CORRELATION_ENVELOPE
+                        );
 
                         if (validator(input)) {
                             expect(handler).toHaveBeenCalledWith(input);
-                            expect(result).toBe("success");
+                            expect(result).toHaveProperty("success", true);
+                            expect(result).toHaveProperty("data", "success");
                         } else {
                             // Validation should fail for invalid input
+                            expect(result).toHaveProperty("success", false);
                             expect(result).toHaveProperty("error");
                         }
                     } catch (error) {
@@ -364,7 +386,7 @@ describe("IPC Communication - 100% Fast-Check Fuzzing Coverage", () => {
                 )?.[1];
 
                 if (registeredHandler) {
-                    const result = await registeredHandler({}, {});
+                    const result = await registeredHandler({});
 
                     // Result should be wrapped in IPC response format
                     expect(result).toHaveProperty("success", true);
@@ -475,7 +497,17 @@ describe("IPC Communication - 100% Fast-Check Fuzzing Coverage", () => {
                     "required" in data &&
                     typeof (data as any).required === "string";
 
-                registerTestHandler(channel, handler, null, registeredHandlers);
+                const validateParams: NonNullIpcValidator = (params) =>
+                    strictValidator(params[0])
+                        ? null
+                        : ["Input must contain required: string"];
+
+                registerTestHandler(
+                    channel,
+                    handler,
+                    validateParams,
+                    registeredHandlers
+                );
 
                 const registeredHandler = mockIpcMain.handle.mock.calls.find(
                     (call) => call[0] === channel
@@ -483,13 +515,19 @@ describe("IPC Communication - 100% Fast-Check Fuzzing Coverage", () => {
 
                 if (registeredHandler) {
                     try {
-                        const result = await registeredHandler({}, input);
+                        const result = await registeredHandler(
+                            {},
+                            input,
+                            TEST_CORRELATION_ENVELOPE
+                        );
 
                         if (strictValidator(input)) {
-                            expect(handler).toHaveBeenCalled();
-                            expect(result).toBe("success");
+                            expect(handler).toHaveBeenCalledWith(input);
+                            expect(result).toHaveProperty("success", true);
+                            expect(result).toHaveProperty("data", "success");
                         } else {
                             // Should return error for invalid input
+                            expect(result).toHaveProperty("success", false);
                             expect(result).toHaveProperty("error");
                         }
                     } catch (error) {
@@ -500,9 +538,9 @@ describe("IPC Communication - 100% Fast-Check Fuzzing Coverage", () => {
             }
         );
 
-        fcTest.prop([arbitraryChannelName, fc.anything()])(
+        fcTest.prop([arbitraryChannelName])(
             "should handle handler errors",
-            async (channel, input) => {
+            async (channel) => {
                 mockIpcMain.handle.mockClear();
                 registeredHandlers.clear();
                 const errorHandler = vi.fn(() => {
@@ -522,7 +560,7 @@ describe("IPC Communication - 100% Fast-Check Fuzzing Coverage", () => {
 
                 if (registeredHandler) {
                     try {
-                        const result = await registeredHandler({}, input);
+                        const result = await registeredHandler({});
                         // Should return error object, not throw
                         expect(result).toHaveProperty("error");
                     } catch (error) {
@@ -556,19 +594,19 @@ describe("IPC Communication - 100% Fast-Check Fuzzing Coverage", () => {
             }
         });
 
-        fcTest.prop([fc.anything()])("should validate contextBridge exposure", (
-            apiData
-        ) => {
-            // Test that contextBridge is used properly
-            expect(mockContextBridge.exposeInMainWorld).toBeDefined();
+        fcTest.prop([fc.anything()])(
+            "should validate contextBridge exposure",
+            (apiData) => {
+                // Test that contextBridge is used properly
+                expect(mockContextBridge.exposeInMainWorld).toBeDefined();
 
-            // Should expose APIs safely
-            mockContextBridge.exposeInMainWorld("electronAPI", apiData);
-            expect(mockContextBridge.exposeInMainWorld).toHaveBeenCalledWith(
-                "electronAPI",
-                apiData
-            );
-        });
+                // Should expose APIs safely
+                mockContextBridge.exposeInMainWorld("electronAPI", apiData);
+                expect(
+                    mockContextBridge.exposeInMainWorld
+                ).toHaveBeenCalledWith("electronAPI", apiData);
+            }
+        );
 
         test("should not expose dangerous globals", () => {
             const dangerousProperties = [
@@ -612,8 +650,9 @@ describe("IPC Communication - 100% Fast-Check Fuzzing Coverage", () => {
 
                 if (registeredHandler) {
                     // Simulate multiple simultaneous calls
-                    const promises = Array.from({ length: callCount }, (_, i) =>
-                        registeredHandler({}, { callId: i }));
+                    const promises = Array.from({ length: callCount }, () =>
+                        registeredHandler({})
+                    );
 
                     const results = await Promise.allSettled(promises);
 
@@ -675,7 +714,7 @@ describe("IPC Communication - 100% Fast-Check Fuzzing Coverage", () => {
                 )?.[1];
 
                 if (registeredHandler) {
-                    const result = await registeredHandler({}, {});
+                    const result = await registeredHandler({});
 
                     // Should return error object, not throw
                     expect(result).toHaveProperty("error");
@@ -703,7 +742,7 @@ describe("IPC Communication - 100% Fast-Check Fuzzing Coverage", () => {
 
             if (registeredHandler) {
                 // Should handle circular references by catching the error
-                const result = await registeredHandler({}, {});
+                const result = await registeredHandler({});
 
                 // Since circular references cause JSON serialization errors,
                 // the system should either handle it gracefully or return an error response
@@ -741,14 +780,28 @@ describe("IPC Communication - 100% Fast-Check Fuzzing Coverage", () => {
                     typeof (data as any).name === "string" &&
                     typeof (data as any).url === "string";
 
-                registerTestHandler(channel, handler, null, registeredHandlers);
+                const validateParams: NonNullIpcValidator = (params) =>
+                    siteValidator(params[0])
+                        ? null
+                        : ["Site data must include name and url strings"];
+
+                registerTestHandler(
+                    channel,
+                    handler,
+                    validateParams,
+                    registeredHandlers
+                );
 
                 const registeredHandler = mockIpcMain.handle.mock.calls.find(
                     (call) => call[0] === channel
                 )?.[1];
 
                 if (registeredHandler) {
-                    const result = await registeredHandler({}, siteData);
+                    const result = await registeredHandler(
+                        {},
+                        siteData,
+                        TEST_CORRELATION_ENVELOPE
+                    );
 
                     if (siteValidator(siteData)) {
                         expect(handler).toHaveBeenCalledWith(siteData);
@@ -757,9 +810,6 @@ describe("IPC Communication - 100% Fast-Check Fuzzing Coverage", () => {
                         expect(result.data).toMatchObject({
                             identifier: "new-site",
                         });
-                    } else {
-                        // For invalid data, the handler should still be called since we have no validation
-                        expect(result).toHaveProperty("success", true);
                     }
                 }
             }
@@ -784,22 +834,35 @@ describe("IPC Communication - 100% Fast-Check Fuzzing Coverage", () => {
                     typeof (data as any).siteIdentifier === "string" &&
                     typeof (data as any).status === "string";
 
-                registerTestHandler(channel, handler, null, registeredHandlers);
+                const validateParams: NonNullIpcValidator = (params) =>
+                    monitoringValidator(params[0])
+                        ? null
+                        : [
+                              "Monitoring data must include siteIdentifier and status strings",
+                          ];
+
+                registerTestHandler(
+                    channel,
+                    handler,
+                    validateParams,
+                    registeredHandlers
+                );
 
                 const registeredHandler = mockIpcMain.handle.mock.calls.find(
                     (call) => call[0] === channel
                 )?.[1];
 
                 if (registeredHandler) {
-                    const result = await registeredHandler({}, monitoringData);
+                    const result = await registeredHandler(
+                        {},
+                        monitoringData,
+                        TEST_CORRELATION_ENVELOPE
+                    );
 
                     if (monitoringValidator(monitoringData)) {
                         expect(handler).toHaveBeenCalledWith(monitoringData);
                         expect(result).toHaveProperty("success", true);
                         expect(result).toHaveProperty("data", "updated");
-                    } else {
-                        // For invalid data, the handler should still be called since we have no validation
-                        expect(result).toHaveProperty("success", true);
                     }
                 }
             }
@@ -819,20 +882,31 @@ describe("IPC Communication - 100% Fast-Check Fuzzing Coverage", () => {
                 ): data is typeof settingsData =>
                     typeof data === "object" && data !== null;
 
-                registerTestHandler(channel, handler, null, registeredHandlers);
+                const validateParams: NonNullIpcValidator = (params) =>
+                    settingsValidator(params[0])
+                        ? null
+                        : ["Settings payload must be an object"];
+
+                registerTestHandler(
+                    channel,
+                    handler,
+                    validateParams,
+                    registeredHandlers
+                );
 
                 const registeredHandler = mockIpcMain.handle.mock.calls.find(
                     (call) => call[0] === channel
                 )?.[1];
 
                 if (registeredHandler) {
-                    const result = await registeredHandler({}, settingsData);
+                    const result = await registeredHandler(
+                        {},
+                        settingsData,
+                        TEST_CORRELATION_ENVELOPE
+                    );
 
                     if (settingsValidator(settingsData)) {
                         expect(handler).toHaveBeenCalledWith(settingsData);
-                        expect(result).toHaveProperty("success", true);
-                    } else {
-                        // For invalid data, the handler should still be called since we have no validation
                         expect(result).toHaveProperty("success", true);
                     }
                 }
@@ -849,17 +923,26 @@ describe("IPC Communication - 100% Fast-Check Fuzzing Coverage", () => {
                 const channel = "test:edge-cases";
                 const handler = vi.fn(() => Promise.resolve("success"));
 
-                registerTestHandler(channel, handler, null, registeredHandlers);
+                registerTestHandler(
+                    channel,
+                    handler,
+                    acceptAnyParamsValidator,
+                    registeredHandlers
+                );
 
                 const registeredHandler = mockIpcMain.handle.mock.calls.find(
                     (call) => call[0] === channel
                 )?.[1];
 
                 if (registeredHandler) {
-                    const result = await registeredHandler({}, input);
+                    const result = await registeredHandler(
+                        {},
+                        input,
+                        TEST_CORRELATION_ENVELOPE
+                    );
 
-                    // Since no validation is performed (validator is null),
-                    // all handlers should be called and return success
+                    // Since validation is permissive, all handlers should be
+                    // called and return success.
                     expect(handler).toHaveBeenCalled();
                     expect(result).toHaveProperty("success", true);
                     expect(result).toHaveProperty("data");

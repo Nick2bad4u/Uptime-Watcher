@@ -56,6 +56,21 @@ vi.mock("@shared/validation/validatorUtils", () => ({
     isNonEmptyString: vi.fn(
         (value) => typeof value === "string" && value.trim().length > 0
     ),
+    isValidLowercaseHexString: vi.fn((value, length) => {
+        if (typeof value !== "string") {
+            return false;
+        }
+
+        if (typeof length !== "number" || !Number.isFinite(length)) {
+            return false;
+        }
+
+        if (value.length !== length) {
+            return false;
+        }
+
+        return /^[\da-f]+$/u.test(value);
+    }),
     isValidUrl: vi.fn(
         (value) =>
             typeof value === "string" && /^(?:https?:\/\/)[^\s]+$/u.test(value)
@@ -1571,15 +1586,78 @@ describe("IPC Utils - Comprehensive Coverage", () => {
                 expect(handleCall).toBeDefined();
 
                 const registeredFunction = handleCall![1];
+
+                // ValidateParams === null means: no-arg channel only.
+                const result = await registeredFunction({} as any);
+
+                expect(mockHandler).toHaveBeenCalledWith();
+                expect(result.success).toBeTruthy();
+                expect(result.data).toBe("execution test");
+            });
+
+            it("should reject unexpected args when validateParams is null", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "regression");
+                await annotate("Component: utils", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Validation", "type");
+
+                const mockHandler = vi.fn().mockResolvedValue("execution test");
+                const registeredHandlers = new Set<TestChannel>();
+
+                registerStandardizedIpcHandler(
+                    CHANNELS_FOR_TESTS.execution,
+                    mockHandler,
+                    null,
+                    registeredHandlers
+                );
+
+                const handleCall = vi
+                    .mocked(ipcMain.handle)
+                    .mock.calls.find(
+                        (call) => call[0] === CHANNELS_FOR_TESTS.execution
+                    );
+                expect(handleCall).toBeDefined();
+
+                const registeredFunction = handleCall![1];
                 const result = await registeredFunction(
                     {} as any,
                     "arg1",
                     "arg2"
                 );
 
-                expect(mockHandler).toHaveBeenCalledWith("arg1", "arg2");
-                expect(result.success).toBeTruthy();
-                expect(result.data).toBe("execution test");
+                expect(mockHandler).not.toHaveBeenCalled();
+                expect(result.success).toBeFalsy();
+                expect(result.error).toContain(
+                    "Unexpected IPC parameters"
+                );
+            });
+
+            it("should throw when handler expects params but validateParams is null", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "regression");
+                await annotate("Component: utils", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Validation", "type");
+
+                const registeredHandlers = new Set<TestChannel>();
+
+                // Function length must be > 0 to trigger the guard.
+                const paramHandler = async (_value: string) =>
+                    "param handler";
+
+                expect(() =>
+                    registerStandardizedIpcHandler(
+                        CHANNELS_FOR_TESTS.validatedExecution,
+                        paramHandler as never,
+                        null,
+                        registeredHandlers
+                    )
+                ).toThrowError(/Missing validateParams/u);
             });
 
             it("should execute registered handler with validation", async ({
@@ -1688,7 +1766,8 @@ describe("IPC Utils - Comprehensive Coverage", () => {
                         vi.fn(),
                         null,
                         registeredHandlers
-                    )).toThrowError(
+                    )
+                ).toThrowError(
                     `[IpcService] Attempted to register duplicate IPC handler for channel '${CHANNELS_FOR_TESTS.duplicate}'`
                 );
 
@@ -1730,7 +1809,8 @@ describe("IPC Utils - Comprehensive Coverage", () => {
                         vi.fn(),
                         null,
                         registeredHandlers
-                    )).toThrowError(registrationError);
+                    )
+                ).toThrowError(registrationError);
 
                 expect(
                     registeredHandlers.has(CHANNELS_FOR_TESTS.failure)

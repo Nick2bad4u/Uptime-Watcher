@@ -49,6 +49,9 @@
  * @see {@link checkHttpConnectivity} - HTTP/HTTPS connectivity checking
  */
 
+import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
+import { isValidUrl } from "@shared/validation/validatorUtils";
+
 import type { MonitorCheckResult } from "../types";
 
 import { RETRY_BACKOFF } from "../../../constants";
@@ -92,16 +95,14 @@ export async function performSinglePingCheck(
 ): Promise<MonitorCheckResult> {
     try {
         // Determine check type based on host format
-        // eslint-disable-next-line regexp/require-unicode-sets-regexp -- The `v` flag is not consistently supported across our Electron/TypeScript toolchain; `u` is sufficient for this ASCII-only protocol prefix.
-        const isHttpUrl = /^https?:\/\//iu.test(host);
+        const isHttpUrl = isValidUrl(host);
 
         // Use native connectivity check instead of ping package
         return isHttpUrl
             ? await checkHttpConnectivity(host, timeout)
             : await checkConnectivity(host, { retries: 0, timeout });
     } catch (error) {
-        const errorMessage =
-            error instanceof Error ? error.message : String(error);
+        const errorMessage = getUserFacingErrorDetail(error);
 
         throw new Error(`Connectivity check failed: ${errorMessage}`, {
             cause: error,

@@ -127,36 +127,35 @@ export class MonitoringLifecycleCoordinator {
             );
 
             // Resume monitoring for each monitor individually
-            const resumePromises = monitorsToResume.map(async ({
-                monitor,
-                site,
-            }) => {
-                try {
-                    const success =
-                        await this.monitorManager.startMonitoringForSite(
-                            site.identifier,
-                            monitor.id
-                        );
+            const resumePromises = monitorsToResume.map(
+                async ({ monitor, site }) => {
+                    try {
+                        const success =
+                            await this.monitorManager.startMonitoringForSite(
+                                site.identifier,
+                                monitor.id
+                            );
 
-                    if (success) {
-                        logger.debug(
-                            `[UptimeOrchestrator] Successfully resumed monitoring for monitor: ${site.identifier}/${monitor.id}`
+                        if (success) {
+                            logger.debug(
+                                `[UptimeOrchestrator] Successfully resumed monitoring for monitor: ${site.identifier}/${monitor.id}`
+                            );
+                        } else {
+                            logger.warn(
+                                `[UptimeOrchestrator] Failed to resume monitoring for monitor: ${site.identifier}/${monitor.id}`
+                            );
+                        }
+
+                        return success;
+                    } catch (error) {
+                        logger.error(
+                            `[UptimeOrchestrator] Error resuming monitoring for monitor ${site.identifier}/${monitor.id}:`,
+                            error
                         );
-                    } else {
-                        logger.warn(
-                            `[UptimeOrchestrator] Failed to resume monitoring for monitor: ${site.identifier}/${monitor.id}`
-                        );
+                        return false;
                     }
-
-                    return success;
-                } catch (error) {
-                    logger.error(
-                        `[UptimeOrchestrator] Error resuming monitoring for monitor ${site.identifier}/${monitor.id}:`,
-                        error
-                    );
-                    return false;
                 }
-            });
+            );
 
             // Wait for all to complete (use allSettled to handle failures gracefully)
             const results = await Promise.allSettled(resumePromises);
@@ -176,7 +175,74 @@ export class MonitoringLifecycleCoordinator {
         }
     }
 
-    public constructor(
+    private async handleSiteMonitoringToggleRequested(args: {
+        identifier: string;
+        kind: "start" | "stop";
+        monitorId?: string;
+    }): Promise<void> {
+        const { identifier, kind, monitorId } = args;
+
+        try {
+            const success =
+                kind === "start"
+                    ? await this.monitorManager.startMonitoringForSite(
+                          identifier,
+                          monitorId
+                      )
+                    : await this.monitorManager.stopMonitoringForSite(
+                          identifier,
+                          monitorId
+                      );
+
+            if (kind === "start") {
+                await this.emitTyped(
+                    "internal:site:start-monitoring-response",
+                    this.buildStartMonitoringResponse(
+                        monitorId
+                            ? { identifier, monitorId, success }
+                            : { identifier, success }
+                    )
+                );
+            } else {
+                await this.emitTyped(
+                    "internal:site:stop-monitoring-response",
+                    this.buildStopMonitoringResponse(
+                        monitorId
+                            ? { identifier, monitorId, success }
+                            : { identifier, success }
+                    )
+                );
+            }
+        } catch (error) {
+            const actionLabel = kind === "start" ? "starting" : "stopping";
+            logger.error(
+                `[UptimeOrchestrator] Error ${actionLabel} monitoring for site ${identifier}:`,
+                error
+            );
+
+            if (kind === "start") {
+                await this.emitTyped(
+                    "internal:site:start-monitoring-response",
+                    this.buildStartMonitoringResponse(
+                        monitorId
+                            ? { identifier, monitorId, success: false }
+                            : { identifier, success: false }
+                    )
+                );
+            } else {
+                await this.emitTyped(
+                    "internal:site:stop-monitoring-response",
+                    this.buildStopMonitoringResponse(
+                        monitorId
+                            ? { identifier, monitorId, success: false }
+                            : { identifier, success: false }
+                    )
+                );
+            }
+        }
+    }
+
+public constructor(
         dependencies: MonitoringLifecycleCoordinatorDependencies
     ) {
         this.monitorManager = dependencies.monitorManager;
@@ -184,51 +250,60 @@ export class MonitoringLifecycleCoordinator {
         this.emitTyped = dependencies.emitTyped;
     }
 
+    private buildStartMonitoringResponse(args: {
+        identifier: string;
+        monitorId?: string;
+        success: boolean;
+    }): UptimeEvents["internal:site:start-monitoring-response"] {
+        return {
+            identifier: args.identifier,
+            operation: "start-monitoring-response",
+            success: args.success,
+            timestamp: Date.now(),
+            ...(args.monitorId ? { monitorId: args.monitorId } : {}),
+        };
+    }
+
+    private buildStopMonitoringResponse(args: {
+        identifier: string;
+        monitorId?: string;
+        success: boolean;
+    }): UptimeEvents["internal:site:stop-monitoring-response"] {
+        return {
+            identifier: args.identifier,
+            operation: "stop-monitoring-response",
+            success: args.success,
+            timestamp: Date.now(),
+            ...(args.monitorId ? { monitorId: args.monitorId } : {}),
+        };
+    }
+
+    private buildRestartMonitoringResponse(args: {
+        identifier: string;
+        monitorId: string;
+        success: boolean;
+    }): UptimeEvents["internal:site:restart-monitoring-response"] {
+        return {
+            identifier: args.identifier,
+            monitorId: args.monitorId,
+            operation: "restart-monitoring-response",
+            success: args.success,
+            timestamp: Date.now(),
+        };
+    }
+
+
+
     /** Event handler for monitoring start requests. */
     public handleStartMonitoringRequestedEvent(
         data: StartMonitoringRequestData
     ): void {
         void (async (): Promise<void> => {
-            try {
-                const success =
-                    await this.monitorManager.startMonitoringForSite(
-                        data.identifier,
-                        data.monitorId
-                    );
-                const payload: UptimeEvents["internal:site:start-monitoring-response"] =
-                    {
-                        identifier: data.identifier,
-                        operation: "start-monitoring-response",
-                        success,
-                        timestamp: Date.now(),
-                        ...(data.monitorId
-                            ? { monitorId: data.monitorId }
-                            : {}),
-                    };
-                await this.emitTyped(
-                    "internal:site:start-monitoring-response",
-                    payload
-                );
-            } catch (error) {
-                logger.error(
-                    `[UptimeOrchestrator] Error starting monitoring for site ${data.identifier}:`,
-                    error
-                );
-                const failurePayload: UptimeEvents["internal:site:start-monitoring-response"] =
-                    {
-                        identifier: data.identifier,
-                        operation: "start-monitoring-response",
-                        success: false,
-                        timestamp: Date.now(),
-                        ...(data.monitorId
-                            ? { monitorId: data.monitorId }
-                            : {}),
-                    };
-                await this.emitTyped(
-                    "internal:site:start-monitoring-response",
-                    failurePayload
-                );
-            }
+            await this.handleSiteMonitoringToggleRequested({
+                identifier: data.identifier,
+                kind: "start",
+                ...(data.monitorId ? { monitorId: data.monitorId } : {}),
+            });
         })();
     }
 
@@ -237,31 +312,11 @@ export class MonitoringLifecycleCoordinator {
         data: StopMonitoringRequestData
     ): void {
         void (async (): Promise<void> => {
-            try {
-                const success = await this.monitorManager.stopMonitoringForSite(
-                    data.identifier,
-                    data.monitorId
-                );
-                await this.emitTyped("internal:site:stop-monitoring-response", {
-                    identifier: data.identifier,
-                    monitorId: data.monitorId,
-                    operation: "stop-monitoring-response",
-                    success,
-                    timestamp: Date.now(),
-                });
-            } catch (error) {
-                logger.error(
-                    `[UptimeOrchestrator] Error stopping monitoring for site ${data.identifier}:`,
-                    error
-                );
-                await this.emitTyped("internal:site:stop-monitoring-response", {
-                    identifier: data.identifier,
-                    monitorId: data.monitorId,
-                    operation: "stop-monitoring-response",
-                    success: false,
-                    timestamp: Date.now(),
-                });
-            }
+            await this.handleSiteMonitoringToggleRequested({
+                identifier: data.identifier,
+                kind: "stop",
+                ...(data.monitorId ? { monitorId: data.monitorId } : {}),
+            });
         })();
     }
 
@@ -302,13 +357,11 @@ export class MonitoringLifecycleCoordinator {
                 );
                 await this.emitTyped(
                     "internal:site:restart-monitoring-response",
-                    {
+                    this.buildRestartMonitoringResponse({
                         identifier: data.identifier,
                         monitorId: data.monitor.id,
-                        operation: "restart-monitoring-response",
                         success,
-                        timestamp: Date.now(),
-                    }
+                    })
                 );
             } catch (error) {
                 logger.error(
@@ -317,13 +370,11 @@ export class MonitoringLifecycleCoordinator {
                 );
                 await this.emitTyped(
                     "internal:site:restart-monitoring-response",
-                    {
+                    this.buildRestartMonitoringResponse({
                         identifier: data.identifier,
                         monitorId: data.monitor.id,
-                        operation: "restart-monitoring-response",
                         success: false,
-                        timestamp: Date.now(),
-                    }
+                    })
                 );
             }
         })();

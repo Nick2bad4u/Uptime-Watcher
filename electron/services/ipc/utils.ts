@@ -14,11 +14,14 @@ import type { UnknownRecord } from "type-fest";
 
 import { isIpcCorrelationEnvelope } from "@shared/types/ipc";
 import { MONITOR_TYPES_CHANNELS } from "@shared/types/preload";
+import { generateCorrelationId } from "@shared/utils/correlation";
 import {
     normalizeLogValue,
     withLogContext,
 } from "@shared/utils/loggingContext";
 import { validateExternalOpenUrlCandidate } from "@shared/utils/urlSafety";
+import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
+import { getUtfByteLength } from "@shared/utils/utfByteLength";
 import {
     isNonEmptyString,
     isValidUrl,
@@ -32,9 +35,8 @@ import type {
 } from "./types";
 
 import { isDev } from "../../electronUtils";
-import { generateCorrelationId } from "../../utils/correlation";
 import { logger } from "../../utils/logger";
-import { getUtfByteLength, truncateUtfString } from "./diagnosticsLimits";
+import { truncateUtfString } from "./diagnosticsLimits";
 
 const HIGH_FREQUENCY_OPERATIONS = new Set<string>([
     MONITOR_TYPES_CHANNELS.formatMonitorDetail,
@@ -50,6 +52,32 @@ const HIGH_FREQUENCY_OPERATIONS = new Set<string>([
  * logging work at IPC boundaries.
  */
 const MAX_IPC_URL_UTF_BYTES = 32_768;
+
+function validateIpcUrlStringGuards(
+    value: string,
+    paramName: string
+): null | string {
+    return /[\n\r]/u.test(value)
+        ? `${paramName} must not contain newlines`
+        : null;
+}
+
+const validateIpcUrlPayloadGuards = (
+    value: unknown,
+    paramName: string
+): null | string => {
+    if (typeof value !== "string") {
+        return null;
+    }
+
+    const byteLength = getUtfByteLength(value);
+
+    if (byteLength > MAX_IPC_URL_UTF_BYTES) {
+        return `${paramName} must not exceed ${MAX_IPC_URL_UTF_BYTES} bytes`;
+    }
+
+    return validateIpcUrlStringGuards(value, paramName);
+};
 
 /** Maximum bytes allowed for IPC error messages returned to the renderer. */
 const MAX_IPC_ERROR_MESSAGE_UTF_BYTES = 4096;
@@ -119,6 +147,17 @@ type StrictIpcInvokeHandler<TChannel extends IpcInvokeChannel> = (
 ) =>
     | IpcInvokeChannelResult<TChannel>
     | Promise<IpcInvokeChannelResult<TChannel>>;
+
+/**
+ * Curried registrar type for standardized IPC handlers.
+ */
+export type StandardizedIpcRegistrar = <TChannel extends IpcInvokeChannel>(
+    channelName: TChannel,
+    handler: StrictIpcInvokeHandler<TChannel>,
+    ...validatorArgs: ChannelParams<TChannel> extends readonly []
+        ? [validateParams?: IpcParameterValidator | null]
+        : [validateParams: IpcParameterValidator]
+) => void;
 
 function assertChannelParams<TChannel extends IpcInvokeChannel>(
     channelName: TChannel,
@@ -216,8 +255,7 @@ async function executeIpcHandler<T>(
         };
     } catch (error) {
         const duration = Date.now() - startTime;
-        const rawErrorMessage =
-            error instanceof Error ? error.message : String(error);
+        const rawErrorMessage = getUserFacingErrorDetail(error);
         const errorMessage = normalizeIpcErrorMessage(rawErrorMessage);
 
         logger.error(
@@ -283,24 +321,17 @@ export const IpcValidators = {
      * `shell.openExternal`.
      *
      * @remarks
-     * This differs from {@link requiredUrl} by allowing `mailto:` in addition
-     * to `http:` and `https:`. It also enforces the same defense-in-depth size
-     * and newline constraints used by {@link requiredUrl}.
+     * This differs from {@link requiredUrl} by allowing `mailto:` in addition to
+     * `http:` and `https:`. It also enforces the same defense-in-depth size and
+     * newline constraints used by {@link requiredUrl}.
      */
     requiredExternalOpenUrl: (
         value: unknown,
         paramName: string
     ): null | string => {
-        if (typeof value === "string") {
-            const byteLength = getUtfByteLength(value);
-            if (byteLength > MAX_IPC_URL_UTF_BYTES) {
-                return `${paramName} must not exceed ${MAX_IPC_URL_UTF_BYTES} bytes`;
-            }
-
-            // eslint-disable-next-line regexp/require-unicode-sets-regexp -- The `v` flag is not consistently supported across our TypeScript/Electron toolchain; `u` is sufficient for this ASCII-only newline check.
-            if (/[\n\r]/u.test(value)) {
-                return `${paramName} must not contain newlines`;
-            }
+        const guardError = validateIpcUrlPayloadGuards(value, paramName);
+        if (guardError) {
+            return guardError;
         }
 
         const validation = validateExternalOpenUrlCandidate(value);
@@ -368,16 +399,9 @@ export const IpcValidators = {
      * @returns Error message or null if valid
      */
     requiredUrl: (value: unknown, paramName: string): null | string => {
-        if (typeof value === "string") {
-            const byteLength = getUtfByteLength(value);
-            if (byteLength > MAX_IPC_URL_UTF_BYTES) {
-                return `${paramName} must not exceed ${MAX_IPC_URL_UTF_BYTES} bytes`;
-            }
-
-            // eslint-disable-next-line regexp/require-unicode-sets-regexp -- The `v` flag is not consistently supported across our TypeScript/Electron toolchain; `u` is sufficient for this ASCII-only newline check.
-            if (/[\n\r]/u.test(value)) {
-                return `${paramName} must not contain newlines`;
-            }
+        const guardError = validateIpcUrlPayloadGuards(value, paramName);
+        if (guardError) {
+            return guardError;
         }
 
         if (
@@ -391,6 +415,26 @@ export const IpcValidators = {
         return null;
     },
 } as const;
+
+/**
+ * Converts an {@link ArrayBufferView} into a standalone {@link ArrayBuffer}
+ * containing exactly the view's bytes.
+ *
+ * @remarks
+ * Useful for IPC payloads when you want to send a plain ArrayBuffer to the
+ * renderer without leaking extra bytes from a larger underlying buffer.
+ */
+export function toClonedArrayBuffer(view: ArrayBufferView): ArrayBuffer {
+    const { buffer, byteLength, byteOffset } = view;
+
+    if (buffer instanceof ArrayBuffer) {
+        return buffer.slice(byteOffset, byteOffset + byteLength);
+    }
+
+    const out = new ArrayBuffer(byteLength);
+    new Uint8Array(out).set(new Uint8Array(buffer, byteOffset, byteLength));
+    return out;
+}
 
 /**
  * Creates a standardized error response.
@@ -516,7 +560,8 @@ export function createValidationResponse(
  * import { SITES_CHANNELS } from "@shared/types/preload";
  *
  * const result = await withIpcHandler(SITES_CHANNELS.getSites, async () =>
- *     this.uptimeOrchestrator.getSites());
+ *     this.uptimeOrchestrator.getSites()
+ * );
  * ```
  *
  * @param channelName - Name of the IPC channel
@@ -662,6 +707,24 @@ export function registerStandardizedIpcHandler<
     validateParams: IpcParameterValidator | null,
     registeredHandlers: Set<IpcInvokeChannel>
 ): void {
+    if (validateParams === null && handler.length > 0) {
+        const errorMessage = `[IpcService] Missing validateParams for '${channelName}'. Handlers that accept parameters must provide runtime validation.`;
+
+        logger.error(
+            errorMessage,
+            withLogContext({
+                channel: channelName,
+                event: "ipc:handler:register",
+                severity: "error",
+            }),
+            {
+                channel: channelName,
+            }
+        );
+
+        throw new Error(errorMessage);
+    }
+
     if (registeredHandlers.has(channelName)) {
         const errorMessage = `[IpcService] Attempted to register duplicate IPC handler for channel '${channelName}'`;
 
@@ -733,20 +796,44 @@ export function registerStandardizedIpcHandler<
                           metadata: baseMetadata,
                       };
 
-            if (validateParams) {
-                return withIpcHandlerValidation(
+            if (validateParams === null) {
+                if (args.length > 0) {
+                    logger.warn(
+                        "[IpcHandler] Rejected IPC invocation with unexpected parameters",
+                        withLogContext({
+                            channel: channelName,
+                            ...correlationMetadata,
+                            event: "ipc:handler:unexpected-params",
+                            severity: "warn",
+                        }),
+                        {
+                            paramCount: args.length,
+                        }
+                    );
+
+                    return createErrorResponse(
+                        `Unexpected IPC parameters for ${channelName}. This channel does not accept any parameters.`,
+                        {
+                            handler: channelName,
+                            ...correlationMetadata,
+                            paramCount: args.length,
+                        }
+                    );
+                }
+
+                return withIpcHandler(
                     channelName,
-                    (...validatedParams: ChannelParams<TChannel>) =>
-                        handler(...validatedParams),
-                    validateParams,
-                    args,
+                    () => handler(...args),
                     handlerOptions
                 );
             }
 
-            return withIpcHandler(
+            return withIpcHandlerValidation(
                 channelName,
-                () => handler(...args),
+                (...validatedParams: ChannelParams<TChannel>) =>
+                    handler(...validatedParams),
+                validateParams,
+                args,
                 handlerOptions
             );
         });
@@ -754,7 +841,9 @@ export function registerStandardizedIpcHandler<
         registeredHandlers.delete(channelName);
 
         const error =
-            rawError instanceof Error ? rawError : new Error(String(rawError));
+            rawError instanceof Error
+                ? rawError
+                : new Error(getUserFacingErrorDetail(rawError));
 
         logger.error(
             `[IpcService] Failed to register IPC handler for channel '${channelName}'`,
@@ -768,4 +857,32 @@ export function registerStandardizedIpcHandler<
 
         throw error;
     }
+}
+
+/**
+ * Creates a typed registrar for {@link registerStandardizedIpcHandler}.
+ *
+ * @remarks
+ * Handler modules typically register multiple channels. Currying the shared
+ * `registeredHandlers` set avoids repeating it for every registration call.
+ */
+export function createStandardizedIpcRegistrar(
+    registeredHandlers: Set<IpcInvokeChannel>
+): StandardizedIpcRegistrar {
+    return function register<TChannel extends IpcInvokeChannel>(
+        channelName: TChannel,
+        handler: StrictIpcInvokeHandler<TChannel>,
+        ...validatorArgs: ChannelParams<TChannel> extends readonly []
+            ? [validateParams?: IpcParameterValidator | null]
+            : [validateParams: IpcParameterValidator]
+    ): void {
+        const validateParams = validatorArgs[0] ?? null;
+
+        registerStandardizedIpcHandler(
+            channelName,
+            handler,
+            validateParams,
+            registeredHandlers
+        );
+    };
 }

@@ -20,7 +20,7 @@
 import { bench, describe, beforeEach, vi } from "vitest";
 import { SiteRepository } from "../../electron/services/database/SiteRepository";
 import type { DatabaseService } from "../../electron/services/database/DatabaseService";
-import type { SiteRow } from "../../electron/services/database/utils/siteMapper";
+import type { SiteRow } from "../../electron/services/database/utils/mappers/siteMapper";
 import type { Database } from "node-sqlite3-wasm";
 import { randomUUID } from "node:crypto";
 
@@ -287,7 +287,7 @@ describe("Site Repository Performance", () => {
             await repository.bulkInsert(testSites);
 
             // Benchmark export
-            await repository.exportAll();
+            await repository.exportAllRows();
         },
         { warmupIterations: 5, iterations: 10_000 }
     );
@@ -300,7 +300,7 @@ describe("Site Repository Performance", () => {
             await repository.bulkInsert(testSites);
 
             // Benchmark export
-            await repository.exportAll();
+            await repository.exportAllRows();
         },
         { warmupIterations: 3, iterations: 1000 }
     );
@@ -313,7 +313,7 @@ describe("Site Repository Performance", () => {
             await repository.bulkInsert(testSites);
 
             // Benchmark export
-            await repository.exportAll();
+            await repository.exportAllRows();
         },
         { warmupIterations: 2, iterations: 100 }
     );

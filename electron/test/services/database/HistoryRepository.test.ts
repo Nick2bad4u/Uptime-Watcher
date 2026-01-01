@@ -27,15 +27,15 @@ import type { DatabaseService } from "../../../services/database/DatabaseService
 import type { StatusHistory } from "@shared/types";
 
 // Import mocked modules
-import * as historyManipulation from "../../../services/database/utils/historyManipulation";
-import * as historyQuery from "../../../services/database/utils/historyQuery";
+import * as historyManipulation from "../../../services/database/utils/maintenance/historyManipulation";
+import * as historyQuery from "../../../services/database/utils/queries/historyQuery";
 import * as operationalHooks from "../../../utils/operationalHooks";
 import * as logger from "../../../utils/logger";
 import * as electronUtils from "../../../electronUtils";
 
 // Mock the modules
-vi.mock("../../../services/database/utils/historyManipulation");
-vi.mock("../../../services/database/utils/historyQuery");
+vi.mock("../../../services/database/utils/maintenance/historyManipulation");
+vi.mock("../../../services/database/utils/queries/historyQuery");
 vi.mock("../../../utils/operationalHooks");
 vi.mock("../../../utils/logger");
 vi.mock("../../../electronUtils");
@@ -67,7 +67,8 @@ describe(HistoryRepository, () => {
         mockDatabaseService = {
             getDatabase: vi.fn(() => mockDatabase),
             executeTransaction: vi.fn((callback) =>
-                Promise.resolve(callback(mockDatabase))),
+                Promise.resolve(callback(mockDatabase))
+            ),
         } as unknown as DatabaseService;
 
         dependencies = {
@@ -77,9 +78,9 @@ describe(HistoryRepository, () => {
         historyRepository = new HistoryRepository(dependencies);
 
         // Setup default mocks
-        vi.mocked(operationalHooks.withDatabaseOperation).mockImplementation((
-            operation
-        ) => operation());
+        vi.mocked(operationalHooks.withDatabaseOperation).mockImplementation(
+            (operation) => operation()
+        );
         vi.mocked(electronUtils.isDev).mockReturnValue(true);
 
         // Clear all mocks
@@ -732,13 +733,14 @@ describe(HistoryRepository, () => {
                                 .chain((base) =>
                                     fc.oneof(
                                         fc.constant(base),
-                                        fc.string({ maxLength: 200 }).map((
-                                            details
-                                        ) => ({
-                                            ...base,
-                                            details,
-                                        }))
-                                    )),
+                                        fc
+                                            .string({ maxLength: 200 })
+                                            .map((details) => ({
+                                                ...base,
+                                                details,
+                                            }))
+                                    )
+                                ),
                             { minLength: 1, maxLength: 50 }
                         ),
                         async (monitorId, historyEntries) => {
@@ -882,13 +884,14 @@ describe(HistoryRepository, () => {
                                 .chain((base) =>
                                     fc.oneof(
                                         fc.constant(base),
-                                        fc.string({ maxLength: 300 }).map((
-                                            details
-                                        ) => ({
-                                            ...base,
-                                            details,
-                                        }))
-                                    )),
+                                        fc
+                                            .string({ maxLength: 300 })
+                                            .map((details) => ({
+                                                ...base,
+                                                details,
+                                            }))
+                                    )
+                                ),
                             { minLength: 1, maxLength: 100 }
                         ),
                         async (monitorId, historyBatch) => {
@@ -1041,13 +1044,14 @@ describe(HistoryRepository, () => {
                                 .chain((base) =>
                                     fc.oneof(
                                         fc.constant(base),
-                                        fc.string({ maxLength: 100 }).map((
-                                            details
-                                        ) => ({
-                                            ...base,
-                                            details,
-                                        }))
-                                    ))
+                                        fc
+                                            .string({ maxLength: 100 })
+                                            .map((details) => ({
+                                                ...base,
+                                                details,
+                                            }))
+                                    )
+                                )
                         ),
                         async (monitorId, latestEntry) => {
                             const mockedGetLatestHistoryEntry = vi.mocked(

@@ -67,6 +67,8 @@ export type FormSubmitProperties = Simplify<
     AddSiteFormState &
         Pick<AddSiteFormActions, "setFormError"> &
         StoreActions & {
+            /** Precomputed monitor validation field map. */
+            dynamicFieldValues?: MonitorValidationFields;
             /** UUID generator function for creating unique identifiers */
             generateUuid: () => string;
             /** Logger instance for debugging and error tracking */
@@ -109,7 +111,7 @@ interface MonitorValidationFields {
     jsonPath: string;
     maxPongDelayMs: string;
     maxReplicationLagSeconds: string;
-    maxResponseTime: string;
+    maxResponseTimeMs: string;
     port: string;
     primaryStatusUrl: string;
     recordType: string;
@@ -178,8 +180,8 @@ const monitorValidationBuilders: MonitorValidationBuilderMap = {
         bodyKeyword: toOptionalString(bodyKeyword),
         url: toOptionalString(url),
     }),
-    "http-latency": ({ maxResponseTime, url }): UnknownRecord => ({
-        maxResponseTime: parseOptionalInteger(maxResponseTime),
+    "http-latency": ({ maxResponseTimeMs, url }): UnknownRecord => ({
+        maxResponseTime: parseOptionalInteger(maxResponseTimeMs),
         url: toOptionalString(url),
     }),
     "http-status": ({ expectedStatusCode, url }): UnknownRecord => ({
@@ -272,7 +274,7 @@ const buildMonitorFormData = (
         certificateWarningDays: parseOptionalInteger(
             properties.certificateWarningDays
         ),
-        checkInterval: properties.checkInterval,
+        checkInterval: properties.checkIntervalMs,
         edgeLocations: toOptionalString(properties.edgeLocations),
         expectedHeaderValue: toOptionalString(properties.expectedHeaderValue),
         expectedJsonValue: toOptionalString(properties.expectedJsonValue),
@@ -298,7 +300,7 @@ const buildMonitorFormData = (
         maxReplicationLagSeconds: parseOptionalInteger(
             properties.maxReplicationLagSeconds
         ),
-        maxResponseTime: parseOptionalInteger(properties.maxResponseTime),
+        maxResponseTime: parseOptionalInteger(properties.maxResponseTimeMs),
         port: parseOptionalInteger(properties.port),
         primaryStatusUrl: toOptionalString(properties.primaryStatusUrl),
         recordType: trimmedRecordType || undefined,
@@ -325,14 +327,14 @@ const buildMonitorFormData = (
  * This ensures consistent monitor defaults and validation across the app.
  */
 function createMonitor(properties: FormSubmitProperties): Monitor {
-    const { checkInterval, generateUuid, monitorType } = properties;
+    const { checkIntervalMs, generateUuid, monitorType } = properties;
     const formData = buildMonitorFormData(properties);
     const baseMonitor = createMonitorObject(monitorType, formData);
 
     return {
         ...baseMonitor,
         activeOperations: [],
-        checkInterval,
+        checkInterval: checkIntervalMs,
         id: generateUuid(),
     };
 }
@@ -442,20 +444,20 @@ async function performSubmission(
 /**
  * Validates check interval configuration using shared schema.
  *
- * @param checkInterval - Check interval in milliseconds
+ * @param checkIntervalMs - Check interval in milliseconds
  *
  * @returns Promise resolving to array of validation error messages
  */
 async function validateCheckInterval(
     monitorType: MonitorType,
-    checkInterval: number
+    checkIntervalMs: number
 ): Promise<readonly string[]> {
     return withUtilityErrorHandling(
         async () => {
             const validationResult = await validateMonitorFieldClientSide(
                 monitorType,
                 "checkInterval",
-                checkInterval
+                checkIntervalMs
             );
             return validationResult.success ? [] : validationResult.errors;
         },
@@ -527,8 +529,9 @@ export async function handleSubmit(
         baselineUrl,
         bodyKeyword,
         certificateWarningDays,
-        checkInterval,
+        checkIntervalMs,
         clearError,
+        dynamicFieldValues,
         edgeLocations,
         expectedHeaderValue,
         expectedJsonValue,
@@ -544,7 +547,7 @@ export async function handleSubmit(
         logger,
         maxPongDelayMs,
         maxReplicationLagSeconds,
-        maxResponseTime,
+        maxResponseTimeMs,
         monitorType,
         name,
         onSuccess,
@@ -557,6 +560,34 @@ export async function handleSubmit(
         setFormError,
         url,
     } = properties;
+
+    const monitorValidationFields: MonitorValidationFields =
+        dynamicFieldValues ?? {
+            baselineUrl,
+            bodyKeyword,
+            certificateWarningDays,
+            edgeLocations,
+            expectedHeaderValue,
+            expectedJsonValue,
+            expectedStatusCode,
+            expectedValue,
+            headerName,
+            heartbeatExpectedStatus,
+            heartbeatMaxDriftSeconds,
+            heartbeatStatusField,
+            heartbeatTimestampField,
+            host,
+            jsonPath,
+            maxPongDelayMs,
+            maxReplicationLagSeconds,
+            maxResponseTimeMs,
+            port,
+            primaryStatusUrl,
+            recordType,
+            replicaStatusUrl,
+            replicationTimestampField,
+            url,
+        };
 
     event.preventDefault();
     setFormError("");
@@ -584,7 +615,7 @@ export async function handleSubmit(
         hasMaxReplicationLagSeconds: Boolean(
             safeTrim(maxReplicationLagSeconds)
         ),
-        hasMaxResponseTime: Boolean(safeTrim(maxResponseTime)),
+        hasMaxResponseTime: Boolean(safeTrim(maxResponseTimeMs)),
         hasName: Boolean(safeTrim(name)),
         hasPort: Boolean(safeTrim(port)),
         hasPrimaryStatusUrl: Boolean(safeTrim(primaryStatusUrl)),
@@ -620,33 +651,8 @@ export async function handleSubmit(
 
     // Collect asynchronous validation errors
     const validationErrors: string[] = [
-        ...(await validateMonitorType(monitorType, {
-            baselineUrl,
-            bodyKeyword,
-            certificateWarningDays,
-            edgeLocations,
-            expectedHeaderValue,
-            expectedJsonValue,
-            expectedStatusCode,
-            expectedValue,
-            headerName,
-            heartbeatExpectedStatus,
-            heartbeatMaxDriftSeconds,
-            heartbeatStatusField,
-            heartbeatTimestampField,
-            host,
-            jsonPath,
-            maxPongDelayMs,
-            maxReplicationLagSeconds,
-            maxResponseTime,
-            port,
-            primaryStatusUrl,
-            recordType,
-            replicaStatusUrl,
-            replicationTimestampField,
-            url,
-        })),
-        ...(await validateCheckInterval(monitorType, checkInterval)),
+        ...(await validateMonitorType(monitorType, monitorValidationFields)),
+        ...(await validateCheckInterval(monitorType, checkIntervalMs)),
     ];
     logger.debug("AddSiteForm validation results", {
         addMode,
@@ -666,7 +672,7 @@ export async function handleSubmit(
                 certificateWarningDays: truncateForLogging(
                     certificateWarningDays
                 ),
-                checkInterval,
+                checkIntervalMs,
                 edgeLocations: truncateForLogging(edgeLocations),
                 expectedHeaderValue: truncateForLogging(expectedHeaderValue),
                 expectedJsonValue: truncateForLogging(expectedJsonValue),
@@ -675,7 +681,7 @@ export async function handleSubmit(
                 headerName: truncateForLogging(headerName),
                 host: truncateForLogging(host),
                 jsonPath: truncateForLogging(jsonPath),
-                maxResponseTime: truncateForLogging(maxResponseTime),
+                maxResponseTimeMs: truncateForLogging(maxResponseTimeMs),
                 monitorType,
                 name: truncateForLogging(name),
                 port,

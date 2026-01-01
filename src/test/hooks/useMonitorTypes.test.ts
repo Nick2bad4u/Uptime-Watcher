@@ -678,33 +678,34 @@ describe("useMonitorTypes Hook", () => {
                 timeout: 1500,
                 numRuns: 5,
             }
-        )("should handle various monitor type option configurations", async (
-            monitorOptions
-        ) => {
-            mockGetMonitorTypeOptions.mockResolvedValue(monitorOptions);
+        )(
+            "should handle various monitor type option configurations",
+            async (monitorOptions) => {
+                mockGetMonitorTypeOptions.mockResolvedValue(monitorOptions);
 
-            const { result } = renderHook(() => useMonitorTypes());
+                const { result } = renderHook(() => useMonitorTypes());
 
-            await waitFor(() => {
-                expect(result.current.isLoading).toBeFalsy();
-            });
+                await waitFor(() => {
+                    expect(result.current.isLoading).toBeFalsy();
+                });
 
-            expect(result.current.options).toEqual(monitorOptions);
-            expect(Array.isArray(result.current.options)).toBeTruthy();
-            expect(result.current.error).toBeUndefined();
+                expect(result.current.options).toEqual(monitorOptions);
+                expect(Array.isArray(result.current.options)).toBeTruthy();
+                expect(result.current.error).toBeUndefined();
 
-            // Verify monitor options properties
-            expect(monitorOptions.length).toBeLessThanOrEqual(10);
-            for (const option of monitorOptions) {
-                expect(typeof option.label).toBe("string");
-                expect(option.label.length).toBeGreaterThan(0);
-                expect(option.label.length).toBeLessThanOrEqual(50);
-                expect(typeof option.value).toBe("string");
-                expect(option.value.length).toBeGreaterThan(0);
-                expect(option.value.length).toBeLessThanOrEqual(20);
-                expect(/^[\w-]+$/.test(option.value)).toBeTruthy();
+                // Verify monitor options properties
+                expect(monitorOptions.length).toBeLessThanOrEqual(10);
+                for (const option of monitorOptions) {
+                    expect(typeof option.label).toBe("string");
+                    expect(option.label.length).toBeGreaterThan(0);
+                    expect(option.label.length).toBeLessThanOrEqual(50);
+                    expect(typeof option.value).toBe("string");
+                    expect(option.value.length).toBeGreaterThan(0);
+                    expect(option.value.length).toBeLessThanOrEqual(20);
+                    expect(/^[\w-]+$/.test(option.value)).toBeTruthy();
+                }
             }
-        });
+        );
 
         test.prop(
             [
@@ -755,33 +756,34 @@ describe("useMonitorTypes Hook", () => {
         test.prop([fc.integer({ min: 0, max: 20 })], {
             timeout: 1500,
             numRuns: 5,
-        })("should handle different monitor type counts correctly", async (
-            optionCount
-        ) => {
-            const monitorOptions = Array.from({ length: optionCount }, (
-                _,
-                i
-            ) => ({
-                label: `Monitor Type ${i + 1}`,
-                value: `type-${i + 1}`,
-            }));
+        })(
+            "should handle different monitor type counts correctly",
+            async (optionCount) => {
+                const monitorOptions = Array.from(
+                    { length: optionCount },
+                    (_, i) => ({
+                        label: `Monitor Type ${i + 1}`,
+                        value: `type-${i + 1}`,
+                    })
+                );
 
-            mockGetMonitorTypeOptions.mockResolvedValue(monitorOptions);
+                mockGetMonitorTypeOptions.mockResolvedValue(monitorOptions);
 
-            const { result } = renderHook(() => useMonitorTypes());
+                const { result } = renderHook(() => useMonitorTypes());
 
-            await waitFor(() => {
-                expect(result.current.isLoading).toBeFalsy();
-            });
+                await waitFor(() => {
+                    expect(result.current.isLoading).toBeFalsy();
+                });
 
-            expect(result.current.options).toHaveLength(optionCount);
-            expect(result.current.error).toBeUndefined();
+                expect(result.current.options).toHaveLength(optionCount);
+                expect(result.current.error).toBeUndefined();
 
-            // Verify option count properties
-            expect(optionCount).toBeGreaterThanOrEqual(0);
-            expect(optionCount).toBeLessThanOrEqual(20);
-            expect(result.current.options).toHaveLength(optionCount);
-        });
+                // Verify option count properties
+                expect(optionCount).toBeGreaterThanOrEqual(0);
+                expect(optionCount).toBeLessThanOrEqual(20);
+                expect(result.current.options).toHaveLength(optionCount);
+            }
+        );
 
         test.prop(
             [
@@ -812,91 +814,98 @@ describe("useMonitorTypes Hook", () => {
                 timeout: 1500,
                 numRuns: 5,
             }
-        )("should handle various option formats and edge cases", async (
-            mixedOptions
-        ) => {
-            mockGetMonitorTypeOptions.mockResolvedValue(mixedOptions as any);
-
-            const { result } = renderHook(() => useMonitorTypes());
-
-            await waitFor(() => {
-                expect(result.current.isLoading).toBeFalsy();
-            });
-
-            expect(result.current.options).toEqual(mixedOptions);
-            expect(result.current.error).toBeUndefined();
-
-            // Verify mixed options array properties
-            expect(Array.isArray(mixedOptions)).toBeTruthy();
-            expect(mixedOptions.length).toBeGreaterThanOrEqual(1);
-            expect(mixedOptions.length).toBeLessThanOrEqual(5);
-        });
-
-        test.prop([fc.integer({ min: 1, max: 5 })], {
-            timeout: 5000, // Increase fast-check timeout to 5s
-            numRuns: 3, // Reduce number of test runs
-        })("should handle multiple refresh calls correctly", async (
-            refreshCount
-        ) => {
-            // Suppress React act warnings for this property-based test
-            const originalConsoleError = console.error;
-
-            console.error = (message: string, ...args: unknown[]) => {
-                if (typeof message === "string" && message.includes("act(")) {
-                    return; // Suppress act warnings
-                }
-                originalConsoleError(message, ...args);
-            };
-
-            try {
-                // Clear mocks at start of each property test execution
-                vi.clearAllMocks();
-
-                const mockOptions = [{ label: "Test", value: "test" }];
-                mockGetMonitorTypeOptions.mockResolvedValue(mockOptions);
+        )(
+            "should handle various option formats and edge cases",
+            async (mixedOptions) => {
+                mockGetMonitorTypeOptions.mockResolvedValue(
+                    mixedOptions as any
+                );
 
                 const { result } = renderHook(() => useMonitorTypes());
 
-                // Wait for initial load
                 await waitFor(() => {
                     expect(result.current.isLoading).toBeFalsy();
                 });
 
-                // Clear mocks after initial load to count only refresh calls
-                mockGetMonitorTypeOptions.mockClear();
-                // Re-set the mock implementation for refresh calls
-                mockGetMonitorTypeOptions.mockResolvedValue(mockOptions);
-
-                // Perform multiple refreshes sequentially to avoid race conditions
-                for (let i = 0; i < refreshCount; i++) {
-                    act(() => {
-                        result.current.refresh();
-                    });
-                }
-
-                // Wait for all refreshes to complete
-                await waitFor(
-                    () => {
-                        expect(result.current.isLoading).toBeFalsy();
-                    },
-                    { timeout: 5000 }
-                );
-
-                expect(result.current.options).toEqual(mockOptions);
+                expect(result.current.options).toEqual(mixedOptions);
                 expect(result.current.error).toBeUndefined();
-                expect(mockGetMonitorTypeOptions).toHaveBeenCalledTimes(
-                    refreshCount
-                );
 
-                // Verify refresh count properties
-                expect(refreshCount).toBeGreaterThanOrEqual(1);
-                expect(refreshCount).toBeLessThanOrEqual(5);
-            } finally {
-                // Restore original console.error
-                // eslint-disable-next-line require-atomic-updates -- console restore for test
-                console.error = originalConsoleError;
+                // Verify mixed options array properties
+                expect(Array.isArray(mixedOptions)).toBeTruthy();
+                expect(mixedOptions.length).toBeGreaterThanOrEqual(1);
+                expect(mixedOptions.length).toBeLessThanOrEqual(5);
             }
-        });
+        );
+
+        test.prop([fc.integer({ min: 1, max: 5 })], {
+            timeout: 5000, // Increase fast-check timeout to 5s
+            numRuns: 3, // Reduce number of test runs
+        })(
+            "should handle multiple refresh calls correctly",
+            async (refreshCount) => {
+                // Suppress React act warnings for this property-based test
+                const originalConsoleError = console.error;
+
+                console.error = (message: string, ...args: unknown[]) => {
+                    if (
+                        typeof message === "string" &&
+                        message.includes("act(")
+                    ) {
+                        return; // Suppress act warnings
+                    }
+                    originalConsoleError(message, ...args);
+                };
+
+                try {
+                    // Clear mocks at start of each property test execution
+                    vi.clearAllMocks();
+
+                    const mockOptions = [{ label: "Test", value: "test" }];
+                    mockGetMonitorTypeOptions.mockResolvedValue(mockOptions);
+
+                    const { result } = renderHook(() => useMonitorTypes());
+
+                    // Wait for initial load
+                    await waitFor(() => {
+                        expect(result.current.isLoading).toBeFalsy();
+                    });
+
+                    // Clear mocks after initial load to count only refresh calls
+                    mockGetMonitorTypeOptions.mockClear();
+                    // Re-set the mock implementation for refresh calls
+                    mockGetMonitorTypeOptions.mockResolvedValue(mockOptions);
+
+                    // Perform multiple refreshes sequentially to avoid race conditions
+                    for (let i = 0; i < refreshCount; i++) {
+                        act(() => {
+                            result.current.refresh();
+                        });
+                    }
+
+                    // Wait for all refreshes to complete
+                    await waitFor(
+                        () => {
+                            expect(result.current.isLoading).toBeFalsy();
+                        },
+                        { timeout: 5000 }
+                    );
+
+                    expect(result.current.options).toEqual(mockOptions);
+                    expect(result.current.error).toBeUndefined();
+                    expect(mockGetMonitorTypeOptions).toHaveBeenCalledTimes(
+                        refreshCount
+                    );
+
+                    // Verify refresh count properties
+                    expect(refreshCount).toBeGreaterThanOrEqual(1);
+                    expect(refreshCount).toBeLessThanOrEqual(5);
+                } finally {
+                    // Restore original console.error
+                    // eslint-disable-next-line require-atomic-updates -- console restore for test
+                    console.error = originalConsoleError;
+                }
+            }
+        );
 
         test.prop(
             [
@@ -923,77 +932,80 @@ describe("useMonitorTypes Hook", () => {
                 timeout: 1500,
                 numRuns: 5,
             }
-        )("should handle alternating success and error scenarios", async ({
-            successOptions,
-            errorMessage,
-        }) => {
-            // Clear mocks and reset completely
-            vi.clearAllMocks();
-            vi.resetAllMocks();
-            mockGetMonitorTypeOptions.mockClear();
+        )(
+            "should handle alternating success and error scenarios",
+            async ({ successOptions, errorMessage }) => {
+                // Clear mocks and reset completely
+                vi.clearAllMocks();
+                vi.resetAllMocks();
+                mockGetMonitorTypeOptions.mockClear();
 
-            // First call succeeds with explicit mock setup
-            mockGetMonitorTypeOptions.mockImplementationOnce(
-                async () => successOptions
-            );
+                // First call succeeds with explicit mock setup
+                mockGetMonitorTypeOptions.mockImplementationOnce(
+                    async () => successOptions
+                );
 
-            const { result } = renderHook(() => useMonitorTypes());
+                const { result } = renderHook(() => useMonitorTypes());
 
-            await waitFor(() => {
-                expect(result.current.isLoading).toBeFalsy();
-            });
+                await waitFor(() => {
+                    expect(result.current.isLoading).toBeFalsy();
+                });
 
-            expect(result.current.options).toEqual(successOptions);
-            expect(result.current.error).toBeUndefined();
+                expect(result.current.options).toEqual(successOptions);
+                expect(result.current.error).toBeUndefined();
 
-            // Second call (refresh) fails with explicit mock setup
-            mockGetMonitorTypeOptions.mockImplementationOnce(async () => {
-                throw new Error(errorMessage);
-            });
+                // Second call (refresh) fails with explicit mock setup
+                mockGetMonitorTypeOptions.mockImplementationOnce(async () => {
+                    throw new Error(errorMessage);
+                });
 
-            // Trigger refresh and wait for completion
-            await act(async () => {
-                await result.current.refresh();
-            });
+                // Trigger refresh and wait for completion
+                await act(async () => {
+                    await result.current.refresh();
+                });
 
-            // Wait for loading to complete
-            await waitFor(() => {
-                expect(result.current.isLoading).toBeFalsy();
-            });
+                // Wait for loading to complete
+                await waitFor(() => {
+                    expect(result.current.isLoading).toBeFalsy();
+                });
 
-            expect(typeof result.current.error).toBe("string");
-            expect(result.current.error).toBe(
-                `Monitor types loading failed: ${errorMessage}. Using fallback options.`
-            );
-            expect(result.current.options).toEqual(
-                FALLBACK_MONITOR_TYPE_OPTIONS
-            ); // Verify scenario properties
-            expect(Array.isArray(successOptions)).toBeTruthy();
-            expect(successOptions.length).toBeGreaterThanOrEqual(1);
-            expect(successOptions.length).toBeLessThanOrEqual(3);
-            expect(typeof errorMessage).toBe("string");
-            expect(errorMessage.trim().length).toBeGreaterThan(1);
-            expect(errorMessage.length).toBeLessThanOrEqual(100);
-        });
+                expect(typeof result.current.error).toBe("string");
+                expect(result.current.error).toBe(
+                    `Monitor types loading failed: ${errorMessage}. Using fallback options.`
+                );
+                expect(result.current.options).toEqual(
+                    FALLBACK_MONITOR_TYPE_OPTIONS
+                ); // Verify scenario properties
+                expect(Array.isArray(successOptions)).toBeTruthy();
+                expect(successOptions.length).toBeGreaterThanOrEqual(1);
+                expect(successOptions.length).toBeLessThanOrEqual(3);
+                expect(typeof errorMessage).toBe("string");
+                expect(errorMessage.trim().length).toBeGreaterThan(1);
+                expect(errorMessage.length).toBeLessThanOrEqual(100);
+            }
+        );
 
         test.prop([fc.constantFrom(null, undefined, [], {}, "invalid", 123)], {
             timeout: 1500, // Increase fast-check timeout to 1.5s
             numRuns: 5, // Reduce number of test runs
-        })("should handle invalid API responses gracefully", async (
-            invalidResponse
-        ) => {
-            mockGetMonitorTypeOptions.mockResolvedValue(invalidResponse as any);
+        })(
+            "should handle invalid API responses gracefully",
+            async (invalidResponse) => {
+                mockGetMonitorTypeOptions.mockResolvedValue(
+                    invalidResponse as any
+                );
 
-            const { result } = renderHook(() => useMonitorTypes());
+                const { result } = renderHook(() => useMonitorTypes());
 
-            await waitFor(() => {
-                expect(result.current.isLoading).toBeFalsy();
-            });
+                await waitFor(() => {
+                    expect(result.current.isLoading).toBeFalsy();
+                });
 
-            // Should accept the invalid response as-is (validation happens elsewhere)
-            expect(result.current.options).toEqual(invalidResponse);
-            expect(result.current.error).toBeUndefined();
-        });
+                // Should accept the invalid response as-is (validation happens elsewhere)
+                expect(result.current.options).toEqual(invalidResponse);
+                expect(result.current.error).toBeUndefined();
+            }
+        );
 
         test.prop([fc.integer({ min: 20, max: 50 })], {
             timeout: 1500, // Increase fast-check timeout to 1.5s
@@ -1007,7 +1019,8 @@ describe("useMonitorTypes Hook", () => {
             mockGetMonitorTypeOptions.mockImplementation(
                 () =>
                     new Promise((resolve) =>
-                        setTimeout(() => resolve(mockOptions), delayMs))
+                        setTimeout(() => resolve(mockOptions), delayMs)
+                    )
             );
 
             const { result } = renderHook(() => useMonitorTypes());

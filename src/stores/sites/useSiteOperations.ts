@@ -18,7 +18,6 @@ import type {
 import { DEFAULT_SITE_NAME } from "@shared/constants/sites";
 import { ERROR_CATALOG } from "@shared/utils/errorCatalog";
 import { ensureError } from "@shared/utils/errorHandling";
-import { getErrorMessage } from "@shared/utils/errorUtils";
 
 import type { BaseSiteOperations } from "./baseTypes";
 import type { SiteOperationsDependencies } from "./types";
@@ -34,6 +33,122 @@ import {
     withSiteOperationReturning,
 } from "./utils/operationHelpers";
 
+type MonitorNumericField = "checkInterval" | "retryAttempts" | "timeout";
+type MonitorNumericUpdateOperationName =
+    | "updateMonitorRetryAttempts"
+    | "updateMonitorTimeout"
+    | "updateSiteCheckInterval";
+
+const updateMonitorNumericField = async (args: {
+    deps: SiteOperationsDependencies;
+    field: MonitorNumericField;
+    monitorId: string;
+    operationName: MonitorNumericUpdateOperationName;
+    siteIdentifier: string;
+    telemetry: Record<string, unknown>;
+    value: number | undefined;
+}): Promise<void> => {
+    const { deps, field, monitorId, operationName, siteIdentifier, telemetry, value } =
+        args;
+
+    await withSiteOperation(
+        operationName,
+        async () => {
+            const updates: Partial<Monitor> = {};
+            if (value !== undefined) {
+                updates[field] = value;
+            }
+
+            await updateMonitorAndSave(siteIdentifier, monitorId, updates, deps);
+        },
+        deps,
+        {
+            syncAfter: false,
+            telemetry,
+        }
+    );
+};
+
+type BackupMetadata = SerializedDatabaseBackupResult["metadata"];
+interface ResultWithBackupMetadata {
+    readonly metadata: BackupMetadata;
+}
+
+const runSqliteBackupOperationReturning = async <T extends ResultWithBackupMetadata>(args: {
+    clearMetadataOnFailure: boolean;
+    deps: SiteOperationsDependencies;
+    errorLogMessage: string;
+    operation: () => Promise<T>;
+}): Promise<T> => {
+    const { clearMetadataOnFailure, deps, errorLogMessage, operation } = args;
+
+    try {
+        const result = await operation();
+        deps.setLastBackupMetadata(result.metadata);
+        return result;
+    } catch (error: unknown) {
+        if (clearMetadataOnFailure) {
+            deps.setLastBackupMetadata(undefined);
+        }
+
+        const resolvedError = ensureError(error);
+        logger.error(errorLogMessage, resolvedError);
+        throw resolvedError;
+    }
+};
+
+const downloadSqliteBackupAction = (
+    deps: SiteOperationsDependencies
+): Promise<SerializedDatabaseBackupResult> =>
+    withSiteOperationReturning(
+        "downloadSqliteBackup",
+        () =>
+            runSqliteBackupOperationReturning({
+                clearMetadataOnFailure: true,
+                deps,
+                errorLogMessage: "Failed to download SQLite backup:",
+                operation: () =>
+                    // eslint-disable-next-line ex/no-unhandled -- The call is awaited and normalized by runSqliteBackupOperationReturning.
+                    handleSQLiteBackupDownload(() =>
+                        deps.services.data.downloadSqliteBackup()
+                    ),
+            }),
+        deps,
+        {
+            syncAfter: false,
+            telemetry: {
+                success: {
+                    message: "SQLite backup download completed",
+                },
+            },
+        }
+    );
+
+const restoreSqliteBackupAction = (
+    deps: SiteOperationsDependencies,
+    payload: SerializedDatabaseRestorePayload
+): Promise<SerializedDatabaseRestoreResult> =>
+    withSiteOperationReturning(
+        "restoreSqliteBackup",
+        () =>
+            runSqliteBackupOperationReturning({
+                clearMetadataOnFailure: false,
+                deps,
+                errorLogMessage: "Failed to restore SQLite backup:",
+                operation: () =>
+
+                    deps.services.data.restoreSqliteBackup(payload),
+            }),
+        deps,
+        {
+            telemetry: {
+                success: {
+                    message: "SQLite backup restore completed",
+                },
+            },
+        }
+    );
+
 const normalizeMonitorOrThrow = (
     monitor: Partial<Monitor>,
     contextMessage: string
@@ -44,7 +159,7 @@ const normalizeMonitorOrThrow = (
         const safeError = ensureError(error);
         logger.error(contextMessage, safeError);
         throw new Error(
-            `Monitor normalization failed: ${getErrorMessage(safeError)}`,
+            `Monitor normalization failed: ${safeError.message}`,
             { cause: error }
         );
     }
@@ -137,7 +252,8 @@ export const createSiteOperationsActions = (
                     normalizeMonitorOrThrow(
                         monitor,
                         "Failed to normalize monitor during site creation"
-                    ));
+                    )
+                );
 
                 // Construct a complete Site object
                 const completeSite: Site = {
@@ -179,34 +295,7 @@ export const createSiteOperationsActions = (
         );
     },
     downloadSqliteBackup: async (): Promise<SerializedDatabaseBackupResult> =>
-        withSiteOperationReturning(
-            "downloadSqliteBackup",
-            async () => {
-                try {
-                    const backupResult = await handleSQLiteBackupDownload(() =>
-                        deps.services.data.downloadSqliteBackup());
-                    deps.setLastBackupMetadata(backupResult.metadata);
-                    return backupResult;
-                } catch (error) {
-                    deps.setLastBackupMetadata(undefined);
-                    const resolvedError = ensureError(error);
-                    logger.error(
-                        "Failed to download SQLite backup:",
-                        resolvedError
-                    );
-                    throw resolvedError;
-                }
-            },
-            deps,
-            {
-                syncAfter: false,
-                telemetry: {
-                    success: {
-                        message: "SQLite backup download completed",
-                    },
-                },
-            } // Don't sync for backup download
-        ),
+        downloadSqliteBackupAction(deps),
     initializeSites: async (): Promise<{
         message: string;
         sitesLoaded: number;
@@ -281,110 +370,50 @@ export const createSiteOperationsActions = (
     restoreSqliteBackup: async (
         payload: SerializedDatabaseRestorePayload
     ): Promise<SerializedDatabaseRestoreResult> =>
-        withSiteOperationReturning(
-            "restoreSqliteBackup",
-            async () => {
-                try {
-                    const restoreResult =
-                        await deps.services.data.restoreSqliteBackup(payload);
-                    deps.setLastBackupMetadata(restoreResult.metadata);
-                    return restoreResult;
-                } catch (error) {
-                    const resolvedError = ensureError(error);
-                    logger.error(
-                        "Failed to restore SQLite backup:",
-                        resolvedError
-                    );
-                    throw resolvedError;
-                }
-            },
-            deps,
-            {
-                telemetry: {
-                    success: {
-                        message: "SQLite backup restore completed",
-                    },
-                },
-            }
-        ),
+        restoreSqliteBackupAction(deps, payload),
     updateMonitorRetryAttempts: async (
         siteIdentifier: string,
         monitorId: string,
         retryAttempts: number | undefined
     ): Promise<void> => {
-        await withSiteOperation(
-            "updateMonitorRetryAttempts",
-            async () => {
-                // Only update if retryAttempts is defined
-                const updates: Partial<Monitor> = {};
-                if (retryAttempts !== undefined) {
-                    updates.retryAttempts = retryAttempts;
-                }
-
-                await updateMonitorAndSave(
-                    siteIdentifier,
-                    monitorId,
-                    updates,
-                    deps
-                );
-            },
+        await updateMonitorNumericField({
             deps,
-            {
-                syncAfter: false,
-                telemetry: { monitorId, retryAttempts, siteIdentifier },
-            }
-        );
+            field: "retryAttempts",
+            monitorId,
+            operationName: "updateMonitorRetryAttempts",
+            siteIdentifier,
+            telemetry: { monitorId, retryAttempts, siteIdentifier },
+            value: retryAttempts,
+        });
     },
     updateMonitorTimeout: async (
         siteIdentifier: string,
         monitorId: string,
         timeout: number | undefined
     ): Promise<void> => {
-        await withSiteOperation(
-            "updateMonitorTimeout",
-            async () => {
-                // Only update if timeout is defined
-                const updates: Partial<Monitor> = {};
-                if (timeout !== undefined) {
-                    updates.timeout = timeout;
-                }
-
-                await updateMonitorAndSave(
-                    siteIdentifier,
-                    monitorId,
-                    updates,
-                    deps
-                );
-            },
+        await updateMonitorNumericField({
             deps,
-            {
-                syncAfter: false,
-                telemetry: { monitorId, siteIdentifier, timeout },
-            }
-        );
+            field: "timeout",
+            monitorId,
+            operationName: "updateMonitorTimeout",
+            siteIdentifier,
+            telemetry: { monitorId, siteIdentifier, timeout },
+            value: timeout,
+        });
     },
     updateSiteCheckInterval: async (
         siteIdentifier: string,
         monitorId: string,
         interval: number
     ): Promise<void> => {
-        await withSiteOperation(
-            "updateSiteCheckInterval",
-            async () => {
-                await updateMonitorAndSave(
-                    siteIdentifier,
-                    monitorId,
-                    {
-                        checkInterval: interval,
-                    },
-                    deps
-                );
-            },
+        await updateMonitorNumericField({
             deps,
-            {
-                syncAfter: false,
-                telemetry: { interval, monitorId, siteIdentifier },
-            }
-        );
+            field: "checkInterval",
+            monitorId,
+            operationName: "updateSiteCheckInterval",
+            siteIdentifier,
+            telemetry: { interval, monitorId, siteIdentifier },
+            value: interval,
+        });
     },
 });

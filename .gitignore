@@ -493,6 +493,7 @@ __generated__
 # Icon must end with two \r
 Icon
 
+
 # Thumbnails
 ._*
 
@@ -688,6 +689,7 @@ cscope.out
 cscope.in.out
 cscope.po.out
 
+
 ### TestComplete ###
 # Test Complete ignore files: https://support.smartbear.com/viewarticle/68002/
 
@@ -842,3 +844,5 @@ codeql-agent-results/
 .gemini/
 gha-creds-*.json
 assets/prettier-plugin-multiline-arrays/
+.jscpd/
+reports/

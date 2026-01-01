@@ -49,36 +49,35 @@ describe("systemApi", () => {
     });
 
     it("invokes quit-and-install via invoke", async () => {
-        vi.mocked(ipcRenderer.invoke).mockImplementation(async (
-            channel: string,
-            ...args: unknown[]
-        ) => {
-            if (channel === "diagnostics-verify-ipc-handler") {
-                const targetChannel = args[0];
+        vi.mocked(ipcRenderer.invoke).mockImplementation(
+            async (channel: string, ...args: unknown[]) => {
+                if (channel === "diagnostics-verify-ipc-handler") {
+                    const targetChannel = args[0];
 
-                return {
-                    success: true,
-                    data: {
-                        availableChannels: [
-                            "diagnostics-verify-ipc-handler",
-                            targetChannel,
-                        ],
-                        channel: targetChannel,
-                        registered: true,
-                    },
-                };
+                    return {
+                        success: true,
+                        data: {
+                            availableChannels: [
+                                "diagnostics-verify-ipc-handler",
+                                targetChannel,
+                            ],
+                            channel: targetChannel,
+                            registered: true,
+                        },
+                    };
+                }
+
+                if (channel === SYSTEM_CHANNELS.quitAndInstall) {
+                    return {
+                        success: true,
+                        data: true,
+                        metadata: { handler: channel },
+                    };
+                }
+
+                throw new Error(`Unexpected channel: ${channel}`);
             }
-
-            if (channel === SYSTEM_CHANNELS.quitAndInstall) {
-                return {
-                    success: true,
-                    data: true,
-                    metadata: { handler: channel },
-                };
-            }
-
-            throw new Error(`Unexpected channel: ${channel}`);
-        });
+        );
 
         const result = await systemApi.quitAndInstall();
 
@@ -95,9 +94,7 @@ describe("systemApi", () => {
             data: true,
         });
 
-        const result = await systemApi.writeClipboardText(
-            "hello clipboard"
-        );
+        const result = await systemApi.writeClipboardText("hello clipboard");
 
         expect(result).toBeTruthy();
         expect(ipcRenderer.invoke).toHaveBeenCalledWith(

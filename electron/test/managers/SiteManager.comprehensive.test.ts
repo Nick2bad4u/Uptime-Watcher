@@ -77,21 +77,21 @@ const cacheMocks = vi.hoisted(() => {
         keys: vi.fn(() => cacheStore.keys()),
         getAll: vi.fn(() => Array.from(cacheStore.values())),
         entries: vi.fn(() => cacheStore.entries()),
-        bulkUpdate: vi.fn((
-            items: { key: string; data: Site; ttl?: number }[]
-        ) => {
-            for (const item of items) {
-                cacheStore.set(item.key, item.data);
+        bulkUpdate: vi.fn(
+            (items: { key: string; data: Site; ttl?: number }[]) => {
+                for (const item of items) {
+                    cacheStore.set(item.key, item.data);
+                }
             }
-        }),
-        replaceAll: vi.fn((
-            items: { key: string; data: Site; ttl?: number }[]
-        ) => {
-            cacheStore.clear();
-            for (const item of items) {
-                cacheStore.set(item.key, item.data);
+        ),
+        replaceAll: vi.fn(
+            (items: { key: string; data: Site; ttl?: number }[]) => {
+                cacheStore.clear();
+                for (const item of items) {
+                    cacheStore.set(item.key, item.data);
+                }
             }
-        }),
+        ),
         cleanup: vi.fn(() => 0),
         invalidate: vi.fn(),
         invalidateAll: vi.fn(),
@@ -151,11 +151,11 @@ const repositoryMocks = vi.hoisted(() => {
     };
 });
 
-vi.mock("../../utils/database/serviceFactory", () => ({
+vi.mock("../../services/database/serviceFactory", () => ({
     LoggerAdapter: repositoryMocks.MockLoggerAdapter,
 }));
 
-vi.mock("../../utils/database/SiteRepositoryService", () => ({
+vi.mock("../../services/database/SiteRepositoryService", () => ({
     SiteRepositoryService: repositoryMocks.MockSiteRepositoryService,
 }));
 
@@ -177,7 +177,7 @@ const siteWriterMocks = vi.hoisted(() => {
     };
 });
 
-vi.mock("../../utils/database/SiteWriterService", () => ({
+vi.mock("../../services/database/SiteWriterService", () => ({
     SiteWriterService: siteWriterMocks.MockSiteWriterService,
 }));
 
@@ -233,29 +233,31 @@ describe("SiteManager - Comprehensive", () => {
             cacheStore.set(key, value);
         });
         mockCache.delete.mockImplementation((key: string) =>
-            cacheStore.delete(key));
+            cacheStore.delete(key)
+        );
         mockCache.has.mockImplementation((key: string) => cacheStore.has(key));
         mockCache.clear.mockImplementation(() => {
             cacheStore.clear();
         });
         mockCache.getAll.mockImplementation(() =>
-            Array.from(cacheStore.values()));
+            Array.from(cacheStore.values())
+        );
         mockCache.entries.mockImplementation(() => cacheStore.entries());
-        mockCache.bulkUpdate.mockImplementation((
-            items: { key: string; data: Site; ttl?: number }[]
-        ) => {
-            for (const item of items) {
-                cacheStore.set(item.key, item.data);
+        mockCache.bulkUpdate.mockImplementation(
+            (items: { key: string; data: Site; ttl?: number }[]) => {
+                for (const item of items) {
+                    cacheStore.set(item.key, item.data);
+                }
             }
-        });
-        mockCache.replaceAll.mockImplementation((
-            items: { key: string; data: Site; ttl?: number }[]
-        ) => {
-            cacheStore.clear();
-            for (const item of items) {
-                cacheStore.set(item.key, item.data);
+        );
+        mockCache.replaceAll.mockImplementation(
+            (items: { key: string; data: Site; ttl?: number }[]) => {
+                cacheStore.clear();
+                for (const item of items) {
+                    cacheStore.set(item.key, item.data);
+                }
             }
-        });
+        );
 
         mockSite = {
             identifier: "site-1",
@@ -1335,14 +1337,11 @@ describe("SiteManager - Comprehensive", () => {
             // Mock handleMonitorIntervalChanges to call setHistoryLimit which should throw
             vi.mocked(
                 mockSiteWriterService.handleMonitorIntervalChanges
-            ).mockImplementation(async (
-                _id: any,
-                _orig: any,
-                _monitors: any,
-                config: any
-            ) => {
-                await config.setHistoryLimit(100);
-            });
+            ).mockImplementation(
+                async (_id: any, _orig: any, _monitors: any, config: any) => {
+                    await config.setHistoryLimit(100);
+                }
+            );
 
             await expect(
                 siteManager.updateSite("site-1", updates)

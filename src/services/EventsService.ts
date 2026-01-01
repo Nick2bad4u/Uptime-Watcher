@@ -26,36 +26,29 @@ import { logger } from "./logger";
 import { subscribeWithValidatedCleanup } from "./utils/cleanupHandlers";
 import { getIpcServiceHelpers } from "./utils/createIpcServiceHelpers";
 
-const { ensureInitialized, wrap } = ((): ReturnType<
-    typeof getIpcServiceHelpers
-> => {
-    try {
-        return getIpcServiceHelpers("EventsService", {
-            bridgeContracts: [
-                {
-                    domain: "events",
-                    methods: [
-                        "onCacheInvalidated",
-                        "onHistoryLimitUpdated",
-                        "onMonitorCheckCompleted",
-                        "onMonitorDown",
-                        "onMonitoringStarted",
-                        "onMonitoringStopped",
-                        "onMonitorStatusChanged",
-                        "onMonitorUp",
-                        "onSiteAdded",
-                        "onSiteRemoved",
-                        "onSiteUpdated",
-                        "onTestEvent",
-                        "onUpdateStatus",
-                    ],
-                },
+// eslint-disable-next-line ex/no-unhandled -- Module-level initialization should fail fast when preload wiring is invalid.
+const { ensureInitialized, wrap } = getIpcServiceHelpers("EventsService", {
+    bridgeContracts: [
+        {
+            domain: "events",
+            methods: [
+                "onCacheInvalidated",
+                "onHistoryLimitUpdated",
+                "onMonitorCheckCompleted",
+                "onMonitorDown",
+                "onMonitoringStarted",
+                "onMonitoringStopped",
+                "onMonitorStatusChanged",
+                "onMonitorUp",
+                "onSiteAdded",
+                "onSiteRemoved",
+                "onSiteUpdated",
+                "onTestEvent",
+                "onUpdateStatus",
             ],
-        });
-    } catch (error: unknown) {
-        throw ensureError(error);
-    }
-})();
+        },
+    ],
+});
 
 type SiteAddedEventData = RendererEventPayloadMap["site:added"];
 type SiteRemovedEventData = RendererEventPayloadMap["site:removed"];
@@ -111,7 +104,8 @@ const isMonitoringStoppedEventData = (
  *
  * @returns A no-op cleanup function that logs a descriptive error when invoked.
  */
-const createInvalidCleanupFallback = (eventName: string): (() => void) =>
+const createInvalidCleanupFallback =
+    (eventName: string): (() => void) =>
     (): void => {
         logger.error(
             `[EventsService] Cleanup skipped for ${eventName}: invalid cleanup handler returned by preload bridge`
@@ -241,12 +235,13 @@ export const EventsService: EventsServiceContract = {
      *
      * @throws If the electron API is unavailable.
      */
-    onCacheInvalidated: wrap("onCacheInvalidated", async (
-        api,
-        callback: (data: CacheInvalidatedEventData) => void
-    ) =>
-        subscribeWithValidation("onCacheInvalidated", () =>
-            api.events.onCacheInvalidated(callback))),
+    onCacheInvalidated: wrap(
+        "onCacheInvalidated",
+        async (api, callback: (data: CacheInvalidatedEventData) => void) =>
+            subscribeWithValidation("onCacheInvalidated", () =>
+                api.events.onCacheInvalidated(callback)
+            )
+    ),
 
     /**
      * Register a callback for database history limit updates.
@@ -255,12 +250,16 @@ export const EventsService: EventsServiceContract = {
      *
      * @returns Cleanup function removing the registered listener.
      */
-    onHistoryLimitUpdated: wrap("onHistoryLimitUpdated", async (
-        api,
-        callback: (data: HistoryLimitUpdatedEventPayload) => void
-    ) =>
-        subscribeWithValidation("onHistoryLimitUpdated", () =>
-            api.events.onHistoryLimitUpdated(callback))),
+    onHistoryLimitUpdated: wrap(
+        "onHistoryLimitUpdated",
+        async (
+            api,
+            callback: (data: HistoryLimitUpdatedEventPayload) => void
+        ) =>
+            subscribeWithValidation("onHistoryLimitUpdated", () =>
+                api.events.onHistoryLimitUpdated(callback)
+            )
+    ),
     /**
      * Register a callback for monitor check completion events.
      *
@@ -268,12 +267,16 @@ export const EventsService: EventsServiceContract = {
      *
      * @returns Cleanup function removing the registered listener.
      */
-    onMonitorCheckCompleted: wrap("onMonitorCheckCompleted", async (
-        api,
-        callback: (data: MonitorCheckCompletedEventPayload) => void
-    ) =>
-        subscribeWithValidation("onMonitorCheckCompleted", () =>
-            api.events.onMonitorCheckCompleted(callback))),
+    onMonitorCheckCompleted: wrap(
+        "onMonitorCheckCompleted",
+        async (
+            api,
+            callback: (data: MonitorCheckCompletedEventPayload) => void
+        ) =>
+            subscribeWithValidation("onMonitorCheckCompleted", () =>
+                api.events.onMonitorCheckCompleted(callback)
+            )
+    ),
     /**
      * Register a callback for monitor down events.
      *
@@ -297,12 +300,13 @@ export const EventsService: EventsServiceContract = {
      *
      * @throws If the electron API is unavailable.
      */
-    onMonitorDown: wrap("onMonitorDown", async (
-        api,
-        callback: (data: MonitorDownEventData) => void
-    ) =>
-        subscribeWithValidation("onMonitorDown", () =>
-            api.events.onMonitorDown(callback))),
+    onMonitorDown: wrap(
+        "onMonitorDown",
+        async (api, callback: (data: MonitorDownEventData) => void) =>
+            subscribeWithValidation("onMonitorDown", () =>
+                api.events.onMonitorDown(callback)
+            )
+    ),
 
     /**
      * Register a callback for monitoring started events.
@@ -326,25 +330,26 @@ export const EventsService: EventsServiceContract = {
      *
      * @throws If the electron API is unavailable.
      */
-    onMonitoringStarted: wrap("onMonitoringStarted", async (
-        api,
-        callback: (data: MonitoringStartedEventData) => void
-    ) =>
-        subscribeWithValidation("onMonitoringStarted", () =>
-            api.events.onMonitoringStarted((data) => {
-                if (!isMonitoringStartedEventData(data)) {
-                    logger.error(
-                        "[EventsService] Dropped monitoring-start payload: invalid monitoring control event",
-                        undefined,
-                        {
-                            payload: data,
-                        }
-                    );
-                    return;
-                }
+    onMonitoringStarted: wrap(
+        "onMonitoringStarted",
+        async (api, callback: (data: MonitoringStartedEventData) => void) =>
+            subscribeWithValidation("onMonitoringStarted", () =>
+                api.events.onMonitoringStarted((data) => {
+                    if (!isMonitoringStartedEventData(data)) {
+                        logger.error(
+                            "[EventsService] Dropped monitoring-start payload: invalid monitoring control event",
+                            undefined,
+                            {
+                                payload: data,
+                            }
+                        );
+                        return;
+                    }
 
-                callback(data);
-            }))),
+                    callback(data);
+                })
+            )
+    ),
 
     /**
      * Register a callback for monitoring stopped events.
@@ -368,25 +373,26 @@ export const EventsService: EventsServiceContract = {
      *
      * @throws If the electron API is unavailable.
      */
-    onMonitoringStopped: wrap("onMonitoringStopped", async (
-        api,
-        callback: (data: MonitoringStoppedEventData) => void
-    ) =>
-        subscribeWithValidation("onMonitoringStopped", () =>
-            api.events.onMonitoringStopped((data) => {
-                if (!isMonitoringStoppedEventData(data)) {
-                    logger.error(
-                        "[EventsService] Dropped monitoring-stop payload: invalid monitoring control event",
-                        undefined,
-                        {
-                            payload: data,
-                        }
-                    );
-                    return;
-                }
+    onMonitoringStopped: wrap(
+        "onMonitoringStopped",
+        async (api, callback: (data: MonitoringStoppedEventData) => void) =>
+            subscribeWithValidation("onMonitoringStopped", () =>
+                api.events.onMonitoringStopped((data) => {
+                    if (!isMonitoringStoppedEventData(data)) {
+                        logger.error(
+                            "[EventsService] Dropped monitoring-stop payload: invalid monitoring control event",
+                            undefined,
+                            {
+                                payload: data,
+                            }
+                        );
+                        return;
+                    }
 
-                callback(data);
-            }))),
+                    callback(data);
+                })
+            )
+    ),
 
     /**
      * Register a callback for monitor status changes.
@@ -396,11 +402,11 @@ export const EventsService: EventsServiceContract = {
      * ```typescript
      * import { logger } from "@app/services/logger";
      *
-     * const cleanup = await EventsService.onMonitorStatusChanged((
-     *     update
-     * ) => {
-     *     logger.info("Monitor status changed", update);
-     * });
+     * const cleanup = await EventsService.onMonitorStatusChanged(
+     *     (update) => {
+     *         logger.info("Monitor status changed", update);
+     *     }
+     * );
      * // Later: cleanup();
      * ```
      *
@@ -410,12 +416,16 @@ export const EventsService: EventsServiceContract = {
      *
      * @throws If the electron API is unavailable.
      */
-    onMonitorStatusChanged: wrap("onMonitorStatusChanged", async (
-        api,
-        callback: (update: MonitorStatusChangedEventData) => void
-    ) =>
-        subscribeWithValidation("onMonitorStatusChanged", () =>
-            api.events.onMonitorStatusChanged(callback))),
+    onMonitorStatusChanged: wrap(
+        "onMonitorStatusChanged",
+        async (
+            api,
+            callback: (update: MonitorStatusChangedEventData) => void
+        ) =>
+            subscribeWithValidation("onMonitorStatusChanged", () =>
+                api.events.onMonitorStatusChanged(callback)
+            )
+    ),
 
     /**
      * Register a callback for monitor up events.
@@ -440,12 +450,13 @@ export const EventsService: EventsServiceContract = {
      *
      * @throws If the electron API is unavailable.
      */
-    onMonitorUp: wrap("onMonitorUp", async (
-        api,
-        callback: (data: MonitorUpEventData) => void
-    ) =>
-        subscribeWithValidation("onMonitorUp", () =>
-            api.events.onMonitorUp(callback))),
+    onMonitorUp: wrap(
+        "onMonitorUp",
+        async (api, callback: (data: MonitorUpEventData) => void) =>
+            subscribeWithValidation("onMonitorUp", () =>
+                api.events.onMonitorUp(callback)
+            )
+    ),
 
     /**
      * Register a callback for site added events.
@@ -466,12 +477,13 @@ export const EventsService: EventsServiceContract = {
      *
      * @returns A cleanup function that removes the listener.
      */
-    onSiteAdded: wrap("onSiteAdded", async (
-        api,
-        callback: (data: SiteAddedEventData) => void
-    ) =>
-        subscribeWithValidation("onSiteAdded", () =>
-            api.events.onSiteAdded(callback))),
+    onSiteAdded: wrap(
+        "onSiteAdded",
+        async (api, callback: (data: SiteAddedEventData) => void) =>
+            subscribeWithValidation("onSiteAdded", () =>
+                api.events.onSiteAdded(callback)
+            )
+    ),
 
     /**
      * Register a callback for site removal events.
@@ -492,12 +504,13 @@ export const EventsService: EventsServiceContract = {
      *
      * @returns A cleanup function that removes the listener.
      */
-    onSiteRemoved: wrap("onSiteRemoved", async (
-        api,
-        callback: (data: SiteRemovedEventData) => void
-    ) =>
-        subscribeWithValidation("onSiteRemoved", () =>
-            api.events.onSiteRemoved(callback))),
+    onSiteRemoved: wrap(
+        "onSiteRemoved",
+        async (api, callback: (data: SiteRemovedEventData) => void) =>
+            subscribeWithValidation("onSiteRemoved", () =>
+                api.events.onSiteRemoved(callback)
+            )
+    ),
 
     /**
      * Register a callback for site updated events.
@@ -507,15 +520,14 @@ export const EventsService: EventsServiceContract = {
      * ```typescript
      * import { logger } from "@app/services/logger";
      *
-     * const cleanup = await EventsService.onSiteUpdated(({
-     *     site,
-     *     updatedFields,
-     * }) => {
-     *     logger.debug("Site updated", {
-     *         id: site.identifier,
-     *         updatedFields,
-     *     });
-     * });
+     * const cleanup = await EventsService.onSiteUpdated(
+     *     ({ site, updatedFields }) => {
+     *         logger.debug("Site updated", {
+     *             id: site.identifier,
+     *             updatedFields,
+     *         });
+     *     }
+     * );
      * // Later: cleanup();
      * ```
      *
@@ -524,12 +536,13 @@ export const EventsService: EventsServiceContract = {
      *
      * @returns A cleanup function that removes the listener.
      */
-    onSiteUpdated: wrap("onSiteUpdated", async (
-        api,
-        callback: (data: SiteUpdatedEventData) => void
-    ) =>
-        subscribeWithValidation("onSiteUpdated", () =>
-            api.events.onSiteUpdated(callback))),
+    onSiteUpdated: wrap(
+        "onSiteUpdated",
+        async (api, callback: (data: SiteUpdatedEventData) => void) =>
+            subscribeWithValidation("onSiteUpdated", () =>
+                api.events.onSiteUpdated(callback)
+            )
+    ),
 
     /**
      * Register a callback for test events (development/debugging).
@@ -551,12 +564,13 @@ export const EventsService: EventsServiceContract = {
      *
      * @throws If the electron API is unavailable.
      */
-    onTestEvent: wrap("onTestEvent", async (
-        api,
-        callback: (data: TestEventData) => void
-    ) =>
-        subscribeWithValidation("onTestEvent", () =>
-            api.events.onTestEvent(callback))),
+    onTestEvent: wrap(
+        "onTestEvent",
+        async (api, callback: (data: TestEventData) => void) =>
+            subscribeWithValidation("onTestEvent", () =>
+                api.events.onTestEvent(callback)
+            )
+    ),
 
     /**
      * Register a callback for application update status events.
@@ -578,10 +592,11 @@ export const EventsService: EventsServiceContract = {
      *
      * @throws If the electron API is unavailable.
      */
-    onUpdateStatus: wrap("onUpdateStatus", async (
-        api,
-        callback: (data: UpdateStatusEventData) => void
-    ) =>
-        subscribeWithValidation("onUpdateStatus", () =>
-            api.events.onUpdateStatus(callback))),
+    onUpdateStatus: wrap(
+        "onUpdateStatus",
+        async (api, callback: (data: UpdateStatusEventData) => void) =>
+            subscribeWithValidation("onUpdateStatus", () =>
+                api.events.onUpdateStatus(callback)
+            )
+    ),
 };

@@ -310,13 +310,13 @@ describe("Error Handling Utilities - Comprehensive Coverage", () => {
             const finallyError = new Error("Finally setLoading error");
 
             // Mock setLoading to succeed for true, fail for false
-            mockStore.setLoading = vi.fn().mockImplementation((
-                loading: boolean
-            ) => {
-                if (!loading) {
-                    throw finallyError;
-                }
-            });
+            mockStore.setLoading = vi
+                .fn()
+                .mockImplementation((loading: boolean) => {
+                    if (!loading) {
+                        throw finallyError;
+                    }
+                });
 
             const result = await withErrorHandling(mockOperation, mockStore);
 

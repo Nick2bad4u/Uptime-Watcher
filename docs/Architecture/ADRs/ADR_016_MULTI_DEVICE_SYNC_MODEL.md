@@ -181,7 +181,7 @@ High-level components (actual implementation):
 
 ### Maintenance operations: remote reset
 
-To support switching encryption modes and cleaning up legacy sync artifacts,
+To support switching encryption modes and cleaning up older sync artifacts,
 we implement an explicit **remote sync reset** maintenance operation.
 
 For safety, the UI performs a preflight preview step first:

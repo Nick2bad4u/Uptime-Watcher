@@ -6,7 +6,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import type { Site } from "@shared/types";
 import type { MonitorCheckResult } from "../../../services/monitoring/types";
-import { DEFAULT_REQUEST_TIMEOUT } from "../../../constants";
 
 // Mock the modules before importing
 vi.mock("../../../services/monitoring/utils/portRetry", () => ({
@@ -65,7 +64,7 @@ describe("PortMonitor Coverage Tests", () => {
         vi.mocked(validateMonitorHostAndPort).mockReturnValue(null); // No validation error
         vi.mocked(createMonitorConfig).mockReturnValue({
             retryAttempts: 3,
-            timeout: 10_000, // Match DEFAULT_REQUEST_TIMEOUT
+            timeout: 5000,
             checkInterval: 30_000,
         });
         vi.mocked(createMonitorErrorResult).mockReturnValue(errorResult);
@@ -80,7 +79,10 @@ describe("PortMonitor Coverage Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: PortMonitor-coverage", "component");
+            await annotate(
+                "Component: PortMonitor-coverage-fixed",
+                "component"
+            );
             await annotate("Category: Service", "category");
             await annotate("Type: Initialization", "type");
 
@@ -95,7 +97,10 @@ describe("PortMonitor Coverage Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: PortMonitor-coverage", "component");
+            await annotate(
+                "Component: PortMonitor-coverage-fixed",
+                "component"
+            );
             await annotate("Category: Service", "category");
             await annotate("Type: Initialization", "type");
 
@@ -110,7 +115,10 @@ describe("PortMonitor Coverage Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: PortMonitor-coverage", "component");
+            await annotate(
+                "Component: PortMonitor-coverage-fixed",
+                "component"
+            );
             await annotate("Category: Service", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -127,7 +135,10 @@ describe("PortMonitor Coverage Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: PortMonitor-coverage", "component");
+            await annotate(
+                "Component: PortMonitor-coverage-fixed",
+                "component"
+            );
             await annotate("Category: Service", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -142,7 +153,10 @@ describe("PortMonitor Coverage Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: PortMonitor-coverage", "component");
+            await annotate(
+                "Component: PortMonitor-coverage-fixed",
+                "component"
+            );
             await annotate("Category: Service", "category");
             await annotate("Type: Monitoring", "type");
 
@@ -156,7 +170,10 @@ describe("PortMonitor Coverage Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: PortMonitor-coverage", "component");
+            await annotate(
+                "Component: PortMonitor-coverage-fixed",
+                "component"
+            );
             await annotate("Category: Service", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -170,7 +187,10 @@ describe("PortMonitor Coverage Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: PortMonitor-coverage", "component");
+            await annotate(
+                "Component: PortMonitor-coverage-fixed",
+                "component"
+            );
             await annotate("Category: Service", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -186,7 +206,10 @@ describe("PortMonitor Coverage Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: PortMonitor-coverage", "component");
+            await annotate(
+                "Component: PortMonitor-coverage-fixed",
+                "component"
+            );
             await annotate("Category: Service", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -202,7 +225,10 @@ describe("PortMonitor Coverage Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: PortMonitor-coverage", "component");
+            await annotate(
+                "Component: PortMonitor-coverage-fixed",
+                "component"
+            );
             await annotate("Category: Service", "category");
             await annotate("Type: Data Update", "type");
 
@@ -215,7 +241,10 @@ describe("PortMonitor Coverage Tests", () => {
 
         it("should merge partial configuration", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: PortMonitor-coverage", "component");
+            await annotate(
+                "Component: PortMonitor-coverage-fixed",
+                "component"
+            );
             await annotate("Category: Service", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -229,7 +258,10 @@ describe("PortMonitor Coverage Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: PortMonitor-coverage", "component");
+            await annotate(
+                "Component: PortMonitor-coverage-fixed",
+                "component"
+            );
             await annotate("Category: Service", "category");
             await annotate("Type: Error Handling", "type");
 
@@ -243,7 +275,10 @@ describe("PortMonitor Coverage Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: PortMonitor-coverage", "component");
+            await annotate(
+                "Component: PortMonitor-coverage-fixed",
+                "component"
+            );
             await annotate("Category: Service", "category");
             await annotate("Type: Error Handling", "type");
 
@@ -257,7 +292,10 @@ describe("PortMonitor Coverage Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: PortMonitor-coverage", "component");
+            await annotate(
+                "Component: PortMonitor-coverage-fixed",
+                "component"
+            );
             await annotate("Category: Service", "category");
             await annotate("Type: Error Handling", "type");
 
@@ -271,7 +309,10 @@ describe("PortMonitor Coverage Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: PortMonitor-coverage", "component");
+            await annotate(
+                "Component: PortMonitor-coverage-fixed",
+                "component"
+            );
             await annotate("Category: Service", "category");
             await annotate("Type: Validation", "type");
 
@@ -282,7 +323,10 @@ describe("PortMonitor Coverage Tests", () => {
 
         it("should handle empty config update", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: PortMonitor-coverage", "component");
+            await annotate(
+                "Component: PortMonitor-coverage-fixed",
+                "component"
+            );
             await annotate("Category: Service", "category");
             await annotate("Type: Data Update", "type");
 
@@ -296,7 +340,10 @@ describe("PortMonitor Coverage Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: PortMonitor-coverage", "component");
+            await annotate(
+                "Component: PortMonitor-coverage-fixed",
+                "component"
+            );
             await annotate("Category: Service", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -312,7 +359,10 @@ describe("PortMonitor Coverage Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: PortMonitor-coverage", "component");
+            await annotate(
+                "Component: PortMonitor-coverage-fixed",
+                "component"
+            );
             await annotate("Category: Service", "category");
             await annotate("Type: Monitoring", "type");
 
@@ -328,8 +378,8 @@ describe("PortMonitor Coverage Tests", () => {
             expect(vi.mocked(performPortCheckWithRetry)).toHaveBeenCalledWith(
                 "example.com",
                 443,
-                10_000, // Timeout as separate parameter
-                3 // RetryAttempts as separate parameter
+                5000,
+                3
             );
             expect(result).toEqual(successResult);
         });
@@ -339,7 +389,10 @@ describe("PortMonitor Coverage Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: PortMonitor-coverage", "component");
+            await annotate(
+                "Component: PortMonitor-coverage-fixed",
+                "component"
+            );
             await annotate("Category: Service", "category");
             await annotate("Type: Error Handling", "type");
 
@@ -358,7 +411,10 @@ describe("PortMonitor Coverage Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: PortMonitor-coverage", "component");
+            await annotate(
+                "Component: PortMonitor-coverage-fixed",
+                "component"
+            );
             await annotate("Category: Service", "category");
             await annotate("Type: Error Handling", "type");
 
@@ -382,7 +438,10 @@ describe("PortMonitor Coverage Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: PortMonitor-coverage", "component");
+            await annotate(
+                "Component: PortMonitor-coverage-fixed",
+                "component"
+            );
             await annotate("Category: Service", "category");
             await annotate("Type: Monitoring", "type");
 
@@ -403,7 +462,10 @@ describe("PortMonitor Coverage Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: PortMonitor-coverage", "component");
+            await annotate(
+                "Component: PortMonitor-coverage-fixed",
+                "component"
+            );
             await annotate("Category: Service", "category");
             await annotate("Type: Monitoring", "type");
 
@@ -424,7 +486,10 @@ describe("PortMonitor Coverage Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: PortMonitor-coverage", "component");
+            await annotate(
+                "Component: PortMonitor-coverage-fixed",
+                "component"
+            );
             await annotate("Category: Service", "category");
             await annotate("Type: Monitoring", "type");
 
@@ -446,7 +511,10 @@ describe("PortMonitor Coverage Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: PortMonitor-coverage", "component");
+            await annotate(
+                "Component: PortMonitor-coverage-fixed",
+                "component"
+            );
             await annotate("Category: Service", "category");
             await annotate("Type: Monitoring", "type");
 
@@ -468,7 +536,10 @@ describe("PortMonitor Coverage Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: PortMonitor-coverage", "component");
+            await annotate(
+                "Component: PortMonitor-coverage-fixed",
+                "component"
+            );
             await annotate("Category: Service", "category");
             await annotate("Type: Monitoring", "type");
 
@@ -493,8 +564,8 @@ describe("PortMonitor Coverage Tests", () => {
             expect(vi.mocked(performPortCheckWithRetry)).toHaveBeenCalledWith(
                 "example.com",
                 443,
-                8000, // Timeout
-                5 // RetryAttempts
+                8000,
+                5
             );
         });
 
@@ -503,7 +574,10 @@ describe("PortMonitor Coverage Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: PortMonitor-coverage", "component");
+            await annotate(
+                "Component: PortMonitor-coverage-fixed",
+                "component"
+            );
             await annotate("Category: Service", "category");
             await annotate("Type: Error Handling", "type");
 
@@ -520,7 +594,10 @@ describe("PortMonitor Coverage Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: PortMonitor-coverage", "component");
+            await annotate(
+                "Component: PortMonitor-coverage-fixed",
+                "component"
+            );
             await annotate("Category: Service", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -541,12 +618,7 @@ describe("PortMonitor Coverage Tests", () => {
 
                 expect(
                     vi.mocked(performPortCheckWithRetry)
-                ).toHaveBeenCalledWith(
-                    host,
-                    443,
-                    10_000, // Timeout
-                    3 // RetryAttempts
-                );
+                ).toHaveBeenCalledWith(host, 443, 5000, 3);
             }
         });
 
@@ -555,7 +627,10 @@ describe("PortMonitor Coverage Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: PortMonitor-coverage", "component");
+            await annotate(
+                "Component: PortMonitor-coverage-fixed",
+                "component"
+            );
             await annotate("Category: Service", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -578,12 +653,7 @@ describe("PortMonitor Coverage Tests", () => {
 
                 expect(
                     vi.mocked(performPortCheckWithRetry)
-                ).toHaveBeenCalledWith(
-                    "example.com",
-                    port,
-                    10_000, // Timeout
-                    3 // RetryAttempts
-                );
+                ).toHaveBeenCalledWith("example.com", port, 5000, 3);
             }
         });
 
@@ -592,7 +662,10 @@ describe("PortMonitor Coverage Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: PortMonitor-coverage", "component");
+            await annotate(
+                "Component: PortMonitor-coverage-fixed",
+                "component"
+            );
             await annotate("Category: Service", "category");
             await annotate("Type: Monitoring", "type");
 
@@ -613,7 +686,10 @@ describe("PortMonitor Coverage Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: PortMonitor-coverage", "component");
+            await annotate(
+                "Component: PortMonitor-coverage-fixed",
+                "component"
+            );
             await annotate("Category: Service", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -628,7 +704,6 @@ describe("PortMonitor Coverage Tests", () => {
                 customErrorResult
             );
 
-            // Actually call the monitor to trigger the expectation
             await customTimeoutMonitor.check(validPortMonitor);
 
             expect(vi.mocked(createMonitorConfig)).toHaveBeenCalledWith(
@@ -644,7 +719,10 @@ describe("PortMonitor Coverage Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: PortMonitor-coverage", "component");
+            await annotate(
+                "Component: PortMonitor-coverage-fixed",
+                "component"
+            );
             await annotate("Category: Service", "category");
             await annotate("Type: Error Handling", "type");
 
@@ -667,7 +745,10 @@ describe("PortMonitor Coverage Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: PortMonitor-coverage", "component");
+            await annotate(
+                "Component: PortMonitor-coverage-fixed",
+                "component"
+            );
             await annotate("Category: Service", "category");
             await annotate("Type: Error Handling", "type");
 
@@ -678,37 +759,26 @@ describe("PortMonitor Coverage Tests", () => {
             expect(vi.mocked(performPortCheckWithRetry)).toHaveBeenCalled();
         });
 
-        it("should handle empty string validation (no error case)", async ({
+        it("should handle empty string validation error", async ({
             task,
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: PortMonitor-coverage", "component");
+            await annotate(
+                "Component: PortMonitor-coverage-fixed",
+                "component"
+            );
             await annotate("Category: Service", "category");
             await annotate("Type: Error Handling", "type");
 
-            // Clear mocks to ensure fresh state
-            vi.clearAllMocks();
-            vi.mocked(validateMonitorHostAndPort).mockReturnValue(""); // Empty string means no validation error
-            vi.mocked(performPortCheckWithRetry).mockResolvedValue(
-                successResult
-            );
-            vi.mocked(createMonitorConfig).mockReturnValue({
-                retryAttempts: 3,
-                timeout: DEFAULT_REQUEST_TIMEOUT,
-                checkInterval: 30_000,
-            });
+            vi.mocked(validateMonitorHostAndPort).mockReturnValue("Empty host");
 
-            const result = await portMonitor.check(validPortMonitor);
+            await portMonitor.check(validPortMonitor);
 
-            // Should continue to performPortCheckWithRetry since no validation error
-            expect(vi.mocked(performPortCheckWithRetry)).toHaveBeenCalledWith(
-                validPortMonitor.host,
-                validPortMonitor.port,
-                DEFAULT_REQUEST_TIMEOUT,
-                3
+            expect(vi.mocked(createMonitorErrorResult)).toHaveBeenCalledWith(
+                "Empty host",
+                0
             );
-            expect(result).toEqual(successResult);
         });
 
         it("should handle monitor with all optional fields", async ({
@@ -716,7 +786,10 @@ describe("PortMonitor Coverage Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: PortMonitor-coverage", "component");
+            await annotate(
+                "Component: PortMonitor-coverage-fixed",
+                "component"
+            );
             await annotate("Category: Service", "category");
             await annotate("Type: Monitoring", "type");
 
@@ -746,7 +819,10 @@ describe("PortMonitor Coverage Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: PortMonitor-coverage", "component");
+            await annotate(
+                "Component: PortMonitor-coverage-fixed",
+                "component"
+            );
             await annotate("Category: Service", "category");
             await annotate("Type: Monitoring", "type");
 
@@ -764,7 +840,10 @@ describe("PortMonitor Coverage Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: PortMonitor-coverage", "component");
+            await annotate(
+                "Component: PortMonitor-coverage-fixed",
+                "component"
+            );
             await annotate("Category: Service", "category");
             await annotate("Type: Monitoring", "type");
 
@@ -788,12 +867,16 @@ describe("PortMonitor Coverage Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: PortMonitor-coverage", "component");
+            await annotate(
+                "Component: PortMonitor-coverage-fixed",
+                "component"
+            );
             await annotate("Category: Service", "category");
             await annotate("Type: Business Logic", "type");
 
             const promises = Array.from({ length: 5 }, () =>
-                portMonitor.check(validPortMonitor));
+                portMonitor.check(validPortMonitor)
+            );
 
             const results = await Promise.all(promises);
 

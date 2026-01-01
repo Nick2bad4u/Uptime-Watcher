@@ -63,6 +63,7 @@ const zeroCoverageConfig: ViteUserConfigFnObject = defineConfig((env) =>
                 },
             } as any,
         })
-    ));
+    )
+);
 
 export default zeroCoverageConfig;

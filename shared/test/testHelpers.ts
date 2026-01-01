@@ -96,4 +96,5 @@ export const createValidMonitors = (
             ...basePartial,
             id: `test-monitor-${index}`,
             url: `https://example-${index}.com`,
-        }));
+        })
+    );

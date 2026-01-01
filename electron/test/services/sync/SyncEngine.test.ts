@@ -6,15 +6,13 @@ import { FilesystemCloudStorageProvider } from "@electron/services/cloud/provide
 import { CLOUD_SYNC_SCHEMA_VERSION } from "@shared/types/cloudSync";
 import { SyncEngine } from "@electron/services/sync/SyncEngine";
 import type { Monitor, Site } from "@shared/types";
+import { isRecord } from "@shared/utils/typeHelpers";
 import {
     DEFAULT_CHECK_INTERVAL,
     DEFAULT_REQUEST_TIMEOUT,
 } from "@electron/constants";
+import { logger } from "@electron/utils/logger";
 import { describe, expect, it, vi } from "vitest";
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-    return typeof value === "object" && value !== null && !Array.isArray(value);
-}
 
 /* eslint-disable unicorn/numeric-separators-style -- Test constants like 1_000 / 60_000 don't match the project's strict grouping rule; readability here is preferred. */
 
@@ -210,6 +208,8 @@ describe("SyncEngine (ADR-016)", () => {
                 baseDirectory,
             });
 
+            const warnSpy = vi.spyOn(logger, "warn");
+
             const remoteDeviceId = "remote-device";
             const snapshotKey = `sync/snapshots/${CLOUD_SYNC_SCHEMA_VERSION}/1.json`;
 
@@ -374,6 +374,13 @@ describe("SyncEngine (ADR-016)", () => {
 
             await engine.syncNow(provider);
 
+            expect(warnSpy).toHaveBeenCalledWith(
+                expect.stringContaining("Failed to load remote snapshot"),
+                expect.objectContaining({
+                    key: snapshotKey,
+                })
+            );
+
             const sites = await orchestrator.getSites();
             expect(sites).toHaveLength(1);
             expect(sites[0]?.identifier).toBe("example.com");
@@ -478,7 +485,8 @@ describe("SyncEngine (ADR-016)", () => {
             expect(snapshotEntries.length).toBeGreaterThan(0);
 
             const snapshotKey = snapshotEntries.find((entry) =>
-                entry.key.endsWith(".json"))?.key;
+                entry.key.endsWith(".json")
+            )?.key;
             expect(snapshotKey).toBeTruthy();
 
             const snapshotRaw = Buffer.from(
@@ -993,7 +1001,8 @@ describe("SyncEngine (ADR-016)", () => {
             await engine.syncNow(providerWithRecording as any);
 
             const opKey = uploadedKeys.find((key) =>
-                key.startsWith("sync/devices/device-a/ops/"));
+                key.startsWith("sync/devices/device-a/ops/")
+            );
             expect(opKey).toBeTruthy();
 
             const fileName = opKey!.split("/").at(-1);

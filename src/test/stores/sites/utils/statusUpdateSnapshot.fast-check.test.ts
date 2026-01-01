@@ -27,8 +27,6 @@ import {
     type StatusUpdateSnapshotPayload,
 } from "../../../../stores/sites/utils/statusUpdateSnapshot";
 
-import { logger } from "../../../../services/logger";
-
 import {
     resetProcessSnapshotOverrideForTesting,
     setProcessSnapshotOverrideForTesting,
@@ -42,8 +40,6 @@ vi.mock("../../../../services/logger", () => ({
         warn: vi.fn(),
     },
 }));
-
-const mockedLogger = vi.mocked(logger);
 
 type MonitorHistoryEntry = Required<Monitor>["history"][number];
 
@@ -107,38 +103,6 @@ describe(applyStatusUpdateSnapshot, () => {
         resetProcessSnapshotOverrideForTesting();
     });
 
-    it("returns the original sites array when snapshot lacks contextual site data", () => {
-        setProcessSnapshotOverrideForTesting({
-            env: {
-                NODE_ENV: "development",
-            },
-        });
-
-        const sites = [
-            createSite("site-a", [createMonitor({ id: "monitor-a" })]),
-        ];
-
-        const payload: StatusUpdateSnapshotPayload = {
-            monitorId: "monitor-a",
-            siteIdentifier: "site-a",
-            status: "down",
-            timestamp: "2024-01-01T00:00:00.000Z",
-        };
-
-        const result = applyStatusUpdateSnapshot(sites, payload);
-
-        expect(result).toBe(sites);
-        expect(mockedLogger.debug).toHaveBeenCalledWith(
-            expect.stringContaining(
-                "status update without site or monitor context"
-            ),
-            expect.objectContaining({
-                monitorId: payload.monitorId,
-                siteIdentifier: payload.siteIdentifier,
-            })
-        );
-    });
-
     it("falls back to the existing monitor history when the snapshot omits history records", () => {
         const existingHistory = [
             createHistoryEntry("up", 0),
@@ -155,6 +119,7 @@ describe(applyStatusUpdateSnapshot, () => {
         const payload: StatusUpdateSnapshotPayload = {
             monitor: createMonitor({ id: monitor.id, history: [] }),
             monitorId: monitor.id,
+            responseTime: 0,
             site: createSite("site-history", [monitor]),
             siteIdentifier: "site-history",
             status: "down",
@@ -186,6 +151,7 @@ describe(applyStatusUpdateSnapshot, () => {
                 status: "down",
             }),
             monitorId: monitor.id,
+            responseTime: 0,
             site: createSite("site-new-history", [monitor]),
             siteIdentifier: "site-new-history",
             status: "down",
@@ -207,7 +173,8 @@ describe(applyStatusUpdateSnapshot, () => {
             maxLength: 5,
         })
         .map((statuses) =>
-            statuses.map((status, index) => createHistoryEntry(status, index)));
+            statuses.map((status, index) => createHistoryEntry(status, index))
+        );
 
     const snapshotHistoryEntries = fc
         .array(fc.constantFrom<StatusHistoryStatus>(...STATUS_HISTORY_VALUES), {
@@ -215,7 +182,9 @@ describe(applyStatusUpdateSnapshot, () => {
         })
         .map((statuses) =>
             statuses.map((status, index) =>
-                createHistoryEntry(status, index + 10)));
+                createHistoryEntry(status, index + 10)
+            )
+        );
 
     test.prop([
         fc
@@ -229,59 +198,63 @@ describe(applyStatusUpdateSnapshot, () => {
         historyEntries,
         snapshotHistoryEntries,
         fc.constantFrom<MonitorStatus>(...MONITOR_STATUS_VALUES),
-    ])("applies snapshot data without disturbing unaffected monitors", (
-        siteIdentifier,
-        monitorId,
-        existingHistory,
-        snapshotHistory,
-        nextStatus
-    ) => {
-        const targetMonitor = createMonitor({
-            history: existingHistory,
-            id: monitorId,
-            status: "up",
-        });
-        const siblingMonitor = createMonitor({
-            id: `${monitorId}-sibling`,
-            status: "up",
-        });
-
-        const site = createSite(siteIdentifier, [
-            targetMonitor,
-            siblingMonitor,
-        ]);
-        const payload: StatusUpdateSnapshotPayload = {
-            monitor: createMonitor({
-                history: snapshotHistory,
-                id: monitorId,
-                status: nextStatus,
-            }),
+    ])(
+        "applies snapshot data without disturbing unaffected monitors",
+        (
+            siteIdentifier,
             monitorId,
-            site: createSite(siteIdentifier, [
+            existingHistory,
+            snapshotHistory,
+            nextStatus
+        ) => {
+            const targetMonitor = createMonitor({
+                history: existingHistory,
+                id: monitorId,
+                status: "up",
+            });
+            const siblingMonitor = createMonitor({
+                id: `${monitorId}-sibling`,
+                status: "up",
+            });
+
+            const site = createSite(siteIdentifier, [
                 targetMonitor,
                 siblingMonitor,
-            ]),
-            siteIdentifier,
-            status: nextStatus,
-            timestamp: new Date("2024-05-05T12:00:00.000Z").toISOString(),
-        };
+            ]);
+            const payload: StatusUpdateSnapshotPayload = {
+                monitor: createMonitor({
+                    history: snapshotHistory,
+                    id: monitorId,
+                    status: nextStatus,
+                }),
+                monitorId,
+                responseTime: 0,
+                site: createSite(siteIdentifier, [
+                    targetMonitor,
+                    siblingMonitor,
+                ]),
+                siteIdentifier,
+                status: nextStatus,
+                timestamp: new Date("2024-05-05T12:00:00.000Z").toISOString(),
+            };
 
-        const [updatedSite] = applyStatusUpdateSnapshot([site], payload);
-        const resolvedSite = ensureSite(updatedSite);
-        const updatedMonitor = resolvedSite.monitors.find(
-            ({ id }) => id === monitorId
-        );
-        const untouchedMonitor = resolvedSite.monitors.find(
-            ({ id }) => id === siblingMonitor.id
-        );
+            const [updatedSite] = applyStatusUpdateSnapshot([site], payload);
+            const resolvedSite = ensureSite(updatedSite);
+            const updatedMonitor = resolvedSite.monitors.find(
+                ({ id }) => id === monitorId
+            );
+            const untouchedMonitor = resolvedSite.monitors.find(
+                ({ id }) => id === siblingMonitor.id
+            );
 
-        expect(updatedMonitor?.status).toBe(nextStatus);
+            expect(updatedMonitor?.status).toBe(nextStatus);
 
-        const expectedHistory =
-            snapshotHistory.length === 0 && existingHistory.length > 0
-                ? existingHistory
-                : snapshotHistory;
-        expect(updatedMonitor?.history).toEqual(expectedHistory);
-        expect(untouchedMonitor).toBe(siblingMonitor);
-    });
+            const expectedHistory =
+                snapshotHistory.length === 0 && existingHistory.length > 0
+                    ? existingHistory
+                    : snapshotHistory;
+            expect(updatedMonitor?.history).toEqual(expectedHistory);
+            expect(untouchedMonitor).toBe(siblingMonitor);
+        }
+    );
 });

@@ -2,12 +2,26 @@ import type { CloudSyncResetResult } from "@shared/types/cloudSyncReset";
 import type { CloudSyncResetPreview } from "@shared/types/cloudSyncResetPreview";
 import type { JSX } from "react";
 
-import { useCallback, useState } from "react";
+import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
+import { useCallback, useMemo, useState } from "react";
 
 import { SystemService } from "../../../services/SystemService";
 import { ThemedButton } from "../../../theme/components/ThemedButton";
 import { ThemedText } from "../../../theme/components/ThemedText";
+import { AppIcons, getIconSize } from "../../../utils/icons";
 import { formatFullTimestamp } from "../../../utils/time";
+
+/* eslint-disable react/no-multi-comp -- Sync Maintenance UI is clearer with co-located presentational components. */
+
+type MaintenanceTone = "info" | "warning";
+
+interface PreviewStats {
+    readonly changes: number;
+    readonly devices: number;
+    readonly other: number;
+    readonly snapshots: number;
+    readonly total: number;
+}
 
 function resolveSyncResetStatusText(args: {
     connected: boolean;
@@ -53,7 +67,6 @@ function formatOptionalEpochMs(timestamp: number | undefined): string {
 }
 
 interface PreviewViewModel {
-    readonly deviceText: null | string;
     readonly mismatchText: null | string;
     readonly otherObjectsText: null | string;
     readonly perDevice: CloudSyncResetPreview["perDevice"];
@@ -65,7 +78,6 @@ function buildPreviewViewModel(
 ): PreviewViewModel {
     if (!preview) {
         return {
-            deviceText: null,
             mismatchText: null,
             otherObjectsText: null,
             perDevice: [],
@@ -77,11 +89,6 @@ function buildPreviewViewModel(
     const previewText =
         `Sync history files: ${preview.syncObjectCount} ` +
         `(snapshots: ${preview.snapshotObjectCount}, changes: ${preview.operationObjectCount}, other: ${preview.otherObjectCount}).`;
-
-    const deviceText =
-        preview.deviceIds.length === 0
-            ? "Devices: none"
-            : `Devices (${preview.deviceIds.length}): ${preview.deviceIds.join(", ")}`;
 
     const manifestSet = new Set(preview.deviceIds);
     const opsSet = new Set(preview.operationDeviceIds);
@@ -107,13 +114,437 @@ function buildPreviewViewModel(
             : null;
 
     return {
-        deviceText,
         mismatchText,
         otherObjectsText,
         perDevice: preview.perDevice,
         previewText,
     };
 }
+
+const MaintenanceStatusCard = (props: {
+    readonly infoIcon: JSX.Element;
+    readonly statusText: string;
+    readonly summary: null | string;
+    readonly tone: MaintenanceTone;
+    readonly warningIcon: JSX.Element;
+}): JSX.Element => {
+    const { infoIcon, statusText, summary, tone, warningIcon } = props;
+
+    const statusIcon = tone === "warning" ? warningIcon : infoIcon;
+    const statusAccentClass =
+        tone === "warning"
+            ? "settings-accent--warning"
+            : "settings-accent--primary";
+    const statusCardClass =
+        tone === "warning"
+            ? "settings-subcard settings-subcard--warning"
+            : "settings-subcard settings-subcard--info";
+
+    return (
+        <div className={statusCardClass}>
+            <div className="settings-subcard__header">
+                <div className="settings-subcard__title">
+                    <span aria-hidden className={statusAccentClass}>
+                        {statusIcon}
+                    </span>
+                    <ThemedText
+                        as="div"
+                        size="xs"
+                        variant="secondary"
+                        weight="medium"
+                    >
+                        About this action
+                    </ThemedText>
+                </div>
+            </div>
+
+            <ThemedText as="p" className="mt-2" size="sm" variant="tertiary">
+                {statusText}
+            </ThemedText>
+
+            {summary ? (
+                <ThemedText as="p" className="mt-2" size="xs" variant="tertiary">
+                    {summary}
+                </ThemedText>
+            ) : null}
+        </div>
+    );
+};
+
+const PreviewMetrics = (props: {
+    readonly stats: PreviewStats;
+}): JSX.Element => {
+    const { stats } = props;
+
+    return (
+        <div className="settings-metrics mt-3">
+            <div className="settings-metric">
+                <ThemedText as="div" size="xs" variant="tertiary">
+                    Sync history files
+                </ThemedText>
+                <ThemedText
+                    as="div"
+                    className="settings-metric__value"
+                    size="sm"
+                    variant="secondary"
+                >
+                    {stats.total}
+                </ThemedText>
+            </div>
+
+            <div className="settings-metric">
+                <ThemedText as="div" size="xs" variant="tertiary">
+                    Devices
+                </ThemedText>
+                <ThemedText
+                    as="div"
+                    className="settings-metric__value"
+                    size="sm"
+                    variant="secondary"
+                >
+                    {stats.devices}
+                </ThemedText>
+            </div>
+
+            <div className="settings-metric settings-metric--wide">
+                <ThemedText as="div" size="xs" variant="tertiary">
+                    Objects breakdown
+                </ThemedText>
+
+                <div className="settings-metric__breakdown">
+                    <div className="settings-metric__breakdown-item">
+                        <ThemedText as="div" size="xs" variant="tertiary">
+                            Snapshots
+                        </ThemedText>
+                        <ThemedText
+                            as="div"
+                            className="settings-metric__value"
+                            size="sm"
+                            variant="secondary"
+                        >
+                            {stats.snapshots}
+                        </ThemedText>
+                    </div>
+
+                    <div className="settings-metric__breakdown-item">
+                        <ThemedText as="div" size="xs" variant="tertiary">
+                            Changes
+                        </ThemedText>
+                        <ThemedText
+                            as="div"
+                            className="settings-metric__value"
+                            size="sm"
+                            variant="secondary"
+                        >
+                            {stats.changes}
+                        </ThemedText>
+                    </div>
+
+                    <div className="settings-metric__breakdown-item">
+                        <ThemedText as="div" size="xs" variant="tertiary">
+                            Other
+                        </ThemedText>
+                        <ThemedText
+                            as="div"
+                            className="settings-metric__value"
+                            size="sm"
+                            variant="secondary"
+                        >
+                            {stats.other}
+                        </ThemedText>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+const PreviewSummaryCard = (props: {
+    readonly connected: boolean;
+    readonly infoIcon: JSX.Element;
+    readonly isRefreshingPreview: boolean;
+    readonly onRefreshPreview: () => void;
+    readonly preview: CloudSyncResetPreview | null;
+    readonly previewStats: null | PreviewStats;
+    readonly previewView: PreviewViewModel;
+    readonly refreshIcon: JSX.Element;
+}): JSX.Element => {
+    const {
+        connected,
+        infoIcon,
+        isRefreshingPreview,
+        onRefreshPreview,
+        preview,
+        previewStats,
+        previewView,
+        refreshIcon,
+    } = props;
+
+    return (
+        <div className="settings-subcard settings-subcard--info">
+            <div className="settings-subcard__header">
+                <div className="settings-subcard__title">
+                    <span aria-hidden className="settings-accent--primary">
+                        {infoIcon}
+                    </span>
+                    <ThemedText
+                        as="div"
+                        size="xs"
+                        variant="secondary"
+                        weight="medium"
+                    >
+                        Preview summary
+                    </ThemedText>
+                </div>
+
+                <div className="settings-subcard__actions">
+                    <ThemedButton
+                        disabled={!connected || isRefreshingPreview}
+                        icon={refreshIcon}
+                        loading={isRefreshingPreview}
+                        onClick={onRefreshPreview}
+                        size="sm"
+                        variant="secondary"
+                    >
+                        Refresh preview
+                    </ThemedButton>
+                </div>
+            </div>
+
+            {previewStats ? (
+                <PreviewMetrics stats={previewStats} />
+            ) : (
+                <ThemedText as="p" className="mt-3" size="xs" variant="tertiary">
+                    {previewView.previewText}
+                </ThemedText>
+            )}
+
+            {preview?.operationObjectCount === 0 ? (
+                <ThemedText as="p" className="mt-3" size="xs" variant="tertiary">
+                    No change history has been uploaded yet. This is normal on
+                    the first device until you make changes with Sync enabled.
+                </ThemedText>
+            ) : null}
+
+            {previewView.otherObjectsText ? (
+                <ThemedText as="p" className="mt-2" size="xs" variant="tertiary">
+                    {previewView.otherObjectsText}
+                </ThemedText>
+            ) : null}
+        </div>
+    );
+};
+
+const MismatchNoticeCard = (props: {
+    readonly mismatchText: string;
+    readonly warningIcon: JSX.Element;
+}): JSX.Element => {
+    const { mismatchText, warningIcon } = props;
+
+    return (
+        <div className="settings-subcard settings-subcard--warning">
+            <div className="settings-subcard__header">
+                <div className="settings-subcard__title">
+                    <span aria-hidden className="settings-accent--warning">
+                        {warningIcon}
+                    </span>
+                    <ThemedText
+                        as="div"
+                        size="xs"
+                        variant="secondary"
+                        weight="medium"
+                    >
+                        Device mismatch detected
+                    </ThemedText>
+                </div>
+            </div>
+
+            <ThemedText as="p" className="mt-2" size="xs" variant="tertiary">
+                {mismatchText}
+            </ThemedText>
+        </div>
+    );
+};
+
+const DeviceIdsDetails = (props: {
+    readonly deviceIds: readonly string[];
+    readonly infoIcon: JSX.Element;
+}): JSX.Element => {
+    const { deviceIds, infoIcon } = props;
+
+    return (
+        <details className="settings-details">
+            <summary className="settings-details__summary">
+                <span className="settings-details__summary-inner">
+                    <span aria-hidden className="settings-accent--primary">
+                        {infoIcon}
+                    </span>
+                    <ThemedText
+                        as="span"
+                        size="xs"
+                        variant="secondary"
+                        weight="medium"
+                    >
+                        View device IDs
+                    </ThemedText>
+                </span>
+            </summary>
+
+            <pre className="settings-mono-block">{deviceIds.join("\n")}</pre>
+        </details>
+    );
+};
+
+const OperationLogsDetails = (props: {
+    readonly infoIcon: JSX.Element;
+    readonly perDevice: CloudSyncResetPreview["perDevice"];
+}): JSX.Element => {
+    const { infoIcon, perDevice } = props;
+
+    return (
+        <details className="settings-details">
+            <summary className="settings-details__summary">
+                <span className="settings-details__summary-inner">
+                    <span aria-hidden className="settings-accent--success">
+                        {infoIcon}
+                    </span>
+                    <ThemedText
+                        as="span"
+                        size="xs"
+                        variant="secondary"
+                        weight="medium"
+                    >
+                        Operation logs by device
+                    </ThemedText>
+                </span>
+            </summary>
+
+            <div className="settings-paragraph-stack mt-3">
+                {perDevice.map((device) => (
+                    <div
+                        className="settings-subcard settings-subcard--compact"
+                        key={device.deviceId}
+                    >
+                        <ThemedText as="div" size="xs" variant="secondary">
+                            {device.deviceId} — {device.operationObjectCount} op
+                            object(s)
+                        </ThemedText>
+                        <div className="settings-paragraph-stack mt-2">
+                            <ThemedText as="p" size="xs" variant="tertiary">
+                                Oldest:{" "}
+                                {formatOptionalEpochMs(
+                                    device.oldestCreatedAtEpochMs
+                                )}
+                            </ThemedText>
+                            <ThemedText as="p" size="xs" variant="tertiary">
+                                Newest:{" "}
+                                {formatOptionalEpochMs(
+                                    device.newestCreatedAtEpochMs
+                                )}
+                            </ThemedText>
+                        </div>
+                    </div>
+                ))}
+            </div>
+        </details>
+    );
+};
+
+const ToolsCard = (props: {
+    readonly copyIcon: JSX.Element;
+    readonly copyResult:
+        | null
+        | {
+              kind: "error";
+              message: string;
+          }
+        | {
+              kind: "success";
+          };
+    readonly disabled: boolean;
+    readonly onCopy: () => void;
+}): JSX.Element => {
+    const { copyIcon, copyResult, disabled, onCopy } = props;
+
+    return (
+        <div className="settings-subcard settings-subcard--compact settings-maintenance__tools">
+            <div className="settings-subcard__header">
+                <ThemedText
+                    as="div"
+                    size="xs"
+                    variant="secondary"
+                    weight="medium"
+                >
+                    Tools
+                </ThemedText>
+
+                <div className="settings-subcard__actions">
+                    <ThemedButton
+                        disabled={disabled}
+                        icon={copyIcon}
+                        onClick={onCopy}
+                        size="sm"
+                        variant="secondary"
+                    >
+                        Copy diagnostics
+                    </ThemedButton>
+                </div>
+            </div>
+
+            {copyResult ? (
+                <div className="mt-2">
+                    <ThemedText as="p" size="xs" variant="tertiary">
+                        {copyResult.kind === "success"
+                            ? "Copied diagnostics to clipboard."
+                            : `Failed to copy diagnostics: ${copyResult.message}`}
+                    </ThemedText>
+                </div>
+            ) : null}
+        </div>
+    );
+};
+
+const DangerZoneCard = (props: {
+    readonly canReset: boolean;
+    readonly isResetting: boolean;
+    readonly onReset: () => void;
+    readonly resetIcon: JSX.Element;
+}): JSX.Element => {
+    const { canReset, isResetting, onReset, resetIcon } = props;
+
+    return (
+        <div className="settings-subcard settings-subcard--danger mt-3">
+            <div className="settings-subcard__header">
+                <ThemedText
+                    as="div"
+                    size="xs"
+                    variant="secondary"
+                    weight="medium"
+                >
+                    Danger zone
+                </ThemedText>
+
+                <div className="settings-subcard__actions">
+                    <ThemedButton
+                        disabled={!canReset || isResetting}
+                        icon={resetIcon}
+                        loading={isResetting}
+                        onClick={onReset}
+                        size="sm"
+                        variant="error"
+                    >
+                        Reset remote sync
+                    </ThemedButton>
+                </div>
+            </div>
+
+            <ThemedText as="p" className="mt-2" size="xs" variant="tertiary">
+                Resetting remote sync deletes remote history and re-seeds from
+                this device. Other devices may need to resync.
+            </ThemedText>
+        </div>
+    );
+};
 
 async function copyTextToClipboard(text: string): Promise<void> {
     await SystemService.writeClipboardText(text);
@@ -162,6 +593,36 @@ export const SyncMaintenancePanel = ({
 }: SyncMaintenancePanelProperties): JSX.Element => {
     const hasPreview = preview !== null;
 
+    const buttonIconSize = getIconSize("sm");
+    const CopyIcon = AppIcons.actions.copy;
+    const InfoIcon = AppIcons.ui.info;
+    const RefreshIcon = AppIcons.actions.refresh;
+    const ResetIcon = AppIcons.actions.refreshAlt;
+    const WarningIcon = AppIcons.status.warning;
+
+    const refreshIcon = useMemo(
+        () => <RefreshIcon aria-hidden size={buttonIconSize} />,
+        [buttonIconSize, RefreshIcon]
+    );
+    const copyIcon = useMemo(
+        () => <CopyIcon aria-hidden size={buttonIconSize} />,
+        [buttonIconSize, CopyIcon]
+    );
+    const resetIcon = useMemo(
+        () => <ResetIcon aria-hidden size={buttonIconSize} />,
+        [buttonIconSize, ResetIcon]
+    );
+
+    const infoIcon = useMemo(
+        () => <InfoIcon aria-hidden size={getIconSize("xs")} />,
+        [InfoIcon]
+    );
+
+    const warningIcon = useMemo(
+        () => <WarningIcon aria-hidden size={getIconSize("xs")} />,
+        [WarningIcon]
+    );
+
     const [copyResult, setCopyResult] = useState<
         | null
         | {
@@ -190,12 +651,25 @@ export const SyncMaintenancePanel = ({
 
     const previewView = buildPreviewViewModel(preview);
 
+    const previewStats = useMemo(() => {
+        if (!preview) {
+            return null;
+        }
+
+        return {
+            changes: preview.operationObjectCount,
+            devices: preview.deviceIds.length,
+            other: preview.otherObjectCount,
+            snapshots: preview.snapshotObjectCount,
+            total: preview.syncObjectCount,
+        };
+    }, [preview]);
+
     const copyDiagnostics = useCallback(
         async function copyDiagnostics(): Promise<void> {
             const computedPreview = buildPreviewViewModel(preview);
             const payload = {
                 computed: {
-                    deviceText: computedPreview.deviceText,
                     mismatchText: computedPreview.mismatchText,
                     otherObjectsText: computedPreview.otherObjectsText,
                     previewText: computedPreview.previewText,
@@ -218,10 +692,11 @@ export const SyncMaintenancePanel = ({
             try {
                 await copyTextToClipboard(text);
                 setCopyResult({ kind: "success" });
-            } catch (error) {
-                const message =
-                    error instanceof Error ? error.message : "Unknown error";
-                setCopyResult({ kind: "error", message });
+            } catch (error: unknown) {
+                setCopyResult({
+                    kind: "error",
+                    message: getUserFacingErrorDetail(error),
+                });
             }
         },
         [lastResult, preview]
@@ -234,155 +709,59 @@ export const SyncMaintenancePanel = ({
         [copyDiagnostics]
     );
 
+    const tone: MaintenanceTone = connected && syncEnabled ? "warning" : "info";
+
     return (
-        <div className="rounded-lg border border-zinc-800 bg-zinc-900/40 p-4">
-            <div className="mb-2 flex items-center justify-between gap-2">
-                <ThemedText size="sm" variant="secondary" weight="medium">
-                    Sync Maintenance
-                </ThemedText>
-            </div>
+        <div className="settings-maintenance-modal">
+            <MaintenanceStatusCard
+                infoIcon={infoIcon}
+                statusText={statusText}
+                summary={summary}
+                tone={tone}
+                warningIcon={warningIcon}
+            />
 
-            <ThemedText size="sm" variant="tertiary">
-                {statusText}
-            </ThemedText>
+            <PreviewSummaryCard
+                connected={connected}
+                infoIcon={infoIcon}
+                isRefreshingPreview={isRefreshingPreview}
+                onRefreshPreview={onRefreshPreview}
+                preview={preview}
+                previewStats={previewStats}
+                previewView={previewView}
+                refreshIcon={refreshIcon}
+            />
 
-            {summary ? (
-                <div className="mt-2">
-                    <ThemedText size="xs" variant="tertiary">
-                        {summary}
-                    </ThemedText>
-                </div>
+            {previewView.mismatchText ? (
+                <MismatchNoticeCard
+                    mismatchText={previewView.mismatchText}
+                    warningIcon={warningIcon}
+                />
             ) : null}
 
-            <div className="mt-3">
-                <ThemedText size="xs" variant="tertiary">
-                    {previewView.previewText}
-                </ThemedText>
+            {preview && preview.deviceIds.length > 0 ? (
+                <DeviceIdsDetails deviceIds={preview.deviceIds} infoIcon={infoIcon} />
+            ) : null}
 
-                {preview?.operationObjectCount === 0 ? (
-                    <ThemedText className="mt-1" size="xs" variant="tertiary">
-                        No change history has been uploaded yet. This is normal
-                        on the first device until you make changes with Sync
-                        enabled.
-                    </ThemedText>
-                ) : null}
+            {previewView.perDevice.length > 0 ? (
+                <OperationLogsDetails infoIcon={infoIcon} perDevice={previewView.perDevice} />
+            ) : null}
 
-                {previewView.deviceText ? (
-                    <ThemedText className="mt-1" size="xs" variant="tertiary">
-                        {previewView.deviceText}
-                    </ThemedText>
-                ) : null}
+            <ToolsCard
+                copyIcon={copyIcon}
+                copyResult={copyResult}
+                disabled={!hasPreview}
+                onCopy={handleCopyDiagnostics}
+            />
 
-                {previewView.mismatchText ? (
-                    <ThemedText className="mt-1" size="xs" variant="tertiary">
-                        {previewView.mismatchText}
-                    </ThemedText>
-                ) : null}
-
-                {previewView.otherObjectsText ? (
-                    <ThemedText className="mt-1" size="xs" variant="tertiary">
-                        {previewView.otherObjectsText}
-                    </ThemedText>
-                ) : null}
-
-                {previewView.perDevice.length > 0 ? (
-                    <div className="mt-2 rounded-md border border-zinc-800 p-2">
-                        <ThemedText
-                            size="xs"
-                            variant="secondary"
-                            weight="medium"
-                        >
-                            Operation logs by device
-                        </ThemedText>
-                        <div className="mt-2 grid grid-cols-1 gap-2">
-                            {previewView.perDevice.map((device) => (
-                                <div
-                                    className="flex flex-col gap-1 rounded-md bg-zinc-950/40 p-2"
-                                    key={device.deviceId}
-                                >
-                                    <ThemedText size="xs" variant="secondary">
-                                        {device.deviceId} —{" "}
-                                        {device.operationObjectCount} op
-                                        object(s)
-                                    </ThemedText>
-                                    <ThemedText size="xs" variant="tertiary">
-                                        Oldest:{" "}
-                                        {formatOptionalEpochMs(
-                                            device.oldestCreatedAtEpochMs
-                                        )}
-                                    </ThemedText>
-                                    <ThemedText size="xs" variant="tertiary">
-                                        Newest:{" "}
-                                        {formatOptionalEpochMs(
-                                            device.newestCreatedAtEpochMs
-                                        )}
-                                    </ThemedText>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                ) : null}
-            </div>
-
-            <div className="mt-3 rounded-md border border-zinc-800 bg-zinc-950/20 p-3">
-                <ThemedText size="xs" variant="secondary" weight="medium">
-                    Tools
-                </ThemedText>
-
-                <div className="mt-2 flex flex-wrap gap-2">
-                    <ThemedButton
-                        disabled={!connected || isRefreshingPreview}
-                        onClick={onRefreshPreview}
-                        size="sm"
-                        variant="secondary"
-                    >
-                        {isRefreshingPreview
-                            ? "Refreshing…"
-                            : "Refresh preview"}
-                    </ThemedButton>
-
-                    <ThemedButton
-                        disabled={!hasPreview}
-                        onClick={handleCopyDiagnostics}
-                        size="sm"
-                        variant="secondary"
-                    >
-                        Copy diagnostics
-                    </ThemedButton>
-                </div>
-
-                {copyResult ? (
-                    <div className="mt-2">
-                        <ThemedText size="xs" variant="tertiary">
-                            {copyResult.kind === "success"
-                                ? "Copied diagnostics to clipboard."
-                                : `Failed to copy diagnostics: ${copyResult.message}`}
-                        </ThemedText>
-                    </div>
-                ) : null}
-            </div>
-
-            <div className="border-error-default bg-error-muted/20 mt-3 rounded-md border p-3">
-                <ThemedText size="xs" variant="secondary" weight="medium">
-                    Danger zone
-                </ThemedText>
-
-                <ThemedText className="mt-1" size="xs" variant="tertiary">
-                    Resetting remote sync deletes remote history and re-seeds from
-                    this device. Other devices may need to resync.
-                </ThemedText>
-
-                <div className="mt-2 flex flex-wrap gap-2">
-                    <ThemedButton
-                        disabled={!canReset || isResetting}
-                        onClick={onResetRemoteSyncState}
-                        size="sm"
-                        variant="error"
-                    >
-                        {isResetting ? "Resetting…" : "Reset remote sync"}
-                    </ThemedButton>
-                </div>
-            </div>
+            <DangerZoneCard
+                canReset={canReset}
+                isResetting={isResetting}
+                onReset={onResetRemoteSyncState}
+                resetIcon={resetIcon}
+            />
         </div>
     );
 };
+
+/* eslint-enable react/no-multi-comp -- Restore default rule after co-located Sync Maintenance view components. */

@@ -32,10 +32,10 @@ import type { SettingsRepository } from "../../../services/database/SettingsRepo
 import type { SiteRepository } from "../../../services/database/SiteRepository";
 
 // Mock all the dependencies
-vi.mock("../../../utils/database/DataBackupService");
-vi.mock("../../../utils/database/DataImportExportService");
-vi.mock("../../../utils/database/serviceFactory");
-vi.mock("../../../utils/database/SiteRepositoryService");
+vi.mock("../../../services/database/DataBackupService");
+vi.mock("../../../services/database/DataImportExportService");
+vi.mock("../../../services/database/serviceFactory");
+vi.mock("../../../services/database/SiteRepositoryService");
 vi.mock("../../../utils/logger", () => {
     const createLoggerMock = () => ({
         debug: vi.fn(),
@@ -144,9 +144,11 @@ describe(DatabaseServiceFactory, () => {
             // checking that services can be created successfully
             expect(() => factory.createBackupService()).not.toThrowError();
             expect(() =>
-                factory.createImportExportService()).not.toThrowError();
+                factory.createImportExportService()
+            ).not.toThrowError();
             expect(() =>
-                factory.createSiteRepositoryService()).not.toThrowError();
+                factory.createSiteRepositoryService()
+            ).not.toThrowError();
         });
     });
 

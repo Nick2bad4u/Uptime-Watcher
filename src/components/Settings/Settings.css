@@ -228,7 +228,8 @@
 }
 
 /* Sections */
-.settings-modal__sections {
+.settings-modal__sections,
+.settings-item-stack {
     display: flex;
     flex-direction: column;
     gap: clamp(0.875rem, 0.7rem + 0.5vi, 1.25rem);
@@ -373,13 +374,68 @@
     display: flex;
     align-items: center;
     gap: 0.875rem;
-    margin-block-end: 0.5rem;
+    margin-block-end: 0.85rem;
 
     & > div {
         display: flex;
         flex-direction: column;
         gap: 0.25rem;
     }
+}
+
+/* Tighten SettingItem spacing specifically within the Settings modal. */
+.settings-modal .setting-item {
+    gap: var(--spacing-md);
+}
+
+.settings-modal .setting-control {
+    min-inline-size: 4.5rem;
+}
+
+.settings-modal .setting-title-row {
+    gap: 0.4rem;
+}
+
+/* Reusable subcard header layout for Settings panels. */
+.settings-subcard__header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+}
+
+.settings-subcard__title {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-inline-size: 0;
+}
+
+.settings-subcard__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.5rem;
+}
+
+/* Subcard-internal separators for readability (helps avoid "wall of text"). */
+.settings-subcard .setting-item {
+    padding-block: 0.5rem;
+
+    & + .setting-item {
+        border-block-start: 1px solid
+            color-mix(in srgb, var(--color-border-secondary) 40%, transparent);
+        margin-block-start: 0.35rem;
+        padding-block-start: 0.75rem;
+    }
+}
+
+.settings-paragraph-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
 }
 
 .settings-section__icon {
@@ -503,10 +559,303 @@
 }
 
 /* Grids & fields */
+.settings-notifications-grid {
+    display: grid;
+    align-items: start;
+    gap: clamp(0.875rem, 0.7rem + 0.5vi, 1.25rem);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
 .settings-toggle-stack {
     display: grid;
     gap: clamp(0.875rem, 0.7rem + 0.5vi, 1.25rem);
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+}
+
+.settings-subcard {
+    padding: 1rem;
+    border: 1px solid
+        color-mix(in srgb, var(--color-border-secondary) 44%, transparent);
+    border-radius: 0.875rem;
+    background: color-mix(
+        in srgb,
+        var(--color-surface-overlay) 70%,
+        transparent
+    );
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 3%);
+}
+
+.settings-subcard--compact {
+    padding: 0.75rem;
+    border-radius: 0.75rem;
+    background: color-mix(in srgb, var(--color-surface-base) 72%, transparent);
+}
+
+.settings-subcard--danger {
+    border-color: color-mix(in srgb, var(--color-error) 55%, transparent);
+    background: linear-gradient(
+        135deg,
+        color-mix(in srgb, var(--color-error) 16%, transparent) 0%,
+        color-mix(in srgb, var(--color-surface-overlay) 78%, transparent) 100%
+    );
+    box-shadow:
+        inset 0 0 0 1px rgb(255 255 255 / 3%),
+        0 14px 38px color-mix(in srgb, var(--color-error) 12%, transparent);
+}
+
+.settings-subcard--info {
+    border-color: color-mix(
+        in srgb,
+        var(--accent-primary-color) 55%,
+        transparent
+    );
+    background: linear-gradient(
+        135deg,
+        color-mix(in srgb, var(--accent-primary-color) 12%, transparent) 0%,
+        color-mix(in srgb, var(--color-surface-overlay) 78%, transparent) 100%
+    );
+}
+
+.settings-subcard--warning {
+    border-color: color-mix(in srgb, var(--color-warning) 55%, transparent);
+    background: linear-gradient(
+        135deg,
+        color-mix(in srgb, var(--color-warning) 14%, transparent) 0%,
+        color-mix(in srgb, var(--color-surface-overlay) 78%, transparent) 100%
+    );
+}
+
+/* Sync maintenance modal tweaks */
+.settings-maintenance-modal {
+    display: flex;
+    flex-direction: column;
+    gap: 0.95rem;
+}
+
+.settings-maintenance__body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.875rem;
+    margin-block-start: 0.9rem;
+}
+
+.settings-maintenance__tools {
+    padding: 0.65rem 0.75rem;
+}
+
+.settings-maintenance__icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.6rem;
+    background: color-mix(in srgb, var(--color-warning) 18%, transparent);
+    block-size: 2.25rem;
+    box-shadow: 0 0 18px
+        color-mix(in srgb, var(--color-warning) 16%, transparent);
+    inline-size: 2.25rem;
+}
+
+.settings-metrics {
+    display: grid;
+    gap: 0.75rem;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.settings-metric {
+    display: flex;
+    flex-direction: column;
+    padding: 0.75rem;
+    border: 1px solid
+        color-mix(in srgb, var(--color-border-secondary) 40%, transparent);
+    border-radius: 0.75rem;
+    background: color-mix(in srgb, var(--color-surface-base) 70%, transparent);
+    gap: 0.35rem;
+    min-inline-size: 0;
+}
+
+.settings-metric__value {
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+}
+
+.settings-metric--wide {
+    grid-column: 1 / -1;
+}
+
+.settings-metric__breakdown {
+    display: grid;
+    gap: 0.75rem;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    margin-block-start: 0.25rem;
+}
+
+.settings-metric__breakdown-item {
+    display: flex;
+    flex-direction: column;
+    padding: 0.6rem 0.65rem;
+    border: 1px solid
+        color-mix(in srgb, var(--color-border-secondary) 40%, transparent);
+    border-radius: 0.65rem;
+    background: color-mix(
+        in srgb,
+        var(--color-surface-overlay) 72%,
+        transparent
+    );
+    gap: 0.3rem;
+    min-inline-size: 0;
+}
+
+.settings-details {
+    padding: 0.75rem;
+    border: 1px solid
+        color-mix(in srgb, var(--color-border-secondary) 40%, transparent);
+    border-radius: 0.75rem;
+    background: color-mix(in srgb, var(--color-surface-base) 66%, transparent);
+}
+
+.settings-details__summary {
+    cursor: pointer;
+    list-style: none;
+
+    &::-webkit-details-marker {
+        display: none;
+    }
+}
+
+.settings-details__summary-inner,
+.settings-field__label-row {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+.settings-mono-block {
+    overflow: auto;
+    padding: 0.75rem;
+    border: 1px solid
+        color-mix(in srgb, var(--color-border-secondary) 40%, transparent);
+    border-radius: 0.75rem;
+    background: color-mix(
+        in srgb,
+        var(--color-surface-overlay) 72%,
+        transparent
+    );
+    font-family:
+        SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+        "Courier New", monospace;
+    font-size: 0.75rem;
+    line-height: 1.5;
+    margin-block-start: 0.75rem;
+    overscroll-behavior: contain;
+    scrollbar-gutter: stable both-edges;
+    white-space: pre;
+}
+
+@media (width <= 540px) {
+    .settings-metrics {
+        grid-template-columns: 1fr;
+    }
+
+    .settings-metric__breakdown {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Settings-specific accent colors sourced from theme tokens (no Tailwind colors). */
+.settings-accent--primary {
+    color: var(--accent-primary-color);
+}
+
+.settings-accent--primary-muted {
+    color: color-mix(
+        in srgb,
+        var(--accent-primary-color) 68%,
+        var(--color-text-tertiary) 32%
+    );
+}
+
+.settings-accent--success {
+    color: var(--accent-success-color);
+}
+
+.settings-accent--success-muted {
+    color: color-mix(
+        in srgb,
+        var(--accent-success-color) 68%,
+        var(--color-text-tertiary) 32%
+    );
+}
+
+.settings-accent--warning {
+    color: var(--color-warning);
+}
+
+.settings-accent--highlight {
+    color: var(--overlay-highlight-color);
+}
+
+.settings-accent--highlight-muted {
+    color: color-mix(
+        in srgb,
+        var(--overlay-highlight-color) 70%,
+        var(--color-text-tertiary) 30%
+    );
+}
+
+/* Cloud provider OAuth panel helpers */
+.settings-provider__tooltip-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid
+        color-mix(in srgb, var(--color-border-secondary) 55%, transparent);
+    border-radius: 0.65rem;
+    background: color-mix(in srgb, var(--color-surface-base) 70%, transparent);
+    block-size: 2.1rem;
+    color: var(--color-text-tertiary);
+    cursor: help;
+    inline-size: 2.1rem;
+    transition:
+        background var(--transition-fast),
+        border-color var(--transition-fast),
+        color var(--transition-fast),
+        transform var(--transition-fast);
+
+    &:hover,
+    &:focus-visible {
+        border-color: color-mix(
+            in srgb,
+            var(--accent-primary-color) 38%,
+            var(--color-border-secondary) 62%
+        );
+        background: color-mix(
+            in srgb,
+            var(--color-surface-overlay) 72%,
+            transparent
+        );
+        color: var(--color-text-secondary);
+        transform: translateY(-1px);
+    }
+
+    &:focus-visible {
+        outline: 2px solid
+            color-mix(in srgb, var(--accent-primary-color) 55%, transparent);
+        outline-offset: 2px;
+    }
+}
+
+.settings-provider__connected-row {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    margin-block-start: 0.75rem;
+}
+
+.settings-provider__connected-icon {
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
 }
 
 .settings-field {
@@ -622,6 +971,10 @@
 
 /* Responsiveness */
 @media (width <= 1024px) {
+    .settings-notifications-grid {
+        grid-template-columns: 1fr;
+    }
+
     .settings-toggle-stack {
         grid-template-columns: 1fr;
     }

@@ -4,20 +4,11 @@
  * @public
  */
 
-const PLAYWRIGHT_FLAG = "PLAYWRIGHT_TEST" as const;
-// eslint-disable-next-line regexp/require-unicode-sets-regexp -- The `v` flag is not consistently supported across our Electron/TypeScript toolchain; `u` is sufficient for this ASCII-only user-agent probe.
-const PLAYWRIGHT_UA_PATTERN = /playwright|pw-test|pwtest/iu;
+import { getEnvVar } from "@shared/utils/environment";
 
-/**
- * Minimal process shape used for environment probing.
- *
- * @internal
- */
-interface MaybeProcess {
-    readonly process?: {
-        env?: Record<string, string | undefined>;
-    };
-}
+const PLAYWRIGHT_FLAG = "PLAYWRIGHT_TEST" as const;
+
+const PLAYWRIGHT_UA_PATTERN = /playwright|pw-test|pwtest/iu;
 
 /**
  * Minimal navigator shape used for user-agent probing.
@@ -38,17 +29,7 @@ interface MaybeNavigator {
  * @public
  */
 export function readProcessEnv(key: string): string | undefined {
-    const automationProcess = (globalThis as MaybeProcess).process;
-    if (automationProcess === undefined) {
-        return undefined;
-    }
-
-    const { env } = automationProcess;
-    if (env === undefined) {
-        return undefined;
-    }
-
-    return env[key];
+    return getEnvVar(key);
 }
 
 /**
@@ -62,7 +43,7 @@ export function readProcessEnv(key: string): string | undefined {
  */
 export function isPlaywrightAutomation(): boolean {
     const automationFlag = readProcessEnv(PLAYWRIGHT_FLAG);
-    if (automationFlag && automationFlag.toLowerCase() === "true") {
+    if (automationFlag?.toLowerCase() === "true") {
         return true;
     }
 

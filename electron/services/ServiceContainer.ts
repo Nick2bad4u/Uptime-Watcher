@@ -19,6 +19,7 @@ import type { EventMetadata } from "@shared/types/events";
 import type { UnknownRecord } from "type-fest";
 
 import { ensureError } from "@shared/utils/errorHandling";
+import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 
 import type { UptimeEventName, UptimeEvents } from "../events/eventTypes";
 import type { EnhancedEventPayload, EventKey } from "../events/TypedEventBus";
@@ -126,10 +127,6 @@ function isPromiseLike(value: unknown): value is PromiseLike<unknown> {
 
     const { then } = value as { then?: unknown };
     return typeof then === "function";
-}
-
-function isNonNullObject(value: unknown): value is UnknownRecord {
-    return typeof value === "object" && value !== null;
 }
 
 /**
@@ -347,8 +344,8 @@ export class ServiceContainer {
      *
      * @remarks
      * `initialize()` may be called multiple times (e.g., tests or re-entrant
-     * app bootstrap). We treat initialization as idempotent and re-use the
-     * same in-flight promise.
+     * app bootstrap). We treat initialization as idempotent and re-use the same
+     * in-flight promise.
      */
     private initializationPromise: Promise<void> | undefined;
 
@@ -462,7 +459,6 @@ export class ServiceContainer {
             this.cloudSyncScheduler = new CloudSyncScheduler({
                 cloudService: this.getCloudService(),
             });
-
             if (this.config.enableDebugLogging) {
                 logger.debug("[ServiceContainer] Created CloudSyncScheduler");
             }
@@ -896,10 +892,7 @@ export class ServiceContainer {
                         logger.error(
                             "[ServiceContainer] Failed to set history limit",
                             {
-                                error:
-                                    error instanceof Error
-                                        ? error.message
-                                        : String(error),
+                                error: getUserFacingErrorDetail(error),
                                 limit,
                             }
                         );
@@ -1110,19 +1103,22 @@ export class ServiceContainer {
 
         if (typeof maybeTypedBus.onTyped === "function") {
             for (const eventName of eventsToForward) {
-                maybeTypedBus.onTyped(eventName, (
-                    payloadWithMeta: EnhancedEventPayload<
-                        UptimeEvents[typeof eventName]
-                    >
-                ): void => {
-                    const forwardablePayload =
-                        toForwardablePayload(payloadWithMeta);
-                    this.emitForwardedEvent(
-                        eventName,
-                        forwardablePayload,
-                        managerName
-                    );
-                });
+                maybeTypedBus.onTyped(
+                    eventName,
+                    (
+                        payloadWithMeta: EnhancedEventPayload<
+                            UptimeEvents[typeof eventName]
+                        >
+                    ): void => {
+                        const forwardablePayload =
+                            toForwardablePayload(payloadWithMeta);
+                        this.emitForwardedEvent(
+                            eventName,
+                            forwardablePayload,
+                            managerName
+                        );
+                    }
+                );
             }
         } else {
             for (const eventName of eventsToForward) {
@@ -1133,15 +1129,19 @@ export class ServiceContainer {
                 ).on;
 
                 if (typeof rawOn === "function") {
-                    rawOn.call(managerEventBus, eventName, (
-                        payload: ForwardableEventPayload<typeof eventName>
-                    ): void => {
-                        this.emitForwardedEvent(
-                            eventName,
-                            payload,
-                            managerName
-                        );
-                    });
+                    rawOn.call(
+                        managerEventBus,
+                        eventName,
+                        (
+                            payload: ForwardableEventPayload<typeof eventName>
+                        ): void => {
+                            this.emitForwardedEvent(
+                                eventName,
+                                payload,
+                                managerName
+                            );
+                        }
+                    );
                 } else if (this.config.enableDebugLogging) {
                     logger.warn(
                         `[ServiceContainer] Skipping forwarding for ${eventName} because manager event bus for ${managerName} lacks an on() method`
@@ -1278,7 +1278,7 @@ export class ServiceContainer {
         payload: ForwardableEventPayload<EventName>
     ): payload is ForwardablePayloadWithMeta<EventName> {
         return (
-            isNonNullObject(payload) &&
+            typeof payload === "object" &&
             FORWARDED_METADATA_PROPERTY_KEY in payload
         );
     }

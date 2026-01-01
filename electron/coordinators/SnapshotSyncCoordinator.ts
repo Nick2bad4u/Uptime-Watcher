@@ -327,20 +327,20 @@ export class SnapshotSyncCoordinator {
                         monitorFromPayload && fallbackSite === siteFromCache
                             ? {
                                   ...fallbackSite,
-                                  monitors: fallbackSite.monitors.map((
-                                      candidate
-                                  ) => {
-                                      if (candidate.id !== monitorId) {
-                                          return candidate;
-                                      }
+                                  monitors: fallbackSite.monitors.map(
+                                      (candidate) => {
+                                          if (candidate.id !== monitorId) {
+                                              return candidate;
+                                          }
 
-                                      return isMonitorSnapshot(candidate)
-                                          ? mergeMonitorSnapshots(
-                                                candidate,
-                                                monitorFromPayload
-                                            )
-                                          : candidate;
-                                  }),
+                                          return isMonitorSnapshot(candidate)
+                                              ? mergeMonitorSnapshots(
+                                                    candidate,
+                                                    monitorFromPayload
+                                                )
+                                              : candidate;
+                                      }
+                                  ),
                               }
                             : fallbackSite;
 

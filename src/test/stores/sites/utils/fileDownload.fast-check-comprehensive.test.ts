@@ -570,17 +570,18 @@ describe("fileDownload utilities - Comprehensive Fast-Check Coverage", () => {
 
         it("should handle very long filenames", () => {
             fc.assert(
-                fc.property(fc.string({ minLength: 100, maxLength: 500 }), (
-                    longFileName
-                ) => {
-                    const options: FileDownloadOptions = {
-                        buffer: new ArrayBuffer(10),
-                        fileName: longFileName,
-                    };
+                fc.property(
+                    fc.string({ minLength: 100, maxLength: 500 }),
+                    (longFileName) => {
+                        const options: FileDownloadOptions = {
+                            buffer: new ArrayBuffer(10),
+                            fileName: longFileName,
+                        };
 
-                    expect(() => downloadFile(options)).not.toThrowError();
-                    expect(mockAnchor.download).toBe(longFileName);
-                })
+                        expect(() => downloadFile(options)).not.toThrowError();
+                        expect(mockAnchor.download).toBe(longFileName);
+                    }
+                )
             );
         });
 

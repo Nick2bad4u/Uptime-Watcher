@@ -64,6 +64,9 @@ export interface ModalProperties {
     /** Optional footer content rendered below the scrollable body. */
     readonly footer?: ReactNode;
 
+    /** Optional accent icon rendered next to the modal title. */
+    readonly headerIcon?: ReactNode;
+
     /**
      * If true, the application root (#root) is set to inert/aria-hidden while
      * this modal is open.
@@ -85,8 +88,10 @@ export interface ModalProperties {
     /** Optional test id for the modal shell. */
     readonly modalTestId?: string;
 
-    /** Called when the modal requests to close (Escape, overlay click, close
-button). */
+    /**
+     * Called when the modal requests to close (Escape, overlay click, close
+     * button).
+     */
     readonly onRequestClose: () => void;
 
     /** Optional test id for the overlay. */
@@ -214,6 +219,7 @@ export const Modal = ({
     closeOnOverlayClick = true,
     escapePriority = 100,
     footer,
+    headerIcon,
     isBlocking = true,
     isBodyScrollable = true,
     isOpen,
@@ -476,9 +482,16 @@ export const Modal = ({
                 <div className="modal-shell__header">
                     <div className="modal-shell__header-content">
                         <div className="modal-shell__title-group">
-                            <h3 className="modal-shell__title" id={titleId}>
-                                {title}
-                            </h3>
+                            <div className="modal-shell__title-row">
+                                {headerIcon ? (
+                                    <div className="modal-shell__accent-icon">
+                                        {headerIcon}
+                                    </div>
+                                ) : null}
+                                <h3 className="modal-shell__title" id={titleId}>
+                                    {title}
+                                </h3>
+                            </div>
                         </div>
                         {showCloseButton ? (
                             <div className="modal-shell__actions">
@@ -497,7 +510,9 @@ export const Modal = ({
 
                 <div className={bodyClassNames}>{children}</div>
 
-                {footer ? <div className="modal-shell__footer">{footer}</div> : null}
+                {footer ? (
+                    <div className="modal-shell__footer">{footer}</div>
+                ) : null}
             </dialog>
         </div>,
         portalRoot

@@ -72,9 +72,18 @@ vi.mock("../../../electronUtils", () => ({
 }));
 
 // Mock shared utils
-vi.mock("../../../../shared/utils/environment", () => ({
-    getNodeEnv: vi.fn(() => "test"),
-}));
+vi.mock("../../../../shared/utils/environment", async () => {
+    const actual =
+        await vi.importActual<typeof import("../../../../shared/utils/environment")>(
+            "../../../../shared/utils/environment"
+        );
+
+    return {
+        ...actual,
+        // Override the environment classifier for deterministic tests.
+        getNodeEnv: vi.fn(() => "test"),
+    };
+});
 
 // Mock node modules
 vi.mock("node:path", () => ({
@@ -89,7 +98,7 @@ vi.mock("node:url", () => ({
 // Mock global fetch for Vite server checking
 globalThis.fetch = vi.fn();
 
-import { BrowserWindow } from "electron";
+import { BrowserWindow, shell } from "electron";
 import { isDev } from "../../../electronUtils";
 import { logger } from "../../../utils/logger";
 import { WindowService } from "../../../services/window/WindowService";
@@ -250,6 +259,10 @@ describe(WindowService, () => {
                 "will-navigate",
                 expect.any(Function)
             );
+            expect(window.webContents.on).toHaveBeenCalledWith(
+                "will-redirect",
+                expect.any(Function)
+            );
             expect(
                 window.webContents.setWindowOpenHandler
             ).toHaveBeenCalledWith(expect.any(Function));
@@ -386,6 +399,80 @@ describe(WindowService, () => {
             windowService.closeMainWindow();
 
             expect(window.close).not.toHaveBeenCalled();
+        });
+    });
+
+    describe("navigation hardening", () => {
+        it("prevents disallowed will-navigate and opens safe URLs externally", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: WindowService", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Security", "type");
+
+            vi.mocked(isDev).mockReturnValue(false);
+
+            const window = windowService.createMainWindow();
+
+            const onCalls = vi.mocked(window.webContents.on).mock
+                .calls as unknown as [string, (event: any, url: string) => void][];
+            const willNavigateHandler = onCalls.find(
+                ([eventName]) => eventName === "will-navigate"
+            )?.[1];
+
+            expect(willNavigateHandler).toBeTypeOf("function");
+
+            const event = {
+                preventDefault: vi.fn(),
+            };
+
+            willNavigateHandler?.(event, "https://example.com");
+
+            // Allow promise chain to flush
+            await Promise.resolve();
+
+            expect(event.preventDefault).toHaveBeenCalledTimes(1);
+
+            expect(shell.openExternal).toHaveBeenCalledWith(
+                "https://example.com"
+            );
+        });
+
+        it("prevents disallowed will-redirect and opens safe URLs externally", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: WindowService", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Security", "type");
+
+            vi.mocked(isDev).mockReturnValue(false);
+
+            const window = windowService.createMainWindow();
+
+            const onCalls = vi.mocked(window.webContents.on).mock
+                .calls as unknown as [string, (event: any, url: string) => void][];
+            const willRedirectHandler = onCalls.find(
+                ([eventName]) => eventName === "will-redirect"
+            )?.[1];
+
+            expect(willRedirectHandler).toBeTypeOf("function");
+
+            const event = {
+                preventDefault: vi.fn(),
+            };
+
+            willRedirectHandler?.(event, "https://example.com/redirect");
+
+            await Promise.resolve();
+
+            expect(event.preventDefault).toHaveBeenCalledTimes(1);
+            expect(shell.openExternal).toHaveBeenCalledWith(
+                "https://example.com/redirect"
+            );
         });
     });
 

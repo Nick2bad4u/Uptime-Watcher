@@ -8,6 +8,8 @@
 import type { Jsonifiable, JsonValue } from "type-fest";
 
 import { ensureError } from "@shared/utils/errorHandling";
+import { collectOwnPropertyValuesSafely } from "@shared/utils/objectIntrospection";
+import { isObject } from "@shared/utils/typeGuards";
 
 /**
  * Result tuple produced by the safe JSON helpers.
@@ -22,6 +24,26 @@ export interface SafeJsonResult<T> {
     error?: string;
     /** Indicates whether the underlying operation completed successfully. */
     success: boolean;
+}
+
+/**
+ * Attempts to parse a JSON string into a plain object record.
+ *
+ * @remarks
+ * This is intentionally strict: arrays are rejected.
+ *
+ * Use this when you need best-effort extraction from third-party payloads (e.g.
+ * OAuth error bodies) without throwing.
+ */
+export function tryParseJsonRecord(
+    text: string
+): null | Record<string, unknown> {
+    try {
+        const parsed: unknown = JSON.parse(text);
+        return isObject(parsed) ? parsed : null;
+    } catch {
+        return null;
+    }
 }
 
 /**
@@ -68,22 +90,7 @@ function safeOperation<T>(
     }
 }
 
-const collectObjectValues = (value: object): readonly unknown[] => {
-    if (Array.isArray(value)) {
-        return value;
-    }
-
-    const values: unknown[] = [];
-    for (const key of Reflect.ownKeys(value)) {
-        try {
-            values.push(Reflect.get(value, key));
-        } catch {
-            values.push(undefined);
-        }
-    }
-
-    return values;
-};
+const collectObjectValues = collectOwnPropertyValuesSafely;
 
 const hasDescriptorValue = (
     descriptor: PropertyDescriptor | undefined

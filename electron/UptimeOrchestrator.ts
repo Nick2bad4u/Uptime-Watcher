@@ -106,7 +106,7 @@ import type {
     DatabaseBackupResult,
     DatabaseRestorePayload,
     DatabaseRestoreSummary,
-} from "./services/database/utils/databaseBackup";
+} from "./services/database/utils/backup/databaseBackup";
 import type {
     IsMonitoringActiveRequestData,
     OrchestratorEvents,
@@ -740,9 +740,7 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
 
         const promise = (async (): Promise<void> => {
             try {
-                logger.info(
-                    "[UptimeOrchestrator] Starting initialization..."
-                );
+                logger.info("[UptimeOrchestrator] Starting initialization...");
 
                 // Step 1: Initialize database first (required by other managers)
                 await this.databaseManager.initialize();

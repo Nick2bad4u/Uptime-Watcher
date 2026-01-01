@@ -22,6 +22,8 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 vi.mock("../../../../../shared/validation/validatorUtils", () => ({
     isNonEmptyString: vi.fn(),
     isValidFQDN: vi.fn(),
+    isValidHost: vi.fn(),
+    isValidPort: vi.fn(),
     isValidUrl: vi.fn(),
 }));
 
@@ -38,6 +40,8 @@ import type { Site } from "@shared/types";
 import {
     isNonEmptyString,
     isValidFQDN,
+    isValidHost,
+    isValidPort,
     isValidUrl,
 } from "@shared/validation/validatorUtils";
 import { MIN_MONITOR_CHECK_INTERVAL_MS } from "@shared/constants/monitoring";
@@ -48,6 +52,14 @@ describe("Monitor Type Guards", () => {
         // Setup default mock return values
         vi.mocked(isNonEmptyString).mockReturnValue(true);
         vi.mocked(isValidFQDN).mockReturnValue(true);
+        vi.mocked(isValidHost).mockReturnValue(false);
+        vi.mocked(isValidPort).mockImplementation(
+            (value) =>
+                typeof value === "number" &&
+                Number.isInteger(value) &&
+                value >= 1 &&
+                value <= 65_535
+        );
         vi.mocked(isValidUrl).mockReturnValue(true);
     });
 
@@ -232,13 +244,17 @@ describe("Monitor Type Guards", () => {
 
             const monitor = createTestMonitor({ host: "example.com" });
             vi.mocked(isNonEmptyString).mockReturnValue(true);
+            vi.mocked(isValidHost).mockReturnValue(false);
             vi.mocked(isValidFQDN).mockReturnValue(true);
 
             const result = hasValidHost(monitor);
 
             expect(result).toBeTruthy();
             expect(isNonEmptyString).toHaveBeenCalledWith("example.com");
+            expect(isValidHost).toHaveBeenCalledWith("example.com");
             expect(isValidFQDN).toHaveBeenCalledWith("example.com", {
+                allow_trailing_dot: true,
+                allow_underscores: true,
                 require_tld: false,
             });
         });
@@ -254,15 +270,13 @@ describe("Monitor Type Guards", () => {
 
             const monitor = createTestMonitor({ host: "localhost" });
             vi.mocked(isNonEmptyString).mockReturnValue(true);
-            vi.mocked(isValidFQDN).mockReturnValue(false); // not a FQDN
+            vi.mocked(isValidHost).mockReturnValue(true);
 
             const result = hasValidHost(monitor);
 
             expect(result).toBeTruthy();
             expect(isNonEmptyString).toHaveBeenCalledWith("localhost");
-            expect(isValidFQDN).toHaveBeenCalledWith("localhost", {
-                require_tld: false,
-            });
+            expect(isValidHost).toHaveBeenCalledWith("localhost");
         });
 
         it("should return true for valid IP address", async ({
@@ -276,7 +290,7 @@ describe("Monitor Type Guards", () => {
 
             const monitor = createTestMonitor({ host: "192.168.1.1" });
             vi.mocked(isNonEmptyString).mockReturnValue(true);
-            vi.mocked(isValidFQDN).mockReturnValue(false);
+            vi.mocked(isValidHost).mockReturnValue(true);
 
             const result = hasValidHost(monitor);
 
@@ -294,7 +308,8 @@ describe("Monitor Type Guards", () => {
 
             const monitor = createTestMonitor({ host: "test-server" });
             vi.mocked(isNonEmptyString).mockReturnValue(true);
-            vi.mocked(isValidFQDN).mockReturnValue(false);
+            vi.mocked(isValidHost).mockReturnValue(false);
+            vi.mocked(isValidFQDN).mockReturnValue(true);
 
             const result = hasValidHost(monitor);
 
@@ -312,7 +327,8 @@ describe("Monitor Type Guards", () => {
 
             const monitor = createTestMonitor({ host: "test_server" });
             vi.mocked(isNonEmptyString).mockReturnValue(true);
-            vi.mocked(isValidFQDN).mockReturnValue(false);
+            vi.mocked(isValidHost).mockReturnValue(false);
+            vi.mocked(isValidFQDN).mockReturnValue(true);
 
             const result = hasValidHost(monitor);
 
@@ -348,6 +364,7 @@ describe("Monitor Type Guards", () => {
 
             const monitor = createTestMonitor({ host: "invalid@host" });
             vi.mocked(isNonEmptyString).mockReturnValue(true);
+            vi.mocked(isValidHost).mockReturnValue(false);
             vi.mocked(isValidFQDN).mockReturnValue(false);
 
             const result = hasValidHost(monitor);
@@ -416,14 +433,35 @@ describe("Monitor Type Guards", () => {
             await annotate("Type: Validation", "type");
 
             const testCases = [
-                { host: "sub.example.com", isValidFQDN: true, expected: true },
-                { host: "example.co.uk", isValidFQDN: true, expected: true },
-                { host: "test", isValidFQDN: false, expected: true }, // Matches regex
-                { host: "test.", isValidFQDN: false, expected: true }, // Matches regex
+                {
+                    expected: true,
+                    host: "sub.example.com",
+                    isValidFQDN: false,
+                    isValidHost: true,
+                },
+                {
+                    expected: true,
+                    host: "example.co.uk",
+                    isValidFQDN: false,
+                    isValidHost: true,
+                },
+                {
+                    expected: true,
+                    host: "test",
+                    isValidFQDN: true,
+                    isValidHost: false,
+                },
+                {
+                    expected: true,
+                    host: "test.",
+                    isValidFQDN: true,
+                    isValidHost: false,
+                },
             ];
 
             for (const testCase of testCases) {
                 vi.mocked(isNonEmptyString).mockReturnValue(true);
+                vi.mocked(isValidHost).mockReturnValue(testCase.isValidHost);
                 vi.mocked(isValidFQDN).mockReturnValue(testCase.isValidFQDN);
 
                 const monitor = createTestMonitor({ host: testCase.host });
@@ -635,9 +673,8 @@ describe("Monitor Type Guards", () => {
             for (const port of floatingPoints) {
                 const monitor = createTestMonitor({ port });
                 const result = hasValidPort(monitor);
-                // Floating point numbers are still numbers, but may not be valid ports
-                // The function checks typeof === "number", so this depends on implementation
-                expect(result).toBeTruthy(); // They are numbers within valid range
+                // Ports must be integers; fractional values are invalid.
+                expect(result).toBeFalsy();
             }
         });
     });

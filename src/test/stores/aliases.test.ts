@@ -60,7 +60,8 @@ vi.mock("../../stores/utils", () => ({
 vi.mock("../../../shared/utils/errorHandling", () => ({
     withErrorHandling: vi.fn((fn) => fn()),
     ensureError: vi.fn((error) =>
-        error instanceof Error ? error : new Error(String(error))),
+        error instanceof Error ? error : new Error(String(error))
+    ),
 }));
 
 const mockStateSyncService = {

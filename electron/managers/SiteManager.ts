@@ -68,18 +68,14 @@ import {
 
 import type { UptimeEvents } from "../events/eventTypes";
 import type { TypedEventBus } from "../events/TypedEventBus";
-import type { DatabaseService } from "../services/database/DatabaseService";
-import type { HistoryRepository } from "../services/database/HistoryRepository";
-import type { MonitorRepository } from "../services/database/MonitorRepository";
-import type { SettingsRepository } from "../services/database/SettingsRepository";
-import type { SiteRepository } from "../services/database/SiteRepository";
-import type { MonitoringConfig } from "../utils/database/interfaces";
+import type { MonitoringConfig } from "../services/database/interfaces";
 import type { ConfigurationManager } from "./ConfigurationManager";
+import type { SiteManagerRepositories } from "./databaseRepositorySets";
 
+import { LoggerAdapter } from "../services/database/serviceFactory";
+import { SiteRepositoryService } from "../services/database/SiteRepositoryService";
+import { SiteWriterService } from "../services/database/SiteWriterService";
 import { StandardizedCache } from "../utils/cache/StandardizedCache";
-import { LoggerAdapter } from "../utils/database/serviceFactory";
-import { SiteRepositoryService } from "../utils/database/SiteRepositoryService";
-import { SiteWriterService } from "../utils/database/SiteWriterService";
 import { logger } from "../utils/logger";
 
 /**
@@ -150,19 +146,19 @@ export interface SiteManagerDependencies {
     /** Configuration manager for business rules and validation. */
     configurationManager: ConfigurationManager;
     /** Database service for transaction management. */
-    databaseService: DatabaseService;
+    databaseService: SiteManagerRepositories["databaseService"];
     /** Event emitter for system-wide communication. */
     eventEmitter: TypedEventBus<UptimeEvents>;
     /** History repository for status history management. */
-    historyRepository: HistoryRepository;
+    historyRepository: SiteManagerRepositories["historyRepository"];
     /** Optional MonitorManager dependency for coordinated operations. */
     monitoringOperations?: IMonitoringOperations;
     /** Monitor repository for monitor-related operations. */
-    monitorRepository: MonitorRepository;
+    monitorRepository: SiteManagerRepositories["monitorRepository"];
     /** Settings repository for configuration management. */
-    settingsRepository: SettingsRepository;
+    settingsRepository: SiteManagerRepositories["settingsRepository"];
     /** Site repository for database operations. */
-    siteRepository: SiteRepository;
+    siteRepository: SiteManagerRepositories["siteRepository"];
 }
 
 interface UpdateSitesCacheOptions {
@@ -200,18 +196,7 @@ export class SiteManager {
     private readonly monitoringOperations: IMonitoringOperations | undefined;
 
     /** Collection of repository and service dependencies for data access */
-    private readonly repositories: {
-        /** Database service for transactional operations */
-        databaseService: DatabaseService;
-        /** Repository for managing status history records */
-        historyRepository: HistoryRepository;
-        /** Repository for managing monitor configuration and data */
-        monitorRepository: MonitorRepository;
-        /** Repository for managing application settings */
-        settingsRepository: SettingsRepository;
-        /** Repository for managing site configuration and data */
-        siteRepository: SiteRepository;
-    };
+    private readonly repositories: SiteManagerRepositories;
 
     /** Service for reading site data from repositories */
     private readonly siteRepositoryService: SiteRepositoryService;
@@ -224,6 +209,172 @@ export class SiteManager {
 
     /** Cached snapshot from the most recent state sync emission. */
     private lastStateSyncSnapshot: Site[] = [];
+
+    /**
+     * Emits a cache-miss event without allowing failures to crash the caller.
+     *
+     * @remarks
+     * Cache-miss emissions are observability-only. Multiple call sites used to
+     * duplicate the same payload and try/catch logic (foreground cache lookup
+     * vs background hydration). Consolidating prevents drift.
+     */
+    private async emitSiteCacheMissSafe(args: {
+        backgroundLoading: boolean;
+        identifier: string;
+        operation: UptimeEvents["internal:site:cache-miss"]["operation"];
+        timestamp?: number;
+    }): Promise<void> {
+        try {
+            await this.eventEmitter.emitTyped("internal:site:cache-miss", {
+                backgroundLoading: args.backgroundLoading,
+                identifier: args.identifier,
+                operation: args.operation,
+                timestamp: args.timestamp ?? Date.now(),
+            });
+        } catch (error) {
+            // Observability only: never crash callers.
+            logger.debug(LOG_TEMPLATES.debug.SITE_CACHE_MISS_ERROR, error);
+        }
+    }
+
+    /**
+     * Emits a cache-updated event.
+     */
+    private async emitSiteCacheUpdated(args: {
+        identifier: string;
+        operation: UptimeEvents["internal:site:cache-updated"]["operation"];
+        timestamp?: number;
+    }): Promise<void> {
+        await this.eventEmitter.emitTyped("internal:site:cache-updated", {
+            identifier: args.identifier,
+            operation: args.operation,
+            timestamp: args.timestamp ?? Date.now(),
+        });
+    }
+
+    /**
+     * Emits the canonical site-updated event and state-sync update.
+     *
+     * @remarks
+     * Multiple mutations previously duplicated this logic, which risks drift in
+     * payload fields, cloning behavior, and timestamp correlation.
+     */
+    private async emitSiteUpdatedAndStateSynchronized(args: {
+        identifier: string;
+        previousSite: Site;
+        site: Site;
+        timestamp?: number;
+        updatedFields: readonly string[];
+    }): Promise<void> {
+        const timestamp = args.timestamp ?? Date.now();
+
+        await this.eventEmitter.emitTyped("internal:site:updated", {
+            identifier: args.identifier,
+            operation: "updated",
+            previousSite: structuredClone(args.previousSite),
+            site: structuredClone(args.site),
+            timestamp,
+            updatedFields: Array.from(args.updatedFields),
+        });
+
+        await this.emitSitesStateSynchronized({
+            action: STATE_SYNC_ACTION.UPDATE,
+            siteIdentifier: args.identifier,
+            source: STATE_SYNC_SOURCE.DATABASE,
+            timestamp,
+        });
+    }
+
+    /**
+     * Emits the canonical site-added event and a correlated state-sync update.
+     */
+    private async emitSiteAddedAndStateSynchronized(args: {
+        site: Site;
+        source: SiteAddedSource;
+        timestamp?: number;
+    }): Promise<void> {
+        const timestamp = args.timestamp ?? Date.now();
+        const site = structuredClone(args.site);
+
+        await this.eventEmitter.emitTyped("internal:site:added", {
+            identifier: site.identifier,
+            operation: "added",
+            site,
+            source: args.source,
+            timestamp,
+        });
+
+        // Preserve existing behavior (UPDATE action) for state consistency.
+        await this.emitSitesStateSynchronized({
+            action: STATE_SYNC_ACTION.UPDATE,
+            siteIdentifier: site.identifier,
+            source: STATE_SYNC_SOURCE.DATABASE,
+            timestamp,
+        });
+    }
+
+    /**
+     * Emits the canonical site-removed event.
+     *
+     * @remarks
+     * Used by both single-site and bulk deletion flows.
+     */
+    private async emitSiteRemovedEvent(args: {
+        cascade: boolean;
+        identifier: string;
+        site?: Site;
+        timestamp?: number;
+    }): Promise<void> {
+        const timestamp = args.timestamp ?? Date.now();
+
+        await this.eventEmitter.emitTyped("internal:site:removed", {
+            cascade: args.cascade,
+            identifier: args.identifier,
+            operation: "removed",
+            ...(args.site ? { site: structuredClone(args.site) } : {}),
+            timestamp,
+        });
+    }
+
+    private async applySiteDeletionFinalization(args: {
+        cascade: boolean;
+        removed: ReadonlyArray<{ identifier: string; site?: Site }>;
+        sitesAfter: Site[];
+        syncAction: StateSyncAction;
+        syncSiteIdentifier: string;
+        /**
+         * Optional timestamp override.
+         *
+         * @remarks
+         * When provided, the same timestamp will be used for removed-event
+         * emissions and the correlated state-sync event.
+         */
+        timestamp?: number;
+    }): Promise<void> {
+        const syncTimestamp =
+            typeof args.timestamp === "number" ? args.timestamp : Date.now();
+
+        /* eslint-disable no-await-in-loop -- Sequential event emission required for consistency */
+        for (const entry of args.removed) {
+            await this.emitSiteRemovedEvent({
+                cascade: args.cascade,
+                identifier: entry.identifier,
+                ...(entry.site ? { site: entry.site } : {}),
+                ...(typeof args.timestamp === "number"
+                    ? { timestamp: args.timestamp }
+                    : {}),
+            });
+        }
+        /* eslint-enable no-await-in-loop -- Re-enable after controlled sequential event processing */
+
+        await this.emitSitesStateSynchronized({
+            action: args.syncAction,
+            siteIdentifier: args.syncSiteIdentifier,
+            sites: args.sitesAfter,
+            source: STATE_SYNC_SOURCE.DATABASE,
+            timestamp: syncTimestamp,
+        });
+    }
 
     /**
      * Emits a sanitized site state synchronization event.
@@ -290,7 +441,8 @@ export class SiteManager {
         });
 
         this.lastStateSyncSnapshot = emissionSnapshot.map((site) =>
-            structuredClone(site));
+            structuredClone(site)
+        );
 
         return emissionSnapshot;
     }
@@ -336,21 +488,9 @@ export class SiteManager {
         }
 
         const sanitizedSite = structuredClone(cachedSite ?? createdSite);
-        const timestamp = Date.now();
-
-        await this.eventEmitter.emitTyped("internal:site:added", {
-            identifier: sanitizedSite.identifier,
-            operation: "added",
+        await this.emitSiteAddedAndStateSynchronized({
             site: sanitizedSite,
             source,
-            timestamp,
-        });
-
-        await this.emitSitesStateSynchronized({
-            action: STATE_SYNC_ACTION.UPDATE,
-            siteIdentifier: sanitizedSite.identifier,
-            source: STATE_SYNC_SOURCE.DATABASE,
-            timestamp,
         });
 
         logger.info(
@@ -484,8 +624,6 @@ export class SiteManager {
         const siteSnapshot =
             await this.getSiteSnapshotForMutation(siteIdentifier);
 
-        const sanitizedPreviousSite = structuredClone(siteSnapshot);
-
         const monitorToRemove = siteSnapshot.monitors.find(
             (monitor) => monitor.id === monitorId
         );
@@ -518,33 +656,14 @@ export class SiteManager {
         );
 
         const timestamp = Date.now();
-        const sanitizedUpdatedSite = structuredClone(updatedSite);
 
-        await this.eventEmitter.emitTyped("internal:site:updated", {
+        await this.emitSiteUpdatedAndStateSynchronized({
             identifier: siteIdentifier,
-            operation: "updated",
-            previousSite: sanitizedPreviousSite,
-            site: sanitizedUpdatedSite,
+            previousSite: siteSnapshot,
+            site: updatedSite,
             timestamp,
             updatedFields: ["monitors"],
         });
-
-        await this.emitSitesStateSynchronized({
-            action: STATE_SYNC_ACTION.UPDATE,
-            siteIdentifier,
-            source: STATE_SYNC_SOURCE.DATABASE,
-            timestamp,
-        });
-
-        logger.info(
-            interpolateLogTemplate(
-                LOG_TEMPLATES.services.MONITOR_REMOVED_FROM_SITE,
-                {
-                    monitorId,
-                    siteIdentifier,
-                }
-            )
-        );
 
         return updatedSite;
     }
@@ -584,20 +703,19 @@ export class SiteManager {
             );
             const timestamp = Date.now();
 
-            await this.eventEmitter.emitTyped("internal:site:removed", {
+            await this.applySiteDeletionFinalization({
                 cascade: false,
-                identifier,
-                operation: "removed",
-                ...(sanitizedRemovedSite ? { site: sanitizedRemovedSite } : {}),
-                timestamp,
-            });
-
-            // Emit sync event for state consistency
-            await this.emitSitesStateSynchronized({
-                action: STATE_SYNC_ACTION.DELETE,
-                siteIdentifier: identifier,
-                sites: sitesAfterRemoval,
-                source: STATE_SYNC_SOURCE.DATABASE,
+                removed: [
+                    {
+                        identifier,
+                        ...(sanitizedRemovedSite
+                            ? { site: sanitizedRemovedSite }
+                            : {}),
+                    },
+                ],
+                sitesAfter: sitesAfterRemoval,
+                syncAction: STATE_SYNC_ACTION.DELETE,
+                syncSiteIdentifier: identifier,
                 timestamp,
             });
         }
@@ -659,28 +777,15 @@ export class SiteManager {
 
         await this.updateSitesCache([], "SiteManager.clearSites");
 
-        // Emit events for each deleted site for consistency
-        for (const site of eventSites) {
-            /* eslint-disable no-await-in-loop -- Sequential event emission required for consistency */
-            await this.eventEmitter.emitTyped("internal:site:removed", {
-                cascade: true,
+        await this.applySiteDeletionFinalization({
+            cascade: true,
+            removed: eventSites.map((site) => ({
                 identifier: site.identifier,
-                operation: "removed",
-                site: structuredClone(site),
-                timestamp: Date.now(),
-            });
-            /* eslint-enable no-await-in-loop -- Re-enable after controlled sequential event processing */
-        }
-
-        const bulkSyncTimestamp = Date.now();
-
-        // Emit bulk sync event for state consistency
-        await this.emitSitesStateSynchronized({
-            action: STATE_SYNC_ACTION.BULK_SYNC,
-            siteIdentifier: "all",
-            sites: [],
-            source: STATE_SYNC_SOURCE.DATABASE,
-            timestamp: bulkSyncTimestamp,
+                site,
+            })),
+            sitesAfter: [],
+            syncAction: STATE_SYNC_ACTION.BULK_SYNC,
+            syncSiteIdentifier: "all",
         });
 
         logger.info(
@@ -777,24 +882,13 @@ export class SiteManager {
         }
 
         const timestamp = Date.now();
-        const sanitizedUpdatedSite = structuredClone(refreshedSite);
-        const sanitizedPreviousSite = structuredClone(originalSite);
 
-        await this.eventEmitter.emitTyped("internal:site:updated", {
+        await this.emitSiteUpdatedAndStateSynchronized({
             identifier,
-            operation: "updated",
-            previousSite: sanitizedPreviousSite,
-            site: sanitizedUpdatedSite,
+            previousSite: originalSite,
+            site: refreshedSite,
             timestamp,
             updatedFields: Object.keys(updates),
-        });
-
-        // Emit sync event for state consistency
-        await this.emitSitesStateSynchronized({
-            action: STATE_SYNC_ACTION.UPDATE,
-            siteIdentifier: identifier,
-            source: STATE_SYNC_SOURCE.DATABASE,
-            timestamp,
         });
 
         return refreshedSite;
@@ -850,10 +944,9 @@ export class SiteManager {
         );
 
         // Emit cache updated event
-        await this.eventEmitter.emitTyped("internal:site:cache-updated", {
+        await this.emitSiteCacheUpdated({
             identifier: "all",
             operation: "cache-updated",
-            timestamp: Date.now(),
         });
 
         if (options?.emitSyncEvent) {
@@ -934,14 +1027,11 @@ export class SiteManager {
                     timestamp,
                 });
 
-                await this.eventEmitter.emitTyped(
-                    "internal:site:cache-updated",
-                    {
-                        identifier,
-                        operation: "background-load",
-                        timestamp,
-                    }
-                );
+                await this.emitSiteCacheUpdated({
+                    identifier,
+                    operation: "background-load",
+                    timestamp,
+                });
 
                 logger.debug(
                     interpolateLogTemplate(
@@ -958,11 +1048,10 @@ export class SiteManager {
                 );
 
                 // Emit not found event for observability
-                await this.eventEmitter.emitTyped("internal:site:cache-miss", {
+                await this.emitSiteCacheMissSafe({
                     backgroundLoading: false,
                     identifier,
                     operation: "cache-lookup",
-                    timestamp: Date.now(),
                 });
             }
         } catch (error) {
@@ -976,20 +1065,11 @@ export class SiteManager {
                 error
             );
 
-            try {
-                await this.eventEmitter.emitTyped("internal:site:cache-miss", {
-                    backgroundLoading: false,
-                    identifier,
-                    operation: "cache-lookup",
-                    timestamp: Date.now(),
-                });
-            } catch (emitError) {
-                // Even emit failures shouldn't crash background operations
-                logger.debug(
-                    LOG_TEMPLATES.errors.SITE_BACKGROUND_LOAD_EMIT_ERROR,
-                    emitError
-                );
-            }
+            await this.emitSiteCacheMissSafe({
+                backgroundLoading: false,
+                identifier,
+                operation: "cache-lookup",
+            });
         }
     }
 
@@ -1005,9 +1085,7 @@ export class SiteManager {
      *
      * @returns A cloned {@link Site} snapshot ready for mutation.
      */
-    private async getSiteSnapshotForMutation(
-        identifier: string
-    ): Promise<Site> {
+    private async getSiteSnapshotForMutation(identifier: string): Promise<Site> {
         const cachedSite = this.sitesCache.get(identifier);
         if (cachedSite) {
             return structuredClone(cachedSite);
@@ -1135,22 +1213,11 @@ export class SiteManager {
         if (!site) {
             // Emit cache miss event
             void (async (): Promise<void> => {
-                try {
-                    await this.eventEmitter.emitTyped(
-                        "internal:site:cache-miss",
-                        {
-                            backgroundLoading: true,
-                            identifier,
-                            operation: "cache-lookup",
-                            timestamp: Date.now(),
-                        }
-                    );
-                } catch (error) {
-                    logger.debug(
-                        LOG_TEMPLATES.debug.SITE_CACHE_MISS_ERROR,
-                        error
-                    );
-                }
+                await this.emitSiteCacheMissSafe({
+                    backgroundLoading: true,
+                    identifier,
+                    operation: "cache-lookup",
+                });
             })();
 
             // Trigger background loading without blocking

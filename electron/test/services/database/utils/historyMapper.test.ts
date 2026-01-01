@@ -15,7 +15,7 @@ import {
     rowsToHistoryEntries,
     rowToHistoryEntry,
     rowToHistoryEntryOrUndefined,
-} from "../../../../services/database/utils/historyMapper";
+} from "../../../../services/database/utils/mappers/historyMapper";
 import { logger } from "../../../../utils/logger";
 
 // Mock the logger

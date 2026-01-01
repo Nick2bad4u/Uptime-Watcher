@@ -220,7 +220,7 @@ const arbitraryPartialMonitor = (): fc.Arbitrary<Partial<Monitor>> =>
             for (const key of keys) {
                 if (Math.random() > 0.5) {
                     // Randomly include ~50% of properties
-                        copyField(key);
+                    copyField(key);
                 }
             }
 
@@ -378,9 +378,8 @@ describe("Monitor Operations Fuzzing Tests", () => {
             fc.assert(
                 fc.property(fc.array(fc.anything()), (arrayInput) => {
                     expect(() =>
-                        normalizeMonitor(
-                            arrayInput as Partial<Monitor>
-                        )).toThrowError(
+                        normalizeMonitor(arrayInput as Partial<Monitor>)
+                    ).toThrowError(
                         "Invalid monitor data: must be an object, not an array"
                     );
                 })
@@ -389,81 +388,84 @@ describe("Monitor Operations Fuzzing Tests", () => {
 
         test("should filter fields by monitor type", () => {
             fc.assert(
-                fc.property(arbitraryMonitorType(), arbitraryPartialMonitor(), (
-                    type,
-                    partial
-                ) => {
-                    const monitorWithType = { ...partial, type };
-                    const normalized = normalizeMonitor(monitorWithType);
+                fc.property(
+                    arbitraryMonitorType(),
+                    arbitraryPartialMonitor(),
+                    (type, partial) => {
+                        const monitorWithType = { ...partial, type };
+                        const normalized = normalizeMonitor(monitorWithType);
 
-                    expect(normalized.type).toBe(type);
+                        expect(normalized.type).toBe(type);
 
-                    // Check type-specific field filtering
-                    switch (type) {
-                        case "http": {
-                            // HTTP monitors should have URL if provided and valid
-                            if (
-                                partial.url &&
-                                typeof partial.url === "string" &&
-                                partial.url.startsWith("http")
-                            ) {
-                                expect(normalized).toHaveProperty("url");
+                        // Check type-specific field filtering
+                        switch (type) {
+                            case "http": {
+                                // HTTP monitors should have URL if provided and valid
+                                if (
+                                    partial.url &&
+                                    typeof partial.url === "string" &&
+                                    partial.url.startsWith("http")
+                                ) {
+                                    expect(normalized).toHaveProperty("url");
+                                }
+                                // HTTP monitors should not have port or host fields (unless host is needed for proxy)
+
+                                break;
                             }
-                            // HTTP monitors should not have port or host fields (unless host is needed for proxy)
+                            case "port": {
+                                // Port monitors should have host and port if provided and valid
+                                if (
+                                    partial.host &&
+                                    typeof partial.host === "string" &&
+                                    partial.host.length > 0
+                                ) {
+                                    expect(normalized).toHaveProperty("host");
+                                }
+                                if (
+                                    partial.port &&
+                                    typeof partial.port === "number" &&
+                                    partial.port > 0 &&
+                                    partial.port <= 65_535
+                                ) {
+                                    expect(normalized).toHaveProperty("port");
+                                }
 
-                            break;
+                                break;
+                            }
+                            case "dns": {
+                                // DNS monitors should have host, recordType, expectedValue if provided and valid
+                                if (
+                                    partial.host &&
+                                    typeof partial.host === "string" &&
+                                    partial.host.length > 0
+                                ) {
+                                    expect(normalized).toHaveProperty("host");
+                                }
+                                if (
+                                    partial.recordType &&
+                                    typeof partial.recordType === "string" &&
+                                    partial.recordType.length > 0
+                                ) {
+                                    expect(normalized).toHaveProperty(
+                                        "recordType"
+                                    );
+                                }
+                                if (
+                                    partial.expectedValue &&
+                                    typeof partial.expectedValue === "string" &&
+                                    isNonEmptyString(partial.expectedValue)
+                                ) {
+                                    expect(normalized).toHaveProperty(
+                                        "expectedValue"
+                                    );
+                                }
+
+                                break;
+                            }
+                            // No default
                         }
-                        case "port": {
-                            // Port monitors should have host and port if provided and valid
-                            if (
-                                partial.host &&
-                                typeof partial.host === "string" &&
-                                partial.host.length > 0
-                            ) {
-                                expect(normalized).toHaveProperty("host");
-                            }
-                            if (
-                                partial.port &&
-                                typeof partial.port === "number" &&
-                                partial.port > 0 &&
-                                partial.port <= 65_535
-                            ) {
-                                expect(normalized).toHaveProperty("port");
-                            }
-
-                            break;
-                        }
-                        case "dns": {
-                            // DNS monitors should have host, recordType, expectedValue if provided and valid
-                            if (
-                                partial.host &&
-                                typeof partial.host === "string" &&
-                                partial.host.length > 0
-                            ) {
-                                expect(normalized).toHaveProperty("host");
-                            }
-                            if (
-                                partial.recordType &&
-                                typeof partial.recordType === "string" &&
-                                partial.recordType.length > 0
-                            ) {
-                                expect(normalized).toHaveProperty("recordType");
-                            }
-                            if (
-                                partial.expectedValue &&
-                                typeof partial.expectedValue === "string" &&
-                                isNonEmptyString(partial.expectedValue)
-                            ) {
-                                expect(normalized).toHaveProperty(
-                                    "expectedValue"
-                                );
-                            }
-
-                            break;
-                        }
-                        // No default
                     }
-                })
+                )
             );
         });
 
@@ -498,55 +500,58 @@ describe("Monitor Operations Fuzzing Tests", () => {
     describe("monitorOperations", () => {
         test("updateStatus should validate status values", () => {
             fc.assert(
-                fc.property(arbitraryPartialMonitor(), arbitraryMixedValue(), (
-                    monitorData,
-                    statusValue
-                ) => {
-                    const monitor = normalizeMonitor(monitorData);
+                fc.property(
+                    arbitraryPartialMonitor(),
+                    arbitraryMixedValue(),
+                    (monitorData, statusValue) => {
+                        const monitor = normalizeMonitor(monitorData);
 
-                    if (
-                        [
-                            "up",
-                            "down",
-                            "pending",
-                            "paused",
-                        ].includes(statusValue as string)
-                    ) {
-                        const updated = monitorOperations.updateStatus(
-                            monitor,
-                            statusValue as MonitorStatus
-                        );
-                        expect(updated.status).toBe(statusValue);
-                        expect(updated.id).toBe(monitor.id); // Other fields preserved
-                    } else {
-                        expect(() =>
-                            monitorOperations.updateStatus(
+                        if (
+                            [
+                                "up",
+                                "down",
+                                "pending",
+                                "paused",
+                            ].includes(statusValue as string)
+                        ) {
+                            const updated = monitorOperations.updateStatus(
                                 monitor,
                                 statusValue as MonitorStatus
-                            )).toThrowError("Invalid monitor status");
+                            );
+                            expect(updated.status).toBe(statusValue);
+                            expect(updated.id).toBe(monitor.id); // Other fields preserved
+                        } else {
+                            expect(() =>
+                                monitorOperations.updateStatus(
+                                    monitor,
+                                    statusValue as MonitorStatus
+                                )
+                            ).toThrowError("Invalid monitor status");
+                        }
                     }
-                })
+                )
             );
         });
 
         test("updateTimeout should preserve monitor integrity", () => {
             fc.assert(
-                fc.property(arbitraryPartialMonitor(), arbitraryTimeout(), (
-                    monitorData,
-                    timeout
-                ) => {
-                    const monitor = normalizeMonitor(monitorData);
-                    const updated = monitorOperations.updateTimeout(
-                        monitor,
-                        timeout
-                    );
+                fc.property(
+                    arbitraryPartialMonitor(),
+                    arbitraryTimeout(),
+                    (monitorData, timeout) => {
+                        const monitor = normalizeMonitor(monitorData);
+                        const updated = monitorOperations.updateTimeout(
+                            monitor,
+                            timeout
+                        );
 
-                    expect(updated.timeout).toBe(timeout);
-                    expect(updated.id).toBe(monitor.id);
-                    expect(updated.type).toBe(monitor.type);
-                    expect(updated.status).toBe(monitor.status);
-                    // All other fields should be preserved
-                })
+                        expect(updated.timeout).toBe(timeout);
+                        expect(updated.id).toBe(monitor.id);
+                        expect(updated.type).toBe(monitor.type);
+                        expect(updated.status).toBe(monitor.status);
+                        // All other fields should be preserved
+                    }
+                )
             );
         });
 
@@ -613,26 +618,28 @@ describe("Monitor Operations Fuzzing Tests", () => {
                 monitoring: fc.boolean(),
                 monitors: fc.array(
                     arbitraryPartialMonitor().map((monitor) =>
-                        normalizeMonitor(monitor))
+                        normalizeMonitor(monitor)
+                    )
                 ),
             });
 
         test("addMonitorToSite should preserve site structure", () => {
             fc.assert(
-                fc.property(arbitrarySite(), arbitraryPartialMonitor(), (
-                    site,
-                    monitorData
-                ) => {
-                    const monitor = normalizeMonitor(monitorData);
-                    const updated = addMonitorToSite(site, monitor);
+                fc.property(
+                    arbitrarySite(),
+                    arbitraryPartialMonitor(),
+                    (site, monitorData) => {
+                        const monitor = normalizeMonitor(monitorData);
+                        const updated = addMonitorToSite(site, monitor);
 
-                    expect(updated.identifier).toBe(site.identifier);
-                    expect(updated.name).toBe(site.name);
-                    expect(updated.monitors).toHaveLength(
-                        site.monitors.length + 1
-                    );
-                    expect(updated.monitors).toContain(monitor);
-                })
+                        expect(updated.identifier).toBe(site.identifier);
+                        expect(updated.name).toBe(site.name);
+                        expect(updated.monitors).toHaveLength(
+                            site.monitors.length + 1
+                        );
+                        expect(updated.monitors).toContain(monitor);
+                    }
+                )
             );
         });
 
@@ -703,16 +710,12 @@ describe("Monitor Operations Fuzzing Tests", () => {
 
                     if (monitorExists) {
                         expect(() =>
-                            validateMonitorExists(
-                                site,
-                                randomId
-                            )).not.toThrowError();
+                            validateMonitorExists(site, randomId)
+                        ).not.toThrowError();
                     } else {
                         expect(() =>
-                            validateMonitorExists(
-                                site,
-                                randomId
-                            )).toThrowError();
+                            validateMonitorExists(site, randomId)
+                        ).toThrowError();
                     }
                 })
             );
@@ -722,10 +725,8 @@ describe("Monitor Operations Fuzzing Tests", () => {
             fc.assert(
                 fc.property(fc.string(), (monitorId) => {
                     expect(() =>
-                        validateMonitorExists(
-                            undefined,
-                            monitorId
-                        )).toThrowError();
+                        validateMonitorExists(undefined, monitorId)
+                    ).toThrowError();
                 })
             );
         });

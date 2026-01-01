@@ -143,9 +143,26 @@ describe("SiteOverviewTab - Complete Coverage", () => {
 
             render(<SiteOverviewTab {...defaultProps} />);
 
-            // Site name should appear multiple times
-            expect(screen.getAllByText(mockSiteName)).toHaveLength(2);
-            expect(screen.getByText(mockSiteIdentifier)).toBeInTheDocument();
+            // Site name should be displayed prominently
+            expect(screen.getByText(mockSiteName)).toBeInTheDocument();
+
+            // Site metadata is rendered as badges with label prefixes
+            expect(
+                screen.getByText(
+                    (text) =>
+                        text.includes("ID:") &&
+                        (text.includes(mockSiteIdentifier) ||
+                            text.includes(mockSiteIdentifier.slice(0, 8)))
+                )
+            ).toBeInTheDocument();
+            expect(
+                screen.getByText(
+                    (text) =>
+                        text.includes("Name:") &&
+                        (text.includes(mockSiteName) ||
+                            text.includes(mockSiteName.slice(0, 10)))
+                )
+            ).toBeInTheDocument();
             // Check specific monitor count context instead of just "2"
             expect(screen.getByText("1/2")).toBeInTheDocument(); // Active/total format
         });
@@ -197,9 +214,9 @@ describe("SiteOverviewTab - Complete Coverage", () => {
             render(<SiteOverviewTab {...defaultProps} />);
 
             // Check monitor summary
-            expect(screen.getByText("Total:")).toBeInTheDocument();
-            expect(screen.getByText("Running:")).toBeInTheDocument();
-            expect(screen.getByText("Stopped:")).toBeInTheDocument();
+            expect(screen.getByText(/Total:\s*2/u)).toBeInTheDocument();
+            expect(screen.getByText(/Running:\s*1/u)).toBeInTheDocument();
+            expect(screen.getByText(/Stopped:\s*1/u)).toBeInTheDocument();
 
             // Check individual monitor details
             expect(screen.getByText("HTTP Monitor")).toBeInTheDocument();
@@ -501,7 +518,9 @@ describe("SiteOverviewTab - Complete Coverage", () => {
                 />
             );
 
-            const removeButton = screen.getByText("Remove Site");
+            const removeButton = screen.getByRole("button", {
+                name: "Remove Site",
+            });
             fireEvent.click(removeButton);
 
             await waitFor(() => {
@@ -522,11 +541,15 @@ describe("SiteOverviewTab - Complete Coverage", () => {
 
             render(<SiteOverviewTab {...defaultProps} isLoading={true} />);
 
-            const removeButton = screen.getByText("Remove Site");
+            const removeButton = screen.getByRole("button", {
+                name: "Remove Site",
+            });
             expect(removeButton).toBeDisabled();
 
             // Check if monitoring button is disabled (start or stop depending on state)
-            const monitoringButton = screen.getByText(/All Monitoring/);
+            const monitoringButton = screen.getByRole("button", {
+                name: /All Monitoring/u,
+            });
             expect(monitoringButton).toBeDisabled();
         });
     });
@@ -782,7 +805,9 @@ describe("SiteOverviewTab - Complete Coverage", () => {
             render(<SiteOverviewTab {...defaultProps} />);
 
             // Buttons should be focusable
-            const removeButton = screen.getByText("Remove Site");
+            const removeButton = screen.getByRole("button", {
+                name: "Remove Site",
+            });
             expect(removeButton).toBeInTheDocument();
 
             removeButton.focus();
@@ -895,7 +920,9 @@ describe("SiteOverviewTab - Complete Coverage", () => {
                 />
             );
 
-            const removeButton = screen.getByText("Remove Site");
+            const removeButton = screen.getByRole("button", {
+                name: "Remove Site",
+            });
             fireEvent.click(removeButton);
 
             await waitFor(() => {

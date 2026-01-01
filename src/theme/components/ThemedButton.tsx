@@ -216,7 +216,7 @@ const ThemedButtonComponent = ({
                 (ariaLabel
                     ? `button-${ariaLabel
                           .toLowerCase()
-                          .replaceAll(/\s+/g, "-")}`
+                          .replaceAll(/\s+/gu, "-")}`
                     : undefined)
             }
             disabled={disabled || loading}

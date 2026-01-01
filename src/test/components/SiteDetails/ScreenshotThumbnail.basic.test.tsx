@@ -15,11 +15,6 @@ import {
     ScreenshotThumbnail,
     type ScreenshotThumbnailProperties,
 } from "../../../components/SiteDetails/ScreenshotThumbnail";
-import {
-    sampleOne,
-    siteNameArbitrary,
-    siteUrlArbitrary,
-} from "@shared/test/arbitraries/siteArbitraries";
 
 // Mock state for UI store
 let mockUIState = {
@@ -33,9 +28,15 @@ let mockThemeState = {
 
 // Mock stores and hooks
 vi.mock("../../../stores/ui/useUiStore", () => ({
-    useUIStore: vi.fn(() => ({
-        openExternal: mockUIState.openExternal,
-    })),
+    useUIStore: vi.fn(
+        (selector?: (state: typeof mockUIState) => unknown) => {
+            const state = {
+                openExternal: mockUIState.openExternal,
+            };
+
+            return typeof selector === "function" ? selector(state) : state;
+        }
+    ),
 }));
 
 vi.mock("../../../theme/useTheme", () => ({
@@ -105,8 +106,10 @@ Object.defineProperty(window, "innerHeight", {
 const createThumbnailProps = (
     overrides: Partial<ScreenshotThumbnailProperties> = {}
 ): ScreenshotThumbnailProperties => ({
-    siteName: sampleOne(siteNameArbitrary),
-    url: sampleOne(siteUrlArbitrary),
+    // Keep these tests deterministic: using random arbitraries can generate
+    // private-network URLs which intentionally disable screenshots.
+    siteName: "Example Site",
+    url: "https://example.com",
     ...overrides,
 });
 

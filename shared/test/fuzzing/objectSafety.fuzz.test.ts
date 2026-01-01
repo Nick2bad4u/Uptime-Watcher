@@ -41,51 +41,48 @@ describe("objectSafety.ts fuzzing tests", () => {
                 fc.constantFrom(Symbol("test"), Symbol.for("test"))
             ),
             fc.anything(),
-        ])("should return fallback for non-objects", (
-            nonObject,
-            key,
-            fallback
-        ) => {
-            fc.pre(
-                nonObject === null ||
-                    typeof nonObject !== "object" ||
-                    Array.isArray(nonObject)
-            );
+        ])(
+            "should return fallback for non-objects",
+            (nonObject, key, fallback) => {
+                fc.pre(
+                    nonObject === null ||
+                        typeof nonObject !== "object" ||
+                        Array.isArray(nonObject)
+                );
 
-            const result = safeObjectAccess(nonObject, key, fallback);
-            expect(result).toBe(fallback);
-        });
+                const result = safeObjectAccess(nonObject, key, fallback);
+                expect(result).toBe(fallback);
+            }
+        );
 
         test.prop([
             fc.record({}),
             fc.string(),
             fc.anything(),
-        ])("should return fallback for missing properties", (
-            obj,
-            key,
-            fallback
-        ) => {
-            fc.pre(!Object.hasOwn(obj, key));
+        ])(
+            "should return fallback for missing properties",
+            (obj, key, fallback) => {
+                fc.pre(!Object.hasOwn(obj, key));
 
-            const result = safeObjectAccess(obj, key, fallback);
-            expect(result).toBe(fallback);
-        });
+                const result = safeObjectAccess(obj, key, fallback);
+                expect(result).toBe(fallback);
+            }
+        );
 
         test.prop([
             fc.string(),
             fc.string(),
             fc.string(),
-        ])("should return actual value when property exists and types match", (
-            key,
-            value,
-            fallback
-        ) => {
-            fc.pre(typeof value === typeof fallback);
+        ])(
+            "should return actual value when property exists and types match",
+            (key, value, fallback) => {
+                fc.pre(typeof value === typeof fallback);
 
-            const obj = { [key]: value };
-            const result = safeObjectAccess(obj, key, fallback);
-            expect(result).toBe(value);
-        });
+                const obj = { [key]: value };
+                const result = safeObjectAccess(obj, key, fallback);
+                expect(result).toBe(value);
+            }
+        );
 
         test.prop([
             fc.string(),
@@ -139,29 +136,30 @@ describe("objectSafety.ts fuzzing tests", () => {
     });
 
     describe(safeObjectIteration, () => {
-        test.prop([fc.anything()])("should handle non-objects gracefully", (
-            nonObject
-        ) => {
-            fc.pre(
-                nonObject === null ||
-                    typeof nonObject !== "object" ||
-                    Array.isArray(nonObject)
-            );
+        test.prop([fc.anything()])(
+            "should handle non-objects gracefully",
+            (nonObject) => {
+                fc.pre(
+                    nonObject === null ||
+                        typeof nonObject !== "object" ||
+                        Array.isArray(nonObject)
+                );
 
-            const consoleSpy = vi
-                .spyOn(console, "warn")
-                .mockImplementation(() => {});
-            const callback = vi.fn();
+                const consoleSpy = vi
+                    .spyOn(console, "warn")
+                    .mockImplementation(() => {});
+                const callback = vi.fn();
 
-            safeObjectIteration(nonObject, callback);
+                safeObjectIteration(nonObject, callback);
 
-            expect(callback).not.toHaveBeenCalled();
-            expect(consoleSpy).toHaveBeenCalledWith(
-                expect.stringContaining("Expected object, got")
-            );
+                expect(callback).not.toHaveBeenCalled();
+                expect(consoleSpy).toHaveBeenCalledWith(
+                    expect.stringContaining("Expected object, got")
+                );
 
-            consoleSpy.mockRestore();
-        });
+                consoleSpy.mockRestore();
+            }
+        );
 
         test.prop([
             fc.record(
@@ -196,7 +194,8 @@ describe("objectSafety.ts fuzzing tests", () => {
                 });
 
                 expect(() =>
-                    safeObjectIteration(obj, callback)).not.toThrowError();
+                    safeObjectIteration(obj, callback)
+                ).not.toThrowError();
                 expect(consoleSpy).toHaveBeenCalledWith(
                     "Object iteration failed for context:",
                     "Safe object iteration",
@@ -471,7 +470,8 @@ describe("objectSafety.ts fuzzing tests", () => {
 
                 for (const value of values) {
                     const containsValue = objValues.some((candidate) =>
-                        Object.is(candidate, value));
+                        Object.is(candidate, value)
+                    );
                     expect(containsValue).toBeTruthy();
                 }
             }

@@ -14,27 +14,16 @@
         "forceConsistentCasingInFileNames": true,
         "incremental": true,
         "jsx": "react-jsx",
-        "lib": [
-            "DOM",
-            "DOM.Iterable",
-            "ES6",
-            "ESNext"
-        ],
+        "lib": ["DOM", "DOM.Iterable", "ES6", "ESNext"],
         "module": "ESNext",
         "moduleDetection": "auto",
         "moduleResolution": "bundler",
         "noEmit": false,
         "outDir": "../../.cache/builds/docusaurus/eslint",
         "paths": {
-            "@docusaurus/*": [
-                "./.docusaurus/docusaurus/*"
-            ],
-            "@site/*": [
-                "./*"
-            ],
-            "@theme/*": [
-                "./.docusaurus/theme/*"
-            ]
+            "@docusaurus/*": ["./.docusaurus/docusaurus/*"],
+            "@site/*": ["./*"],
+            "@theme/*": ["./.docusaurus/theme/*"]
         },
         "resolveJsonModule": true,
         "skipLibCheck": true,

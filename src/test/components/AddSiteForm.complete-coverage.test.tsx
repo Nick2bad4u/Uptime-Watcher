@@ -86,7 +86,7 @@ vi.mock("../../stores/error/useErrorStore", () => ({
 vi.mock("../../components/SiteDetails/useAddSiteForm", () => ({
     useAddSiteForm: () => ({
         addMode: "existing",
-        checkInterval: 30,
+        checkIntervalMs: 30,
         formError: null,
         host: "",
         monitorType: "http",
@@ -95,7 +95,7 @@ vi.mock("../../components/SiteDetails/useAddSiteForm", () => ({
         resetForm: vi.fn(),
         selectedExistingSite: null,
         setAddMode: vi.fn(),
-        setCheckInterval: vi.fn(),
+        setCheckIntervalMs: vi.fn(),
         setFormError: vi.fn(),
         setHost: vi.fn(),
         setMonitorType: vi.fn(),

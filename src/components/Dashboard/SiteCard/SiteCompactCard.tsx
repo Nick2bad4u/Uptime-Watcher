@@ -18,12 +18,12 @@ import {
     getMonitorDisplayIdentifier,
     getMonitorTypeDisplayLabel,
 } from "../../../utils/fallbacks";
-import { getMonitorRuntimeSummary } from "../../../utils/monitoring/monitorRuntime";
 import { toSentenceCase } from "../../../utils/text/toSentenceCase";
 import {
     MarqueeText,
     type MarqueeTextProperties,
 } from "../../common/MarqueeText/MarqueeText";
+import { useDashboardSiteSummaryMeta } from "../shared/useDashboardSiteSummaryMeta";
 import { ActionButtonGroup } from "./components/ActionButtonGroup";
 import { MonitorSelector } from "./components/MonitorSelector";
 import "./SiteCompactCard.css";
@@ -60,11 +60,6 @@ export const SiteCompactCard: NamedExoticComponent<SiteCompactCardProperties> =
             uptime,
         } = useSite(site);
 
-        const marqueeDependencies = useMemo(
-            () => [latestSite.name, site.identifier],
-            [latestSite.name, site.identifier]
-        );
-
         const marqueeTextProps = useMemo<
             NonNullable<MarqueeTextProperties["textProps"]>
         >(
@@ -77,12 +72,14 @@ export const SiteCompactCard: NamedExoticComponent<SiteCompactCardProperties> =
 
         const {
             allRunning: allMonitorsRunning,
+            marqueeDependencies,
             runningCount: runningMonitors,
             totalCount: totalMonitors,
-        } = useMemo(
-            () => getMonitorRuntimeSummary(latestSite.monitors),
-            [latestSite.monitors]
-        );
+        } = useDashboardSiteSummaryMeta(useMemo(() => ({
+            latestSiteName: latestSite.name,
+            monitors: latestSite.monitors,
+            siteIdentifier: site.identifier,
+        }), [latestSite.monitors, latestSite.name, site.identifier]));
 
         const monitorSummary = useMemo(() => {
             if (!monitor) {
@@ -184,30 +181,27 @@ export const SiteCompactCard: NamedExoticComponent<SiteCompactCardProperties> =
                         />
                     </div>
                     <div className="site-card__compact-status">
-                        {compactStatusEntries.map(({
-                            id,
-                            label,
-                            status: statusValue,
-                            value,
-                        }) => (
-                            <div
-                                className="site-card__compact-status-item"
-                                key={id}
-                            >
-                                <StatusIndicator
-                                    size="sm"
-                                    status={statusValue}
-                                />
-                                <div className="site-card__compact-status-meta">
-                                    <span className="site-card__compact-status-label">
-                                        {label}
-                                    </span>
-                                    <span className="site-card__compact-status-value">
-                                        {value}
-                                    </span>
+                        {compactStatusEntries.map(
+                            ({ id, label, status: statusValue, value }) => (
+                                <div
+                                    className="site-card__compact-status-item"
+                                    key={id}
+                                >
+                                    <StatusIndicator
+                                        size="sm"
+                                        status={statusValue}
+                                    />
+                                    <div className="site-card__compact-status-meta">
+                                        <span className="site-card__compact-status-label">
+                                            {label}
+                                        </span>
+                                        <span className="site-card__compact-status-value">
+                                            {value}
+                                        </span>
+                                    </div>
                                 </div>
-                            </div>
-                        ))}
+                            )
+                        )}
                     </div>
                 </div>
 

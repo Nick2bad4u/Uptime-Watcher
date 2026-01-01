@@ -46,18 +46,19 @@ vi.mock("../../services/logger", () => ({
     logger: mockLogger,
 }));
 
-vi.mock("../../services/utils/createIpcServiceHelpers", async (
-    importOriginal
-) => {
-    const actual =
-        await importOriginal<
-            typeof import("../../services/utils/createIpcServiceHelpers")
-        >();
-    return {
-        ...actual,
-        createIpcServiceHelpers: actual.createIpcServiceHelpers,
-    };
-});
+vi.mock(
+    "../../services/utils/createIpcServiceHelpers",
+    async (importOriginal) => {
+        const actual =
+            await importOriginal<
+                typeof import("../../services/utils/createIpcServiceHelpers")
+            >();
+        return {
+            ...actual,
+            createIpcServiceHelpers: actual.createIpcServiceHelpers,
+        };
+    }
+);
 
 describe("StateSyncService", () => {
     let capturedHandler: ((event: unknown) => void) | undefined;
@@ -374,12 +375,12 @@ describe("StateSyncService", () => {
     ])(
         "wraps invalid cleanup candidates returned by the preload bridge",
         async (invalidCleanup) => {
-            mockElectronAPI.stateSync.onStateSyncEvent.mockImplementationOnce((
-                handler: (event: unknown) => void
-            ) => {
-                capturedHandler = handler;
-                return invalidCleanup;
-            });
+            mockElectronAPI.stateSync.onStateSyncEvent.mockImplementationOnce(
+                (handler: (event: unknown) => void) => {
+                    capturedHandler = handler;
+                    return invalidCleanup;
+                }
+            );
 
             const callback = vi.fn();
             const initialErrorCount = mockLogger.error.mock.calls.length;
@@ -412,14 +413,14 @@ describe("StateSyncService", () => {
     ])(
         "reports cleanup errors through the logger while preserving control flow",
         async (cleanupError) => {
-            mockElectronAPI.stateSync.onStateSyncEvent.mockImplementationOnce((
-                handler: (event: unknown) => void
-            ) => {
-                capturedHandler = handler;
-                return () => {
-                    throw cleanupError;
-                };
-            });
+            mockElectronAPI.stateSync.onStateSyncEvent.mockImplementationOnce(
+                (handler: (event: unknown) => void) => {
+                    capturedHandler = handler;
+                    return () => {
+                        throw cleanupError;
+                    };
+                }
+            );
 
             const callback = vi.fn();
             const initialErrorCount = mockLogger.error.mock.calls.length;

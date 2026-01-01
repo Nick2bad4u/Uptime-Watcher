@@ -65,7 +65,8 @@ class MockReactRenderer {
             tagName: element.type,
             props: element.props,
             children: element.children.map((child) =>
-                this.renderElement(child)),
+                this.renderElement(child)
+            ),
         };
         return node;
     }
@@ -294,25 +295,24 @@ class MockDashboard {
                 {
                     type: "div",
                     props: { className: "recent-activity" },
-                    children: recentActivity.map((
-                        activity: any,
-                        index: number
-                    ) => ({
-                        type: "div",
-                        props: {
-                            className: "activity-item",
-                            key: activity.id,
-                        },
-                        children: [
-                            {
-                                type: "text",
-                                props: {
-                                    content: `${activity.siteName}: ${activity.status}`,
-                                },
-                                children: [],
+                    children: recentActivity.map(
+                        (activity: any, index: number) => ({
+                            type: "div",
+                            props: {
+                                className: "activity-item",
+                                key: activity.id,
                             },
-                        ],
-                    })),
+                            children: [
+                                {
+                                    type: "text",
+                                    props: {
+                                        content: `${activity.siteName}: ${activity.status}`,
+                                    },
+                                    children: [],
+                                },
+                            ],
+                        })
+                    ),
                 },
             ],
         };
@@ -622,7 +622,8 @@ describe("React Component Rendering Performance", () => {
                             props: { content: item.value.toString() },
                             children: [],
                         } as ReactElement)
-                    ))
+                    )
+                )
             );
 
             renderer.render(listElement);

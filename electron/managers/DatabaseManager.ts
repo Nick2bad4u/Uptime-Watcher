@@ -51,20 +51,17 @@ import type { Site } from "@shared/types";
 
 import { normalizeHistoryLimit } from "@shared/constants/history";
 import { ensureError, withErrorHandling } from "@shared/utils/errorHandling";
+import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 
 import type { UptimeEvents } from "../events/eventTypes";
 import type { TypedEventBus } from "../events/TypedEventBus";
-import type { DatabaseService } from "../services/database/DatabaseService";
-import type { HistoryRepository } from "../services/database/HistoryRepository";
-import type { MonitorRepository } from "../services/database/MonitorRepository";
-import type { SettingsRepository } from "../services/database/SettingsRepository";
-import type { SiteRepository } from "../services/database/SiteRepository";
 import type {
     DatabaseBackupResult,
     DatabaseRestorePayload,
     DatabaseRestoreSummary,
-} from "../services/database/utils/databaseBackup";
+} from "../services/database/utils/backup/databaseBackup";
 import type { ConfigurationManager } from "./ConfigurationManager";
+import type { DatabaseManagerRepositories } from "./databaseRepositorySets";
 
 import { DEFAULT_HISTORY_LIMIT } from "../constants";
 import {
@@ -74,11 +71,11 @@ import {
     ImportDataCommand,
     RestoreBackupCommand,
 } from "../services/commands/DatabaseCommands";
+import { setHistoryLimit as setHistoryLimitUtil } from "../services/database/historyLimitManager";
+import { createSiteCache } from "../services/database/serviceFactory";
+import { SiteLoadingOrchestrator } from "../services/database/SiteRepositoryService";
 import { DatabaseServiceFactory } from "../services/factories/DatabaseServiceFactory";
 import { StandardizedCache } from "../utils/cache/StandardizedCache";
-import { setHistoryLimit as setHistoryLimitUtil } from "../utils/database/historyLimitManager";
-import { createSiteCache } from "../utils/database/serviceFactory";
-import { SiteLoadingOrchestrator } from "../utils/database/SiteRepositoryService";
 import { monitorLogger } from "../utils/logger";
 
 /**
@@ -98,18 +95,7 @@ export interface DatabaseManagerDependencies {
     /** The typed event emitter for system-wide coordination. */
     eventEmitter: TypedEventBus<UptimeEvents>;
     /** The set of repositories used for all database operations. */
-    repositories: {
-        /** The main database service. */
-        database: DatabaseService;
-        /** Repository for status history. */
-        history: HistoryRepository;
-        /** Repository for monitor data. */
-        monitor: MonitorRepository;
-        /** Repository for application settings. */
-        settings: SettingsRepository;
-        /** Repository for site data. */
-        site: SiteRepository;
-    };
+    repositories: DatabaseManagerRepositories;
 }
 
 /**
@@ -574,7 +560,7 @@ export class DatabaseManager {
         const historyRules =
             this.configurationManager.getHistoryRetentionRules();
 
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- Configuration manager may temporarily return undefined during legacy migrations; surface an explicit error for diagnostics.
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- Configuration manager may temporarily return undefined during development-time schema transitions; surface an explicit error for diagnostics.
         if (!historyRules) {
             throw new TypeError(
                 "[DatabaseManager.setHistoryLimit] History retention rules are not configured"
@@ -593,14 +579,14 @@ export class DatabaseManager {
             setHistoryLimit: (newLimit) => {
                 this.historyLimit = newLimit;
                 // Use centralized event emission (fire and forget)
-                this.emitHistoryLimitUpdated(newLimit).catch((
-                    error: unknown
-                ) => {
-                    monitorLogger.error(
-                        "[DatabaseManager] Failed to emit history limit updated event:",
-                        error
-                    );
-                });
+                this.emitHistoryLimitUpdated(newLimit).catch(
+                    (error: unknown) => {
+                        monitorLogger.error(
+                            "[DatabaseManager] Failed to emit history limit updated event:",
+                            error
+                        );
+                    }
+                );
             },
         });
     }
@@ -661,6 +647,52 @@ export class DatabaseManager {
     }
 
     /**
+     * Emits a monitoring lifecycle request event for a site/monitor.
+     *
+     * @remarks
+     * Centralizes the request emission and error normalization so start/stop
+     * paths do not drift.
+     */
+    private async emitSiteMonitoringRequested(args: {
+        identifier: string;
+        kind: "start" | "stop";
+        monitorId: string;
+    }): Promise<void> {
+        try {
+            if (args.kind === "start") {
+                await this.eventEmitter.emitTyped(
+                    "internal:site:start-monitoring-requested",
+                    {
+                        identifier: args.identifier,
+                        monitorId: args.monitorId,
+                        operation: "start-monitoring-requested",
+                        timestamp: Date.now(),
+                    }
+                );
+                return;
+            }
+
+            await this.eventEmitter.emitTyped(
+                "internal:site:stop-monitoring-requested",
+                {
+                    identifier: args.identifier,
+                    monitorId: args.monitorId,
+                    operation: "stop-monitoring-requested",
+                    timestamp: Date.now(),
+                }
+            );
+        } catch (error) {
+            monitorLogger.error(
+                `[DatabaseManager] Failed to emit ${args.kind} monitoring requested event:`,
+                error
+            );
+            throw error instanceof Error
+                ? error
+                : new Error(getUserFacingErrorDetail(error));
+        }
+    }
+
+    /**
      * Loads sites from the database and updates the cache using atomic
      * replacement.
      *
@@ -709,27 +741,11 @@ export class DatabaseManager {
                 // First update the cache so monitoring can find the sites
                 await this.emitSitesCacheUpdateRequested();
 
-                // Then request monitoring start via events (with error
-                // handling)
-                try {
-                    await this.eventEmitter.emitTyped(
-                        "internal:site:start-monitoring-requested",
-                        {
-                            identifier,
-                            monitorId,
-                            operation: "start-monitoring-requested",
-                            timestamp: Date.now(),
-                        }
-                    );
-                } catch (error) {
-                    monitorLogger.error(
-                        "[DatabaseManager] Failed to emit start monitoring requested event:",
-                        error
-                    );
-                    throw error instanceof Error
-                        ? error
-                        : new Error(String(error));
-                }
+                await this.emitSiteMonitoringRequested({
+                    identifier,
+                    kind: "start",
+                    monitorId,
+                });
 
                 return true;
             },
@@ -737,26 +753,11 @@ export class DatabaseManager {
                 identifier: string,
                 monitorId: string
             ): Promise<boolean> => {
-                // Request monitoring stop via events (with error handling)
-                try {
-                    await this.eventEmitter.emitTyped(
-                        "internal:site:stop-monitoring-requested",
-                        {
-                            identifier,
-                            monitorId,
-                            operation: "stop-monitoring-requested",
-                            timestamp: Date.now(),
-                        }
-                    );
-                } catch (error) {
-                    monitorLogger.error(
-                        "[DatabaseManager] Failed to emit stop monitoring requested event:",
-                        error
-                    );
-                    throw error instanceof Error
-                        ? error
-                        : new Error(String(error));
-                }
+                await this.emitSiteMonitoringRequested({
+                    identifier,
+                    kind: "stop",
+                    monitorId,
+                });
 
                 return true;
             },
@@ -774,10 +775,10 @@ export class DatabaseManager {
         }
 
         // Atomically replace the main cache (prevents race conditions)
-        const serializedEntries = Array.from(tempCache.entries(), ([
-            key,
-            site,
-        ]) => ({ data: site, key }));
+        const serializedEntries = Array.from(
+            tempCache.entries(),
+            ([key, site]) => ({ data: site, key })
+        );
         this.siteCache.replaceAll(serializedEntries);
 
         // Update the cache with loaded sites (final update to ensure

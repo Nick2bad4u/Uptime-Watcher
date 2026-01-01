@@ -147,4 +147,164 @@ describe("CloudService", () => {
             "Cloud sync is disabled"
         );
     });
+
+    it("rejects filesystem provider baseDirectory with leading/trailing whitespace", async () => {
+        const settings = new Map<string, string>();
+        const syncEngine = {
+            syncNow: vi.fn().mockResolvedValue({
+                appliedRemoteOperations: 0,
+                emittedLocalOperations: 0,
+                mergedEntities: 0,
+                snapshotKey: null,
+            }),
+        };
+
+        const orchestrator = {
+            downloadBackup: vi.fn(),
+            restoreBackup: vi.fn(),
+        } as unknown as UptimeOrchestrator;
+
+        const cloudService = new CloudService({
+            orchestrator,
+            settings: {
+                get: async (key) => settings.get(key),
+                set: async (key, value) => {
+                    settings.set(key, value);
+                },
+            },
+            syncEngine,
+            secretStore: new InMemorySecretStore(),
+        });
+
+        await expect(
+            cloudService.configureFilesystemProvider({
+                baseDirectory: ` ${baseDirectory}`,
+            })
+        ).rejects.toThrowError(
+            "Filesystem base directory must not have leading or trailing whitespace"
+        );
+    });
+
+    it("treats corrupted stored filesystem baseDirectory as unconfigured", async () => {
+        const settings = new Map<string, string>([
+            ["cloud.provider", "filesystem"],
+            // Invalid due to leading whitespace.
+            ["cloud.filesystem.baseDirectory", ` ${baseDirectory}`],
+        ]);
+
+        const syncEngine = {
+            syncNow: vi.fn().mockResolvedValue({
+                appliedRemoteOperations: 0,
+                emittedLocalOperations: 0,
+                mergedEntities: 0,
+                snapshotKey: null,
+            }),
+        };
+
+        const orchestrator = {
+            downloadBackup: vi.fn(),
+            restoreBackup: vi.fn(),
+        } as unknown as UptimeOrchestrator;
+
+        const cloudService = new CloudService({
+            orchestrator,
+            settings: {
+                get: async (key) => settings.get(key),
+                set: async (key, value) => {
+                    settings.set(key, value);
+                },
+            },
+            syncEngine,
+            secretStore: new InMemorySecretStore(),
+        });
+
+        const status = await cloudService.getStatus();
+        expect(status.provider).toBe("filesystem");
+        expect(status.configured).toBeFalsy();
+        expect(status.connected).toBeFalsy();
+
+        await expect(cloudService.listBackups()).rejects.toThrowError(
+            "Cloud provider is not configured"
+        );
+    });
+
+    it("rejects encryption passphrases with control characters", async () => {
+        const settings = new Map<string, string>();
+        const syncEngine = {
+            syncNow: vi.fn().mockResolvedValue({
+                appliedRemoteOperations: 0,
+                emittedLocalOperations: 0,
+                mergedEntities: 0,
+                snapshotKey: null,
+            }),
+        };
+
+        const orchestrator = {
+            downloadBackup: vi.fn(),
+            restoreBackup: vi.fn(),
+        } as unknown as UptimeOrchestrator;
+
+        const cloudService = new CloudService({
+            orchestrator,
+            settings: {
+                get: async (key) => settings.get(key),
+                set: async (key, value) => {
+                    settings.set(key, value);
+                },
+            },
+            syncEngine,
+            secretStore: new InMemorySecretStore(),
+        });
+
+        await cloudService.configureFilesystemProvider({ baseDirectory });
+
+        await expect(
+            cloudService.setEncryptionPassphrase("correct\nhorse")
+        ).rejects.toThrowError(
+            "Passphrase must not contain control characters"
+        );
+    });
+
+    it("accepts passphrase with accidental surrounding whitespace when unlocking existing encryption", async () => {
+        const settings = new Map<string, string>();
+        const syncEngine = {
+            syncNow: vi.fn().mockResolvedValue({
+                appliedRemoteOperations: 0,
+                emittedLocalOperations: 0,
+                mergedEntities: 0,
+                snapshotKey: null,
+            }),
+        };
+
+        const orchestrator = {
+            downloadBackup: vi.fn(),
+            restoreBackup: vi.fn(),
+        } as unknown as UptimeOrchestrator;
+
+        const secretStore = new InMemorySecretStore();
+
+        const cloudService = new CloudService({
+            orchestrator,
+            settings: {
+                get: async (key) => settings.get(key),
+                set: async (key, value) => {
+                    settings.set(key, value);
+                },
+            },
+            syncEngine,
+            secretStore,
+        });
+
+        await cloudService.configureFilesystemProvider({ baseDirectory });
+
+        await expect(
+            cloudService.setEncryptionPassphrase("correct horse battery staple")
+        ).resolves.toBeTruthy();
+
+        await expect(
+            cloudService.setEncryptionPassphrase(
+                "  correct horse battery staple  "
+            )
+        ).resolves.toBeTruthy();
+    });
 });

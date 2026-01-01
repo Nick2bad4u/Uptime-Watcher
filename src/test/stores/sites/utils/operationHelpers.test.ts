@@ -28,7 +28,8 @@ vi.mock("../../../../../shared/utils/errorCatalog", () => ({
 vi.mock("../../../../../shared/utils/errorHandling", () => ({
     withErrorHandling: vi.fn(),
     ensureError: vi.fn((error) =>
-        error instanceof Error ? error : new Error(String(error))),
+        error instanceof Error ? error : new Error(String(error))
+    ),
 }));
 
 // Mock the store action logging
@@ -146,7 +147,8 @@ describe("OperationHelpers", () => {
                 },
             })),
             restoreSqliteBackup: vi.fn(async (payload) =>
-                mockElectronAPI.data.restoreSqliteBackup(payload)),
+                mockElectronAPI.data.restoreSqliteBackup(payload)
+            ),
         };
 
         const siteService = {
@@ -155,7 +157,8 @@ describe("OperationHelpers", () => {
             removeMonitor: vi.fn(async () => mockSites[0]!),
             removeSite: vi.fn(async () => true),
             updateSite: vi.fn(async (identifier: string, updates: unknown) =>
-                mockElectronAPI.sites.updateSite(identifier, updates)),
+                mockElectronAPI.sites.updateSite(identifier, updates)
+            ),
         };
 
         getSitesSpy = createMockFunction(() => mockSites);
@@ -281,9 +284,8 @@ describe("OperationHelpers", () => {
             };
 
             expect(() =>
-                applySavedSiteToStore(savedSite, mockDeps)).toThrowError(
-                DuplicateSiteIdentifierError
-            );
+                applySavedSiteToStore(savedSite, mockDeps)
+            ).toThrowError(DuplicateSiteIdentifierError);
             expect(setSitesSpy).not.toHaveBeenCalled();
             expect(mockLogger.error).toHaveBeenCalledWith(
                 "Duplicate site identifiers detected while persisting backend snapshot",
@@ -324,9 +326,8 @@ describe("OperationHelpers", () => {
             await annotate("Type: Error Handling", "type");
 
             expect(() =>
-                getSiteByIdentifier("nonexistent", mockDeps)).toThrowError(
-                "Site not found"
-            );
+                getSiteByIdentifier("nonexistent", mockDeps)
+            ).toThrowError("Site not found");
             expect(getSitesSpy).toHaveBeenCalledTimes(1);
         });
 

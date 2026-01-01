@@ -3,14 +3,18 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { ThemedButton } from "@app/theme/components/ThemedButton";
 import { ThemedCard } from "@app/theme/components/ThemedCard";
 import { ThemedText } from "@app/theme/components/ThemedText";
-import { FiBarChart2, FiServer, FiTrendingUp } from "react-icons/fi";
+import { AppIcons } from "@app/utils/icons";
+
+const CardIcon = AppIcons.metrics.uptime;
+const NewSiteIcon = AppIcons.ui.site;
+const AnalyticsIcon = AppIcons.ui.analytics;
 
 const meta: Meta<typeof ThemedCard> = {
     component: ThemedCard,
     args: {
         title: "Site Availability",
         subtitle: "Last 24 hours",
-        icon: <FiTrendingUp />,
+        icon: <CardIcon />,
         children: (
             <ThemedText>
                 Monitor uptime, response time, and incidents for every site in
@@ -50,17 +54,17 @@ export const WithAction: Story = {
                 for common protocols.
             </ThemedText>
             <div style={{ marginTop: "1rem", display: "flex", gap: "0.75rem" }}>
-                <ThemedButton icon={<FiServer />} variant="primary">
+                <ThemedButton icon={<NewSiteIcon />} variant="primary">
                     New Site
                 </ThemedButton>
-                <ThemedButton icon={<FiBarChart2 />} variant="outline">
+                <ThemedButton icon={<AnalyticsIcon />} variant="outline">
                     View Analytics
                 </ThemedButton>
             </div>
         </ThemedCard>
     ),
     args: {
-        icon: <FiTrendingUp />,
+        icon: <CardIcon />,
         hoverable: true,
     },
 };

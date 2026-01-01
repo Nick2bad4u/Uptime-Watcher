@@ -16,7 +16,7 @@
 import { describe, expect } from "vitest";
 import fc from "fast-check";
 import { test as fcTest } from "@fast-check/vitest";
-import { validateMonitorType, validateSite } from "../../utils/validation";
+import { validateMonitorType } from "../../utils/validation";
 import {
     validateMonitorData,
     validateMonitorField,
@@ -103,11 +103,11 @@ describe("Validation Utils Comprehensive Fuzzing Tests", () => {
         );
     });
 
-    describe(validateSite, () => {
+    describe(validateSiteData, () => {
         fcTest.prop([malformedSiteArbitrary])(
             "should handle malformed site objects gracefully",
             (site) => {
-                const result = validateSite(site as any);
+                const result = validateSiteData(site as any).success;
 
                 expect(typeof result).toBe("boolean");
 
@@ -126,7 +126,7 @@ describe("Validation Utils Comprehensive Fuzzing Tests", () => {
             "should never throw an error for any input",
             (input) => {
                 expect(() => {
-                    validateSite(input as any);
+                    validateSiteData(input as any);
                 }).not.toThrowError();
             }
         );
@@ -205,37 +205,35 @@ describe("Validation Utils Comprehensive Fuzzing Tests", () => {
             fc.string(),
             fc.string(),
             fc.anything(),
-        ])("should handle various field inputs", (
-            monitorType,
-            fieldName,
-            input
-        ) => {
-            const result = validateMonitorField(
-                monitorType,
-                fieldName,
-                input as any
-            );
+        ])(
+            "should handle various field inputs",
+            (monitorType, fieldName, input) => {
+                const result = validateMonitorField(
+                    monitorType,
+                    fieldName,
+                    input as any
+                );
 
-            expect(typeof result).toBe("object");
-            expect(result).toHaveProperty("success");
-            expect(result).toHaveProperty("errors");
-            expect(typeof result.success).toBe("boolean");
-            expect(Array.isArray(result.errors)).toBeTruthy();
-        });
+                expect(typeof result).toBe("object");
+                expect(result).toHaveProperty("success");
+                expect(result).toHaveProperty("errors");
+                expect(typeof result.success).toBe("boolean");
+                expect(Array.isArray(result.errors)).toBeTruthy();
+            }
+        );
 
         fcTest.prop([
             fc.string(),
             fc.string(),
             fc.anything(),
-        ])("should never throw an error for any input", (
-            monitorType,
-            fieldName,
-            input
-        ) => {
-            expect(() => {
-                validateMonitorField(monitorType, fieldName, input as any);
-            }).not.toThrowError();
-        });
+        ])(
+            "should never throw an error for any input",
+            (monitorType, fieldName, input) => {
+                expect(() => {
+                    validateMonitorField(monitorType, fieldName, input as any);
+                }).not.toThrowError();
+            }
+        );
     });
 
     describe("Edge Case Testing", () => {
@@ -250,7 +248,6 @@ describe("Validation Utils Comprehensive Fuzzing Tests", () => {
             ),
         ])("should handle special object types", (specialObject) => {
             expect(() => {
-                validateSite(specialObject as any);
                 validateSiteData(specialObject as any);
                 validateMonitorData("http", specialObject as any);
             }).not.toThrowError();
@@ -291,7 +288,6 @@ describe("Validation Utils Comprehensive Fuzzing Tests", () => {
             };
 
             expect(() => {
-                validateSite(testObject as any);
                 validateSiteData(testObject as any);
             }).not.toThrowError();
         });
@@ -308,21 +304,22 @@ describe("Validation Utils Comprehensive Fuzzing Tests", () => {
                 fc.constant("file:///etc/passwd"),
                 fc.constant("ftp://malicious.com")
             ),
-        ])("should handle potential malicious payloads safely", (
-            maliciousString
-        ) => {
-            const maliciousObject = {
-                identifier: maliciousString,
-                name: maliciousString,
-                url: maliciousString,
-            };
+        ])(
+            "should handle potential malicious payloads safely",
+            (maliciousString) => {
+                const maliciousObject = {
+                    identifier: maliciousString,
+                    name: maliciousString,
+                    url: maliciousString,
+                };
 
-            expect(() => {
-                const result = validateSiteData(maliciousObject as any);
-                expect(result).toHaveProperty("success");
-                expect(result).toHaveProperty("errors");
-            }).not.toThrowError();
-        });
+                expect(() => {
+                    const result = validateSiteData(maliciousObject as any);
+                    expect(result).toHaveProperty("success");
+                    expect(result).toHaveProperty("errors");
+                }).not.toThrowError();
+            }
+        );
 
         fcTest.prop([
             fc.oneof(

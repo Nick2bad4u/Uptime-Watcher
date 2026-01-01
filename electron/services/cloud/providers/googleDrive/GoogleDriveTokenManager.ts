@@ -1,7 +1,12 @@
+import { tryParseJsonRecord } from "@shared/utils/jsonSafety";
+import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import axios from "axios";
 import * as z from "zod";
 
 import type { SecretStore } from "../../secrets/SecretStore";
+
+import { logger } from "../../../../utils/logger";
+import { googleTokenResponseSchema } from "./googleDriveTokenSchemas";
 
 /**
  * Persisted Google Drive OAuth tokens.
@@ -23,14 +28,6 @@ const googleTokenSchema: z.ZodType<GoogleDriveTokens> = z
         tokenType: z.string().optional(),
     })
     .strict();
-
-const googleTokenResponseSchema = z.looseObject({
-    access_token: z.string().min(1),
-    expires_in: z.number().int().positive().optional(),
-    refresh_token: z.string().min(1).optional(),
-    scope: z.string().optional(),
-    token_type: z.string().optional(),
-});
 
 /**
  * Manages OAuth tokens for Google Drive.
@@ -54,10 +51,49 @@ export class GoogleDriveTokenManager {
             return undefined;
         }
 
+        const parsed = tryParseJsonRecord(raw);
+        if (!parsed) {
+            logger.warn(
+                "[GoogleDriveTokenManager] Stored tokens were not valid JSON; clearing",
+                {
+                    storageKey: this.storageKey,
+                }
+            );
+            try {
+                await this.clear();
+            } catch (error) {
+                logger.warn(
+                    "[GoogleDriveTokenManager] Failed to clear invalid stored tokens",
+                    {
+                        message: getUserFacingErrorDetail(error),
+                        storageKey: this.storageKey,
+                    }
+                );
+            }
+            return undefined;
+        }
+
         try {
-            const parsed = JSON.parse(raw) as unknown;
             return googleTokenSchema.parse(parsed);
-        } catch {
+        } catch (error) {
+            logger.warn(
+                "[GoogleDriveTokenManager] Stored tokens failed schema validation; clearing",
+                {
+                    message: getUserFacingErrorDetail(error),
+                    storageKey: this.storageKey,
+                }
+            );
+            try {
+                await this.clear();
+            } catch (clearError) {
+                logger.warn(
+                    "[GoogleDriveTokenManager] Failed to clear invalid stored tokens",
+                    {
+                        message: getUserFacingErrorDetail(clearError),
+                        storageKey: this.storageKey,
+                    }
+                );
+            }
             return undefined;
         }
     }

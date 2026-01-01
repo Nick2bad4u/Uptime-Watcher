@@ -196,6 +196,7 @@
     box-shadow:
         inset 0 0 0 1px rgb(255 255 255 / 8%),
         0 14px 28px rgb(5 12 24 / 32%);
+    cursor: zoom-in;
     inline-size: 3rem;
 
     .app-sidebar--light & {
@@ -208,6 +209,27 @@
             inset 0 0 0 1px rgb(255 255 255 / 10%),
             0 10px 18px rgb(148 163 184 / 26%);
     }
+}
+
+.app-sidebar__logo-tooltip {
+    display: grid;
+    padding: 0.35rem;
+    border-radius: 0.9rem;
+    background: color-mix(
+        in srgb,
+        var(--color-surface-overlay) 88%,
+        transparent
+    );
+    box-shadow: 0 18px 44px rgb(0 0 0 / 45%);
+    place-items: center;
+}
+
+.app-sidebar__logo-tooltip-image {
+    display: block;
+    border-radius: 0.75rem;
+    block-size: auto;
+    inline-size: min(14rem, 70vi);
+    object-fit: cover;
 }
 
 .app-sidebar__brand-logo-image {
@@ -240,6 +262,8 @@
 }
 
 .app-sidebar__search-label {
+    position: relative;
+    display: block;
     color: color-mix(
         in srgb,
         var(--color-status-down) 78%,
@@ -247,8 +271,20 @@
     );
 }
 
+.app-sidebar__search-icon {
+    position: absolute;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: color-mix(in srgb, var(--color-text-secondary) 78%, transparent);
+    inset-block-start: 50%;
+    inset-inline-start: 0.85rem;
+    pointer-events: none;
+    transform: translateY(-50%);
+}
+
 .app-sidebar__search-input {
-    padding: 0.625rem 0.75rem;
+    padding: 0.625rem 0.75rem 0.625rem 2.25rem;
     border: 1px solid
         color-mix(in srgb, var(--color-border-secondary) 52%, transparent);
     border-radius: 0.875rem;

@@ -63,7 +63,7 @@ vi.mock("electron", () => ({
     },
 }));
 
-vi.mock("../../../services/database/utils/databaseBackup", () => ({
+vi.mock("../../../services/database/utils/backup/databaseBackup", () => ({
     createDatabaseBackup: vi.fn(),
     validateDatabaseBackupPayload: vi.fn(),
     DEFAULT_BACKUP_RETENTION_HINT_DAYS: 30,
@@ -89,14 +89,14 @@ vi.mock("node-sqlite3-wasm", () => ({
 }));
 
 // Import after mocks are set up
-import { DataBackupService } from "../../../utils/database/DataBackupService";
-import { SiteLoadingError } from "../../../utils/database/interfaces";
+import { DataBackupService } from "../../../services/database/DataBackupService";
+import { SiteLoadingError } from "../../../services/database/interfaces";
 import { app } from "electron";
 import {
     createDatabaseBackup,
     validateDatabaseBackupPayload,
-} from "../../../services/database/utils/databaseBackup";
-import type { DatabaseBackupResult } from "../../../services/database/utils/databaseBackup";
+} from "../../../services/database/utils/backup/databaseBackup";
+import type { DatabaseBackupResult } from "../../../services/database/utils/backup/databaseBackup";
 
 // Test utilities and mocks
 const createMockEventEmitter = () => ({
@@ -625,7 +625,10 @@ describe(DataBackupService, () => {
         });
 
         it("should validate payload, snapshot database, and emit events", async () => {
-            const buffer = Buffer.from("restored-db");
+            const buffer = Buffer.concat([
+                Buffer.from("SQLite format 3\0", "ascii"),
+                Buffer.from("restored-db"),
+            ]);
 
             const summary = await dataBackupService.restoreDatabaseBackup({
                 buffer,
@@ -657,6 +660,21 @@ describe(DataBackupService, () => {
                 })
             );
             expect(summary.metadata.sizeBytes).toBe(buffer.length);
+        });
+
+        it("should reject non-SQLite payloads before writing temp files", async () => {
+            const buffer = Buffer.from("definitely-not-a-sqlite-file");
+
+            await expect(
+                dataBackupService.restoreDatabaseBackup({
+                    buffer,
+                    fileName: "not-sqlite.bin",
+                })
+            ).rejects.toThrowError(/not a valid SQLite database file/u);
+
+            expect(mockFsPromises.mkdtemp).not.toHaveBeenCalled();
+            expect(mockFsPromises.writeFile).not.toHaveBeenCalled();
+            expect(mockDatabaseConstructor).not.toHaveBeenCalled();
         });
     });
 
@@ -691,6 +709,36 @@ describe(DataBackupService, () => {
             expect(mockDatabaseService.initialize).toHaveBeenCalled();
             expect(mockFsPromises.copyFile).toHaveBeenCalled();
             expect(metadata).toEqual(backup.metadata);
+        });
+
+        it("should attempt to reinitialize even when copy fails", async () => {
+            const backup: DatabaseBackupResult = {
+                buffer: Buffer.concat([
+                    Buffer.from("SQLite format 3\0", "ascii"),
+                    Buffer.from("previous"),
+                ]),
+                fileName: "pre-restore.sqlite",
+                metadata: {
+                    appVersion: "0.0.0-test",
+                    checksum: "checksum",
+                    createdAt: Date.now(),
+                    originalPath: "/tmp/pre-restore.sqlite",
+                    retentionHintDays: 30,
+                    schemaVersion: 1,
+                    sizeBytes: 23,
+                },
+            };
+
+            mockFsPromises.copyFile.mockRejectedValueOnce(
+                new Error("copy failed")
+            );
+
+            await expect(
+                dataBackupService.applyDatabaseBackupResult(backup)
+            ).rejects.toThrowError("copy failed");
+
+            expect(mockDatabaseService.close).toHaveBeenCalled();
+            expect(mockDatabaseService.initialize).toHaveBeenCalled();
         });
     });
 

@@ -97,7 +97,8 @@ test.describe(
                                     button.textContent
                                         ?.trim()
                                         .toLowerCase()
-                                        .startsWith("remove site"));
+                                        .startsWith("remove site")
+                                );
 
                                 if (!target || target.disabled) {
                                     return "pending";
@@ -186,7 +187,8 @@ test.describe(
                                     button.textContent
                                         ?.trim()
                                         .toLowerCase()
-                                        .startsWith("remove site"));
+                                        .startsWith("remove site")
+                                );
 
                                 if (!target || target.disabled) {
                                     return "pending";

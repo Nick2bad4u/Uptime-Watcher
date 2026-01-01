@@ -503,7 +503,8 @@ describe("testHelpers", () => {
             const histories = monitors.map(() =>
                 createValidStatusHistory({
                     timestamp: Date.now() - Math.random() * 100_000,
-                }));
+                })
+            );
 
             expect(histories).toHaveLength(3);
             for (const history of histories) {
@@ -560,7 +561,8 @@ describe("testHelpers", () => {
                 const validHistoryStatus =
                     status === "up" || status === "down" ? status : "down";
                 const history = monitors.map(() =>
-                    createValidStatusHistory({ status: validHistoryStatus }));
+                    createValidStatusHistory({ status: validHistoryStatus })
+                );
 
                 for (const [index, monitor] of monitors.entries()) {
                     expect(monitor.status).toBe(status);

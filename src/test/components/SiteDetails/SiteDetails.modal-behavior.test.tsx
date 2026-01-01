@@ -225,10 +225,10 @@ const createHookState = (overrides: Record<string, unknown> = {}) => {
         intervalChanged: false,
         isLoading: false,
         isMonitoring: true,
-        localCheckInterval: 60_000,
+        localCheckIntervalMs: 60_000,
         localName: baseSite.name,
         localRetryAttempts: 2,
-        localTimeout: 5000,
+        localTimeoutSeconds: 5,
         retryAttemptsChanged: false,
         selectedMonitor: baseMonitor,
         selectedMonitorId: baseMonitor.id,
@@ -386,6 +386,7 @@ describe(SiteDetails, () => {
 
         props.handleSaveInterval();
         await waitFor(() =>
-            expect(handleSaveInterval).toHaveBeenCalledTimes(1));
+            expect(handleSaveInterval).toHaveBeenCalledTimes(1)
+        );
     });
 });

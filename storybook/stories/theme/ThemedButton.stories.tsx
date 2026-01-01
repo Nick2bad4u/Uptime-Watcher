@@ -1,7 +1,12 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { ThemedButton } from "@app/theme/components/ThemedButton";
-import { FiAlertTriangle, FiCheck, FiDownload, FiPlus } from "react-icons/fi";
+import { AppIcons } from "@app/utils/icons";
+
+const DownloadIcon = AppIcons.actions.download;
+const AddIcon = AppIcons.actions.add;
+const WarningIcon = AppIcons.status.warning;
+const SuccessIcon = AppIcons.status.upAlt;
 
 const meta: Meta<typeof ThemedButton> = {
     component: ThemedButton,
@@ -34,14 +39,14 @@ export const Secondary: Story = {
 
 export const WithLeadingIcon: Story = {
     args: {
-        icon: <FiDownload />,
+        icon: <DownloadIcon />,
         children: "Download",
     },
 };
 
 export const WithTrailingIcon: Story = {
     args: {
-        icon: <FiPlus />,
+        icon: <AddIcon />,
         iconPosition: "right",
         children: "Add Monitor",
     },
@@ -57,7 +62,7 @@ export const Loading: Story = {
 export const Destructive: Story = {
     args: {
         variant: "error",
-        icon: <FiAlertTriangle />,
+        icon: <WarningIcon />,
         children: "Remove",
     },
 };
@@ -65,7 +70,7 @@ export const Destructive: Story = {
 export const Success: Story = {
     args: {
         variant: "success",
-        icon: <FiCheck />,
+        icon: <SuccessIcon />,
         children: "Complete",
     },
 };

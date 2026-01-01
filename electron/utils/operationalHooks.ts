@@ -60,6 +60,8 @@
 
 import type { Tagged, UnknownRecord } from "type-fest";
 
+import { sleep } from "@shared/utils/abortUtils";
+import { ensureError } from "@shared/utils/errorHandling";
 import * as z from "zod";
 
 import type { UptimeEvents } from "../events/eventTypes";
@@ -246,9 +248,10 @@ function calculateDelay(
     backoff: "exponential" | "linear"
 ): number {
     if (backoff === "exponential") {
-        return initialDelay * 2 ** (attempt - 1);
+        // Attempt is 0-based (attempt=0 means first retry after initial failure)
+        return initialDelay * 2 ** attempt;
     }
-    return initialDelay * attempt;
+    return initialDelay * (attempt + 1);
 }
 
 /**
@@ -469,13 +472,7 @@ async function handleRetry<T>(
             }
         );
 
-        await new Promise<void>((resolve) => {
-            // Timer will complete when Promise resolves, cleanup not needed
-            // eslint-disable-next-line clean-timer/assign-timer-id -- Timer completes with Promise resolution
-            setTimeout(() => {
-                resolve();
-            }, delay);
-        });
+        await sleep(delay);
     }
 }
 
@@ -591,8 +588,7 @@ export async function withOperationalHooks<T>(
                 context
             );
         } catch (error) {
-            lastError =
-                error instanceof Error ? error : new Error(String(error));
+            lastError = ensureError(error);
 
             /* V8 ignore next 2 */ logger.debug(
                 `[OperationalHooks] ${operationName} failed on attempt ${attempt}/${maxRetries}`,

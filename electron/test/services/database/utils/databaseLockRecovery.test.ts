@@ -3,7 +3,7 @@ import {
     cleanupDatabaseLockArtifacts,
     generateLockArtifactCandidates,
     listExistingLockArtifacts,
-} from "../../../../services/database/utils/databaseLockRecovery";
+} from "../../../../services/database/utils/maintenance/databaseLockRecovery";
 import { mkdtempSync, rmSync, writeFileSync, existsSync } from "node:fs";
 import * as fs from "node:fs";
 import { tmpdir } from "node:os";

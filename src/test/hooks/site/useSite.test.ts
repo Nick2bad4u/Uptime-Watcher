@@ -59,12 +59,18 @@ vi.mock("../../../hooks/site/useSiteActions", () => ({
 }));
 
 vi.mock("../../../stores/error/useErrorStore", () => ({
-    useErrorStore: vi.fn(() => ({
-        isLoading: false,
-        error: null,
-        setError: vi.fn(),
-        clearError: vi.fn(),
-    })),
+    useErrorStore: vi.fn(
+        (selector?: (state: { isLoading: boolean }) => unknown) => {
+            const state = {
+                isLoading: false,
+                error: null,
+                setError: vi.fn(),
+                clearError: vi.fn(),
+            };
+
+            return typeof selector === "function" ? selector(state) : state;
+        }
+    ),
 }));
 
 import { useSiteMonitor } from "../../../hooks/site/useSiteMonitor";
@@ -227,12 +233,20 @@ describe("useSite Hook - Coverage Tests", () => {
             await annotate("Type: Data Loading", "type");
 
             // Mock error store to return loading: true
-            (useErrorStore as any).mockReturnValueOnce({
-                isLoading: true,
-                error: null,
-                setError: vi.fn(),
-                clearError: vi.fn(),
-            });
+            (useErrorStore as any).mockImplementationOnce(
+                (selector?: (state: unknown) => unknown) => {
+                    const state = {
+                        clearError: vi.fn(),
+                        error: null,
+                        isLoading: true,
+                        setError: vi.fn(),
+                    };
+
+                    return typeof selector === "function"
+                        ? selector(state)
+                        : state;
+                }
+            );
 
             const { result } = renderHook(() => useSite(mockSite));
 

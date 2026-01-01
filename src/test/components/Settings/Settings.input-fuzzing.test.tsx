@@ -348,6 +348,15 @@ vi.mock("../../../components/Settings/CloudSettingsSection", () => ({
 
 vi.mock("../../../utils/icons", () => {
     const Icon = () => <span data-testid="app-icon" />;
+    const IconSizes = {
+        lg: 24,
+        md: 20,
+        sm: 16,
+        xl: 32,
+        xs: 12,
+        xxl: 40,
+    } as const;
+
     return {
         AppIcons: {
             actions: {
@@ -357,6 +366,7 @@ vi.mock("../../../utils/icons", () => {
             },
             metrics: {
                 monitor: Icon,
+                time: Icon,
             },
             settings: {
                 gearFilled: Icon,
@@ -364,14 +374,25 @@ vi.mock("../../../utils/icons", () => {
             status: {
                 upFilled: Icon,
             },
+            theme: {
+                dark: Icon,
+            },
             ui: {
                 bell: Icon,
                 close: Icon,
                 cloud: Icon,
                 database: Icon,
+                history: Icon,
                 home: Icon,
+                inbox: Icon,
+                monitor: Icon,
+                sliders: Icon,
+                volume: Icon,
             },
         },
+        IconSizes,
+        getIconSize: (size: keyof typeof IconSizes): number =>
+            IconSizes[size] ?? 16,
     };
 });
 

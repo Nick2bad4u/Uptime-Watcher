@@ -96,7 +96,8 @@ const expectButtonIconPath = (
     expect(icon).not.toBeNull();
     const pathElements = icon?.querySelectorAll("path") ?? [];
     const pathValues = Array.from(pathElements, (path) =>
-        path.getAttribute("d"));
+        path.getAttribute("d")
+    );
     expect(pathValues).toContain(expectedPath);
 };
 

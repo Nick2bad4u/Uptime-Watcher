@@ -1,8 +1,11 @@
 import type { CloudBackupMigrationResult } from "@shared/types/cloudBackupMigration";
 import type { JSX } from "react";
 
+import { useMemo } from "react";
+
 import { ThemedButton } from "../../../theme/components/ThemedButton";
 import { ThemedText } from "../../../theme/components/ThemedText";
+import { AppIcons, getIconSize } from "../../../utils/icons";
 
 function resolveBackupMigrationStatusText(args: {
     encryptionLocked: boolean;
@@ -73,6 +76,19 @@ export const BackupMigrationPanel = ({
     onEncryptBackupsKeepOriginals,
     plaintextBackupCount,
 }: BackupMigrationPanelProperties): JSX.Element => {
+    const buttonIconSize = getIconSize("sm");
+    const LockIcon = AppIcons.ui.lock;
+    const TrashIcon = AppIcons.actions.remove;
+
+    const headerIcon = <LockIcon aria-hidden className="h-5 w-5" />;
+    const encryptIcon = useMemo(
+        () => <LockIcon aria-hidden size={buttonIconSize} />,
+        [buttonIconSize, LockIcon]
+    );
+    const deleteOriginalsIcon = useMemo(
+        () => <TrashIcon aria-hidden size={buttonIconSize} />,
+        [buttonIconSize, TrashIcon]
+    );
     const canEncrypt =
         connected &&
         encryptionMode === "passphrase" &&
@@ -88,20 +104,25 @@ export const BackupMigrationPanel = ({
     const lastSummary = resolveBackupMigrationLastSummary(lastResult);
 
     return (
-        <div className="rounded-lg border border-zinc-800 bg-zinc-900/40 p-4">
+        <div className="settings-subcard">
             <div className="mb-2 flex items-center justify-between gap-2">
-                <ThemedText size="sm" variant="secondary" weight="medium">
-                    Backup Migration
-                </ThemedText>
+                <div className="flex items-center gap-2">
+                    <span aria-hidden className="settings-accent--highlight">
+                        {headerIcon}
+                    </span>
+                    <ThemedText size="sm" variant="secondary" weight="medium">
+                        Backup Migration
+                    </ThemedText>
+                </div>
             </div>
 
-            <ThemedText size="sm" variant="tertiary">
+            <ThemedText as="p" size="sm" variant="tertiary">
                 {statusText}
             </ThemedText>
 
             {lastSummary ? (
                 <div className="mt-2">
-                    <ThemedText size="xs" variant="tertiary">
+                    <ThemedText as="p" size="xs" variant="tertiary">
                         {lastSummary}
                     </ThemedText>
                 </div>
@@ -110,6 +131,7 @@ export const BackupMigrationPanel = ({
             <div className="mt-3 flex flex-wrap gap-2">
                 <ThemedButton
                     disabled={!canEncrypt || isMigratingBackups}
+                    icon={encryptIcon}
                     onClick={onEncryptBackupsKeepOriginals}
                     size="sm"
                     variant="secondary"
@@ -120,6 +142,7 @@ export const BackupMigrationPanel = ({
                 </ThemedButton>
                 <ThemedButton
                     disabled={!canEncrypt || isMigratingBackups}
+                    icon={deleteOriginalsIcon}
                     onClick={onEncryptBackupsDeleteOriginals}
                     size="sm"
                     variant="error"

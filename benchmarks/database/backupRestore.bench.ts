@@ -714,7 +714,8 @@ describe("Database Backup and Restore Benchmarks", () => {
                     algResults.reduce((sum, r) => sum + r.qualityScore, 0) /
                     algResults.length,
                 bestUseCase: algResults.reduce((best, current) =>
-                    current.qualityScore > best.qualityScore ? current : best),
+                    current.qualityScore > best.qualityScore ? current : best
+                ),
             };
         });
 
@@ -728,19 +729,23 @@ describe("Database Backup and Restore Benchmarks", () => {
             fastestCompression: algorithmSummary.reduce((fastest, current) =>
                 current.averageCompressionTime < fastest.averageCompressionTime
                     ? current
-                    : fastest),
+                    : fastest
+            ),
             bestCompression: algorithmSummary.reduce((best, current) =>
                 current.averageCompressionRatio < best.averageCompressionRatio
                     ? current
-                    : best),
+                    : best
+            ),
             lowestCpu: algorithmSummary.reduce((lowest, current) =>
                 current.averageCpuUsage < lowest.averageCpuUsage
                     ? current
-                    : lowest),
+                    : lowest
+            ),
             lowestMemory: algorithmSummary.reduce((lowest, current) =>
                 current.averageMemoryUsage < lowest.averageMemoryUsage
                     ? current
-                    : lowest),
+                    : lowest
+            ),
         };
     });
 

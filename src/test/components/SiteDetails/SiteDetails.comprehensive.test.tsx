@@ -136,7 +136,8 @@ vi.mock("../../../theme/useTheme", () => ({
         getTextClass: vi.fn(() => ({ color: "#000000" })),
     })),
     useThemeValue: vi.fn((selector) =>
-        selector({ colors: { text: { primary: "#000000" } } })),
+        selector({ colors: { text: { primary: "#000000" } } })
+    ),
 }));
 
 vi.mock("../../../services/chartConfig", () => {
@@ -175,32 +176,31 @@ vi.mock("../../../components/SiteDetails/SiteDetailsHeader", () => ({
 }));
 
 vi.mock("../../../components/SiteDetails/SiteDetailsNavigation", () => ({
-    SiteDetailsNavigation: vi.fn(({
-        setActiveSiteDetailsTab,
-        activeSiteDetailsTab,
-    }) => (
-        <div data-testid="site-details-navigation">
-            <button
-                onClick={() => setActiveSiteDetailsTab("overview")}
-                data-testid="overview-tab"
-            >
-                Overview
-            </button>
-            <button
-                onClick={() => setActiveSiteDetailsTab("history")}
-                data-testid="history-tab"
-            >
-                History
-            </button>
-            <button
-                onClick={() => setActiveSiteDetailsTab("analytics")}
-                data-testid="analytics-tab"
-            >
-                Analytics
-            </button>
-            <span data-testid="selected-tab">{activeSiteDetailsTab}</span>
-        </div>
-    )),
+    SiteDetailsNavigation: vi.fn(
+        ({ setActiveSiteDetailsTab, activeSiteDetailsTab }) => (
+            <div data-testid="site-details-navigation">
+                <button
+                    onClick={() => setActiveSiteDetailsTab("overview")}
+                    data-testid="overview-tab"
+                >
+                    Overview
+                </button>
+                <button
+                    onClick={() => setActiveSiteDetailsTab("history")}
+                    data-testid="history-tab"
+                >
+                    History
+                </button>
+                <button
+                    onClick={() => setActiveSiteDetailsTab("analytics")}
+                    data-testid="analytics-tab"
+                >
+                    Analytics
+                </button>
+                <span data-testid="selected-tab">{activeSiteDetailsTab}</span>
+            </div>
+        )
+    ),
 }));
 
 vi.mock("../../../components/SiteDetails/tabs/OverviewTab", () => ({
@@ -320,10 +320,10 @@ const mockUseSiteDetailsReturn = {
     intervalChanged: false,
     isLoading: false,
     isMonitoring: true,
-    localCheckInterval: 300_000,
+    localCheckIntervalMs: 300_000,
     localName: sampledSiteName,
     localRetryAttempts: 3,
-    localTimeout: 30_000,
+    localTimeoutSeconds: 30,
     retryAttemptsChanged: false,
     selectedMonitor: primaryMonitor,
     selectedMonitorId: primaryMonitor.id,

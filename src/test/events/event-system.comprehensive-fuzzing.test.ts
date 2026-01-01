@@ -16,7 +16,7 @@ import type {
     UptimeEventName,
     UptimeEvents,
 } from "../../../electron/events/eventTypes";
-import { generateCorrelationId } from "../../../electron/utils/correlation";
+import { generateCorrelationId } from "@shared/utils/correlation";
 
 // Custom arbitraries for event system testing
 const arbitraryEventType = fc.constantFrom(
@@ -213,61 +213,62 @@ describe("Event System - 100% Fast-Check Fuzzing Coverage", () => {
             arbitraryEventType,
             arbitraryEventPayload,
             fc.integer({ min: 2, max: 10 }),
-        ])("should handle multiple listeners per event", async (
-            eventType,
-            payload,
-            listenerCount
-        ) => {
-            const listeners: any[] = [];
+        ])(
+            "should handle multiple listeners per event",
+            async (eventType, payload, listenerCount) => {
+                const listeners: any[] = [];
 
-            // Register multiple listeners
-            for (let i = 0; i < listenerCount; i++) {
-                const listener = vi.fn();
-                listeners.push(listener);
-                eventBus.onTyped(eventType as UptimeEventName, listener);
+                // Register multiple listeners
+                for (let i = 0; i < listenerCount; i++) {
+                    const listener = vi.fn();
+                    listeners.push(listener);
+                    eventBus.onTyped(eventType as UptimeEventName, listener);
+                }
+
+                // Emit event
+                await eventBus.emitTyped(eventType as UptimeEventName, payload);
+
+                // Verify all listeners were called
+                for (const listener of listeners) {
+                    expect(listener).toHaveBeenCalledTimes(1);
+                }
+
+                // Cleanup
+                for (const listener of listeners) {
+                    eventBus.offTyped(eventType as UptimeEventName, listener);
+                }
             }
-
-            // Emit event
-            await eventBus.emitTyped(eventType as UptimeEventName, payload);
-
-            // Verify all listeners were called
-            for (const listener of listeners) {
-                expect(listener).toHaveBeenCalledTimes(1);
-            }
-
-            // Cleanup
-            for (const listener of listeners) {
-                eventBus.offTyped(eventType as UptimeEventName, listener);
-            }
-        });
+        );
     });
 
     describe("Event Metadata and Correlation", () => {
-        fcTest.prop([arbitraryCorrelationId])("should handle correlation IDs", (
-            correlationId
-        ) => {
-            expect(typeof correlationId).toBe("string");
-            expect(correlationId.length).toBeGreaterThan(0);
+        fcTest.prop([arbitraryCorrelationId])(
+            "should handle correlation IDs",
+            (correlationId) => {
+                expect(typeof correlationId).toBe("string");
+                expect(correlationId.length).toBeGreaterThan(0);
 
-            // Test correlation ID format validation
-            const isValidFormat =
-                correlationId.length >= 8 && correlationId.length <= 36;
-            expect(isValidFormat).toBeTruthy();
-        });
+                // Test correlation ID format validation
+                const isValidFormat =
+                    correlationId.length >= 8 && correlationId.length <= 36;
+                expect(isValidFormat).toBeTruthy();
+            }
+        );
 
-        fcTest.prop([arbitraryEventMetadata])("should handle event metadata", (
-            metadata
-        ) => {
-            expect(typeof metadata.correlationId).toBe("string");
-            expect(typeof metadata.timestamp).toBe("number");
-            expect(typeof metadata.source).toBe("string");
-            expect(typeof metadata.version).toBe("string");
+        fcTest.prop([arbitraryEventMetadata])(
+            "should handle event metadata",
+            (metadata) => {
+                expect(typeof metadata.correlationId).toBe("string");
+                expect(typeof metadata.timestamp).toBe("number");
+                expect(typeof metadata.source).toBe("string");
+                expect(typeof metadata.version).toBe("string");
 
-            expect(metadata.correlationId.length).toBeGreaterThan(0);
-            expect(metadata.timestamp).toBeGreaterThan(0);
-            expect(metadata.source.length).toBeGreaterThan(0);
-            expect(metadata.version.length).toBeGreaterThan(0);
-        });
+                expect(metadata.correlationId.length).toBeGreaterThan(0);
+                expect(metadata.timestamp).toBeGreaterThan(0);
+                expect(metadata.source.length).toBeGreaterThan(0);
+                expect(metadata.version.length).toBeGreaterThan(0);
+            }
+        );
 
         fcTest.prop([arbitraryEvent])(
             "should handle complete event structures",
@@ -303,32 +304,34 @@ describe("Event System - 100% Fast-Check Fuzzing Coverage", () => {
 
             // Test uniqueness by generating multiple IDs
             const ids = Array.from({ length: 100 }, () =>
-                generateCorrelationId());
+                generateCorrelationId()
+            );
             const uniqueIds = new Set(ids);
             expect(uniqueIds.size).toBe(ids.length); // All should be unique
         });
     });
 
     describe("Event Type Validation", () => {
-        fcTest.prop([arbitraryEventType])("should validate event types", (
-            eventType
-        ) => {
-            // Test that event type is valid
-            const validEventTypes = [
-                "cache:invalidated",
-                "config:changed",
-                "site:added",
-                "site:removed",
-                "monitor:created",
-                "monitor:status:changed",
-                "database:error",
-                "system:health:check",
-            ];
+        fcTest.prop([arbitraryEventType])(
+            "should validate event types",
+            (eventType) => {
+                // Test that event type is valid
+                const validEventTypes = [
+                    "cache:invalidated",
+                    "config:changed",
+                    "site:added",
+                    "site:removed",
+                    "monitor:created",
+                    "monitor:status:changed",
+                    "database:error",
+                    "system:health:check",
+                ];
 
-            expect(validEventTypes).toContain(eventType);
-            expect(typeof eventType).toBe("string");
-            expect(eventType.length).toBeGreaterThan(0);
-        });
+                expect(validEventTypes).toContain(eventType);
+                expect(typeof eventType).toBe("string");
+                expect(eventType.length).toBeGreaterThan(0);
+            }
+        );
 
         fcTest.prop([arbitraryEventPayload])(
             "should handle payload validation",
@@ -353,13 +356,11 @@ describe("Event System - 100% Fast-Check Fuzzing Coverage", () => {
         fcTest.prop([arbitraryEventType, arbitraryEventPayload])(
             "should handle middleware execution",
             async (eventType, payload) => {
-                const middleware = vi.fn().mockImplementation(async (
-                    _event,
-                    _data,
-                    next
-                ) => {
-                    await next();
-                });
+                const middleware = vi
+                    .fn()
+                    .mockImplementation(async (_event, _data, next) => {
+                        await next();
+                    });
                 const listener = vi.fn();
 
                 // Add middleware
@@ -495,28 +496,27 @@ describe("Event System - 100% Fast-Check Fuzzing Coverage", () => {
             arbitraryEventType,
             arbitraryEventPayload,
             arbitraryEventMetadata,
-        ])("should handle complete event lifecycle", (
-            eventType,
-            payload,
-            _metadata
-        ) => {
-            const listener = vi.fn();
-            eventBus.on(String(eventType), listener);
+        ])(
+            "should handle complete event lifecycle",
+            (eventType, payload, _metadata) => {
+                const listener = vi.fn();
+                eventBus.on(String(eventType), listener);
 
-            // Create complete event (unused)
-            // const _completeEvent = {
-            //     type: eventType,
-            //     payload,
-            //     metadata,
-            // };
+                // Create complete event (unused)
+                // const _completeEvent = {
+                //     type: eventType,
+                //     payload,
+                //     metadata,
+                // };
 
-            // Emit with metadata
-            eventBus.emit(String(eventType), payload);
+                // Emit with metadata
+                eventBus.emit(String(eventType), payload);
 
-            expect(listener).toHaveBeenCalledTimes(1);
+                expect(listener).toHaveBeenCalledTimes(1);
 
-            eventBus.off(String(eventType), listener);
-        });
+                eventBus.off(String(eventType), listener);
+            }
+        );
 
         fcTest.prop([fc.array(arbitraryEvent, { maxLength: 20 })])(
             "should handle event batching",
@@ -578,16 +578,17 @@ describe("Event System - 100% Fast-Check Fuzzing Coverage", () => {
     });
 
     describe("Event System Edge Cases", () => {
-        fcTest.prop([arbitraryEventType])("should handle missing listeners", (
-            eventType
-        ) => {
-            // Emit event with no listeners
-            expect(() => {
-                eventBus.emit(String(eventType), {
-                    test: true,
-                });
-            }).not.toThrowError();
-        });
+        fcTest.prop([arbitraryEventType])(
+            "should handle missing listeners",
+            (eventType) => {
+                // Emit event with no listeners
+                expect(() => {
+                    eventBus.emit(String(eventType), {
+                        test: true,
+                    });
+                }).not.toThrowError();
+            }
+        );
 
         fcTest.prop([arbitraryEventType, arbitraryEventPayload])(
             "should handle listener removal during event",

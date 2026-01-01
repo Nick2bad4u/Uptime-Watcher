@@ -5,6 +5,7 @@ import type { CloudSyncResetPreview } from "@shared/types/cloudSyncResetPreview"
 import type { StoreApi, UseBoundStore } from "zustand";
 
 import { ensureError, withErrorHandling } from "@shared/utils/errorHandling";
+import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import { create } from "zustand";
 
 import { AppNotificationService } from "../../services/AppNotificationService";
@@ -75,10 +76,11 @@ async function dispatchSystemNotificationIfEnabled(request: {
 }
 
 function enqueueCloudErrorToast(title: string, error: unknown): void {
-    const resolved = ensureError(error);
+    // Use shared user-facing error detail for notifications
+    const userFacingMessage = getUserFacingErrorDetail(error);
 
     enqueueCloudToast({
-        message: resolved.message,
+        message: userFacingMessage,
         title,
         variant: "error",
     });
@@ -134,7 +136,20 @@ export interface CloudStoreState {
 }
 
 export const useCloudStore: UseBoundStore<StoreApi<CloudStoreState>> =
-    create<CloudStoreState>()((set, get) => ({
+    create<CloudStoreState>()((set, get) => {
+        const listBackupsWithFallback = async (): Promise<CloudBackupEntry[]> => {
+            try {
+                return await CloudService.listBackups();
+            } catch (error: unknown) {
+                logger.debug(
+                    "[CloudStore] Failed to refresh backup list; using cached backups",
+                    ensureError(error)
+                );
+                return get().backups;
+            }
+        };
+
+        return {
         backups: [],
         clearEncryptionKey: async (): Promise<void> => {
             set({ isClearingEncryptionKey: true });
@@ -213,13 +228,14 @@ export const useCloudStore: UseBoundStore<StoreApi<CloudStoreState>> =
                     title: "Dropbox connected",
                 });
             } catch (error) {
+                const safeError = ensureError(error);
                 enqueueCloudErrorToast("Failed to connect Dropbox", error);
 
                 void dispatchSystemNotificationIfEnabled({
-                    body: ensureError(error).message,
+                    body: getUserFacingErrorDetail(error),
                     title: "Failed to connect Dropbox",
                 });
-                throw ensureError(error);
+                throw safeError;
             } finally {
                 dismissToastSafely(startedToastId);
                 set({ isConnectingDropbox: false });
@@ -264,13 +280,14 @@ export const useCloudStore: UseBoundStore<StoreApi<CloudStoreState>> =
                     title: "Google Drive connected",
                 });
             } catch (error) {
+                const safeError = ensureError(error);
                 enqueueCloudErrorToast("Failed to connect Google Drive", error);
 
                 void dispatchSystemNotificationIfEnabled({
-                    body: ensureError(error).message,
+                    body: getUserFacingErrorDetail(error),
                     title: "Failed to connect Google Drive",
                 });
-                throw ensureError(error);
+                throw safeError;
             } finally {
                 dismissToastSafely(startedToastId);
                 set({ isConnectingGoogleDrive: false });
@@ -368,9 +385,7 @@ export const useCloudStore: UseBoundStore<StoreApi<CloudStoreState>> =
 
                         const [status, backups] = await Promise.all([
                             CloudService.getStatus(),
-                            CloudService.listBackups().catch(
-                                () => get().backups
-                            ),
+                            listBackupsWithFallback(),
                         ]);
 
                         set({
@@ -415,13 +430,14 @@ export const useCloudStore: UseBoundStore<StoreApi<CloudStoreState>> =
                     title,
                 });
             } catch (error) {
+                const safeError = ensureError(error);
                 enqueueCloudErrorToast("Backup migration failed", error);
 
                 void dispatchSystemNotificationIfEnabled({
-                    body: ensureError(error).message,
+                    body: getUserFacingErrorDetail(error),
                     title: "Backup migration failed",
                 });
-                throw ensureError(error);
+                throw safeError;
             } finally {
                 dismissToastSafely(startedToastId);
                 set({ isMigratingBackups: false });
@@ -496,13 +512,14 @@ export const useCloudStore: UseBoundStore<StoreApi<CloudStoreState>> =
                     title: "Sync complete",
                 });
             } catch (error) {
+                const safeError = ensureError(error);
                 enqueueCloudErrorToast("Sync failed", error);
 
                 void dispatchSystemNotificationIfEnabled({
-                    body: ensureError(error).message,
+                    body: getUserFacingErrorDetail(error),
                     title: "Sync failed",
                 });
-                throw ensureError(error);
+                throw safeError;
             } finally {
                 dismissToastSafely(startedToastId);
                 set({ isRequestingSyncNow: false });
@@ -524,9 +541,7 @@ export const useCloudStore: UseBoundStore<StoreApi<CloudStoreState>> =
 
                         const [status, backups] = await Promise.all([
                             CloudService.getStatus(),
-                            CloudService.listBackups().catch(
-                                () => get().backups
-                            ),
+                            listBackupsWithFallback(),
                         ]);
 
                         set({
@@ -566,13 +581,14 @@ export const useCloudStore: UseBoundStore<StoreApi<CloudStoreState>> =
                     title: "Remote sync reset",
                 });
             } catch (error) {
+                const safeError = ensureError(error);
                 enqueueCloudErrorToast("Remote sync reset failed", error);
 
                 void dispatchSystemNotificationIfEnabled({
-                    body: ensureError(error).message,
+                    body: getUserFacingErrorDetail(error),
                     title: "Remote sync reset failed",
                 });
-                throw ensureError(error);
+                throw safeError;
             } finally {
                 dismissToastSafely(startedToastId);
                 set({ isResettingRemoteSyncState: false });
@@ -598,9 +614,7 @@ export const useCloudStore: UseBoundStore<StoreApi<CloudStoreState>> =
 
                             const [status, backups] = await Promise.all([
                                 CloudService.getStatus(),
-                                CloudService.listBackups().catch(
-                                    () => get().backups
-                                ),
+                                listBackupsWithFallback(),
                             ]);
                             set({ backups, status });
                         },
@@ -621,13 +635,14 @@ export const useCloudStore: UseBoundStore<StoreApi<CloudStoreState>> =
                     title: "Backup restored",
                 });
             } catch (error) {
+                const safeError = ensureError(error);
                 enqueueCloudErrorToast("Backup restore failed", error);
 
                 void dispatchSystemNotificationIfEnabled({
-                    body: ensureError(error).message,
+                    body: getUserFacingErrorDetail(error),
                     title: "Backup restore failed",
                 });
-                throw ensureError(error);
+                throw safeError;
             } finally {
                 set({ restoringBackupKey: null });
             }
@@ -687,9 +702,7 @@ export const useCloudStore: UseBoundStore<StoreApi<CloudStoreState>> =
 
                         const [status, backups] = await Promise.all([
                             CloudService.getStatus(),
-                            CloudService.listBackups().catch(
-                                () => get().backups
-                            ),
+                            listBackupsWithFallback(),
                         ]);
 
                         set({ backups, status });
@@ -706,16 +719,18 @@ export const useCloudStore: UseBoundStore<StoreApi<CloudStoreState>> =
                     title: "Backup uploaded",
                 });
             } catch (error) {
+                const safeError = ensureError(error);
                 enqueueCloudErrorToast("Backup upload failed", error);
 
                 void dispatchSystemNotificationIfEnabled({
-                    body: ensureError(error).message,
+                    body: getUserFacingErrorDetail(error),
                     title: "Backup upload failed",
                 });
-                throw ensureError(error);
+                throw safeError;
             } finally {
                 dismissToastSafely(startedToastId);
                 set({ isUploadingBackup: false });
             }
         },
-    }));
+        };
+    });

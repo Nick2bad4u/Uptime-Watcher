@@ -1,20 +1,17 @@
 import type { IpcInvokeChannel } from "@shared/types/ipc";
 
-import { SYSTEM_CHANNELS } from "@shared/types/preload";
-import { ensureError } from "@shared/utils/errorHandling";
-import { LOG_TEMPLATES } from "@shared/utils/logTemplates";
 import {
-    getSafeUrlForLogging,
-    validateExternalOpenUrlCandidate,
-} from "@shared/utils/urlSafety";
-import { clipboard, shell  } from "electron";
+    getElectronErrorCodeSuffix,
+    openExternalOrThrow,
+} from "@electron/services/shell/openExternalUtils";
+import { SYSTEM_CHANNELS } from "@shared/types/preload";
+import { validateExternalOpenUrlCandidate } from "@shared/utils/urlSafety";
+import { clipboard } from "electron";
 
 import type { AutoUpdaterService } from "../../updater/AutoUpdaterService";
 
-import { logger } from "../../../utils/logger";
-import { registerStandardizedIpcHandler } from "../utils";
+import { createStandardizedIpcRegistrar } from "../utils";
 import { SystemHandlerValidators } from "../validators";
-import { withIgnoredIpcEvent } from "./handlerShared";
 
 /**
  * Dependencies required to register system-level IPC handlers.
@@ -31,69 +28,57 @@ export function registerSystemHandlers({
     autoUpdaterService,
     registeredHandlers,
 }: SystemHandlersDependencies): void {
+    const register = createStandardizedIpcRegistrar(registeredHandlers);
 
-    registerStandardizedIpcHandler(
+    register(
         SYSTEM_CHANNELS.openExternal,
-        withIgnoredIpcEvent(async (url) => {
+        async (url): Promise<boolean> => {
             const validation = validateExternalOpenUrlCandidate(url);
-            const urlForLog = getSafeUrlForLogging(
-                typeof url === "string" ? url.trim() : ""
-            );
 
             if ("reason" in validation) {
+                const { reason, safeUrlForLogging } = validation;
                 throw new TypeError(
-                    `Rejected unsafe openExternal URL: ${validation.safeUrlForLogging} (url ${validation.reason})`
+                    `Rejected unsafe openExternal URL: ${safeUrlForLogging} (reason ${reason})`
                 );
             }
 
-            try {
-                await shell.openExternal(validation.normalizedUrl);
-            } catch (error: unknown) {
-                const resolved = ensureError(error);
-                const { code } = resolved as Error & { code?: unknown };
-                const codeSuffix =
-                    typeof code === "string" && code.length > 0
-                        ? ` (${code})`
-                        : "";
+            const { normalizedUrl, safeUrlForLogging } = validation;
 
-                // Do not allow errors to echo the full URL (queries may include
-                // tokens); keep logs and renderer error messages redacted.
-                throw new Error(
-                    `Failed to open external URL: ${urlForLog}${codeSuffix}`,
-                    { cause: error }
-                );
-            }
+            await openExternalOrThrow({
+                failureMessagePrefix: "Failed to open external URL",
+                normalizedUrl,
+                safeUrlForLogging,
+            });
+
             return true;
-        }),
-        SystemHandlerValidators.openExternal,
-        registeredHandlers
+        },
+        SystemHandlerValidators.openExternal
     );
 
-    registerStandardizedIpcHandler(
-        SYSTEM_CHANNELS.quitAndInstall,
-        withIgnoredIpcEvent(() => {
-            logger.info(LOG_TEMPLATES.services.UPDATER_QUIT_INSTALL);
-            autoUpdaterService.quitAndInstall();
-            return true;
-        }),
-        SystemHandlerValidators.quitAndInstall,
-        registeredHandlers
-    );
-
-    registerStandardizedIpcHandler(
+    register(
         SYSTEM_CHANNELS.writeClipboardText,
-        withIgnoredIpcEvent((text: string) => {
+        (text): boolean => {
             try {
                 clipboard.writeText(text);
+                return true;
             } catch (error: unknown) {
-                throw new Error("Failed to write clipboard text", {
+                const codeSuffix = getElectronErrorCodeSuffix(error);
+
+                // Never include clipboard contents in thrown errors/logs.
+                throw new Error(`Failed to write clipboard text${codeSuffix}`, {
                     cause: error,
                 });
             }
+        },
+        SystemHandlerValidators.writeClipboardText
+    );
 
+    register(
+        SYSTEM_CHANNELS.quitAndInstall,
+        (): boolean => {
+            autoUpdaterService.quitAndInstall();
             return true;
-        }),
-        SystemHandlerValidators.writeClipboardText,
-        registeredHandlers
+        },
+        SystemHandlerValidators.quitAndInstall
     );
 }

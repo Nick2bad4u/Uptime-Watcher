@@ -51,7 +51,8 @@ const jsonValueSchemaInternal: z.ZodType<JsonValue> = z.lazy(() =>
         z.null(),
         z.array(jsonValueSchemaInternal),
         z.record(z.string(), jsonValueSchemaInternal),
-    ]));
+    ])
+);
 
 /**
  * Zod schema validating {@link JsonValue}.
@@ -153,31 +154,32 @@ const setFieldOperationSchema = z
         deviceId: z.string().min(1),
         entityId: z.string().min(1),
         entityType: cloudSyncEntityTypeSchemaInternal,
-        field: z.string().min(1),
-        kind: z.literal("set-field"),
         opId: z.number().int().nonnegative().max(MAX_SAFE_INT),
         syncSchemaVersion: z.literal(CLOUD_SYNC_SCHEMA_VERSION),
         timestamp: z.number().int().nonnegative().max(MAX_SAFE_INT),
+    })
+    .strict();
+
+const cloudSyncBaseOperationSchema = setFieldOperationSchema;
+
+const setFieldOperationSchemaTyped = cloudSyncBaseOperationSchema
+    .extend({
+        field: z.string().min(1),
+        kind: z.literal("set-field"),
         value: jsonValueSchemaInternal,
     })
     .strict() satisfies z.ZodType<CloudSyncSetFieldOperation>;
 
-const deleteEntityOperationSchema = z
-    .object({
-        deviceId: z.string().min(1),
-        entityId: z.string().min(1),
-        entityType: cloudSyncEntityTypeSchemaInternal,
+const deleteEntityOperationSchema = cloudSyncBaseOperationSchema
+    .extend({
         kind: z.literal("delete-entity"),
-        opId: z.number().int().nonnegative().max(MAX_SAFE_INT),
-        syncSchemaVersion: z.literal(CLOUD_SYNC_SCHEMA_VERSION),
-        timestamp: z.number().int().nonnegative().max(MAX_SAFE_INT),
     })
     .strict() satisfies z.ZodType<CloudSyncDeleteEntityOperation>;
 
 const cloudSyncOperationSchemaInternal: z.ZodType<CloudSyncOperation> =
     z.discriminatedUnion("kind", [
         deleteEntityOperationSchema,
-        setFieldOperationSchema,
+        setFieldOperationSchemaTyped,
     ]);
 
 /**

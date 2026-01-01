@@ -37,7 +37,7 @@ vi.mock("../../utils/logger", () => ({
 }));
 
 // Mock correlation ID generator to get predictable results
-vi.mock("../../utils/correlation", () => ({
+vi.mock("@shared/utils/correlation", () => ({
     generateCorrelationId: vi.fn(() => "test-correlation-id"),
 }));
 
@@ -207,25 +207,21 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
         it("should execute middleware in order", async () => {
             const executionOrder: number[] = [];
 
-            const middleware1: EventMiddleware = vi.fn(async (
-                _event,
-                _data,
-                next
-            ) => {
-                executionOrder.push(1);
-                await next();
-                executionOrder.push(4);
-            });
+            const middleware1: EventMiddleware = vi.fn(
+                async (_event, _data, next) => {
+                    executionOrder.push(1);
+                    await next();
+                    executionOrder.push(4);
+                }
+            );
 
-            const middleware2: EventMiddleware = vi.fn(async (
-                _event,
-                _data,
-                next
-            ) => {
-                executionOrder.push(2);
-                await next();
-                executionOrder.push(3);
-            });
+            const middleware2: EventMiddleware = vi.fn(
+                async (_event, _data, next) => {
+                    executionOrder.push(2);
+                    await next();
+                    executionOrder.push(3);
+                }
+            );
 
             eventBus.registerMiddleware(middleware1);
             eventBus.registerMiddleware(middleware2);
@@ -288,13 +284,11 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
             expect(mockListener).not.toHaveBeenCalled();
         });
         it("should handle synchronous middleware", async () => {
-            const syncMiddleware: EventMiddleware = vi.fn((
-                _event,
-                _data,
-                next
-            ) => {
-                next(); // Synchronous call
-            });
+            const syncMiddleware: EventMiddleware = vi.fn(
+                (_event, _data, next) => {
+                    next(); // Synchronous call
+                }
+            );
 
             eventBus.registerMiddleware(syncMiddleware);
             eventBus.onTyped("string-event", mockListener);
@@ -857,15 +851,13 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
             ).toThrowError("maxMiddleware must be positive, got -1");
         });
         it("should handle middleware that modifies next function but still processes", async () => {
-            const modifyingMiddleware: EventMiddleware = vi.fn(async (
-                _event,
-                _data,
-                next
-            ) => {
-                // Middleware that wraps the next function
-                await next();
-                // Additional processing after next
-            });
+            const modifyingMiddleware: EventMiddleware = vi.fn(
+                async (_event, _data, next) => {
+                    // Middleware that wraps the next function
+                    await next();
+                    // Additional processing after next
+                }
+            );
 
             eventBus.registerMiddleware(modifyingMiddleware);
             eventBus.onTyped("string-event", mockListener);
@@ -1014,22 +1006,18 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
             );
         });
         it("should handle middleware with synchronous and asynchronous mix", async () => {
-            const syncMiddleware: EventMiddleware = vi.fn((
-                _event,
-                _data,
-                next
-            ) => {
-                next(); // Synchronous
-            });
+            const syncMiddleware: EventMiddleware = vi.fn(
+                (_event, _data, next) => {
+                    next(); // Synchronous
+                }
+            );
 
-            const asyncMiddleware: EventMiddleware = vi.fn(async (
-                _event,
-                _data,
-                next
-            ) => {
-                await new Promise((resolve) => setTimeout(resolve, 1));
-                await next(); // Asynchronous
-            });
+            const asyncMiddleware: EventMiddleware = vi.fn(
+                async (_event, _data, next) => {
+                    await new Promise((resolve) => setTimeout(resolve, 1));
+                    await next(); // Asynchronous
+                }
+            );
 
             eventBus.registerMiddleware(syncMiddleware);
             eventBus.registerMiddleware(asyncMiddleware);

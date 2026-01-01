@@ -47,13 +47,18 @@
 import type { Database } from "node-sqlite3-wasm";
 
 import { DEFAULT_SITE_NAME } from "@shared/constants/sites";
+import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 
 import type { DatabaseService } from "./DatabaseService";
 
 import { logger } from "../../utils/logger";
 import { withDatabaseOperation } from "../../utils/operationalHooks";
-import { rowsToSites, rowToSite, type SiteRow } from "./utils/siteMapper";
-import { querySiteRow, querySiteRows } from "./utils/typedQueries";
+import { rowsToSites, rowToSite, type SiteRow } from "./utils/mappers/siteMapper";
+import { querySiteRow, querySiteRows } from "./utils/queries/typedQueries";
+import {
+    assertValidSiteIdentifier,
+    isValidSiteIdentifier,
+} from "./utils/validation/identifierValidation";
 
 /**
  * Defines the dependencies required by the {@link SiteRepository} for managing
@@ -205,10 +210,14 @@ export class SiteRepository {
      * @throws Error When the database operation fails.
      */
     public async delete(identifier: string): Promise<boolean> {
+        if (!isValidSiteIdentifier(identifier)) {
+            return false;
+        }
         return withDatabaseOperation(
             () =>
                 this.databaseService.executeTransaction((db) =>
-                    Promise.resolve(this.deleteInternal(db, identifier))),
+                    Promise.resolve(this.deleteInternal(db, identifier))
+                ),
             "site-delete",
             undefined,
             { identifier }
@@ -260,6 +269,9 @@ export class SiteRepository {
      * @throws Error When the database operation fails.
      */
     public async exists(identifier: string): Promise<boolean> {
+        if (!isValidSiteIdentifier(identifier)) {
+            return false;
+        }
         return this.runSiteReadOperation(
             "site-exists",
             (db) => this.findByIdentifierInternal(db, identifier) !== undefined,
@@ -276,14 +288,14 @@ export class SiteRepository {
      * @example
      *
      * ```typescript
-     * const allSites = await repo.exportAll();
+     * const allSites = await repo.exportAllRows();
      * ```
      *
-     * @returns Promise resolving to an array of all site data.
+     * @returns Promise resolving to an array of all site rows.
      *
      * @throws Error When the database operation fails.
      */
-    public async exportAll(): Promise<SiteRow[]> {
+    public async exportAllRows(): Promise<SiteRow[]> {
         return this.runAllSitesOperation("site-export-all");
     }
 
@@ -291,8 +303,8 @@ export class SiteRepository {
      * Retrieves all sites from the database.
      *
      * @remarks
-     * Functionally identical to {@link exportAll}, but intended for general
-     * querying.
+     * Functionally identical to {@link exportAllRows}, but intended for
+     * general querying.
      *
      * @example
      *
@@ -300,7 +312,7 @@ export class SiteRepository {
      * const sites = await repo.findAll();
      * ```
      *
-     * @returns Promise resolving to an array of all site data.
+     * @returns Promise resolving to an array of all site rows.
      *
      * @throws Error When the database operation fails.
      */
@@ -327,6 +339,9 @@ export class SiteRepository {
     public async findByIdentifier(
         identifier: string
     ): Promise<SiteRow | undefined> {
+        if (!isValidSiteIdentifier(identifier)) {
+            return undefined;
+        }
         return this.runSiteReadOperation(
             "site-lookup",
             (db) => this.findByIdentifierInternal(db, identifier),
@@ -360,6 +375,7 @@ export class SiteRepository {
     public async upsert(
         site: Pick<SiteRow, SiteRowUpsertFields>
     ): Promise<void> {
+        assertValidSiteIdentifier(site.identifier, "SiteRepository.upsert");
         return withDatabaseOperation(
             () =>
                 this.databaseService.executeTransaction((db) => {
@@ -386,7 +402,8 @@ export class SiteRepository {
         operationName: string
     ): Promise<SiteRow[]> {
         return this.runSiteReadOperation(operationName, (db) =>
-            this.fetchAllSitesInternal(db));
+            this.fetchAllSitesInternal(db)
+        );
     }
 
     /**
@@ -499,6 +516,10 @@ export class SiteRepository {
 
         try {
             for (const site of sites) {
+                assertValidSiteIdentifier(
+                    site.identifier,
+                    "SiteRepository.bulkInsertInternal"
+                );
                 // Apply consistent data normalization
                 const name = site.name ?? SITE_DEFAULTS.NAME;
                 const monitoring = site.monitoring ?? SITE_DEFAULTS.MONITORING;
@@ -551,6 +572,9 @@ export class SiteRepository {
      * @throws Error When database operations fail.
      */
     private deleteInternal(db: Database, identifier: string): boolean {
+        if (!isValidSiteIdentifier(identifier)) {
+            return false;
+        }
         try {
             const result = db.run(SITE_QUERIES.DELETE_BY_ID, [identifier]);
             const deleted = result.changes > 0;
@@ -592,6 +616,7 @@ export class SiteRepository {
     ): void {
         // Apply consistent data normalization
         const { identifier } = site;
+        assertValidSiteIdentifier(identifier, "SiteRepository.upsertInternal");
         const name = site.name ?? SITE_DEFAULTS.NAME;
         const monitoring = site.monitoring ?? SITE_DEFAULTS.MONITORING;
         const monitoringValue = monitoring ? 1 : 0;
@@ -645,6 +670,9 @@ export class SiteRepository {
         db: Database,
         identifier: string
     ): SiteRow | undefined {
+        if (!isValidSiteIdentifier(identifier)) {
+            return undefined;
+        }
         try {
             const siteRow = querySiteRow(db, SITE_QUERIES.SELECT_BY_ID, [
                 identifier,
@@ -656,7 +684,9 @@ export class SiteRepository {
                 `[SiteRepository] Failed to find site: ${identifier}`,
                 error
             );
-            throw error instanceof Error ? error : new Error(String(error));
+            throw error instanceof Error
+                ? error
+                : new Error(getUserFacingErrorDetail(error));
         }
     }
 }

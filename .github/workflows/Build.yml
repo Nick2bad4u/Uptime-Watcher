@@ -126,6 +126,12 @@ jobs:
     build:
         needs: bump-version
         runs-on: ${{ matrix.os }}
+        env:
+            # Vite (and vite-plugin-electron) can run multiple builds in the same
+            # Node process (renderer + main + preload). With sourcemaps and build
+            # plugins, the default ~2GB heap on GitHub runners (notably macOS
+            # arm64) is easy to exceed.
+            NODE_OPTIONS: --max_old_space_size=8192
         strategy:
             matrix:
                 os:

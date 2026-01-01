@@ -290,7 +290,8 @@ const createSyncListener = (id: string) => (data: any) => {
  *
  * @returns Async event listener that simulates IO latency.
  */
-const createAsyncListener = (id: string, delay: number = 0) =>
+const createAsyncListener =
+    (id: string, delay: number = 0) =>
     async (data: any) => {
         // Simulate async processing
         JSON.stringify(data);

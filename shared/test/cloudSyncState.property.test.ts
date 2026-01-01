@@ -71,7 +71,8 @@ describe(applyCloudSyncOperations, () => {
                             minLength: ops.length,
                             maxLength: ops.length,
                         })
-                    )),
+                    )
+                ),
                 async ([ops, shuffled]) => {
                     const state = applyCloudSyncOperations(ops);
                     const shuffledState = applyCloudSyncOperations(shuffled);
@@ -84,13 +85,17 @@ describe(applyCloudSyncOperations, () => {
 
     it("is idempotent for duplicated operations", async () => {
         await fc.assert(
-            fc.asyncProperty(fc.array(operationArb, { maxLength: 50 }), async (
-                ops
-            ) => {
-                const state = applyCloudSyncOperations(ops);
-                const duplicated = applyCloudSyncOperations([...ops, ...ops]);
-                expect(duplicated).toEqual(state);
-            }),
+            fc.asyncProperty(
+                fc.array(operationArb, { maxLength: 50 }),
+                async (ops) => {
+                    const state = applyCloudSyncOperations(ops);
+                    const duplicated = applyCloudSyncOperations([
+                        ...ops,
+                        ...ops,
+                    ]);
+                    expect(duplicated).toEqual(state);
+                }
+            ),
             { numRuns: 50 }
         );
     });

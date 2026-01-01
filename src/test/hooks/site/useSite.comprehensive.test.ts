@@ -23,7 +23,15 @@ vi.mock("../../../hooks/site/useSiteActions", () => ({
 }));
 
 vi.mock("../../../stores/error/useErrorStore", () => ({
-    useErrorStore: vi.fn(),
+    useErrorStore: vi.fn(
+        (selector?: (state: { isLoading: boolean }) => unknown) => {
+            const state = {
+                isLoading: false,
+            };
+
+            return typeof selector === "function" ? selector(state) : state;
+        }
+    ),
 }));
 
 // Import the mocked modules
@@ -245,7 +253,12 @@ describe("useSite Hook", () => {
             mockUseSiteMonitor.mockReturnValueOnce(mockMonitorData);
             mockUseSiteStats.mockReturnValueOnce(mockStatsData);
             mockUseSiteActions.mockReturnValueOnce(mockActionsData);
-            mockUseErrorStore.mockReturnValueOnce(mockLoadingData);
+            mockUseErrorStore.mockImplementationOnce(
+                ((selector?: (state: unknown) => unknown) =>
+                    typeof selector === "function"
+                        ? selector(mockLoadingData)
+                        : mockLoadingData) as never
+            );
 
             const { result } = renderHook(() => useSite(mockSite));
 
@@ -379,7 +392,8 @@ describe("useSite Hook", () => {
             });
 
             const { result } = renderHook(() =>
-                useSite(disabledMonitoringSite));
+                useSite(disabledMonitoringSite)
+            );
 
             expect(result.current.status).toBe("down");
         });
@@ -422,7 +436,8 @@ describe("useSite Hook", () => {
 
             const { result: firstResult } = renderHook(() => useSite(mockSite));
             const { result: secondResult } = renderHook(() =>
-                useSite(mockSite));
+                useSite(mockSite)
+            );
 
             // Functions should be stable across renders with same data
             expect(typeof firstResult.current.handleStartMonitoring).toBe(

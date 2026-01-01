@@ -4,11 +4,7 @@
     "BasePath": "",
     "CacheLocation": ".devskim-cache",
     "CommentsPath": "",
-    "Confidences": [
-        "High",
-        "Medium",
-        "Low"
-    ],
+    "Confidences": ["High", "Medium", "Low"],
     "ConsoleVerbosityLevel": "Information",
     "CrawlArchives": false,
     "DisableConsoleOutput": false,
@@ -58,16 +54,10 @@
         "**/service-worker.js"
     ],
     "IgnoreDefaultRules": false,
-    "IgnoreRuleIds": [
-        "DS162092"
-    ],
+    "IgnoreRuleIds": ["DS162092"],
     "LanguageRuleIgnoreMap": {
-        "typescript": [
-            "DS172411"
-        ],
-        "javascript": [
-            "DS172411"
-        ],
+        "typescript": ["DS172411"],
+        "javascript": ["DS172411"],
         "react": [],
         "jsx": []
     },

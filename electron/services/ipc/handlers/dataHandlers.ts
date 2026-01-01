@@ -8,10 +8,9 @@ import { DATA_CHANNELS } from "@shared/types/preload";
 
 import type { UptimeOrchestrator } from "../../../UptimeOrchestrator";
 
-import { validateDatabaseBackupPayload } from "../../database/utils/databaseBackup";
-import { registerStandardizedIpcHandler } from "../utils";
+import { validateDatabaseBackupPayload } from "../../database/utils/backup/databaseBackup";
+import { createStandardizedIpcRegistrar, toClonedArrayBuffer } from "../utils";
 import { DataHandlerValidators } from "../validators";
-import { withIgnoredIpcEvent } from "./handlerShared";
 
 /**
  * Dependencies required for registering data IPC handlers.
@@ -28,49 +27,40 @@ export function registerDataHandlers({
     registeredHandlers,
     uptimeOrchestrator,
 }: DataHandlersDependencies): void {
-    registerStandardizedIpcHandler(
+    const register = createStandardizedIpcRegistrar(registeredHandlers);
+
+    register(
         DATA_CHANNELS.exportData,
-        withIgnoredIpcEvent(() => uptimeOrchestrator.exportData()),
-        DataHandlerValidators.exportData,
-        registeredHandlers
+        () => uptimeOrchestrator.exportData(),
+        DataHandlerValidators.exportData
     );
 
-    registerStandardizedIpcHandler(
+    register(
         DATA_CHANNELS.importData,
-        withIgnoredIpcEvent((serializedBackup) =>
-            uptimeOrchestrator.importData(serializedBackup)),
-        DataHandlerValidators.importData,
-        registeredHandlers
+        (serializedBackup) => uptimeOrchestrator.importData(serializedBackup),
+        DataHandlerValidators.importData
     );
 
-    registerStandardizedIpcHandler(
+    register(
         DATA_CHANNELS.downloadSqliteBackup,
-        withIgnoredIpcEvent(async () => {
+        async () => {
             const result = await uptimeOrchestrator.downloadBackup();
             validateDatabaseBackupPayload(result);
             const { buffer, fileName, metadata } = result;
-            const underlyingBuffer = buffer.buffer;
-            const arrayBuffer: ArrayBuffer =
-                underlyingBuffer instanceof ArrayBuffer
-                    ? underlyingBuffer.slice(
-                          buffer.byteOffset,
-                          buffer.byteOffset + buffer.byteLength
-                      )
-                    : globalThis["Uint8Array"].from(buffer).buffer;
+            const arrayBuffer = toClonedArrayBuffer(buffer);
 
             return {
                 buffer: arrayBuffer,
                 fileName,
                 metadata,
             } satisfies SerializedDatabaseBackupResult;
-        }),
-        DataHandlerValidators.downloadSqliteBackup,
-        registeredHandlers
+        },
+        DataHandlerValidators.downloadSqliteBackup
     );
 
-    registerStandardizedIpcHandler(
+    register(
         DATA_CHANNELS.restoreSqliteBackup,
-        withIgnoredIpcEvent(async (payload) => {
+        async (payload) => {
             const buffer = Buffer.from(payload.buffer);
             const restorePayload = payload.fileName
                 ? { buffer, fileName: payload.fileName }
@@ -83,8 +73,7 @@ export function registerDataHandlers({
                 preRestoreFileName: summary.preRestoreFileName,
                 restoredAt: summary.restoredAt,
             } satisfies SerializedDatabaseRestoreResult;
-        }),
-        DataHandlerValidators.restoreSqliteBackup,
-        registeredHandlers
+        },
+        DataHandlerValidators.restoreSqliteBackup
     );
 }

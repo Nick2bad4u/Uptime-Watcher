@@ -1,6 +1,7 @@
 import type { Site } from "@shared/types";
 import type { Logger } from "@shared/utils/logger/interfaces";
 
+import { generateCorrelationId } from "@shared/utils/correlation";
 import { randomInt } from "node:crypto";
 
 import type { UptimeEvents } from "../../events/eventTypes";
@@ -8,7 +9,6 @@ import type { TypedEventBus } from "../../events/TypedEventBus";
 
 import { DEFAULT_CHECK_INTERVAL } from "../../constants";
 import { isDev } from "../../electronUtils";
-import { generateCorrelationId } from "../../utils/correlation";
 import { logger as backendLogger } from "../../utils/logger";
 import {
     DEFAULT_MONITOR_TIMEOUT_SECONDS,
@@ -591,7 +591,8 @@ export class MonitorScheduler {
         } else {
             // Stop all monitors for this site
             const siteIntervals = Array.from(this.jobs.keys()).filter((key) =>
-                key.startsWith(`${siteIdentifier}|`));
+                key.startsWith(`${siteIdentifier}|`)
+            );
             for (const intervalKey of siteIntervals) {
                 const parsed = this.parseIntervalKey(intervalKey);
                 if (parsed) {

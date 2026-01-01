@@ -87,6 +87,7 @@ function evaluateTimestamp(
             `${role} timestamp field '${field}' missing or invalid`,
             responseTime
         );
+
     }
 
     return { kind: "ok", timestamp };
@@ -215,7 +216,7 @@ const behavior: RemoteMonitorBehavior<
                 thresholdSeconds,
                 timestampField,
             },
-            kind: "context",
+            kind: "success",
         };
     },
     scope: "ReplicationMonitor",

@@ -58,28 +58,31 @@ const mockOpenExternal = vi.fn();
 
 // Mock useUIStore hook
 vi.mock("../stores/ui/useUiStore", () => ({
-    useUIStore: () => ({
-        openExternal: mockOpenExternal,
-    }),
+    useUIStore: (selector?: (state: { openExternal: typeof mockOpenExternal }) => unknown) => {
+        const state = {
+            openExternal: mockOpenExternal,
+        };
+
+        return typeof selector === "function" ? selector(state) : state;
+    },
 }));
 
 // Mock useMount hook
 vi.mock("../hooks/useMount", () => {
     const calledCallbacks = new WeakSet();
     return {
-        useMount: vi.fn((
-            callback: () => void,
-            cleanupCallback?: () => void
-        ) => {
-            // Only call the callback once per component instance to avoid infinite loops
-            // This simulates the real useMount behavior
-            if (!calledCallbacks.has(callback)) {
-                calledCallbacks.add(callback);
-                callback();
+        useMount: vi.fn(
+            (callback: () => void, cleanupCallback?: () => void) => {
+                // Only call the callback once per component instance to avoid infinite loops
+                // This simulates the real useMount behavior
+                if (!calledCallbacks.has(callback)) {
+                    calledCallbacks.add(callback);
+                    callback();
+                }
+                // Return cleanup function if provided (for testing unmount behavior)
+                return cleanupCallback;
             }
-            // Return cleanup function if provided (for testing unmount behavior)
-            return cleanupCallback;
-        }),
+        ),
     };
 });
 

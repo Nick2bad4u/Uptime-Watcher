@@ -830,7 +830,8 @@ describe("Command Service Benchmarks", () => {
                             Math.floor(Math.random() * commonCommands.length)
                         ];
                     resultsCount = historyEntries.filter((h) =>
-                        h.command.includes(searchCommand)).length;
+                        h.command.includes(searchCommand)
+                    ).length;
                     queryTime = Math.random() * 15 + 3; // 3-18ms
                     break;
                 }

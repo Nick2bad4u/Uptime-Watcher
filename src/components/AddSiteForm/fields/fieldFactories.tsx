@@ -15,6 +15,41 @@ import {
 
 import { type AriaProperties, BaseFormField } from "../BaseFormField";
 
+function buildBaseFormFieldProps(args: {
+    readonly error: string | undefined;
+    readonly helpText: string | undefined;
+    readonly id: string;
+    readonly label: string;
+    readonly required: boolean;
+}): FormFieldBaseProperties & { readonly required: boolean } {
+    return {
+        ...(args.error !== undefined && { error: args.error }),
+        ...(args.helpText !== undefined && { helpText: args.helpText }),
+        id: args.id,
+        label: args.label,
+        required: args.required,
+    };
+}
+
+function renderBaseFormField(
+    props: FormFieldBaseProperties & { readonly required: boolean },
+    renderControl: (ariaProps: AriaProperties) => ReactElement
+): ReactElement {
+    const { error, helpText, id, label, required } = props;
+
+    return (
+        <BaseFormField
+            {...(error !== undefined && { error })}
+            {...(helpText !== undefined && { helpText })}
+            id={id}
+            label={label}
+            required={required}
+        >
+            {renderControl}
+        </BaseFormField>
+    );
+}
+
 /**
  * Base properties shared across string-based form field components.
  */
@@ -67,21 +102,21 @@ export function createStringField<
         );
 
         return (
-            <BaseFormField
-                {...(error !== undefined && { error })}
-                {...(helpText !== undefined && { helpText })}
-                id={id}
-                label={label}
-                required={required}
-            >
-                {(ariaProps) =>
+            renderBaseFormField(
+                buildBaseFormFieldProps({
+                    error,
+                    helpText,
+                    id,
+                    label,
+                    required,
+                }),
+                (ariaProps) =>
                     options.renderControl({
                         ariaProps,
                         handleChange,
                         props,
                     })
-                }
-            </BaseFormField>
+            )
         );
     });
 
@@ -116,21 +151,19 @@ export function createFieldWrapper<
     const FieldComponent = memo((props: TProps): ReactElement => {
         const { error, helpText, id, label, required = false } = props;
 
-        return (
-            <BaseFormField
-                {...(error !== undefined && { error })}
-                {...(helpText !== undefined && { helpText })}
-                id={id}
-                label={label}
-                required={required}
-            >
-                {(ariaProps) =>
-                    options.renderControl({
-                        ariaProps,
-                        props,
-                    })
-                }
-            </BaseFormField>
+        return renderBaseFormField(
+            buildBaseFormFieldProps({
+                error,
+                helpText,
+                id,
+                label,
+                required,
+            }),
+            (ariaProps) =>
+                options.renderControl({
+                    ariaProps,
+                    props,
+                })
         );
     });
 

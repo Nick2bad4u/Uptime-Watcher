@@ -47,7 +47,9 @@ export const validateSiteSnapshot = (value: unknown): SiteSnapshotParseResult =>
 /**
  * Validates an unknown payload against the canonical site update schema.
  */
-export type SiteUpdateParseResult = ReturnType<typeof siteUpdateSchema.safeParse>;
+export type SiteUpdateParseResult = ReturnType<
+    typeof siteUpdateSchema.safeParse
+>;
 
 export const validateSiteUpdate = (value: unknown): SiteUpdateParseResult =>
     siteUpdateSchema.safeParse(value);

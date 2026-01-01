@@ -12,7 +12,15 @@
  * @see {@link IpcParameterValidator}
  */
 
+import { DEFAULT_MAX_BACKUP_SIZE_BYTES } from "@shared/constants/backup";
+import { normalizePathSeparatorsToPosix } from "@shared/utils/pathSeparators";
+import { hasAsciiControlCharacters } from "@shared/utils/stringSafety";
 import { isRecord } from "@shared/utils/typeHelpers";
+import { formatZodIssues } from "@shared/utils/zodIssueFormatting";
+import {
+    MAX_FILESYSTEM_BASE_DIRECTORY_BYTES,
+    validateFilesystemBaseDirectoryCandidate,
+} from "@shared/validation/filesystemBaseDirectoryValidation";
 import {
     validateSiteSnapshot,
     validateSiteUpdate,
@@ -21,10 +29,14 @@ import {
     validateAppNotificationRequest,
     validateNotificationPreferenceUpdate,
 } from "@shared/validation/notifications";
+import {
+    SITE_IDENTIFIER_MAX_LENGTH,
+    SITE_IDENTIFIER_REQUIRED_MESSAGE,
+    SITE_IDENTIFIER_TOO_LONG_MESSAGE,
+} from "@shared/validation/siteFieldConstants";
 
 import type { IpcParameterValidator } from "./types";
 
-import { DEFAULT_MAX_BACKUP_SIZE_BYTES } from "../database/utils/databaseBackup";
 import {
     getUtfByteLength,
     MAX_DIAGNOSTICS_METADATA_BYTES,
@@ -135,22 +147,51 @@ interface SystemHandlerValidatorsInterface {
     writeClipboardText: IpcParameterValidator;
 }
 
-type ParameterValueValidator = (value: unknown) => null | string;
+type ParameterValueValidator = (
+    value: unknown
+) => ParameterValueValidationResult;
 
-interface ZodIssueLike {
-    readonly message: string;
-    readonly path: ReadonlyArray<number | string | symbol>;
+type ParameterValueValidationResult = null | readonly string[];
+
+function toValidationResult(
+    error: null | readonly string[] | string
+): ParameterValueValidationResult {
+    if (error === null) {
+        return null;
+    }
+
+    return typeof error === "string" ? [error] : error;
 }
 
-const formatZodIssues = (issues: readonly ZodIssueLike[]): string[] =>
-    issues.map((issue) => {
-        if (issue.path.length === 0) {
-            return issue.message;
-        }
+type RequiredRecordResult =
+    | { readonly error: ParameterValueValidationResult; readonly ok: false }
+    | { readonly ok: true; readonly record: Record<string, unknown> };
 
-        const path = issue.path.map(String).join(".");
-        return `${path}: ${issue.message}`;
-    });
+const isRequiredRecordError = (
+    result: RequiredRecordResult
+): result is Extract<RequiredRecordResult, { readonly ok: false }> =>
+    !result.ok;
+
+const requireRecordParam = (
+    value: unknown,
+    paramName: string
+): RequiredRecordResult => {
+    const objectError = IpcValidators.requiredObject(value, paramName);
+    if (objectError) {
+        return { error: toValidationResult(objectError), ok: false };
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- validated as object above
+    return { ok: true, record: value as Record<string, unknown> };
+};
+
+interface CreateParamValidatorOptions {
+    /**
+     * When true, do not run per-parameter validators when the parameter count
+     * is invalid.
+     */
+    readonly stopOnCountMismatch?: boolean;
+}
 
 /**
  * Maximum byte budget accepted for JSON import payloads transported over IPC.
@@ -175,70 +216,13 @@ const MAX_CLIPBOARD_TEXT_BYTES: number = 5 * 1024 * 1024;
 /** Maximum byte budget accepted for user-supplied restore filenames. */
 const MAX_RESTORE_FILE_NAME_BYTES: number = 512;
 
-/** Maximum byte budget accepted for filesystem provider base directories. */
-const MAX_FILESYSTEM_BASE_DIRECTORY_BYTES: number = 4096;
-
-function isAbsoluteFilesystemPath(value: string): boolean {
-    // POSIX absolute paths
-    if (value.startsWith("/")) {
-        return true;
-    }
-
-    // UNC paths (\\server\share or //server/share)
-    if (value.startsWith("\\\\") || value.startsWith("//")) {
-        return true;
-    }
-
-    // Windows drive paths (C:\ or C:/)
-    if (value.length >= 3) {
-        const [
-            firstChar,
-            secondChar,
-            thirdChar,
-        ] = value;
-        if (secondChar !== ":" || firstChar === undefined) {
-            return false;
-        }
-
-        const codePoint = firstChar.codePointAt(0);
-        const isAsciiLetter =
-            codePoint !== undefined &&
-            ((codePoint >= 65 && codePoint <= 90) ||
-                (codePoint >= 97 && codePoint <= 122));
-
-        if (!isAsciiLetter) {
-            return false;
-        }
-
-        return thirdChar === "\\" || thirdChar === "/";
-    }
-
-    return false;
-}
-
-function isWindowsDeviceNamespacePath(value: string): boolean {
-    // Treat forward slashes as backslashes for this check.
-    const normalized = value.replaceAll("/", "\\");
-    return normalized.startsWith("\\\\?\\") || normalized.startsWith("\\\\.\\");
-}
-
-function hasAsciiControlCharacters(value: string): boolean {
-    for (const char of value) {
-        const codePoint = char.codePointAt(0);
-        if (
-            codePoint !== undefined &&
-            (codePoint < 0x20 || codePoint === 0x7f)
-        ) {
-            return true;
-        }
-    }
-
-    return false;
-}
+// NOTE: filesystem path validation helpers are centralized in
+// @shared/validation/filesystemBaseDirectoryValidation.
 
 function createParamValidator(
     expectedCount: number,
-    validators: readonly ParameterValueValidator[] = []
+    validators: readonly ParameterValueValidator[] = [],
+    options: CreateParamValidatorOptions = {}
 ): IpcParameterValidator {
     let countMessage = "No parameters expected";
 
@@ -252,13 +236,19 @@ function createParamValidator(
 
         if (params.length !== expectedCount) {
             errors.push(countMessage);
+
+            if (options.stopOnCountMismatch) {
+                return errors;
+            }
         }
 
         validators.forEach((validate, index) => {
             const error = validate(params[index]);
-            if (error) {
-                errors.push(error);
+            if (!error) {
+                return;
             }
+
+            errors.push(...error);
         });
 
         return errors.length > 0 ? errors : null;
@@ -269,62 +259,92 @@ function createNoParamsValidator(): IpcParameterValidator {
     return createParamValidator(0);
 }
 
-function validateSitePayload(params: readonly unknown[]): null | string[] {
-    if (params.length !== 1) {
-        return ["Expected exactly 1 parameter"];
+const validateSiteIdentifierCandidate = (
+    value: unknown,
+    paramName: string
+): ParameterValueValidationResult => {
+    if (typeof value !== "string") {
+        return toValidationResult(
+            IpcValidators.requiredString(value, paramName)
+        );
     }
 
-    const [siteCandidate] = params;
-    const result = validateSiteSnapshot(siteCandidate);
-    if (result.success) {
-        return null;
+    if (value.trim().length === 0) {
+        return [SITE_IDENTIFIER_REQUIRED_MESSAGE];
     }
 
-    return formatZodIssues(result.error.issues);
+    if (value.length > SITE_IDENTIFIER_MAX_LENGTH) {
+        return [SITE_IDENTIFIER_TOO_LONG_MESSAGE];
+    }
+
+    return null;
+};
+
+function createSiteIdentifierValidator(
+    paramName: string
+): IpcParameterValidator {
+    return createParamValidator(1, [
+        (value): ParameterValueValidationResult =>
+            validateSiteIdentifierCandidate(value, paramName),
+    ]);
 }
 
-function validateSiteUpdatePayload(
-    params: readonly unknown[]
-): null | string[] {
-    const errors: string[] = [];
-
-    const [identifierCandidate, updatesCandidate] = params;
-
-    if (params.length !== 2) {
-        errors.push("Expected exactly 2 parameters");
-    }
-
-    const identifierError = IpcValidators.requiredString(
-        identifierCandidate,
-        "identifier"
-    );
-    if (identifierError) {
-        errors.push(identifierError);
-    }
-
-    const objectError = IpcValidators.requiredObject(
-        updatesCandidate,
-        "updates"
-    );
-    if (objectError) {
-        errors.push(objectError);
-        return errors;
-    }
-
-    if (
-        isRecord(updatesCandidate) &&
-        Object.keys(updatesCandidate).length === 0
-    ) {
-        errors.push("updates must not be empty");
-    }
-
-    const validationResult = validateSiteUpdate(updatesCandidate);
-    if (!validationResult.success) {
-        errors.push(...formatZodIssues(validationResult.error.issues));
-    }
-
-    return errors.length > 0 ? errors : null;
+function createSiteIdentifierAndMonitorIdValidator(
+    siteParamName: string,
+    monitorParamName: string
+): IpcParameterValidator {
+    return createParamValidator(2, [
+        (value): ParameterValueValidationResult =>
+            validateSiteIdentifierCandidate(value, siteParamName),
+        (value): ParameterValueValidationResult =>
+            toValidationResult(
+                IpcValidators.requiredString(value, monitorParamName)
+            ),
+    ]);
 }
+
+const validateSitePayload: IpcParameterValidator = createParamValidator(
+    1,
+    [
+        (siteCandidate): ParameterValueValidationResult => {
+            const result = validateSiteSnapshot(siteCandidate);
+            return result.success ? null : formatZodIssues(result.error.issues);
+        },
+    ],
+    { stopOnCountMismatch: true }
+);
+
+const validateSiteUpdatePayload: IpcParameterValidator = createParamValidator(
+    2,
+    [
+        (identifierCandidate): ParameterValueValidationResult =>
+            validateSiteIdentifierCandidate(identifierCandidate, "identifier"),
+        (updatesCandidate): ParameterValueValidationResult => {
+            const objectError = IpcValidators.requiredObject(
+                updatesCandidate,
+                "updates"
+            );
+            if (objectError) {
+                return toValidationResult(objectError);
+            }
+
+            const errors: string[] = [];
+            if (
+                isRecord(updatesCandidate) &&
+                Object.keys(updatesCandidate).length === 0
+            ) {
+                errors.push("updates must not be empty");
+            }
+
+            const validationResult = validateSiteUpdate(updatesCandidate);
+            if (!validationResult.success) {
+                errors.push(...formatZodIssues(validationResult.error.issues));
+            }
+
+            return errors.length > 0 ? errors : null;
+        },
+    ]
+);
 
 /**
  * Helper function to create validators for single number parameters.
@@ -335,291 +355,297 @@ function validateSiteUpdatePayload(
  */
 function createSingleNumberValidator(paramName: string): IpcParameterValidator {
     return createParamValidator(1, [
-        (
-            value
-        ):
-            | null
-            | string => IpcValidators.requiredNumber(value, paramName),
+        (value): ParameterValueValidationResult =>
+            toValidationResult(IpcValidators.requiredNumber(value, paramName)),
     ]);
 }
 
-function validateCloudFilesystemProviderConfig(
-    params: readonly unknown[]
-): null | string[] {
-    const errors: string[] = [];
-
-    if (params.length !== 1) {
-        errors.push("Expected exactly 1 parameter");
-    }
-
-    const [config] = params;
-    const objectError = IpcValidators.requiredObject(config, "config");
-    if (objectError) {
-        errors.push(objectError);
-        return errors;
-    }
-
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- config validated as object
-    const record = config as Record<string, unknown>;
-    const baseDirectoryError = IpcValidators.requiredString(
-        record["baseDirectory"],
-        "baseDirectory"
-    );
-    if (baseDirectoryError) {
-        errors.push(baseDirectoryError);
-        return errors;
-    }
-
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- validated as string above
-    const baseDirectoryRaw = record["baseDirectory"] as string;
-    const baseDirectory = baseDirectoryRaw.trim();
-    if (baseDirectory.length === 0) {
-        errors.push("baseDirectory must not be empty");
-        return errors;
-    }
-
-    if (
-        getUtfByteLength(baseDirectoryRaw) > MAX_FILESYSTEM_BASE_DIRECTORY_BYTES
-    ) {
-        errors.push(
-            `baseDirectory must not exceed ${MAX_FILESYSTEM_BASE_DIRECTORY_BYTES} bytes`
-        );
-    }
-
-    if (hasAsciiControlCharacters(baseDirectoryRaw)) {
-        errors.push("baseDirectory must not contain control characters");
-    }
-
-    if (isWindowsDeviceNamespacePath(baseDirectoryRaw)) {
-        errors.push(
-            String.raw`baseDirectory must not use Windows device namespace paths (\\?\ or \\.\)`
-        );
-    }
-
-    if (!isAbsoluteFilesystemPath(baseDirectory)) {
-        errors.push(
-            "baseDirectory must be an absolute path (e.g. C:/Backups or /home/user/backups)"
-        );
-    }
-
-    return errors.length > 0 ? errors : null;
-}
-
-function validateCloudEnableSyncConfig(
-    params: readonly unknown[]
-): null | string[] {
-    const errors: string[] = [];
-
-    if (params.length !== 1) {
-        errors.push("Expected exactly 1 parameter");
-    }
-
-    const [config] = params;
-    const objectError = IpcValidators.requiredObject(config, "config");
-    if (objectError) {
-        errors.push(objectError);
-        return errors;
-    }
-
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- config validated as object
-    const record = config as Record<string, unknown>;
-    const { enabled } = record;
-    if (typeof enabled !== "boolean") {
-        errors.push("enabled must be a boolean");
-    }
-
-    return errors.length > 0 ? errors : null;
-}
-
-function validateCloudBackupMigrationRequest(
-    params: readonly unknown[]
-): null | string[] {
-    const errors: string[] = [];
-
-    if (params.length !== 1) {
-        errors.push("Expected exactly 1 parameter");
-    }
-
-    const [config] = params;
-    const objectError = IpcValidators.requiredObject(config, "config");
-    if (objectError) {
-        errors.push(objectError);
-        return errors;
-    }
-
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- config validated as object
-    const record = config as Record<string, unknown>;
-
-    const { deleteSource, limit, target } = record;
-    if (typeof deleteSource !== "boolean") {
-        errors.push("deleteSource must be a boolean");
-    }
-
-    if (target !== "plaintext" && target !== "encrypted") {
-        errors.push("target must be 'plaintext' or 'encrypted'");
-    }
-
-    if (limit !== undefined) {
-        const limitError = IpcValidators.requiredNumber(limit, "limit");
-        if (limitError) {
-            errors.push(limitError);
-        } else if (
-            typeof limit === "number" &&
-            (!Number.isInteger(limit) || limit <= 0)
-        ) {
-            errors.push("limit must be a positive integer");
-        }
-    }
-
-    return errors.length > 0 ? errors : null;
-}
-
-function validatePreloadGuardReport(
-    params: readonly unknown[]
-): null | string[] {
-    const errors: string[] = [];
-
-    if (params.length !== 1) {
-        errors.push("Expected exactly 1 parameter");
-    }
-
-    const [report] = params;
-    const objectError = IpcValidators.requiredObject(report, "guardReport");
-
-    if (objectError) {
-        errors.push(objectError);
-        return errors.length > 0 ? errors : null;
-    }
-
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- guardReport validated as object
-    const record = report as Record<string, unknown>;
-
-    const channelError = IpcValidators.requiredString(
-        record["channel"],
-        "channel"
-    );
-    if (channelError) {
-        errors.push(channelError);
-    }
-
-    const guardError = IpcValidators.requiredString(record["guard"], "guard");
-    if (guardError) {
-        errors.push(guardError);
-    }
-
-    const reasonError = IpcValidators.optionalString(
-        record["reason"],
-        "reason"
-    );
-    if (reasonError) {
-        errors.push(reasonError);
-    }
-
-    const payloadPreviewValue = record["payloadPreview"];
-    const payloadPreviewError = IpcValidators.optionalString(
-        payloadPreviewValue,
-        "payloadPreview"
-    );
-    if (payloadPreviewError) {
-        errors.push(payloadPreviewError);
-    } else if (
-        typeof payloadPreviewValue === "string" &&
-        getUtfByteLength(payloadPreviewValue) >
-            MAX_DIAGNOSTICS_PAYLOAD_PREVIEW_BYTES
-    ) {
-        errors.push(
-            `payloadPreview exceeds ${MAX_DIAGNOSTICS_PAYLOAD_PREVIEW_BYTES} bytes`
-        );
-    }
-
-    const metadataValue = record["metadata"];
-    if (metadataValue !== undefined) {
-        const metadataError = IpcValidators.requiredObject(
-            metadataValue,
-            "metadata"
-        );
-        if (metadataError) {
-            errors.push(metadataError);
-        } else {
-            try {
-                const serialized = JSON.stringify(metadataValue);
-                if (
-                    !serialized ||
-                    getUtfByteLength(serialized) >
-                        MAX_DIAGNOSTICS_METADATA_BYTES
-                ) {
-                    errors.push(
-                        `metadata exceeds ${MAX_DIAGNOSTICS_METADATA_BYTES} bytes`
-                    );
-                }
-            } catch {
-                errors.push("metadata must be serializable");
+const validateCloudFilesystemProviderConfig: IpcParameterValidator =
+    createParamValidator(1, [
+        (config): ParameterValueValidationResult => {
+            const recordResult = requireRecordParam(config, "config");
+            if (isRequiredRecordError(recordResult)) {
+                return recordResult.error;
             }
-        }
-    }
 
-    const timestampError = IpcValidators.requiredNumber(
-        record["timestamp"],
-        "timestamp"
-    );
-    if (timestampError) {
-        errors.push(timestampError);
-    }
+            const { record } = recordResult;
+            const baseDirectoryError = IpcValidators.requiredString(
+                record["baseDirectory"],
+                "baseDirectory"
+            );
+            if (baseDirectoryError) {
+                return toValidationResult(baseDirectoryError);
+            }
 
-    return errors.length > 0 ? errors : null;
-}
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- validated as string above
+            const baseDirectoryRaw = record["baseDirectory"] as string;
+            const issues = validateFilesystemBaseDirectoryCandidate(
+                baseDirectoryRaw,
+                { maxBytes: MAX_FILESYSTEM_BASE_DIRECTORY_BYTES }
+            );
+
+            // Preserve the historical IPC error message wording + ordering.
+            const errors: string[] = [];
+            for (const issue of issues) {
+                switch (issue.code) {
+                    case "control-chars": {
+                        errors.push(
+                            "baseDirectory must not contain control characters"
+                        );
+                        break;
+                    }
+                    case "empty": {
+                        errors.push("baseDirectory must not be empty");
+                        break;
+                    }
+                    case "not-absolute": {
+                        errors.push(
+                            "baseDirectory must be an absolute path (e.g. C:/Backups or /home/user/backups)"
+                        );
+                        break;
+                    }
+                    case "not-string": {
+                        errors.push("baseDirectory must be a string");
+                        break;
+                    }
+                    case "null-byte": {
+                        errors.push(
+                            "baseDirectory must not contain a null byte"
+                        );
+                        break;
+                    }
+                    case "too-large": {
+                        errors.push(
+                            `baseDirectory must not exceed ${issue.maxBytes} bytes`
+                        );
+                        break;
+                    }
+                    case "whitespace": {
+                        errors.push(
+                            "baseDirectory must not have leading or trailing whitespace"
+                        );
+                        break;
+                    }
+                    case "windows-device-namespace": {
+                        errors.push(
+                            String.raw`baseDirectory must not use Windows device namespace paths (\\?\ or \\.\)`
+                        );
+                        break;
+                    }
+                    default: {
+                        break;
+                    }
+                }
+            }
+
+            return errors.length > 0 ? errors : null;
+        },
+    ]);
+
+const validateCloudEnableSyncConfig: IpcParameterValidator =
+    createParamValidator(1, [
+        (config): ParameterValueValidationResult => {
+            const recordResult = requireRecordParam(config, "config");
+            if (isRequiredRecordError(recordResult)) {
+                return recordResult.error;
+            }
+
+            const { record } = recordResult;
+            const { enabled } = record;
+            return typeof enabled === "boolean"
+                ? null
+                : toValidationResult("enabled must be a boolean");
+        },
+    ]);
+
+const validateCloudBackupMigrationRequest: IpcParameterValidator =
+    createParamValidator(1, [
+        (config): ParameterValueValidationResult => {
+            const errors: string[] = [];
+
+            const recordResult = requireRecordParam(config, "config");
+            if (isRequiredRecordError(recordResult)) {
+                return recordResult.error;
+            }
+
+            const { record } = recordResult;
+
+            const { deleteSource, limit, target } = record;
+            if (typeof deleteSource !== "boolean") {
+                errors.push("deleteSource must be a boolean");
+            }
+
+            if (target !== "plaintext" && target !== "encrypted") {
+                errors.push("target must be 'plaintext' or 'encrypted'");
+            }
+
+            if (limit !== undefined) {
+                const limitError = IpcValidators.requiredNumber(limit, "limit");
+                if (limitError) {
+                    errors.push(limitError);
+                } else if (
+                    typeof limit === "number" &&
+                    (!Number.isInteger(limit) || limit <= 0)
+                ) {
+                    errors.push("limit must be a positive integer");
+                }
+            }
+
+            return errors.length > 0 ? errors : null;
+        },
+    ]);
+
+const validatePreloadGuardReport: IpcParameterValidator = createParamValidator(
+    1,
+    [
+        (report): ParameterValueValidationResult => {
+            const errors: string[] = [];
+
+            const objectError = IpcValidators.requiredObject(
+                report,
+                "guardReport"
+            );
+            if (objectError) {
+                return toValidationResult(objectError);
+            }
+
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- guardReport validated as object
+            const record = report as Record<string, unknown>;
+
+            const channelError = IpcValidators.requiredString(
+                record["channel"],
+                "channel"
+            );
+            if (channelError) {
+                errors.push(channelError);
+            }
+
+            const guardError = IpcValidators.requiredString(
+                record["guard"],
+                "guard"
+            );
+            if (guardError) {
+                errors.push(guardError);
+            }
+
+            const reasonError = IpcValidators.optionalString(
+                record["reason"],
+                "reason"
+            );
+            if (reasonError) {
+                errors.push(reasonError);
+            }
+
+            const payloadPreviewValue = record["payloadPreview"];
+            const payloadPreviewError = IpcValidators.optionalString(
+                payloadPreviewValue,
+                "payloadPreview"
+            );
+            if (payloadPreviewError) {
+                errors.push(payloadPreviewError);
+            } else if (
+                typeof payloadPreviewValue === "string" &&
+                getUtfByteLength(payloadPreviewValue) >
+                    MAX_DIAGNOSTICS_PAYLOAD_PREVIEW_BYTES
+            ) {
+                errors.push(
+                    `payloadPreview exceeds ${MAX_DIAGNOSTICS_PAYLOAD_PREVIEW_BYTES} bytes`
+                );
+            }
+
+            const metadataValue = record["metadata"];
+            if (metadataValue !== undefined) {
+                const metadataError = IpcValidators.requiredObject(
+                    metadataValue,
+                    "metadata"
+                );
+                if (metadataError) {
+                    errors.push(metadataError);
+                } else {
+                    try {
+                        const serialized = JSON.stringify(metadataValue);
+                        if (
+                            !serialized ||
+                            getUtfByteLength(serialized) >
+                                MAX_DIAGNOSTICS_METADATA_BYTES
+                        ) {
+                            errors.push(
+                                `metadata exceeds ${MAX_DIAGNOSTICS_METADATA_BYTES} bytes`
+                            );
+                        }
+                    } catch {
+                        errors.push("metadata must be serializable");
+                    }
+                }
+            }
+
+            const timestampError = IpcValidators.requiredNumber(
+                record["timestamp"],
+                "timestamp"
+            );
+            if (timestampError) {
+                errors.push(timestampError);
+            }
+
+            return errors.length > 0 ? errors : null;
+        },
+    ]
+);
 
 function createPreloadGuardReportValidator(): IpcParameterValidator {
     return validatePreloadGuardReport;
 }
 
-function validateNotificationPreferences(
-    params: readonly unknown[]
-): null | string[] {
-    if (params.length !== 1) {
-        return ["Expected exactly 1 parameter"];
-    }
+const validateNotificationPreferences: IpcParameterValidator =
+    createParamValidator(
+        1,
+        [
+            (preferences): ParameterValueValidationResult => {
+                const objectError = IpcValidators.requiredObject(
+                    preferences,
+                    "preferences"
+                );
 
-    const [preferences] = params;
-    const objectError = IpcValidators.requiredObject(
-        preferences,
-        "preferences"
+                if (objectError) {
+                    return toValidationResult(objectError);
+                }
+
+                if (!isRecord(preferences)) {
+                    return toValidationResult(
+                        "Notification preferences payload must be an object"
+                    );
+                }
+
+                const validationResult =
+                    validateNotificationPreferenceUpdate(preferences);
+                return validationResult.success
+                    ? null
+                    : formatZodIssues(validationResult.error.issues);
+            },
+        ],
+        { stopOnCountMismatch: true }
     );
 
-    if (objectError) {
-        return [objectError];
-    }
+const validateNotifyAppEvent: IpcParameterValidator = createParamValidator(
+    1,
+    [
+        (request): ParameterValueValidationResult => {
+            const objectError = IpcValidators.requiredObject(
+                request,
+                "request"
+            );
+            if (objectError) {
+                return toValidationResult(objectError);
+            }
 
-    if (!isRecord(preferences)) {
-        return ["Notification preferences payload must be an object"];
-    }
-
-    const validationResult = validateNotificationPreferenceUpdate(preferences);
-    if (validationResult.success) {
-        return null;
-    }
-
-    return validationResult.error.issues.map((issue) => issue.message);
-}
-
-function validateNotifyAppEvent(params: readonly unknown[]): null | string[] {
-    if (params.length !== 1) {
-        return ["Expected exactly 1 parameter"];
-    }
-
-    const [request] = params;
-    const objectError = IpcValidators.requiredObject(request, "request");
-    if (objectError) {
-        return [objectError];
-    }
-
-    const validationResult = validateAppNotificationRequest(request);
-    if (validationResult.success) {
-        return null;
-    }
-
-    return validationResult.error.issues.map((issue) => issue.message);
-}
+            const validationResult = validateAppNotificationRequest(request);
+            return validationResult.success
+                ? null
+                : formatZodIssues(validationResult.error.issues);
+        },
+    ],
+    { stopOnCountMismatch: true }
+);
 
 function validateRestoreBufferCandidate(candidate: unknown): string[] {
     if (!(candidate instanceof ArrayBuffer)) {
@@ -646,12 +672,17 @@ function validateRestoreFileNameCandidate(candidate: unknown): string[] {
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- validated as non-empty string above
-    const fileName = (candidate as string).trim();
+    const rawFileName = candidate as string;
+    const fileName = rawFileName.trim();
     if (fileName.length === 0) {
         return ["fileName must not be blank"];
     }
 
     const errors: string[] = [];
+
+    if (rawFileName !== fileName) {
+        errors.push("fileName must not have leading or trailing whitespace");
+    }
 
     if (getUtfByteLength(fileName) > MAX_RESTORE_FILE_NAME_BYTES) {
         errors.push(
@@ -669,92 +700,95 @@ function validateRestoreFileNameCandidate(candidate: unknown): string[] {
 
     // `fileName` is intended for UI/logging only; it should be a base name, not
     // a path.
-    if (fileName.includes("/") || fileName.includes("\\")) {
+    if (normalizePathSeparatorsToPosix(fileName).includes("/")) {
         errors.push("fileName must not contain path separators");
     }
 
     return errors;
 }
 
-function validateRestorePayload(params: readonly unknown[]): null | string[] {
-    const errors: string[] = [];
+const validateRestorePayload: IpcParameterValidator = createParamValidator(1, [
+    (payload): ParameterValueValidationResult => {
+        const errors: string[] = [];
 
-    if (params.length !== 1) {
-        errors.push("Expected exactly 1 parameter");
-    }
+        const objectError = IpcValidators.requiredObject(payload, "payload");
+        if (objectError) {
+            return toValidationResult(objectError);
+        }
 
-    const [payload] = params;
-    const objectError = IpcValidators.requiredObject(payload, "payload");
-    if (objectError) {
-        errors.push(objectError);
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- payload validated as object above
+        const record = payload as Record<string, unknown>;
+        errors.push(...validateRestoreBufferCandidate(record["buffer"]));
+
+        const fileNameValue = record["fileName"];
+        if (fileNameValue !== undefined) {
+            errors.push(...validateRestoreFileNameCandidate(fileNameValue));
+        }
+
         return errors.length > 0 ? errors : null;
-    }
+    },
+]);
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- payload validated as object above
-    const record = payload as Record<string, unknown>;
-    errors.push(...validateRestoreBufferCandidate(record["buffer"]));
+const validateImportDataPayload: IpcParameterValidator = createParamValidator(
+    1,
+    [
+        (candidate): ParameterValueValidationResult => {
+            const errors: string[] = [];
 
-    const fileNameValue = record["fileName"];
-    if (fileNameValue !== undefined) {
-        errors.push(...validateRestoreFileNameCandidate(fileNameValue));
-    }
+            const stringError = IpcValidators.requiredString(candidate, "data");
+            if (stringError) {
+                return toValidationResult(stringError);
+            }
 
-    return errors.length > 0 ? errors : null;
-}
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- validated as string above
+            const data = candidate as string;
+            if (getUtfByteLength(data) > MAX_IMPORT_DATA_PAYLOAD_BYTES) {
+                errors.push(
+                    `data exceeds ${MAX_IMPORT_DATA_PAYLOAD_BYTES} bytes; use SQLite backup/restore for large snapshots`
+                );
+            }
 
-function validateImportDataPayload(
-    params: readonly unknown[]
-): null | string[] {
-    const errors: string[] = [];
+            return errors.length > 0 ? errors : null;
+        },
+    ]
+);
 
-    if (params.length !== 1) {
-        errors.push("Expected exactly 1 parameter");
-    }
+const validateEncryptionPassphrasePayload: IpcParameterValidator =
+    createParamValidator(1, [
+        (candidate): ParameterValueValidationResult => {
+            const errors: string[] = [];
 
-    const [candidate] = params;
-    const stringError = IpcValidators.requiredString(candidate, "data");
-    if (stringError) {
-        errors.push(stringError);
-        return errors;
-    }
+            const stringError = IpcValidators.requiredString(
+                candidate,
+                "passphrase"
+            );
+            if (stringError) {
+                return toValidationResult(stringError);
+            }
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- validated as string above
-    const data = candidate as string;
-    if (getUtfByteLength(data) > MAX_IMPORT_DATA_PAYLOAD_BYTES) {
-        errors.push(
-            `data exceeds ${MAX_IMPORT_DATA_PAYLOAD_BYTES} bytes; use SQLite backup/restore for large snapshots`
-        );
-    }
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- validated as string above
+            const passphrase = candidate as string;
+            if (
+                getUtfByteLength(passphrase) > MAX_ENCRYPTION_PASSPHRASE_BYTES
+            ) {
+                errors.push(
+                    `passphrase must not exceed ${MAX_ENCRYPTION_PASSPHRASE_BYTES} bytes`
+                );
+            }
 
-    return errors.length > 0 ? errors : null;
-}
+            if (hasAsciiControlCharacters(passphrase)) {
+                errors.push("passphrase must not contain control characters");
+            }
 
-function validateEncryptionPassphrasePayload(
-    params: readonly unknown[]
-): null | string[] {
-    const errors: string[] = [];
+            if (passphrase.trim().length < 8) {
+                errors.push(
+                    "passphrase must be at least 8 characters (after trimming)"
+                );
+            }
 
-    if (params.length !== 1) {
-        errors.push("Expected exactly 1 parameter");
-    }
-
-    const [candidate] = params;
-    const stringError = IpcValidators.requiredString(candidate, "passphrase");
-    if (stringError) {
-        errors.push(stringError);
-        return errors;
-    }
-
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- validated as string above
-    const passphrase = candidate as string;
-    if (getUtfByteLength(passphrase) > MAX_ENCRYPTION_PASSPHRASE_BYTES) {
-        errors.push(
-            `passphrase must not exceed ${MAX_ENCRYPTION_PASSPHRASE_BYTES} bytes`
-        );
-    }
-
-    return errors.length > 0 ? errors : null;
-}
+            return errors.length > 0 ? errors : null;
+        },
+    ]);
 
 /**
  * Helper function to create validators for handlers expecting a single string
@@ -766,30 +800,25 @@ function validateEncryptionPassphrasePayload(
  */
 function createSingleStringValidator(paramName: string): IpcParameterValidator {
     return createParamValidator(1, [
-        (
-            value
-        ):
-            | null
-            | string => IpcValidators.requiredString(value, paramName),
+        (value): ParameterValueValidationResult =>
+            toValidationResult(IpcValidators.requiredString(value, paramName)),
     ]);
 }
 
 function createClipboardTextValidator(): IpcParameterValidator {
     return createParamValidator(1, [
-        (
-            value
-        ):
-            | null
-            | string => {
+        (value): ParameterValueValidationResult => {
             const error = IpcValidators.requiredString(value, "text");
             if (error) {
-                return error;
+                return toValidationResult(error);
             }
 
             // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- validated above
             const text = value as string;
             if (getUtfByteLength(text) > MAX_CLIPBOARD_TEXT_BYTES) {
-                return `text must not exceed ${MAX_CLIPBOARD_TEXT_BYTES} bytes`;
+                return toValidationResult(
+                    `text must not exceed ${MAX_CLIPBOARD_TEXT_BYTES} bytes`
+                );
             }
 
             return null;
@@ -799,34 +828,38 @@ function createClipboardTextValidator(): IpcParameterValidator {
 
 function createBackupKeyValidator(paramName: string): IpcParameterValidator {
     return createParamValidator(1, [
-        (
-            value
-        ):
-            | null
-            | string => {
+        (value): ParameterValueValidationResult => {
             const error = IpcValidators.requiredString(value, paramName);
             if (error) {
-                return error;
+                return toValidationResult(error);
             }
 
             // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- validated above
-            const key = (value as string).replaceAll("\\", "/").trim();
+            const key = normalizePathSeparatorsToPosix(value as string).trim();
 
             if (getUtfByteLength(key) > MAX_BACKUP_KEY_BYTES) {
-                return `${paramName} must not exceed ${MAX_BACKUP_KEY_BYTES} bytes`;
+                return toValidationResult(
+                    `${paramName} must not exceed ${MAX_BACKUP_KEY_BYTES} bytes`
+                );
             }
 
             // Reject ASCII control characters including NUL.
             if (hasAsciiControlCharacters(key)) {
-                return `${paramName} must not contain control characters`;
+                return toValidationResult(
+                    `${paramName} must not contain control characters`
+                );
             }
 
             if (!key.startsWith("backups/")) {
-                return `${paramName} must start with 'backups/'`;
+                return toValidationResult(
+                    `${paramName} must start with 'backups/'`
+                );
             }
 
             if (key === "backups/" || key.endsWith("/")) {
-                return `${paramName} must reference a backup object key`;
+                return toValidationResult(
+                    `${paramName} must reference a backup object key`
+                );
             }
 
             // Defense-in-depth: provider keys are logical identifiers, not OS
@@ -836,22 +869,30 @@ function createBackupKeyValidator(paramName: string): IpcParameterValidator {
                 key.includes(":") ||
                 key.includes("://")
             ) {
-                return `${paramName} must be a relative provider key`;
+                return toValidationResult(
+                    `${paramName} must be a relative provider key`
+                );
             }
 
             const segments = key.split("/");
             if (segments.some((segment) => segment.length === 0)) {
-                return `${paramName} must not contain empty path segments`;
+                return toValidationResult(
+                    `${paramName} must not contain empty path segments`
+                );
             }
 
             if (
                 segments.some((segment) => segment === "." || segment === "..")
             ) {
-                return `${paramName} must not contain path traversal segments`;
+                return toValidationResult(
+                    `${paramName} must not contain path traversal segments`
+                );
             }
 
             if (key.endsWith(".metadata.json")) {
-                return `${paramName} must reference the backup object, not metadata`;
+                return toValidationResult(
+                    `${paramName} must reference the backup object, not metadata`
+                );
             }
 
             return null;
@@ -863,11 +904,10 @@ function createSingleExternalOpenUrlValidator(
     paramName: string
 ): IpcParameterValidator {
     return createParamValidator(1, [
-        (
-            value
-        ):
-            | null
-            | string => IpcValidators.requiredExternalOpenUrl(value, paramName),
+        (value): ParameterValueValidationResult =>
+            toValidationResult(
+                IpcValidators.requiredExternalOpenUrl(value, paramName)
+            ),
     ]);
 }
 
@@ -884,16 +924,14 @@ function createStringObjectValidator(
     objectParamName: string
 ): IpcParameterValidator {
     return createParamValidator(2, [
-        (
-            value
-        ):
-            | null
-            | string => IpcValidators.requiredString(value, stringParamName),
-        (
-            value
-        ):
-            | null
-            | string => IpcValidators.requiredObject(value, objectParamName),
+        (value): ParameterValueValidationResult =>
+            toValidationResult(
+                IpcValidators.requiredString(value, stringParamName)
+            ),
+        (value): ParameterValueValidationResult =>
+            toValidationResult(
+                IpcValidators.requiredObject(value, objectParamName)
+            ),
     ]);
 }
 
@@ -909,12 +947,11 @@ function createStringWithUnvalidatedSecondValidator(
     firstParamName: string
 ): IpcParameterValidator {
     return createParamValidator(2, [
-        (
-            value
-        ):
-            | null
-            | string => IpcValidators.requiredString(value, firstParamName),
-        (): null => null,
+        (value): ParameterValueValidationResult =>
+            toValidationResult(
+                IpcValidators.requiredString(value, firstParamName)
+            ),
+        (): ParameterValueValidationResult => null,
     ]);
 }
 
@@ -932,16 +969,14 @@ function createTwoStringValidator(
     secondParamName: string
 ): IpcParameterValidator {
     return createParamValidator(2, [
-        (
-            value
-        ):
-            | null
-            | string => IpcValidators.requiredString(value, firstParamName),
-        (
-            value
-        ):
-            | null
-            | string => IpcValidators.requiredString(value, secondParamName),
+        (value): ParameterValueValidationResult =>
+            toValidationResult(
+                IpcValidators.requiredString(value, firstParamName)
+            ),
+        (value): ParameterValueValidationResult =>
+            toValidationResult(
+                IpcValidators.requiredString(value, secondParamName)
+            ),
     ]);
 }
 
@@ -985,7 +1020,10 @@ export const SiteHandlerValidators: SiteHandlerValidatorsInterface = {
      * @remarks
      * Expects two parameters: site identifier and monitor ID (both strings).
      */
-    removeMonitor: createTwoStringValidator("siteIdentifier", "monitorId"),
+    removeMonitor: createSiteIdentifierAndMonitorIdValidator(
+        "siteIdentifier",
+        "monitorId"
+    ),
 
     /**
      * Validates parameters for the "remove-site" IPC handler.
@@ -993,7 +1031,7 @@ export const SiteHandlerValidators: SiteHandlerValidatorsInterface = {
      * @remarks
      * Expects a single parameter: the site identifier (string).
      */
-    removeSite: createSingleStringValidator("identifier"),
+    removeSite: createSiteIdentifierValidator("identifier"),
 
     /**
      * Validates parameters for the "update-site" IPC handler.
@@ -1021,7 +1059,10 @@ export const MonitoringHandlerValidators: MonitoringHandlerValidatorsInterface =
          * Expects two parameters: site identifier and monitor ID (both
          * strings).
          */
-        checkSiteNow: createTwoStringValidator("identifier", "monitorId"),
+        checkSiteNow: createSiteIdentifierAndMonitorIdValidator(
+            "identifier",
+            "monitorId"
+        ),
 
         /**
          * Validates parameters for the "start-monitoring" IPC handler.
@@ -1039,7 +1080,7 @@ export const MonitoringHandlerValidators: MonitoringHandlerValidatorsInterface =
          * Expects two parameters: site identifier (string) and monitor ID
          * (string).
          */
-        startMonitoringForMonitor: createTwoStringValidator(
+        startMonitoringForMonitor: createSiteIdentifierAndMonitorIdValidator(
             "identifier",
             "monitorId"
         ),
@@ -1050,7 +1091,7 @@ export const MonitoringHandlerValidators: MonitoringHandlerValidatorsInterface =
          * @remarks
          * Expects one parameter: site identifier (string).
          */
-        startMonitoringForSite: createSingleStringValidator("identifier"),
+        startMonitoringForSite: createSiteIdentifierValidator("identifier"),
 
         /**
          * Validates parameters for the "stop-monitoring" IPC handler.
@@ -1068,7 +1109,7 @@ export const MonitoringHandlerValidators: MonitoringHandlerValidatorsInterface =
          * Expects two parameters: site identifier (string) and monitor ID
          * (string).
          */
-        stopMonitoringForMonitor: createTwoStringValidator(
+        stopMonitoringForMonitor: createSiteIdentifierAndMonitorIdValidator(
             "identifier",
             "monitorId"
         ),
@@ -1079,7 +1120,7 @@ export const MonitoringHandlerValidators: MonitoringHandlerValidatorsInterface =
          * @remarks
          * Expects one parameter: site identifier (string).
          */
-        stopMonitoringForSite: createSingleStringValidator("identifier"),
+        stopMonitoringForSite: createSiteIdentifierValidator("identifier"),
     } as const;
 
 /**

@@ -11,18 +11,10 @@
         "maxNodeModuleJsDepth": 0,
         "outDir": ".cache/builds/jsconfig",
         "paths": {
-            "@app/*": [
-                "src/*"
-            ],
-            "@assets/*": [
-                "assets/*"
-            ],
-            "@electron/*": [
-                "electron/*"
-            ],
-            "@shared/*": [
-                "shared/*"
-            ]
+            "@app/*": ["src/*"],
+            "@assets/*": ["assets/*"],
+            "@electron/*": ["electron/*"],
+            "@shared/*": ["shared/*"]
         },
         "resolveJsonModule": false,
         "skipDefaultLibCheck": true,

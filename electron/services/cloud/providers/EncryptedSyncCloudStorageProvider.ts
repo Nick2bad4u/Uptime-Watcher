@@ -1,6 +1,9 @@
 import type { CloudBackupEntry, CloudProviderKind } from "@shared/types/cloud";
 import type { SerializedDatabaseBackupMetadata } from "@shared/types/databaseBackup";
 
+import { tryGetErrorCode } from "@shared/utils/errorCodes";
+import { ensureError } from "@shared/utils/errorHandling";
+
 import type {
     CloudObjectEntry,
     CloudStorageProvider,
@@ -11,98 +14,10 @@ import {
     encryptBuffer,
     isEncryptedPayload,
 } from "../crypto/cloudCrypto";
+import { CloudProviderOperationError } from "./cloudProviderErrors";
 
 const SYNC_PREFIX = "sync/" as const;
 const MANIFEST_KEY = "manifest.json" as const;
-
-function isAsciiDigits(value: string): boolean {
-    if (value.length === 0) {
-        return false;
-    }
-
-    for (const char of value) {
-        const codePoint = char.codePointAt(0);
-        if (codePoint === undefined || codePoint < 48 || codePoint > 57) {
-            return false;
-        }
-    }
-
-    return true;
-}
-
-function parseSyncObjectCreatedAt(key: string): null | number {
-    if (key.startsWith("sync/snapshots/")) {
-        const segments = key.split("/");
-        if (segments.length !== 4) {
-            return null;
-        }
-
-        const [syncSegment, snapshotsSegment, schemaSegment, fileName] =
-            segments;
-
-        if (
-            !syncSegment ||
-            !snapshotsSegment ||
-            !schemaSegment ||
-            !fileName ||
-            syncSegment !== "sync" ||
-            snapshotsSegment !== "snapshots" ||
-            schemaSegment.length === 0 ||
-            !fileName.endsWith(".json")
-        ) {
-            return null;
-        }
-
-        const stem = fileName.slice(0, -".json".length);
-        if (!isAsciiDigits(stem)) {
-            return null;
-        }
-
-        const createdAt = Number(stem);
-        return Number.isSafeInteger(createdAt) && createdAt >= 0
-            ? createdAt
-            : null;
-    }
-
-    if (key.startsWith("sync/devices/")) {
-        const segments = key.split("/");
-        if (segments.length !== 5) {
-            return null;
-        }
-
-        const [syncSegment, devicesSegment, deviceId, opsSegment, fileName] =
-            segments;
-
-        if (
-            !syncSegment ||
-            !devicesSegment ||
-            !deviceId ||
-            !opsSegment ||
-            !fileName ||
-            syncSegment !== "sync" ||
-            devicesSegment !== "devices" ||
-            deviceId.length === 0 ||
-            opsSegment !== "ops" ||
-            !fileName.endsWith(".ndjson")
-        ) {
-            return null;
-        }
-
-        const stem = fileName.slice(0, -".ndjson".length);
-        const parts = stem.split("-");
-        const [createdAtRaw] = parts;
-        if (!createdAtRaw || !isAsciiDigits(createdAtRaw)) {
-            return null;
-        }
-
-        const createdAt = Number(createdAtRaw);
-        return Number.isSafeInteger(createdAt) && createdAt >= 0
-            ? createdAt
-            : null;
-    }
-
-    return null;
-}
 
 function shouldEncryptSyncObject(key: string): boolean {
     if (key === MANIFEST_KEY) {
@@ -121,8 +36,6 @@ export class EncryptedSyncCloudStorageProvider implements CloudStorageProvider {
 
     private readonly key: Buffer;
 
-    private readonly encryptionEnabledAt: number | undefined;
-
     public get kind(): CloudProviderKind {
         return this.inner.kind;
     }
@@ -138,31 +51,43 @@ export class EncryptedSyncCloudStorageProvider implements CloudStorageProvider {
     }
 
     public async downloadObject(key: string): Promise<Buffer> {
-        const buffer = await this.inner.downloadObject(key);
+        try {
+            const buffer = await this.inner.downloadObject(key);
 
-        if (!shouldEncryptSyncObject(key)) {
-            return buffer;
-        }
-
-        if (!isEncryptedPayload(buffer)) {
-            if (this.encryptionEnabledAt === undefined) {
+            if (!shouldEncryptSyncObject(key)) {
                 return buffer;
             }
 
-            const createdAt = parseSyncObjectCreatedAt(key);
-            if (createdAt !== null && createdAt < this.encryptionEnabledAt) {
-                return buffer;
+            if (!isEncryptedPayload(buffer)) {
+                throw new CloudProviderOperationError(
+                    "Refusing to read unencrypted sync object",
+                    {
+                        operation: "downloadObject",
+                        providerKind: this.kind,
+                        target: key,
+                    }
+                );
             }
 
-            // If encryption is enabled and the object appears "new" (or we
-            // cannot determine its creation timestamp), refuse to accept
-            // plaintext sync artifacts.
-            throw new Error(
-                "Refusing to read unencrypted sync object after encryption was enabled"
+            return decryptBuffer({ ciphertext: buffer, key: this.key });
+        } catch (error) {
+            if (error instanceof CloudProviderOperationError) {
+                throw error;
+            }
+
+            const code = tryGetErrorCode(error);
+            const normalized = ensureError(error);
+            throw new CloudProviderOperationError(
+                `Failed to download encrypted sync object '${key}': ${normalized.message}`,
+                {
+                    cause: error,
+                    code,
+                    operation: "downloadObject",
+                    providerKind: this.kind,
+                    target: key,
+                }
             );
         }
-
-        return decryptBuffer({ ciphertext: buffer, key: this.key });
     }
 
     public async isConnected(): Promise<boolean> {
@@ -191,28 +116,42 @@ export class EncryptedSyncCloudStorageProvider implements CloudStorageProvider {
         key: string;
         overwrite?: boolean;
     }): Promise<CloudObjectEntry> {
-        if (!shouldEncryptSyncObject(args.key)) {
-            return this.inner.uploadObject(args);
+        try {
+            if (!shouldEncryptSyncObject(args.key)) {
+                return await this.inner.uploadObject(args);
+            }
+
+            const encryptedBuffer = encryptBuffer({
+                key: this.key,
+                plaintext: args.buffer,
+            });
+
+            return await this.inner.uploadObject({
+                ...args,
+                buffer: encryptedBuffer,
+            });
+        } catch (error) {
+            if (error instanceof CloudProviderOperationError) {
+                throw error;
+            }
+
+            const code = tryGetErrorCode(error);
+            const normalized = ensureError(error);
+            throw new CloudProviderOperationError(
+                `Failed to upload encrypted sync object '${args.key}': ${normalized.message}`,
+                {
+                    cause: error,
+                    code,
+                    operation: "uploadObject",
+                    providerKind: this.kind,
+                    target: args.key,
+                }
+            );
         }
-
-        const encryptedBuffer = encryptBuffer({
-            key: this.key,
-            plaintext: args.buffer,
-        });
-
-        return this.inner.uploadObject({
-            ...args,
-            buffer: encryptedBuffer,
-        });
     }
 
-    public constructor(args: {
-        encryptionEnabledAt?: number | undefined;
-        inner: CloudStorageProvider;
-        key: Buffer;
-    }) {
+    public constructor(args: { inner: CloudStorageProvider; key: Buffer }) {
         this.inner = args.inner;
         this.key = args.key;
-        this.encryptionEnabledAt = args.encryptionEnabledAt;
     }
 }

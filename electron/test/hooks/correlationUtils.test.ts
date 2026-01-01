@@ -7,8 +7,8 @@ import { describe, it, expect } from "vitest";
 
 import {
     generateCorrelationId,
-    ValidationError,
-} from "../../utils/correlation";
+} from "@shared/utils/correlation";
+import { ValidationError } from "@shared/utils/validationError";
 
 describe("correlationUtils", () => {
     describe(generateCorrelationId, () => {

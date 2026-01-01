@@ -142,7 +142,7 @@ describe("Function Coverage Boost - Targeting Actual Exports", () => {
                 errorCatalogModule.isKnownErrorMessage("Site not found")
             ).toBeTruthy();
             expect(
-                errorCatalogModule.isKnownErrorMessage("Unknown error")
+                errorCatalogModule.isKnownErrorMessage("Unknown error message")
             ).toBeFalsy();
 
             // Test ERROR_CATALOG access

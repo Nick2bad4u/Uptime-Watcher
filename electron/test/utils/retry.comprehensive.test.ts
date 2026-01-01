@@ -906,10 +906,12 @@ describe("Retry Utilities", () => {
             await annotate("Type: Business Logic", "type");
 
             const operations = Array.from({ length: 10 }, (_, i) =>
-                vi.fn().mockResolvedValue(`result-${i}`));
+                vi.fn().mockResolvedValue(`result-${i}`)
+            );
 
             const promises = operations.map((op, i) =>
-                withRetry(op, { operationName: `operation-${i}` }));
+                withRetry(op, { operationName: `operation-${i}` })
+            );
 
             const results = await Promise.all(promises);
 

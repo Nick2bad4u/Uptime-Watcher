@@ -36,6 +36,7 @@
  * @public
  */
 
+import { isRecord } from "@shared/utils/typeHelpers";
 import { create, type StoreApi, type UseBoundStore } from "zustand";
 import { persist, type PersistOptions } from "zustand/middleware";
 
@@ -45,10 +46,6 @@ import type { SettingsStore } from "./types";
 import { syncSettingsAfterRehydration } from "./hydration";
 import { createSettingsOperationsSlice } from "./operations";
 import { createSettingsStateSlice, normalizeAppSettings } from "./state";
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-    return typeof value === "object" && value !== null;
-}
 
 /**
  * Zustand store for managing application settings with persistence.

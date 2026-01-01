@@ -265,46 +265,46 @@ describe("SettingsTab arithmetic mutations", () => {
         selectedMonitor: mockMonitor,
         setLocalName: vi.fn(),
         timeoutChanged: false,
-        localCheckInterval: 60_000,
+        localCheckIntervalMs: 60_000,
         localRetryAttempts: 3,
-        localTimeout: 30,
+        localTimeoutSeconds: 30,
     };
 
-    describe("Line 466: Math.round(localCheckInterval / 1000) mutation", () => {
+    describe(
+        "Line 466: Math.round(localCheckIntervalMs / 1000) mutation",
+        () => {
         it("should correctly convert 60000ms to 60s (kills / -> * mutation)", () => {
             const props = {
                 ...defaultProps,
-                localCheckInterval: 60_000, // 60000ms should show as 60s
+                localCheckIntervalMs: 60_000, // 60000ms should show as 60s
             };
 
             render(<SettingsTab {...props} />);
 
-            // Should display "Monitor checks every 60 seconds"
-            expect(
-                screen.getByText(/Monitor checks every 60 seconds/)
-            ).toBeInTheDocument();
+            // Remains readable with the new help callout formatting.
+            expect(screen.getByText(/Current:\s*60s/u)).toBeInTheDocument();
 
             // Mutation (/ 1000 -> * 1000) would yield 60,000,000 which would be incorrect
             expect(
-                screen.queryByText(/Monitor checks every 60{7} seconds/)
+                screen.queryByText(/Currently:\s*60{7}s/u)
             ).not.toBeInTheDocument();
         });
 
         it("should handle sub-second intervals correctly", () => {
             const props = {
                 ...defaultProps,
-                localCheckInterval: 500, // 500ms should round to 1s
+                localCheckIntervalMs: 500, // 500ms should round to 1s
             };
             render(<SettingsTab {...props} />);
 
-            // Should display "Monitor checks every 1 seconds" (Math.round(0.5) = 1)
+            // (Math.round(0.5) = 1)
             expect(
-                screen.getByText(/Monitor checks every 1 seconds/)
+                screen.getByText(/How often Uptime Watcher runs a check for this monitor/u)
             ).toBeInTheDocument();
 
             // Mutation (/ 1000 -> * 1000) would yield 500,000 which would be incorrect
             expect(
-                screen.queryByText(/Monitor checks every 50{5} seconds/)
+                screen.queryByText(/Currently:\s*50{5}s/u)
             ).not.toBeInTheDocument();
         });
     });
@@ -314,14 +314,14 @@ describe("SettingsTab arithmetic mutations", () => {
             const props = {
                 ...defaultProps,
                 localRetryAttempts: 3,
-                localTimeout: 30,
+                localTimeoutSeconds: 30,
             };
 
             render(<SettingsTab {...props} />);
 
             // Should display "4 attempts" (3 + 1 = 4) - target the specific span with just the attempts text
             expect(
-                screen.getByText("4 attempts + backoff")
+                screen.getByText(/\b4 attempts \+ backoff\./u)
             ).toBeInTheDocument();
 
             // Mutation (+ 1 -> - 1) would yield 2 attempts which would be incorrect
@@ -334,7 +334,7 @@ describe("SettingsTab arithmetic mutations", () => {
             const props = {
                 ...defaultProps,
                 localRetryAttempts: 0,
-                localTimeout: 30,
+                localTimeoutSeconds: 30,
             };
 
             render(<SettingsTab {...props} />);
@@ -473,21 +473,18 @@ describe("SettingsTab arithmetic mutations", () => {
         it("should display all arithmetic calculations correctly in UI", () => {
             const props = {
                 ...defaultProps,
-                localCheckInterval: 30_000, // 30s
+                localCheckIntervalMs: 30_000, // 30s
                 localRetryAttempts: 2,
-                localTimeout: 10,
+                localTimeoutSeconds: 10,
             };
 
             render(<SettingsTab {...props} />);
 
-            // Check interval display: Math.round(30000 / 1000) = 30 seconds
-            expect(
-                screen.getByText(/Monitor checks every 30 seconds/)
-            ).toBeInTheDocument();
+            expect(screen.getByText(/Current:\s*30s/u)).toBeInTheDocument();
 
             // Check retry attempts display: 2 + 1 = 3 attempts - target the specific span
             expect(
-                screen.getByText("3 attempts + backoff")
+                screen.getByText(/\b3 attempts \+ backoff\./u)
             ).toBeInTheDocument();
 
             // Check max duration calculation appears (calculateMaxDuration with all its arithmetic)

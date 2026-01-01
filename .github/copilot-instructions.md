@@ -58,7 +58,7 @@ applyTo: "**"
 - Deliver fixes that handle edge cases, include error handling, and won't break under future refactors.
 - Take the time needed for careful design, testing, and review rather than rushing to finish tasks.
 - Only implement backwards-compatibility layers or wrappers with explicit approval.
-- Follow current, supported patterns and best practices; propose migrations when legacy or deprecated approaches are encountered.
+- Follow current, supported patterns and best practices; propose migrations when older or deprecated approaches are encountered.
 - Prioritize code quality, maintainability, readability.
 - Avoid `any` type; use `unknown` with type guards instead.
 - Avoid barrel exports (`index.ts` re-exports) except at module boundaries.

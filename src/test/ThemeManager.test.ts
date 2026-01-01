@@ -541,45 +541,43 @@ describe(ThemeManager, () => {
 
             // These should all complete without throwing, exercising the null checks
             expect(() =>
-                manager.generateCSSVariables(
-                    themeWithNullBorderRadius
-                )).not.toThrowError();
+                manager.generateCSSVariables(themeWithNullBorderRadius)
+            ).not.toThrowError();
             expect(() =>
-                manager.generateCSSVariables(
-                    themeWithNullSpacing
-                )).not.toThrowError();
+                manager.generateCSSVariables(themeWithNullSpacing)
+            ).not.toThrowError();
             expect(() =>
-                manager.generateCSSVariables(
-                    themeWithNullShadows
-                )).not.toThrowError();
+                manager.generateCSSVariables(themeWithNullShadows)
+            ).not.toThrowError();
             expect(() =>
-                manager.generateCSSVariables(
-                    themeWithNullColors
-                )).not.toThrowError();
+                manager.generateCSSVariables(themeWithNullColors)
+            ).not.toThrowError();
             expect(() =>
-                manager.generateCSSVariables(
-                    themeWithNullTypography
-                )).not.toThrowError();
+                manager.generateCSSVariables(themeWithNullTypography)
+            ).not.toThrowError();
             expect(() =>
-                manager.generateCSSVariables(
-                    themeWithNullFontSize
-                )).not.toThrowError();
+                manager.generateCSSVariables(themeWithNullFontSize)
+            ).not.toThrowError();
 
             // Also test applyTheme method which calls the apply methods directly
             expect(() =>
-                manager.applyTheme(
-                    themeWithNullBorderRadius
-                )).not.toThrowError();
+                manager.applyTheme(themeWithNullBorderRadius)
+            ).not.toThrowError();
             expect(() =>
-                manager.applyTheme(themeWithNullSpacing)).not.toThrowError();
+                manager.applyTheme(themeWithNullSpacing)
+            ).not.toThrowError();
             expect(() =>
-                manager.applyTheme(themeWithNullShadows)).not.toThrowError();
+                manager.applyTheme(themeWithNullShadows)
+            ).not.toThrowError();
             expect(() =>
-                manager.applyTheme(themeWithNullColors)).not.toThrowError();
+                manager.applyTheme(themeWithNullColors)
+            ).not.toThrowError();
             expect(() =>
-                manager.applyTheme(themeWithNullTypography)).not.toThrowError();
+                manager.applyTheme(themeWithNullTypography)
+            ).not.toThrowError();
             expect(() =>
-                manager.applyTheme(themeWithNullFontSize)).not.toThrowError();
+                manager.applyTheme(themeWithNullFontSize)
+            ).not.toThrowError();
         });
 
         it("should handle undefined document in applyThemeClasses", async ({

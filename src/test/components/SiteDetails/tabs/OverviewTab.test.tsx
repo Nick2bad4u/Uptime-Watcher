@@ -283,7 +283,8 @@ const createAvailabilityColors = () => ({
               ? "Great"
               : value >= 90
                 ? "Fair"
-                : "Poor"),
+                : "Poor"
+    ),
 });
 
 let availabilityColorsMock: ReturnType<typeof createAvailabilityColors>;
@@ -322,8 +323,8 @@ describe(OverviewTab, () => {
         handleTimeoutChange: mockHandleTimeoutChange,
         intervalChanged: false,
         isLoading: false,
-        localCheckInterval: 60_000,
-        localTimeout: 5000,
+        localCheckIntervalMs: 60_000,
+        localTimeoutSeconds: 5,
         onCheckNow: mockOnCheckNow,
         selectedMonitor: createMockMonitor(),
         slowestResponse: 200,
@@ -799,7 +800,9 @@ describe(OverviewTab, () => {
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
-            render(<OverviewTab {...baseProps} localCheckInterval={30_000} />);
+            render(
+                <OverviewTab {...baseProps} localCheckIntervalMs={30_000} />
+            );
 
             expect(
                 document.querySelector(".themed-select")
@@ -817,7 +820,9 @@ describe(OverviewTab, () => {
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
-            render(<OverviewTab {...baseProps} localTimeout={30_000} />);
+            render(
+                <OverviewTab {...baseProps} localTimeoutSeconds={30} />
+            );
 
             expect(document.querySelector(".themed-input")).toBeInTheDocument();
         });

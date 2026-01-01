@@ -52,24 +52,19 @@ vi.mock("../../../theme/components", () => ({
             {children}
         </div>
     )),
-    ThemedButton: vi.fn(({
-        children,
-        onClick,
-        variant,
-        size,
-        className,
-        ...props
-    }) => (
-        <button
-            onClick={onClick}
-            data-variant={variant}
-            data-size={size}
-            className={className}
-            {...props}
-        >
-            {children}
-        </button>
-    )),
+    ThemedButton: vi.fn(
+        ({ children, onClick, variant, size, className, ...props }) => (
+            <button
+                onClick={onClick}
+                data-variant={variant}
+                data-size={size}
+                className={className}
+                {...props}
+            >
+                {children}
+            </button>
+        )
+    ),
     ThemedText: vi.fn(({ children, size, variant, ...props }) => (
         <span data-size={size} data-variant={variant} {...props}>
             {children}
@@ -117,28 +112,26 @@ vi.mock(
 vi.mock(
     "../../../components/common/SiteMonitoringButton/SiteMonitoringButton",
     () => ({
-        SiteMonitoringButton: vi.fn(({
-            isLoading,
-            onStartSiteMonitoring,
-            onStopSiteMonitoring,
-        }) => (
-            <div data-testid="site-monitoring-button">
-                <button
-                    data-testid="start-site-monitoring"
-                    onClick={onStartSiteMonitoring}
-                    disabled={isLoading}
-                >
-                    Start Site
-                </button>
-                <button
-                    data-testid="stop-site-monitoring"
-                    onClick={onStopSiteMonitoring}
-                    disabled={isLoading}
-                >
-                    Stop Site
-                </button>
-            </div>
-        )),
+        SiteMonitoringButton: vi.fn(
+            ({ isLoading, onStartSiteMonitoring, onStopSiteMonitoring }) => (
+                <div data-testid="site-monitoring-button">
+                    <button
+                        data-testid="start-site-monitoring"
+                        onClick={onStartSiteMonitoring}
+                        disabled={isLoading}
+                    >
+                        Start Site
+                    </button>
+                    <button
+                        data-testid="stop-site-monitoring"
+                        onClick={onStopSiteMonitoring}
+                        disabled={isLoading}
+                    >
+                        Stop Site
+                    </button>
+                </div>
+            )
+        ),
     })
 );
 

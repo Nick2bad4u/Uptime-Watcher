@@ -269,10 +269,7 @@ describe("bridgeFactory", function describeBridgeFactorySuite() {
 
             const args: IpcInvokeChannelParams<
                 typeof SITES_CHANNELS.removeMonitor
-            > = [
-                "site-1",
-                "monitor-1",
-            ];
+            > = ["site-1", "monitor-1"];
 
             const persistedSite = {
                 identifier: "site-1",

@@ -119,13 +119,13 @@ const electronProjects: ProjectConfig[] = [
 
 const uiProjects: ProjectConfig[] = [
     createUiProject({
-        grep: /@smoke/,
+        grep: /@smoke/u,
         metadata: { tier: "smoke" },
         name: "ui-smoke",
         workers: Math.min(2, uiTestWorkerCount),
     }),
     createUiProject({
-        grepInvert: /@smoke/,
+        grepInvert: /@smoke/u,
         metadata: { tier: "regression" },
         name: "ui-regression",
     }),

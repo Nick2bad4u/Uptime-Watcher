@@ -1,6 +1,15 @@
 /**
- * Utility helpers for building renderer-side IPC services with consistent
- * initialization and error handling semantics.
+ * Renderer-side IPC service helper factory.
+ *
+ * @remarks
+ * Centralizes preload bridge readiness checks and consistent error handling for
+ * renderer services that call {@link window.electronAPI}.
+ *
+ * Concurrency semantics:
+ *
+ * - Concurrent calls share a single in-flight initialization promise.
+ * - Once the in-flight promise settles, the cached promise is cleared so
+ *   sequential calls re-validate the bridge.
  */
 
 import { ensureError } from "@shared/utils/errorHandling";
@@ -93,14 +102,21 @@ const defaultLogger: LoggerLike | null = resolveDefaultLogger();
  *
  * @internal
  */
-const createStructuredFallbackLogger = (serviceName: string): LoggerLike => ({
-    debug: (message: string, ...details: unknown[]): void => {
-        log.debug(`[${serviceName}] ${message}`, ...details);
-    },
-    error: (message: string, ...details: unknown[]): void => {
-        log.error(`[${serviceName}] ${message}`, ...details);
-    },
-});
+const createStructuredFallbackLogger = (serviceName: string): LoggerLike => {
+    const prefix = `[${serviceName}]`;
+
+    const normalizeMessage = (message: string): string =>
+        message.startsWith(prefix) ? message : `${prefix} ${message}`;
+
+    return {
+        debug: (message: string, ...details: unknown[]): void => {
+            log.debug(normalizeMessage(message), ...details);
+        },
+        error: (message: string, ...details: unknown[]): void => {
+            log.error(normalizeMessage(message), ...details);
+        },
+    };
+};
 
 /**
  * Options for configuring {@link createIpcServiceHelpers} behavior.
@@ -129,6 +145,7 @@ interface CreateIpcServiceHelpersOptions {
 export interface GuardedIpcServiceHelpers {
     /** Ensures the preload bridge is ready before IPC calls. */
     ensureInitialized: () => Promise<void>;
+
     /**
      * Wraps a handler so it automatically waits for initialization and logs
      * failures using a consistent format.
@@ -146,12 +163,6 @@ export interface GuardedIpcServiceHelpers {
  * Creates helper utilities that enforce guarded access to
  * {@link window.electronAPI}.
  *
- * @remarks
- * Each helper waits for {@link waitForElectronBridge} before executing the
- * wrapped handler and logs failures using the provided logger (or a console
- * fallback). Primarily used by renderer services to standardize preload
- * access.
- *
  * @param serviceName - Human-readable service name used for log messages.
  * @param options - Optional configuration overrides.
  *
@@ -167,37 +178,56 @@ export function createIpcServiceHelpers(
         options.logger ??
         defaultLogger ??
         createStructuredFallbackLogger(serviceName);
-    const ensureInitialized = async (): Promise<void> => {
-        try {
-            const bridgeOptions: WaitForElectronBridgeOptions = {
-                ...(options.bridgeContracts === undefined
-                    ? {}
-                    : { contracts: options.bridgeContracts }),
-                ...(options.bridgeOptions?.baseDelay === undefined
-                    ? {}
-                    : { baseDelay: options.bridgeOptions.baseDelay }),
-                ...(options.bridgeOptions?.maxAttempts === undefined
-                    ? {}
-                    : { maxAttempts: options.bridgeOptions.maxAttempts }),
-            };
 
-            await waitForElectronBridge(bridgeOptions);
-        } catch (error) {
-            const normalizedError = ensureError(error);
-            if (error instanceof ElectronBridgeNotReadyError) {
-                logger.error(
-                    `[${serviceName}] Failed to initialize:`,
-                    normalizedError,
-                    { diagnostics: error.diagnostics }
-                );
-            } else {
-                logger.error(
-                    `[${serviceName}] Failed to initialize:`,
-                    normalizedError
-                );
-            }
-            throw error;
+    let initializationPromise: Promise<void> | undefined = undefined;
+
+    const buildBridgeOptions = (): WaitForElectronBridgeOptions => ({
+        ...(options.bridgeContracts === undefined
+            ? {}
+            : { contracts: options.bridgeContracts }),
+        ...(options.bridgeOptions?.baseDelay === undefined
+            ? {}
+            : { baseDelay: options.bridgeOptions.baseDelay }),
+        ...(options.bridgeOptions?.maxAttempts === undefined
+            ? {}
+            : { maxAttempts: options.bridgeOptions.maxAttempts }),
+    });
+
+    const ensureInitialized = (): Promise<void> => {
+        if (initializationPromise) {
+            return initializationPromise;
         }
+
+        // Share in-flight initialization between concurrent callers.
+        const currentPromise = (async (): Promise<void> => {
+            try {
+                await waitForElectronBridge(buildBridgeOptions());
+            } catch (error: unknown) {
+                const normalizedError = ensureError(error);
+
+                if (error instanceof ElectronBridgeNotReadyError) {
+                    logger.error(
+                        `[${serviceName}] Failed to initialize:`,
+                        normalizedError,
+                        { diagnostics: error.diagnostics }
+                    );
+                } else {
+                    logger.error(
+                        `[${serviceName}] Failed to initialize:`,
+                        normalizedError
+                    );
+                }
+
+                throw error;
+            } finally {
+                // Clear the cached in-flight promise once it settles so
+                // sequential calls re-validate the bridge.
+                initializationPromise = undefined;
+            }
+        })();
+
+        initializationPromise = currentPromise;
+        return currentPromise;
     };
 
     const wrap: GuardedIpcServiceHelpers["wrap"] = function wrap<
@@ -257,13 +287,17 @@ export function getIpcServiceHelpers(
             options.logger ??
             defaultLogger ??
             createStructuredFallbackLogger(serviceName);
+
         loggerInstance.error(
             `[${serviceName}] Failed to create IPC service helpers`,
             ensuredError
         );
+
         throw new Error(
             `[${serviceName}] Failed to create IPC service helpers`,
-            { cause: error }
+            {
+                cause: error,
+            }
         );
     }
 }

@@ -27,7 +27,8 @@ const mockSafeExtractIpcData = vi.hoisted(() => vi.fn());
 vi.mock("@shared/utils/errorHandling", () => ({
     withErrorHandling: mockWithErrorHandling,
     ensureError: vi.fn((error) =>
-        error instanceof Error ? error : new Error(String(error))),
+        error instanceof Error ? error : new Error(String(error))
+    ),
 }));
 
 vi.mock("../../../stores/utils", () => ({

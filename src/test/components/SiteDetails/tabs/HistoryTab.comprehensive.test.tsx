@@ -31,32 +31,6 @@ vi.mock("../../../../theme/useTheme", () => ({
     })),
 }));
 
-// Mock icon imports while merging with actual modules
-vi.mock("react-icons/fi", async () => {
-    const actual =
-        await vi.importActual<typeof import("react-icons/fi")>(
-            "react-icons/fi"
-        );
-
-    return {
-        ...actual,
-        FiFilter: () => <div data-testid="filter-icon">FiFilter</div>,
-        FiInbox: () => <div data-testid="inbox-icon">FiInbox</div>,
-    } satisfies typeof actual;
-});
-
-vi.mock("react-icons/md", async () => {
-    const actual =
-        await vi.importActual<typeof import("react-icons/md")>(
-            "react-icons/md"
-        );
-
-    return {
-        ...actual,
-        MdHistory: () => <div data-testid="history-icon">MdHistory</div>,
-    } satisfies typeof actual;
-});
-
 // Mock themed components
 vi.mock("../../../../theme/components", () => ({
     StatusIndicator: ({ children, ...props }: any) => (
@@ -106,7 +80,8 @@ const mockUseTheme = vi.mocked(useTheme);
 
 describe(HistoryTab, () => {
     const mockFormatFullTimestamp = vi.fn((timestamp: number) =>
-        new Date(timestamp).toISOString());
+        new Date(timestamp).toISOString()
+    );
     const mockFormatResponseTime = vi.fn((time: number) => `${time}ms`);
     const createMockMonitor = (historyLength: number = 5): Monitor => ({
         id: "test-monitor",
@@ -272,7 +247,8 @@ describe(HistoryTab, () => {
                 "Down",
             ];
             const filterButtons = filterLabels.map((label) =>
-                screen.getByRole("button", { name: label }));
+                screen.getByRole("button", { name: label })
+            );
 
             expect(filterButtons).toHaveLength(filterLabels.length);
         });
@@ -317,7 +293,6 @@ describe(HistoryTab, () => {
             const monitor = createMockMonitor(0);
             render(<HistoryTab {...defaultProps} selectedMonitor={monitor} />);
 
-            expect(screen.getByTestId("inbox-icon")).toBeInTheDocument();
             expect(screen.getByText("No records found")).toBeInTheDocument();
         });
     });
@@ -736,7 +711,8 @@ describe(HistoryTab, () => {
             expect(() =>
                 render(
                     <HistoryTab {...defaultProps} selectedMonitor={monitor} />
-                )).not.toThrowError();
+                )
+            ).not.toThrowError();
         });
 
         it("should handle missing settings gracefully", ({
@@ -765,7 +741,8 @@ describe(HistoryTab, () => {
             expect(() =>
                 render(
                     <HistoryTab {...defaultProps} selectedMonitor={monitor} />
-                )).not.toThrowError();
+                )
+            ).not.toThrowError();
         });
 
         it("should handle history records with missing fields", ({
@@ -792,7 +769,8 @@ describe(HistoryTab, () => {
             expect(() =>
                 render(
                     <HistoryTab {...defaultProps} selectedMonitor={monitor} />
-                )).not.toThrowError();
+                )
+            ).not.toThrowError();
         });
     });
 

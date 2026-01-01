@@ -15,18 +15,10 @@
         "noUncheckedIndexedAccess": false,
         "outDir": "../../.cache/builds/test/js",
         "paths": {
-            "@app/*": [
-                "src/*"
-            ],
-            "@assets/*": [
-                "assets/*"
-            ],
-            "@electron/*": [
-                "electron/*"
-            ],
-            "@shared/*": [
-                "shared/*"
-            ]
+            "@app/*": ["src/*"],
+            "@assets/*": ["assets/*"],
+            "@electron/*": ["electron/*"],
+            "@shared/*": ["shared/*"]
         },
         "rootDir": "../..",
         "tsBuildInfoFile": "../../.cache/tsconfig.js.tsbuildinfo"

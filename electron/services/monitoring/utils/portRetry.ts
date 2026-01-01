@@ -17,6 +17,8 @@
  * @see {@link portErrorHandling.ts}
  */
 
+import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
+
 import type { MonitorCheckResult } from "../types";
 
 import { RETRY_BACKOFF } from "../../../constants";
@@ -99,10 +101,7 @@ export async function performPortCheckWithRetry(
             ? {
                   ...baseConfig,
                   onRetry: (attempt: number, error: Error): void => {
-                      const errorMessage =
-                          error instanceof Error
-                              ? error.message
-                              : String(error);
+                      const errorMessage = getUserFacingErrorDetail(error);
                       logger.debug(
                           `[PortMonitor] Port ${host}:${port} failed attempt ${attempt}/${totalAttempts}: ${errorMessage}`
                       );

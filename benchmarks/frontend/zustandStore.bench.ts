@@ -101,7 +101,8 @@ function createComplexStore(): StoreApi<ComplexState & ComplexActions> {
         updateItem: (id, updates) =>
             set((state) => ({
                 items: state.items.map((item) =>
-                    item.id === id ? { ...item, ...updates } : item),
+                    item.id === id ? { ...item, ...updates } : item
+                ),
                 metadata: { ...state.metadata, lastUpdate: Date.now() },
             })),
 

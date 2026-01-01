@@ -5,11 +5,10 @@
 
 import { describe, expect, it } from "vitest";
 import type { Monitor, Site } from "@shared/types";
-import {
-    getMonitorValidationErrors,
-    validateMonitorType,
-    validateSite,
-} from "@shared/utils/validation";
+import { getMonitorValidationErrors } from "@shared/validation/monitorSchemas";
+import { validateSiteData } from "@shared/validation/siteSchemas";
+import { validateMonitorType } from "@shared/utils/validation";
+import { MIN_MONITOR_CHECK_INTERVAL_MS } from "@shared/constants/monitoring";
 
 describe("Shared Validation - Backend Coverage", () => {
     describe(getMonitorValidationErrors, () => {
@@ -27,6 +26,9 @@ describe("Shared Validation - Backend Coverage", () => {
                 type: "http",
                 url: "https://example.com",
                 status: "pending",
+                monitoring: true,
+                responseTime: -1,
+                history: [],
                 checkInterval: 60_000,
                 timeout: 5000,
                 retryAttempts: 3,
@@ -46,6 +48,7 @@ describe("Shared Validation - Backend Coverage", () => {
             await annotate("Type: Error Handling", "type");
 
             const monitor: Partial<Monitor> = {
+                id: "",
                 type: "http",
                 checkInterval: 500,
                 timeout: -1,
@@ -53,12 +56,17 @@ describe("Shared Validation - Backend Coverage", () => {
             };
 
             const errors = getMonitorValidationErrors(monitor);
-            expect(errors).toHaveLength(6); // Updated to match actual count
-            expect(errors).toContain("Monitor id is required");
-            expect(errors).toContain("Check interval must be at least 1000ms");
-            expect(errors).toContain("Timeout must be a positive number");
-            expect(errors).toContain("Retry attempts must be between 0 and 10");
-            expect(errors).toContain("URL is required for HTTP monitors");
+            expect(errors).toEqual(
+                expect.arrayContaining([
+                    expect.stringContaining("Monitor ID is required"),
+                    expect.stringContaining(
+                        `Check interval must be at least ${MIN_MONITOR_CHECK_INTERVAL_MS}ms`
+                    ),
+                    expect.stringContaining("Timeout"),
+                    expect.stringContaining("Retry"),
+                    expect.stringContaining("url"),
+                ])
+            );
         });
 
         it("should validate port monitor fields", async ({
@@ -78,9 +86,11 @@ describe("Shared Validation - Backend Coverage", () => {
             };
 
             const errors = getMonitorValidationErrors(monitor);
-            expect(errors).toContain("Host is required for port monitors");
-            expect(errors).toContain(
-                "Valid port number (1-65535) is required for port monitors"
+            expect(errors).toEqual(
+                expect.arrayContaining([
+                    expect.stringContaining("host"),
+                    expect.stringContaining("port"),
+                ])
             );
         });
     });
@@ -112,15 +122,34 @@ describe("Shared Validation - Backend Coverage", () => {
         });
     });
 
-    describe(validateSite, () => {
+    describe(validateSiteData, () => {
         it("should validate complete site", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: sharedValidation", "component");
             await annotate("Category: Utility", "category");
             await annotate("Type: Validation", "type");
 
-            // Test disabled - the validateSiteData function is part of a larger validation system refactor
-            expect(true).toBeTruthy();
+            const site: Site = {
+                identifier: "test-site",
+                name: "Test Site",
+                monitoring: true,
+                monitors: [
+                    {
+                        id: "m1",
+                        type: "http",
+                        status: "up",
+                        monitoring: true,
+                        responseTime: -1,
+                        history: [],
+                        url: "https://example.com",
+                        checkInterval: MIN_MONITOR_CHECK_INTERVAL_MS,
+                        timeout: 1000,
+                        retryAttempts: 0,
+                    },
+                ],
+            };
+
+            expect(validateSiteData(site).success).toBeTruthy();
         });
 
         it("should reject invalid site structure", async ({
@@ -132,12 +161,14 @@ describe("Shared Validation - Backend Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(validateSite(null as unknown as Partial<Site>)).toBeFalsy();
             expect(
-                validateSite(undefined as unknown as Partial<Site>)
+                validateSiteData(null as unknown as Partial<Site>).success
             ).toBeFalsy();
             expect(
-                validateSite("string" as unknown as Partial<Site>)
+                validateSiteData(undefined as unknown as Partial<Site>).success
+            ).toBeFalsy();
+            expect(
+                validateSiteData("string" as unknown as Partial<Site>).success
             ).toBeFalsy();
         });
 
@@ -156,7 +187,7 @@ describe("Shared Validation - Backend Coverage", () => {
                 monitors: [],
             } as Partial<Site>;
 
-            expect(validateSite(site)).toBeFalsy();
+            expect(validateSiteData(site).success).toBeFalsy();
         });
 
         it("should reject site with invalid monitors", async ({
@@ -181,7 +212,7 @@ describe("Shared Validation - Backend Coverage", () => {
                 ],
             } as Partial<Site>;
 
-            expect(validateSite(site)).toBeFalsy();
+            expect(validateSiteData(site).success).toBeFalsy();
         });
     });
 });

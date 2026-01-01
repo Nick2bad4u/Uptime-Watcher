@@ -10,7 +10,11 @@
  * @packageDocumentation
  */
 
-import { isValidUrl } from "../validation/validatorUtils";
+import {
+    isValidInteger,
+    isValidPort as isValidPortValue,
+    isValidUrl,
+} from "../validation/validatorUtils";
 
 /**
  * Validates that a string field is not empty after trimming.
@@ -117,16 +121,37 @@ export function validatePort(
         };
     }
 
-    const portNum = Number.parseInt(portStr, 10);
+    if (typeof port === "string") {
+        // Preserve existing error messaging: distinguish non-numeric from
+        // out-of-range.
+        if (!isValidInteger(portStr)) {
+            return {
+                error: `${fieldName} must be a number`,
+                isValid: false,
+            };
+        }
 
-    if (Number.isNaN(portNum)) {
+        const portNum = Number.parseInt(portStr, 10);
+
+        if (!isValidPortValue(portNum)) {
+            return {
+                error: `${fieldName} must be between 1 and 65535`,
+                isValid: false,
+            };
+        }
+
+        return { isValid: true };
+    }
+
+    // Number input path
+    if (!Number.isFinite(port)) {
         return {
             error: `${fieldName} must be a number`,
             isValid: false,
         };
     }
 
-    if (portNum < 1 || portNum > 65_535) {
+    if (!isValidPortValue(port)) {
         return {
             error: `${fieldName} must be between 1 and 65535`,
             isValid: false,

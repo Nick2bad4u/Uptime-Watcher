@@ -93,7 +93,8 @@ const mockMonitorManager = vi.hoisted(() =>
             getMonitorStatus: vi.fn().mockReturnValue("stopped"),
             isInitialized: vi.fn().mockReturnValue(true),
         };
-    }));
+    })
+);
 
 const mockDatabaseService = vi.hoisted(() =>
     vi.fn(function DatabaseServiceMock() {
@@ -107,7 +108,8 @@ const mockDatabaseService = vi.hoisted(() =>
             rollbackTransaction: vi.fn(),
             getInstance: vi.fn().mockReturnThis(),
         };
-    }));
+    })
+);
 
 const mockDatabaseManager = vi.hoisted(() =>
     vi.fn(function DatabaseManagerMock() {
@@ -118,7 +120,8 @@ const mockDatabaseManager = vi.hoisted(() =>
             isInitialized: vi.fn().mockReturnValue(true),
             refreshSites: vi.fn().mockResolvedValue(undefined),
         };
-    }));
+    })
+);
 
 const mockUptimeOrchestrator = vi.hoisted(() =>
     vi.fn(function UptimeOrchestratorMock() {
@@ -130,7 +133,8 @@ const mockUptimeOrchestrator = vi.hoisted(() =>
             isInitialized: vi.fn().mockReturnValue(true),
             getHistoryLimit: vi.fn().mockReturnValue(100),
         };
-    }));
+    })
+);
 
 const mockIpcService = vi.hoisted(() =>
     vi.fn(function IpcServiceMock() {
@@ -139,7 +143,8 @@ const mockIpcService = vi.hoisted(() =>
             cleanup: vi.fn(),
             isInitialized: vi.fn().mockReturnValue(true),
         };
-    }));
+    })
+);
 
 // Hoisted mocks for all dependencies
 vi.mock("../../services/database/DatabaseService", () => ({

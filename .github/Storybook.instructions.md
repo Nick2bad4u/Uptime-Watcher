@@ -174,7 +174,7 @@ Secondary.args = {
 **Guidelines:**
 
 -   Prefer `StoryObj` style for **new stories**.
--   Use Template pattern only for **legacy stories** or when explicitly requested by project convention.
+-   Use Template pattern only for **older stories** or when explicitly requested by project convention.
 
 ---
 

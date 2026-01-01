@@ -15,7 +15,7 @@ import { describe, expect, it, vi } from "vitest";
 import {
     createDatabaseSchema,
     synchronizeDatabaseSchemaVersion,
-} from "../../../../services/database/utils/databaseSchema";
+} from "../../../../services/database/utils/schema/databaseSchema";
 
 describe("databaseSchema integration (node-sqlite3-wasm)", () => {
     it("creates schema and commits cleanly on a fresh database", async ({
@@ -37,7 +37,8 @@ describe("databaseSchema integration (node-sqlite3-wasm)", () => {
         try {
             expect(() => createDatabaseSchema(db)).not.toThrowError();
             expect(() =>
-                synchronizeDatabaseSchemaVersion(db)).not.toThrowError();
+                synchronizeDatabaseSchemaVersion(db)
+            ).not.toThrowError();
 
             const sitesTable = db.get(
                 "SELECT name FROM sqlite_master WHERE type='table' AND name='sites'"

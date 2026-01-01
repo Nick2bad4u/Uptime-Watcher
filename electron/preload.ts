@@ -33,7 +33,8 @@ interface AutomationProcess {
 }
 
 const isObjectLike = (value: unknown): value is object =>
-    (typeof value === "object" && value !== null) || typeof value === "function";
+    (typeof value === "object" && value !== null) ||
+    typeof value === "function";
 
 function isPlaywrightAutomationFlagSet(
     processContext?: AutomationProcess

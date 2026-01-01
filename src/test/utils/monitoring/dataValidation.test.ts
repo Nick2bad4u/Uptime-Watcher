@@ -29,16 +29,18 @@ const safeHttpUrlArb = fc
         fc.array(safeSegmentArb, { maxLength: 3 }),
         fc.option(safeQueryArb, { nil: undefined })
     )
-    .map(([
-        scheme,
-        host,
-        segments,
-        query,
-    ]) => {
-        const path = segments.length > 0 ? `/${segments.join("/")}` : "";
-        const queryPart = query ? `?${query}=1` : "";
-        return `${scheme}://${host}${path}${queryPart}`;
-    });
+    .map(
+        ([
+            scheme,
+            host,
+            segments,
+            query,
+        ]) => {
+            const path = segments.length > 0 ? `/${segments.join("/")}` : "";
+            const queryPart = query ? `?${query}=1` : "";
+            return `${scheme}://${host}${path}${queryPart}`;
+        }
+    );
 
 // Mock the logger
 vi.mock("../../../services/logger", () => ({
@@ -161,24 +163,23 @@ describe("Monitoring Data Validation", () => {
                 fc.boolean(),
             ],
             { numRuns: 75 }
-        )("parses numeric strings with optional percent sign and whitespace", (
-            value,
-            includePercent,
-            includeWhitespace
-        ) => {
-            let text = value.toString();
-            if (includePercent) {
-                text = `${text}%`;
-            }
-            if (includeWhitespace) {
-                text = `\n ${text} \t`;
-            }
+        )(
+            "parses numeric strings with optional percent sign and whitespace",
+            (value, includePercent, includeWhitespace) => {
+                let text = value.toString();
+                if (includePercent) {
+                    text = `${text}%`;
+                }
+                if (includeWhitespace) {
+                    text = `\n ${text} \t`;
+                }
 
-            const parsed = parseUptimeValue(text);
-            const expected = Math.max(0, Math.min(100, value));
+                const parsed = parseUptimeValue(text);
+                const expected = Math.max(0, Math.min(100, value));
 
-            expect(parsed).toBeCloseTo(expected, 10);
-        });
+                expect(parsed).toBeCloseTo(expected, 10);
+            }
+        );
 
         it("should return 0 for invalid numeric strings and log warning", async ({
             task,

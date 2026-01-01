@@ -120,11 +120,11 @@ describe("MonitorManager - Comprehensive Coverage", () => {
 
         mockDependencies = {
             databaseService: {
-                executeTransaction: vi.fn(async (
-                    fn: (db: unknown) => Promise<void>
-                ) => {
-                    await fn({});
-                }),
+                executeTransaction: vi.fn(
+                    async (fn: (db: unknown) => Promise<void>) => {
+                        await fn({});
+                    }
+                ),
                 getDatabase: vi.fn(() => ({})),
             },
             eventEmitter: {
@@ -136,16 +136,17 @@ describe("MonitorManager - Comprehensive Coverage", () => {
                 history: {},
                 monitor: {
                     updateInternal: vi.fn(),
-                    createTransactionAdapter: vi.fn().mockImplementation((
-                        db: unknown
-                    ) => ({
-                        update: vi.fn((id: string, changes: unknown) =>
-                            mockDependencies.repositories.monitor.updateInternal(
-                                db,
-                                id,
-                                changes
-                            )),
-                    })),
+                    createTransactionAdapter: vi
+                        .fn()
+                        .mockImplementation((db: unknown) => ({
+                            update: vi.fn((id: string, changes: unknown) =>
+                                mockDependencies.repositories.monitor.updateInternal(
+                                    db,
+                                    id,
+                                    changes
+                                )
+                            ),
+                        })),
                 },
                 site: {},
             },

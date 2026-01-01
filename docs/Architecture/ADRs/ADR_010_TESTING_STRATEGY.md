@@ -150,7 +150,8 @@ export default defineConfig((configEnv) =>
     },
    },
   })
- ));
+ )
+);
 ```
 
 <!-- remark-ignore-start -->

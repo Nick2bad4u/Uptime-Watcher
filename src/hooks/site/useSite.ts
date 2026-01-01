@@ -12,6 +12,7 @@ import type { Site } from "@shared/types";
 
 import { useMemo } from "react";
 
+import { selectErrorIsLoading } from "../../stores/error/selectors";
 import { useErrorStore } from "../../stores/error/useErrorStore";
 import { type SiteActionsResult, useSiteActions } from "./useSiteActions";
 import { type SiteMonitorResult, useSiteMonitor } from "./useSiteMonitor";
@@ -93,7 +94,7 @@ export function useSite(site: Site): UseSiteResult {
     const actions = useSiteActions(site, monitor);
 
     // Get UI state from store for consistency
-    const { isLoading } = useErrorStore();
+    const isLoading = useErrorStore(selectErrorIsLoading);
 
     // Return everything together
     return useMemo(

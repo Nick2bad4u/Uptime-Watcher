@@ -138,9 +138,8 @@ export const useUIStore: UIStoreWithPersist = create<UIStore>()(
                 const requestedUrl = url;
                 const urlForMessage = getSafeUrlForLogging(url);
 
-                const validation = validateExternalOpenUrlCandidate(
-                    requestedUrl
-                );
+                const validation =
+                    validateExternalOpenUrlCandidate(requestedUrl);
 
                 if ("reason" in validation) {
                     logger.warn(

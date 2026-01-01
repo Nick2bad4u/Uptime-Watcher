@@ -52,45 +52,57 @@ function createThemedComponent(testId: string) {
 const ThemedCardMock = vi.hoisted(() => createThemedComponent("themed-card"));
 const ThemedBadgeMock = vi.hoisted(() => createThemedComponent("themed-badge"));
 const ThemedButtonMock = vi.hoisted(() =>
-    vi.fn(({
-        children,
-        onClick,
-        ...props
-    }: {
-        children?: ReactNode;
-        onClick?: () => void;
-    }) => (
-        <button
-            data-testid="themed-button"
-            onClick={onClick}
-            type="button"
-            {...props}
-        >
-            {children}
-        </button>
-    )));
+    vi.fn(
+        ({
+            children,
+            onClick,
+            ...props
+        }: {
+            children?: ReactNode;
+            onClick?: () => void;
+        }) => (
+            <button
+                data-testid="themed-button"
+                onClick={onClick}
+                type="button"
+                {...props}
+            >
+                {children}
+            </button>
+        )
+    )
+);
 const ThemedInputMock = vi.hoisted(() =>
-    vi.fn(({
-        onChange,
-        ...props
-    }: {
-        onChange?: ChangeEventHandler<HTMLInputElement>;
-    }) => <input data-testid="themed-input" onChange={onChange} {...props} />));
+    vi.fn(
+        ({
+            onChange,
+            ...props
+        }: {
+            onChange?: ChangeEventHandler<HTMLInputElement>;
+        }) => (
+            <input data-testid="themed-input" onChange={onChange} {...props} />
+        )
+    )
+);
 const ThemedProgressMock = vi.hoisted(() =>
-    createThemedComponent("themed-progress"));
+    createThemedComponent("themed-progress")
+);
 const ThemedSelectMock = vi.hoisted(() =>
-    vi.fn(({
-        children,
-        onChange,
-        ...props
-    }: {
-        children?: ReactNode;
-        onChange?: ChangeEventHandler<HTMLSelectElement>;
-    }) => (
-        <select data-testid="themed-select" onChange={onChange} {...props}>
-            {children}
-        </select>
-    )));
+    vi.fn(
+        ({
+            children,
+            onChange,
+            ...props
+        }: {
+            children?: ReactNode;
+            onChange?: ChangeEventHandler<HTMLSelectElement>;
+        }) => (
+            <select data-testid="themed-select" onChange={onChange} {...props}>
+                {children}
+            </select>
+        )
+    )
+);
 const ThemedTextMock = vi.hoisted(() => createThemedComponent("themed-text"));
 
 vi.mock("../../theme/components/ThemedCard", () => ({
@@ -171,8 +183,8 @@ describe("OverviewTab coverage", () => {
                 handleTimeoutChange={handleTimeoutChange}
                 intervalChanged
                 isLoading={false}
-                localCheckInterval={60_000}
-                localTimeout={45}
+                localCheckIntervalMs={60_000}
+                localTimeoutSeconds={45}
                 onCheckNow={onCheckNow}
                 selectedMonitor={selectedMonitor}
                 slowestResponse={520}

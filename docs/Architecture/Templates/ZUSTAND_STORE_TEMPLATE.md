@@ -495,7 +495,8 @@ export function createExampleStateActions(
    logStoreAction("ExampleStore", "updateItem", { id, updates });
    set((state) => ({
     items: state.items.map((item) =>
-     item.id === id ? { ...item, ...updates } : item),
+     item.id === id ? { ...item, ...updates } : item
+    ),
     lastUpdated: Date.now(),
    }));
   },

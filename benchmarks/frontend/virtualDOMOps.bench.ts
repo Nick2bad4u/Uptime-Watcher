@@ -194,7 +194,8 @@ class MockVirtualDOM {
 
         // Optimize children recursively
         const optimizedChildren = vnode.children.map((child) =>
-            this.optimizeNode(child));
+            this.optimizeNode(child)
+        );
 
         return {
             ...vnode,
@@ -522,7 +523,8 @@ describe("Virtual DOM Operations Performance", () => {
 
             // Update half the sites
             const updatedSites = initialSites.map((site, i) =>
-                i % 2 === 0 ? { ...site, status: "offline" } : site);
+                i % 2 === 0 ? { ...site, status: "offline" } : site
+            );
 
             vdom.reconcile(createSiteList(updatedSites));
         },

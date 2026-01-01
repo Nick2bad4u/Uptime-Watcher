@@ -296,7 +296,8 @@ async function collectTestFiles(
     );
     if (options.explicitFiles.length > 0) {
         const resolved = options.explicitFiles.map((file) =>
-            path.resolve(options.cwd, file));
+            path.resolve(options.cwd, file)
+        );
         console.log(
             `[collectTestFiles] Using explicit files: ${resolved.length}`
         );

@@ -1,0 +1,146 @@
+/**
+ * Interfaces for database utilities to support dependency injection and
+ * testing.
+ */
+
+import type { Site } from "@shared/types";
+import type { Logger } from "@shared/utils/logger/interfaces";
+
+import type { UptimeEvents } from "../../events/eventTypes";
+import type { TypedEventBus } from "../../events/TypedEventBus";
+import type { HistoryRepository } from "./HistoryRepository";
+import type { MonitorRepository } from "./MonitorRepository";
+import type { SettingsRepository } from "./SettingsRepository";
+import type { SiteRepository } from "./SiteRepository";
+
+// Logger type available for internal use - external consumers should import
+// from ../interfaces
+
+/**
+ * Configuration for monitoring operations.
+ */
+export interface MonitoringConfig {
+    /**
+     * Function to set history limit.
+     *
+     * @remarks
+     * Implementations may perform asynchronous work (database mutation,
+     * orchestrator notifications). Callers must await completion to guarantee
+     * deterministic ordering with subsequent state-sync emissions.
+     */
+    setHistoryLimit: (limit: number) => Promise<void>;
+    /** Function to setup new monitors for a site */
+    setupNewMonitors: (site: Site, newMonitorIds: string[]) => Promise<void>;
+    /** Function to start monitoring for a site/monitor */
+    startMonitoring: (
+        identifier: string,
+        monitorId: string
+    ) => Promise<boolean>;
+    /** Function to stop monitoring for a site/monitor */
+    stopMonitoring: (identifier: string, monitorId: string) => Promise<boolean>;
+}
+
+/**
+ * Configuration for site loading operations.
+ */
+export interface SiteLoadingConfig {
+    /** Typed event emitter for error handling */
+    eventEmitter: TypedEventBus<UptimeEvents>;
+    /** Logger instance */
+    logger: Logger;
+    /** Repository dependencies */
+    repositories: {
+        history: HistoryRepository;
+        monitor: MonitorRepository;
+        settings: SettingsRepository;
+        site: SiteRepository;
+    };
+}
+
+/**
+ * Configuration for site writing operations.
+ */
+export interface SiteWritingConfig {
+    /** Logger instance */
+    logger: Logger;
+    /** Repository dependencies */
+    repositories: {
+        monitor: MonitorRepository;
+        site: SiteRepository;
+    };
+}
+
+/**
+ * Custom error for site loading operations.
+ *
+ * Provides enhanced error context and stack trace preservation for site loading
+ * failures.
+ */
+export class SiteLoadingError extends Error {
+    /**
+     * Create a new SiteLoadingError.
+     *
+     * @param message - Descriptive error message
+     * @param options - Optional error options with causal metadata
+     */
+    public constructor(message: string, options?: ErrorOptions) {
+        super(`Failed to load sites: ${message}`, options);
+        this.name = "SiteLoadingError";
+        const causeStack =
+            options?.cause instanceof Error ? options.cause.stack : undefined;
+        if (causeStack && this.stack) {
+            // Preserve both stack traces for better debugging
+            this.stack = `${this.stack}\nCaused by: ${causeStack}`;
+        }
+    }
+}
+
+/**
+ * Custom error for import/export data operations.
+ *
+ * @remarks
+ * Used by {@link DataImportExportService} to surface errors related to JSON
+ * export, JSON import parsing, schema validation, and persistence workflows.
+ *
+ * Unlike {@link SiteLoadingError}, this error does not apply a site-loading
+ * specific prefix to the message.
+ */
+export class DataImportExportError extends Error {
+    /**
+     * Create a new DataImportExportError.
+     *
+     * @param message - Human-readable error message.
+     * @param options - Optional error options with causal metadata.
+     */
+    public constructor(message: string, options?: ErrorOptions) {
+        super(message, options);
+        this.name = "DataImportExportError";
+
+        const causeStack =
+            options?.cause instanceof Error ? options.cause.stack : undefined;
+        if (causeStack && this.stack) {
+            this.stack = `${this.stack}\nCaused by: ${causeStack}`;
+        }
+    }
+}
+
+/**
+ * Custom error types for better error handling.
+ */
+
+/**
+ * Custom error for site not found scenarios.
+ *
+ * Thrown when attempting to access a site that doesn't exist in the system.
+ */
+export class SiteNotFoundError extends Error {
+    /**
+     * Create a new SiteNotFoundError.
+     *
+     * @param identifier - The site identifier that was not found
+     */
+    public constructor(identifier: string) {
+        super(`Site not found: ${identifier}`);
+        this.name = "SiteNotFoundError";
+    }
+}

@@ -14,20 +14,21 @@ describe("CacheKeys - Property-Based Tests", () => {
     describe("Site cache keys", () => {
         test.prop({
             identifier: fc.string({ minLength: 1, maxLength: 50 }),
-        })("should generate consistent site keys for any valid identifier", (
-            props
-        ) => {
-            const key = CacheKeys.site.byIdentifier(props.identifier);
+        })(
+            "should generate consistent site keys for any valid identifier",
+            (props) => {
+                const key = CacheKeys.site.byIdentifier(props.identifier);
 
-            // Should always start with site prefix
-            expect(key).toMatch(/^site:/);
+                // Should always start with site prefix
+                expect(key).toMatch(/^site:/);
 
-            // Should contain the identifier
-            expect(key).toContain(props.identifier);
+                // Should contain the identifier
+                expect(key).toContain(props.identifier);
 
-            // Should follow the expected pattern
-            expect(key).toBe(`site:${props.identifier}`);
-        });
+                // Should follow the expected pattern
+                expect(key).toBe(`site:${props.identifier}`);
+            }
+        );
 
         test.prop({
             identifier: fc.string({ minLength: 1, maxLength: 50 }),
@@ -42,20 +43,21 @@ describe("CacheKeys - Property-Based Tests", () => {
     describe("Monitor cache keys", () => {
         test.prop({
             monitorId: fc.string({ minLength: 1, maxLength: 50 }),
-        })("should generate consistent monitor keys for any valid id", (
-            props
-        ) => {
-            const key = CacheKeys.monitor.byId(props.monitorId);
+        })(
+            "should generate consistent monitor keys for any valid id",
+            (props) => {
+                const key = CacheKeys.monitor.byId(props.monitorId);
 
-            // Should always start with monitor prefix
-            expect(key).toMatch(/^monitor:/);
+                // Should always start with monitor prefix
+                expect(key).toMatch(/^monitor:/);
 
-            // Should contain the monitor id
-            expect(key).toContain(props.monitorId);
+                // Should contain the monitor id
+                expect(key).toContain(props.monitorId);
 
-            // Should follow the expected pattern
-            expect(key).toBe(`monitor:${props.monitorId}`);
-        });
+                // Should follow the expected pattern
+                expect(key).toBe(`monitor:${props.monitorId}`);
+            }
+        );
 
         test.prop({
             siteIdentifier: fc.string({ minLength: 1, maxLength: 50 }),
@@ -78,21 +80,22 @@ describe("CacheKeys - Property-Based Tests", () => {
             configName: fc
                 .string({ minLength: 1, maxLength: 30 })
                 .filter((s) => !s.includes(":")),
-        })("should generate config keys without separator conflicts", (
-            props
-        ) => {
-            const key = CacheKeys.config.byName(props.configName);
+        })(
+            "should generate config keys without separator conflicts",
+            (props) => {
+                const key = CacheKeys.config.byName(props.configName);
 
-            // Should start with config prefix
-            expect(key).toMatch(/^config:/);
+                // Should start with config prefix
+                expect(key).toMatch(/^config:/);
 
-            // Should contain the config name
-            expect(key).toContain(props.configName);
+                // Should contain the config name
+                expect(key).toContain(props.configName);
 
-            // Should have exactly one separator (between prefix and name)
-            const separatorCount = (key.match(/:/g) ?? []).length;
-            expect(separatorCount).toBe(1);
-        });
+                // Should have exactly one separator (between prefix and name)
+                const separatorCount = (key.match(/:/g) ?? []).length;
+                expect(separatorCount).toBe(1);
+            }
+        );
     });
 
     describe("Validation cache keys", () => {

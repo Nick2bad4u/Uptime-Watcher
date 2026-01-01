@@ -183,7 +183,8 @@ describe("useSiteDetails Hook - Basic Coverage", () => {
             await annotate("Type: Initialization", "type");
 
             const { result } = renderHook(() =>
-                useSiteDetails({ site: mockSite }));
+                useSiteDetails({ site: mockSite })
+            );
 
             expect(result.current.currentSite).toEqual(mockSite);
             expect(result.current.selectedMonitorId).toBe("monitor-1");
@@ -223,7 +224,8 @@ describe("useSiteDetails Hook - Basic Coverage", () => {
             });
 
             const { result } = renderHook(() =>
-                useSiteDetails({ site: siteWithNoMonitors }));
+                useSiteDetails({ site: siteWithNoMonitors })
+            );
 
             expect(result.current.selectedMonitor).toBeUndefined();
             expect(result.current.isMonitoring).toBeFalsy();
@@ -256,7 +258,8 @@ describe("useSiteDetails Hook - Basic Coverage", () => {
             });
 
             const { result } = renderHook(() =>
-                useSiteDetails({ site: mockSite }));
+                useSiteDetails({ site: mockSite })
+            );
             expect(result.current.currentSite.name).toBe(DEFAULT_SITE_NAME);
             expect(result.current.currentSite.name).toBe("Unnamed Site");
             expect(result.current.currentSite.monitoring).toBeTruthy();
@@ -272,7 +275,8 @@ describe("useSiteDetails Hook - Basic Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             const { result } = renderHook(() =>
-                useSiteDetails({ site: mockSite }));
+                useSiteDetails({ site: mockSite })
+            );
 
             expect(result.current.localName).toBe("Test Site");
             expect(result.current.hasUnsavedChanges).toBeFalsy();
@@ -292,7 +296,8 @@ describe("useSiteDetails Hook - Basic Coverage", () => {
             await annotate("Type: Monitoring", "type");
 
             const { result } = renderHook(() =>
-                useSiteDetails({ site: mockSite }));
+                useSiteDetails({ site: mockSite })
+            );
 
             expect(result.current.isMonitoring).toBeTruthy();
             expect(result.current.selectedMonitor).toBeDefined();
@@ -308,10 +313,11 @@ describe("useSiteDetails Hook - Basic Coverage", () => {
             await annotate("Type: Monitoring", "type");
 
             const { result } = renderHook(() =>
-                useSiteDetails({ site: mockSite }));
+                useSiteDetails({ site: mockSite })
+            );
 
-            expect(result.current.localCheckInterval).toBe(60_000);
-            expect(result.current.localTimeout).toBeDefined();
+            expect(result.current.localCheckIntervalMs).toBe(60_000);
+            expect(result.current.localTimeoutSeconds).toBeDefined();
             expect(result.current.localRetryAttempts).toBe(3);
         });
     });
@@ -327,7 +333,8 @@ describe("useSiteDetails Hook - Basic Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             const { result } = renderHook(() =>
-                useSiteDetails({ site: mockSite }));
+                useSiteDetails({ site: mockSite })
+            );
 
             expect(typeof result.current.handleCheckNow).toBe("function");
             expect(typeof result.current.handleMonitorIdChange).toBe(
@@ -352,7 +359,8 @@ describe("useSiteDetails Hook - Basic Coverage", () => {
             await annotate("Type: Error Handling", "type");
 
             const { result } = renderHook(() =>
-                useSiteDetails({ site: mockSite }));
+                useSiteDetails({ site: mockSite })
+            );
 
             // Test that handlers execute without errors
             await act(async () => {
@@ -375,7 +383,8 @@ describe("useSiteDetails Hook - Basic Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             const { result } = renderHook(() =>
-                useSiteDetails({ site: mockSite }));
+                useSiteDetails({ site: mockSite })
+            );
 
             expect(result.current.analytics).toBeDefined();
             expect(useSiteAnalytics).toHaveBeenCalled();
@@ -390,7 +399,8 @@ describe("useSiteDetails Hook - Basic Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             const { result } = renderHook(() =>
-                useSiteDetails({ site: mockSite }));
+                useSiteDetails({ site: mockSite })
+            );
 
             expect(result.current.activeSiteDetailsTab).toBe("overview");
             expect(result.current.showAdvancedMetrics).toBeFalsy();
@@ -417,7 +427,8 @@ describe("useSiteDetails Hook - Basic Coverage", () => {
             });
 
             const { result } = renderHook(() =>
-                useSiteDetails({ site: mockSite }));
+                useSiteDetails({ site: mockSite })
+            );
 
             expect(result.current.isLoading).toBeTruthy();
         });
@@ -460,7 +471,8 @@ describe("useSiteDetails Hook - Basic Coverage", () => {
             });
 
             const { result } = renderHook(() =>
-                useSiteDetails({ site: mockSite }));
+                useSiteDetails({ site: mockSite })
+            );
 
             const mockEvent = {
                 target: { value: "monitor-2" },
@@ -561,7 +573,8 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             const { result } = renderHook(() =>
-                useSiteDetails({ site: mockSite }));
+                useSiteDetails({ site: mockSite })
+            );
 
             // Should not throw error since withUtilityErrorHandling catches it
             await act(async () => {
@@ -599,7 +612,8 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
             });
 
             const { result } = renderHook(() =>
-                useSiteDetails({ site: mockSite }));
+                useSiteDetails({ site: mockSite })
+            );
 
             // Should complete without throwing when no monitor is selected
             await expect(
@@ -638,7 +652,8 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
             });
 
             const { result } = renderHook(() =>
-                useSiteDetails({ site: mockSite }));
+                useSiteDetails({ site: mockSite })
+            );
 
             // First update the local interval via change handler
             const mockEvent = {
@@ -690,7 +705,8 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
             });
 
             const { result } = renderHook(() =>
-                useSiteDetails({ site: mockSite }));
+                useSiteDetails({ site: mockSite })
+            );
 
             // First update the local interval to an invalid value
             const mockEvent = {
@@ -741,7 +757,8 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
             });
 
             const { result } = renderHook(() =>
-                useSiteDetails({ site: mockSite }));
+                useSiteDetails({ site: mockSite })
+            );
 
             // First update the local timeout via change handler (in seconds)
             const mockEvent = {
@@ -793,7 +810,8 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
             });
 
             const { result } = renderHook(() =>
-                useSiteDetails({ site: mockSite }));
+                useSiteDetails({ site: mockSite })
+            );
 
             // First update the local timeout to an invalid value (in seconds)
             const mockEvent = {
@@ -844,7 +862,8 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
             });
 
             const { result } = renderHook(() =>
-                useSiteDetails({ site: mockSite }));
+                useSiteDetails({ site: mockSite })
+            );
 
             // First update the local retry attempts via change handler
             const mockEvent = {
@@ -896,7 +915,8 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
             });
 
             const { result } = renderHook(() =>
-                useSiteDetails({ site: mockSite }));
+                useSiteDetails({ site: mockSite })
+            );
 
             // First update the local retry attempts to an invalid value
             const mockEvent = {
@@ -907,15 +927,15 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
                 result.current.handleRetryAttemptsChange(mockEvent);
             });
 
-            // Try to save the invalid retry attempts - should throw
             await act(async () => {
-                await expect(
-                    result.current.handleSaveRetryAttempts()
-                ).rejects.toThrowError();
+                await result.current.handleSaveRetryAttempts();
             });
 
-            // Should not call store method with invalid value
-            expect(mockUpdateMonitorRetryAttempts).not.toHaveBeenCalled();
+            expect(mockUpdateMonitorRetryAttempts).toHaveBeenCalledWith(
+                "site-1",
+                "monitor-1",
+                10 // Clamped value
+            );
         });
     });
 
@@ -927,7 +947,8 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
             await annotate("Type: Data Update", "type");
 
             const { result } = renderHook(() =>
-                useSiteDetails({ site: mockSite }));
+                useSiteDetails({ site: mockSite })
+            );
 
             // Change the local name first
             act(() => {
@@ -976,7 +997,8 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
             });
 
             const { result } = renderHook(() =>
-                useSiteDetails({ site: mockSite }));
+                useSiteDetails({ site: mockSite })
+            );
 
             // Don't change the name - should not trigger save
             await act(async () => {
@@ -998,7 +1020,8 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
             await annotate("Type: Monitoring", "type");
 
             const { result } = renderHook(() =>
-                useSiteDetails({ site: mockSite }));
+                useSiteDetails({ site: mockSite })
+            );
 
             await act(async () => {
                 await result.current.handleRemoveMonitor();
@@ -1040,7 +1063,8 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
             });
 
             const { result } = renderHook(() =>
-                useSiteDetails({ site: mockSite }));
+                useSiteDetails({ site: mockSite })
+            );
 
             await act(async () => {
                 await result.current.handleRemoveMonitor();
@@ -1060,7 +1084,8 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             const { result } = renderHook(() =>
-                useSiteDetails({ site: mockSite }));
+                useSiteDetails({ site: mockSite })
+            );
 
             await act(async () => {
                 await result.current.handleRemoveSite();
@@ -1102,7 +1127,8 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
             });
 
             const { result } = renderHook(() =>
-                useSiteDetails({ site: mockSite }));
+                useSiteDetails({ site: mockSite })
+            );
 
             await act(async () => {
                 await result.current.handleRemoveSite();
@@ -1124,7 +1150,8 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
             await annotate("Type: Monitoring", "type");
 
             const { result } = renderHook(() =>
-                useSiteDetails({ site: { ...mockSite, monitoring: false } }));
+                useSiteDetails({ site: { ...mockSite, monitoring: false } })
+            );
 
             await act(async () => {
                 await result.current.handleStartSiteMonitoring();
@@ -1149,7 +1176,8 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
             };
 
             const { result } = renderHook(() =>
-                useSiteDetails({ site: siteWithInactiveMonitor }));
+                useSiteDetails({ site: siteWithInactiveMonitor })
+            );
 
             await act(async () => {
                 await result.current.handleStartMonitoring();
@@ -1169,7 +1197,8 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
             await annotate("Type: Monitoring", "type");
 
             const { result } = renderHook(() =>
-                useSiteDetails({ site: mockSite }));
+                useSiteDetails({ site: mockSite })
+            );
 
             await act(async () => {
                 await result.current.handleStopSiteMonitoring();
@@ -1189,7 +1218,8 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
             await annotate("Type: Monitoring", "type");
 
             const { result } = renderHook(() =>
-                useSiteDetails({ site: mockSite }));
+                useSiteDetails({ site: mockSite })
+            );
 
             await act(async () => {
                 await result.current.handleStopMonitoring();
@@ -1240,7 +1270,8 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
             });
 
             const { result } = renderHook(() =>
-                useSiteDetails({ site: mockSite }));
+                useSiteDetails({ site: mockSite })
+            );
 
             const mockEvent = {
                 target: { value: "monitor-2" },
@@ -1317,7 +1348,8 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
             });
 
             const { result } = renderHook(() =>
-                useSiteDetails({ site: mockSite }));
+                useSiteDetails({ site: mockSite })
+            );
 
             expect(result.current.isLoading).toBeTruthy();
         });
@@ -1332,10 +1364,11 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
             await annotate("Type: Initialization", "type");
 
             const { result } = renderHook(() =>
-                useSiteDetails({ site: mockSite }));
+                useSiteDetails({ site: mockSite })
+            );
 
-            expect(result.current.localCheckInterval).toBe(60_000);
-            expect(result.current.localTimeout).toBe(10); // Should be 10 seconds (converted from 10,000ms)
+            expect(result.current.localCheckIntervalMs).toBe(60_000);
+            expect(result.current.localTimeoutSeconds).toBe(10); // Should be 10 seconds (converted from 10,000ms)
             expect(result.current.localRetryAttempts).toBe(3);
         });
 
@@ -1349,7 +1382,8 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
             await annotate("Type: Data Saving", "type");
 
             const { result } = renderHook(() =>
-                useSiteDetails({ site: mockSite }));
+                useSiteDetails({ site: mockSite })
+            );
 
             // Initially no changes
             expect(result.current.hasUnsavedChanges).toBeFalsy();
@@ -1381,7 +1415,8 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
             await annotate("Type: Error Handling", "type");
 
             const { result } = renderHook(() =>
-                useSiteDetails({ site: mockSite }));
+                useSiteDetails({ site: mockSite })
+            );
 
             // The operation should not rethrow to the UI layer even when the
             // underlying store action fails; errors are handled by store-level
@@ -1420,7 +1455,8 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
             });
 
             const { result } = renderHook(() =>
-                useSiteDetails({ site: mockSite }));
+                useSiteDetails({ site: mockSite })
+            );
 
             // First update the local interval to an invalid value
             const mockEvent = {

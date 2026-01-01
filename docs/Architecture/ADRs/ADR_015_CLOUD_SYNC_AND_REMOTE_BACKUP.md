@@ -192,7 +192,7 @@ Notes:
 ### 7) Maintenance operations
 
 Two explicit maintenance operations exist to help users transition between
-plaintext/encrypted storage and to clean up legacy artifacts.
+plaintext/encrypted storage and to clean up older artifacts.
 
 #### 7.1 Backup migration (plaintext → encrypted)
 
@@ -218,7 +218,7 @@ This is user-initiated and does not run automatically.
   - Writes `manifest.resetAt` and re-seeds remote state from the current device.
 
 The sync engine ignores any operation-log objects whose embedded
-`createdAtEpochMs` is older than `manifest.resetAt`, preventing legacy plaintext
+`createdAtEpochMs` is older than `manifest.resetAt`, preventing older plaintext
 ops from resurfacing even if remote deletions are incomplete.
 
 ### 7) Retry, backoff, and rate limiting

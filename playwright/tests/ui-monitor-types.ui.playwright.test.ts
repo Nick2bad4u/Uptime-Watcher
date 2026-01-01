@@ -356,17 +356,17 @@ test.describe(
                     )
                 ).sort((first, second) => first.localeCompare(second));
 
-                const expectedTypes = Array.from(BASE_MONITOR_TYPES).sort((
-                    first,
-                    second
-                ) => first.localeCompare(second));
+                const expectedTypes = Array.from(BASE_MONITOR_TYPES).sort(
+                    (first, second) => first.localeCompare(second)
+                );
 
                 expect(actualTypes).toStrictEqual(expectedTypes);
 
                 const scenarios = typedConfigs
                     .map(buildMonitorScenario)
                     .sort((first, second) =>
-                        first.monitorType.localeCompare(second.monitorType));
+                        first.monitorType.localeCompare(second.monitorType)
+                    );
 
                 expect(scenarios).toHaveLength(expectedTypes.length);
 

@@ -138,6 +138,5 @@ describe(CloudProviderSetupPanel, () => {
                 name: "Connect Google Drive",
             })
         ).not.toBeInTheDocument();
-
     });
 });

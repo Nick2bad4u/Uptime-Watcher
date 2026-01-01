@@ -146,14 +146,14 @@ describe("IPC Communication Performance Benchmarks", () => {
         bench(
             "serialize monitors with history",
             () => {
-                const monitorsWithHistory = testMonitors.slice(0, 50).map((
-                    monitor
-                ) => ({
-                    ...monitor,
-                    history: testHistory
-                        .filter((h) => h.monitorId === monitor.id)
-                        .slice(0, 100),
-                }));
+                const monitorsWithHistory = testMonitors
+                    .slice(0, 50)
+                    .map((monitor) => ({
+                        ...monitor,
+                        history: testHistory
+                            .filter((h) => h.monitorId === monitor.id)
+                            .slice(0, 100),
+                    }));
                 serializeData(monitorsWithHistory);
             },
             {

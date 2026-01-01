@@ -42,10 +42,7 @@
         "jsx": "react-jsx",
         "jsxImportSource": "react",
         "keyofStringsOnly": false,
-        "lib": [
-            "DOM",
-            "ESNext"
-        ],
+        "lib": ["DOM", "ESNext"],
         "libReplacement": true,
         "listEmittedFiles": false,
         "listFiles": false,
@@ -74,18 +71,10 @@
         "noUnusedParameters": true,
         "outDir": ".cache/builds/app",
         "paths": {
-            "@app/*": [
-                "src/*"
-            ],
-            "@assets/*": [
-                "assets/*"
-            ],
-            "@electron/*": [
-                "electron/*"
-            ],
-            "@shared/*": [
-                "shared/*"
-            ]
+            "@app/*": ["src/*"],
+            "@assets/*": ["assets/*"],
+            "@electron/*": ["electron/*"],
+            "@shared/*": ["shared/*"]
         },
         "plugins": [
             {
@@ -159,10 +148,7 @@
         ".storybook/**",
         "storybook-static/**"
     ],
-    "include": [
-        "global.d.ts",
-        "src/**/*"
-    ],
+    "include": ["global.d.ts", "src/**/*"],
     "references": [
         {
             "path": "./tsconfig.shared.json"

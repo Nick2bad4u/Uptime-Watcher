@@ -10,23 +10,27 @@ import type { NotificationPreferenceUpdate } from "@shared/types/notifications";
 const ensureInitializedMock = vi.hoisted(() => vi.fn(async () => {}));
 
 const wrapMock = vi.hoisted(() =>
-    vi.fn((
-        _methodName: string,
-        handler: (
-            api: typeof window.electronAPI,
-            preferences: NotificationPreferenceUpdate
-        ) => Promise<void>
-    ) =>
-        vi.fn(async (preferences: NotificationPreferenceUpdate) => {
-            await ensureInitializedMock();
-            return handler(window.electronAPI!, preferences);
-        })));
+    vi.fn(
+        (
+            _methodName: string,
+            handler: (
+                api: typeof window.electronAPI,
+                preferences: NotificationPreferenceUpdate
+            ) => Promise<void>
+        ) =>
+            vi.fn(async (preferences: NotificationPreferenceUpdate) => {
+                await ensureInitializedMock();
+                return handler(window.electronAPI!, preferences);
+            })
+    )
+);
 
 const getHelpersMock = vi.hoisted(() =>
     vi.fn(() => ({
         ensureInitialized: ensureInitializedMock,
         wrap: wrapMock,
-    })));
+    }))
+);
 
 vi.mock("../../services/utils/createIpcServiceHelpers", () => ({
     getIpcServiceHelpers: getHelpersMock,
@@ -36,9 +40,9 @@ import { NotificationPreferenceService } from "../../services/NotificationPrefer
 
 const createElectronApi = () => ({
     notifications: {
-        updatePreferences: vi.fn(async (
-            _preferences: NotificationPreferenceUpdate
-        ) => {}),
+        updatePreferences: vi.fn(
+            async (_preferences: NotificationPreferenceUpdate) => {}
+        ),
     },
 });
 

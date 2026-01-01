@@ -17,7 +17,7 @@
 
 import { describe, expect, it, vi, afterEach } from "vitest";
 import { fc } from "@fast-check/vitest";
-import { createDatabaseTables } from "../../../../services/database/utils/databaseSchema";
+import { createDatabaseTables } from "../../../../services/database/utils/schema/databaseSchema";
 
 describe("Database Schema", () => {
     const mockDatabase = {
@@ -117,9 +117,8 @@ describe("Database Schema", () => {
 
                         // Act & Assert
                         expect(() =>
-                            createDatabaseTables(
-                                testDatabase as any
-                            )).toThrowError(errorMessage);
+                            createDatabaseTables(testDatabase as any)
+                        ).toThrowError(errorMessage);
                     }
                 )
             );
@@ -209,9 +208,8 @@ describe("Database Schema", () => {
                         // Act & Assert
                         if (shouldSucceed) {
                             expect(() =>
-                                createDatabaseTables(
-                                    testDatabase as any
-                                )).not.toThrowError();
+                                createDatabaseTables(testDatabase as any)
+                            ).not.toThrowError();
 
                             // Verify SQL commands are well-formed
                             const allCalls = testDatabase.run.mock.calls;
@@ -228,9 +226,8 @@ describe("Database Schema", () => {
                             }
                         } else {
                             expect(() =>
-                                createDatabaseTables(
-                                    testDatabase as any
-                                )).toThrowError("Mock SQL error");
+                                createDatabaseTables(testDatabase as any)
+                            ).toThrowError("Mock SQL error");
                         }
                     }
                 )

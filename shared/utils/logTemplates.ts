@@ -135,13 +135,6 @@ export const SERVICE_LOGS = {
     /** IPC service cleanup */
     IPC_SERVICE_CLEANUP: "[IpcService] Cleaning up IPC handlers",
 
-    /** Migration system */
-    MIGRATION_APPLYING:
-        "Applying migration: {monitorType} {fromVersion} -> {toVersion}",
-
-    MIGRATION_REGISTERED:
-        "Registered migration for {monitorType}: {fromVersion} → {toVersion}",
-
     /** Monitor manager applying intervals */
     MONITOR_MANAGER_APPLYING_INTERVALS:
         "[MonitorManager] Completed applying default intervals for site: {identifier}",
@@ -540,7 +533,7 @@ export function interpolateLogTemplate(
     };
 
     return template.replaceAll(
-        // eslint-disable-next-line regexp/strict, regexp/require-unicode-sets-regexp, regexp/require-unicode-regexp -- Conflicting rules: strict wants escaped braces, require-unicode-sets wants v flag, require-unicode wants u flag
+        // eslint-disable-next-line regexp/strict, regexp/require-unicode-regexp -- Conflicting rules: strict wants escaped braces, require-unicode-sets wants v flag, require-unicode wants u flag
         /{(?<variableName>[$_a-z][\w$]*)}/gi,
         (match, key) => {
             // Type assertion is safe here as we're accessing with a string key

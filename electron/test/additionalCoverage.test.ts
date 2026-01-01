@@ -29,7 +29,7 @@ vi.mock("../utils/logger", () => ({
     },
 }));
 
-vi.mock("../utils/correlation", () => ({
+vi.mock("@shared/utils/correlation", () => ({
     generateCorrelationId: vi.fn(() => "test-correlation-id"),
 }));
 
@@ -71,7 +71,7 @@ describe("Additional Coverage Tests", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Validation", "type");
 
-            const correlation = await import("../utils/correlation");
+            const correlation = await import("@shared/utils/correlation");
             const logger = await import("../utils/logger");
 
             expect(correlation.generateCorrelationId).toBeDefined();

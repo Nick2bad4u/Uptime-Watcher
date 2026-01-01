@@ -11,13 +11,13 @@ describe("ValidatorUtils Fuzzing - Line 333", () => {
         test.prop([
             fc.constantFrom("not a number", "12.34", "NaN", ""),
             fc.integer(),
-        ])("should handle invalid integer strings - line 333", (
-            invalidString,
-            defaultValue
-        ) => {
-            const result = safeInteger(invalidString, defaultValue);
-            expect(result).toBe(defaultValue);
-        });
+        ])(
+            "should handle invalid integer strings - line 333",
+            (invalidString, defaultValue) => {
+                const result = safeInteger(invalidString, defaultValue);
+                expect(result).toBe(defaultValue);
+            }
+        );
 
         test.prop([fc.constantFrom("", " ", "123.456", "NaN", "abc")])(
             "should correctly identify invalid integers",

@@ -5,7 +5,16 @@
 
 import type { EventMetadata } from "@shared/types/events";
 
+import { isEventMetadata as isEventMetadataGuard } from "../events/eventMetadataGuards";
 import { ORIGINAL_METADATA_SYMBOL } from "../events/TypedEventBus";
+
+/**
+ * Determines whether the provided value conforms to {@link EventMetadata}.
+ *
+ * @public
+ */
+export const isEventMetadata = (value: unknown): value is EventMetadata =>
+    isEventMetadataGuard(value);
 
 /** Metadata property key used when forwarding typed event metadata. */
 export const FORWARDED_METADATA_PROPERTY_KEY = "_meta" as const;
@@ -26,26 +35,7 @@ interface AttachForwardedMetadataParams<TPayload extends object> {
     source: unknown;
 }
 
-/**
- * Determines whether the provided value conforms to {@link EventMetadata}.
- */
-function isEventMetadataCandidate(value: unknown): value is EventMetadata {
-    if (!value || typeof value !== "object") {
-        return false;
-    }
 
-    const candidate = value as Partial<EventMetadata>;
-
-    return (
-        typeof candidate.busId === "string" &&
-        typeof candidate.correlationId === "string" &&
-        typeof candidate.eventName === "string" &&
-        typeof candidate.timestamp === "number"
-    );
-}
-
-export const isEventMetadata: (value: unknown) => value is EventMetadata =
-    isEventMetadataCandidate;
 
 /**
  * Attaches existing metadata from an internal event to the forwarded payload.
@@ -72,7 +62,7 @@ export function attachForwardedMetadata<TPayload extends object>(
         FORWARDED_METADATA_PROPERTY_KEY
     ) as unknown;
 
-    if (!isEventMetadataCandidate(metaCandidate)) {
+    if (!isEventMetadataGuard(metaCandidate)) {
         return payload;
     }
 
@@ -83,7 +73,7 @@ export function attachForwardedMetadata<TPayload extends object>(
         ? (Reflect.get(source, ORIGINAL_METADATA_PROPERTY_KEY) as unknown)
         : undefined;
 
-    const originalMeta = isEventMetadataCandidate(originalMetaCandidate)
+    const originalMeta = isEventMetadataGuard(originalMetaCandidate)
         ? originalMetaCandidate
         : metaCandidate;
 

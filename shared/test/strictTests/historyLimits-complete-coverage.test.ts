@@ -44,21 +44,17 @@ describe(normalizeHistoryLimit, () => {
     it("throws a TypeError when provided non-finite input", () => {
         expect(() => normalizeHistoryLimit(Number.NaN)).toThrowError(TypeError);
         expect(() =>
-            normalizeHistoryLimit("25" as unknown as number)).toThrowError(
-            TypeError
-        );
+            normalizeHistoryLimit("25" as unknown as number)
+        ).toThrowError(TypeError);
     });
 
     it("throws a RangeError when the value is infinite or above the maximum", () => {
         expect(() =>
-            normalizeHistoryLimit(Number.POSITIVE_INFINITY)).toThrowError(
-            RangeError
-        );
+            normalizeHistoryLimit(Number.POSITIVE_INFINITY)
+        ).toThrowError(RangeError);
         expect(() =>
-            normalizeHistoryLimit(
-                customRules.maxLimit + 1,
-                customRules
-            )).toThrowError(RangeError);
+            normalizeHistoryLimit(customRules.maxLimit + 1, customRules)
+        ).toThrowError(RangeError);
     });
 
     it("interprets zero or negative values as unlimited", () => {

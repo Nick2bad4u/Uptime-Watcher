@@ -9,8 +9,6 @@ import type { ChartOptions } from "chart.js";
 import type { JSX } from "react/jsx-runtime";
 
 import { useCallback, useMemo } from "react";
-import { FiActivity, FiBarChart2, FiTrendingUp } from "react-icons/fi";
-import { MdAnalytics, MdPieChart, MdSpeed, MdTrendingUp } from "react-icons/md";
 
 import type { ChartTimeRange } from "../../../constants";
 import type { DowntimePeriod } from "../../../hooks/site/useSiteAnalytics";
@@ -29,6 +27,7 @@ import { ThemedCard } from "../../../theme/components/ThemedCard";
 import { ThemedProgress } from "../../../theme/components/ThemedProgress";
 import { ThemedText } from "../../../theme/components/ThemedText";
 import { useAvailabilityColors, useTheme } from "../../../theme/useTheme";
+import { AppIcons } from "../../../utils/icons";
 import { parseUptimeValue } from "../../../utils/monitoring/dataValidation";
 import { ConditionalResponseTime } from "../../common/MonitorUiComponents";
 import { ResponseTimeChart } from "../charts/ResponseTimeChart";
@@ -163,10 +162,10 @@ export const AnalyticsTab = ({
         (responseTime: number): string => {
             if (responseTime <= 100) {
                 return currentTheme.colors.success;
-            } // Green for excellent (≤100ms)
+            } // Green for excellent (Γëñ100ms)
             if (responseTime <= 500) {
                 return currentTheme.colors.warning;
-            } // Yellow for good (≤500ms)
+            } // Yellow for good (Γëñ500ms)
             return currentTheme.colors.error; // Red for poor (>500ms)
         },
         [
@@ -234,6 +233,17 @@ export const AnalyticsTab = ({
     };
 
     const iconColors = getIconColors();
+
+    const AnalyticsIcon = AppIcons.ui.analytics;
+    const CollapseIcon = AppIcons.ui.collapse;
+    const DownIcon = AppIcons.status.down;
+    const ExpandIcon = AppIcons.ui.expand;
+    const IncidentsIcon = AppIcons.metrics.incidents;
+    const ListIcon = AppIcons.layout.listAlt;
+    const ResponseIcon = AppIcons.metrics.response;
+    const TimeIcon = AppIcons.metrics.time;
+    const UpIcon = AppIcons.status.up;
+    const UptimeIcon = AppIcons.metrics.uptime;
     const variant = getVariant(uptimeValue);
     // Map variant to progress/badge variant - "danger" becomes "error" for UI
     // consistency
@@ -273,27 +283,38 @@ export const AnalyticsTab = ({
     ]);
 
     // Memoized icons to prevent unnecessary re-renders
-    const analyticsIcon = useMemo(() => <MdAnalytics />, []);
-    const trendingIcon = useMemo(() => <MdTrendingUp />, []);
-    const activityIcon = useMemo(() => <FiActivity />, []);
-    const trendingUpIcon = useMemo(() => <FiTrendingUp />, []);
+    const timeRangeIcon = useMemo(() => <TimeIcon />, [TimeIcon]);
+    const availabilityIcon = useMemo(() => <UptimeIcon />, [UptimeIcon]);
+    const responseIcon = useMemo(() => <ResponseIcon />, [ResponseIcon]);
+    const downtimeIcon = useMemo(() => <IncidentsIcon />, [IncidentsIcon]);
+    const checksIcon = useMemo(() => <ListIcon />, [ListIcon]);
+    const expandIcon = useMemo(() => <ExpandIcon />, [ExpandIcon]);
+    const collapseIcon = useMemo(() => <CollapseIcon />, [CollapseIcon]);
+    const upCountIcon = useMemo(
+        () => <UpIcon aria-hidden className="h-4 w-4" />,
+        [UpIcon]
+    );
+    const downCountIcon = useMemo(
+        () => <DownIcon aria-hidden className="h-4 w-4" />,
+        [DownIcon]
+    );
 
     // Colored icons with dependencies on iconColors
     const speedIconColored = useMemo(
-        () => <MdSpeed color={iconColors.performance} />,
-        [iconColors.performance]
+        () => <ResponseIcon color={iconColors.performance} />,
+        [iconColors.performance, ResponseIcon]
     );
     const trendingUpIconColored = useMemo(
-        () => <FiTrendingUp color={iconColors.performance} />,
-        [iconColors.performance]
+        () => <UptimeIcon color={iconColors.performance} />,
+        [iconColors.performance, UptimeIcon]
     );
     const pieChartIconColored = useMemo(
-        () => <MdPieChart color={iconColors.uptime} />,
-        [iconColors.uptime]
+        () => <UptimeIcon color={iconColors.uptime} />,
+        [iconColors.uptime, UptimeIcon]
     );
     const barChartIconColored = useMemo(
-        () => <FiBarChart2 color={iconColors.charts} />,
-        [iconColors.charts]
+        () => <AnalyticsIcon color={iconColors.charts} />,
+        [AnalyticsIcon, iconColors.charts]
     );
 
     // Memoized style objects to prevent object recreation
@@ -324,8 +345,21 @@ export const AnalyticsTab = ({
 
     return (
         <div className="space-y-6" data-testid="analytics-tab">
+            {totalChecks === 0 ? (
+                <ThemedCard
+                    icon={barChartIconColored}
+                    title="No analytics yet"
+                    variant="secondary"
+                >
+                    <ThemedText size="sm" variant="secondary">
+                        Run a check (or wait for scheduled checks) to populate uptime and
+                        response-time charts.
+                    </ThemedText>
+                </ThemedCard>
+            ) : null}
+
             {/* Time Range Selector */}
-            <ThemedCard icon={analyticsIcon} title="Analytics Time Range">
+            <ThemedCard icon={timeRangeIcon} title="Analytics Time Range">
                 <div className="flex items-center justify-between">
                     <ThemedText size="sm" variant="secondary">
                         Select time range for analytics data:
@@ -333,13 +367,14 @@ export const AnalyticsTab = ({
                     <div className="flex gap-2">
                         {CHART_TIME_RANGES.map((range) => (
                             <ThemedButton
+                                aria-pressed={siteDetailsChartTimeRange === range}
                                 key={range}
                                 onClick={createTimeRangeHandler(range)}
                                 size="sm"
                                 variant={
                                     siteDetailsChartTimeRange === range
                                         ? "primary"
-                                        : "ghost"
+                                        : "secondary"
                                 }
                             >
                                 {range}
@@ -354,7 +389,7 @@ export const AnalyticsTab = ({
                 <ThemedCard
                     className="flex flex-col items-center text-center"
                     hoverable
-                    icon={analyticsIcon}
+                    icon={availabilityIcon}
                     iconColor={iconColors.uptime}
                     title="Availability"
                 >
@@ -379,7 +414,7 @@ export const AnalyticsTab = ({
                     <ThemedCard
                         className="flex flex-col items-center text-center"
                         hoverable
-                        icon={trendingIcon}
+                        icon={responseIcon}
                         iconColor={iconColors.performance}
                         title="Avg Response"
                     >
@@ -397,7 +432,7 @@ export const AnalyticsTab = ({
                 <ThemedCard
                     className="flex flex-col items-center text-center"
                     hoverable
-                    icon={activityIcon}
+                    icon={downtimeIcon}
                     iconColor={iconColors.downtime}
                     title="Downtime"
                 >
@@ -414,7 +449,7 @@ export const AnalyticsTab = ({
                 <ThemedCard
                     className="flex flex-col items-center text-center"
                     hoverable
-                    icon={trendingUpIcon}
+                    icon={checksIcon}
                     iconColor={iconColors.analytics}
                     title="Total Checks"
                 >
@@ -422,9 +457,22 @@ export const AnalyticsTab = ({
                         <ThemedText size="xl" weight="bold">
                             {totalChecks.toLocaleString()}
                         </ThemedText>
-                        <ThemedText size="xs" variant="secondary">
-                            Up: {upCount} / Down: {downCount}
-                        </ThemedText>
+                        <div className="flex flex-wrap items-center justify-center gap-2">
+                            <ThemedBadge
+                                icon={upCountIcon}
+                                size="sm"
+                                variant="success"
+                            >
+                                Up: {upCount}
+                            </ThemedBadge>
+                            <ThemedBadge
+                                icon={downCountIcon}
+                                size="sm"
+                                variant="error"
+                            >
+                                Down: {downCount}
+                            </ThemedBadge>
+                        </div>
                     </div>
                 </ThemedCard>
             </div>
@@ -441,6 +489,11 @@ export const AnalyticsTab = ({
                                 Percentile Analysis
                             </ThemedText>
                             <ThemedButton
+                                icon={
+                                    showAdvancedMetrics
+                                        ? collapseIcon
+                                        : expandIcon
+                                }
                                 onClick={handleAdvancedMetricsToggle}
                                 size="sm"
                                 variant="ghost"

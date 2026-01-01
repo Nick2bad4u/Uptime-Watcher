@@ -110,11 +110,13 @@ describe("middleware.ts", () => {
             await annotate("Type: Business Logic", "type");
 
             vi.useFakeTimers();
-            const metricsCallback = vi.fn((_metric: {
-                name: string;
-                type: "counter" | "timing";
-                value: number;
-            }) => {});
+            const metricsCallback = vi.fn(
+                (_metric: {
+                    name: string;
+                    type: "counter" | "timing";
+                    value: number;
+                }) => {}
+            );
             const next = vi.fn(async () => {
                 // Simulate some processing time
                 await Promise.resolve();

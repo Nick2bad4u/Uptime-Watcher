@@ -15,27 +15,22 @@
 
 import type { AppNotificationRequest } from "@shared/types/notifications";
 
-import { ensureError } from "@shared/utils/errorHandling";
 import { validateAppNotificationRequest } from "@shared/validation/notifications";
 
 import { getIpcServiceHelpers } from "./utils/createIpcServiceHelpers";
 
-const { ensureInitialized, wrap } = ((): ReturnType<
-    typeof getIpcServiceHelpers
-> => {
-    try {
-        return getIpcServiceHelpers("AppNotificationService", {
-            bridgeContracts: [
-                {
-                    domain: "notifications",
-                    methods: ["notifyAppEvent"],
-                },
-            ],
-        });
-    } catch (error: unknown) {
-        throw ensureError(error);
+// eslint-disable-next-line ex/no-unhandled -- Module-level initialization should fail fast when preload wiring is invalid.
+const { ensureInitialized, wrap } = getIpcServiceHelpers(
+    "AppNotificationService",
+    {
+        bridgeContracts: [
+            {
+                domain: "notifications",
+                methods: ["notifyAppEvent"],
+            },
+        ],
     }
-})();
+);
 
 /**
  * Contract describing app notification operations from the renderer.
@@ -60,20 +55,20 @@ interface AppNotificationServiceContract {
 export const AppNotificationService: AppNotificationServiceContract = {
     initialize: ensureInitialized,
 
-    notifyAppEvent: wrap("notifyAppEvent", async (
-        api,
-        request: AppNotificationRequest
-    ) => {
-        const validation = validateAppNotificationRequest(request);
-        if (!validation.success) {
-            const issues = validation.error.issues
-                .map(({ message }) => message)
-                .join(", ");
-            throw new Error(`Invalid app notification request: ${issues}`, {
-                cause: validation.error,
-            });
-        }
+    notifyAppEvent: wrap(
+        "notifyAppEvent",
+        async (api, request: AppNotificationRequest) => {
+            const validation = validateAppNotificationRequest(request);
+            if (!validation.success) {
+                const issues = validation.error.issues
+                    .map(({ message }) => message)
+                    .join(", ");
+                throw new Error(`Invalid app notification request: ${issues}`, {
+                    cause: validation.error,
+                });
+            }
 
-        await api.notifications.notifyAppEvent(validation.data);
-    }),
+            await api.notifications.notifyAppEvent(validation.data);
+        }
+    ),
 };

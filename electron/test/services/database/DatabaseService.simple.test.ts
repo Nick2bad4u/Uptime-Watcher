@@ -5,6 +5,8 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
 import { fc } from "@fast-check/vitest";
 
+import { normalizePathSeparatorsToPosix } from "@shared/utils/pathSeparators";
+
 // Mock external dependencies
 vi.mock("electron", () => ({
     app: {
@@ -47,17 +49,21 @@ vi.mock("../../utils/logger", () => ({
     },
 }));
 
-vi.mock("./utils/databaseSchema", () => ({
+vi.mock("../../../services/database/utils/schema/databaseSchema", () => ({
     createDatabaseSchema: vi.fn(),
+    synchronizeDatabaseSchemaVersion: vi.fn(),
 }));
 
-vi.mock("./utils/databaseLockRecovery", () => ({
+vi.mock(
+    "../../../services/database/utils/maintenance/databaseLockRecovery",
+    () => ({
     cleanupDatabaseLockArtifacts: vi.fn(() => ({
         failed: [],
         missing: [],
         relocated: [],
     })),
-}));
+    })
+);
 
 vi.mock("node:path", () => {
     const pathMock = {
@@ -65,8 +71,7 @@ vi.mock("node:path", () => {
         resolve: vi.fn((...args: string[]) => args.join("/")),
         dirname: vi.fn(
             (target: string) =>
-                target
-                    .replaceAll("\\", "/")
+                normalizePathSeparatorsToPosix(target)
                     .split("/")
                     .slice(0, -1)
                     .join("/") || "."
@@ -74,7 +79,7 @@ vi.mock("node:path", () => {
         sep: "/",
         basename: vi.fn(
             (target: string) =>
-                target.replaceAll("\\", "/").split("/").pop() ?? ""
+                normalizePathSeparatorsToPosix(target).split("/").pop() ?? ""
         ),
     };
 
@@ -142,9 +147,9 @@ describe("DatabaseService Coverage Tests", () => {
         const { DatabaseService } =
             await import("../../../services/database/DatabaseService");
         const schemaModule =
-            await import("../../../services/database/utils/databaseSchema");
+              await import("../../../services/database/utils/schema/databaseSchema");
         const recoveryModule =
-            await import("../../../services/database/utils/databaseLockRecovery");
+              await import("../../../services/database/utils/maintenance/databaseLockRecovery");
 
         const createDatabaseSchemaSpy = vi.spyOn(
             schemaModule,
@@ -177,7 +182,8 @@ describe("DatabaseService Coverage Tests", () => {
             const instance = DatabaseService.getInstance();
             await instance.executeTransaction(() =>
                 // Mock transaction operation
-                Promise.resolve("success"));
+                Promise.resolve("success")
+            );
             expect(true).toBeTruthy();
         } catch (error) {
             // Transaction might fail in test environment
@@ -354,11 +360,13 @@ describe("DatabaseService Coverage Tests", () => {
                             } else if (errorOnConnect) {
                                 // Error scenarios
                                 expect(() =>
-                                    instance.getDatabase()).toThrowError();
+                                    instance.getDatabase()
+                                ).toThrowError();
                             } else if (!initialized) {
                                 // Uninitialized state
                                 expect(() =>
-                                    instance.getDatabase()).toThrowError();
+                                    instance.getDatabase()
+                                ).toThrowError();
                             }
                         } catch (error) {
                             expect(error).toBeInstanceOf(Error);

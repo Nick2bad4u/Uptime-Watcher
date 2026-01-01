@@ -201,7 +201,8 @@ describe(Modal, () => {
         fireEvent.keyDown(document, { key: "Escape" });
 
         await waitFor(() =>
-            expect(screen.queryByText("B content")).not.toBeInTheDocument());
+            expect(screen.queryByText("B content")).not.toBeInTheDocument()
+        );
         expect(screen.getByText("A content")).toBeInTheDocument();
 
         fireEvent.keyDown(document, { key: "Escape" });

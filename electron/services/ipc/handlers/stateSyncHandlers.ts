@@ -10,9 +10,8 @@ import { STATE_SYNC_ACTION, STATE_SYNC_SOURCE } from "@shared/types/stateSync";
 import type { UptimeOrchestrator } from "../../../UptimeOrchestrator";
 
 import { logger } from "../../../utils/logger";
-import { registerStandardizedIpcHandler } from "../utils";
+import { createStandardizedIpcRegistrar } from "../utils";
 import { StateSyncHandlerValidators } from "../validators";
-import { withIgnoredIpcEvent } from "./handlerShared";
 
 /**
  * Dependencies required to register state synchronization IPC handlers.
@@ -33,9 +32,11 @@ export function registerStateSyncHandlers({
     setStateSyncStatus,
     uptimeOrchestrator,
 }: StateSyncHandlersDependencies): void {
-    registerStandardizedIpcHandler(
+    const register = createStandardizedIpcRegistrar(registeredHandlers);
+
+    register(
         STATE_SYNC_CHANNELS.requestFullSync,
-        withIgnoredIpcEvent(async () => {
+        async () => {
             const sites = await uptimeOrchestrator.getSites();
             const timestamp = Date.now();
 
@@ -49,7 +50,8 @@ export function registerStateSyncHandlers({
                 });
 
             const responseSites = sanitizedSites.map((site) =>
-                structuredClone(site));
+                structuredClone(site)
+            );
 
             logger.debug("[IpcService] Full sync completed", {
                 siteCount: responseSites.length,
@@ -69,14 +71,13 @@ export function registerStateSyncHandlers({
                 source: STATE_SYNC_SOURCE.DATABASE,
                 synchronized: true,
             } satisfies StateSyncFullSyncResult;
-        }),
-        StateSyncHandlerValidators.requestFullSync,
-        registeredHandlers
+        },
+        StateSyncHandlerValidators.requestFullSync
     );
 
-    registerStandardizedIpcHandler(
+    register(
         STATE_SYNC_CHANNELS.getSyncStatus,
-        withIgnoredIpcEvent(() => {
+        () => {
             const currentStatus = getStateSyncStatus();
             const cachedSiteCount = uptimeOrchestrator.getCachedSiteCount();
             const hasTrustedDatabaseSummary =
@@ -113,8 +114,7 @@ export function registerStateSyncHandlers({
 
             setStateSyncStatus(summary);
             return summary;
-        }),
-        StateSyncHandlerValidators.getSyncStatus,
-        registeredHandlers
+        },
+        StateSyncHandlerValidators.getSyncStatus
     );
 }

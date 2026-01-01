@@ -9,8 +9,6 @@ import type { ChangeEvent, JSX } from "react";
 
 import { withUtilityErrorHandling } from "@shared/utils/errorHandling";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { FiSave, FiTrash2 } from "react-icons/fi";
-import { MdDangerous, MdInfoOutline, MdSettings } from "react-icons/md";
 
 import {
     CHECK_INTERVALS,
@@ -27,21 +25,81 @@ import { ThemedInput } from "../../../theme/components/ThemedInput";
 import { ThemedSelect } from "../../../theme/components/ThemedSelect";
 import { ThemedText } from "../../../theme/components/ThemedText";
 import { useTheme } from "../../../theme/useTheme";
-import { calculateMaxDuration } from "../../../utils/duration";
 import {
     getMonitorDisplayIdentifier,
     getMonitorTypeDisplayLabel,
     UiDefaults,
 } from "../../../utils/fallbacks";
-import { AppIcons } from "../../../utils/icons";
+import { AppIcons, getIconSize } from "../../../utils/icons";
 import { getMonitorTypeConfig } from "../../../utils/monitorTypeHelper";
 import { formatRetryAttemptsText, getIntervalLabel } from "../../../utils/time";
+import { SiteSettingsHelpText } from "./SiteSettingsHelpText";
+import { SiteSettingsNumberField } from "./SiteSettingsNumberField";
 
 const WarningIcon = AppIcons.status.warning;
 const DurationIcon = AppIcons.metrics.time;
+const BellIcon = AppIcons.ui.bell;
 const IdentifierIcon = AppIcons.ui.link;
-const HistoryIcon = AppIcons.metrics.activity;
-const LastCheckedIcon = AppIcons.ui.history;
+const HistoryIcon = AppIcons.ui.history;
+const LockIcon = AppIcons.ui.lock;
+const LastCheckedIcon = AppIcons.metrics.activity;
+const RetryIcon = AppIcons.actions.refreshAlt;
+const SiteIcon = AppIcons.ui.site;
+const UnlockIcon = AppIcons.ui.unlock;
+
+const DangerZoneIcon = AppIcons.status.downFilled;
+const InfoIcon = AppIcons.ui.info;
+const SaveIcon = AppIcons.actions.save;
+const SettingsIcon = AppIcons.settings.gear;
+const TrashIcon = AppIcons.actions.remove;
+
+const CHECK_INTERVAL_INFLIGHT_WARNING_SECONDS = 15;
+
+function formatSecondsWithMinutes(totalSeconds: number): string {
+    const safeSeconds = Number.isFinite(totalSeconds)
+        ? Math.max(0, Math.round(totalSeconds))
+        : 0;
+
+    if (safeSeconds < 60) {
+        return `${safeSeconds}s`;
+    }
+
+    const minutes = Math.floor(safeSeconds / 60);
+    const seconds = safeSeconds % 60;
+    return `${safeSeconds}s (${minutes}m ${seconds}s)`;
+}
+
+function calculateBackoffSeconds(retryAttempts: number): number {
+    if (retryAttempts <= 0) {
+        return 0;
+    }
+
+    let backoffSeconds = 0;
+    for (let i = 0; i < retryAttempts; i += 1) {
+        backoffSeconds += 2 ** i;
+    }
+
+    return backoffSeconds;
+}
+
+function calculateMaxCheckDurationSeconds(args: {
+    retryAttempts: number;
+    timeoutSeconds: number;
+}): {
+    readonly backoffSeconds: number;
+    readonly totalAttempts: number;
+    readonly totalSeconds: number;
+} {
+    const totalAttempts = args.retryAttempts + 1;
+    const backoffSeconds = calculateBackoffSeconds(args.retryAttempts);
+    const totalSeconds = args.timeoutSeconds * totalAttempts + backoffSeconds;
+
+    return {
+        backoffSeconds,
+        totalAttempts,
+        totalSeconds,
+    };
+}
 
 /**
  * Props for the SettingsTab component.
@@ -75,8 +133,8 @@ export interface SettingsTabProperties {
     readonly intervalChanged: boolean;
     /** Whether any async operation is in progress */
     readonly isLoading: boolean;
-    /** Local state value for check interval */
-    readonly localCheckInterval: number;
+    /** Local state value for check interval in milliseconds */
+    readonly localCheckIntervalMs: number;
     /** Local state value for site name */
     readonly localName: string;
     /** Local state value for retry attempts */
@@ -84,7 +142,7 @@ export interface SettingsTabProperties {
     /**
      * Local state value for timeout in seconds (converted to ms when saving)
      */
-    readonly localTimeout: number;
+    readonly localTimeoutSeconds: number;
     /** Whether the retry attempts have been changed */
     readonly retryAttemptsChanged: boolean;
     /** Currently selected monitor being configured */
@@ -202,10 +260,10 @@ export const SettingsTab = ({
     hasUnsavedChanges,
     intervalChanged,
     isLoading,
-    localCheckInterval,
+    localCheckIntervalMs,
     localName,
     localRetryAttempts,
-    localTimeout,
+    localTimeoutSeconds,
     retryAttemptsChanged,
     selectedMonitor,
     setLocalName,
@@ -217,28 +275,22 @@ export const SettingsTab = ({
     const trimmedSiteName = localName.trim();
     const isSiteNameValid = trimmedSiteName.length > 0;
     const isTimeoutValid =
-        localTimeout >= TIMEOUT_CONSTRAINTS.MIN &&
-        localTimeout <= TIMEOUT_CONSTRAINTS.MAX;
+        localTimeoutSeconds >= TIMEOUT_CONSTRAINTS.MIN &&
+        localTimeoutSeconds <= TIMEOUT_CONSTRAINTS.MAX;
     const isRetryAttemptsValid =
         localRetryAttempts >= RETRY_CONSTRAINTS.MIN &&
         localRetryAttempts <= RETRY_CONSTRAINTS.MAX;
 
-    // Icon colors configuration
-    const getIconColors = (): {
-        danger: string;
-        info: string;
-        monitoring: string;
-        settings: string;
-        timing: string;
-    } => ({
-        danger: currentTheme.colors.error,
-        info: currentTheme.colors.info,
-        monitoring: currentTheme.colors.primary[600],
-        settings: currentTheme.colors.primary[500],
-        timing: currentTheme.colors.warning,
-    });
-
-    const iconColors = getIconColors();
+    const iconColors = useMemo(
+        () => ({
+            danger: currentTheme.colors.error,
+            info: currentTheme.colors.info,
+            monitoring: currentTheme.colors.primary[600],
+            settings: currentTheme.colors.primary[500],
+            timing: currentTheme.colors.warning,
+        }),
+        [currentTheme.colors]
+    );
 
     const loggedHandleSaveName = useCallback(async () => {
         logger.user.action("Settings: Save site name initiated", {
@@ -247,12 +299,7 @@ export const SettingsTab = ({
             siteIdentifier: currentSite.identifier,
         });
         await handleSaveName();
-    }, [
-        currentSite.identifier,
-        currentSite.name,
-        handleSaveName,
-        trimmedSiteName,
-    ]);
+    }, [currentSite.identifier, currentSite.name, handleSaveName, trimmedSiteName]);
 
     const isSiteMuted = useMemo(
         () =>
@@ -286,7 +333,7 @@ export const SettingsTab = ({
     const loggedHandleSaveInterval = useCallback(() => {
         logger.user.action("Settings: Save check interval", {
             monitorId: selectedMonitor.id,
-            newInterval: localCheckInterval,
+            newInterval: localCheckIntervalMs,
             oldInterval: selectedMonitor.checkInterval,
             siteIdentifier: currentSite.identifier,
         });
@@ -294,7 +341,7 @@ export const SettingsTab = ({
     }, [
         currentSite.identifier,
         handleSaveInterval,
-        localCheckInterval,
+        localCheckIntervalMs,
         selectedMonitor.checkInterval,
         selectedMonitor.id,
     ]);
@@ -314,7 +361,7 @@ export const SettingsTab = ({
     const loggedHandleSaveTimeout = useCallback(async () => {
         logger.user.action("Settings: Save timeout", {
             monitorId: selectedMonitor.id,
-            newTimeout: localTimeout,
+            newTimeoutSeconds: localTimeoutSeconds,
             oldTimeout: selectedMonitor.timeout,
             siteIdentifier: currentSite.identifier,
         });
@@ -322,7 +369,7 @@ export const SettingsTab = ({
     }, [
         currentSite.identifier,
         handleSaveTimeout,
-        localTimeout,
+        localTimeoutSeconds,
         selectedMonitor.id,
         selectedMonitor.timeout,
     ]);
@@ -367,28 +414,139 @@ export const SettingsTab = ({
         void loggedHandleRemoveSite();
     }, [loggedHandleRemoveSite]);
 
+    const buttonIconSize = getIconSize("sm");
+    const fieldIconSize = getIconSize("xs");
+
     const settingsIcon = useMemo(
-        () => <MdSettings color={iconColors.settings} />,
+        () => <SettingsIcon color={iconColors.settings} />,
         [iconColors.settings]
     );
-    const saveIcon = useMemo(() => <FiSave />, []);
+    const saveIcon = useMemo(
+        () => <SaveIcon aria-hidden size={buttonIconSize} />,
+        [buttonIconSize]
+    );
     const timerIcon = useMemo(
         () => <DurationIcon color={iconColors.timing} size={18} />,
         [iconColors.timing]
     );
-    const saveIconTwo = useMemo(() => <FiSave />, []);
-    const saveIconThree = useMemo(() => <FiSave />, []);
-    const saveIconFour = useMemo(() => <FiSave />, []);
+    const notificationsIcon = useMemo(
+        () => <BellIcon color={iconColors.info} size={18} />,
+        [iconColors.info]
+    );
     const infoIcon = useMemo(
-        () => <MdInfoOutline color={iconColors.info} />,
+        () => <InfoIcon color={iconColors.info} />,
         [iconColors.info]
     );
     const dangerIcon = useMemo(
-        () => <MdDangerous color={iconColors.danger} />,
+        () => <DangerZoneIcon color={iconColors.danger} />,
         [iconColors.danger]
     );
-    const trashIcon = useMemo(() => <FiTrash2 />, []);
-    const icon = useMemo(() => <WarningIcon />, []);
+    const trashIcon = useMemo(
+        () => <TrashIcon aria-hidden size={buttonIconSize} />,
+        [buttonIconSize]
+    );
+
+    const muteToggleIcon = useMemo(() => {
+        const IconComponent = isSiteMuted ? UnlockIcon : LockIcon;
+        return <IconComponent aria-hidden size={buttonIconSize} />;
+    }, [buttonIconSize, isSiteMuted]);
+
+    const nameLabelIcon = useMemo(
+        () => <SiteIcon aria-hidden size={fieldIconSize} />,
+        [fieldIconSize]
+    );
+    const identifierLabelIcon = useMemo(
+        () => <IdentifierIcon aria-hidden size={fieldIconSize} />,
+        [fieldIconSize]
+    );
+    const intervalLabelIcon = useMemo(
+        () => <DurationIcon aria-hidden size={fieldIconSize} />,
+        [fieldIconSize]
+    );
+    const timeoutLabelIcon = useMemo(
+        () => <DurationIcon aria-hidden size={fieldIconSize} />,
+        [fieldIconSize]
+    );
+    const retryLabelIcon = useMemo(
+        () => <RetryIcon aria-hidden size={fieldIconSize} />,
+        [fieldIconSize]
+    );
+
+    const timeoutFieldLabel = useMemo(
+        () => (
+            <span className="inline-flex items-center gap-2">
+                {timeoutLabelIcon}
+                Timeout (seconds)
+            </span>
+        ),
+        [timeoutLabelIcon]
+    );
+
+    const retryAttemptsFieldLabel = useMemo(
+        () => (
+            <span className="inline-flex items-center gap-2">
+                {retryLabelIcon}
+                Retry attempts
+            </span>
+        ),
+        [retryLabelIcon]
+    );
+
+    const maxCheckDuration = useMemo(
+        () =>
+            calculateMaxCheckDurationSeconds({
+                retryAttempts: localRetryAttempts,
+                timeoutSeconds: localTimeoutSeconds,
+            }),
+        [localRetryAttempts, localTimeoutSeconds]
+    );
+
+    const maxDurationVariant = useMemo(() => {
+        if (maxCheckDuration.backoffSeconds >= 16 || maxCheckDuration.totalSeconds >= 180) {
+            return "error";
+        }
+
+        if (maxCheckDuration.backoffSeconds >= 8 || maxCheckDuration.totalSeconds >= 60) {
+            return "warning";
+        }
+
+        return "success";
+    }, [maxCheckDuration.backoffSeconds, maxCheckDuration.totalSeconds]);
+
+    const maxDurationLabel = useMemo(
+        () => formatSecondsWithMinutes(maxCheckDuration.totalSeconds),
+        [maxCheckDuration.totalSeconds]
+    );
+
+    const timeoutHelperText = useMemo(
+        () => (
+            <span>
+                Maximum time to wait per attempt before it is treated as failed.
+                <span className="ml-2 inline-flex items-center gap-1 font-medium">
+                    <DurationIcon aria-hidden size={14} />
+                    Current: {formatSecondsWithMinutes(localTimeoutSeconds)}
+                </span>
+                <span className="ml-2 inline-flex items-center gap-1">
+                    <DurationIcon aria-hidden size={14} />
+                    Max: {formatSecondsWithMinutes(TIMEOUT_CONSTRAINTS.MAX)}
+                </span>
+            </span>
+        ),
+        [localTimeoutSeconds]
+    );
+
+    const retryAttemptsHelperText = useMemo(
+        () => (
+            <span>
+                {formatRetryAttemptsText(localRetryAttempts)}.
+                <span className="ml-2">Range: 0–{RETRY_CONSTRAINTS.MAX}.</span>
+                <span className="ml-2">
+                    Values above {RETRY_CONSTRAINTS.MAX} are clamped.
+                </span>
+            </span>
+        ),
+        [localRetryAttempts]
+    );
     return (
         <div className="space-y-6" data-testid="settings-tab">
             {/* Site Configuration */}
@@ -402,7 +560,10 @@ export const SettingsTab = ({
                             variant="secondary"
                             weight="medium"
                         >
-                            Site Name
+                            <span className="inline-flex items-center gap-2">
+                                {nameLabelIcon}
+                                Site name
+                            </span>
                         </ThemedText>
                         <div className="site-settings-field__controls">
                             <ThemedInput
@@ -450,7 +611,10 @@ export const SettingsTab = ({
                             variant="secondary"
                             weight="medium"
                         >
-                            {identifierLabel}
+                            <span className="inline-flex items-center gap-2">
+                                {identifierLabelIcon}
+                                {identifierLabel}
+                            </span>
                         </ThemedText>
                         <ThemedInput
                             className="opacity-70"
@@ -461,38 +625,42 @@ export const SettingsTab = ({
                                 selectedMonitor
                             )}
                         />
-                        <ThemedText size="xs" variant="tertiary">
-                            Identifier cannot be changed
-                        </ThemedText>
+                            <div className="mt-2">
+                                <SiteSettingsHelpText icon={InfoIcon}>
+                                    Generated when this site is created and cannot be changed.
+                                </SiteSettingsHelpText>
+                            </div>
                     </div>
                 </div>
             </ThemedCard>
 
             <ThemedCard
                 className="site-settings-section"
-                icon={dangerIcon}
+                icon={notificationsIcon}
                 title="Notifications"
             >
                 <div className="site-settings-field">
                     <ThemedText className="mb-2" size="sm" variant="secondary">
-                        System notifications for this site
+                        System notifications
                     </ThemedText>
-                    <ThemedText className="mb-4" size="xs" variant="tertiary">
-                        {isSiteMuted
-                            ? "System notifications are muted for this site, even when global notifications are enabled."
-                            : "System notifications will follow your global notification settings for this site."}
-                    </ThemedText>
+                    <div className="mb-4">
+                        <SiteSettingsHelpText icon={BellIcon}>
+                            {isSiteMuted
+                                ? "Notifications for this site are muted. This overrides global notification settings."
+                                : "This site follows your global notification settings."}
+                        </SiteSettingsHelpText>
+                    </div>
                     <ThemedButton
                         className="site-settings-field__cta"
-                        icon={icon}
+                        icon={muteToggleIcon}
                         loading={isLoading}
                         onClick={handleToggleSiteMute}
                         size="sm"
                         variant={isSiteMuted ? "secondary" : "primary"}
                     >
                         {isSiteMuted
-                            ? "Unmute system notifications"
-                            : "Mute system notifications"}
+                            ? "Unmute notifications for this site"
+                            : "Mute notifications for this site"}
                     </ThemedButton>
                 </div>
             </ThemedCard>
@@ -508,13 +676,16 @@ export const SettingsTab = ({
                             variant="secondary"
                             weight="medium"
                         >
-                            Check Interval
+                            <span className="inline-flex items-center gap-2">
+                                {intervalLabelIcon}
+                                Check interval
+                            </span>
                         </ThemedText>
                         <div className="site-settings-field__controls">
                             <ThemedSelect
                                 className="flex-1"
                                 onChange={handleIntervalChange}
-                                value={localCheckInterval}
+                                value={localCheckIntervalMs}
                             >
                                 {CHECK_INTERVALS.map((interval) => {
                                     const value =
@@ -531,7 +702,7 @@ export const SettingsTab = ({
                             </ThemedSelect>
                             <ThemedButton
                                 disabled={!intervalChanged}
-                                icon={saveIconTwo}
+                                icon={saveIcon}
                                 onClick={loggedHandleSaveInterval}
                                 size="sm"
                                 variant={
@@ -541,146 +712,135 @@ export const SettingsTab = ({
                                 Save
                             </ThemedButton>
                         </div>
-                        <ThemedText size="xs" variant="tertiary">
-                            Monitor checks every{" "}
-                            {Math.round(localCheckInterval / 1000)} seconds
-                        </ThemedText>
+                        <div className="mt-2">
+                            <SiteSettingsHelpText>
+                                How often Uptime Watcher runs a check for this monitor.
+                                <span className="ml-2 inline-flex items-center gap-1 font-medium">
+                                    <DurationIcon aria-hidden size={14} />
+                                    Current: {formatSecondsWithMinutes(
+                                        Math.round(localCheckIntervalMs / 1000)
+                                    )}
+                                </span>
+                            </SiteSettingsHelpText>
+                        </div>
+
+                        {Math.round(localCheckIntervalMs / 1000) <
+                        CHECK_INTERVAL_INFLIGHT_WARNING_SECONDS ? (
+                            <div className="mt-2">
+                                <SiteSettingsHelpText
+                                    icon={WarningIcon}
+                                    tone="warning"
+                                >
+                                    Intervals below {CHECK_INTERVAL_INFLIGHT_WARNING_SECONDS}s may
+                                    cause multiple in-flight checks if a request takes longer than
+                                    the interval. Not recommended.
+                                </SiteSettingsHelpText>
+                            </div>
+                        ) : null}
                     </div>
 
                     {/* Timeout Configuration */}
-                    <div className="site-settings-field">
-                        <ThemedText
-                            className="site-settings-field__label"
-                            size="sm"
-                            variant="secondary"
-                            weight="medium"
-                        >
-                            Timeout (seconds)
-                        </ThemedText>
-                        <div className="site-settings-field__controls">
-                            <ThemedInput
-                                className="flex-1"
-                                max={TIMEOUT_CONSTRAINTS.MAX}
-                                min={TIMEOUT_CONSTRAINTS.MIN}
-                                onChange={handleTimeoutChange}
-                                placeholder="Enter timeout in seconds"
-                                step={TIMEOUT_CONSTRAINTS.STEP}
-                                type="number"
-                                value={localTimeout}
-                            />
-                            <ThemedButton
-                                disabled={!timeoutChanged || !isTimeoutValid}
-                                icon={saveIconThree}
-                                onClick={handleSaveTimeoutClick}
-                                size="sm"
-                                variant={
-                                    timeoutChanged ? "primary" : "secondary"
-                                }
-                            >
-                                Save
-                            </ThemedButton>
-                        </div>
-                        <ThemedText size="xs" variant="tertiary">
-                            Request timeout: {localTimeout} seconds
-                        </ThemedText>
-                        {isTimeoutValid ? null : (
-                            <ThemedText size="xs" variant="error">
-                                Allowed range: {TIMEOUT_CONSTRAINTS.MIN}-
-                                {TIMEOUT_CONSTRAINTS.MAX} seconds.
-                            </ThemedText>
-                        )}
-                    </div>
+                    <SiteSettingsNumberField
+                        errorText={`Allowed range: ${TIMEOUT_CONSTRAINTS.MIN}-${TIMEOUT_CONSTRAINTS.MAX} seconds.`}
+                        helperText={timeoutHelperText}
+                        isChanged={timeoutChanged}
+                        isValid={isTimeoutValid}
+                        label={timeoutFieldLabel}
+                        max={TIMEOUT_CONSTRAINTS.MAX}
+                        min={TIMEOUT_CONSTRAINTS.MIN}
+                        onChange={handleTimeoutChange}
+                        onSave={handleSaveTimeoutClick}
+                        placeholder="Enter timeout in seconds"
+                        saveIcon={saveIcon}
+                        step={TIMEOUT_CONSTRAINTS.STEP}
+                        value={localTimeoutSeconds}
+                    />
 
                     {/* Retry Attempts Configuration */}
-                    <div className="site-settings-field">
-                        <ThemedText
-                            className="site-settings-field__label"
-                            size="sm"
-                            variant="secondary"
-                            weight="medium"
-                        >
-                            Retry Attempts
-                        </ThemedText>
-                        <div className="site-settings-field__controls">
-                            <ThemedInput
-                                className="flex-1"
-                                max={RETRY_CONSTRAINTS.MAX}
-                                min={RETRY_CONSTRAINTS.MIN}
-                                onChange={handleRetryAttemptsChange}
-                                placeholder="Enter retry attempts"
-                                step={RETRY_CONSTRAINTS.STEP}
-                                type="number"
-                                value={localRetryAttempts}
-                            />
-                            <ThemedButton
-                                disabled={
-                                    !retryAttemptsChanged ||
-                                    !isRetryAttemptsValid
-                                }
-                                icon={saveIconFour}
-                                onClick={handleSaveRetryAttemptsClick}
-                                size="sm"
-                                variant={
-                                    retryAttemptsChanged
-                                        ? "primary"
-                                        : "secondary"
-                                }
-                            >
-                                Save
-                            </ThemedButton>
-                        </div>
-                        <ThemedText size="xs" variant="tertiary">
-                            {formatRetryAttemptsText(localRetryAttempts)}
-                        </ThemedText>
-                        {isRetryAttemptsValid ? null : (
-                            <ThemedText size="xs" variant="error">
-                                Retry attempts must be between{" "}
-                                {RETRY_CONSTRAINTS.MIN} and{" "}
-                                {RETRY_CONSTRAINTS.MAX}.
-                            </ThemedText>
-                        )}
-                    </div>
+                    <SiteSettingsNumberField
+                        errorText={`Retry attempts must be between ${RETRY_CONSTRAINTS.MIN} and ${RETRY_CONSTRAINTS.MAX}.`}
+                        helperText={retryAttemptsHelperText}
+                        isChanged={retryAttemptsChanged}
+                        isValid={isRetryAttemptsValid}
+                        label={retryAttemptsFieldLabel}
+                        max={RETRY_CONSTRAINTS.MAX}
+                        min={RETRY_CONSTRAINTS.MIN}
+                        onChange={handleRetryAttemptsChange}
+                        onSave={handleSaveRetryAttemptsClick}
+                        placeholder="Enter retry attempts"
+                        saveIcon={saveIcon}
+                        step={RETRY_CONSTRAINTS.STEP}
+                        value={localRetryAttempts}
+                    />
 
                     {/* Total monitoring time indicator */}
-                    {localRetryAttempts > 0 && (
+                    {localRetryAttempts > 0 ? (
                         <ThemedBox
                             className="site-settings-duration"
                             padding="md"
                             rounded="lg"
                             variant="tertiary"
                         >
-                            <div className="site-settings-duration__body">
-                                <span
-                                    aria-hidden="true"
-                                    className="site-settings-duration__icon"
-                                >
-                                    <DurationIcon size={18} />
-                                </span>
-                                <div className="site-settings-duration__content">
+                        <div className="site-settings-duration__body">
+                            <span
+                                aria-hidden="true"
+                                className="site-settings-duration__icon"
+                            >
+                                <DurationIcon size={18} />
+                            </span>
+                            <div className="site-settings-duration__content">
+                                <div className="flex flex-wrap items-center gap-2">
                                     <ThemedText
                                         size="sm"
-                                        variant="primary"
+                                        variant="secondary"
                                         weight="medium"
                                     >
-                                        Maximum check duration ~{" "}
-                                        {calculateMaxDuration(
-                                            localTimeout,
-                                            localRetryAttempts
-                                        )}
+                                        Maximum check duration
                                     </ThemedText>
-                                    <ThemedText
-                                        className="site-settings-duration__meta"
-                                        size="xs"
-                                        variant="secondary"
+                                    <ThemedBadge
+                                        className="shrink-0"
+                                        size="sm"
+                                        variant={maxDurationVariant}
                                     >
-                                        {localTimeout}s per attempt x{" "}
-                                        {localRetryAttempts + 1} attempts +{" "}
-                                        backoff delays
-                                    </ThemedText>
+                                        <span className="inline-flex items-center gap-1">
+                                            <DurationIcon aria-hidden size={14} />
+                                            ~ {maxDurationLabel}
+                                        </span>
+                                    </ThemedBadge>
+                                </div>
+                                <ThemedText
+                                    className="site-settings-duration__meta"
+                                    size="xs"
+                                    variant="secondary"
+                                >
+                                    <span className="inline-flex items-center gap-1">
+                                        <DurationIcon aria-hidden size={14} />
+                                        {formatSecondsWithMinutes(localTimeoutSeconds)}
+                                    </span>
+                                    <span> per attempt</span>
+                                    <span className="mx-1">×</span>
+                                    <span className="inline-flex items-center gap-1">
+                                        <RetryIcon aria-hidden size={14} />
+                                        {maxCheckDuration.totalAttempts} attempts
+                                    </span>
+                                    <span className="mx-1">+</span>
+                                    <span className="inline-flex items-center gap-1">
+                                        <LastCheckedIcon aria-hidden size={14} />
+                                        {formatSecondsWithMinutes(
+                                            maxCheckDuration.backoffSeconds
+                                        )} backoff
+                                    </span>
+                                </ThemedText>
+                                <div className="mt-2">
+                                    <SiteSettingsHelpText icon={InfoIcon}>
+                                        This estimate updates automatically based on Timeout and
+                                        Retry attempts above.
+                                    </SiteSettingsHelpText>
                                 </div>
                             </div>
+                        </div>
                         </ThemedBox>
-                    )}
+                    ) : null}
                 </div>
             </ThemedCard>
 

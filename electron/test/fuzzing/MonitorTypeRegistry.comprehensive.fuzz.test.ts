@@ -31,7 +31,6 @@ import {
     registerMonitorType,
     createMonitorWithTypeGuards,
     isValidMonitorTypeGuard,
-    migrateMonitorType,
     type BaseMonitorConfig,
 } from "../../services/monitoring/MonitorTypeRegistry";
 
@@ -52,7 +51,8 @@ describe("MonitorTypeRegistry Fuzzing Tests", () => {
                 fc.property(fc.string(), (input: string) => {
                     // Property: function should never throw for any string input
                     expect(() =>
-                        getMonitorTypeConfig(input)).not.toThrowError();
+                        getMonitorTypeConfig(input)
+                    ).not.toThrowError();
 
                     const result = getMonitorTypeConfig(input);
                     // Property: result is either undefined or a valid config object
@@ -115,7 +115,8 @@ describe("MonitorTypeRegistry Fuzzing Tests", () => {
                     (input: any) => {
                         // Property: should handle non-string inputs gracefully
                         expect(() =>
-                            isValidMonitorType(input)).not.toThrowError();
+                            isValidMonitorType(input)
+                        ).not.toThrowError();
                     }
                 )
             );
@@ -161,7 +162,8 @@ describe("MonitorTypeRegistry Fuzzing Tests", () => {
                 fc.property(fc.string(), (input: string) => {
                     // Property: should never throw for any string input
                     expect(() =>
-                        getMonitorServiceFactory(input)).not.toThrowError();
+                        getMonitorServiceFactory(input)
+                    ).not.toThrowError();
                 })
             );
         });
@@ -281,7 +283,8 @@ describe("MonitorTypeRegistry Fuzzing Tests", () => {
 
                         // Property: registration with valid field should not throw
                         expect(() =>
-                            registerMonitorType(config)).not.toThrowError();
+                            registerMonitorType(config)
+                        ).not.toThrowError();
                     }
                 )
             );
@@ -294,7 +297,8 @@ describe("MonitorTypeRegistry Fuzzing Tests", () => {
                 fc.property(fc.string(), (input: string) => {
                     // Property: type guard should never throw
                     expect(() =>
-                        isValidMonitorTypeGuard(input)).not.toThrowError();
+                        isValidMonitorTypeGuard(input)
+                    ).not.toThrowError();
 
                     const result = isValidMonitorTypeGuard(input);
                     // Property: result must be boolean
@@ -339,31 +343,8 @@ describe("MonitorTypeRegistry Fuzzing Tests", () => {
             };
 
             expect(() =>
-                createMonitorWithTypeGuards(
-                    "test-guard-type",
-                    testMonitor
-                )).not.toThrowError();
-        });
-    });
-
-    describe(migrateMonitorType, () => {
-        it("should handle migration parameters safely", () => {
-            fc.assert(
-                fc.property(fc.string(), fc.string(), fc.record({}), (
-                    fromType: string,
-                    _toType: string,
-                    data: Record<string, any>
-                ) => {
-                    // Property: migration should not throw with any parameters
-                    expect(() =>
-                        migrateMonitorType(
-                            fromType as MonitorType,
-                            "1.0.0",
-                            "2.0.0",
-                            data
-                        )).not.toThrowError();
-                })
-            );
+                createMonitorWithTypeGuards("test-guard-type", testMonitor)
+            ).not.toThrowError();
         });
     });
 
@@ -380,13 +361,14 @@ describe("MonitorTypeRegistry Fuzzing Tests", () => {
 
             for (const maliciousInput of sqlInjectionAttempts) {
                 expect(() =>
-                    getMonitorTypeConfig(maliciousInput)).not.toThrowError();
+                    getMonitorTypeConfig(maliciousInput)
+                ).not.toThrowError();
                 expect(() =>
-                    isValidMonitorType(maliciousInput)).not.toThrowError();
+                    isValidMonitorType(maliciousInput)
+                ).not.toThrowError();
                 expect(() =>
-                    getMonitorServiceFactory(
-                        maliciousInput
-                    )).not.toThrowError();
+                    getMonitorServiceFactory(maliciousInput)
+                ).not.toThrowError();
 
                 const result = getMonitorTypeConfig(maliciousInput);
                 expect(result).toBeUndefined(); // Should not find malicious "types"
@@ -404,9 +386,11 @@ describe("MonitorTypeRegistry Fuzzing Tests", () => {
 
             for (const maliciousInput of xssAttempts) {
                 expect(() =>
-                    getMonitorTypeConfig(maliciousInput)).not.toThrowError();
+                    getMonitorTypeConfig(maliciousInput)
+                ).not.toThrowError();
                 expect(() =>
-                    isValidMonitorType(maliciousInput)).not.toThrowError();
+                    isValidMonitorType(maliciousInput)
+                ).not.toThrowError();
 
                 const result = getMonitorTypeConfig(maliciousInput);
                 expect(result).toBeUndefined();
@@ -429,7 +413,8 @@ describe("MonitorTypeRegistry Fuzzing Tests", () => {
                 expect(() => getMonitorTypeConfig(input)).not.toThrowError();
                 expect(() => isValidMonitorType(input)).not.toThrowError();
                 expect(() =>
-                    getMonitorServiceFactory(input)).not.toThrowError();
+                    getMonitorServiceFactory(input)
+                ).not.toThrowError();
             }
         });
 
@@ -439,13 +424,9 @@ describe("MonitorTypeRegistry Fuzzing Tests", () => {
 
             expect(() => getMonitorTypeConfig(largeString)).not.toThrowError();
             expect(() => isValidMonitorType(largeString)).not.toThrowError();
-            expect(() =>
-                migrateMonitorType(
-                    "http" as MonitorType,
-                    "1.0.0",
-                    "2.0.0",
-                    deepObject
-                )).not.toThrowError();
+            // Registry APIs are string-keyed; ensure deep objects don't break
+            // unrelated registry operations.
+            expect(() => JSON.stringify(deepObject)).not.toThrowError();
         });
     });
 

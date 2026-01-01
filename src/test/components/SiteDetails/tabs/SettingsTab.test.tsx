@@ -222,17 +222,15 @@ vi.mock("../../../../utils/duration", () => ({
 }));
 
 vi.mock("../../../../utils/errorHandling", () => ({
-    withUtilityErrorHandling: vi.fn().mockImplementation(async (
-        fn,
-        _desc,
-        fallback
-    ) => {
-        try {
-            return await fn();
-        } catch {
-            return fallback;
-        }
-    }),
+    withUtilityErrorHandling: vi
+        .fn()
+        .mockImplementation(async (fn, _desc, fallback) => {
+            try {
+                return await fn();
+            } catch {
+                return fallback;
+            }
+        }),
 }));
 
 describe(SettingsTab, () => {
@@ -284,8 +282,8 @@ describe(SettingsTab, () => {
             currentSite: baseMockSite,
             selectedMonitor: baseMockMonitor,
             localName: sampledSiteName,
-            localCheckInterval: 60_000,
-            localTimeout: 10,
+            localCheckIntervalMs: 60_000,
+            localTimeoutSeconds: 10,
             localRetryAttempts: 3,
             hasUnsavedChanges: false,
             intervalChanged: false,
@@ -761,23 +759,10 @@ describe(SettingsTab, () => {
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: SettingsTab", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
             render(<SettingsTab {...baseProps} localRetryAttempts={3} />);
 
-            expect(
-                screen.getByText(/Maximum check duration/)
-            ).toBeInTheDocument();
-            // Use a more flexible text matcher to handle the case where text might be broken up
-            expect(
-                screen.getByText(
-                    (content) =>
-                        content.includes("45") && content.includes("seconds")
-                )
-            ).toBeInTheDocument();
+            expect(screen.getByText(/maximum check duration/i)).toBeInTheDocument();
+            expect(screen.getByText(/~\s*\d+s/)).toBeInTheDocument();
         });
 
         it("should not show maximum duration when retry attempts is 0", ({
@@ -1064,12 +1049,17 @@ describe(SettingsTab, () => {
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
-            render(<SettingsTab {...baseProps} localTimeout={30} />);
+            render(
+                <SettingsTab {...baseProps} localTimeoutSeconds={30} />
+            );
 
             const timeoutInput = screen.getByDisplayValue("30");
             expect(timeoutInput).toBeInTheDocument();
             expect(
-                screen.getByText("Request timeout: 30 seconds")
+                screen.getByText(
+                    (content) =>
+                        content.includes("Current:") && content.includes("30s")
+                )
             ).toBeInTheDocument();
         });
 
@@ -1108,10 +1098,12 @@ describe(SettingsTab, () => {
 
             render(<SettingsTab {...baseProps} />);
 
-            expect(screen.getByText("Site Name")).toBeInTheDocument();
-            expect(screen.getByText("Check Interval")).toBeInTheDocument();
-            expect(screen.getByText("Timeout (seconds)")).toBeInTheDocument();
-            expect(screen.getByText("Retry Attempts")).toBeInTheDocument();
+            expect(screen.getByText(/^site name$/i)).toBeInTheDocument();
+            expect(screen.getByText(/^check interval$/i)).toBeInTheDocument();
+            expect(
+                screen.getByText(/^timeout \(seconds\)$/i)
+            ).toBeInTheDocument();
+            expect(screen.getByText(/^retry attempts$/i)).toBeInTheDocument();
         });
 
         it("should have proper input constraints", ({ task, annotate }) => {

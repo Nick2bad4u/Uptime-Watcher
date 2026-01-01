@@ -12,7 +12,7 @@ import type { Site } from "@shared/types";
 import type { StandardizedCache } from "../../../utils/cache/StandardizedCache";
 import type { DatabaseServiceFactory } from "../../../services/factories/DatabaseServiceFactory";
 import type { ConfigurationManager } from "../../../managers/ConfigurationManager";
-import type { DatabaseRestorePayload } from "../../../services/database/utils/databaseBackup";
+import type { DatabaseRestorePayload } from "../../../services/database/utils/backup/databaseBackup";
 import { logger as backendLogger } from "../../../utils/logger";
 
 import {
@@ -785,7 +785,7 @@ describe("DatabaseCommands", () => {
                 cache: mockCache as StandardizedCache<Site>,
                 configurationManager:
                     mockConfigurationManager as unknown as ConfigurationManager,
-                data: '{"sites": [], "settings": {}}',
+                data: '{"sites": [{"identifier": "test1"}], "settings": {}}',
                 eventEmitter:
                     mockEventBus as unknown as TypedEventBus<UptimeEvents>,
                 serviceFactory:
@@ -814,7 +814,9 @@ describe("DatabaseCommands", () => {
             expect(result).toBeTruthy();
             expect(
                 mockImportExportService.importDataFromJson
-            ).toHaveBeenCalledWith('{"sites": [], "settings": {}}');
+            ).toHaveBeenCalledWith(
+                '{"sites": [{"identifier": "test1"}], "settings": {}}'
+            );
             expect(
                 mockImportExportService.persistImportedData
             ).toHaveBeenCalled();
@@ -1116,6 +1118,34 @@ describe("DatabaseCommands", () => {
             const result = await command.validate();
 
             expect(result).toEqual({ errors: [], isValid: true });
+        });
+
+        it("should reject schema-invalid JSON", async ({ task, annotate }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseCommands", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Validation", "type");
+
+            const invalidCommand = new ImportDataCommand({
+                cache: mockCache as StandardizedCache<Site>,
+                configurationManager:
+                    mockConfigurationManager as unknown as ConfigurationManager,
+                data: '{"sites": [], "settings": {}}',
+                eventEmitter:
+                    mockEventBus as unknown as TypedEventBus<UptimeEvents>,
+                serviceFactory:
+                    mockServiceFactory as unknown as DatabaseServiceFactory,
+            });
+
+            const result = await invalidCommand.validate();
+
+            expect(result.isValid).toBeFalsy();
+            expect(result.errors).toContain(
+                "Import data did not match the expected format."
+            );
+            expect(result.errors.some((error) => error.includes("sites"))).toBeTruthy(
+
+            );
         });
 
         it("should provide correct description", async ({ task, annotate }) => {

@@ -35,9 +35,11 @@ vi.mock("../DatabaseService", () => ({
     },
 }));
 
-vi.mock("../utils/settingsMapper", () => ({
-    settingsRowToObject: vi.fn(),
-    settingsObjectToRow: vi.fn(),
+vi.mock("../../../services/database/utils/mappers/settingsMapper", () => ({
+    rowToSetting: vi.fn(),
+    rowToSettingValue: vi.fn(),
+    rowsToSettings: vi.fn(),
+    settingsToRecord: vi.fn(),
 }));
 
 vi.mock("../../utils/operationalHooks", () => ({

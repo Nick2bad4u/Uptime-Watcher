@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { test } from "@fast-check/vitest";
 import * as fc from "fast-check";
 
-const modulePath = "../../../../../../electron/utils/database/siteDeletion";
+const modulePath = "../../../../../../electron/services/database/siteDeletion";
 const errorUtilsPath = "../../../../../../shared/utils/errorHandling";
 
 /** Arbitrary for generating valid site identifiers */

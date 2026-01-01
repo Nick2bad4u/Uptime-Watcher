@@ -128,30 +128,32 @@ describe("StatusUpdateHandler", () => {
         vi.clearAllMocks();
 
         // Mock withUtilityErrorHandling to just call the function and handle parameters properly
-        mockWithUtilityErrorHandling.mockImplementation(async (
-            fn: () => Promise<any>,
-            operationName: string,
-            fallbackValue = undefined,
-            shouldThrow = false
-        ) => {
-            try {
-                return await fn();
-            } catch (error) {
-                if (shouldThrow) {
-                    throw error;
-                }
+        mockWithUtilityErrorHandling.mockImplementation(
+            async (
+                fn: () => Promise<any>,
+                operationName: string,
+                fallbackValue = undefined,
+                shouldThrow = false
+            ) => {
+                try {
+                    return await fn();
+                } catch (error) {
+                    if (shouldThrow) {
+                        throw error;
+                    }
 
-                if (fallbackValue === undefined) {
-                    throw new Error(
-                        `${operationName} failed and no fallback value provided. ` +
-                            `When shouldThrow is false, you must provide a fallbackValue parameter.`,
-                        { cause: error }
-                    );
-                }
+                    if (fallbackValue === undefined) {
+                        throw new Error(
+                            `${operationName} failed and no fallback value provided. ` +
+                                `When shouldThrow is false, you must provide a fallbackValue parameter.`,
+                            { cause: error }
+                        );
+                    }
 
-                return fallbackValue;
+                    return fallbackValue;
+                }
             }
-        });
+        );
 
         mockIsDevelopment.mockReturnValue(true);
 
@@ -343,24 +345,24 @@ describe("StatusUpdateHandler", () => {
 
         beforeEach(() => {
             // Mock the event listener functions to capture callbacks
-            mockEventsService.onMonitorStatusChanged.mockImplementation(async (
-                callback: any
-            ) => {
-                statusChangedCallback = callback;
-                return () => {}; // Return cleanup function
-            });
-            mockEventsService.onMonitoringStarted.mockImplementation(async (
-                callback: any
-            ) => {
-                startedCallback = callback;
-                return () => {}; // Return cleanup function
-            });
-            mockEventsService.onMonitoringStopped.mockImplementation(async (
-                callback: any
-            ) => {
-                stoppedCallback = callback;
-                return () => {}; // Return cleanup function
-            });
+            mockEventsService.onMonitorStatusChanged.mockImplementation(
+                async (callback: any) => {
+                    statusChangedCallback = callback;
+                    return () => {}; // Return cleanup function
+                }
+            );
+            mockEventsService.onMonitoringStarted.mockImplementation(
+                async (callback: any) => {
+                    startedCallback = callback;
+                    return () => {}; // Return cleanup function
+                }
+            );
+            mockEventsService.onMonitoringStopped.mockImplementation(
+                async (callback: any) => {
+                    stoppedCallback = callback;
+                    return () => {}; // Return cleanup function
+                }
+            );
         });
 
         it("should handle monitor status changed events", async ({
@@ -494,12 +496,12 @@ describe("StatusUpdateHandler", () => {
         let statusChangedCallback: any;
 
         beforeEach(() => {
-            mockEventsService.onMonitorStatusChanged.mockImplementation(async (
-                callback: any
-            ) => {
-                statusChangedCallback = callback;
-                return () => {};
-            });
+            mockEventsService.onMonitorStatusChanged.mockImplementation(
+                async (callback: any) => {
+                    statusChangedCallback = callback;
+                    return () => {};
+                }
+            );
             mockEventsService.onMonitoringStarted.mockResolvedValue(() => {});
             mockEventsService.onMonitoringStopped.mockResolvedValue(() => {});
         });
@@ -656,12 +658,12 @@ describe("StatusUpdateHandler", () => {
                 optionsWithoutCallback
             );
 
-            mockEventsService.onMonitorStatusChanged.mockImplementation(async (
-                callback: any
-            ) => {
-                statusChangedCallback = callback;
-                return () => {};
-            });
+            mockEventsService.onMonitorStatusChanged.mockImplementation(
+                async (callback: any) => {
+                    statusChangedCallback = callback;
+                    return () => {};
+                }
+            );
             mockEventsService.onMonitoringStarted.mockResolvedValue(() => {});
             mockEventsService.onMonitoringStopped.mockResolvedValue(() => {});
 
@@ -683,12 +685,12 @@ describe("StatusUpdateHandler", () => {
         let statusChangedCallback: any;
 
         beforeEach(() => {
-            mockEventsService.onMonitorStatusChanged.mockImplementation(async (
-                callback: any
-            ) => {
-                statusChangedCallback = callback;
-                return () => {};
-            });
+            mockEventsService.onMonitorStatusChanged.mockImplementation(
+                async (callback: any) => {
+                    statusChangedCallback = callback;
+                    return () => {};
+                }
+            );
             mockEventsService.onMonitoringStarted.mockResolvedValue(() => {});
             mockEventsService.onMonitoringStopped.mockResolvedValue(() => {});
         });
@@ -707,28 +709,30 @@ describe("StatusUpdateHandler", () => {
             });
 
             // Mock error handling to trigger fallback
-            mockWithUtilityErrorHandling.mockImplementation(async (
-                fn: () => Promise<any>,
-                _operationName: string,
-                fallbackValue = undefined,
-                shouldThrow = false
-            ) => {
-                try {
-                    return await fn();
-                } catch (error) {
-                    if (shouldThrow) {
-                        throw error;
-                    }
+            mockWithUtilityErrorHandling.mockImplementation(
+                async (
+                    fn: () => Promise<any>,
+                    _operationName: string,
+                    fallbackValue = undefined,
+                    shouldThrow = false
+                ) => {
+                    try {
+                        return await fn();
+                    } catch (error) {
+                        if (shouldThrow) {
+                            throw error;
+                        }
 
-                    if (fallbackValue === undefined) {
-                        // Simulate fallback to full sync on error for this specific test
-                        await mockfullResyncSites();
-                        return void 0;
-                    }
+                        if (fallbackValue === undefined) {
+                            // Simulate fallback to full sync on error for this specific test
+                            await mockfullResyncSites();
+                            return void 0;
+                        }
 
-                    return fallbackValue;
+                        return fallbackValue;
+                    }
                 }
-            });
+            );
 
             await manager.subscribe();
 
@@ -767,7 +771,8 @@ describe("StatusUpdateHandler", () => {
             };
 
             expect(() =>
-                statusChangedCallback(statusUpdate)).not.toThrowError();
+                statusChangedCallback(statusUpdate)
+            ).not.toThrowError();
         });
 
         it("should handle errors in full sync gracefully", async ({
@@ -791,12 +796,12 @@ describe("StatusUpdateHandler", () => {
         let statusChangedCallback: any;
 
         beforeEach(() => {
-            mockEventsService.onMonitorStatusChanged.mockImplementation(async (
-                callback: any
-            ) => {
-                statusChangedCallback = callback;
-                return () => {};
-            });
+            mockEventsService.onMonitorStatusChanged.mockImplementation(
+                async (callback: any) => {
+                    statusChangedCallback = callback;
+                    return () => {};
+                }
+            );
             mockEventsService.onMonitoringStarted.mockResolvedValue(() => {});
             mockEventsService.onMonitoringStopped.mockResolvedValue(() => {});
         });
@@ -947,12 +952,12 @@ describe("StatusUpdateHandler", () => {
         let statusChangedCallback: any;
 
         beforeEach(() => {
-            mockEventsService.onMonitorStatusChanged.mockImplementation(async (
-                callback: any
-            ) => {
-                statusChangedCallback = callback;
-                return () => {};
-            });
+            mockEventsService.onMonitorStatusChanged.mockImplementation(
+                async (callback: any) => {
+                    statusChangedCallback = callback;
+                    return () => {};
+                }
+            );
             mockEventsService.onMonitoringStarted.mockResolvedValue(() => {});
             mockEventsService.onMonitoringStopped.mockResolvedValue(() => {});
         });
@@ -1110,24 +1115,24 @@ describe("StatusUpdateHandler", () => {
         let monitoringStoppedCallback: any;
 
         beforeEach(() => {
-            mockEventsService.onMonitorStatusChanged.mockImplementation(async (
-                callback: any
-            ) => {
-                statusChangedCallback = callback;
-                return () => {};
-            });
-            mockEventsService.onMonitoringStarted.mockImplementation(async (
-                callback: any
-            ) => {
-                monitoringStartedCallback = callback;
-                return () => {};
-            });
-            mockEventsService.onMonitoringStopped.mockImplementation(async (
-                callback: any
-            ) => {
-                monitoringStoppedCallback = callback;
-                return () => {};
-            });
+            mockEventsService.onMonitorStatusChanged.mockImplementation(
+                async (callback: any) => {
+                    statusChangedCallback = callback;
+                    return () => {};
+                }
+            );
+            mockEventsService.onMonitoringStarted.mockImplementation(
+                async (callback: any) => {
+                    monitoringStartedCallback = callback;
+                    return () => {};
+                }
+            );
+            mockEventsService.onMonitoringStopped.mockImplementation(
+                async (callback: any) => {
+                    monitoringStoppedCallback = callback;
+                    return () => {};
+                }
+            );
         });
 
         it("should execute onUpdate callback when site is found after status update", async ({
@@ -1308,14 +1313,14 @@ describe("StatusUpdateHandler", () => {
             // Mock setSites to actually call the provided function to set state
             let storedSites: any[] = [createMockSite("site1", "monitor1")];
             mockGetSites.mockImplementation(() => storedSites);
-            mockSetSites.mockImplementation((
-                siteSetter: any[] | ((arg0: any[]) => any[])
-            ) => {
-                storedSites =
-                    typeof siteSetter === "function"
-                        ? siteSetter(storedSites)
-                        : siteSetter;
-            });
+            mockSetSites.mockImplementation(
+                (siteSetter: any[] | ((arg0: any[]) => any[])) => {
+                    storedSites =
+                        typeof siteSetter === "function"
+                            ? siteSetter(storedSites)
+                            : siteSetter;
+                }
+            );
 
             const event = {
                 siteIdentifier: "site1",
@@ -1412,14 +1417,14 @@ describe("StatusUpdateHandler", () => {
 
             let storedSites = [createMockSite("site1", "monitor1")];
             mockGetSites.mockImplementation(() => storedSites);
-            mockSetSites.mockImplementation((
-                siteSetter: Site[] | ((arg0: Site[]) => Site[])
-            ) => {
-                storedSites =
-                    typeof siteSetter === "function"
-                        ? siteSetter(storedSites)
-                        : siteSetter;
-            });
+            mockSetSites.mockImplementation(
+                (siteSetter: Site[] | ((arg0: Site[]) => Site[])) => {
+                    storedSites =
+                        typeof siteSetter === "function"
+                            ? siteSetter(storedSites)
+                            : siteSetter;
+                }
+            );
 
             const event = createCompleteMonitorStatusEvent(
                 "site1",

@@ -15,13 +15,13 @@
 
 import type { AxiosInstance, AxiosRequestConfig } from "axios";
 
+import { readNumberEnv } from "@shared/utils/environment";
+import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import axios from "axios";
 import * as http from "node:http";
 import * as https from "node:https";
 
 import type { MonitorServiceConfig } from "../types";
-
-import { readNumberEnv } from "../../../utils/environment";
 
 /**
  * Ensures an unknown value is an Error instance.
@@ -43,7 +43,9 @@ import { readNumberEnv } from "../../../utils/environment";
  * @public
  */
 function ensureErrorInstance(error: unknown): Error {
-    return error instanceof Error ? error : new Error(String(error));
+    return error instanceof Error
+        ? error
+        : new Error(getUserFacingErrorDetail(error));
 }
 
 /**

@@ -117,10 +117,6 @@ export interface MonitorRow extends BaseRow {
      */
     last_error?: string;
     /**
-     * Whether monitoring is active (1) or inactive (0).
-     */
-    monitoring?: number;
-    /**
      * Timestamp (epoch ms) for the next scheduled check.
      */
     next_check?: number;

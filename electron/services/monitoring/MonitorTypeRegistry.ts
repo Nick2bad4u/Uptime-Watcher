@@ -19,7 +19,6 @@ import type * as z from "zod";
 
 import { MONITOR_STATUS } from "@shared/types";
 // Import shared validation schemas
-import { withErrorHandling } from "@shared/utils/errorHandling";
 import {
     httpHeaderMonitorSchema,
     httpJsonMonitorSchema,
@@ -44,12 +43,6 @@ import { HttpKeywordMonitor } from "./HttpKeywordMonitor";
 import { HttpLatencyMonitor } from "./HttpLatencyMonitor";
 import { HttpMonitor } from "./HttpMonitor";
 import { HttpStatusMonitor } from "./HttpStatusMonitor";
-import {
-    createMigrationOrchestrator,
-    exampleMigrations,
-    migrationRegistry,
-    versionManager,
-} from "./MigrationSystem";
 import { PingMonitor } from "./PingMonitor";
 import { PortMonitor } from "./PortMonitor";
 import { ReplicationMonitor } from "./ReplicationMonitor";
@@ -1146,26 +1139,6 @@ registerMonitorType({
     version: "1.0.0",
 });
 
-// Register example migrations for the migration system
-migrationRegistry.registerMigration("http", exampleMigrations.httpV1_0_to_1_1);
-migrationRegistry.registerMigration("port", exampleMigrations.portV1_0_to_1_1);
-
-// Set current versions for existing monitor types
-versionManager.setVersion("dns", "1.0.0");
-versionManager.setVersion("ssl", "1.0.0");
-versionManager.setVersion("http", "1.0.0");
-versionManager.setVersion("http-header", "1.0.0");
-versionManager.setVersion("http-json", "1.0.0");
-versionManager.setVersion("http-keyword", "1.0.0");
-versionManager.setVersion("http-latency", "1.0.0");
-versionManager.setVersion("http-status", "1.0.0");
-versionManager.setVersion("ping", "1.0.0");
-versionManager.setVersion("port", "1.0.0");
-versionManager.setVersion("cdn-edge-consistency", "1.0.0");
-versionManager.setVersion("replication", "1.0.0");
-versionManager.setVersion("server-heartbeat", "1.0.0");
-versionManager.setVersion("websocket-keepalive", "1.0.0");
-
 /**
  * Create monitor object with runtime type validation.
  *
@@ -1279,136 +1252,6 @@ export function isValidMonitorTypeGuard(type: unknown): type is string {
 }
 
 /**
- * Migrate monitor data between versions with comprehensive error handling.
- *
- * @remarks
- * Provides version migration support for monitor configurations using the
- * migration system. Handles both data transformations and version updates.
- *
- * Migration process:
- *
- * 1. Validates monitor type using internal validation
- * 2. Checks if migration is needed (version comparison)
- * 3. Uses migration orchestrator for data transformation
- * 4. Returns structured result with applied migrations
- *
- * Error handling:
- *
- * - Invalid monitor types return validation errors
- * - Missing migration paths return migration errors
- * - Transform failures include original error details
- * - All errors are logged for debugging
- *
- * @example
- *
- * ```typescript
- * import { monitorLogger } from "../../utils/logger";
- *
- * const result = await migrateMonitorType(
- *     "http",
- *     "1.0.0",
- *     "1.1.0",
- *     monitorData
- * );
- * if (result.success) {
- *     monitorLogger.info("Applied monitor migrations", {
- *         migrations: result.appliedMigrations,
- *     });
- *     return result.data;
- * } else {
- *     monitorLogger.error("Monitor migration failed", result.errors);
- * }
- * ```
- *
- * @param monitorType - Type of monitor to migrate
- * @param fromVersion - Source version of the data
- * @param toVersion - Target version for migration
- * @param data - Optional monitor data to migrate
- *
- * @returns Migration result with transformed data or errors
+ * Monitor configuration migrations are intentionally not supported in this
+ * development build.
  */
-// Database migration helper - properly implemented with basic migration system
-export async function migrateMonitorType(
-    monitorType: MonitorType,
-    fromVersion: string,
-    toVersion: string,
-    data?: MonitorConfigurationInput
-): Promise<{
-    appliedMigrations: string[];
-    data?: MonitorConfigurationInput;
-    errors: string[];
-    success: boolean;
-}> {
-    try {
-        return await withErrorHandling(
-            async () => {
-                // Validate the monitor type using internal validation
-                const validationResult =
-                    validateMonitorTypeInternal(monitorType);
-                if (!validationResult.success) {
-                    const errorMessage =
-                        "error" in validationResult
-                            ? validationResult.error
-                            : "Invalid monitor type";
-                    return {
-                        appliedMigrations: [],
-                        errors: [errorMessage],
-                        success: false,
-                    };
-                }
-
-                logger.info(
-                    `Migrating monitor type ${monitorType} from ${fromVersion} to ${toVersion}`
-                );
-
-                // Check if migration is needed
-                if (fromVersion === toVersion) {
-                    return {
-                        appliedMigrations: [],
-                        errors: [],
-                        success: true,
-                        ...(data && { data }),
-                    };
-                }
-
-                // If no data provided, just return success for version bump
-                if (!data) {
-                    return {
-                        appliedMigrations: [
-                            `${monitorType}_${fromVersion}_to_${toVersion}`,
-                        ],
-                        errors: [],
-                        success: true,
-                    };
-                }
-
-                // Use the migration orchestrator for data migration
-                const migrationOrchestrator = createMigrationOrchestrator();
-
-                const migrationResult =
-                    await migrationOrchestrator.migrateMonitorData(
-                        monitorType,
-                        data,
-                        fromVersion,
-                        toVersion
-                    );
-
-                return {
-                    appliedMigrations: migrationResult.appliedMigrations,
-                    errors: migrationResult.errors,
-                    success: migrationResult.success,
-                    ...(migrationResult.data && { data: migrationResult.data }),
-                };
-            },
-            { logger, operationName: "Monitor migration" }
-        );
-    } catch (error) {
-        return {
-            appliedMigrations: [],
-            errors: [
-                `Migration failed: ${error instanceof Error ? error.message : String(error)}`,
-            ],
-            success: false,
-        };
-    }
-}

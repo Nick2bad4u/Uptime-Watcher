@@ -11,14 +11,7 @@
     "cooldown": 0,
     "cwd": "",
     "deep": false,
-    "dep": [
-        "prod",
-        "dev",
-        "optional",
-        "packageManager",
-        "peer",
-        "dep"
-    ],
+    "dep": ["prod", "dev", "optional", "packageManager", "peer", "dep"],
     "deprecated": true,
     "doctor": false,
     "doctorInstall": "npm run install --force",

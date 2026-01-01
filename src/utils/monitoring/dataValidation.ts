@@ -54,7 +54,7 @@ import { logger } from "../../services/logger";
  */
 export const parseUptimeValue = (uptimeString: string): number => {
     // Remove any percent signs and whitespace
-    // eslint-disable-next-line regexp/require-unicode-sets-regexp -- Simple character class [\s%] is more readable and compatible than unicode sets for basic whitespace/percent removal
+
     const cleanedUptime = uptimeString.replaceAll(/[\s%]/gu, "");
     const parsed = Number.parseFloat(cleanedUptime);
 

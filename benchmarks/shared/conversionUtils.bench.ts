@@ -273,7 +273,8 @@ describe("Shared Conversion and Validation Performance", () => {
     // High-volume operations
     bench("high-volume number conversions", () => {
         const values = Array.from({ length: 1000 }, (_, i) =>
-            i % 2 === 0 ? String(i) : i);
+            i % 2 === 0 ? String(i) : i
+        );
 
         for (const value of values) {
             safeNumberConversion(value);

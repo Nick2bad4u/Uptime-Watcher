@@ -180,14 +180,14 @@ describe("React Component Rendering Performance", () => {
         Array.from({ length: count }, (_, i) => ({
             id: `component-${i}`,
             title: `Component ${i}`,
-            data: Array.from({ length: 10 + Math.floor(Math.random() * 90) }, (
-                _,
-                j
-            ) => ({
-                id: `item-${i}-${j}`,
-                name: `Item ${j}`,
-                value: Math.random() * 1000,
-            })),
+            data: Array.from(
+                { length: 10 + Math.floor(Math.random() * 90) },
+                (_, j) => ({
+                    id: `item-${i}-${j}`,
+                    name: `Item ${j}`,
+                    value: Math.random() * 1000,
+                })
+            ),
             isVisible: Math.random() > 0.2,
             className: `component-${i % 5}`,
             style: {
@@ -344,17 +344,19 @@ describe("React Component Rendering Performance", () => {
             return component.render();
         });
 
-        const newElements = componentPropsSet.slice(0, 20).map((
-            props,
-            index
-        ) => {
-            const component = new MockComponent({
-                ...props,
-                title: `Updated ${props.title}`,
-                data: props.data.slice(0, Math.floor(props.data.length / 2)),
+        const newElements = componentPropsSet
+            .slice(0, 20)
+            .map((props, index) => {
+                const component = new MockComponent({
+                    ...props,
+                    title: `Updated ${props.title}`,
+                    data: props.data.slice(
+                        0,
+                        Math.floor(props.data.length / 2)
+                    ),
+                });
+                return component.render();
             });
-            return component.render();
-        });
 
         // Simulate virtual DOM diffing
         for (const [i, oldElement] of oldElements.entries()) {
@@ -461,7 +463,8 @@ describe("React Component Rendering Performance", () => {
                         (_, k) => `tag-${k}`
                     ),
                 },
-            })));
+            }))
+        );
 
         for (const listData of largeLists) {
             const component = new MockComponent({

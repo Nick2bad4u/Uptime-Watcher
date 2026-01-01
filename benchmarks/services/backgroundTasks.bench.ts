@@ -177,7 +177,8 @@ class MockTaskQueue {
         // Filter by worker capabilities
         if (workerCapabilities) {
             eligibleTasks = eligibleTasks.filter((task) =>
-                workerCapabilities.includes(task.type));
+                workerCapabilities.includes(task.type)
+            );
         }
 
         if (eligibleTasks.length === 0) {
@@ -782,7 +783,8 @@ class MockBackgroundTaskService {
                     setTimeout(
                         () => reject(new Error("Task timeout")),
                         task.timeout
-                    )),
+                    )
+                ),
             ]);
 
             await this.queue.complete(task.id, result);
@@ -1139,16 +1141,16 @@ describe("Background Task Service Performance", () => {
 
             // Register processor that always fails initially
             let attemptCount = 0;
-            service.registerProcessor("failing", async (
-                payload: any,
-                context: TaskExecutionContext
-            ) => {
-                attemptCount++;
-                if (attemptCount <= 2) {
-                    throw new Error("Simulated failure");
+            service.registerProcessor(
+                "failing",
+                async (payload: any, context: TaskExecutionContext) => {
+                    attemptCount++;
+                    if (attemptCount <= 2) {
+                        throw new Error("Simulated failure");
+                    }
+                    return { success: true, attempts: attemptCount };
                 }
-                return { success: true, attempts: attemptCount };
-            });
+            );
 
             service
                 .submitTask(
@@ -1173,7 +1175,8 @@ describe("Background Task Service Performance", () => {
 
             // Submit tasks
             const tasks = Array.from({ length: 10 }, (_, i) =>
-                service.submitTask("cancel-test", { index: i }));
+                service.submitTask("cancel-test", { index: i })
+            );
 
             Promise.all(tasks).then((taskIds) => {
                 // Cancel half the tasks
@@ -1250,14 +1253,15 @@ describe("Background Task Service Performance", () => {
             );
             service.startWorker(worker.id);
 
-            service.submitTask("track", { data: "tracking test" }).then((
-                taskId
-            ) => {
-                // Check status multiple times
-                const statusChecks = Array.from({ length: 5 }, () =>
-                    service.getTaskStatus(taskId));
-                Promise.all(statusChecks);
-            });
+            service
+                .submitTask("track", { data: "tracking test" })
+                .then((taskId) => {
+                    // Check status multiple times
+                    const statusChecks = Array.from({ length: 5 }, () =>
+                        service.getTaskStatus(taskId)
+                    );
+                    Promise.all(statusChecks);
+                });
         },
         { warmupIterations: 10, iterations: 1500 }
     );
@@ -1274,15 +1278,15 @@ describe("Background Task Service Performance", () => {
             );
             service.startWorker(worker.id);
 
-            service.submitTask("result", { data: "result test" }).then((
-                taskId
-            ) => {
-                // Process the task
-                service["processQueue"]().then(() => {
-                    // Retrieve result
-                    service.getTaskResult(taskId);
+            service
+                .submitTask("result", { data: "result test" })
+                .then((taskId) => {
+                    // Process the task
+                    service["processQueue"]().then(() => {
+                        // Retrieve result
+                        service.getTaskResult(taskId);
+                    });
                 });
-            });
         },
         { warmupIterations: 10, iterations: 1500 }
     );

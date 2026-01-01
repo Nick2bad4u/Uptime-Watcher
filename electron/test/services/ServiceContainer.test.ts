@@ -81,14 +81,17 @@ describe(ServiceContainer, () => {
 
             const customContainer = ServiceContainer.getInstance(config);
             expect(() =>
-                customContainer.getDatabaseService()).not.toThrowError();
+                customContainer.getDatabaseService()
+            ).not.toThrowError();
             expect(() =>
-                customContainer.getNotificationService()).not.toThrowError();
+                customContainer.getNotificationService()
+            ).not.toThrowError();
 
             // Complex services should work after initializing dependencies
             customContainer.getSiteManager();
             expect(() =>
-                customContainer.getUptimeOrchestrator()).not.toThrowError();
+                customContainer.getUptimeOrchestrator()
+            ).not.toThrowError();
         });
         it("should handle partial configuration", async ({
             task,
@@ -104,14 +107,17 @@ describe(ServiceContainer, () => {
 
             const customContainer = ServiceContainer.getInstance(config);
             expect(() =>
-                customContainer.getDatabaseService()).not.toThrowError();
+                customContainer.getDatabaseService()
+            ).not.toThrowError();
             expect(() =>
-                customContainer.getNotificationService()).not.toThrowError();
+                customContainer.getNotificationService()
+            ).not.toThrowError();
 
             // Complex services should work after initializing dependencies
             customContainer.getSiteManager();
             expect(() =>
-                customContainer.getUptimeOrchestrator()).not.toThrowError();
+                customContainer.getUptimeOrchestrator()
+            ).not.toThrowError();
         });
         it("should handle notification config only", async ({
             task,
@@ -130,14 +136,17 @@ describe(ServiceContainer, () => {
 
             const customContainer = ServiceContainer.getInstance(config);
             expect(() =>
-                customContainer.getDatabaseService()).not.toThrowError();
+                customContainer.getDatabaseService()
+            ).not.toThrowError();
             expect(() =>
-                customContainer.getNotificationService()).not.toThrowError();
+                customContainer.getNotificationService()
+            ).not.toThrowError();
 
             // Complex services should work after initializing dependencies
             customContainer.getSiteManager();
             expect(() =>
-                customContainer.getUptimeOrchestrator()).not.toThrowError();
+                customContainer.getUptimeOrchestrator()
+            ).not.toThrowError();
         });
     });
     describe("Core Service Getters", () => {
@@ -426,14 +435,17 @@ describe(ServiceContainer, () => {
 
             const customContainer = ServiceContainer.getInstance(config);
             expect(() =>
-                customContainer.getDatabaseService()).not.toThrowError();
+                customContainer.getDatabaseService()
+            ).not.toThrowError();
             expect(() =>
-                customContainer.getNotificationService()).not.toThrowError();
+                customContainer.getNotificationService()
+            ).not.toThrowError();
 
             // Complex services should work after initializing dependencies
             customContainer.getSiteManager();
             expect(() =>
-                customContainer.getUptimeOrchestrator()).not.toThrowError();
+                customContainer.getUptimeOrchestrator()
+            ).not.toThrowError();
         });
         it("should handle configuration with only enableDebugLogging false", async ({
             task,
@@ -449,14 +461,17 @@ describe(ServiceContainer, () => {
 
             const customContainer = ServiceContainer.getInstance(config);
             expect(() =>
-                customContainer.getDatabaseService()).not.toThrowError();
+                customContainer.getDatabaseService()
+            ).not.toThrowError();
             expect(() =>
-                customContainer.getNotificationService()).not.toThrowError();
+                customContainer.getNotificationService()
+            ).not.toThrowError();
 
             // Complex services should work after initializing dependencies
             customContainer.getSiteManager();
             expect(() =>
-                customContainer.getUptimeOrchestrator()).not.toThrowError();
+                customContainer.getUptimeOrchestrator()
+            ).not.toThrowError();
         });
         it("should handle configuration with all notification options disabled", async ({
             task,
@@ -475,7 +490,8 @@ describe(ServiceContainer, () => {
 
             const customContainer = ServiceContainer.getInstance(config);
             expect(() =>
-                customContainer.getNotificationService()).not.toThrowError();
+                customContainer.getNotificationService()
+            ).not.toThrowError();
         });
         it("should handle undefined configuration", async ({
             task,
@@ -488,7 +504,8 @@ describe(ServiceContainer, () => {
 
             const customContainer = ServiceContainer.getInstance(undefined);
             expect(() =>
-                customContainer.getNotificationService()).not.toThrowError();
+                customContainer.getNotificationService()
+            ).not.toThrowError();
         });
     });
     describe("Service Interdependencies", () => {

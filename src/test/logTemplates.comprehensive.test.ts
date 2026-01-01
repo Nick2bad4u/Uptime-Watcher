@@ -117,15 +117,9 @@ describe("logTemplates.ts - Comprehensive Coverage", () => {
                 );
             });
 
-            it("should contain history and migration templates", () => {
+            it("should contain history templates", () => {
                 expect(SERVICE_LOGS.HISTORY_BULK_INSERT).toContain(
                     "[HistoryManipulation]"
-                );
-                expect(SERVICE_LOGS.MIGRATION_APPLYING).toContain(
-                    "Applying migration"
-                );
-                expect(SERVICE_LOGS.MIGRATION_REGISTERED).toContain(
-                    "Registered migration"
                 );
             });
 

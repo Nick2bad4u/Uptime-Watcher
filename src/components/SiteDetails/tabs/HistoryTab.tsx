@@ -31,12 +31,11 @@ import type {
     NamedExoticComponent,
     ReactElement,
 } from "react";
+import type { IconType } from "react-icons";
 import type { JSX } from "react/jsx-runtime";
 
 import { DEFAULT_HISTORY_LIMIT_RULES } from "@shared/constants/history";
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { FiFilter, FiInbox } from "react-icons/fi";
-import { MdHistory } from "react-icons/md";
 
 import type { InterfaceDensity } from "../../../stores/ui/types";
 
@@ -76,6 +75,54 @@ const HISTORY_DENSITY_LABELS: Record<InterfaceDensity, string> = {
     compact: "Compact",
     cozy: "Cozy",
 };
+
+const HISTORY_DENSITY_ICONS: Record<InterfaceDensity, IconType> = {
+    comfortable: AppIcons.layout.cards,
+    compact: AppIcons.layout.list,
+    cozy: AppIcons.layout.compact,
+};
+
+function extractHttpStatusCode(details: string): null | number {
+    const trimmed = details.trim();
+    if (trimmed.length === 0) return null;
+
+    const candidateRegex = /\b(?<statusCode>[1-5]\d{2})\b/u;
+    const hasHttpContext = /\bcode\b|\bhttp\b|\bstatus\b/iu.test(trimmed);
+
+    if (hasHttpContext) {
+        const match = candidateRegex.exec(trimmed);
+        const raw = match?.groups?.["statusCode"];
+        return raw ? Number(raw) : null;
+    }
+
+    // Also accept strings like "200 OK" or "404 Not Found".
+    const beginsWithCode = /^(?<statusCode>[1-5]\d{2})\b/u.exec(trimmed);
+    const raw = beginsWithCode?.groups?.["statusCode"];
+    return raw ? Number(raw) : null;
+}
+
+function getHttpStatusIcon(code: number): IconType | null {
+    if (!Number.isFinite(code)) return null;
+
+    if (code >= 200 && code <= 299) {
+        return AppIcons.status.up;
+    }
+
+    if (code >= 300 && code <= 399) {
+        return AppIcons.actions.refreshAlt;
+    }
+
+    if (code >= 400 && code <= 499) {
+        return AppIcons.status.warning;
+    }
+
+    if (code >= 500 && code <= 599) {
+        return AppIcons.status.downFilled;
+    }
+
+    return null;
+}
+
 type HistoryRowStyle = CSSProperties & {
     "--surface-order"?: number;
 };
@@ -223,6 +270,10 @@ export const HistoryTab: NamedExoticComponent<HistoryTabProperties> = memo(
 
         const iconColors = getIconColors();
 
+        const FilterIcon = AppIcons.actions.filter;
+        const HistoryIcon = AppIcons.ui.history;
+        const InboxIcon = AppIcons.ui.inbox;
+
         const FilterAllIcon = AppIcons.ui.analytics;
 
         // Dropdown options: a curated set of record counts plus an "All"
@@ -289,8 +340,7 @@ export const HistoryTab: NamedExoticComponent<HistoryTabProperties> = memo(
                 // Only log if monitor ID or type has changed (not just history
                 // length)
                 if (
-                    !lastLogged ||
-                    lastLogged.id !== currentMonitor.id ||
+                    lastLogged?.id !== currentMonitor.id ||
                     lastLogged.type !== currentMonitor.type
                 ) {
                     logger.user.action("History tab viewed", {
@@ -308,12 +358,25 @@ export const HistoryTab: NamedExoticComponent<HistoryTabProperties> = memo(
             ]
         );
 
-        const filteredHistoryRecords = selectedMonitor.history
-            .filter(
-                (record: StatusHistory) =>
-                    historyFilter === "all" || record.status === historyFilter
-            )
-            .slice(0, safeHistoryLimit);
+        const recordIndexByTimestamp = useMemo(() => {
+            const map = new Map<number, number>();
+            for (const [index, record] of selectedMonitor.history.entries()) {
+                map.set(record.timestamp, index);
+            }
+            return map;
+        }, [selectedMonitor.history]);
+
+        const filteredHistoryRecords = useMemo(
+            () =>
+                selectedMonitor.history
+                    .filter(
+                        (record: StatusHistory) =>
+                            historyFilter === "all" ||
+                            record.status === historyFilter
+                    )
+                    .slice(0, safeHistoryLimit),
+            [historyFilter, safeHistoryLimit, selectedMonitor.history]
+        );
 
         // Helper to render details with label using dynamic formatting
         function renderDetails(record: StatusHistory): null | ReactElement {
@@ -321,11 +384,25 @@ export const HistoryTab: NamedExoticComponent<HistoryTabProperties> = memo(
                 return null;
             }
 
-            return (
-                <DetailLabel
-                    details={record.details}
-                    monitorType={selectedMonitor.type}
+            const statusCode = extractHttpStatusCode(record.details);
+            const StatusCodeIcon =
+                statusCode === null ? null : getHttpStatusIcon(statusCode);
+
+            const statusIconNode = StatusCodeIcon ? (
+                <StatusCodeIcon
+                    aria-hidden="true"
+                    className="h-4 w-4"
                 />
+            ) : null;
+
+            return (
+                <div className="flex items-center gap-2">
+                    {statusIconNode}
+                    <DetailLabel
+                        details={record.details}
+                        monitorType={selectedMonitor.type}
+                    />
+                </div>
             );
         }
 
@@ -369,12 +446,12 @@ export const HistoryTab: NamedExoticComponent<HistoryTabProperties> = memo(
         );
 
         const filterIcon = useMemo(
-            () => <FiFilter color={iconColors.filters} />,
-            [iconColors.filters]
+            () => <FilterIcon color={iconColors.filters} />,
+            [FilterIcon, iconColors.filters]
         );
         const historyIcon = useMemo(
-            () => <MdHistory color={iconColors.history} />,
-            [iconColors.history]
+            () => <HistoryIcon color={iconColors.history} />,
+            [HistoryIcon, iconColors.history]
         );
 
         const handleHistoryDensityChange = useCallback(
@@ -401,13 +478,42 @@ export const HistoryTab: NamedExoticComponent<HistoryTabProperties> = memo(
             [handleHistoryDensityChange]
         );
 
+        const densityIconNodes = useMemo(() => {
+            const ComfortableDensityIcon = HISTORY_DENSITY_ICONS.comfortable;
+            const CozyDensityIcon = HISTORY_DENSITY_ICONS.cozy;
+            const CompactDensityIcon = HISTORY_DENSITY_ICONS.compact;
+
+            return {
+                comfortable: (
+                    <ComfortableDensityIcon
+                        aria-hidden
+                        className="h-4 w-4"
+                    />
+                ),
+                compact: (
+                    <CompactDensityIcon
+                        aria-hidden
+                        className="h-4 w-4"
+                    />
+                ),
+                cozy: (
+                    <CozyDensityIcon
+                        aria-hidden
+                        className="h-4 w-4"
+                    />
+                ),
+            } satisfies Record<InterfaceDensity, ReactElement>;
+        }, []);
+
         const densityButtons = useMemo(
             () =>
                 HISTORY_DENSITY_OPTIONS.map((density) => {
                     const isActive = historyDensity === density;
+                    const densityIcon = densityIconNodes[density];
 
                     return (
                         <ThemedButton
+                            icon={densityIcon}
                             key={density}
                             onClick={createDensityHandler(density)}
                             size="xs"
@@ -417,7 +523,7 @@ export const HistoryTab: NamedExoticComponent<HistoryTabProperties> = memo(
                         </ThemedButton>
                     );
                 }),
-            [createDensityHandler, historyDensity]
+            [createDensityHandler, densityIconNodes, historyDensity]
         );
 
         const historyTabClassName = `space-y-6 history-tab history-tab--${historyDensity} density--${historyDensity}`;
@@ -515,6 +621,16 @@ export const HistoryTab: NamedExoticComponent<HistoryTabProperties> = memo(
                                 | undefined;
                             const resolvedStatus: SiteStatus =
                                 rawStatus ?? "unknown";
+
+                            const recordIndex = recordIndexByTimestamp.get(
+                                record.timestamp
+                            );
+                            const resolvedIndex =
+                                recordIndex ??
+                                Math.min(historyLength - 1, index);
+                            const recordSequenceNumber =
+                                historyLength - resolvedIndex;
+
                             const StatusIconComponent =
                                 getStatusIconComponent(resolvedStatus);
                             const statusLabel =
@@ -551,12 +667,7 @@ export const HistoryTab: NamedExoticComponent<HistoryTabProperties> = memo(
                                                     variant="secondary"
                                                 >
                                                     Record #
-                                                    {historyLength -
-                                                        selectedMonitor.history.findIndex(
-                                                            (r) =>
-                                                                r.timestamp ===
-                                                                record.timestamp
-                                                        )}
+                                                    {recordSequenceNumber}
                                                 </ThemedText>
                                             </div>
                                         </div>
@@ -595,7 +706,7 @@ export const HistoryTab: NamedExoticComponent<HistoryTabProperties> = memo(
 
                         {filteredHistoryRecords.length === 0 && (
                             <div className="flex flex-col items-center justify-center py-12 text-center">
-                                <FiInbox className="mb-4 text-4xl opacity-50" />
+                                <InboxIcon className="mb-4 text-4xl opacity-50" />
                                 <ThemedText
                                     className="mb-2"
                                     size="lg"

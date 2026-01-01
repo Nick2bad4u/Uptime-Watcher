@@ -134,27 +134,6 @@ function writeHtml(
     );
 }
 
-function parseCallback(request: IncomingMessage): {
-    readonly code: null | string;
-    readonly error: null | string;
-    readonly pathOk: boolean;
-    readonly state: null | string;
-} {
-    const url = new URL(request.url ?? "/", "http://localhost");
-    const pathOk = url.pathname === DEFAULT_OAUTH_LOOPBACK_PATH;
-
-    const code = url.searchParams.get("code");
-    const state = url.searchParams.get("state");
-    const error = url.searchParams.get("error");
-
-    return {
-        code,
-        error,
-        pathOk,
-        state,
-    };
-}
-
 function normalizeRedirectPath(path: string): string {
     if (path === "" || path === "/") {
         return "/";
@@ -233,13 +212,12 @@ export async function startLoopbackOAuthServer(args?: {
     let resolvePromise: ((value: LoopbackOAuthCallback) => void) | null = null;
     let rejectPromise: ((error: unknown) => void) | null = null;
 
-    const callbackPromise = new Promise<LoopbackOAuthCallback>((
-        resolve,
-        reject
-    ) => {
-        resolvePromise = resolve;
-        rejectPromise = reject;
-    });
+    const callbackPromise = new Promise<LoopbackOAuthCallback>(
+        (resolve, reject) => {
+            resolvePromise = resolve;
+            rejectPromise = reject;
+        }
+    );
 
     const servers = LOOPBACK_HOSTS.map((host) => {
         const server = createServer((request, response) => {
@@ -252,10 +230,7 @@ export async function startLoopbackOAuthServer(args?: {
                 return;
             }
 
-            const parsed =
-                redirectPathRaw === undefined
-                    ? parseCallback(request)
-                    : parseCallbackWithExpectedPath(request, expectedPath);
+            const parsed = parseCallbackWithExpectedPath(request, expectedPath);
 
             if (!parsed.pathOk) {
                 writeHtml(response, {

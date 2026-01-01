@@ -191,6 +191,9 @@ export const SYSTEM_ERRORS = {
 
     /** Error when service is unavailable */
     SERVICE_UNAVAILABLE: "Service temporarily unavailable",
+
+    /** Default message when an unknown non-Error value was thrown. */
+    UNKNOWN_ERROR: "Unknown error",
 } as const;
 
 /**
@@ -261,9 +264,6 @@ export const DATABASE_ERRORS = {
 
     /** Error when import data format is invalid */
     IMPORT_DATA_INVALID: "Invalid import data format",
-
-    /** Error when data migration fails */
-    MIGRATION_FAILED: "Data migration failed",
 
     /** Error when query execution fails */
     QUERY_FAILED: "Database query failed",
@@ -433,8 +433,28 @@ export function isKnownErrorMessage(message: string): message is ErrorMessage {
     const allMessages = Object.values(ERROR_CATALOG).flatMap((category) =>
         // This assertion is safe as we're extracting known error messages from the catalog
         // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe type assertion extracting known error messages from validated ERROR_CATALOG
-        Object.values(category as Record<string, string>));
+        Object.values(category as Record<string, string>)
+    );
     // This assertion is safe as we're checking against the known catalog
     // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe type assertion checking against known catalog messages
     return allMessages.includes(message as ErrorMessage);
+}
+
+/**
+ * Derives a user-friendly message from an unknown error value.
+ *
+ * @remarks
+ * This helper replaces the legacy `@shared/utils/errorUtils.getErrorMessage`
+ * implementation so that fallback strings come from the centralized
+ * {@link ERROR_CATALOG}.
+ *
+ * - When the supplied value is an {@link Error} instance, the underlying
+ *   `message` property is returned.
+ * - All other values yield the provided fallback string.
+ */
+export function getUnknownErrorMessage(
+    error: unknown,
+    fallback: string = ERROR_CATALOG.system.UNKNOWN_ERROR
+): string {
+    return error instanceof Error ? error.message : fallback;
 }

@@ -12,12 +12,8 @@ import {
     getAllMonitorTypeConfigs,
     getMonitorTypeConfig,
 } from "../../monitoring/MonitorTypeRegistry";
-import {
-    createValidationResponse,
-    registerStandardizedIpcHandler,
-} from "../utils";
+import { createStandardizedIpcRegistrar, createValidationResponse } from "../utils";
 import { MonitorTypeHandlerValidators } from "../validators";
-import { withIgnoredIpcEvent } from "./handlerShared";
 
 type BaseMonitorUiConfig = ReturnType<
     typeof getAllMonitorTypeConfigs
@@ -256,19 +252,20 @@ export interface MonitorTypeHandlersDependencies {
 export function registerMonitorTypeHandlers({
     registeredHandlers,
 }: MonitorTypeHandlersDependencies): void {
-    registerStandardizedIpcHandler(
+    const register = createStandardizedIpcRegistrar(registeredHandlers);
+
+    register(
         MONITOR_TYPES_CHANNELS.getMonitorTypes,
-        withIgnoredIpcEvent(() => {
+        () => {
             const configs = getAllMonitorTypeConfigs();
             return configs.map((config) => serializeMonitorTypeConfig(config));
-        }),
-        MonitorTypeHandlerValidators.getMonitorTypes,
-        registeredHandlers
+        },
+        MonitorTypeHandlerValidators.getMonitorTypes
     );
 
-    registerStandardizedIpcHandler(
+    register(
         MONITOR_TYPES_CHANNELS.formatMonitorDetail,
-        withIgnoredIpcEvent((monitorType, details) => {
+        (monitorType, details) => {
             const config = getMonitorTypeConfig(monitorType.trim());
             if (!config) {
                 logger.warn(
@@ -283,14 +280,13 @@ export function registerMonitorTypeHandlers({
             }
 
             return details;
-        }),
-        MonitorTypeHandlerValidators.formatMonitorDetail,
-        registeredHandlers
+        },
+        MonitorTypeHandlerValidators.formatMonitorDetail
     );
 
-    registerStandardizedIpcHandler(
+    register(
         MONITOR_TYPES_CHANNELS.formatMonitorTitleSuffix,
-        withIgnoredIpcEvent((monitorType, monitor) => {
+        (monitorType, monitor) => {
             const config = getMonitorTypeConfig(monitorType.trim());
             if (!config) {
                 logger.warn(LOG_TEMPLATES.warnings.MONITOR_TYPE_UNKNOWN_TITLE, {
@@ -304,14 +300,13 @@ export function registerMonitorTypeHandlers({
             }
 
             return "";
-        }),
-        MonitorTypeHandlerValidators.formatMonitorTitleSuffix,
-        registeredHandlers
+        },
+        MonitorTypeHandlerValidators.formatMonitorTitleSuffix
     );
 
-    registerStandardizedIpcHandler(
+    register(
         MONITOR_TYPES_CHANNELS.validateMonitorData,
-        withIgnoredIpcEvent((monitorType, data) => {
+        (monitorType, data) => {
             const result = validateMonitorData(monitorType.trim(), data);
 
             const metadata = isRecord(result.metadata)
@@ -324,8 +319,7 @@ export function registerMonitorTypeHandlers({
                 result.warnings,
                 metadata
             );
-        }),
-        MonitorTypeHandlerValidators.validateMonitorData,
-        registeredHandlers
+        },
+        MonitorTypeHandlerValidators.validateMonitorData
     );
 }

@@ -85,14 +85,14 @@ vi.mock("electron", () => ({
 }));
 
 vi.mock(
-    "../../../../../electron/services/database/utils/databaseSchema",
+    "../../../../../electron/services/database/utils/schema/databaseSchema",
     () =>
         ({
             createDatabaseSchema: createDatabaseSchemaMock,
             synchronizeDatabaseSchemaVersion:
                 synchronizeDatabaseSchemaVersionMock,
         }) satisfies Partial<
-            typeof import("../../../../../electron/services/database/utils/databaseSchema")
+            typeof import("../../../../../electron/services/database/utils/schema/databaseSchema")
         >
 );
 

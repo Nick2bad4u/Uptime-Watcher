@@ -48,21 +48,16 @@ export class WebsocketKeepaliveMonitor implements IMonitorService {
             );
         }
 
-        const urlCandidate = Reflect.get(monitor, "url");
+        const rawUrlCandidate = Reflect.get(monitor, "url");
+        const urlCandidate =
+            typeof rawUrlCandidate === "string" ? rawUrlCandidate.trim() : null;
+
         if (
             typeof urlCandidate !== "string" ||
             !isValidUrl(urlCandidate, { protocols: ["ws", "wss"] })
         ) {
             return createMonitorErrorResult(
                 "WebSocket keepalive monitor requires a valid ws:// or wss:// URL",
-                0
-            );
-        }
-
-        // eslint-disable-next-line regexp/require-unicode-sets-regexp -- The `v` flag is not consistently supported across our Electron/TypeScript toolchain; `u` is sufficient for this ASCII-only prefix check.
-        if (!/^wss?:\/\//iu.test(urlCandidate)) {
-            return createMonitorErrorResult(
-                "WebSocket URL must start with ws:// or wss://",
                 0
             );
         }
@@ -76,7 +71,7 @@ export class WebsocketKeepaliveMonitor implements IMonitorService {
             return await withOperationalHooks(
                 () =>
                     this.performKeepaliveCheck(
-                        urlCandidate.trim(),
+                        urlCandidate,
                         timeout,
                         maxPongDelayMs,
                         signal
@@ -282,12 +277,12 @@ export class WebsocketKeepaliveMonitor implements IMonitorService {
                         break;
                     }
 
-                        default: {
+                    default: {
                         // Exhaustiveness guard (should be unreachable).
                         throw new Error(
                             `Unexpected WebSocket readyState: ${String(socket.readyState)}`
                         );
-                        }
+                    }
                 }
             });
 

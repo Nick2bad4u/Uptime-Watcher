@@ -41,9 +41,9 @@ describe("pingRetry utilities", () => {
         }));
 
         vi.doMock("../../../../../../electron/utils/operationalHooks", () => ({
-            withOperationalHooks: vi.fn(async (
-                operation: () => Promise<unknown>
-            ) => operation()),
+            withOperationalHooks: vi.fn(
+                async (operation: () => Promise<unknown>) => operation()
+            ),
         }));
 
         vi.doMock(
@@ -51,21 +51,21 @@ describe("pingRetry utilities", () => {
             () => ({
                 checkConnectivity: vi.fn(() => Promise.resolve(MOCK_RESULT)),
                 checkHttpConnectivity: vi.fn(() =>
-                    Promise.resolve(MOCK_RESULT)),
+                    Promise.resolve(MOCK_RESULT)
+                ),
             })
         );
 
         vi.doMock(
             "../../../../../../electron/services/monitoring/utils/pingErrorHandling",
             () => ({
-                handlePingCheckError: vi.fn((
-                    error: unknown,
-                    context: unknown
-                ) => ({
-                    error,
-                    context,
-                    status: "down" as const,
-                })),
+                handlePingCheckError: vi.fn(
+                    (error: unknown, context: unknown) => ({
+                        error,
+                        context,
+                        status: "down" as const,
+                    })
+                ),
             })
         );
     });

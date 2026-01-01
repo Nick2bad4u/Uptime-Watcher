@@ -169,7 +169,8 @@ describe("Validation Fuzzing Tests", () => {
                         const malformedIp = numbers.join(separator);
 
                         expect(() =>
-                            isValidHost(malformedIp)).not.toThrowError();
+                            isValidHost(malformedIp)
+                        ).not.toThrowError();
                         const result = isValidHost(malformedIp);
                         expect(typeof result).toBe("boolean");
                     }
@@ -239,12 +240,13 @@ describe("Validation Fuzzing Tests", () => {
 
         it("should accept valid port numbers in correct range", () => {
             fc.assert(
-                fc.property(fc.integer({ min: 1, max: 65_535 }), (
-                    port: number
-                ) => {
-                    const result = isValidPort(port);
-                    expect(result).toBeTruthy();
-                })
+                fc.property(
+                    fc.integer({ min: 1, max: 65_535 }),
+                    (port: number) => {
+                        const result = isValidPort(port);
+                        expect(result).toBeTruthy();
+                    }
+                )
             );
         });
 

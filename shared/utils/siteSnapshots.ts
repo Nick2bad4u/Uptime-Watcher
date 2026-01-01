@@ -177,7 +177,8 @@ const hasOverlayValues = <TOverlay extends object>(
     overlay: Partial<TOverlay>
 ): overlay is TOverlay =>
     Object.values(overlay).some((entry) =>
-        Array.isArray(entry) ? entry.length > 0 : entry !== undefined);
+        Array.isArray(entry) ? entry.length > 0 : entry !== undefined
+    );
 
 /**
  * Snapshot overlay for monitors used when merging payloads with canonical cache
@@ -432,7 +433,8 @@ export function mergeSiteSnapshots(
         mergeMonitorSnapshots(
             canonicalMonitor,
             overlayMonitors.get(canonicalMonitor.id)
-        ));
+        )
+    );
 
     return {
         ...canonicalSite,

@@ -15,6 +15,7 @@ import {
 import "@testing-library/jest-dom";
 
 import { App } from "../App";
+import { UI_DELAYS } from "../constants";
 import { useErrorStore } from "../stores/error/useErrorStore";
 import { defaultSettings } from "../stores/settings/state";
 import { useSettingsStore } from "../stores/settings/useSettingsStore";
@@ -214,7 +215,8 @@ describe("App Component - Comprehensive Coverage", () => {
         const baseTheme = isDark ? darkTheme : lightTheme;
         const currentTheme = cloneTheme(baseTheme);
         const mockGetColor = vi.fn((path: string) =>
-            getThemeColorByPath(currentTheme, path));
+            getThemeColorByPath(currentTheme, path)
+        );
         const mockGetStatusColor = vi.fn(
             (status: keyof typeof currentTheme.colors.status) =>
                 currentTheme.colors.status[status] ??
@@ -302,15 +304,18 @@ describe("App Component - Comprehensive Coverage", () => {
                 ? (selector as (state: typeof defaultSettingsStore) => unknown)(
                       defaultSettingsStore
                   )
-                : defaultSettingsStore);
+                : defaultSettingsStore
+        );
         mockUseSitesStore.mockImplementation((selector: any) =>
             typeof selector === "function"
                 ? selector(defaultSitesStore)
-                : defaultSitesStore);
+                : defaultSitesStore
+        );
         mockUseUIStore.mockImplementation((selector: any) =>
             typeof selector === "function"
                 ? selector(defaultUIStore)
-                : defaultUIStore);
+                : defaultUIStore
+        );
         mockUseUpdatesStore.mockImplementation(() => defaultUpdatesStore);
         mockUseTheme.mockReturnValue(createMockTheme());
 
@@ -469,14 +474,15 @@ describe("App Component - Comprehensive Coverage", () => {
 
             await renderApp();
 
-            // Wait for loading overlay to appear (after 100ms delay)
+            // The overlay is intentionally delayed (UI_DELAYS.LOADING_OVERLAY) and
+            // gated behind initialization.
             await waitFor(
                 () => {
                     expect(
                         screen.getByLabelText("Loading application")
                     ).toBeInTheDocument();
                 },
-                { timeout: 200 }
+                { timeout: UI_DELAYS.LOADING_OVERLAY + 1500 }
             );
 
             expect(screen.getByText("Loading...")).toBeInTheDocument();

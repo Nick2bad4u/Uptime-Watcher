@@ -1,9 +1,5 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
 import { renderHook, act } from "@testing-library/react";
-
-// Unmock the theme module to test the actual implementation
-vi.unmock("../../theme/useTheme");
-
 import {
     useTheme,
     useAvailabilityColors,
@@ -54,7 +50,7 @@ describe("useTheme - Complete Coverage", () => {
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: useTheme.complete-coverage",
+                "Component: useTheme.complete-coverage-fixed",
                 "component"
             );
             await annotate("Category: Core", "category");
@@ -81,7 +77,7 @@ describe("useTheme - Complete Coverage", () => {
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: useTheme.complete-coverage",
+                "Component: useTheme.complete-coverage-fixed",
                 "component"
             );
             await annotate("Category: Core", "category");
@@ -92,7 +88,8 @@ describe("useTheme - Complete Coverage", () => {
             await act(async () => {
                 result.current.setTheme("system");
                 await new Promise((resolve) =>
-                    setTimeout(resolve, UI_DELAYS.STATE_UPDATE_DEFER + 10));
+                    setTimeout(resolve, UI_DELAYS.STATE_UPDATE_DEFER + 10)
+                );
             });
 
             // Verify setTheme function was called and works
@@ -103,7 +100,7 @@ describe("useTheme - Complete Coverage", () => {
         it("should handle theme toggling", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: useTheme.complete-coverage",
+                "Component: useTheme.complete-coverage-fixed",
                 "component"
             );
             await annotate("Category: Core", "category");
@@ -114,7 +111,8 @@ describe("useTheme - Complete Coverage", () => {
             await act(async () => {
                 result.current.toggleTheme();
                 await new Promise((resolve) =>
-                    setTimeout(resolve, UI_DELAYS.STATE_UPDATE_DEFER + 10));
+                    setTimeout(resolve, UI_DELAYS.STATE_UPDATE_DEFER + 10)
+                );
             });
 
             // Verify toggleTheme function works
@@ -125,7 +123,7 @@ describe("useTheme - Complete Coverage", () => {
         it("should handle color retrieval", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: useTheme.complete-coverage",
+                "Component: useTheme.complete-coverage-fixed",
                 "component"
             );
             await annotate("Category: Core", "category");
@@ -143,7 +141,7 @@ describe("useTheme - Complete Coverage", () => {
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: useTheme.complete-coverage",
+                "Component: useTheme.complete-coverage-fixed",
                 "component"
             );
             await annotate("Category: Core", "category");
@@ -161,7 +159,7 @@ describe("useTheme - Complete Coverage", () => {
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: useTheme.complete-coverage",
+                "Component: useTheme.complete-coverage-fixed",
                 "component"
             );
             await annotate("Category: Core", "category");
@@ -179,7 +177,7 @@ describe("useTheme - Complete Coverage", () => {
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: useTheme.complete-coverage",
+                "Component: useTheme.complete-coverage-fixed",
                 "component"
             );
             await annotate("Category: Core", "category");
@@ -204,7 +202,7 @@ describe("useTheme - Complete Coverage", () => {
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: useTheme.complete-coverage",
+                "Component: useTheme.complete-coverage-fixed",
                 "component"
             );
             await annotate("Category: Core", "category");
@@ -223,7 +221,7 @@ describe("useTheme - Complete Coverage", () => {
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: useTheme.complete-coverage",
+                "Component: useTheme.complete-coverage-fixed",
                 "component"
             );
             await annotate("Category: Core", "category");
@@ -246,7 +244,7 @@ describe("useTheme - Complete Coverage", () => {
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: useTheme.complete-coverage",
+                "Component: useTheme.complete-coverage-fixed",
                 "component"
             );
             await annotate("Category: Core", "category");
@@ -273,7 +271,7 @@ describe("useTheme - Complete Coverage", () => {
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: useTheme.complete-coverage",
+                "Component: useTheme.complete-coverage-fixed",
                 "component"
             );
             await annotate("Category: Core", "category");
@@ -291,7 +289,7 @@ describe("useTheme - Complete Coverage", () => {
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: useTheme.complete-coverage",
+                "Component: useTheme.complete-coverage-fixed",
                 "component"
             );
             await annotate("Category: Core", "category");
@@ -336,7 +334,7 @@ describe("useTheme - Complete Coverage", () => {
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: useTheme.complete-coverage",
+                "Component: useTheme.complete-coverage-fixed",
                 "component"
             );
             await annotate("Category: Core", "category");
@@ -357,7 +355,7 @@ describe("useTheme - Complete Coverage", () => {
         it("should return status color object", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: useTheme.complete-coverage",
+                "Component: useTheme.complete-coverage-fixed",
                 "component"
             );
             await annotate("Category: Core", "category");
@@ -384,7 +382,7 @@ describe("useTheme - Complete Coverage", () => {
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: useTheme.complete-coverage",
+                "Component: useTheme.complete-coverage-fixed",
                 "component"
             );
             await annotate("Category: Core", "category");
@@ -406,7 +404,7 @@ describe("useTheme - Complete Coverage", () => {
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: useTheme.complete-coverage",
+                "Component: useTheme.complete-coverage-fixed",
                 "component"
             );
             await annotate("Category: Core", "category");
@@ -430,7 +428,7 @@ describe("useTheme - Complete Coverage", () => {
         it("should handle color path retrieval", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: useTheme.complete-coverage",
+                "Component: useTheme.complete-coverage-fixed",
                 "component"
             );
             await annotate("Category: Core", "category");
@@ -450,14 +448,15 @@ describe("useTheme - Complete Coverage", () => {
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: useTheme.complete-coverage",
+                "Component: useTheme.complete-coverage-fixed",
                 "component"
             );
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
             const { result } = renderHook(() =>
-                useThemeValue((theme) => theme.colors.text.primary));
+                useThemeValue((theme) => theme.colors.text.primary)
+            );
 
             expect(typeof result.current).toBe("string");
         });
@@ -468,14 +467,15 @@ describe("useTheme - Complete Coverage", () => {
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: useTheme.complete-coverage",
+                "Component: useTheme.complete-coverage-fixed",
                 "component"
             );
             await annotate("Category: Core", "category");
             await annotate("Type: Data Retrieval", "type");
 
             const { result } = renderHook(() =>
-                useThemeValue((theme) => theme.colors));
+                useThemeValue((theme) => theme.colors)
+            );
 
             expect(typeof result.current).toBe("object");
             expect(result.current).toHaveProperty("text");
@@ -484,14 +484,15 @@ describe("useTheme - Complete Coverage", () => {
         it("should handle complex selectors", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: useTheme.complete-coverage",
+                "Component: useTheme.complete-coverage-fixed",
                 "component"
             );
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
             const { result } = renderHook(() =>
-                useThemeValue((theme) => theme.spacing));
+                useThemeValue((theme) => theme.spacing)
+            );
 
             expect(typeof result.current).toBe("object");
         });
@@ -502,14 +503,15 @@ describe("useTheme - Complete Coverage", () => {
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: useTheme.complete-coverage",
+                "Component: useTheme.complete-coverage-fixed",
                 "component"
             );
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
             const { result } = renderHook(() =>
-                useThemeValue((theme) => (theme as any).nonexistent?.path));
+                useThemeValue((theme) => (theme as any).nonexistent?.path)
+            );
 
             expect(result.current).toBeUndefined();
         });
@@ -522,7 +524,7 @@ describe("useTheme - Complete Coverage", () => {
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: useTheme.complete-coverage",
+                "Component: useTheme.complete-coverage-fixed",
                 "component"
             );
             await annotate("Category: Core", "category");
@@ -530,9 +532,11 @@ describe("useTheme - Complete Coverage", () => {
 
             const { result: themeResult } = renderHook(() => useTheme());
             const { result: statusResult } = renderHook(() =>
-                useStatusColors());
+                useStatusColors()
+            );
             const { result: _classesResult } = renderHook(() =>
-                useThemeClasses());
+                useThemeClasses()
+            );
 
             // Status colors should be consistent
             const themeUpColor = themeResult.current.getStatusColor("up");
@@ -548,7 +552,7 @@ describe("useTheme - Complete Coverage", () => {
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: useTheme.complete-coverage",
+                "Component: useTheme.complete-coverage-fixed",
                 "component"
             );
             await annotate("Category: Core", "category");
@@ -556,7 +560,8 @@ describe("useTheme - Complete Coverage", () => {
 
             const { result: themeResult } = renderHook(() => useTheme());
             const { result: availabilityResult } = renderHook(() =>
-                useAvailabilityColors());
+                useAvailabilityColors()
+            );
 
             const initialTheme = themeResult.current.themeName;
 
@@ -565,7 +570,8 @@ describe("useTheme - Complete Coverage", () => {
                     initialTheme === "light" ? "dark" : "light"
                 );
                 await new Promise((resolve) =>
-                    setTimeout(resolve, UI_DELAYS.STATE_UPDATE_DEFER + 10));
+                    setTimeout(resolve, UI_DELAYS.STATE_UPDATE_DEFER + 10)
+                );
             });
 
             // All hooks should still function after theme change
@@ -585,7 +591,7 @@ describe("useTheme - Complete Coverage", () => {
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: useTheme.complete-coverage",
+                "Component: useTheme.complete-coverage-fixed",
                 "component"
             );
             await annotate("Category: Core", "category");
@@ -594,23 +600,23 @@ describe("useTheme - Complete Coverage", () => {
             const { result } = renderHook(() => useAvailabilityColors());
 
             expect(() =>
-                result.current.getAvailabilityColor(999)).not.toThrowError();
+                result.current.getAvailabilityColor(999)
+            ).not.toThrowError();
             expect(() =>
-                result.current.getAvailabilityColor(-999)).not.toThrowError();
+                result.current.getAvailabilityColor(-999)
+            ).not.toThrowError();
             expect(() =>
-                result.current.getAvailabilityDescription(
-                    Infinity
-                )).not.toThrowError();
+                result.current.getAvailabilityDescription(Infinity)
+            ).not.toThrowError();
             expect(() =>
-                result.current.getAvailabilityDescription(
-                    -Infinity
-                )).not.toThrowError();
+                result.current.getAvailabilityDescription(-Infinity)
+            ).not.toThrowError();
         });
 
         it("should handle invalid color paths", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: useTheme.complete-coverage",
+                "Component: useTheme.complete-coverage-fixed",
                 "component"
             );
             await annotate("Category: Core", "category");
@@ -620,7 +626,8 @@ describe("useTheme - Complete Coverage", () => {
 
             expect(() => result.current.getColor("")).not.toThrowError();
             expect(() =>
-                result.current.getColor("invalid.path")).not.toThrowError();
+                result.current.getColor("invalid.path")
+            ).not.toThrowError();
         });
 
         it("should handle invalid status values", async ({
@@ -629,7 +636,7 @@ describe("useTheme - Complete Coverage", () => {
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: useTheme.complete-coverage",
+                "Component: useTheme.complete-coverage-fixed",
                 "component"
             );
             await annotate("Category: Core", "category");
@@ -638,11 +645,11 @@ describe("useTheme - Complete Coverage", () => {
             const { result } = renderHook(() => useTheme());
 
             expect(() =>
-                result.current.getStatusColor(
-                    "invalid" as any
-                )).not.toThrowError();
+                result.current.getStatusColor("invalid" as any)
+            ).not.toThrowError();
             expect(() =>
-                result.current.getStatusColor("" as any)).not.toThrowError();
+                result.current.getStatusColor("" as any)
+            ).not.toThrowError();
         });
     });
 });

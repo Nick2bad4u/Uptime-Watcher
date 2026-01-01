@@ -91,15 +91,15 @@ test.describe(
                 await electronApp.firstWindow();
 
                 // Test window properties
-                const bounds = await electronApp.evaluate(async ({
-                    BrowserWindow,
-                }) => {
-                    const windows = BrowserWindow.getAllWindows();
-                    if (windows.length > 0) {
-                        return windows[0]?.getBounds();
+                const bounds = await electronApp.evaluate(
+                    async ({ BrowserWindow }) => {
+                        const windows = BrowserWindow.getAllWindows();
+                        if (windows.length > 0) {
+                            return windows[0]?.getBounds();
+                        }
+                        return null;
                     }
-                    return null;
-                });
+                );
 
                 expect(bounds).toBeTruthy();
                 expect(bounds).toHaveProperty("width");
@@ -131,15 +131,15 @@ test.describe(
                 const electronApp = await launchElectronApp();
 
                 // Test app ready state
-                const readyState = await electronApp.evaluate(async ({
-                    app,
-                }) => {
-                    return {
-                        isReady: app.isReady(),
-                        name: app.getName(),
-                        locale: app.getLocale(),
-                    };
-                });
+                const readyState = await electronApp.evaluate(
+                    async ({ app }) => {
+                        return {
+                            isReady: app.isReady(),
+                            name: app.getName(),
+                            locale: app.getLocale(),
+                        };
+                    }
+                );
 
                 expect(readyState.isReady).toBe(true);
                 expect(readyState.name).toBeTruthy();
@@ -169,17 +169,17 @@ test.describe(
                 const electronApp = await launchElectronApp();
 
                 // Get system information
-                const systemInfo = await electronApp.evaluate(async ({
-                    app,
-                }) => {
-                    return {
-                        version: app.getVersion(),
-                        locale: app.getLocale(),
-                        systemLocale: app.getSystemLocale(),
-                        preferredSystemLanguages:
-                            app.getPreferredSystemLanguages(),
-                    };
-                });
+                const systemInfo = await electronApp.evaluate(
+                    async ({ app }) => {
+                        return {
+                            version: app.getVersion(),
+                            locale: app.getLocale(),
+                            systemLocale: app.getSystemLocale(),
+                            preferredSystemLanguages:
+                                app.getPreferredSystemLanguages(),
+                        };
+                    }
+                );
 
                 expect(systemInfo.version).toBeTruthy();
                 expect(systemInfo.locale).toBeTruthy();

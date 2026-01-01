@@ -9,14 +9,13 @@ import type {
     CloudSyncState,
 } from "@shared/types/cloudSyncState";
 
-import {
-    CLOUD_SYNC_SCHEMA_VERSION,
-} from "@shared/types/cloudSync";
+import { CLOUD_SYNC_SCHEMA_VERSION } from "@shared/types/cloudSync";
 import {
     CLOUD_SYNC_BASELINE_VERSION,
     type CloudSyncBaseline,
 } from "@shared/types/cloudSyncBaseline";
 import { applyCloudSyncOperationsToState } from "@shared/utils/cloudSyncState";
+import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import { validateMonitorData } from "@shared/validation/monitorSchemas";
 import { validateSiteData } from "@shared/validation/siteSchemas";
 
@@ -88,6 +87,9 @@ export interface SyncEngineResult {
 
 /** Concurrency used when downloading remote operation log objects. */
 const DEFAULT_OPS_OBJECT_READ_CONCURRENCY = 4;
+
+/** Concurrency cap used when deleting compacted remote sync objects. */
+const DEFAULT_SYNC_CLEANUP_DELETE_CONCURRENCY = 4;
 
 /**
  * Narrow interface for components that can perform a sync cycle.
@@ -221,10 +223,7 @@ export class SyncEngine {
                         "[SyncEngine] Failed to read remote operations object; skipping",
                         {
                             key: entry.key,
-                            message:
-                                error instanceof Error
-                                    ? error.message
-                                    : String(error),
+                            message: getUserFacingErrorDetail(error),
                         }
                     );
                     return [];
@@ -291,19 +290,11 @@ export class SyncEngine {
         // compacted operation objects to keep remote storage bounded.
         //
         // @remarks
-        // This is especially important when enabling encryption after legacy
+        // This is especially important when enabling encryption after older
         // plaintext sync artifacts exist; the first encrypted compaction should
-        // remove the old plaintext snapshot/ops.
+        // remove the previous plaintext snapshot/ops.
 
-        async function safeDelete(key: string): Promise<void> {
-            try {
-                await transport.deleteObject(key);
-            } catch {
-                // Best-effort cleanup.
-            }
-        }
-
-        const deletions: Array<Promise<void>> = [];
+        const keysToDelete: string[] = [];
         for (const entry of opObjects) {
             const metadata = parseOpsObjectKeyMetadata(entry.key);
             if (metadata) {
@@ -314,16 +305,28 @@ export class SyncEngine {
                     compactedUpTo !== undefined &&
                     metadata.lastOpId <= compactedUpTo
                 ) {
-                    deletions.push(safeDelete(entry.key));
+                    keysToDelete.push(entry.key);
                 }
             }
         }
 
         if (previousSnapshotKey && previousSnapshotKey !== snapshotEntry.key) {
-            deletions.push(safeDelete(previousSnapshotKey));
+            keysToDelete.push(previousSnapshotKey);
         }
 
-        await Promise.all(deletions);
+        await mapWithConcurrency({
+            concurrency: DEFAULT_SYNC_CLEANUP_DELETE_CONCURRENCY,
+            items: keysToDelete,
+            task: async (keyToDelete) => {
+                try {
+                    await transport.deleteObject(keyToDelete);
+                    return true;
+                } catch {
+                    // Best-effort cleanup.
+                    return false;
+                }
+            },
+        });
 
         const appliedBaseline = await this.applyMergedState(
             sanitizedMergedState,
@@ -408,10 +411,7 @@ export class SyncEngine {
                 logger.warn(
                     "[SyncEngine] Failed to apply remote site during sync",
                     {
-                        message:
-                            error instanceof Error
-                                ? error.message
-                                : String(error),
+                        message: getUserFacingErrorDetail(error),
                         monitorCount: site.monitors.length,
                         siteIdentifier: identifier,
                     }
@@ -427,10 +427,7 @@ export class SyncEngine {
                     logger.warn(
                         "[SyncEngine] Failed to remove local site during sync",
                         {
-                            message:
-                                error instanceof Error
-                                    ? error.message
-                                    : String(error),
+                            message: getUserFacingErrorDetail(error),
                             siteIdentifier: existing.identifier,
                         }
                     );
@@ -496,7 +493,14 @@ export class SyncEngine {
                 snapshotState: snapshot.state,
                 snapshotTrusted: true,
             };
-        } catch {
+        } catch (error) {
+            logger.warn(
+                "[SyncEngine] Failed to load remote snapshot; rebuilding from operation log",
+                {
+                    key: manifest.latestSnapshotKey,
+                    message: getUserFacingErrorDetail(error),
+                }
+            );
             return {
                 snapshotState: EMPTY_STATE,
                 snapshotTrusted: false,
@@ -540,7 +544,18 @@ export class SyncEngine {
             return createEmptyBaseline();
         }
 
-        return parseBaseline(raw);
+        const parsed = parseBaseline(raw);
+        if (parsed.recovered) {
+            logger.warn(
+                "[SyncEngine] Stored baseline is invalid; falling back to empty baseline",
+                {
+                    message: parsed.error,
+                    storedLength: raw.length,
+                }
+            );
+        }
+
+        return parsed.baseline;
     }
 
     private async setBaseline(baseline: CloudSyncBaseline): Promise<void> {
@@ -556,7 +571,7 @@ export class SyncEngine {
      * orchestrator.
      *
      * @remarks
-     * Remote operation streams may materialize into partial or legacy
+     * Remote operation streams may materialize into partial or outdated
      * configurations (e.g. an HTTP monitor without a URL). The orchestrator
      * performs strict validation and will reject these payloads.
      *

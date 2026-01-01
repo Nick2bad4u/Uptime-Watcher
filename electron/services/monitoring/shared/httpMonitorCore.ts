@@ -10,12 +10,13 @@
  */
 
 import type { Site } from "@shared/types";
-import type { AxiosInstance, AxiosResponse } from "axios";
+import type { AxiosResponse } from "axios";
 
 import {
     interpolateLogTemplate,
     LOG_TEMPLATES,
 } from "@shared/utils/logTemplates";
+import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 
 import type {
     IMonitorService,
@@ -34,11 +35,13 @@ import { withOperationalHooks } from "../../../utils/operationalHooks";
 import { handleCheckError, isCancellationError } from "../utils/errorHandling";
 import { createHttpClient } from "../utils/httpClient";
 import { getSharedHttpRateLimiter } from "../utils/httpRateLimiter";
+import { createTimeoutSignal } from "./abortSignalUtils";
 import {
     deriveMonitorTiming,
     ensureMonitorType,
     type MonitorByType,
 } from "./monitorCoreHelpers";
+import { MonitorServiceAdapterBase } from "./monitorServiceAdapterBase";
 import {
     createMonitorErrorResult,
     validateMonitorUrl,
@@ -127,10 +130,9 @@ export function createHttpMonitorService<
         url: string;
     }
 
-    return class HttpMonitorServiceAdapter implements IMonitorService {
-        private axiosInstance: AxiosInstance;
-
-        private config: MonitorServiceConfig;
+    return class HttpMonitorServiceAdapter
+        extends MonitorServiceAdapterBase<TType>
+        implements HttpMonitorServiceInstance {
 
         public async check(
             monitor: Site["monitors"][0],
@@ -177,7 +179,8 @@ export function createHttpMonitorService<
             };
 
             return rateLimiter.schedule(url, () =>
-                this.performCheckWithRetry(retryParams));
+                this.performCheckWithRetry(retryParams)
+            );
         }
 
         private async performCheckWithRetry(params: {
@@ -225,10 +228,9 @@ export function createHttpMonitorService<
                         operationName,
                         ...(isDev() && {
                             onRetry: (attempt: number, error: Error): void => {
-                                const errorMessage =
-                                    error instanceof Error
-                                        ? error.message
-                                        : String(error);
+                                const errorMessage = getUserFacingErrorDetail(
+                                    error
+                                );
                                 logger.debug(
                                     `[${behavior.scope}] URL ${url} failed attempt ${attempt}/${totalAttempts}: ${errorMessage}`
                                 );
@@ -250,7 +252,12 @@ export function createHttpMonitorService<
                     `[${behavior.scope}] Checking URL: ${url} with timeout: ${timeout}ms`
                 );
             }
-            const response = await this.makeRequest(monitor, url, timeout, signal);
+            const response = await this.makeRequest(
+                monitor,
+                url,
+                timeout,
+                signal
+            );
             const responseTime = response.responseTime ?? 0;
 
             if (isDev()) {
@@ -286,40 +293,39 @@ export function createHttpMonitorService<
             timeout: number,
             signal?: AbortSignal
         ): Promise<AxiosResponse> {
-            const signals = [AbortSignal.timeout(timeout)];
-            if (signal) {
-                signals.push(signal);
-            }
+            const requestSignal = createTimeoutSignal(timeout, signal);
 
             const shouldFollowRedirects =
                 Reflect.get(monitor, "followRedirects") !== false;
 
             return this.axiosInstance.get(url, {
-                signal: AbortSignal.any(signals),
+                signal: requestSignal,
                 timeout,
                 ...(!shouldFollowRedirects && { maxRedirects: 0 }),
             });
         }
 
         public constructor(config: MonitorServiceConfig = {}) {
-            this.config = {
+            const nextConfig: MonitorServiceConfig = {
                 timeout: DEFAULT_REQUEST_TIMEOUT,
                 userAgent: USER_AGENT,
                 ...config,
             };
 
-            this.axiosInstance = createHttpClient({
-                timeout: this.config.timeout ?? DEFAULT_REQUEST_TIMEOUT,
-                userAgent: this.config.userAgent ?? USER_AGENT,
+            const axiosInstance = createHttpClient({
+                timeout: nextConfig.timeout ?? DEFAULT_REQUEST_TIMEOUT,
+                userAgent: nextConfig.userAgent ?? USER_AGENT,
+            });
+
+            super({
+                axiosInstance,
+                config: nextConfig,
+                type: behavior.type,
             });
         }
 
         public getConfig(): MonitorServiceConfig {
             return { ...this.config };
-        }
-
-        public getType(): Site["monitors"][0]["type"] {
-            return behavior.type;
         }
 
         public updateConfig(config: Partial<MonitorServiceConfig>): void {

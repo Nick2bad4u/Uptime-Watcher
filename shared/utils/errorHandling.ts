@@ -139,7 +139,7 @@ export class ApplicationError extends Error {
  * @returns Human-readable error message that avoids leaking implementation
  *   details.
  */
-function getErrorMessage(operationName: unknown): string {
+function getOperationFailureMessage(operationName: unknown): string {
     if (
         operationName &&
         (typeof operationName === "string" || typeof operationName === "number")
@@ -334,7 +334,7 @@ async function handleBackendOperation<T>(
     try {
         return await operation();
     } catch (error: unknown) {
-        const errorMessage = getErrorMessage(operationName);
+        const errorMessage = getOperationFailureMessage(operationName);
 
         // Safely handle logging - fallback to console.error if logger fails
         try {

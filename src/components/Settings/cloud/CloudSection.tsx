@@ -9,6 +9,7 @@ import { useCallback, useMemo } from "react";
 
 import { ThemedButton } from "../../../theme/components/ThemedButton";
 import { ThemedText } from "../../../theme/components/ThemedText";
+import { AppIcons, getIconSize } from "../../../utils/icons";
 import { ErrorAlert } from "../../common/ErrorAlert/ErrorAlert";
 import { SettingItem } from "../../shared/SettingItem";
 import { SettingsSection } from "../SettingsSections";
@@ -251,6 +252,102 @@ export const CloudSection = ({
 
     const syncNowLabel = resolveSyncNowLabel({ isRequestingSyncNow });
 
+    const buttonIconSize = getIconSize("sm");
+    const rowIconSize = getIconSize("xs");
+
+    const CloudIcon = AppIcons.ui.cloud;
+    const LockIcon = AppIcons.ui.lock;
+    const SyncIcon = AppIcons.actions.refreshAlt;
+    const SyncNowIcon = AppIcons.actions.checkNow;
+    const TimeIcon = AppIcons.metrics.time;
+    const UnlockIcon = AppIcons.ui.unlock;
+    const UploadIcon = AppIcons.actions.upload;
+
+    const connectionHeaderIcon = useMemo(
+        () => (
+            <CloudIcon
+                aria-hidden
+                className="settings-accent--primary h-5 w-5"
+            />
+        ),
+        [CloudIcon]
+    );
+    const syncHeaderIcon = useMemo(
+        () => (
+            <SyncIcon
+                aria-hidden
+                className="settings-accent--success h-5 w-5"
+            />
+        ),
+        [SyncIcon]
+    );
+    const encryptionHeaderIcon = useMemo(
+        () => (
+            <LockIcon
+                aria-hidden
+                className="settings-accent--highlight h-5 w-5"
+            />
+        ),
+        [LockIcon]
+    );
+
+    const lastSyncRowIcon = useMemo(
+        () => (
+            <TimeIcon
+                aria-hidden
+                className="settings-accent--primary-muted"
+                size={rowIconSize}
+            />
+        ),
+        [rowIconSize, TimeIcon]
+    );
+    const lastBackupRowIcon = useMemo(
+        () => (
+            <UploadIcon
+                aria-hidden
+                className="settings-accent--primary-muted"
+                size={rowIconSize}
+            />
+        ),
+        [rowIconSize, UploadIcon]
+    );
+    const syncEnabledRowIcon = useMemo(
+        () => (
+            <SyncIcon
+                aria-hidden
+                className="settings-accent--success-muted"
+                size={rowIconSize}
+            />
+        ),
+        [rowIconSize, SyncIcon]
+    );
+    const encryptionStatusRowIcon = useMemo(
+        () => (
+            <LockIcon
+                aria-hidden
+                className="settings-accent--highlight-muted"
+                size={rowIconSize}
+            />
+        ),
+        [LockIcon, rowIconSize]
+    );
+
+    const syncNowButtonIcon = useMemo(
+        () => <SyncNowIcon aria-hidden size={buttonIconSize} />,
+        [buttonIconSize, SyncNowIcon]
+    );
+    const lockEncryptionButtonIcon = useMemo(
+        () => <LockIcon aria-hidden size={buttonIconSize} />,
+        [buttonIconSize, LockIcon]
+    );
+    const encryptionActionButtonIcon = useMemo(() => {
+        const IconComponent =
+            encryptionMode === "passphrase" && encryptionLocked
+                ? UnlockIcon
+                : LockIcon;
+        return <IconComponent aria-hidden size={buttonIconSize} />;
+    }, [buttonIconSize, encryptionLocked, encryptionMode, LockIcon, UnlockIcon]);
+
     const notConfiguredHint = renderCloudNotConfiguredHint({ configured });
 
     return (
@@ -281,35 +378,44 @@ export const CloudSection = ({
                     status={status}
                 />
 
-                <div className="rounded-lg border border-zinc-800 bg-zinc-900/40 p-4">
-                    <ThemedText size="sm" variant="secondary" weight="medium">
-                        Connection & Status
-                    </ThemedText>
+                <div className="settings-subcard">
+                    <div className="flex items-center gap-2">
+                        {connectionHeaderIcon}
+                        <ThemedText size="sm" variant="secondary" weight="medium">
+                            Connection & Status
+                        </ThemedText>
+                    </div>
 
-                    <div className="settings-toggle-stack mt-3">
+                    <div className="settings-item-stack mt-4">
                         <SettingItem
                             control={lastSyncControl}
                             description="Last completed sync time (based on this device)."
+                            icon={lastSyncRowIcon}
                             title="Last Sync"
                         />
 
                         <SettingItem
                             control={lastBackupControl}
                             description="Last completed remote backup upload time (based on this device)."
+                            icon={lastBackupRowIcon}
                             title="Last Backup"
                         />
                     </div>
                 </div>
 
-                <div className="rounded-lg border border-zinc-800 bg-zinc-900/40 p-4">
-                    <ThemedText size="sm" variant="secondary" weight="medium">
-                        Sync
-                    </ThemedText>
+                <div className="settings-subcard">
+                    <div className="flex items-center gap-2">
+                        {syncHeaderIcon}
+                        <ThemedText size="sm" variant="secondary" weight="medium">
+                            Sync
+                        </ThemedText>
+                    </div>
 
-                    <div className="settings-toggle-stack mt-3">
+                    <div className="settings-item-stack mt-4">
                         <SettingItem
                             control={syncEnabledControl}
                             description="When enabled, configuration changes are merged across devices."
+                            icon={syncEnabledRowIcon}
                             title="Enable Sync"
                         />
                     </div>
@@ -317,6 +423,7 @@ export const CloudSection = ({
                     <div className="mt-3 flex flex-wrap gap-2">
                         <ThemedButton
                             disabled={!connected || isRequestingSyncNow}
+                            icon={syncNowButtonIcon}
                             onClick={onRequestSyncNow}
                             size="sm"
                             variant="secondary"
@@ -326,15 +433,19 @@ export const CloudSection = ({
                     </div>
                 </div>
 
-                <div className="rounded-lg border border-zinc-800 bg-zinc-900/40 p-4">
-                    <ThemedText size="sm" variant="secondary" weight="medium">
-                        Encryption
-                    </ThemedText>
+                <div className="settings-subcard">
+                    <div className="flex items-center gap-2">
+                        {encryptionHeaderIcon}
+                        <ThemedText size="sm" variant="secondary" weight="medium">
+                            Encryption
+                        </ThemedText>
+                    </div>
 
-                    <div className="settings-toggle-stack mt-3">
+                    <div className="settings-item-stack mt-4">
                         <SettingItem
                             control={encryptionStatusControl}
                             description="Optional client-side encryption for new cloud sync artifacts and backups."
+                            icon={encryptionStatusRowIcon}
                             title="Status"
                         />
                     </div>
@@ -344,6 +455,7 @@ export const CloudSection = ({
                             disabled={
                                 !connected || isSettingEncryptionPassphrase
                             }
+                            icon={encryptionActionButtonIcon}
                             onClick={onSetEncryptionPassphrase}
                             size="sm"
                             variant="secondary"
@@ -354,6 +466,7 @@ export const CloudSection = ({
                         {showLockEncryptionButton ? (
                             <ThemedButton
                                 disabled={isClearingEncryptionKey}
+                                icon={lockEncryptionButtonIcon}
                                 onClick={onClearEncryptionKey}
                                 size="sm"
                                 variant="secondary"

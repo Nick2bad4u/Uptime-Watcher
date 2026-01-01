@@ -16,13 +16,13 @@ import {
 
 import { useSite } from "../../../hooks/site/useSite";
 import { ThemedText } from "../../../theme/components/ThemedText";
-import { getMonitorRuntimeSummary } from "../../../utils/monitoring/monitorRuntime";
 import { toSentenceCase } from "../../../utils/text/toSentenceCase";
 import {
     MarqueeText,
     type MarqueeTextProperties,
 } from "../../common/MarqueeText/MarqueeText";
 import { StatusBadge } from "../../common/StatusBadge";
+import { useDashboardSiteSummaryMeta } from "../shared/useDashboardSiteSummaryMeta";
 import { ActionButtonGroup } from "../SiteCard/components/ActionButtonGroup";
 import { MonitorSelector } from "../SiteCard/components/MonitorSelector";
 
@@ -51,14 +51,8 @@ export const SiteTableRow: NamedExoticComponent<SiteTableRowProperties> = memo(
         rowVariant,
         site,
     }: SiteTableRowProperties) {
+        const siteState = useSite(site);
         const {
-            handleCardClick,
-            handleCheckNow,
-            handleMonitorIdChange,
-            handleStartMonitoring,
-            handleStartSiteMonitoring,
-            handleStopMonitoring,
-            handleStopSiteMonitoring,
             isLoading,
             isMonitoring,
             latestSite,
@@ -67,12 +61,16 @@ export const SiteTableRow: NamedExoticComponent<SiteTableRowProperties> = memo(
             selectedMonitorId,
             status,
             uptime,
-        } = useSite(site);
-
-        const marqueeDependencies = useMemo(
-            () => [latestSite.name, site.identifier],
-            [latestSite.name, site.identifier]
-        );
+        } = siteState;
+        const {
+            handleCardClick,
+            handleCheckNow,
+            handleMonitorIdChange,
+            handleStartMonitoring,
+            handleStartSiteMonitoring,
+            handleStopMonitoring,
+            handleStopSiteMonitoring,
+        } = siteState;
 
         const marqueeTextProps = useMemo<
             NonNullable<MarqueeTextProperties["textProps"]>
@@ -84,14 +82,21 @@ export const SiteTableRow: NamedExoticComponent<SiteTableRowProperties> = memo(
             []
         );
 
+        const dashboardMetaArgs = useMemo(
+            () => ({
+                latestSiteName: latestSite.name,
+                monitors: latestSite.monitors,
+                siteIdentifier: site.identifier,
+            }),
+            [latestSite.monitors, latestSite.name, site.identifier]
+        );
+
         const {
             allRunning: allMonitorsRunning,
+            marqueeDependencies,
             runningCount: runningMonitors,
             totalCount: totalMonitors,
-        } = useMemo(
-            () => getMonitorRuntimeSummary(latestSite.monitors),
-            [latestSite.monitors]
-        );
+        } = useDashboardSiteSummaryMeta(dashboardMetaArgs);
 
         const statusFormatter = useCallback(
             (label: string, monitorStatus: MonitorStatus) =>

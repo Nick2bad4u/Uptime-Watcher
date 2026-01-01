@@ -7,6 +7,7 @@
  * database operations.
  */
 
+import { tryGetErrorCode } from "@shared/utils/errorCodes";
 import { ensureError } from "@shared/utils/errorHandling";
 import { LOG_TEMPLATES } from "@shared/utils/logTemplates";
 import { app } from "electron";
@@ -16,11 +17,11 @@ import * as path from "node:path";
 
 import { DB_FILE_NAME } from "../../constants";
 import { logger } from "../../utils/logger";
-import { cleanupDatabaseLockArtifacts } from "./utils/databaseLockRecovery";
+import { cleanupDatabaseLockArtifacts } from "./utils/maintenance/databaseLockRecovery";
 import {
     createDatabaseSchema,
     synchronizeDatabaseSchemaVersion,
-} from "./utils/databaseSchema";
+} from "./utils/schema/databaseSchema";
 
 /**
  * Common SQL queries for database service operations.
@@ -414,12 +415,9 @@ export class DatabaseService {
         try {
             db.get("PRAGMA temp_store = MEMORY");
         } catch (error) {
-            logger.warn(
-                "[DatabaseService] Failed to apply PRAGMA temp_store",
-                {
-                    message: ensureError(error).message,
-                }
-            );
+            logger.warn("[DatabaseService] Failed to apply PRAGMA temp_store", {
+                message: ensureError(error).message,
+            });
         }
 
         try {
@@ -442,6 +440,11 @@ export class DatabaseService {
      * @returns `true` when the error indicates an outstanding lock.
      */
     private isDatabaseLockedError(error: unknown): boolean {
+        const code = tryGetErrorCode(error);
+        if (code === "SQLITE_BUSY" || code === "SQLITE_LOCKED") {
+            return true;
+        }
+
         const normalized = ensureError(error);
         const message = normalized.message.toLowerCase();
 

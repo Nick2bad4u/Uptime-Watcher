@@ -168,13 +168,15 @@ export class PingMonitor implements IMonitorService {
             return createMonitorErrorResult("Monitor missing valid host", 0);
         }
 
+        const host = monitor.host.trim();
+
         // Normalize effective config (timeout, retryAttempts, interval)
         const { retryAttempts, timeout } = createMonitorConfig(monitor, {
             retryAttempts: DEFAULT_RETRY_ATTEMPTS,
             timeout: this.config.timeout ?? DEFAULT_REQUEST_TIMEOUT,
         });
 
-        return performPingCheckWithRetry(monitor.host, timeout, retryAttempts);
+        return performPingCheckWithRetry(host, timeout, retryAttempts);
     }
 
     /**

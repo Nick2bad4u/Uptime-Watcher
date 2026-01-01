@@ -17,19 +17,19 @@ import type { HistoryRepository } from "../../../services/database/HistoryReposi
 import type { MonitorRepository } from "../../../services/database/MonitorRepository";
 import type { SettingsRepository } from "../../../services/database/SettingsRepository";
 import type { SiteRepository } from "../../../services/database/SiteRepository";
-import type { SiteRow } from "../../../services/database/utils/siteMapper";
+import type { SiteRow } from "../../../services/database/utils/mappers/siteMapper";
 import type { StandardizedCache } from "../../../utils/cache/StandardizedCache";
 import type { Logger } from "@shared/utils/logger/interfaces";
 import type {
     MonitoringConfig,
     SiteLoadingConfig,
-} from "../../../utils/database/interfaces";
+} from "../../../services/database/interfaces";
 
-import { SiteLoadingError } from "../../../utils/database/interfaces";
+import { SiteLoadingError } from "../../../services/database/interfaces";
 import {
     SiteLoadingOrchestrator,
     SiteRepositoryService,
-} from "../../../utils/database/SiteRepositoryService";
+} from "../../../services/database/SiteRepositoryService";
 
 // Mock constants
 vi.mock("../../../constants", () => ({

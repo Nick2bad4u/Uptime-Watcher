@@ -266,7 +266,8 @@ describe("Real Alert System Performance", () => {
     beforeAll(() => {
         // Pre-generate test sites to avoid affecting benchmark timing
         testSites = Array.from({ length: 10 }, (_, i) =>
-            createMockSite(`site-${i}`, 5));
+            createMockSite(`site-${i}`, 5)
+        );
     });
 
     bench(

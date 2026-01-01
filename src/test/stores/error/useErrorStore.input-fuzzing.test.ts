@@ -376,19 +376,19 @@ describe("Error Store - Property-Based Fuzzing Tests", () => {
         fcTest.prop([
             arbitraries.storeName,
             fc.array(arbitraries.errorMessage, { minLength: 1, maxLength: 5 }),
-        ])("should handle rapid store error updates", (
-            storeName,
-            errorMessages
-        ) => {
-            store = createTestErrorStore();
-            // Act - rapidly update store errors
-            for (const error of errorMessages)
-                store.setStoreError(storeName, error);
+        ])(
+            "should handle rapid store error updates",
+            (storeName, errorMessages) => {
+                store = createTestErrorStore();
+                // Act - rapidly update store errors
+                for (const error of errorMessages)
+                    store.setStoreError(storeName, error);
 
-            // Assert - last error should win
-            const lastError = errorMessages.at(-1);
-            expect(store.getStoreError(storeName)).toBe(lastError);
-        });
+                // Assert - last error should win
+                const lastError = errorMessages.at(-1);
+                expect(store.getStoreError(storeName)).toBe(lastError);
+            }
+        );
 
         fcTest.prop([arbitraries.storeName])(
             "should handle getting non-existent store errors",
@@ -453,21 +453,21 @@ describe("Error Store - Property-Based Fuzzing Tests", () => {
         fcTest.prop([
             arbitraries.operationName,
             fc.array(arbitraries.loadingState, { minLength: 1, maxLength: 10 }),
-        ])("should handle rapid operation loading updates", (
-            operationName,
-            loadingStates
-        ) => {
-            store = createTestErrorStore();
-            // Act - rapidly update operation loading
-            for (const loading of loadingStates)
-                store.setOperationLoading(operationName, loading);
+        ])(
+            "should handle rapid operation loading updates",
+            (operationName, loadingStates) => {
+                store = createTestErrorStore();
+                // Act - rapidly update operation loading
+                for (const loading of loadingStates)
+                    store.setOperationLoading(operationName, loading);
 
-            // Assert - last state should win
-            const lastLoadingState = loadingStates.at(-1);
-            expect(store.getOperationLoading(operationName)).toBe(
-                lastLoadingState
-            );
-        });
+                // Assert - last state should win
+                const lastLoadingState = loadingStates.at(-1);
+                expect(store.getOperationLoading(operationName)).toBe(
+                    lastLoadingState
+                );
+            }
+        );
 
         fcTest.prop([arbitraries.operationName])(
             "should handle getting non-existent operation loading",
@@ -519,42 +519,43 @@ describe("Error Store - Property-Based Fuzzing Tests", () => {
             arbitraries.multipleStoreErrors,
             arbitraries.multipleOperationLoadings,
             arbitraries.loadingState,
-        ])("should clear all errors and states", (
-            globalError,
-            storeErrors,
-            operationLoadings,
-            globalLoading
-        ) => {
-            store = createTestErrorStore();
-            // Arrange - set up complex error state
-            store.setError(globalError);
-            store.setLoading(globalLoading);
-            for (const config of storeErrors) {
-                store.setStoreError(config.store, config.error ?? undefined);
+        ])(
+            "should clear all errors and states",
+            (globalError, storeErrors, operationLoadings, globalLoading) => {
+                store = createTestErrorStore();
+                // Arrange - set up complex error state
+                store.setError(globalError);
+                store.setLoading(globalLoading);
+                for (const config of storeErrors) {
+                    store.setStoreError(
+                        config.store,
+                        config.error ?? undefined
+                    );
+                }
+                for (const config of operationLoadings) {
+                    store.setOperationLoading(config.operation, config.loading);
+                }
+
+                // Verify state is set
+                expect(useErrorStore.getState().lastError).toBe(globalError);
+                expect(useErrorStore.getState().isLoading).toBe(globalLoading);
+
+                // Act
+                store.clearAllErrors();
+
+                // Assert - all errors should be cleared
+                expect(useErrorStore.getState().lastError).toBeUndefined();
+                // Note: isLoading is NOT cleared by clearAllErrors - it's a separate global loading state
+
+                // Store errors should be cleared
+                for (const config of storeErrors) {
+                    expect(store.getStoreError(config.store)).toBeUndefined();
+                }
+
+                // Note: Operation loadings are NOT cleared by clearAllErrors - they are separate operation states
+                // clearAllErrors only clears error states (lastError and storeErrors)
             }
-            for (const config of operationLoadings) {
-                store.setOperationLoading(config.operation, config.loading);
-            }
-
-            // Verify state is set
-            expect(useErrorStore.getState().lastError).toBe(globalError);
-            expect(useErrorStore.getState().isLoading).toBe(globalLoading);
-
-            // Act
-            store.clearAllErrors();
-
-            // Assert - all errors should be cleared
-            expect(useErrorStore.getState().lastError).toBeUndefined();
-            // Note: isLoading is NOT cleared by clearAllErrors - it's a separate global loading state
-
-            // Store errors should be cleared
-            for (const config of storeErrors) {
-                expect(store.getStoreError(config.store)).toBeUndefined();
-            }
-
-            // Note: Operation loadings are NOT cleared by clearAllErrors - they are separate operation states
-            // clearAllErrors only clears error states (lastError and storeErrors)
-        });
+        );
 
         fcTest.prop([arbitraries.multipleStoreErrors])(
             "should handle clearing empty error state",
@@ -584,26 +585,23 @@ describe("Error Store - Property-Based Fuzzing Tests", () => {
             arbitraries.errorMessage,
             arbitraries.operationName,
             arbitraries.loadingState,
-        ])("should handle complex state combinations", (
-            globalError,
-            storeName,
-            storeError,
-            operationName,
-            loading
-        ) => {
-            store = createTestErrorStore();
-            // Act - set complex state combination
-            store.setError(globalError);
-            store.setStoreError(storeName, storeError);
-            store.setOperationLoading(operationName, loading);
-            store.setLoading(loading);
+        ])(
+            "should handle complex state combinations",
+            (globalError, storeName, storeError, operationName, loading) => {
+                store = createTestErrorStore();
+                // Act - set complex state combination
+                store.setError(globalError);
+                store.setStoreError(storeName, storeError);
+                store.setOperationLoading(operationName, loading);
+                store.setLoading(loading);
 
-            // Assert - all state should be consistent
-            expect(useErrorStore.getState().lastError).toBe(globalError);
-            expect(store.getStoreError(storeName)).toBe(storeError);
-            expect(store.getOperationLoading(operationName)).toBe(loading);
-            expect(useErrorStore.getState().isLoading).toBe(loading);
-        });
+                // Assert - all state should be consistent
+                expect(useErrorStore.getState().lastError).toBe(globalError);
+                expect(store.getStoreError(storeName)).toBe(storeError);
+                expect(store.getOperationLoading(operationName)).toBe(loading);
+                expect(useErrorStore.getState().isLoading).toBe(loading);
+            }
+        );
 
         fcTest.prop([
             fc.array(arbitraries.storeErrorConfig, {
@@ -614,56 +612,65 @@ describe("Error Store - Property-Based Fuzzing Tests", () => {
                 minLength: 1,
                 maxLength: 5,
             }),
-        ])("should handle mixed store errors and operation loadings", (
-            storeConfigs,
-            operationConfigs
-        ) => {
-            store = createTestErrorStore();
-            // Act - interleave store errors and operation loadings
-            for (
-                let i = 0;
-                i < Math.max(storeConfigs.length, operationConfigs.length);
-                i++
-            ) {
-                if (i < storeConfigs.length) {
-                    const config = storeConfigs[i]!;
-                    store.setStoreError(
+        ])(
+            "should handle mixed store errors and operation loadings",
+            (storeConfigs, operationConfigs) => {
+                store = createTestErrorStore();
+                // Act - interleave store errors and operation loadings
+                for (
+                    let i = 0;
+                    i < Math.max(storeConfigs.length, operationConfigs.length);
+                    i++
+                ) {
+                    if (i < storeConfigs.length) {
+                        const config = storeConfigs[i]!;
+                        store.setStoreError(
+                            config.store,
+                            config.error ?? undefined
+                        );
+                    }
+                    if (i < operationConfigs.length) {
+                        const config = operationConfigs[i]!;
+                        store.setOperationLoading(
+                            config.operation,
+                            config.loading
+                        );
+                    }
+                }
+
+                // Assert - build expected final states (last wins for each store/operation)
+                const expectedStoreErrors = new Map<
+                    string,
+                    string | undefined
+                >();
+                for (const config of storeConfigs) {
+                    expectedStoreErrors.set(
                         config.store,
                         config.error ?? undefined
                     );
                 }
-                if (i < operationConfigs.length) {
-                    const config = operationConfigs[i]!;
-                    store.setOperationLoading(config.operation, config.loading);
+
+                const expectedOperationLoadings = new Map<string, boolean>();
+                for (const config of operationConfigs) {
+                    expectedOperationLoadings.set(
+                        config.operation,
+                        config.loading
+                    );
+                }
+
+                for (const [storeName, expectedError] of expectedStoreErrors) {
+                    expect(store.getStoreError(storeName)).toBe(expectedError);
+                }
+                for (const [
+                    operationName,
+                    expectedLoading,
+                ] of expectedOperationLoadings) {
+                    expect(store.getOperationLoading(operationName)).toBe(
+                        expectedLoading
+                    );
                 }
             }
-
-            // Assert - build expected final states (last wins for each store/operation)
-            const expectedStoreErrors = new Map<string, string | undefined>();
-            for (const config of storeConfigs) {
-                expectedStoreErrors.set(
-                    config.store,
-                    config.error ?? undefined
-                );
-            }
-
-            const expectedOperationLoadings = new Map<string, boolean>();
-            for (const config of operationConfigs) {
-                expectedOperationLoadings.set(config.operation, config.loading);
-            }
-
-            for (const [storeName, expectedError] of expectedStoreErrors) {
-                expect(store.getStoreError(storeName)).toBe(expectedError);
-            }
-            for (const [
-                operationName,
-                expectedLoading,
-            ] of expectedOperationLoadings) {
-                expect(store.getOperationLoading(operationName)).toBe(
-                    expectedLoading
-                );
-            }
-        });
+        );
     });
 
     describe("Concurrent Operations", () => {
@@ -684,36 +691,37 @@ describe("Error Store - Property-Based Fuzzing Tests", () => {
             fc.array(arbitraries.errorMessage, { minLength: 2, maxLength: 5 }),
             arbitraries.operationName,
             fc.array(arbitraries.loadingState, { minLength: 2, maxLength: 5 }),
-        ])("should handle concurrent store and operation updates", (
-            storeName,
-            storeErrors,
-            operationName,
-            loadingStates
-        ) => {
-            store = createTestErrorStore();
-            // Act - interleave store error and operation loading updates
-            for (
-                let i = 0;
-                i < Math.max(storeErrors.length, loadingStates.length);
-                i++
-            ) {
-                if (i < storeErrors.length) {
-                    store.setStoreError(storeName, storeErrors[i]);
+        ])(
+            "should handle concurrent store and operation updates",
+            (storeName, storeErrors, operationName, loadingStates) => {
+                store = createTestErrorStore();
+                // Act - interleave store error and operation loading updates
+                for (
+                    let i = 0;
+                    i < Math.max(storeErrors.length, loadingStates.length);
+                    i++
+                ) {
+                    if (i < storeErrors.length) {
+                        store.setStoreError(storeName, storeErrors[i]);
+                    }
+                    if (i < loadingStates.length) {
+                        store.setOperationLoading(
+                            operationName,
+                            loadingStates[i]!
+                        );
+                    }
                 }
-                if (i < loadingStates.length) {
-                    store.setOperationLoading(operationName, loadingStates[i]!);
-                }
+
+                // Assert - final states should be set
+                const finalStoreError = storeErrors.at(-1);
+                const finalLoadingState = loadingStates.at(-1);
+
+                expect(store.getStoreError(storeName)).toBe(finalStoreError);
+                expect(store.getOperationLoading(operationName)).toBe(
+                    finalLoadingState
+                );
             }
-
-            // Assert - final states should be set
-            const finalStoreError = storeErrors.at(-1);
-            const finalLoadingState = loadingStates.at(-1);
-
-            expect(store.getStoreError(storeName)).toBe(finalStoreError);
-            expect(store.getOperationLoading(operationName)).toBe(
-                finalLoadingState
-            );
-        });
+        );
     });
 
     describe("Edge Cases and Error Scenarios", () => {
@@ -788,44 +796,45 @@ describe("Error Store - Property-Based Fuzzing Tests", () => {
             arbitraries.loadingState,
             arbitraries.multipleStoreErrors,
             arbitraries.multipleOperationLoadings,
-        ])("should maintain state type consistency", (
-            globalError,
-            globalLoading,
-            storeErrors,
-            operationLoadings
-        ) => {
-            store = createTestErrorStore();
-            // Act
-            store.setError(globalError);
-            store.setLoading(globalLoading);
-            for (const config of storeErrors) {
-                store.setStoreError(config.store, config.error ?? undefined);
-            }
-            for (const config of operationLoadings) {
-                store.setOperationLoading(config.operation, config.loading);
-            }
+        ])(
+            "should maintain state type consistency",
+            (globalError, globalLoading, storeErrors, operationLoadings) => {
+                store = createTestErrorStore();
+                // Act
+                store.setError(globalError);
+                store.setLoading(globalLoading);
+                for (const config of storeErrors) {
+                    store.setStoreError(
+                        config.store,
+                        config.error ?? undefined
+                    );
+                }
+                for (const config of operationLoadings) {
+                    store.setOperationLoading(config.operation, config.loading);
+                }
 
-            // Assert invariants
-            expect(
-                typeof store.lastError === "string" ||
-                    store.lastError === undefined
-            ).toBeTruthy();
-            expect(typeof store.isLoading).toBe("boolean");
-            expect(typeof store.storeErrors).toBe("object");
-            expect(typeof store.operationLoading).toBe("object");
-
-            // Store errors should all be strings or undefined
-            for (const error of Object.values(store.storeErrors)) {
+                // Assert invariants
                 expect(
-                    typeof error === "string" || error === undefined
+                    typeof store.lastError === "string" ||
+                        store.lastError === undefined
                 ).toBeTruthy();
-            }
+                expect(typeof store.isLoading).toBe("boolean");
+                expect(typeof store.storeErrors).toBe("object");
+                expect(typeof store.operationLoading).toBe("object");
 
-            // Operation loadings should all be booleans
-            for (const loading of Object.values(store.operationLoading)) {
-                expect(typeof loading).toBe("boolean");
+                // Store errors should all be strings or undefined
+                for (const error of Object.values(store.storeErrors)) {
+                    expect(
+                        typeof error === "string" || error === undefined
+                    ).toBeTruthy();
+                }
+
+                // Operation loadings should all be booleans
+                for (const loading of Object.values(store.operationLoading)) {
+                    expect(typeof loading).toBe("boolean");
+                }
             }
-        });
+        );
 
         fcTest.prop([arbitraries.multipleStoreErrors])(
             "should maintain store error isolation",

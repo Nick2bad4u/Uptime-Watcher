@@ -31,11 +31,6 @@ import {
     ScreenshotThumbnail,
     type ScreenshotThumbnailProperties,
 } from "../../../components/SiteDetails/ScreenshotThumbnail";
-import {
-    sampleOne,
-    siteNameArbitrary,
-    siteUrlArbitrary,
-} from "@shared/test/arbitraries/siteArbitraries";
 
 // Mock the logger (following existing pattern)
 vi.mock("../../../services/logger", () => ({
@@ -57,9 +52,13 @@ vi.mock("../../../theme/useTheme", () => ({
 
 // Mock useUIStore (following existing pattern)
 vi.mock("../../../stores/ui/useUiStore", () => ({
-    useUIStore: () => ({
-        openExternal: vi.fn(),
-    }),
+    useUIStore: (selector?: (state: { openExternal: () => void }) => unknown) => {
+        const state = {
+            openExternal: vi.fn(),
+        };
+
+        return typeof selector === "function" ? selector(state) : state;
+    },
 }));
 
 // Mock useMount hook (following existing pattern)
@@ -91,8 +90,11 @@ describe("ScreenshotThumbnail Arithmetic Mutations", () => {
         overrides: Partial<ScreenshotThumbnailProperties> = {}
     ): ScreenshotThumbnailProperties => {
         const thumbnailConfig: ScreenshotThumbnailProperties = {
-            siteName: sampleOne(siteNameArbitrary),
-            url: sampleOne(siteUrlArbitrary),
+            // Must be a non-private network URL; otherwise ScreenshotThumbnail
+            // intentionally disables screenshots and the portal overlay will
+            // never render.
+            siteName: "Test Site",
+            url: "https://example.com/",
             ...overrides,
         };
         render(<ScreenshotThumbnail {...thumbnailConfig} />);

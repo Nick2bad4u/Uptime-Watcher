@@ -35,7 +35,7 @@ vi.mock("../../services/commands/DatabaseCommands", () => ({
     ImportDataCommand: vi.fn(function ImportDataCommandMock() {}),
 }));
 
-vi.mock("../../utils/database/serviceFactory", () => {
+vi.mock("../../services/database/serviceFactory", () => {
     const createLoggerAdapterMock = () => ({
         debug: vi.fn(),
         info: vi.fn(),
@@ -53,7 +53,7 @@ vi.mock("../../utils/database/serviceFactory", () => {
     };
 });
 
-vi.mock("../../utils/database/historyLimitManager", () => ({
+vi.mock("../../services/database/historyLimitManager", () => ({
     setHistoryLimit: vi.fn(async (params: any) => {
         if (params?.setHistoryLimit) {
             const finalLimit = normalizeHistoryLimit(
@@ -85,7 +85,7 @@ describe("DatabaseManager - Coverage Tests", () => {
 
         // Manually setup the history limit mock
         const historyLimitManager =
-            await import("../../utils/database/historyLimitManager");
+            await import("../../services/database/historyLimitManager");
         vi.mocked(historyLimitManager.setHistoryLimit).mockImplementation(
             async (params) => {
                 if (params?.setHistoryLimit) {

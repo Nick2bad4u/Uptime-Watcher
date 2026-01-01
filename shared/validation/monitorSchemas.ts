@@ -20,8 +20,12 @@ import type { ValidationResult } from "@shared/types/validation";
 import type { Jsonify, UnknownRecord } from "type-fest";
 
 import { MIN_MONITOR_CHECK_INTERVAL_MS } from "@shared/constants/monitoring";
+import { hasAsciiControlCharacters } from "@shared/utils/stringSafety";
+import { isRecord } from "@shared/utils/typeHelpers";
+import { formatZodIssues } from "@shared/utils/zodIssueFormatting";
 import * as z from "zod";
 
+import { monitorIdSchema } from "./monitorFieldSchemas";
 import {
     monitorStatusEnumValues,
     statusHistoryEnumValues,
@@ -89,14 +93,14 @@ export const baseMonitorSchema: BaseMonitorSchemaType = z
             .number()
             .min(
                 VALIDATION_CONSTRAINTS.CHECK_INTERVAL.MIN,
-                "Check interval must be at least 5 seconds"
+                `Check interval must be at least ${MIN_MONITOR_CHECK_INTERVAL_MS}ms`
             )
             .max(
                 VALIDATION_CONSTRAINTS.CHECK_INTERVAL.MAX,
                 "Check interval cannot exceed 30 days"
             ),
         history: z.array(statusHistorySchema),
-        id: z.string().min(1, "Monitor ID is required"),
+        id: monitorIdSchema,
         lastChecked: z.date().optional(),
         monitoring: z.boolean(),
         /**
@@ -148,23 +152,16 @@ export const baseMonitorSchema: BaseMonitorSchemaType = z
     .strict();
 
 /**
- * Reusable HTTP URL validation schema for multiple monitor types.
+ * Reusable URL validation helper restricted to a specific set of protocols.
  *
  * @remarks
- * Validates using WHATWG URL parsing plus {@link isValidHost}.
+ * The primary syntax validation uses {@link isValidUrl} (validator.js backed) so
+ * we avoid hand-rolled URL parsing heuristics.
  *
- * This intentionally allows valid URL path characters (including quotes) while
- * enforcing strict host validation (FQDN with TLD, IP literals, or
- * `localhost`).
+ * We still parse the URL using WHATWG {@link URL} to extract the hostname and
+ * apply {@link isValidHost} so host semantics (FQDN with TLD, IP literals, or
+ * `localhost`) remain consistent across monitor types.
  */
-function tryParseUrl(candidate: string): undefined | URL {
-    try {
-        return new URL(candidate);
-    } catch {
-        return undefined;
-    }
-}
-
 function isUrlWithAllowedProtocols(
     candidate: string,
     protocols: readonly string[]
@@ -173,7 +170,19 @@ function isUrlWithAllowedProtocols(
         return false;
     }
 
-    const parsed = tryParseUrl(candidate);
+    // Defense-in-depth: reject ASCII control characters (including newlines)
+    // to avoid ambiguous parsing/logging behavior.
+    if (hasAsciiControlCharacters(candidate)) {
+        return false;
+    }
+
+    const parsed = ((): null | URL => {
+        try {
+            return new URL(candidate);
+        } catch {
+            return null;
+        }
+    })();
 
     if (!parsed) {
         return false;
@@ -187,26 +196,41 @@ function isUrlWithAllowedProtocols(
     return isValidHost(parsed.hostname);
 }
 
-const httpUrlSchema = z
-    .string()
-    .refine(
-        (val): boolean => isUrlWithAllowedProtocols(val, ["http", "https"]),
-        "Must be a valid HTTP or HTTPS URL"
-    );
+/**
+ * Creates a reusable URL schema restricted to a specific set of protocols.
+ *
+ * @remarks
+ * Uses WHATWG {@link URL} parsing plus {@link isValidHost} to keep hostname
+ * validation consistent across monitor types.
+ */
+const createProtocolUrlSchema = (
+    protocols: readonly string[],
+    message: string
+): z.ZodString =>
+    z
+        .string()
+        .refine(
+            (value): boolean => isUrlWithAllowedProtocols(value, protocols),
+            message
+        );
 
+const httpUrlSchema = createProtocolUrlSchema(
+    ["http", "https"],
+    "Must be a valid HTTP or HTTPS URL"
+);
 /**
  * Reusable WebSocket URL validation schema for multiple monitor types.
  *
  * @remarks
- * Restricts URLs to `ws://` or `wss://` protocols and leverages
- * {@link validator.isURL} for RFC-compliant validation.
+ * Restricts URLs to `ws://` or `wss://` protocols.
+ * @remarks
+ * Uses WHATWG {@link URL} parsing plus {@link isValidHost} (same strategy as
+ * {@link httpUrlSchema}) so host validation is consistent across monitor types.
  */
-const websocketUrlSchema = z
-    .string()
-    .refine(
-        (val): boolean => isUrlWithAllowedProtocols(val, ["ws", "wss"]),
-        "Must be a valid WebSocket URL (ws:// or wss://)"
-    );
+const websocketUrlSchema = createProtocolUrlSchema(
+    ["ws", "wss"],
+    "Must be a valid WebSocket URL (ws:// or wss://)"
+);
 
 /**
  * RFC 7230 token characters permitted within HTTP header names.
@@ -304,17 +328,42 @@ const httpHeaderValueSchema = z
  * @returns `true` when the path is non-empty, contains no spaces, and does not
  *   use double dots; otherwise `false`.
  */
-const isValidJsonPath = (value: string): boolean => {
+type DotSeparatedPathValidationOptions = Readonly<{
+    /** When false, spaces are rejected anywhere in the path. */
+    allowSpaces: boolean;
+}>;
+
+/**
+ * Validates whether a string represents a dot-separated path.
+ *
+ * @remarks
+ * Used for monitor configurations that reference JSON object field paths.
+ *
+ * Rules:
+ * - Must be non-empty after trimming
+ * - Must not contain ".."
+ * - Must not contain empty segments
+ * - Optionally rejects spaces
+ */
+const isValidDotSeparatedPath = (
+    value: string,
+    options: DotSeparatedPathValidationOptions
+): boolean => {
     const trimmed = value.trim();
 
     if (trimmed.length === 0 || trimmed.includes("..")) {
         return false;
     }
 
-    return trimmed
-        .split(".")
-        .every((segment) => segment.length > 0 && !segment.includes(" "));
+    if (!options.allowSpaces && trimmed.includes(" ")) {
+        return false;
+    }
+
+    return trimmed.split(".").every((segment) => segment.length > 0);
 };
+
+const isValidJsonPath = (value: string): boolean =>
+    isValidDotSeparatedPath(value, { allowSpaces: false });
 
 /**
  * Shared schema validating JSON path configuration fields.
@@ -336,14 +385,8 @@ const jsonPathSchema = z
  * @returns `true` when the path is non-empty, has no empty segments, and does
  *   not contain double dots; otherwise `false`.
  */
-const isValidDotPath = (value: string): boolean => {
-    const trimmed = value.trim();
-    if (trimmed.length === 0 || trimmed.includes("..")) {
-        return false;
-    }
-
-    return trimmed.split(".").every((segment) => segment.length > 0);
-};
+const isValidDotPath = (value: string): boolean =>
+    isValidDotSeparatedPath(value, { allowSpaces: false });
 
 /**
  * Creates a dot-notation schema with a contextualized validation message.
@@ -373,7 +416,7 @@ const edgeLocationListSchema = z
     .min(1, "At least one edge endpoint is required")
     .refine((value) => {
         const entries = value
-            .split(/[\n\r,]+/v)
+            .split(/[\n\r,]+/u)
             .map((entry) => entry.trim())
             .filter((entry) => entry.length > 0);
 
@@ -382,7 +425,8 @@ const edgeLocationListSchema = z
         }
 
         return entries.every((entry) =>
-            isUrlWithAllowedProtocols(entry, ["http", "https"]));
+            isUrlWithAllowedProtocols(entry, ["http", "https"])
+        );
     }, "Edge endpoints must be valid HTTP or HTTPS URLs separated by commas or new lines");
 
 /**
@@ -733,6 +777,12 @@ export const monitorSchemas: MonitorSchemas = {
     "websocket-keepalive": websocketKeepaliveMonitorSchema,
 };
 
+function isKnownMonitorTypeKey(
+    value: string
+): value is keyof typeof monitorSchemas {
+    return Object.hasOwn(monitorSchemas, value);
+}
+
 /**
  * Type representing a validated HTTP monitor.
  *
@@ -855,9 +905,11 @@ export type SslMonitor = z.infer<typeof sslMonitorSchema>;
 function getMonitorSchema(
     type: string
 ): (typeof monitorSchemas)[keyof typeof monitorSchemas] | undefined {
-    // Type assertion is safe since we're checking if the property exists
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- safe type assertion for monitor schema lookup
-    return monitorSchemas[type as keyof typeof monitorSchemas];
+    if (!isKnownMonitorTypeKey(type)) {
+        return undefined;
+    }
+
+    return monitorSchemas[type];
 }
 
 /**
@@ -978,8 +1030,9 @@ export function validateMonitorData(
         };
     } catch (error) {
         if (error instanceof z.ZodError) {
-            const errors: string[] = [];
-            const warnings: string[] = [];
+            type Issue = (typeof error.issues)[number];
+            const errorIssues: Issue[] = [];
+            const warningIssues: Issue[] = [];
 
             for (const issue of error.issues) {
                 // Use Zod's structured error codes for robust warning detection
@@ -990,17 +1043,17 @@ export function validateMonitorData(
                     issue.path.length > 0;
 
                 if (isOptionalField) {
-                    warnings.push(`${issue.path.join(".")}: ${issue.message}`);
+                    warningIssues.push(issue);
                 } else {
-                    errors.push(`${issue.path.join(".")}: ${issue.message}`);
+                    errorIssues.push(issue);
                 }
             }
 
             return {
-                errors,
+                errors: formatZodIssues(errorIssues),
                 metadata: { monitorType: type },
                 success: false,
-                warnings,
+                warnings: formatZodIssues(warningIssues),
             };
         }
 
@@ -1015,6 +1068,29 @@ export function validateMonitorData(
             warnings: [],
         };
     }
+}
+
+/**
+ * Validates an unknown monitor candidate and returns a list of human-readable
+ * validation errors.
+ *
+ * @remarks
+ * Prefer this function whenever you need to validate an unknown monitor-like
+ * payload (for example from JSON, IPC, or tests).
+ */
+export function getMonitorValidationErrors(candidate: unknown): string[] {
+    if (!isRecord(candidate)) {
+        return ["Monitor data must be an object"];
+    }
+
+    const rawKind = candidate["type"];
+    if (typeof rawKind !== "string" || rawKind.trim().length === 0) {
+        return ["Monitor type is required"];
+    }
+
+    const result = validateMonitorData(rawKind, candidate);
+
+    return result.success ? [] : Array.from(result.errors);
 }
 
 /**
@@ -1066,7 +1142,9 @@ export function validateMonitorField(
         };
     } catch (error) {
         if (error instanceof z.ZodError) {
-            const errors = error.issues.map((issue) => issue.message);
+            const errors = formatZodIssues(error.issues, {
+                includePath: false,
+            });
 
             return {
                 errors,

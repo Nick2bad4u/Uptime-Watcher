@@ -268,7 +268,8 @@ describe("Shared SiteStatus Utilities", () => {
 
             // These should handle invalid inputs gracefully
             expect(() =>
-                getSiteStatusVariant("invalid" as any)).not.toThrowError();
+                getSiteStatusVariant("invalid" as any)
+            ).not.toThrowError();
         });
     });
 });

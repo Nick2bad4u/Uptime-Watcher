@@ -164,6 +164,14 @@ const vitestConfig = defineConfig({
         includeTaskLocation: true,
         isolate: true,
         logHeapUsage: true,
+        // NOTE: Vitest v4 removed `test.poolOptions`. Use `maxWorkers` instead.
+        maxWorkers: Math.max(
+            1,
+            Number(
+                // eslint-disable-next-line n/no-process-env -- safe for test time use
+                process.env["MAX_THREADS"] ?? (process.env["CI"] ? "1" : "8")
+            )
+        ),
         name: {
             color: "magenta",
             label: "Backend",
@@ -172,23 +180,6 @@ const vitestConfig = defineConfig({
             json: "./coverage/electron/test-results.json",
         },
         pool: "threads", // Use worker threads for better performance
-        poolOptions: {
-            threads: {
-                isolate: true, // Isolate tests for better reliability
-                maxThreads: Math.max(
-                    1,
-                    Number(
-                        // eslint-disable-next-line n/no-process-env -- safe for test time use
-                        process.env["MAX_THREADS"] ??
-                            (process.env["CI"] ? "1" : "16")
-                    )
-                ), // 16 threads on local, 1 thread on CI by default
-                minThreads: 1, // Ensure at least one thread
-                singleThread: Boolean(process.env["CI"]), // Enable single-threading in CI
-                startupTimeout: 120_000, // Electron suites boot slower on Windows; allow 2 minutes to avoid Vitest pool errors
-                useAtomics: true,
-            },
-        },
         printConsoleTrace: false,
         reporters: [
             "default",

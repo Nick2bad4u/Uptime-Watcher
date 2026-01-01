@@ -105,15 +105,23 @@ vi.mock("../../../stores/monitor/useMonitorTypesStore", () => ({
 }));
 
 vi.mock("../../../stores/error/useErrorStore", () => ({
-    useErrorStore: vi.fn(() => ({
-        formError: undefined,
-        clearError: vi.fn(),
-    })),
+    useErrorStore: vi.fn(
+        (selector?: (state: { clearError: () => void; isLoading: boolean; lastError: string | undefined; formError?: unknown }) => unknown) => {
+            const state = {
+                clearError: vi.fn(),
+                formError: undefined,
+                isLoading: false,
+                lastError: undefined,
+            };
+
+            return typeof selector === "function" ? selector(state) : state;
+        }
+    ),
 }));
 
 // Mock form hook to return functions we can control
 const mockSetMonitorType = vi.fn();
-const mockSetCheckInterval = vi.fn();
+const mockSetCheckIntervalMs = vi.fn();
 const mockSetAddMode = vi.fn();
 const mockResetForm = vi.fn();
 const mockCreateSite = vi.fn();
@@ -134,8 +142,8 @@ vi.mock("../../../components/SiteDetails/useAddSiteForm", () => ({
         setUrl: vi.fn(),
         monitorType: "http",
         setMonitorType: mockSetMonitorType,
-        checkInterval: 60_000,
-        setCheckInterval: mockSetCheckInterval,
+        checkIntervalMs: 60_000,
+        setCheckIntervalMs: mockSetCheckIntervalMs,
         selectedExistingSite: "",
         setSelectedExistingSite: vi.fn(),
         host: "",
@@ -404,13 +412,12 @@ describe("AddSiteForm Uncovered Lines Coverage", () => {
         annotate("Type: Business Logic", "type");
 
         // Mock handleSubmit to call the onSuccess callback
-        vi.mocked(handleSubmit).mockImplementation(async (
-            _event,
-            properties
-        ) => {
-            // Simulate successful submission - call the onSuccess callback
-            properties.onSuccess?.();
-        });
+        vi.mocked(handleSubmit).mockImplementation(
+            async (_event, properties) => {
+                // Simulate successful submission - call the onSuccess callback
+                properties.onSuccess?.();
+            }
+        );
 
         render(<AddSiteForm onSuccess={mockOnSuccess} />);
 
@@ -501,11 +508,24 @@ describe("AddSiteForm Uncovered Lines Coverage", () => {
         annotate("Category: Component", "category");
         annotate("Type: Error Handling", "type");
 
-        // First set a form error to trigger the ErrorAlert component
-        vi.mocked(useErrorStore).mockReturnValue({
-            lastError: "Test error",
-            clearError: mockClearError,
-        });
+        const selectorAwareImplementation = (
+            selector?: (state: unknown) => unknown
+        ) => {
+            const state = {
+                clearError: mockClearError,
+                formError: undefined,
+                isLoading: false,
+                lastError: "Test error",
+            };
+
+            return typeof selector === "function" ? selector(state) : state;
+        };
+
+        // AddSiteForm reads from the error store multiple times via selectors.
+        vi.mocked(useErrorStore)
+            .mockImplementationOnce(selectorAwareImplementation as never)
+            .mockImplementationOnce(selectorAwareImplementation as never)
+            .mockImplementationOnce(selectorAwareImplementation as never);
 
         render(<AddSiteForm onSuccess={mockOnSuccess} />);
 

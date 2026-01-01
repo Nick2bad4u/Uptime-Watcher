@@ -31,31 +31,18 @@
 import type { EventMetadata } from "@shared/types/events";
 import type { Simplify } from "type-fest";
 
+import { generateCorrelationId } from "@shared/utils/correlation";
 import {
     createTemplateLogger,
     LOG_TEMPLATES,
 } from "@shared/utils/logTemplates";
+import { isObject } from "@shared/utils/typeGuards";
 import { EventEmitter } from "node:events";
 
-import { generateCorrelationId } from "../utils/correlation";
 import { logger as baseLogger } from "../utils/logger";
+import { isEventMetadata } from "./eventMetadataGuards";
 
 const logger = createTemplateLogger(baseLogger);
-
-const isEventMetadataCandidate = (value: unknown): value is EventMetadata => {
-    if (!value || typeof value !== "object") {
-        return false;
-    }
-
-    const candidate = value as Partial<EventMetadata>;
-
-    return (
-        typeof candidate.busId === "string" &&
-        typeof candidate.correlationId === "string" &&
-        typeof candidate.eventName === "string" &&
-        typeof candidate.timestamp === "number"
-    );
-};
 
 interface MetaCarrier {
     readonly _meta: EventMetadata;
@@ -67,7 +54,7 @@ interface OriginalMetaCarrier {
 
 const resolveOriginalMetadata = (
     ...candidates: readonly unknown[]
-): EventMetadata | undefined => candidates.find(isEventMetadataCandidate);
+): EventMetadata | undefined => candidates.find(isEventMetadata);
 
 /**
  * Internal symbol used to carry original metadata through event forwarding.
@@ -516,7 +503,8 @@ export class TypedEventBus<
 
             try {
                 await middleware(currentEvent, currentData, () =>
-                    processNext(index + 1, currentEvent, currentData));
+                    processNext(index + 1, currentEvent, currentData)
+                );
             } catch (error) {
                 baseLogger.error(
                     `[TypedEventBus:${this.busId}] Middleware error for '${eventName}' [${correlationId}]`,
@@ -905,7 +893,9 @@ export class TypedEventBus<
             symbolOriginalMetaCandidate,
             existingOriginalMetaCandidate,
             existingMetaCandidate,
-        ].filter(isEventMetadataCandidate);
+        ].filter((candidate): candidate is EventMetadata =>
+            isEventMetadata(candidate)
+        );
 
         const resolvedOriginalMeta =
             metadataCandidates.length > 0
@@ -955,9 +945,7 @@ export class TypedEventBus<
     private isObjectPayload(
         value: EventPayloadValue
     ): value is NonArrayObjectPayload {
-        return (
-            typeof value === "object" && value !== null && !Array.isArray(value)
-        );
+        return isObject(value);
     }
 }
 

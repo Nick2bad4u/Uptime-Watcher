@@ -5,11 +5,18 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import {
     getMonitor,
+    getMonitorWithResult,
     getAvailableMonitorTypes,
     clearMonitorFactoryCache,
     updateMonitorConfig,
+    MonitorConfigurationError,
 } from "../../../services/monitoring/MonitorFactory";
-import type { MonitorServiceConfig } from "../../../services/monitoring/types";
+import * as MonitorTypeRegistry from "../../../services/monitoring/MonitorTypeRegistry";
+import type {
+    IMonitorService,
+    MonitorServiceConfig,
+} from "../../../services/monitoring/types";
+import type { Site } from "@shared/types";
 
 describe("MonitorFactory - Fixed", () => {
     let mockMonitorConfig: MonitorServiceConfig;
@@ -63,7 +70,8 @@ describe("MonitorFactory - Fixed", () => {
             await annotate("Type: Monitoring", "type");
 
             expect(() =>
-                getMonitor("invalid" as any, mockMonitorConfig)).toThrowError();
+                getMonitor("invalid" as any, mockMonitorConfig)
+            ).toThrowError();
         });
 
         it("should get monitor with configuration", async ({
@@ -77,6 +85,52 @@ describe("MonitorFactory - Fixed", () => {
 
             const monitor = getMonitor("ping", mockMonitorConfig);
             expect(monitor).toBeDefined();
+        });
+
+        it("should throw when configuration update fails", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorFactory", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
+            const originalGetFactory =
+                MonitorTypeRegistry.getMonitorServiceFactory;
+            const failingService: IMonitorService = {
+                check: vi.fn(async () => ({
+                    responseTime: 0,
+                    status: "up" as const,
+                })),
+                getType: vi.fn(
+                    () => "ping"
+                ) as () => Site["monitors"][0]["type"],
+                updateConfig: vi.fn(() => {
+                    throw new Error("Configuration failure");
+                }),
+            };
+
+            const factorySpy = vi
+                .spyOn(MonitorTypeRegistry, "getMonitorServiceFactory")
+                .mockImplementation((type: string) => {
+                    if (type === "ping") {
+                        return () => failingService;
+                    }
+
+                    return originalGetFactory(type);
+                });
+
+            clearMonitorFactoryCache();
+
+            try {
+                expect(() =>
+                    getMonitorWithResult("ping", mockMonitorConfig)
+                ).toThrowError(MonitorConfigurationError);
+            } finally {
+                factorySpy.mockRestore();
+                clearMonitorFactoryCache();
+            }
         });
     });
 

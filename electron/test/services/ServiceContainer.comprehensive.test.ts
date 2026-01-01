@@ -1386,7 +1386,9 @@ describe("ServiceContainer - Comprehensive Coverage", () => {
             expect(
                 container.getUptimeOrchestrator().initialize
             ).toHaveBeenCalledTimes(1);
-            expect(container.getIpcService().setupHandlers).toHaveBeenCalledTimes(1);
+            expect(
+                container.getIpcService().setupHandlers
+            ).toHaveBeenCalledTimes(1);
         });
 
         it("should handle service creation order independence", async ({

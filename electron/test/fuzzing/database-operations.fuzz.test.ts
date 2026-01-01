@@ -27,7 +27,11 @@ import {
     type MockedFunction,
 } from "vitest";
 import fc from "fast-check";
-import type { SiteRow } from "../../services/database/utils/siteMapper";
+import type { SiteRow } from "../../services/database/utils/mappers/siteMapper";
+import {
+    isValidMonitorId,
+    isValidSiteIdentifier,
+} from "../../services/database/utils/validation/identifierValidation";
 import { HistoryRepository } from "../../services/database/HistoryRepository";
 import { MonitorRepository } from "../../services/database/MonitorRepository";
 import { SiteRepository } from "../../services/database/SiteRepository";
@@ -38,7 +42,9 @@ const SIMULATED_TRANSACTION_FAILURE = new Error(
 
 const SITE_ROW_ARBITRARY: fc.Arbitrary<SiteRow> = fc
     .record({
-        identifier: fc.string({ minLength: 1, maxLength: 64 }),
+        identifier: fc
+            .stringMatching(/^[\dA-Za-z][\w-]{0,63}$/)
+            .filter((value) => isValidSiteIdentifier(value)),
         name: fc.option(fc.string({ minLength: 1, maxLength: 128 }), {
             nil: undefined,
         }),
@@ -220,9 +226,14 @@ describe("Database Operations Fuzzing Tests", () => {
                     // Should return boolean and not throw
                     const result = await siteRepository.delete(identifier);
                     expect(typeof result).toBe("boolean");
-                    expect(
-                        mockDatabaseService.executeTransaction
-                    ).toHaveBeenCalled();
+
+                    if (isValidSiteIdentifier(identifier)) {
+                        expect(
+                            mockDatabaseService.executeTransaction
+                        ).toHaveBeenCalled();
+                    } else {
+                        expect(result).toBeFalsy();
+                    }
                 }),
                 { numRuns: 20 }
             );
@@ -250,73 +261,76 @@ describe("Database Operations Fuzzing Tests", () => {
 
         it("rolls back bulk inserts when a statement fails mid-transaction", async () => {
             await fc.assert(
-                fc.asyncProperty(SITE_ROWS_ARBITRARY, fc.nat(), async (
-                    sites: SiteRow[],
-                    failureSeed: number
-                ) => {
-                    const failureIndex = failureSeed % (sites.length + 1);
+                fc.asyncProperty(
+                    SITE_ROWS_ARBITRARY,
+                    fc.nat(),
+                    async (sites: SiteRow[], failureSeed: number) => {
+                        const failureIndex = failureSeed % (sites.length + 1);
 
-                    const preparedStatements: PreparedStatementMock[] = [];
+                        const preparedStatements: PreparedStatementMock[] = [];
 
-                    mockDatabaseService.executeTransaction.mockClear();
-                    mockDb.prepare.mockReset();
+                        mockDatabaseService.executeTransaction.mockClear();
+                        mockDb.prepare.mockReset();
 
-                    mockDatabaseService.executeTransaction.mockImplementation(
-                        async (callback: any) => await callback(mockDb)
-                    );
-
-                    mockDb.prepare.mockImplementation(() => {
-                        let invocationCount = 0;
-
-                        const statement: PreparedStatementMock = {
-                            finalize: vi.fn(),
-                            run: vi.fn(() => {
-                                const shouldFail =
-                                    failureIndex < sites.length &&
-                                    invocationCount === failureIndex;
-
-                                invocationCount += 1;
-
-                                if (shouldFail) {
-                                    throw SIMULATED_TRANSACTION_FAILURE;
-                                }
-
-                                return { changes: 1 };
-                            }),
-                        };
-
-                        preparedStatements.push(statement);
-                        return statement;
-                    });
-
-                    const resultPromise = siteRepository.bulkInsert(sites);
-
-                    const expectedAttempts =
-                        failureIndex < sites.length ? 3 : 1;
-
-                    await (failureIndex < sites.length
-                        ? expect(resultPromise).rejects.toThrowError(
-                              SIMULATED_TRANSACTION_FAILURE
-                          )
-                        : expect(resultPromise).resolves.toBeUndefined());
-
-                    expect(
-                        mockDatabaseService.executeTransaction
-                    ).toHaveBeenCalledTimes(expectedAttempts);
-                    expect(preparedStatements).toHaveLength(expectedAttempts);
-
-                    const expectedRuns =
-                        failureIndex < sites.length
-                            ? failureIndex + 1
-                            : sites.length;
-
-                    for (const statement of preparedStatements) {
-                        expect(statement.finalize).toHaveBeenCalledTimes(1);
-                        expect(statement.run).toHaveBeenCalledTimes(
-                            expectedRuns
+                        mockDatabaseService.executeTransaction.mockImplementation(
+                            async (callback: any) => await callback(mockDb)
                         );
+
+                        mockDb.prepare.mockImplementation(() => {
+                            let invocationCount = 0;
+
+                            const statement: PreparedStatementMock = {
+                                finalize: vi.fn(),
+                                run: vi.fn(() => {
+                                    const shouldFail =
+                                        failureIndex < sites.length &&
+                                        invocationCount === failureIndex;
+
+                                    invocationCount += 1;
+
+                                    if (shouldFail) {
+                                        throw SIMULATED_TRANSACTION_FAILURE;
+                                    }
+
+                                    return { changes: 1 };
+                                }),
+                            };
+
+                            preparedStatements.push(statement);
+                            return statement;
+                        });
+
+                        const resultPromise = siteRepository.bulkInsert(sites);
+
+                        const expectedAttempts =
+                            failureIndex < sites.length ? 3 : 1;
+
+                        await (failureIndex < sites.length
+                            ? expect(resultPromise).rejects.toThrowError(
+                                  SIMULATED_TRANSACTION_FAILURE
+                              )
+                            : expect(resultPromise).resolves.toBeUndefined());
+
+                        expect(
+                            mockDatabaseService.executeTransaction
+                        ).toHaveBeenCalledTimes(expectedAttempts);
+                        expect(preparedStatements).toHaveLength(
+                            expectedAttempts
+                        );
+
+                        const expectedRuns =
+                            failureIndex < sites.length
+                                ? failureIndex + 1
+                                : sites.length;
+
+                        for (const statement of preparedStatements) {
+                            expect(statement.finalize).toHaveBeenCalledTimes(1);
+                            expect(statement.run).toHaveBeenCalledTimes(
+                                expectedRuns
+                            );
+                        }
                     }
-                }),
+                ),
                 { numRuns: 25 }
             );
         });
@@ -326,8 +340,11 @@ describe("Database Operations Fuzzing Tests", () => {
         it("should handle create operations with monitor data", async () => {
             await fc.assert(
                 fc.asyncProperty(
+                    // Align with shared schemas: identifiers must contain non-whitespace.
+                    fc
+                        .string({ minLength: 1, maxLength: 64 })
+                        .filter((value) => /\S/u.test(value)),
                     fc.record({
-                        id: fc.string({ minLength: 1, maxLength: 64 }),
                         type: fc.constant("http"),
                         url: fc.string({ minLength: 1, maxLength: 200 }),
                         checkInterval: fc.integer({ min: 1000, max: 300_000 }),
@@ -342,18 +359,32 @@ describe("Database Operations Fuzzing Tests", () => {
                         monitoring: fc.boolean(),
                         responseTime: fc.integer({ min: 0, max: 30_000 }),
                     }),
-                    fc.string({ minLength: 1, maxLength: 100 }), // SiteIdentifier
-                    async (monitorData: any, siteIdentifier: string) => {
+                    // Site identifiers must contain non-whitespace and respect max length.
+                    fc
+                        .string({ minLength: 1, maxLength: 100 })
+                        .filter((value) => /\S/u.test(value)),
+                    async (
+                        monitorId: string,
+                        monitorData: any,
+                        siteIdentifier: string
+                    ) => {
                         mockDatabaseService.executeTransaction.mockImplementation(
                             async (callback: any) => await callback(mockDb)
                         );
                         // MonitorRepository uses INSERT ... RETURNING via db.get
                         // (insertWithReturning). Ensure the mock returns an id.
-                        mockDb.get.mockReturnValue({ id: monitorData.id });
+                        const normalizedMonitorData = {
+                            ...monitorData,
+                            id: monitorId,
+                        };
+
+                        mockDb.get.mockReturnValue({
+                            id: normalizedMonitorData.id,
+                        });
 
                         const createdId = await monitorRepository.create(
                             siteIdentifier,
-                            monitorData
+                            normalizedMonitorData
                         );
                         expect(createdId).toBeTypeOf("string");
 
@@ -369,6 +400,7 @@ describe("Database Operations Fuzzing Tests", () => {
         it("should handle findByIdentifier with various monitor IDs", async () => {
             await fc.assert(
                 fc.asyncProperty(fc.string(), async (monitorId: string) => {
+                    mockDatabaseService.executeTransaction.mockClear();
                     mockDatabaseService.executeTransaction.mockImplementation(
                         async (callback: any) => await callback(mockDb)
                     );
@@ -392,44 +424,55 @@ describe("Database Operations Fuzzing Tests", () => {
 
         it("should handle findBySiteIdentifier operations", async () => {
             await fc.assert(
-                fc.asyncProperty(fc.string(), async (
-                    siteIdentifier: string
-                ) => {
-                    mockDatabaseService.executeTransaction.mockImplementation(
-                        async (callback: any) => await callback(mockDb)
-                    );
-                    mockDb.all.mockReturnValue([]);
+                fc.asyncProperty(
+                    fc.string(),
+                    async (siteIdentifier: string) => {
+                        mockDatabaseService.executeTransaction.mockImplementation(
+                            async (callback: any) => await callback(mockDb)
+                        );
+                        mockDb.all.mockReturnValue([]);
 
-                    // Should handle any site identifier gracefully
-                    try {
-                        const result =
-                            await monitorRepository.findBySiteIdentifier(
-                                siteIdentifier
-                            );
-                        expect(Array.isArray(result)).toBeTruthy();
-                    } catch (error) {
-                        // Method may throw for invalid identifiers, which is acceptable
+                        // Should handle any site identifier gracefully
+                        try {
+                            const result =
+                                await monitorRepository.findBySiteIdentifier(
+                                    siteIdentifier
+                                );
+                            expect(Array.isArray(result)).toBeTruthy();
+                        } catch (error) {
+                            // Method may throw for invalid identifiers, which is acceptable
+                        }
                     }
-                }),
+                ),
                 { numRuns: 20 }
             );
         });
 
         it("should handle delete operations safely", async () => {
             await fc.assert(
-                fc.asyncProperty(fc.string(), async (monitorId: string) => {
-                    mockDatabaseService.executeTransaction.mockImplementation(
-                        async (callback: any) => await callback(mockDb)
-                    );
-                    mockDb.run.mockReturnValue({ changes: 0 });
+                fc.asyncProperty(
+                    fc
+                        .stringMatching(/^[\dA-Za-z][\w-]{0,63}$/)
+                        .filter((value) => isValidMonitorId(value)),
+                    async (monitorId: string) => {
+                        mockDatabaseService.executeTransaction.mockClear();
+                        mockDatabaseService.executeTransaction.mockImplementation(
+                            async (callback: any) => await callback(mockDb)
+                        );
+                        mockDb.run.mockReturnValue({ changes: 0 });
 
-                    // Should return boolean and not throw
-                    const result = await monitorRepository.delete(monitorId);
-                    expect(typeof result).toBe("boolean");
-                    expect(
-                        mockDatabaseService.executeTransaction
-                    ).toHaveBeenCalled();
-                }),
+                        // Should return boolean and not throw
+                        const result =
+                            await monitorRepository.delete(monitorId);
+                        expect(typeof result).toBe("boolean");
+                        expect(
+                            mockDatabaseService.executeTransaction
+                        ).toHaveBeenCalled();
+
+                        // Also assert the boolean result is stable.
+                        expect(typeof result).toBe("boolean");
+                    }
+                ),
                 { numRuns: 20 }
             );
         });

@@ -11,7 +11,6 @@ interface PreviewDevice {
 }
 
 const opsKeyPattern =
-    // eslint-disable-next-line regexp/require-unicode-sets-regexp -- This pattern does not require Unicode sets; /u is sufficient.
     /^sync\/devices\/(?<deviceId>[^/]+)\/ops\/(?<createdAtEpochMs>\d+)-\d+-\d+\.ndjson$/u;
 
 /**

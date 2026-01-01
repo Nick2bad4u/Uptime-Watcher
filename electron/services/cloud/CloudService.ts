@@ -19,7 +19,14 @@ import {
     type CloudEncryptionConfigPassphrase,
     type CloudEncryptionMode,
 } from "@shared/types/cloudEncryption";
+import { readProcessEnv } from "@shared/utils/environment";
+import { tryGetErrorCode } from "@shared/utils/errorCodes";
 import { ensureError } from "@shared/utils/errorHandling";
+import { hasAsciiControlCharacters } from "@shared/utils/stringSafety";
+import {
+    MAX_FILESYSTEM_BASE_DIRECTORY_BYTES,
+    validateFilesystemBaseDirectoryCandidate,
+} from "@shared/validation/filesystemBaseDirectoryValidation";
 import { safeStorage } from "electron";
 import { promises as fs } from "node:fs";
 import path from "node:path";
@@ -28,14 +35,14 @@ import type { UptimeOrchestrator } from "../../UptimeOrchestrator";
 import type {
     DatabaseBackupResult,
     DatabaseRestorePayload,
-} from "../database/utils/databaseBackup";
+} from "../database/utils/backup/databaseBackup";
 import type { CloudSyncEngine } from "../sync/SyncEngine";
 import type { CloudSettingsAdapter } from "./CloudService.types";
 import type { CloudStorageProvider } from "./providers/CloudStorageProvider.types";
 
-import { readProcessEnv } from "../../utils/environment";
 import { logger } from "../../utils/logger";
 import { ProviderCloudSyncTransport } from "../sync/ProviderCloudSyncTransport";
+import { normalizeCloudObjectKey } from "./cloudKeyNormalization";
 import {
     createKeyCheckBase64,
     decryptBuffer,
@@ -61,6 +68,7 @@ import { migrateProviderBackups } from "./migrations/backupMigration";
 import { resetProviderCloudSyncState } from "./migrations/syncReset";
 import { buildCloudSyncResetPreview } from "./migrations/syncResetPreview";
 import { backupMetadataKeyForBackupKey } from "./providers/CloudBackupMetadataFile";
+import { isCloudProviderOperationError } from "./providers/cloudProviderErrors";
 import { DropboxAuthFlow } from "./providers/dropbox/DropboxAuthFlow";
 import { DropboxCloudStorageProvider } from "./providers/dropbox/DropboxCloudStorageProvider";
 import { DropboxTokenManager } from "./providers/dropbox/DropboxTokenManager";
@@ -83,34 +91,11 @@ const SETTINGS_KEY_GOOGLE_DRIVE_TOKENS = "cloud.googleDrive.tokens" as const;
 const SETTINGS_KEY_GOOGLE_DRIVE_ACCOUNT_LABEL =
     "cloud.googleDrive.accountLabel" as const;
 
-function isENOENT(error: unknown): boolean {
-    return (
-        typeof error === "object" &&
-        error !== null &&
-        "code" in error &&
-        (error as { code?: unknown }).code === "ENOENT"
-    );
-}
-
-function hasAsciiControlCharacters(value: string): boolean {
-    for (const char of value) {
-        const codePoint = char.codePointAt(0);
-        if (
-            codePoint !== undefined &&
-            (codePoint < 0x20 || codePoint === 0x7f)
-        ) {
-            return true;
-        }
-    }
-
-    return false;
-}
-
 async function ignoreENOENT(fn: () => Promise<void>): Promise<void> {
     try {
         await fn();
     } catch (error) {
-        if (isENOENT(error)) {
+        if (tryGetErrorCode(error) === "ENOENT") {
             return;
         }
         throw ensureError(error);
@@ -145,15 +130,15 @@ const BACKUP_KEY_PREFIX = "backups/" as const;
 const MAX_BACKUP_KEY_BYTES = 2048;
 
 function normalizeCloudKey(rawKey: string): string {
-    const normalized = rawKey.trim().replaceAll("\\", "/");
-
-    // Collapse redundant slashes deterministically without regex.
-    let collapsed = normalized;
-    while (collapsed.includes("//")) {
-        collapsed = collapsed.replaceAll("//", "/");
-    }
-
-    return collapsed;
+    return normalizeCloudObjectKey(rawKey, {
+        forbidAsciiControlCharacters: false,
+        // Preserve existing behavior: traversal segments are rejected later by
+        // assertBackupObjectKey.
+        forbidTraversalSegments: false,
+        // Preserve leading slashes so assertBackupObjectKey can reject absolute
+        // keys.
+        stripLeadingSlashes: false,
+    });
 }
 
 function assertBackupObjectKey(rawKey: string): string {
@@ -164,7 +149,9 @@ function assertBackupObjectKey(rawKey: string): string {
     const key = normalizeCloudKey(rawKey);
 
     if (Buffer.byteLength(key, "utf8") > MAX_BACKUP_KEY_BYTES) {
-        throw new Error(`Backup key must not exceed ${MAX_BACKUP_KEY_BYTES} bytes`);
+        throw new Error(
+            `Backup key must not exceed ${MAX_BACKUP_KEY_BYTES} bytes`
+        );
     }
 
     if (!key.startsWith(BACKUP_KEY_PREFIX)) {
@@ -176,7 +163,9 @@ function assertBackupObjectKey(rawKey: string): string {
     }
 
     if (key.endsWith(".metadata.json")) {
-        throw new Error("Backup key must reference the backup object, not metadata");
+        throw new Error(
+            "Backup key must reference the backup object, not metadata"
+        );
     }
 
     if (hasAsciiControlCharacters(key)) {
@@ -293,9 +282,20 @@ export class CloudService {
         } catch (error: unknown) {
             const resolved = ensureError(error);
             await setLastError(this.settings, resolved.message);
+
+            const providerDetails = isCloudProviderOperationError(resolved)
+                ? {
+                      code: resolved.code,
+                      operation: resolved.operation,
+                      providerKind: resolved.providerKind,
+                      target: resolved.target,
+                  }
+                : undefined;
+
             logger.warn(`[CloudService] Operation '${operationName}' failed`, {
                 message: resolved.message,
                 name: resolved.name,
+                ...(providerDetails ? { providerDetails } : {}),
             });
             throw resolved;
         }
@@ -343,8 +343,12 @@ export class CloudService {
             await this.settings.set(SETTINGS_KEY_ENCRYPTION_SALT, "");
 
             await this.secretStore.deleteSecret(SETTINGS_KEY_DROPBOX_TOKENS);
-            await this.secretStore.deleteSecret(SETTINGS_KEY_GOOGLE_DRIVE_TOKENS);
-            await this.secretStore.deleteSecret(SECRET_KEY_ENCRYPTION_DERIVED_KEY);
+            await this.secretStore.deleteSecret(
+                SETTINGS_KEY_GOOGLE_DRIVE_TOKENS
+            );
+            await this.secretStore.deleteSecret(
+                SECRET_KEY_ENCRYPTION_DERIVED_KEY
+            );
 
             logger.info("[CloudService] Disconnected cloud provider");
             return this.buildStatusSummary();
@@ -386,14 +390,27 @@ export class CloudService {
         passphrase: string
     ): Promise<CloudStatusSummary> {
         return this.runCloudOperation("setEncryptionPassphrase", async () => {
-            if (
-                typeof passphrase !== "string" ||
-                passphrase.trim().length < 8
-            ) {
+            if (typeof passphrase !== "string") {
+                throw new TypeError("Passphrase must be a string");
+            }
+
+            if (hasAsciiControlCharacters(passphrase)) {
+                throw new Error(
+                    "Passphrase must not contain control characters"
+                );
+            }
+
+            const trimmedPassphrase = passphrase.trim();
+            if (trimmedPassphrase.length < 8) {
                 throw new Error(
                     "Passphrase must be at least 8 characters (after trimming)"
                 );
             }
+
+            const passphraseCandidates: readonly [string, string?] =
+                passphrase === trimmedPassphrase
+                    ? [passphrase]
+                    : [passphrase, trimmedPassphrase];
 
             const provider = await this.resolveProviderOrThrow({
                 requireEncryptionUnlocked: false,
@@ -409,30 +426,38 @@ export class CloudService {
 
             if (remoteEncryption?.mode === "passphrase") {
                 const salt = decodeBase64(remoteEncryption.saltBase64);
-                const key = await derivePassphraseKey({ passphrase, salt });
+                const tryDeriveKey = async (
+                    candidatePassphrase: string
+                ): Promise<Buffer | null> => {
+                    const candidateKey = await derivePassphraseKey({
+                        passphrase: candidatePassphrase,
+                        salt,
+                    });
 
-                const valid = verifyKeyCheckBase64({
-                    key,
-                    keyCheckBase64: remoteEncryption.keyCheckBase64,
-                });
+                    const valid = verifyKeyCheckBase64({
+                        key: candidateKey,
+                        keyCheckBase64: remoteEncryption.keyCheckBase64,
+                    });
 
-                if (!valid) {
-                    throw new Error("Incorrect encryption passphrase");
+                    if (valid) {
+                        return candidateKey;
+                    }
+
+                    candidateKey.fill(0);
+                    return null;
+                };
+
+                // At most two candidates (raw + trimmed); avoid `no-await-in-loop`.
+                const [primaryCandidate, secondaryCandidate] =
+                    passphraseCandidates;
+
+                let derivedKey = await tryDeriveKey(primaryCandidate);
+                if (!derivedKey && secondaryCandidate) {
+                    derivedKey = await tryDeriveKey(secondaryCandidate);
                 }
 
-                // Backfill `enabledAt` for older manifests so we can enforce a
-                // stable "encryption boundary" going forward.
-                if (manifest && remoteEncryption.enabledAt === undefined) {
-                    const enabledAt = Date.now();
-                    const nextManifest: CloudSyncManifest = {
-                        ...manifest,
-                        encryption: {
-                            ...remoteEncryption,
-                            enabledAt,
-                        },
-                    };
-
-                    await transport.writeManifest(nextManifest).catch(() => {});
+                if (!derivedKey) {
+                    throw new Error("Incorrect encryption passphrase");
                 }
 
                 // NOTE: Do not run settings writes in parallel.
@@ -448,19 +473,21 @@ export class CloudService {
                 );
                 await this.secretStore.setSecret(
                     SECRET_KEY_ENCRYPTION_DERIVED_KEY,
-                    encodeBase64(key)
+                    encodeBase64(derivedKey)
                 );
 
-                key.fill(0);
+                derivedKey.fill(0);
 
                 return this.buildStatusSummary();
             }
 
             const salt = generateEncryptionSalt();
-            const key = await derivePassphraseKey({ passphrase, salt });
+            const key = await derivePassphraseKey({
+                passphrase: trimmedPassphrase,
+                salt,
+            });
             const encryptionConfig: CloudEncryptionConfigPassphrase = {
                 configVersion: CLOUD_ENCRYPTION_CONFIG_VERSION,
-                enabledAt: Date.now(),
                 kdf: "scrypt",
                 keyCheckBase64: createKeyCheckBase64(key),
                 mode: "passphrase",
@@ -468,7 +495,8 @@ export class CloudService {
             };
 
             const nextManifest: CloudSyncManifest = {
-                ...(manifest ?? ProviderCloudSyncTransport.createEmptyManifest()),
+                ...(manifest ??
+                    ProviderCloudSyncTransport.createEmptyManifest()),
                 encryption: encryptionConfig,
             };
 
@@ -588,41 +616,68 @@ export class CloudService {
         return this.runCloudOperation(
             "configureFilesystemProvider",
             async () => {
-                if (hasAsciiControlCharacters(config.baseDirectory)) {
-                    throw new Error(
-                        "Filesystem base directory must not contain control characters"
-                    );
+                const issues = validateFilesystemBaseDirectoryCandidate(
+                    config.baseDirectory,
+                    { maxBytes: MAX_FILESYSTEM_BASE_DIRECTORY_BYTES }
+                );
+
+                if (issues.length > 0) {
+                    const [issue] = issues;
+                    if (!issue) {
+                        throw new Error("Filesystem base directory is invalid");
+                    }
+                    const candidate = config.baseDirectory;
+
+                    switch (issue.code) {
+                        case "not-string": {
+                            throw new TypeError(
+                                "Filesystem base directory must be a string"
+                            );
+                        }
+                        case "empty": {
+                            throw new Error(
+                                "Filesystem base directory must not be empty"
+                            );
+                        }
+                        case "whitespace": {
+                            throw new Error(
+                                "Filesystem base directory must not have leading or trailing whitespace"
+                            );
+                        }
+                        case "too-large": {
+                            throw new Error(
+                                `Filesystem base directory must not exceed ${issue.maxBytes} bytes`
+                            );
+                        }
+                        case "control-chars": {
+                            throw new Error(
+                                "Filesystem base directory must not contain control characters"
+                            );
+                        }
+                        case "null-byte": {
+                            throw new Error(
+                                "Filesystem base directory must not contain a null byte"
+                            );
+                        }
+                        case "windows-device-namespace": {
+                            throw new Error(
+                                String.raw`Filesystem base directory must not use Windows device namespace paths (\\?\ or \\.\)`
+                            );
+                        }
+                        case "not-absolute": {
+                            throw new Error(
+                                `Filesystem base directory must be absolute. Received '${candidate}'`
+                            );
+                        }
+                        default: {
+                            throw new Error(
+                                "Filesystem base directory is invalid"
+                            );
+                        }
+                    }
                 }
 
-                const deviceCheck = config.baseDirectory.replaceAll("/", "\\");
-                if (
-                    deviceCheck.startsWith("\\\\?\\") ||
-                    deviceCheck.startsWith("\\\\.\\")
-                ) {
-                    throw new Error(
-                        String.raw`Filesystem base directory must not use Windows device namespace paths (\\?\ or \\.\)`
-                    );
-                }
-
-                const baseDirectory = config.baseDirectory.trim();
-                if (baseDirectory.length === 0) {
-                    throw new Error("Filesystem base directory must not be empty");
-                }
-
-                if (baseDirectory.includes("\0")) {
-                    throw new Error(
-                        "Filesystem base directory must not contain a null byte"
-                    );
-                }
-
-                // Validate the user-supplied path, not the resolved one.
-                // `path.resolve(relative)` always yields an absolute path.
-                if (!path.isAbsolute(baseDirectory)) {
-                    throw new Error(
-                        `Filesystem base directory must be absolute. Received '${config.baseDirectory}'`
-                    );
-                }
-
+                const { baseDirectory } = config;
                 const resolved = path.resolve(baseDirectory);
 
                 await fs.mkdir(resolved, { recursive: true }); // eslint-disable-line security/detect-non-literal-fs-filename -- Dynamic but validated path supplied by the user.
@@ -634,6 +689,16 @@ export class CloudService {
                 }
 
                 const canonical = await fs.realpath(resolved); // eslint-disable-line security/detect-non-literal-fs-filename -- Dynamic but validated path supplied by the user.
+
+                const canonicalIssues =
+                    validateFilesystemBaseDirectoryCandidate(canonical, {
+                        maxBytes: MAX_FILESYSTEM_BASE_DIRECTORY_BYTES,
+                    });
+                if (canonicalIssues.length > 0) {
+                    throw new Error(
+                        "Filesystem base directory resolved to an invalid canonical path"
+                    );
+                }
 
                 await this.settings.set(SETTINGS_KEY_PROVIDER, "filesystem");
                 await this.settings.set(
@@ -941,26 +1006,8 @@ export class CloudService {
         }
 
         const key = decodeBase64(rawKey);
-        let encryptionEnabledAt: number | undefined = undefined;
-
-        try {
-            const transport = ProviderCloudSyncTransport.create(provider);
-            const manifest = await transport.readManifest();
-            const encryption = manifest?.encryption;
-            if (
-                encryption?.mode === "passphrase" &&
-                typeof encryption.enabledAt === "number"
-            ) {
-                encryptionEnabledAt = encryption.enabledAt;
-            }
-        } catch {
-            encryptionEnabledAt = undefined;
-        }
 
         return new EncryptedSyncCloudStorageProvider({
-            ...(encryptionEnabledAt === undefined
-                ? {}
-                : { encryptionEnabledAt }),
             inner: provider,
             key,
         });

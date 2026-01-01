@@ -201,28 +201,28 @@ describe("Cache Utils Property-Based Tests", () => {
                 minLength: 1,
                 maxLength: 10,
             }),
-        ])("should use configured TTL when no per-entry TTL is provided", (
-            configuredTtl,
-            entries
-        ) => {
-            const cache = new TypedCache<string, string>({
-                ttl: configuredTtl,
-            });
+        ])(
+            "should use configured TTL when no per-entry TTL is provided",
+            (configuredTtl, entries) => {
+                const cache = new TypedCache<string, string>({
+                    ttl: configuredTtl,
+                });
 
-            // Set entries without per-entry TTL
-            for (const [key, value] of entries) {
-                cache.set(key, value);
-                expect(cache.get(key)).toBe(value);
+                // Set entries without per-entry TTL
+                for (const [key, value] of entries) {
+                    cache.set(key, value);
+                    expect(cache.get(key)).toBe(value);
+                }
+
+                // Advance time beyond configured TTL
+                advanceTime(configuredTtl + 1);
+
+                // All entries should be expired
+                for (const [key] of entries) {
+                    expect(cache.get(key)).toBeUndefined();
+                }
             }
-
-            // Advance time beyond configured TTL
-            advanceTime(configuredTtl + 1);
-
-            // All entries should be expired
-            for (const [key] of entries) {
-                expect(cache.get(key)).toBeUndefined();
-            }
-        });
+        );
 
         fcTest.prop([
             fc.integer({ min: 1, max: 1000 }),
@@ -231,42 +231,41 @@ describe("Cache Utils Property-Based Tests", () => {
                 minLength: 1,
                 maxLength: 10,
             }),
-        ])("should honor per-entry TTL over configured TTL", (
-            configuredTtl,
-            perEntryTtl,
-            entries
-        ) => {
-            // Filter to unique keys only to avoid duplicate key issues
-            const uniqueEntries = entries.filter(
-                (entry, index, arr) =>
-                    arr.findIndex((e) => e[0] === entry[0]) === index
-            );
+        ])(
+            "should honor per-entry TTL over configured TTL",
+            (configuredTtl, perEntryTtl, entries) => {
+                // Filter to unique keys only to avoid duplicate key issues
+                const uniqueEntries = entries.filter(
+                    (entry, index, arr) =>
+                        arr.findIndex((e) => e[0] === entry[0]) === index
+                );
 
-            const cache = new TypedCache<string, string>({
-                ttl: configuredTtl,
-            });
+                const cache = new TypedCache<string, string>({
+                    ttl: configuredTtl,
+                });
 
-            // Set entries with per-entry TTL
-            for (const [key, value] of uniqueEntries) {
-                cache.set(key, value, perEntryTtl);
+                // Set entries with per-entry TTL
+                for (const [key, value] of uniqueEntries) {
+                    cache.set(key, value, perEntryTtl);
+                }
+
+                // Advance time beyond configured TTL but before per-entry TTL
+                advanceTime(configuredTtl + 100);
+
+                // Entries should still be valid (using per-entry TTL)
+                for (const [key, value] of uniqueEntries) {
+                    expect(cache.get(key)).toBe(value);
+                }
+
+                // Advance time beyond per-entry TTL
+                advanceTime(perEntryTtl);
+
+                // Now entries should be expired
+                for (const [key] of uniqueEntries) {
+                    expect(cache.get(key)).toBeUndefined();
+                }
             }
-
-            // Advance time beyond configured TTL but before per-entry TTL
-            advanceTime(configuredTtl + 100);
-
-            // Entries should still be valid (using per-entry TTL)
-            for (const [key, value] of uniqueEntries) {
-                expect(cache.get(key)).toBe(value);
-            }
-
-            // Advance time beyond per-entry TTL
-            advanceTime(perEntryTtl);
-
-            // Now entries should be expired
-            for (const [key] of uniqueEntries) {
-                expect(cache.get(key)).toBeUndefined();
-            }
-        });
+        );
     });
 
     describe("LRU (Least Recently Used) eviction", () => {
@@ -276,59 +275,61 @@ describe("Cache Utils Property-Based Tests", () => {
                 minLength: 20,
                 maxLength: 40,
             }),
-        ])("should evict least recently used entries when maxSize is reached", (
-            maxSize,
-            entries
-        ) => {
-            // Filter to ensure unique keys and sufficient entries
-            const uniqueEntries = entries.filter(
-                (entry, index, arr) =>
-                    arr.findIndex((e) => e[0] === entry[0]) === index
-            );
+        ])(
+            "should evict least recently used entries when maxSize is reached",
+            (maxSize, entries) => {
+                // Filter to ensure unique keys and sufficient entries
+                const uniqueEntries = entries.filter(
+                    (entry, index, arr) =>
+                        arr.findIndex((e) => e[0] === entry[0]) === index
+                );
 
-            if (uniqueEntries.length < maxSize + 3) {
-                // Skip if we don't have enough unique entries to test properly
-                return;
+                if (uniqueEntries.length < maxSize + 3) {
+                    // Skip if we don't have enough unique entries to test properly
+                    return;
+                }
+
+                const cache = new TypedCache<string, string>({ maxSize });
+
+                // Add entries up to maxSize
+                const initialEntries = uniqueEntries.slice(0, maxSize);
+                for (const [key, value] of initialEntries) {
+                    cache.set(key, value);
+                    advanceTime(1); // Ensure different timestamps
+                }
+
+                expect(cache.size).toBe(maxSize);
+
+                // Access first entry to make it recently used
+                const firstEntry = initialEntries[0];
+                let firstKey: string | undefined;
+                if (firstEntry) {
+                    [firstKey] = firstEntry;
+                    advanceTime(1);
+                    cache.get(firstKey); // Updates lastAccessed
+                    advanceTime(1);
+                }
+
+                // Add one more entry to trigger eviction
+                const nextEntry = uniqueEntries[maxSize];
+                if (!nextEntry) {
+                    throw new Error(
+                        "Expected additional entry for eviction test"
+                    );
+                }
+                const [newKey, newValue] = nextEntry;
+                cache.set(newKey, newValue);
+
+                // Cache size should still be maxSize
+                expect(cache.size).toBe(maxSize);
+
+                // First entry should still exist (was recently accessed)
+                if (firstKey) {
+                    expect(cache.has(firstKey)).toBeTruthy();
+                }
+                expect(cache.has(newKey)).toBeTruthy();
             }
-
-            const cache = new TypedCache<string, string>({ maxSize });
-
-            // Add entries up to maxSize
-            const initialEntries = uniqueEntries.slice(0, maxSize);
-            for (const [key, value] of initialEntries) {
-                cache.set(key, value);
-                advanceTime(1); // Ensure different timestamps
-            }
-
-            expect(cache.size).toBe(maxSize);
-
-            // Access first entry to make it recently used
-            const firstEntry = initialEntries[0];
-            let firstKey: string | undefined;
-            if (firstEntry) {
-                [firstKey] = firstEntry;
-                advanceTime(1);
-                cache.get(firstKey); // Updates lastAccessed
-                advanceTime(1);
-            }
-
-            // Add one more entry to trigger eviction
-            const nextEntry = uniqueEntries[maxSize];
-            if (!nextEntry) {
-                throw new Error("Expected additional entry for eviction test");
-            }
-            const [newKey, newValue] = nextEntry;
-            cache.set(newKey, newValue);
-
-            // Cache size should still be maxSize
-            expect(cache.size).toBe(maxSize);
-
-            // First entry should still exist (was recently accessed)
-            if (firstKey) {
-                expect(cache.has(firstKey)).toBeTruthy();
-            }
-            expect(cache.has(newKey)).toBeTruthy();
-        });
+        );
 
         fcTest.prop([fc.integer({ min: 3, max: 8 })])(
             "should maintain LRU order correctly with access patterns",

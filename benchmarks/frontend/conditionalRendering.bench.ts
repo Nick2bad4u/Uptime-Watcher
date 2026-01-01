@@ -779,7 +779,8 @@ class MockConditionalRenderer {
                 : condition.toString();
         const depsKey = dependencies
             .map((dep) =>
-                typeof dep === "object" ? JSON.stringify(dep) : String(dep))
+                typeof dep === "object" ? JSON.stringify(dep) : String(dep)
+            )
             .join("|");
 
         return `${conditionKey}|${depsKey}`;
@@ -992,7 +993,8 @@ describe("Conditional Rendering Performance", () => {
                 elementFactory.createElement("ConditionalComponent", {
                     id: render,
                     data: Array.from({ length: 10 }, () => Math.random()),
-                }));
+                })
+            );
         }
 
         renderer.reset();
@@ -1038,7 +1040,8 @@ describe("Conditional Rendering Performance", () => {
             renderer.renderWithSwitch(componentId, selectedCase, cases, () =>
                 elementFactory.createElement("DefaultComponent", {
                     type: "default",
-                }));
+                })
+            );
         }
 
         renderer.reset();
@@ -1093,7 +1096,8 @@ describe("Conditional Rendering Performance", () => {
             ];
 
             renderer.renderWithGuardClause(componentId, guards, () =>
-                elementFactory.createElement("MainContent", { userData }));
+                elementFactory.createElement("MainContent", { userData })
+            );
         }
 
         renderer.reset();
@@ -1120,7 +1124,8 @@ describe("Conditional Rendering Performance", () => {
                     Math.random() > 0.1
                         ? {
                               items: Array.from({ length: 5 }, () =>
-                                  Math.random()),
+                                  Math.random()
+                              ),
                           }
                         : null,
                 user:
@@ -1547,36 +1552,37 @@ describe("Conditional Rendering Performance", () => {
             // Multiple conditional renders per iteration
             for (let j = 0; j < 5; j++) {
                 // Complex nested conditionals
-                const nestedConditions = Array.from({ length: 8 }, (
-                    _,
-                    index
-                ) => ({
-                    test: () => {
-                        // Complex condition logic
-                        const factors = Array.from({ length: 5 }, () =>
-                            Math.random());
-                        return factors.reduce(
-                            (acc, factor, i) =>
-                                acc && (factor > 0.3 || i % 2 === 0),
-                            true
-                        );
-                    },
-                    render: () =>
-                        elementFactory.createComplexElement(3 + index),
-                    nested:
-                        index < 3
-                            ? [
-                                  {
-                                      test: () => Math.random() > 0.6,
-                                      render: () =>
-                                          elementFactory.createElement(
-                                              `NestedChild${index}`,
-                                              { depth: index }
-                                          ),
-                                  },
-                              ]
-                            : undefined,
-                }));
+                const nestedConditions = Array.from(
+                    { length: 8 },
+                    (_, index) => ({
+                        test: () => {
+                            // Complex condition logic
+                            const factors = Array.from({ length: 5 }, () =>
+                                Math.random()
+                            );
+                            return factors.reduce(
+                                (acc, factor, i) =>
+                                    acc && (factor > 0.3 || i % 2 === 0),
+                                true
+                            );
+                        },
+                        render: () =>
+                            elementFactory.createComplexElement(3 + index),
+                        nested:
+                            index < 3
+                                ? [
+                                      {
+                                          test: () => Math.random() > 0.6,
+                                          render: () =>
+                                              elementFactory.createElement(
+                                                  `NestedChild${index}`,
+                                                  { depth: index }
+                                              ),
+                                      },
+                                  ]
+                                : undefined,
+                    })
+                );
 
                 renderer.renderNestedConditionals(
                     componentId,
@@ -1584,23 +1590,23 @@ describe("Conditional Rendering Performance", () => {
                 );
 
                 // Conditional list with complex filtering
-                const largeDataset = Array.from({ length: 200 }, (
-                    _,
-                    index
-                ) => ({
-                    id: index,
-                    value: Math.random() * 100,
-                    category: `cat${index % 5}`,
-                    tags: Array.from(
-                        { length: 3 },
-                        () => `tag${Math.floor(Math.random() * 10)}`
-                    ),
-                    metadata: {
-                        priority: Math.random(),
-                        visible: Math.random() > 0.2,
-                        active: Math.random() > 0.1,
-                    },
-                }));
+                const largeDataset = Array.from(
+                    { length: 200 },
+                    (_, index) => ({
+                        id: index,
+                        value: Math.random() * 100,
+                        category: `cat${index % 5}`,
+                        tags: Array.from(
+                            { length: 3 },
+                            () => `tag${Math.floor(Math.random() * 10)}`
+                        ),
+                        metadata: {
+                            priority: Math.random(),
+                            visible: Math.random() > 0.2,
+                            active: Math.random() > 0.1,
+                        },
+                    })
+                );
 
                 renderer.renderConditionalList(
                     componentId,

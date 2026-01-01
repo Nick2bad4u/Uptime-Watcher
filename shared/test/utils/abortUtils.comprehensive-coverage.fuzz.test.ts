@@ -428,44 +428,44 @@ describe("abortUtils comprehensive fuzzing tests", () => {
                     noNaN: true,
                 })
                 .filter((n) => !Number.isNaN(n) && Number.isFinite(n) && n > 1),
-        ])("implements exponential backoff correctly", async (
-            initialDelay,
-            backoffMultiplier
-        ) => {
-            let attemptCount = 0;
-            const operation = vi.fn(async () => {
-                attemptCount++;
-                if (attemptCount <= 2) {
-                    throw new Error(`Attempt ${attemptCount} failed`);
-                }
-                return "success";
-            });
-
-            // Test the backoff calculation logic by verifying parameters
-            expect(initialDelay).toBeGreaterThan(0);
-            expect(backoffMultiplier).toBeGreaterThan(1);
-
-            // Calculate expected delays
-            const expectedFirstDelay = initialDelay;
-            const expectedSecondDelay = initialDelay * backoffMultiplier;
-
-            expect(expectedFirstDelay).toBe(initialDelay);
-            expect(expectedSecondDelay).toBeGreaterThan(expectedFirstDelay);
-
-            // Test that operation can be called with these parameters
-            // (without actually waiting for delays)
-            try {
-                await retryWithAbort(operation, {
-                    maxRetries: 0, // No retries to avoid delays
-                    initialDelay,
-                    backoffMultiplier,
+        ])(
+            "implements exponential backoff correctly",
+            async (initialDelay, backoffMultiplier) => {
+                let attemptCount = 0;
+                const operation = vi.fn(async () => {
+                    attemptCount++;
+                    if (attemptCount <= 2) {
+                        throw new Error(`Attempt ${attemptCount} failed`);
+                    }
+                    return "success";
                 });
-            } catch {
-                // Expected to fail with maxRetries: 0
-            }
 
-            expect(operation).toHaveBeenCalledTimes(1);
-        });
+                // Test the backoff calculation logic by verifying parameters
+                expect(initialDelay).toBeGreaterThan(0);
+                expect(backoffMultiplier).toBeGreaterThan(1);
+
+                // Calculate expected delays
+                const expectedFirstDelay = initialDelay;
+                const expectedSecondDelay = initialDelay * backoffMultiplier;
+
+                expect(expectedFirstDelay).toBe(initialDelay);
+                expect(expectedSecondDelay).toBeGreaterThan(expectedFirstDelay);
+
+                // Test that operation can be called with these parameters
+                // (without actually waiting for delays)
+                try {
+                    await retryWithAbort(operation, {
+                        maxRetries: 0, // No retries to avoid delays
+                        initialDelay,
+                        backoffMultiplier,
+                    });
+                } catch {
+                    // Expected to fail with maxRetries: 0
+                }
+
+                expect(operation).toHaveBeenCalledTimes(1);
+            }
+        );
 
         test.prop([fc.integer({ min: 50, max: 200 })])(
             "respects maxDelay constraint",
@@ -558,27 +558,30 @@ describe("abortUtils comprehensive fuzzing tests", () => {
             }
         );
 
-        test.prop([fc.string()])("returns false for non-abort errors", (
-            message
-        ) => {
-            fc.pre(
-                !message.toLowerCase().includes("abort") &&
-                    !message.toLowerCase().includes("cancel")
-            );
+        test.prop([fc.string()])(
+            "returns false for non-abort errors",
+            (message) => {
+                fc.pre(
+                    !message.toLowerCase().includes("abort") &&
+                        !message.toLowerCase().includes("cancel")
+                );
 
-            const error = new Error(message);
-            expect(isAbortError(error)).toBeFalsy();
-        });
+                const error = new Error(message);
+                expect(isAbortError(error)).toBeFalsy();
+            }
+        );
 
-        test.prop([fc.anything()])("returns false for non-Error values", (
-            value
-        ) => {
-            fc.pre(
-                !(value instanceof Error) && !(value instanceof DOMException)
-            );
+        test.prop([fc.anything()])(
+            "returns false for non-Error values",
+            (value) => {
+                fc.pre(
+                    !(value instanceof Error) &&
+                        !(value instanceof DOMException)
+                );
 
-            expect(isAbortError(value)).toBeFalsy();
-        });
+                expect(isAbortError(value)).toBeFalsy();
+            }
+        );
 
         test("handles null and undefined", () => {
             expect(isAbortError(null)).toBeFalsy();

@@ -124,9 +124,9 @@ describe("IPC Standardization Concepts", () => {
             await annotate("Category: Service", "category");
             await annotate("Type: Validation", "type");
 
-            const mockHandler = createMockStandardizedHandler(async (
-                data: string
-            ) => ({ result: data }));
+            const mockHandler = createMockStandardizedHandler(
+                async (data: string) => ({ result: data })
+            );
 
             const response = await mockHandler("test-data");
 

@@ -57,10 +57,10 @@ class MockDatabaseService {
         await this.sleep(Math.random() * 5);
 
         const result = {
-            rows: Array.from({ length: Math.floor(Math.random() * 100) }, (
-                _,
-                i
-            ) => ({ id: i, data: `row${i}` })),
+            rows: Array.from(
+                { length: Math.floor(Math.random() * 100) },
+                (_, i) => ({ id: i, data: `row${i}` })
+            ),
             rowCount: Math.floor(Math.random() * 100),
             executionTime: Math.random() * 100,
         };

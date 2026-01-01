@@ -9,19 +9,33 @@ import React from "react";
 
 // Mock all dependencies
 vi.mock("../../../stores/error/useErrorStore", () => ({
-    useErrorStore: vi.fn(() => ({
-        clearError: vi.fn(),
-        setError: vi.fn(),
-        lastError: null,
-    })),
+    useErrorStore: vi.fn(
+        (selector?: (state: unknown) => unknown) => {
+            const state = {
+                clearError: vi.fn(),
+                isLoading: false,
+                lastError: undefined,
+                setError: vi.fn(),
+            };
+
+            return typeof selector === "function" ? selector(state) : state;
+        }
+    ),
 }));
 
 vi.mock("../../../stores/sites/useSitesStore", () => ({
-    useSitesStore: vi.fn(() => ({
-        sites: [],
-        addSite: vi.fn(),
-        isLoading: false,
-    })),
+    useSitesStore: vi.fn(
+        (selector?: (state: unknown) => unknown) => {
+            const state = {
+                addMonitorToSite: vi.fn().mockResolvedValue(undefined),
+                createSite: vi.fn().mockResolvedValue(undefined),
+                isLoading: false,
+                sites: [],
+            };
+
+            return typeof selector === "function" ? selector(state) : state;
+        }
+    ),
 }));
 
 vi.mock("../../../components/SiteDetails/useAddSiteForm", () => ({
@@ -33,12 +47,13 @@ vi.mock("../../../components/SiteDetails/useAddSiteForm", () => ({
         name: "", // non-null string so AddSiteForm's name.trim() guard is safe
         formError: undefined,
         siteIdentifier: "test-id",
+        checkIntervalMs: 60_000,
 
         // No-op action stubs used by internal handlers
         resetForm: vi.fn(),
         setAddMode: vi.fn(),
         setName: vi.fn(),
-        setCheckInterval: vi.fn(),
+        setCheckIntervalMs: vi.fn(),
         setBaselineUrl: vi.fn(),
         setBodyKeyword: vi.fn(),
         setCertificateWarningDays: vi.fn(),
@@ -57,7 +72,7 @@ vi.mock("../../../components/SiteDetails/useAddSiteForm", () => ({
         setJsonPath: vi.fn(),
         setMaxPongDelayMs: vi.fn(),
         setMaxReplicationLagSeconds: vi.fn(),
-        setMaxResponseTime: vi.fn(),
+        setMaxResponseTimeMs: vi.fn(),
         setMonitorType: vi.fn(),
         setPort: vi.fn(),
         setPrimaryStatusUrl: vi.fn(),
@@ -68,7 +83,7 @@ vi.mock("../../../components/SiteDetails/useAddSiteForm", () => ({
         setSiteIdentifier: vi.fn(),
         setUrl: vi.fn(),
 
-        // Legacy properties kept for backwards compatibility with older tests
+        // Previous properties kept for backwards compatibility with older tests
         formData: {
             siteName: "",
             url: "",

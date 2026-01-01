@@ -1,12 +1,12 @@
 import type { Monitor, Site } from "@shared/types";
 import type { AppNotificationRequest } from "@shared/types/notifications";
 
+import { generateCorrelationId } from "@shared/utils/correlation";
 import { Notification } from "electron";
 
 import type { UptimeEvents } from "../../events/eventTypes";
 import type { TypedEventBus } from "../../events/TypedEventBus";
 
-import { generateCorrelationId } from "../../utils/correlation";
 import { logger } from "../../utils/logger";
 import { MIN_CHECK_INTERVAL } from "../monitoring/constants";
 
@@ -132,6 +132,35 @@ export class NotificationService {
         return { ...this.config };
     }
 
+    /**
+     * Applies shared suppression logic for monitor status notifications.
+     *
+     * @remarks
+     * Consolidates the duplicated code paths used by both down/up notifications:
+     * - site muting
+     * - per-monitor cooldown suppression
+     */
+    private shouldDispatchMonitorStatusNotification(args: {
+        monitorId: string;
+        now: number;
+        siteIdentifier: string;
+        status: "down" | "up";
+    }): boolean {
+        const stateKey = this.getStateKey(args.siteIdentifier, args.monitorId);
+
+        if (this.isSiteMuted(args.siteIdentifier)) {
+            logger.debug(
+                LOG_TEMPLATES.warnings.NOTIFY_SUPPRESSED,
+                args.status,
+                stateKey,
+                "site muted"
+            );
+            return false;
+        }
+
+        return this.shouldDispatchForStatus(stateKey, args.status, args.now);
+    }
+
     public notifyMonitorDown(site: Site, monitorId: string): void {
         if (!this.shouldGenerateNotification(this.config.showDownAlerts)) {
             return;
@@ -141,17 +170,14 @@ export class NotificationService {
         if (!monitor) return;
 
         const now = Date.now();
-        const stateKey = this.getStateKey(site.identifier, monitorId);
-        if (this.isSiteMuted(site.identifier)) {
-            logger.debug(
-                LOG_TEMPLATES.warnings.NOTIFY_SUPPRESSED,
-                "down",
-                stateKey,
-                "site muted"
-            );
-            return;
-        }
-        if (!this.shouldDispatchForStatus(stateKey, "down", now)) {
+        if (
+            !this.shouldDispatchMonitorStatusNotification({
+                monitorId,
+                now,
+                siteIdentifier: site.identifier,
+                status: "down",
+            })
+        ) {
             return;
         }
 
@@ -177,17 +203,14 @@ export class NotificationService {
         if (!monitor) return;
 
         const now = Date.now();
-        const stateKey = this.getStateKey(site.identifier, monitorId);
-        if (this.isSiteMuted(site.identifier)) {
-            logger.debug(
-                LOG_TEMPLATES.warnings.NOTIFY_SUPPRESSED,
-                "up",
-                stateKey,
-                "site muted"
-            );
-            return;
-        }
-        if (!this.shouldDispatchForStatus(stateKey, "up", now)) {
+        if (
+            !this.shouldDispatchMonitorStatusNotification({
+                monitorId,
+                now,
+                siteIdentifier: site.identifier,
+                status: "up",
+            })
+        ) {
             return;
         }
 

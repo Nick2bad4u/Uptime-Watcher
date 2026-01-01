@@ -15,7 +15,7 @@
  * @see {@link handlePortCheckError}
  */
 
-import { getErrorMessage } from "@shared/utils/errorUtils";
+import { getUnknownErrorMessage } from "@shared/utils/errorCatalog";
 
 import { isDev } from "../../../electronUtils";
 import { logger } from "../../../utils/logger";
@@ -173,7 +173,7 @@ export function handlePortCheckError(
     host: string,
     port: number
 ): PortCheckErrorResult {
-    const errorMessage = getErrorMessage(error);
+    const errorMessage = getUnknownErrorMessage(error);
     // Extract response time from custom error if available, use -1 for unknown
     // timing
     const responseTime =

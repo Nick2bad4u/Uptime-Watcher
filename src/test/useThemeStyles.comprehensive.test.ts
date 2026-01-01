@@ -77,9 +77,11 @@ describe(useThemeStyles, () => {
         await annotate("Type: Business Logic", "type");
 
         const { result: collapsedResult } = renderHook(() =>
-            useThemeStyles(true));
+            useThemeStyles(true)
+        );
         const { result: expandedResult } = renderHook(() =>
-            useThemeStyles(false));
+            useThemeStyles(false)
+        );
 
         expect(collapsedResult.current.contentStyle.padding).toBe(
             "1rem 1.5rem"

@@ -650,9 +650,11 @@ describe("useThemeStyles Hook", () => {
             await annotate("Type: Business Logic", "type");
 
             const { result: undefinedResult } = renderHook(() =>
-                useThemeStyles(undefined as any));
+                useThemeStyles(undefined as any)
+            );
             const { result: nullResult } = renderHook(() =>
-                useThemeStyles(null as any));
+                useThemeStyles(null as any)
+            );
 
             // Should handle falsy values properly (default to false)
             expect(undefinedResult.current.headerStyle.height).toBe("auto");

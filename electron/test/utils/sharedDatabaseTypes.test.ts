@@ -131,7 +131,6 @@ describe("Shared Database Types - Backend Coverage", () => {
                 type: "http",
                 url: "https://example.com",
                 enabled: 1,
-                monitoring: 1,
                 status: "up",
                 check_interval: 60,
                 timeout: 5000,

@@ -81,42 +81,42 @@ export const createStatusUpdateListenerDescriptors = (
     {
         label: "monitor:check-completed",
         register: () =>
-            EventsService.onMonitorCheckCompleted((
-                event: RendererEventPayloadMap["monitor:check-completed"]
-            ) => {
-                deps.processStatusUpdateCandidate(
-                    event.result,
-                    "monitor:check-completed"
-                );
-            }),
+            EventsService.onMonitorCheckCompleted(
+                (event: RendererEventPayloadMap["monitor:check-completed"]) => {
+                    deps.processStatusUpdateCandidate(
+                        event.result,
+                        "monitor:check-completed"
+                    );
+                }
+            ),
         scope: "monitor:check-completed",
     },
     {
         label: "monitoring:started",
         register: () =>
-            EventsService.onMonitoringStarted((
-                event: RendererEventPayloadMap["monitoring:started"]
-            ) => {
-                safeHandleMonitoringLifecycleEvent(
-                    "started",
-                    deps.handleMonitoringStarted,
-                    event
-                );
-            }),
+            EventsService.onMonitoringStarted(
+                (event: RendererEventPayloadMap["monitoring:started"]) => {
+                    safeHandleMonitoringLifecycleEvent(
+                        "started",
+                        deps.handleMonitoringStarted,
+                        event
+                    );
+                }
+            ),
         scope: "monitoring:started",
     },
     {
         label: "monitoring:stopped",
         register: () =>
-            EventsService.onMonitoringStopped((
-                event: RendererEventPayloadMap["monitoring:stopped"]
-            ) => {
-                safeHandleMonitoringLifecycleEvent(
-                    "stopped",
-                    deps.handleMonitoringStopped,
-                    event
-                );
-            }),
+            EventsService.onMonitoringStopped(
+                (event: RendererEventPayloadMap["monitoring:stopped"]) => {
+                    safeHandleMonitoringLifecycleEvent(
+                        "stopped",
+                        deps.handleMonitoringStopped,
+                        event
+                    );
+                }
+            ),
         scope: "monitoring:stopped",
     },
 ];

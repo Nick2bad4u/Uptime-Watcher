@@ -4,6 +4,8 @@
 
 import { describe, expect, it, vi, beforeEach } from "vitest";
 
+import { normalizePathSeparatorsToPosix } from "@shared/utils/pathSeparators";
+
 // Mock external dependencies
 vi.mock("../../../utils/logger", () => ({
     logger: {
@@ -55,8 +57,10 @@ vi.mock("node:path", () => ({
     resolve: vi.fn((...segments: string[]) => segments.join("/")),
     dirname: vi.fn(
         (target: string) =>
-            target.replaceAll("\\", "/").split("/").slice(0, -1).join("/") ||
-            "."
+            normalizePathSeparatorsToPosix(target)
+                .split("/")
+                .slice(0, -1)
+                .join("/") || "."
     ),
 }));
 

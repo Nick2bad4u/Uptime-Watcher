@@ -230,10 +230,10 @@ describe("HistoryChart - Complete Coverage", () => {
             annotate("Type: Configuration", "type");
 
             // Create 150 history items
-            const history: StatusHistory[] = Array.from({ length: 150 }, (
-                _,
-                i
-            ) => createStatusHistory("up", 1000 + i, 100 + i));
+            const history: StatusHistory[] = Array.from(
+                { length: 150 },
+                (_, i) => createStatusHistory("up", 1000 + i, 100 + i)
+            );
 
             renderWithTheme(
                 <HistoryChart title="Test Chart" history={history} />
@@ -255,10 +255,10 @@ describe("HistoryChart - Complete Coverage", () => {
             annotate("Type: Configuration", "type");
 
             // Create 50 history items
-            const history: StatusHistory[] = Array.from({ length: 50 }, (
-                _,
-                i
-            ) => createStatusHistory("up", 1000 + i, 100 + i));
+            const history: StatusHistory[] = Array.from(
+                { length: 50 },
+                (_, i) => createStatusHistory("up", 1000 + i, 100 + i)
+            );
 
             renderWithTheme(
                 <HistoryChart

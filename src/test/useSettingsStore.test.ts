@@ -7,10 +7,7 @@ import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 
 import type { AppSettings } from "../stores/types";
 
-import {
-    defaultSettings,
-    normalizeAppSettings,
-} from "../stores/settings/state";
+import { normalizeAppSettings } from "../stores/settings/state";
 import fc from "fast-check";
 import { useSettingsStore } from "../stores/settings/useSettingsStore";
 
@@ -55,7 +52,8 @@ vi.mock("../stores/utils", () => ({
         asyncFn().catch((error: Error) => {
             handlers.setError(error);
             throw error;
-        })),
+        })
+    ),
 }));
 
 // Mock useErrorStore
@@ -660,34 +658,7 @@ describe(useSettingsStore, () => {
         });
     });
 
-    describe("normalizeAppSettings migration", () => {
-        it("maps legacy notifications flag to system notification toggle", () => {
-            const normalized = normalizeAppSettings({ notifications: true });
-
-            expect(normalized.systemNotificationsEnabled).toBeTruthy();
-            expect(normalized.inAppAlertsEnabled).toBe(
-                defaultSettings.inAppAlertsEnabled
-            );
-        });
-
-        it("propagates legacy soundAlerts flag to both sound toggles", () => {
-            const normalized = normalizeAppSettings({ soundAlerts: true });
-
-            expect(normalized.inAppAlertsSoundEnabled).toBeTruthy();
-            expect(normalized.systemNotificationsSoundEnabled).toBeTruthy();
-        });
-
-        it("respects explicit overrides when migrating legacy fields", () => {
-            const normalized = normalizeAppSettings({
-                notifications: false,
-                soundAlerts: true,
-                systemNotificationsEnabled: true,
-            });
-
-            expect(normalized.systemNotificationsEnabled).toBeTruthy();
-            expect(normalized.inAppAlertsSoundEnabled).toBeTruthy();
-            expect(normalized.systemNotificationsSoundEnabled).toBeTruthy();
-        });
+    describe(normalizeAppSettings, () => {
         it("should clamp persisted in-app alert volume values", () => {
             const loud = normalizeAppSettings({ inAppAlertVolume: 2 });
             const muted = normalizeAppSettings({ inAppAlertVolume: -0.5 });

@@ -41,18 +41,6 @@ vi.mock("../../../theme/components/ThemedButton", () => ({
     ),
 }));
 
-vi.mock("react-icons/fi", async () => {
-    const actual =
-        await vi.importActual<typeof import("react-icons/fi")>(
-            "react-icons/fi"
-        );
-
-    return {
-        ...actual,
-        FiSave: () => <svg data-testid="save-icon">Save Icon</svg>,
-    } satisfies typeof actual;
-});
-
 describe(SaveButton, () => {
     const defaultProps: SaveButtonProperties = {
         onClick: vi.fn(),
@@ -101,8 +89,9 @@ describe(SaveButton, () => {
 
             render(<SaveButton {...defaultProps} />);
 
-            expect(screen.getByTestId("button-icon")).toBeInTheDocument();
-            expect(screen.getByTestId("save-icon")).toBeInTheDocument();
+            const iconWrapper = screen.getByTestId("button-icon");
+            expect(iconWrapper).toBeInTheDocument();
+            expect(iconWrapper.querySelector("svg")).not.toBeNull();
         });
 
         it("should render with custom aria-label", ({ task, annotate }) => {
@@ -999,8 +988,9 @@ describe(SaveButton, () => {
 
             render(<SaveButton {...defaultProps} />);
 
-            expect(screen.getByTestId("button-icon")).toBeInTheDocument();
-            expect(screen.getByTestId("save-icon")).toBeInTheDocument();
+            const iconWrapper = screen.getByTestId("button-icon");
+            expect(iconWrapper).toBeInTheDocument();
+            expect(iconWrapper.querySelector("svg")).not.toBeNull();
             expect(screen.getByTestId("themed-button")).toHaveTextContent(
                 "Save"
             );

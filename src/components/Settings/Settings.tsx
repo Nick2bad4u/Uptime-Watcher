@@ -38,6 +38,7 @@ import type { ChangeEvent, MouseEvent, ReactElement } from "react";
 
 import { DEFAULT_HISTORY_LIMIT_RULES } from "@shared/constants/history";
 import { ensureError } from "@shared/utils/errorHandling";
+import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import { safeInteger } from "@shared/validation/validatorUtils";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
@@ -743,8 +744,6 @@ export const Settings = ({
         ]
     );
 
-    // Manual Sync Now handler (moved from Header)
-    /* eslint-disable @typescript-eslint/no-unsafe-type-assertion -- Safe: Error message extraction with runtime validation */
     const handleSyncNow = useCallback(async () => {
         setSyncSuccess(false);
         try {
@@ -757,11 +756,7 @@ export const Settings = ({
                 ensureError(error)
             );
             setError(
-                `Failed to sync data: ${
-                    error && typeof error === "object" && "message" in error
-                        ? (error as { message?: string }).message
-                        : String(error)
-                }`
+                `Failed to sync data: ${getUserFacingErrorDetail(error)}`
             );
         }
     }, [fullResyncSites, setError]);
@@ -781,11 +776,7 @@ export const Settings = ({
                 ensureError(error)
             );
             setError(
-                `Failed to download SQLite backup: ${
-                    error && typeof error === "object" && "message" in error
-                        ? (error as { message?: string }).message
-                        : String(error)
-                }`
+                `Failed to download SQLite backup: ${getUserFacingErrorDetail(error)}`
             );
         }
     }, [
@@ -815,11 +806,7 @@ export const Settings = ({
                     ensureError(error)
                 );
                 setError(
-                    `Failed to restore SQLite backup: ${
-                        error && typeof error === "object" && "message" in error
-                            ? (error as { message?: string }).message
-                            : String(error)
-                    }`
+                    `Failed to restore SQLite backup: ${getUserFacingErrorDetail(error)}`
                 );
             }
         },
@@ -854,7 +841,6 @@ export const Settings = ({
         },
         [handleRestoreFileChange]
     );
-    /* eslint-enable @typescript-eslint/no-unsafe-type-assertion -- Re-enable after safe file system operations */
 
     // Click handlers for buttons
     const handleClose = useCallback(async () => {
@@ -1017,19 +1003,6 @@ export const Settings = ({
                     ) : null}
 
                     <div className="settings-modal__sections">
-                        <MonitoringSection
-                            currentHistoryLimit={currentHistoryLimit}
-                            icon={MonitoringIcon}
-                            isLoading={isLoading}
-                            onHistoryLimitChange={
-                                handleHistoryLimitSelectChange
-                            }
-                        />
-
-                        <NotificationSection {...notificationSectionProps} />
-
-                        <CloudSettingsSection />
-
                         <ApplicationSection
                             autoStartControl={autoStartControl}
                             availableThemes={availableThemes}
@@ -1039,6 +1012,19 @@ export const Settings = ({
                             minimizeToTrayControl={minimizeToTrayControl}
                             onThemeChange={handleThemeSelectChange}
                         />
+
+                        <NotificationSection {...notificationSectionProps} />
+
+                        <MonitoringSection
+                            currentHistoryLimit={currentHistoryLimit}
+                            icon={MonitoringIcon}
+                            isLoading={isLoading}
+                            onHistoryLimitChange={
+                                handleHistoryLimitSelectChange
+                            }
+                        />
+
+                        <CloudSettingsSection />
 
                         <MaintenanceSection
                             backupSummary={backupSummary}
@@ -1057,20 +1043,6 @@ export const Settings = ({
                             uploadButtonIcon={uploadButtonIcon}
                         />
                     </div>
-
-                    <footer className="settings-modal__footer">
-                        <div className="settings-modal__footer-actions">
-                            <ThemedButton
-                                data-testid="settings-close"
-                                disabled={isLoading}
-                                onClick={handleCloseButtonClick}
-                                size="sm"
-                                variant="secondary"
-                            >
-                                Close
-                            </ThemedButton>
-                        </div>
-                    </footer>
                 </div>
             </ThemedBox>
         </div>

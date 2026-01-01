@@ -44,6 +44,7 @@
 
 import type { MonitorType, Site } from "@shared/types";
 
+import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import {
     resolve4,
     resolve6,
@@ -264,8 +265,7 @@ export class DnsMonitor implements IMonitorService {
                 const responseTime = performance.now() - startTime;
                 return {
                     details: "DNS resolution failed after retries",
-                    error:
-                        error instanceof Error ? error.message : String(error),
+                    error: getUserFacingErrorDetail(error),
                     responseTime: Math.round(responseTime),
                     status: "down",
                 };
@@ -331,7 +331,7 @@ export class DnsMonitor implements IMonitorService {
 
             return {
                 details: `DNS resolution failed for ${recordType} record`,
-                error: error instanceof Error ? error.message : String(error),
+                error: getUserFacingErrorDetail(error),
                 success: false,
             };
         }
@@ -736,7 +736,7 @@ export class DnsMonitor implements IMonitorService {
         } catch (error) {
             return {
                 details: "Failed to format DNS result",
-                error: error instanceof Error ? error.message : String(error),
+                error: getUserFacingErrorDetail(error),
                 success: false,
             };
         }

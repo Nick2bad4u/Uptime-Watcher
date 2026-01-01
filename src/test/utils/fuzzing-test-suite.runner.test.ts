@@ -212,122 +212,131 @@ describe("Comprehensive Fast-Check Fuzzing Test Suite", () => {
                 }),
                 edgeCases: fc.integer({ min: 0, max: 100 }),
             }),
-        ])("Test quality metrics should meet fuzzing standards", (
-            testMetrics
-        ) => {
-            const qualityAnalyzer = {
-                analyze: function (metrics: typeof testMetrics) {
-                    const qualityScore = this.calculateQualityScore(metrics);
-                    const recommendations: string[] = [];
-                    const issues: string[] = [];
+        ])(
+            "Test quality metrics should meet fuzzing standards",
+            (testMetrics) => {
+                const qualityAnalyzer = {
+                    analyze: function (metrics: typeof testMetrics) {
+                        const qualityScore =
+                            this.calculateQualityScore(metrics);
+                        const recommendations: string[] = [];
+                        const issues: string[] = [];
 
-                    // Coverage analysis
-                    if (metrics.coverage < 90) {
-                        issues.push("Coverage below 90%");
-                        recommendations.push(
-                            "Add more comprehensive test cases"
-                        );
-                    }
+                        // Coverage analysis
+                        if (metrics.coverage < 90) {
+                            issues.push("Coverage below 90%");
+                            recommendations.push(
+                                "Add more comprehensive test cases"
+                            );
+                        }
 
-                    // Performance analysis
-                    if (metrics.performance.avgTime > 100) {
-                        issues.push("Average test time too high");
-                        recommendations.push(
-                            "Optimize test execution or reduce test complexity"
-                        );
-                    }
+                        // Performance analysis
+                        if (metrics.performance.avgTime > 100) {
+                            issues.push("Average test time too high");
+                            recommendations.push(
+                                "Optimize test execution or reduce test complexity"
+                            );
+                        }
 
-                    // Memory analysis
-                    if (metrics.performance.memory > 536_870_912) {
-                        // 512MB
-                        issues.push("Memory usage too high");
-                        recommendations.push(
-                            "Investigate memory leaks or reduce test data size"
-                        );
-                    }
+                        // Memory analysis
+                        if (metrics.performance.memory > 536_870_912) {
+                            // 512MB
+                            issues.push("Memory usage too high");
+                            recommendations.push(
+                                "Investigate memory leaks or reduce test data size"
+                            );
+                        }
 
-                    // Edge case analysis (fuzzing should find edge cases)
-                    if (
-                        metrics.testType === "fuzzing" &&
-                        metrics.edgeCases === 0
+                        // Edge case analysis (fuzzing should find edge cases)
+                        if (
+                            metrics.testType === "fuzzing" &&
+                            metrics.edgeCases === 0
+                        ) {
+                            issues.push("No edge cases found in fuzzing tests");
+                            recommendations.push(
+                                "Review fuzzing arbitraries and test ranges"
+                            );
+                        }
+
+                        return {
+                            qualityScore,
+                            issues,
+                            recommendations,
+                            passed: issues.length === 0,
+                        };
+                    },
+
+                    calculateQualityScore: function (
+                        metrics: typeof testMetrics
                     ) {
-                        issues.push("No edge cases found in fuzzing tests");
-                        recommendations.push(
-                            "Review fuzzing arbitraries and test ranges"
+                        let score = 0;
+
+                        // Coverage weight: 40%
+                        const coverage = Number.isNaN(metrics.coverage)
+                            ? 0
+                            : metrics.coverage;
+                        score += (coverage / 100) * 40;
+
+                        // Performance weight: 30%
+                        const avgTime = Number.isNaN(
+                            metrics.performance.avgTime
+                        )
+                            ? 1000
+                            : metrics.performance.avgTime;
+                        const perfScore = Math.max(0, 100 - avgTime) / 100;
+                        score += perfScore * 30;
+
+                        // Edge case discovery weight: 20% (for fuzzing tests)
+                        if (metrics.testType === "fuzzing") {
+                            const edgeScore = Math.min(
+                                metrics.edgeCases / 10,
+                                1
+                            );
+                            score += edgeScore * 20;
+                        } else {
+                            score += 20; // Full points for non-fuzzing tests
+                        }
+
+                        // Memory efficiency weight: 10%
+                        const memoryScore = Math.max(
+                            0,
+                            1 - metrics.performance.memory / 1_073_741_824
                         );
-                    }
+                        score += memoryScore * 10;
 
-                    return {
-                        qualityScore,
-                        issues,
-                        recommendations,
-                        passed: issues.length === 0,
-                    };
-                },
+                        return Math.round(score);
+                    },
+                };
 
-                calculateQualityScore: function (metrics: typeof testMetrics) {
-                    let score = 0;
+                const analysis = qualityAnalyzer.analyze(testMetrics);
 
-                    // Coverage weight: 40%
-                    const coverage = Number.isNaN(metrics.coverage)
-                        ? 0
-                        : metrics.coverage;
-                    score += (coverage / 100) * 40;
+                // Property: Quality analysis should never throw
+                expect(analysis).toHaveProperty("qualityScore");
+                expect(analysis).toHaveProperty("issues");
+                expect(analysis).toHaveProperty("recommendations");
+                expect(analysis).toHaveProperty("passed");
 
-                    // Performance weight: 30%
-                    const avgTime = Number.isNaN(metrics.performance.avgTime)
-                        ? 1000
-                        : metrics.performance.avgTime;
-                    const perfScore = Math.max(0, 100 - avgTime) / 100;
-                    score += perfScore * 30;
+                // Property: Quality score should be in valid range
+                expect(analysis.qualityScore).toBeGreaterThanOrEqual(0);
+                expect(analysis.qualityScore).toBeLessThanOrEqual(100);
 
-                    // Edge case discovery weight: 20% (for fuzzing tests)
-                    if (metrics.testType === "fuzzing") {
-                        const edgeScore = Math.min(metrics.edgeCases / 10, 1);
-                        score += edgeScore * 20;
-                    } else {
-                        score += 20; // Full points for non-fuzzing tests
-                    }
+                // Property: High coverage should result in higher scores
+                if (testMetrics.coverage >= 95) {
+                    expect(analysis.qualityScore).toBeGreaterThanOrEqual(40);
+                }
 
-                    // Memory efficiency weight: 10%
-                    const memoryScore = Math.max(
-                        0,
-                        1 - metrics.performance.memory / 1_073_741_824
+                // Property: Fuzzing tests should find edge cases for high quality
+                if (
+                    testMetrics.testType === "fuzzing" &&
+                    testMetrics.coverage > 90 &&
+                    testMetrics.edgeCases === 0
+                ) {
+                    expect(analysis.issues).toContain(
+                        "No edge cases found in fuzzing tests"
                     );
-                    score += memoryScore * 10;
-
-                    return Math.round(score);
-                },
-            };
-
-            const analysis = qualityAnalyzer.analyze(testMetrics);
-
-            // Property: Quality analysis should never throw
-            expect(analysis).toHaveProperty("qualityScore");
-            expect(analysis).toHaveProperty("issues");
-            expect(analysis).toHaveProperty("recommendations");
-            expect(analysis).toHaveProperty("passed");
-
-            // Property: Quality score should be in valid range
-            expect(analysis.qualityScore).toBeGreaterThanOrEqual(0);
-            expect(analysis.qualityScore).toBeLessThanOrEqual(100);
-
-            // Property: High coverage should result in higher scores
-            if (testMetrics.coverage >= 95) {
-                expect(analysis.qualityScore).toBeGreaterThan(40);
+                }
             }
-
-            // Property: Fuzzing tests should find edge cases for high quality
-            if (
-                testMetrics.testType === "fuzzing" &&
-                testMetrics.coverage > 90 &&
-                testMetrics.edgeCases === 0
-            ) {
-                expect(analysis.issues).toContain(
-                    "No edge cases found in fuzzing tests"
-                );
-            }
-        });
+        );
     });
 
     describe("Coverage Analysis and Reporting", () => {
@@ -344,158 +353,166 @@ describe("Comprehensive Fast-Check Fuzzing Test Suite", () => {
                 }),
                 { minLength: 1, maxLength: 20 }
             ),
-        ])("Coverage reporting should provide comprehensive metrics", (
-            coverageData
-        ) => {
-            const coverageReporter = {
-                generateReport: (data: typeof coverageData) => {
-                    const overallMetrics = {
-                        totalLines: 0,
-                        coveredLines: 0,
-                        totalBranches: 0,
-                        coveredBranches: 0,
-                        totalFunctions: 0,
-                        coveredFunctions: 0,
-                    };
+        ])(
+            "Coverage reporting should provide comprehensive metrics",
+            (coverageData) => {
+                const coverageReporter = {
+                    generateReport: (data: typeof coverageData) => {
+                        const overallMetrics = {
+                            totalLines: 0,
+                            coveredLines: 0,
+                            totalBranches: 0,
+                            coveredBranches: 0,
+                            totalFunctions: 0,
+                            coveredFunctions: 0,
+                        };
 
-                    const fileReports = data.map((file) => {
-                        // Ensure covered doesn't exceed total
-                        const linesCovered = Math.min(
-                            file.linesCovered,
-                            file.totalLines
-                        );
-                        const branchesCovered = Math.min(
-                            file.branchesCovered,
-                            file.totalBranches
-                        );
-                        const functionsCovered = Math.min(
-                            file.functionsCovered,
-                            file.totalFunctions
-                        );
+                        const fileReports = data.map((file) => {
+                            // Ensure covered doesn't exceed total
+                            const linesCovered = Math.min(
+                                file.linesCovered,
+                                file.totalLines
+                            );
+                            const branchesCovered = Math.min(
+                                file.branchesCovered,
+                                file.totalBranches
+                            );
+                            const functionsCovered = Math.min(
+                                file.functionsCovered,
+                                file.totalFunctions
+                            );
 
-                        // Calculate coverage percentages
-                        const lineCoverage =
-                            file.totalLines > 0
-                                ? (linesCovered / file.totalLines) * 100
-                                : 100;
-                        const branchCoverage =
-                            file.totalBranches > 0
-                                ? (branchesCovered / file.totalBranches) * 100
-                                : 100;
-                        const functionCoverage =
-                            file.totalFunctions > 0
-                                ? (functionsCovered / file.totalFunctions) * 100
-                                : 100;
+                            // Calculate coverage percentages
+                            const lineCoverage =
+                                file.totalLines > 0
+                                    ? (linesCovered / file.totalLines) * 100
+                                    : 100;
+                            const branchCoverage =
+                                file.totalBranches > 0
+                                    ? (branchesCovered / file.totalBranches) *
+                                      100
+                                    : 100;
+                            const functionCoverage =
+                                file.totalFunctions > 0
+                                    ? (functionsCovered / file.totalFunctions) *
+                                      100
+                                    : 100;
 
-                        // Update overall metrics
-                        overallMetrics.totalLines += file.totalLines;
-                        overallMetrics.coveredLines += linesCovered;
-                        overallMetrics.totalBranches += file.totalBranches;
-                        overallMetrics.coveredBranches += branchesCovered;
-                        overallMetrics.totalFunctions += file.totalFunctions;
-                        overallMetrics.coveredFunctions += functionsCovered;
+                            // Update overall metrics
+                            overallMetrics.totalLines += file.totalLines;
+                            overallMetrics.coveredLines += linesCovered;
+                            overallMetrics.totalBranches += file.totalBranches;
+                            overallMetrics.coveredBranches += branchesCovered;
+                            overallMetrics.totalFunctions +=
+                                file.totalFunctions;
+                            overallMetrics.coveredFunctions += functionsCovered;
+
+                            return {
+                                fileName: file.fileName,
+                                lineCoverage,
+                                branchCoverage,
+                                functionCoverage,
+                                overallCoverage:
+                                    (lineCoverage +
+                                        branchCoverage +
+                                        functionCoverage) /
+                                    3,
+                            };
+                        });
+
+                        // Calculate overall percentages
+                        const overallLineCoverage =
+                            overallMetrics.totalLines > 0
+                                ? (overallMetrics.coveredLines /
+                                      overallMetrics.totalLines) *
+                                  100
+                                : 100;
+                        const overallBranchCoverage =
+                            overallMetrics.totalBranches > 0
+                                ? (overallMetrics.coveredBranches /
+                                      overallMetrics.totalBranches) *
+                                  100
+                                : 100;
+                        const overallFunctionCoverage =
+                            overallMetrics.totalFunctions > 0
+                                ? (overallMetrics.coveredFunctions /
+                                      overallMetrics.totalFunctions) *
+                                  100
+                                : 100;
 
                         return {
-                            fileName: file.fileName,
-                            lineCoverage,
-                            branchCoverage,
-                            functionCoverage,
-                            overallCoverage:
-                                (lineCoverage +
-                                    branchCoverage +
-                                    functionCoverage) /
-                                3,
+                            fileReports,
+                            overall: {
+                                lineCoverage: overallLineCoverage,
+                                branchCoverage: overallBranchCoverage,
+                                functionCoverage: overallFunctionCoverage,
+                                totalCoverage:
+                                    (overallLineCoverage +
+                                        overallBranchCoverage +
+                                        overallFunctionCoverage) /
+                                    3,
+                            },
+                            summary: {
+                                filesAnalyzed: data.length,
+                                totalLines: overallMetrics.totalLines,
+                                coveredLines: overallMetrics.coveredLines,
+                                goalMet:
+                                    overallLineCoverage >= 90 &&
+                                    overallBranchCoverage >= 85 &&
+                                    overallFunctionCoverage >= 95,
+                            },
                         };
-                    });
+                    },
+                };
 
-                    // Calculate overall percentages
-                    const overallLineCoverage =
-                        overallMetrics.totalLines > 0
-                            ? (overallMetrics.coveredLines /
-                                  overallMetrics.totalLines) *
-                              100
-                            : 100;
-                    const overallBranchCoverage =
-                        overallMetrics.totalBranches > 0
-                            ? (overallMetrics.coveredBranches /
-                                  overallMetrics.totalBranches) *
-                              100
-                            : 100;
-                    const overallFunctionCoverage =
-                        overallMetrics.totalFunctions > 0
-                            ? (overallMetrics.coveredFunctions /
-                                  overallMetrics.totalFunctions) *
-                              100
-                            : 100;
+                const report = coverageReporter.generateReport(coverageData);
 
-                    return {
-                        fileReports,
-                        overall: {
-                            lineCoverage: overallLineCoverage,
-                            branchCoverage: overallBranchCoverage,
-                            functionCoverage: overallFunctionCoverage,
-                            totalCoverage:
-                                (overallLineCoverage +
-                                    overallBranchCoverage +
-                                    overallFunctionCoverage) /
-                                3,
-                        },
-                        summary: {
-                            filesAnalyzed: data.length,
-                            totalLines: overallMetrics.totalLines,
-                            coveredLines: overallMetrics.coveredLines,
-                            goalMet:
-                                overallLineCoverage >= 90 &&
-                                overallBranchCoverage >= 85 &&
-                                overallFunctionCoverage >= 95,
-                        },
-                    };
-                },
-            };
+                // Property: Report should have complete structure
+                expect(report).toHaveProperty("fileReports");
+                expect(report).toHaveProperty("overall");
+                expect(report).toHaveProperty("summary");
 
-            const report = coverageReporter.generateReport(coverageData);
+                // Property: File reports should match input data length
+                expect(report.fileReports).toHaveLength(coverageData.length);
 
-            // Property: Report should have complete structure
-            expect(report).toHaveProperty("fileReports");
-            expect(report).toHaveProperty("overall");
-            expect(report).toHaveProperty("summary");
+                // Property: Coverage percentages should be in valid range
+                expect(report.overall.lineCoverage).toBeGreaterThanOrEqual(0);
+                expect(report.overall.lineCoverage).toBeLessThanOrEqual(100);
+                expect(report.overall.branchCoverage).toBeGreaterThanOrEqual(0);
+                expect(report.overall.branchCoverage).toBeLessThanOrEqual(100);
+                expect(report.overall.functionCoverage).toBeGreaterThanOrEqual(
+                    0
+                );
+                expect(report.overall.functionCoverage).toBeLessThanOrEqual(
+                    100
+                );
 
-            // Property: File reports should match input data length
-            expect(report.fileReports).toHaveLength(coverageData.length);
+                // Property: Total coverage should be average of component coverages
+                const expectedTotal =
+                    (report.overall.lineCoverage +
+                        report.overall.branchCoverage +
+                        report.overall.functionCoverage) /
+                    3;
+                expect(
+                    Math.abs(report.overall.totalCoverage - expectedTotal)
+                ).toBeLessThan(0.01);
 
-            // Property: Coverage percentages should be in valid range
-            expect(report.overall.lineCoverage).toBeGreaterThanOrEqual(0);
-            expect(report.overall.lineCoverage).toBeLessThanOrEqual(100);
-            expect(report.overall.branchCoverage).toBeGreaterThanOrEqual(0);
-            expect(report.overall.branchCoverage).toBeLessThanOrEqual(100);
-            expect(report.overall.functionCoverage).toBeGreaterThanOrEqual(0);
-            expect(report.overall.functionCoverage).toBeLessThanOrEqual(100);
+                // Property: Summary should reflect actual totals
+                expect(report.summary.filesAnalyzed).toBe(coverageData.length);
+                expect(report.summary.totalLines).toBe(
+                    coverageData.reduce((sum, f) => sum + f.totalLines, 0)
+                );
 
-            // Property: Total coverage should be average of component coverages
-            const expectedTotal =
-                (report.overall.lineCoverage +
-                    report.overall.branchCoverage +
-                    report.overall.functionCoverage) /
-                3;
-            expect(
-                Math.abs(report.overall.totalCoverage - expectedTotal)
-            ).toBeLessThan(0.01);
-
-            // Property: Summary should reflect actual totals
-            expect(report.summary.filesAnalyzed).toBe(coverageData.length);
-            expect(report.summary.totalLines).toBe(
-                coverageData.reduce((sum, f) => sum + f.totalLines, 0)
-            );
-
-            // Property: Goal should be met for high coverage scenarios
-            if (
-                report.overall.lineCoverage >= 90 &&
-                report.overall.branchCoverage >= 85 &&
-                report.overall.functionCoverage >= 95
-            ) {
-                expect(report.summary.goalMet).toBeTruthy();
+                // Property: Goal should be met for high coverage scenarios
+                if (
+                    report.overall.lineCoverage >= 90 &&
+                    report.overall.branchCoverage >= 85 &&
+                    report.overall.functionCoverage >= 95
+                ) {
+                    expect(report.summary.goalMet).toBeTruthy();
+                }
             }
-        });
+        );
     });
 
     describe("Integration Testing", () => {

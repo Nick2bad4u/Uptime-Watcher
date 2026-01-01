@@ -32,6 +32,12 @@ export interface ConfirmDialogOptions {
     readonly confirmLabel?: string;
     /** Optional additional detail text. */
     readonly details?: string;
+
+    /**
+     * Optional substring of {@link ConfirmDialogOptions.message} that should be
+     * visually emphasized.
+     */
+    readonly emphasisText?: string;
     /** Primary message describing the action. */
     readonly message: string;
     /** Dialog headline shown to the user. */
@@ -49,6 +55,7 @@ export interface ConfirmDialogRequest {
     readonly cancelLabel: string;
     readonly confirmLabel: string;
     readonly details?: string;
+    readonly emphasisText?: string;
     readonly message: string;
     readonly title: string;
     readonly tone: ConfirmDialogTone;
@@ -249,6 +256,7 @@ export async function requestConfirmation(
     const request: ConfirmDialogRequest = {
         cancelLabel: options.cancelLabel ?? DEFAULT_CANCEL_LABEL,
         confirmLabel: options.confirmLabel ?? DEFAULT_CONFIRM_LABEL,
+        ...(options.emphasisText ? { emphasisText: options.emphasisText } : {}),
         message: options.message,
         title: options.title,
         tone: options.tone ?? "default",

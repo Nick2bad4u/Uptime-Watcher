@@ -287,16 +287,16 @@ describe("Event Handler Performance", () => {
                 // Simulate processing
             });
 
-            const events: DomainEvent[] = Array.from({ length: 20 }, (
-                _,
-                i
-            ) => ({
-                id: `batch-event-${i}`,
-                type: "batch.event",
-                timestamp: Date.now(),
-                correlationId: `batch-corr-${i}`,
-                payload: { index: i },
-            }));
+            const events: DomainEvent[] = Array.from(
+                { length: 20 },
+                (_, i) => ({
+                    id: `batch-event-${i}`,
+                    type: "batch.event",
+                    timestamp: Date.now(),
+                    correlationId: `batch-corr-${i}`,
+                    payload: { index: i },
+                })
+            );
 
             for (const event of events) {
                 await eventHandler.handleEvent(event);

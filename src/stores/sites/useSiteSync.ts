@@ -202,6 +202,25 @@ const resolveExpectedListenerCount = (): number => {
         : FALLBACK_EXPECTED_LISTENERS;
 };
 
+const buildStatusSubscriptionFailureSummary = (args: {
+    errors: string[];
+    expectedListeners: number;
+    message: string;
+}): StatusUpdateSubscriptionSummary => ({
+    errors: args.errors,
+    expectedListeners: args.expectedListeners,
+    listenersAttached: 0,
+    listenerStates: [],
+    message: args.message,
+    subscribed: false,
+    success: false,
+});
+
+const resolveManagerExpectedListenerCount = (
+    manager: StatusUpdateManager | undefined,
+    fallback: number
+): number => manager?.getExpectedListenerCount() ?? fallback;
+
 /**
  * Creates site synchronization actions with injected dependencies.
  *
@@ -325,16 +344,13 @@ export const createSiteSyncActions = (
             if (!effectiveCallback) {
                 const message =
                     "Retry attempted without previously registered callback";
-                const fallbackSummary: StatusUpdateSubscriptionSummary = {
-                    errors: [message],
-                    expectedListeners: resolveExpectedListenerCount(),
-                    listenersAttached: 0,
-                    listenerStates: [],
-                    message:
-                        "Unable to retry status subscription without callback context",
-                    subscribed: false,
-                    success: false,
-                };
+                const fallbackSummary =
+                    buildStatusSubscriptionFailureSummary({
+                        errors: [message],
+                        expectedListeners: resolveExpectedListenerCount(),
+                        message:
+                            "Unable to retry status subscription without callback context",
+                    });
 
                 deps.setStatusSubscriptionSummary(fallbackSummary);
                 errorHandler.setError(message);
@@ -370,16 +386,13 @@ export const createSiteSyncActions = (
             if (!effectiveCallback) {
                 const initializationMessage =
                     "Status update subscription attempted without a callback";
-                const fallbackSummary: StatusUpdateSubscriptionSummary = {
-                    errors: [initializationMessage],
-                    expectedListeners: resolveExpectedListenerCount(),
-                    listenersAttached: 0,
-                    listenerStates: [],
-                    message:
-                        "Failed to subscribe to status updates due to missing callback",
-                    subscribed: false,
-                    success: false,
-                };
+                const fallbackSummary =
+                    buildStatusSubscriptionFailureSummary({
+                        errors: [initializationMessage],
+                        expectedListeners: resolveExpectedListenerCount(),
+                        message:
+                            "Failed to subscribe to status updates due to missing callback",
+                    });
 
                 deps.setStatusSubscriptionSummary(fallbackSummary);
                 errorHandler.setError(initializationMessage);
@@ -414,19 +427,13 @@ export const createSiteSyncActions = (
                             "Status update subscription attempted without an initialized manager",
                             initializationMessage
                         );
-
-                        const fallbackSummary: StatusUpdateSubscriptionSummary =
-                            {
+                        const fallbackSummary =
+                            buildStatusSubscriptionFailureSummary({
                                 errors: [initializationMessage],
-                                expectedListeners:
-                                    resolveExpectedListenerCount(),
-                                listenersAttached: 0,
-                                listenerStates: [],
+                                expectedListeners: resolveExpectedListenerCount(),
                                 message:
                                     "Failed to subscribe to status updates",
-                                subscribed: false,
-                                success: false,
-                            };
+                            });
 
                         deps.setStatusSubscriptionSummary(fallbackSummary);
 
@@ -497,19 +504,17 @@ export const createSiteSyncActions = (
                             normalizedError
                         );
 
-                        const failureSummary: StatusUpdateSubscriptionSummary =
-                            {
+                        const failureSummary =
+                            buildStatusSubscriptionFailureSummary({
                                 errors: [normalizedError.message],
                                 expectedListeners:
-                                    statusUpdateManager.instance?.getExpectedListenerCount() ??
-                                    resolveExpectedListenerCount(),
-                                listenersAttached: 0,
-                                listenerStates: [],
+                                    resolveManagerExpectedListenerCount(
+                                        statusUpdateManager.instance,
+                                        resolveExpectedListenerCount()
+                                    ),
                                 message:
                                     "Failed to subscribe to status updates",
-                                subscribed: false,
-                                success: false,
-                            };
+                            });
 
                         deps.setStatusSubscriptionSummary(failureSummary);
 

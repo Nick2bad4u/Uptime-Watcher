@@ -1,6 +1,8 @@
 import { describe, expect, it, vi } from "vitest";
 
 import { DropboxCloudStorageProvider } from "@electron/services/cloud/providers/dropbox/DropboxCloudStorageProvider";
+import { CloudProviderOperationError } from "@electron/services/cloud/providers/cloudProviderErrors";
+import { DropboxResponseError } from "dropbox";
 
 describe(DropboxCloudStorageProvider, () => {
     it("lists objects under the app root and filters by prefix", async () => {
@@ -93,5 +95,51 @@ describe(DropboxCloudStorageProvider, () => {
         };
 
         expect(call.mode?.[".tag"]).toBe("overwrite");
+    });
+
+    it("throws EEXIST when overwrite is false and the Dropbox path conflicts", async () => {
+        const tokenManager = {
+            getAccessToken: vi.fn().mockResolvedValue("token"),
+        };
+
+        const conflict = new DropboxResponseError(409, {}, {
+            ".tag": "path",
+            path: {
+                ".tag": "conflict",
+            },
+        });
+
+        const filesUpload = vi.fn().mockRejectedValue(conflict);
+
+        const provider = new DropboxCloudStorageProvider({
+            clientFactory: () =>
+                ({
+                    filesListFolder: vi.fn(),
+                    filesListFolderContinue: vi.fn(),
+                    filesUpload,
+                    filesDownload: vi.fn(),
+                    filesDeleteV2: vi.fn(),
+                    usersGetCurrentAccount: vi.fn(),
+                    authTokenRevoke: vi.fn(),
+                }) as never,
+            tokenManager: tokenManager as never,
+        });
+
+        try {
+            await provider.uploadObject({
+                buffer: Buffer.from("hey", "utf8"),
+                key: "sync/foo.txt",
+                overwrite: false,
+            });
+            throw new Error("Expected uploadObject to throw");
+        } catch (error: unknown) {
+            expect(error).toBeInstanceOf(CloudProviderOperationError);
+
+            const typed = error as CloudProviderOperationError;
+            expect(typed.code).toBe("EEXIST");
+            expect(typed.operation).toBe("uploadObject");
+            expect(typed.providerKind).toBe("dropbox");
+            expect(typed.target).toBe("sync/foo.txt");
+        }
     });
 });

@@ -10,6 +10,7 @@
 
 import type { MonitorType, Site } from "@shared/types";
 
+import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import tls, { type PeerCertificate } from "node:tls";
 
 import type {
@@ -108,8 +109,7 @@ export class SslMonitor implements IMonitorService {
                 }
             );
         } catch (error) {
-            const message =
-                error instanceof Error ? error.message : String(error);
+            const message = getUserFacingErrorDetail(error);
             return createMonitorErrorResult(message, 0);
         }
     }
@@ -141,7 +141,7 @@ export class SslMonitor implements IMonitorService {
         } catch (error) {
             const responseTime = Math.round(performance.now() - start);
             return createMonitorErrorResult(
-                error instanceof Error ? error.message : String(error),
+                getUserFacingErrorDetail(error),
                 responseTime
             );
         }

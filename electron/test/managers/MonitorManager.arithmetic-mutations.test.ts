@@ -28,7 +28,8 @@ const mockInterpolateLogTemplate = vi.hoisted(() =>
             return `Applied interval for monitor ${params.monitorId}: ${params.interval}s`;
         }
         return template || "";
-    }));
+    })
+);
 
 // Mock all dependencies
 vi.mock("../../services/database/DatabaseService");
@@ -70,21 +71,20 @@ describe("MonitorManager arithmetic mutations", () => {
         vi.clearAllMocks();
 
         // Reset template interpolation mock to return seconds value for testing
-        mockInterpolateLogTemplate.mockImplementation((
-            template: string,
-            params: any
-        ) => {
-            if (
-                template &&
-                typeof template === "string" &&
-                template.includes("interval") &&
-                params &&
-                params.interval !== undefined
-            ) {
-                return `Applied interval for monitor ${params.monitorId}: ${params.interval}s`;
+        mockInterpolateLogTemplate.mockImplementation(
+            (template: string, params: any) => {
+                if (
+                    template &&
+                    typeof template === "string" &&
+                    template.includes("interval") &&
+                    params &&
+                    params.interval !== undefined
+                ) {
+                    return `Applied interval for monitor ${params.monitorId}: ${params.interval}s`;
+                }
+                return template || "";
             }
-            return template || "";
-        });
+        );
 
         mockDependencies = {
             eventEmitter: {
@@ -100,14 +100,18 @@ describe("MonitorManager arithmetic mutations", () => {
             },
             historyRepository: {},
             databaseService: {
-                executeTransaction: vi.fn().mockImplementation(async (
-                    handler: (
-                        db: Record<string, unknown>
-                    ) => Promise<unknown> | unknown
-                ) => {
-                    const db = {} as Record<string, unknown>;
-                    return handler(db);
-                }),
+                executeTransaction: vi
+                    .fn()
+                    .mockImplementation(
+                        async (
+                            handler: (
+                                db: Record<string, unknown>
+                            ) => Promise<unknown> | unknown
+                        ) => {
+                            const db = {} as Record<string, unknown>;
+                            return handler(db);
+                        }
+                    ),
                 getDatabase: vi.fn().mockReturnValue({}),
             },
             cache: {
@@ -118,16 +122,17 @@ describe("MonitorManager arithmetic mutations", () => {
             repositories: {
                 monitor: {
                     updateInternal: vi.fn().mockResolvedValue({}),
-                    createTransactionAdapter: vi.fn().mockImplementation((
-                        db: unknown
-                    ) => ({
-                        update: vi.fn((id: string, changes: unknown) =>
-                            mockDependencies.repositories.monitor.updateInternal(
-                                db,
-                                id,
-                                changes
-                            )),
-                    })),
+                    createTransactionAdapter: vi
+                        .fn()
+                        .mockImplementation((db: unknown) => ({
+                            update: vi.fn((id: string, changes: unknown) =>
+                                mockDependencies.repositories.monitor.updateInternal(
+                                    db,
+                                    id,
+                                    changes
+                                )
+                            ),
+                        })),
                 },
             },
             getSitesCache: vi.fn().mockReturnValue({

@@ -6,6 +6,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { ChangeEvent, ComponentProps, ReactElement } from "react";
 
 import { OverviewTab } from "@app/components/SiteDetails/tabs/OverviewTab";
+import { timeoutMsToSeconds } from "@app/utils/timeoutUtils";
 import { useCallback, useMemo, useState } from "react";
 import { action } from "storybook/actions";
 
@@ -14,7 +15,7 @@ import { createMockMonitor } from "../helpers/siteStoryHelpers";
 const formatResponseTime = (time: number): string => `${time} ms`;
 
 const baseMonitor = createMockMonitor({
-    checkInterval: 5,
+    checkInterval: 5000,
     history: Array.from({ length: 20 }, (_, index) => ({
         responseTime: 110 + index * 5,
         status: index % 7 === 0 ? "degraded" : "up",
@@ -23,7 +24,7 @@ const baseMonitor = createMockMonitor({
     id: "monitor-http",
     responseTime: 140,
     status: "up",
-    timeout: 10,
+    timeout: 10_000,
     url: "https://status.example.com/health",
 });
 
@@ -31,20 +32,22 @@ const OverviewTabStory = ({
     handleIntervalChange,
     handleTimeoutChange,
     intervalChanged,
-    localCheckInterval,
-    localTimeout,
+    localCheckIntervalMs,
+    localTimeoutSeconds,
     timeoutChanged,
     ...rest
 }: ComponentProps<typeof OverviewTab>): ReactElement => {
-    const [checkInterval, setCheckInterval] = useState(localCheckInterval);
-    const [timeoutValue, setTimeoutValue] = useState(localTimeout);
+    const [checkIntervalMs, setCheckIntervalMs] = useState(
+        localCheckIntervalMs
+    );
+    const [timeoutSeconds, setTimeoutSeconds] = useState(localTimeoutSeconds);
     const [intervalDirty, setIntervalDirty] = useState(intervalChanged);
     const [timeoutDirty, setTimeoutDirty] = useState(timeoutChanged);
 
     const handleIntervalChangeWrapper = useCallback(
         (event: ChangeEvent<HTMLSelectElement>): void => {
             const nextValue = Number(event.target.value);
-            setCheckInterval(nextValue);
+            setCheckIntervalMs(nextValue);
             setIntervalDirty(true);
             action("overview/changeInterval")(event.target.value);
             handleIntervalChange?.(event);
@@ -55,7 +58,7 @@ const OverviewTabStory = ({
     const handleTimeoutChangeWrapper = useCallback(
         (event: ChangeEvent<HTMLInputElement>): void => {
             const nextValue = Number(event.target.value);
-            setTimeoutValue(nextValue);
+            setTimeoutSeconds(nextValue);
             setTimeoutDirty(true);
             action("overview/changeTimeout")(event.target.value);
             handleTimeoutChange?.(event);
@@ -66,15 +69,15 @@ const OverviewTabStory = ({
     const memoizedProps = useMemo(
         () => ({
             intervalChanged: intervalDirty,
-            localCheckInterval: checkInterval,
-            localTimeout: timeoutValue,
+            localCheckIntervalMs: checkIntervalMs,
+            localTimeoutSeconds: timeoutSeconds,
             timeoutChanged: timeoutDirty,
         }),
         [
-            checkInterval,
+            checkIntervalMs,
             intervalDirty,
             timeoutDirty,
-            timeoutValue,
+            timeoutSeconds,
         ]
     );
 
@@ -106,8 +109,8 @@ const meta: Meta<typeof OverviewTab> = {
         handleTimeoutChange: (): void => {},
         intervalChanged: false,
         isLoading: false,
-        localCheckInterval: baseMonitor.checkInterval,
-        localTimeout: baseMonitor.timeout,
+        localCheckIntervalMs: baseMonitor.checkInterval,
+        localTimeoutSeconds: timeoutMsToSeconds(baseMonitor.timeout),
         onCheckNow: (): void => {
             action("overview/checkNow")();
         },
@@ -131,8 +134,8 @@ export const DefaultOverview: Story = {};
 export const PendingChanges: Story = {
     args: {
         intervalChanged: true,
-        localCheckInterval: 10,
-        localTimeout: 20,
+        localCheckIntervalMs: 10_000,
+        localTimeoutSeconds: 20,
         timeoutChanged: true,
     },
 };

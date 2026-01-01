@@ -60,10 +60,10 @@ describe(usePrefersReducedMotion, () => {
                         // No-op in tests
                     },
                     addListener: () => {
-                        // Legacy API, unused in hook
+                        // Previous API, unused in hook
                     },
                     removeListener: () => {
-                        // Legacy API, unused in hook
+                        // Previous API, unused in hook
                     },
                     dispatchEvent: () => false,
                 };
@@ -101,10 +101,10 @@ describe(usePrefersReducedMotion, () => {
                         // Intentionally omit addEventListener/removeEventListener to
                         // exercise the fallback branch in subscribeToPreferenceChanges.
                         addListener: () => {
-                            // Legacy no-op
+                            // Previous no-op
                         },
                         removeListener: () => {
-                            // Legacy no-op
+                            // Previous no-op
                         },
                         dispatchEvent: () => false,
                     }) as unknown as MediaQueryList

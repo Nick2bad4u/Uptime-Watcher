@@ -9,6 +9,7 @@ import {
     isEncryptedPayload,
 } from "@electron/services/cloud/crypto/cloudCrypto";
 import { EncryptedSyncCloudStorageProvider } from "@electron/services/cloud/providers/EncryptedSyncCloudStorageProvider";
+import { CloudProviderOperationError } from "@electron/services/cloud/providers/cloudProviderErrors";
 import type {
     CloudObjectEntry,
     CloudStorageProvider,
@@ -154,65 +155,28 @@ describe(EncryptedSyncCloudStorageProvider, () => {
         expect(stored ? isEncryptedPayload(stored) : false).toBeFalsy();
     });
 
-    it("passes through plaintext sync objects (for legacy data)", async () => {
+    it("rejects plaintext sync objects", async () => {
         const inner = new InMemoryProvider();
         const key = await derivePassphraseKey({
             passphrase: "secret",
             salt: generateEncryptionSalt(),
         });
 
-        inner.objects.set("sync/devices/a/ops/1-1-1.ndjson", Buffer.from("x"));
+        inner.objects.set("sync/devices/a/ops/30-1-1.ndjson", Buffer.from("x"));
 
         const provider = new EncryptedSyncCloudStorageProvider({ inner, key });
-        const read = await provider.downloadObject(
-            "sync/devices/a/ops/1-1-1.ndjson"
-        );
-        expect(read.toString("utf8")).toBe("x");
-    });
 
-    it("allows legacy plaintext sync objects created before enabledAt", async () => {
-        const inner = new InMemoryProvider();
-        const key = await derivePassphraseKey({
-            passphrase: "secret",
-            salt: generateEncryptionSalt(),
-        });
+        try {
+            await provider.downloadObject("sync/devices/a/ops/30-1-1.ndjson");
+            throw new Error("Expected downloadObject to throw");
+        } catch (error: unknown) {
+            expect(error).toBeInstanceOf(CloudProviderOperationError);
 
-        inner.objects.set(
-            "sync/devices/a/ops/10-1-1.ndjson",
-            Buffer.from("x")
-        );
-
-        const provider = new EncryptedSyncCloudStorageProvider({
-            inner,
-            key,
-            encryptionEnabledAt: 20,
-        });
-
-        await expect(
-            provider.downloadObject("sync/devices/a/ops/10-1-1.ndjson")
-        ).resolves.toEqual(Buffer.from("x"));
-    });
-
-    it("rejects plaintext sync objects created at/after enabledAt", async () => {
-        const inner = new InMemoryProvider();
-        const key = await derivePassphraseKey({
-            passphrase: "secret",
-            salt: generateEncryptionSalt(),
-        });
-
-        inner.objects.set(
-            "sync/devices/a/ops/30-1-1.ndjson",
-            Buffer.from("x")
-        );
-
-        const provider = new EncryptedSyncCloudStorageProvider({
-            inner,
-            key,
-            encryptionEnabledAt: 20,
-        });
-
-        await expect(
-            provider.downloadObject("sync/devices/a/ops/30-1-1.ndjson")
-        ).rejects.toThrowError(/refusing to read unencrypted sync object/i);
+            const typed = error as CloudProviderOperationError;
+            expect(typed.operation).toBe("downloadObject");
+            expect(typed.providerKind).toBe("filesystem");
+            expect(typed.target).toBe("sync/devices/a/ops/30-1-1.ndjson");
+            expect(typed.message).toMatch(/refusing to read unencrypted sync object/i);
+        }
     });
 });

@@ -139,7 +139,8 @@ async function withRetry<T>(
             // Exponential backoff (simulated)
             const delay = baseDelay * 2 ** attempt;
             await new Promise((resolve) =>
-                setTimeout(resolve, Math.min(delay, 0.1))); // Very short for benchmarking
+                setTimeout(resolve, Math.min(delay, 0.1))
+            ); // Very short for benchmarking
         }
     }
 

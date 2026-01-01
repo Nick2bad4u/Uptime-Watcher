@@ -17,7 +17,7 @@ vi.mock("../../../../../electron/utils/logger", () => ({
 import {
     createDatabaseBackup,
     type DatabaseBackupResult,
-} from "../../../../../electron/services/database/utils/databaseBackup";
+} from "../../../../../electron/services/database/utils/backup/databaseBackup";
 import { BACKUP_DB_FILE_NAME } from "../../../../../electron/constants";
 import { logger } from "../../../../../electron/utils/logger";
 import { promises as fs } from "node:fs";
@@ -87,10 +87,10 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
             const customFileName = "custom-backup.sqlite";
             mockReadFile.mockResolvedValue(testBuffer);
 
-            const result = await createDatabaseBackup(
-                testDbPath,
-                customFileName
-            );
+            const result = await createDatabaseBackup({
+                dbPath: testDbPath,
+                fileName: customFileName,
+            });
 
             expect(result.fileName).toBe(customFileName);
             expect(result.buffer).toBe(testBuffer);
@@ -316,7 +316,10 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
                 mockReadFile.mockRejectedValue(error);
 
                 await expect(
-                    createDatabaseBackup(testDbPath, customFileName)
+                    createDatabaseBackup({
+                        dbPath: testDbPath,
+                        fileName: customFileName,
+                    })
                 ).rejects.toThrowError(error);
 
                 expect(logger.error).toHaveBeenCalledWith(
@@ -375,7 +378,10 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
 
                 mockReadFile.mockResolvedValue(testBuffer);
 
-                const result = await createDatabaseBackup(testDbPath, "");
+                const result = await createDatabaseBackup({
+                    dbPath: testDbPath,
+                    fileName: "",
+                });
 
                 expect(result.fileName).toBe(BACKUP_DB_FILE_NAME);
                 expect(logger.info).toHaveBeenCalledWith(
@@ -402,10 +408,10 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
                 const longFileName = `very-long-filename-${"x".repeat(1000)}.sqlite`;
                 mockReadFile.mockResolvedValue(testBuffer);
 
-                const result = await createDatabaseBackup(
-                    testDbPath,
-                    longFileName
-                );
+                const result = await createDatabaseBackup({
+                    dbPath: testDbPath,
+                    fileName: longFileName,
+                });
 
                 expect(result.fileName).toBe(longFileName);
             });
@@ -421,10 +427,10 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
                 const unicodeFileName = "backup-файл-数据库-🗃️.sqlite";
                 mockReadFile.mockResolvedValue(testBuffer);
 
-                const result = await createDatabaseBackup(
-                    testDbPath,
-                    unicodeFileName
-                );
+                const result = await createDatabaseBackup({
+                    dbPath: testDbPath,
+                    fileName: unicodeFileName,
+                });
 
                 expect(result.fileName).toBe(unicodeFileName);
             });
@@ -489,10 +495,10 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
 
                 mockReadFile.mockResolvedValue(testBuffer);
 
-                const result = await createDatabaseBackup(
-                    testDbPath,
-                    "test.sqlite"
-                );
+                const result = await createDatabaseBackup({
+                    dbPath: testDbPath,
+                    fileName: "test.sqlite",
+                });
 
                 expect(result.metadata.sizeBytes).toBe(result.buffer.length);
                 expect(result.metadata.originalPath).toBe(testDbPath);

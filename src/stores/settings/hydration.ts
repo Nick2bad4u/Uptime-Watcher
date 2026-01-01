@@ -81,18 +81,24 @@ export const syncSettingsAfterRehydration = (
                     "[SettingsHydration] fetching history limit for sync"
                 );
                 const historyLimit = await SettingsService.getHistoryLimit();
-                logger.debug("[SettingsHydration] applying backend history limit", {
-                    historyLimit,
-                });
+                logger.debug(
+                    "[SettingsHydration] applying backend history limit",
+                    {
+                        historyLimit,
+                    }
+                );
                 state.updateSettings({ historyLimit });
             } catch (error) {
                 logger.warn(
                     "Failed to sync settings after rehydration:",
                     ensureError(error)
                 );
-                logger.debug("[SettingsHydration] applying fallback history limit", {
-                    historyLimit: defaultSettings.historyLimit,
-                });
+                logger.debug(
+                    "[SettingsHydration] applying fallback history limit",
+                    {
+                        historyLimit: defaultSettings.historyLimit,
+                    }
+                );
                 state.updateSettings({
                     historyLimit: defaultSettings.historyLimit,
                 });

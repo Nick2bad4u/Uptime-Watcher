@@ -56,6 +56,7 @@ const ThemedIconButtonComponent = ({
     size = "md",
     tooltip,
     variant = "ghost",
+    ...rest
 }: ThemedIconButtonProperties): JSX.Element => {
     const getSize = (): string => {
         switch (size) {
@@ -105,6 +106,7 @@ const ThemedIconButtonComponent = ({
             {...(iconColor && { iconColor })}
             style={buttonStyle}
             {...(tooltip && { title: tooltip })}
+            {...rest}
         />
     );
 };

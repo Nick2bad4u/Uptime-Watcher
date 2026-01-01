@@ -18,11 +18,12 @@ import { stringifyJsonValueStable } from "@shared/utils/canonicalJson";
 
 type Mutable<T> = { -readonly [K in keyof T]: T[K] };
 
-const OPERATION_KIND_RANK: Readonly<Record<CloudSyncOperation["kind"], number>> =
-    Object.freeze({
-        "delete-entity": 1,
-        "set-field": 0,
-    });
+const OPERATION_KIND_RANK: Readonly<
+    Record<CloudSyncOperation["kind"], number>
+> = Object.freeze({
+    "delete-entity": 1,
+    "set-field": 0,
+});
 
 function compareStrings(a: string, b: string): number {
     if (a === b) {
@@ -325,7 +326,9 @@ export function applyCloudSyncOperationsToState(
 ): CloudSyncState {
     const state = cloneState(initialState);
 
-    const sorted = Array.from(operations).toSorted(compareOperationsDeterministic);
+    const sorted = Array.from(operations).toSorted(
+        compareOperationsDeterministic
+    );
     for (const operation of sorted) {
         applyOperation(state, operation);
     }
@@ -341,7 +344,9 @@ export function applyCloudSyncOperations(
 ): CloudSyncState {
     const state = createEmptyState();
 
-    const sorted = Array.from(operations).toSorted(compareOperationsDeterministic);
+    const sorted = Array.from(operations).toSorted(
+        compareOperationsDeterministic
+    );
     for (const operation of sorted) {
         applyOperation(state, operation);
     }

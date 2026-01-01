@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const modulePath = "../../../utils/database/siteDeletion";
+const modulePath = "../../../services/database/siteDeletion";
 const errorUtilsModulePath = "../../../../shared/utils/errorHandling";
 
 interface MonitorAdapterStub {
@@ -128,7 +128,8 @@ describe("deleteSiteWithAdapters runtime coverage", () => {
                 monitorAdapter: monitorAdapter,
                 preloadedMonitors: [] as never,
                 siteAdapter: siteAdapter,
-            })).toThrowError(SiteDeletionError);
+            })
+        ).toThrowError(SiteDeletionError);
 
         const thrown = vi.mocked(ensureErrorSpy).mock.calls[0]?.[0];
         expect(thrown).toBe(failure);

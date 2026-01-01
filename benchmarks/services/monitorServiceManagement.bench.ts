@@ -146,7 +146,8 @@ class MockMonitorServiceManager {
         this.operationCount++;
 
         const registrationPromises = monitors.map((monitor) =>
-            this.registerMonitor(monitor));
+            this.registerMonitor(monitor)
+        );
 
         await Promise.all(registrationPromises);
     }
@@ -219,7 +220,8 @@ class MockMonitorServiceManager {
         for (let i = 0; i < monitorIds.length; i += maxConcurrency) {
             const batch = monitorIds.slice(i, i + maxConcurrency);
             const batchPromises = batch.map((id) =>
-                this.performMonitorCheck(id));
+                this.performMonitorCheck(id)
+            );
             const batchResults = await Promise.allSettled(batchPromises);
 
             for (const result of batchResults) {
@@ -1089,13 +1091,13 @@ describe("Monitor Service Management Benchmarks", () => {
                     metadata: { ...m.metadata, priority: "normal" },
                 }));
 
-                const lowPriorityMonitors = generateMonitors(100, 25).map((
-                    m
-                ) => ({
-                    ...m,
-                    interval: 600_000, // 10 minutes
-                    metadata: { ...m.metadata, priority: "low" },
-                }));
+                const lowPriorityMonitors = generateMonitors(100, 25).map(
+                    (m) => ({
+                        ...m,
+                        interval: 600_000, // 10 minutes
+                        metadata: { ...m.metadata, priority: "low" },
+                    })
+                );
 
                 const allMonitors = [
                     ...criticalMonitors,

@@ -332,12 +332,7 @@
         "useMaxWidth": false,
         "width": 600
     },
-    "secure": [
-        "secure",
-        "securityLevel",
-        "startOnLoad",
-        "maxTextSize"
-    ],
+    "secure": ["secure", "securityLevel", "startOnLoad", "maxTextSize"],
     "securityLevel": "strict",
     "sequence": {
         "activationWidth": 10,

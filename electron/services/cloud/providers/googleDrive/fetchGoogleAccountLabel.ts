@@ -1,4 +1,4 @@
-import { safePropertyAccess } from "@shared/utils/typeHelpers";
+import { tryParseGoogleUserInfoResponse } from "./googleOpenIdSchemas";
 
 /**
  * Fetches a human-readable account label for the currently authorized Google
@@ -26,15 +26,16 @@ export async function fetchGoogleAccountLabel(
             return undefined;
         }
 
-        const json: unknown = await response.json();
+        const candidate: unknown = await response.json();
 
-        const email = safePropertyAccess(json, "email");
-        if (typeof email === "string" && email.length > 0) {
+        const parsed = tryParseGoogleUserInfoResponse(candidate);
+        const email = parsed?.email?.trim();
+        if (email) {
             return email;
         }
 
-        const name = safePropertyAccess(json, "name");
-        if (typeof name === "string" && name.length > 0) {
+        const name = parsed?.name?.trim();
+        if (name) {
             return name;
         }
 

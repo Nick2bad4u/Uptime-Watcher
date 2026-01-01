@@ -2553,7 +2553,10 @@ const rendererNoWindowOpenRule = {
             const unwrapped = unwrapChain(callee);
 
             if (unwrapped.type === "Identifier") {
-                if (unwrapped.name === "open" && !hasLocalBinding("open", node)) {
+                if (
+                    unwrapped.name === "open" &&
+                    !hasLocalBinding("open", node)
+                ) {
                     return true;
                 }
                 return false;
@@ -3355,11 +3358,297 @@ const noLocalErrorNormalizersRule = {
 };
 
 /**
+ * ESLint rule disallowing the RegExp `v` flag.
+ *
+ * @remarks
+ * The `v` flag is still experimental and can cause runtime SyntaxErrors
+ * depending on runtime/toolchain.
+ */
+const noRegexpVFlagRule = {
+    meta: {
+        type: "problem",
+        docs: {
+            description:
+                "Disallow RegExp literals using the experimental 'v' flag",
+            recommended: false,
+        },
+        schema: [],
+        messages: {
+            disallowed:
+                "RegExp flag 'v' is not allowed. Use 'u'/'gu' or rewrite the regex.",
+        },
+    },
+    create(context) {
+        return {
+            Literal(node) {
+                const regex = node?.regex;
+                if (!regex || typeof regex.flags !== "string") {
+                    return;
+                }
+
+                if (regex.flags.includes("v")) {
+                    context.report({
+                        node,
+                        messageId: "disallowed",
+                    });
+                }
+            },
+        };
+    },
+};
+
+/**
+ * ESLint rule disallowing local helper definitions by identifier name.
+ *
+ * @remarks
+ * Used as a configurable drift guard to prevent reintroducing duplicated helper
+ * functions/variables across modules.
+ */
+const noLocalIdentifiersRule = {
+    meta: {
+        type: "problem",
+        docs: {
+            description:
+                "Disallow defining local helper identifiers that should be imported from shared utilities",
+            recommended: false,
+        },
+        schema: [
+            {
+                type: "object",
+                additionalProperties: false,
+                properties: {
+                    banned: {
+                        type: "array",
+                        items: {
+                            type: "object",
+                            additionalProperties: false,
+                            properties: {
+                                name: { type: "string", minLength: 1 },
+                                message: { type: "string" },
+                                kinds: {
+                                    type: "array",
+                                    items: {
+                                        enum: ["function", "variable"],
+                                    },
+                                },
+                            },
+                            required: ["name"],
+                        },
+                    },
+                },
+            },
+        ],
+        messages: {
+            banned: "Local definition of '{{name}}' is not allowed. {{details}}",
+        },
+    },
+    create(context) {
+        const option = context.options?.[0];
+        const banned = Array.isArray(option?.banned) ? option.banned : [];
+        const bannedByName = new Map(
+            banned.map((entry) => [entry.name, entry])
+        );
+
+        const shouldReport = (entry, kind) => {
+            const kinds = entry.kinds;
+            return !Array.isArray(kinds) || kinds.includes(kind);
+        };
+
+        const detailsFor = (entry) =>
+            typeof entry.message === "string" && entry.message.length > 0
+                ? entry.message
+                : "Import and reuse the shared helper instead.";
+
+        return {
+            FunctionDeclaration(node) {
+                const id = node?.id;
+                if (!id || id.type !== "Identifier") {
+                    return;
+                }
+
+                const entry = bannedByName.get(id.name);
+                if (!entry || !shouldReport(entry, "function")) {
+                    return;
+                }
+
+                context.report({
+                    node: id,
+                    messageId: "banned",
+                    data: {
+                        name: id.name,
+                        details: detailsFor(entry),
+                    },
+                });
+            },
+            VariableDeclarator(node) {
+                const id = node?.id;
+                if (!id || id.type !== "Identifier") {
+                    return;
+                }
+
+                const entry = bannedByName.get(id.name);
+                if (!entry || !shouldReport(entry, "variable")) {
+                    return;
+                }
+
+                context.report({
+                    node: id,
+                    messageId: "banned",
+                    data: {
+                        name: id.name,
+                        details: detailsFor(entry),
+                    },
+                });
+            },
+        };
+    },
+};
+
+/**
+ * ESLint rule disallowing calling certain imported identifiers.
+ */
+const noCallIdentifiersRule = {
+    meta: {
+        type: "problem",
+        docs: {
+            description:
+                "Disallow calling certain identifier functions directly",
+            recommended: false,
+        },
+        schema: [
+            {
+                type: "object",
+                additionalProperties: false,
+                properties: {
+                    banned: {
+                        type: "array",
+                        items: {
+                            type: "object",
+                            additionalProperties: false,
+                            properties: {
+                                name: { type: "string", minLength: 1 },
+                                message: { type: "string" },
+                            },
+                            required: ["name"],
+                        },
+                    },
+                },
+            },
+        ],
+        messages: {
+            bannedCall:
+                "Calling '{{name}}' directly is not allowed. {{details}}",
+        },
+    },
+    create(context) {
+        const option = context.options?.[0];
+        const banned = Array.isArray(option?.banned) ? option.banned : [];
+        const bannedByName = new Map(
+            banned.map((entry) => [entry.name, entry])
+        );
+
+        return {
+            CallExpression(node) {
+                const callee = node?.callee;
+                if (!callee || callee.type !== "Identifier") {
+                    return;
+                }
+
+                const entry = bannedByName.get(callee.name);
+                if (!entry) {
+                    return;
+                }
+
+                const details =
+                    typeof entry.message === "string" &&
+                    entry.message.length > 0
+                        ? entry.message
+                        : "Use the centralized helper instead.";
+
+                context.report({
+                    node: callee,
+                    messageId: "bannedCall",
+                    data: {
+                        name: callee.name,
+                        details,
+                    },
+                });
+            },
+        };
+    },
+};
+
+function typeContainsCodeProperty(typeNode) {
+    if (!typeNode || typeof typeNode !== "object") {
+        return false;
+    }
+
+    switch (typeNode.type) {
+        case "TSParenthesizedType":
+            return typeContainsCodeProperty(typeNode.typeAnnotation);
+        case "TSIntersectionType":
+            return (typeNode.types ?? []).some(typeContainsCodeProperty);
+        case "TSTypeLiteral":
+            return (typeNode.members ?? []).some((member) => {
+                if (!member || member.type !== "TSPropertySignature") {
+                    return false;
+                }
+                return (
+                    member.key?.type === "Identifier" &&
+                    member.key.name === "code"
+                );
+            });
+        default:
+            return false;
+    }
+}
+
+/**
+ * ESLint rule enforcing tryGetErrorCode() usage instead of `{ code?: unknown }`
+ * type assertions.
+ */
+const preferTryGetErrorCodeRule = {
+    meta: {
+        type: "problem",
+        docs: {
+            description:
+                "Prefer tryGetErrorCode() over `{ code?: unknown }` type assertions",
+            recommended: false,
+        },
+        schema: [],
+        messages: {
+            prefer: "Use tryGetErrorCode() from shared/utils/errorCodes.ts instead of asserting a `{ code?: unknown }` type.",
+        },
+    },
+    create(context) {
+        const check = (typeAnnotation) => {
+            if (!typeAnnotation || !typeContainsCodeProperty(typeAnnotation)) {
+                return;
+            }
+
+            context.report({
+                node: typeAnnotation,
+                messageId: "prefer",
+            });
+        };
+
+        return {
+            TSAsExpression(node) {
+                check(node.typeAnnotation);
+            },
+            TSTypeAssertion(node) {
+                check(node.typeAnnotation);
+            },
+        };
+    },
+};
+
+/**
  * ESLint rule preventing a common logging footgun:
  *
  * `logger.error(message, { error: ensureError(error) })`
  *
- * should instead be:
+ * Should instead be:
  *
  * `logger.error(message, ensureError(error), { ...context })`
  *
@@ -3498,9 +3787,8 @@ const loggerNoErrorInContextRule = {
                         continue;
                     }
 
-                    const errorProperty = getErrorPropertyFromObjectExpression(
-                        arg
-                    );
+                    const errorProperty =
+                        getErrorPropertyFromObjectExpression(arg);
                     if (!errorProperty) {
                         continue;
                     }
@@ -3522,6 +3810,7 @@ const loggerNoErrorInContextRule = {
  *
  * @remarks
  * This rule is intentionally narrow:
+ *
  * - It only targets `src/stores/**` (non-test) files.
  * - It only triggers on direct `set({ isX: true })` calls inside store actions.
  * - It requires a corresponding `set({ isX: false })` to appear inside a
@@ -3569,8 +3858,9 @@ const storeActionsRequireFinallyResetRule = {
          * Extracts an object literal from a set() argument.
          *
          * Supports:
-         * - set({ ... })
-         * - set(() => ({ ... }))
+         *
+         * - Set({ ... })
+         * - Set(() => ({ ... }))
          */
         function getSetObjectExpression(argument) {
             if (!argument) {
@@ -3913,7 +4203,7 @@ const noOneDriveRule = {
     create(context) {
         const normalizedFilename = normalizePath(context.getFilename());
 
-        // Ignore tests to avoid creating busywork when describing legacy state.
+        // Ignore tests to avoid creating busywork when describing previous state.
         if (
             normalizedFilename.includes("/test/") ||
             normalizedFilename.includes("/tests/") ||
@@ -3988,6 +4278,10 @@ const uptimeWatcherPlugin = {
         "no-deprecated-exports": noDeprecatedExportsRule,
         "no-local-record-guards": noLocalRecordGuardsRule,
         "no-local-error-normalizers": noLocalErrorNormalizersRule,
+        "no-regexp-v-flag": noRegexpVFlagRule,
+        "no-local-identifiers": noLocalIdentifiersRule,
+        "no-call-identifiers": noCallIdentifiersRule,
+        "prefer-try-get-error-code": preferTryGetErrorCodeRule,
         "logger-no-error-in-context": loggerNoErrorInContextRule,
         "store-actions-require-finally-reset":
             storeActionsRequireFinallyResetRule,

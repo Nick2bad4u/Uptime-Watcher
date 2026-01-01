@@ -89,17 +89,16 @@ describe("useSitesStore Function Coverage Tests", () => {
         mockElectronAPI.sites.addSite.mockResolvedValue(
             createValidSite("new-site")
         );
-        mockElectronAPI.sites.updateSite.mockImplementation(async (
-            identifier: string,
-            updates: Partial<Site>
-        ) =>
-            createValidSite(identifier, {
-                ...updates,
-                name:
-                    typeof updates?.name === "string"
-                        ? updates.name
-                        : "Updated Site",
-            }));
+        mockElectronAPI.sites.updateSite.mockImplementation(
+            async (identifier: string, updates: Partial<Site>) =>
+                createValidSite(identifier, {
+                    ...updates,
+                    name:
+                        typeof updates?.name === "string"
+                            ? updates.name
+                            : "Updated Site",
+                })
+        );
         mockElectronAPI.sites.removeSite.mockResolvedValue(true);
         mockStateSyncService.getSyncStatus.mockResolvedValue({
             lastSyncAt: Date.now(),
@@ -120,17 +119,16 @@ describe("useSitesStore Function Coverage Tests", () => {
             createValidSite("new-site", { name: "New Site" })
         );
         vi.mocked(SiteService.getSites).mockResolvedValue([]);
-        vi.mocked(SiteService.updateSite).mockImplementation(async (
-            identifier: string,
-            updates: Partial<Site>
-        ) =>
-            createValidSite(identifier, {
-                ...updates,
-                name:
-                    typeof updates?.name === "string"
-                        ? updates.name
-                        : "Updated Site",
-            }));
+        vi.mocked(SiteService.updateSite).mockImplementation(
+            async (identifier: string, updates: Partial<Site>) =>
+                createValidSite(identifier, {
+                    ...updates,
+                    name:
+                        typeof updates?.name === "string"
+                            ? updates.name
+                            : "Updated Site",
+                })
+        );
         vi.mocked(SiteService.removeSite).mockResolvedValue(true);
         vi.mocked(SiteService.initialize).mockResolvedValue(undefined);
 

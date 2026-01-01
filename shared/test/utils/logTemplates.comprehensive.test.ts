@@ -56,10 +56,11 @@ describe("Log Templates", () => {
 
             // Most service logs should start with a bracketed service name
             const logWithPrefix = serviceLogValues.filter((msg: string) =>
-                msg.startsWith("["));
+                msg.startsWith("[")
+            );
 
             // Should have mostly prefixed logs (expect at least 80% to have brackets)
-            // Note: Some logs like "Applying migration:" and "Started monitoring" don't use brackets
+            // Note: Some logs like "Started monitoring" don't use brackets
             expect(logWithPrefix.length).toBeGreaterThanOrEqual(
                 Math.floor(serviceLogValues.length * 0.8)
             );
@@ -436,7 +437,8 @@ describe("Log Templates", () => {
             const serviceKeys = Object.keys(SERVICE_LOGS);
             // Look for APPLICATION or similar service logs since there might not be specific "ORCHESTRATOR" logs
             const applicationLogs = serviceKeys.filter((key) =>
-                key.includes("APPLICATION"));
+                key.includes("APPLICATION")
+            );
             expect(applicationLogs.length).toBeGreaterThan(0);
         });
 
@@ -582,8 +584,6 @@ describe("Log Templates", () => {
                 "[DependencyInjection]",
                 "[BackupRestore]",
                 // Non-bracket patterns
-                "Applying migration:", // Migration logs have different format
-                "Registered migration",
                 "Started monitoring",
                 "Stopped monitoring",
                 "Site added successfully:",
@@ -606,7 +606,8 @@ describe("Log Templates", () => {
 
             for (const message of serviceValues) {
                 const hasKnownPrefix = knownPrefixes.some((prefix) =>
-                    message.startsWith(prefix));
+                    message.startsWith(prefix)
+                );
                 expect(hasKnownPrefix).toBeTruthy();
             }
         });

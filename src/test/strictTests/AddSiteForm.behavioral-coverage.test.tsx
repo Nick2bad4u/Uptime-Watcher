@@ -84,7 +84,10 @@ vi.mock("../../stores/sites/useSitesStore", () => ({
 const useErrorStoreMock = vi.fn();
 
 vi.mock("../../stores/error/useErrorStore", () => ({
-    useErrorStore: () => useErrorStoreMock(),
+    useErrorStore: (selector?: (state: unknown) => unknown) => {
+        const state = useErrorStoreMock();
+        return typeof selector === "function" ? selector(state) : state;
+    },
 }));
 
 const useMonitorTypesMock = vi.fn();
@@ -261,7 +264,7 @@ interface FormStateReferences {
     setBaselineUrl: ReturnType<typeof vi.fn>;
     setBodyKeyword: ReturnType<typeof vi.fn>;
     setCertificateWarningDays: ReturnType<typeof vi.fn>;
-    setCheckInterval: ReturnType<typeof vi.fn>;
+    setCheckIntervalMs: ReturnType<typeof vi.fn>;
     setEdgeLocations: ReturnType<typeof vi.fn>;
     setExpectedHeaderValue: ReturnType<typeof vi.fn>;
     setExpectedJsonValue: ReturnType<typeof vi.fn>;
@@ -277,7 +280,7 @@ interface FormStateReferences {
     setJsonPath: ReturnType<typeof vi.fn>;
     setMaxPongDelayMs: ReturnType<typeof vi.fn>;
     setMaxReplicationLagSeconds: ReturnType<typeof vi.fn>;
-    setMaxResponseTime: ReturnType<typeof vi.fn>;
+    setMaxResponseTimeMs: ReturnType<typeof vi.fn>;
     setMonitorType: ReturnType<typeof vi.fn>;
     setName: ReturnType<typeof vi.fn>;
     setPort: ReturnType<typeof vi.fn>;
@@ -303,7 +306,7 @@ const createFormState = (
         baselineUrl: "",
         bodyKeyword: "",
         certificateWarningDays: "",
-        checkInterval: 60_000,
+        checkIntervalMs: 60_000,
         edgeLocations: "",
         expectedHeaderValue: "",
         expectedJsonValue: "",
@@ -320,7 +323,7 @@ const createFormState = (
         jsonPath: "",
         maxPongDelayMs: "",
         maxReplicationLagSeconds: "",
-        maxResponseTime: "",
+        maxResponseTimeMs: "",
         monitorType: "http",
         name: "My Site",
         port: "80",
@@ -334,7 +337,7 @@ const createFormState = (
         setBaselineUrl: defaultSetter(),
         setBodyKeyword: defaultSetter(),
         setCertificateWarningDays: defaultSetter(),
-        setCheckInterval: defaultSetter(),
+        setCheckIntervalMs: defaultSetter(),
         setEdgeLocations: defaultSetter(),
         setExpectedHeaderValue: defaultSetter(),
         setExpectedJsonValue: defaultSetter(),
@@ -350,7 +353,7 @@ const createFormState = (
         setJsonPath: defaultSetter(),
         setMaxPongDelayMs: defaultSetter(),
         setMaxReplicationLagSeconds: defaultSetter(),
-        setMaxResponseTime: defaultSetter(),
+        setMaxResponseTimeMs: defaultSetter(),
         setMonitorType: defaultSetter(),
         setName: defaultSetter(),
         setPort: defaultSetter(),
@@ -440,7 +443,7 @@ describe("AddSiteForm behavioral coverage", () => {
         const intervalSelect = selectFieldProps.get("checkInterval");
         expect(intervalSelect).toBeDefined();
         intervalSelect?.onChange("120000");
-        expect(formStateRefs.setCheckInterval).toHaveBeenCalledWith(120_000);
+        expect(formStateRefs.setCheckIntervalMs).toHaveBeenCalledWith(120_000);
 
         intervalSelect?.onChange("NaN-value");
         expect(loggerErrorMock).toHaveBeenCalledWith(
@@ -496,7 +499,8 @@ describe("AddSiteForm behavioral coverage", () => {
             createFormState({
                 addMode: "existing",
                 selectedExistingSite: "site-1",
-            }));
+            })
+        );
         render(<AddSiteForm />);
 
         const existingSiteSelect = selectFieldProps.get("selectedSite");
@@ -545,7 +549,8 @@ describe("AddSiteForm behavioral coverage", () => {
             expect(loggerErrorMock).toHaveBeenCalledWith(
                 "Form submission failed:",
                 expect.objectContaining({ message: "network failure" })
-            ));
+            )
+        );
     });
 
     it("displays errors and clears them via alert dismiss", () => {
@@ -560,7 +565,8 @@ describe("AddSiteForm behavioral coverage", () => {
             createFormState({
                 formError: "validation failed",
                 setFormError: setFormErrorSpy,
-            }));
+            })
+        );
 
         render(<AddSiteForm />);
         expect(errorAlertProps).toBeDefined();

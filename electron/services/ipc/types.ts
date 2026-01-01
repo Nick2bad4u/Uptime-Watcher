@@ -26,13 +26,16 @@ export type IpcValidationResponse = SharedIpcValidationResponse;
  *
  * @public
  */
-export interface IpcHandlerConfig<TParams = unknown[], TResult = unknown> {
+export interface IpcHandlerConfig<
+    TParams extends readonly unknown[] = readonly unknown[],
+    TResult = unknown,
+> {
     /** Channel name for the IPC handler */
     channelName: string;
     /** The actual handler function */
-    handler: (...args: TParams[]) => Promise<TResult> | TResult;
+    handler: (...args: TParams) => Promise<TResult> | TResult;
     /** Optional parameter validation function */
-    validateParams?: (params: unknown[]) => null | string[];
+    validateParams?: IpcParameterValidator;
 }
 
 /**

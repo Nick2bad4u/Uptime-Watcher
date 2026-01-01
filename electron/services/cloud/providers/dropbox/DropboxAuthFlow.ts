@@ -1,15 +1,15 @@
+import { openExternalOrThrow } from "@electron/services/shell/openExternalUtils";
+import { tryGetErrorCode } from "@shared/utils/errorCodes";
 import { ensureError } from "@shared/utils/errorHandling";
-import {
-    getSafeUrlForLogging,
-    isAllowedExternalOpenUrl,
-} from "@shared/utils/urlSafety";
+import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import { DropboxAuth } from "dropbox";
-import { shell } from "electron";
 import crypto from "node:crypto";
 import http from "node:http";
 import * as z from "zod";
 
 import type { DropboxTokens } from "./DropboxTokens";
+
+import { validateOAuthAuthorizeUrl } from "../oauthAuthorizeUrl";
 
 /* eslint-disable @microsoft/sdl/no-insecure-url -- OAuth loopback redirects require http://localhost; https would require local certificates. */
 
@@ -49,7 +49,7 @@ function createRandomState(): string {
 function handleUnexpectedOAuthRuntimeError(error: unknown): void {
     // Should never be used; replaced before listeners are registered.
     throw new Error(
-        `Unexpected OAuth runtime error handler invocation: ${String(error)}`
+        `Unexpected OAuth runtime error handler invocation: ${getUserFacingErrorDetail(error)}`
     );
 }
 
@@ -63,6 +63,22 @@ function handleUnexpectedOAuthRequest(
         "Content-Type": "text/plain; charset=utf-8",
     });
     response.end(`Unexpected OAuth request handler invocation: ${url}`);
+}
+
+function applyLoopbackResponseHeaders(
+    response: http.ServerResponse,
+    contentType: "text/html; charset=utf-8" | "text/plain; charset=utf-8"
+): void {
+    response.setHeader("Content-Type", contentType);
+
+    // Defensive security headers for the browser page.
+    response.setHeader("Cache-Control", "no-store");
+    response.setHeader("X-Content-Type-Options", "nosniff");
+    response.setHeader("Referrer-Policy", "no-referrer");
+    response.setHeader(
+        "Content-Security-Policy",
+        "default-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'"
+    );
 }
 
 type DropboxAuthClient = Pick<
@@ -87,9 +103,7 @@ async function closeServerSafely(server: http.Server): Promise<void> {
                 resolve();
             });
         } catch (error: unknown) {
-            const resolved = ensureError(error);
-            const { code } = resolved as Error & { code?: unknown };
-            if (code === "ERR_SERVER_NOT_RUNNING") {
+            if (tryGetErrorCode(error) === "ERR_SERVER_NOT_RUNNING") {
                 resolve();
                 return;
             }
@@ -160,44 +174,22 @@ export class DropboxAuthFlow {
                 )
             );
 
-            const authorizeUrlForLog = getSafeUrlForLogging(authorizeUrl);
-            const parsedAuthorizeUrl = new URL(authorizeUrl);
-            if (
-                parsedAuthorizeUrl.protocol !== "https:" ||
-                parsedAuthorizeUrl.username.length > 0 ||
-                parsedAuthorizeUrl.password.length > 0
-            ) {
-                throw new Error(
-                    `Refusing to open unexpected Dropbox OAuth URL: ${authorizeUrlForLog}`
-                );
-            }
-
-            if (!isAllowedExternalOpenUrl(authorizeUrl)) {
-                throw new Error(
-                    `Refusing to open disallowed Dropbox OAuth URL: ${authorizeUrlForLog}`
-                );
-            }
+            const { normalizedUrl, urlForLog: authorizeUrlForLog } =
+                validateOAuthAuthorizeUrl({
+                    providerName: "Dropbox",
+                    url: authorizeUrl,
+                });
 
             const callbackPromise = this.waitForOAuthCallback({
                 servers,
                 timeoutMs: args.timeoutMs,
             });
 
-            try {
-                await shell.openExternal(authorizeUrl);
-            } catch (error: unknown) {
-                const resolved = ensureError(error);
-                const { code } = resolved as Error & { code?: unknown };
-                const codeSuffix =
-                    typeof code === "string" && code.length > 0
-                        ? ` (${code})`
-                        : "";
-
-                throw new Error(
-                    `Failed to open Dropbox OAuth URL: ${authorizeUrlForLog}${codeSuffix}`,
-                    { cause: error }
-                );
-            }
+            await openExternalOrThrow({
+                failureMessagePrefix: "Failed to open Dropbox OAuth URL",
+                normalizedUrl,
+                safeUrlForLogging: authorizeUrlForLog,
+            });
 
             const callback = await callbackPromise;
             if (callback.state !== args.state) {
@@ -208,7 +200,11 @@ export class DropboxAuthFlow {
         } catch (error: unknown) {
             const resolved = ensureError(error);
 
-            if (this.loopbackPort !== 0 && resolved.message.includes("EADDR")) {
+            const code = tryGetErrorCode(error);
+            const isAddressBindingError =
+                typeof code === "string" && code.startsWith("EADDR");
+
+            if (this.loopbackPort !== 0 && isAddressBindingError) {
                 throw new Error(
                     "Dropbox OAuth loopback server failed to start on both IPv4 and IPv6. " +
                         "Ensure IPv6 is enabled or change the configured redirect URI to use 127.0.0.1.",
@@ -351,21 +347,47 @@ export class DropboxAuthFlow {
                 response: http.ServerResponse
             ): void {
                 if (settled) {
-                    response.writeHead(410, {
-                        "Content-Type": "text/plain; charset=utf-8",
-                    });
+                    response.statusCode = 410;
+                    applyLoopbackResponseHeaders(
+                        response,
+                        "text/plain; charset=utf-8"
+                    );
                     response.end("Request already handled");
                     return;
                 }
 
-                try {
-                    const requestUrl = new URL(
-                        request.url ?? "/",
-                        `http://${request.headers.host ?? LOOPBACK_IP_HOST_4}`
+                if (request.method && request.method !== "GET") {
+                    response.statusCode = 405;
+                    applyLoopbackResponseHeaders(
+                        response,
+                        "text/plain; charset=utf-8"
                     );
+                    response.end("Method not allowed");
+                    return;
+                }
+
+                try {
+                    const rawUrl = request.url ?? "/";
+                    // Only accept origin-form URIs (path + query) to avoid
+                    // ambiguous absolute-form requests.
+                    if (!rawUrl.startsWith("/")) {
+                        response.statusCode = 400;
+                        applyLoopbackResponseHeaders(
+                            response,
+                            "text/plain; charset=utf-8"
+                        );
+                        response.end("Bad request");
+                        return;
+                    }
+
+                    const requestUrl = new URL(rawUrl, "http://localhost");
 
                     if (requestUrl.pathname !== LOOPBACK_PATH) {
-                        response.writeHead(404);
+                        response.statusCode = 404;
+                        applyLoopbackResponseHeaders(
+                            response,
+                            "text/plain; charset=utf-8"
+                        );
                         response.end();
                         return;
                     }
@@ -376,9 +398,11 @@ export class DropboxAuthFlow {
                         requestUrl.searchParams.get("error_description");
 
                     if (errorDescription) {
-                        response.writeHead(400, {
-                            "Content-Type": "text/plain; charset=utf-8",
-                        });
+                        response.statusCode = 400;
+                        applyLoopbackResponseHeaders(
+                            response,
+                            "text/plain; charset=utf-8"
+                        );
                         response.end(`OAuth error: ${errorDescription}`);
                         fail(
                             new Error(
@@ -389,9 +413,11 @@ export class DropboxAuthFlow {
                     }
 
                     if (!code || !state) {
-                        response.writeHead(400, {
-                            "Content-Type": "text/plain; charset=utf-8",
-                        });
+                        response.statusCode = 400;
+                        applyLoopbackResponseHeaders(
+                            response,
+                            "text/plain; charset=utf-8"
+                        );
                         response.end("Missing code/state");
                         fail(
                             new Error(
@@ -400,10 +426,11 @@ export class DropboxAuthFlow {
                         );
                         return;
                     }
-
-                    response.writeHead(200, {
-                        "Content-Type": "text/html; charset=utf-8",
-                    });
+                    response.statusCode = 200;
+                    applyLoopbackResponseHeaders(
+                        response,
+                        "text/html; charset=utf-8"
+                    );
                     response.end(
                         "<html><body><h1>Connected</h1><p>You can close this tab and return to Uptime Watcher.</p></body></html>"
                     );

@@ -501,7 +501,8 @@ describe("SettingsService", () => {
 
             await Promise.all(promises);
 
-            expect(mockWaitForElectronBridge).toHaveBeenCalledTimes(3);
+            // Concurrent operations share a single in-flight initialization.
+            expect(mockWaitForElectronBridge).toHaveBeenCalledTimes(1);
             expect(
                 mockElectronAPI.settings.getHistoryLimit
             ).toHaveBeenCalledTimes(2);
@@ -826,7 +827,9 @@ describe("SettingsService", () => {
 
             await Promise.all(promises);
 
-            expect(mockWaitForElectronBridge).toHaveBeenCalledTimes(30);
+            // All operations are created in the same tick; they share a single
+            // in-flight initialization check.
+            expect(mockWaitForElectronBridge).toHaveBeenCalledTimes(1);
         });
     });
 });

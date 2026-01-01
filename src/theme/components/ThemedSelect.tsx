@@ -50,7 +50,6 @@ import type {
     EventHandlers,
 } from "@shared/types/componentProps";
 import type {
-    CSSProperties,
     ForwardedRef,
     ForwardRefExoticComponent,
     JSX,
@@ -60,8 +59,12 @@ import type {
 
 import { forwardRef, memo, useMemo } from "react";
 
-import { ARIA_LABEL, TRANSITION_ALL } from "../../constants";
+import { ARIA_LABEL } from "../../constants";
 import { useTheme, useThemeClasses } from "../useTheme";
+import {
+    type ThemedControlTone,
+    useThemedControlStyles,
+} from "./useThemedControlStyles";
 
 /**
  * Properties for the ThemedSelect component.
@@ -91,7 +94,7 @@ export interface ThemedSelectProperties
     /** Tooltip text that appears on hover */
     readonly title?: string;
     /** Visual tone applied to the control surface */
-    readonly tone?: "default" | "transparent";
+    readonly tone?: ThemedControlTone;
     /** Current selected value */
     readonly value?: number | string;
 }
@@ -127,32 +130,19 @@ const ForwardedSelect = forwardRef<HTMLSelectElement, ThemedSelectProperties>(
 
         const selectValue = value ?? "";
 
-        const styles = useMemo(
-            (): CSSProperties => ({
-                ...getBackgroundClass("primary"),
-                ...getTextClass("primary"),
-                ...getBorderClass("primary"),
-                borderRadius: currentTheme.borderRadius.md,
-                borderStyle: "solid",
-                borderWidth: tone === "transparent" ? "0" : "1px",
-                cursor: disabled ? "not-allowed" : "pointer",
-                fontSize: currentTheme.typography.fontSize.sm,
-                padding: `${currentTheme.spacing.sm} ${currentTheme.spacing.md}`,
-                transition: TRANSITION_ALL,
-                ...(fluid ? { width: "100%" } : {}),
-                ...(tone === "transparent"
-                    ? {
-                          backgroundColor: "transparent",
-                          borderColor: "transparent",
-                          padding: "0",
-                      }
-                    : {}),
+        const controlStyleArgs = useMemo(
+            () => ({
+                currentTheme,
+                cursor: "pointer" as const,
+                disabled,
+                fluid,
+                getBackgroundClass,
+                getBorderClass,
+                getTextClass,
+                tone,
             }),
             [
-                currentTheme.borderRadius.md,
-                currentTheme.spacing.md,
-                currentTheme.spacing.sm,
-                currentTheme.typography.fontSize.sm,
+                currentTheme,
                 disabled,
                 fluid,
                 getBackgroundClass,
@@ -161,6 +151,8 @@ const ForwardedSelect = forwardRef<HTMLSelectElement, ThemedSelectProperties>(
                 tone,
             ]
         );
+
+        const styles = useThemedControlStyles(controlStyleArgs);
 
         return (
             <select

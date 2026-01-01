@@ -9,7 +9,17 @@ import { useDelayedButtonLoading } from "../../hooks/useDelayedButtonLoading";
 import { useDynamicHelpText } from "../../hooks/useDynamicHelpText";
 import { useMonitorTypes } from "../../hooks/useMonitorTypes";
 import { logger } from "../../services/logger";
+import {
+    selectClearError,
+    selectErrorIsLoading,
+    selectLastError,
+} from "../../stores/error/selectors";
 import { useErrorStore } from "../../stores/error/useErrorStore";
+import {
+    selectAddMonitorToSite,
+    selectCreateSite,
+    selectSites,
+} from "../../stores/sites/selectors";
 import { useSitesStore } from "../../stores/sites/useSitesStore";
 import { ThemedButton } from "../../theme/components/ThemedButton";
 import { ThemedText } from "../../theme/components/ThemedText";
@@ -127,9 +137,15 @@ const MonitorConfigIcon = AppIcons.metrics.monitor;
 
 export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
     function AddSiteForm({ onSuccess }: AddSiteFormProperties) {
-        // Combine store calls to avoid duplicates and improve performance
-        const { clearError, isLoading, lastError } = useErrorStore();
-        const { addMonitorToSite, createSite, sites } = useSitesStore();
+        // Subscribe only to the fields we actually use, otherwise this form
+        // rerenders on unrelated store updates.
+        const clearError = useErrorStore(selectClearError);
+        const isLoading = useErrorStore(selectErrorIsLoading);
+        const lastError = useErrorStore(selectLastError);
+
+        const addMonitorToSite = useSitesStore(selectAddMonitorToSite);
+        const createSite = useSitesStore(selectCreateSite);
+        const sites = useSitesStore(selectSites);
 
         // Load monitor types from backend
         const {
@@ -143,7 +159,7 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
             baselineUrl,
             bodyKeyword,
             certificateWarningDays,
-            checkInterval,
+            checkIntervalMs,
             edgeLocations,
             expectedHeaderValue,
             expectedJsonValue,
@@ -159,7 +175,7 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
             jsonPath,
             maxPongDelayMs,
             maxReplicationLagSeconds,
-            maxResponseTime,
+            maxResponseTimeMs,
             monitorFieldsError,
             monitorType,
             name,
@@ -174,7 +190,7 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
             setBaselineUrl,
             setBodyKeyword,
             setCertificateWarningDays,
-            setCheckInterval,
+            setCheckIntervalMs,
             setEdgeLocations,
             setExpectedHeaderValue,
             setExpectedJsonValue,
@@ -190,7 +206,7 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
             setJsonPath,
             setMaxPongDelayMs,
             setMaxReplicationLagSeconds,
-            setMaxResponseTime,
+            setMaxResponseTimeMs,
             setMonitorType,
             setName,
             setPort,
@@ -272,10 +288,10 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
                 if (Number.isNaN(numericValue)) {
                     logger.error(`Invalid check interval value: ${value}`);
                 } else {
-                    setCheckInterval(numericValue);
+                    setCheckIntervalMs(numericValue);
                 }
             },
-            [setCheckInterval]
+            [setCheckIntervalMs]
         );
 
         // Combined success callback that resets form and calls prop callback
@@ -343,8 +359,8 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
                 maxReplicationLagSeconds: (value: number | string): void => {
                     setMaxReplicationLagSeconds(String(value));
                 },
-                maxResponseTime: (value: number | string): void => {
-                    setMaxResponseTime(String(value));
+                maxResponseTimeMs: (value: number | string): void => {
+                    setMaxResponseTimeMs(String(value));
                 },
                 port: (value: number | string): void => {
                     setPort(String(value));
@@ -383,7 +399,7 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
                 setJsonPath,
                 setMaxPongDelayMs,
                 setMaxReplicationLagSeconds,
-                setMaxResponseTime,
+                setMaxResponseTimeMs,
                 setPort,
                 setPrimaryStatusUrl,
                 setRecordType,
@@ -413,7 +429,7 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
                 jsonPath,
                 maxPongDelayMs,
                 maxReplicationLagSeconds,
-                maxResponseTime,
+                maxResponseTimeMs,
                 port,
                 primaryStatusUrl,
                 recordType,
@@ -439,7 +455,7 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
                 jsonPath,
                 maxPongDelayMs,
                 maxReplicationLagSeconds,
-                maxResponseTime,
+                maxResponseTimeMs,
                 port,
                 primaryStatusUrl,
                 recordType,
@@ -470,9 +486,10 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
                         baselineUrl,
                         bodyKeyword,
                         certificateWarningDays,
-                        checkInterval,
+                        checkIntervalMs,
                         clearError,
                         createSite,
+                        dynamicFieldValues,
                         edgeLocations,
                         expectedHeaderValue,
                         expectedJsonValue,
@@ -490,7 +507,7 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
                         logger,
                         maxPongDelayMs,
                         maxReplicationLagSeconds,
-                        maxResponseTime,
+                        maxResponseTimeMs,
                         monitorType,
                         name,
                         onSuccess: handleSuccess,
@@ -519,9 +536,10 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
                 baselineUrl,
                 bodyKeyword,
                 certificateWarningDays,
-                checkInterval,
+                checkIntervalMs,
                 clearError,
                 createSite,
+                dynamicFieldValues,
                 edgeLocations,
                 expectedHeaderValue,
                 expectedJsonValue,
@@ -538,7 +556,7 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
                 jsonPath,
                 maxPongDelayMs,
                 maxReplicationLagSeconds,
-                maxResponseTime,
+                maxResponseTimeMs,
                 monitorType,
                 name,
                 port,
@@ -801,7 +819,7 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
                                 label="Check Interval"
                                 onChange={handleCheckIntervalChange}
                                 options={checkIntervalOptions}
-                                value={String(checkInterval)}
+                                value={String(checkIntervalMs)}
                             />
                         </div>
                     </section>

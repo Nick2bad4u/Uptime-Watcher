@@ -9,8 +9,6 @@ import { describe, expect, it } from "vitest";
 import {
     DEFAULT_MONITOR_TIMEOUT_SECONDS,
     DEFAULT_RETRY_ATTEMPTS,
-    MAX_LOG_DATA_LENGTH,
-    MAX_MIGRATION_STEPS,
     MIN_CHECK_INTERVAL,
     MONITOR_TIMEOUT_BUFFER_MS,
     SECONDS_TO_MS_MULTIPLIER,
@@ -150,77 +148,6 @@ describe("Monitoring Service Constants", () => {
         });
     });
 
-    describe("Migration Configuration", () => {
-        it("should export MAX_MIGRATION_STEPS with correct value", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: monitoring constants", "component");
-            await annotate("Constant: MAX_MIGRATION_STEPS", "constant");
-            await annotate("Expected value: 100", "expected");
-
-            expect(MAX_MIGRATION_STEPS).toBe(100);
-            expect(typeof MAX_MIGRATION_STEPS).toBe("number");
-        });
-
-        it("should export MAX_LOG_DATA_LENGTH with correct value", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: monitoring constants", "component");
-            await annotate("Constant: MAX_LOG_DATA_LENGTH", "constant");
-            await annotate("Expected value: 500 characters", "expected");
-
-            expect(MAX_LOG_DATA_LENGTH).toBe(500);
-            expect(typeof MAX_LOG_DATA_LENGTH).toBe("number");
-        });
-
-        it("should have reasonable migration limits", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: monitoring constants", "component");
-            await annotate(
-                "Test case: Migration limits validation",
-                "test-case"
-            );
-            await annotate("Safety: Prevent excessive migrations", "safety");
-
-            // Migration steps should be positive and not excessive
-            expect(MAX_MIGRATION_STEPS).toBeGreaterThan(0);
-            expect(MAX_MIGRATION_STEPS).toBeLessThanOrEqual(1000); // Reasonable upper bound
-
-            // Log data length should be positive and manageable
-            expect(MAX_LOG_DATA_LENGTH).toBeGreaterThan(0);
-            expect(MAX_LOG_DATA_LENGTH).toBeLessThanOrEqual(10_000); // Reasonable log size
-        });
-
-        it("should have migration steps greater than typical needs", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: monitoring constants", "component");
-            await annotate(
-                "Test case: Migration capacity validation",
-                "test-case"
-            );
-            await annotate(
-                "Purpose: Support complex migration scenarios",
-                "purpose"
-            );
-
-            // Should support a reasonable number of migration steps
-            expect(MAX_MIGRATION_STEPS).toBeGreaterThanOrEqual(10); // Minimum useful value
-            expect(MAX_MIGRATION_STEPS).toBeGreaterThanOrEqual(
-                DEFAULT_RETRY_ATTEMPTS * 10
-            ); // Much larger than retry attempts
-        });
-    });
-
     describe("Constant Relationships", () => {
         it("should have buffer time less than default timeout", async ({
             task,
@@ -276,27 +203,6 @@ describe("Monitoring Service Constants", () => {
             expect(maxRetryTime).toBeLessThanOrEqual(300); // Should complete within 5 minutes
         });
 
-        it("should have log data length appropriate for debugging", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "integration");
-            await annotate("Component: monitoring constants", "component");
-            await annotate(
-                "Relationship: Log Length vs Usefulness",
-                "relationship"
-            );
-            await annotate(
-                "Balance: Detailed enough but not excessive",
-                "balance"
-            );
-
-            // Log data should be large enough for meaningful context
-            expect(MAX_LOG_DATA_LENGTH).toBeGreaterThanOrEqual(100); // Minimum useful length
-
-            // But not so large as to overwhelm logs
-            expect(MAX_LOG_DATA_LENGTH).toBeLessThanOrEqual(5000);
-        });
     });
 
     describe("Constant Types and Immutability", () => {
@@ -318,8 +224,6 @@ describe("Monitoring Service Constants", () => {
                 DEFAULT_MONITOR_TIMEOUT_SECONDS,
                 MONITOR_TIMEOUT_BUFFER_MS,
                 SECONDS_TO_MS_MULTIPLIER,
-                MAX_MIGRATION_STEPS,
-                MAX_LOG_DATA_LENGTH,
             };
 
             for (const [name, value] of Object.entries(constants)) {
@@ -355,8 +259,6 @@ describe("Monitoring Service Constants", () => {
                 DEFAULT_MONITOR_TIMEOUT_SECONDS,
                 MONITOR_TIMEOUT_BUFFER_MS,
                 SECONDS_TO_MS_MULTIPLIER,
-                MAX_MIGRATION_STEPS,
-                MAX_LOG_DATA_LENGTH,
             ];
 
             for (const value of constants) {
@@ -378,8 +280,6 @@ describe("Monitoring Service Constants", () => {
 
             // These should be integers (counts, steps, etc.)
             expect(Number.isInteger(DEFAULT_RETRY_ATTEMPTS)).toBeTruthy();
-            expect(Number.isInteger(MAX_MIGRATION_STEPS)).toBeTruthy();
-            expect(Number.isInteger(MAX_LOG_DATA_LENGTH)).toBeTruthy();
             expect(Number.isInteger(SECONDS_TO_MS_MULTIPLIER)).toBeTruthy();
 
             // Time intervals should also be integers (milliseconds/seconds)
@@ -442,33 +342,5 @@ describe("Monitoring Service Constants", () => {
             );
         });
 
-        it("should support migration logging scenarios", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "integration");
-            await annotate("Component: monitoring constants", "component");
-            await annotate("Scenario: Migration with logging", "scenario");
-            await annotate(
-                "Feature: Error logging with size limits",
-                "feature"
-            );
-
-            // Simulate a migration with multiple steps and logging
-            const stepsPerMigration = 10;
-            const avgLogDataPerStep = MAX_LOG_DATA_LENGTH / 2; // Average usage
-
-            const maxMigrations = Math.floor(
-                MAX_MIGRATION_STEPS / stepsPerMigration
-            );
-            const totalLogData =
-                maxMigrations * stepsPerMigration * avgLogDataPerStep;
-
-            // Should support reasonable number of migrations
-            expect(maxMigrations).toBeGreaterThanOrEqual(5);
-
-            // Total log data should be manageable (less than 10MB)
-            expect(totalLogData).toBeLessThan(10 * 1024 * 1024);
-        });
     });
 });

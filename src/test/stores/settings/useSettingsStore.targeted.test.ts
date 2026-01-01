@@ -50,7 +50,8 @@ vi.mock("../../../stores/utils", () => ({
 vi.mock("../../../../shared/utils/errorHandling", () => ({
     withErrorHandling: vi.fn(),
     ensureError: vi.fn((error) =>
-        error instanceof Error ? error : new Error(String(error))),
+        error instanceof Error ? error : new Error(String(error))
+    ),
 }));
 
 // Import mocked modules
@@ -118,19 +119,18 @@ describe("useSettingsStore - Targeted Coverage", () => {
         });
 
         // Setup default withErrorHandling behavior
-        mockWithErrorHandling.mockImplementation(async (
-            asyncFn,
-            errorHandler
-        ) => {
-            try {
-                return await asyncFn();
-            } catch (error: unknown) {
-                if (errorHandler && "setError" in errorHandler) {
-                    errorHandler.setError(String(error));
+        mockWithErrorHandling.mockImplementation(
+            async (asyncFn, errorHandler) => {
+                try {
+                    return await asyncFn();
+                } catch (error: unknown) {
+                    if (errorHandler && "setError" in errorHandler) {
+                        errorHandler.setError(String(error));
+                    }
+                    throw error;
                 }
-                throw error;
             }
-        });
+        );
     });
 
     afterEach(() => {
@@ -285,19 +285,18 @@ describe("useSettingsStore - Targeted Coverage", () => {
             );
 
             // Mock withErrorHandling to throw the error
-            mockWithErrorHandling.mockImplementation(async (
-                asyncFn,
-                errorHandler
-            ) => {
-                try {
-                    return await asyncFn();
-                } catch (error) {
-                    if (errorHandler && "setError" in errorHandler) {
-                        errorHandler.setError(String(error));
+            mockWithErrorHandling.mockImplementation(
+                async (asyncFn, errorHandler) => {
+                    try {
+                        return await asyncFn();
+                    } catch (error) {
+                        if (errorHandler && "setError" in errorHandler) {
+                            errorHandler.setError(String(error));
+                        }
+                        throw error;
                     }
-                    throw error;
                 }
-            });
+            );
 
             const { syncFromBackend } = useSettingsStore.getState();
 
@@ -371,19 +370,18 @@ describe("useSettingsStore - Targeted Coverage", () => {
                 apiError
             );
 
-            mockWithErrorHandling.mockImplementation(async (
-                asyncFn,
-                errorHandler
-            ) => {
-                try {
-                    return await asyncFn();
-                } catch (error) {
-                    if (errorHandler && "setError" in errorHandler) {
-                        errorHandler.setError(String(error));
+            mockWithErrorHandling.mockImplementation(
+                async (asyncFn, errorHandler) => {
+                    try {
+                        return await asyncFn();
+                    } catch (error) {
+                        if (errorHandler && "setError" in errorHandler) {
+                            errorHandler.setError(String(error));
+                        }
+                        throw error;
                     }
-                    throw error;
                 }
-            });
+            );
 
             const { syncFromBackend } = useSettingsStore.getState();
 

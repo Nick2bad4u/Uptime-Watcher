@@ -72,7 +72,8 @@ vi.mock("../../common/MonitorUiComponents", () => ({
 
 describe(HistoryTab, () => {
     const mockFormatFullTimestamp = vi.fn((timestamp: number) =>
-        new Date(timestamp).toISOString());
+        new Date(timestamp).toISOString()
+    );
     const mockFormatResponseTime = vi.fn((time: number) => `${time}ms`);
 
     const createMockMonitor = (historyLength: number = 5): Monitor => ({
@@ -221,7 +222,8 @@ describe(HistoryTab, () => {
                         {...defaultProps}
                         selectedMonitor={monitorWithUndefinedHistory}
                     />
-                )).not.toThrowError();
+                )
+            ).not.toThrowError();
         });
 
         it("should handle history records with missing fields", ({
@@ -252,7 +254,8 @@ describe(HistoryTab, () => {
                         {...defaultProps}
                         selectedMonitor={monitorWithIncompleteHistory}
                     />
-                )).not.toThrowError();
+                )
+            ).not.toThrowError();
         });
     });
 });

@@ -6,6 +6,7 @@ import {
     normalizeHistoryLimit,
 } from "@shared/constants/history";
 import { ensureError, withErrorHandling } from "@shared/utils/errorHandling";
+import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 
 import type { SettingsStore } from "./types";
 
@@ -63,37 +64,41 @@ export const createSettingsOperationsSlice = (
         }
 
         try {
-            const cleanup = await EventsService.onHistoryLimitUpdated((
-                event
-            ) => {
-                const currentSettings = getState().settings;
+            const cleanup = await EventsService.onHistoryLimitUpdated(
+                (event) => {
+                    const currentSettings = getState().settings;
 
-                if (currentSettings.historyLimit === event.limit) {
-                    return;
-                }
-
-                logStoreAction("SettingsStore", "historyLimitUpdatedEvent", {
-                    limit: event.limit,
-                    previousLimit: event.previousLimit,
-                    timestamp: event.timestamp,
-                });
-
-                logger.debug(
-                    "[SettingsStore] Applying history limit update from backend",
-                    {
-                        limit: event.limit,
-                        previousLimit: event.previousLimit,
-                        timestamp: event.timestamp,
+                    if (currentSettings.historyLimit === event.limit) {
+                        return;
                     }
-                );
 
-                setState({
-                    settings: normalizeAppSettings({
-                        ...currentSettings,
-                        historyLimit: event.limit,
-                    }),
-                });
-            });
+                    logStoreAction(
+                        "SettingsStore",
+                        "historyLimitUpdatedEvent",
+                        {
+                            limit: event.limit,
+                            previousLimit: event.previousLimit,
+                            timestamp: event.timestamp,
+                        }
+                    );
+
+                    logger.debug(
+                        "[SettingsStore] Applying history limit update from backend",
+                        {
+                            limit: event.limit,
+                            previousLimit: event.previousLimit,
+                            timestamp: event.timestamp,
+                        }
+                    );
+
+                    setState({
+                        settings: normalizeAppSettings({
+                            ...currentSettings,
+                            historyLimit: event.limit,
+                        }),
+                    });
+                }
+            );
 
             // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- Guard against race conditions when concurrent callers initialize after await.
             if (historyLimitSubscriptionRef.current) {
@@ -167,8 +172,7 @@ export const createSettingsOperationsSlice = (
                 } as const;
 
                 logStoreAction("SettingsStore", "initializeSettings", {
-                    error:
-                        error instanceof Error ? error.message : String(error),
+                    error: getUserFacingErrorDetail(error),
                     message: fallbackResult.message,
                     settingsLoaded: fallbackResult.settingsLoaded,
                     success: fallbackResult.success,

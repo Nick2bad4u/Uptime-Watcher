@@ -93,10 +93,6 @@ export function ensureRecordLike(value: unknown): undefined | UnknownRecord {
  * @returns Property value or undefined
  */
 export function safePropertyAccess(obj: unknown, key: string): unknown {
-    // Special-case arrays for common 'length' access in tests
-    if (Array.isArray(obj) && key === "length") {
-        return obj.length;
-    }
     if (isRecord(obj) && key in obj) {
         return obj[key];
     }

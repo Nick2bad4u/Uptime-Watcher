@@ -55,27 +55,30 @@ export function mergeMonitorStatusChange(
             return site;
         }
 
-        const monitorExists = site.monitors.some(
-            (monitor) => monitor.id === event.monitorId
-        );
+        let monitorFound = false;
+        const updatedMonitors: Monitor[] = [];
 
-        if (!monitorExists && isDevelopment()) {
+        for (const monitor of site.monitors) {
+            if (monitor.id === event.monitorId) {
+                monitorFound = true;
+
+                // The status update payload carries the fresh monitor snapshot on
+                // `event.monitor`. The embedded `event.site` can legitimately lag
+                // behind (tests and some backend paths build it from the existing
+                // store snapshot), so we always merge using the monitor snapshot.
+                updatedMonitors.push(
+                    mergeMonitorSnapshots(monitor, event.monitor)
+                );
+            } else {
+                updatedMonitors.push(monitor);
+            }
+        }
+
+        if (!monitorFound && isDevelopment()) {
             logger.debug(
                 `Monitor ${event.monitorId} not found in site ${event.siteIdentifier}`
             );
         }
-
-        const updatedMonitors = site.monitors.map((monitor) => {
-            if (monitor.id !== event.monitorId) {
-                return monitor;
-            }
-
-            // The status update payload carries the fresh monitor snapshot on
-            // `event.monitor`. The embedded `event.site` can legitimately lag
-            // behind (tests and some backend paths build it from the existing
-            // store snapshot), so we always merge using the monitor snapshot.
-            return mergeMonitorSnapshots(monitor, event.monitor);
-        });
 
         return {
             ...site,

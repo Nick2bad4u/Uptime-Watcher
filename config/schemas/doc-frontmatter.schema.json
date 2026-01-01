@@ -25,9 +25,7 @@
         },
         "category": {
             "description": "Coarse document type; currently always 'guide' for docs/Guides/*.md.",
-            "enum": [
-                "guide"
-            ],
+            "enum": ["guide"],
             "type": "string"
         },
         "created": {
@@ -47,11 +45,7 @@
         },
         "status": {
             "description": "Optional lifecycle state of the document.",
-            "enum": [
-                "draft",
-                "active",
-                "deprecated"
-            ],
+            "enum": ["draft", "active", "deprecated"],
             "type": "string"
         },
         "summary": {

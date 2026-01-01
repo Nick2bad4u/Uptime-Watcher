@@ -59,8 +59,8 @@ import {
     rowsToSettings,
     rowToSettingValue,
     settingsToRecord,
-} from "./utils/settingsMapper";
-import { querySettingsRows } from "./utils/typedQueries";
+} from "./utils/mappers/settingsMapper";
+import { querySettingsRows } from "./utils/queries/typedQueries";
 
 /**
  * Defines the dependencies required by the SettingsRepository for managing

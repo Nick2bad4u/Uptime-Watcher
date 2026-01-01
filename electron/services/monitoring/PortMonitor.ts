@@ -109,13 +109,15 @@ export class PortMonitor implements IMonitorService {
             );
         }
 
+        const host = monitor.host.trim();
+
         // Use type-safe utility functions instead of type assertions
         const { retryAttempts, timeout } = createMonitorConfig(monitor, {
             timeout: this.config.timeout ?? DEFAULT_REQUEST_TIMEOUT,
         });
 
         return performPortCheckWithRetry(
-            monitor.host,
+            host,
             monitor.port,
             timeout,
             retryAttempts

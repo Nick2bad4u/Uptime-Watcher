@@ -29,9 +29,8 @@ import {
     recordPreloadGuardFailure,
     recordSuccessfulHandlerCheck,
 } from "../diagnosticsMetrics";
-import { registerStandardizedIpcHandler } from "../utils";
+import { createStandardizedIpcRegistrar } from "../utils";
 import { SystemHandlerValidators } from "../validators";
-import { withIgnoredIpcEvent } from "./handlerShared";
 
 const isUnknownRecord = (value: unknown): value is UnknownRecord =>
     isSharedRecord(value);
@@ -122,17 +121,18 @@ export function registerDiagnosticsHandlers({
     eventEmitter,
     registeredHandlers,
 }: DiagnosticsHandlersDependencies): void {
-    registerStandardizedIpcHandler(
+    const register = createStandardizedIpcRegistrar(registeredHandlers);
+
+    register(
         DIAGNOSTICS_CHANNELS.verifyIpcHandler,
-        withIgnoredIpcEvent((channelRaw) => {
+        (channelRaw) => {
             if (typeof channelRaw !== "string") {
                 throw new TypeError("Channel name must be a non-empty string");
             }
 
-            const availableChannels = Array.from(registeredHandlers).toSorted((
-                left,
-                right
-            ) => left.localeCompare(right));
+            const availableChannels = Array.from(registeredHandlers).toSorted(
+                (left, right) => left.localeCompare(right)
+            );
 
             const matchedChannel = availableChannels.find(
                 (registeredChannel) => registeredChannel === channelRaw
@@ -152,9 +152,9 @@ export function registerDiagnosticsHandlers({
                     withLogContext({
                         channel: channelRaw,
                         event: "diagnostics:verify-ipc-handler",
+                        metadata: logMetadata,
                         severity: "error",
-                    }),
-                    logMetadata
+                    })
                 );
             }
 
@@ -163,14 +163,13 @@ export function registerDiagnosticsHandlers({
                 channel: channelRaw,
                 registered: isRegistered,
             };
-        }),
-        SystemHandlerValidators.verifyIpcHandler,
-        registeredHandlers
+        },
+        SystemHandlerValidators.verifyIpcHandler
     );
 
-    registerStandardizedIpcHandler(
+    register(
         DIAGNOSTICS_CHANNELS.reportPreloadGuard,
-        withIgnoredIpcEvent((reportCandidate): undefined => {
+        (reportCandidate): undefined => {
             if (!isPreloadGuardDiagnosticsReport(reportCandidate)) {
                 throw new TypeError(
                     "Invalid preload guard diagnostics payload"
@@ -190,13 +189,15 @@ export function registerDiagnosticsHandlers({
             const logMetadata: PreloadGuardDiagnosticsLogMetadata = {
                 channel: report.channel,
                 guard: report.guard,
-                ...(report.metadata !== undefined && {
-                    metadata: report.metadata,
-                }),
-                ...(report.payloadPreview !== undefined && {
-                    payloadPreview: report.payloadPreview,
-                }),
-                ...(report.reason !== undefined && { reason: report.reason }),
+                ...(report.metadata === undefined
+                    ? {}
+                    : { metadata: report.metadata }),
+                ...(report.payloadPreview === undefined
+                    ? {}
+                    : { payloadPreview: report.payloadPreview }),
+                ...(report.reason === undefined
+                    ? {}
+                    : { reason: report.reason }),
                 timestamp: report.timestamp,
             };
 
@@ -227,9 +228,8 @@ export function registerDiagnosticsHandlers({
             });
 
             return undefined;
-        }),
-        SystemHandlerValidators.reportPreloadGuard,
-        registeredHandlers
+        },
+        SystemHandlerValidators.reportPreloadGuard
     );
 }
 

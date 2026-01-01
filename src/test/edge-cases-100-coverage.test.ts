@@ -436,7 +436,8 @@ describe("100% Coverage Edge Cases", () => {
 
         it("should handle rapid async operations", async () => {
             const operations = Array.from({ length: 10 }, (_, i) =>
-                vi.fn().mockResolvedValue(`result-${i}`));
+                vi.fn().mockResolvedValue(`result-${i}`)
+            );
 
             const promises = operations.map((op, i) =>
                 withUtilityErrorHandling(
@@ -444,7 +445,8 @@ describe("100% Coverage Edge Cases", () => {
                     `operation-${i}`,
                     `fallback-${i}`,
                     false
-                ));
+                )
+            );
 
             const results = await Promise.all(promises);
 
@@ -467,7 +469,8 @@ describe("100% Coverage Edge Cases", () => {
                     `operation-${i}`,
                     `fallback-${i}`,
                     false
-                ));
+                )
+            );
 
             const results = await Promise.all(promises);
 

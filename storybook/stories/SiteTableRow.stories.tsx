@@ -42,7 +42,8 @@ const incidentSite: Site = {
                   responseTime: 680,
                   status: "down",
               }
-            : monitor),
+            : monitor
+    ),
 };
 
 const pausedSite: Site = {

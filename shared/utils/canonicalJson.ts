@@ -22,7 +22,8 @@ export function createCanonicalJsonValue(value: JsonValue): JsonValue {
 
     if (isJsonRecord(value)) {
         const entries = Object.entries(value).toSorted(([a], [b]) =>
-            a.localeCompare(b));
+            a.localeCompare(b)
+        );
         const result: Record<string, JsonValue> = {};
         for (const [key, entryValue] of entries) {
             result[key] = createCanonicalJsonValue(entryValue);

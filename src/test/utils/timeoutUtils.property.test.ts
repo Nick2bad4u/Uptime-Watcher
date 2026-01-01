@@ -95,12 +95,13 @@ describe("TimeoutUtils Property-Based Tests", () => {
                 max: TIMEOUT_CONSTRAINTS_MS.MIN - 1,
                 noNaN: true,
             }),
-        ])("should return minimum value for inputs below minimum", (
-            belowMin
-        ) => {
-            const result = clampTimeoutMs(belowMin);
-            expect(result).toBe(TIMEOUT_CONSTRAINTS_MS.MIN);
-        });
+        ])(
+            "should return minimum value for inputs below minimum",
+            (belowMin) => {
+                const result = clampTimeoutMs(belowMin);
+                expect(result).toBe(TIMEOUT_CONSTRAINTS_MS.MIN);
+            }
+        );
 
         test.prop([
             fc.double({
@@ -108,12 +109,13 @@ describe("TimeoutUtils Property-Based Tests", () => {
                 max: 10_000_000,
                 noNaN: true,
             }),
-        ])("should return maximum value for inputs above maximum", (
-            aboveMax
-        ) => {
-            const result = clampTimeoutMs(aboveMax);
-            expect(result).toBe(TIMEOUT_CONSTRAINTS_MS.MAX);
-        });
+        ])(
+            "should return maximum value for inputs above maximum",
+            (aboveMax) => {
+                const result = clampTimeoutMs(aboveMax);
+                expect(result).toBe(TIMEOUT_CONSTRAINTS_MS.MAX);
+            }
+        );
 
         test.prop([fc.double()])(
             "should always return a value within valid range",
@@ -163,12 +165,13 @@ describe("TimeoutUtils Property-Based Tests", () => {
                 max: TIMEOUT_CONSTRAINTS.MIN - 0.1,
                 noNaN: true,
             }),
-        ])("should return minimum value for inputs below minimum", (
-            belowMin
-        ) => {
-            const result = clampTimeoutSeconds(belowMin);
-            expect(result).toBe(TIMEOUT_CONSTRAINTS.MIN);
-        });
+        ])(
+            "should return minimum value for inputs below minimum",
+            (belowMin) => {
+                const result = clampTimeoutSeconds(belowMin);
+                expect(result).toBe(TIMEOUT_CONSTRAINTS.MIN);
+            }
+        );
 
         test.prop([
             fc.double({
@@ -176,12 +179,13 @@ describe("TimeoutUtils Property-Based Tests", () => {
                 max: 10_000,
                 noNaN: true,
             }),
-        ])("should return maximum value for inputs above maximum", (
-            aboveMax
-        ) => {
-            const result = clampTimeoutSeconds(aboveMax);
-            expect(result).toBe(TIMEOUT_CONSTRAINTS.MAX);
-        });
+        ])(
+            "should return maximum value for inputs above maximum",
+            (aboveMax) => {
+                const result = clampTimeoutSeconds(aboveMax);
+                expect(result).toBe(TIMEOUT_CONSTRAINTS.MAX);
+            }
+        );
 
         test.prop([fc.double()])(
             "should always return a value within valid range",
@@ -315,13 +319,14 @@ describe("TimeoutUtils Property-Based Tests", () => {
             fc
                 .double({ min: 1, max: 1_000_000, noNaN: true })
                 .filter((n) => n !== 0),
-        ])("should convert truthy numeric values correctly", (
-            truthyTimeout
-        ) => {
-            const result = getTimeoutSeconds(truthyTimeout);
-            const expected = truthyTimeout / 1000;
-            expect(result).toBeCloseTo(expected, 5);
-        });
+        ])(
+            "should convert truthy numeric values correctly",
+            (truthyTimeout) => {
+                const result = getTimeoutSeconds(truthyTimeout);
+                const expected = truthyTimeout / 1000;
+                expect(result).toBeCloseTo(expected, 5);
+            }
+        );
     });
 
     describe(isValidTimeoutMs, () => {

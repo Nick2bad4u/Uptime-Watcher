@@ -73,7 +73,7 @@ describe("AddSiteForm Component Coverage Tests", () => {
 
             const formData = {
                 addMode: "new",
-                checkInterval: 5000,
+                checkIntervalMs: 5000,
                 formError: null,
                 host: "",
                 monitorType: "http",
@@ -85,7 +85,7 @@ describe("AddSiteForm Component Coverage Tests", () => {
             };
 
             expect(formData.addMode).toBe("new");
-            expect(formData.checkInterval).toBe(5000);
+            expect(formData.checkIntervalMs).toBe(5000);
             expect(formData.monitorType).toBe("http");
             expect(formData.port).toBe(80);
             expect(formData.formError).toBeNull();
@@ -102,18 +102,18 @@ describe("AddSiteForm Component Coverage Tests", () => {
 
             const mockHandlers = {
                 setAddMode: vi.fn(),
-                setCheckInterval: vi.fn(),
+                setCheckIntervalMs: vi.fn(),
                 setMonitorType: vi.fn(),
                 resetForm: vi.fn(),
             };
 
             mockHandlers.setAddMode("existing");
-            mockHandlers.setCheckInterval(10_000);
+            mockHandlers.setCheckIntervalMs(10_000);
             mockHandlers.setMonitorType("port");
             mockHandlers.resetForm();
 
             expect(mockHandlers.setAddMode).toHaveBeenCalledWith("existing");
-            expect(mockHandlers.setCheckInterval).toHaveBeenCalledWith(10_000);
+            expect(mockHandlers.setCheckIntervalMs).toHaveBeenCalledWith(10_000);
             expect(mockHandlers.setMonitorType).toHaveBeenCalledWith("port");
             expect(mockHandlers.resetForm).toHaveBeenCalled();
         });

@@ -89,7 +89,7 @@ describe(SiteRepository, () => {
         });
     });
 
-    describe("exportAll", () => {
+    describe("exportAllRows", () => {
         it("should return the same data set as findAll", async ({
             task,
             annotate,
@@ -111,11 +111,12 @@ describe(SiteRepository, () => {
 
             mockDb.all.mockReturnValueOnce(mockSites);
 
-            const exportAllResult = await repository.exportAll();
+            const exportAllResult = await repository.exportAllRows();
 
             expect(findAllResult).toEqual(exportAllResult);
             expect(mockDb.all).toHaveBeenCalledWith(
-                expect.stringContaining("SELECT")
+                expect.stringContaining("SELECT"),
+                undefined
             );
         });
     });
@@ -171,9 +172,9 @@ describe(SiteRepository, () => {
                 monitoring: true,
             };
 
-            mockDatabaseService.executeTransaction.mockImplementation(async (
-                callback: any
-            ) => callback(mockDatabase));
+            mockDatabaseService.executeTransaction.mockImplementation(
+                async (callback: any) => callback(mockDatabase)
+            );
 
             await repository.upsert(siteData);
 
@@ -218,15 +219,15 @@ describe(SiteRepository, () => {
                 run: vi.fn().mockReturnValue({ changes: 1 }),
                 finalize: vi.fn(),
             });
-            mockDatabaseService.executeTransaction.mockImplementation((
-                callback: any
-            ) => {
-                const mockDb = {
-                    prepare: mockPrepare,
-                    run: vi.fn().mockReturnValue({ changes: 0 }),
-                };
-                return callback(mockDb);
-            });
+            mockDatabaseService.executeTransaction.mockImplementation(
+                (callback: any) => {
+                    const mockDb = {
+                        prepare: mockPrepare,
+                        run: vi.fn().mockReturnValue({ changes: 0 }),
+                    };
+                    return callback(mockDb);
+                }
+            );
 
             const result = await repository.delete("nonexistent");
 
@@ -259,15 +260,15 @@ describe(SiteRepository, () => {
             });
             const mockRun = vi.fn();
 
-            mockDatabaseService.executeTransaction.mockImplementation((
-                callback: any
-            ) => {
-                const mockDb = {
-                    prepare: mockPrepare,
-                    run: mockRun,
-                };
-                return callback(mockDb);
-            });
+            mockDatabaseService.executeTransaction.mockImplementation(
+                (callback: any) => {
+                    const mockDb = {
+                        prepare: mockPrepare,
+                        run: mockRun,
+                    };
+                    return callback(mockDb);
+                }
+            );
 
             await repository.deleteAll();
 
@@ -344,12 +345,12 @@ describe(SiteRepository, () => {
                 run: vi.fn().mockReturnValue({ changes: 1 }),
                 finalize: vi.fn(),
             });
-            mockDatabaseService.executeTransaction.mockImplementation((
-                callback: any
-            ) => {
-                const mockDb = { prepare: mockPrepare };
-                return callback(mockDb);
-            });
+            mockDatabaseService.executeTransaction.mockImplementation(
+                (callback: any) => {
+                    const mockDb = { prepare: mockPrepare };
+                    return callback(mockDb);
+                }
+            );
 
             await repository.bulkInsert(sites);
 
@@ -551,7 +552,8 @@ describe(SiteRepository, () => {
 
                         expect(result).toEqual(mockSites);
                         expect(mockDatabase.all).toHaveBeenCalledWith(
-                            expect.stringContaining("SELECT")
+                            expect.stringContaining("SELECT"),
+                            undefined
                         );
                     }
                 )

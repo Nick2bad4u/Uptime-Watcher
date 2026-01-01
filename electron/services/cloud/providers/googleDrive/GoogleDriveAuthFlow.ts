@@ -1,49 +1,19 @@
-import { ensureError } from "@shared/utils/errorHandling";
-import {
-    getSafeUrlForLogging,
-    isAllowedExternalOpenUrl,
-} from "@shared/utils/urlSafety";
+import type * as z from "zod";
+
+import { openExternalOrThrow } from "@electron/services/shell/openExternalUtils";
+import { tryParseJsonRecord } from "@shared/utils/jsonSafety";
 import axios from "axios";
-import { shell } from "electron";
-import * as z from "zod";
 
 import {
     createOAuthState,
     startLoopbackOAuthServer,
 } from "../../oauth/LoopbackOAuthServer";
 import { createPkcePair } from "../../oauth/pkce";
-
-const googleTokenResponseSchema = z.looseObject({
-    access_token: z.string().min(1),
-    expires_in: z.number().int().positive().optional(),
-    refresh_token: z.string().min(1).optional(),
-    scope: z.string().optional(),
-    token_type: z.string().optional(),
-});
-
-function isPlainObject(value: unknown): value is Record<string, unknown> {
-    return typeof value === "object" && value !== null && !Array.isArray(value);
-}
-
-function tryParseJsonRecord(text: string): null | Record<string, unknown> {
-    try {
-        const parsed: unknown = JSON.parse(text);
-        return isPlainObject(parsed) ? parsed : null;
-    } catch {
-        return null;
-    }
-}
-
-function getErrorCodeSuffix(error: unknown): string {
-    const resolved = ensureError(error);
-
-    if (!isPlainObject(resolved) || !("code" in resolved)) {
-        return "";
-    }
-
-    const { code } = resolved;
-    return typeof code === "string" && code.length > 0 ? ` (${code})` : "";
-}
+import { validateOAuthAuthorizeUrl } from "../oauthAuthorizeUrl";
+import {
+    googleTokenResponseSchema,
+    tryParseGoogleOAuthErrorResponse,
+} from "./googleDriveTokenSchemas";
 
 /**
  * Result of a successful Google Drive OAuth connect flow.
@@ -113,35 +83,17 @@ export class GoogleDriveAuthFlow {
             authorizationUrl.searchParams.set("include_granted_scopes", "true");
 
             const authorizeUrl = authorizationUrl.toString();
-            const urlForLog = getSafeUrlForLogging(authorizeUrl);
 
-            // Defensive: avoid opening unexpected schemes or credential-bearing URLs.
-            if (
-                authorizationUrl.protocol !== "https:" ||
-                authorizationUrl.username.length > 0 ||
-                authorizationUrl.password.length > 0
-            ) {
-                throw new Error(
-                    `Refusing to open unexpected Google OAuth URL: ${urlForLog}`
-                );
-            }
+            const { normalizedUrl, urlForLog } = validateOAuthAuthorizeUrl({
+                providerName: "Google",
+                url: authorizeUrl,
+            });
 
-            if (!isAllowedExternalOpenUrl(authorizeUrl)) {
-                throw new Error(
-                    `Refusing to open disallowed Google OAuth URL: ${urlForLog}`
-                );
-            }
-
-            try {
-                await shell.openExternal(authorizeUrl);
-            } catch (error: unknown) {
-                const codeSuffix = getErrorCodeSuffix(error);
-
-                throw new Error(
-                    `Failed to open Google OAuth URL: ${urlForLog}${codeSuffix}`,
-                    { cause: error }
-                );
-            }
+            await openExternalOrThrow({
+                failureMessagePrefix: "Failed to open Google OAuth URL",
+                normalizedUrl,
+                safeUrlForLogging: urlForLog,
+            });
 
             const callback = await server.waitForCallback({
                 expectedState: state,
@@ -208,23 +160,14 @@ export class GoogleDriveAuthFlow {
                 const status = error.response?.status;
                 const data: unknown = error.response?.data;
 
-                let parsed: null | Record<string, unknown> = null;
-                if (isPlainObject(data)) {
-                    parsed = data;
-                } else if (typeof data === "string") {
-                    parsed = tryParseJsonRecord(data);
-                }
+                const parsed =
+                    typeof data === "string"
+                        ? tryParseJsonRecord(data)
+                        : data;
 
-                const {
-                    error: rawError,
-                    error_description: rawErrorDescription,
-                } = parsed ?? {};
-                const errorName =
-                    typeof rawError === "string" ? rawError : undefined;
-                const errorDescription =
-                    typeof rawErrorDescription === "string"
-                        ? rawErrorDescription
-                        : undefined;
+                const oauthError = tryParseGoogleOAuthErrorResponse(parsed);
+                const errorName = oauthError?.error;
+                const errorDescription = oauthError?.error_description;
 
                 if (errorName) {
                     const prefix = `Google OAuth token exchange failed (${status ?? "unknown"}): ${errorName}`;
