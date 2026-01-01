@@ -92,9 +92,30 @@ function isCloudSyncJsonValidationError(error: unknown): boolean {
     return resolved instanceof SyntaxError || resolved.name === "ZodError";
 }
 
+class CloudSyncSizeLimitError extends Error {
+    public readonly maxBytes: number;
+
+    public readonly actualBytes: number;
+
+    public readonly objectKind: "manifest" | "snapshot";
+
+    public constructor(args: {
+        actualBytes: number;
+        maxBytes: number;
+        objectKind: "manifest" | "snapshot";
+    }) {
+        super(
+            `Cloud sync ${args.objectKind} exceeds size limit of ${args.maxBytes} bytes. Actual: ${args.actualBytes} bytes.`
+        );
+        this.name = "CloudSyncSizeLimitError";
+        this.actualBytes = args.actualBytes;
+        this.maxBytes = args.maxBytes;
+        this.objectKind = args.objectKind;
+    }
+}
+
 function isCloudSyncSizeLimitError(error: unknown): boolean {
-    const resolved = ensureError(error);
-    return resolved.message.includes("exceeds size limit");
+    return ensureError(error) instanceof CloudSyncSizeLimitError;
 }
 
 function getSnapshotsPrefix(): string {
@@ -432,9 +453,11 @@ export class ProviderCloudSyncTransport implements CloudSyncTransport {
             const buffer = await this.provider.downloadObject(MANIFEST_KEY);
             const maxBytes = getMaxManifestBytes();
             if (buffer.byteLength > maxBytes) {
-                throw new Error(
-                    `Cloud sync manifest exceeds size limit (${maxBytes} bytes)`
-                );
+                throw new CloudSyncSizeLimitError({
+                    actualBytes: buffer.byteLength,
+                    maxBytes,
+                    objectKind: "manifest",
+                });
             }
 
             const raw = decodeUtf8(buffer);

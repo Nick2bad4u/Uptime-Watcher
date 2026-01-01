@@ -13,20 +13,15 @@
  */
 import { useCallback, useRef, useState } from "react";
 
+import {
+    getMediaQueryMatches,
+    subscribeToMediaQueryMatches,
+} from "../utils/mediaQueries";
 import { useMount } from "./useMount";
 
 const MEDIA_QUERY = "(prefers-reduced-motion: reduce)";
 
-const readPreference = (): boolean => {
-    if (
-        typeof window === "undefined" ||
-        typeof window.matchMedia !== "function"
-    ) {
-        return false;
-    }
-
-    return window.matchMedia(MEDIA_QUERY).matches;
-};
+const readPreference = (): boolean => getMediaQueryMatches(MEDIA_QUERY);
 
 /**
  * Subscribes to reduced-motion preference changes.
@@ -35,28 +30,8 @@ const readPreference = (): boolean => {
  */
 const subscribeToPreferenceChanges = (
     setPreference: (value: boolean) => void
-): (() => void) | undefined => {
-    if (
-        typeof window === "undefined" ||
-        typeof window.matchMedia !== "function"
-    ) {
-        return undefined;
-    }
-
-    const mediaQuery = window.matchMedia(MEDIA_QUERY);
-    const handleChange = (event: MediaQueryListEvent): void => {
-        setPreference(event.matches);
-    };
-
-    if (typeof mediaQuery.addEventListener === "function") {
-        mediaQuery.addEventListener("change", handleChange);
-        return () => {
-            mediaQuery.removeEventListener("change", handleChange);
-        };
-    }
-
-    return undefined;
-};
+): (() => void) =>
+    subscribeToMediaQueryMatches(MEDIA_QUERY, setPreference);
 
 /**
  * React hook that returns whether the user requests reduced motion.
@@ -66,7 +41,7 @@ const subscribeToPreferenceChanges = (
 export const usePrefersReducedMotion = (): boolean => {
     const [prefersReducedMotion, setPrefersReducedMotion] =
         useState(readPreference);
-    const unsubscribeRef = useRef<(() => void) | undefined>(undefined);
+    const unsubscribeRef = useRef<(() => void) | null>(null);
 
     const mount = useCallback((): void => {
         unsubscribeRef.current = subscribeToPreferenceChanges(
@@ -76,7 +51,7 @@ export const usePrefersReducedMotion = (): boolean => {
 
     const unmount = useCallback((): void => {
         unsubscribeRef.current?.();
-        unsubscribeRef.current = undefined;
+        unsubscribeRef.current = null;
     }, []);
 
     useMount(mount, unmount);

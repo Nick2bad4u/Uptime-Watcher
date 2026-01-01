@@ -14,6 +14,8 @@ import type { RendererEventPayloadMap } from "@shared/ipc/rendererEvents";
 import type {
     CacheInvalidatedEventData,
     MonitorDownEventData,
+    MonitoringStartedEventData,
+    MonitoringStoppedEventData,
     MonitorStatusChangedEventData,
     MonitorUpEventData,
     TestEventData,
@@ -53,48 +55,14 @@ const { ensureInitialized, wrap } = getIpcServiceHelpers("EventsService", {
 type SiteAddedEventData = RendererEventPayloadMap["site:added"];
 type SiteRemovedEventData = RendererEventPayloadMap["site:removed"];
 type SiteUpdatedEventData = RendererEventPayloadMap["site:updated"];
-type MonitoringStartedEventData = RendererEventPayloadMap["monitoring:started"];
-type MonitoringStoppedEventData = RendererEventPayloadMap["monitoring:stopped"];
 type MonitorCheckCompletedEventPayload =
     RendererEventPayloadMap["monitor:check-completed"];
 type HistoryLimitUpdatedEventPayload =
     RendererEventPayloadMap["settings:history-limit-updated"];
 
-/**
- * Runtime type guard narrowing monitoring control payloads to the "started"
- * variant.
- *
- * @param data - Raw payload emitted by the preload bridge.
- *
- * @returns `true` when the payload contains the counters associated with a
- *   monitoring-start event.
- */
-const isMonitoringStartedEventData = (
-    data: unknown
-): data is MonitoringStartedEventData =>
-    typeof data === "object" &&
-    data !== null &&
-    typeof (data as Partial<MonitoringStartedEventData>).monitorCount ===
-        "number" &&
-    typeof (data as Partial<MonitoringStartedEventData>).siteCount === "number";
-
-/**
- * Runtime type guard narrowing monitoring control payloads to the "stopped"
- * variant.
- *
- * @param data - Raw payload emitted by the preload bridge.
- *
- * @returns `true` when the payload contains the fields expected from a
- *   monitoring-stop event.
- */
-const isMonitoringStoppedEventData = (
-    data: unknown
-): data is MonitoringStoppedEventData =>
-    typeof data === "object" &&
-    data !== null &&
-    typeof (data as Partial<MonitoringStoppedEventData>).activeMonitors ===
-        "number" &&
-    typeof (data as Partial<MonitoringStoppedEventData>).reason === "string";
+// Event payload validation is enforced at the preload boundary
+// (electron/preload/domains/eventsApi.ts). The renderer should treat the preload
+// bridge as a trusted interface and focus on cleanup contract validation.
 
 /**
  * Builds a defensive cleanup handler used when the preload bridge returns an
@@ -334,20 +302,7 @@ export const EventsService: EventsServiceContract = {
         "onMonitoringStarted",
         async (api, callback: (data: MonitoringStartedEventData) => void) =>
             subscribeWithValidation("onMonitoringStarted", () =>
-                api.events.onMonitoringStarted((data) => {
-                    if (!isMonitoringStartedEventData(data)) {
-                        logger.error(
-                            "[EventsService] Dropped monitoring-start payload: invalid monitoring control event",
-                            undefined,
-                            {
-                                payload: data,
-                            }
-                        );
-                        return;
-                    }
-
-                    callback(data);
-                })
+                api.events.onMonitoringStarted(callback)
             )
     ),
 
@@ -377,20 +332,7 @@ export const EventsService: EventsServiceContract = {
         "onMonitoringStopped",
         async (api, callback: (data: MonitoringStoppedEventData) => void) =>
             subscribeWithValidation("onMonitoringStopped", () =>
-                api.events.onMonitoringStopped((data) => {
-                    if (!isMonitoringStoppedEventData(data)) {
-                        logger.error(
-                            "[EventsService] Dropped monitoring-stop payload: invalid monitoring control event",
-                            undefined,
-                            {
-                                payload: data,
-                            }
-                        );
-                        return;
-                    }
-
-                    callback(data);
-                })
+                api.events.onMonitoringStopped(callback)
             )
     ),
 

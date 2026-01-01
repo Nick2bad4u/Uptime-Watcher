@@ -11,7 +11,7 @@
 
 import type { Monitor, Site } from "@shared/types";
 import type { MonitorRow as DatabaseMonitorRow } from "@shared/types/database";
-import type { JsonValue, UnknownRecord  } from "type-fest";
+import type { JsonValue, UnknownRecord } from "type-fest";
 
 import { ensureError } from "@shared/utils/errorHandling";
 import { safeJsonParse } from "@shared/utils/jsonSafety";

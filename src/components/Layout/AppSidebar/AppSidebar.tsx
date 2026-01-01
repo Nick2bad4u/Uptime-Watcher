@@ -19,17 +19,17 @@ import {
     useState,
 } from "react";
 
+import { SIDEBAR_COLLAPSE_MEDIA_QUERY } from "../../../constants/layout";
 import { useSitesStore } from "../../../stores/sites/useSitesStore";
 import { useUIStore } from "../../../stores/ui/useUiStore";
 import { ThemedText } from "../../../theme/components/ThemedText";
 import { useTheme } from "../../../theme/useTheme";
 import { scrollToSiteCard } from "../../../utils/dom/scrollToSiteCard";
 import { AppIcons } from "../../../utils/icons";
+import { getMediaQueryMatches } from "../../../utils/mediaQueries";
 import { Tooltip } from "../../common/Tooltip/Tooltip";
 import { useSidebarLayout } from "../SidebarLayoutContext";
 import "./AppSidebar.css";
-
-const SIDEBAR_COLLAPSE_MEDIA_QUERY = "(max-width: 1280px)";
 
 /**
  * Application sidebar containing global navigation and site quick-switching.
@@ -166,12 +166,7 @@ export const AppSidebar: NamedExoticComponent = memo(function AppSidebar() {
 
             setShowSiteDetails(true);
 
-            if (
-                typeof window !== "undefined" &&
-                typeof window.matchMedia === "function" &&
-                window.matchMedia(SIDEBAR_COLLAPSE_MEDIA_QUERY).matches &&
-                isSidebarOpen
-            ) {
+            if (getMediaQueryMatches(SIDEBAR_COLLAPSE_MEDIA_QUERY) && isSidebarOpen) {
                 toggleSidebar();
             }
 

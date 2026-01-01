@@ -57,11 +57,11 @@ vi.mock("../../../services/database/utils/schema/databaseSchema", () => ({
 vi.mock(
     "../../../services/database/utils/maintenance/databaseLockRecovery",
     () => ({
-    cleanupDatabaseLockArtifacts: vi.fn(() => ({
-        failed: [],
-        missing: [],
-        relocated: [],
-    })),
+        cleanupDatabaseLockArtifacts: vi.fn(() => ({
+            failed: [],
+            missing: [],
+            relocated: [],
+        })),
     })
 );
 
@@ -147,9 +147,9 @@ describe("DatabaseService Coverage Tests", () => {
         const { DatabaseService } =
             await import("../../../services/database/DatabaseService");
         const schemaModule =
-              await import("../../../services/database/utils/schema/databaseSchema");
+            await import("../../../services/database/utils/schema/databaseSchema");
         const recoveryModule =
-              await import("../../../services/database/utils/maintenance/databaseLockRecovery");
+            await import("../../../services/database/utils/maintenance/databaseLockRecovery");
 
         const createDatabaseSchemaSpy = vi.spyOn(
             schemaModule,

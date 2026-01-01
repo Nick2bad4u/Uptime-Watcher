@@ -83,6 +83,8 @@ export function registerSiteHandlers({
     register(
         SITES_CHANNELS.deleteAllSites,
         () => uptimeOrchestrator.deleteAllSites(),
-        null
+        SiteHandlerValidators.deleteAllSites
     );
+
+    // No further handlers.
 }

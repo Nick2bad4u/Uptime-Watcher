@@ -26,6 +26,13 @@ export interface SafeJsonResult<T> {
     success: boolean;
 }
 
+class JsonValidationError extends TypeError {
+    public constructor(message: string) {
+        super(message);
+        this.name = "JsonValidationError";
+    }
+}
+
 /**
  * Attempts to parse a JSON string into a plain object record.
  *
@@ -74,12 +81,10 @@ function safeOperation<T>(
     } catch (error) {
         const errorObj = ensureError(error);
 
-        // For custom TypeErrors (validation failures), return the message
-        // directly For JSON.parse errors, add the prefix
+        // For internal validation failures, return the message directly.
+        // For JSON.parse errors, add the prefix.
         const errorMessage =
-            errorObj instanceof TypeError &&
-            (errorObj.message.includes("does not match expected type") ||
-                errorObj.message.includes("is not an array"))
+            errorObj instanceof JsonValidationError
                 ? errorObj.message
                 : `${errorPrefix}: ${errorObj.message}`;
 
@@ -233,7 +238,9 @@ export function safeJsonParse<T extends JsonValue>(
             return parsed;
         }
 
-        throw new TypeError("Parsed data does not match expected type");
+        throw new JsonValidationError(
+            "Parsed data does not match expected type"
+        );
     }, "JSON parsing failed");
 }
 
@@ -277,14 +284,14 @@ export function safeJsonParseArray<T extends JsonValue>(
         const parsedValue: unknown = JSON.parse(json);
 
         if (!Array.isArray(parsedValue)) {
-            throw new TypeError("Parsed data is not an array");
+            throw new JsonValidationError("Parsed data is not an array");
         }
 
         const typedArray: T[] = [];
 
         parsedValue.forEach((element, index) => {
             if (!elementValidator(element)) {
-                throw new TypeError(
+                throw new JsonValidationError(
                     `Array element at index ${index} does not match expected type`
                 );
             }

@@ -455,7 +455,7 @@ describe("EventsService", () => {
             ).not.toHaveBeenCalled();
         });
 
-        it("should log an error when the payload fails validation", async () => {
+        it("should not validate payloads in the renderer (preload is the boundary)", async () => {
             const callback = vi.fn();
             await EventsService.onMonitoringStarted(callback);
 
@@ -473,12 +473,8 @@ describe("EventsService", () => {
                 invalidPayload as unknown as MonitoringStartedEventData
             );
 
-            expect(callback).not.toHaveBeenCalled();
-            expect(mockLogger.error).toHaveBeenCalledWith(
-                "[EventsService] Dropped monitoring-start payload: invalid monitoring control event",
-                undefined,
-                { payload: invalidPayload }
-            );
+            expect(callback).toHaveBeenCalledWith(invalidPayload);
+            expect(mockLogger.error).not.toHaveBeenCalled();
         });
     });
 
@@ -527,7 +523,7 @@ describe("EventsService", () => {
             ).not.toHaveBeenCalled();
         });
 
-        it("should log an error when the stop payload fails validation", async () => {
+        it("should not validate payloads in the renderer (preload is the boundary)", async () => {
             const callback = vi.fn();
             await EventsService.onMonitoringStopped(callback);
 
@@ -545,12 +541,8 @@ describe("EventsService", () => {
                 invalidPayload as unknown as MonitoringStoppedEventData
             );
 
-            expect(callback).not.toHaveBeenCalled();
-            expect(mockLogger.error).toHaveBeenCalledWith(
-                "[EventsService] Dropped monitoring-stop payload: invalid monitoring control event",
-                undefined,
-                { payload: invalidPayload }
-            );
+            expect(callback).toHaveBeenCalledWith(invalidPayload);
+            expect(mockLogger.error).not.toHaveBeenCalled();
         });
     });
 

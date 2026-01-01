@@ -45,6 +45,7 @@ import { SidebarRevealButton } from "./components/Layout/SidebarRevealButton/Sid
 import { Settings } from "./components/Settings/Settings";
 import { SiteDetails } from "./components/SiteDetails/SiteDetails";
 import { UI_DELAYS } from "./constants";
+import { SIDEBAR_COLLAPSE_MEDIA_QUERY } from "./constants/layout";
 import { useBackendFocusSync } from "./hooks/useBackendFocusSync";
 import { useGlobalMonitoringMetrics } from "./hooks/useGlobalMonitoringMetrics";
 import { useMount } from "./hooks/useMount";
@@ -68,6 +69,10 @@ import { ThemeProvider } from "./theme/components/ThemeProvider";
 import { useTheme } from "./theme/useTheme";
 import { setupCacheSync } from "./utils/cacheSync";
 import { AppIcons } from "./utils/icons";
+import {
+    subscribeToMediaQueryListChanges,
+    tryGetMediaQueryList,
+} from "./utils/mediaQueries";
 
 // UI Message constants for consistency and future localization
 const UI_MESSAGES = {
@@ -81,8 +86,6 @@ const UI_MESSAGES = {
     UPDATE_ERROR_FALLBACK: "Update failed.",
     UPDATE_RESTART_BUTTON: "Restart Now",
 } as const;
-
-const SIDEBAR_COLLAPSE_MEDIA_QUERY = "(max-width: 1280px)";
 
 const warnMissingImplementation = (message: string): void => {
     if (isDevelopment()) {
@@ -249,6 +252,7 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
     const cacheSyncCleanupRef = useRef<(() => void) | null>(null);
     const syncEventsCleanupRef = useRef<(() => void) | null>(null);
     const sidebarMediaQueryRef = useRef<MediaQueryList | null>(null);
+        const sidebarMediaQueryUnsubscribeRef = useRef<(() => void) | null>(null);
     const settingsSubscriptionRef = useRef<(() => void) | null>(null);
     const debugSubscriptionsRef = useRef<Array<() => void>>([]);
     const settingsUpdateCountRef = useRef(0);
@@ -759,30 +763,20 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
     );
 
     const cleanupSidebarListener = useCallback(() => {
-        const mediaQuery = sidebarMediaQueryRef.current;
-        if (!mediaQuery) {
-            return;
-        }
-
-        if (typeof mediaQuery.removeEventListener === "function") {
-            mediaQuery.removeEventListener(
-                "change",
-                handleSidebarBreakpointChange
-            );
-        }
+        sidebarMediaQueryUnsubscribeRef.current?.();
+        sidebarMediaQueryUnsubscribeRef.current = null;
         sidebarMediaQueryRef.current = null;
-    }, [handleSidebarBreakpointChange]);
+    }, []);
 
     useMount(
         useCallback(() => {
-            const { matchMedia } = globalThis as typeof globalThis & {
-                matchMedia?: (query: string) => MediaQueryList;
-            };
-            if (typeof matchMedia !== "function") {
+            const mediaQuery = tryGetMediaQueryList(
+                SIDEBAR_COLLAPSE_MEDIA_QUERY
+            );
+            if (!mediaQuery) {
                 return;
             }
 
-            const mediaQuery = matchMedia(SIDEBAR_COLLAPSE_MEDIA_QUERY);
             sidebarMediaQueryRef.current = mediaQuery;
             const { matches } = mediaQuery;
             if (typeof matches === "boolean") {
@@ -792,12 +786,11 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
                 }
             }
 
-            if (typeof mediaQuery.addEventListener === "function") {
-                mediaQuery.addEventListener(
-                    "change",
+            sidebarMediaQueryUnsubscribeRef.current =
+                subscribeToMediaQueryListChanges(
+                    mediaQuery,
                     handleSidebarBreakpointChange
                 );
-            }
         }, [handleSidebarBreakpointChange]),
         cleanupSidebarListener
     );
@@ -805,14 +798,9 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
     // Auto-dismiss the navigation drawer on compact viewports once focus leaves it.
     useEffect(
         function handleCompactSidebarAutoDismissal(): () => void {
-            const { matchMedia } = globalThis as typeof globalThis & {
-                matchMedia?: (query: string) => MediaQueryList;
-            };
             const mediaQuery =
                 sidebarMediaQueryRef.current ??
-                (typeof matchMedia === "function"
-                    ? matchMedia(SIDEBAR_COLLAPSE_MEDIA_QUERY)
-                    : undefined);
+                tryGetMediaQueryList(SIDEBAR_COLLAPSE_MEDIA_QUERY);
 
             if (!isSidebarOpen || !(mediaQuery?.matches ?? false)) {
                 return () => {};

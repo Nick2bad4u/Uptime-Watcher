@@ -15,6 +15,13 @@ import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import { logger } from "../../../services/logger";
 import { isPlaywrightAutomation } from "../../../utils/environment";
 
+class FileDownloadDomAttachmentError extends Error {
+    public constructor(message: string, options?: ErrorOptions) {
+        super(message, options);
+        this.name = "FileDownloadDomAttachmentError";
+    }
+}
+
 /**
  * Creates an object URL for the provided blob and guarantees cleanup.
  */
@@ -49,24 +56,32 @@ function clickDownloadAnchor(
     anchor.style.display = "none";
 
     const { body } = document;
+
     try {
         body.append(anchor);
+    } catch (error: unknown) {
+        throw new FileDownloadDomAttachmentError(
+            "Failed to attach download anchor to DOM",
+            { cause: error }
+        );
+    }
+
+    try {
         anchor.click();
-        anchor.remove();
     } catch (domError) {
         const error =
             domError instanceof Error
                 ? domError
                 : new Error(getUserFacingErrorDetail(domError));
-
-        // For appendChild errors, re-throw to trigger proper fallback mechanism.
-        if (error.message.includes("appendChild")) {
-            throw error;
-        }
-
-        // For other DOM errors, use simple fallback.
-        logger.warn("DOM manipulation failed, using fallback click", error);
+        logger.warn("DOM click failed, retrying direct click", error);
         anchor.click();
+    } finally {
+        // Best-effort cleanup.
+        try {
+            anchor.remove();
+        } catch {
+            // Ignore cleanup errors.
+        }
     }
 }
 
@@ -105,13 +120,14 @@ export interface FileDownloadOptions {
 function createAndTriggerDownload(
     buffer: ArrayBuffer,
     fileName: string,
-    mimeType: string
+    mimeType: string,
+    attachToDom: boolean
 ): void {
     const blob = new Blob([buffer], { type: mimeType });
 
     withObjectUrl(blob, (objectURL) => {
         const anchor = createDownloadAnchor(objectURL, fileName);
-        clickDownloadAnchor(anchor, true);
+        clickDownloadAnchor(anchor, attachToDom);
     });
 }
 
@@ -152,7 +168,7 @@ function tryFallbackDownload(
     mimeType: string
 ): void {
     try {
-        createAndTriggerDownload(buffer, fileName, mimeType);
+        createAndTriggerDownload(buffer, fileName, mimeType, false);
     } catch (fallbackError) {
         logger.error(
             "File download failed: both primary and fallback methods failed",
@@ -191,8 +207,8 @@ function handleDownloadError(
         throw error;
     }
 
-    // Try fallback for DOM-related errors
-    if (error.message.includes("appendChild")) {
+    // Try fallback for DOM attachment failures.
+    if (error instanceof FileDownloadDomAttachmentError) {
         tryFallbackDownload(buffer, fileName, mimeType);
         return;
     }
@@ -231,7 +247,7 @@ export function downloadFile(options: FileDownloadOptions): void {
     const { buffer, fileName, mimeType = "application/octet-stream" } = options;
 
     try {
-        createAndTriggerDownload(buffer, fileName, mimeType);
+        createAndTriggerDownload(buffer, fileName, mimeType, true);
     } catch (error) {
         handleDownloadError(error, buffer, fileName, mimeType);
     }
