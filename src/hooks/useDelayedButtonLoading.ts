@@ -72,7 +72,11 @@ export function useDelayedButtonLoading(isLoading: boolean): boolean {
                 clearTimeout(timeoutId);
             };
         },
-        [clearButtonLoading, isLoading, showButtonLoadingCallback]
+        [
+            clearButtonLoading,
+            isLoading,
+            showButtonLoadingCallback,
+        ]
     );
 
     return showButtonLoading;

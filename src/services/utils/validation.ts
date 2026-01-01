@@ -122,8 +122,10 @@ const describeValidationFailureReason = (
  * following the pattern used by data-oriented services:
  *
  * - When the validator throws, the error message uses the form:
+ *
  *   - `"[ServiceName] <operation> threw during validation"`.
  * - When validation fails, the message uses the form:
+ *
  *   - `"[ServiceName] <operation> returned invalid payload: <issues>"`.
  *
  * In both cases, the original error (validator exception or Zod error) is
@@ -181,7 +183,7 @@ export function validateServicePayload<T>(
         const messages =
             formattedIssues.length > 0
                 ? formattedIssues
-                : fallbackReason ?? "unknown validation error";
+                : (fallbackReason ?? "unknown validation error");
         const diagnosticSuffix = stringifyDiagnostics(diagnostics);
 
         throw new ApplicationError({

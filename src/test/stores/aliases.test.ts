@@ -64,7 +64,9 @@ vi.mock("../../stores/utils", async (importOriginal) => {
 
 vi.mock("../../../shared/utils/errorHandling", async (importOriginal) => {
     const actual =
-        await importOriginal<typeof import("../../../shared/utils/errorHandling")>();
+        await importOriginal<
+            typeof import("../../../shared/utils/errorHandling")
+        >();
 
     return {
         ...actual,

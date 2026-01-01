@@ -256,8 +256,8 @@ export class TypedCache<K, V> {
      * Returns the current cache generation.
      *
      * @remarks
-     * Consumers can capture this value before starting a long-running fetch
-     * and ensure the cache has not been invalidated before storing results.
+     * Consumers can capture this value before starting a long-running fetch and
+     * ensure the cache has not been invalidated before storing results.
      */
     public getGeneration(): number {
         return this.generation;

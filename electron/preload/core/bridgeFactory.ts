@@ -22,7 +22,10 @@ import type {
 import type { IpcRendererEvent } from "electron";
 import type { UnknownRecord } from "type-fest";
 
-import { createIpcCorrelationEnvelope, isIpcHandlerVerificationResult } from "@shared/types/ipc";
+import {
+    createIpcCorrelationEnvelope,
+    isIpcHandlerVerificationResult,
+} from "@shared/types/ipc";
 import { DIAGNOSTICS_CHANNELS } from "@shared/types/preload";
 import { generateCorrelationId } from "@shared/utils/correlation";
 import { ensureError } from "@shared/utils/errorHandling";
@@ -144,7 +147,6 @@ export class IpcError extends Error {
  * @returns True if value is a valid IPC response
  */
 
-
 async function verifyChannelOrThrow(channel: string): Promise<void> {
     if (verifiedChannels.has(channel) || channel === DIAGNOSTICS_CHANNEL) {
         return;
@@ -206,9 +208,9 @@ async function verifyChannelOrThrow(channel: string): Promise<void> {
 
                 // eslint-disable-next-line ex/use-error-cause -- IpcError constructor preserves original error via dedicated field
                 throw new IpcError(
-                    `Failed verifying handler for channel '${channel}': ${
-                        getUserFacingErrorDetail(error)
-                    }`,
+                    `Failed verifying handler for channel '${channel}': ${getUserFacingErrorDetail(
+                        error
+                    )}`,
                     channel,
                     normalizedError
                 );

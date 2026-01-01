@@ -177,15 +177,16 @@ export const useUpdatesStore: UpdatesStoreWithPersist = create<UpdatesStore>()(
                     (() => void) | undefined
                 > => {
                     try {
-                        const serviceCleanup = await EventsService.onUpdateStatus(
-                            ({ error, status }: UpdateStatusEventData) => {
-                                // Read the latest actions to avoid stale
-                                // closures if tests replace store methods.
-                                const store = get();
-                                store.applyUpdateStatus(status);
-                                store.setUpdateError(error);
-                            }
-                        );
+                        const serviceCleanup =
+                            await EventsService.onUpdateStatus(
+                                ({ error, status }: UpdateStatusEventData) => {
+                                    // Read the latest actions to avoid stale
+                                    // closures if tests replace store methods.
+                                    const store = get();
+                                    store.applyUpdateStatus(status);
+                                    store.setUpdateError(error);
+                                }
+                            );
 
                         // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- disposed may flip while awaiting subscription.
                         if (disposed) {

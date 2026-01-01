@@ -361,13 +361,12 @@ export const createSiteSyncActions = (
             if (!effectiveCallback) {
                 const message =
                     "Retry attempted without previously registered callback";
-                const fallbackSummary =
-                    buildStatusSubscriptionFailureSummary({
-                        errors: [message],
-                        expectedListeners: resolveExpectedListenerCount(),
-                        message:
-                            "Unable to retry status subscription without callback context",
-                    });
+                const fallbackSummary = buildStatusSubscriptionFailureSummary({
+                    errors: [message],
+                    expectedListeners: resolveExpectedListenerCount(),
+                    message:
+                        "Unable to retry status subscription without callback context",
+                });
 
                 deps.setStatusSubscriptionSummary(fallbackSummary);
                 errorHandler.setError(message);
@@ -403,13 +402,12 @@ export const createSiteSyncActions = (
             if (!effectiveCallback) {
                 const initializationMessage =
                     "Status update subscription attempted without a callback";
-                const fallbackSummary =
-                    buildStatusSubscriptionFailureSummary({
-                        errors: [initializationMessage],
-                        expectedListeners: resolveExpectedListenerCount(),
-                        message:
-                            "Failed to subscribe to status updates due to missing callback",
-                    });
+                const fallbackSummary = buildStatusSubscriptionFailureSummary({
+                    errors: [initializationMessage],
+                    expectedListeners: resolveExpectedListenerCount(),
+                    message:
+                        "Failed to subscribe to status updates due to missing callback",
+                });
 
                 deps.setStatusSubscriptionSummary(fallbackSummary);
                 errorHandler.setError(initializationMessage);
@@ -447,7 +445,8 @@ export const createSiteSyncActions = (
                         const fallbackSummary =
                             buildStatusSubscriptionFailureSummary({
                                 errors: [initializationMessage],
-                                expectedListeners: resolveExpectedListenerCount(),
+                                expectedListeners:
+                                    resolveExpectedListenerCount(),
                                 message:
                                     "Failed to subscribe to status updates",
                             });

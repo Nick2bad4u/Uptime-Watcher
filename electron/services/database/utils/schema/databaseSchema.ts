@@ -235,7 +235,10 @@ export function createDatabaseTables(db: Database): void {
         logger.info(LOG_TEMPLATES.services.DATABASE_TABLES_CREATED);
     } catch (error) {
         const normalizedError = ensureError(error);
-        logger.error(LOG_TEMPLATES.errors.DATABASE_TABLES_FAILED, normalizedError);
+        logger.error(
+            LOG_TEMPLATES.errors.DATABASE_TABLES_FAILED,
+            normalizedError
+        );
         throw normalizedError;
     }
 }

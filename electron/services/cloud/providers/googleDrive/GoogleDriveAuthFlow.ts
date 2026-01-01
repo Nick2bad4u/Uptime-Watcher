@@ -164,9 +164,7 @@ export class GoogleDriveAuthFlow {
                 const data: unknown = error.response?.data;
 
                 const parsed =
-                    typeof data === "string"
-                        ? tryParseJsonRecord(data)
-                        : data;
+                    typeof data === "string" ? tryParseJsonRecord(data) : data;
 
                 const oauthError = tryParseGoogleOAuthErrorResponse(parsed);
                 const errorName = oauthError?.error;

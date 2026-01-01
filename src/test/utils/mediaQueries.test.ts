@@ -16,7 +16,9 @@ describe("mediaQueries utilities", () => {
             });
 
             try {
-                expect(tryGetMediaQueryList("(prefers-reduced-motion: reduce)")).toBeNull();
+                expect(
+                    tryGetMediaQueryList("(prefers-reduced-motion: reduce)")
+                ).toBeNull();
             } finally {
                 Object.defineProperty(window, "matchMedia", {
                     configurable: true,
@@ -37,7 +39,10 @@ describe("mediaQueries utilities", () => {
             } as unknown as MediaQueryList;
 
             const handler = vi.fn();
-            const cleanup = subscribeToMediaQueryListChanges(mediaQueryList, handler);
+            const cleanup = subscribeToMediaQueryListChanges(
+                mediaQueryList,
+                handler
+            );
 
             expect(addEventListener).toHaveBeenCalledWith("change", handler);
 
@@ -55,7 +60,10 @@ describe("mediaQueries utilities", () => {
             } as unknown as MediaQueryList;
 
             const handler = vi.fn();
-            const cleanup = subscribeToMediaQueryListChanges(mediaQueryList, handler);
+            const cleanup = subscribeToMediaQueryListChanges(
+                mediaQueryList,
+                handler
+            );
 
             expect(addListener).toHaveBeenCalledWith(handler);
 

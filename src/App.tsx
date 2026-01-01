@@ -252,7 +252,7 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
     const syncEventsCleanupRef = useRef<(() => void) | null>(null);
     const updateStatusEventsCleanupRef = useRef<(() => void) | null>(null);
     const sidebarMediaQueryRef = useRef<MediaQueryList | null>(null);
-        const sidebarMediaQueryUnsubscribeRef = useRef<(() => void) | null>(null);
+    const sidebarMediaQueryUnsubscribeRef = useRef<(() => void) | null>(null);
     const settingsSubscriptionRef = useRef<(() => void) | null>(null);
     const debugSubscriptionsRef = useRef<Array<() => void>>([]);
     const settingsUpdateCountRef = useRef(0);
