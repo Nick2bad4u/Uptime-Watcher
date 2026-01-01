@@ -39,6 +39,16 @@ vi.mock("../../utils/cache", () => ({
             clear: vi.fn(),
         },
     },
+    getCachedOrFetch: vi.fn(async (cache, key, fetcher) => {
+        const cached = cache.get(key);
+        if (cached !== undefined) {
+            return cached;
+        }
+
+        const value = await fetcher();
+        cache.set(key, value);
+        return value;
+    }),
 }));
 
 vi.mock("../../types/ipc", () => ({

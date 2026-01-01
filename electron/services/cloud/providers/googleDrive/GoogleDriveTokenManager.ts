@@ -6,6 +6,7 @@ import * as z from "zod";
 import type { SecretStore } from "../../secrets/SecretStore";
 
 import { logger } from "../../../../utils/logger";
+import { GOOGLE_OAUTH_REQUEST_TIMEOUT_MS } from "./googleDriveOAuthConstants";
 import { googleTokenResponseSchema } from "./googleDriveTokenSchemas";
 
 /**
@@ -162,6 +163,7 @@ export class GoogleDriveTokenManager {
                 headers: {
                     "Content-Type": "application/x-www-form-urlencoded",
                 },
+                timeout: GOOGLE_OAUTH_REQUEST_TIMEOUT_MS,
             }
         );
 
@@ -182,6 +184,7 @@ export class GoogleDriveTokenManager {
                     headers: {
                         "Content-Type": "application/x-www-form-urlencoded",
                     },
+                    timeout: GOOGLE_OAUTH_REQUEST_TIMEOUT_MS,
                 }
             )
             .catch(() => {

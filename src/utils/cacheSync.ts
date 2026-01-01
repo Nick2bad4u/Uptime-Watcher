@@ -144,6 +144,11 @@ export function setupCacheSync(): () => void {
 
     const handleInvalidation = (data: CacheInvalidatedEventData): void => {
         try {
+            // Avoid processing events after teardown.
+            if (disposed) {
+                return;
+            }
+
             logger.debug("Received cache invalidation event", data);
 
             const syncSitesFromBackend = async (

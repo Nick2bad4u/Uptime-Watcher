@@ -57,18 +57,31 @@ vi.mock("../../../stores/error/useErrorStore", () => ({
     },
 }));
 
-// Mock store utils
-vi.mock("../../../stores/utils", () => ({
-    logStoreAction: vi.fn(),
-}));
+// Mock store utils (partial) so createPersistConfig remains available.
+vi.mock("../../../stores/utils", async (importOriginal) => {
+    const actual =
+        await importOriginal<typeof import("../../../stores/utils")>();
+    return {
+        ...actual,
+        logStoreAction: vi.fn(),
+    };
+});
 
-// Mock withErrorHandling from shared utils
-vi.mock("../../../../shared/utils/errorHandling", () => ({
-    withErrorHandling: vi.fn(),
-    ensureError: vi.fn((error) =>
-        error instanceof Error ? error : new Error(String(error))
-    ),
-}));
+// Mock withErrorHandling from shared utils (partial) to preserve ApplicationError, etc.
+vi.mock("../../../../shared/utils/errorHandling", async (importOriginal) => {
+    const actual =
+        await importOriginal<
+            typeof import("../../../../shared/utils/errorHandling")
+        >();
+
+    return {
+        ...actual,
+        ensureError: vi.fn((error) =>
+            error instanceof Error ? error : new Error(String(error))
+        ),
+        withErrorHandling: vi.fn(),
+    };
+});
 
 // Import mocked modules to get references
 import { safeExtractIpcData } from "../../../types/ipc";

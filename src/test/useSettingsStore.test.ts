@@ -45,16 +45,22 @@ Object.defineProperty(globalThis, "electronAPI", {
     writable: true,
 });
 
-// Mock utils
-vi.mock("../stores/utils", () => ({
-    logStoreAction: vi.fn(),
-    withErrorHandling: vi.fn((asyncFn, handlers) =>
-        asyncFn().catch((error: Error) => {
-            handlers.setError(error);
-            throw error;
-        })
-    ),
-}));
+// Mock utils (partial) so createPersistConfig remains available.
+vi.mock("../stores/utils", async (importOriginal) => {
+    const actual = await importOriginal<typeof import("../stores/utils")>();
+
+    return {
+        ...actual,
+        logStoreAction: vi.fn(),
+        // Included for legacy tests that may reference this symbol via mocks.
+        withErrorHandling: vi.fn((asyncFn, handlers) =>
+            asyncFn().catch((error: Error) => {
+                handlers.setError(error);
+                throw error;
+            })
+        ),
+    };
+});
 
 // Mock useErrorStore
 vi.mock("../stores/error/useErrorStore", () => ({

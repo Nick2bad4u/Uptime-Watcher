@@ -1,5 +1,6 @@
 import type { Database } from "node-sqlite3-wasm";
 
+import { ensureError } from "@shared/utils/errorHandling";
 import { LOG_TEMPLATES } from "@shared/utils/logTemplates";
 
 import { logger } from "../../../../utils/logger";
@@ -177,8 +178,12 @@ export function createDatabaseIndexes(db: Database): void {
 
         logger.debug(LOG_TEMPLATES.services.DATABASE_INDEXES_CREATED);
     } catch (error) {
-        logger.error(LOG_TEMPLATES.errors.DATABASE_INDEXES_FAILED, error);
-        throw error;
+        const normalizedError = ensureError(error);
+        logger.error(
+            LOG_TEMPLATES.errors.DATABASE_INDEXES_FAILED,
+            normalizedError
+        );
+        throw normalizedError;
     }
 }
 
@@ -229,8 +234,9 @@ export function createDatabaseTables(db: Database): void {
 
         logger.info(LOG_TEMPLATES.services.DATABASE_TABLES_CREATED);
     } catch (error) {
-        logger.error(LOG_TEMPLATES.errors.DATABASE_TABLES_FAILED, error);
-        throw error;
+        const normalizedError = ensureError(error);
+        logger.error(LOG_TEMPLATES.errors.DATABASE_TABLES_FAILED, normalizedError);
+        throw normalizedError;
     }
 }
 

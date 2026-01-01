@@ -218,7 +218,7 @@ export function createIpcServiceHelpers(
                     );
                 }
 
-                throw error;
+                throw normalizedError;
             } finally {
                 // Clear the cached in-flight promise once it settles so
                 // sequential calls re-validate the bridge.
@@ -245,12 +245,13 @@ export function createIpcServiceHelpers(
 
             try {
                 return await handler(window.electronAPI, ...args);
-            } catch (error) {
+            } catch (error: unknown) {
+                const normalizedError = ensureError(error);
                 logger.error(
                     `[${serviceName}] ${methodName} failed:`,
-                    ensureError(error)
+                    normalizedError
                 );
-                throw error;
+                throw normalizedError;
             }
         };
     };

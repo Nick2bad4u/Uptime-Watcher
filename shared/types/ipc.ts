@@ -154,6 +154,35 @@ export interface IpcHandlerVerificationResult {
 }
 
 /**
+ * Runtime type guard for {@link IpcHandlerVerificationResult}.
+ *
+ * @remarks
+ * The preload bridge uses this guard when validating responses from the
+ * diagnostics verification channel.
+ */
+export const isIpcHandlerVerificationResult = (
+    value: unknown
+): value is IpcHandlerVerificationResult => {
+    if (!isRecord(value)) {
+        return false;
+    }
+
+    const { availableChannels, channel, registered } = value;
+
+    if (
+        typeof channel !== "string" ||
+        typeof registered !== "boolean" ||
+        !Array.isArray(availableChannels)
+    ) {
+        return false;
+    }
+
+    return availableChannels.every(
+        (availableChannel) => typeof availableChannel === "string"
+    );
+};
+
+/**
  * Structured metadata logged when verifying IPC handler registration.
  */
 export interface IpcHandlerVerificationLogMetadata {

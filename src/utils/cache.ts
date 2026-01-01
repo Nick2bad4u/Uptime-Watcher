@@ -40,6 +40,14 @@ import { CACHE_CONFIG } from "@shared/constants/cacheConfig";
 import { logger } from "../services/logger";
 
 /**
+ * In-flight fetch registry used by {@link getCachedOrFetch}.
+ *
+ * @remarks
+ * Stored as a WeakMap keyed by cache instance to avoid memory leaks.
+ */
+const inFlightFetches = new WeakMap<object, Map<string, Promise<unknown>>>();
+
+/**
  * Predefined application cache collection interface.
  *
  * @remarks
@@ -141,6 +149,16 @@ export class TypedCache<K, V> {
     private readonly cache = new Map<K, CacheEntry<V>>();
 
     /**
+     * Cache generation counter.
+     *
+     * @remarks
+     * Incremented whenever the cache is cleared. Used by higher-level helpers
+     * (for example {@link getCachedOrFetch}) to avoid caching values fetched
+     * before an invalidation/clear event.
+     */
+    private generation = 0;
+
+    /**
      * Default time-to-live for cache entries in milliseconds.
      *
      * @remarks
@@ -230,7 +248,19 @@ export class TypedCache<K, V> {
      * @public
      */
     public clear(): void {
+        this.generation += 1;
         this.cache.clear();
+    }
+
+    /**
+     * Returns the current cache generation.
+     *
+     * @remarks
+     * Consumers can capture this value before starting a long-running fetch
+     * and ensure the cache has not been invalidated before storing results.
+     */
+    public getGeneration(): number {
+        return this.generation;
     }
 
     /**
@@ -438,20 +468,65 @@ export function clearAllCaches(): void {
  *
  * @public
  */
-export async function getCachedOrFetch<T>(
+export async function getCachedOrFetch<T extends Exclude<unknown, undefined>>(
     cache: TypedCache<string, T>,
     key: string,
     fetcher: () => Promise<T>,
     ttl?: number
 ): Promise<T> {
+    // Track in-flight fetches per cache instance to avoid duplicate work.
+    // WeakMap ensures entries are GC'd once caches are no longer referenced.
+    const ensureInFlightRegistry = (): Map<string, Promise<unknown>> => {
+        const existing = inFlightFetches.get(cache);
+        if (existing) {
+            return existing;
+        }
+
+        const created = new Map<string, Promise<unknown>>();
+        inFlightFetches.set(cache, created);
+        return created;
+    };
+
     // Try to get from cache first
     const cached = cache.get(key);
     if (cached !== undefined) {
         return cached;
     }
 
-    // Fetch and cache
-    const value = await fetcher();
-    cache.set(key, value, ttl);
-    return value;
+    const inFlight = ensureInFlightRegistry();
+    const existingPromise = inFlight.get(key);
+    if (existingPromise) {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Promise is inserted by this helper for the same generic T.
+        return existingPromise as Promise<T>;
+    }
+
+    const generationAtStart = cache.getGeneration();
+
+    const fetchPromise: Promise<T> = (async (): Promise<T> => {
+        const value = await fetcher();
+
+        // Avoid caching stale results when the cache was cleared/invalidate
+        // while the fetch was in progress.
+        if (cache.getGeneration() !== generationAtStart) {
+            return value;
+        }
+
+        // Avoid overwriting newer values set while the fetch was in flight.
+        if (cache.get(key) === undefined) {
+            cache.set(key, value, ttl);
+        }
+
+        return value;
+    })();
+
+    inFlight.set(key, fetchPromise);
+
+    try {
+        return await fetchPromise;
+    } finally {
+        inFlight.delete(key);
+        if (inFlight.size === 0) {
+            inFlightFetches.delete(cache);
+        }
+    }
 }

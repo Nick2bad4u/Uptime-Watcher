@@ -117,6 +117,7 @@ const mockUpdatesStoreState = {
     applyUpdate: vi.fn(),
     checkForUpdates: vi.fn(),
     subscribeToStatusUpdates: vi.fn(),
+    subscribeToUpdateStatusEvents: vi.fn(() => vi.fn()),
 };
 
 const mockSiteName = sampleOne(siteNameArbitrary);

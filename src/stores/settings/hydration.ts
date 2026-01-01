@@ -19,6 +19,26 @@ const hasOwn = <T extends object>(
 let settingsSyncTimer: null | ReturnType<typeof setTimeout> = null;
 
 /**
+ * Clears the pending settings hydration sync timer.
+ *
+ * @remarks
+ * Settings hydration uses a small deferred sync to pull authoritative backend
+ * values (currently the history limit). Tests that re-import modules or create
+ * multiple store instances benefit from being able to clear pending timeouts
+ * deterministically.
+ *
+ * @internal
+ */
+export function resetSettingsHydrationTimerForTesting(): void {
+    if (!settingsSyncTimer) {
+        return;
+    }
+
+    clearTimeout(settingsSyncTimer);
+    settingsSyncTimer = null;
+}
+
+/**
  * Synchronizes critical settings from the backend after the store rehydrates.
  */
 export const syncSettingsAfterRehydration = (

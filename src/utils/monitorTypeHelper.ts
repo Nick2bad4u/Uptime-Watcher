@@ -56,6 +56,7 @@ export async function getAvailableMonitorTypes(): Promise<MonitorTypeConfig[]> {
     /* eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Cache stores typed data, safe to assert known cache value type */
     const cached = AppCaches.monitorTypes.get(cacheKey) as
         | MonitorTypeConfig[]
+        | null
         | undefined;
     if (cached) {
         return cached;

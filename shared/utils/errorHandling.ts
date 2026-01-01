@@ -89,7 +89,7 @@ function normalizeErrorCause(cause: unknown): Error | undefined {
     }
 
     const message = formatUnknownErrorCause(cause);
-    return new Error(message);
+    return new Error(message, { cause });
 }
 
 /**
@@ -289,7 +289,7 @@ export function convertError(error: unknown): ErrorConversionResult {
     }
 
     return {
-        error: new Error(errorMessage),
+        error: new Error(errorMessage, { cause: error }),
         originalType: typeof error,
         wasError: false,
     };

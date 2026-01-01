@@ -157,7 +157,11 @@ describe("databaseInitializer", () => {
 
         await expect(
             initDatabase(service, loadSites, eventEmitter)
-        ).rejects.toBe("load failure");
+        ).rejects.toMatchObject({
+            cause: "load failure",
+            message: "load failure",
+            name: "Error",
+        });
 
         expect(initialize).toHaveBeenCalledTimes(1);
         expect(mockedWithDatabaseOperation).toHaveBeenCalledWith(

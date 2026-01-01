@@ -284,7 +284,13 @@ export function useOverflowMarquee<
     }, [measureOverflow]);
 
     const dependencyFingerprint = useMemo(
-        () => JSON.stringify(dependencies),
+        () => {
+            try {
+                return JSON.stringify(dependencies);
+            } catch {
+                return "[unserializable-dependencies]";
+            }
+        },
         [dependencies]
     );
 

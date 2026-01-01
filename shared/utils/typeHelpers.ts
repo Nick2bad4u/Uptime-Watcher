@@ -93,10 +93,20 @@ export function ensureRecordLike(value: unknown): undefined | UnknownRecord {
  * @returns Property value or undefined
  */
 export function safePropertyAccess(obj: unknown, key: string): unknown {
-    if (isRecord(obj) && key in obj) {
-        return obj[key];
+    if (Array.isArray(obj)) {
+        // Arrays are intentionally treated as non-records in this codebase.
+        // The sole supported safe access is the built-in `length` property.
+        return key === "length" ? obj.length : undefined;
     }
-    return undefined;
+
+    if (!isRecord(obj)) {
+        return undefined;
+    }
+
+    // Intentionally supports inherited properties for record-like objects.
+    // This matches the fuzz-suite contract and keeps the helper convenient
+    // for Date/Error and other non-plain objects treated as record-like.
+    return key in obj ? obj[key] : undefined;
 }
 
 /**

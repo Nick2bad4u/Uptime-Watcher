@@ -17,31 +17,42 @@ import type { ValidationResult } from "@shared/types/validation";
 import { useMonitorTypesStore } from "../../../stores/monitor/useMonitorTypesStore";
 import { useErrorStore } from "../../../stores/error/useErrorStore";
 
-// Mock dependencies
-vi.mock("@shared/utils/errorHandling", () => ({
-    withErrorHandling: vi.fn(async (operation, store) => {
-        // Simulate the real withErrorHandling behavior
-        try {
-            store.clearError();
-            store.setLoading(true);
-            return await operation();
-        } catch (error: unknown) {
-            const errorMessage =
-                error instanceof Error ? error.message : String(error);
-            store.setError(errorMessage);
-            throw error;
-        } finally {
-            store.setLoading(false);
-        }
-    }),
-    ensureError: vi.fn((error) =>
-        error instanceof Error ? error : new Error(String(error))
-    ),
-}));
+// Mock dependencies (partial mock to preserve exports like ApplicationError)
+vi.mock("@shared/utils/errorHandling", async (importOriginal) => {
+    const actual =
+        await importOriginal<typeof import("@shared/utils/errorHandling")>();
 
-vi.mock("../../../stores/utils", () => ({
-    logStoreAction: vi.fn(),
-}));
+    return {
+        ...actual,
+        ensureError: vi.fn((error) =>
+            error instanceof Error ? error : new Error(String(error))
+        ),
+        withErrorHandling: vi.fn(async (operation, store) => {
+            // Simulate the real withErrorHandling behavior
+            try {
+                store.clearError();
+                store.setLoading(true);
+                return await operation();
+            } catch (error: unknown) {
+                const errorMessage =
+                    error instanceof Error ? error.message : String(error);
+                store.setError(errorMessage);
+                throw error;
+            } finally {
+                store.setLoading(false);
+            }
+        }),
+    };
+});
+
+vi.mock("../../../stores/utils", async (importOriginal) => {
+    const actual =
+        await importOriginal<typeof import("../../../stores/utils")>();
+    return {
+        ...actual,
+        logStoreAction: vi.fn(),
+    };
+});
 
 vi.mock("../../../types/ipc", () => ({
     safeExtractIpcData: vi.fn((response, fallback) => response || fallback),

@@ -131,7 +131,9 @@ describe("SettingsService", () => {
             const error = "String error";
             mockWaitForElectronBridge.mockRejectedValue(error);
 
-            await expect(SettingsService.initialize()).rejects.toBe(error);
+            await expect(SettingsService.initialize()).rejects.toThrowError(
+                "String error"
+            );
             expect(mockLogger.error).toHaveBeenCalled();
             expect(vi.mocked(ensureError)).toHaveBeenCalledWith(error);
         });
@@ -139,7 +141,9 @@ describe("SettingsService", () => {
         it("should handle null/undefined initialization errors", async () => {
             mockWaitForElectronBridge.mockRejectedValue(null);
 
-            await expect(SettingsService.initialize()).rejects.toBeNull();
+            await expect(SettingsService.initialize()).rejects.toThrowError(
+                "null"
+            );
             expect(mockLogger.error).toHaveBeenCalled();
             expect(vi.mocked(ensureError)).toHaveBeenCalledWith(null);
         });

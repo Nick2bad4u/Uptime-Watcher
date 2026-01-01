@@ -53,7 +53,7 @@ import type {
 import { logger } from "../../services/logger";
 import { SystemService } from "../../services/SystemService";
 import { useErrorStore } from "../error/useErrorStore";
-import { logStoreAction } from "../utils";
+import { createPersistConfig, logStoreAction } from "../utils";
 
 interface UIPersistedState {
     activeSiteDetailsTab: SiteDetailsTab;
@@ -114,6 +114,22 @@ type UIStoreWithPersist = UseBoundStore<
         };
     }
 >;
+
+const UI_PERSIST_CONFIG = createPersistConfig<UIStore, UIPersistedState>(
+    "ui",
+    (state) => ({
+        activeSiteDetailsTab: state.activeSiteDetailsTab,
+        showAdvancedMetrics: state.showAdvancedMetrics,
+        sidebarCollapsedPreference: state.sidebarCollapsedPreference,
+        siteCardPresentation: state.siteCardPresentation,
+        siteDetailsChartTimeRange: state.siteDetailsChartTimeRange,
+        siteDetailsHeaderCollapsedState: state.siteDetailsHeaderCollapsedState,
+        siteDetailsTabState: state.siteDetailsTabState,
+        siteListLayout: state.siteListLayout,
+        siteTableColumnWidths: state.siteTableColumnWidths,
+        surfaceDensity: state.surfaceDensity,
+    })
+);
 
 /**
  * Zustand store for managing UI state and user interface interactions.
@@ -370,46 +386,11 @@ export const useUIStore: UIStoreWithPersist = create<UIStore>()(
             },
         }),
         {
-            name: "uptime-watcher-ui",
-            /**
-             * Partialize function for selective state persistence.
-             *
-             * @remarks
-             * This function determines which parts of the UI state should be
-             * persisted across browser sessions. It includes user preferences
-             * and settings that should be remembered, while excluding transient
-             * state like modal visibility and selected site which should reset
-             * on each session.
-             *
-             * Persisted state:
-             *
-             * - ActiveSiteDetailsTab: Remember which tab was last active
-             * - ShowAdvancedMetrics: User preference for advanced metrics
-             *   visibility
-             * - SiteDetailsTabState: Per-site tab preferences for the details
-             *   modal
-             * - SiteDetailsChartTimeRange: User preference for chart time range
-             *
-             * Non-persisted state:
-             *
-             * - Modal states (showSettings, showSiteDetails): Reset on each
-             *   session - selectedSiteIdentifier: Reset on each session for
-             *   security/privacy
-             */
-            partialize: (state) => ({
-                activeSiteDetailsTab: state.activeSiteDetailsTab,
-                showAdvancedMetrics: state.showAdvancedMetrics,
-                sidebarCollapsedPreference: state.sidebarCollapsedPreference,
-                siteCardPresentation: state.siteCardPresentation,
-                siteDetailsChartTimeRange: state.siteDetailsChartTimeRange,
-                siteDetailsHeaderCollapsedState:
-                    state.siteDetailsHeaderCollapsedState,
-                siteDetailsTabState: state.siteDetailsTabState,
-                siteListLayout: state.siteListLayout,
-                siteTableColumnWidths: state.siteTableColumnWidths,
-                surfaceDensity: state.surfaceDensity,
-                // Don't persist modal states or selected site
-            }),
+            // Selectively persist stable UI preferences across sessions while
+            // keeping transient state (modals, selections) in memory only.
+            ...UI_PERSIST_CONFIG,
+            // Re-state required fields explicitly for exactOptionalPropertyTypes.
+            name: UI_PERSIST_CONFIG.name,
         }
     )
 );

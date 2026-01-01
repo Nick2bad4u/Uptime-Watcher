@@ -188,6 +188,23 @@ const statusUpdateManager: {
     instance?: StatusUpdateManager;
 } = {};
 
+/**
+ * Resets the module-level status update manager singleton.
+ *
+ * @remarks
+ * The sites sync module keeps a lazily-initialized singleton
+ * {@link StatusUpdateManager} instance. This helper exists to support
+ * deterministic testing and to avoid leaked event subscriptions when modules
+ * are reloaded in development.
+ *
+ * @internal
+ */
+export function resetStatusUpdateManagerForTesting(): void {
+    statusUpdateManager.instance?.unsubscribe();
+    delete statusUpdateManager.instance;
+    delete statusUpdateManager.callback;
+}
+
 const FALLBACK_EXPECTED_LISTENERS = 4;
 
 const resolveExpectedListenerCount = (): number => {

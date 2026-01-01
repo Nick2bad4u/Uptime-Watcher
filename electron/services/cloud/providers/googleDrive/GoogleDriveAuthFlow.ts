@@ -1,6 +1,7 @@
 import type * as z from "zod";
 
 import { openExternalOrThrow } from "@electron/services/shell/openExternalUtils";
+import { ensureError } from "@shared/utils/errorHandling";
 import { tryParseJsonRecord } from "@shared/utils/jsonSafety";
 import axios from "axios";
 
@@ -10,6 +11,7 @@ import {
 } from "../../oauth/LoopbackOAuthServer";
 import { createPkcePair } from "../../oauth/pkce";
 import { validateOAuthAuthorizeUrl } from "../oauthAuthorizeUrl";
+import { GOOGLE_OAUTH_REQUEST_TIMEOUT_MS } from "./googleDriveOAuthConstants";
 import {
     googleTokenResponseSchema,
     tryParseGoogleOAuthErrorResponse,
@@ -151,6 +153,7 @@ export class GoogleDriveAuthFlow {
                     headers: {
                         "Content-Type": "application/x-www-form-urlencoded",
                     },
+                    timeout: GOOGLE_OAUTH_REQUEST_TIMEOUT_MS,
                 }
             );
 
@@ -190,7 +193,13 @@ export class GoogleDriveAuthFlow {
                 throw new Error(message, { cause: error });
             }
 
-            throw error;
+            const normalized = ensureError(error);
+            throw new Error(
+                `Google OAuth token exchange failed: ${normalized.message}`,
+                {
+                    cause: error,
+                }
+            );
         }
     }
 

@@ -35,24 +35,38 @@ vi.mock("../../../stores/error/useErrorStore", () => ({
     },
 }));
 
-// Mock store utils with logStoreAction
-vi.mock("../../../stores/utils", () => ({
-    logStoreAction: vi.fn(),
-    createStoreErrorHandler: vi.fn((storeName, operation) => ({
-        setError: mockErrorStore.setStoreError,
-        setLoading: mockErrorStore.setOperationLoading,
-        clearError: mockErrorStore.clearStoreError,
-        operationName: `${storeName}.${operation}`,
-    })),
-}));
+// Mock store utils (partial) so required exports like createPersistConfig remain available.
+vi.mock("../../../stores/utils", async (importOriginal) => {
+    const actual =
+        await importOriginal<typeof import("../../../stores/utils")>();
 
-// Mock withErrorHandling from shared utils
-vi.mock("../../../../shared/utils/errorHandling", () => ({
-    withErrorHandling: vi.fn(),
-    ensureError: vi.fn((error) =>
-        error instanceof Error ? error : new Error(String(error))
-    ),
-}));
+    return {
+        ...actual,
+        createStoreErrorHandler: vi.fn((storeName, operation) => ({
+            setError: mockErrorStore.setStoreError,
+            setLoading: mockErrorStore.setOperationLoading,
+            clearError: mockErrorStore.clearStoreError,
+            operationName: `${storeName}.${operation}`,
+        })),
+        logStoreAction: vi.fn(),
+    };
+});
+
+// Mock withErrorHandling from shared utils (partial) to retain ApplicationError, etc.
+vi.mock("../../../../shared/utils/errorHandling", async (importOriginal) => {
+    const actual =
+        await importOriginal<
+            typeof import("../../../../shared/utils/errorHandling")
+        >();
+
+    return {
+        ...actual,
+        ensureError: vi.fn((error) =>
+            error instanceof Error ? error : new Error(String(error))
+        ),
+        withErrorHandling: vi.fn(),
+    };
+});
 
 // Import mocked modules
 import { safeExtractIpcData } from "../../../types/ipc";

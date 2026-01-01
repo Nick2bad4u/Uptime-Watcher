@@ -58,10 +58,14 @@ vi.mock("../services/SystemService", () => ({
     SystemService: mockSystemService,
 }));
 
-// Mock the store utils
-vi.mock("../stores/utils", () => ({
-    logStoreAction: vi.fn(),
-}));
+// Mock the store utils (partial) so createPersistConfig remains available.
+vi.mock("../stores/utils", async (importOriginal) => {
+    const actual = await importOriginal<typeof import("../stores/utils")>();
+    return {
+        ...actual,
+        logStoreAction: vi.fn(),
+    };
+});
 
 // Mock the theme hook
 vi.mock("../theme/useTheme", () => ({

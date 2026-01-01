@@ -36,6 +36,7 @@
  * @public
  */
 
+import type { UpdateStatusEventData } from "@shared/types/events";
 import type { Merge } from "type-fest";
 
 import { ensureError } from "@shared/utils/errorHandling";
@@ -45,8 +46,10 @@ import { persist, type PersistOptions } from "zustand/middleware";
 import type { UpdateStatus } from "../types";
 import type { UpdateInfo, UpdatesStore } from "./types";
 
+import { EventsService } from "../../services/EventsService";
+import { logger } from "../../services/logger";
 import { SystemService } from "../../services/SystemService";
-import { logStoreAction } from "../utils";
+import { createPersistConfig, logStoreAction } from "../utils";
 
 /**
  * Interface for the updates store with persistence capabilities.
@@ -88,6 +91,17 @@ type UpdatesStoreWithPersist = UseBoundStore<
     >
 >;
 
+const UPDATES_PERSIST_CONFIG = createPersistConfig<
+    UpdatesStore,
+    {
+        updateInfo: undefined | UpdateInfo;
+        updateStatus: UpdateStatus;
+    }
+>("updates", (state) => ({
+    updateInfo: state.updateInfo,
+    updateStatus: state.updateStatus,
+}));
+
 /**
  * Zustand store for managing application updates and update lifecycle.
  *
@@ -100,7 +114,7 @@ type UpdatesStoreWithPersist = UseBoundStore<
  */
 export const useUpdatesStore: UpdatesStoreWithPersist = create<UpdatesStore>()(
     persist(
-        (set) => ({
+        (set, get) => ({
             // Actions
             applyUpdate: async (): Promise<void> => {
                 set({ updateError: undefined });
@@ -153,6 +167,82 @@ export const useUpdatesStore: UpdatesStoreWithPersist = create<UpdatesStore>()(
                 });
                 set({ updateProgress: progress });
             },
+
+            subscribeToUpdateStatusEvents: (): (() => void) => {
+                let disposed = false;
+                let cleanup: (() => void) | null = null;
+                let cleanupExecuted = false;
+
+                const subscriptionPromise = (async (): Promise<
+                    (() => void) | undefined
+                > => {
+                    try {
+                        const serviceCleanup = await EventsService.onUpdateStatus(
+                            ({ error, status }: UpdateStatusEventData) => {
+                                // Read the latest actions to avoid stale
+                                // closures if tests replace store methods.
+                                const store = get();
+                                store.applyUpdateStatus(status);
+                                store.setUpdateError(error);
+                            }
+                        );
+
+                        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- disposed may flip while awaiting subscription.
+                        if (disposed) {
+                            serviceCleanup();
+                            return serviceCleanup;
+                        }
+
+                        cleanup = serviceCleanup;
+                        return serviceCleanup;
+                    } catch (error: unknown) {
+                        logger.error(
+                            "[UpdatesStore] Failed to subscribe to update status events",
+                            ensureError(error)
+                        );
+                        return undefined;
+                    }
+                })();
+
+                return (): void => {
+                    disposed = true;
+
+                    if (cleanupExecuted) {
+                        return;
+                    }
+
+                    cleanupExecuted = true;
+
+                    if (cleanup) {
+                        try {
+                            cleanup();
+                        } catch (error: unknown) {
+                            logger.error(
+                                "[UpdatesStore] Failed to cleanup update status subscription",
+                                ensureError(error)
+                            );
+                        } finally {
+                            cleanup = null;
+                        }
+
+                        return;
+                    }
+
+                    void (async (): Promise<void> => {
+                        try {
+                            const deferredCleanup = await subscriptionPromise;
+                            if (typeof deferredCleanup === "function") {
+                                deferredCleanup();
+                            }
+                        } catch (error: unknown) {
+                            logger.error(
+                                "[UpdatesStore] Failed to cleanup deferred update status subscription",
+                                ensureError(error)
+                            );
+                        }
+                    })();
+                };
+            },
             updateError: undefined,
             updateInfo: undefined,
             updateProgress: 0,
@@ -160,11 +250,9 @@ export const useUpdatesStore: UpdatesStoreWithPersist = create<UpdatesStore>()(
             updateStatus: "idle",
         }),
         {
-            name: "uptime-watcher-updates",
-            partialize: (state) => ({
-                updateInfo: state.updateInfo,
-                updateStatus: state.updateStatus,
-            }),
+            ...UPDATES_PERSIST_CONFIG,
+            // Re-state required fields explicitly for exactOptionalPropertyTypes.
+            name: UPDATES_PERSIST_CONFIG.name,
         }
     )
 );

@@ -12,6 +12,7 @@
  */
 
 import type {
+    IpcHandlerVerificationResult,
     IpcInvokeChannel,
     IpcInvokeChannelParams,
     IpcInvokeChannelResult,
@@ -21,9 +22,10 @@ import type {
 import type { IpcRendererEvent } from "electron";
 import type { UnknownRecord } from "type-fest";
 
-import { createIpcCorrelationEnvelope } from "@shared/types/ipc";
+import { createIpcCorrelationEnvelope, isIpcHandlerVerificationResult } from "@shared/types/ipc";
 import { DIAGNOSTICS_CHANNELS } from "@shared/types/preload";
 import { generateCorrelationId } from "@shared/utils/correlation";
+import { ensureError } from "@shared/utils/errorHandling";
 import {
     extractIpcResponseData,
     validateVoidIpcResponse,
@@ -79,12 +81,6 @@ function shouldAllowDiagnosticsFallback(): boolean {
             : undefined;
 
     return Boolean(vitestFlag) || nodeEnv === "test";
-}
-
-interface HandlerVerificationResponse {
-    readonly availableChannels: readonly string[];
-    readonly channel: string;
-    readonly registered: boolean;
 }
 
 const verifiedChannels = new Set<string>([DIAGNOSTICS_CHANNEL]);
@@ -149,32 +145,6 @@ export class IpcError extends Error {
  */
 
 
-function isHandlerVerificationResponse(
-    value: unknown
-): value is HandlerVerificationResponse {
-    if (typeof value !== "object" || value === null) {
-        return false;
-    }
-
-    // We need a minimal structural read of unknown object properties.
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Guarded by the runtime object/null check above.
-    const record = value as Record<string, unknown>;
-
-    const { availableChannels, channel, registered } = record;
-
-    if (
-        typeof channel !== "string" ||
-        typeof registered !== "boolean" ||
-        !Array.isArray(availableChannels)
-    ) {
-        return false;
-    }
-
-    return availableChannels.every(
-        (availableChannel) => typeof availableChannel === "string"
-    );
-}
-
 async function verifyChannelOrThrow(channel: string): Promise<void> {
     if (verifiedChannels.has(channel) || channel === DIAGNOSTICS_CHANNEL) {
         return;
@@ -196,11 +166,11 @@ async function verifyChannelOrThrow(channel: string): Promise<void> {
                 );
 
                 const verificationResult =
-                    extractIpcResponseData<HandlerVerificationResponse>(
+                    extractIpcResponseData<IpcHandlerVerificationResult>(
                         rawResponse
                     );
 
-                if (!isHandlerVerificationResponse(verificationResult)) {
+                if (!isIpcHandlerVerificationResult(verificationResult)) {
                     throw new Error(
                         "Invalid diagnostics verification response"
                     );
@@ -232,13 +202,15 @@ async function verifyChannelOrThrow(channel: string): Promise<void> {
                     throw error;
                 }
 
+                const normalizedError = ensureError(error);
+
                 // eslint-disable-next-line ex/use-error-cause -- IpcError constructor preserves original error via dedicated field
                 throw new IpcError(
                     `Failed verifying handler for channel '${channel}': ${
                         getUserFacingErrorDetail(error)
                     }`,
                     channel,
-                    error instanceof Error ? error : undefined
+                    normalizedError
                 );
             } finally {
                 pendingVerifications.delete(channel);
@@ -276,11 +248,12 @@ async function invokeWithValidation<T>(
         return validate(response);
     } catch (error) {
         const errorMessage = getUserFacingErrorDetail(error);
+        const normalizedError = ensureError(error);
         // eslint-disable-next-line ex/use-error-cause -- Using custom IpcError class with cause handling
         throw new IpcError(
             `IPC call failed for channel '${channel}': ${errorMessage}`,
             channel,
-            error instanceof Error ? error : undefined
+            normalizedError
         );
     }
 }
@@ -365,9 +338,10 @@ export function createEventManager(channel: string): {
                 callback(...args);
             } catch (error) {
                 // Log callback errors but don't propagate them to prevent event system crashes
+                const normalizedError = ensureError(error);
                 preloadLogger.warn("Event callback error", {
                     channel,
-                    error,
+                    error: normalizedError,
                 });
             }
         };

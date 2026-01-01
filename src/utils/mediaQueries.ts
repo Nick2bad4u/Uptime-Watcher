@@ -57,6 +57,24 @@ export function subscribeToMediaQueryListChanges(
         };
     }
 
+    // Legacy Safari/Chromium implementations.
+    // Use Reflect.get to avoid touching deprecated DOM lib declarations while
+    // still supporting older runtime APIs.
+    const addListenerCandidate = Reflect.get(mediaQueryList, "addListener");
+
+    if (typeof addListenerCandidate === "function") {
+        addListenerCandidate.call(mediaQueryList, handler);
+        return () => {
+            const removeListenerCandidate = Reflect.get(
+                mediaQueryList,
+                "removeListener"
+            );
+            if (typeof removeListenerCandidate === "function") {
+                removeListenerCandidate.call(mediaQueryList, handler);
+            }
+        };
+    }
+
     return noop;
 }
 

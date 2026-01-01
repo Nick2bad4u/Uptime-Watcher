@@ -90,7 +90,7 @@ export function rowToSite(row: DatabaseSiteRow): SiteRow {
     } catch (error: unknown) {
         const normalizedError = ensureError(error);
         logger.error(LOG_TEMPLATES.errors.SITE_MAPPER_FAILED, normalizedError, {
-            errorType: normalizedError.constructor.name,
+            errorType: normalizedError.name,
             functionName: "rowToSite",
             row,
         });

@@ -8,7 +8,6 @@
  */
 
 import type { StatusUpdate } from "@shared/types";
-import type { UpdateStatusEventData } from "@shared/types/events";
 import type { JSX } from "react/jsx-runtime";
 
 import { isDevelopment, isProduction } from "@shared/utils/environment";
@@ -50,7 +49,6 @@ import { useBackendFocusSync } from "./hooks/useBackendFocusSync";
 import { useGlobalMonitoringMetrics } from "./hooks/useGlobalMonitoringMetrics";
 import { useMount } from "./hooks/useMount";
 import { useSelectedSite } from "./hooks/useSelectedSite";
-import { EventsService } from "./services/EventsService";
 import { logger } from "./services/logger";
 import { NotificationPreferenceService } from "./services/NotificationPreferenceService";
 import { useAlertStore } from "./stores/alerts/useAlertStore";
@@ -226,6 +224,7 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
         applyUpdate,
         applyUpdateStatus,
         setUpdateError,
+        subscribeToUpdateStatusEvents,
         updateError,
         updateStatus,
     } = useUpdatesStore();
@@ -251,6 +250,7 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
     // Ref to store cache sync cleanup function
     const cacheSyncCleanupRef = useRef<(() => void) | null>(null);
     const syncEventsCleanupRef = useRef<(() => void) | null>(null);
+    const updateStatusEventsCleanupRef = useRef<(() => void) | null>(null);
     const sidebarMediaQueryRef = useRef<MediaQueryList | null>(null);
         const sidebarMediaQueryUnsubscribeRef = useRef<(() => void) | null>(null);
     const settingsSubscriptionRef = useRef<(() => void) | null>(null);
@@ -461,6 +461,14 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
                 );
             }
 
+            // Subscribe to app update status events (store-owned subscription)
+            logger.debug("[App:init] subscribing to update status events");
+            updateStatusEventsCleanupRef.current =
+                subscribeToUpdateStatusEvents();
+            logger.debug(
+                "[App:init] update status events subscription established"
+            );
+
             // Mark initialization as complete to enable loading overlay for future operations
             logger.debug(
                 "[App:init] initialization pipeline finished, marking initialized"
@@ -487,7 +495,7 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
                         "Failed to initialize application. Please restart and try again."
                 );
         }
-    }, []);
+    }, [subscribeToUpdateStatusEvents]);
 
     /**
      * Cleans up application resources when the component unmounts.
@@ -522,6 +530,11 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
         if (syncEventsCleanupRef.current) {
             syncEventsCleanupRef.current();
             syncEventsCleanupRef.current = null;
+        }
+
+        if (updateStatusEventsCleanupRef.current) {
+            updateStatusEventsCleanupRef.current();
+            updateStatusEventsCleanupRef.current = null;
         }
     }, []);
 
@@ -675,78 +688,8 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
         [systemNotificationsEnabled, systemNotificationsSoundEnabled]
     );
 
-    useEffect(
-        function subscribeToUpdateStatusEvents(): () => void {
-            const cleanupHandleRef: {
-                current: (() => void) | undefined;
-            } = {
-                current: undefined,
-            };
-            const cleanupRequestedRef: { current: boolean } = {
-                current: false,
-            };
-
-            const subscriptionPromise = (async (): Promise<
-                (() => void) | undefined
-            > => {
-                try {
-                    const cleanup = await EventsService.onUpdateStatus(
-                        ({ error, status }: UpdateStatusEventData) => {
-                            applyUpdateStatus(status);
-                            setUpdateError(error);
-                        }
-                    );
-
-                    if (cleanupRequestedRef.current) {
-                        cleanup();
-                        return cleanup;
-                    }
-
-                    cleanupHandleRef.current = cleanup;
-                    return cleanup;
-                } catch (error: unknown) {
-                    logger.error(
-                        "[App] Failed to subscribe to update status events",
-                        ensureError(error)
-                    );
-                    return undefined;
-                }
-            })();
-
-            return (): void => {
-                cleanupRequestedRef.current = true;
-
-                const cleanupHandle = cleanupHandleRef.current;
-                if (typeof cleanupHandle === "function") {
-                    try {
-                        cleanupHandle();
-                    } catch (error: unknown) {
-                        logger.error(
-                            "[App] Failed to cleanup update status subscription",
-                            ensureError(error)
-                        );
-                    }
-
-                    return;
-                }
-
-                void (async (): Promise<void> => {
-                    try {
-                        const deferredCleanup = await subscriptionPromise;
-                        if (typeof deferredCleanup === "function") {
-                            deferredCleanup();
-                        }
-                    } catch (error: unknown) {
-                        logger.error(
-                            "[App] Failed to cleanup deferred update status subscription",
-                            ensureError(error)
-                        );
-                    }
-                })();
-            };
-        },
-        [applyUpdateStatus, setUpdateError]
-    );
+    // Update status events are subscribed during the initialization pipeline
+    // via the UpdatesStore to keep event ownership consistent.
 
     // Focus-based state synchronization (disabled by default for performance)
     // eslint-disable-next-line n/no-sync -- Function name contains 'sync' but is not a synchronous file operation

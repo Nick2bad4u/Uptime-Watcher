@@ -14,11 +14,16 @@ import type {
 
 import { useUIStore } from "../../../stores/ui/useUiStore";
 
-// Mock the shared utils
-vi.mock("../../../stores/utils", () => ({
-    logStoreAction: vi.fn(),
-    // Prior bridge helper mock removed
-}));
+// Mock the store utils (partial) so createPersistConfig remains available.
+vi.mock("../../../stores/utils", async (importOriginal) => {
+    const actual =
+        await importOriginal<typeof import("../../../stores/utils")>();
+    return {
+        ...actual,
+        logStoreAction: vi.fn(),
+        // Prior bridge helper mock removed
+    };
+});
 
 // Mock localStorage for persistence testing
 const localStorageMock = {
