@@ -23,7 +23,11 @@
         "**/scripts/**"
     ],
     "extends": "./tsconfig.json",
-    "include": ["electron/**/*", "vite/client", "vitest.electron.config.ts"],
+    "include": [
+        "electron/**/*",
+        "vite/client",
+        "vitest.electron.config.ts"
+    ],
     "references": [
         {
             "path": "./tsconfig.shared.json"

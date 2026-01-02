@@ -103,7 +103,11 @@ function describeDropboxSdkErrorRich(error: unknown): string | undefined {
     return `HTTP ${error.status}`;
 }
 
-function hasTag(value: unknown, tag: string, visited: WeakSet<object>): boolean {
+function hasTag(
+    value: unknown,
+    tag: string,
+    visited: WeakSet<object>
+): boolean {
     if (typeof value !== "object" || value === null) {
         return false;
     }
@@ -310,7 +314,9 @@ export class DropboxCloudStorageProvider
 
             let invalidEntryCount = 0;
 
-            const mapEntryToCloudObject = (entry: unknown): {
+            const mapEntryToCloudObject = (
+                entry: unknown
+            ): {
                 cloudObject: CloudObjectEntry | null;
                 isInvalid: boolean;
             } => {
@@ -554,12 +560,15 @@ export class DropboxCloudStorageProvider
 
             const described = describeDropboxSdkErrorRich(error);
             const detail = described ?? ensureError(error).message;
-            throw new CloudProviderOperationError(`Dropbox delete failed: ${detail}`, {
-                cause: error,
-                operation: "deleteObject",
-                providerKind: this.kind,
-                target: normalizedKey,
-            });
+            throw new CloudProviderOperationError(
+                `Dropbox delete failed: ${detail}`,
+                {
+                    cause: error,
+                    operation: "deleteObject",
+                    providerKind: this.kind,
+                    target: normalizedKey,
+                }
+            );
         });
     }
 

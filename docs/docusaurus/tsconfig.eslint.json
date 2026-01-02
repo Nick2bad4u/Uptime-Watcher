@@ -14,7 +14,12 @@
         "forceConsistentCasingInFileNames": true,
         "incremental": true,
         "jsx": "react-jsx",
-        "lib": ["DOM", "DOM.Iterable", "ES6", "ESNext"],
+        "lib": [
+            "DOM",
+            "DOM.Iterable",
+            "ES6",
+            "ESNext"
+        ],
         "module": "ESNext",
         "moduleDetection": "auto",
         "moduleResolution": "bundler",
