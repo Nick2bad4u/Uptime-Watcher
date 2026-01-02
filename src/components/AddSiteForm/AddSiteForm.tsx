@@ -25,6 +25,7 @@ import { ThemedButton } from "../../theme/components/ThemedButton";
 import { ThemedText } from "../../theme/components/ThemedText";
 import { generateUuid } from "../../utils/data/generateUuid";
 import { AppIcons } from "../../utils/icons";
+import { buildMonitorValidationFieldValues } from "../../utils/monitorValidationFields";
 import { ErrorAlert } from "../common/ErrorAlert/ErrorAlert";
 import { SurfaceContainer } from "../shared/SurfaceContainer";
 import { type FormMode, useAddSiteForm } from "../SiteDetails/useAddSiteForm";
@@ -359,7 +360,9 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
                 maxReplicationLagSeconds: (value: number | string): void => {
                     setMaxReplicationLagSeconds(String(value));
                 },
-                maxResponseTimeMs: (value: number | string): void => {
+                // Canonical backend field is `maxResponseTime` (milliseconds).
+                // UI state uses `maxResponseTimeMs` for clarity.
+                maxResponseTime: (value: number | string): void => {
                     setMaxResponseTimeMs(String(value));
                 },
                 port: (value: number | string): void => {
@@ -409,61 +412,8 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
             ]
         );
 
-        // Dynamic monitor field values
-        const dynamicFieldValues = useMemo(
-            () => ({
-                baselineUrl,
-                bodyKeyword,
-                certificateWarningDays,
-                edgeLocations,
-                expectedHeaderValue,
-                expectedJsonValue,
-                expectedStatusCode,
-                expectedValue,
-                headerName,
-                heartbeatExpectedStatus,
-                heartbeatMaxDriftSeconds,
-                heartbeatStatusField,
-                heartbeatTimestampField,
-                host,
-                jsonPath,
-                maxPongDelayMs,
-                maxReplicationLagSeconds,
-                maxResponseTimeMs,
-                port,
-                primaryStatusUrl,
-                recordType,
-                replicaStatusUrl,
-                replicationTimestampField,
-                url,
-            }),
-            [
-                baselineUrl,
-                bodyKeyword,
-                certificateWarningDays,
-                edgeLocations,
-                expectedHeaderValue,
-                expectedJsonValue,
-                expectedStatusCode,
-                expectedValue,
-                headerName,
-                heartbeatExpectedStatus,
-                heartbeatMaxDriftSeconds,
-                heartbeatStatusField,
-                heartbeatTimestampField,
-                host,
-                jsonPath,
-                maxPongDelayMs,
-                maxReplicationLagSeconds,
-                maxResponseTimeMs,
-                port,
-                primaryStatusUrl,
-                recordType,
-                replicaStatusUrl,
-                replicationTimestampField,
-                url,
-            ]
-        );
+        // Dynamic monitor field values (canonical field names).
+        const dynamicFieldValues = buildMonitorValidationFieldValues(formState);
 
         // Delayed loading state for button spinner (managed by custom hook)
         const showButtonLoading = useDelayedButtonLoading(isLoading);

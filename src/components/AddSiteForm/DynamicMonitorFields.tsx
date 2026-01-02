@@ -45,11 +45,13 @@ export interface DynamicMonitorFieldsProperties {
     /**
      * Change handlers for each field, keyed by field name.
      */
-    readonly onChange: Record<string, (value: number | string) => void>;
+    readonly onChange: Readonly<
+        Record<string, (value: number | string) => void>
+    >;
     /**
      * Current values for each field, keyed by field name.
      */
-    readonly values: Record<string, number | string>;
+    readonly values: Readonly<Record<string, number | string>>;
 }
 
 /**

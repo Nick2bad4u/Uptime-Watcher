@@ -161,9 +161,16 @@ vi.mock("../hooks/useDelayedButtonLoading", () => ({
     useDelayedButtonLoading: vi.fn(() => false),
 }));
 
-vi.mock("../components/SiteDetails/useAddSiteForm", () => ({
-    useAddSiteForm: vi.fn(() => buildAddSiteFormState()),
-}));
+vi.mock("../components/SiteDetails/useAddSiteForm", async () => {
+    const actual = await vi.importActual<
+        typeof import("../components/SiteDetails/useAddSiteForm")
+    >("../components/SiteDetails/useAddSiteForm");
+
+    return {
+        ...actual,
+        useAddSiteForm: vi.fn(() => buildAddSiteFormState()),
+    };
+});
 
 vi.mock("../constants", () => ({
     CHECK_INTERVALS: [

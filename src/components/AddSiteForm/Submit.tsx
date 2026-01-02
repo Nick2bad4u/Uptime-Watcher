@@ -22,6 +22,10 @@ import {
     validateMonitorFieldClientSide,
     validateMonitorFormData,
 } from "../../utils/monitorValidation";
+import {
+    buildMonitorValidationFieldValues,
+    type MonitorValidationFieldValues,
+} from "../../utils/monitorValidationFields";
 
 /**
  * Safely trims a string value. Returns empty string for non-strings.
@@ -68,7 +72,7 @@ export type FormSubmitProperties = Simplify<
         Pick<AddSiteFormActions, "setFormError"> &
         StoreActions & {
             /** Precomputed monitor validation field map. */
-            dynamicFieldValues?: MonitorValidationFields;
+            dynamicFieldValues?: MonitorValidationFieldValues;
             /** UUID generator function for creating unique identifiers */
             generateUuid: () => string;
             /** Logger instance for debugging and error tracking */
@@ -93,36 +97,9 @@ const parseOptionalInteger = (value?: string): number | undefined => {
     return Number.isNaN(parsed) ? undefined : parsed;
 };
 
-interface MonitorValidationFields {
-    baselineUrl: string;
-    bodyKeyword: string;
-    certificateWarningDays: string;
-    edgeLocations: string;
-    expectedHeaderValue: string;
-    expectedJsonValue: string;
-    expectedStatusCode: string;
-    expectedValue: string;
-    headerName: string;
-    heartbeatExpectedStatus: string;
-    heartbeatMaxDriftSeconds: string;
-    heartbeatStatusField: string;
-    heartbeatTimestampField: string;
-    host: string;
-    jsonPath: string;
-    maxPongDelayMs: string;
-    maxReplicationLagSeconds: string;
-    maxResponseTimeMs: string;
-    port: string;
-    primaryStatusUrl: string;
-    recordType: string;
-    replicaStatusUrl: string;
-    replicationTimestampField: string;
-    url: string;
-}
-
 type MonitorValidationBuilderMap = {
     [K in MonitorType]: (
-        fields: MonitorValidationFields
+        fields: MonitorValidationFieldValues
     ) => PartialMonitorFormDataByType<K>;
 };
 
@@ -180,8 +157,8 @@ const monitorValidationBuilders: MonitorValidationBuilderMap = {
         bodyKeyword: toOptionalString(bodyKeyword),
         url: toOptionalString(url),
     }),
-    "http-latency": ({ maxResponseTimeMs, url }): UnknownRecord => ({
-        maxResponseTime: parseOptionalInteger(maxResponseTimeMs),
+    "http-latency": ({ maxResponseTime, url }): UnknownRecord => ({
+        maxResponseTime: parseOptionalInteger(maxResponseTime),
         url: toOptionalString(url),
     }),
     "http-status": ({ expectedStatusCode, url }): UnknownRecord => ({
@@ -388,8 +365,8 @@ async function addToExistingSite(
     logger.info("Monitor added to site successfully", {
         identifier: selectedExistingSite,
         monitorId: monitor.id,
-        monitorType: monitor.type,
-    });
+                monitorType: monitor.type,
+        });
 }
 
 /**
@@ -477,7 +454,7 @@ async function validateCheckInterval(
 // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-parameters -- Generic preserves precise builder-to-schema linkage for each monitor type.
 async function validateMonitorType<TType extends MonitorType>(
     monitorType: TType,
-    fields: MonitorValidationFields
+    fields: MonitorValidationFieldValues
 ): Promise<readonly string[]> {
     const builderCandidate = resolveMonitorValidationBuilder(monitorType);
     const partialData = builderCandidate(fields);
@@ -561,33 +538,8 @@ export async function handleSubmit(
         url,
     } = properties;
 
-    const monitorValidationFields: MonitorValidationFields =
-        dynamicFieldValues ?? {
-            baselineUrl,
-            bodyKeyword,
-            certificateWarningDays,
-            edgeLocations,
-            expectedHeaderValue,
-            expectedJsonValue,
-            expectedStatusCode,
-            expectedValue,
-            headerName,
-            heartbeatExpectedStatus,
-            heartbeatMaxDriftSeconds,
-            heartbeatStatusField,
-            heartbeatTimestampField,
-            host,
-            jsonPath,
-            maxPongDelayMs,
-            maxReplicationLagSeconds,
-            maxResponseTimeMs,
-            port,
-            primaryStatusUrl,
-            recordType,
-            replicaStatusUrl,
-            replicationTimestampField,
-            url,
-        };
+    const monitorValidationFields: MonitorValidationFieldValues =
+        dynamicFieldValues ?? buildMonitorValidationFieldValues(properties);
 
     event.preventDefault();
     setFormError("");

@@ -1,11 +1,10 @@
-import { tryParseJsonRecord } from "@shared/utils/jsonSafety";
-import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import axios from "axios";
 import * as z from "zod";
 
 import type { SecretStore } from "../../secrets/SecretStore";
 
 import { logger } from "../../../../utils/logger";
+import { readStoredJsonSecret } from "../oauthStoredTokens";
 import { GOOGLE_OAUTH_REQUEST_TIMEOUT_MS } from "./googleDriveOAuthConstants";
 import { googleTokenResponseSchema } from "./googleDriveTokenSchemas";
 
@@ -47,56 +46,14 @@ export class GoogleDriveTokenManager {
     }
 
     public async getTokens(): Promise<GoogleDriveTokens | undefined> {
-        const raw = await this.secretStore.getSecret(this.storageKey);
-        if (!raw) {
-            return undefined;
-        }
-
-        const parsed = tryParseJsonRecord(raw);
-        if (!parsed) {
-            logger.warn(
-                "[GoogleDriveTokenManager] Stored tokens were not valid JSON; clearing",
-                {
-                    storageKey: this.storageKey,
-                }
-            );
-            try {
-                await this.clear();
-            } catch (error) {
-                logger.warn(
-                    "[GoogleDriveTokenManager] Failed to clear invalid stored tokens",
-                    {
-                        message: getUserFacingErrorDetail(error),
-                        storageKey: this.storageKey,
-                    }
-                );
-            }
-            return undefined;
-        }
-
-        try {
-            return googleTokenSchema.parse(parsed);
-        } catch (error) {
-            logger.warn(
-                "[GoogleDriveTokenManager] Stored tokens failed schema validation; clearing",
-                {
-                    message: getUserFacingErrorDetail(error),
-                    storageKey: this.storageKey,
-                }
-            );
-            try {
-                await this.clear();
-            } catch (clearError) {
-                logger.warn(
-                    "[GoogleDriveTokenManager] Failed to clear invalid stored tokens",
-                    {
-                        message: getUserFacingErrorDetail(clearError),
-                        storageKey: this.storageKey,
-                    }
-                );
-            }
-            return undefined;
-        }
+        return readStoredJsonSecret({
+            clear: () => this.clear(),
+            logger,
+            logPrefix: "[GoogleDriveTokenManager]",
+            parse: (record) => googleTokenSchema.parse(record),
+            secretStore: this.secretStore,
+            storageKey: this.storageKey,
+        });
     }
 
     public async setTokens(tokens: GoogleDriveTokens): Promise<void> {
