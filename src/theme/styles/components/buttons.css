@@ -1,6 +1,4 @@
 /* Themed Button Styles */
-/* stylelint-disable a11y/selector-pseudo-class-focus -- TODO: Create Script to Fix at release to reduce LoC */
-/* stylelint-disable a11y/media-prefers-reduced-motion -- TODO: Create Script to Fix at release to reduce LoC */
 /* stylelint-disable no-unknown-animations -- animation keyframes live in shared animations.css */
 
 .themed-button {
@@ -60,7 +58,16 @@
             transform var(--transition-fast);
     }
 
-    &:hover {
+    @media (prefers-reduced-motion: reduce) {
+        transition: none;
+
+        &::after {
+            transition: none;
+        }
+    }
+
+    &:hover,
+    &:focus {
         box-shadow:
             0 26px 48px
                 color-mix(in srgb, var(--themed-button-accent) 24%, transparent),
@@ -79,6 +86,10 @@
         transition:
             transform var(--transition-fast),
             box-shadow var(--transition-fast);
+
+        @media (prefers-reduced-motion: reduce) {
+            transition: none;
+        }
     }
 
     &:focus-visible {
@@ -278,6 +289,10 @@
     block-size: 16px;
     border-block-start: 2px solid currentcolor;
     inline-size: 16px;
+
+    @media (prefers-reduced-motion: reduce) {
+        animation: none;
+    }
 }
 
 .icon-button {
@@ -299,7 +314,7 @@
         transition: transform var(--transition-normal);
     }
 
-    &:hover .icon {
+    &:is(:hover, :focus, :focus-visible) .icon {
         transform: scale(1.1);
     }
 
@@ -313,7 +328,7 @@
         transition: opacity var(--transition-normal);
     }
 
-    &:hover::before {
+    &:is(:hover, :focus, :focus-visible)::before {
         opacity: 0.1;
     }
 
@@ -325,6 +340,18 @@
         box-shadow: 0 0 0 2px
             color-mix(in srgb, var(--color-primary-500) 75%, transparent);
         transform: translateY(-1px);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        transition: none;
+
+        & .icon {
+            transition: none;
+        }
+
+        &::before {
+            transition: none;
+        }
     }
 }
 
@@ -352,6 +379,10 @@
             transform var(--transition-normal),
             block-size var(--transition-fast),
             inline-size var(--transition-fast);
+
+        @media (prefers-reduced-motion: reduce) {
+            transition: none;
+        }
     }
 
     &:active::after {

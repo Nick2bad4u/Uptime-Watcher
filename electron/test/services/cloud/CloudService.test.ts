@@ -307,4 +307,52 @@ describe("CloudService", () => {
             )
         ).resolves.toBeTruthy();
     });
+
+    it("treats a corrupted stored derived key as locked and clears it", async () => {
+        const settings = new Map<string, string>();
+        const syncEngine = {
+            syncNow: vi.fn().mockResolvedValue({
+                appliedRemoteOperations: 0,
+                emittedLocalOperations: 0,
+                mergedEntities: 0,
+                snapshotKey: null,
+            }),
+        };
+
+        const orchestrator = {
+            downloadBackup: vi.fn(),
+            restoreBackup: vi.fn(),
+        } as unknown as UptimeOrchestrator;
+
+        const secretStore = new InMemorySecretStore();
+
+        const cloudService = new CloudService({
+            orchestrator,
+            settings: {
+                get: async (key) => settings.get(key),
+                set: async (key, value) => {
+                    settings.set(key, value);
+                },
+            },
+            syncEngine,
+            secretStore,
+        });
+
+        await cloudService.configureFilesystemProvider({ baseDirectory });
+
+        await expect(
+            cloudService.setEncryptionPassphrase("correct horse battery staple")
+        ).resolves.toBeTruthy();
+
+        // Corrupt the stored derived key so it decodes to the wrong length.
+        await secretStore.setSecret("cloud.encryption.key.v1", "not-base64");
+
+        const status = await cloudService.getStatus();
+        expect(status.encryptionMode).toBe("passphrase");
+        expect(status.encryptionLocked).toBeTruthy();
+
+        await expect(
+            secretStore.getSecret("cloud.encryption.key.v1")
+        ).resolves.toBeUndefined();
+    });
 });

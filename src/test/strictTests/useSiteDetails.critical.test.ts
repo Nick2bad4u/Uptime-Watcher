@@ -62,7 +62,7 @@ describe("useSiteDetails - Critical Coverage Tests", () => {
     const createMockStore = (overrides: any = {}) => ({
         getSiteByIdentifier: vi.fn().mockReturnValue(mockSite),
         removeSiteMonitor: vi.fn(),
-        getSelectedMonitorId: vi.fn().mockReturnValue(null),
+        getSelectedMonitorId: vi.fn().mockReturnValue(undefined),
         selectedMonitorIds: {
             [mockSite.identifier]: undefined,
         },
@@ -83,6 +83,12 @@ describe("useSiteDetails - Critical Coverage Tests", () => {
         clearError: vi.fn(),
         ...overrides,
     });
+
+    const applySitesStoreMockState = (store: unknown): void => {
+        (useSitesStore as any).mockImplementation((selector: any) =>
+            typeof selector === "function" ? selector(store) : store
+        );
+    };
 
     beforeEach(() => {
         vi.clearAllMocks();
@@ -116,7 +122,7 @@ describe("useSiteDetails - Critical Coverage Tests", () => {
         // Setup store without selected monitor
         const mockStore = createMockStore();
 
-        (useSitesStore as any).mockReturnValue(mockStore);
+        applySitesStoreMockState(mockStore);
 
         const { result } = renderHook(() => useSiteDetails({ site: mockSite }));
 
@@ -143,7 +149,7 @@ describe("useSiteDetails - Critical Coverage Tests", () => {
             },
         });
 
-        (useSitesStore as any).mockReturnValue(mockStore);
+        applySitesStoreMockState(mockStore);
 
         const { result } = renderHook(() => useSiteDetails({ site: mockSite }));
 
@@ -173,7 +179,7 @@ describe("useSiteDetails - Critical Coverage Tests", () => {
             sites: [siteWithMonitor],
         });
 
-        (useSitesStore as any).mockReturnValue(mockStore);
+        applySitesStoreMockState(mockStore);
 
         confirmMock.mockResolvedValue(false);
 
@@ -210,7 +216,7 @@ describe("useSiteDetails - Critical Coverage Tests", () => {
             sites: [siteWithMonitor],
         });
 
-        (useSitesStore as any).mockReturnValue(mockStore);
+        applySitesStoreMockState(mockStore);
 
         confirmMock.mockResolvedValue(true);
 
@@ -240,7 +246,7 @@ describe("useSiteDetails - Critical Coverage Tests", () => {
     it("should handle removeSite confirmation dialog cancellation", async () => {
         const mockStore = createMockStore();
 
-        (useSitesStore as any).mockReturnValue(mockStore);
+        applySitesStoreMockState(mockStore);
 
         confirmMock.mockResolvedValue(false);
 
@@ -296,7 +302,7 @@ describe("useSiteDetails - Critical Coverage Tests", () => {
             updateSiteCheckInterval: vi.fn(),
         };
 
-        (useSitesStore as any).mockReturnValue(mockStore);
+        applySitesStoreMockState(mockStore);
 
         const { result } = renderHook(() =>
             useSiteDetails({ site: siteWithSpecialMonitor })
@@ -332,7 +338,7 @@ describe("useSiteDetails - Critical Coverage Tests", () => {
             updateSiteCheckInterval: vi.fn(),
         };
 
-        (useSitesStore as any).mockReturnValue(mockStore);
+        applySitesStoreMockState(mockStore);
 
         const { result } = renderHook(() =>
             useSiteDetails({ site: siteWithoutMonitors })
@@ -357,7 +363,7 @@ describe("useSiteDetails - Critical Coverage Tests", () => {
         (useUIStore as any).mockReturnValue(mockUIStore);
 
         const mockStore = createMockStore();
-        (useSitesStore as any).mockReturnValue(mockStore);
+        applySitesStoreMockState(mockStore);
 
         const { result } = renderHook(() => useSiteDetails({ site: mockSite }));
 
@@ -381,7 +387,7 @@ describe("useSiteDetails - Critical Coverage Tests", () => {
             sites: [siteWithoutMonitors],
         });
 
-        (useSitesStore as any).mockReturnValue(mockStore);
+        applySitesStoreMockState(mockStore);
 
         const { result } = renderHook(() =>
             useSiteDetails({ site: siteWithoutMonitors })
@@ -440,7 +446,7 @@ describe("useSiteDetails - Critical Coverage Tests", () => {
             updateSiteCheckInterval: vi.fn(),
         };
 
-        (useSitesStore as any).mockReturnValue(mockStore);
+        applySitesStoreMockState(mockStore);
 
         const { result } = renderHook(() => useSiteDetails({ site: mockSite }));
 
@@ -484,7 +490,7 @@ describe("useSiteDetails - Critical Coverage Tests", () => {
             updateSiteCheckInterval: vi.fn(),
         };
 
-        (useSitesStore as any).mockReturnValue(mockStore);
+        applySitesStoreMockState(mockStore);
 
         const { result } = renderHook(() =>
             useSiteDetails({ site: siteWithInvalidMonitor })
@@ -504,7 +510,7 @@ describe("useSiteDetails - Critical Coverage Tests", () => {
                 .mockRejectedValue(new Error("Stop failed")),
         });
 
-        (useSitesStore as any).mockReturnValue(mockStore);
+        applySitesStoreMockState(mockStore);
 
         const { result } = renderHook(() => useSiteDetails({ site: mockSite }));
 

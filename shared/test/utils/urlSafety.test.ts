@@ -138,6 +138,19 @@ describe("urlSafety", () => {
             expect(
                 validateExternalOpenUrlCandidate("mailto:test@example.com").ok
             ).toBeTruthy();
+
+            // Scheme checks should be case-insensitive.
+            expect(
+                validateExternalOpenUrlCandidate("HTTP://example.com").ok
+            ).toBeTruthy();
+            expect(
+                validateExternalOpenUrlCandidate("MAILTO:test@example.com").ok
+            ).toBeTruthy();
+        });
+
+        it("rejects uppercase mailto when email is invalid", () => {
+            const result = validateExternalOpenUrlCandidate("MAILTO:not-an-email");
+            expect(result.ok).toBeFalsy();
         });
 
         it("rejects javascript/file URLs", () => {

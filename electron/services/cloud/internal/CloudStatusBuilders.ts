@@ -14,14 +14,15 @@ import { FilesystemCloudStorageProvider } from "../providers/FilesystemCloudStor
  *
  * @remarks
  * The values are sourced by `CloudService` from settings and the configured
- * secret store (for `localEncryptionKey`). Keeping this type centralised keeps
- * all provider summaries consistent.
+ * secret store (for `hasLocalEncryptionKey`). Keeping this type centralised
+ * keeps all provider summaries consistent.
  */
 export type CloudStatusCommonArgs = Readonly<{
+    /** True when this device has a locally cached derived encryption key. */
+    hasLocalEncryptionKey: boolean;
     lastBackupAt: null | number;
     lastError: string | undefined;
     lastSyncAt: null | number;
-    localEncryptionKey: string | undefined;
     localEncryptionMode: CloudEncryptionMode;
     syncEnabled: boolean;
 }>;
@@ -61,7 +62,7 @@ const buildCloudStatusSummary = (
     overrides: CloudStatusBuildOverrides
 ): CloudStatusSummary => {
     const encryptionLocked =
-        overrides.encryptionMode === "passphrase" && !common.localEncryptionKey;
+        overrides.encryptionMode === "passphrase" && !common.hasLocalEncryptionKey;
 
     const lastError = overrides.lastError ?? common.lastError;
 
@@ -119,7 +120,7 @@ export async function buildDropboxStatus(args: {
             : common.localEncryptionMode;
 
     const encryptionLocked =
-        encryptionMode === "passphrase" && !common.localEncryptionKey;
+        encryptionMode === "passphrase" && !common.hasLocalEncryptionKey;
 
     const lastError = common.lastError ?? connectionError;
 
@@ -166,7 +167,7 @@ export async function buildGoogleDriveStatus(args: {
             : common.localEncryptionMode;
 
     const encryptionLocked =
-        encryptionMode === "passphrase" && !common.localEncryptionKey;
+        encryptionMode === "passphrase" && !common.hasLocalEncryptionKey;
 
     return {
         backupsEnabled: connected,

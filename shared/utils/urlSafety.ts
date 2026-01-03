@@ -11,7 +11,7 @@
 
 import { hasAsciiControlCharacters } from "@shared/utils/stringSafety";
 import { getUtfByteLength } from "@shared/utils/utfByteLength";
-import { isValidUrl } from "@shared/validation/validatorUtils";
+import validator from "validator";
 
 /** Maximum accepted UTF-8 byte budget for user-supplied external-open URLs. */
 const MAX_EXTERNAL_OPEN_URL_BYTES = 4096;
@@ -316,27 +316,51 @@ export function validateExternalOpenUrlCandidate(
         };
     }
 
-    // For hierarchical URLs, enforce the stricter validator.js checks.
-    if (
-        (normalizedUrl.startsWith("http:") ||
-            normalizedUrl.startsWith("https:")) &&
-        !isValidUrl(normalizedUrl, {
-            disallowAuth: true,
-        })
-    ) {
-        return {
-            ok: false,
-            reason: "must be a valid http(s) URL",
-            safeUrlForLogging,
-        };
-    }
-
     if (!isAllowedExternalOpenUrl(normalizedUrl)) {
         return {
             ok: false,
             reason: "must be an http(s) or mailto URL",
             safeUrlForLogging,
         };
+    }
+
+    const normalizedUrlLower = normalizedUrl.toLowerCase();
+
+    // For hierarchical URLs, enforce the stricter validator.js checks.
+    if (
+        normalizedUrlLower.startsWith("http:") ||
+        normalizedUrlLower.startsWith("https:")
+    ) {
+        const isValidHttpUrl = validator.isURL(normalizedUrl, {
+            allow_protocol_relative_urls: false,
+            disallow_auth: true,
+            protocols: ["http", "https"],
+            require_host: true,
+            require_protocol: true,
+            // Allow localhost-style hosts. Private-network IPs are still blocked
+            // by isAllowedExternalOpenUrl() above.
+            require_tld: false,
+        });
+
+        if (!isValidHttpUrl) {
+            return {
+                ok: false,
+                reason: "must be a valid http(s) URL",
+                safeUrlForLogging,
+            };
+        }
+    }
+
+    if (normalizedUrlLower.startsWith("mailto:")) {
+        const mailtoUrl = new URL(normalizedUrl);
+        const email = mailtoUrl.pathname;
+        if (!validator.isEmail(email)) {
+            return {
+                ok: false,
+                reason: "mailto URL must include a valid email address",
+                safeUrlForLogging,
+            };
+        }
     }
 
     return {

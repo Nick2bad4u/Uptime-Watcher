@@ -1,7 +1,5 @@
 /* Form Controls and Structured Inputs */
 /* stylelint-disable no-descending-specificity -- selector order encodes focus/hover precedence */
-/* stylelint-disable a11y/selector-pseudo-class-focus -- TODO: Create Script to Fix at release to reduce LoC */
-/* stylelint-disable a11y/media-prefers-reduced-motion -- TODO: Create Script to Fix at release to reduce LoC */
 /* stylelint-disable no-unknown-animations -- animation keyframes live in shared animations.css */
 
 .themed-input {
@@ -22,7 +20,16 @@
         box-shadow var(--transition-normal),
         transform var(--transition-normal);
 
-    &:focus {
+    @media (prefers-reduced-motion: reduce) {
+        transition: none;
+    }
+
+    &:is(:hover, :focus, :focus-visible) {
+        box-shadow: var(--shadow-elevation-1);
+        transform: translateY(-0.5px);
+    }
+
+    &:is(:focus, :focus-visible) {
         border-color: color-mix(
             in srgb,
             var(--color-primary-500) 65%,
@@ -31,11 +38,6 @@
         box-shadow: 0 0 0 3px var(--color-primary-200);
         outline: none;
         transform: translateY(-1px);
-    }
-
-    &:hover:not(:focus) {
-        box-shadow: var(--shadow-elevation-1);
-        transform: translateY(-0.5px);
     }
 
     &:disabled {
@@ -67,7 +69,16 @@
         box-shadow var(--transition-normal),
         transform var(--transition-normal);
 
-    &:focus {
+    @media (prefers-reduced-motion: reduce) {
+        transition: none;
+    }
+
+    &:is(:hover, :focus, :focus-visible) {
+        box-shadow: var(--shadow-elevation-1);
+        transform: translateY(-0.5px);
+    }
+
+    &:is(:focus, :focus-visible) {
         border-color: color-mix(
             in srgb,
             var(--color-primary-500) 65%,
@@ -78,28 +89,10 @@
         transform: translateY(-1px);
     }
 
-    &:hover:not(:focus) {
-        box-shadow: var(--shadow-elevation-1);
-        transform: translateY(-0.5px);
-    }
-
     &:disabled {
         cursor: not-allowed;
         opacity: 0.6;
     }
-}
-
-.themed-input:focus,
-.themed-select:focus {
-    border-color: var(--color-primary-500);
-    box-shadow: 0 0 0 3px var(--color-primary-200);
-    outline: none;
-    transform: translateY(-1px);
-}
-
-.themed-input:hover,
-.themed-select:hover {
-    transform: translateY(-1px);
 }
 
 .themed-checkbox {
@@ -116,14 +109,18 @@
         box-shadow var(--transition-normal),
         transform var(--transition-normal);
 
-    &:focus {
-        box-shadow: 0 0 0 3px var(--color-primary-200);
-        outline: none;
+    @media (prefers-reduced-motion: reduce) {
+        transition: none;
     }
 
-    &:hover {
+    &:is(:hover, :focus, :focus-visible) {
         box-shadow: var(--shadow-elevation-1);
         transform: scale(1.05);
+    }
+
+    &:is(:focus, :focus-visible) {
+        box-shadow: 0 0 0 3px var(--color-primary-200);
+        outline: none;
     }
 
     &:checked {
@@ -164,14 +161,18 @@
         box-shadow var(--transition-normal),
         transform var(--transition-normal);
 
-    &:focus {
+    @media (prefers-reduced-motion: reduce) {
+        transition: none;
+    }
+
+    &:is(:hover, :focus, :focus-visible):not(:disabled) {
+        box-shadow: var(--shadow-elevation-1);
+    }
+
+    &:is(:focus, :focus-visible):not(:disabled) {
         box-shadow: 0 0 0 3px var(--color-primary-200);
         outline: none;
         transform: translateY(-1px);
-    }
-
-    &:hover:not(:disabled, :focus) {
-        box-shadow: var(--shadow-elevation-1);
     }
 
     &:disabled {
@@ -209,6 +210,10 @@
         inline-size: 0.875rem;
         margin-block-start: -0.25rem;
         transition: transform var(--transition-normal);
+
+        @media (prefers-reduced-motion: reduce) {
+            transition: none;
+        }
     }
 
     &:focus::-webkit-slider-thumb,
@@ -224,6 +229,10 @@
         box-shadow: var(--shadow-elevation-1);
         inline-size: 0.875rem;
         transition: transform var(--transition-normal);
+
+        @media (prefers-reduced-motion: reduce) {
+            transition: none;
+        }
     }
 
     &:focus::-moz-range-thumb,
@@ -244,6 +253,10 @@
     block-size: 100%;
     transition: inline-size 0.3s ease-in-out;
 
+    @media (prefers-reduced-motion: reduce) {
+        transition: none;
+    }
+
     &::after {
         position: absolute;
         animation: shimmer 2s infinite;
@@ -258,6 +271,10 @@
         inline-size: 100%;
         inset-block-start: 0;
         inset-inline-start: -100%;
+
+        @media (prefers-reduced-motion: reduce) {
+            animation: none;
+        }
     }
 }
 
@@ -272,6 +289,10 @@
             opacity var(--transition-normal),
             transform var(--transition-normal);
         visibility: hidden;
+
+        @media (prefers-reduced-motion: reduce) {
+            transition: none;
+        }
     }
 
     &::before {
@@ -304,8 +325,8 @@
         transform: translateX(-50%);
     }
 
-    &:hover::before,
-    &:hover::after {
+    &:is(:hover, :focus, :focus-visible)::before,
+    &:is(:hover, :focus, :focus-visible)::after {
         opacity: 1;
         transform: translateX(-50%);
         visibility: visible;

@@ -10,25 +10,31 @@ import React from "react";
 import { useSiteMonitor } from "../../../hooks/site/useSiteMonitor";
 import { createMockSite, createMockMonitor } from "../../utils/mockFactories";
 
-// Define types locally since they are not exported from types
-interface Site {
-    identifier: string;
-    name: string;
-    monitoring: boolean;
-    monitors: any[];
-}
+import type { Site } from "@shared/types";
 
-// Mock the dependencies
-vi.mock("../../../stores/sites/useSitesStore", () => ({
-    useSitesStore: vi.fn(() => ({
-        getSelectedMonitorId: vi.fn(() => "monitor-1"),
-        selectedMonitorIds: {},
-        setSelectedMonitorId: vi.fn(),
-        sites: [],
-    })),
+import type { SelectorHookMock } from "../../utils/createSelectorHookMock";
+
+import { createSitesStoreMock } from "../../utils/createSitesStoreMock";
+
+const useSitesStoreMockRef = vi.hoisted(() => ({
+    current: undefined as SelectorHookMock<any> | undefined,
 }));
 
-import { useSitesStore } from "../../../stores/sites/useSitesStore";
+// Mock the dependencies
+vi.mock("../../../stores/sites/useSitesStore", async () => {
+    const { createSelectorHookMock } = await import(
+        "../../utils/createSelectorHookMock"
+    );
+    const { createSitesStoreMock } = await import("../../utils/createSitesStoreMock");
+
+    useSitesStoreMockRef.current = createSelectorHookMock(
+        createSitesStoreMock({ sites: [] })
+    );
+
+    return {
+        useSitesStore: useSitesStoreMockRef.current,
+    };
+});
 
 describe("useSiteMonitor Hook", () => {
     const mockSite: Site = createMockSite({
@@ -73,14 +79,15 @@ describe("useSiteMonitor Hook", () => {
         vi.clearAllMocks();
 
         // Default mock setup
-        (useSitesStore as any).mockReturnValue({
-            getSelectedMonitorId: vi.fn(() => "monitor-1"),
-            selectedMonitorIds: {
-                "site-1": "monitor-1",
-            },
-            setSelectedMonitorId: vi.fn(),
-            sites: [mockSite],
-        });
+        useSitesStoreMockRef.current!.setState(
+            createSitesStoreMock({
+                selectedMonitorIds: {
+                    [mockSite.identifier]: "monitor-1",
+                },
+                setSelectedMonitorId: vi.fn(),
+                sites: [mockSite],
+            })
+        );
     });
 
     describe("Hook Initialization", () => {
@@ -119,14 +126,15 @@ describe("useSiteMonitor Hook", () => {
                 monitors: [],
             };
 
-            (useSitesStore as any).mockReturnValue({
-                getSelectedMonitorId: vi.fn(() => null),
-                selectedMonitorIds: {
-                    "site-1": undefined,
-                },
-                setSelectedMonitorId: vi.fn(),
-                sites: [emptyMonitorsSite],
-            });
+            useSitesStoreMockRef.current!.setState(
+                createSitesStoreMock({
+                    selectedMonitorIds: {
+                        [emptyMonitorsSite.identifier]: undefined,
+                    },
+                    setSelectedMonitorId: vi.fn(),
+                    sites: [emptyMonitorsSite],
+                })
+            );
 
             const { result } = renderHook(() =>
                 useSiteMonitor(emptyMonitorsSite)
@@ -152,14 +160,12 @@ describe("useSiteMonitor Hook", () => {
                 name: "Updated Site Name",
             };
 
-            (useSitesStore as any).mockReturnValue({
-                getSelectedMonitorId: vi.fn(() => "monitor-1"),
-                selectedMonitorIds: {
-                    "site-1": "monitor-1",
-                },
-                setSelectedMonitorId: vi.fn(),
-                sites: [updatedSite],
-            });
+            useSitesStoreMockRef.current!.setState(
+                createSitesStoreMock({
+                    getSelectedMonitorId: vi.fn(() => "monitor-1"),
+                    sites: [updatedSite],
+                })
+            );
 
             const { result } = renderHook(() => useSiteMonitor(mockSite));
 
@@ -175,12 +181,12 @@ describe("useSiteMonitor Hook", () => {
             await annotate("Category: Hook", "category");
             await annotate("Type: Business Logic", "type");
 
-            (useSitesStore as any).mockReturnValue({
-                getSelectedMonitorId: vi.fn(() => "monitor-1"),
-                selectedMonitorIds: {},
-                setSelectedMonitorId: vi.fn(),
-                sites: [], // Empty sites array
-            });
+            useSitesStoreMockRef.current!.setState(
+                createSitesStoreMock({
+                    getSelectedMonitorId: vi.fn(() => "monitor-1"),
+                    sites: [],
+                })
+            );
 
             const { result } = renderHook(() => useSiteMonitor(mockSite));
 
@@ -229,11 +235,12 @@ describe("useSiteMonitor Hook", () => {
             await annotate("Category: Hook", "category");
             await annotate("Type: Monitoring", "type");
 
-            (useSitesStore as any).mockReturnValue({
-                getSelectedMonitorId: vi.fn(() => "monitor-2"),
-                setSelectedMonitorId: vi.fn(),
-                sites: [mockSite],
-            });
+            useSitesStoreMockRef.current!.setState(
+                createSitesStoreMock({
+                    getSelectedMonitorId: vi.fn(() => "monitor-2"),
+                    sites: [mockSite],
+                })
+            );
 
             const { result } = renderHook(() => useSiteMonitor(mockSite));
 
@@ -251,11 +258,12 @@ describe("useSiteMonitor Hook", () => {
             await annotate("Category: Hook", "category");
             await annotate("Type: Monitoring", "type");
 
-            (useSitesStore as any).mockReturnValue({
-                getSelectedMonitorId: vi.fn(() => "non-existent-monitor"),
-                setSelectedMonitorId: vi.fn(),
-                sites: [mockSite],
-            });
+            useSitesStoreMockRef.current!.setState(
+                createSitesStoreMock({
+                    getSelectedMonitorId: vi.fn(() => "non-existent-monitor"),
+                    sites: [mockSite],
+                })
+            );
 
             const { result } = renderHook(() => useSiteMonitor(mockSite));
 
@@ -278,11 +286,13 @@ describe("useSiteMonitor Hook", () => {
 
             const mockSetSelectedMonitorId = vi.fn();
 
-            (useSitesStore as any).mockReturnValue({
-                getSelectedMonitorId: vi.fn(() => "monitor-1"),
-                setSelectedMonitorId: mockSetSelectedMonitorId,
-                sites: [mockSite],
-            });
+            useSitesStoreMockRef.current!.setState(
+                createSitesStoreMock({
+                        getSelectedMonitorId: vi.fn(() => undefined),
+                    setSelectedMonitorId: mockSetSelectedMonitorId,
+                    sites: [mockSite],
+                })
+            );
 
             const { result } = renderHook(() => useSiteMonitor(mockSite));
 
@@ -323,11 +333,12 @@ describe("useSiteMonitor Hook", () => {
             await annotate("Category: Hook", "category");
             await annotate("Type: Monitoring", "type");
 
-            (useSitesStore as any).mockReturnValue({
-                getSelectedMonitorId: vi.fn(() => null),
-                setSelectedMonitorId: vi.fn(),
-                sites: [mockSite],
-            });
+            useSitesStoreMockRef.current!.setState(
+                createSitesStoreMock({
+                        getSelectedMonitorId: vi.fn(() => undefined),
+                    sites: [mockSite],
+                })
+            );
 
             const { result } = renderHook(() => useSiteMonitor(mockSite));
 
@@ -359,11 +370,12 @@ describe("useSiteMonitor Hook", () => {
                 ],
             });
 
-            (useSitesStore as any).mockReturnValue({
-                getSelectedMonitorId: vi.fn(() => "monitor-1"),
-                setSelectedMonitorId: vi.fn(),
-                sites: [siteWithUndefinedStatus],
-            });
+            useSitesStoreMockRef.current!.setState(
+                createSitesStoreMock({
+                    getSelectedMonitorId: vi.fn(() => "monitor-1"),
+                    sites: [siteWithUndefinedStatus],
+                })
+            );
 
             const { result } = renderHook(() =>
                 useSiteMonitor(siteWithUndefinedStatus)
@@ -395,11 +407,12 @@ describe("useSiteMonitor Hook", () => {
                 ],
             });
 
-            (useSitesStore as any).mockReturnValue({
-                getSelectedMonitorId: vi.fn(() => "monitor-1"),
-                setSelectedMonitorId: vi.fn(),
-                sites: [siteWithUndefinedMonitoring],
-            });
+            useSitesStoreMockRef.current!.setState(
+                createSitesStoreMock({
+                    getSelectedMonitorId: vi.fn(() => "monitor-1"),
+                    sites: [siteWithUndefinedMonitoring],
+                })
+            );
 
             const { result } = renderHook(() =>
                 useSiteMonitor(siteWithUndefinedMonitoring)
@@ -432,11 +445,12 @@ describe("useSiteMonitor Hook", () => {
                 ],
             });
 
-            (useSitesStore as any).mockReturnValue({
-                getSelectedMonitorId: vi.fn(() => "monitor-1"),
-                setSelectedMonitorId: vi.fn(),
-                sites: [siteWithDisabledMonitoring],
-            });
+            useSitesStoreMockRef.current!.setState(
+                createSitesStoreMock({
+                    getSelectedMonitorId: vi.fn(() => "monitor-1"),
+                    sites: [siteWithDisabledMonitoring],
+                })
+            );
 
             const { result } = renderHook(() =>
                 useSiteMonitor(siteWithDisabledMonitoring)

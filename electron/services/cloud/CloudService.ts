@@ -120,14 +120,11 @@ const SETTINGS_KEY_LAST_SYNC_AT = "cloud.lastSyncAt" as const;
 const SETTINGS_KEY_LAST_ERROR = "cloud.lastError" as const;
 const SETTINGS_KEY_SYNC_ENABLED = "cloud.syncEnabled" as const;
 
-const SETTINGS_KEY_ENCRYPTION_MODE = "cloud.encryption.mode" as const;
-const SETTINGS_KEY_ENCRYPTION_SALT = "cloud.encryption.salt" as const;
-
+const SETTINGS_KEY_ENCRYPTION_MODE = "cloud.encryption.mode" as const; const SETTINGS_KEY_ENCRYPTION_SALT = "cloud.encryption.salt" as const;
 const SECRET_KEY_ENCRYPTION_DERIVED_KEY = "cloud.encryption.key.v1" as const;
-
 const BACKUP_KEY_PREFIX = "backups/" as const;
-
 const MAX_BACKUP_KEY_BYTES = 2048;
+const ENCRYPTION_KEY_BYTES = 32; const ENCRYPTION_SALT_BYTES = 16;
 
 function normalizeCloudKey(rawKey: string): string {
     return normalizeCloudObjectKey(rawKey, {
@@ -198,6 +195,22 @@ function encodeBase64(buffer: Buffer): string {
 
 function decodeBase64(value: string): Buffer {
     return Buffer.from(value, "base64");
+}
+
+function decodeStrictBase64(args: {
+    expectedBytes: number;
+    label: string;
+    value: string;
+}): Buffer {
+    const buffer = decodeBase64(args.value);
+
+    if (buffer.byteLength !== args.expectedBytes) {
+        throw new Error(
+            `Invalid ${args.label} length (expected ${args.expectedBytes} bytes)`
+        );
+    }
+
+    return buffer;
 }
 
 function determineBackupMigrationNeedsEncryptionKey(
@@ -425,7 +438,11 @@ export class CloudService {
             const remoteEncryption = manifest?.encryption;
 
             if (remoteEncryption?.mode === "passphrase") {
-                const salt = decodeBase64(remoteEncryption.saltBase64);
+                const salt = decodeStrictBase64({
+                    expectedBytes: ENCRYPTION_SALT_BYTES,
+                    label: "encryption salt",
+                    value: remoteEncryption.saltBase64,
+                });
                 const tryDeriveKey = async (
                     candidatePassphrase: string
                 ): Promise<Buffer | null> => {
@@ -1005,12 +1022,43 @@ export class CloudService {
             return provider;
         }
 
-        const key = decodeBase64(rawKey);
+        const key = await this.loadDerivedEncryptionKeyOrClear(rawKey);
+
+        if (!key) {
+            if (args?.requireEncryptionUnlocked ?? true) {
+                throw new Error(
+                    "Cloud encryption is enabled but locked on this device"
+                );
+            }
+
+            return provider;
+        }
 
         return new EncryptedSyncCloudStorageProvider({
             inner: provider,
             key,
         });
+    }
+
+    /**
+     * Decodes a derived encryption key and clears the stored secret when it is
+     * corrupted.
+     */
+    private async loadDerivedEncryptionKeyOrClear(
+        rawKeyBase64: string
+    ): Promise<Buffer | undefined> {
+        try {
+            return decodeStrictBase64({
+                expectedBytes: ENCRYPTION_KEY_BYTES,
+                label: "encryption key",
+                value: rawKeyBase64,
+            });
+        } catch {
+            await this.secretStore
+                .deleteSecret(SECRET_KEY_ENCRYPTION_DERIVED_KEY)
+                .catch(() => {});
+            return undefined;
+        }
     }
 
     private async resolveProviderOrNull(): Promise<CloudStorageProvider | null> {
@@ -1042,9 +1090,15 @@ export class CloudService {
             SECRET_KEY_ENCRYPTION_DERIVED_KEY
         );
 
+        if (!raw) {
+            return { encrypted: true, key: undefined };
+        }
+
+        const key = await this.loadDerivedEncryptionKeyOrClear(raw);
+
         return {
             encrypted: true,
-            key: raw ? decodeBase64(raw) : undefined,
+            key,
         };
     }
 
@@ -1058,7 +1112,14 @@ export class CloudService {
             );
         }
 
-        return decodeBase64(raw);
+        const key = await this.loadDerivedEncryptionKeyOrClear(raw);
+        if (!key) {
+            throw new Error(
+                "Cloud encryption is enabled but locked on this device"
+            );
+        }
+
+        return key;
     }
 
     private async decryptBackupOrThrow(buffer: Buffer): Promise<Buffer> {
@@ -1106,15 +1167,24 @@ export class CloudService {
         const localEncryptionMode = parseEncryptionMode(
             await this.settings.get(SETTINGS_KEY_ENCRYPTION_MODE)
         );
-        const localEncryptionKey = await this.secretStore.getSecret(
+        const localEncryptionKeyRaw = await this.secretStore.getSecret(
             SECRET_KEY_ENCRYPTION_DERIVED_KEY
         );
 
+        let hasLocalEncryptionKey = false;
+        if (typeof localEncryptionKeyRaw === "string") {
+            const candidateKey = await this.loadDerivedEncryptionKeyOrClear(
+                localEncryptionKeyRaw
+            );
+            hasLocalEncryptionKey = candidateKey !== undefined;
+            candidateKey?.fill(0);
+        }
+
         const common: CloudStatusCommonArgs = {
+            hasLocalEncryptionKey,
             lastBackupAt,
             lastError,
             lastSyncAt,
-            localEncryptionKey,
             localEncryptionMode,
             syncEnabled,
         };

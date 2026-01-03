@@ -74,12 +74,16 @@
                 "multilineArraysWrapThreshold": 1,
                 "plugins": [
                     "prettier-plugin-multiline-arrays",
-                    "prettier-plugin-tailwindcss"
+                    "prettier-plugin-css-order",
+                    "prettier-plugin-tailwindcss",
+                    "prettier-plugin-merge"
                 ],
                 "printWidth": 80,
                 "tailwindPreserveDuplicates": false,
                 "tailwindPreserveWhitespace": false,
-                "tailwindStylesheet": "./src/index.css"
+                "tailwindStylesheet": "./src/index.css",
+                "cssDeclarationSorterOrder": "concentric-css",
+                "cssDeclarationSorterKeepOverrides": true
             }
         },
         {

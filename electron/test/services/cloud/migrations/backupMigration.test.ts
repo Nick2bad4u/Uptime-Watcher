@@ -311,4 +311,94 @@ describe(migrateProviderBackups, () => {
             "backups/uptime-watcher-backup-10.sqlite"
         );
     });
+
+    it("refuses to overwrite an existing migrated target backup", async () => {
+        const provider = new InMemoryBackupProvider();
+
+        provider.seedBackup({
+            buffer: Buffer.from("plain", "utf8"),
+            createdAt: 10,
+            encrypted: false,
+            fileName: "uptime-watcher-backup-10.sqlite",
+            key: "backups/uptime-watcher-backup-10.sqlite",
+        });
+
+        provider.seedBackup({
+            buffer: Buffer.from("existing", "utf8"),
+            createdAt: 11,
+            encrypted: true,
+            fileName: "uptime-watcher-backup-10.sqlite.enc",
+            key: "backups/uptime-watcher-backup-10.sqlite.enc",
+        });
+
+        const key = await derivePassphraseKey({
+            passphrase: "correct horse battery staple",
+            salt: generateEncryptionSalt(),
+        });
+
+        const request: CloudBackupMigrationRequest = {
+            deleteSource: false,
+            target: "encrypted",
+        };
+
+        const result = await migrateProviderBackups({
+            encryptionKey: key,
+            provider,
+            request,
+        });
+
+        expect(result.migrated).toBe(0);
+        expect(result.failures).toHaveLength(1);
+
+        const stored = provider.readBlob(
+            "backups/uptime-watcher-backup-10.sqlite.enc"
+        );
+        expect(stored?.toString("utf8")).toBe("existing");
+    });
+
+    it("counts upload as migrated even when deleteSource cleanup fails", async () => {
+        class DeleteFailsProvider extends InMemoryBackupProvider {
+            public override async deleteObject(key: string): Promise<void> {
+                if (key.endsWith(".metadata.json")) {
+                    throw new Error("metadata delete failed");
+                }
+
+                return super.deleteObject(key);
+            }
+        }
+
+        const provider = new DeleteFailsProvider();
+        provider.seedBackup({
+            buffer: Buffer.from("plain", "utf8"),
+            createdAt: 10,
+            encrypted: false,
+            fileName: "uptime-watcher-backup-10.sqlite",
+            key: "backups/uptime-watcher-backup-10.sqlite",
+        });
+
+        const key = await derivePassphraseKey({
+            passphrase: "correct horse battery staple",
+            salt: generateEncryptionSalt(),
+        });
+
+        const request: CloudBackupMigrationRequest = {
+            deleteSource: true,
+            target: "encrypted",
+        };
+
+        const result = await migrateProviderBackups({
+            encryptionKey: key,
+            provider,
+            request,
+        });
+
+        expect(result.migrated).toBe(1);
+        expect(result.failures).toHaveLength(1);
+
+        const encryptedBuffer = provider.readBlob(
+            "backups/uptime-watcher-backup-10.sqlite.enc"
+        );
+        expect(encryptedBuffer).toBeDefined();
+        expect(isEncryptedPayload(encryptedBuffer!)).toBeTruthy();
+    });
 });

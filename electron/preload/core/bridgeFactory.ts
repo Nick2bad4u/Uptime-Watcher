@@ -60,20 +60,28 @@ const globalEnvCandidate: unknown =
         ? (Reflect.get(globalProcessCandidate, "env") as unknown)
         : undefined;
 
-function shouldAllowDiagnosticsFallback(): boolean {
-    const overrideFlag: unknown = Reflect.get(
-        globalThis,
-        "__UPTIME_ALLOW_IPC_DIAGNOSTICS_FALLBACK__"
-    );
-
-    if (overrideFlag === false) {
-        return false;
-    }
-
-    if (overrideFlag === true) {
+function isTruthyEnvFlag(value: unknown): boolean {
+    if (value === true) {
         return true;
     }
 
+    if (typeof value !== "string") {
+        return false;
+    }
+
+    switch (value.trim().toLowerCase()) {
+        case "1":
+        case "true":
+        case "yes": {
+            return true;
+        }
+        default: {
+            return false;
+        }
+    }
+}
+
+function shouldAllowDiagnosticsFallback(): boolean {
     const vitestFlag: unknown =
         typeof globalEnvCandidate === "object" && globalEnvCandidate !== null
             ? (Reflect.get(globalEnvCandidate, "VITEST") as unknown)
@@ -83,7 +91,18 @@ function shouldAllowDiagnosticsFallback(): boolean {
             ? (Reflect.get(globalEnvCandidate, "NODE_ENV") as unknown)
             : undefined;
 
-    return Boolean(vitestFlag) || nodeEnv === "test";
+    const isTestEnv = isTruthyEnvFlag(vitestFlag) || nodeEnv === "test";
+    if (!isTestEnv) {
+        return false;
+    }
+
+    // Test-only override: allow targeted tests to force fallback off.
+    const overrideFlag: unknown = Reflect.get(
+        globalThis,
+        "__UPTIME_ALLOW_IPC_DIAGNOSTICS_FALLBACK__"
+    );
+
+    return overrideFlag !== false;
 }
 
 const verifiedChannels = new Set<string>([DIAGNOSTICS_CHANNEL]);

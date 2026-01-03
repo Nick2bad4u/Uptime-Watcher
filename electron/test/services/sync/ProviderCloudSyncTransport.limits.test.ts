@@ -264,6 +264,100 @@ describe("ProviderCloudSyncTransport.readOperationsObject limits", () => {
             transport.readOperationsObject("sync/devices/a/ops/1-1-1.ndjson")
         ).rejects.toThrowError(/at line 2:/i);
     });
+
+    it("rejects operation objects that contain operations for a different deviceId", async () => {
+        const operationLine = JSON.stringify({
+            deviceId: "b",
+            entityId: "e",
+            entityType: "site",
+            field: "x",
+            kind: "set-field",
+            opId: 1,
+            syncSchemaVersion: CLOUD_SYNC_SCHEMA_VERSION,
+            timestamp: 1,
+            value: true,
+        } satisfies CloudSyncOperation);
+
+        const provider = createProvider({
+            downloadObject: async () => Buffer.from(`${operationLine}\n`, "utf8"),
+        });
+
+        const transport = ProviderCloudSyncTransport.create(provider);
+
+        await expect(
+            transport.readOperationsObject("sync/devices/a/ops/1-1-1.ndjson")
+        ).rejects.toThrowError(/unexpected deviceid/i);
+    });
+
+    it("rejects operation objects whose opId range does not match the key metadata", async () => {
+        const operationLine = JSON.stringify({
+            deviceId: "a",
+            entityId: "e",
+            entityType: "site",
+            field: "x",
+            kind: "set-field",
+            opId: 2,
+            syncSchemaVersion: CLOUD_SYNC_SCHEMA_VERSION,
+            timestamp: 1,
+            value: true,
+        } satisfies CloudSyncOperation);
+
+        const provider = createProvider({
+            downloadObject: async () => Buffer.from(`${operationLine}\n`, "utf8"),
+        });
+
+        const transport = ProviderCloudSyncTransport.create(provider);
+
+        await expect(
+            transport.readOperationsObject("sync/devices/a/ops/1-1-1.ndjson")
+        ).rejects.toThrowError(/opid range is inconsistent/i);
+    });
+});
+
+describe("ProviderCloudSyncTransport.appendOperations key metadata", () => {
+    it("uses min/max opIds for key metadata even when operations are out of order", async () => {
+        let uploadedKey: string | undefined;
+
+        const provider = createProvider({
+            uploadObject: async ({ key }): Promise<CloudObjectEntry> => {
+                uploadedKey = key;
+                return {
+                    key,
+                    lastModifiedAt: Date.now(),
+                    sizeBytes: 1,
+                };
+            },
+        });
+
+        const transport = ProviderCloudSyncTransport.create(provider);
+
+        const op5: CloudSyncOperation = {
+            deviceId: "a",
+            entityId: "e",
+            entityType: "site",
+            field: "x",
+            kind: "set-field",
+            opId: 5,
+            syncSchemaVersion: CLOUD_SYNC_SCHEMA_VERSION,
+            timestamp: 1,
+            value: true,
+        };
+
+        const op2: CloudSyncOperation = {
+            deviceId: "a",
+            entityId: "e",
+            entityType: "site",
+            field: "y",
+            kind: "set-field",
+            opId: 2,
+            syncSchemaVersion: CLOUD_SYNC_SCHEMA_VERSION,
+            timestamp: 1,
+            value: true,
+        };
+
+        await transport.appendOperations("a", [op5, op2], 123);
+        expect(uploadedKey).toBe("sync/devices/a/ops/123-2-5.ndjson");
+    });
 });
 
 describe("ProviderCloudSyncTransport snapshot key validation", () => {

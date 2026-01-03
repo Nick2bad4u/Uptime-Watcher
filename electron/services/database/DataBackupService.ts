@@ -27,6 +27,10 @@ import {
 
 const RESTORE_TEMP_PREFIX = "uptime-watcher-restore-";
 const ROLLBACK_TEMP_PREFIX = "uptime-watcher-rollback-";
+const BACKUP_TEMP_PREFIX = "uptime-watcher-backup-";
+
+const BACKUP_SNAPSHOT_FILE_NAME = "backup-snapshot.sqlite";
+const PRERESTORE_SNAPSHOT_FILE_NAME = "pre-restore-snapshot.sqlite";
 
 const SQLITE_HEADER = Buffer.from("SQLite format 3\0", "ascii");
 
@@ -58,9 +62,18 @@ export class DataBackupService {
     private readonly logger: Logger;
 
     public async downloadDatabaseBackup(): Promise<DatabaseBackupResult> {
+        let snapshotDir: string | undefined = undefined;
         try {
             const dbPath = path.join(app.getPath("userData"), DB_FILE_NAME);
-            const result = await createDatabaseBackup({ dbPath });
+            snapshotDir = await this.createTempDirectory(BACKUP_TEMP_PREFIX);
+            const snapshotPath = this.createConsistentSnapshot({
+                dbPath,
+                snapshotDir,
+                snapshotFileName: BACKUP_SNAPSHOT_FILE_NAME,
+            });
+
+            const rawResult = await createDatabaseBackup({ dbPath: snapshotPath });
+            const result = this.normalizeBackupResultMetadata(rawResult);
             validateDatabaseBackupPayload(result);
             this.logger.info("[DataBackupService] Created database backup", {
                 checksum: result.metadata.checksum,
@@ -82,6 +95,10 @@ export class DataBackupService {
 
             this.logger.error(message, normalizedError);
             throw new SiteLoadingError(message, { cause: normalizedError });
+        } finally {
+            if (snapshotDir) {
+                await this.removeDirectorySafe(snapshotDir, "backup-temp-directory");
+            }
         }
     }
 
@@ -92,6 +109,7 @@ export class DataBackupService {
         const dbPath = path.join(app.getPath("userData"), DB_FILE_NAME);
         const timestamp = Date.now();
         let tempDir: string | undefined = undefined;
+        let preRestoreSnapshotDir: string | undefined = undefined;
 
         try {
             if (
@@ -123,10 +141,20 @@ export class DataBackupService {
             );
             validateDatabaseBackupPayload({ buffer, metadata });
 
-            const preRestore = await createDatabaseBackup({
+            preRestoreSnapshotDir = await this.createTempDirectory(
+                BACKUP_TEMP_PREFIX
+            );
+            const preRestoreSnapshotPath = this.createConsistentSnapshot({
                 dbPath,
+                snapshotDir: preRestoreSnapshotDir,
+                snapshotFileName: PRERESTORE_SNAPSHOT_FILE_NAME,
+            });
+
+            const preRestoreRaw = await createDatabaseBackup({
+                dbPath: preRestoreSnapshotPath,
                 fileName: `pre-restore-${timestamp}.sqlite`,
             });
+            const preRestore = this.normalizeBackupResultMetadata(preRestoreRaw);
             const normalizedPreRestoreName = preRestore.fileName.trim();
             const preRestoreFileName = createSanitizedFileName(
                 normalizedPreRestoreName.length > 0
@@ -188,25 +216,33 @@ export class DataBackupService {
                     "restore-temp-directory"
                 );
             }
+
+            if (preRestoreSnapshotDir) {
+                await this.removeDirectorySafe(
+                    preRestoreSnapshotDir,
+                    "pre-restore-snapshot-directory"
+                );
+            }
         }
     }
 
     public async applyDatabaseBackupResult(
         backup: DatabaseBackupResult
     ): Promise<DatabaseBackupMetadata> {
-        validateDatabaseBackupPayload(backup);
+        const normalizedBackup = this.normalizeBackupResultMetadata(backup);
+        validateDatabaseBackupPayload(normalizedBackup);
         const tempDir = await this.createTempDirectory(ROLLBACK_TEMP_PREFIX);
-        const safeFileName = createSanitizedFileName(backup.fileName);
+        const safeFileName = createSanitizedFileName(normalizedBackup.fileName);
         const dbPath = path.join(app.getPath("userData"), DB_FILE_NAME);
 
         try {
             const tempFilePath = await this.writeFileWithinDirectory(
                 tempDir,
                 safeFileName,
-                backup.buffer
+                normalizedBackup.buffer
             );
             await this.replaceDatabaseFile(tempFilePath, dbPath);
-            return backup.metadata;
+            return normalizedBackup.metadata;
         } finally {
             await this.removeDirectorySafe(tempDir, "rollback-temp-directory");
         }
@@ -218,9 +254,34 @@ export class DataBackupService {
     ): Promise<void> {
         this.databaseService.close();
 
+        const targetDir = path.dirname(targetPath);
+        const baseName = path.basename(targetPath);
+        const timestamp = Date.now();
+        const rollbackPath = path.join(targetDir, `${baseName}.rollback-${timestamp}`);
+        const incomingPath = path.join(targetDir, `${baseName}.incoming-${timestamp}`);
+
+        let hadExistingTarget = false;
         let copyError: Error | undefined = undefined;
+
         try {
-            await fs.copyFile(sourcePath, targetPath);
+            // Move the existing DB out of the way (so rename into place is safe).
+            try {
+
+                // eslint-disable-next-line security/detect-non-literal-fs-filename -- rollbackPath is derived from the trusted DB path with a controlled suffix.
+                await fs.rename(targetPath, rollbackPath);
+                hadExistingTarget = true;
+            } catch (error) {
+                const normalized = ensureError(error);
+                if (normalized.message.includes("ENOENT")) {
+                    // No existing file.
+                } else {
+                    throw normalized;
+                }
+            }
+
+            await fs.copyFile(sourcePath, incomingPath);
+            // eslint-disable-next-line security/detect-non-literal-fs-filename -- incomingPath/targetPath are within app-controlled userData directory.
+            await fs.rename(incomingPath, targetPath);
         } catch (error: unknown) {
             copyError = ensureError(error);
         }
@@ -230,6 +291,18 @@ export class DataBackupService {
         } catch (error: unknown) {
             const initError = ensureError(error);
 
+            // Attempt rollback if we replaced the file.
+            if (hadExistingTarget) {
+                try {
+                    await fs.rm(targetPath, { force: true });
+                    // eslint-disable-next-line security/detect-non-literal-fs-filename -- rollbackPath/targetPath are within app-controlled userData directory.
+                    await fs.rename(rollbackPath, targetPath);
+                    this.databaseService.initialize();
+                } catch {
+                    // If rollback fails, we still surface the init error below.
+                }
+            }
+
             if (copyError) {
                 throw new Error(
                     `Failed to restore database file (copy failed: ${copyError.message}; reinitialize failed: ${initError.message})`,
@@ -238,9 +311,25 @@ export class DataBackupService {
             }
 
             throw initError;
+        } finally {
+            await fs.rm(incomingPath, { force: true }).catch(() => {});
+            if (!copyError) {
+                await fs.rm(rollbackPath, { force: true }).catch(() => {});
+            }
         }
 
         if (copyError) {
+            // Restore the old DB if we had one and the copy step failed.
+            if (hadExistingTarget) {
+                try {
+                    await fs.rm(targetPath, { force: true });
+                    // eslint-disable-next-line security/detect-non-literal-fs-filename -- rollbackPath/targetPath are within app-controlled userData directory.
+                    await fs.rename(rollbackPath, targetPath);
+                } catch {
+                    // Best effort.
+                }
+            }
+
             throw copyError;
         }
     }
@@ -278,6 +367,53 @@ export class DataBackupService {
         // eslint-disable-next-line security/detect-non-literal-fs-filename -- targetPath is sanitized and confined to baseDirectory.
         await fs.writeFile(targetPath, contents);
         return targetPath;
+    }
+
+    private createConsistentSnapshot(args: {
+        dbPath: string;
+        snapshotDir: string;
+        snapshotFileName: string;
+    }): string {
+        const { dbPath, snapshotDir, snapshotFileName } = args;
+
+        const safeName = createSanitizedFileName(snapshotFileName);
+        const snapshotPath = this.resolvePathWithinDirectory(snapshotDir, safeName);
+
+        // Ensure we get a consistent snapshot when WAL mode is enabled.
+        // We close/reopen the app's main connection to avoid lock contention.
+        this.databaseService.close();
+
+        try {
+            const tempDb = new sqlite3.Database(dbPath, { fileMustExist: true });
+            try {
+                tempDb.exec(
+                    `VACUUM INTO ${this.escapeSqlStringLiteral(snapshotPath)}`
+                );
+            } finally {
+                tempDb.close();
+            }
+        } finally {
+            this.databaseService.initialize();
+        }
+
+        return snapshotPath;
+    }
+
+    private normalizeBackupResultMetadata(
+        backup: DatabaseBackupResult
+    ): DatabaseBackupResult {
+        const safeOriginalPath = backup.fileName;
+        return {
+            ...backup,
+            metadata: {
+                ...backup.metadata,
+                originalPath: safeOriginalPath,
+            },
+        };
+    }
+
+    private escapeSqlStringLiteral(value: string): string {
+        return `'${value.replaceAll("'", "''")}'`;
     }
 
     private resolvePathWithinDirectory(

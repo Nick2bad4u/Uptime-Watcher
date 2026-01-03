@@ -120,6 +120,35 @@ describe("cloudSyncState", () => {
         expect(entity?.fields["monitoring"]?.value).toBeFalsy();
     });
 
+    it("treats delete-entity as winning ties when write keys are equal", () => {
+        const state = applyCloudSyncOperations([
+            setField({
+                deviceId: "a",
+                entityId: "site-1",
+                entityType: "site",
+                field: "monitoring",
+                opId: 1,
+                syncSchemaVersion: 1,
+                timestamp: 1,
+                value: true,
+            }),
+            // Corrupt/tie case: delete shares the same write key as the field
+            // write. Deterministic ordering should ensure delete wins.
+            deleteEntity({
+                deviceId: "a",
+                entityId: "site-1",
+                entityType: "site",
+                opId: 1,
+                syncSchemaVersion: 1,
+                timestamp: 1,
+            }),
+        ]);
+
+        const entity = state.site["site-1"];
+        expect(entity?.deleted).toBeDefined();
+        expect(entity?.fields["monitoring"]?.value).toBeTruthy();
+    });
+
     it("resurrects an entity when a newer write arrives after deletion", () => {
         const state = applyCloudSyncOperations([
             deleteEntity({

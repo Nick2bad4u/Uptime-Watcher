@@ -110,7 +110,9 @@ describe("useSiteDetails - Branch Coverage Tests", () => {
     beforeEach(() => {
         vi.clearAllMocks();
 
-        mockUseSitesStore.mockReturnValue(mockSitesStore);
+        mockUseSitesStore.mockImplementation((selector: any) =>
+            typeof selector === "function" ? selector(mockSitesStore) : mockSitesStore
+        );
         mockUseErrorStore.mockReturnValue(mockErrorStore);
         mockUseUIStore.mockReturnValue(mockUIStore);
         mockUseSiteAnalytics.mockReturnValue(mockAnalytics);

@@ -206,7 +206,9 @@ function shouldReplaceWrite(
         return true;
     }
 
-    return compareCloudSyncWriteKey(current, incoming) < 0;
+    // Treat equal write keys as replaceable so deterministic ordering
+    // (compareOperationsDeterministic) can break ties safely.
+    return compareCloudSyncWriteKey(current, incoming) <= 0;
 }
 
 function getLatestEntityWrite(

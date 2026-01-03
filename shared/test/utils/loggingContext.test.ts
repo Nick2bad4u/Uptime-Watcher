@@ -35,6 +35,19 @@ describe("logging context helpers", () => {
         expect(sanitizedString).not.toMatch(/bearer\s+secret/i);
     });
 
+    it("redacts secret query params even when string is not a URL", () => {
+        const sanitized = normalizeLogValue(
+            "GET https://example.com/callback?access_token=abc&refresh_token=def"
+        );
+
+        expect(typeof sanitized).toBe("string");
+        const sanitizedString = sanitized as string;
+        expect(sanitizedString).not.toContain("access_token=abc");
+        expect(sanitizedString).not.toContain("refresh_token=def");
+        expect(sanitizedString).toContain("access_token=[redacted]");
+        expect(sanitizedString).toContain("refresh_token=[redacted]");
+    });
+
     it("redacts secrets in object metadata fields", () => {
         const input = {
             access_token: "abc",

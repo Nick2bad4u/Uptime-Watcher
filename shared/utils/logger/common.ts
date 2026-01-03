@@ -6,6 +6,8 @@
  * log output regardless of execution environment.
  */
 
+import { normalizeLogValue } from "../loggingContext";
+
 /**
  * Structured error payload for serialized Error instances.
  *
@@ -34,6 +36,42 @@ export interface SerializedError {
     readonly stack?: string;
 }
 
+function safeNormalizeLogValue(value: unknown): unknown {
+    try {
+        return normalizeLogValue(value);
+    } catch {
+        return value;
+    }
+}
+
+function safeNormalizeLogString(value: string): string {
+    const sanitized = safeNormalizeLogValue(value);
+    return typeof sanitized === "string" ? sanitized : value;
+}
+
+function safeSerializeErrorInternal(error: Error, depth: number): SerializedError {
+    const safeSerializeCause = (cause: unknown): unknown => {
+        if (cause instanceof Error && depth < 3) {
+            return safeNormalizeLogValue(
+                safeSerializeErrorInternal(cause, depth + 1)
+            );
+        }
+
+        return safeNormalizeLogValue(cause);
+    };
+
+    return {
+        message: safeNormalizeLogString(error.message),
+        name: safeNormalizeLogString(error.name),
+        ...(error.stack ? { stack: safeNormalizeLogString(error.stack) } : {}),
+        ...("cause" in error
+            ? {
+                  cause: safeSerializeCause((error as { cause?: unknown }).cause),
+              }
+            : {}),
+    } satisfies SerializedError;
+}
+
 /**
  * Formats a log message using a standard prefix.
  *
@@ -56,14 +94,7 @@ export const formatLogMessage = (prefix: string, message: string): string =>
  */
 export const serializeError = (error: unknown): null | SerializedError => {
     if (error instanceof Error) {
-        return {
-            message: error.message,
-            name: error.name,
-            ...(error.stack ? { stack: error.stack } : {}),
-            ...("cause" in error
-                ? { cause: (error as { cause?: unknown }).cause }
-                : {}),
-        } satisfies SerializedError;
+        return safeSerializeErrorInternal(error, 0) satisfies SerializedError;
     }
 
     return null;
@@ -111,14 +142,14 @@ export const buildErrorLogArguments = (
     if (serialized === null) {
         return [
             baseMessage,
-            error,
+            safeNormalizeLogValue(error),
             ...args,
         ];
     }
 
     return [
         baseMessage,
-        serialized,
+        safeNormalizeLogValue(serialized),
         ...args,
     ];
 };

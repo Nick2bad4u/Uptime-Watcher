@@ -54,7 +54,8 @@ const flushAsync = async (): Promise<void> => {
 
 type MonitorCheckCallback = (
     siteIdentifier: string,
-    monitorId: string
+    monitorId: string,
+    signal: AbortSignal
 ) => Promise<void>;
 
 const createCheckCallbackMock = () => vi.fn<MonitorCheckCallback>();
@@ -207,6 +208,36 @@ describe("MonitorScheduler – comprehensive", () => {
             scheduler.getJobsForTesting().get("site-1|monitor-1")
                 ?.backoffAttempt
         ).toBe(1);
+    });
+
+    it("does not overlap checks after timeout when the underlying check never settles", async () => {
+        const timeoutMs = 120;
+        const neverSettles = new Promise<void>(() => {});
+
+        mockCheckCallback = createCheckCallbackMock().mockReturnValue(
+            neverSettles
+        );
+        scheduler.setCheckCallback(mockCheckCallback);
+
+        scheduler.startMonitor(
+            "site-1",
+            createMonitor({ checkInterval: 1000, timeout: timeoutMs })
+        );
+        await flushAsync();
+
+        expect(mockCheckCallback).toHaveBeenCalledTimes(1);
+
+        const guardDuration = timeoutMs + MONITOR_TIMEOUT_BUFFER_MS;
+        await vi.advanceTimersByTimeAsync(guardDuration);
+        await flushAsync();
+
+        // Even though the scheduler will keep re-arming timers, it must not
+        // invoke the check callback again while the first promise is still
+        // pending.
+        await vi.advanceTimersByTimeAsync(10_000);
+        await flushAsync();
+
+        expect(mockCheckCallback).toHaveBeenCalledTimes(1);
     });
 
     it("stopSite removes only the targeted site's jobs", () => {
