@@ -8,6 +8,7 @@ import {
     getSafeUrlForLogging,
     isAllowedExternalOpenUrl,
     isPrivateNetworkHostname,
+    tryGetSafeThirdPartyHttpUrl,
     validateExternalOpenUrlCandidate,
 } from "../../utils/urlSafety";
 
@@ -229,6 +230,49 @@ describe("urlSafety", () => {
             expect(
                 getSafeUrlForLogging("file:///C:/Users/Nick/Secrets.txt")
             ).toBe("file:[redacted]");
+        });
+    });
+
+    describe(tryGetSafeThirdPartyHttpUrl, () => {
+        it("returns null for non-http(s) URLs", () => {
+            expect(tryGetSafeThirdPartyHttpUrl("mailto:test@example.com")).toBe(
+                null
+            );
+            expect(tryGetSafeThirdPartyHttpUrl("file:///C:/Windows")).toBe(
+                null
+            );
+        });
+
+        it("returns null for private/local hostnames", () => {
+            expect(tryGetSafeThirdPartyHttpUrl("http://localhost")).toBe(
+                null
+            );
+            expect(tryGetSafeThirdPartyHttpUrl("https://192.168.1.1")).toBe(
+                null
+            );
+        });
+
+        it("returns null for URLs with credentials", () => {
+            expect(
+                tryGetSafeThirdPartyHttpUrl("https://user:pass@example.com")
+            ).toBe(null);
+        });
+
+        it("strips query strings and hashes", () => {
+            expect(
+                tryGetSafeThirdPartyHttpUrl(
+                    "https://example.com/path?token=secret#section"
+                )
+            ).toBe("https://example.com/path");
+        });
+
+        it("redacts suspicious long path segments", () => {
+            const tokenSegment = "A1".repeat(40);
+            const result = tryGetSafeThirdPartyHttpUrl(
+                `https://example.com/reset/${tokenSegment}`
+            );
+
+            expect(result).toBe("https://example.com/reset/[redacted]");
         });
     });
 });

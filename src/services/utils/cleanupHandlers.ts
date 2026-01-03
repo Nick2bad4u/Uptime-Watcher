@@ -88,16 +88,22 @@ export const resolveCleanupHandler = (
     cleanupCandidate: unknown,
     handlers: CleanupResolutionHandlers
 ): (() => void) => {
-    if (!isCleanupFunction(cleanupCandidate)) {
-        return handlers.handleInvalidCleanup({
-            actualType: typeof cleanupCandidate,
-            cleanupCandidate,
-        });
-    }
+    const cleanup: () => void = isCleanupFunction(cleanupCandidate)
+        ? cleanupCandidate
+        : handlers.handleInvalidCleanup({
+              actualType: typeof cleanupCandidate,
+              cleanupCandidate,
+          });
 
-    const cleanup: () => void = cleanupCandidate;
+    let didCleanup = false;
 
     return (): void => {
+        if (didCleanup) {
+            return;
+        }
+
+        didCleanup = true;
+
         try {
             cleanup();
         } catch (error) {

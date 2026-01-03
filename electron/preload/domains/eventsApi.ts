@@ -71,6 +71,17 @@ export type EventsApi = EventsDomainBridge;
 type EventManager = ReturnType<typeof createEventManager>;
 type EventGuard<TPayload> = (payload: unknown) => payload is TPayload;
 
+const RENDERER_EVENT_CHANNEL_VALUES = Object.values(
+    RENDERER_EVENT_CHANNELS
+) as readonly RendererEventChannel[];
+
+function isRendererEventChannel(value: unknown): value is RendererEventChannel {
+    return (
+        typeof value === "string" &&
+        RENDERER_EVENT_CHANNEL_VALUES.includes(value)
+    );
+}
+
 type SiteAddedEventDataPayload = RendererEventPayload<
     typeof RENDERER_EVENT_CHANNELS.SITE_ADDED
 >;
@@ -532,6 +543,32 @@ export function createEventsApi(): EventsApi {
         updateStatus: createEventManager(RENDERER_EVENT_CHANNELS.UPDATE_STATUS),
     } as const;
 
+    const managersByChannel = new Map<RendererEventChannel, EventManager>([
+        [RENDERER_EVENT_CHANNELS.CACHE_INVALIDATED, managers.cacheInvalidated],
+        [
+            RENDERER_EVENT_CHANNELS.MONITOR_CHECK_COMPLETED,
+            managers.monitorCheckCompleted,
+        ],
+        [RENDERER_EVENT_CHANNELS.MONITOR_DOWN, managers.monitorDown],
+        [
+            RENDERER_EVENT_CHANNELS.MONITOR_STATUS_CHANGED,
+            managers.monitorStatusChanged,
+        ],
+        [RENDERER_EVENT_CHANNELS.MONITOR_UP, managers.monitorUp],
+        [RENDERER_EVENT_CHANNELS.MONITORING_STARTED, managers.monitoringStarted],
+        [RENDERER_EVENT_CHANNELS.MONITORING_STOPPED, managers.monitoringStopped],
+        [
+            RENDERER_EVENT_CHANNELS.SETTINGS_HISTORY_LIMIT_UPDATED,
+            managers.historyLimitUpdated,
+        ],
+        [RENDERER_EVENT_CHANNELS.SITE_ADDED, managers.siteAdded],
+        [RENDERER_EVENT_CHANNELS.SITE_REMOVED, managers.siteRemoved],
+        [RENDERER_EVENT_CHANNELS.SITE_UPDATED, managers.siteUpdated],
+        [RENDERER_EVENT_CHANNELS.STATE_SYNC, managers.stateSync],
+        [RENDERER_EVENT_CHANNELS.TEST_EVENT, managers.testEvent],
+        [RENDERER_EVENT_CHANNELS.UPDATE_STATUS, managers.updateStatus],
+    ]);
+
     return {
         onCacheInvalidated: (
             callback: (data: CacheInvalidatedEventData) => void
@@ -713,10 +750,21 @@ export function createEventsApi(): EventsApi {
                     reason: RENDERER_EVENT_CHANNELS.UPDATE_STATUS,
                 }
             ),
-        removeAllListeners: (): void => {
-            for (const manager of Object.values(managers)) {
-                manager.removeAll();
+        removeAllListeners: (...args: readonly unknown[]): void => {
+            const [candidate] = args;
+
+            if (candidate === undefined) {
+                for (const manager of Object.values(managers)) {
+                    manager.removeAll();
+                }
+                return;
             }
+
+            if (!isRendererEventChannel(candidate)) {
+                return;
+            }
+
+            managersByChannel.get(candidate)?.removeAll();
         },
     };
 }

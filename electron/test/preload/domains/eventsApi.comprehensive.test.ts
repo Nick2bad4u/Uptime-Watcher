@@ -66,7 +66,6 @@ import type {
     TestEventData,
     UpdateStatusEventData,
 } from "@shared/types/events";
-import { RENDERER_EVENT_CHANNELS } from "@shared/ipc/rendererEvents";
 
 const createMonitorFixture = (overrides: Partial<Monitor> = {}): Monitor => ({
     activeOperations: [],
@@ -812,31 +811,37 @@ describe("Events Domain API", () => {
 
     describe("removeAllListeners", () => {
         it("should remove all listeners for all event channels", () => {
+            const cleanupHandlers: [string, unknown][] = [];
+
+            eventsApi.onCacheInvalidated(() => {});
+            eventsApi.onMonitorDown(() => {});
+            eventsApi.onMonitorCheckCompleted(() => {});
+            eventsApi.onHistoryLimitUpdated(() => {});
+            eventsApi.onMonitoringStarted(() => {});
+            eventsApi.onMonitoringStopped(() => {});
+            eventsApi.onMonitorStatusChanged(() => {});
+            eventsApi.onMonitorUp(() => {});
+            eventsApi.onSiteAdded(() => {});
+            eventsApi.onSiteRemoved(() => {});
+            eventsApi.onSiteUpdated(() => {});
+            eventsApi.onTestEvent(() => {});
+            eventsApi.onUpdateStatus(() => {});
+
+            // Capture handlers as they were registered.
+            for (const [channel, handler] of mockIpcRenderer.on.mock.calls) {
+                cleanupHandlers.push([channel as string, handler]);
+            }
+
             eventsApi.removeAllListeners();
 
-            const expectedChannels = [
-                RENDERER_EVENT_CHANNELS.CACHE_INVALIDATED,
-                RENDERER_EVENT_CHANNELS.MONITOR_DOWN,
-                RENDERER_EVENT_CHANNELS.MONITOR_CHECK_COMPLETED,
-                RENDERER_EVENT_CHANNELS.SETTINGS_HISTORY_LIMIT_UPDATED,
-                RENDERER_EVENT_CHANNELS.MONITORING_STARTED,
-                RENDERER_EVENT_CHANNELS.MONITORING_STOPPED,
-                RENDERER_EVENT_CHANNELS.MONITOR_STATUS_CHANGED,
-                RENDERER_EVENT_CHANNELS.MONITOR_UP,
-                RENDERER_EVENT_CHANNELS.SITE_ADDED,
-                RENDERER_EVENT_CHANNELS.SITE_REMOVED,
-                RENDERER_EVENT_CHANNELS.SITE_UPDATED,
-                RENDERER_EVENT_CHANNELS.STATE_SYNC,
-                RENDERER_EVENT_CHANNELS.TEST_EVENT,
-                RENDERER_EVENT_CHANNELS.UPDATE_STATUS,
-            ];
-
-            expect(mockIpcRenderer.removeAllListeners).toHaveBeenCalledTimes(
-                expectedChannels.length
+            expect(mockIpcRenderer.removeListener).toHaveBeenCalledTimes(
+                cleanupHandlers.length
             );
-            for (const channel of expectedChannels) {
-                expect(mockIpcRenderer.removeAllListeners).toHaveBeenCalledWith(
-                    channel
+
+            for (const [channel, handler] of cleanupHandlers) {
+                expect(mockIpcRenderer.removeListener).toHaveBeenCalledWith(
+                    channel,
+                    handler
                 );
             }
         });
@@ -845,6 +850,7 @@ describe("Events Domain API", () => {
             const freshApi = createEventsApi();
 
             expect(() => freshApi.removeAllListeners()).not.toThrowError();
+            expect(mockIpcRenderer.removeListener).not.toHaveBeenCalled();
         });
     });
 
@@ -1260,7 +1266,7 @@ describe("Events Domain API", () => {
             cleanup(); // Or third call
 
             // Should only remove listener once per actual registration
-            expect(mockIpcRenderer.removeListener).toHaveBeenCalledTimes(3);
+            expect(mockIpcRenderer.removeListener).toHaveBeenCalledTimes(1);
         });
 
         it("should handle event data with circular references", () => {

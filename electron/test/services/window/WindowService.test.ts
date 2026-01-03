@@ -956,6 +956,48 @@ describe(WindowService, () => {
             );
         });
 
+        it("should not inject CSP into non-document resources", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "regression");
+            await annotate("Component: WindowService", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Security", "type");
+
+            vi.mocked(isDev).mockReturnValue(false);
+
+            const mockWindowRef = (
+                BrowserWindow as unknown as { __mockWindow: any }
+            ).__mockWindow;
+            const headerSpy = vi.mocked(
+                mockWindowRef.webContents.session.webRequest.onHeadersReceived
+            );
+
+            windowService.createMainWindow();
+
+            expect(headerSpy).toHaveBeenCalledWith(expect.any(Function));
+            const [handler] = headerSpy.mock.calls[0];
+            const callback = vi.fn();
+
+            const originalHeaders = {
+                "Cache-Control": ["max-age=3600"],
+            };
+
+            handler(
+                {
+                    resourceType: "image",
+                    responseHeaders: originalHeaders,
+                } as any,
+                callback
+            );
+
+            expect(callback).toHaveBeenCalledWith({
+                cancel: false,
+                responseHeaders: originalHeaders,
+            });
+        });
+
         it("should warn when applying security middleware fails", async ({
             task,
             annotate,

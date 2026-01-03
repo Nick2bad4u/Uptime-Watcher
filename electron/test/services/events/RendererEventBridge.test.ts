@@ -77,6 +77,7 @@ describe(RendererEventBridge, () => {
 
         vi.spyOn(logger, "debug").mockImplementation(() => undefined);
         vi.spyOn(logger, "error").mockImplementation(() => undefined);
+        vi.spyOn(logger, "warn").mockImplementation(() => undefined);
 
         bridge = new RendererEventBridge(
             mockWindowService as unknown as WindowService
@@ -161,6 +162,29 @@ describe(RendererEventBridge, () => {
             expect.stringContaining(
                 `Skipping broadcast for ${RENDERER_EVENT_CHANNELS.STATE_SYNC}`
             )
+        );
+    });
+
+    it("drops state sync events that exceed the payload size budget", () => {
+        const firstWindow = createWindow();
+        mockWindowService.getAllWindows.mockReturnValue([firstWindow]);
+
+        const hugePayload = createPayload();
+        const firstSite = hugePayload.sites[0];
+        if (!firstSite) {
+            throw new Error("Expected at least one site in state sync payload");
+        }
+
+        firstSite.name = "a".repeat(3_000_000);
+
+        bridge.sendStateSyncEvent(hugePayload);
+
+        expect(firstWindow.webContents.send).not.toHaveBeenCalled();
+        expect(logger.warn).toHaveBeenCalledWith(
+            expect.stringContaining("Dropping state-sync event"),
+            expect.objectContaining({
+                channel: RENDERER_EVENT_CHANNELS.STATE_SYNC,
+            })
         );
     });
 });

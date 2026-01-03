@@ -52,6 +52,18 @@ export type ExternalOpenUrlAcceptedResult = Readonly<{
 export type ExternalOpenUrlValidationResult =
     | ExternalOpenUrlAcceptedResult
     | ExternalOpenUrlRejectedResult;
+
+function getRedactedPathname(pathname: string): string {
+    return pathname
+        .split("/")
+        .map((segment) =>
+            segment.length >= SAFE_URL_SUSPECT_SEGMENT_MIN_LENGTH
+                ? "[redacted]"
+                : segment
+        )
+        .join("/");
+}
+
 /**
  * Removes sensitive URL parts so log lines don't leak credentials or tokens.
  *
@@ -80,14 +92,7 @@ export function getSafeUrlForLogging(rawUrl: string): string {
 
         // Remove query strings and hashes to avoid logging secrets.
         // Additionally, redact suspiciously-long path segments (tokens, IDs).
-        const safePath = url.pathname
-            .split("/")
-            .map((segment) =>
-                segment.length >= SAFE_URL_SUSPECT_SEGMENT_MIN_LENGTH
-                    ? "[redacted]"
-                    : segment
-            )
-            .join("/");
+        const safePath = getRedactedPathname(url.pathname);
 
         return `${url.origin}${safePath}`;
     } catch {
@@ -327,8 +332,8 @@ export function validateExternalOpenUrlCandidate(
             protocols: ["http", "https"],
             require_host: true,
             require_protocol: true,
-            // Allow localhost-style hosts. Private-network IPs are still blocked
-            // by isAllowedExternalOpenUrl() above.
+            // Allow localhost-style hosts. We intentionally do *not* block
+            // private-network hosts for external opening.
             require_tld: false,
         });
 
@@ -499,4 +504,79 @@ export function isPrivateNetworkHostname(hostname: string): boolean {
     }
 
     return false;
+}
+
+/**
+ * Returns a sanitized HTTP(S) URL safe to send to third-party services.
+ *
+ * @remarks
+ * This is stricter than {@link getSafeUrlForLogging} because the output must
+ * be a *valid* URL that a third-party can request.
+ *
+ * - Allows only `http:` and `https:`.
+ * - Rejects credentials.
+ * - Rejects CR/LF and ASCII control characters.
+ * - Rejects private/local hostnames (see {@link isPrivateNetworkHostname}).
+ * - Strips query string and hash.
+ * - Redacts suspiciously-long path segments to reduce secret leakage.
+ *
+ * @param rawUrl - Untrusted URL candidate.
+ *
+ * @returns A safe URL string, or null when the input should not be sent.
+ */
+export function tryGetSafeThirdPartyHttpUrl(rawUrl: string): null | string {
+    if (typeof rawUrl !== "string") {
+        return null;
+    }
+
+    const normalized = rawUrl.trim();
+    if (normalized.length === 0) {
+        return null;
+    }
+
+    if (getUtfByteLength(normalized) > MAX_EXTERNAL_OPEN_URL_BYTES) {
+        return null;
+    }
+
+    if (/[\n\r]/u.test(normalized)) {
+        return null;
+    }
+
+    if (hasAsciiControlCharacters(normalized)) {
+        return null;
+    }
+
+    const parsed = ((): null | URL => {
+        try {
+            return new URL(normalized);
+        } catch {
+            return null;
+        }
+    })();
+
+    if (!parsed) {
+        return null;
+    }
+
+    if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
+        return null;
+    }
+
+    if (parsed.username.length > 0 || parsed.password.length > 0) {
+        return null;
+    }
+
+    if (parsed.hostname.length === 0) {
+        return null;
+    }
+
+    if (isPrivateNetworkHostname(parsed.hostname)) {
+        return null;
+    }
+
+    parsed.search = "";
+    parsed.hash = "";
+
+    const safePath = getRedactedPathname(parsed.pathname);
+    return `${parsed.origin}${safePath}`;
 }

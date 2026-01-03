@@ -1,5 +1,16 @@
 import { normalizePathSeparatorsToPosix } from "@shared/utils/pathSeparators";
 import { hasAsciiControlCharacters } from "@shared/utils/stringSafety";
+import { getUtfByteLength } from "@shared/utils/utfByteLength";
+
+/**
+ * Default maximum size budget for provider object keys.
+ *
+ * @remarks
+ * This is intentionally generous. It is primarily a defense-in-depth guard
+ * against pathological inputs that can cause excessive memory or filesystem
+ * overhead.
+ */
+export const DEFAULT_MAX_PROVIDER_OBJECT_KEY_BYTES = 4096;
 
 /**
  * Options for {@link normalizeCloudObjectKey}.
@@ -32,6 +43,14 @@ export type NormalizeCloudKeyOptions = Readonly<{
      * @defaultValue true
      */
     forbidTraversalSegments?: boolean;
+
+    /**
+     * Maximum allowed UTF-8 byte length of the normalized key.
+     *
+     * @remarks
+     * Use this when the key originates from untrusted input.
+     */
+    maxByteLength?: number;
 
     /**
      * When true, Windows path separators (`\\`) are normalized to `/`.
@@ -72,6 +91,7 @@ export function normalizeCloudObjectKey(
         collapseSlashes = true,
         forbidAsciiControlCharacters = false,
         forbidTraversalSegments = true,
+        maxByteLength,
         normalizeSeparators = true,
         stripLeadingSlashes = true,
         trim = true,
@@ -115,6 +135,17 @@ export function normalizeCloudObjectKey(
         }
     }
 
+    if (
+        typeof maxByteLength === "number" &&
+        Number.isFinite(maxByteLength) &&
+        maxByteLength > 0 &&
+        getUtfByteLength(normalized) > maxByteLength
+    ) {
+        throw new Error(
+            `Cloud key must not exceed ${maxByteLength} bytes`
+        );
+    }
+
     return normalized;
 }
 
@@ -137,6 +168,7 @@ export function normalizeProviderObjectKey(rawKey: string): string {
         allowEmpty: true,
         forbidAsciiControlCharacters: true,
         forbidTraversalSegments: true,
+        maxByteLength: DEFAULT_MAX_PROVIDER_OBJECT_KEY_BYTES,
         stripLeadingSlashes: true,
     });
 }

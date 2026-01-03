@@ -36,8 +36,87 @@ const SQLITE_HEADER = Buffer.from("SQLite format 3\0", "ascii");
 
 const UNSAFE_FILENAME_PATTERN = /[^\p{L}\p{N}._-]/gu;
 
-const createSanitizedFileName = (fileName: string): string =>
-    path.basename(fileName).replaceAll(UNSAFE_FILENAME_PATTERN, "_");
+const WINDOWS_RESERVED_BASENAMES = new Set(
+    [
+        "aux",
+        "com1",
+        "com2",
+        "com3",
+        "com4",
+        "com5",
+        "com6",
+        "com7",
+        "com8",
+        "com9",
+        "con",
+        "lpt1",
+        "lpt2",
+        "lpt3",
+        "lpt4",
+        "lpt5",
+        "lpt6",
+        "lpt7",
+        "lpt8",
+        "lpt9",
+        "nul",
+        "prn",
+    ]
+);
+
+function createSanitizedFileName(fileName: string): string {
+    const MAX_FILE_NAME_LENGTH = 200;
+    const fallback = "backup.sqlite";
+
+    const rawBase = path.basename(fileName);
+    const normalizedBase = rawBase.replaceAll(UNSAFE_FILENAME_PATTERN, "_");
+    let withoutTrailingDotsOrSpaces = normalizedBase;
+    while (
+        withoutTrailingDotsOrSpaces.endsWith(".") ||
+        withoutTrailingDotsOrSpaces.endsWith(" ")
+    ) {
+        withoutTrailingDotsOrSpaces = withoutTrailingDotsOrSpaces.slice(0, -1);
+    }
+
+    const trimmed = withoutTrailingDotsOrSpaces.trim();
+
+    if (trimmed.length === 0 || trimmed === "." || trimmed === "..") {
+        return fallback;
+    }
+
+    const ext = path.extname(trimmed);
+    const baseName = path.basename(trimmed, ext);
+    const baseNameLower = baseName.toLowerCase();
+
+    // Avoid Windows device names (even when running on non-Windows, a backup
+    // can later be downloaded/restored on Windows).
+    const safeBaseName = WINDOWS_RESERVED_BASENAMES.has(baseNameLower)
+        ? `${baseName}_`
+        : baseName;
+
+    const candidate = `${safeBaseName}${ext}`;
+    if (candidate.length <= MAX_FILE_NAME_LENGTH) {
+        return candidate;
+    }
+
+    const shortenedBase = safeBaseName.slice(
+        0,
+        Math.max(1, MAX_FILE_NAME_LENGTH - ext.length)
+    );
+
+    return `${shortenedBase}${ext}`;
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+    return typeof value === "object" && value !== null;
+}
+
+function isErrnoWithCode(value: unknown): value is NodeJS.ErrnoException {
+    if (!isRecord(value)) {
+        return false;
+    }
+
+    return typeof value["code"] === "string";
+}
 
 /**
  * Dependencies required to orchestrate database backup workflows.
@@ -281,11 +360,10 @@ export class DataBackupService {
                 await fs.rename(targetPath, rollbackPath);
                 hadExistingTarget = true;
             } catch (error) {
-                const normalized = ensureError(error);
-                if (normalized.message.includes("ENOENT")) {
+                if (isErrnoWithCode(error) && error.code === "ENOENT") {
                     // No existing file.
                 } else {
-                    throw normalized;
+                    throw ensureError(error);
                 }
             }
 
@@ -478,7 +556,9 @@ export class DataBackupService {
     }
 
     private readSchemaVersion(filePath: string): number {
-        const database = new sqlite3.Database(filePath);
+        const database = new sqlite3.Database(filePath, {
+            fileMustExist: true,
+        });
         try {
             const result: unknown = database
                 .prepare("PRAGMA user_version")

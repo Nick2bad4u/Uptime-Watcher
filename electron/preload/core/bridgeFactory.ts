@@ -26,7 +26,11 @@ import {
     createIpcCorrelationEnvelope,
     isIpcHandlerVerificationResult,
 } from "@shared/types/ipc";
-import { DIAGNOSTICS_CHANNELS } from "@shared/types/preload";
+import {
+    DATA_CHANNELS,
+    DIAGNOSTICS_CHANNELS,
+    MONITORING_CHANNELS,
+} from "@shared/types/preload";
 import { generateCorrelationId } from "@shared/utils/correlation";
 import { ensureError } from "@shared/utils/errorHandling";
 import {
@@ -36,6 +40,7 @@ import {
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import { ipcRenderer } from "electron";
 
+import { isJsonByteBudgetExceeded } from "../../utils/jsonByteBudget";
 import {
     preloadDiagnosticsLogger,
     preloadLogger,
@@ -156,6 +161,50 @@ export class IpcError extends Error {
         this.originalError = originalError;
         this.details = details ? Object.freeze({ ...details }) : undefined;
     }
+}
+
+const DEFAULT_MAX_INVOKE_ARGS_BYTES = 5_000_000;
+const MAX_IMPORT_DATA_ARGS_BYTES = 50_000_000;
+const MAX_SQLITE_RESTORE_ARGS_BYTES = 250_000_000;
+
+function getInvokeArgsByteBudget(channel: string): number {
+    switch (channel) {
+        case DATA_CHANNELS.importData: {
+            return MAX_IMPORT_DATA_ARGS_BYTES;
+        }
+        case DATA_CHANNELS.restoreSqliteBackup: {
+            return MAX_SQLITE_RESTORE_ARGS_BYTES;
+        }
+        default: {
+            return DEFAULT_MAX_INVOKE_ARGS_BYTES;
+        }
+    }
+}
+
+function assertInvokeArgsWithinBudget(channel: string, args: unknown[]): void {
+    const maxBytes = getInvokeArgsByteBudget(channel);
+
+    if (!isJsonByteBudgetExceeded(args, maxBytes)) {
+        return;
+    }
+
+    preloadDiagnosticsLogger.warn(
+        "[IPC Bridge] Rejected invoke payload (exceeds byte budget)",
+        undefined,
+        {
+            channel,
+            maxBytes,
+        }
+    );
+
+    throw new IpcError(
+        `IPC payload too large for channel '${channel}' (max ${maxBytes} bytes)`,
+        channel,
+        undefined,
+        {
+            maxBytes,
+        }
+    );
 }
 
 /**
@@ -291,9 +340,18 @@ export function createTypedInvoker<TChannel extends IpcInvokeChannel>(
 ): (
     ...args: IpcInvokeChannelParams<TChannel>
 ) => Promise<IpcInvokeChannelResult<TChannel>> {
+    // Some IPC channels legitimately return `undefined` as a successful result
+    // (e.g. optional lookups). The main process standard helper
+    // `createSuccessResponse` omits the `data` field when the value is
+    // `undefined`, so the typed invoker must not require a `data` field for
+    // those channels.
+    const requireData = channel !== MONITORING_CHANNELS.checkSiteNow;
+
     return async function invokeTypedChannel(
         ...args: IpcInvokeChannelParams<TChannel>
     ): Promise<IpcInvokeChannelResult<TChannel>> {
+        assertInvokeArgsWithinBudget(channel, args as unknown[]);
+
         return invokeWithValidation(
             channel,
             (correlationId) =>
@@ -304,7 +362,8 @@ export function createTypedInvoker<TChannel extends IpcInvokeChannel>(
                 ),
             (response) =>
                 extractIpcResponseData<IpcInvokeChannelResult<TChannel>>(
-                    response
+                    response,
+                    { requireData }
                 )
         );
     };
@@ -324,6 +383,8 @@ export function createVoidInvoker<TChannel extends VoidIpcInvokeChannel>(
     return async function invokeVoidChannel(
         ...args: IpcInvokeChannelParams<TChannel>
     ): Promise<void> {
+        assertInvokeArgsWithinBudget(channel, args as unknown[]);
+
         await invokeWithValidation(
             channel,
             (correlationId) =>
@@ -351,31 +412,49 @@ export function createEventManager(channel: string): {
     once: (callback: EventCallback) => void;
     removeAll: () => void;
 } {
-    const createSafeEventCallback =
-        (callback: EventCallback) =>
-        (_event: IpcRendererEvent, ...args: unknown[]): void => {
-            try {
-                // eslint-disable-next-line n/callback-return -- Event handler callback, no return needed
-                callback(...args);
-            } catch (error) {
-                // Log callback errors but don't propagate them to prevent event system crashes
-                const normalizedError = ensureError(error);
-                preloadLogger.warn("Event callback error", {
-                    channel,
-                    error: normalizedError,
-                });
-            }
-        };
+    const registeredHandlers = new Set<
+        (_event: IpcRendererEvent, ...args: unknown[]) => void
+    >();
+
+    const invokeSafely = (callback: EventCallback, args: unknown[]): void => {
+        try {
+            // eslint-disable-next-line n/callback-return -- Event handler callback, no return needed
+            callback(...args);
+        } catch (error) {
+            // Log callback errors but don't propagate them to prevent event system crashes.
+            const normalizedError = ensureError(error);
+            preloadLogger.warn("Event callback error", {
+                channel,
+                error: normalizedError,
+            });
+        }
+    };
+
+    const removeRegisteredHandler = (
+        handler: (_event: IpcRendererEvent, ...args: unknown[]) => void
+    ): void => {
+        if (!registeredHandlers.delete(handler)) {
+            return;
+        }
+
+        ipcRenderer.removeListener(channel, handler);
+    };
 
     return {
         /**
          * Add an event listener
          */
         on: (callback: EventCallback): RemoveListener => {
-            const handleEventCallback = createSafeEventCallback(callback);
+            const handleEventCallback = (
+                _event: IpcRendererEvent,
+                ...args: unknown[]
+            ): void => {
+                invokeSafely(callback, args);
+            };
+            registeredHandlers.add(handleEventCallback);
             ipcRenderer.on(channel, handleEventCallback);
             return (): void => {
-                ipcRenderer.removeListener(channel, handleEventCallback);
+                removeRegisteredHandler(handleEventCallback);
             };
         },
 
@@ -383,14 +462,26 @@ export function createEventManager(channel: string): {
          * Add a one-time event listener
          */
         once: (callback: EventCallback): void => {
-            ipcRenderer.once(channel, createSafeEventCallback(callback));
+            const handleEventCallback = (
+                _event: IpcRendererEvent,
+                ...args: unknown[]
+            ): void => {
+                removeRegisteredHandler(handleEventCallback);
+                invokeSafely(callback, args);
+            };
+
+            registeredHandlers.add(handleEventCallback);
+            ipcRenderer.on(channel, handleEventCallback);
         },
 
         /**
          * Remove all listeners for this channel
          */
         removeAll: (): void => {
-            ipcRenderer.removeAllListeners(channel);
+            for (const handler of registeredHandlers) {
+                ipcRenderer.removeListener(channel, handler);
+            }
+            registeredHandlers.clear();
         },
     };
 }

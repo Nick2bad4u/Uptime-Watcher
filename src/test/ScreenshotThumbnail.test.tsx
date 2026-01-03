@@ -27,6 +27,7 @@ import {
 import {
     getSafeUrlForLogging,
     isPrivateNetworkHostname,
+    tryGetSafeThirdPartyHttpUrl,
 } from "@shared/utils/urlSafety";
 import { isValidUrl } from "@shared/validation/validatorUtils";
 
@@ -229,7 +230,13 @@ describe(ScreenshotThumbnail, () => {
             const image = screen.getByAltText(
                 `Screenshot of ${defaultProps.siteName}`
             );
-            const encodedUrl = encodeURIComponent(defaultProps.url.trim());
+            const targetUrl = tryGetSafeThirdPartyHttpUrl(defaultProps.url);
+            expect(targetUrl).not.toBeNull();
+            if (targetUrl === null) {
+                throw new Error("Expected screenshot target URL to be valid");
+            }
+
+            const encodedUrl = encodeURIComponent(targetUrl);
             const expectedUrl = `https://api.microlink.io/?url=${encodedUrl}&screenshot=true&meta=false&embed=screenshot.url&colorScheme=auto`;
             expect(image).toHaveAttribute("src", expectedUrl);
         });
@@ -258,7 +265,7 @@ describe(ScreenshotThumbnail, () => {
                 `Screenshot of ${propsWithSpecialChars.siteName}`
             );
             const expectedUrl =
-                "https://api.microlink.io/?url=https%3A%2F%2Fexample.com%2Fpath%3Fquery%3Dtest%26value%3D123&screenshot=true&meta=false&embed=screenshot.url&colorScheme=auto";
+                "https://api.microlink.io/?url=https%3A%2F%2Fexample.com%2Fpath&screenshot=true&meta=false&embed=screenshot.url&colorScheme=auto";
             expect(image).toHaveAttribute("src", expectedUrl);
         });
     });
@@ -295,6 +302,10 @@ describe(ScreenshotThumbnail, () => {
                             }
                         })();
 
+                        const screenshotTargetUrl = isUrlSafeForScreenshot
+                            ? tryGetSafeThirdPartyHttpUrl(trimmedUrl)
+                            : null;
+
                         render(
                             <ScreenshotThumbnail
                                 siteName={siteName}
@@ -322,11 +333,11 @@ describe(ScreenshotThumbnail, () => {
                                 `Screenshot of ${siteName}`
                         );
 
-                        if (isUrlSafeForScreenshot) {
+                        if (screenshotTargetUrl) {
                             expect(matchingImage).toBeDefined();
                             expect(matchingImage).toHaveAttribute(
                                 "src",
-                                `https://api.microlink.io/?url=${encodeURIComponent(trimmedUrl)}&screenshot=true&meta=false&embed=screenshot.url&colorScheme=auto`
+                                `https://api.microlink.io/?url=${encodeURIComponent(screenshotTargetUrl)}&screenshot=true&meta=false&embed=screenshot.url&colorScheme=auto`
                             );
                         } else {
                             expect(matchingImage).toBeUndefined();

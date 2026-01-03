@@ -14,6 +14,7 @@ import type {
 
 import {
     assertCloudObjectKey,
+    DEFAULT_MAX_PROVIDER_OBJECT_KEY_BYTES,
     normalizeCloudObjectKey,
     normalizeProviderObjectKey,
 } from "../cloudKeyNormalization";
@@ -93,6 +94,7 @@ export class FilesystemCloudStorageProvider
             allowEmpty: true,
             forbidAsciiControlCharacters: true,
             forbidTraversalSegments: true,
+            maxByteLength: DEFAULT_MAX_PROVIDER_OBJECT_KEY_BYTES,
             stripLeadingSlashes: true,
         });
 

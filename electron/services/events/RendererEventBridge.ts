@@ -7,7 +7,10 @@ import { ensureError } from "@shared/utils/errorHandling";
 
 import type { WindowService } from "../window/WindowService";
 
+import { isJsonByteBudgetExceeded } from "../../utils/jsonByteBudget";
 import { logger } from "../../utils/logger";
+
+const MAX_STATE_SYNC_EVENT_BYTES = 2_000_000;
 
 /**
  * Bridges typed backend events to renderer processes via IPC.
@@ -84,6 +87,17 @@ export class RendererEventBridge {
     public sendStateSyncEvent(
         payload: RendererEventPayload<typeof RENDERER_EVENT_CHANNELS.STATE_SYNC>
     ): void {
+        if (isJsonByteBudgetExceeded(payload, MAX_STATE_SYNC_EVENT_BYTES)) {
+            logger.warn(
+                "[RendererEventBridge] Dropping state-sync event (payload exceeds size budget)",
+                {
+                    channel: RENDERER_EVENT_CHANNELS.STATE_SYNC,
+                    maxBytes: MAX_STATE_SYNC_EVENT_BYTES,
+                }
+            );
+            return;
+        }
+
         this.sendToRenderers(RENDERER_EVENT_CHANNELS.STATE_SYNC, payload);
     }
 }

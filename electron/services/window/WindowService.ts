@@ -565,6 +565,36 @@ export class WindowService {
             try {
                 const sess = this.mainWindow.webContents.session;
                 sess.webRequest.onHeadersReceived((details, callback) => {
+                    // Only documents should receive CSP and related headers.
+                    // When Electron provides resourceType, use it to avoid
+                    // mutating headers for non-document resources.
+                    if (
+                        typeof (details as { resourceType?: unknown })
+                            .resourceType === "string"
+                    ) {
+                        const {resourceType} = (details as { resourceType: string });
+                        if (
+                            resourceType !== "mainFrame" &&
+                            resourceType !== "subFrame"
+                        ) {
+                            const {responseHeaders} = details;
+                            if (!responseHeaders) {
+                                callback({ cancel: false });
+                                return;
+                            }
+
+                            callback({
+                                cancel: false,
+                                responseHeaders:
+                                    responseHeaders as Record<
+                                        string,
+                                        string | string[]
+                                    >,
+                            });
+                            return;
+                        }
+                    }
+
                     const headers = {
                         ...details.responseHeaders,
                     } as Record<string, string | string[]>;

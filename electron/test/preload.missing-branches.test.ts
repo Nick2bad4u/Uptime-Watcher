@@ -13,6 +13,7 @@ const mockContextBridge = {
 const mockIpcRenderer = {
     invoke: vi.fn(),
     on: vi.fn(),
+    removeListener: vi.fn(),
     removeAllListeners: vi.fn(),
     send: vi.fn(),
 };

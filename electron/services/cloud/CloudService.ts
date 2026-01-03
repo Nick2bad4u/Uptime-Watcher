@@ -27,7 +27,6 @@ import {
     MAX_FILESYSTEM_BASE_DIRECTORY_BYTES,
     validateFilesystemBaseDirectoryCandidate,
 } from "@shared/validation/filesystemBaseDirectoryValidation";
-import { safeStorage } from "electron";
 import { promises as fs } from "node:fs";
 import path from "node:path";
 
@@ -42,7 +41,6 @@ import type { CloudStorageProvider } from "./providers/CloudStorageProvider.type
 
 import { logger } from "../../utils/logger";
 import { ProviderCloudSyncTransport } from "../sync/ProviderCloudSyncTransport";
-import { normalizeCloudObjectKey } from "./cloudKeyNormalization";
 import {
     createKeyCheckBase64,
     decryptBuffer,
@@ -51,6 +49,14 @@ import {
     generateEncryptionSalt,
     verifyKeyCheckBase64,
 } from "./crypto/cloudCrypto";
+import {
+    assertBackupObjectKey,
+    decodeStrictBase64,
+    encodeBase64,
+    ENCRYPTION_KEY_BYTES,
+    ENCRYPTION_SALT_BYTES,
+    parseEncryptionMode,
+} from "./internal/cloudServicePrimitives";
 import {
     buildDropboxStatus,
     buildFilesystemStatus,
@@ -120,98 +126,9 @@ const SETTINGS_KEY_LAST_SYNC_AT = "cloud.lastSyncAt" as const;
 const SETTINGS_KEY_LAST_ERROR = "cloud.lastError" as const;
 const SETTINGS_KEY_SYNC_ENABLED = "cloud.syncEnabled" as const;
 
-const SETTINGS_KEY_ENCRYPTION_MODE = "cloud.encryption.mode" as const; const SETTINGS_KEY_ENCRYPTION_SALT = "cloud.encryption.salt" as const;
+const SETTINGS_KEY_ENCRYPTION_MODE = "cloud.encryption.mode" as const;
+const SETTINGS_KEY_ENCRYPTION_SALT = "cloud.encryption.salt" as const;
 const SECRET_KEY_ENCRYPTION_DERIVED_KEY = "cloud.encryption.key.v1" as const;
-const BACKUP_KEY_PREFIX = "backups/" as const;
-const MAX_BACKUP_KEY_BYTES = 2048;
-const ENCRYPTION_KEY_BYTES = 32; const ENCRYPTION_SALT_BYTES = 16;
-
-function normalizeCloudKey(rawKey: string): string {
-    return normalizeCloudObjectKey(rawKey, {
-        forbidAsciiControlCharacters: false,
-        // Preserve existing behavior: traversal segments are rejected later by
-        // assertBackupObjectKey.
-        forbidTraversalSegments: false,
-        // Preserve leading slashes so assertBackupObjectKey can reject absolute
-        // keys.
-        stripLeadingSlashes: false,
-    });
-}
-
-function assertBackupObjectKey(rawKey: string): string {
-    if (typeof rawKey !== "string" || rawKey.trim().length === 0) {
-        throw new Error("Backup key must be a non-empty string");
-    }
-
-    const key = normalizeCloudKey(rawKey);
-
-    if (Buffer.byteLength(key, "utf8") > MAX_BACKUP_KEY_BYTES) {
-        throw new Error(
-            `Backup key must not exceed ${MAX_BACKUP_KEY_BYTES} bytes`
-        );
-    }
-
-    if (!key.startsWith(BACKUP_KEY_PREFIX)) {
-        throw new Error("Backup key must start with 'backups/'");
-    }
-
-    if (key === BACKUP_KEY_PREFIX || key.endsWith("/")) {
-        throw new Error("Backup key must reference a backup object key");
-    }
-
-    if (key.endsWith(".metadata.json")) {
-        throw new Error(
-            "Backup key must reference the backup object, not metadata"
-        );
-    }
-
-    if (hasAsciiControlCharacters(key)) {
-        throw new Error("Backup key must not contain control characters");
-    }
-
-    if (key.startsWith("/") || key.includes(":") || key.includes("://")) {
-        throw new Error("Backup key must be a relative provider key");
-    }
-
-    const segments = key.split("/");
-    if (segments.some((segment) => segment.length === 0)) {
-        throw new Error("Backup key must not contain empty path segments");
-    }
-
-    if (segments.some((segment) => segment === "." || segment === "..")) {
-        throw new Error("Backup key must not contain path traversal segments");
-    }
-
-    return key;
-}
-
-function parseEncryptionMode(value: string | undefined): CloudEncryptionMode {
-    return value === "passphrase" ? "passphrase" : "none";
-}
-
-function encodeBase64(buffer: Buffer): string {
-    return buffer.toString("base64");
-}
-
-function decodeBase64(value: string): Buffer {
-    return Buffer.from(value, "base64");
-}
-
-function decodeStrictBase64(args: {
-    expectedBytes: number;
-    label: string;
-    value: string;
-}): Buffer {
-    const buffer = decodeBase64(args.value);
-
-    if (buffer.byteLength !== args.expectedBytes) {
-        throw new Error(
-            `Invalid ${args.label} length (expected ${args.expectedBytes} bytes)`
-        );
-    }
-
-    return buffer;
-}
 
 function determineBackupMigrationNeedsEncryptionKey(
     request: CloudBackupMigrationRequest,
@@ -1250,15 +1167,14 @@ export class CloudService {
                 settings: args.settings,
             });
 
-            // SafeStorage can be unavailable on some Linux environments without
-            // a keyring. Fall back to an in-memory store to keep the app usable
-            // (but secrets won't persist across restarts).
-            this.secretStore = safeStorage.isEncryptionAvailable()
-                ? persistent
-                : new FallbackSecretStore({
-                      fallback: new EphemeralSecretStore(),
-                      primary: persistent,
-                  });
+            // SafeStorage can be unavailable (or become unavailable) on some
+            // systems (e.g., missing/locked keyring). Always wrap with an
+            // in-memory fallback so cloud operations can remain usable even if
+            // secrets cannot be persisted.
+            this.secretStore = new FallbackSecretStore({
+                fallback: new EphemeralSecretStore(),
+                primary: persistent,
+            });
         }
     }
 }
