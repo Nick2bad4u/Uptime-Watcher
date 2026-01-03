@@ -1,4 +1,3 @@
-import type { Event, HandlerDetails } from "electron";
 /**
  * Window management service for Electron application windows.
  *
@@ -41,13 +40,14 @@ import { tryGetErrorCode } from "@shared/utils/errorCodes";
 import { ensureError, withErrorHandling } from "@shared/utils/errorHandling";
 import { validateExternalOpenUrlCandidate } from "@shared/utils/urlSafety";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
-import { BrowserWindow, shell } from "electron";
+import { BrowserWindow, type Event, type HandlerDetails } from "electron";
 // eslint-disable-next-line unicorn/import-style -- Need namespace import for path operations
 import * as path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { isDev } from "../../electronUtils";
 import { logger } from "../../utils/logger";
+import { openExternalOrThrow } from "../shell/openExternalUtils";
 
 // ESM equivalent of currentDirectory
 // eslint-disable-next-line unicorn/prefer-import-meta-properties -- Electron main-process path resolution under ESM requires an __dirname equivalent
@@ -84,6 +84,23 @@ export class WindowService {
 
     /** Tracks whether production security headers were attached. */
     private hasAttachedProductionSecurityHeaders = false;
+
+    /**
+     * Named event handler for did-fail-load event
+     */
+    private readonly handleDidFailLoad: (
+        event: Event,
+        errorCode: number,
+        errorDescription: string
+    ) => void = (
+        _event: Event,
+        errorCode: number,
+        errorDescription: string
+    ): void => {
+        logger.error(
+            `[WindowService] Failed to load renderer: ${errorCode} - ${errorDescription}`
+        );
+    };
 
     private readonly handleWindowOpen = (
         details: HandlerDetails
@@ -148,19 +165,6 @@ export class WindowService {
     };
 
     /**
-     * Named event handler for did-fail-load event
-     */
-    private readonly handleDidFailLoad = (
-        _event: Event,
-        errorCode: number,
-        errorDescription: string
-    ): void => {
-        logger.error(
-            `[WindowService] Failed to load renderer: ${errorCode} - ${errorDescription}`
-        );
-    };
-
-    /**
      * Named event handler for closed event
      */
     private readonly handleClosed = (): void => {
@@ -174,25 +178,37 @@ export class WindowService {
     ): Promise<void> {
         const validation = validateExternalOpenUrlCandidate(targetUrl);
 
+        const safeUrlForLogging =
+            validation.safeUrlForLogging.length > 0
+                ? validation.safeUrlForLogging
+                : "[redacted]";
+
         if ("reason" in validation) {
             logger.warn("[WindowService] Blocked external navigation", {
                 context,
                 reason: validation.reason,
-                url: validation.safeUrlForLogging,
+                url: safeUrlForLogging,
             });
             return;
         }
 
         try {
-            await shell.openExternal(validation.normalizedUrl);
+            await openExternalOrThrow({
+                failureMessagePrefix:
+                    "[WindowService] Failed to open external navigation",
+                normalizedUrl: validation.normalizedUrl,
+                safeUrlForLogging,
+            });
         } catch (error: unknown) {
             const resolved = ensureError(error);
-            const code = tryGetErrorCode(error);
+            const code = tryGetErrorCode(
+                (resolved as { cause?: unknown }).cause ?? resolved
+            );
 
             logger.warn("[WindowService] Failed to open external navigation", {
                 context,
                 errorName: resolved.name,
-                url: validation.safeUrlForLogging,
+                url: safeUrlForLogging,
                 ...(typeof code === "string" && code.length > 0
                     ? { errorCode: code }
                     : {}),

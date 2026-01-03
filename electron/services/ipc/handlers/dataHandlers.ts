@@ -11,6 +11,7 @@ import type { UptimeOrchestrator } from "../../../UptimeOrchestrator";
 import { validateDatabaseBackupPayload } from "../../database/utils/backup/databaseBackup";
 import { createStandardizedIpcRegistrar, toClonedArrayBuffer } from "../utils";
 import { DataHandlerValidators } from "../validators";
+import { createSingleFlight } from "./utils/createSingleFlight";
 
 /**
  * Dependencies required for registering data IPC handlers.
@@ -29,9 +30,26 @@ export function registerDataHandlers({
 }: DataHandlersDependencies): void {
     const register = createStandardizedIpcRegistrar(registeredHandlers);
 
+    const exportDataSingleFlight = createSingleFlight(async () =>
+        uptimeOrchestrator.exportData()
+    );
+
+    const downloadSqliteBackupSingleFlight = createSingleFlight(async () => {
+        const result = await uptimeOrchestrator.downloadBackup();
+        validateDatabaseBackupPayload(result);
+        const { buffer, fileName, metadata } = result;
+        const arrayBuffer = toClonedArrayBuffer(buffer);
+
+        return {
+            buffer: arrayBuffer,
+            fileName,
+            metadata,
+        } satisfies SerializedDatabaseBackupResult;
+    });
+
     register(
         DATA_CHANNELS.exportData,
-        () => uptimeOrchestrator.exportData(),
+        () => exportDataSingleFlight(),
         DataHandlerValidators.exportData
     );
 
@@ -43,18 +61,7 @@ export function registerDataHandlers({
 
     register(
         DATA_CHANNELS.downloadSqliteBackup,
-        async () => {
-            const result = await uptimeOrchestrator.downloadBackup();
-            validateDatabaseBackupPayload(result);
-            const { buffer, fileName, metadata } = result;
-            const arrayBuffer = toClonedArrayBuffer(buffer);
-
-            return {
-                buffer: arrayBuffer,
-                fileName,
-                metadata,
-            } satisfies SerializedDatabaseBackupResult;
-        },
+        () => downloadSqliteBackupSingleFlight(),
         DataHandlerValidators.downloadSqliteBackup
     );
 

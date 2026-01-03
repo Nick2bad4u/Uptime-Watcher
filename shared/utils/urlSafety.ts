@@ -18,50 +18,40 @@ const MAX_EXTERNAL_OPEN_URL_BYTES = 4096;
 
 const SAFE_URL_SUSPECT_SEGMENT_MIN_LENGTH = 32;
 
+/** Fallback placeholder when a user-supplied URL cannot be safely represented in logs. */
+const FALLBACK_SAFE_URL_FOR_LOGGING = "[redacted]";
+
 /**
  * Result of validating and normalizing a URL intended for external opening.
  *
- * @public
- */
-export type ExternalOpenUrlValidationResult =
-    | {
-          /** The trimmed, normalized URL string safe to pass to `openExternal`. */
-          readonly normalizedUrl: string;
-          readonly ok: true;
-          /** A redacted representation safe for logs and user-facing errors. */
-          readonly safeUrlForLogging: string;
-      }
-    | {
-          readonly ok: false;
-          /**
-           * A short message fragment starting with "must" suitable for
-           * prefixing with a field name (e.g. "url").
-           */
-          readonly reason: string;
-          /** A redacted representation safe for logs and user-facing errors. */
-          readonly safeUrlForLogging: string;
-      };
-
-/**
- * Validates and normalizes a URL intended to be opened via
- * `shell.openExternal`.
- *
  * @remarks
- * This helper is used at multiple trust boundaries (renderer input, IPC
- * validators, and main-process handlers). Keeping the policy here prevents
- * subtle inconsistencies (e.g. allowing `mailto:` in one layer but rejecting it
- * in another).
- *
- * Policy:
- *
- * - Allows only `http:`, `https:`, and `mailto:`.
- * - Rejects credentials.
- * - Rejects CR/LF characters.
- * - For `http(s)` additionally applies stricter URL validation
- *   ({@link isValidUrl}) with credentials disallowed.
- *
- * @param rawUrl - Untrusted URL candidate.
+ * `safeUrlForLogging` is always present, allowing callers to log failures
+ * without additional guards.
  */
+export type ExternalOpenUrlRejectedResult = Readonly<{
+    ok: false;
+    /**
+     * A short message fragment starting with "must" suitable for prefixing with
+     * a field name (e.g. "url").
+     */
+    reason: string;
+    /** A redacted representation safe for logs and user-facing errors. */
+    safeUrlForLogging: string;
+}>;
+
+/** Accepted result from {@link validateExternalOpenUrlCandidate}. */
+export type ExternalOpenUrlAcceptedResult = Readonly<{
+    /** A normalized URL safe to pass to Electron's `shell.openExternal()`. */
+    normalizedUrl: string;
+    ok: true;
+    /** A redacted representation safe for logs and user-facing errors. */
+    safeUrlForLogging: string;
+}>;
+
+/** Discriminated union result from {@link validateExternalOpenUrlCandidate}. */
+export type ExternalOpenUrlValidationResult =
+    | ExternalOpenUrlAcceptedResult
+    | ExternalOpenUrlRejectedResult;
 /**
  * Removes sensitive URL parts so log lines don't leak credentials or tokens.
  *
@@ -263,7 +253,7 @@ export function isAllowedExternalOpenUrl(rawUrl: string): boolean {
 export function validateExternalOpenUrlCandidate(
     rawUrl: unknown
 ): ExternalOpenUrlValidationResult {
-    let safeUrlForLogging = "";
+    let safeUrlForLogging = FALLBACK_SAFE_URL_FOR_LOGGING;
 
     if (typeof rawUrl !== "string") {
         return {

@@ -7,6 +7,7 @@ import type { CloudService } from "../../cloud/CloudService";
 
 import { createStandardizedIpcRegistrar } from "../utils";
 import { CloudHandlerValidators } from "../validators";
+import { createSingleFlight } from "./utils/createSingleFlight";
 
 /**
  * Dependencies required for registering cloud IPC handlers.
@@ -24,6 +25,17 @@ export function registerCloudHandlers({
     registeredHandlers,
 }: CloudHandlersDependencies): void {
     const register = createStandardizedIpcRegistrar(registeredHandlers);
+
+    const requestSyncNowSingleFlight = createSingleFlight(
+        async (): Promise<undefined> => {
+            await cloudService.requestSyncNow();
+            return undefined;
+        }
+    );
+
+    const uploadLatestBackupSingleFlight = createSingleFlight(() =>
+        cloudService.uploadLatestBackup()
+    );
 
     register(
         CLOUD_CHANNELS.clearEncryptionKey,
@@ -106,7 +118,7 @@ export function registerCloudHandlers({
 
     register(
         CLOUD_CHANNELS.uploadLatestBackup,
-        () => cloudService.uploadLatestBackup(),
+        () => uploadLatestBackupSingleFlight(),
         CloudHandlerValidators.uploadLatestBackup
     );
 
@@ -118,10 +130,7 @@ export function registerCloudHandlers({
 
     register(
         CLOUD_CHANNELS.requestSyncNow,
-        async (): Promise<undefined> => {
-            await cloudService.requestSyncNow();
-            return undefined;
-        },
+        () => requestSyncNowSingleFlight(),
         CloudHandlerValidators.requestSyncNow
     );
 }
