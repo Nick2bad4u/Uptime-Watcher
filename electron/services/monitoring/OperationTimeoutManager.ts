@@ -64,6 +64,11 @@ export class OperationTimeoutManager {
      * @param timeoutMs - Timeout duration in milliseconds
      */
     public scheduleTimeout(operationId: string, timeoutMs: number): void {
+        // If a timeout was already scheduled for this operation, replace it.
+        // Without clearing, the old timer can still fire later and cancel the
+        // operation unexpectedly.
+        this.clearTimeout(operationId);
+
         const timeout = setTimeout(() => {
             this.handleTimeout(operationId);
         }, timeoutMs);
