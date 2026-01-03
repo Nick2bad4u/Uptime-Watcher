@@ -149,7 +149,9 @@ describe("urlSafety", () => {
         });
 
         it("rejects uppercase mailto when email is invalid", () => {
-            const result = validateExternalOpenUrlCandidate("MAILTO:not-an-email");
+            const result = validateExternalOpenUrlCandidate(
+                "MAILTO:not-an-email"
+            );
             expect(result.ok).toBeFalsy();
         });
 

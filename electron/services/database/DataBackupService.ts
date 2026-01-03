@@ -72,7 +72,9 @@ export class DataBackupService {
                 snapshotFileName: BACKUP_SNAPSHOT_FILE_NAME,
             });
 
-            const rawResult = await createDatabaseBackup({ dbPath: snapshotPath });
+            const rawResult = await createDatabaseBackup({
+                dbPath: snapshotPath,
+            });
             const result = this.normalizeBackupResultMetadata(rawResult);
             validateDatabaseBackupPayload(result);
             this.logger.info("[DataBackupService] Created database backup", {
@@ -97,7 +99,10 @@ export class DataBackupService {
             throw new SiteLoadingError(message, { cause: normalizedError });
         } finally {
             if (snapshotDir) {
-                await this.removeDirectorySafe(snapshotDir, "backup-temp-directory");
+                await this.removeDirectorySafe(
+                    snapshotDir,
+                    "backup-temp-directory"
+                );
             }
         }
     }
@@ -141,9 +146,8 @@ export class DataBackupService {
             );
             validateDatabaseBackupPayload({ buffer, metadata });
 
-            preRestoreSnapshotDir = await this.createTempDirectory(
-                BACKUP_TEMP_PREFIX
-            );
+            preRestoreSnapshotDir =
+                await this.createTempDirectory(BACKUP_TEMP_PREFIX);
             const preRestoreSnapshotPath = this.createConsistentSnapshot({
                 dbPath,
                 snapshotDir: preRestoreSnapshotDir,
@@ -154,7 +158,8 @@ export class DataBackupService {
                 dbPath: preRestoreSnapshotPath,
                 fileName: `pre-restore-${timestamp}.sqlite`,
             });
-            const preRestore = this.normalizeBackupResultMetadata(preRestoreRaw);
+            const preRestore =
+                this.normalizeBackupResultMetadata(preRestoreRaw);
             const normalizedPreRestoreName = preRestore.fileName.trim();
             const preRestoreFileName = createSanitizedFileName(
                 normalizedPreRestoreName.length > 0
@@ -257,8 +262,14 @@ export class DataBackupService {
         const targetDir = path.dirname(targetPath);
         const baseName = path.basename(targetPath);
         const timestamp = Date.now();
-        const rollbackPath = path.join(targetDir, `${baseName}.rollback-${timestamp}`);
-        const incomingPath = path.join(targetDir, `${baseName}.incoming-${timestamp}`);
+        const rollbackPath = path.join(
+            targetDir,
+            `${baseName}.rollback-${timestamp}`
+        );
+        const incomingPath = path.join(
+            targetDir,
+            `${baseName}.incoming-${timestamp}`
+        );
 
         let hadExistingTarget = false;
         let copyError: Error | undefined = undefined;
@@ -266,7 +277,6 @@ export class DataBackupService {
         try {
             // Move the existing DB out of the way (so rename into place is safe).
             try {
-
                 // eslint-disable-next-line security/detect-non-literal-fs-filename -- rollbackPath is derived from the trusted DB path with a controlled suffix.
                 await fs.rename(targetPath, rollbackPath);
                 hadExistingTarget = true;
@@ -377,14 +387,19 @@ export class DataBackupService {
         const { dbPath, snapshotDir, snapshotFileName } = args;
 
         const safeName = createSanitizedFileName(snapshotFileName);
-        const snapshotPath = this.resolvePathWithinDirectory(snapshotDir, safeName);
+        const snapshotPath = this.resolvePathWithinDirectory(
+            snapshotDir,
+            safeName
+        );
 
         // Ensure we get a consistent snapshot when WAL mode is enabled.
         // We close/reopen the app's main connection to avoid lock contention.
         this.databaseService.close();
 
         try {
-            const tempDb = new sqlite3.Database(dbPath, { fileMustExist: true });
+            const tempDb = new sqlite3.Database(dbPath, {
+                fileMustExist: true,
+            });
             try {
                 tempDb.exec(
                     `VACUUM INTO ${this.escapeSqlStringLiteral(snapshotPath)}`

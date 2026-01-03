@@ -9,13 +9,14 @@
  * invocations. Callers receive the same in-flight promise until it settles.
  *
  * Notes:
+ *
  * - This is NOT a rate limiter. Sequential calls still execute normally.
  * - Prefer using this only for idempotent or "best effort" operations.
  */
 
 /**
- * Wrap an async function so that only one invocation runs at a time.
- * Concurrent calls return the in-flight promise.
+ * Wrap an async function so that only one invocation runs at a time. Concurrent
+ * calls return the in-flight promise.
  */
 export function createSingleFlight<Args extends readonly unknown[], Result>(
     fn: (...args: Args) => Promise<Result>
@@ -23,7 +24,12 @@ export function createSingleFlight<Args extends readonly unknown[], Result>(
     let inFlight: Promise<Result> | undefined = undefined;
 
     return async (...args: Args): Promise<Result> => {
-        const current = inFlight ?? fn(...args);
+        // Ensure synchronous throws become a rejected promise so we can:
+        // 1) share the same in-flight promise across concurrent callers, and
+        // 2) always clear inFlight in the finally block.
+        const invoke = async (): Promise<Result> => fn(...args);
+
+        const current = inFlight ?? invoke();
         inFlight = current;
         try {
             return await current;
