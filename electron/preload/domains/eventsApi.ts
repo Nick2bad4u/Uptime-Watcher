@@ -78,7 +78,7 @@ const RENDERER_EVENT_CHANNEL_VALUES = Object.values(
 function isRendererEventChannel(value: unknown): value is RendererEventChannel {
     return (
         typeof value === "string" &&
-        RENDERER_EVENT_CHANNEL_VALUES.includes(value)
+        RENDERER_EVENT_CHANNEL_VALUES.some((channel) => channel === value)
     );
 }
 

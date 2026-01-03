@@ -14,7 +14,6 @@ import type { BrowserWindow } from "electron";
 import { readProcessEnv } from "@shared/utils/environment";
 import { ensureError } from "@shared/utils/errorHandling";
 import { app } from "electron";
-import debug from "electron-debug";
 import {
     installExtension,
     REACT_DEVELOPER_TOOLS,
@@ -95,12 +94,44 @@ const configureUserDataPath = (): void => {
 
 configureUserDataPath();
 
-// Initialize electron-debug for enhanced debugging capabilities
-debug({
-    devToolsMode: "right", // Dock DevTools to the right by default
-    isEnabled: isDev(), // Only enable in development mode
-    showDevTools: isDev(), // Auto-open DevTools in development
-});
+// Dev-only: electron-debug should not be a production dependency.
+// Use dynamic import so packaged builds don't require devDependencies.
+if (isDev()) {
+    type ElectronDebugInitializer = (options: {
+        devToolsMode?: string;
+        isEnabled?: boolean;
+        showDevTools?: boolean;
+    }) => void;
+
+    void (async (): Promise<void> => {
+        try {
+
+            const module = await import(
+                /* WebpackChunkName: "electron-debug" */ "electron-debug"
+            );
+            const maybeDefault: unknown = (module as { default?: unknown })
+                .default;
+
+            if (typeof maybeDefault !== "function") {
+                logger.warn(
+                    "[Main] electron-debug loaded but did not export a function"
+                );
+                return;
+            }
+
+            (maybeDefault as ElectronDebugInitializer)({
+                devToolsMode: "right",
+                isEnabled: true,
+                showDevTools: true,
+            });
+        } catch (error: unknown) {
+            logger.warn(
+                "[Main] Failed to load electron-debug",
+                ensureError(error)
+            );
+        }
+    })();
+}
 
 // Configure electron-log for main process
 /**
