@@ -57,21 +57,35 @@ export const EmptyState = (): JSX.Element => {
     const MonitorIcon = AppIcons.metrics.monitor;
 
     return (
-        <SurfaceContainer
-            className="text-center"
-            data-testid="empty-state"
-            padding="xl"
-        >
-            {/* empty-state-icon class styling loads via src/index.css fragment imports */}
-            <div className="empty-state-icon">
-                <MonitorIcon className="empty-state-icon__symbol" size={56} />
+        <SurfaceContainer className="w-full" padding="xl">
+            <div
+                className="flex min-h-56 flex-col items-center justify-center"
+                data-testid="empty-state"
+            >
+                <div className="flex items-center justify-center">
+                    <MonitorIcon
+                        aria-hidden="true"
+                        className="h-14 w-14 opacity-70"
+                        data-testid="empty-state-monitor-icon"
+                    />
+                </div>
+
+                <div className="mt-5 space-y-2 text-center">
+                    <ThemedText
+                        align="center"
+                        as="h3"
+                        size="lg"
+                        variant="primary"
+                        weight="semibold"
+                    >
+                        No sites are being monitored
+                    </ThemedText>
+
+                    <ThemedText align="center" as="p" size="base" variant="secondary">
+                        Add your first website to start monitoring its uptime.
+                    </ThemedText>
+                </div>
             </div>
-            <ThemedText className="mb-2" size="lg" weight="medium">
-                No sites are being monitored
-            </ThemedText>
-            <ThemedText variant="secondary">
-                Add your first website to start monitoring its uptime.
-            </ThemedText>
         </SurfaceContainer>
     );
 };
