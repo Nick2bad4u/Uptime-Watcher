@@ -67,3 +67,16 @@ describe(handleCheckError, () => {
         expect(result.error).toContain("Too many redirects");
     });
 });
+
+describe("redirect safety errors", () => {
+    it("maps unsupported redirect protocol to a user-friendly message", () => {
+        const url = "https://example.com";
+        const error = new Error("Unsupported redirect protocol: file:");
+        (error as unknown as { code: string }).code =
+            "UW_UNSUPPORTED_REDIRECT_PROTOCOL";
+
+        const result = handleCheckError(error, url, "cid");
+        expect(result.status).toBe(STATUS_KIND.DOWN);
+        expect(result.error).toContain("Redirected to an unsupported URL");
+    });
+});

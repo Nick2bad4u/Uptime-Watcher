@@ -77,6 +77,7 @@ const RESPONSE_TOO_LARGE_ERROR_MESSAGE =
 const REQUEST_TOO_LARGE_ERROR_MESSAGE =
     "Request too large (exceeded maximum allowed size)";
 const TOO_MANY_REDIRECTS_ERROR_MESSAGE = "Too many redirects";
+const UNSUPPORTED_REDIRECT_ERROR_MESSAGE = "Redirected to an unsupported URL";
 
 function normalizeErrorCode(error: Error): string | undefined {
     const candidate: unknown = Reflect.get(error as object, "code");
@@ -162,14 +163,31 @@ export function handleAxiosError(
 
     if (isCancellationError(error)) {
         errorMessage = "Request canceled";
-    } else if (normalizedCode === "ECONNABORTED") {
-        errorMessage = "Request timed out";
-    } else if (normalizedCode === "ERR_FR_TOO_MANY_REDIRECTS") {
-        errorMessage = TOO_MANY_REDIRECTS_ERROR_MESSAGE;
-    } else if (messageTextLower.includes("maxcontentlength")) {
-        errorMessage = RESPONSE_TOO_LARGE_ERROR_MESSAGE;
-    } else if (messageTextLower.includes("maxbodylength")) {
-        errorMessage = REQUEST_TOO_LARGE_ERROR_MESSAGE;
+    } else {
+        switch (normalizedCode ?? "UNKNOWN") {
+            case "ECONNABORTED": {
+                errorMessage = "Request timed out";
+                break;
+            }
+            case "ERR_FR_TOO_MANY_REDIRECTS": {
+                errorMessage = TOO_MANY_REDIRECTS_ERROR_MESSAGE;
+                break;
+            }
+            case "UW_UNSUPPORTED_REDIRECT_AUTH":
+            case "UW_UNSUPPORTED_REDIRECT_PROTOCOL": {
+                errorMessage = UNSUPPORTED_REDIRECT_ERROR_MESSAGE;
+                break;
+            }
+            default: {
+                if (messageTextLower.includes("maxcontentlength")) {
+                    errorMessage = RESPONSE_TOO_LARGE_ERROR_MESSAGE;
+                } else if (messageTextLower.includes("maxbodylength")) {
+                    errorMessage = REQUEST_TOO_LARGE_ERROR_MESSAGE;
+                }
+
+                break;
+            }
+        }
     }
 
     if (isDev()) {
@@ -219,6 +237,20 @@ export function handleCheckError(
     url: string,
     correlationId?: string
 ): MonitorCheckResult {
+    if (error instanceof Error) {
+        const normalizedCode = normalizeErrorCode(error);
+        if (
+            normalizedCode === "UW_UNSUPPORTED_REDIRECT_PROTOCOL" ||
+            normalizedCode === "UW_UNSUPPORTED_REDIRECT_AUTH"
+        ) {
+            return createErrorResult(
+                UNSUPPORTED_REDIRECT_ERROR_MESSAGE,
+                0,
+                correlationId
+            );
+        }
+    }
+
     const axiosError = axios.isAxiosError(error) ? error : undefined;
     const responseTime = axiosError?.responseTime ?? 0;
 

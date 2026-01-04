@@ -74,6 +74,7 @@ describe("HTTP Client Utils", () => {
                 maxBodyLength: 8 * 1024, // 8KB default
                 maxContentLength: 1 * 1024 * 1024, // 1MB default
                 maxRedirects: 3, // Tightened default
+                beforeRedirect: expect.any(Function),
                 responseType: "text",
                 timeout: 5000,
                 validateStatus: expect.any(Function),
@@ -101,6 +102,7 @@ describe("HTTP Client Utils", () => {
                 maxBodyLength: 8 * 1024,
                 maxContentLength: 1 * 1024 * 1024,
                 maxRedirects: 3,
+                beforeRedirect: expect.any(Function),
                 responseType: "text",
                 validateStatus: expect.any(Function),
             });

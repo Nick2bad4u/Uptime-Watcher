@@ -372,6 +372,21 @@ export class DataBackupService {
             copyError = ensureError(error);
         }
 
+        // If we failed to copy the restored DB into place but we moved the
+        // original DB out of the way, restore the original before we
+        // re-initialize. Otherwise initialize() may open/lock an empty/bad DB
+        // and make rollback impossible on Windows.
+        if (copyError && hadExistingTarget) {
+            try {
+                await fs.rm(targetPath, { force: true });
+                // eslint-disable-next-line security/detect-non-literal-fs-filename -- rollbackPath/targetPath are within app-controlled userData directory.
+                await fs.rename(rollbackPath, targetPath);
+                hadExistingTarget = false;
+            } catch {
+                // Best effort. We still surface the original copy error below.
+            }
+        }
+
         try {
             this.databaseService.initialize();
         } catch (error: unknown) {
@@ -405,17 +420,6 @@ export class DataBackupService {
         }
 
         if (copyError) {
-            // Restore the old DB if we had one and the copy step failed.
-            if (hadExistingTarget) {
-                try {
-                    await fs.rm(targetPath, { force: true });
-                    // eslint-disable-next-line security/detect-non-literal-fs-filename -- rollbackPath/targetPath are within app-controlled userData directory.
-                    await fs.rename(rollbackPath, targetPath);
-                } catch {
-                    // Best effort.
-                }
-            }
-
             throw copyError;
         }
     }

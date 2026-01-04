@@ -232,6 +232,38 @@ function getSharedHttpsAgent(): https.Agent {
     return sharedAgents.https;
 }
 
+const ALLOWED_REDIRECT_PROTOCOLS = new Set(["http:", "https:"]);
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+    return typeof value === "object" && value !== null;
+}
+
+/**
+ * Prevent following redirects to unsupported schemes (e.g. file:, javascript:)
+ * or redirects that include credentials.
+ */
+function enforceRedirectSafety(options: unknown): void {
+    if (!isRecord(options)) {
+        return;
+    }
+
+    const protocol =
+        typeof options["protocol"] === "string" ? options["protocol"] : "";
+    const auth = typeof options["auth"] === "string" ? options["auth"] : "";
+
+    if (protocol.length > 0 && !ALLOWED_REDIRECT_PROTOCOLS.has(protocol)) {
+        const error = new Error(`Unsupported redirect protocol: ${protocol}`);
+        Reflect.set(error, "code", "UW_UNSUPPORTED_REDIRECT_PROTOCOL");
+        throw error;
+    }
+
+    if (auth.length > 0) {
+        const error = new Error("Redirect URL must not include credentials");
+        Reflect.set(error, "code", "UW_UNSUPPORTED_REDIRECT_AUTH");
+        throw error;
+    }
+}
+
 /**
  * Creates a hardened Axios HTTP client instance suitable for monitor services.
  *
@@ -252,6 +284,7 @@ export function createHttpClient(config: MonitorServiceConfig): AxiosInstance {
     headers["Accept"] = "*/*";
 
     const createConfig: AxiosRequestConfig = {
+        beforeRedirect: enforceRedirectSafety,
         headers,
         // Connection pooling for better performance
         httpAgent: getSharedHttpAgent(),
