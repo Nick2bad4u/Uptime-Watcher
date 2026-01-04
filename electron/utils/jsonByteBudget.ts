@@ -42,7 +42,10 @@ function getJsonBytesForNull(): number {
     return 4;
 }
 
-function addJsonBytesForObject(state: JsonByteBudgetState, value: object): void {
+function addJsonBytesForObject(
+    state: JsonByteBudgetState,
+    value: object
+): void {
     if (value instanceof Date) {
         addBytes(state, getJsonBytesForString(value.toISOString()));
         return;
@@ -108,7 +111,10 @@ function addJsonBytesForObject(state: JsonByteBudgetState, value: object): void 
     }
 }
 
-function addJsonBytesForValue(state: JsonByteBudgetState, value: unknown): void {
+function addJsonBytesForValue(
+    state: JsonByteBudgetState,
+    value: unknown
+): void {
     if (value === null) {
         addBytes(state, getJsonBytesForNull());
         return;
@@ -155,7 +161,10 @@ function addJsonBytesForValue(state: JsonByteBudgetState, value: unknown): void 
  * Returns a conservative estimate of JSON UTF-8 byte length, stopping early
  * once the budget is exceeded.
  */
-export function getJsonByteLengthUpTo(value: unknown, maxBytes: number): number {
+export function getJsonByteLengthUpTo(
+    value: unknown,
+    maxBytes: number
+): number {
     if (!Number.isFinite(maxBytes) || maxBytes <= 0) {
         return 0;
     }
@@ -176,6 +185,9 @@ export function getJsonByteLengthUpTo(value: unknown, maxBytes: number): number 
 }
 
 /** Returns true when {@link getJsonByteLengthUpTo} exceeds `maxBytes`. */
-export function isJsonByteBudgetExceeded(value: unknown, maxBytes: number): boolean {
+export function isJsonByteBudgetExceeded(
+    value: unknown,
+    maxBytes: number
+): boolean {
     return getJsonByteLengthUpTo(value, maxBytes) > maxBytes;
 }

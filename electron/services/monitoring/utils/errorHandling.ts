@@ -70,10 +70,7 @@ export function createErrorResult(
 }
 
 const CANCELLATION_ERROR_CODES = new Set(["ERR_CANCELED"]);
-const CANCELLATION_ERROR_NAMES = new Set([
-    "AbortError",
-    "CanceledError",
-]);
+const CANCELLATION_ERROR_NAMES = new Set(["AbortError", "CanceledError"]);
 
 const RESPONSE_TOO_LARGE_ERROR_MESSAGE =
     "Response too large (exceeded maximum allowed size)";

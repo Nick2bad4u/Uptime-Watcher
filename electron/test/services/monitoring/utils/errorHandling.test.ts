@@ -56,7 +56,8 @@ describe(handleCheckError, () => {
     it("maps too-many-redirects errors to a user-friendly redirect message", () => {
         const url = "https://example.com";
         const error = new Error("Maximum number of redirects exceeded");
-        (error as unknown as { code: string }).code = "ERR_FR_TOO_MANY_REDIRECTS";
+        (error as unknown as { code: string }).code =
+            "ERR_FR_TOO_MANY_REDIRECTS";
         (error as unknown as { isAxiosError: boolean }).isAxiosError = true;
         error.name = "AxiosError";
 

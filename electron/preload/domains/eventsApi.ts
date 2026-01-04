@@ -555,8 +555,14 @@ export function createEventsApi(): EventsApi {
             managers.monitorStatusChanged,
         ],
         [RENDERER_EVENT_CHANNELS.MONITOR_UP, managers.monitorUp],
-        [RENDERER_EVENT_CHANNELS.MONITORING_STARTED, managers.monitoringStarted],
-        [RENDERER_EVENT_CHANNELS.MONITORING_STOPPED, managers.monitoringStopped],
+        [
+            RENDERER_EVENT_CHANNELS.MONITORING_STARTED,
+            managers.monitoringStarted,
+        ],
+        [
+            RENDERER_EVENT_CHANNELS.MONITORING_STOPPED,
+            managers.monitoringStopped,
+        ],
         [
             RENDERER_EVENT_CHANNELS.SETTINGS_HISTORY_LIMIT_UPDATED,
             managers.historyLimitUpdated,

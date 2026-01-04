@@ -138,7 +138,9 @@ describe("bridgeFactory", function describeBridgeFactorySuite() {
 
             const invoke = createTypedInvoker(MONITORING_CHANNELS.checkSiteNow);
 
-            await expect(invoke("site-id", "monitor-id")).resolves.toBeUndefined();
+            await expect(
+                invoke("site-id", "monitor-id")
+            ).resolves.toBeUndefined();
         });
 
         it("throws an IpcError when the response is unsuccessful", async () => {

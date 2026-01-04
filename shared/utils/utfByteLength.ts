@@ -22,7 +22,10 @@ export function getUtfByteLength(value: string): number {
 
     // Prefer Buffer.byteLength in Node-like environments where TextEncoder may
     // be unavailable.
-    if (typeof Buffer !== "undefined" && typeof Buffer.byteLength === "function") {
+    if (
+        typeof Buffer !== "undefined" &&
+        typeof Buffer.byteLength === "function"
+    ) {
         return Buffer.byteLength(value, "utf8");
     }
 

@@ -226,10 +226,7 @@ export function getMonitorWithResult(
 
     // Apply configuration if provided and either forcing update or instance is
     // new
-    if (
-        config &&
-        (forceConfigUpdate || didCreateInstance)
-    ) {
+    if (config && (forceConfigUpdate || didCreateInstance)) {
         try {
             instance.updateConfig(config);
             // ConfigurationApplied remains true

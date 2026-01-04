@@ -572,12 +572,14 @@ export class WindowService {
                         typeof (details as { resourceType?: unknown })
                             .resourceType === "string"
                     ) {
-                        const {resourceType} = (details as { resourceType: string });
+                        const { resourceType } = details as {
+                            resourceType: string;
+                        };
                         if (
                             resourceType !== "mainFrame" &&
                             resourceType !== "subFrame"
                         ) {
-                            const {responseHeaders} = details;
+                            const { responseHeaders } = details;
                             if (!responseHeaders) {
                                 callback({ cancel: false });
                                 return;
@@ -585,11 +587,10 @@ export class WindowService {
 
                             callback({
                                 cancel: false,
-                                responseHeaders:
-                                    responseHeaders as Record<
-                                        string,
-                                        string | string[]
-                                    >,
+                                responseHeaders: responseHeaders as Record<
+                                    string,
+                                    string | string[]
+                                >,
                             });
                             return;
                         }

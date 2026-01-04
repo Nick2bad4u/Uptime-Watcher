@@ -21,8 +21,9 @@ function createMonitorWithUrl(url: string): Monitor {
 
 describe(validateMonitorUrl, () => {
     it("accepts http/https URLs", () => {
-        expect(validateMonitorUrl(createMonitorWithUrl("https://example.com")))
-            .toBeNull();
+        expect(
+            validateMonitorUrl(createMonitorWithUrl("https://example.com"))
+        ).toBeNull();
         expect(
             validateMonitorUrl(
                 createMonitorWithUrl("http://localhost:1234/health")
@@ -31,7 +32,8 @@ describe(validateMonitorUrl, () => {
     });
 
     it("rejects non-http protocols", () => {
-        expect(validateMonitorUrl(createMonitorWithUrl("ftp://example.com")))
-            .not.toBeNull();
+        expect(
+            validateMonitorUrl(createMonitorWithUrl("ftp://example.com"))
+        ).not.toBeNull();
     });
 });

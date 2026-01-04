@@ -131,8 +131,8 @@ export function createHttpMonitorService<
 
     return class HttpMonitorServiceAdapter
         extends MonitorServiceAdapterBase<TType>
-        implements HttpMonitorServiceInstance {
-
+        implements HttpMonitorServiceInstance
+    {
         public async check(
             monitor: Site["monitors"][0],
             signal?: AbortSignal
@@ -227,9 +227,8 @@ export function createHttpMonitorService<
                         operationName,
                         ...(isDev() && {
                             onRetry: (attempt: number, error: Error): void => {
-                                const errorMessage = getUserFacingErrorDetail(
-                                    error
-                                );
+                                const errorMessage =
+                                    getUserFacingErrorDetail(error);
                                 logger.debug(
                                     `[${behavior.scope}] URL ${url} failed attempt ${attempt}/${totalAttempts}: ${errorMessage}`
                                 );

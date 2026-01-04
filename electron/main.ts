@@ -110,7 +110,9 @@ if (isDev()) {
     const isRecord = (value: unknown): value is Record<string, unknown> =>
         typeof value === "object" && value !== null;
 
-    const isElectronDebugModule = (value: unknown): value is ElectronDebugModule => {
+    const isElectronDebugModule = (
+        value: unknown
+    ): value is ElectronDebugModule => {
         if (!isRecord(value)) {
             return false;
         }
@@ -121,7 +123,9 @@ if (isDev()) {
     void (async (): Promise<void> => {
         try {
             // eslint-disable-next-line n/no-unpublished-import -- Dev-only dependency loaded only in development mode.
-            const module: unknown = await import(/* webpackChunkName: "electron-debug" */ "electron-debug");
+            const module: unknown = await import(
+                /* webpackChunkName: "electron-debug" */ "electron-debug"
+            );
 
             if (!isElectronDebugModule(module)) {
                 logger.warn(

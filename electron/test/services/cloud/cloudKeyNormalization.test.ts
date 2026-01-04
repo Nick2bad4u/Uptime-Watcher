@@ -13,9 +13,9 @@ import {
 
 describe("cloudKeyNormalization", () => {
     it("normalizes Windows separators and strips leading slashes by default", () => {
-        expect(normalizeCloudObjectKey(String.raw`\\backups\\file.sqlite`)).toBe(
-            "backups/file.sqlite"
-        );
+        expect(
+            normalizeCloudObjectKey(String.raw`\\backups\\file.sqlite`)
+        ).toBe("backups/file.sqlite");
         expect(normalizeCloudObjectKey("////backups//file.sqlite")).toBe(
             "backups/file.sqlite"
         );
@@ -47,9 +47,9 @@ describe("cloudKeyNormalization", () => {
     });
 
     it("enforces a default byte budget for provider object keys", () => {
-        expect(() => normalizeProviderObjectKey("a".repeat(10_000))).toThrowError(
-            `${DEFAULT_MAX_PROVIDER_OBJECT_KEY_BYTES}`
-        );
+        expect(() =>
+            normalizeProviderObjectKey("a".repeat(10_000))
+        ).toThrowError(`${DEFAULT_MAX_PROVIDER_OBJECT_KEY_BYTES}`);
     });
 
     it("assertCloudObjectKey rejects empty and trailing slash keys", () => {

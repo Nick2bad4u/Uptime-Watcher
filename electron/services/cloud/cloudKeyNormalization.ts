@@ -141,9 +141,7 @@ export function normalizeCloudObjectKey(
         maxByteLength > 0 &&
         getUtfByteLength(normalized) > maxByteLength
     ) {
-        throw new Error(
-            `Cloud key must not exceed ${maxByteLength} bytes`
-        );
+        throw new Error(`Cloud key must not exceed ${maxByteLength} bytes`);
     }
 
     return normalized;
@@ -155,11 +153,12 @@ export function normalizeCloudObjectKey(
  *
  * @remarks
  * This is the common configuration used by Dropbox + Google Drive providers:
- * - trim
- * - normalize Windows separators
- * - strip leading slashes
- * - reject ASCII control characters
- * - reject traversal segments
+ *
+ * - Trim
+ * - Normalize Windows separators
+ * - Strip leading slashes
+ * - Reject ASCII control characters
+ * - Reject traversal segments
  *
  * Providers may still apply additional constraints (prefixing, max sizes, etc).
  */

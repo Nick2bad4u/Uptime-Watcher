@@ -73,10 +73,9 @@ vi.mock("../../../electronUtils", () => ({
 
 // Mock shared utils
 vi.mock("../../../../shared/utils/environment", async () => {
-    const actual =
-        await vi.importActual<typeof import("../../../../shared/utils/environment")>(
-            "../../../../shared/utils/environment"
-        );
+    const actual = await vi.importActual<
+        typeof import("../../../../shared/utils/environment")
+    >("../../../../shared/utils/environment");
 
     return {
         ...actual,
@@ -417,7 +416,10 @@ describe(WindowService, () => {
             const window = windowService.createMainWindow();
 
             const onCalls = vi.mocked(window.webContents.on).mock
-                .calls as unknown as [string, (event: any, url: string) => void][];
+                .calls as unknown as [
+                string,
+                (event: any, url: string) => void,
+            ][];
             const willNavigateHandler = onCalls.find(
                 ([eventName]) => eventName === "will-navigate"
             )?.[1];
@@ -454,7 +456,10 @@ describe(WindowService, () => {
             const window = windowService.createMainWindow();
 
             const onCalls = vi.mocked(window.webContents.on).mock
-                .calls as unknown as [string, (event: any, url: string) => void][];
+                .calls as unknown as [
+                string,
+                (event: any, url: string) => void,
+            ][];
             const willRedirectHandler = onCalls.find(
                 ([eventName]) => eventName === "will-redirect"
             )?.[1];
