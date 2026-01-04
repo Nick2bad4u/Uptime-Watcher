@@ -97,29 +97,40 @@ configureUserDataPath();
 // Dev-only: electron-debug should not be a production dependency.
 // Use dynamic import so packaged builds don't require devDependencies.
 if (isDev()) {
-    type ElectronDebugInitializer = (options: {
+    interface ElectronDebugOptions {
         devToolsMode?: string;
         isEnabled?: boolean;
         showDevTools?: boolean;
-    }) => void;
+    }
+
+    interface ElectronDebugModule {
+        default: (options: ElectronDebugOptions) => void;
+    }
+
+    const isRecord = (value: unknown): value is Record<string, unknown> =>
+        typeof value === "object" && value !== null;
+
+    const isElectronDebugModule = (value: unknown): value is ElectronDebugModule => {
+        if (!isRecord(value)) {
+            return false;
+        }
+
+        return typeof value["default"] === "function";
+    };
 
     void (async (): Promise<void> => {
         try {
+            // eslint-disable-next-line n/no-unpublished-import -- Dev-only dependency loaded only in development mode.
+            const module: unknown = await import(/* webpackChunkName: "electron-debug" */ "electron-debug");
 
-            const module = await import(
-                /* WebpackChunkName: "electron-debug" */ "electron-debug"
-            );
-            const maybeDefault: unknown = (module as { default?: unknown })
-                .default;
-
-            if (typeof maybeDefault !== "function") {
+            if (!isElectronDebugModule(module)) {
                 logger.warn(
                     "[Main] electron-debug loaded but did not export a function"
                 );
                 return;
             }
 
-            (maybeDefault as ElectronDebugInitializer)({
+            module.default({
                 devToolsMode: "right",
                 isEnabled: true,
                 showDevTools: true,

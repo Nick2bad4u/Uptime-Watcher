@@ -534,7 +534,6 @@ describe("HttpMonitor - Comprehensive Coverage", () => {
                 singleCheckParams.url,
                 expect.objectContaining({
                     timeout: singleCheckParams.timeout,
-                    signal: expect.any(AbortSignal),
                 })
             );
             expect(determineMonitorStatus).toHaveBeenCalledWith(200);

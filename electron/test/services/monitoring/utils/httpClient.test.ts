@@ -19,12 +19,12 @@ vi.mock("axios", () => ({
     },
 }));
 
-// Mock http and https agents
-vi.mock("http", () => ({
+// Mock http and https agents (node: specifiers match implementation)
+vi.mock("node:http", () => ({
     Agent: vi.fn(),
 }));
 
-vi.mock("https", () => ({
+vi.mock("node:https", () => ({
     Agent: vi.fn(),
 }));
 

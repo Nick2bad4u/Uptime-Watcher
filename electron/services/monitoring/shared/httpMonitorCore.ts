@@ -35,7 +35,6 @@ import { withOperationalHooks } from "../../../utils/operationalHooks";
 import { handleCheckError, isCancellationError } from "../utils/errorHandling";
 import { createHttpClient } from "../utils/httpClient";
 import { getSharedHttpRateLimiter } from "../utils/httpRateLimiter";
-import { createTimeoutSignal } from "./abortSignalUtils";
 import {
     deriveMonitorTiming,
     ensureMonitorType,
@@ -293,13 +292,11 @@ export function createHttpMonitorService<
             timeout: number,
             signal?: AbortSignal
         ): Promise<AxiosResponse> {
-            const requestSignal = createTimeoutSignal(timeout, signal);
-
             const shouldFollowRedirects =
                 Reflect.get(monitor, "followRedirects") !== false;
 
             return this.axiosInstance.get(url, {
-                signal: requestSignal,
+                ...(signal ? { signal } : {}),
                 timeout,
                 ...(!shouldFollowRedirects && { maxRedirects: 0 }),
             });

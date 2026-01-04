@@ -180,6 +180,58 @@ function normalizePositiveInteger(value: number, fallback: number): number {
     return Math.trunc(value);
 }
 
+const sharedAgents: {
+    http: http.Agent | null;
+    https: https.Agent | null;
+} = {
+    http: null,
+    https: null,
+};
+
+function getSharedHttpAgent(): http.Agent {
+    if (sharedAgents.http) {
+        return sharedAgents.http;
+    }
+
+    sharedAgents.http = new http.Agent({
+        keepAlive: true,
+        keepAliveMsecs: normalizePositiveInteger(
+            DEFAULT_AGENT_KEEP_ALIVE_MSECS,
+            1000
+        ),
+        maxFreeSockets: normalizePositiveInteger(
+            DEFAULT_AGENT_MAX_FREE_SOCKETS,
+            8
+        ),
+        maxSockets: normalizePositiveInteger(DEFAULT_AGENT_MAX_SOCKETS, 32),
+        scheduling: "lifo",
+    });
+
+    return sharedAgents.http;
+}
+
+function getSharedHttpsAgent(): https.Agent {
+    if (sharedAgents.https) {
+        return sharedAgents.https;
+    }
+
+    sharedAgents.https = new https.Agent({
+        keepAlive: true,
+        keepAliveMsecs: normalizePositiveInteger(
+            DEFAULT_AGENT_KEEP_ALIVE_MSECS,
+            1000
+        ),
+        maxFreeSockets: normalizePositiveInteger(
+            DEFAULT_AGENT_MAX_FREE_SOCKETS,
+            8
+        ),
+        maxSockets: normalizePositiveInteger(DEFAULT_AGENT_MAX_SOCKETS, 32),
+        scheduling: "lifo",
+    });
+
+    return sharedAgents.https;
+}
+
 /**
  * Creates a hardened Axios HTTP client instance suitable for monitor services.
  *
@@ -202,32 +254,8 @@ export function createHttpClient(config: MonitorServiceConfig): AxiosInstance {
     const createConfig: AxiosRequestConfig = {
         headers,
         // Connection pooling for better performance
-        httpAgent: new http.Agent({
-            keepAlive: true,
-            keepAliveMsecs: normalizePositiveInteger(
-                DEFAULT_AGENT_KEEP_ALIVE_MSECS,
-                1000
-            ),
-            maxFreeSockets: normalizePositiveInteger(
-                DEFAULT_AGENT_MAX_FREE_SOCKETS,
-                8
-            ),
-            maxSockets: normalizePositiveInteger(DEFAULT_AGENT_MAX_SOCKETS, 32),
-            scheduling: "lifo",
-        }),
-        httpsAgent: new https.Agent({
-            keepAlive: true,
-            keepAliveMsecs: normalizePositiveInteger(
-                DEFAULT_AGENT_KEEP_ALIVE_MSECS,
-                1000
-            ),
-            maxFreeSockets: normalizePositiveInteger(
-                DEFAULT_AGENT_MAX_FREE_SOCKETS,
-                8
-            ),
-            maxSockets: normalizePositiveInteger(DEFAULT_AGENT_MAX_SOCKETS, 32),
-            scheduling: "lifo",
-        }),
+        httpAgent: getSharedHttpAgent(),
+        httpsAgent: getSharedHttpsAgent(),
         maxBodyLength: DEFAULT_MAX_BODY_LENGTH, // Bounded request size
         maxContentLength: DEFAULT_MAX_CONTENT_LENGTH, // Bounded response size
         maxRedirects: DEFAULT_MAX_REDIRECTS,

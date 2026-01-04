@@ -69,12 +69,17 @@ export function createErrorResult(
     };
 }
 
-const CANCELLATION_ERROR_CODES = new Set(["ECONNABORTED", "ERR_CANCELED"]);
+const CANCELLATION_ERROR_CODES = new Set(["ERR_CANCELED"]);
 const CANCELLATION_ERROR_NAMES = new Set([
     "AbortError",
     "CanceledError",
-    "TimeoutError",
 ]);
+
+const RESPONSE_TOO_LARGE_ERROR_MESSAGE =
+    "Response too large (exceeded maximum allowed size)";
+const REQUEST_TOO_LARGE_ERROR_MESSAGE =
+    "Request too large (exceeded maximum allowed size)";
+const TOO_MANY_REDIRECTS_ERROR_MESSAGE = "Too many redirects";
 
 function normalizeErrorCode(error: Error): string | undefined {
     const candidate: unknown = Reflect.get(error as object, "code");
@@ -150,8 +155,11 @@ export function handleAxiosError(
     responseTime: number,
     correlationId?: string
 ): MonitorCheckResult {
+    const messageText = typeof error.message === "string" ? error.message : "";
+    const messageTextLower = messageText.toLowerCase();
+
     // Network errors, timeouts, DNS failures, etc.
-    let errorMessage = error.message || "Network error";
+    let errorMessage = messageText || "Network error";
 
     const normalizedCode = normalizeErrorCode(error);
 
@@ -159,6 +167,12 @@ export function handleAxiosError(
         errorMessage = "Request canceled";
     } else if (normalizedCode === "ECONNABORTED") {
         errorMessage = "Request timed out";
+    } else if (normalizedCode === "ERR_FR_TOO_MANY_REDIRECTS") {
+        errorMessage = TOO_MANY_REDIRECTS_ERROR_MESSAGE;
+    } else if (messageTextLower.includes("maxcontentlength")) {
+        errorMessage = RESPONSE_TOO_LARGE_ERROR_MESSAGE;
+    } else if (messageTextLower.includes("maxbodylength")) {
+        errorMessage = REQUEST_TOO_LARGE_ERROR_MESSAGE;
     }
 
     if (isDev()) {

@@ -139,7 +139,10 @@ export function validateMonitorUrl(monitor: Monitor): null | string {
     // - parse with WHATWG URL and validate hostname semantics
     if (
         !isValidUrl(url, {
+            allow_protocol_relative_urls: false,
             allowSingleQuotes: true,
+            protocols: ["http", "https"],
+            require_protocol: true,
             require_tld: false,
         })
     ) {
