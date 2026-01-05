@@ -11,13 +11,19 @@ import type { Monitor } from "@shared/types";
 
 // Mock all external dependencies
 vi.mock("../../../../stores/settings/useSettingsStore", () => ({
-    useSettingsStore: vi.fn(() => ({
-        settings: { historyLimit: 25 },
-        initializeSettings: vi.fn(),
-        updateSettings: vi.fn(),
-        exportSettings: vi.fn(),
-        importSettings: vi.fn(),
-    })),
+    useSettingsStore: (selector?: unknown) => {
+        const state = {
+            settings: { historyLimit: 25 },
+            exportSettings: vi.fn(),
+            importSettings: vi.fn(),
+            initializeSettings: vi.fn(),
+            updateSettings: vi.fn(),
+        };
+
+        return typeof selector === "function"
+            ? (selector as (value: typeof state) => unknown)(state)
+            : state;
+    },
 }));
 
 vi.mock("../../../../services/logger", () => ({

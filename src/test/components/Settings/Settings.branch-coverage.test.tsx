@@ -230,8 +230,20 @@ describe("Settings - Branch Coverage Tests", () => {
         };
 
         // Setup default mock implementations
-        vi.mocked(useErrorStore).mockReturnValue(mockErrorStore);
-        vi.mocked(useSettingsStore).mockReturnValue(mockSettingsStore);
+        vi.mocked(useErrorStore).mockImplementation((selector?: unknown) =>
+            typeof selector === "function"
+                ? (selector as (state: typeof mockErrorStore) => unknown)(
+                      mockErrorStore
+                  )
+                : mockErrorStore
+        );
+        vi.mocked(useSettingsStore).mockImplementation((selector?: unknown) =>
+            typeof selector === "function"
+                ? (selector as (state: typeof mockSettingsStore) => unknown)(
+                      mockSettingsStore
+                  )
+                : mockSettingsStore
+        );
         vi.mocked(useTheme).mockReturnValue(mockTheme);
         vi.mocked(useThemeClasses).mockReturnValue({
             getBackgroundClass: vi
@@ -266,10 +278,7 @@ describe("Settings - Branch Coverage Tests", () => {
             annotate("Category: Component", "category");
             annotate("Type: Error Handling", "type");
 
-            vi.mocked(useErrorStore).mockReturnValue({
-                ...mockErrorStore,
-                lastError: "Test error message",
-            });
+            mockErrorStore.lastError = "Test error message";
 
             render(<Settings onClose={mockOnClose} />);
 
@@ -290,10 +299,7 @@ describe("Settings - Branch Coverage Tests", () => {
             annotate("Category: Component", "category");
             annotate("Type: Error Handling", "type");
 
-            vi.mocked(useErrorStore).mockReturnValue({
-                ...mockErrorStore,
-                lastError: null,
-            });
+            mockErrorStore.lastError = null;
 
             render(<Settings onClose={mockOnClose} />);
 
@@ -353,10 +359,7 @@ describe("Settings - Branch Coverage Tests", () => {
             annotate("Category: Component", "category");
             annotate("Type: Error Handling", "type");
 
-            vi.mocked(useErrorStore).mockReturnValue({
-                ...mockErrorStore,
-                lastError: "Error message",
-            });
+            mockErrorStore.lastError = "Error message";
 
             render(<Settings onClose={mockOnClose} />);
 
@@ -433,10 +436,7 @@ describe("Settings - Branch Coverage Tests", () => {
             annotate("Category: Component", "category");
             annotate("Type: Data Loading", "type");
 
-            vi.mocked(useErrorStore).mockReturnValue({
-                ...mockErrorStore,
-                isLoading: true,
-            });
+            mockErrorStore.isLoading = true;
 
             render(<Settings onClose={mockOnClose} />);
 
@@ -467,10 +467,7 @@ describe("Settings - Branch Coverage Tests", () => {
             annotate("Category: Component", "category");
             annotate("Type: Data Loading", "type");
 
-            vi.mocked(useErrorStore).mockReturnValue({
-                ...mockErrorStore,
-                isLoading: false,
-            });
+            mockErrorStore.isLoading = false;
 
             render(<Settings onClose={mockOnClose} />);
 
@@ -575,10 +572,7 @@ describe("Settings - Branch Coverage Tests", () => {
                 .fn()
                 .mockRejectedValue(historyError);
 
-            vi.mocked(useSettingsStore).mockReturnValue({
-                ...mockSettingsStore,
-                persistHistoryLimit: mockUpdateHistoryLimit,
-            });
+            mockSettingsStore.persistHistoryLimit = mockUpdateHistoryLimit;
 
             render(<Settings onClose={mockOnClose} />);
 

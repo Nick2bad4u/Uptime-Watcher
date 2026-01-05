@@ -25,13 +25,54 @@ import {
 } from "../../utils/createSitesStoreMock";
 import type { ThemeName } from "../../../theme/types";
 
+const errorStoreState = {
+    clearError: vi.fn(),
+    isLoading: false,
+    lastError: null as null | string,
+    setError: vi.fn(),
+};
+
+const settingsStoreState = {
+    exportSettings: vi.fn(),
+    importSettings: vi.fn(),
+    initializeSettings: vi.fn(),
+    persistHistoryLimit: vi.fn().mockResolvedValue(undefined),
+    resetSettings: vi.fn(),
+    settings: {
+        historyLimit: 1000,
+        inAppAlertVolume: 1,
+        inAppAlertsEnabled: true,
+        inAppAlertsSoundEnabled: true,
+        systemNotificationsEnabled: true,
+        systemNotificationsSoundEnabled: true,
+        theme: "light" as const,
+    },
+    syncSettings: vi.fn(),
+    updateSetting: vi.fn(),
+    updateSettings: vi.fn(),
+};
+
+const useErrorStoreMock = createSelectorHookMock(errorStoreState);
+const useSettingsStoreMock = createSelectorHookMock(settingsStoreState);
+
+(globalThis as any).__useErrorStoreMock_settings__ = useErrorStoreMock;
+(globalThis as any).__useSettingsStoreMock_settings__ = useSettingsStoreMock;
+
 // Mock all dependencies
 vi.mock("../../../stores/error/useErrorStore", () => ({
-    useErrorStore: vi.fn(),
+    useErrorStore: (selector?: unknown, equality?: unknown) =>
+        (globalThis as any).__useErrorStoreMock_settings__?.(
+            selector,
+            equality
+        ),
 }));
 
 vi.mock("../../../stores/settings/useSettingsStore", () => ({
-    useSettingsStore: vi.fn(),
+    useSettingsStore: (selector?: unknown, equality?: unknown) =>
+        (globalThis as any).__useSettingsStoreMock_settings__?.(
+            selector,
+            equality
+        ),
 }));
 
 // Cloud settings integration triggers side-effectful store operations and IPC
@@ -276,8 +317,13 @@ describe("Settings Component", () => {
         mockSettingsStore.settings.inAppAlertsSoundEnabled = true;
         mockSettingsStore.settings.inAppAlertVolume = 1;
 
-        mockUseErrorStore.mockReturnValue(mockErrorStore);
-        mockUseSettingsStore.mockReturnValue(mockSettingsStore);
+        useErrorStoreMock.setState({
+            ...mockErrorStore,
+        });
+        useSettingsStoreMock.setState({
+            ...mockSettingsStore,
+            settings: mockSettingsStore.settings,
+        });
         themeState.current = mockTheme as Record<string, unknown>;
         mockUseTheme.mockReturnValue(themeState.current as any);
         mockUseThemeClasses.mockReturnValue({
@@ -350,8 +396,7 @@ describe("Settings Component", () => {
         annotate("Category: Component", "category");
         annotate("Type: Error Handling", "type");
 
-        const errorStore = { ...mockErrorStore, lastError: "Test error" };
-        mockUseErrorStore.mockReturnValue(errorStore);
+        useErrorStoreMock.setState({ lastError: "Test error" });
 
         render(<Settings onClose={mockOnClose} />);
 
@@ -557,7 +602,7 @@ describe("Settings Component", () => {
                 historyLimit: "500" as any,
             },
         };
-        mockUseSettingsStore.mockReturnValue(settingsWithStringLimit);
+        useSettingsStoreMock.setState(settingsWithStringLimit);
 
         render(<Settings onClose={mockOnClose} />);
 

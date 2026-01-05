@@ -121,11 +121,12 @@ vi.mock("../../hooks/useMonitorTypes", () => ({
 }));
 
 vi.mock("../../stores/monitor/useMonitorTypesStore", () => ({
-    useMonitorTypesStore: () => ({
-        isLoaded: true,
-        lastError: null,
-        loadMonitorTypes: vi.fn(),
-        monitorTypes: [
+    useMonitorTypesStore: (selector?: unknown) => {
+        const state = {
+            isLoaded: true,
+            lastError: null,
+            loadMonitorTypes: vi.fn(),
+            monitorTypes: [
             {
                 description: "Monitor HTTP endpoints",
                 displayName: "HTTP Monitor",
@@ -146,8 +147,13 @@ vi.mock("../../stores/monitor/useMonitorTypesStore", () => ({
                 },
                 version: "1.0.0",
             },
-        ],
-    }),
+            ],
+        };
+
+        return typeof selector === "function"
+            ? (selector as (value: typeof state) => unknown)(state)
+            : state;
+    },
 }));
 
 vi.mock("../../hooks/useDelayedButtonLoading", () => ({

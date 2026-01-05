@@ -166,9 +166,43 @@ export interface SettingsProperties {
 export const Settings = ({
     onClose,
 }: Readonly<SettingsProperties>): ReactElement => {
-    const { clearError, isLoading, lastError, setError } = useErrorStore();
-    const { persistHistoryLimit, resetSettings, settings, updateSettings } =
-        useSettingsStore();
+    type ErrorStoreState = ReturnType<typeof useErrorStore.getState>;
+    type SettingsStoreState = ReturnType<typeof useSettingsStore.getState>;
+
+    const selectClearError = useCallback((
+        state: ErrorStoreState
+    ): ErrorStoreState["clearError"] => state.clearError, []);
+    const selectIsLoading = useCallback((state: ErrorStoreState): boolean =>
+        state.isLoading, []);
+    const selectLastError = useCallback((
+        state: ErrorStoreState
+    ): ErrorStoreState["lastError"] => state.lastError, []);
+    const selectSetError = useCallback((
+        state: ErrorStoreState
+    ): ErrorStoreState["setError"] => state.setError, []);
+
+    const clearError = useErrorStore(selectClearError);
+    const isLoading = useErrorStore(selectIsLoading);
+    const lastError = useErrorStore(selectLastError);
+    const setError = useErrorStore(selectSetError);
+
+    const selectPersistHistoryLimit = useCallback((
+        state: SettingsStoreState
+    ): SettingsStoreState["persistHistoryLimit"] => state.persistHistoryLimit, []);
+    const selectResetSettings = useCallback((
+        state: SettingsStoreState
+    ): SettingsStoreState["resetSettings"] => state.resetSettings, []);
+    const selectSettings = useCallback((
+        state: SettingsStoreState
+    ): SettingsStoreState["settings"] => state.settings, []);
+    const selectUpdateSettings = useCallback((
+        state: SettingsStoreState
+    ): SettingsStoreState["updateSettings"] => state.updateSettings, []);
+
+    const persistHistoryLimit = useSettingsStore(selectPersistHistoryLimit);
+    const resetSettings = useSettingsStore(selectResetSettings);
+    const settings = useSettingsStore(selectSettings);
+    const updateSettings = useSettingsStore(selectUpdateSettings);
     const downloadSqliteBackup = useSitesStore(selectDownloadSqliteBackup);
     const restoreSqliteBackup = useSitesStore(selectRestoreSqliteBackup);
     const lastBackupMetadata = useSitesStore(selectLastBackupMetadata);

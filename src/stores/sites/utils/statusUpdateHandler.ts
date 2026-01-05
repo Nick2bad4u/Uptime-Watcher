@@ -504,14 +504,24 @@ export class StatusUpdateManager {
      * ```
      */
     public unsubscribe(): void {
-        // Clean up all event listeners
-        for (const cleanup of this.cleanupFunctions) {
-            cleanup();
-        }
+        // Reset state first to avoid re-entrancy issues where cleanup handlers
+        // indirectly trigger another unsubscribe call.
+        this.isListenerAttached = false;
+
+        const { cleanupFunctions } = this;
         this.cleanupFunctions = [];
 
-        // Reset state
-        this.isListenerAttached = false;
+        // Clean up all event listeners (best-effort).
+        for (const cleanup of cleanupFunctions) {
+            try {
+                cleanup();
+            } catch (error) {
+                logger.warn(
+                    "[StatusUpdateHandler] Listener cleanup threw during unsubscribe",
+                    ensureError(error)
+                );
+            }
+        }
     }
 
     private handleMonitoringLifecycleEvent(

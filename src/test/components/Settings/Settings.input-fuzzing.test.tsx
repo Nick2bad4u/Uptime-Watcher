@@ -178,12 +178,18 @@ vi.mock("../../../stores/settings/useSettingsStore", () => ({
 }));
 
 vi.mock("../../../stores/error/useErrorStore", () => ({
-    useErrorStore: () => ({
-        clearError: mocks.clearError,
-        isLoading: storeState.error.isLoading,
-        lastError: storeState.error.lastError ?? null,
-        setError: mocks.setError,
-    }),
+    useErrorStore: (selector?: unknown) => {
+        const state = {
+            clearError: mocks.clearError,
+            isLoading: storeState.error.isLoading,
+            lastError: storeState.error.lastError ?? null,
+            setError: mocks.setError,
+        };
+
+        return typeof selector === "function"
+            ? (selector as (value: typeof state) => unknown)(state)
+            : state;
+    },
 }));
 
 vi.mock("../../../stores/sites/useSitesStore", () => ({

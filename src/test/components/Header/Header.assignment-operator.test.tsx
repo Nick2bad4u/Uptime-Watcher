@@ -48,6 +48,8 @@ const mockUseUIStore = vi.mocked(useUIStore);
 const mockUseTheme = vi.mocked(useTheme);
 const mockUseAvailabilityColors = vi.mocked(useAvailabilityColors);
 
+let uiStoreState: UIStore;
+
 /**
  * Builds a mock UI store state matching the modular store contract.
  *
@@ -182,12 +184,11 @@ describe("Header Assignment Operator Mutations", () => {
     beforeEach(() => {
         vi.clearAllMocks();
 
-        const uiStoreState = createMockUiStoreState();
-        mockUseUIStore.mockImplementation(
-            <Result,>(selector?: (state: UIStore) => Result) =>
-                typeof selector === "function"
-                    ? selector(uiStoreState)
-                    : (uiStoreState as unknown as Result)
+        uiStoreState = createMockUiStoreState();
+        mockUseUIStore.mockImplementation((selector?: unknown) =>
+            typeof selector === "function"
+                ? (selector as (state: UIStore) => unknown)(uiStoreState)
+                : uiStoreState
         );
 
         // Mock theme hooks with proper types
@@ -234,11 +235,7 @@ describe("Header Assignment Operator Mutations", () => {
             getAvailabilityVariant: vi.fn(),
         } as any);
 
-        // Mock UI store
-        mockUseUIStore.mockReturnValue({
-            isLoading: false,
-            setLoading: vi.fn(),
-        } as any);
+        // UI store mock already configured above.
     });
 
     /**

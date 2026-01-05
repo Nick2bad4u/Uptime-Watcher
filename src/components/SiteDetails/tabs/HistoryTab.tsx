@@ -235,7 +235,13 @@ export const HistoryTab: NamedExoticComponent<HistoryTabProperties> = memo(
         formatResponseTime,
         selectedMonitor,
     }: HistoryTabProperties): JSX.Element {
-        const { settings } = useSettingsStore();
+        type SettingsStoreState = ReturnType<typeof useSettingsStore.getState>;
+        const selectHistoryLimit = useCallback((
+            state: SettingsStoreState
+        ): SettingsStoreState["settings"]["historyLimit"] =>
+            state.settings.historyLimit, []);
+
+        const historyLimitSetting = useSettingsStore(selectHistoryLimit);
         const historyDensity = useUIStore(selectSurfaceDensity);
         const setHistoryDensity = useUIStore(selectSetSurfaceDensity);
         const [userHistoryLimit, setUserHistoryLimit] = useState<
@@ -246,7 +252,7 @@ export const HistoryTab: NamedExoticComponent<HistoryTabProperties> = memo(
             useState<HistoryFilter>("all");
         const historyLength = selectedMonitor.history.length;
         const backendLimit = resolveBackendHistoryLimit(
-            settings.historyLimit,
+            historyLimitSetting,
             historyLength
         );
 

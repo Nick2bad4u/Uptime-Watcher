@@ -72,4 +72,24 @@ describe("logging context helpers", () => {
             },
         });
     });
+
+    it("handles circular references safely", () => {
+        const input: Record<string, unknown> = {
+            name: "root",
+        };
+
+        input["self"] = input;
+        input["nested"] = { parent: input };
+
+        expect(() => normalizeLogValue(input)).not.toThrowError();
+
+        const sanitized = normalizeLogValue(input);
+        expect(sanitized).toEqual({
+            name: "root",
+            nested: {
+                parent: "[Circular]",
+            },
+            self: "[Circular]",
+        });
+    });
 });

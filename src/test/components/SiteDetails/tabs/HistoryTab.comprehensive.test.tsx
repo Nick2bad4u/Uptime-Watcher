@@ -110,13 +110,21 @@ describe(HistoryTab, () => {
     beforeEach(() => {
         vi.clearAllMocks();
 
-        mockUseSettingsStore.mockReturnValue({
+        const settingsStoreState = {
             settings: { historyLimit: 25 },
-            initializeSettings: vi.fn(),
-            updateSettings: vi.fn(),
             exportSettings: vi.fn(),
             importSettings: vi.fn(),
-        });
+            initializeSettings: vi.fn(),
+            updateSettings: vi.fn(),
+        };
+
+        mockUseSettingsStore.mockImplementation((selector?: unknown) =>
+            typeof selector === "function"
+                ? (selector as (state: typeof settingsStoreState) => unknown)(
+                      settingsStoreState
+                  )
+                : settingsStoreState
+        );
 
         mockUseTheme.mockReturnValue({
             availableThemes: ["light", "dark"],
@@ -369,13 +377,21 @@ describe(HistoryTab, () => {
             annotate("Category: Component", "category");
             annotate("Type: Configuration", "type");
 
-            vi.mocked(useSettingsStore).mockReturnValue({
+            const settingsStoreState = {
                 settings: { historyLimit: 10 },
-                initializeSettings: vi.fn(),
-                updateSettings: vi.fn(),
                 exportSettings: vi.fn(),
                 importSettings: vi.fn(),
-            });
+                initializeSettings: vi.fn(),
+                updateSettings: vi.fn(),
+            };
+
+            mockUseSettingsStore.mockImplementation((selector?: unknown) =>
+                typeof selector === "function"
+                    ? (selector as (state: typeof settingsStoreState) => unknown)(
+                          settingsStoreState
+                      )
+                    : settingsStoreState
+            );
 
             const monitor = createMockMonitor(20);
             render(<HistoryTab {...defaultProps} selectedMonitor={monitor} />);
@@ -400,13 +416,21 @@ describe(HistoryTab, () => {
             annotate("Category: Component", "category");
             annotate("Type: Configuration", "type");
 
-            vi.mocked(useSettingsStore).mockReturnValue({
+            const settingsStoreState = {
                 settings: { historyLimit: 100 },
-                initializeSettings: vi.fn(),
-                updateSettings: vi.fn(),
                 exportSettings: vi.fn(),
                 importSettings: vi.fn(),
-            });
+                initializeSettings: vi.fn(),
+                updateSettings: vi.fn(),
+            };
+
+            mockUseSettingsStore.mockImplementation((selector?: unknown) =>
+                typeof selector === "function"
+                    ? (selector as (state: typeof settingsStoreState) => unknown)(
+                          settingsStoreState
+                      )
+                    : settingsStoreState
+            );
 
             const monitor = createMockMonitor(5);
             render(<HistoryTab {...defaultProps} selectedMonitor={monitor} />);

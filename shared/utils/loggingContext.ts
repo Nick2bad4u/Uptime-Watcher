@@ -236,27 +236,41 @@ const buildBaseLogContext = (
 });
 
 export const normalizeLogValue = (value: unknown): unknown => {
-    if (typeof value === "string") {
-        return normalizeLogString(value);
-    }
+    const seen = new WeakSet<object>();
 
-    if (Array.isArray(value)) {
-        return value.map((item) => normalizeLogValue(item));
-    }
-
-    if (isRecord(value)) {
-        const sanitizedRecord: Record<string, unknown> = {};
-        for (const [key, entry] of Object.entries(value)) {
-            if (isSecretMetadataKey(key)) {
-                sanitizedRecord[key] = SECRET_PLACEHOLDER;
-            } else {
-                sanitizedRecord[key] = normalizeLogValue(entry);
-            }
+    const normalize = (candidate: unknown): unknown => {
+        if (typeof candidate === "string") {
+            return normalizeLogString(candidate);
         }
-        return sanitizedRecord;
-    }
 
-    return value;
+        if (typeof candidate === "object" && candidate !== null) {
+            if (seen.has(candidate)) {
+                return "[Circular]";
+            }
+
+            seen.add(candidate);
+        }
+
+        if (Array.isArray(candidate)) {
+            return candidate.map((item) => normalize(item));
+        }
+
+        if (isRecord(candidate)) {
+            const sanitizedRecord: Record<string, unknown> = {};
+            for (const [key, entry] of Object.entries(candidate)) {
+                if (isSecretMetadataKey(key)) {
+                    sanitizedRecord[key] = SECRET_PLACEHOLDER;
+                } else {
+                    sanitizedRecord[key] = normalize(entry);
+                }
+            }
+            return sanitizedRecord;
+        }
+
+        return candidate;
+    };
+
+    return normalize(value);
 };
 
 const collectOptionalFields = (

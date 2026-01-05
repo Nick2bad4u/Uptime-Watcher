@@ -270,7 +270,21 @@ export const SettingsTab = ({
     timeoutChanged,
 }: SettingsTabProperties): JSX.Element => {
     const { currentTheme } = useTheme();
-    const { settings, updateSettings } = useSettingsStore();
+    type SettingsStoreState = ReturnType<typeof useSettingsStore.getState>;
+
+    const selectMutedSiteNotificationIdentifiers = useCallback((
+        state: SettingsStoreState
+    ): SettingsStoreState["settings"]["mutedSiteNotificationIdentifiers"] =>
+        state.settings.mutedSiteNotificationIdentifiers, []);
+
+    const selectUpdateSettings = useCallback((
+        state: SettingsStoreState
+    ): SettingsStoreState["updateSettings"] => state.updateSettings, []);
+
+    const mutedSiteNotificationIdentifiers = useSettingsStore(
+        selectMutedSiteNotificationIdentifiers
+    );
+    const updateSettings = useSettingsStore(selectUpdateSettings);
     const identifierLabel = useIdentifierLabel(selectedMonitor);
     const trimmedSiteName = localName.trim();
     const isSiteNameValid = trimmedSiteName.length > 0;
@@ -303,14 +317,14 @@ export const SettingsTab = ({
 
     const isSiteMuted = useMemo(
         () =>
-            settings.mutedSiteNotificationIdentifiers.includes(
+            mutedSiteNotificationIdentifiers.includes(
                 currentSite.identifier
             ),
-        [currentSite.identifier, settings.mutedSiteNotificationIdentifiers]
+        [currentSite.identifier, mutedSiteNotificationIdentifiers]
     );
 
     const handleToggleSiteMute = useCallback(() => {
-        const currentMuted = settings.mutedSiteNotificationIdentifiers;
+        const currentMuted = mutedSiteNotificationIdentifiers;
         const nextMuted = isSiteMuted
             ? currentMuted.filter((id) => id !== currentSite.identifier)
             : [...currentMuted, currentSite.identifier];
@@ -326,7 +340,7 @@ export const SettingsTab = ({
     }, [
         currentSite.identifier,
         isSiteMuted,
-        settings.mutedSiteNotificationIdentifiers,
+        mutedSiteNotificationIdentifiers,
         updateSettings,
     ]);
 

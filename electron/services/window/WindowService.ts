@@ -55,6 +55,38 @@ const currentFilename = fileURLToPath(import.meta.url);
 // eslint-disable-next-line unicorn/prefer-import-meta-properties -- Electron main-process path resolution under ESM requires an __dirname equivalent
 const currentDirectory = path.dirname(currentFilename);
 
+const normalizePathForComparison = (value: string): string =>
+    process.platform === "win32" ? value.toLowerCase() : value;
+
+/**
+ * Returns true when `targetPath` is inside `directoryPath`.
+ *
+ * @remarks
+ * Used to ensure we never allow navigations to arbitrary `file://` URLs outside
+ * the packaged renderer bundle.
+ */
+const isPathWithinDirectory = (args: {
+    readonly directoryPath: string;
+    readonly targetPath: string;
+}): boolean => {
+    const resolvedTarget = normalizePathForComparison(
+        path.resolve(args.targetPath)
+    );
+    let resolvedDirectory = normalizePathForComparison(
+        path.resolve(args.directoryPath)
+    );
+
+    if (!resolvedDirectory.endsWith(path.sep)) {
+        resolvedDirectory = `${resolvedDirectory}${path.sep}`;
+    }
+
+    return resolvedTarget.startsWith(resolvedDirectory);
+};
+
+const PRODUCTION_DIST_DIRECTORY = path.resolve(
+    path.join(currentDirectory, "../dist")
+);
+
 /**
  * Service responsible for window management and lifecycle.
  *
@@ -425,7 +457,15 @@ export class WindowService {
             }
 
             if (!isDev()) {
-                return parsed.protocol === "file:";
+                if (parsed.protocol !== "file:") {
+                    return false;
+                }
+
+                const targetPath = fileURLToPath(parsed);
+                return isPathWithinDirectory({
+                    directoryPath: PRODUCTION_DIST_DIRECTORY,
+                    targetPath,
+                });
             }
 
             // In development, allow navigation within the Vite dev server origin.

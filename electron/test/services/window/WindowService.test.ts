@@ -85,14 +85,9 @@ vi.mock("../../../../shared/utils/environment", async () => {
 });
 
 // Mock node modules
-vi.mock("node:path", () => ({
-    dirname: vi.fn(() => "/mock/path"),
-    join: vi.fn((...args) => args.join("/")),
-}));
-
-vi.mock("node:url", () => ({
-    fileURLToPath: vi.fn(() => "/mock/file.js"),
-}));
+// NOTE: Do not mock node:path/node:url here.
+// WindowService relies on real path and file URL behaviour for production
+// navigation hardening (e.g., path.resolve + fileURLToPath).
 
 // Mock global fetch for Vite server checking
 globalThis.fetch = vi.fn();
@@ -440,6 +435,42 @@ describe(WindowService, () => {
             expect(shell.openExternal).toHaveBeenCalledWith(
                 "https://example.com"
             );
+        });
+
+        it("blocks file:// navigations outside the packaged renderer bundle", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: WindowService", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Security", "type");
+
+            vi.mocked(isDev).mockReturnValue(false);
+
+            const window = windowService.createMainWindow();
+
+            const onCalls = vi.mocked(window.webContents.on).mock
+                .calls as unknown as [
+                string,
+                (event: any, url: string) => void,
+            ][];
+            const willNavigateHandler = onCalls.find(
+                ([eventName]) => eventName === "will-navigate"
+            )?.[1];
+
+            expect(willNavigateHandler).toBeTypeOf("function");
+
+            const event = {
+                preventDefault: vi.fn(),
+            };
+
+            willNavigateHandler?.(event, "file:///etc/passwd");
+
+            await Promise.resolve();
+
+            expect(event.preventDefault).toHaveBeenCalledTimes(1);
+            expect(shell.openExternal).not.toHaveBeenCalled();
         });
 
         it("prevents disallowed will-redirect and opens safe URLs externally", async ({

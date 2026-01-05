@@ -21,6 +21,8 @@ import type { JSX } from "react/jsx-runtime";
 
 import { useCallback } from "react";
 
+import type { SiteListLayoutMode } from "../../stores/ui/types";
+
 import { useGlobalMonitoringMetrics } from "../../hooks/useGlobalMonitoringMetrics";
 import { useUIStore } from "../../stores/ui/useUiStore";
 import { ThemedBox } from "../../theme/components/ThemedBox";
@@ -47,8 +49,20 @@ import { StatusSummary } from "./StatusSummary";
  * @returns JSX element containing the application header
  */
 export const Header = (): JSX.Element => {
-    const { setShowAddSiteModal, setShowSettings, siteListLayout } =
-        useUIStore();
+    type UiStoreState = ReturnType<typeof useUIStore.getState>;
+
+    const selectSetShowAddSiteModal = useCallback((
+        state: UiStoreState
+    ): UiStoreState["setShowAddSiteModal"] => state.setShowAddSiteModal, []);
+    const selectSetShowSettings = useCallback((
+        state: UiStoreState
+    ): UiStoreState["setShowSettings"] => state.setShowSettings, []);
+    const selectSiteListLayout = useCallback((state: UiStoreState): SiteListLayoutMode =>
+        state.siteListLayout, []);
+
+    const setShowAddSiteModal = useUIStore(selectSetShowAddSiteModal);
+    const setShowSettings = useUIStore(selectSetShowSettings);
+    const siteListLayout = useUIStore(selectSiteListLayout);
     const { isDark, toggleTheme } = useTheme();
     const { getAvailabilityColor } = useAvailabilityColors();
     const metrics = useGlobalMonitoringMetrics();

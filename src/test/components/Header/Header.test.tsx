@@ -219,11 +219,17 @@ const createThemeState = (
     ...overrides,
 });
 
+let uiState: UIStore;
+
 beforeEach(() => {
     vi.clearAllMocks();
 
-    const uiState = createUiState();
-    mockUseUIStore.mockReturnValue(uiState);
+    uiState = createUiState();
+    mockUseUIStore.mockImplementation((selector?: unknown) =>
+        typeof selector === "function"
+            ? (selector as (state: UIStore) => unknown)(uiState)
+            : uiState
+    );
 
     mockUseTheme.mockReturnValue(createThemeState());
 
@@ -265,9 +271,6 @@ describe(Header, () => {
     });
 
     it("opens add site modal", () => {
-        const uiState = createUiState();
-        mockUseUIStore.mockReturnValue(uiState);
-
         render(<Header />);
         fireEvent.click(screen.getByLabelText("Add new site"));
 
@@ -275,9 +278,6 @@ describe(Header, () => {
     });
 
     it("opens settings modal", () => {
-        const uiState = createUiState();
-        mockUseUIStore.mockReturnValue(uiState);
-
         render(<Header />);
         fireEvent.click(screen.getByLabelText("Open settings"));
 
@@ -317,9 +317,7 @@ describe(Header, () => {
     });
 
     it("hides the status summary when using the large card layout", () => {
-        const uiState = createUiState();
         uiState.siteListLayout = "card-large";
-        mockUseUIStore.mockReturnValue(uiState);
 
         render(<Header />);
 
