@@ -1,3 +1,6 @@
+import type { Monitor, Site } from "@shared/types";
+import type { SiteSyncDelta } from "@shared/types/stateSync";
+
 import {
     RENDERER_EVENT_CHANNELS,
     type RendererEventChannel,
@@ -7,10 +10,88 @@ import { ensureError } from "@shared/utils/errorHandling";
 
 import type { WindowService } from "../window/WindowService";
 
-import { isJsonByteBudgetExceeded } from "../../utils/jsonByteBudget";
+import {
+    getJsonByteLengthUpTo,
+    isJsonByteBudgetExceeded,
+} from "../../utils/jsonByteBudget";
 import { logger } from "../../utils/logger";
 
 const MAX_STATE_SYNC_EVENT_BYTES = 2_000_000;
+
+const HISTORY_TRUNCATION_STEPS: readonly number[] = Object.freeze([
+    50,
+    25,
+    10,
+    3,
+    1,
+    0,
+]);
+
+const truncateMonitorHistory = (
+    monitor: Monitor,
+    maxHistoryEntriesPerMonitor: number
+): Monitor => {
+    if (maxHistoryEntriesPerMonitor < 0) {
+        return monitor;
+    }
+
+    const truncatedHistory =
+        maxHistoryEntriesPerMonitor === 0
+            ? []
+            : monitor.history.slice(-maxHistoryEntriesPerMonitor);
+
+    return {
+        ...monitor,
+        history: truncatedHistory,
+    };
+};
+
+const truncateSiteHistory = (
+    site: Site,
+    maxHistoryEntriesPerMonitor: number
+): Site => ({
+    ...site,
+    monitors: site.monitors.map((monitor) =>
+        truncateMonitorHistory(monitor, maxHistoryEntriesPerMonitor)
+    ),
+});
+
+const truncateDeltaHistory = (
+    delta: SiteSyncDelta,
+    maxHistoryEntriesPerMonitor: number
+): SiteSyncDelta => ({
+    ...delta,
+    addedSites: delta.addedSites.map((site) =>
+        truncateSiteHistory(site, maxHistoryEntriesPerMonitor)
+    ),
+    updatedSites: delta.updatedSites.map((entry) => ({
+        ...entry,
+        next: truncateSiteHistory(entry.next, maxHistoryEntriesPerMonitor),
+        previous: truncateSiteHistory(
+            entry.previous,
+            maxHistoryEntriesPerMonitor
+        ),
+    })),
+});
+
+const compactStateSyncPayload = (
+    payload: RendererEventPayload<typeof RENDERER_EVENT_CHANNELS.STATE_SYNC>,
+    maxHistoryEntriesPerMonitor: number
+): RendererEventPayload<typeof RENDERER_EVENT_CHANNELS.STATE_SYNC> => {
+    const sites = payload.sites.map((site) =>
+        truncateSiteHistory(site, maxHistoryEntriesPerMonitor)
+    );
+
+    const delta = payload.delta
+        ? truncateDeltaHistory(payload.delta, maxHistoryEntriesPerMonitor)
+        : undefined;
+
+    return {
+        ...payload,
+        ...(delta ? { delta } : {}),
+        sites,
+    };
+};
 
 /**
  * Bridges typed backend events to renderer processes via IPC.
@@ -87,12 +168,56 @@ export class RendererEventBridge {
     public sendStateSyncEvent(
         payload: RendererEventPayload<typeof RENDERER_EVENT_CHANNELS.STATE_SYNC>
     ): void {
-        if (isJsonByteBudgetExceeded(payload, MAX_STATE_SYNC_EVENT_BYTES)) {
+        const estimatedBytes = getJsonByteLengthUpTo(
+            payload,
+            MAX_STATE_SYNC_EVENT_BYTES + 1
+        );
+
+        if (estimatedBytes > MAX_STATE_SYNC_EVENT_BYTES) {
+            for (const maxHistoryEntriesPerMonitor of HISTORY_TRUNCATION_STEPS) {
+                const compacted = compactStateSyncPayload(
+                    payload,
+                    maxHistoryEntriesPerMonitor
+                );
+
+                if (
+                    !isJsonByteBudgetExceeded(
+                        compacted,
+                        MAX_STATE_SYNC_EVENT_BYTES
+                    )
+                ) {
+                    logger.warn(
+                        "[RendererEventBridge] Compacting state-sync event payload to satisfy size budget",
+                        {
+                            action: payload.action,
+                            channel: RENDERER_EVENT_CHANNELS.STATE_SYNC,
+                            estimatedBytes,
+                            maxBytes: MAX_STATE_SYNC_EVENT_BYTES,
+                            maxHistoryEntriesPerMonitor,
+                            siteCount: payload.sites.length,
+                            siteIdentifier: payload.siteIdentifier,
+                            source: payload.source,
+                        }
+                    );
+
+                    this.sendToRenderers(
+                        RENDERER_EVENT_CHANNELS.STATE_SYNC,
+                        compacted
+                    );
+                    return;
+                }
+            }
+
             logger.warn(
                 "[RendererEventBridge] Dropping state-sync event (payload exceeds size budget)",
                 {
+                    action: payload.action,
                     channel: RENDERER_EVENT_CHANNELS.STATE_SYNC,
+                    estimatedBytes,
                     maxBytes: MAX_STATE_SYNC_EVENT_BYTES,
+                    siteCount: payload.sites.length,
+                    siteIdentifier: payload.siteIdentifier,
+                    source: payload.source,
                 }
             );
             return;

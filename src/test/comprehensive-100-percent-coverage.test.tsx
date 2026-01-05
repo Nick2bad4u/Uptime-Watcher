@@ -736,10 +736,10 @@ describe("100% Coverage Edge Cases", () => {
             });
 
             render(<AddSiteForm />);
-            expect(screen.getByText("• Primary help text")).toBeInTheDocument();
+            expect(screen.getByText("Primary help text")).toBeInTheDocument();
             expect(
-                screen.getByText("• Secondary help text")
-            ).toBeInTheDocument();
+                screen.queryByText("Secondary help text")
+            ).not.toBeInTheDocument();
         });
 
         it("should handle empty help text", () => {
@@ -753,10 +753,10 @@ describe("100% Coverage Edge Cases", () => {
             render(<AddSiteForm />);
             // Should only show the default help text items
             expect(
-                screen.queryByText("• Primary help text")
+                screen.queryByText("Primary help text")
             ).not.toBeInTheDocument();
             expect(
-                screen.queryByText("• Secondary help text")
+                screen.queryByText("Secondary help text")
             ).not.toBeInTheDocument();
         });
     });

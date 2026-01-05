@@ -15,7 +15,6 @@ import pc from "picocolors";
 import { visualizer } from "rollup-plugin-visualizer";
 import {
     defineConfig,
-    type IndexHtmlTransformContext,
     normalizePath,
     type PluginOption,
     type UserConfigFnObject,
@@ -280,47 +279,7 @@ export default defineConfig(({ command, mode }) => {
             }),
             // Inject package version into import.meta.env.PACKAGE_VERSION
             packageVersion(),
-            /**
-             * @remarks
-             * Csp-dev-fix
-             *
-             * Temporarily adds 'unsafe-eval' to the Content Security Policy
-             * (CSP) in development mode to allow libraries (like zod) that use
-             * eval or new Function for code generation.
-             *
-             * Security Implications:
-             *
-             * - 'unsafe-eval' is a known CSP relaxation that allows dynamic code
-             *   execution, which can be exploited in production.
-             * - This plugin only enables 'unsafe-eval' when running the Vite dev
-             *   server (context.server is truthy).
-             * - In production builds, the CSP remains strict and does NOT include
-             *   'unsafe-eval'.
-             *
-             * Why it's safe in development:
-             *
-             * - The development server is only accessible locally and is not
-             *   exposed to the public internet.
-             * - This change is necessary for developer experience and debugging,
-             *   but is never present in production output.
-             */
-            {
-                name: "csp-dev-fix",
-                transformIndexHtml(
-                    html: string,
-                    context: IndexHtmlTransformContext
-                ) {
-                    if (context.server) {
-                        // Development mode: Add 'unsafe-eval' for zod compatibility
-                        return html.replace(
-                            /script-src 'self' blob:/u,
-                            "script-src 'self' blob: 'unsafe-eval'"
-                        );
-                    }
-                    // Production mode: Keep strict CSP
-                    return html;
-                },
-            },
+            // CSP: keep strict in dev/prod (avoid unsafe-eval so Electron does not emit warnings).
             electron([
                 {
                     // Main process entry file of the Electron App

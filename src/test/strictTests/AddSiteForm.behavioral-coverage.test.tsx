@@ -495,8 +495,13 @@ describe("AddSiteForm behavioral coverage", () => {
             )
         ).toBeInTheDocument();
         expect(
-            within(screen.getByTestId("add-site-form")).getByText(
+            within(screen.getByTestId("add-site-form")).queryByText(
                 /secondary guidance/i
+            )
+        ).not.toBeInTheDocument();
+        expect(
+            within(screen.getByTestId("add-site-form")).getByText(
+                /checks run every/i
             )
         ).toBeInTheDocument();
     });

@@ -196,13 +196,9 @@ vi.mock("../../../hooks/ui/useConfirmDialog", () => ({
 // Import after mocks
 import { Settings } from "../../../components/Settings/Settings";
 import { playInAppAlertTone } from "../../../components/Alerts/alertCoordinator";
-import { useErrorStore } from "../../../stores/error/useErrorStore";
-import { useSettingsStore } from "../../../stores/settings/useSettingsStore";
 import { useTheme, useThemeClasses } from "../../../theme/useTheme";
 
 // Get mocked functions
-const mockUseErrorStore = vi.mocked(useErrorStore);
-const mockUseSettingsStore = vi.mocked(useSettingsStore);
 const mockUseTheme = vi.mocked(useTheme);
 const mockUseThemeClasses = vi.mocked(useThemeClasses);
 const mockPlayInAppAlertTone = vi.mocked(playInAppAlertTone);
