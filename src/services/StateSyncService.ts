@@ -21,7 +21,6 @@ import {
 import {
     parseStateSyncFullSyncResult,
     parseStateSyncStatusSummary,
-    STATE_SYNC_ACTION,
     type StateSyncFullSyncResult,
     type StateSyncStatusSummary,
 } from "@shared/types/stateSync";
@@ -30,6 +29,8 @@ import { ensureError } from "@shared/utils/errorHandling";
 import { logger } from "./logger";
 import { resolveCleanupHandler } from "./utils/cleanupHandlers";
 import { getIpcServiceHelpers } from "./utils/createIpcServiceHelpers";
+
+type RecoveryTrigger = "invalid-event" | "revision-gap" | "truncated-event";
 
 // eslint-disable-next-line ex/no-unhandled -- Module-level initialization should fail fast when preload wiring is invalid.
 const { ensureInitialized, wrap } = getIpcServiceHelpers("StateSyncService", {
@@ -153,12 +154,15 @@ export const StateSyncService: StateSyncServiceContract = {
             let subscriptionActive = true;
             let pendingRecoveryExpectation: null | {
                 appliedLocally: boolean;
+                expectedRevision: number;
                 expectedTimestamp: number;
                 siteCount: number;
                 source: StateSyncFullSyncResult["source"];
             } = null;
             let pendingRecoveryTimer: null | ReturnType<typeof setTimeout> =
                 null;
+
+            let lastSeenRevision: null | number = null;
 
             const clearPendingRecoveryExpectation = (): void => {
                 if (pendingRecoveryTimer) {
@@ -168,7 +172,7 @@ export const StateSyncService: StateSyncServiceContract = {
                 pendingRecoveryExpectation = null;
             };
 
-            const scheduleRecovery = (): void => {
+            const scheduleRecovery = (trigger: RecoveryTrigger): void => {
                 if (
                     pendingRecovery !== null ||
                     pendingRecoveryExpectation !== null
@@ -178,9 +182,34 @@ export const StateSyncService: StateSyncServiceContract = {
 
                 pendingRecovery = (async (): Promise<void> => {
                     try {
-                        logger.warn(
-                            "[StateSyncService] Attempting full sync recovery after invalid state sync event"
-                        );
+                        let recoveryMessage =
+                            "[StateSyncService] Attempting full sync recovery";
+
+                        switch (trigger) {
+                            case "invalid-event": {
+                                recoveryMessage =
+                                    "[StateSyncService] Attempting full sync recovery after invalid state sync event";
+                                break;
+                            }
+
+                            case "revision-gap": {
+                                recoveryMessage =
+                                    "[StateSyncService] Attempting full sync recovery after detected revision gap";
+                                break;
+                            }
+
+                            case "truncated-event": {
+                                recoveryMessage =
+                                    "[StateSyncService] Attempting full sync recovery after truncated state sync event";
+                                break;
+                            }
+
+                            default: {
+                                break;
+                            }
+                        }
+
+                        logger.warn(recoveryMessage);
 
                         const rawFullSync =
                             await api.stateSync.requestFullSync();
@@ -201,7 +230,9 @@ export const StateSyncService: StateSyncServiceContract = {
                         }
 
                         const synthesizedEvent: StateSyncEventData = {
-                            action: STATE_SYNC_ACTION.BULK_SYNC,
+                            action: "bulk-sync",
+                            revision: fullSync.revision,
+                            siteCount: fullSync.siteCount,
                             siteIdentifier: "all",
                             sites: fullSync.sites,
                             source: fullSync.source,
@@ -210,8 +241,11 @@ export const StateSyncService: StateSyncServiceContract = {
 
                         callback(synthesizedEvent);
 
+                        lastSeenRevision = fullSync.revision;
+
                         pendingRecoveryExpectation = {
                             appliedLocally: true,
+                            expectedRevision: fullSync.revision,
                             expectedTimestamp: fullSync.completedAt,
                             siteCount: fullSync.siteCount,
                             source: fullSync.source,
@@ -255,27 +289,86 @@ export const StateSyncService: StateSyncServiceContract = {
                             }
                         );
 
-                        scheduleRecovery();
+                        scheduleRecovery("invalid-event");
                         return;
                     }
+
+                    if (parsedEvent.data.truncated === true) {
+                        logger.warn(
+                            "[StateSyncService] Received truncated state sync event; scheduling full sync recovery",
+                            {
+                                action: parsedEvent.data.action,
+                                revision: parsedEvent.data.revision,
+                                siteCount: parsedEvent.data.siteCount,
+                                source: parsedEvent.data.source,
+                                timestamp: parsedEvent.data.timestamp,
+                            }
+                        );
+
+                        scheduleRecovery("truncated-event");
+                        return;
+                    }
+
+                    const expectedRecoveryRevision =
+                        pendingRecoveryExpectation?.expectedRevision;
+                    const isExpectedRecoveryBroadcast =
+                        typeof expectedRecoveryRevision === "number" &&
+                        parsedEvent.data.revision === expectedRecoveryRevision;
+
+                    if (!isExpectedRecoveryBroadcast) {
+                        if (
+                            lastSeenRevision !== null &&
+                            parsedEvent.data.revision <= lastSeenRevision
+                        ) {
+                            logger.debug(
+                                "[StateSyncService] Ignoring stale state sync event",
+                                {
+                                    eventRevision: parsedEvent.data.revision,
+                                    lastSeenRevision,
+                                }
+                            );
+                            return;
+                        }
+
+                        if (
+                            lastSeenRevision !== null &&
+                            parsedEvent.data.revision > lastSeenRevision + 1
+                        ) {
+                            logger.warn(
+                                "[StateSyncService] Detected state sync revision gap; scheduling full sync recovery",
+                                {
+                                    eventRevision: parsedEvent.data.revision,
+                                    expectedNextRevision: lastSeenRevision + 1,
+                                    lastSeenRevision,
+                                }
+                            );
+                            scheduleRecovery("revision-gap");
+                            return;
+                        }
+                    }
+
+                    lastSeenRevision = parsedEvent.data.revision;
 
                     const shouldSkipCallback =
                         pendingRecoveryExpectation !== null &&
                         pendingRecoveryExpectation.appliedLocally &&
-                        parsedEvent.data.timestamp ===
-                            pendingRecoveryExpectation.expectedTimestamp;
+                        parsedEvent.data.revision ===
+                            pendingRecoveryExpectation.expectedRevision;
 
                     if (!shouldSkipCallback) {
                         callback(parsedEvent.data);
                     }
 
-                    if (
-                        parsedEvent.data.timestamp === pendingRecoveryExpectation?.expectedTimestamp
-                    ) {
+                    if (isExpectedRecoveryBroadcast) {
                         logger.info(
                             "[StateSyncService] Full sync recovery broadcast applied",
                             {
-                                siteCount: parsedEvent.data.sites.length,
+                                revision: parsedEvent.data.revision,
+                                siteCount:
+                                    parsedEvent.data.action ===
+                                    "bulk-sync"
+                                        ? parsedEvent.data.siteCount
+                                        : undefined,
                                 source: parsedEvent.data.source,
                                 timestamp: parsedEvent.data.timestamp,
                             }

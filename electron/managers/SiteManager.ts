@@ -1,4 +1,4 @@
-/**
+    /**
  * Site management service responsible for site CRUD operations and monitoring
  * coordination.
  *
@@ -63,6 +63,7 @@ import {
 } from "@shared/utils/logTemplates";
 import {
     deriveSiteSnapshot,
+    hasSiteSyncChanges,
     prepareSiteSyncSnapshot,
 } from "@shared/utils/siteSnapshots";
 
@@ -78,7 +79,7 @@ import { SiteWriterService } from "../services/database/SiteWriterService";
 import { StandardizedCache } from "../utils/cache/StandardizedCache";
 import { logger } from "../utils/logger";
 
-/**
+    /**
  * @remarks
  * Defines the contract for monitoring operations that can be performed in
  * coordination with site management. This allows loose coupling between the
@@ -133,7 +134,7 @@ export interface IMonitoringOperations {
     ) => Promise<boolean>;
 }
 
-/**
+    /**
  * @remarks
  * Provides all required dependencies for SiteManager operation, including
  * repository services, database access, event communication, and optional
@@ -209,6 +210,9 @@ export class SiteManager {
 
     /** Cached snapshot from the most recent state sync emission. */
     private lastStateSyncSnapshot: Site[] = [];
+
+    /** Monotonic revision incremented for each emitted state sync event. */
+    private stateSyncRevision = 0;
 
     /**
      * Emits a cache-miss event without allowing failures to crash the caller.
@@ -377,24 +381,16 @@ export class SiteManager {
     }
 
     /**
-     * Emits a sanitized site state synchronization event.
+     * Emits a `sites:state-synchronized` event using the modern sync contract.
      *
      * @remarks
-     * Clones the supplied site snapshots (or the current cache snapshot when
-     * `sites` is omitted) before emitting `sites:state-synchronized` to avoid
-     * leaking mutable references to consumers. The cloned snapshot is returned
-     * to callers for further processing (for example, IPC responses).
+     * - `bulk-sync` emits a full snapshot (`sites`) and `siteCount`.
+     * - `update`/`delete` emit *delta-only* payloads.
+     * - A monotonic `revision` is incremented for every emitted sync event so
+     *   renderers can detect gaps and trigger a full-sync recovery.
      *
-     * @param params - Synchronization parameters containing:
-     *
-     *   - `action`: Synchronization action that triggered the emission.
-     *   - `siteIdentifier`: Identifier associated with the synchronization.
-     *   - `sites`: Optional site collection to broadcast; defaults to the current
-     *       cache snapshot.
-     *   - `source`: Origin of the synchronization event.
-     *   - `timestamp`: Optional timestamp override for deterministic testing.
-     *
-     * @returns Cloned site snapshots that were dispatched with the event.
+     * The returned snapshot is suitable for IPC responses (e.g.
+     * `request-full-sync`).
      */
     public async emitSitesStateSynchronized({
         action,
@@ -408,7 +404,7 @@ export class SiteManager {
         sites?: Site[];
         source: StateSyncSource;
         timestamp?: number;
-    }): Promise<Site[]> {
+    }): Promise<{ revision: number; sites: Site[] }> {
         const candidateSites = sites ?? this.getSitesSnapshot();
         const { delta, duplicates, emissionSnapshot } = prepareSiteSyncSnapshot(
             {
@@ -431,20 +427,70 @@ export class SiteManager {
 
         const effectiveTimestamp = timestamp ?? Date.now();
 
-        await this.eventEmitter.emitTyped("sites:state-synchronized", {
-            action,
-            delta,
-            siteIdentifier,
-            sites: emissionSnapshot,
-            source,
-            timestamp: effectiveTimestamp,
-        });
+        let effectiveDelta = delta;
+        let hasChanges = hasSiteSyncChanges(effectiveDelta);
+
+        // If a delete happens before we've ever emitted a baseline snapshot,
+        // the computed delta can be empty (previous snapshot empty, next empty),
+        // but consumers still need a remove signal.
+        if (action === "delete" && !hasChanges && siteIdentifier.length > 0) {
+            effectiveDelta = {
+                addedSites: [],
+                removedSiteIdentifiers: [siteIdentifier],
+                updatedSites: [],
+            };
+            hasChanges = true;
+        }
+
+        const shouldEmit = action === "bulk-sync" || hasChanges;
+
+        if (!shouldEmit) {
+            logger.debug(
+                "[SiteManager] Skipping state sync emission (no changes)",
+                {
+                    action,
+                    siteIdentifier,
+                    source,
+                    timestamp: effectiveTimestamp,
+                }
+            );
+
+            this.lastStateSyncSnapshot = emissionSnapshot.map((site) =>
+                structuredClone(site)
+            );
+
+            return { revision: this.stateSyncRevision, sites: emissionSnapshot };
+        }
+
+        this.stateSyncRevision += 1;
+        const revision = this.stateSyncRevision;
+
+        if (action === "bulk-sync") {
+            await this.eventEmitter.emitTyped("sites:state-synchronized", {
+                action: "bulk-sync",
+                revision,
+                siteCount: emissionSnapshot.length,
+                siteIdentifier,
+                sites: emissionSnapshot,
+                source,
+                timestamp: effectiveTimestamp,
+            });
+        } else {
+            await this.eventEmitter.emitTyped("sites:state-synchronized", {
+                action,
+                delta: effectiveDelta,
+                revision,
+                siteIdentifier,
+                source,
+                timestamp: effectiveTimestamp,
+            });
+        }
 
         this.lastStateSyncSnapshot = emissionSnapshot.map((site) =>
             structuredClone(site)
         );
 
-        return emissionSnapshot;
+        return { revision, sites: emissionSnapshot };
     }
 
     /**
@@ -723,7 +769,7 @@ export class SiteManager {
         return result;
     }
 
-    /**
+/**
      * Removes all sites from the database and cache.
      *
      * @remarks
@@ -894,7 +940,7 @@ export class SiteManager {
         return refreshedSite;
     }
 
-    /**
+/**
      * Updates the sites cache with new data, replacing all existing entries
      * atomically.
      *
@@ -1073,7 +1119,7 @@ export class SiteManager {
         }
     }
 
-    /**
+/**
      * Retrieves a mutable site snapshot for mutation operations.
      *
      * @remarks
@@ -1127,6 +1173,59 @@ export class SiteManager {
             );
         }
     }
+
+    /** Returns the current monotonic state sync revision. */
+    public getStateSyncRevision(): number {
+        return this.stateSyncRevision;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     /**
      * Constructs a new SiteManager instance.

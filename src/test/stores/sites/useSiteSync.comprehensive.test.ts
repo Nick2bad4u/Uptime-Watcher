@@ -182,6 +182,7 @@ describe("useSiteSync", () => {
 
             const fullSyncResult = {
                 completedAt: Date.now(),
+                   revision: 1,
                 siteCount: mockSites.length,
                 sites: mockSites,
                 source: "frontend" as const,
@@ -211,6 +212,7 @@ describe("useSiteSync", () => {
 
             const fullSyncResult = {
                 completedAt: Date.now(),
+                revision: 10,
                 siteCount: mockSites.length,
                 sites: mockSites,
                 source: "frontend" as const,
@@ -491,12 +493,14 @@ describe("useSiteSync", () => {
 
             syncActions.subscribeToSyncEvents();
 
-            const bulkSyncEvent = {
-                action: "bulk-sync",
-                sites: mockSites,
-                source: "database",
-                timestamp: Date.now(),
-            };
+                const bulkSyncEvent = {
+                    action: "bulk-sync",
+                    revision: 1,
+                    siteCount: mockSites.length,
+                    sites: mockSites,
+                    source: "database",
+                    timestamp: Date.now(),
+                };
 
             mockDeps.getSites.mockReturnValueOnce([]);
             eventHandler(bulkSyncEvent);
@@ -527,13 +531,18 @@ describe("useSiteSync", () => {
 
             syncActions.subscribeToSyncEvents();
 
-            const deleteEvent = {
-                action: "delete" as const,
-                siteIdentifier: "site-1",
-                sites: [],
-                source: "frontend" as const,
-                timestamp: Date.now(),
-            };
+                const deleteEvent = {
+                    action: "delete" as const,
+                    siteIdentifier: "site-1",
+                    delta: {
+                        addedSites: [],
+                        removedSiteIdentifiers: ["site-1"],
+                        updatedSites: [],
+                    },
+                    revision: 2,
+                    source: "frontend" as const,
+                    timestamp: Date.now(),
+                };
 
             mockDeps.getSites.mockReturnValueOnce([buildSite("site-1")]);
             eventHandler(deleteEvent);
@@ -600,8 +609,13 @@ describe("useSiteSync", () => {
 
             const deleteEvent = {
                 action: "delete" as const,
+                delta: {
+                    addedSites: [],
+                    removedSiteIdentifiers: ["site-1"],
+                    updatedSites: [],
+                },
+                revision: 3,
                 siteIdentifier: "site-1",
-                sites: [initialSites[1]!],
                 source: "database" as const,
                 timestamp: Date.now(),
             };
@@ -638,18 +652,23 @@ describe("useSiteSync", () => {
 
             syncActions.subscribeToSyncEvents();
 
-            const updateEvent = {
-                action: "update" as const,
-                siteIdentifier: "site-1",
-                sites: [
-                    {
-                        ...buildSite("site-1"),
-                        name: "Updated Site 1",
+                const updateEvent = {
+                    action: "update" as const,
+                    siteIdentifier: "site-1",
+                    delta: {
+                        addedSites: [],
+                        removedSiteIdentifiers: [],
+                        updatedSites: [
+                            {
+                                ...buildSite("site-1"),
+                                name: "Updated Site 1",
+                            },
+                        ],
                     },
-                ],
-                source: "frontend" as const,
-                timestamp: Date.now(),
-            };
+                    revision: 4,
+                    source: "frontend" as const,
+                    timestamp: Date.now(),
+                };
 
             mockDeps.getSites.mockReturnValueOnce([buildSite("site-1")]);
             eventHandler(updateEvent);
@@ -709,14 +728,19 @@ describe("useSiteSync", () => {
             const duplicateEvent = {
                 action: "update" as const,
                 siteIdentifier: "duplicate",
-                sites: duplicateSites,
+                delta: {
+                    addedSites: duplicateSites,
+                    removedSiteIdentifiers: [],
+                    updatedSites: [],
+                },
+                revision: 5,
                 source: "database" as const,
                 timestamp: Date.now(),
             };
 
             expect(() => eventHandler(duplicateEvent)).not.toThrowError();
             expect(logger.error).toHaveBeenCalledWith(
-                "Duplicate site identifiers detected in state sync event",
+                "Duplicate site identifiers detected in incoming sync delta",
                 expect.objectContaining({
                     action: "update",
                     duplicates: expect.arrayContaining([
@@ -725,14 +749,18 @@ describe("useSiteSync", () => {
                             occurrences: 2,
                         }),
                     ]),
-                    originalSiteCount: duplicateSites.length,
-                    sanitizedSiteCount: 1,
-                    source: "database",
+                    source: "database" as const,
                 })
             );
-            expect(mockDeps.setSites).toHaveBeenCalledWith([
-                expect.objectContaining({ identifier: "duplicate" }),
-            ]);
+            expect(mockDeps.setSites).toHaveBeenCalledWith(
+                expect.arrayContaining([
+                    expect.objectContaining({ identifier: "site-1" }),
+                    expect.objectContaining({ identifier: "duplicate" }),
+                ])
+            );
+
+            const lastSetSitesArg = mockDeps.setSites.mock.calls.at(-1)?.[0];
+            expect(lastSetSitesArg).toHaveLength(2);
         });
     });
 
@@ -898,6 +926,7 @@ describe("useSiteSync", () => {
 
                 mockStateSyncService.requestFullSync.mockResolvedValueOnce({
                     completedAt: Date.now(),
+                    revision: 30,
                     siteCount: sites.length,
                     sites,
                     source: "property-test" as const,

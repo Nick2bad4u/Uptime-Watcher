@@ -187,6 +187,7 @@ describe("IpcService - Comprehensive Coverage", () => {
     ];
     let startSummary: MonitoringStartSummary;
     let stopSummary: MonitoringStopSummary;
+    let stateSyncRevision = 0;
 
     let stateSyncListener: ((data: any) => void) | undefined;
 
@@ -238,6 +239,8 @@ describe("IpcService - Comprehensive Coverage", () => {
             isMonitoring: false,
             alreadyInactive: false,
         };
+
+        stateSyncRevision = 0;
         const offMock = vi.fn(
             (eventName: string, handler: (data: any) => void) => {
                 if (
@@ -277,11 +280,15 @@ describe("IpcService - Comprehensive Coverage", () => {
             }),
             emitSitesStateSynchronized: vi
                 .fn()
-                .mockImplementation(async ({ sites }) =>
-                    (sites ?? mockSites).map((site: Site) =>
-                        structuredClone(site)
-                    )
-                ),
+                .mockImplementation(async ({ sites }) => {
+                    stateSyncRevision += 1;
+                    return {
+                        revision: stateSyncRevision,
+                        sites: (sites ?? mockSites).map((site: Site) =>
+                            structuredClone(site)
+                        ),
+                    };
+                }),
             emitTyped: vi.fn().mockResolvedValue(undefined),
             onTyped: vi.fn(
                 (eventName: string, handler: (data: any) => void) => {
@@ -1335,6 +1342,7 @@ describe("IpcService - Comprehensive Coverage", () => {
                 success: true,
                 data: expect.objectContaining({
                     completedAt: expect.any(Number),
+                    revision: expect.any(Number),
                     siteCount: 1,
                     sites: expect.any(Array),
                     source: "database",
@@ -1403,6 +1411,8 @@ describe("IpcService - Comprehensive Coverage", () => {
             const timestamp = Date.now();
             stateSyncListener?.({
                 action: "bulk-sync",
+                revision: 1,
+                siteCount: mockSites.length,
                 sites: mockSites,
                 source: "database",
                 timestamp,
@@ -1648,7 +1658,12 @@ describe("IpcService - Comprehensive Coverage", () => {
             const handler = handleCall![1];
             const result = await handler(mockIpcEvent);
 
-            expect(result.data.siteCount).toBe(0);
+            expect(result.success).toBeTruthy();
+
+            if (result.success) {
+                expect(result.data.revision).toEqual(expect.any(Number));
+                expect(result.data.siteCount).toBe(0);
+            }
         });
 
         it("should handle monitor configuration without formatDetail function", async ({

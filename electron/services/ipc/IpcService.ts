@@ -44,6 +44,8 @@ export class IpcService {
 
     private stateSyncStatus: StateSyncStatusSummary;
 
+    private knownSiteIdentifiers = new Set<string>();
+
     private stateSyncListenerRegistered = false;
 
     private readonly notificationService: NotificationService;
@@ -55,7 +57,7 @@ export class IpcService {
             _meta: EventMetadata;
         }
     ): void => {
-        this.updateStateSyncStatus(data.sites, data.source, data.timestamp);
+        this.updateStateSyncStatusFromEvent(data);
     };
 
     public constructor(
@@ -178,6 +180,52 @@ export class IpcService {
         this.stateSyncStatus = {
             lastSyncAt: timestamp,
             siteCount: sites.length,
+            source,
+            synchronized: true,
+        } satisfies StateSyncStatusSummary;
+    }
+
+    private updateStateSyncStatusFromEvent(
+        event: UptimeEvents["sites:state-synchronized"]
+    ): void {
+        const { source, timestamp } = event;
+
+        if (event.truncated === true) {
+            this.stateSyncStatus = {
+                lastSyncAt: timestamp,
+                siteCount: this.knownSiteIdentifiers.size,
+                source,
+                synchronized: false,
+            } satisfies StateSyncStatusSummary;
+            return;
+        }
+
+        if (event.action === "bulk-sync") {
+            this.knownSiteIdentifiers = new Set(
+                event.sites.map((site) => site.identifier)
+            );
+            this.updateStateSyncStatus(event.sites, source, timestamp);
+            return;
+        }
+
+        // update/delete are delta-only.
+        const { delta } = event;
+
+        for (const removedSiteIdentifier of delta.removedSiteIdentifiers) {
+            this.knownSiteIdentifiers.delete(removedSiteIdentifier);
+        }
+
+        for (const site of delta.addedSites) {
+            this.knownSiteIdentifiers.add(site.identifier);
+        }
+
+        for (const site of delta.updatedSites) {
+            this.knownSiteIdentifiers.add(site.identifier);
+        }
+
+        this.stateSyncStatus = {
+            lastSyncAt: timestamp,
+            siteCount: this.knownSiteIdentifiers.size,
             source,
             synchronized: true,
         } satisfies StateSyncStatusSummary;

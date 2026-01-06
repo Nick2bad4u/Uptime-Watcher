@@ -4,7 +4,12 @@ import {
     type RendererEventPayload,
 } from "@shared/ipc/rendererEvents";
 import { STATUS_KIND } from "@shared/types";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import type {
+    BulkStateSyncEventData,
+    DeltaStateSyncEventData,
+    StateSyncEventData,
+} from "@shared/types/events";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { RendererEventBridge } from "../../../services/events/RendererEventBridge";
 import type { WindowService } from "../../../services/window/WindowService";
@@ -19,6 +24,10 @@ interface WindowStub {
 }
 
 describe(RendererEventBridge, () => {
+    const STATE_SYNC_BUDGET_ENV_KEY = "UPTIME_STATE_SYNC_EVENT_MAX_BYTES";
+    const DEFAULT_TEST_BUDGET_BYTES = "2000000";
+    const originalStateSyncBudgetEnv = process.env[STATE_SYNC_BUDGET_ENV_KEY];
+
     const createWindow = (): WindowStub => {
         const isDestroyed = vi.fn(() => false);
         const send = vi.fn(
@@ -35,10 +44,11 @@ describe(RendererEventBridge, () => {
         };
     };
 
-    const createPayload = (): RendererEventPayload<
-        typeof RENDERER_EVENT_CHANNELS.STATE_SYNC
-    > => ({
+    const createPayload = (): BulkStateSyncEventData =>
+        ({
         action: "bulk-sync",
+        revision: 1,
+        siteCount: 1,
         sites: [
             {
                 identifier: "site-1",
@@ -61,7 +71,48 @@ describe(RendererEventBridge, () => {
         ],
         source: "database",
         timestamp: Date.now(),
-    });
+        }) satisfies BulkStateSyncEventData;
+
+    const createUpdatePayloadWithHistory = (
+        historyEntries: number
+    ): DeltaStateSyncEventData =>
+        ({
+        action: "update",
+        delta: {
+            addedSites: [],
+            removedSiteIdentifiers: [],
+            updatedSites: [
+                {
+                    identifier: "site-1",
+                    monitoring: true,
+                    monitors: [
+                        {
+                            checkInterval: 60_000,
+                            history: Array.from({ length: historyEntries }, (_, index) => ({
+                                details: `entry-${index}`,
+                                responseTime: 0,
+                                status: STATUS_KIND.UP,
+                                timestamp: Date.now() + index,
+                            })),
+                            id: "monitor-1",
+                            monitoring: true,
+                            responseTime: 0,
+                            retryAttempts: 0,
+                            status: STATUS_KIND.UP,
+                            timeout: 5000,
+                            type: "http",
+                            url: "https://example.com",
+                        },
+                    ],
+                    name: "Sample Site",
+                },
+            ],
+        },
+        revision: 2,
+        siteIdentifier: "site-1",
+        source: "database",
+        timestamp: Date.now(),
+        }) satisfies DeltaStateSyncEventData;
 
     let bridge: RendererEventBridge;
     let mockWindowService: {
@@ -70,6 +121,11 @@ describe(RendererEventBridge, () => {
 
     beforeEach(() => {
         vi.restoreAllMocks();
+
+        // Keep this suite deterministic regardless of the runtime default.
+        // The production budget may be higher (and configurable), but these
+        // tests validate the compaction/truncation behavior under a known cap.
+        process.env[STATE_SYNC_BUDGET_ENV_KEY] = DEFAULT_TEST_BUDGET_BYTES;
 
         mockWindowService = {
             getAllWindows: vi.fn(() => []),
@@ -82,6 +138,15 @@ describe(RendererEventBridge, () => {
         bridge = new RendererEventBridge(
             mockWindowService as unknown as WindowService
         );
+    });
+
+    afterEach(() => {
+        if (originalStateSyncBudgetEnv === undefined) {
+            Reflect.deleteProperty(process.env, STATE_SYNC_BUDGET_ENV_KEY);
+            return;
+        }
+
+        process.env[STATE_SYNC_BUDGET_ENV_KEY] = originalStateSyncBudgetEnv;
     });
 
     it("broadcasts state sync events to all active windows", () => {
@@ -165,9 +230,12 @@ describe(RendererEventBridge, () => {
         );
     });
 
-    it("drops state sync events that exceed the payload size budget", () => {
+    it("broadcasts a truncated marker when state sync exceeds payload budget", () => {
         const firstWindow = createWindow();
         mockWindowService.getAllWindows.mockReturnValue([firstWindow]);
+
+        // Keep this test small and avoid giant assertion diffs.
+        process.env[STATE_SYNC_BUDGET_ENV_KEY] = "1000";
 
         const hugePayload = createPayload();
         const firstSite = hugePayload.sites[0];
@@ -175,15 +243,64 @@ describe(RendererEventBridge, () => {
             throw new Error("Expected at least one site in state sync payload");
         }
 
-        firstSite.name = "a".repeat(3_000_000);
+        firstSite.name = "a".repeat(2000);
 
         bridge.sendStateSyncEvent(hugePayload);
 
-        expect(firstWindow.webContents.send).not.toHaveBeenCalled();
+        expect(firstWindow.webContents.send).toHaveBeenCalledWith(
+            RENDERER_EVENT_CHANNELS.STATE_SYNC,
+            expect.objectContaining({
+                action: hugePayload.action,
+                revision: hugePayload.revision,
+                sites: [],
+                siteCount: 1,
+                source: hugePayload.source,
+                timestamp: hugePayload.timestamp,
+                truncated: true,
+            })
+        );
+
         expect(logger.warn).toHaveBeenCalledWith(
-            expect.stringContaining("Dropping state-sync event"),
+            expect.stringContaining(
+                "State-sync payload exceeds size budget; broadcasting truncated marker"
+            ),
             expect.objectContaining({
                 channel: RENDERER_EVENT_CHANNELS.STATE_SYNC,
+            })
+        );
+    });
+
+    it("truncates delta history to satisfy payload budget", () => {
+        const firstWindow = createWindow();
+        mockWindowService.getAllWindows.mockReturnValue([firstWindow]);
+
+        process.env[STATE_SYNC_BUDGET_ENV_KEY] = "5000";
+
+        const payload = createUpdatePayloadWithHistory(200);
+        bridge.sendStateSyncEvent(payload);
+
+        expect(firstWindow.webContents.send).toHaveBeenCalledTimes(1);
+
+        const sentPayload = vi.mocked(firstWindow.webContents.send).mock
+            .calls[0]?.[1] as unknown as StateSyncEventData;
+
+        expect(sentPayload.action).toBe("update");
+        if (sentPayload.action !== "update") {
+            throw new Error("Expected update state-sync payload");
+        }
+
+        expect(sentPayload.truncated).not.toBeTruthy();
+        expect(
+            sentPayload.delta.updatedSites[0]?.monitors[0]?.history.length
+        ).toBe(50);
+
+        expect(logger.debug).toHaveBeenCalledWith(
+            expect.stringContaining(
+                "Compacting state-sync event payload to satisfy size budget"
+            ),
+            expect.objectContaining({
+                channel: RENDERER_EVENT_CHANNELS.STATE_SYNC,
+                revision: payload.revision,
             })
         );
     });

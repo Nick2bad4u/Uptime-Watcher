@@ -180,6 +180,7 @@ const mockElectronAPI = {
         onStateSyncEvent: vi.fn(),
         requestFullSync: vi.fn().mockResolvedValue({
             completedAt: Date.now(),
+            revision: 1,
             siteCount: 0,
             sites: [],
             source: "cache",
@@ -500,6 +501,7 @@ describe("useSitesStore Function Coverage Tests", () => {
 
             const fullSyncResult = {
                 completedAt: Date.now(),
+                revision: 1,
                 siteCount: 0,
                 sites: [],
                 source: "frontend" as const,

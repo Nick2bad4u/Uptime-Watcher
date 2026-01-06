@@ -995,6 +995,10 @@ describe("SiteManager - Comprehensive", () => {
                 "sites:state-synchronized",
                 expect.objectContaining({
                     action: STATE_SYNC_ACTION.DELETE,
+                    delta: expect.objectContaining({
+                        removedSiteIdentifiers: ["site-1"],
+                    }),
+                    revision: expect.any(Number),
                     siteIdentifier: "site-1",
                     source: STATE_SYNC_SOURCE.DATABASE,
                 })

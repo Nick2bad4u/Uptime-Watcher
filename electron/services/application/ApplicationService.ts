@@ -752,12 +752,30 @@ export class ApplicationService {
                 data
             );
             try {
+                const sitesCount =
+                    payload.action === "bulk-sync" ? payload.sites.length : undefined;
+                const delta =
+                    payload.action === "bulk-sync" ? undefined : payload.delta;
+
                 logger.debug(
                     LOG_TEMPLATES.debug.APPLICATION_FORWARDING_STATE_SYNC,
                     {
                         action: payload.action,
+                        revision: payload.revision,
                         siteIdentifier: payload.siteIdentifier,
-                        sitesCount: payload.sites.length,
+                        ...(typeof sitesCount === "number"
+                            ? { sitesCount }
+                            : {}),
+                        ...(delta
+                            ? {
+                                  deltaAddedCount:
+                                      delta.addedSites.length,
+                                  deltaRemovedCount:
+                                      delta.removedSiteIdentifiers.length,
+                                  deltaUpdatedCount:
+                                      delta.updatedSites.length,
+                              }
+                            : {}),
                         source: payload.source,
                     }
                 );

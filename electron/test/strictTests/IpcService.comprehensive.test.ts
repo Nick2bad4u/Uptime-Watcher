@@ -198,6 +198,7 @@ describe("IpcService - Comprehensive Coverage", () => {
 
     let startSummary: MonitoringStartSummary;
     let stopSummary: MonitoringStopSummary;
+    let stateSyncRevision = 0;
 
     beforeEach(() => {
         vi.clearAllMocks();
@@ -245,6 +246,8 @@ describe("IpcService - Comprehensive Coverage", () => {
             isMonitoring: false,
             alreadyInactive: false,
         };
+
+        stateSyncRevision = 0;
         mockUptimeOrchestrator = {
             addSite: vi.fn().mockResolvedValue(true),
             removeSite: vi.fn().mockResolvedValue(true),
@@ -273,11 +276,15 @@ describe("IpcService - Comprehensive Coverage", () => {
             }),
             emitSitesStateSynchronized: vi
                 .fn()
-                .mockImplementation(async ({ sites }) =>
-                    (sites ?? mockSites).map((site: Site) =>
-                        structuredClone(site)
-                    )
-                ),
+                .mockImplementation(async ({ sites }) => {
+                    stateSyncRevision += 1;
+                    return {
+                        revision: stateSyncRevision,
+                        sites: (sites ?? mockSites).map((site: Site) =>
+                            structuredClone(site)
+                        ),
+                    };
+                }),
             emitTyped: vi.fn().mockResolvedValue(undefined),
             onTyped: vi.fn(),
             off: vi.fn(),
@@ -1312,6 +1319,7 @@ describe("IpcService - Comprehensive Coverage", () => {
                 success: true,
                 data: expect.objectContaining({
                     completedAt: expect.any(Number),
+                    revision: expect.any(Number),
                     siteCount: 1,
                     sites: expect.any(Array),
                     source: "database",

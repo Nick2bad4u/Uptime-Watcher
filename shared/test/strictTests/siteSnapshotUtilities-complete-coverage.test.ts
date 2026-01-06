@@ -98,8 +98,7 @@ describe(prepareSiteSyncSnapshot, () => {
             "site-beta",
         ]);
         expect(updatedSite).toMatchObject({ identifier: "site-alpha" });
-        expect(updatedSite?.previous).toBe(previousSnapshot[0]);
-        expect(updatedSite?.next).toStrictEqual(snapshot.emissionSnapshot[0]);
+        expect(updatedSite).toStrictEqual(snapshot.emissionSnapshot[0]);
     });
 });
 

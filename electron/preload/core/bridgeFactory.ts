@@ -20,8 +20,8 @@ import type {
     VoidIpcInvokeChannel,
 } from "@shared/types/ipc";
 import type { IpcRendererEvent } from "electron";
-import type { UnknownRecord } from "type-fest";
 
+import { DEFAULT_MAX_BACKUP_SIZE_BYTES } from "@shared/constants/backup";
 import {
     createIpcCorrelationEnvelope,
     isIpcHandlerVerificationResult,
@@ -45,6 +45,8 @@ import {
     preloadDiagnosticsLogger,
     preloadLogger,
 } from "../utils/preloadLogger";
+
+type UnknownRecord = Record<string, unknown>;
 
 /**
  * Canonical IPC response shape used by the preload bridge.
@@ -164,8 +166,8 @@ export class IpcError extends Error {
 }
 
 const DEFAULT_MAX_INVOKE_ARGS_BYTES = 5_000_000;
-const MAX_IMPORT_DATA_ARGS_BYTES = 50_000_000;
-const MAX_SQLITE_RESTORE_ARGS_BYTES = 250_000_000;
+const MAX_IMPORT_DATA_ARGS_BYTES = DEFAULT_MAX_BACKUP_SIZE_BYTES;
+const MAX_SQLITE_RESTORE_ARGS_BYTES = DEFAULT_MAX_BACKUP_SIZE_BYTES;
 
 function getInvokeArgsByteBudget(channel: string): number {
     switch (channel) {

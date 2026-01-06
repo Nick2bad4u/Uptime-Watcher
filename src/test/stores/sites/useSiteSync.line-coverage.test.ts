@@ -334,8 +334,13 @@ describe("useSiteSync - Line Coverage Completion", () => {
 
             const deleteEvent = {
                 action: "delete" as const,
-                siteIdentifier: "site-1",
-                sites: [],
+                delta: {
+                    addedSites: [],
+                    removedSiteIdentifiers: ["site-2"],
+                    updatedSites: [],
+                },
+                revision: 1,
+                siteIdentifier: "site-2",
                 source: "frontend" as const,
                 timestamp: Date.now(),
             };
@@ -344,7 +349,7 @@ describe("useSiteSync - Line Coverage Completion", () => {
             mockDeps.getSites.mockReturnValueOnce([buildSite("site-1")]);
             eventHandler(deleteEvent);
 
-            expect(mockDeps.setSites).toHaveBeenCalledWith([]);
+            expect(mockDeps.setSites).toHaveBeenCalledWith([buildSite("site-1")]);
         });
 
         it("should handle update event and apply provided snapshot", async ({
@@ -366,18 +371,23 @@ describe("useSiteSync - Line Coverage Completion", () => {
 
             syncActions.subscribeToSyncEvents();
 
-            const updateEvent = {
-                action: "update" as const,
-                siteIdentifier: "site-1",
-                sites: [
-                    {
-                        ...buildSite("site-1"),
-                        name: "Updated Site 1",
+                const updateEvent = {
+                    action: "update" as const,
+                    delta: {
+                        addedSites: [],
+                        removedSiteIdentifiers: [],
+                        updatedSites: [
+                            {
+                                ...buildSite("site-1"),
+                                name: "Updated Site 1",
+                            },
+                        ],
                     },
-                ],
-                source: "frontend" as const,
-                timestamp: Date.now(),
-            };
+                    revision: 2,
+                    siteIdentifier: "site-1",
+                    source: "frontend" as const,
+                    timestamp: Date.now(),
+                };
 
             // Trigger update event (line 296-297)
             mockDeps.getSites.mockReturnValueOnce([buildSite("site-1")]);
@@ -416,7 +426,7 @@ describe("useSiteSync - Line Coverage Completion", () => {
             const deleteEvent = {
                 action: "delete" as const,
                 siteIdentifier: "site-1",
-                sites: undefined,
+                revision: 99,
                 source: "frontend" as const,
                 timestamp: Date.now(),
             };
@@ -468,6 +478,7 @@ describe("useSiteSync - Line Coverage Completion", () => {
 
             const fullSyncResult = {
                 completedAt: Date.now(),
+                revision: 1,
                 siteCount: mockSites.length,
                 sites: mockSites,
                 source: "frontend" as const,

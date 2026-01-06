@@ -128,6 +128,7 @@ describe("useSiteSync - Final 100% Coverage", () => {
 
             const fullSyncResult = {
                 completedAt: Date.now(),
+                revision: 1,
                 siteCount: mockSites.length,
                 sites: mockSites,
                 source: "frontend" as const,

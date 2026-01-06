@@ -29,8 +29,8 @@ import type {
     MonitorStatusChangedEventData,
     MonitorUpEventData,
     SiteAddedSource,
+    StateSyncEventData,
 } from "@shared/types/events";
-import type { SiteSyncDelta } from "@shared/types/stateSync";
 import type { SerializedError } from "@shared/utils/logger/common";
 import type { JsonValue } from "type-fest";
 
@@ -1478,23 +1478,7 @@ export interface UptimeEvents extends Record<string, EventPayloadValue> {
      *   "database", or "frontend").
      * @param timestamp - Unix timestamp (ms) when synchronization occurred.
      */
-    "sites:state-synchronized": {
-        /** The synchronization action ("bulk-sync", "delete", or "update"). */
-        action: "bulk-sync" | "delete" | "update";
-        /**
-         * Structured delta describing the changes applied by the
-         * synchronization.
-         */
-        delta?: SiteSyncDelta;
-        /** Optional site identifier. */
-        siteIdentifier?: string;
-        /** Complete dataset snapshot after the synchronization. */
-        sites: Site[];
-        /** Source of the synchronization ("cache", "database", or "frontend"). */
-        source: "cache" | "database" | "frontend";
-        /** Unix timestamp (ms) when synchronization occurred. */
-        timestamp: number;
-    };
+    "sites:state-synchronized": StateSyncEventData;
 
     /**
      * Emitted when a system error occurs.

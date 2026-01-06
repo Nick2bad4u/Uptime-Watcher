@@ -94,6 +94,7 @@ describe("StateSyncService", () => {
         const callback = vi.fn();
         const fullSyncPayload = {
             completedAt: Date.now(),
+                revision: 10,
             siteCount: 1,
             sites: [
                 {
@@ -138,16 +139,15 @@ describe("StateSyncService", () => {
         expect(callback.mock.calls[0]?.[0]).toMatchObject({
             action: STATE_SYNC_ACTION.BULK_SYNC,
             siteIdentifier: "all",
+            revision: fullSyncPayload.revision,
+            siteCount: fullSyncPayload.siteCount,
             source: fullSyncPayload.source,
         });
 
         const broadcastEvent = {
             action: STATE_SYNC_ACTION.BULK_SYNC,
-            delta: {
-                addedSites: fullSyncPayload.sites,
-                removedSiteIdentifiers: [],
-                updatedSites: [],
-            },
+            revision: fullSyncPayload.revision,
+            siteCount: fullSyncPayload.siteCount,
             siteIdentifier: "all",
             sites: fullSyncPayload.sites,
             source: fullSyncPayload.source,
@@ -175,10 +175,87 @@ describe("StateSyncService", () => {
         expect(mockLogger.info).toHaveBeenCalledWith(
             "[StateSyncService] Full sync recovery broadcast applied",
             expect.objectContaining({
-                siteCount: broadcastEvent.sites.length,
+                siteCount: broadcastEvent.siteCount,
                 source: broadcastEvent.source,
                 timestamp: broadcastEvent.timestamp,
             })
+        );
+    });
+
+    it("recovers via full sync when event is truncated", async () => {
+        const callback = vi.fn();
+        const fullSyncPayload = {
+            completedAt: Date.now(),
+            revision: 11,
+            siteCount: 1,
+            sites: [
+                {
+                    identifier: "site-1",
+                    monitoring: true,
+                    monitors: [
+                        {
+                            checkInterval: 60_000,
+                            history: [],
+                            id: "monitor-1",
+                            monitoring: true,
+                            responseTime: -1,
+                            retryAttempts: 0,
+                            status: "up",
+                            timeout: 5000,
+                            type: "http",
+                            url: "https://example.com",
+                        },
+                    ],
+                    name: "Site 1",
+                },
+            ],
+            source: "database" as const,
+            synchronized: true,
+        };
+
+        mockElectronAPI.stateSync.requestFullSync.mockResolvedValueOnce(
+            fullSyncPayload
+        );
+
+        await StateSyncService.onStateSyncEvent(callback);
+        expect(capturedHandler).toBeTypeOf("function");
+
+        const truncatedEvent = {
+            action: STATE_SYNC_ACTION.BULK_SYNC,
+            revision: 22,
+            siteCount: 123,
+            sites: [],
+            source: "database" as const,
+            timestamp: Date.now(),
+            truncated: true,
+        } as const;
+
+        capturedHandler?.(truncatedEvent);
+
+        await vi.waitFor(() => {
+            expect(
+                mockElectronAPI.stateSync.requestFullSync
+            ).toHaveBeenCalledTimes(1);
+        });
+
+        expect(callback).toHaveBeenCalledTimes(1);
+        expect(callback.mock.calls[0]?.[0]).toMatchObject({
+            action: STATE_SYNC_ACTION.BULK_SYNC,
+            siteIdentifier: "all",
+            source: fullSyncPayload.source,
+        });
+
+        expect(mockLogger.warn).toHaveBeenCalledWith(
+            "[StateSyncService] Received truncated state sync event; scheduling full sync recovery",
+            expect.objectContaining({
+                action: STATE_SYNC_ACTION.BULK_SYNC,
+                revision: truncatedEvent.revision,
+                siteCount: 123,
+                source: truncatedEvent.source,
+            })
+        );
+        expect(mockLogger.warn).toHaveBeenCalledWith(
+            "[StateSyncService] Attempting full sync recovery after truncated state sync event"
         );
     });
 
@@ -187,6 +264,7 @@ describe("StateSyncService", () => {
         let resolveFullSync: (() => void) | undefined;
         const fullSyncPayload = {
             completedAt: Date.now(),
+            revision: 12,
             siteCount: 0,
             sites: [],
             source: "database" as const,
@@ -216,11 +294,8 @@ describe("StateSyncService", () => {
 
         capturedHandler?.({
             action: STATE_SYNC_ACTION.BULK_SYNC,
-            delta: {
-                addedSites: [],
-                removedSiteIdentifiers: [],
-                updatedSites: [],
-            },
+            revision: fullSyncPayload.revision,
+            siteCount: 0,
             siteIdentifier: "all",
             sites: [],
             source: fullSyncPayload.source,
@@ -238,6 +313,7 @@ describe("StateSyncService", () => {
         const callback = vi.fn();
         const fullSyncPayload = {
             completedAt: Date.now(),
+            revision: 20,
             siteCount: 1,
             sites: [
                 {
@@ -303,6 +379,7 @@ describe("StateSyncService", () => {
         const callback = vi.fn();
         const fullSyncPayload = {
             completedAt: Date.now(),
+            revision: 21,
             siteCount: 2,
             sites: [],
             source: "database" as const,
@@ -468,6 +545,7 @@ describe("StateSyncService", () => {
                 ],
                 source: "database" as const,
                 synchronized: true,
+                   revision: 30,
             };
 
             mockElectronAPI.stateSync.requestFullSync.mockResolvedValueOnce(

@@ -817,7 +817,7 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
         sites?: Site[];
         source: StateSyncSource;
         timestamp?: number;
-    }): Promise<Site[]> {
+    }): Promise<{ revision: number; sites: Site[] }> {
         return this.runWithContext(
             () =>
                 this.snapshotSyncCoordinator.emitSitesStateSynchronized(

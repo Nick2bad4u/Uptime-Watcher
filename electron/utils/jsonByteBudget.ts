@@ -10,10 +10,25 @@
 
 import { getUtfByteLength } from "@shared/utils/utfByteLength";
 
+const JSON_BYTE_BUDGET_LEAVE = Symbol("json-byte-budget-leave");
+
+interface LeaveMarker {
+    readonly [JSON_BYTE_BUDGET_LEAVE]: object;
+}
+
+function isLeaveMarker(value: unknown): value is LeaveMarker {
+    return (
+        typeof value === "object" &&
+        value !== null &&
+        JSON_BYTE_BUDGET_LEAVE in value
+    );
+}
+
 interface JsonByteBudgetState {
     bytes: number;
     readonly maxBytes: number;
-    readonly seen: WeakSet<object>;
+    /** Tracks objects currently on the traversal path to detect cycles only. */
+    readonly path: WeakSet<object>;
     readonly stack: unknown[];
 }
 
@@ -66,13 +81,26 @@ function addJsonBytesForObject(
         return;
     }
 
-    if (state.seen.has(value)) {
+    const isArray = Array.isArray(value);
+    const isRecord = !isArray && isPlainRecord(value);
+
+    if (!isArray && !isRecord) {
         addBytes(state, state.maxBytes + 1);
         return;
     }
-    state.seen.add(value);
 
-    if (Array.isArray(value)) {
+    // Detect only true cycles (the same object encountered again while still
+    // on the current traversal path). Shared references are valid in JSON and
+    // structured clone payloads and must not be treated as overflow.
+    if (state.path.has(value)) {
+        addBytes(state, state.maxBytes + 1);
+        return;
+    }
+
+    state.path.add(value);
+    state.stack.push({ [JSON_BYTE_BUDGET_LEAVE]: value });
+
+    if (isArray) {
         addBytes(state, 2);
         if (value.length > 1) {
             addBytes(state, value.length - 1);
@@ -82,11 +110,6 @@ function addJsonBytesForObject(
             state.stack.push(value[i]);
         }
 
-        return;
-    }
-
-    if (!isPlainRecord(value)) {
-        addBytes(state, state.maxBytes + 1);
         return;
     }
 
@@ -115,6 +138,11 @@ function addJsonBytesForValue(
     state: JsonByteBudgetState,
     value: unknown
 ): void {
+    if (isLeaveMarker(value)) {
+        state.path.delete(value[JSON_BYTE_BUDGET_LEAVE]);
+        return;
+    }
+
     if (value === null) {
         addBytes(state, getJsonBytesForNull());
         return;
@@ -172,7 +200,7 @@ export function getJsonByteLengthUpTo(
     const state: JsonByteBudgetState = {
         bytes: 0,
         maxBytes,
-        seen: new WeakSet<object>(),
+        path: new WeakSet<object>(),
         stack: [value],
     };
 
