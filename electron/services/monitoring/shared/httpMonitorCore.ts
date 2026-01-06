@@ -294,11 +294,44 @@ export function createHttpMonitorService<
             const shouldFollowRedirects =
                 Reflect.get(monitor, "followRedirects") !== false;
 
-            return this.axiosInstance.get(url, {
+            const response = await this.axiosInstance.get(url, {
                 ...(signal ? { signal } : {}),
+                responseType: "stream",
                 timeout,
                 ...(!shouldFollowRedirects && { maxRedirects: 0 }),
             });
+
+            this.cleanupAxiosResponseData(response.data);
+            return response;
+        }
+
+        private cleanupAxiosResponseData(data: unknown): void {
+            if (data === null || data === undefined || typeof data !== "object") {
+                return;
+            }
+
+            const resumeCandidate = Reflect.get(data, "resume");
+            const destroyCandidate = Reflect.get(data, "destroy");
+
+            const isCallable = (
+                value: unknown
+            ): value is (...args: never[]) => unknown => typeof value === "function";
+
+            try {
+                if (isCallable(resumeCandidate)) {
+                    resumeCandidate();
+                }
+            } catch {
+                // Ignore
+            }
+
+            try {
+                if (isCallable(destroyCandidate)) {
+                    destroyCandidate();
+                }
+            } catch {
+                // Ignore
+            }
         }
 
         public constructor(config: MonitorServiceConfig = {}) {

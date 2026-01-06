@@ -124,7 +124,8 @@ describe("Operational Hooks", () => {
             expect(warnSpy).toHaveBeenCalledWith(
                 expect.stringContaining("custom-log-level"),
                 expect.objectContaining({
-                    error: failure,
+                    errorMessage: failure.message,
+                    errorName: failure.name,
                     operationId: expect.any(String),
                 })
             );

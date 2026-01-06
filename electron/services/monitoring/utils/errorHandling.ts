@@ -211,6 +211,7 @@ export function handleAxiosError(
  * errors for diagnostic purposes. Always returns a {@link MonitorCheckResult}
  * and never throws.
  *
+            import { ensureError } from "@shared/utils/errorHandling";
  * @example
  *
  * ```typescript
@@ -280,8 +281,21 @@ export function handleCheckError(
     // "Unknown error" fallback handles cases where thrown value isn't an Error
     // instance
     const errorMessage = getUnknownErrorMessage(error);
+    const normalizedError = ensureError(error);
+    const normalizedCode = normalizeErrorCode(normalizedError);
 
-    const logData = correlationId ? { correlationId, error } : { error };
+    const logData = correlationId
+        ? {
+              correlationId,
+              errorMessage: normalizedError.message,
+              errorName: normalizedError.name,
+              ...(normalizedCode ? { errorCode: normalizedCode } : {}),
+          }
+        : {
+              errorMessage: normalizedError.message,
+              errorName: normalizedError.name,
+              ...(normalizedCode ? { errorCode: normalizedCode } : {}),
+          };
     logger.error(`[HttpMonitor] Unexpected error checking ${url}`, logData);
 
     return createErrorResult(errorMessage, responseTime, correlationId);

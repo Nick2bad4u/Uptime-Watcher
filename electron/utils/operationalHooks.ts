@@ -69,6 +69,35 @@ import type { TypedEventBus } from "../events/TypedEventBus";
 
 import { logger } from "./logger";
 
+interface OperationalErrorMetadata {
+    readonly errorCauseMessage?: string | undefined;
+    readonly errorCauseName?: string | undefined;
+    readonly errorCode?: string | undefined;
+    readonly errorMessage: string;
+    readonly errorName: string;
+}
+
+function toOperationalErrorMetadata(error: Error): OperationalErrorMetadata {
+    const codeCandidate: unknown = Reflect.get(error as object, "code");
+    const errorCode = typeof codeCandidate === "string" ? codeCandidate : undefined;
+
+    const { cause, message: errorMessage, name: errorName } = error;
+
+    const causeError = cause instanceof Error ? cause : undefined;
+
+    return {
+        errorMessage,
+        errorName,
+        ...(errorCode ? { errorCode } : {}),
+        ...(causeError
+            ? {
+                  errorCauseMessage: causeError.message,
+                  errorCauseName: causeError.name,
+              }
+            : {}),
+    };
+}
+
 type OperationalLogLevel = "debug" | "error" | "info" | "warn";
 
 type OperationalHookContextTag = "OperationalHookContext";
@@ -384,7 +413,7 @@ async function handleFailure<T>(
     const logMetadata = {
         context,
         duration,
-        error,
+        ...toOperationalErrorMetadata(error),
         operationId,
     } as const;
 
@@ -594,7 +623,7 @@ export async function withOperationalHooks<T>(
                 `[OperationalHooks] ${operationName} failed on attempt ${attempt}/${maxRetries}`,
                 {
                     context,
-                    error: lastError,
+                    ...toOperationalErrorMetadata(lastError),
                     operationId,
                 }
             );

@@ -379,14 +379,17 @@ export class WindowService {
                     controller.abort();
                 }, FETCH_TIMEOUT);
 
-                // eslint-disable-next-line no-await-in-loop -- Sequential server readiness check required
-                const response = await fetch(SERVER_URL, {
-                    signal: controller.signal,
-                });
+                let response: Response | undefined;
+                try {
+                    // eslint-disable-next-line no-await-in-loop -- Sequential server readiness check required
+                    response = await fetch(SERVER_URL, {
+                        signal: controller.signal,
+                    });
+                } finally {
+                    clearTimeout(timeoutId);
+                }
 
-                clearTimeout(timeoutId);
-
-                if (response.ok) {
+                if (response?.ok) {
                     logger.debug("[WindowService] Vite dev server is ready");
                     return;
                 }
@@ -553,8 +556,8 @@ export class WindowService {
             session.setPermissionCheckHandler(() => false);
             session.setPermissionRequestHandler(
                 (_webContents, _permission, callback) => {
-                    const denyPermission = false;
-                    callback(denyPermission);
+                    // eslint-disable-next-line n/no-callback-literal -- Electron permission callback expects a boolean grant flag.
+                    callback(false);
                 }
             );
 
@@ -755,7 +758,7 @@ export class WindowService {
      *
      * @returns Void - Method handles content loading asynchronously
      */
-    private loadContent(): void {
+    public loadContent(): void {
         if (!this.mainWindow) {
             logger.error(
                 "[WindowService] Cannot load content: main window not initialized"

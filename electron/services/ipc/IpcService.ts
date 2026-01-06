@@ -54,7 +54,7 @@ export class IpcService {
 
     private readonly handleStateSyncStatusUpdate = (
         data: UptimeEvents["sites:state-synchronized"] & {
-            _meta: EventMetadata;
+            _meta?: EventMetadata;
         }
     ): void => {
         this.updateStateSyncStatusFromEvent(data);
@@ -186,7 +186,9 @@ export class IpcService {
     }
 
     private updateStateSyncStatusFromEvent(
-        event: UptimeEvents["sites:state-synchronized"]
+        event: UptimeEvents["sites:state-synchronized"] & {
+            _meta?: EventMetadata;
+        }
     ): void {
         const { source, timestamp } = event;
 
@@ -201,25 +203,28 @@ export class IpcService {
         }
 
         if (event.action === "bulk-sync") {
+            const { sites } = event;
             this.knownSiteIdentifiers = new Set(
-                event.sites.map((site) => site.identifier)
+                sites.map((site) => site.identifier)
             );
-            this.updateStateSyncStatus(event.sites, source, timestamp);
+            this.updateStateSyncStatus(sites, source, timestamp);
             return;
         }
 
-        // update/delete are delta-only.
+        // Update/delete are delta-only.
         const { delta } = event;
 
-        for (const removedSiteIdentifier of delta.removedSiteIdentifiers) {
+        const { addedSites, removedSiteIdentifiers, updatedSites } = delta;
+
+        for (const removedSiteIdentifier of removedSiteIdentifiers) {
             this.knownSiteIdentifiers.delete(removedSiteIdentifier);
         }
 
-        for (const site of delta.addedSites) {
+        for (const site of addedSites) {
             this.knownSiteIdentifiers.add(site.identifier);
         }
 
-        for (const site of delta.updatedSites) {
+        for (const site of updatedSites) {
             this.knownSiteIdentifiers.add(site.identifier);
         }
 
