@@ -86,40 +86,29 @@ vi.mock("../../../../shared/utils/errorHandling", async (importOriginal) => {
 // Import mocked modules to get references
 import { safeExtractIpcData } from "../../../types/ipc";
 import { withErrorHandling } from "@shared/utils/errorHandling";
+import { installElectronApiMock } from "../../utils/electronApiMock";
 
 const mockSafeExtractIpcData = vi.mocked(safeExtractIpcData);
 const mockWithErrorHandling = vi.mocked(withErrorHandling);
 
 // Mock the entire electronAPI
 const mockElectronAPI = {
-    data: {
-        resetToDefaults: vi.fn(),
-        syncSettings: vi.fn(),
-    },
     settings: {
         getHistoryLimit: vi.fn(),
         updateHistoryLimit: vi.fn(),
     },
 };
 
-// Global mock for window.electronAPI
-if (globalThis.window === undefined) {
-    Object.defineProperty(globalThis, "electronAPI", {
-        value: mockElectronAPI,
-        writable: true,
-        configurable: true,
-    });
-} else {
-    Object.defineProperty(globalThis, "electronAPI", {
-        value: mockElectronAPI,
-        writable: true,
-    });
-}
+let restoreElectronApi: (() => void) | undefined;
 
 describe("useSettingsStore Branch Coverage Tests", () => {
     beforeEach(() => {
         // Reset all mocks
         vi.clearAllMocks();
+
+        ({ restore: restoreElectronApi } = installElectronApiMock(mockElectronAPI, {
+            ensureWindow: true,
+        }));
 
         mockWaitForElectronBridge.mockResolvedValue(undefined);
 
@@ -153,6 +142,11 @@ describe("useSettingsStore Branch Coverage Tests", () => {
                 }
             }
         );
+    });
+
+    afterEach(() => {
+        restoreElectronApi?.();
+        restoreElectronApi = undefined;
     });
 
     describe("syncSettingsAfterRehydration branches", () => {

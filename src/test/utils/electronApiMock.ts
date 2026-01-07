@@ -49,13 +49,26 @@ const mergeInto = (target: PlainObject, source: PlainObject): void => {
  * The global test setup installs a canonical `electronAPI` mock. Some suites
  * still override it ad-hoc, which can leak changes into later tests. This
  * helper provides a consistent pattern:
- * - shallow-clone the existing API surface,
- * - apply deep overrides,
- * - install the clone into `globalThis` + `window`,
- * - return a restore function.
+ *
+ * - Shallow-clone the existing API surface,
+ * - Apply deep overrides,
+ * - Install the clone into `globalThis` + `window`,
+ * - Return a restore function.
  */
 export const installElectronApiMock = (
-    overrides: PartialDeep<ElectronAPI> = {}
+    overrides: PartialDeep<ElectronAPI> = {},
+    options: {
+        /**
+         * Ensure `globalThis.window` exists.
+         *
+         * @remarks
+         * Some Vitest suites run in a non-DOM environment. Production code
+         * accesses `window.electronAPI`, so those suites historically created a
+         * fake `window` object. This option centralizes that behavior and
+         * restores the original global after the test.
+         */
+        ensureWindow?: boolean;
+    } = {}
 ): { mock: ElectronAPI; restore: () => void } => {
     const original = Reflect.get(globalThis, "electronAPI") as
         | ElectronAPI
@@ -68,7 +81,23 @@ export const installElectronApiMock = (
     }
 
     const mock = shallowCloneApi(original);
-    mergeInto(mock as unknown as PlainObject, overrides as unknown as PlainObject);
+    mergeInto(
+        mock as unknown as PlainObject,
+        overrides as unknown as PlainObject
+    );
+
+    const hadWindow = Reflect.has(globalThis, "window");
+    const createdWindow = options.ensureWindow === true && !hadWindow;
+
+    if (createdWindow) {
+        Object.defineProperty(globalThis, "window", {
+            configurable: true,
+            writable: true,
+            value: {},
+        });
+    }
+
+    const windowRef = Reflect.get(globalThis, "window");
 
     Object.defineProperty(globalThis, "electronAPI", {
         configurable: true,
@@ -76,8 +105,8 @@ export const installElectronApiMock = (
         value: mock,
     });
 
-    if (typeof window !== "undefined") {
-        Object.defineProperty(window, "electronAPI", {
+    if (windowRef !== undefined && typeof windowRef === "object") {
+        Object.defineProperty(windowRef as object, "electronAPI", {
             configurable: true,
             writable: true,
             value: mock,
@@ -91,12 +120,18 @@ export const installElectronApiMock = (
             value: original,
         });
 
-        if (typeof window !== "undefined") {
-            Object.defineProperty(window, "electronAPI", {
+        const currentWindowRef = Reflect.get(globalThis, "window");
+        if (currentWindowRef !== undefined && typeof currentWindowRef === "object") {
+            Object.defineProperty(currentWindowRef as object, "electronAPI", {
                 configurable: true,
                 writable: true,
                 value: original,
             });
+        }
+
+        if (createdWindow) {
+
+            delete (globalThis as Record<string, unknown>)["window"];
         }
     };
 

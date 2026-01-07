@@ -2,11 +2,12 @@
  * Comprehensive tests for useSettingsStore providing maximum coverage.
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { afterAll, describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { act, renderHook } from "@testing-library/react";
 import { test, fc } from "@fast-check/vitest";
 import type { ElectronAPI } from "../../../types";
 import type { AppSettings } from "../../../stores/types";
+import { installElectronApiMock } from "../../utils/electronApiMock";
 import {
     defaultSettings,
     normalizeAppSettings,
@@ -128,18 +129,13 @@ const mockElectronAPI = {
     },
 };
 
-// Set up window.electronAPI mock conditionally
-if ((globalThis as any).window?.electronAPI) {
-    (globalThis as any).window.electronAPI = mockElectronAPI;
-} else if ((globalThis as any).electronAPI) {
-    (globalThis as any).electronAPI = mockElectronAPI;
-} else {
-    Object.defineProperty(globalThis, "window", {
-        value: { electronAPI: mockElectronAPI },
-        writable: true,
-        configurable: true,
-    });
-}
+const { restore: restoreElectronApi } = installElectronApiMock(mockElectronAPI, {
+    ensureWindow: true,
+});
+
+afterAll(() => {
+    restoreElectronApi();
+});
 
 const createSettings = (overrides: Partial<AppSettings> = {}): AppSettings =>
     normalizeAppSettings({ ...defaultSettings, ...overrides });

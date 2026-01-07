@@ -3,7 +3,15 @@
  * lifecycle operations for sites and monitors.
  */
 
-import { describe, expect, it, vi, beforeEach, type Mock } from "vitest";
+import {
+    afterEach,
+    beforeEach,
+    describe,
+    expect,
+    it,
+    vi,
+    type Mock,
+} from "vitest";
 
 import { createSiteMonitoringActions } from "../../../stores/sites/useSiteMonitoring";
 import type { Site, StatusUpdate } from "@shared/types";
@@ -13,6 +21,7 @@ import {
 } from "@shared/test/arbitraries/siteArbitraries";
 import type { StatusUpdateSnapshotPayload } from "../../../stores/sites/utils/statusUpdateSnapshot";
 import { createMockFunction } from "../../utils/mockFactories";
+import { installElectronApiMock } from "../../utils/electronApiMock";
 
 // Mock electron API
 const mockElectronAPI = {
@@ -26,10 +35,7 @@ const mockElectronAPI = {
     sites: {},
 };
 
-Object.defineProperty(globalThis, "electronAPI", {
-    value: mockElectronAPI,
-    writable: true,
-});
+let restoreElectronApi: (() => void) | undefined;
 
 // Mock error store
 vi.mock("../../../stores/error/useErrorStore", () => ({
@@ -59,6 +65,9 @@ describe("useSiteMonitoring", () => {
 
     beforeEach(() => {
         vi.clearAllMocks();
+        ({ restore: restoreElectronApi } = installElectronApiMock(mockElectronAPI, {
+            ensureWindow: true,
+        }));
         currentSites = [];
         mockGetSites = createMockFunction(() => currentSites);
         mockSetSites = createMockFunction<(sites: Site[]) => void>((sites) => {
@@ -108,6 +117,11 @@ describe("useSiteMonitoring", () => {
             setSites: mockSetSites,
             applyStatusUpdate: mockApplyStatusUpdate,
         });
+    });
+
+    afterEach(() => {
+        restoreElectronApi?.();
+        restoreElectronApi = undefined;
     });
 
     describe("checkSiteNow", () => {

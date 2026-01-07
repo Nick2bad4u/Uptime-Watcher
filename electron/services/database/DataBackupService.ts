@@ -213,7 +213,7 @@ export class DataBackupService {
                     );
                 }
 
-                let snapshotDir: string | undefined = undefined;
+                let snapshotDir: null | string = null;
                 try {
                     snapshotDir = await this.createTempDirectory(
                         BACKUP_TEMP_PREFIX

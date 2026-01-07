@@ -5,7 +5,7 @@
  * all state management, actions, error handling, and IPC interactions.
  */
 
-import { describe, it, expect, beforeEach, vi } from "vitest";
+import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { act, renderHook } from "@testing-library/react";
 import type {
     Monitor,
@@ -16,6 +16,7 @@ import type { MonitorTypeConfig } from "@shared/types/monitorTypes";
 import type { ValidationResult } from "@shared/types/validation";
 import { useMonitorTypesStore } from "../../../stores/monitor/useMonitorTypesStore";
 import { useErrorStore } from "../../../stores/error/useErrorStore";
+import { installElectronApiMock } from "../../utils/electronApiMock";
 
 // Mock dependencies (partial mock to preserve exports like ApplicationError)
 vi.mock("@shared/utils/errorHandling", async (importOriginal) => {
@@ -46,19 +47,15 @@ vi.mock("@shared/utils/errorHandling", async (importOriginal) => {
 });
 
 vi.mock("../../../stores/utils", async (importOriginal) => {
-    const actual =
-        await importOriginal<typeof import("../../../stores/utils")>();
+    const actual = await importOriginal<typeof import("../../../stores/utils")>();
     return {
         ...actual,
         logStoreAction: vi.fn(),
     };
+
 });
 
-vi.mock("../../../types/ipc", () => ({
-    safeExtractIpcData: vi.fn((response, fallback) => response || fallback),
-}));
 
-// Mock ElectronAPI
 const mockElectronAPI = {
     monitorTypes: {
         getMonitorTypes: vi.fn(),
@@ -66,17 +63,9 @@ const mockElectronAPI = {
         formatMonitorDetail: vi.fn(),
         formatMonitorTitleSuffix: vi.fn(),
     },
-    monitoring: {},
-};
+} as const;
 
-// Properly mock window.electronAPI
-Object.defineProperty(globalThis, "window", {
-    value: {
-        electronAPI: mockElectronAPI,
-    },
-    writable: true,
-});
-
+let restoreElectronApi: (() => void) | undefined;
 const createMonitorTypeConfig = (
     overrides: Partial<MonitorTypeConfig> = {}
 ): MonitorTypeConfig => ({
@@ -119,6 +108,15 @@ describe(useMonitorTypesStore, () => {
             fieldConfigs: {},
             isLoaded: false,
         });
+
+        ({ restore: restoreElectronApi } = installElectronApiMock({
+            monitorTypes: mockElectronAPI.monitorTypes,
+        }));
+    });
+
+    afterEach(() => {
+        restoreElectronApi?.();
+        restoreElectronApi = undefined;
     });
 
     describe("Initial State", () => {

@@ -138,9 +138,8 @@ export function registerDiagnosticsHandlers({
             // Do not expose the full channel inventory outside dev/test.
             const includeInventory = shouldExposeChannelInventory();
 
-            const isRegistered = Array.from(registeredHandlers).some(
-                (registeredChannel) => registeredChannel === channelRaw
-            );
+            const registeredHandlerSet: ReadonlySet<string> = registeredHandlers;
+            const isRegistered = registeredHandlerSet.has(channelRaw);
 
             const availableChannels = includeInventory
                 ? Array.from(registeredHandlers).toSorted((left, right) =>

@@ -8,10 +8,11 @@ import type { Promisable } from "type-fest";
  * time. Concurrent calls return the same in-flight promise until it settles.
  *
  * This is useful for:
- * - preventing expensive duplicated work (e.g. creating backups, refreshing
+ *
+ * - Preventing expensive duplicated work (e.g. creating backups, refreshing
  *   caches),
- * - mitigating amplification points (e.g. repeated UI/IPC triggers),
- * - ensuring logically idempotent operations behave predictably under
+ * - Mitigating amplification points (e.g. repeated UI/IPC triggers),
+ * - Ensuring logically idempotent operations behave predictably under
  *   concurrency.
  *
  * It is intentionally **not** a rate limiter. Sequential calls still execute
@@ -19,8 +20,8 @@ import type { Promisable } from "type-fest";
  */
 
 /**
- * Wrap an async function so that only one invocation runs at a time.
- * Concurrent calls return the in-flight promise.
+ * Wrap an async function so that only one invocation runs at a time. Concurrent
+ * calls return the in-flight promise.
  */
 export function createSingleFlight<Args extends readonly unknown[], Result>(
     fn: (...args: Args) => Promisable<Result>

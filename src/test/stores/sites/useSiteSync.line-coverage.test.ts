@@ -3,10 +3,11 @@
  * specifically identified by coverage analysis
  */
 
-import { beforeEach, describe, expect, it, vi, type Mock } from "vitest";
+import { afterAll, beforeEach, describe, expect, it, vi, type Mock } from "vitest";
 import type { Site } from "@shared/types";
 import type { StatusUpdateManager } from "../../../stores/sites/utils/statusUpdateHandler";
 import { createMockFunction } from "../../utils/mockFactories";
+import { installElectronApiMock } from "../../utils/electronApiMock";
 
 const LISTENER_NAMES = [
     "monitor:status-changed",
@@ -97,12 +98,13 @@ vi.mock("../../../services/StateSyncService", () => ({
     StateSyncService: mockStateSyncService,
 }));
 
-// Mock window.electronAPI
-Object.defineProperty(globalThis, "window", {
-    value: {
-        electronAPI: {},
-    },
-    writable: true,
+const { restore: restoreElectronApi } = installElectronApiMock(
+    {},
+    { ensureWindow: true }
+);
+
+afterAll(() => {
+    restoreElectronApi();
 });
 
 // Import after mocking

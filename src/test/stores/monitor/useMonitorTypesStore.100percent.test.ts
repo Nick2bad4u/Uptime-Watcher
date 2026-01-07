@@ -27,6 +27,7 @@ import type { MonitorTypeConfig } from "@shared/types/monitorTypes";
 import type { ValidationResult } from "@shared/types/validation";
 import { useMonitorTypesStore } from "../../../stores/monitor/useMonitorTypesStore";
 import { useErrorStore } from "../../../stores/error/useErrorStore";
+import { installElectronApiMock } from "../../utils/electronApiMock";
 
 // Store the original implementations to restore later
 const originalWithErrorHandling = vi.hoisted(() => vi.fn());
@@ -82,17 +83,17 @@ const mockElectronAPI = {
     monitoring: {},
 };
 
-// Properly mock window.electronAPI
-Object.defineProperty(globalThis, "window", {
-    value: {
-        electronAPI: mockElectronAPI,
-    },
-    writable: true,
+let restoreElectronApi: (() => void) | undefined;
+
+beforeEach(() => {
+    ({ restore: restoreElectronApi } = installElectronApiMock(mockElectronAPI, {
+        ensureWindow: true,
+    }));
 });
 
-// Mock window.electronAPI for global access
-vi.stubGlobal("window", {
-    electronAPI: mockElectronAPI,
+afterEach(() => {
+    restoreElectronApi?.();
+    restoreElectronApi = undefined;
 });
 
 const createMonitorTypeConfig = (

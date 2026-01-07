@@ -3,7 +3,7 @@
  */
 
 import { renderHook } from "@testing-library/react";
-import { describe, expect, it, vi, beforeEach } from "vitest";
+import { describe, expect, it } from "vitest";
 import "@testing-library/jest-dom";
 
 // Import the hooks directly
@@ -15,21 +15,6 @@ import {
     useThemeValue,
 } from "../../theme/useTheme";
 
-// Mock window.electronAPI
-beforeEach(() => {
-    Object.defineProperty(globalThis, "electronAPI", {
-        value: {
-            settings: {
-                get: vi.fn().mockResolvedValue({
-                    success: true,
-                    data: { theme: "light" },
-                }),
-                set: vi.fn().mockResolvedValue({ success: true }),
-            },
-        },
-        writable: true,
-    });
-});
 
 describe("useTheme Hooks - Working Tests", () => {
     describe(useAvailabilityColors, () => {

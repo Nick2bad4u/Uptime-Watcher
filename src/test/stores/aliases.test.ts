@@ -16,25 +16,7 @@
  * - Updates store: applyUpdateStatus -> applyUpdateStatus
  */
 
-import { describe, it, expect, vi, beforeEach } from "vitest";
-
-// Mock all dependencies
-vi.mock("../../constants", () => ({
-    DEFAULT_HISTORY_LIMIT: 100,
-}));
-
-vi.mock("../../types/ipc", () => ({
-    extractIpcData: vi.fn((data) => data),
-    safeExtractIpcData: vi.fn((data) => data),
-}));
-
-vi.mock("../../services/logger", () => ({
-    logger: {
-        warn: vi.fn(),
-        error: vi.fn(),
-        info: vi.fn(),
-    },
-}));
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mockErrorStore = {
     clearStoreError: vi.fn(),
@@ -93,32 +75,6 @@ const mockStateSyncService = {
 vi.mock("../../services/StateSyncService", () => ({
     StateSyncService: mockStateSyncService,
 }));
-
-// Mock electron API
-const mockElectronAPI = {
-    settings: {
-        getHistoryLimit: vi.fn().mockResolvedValue(100),
-        updateHistoryLimit: vi.fn().mockResolvedValue(100),
-        resetSettings: vi.fn().mockResolvedValue(undefined),
-        loadSettings: vi.fn().mockResolvedValue({}),
-        syncSettings: vi.fn().mockResolvedValue(undefined),
-    },
-    sites: {
-        loadSites: vi.fn().mockResolvedValue([]),
-        syncSites: vi.fn().mockResolvedValue(undefined),
-        getSites: vi.fn().mockResolvedValue([]),
-        saveSites: vi.fn().mockResolvedValue(undefined),
-        validateSite: vi.fn().mockResolvedValue({ isValid: true }),
-    },
-    system: {
-        quitAndInstall: vi.fn().mockResolvedValue(true),
-    },
-};
-
-Object.defineProperty(window, "electronAPI", {
-    value: mockElectronAPI,
-    writable: true,
-});
 
 describe("Store Alias Methods", () => {
     beforeEach(() => {

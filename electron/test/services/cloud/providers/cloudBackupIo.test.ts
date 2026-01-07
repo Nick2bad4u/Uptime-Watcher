@@ -9,9 +9,7 @@ describe(downloadBackupWithMetadata, () => {
         const key = "backups/backup.sqlite";
 
         const downloadObject = vi
-            .fn<
-                (key: string) => Promise<Buffer>
-            >()
+            .fn<(key: string) => Promise<Buffer>>()
             .mockImplementation(async (requestedKey) => {
                 if (requestedKey.endsWith(".metadata.json")) {
                     const entry: CloudBackupEntry = {
@@ -43,9 +41,7 @@ describe(downloadBackupWithMetadata, () => {
         const key = "backups/backup.sqlite";
 
         const downloadObject = vi
-            .fn<
-                (key: string) => Promise<Buffer>
-            >()
+            .fn<(key: string) => Promise<Buffer>>()
             .mockImplementation(async (requestedKey) => {
                 if (requestedKey.endsWith(".metadata.json")) {
                     const entry: CloudBackupEntry = {

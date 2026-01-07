@@ -9,11 +9,13 @@ import {
     vi,
     beforeEach,
     afterEach,
+    afterAll,
     type Mock,
 } from "vitest";
 import type { Site } from "@shared/types";
 import type { SiteOperationsDependencies } from "../../../../stores/sites/types";
 import { createMockFunction } from "../../../utils/mockFactories";
+import { installElectronApiMock } from "../../../utils/electronApiMock";
 
 // Mock the error catalog
 vi.mock("../../../../../shared/utils/errorCatalog", () => ({
@@ -68,9 +70,10 @@ const mockElectronAPI = {
     },
 };
 
-Object.defineProperty(globalThis, "electronAPI", {
-    value: mockElectronAPI,
-    writable: true,
+const { restore: restoreElectronApi } = installElectronApiMock(mockElectronAPI);
+
+afterAll(() => {
+    restoreElectronApi();
 });
 
 // Import after mocking

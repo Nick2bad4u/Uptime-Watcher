@@ -4,6 +4,7 @@
  */
 
 import {
+    afterAll,
     afterEach,
     beforeEach,
     describe,
@@ -17,6 +18,7 @@ import type { Site } from "@shared/types";
 import type { StateSyncStatusSummary } from "@shared/types/stateSync";
 import type { StatusUpdateManager } from "../../../stores/sites/utils/statusUpdateHandler";
 import { createMockFunction } from "../../utils/mockFactories";
+import { installElectronApiMock } from "../../utils/electronApiMock";
 
 const LISTENER_NAMES = [
     "monitor:status-changed",
@@ -120,12 +122,13 @@ vi.mock("../../../types/ipc", () => ({
     safeExtractIpcData: vi.fn((response, fallback) => response ?? fallback),
 }));
 
-// Mock window.electronAPI
-Object.defineProperty(globalThis, "window", {
-    value: {
-        electronAPI: {},
-    },
-    writable: true,
+const { restore: restoreElectronApi } = installElectronApiMock(
+    {},
+    { ensureWindow: true }
+);
+
+afterAll(() => {
+    restoreElectronApi();
 });
 
 // Import the modules after mocking

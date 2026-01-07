@@ -8,11 +8,13 @@
  * @file Property-based fuzzing tests for Sites Store using fast-check
  */
 
-import { describe, expect, beforeEach, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, vi } from "vitest";
 import { test as fcTest } from "@fast-check/vitest";
 import * as fc from "fast-check";
 import { useSitesStore } from "../../../stores/sites/useSitesStore";
 import type { Site, Monitor, MonitorStatus } from "@shared/types";
+
+import { installElectronApiMock } from "../../utils/electronApiMock";
 
 // Mock window.electronAPI for testing
 const mockElectronAPI = {
@@ -25,15 +27,17 @@ const mockElectronAPI = {
     },
 };
 
-// Setup global electronAPI mock
+let restoreElectronApi: (() => void) | undefined;
+
 beforeEach(() => {
-    vi.clearAllMocks();
-    Object.defineProperty(globalThis, "window", {
-        value: {
-            electronAPI: mockElectronAPI,
-        },
-        writable: true,
-    });
+    ({ restore: restoreElectronApi } = installElectronApiMock(mockElectronAPI, {
+        ensureWindow: true,
+    }));
+});
+
+afterEach(() => {
+    restoreElectronApi?.();
+    restoreElectronApi = undefined;
 });
 
 // Test utilities for sites store state management

@@ -37,21 +37,6 @@ vi.mock("../services/logger", () => {
 });
 
 // Mock window and setTimeout
-interface MockWindow {
-    electronAPI?:
-        | {
-              sites?: {
-                  getSites?: (() => void) | string;
-              };
-          }
-        | undefined;
-}
-
-Object.defineProperty(globalThis, "window", {
-    value: {} as MockWindow,
-    writable: true,
-});
-
 describe("Additional Uncovered Lines Tests", () => {
     beforeEach(() => {
         vi.clearAllMocks();
@@ -75,12 +60,10 @@ describe("Additional Uncovered Lines Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: additional-uncovered-lines",
-                "component"
-            );
-            await annotate("Category: Core", "category");
-            await annotate("Type: Monitoring", "type");
+            await annotate("Component: handleTimeoutChange", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Edge Case", "type");
+
 
             const mockSite: Site = {
                 identifier: "test-site-id",

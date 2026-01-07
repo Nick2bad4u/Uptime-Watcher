@@ -6,6 +6,8 @@ import { render, screen, act, fireEvent } from "@testing-library/react";
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 import "@testing-library/jest-dom";
 
+import { installElectronApiMock } from "./utils/electronApiMock";
+
 import {
     ScreenshotThumbnail,
     type ScreenshotThumbnailProperties,
@@ -128,17 +130,7 @@ const createMockBoundingClientRect = (overrides = {}) => ({
     ...overrides,
 });
 
-// Set global electronAPI once (check if it exists first)
-if ((globalThis as any).electronAPI) {
-    // Update existing electronAPI
-    Object.assign((globalThis as any).electronAPI, mockElectronAPI);
-} else {
-    Object.defineProperty(globalThis, "electronAPI", {
-        configurable: true,
-        value: mockElectronAPI,
-        writable: true,
-    });
-}
+let restoreElectronApi: (() => void) | undefined;
 
 describe("ScreenshotThumbnail - Complete Coverage", () => {
     const createProps = (
@@ -154,6 +146,8 @@ describe("ScreenshotThumbnail - Complete Coverage", () => {
     beforeEach(() => {
         vi.clearAllMocks();
         mockOpenExternal.mockClear();
+
+        ({ restore: restoreElectronApi } = installElectronApiMock(mockElectronAPI));
         // Clear any existing timeouts
         vi.useFakeTimers();
 
@@ -173,6 +167,8 @@ describe("ScreenshotThumbnail - Complete Coverage", () => {
     });
 
     afterEach(() => {
+        restoreElectronApi?.();
+        restoreElectronApi = undefined;
         vi.useRealTimers();
     });
 

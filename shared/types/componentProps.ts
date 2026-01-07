@@ -20,7 +20,7 @@ import type {
     MouseEvent,
     ReactNode,
 } from "react";
-import type { UnknownRecord } from "type-fest";
+import type { SetOptional, SetRequired, UnknownRecord } from "type-fest";
 
 /**
  * Core set of structural properties shared by many UI components.
@@ -149,7 +149,7 @@ export interface FormFieldBaseProperties {
 }
 
 /**
- * Icon integration properties.
+ * Icon-related properties for components that support icon rendering.
  *
  * @remarks
  * These props provide consistent icon integration patterns across components
@@ -557,7 +557,7 @@ export type ComponentProperties<TBase, TOverrides = UnknownRecord> = Omit<
  *
  * @public
  */
-export type RequireProperties<T, K extends keyof T> = Required<Pick<T, K>> & T;
+export type RequireProperties<T, K extends keyof T> = SetRequired<T, K>;
 
 /**
  * Utility type for making certain properties optional.
@@ -573,5 +573,4 @@ export type RequireProperties<T, K extends keyof T> = Required<Pick<T, K>> & T;
  *
  * @public
  */
-export type OptionalProperties<T, K extends keyof T> = Omit<T, K> &
-    Partial<Pick<T, K>>;
+export type OptionalProperties<T, K extends keyof T> = SetOptional<T, K>;

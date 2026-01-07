@@ -3,35 +3,9 @@
  * Tests the store creation and composition pattern.
  */
 
-import { describe, expect, it, vi } from "vitest";
-
+import { describe, it, expect, vi } from "vitest";
 import type { Site } from "@shared/types";
-
-// Mock the electron API
-const mockElectronAPI = {
-    sites: {
-        getAll: vi.fn(),
-        create: vi.fn(),
-        update: vi.fn(),
-        delete: vi.fn(),
-    },
-    monitoring: {
-        start: vi.fn(),
-        stop: vi.fn(),
-        check: vi.fn(),
-    },
-    events: {
-        on: vi.fn(),
-        off: vi.fn(),
-        emit: vi.fn(),
-    },
-};
-
-// Mock window.electronAPI
-Object.defineProperty(window, "electronAPI", {
-    value: mockElectronAPI,
-    writable: true,
-});
+// The global electronAPI bootstrap block has been removed as it references a non-existent mockElectronAPI.
 
 describe("useSitesStore - Complete Function Coverage", () => {
     // Test only the store creation and composition functions

@@ -5,6 +5,8 @@
 
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 
+import { installElectronApiMock } from "./utils/electronApiMock";
+
 import type { AppSettings } from "../stores/types";
 
 import { normalizeAppSettings } from "../stores/settings/state";
@@ -40,10 +42,7 @@ const mockElectronAPI = {
     },
 };
 
-Object.defineProperty(globalThis, "electronAPI", {
-    value: mockElectronAPI,
-    writable: true,
-});
+let restoreElectronApi: (() => void) | undefined;
 
 // Mock utils (partial) so createPersistConfig remains available.
 vi.mock("../stores/utils", async (importOriginal) => {
@@ -81,6 +80,8 @@ vi.mock("../constants", () => ({
 describe(useSettingsStore, () => {
     beforeEach(() => {
         vi.clearAllMocks();
+
+        ({ restore: restoreElectronApi } = installElectronApiMock(mockElectronAPI));
         mockWaitForElectronBridge.mockResolvedValue(undefined);
         // Reset store state to defaults
         useSettingsStore.setState({
@@ -100,6 +101,8 @@ describe(useSettingsStore, () => {
     });
 
     afterEach(() => {
+        restoreElectronApi?.();
+        restoreElectronApi = undefined;
         vi.restoreAllMocks();
     });
 

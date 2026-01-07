@@ -73,6 +73,7 @@ import { safeExtractIpcData } from "../../../types/ipc";
 import { withErrorHandling } from "@shared/utils/errorHandling";
 import { useSettingsStore } from "../../../stores/settings/useSettingsStore";
 import type { AppSettings } from "../../../stores/types";
+import { installElectronApiMock } from "../../utils/electronApiMock";
 
 const mockWaitForElectronBridge = vi.hoisted(() => vi.fn());
 const MockElectronBridgeNotReadyError = vi.hoisted(
@@ -105,14 +106,13 @@ const mockElectronAPI = {
     },
 };
 
-Object.defineProperty(globalThis, "electronAPI", {
-    value: mockElectronAPI,
-    writable: true,
-});
+let restoreElectronApi: (() => void) | undefined;
 
 describe("useSettingsStore - Targeted Coverage", () => {
     beforeEach(() => {
         vi.clearAllMocks();
+
+        ({ restore: restoreElectronApi } = installElectronApiMock(mockElectronAPI));
 
         mockWaitForElectronBridge.mockResolvedValue(undefined);
 
@@ -148,6 +148,8 @@ describe("useSettingsStore - Targeted Coverage", () => {
     });
 
     afterEach(() => {
+        restoreElectronApi?.();
+        restoreElectronApi = undefined;
         vi.restoreAllMocks();
     });
 

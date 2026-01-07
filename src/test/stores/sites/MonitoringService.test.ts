@@ -14,6 +14,7 @@ import {
 } from "@shared/test/arbitraries/siteArbitraries";
 
 import { MonitoringService } from "../../../services/MonitoringService";
+import { installElectronApiMock } from "../../utils/electronApiMock";
 
 const MOCK_BRIDGE_ERROR_MESSAGE =
     "ElectronAPI not available after maximum attempts. The application may not be running in an Electron environment.";
@@ -83,10 +84,7 @@ const mockElectronAPI = {
     },
 };
 
-Object.defineProperty(globalThis, "electronAPI", {
-    value: mockElectronAPI,
-    writable: true,
-});
+let restoreElectronApi: (() => void) | undefined;
 
 const createMonitorFixture = () => ({
     activeOperations: [],
@@ -141,7 +139,15 @@ describe("MonitoringService", () => {
                 });
             }
         });
+            ({ restore: restoreElectronApi } = installElectronApiMock(mockElectronAPI, {
+                ensureWindow: true,
+            }));
     });
+
+        afterEach(() => {
+            restoreElectronApi?.();
+            restoreElectronApi = undefined;
+        });
 
     describe("checkSiteNow", () => {
         it("should return validated status updates", async ({

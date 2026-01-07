@@ -2,9 +2,10 @@
  * Test file for site-level monitoring functionality in MonitoringService
  */
 
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 
 import { MonitoringService } from "../../../services/MonitoringService";
+import { installElectronApiMock } from "../../utils/electronApiMock";
 
 const mockWaitForElectronBridge = vi.hoisted(() => vi.fn());
 const MockElectronBridgeNotReadyError = vi.hoisted(
@@ -40,15 +41,20 @@ const mockElectronAPI = {
     },
 };
 
-Object.defineProperty(globalThis, "electronAPI", {
-    value: mockElectronAPI,
-    writable: true,
-});
+let restoreElectronApi: (() => void) | undefined;
 
 describe("MonitoringService - Site-level monitoring", () => {
     beforeEach(() => {
         vi.clearAllMocks();
         mockWaitForElectronBridge.mockResolvedValue(undefined);
+        ({ restore: restoreElectronApi } = installElectronApiMock(mockElectronAPI, {
+            ensureWindow: true,
+        }));
+    });
+
+    afterEach(() => {
+        restoreElectronApi?.();
+        restoreElectronApi = undefined;
     });
 
     describe("startMonitoringForSite", () => {
