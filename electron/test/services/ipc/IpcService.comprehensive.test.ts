@@ -420,6 +420,7 @@ describe("IpcService - Comprehensive Coverage", () => {
             expect(registeredChannels).toContain("get-history-limit");
             expect(registeredChannels).toContain("reset-settings");
             expect(registeredChannels).toContain("download-sqlite-backup");
+            expect(registeredChannels).toContain("save-sqlite-backup");
 
             // Notification handlers
             expect(registeredChannels).toContain(
@@ -1426,6 +1427,50 @@ describe("IpcService - Comprehensive Coverage", () => {
                 siteCount: 1,
                 source: "database",
                 synchronized: true,
+            });
+        });
+
+        it("should preserve siteCount when receiving truncated bulk-sync events", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "regression");
+            await annotate("Component: IpcService", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: State Sync", "type");
+
+            const handleCall = vi
+                .mocked(ipcMain.handle)
+                .mock.calls.find((call) => call[0] === "get-sync-status");
+            expect(handleCall).toBeDefined();
+
+            const handler = handleCall![1];
+            expect(stateSyncListener).toBeDefined();
+
+            // Simulate the orchestrator cache not being populated yet.
+            vi.mocked(mockUptimeOrchestrator.getCachedSiteCount).mockReturnValue(
+                0
+            );
+
+            const timestamp = Date.now();
+            stateSyncListener?.({
+                action: "bulk-sync",
+                revision: 25,
+                siteCount: 500,
+                sites: [],
+                truncated: true,
+                source: "database",
+                timestamp,
+            });
+
+            const result = await handler(mockIpcEvent);
+
+            expect(result.success).toBeTruthy();
+            expect(result.data).toEqual({
+                lastSyncAt: timestamp,
+                siteCount: 500,
+                source: "cache",
+                synchronized: false,
             });
         });
     });

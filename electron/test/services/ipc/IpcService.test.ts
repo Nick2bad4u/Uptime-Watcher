@@ -412,6 +412,7 @@ describe(IpcService, () => {
                 (call) => call[0]
             );
             expect(handleCalls).toContain("download-sqlite-backup");
+            expect(handleCalls).toContain("save-sqlite-backup");
             expect(handleCalls).toContain("export-data");
             expect(handleCalls).toContain("import-data");
         });

@@ -147,29 +147,19 @@ describe("Settings Component Coverage Tests", () => {
             await annotate("Type: Business Logic", "type");
 
             const sitesStore = {
-                downloadSqliteBackup: vi.fn().mockResolvedValue({
-                    buffer: new ArrayBuffer(8),
-                    fileName: "backup.db",
-                    metadata: {
-                        appVersion: "0.0.0-test",
-                        checksum: "mock-checksum",
-                        createdAt: 0,
-                        originalPath: "/tmp/backup.db",
-                        retentionHintDays: 30,
-                        schemaVersion: 1,
-                        sizeBytes: 8,
-                    },
+                saveSqliteBackup: vi.fn().mockResolvedValue({
+                    canceled: true,
                 }),
                 fullResyncSites: vi.fn(),
             };
 
-            expect(typeof sitesStore.downloadSqliteBackup).toBe("function");
+            expect(typeof sitesStore.saveSqliteBackup).toBe("function");
             expect(typeof sitesStore.fullResyncSites).toBe("function");
 
-            sitesStore.downloadSqliteBackup();
+            sitesStore.saveSqliteBackup();
             sitesStore.fullResyncSites();
 
-            expect(sitesStore.downloadSqliteBackup).toHaveBeenCalled();
+            expect(sitesStore.saveSqliteBackup).toHaveBeenCalled();
             expect(sitesStore.fullResyncSites).toHaveBeenCalled();
         });
 

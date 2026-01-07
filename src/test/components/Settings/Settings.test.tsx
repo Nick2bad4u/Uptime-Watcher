@@ -82,8 +82,13 @@ vi.mock("../../../components/Settings/CloudSettingsSection", () => ({
     CloudSettingsSection: (): null => null,
 }));
 
-const createDefaultDownloadBackup = () =>
-    vi.fn(async () => createSerializedBackupResult());
+const createDefaultSaveBackup = () =>
+    vi.fn(async () => ({
+        canceled: false as const,
+        fileName: "uptime-watcher-backup.sqlite",
+        filePath: "/tmp/uptime-watcher-backup.sqlite",
+        metadata: createSerializedBackupResult().metadata,
+    }));
 
 const createDefaultRestoreBackup = () =>
     vi.fn(async () => createSerializedRestoreResult());
@@ -92,7 +97,7 @@ const createDefaultFullResync = () => vi.fn(async () => undefined);
 
 // Standard creation bridged through global to avoid hoist-time import errors
 const sitesStoreState = createSitesStoreMock({
-    downloadSqliteBackup: createDefaultDownloadBackup(),
+    saveSqliteBackup: createDefaultSaveBackup(),
     restoreSqliteBackup: createDefaultRestoreBackup(),
     fullResyncSites: createDefaultFullResync(),
     lastBackupMetadata: createSerializedBackupResult().metadata,
@@ -113,7 +118,7 @@ vi.mock("../../../stores/sites/useSitesStore", () => ({
 
 const resetSitesStoreState = (): void => {
     updateSitesStoreMock(sitesStoreState, {
-        downloadSqliteBackup: createDefaultDownloadBackup(),
+        saveSqliteBackup: createDefaultSaveBackup(),
         restoreSqliteBackup: createDefaultRestoreBackup(),
         fullResyncSites: createDefaultFullResync(),
         lastBackupMetadata: createSerializedBackupResult().metadata,
@@ -518,7 +523,7 @@ describe("Settings Component", () => {
         expect(mockSitesStore.fullResyncSites).toHaveBeenCalled();
     });
 
-    it("should handle SQLite backup download", ({ task, annotate }) => {
+    it("should handle SQLite backup save", ({ task, annotate }) => {
         annotate(`Testing: ${task.name}`, "functional");
         annotate("Component: Settings", "component");
         annotate("Category: Component", "category");
@@ -536,7 +541,7 @@ describe("Settings Component", () => {
         });
         fireEvent.click(downloadButton);
 
-        expect(mockSitesStore.downloadSqliteBackup).toHaveBeenCalled();
+        expect(mockSitesStore.saveSqliteBackup).toHaveBeenCalled();
     });
 
     it("should handle theme changes", ({ task, annotate }) => {

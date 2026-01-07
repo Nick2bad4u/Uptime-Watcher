@@ -1,17 +1,26 @@
 import type {
     IpcInvokeChannel,
     SerializedDatabaseBackupResult,
+    SerializedDatabaseBackupSaveResult,
     SerializedDatabaseRestoreResult,
 } from "@shared/types/ipc";
 
+import { DEFAULT_MAX_IPC_BACKUP_TRANSFER_BYTES } from "@shared/constants/backup";
 import { DATA_CHANNELS } from "@shared/types/preload";
+import { createSingleFlight } from "@shared/utils/singleFlight";
+import { app, dialog } from "electron";
+import path from "node:path";
 
 import type { UptimeOrchestrator } from "../../../UptimeOrchestrator";
 
 import { validateDatabaseBackupPayload } from "../../database/utils/backup/databaseBackup";
 import { createStandardizedIpcRegistrar, toClonedArrayBuffer } from "../utils";
 import { DataHandlerValidators } from "../validators";
-import { createSingleFlight } from "./utils/createSingleFlight";
+
+function ensureSqliteFileExtension(rawPath: string): string {
+    const ext = path.extname(rawPath);
+    return ext.length > 0 ? rawPath : `${rawPath}.sqlite`;
+}
 
 /**
  * Dependencies required for registering data IPC handlers.
@@ -38,6 +47,12 @@ export function registerDataHandlers({
         const result = await uptimeOrchestrator.downloadBackup();
         validateDatabaseBackupPayload(result);
         const { buffer, fileName, metadata } = result;
+
+        if (buffer.byteLength > DEFAULT_MAX_IPC_BACKUP_TRANSFER_BYTES) {
+            throw new Error(
+                `SQLite backup is too large to transfer over IPC (${buffer.byteLength} > ${DEFAULT_MAX_IPC_BACKUP_TRANSFER_BYTES} bytes). Use the save-sqlite-backup flow instead.`
+            );
+        }
         const arrayBuffer = toClonedArrayBuffer(buffer);
 
         return {
@@ -46,6 +61,46 @@ export function registerDataHandlers({
             metadata,
         } satisfies SerializedDatabaseBackupResult;
     });
+
+    const saveSqliteBackupSingleFlight = createSingleFlight(
+        async (): Promise<SerializedDatabaseBackupSaveResult> => {
+            const downloadsDir = app.getPath("downloads");
+            const suggestedFileName = `uptime-watcher-backup-${Date.now()}.sqlite`;
+            const defaultPath = path.join(downloadsDir, suggestedFileName);
+
+            const dialogResult = await dialog.showSaveDialog({
+                defaultPath,
+                filters: [
+                    {
+                        extensions: ["sqlite", "db"],
+                        name: "SQLite Backup",
+                    },
+                    {
+                        extensions: ["*"],
+                        name: "All Files",
+                    },
+                ],
+                title: "Save SQLite Backup",
+            });
+
+            if (dialogResult.canceled || !dialogResult.filePath) {
+                return { canceled: true };
+            }
+
+            const targetPath = ensureSqliteFileExtension(dialogResult.filePath);
+
+            const metadata = await uptimeOrchestrator.saveBackupToPath(
+                targetPath
+            );
+
+            return {
+                canceled: false,
+                fileName: path.basename(targetPath),
+                filePath: targetPath,
+                metadata,
+            } satisfies SerializedDatabaseBackupSaveResult;
+        }
+    );
 
     register(
         DATA_CHANNELS.exportData,
@@ -63,6 +118,12 @@ export function registerDataHandlers({
         DATA_CHANNELS.downloadSqliteBackup,
         () => downloadSqliteBackupSingleFlight(),
         DataHandlerValidators.downloadSqliteBackup
+    );
+
+    register(
+        DATA_CHANNELS.saveSqliteBackup,
+        () => saveSqliteBackupSingleFlight(),
+        DataHandlerValidators.saveSqliteBackup
     );
 
     register(

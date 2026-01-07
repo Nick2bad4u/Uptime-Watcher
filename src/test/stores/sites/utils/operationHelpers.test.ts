@@ -60,6 +60,7 @@ vi.mock("../../../../stores/sites/utils/monitorOperations", () => ({
 const mockElectronAPI = {
     data: {
         downloadSqliteBackup: vi.fn(),
+        saveSqliteBackup: vi.fn(),
         restoreSqliteBackup: vi.fn(),
     },
     sites: {
@@ -145,6 +146,9 @@ describe("OperationHelpers", () => {
                     schemaVersion: 1,
                     sizeBytes: 0,
                 },
+            })),
+            saveSqliteBackup: vi.fn(async () => ({
+                canceled: true as const,
             })),
             restoreSqliteBackup: vi.fn(async (payload) =>
                 mockElectronAPI.data.restoreSqliteBackup(payload)

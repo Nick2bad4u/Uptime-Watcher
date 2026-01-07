@@ -68,8 +68,10 @@ vi.mock("electron", () => ({
 
 vi.mock("../../../services/database/utils/backup/databaseBackup", () => ({
     createDatabaseBackup: vi.fn(),
+    computeDatabaseBackupChecksum: vi.fn(() => "mock-checksum"),
     validateDatabaseBackupPayload: vi.fn(),
     DEFAULT_BACKUP_RETENTION_HINT_DAYS: 30,
+    readDatabaseSchemaVersionFromFile: vi.fn(() => 1),
 }));
 
 vi.mock("../../../constants", () => ({
@@ -260,8 +262,11 @@ describe(DataBackupService, () => {
                 },
             });
             expect(app.getPath).toHaveBeenCalledWith("userData");
-            expect(mockDatabaseService.close).toHaveBeenCalled();
-            expect(mockDatabaseService.initialize).toHaveBeenCalled();
+            // Snapshot creation should prefer leaving the primary connection
+            // open. Closing/reinitializing is reserved for SQLITE_BUSY/LOCKED
+            // fallback scenarios.
+            expect(mockDatabaseService.close).not.toHaveBeenCalled();
+            expect(mockDatabaseService.initialize).not.toHaveBeenCalled();
             expect(mockFsPromises.mkdtemp).toHaveBeenCalled();
             expect(mockDatabaseInstance.exec).toHaveBeenCalledWith(
                 expect.stringContaining("VACUUM INTO")
@@ -293,6 +298,54 @@ describe(DataBackupService, () => {
                     sizeBytes: mockResult.metadata.sizeBytes,
                 })
             );
+        });
+
+        it("should close and reinitialize the primary DB when VACUUM INTO hits SQLITE_BUSY", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DataBackupService", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Backup Operation", "type");
+
+            const mockResult = {
+                buffer: Buffer.from("test database content"),
+                fileName: "uptime-watcher-backup.sqlite",
+                metadata: {
+                    appVersion: "0.0.0-test",
+                    checksum: "mock-checksum",
+                    createdAt: Date.now(),
+                    originalPath: "/test/userdata/uptime-watcher.sqlite",
+                    retentionHintDays: 30,
+                    schemaVersion: 1,
+                    sizeBytes: 1024,
+                },
+            };
+            vi.mocked(createDatabaseBackup).mockResolvedValue(mockResult);
+
+            let shouldFailVacuum = true;
+            const lockError = Object.assign(
+                new Error("SQLITE_BUSY: database is locked"),
+                { code: "SQLITE_BUSY" }
+            );
+
+            vi.mocked(mockDatabaseInstance.exec).mockImplementation((sql) => {
+                if (
+                    shouldFailVacuum &&
+                    typeof sql === "string" &&
+                    sql.includes("VACUUM INTO")
+                ) {
+                    shouldFailVacuum = false;
+                    throw lockError;
+                }
+                return undefined as never;
+            });
+
+            await dataBackupService.downloadDatabaseBackup();
+
+            expect(mockDatabaseService.close).toHaveBeenCalledTimes(1);
+            expect(mockDatabaseService.initialize).toHaveBeenCalledTimes(1);
         });
 
         it("should use correct database path", async ({ task, annotate }) => {
@@ -924,7 +977,7 @@ describe(DataBackupService, () => {
             // Assert
             expect(result1.fileName).toBe("concurrent-backup.sqlite");
             expect(result2.fileName).toBe("concurrent-backup.sqlite");
-            expect(createDatabaseBackup).toHaveBeenCalledTimes(2);
+            expect(createDatabaseBackup).toHaveBeenCalledTimes(1);
         });
     });
 });

@@ -405,6 +405,7 @@ describe("IpcService - Comprehensive Coverage", () => {
             expect(registeredChannels).toContain("export-data");
             expect(registeredChannels).toContain("import-data");
             expect(registeredChannels).toContain("download-sqlite-backup");
+            expect(registeredChannels).toContain("save-sqlite-backup");
 
             // Settings handlers
             expect(registeredChannels).toContain("update-history-limit");

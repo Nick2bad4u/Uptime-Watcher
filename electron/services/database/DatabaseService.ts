@@ -7,9 +7,9 @@
  * database operations.
  */
 
-import { tryGetErrorCode } from "@shared/utils/errorCodes";
 import { ensureError } from "@shared/utils/errorHandling";
 import { LOG_TEMPLATES } from "@shared/utils/logTemplates";
+import { isSqliteLockedError } from "@shared/utils/sqliteErrors";
 import { app } from "electron";
 import { Database } from "node-sqlite3-wasm";
 // eslint-disable-next-line unicorn/import-style -- Need namespace import for both sync and async usage
@@ -85,6 +85,8 @@ export class DatabaseService {
     /** Singleton instance of the database service */
     private static readonly instance: DatabaseService = new DatabaseService();
 
+    private static savepointCounter = 0;
+
     /** SQLite database connection instance */
     private db: Database | undefined;
 
@@ -146,15 +148,40 @@ export class DatabaseService {
     ): Promise<T> {
         const db = this.getDatabase();
 
-        // Check if we're already in a transaction (nested transaction scenario)
+        // Nested transaction scenario: use SAVEPOINT so callers still get an
+        // atomic boundary even when already inside a broader transaction.
+        //
+        // SQLite doesn't support nested BEGIN/COMMIT, but savepoints are the
+        // supported mechanism.
         if (db.inTransaction) {
+            DatabaseService.savepointCounter += 1;
+            const savepointName = `uptime_watcher_sp_${DatabaseService.savepointCounter}`;
+
             logger.warn(
-                "[DatabaseService] Nested transaction detected - executing operation within existing transaction. " +
-                    "This may indicate a design issue where transaction boundaries are not properly managed."
+                "[DatabaseService] Nested transaction detected - using SAVEPOINT for isolation",
+                { savepointName }
             );
-            // If we're already in a transaction, just execute the operation
-            // without starting a new transaction (SQLite doesn't support nested transactions)
-            return operation(db);
+
+            db.run(`SAVEPOINT ${savepointName}`);
+
+            try {
+                return await operation(db).then((result) => {
+                    db.run(`RELEASE ${savepointName}`);
+                    return result;
+                });
+            } catch (error) {
+                const normalizedError = ensureError(error);
+                try {
+                    db.run(`ROLLBACK TO ${savepointName}`);
+                    db.run(`RELEASE ${savepointName}`);
+                } catch (rollbackError) {
+                    logger.error(
+                        "[DatabaseService] Failed to rollback savepoint",
+                        ensureError(rollbackError)
+                    );
+                }
+                throw normalizedError;
+            }
         }
 
         try {
@@ -345,7 +372,7 @@ export class DatabaseService {
             } catch (error: unknown) {
                 const normalizedError = ensureError(error);
                 if (
-                    this.isDatabaseLockedError(error) &&
+                    isSqliteLockedError(error) &&
                     attempt < DATABASE_INITIALIZATION_MAX_ATTEMPTS
                 ) {
                     this.handleDatabaseLockedError(dbPath, attempt, error);
@@ -389,7 +416,7 @@ export class DatabaseService {
             db.get("PRAGMA journal_mode = WAL");
         } catch (error: unknown) {
             const normalizedError = ensureError(error);
-            if (this.isDatabaseLockedError(error)) {
+            if (isSqliteLockedError(error)) {
                 // Escalate to the caller so initialization retries with the
                 // lock recovery flow (busy_timeout + artifact relocation).
                 throw normalizedError;
@@ -407,7 +434,7 @@ export class DatabaseService {
             db.get("PRAGMA synchronous = NORMAL");
         } catch (error: unknown) {
             const normalizedError = ensureError(error);
-            if (this.isDatabaseLockedError(error)) {
+            if (isSqliteLockedError(error)) {
                 throw normalizedError;
             }
             logger.warn(
@@ -447,22 +474,6 @@ export class DatabaseService {
      *
      * @returns `true` when the error indicates an outstanding lock.
      */
-    private isDatabaseLockedError(error: unknown): boolean {
-        const code = tryGetErrorCode(error);
-        if (code === "SQLITE_BUSY" || code === "SQLITE_LOCKED") {
-            return true;
-        }
-
-        const normalized = ensureError(error);
-        const message = normalized.message.toLowerCase();
-
-        return (
-            message.includes("database is locked") ||
-            message.includes("sqlite_busy") ||
-            message.includes("sqlite_locked")
-        );
-    }
-
     /**
      * Handles lock-related initialization failures by relocating stale lock
      * artifacts and preparing for a retry.

@@ -434,6 +434,9 @@ export function toClonedArrayBuffer(view: ArrayBufferView): ArrayBuffer {
     const { buffer, byteLength, byteOffset } = view;
 
     if (buffer instanceof ArrayBuffer) {
+        if (byteOffset === 0 && byteLength === buffer.byteLength) {
+            return buffer;
+        }
         return buffer.slice(byteOffset, byteOffset + byteLength);
     }
 

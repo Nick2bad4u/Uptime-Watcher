@@ -2,6 +2,8 @@ import type { UptimeOrchestrator } from "../../../UptimeOrchestrator";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { InMemorySecretStore } from "../../utils/InMemorySecretStore";
+
+import { createHash } from "node:crypto";
 describe("CloudService", () => {
     let baseDirectory: string;
     let fs: (typeof import("node:fs"))["promises"];
@@ -37,6 +39,9 @@ describe("CloudService", () => {
     });
 
     it("configures filesystem provider and uploads backup", async () => {
+        const backupBuffer = Buffer.from("backup");
+        const checksum = createHash("sha256").update(backupBuffer).digest("hex");
+
         const settings = new Map<string, string>();
         const syncEngine = {
             syncNow: vi.fn().mockResolvedValue({
@@ -48,11 +53,11 @@ describe("CloudService", () => {
         };
         const orchestrator = {
             downloadBackup: vi.fn().mockResolvedValue({
-                buffer: Buffer.from("backup"),
+                buffer: backupBuffer,
                 fileName: "uptime-watcher-backup.sqlite",
                 metadata: {
                     appVersion: "1.0.0",
-                    checksum: "abc",
+                    checksum,
                     createdAt: 1_700_000_000_000,
                     originalPath: "C:/db.sqlite",
                     retentionHintDays: 30,
@@ -65,7 +70,7 @@ describe("CloudService", () => {
                 preRestoreFileName: "pre.sqlite",
                 metadata: {
                     appVersion: "1.0.0",
-                    checksum: "abc",
+                    checksum,
                     createdAt: 1_700_000_000_000,
                     originalPath: "C:/db.sqlite",
                     retentionHintDays: 30,

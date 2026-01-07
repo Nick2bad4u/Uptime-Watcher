@@ -79,8 +79,39 @@ describe("dataApi", () => {
                 "exportData",
                 "importData",
                 "restoreSqliteBackup",
+                "saveSqliteBackup",
             ].toSorted()
         );
+    });
+
+    describe("saveSqliteBackup", () => {
+        it("returns the save result when IPC succeeds", async () => {
+            const response: IpcResponse = {
+                success: true,
+                data: { canceled: true },
+            };
+            ipcRenderer.invoke.mockResolvedValueOnce(response);
+
+            const result = await dataApi.saveSqliteBackup();
+
+            expect(ipcRenderer.invoke).toHaveBeenCalledWith(
+                DATA_CHANNELS.saveSqliteBackup,
+                ipcContext
+            );
+            expect(result).toStrictEqual({ canceled: true });
+        });
+
+        it("throws when the backend reports a failure", async () => {
+            const response: IpcResponse = {
+                success: false,
+                error: "save-failed",
+            };
+            ipcRenderer.invoke.mockResolvedValueOnce(response);
+
+            await expect(dataApi.saveSqliteBackup()).rejects.toThrowError(
+                "save-failed"
+            );
+        });
     });
 
     describe("downloadSqliteBackup", () => {

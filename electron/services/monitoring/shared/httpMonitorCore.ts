@@ -16,6 +16,7 @@ import {
     interpolateLogTemplate,
     LOG_TEMPLATES,
 } from "@shared/utils/logTemplates";
+import { isRecord } from "@shared/utils/typeHelpers";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 
 import type {
@@ -45,6 +46,9 @@ import {
     createMonitorErrorResult,
     validateMonitorUrl,
 } from "./monitorServiceHelpers";
+
+const isCallable = (value: unknown): value is (...args: never[]) => unknown =>
+    typeof value === "function";
 
 declare module "axios" {
     interface AxiosError {
@@ -306,16 +310,12 @@ export function createHttpMonitorService<
         }
 
         private cleanupAxiosResponseData(data: unknown): void {
-            if (data === null || data === undefined || typeof data !== "object") {
+            if (!isRecord(data)) {
                 return;
             }
 
-            const resumeCandidate = Reflect.get(data, "resume");
-            const destroyCandidate = Reflect.get(data, "destroy");
-
-            const isCallable = (
-                value: unknown
-            ): value is (...args: never[]) => unknown => typeof value === "function";
+            const resumeCandidate = data["resume"];
+            const destroyCandidate = data["destroy"];
 
             try {
                 if (isCallable(resumeCandidate)) {

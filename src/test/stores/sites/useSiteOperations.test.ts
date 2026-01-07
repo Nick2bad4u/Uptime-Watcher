@@ -160,6 +160,9 @@ describe(createSiteOperationsActions, () => {
             downloadSqliteBackup: vi.fn(async () =>
                 mockElectronAPI.data.downloadSqliteBackup()
             ),
+            saveSqliteBackup: vi.fn(async () =>
+                mockElectronAPI.data.saveSqliteBackup()
+            ),
             restoreSqliteBackup: vi.fn(async (payload) =>
                 mockElectronAPI.data.restoreSqliteBackup(payload)
             ),

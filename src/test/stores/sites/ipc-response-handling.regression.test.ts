@@ -54,6 +54,9 @@ const mockElectronAPI = {
                 sizeBytes: 1024,
             },
         }),
+        saveSqliteBackup: vi.fn().mockResolvedValue({
+            canceled: true as const,
+        }),
     },
     settings: {
         getHistoryLimit: vi.fn().mockResolvedValue(1000),
@@ -115,6 +118,9 @@ vi.mock("../../../services/DataService", () => ({
                 schemaVersion: 1,
                 sizeBytes: 1024,
             },
+        }),
+        saveSqliteBackup: vi.fn().mockResolvedValue({
+            canceled: true as const,
         }),
     },
 }));

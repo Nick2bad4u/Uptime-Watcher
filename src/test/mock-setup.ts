@@ -191,6 +191,7 @@ const defaultStateSyncStatus: StateSyncStatusSummary = {
 
 const defaultFullSyncResult: StateSyncFullSyncResult = {
     completedAt: Date.now(),
+    revision: 1,
     siteCount: 1,
     sites: [cloneSite(defaultSite)],
     source: "frontend",
@@ -403,6 +404,11 @@ const mockElectronAPI: ElectronAPI = {
                 sizeBytes: 8,
             },
         })),
+        saveSqliteBackup: vi.fn<ElectronAPI["data"]["saveSqliteBackup"]>(
+            async () => ({
+                canceled: true as const,
+            })
+        ),
         exportData: vi.fn<ElectronAPI["data"]["exportData"]>(async () => "{}"),
         importData: vi.fn<ElectronAPI["data"]["importData"]>(async () => true),
         restoreSqliteBackup: vi.fn<ElectronAPI["data"]["restoreSqliteBackup"]>(

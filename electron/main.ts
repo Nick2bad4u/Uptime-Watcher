@@ -9,7 +9,12 @@
  * @packageDocumentation
  */
 
-import type { BrowserWindow } from "electron";
+import type {
+    BrowserWindow,
+    Event,
+    RenderProcessGoneDetails,
+    WebContents,
+} from "electron";
 
 import { readProcessEnv } from "@shared/utils/environment";
 import { ensureError } from "@shared/utils/errorHandling";
@@ -465,16 +470,44 @@ if (isDev()) {
  * are triggered, to prevent resource leaks and errors.
  */
 class Main {
-    /** Application service instance for managing app lifecycle and features */
+    private static readonly FATAL_SHUTDOWN_TIMEOUT_MS = 5000;
+
+/** Application service instance for managing app lifecycle and features */
     private readonly applicationService: ApplicationService;
 
     /** Flag to ensure cleanup is only called once */
     private cleanedUp = false;
 
+
+
+    private readonly handleUnhandledRejection = (reason: unknown): void => {
+        const normalizedError = ensureError(reason);
+        logger.error("[Main] Unhandled promise rejection", normalizedError);
+        void this.performFatalShutdown("unhandledRejection", normalizedError);
+    };
+
+    private readonly handleUncaughtException = (error: unknown): void => {
+        const normalizedError = ensureError(error);
+        logger.error("[Main] Uncaught exception", normalizedError);
+        void this.performFatalShutdown("uncaughtException", normalizedError);
+    };
+
+    private readonly handleRenderProcessGone = (
+        _event: Event,
+        webContents: WebContents,
+        details: RenderProcessGoneDetails
+    ): void => {
+        logger.error("[Main] Renderer process gone", {
+            exitCode: details.exitCode,
+            reason: details.reason,
+            url: webContents.getURL(),
+        });
+    };
+
     /**
      * Named event handler for safe cleanup on process exit.
      */
-    private readonly handleProcessExit = (): void => {
+private readonly handleProcessExit = (): void => {
         if (!this.cleanedUp) {
             this.cleanedUp = true;
             // Handle cleanup asynchronously without blocking process exit
@@ -495,10 +528,10 @@ class Main {
         }
     };
 
-    /**
+/**
      * Named event handler for safe cleanup on app quit.
      */
-    private readonly handleAppQuit = (): void => {
+private readonly handleAppQuit = (): void => {
         if (!this.cleanedUp) {
             this.cleanedUp = true;
             // Handle cleanup asynchronously during app quit
@@ -518,6 +551,52 @@ class Main {
             });
         }
     };
+
+private async performFatalShutdown(
+        reason: "uncaughtException" | "unhandledRejection",
+        error: Error
+    ): Promise<void> {
+        if (this.cleanedUp) {
+            return;
+        }
+
+        this.cleanedUp = true;
+
+        logger.error("[Main] Initiating fatal shutdown", {
+            message: error.message,
+            reason,
+        });
+
+        const cleanup = async (): Promise<void> => {
+            try {
+                await this.performCleanup();
+            } catch (cleanupError: unknown) {
+                logger.error(
+                    "[Main] Fatal shutdown cleanup failed",
+                    ensureError(cleanupError)
+                );
+            }
+        };
+
+        let timeoutId: ReturnType<typeof setTimeout> | undefined = undefined;
+        const timeout = new Promise<void>((resolve) => {
+            timeoutId = setTimeout(resolve, Main.FATAL_SHUTDOWN_TIMEOUT_MS);
+        });
+
+        try {
+            await Promise.race([cleanup(), timeout]);
+        } finally {
+            clearTimeout(timeoutId);
+        }
+
+        app.exit(1);
+    }
+
+
+
+
+
+
 
     /**
      * Performs cleanup of application service.
@@ -551,6 +630,14 @@ class Main {
         logger.info("Starting Uptime Watcher application");
         this.applicationService = new ApplicationService();
 
+        // Crash resilience: ensure unexpected errors are logged and we exit
+        // cleanly rather than leaving the app in a corrupted state.
+        process.on("unhandledRejection", this.handleUnhandledRejection);
+        process.on("uncaughtException", this.handleUncaughtException);
+
+        // Log renderer crashes (useful for diagnosing GPU/JS crashes).
+        app.on("render-process-gone", this.handleRenderProcessGone);
+
         // Setup cleanup on Node.js process exit to ensure graceful shutdown.
         // Note: 'beforeExit' may not fire in all shutdown scenarios (e.g.,
         // forced kills or SIGKILL). It is best-effort and should be combined
@@ -572,6 +659,9 @@ class Main {
     public removeEventListeners(): void {
         process.off("beforeExit", this.handleProcessExit);
         app.off("will-quit", this.handleAppQuit);
+        process.off("unhandledRejection", this.handleUnhandledRejection);
+        process.off("uncaughtException", this.handleUncaughtException);
+        app.off("render-process-gone", this.handleRenderProcessGone);
     }
 }
 

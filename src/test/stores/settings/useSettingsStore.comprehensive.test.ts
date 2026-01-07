@@ -105,6 +105,9 @@ const mockElectronAPI = {
                 sizeBytes: 100,
             },
         }),
+        saveSqliteBackup: vi.fn().mockResolvedValue({
+            canceled: true as const,
+        }),
     },
     events: {
         onHistoryLimitUpdated: vi.fn<

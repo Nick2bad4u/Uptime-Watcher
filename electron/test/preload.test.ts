@@ -856,6 +856,46 @@ describe("Electron Preload Script", () => {
                 );
                 expect(result).toEqual(mockBackupData);
             });
+
+            it("should properly invoke IPC for saveSqliteBackup", async ({
+                annotate,
+            }) => {
+                await annotate("Component: Data API", "component");
+                await annotate(
+                    "Test Type: Unit - IPC Bridge Validation",
+                    "test-type"
+                );
+                await annotate("Operation: SQLite Backup Save", "operation");
+                await annotate(
+                    "Priority: Critical - Database Backup",
+                    "priority"
+                );
+                await annotate(
+                    "Complexity: Low - No large payload",
+                    "complexity"
+                );
+                await annotate(
+                    "IPC Channel: save-sqlite-backup",
+                    "ipc-channel"
+                );
+
+                const mockResponse = {
+                    success: true,
+                    data: { canceled: true },
+                };
+                mockIpcRenderer.invoke.mockResolvedValueOnce(mockResponse);
+
+                await import("../preload");
+
+                const exposedAPI = getExposedAPI();
+
+                const result = await exposedAPI.data.saveSqliteBackup();
+
+                expect(mockIpcRenderer.invoke).toHaveBeenCalledWith(
+                    "save-sqlite-backup"
+                );
+                expect(result).toEqual({ canceled: true });
+            });
         });
 
         describe("Settings API", () => {

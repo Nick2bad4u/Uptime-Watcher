@@ -99,8 +99,26 @@ export async function downloadBackupWithMetadata(args: {
     const metadataKey = backupMetadataKeyForBackupKey(args.key);
     const metadataBuffer = await args.downloadObject(metadataKey);
 
+    const entry = parseCloudBackupMetadataFileBuffer(metadataBuffer);
+
+    // Safety: the metadata file is untrusted input. Ensure it describes the
+    // same object we asked for, otherwise consumers may restore a backup using
+    // the wrong metadata (checksum/schema), or display misleading names.
+    if (entry.key !== args.key) {
+        throw new Error(
+            `Backup metadata mismatch: expected key '${args.key}' but received '${entry.key}'`
+        );
+    }
+
+    const expectedFileName = args.key.split("/").pop() ?? "";
+    if (expectedFileName && entry.fileName !== expectedFileName) {
+        throw new Error(
+            `Backup metadata mismatch: expected fileName '${expectedFileName}' but received '${entry.fileName}'`
+        );
+    }
+
     return {
         buffer,
-        entry: parseCloudBackupMetadataFileBuffer(metadataBuffer),
+        entry,
     };
 }

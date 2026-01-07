@@ -32,6 +32,7 @@ import path from "node:path";
 
 import type { UptimeOrchestrator } from "../../UptimeOrchestrator";
 import type {
+    DatabaseBackupMetadata,
     DatabaseBackupResult,
     DatabaseRestorePayload,
 } from "../database/utils/backup/databaseBackup";
@@ -40,6 +41,7 @@ import type { CloudSettingsAdapter } from "./CloudService.types";
 import type { CloudStorageProvider } from "./providers/CloudStorageProvider.types";
 
 import { logger } from "../../utils/logger";
+import { validateDatabaseBackupPayload } from "../database/utils/backup/databaseBackup";
 import { ProviderCloudSyncTransport } from "../sync/ProviderCloudSyncTransport";
 import {
     createKeyCheckBase64,
@@ -152,18 +154,49 @@ async function clearLastError(settings: CloudSettingsAdapter): Promise<void> {
     await settings.set(SETTINGS_KEY_LAST_ERROR, "");
 }
 
+function deriveCloudBackupOriginalPath(fileName: string): string {
+    const trimmed = fileName.trim();
+    if (!trimmed) {
+        return "backup.sqlite";
+    }
+
+    // Avoid leaking local absolute paths into cloud metadata. Also handle both
+    // Windows and POSIX separators.
+    const segments = trimmed.split(/[\\/]/u).filter(Boolean);
+    return segments.at(-1) ?? "backup.sqlite";
+}
+
 function serializeBackupMetadata(
-    metadata: DatabaseBackupResult["metadata"]
+    args: {
+        readonly fileName: string;
+        readonly metadata: DatabaseBackupResult["metadata"];
+    }
 ): SerializedDatabaseBackupMetadata {
+    const { fileName, metadata } = args;
+
     return {
         appVersion: metadata.appVersion,
         checksum: metadata.checksum,
         createdAt: metadata.createdAt,
-        originalPath: metadata.originalPath,
+        originalPath: deriveCloudBackupOriginalPath(fileName),
         retentionHintDays: metadata.retentionHintDays,
         schemaVersion: metadata.schemaVersion,
         sizeBytes: metadata.sizeBytes,
     };
+}
+
+function toDatabaseBackupMetadata(
+    serialized: SerializedDatabaseBackupMetadata
+): DatabaseBackupMetadata {
+    return {
+        appVersion: serialized.appVersion,
+        checksum: serialized.checksum,
+        createdAt: serialized.createdAt,
+        originalPath: serialized.originalPath,
+        retentionHintDays: serialized.retentionHintDays,
+        schemaVersion: serialized.schemaVersion,
+        sizeBytes: serialized.sizeBytes,
+    } satisfies DatabaseBackupMetadata;
 }
 
 function parseBooleanSetting(value: string | undefined): boolean {
@@ -828,7 +861,7 @@ export class CloudService {
             const provider = await this.resolveProviderOrThrow();
 
             const backup = await this.orchestrator.downloadBackup();
-            const metadata = serializeBackupMetadata(backup.metadata);
+            validateDatabaseBackupPayload(backup);
 
             const { encrypted, key } = await this.getEncryptionKeyMaybe();
             const shouldEncrypt = encrypted && key !== undefined;
@@ -839,8 +872,13 @@ export class CloudService {
             }
 
             const fileName = shouldEncrypt
-                ? `uptime-watcher-backup-${metadata.createdAt}.sqlite.enc`
-                : `uptime-watcher-backup-${metadata.createdAt}.sqlite`;
+                ? `uptime-watcher-backup-${backup.metadata.createdAt}.sqlite.enc`
+                : `uptime-watcher-backup-${backup.metadata.createdAt}.sqlite`;
+
+            const metadata = serializeBackupMetadata({
+                fileName,
+                metadata: backup.metadata,
+            });
 
             const payloadBuffer = shouldEncrypt
                 ? encryptBuffer({ key, plaintext: backup.buffer })
@@ -879,6 +917,11 @@ export class CloudService {
                 ? await this.decryptBackupOrThrow(downloaded.buffer)
                 : downloaded.buffer;
 
+            validateDatabaseBackupPayload({
+                buffer,
+                metadata: toDatabaseBackupMetadata(downloaded.entry.metadata),
+            });
+
             const payload: DatabaseRestorePayload = {
                 buffer,
                 fileName: downloaded.entry.fileName,
@@ -887,7 +930,10 @@ export class CloudService {
             const summary = await this.orchestrator.restoreBackup(payload);
 
             return {
-                metadata: serializeBackupMetadata(summary.metadata),
+                metadata: serializeBackupMetadata({
+                    fileName: downloaded.entry.fileName,
+                    metadata: summary.metadata,
+                }),
                 preRestoreFileName: summary.preRestoreFileName,
                 restoredAt: summary.restoredAt,
             };

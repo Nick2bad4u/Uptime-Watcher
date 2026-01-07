@@ -15,6 +15,7 @@ import {
     createSuccessResponse,
     createValidationResponse,
     registerStandardizedIpcHandler,
+    toClonedArrayBuffer,
     withIpcHandler,
     withIpcHandlerValidation,
 } from "../../../services/ipc/utils";
@@ -712,6 +713,49 @@ describe("IPC Utils - Comprehensive Coverage", () => {
                 const result = IpcValidators.requiredString([], "testParam");
                 expect(result).toBe("testParam must be a non-empty string");
             });
+        });
+    });
+
+    describe(toClonedArrayBuffer, () => {
+        it("should return the original ArrayBuffer when the view spans the entire buffer", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: utils", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Performance", "type");
+
+            const buffer = new ArrayBuffer(8);
+            const view = new Uint8Array(buffer);
+            view.set([1, 2, 3, 4, 5, 6, 7, 8]);
+
+            const result = toClonedArrayBuffer(view);
+            expect(result).toBe(buffer);
+            expect(Array.from(new Uint8Array(result))).toEqual([
+                1, 2, 3, 4, 5, 6, 7, 8,
+            ]);
+        });
+
+        it("should clone a new ArrayBuffer when the view is a slice", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: utils", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
+            const buffer = new ArrayBuffer(8);
+            const view = new Uint8Array(buffer);
+            view.set([1, 2, 3, 4, 5, 6, 7, 8]);
+
+            const slice = new Uint8Array(buffer, 2, 4);
+            const result = toClonedArrayBuffer(slice);
+
+            expect(result).not.toBe(buffer);
+            expect(result.byteLength).toBe(4);
+            expect(Array.from(new Uint8Array(result))).toEqual([3, 4, 5, 6]);
         });
     });
 

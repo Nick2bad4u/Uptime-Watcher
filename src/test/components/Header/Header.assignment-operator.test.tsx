@@ -133,6 +133,7 @@ const createMockSitesStoreState = (sites: Site[]): SitesStore => {
         createSite: vi.fn(async () => {}),
         deleteSite: vi.fn(async () => {}),
         downloadSqliteBackup: vi.fn(async () => createSerializedBackupResult()),
+        saveSqliteBackup: vi.fn(async () => ({ canceled: true } as const)),
         fullResyncSites: vi.fn(async () => {}),
         getSelectedMonitorId: vi.fn(() => undefined),
         getSelectedSite: vi.fn(() => undefined),

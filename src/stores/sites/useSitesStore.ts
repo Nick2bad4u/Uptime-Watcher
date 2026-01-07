@@ -111,6 +111,7 @@ export const useSitesStore: UseBoundStore<StoreApi<SitesStore>> =
                     restoreSqliteBackup: (
                         payload: SerializedDatabaseRestorePayload
                     ) => DataService.restoreSqliteBackup(payload),
+                    saveSqliteBackup: () => DataService.saveSqliteBackup(),
                 },
                 site: {
                     addSite: (site: Site) => SiteService.addSite(site),

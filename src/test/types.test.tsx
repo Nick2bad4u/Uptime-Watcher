@@ -436,6 +436,10 @@ describe("Types Module", () => {
                             buffer: new ArrayBuffer(0),
                             fileName: "backup.db",
                         }),
+                    saveSqliteBackup: () =>
+                        Promise.resolve({
+                            canceled: true as const,
+                        }),
                 },
                 events: {
                     onMonitorStatusChanged: () => {
@@ -573,6 +577,7 @@ describe("Types Module", () => {
             expect(typeof mockAPI.data.exportData).toBe("function");
             expect(typeof mockAPI.data.importData).toBe("function");
             expect(typeof mockAPI.data.downloadSqliteBackup).toBe("function");
+            expect(typeof mockAPI.data.saveSqliteBackup).toBe("function");
 
             expect(typeof mockAPI.events.onMonitorStatusChanged).toBe(
                 "function"

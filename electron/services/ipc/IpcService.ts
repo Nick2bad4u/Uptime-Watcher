@@ -9,6 +9,7 @@ import type {
 import { STATE_SYNC_SOURCE } from "@shared/types/stateSync";
 import { ensureError } from "@shared/utils/errorHandling";
 import { LOG_TEMPLATES } from "@shared/utils/logTemplates";
+import { isRecord } from "@shared/utils/typeHelpers";
 import { ipcMain } from "electron";
 
 import type { UptimeEvents } from "../../events/eventTypes";
@@ -52,13 +53,158 @@ export class IpcService {
 
     private readonly cloudService: CloudService;
 
-    private readonly handleStateSyncStatusUpdate = (
-        data: UptimeEvents["sites:state-synchronized"] & {
-            _meta?: EventMetadata;
+    private readonly handleStateSyncStatusUpdate = (data: unknown): void => {
+        const normalized = this.normalizeStateSyncPayload(data);
+        if (!normalized) {
+            logger.warn(
+                "[IpcService] Ignoring malformed sites:state-synchronized payload",
+                {
+                    payloadType: Array.isArray(data) ? "array" : typeof data,
+                }
+            );
+            return;
         }
-    ): void => {
-        this.updateStateSyncStatusFromEvent(data);
+
+        this.updateStateSyncStatusFromEvent(normalized);
     };
+
+private static isValidStateSyncSource(
+        candidate: unknown
+    ): candidate is StateSyncSource {
+        return (
+            candidate === STATE_SYNC_SOURCE.CACHE ||
+            candidate === STATE_SYNC_SOURCE.DATABASE ||
+            candidate === STATE_SYNC_SOURCE.FRONTEND
+        );
+    }
+
+    private static buildIdentifierOnlySites(candidate: unknown): Site[] {
+        if (!Array.isArray(candidate)) {
+            return [];
+        }
+
+        return candidate
+            .filter(isRecord)
+            .map((siteCandidate) => siteCandidate["identifier"])
+            .filter((identifier): identifier is string =>
+                typeof identifier === "string"
+            )
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Identifier-only snapshots are sufficient for IPC sync bookkeeping.
+            .map((identifier) => ({ identifier }) as Site);
+    }
+
+    /**
+     * Normalizes a raw state-sync event payload into a lightweight shape the
+     * IPC layer can safely consume.
+     *
+     * @remarks
+     * We intentionally avoid validating full {@link Site} payloads here.
+     * State sync events can be high-frequency and large, and IPC only needs
+     * identifiers and counts to maintain {@link StateSyncStatusSummary}.
+     */
+    private normalizeStateSyncPayload(
+        candidate: unknown
+    ):
+        | null
+        | (UptimeEvents["sites:state-synchronized"] & {
+              _meta?: EventMetadata;
+          }) {
+        if (!isRecord(candidate)) {
+            return null;
+        }
+
+        const { action, revision, source, timestamp } = candidate;
+
+        if (
+            (action !== "bulk-sync" && action !== "delete" && action !== "update") ||
+            !IpcService.isValidStateSyncSource(source) ||
+            typeof timestamp !== "number" ||
+            !Number.isFinite(timestamp) ||
+            typeof revision !== "number" ||
+            !Number.isFinite(revision)
+        ) {
+            return null;
+        }
+
+        if (action === "bulk-sync") {
+            const {
+                siteCount: siteCountCandidate,
+                sites: sitesCandidate,
+                truncated,
+            } = candidate;
+
+            if (
+                typeof siteCountCandidate !== "number" ||
+                !Number.isFinite(siteCountCandidate) ||
+                !Array.isArray(sitesCandidate)
+            ) {
+                return null;
+            }
+
+            const isTruncated = truncated === true;
+            const sites = isTruncated
+                ? []
+                : IpcService.buildIdentifierOnlySites(sitesCandidate);
+
+            return {
+                action,
+                revision,
+                // Preserve the declared count even if we drop invalid site entries.
+                siteCount: Math.max(0, Math.trunc(siteCountCandidate)),
+                sites,
+                source,
+                timestamp,
+                truncated: isTruncated,
+            } as UptimeEvents["sites:state-synchronized"] & {
+                _meta?: EventMetadata;
+            };
+        }
+
+        const { delta: deltaCandidate } = candidate;
+        if (!isRecord(deltaCandidate)) {
+            return null;
+        }
+
+        const {
+            addedSites: addedSitesCandidate,
+            removedSiteIdentifiers: removedSiteIdentifiersCandidate,
+            updatedSites: updatedSitesCandidate,
+        } = deltaCandidate;
+
+        if (
+            !Array.isArray(addedSitesCandidate) ||
+            !Array.isArray(updatedSitesCandidate) ||
+            !Array.isArray(removedSiteIdentifiersCandidate)
+        ) {
+            return null;
+        }
+
+        const addedSites = IpcService.buildIdentifierOnlySites(
+            addedSitesCandidate
+        );
+        const updatedSites = IpcService.buildIdentifierOnlySites(
+            updatedSitesCandidate
+        );
+        const removedSiteIdentifiers = removedSiteIdentifiersCandidate.filter(
+            (identifier): identifier is string => typeof identifier === "string"
+        );
+
+        return {
+            action,
+            delta: {
+                addedSites,
+                removedSiteIdentifiers,
+                updatedSites,
+            },
+            revision,
+            source,
+            timestamp,
+        } as UptimeEvents["sites:state-synchronized"] & {
+            _meta?: EventMetadata;
+        };
+    }
+
+
 
     public constructor(
         uptimeOrchestrator: UptimeOrchestrator,
@@ -190,19 +336,21 @@ export class IpcService {
             _meta?: EventMetadata;
         }
     ): void {
-        const { source, timestamp } = event;
+        const { action, source, timestamp, truncated } = event;
 
-        if (event.truncated === true) {
+        if (truncated === true) {
+            const { siteCount } = event;
+
             this.stateSyncStatus = {
                 lastSyncAt: timestamp,
-                siteCount: this.knownSiteIdentifiers.size,
+                siteCount,
                 source,
                 synchronized: false,
             } satisfies StateSyncStatusSummary;
             return;
         }
 
-        if (event.action === "bulk-sync") {
+        if (action === "bulk-sync") {
             const { sites } = event;
             this.knownSiteIdentifiers = new Set(
                 sites.map((site) => site.identifier)

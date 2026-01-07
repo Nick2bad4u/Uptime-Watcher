@@ -8,7 +8,7 @@
 
 import { describe, expect, it, vi } from "vitest";
 
-import { createSingleFlight } from "../../../services/ipc/handlers/utils/createSingleFlight";
+import { createSingleFlight } from "@shared/utils/singleFlight";
 
 interface Deferred<T> {
     readonly promise: Promise<T>;

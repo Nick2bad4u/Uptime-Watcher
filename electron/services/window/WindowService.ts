@@ -40,7 +40,12 @@ import { tryGetErrorCode } from "@shared/utils/errorCodes";
 import { ensureError, withErrorHandling } from "@shared/utils/errorHandling";
 import { validateExternalOpenUrlCandidate } from "@shared/utils/urlSafety";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
-import { BrowserWindow, type Event, type HandlerDetails } from "electron";
+import {
+    BrowserWindow,
+    type Event,
+    type HandlerDetails,
+    type WebPreferences,
+} from "electron";
 // eslint-disable-next-line unicorn/import-style -- Need namespace import for path operations
 import * as path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -157,6 +162,25 @@ export class WindowService {
 
         event.preventDefault();
         void this.openExternalIfSafe(url, "will-redirect");
+    };
+
+    /**
+     * Prevent attaching `<webview>` tags.
+     *
+     * @remarks
+     * Even with `webPreferences.webviewTag = false`, explicitly denying
+     * attachment provides defense-in-depth against unexpected Electron
+     * regressions or future configuration drift.
+     */
+    private readonly handleWillAttachWebview = (
+        event: Event,
+        _webPreferences: WebPreferences,
+        params: Record<string, string>
+    ): void => {
+        event.preventDefault();
+        logger.warn("[WindowService] Blocked webview attachment", {
+            src: typeof params["src"] === "string" ? params["src"] : "",
+        });
     };
 
     /**
@@ -379,19 +403,18 @@ export class WindowService {
                     controller.abort();
                 }, FETCH_TIMEOUT);
 
-                let response: Response | undefined;
                 try {
                     // eslint-disable-next-line no-await-in-loop -- Sequential server readiness check required
-                    response = await fetch(SERVER_URL, {
+                    const response = await fetch(SERVER_URL, {
                         signal: controller.signal,
                     });
+
+                    if (response.ok) {
+                        logger.debug("[WindowService] Vite dev server is ready");
+                        return;
+                    }
                 } finally {
                     clearTimeout(timeoutId);
-                }
-
-                if (response?.ok) {
-                    logger.debug("[WindowService] Vite dev server is ready");
-                    return;
                 }
             } catch (error) {
                 // Log only significant errors or last attempt
@@ -826,6 +849,12 @@ export class WindowService {
             this.handleWillRedirect
         );
 
+        // Extra defense-in-depth: never allow webview tags.
+        this.mainWindow.webContents.on(
+            "will-attach-webview",
+            this.handleWillAttachWebview
+        );
+
         this.mainWindow.on("closed", this.handleClosed);
     }
 
@@ -861,6 +890,11 @@ export class WindowService {
         this.mainWindow.webContents.removeListener(
             "will-redirect",
             this.handleWillRedirect
+        );
+
+        this.mainWindow.webContents.removeListener(
+            "will-attach-webview",
+            this.handleWillAttachWebview
         );
 
         this.mainWindow.removeListener("closed", this.handleClosed);

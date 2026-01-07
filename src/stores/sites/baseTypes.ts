@@ -8,6 +8,7 @@
 import type { Monitor, Site, StatusUpdate } from "@shared/types";
 import type {
     SerializedDatabaseBackupResult,
+    SerializedDatabaseBackupSaveResult,
     SerializedDatabaseRestorePayload,
     SerializedDatabaseRestoreResult,
 } from "@shared/types/ipc";
@@ -87,6 +88,8 @@ export interface BaseSiteOperations {
     restoreSqliteBackup: (
         payload: SerializedDatabaseRestorePayload
     ) => Promise<SerializedDatabaseRestoreResult>;
+    /** Save SQLite backup via main process */
+    saveSqliteBackup: () => Promise<SerializedDatabaseBackupSaveResult>;
     /** Update monitor retry attempts */
     updateMonitorRetryAttempts: (
         siteIdentifier: string,

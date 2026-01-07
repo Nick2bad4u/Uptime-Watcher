@@ -20,9 +20,11 @@ import {
 } from "../../../../../electron/services/database/utils/backup/databaseBackup";
 import { BACKUP_DB_FILE_NAME } from "../../../../../electron/constants";
 import { logger } from "../../../../../electron/utils/logger";
+import { DEFAULT_MAX_BACKUP_SIZE_BYTES } from "@shared/constants/backup";
 import { promises as fs } from "node:fs";
 
 let mockReadFile: ReturnType<typeof vi.spyOn>;
+let mockStat: ReturnType<typeof vi.spyOn>;
 
 describe("databaseBackup.ts - Comprehensive Coverage", () => {
     const testDbPath = "/test/path/database.sqlite";
@@ -34,6 +36,10 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
         // Spy (and restore) instead of module-mocking node:fs to avoid leaking
         // a mocked fs implementation into unrelated suites.
         mockReadFile = vi.spyOn(fs, "readFile");
+        mockStat = vi.spyOn(fs, "stat");
+        mockStat.mockResolvedValue({
+            size: testBuffer.byteLength,
+        } as unknown as Awaited<ReturnType<typeof fs.stat>>);
     });
 
     afterEach(() => {
@@ -198,6 +204,34 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
             ]);
         });
         describe("createDatabaseBackup - Error scenarios", () => {
+            it("should fail early when file size exceeds maximum", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: databaseBackup", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Error Handling", "type");
+
+                mockStat.mockResolvedValue({
+                    size: DEFAULT_MAX_BACKUP_SIZE_BYTES + 1,
+                } as unknown as Awaited<ReturnType<typeof fs.stat>>);
+
+                await expect(
+                    createDatabaseBackup(testDbPath)
+                ).rejects.toThrowError(/exceeds maximum allowed size/i);
+
+                expect(mockReadFile).not.toHaveBeenCalled();
+                expect(logger.error).toHaveBeenCalledWith(
+                    "[DatabaseBackup] Failed to create database backup",
+                    expect.objectContaining({
+                        dbPath: testDbPath,
+                        error: expect.stringMatching(/exceeds maximum allowed size/i),
+                        fileName: BACKUP_DB_FILE_NAME,
+                    })
+                );
+            });
+
             it("should handle file read errors", async ({ task, annotate }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: databaseBackup", "component");

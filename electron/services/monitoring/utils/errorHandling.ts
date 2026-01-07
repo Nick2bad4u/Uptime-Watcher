@@ -15,6 +15,7 @@
 import type { AxiosError } from "axios";
 
 import { getUnknownErrorMessage } from "@shared/utils/errorCatalog";
+import { ensureError } from "@shared/utils/errorHandling";
 import axios from "axios";
 
 import type { MonitorCheckResult } from "../types";
@@ -210,8 +211,6 @@ export function handleAxiosError(
  * non-Error objects, uses "Unknown error" as a fallback message. Logs all
  * errors for diagnostic purposes. Always returns a {@link MonitorCheckResult}
  * and never throws.
- *
-            import { ensureError } from "@shared/utils/errorHandling";
  * @example
  *
  * ```typescript

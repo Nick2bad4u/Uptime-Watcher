@@ -50,6 +50,9 @@ const mockElectronAPI = {
                 sizeBytes: 8,
             },
         }),
+        saveSqliteBackup: vi.fn().mockResolvedValue({
+            canceled: true as const,
+        }),
         exportData: vi.fn(),
     },
     sites: {

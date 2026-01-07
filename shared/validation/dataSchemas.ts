@@ -1,7 +1,11 @@
 import type { SerializedDatabaseBackupMetadata } from "@shared/types/databaseBackup";
-import type { SerializedDatabaseRestoreResult } from "@shared/types/ipc";
+import type {
+    SerializedDatabaseBackupSaveResult,
+    SerializedDatabaseRestoreResult,
+} from "@shared/types/ipc";
 import type { MonitorTypeConfig } from "@shared/types/monitorTypes";
 
+import { DEFAULT_MAX_IPC_BACKUP_TRANSFER_BYTES } from "@shared/constants/backup";
 import { isMonitorTypeConfig } from "@shared/types/monitorTypes";
 import * as z from "zod";
 
@@ -29,11 +33,35 @@ export const serializedDatabaseBackupResultSchema: z.ZodType<{
     metadata: z.infer<typeof serializedDatabaseBackupMetadataSchema>;
 }> = z
     .object({
-        buffer: arrayBufferSchema,
+        buffer: arrayBufferSchema.refine(
+            (buffer) => buffer.byteLength <= DEFAULT_MAX_IPC_BACKUP_TRANSFER_BYTES,
+            {
+                message: `Backup buffer exceeds maximum IPC transfer size (${DEFAULT_MAX_IPC_BACKUP_TRANSFER_BYTES} bytes)`,
+            }
+        ),
         fileName: z.string().min(1),
         metadata: serializedDatabaseBackupMetadataSchema,
     })
     .strict();
+
+export const serializedDatabaseBackupSaveResultSchema: z.ZodType<SerializedDatabaseBackupSaveResult> =
+    z
+        .union([
+            z
+                .object({
+                    canceled: z.literal(true),
+                })
+                .strict(),
+            z
+                .object({
+                    canceled: z.literal(false),
+                    fileName: z.string().min(1),
+                    filePath: z.string().min(1),
+                    metadata: serializedDatabaseBackupMetadataSchema,
+                })
+                .strict(),
+        ])
+        .readonly();
 
 export const serializedDatabaseRestorePayloadSchema: z.ZodType<{
     buffer: ArrayBuffer;
@@ -90,6 +118,11 @@ export const validateSerializedDatabaseBackupResult = (
 ): ReturnType<typeof serializedDatabaseBackupResultSchema.safeParse> =>
     serializedDatabaseBackupResultSchema.safeParse(value);
 
+export const validateSerializedDatabaseBackupSaveResult = (
+    value: unknown
+): ReturnType<typeof serializedDatabaseBackupSaveResultSchema.safeParse> =>
+    serializedDatabaseBackupSaveResultSchema.safeParse(value);
+
 export const validateSerializedDatabaseBackupMetadata = (
     value: unknown
 ): ReturnType<typeof serializedDatabaseBackupMetadataSchema.safeParse> =>
@@ -125,6 +158,9 @@ export type SerializedDatabaseBackupMetadataSchema =
 /** Shared schema type for database backup payloads. */
 export type SerializedDatabaseBackupResultSchema =
     typeof serializedDatabaseBackupResultSchema;
+/** Shared schema type for database backup save results. */
+export type SerializedDatabaseBackupSaveResultSchema =
+    typeof serializedDatabaseBackupSaveResultSchema;
 /** Shared schema type for database restore payloads. */
 export type SerializedDatabaseRestorePayloadSchema =
     typeof serializedDatabaseRestorePayloadSchema;

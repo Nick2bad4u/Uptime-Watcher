@@ -103,6 +103,7 @@ import type { DatabaseManager } from "./managers/DatabaseManager";
 import type { MonitorManager } from "./managers/MonitorManager";
 import type { SiteManager } from "./managers/SiteManager";
 import type {
+    DatabaseBackupMetadata,
     DatabaseBackupResult,
     DatabaseRestorePayload,
     DatabaseRestoreSummary,
@@ -653,6 +654,26 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
                 code: "ORCHESTRATOR_DOWNLOAD_BACKUP_FAILED",
                 message: "Failed to download SQLite backup",
                 operation: "orchestrator.downloadBackup",
+            }
+        );
+    }
+
+    /**
+     * Saves a backup of the SQLite database directly to disk.
+     *
+     * @remarks
+     * Prefer this over {@link downloadBackup} for large databases because it
+     * avoids materializing the backup as a large in-memory buffer.
+     */
+    public async saveBackupToPath(
+        targetPath: string
+    ): Promise<DatabaseBackupMetadata> {
+        return this.runWithContext(
+            () => this.databaseManager.saveBackupToPath(targetPath),
+            {
+                code: "ORCHESTRATOR_SAVE_BACKUP_FAILED",
+                message: "Failed to save SQLite backup",
+                operation: "orchestrator.saveBackupToPath",
             }
         );
     }

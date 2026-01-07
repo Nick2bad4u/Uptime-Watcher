@@ -108,7 +108,10 @@ export function registerStateSyncHandlers({
                   }
                 : {
                       lastSyncAt,
-                      siteCount: normalizedCachedSiteCount,
+                      siteCount: Math.max(
+                          normalizedCachedSiteCount,
+                          normalizedSiteCount
+                      ),
                       source: STATE_SYNC_SOURCE.CACHE,
                       synchronized: false,
                   };

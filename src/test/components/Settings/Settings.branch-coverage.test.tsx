@@ -38,13 +38,18 @@ type MutableSitesStore = ReturnType<typeof createSitesStoreMock>;
 vi.mock("../../../stores/error/useErrorStore");
 vi.mock("../../../stores/settings/useSettingsStore");
 
-const createDefaultDownloadBackup = () =>
-    vi.fn(async () => createSerializedBackupResult());
+const createDefaultSaveBackup = () =>
+    vi.fn(async () => ({
+        canceled: false as const,
+        fileName: "uptime-watcher-backup.sqlite",
+        filePath: "/tmp/uptime-watcher-backup.sqlite",
+        metadata: createSerializedBackupResult().metadata,
+    }));
 
 const createDefaultFullResync = () => vi.fn(async () => undefined);
 
 const sitesStoreState = createSitesStoreMock({
-    downloadSqliteBackup: createDefaultDownloadBackup(),
+    saveSqliteBackup: createDefaultSaveBackup(),
     fullResyncSites: createDefaultFullResync(),
     restoreSqliteBackup: vi.fn(async () => createSerializedRestoreResult()),
     lastBackupMetadata: createSerializedBackupResult().metadata,
@@ -57,7 +62,7 @@ const useSitesStoreMock = createSelectorHookMock(sitesStoreState);
 
 const resetSitesStoreState = (): void => {
     updateSitesStoreMock(sitesStoreState, {
-        downloadSqliteBackup: createDefaultDownloadBackup(),
+        saveSqliteBackup: createDefaultSaveBackup(),
         fullResyncSites: createDefaultFullResync(),
         restoreSqliteBackup: vi.fn(async () => createSerializedRestoreResult()),
         lastBackupMetadata: createSerializedBackupResult().metadata,
@@ -519,7 +524,7 @@ describe("Settings - Branch Coverage Tests", () => {
             });
         });
 
-        it("should handle backup download errors", async ({
+        it("should handle backup save errors", async ({
             task,
             annotate,
         }) => {
@@ -535,7 +540,7 @@ describe("Settings - Branch Coverage Tests", () => {
 
             const backupError = new Error("Backup failed");
             setSitesStoreState({
-                downloadSqliteBackup: vi.fn().mockRejectedValue(backupError),
+                saveSqliteBackup: vi.fn().mockRejectedValue(backupError),
             });
 
             render(<Settings onClose={mockOnClose} />);
@@ -547,7 +552,7 @@ describe("Settings - Branch Coverage Tests", () => {
 
             await waitFor(() => {
                 expect(mockErrorStore.setError).toHaveBeenCalledWith(
-                    "Failed to download SQLite backup: Backup failed"
+                    "Failed to save SQLite backup: Backup failed"
                 );
             });
         });
@@ -764,7 +769,7 @@ describe("Settings - Branch Coverage Tests", () => {
 
             const errorWithoutMessage = { code: "ERROR_CODE" };
             setSitesStoreState({
-                downloadSqliteBackup: vi
+                saveSqliteBackup: vi
                     .fn()
                     .mockRejectedValue(errorWithoutMessage),
             });
@@ -778,7 +783,7 @@ describe("Settings - Branch Coverage Tests", () => {
 
             await waitFor(() => {
                 expect(mockErrorStore.setError).toHaveBeenCalledWith(
-                    "Failed to download SQLite backup: Unknown error"
+                    "Failed to save SQLite backup: Unknown error"
                 );
             });
         });
@@ -949,7 +954,7 @@ describe("Settings - Branch Coverage Tests", () => {
             });
         });
 
-        it("should handle successful backup download", async ({
+        it("should handle successful backup save", async ({
             task,
             annotate,
         }) => {
@@ -964,10 +969,12 @@ describe("Settings - Branch Coverage Tests", () => {
             annotate("Type: Backup Operation", "type");
 
             const user = userEvent.setup();
-            const mockDownloadBackup = vi.fn().mockResolvedValue(undefined);
+            const mockSaveBackup = vi
+                .fn()
+                .mockResolvedValue({ canceled: true } as const);
 
             setSitesStoreState({
-                downloadSqliteBackup: mockDownloadBackup,
+                saveSqliteBackup: mockSaveBackup,
             });
 
             render(<Settings onClose={mockOnClose} />);
@@ -978,7 +985,7 @@ describe("Settings - Branch Coverage Tests", () => {
             await user.click(backupButton);
 
             await waitFor(() => {
-                expect(mockDownloadBackup).toHaveBeenCalled();
+                expect(mockSaveBackup).toHaveBeenCalled();
             });
         });
     });

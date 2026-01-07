@@ -257,6 +257,10 @@ describe(WindowService, () => {
                 "will-redirect",
                 expect.any(Function)
             );
+            expect(window.webContents.on).toHaveBeenCalledWith(
+                "will-attach-webview",
+                expect.any(Function)
+            );
             expect(
                 window.webContents.setWindowOpenHandler
             ).toHaveBeenCalledWith(expect.any(Function));
@@ -1140,6 +1144,18 @@ describe(WindowService, () => {
             );
             expect(window.webContents.removeListener).toHaveBeenCalledWith(
                 "did-fail-load",
+                expect.any(Function)
+            );
+            expect(window.webContents.removeListener).toHaveBeenCalledWith(
+                "will-navigate",
+                expect.any(Function)
+            );
+            expect(window.webContents.removeListener).toHaveBeenCalledWith(
+                "will-redirect",
+                expect.any(Function)
+            );
+            expect(window.webContents.removeListener).toHaveBeenCalledWith(
+                "will-attach-webview",
                 expect.any(Function)
             );
             expect(window.removeListener).toHaveBeenCalledWith(

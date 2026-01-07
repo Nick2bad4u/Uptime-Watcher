@@ -49,6 +49,15 @@ export interface DataApiInterface extends DataDomainBridge {
      * Restores a SQLite database backup from the renderer
      */
     restoreSqliteBackup: DataDomainBridge["restoreSqliteBackup"];
+
+    /**
+     * Saves a SQLite database backup using an Electron save dialog.
+     *
+     * @remarks
+     * This method exists to avoid transferring large backup buffers across
+     * IPC. The backup is created and written on the main process.
+     */
+    saveSqliteBackup: DataDomainBridge["saveSqliteBackup"];
 }
 
 /**
@@ -84,6 +93,9 @@ export const dataApi: DataApiInterface = {
 
     /** Restores a SQLite backup from an uploaded file */
     restoreSqliteBackup: createTypedInvoker(DATA_CHANNELS.restoreSqliteBackup),
+
+    /** Saves a SQLite backup to disk via the main process. */
+    saveSqliteBackup: createTypedInvoker(DATA_CHANNELS.saveSqliteBackup),
 } as const;
 
 /**

@@ -52,6 +52,7 @@ interface DataHandlerValidatorsInterface {
     exportData: IpcParameterValidator;
     importData: IpcParameterValidator;
     restoreSqliteBackup: IpcParameterValidator;
+    saveSqliteBackup: IpcParameterValidator;
 }
 
 /**
@@ -1160,6 +1161,14 @@ export const DataHandlerValidators: DataHandlerValidatorsInterface = {
      * Validates parameters for the "restore-sqlite-backup" IPC handler.
      */
     restoreSqliteBackup: validateRestorePayload,
+
+    /**
+     * Validates parameters for the "save-sqlite-backup" IPC handler.
+     *
+     * @remarks
+     * Expects no parameters.
+     */
+    saveSqliteBackup: createNoParamsValidator(),
 } as const;
 
 /**

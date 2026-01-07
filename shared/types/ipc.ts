@@ -119,6 +119,30 @@ export interface SerializedDatabaseBackupResult {
 }
 
 /**
+ * Result returned when saving a SQLite backup via the main process.
+ *
+ * @remarks
+ * This channel exists to avoid transferring large backup buffers over IPC.
+ */
+export type SerializedDatabaseBackupSaveResult = Simplify<
+    ExclusifyUnion<
+        | {
+              /** Indicates the user dismissed the save dialog. */
+              canceled: true;
+          }
+        | {
+              canceled: false;
+              /** File name written to disk (basename of {@link filePath}). */
+              fileName: string;
+              /** Absolute path where the backup was written. */
+              filePath: string;
+              /** Metadata describing the created backup. */
+              metadata: SerializedDatabaseBackupMetadata;
+          }
+    >
+>;
+
+/**
  * Payload supplied by renderer processes when restoring SQLite backups.
  */
 export interface SerializedDatabaseRestorePayload {
@@ -406,6 +430,10 @@ export interface IpcInvokeChannelMap {
     "restore-sqlite-backup": {
         params: readonly [payload: SerializedDatabaseRestorePayload];
         result: SerializedDatabaseRestoreResult;
+    };
+    "save-sqlite-backup": {
+        params: readonly [];
+        result: SerializedDatabaseBackupSaveResult;
     };
     "start-monitoring": {
         params: readonly [];

@@ -12,6 +12,7 @@ import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 import { DataService } from "../../services/DataService";
 import type {
     SerializedDatabaseBackupResult,
+    SerializedDatabaseBackupSaveResult,
     SerializedDatabaseRestorePayload,
     SerializedDatabaseRestoreResult,
 } from "@shared/types/ipc";
@@ -116,10 +117,32 @@ function createMockRestorePayload(): SerializedDatabaseRestorePayload {
     };
 }
 
+function createMockSaveResult(
+    overrides: Partial<SerializedDatabaseBackupSaveResult> = {}
+): SerializedDatabaseBackupSaveResult {
+    if ("canceled" in overrides && overrides.canceled === false) {
+        return {
+            canceled: false,
+            fileName: "backup.sqlite",
+            filePath: "/tmp/backup.sqlite",
+            metadata: createMockBackupResult().metadata,
+            ...overrides,
+        } as SerializedDatabaseBackupSaveResult;
+    }
+
+    return {
+        canceled: true,
+        ...overrides,
+    } as SerializedDatabaseBackupSaveResult;
+}
+
 function createMockDataApi() {
     return {
         downloadSqliteBackup: vi.fn(() =>
             Promise.resolve(createMockBackupResult())
+        ),
+        saveSqliteBackup: vi.fn(() =>
+            Promise.resolve(createMockSaveResult())
         ),
         exportData: vi.fn(() =>
             Promise.resolve('{"sites":[],"monitors":[],"settings":{}}')
@@ -172,6 +195,7 @@ describe("DataService", () => {
         it("should expose all required methods", () => {
             const expectedMethods = [
                 "downloadSqliteBackup",
+                "saveSqliteBackup",
                 "exportData",
                 "importData",
                 "restoreSqliteBackup",
@@ -648,7 +672,7 @@ describe("DataService", () => {
     });
 
     describe("Data Validation Edge Cases", () => {
-        it("should handle extremely large backup files", async () => {
+        it("should reject extremely large backup files", async () => {
             const largeBuffer = new ArrayBuffer(50 * 1024 * 1024); // 50MB
             const largeBackup = {
                 buffer: largeBuffer,
@@ -667,10 +691,9 @@ describe("DataService", () => {
                 largeBackup
             );
 
-            const result = await DataService.downloadSqliteBackup();
-
-            expect(result.buffer.byteLength).toBe(50 * 1024 * 1024);
-            expect(result.fileName).toBe("large_backup.sqlite");
+            await expect(
+                DataService.downloadSqliteBackup()
+            ).rejects.toThrowError(/exceeds maximum ipc transfer size/i);
         });
 
         it("should handle unicode characters in export/import", async () => {

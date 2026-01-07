@@ -135,6 +135,7 @@ const createMockElectronAPI = (_hasAPI = true, hasEvents = true) => ({
                 sizeBytes: 8,
             },
         }),
+        saveSqliteBackup: vi.fn().mockResolvedValue({ canceled: true } as const),
         exportData: vi.fn(),
         importData: vi.fn(),
     },

@@ -15,6 +15,7 @@
 
 import type {
     SerializedDatabaseBackupResult,
+    SerializedDatabaseBackupSaveResult,
     SerializedDatabaseRestorePayload,
     SerializedDatabaseRestoreResult,
 } from "@shared/types/ipc";
@@ -22,6 +23,7 @@ import type {
 import { ensureError } from "@shared/utils/errorHandling";
 import {
     validateSerializedDatabaseBackupResult,
+    validateSerializedDatabaseBackupSaveResult,
     validateSerializedDatabaseRestoreResult,
 } from "@shared/validation/dataSchemas";
 
@@ -36,6 +38,7 @@ interface DataServiceContract {
     readonly restoreSqliteBackup: (
         payload: SerializedDatabaseRestorePayload
     ) => Promise<SerializedDatabaseRestoreResult>;
+    readonly saveSqliteBackup: () => Promise<SerializedDatabaseBackupSaveResult>;
 }
 
 // eslint-disable-next-line ex/no-unhandled -- Module-level initialization should fail fast when preload wiring is invalid.
@@ -47,6 +50,7 @@ const { ensureInitialized, wrap } = getIpcServiceHelpers("DataService", {
                 "downloadSqliteBackup",
                 "exportData",
                 "importData",
+                "saveSqliteBackup",
                 "restoreSqliteBackup",
             ],
         },
@@ -217,4 +221,27 @@ export const DataService: DataServiceContract = {
             }
         }
     ),
+
+    /**
+     * Saves a SQLite backup to disk via a native save dialog.
+     *
+     * @remarks
+     * This method exists to avoid transferring large backup buffers over IPC.
+     * The main process creates the backup, shows a save dialog, and writes the
+     * file on behalf of the renderer.
+     */
+    saveSqliteBackup: wrap("saveSqliteBackup", async (api) => {
+        try {
+            return validateServicePayload(
+                validateSerializedDatabaseBackupSaveResult,
+                await api.data.saveSqliteBackup(),
+                {
+                    operation: "saveSqliteBackup",
+                    serviceName: "DataService",
+                }
+            );
+        } catch (error: unknown) {
+            throw ensureError(error);
+        }
+    }),
 };

@@ -2,12 +2,12 @@ import type { CloudEnableSyncConfig } from "@shared/types/cloud";
 import type { IpcInvokeChannel } from "@shared/types/ipc";
 
 import { CLOUD_CHANNELS } from "@shared/types/preload";
+import { createSingleFlight } from "@shared/utils/singleFlight";
 
 import type { CloudService } from "../../cloud/CloudService";
 
 import { createStandardizedIpcRegistrar } from "../utils";
 import { CloudHandlerValidators } from "../validators";
-import { createSingleFlight } from "./utils/createSingleFlight";
 
 /**
  * Dependencies required for registering cloud IPC handlers.
