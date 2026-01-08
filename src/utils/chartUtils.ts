@@ -12,7 +12,7 @@
  */
 
 import type { ChartScalesConfig } from "@shared/types/chartConfig";
-import type { Simplify } from "type-fest";
+import type { Simplify, UnknownRecord } from "type-fest";
 
 import { hasScales as hasScalesInternal } from "@shared/types/chartConfig";
 
@@ -25,7 +25,7 @@ export type ScaleConfigResult = Simplify<{
     /** The scale configuration object */
     config:
         | ChartScalesConfig[keyof ChartScalesConfig]
-        | Record<string, unknown>;
+        | UnknownRecord;
     /** Whether the scale exists */
     exists: boolean;
 }>;
@@ -51,14 +51,15 @@ export function getScaleConfigSafe(
         };
     }
 
-    const chartConfig = config as { scales: Record<string, unknown> };
-    const { scales } = chartConfig;
+    const { scales } = config;
 
-    if (axis in scales && scales[axis] !== undefined) {
-        const scale = scales[axis];
+    if (Object.hasOwn(scales, axis)) {
+        const scale: unknown = scales[axis];
+
         // Validate that the scale is actually an object (handle runtime type safety)
         if (typeof scale === "object" && scale !== null) {
             return {
+
                 config: scale as ChartScalesConfig[keyof ChartScalesConfig],
                 exists: true,
             };
@@ -149,7 +150,7 @@ export function getNestedScalePropertySafe(
 
         validPath.push(part);
         // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe: current is validated as object above, accessing known property
-        current = (current as Record<string, unknown>)[part];
+        current = (current as UnknownRecord)[part];
     }
 
     return {
@@ -207,5 +208,5 @@ export function getScaleProperty(
 
     // Scale is guaranteed to be an object here, safe to access property
     // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe: scale validated as object with hasOwn check above
-    return (scale as Record<string, unknown>)[property];
+    return (scale as UnknownRecord)[property];
 }

@@ -17,11 +17,14 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import type { UnknownRecord } from "type-fest";
 
 import { Settings } from "../../../components/Settings/Settings";
 import { useErrorStore } from "../../../stores/error/useErrorStore";
 import { useSettingsStore } from "../../../stores/settings/useSettingsStore";
 import { useTheme, useThemeClasses } from "../../../theme/useTheme";
+import { ThemeManager } from "../../../theme/ThemeManager";
+import { themes } from "../../../theme/themes";
 import { createSelectorHookMock } from "../../utils/createSelectorHookMock";
 import {
     createSitesStoreMock,
@@ -58,7 +61,12 @@ const sitesStoreState = createSitesStoreMock({
 
 const useSitesStoreMock = createSelectorHookMock(sitesStoreState);
 
-(globalThis as any).__useSitesStoreMock_settingsBranch__ = useSitesStoreMock;
+interface GlobalWithSitesStoreMock extends UnknownRecord {
+    __useSitesStoreMock_settingsBranch__?: typeof useSitesStoreMock;
+}
+
+const globalWithSitesStoreMock = globalThis as unknown as GlobalWithSitesStoreMock;
+globalWithSitesStoreMock.__useSitesStoreMock_settingsBranch__ = useSitesStoreMock;
 
 const resetSitesStoreState = (): void => {
     updateSitesStoreMock(sitesStoreState, {
@@ -71,22 +79,25 @@ const resetSitesStoreState = (): void => {
 };
 
 vi.mock("../../../stores/sites/useSitesStore", () => ({
-    useSitesStore: (selector?: any, equality?: any) =>
-        (globalThis as any).__useSitesStoreMock_settingsBranch__?.(
-            selector,
-            equality
-        ),
+    useSitesStore: <Result = typeof sitesStoreState>(
+        selector?: (state: typeof sitesStoreState) => Result,
+        equality?: (a: Result, b: Result) => boolean
+    ): Result | typeof sitesStoreState => {
+        const hook = globalWithSitesStoreMock.__useSitesStoreMock_settingsBranch__;
+        if (!hook) {
+            throw new Error("useSitesStore mock was not initialized");
+        }
+
+        return hook(selector, equality) as Result | typeof sitesStoreState;
+    },
 }));
 
 vi.mock("../../../theme/useTheme");
-vi.mock("../../../services/logger");
-vi.mock("../../../hooks/useDelayedButtonLoading");
 const confirmMock = vi.fn();
 vi.mock("../../../hooks/ui/useConfirmDialog", () => ({
     useConfirmDialog: () => confirmMock,
 }));
 
-// Mock logger
 vi.mock("../../../services/logger", () => ({
     logger: {
         warn: vi.fn(),
@@ -98,7 +109,6 @@ vi.mock("../../../services/logger", () => ({
     },
 }));
 
-// Mock useDelayedButtonLoading
 vi.mock("../../../hooks/useDelayedButtonLoading", () => ({
     useDelayedButtonLoading: vi.fn(() => false),
 }));
@@ -113,7 +123,7 @@ describe("Settings - Branch Coverage Tests", () => {
     const mockErrorStore = {
         clearError: vi.fn(),
         isLoading: false,
-        lastError: null as string | null,
+        lastError: null as null | string,
         setError: vi.fn(),
         setLoading: vi.fn(),
     };
@@ -121,6 +131,8 @@ describe("Settings - Branch Coverage Tests", () => {
     const mockSettingsStore = {
         persistHistoryLimit: vi.fn().mockResolvedValue(undefined),
         resetSettings: vi.fn().mockResolvedValue(undefined),
+        syncSettings: vi.fn(),
+        updateSettings: vi.fn(),
         settings: {
             autoStart: false,
             historyLimit: 1000,
@@ -129,79 +141,23 @@ describe("Settings - Branch Coverage Tests", () => {
             inAppAlertsSoundEnabled: false,
             systemNotificationsEnabled: true,
             systemNotificationsSoundEnabled: false,
-            theme: "light",
+            theme: "light" as const,
         },
-        syncSettings: vi.fn(),
-        updateSettings: vi.fn(),
     };
 
     const mockTheme = {
-        currentTheme: {
-            name: "light",
-            isDark: false,
-            colors: {
-                primary: "#000",
-                secondary: "#333",
-                background: "#fff",
-                text: "#000",
-                error: "#ff0000",
-                success: "#00ff00",
-                warning: "#ffff00",
-                status: {
-                    up: "#00ff00",
-                    down: "#ff0000",
-                    pending: "#ffff00",
-                },
-            },
-            borderRadius: {
-                sm: "4px",
-                md: "8px",
-                lg: "12px",
-                full: "50%",
-                none: "0",
-                xl: "16px",
-            },
-            shadows: {
-                sm: "0 1px 2px rgba(0, 0, 0, 0.1)",
-                md: "0 4px 6px rgba(0, 0, 0, 0.1)",
-                lg: "0 10px 15px rgba(0, 0, 0, 0.1)",
-                none: "none",
-            },
-            spacing: {
-                sm: "8px",
-                md: "16px",
-                lg: "24px",
-                xl: "32px",
-            },
-            typography: {
-                fontSize: {
-                    sm: "14px",
-                    md: "16px",
-                    lg: "18px",
-                    xl: "20px",
-                },
-                fontWeight: {
-                    normal: "400",
-                    medium: "500",
-                    bold: "600",
-                },
-            },
-        },
-        isDark: false,
-        setTheme: vi.fn(),
-        availableThemes: [
-            "light",
-            "dark",
-            "system",
-        ],
+        availableThemes: ["light", "dark", "system"],
+        currentTheme: themes.light,
         getColor: vi.fn(() => "#000"),
         getStatusColor: vi.fn(),
+        isDark: false,
+        setTheme: vi.fn(),
         systemTheme: "light",
-        themeManager: {},
+        themeManager: ThemeManager.getInstance(),
         themeName: "light",
-        themeVersion: "1.0.0",
+        themeVersion: 1,
         toggleTheme: vi.fn(),
-    } as any;
+    } satisfies ReturnType<typeof useTheme>;
 
     const mockOnClose = vi.fn();
 
@@ -255,13 +211,13 @@ describe("Settings - Branch Coverage Tests", () => {
                 .fn()
                 .mockReturnValue({ backgroundColor: "#ffffff" }),
             getBorderClass: vi.fn().mockReturnValue({ borderColor: "#cccccc" }),
-            getTextClass: vi.fn().mockReturnValue({ color: "#000000" }),
             getColor: vi.fn().mockReturnValue("#000000"),
             getStatusClass: vi.fn().mockReturnValue({ color: "#000000" }),
             getSurfaceClass: vi
                 .fn()
                 .mockReturnValue({ backgroundColor: "#f5f5f5" }),
-        } as any);
+            getTextClass: vi.fn().mockReturnValue({ color: "#000000" }),
+        } satisfies ReturnType<typeof useThemeClasses>);
 
         // Reset confirmation dialog mock
         confirmMock.mockReset();

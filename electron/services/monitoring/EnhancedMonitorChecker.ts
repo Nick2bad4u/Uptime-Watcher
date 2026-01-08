@@ -37,6 +37,7 @@ import type {
     MonitorLifecycleEventData,
     MonitorUpEventData,
 } from "@shared/types/events";
+import type { UnknownRecord } from "type-fest";
 
 import { BASE_MONITOR_TYPES } from "@shared/types";
 import {
@@ -201,7 +202,7 @@ export class EnhancedMonitorChecker {
      */
     private readonly servicesByType: Map<Monitor["type"], IMonitorService>;
 
-    private static isUnknownRecord(value: unknown): value is Record<string, unknown> {
+    private static isUnknownRecord(value: unknown): value is UnknownRecord {
         return (
             typeof value === "object" &&
             value !== null &&

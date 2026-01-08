@@ -3,6 +3,8 @@
  *
  * @public
  */
+import type { UnknownRecord } from "type-fest";
+
 export const STATUS_KIND = {
     DEGRADED: "degraded",
     DOWN: "down",
@@ -400,7 +402,7 @@ export interface StatusHistory {
  *
  * @public
  */
-export interface StatusUpdate extends Readonly<Record<PropertyKey, unknown>> {
+export interface StatusUpdate extends Readonly<UnknownRecord> {
     /** Optional diagnostic message describing the change. */
     details?: string;
     readonly length?: never;

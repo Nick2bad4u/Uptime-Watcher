@@ -14,6 +14,7 @@
  */
 
 import type { AxiosInstance, AxiosRequestConfig } from "axios";
+import type { UnknownRecord } from "type-fest";
 
 import { readNumberEnv } from "@shared/utils/environment";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
@@ -234,8 +235,8 @@ function getSharedHttpsAgent(): https.Agent {
 
 const ALLOWED_REDIRECT_PROTOCOLS = new Set(["http:", "https:"]);
 
-function isRecord(value: unknown): value is Record<string, unknown> {
-    return typeof value === "object" && value !== null;
+function isRecord(value: unknown): value is UnknownRecord {
+    return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
 /**

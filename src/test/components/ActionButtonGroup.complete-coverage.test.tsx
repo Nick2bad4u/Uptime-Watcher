@@ -6,10 +6,22 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi, beforeEach } from "vitest";
+import type {
+    ButtonHTMLAttributes,
+    ComponentProps,
+    PropsWithChildren,
+} from "react";
 import { ActionButtonGroup } from "../../components/Dashboard/SiteCard/components/ActionButtonGroup";
 import { ThemeProvider } from "../../theme/components/ThemeProvider";
 
 // Mock ThemedButton
+type ThemedButtonMockProperties = PropsWithChildren<
+    Omit<ButtonHTMLAttributes<HTMLButtonElement>, "onClick"> & {
+        readonly "aria-label"?: string;
+        readonly onClick?: (event: unknown) => void;
+    }
+>;
+
 vi.mock("../../theme/components/ThemedButton", () => ({
     ThemedButton: ({
         children,
@@ -17,7 +29,7 @@ vi.mock("../../theme/components/ThemedButton", () => ({
         disabled,
         "aria-label": ariaLabel,
         ...props
-    }: any) => (
+    }: ThemedButtonMockProperties) => (
         <button
             onClick={onClick}
             disabled={disabled}
@@ -41,7 +53,14 @@ vi.mock(
             isLoading,
             className,
             compact,
-        }: any) => (
+        }: {
+            readonly allMonitorsRunning: boolean;
+            readonly className?: string;
+            readonly compact?: boolean;
+            readonly isLoading: boolean;
+            readonly onStartSiteMonitoring: () => void;
+            readonly onStopSiteMonitoring: () => void;
+        }) => (
             <div
                 data-testid="site-monitoring-button"
                 className={className}
@@ -75,7 +94,11 @@ const defaultProps = {
     onStopSiteMonitoring: vi.fn(),
 };
 
-const renderActionButtonGroup = (props = {}) =>
+type ActionButtonGroupProperties = ComponentProps<typeof ActionButtonGroup>;
+
+const renderActionButtonGroup = (
+    props: Partial<ActionButtonGroupProperties> = {}
+): ReturnType<typeof render> =>
     render(
         <ThemeProvider>
             <ActionButtonGroup {...defaultProps} {...props} />

@@ -1,3 +1,5 @@
+import type { UnknownRecord } from "type-fest";
+
 import { DEFAULT_MAX_BACKUP_SIZE_BYTES } from "@shared/constants/backup";
 import { ensureError } from "@shared/utils/errorHandling";
 import { app } from "electron";
@@ -97,7 +99,7 @@ export function readDatabaseSchemaVersionFromFile(filePath: string): number {
         const result: unknown = database.prepare("PRAGMA user_version").get();
 
         if (result && typeof result === "object" && "user_version" in result) {
-            const version = (result as Record<string, unknown>)[
+            const version = (result as UnknownRecord)[
                 "user_version"
             ];
             if (typeof version === "number") {

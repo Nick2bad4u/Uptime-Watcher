@@ -13,6 +13,8 @@ import type {
     AccessibilityProperties,
     ClickHandler,
     CoreComponentProperties,
+    DataAttributeProperties,
+    DomIdentityProperties,
 } from "@shared/types/componentProps";
 
 import {
@@ -46,7 +48,11 @@ import { CSS_CLASSES } from "./types";
  * @public
  */
 export interface ThemedBoxProperties
-    extends AccessibilityProperties, CoreComponentProperties {
+    extends
+        AccessibilityProperties,
+        CoreComponentProperties,
+        DataAttributeProperties,
+        DomIdentityProperties {
     /**
      * Element type to render (for example `div`, `button`, `section`).
      *

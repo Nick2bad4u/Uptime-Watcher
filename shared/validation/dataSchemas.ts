@@ -4,6 +4,7 @@ import type {
     SerializedDatabaseRestoreResult,
 } from "@shared/types/ipc";
 import type { MonitorTypeConfig } from "@shared/types/monitorTypes";
+import type { UnknownRecord } from "type-fest";
 
 import { DEFAULT_MAX_IPC_BACKUP_TRANSFER_BYTES } from "@shared/constants/backup";
 import { isMonitorTypeConfig } from "@shared/types/monitorTypes";
@@ -100,7 +101,7 @@ export const monitorTypeConfigArraySchema: z.ZodType<MonitorTypeConfig[]> = z
 export const validationResultSchema: z.ZodType<{
     data?: unknown;
     errors: string[];
-    metadata?: Record<string, unknown> | undefined;
+    metadata?: undefined | UnknownRecord;
     success: boolean;
     warnings?: string[] | undefined;
 }> = z

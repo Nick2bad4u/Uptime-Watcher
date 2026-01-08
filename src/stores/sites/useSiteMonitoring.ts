@@ -9,6 +9,7 @@
  */
 
 import type { Monitor, Site, StatusUpdate } from "@shared/types";
+import type { UnknownRecord } from "type-fest";
 
 import { ensureError, withErrorHandling } from "@shared/utils/errorHandling";
 
@@ -123,20 +124,20 @@ type MonitoringActionName =
 const buildMonitoringLogPayload = (
     siteIdentifier: string,
     monitorId: string | undefined,
-    base: Record<string, unknown>
-): Record<string, unknown> => {
+    base: UnknownRecord
+): UnknownRecord => {
     if (monitorId === undefined) {
         return {
             siteIdentifier,
             ...base,
-        } satisfies Record<string, unknown>;
+        } satisfies UnknownRecord;
     }
 
     return {
         monitorId,
         siteIdentifier,
         ...base,
-    } satisfies Record<string, unknown>;
+    } satisfies UnknownRecord;
 };
 
 /**

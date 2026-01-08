@@ -12,6 +12,8 @@
  * @see {@link IpcParameterValidator}
  */
 
+import type { UnknownRecord } from "type-fest";
+
 import { DEFAULT_MAX_BACKUP_SIZE_BYTES } from "@shared/constants/backup";
 import { normalizePathSeparatorsToPosix } from "@shared/utils/pathSeparators";
 import { hasAsciiControlCharacters } from "@shared/utils/stringSafety";
@@ -166,7 +168,7 @@ function toValidationResult(
 
 type RequiredRecordResult =
     | { readonly error: ParameterValueValidationResult; readonly ok: false }
-    | { readonly ok: true; readonly record: Record<string, unknown> };
+    | { readonly ok: true; readonly record: UnknownRecord };
 
 const isRequiredRecordError = (
     result: RequiredRecordResult
@@ -183,7 +185,7 @@ const requireRecordParam = (
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- validated as object above
-    return { ok: true, record: value as Record<string, unknown> };
+    return { ok: true, record: value as UnknownRecord };
 };
 
 interface CreateParamValidatorOptions {
@@ -511,7 +513,7 @@ const validatePreloadGuardReport: IpcParameterValidator = createParamValidator(
             }
 
             // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- guardReport validated as object
-            const record = report as Record<string, unknown>;
+            const record = report as UnknownRecord;
 
             const channelError = IpcValidators.requiredString(
                 record["channel"],
@@ -718,7 +720,7 @@ const validateRestorePayload: IpcParameterValidator = createParamValidator(1, [
         }
 
         // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- payload validated as object above
-        const record = payload as Record<string, unknown>;
+        const record = payload as UnknownRecord;
         errors.push(...validateRestoreBufferCandidate(record["buffer"]));
 
         const fileNameValue = record["fileName"];

@@ -8,6 +8,8 @@
  * The estimate is conservative and stops early once the budget is exceeded.
  */
 
+import type { UnknownRecord } from "type-fest";
+
 import { getUtfByteLength } from "@shared/utils/utfByteLength";
 
 const JSON_BYTE_BUDGET_LEAVE = Symbol("json-byte-budget-leave");
@@ -32,7 +34,7 @@ interface JsonByteBudgetState {
     readonly stack: unknown[];
 }
 
-function isPlainRecord(value: unknown): value is Record<string, unknown> {
+function isPlainRecord(value: unknown): value is UnknownRecord {
     return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
@@ -82,12 +84,6 @@ function addJsonBytesForObject(
     }
 
     const isArray = Array.isArray(value);
-    const isRecord = !isArray && isPlainRecord(value);
-
-    if (!isArray && !isRecord) {
-        addBytes(state, state.maxBytes + 1);
-        return;
-    }
 
     // Detect only true cycles (the same object encountered again while still
     // on the current traversal path). Shared references are valid in JSON and
@@ -113,9 +109,14 @@ function addJsonBytesForObject(
         return;
     }
 
+    if (!isPlainRecord(value)) {
+        addBytes(state, state.maxBytes + 1);
+        return;
+    }
+
     addBytes(state, 2);
 
-    const record: Record<string, unknown> = value;
+    const record = value;
     const keys = Object.keys(record);
 
     if (keys.length > 1) {

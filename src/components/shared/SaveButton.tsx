@@ -6,7 +6,10 @@
  * accessibility support. Used throughout forms and settings interfaces.
  */
 
-import type { CoreComponentProperties } from "@shared/types/componentProps";
+import type {
+    ComponentProperties,
+    StandardButtonProperties,
+} from "@shared/types/componentProps";
 
 import { type FC, useMemo } from "react";
 
@@ -14,18 +17,24 @@ import { ThemedButton } from "../../theme/components/ThemedButton";
 import { AppIcons, getIconSize } from "../../utils/icons";
 
 /**
- * Props for the SaveButton component
+ * Props for the SaveButton component.
+ *
+ * @remarks
+ * This component forwards most button/DOM attributes to the underlying
+ * {@link ThemedButton}. See {@link StandardButtonProperties} for the shared
+ * prop surface.
  */
-export interface SaveButtonProperties extends CoreComponentProperties {
-    /** Accessibility label */
-    readonly "aria-label"?: string;
-    /** Whether the save operation is loading */
-    readonly isLoading?: boolean;
-    /** Click handler for the save action */
-    readonly onClick: () => void;
-    /** Button size variant */
-    readonly size?: "lg" | "md" | "sm" | "xs";
-}
+export type SaveButtonProperties = ComponentProperties<
+    StandardButtonProperties,
+    Readonly<{
+        /** Whether the save operation is loading. */
+        readonly isLoading?: boolean;
+        /** Click handler for the save action. */
+        readonly onClick: () => void;
+        /** Button size variant. */
+        readonly size?: "lg" | "md" | "sm" | "xs";
+    }>
+>;
 
 /**
  * Standardized save button with consistent styling and behavior

@@ -45,6 +45,7 @@
  * ```
  */
 import type { Database } from "node-sqlite3-wasm";
+import type { UnknownRecord } from "type-fest";
 
 import { DEFAULT_SITE_NAME } from "@shared/constants/sites";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
@@ -423,7 +424,7 @@ export class SiteRepository {
     private async runSiteReadOperation<TResult>(
         operationName: string,
         handler: (db: Database) => TResult,
-        metadata?: Record<string, unknown>
+        metadata?: UnknownRecord
     ): Promise<TResult> {
         return withDatabaseOperation(
             () => {

@@ -6,8 +6,9 @@
  */
 
 import type { JsonValue } from "@shared/types/cloudSync";
+import type { JsonObject } from "type-fest";
 
-function isJsonRecord(value: JsonValue): value is Record<string, JsonValue> {
+function isJsonRecord(value: JsonValue): value is JsonObject {
     return !Array.isArray(value) && typeof value === "object" && value !== null;
 }
 
@@ -24,7 +25,7 @@ export function createCanonicalJsonValue(value: JsonValue): JsonValue {
         const entries = Object.entries(value).toSorted(([a], [b]) =>
             a.localeCompare(b)
         );
-        const result: Record<string, JsonValue> = {};
+        const result: JsonObject = {};
         for (const [key, entryValue] of entries) {
             result[key] = createCanonicalJsonValue(entryValue);
         }

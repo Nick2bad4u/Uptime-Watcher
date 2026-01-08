@@ -13,6 +13,8 @@
 /* eslint-disable @typescript-eslint/no-unnecessary-condition, sonarjs/different-types-comparison -- Defensive programming for test edge cases and cross-environment compatibility */
 // Defensive programming for test edge cases and cross-environment compatibility
 
+import type { UnknownRecord } from "type-fest";
+
 import { isRecord } from "@shared/utils/typeHelpers";
 
 import type { SystemThemePreference } from "./components/types";
@@ -270,7 +272,7 @@ export class ThemeManager {
 
     private emitColorShades(
         categoryToken: string,
-        shades: Record<string, unknown>,
+        shades: UnknownRecord,
         visitor: (property: string, value: string) => void
     ): void {
         for (const [shadeKey, nestedValue] of Object.entries(shades)) {

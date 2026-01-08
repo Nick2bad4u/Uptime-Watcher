@@ -1,3 +1,5 @@
+import type { UnknownRecord } from "type-fest";
+
 import { generateCorrelationId } from "@shared/utils/correlation";
 import { isRecord } from "@shared/utils/typeHelpers";
 
@@ -256,7 +258,7 @@ export const normalizeLogValue = (value: unknown): unknown => {
         }
 
         if (isRecord(candidate)) {
-            const sanitizedRecord: Record<string, unknown> = {};
+            const sanitizedRecord: UnknownRecord = {};
             for (const [key, entry] of Object.entries(candidate)) {
                 if (isSecretMetadataKey(key)) {
                     sanitizedRecord[key] = SECRET_PLACEHOLDER;

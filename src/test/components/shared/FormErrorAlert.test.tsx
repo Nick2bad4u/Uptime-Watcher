@@ -7,14 +7,25 @@
 import { describe, expect, it, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import type {
+    ButtonHTMLAttributes,
+    HTMLAttributes,
+    PropsWithChildren,
+} from "react";
 import {
     FormErrorAlert,
     type FormErrorAlertProperties,
 } from "../../../components/shared/FormErrorAlert";
 
 // Mock themed components
+type ThemedBoxMockProperties = PropsWithChildren<
+    HTMLAttributes<HTMLDivElement> & {
+        readonly variant?: string;
+    }
+>;
+
 vi.mock("../../../theme/components/ThemedBox", () => ({
-    ThemedBox: ({ children, className, variant }: any) => (
+    ThemedBox: ({ children, className, variant }: ThemedBoxMockProperties) => (
         <div
             data-testid="themed-box"
             className={className}
@@ -25,13 +36,27 @@ vi.mock("../../../theme/components/ThemedBox", () => ({
     ),
 }));
 
+type ThemedTextMockProperties = PropsWithChildren<
+    HTMLAttributes<HTMLSpanElement> & {
+        readonly size?: string;
+        readonly variant?: string;
+    }
+>;
+
 vi.mock("../../../theme/components/ThemedText", () => ({
-    ThemedText: ({ children, size, variant }: any) => (
+    ThemedText: ({ children, size, variant }: ThemedTextMockProperties) => (
         <span data-testid="themed-text" data-size={size} data-variant={variant}>
             {children}
         </span>
     ),
 }));
+
+type ThemedButtonMockProperties = PropsWithChildren<
+    ButtonHTMLAttributes<HTMLButtonElement> & {
+        readonly size?: string;
+        readonly variant?: string;
+    }
+>;
 
 vi.mock("../../../theme/components/ThemedButton", () => ({
     ThemedButton: ({
@@ -41,7 +66,7 @@ vi.mock("../../../theme/components/ThemedButton", () => ({
         size,
         variant,
         ...props
-    }: any) => (
+    }: ThemedButtonMockProperties) => (
         <button
             data-testid="themed-button"
             className={className}

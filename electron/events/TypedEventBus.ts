@@ -29,7 +29,7 @@
  */
 
 import type { EventMetadata } from "@shared/types/events";
-import type { Simplify } from "type-fest";
+import type { Simplify, UnknownRecord } from "type-fest";
 
 import { generateCorrelationId } from "@shared/utils/correlation";
 import {
@@ -229,7 +229,8 @@ type PrimitivePayload =
  * Non-array object payload shape used to distinguish plain objects from arrays.
  * The optional `length` exclusion prevents accidental array matches.
  */
-type NonArrayObjectPayload = Record<PropertyKey, unknown> & {
+// Use Type-Fest's canonical unknown-record typing for object payloads.
+type NonArrayObjectPayload = UnknownRecord & {
     readonly length?: never;
 };
 

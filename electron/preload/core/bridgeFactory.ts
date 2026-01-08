@@ -20,6 +20,7 @@ import type {
     VoidIpcInvokeChannel,
 } from "@shared/types/ipc";
 import type { IpcRendererEvent } from "electron";
+import type { UnknownRecord } from "type-fest";
 
 import { DEFAULT_MAX_BACKUP_SIZE_BYTES } from "@shared/constants/backup";
 import {
@@ -45,8 +46,6 @@ import {
     preloadDiagnosticsLogger,
     preloadLogger,
 } from "../utils/preloadLogger";
-
-type UnknownRecord = Record<string, unknown>;
 
 /**
  * Canonical IPC response shape used by the preload bridge.

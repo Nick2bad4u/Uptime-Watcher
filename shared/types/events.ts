@@ -99,10 +99,7 @@ export const eventMetadataSchema: z.ZodType<EventMetadata> = z
  * Common base shape shared by all event payloads emitted through the typed
  * event bus.
  */
-export interface BaseEventData extends Record<PropertyKey, unknown> {
-    [key: string]: unknown;
-    [key: number]: unknown;
-    [key: symbol]: unknown;
+export interface BaseEventData extends UnknownRecord {
     /** The time (in milliseconds since epoch) when the event occurred. */
     readonly timestamp: number;
     /** Runtime metadata describing the emission context. */

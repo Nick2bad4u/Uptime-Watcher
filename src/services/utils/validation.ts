@@ -9,6 +9,8 @@
  * makes it easier to evolve diagnostics formatting over time.
  */
 
+import type { UnknownRecord } from "type-fest";
+
 import { ApplicationError } from "@shared/utils/errorHandling";
 import { isObject } from "@shared/utils/typeGuards";
 import {
@@ -61,7 +63,7 @@ interface ValidationContext {
      * troubleshooting. This object is JSON-stringified defensively; if
      * serialization fails a placeholder token is used instead.
      */
-    readonly diagnostics?: Record<string, unknown>;
+    readonly diagnostics?: UnknownRecord;
     /**
      * Logical operation name used when constructing error messages.
      *
@@ -77,7 +79,7 @@ interface ValidationContext {
 }
 
 const stringifyDiagnostics = (
-    diagnostics: Record<string, unknown> | undefined
+    diagnostics: undefined | UnknownRecord
 ): string => {
     if (!diagnostics) {
         return "";

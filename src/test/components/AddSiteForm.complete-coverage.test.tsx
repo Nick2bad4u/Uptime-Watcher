@@ -1,6 +1,7 @@
 import type { Site } from "@shared/types";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen } from "@testing-library/react";
+import type { UnknownRecord } from "type-fest";
 
 import { AddSiteForm } from "../../components/AddSiteForm/AddSiteForm";
 import { createSelectorHookMock } from "../utils/createSelectorHookMock";
@@ -26,11 +27,25 @@ const useSitesStoreMock = createSelectorHookMock(sitesStoreState);
 
 // Expose the mock via global so the hoisted mock factory can access it lazily
 
-(globalThis as any).__useSitesStoreMock__ = useSitesStoreMock;
+interface GlobalWithSitesStoreMock extends UnknownRecord {
+    __useSitesStoreMock__?: typeof useSitesStoreMock;
+}
+
+const globalWithSitesStoreMock = globalThis as unknown as GlobalWithSitesStoreMock;
+globalWithSitesStoreMock.__useSitesStoreMock__ = useSitesStoreMock;
 
 vi.mock("../../stores/sites/useSitesStore", () => ({
-    useSitesStore: (selector?: any, equality?: any) =>
-        (globalThis as any).__useSitesStoreMock__?.(selector, equality),
+    useSitesStore: <Result = typeof sitesStoreState>(
+        selector?: (state: typeof sitesStoreState) => Result,
+        equality?: (a: Result, b: Result) => boolean
+    ): Result | typeof sitesStoreState => {
+        const hook = globalWithSitesStoreMock.__useSitesStoreMock__;
+        if (!hook) {
+            throw new Error("useSitesStore mock was not initialized");
+        }
+
+        return hook(selector, equality) as Result | typeof sitesStoreState;
+    },
 }));
 
 const resetSitesStoreState = (): void => {

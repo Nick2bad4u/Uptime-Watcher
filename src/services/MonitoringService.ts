@@ -37,6 +37,7 @@ import type {
     MonitoringStopSummary,
     StatusUpdate,
 } from "@shared/types";
+import type { UnknownRecord } from "type-fest";
 import type { ZodError } from "zod";
 
 import { validateStatusUpdate } from "@shared/validation/guards";
@@ -106,7 +107,7 @@ const resolveIdentifier = (candidate: unknown, fallback: string): string => {
  */
 const logInvalidStatusUpdateAndThrow = (
     error: ZodError,
-    metadata: Record<string, unknown>
+    metadata: UnknownRecord
 ): never => {
     logger.error(
         "[MonitoringService] Invalid status update returned after checkSiteNow",

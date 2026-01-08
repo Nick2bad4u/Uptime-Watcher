@@ -15,6 +15,7 @@ import type {
     SerializedDatabaseRestorePayload,
     SerializedDatabaseRestoreResult,
 } from "@shared/types/ipc";
+import type { UnknownRecord } from "type-fest";
 
 import { DEFAULT_SITE_NAME } from "@shared/constants/sites";
 import { ERROR_CATALOG } from "@shared/utils/errorCatalog";
@@ -46,7 +47,7 @@ const updateMonitorNumericField = async (args: {
     monitorId: string;
     operationName: MonitorNumericUpdateOperationName;
     siteIdentifier: string;
-    telemetry: Record<string, unknown>;
+    telemetry: UnknownRecord;
     value: number | undefined;
 }): Promise<void> => {
     const { deps, field, monitorId, operationName, siteIdentifier, telemetry, value } =

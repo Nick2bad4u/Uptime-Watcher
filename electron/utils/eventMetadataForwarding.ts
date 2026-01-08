@@ -4,6 +4,7 @@
  */
 
 import type { EventMetadata } from "@shared/types/events";
+import type { UnknownRecord } from "type-fest";
 
 import { isEventMetadata as isEventMetadataGuard } from "../events/eventMetadataGuards";
 import { ORIGINAL_METADATA_SYMBOL } from "../events/TypedEventBus";
@@ -158,7 +159,7 @@ export function stripForwardedEventMetadata(
     // At this point payload is a non-null object. Clone into a plain record to
     // strip well-known metadata keys while preserving the remaining shape.
 
-    const clonedPayload: Record<PropertyKey, unknown> = {
+    const clonedPayload: UnknownRecord = {
         ...(payload as object),
     };
 

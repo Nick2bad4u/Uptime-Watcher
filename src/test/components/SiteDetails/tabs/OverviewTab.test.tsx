@@ -5,6 +5,14 @@
 
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { describe, expect, it, vi, beforeEach } from "vitest";
+import type {
+    ButtonHTMLAttributes,
+    HTMLAttributes,
+    InputHTMLAttributes,
+    PropsWithChildren,
+    ReactNode,
+    SelectHTMLAttributes,
+} from "react";
 
 import type { Monitor } from "@shared/types";
 import { OverviewTab } from "../../../../components/SiteDetails/tabs/OverviewTab";
@@ -118,8 +126,19 @@ vi.mock("../../../../theme/useTheme", () => ({
 const withBaseClass = (base: string, provided?: string): string =>
     provided ? `${base} ${provided}` : base;
 
+type StatusIndicatorMockProperties = PropsWithChildren<
+    HTMLAttributes<HTMLDivElement> & {
+        readonly showText?: boolean;
+    }
+>;
+
 vi.mock("../../../../theme/components/StatusIndicator", () => ({
-    StatusIndicator: ({ children, className, showText, ...props }: any) => (
+    StatusIndicator: ({
+        children,
+        className,
+        showText: _showText,
+        ...props
+    }: StatusIndicatorMockProperties) => (
         <div
             className={withBaseClass("themed-status-indicator", className)}
             data-testid="status-indicator"
@@ -130,8 +149,21 @@ vi.mock("../../../../theme/components/StatusIndicator", () => ({
     ),
 }));
 
+type ThemedBadgeMockProperties = PropsWithChildren<
+    HTMLAttributes<HTMLSpanElement> & {
+        readonly icon?: ReactNode;
+        readonly iconColor?: string;
+    }
+>;
+
 vi.mock("../../../../theme/components/ThemedBadge", () => ({
-    ThemedBadge: ({ children, className, icon, iconColor, ...props }: any) => (
+    ThemedBadge: ({
+        children,
+        className,
+        icon,
+        iconColor,
+        ...props
+    }: ThemedBadgeMockProperties) => (
         <span
             className={withBaseClass("themed-badge", className)}
             data-testid="themed-badge"
@@ -151,8 +183,12 @@ vi.mock("../../../../theme/components/ThemedBadge", () => ({
     ),
 }));
 
+type ThemedButtonMockProperties = PropsWithChildren<
+    ButtonHTMLAttributes<HTMLButtonElement>
+>;
+
 vi.mock("../../../../theme/components/ThemedButton", () => ({
-    ThemedButton: ({ children, className, ...props }: any) => (
+    ThemedButton: ({ children, className, ...props }: ThemedButtonMockProperties) => (
         <button
             className={withBaseClass("themed-button", className)}
             data-testid="themed-button"
@@ -163,6 +199,14 @@ vi.mock("../../../../theme/components/ThemedButton", () => ({
     ),
 }));
 
+type ThemedCardMockProperties = PropsWithChildren<
+    HTMLAttributes<HTMLDivElement> & {
+        readonly icon?: ReactNode;
+        readonly iconColor?: string;
+        readonly title?: ReactNode;
+    }
+>;
+
 vi.mock("../../../../theme/components/ThemedCard", () => ({
     ThemedCard: ({
         children,
@@ -172,7 +216,7 @@ vi.mock("../../../../theme/components/ThemedCard", () => ({
         iconColor,
         title,
         ...props
-    }: any) => (
+    }: ThemedCardMockProperties & { readonly hoverable?: boolean }) => (
         <div
             className={withBaseClass("themed-card", className)}
             data-testid="themed-card"
@@ -200,8 +244,10 @@ vi.mock("../../../../theme/components/ThemedCard", () => ({
     ),
 }));
 
+type ThemedInputMockProperties = InputHTMLAttributes<HTMLInputElement>;
+
 vi.mock("../../../../theme/components/ThemedInput", () => ({
-    ThemedInput: ({ className, ...props }: any) => (
+    ThemedInput: ({ className, ...props }: ThemedInputMockProperties) => (
         <input
             className={withBaseClass("themed-input", className)}
             data-testid="themed-input"
@@ -210,8 +256,16 @@ vi.mock("../../../../theme/components/ThemedInput", () => ({
     ),
 }));
 
+type ThemedProgressMockProperties = HTMLAttributes<HTMLDivElement> & {
+    readonly showLabel?: boolean;
+};
+
 vi.mock("../../../../theme/components/ThemedProgress", () => ({
-    ThemedProgress: ({ className, showLabel: _showLabel, ...props }: any) => (
+    ThemedProgress: ({
+        className,
+        showLabel: _showLabel,
+        ...props
+    }: ThemedProgressMockProperties) => (
         <div
             className={withBaseClass("themed-progress", className)}
             data-testid="themed-progress"
@@ -220,8 +274,16 @@ vi.mock("../../../../theme/components/ThemedProgress", () => ({
     ),
 }));
 
+type ThemedSelectMockProperties = PropsWithChildren<
+    SelectHTMLAttributes<HTMLSelectElement>
+>;
+
 vi.mock("../../../../theme/components/ThemedSelect", () => ({
-    ThemedSelect: ({ children, className, ...props }: any) => (
+    ThemedSelect: ({
+        children,
+        className,
+        ...props
+    }: ThemedSelectMockProperties) => (
         <select
             className={withBaseClass("themed-select", className)}
             data-testid="themed-select"
@@ -232,8 +294,16 @@ vi.mock("../../../../theme/components/ThemedSelect", () => ({
     ),
 }));
 
+type ThemedTextMockProperties = PropsWithChildren<
+    HTMLAttributes<HTMLSpanElement>
+>;
+
 vi.mock("../../../../theme/components/ThemedText", () => ({
-    ThemedText: ({ children, className, ...props }: any) => (
+    ThemedText: ({
+        children,
+        className,
+        ...props
+    }: ThemedTextMockProperties) => (
         <span
             className={withBaseClass("themed-text", className)}
             data-testid="themed-text"

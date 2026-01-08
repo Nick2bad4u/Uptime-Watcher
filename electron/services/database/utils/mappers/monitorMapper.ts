@@ -68,7 +68,7 @@ function copyDynamicFields(
             // Dynamic field assignment for monitor type system
             // Key is validated from dynamicMonitor which comes from typed database mapping
             // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Required for dynamic monitor field assignment system
-            (monitor as unknown as Record<string, unknown>)[key] = value;
+            (monitor as unknown as UnknownRecord)[key] = value;
         }
     }
 }

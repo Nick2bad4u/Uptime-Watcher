@@ -41,6 +41,34 @@ export interface CoreComponentProperties {
 }
 
 /**
+ * DOM identity properties commonly forwarded to native elements.
+ *
+ * @remarks
+ * `id` is frequently needed for accessibility, automation, and integration with
+ * browser APIs.
+ *
+ * @public
+ */
+export interface DomIdentityProperties {
+    /** Optional DOM id forwarded to the underlying element. */
+    readonly id?: string;
+}
+
+/**
+ * Strongly-typed `data-*` attributes for automation and diagnostics.
+ *
+ * @remarks
+ * These are intentionally limited to JSON-serializable primitives. React will
+ * stringify these values when emitting to the DOM.
+ *
+ * @public
+ */
+export type DataAttributeProperties = Readonly<
+    Partial<Record<`data-${string}`, boolean | number | string | undefined>>
+>;
+
+
+/**
  * Accessibility properties following ARIA standards.
  *
  * @remarks
@@ -320,6 +348,8 @@ export interface StandardButtonProperties
     extends
         AccessibilityProperties,
         CoreComponentProperties,
+        DataAttributeProperties,
+        DomIdentityProperties,
         IconProperties,
         StateProperties,
         StylingProperties {

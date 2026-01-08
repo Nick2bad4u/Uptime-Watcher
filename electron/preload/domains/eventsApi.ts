@@ -33,6 +33,7 @@ import type {
     UpdateStatusEventData,
 } from "@shared/types/events";
 import type { EventsDomainBridge } from "@shared/types/eventsBridge";
+import type { UnknownRecord } from "type-fest";
 
 import {
     RENDERER_EVENT_CHANNELS,
@@ -152,7 +153,7 @@ const isUpdateStatus = (value: unknown): value is UpdateStatus =>
     typeof value === "string" &&
     UPDATE_STATUS_SET.has(value);
 
-const isUnknownRecord = (value: unknown): value is Record<string, unknown> =>
+const isUnknownRecord = (value: unknown): value is UnknownRecord =>
     isSharedRecord(value);
 
 const hasFiniteTimestamp = (value: unknown): value is number =>

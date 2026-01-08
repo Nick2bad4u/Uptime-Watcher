@@ -100,6 +100,109 @@ export function getSafeUrlForLogging(rawUrl: string): string {
     }
 }
 
+type HttpUrlNormalizationResult =
+    | ExternalOpenUrlAcceptedResult
+    | ExternalOpenUrlRejectedResult;
+
+function getFirstQueryOrHashIndex(url: string): number {
+    const queryIndex = url.indexOf("?");
+    const hashIndex = url.indexOf("#");
+
+    if (queryIndex === -1) {
+        return hashIndex;
+    }
+
+    if (hashIndex === -1) {
+        return queryIndex;
+    }
+
+    return Math.min(queryIndex, hashIndex);
+}
+
+function hasSpaceBeforeQueryOrHash(url: string): boolean {
+    const delimiterIndex = getFirstQueryOrHashIndex(url);
+    const prefix = delimiterIndex === -1 ? url : url.slice(0, delimiterIndex);
+    return prefix.includes(" ");
+}
+
+function isValidHttpUrlWithValidator(url: string): boolean {
+    return validator.isURL(url, {
+        allow_protocol_relative_urls: false,
+        disallow_auth: true,
+        protocols: ["http", "https"],
+        require_host: true,
+        require_protocol: true,
+        // Allow localhost-style hosts. We intentionally do *not* block
+        // private-network hosts for external opening.
+        require_tld: false,
+    });
+}
+
+function tryNormalizeHttpUrlViaWhatwg(url: string): null | string {
+    try {
+        return new URL(url).toString();
+    } catch {
+        return null;
+    }
+}
+
+function normalizeHttpUrlForExternalOpen(args: {
+    safeUrlForLogging: string;
+    url: string;
+}): HttpUrlNormalizationResult {
+    if (isValidHttpUrlWithValidator(args.url)) {
+        return {
+            normalizedUrl: args.url,
+            ok: true,
+            safeUrlForLogging: getSafeUrlForLogging(args.url),
+        };
+    }
+
+    // Keep a strict stance on path whitespace: if spaces appear before the
+    // query/hash delimiter, treat it as invalid rather than "fixing" it.
+    // This preserves our existing security posture and UX.
+    if (hasSpaceBeforeQueryOrHash(args.url)) {
+        return {
+            ok: false,
+            reason: "must be a valid http(s) URL",
+            safeUrlForLogging: args.safeUrlForLogging,
+        };
+    }
+
+    const normalizedViaWhatwg = tryNormalizeHttpUrlViaWhatwg(args.url);
+    if (!normalizedViaWhatwg) {
+        return {
+            ok: false,
+            reason: "must be a valid http(s) URL",
+            safeUrlForLogging: args.safeUrlForLogging,
+        };
+    }
+
+    // Encoding (e.g. spaces -> %20) can grow the URL slightly; enforce the
+    // byte budget on the normalized representation.
+    if (getUtfByteLength(normalizedViaWhatwg) > MAX_EXTERNAL_OPEN_URL_BYTES) {
+        return {
+            ok: false,
+            reason: `must not exceed ${MAX_EXTERNAL_OPEN_URL_BYTES} bytes`,
+            safeUrlForLogging: args.safeUrlForLogging,
+        };
+    }
+
+    if (!isValidHttpUrlWithValidator(normalizedViaWhatwg)) {
+        return {
+            ok: false,
+            reason: "must be a valid http(s) URL",
+            safeUrlForLogging: args.safeUrlForLogging,
+        };
+    }
+
+    return {
+        normalizedUrl: normalizedViaWhatwg,
+        ok: true,
+        safeUrlForLogging: getSafeUrlForLogging(normalizedViaWhatwg),
+    };
+}
+
 function toIpvOctets(
     hostname: string
 ): [number, number, number, number] | null {
@@ -268,7 +371,7 @@ export function validateExternalOpenUrlCandidate(
         };
     }
 
-    const normalizedUrl = rawUrl.trim();
+    let normalizedUrl = rawUrl.trim();
 
     if (
         normalizedUrl.length > 0 &&
@@ -326,24 +429,17 @@ export function validateExternalOpenUrlCandidate(
         normalizedUrlLower.startsWith("http:") ||
         normalizedUrlLower.startsWith("https:")
     ) {
-        const isValidHttpUrl = validator.isURL(normalizedUrl, {
-            allow_protocol_relative_urls: false,
-            disallow_auth: true,
-            protocols: ["http", "https"],
-            require_host: true,
-            require_protocol: true,
-            // Allow localhost-style hosts. We intentionally do *not* block
-            // private-network hosts for external opening.
-            require_tld: false,
+        const normalizedHttpUrl = normalizeHttpUrlForExternalOpen({
+            safeUrlForLogging,
+            url: normalizedUrl,
         });
 
-        if (!isValidHttpUrl) {
-            return {
-                ok: false,
-                reason: "must be a valid http(s) URL",
-                safeUrlForLogging,
-            };
+        if (!normalizedHttpUrl.ok) {
+            return normalizedHttpUrl;
         }
+
+        const { normalizedUrl: normalizedHttpUrlString } = normalizedHttpUrl;
+        normalizedUrl = normalizedHttpUrlString;
     }
 
     if (normalizedUrlLower.startsWith("mailto:")) {
@@ -361,7 +457,8 @@ export function validateExternalOpenUrlCandidate(
     return {
         normalizedUrl,
         ok: true,
-        safeUrlForLogging,
+        // Ensure logging uses a canonical representation (query/hash stripped).
+        safeUrlForLogging: getSafeUrlForLogging(normalizedUrl),
     };
 }
 

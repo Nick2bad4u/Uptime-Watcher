@@ -11,6 +11,7 @@
  */
 import type { RendererEventPayloadMap } from "@shared/ipc/rendererEvents";
 import type { Site, StatusUpdate } from "@shared/types";
+import type { UnknownRecord } from "type-fest";
 
 import { isDevelopment } from "@shared/utils/environment";
 import { ensureError } from "@shared/utils/errorHandling";
@@ -540,7 +541,7 @@ export class StatusUpdateManager {
             | RendererEventPayloadMap["monitoring:started"]
             | RendererEventPayloadMap["monitoring:stopped"]
     ): void {
-        const logPayload: Record<string, unknown> = { phase };
+        const logPayload: UnknownRecord = { phase };
 
         if (event.monitorCount !== undefined) {
             logPayload["monitorCount"] = event.monitorCount;

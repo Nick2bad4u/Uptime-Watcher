@@ -194,6 +194,36 @@ describe("urlSafety", () => {
             const result = validateExternalOpenUrlCandidate(url);
             expect(result.ok).toBeFalsy();
         });
+
+        it("normalizes URLs with unescaped spaces (Dropbox OAuth scope)", () => {
+            // Dropbox's SDK currently generates an OAuth authorize URL where
+            // the `scope` query parameter is space-delimited without
+            // percent-encoding. Browsers are typically lenient, but our safety
+            // helpers should normalize it to a canonical URL.
+            const rawDropboxAuthorizeUrl =
+                "https://dropbox.com/oauth2/authorize?response_type=code&client_id=app-key&redirect_uri=http://localhost:53682/oauth2/callback&state=STATE&token_access_type=offline&scope=account_info.read files.content.read files.content.write files.metadata.read";
+
+            const result = validateExternalOpenUrlCandidate(
+                rawDropboxAuthorizeUrl
+            );
+
+            expect(result.ok).toBeTruthy();
+            if (result.ok === false) {
+                throw new Error(
+                    `Expected ok result, got rejection: ${result.reason}`
+                );
+            }
+
+            // Ensure the spaces in the scope param were encoded.
+            expect(result.normalizedUrl).toContain(
+                "scope=account_info.read%20files.content.read%20files.content.write%20files.metadata.read"
+            );
+
+            // Query is stripped for logs.
+            expect(result.safeUrlForLogging).toBe(
+                "https://dropbox.com/oauth2/authorize"
+            );
+        });
     });
 
     describe(getSafeUrlForLogging, () => {

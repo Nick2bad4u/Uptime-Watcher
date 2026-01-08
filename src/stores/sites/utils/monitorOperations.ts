@@ -10,6 +10,8 @@
 
 /* eslint-disable tsdoc-require/require -- This module has comprehensive TSDoc coverage, but the tsdoc-require rule currently mis-detects documentation on normalizeMonitor due to nearby directives and complex comments. */
 
+import type { UnknownRecord } from "type-fest";
+
 import {
     DEFAULT_MONITOR_CHECK_INTERVAL_MS,
     MIN_MONITOR_CHECK_INTERVAL_MS,
@@ -32,8 +34,6 @@ import {
 } from "@shared/validation/validatorUtils";
 
 import { logger } from "../../../services/logger";
-
-// Import validateMonitor directly from "@shared/types" if needed
 
 /**
  * Baseline defaults applied to every monitor regardless of type.
@@ -59,6 +59,7 @@ function ensureTrimmedStringOrFallback(
 ): string {
     if (typeof value === "string") {
         const trimmed = value.trim();
+
         if (trimmed.length > 0) {
             return trimmed;
         }
@@ -340,7 +341,8 @@ function filterMonitorFieldsByType(
     // to perform dynamic key assignment.
     for (const [key, value] of Object.entries(monitor)) {
         if (allowedFields.has(key)) {
-            (filtered as Record<string, unknown>)[key] = value;
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Dynamic key assignment for field-filtering.
+            (filtered as unknown as UnknownRecord)[key] = value;
         }
     }
 

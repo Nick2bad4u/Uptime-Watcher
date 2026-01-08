@@ -66,7 +66,7 @@ const TELEMETRY_CONFIG_KEYS = [
     "success",
 ] as const;
 
-const isPlainRecord = (value: unknown): value is Record<string, unknown> =>
+const isPlainRecord = (value: unknown): value is UnknownRecord =>
     isSharedRecord(value);
 
 const isTelemetryConfig = (
@@ -126,7 +126,7 @@ const selectStageMetadata = (
 const createTelemetryEmitter =
     (operationName: string, telemetry: NormalizedTelemetry) =>
     (stage: OperationStage, additional: UnknownRecord): void => {
-        const payload: Record<string, unknown> = {
+        const payload: UnknownRecord = {
             ...telemetry.base,
             ...selectStageMetadata(stage, telemetry),
             ...additional,

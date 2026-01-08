@@ -1,5 +1,10 @@
 import type { Site } from "@shared/types";
 import React from "react";
+import type {
+    ButtonHTMLAttributes,
+    HTMLAttributes,
+    PropsWithChildren,
+} from "react";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { vi, describe, it, expect, beforeEach } from "vitest";
 import "@testing-library/jest-dom";
@@ -73,14 +78,25 @@ const sitesStoreState = createSitesStoreMock({
 
 const useSitesStoreMock = createSelectorHookMock(sitesStoreState);
 
-(globalThis as any).__useSitesStoreMock_uncovered__ = useSitesStoreMock;
+interface GlobalWithSitesStoreMock {
+    __useSitesStoreMock_uncovered__?: typeof useSitesStoreMock;
+}
+
+const globalWithMock = globalThis as unknown as GlobalWithSitesStoreMock;
+globalWithMock.__useSitesStoreMock_uncovered__ = useSitesStoreMock;
 
 vi.mock("../../../stores/sites/useSitesStore", () => ({
-    useSitesStore: (selector?: any, equality?: any) =>
-        (globalThis as any).__useSitesStoreMock_uncovered__?.(
-            selector,
-            equality
-        ),
+    useSitesStore: <Result = typeof sitesStoreState>(
+        selector?: (state: typeof sitesStoreState) => Result,
+        equality?: (a: Result, b: Result) => boolean
+    ): Result | typeof sitesStoreState => {
+        const hook = globalWithMock.__useSitesStoreMock_uncovered__;
+        if (!hook) {
+            throw new Error("useSitesStore mock was not initialized");
+        }
+
+        return hook(selector, equality) as Result | typeof sitesStoreState;
+    },
 }));
 
 const resetSitesStoreState = (): void => {
@@ -188,10 +204,19 @@ vi.mock("../../../hooks/useDynamicHelpText", () => ({
 }));
 
 // Mock the component fields to intercept user interactions
+type SelectOption = Readonly<{ label: string; value: string }>;
+type ChangeStringHandler = (nextValue: string) => void;
+
+type SelectFieldMockProperties = Readonly<{
+    id: string;
+    onChange?: ChangeStringHandler;
+    options?: readonly SelectOption[];
+}>;
+
 vi.mock("../../../components/AddSiteForm/SelectField", () => ({
-    SelectField: ({ onChange, options, id }: any) => (
+    SelectField: ({ onChange, options, id }: SelectFieldMockProperties) => (
         <select data-testid={id} onChange={(e) => onChange?.(e.target.value)}>
-            {options?.map((option: any) => (
+            {options?.map((option) => (
                 <option key={option.value} value={option.value}>
                     {option.label}
                 </option>
@@ -204,8 +229,14 @@ vi.mock("../../../components/AddSiteForm/SelectField", () => ({
     ),
 }));
 
+type RadioGroupMockProperties = Readonly<{
+    id: string;
+    onChange?: ChangeStringHandler;
+    options?: readonly SelectOption[];
+}>;
+
 vi.mock("../../../components/AddSiteForm/RadioGroup", () => ({
-    RadioGroup: ({ onChange, options, id }: any) => {
+    RadioGroup: ({ onChange, options, id }: RadioGroupMockProperties) => {
         React.useEffect(() => {
             // Trigger an invalid add mode value once on mount to exercise the
             // error-logging branch in handleAddModeChange.
@@ -214,7 +245,7 @@ vi.mock("../../../components/AddSiteForm/RadioGroup", () => ({
 
         return (
             <div data-testid={id}>
-                {options?.map((option: any) => (
+                {options?.map((option) => (
                     <label key={option.value}>
                         <input
                             type="radio"
@@ -229,8 +260,14 @@ vi.mock("../../../components/AddSiteForm/RadioGroup", () => ({
     },
 }));
 
+type TextFieldMockProperties = Readonly<{
+    id: string;
+    onChange?: ChangeStringHandler;
+    type?: string;
+}>;
+
 vi.mock("../../../components/AddSiteForm/TextField", () => ({
-    TextField: ({ onChange, id, type }: any) => (
+    TextField: ({ onChange, id, type }: TextFieldMockProperties) => (
         <input
             data-testid={id}
             type={type || "text"}
@@ -239,8 +276,12 @@ vi.mock("../../../components/AddSiteForm/TextField", () => ({
     ),
 }));
 
+type DynamicMonitorFieldsMockProperties = Readonly<{
+    monitorType: string;
+}>;
+
 vi.mock("../../../components/AddSiteForm/DynamicMonitorFields", () => ({
-    DynamicMonitorFields: ({ monitorType: _monitorType }: any) => (
+    DynamicMonitorFields: ({ monitorType: _monitorType }: DynamicMonitorFieldsMockProperties) => (
         <div data-testid="dynamic-monitor-fields">
             <input data-testid="host" />
             <input data-testid="port" type="number" />
@@ -293,14 +334,24 @@ vi.mock("../../../hooks/useDelayedButtonLoading", () => ({
     useDelayedButtonLoading: () => false,
 }));
 
+type ThemedBoxMockProperties = PropsWithChildren<HTMLAttributes<HTMLDivElement>>;
+type ThemedButtonMockProperties = PropsWithChildren<
+    ButtonHTMLAttributes<HTMLButtonElement>
+>;
+type ThemedTextMockProperties = PropsWithChildren<HTMLAttributes<HTMLSpanElement>>;
+type ErrorAlertMockProperties = Readonly<{
+    message: string;
+    onDismiss: () => void;
+}>;
+
 vi.mock("../../theme/components/ThemedBox", () => ({
-    ThemedBox: ({ children }: any) => (
+    ThemedBox: ({ children }: ThemedBoxMockProperties) => (
         <div className="themed-box">{children}</div>
     ),
 }));
 
 vi.mock("../../theme/components/ThemedButton", () => ({
-    ThemedButton: ({ children, onClick, type }: any) => (
+    ThemedButton: ({ children, onClick, type }: ThemedButtonMockProperties) => (
         <button className="themed-button" onClick={onClick} type={type}>
             {children}
         </button>
@@ -308,13 +359,13 @@ vi.mock("../../theme/components/ThemedButton", () => ({
 }));
 
 vi.mock("../../theme/components/ThemedText", () => ({
-    ThemedText: ({ children }: any) => (
+    ThemedText: ({ children }: ThemedTextMockProperties) => (
         <span className="themed-text">{children}</span>
     ),
 }));
 
 vi.mock("../../../components/common/ErrorAlert/ErrorAlert", () => ({
-    ErrorAlert: ({ message, onDismiss }: any) => (
+    ErrorAlert: ({ message, onDismiss }: ErrorAlertMockProperties) => (
         <div data-testid="error-alert">
             {message}
             <button onClick={onDismiss}>Clear</button>

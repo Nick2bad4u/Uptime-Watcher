@@ -6,13 +6,26 @@
 import { render, screen } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import React from "react";
+import type { HTMLAttributes, PropsWithChildren } from "react";
 import { HistoryChart } from "../../components/common/HistoryChart";
 import type { StatusHistory } from "@shared/types";
 import { ThemeProvider } from "../../theme/components/ThemeProvider";
 
 // Mock MiniChartBar component
+type MiniChartBarMockProperties = Readonly<{
+    className?: string;
+    responseTime: number;
+    status: StatusHistory["status"];
+    timestamp: number;
+}>;
+
 vi.mock("../../theme/components/MiniChartBar", () => ({
-    MiniChartBar: ({ status, responseTime, timestamp, className }: any) => (
+    MiniChartBar: ({
+        status,
+        responseTime,
+        timestamp,
+        className,
+    }: MiniChartBarMockProperties) => (
         <div
             data-testid="mini-chart-bar"
             data-status={status}
@@ -25,8 +38,19 @@ vi.mock("../../theme/components/MiniChartBar", () => ({
 }));
 
 // Mock ThemedText component
+type ThemedTextMockProperties = PropsWithChildren<
+    HTMLAttributes<HTMLSpanElement> &
+        Readonly<{ size?: string; variant?: string }>
+>;
+
 vi.mock("../../theme/components/ThemedText", () => ({
-    ThemedText: ({ children, size, variant, className, ...props }: any) => (
+    ThemedText: ({
+        children,
+        size,
+        variant,
+        className,
+        ...props
+    }: ThemedTextMockProperties) => (
         <span
             data-testid="themed-text"
             data-size={size}

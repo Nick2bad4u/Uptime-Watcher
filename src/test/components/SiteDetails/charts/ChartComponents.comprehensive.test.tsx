@@ -13,20 +13,25 @@ import type {
 } from "../../../../services/chartConfig";
 
 // Mock react-chartjs-2 components
+type ChartJsMockComponentProperties = Readonly<{
+    data: unknown;
+    options?: unknown;
+}>;
+
 vi.mock("react-chartjs-2", () => ({
-    Line: ({ data, options }: any) => (
+    Line: ({ data, options }: ChartJsMockComponentProperties) => (
         <div data-testid="line-chart" data-chart-type="line">
             <div data-testid="chart-data">{JSON.stringify(data)}</div>
             <div data-testid="chart-options">{JSON.stringify(options)}</div>
         </div>
     ),
-    Doughnut: ({ data, options }: any) => (
+    Doughnut: ({ data, options }: ChartJsMockComponentProperties) => (
         <div data-testid="doughnut-chart" data-chart-type="doughnut">
             <div data-testid="chart-data">{JSON.stringify(data)}</div>
             <div data-testid="chart-options">{JSON.stringify(options)}</div>
         </div>
     ),
-    Bar: ({ data, options }: any) => (
+    Bar: ({ data, options }: ChartJsMockComponentProperties) => (
         <div data-testid="bar-chart" data-chart-type="bar">
             <div data-testid="chart-data">{JSON.stringify(data)}</div>
             <div data-testid="chart-options">{JSON.stringify(options)}</div>

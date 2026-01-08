@@ -8,6 +8,7 @@
  */
 
 import type { Logger } from "@shared/utils/logger/interfaces";
+import type { UnknownRecord } from "type-fest";
 
 import { tryParseJsonRecord } from "@shared/utils/jsonSafety";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
@@ -29,7 +30,7 @@ export interface ReadStoredJsonSecretArgs<T> {
     readonly logPrefix: string;
 
     /** Parses/validates the decoded JSON record into a concrete token type. */
-    readonly parse: (record: Record<string, unknown>) => T;
+    readonly parse: (record: UnknownRecord) => T;
 
     /** Secret storage provider. */
     readonly secretStore: SecretStore;

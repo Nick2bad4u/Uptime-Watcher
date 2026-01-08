@@ -1,5 +1,6 @@
 import type { IpcInvokeChannel } from "@shared/types/ipc";
 import type { MonitorTypeConfig } from "@shared/types/monitorTypes";
+import type { UnknownRecord } from "type-fest";
 
 import { isMonitorTypeConfig } from "@shared/types/monitorTypes";
 import { MONITOR_TYPES_CHANNELS } from "@shared/types/preload";
@@ -27,7 +28,7 @@ const pickBooleanWithFallback = (value: unknown, fallback: boolean): boolean =>
 
 const ConfigPropertyValidator = {
     assertNoUnexpectedProperties(
-        unexpectedProperties: Record<string, unknown>,
+        unexpectedProperties: UnknownRecord,
         monitorType: string
     ): void {
         const unexpectedEntries = Object.entries(unexpectedProperties);
@@ -62,7 +63,7 @@ const ConfigPropertyValidator = {
             uiConfig: BaseMonitorUiConfig;
             version: string;
         };
-        unexpectedProperties: Record<string, unknown>;
+        unexpectedProperties: UnknownRecord;
     } {
         const {
             description,

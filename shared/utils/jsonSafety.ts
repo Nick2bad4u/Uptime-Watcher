@@ -5,7 +5,7 @@
  * Operations capture thrown errors and expose them as structured metadata so
  * callers never deal with exceptions during normal control flow.
  */
-import type { Jsonifiable, JsonValue } from "type-fest";
+import type { Jsonifiable, JsonValue, UnknownRecord } from "type-fest";
 
 import { ensureError } from "@shared/utils/errorHandling";
 import { collectOwnPropertyValuesSafely } from "@shared/utils/objectIntrospection";
@@ -44,7 +44,7 @@ class JsonValidationError extends TypeError {
  */
 export function tryParseJsonRecord(
     text: string
-): null | Record<string, unknown> {
+): null | UnknownRecord {
     try {
         const parsed: unknown = JSON.parse(text);
         return isObject(parsed) ? parsed : null;

@@ -8,6 +8,7 @@
  */
 
 import type { Site } from "@shared/types";
+import type { UnknownRecord } from "type-fest";
 import type { ZodError } from "zod";
 
 import {
@@ -38,7 +39,7 @@ const { ensureInitialized, wrap } = getIpcServiceHelpers("SiteService", {
 const logInvalidSnapshotAndThrow = (
     logMessage: string,
     error: ZodError<Site>,
-    metadata: Record<string, unknown>,
+    metadata: UnknownRecord,
     thrownMessage: string
 ): never => {
     logger.error(`[SiteService] ${logMessage}`, error, {

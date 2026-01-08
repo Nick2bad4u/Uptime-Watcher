@@ -24,6 +24,7 @@ import type {
     SiteSyncDelta,
     StateSyncStatusSummary,
 } from "@shared/types/stateSync";
+import type { UnknownRecord } from "type-fest";
 
 import { ensureError, withErrorHandling } from "@shared/utils/errorHandling";
 import {
@@ -900,7 +901,7 @@ export const createSiteSyncActions = (
                             );
                         }
 
-                        const telemetryPayload: Record<string, unknown> = {
+                        const telemetryPayload: UnknownRecord = {
                             completedAt,
                             message: synchronized
                                 ? "Sites synchronized from backend"
