@@ -90,7 +90,6 @@ const knipConfig: KnipConfig = {
         "@types.*",
         "@vitest.*",
         "async",
-        "babel-plugin-react-compiler",
         "chartjs-adapter-date-fns",
         "chartjs-plugin-zoom",
         "cli-table3",
@@ -132,9 +131,10 @@ const knipConfig: KnipConfig = {
         "vite.*",
         "ws",
         "zod-fast-check",
-        // False-positive: used by the Electron Google Drive provider, but Knip
-        // does not currently detect it as a referenced dependency.
-        "googleapis",
+        // False-positive: `@vitejs/plugin-react` accepts babel plugins by name
+        // (see `vite.config.ts`). Knip cannot attribute that string reference
+        // to this devDependency.
+        "babel-plugin-react-compiler",
     ],
     ignoreExportsUsedInFile: {
         interface: true,

@@ -52,6 +52,12 @@ import {
     verifyKeyCheckBase64,
 } from "./crypto/cloudCrypto";
 import {
+    type DropboxProviderDeps,
+    type GoogleDriveProviderDeps,
+    loadDropboxProviderDeps,
+    loadGoogleDriveProviderDeps,
+} from "./internal/cloudProviderDeps";
+import {
     assertBackupObjectKey,
     decodeStrictBase64,
     encodeBase64,
@@ -85,14 +91,6 @@ import {
     type SecretStore,
 } from "./secrets/SecretStore";
 
-const SETTINGS_KEY_PROVIDER = "cloud.provider" as const;
-const SETTINGS_KEY_FILESYSTEM_BASE_DIRECTORY =
-    "cloud.filesystem.baseDirectory" as const;
-const SETTINGS_KEY_DROPBOX_TOKENS = "cloud.dropbox.tokens" as const;
-const SETTINGS_KEY_GOOGLE_DRIVE_TOKENS = "cloud.googleDrive.tokens" as const;
-const SETTINGS_KEY_GOOGLE_DRIVE_ACCOUNT_LABEL =
-    "cloud.googleDrive.accountLabel" as const;
-
 async function ignoreENOENT(fn: () => Promise<void>): Promise<void> {
     try {
         await fn();
@@ -121,6 +119,15 @@ const SETTINGS_KEY_LAST_BACKUP_AT = "cloud.lastBackupAt" as const;
 const SETTINGS_KEY_LAST_SYNC_AT = "cloud.lastSyncAt" as const;
 const SETTINGS_KEY_LAST_ERROR = "cloud.lastError" as const;
 const SETTINGS_KEY_SYNC_ENABLED = "cloud.syncEnabled" as const;
+
+const SETTINGS_KEY_PROVIDER = "cloud.provider" as const;
+const SETTINGS_KEY_FILESYSTEM_BASE_DIRECTORY =
+    "cloud.filesystem.baseDirectory" as const;
+
+const SETTINGS_KEY_DROPBOX_TOKENS = "cloud.dropbox.tokens" as const;
+const SETTINGS_KEY_GOOGLE_DRIVE_TOKENS = "cloud.googleDrive.tokens" as const;
+const SETTINGS_KEY_GOOGLE_DRIVE_ACCOUNT_LABEL =
+    "cloud.googleDrive.accountLabel" as const;
 
 const SETTINGS_KEY_ENCRYPTION_MODE = "cloud.encryption.mode" as const;
 const SETTINGS_KEY_ENCRYPTION_SALT = "cloud.encryption.salt" as const;
@@ -205,18 +212,6 @@ function parseNumberSetting(value: string | undefined): null | number {
     const parsed = Number(value);
     return Number.isFinite(parsed) ? parsed : null;
 }
-
-type DropboxProviderDeps = Readonly<{
-    DropboxAuthFlow: typeof import("./providers/dropbox/DropboxAuthFlow").DropboxAuthFlow;
-    DropboxCloudStorageProvider: typeof import("./providers/dropbox/DropboxCloudStorageProvider").DropboxCloudStorageProvider;
-    DropboxTokenManager: typeof import("./providers/dropbox/DropboxTokenManager").DropboxTokenManager;
-}>;
-
-type GoogleDriveProviderDeps = Readonly<{
-    fetchGoogleAccountLabel: typeof import("./providers/googleDrive/fetchGoogleAccountLabel").fetchGoogleAccountLabel;
-    GoogleDriveAuthFlow: typeof import("./providers/googleDrive/GoogleDriveAuthFlow").GoogleDriveAuthFlow;
-    GoogleDriveTokenManager: typeof import("./providers/googleDrive/GoogleDriveTokenManager").GoogleDriveTokenManager;
-}>;
 
 /**
  * Coordinates cloud provider configuration and remote backup operations.
@@ -698,80 +693,11 @@ public async configureFilesystemProvider(
             }
         );
     }
-private loadDropboxDeps(): Promise<DropboxProviderDeps> {
-        this.dropboxDepsPromise ??= (async () => {
-            const [authFlowModule, providerModule, tokenModule] =
-                await Promise.all([
-                    import("./providers/dropbox/DropboxAuthFlow"),
-                    import("./providers/dropbox/DropboxCloudStorageProvider"),
-                    import("./providers/dropbox/DropboxTokenManager"),
-                ]);
 
-            return {
-                DropboxAuthFlow: authFlowModule.DropboxAuthFlow,
-                DropboxCloudStorageProvider:
-                    providerModule.DropboxCloudStorageProvider,
-                DropboxTokenManager: tokenModule.DropboxTokenManager,
-            };
-        })();
-
-        return this.dropboxDepsPromise;
-    }
-
-    private loadGoogleDriveDeps(): Promise<GoogleDriveProviderDeps> {
-        this.googleDriveDepsPromise ??= (async () => {
-            const [authFlowModule, tokenModule, labelModule] =
-                await Promise.all([
-                    import("./providers/googleDrive/GoogleDriveAuthFlow"),
-                    import("./providers/googleDrive/GoogleDriveTokenManager"),
-                    import(
-                        "./providers/googleDrive/fetchGoogleAccountLabel"
-                    ),
-                ]);
-
-            return {
-                fetchGoogleAccountLabel: labelModule.fetchGoogleAccountLabel,
-                GoogleDriveAuthFlow: authFlowModule.GoogleDriveAuthFlow,
-                GoogleDriveTokenManager: tokenModule.GoogleDriveTokenManager,
-            };
-        })();
-
-        return this.googleDriveDepsPromise;
-    }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    /**
+/**
      * Connects the Dropbox provider via system-browser OAuth.
      */
-    public async connectDropbox(): Promise<CloudStatusSummary> {
+public async connectDropbox(): Promise<CloudStatusSummary> {
         return this.runCloudOperation("connectDropbox", async () => {
             const {
                 DropboxAuthFlow,
@@ -822,7 +748,7 @@ private loadDropboxDeps(): Promise<DropboxProviderDeps> {
         });
     }
 
-    public async connectGoogleDrive(): Promise<CloudStatusSummary> {
+public async connectGoogleDrive(): Promise<CloudStatusSummary> {
         return this.runCloudOperation("connectGoogleDrive", async () => {
             const {
                 fetchGoogleAccountLabel,
@@ -881,21 +807,21 @@ private loadDropboxDeps(): Promise<DropboxProviderDeps> {
         });
     }
 
-    /** Lists all backups stored in the configured provider. */
-    public async listBackups(): Promise<CloudBackupEntry[]> {
+/** Lists all backups stored in the configured provider. */
+public async listBackups(): Promise<CloudBackupEntry[]> {
         return this.runCloudOperation("listBackups", async () => {
             const provider = await this.resolveProviderOrThrow();
             return provider.listBackups();
         });
     }
 
-    /**
+/**
      * Migrates remote backups between plaintext and encrypted forms.
      *
      * @remarks
      * This operation only affects `backups/` objects (not `sync/`).
      */
-    public async migrateBackups(
+public async migrateBackups(
         request: CloudBackupMigrationRequest
     ): Promise<CloudBackupMigrationResult> {
         return this.runCloudOperation("migrateBackups", async () => {
@@ -947,8 +873,8 @@ private loadDropboxDeps(): Promise<DropboxProviderDeps> {
         });
     }
 
-    /** Creates a fresh SQLite backup and uploads it to the configured provider. */
-    public async uploadLatestBackup(): Promise<CloudBackupEntry> {
+/** Creates a fresh SQLite backup and uploads it to the configured provider. */
+public async uploadLatestBackup(): Promise<CloudBackupEntry> {
         return this.runCloudOperation("uploadLatestBackup", async () => {
             const provider = await this.resolveProviderOrThrow();
 
@@ -996,8 +922,8 @@ private loadDropboxDeps(): Promise<DropboxProviderDeps> {
         });
     }
 
-    /** Downloads the specified backup from the provider and restores it. */
-    public async restoreBackup(
+/** Downloads the specified backup from the provider and restores it. */
+public async restoreBackup(
         key: string
     ): Promise<SerializedDatabaseRestoreResult> {
         return this.runCloudOperation("restoreBackup", async () => {
@@ -1032,8 +958,8 @@ private loadDropboxDeps(): Promise<DropboxProviderDeps> {
         });
     }
 
-    /** Deletes the specified remote backup and its metadata sidecar. */
-    public async deleteBackup(key: string): Promise<CloudBackupEntry[]> {
+/** Deletes the specified remote backup and its metadata sidecar. */
+public async deleteBackup(key: string): Promise<CloudBackupEntry[]> {
         return this.runCloudOperation("deleteBackup", async () => {
             const provider = await this.resolveProviderOrThrow();
             const normalizedKey = assertBackupObjectKey(key);
@@ -1046,7 +972,7 @@ private loadDropboxDeps(): Promise<DropboxProviderDeps> {
         });
     }
 
-    private async resolveProviderOrThrow(args?: {
+private async resolveProviderOrThrow(args?: {
         requireEncryptionUnlocked?: boolean;
     }): Promise<CloudStorageProvider> {
         const provider = await this.resolveProviderOrNull();
@@ -1095,11 +1021,11 @@ private loadDropboxDeps(): Promise<DropboxProviderDeps> {
         });
     }
 
-    /**
+/**
      * Decodes a derived encryption key and clears the stored secret when it is
      * corrupted.
      */
-    private async loadDerivedEncryptionKeyOrClear(
+private async loadDerivedEncryptionKeyOrClear(
         rawKeyBase64: string
     ): Promise<Buffer | undefined> {
         try {
@@ -1157,7 +1083,7 @@ private loadDropboxDeps(): Promise<DropboxProviderDeps> {
         };
     }
 
-    private async getEncryptionKeyOrThrow(): Promise<Buffer> {
+private async getEncryptionKeyOrThrow(): Promise<Buffer> {
         const raw = await this.secretStore.getSecret(
             SECRET_KEY_ENCRYPTION_DERIVED_KEY
         );
@@ -1177,12 +1103,12 @@ private loadDropboxDeps(): Promise<DropboxProviderDeps> {
         return key;
     }
 
-    private async decryptBackupOrThrow(buffer: Buffer): Promise<Buffer> {
+private async decryptBackupOrThrow(buffer: Buffer): Promise<Buffer> {
         const key = await this.getEncryptionKeyOrThrow();
         return decryptBuffer({ ciphertext: buffer, key });
     }
 
-    private async getEffectiveEncryptionMode(
+private async getEffectiveEncryptionMode(
         provider: CloudStorageProvider
     ): Promise<CloudEncryptionMode> {
         const localMode = parseEncryptionMode(
@@ -1202,7 +1128,7 @@ private loadDropboxDeps(): Promise<DropboxProviderDeps> {
         }
     }
 
-    private async buildStatusSummary(): Promise<CloudStatusSummary> {
+private async buildStatusSummary(): Promise<CloudStatusSummary> {
         const providerKind = await this.settings.get(SETTINGS_KEY_PROVIDER);
         const syncEnabled = parseBooleanSetting(
             await this.settings.get(SETTINGS_KEY_SYNC_ENABLED)
@@ -1277,6 +1203,27 @@ private loadDropboxDeps(): Promise<DropboxProviderDeps> {
             }
         }
     }
+
+private async loadDropboxDeps(): Promise<DropboxProviderDeps> {
+        this.dropboxDepsPromise ??= loadDropboxProviderDeps();
+        return this.dropboxDepsPromise;
+    }
+
+    private async loadGoogleDriveDeps(): Promise<GoogleDriveProviderDeps> {
+        this.googleDriveDepsPromise ??= loadGoogleDriveProviderDeps();
+        return this.googleDriveDepsPromise;
+    }
+
+
+
+
+
+
+
+
+
+
+
 
     private getDropboxAppKeyOverrideMaybe(): string | undefined {
         const value = readProcessEnv("UPTIME_WATCHER_DROPBOX_APP_KEY");

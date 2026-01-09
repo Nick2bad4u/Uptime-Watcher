@@ -3,7 +3,7 @@ import { describe, expect, it, vi, beforeEach } from "vitest";
 import { GoogleDriveCloudStorageProvider } from "@electron/services/cloud/providers/googleDrive/GoogleDriveCloudStorageProvider";
 import { CloudProviderOperationError } from "@electron/services/cloud/providers/cloudProviderErrors";
 
-const googleApisMocks = vi.hoisted(() => {
+const googleDriveClientMocks = vi.hoisted(() => {
     const driveStub = {
         files: {
             create: vi.fn(),
@@ -14,50 +14,41 @@ const googleApisMocks = vi.hoisted(() => {
         },
     };
 
-    const driveFactory = vi.fn(() => driveStub);
+    const createGoogleDriveClient = vi.fn(() => driveStub);
 
-    return { driveFactory, driveStub };
+    return { createGoogleDriveClient, driveStub };
 });
 
-vi.mock("googleapis", () => ({
-    google: {
-        auth: {
-            OAuth2: class {
-                public setCredentials(): void {
-                    // noop
-                }
-            },
-        },
-        drive: googleApisMocks.driveFactory,
-    },
-}));
+vi.mock(
+    "@electron/services/cloud/providers/googleDrive/googleDriveHttpClient",
+    () => ({
+        createGoogleDriveClient: googleDriveClientMocks.createGoogleDriveClient,
+    })
+);
 
 describe(GoogleDriveCloudStorageProvider, () => {
     beforeEach(() => {
         vi.clearAllMocks();
-        googleApisMocks.driveFactory.mockReturnValue(googleApisMocks.driveStub);
     });
 
     it("stores data in appDataFolder and creates the app root folder", async () => {
         const tokenManager = {
-            getValidAccessToken: vi.fn().mockResolvedValue("token"),
             isConnected: vi.fn().mockResolvedValue(true),
         };
 
         // 1) findChildByName for uptime-watcher under appDataFolder => not found
-        googleApisMocks.driveStub.files.list
+        googleDriveClientMocks.driveStub.files.list
             .mockResolvedValueOnce({ data: { files: [] } })
             // 2) listFolderRecursive for created folder => empty
             .mockResolvedValueOnce({
                 data: { files: [], nextPageToken: null },
             });
 
-        googleApisMocks.driveStub.files.create.mockResolvedValueOnce({
+        googleDriveClientMocks.driveStub.files.create.mockResolvedValueOnce({
             data: { id: "root-id" },
         });
 
         const provider = new GoogleDriveCloudStorageProvider({
-            clientId: "client-id",
             tokenManager: tokenManager as never,
         });
 
@@ -65,12 +56,12 @@ describe(GoogleDriveCloudStorageProvider, () => {
         expect(result).toEqual([]);
 
         // It must search in appDataFolder.
-        expect(googleApisMocks.driveStub.files.list).toHaveBeenCalledWith(
+        expect(googleDriveClientMocks.driveStub.files.list).toHaveBeenCalledWith(
             expect.objectContaining({ spaces: "appDataFolder" })
         );
 
         // It must create root folder under appDataFolder parents.
-        expect(googleApisMocks.driveStub.files.create).toHaveBeenCalledWith(
+        expect(googleDriveClientMocks.driveStub.files.create).toHaveBeenCalledWith(
             expect.objectContaining({
                 requestBody: expect.objectContaining({
                     mimeType: "application/vnd.google-apps.folder",
@@ -80,23 +71,23 @@ describe(GoogleDriveCloudStorageProvider, () => {
             })
         );
 
-        expect(tokenManager.getValidAccessToken).toHaveBeenCalledTimes(1);
+        expect(googleDriveClientMocks.createGoogleDriveClient).toHaveBeenCalledWith(
+            tokenManager
+        );
     });
 
     it("throws ENOENT when downloading a missing object", async () => {
         const tokenManager = {
-            getValidAccessToken: vi.fn().mockResolvedValue("token"),
             isConnected: vi.fn().mockResolvedValue(true),
         };
 
         // ResolveFolderId() starts by locating the app root folder.
         // Return no folders => treat as missing object.
-        googleApisMocks.driveStub.files.list.mockResolvedValueOnce({
+        googleDriveClientMocks.driveStub.files.list.mockResolvedValueOnce({
             data: { files: [], nextPageToken: null },
         });
 
         const provider = new GoogleDriveCloudStorageProvider({
-            clientId: "client-id",
             tokenManager: tokenManager as never,
         });
 
@@ -115,7 +106,6 @@ describe(GoogleDriveCloudStorageProvider, () => {
 
     it("throws EEXIST when overwrite is false and object exists", async () => {
         const tokenManager = {
-            getValidAccessToken: vi.fn().mockResolvedValue("token"),
             isConnected: vi.fn().mockResolvedValue(true),
         };
 
@@ -123,7 +113,7 @@ describe(GoogleDriveCloudStorageProvider, () => {
         // 1) find uptime-watcher under appDataFolder
         // 2) find sync under uptime-watcher
         // 3) find existing.txt under sync
-        googleApisMocks.driveStub.files.list
+        googleDriveClientMocks.driveStub.files.list
             .mockResolvedValueOnce({
                 data: { files: [{ id: "root-id" }], nextPageToken: null },
             })
@@ -135,7 +125,6 @@ describe(GoogleDriveCloudStorageProvider, () => {
             });
 
         const provider = new GoogleDriveCloudStorageProvider({
-            clientId: "client-id",
             tokenManager: tokenManager as never,
         });
 

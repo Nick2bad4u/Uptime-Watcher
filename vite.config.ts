@@ -312,7 +312,6 @@ export default defineConfig(({ command, mode }) => {
                                     // externalized to avoid inflating the
                                     // main-process bundle. electron-builder
                                     // packages node_modules.
-                                    "googleapis",
                                     "dropbox",
                                 ],
                                 output: {

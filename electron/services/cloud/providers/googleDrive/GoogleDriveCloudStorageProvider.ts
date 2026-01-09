@@ -1,16 +1,14 @@
 import type { CloudProviderKind } from "@shared/types/cloud";
-import type { drive_v3 } from "googleapis";
 
 import { tryGetErrorCode } from "@shared/utils/errorCodes";
 import { ensureError } from "@shared/utils/errorHandling";
 import { normalizePathSeparatorsToPosix } from "@shared/utils/pathSeparators";
-import { google } from "googleapis";
-import { Readable } from "node:stream";
 
 import type {
     CloudObjectEntry,
     CloudStorageProvider,
 } from "../CloudStorageProvider.types";
+import type { GoogleDriveClient } from "./googleDriveHttpClient";
 import type { GoogleDriveTokenManager } from "./GoogleDriveTokenManager";
 
 import {
@@ -27,10 +25,15 @@ import {
     parseGoogleDriveListResponse,
 } from "./googleDriveApiSchemas";
 import { tryDescribeGoogleDriveApiError } from "./googleDriveErrorSchemas";
+import { createGoogleDriveClient } from "./googleDriveHttpClient";
 
 const GOOGLE_FOLDER_MIME_TYPE = "application/vnd.google-apps.folder";
 const APP_ROOT_FOLDER_NAME = "uptime-watcher";
 const BACKUPS_PREFIX = "backups/";
+
+const GOOGLE_DRIVE_LIST_PAGE_SIZE = 1000;
+
+type DriveListParams = Parameters<GoogleDriveClient["files"]["list"]>[0];
 
 function normalizeKey(key: string): string {
     return normalizeProviderObjectKey(key);
@@ -72,12 +75,12 @@ function tryGetGoogleDriveHttpStatus(error: unknown): number | undefined {
         return undefined;
     }
 
-    const {response} = (error as { response?: unknown });
+    const { response } = error as { response?: unknown };
     if (typeof response !== "object" || response === null) {
         return undefined;
     }
 
-    const {status} = (response as { status?: unknown });
+    const { status } = response as { status?: unknown };
     return typeof status === "number" ? status : undefined;
 }
 
@@ -108,14 +111,16 @@ function splitKey(key: string): { dirSegments: string[]; fileName: string } {
     };
 }
 
-async function convertStreamToBuffer(
-    stream: NodeJS.ReadableStream
-): Promise<Buffer> {
-    const chunks: Buffer[] = [];
-    for await (const chunk of stream) {
-        chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
-    }
-    return Buffer.concat(chunks);
+/**
+ * Escapes a value for inclusion inside a Google Drive query string literal.
+ *
+ * @remarks
+ * Drive query strings use single quotes to delimit string literals.
+ * Unescaped input (especially names with `'` or `\`) can break queries and
+ * lead to incorrect lookups.
+ */
+function escapeGoogleDriveQueryStringLiteral(value: string): string {
+    return value.replaceAll("\\", "\\\\").replaceAll("'", String.raw`\'`);
 }
 
 /**
@@ -128,11 +133,9 @@ export class GoogleDriveCloudStorageProvider
 {
     public readonly kind: CloudProviderKind = "google-drive";
 
-    private readonly clientId: string;
-
-    private readonly clientSecret: string | undefined;
-
     private readonly tokenManager: GoogleDriveTokenManager;
+
+    private readonly drive: GoogleDriveClient;
 
     private readonly folderCache = new Map<string, string>();
 
@@ -142,9 +145,10 @@ export class GoogleDriveCloudStorageProvider
 
     public async deleteObject(key: string): Promise<void> {
         const normalized = normalizeKey(key);
-        try {
-            const drive = await this.getDriveClient();
 
+        const drive = this.getDriveClient();
+        const { kind } = this;
+        try {
             const existing = await this.findFileByKey(drive, normalized);
             if (!existing) {
                 return;
@@ -164,7 +168,7 @@ export class GoogleDriveCloudStorageProvider
                 {
                     cause: error,
                     operation: "deleteObject",
-                    providerKind: this.kind,
+                    providerKind: kind,
                     target: normalized,
                 }
             );
@@ -173,9 +177,10 @@ export class GoogleDriveCloudStorageProvider
 
     public async downloadObject(key: string): Promise<Buffer> {
         const normalized = normalizeKey(key);
-        try {
-            const drive = await this.getDriveClient();
 
+        const drive = this.getDriveClient();
+        const { kind } = this;
+        try {
             const existing = await this.findFileByKey(drive, normalized);
             if (!existing) {
                 throw new CloudProviderOperationError(
@@ -183,19 +188,24 @@ export class GoogleDriveCloudStorageProvider
                     {
                         code: "ENOENT",
                         operation: "downloadObject",
-                        providerKind: this.kind,
+                        providerKind: kind,
                         target: normalized,
                     }
                 );
             }
 
-            const response = await drive.files.get(
-                { alt: "media", fileId: existing.id },
-                { responseType: "stream" }
-            );
+            const response = await drive.files.get({
+                alt: "media",
+                fileId: existing.id,
+            });
 
+            if (!Buffer.isBuffer(response.data)) {
+                throw new TypeError(
+                    "Google Drive download response did not return raw bytes."
+                );
+            }
 
-            return await convertStreamToBuffer(response.data);
+            return response.data;
         } catch (error) {
             const code = tryGetErrorCode(error);
             if (code === "ENOENT") {
@@ -209,7 +219,7 @@ export class GoogleDriveCloudStorageProvider
                         cause: error,
                         code: "ENOENT",
                         operation: "downloadObject",
-                        providerKind: this.kind,
+                        providerKind: kind,
                         target: normalized,
                     }
                 );
@@ -222,7 +232,7 @@ export class GoogleDriveCloudStorageProvider
                 {
                     cause: error,
                     operation: "downloadObject",
-                    providerKind: this.kind,
+                    providerKind: kind,
                     target: normalized,
                 }
             );
@@ -231,9 +241,10 @@ export class GoogleDriveCloudStorageProvider
 
     public async listObjects(prefix: string): Promise<CloudObjectEntry[]> {
         const normalizedPrefix = ensureTrailingSlash(prefix);
-        try {
-            const drive = await this.getDriveClient();
 
+        const drive = this.getDriveClient();
+        const { kind } = this;
+        try {
             const rootFolderId = await this.getOrCreateFolderId(drive, []);
 
             // If a prefix is provided, attempt to resolve that folder first.
@@ -268,7 +279,7 @@ export class GoogleDriveCloudStorageProvider
                 {
                     cause: error,
                     operation: "listObjects",
-                    providerKind: this.kind,
+                    providerKind: kind,
                     target: normalizedPrefix,
                 }
             );
@@ -281,9 +292,11 @@ export class GoogleDriveCloudStorageProvider
         overwrite?: boolean;
     }): Promise<CloudObjectEntry> {
         const normalizedKey = normalizeKey(args.key);
+
+        const drive = this.getDriveClient();
+        const { kind } = this;
         try {
             const { dirSegments, fileName } = splitKey(normalizedKey);
-            const drive = await this.getDriveClient();
 
             const parentId = await this.getOrCreateFolderId(drive, dirSegments);
 
@@ -299,14 +312,14 @@ export class GoogleDriveCloudStorageProvider
                     {
                         code: "EEXIST",
                         operation: "uploadObject",
-                        providerKind: this.kind,
+                        providerKind: kind,
                         target: normalizedKey,
                     }
                 );
             }
 
             const media = {
-                body: Readable.from(args.buffer),
+                body: args.buffer,
                 mimeType: "application/octet-stream",
             };
 
@@ -362,7 +375,7 @@ export class GoogleDriveCloudStorageProvider
                     cause: error,
                     code: "EEXIST",
                     operation: "uploadObject",
-                    providerKind: this.kind,
+                    providerKind: kind,
                     target: normalizedKey,
                 });
             }
@@ -374,31 +387,15 @@ export class GoogleDriveCloudStorageProvider
                 {
                     cause: error,
                     operation: "uploadObject",
-                    providerKind: this.kind,
+                    providerKind: kind,
                     target: normalizedKey,
                 }
             );
         }
     }
 
-    private async getDriveClient(): Promise<drive_v3.Drive> {
-        const accessToken = await this.tokenManager.getValidAccessToken();
-
-        const oauth2 = new google.auth.OAuth2(
-            this.clientId,
-            this.clientSecret,
-            undefined
-        );
-
-        oauth2.setCredentials({
-            access_token: accessToken,
-        });
-
-        return google.drive({ auth: oauth2, version: "v3" });
-    }
-
     private async getOrCreateFolderId(
-        drive: drive_v3.Drive,
+        drive: GoogleDriveClient,
         pathSegments: string[]
     ): Promise<string> {
         const normalizedSegments = [APP_ROOT_FOLDER_NAME, ...pathSegments]
@@ -450,7 +447,7 @@ export class GoogleDriveCloudStorageProvider
     }
 
     private async findFileByKey(
-        drive: drive_v3.Drive,
+        drive: GoogleDriveClient,
         key: string
     ): Promise<null | { id: string }> {
         const { dirSegments, fileName } = splitKey(key);
@@ -469,7 +466,7 @@ export class GoogleDriveCloudStorageProvider
     }
 
     private async resolveFolderId(
-        drive: drive_v3.Drive,
+        drive: GoogleDriveClient,
         pathSegments: string[]
     ): Promise<null | string> {
         const normalizedSegments = [APP_ROOT_FOLDER_NAME, ...pathSegments]
@@ -497,22 +494,26 @@ export class GoogleDriveCloudStorageProvider
     }
 
     private async findChildByName(
-        drive: drive_v3.Drive,
+        drive: GoogleDriveClient,
         args: { mimeType: string | undefined; name: string; parentId: string }
     ): Promise<null | { id: string }> {
-        const safeName = args.name.replaceAll("'", String.raw`\\'`);
+        const safeName = escapeGoogleDriveQueryStringLiteral(args.name);
+        const safeParentId = escapeGoogleDriveQueryStringLiteral(args.parentId);
         const conditions: string[] = [
             `name = '${safeName}'`,
-            `'${args.parentId}' in parents`,
+            `'${safeParentId}' in parents`,
             "trashed = false",
         ];
 
         if (args.mimeType) {
-            conditions.push(`mimeType = '${args.mimeType}'`);
+            conditions.push(
+                `mimeType = '${escapeGoogleDriveQueryStringLiteral(args.mimeType)}'`
+            );
         }
 
         const response = await drive.files.list({
             fields: "files(id)",
+            pageSize: 1,
             q: conditions.join(" and "),
             spaces: "appDataFolder",
         });
@@ -531,7 +532,7 @@ export class GoogleDriveCloudStorageProvider
     }
 
     private async listFolderRecursive(
-        drive: drive_v3.Drive,
+        drive: GoogleDriveClient,
         folderId: string,
         prefix: string
     ): Promise<CloudObjectEntry[]> {
@@ -571,15 +572,13 @@ export class GoogleDriveCloudStorageProvider
         let pageToken: null | string = null;
 
         do {
-            const params: drive_v3.Params$Resource$Files$List = {
+            const params: DriveListParams = {
                 fields: "nextPageToken, files(id, name, mimeType, modifiedTime, size)",
-                q: `'${folderId}' in parents and trashed = false`,
+                pageSize: GOOGLE_DRIVE_LIST_PAGE_SIZE,
+                q: `'${escapeGoogleDriveQueryStringLiteral(folderId)}' in parents and trashed = false`,
                 spaces: "appDataFolder",
+                ...(pageToken ? { pageToken } : {}),
             };
-
-            if (pageToken) {
-                params.pageToken = pageToken;
-            }
 
             // eslint-disable-next-line no-await-in-loop -- Drive pagination requests must be sequential.
             const response = await drive.files.list(params);
@@ -596,14 +595,15 @@ export class GoogleDriveCloudStorageProvider
         return entries;
     }
 
+    private getDriveClient(): GoogleDriveClient {
+        return this.drive;
+    }
+
     public constructor(args: {
-        clientId: string;
-        clientSecret?: string;
         tokenManager: GoogleDriveTokenManager;
     }) {
         super(BACKUPS_PREFIX);
-        this.clientId = args.clientId;
-        this.clientSecret = args.clientSecret;
         this.tokenManager = args.tokenManager;
+        this.drive = createGoogleDriveClient(args.tokenManager);
     }
 }

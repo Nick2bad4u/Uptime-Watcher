@@ -23,13 +23,17 @@ const config: Configuration = {
     artifactName: `Uptime-Watcher-\${platform}-\${arch}-\${version}.\${ext}`,
     asar: true,
     buildDependenciesFromSource: false,
-    compression: "normal",
+    // Smaller installers at the cost of slower build time.
+    compression: "maximum",
     copyright: "Copyright © 2025 Nick2bad4u",
     deb: {
         artifactName: `Uptime-Watcher-deb-\${arch}-\${version}.\${ext}`,
     },
     directories: {
-        output: "dist",
+        // Keep installer artifacts separate from Vite/Electron build outputs
+        // under dist/ to avoid accidentally packaging previous installers
+        // back into the app (and to keep file inclusion rules simpler).
+        output: "release",
     },
     disableDefaultIgnoredFiles: false,
     disableSanityCheckAsar: false,
@@ -40,13 +44,21 @@ const config: Configuration = {
     executableName: "Uptime-Watcher",
     files: [
         "dist/**/*",
-        "node_modules/**/*",
-        "!node_modules/@tailwindcss/oxide-*",
-        "!node_modules/@tailwindcss/oxide-*/**",
-        "!dist/mac-universal-*",
-        "!dist/*.app",
-        "!dist/*.dmg",
-        "!dist/*.zip",
+        // Visualizer outputs are build diagnostics and should not ship.
+        "!dist/build-stats.html",
+        "!dist/bundle-analysis.html",
+        // Sourcemaps are useful for debugging but massively inflate installers
+        // (the renderer map alone can be ~20MB+). Keep them as separate CI
+        // artifacts instead of shipping to end users.
+        "!dist/**/*.map",
+        // TypeScript incremental build artifacts are never needed at runtime.
+        "!dist/**/*.tsbuildinfo",
+        // MSW is used for dev/testing only.
+        "!dist/mockServiceWorker.js",
+        // Let electron-builder resolve and include only production
+        // dependencies from package.json. Including `node_modules/**/*`
+        // would pull in devDependencies (storybook/playwright/etc.) and
+        // massively inflate installer size.
     ],
     flatpak: {
         artifactName: `Uptime-Watcher-flatpak-\${arch}-\${version}.\${ext}`,
