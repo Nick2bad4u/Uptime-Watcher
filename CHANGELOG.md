@@ -4,6 +4,447 @@
 
 All notable changes to this project will be documented in this file.
 
+## [20.4.0] - 2026-01-09
+
+
+[[035312d](https://github.com/Nick2bad4u/Uptime-Watcher/commit/035312d755c30d89d4584d3f95d1deb08b68eb74)...
+[ca17620](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ca176206fe1d67e7463ba8dc59bd3c320b255c48)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/035312d755c30d89d4584d3f95d1deb08b68eb74...ca176206fe1d67e7463ba8dc59bd3c320b255c48))
+
+
+### ✨ Features
+
+- ✨ [feat] Enhance backup and restore functionality
+ - 🆕 Introduced constants for maximum sizes of SQLite backup buffers and restore payloads over IPC.
+ - 🆕 Added constants for JSON import payload sizes to improve data handling during imports.
+
+🔧 [refactor] Update MonitorRow interface
+ - 🔄 Extended MonitorRow to include UnknownRecord for better type safety.
+ - 🗑️ Removed the optional id property to streamline the interface.
+
+🛠️ [fix] Improve error handling in MonitoringService
+ - 🔄 Replaced generic Error throws with ApplicationError for better error context.
+ - 📝 Added detailed error messages and codes for backend operation failures.
+
+🧪 [test] Update tests for MonitoringService edge cases
+ - ✅ Adjusted tests to expect ApplicationError structure in rejection cases.
+ - 🔄 Ensured error messages reflect the new error handling strategy.
+
+✨ [feat] Add applySiteSnapshot method to site state management
+ - 🆕 Implemented applySiteSnapshot in BaseSiteState to allow authoritative site state updates.
+ - 🔄 Updated useSitesState to include applySiteSnapshot for local state mutations.
+
+🧹 [chore] Update mock setups for testing
+ - 🔄 Refined mock implementations to include new methods and ensure compatibility with updated interfaces.
+ - 🧪 Enhanced test coverage for new features and error handling improvements.
+
+🎨 [style] Change image format for mascot logo
+ - 🔄 Updated mascot logo import from PNG to AVIF for better performance and quality.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(250bc5c)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/250bc5cd0e044d3958ca49ceefa5793cec1c9339)
+
+
+- ✨ [feat] Implement path-based backups and harden process resilience
+
+✨ [feat] Introduce path-based SQLite backup saving to prevent memory spikes when handling large databases
+ - 💾 Implement a direct-to-disk backup flow utilizing `VACUUM INTO` for consistent snapshots
+ - 🔄 Add fallback logic to temporarily close the primary connection if snapshotting hits `SQLITE_BUSY` locks
+ - 🛡️ Ensure data integrity via atomic file replacement with a `.bak` recovery fallback during target writes
+ - 📏 Enforce a 10MB limit on IPC database transfers, directing larger files to the native save dialog flow
+
+🛠️ [fix] Improve main process stability and crash resilience with dedicated shutdown orchestration
+ - 🛑 Register global handlers for `uncaughtException` and `unhandledRejection` to ensure safe app termination
+ - 📉 Monitor `render-process-gone` events to better diagnose renderer-level crashes or GPU resets
+ - ⏱️ Implement an asynchronous fatal shutdown sequence with a 5-second timeout to prevent zombie processes
+
+🏗️ [refactor] Enhance database transaction isolation and error handling heuristics
+ - 🖇️ Support nested transaction boundaries by utilizing `SAVEPOINT` and `RELEASE` operations
+ - 🔍 Centralize SQLite lock detection logic into a shared utility for consistent service-level retries
+ - 🧼 Harden http monitor cleanup by safely handling stream-like response data properties
+
+📡 [feat] Optimize IPC state synchronization and data payload normalization
+ - 🔢 Preserve accurate site counts when processing truncated bulk-sync events from the orchestrator
+ - 🧹 Normalize state-sync payloads into lightweight structures to minimize IPC serialization overhead
+ - 🔒 Block `<webview>` tag attachment in the window service as a defense-in-depth security measure
+
+🧪 [test] Expand comprehensive test coverage for backup validation and cloud metadata
+ - 🏗️ Move `createSingleFlight` to shared utilities for deduplicating concurrent async work across layers
+ - 📂 Sanitize file path segments in cloud metadata to prevent leaking local system structures
+ - 🧪 Add regression tests for siteCount preservation and IPC buffer transfer size validation
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(e501db4)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/e501db4f9145b51285caac11671d3fad7e199180)
+
+
+- ✨ [feat] Enhance state synchronization and event handling
+ - 🔧 Update `StateSyncEventData` to include `revision` and `siteCount` for better tracking of sync events.
+ - 🛠️ Refactor event handling in `StateSyncService` to manage `truncated` events and implement recovery logic.
+ - ⚡ Improve `calculateSiteSyncDelta` to streamline delta calculations by removing unnecessary previous site snapshots.
+ - 🚜 Refactor `applySnapshotEvent` and `applyDeltaEvent` to handle new event structures and ensure proper state updates.
+ - 🧪 Add comprehensive tests for new event structures and recovery scenarios in `StateSyncService` and `useSiteSync`.
+ - 🎨 Update test cases to reflect changes in event data structure and ensure coverage for new features.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(66a81e0)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/66a81e0897ebb20d2de3acc2d650116b21806fcf)
+
+
+- ✨ [feat] Implement JSON byte budgeting for state sync events
+ - Introduced `isJsonByteBudgetExceeded` utility to check payload size against a defined budget.
+ - Added a size check in `sendStateSyncEvent` method of `RendererEventBridge` to drop oversized events.
+ - Logged a warning when state sync events are dropped due to exceeding the size budget.
+
+🛠️ [fix] Improve IPC handler parameter validation
+ - Updated `assertChannelParams` to enforce exact parameter count for handlers.
+ - Enhanced error handling for unexpected parameters in IPC handlers, ensuring proper logging and response creation.
+
+🚜 [refactor] Enhance CSP header handling in WindowService
+ - Modified `onHeadersReceived` to apply CSP headers only to document resources, preventing unnecessary mutations for other resource types.
+
+🧪 [test] Add comprehensive tests for new features and fixes
+ - Created tests for JSON byte budgeting in `RendererEventBridge` to ensure oversized payloads are correctly handled.
+ - Added tests for IPC handler parameter validation to confirm correct behavior with missing and extra parameters.
+ - Implemented tests for CSP header handling in `WindowService` to verify correct application based on resource type.
+
+✨ [feat] Introduce cloud object key normalization utilities
+ - Added `normalizeCloudObjectKey` and `assertCloudObjectKey` functions to enforce key formatting and validation.
+ - Implemented tests to cover various normalization scenarios, including path traversal prevention and byte length enforcement.
+
+🧹 [chore] Update URL safety utilities
+ - Introduced `tryGetSafeThirdPartyHttpUrl` to sanitize URLs for third-party requests, ensuring they meet strict safety criteria.
+ - Updated `ScreenshotThumbnail` component to utilize new URL safety checks, improving security when handling screenshot URLs.
+
+📝 [docs] Improve code documentation and comments
+ - Enhanced comments throughout the codebase for clarity on new features and changes, particularly in utility functions and event handling.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(56cd5a8)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/56cd5a89c4fc5cda60b86282cb055003c7184246)
+
+
+- ✨ [feat] Implement single-flight utility for IPC handlers
+ - 🛠️ [fix] Add createSingleFlight function to mitigate concurrent IPC calls
+ - 🔧 [build] Refactor registerCloudHandlers to utilize single-flight for sync and backup operations
+ - 🔧 [build] Refactor registerDataHandlers to utilize single-flight for data export and download operations
+ - 🎨 [style] Improve logging safety by using redacted URLs in urlSafety utility
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(f1ee12f)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/f1ee12fed76fbaa5190470b4ba405a8135087a97)
+
+
+- ✨ [feat] Implement update status subscription in updates store
+ - 🛠️ Added `subscribeToUpdateStatusEvents` method to `UpdatesStore` interface for subscribing to backend update status events.
+ - 🛠️ Implemented the subscription logic in `useUpdatesStore`, handling event cleanup and error logging.
+ - ⚡ Enhanced the persistence configuration for the updates store to include `updateInfo` and `updateStatus`.
+ - 🧪 Updated tests to mock the new subscription method and ensure coverage for the updates store functionality.
+
+🧪 [test] Add comprehensive tests for updates store and related utilities
+ - 🧪 Added tests for the new `subscribeToUpdateStatusEvents` method in various test files to ensure proper functionality.
+ - 🧪 Enhanced existing tests to check for error handling and subscription cleanup.
+ - 🧪 Introduced new tests for cache utilities to validate deduplication of concurrent fetches and cache invalidation behavior.
+
+🛠️ [fix] Improve error handling in settings and system services
+ - 🛠️ Updated error handling in `SettingsService` and `SystemService` to throw descriptive errors instead of returning raw values.
+ - 🛠️ Ensured that null and undefined errors are properly handled and logged.
+
+⚡ [perf] Optimize cache utilities for concurrent fetches
+ - ⚡ Implemented a mechanism to deduplicate concurrent fetches for the same cache key, improving performance and reducing unnecessary network requests.
+ - ⚡ Added cache generation tracking to prevent overwriting newer values set during fetch operations.
+
+🎨 [style] Refactor media query utilities for better compatibility
+ - 🎨 Updated `subscribeToMediaQueryListChanges` to support legacy implementations of `addListener` and `removeListener` for broader browser compatibility.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(462c8df)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/462c8df71dbab886bf5ffcee66552033087f4138)
+
+
+
+### 🛠️ Bug Fixes
+
+- 🛠️ [fix] Improve type safety in chart components and themed components
+ - 🔧 Update mock components in tests to use specific prop types for better type safety
+ - 🧪 Refactor tests for `ChartComponents` to use `ChartJsMockComponentProperties` instead of `any`
+ - 🧪 Refactor tests for `AnalyticsTab`, `HistoryTab`, and `OverviewTab` to use `PropsWithChildren` and specific HTML attributes
+ - 🧪 Update `ThemedButton`, `ThemedCard`, `ThemedSelect`, and other themed components to use more specific prop types
+ - 🔧 Improve type definitions in `ThemeManager`, `ThemedBox`, and `ThemedSelect` to use `UnknownRecord` for better type handling
+ - 🔧 Refactor utility functions in `chartUtils` to ensure type safety with `UnknownRecord`
+ - 🔧 Update `FormErrorAlert` and `SaveButton` tests to use specific prop types for better clarity and type safety
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(d6f680e)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/d6f680eef756e3dbb7d1750e171aa9cb7d80bc87)
+
+
+- 🛠️ [fix] Refactor Electron API mocking across test files
+
+ - 🔧 Update the electron API mocking strategy to use a centralized `installElectronApiMock` utility for better consistency and maintainability.
+ - 🧪 Enhance test setup by ensuring `window` exists when needed, preventing potential issues in non-DOM environments.
+ - 🧹 Remove redundant global `electronAPI` definitions from individual test files, streamlining the mocking process.
+ - 📝 Update tests to properly restore the mocked API after each test, ensuring isolation and preventing state leakage between tests.
+ - ⚡ Improve performance by reducing the complexity of the mock setup, allowing for easier adjustments and clearer test intentions.
+ - 🎨 Clean up test files by removing outdated comments and unused code related to the previous mocking strategy.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(0943d4f)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/0943d4f8129e1e059dd1d8a284c16d1cccda0040)
+
+
+- 🛠️ [fix] Refactor useSiteMonitor tests to improve mock store handling
+ - 🔧 Update the mock implementation of `useSitesStore` to use `createSelectorHookMock` and `createSitesStoreMock` for better state management.
+ - 🔄 Replace direct mock return values with `setState` calls to ensure consistent state across tests.
+ - 🧪 Adjust tests to handle undefined monitor IDs instead of null for better clarity and accuracy.
+
+🎨 [style] Enhance button and form styles for accessibility
+ - 🎨 Add media queries to disable transitions for users with reduced motion preferences in button styles.
+ - 🎨 Update hover and focus styles to improve accessibility and user experience in form controls.
+ - 🎨 Remove deprecated hover styles and replace them with `:is()` pseudo-class for better specificity and clarity.
+
+🧪 [test] Update critical coverage tests for useSiteDetails
+ - 🔧 Change mock return values in critical tests to use `undefined` instead of `null` for selected monitor IDs.
+ - 🔄 Introduce a helper function `applySitesStoreMockState` to streamline mock store setup across tests.
+ - 🧪 Ensure all tests are consistent with the new mock store structure and improve overall test reliability.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(8957ce7)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/8957ce7636a38b38304e1f7ff7493c545b607acb)
+
+
+
+### 📦 Dependencies
+
+- *(deps)* [dependency] Update the github-actions group across 1 directory with 13 updates [`(7f278a1)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7f278a1c5e7c63358a47a0e0d342f3af5b9f5c86)
+
+
+
+### 🛡️ Security
+
+- 🔧 [refactor] Enhance path navigation security and improve state management
+ - 🔒 Implement `isPathWithinDirectory` to restrict `file://` navigations outside the production directory
+ - 🔄 Refactor `normalizeLogValue` to safely handle circular references
+ - 🔄 Update `DynamicMonitorFields`, `Header`, `Settings`, and `HistoryTab` components to use selectors for state management
+ - 🧪 Add tests for `WindowService` to validate navigation restrictions
+ - 🧪 Improve test mocks for `useErrorStore` and `useSettingsStore` to support selector-based state retrieval
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(a29e9e6)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/a29e9e66ae2921d64534c858fef5bf7fe4a3d98f)
+
+
+
+### 🛠️ Other Changes
+
+- 🔧 [refactor] Update IPC service state synchronization and error handling
+ - Make `_meta` optional in state synchronization event data
+ - Refactor state update logic to use destructured variables for clarity
+ - Improve error handling in HTTP client by adding response type and cleanup methods
+
+🧪 [test] Enhance tests for HTTP monitor service
+ - Verify response type in follow redirects tests
+ - Ensure error logging captures detailed error information
+
+🛠️ [fix] Adjust WindowService fetch logic
+ - Safeguard against undefined response in server readiness check
+ - Change loadContent method visibility to public for better access
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(f04b6e9)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/f04b6e90635bb15bacf50b93451d0ba1dcbbd412)
+
+
+- 🔧 [refactor] Enhance AddSiteForm and FormField components with improved helper text display
+
+ - 🆕 Introduce HelperInfoIcon to provide visual cues for help text in AddSiteForm
+ - 🔄 Refactor helper bullet text generation to avoid duplicates and normalize text
+ - 📝 Update tests to reflect changes in help text rendering and ensure accurate coverage
+ - 🔍 Adjust behavioral tests to verify presence and absence of specific help text
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(aa9c213)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/aa9c21340ef58b1f2244288b6eb5c1342e365dda)
+
+
+- 🔧 [refactor] Revamp EmptyState component layout and styling
+ - 🆕 Update structure for improved responsiveness and alignment
+ - 🎨 Enhance visual hierarchy with flexbox for centering content
+ - ✏️ Remove outdated CSS classes and styles for clarity
+ - 🧪 Simplify test cases to focus on essential rendering checks
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(e25135e)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/e25135ee8f3939f50e93937c6f1954c7edf37131)
+
+
+- 🔧 [refactor] Improve error handling and redirect safety in HTTP client
+
+ - 🛠️ Enhance error handling in handleCheckError to map unsupported redirect protocols to user-friendly messages.
+ - 🛠️ Introduce enforceRedirectSafety function to prevent following redirects to unsupported schemes or those including credentials.
+ - 🔧 Update createHttpClient to include beforeRedirect option for redirect safety enforcement.
+ - 🧪 Add tests for redirect safety errors to ensure proper handling of unsupported protocols.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(ce22b32)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ce22b32048ff3acf4be028ebbcf1691a9f578409)
+
+
+- 🔧 [refactor] Enhance electron-debug initialization and improve monitor service handling
+ - 🛠️ Refactor electron-debug initialization to use type-safe interfaces and validation
+ - 🛠️ Update getMonitorWithResult to prevent unnecessary config re-application on cached instances
+ - 🛠️ Simplify HTTP client agent management by implementing shared agents for connection pooling
+ - 🎨 Improve URL validation to enforce HTTP/HTTPS protocols
+ - 🧪 Add comprehensive tests for monitor service and error handling utilities
+ - 🧪 Introduce tests for validateMonitorUrl and handleCheckError functions
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(cd8a28a)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/cd8a28a3e8e8e98804716f94db33e396a0ad69c5)
+
+
+- 🔧 [fix] Ensure proper timeout management in OperationTimeoutManager
+ - Clear existing timeout before scheduling a new one to prevent unexpected cancellations
+ - Update tests to reflect that only one timeout should be active for the same operation
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(5063012)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5063012482a485a497376fdf89d8e722f4da8041)
+
+
+
+### 🎨 Styling
+
+- 🎨 [style] Improve code formatting and readability across multiple files
+ - 🔧 [style] Refactor knip.config.ts by removing unused entries
+ - 🎨 [style] Enhance formatting in main.ts for better readability
+ - 🎨 [style] Adjust formatting in eventsApi.ts for consistent style
+ - 🎨 [style] Simplify error message formatting in cloudKeyNormalization.ts
+ - 🎨 [style] Clean up DataBackupService.ts by improving code structure
+ - 🎨 [style] Streamline MonitorFactory.ts for better clarity
+ - 🎨 [style] Refine httpMonitorCore.ts for improved readability
+ - 🎨 [style] Consolidate errorHandling.ts for cleaner code
+ - 🎨 [style] Enhance WindowService.ts formatting for consistency
+ - 🎨 [style] Improve bridgeFactory.comprehensive.test.ts formatting
+ - 🎨 [style] Adjust cloudKeyNormalization.test.ts for better readability
+ - 🎨 [style] Refactor monitorServiceHelpers.test.ts for clarity
+ - 🎨 [style] Clean up errorHandling.test.ts for improved structure
+ - 🎨 [style] Enhance WindowService.test.ts formatting for consistency
+ - 🎨 [style] Refactor jsonByteBudget.ts for better readability
+ - 🎨 [style] Improve utfByteLength.ts formatting for clarity
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(a79040b)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/a79040b93939505c478865175ecc32e1eed2287c)
+
+
+- 🎨 [style] Improve code formatting for better readability
+
+ - Refactor `DataBackupService.ts` to enhance code formatting by aligning parameters and arguments for better clarity.
+ - Update `createSingleFlight.ts` to improve inline comments and formatting for better understanding.
+ - Adjust `urlSafety.test.ts` to format the `validateExternalOpenUrlCandidate` test case for improved readability.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(b7d3e0e)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b7d3e0ed09e3259d6d5d30e38ef338943f61c3b0)
+
+
+- 🎨 [style] Improve code formatting and readability across multiple files
+ - Reformat JSON arrays for better readability in:
+   - .devskim.json
+   - .ncurc.json
+   - .npmpackagejsonlintrc.json
+   - .prettierrc
+   - .vscode/launch.json
+   - .vscode/settings.json
+   - config/linting/.secretlintrc.json
+   - config/schemas/doc-frontmatter.schema.json
+   - config/testing/tsconfig.shared.test.json
+   - config/tools/.markdown-link-check.json
+   - docs/docusaurus/tsconfig.eslint.json
+   - docs/docusaurus/tsconfig.json
+   - electron/services/cloud/providers/dropbox/DropboxCloudStorageProvider.ts
+   - mermaid.config.json
+ - Update package dependencies in package.json and package-lock.json:
+   - globals from ^16.5.0 to ^17.0.0
+   - npm-package-json-lint from ^9.0.0 to ^9.1.0
+   - putout from ^41.4.0 to ^41.4.1
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(76a028d)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/76a028d45710df6b7371f863bd7ed6acd850487a)
+
+
+- 🎨 [style] Improve code formatting and readability
+ - Refactor import statements for better clarity in bridgeFactory.ts
+ - Simplify error handling code structure in GoogleDriveAuthFlow.ts
+ - Enhance error logging format in databaseSchema.ts
+ - Adjust indentation for consistency in App.tsx
+ - Streamline useMemo hook implementation in useOverflowMarquee.ts
+ - Format dependencies array in useDelayedButtonLoading.ts for readability
+ - Clarify error message formatting in validation.ts
+ - Refine status subscription error handling in useSiteSync.ts
+ - Enhance update status handling in useUpdatesStore.ts
+ - Improve mock import formatting in aliases.test.ts
+ - Adjust media query test assertions for better readability in mediaQueries.test.ts
+ - Clarify comments and formatting in cache.ts
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(ea206cc)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ea206cc7ff6671cb2b44e65e8c230e2cfa32d93b)
+
+
+
+### 🧹 Chores
+
+- *(release)* V20.4.0 [skip ci] [`(ca17620)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ca176206fe1d67e7463ba8dc59bd3c320b255c48)
+
+
+- Update changelogs for v20.3.0 [skip ci] [`(035312d)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/035312d755c30d89d4584d3f95d1deb08b68eb74)
+
+
+
+### 🔧 Build System
+
+- 🔧 [build] Update dependencies in package.json
+
+ - 🔄 Upgrade electron-updater from ^6.6.2 to ^6.7.3 for improved update handling.
+ - 🔄 Upgrade ws from ^8.18.3 to ^8.19.0 for WebSocket enhancements.
+ - 🔄 Upgrade zod from ^4.3.4 to ^4.3.5 for better type validation.
+ - 🔄 Upgrade @dword-design/eslint-plugin-import-alias from ^8.1.2 to ^8.1.3 for import alias linting improvements.
+ - 🔄 Upgrade @eslint-react/eslint-plugin from ^2.5.0 to ^2.5.1 for React linting updates.
+ - 🔄 Upgrade @typescript-eslint/eslint-plugin, parser, and types from ^8.51.0 to ^8.52.0 for TypeScript linting enhancements.
+ - 🔄 Upgrade electron-builder and electron-builder-squirrel-windows from ^26.0.12 to ^26.4.0 for better packaging support.
+ - 🔄 Upgrade electron-publish from ^26.0.11 to ^26.3.4 for publishing improvements.
+ - 🔄 Upgrade eslint-plugin-antfu from ^3.1.1 to ^3.1.3 for additional linting rules.
+ - 🔄 Upgrade eslint-plugin-package-json from ^0.87.1 to ^0.88.0 for package.json linting updates.
+ - 🔄 Upgrade eslint-plugin-perfectionist from ^5.2.0 to ^5.3.0 for enhanced code perfectionism checks.
+ - 🔄 Upgrade eslint-plugin-putout from ^29.2.4 to ^29.3.0 for better code quality checks.
+ - 🔄 Upgrade eslint-plugin-react-dom from ^2.5.0 to ^2.5.1 for React DOM linting improvements.
+ - 🔄 Upgrade eslint-plugin-react-hooks-extra and react-naming-convention from ^2.5.0 to ^2.5.1 for additional React hooks linting rules.
+ - 🔄 Upgrade eslint-plugin-react-web-api from ^2.5.0 to ^2.5.1 for improved web API linting.
+ - 🔄 Upgrade knip from ^5.79.0 to ^5.80.0 for better dependency management.
+ - 🔄 Upgrade npm-check-updates from ^19.2.1 to ^19.3.1 for improved package update checks.
+ - 🔄 Upgrade putout from ^41.5.0 to ^41.6.1 for enhanced code quality checks.
+ - 🔄 Upgrade typedoc-plugin-dt-links from ^2.0.35 to ^2.0.36 for better documentation generation.
+ - 🔄 Upgrade typescript-eslint from ^8.51.0 to ^8.52.0 for improved TypeScript linting capabilities.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(a2dd2d7)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/a2dd2d7f517c6ac4edae43d83deb8e61c7acc1ea)
+
+
+- 🔧 [build] Refactor electron-debug initialization for development mode
+ - Use dynamic import for electron-debug to avoid production dependency
+ - Ensure electron-debug is only loaded in development mode
+ - Log warnings if electron-debug fails to load or does not export a function
+
+🛠️ [fix] Update isRendererEventChannel function for better validation
+ - Change includes check to some for improved performance and accuracy
+
+🔧 [build] Update package dependencies
+ - Upgrade @biomejs/biome to version 2.3.11
+ - Upgrade eslint-plugin-import-alias to version 8.1.2
+ - Upgrade eslint-plugin-putout to version 29.2.4
+ - Upgrade putout to version 41.5.0
+ - Upgrade other dependencies as necessary
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(35ca57a)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/35ca57a2496444104aef7983f3e6a51648e52d9c)
+
+
+- 🔧 [build] Update Prettier configuration for CSS plugins
+ - Removed unused Prettier plugins: `prettier-plugin-css-order`, `prettier-plugin-merge`
+ - Retained `prettier-plugin-tailwindcss` for Tailwind CSS support
+ - Adjusted `multilineArraysWrapThreshold` to 1 for better array formatting
+ - Ensured `tailwindStylesheet` path remains consistent
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(7936315)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/793631593216711920543b512473f0273233f3d3)
+
+
+- 🔧 [build] Refactor OAuth token management and validation
+
+ - 🛠️ [fix] Consolidate token retrieval logic in DropboxTokenManager and GoogleDriveTokenManager using readStoredJsonSecret for improved maintainability.
+ - 🚜 [refactor] Remove redundant error handling code in token retrieval methods, enhancing clarity and reducing duplication.
+ - ✨ [feat] Introduce new utility module oauthStoredTokens for centralized JSON token handling, including schema validation and error logging.
+ - 🎨 [style] Improve code readability by using consistent naming conventions and simplifying complex structures in AddSiteForm and related components.
+ - ⚡ [perf] Optimize dynamic monitor field value handling in AddSiteForm by utilizing buildMonitorValidationFieldValues for better performance and clarity.
+ - 🧪 [test] Enhance test coverage for AddSiteForm and related components, ensuring robust validation and error handling.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(3e5f994)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/3e5f99475023c95249dd6954822b8ad876ea0841)
+
+
+- 🔧 [build] Update dependencies in package.json and package-lock.json
+ - 🔄 [dependency] Update zod ^4.3.4 for improved validation features
+ - 🔄 Upgrade @commitlint packages to ^20.3.0 for better commit message linting
+ - 🔄 Update eslint-plugin-package-json from ^0.87.0 to ^0.87.1 for enhanced package.json linting
+ - 🔄 Upgrade putout from ^41.3.3 to ^41.4.0 for improved code transformation capabilities
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(c80fd22)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c80fd22a4aec538aed9a66242ed7bd44c1303744)
+
+
+
+
+
+
 ## [20.3.0] - 2025-12-31
 
 
@@ -44,6 +485,26 @@ Co-authored-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(045
 
 
 ### 🔧 Build System
+
+- 🔧 [build] Refactor media query handling and improve error management
+
+ - 🎨 [style] Standardize media query usage with new utility functions
+   - Introduced `getMediaQueryMatches`, `tryGetMediaQueryList`, and `subscribeToMediaQueryMatches` for consistent media query handling across components.
+   - Centralized media query logic to avoid duplication and improve maintainability.
+
+ - 🛠️ [fix] Enhance error handling in file download process
+   - Added `FileDownloadDomAttachmentError` to specifically handle DOM attachment failures during file downloads.
+   - Updated `clickDownloadAnchor` to throw this new error for better clarity on failure reasons.
+
+ - ⚡ [perf] Optimize sidebar collapse behavior
+   - Replaced direct media query checks with `getMediaQueryMatches` in `AppSidebar` and `usePrefersReducedMotion` hooks for improved performance and readability.
+   - Introduced `SIDEBAR_COLLAPSE_MEDIA_QUERY` constant for better maintainability of sidebar collapse logic.
+
+ - 📝 [docs] Update comments and documentation for clarity
+   - Improved JSDoc comments across various functions to better describe their purpose and usage.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(f6df058)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/f6df0588e6d1e607b3c6b6c11b2abd1ebc43c213)
+
 
 - 🔧 [build] Optimize build process and improve path handling
 
