@@ -11,7 +11,7 @@ import type { UptimeOrchestrator } from "../../../UptimeOrchestrator";
 
 import { logger } from "../../../utils/logger";
 import { createStandardizedIpcRegistrar } from "../utils";
-import { StateSyncHandlerValidators } from "../validators";
+import { StateSyncHandlerValidators } from "../validators/stateSync";
 
 /**
  * Dependencies required to register state synchronization IPC handlers.

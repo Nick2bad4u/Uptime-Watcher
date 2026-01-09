@@ -32,7 +32,7 @@ import {
     recordSuccessfulHandlerCheck,
 } from "../diagnosticsMetrics";
 import { createStandardizedIpcRegistrar } from "../utils";
-import { SystemHandlerValidators } from "../validators";
+import { SystemHandlerValidators } from "../validators/system";
 
 const shouldExposeChannelInventory = (): boolean =>
     isDev() || readBooleanEnv("VITEST");

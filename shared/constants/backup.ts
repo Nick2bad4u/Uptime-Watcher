@@ -29,3 +29,32 @@ export const DEFAULT_MAX_BACKUP_SIZE_BYTES: number = 50 * 1024 * 1024;
  * dialog + file write) for large databases.
  */
 export const DEFAULT_MAX_IPC_BACKUP_TRANSFER_BYTES: number = 10 * 1024 * 1024;
+
+/**
+ * Maximum size (bytes) allowed for SQLite backup buffers transferred over IPC.
+ *
+ * @remarks
+ * Alias of {@link DEFAULT_MAX_IPC_BACKUP_TRANSFER_BYTES} intended for use in
+ * transport checks where the operation context matters.
+ */
+export const MAX_IPC_SQLITE_BACKUP_TRANSFER_BYTES: number =
+	DEFAULT_MAX_IPC_BACKUP_TRANSFER_BYTES;
+
+/**
+ * Maximum size (bytes) accepted for SQLite restore payloads sent over IPC.
+ *
+ * @remarks
+ * This limit is applied to renderer → main transfers (restore) and should be
+ * kept aligned with the renderer-side byte budget enforced in the preload
+ * bridge.
+ */
+export const MAX_IPC_SQLITE_RESTORE_BYTES: number = DEFAULT_MAX_BACKUP_SIZE_BYTES;
+
+/**
+ * Maximum size (bytes) accepted for JSON import payloads transported over IPC.
+ *
+ * @remarks
+ * JSON import/export is intended for portability and small-to-medium snapshots.
+ * For very large datasets users should prefer SQLite backup/restore.
+ */
+export const MAX_IPC_JSON_IMPORT_BYTES: number = DEFAULT_MAX_BACKUP_SIZE_BYTES;

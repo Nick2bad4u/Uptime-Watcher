@@ -37,13 +37,13 @@ import type {
     MonitorLifecycleEventData,
     MonitorUpEventData,
 } from "@shared/types/events";
-import type { UnknownRecord } from "type-fest";
 
 import { BASE_MONITOR_TYPES } from "@shared/types";
 import {
     interpolateLogTemplate,
     LOG_TEMPLATES,
 } from "@shared/utils/logTemplates";
+import { isRecord } from "@shared/utils/typeHelpers";
 
 import type { EnhancedMonitoringDependencies } from "./EnhancedMonitoringDependencies";
 import type {
@@ -202,15 +202,7 @@ export class EnhancedMonitorChecker {
      */
     private readonly servicesByType: Map<Monitor["type"], IMonitorService>;
 
-    private static isUnknownRecord(value: unknown): value is UnknownRecord {
-        return (
-            typeof value === "object" &&
-            value !== null &&
-            !Array.isArray(value)
-        );
-    }
-
-/**
+    /**
      * Performs a comprehensive monitor status check with advanced operation
      * correlation.
      *
@@ -900,7 +892,7 @@ private async runServiceCheck(args: {
         const isValidServiceResult = (
             value: unknown
         ): value is MonitorCheckResult => {
-            if (!EnhancedMonitorChecker.isUnknownRecord(value)) {
+            if (!isRecord(value)) {
                 return false;
             }
 

@@ -64,10 +64,6 @@ export class TypedQueryRowValidationError extends Error {
     }
 }
 
-function isUnknownRecord(value: unknown): value is UnknownRecord {
-    return isSharedRecord(value);
-}
-
 function describeRow(label?: string, context?: string): string {
     const base = label ?? "row";
     return context ? `${base} (${context})` : base;
@@ -78,7 +74,7 @@ function ensureValidRow<TRow extends object>(
     options?: RowValidationOptions<TRow>,
     context?: string
 ): TRow {
-    if (!isUnknownRecord(row)) {
+    if (!isSharedRecord(row)) {
         throw new TypedQueryRowValidationError(
             `Expected ${describeRow(options?.label, context)} to be an object`,
             {
@@ -241,7 +237,7 @@ export function queryForIds(
     const validRows: IdOnlyResult[] = [];
 
     rows.forEach((row) => {
-        if (!isUnknownRecord(row)) {
+        if (!isSharedRecord(row)) {
             return;
         }
 

@@ -22,6 +22,17 @@ export const FORWARDED_METADATA_PROPERTY_KEY = "_meta" as const;
 /** Metadata property key used to preserve original event metadata. */
 export const ORIGINAL_METADATA_PROPERTY_KEY = "_originalMeta" as const;
 
+type ForwardedMetadataKey =
+    | typeof FORWARDED_METADATA_PROPERTY_KEY
+    | typeof ORIGINAL_METADATA_PROPERTY_KEY;
+
+type StrippedForwardedEventMetadata<TPayload> =
+    TPayload extends readonly unknown[]
+        ? TPayload
+        : TPayload extends object
+          ? Omit<TPayload, ForwardedMetadataKey>
+          : never;
+
 /**
  * Parameters for attaching forwarded metadata to an event payload.
  */
@@ -123,6 +134,9 @@ export function attachForwardedMetadata<TPayload extends object>(
  * This helper centralises that stripping logic so multiple callers do not
  * duplicate knowledge of the metadata property keys.
  *
+ * For object payloads, the return type is {@link Omit} of `_meta` and
+ * `_originalMeta`. For array payloads, the same array type is returned.
+ *
  * @param payload - Payload that may carry forwarded metadata. Must be an array
  *   or an object; primitives are rejected at runtime.
  *
@@ -133,26 +147,24 @@ export function attachForwardedMetadata<TPayload extends object>(
  *   Event metadata is only attached to object or array payloads, so attempting
  *   to strip metadata from primitives usually indicates a programming error.
  */
-export function stripForwardedEventMetadata(
-    payload: object | readonly unknown[]
-): object | readonly unknown[] {
+export function stripForwardedEventMetadata<
+    TPayload extends object | readonly unknown[],
+>(payload: TPayload): StrippedForwardedEventMetadata<TPayload> {
     if (Array.isArray(payload)) {
-        // After the Array.isArray check we know payload is an array. Narrow to a
-        // readonly array for Array.from while preserving element types.
-
-        const arrayPayload = payload as readonly unknown[];
-        const clonedArray = Array.from(arrayPayload);
+        const clonedArray = Array.from(payload);
 
         Reflect.deleteProperty(clonedArray, FORWARDED_METADATA_PROPERTY_KEY);
         Reflect.deleteProperty(clonedArray, ORIGINAL_METADATA_PROPERTY_KEY);
         Reflect.deleteProperty(clonedArray, ORIGINAL_METADATA_SYMBOL);
 
-        return clonedArray;
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Preserves runtime array structure; strips non-enumerable metadata properties.
+        return clonedArray as unknown as StrippedForwardedEventMetadata<TPayload>;
     }
 
-    if (Object(payload) !== payload) {
+        const candidate: unknown = payload;
+        if (typeof candidate !== "object" || candidate === null) {
         throw new TypeError(
-            "Unexpected primitive payload when stripping metadata"
+                "Expected object/array payload for metadata stripping"
         );
     }
 
@@ -175,5 +187,6 @@ export function stripForwardedEventMetadata(
         Reflect.deleteProperty(clonedPayload, ORIGINAL_METADATA_SYMBOL);
     }
 
-    return clonedPayload;
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Preserves runtime object shape; strips non-enumerable metadata properties.
+    return clonedPayload as unknown as StrippedForwardedEventMetadata<TPayload>;
 }

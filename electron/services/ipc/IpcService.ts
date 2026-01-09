@@ -1,7 +1,7 @@
-import type { Site } from "@shared/types";
 import type { EventMetadata } from "@shared/types/events";
 import type { IpcInvokeChannel } from "@shared/types/ipc";
 import type {
+    SiteIdentifierSnapshot,
     StateSyncSource,
     StateSyncStatusSummary,
 } from "@shared/types/stateSync";
@@ -30,6 +30,34 @@ import { registerSettingsHandlers } from "./handlers/settingsHandlers";
 import { registerSiteHandlers } from "./handlers/siteHandlers";
 import { registerStateSyncHandlers } from "./handlers/stateSyncHandlers";
 import { registerSystemHandlers } from "./handlers/systemHandlers";
+
+/**
+ * Lightweight, normalized view of the `sites:state-synchronized` event used
+ * exclusively for IPC status bookkeeping.
+ */
+type NormalizedStateSyncStatusEvent =
+    | {
+          readonly _meta?: EventMetadata | undefined;
+          readonly action: "bulk-sync";
+          readonly revision: number;
+          readonly siteCount: number;
+          readonly sites: readonly SiteIdentifierSnapshot[];
+          readonly source: StateSyncSource;
+          readonly timestamp: number;
+          readonly truncated?: boolean | undefined;
+      }
+    | {
+          readonly _meta?: EventMetadata | undefined;
+          readonly action: "delete" | "update";
+          readonly delta: {
+              readonly addedSites: readonly SiteIdentifierSnapshot[];
+              readonly removedSiteIdentifiers: readonly string[];
+              readonly updatedSites: readonly SiteIdentifierSnapshot[];
+          };
+          readonly revision: number;
+          readonly source: StateSyncSource;
+          readonly timestamp: number;
+      };
 
 /**
  * Centralizes registration and lifecycle management of Electron IPC handlers.
@@ -68,7 +96,7 @@ export class IpcService {
         this.updateStateSyncStatusFromEvent(normalized);
     };
 
-private static isValidStateSyncSource(
+    private static isValidStateSyncSource(
         candidate: unknown
     ): candidate is StateSyncSource {
         return (
@@ -78,7 +106,9 @@ private static isValidStateSyncSource(
         );
     }
 
-    private static buildIdentifierOnlySites(candidate: unknown): Site[] {
+    private static buildIdentifierOnlySites(
+        candidate: unknown
+    ): SiteIdentifierSnapshot[] {
         if (!Array.isArray(candidate)) {
             return [];
         }
@@ -89,8 +119,7 @@ private static isValidStateSyncSource(
             .filter((identifier): identifier is string =>
                 typeof identifier === "string"
             )
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Identifier-only snapshots are sufficient for IPC sync bookkeeping.
-            .map((identifier) => ({ identifier }) as Site);
+            .map((identifier) => ({ identifier }));
     }
 
     /**
@@ -98,17 +127,13 @@ private static isValidStateSyncSource(
      * IPC layer can safely consume.
      *
      * @remarks
-     * We intentionally avoid validating full {@link Site} payloads here.
+     * We intentionally avoid validating full site payloads here.
      * State sync events can be high-frequency and large, and IPC only needs
      * identifiers and counts to maintain {@link StateSyncStatusSummary}.
      */
     private normalizeStateSyncPayload(
         candidate: unknown
-    ):
-        | null
-        | (UptimeEvents["sites:state-synchronized"] & {
-              _meta?: EventMetadata;
-          }) {
+    ): NormalizedStateSyncStatusEvent | null {
         if (!isRecord(candidate)) {
             return null;
         }
@@ -155,8 +180,6 @@ private static isValidStateSyncSource(
                 source,
                 timestamp,
                 truncated: isTruncated,
-            } as UptimeEvents["sites:state-synchronized"] & {
-                _meta?: EventMetadata;
             };
         }
 
@@ -199,8 +222,6 @@ private static isValidStateSyncSource(
             revision,
             source,
             timestamp,
-        } as UptimeEvents["sites:state-synchronized"] & {
-            _meta?: EventMetadata;
         };
     }
 
@@ -319,7 +340,7 @@ private static isValidStateSyncSource(
     }
 
     private updateStateSyncStatus(
-        sites: Site[],
+        sites: readonly SiteIdentifierSnapshot[],
         source: StateSyncSource,
         timestamp: number
     ): void {
@@ -332,26 +353,23 @@ private static isValidStateSyncSource(
     }
 
     private updateStateSyncStatusFromEvent(
-        event: UptimeEvents["sites:state-synchronized"] & {
-            _meta?: EventMetadata;
-        }
+        event: NormalizedStateSyncStatusEvent
     ): void {
-        const { action, source, timestamp, truncated } = event;
-
-        if (truncated === true) {
-            const { siteCount } = event;
-
-            this.stateSyncStatus = {
-                lastSyncAt: timestamp,
-                siteCount,
-                source,
-                synchronized: false,
-            } satisfies StateSyncStatusSummary;
-            return;
-        }
+        const { action, source, timestamp } = event;
 
         if (action === "bulk-sync") {
-            const { sites } = event;
+            const { siteCount, sites, truncated } = event;
+
+            if (truncated === true) {
+                this.stateSyncStatus = {
+                    lastSyncAt: timestamp,
+                    siteCount,
+                    source,
+                    synchronized: false,
+                } satisfies StateSyncStatusSummary;
+                return;
+            }
+
             this.knownSiteIdentifiers = new Set(
                 sites.map((site) => site.identifier)
             );

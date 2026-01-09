@@ -11,6 +11,7 @@ import type { Site } from "@shared/types";
 import type { UnknownRecord } from "type-fest";
 import type { ZodError } from "zod";
 
+import { ApplicationError } from "@shared/utils/errorHandling";
 import {
     validateSiteSnapshot,
     validateSiteSnapshots,
@@ -47,7 +48,15 @@ const logInvalidSnapshotAndThrow = (
         issues: error.issues,
     });
 
-    throw new Error(thrownMessage, { cause: error });
+    throw new ApplicationError({
+        cause: error,
+        code: "RENDERER_SERVICE_INVALID_PAYLOAD",
+        details: {
+            ...metadata,
+            issues: error.issues,
+        },
+        message: `[SiteService] ${thrownMessage}`,
+    });
 };
 
 /**
@@ -142,9 +151,11 @@ export const SiteService: SiteServiceContract = {
         const [firstIssue] = validationResult.errors;
 
         if (!firstIssue) {
-            throw new Error(
-                "getSites returned invalid site snapshot data (validation errors were empty)"
-            );
+            throw new ApplicationError({
+                code: "RENDERER_SERVICE_INVALID_PAYLOAD",
+                message:
+                    "[SiteService] getSites returned invalid site snapshot data (validation errors were empty)",
+            });
         }
 
         const invalidIndices = validationResult.errors.map(
@@ -163,10 +174,18 @@ export const SiteService: SiteServiceContract = {
             }
         );
 
-        throw new Error(
-            `getSites returned invalid site snapshot data (indices: ${invalidIndices.join(", ")})`,
-            { cause: firstIssue.error }
-        );
+        throw new ApplicationError({
+            cause: firstIssue.error,
+            code: "RENDERER_SERVICE_INVALID_PAYLOAD",
+            details: {
+                invalidIndices,
+                issues: validationResult.errors.map(({ error, index }) => ({
+                    index,
+                    issues: error.issues,
+                })),
+            },
+            message: `[SiteService] getSites returned invalid site snapshot data (indices: ${invalidIndices.join(", ")})`,
+        });
     }),
 
     /**
@@ -248,9 +267,15 @@ export const SiteService: SiteServiceContract = {
         const removed = await api.sites.removeSite(identifier);
 
         if (!removed) {
-            throw new Error(
-                `Site removal failed for site ${identifier}: Backend operation returned false`
-            );
+            throw new ApplicationError({
+                code: "RENDERER_SERVICE_BACKEND_OPERATION_FAILED",
+                details: {
+                    identifier,
+                    operation: "removeSite",
+                    serviceName: "SiteService",
+                },
+                message: `[SiteService] Site removal failed for site ${identifier}: backend returned false`,
+            });
         }
 
         return true;

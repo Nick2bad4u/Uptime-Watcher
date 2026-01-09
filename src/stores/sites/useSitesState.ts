@@ -124,6 +124,14 @@ export interface SitesState {
 export interface SitesStateActions {
     /** Add a site to the store */
     addSite: (site: Site) => void;
+    /** Replace a site snapshot in the store */
+    /**
+     * Applies a site snapshot to local state.
+     *
+     * @remarks
+     * This is a local state mutation helper (replace-by-identifier).
+     */
+    applySiteSnapshot: (site: Site) => void;
     /** Clear optimistic monitoring locks for the provided monitors. */
     clearOptimisticMonitoringLocks: (
         siteIdentifier: Site["identifier"],
@@ -229,6 +237,29 @@ export const createSitesStateActions = (
                 sites: [...state.sites, site],
                 sitesRevision: state.sitesRevision + 1,
             }));
+        },
+        applySiteSnapshot: (site: Site): void => {
+            logStoreAction("SitesStore", "applySiteSnapshot", {
+                identifier: site.identifier,
+            });
+            set((state) => {
+                const hasSite = state.sites.some(
+                    (existing) => existing.identifier === site.identifier
+                );
+
+                if (!hasSite) {
+                    return {};
+                }
+
+                return {
+                    sites: state.sites.map((existing) =>
+                        existing.identifier === site.identifier
+                            ? site
+                            : existing
+                    ),
+                    sitesRevision: state.sitesRevision + 1,
+                };
+            });
         },
         clearOptimisticMonitoringLocks: (
             siteIdentifier: Site["identifier"],

@@ -168,6 +168,7 @@ const createMockSitesStoreState = (sites: Site[]): SitesStore => {
         subscribeToSyncEvents: vi.fn(() => unsubscribe),
         syncSites: vi.fn(async () => {}),
         unsubscribeFromStatusUpdates: unsubscribeFromStatusUpdatesMock,
+        applySiteSnapshot: vi.fn(),
         updateMonitorRetryAttempts: vi.fn(async () => {}),
         updateMonitorTimeout: vi.fn(async () => {}),
         updateSiteCheckInterval: vi.fn(async () => {}),

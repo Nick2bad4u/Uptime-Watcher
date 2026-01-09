@@ -1,9 +1,9 @@
 ---
-schema: "../config/schemas/doc-frontmatter.schema.json"
+schema: "../../config/schemas/doc-frontmatter.schema.json"
 title: "Uptime Watcher Consistency Guide"
 summary: "Architectural patterns, conventions, and standards for consistency across the Uptime Watcher codebase."
 created: "2025-11-15"
-last_reviewed: "2025-12-16"
+last_reviewed: "2026-01-08"
 category: "guide"
 author: "Nick2bad4u"
 tags:

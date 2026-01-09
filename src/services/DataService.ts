@@ -198,28 +198,28 @@ export const DataService: DataServiceContract = {
         async (
             api,
             payload: SerializedDatabaseRestorePayload
-        ): Promise<SerializedDatabaseRestoreResult> => {
-            try {
-                // The Zod schema already models `preRestoreFileName` as
-                // optional, so we can return the parsed result directly
-                // without reshaping. Callers can treat the absence of the
-                // property and an explicit `undefined` value equivalently
-                // when displaying restore summaries.
-                return validateServicePayload<SerializedDatabaseRestoreResult>(
-                    validateSerializedDatabaseRestoreResult,
-                    await api.data.restoreSqliteBackup(payload),
-                    {
-                        diagnostics: {
-                            payloadFileName: payload.fileName,
-                        },
-                        operation: "restoreSqliteBackup",
-                        serviceName: "DataService",
-                    }
-                );
-            } catch (error: unknown) {
-                throw ensureError(error);
+        ): Promise<SerializedDatabaseRestoreResult> =>
+            // The Zod schema already models `preRestoreFileName` as optional,
+            // so we can return the parsed result directly without reshaping.
+            // Callers can treat the absence of the property and an explicit
+            // `undefined` value equivalently when displaying restore summaries.
+            {
+                try {
+                    return validateServicePayload<SerializedDatabaseRestoreResult>(
+                        validateSerializedDatabaseRestoreResult,
+                        await api.data.restoreSqliteBackup(payload),
+                        {
+                            diagnostics: {
+                                payloadFileName: payload.fileName,
+                            },
+                            operation: "restoreSqliteBackup",
+                            serviceName: "DataService",
+                        }
+                    );
+                } catch (error: unknown) {
+                    throw ensureError(error);
+                }
             }
-        }
     ),
 
     /**

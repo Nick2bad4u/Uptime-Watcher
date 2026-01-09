@@ -15,11 +15,7 @@ import type { CloudSettingsAdapter } from "../CloudService.types";
 import type { CloudStorageProvider } from "../providers/CloudStorageProvider.types";
 import type { SecretStore } from "../secrets/SecretStore";
 
-import { DropboxCloudStorageProvider } from "../providers/dropbox/DropboxCloudStorageProvider";
-import { DropboxTokenManager } from "../providers/dropbox/DropboxTokenManager";
 import { FilesystemCloudStorageProvider } from "../providers/FilesystemCloudStorageProvider";
-import { GoogleDriveCloudStorageProvider } from "../providers/googleDrive/GoogleDriveCloudStorageProvider";
-import { GoogleDriveTokenManager } from "../providers/googleDrive/GoogleDriveTokenManager";
 import { resolveGoogleDriveOAuthConfig } from "./googleOAuthConfig";
 
 /**
@@ -49,6 +45,12 @@ export async function resolveCloudProviderOrNull(args: {
     switch (providerKind) {
         case "dropbox": {
             const appKey = getDropboxAppKey();
+
+            const [{ DropboxTokenManager }, { DropboxCloudStorageProvider }] =
+                await Promise.all([
+                    import("../providers/dropbox/DropboxTokenManager"),
+                    import("../providers/dropbox/DropboxCloudStorageProvider"),
+                ]);
 
             const tokenManager = new DropboxTokenManager({
                 appKey,
@@ -84,6 +86,14 @@ export async function resolveCloudProviderOrNull(args: {
 
         case "google-drive": {
             const { clientId, clientSecret } = resolveGoogleDriveOAuthConfig();
+
+            const [{ GoogleDriveTokenManager }, { GoogleDriveCloudStorageProvider }] =
+                await Promise.all([
+                    import("../providers/googleDrive/GoogleDriveTokenManager"),
+                    import(
+                        "../providers/googleDrive/GoogleDriveCloudStorageProvider"
+                    ),
+                ]);
 
             const tokenManager = new GoogleDriveTokenManager({
                 clientId,

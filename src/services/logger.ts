@@ -22,13 +22,13 @@ import type {
     UserLogger,
 } from "@shared/utils/logger/interfaces";
 import type { RendererLogger } from "electron-log";
-import type { UnknownRecord } from "type-fest";
 
 import {
     buildErrorLogArguments,
     buildLogArguments,
 } from "@shared/utils/logger/common";
 import { extractLogContext } from "@shared/utils/loggingContext";
+import { isRecord } from "@shared/utils/typeHelpers";
 import log from "electron-log/renderer";
 
 /**
@@ -83,6 +83,35 @@ interface LogTransports {
     };
 }
 
+function isConsoleTransport(value: unknown): value is LogTransports["console"] {
+    return (
+        isRecord(value) &&
+        typeof value["format"] === "string" &&
+        typeof value["level"] === "string"
+    );
+}
+
+function isFileTransport(
+    value: unknown
+): value is NonNullable<LogTransports["file"]> {
+    return isRecord(value) && typeof value["level"] === "string";
+}
+
+function isTransportFor<K extends keyof LogTransports>(
+    name: K,
+    value: unknown
+): value is LogTransports[K] {
+    if (name === "console") {
+        return isConsoleTransport(value);
+    }
+
+    if (name === "file") {
+        return isFileTransport(value);
+    }
+
+    return false;
+}
+
 /**
  * Safely access a log transport property.
  *
@@ -90,19 +119,22 @@ interface LogTransports {
  *
  * @returns Transport object or undefined if not available
  */
-/* eslint-disable @typescript-eslint/no-unsafe-type-assertion -- Safe: Logger transport access with known structure */
 function getLogTransport<K extends keyof LogTransports>(
     transportName: K
 ): LogTransports[K] | undefined {
-    const transports = log.transports as unknown as UnknownRecord;
-
-    if (transportName in transports) {
-        return transports[transportName] as LogTransports[K];
+    const {transports} = log;
+    if (!isRecord(transports)) {
+        return undefined;
     }
 
-    return undefined;
+    const candidate = transports[transportName];
+
+    if (!isTransportFor(transportName, candidate)) {
+        return undefined;
+    }
+
+    return candidate;
 }
-/* eslint-enable @typescript-eslint/no-unsafe-type-assertion -- Re-enable after safe log level parsing from unknown input */
 
 // Configure electron-log for renderer process
 // The /renderer import is specifically chosen because:

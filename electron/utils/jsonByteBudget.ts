@@ -8,8 +8,7 @@
  * The estimate is conservative and stops early once the budget is exceeded.
  */
 
-import type { UnknownRecord } from "type-fest";
-
+import { isRecord } from "@shared/utils/typeHelpers";
 import { getUtfByteLength } from "@shared/utils/utfByteLength";
 
 const JSON_BYTE_BUDGET_LEAVE = Symbol("json-byte-budget-leave");
@@ -32,10 +31,6 @@ interface JsonByteBudgetState {
     /** Tracks objects currently on the traversal path to detect cycles only. */
     readonly path: WeakSet<object>;
     readonly stack: unknown[];
-}
-
-function isPlainRecord(value: unknown): value is UnknownRecord {
-    return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
 function addBytes(state: JsonByteBudgetState, increment: number): void {
@@ -109,7 +104,7 @@ function addJsonBytesForObject(
         return;
     }
 
-    if (!isPlainRecord(value)) {
+    if (!isRecord(value)) {
         addBytes(state, state.maxBytes + 1);
         return;
     }

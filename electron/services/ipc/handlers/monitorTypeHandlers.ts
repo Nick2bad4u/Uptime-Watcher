@@ -14,7 +14,7 @@ import {
     getMonitorTypeConfig,
 } from "../../monitoring/MonitorTypeRegistry";
 import { createStandardizedIpcRegistrar, createValidationResponse } from "../utils";
-import { MonitorTypeHandlerValidators } from "../validators";
+import { MonitorTypeHandlerValidators } from "../validators/monitorTypes";
 
 type BaseMonitorUiConfig = ReturnType<
     typeof getAllMonitorTypeConfigs

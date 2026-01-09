@@ -146,5 +146,9 @@ export const useSitesStore: UseBoundStore<StoreApi<SitesStore>> =
 
             // Sync actions
             ...syncActions,
-        };
+
+            // NOTE: Explicitly re-attach applySiteSnapshot so the composed
+            // store always satisfies the SitesStore contract.
+            applySiteSnapshot: stateActions.applySiteSnapshot,
+        } satisfies SitesStore;
     });

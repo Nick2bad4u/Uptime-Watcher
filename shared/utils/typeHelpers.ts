@@ -81,6 +81,28 @@ export function ensureRecordLike(value: unknown): undefined | UnknownRecord {
 }
 
 /**
+ * Asserts that a value is record-like (a non-null, non-array object) and returns
+ * it as an {@link UnknownRecord}.
+ *
+ * @remarks
+ * Use this when a record-like shape is required for correct operation.
+ * Prefer {@link ensureRecordLike} when absence should be handled without
+ * throwing.
+ *
+ * @throws TypeError If {@link value} is not record-like.
+ */
+export function requireRecordLike(
+    value: unknown,
+    message = "Expected record-like value"
+): UnknownRecord {
+    const record = ensureRecordLike(value);
+    if (!record) {
+        throw new TypeError(message);
+    }
+    return record;
+}
+
+/**
  * Safely extracts a property from an unknown object.
  *
  * @remarks

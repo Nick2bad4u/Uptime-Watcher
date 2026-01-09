@@ -1051,6 +1051,21 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
     }
 
     /**
+     * Starts monitoring for a specific monitor on a site.
+     *
+     * @remarks
+     * This method exists primarily for naming clarity at call sites (e.g. IPC
+     * handlers) so that monitor-scoped operations do not route through a
+     * `*ForSite` method with an optional monitor identifier.
+     */
+    public async startMonitoringForMonitor(
+        identifier: string,
+        monitorId: string
+    ): Promise<boolean> {
+        return this.startMonitoringForSite(identifier, monitorId);
+    }
+
+    /**
      * Stops monitoring for all sites.
      *
      * @returns Promise that resolves when monitoring has stopped.
@@ -1103,6 +1118,19 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
                 operation,
             }
         );
+    }
+
+    /**
+     * Stops monitoring for a specific monitor on a site.
+     *
+     * @remarks
+     * Naming clarity wrapper around {@link stopMonitoringForSite}.
+     */
+    public async stopMonitoringForMonitor(
+        identifier: string,
+        monitorId: string
+    ): Promise<boolean> {
+        return this.stopMonitoringForSite(identifier, monitorId);
     }
 
     /**

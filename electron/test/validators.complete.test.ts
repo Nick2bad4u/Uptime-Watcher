@@ -1,6 +1,6 @@
 /**
  * Provides complete test coverage for all exported validator groups in the
- * validators.ts module using isolated testing with comprehensive dependency
+ * per-domain validator modules using isolated testing with comprehensive dependency
  * mocking. Tests the actual validator behavior and parameter validation logic.
  *
  * @module ValidatorsTest
@@ -14,17 +14,15 @@
 
 import { describe, it, expect } from "vitest";
 
-// Import all exported validator groups
-import {
-    SiteHandlerValidators,
-    MonitoringHandlerValidators,
-    DataHandlerValidators,
-    CloudHandlerValidators,
-    MonitorTypeHandlerValidators,
-    SettingsHandlerValidators,
-    StateSyncHandlerValidators,
-    SystemHandlerValidators,
-} from "../services/ipc/validators";
+// Import all exported validator groups (domain modules)
+import { CloudHandlerValidators } from "../services/ipc/validators/cloud";
+import { DataHandlerValidators } from "../services/ipc/validators/data";
+import { MonitorTypeHandlerValidators } from "../services/ipc/validators/monitorTypes";
+import { MonitoringHandlerValidators } from "../services/ipc/validators/monitoring";
+import { SettingsHandlerValidators } from "../services/ipc/validators/settings";
+import { SiteHandlerValidators } from "../services/ipc/validators/sites";
+import { StateSyncHandlerValidators } from "../services/ipc/validators/stateSync";
+import { SystemHandlerValidators } from "../services/ipc/validators/system";
 
 /**
  * Helper function to check if validation result indicates success

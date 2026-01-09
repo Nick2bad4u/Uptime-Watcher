@@ -125,7 +125,7 @@ export const createSitesStoreMock = (
         updateMonitorRetryAttempts: asyncVoid(),
         updateMonitorTimeout: asyncVoid(),
         updateSiteCheckInterval: asyncVoid(),
-        updateSite: vi.fn(),
+        applySiteSnapshot: vi.fn(),
         restoreSqliteBackup: vi.fn(async () => ({
             metadata: {
                 appVersion: "0.0.0-test",

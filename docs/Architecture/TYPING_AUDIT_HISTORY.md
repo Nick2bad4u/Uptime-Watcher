@@ -6,7 +6,7 @@ summary: >-
  audits produced during the 2025 refactor, including the comprehensive file
  review tracker for future AI/context use.
 created: "2025-12-01"
-last_reviewed: "2025-12-12"
+last_reviewed: "2026-01-08"
 category: "guide"
 author: "AI Pair"
 tags:
@@ -225,7 +225,7 @@ the rationale for its modifications.
 | electron/services/ipc/IpcService.ts                                        | Reviewed | IPC handlers now use typed invoke channels, helper wrappers, and metadata stripping before renderer emission.                                 |
 | electron/services/ipc/types.ts                                             | Reviewed | Validators now accept readonly parameter arrays to align with register handler usage.                                                         |
 | electron/services/ipc/utils.ts                                             | Reviewed | IPC handler utilities now leverage typed invoke channels, metadata-aware logging, and readonly parameter validation.                          |
-| electron/services/ipc/validators.ts                                        | Reviewed | Param validators now accept readonly arrays and preload/notification validators updated accordingly.                                          |
+| electron/services/ipc/validators/shared.ts                                 | Reviewed | IPC parameter validator helpers split into shared builder module plus per-domain validator sets under electron/services/ipc/validators/\*.ts  |
 | electron/services/monitoring/CdnEdgeConsistencyMonitor.ts                  | Reviewed | Monitor now uses shared MonitorServiceConfig type for constructor/updateConfig.                                                               |
 | electron/services/monitoring/DnsMonitor.ts                                 | Reviewed | Switched service config typing to MonitorServiceConfig and updated docs/accessors accordingly.                                                |
 | electron/services/monitoring/HttpHeaderMonitor.ts                          | Reviewed | Factory now accepts MonitorServiceConfig instead of monitor-level config.                                                                     |

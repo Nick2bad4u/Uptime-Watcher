@@ -308,8 +308,12 @@ export default defineConfig(({ command, mode }) => {
                                     "form-data",
                                     "lodash",
                                     "lodash-es",
-                                    "es-set-tostringtag",
-                                    "get-intrinsic",
+                                    // Cloud provider SDKs are intentionally
+                                    // externalized to avoid inflating the
+                                    // main-process bundle. electron-builder
+                                    // packages node_modules.
+                                    "googleapis",
+                                    "dropbox",
                                 ],
                                 output: {
                                     // Reduce memory pressure from sourcemap generation. We still

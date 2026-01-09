@@ -3,7 +3,7 @@ schema: "../../config/schemas/doc-frontmatter.schema.json"
 title: "Error Handling Guide"
 summary: "Comprehensive overview of error handling patterns, stores, and utilities in Uptime Watcher."
 created: "2025-09-22"
-last_reviewed: "2025-12-11"
+last_reviewed: "2026-01-08"
 category: "guide"
 author: "Nick2bad4u"
 tags:
@@ -537,7 +537,7 @@ import { SITES_CHANNELS } from "@shared/types/preload";
 import type { UptimeOrchestrator } from "@electron/UptimeOrchestrator";
 
 import { registerStandardizedIpcHandler } from "@electron/services/ipc/utils";
-import { SiteHandlerValidators } from "@electron/services/ipc/validators";
+import { SiteHandlerValidators } from "@electron/services/ipc/validators/sites";
 import { withIgnoredIpcEvent } from "@electron/services/ipc/handlers/handlerShared";
 
 export const registerSitesHandlers = ({

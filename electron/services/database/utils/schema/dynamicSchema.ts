@@ -14,6 +14,7 @@ import type { MonitorRow } from "@shared/types/database";
 import type { Simplify, UnknownRecord } from "type-fest";
 
 import { safeStringify } from "@shared/utils/stringConversion";
+import { requireRecordLike } from "@shared/utils/typeHelpers";
 
 import { dbLogger } from "../../../../utils/logger";
 import { getAllMonitorTypeConfigs } from "../../../monitoring/MonitorTypeRegistry";
@@ -56,6 +57,26 @@ interface SqlParameters {
     columns: string[];
     placeholders: string;
 }
+
+/**
+ * Source shape accepted by {@link mapMonitorToRow}.
+ *
+ * @remarks
+ * The database layer persists a superset of the runtime {@link Monitor} model
+ * (timestamps, site identifiers, scheduler fields). We represent those fields
+ * explicitly to avoid unsafe casts while still keeping the mapping logic
+ * flexible for partial updates.
+ */
+export type MonitorRowSource = Monitor &
+    Readonly<
+        Partial<{
+            createdAt: number;
+            lastError: string;
+            nextCheck: number;
+            siteIdentifier: string;
+            updatedAt: number;
+        }>
+    >;
 
 /**
  * Converts a `lastChecked` value to a database-compatible timestamp.
@@ -233,7 +254,7 @@ export interface DatabaseFieldDefinition {
  *
  * @internal
  */
-function convertMonitoringToDbEnabled(monitor: UnknownRecord): number {
+function convertMonitoringToDbEnabled(monitor: UnknownRecord): 0 | 1 {
     return monitor["monitoring"] === true ? 1 : 0;
 }
 
@@ -656,10 +677,9 @@ export function generateSqlParameters(): SqlParameters {
  *
  * @returns Database row object suitable for SQL operations.
  */
-export function mapMonitorToRow(monitor: Monitor): MonitorRow {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Monitor object is converted to generic record for dynamic field access
-    const monitorRecord = monitor as unknown as UnknownRecord;
-    const row: UnknownRecord = {};
+export function mapMonitorToRow(monitor: Partial<MonitorRowSource>): MonitorRow {
+    const monitorRecord = requireRecordLike(monitor, "Expected monitor to be record-like");
+    const row: MonitorRow = {};
 
     // Map standard fields first
     mapStandardFields(monitorRecord, row);
@@ -667,7 +687,7 @@ export function mapMonitorToRow(monitor: Monitor): MonitorRow {
     // Map dynamic monitor type-specific fields
     mapDynamicFields(monitorRecord, row);
 
-    return row as MonitorRow;
+    return row;
 }
 
 /**
@@ -724,7 +744,7 @@ export function mapRowToMonitor(row: MonitorRow): Monitor {
 
     if (monitorTypeConfig) {
         // Create a mutable version for dynamic field assignment
-        const mutableMonitor = monitor as unknown as UnknownRecord;
+        const mutableMonitor = requireRecordLike(monitor, "Expected monitor to be record-like");
 
         // Only add fields that are specifically defined for this monitor type
         for (const field of monitorTypeConfig.fields) {
@@ -742,8 +762,7 @@ export function mapRowToMonitor(row: MonitorRow): Monitor {
             }
         }
 
-        // Return the monitor with type assertion back to Monitor interface
-        return mutableMonitor as unknown as Monitor;
+        return monitor;
     }
     /* eslint-enable @typescript-eslint/no-unsafe-type-assertion -- Re-enable type assertion checks after controlled cast back to Monitor interface */
 

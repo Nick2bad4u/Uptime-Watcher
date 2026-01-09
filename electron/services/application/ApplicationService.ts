@@ -829,12 +829,14 @@ export class ApplicationService {
         payload: EnhancedEventPayload<UptimeEvents[EventName]>
     ): UptimeEvents[EventName] {
         const isArrayPayload = Array.isArray(payload);
-        const sanitizedPayload = stripForwardedEventMetadata(payload);
 
-        this.logMetadataRemoval(eventName, isArrayPayload);
+        if (isArrayPayload) {
+            this.logMetadataRemoval(eventName, true);
+            return stripForwardedEventMetadata(payload);
+        }
 
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- After stripping metadata, the payload matches the event contract.
-        return sanitizedPayload as unknown as UptimeEvents[EventName];
+        this.logMetadataRemoval(eventName, false);
+        return stripForwardedEventMetadata(payload);
     }
 
     private logMetadataRemoval(

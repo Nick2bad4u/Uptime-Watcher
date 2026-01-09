@@ -10,7 +10,7 @@ import type { UptimeOrchestrator } from "../../../UptimeOrchestrator";
 
 import { logger } from "../../../utils/logger";
 import { createStandardizedIpcRegistrar } from "../utils";
-import { SiteHandlerValidators } from "../validators";
+import { SiteHandlerValidators } from "../validators/sites";
 
 /**
  * Dependencies required to register site CRUD IPC handlers.

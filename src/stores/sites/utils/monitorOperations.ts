@@ -341,8 +341,8 @@ function filterMonitorFieldsByType(
     // to perform dynamic key assignment.
     for (const [key, value] of Object.entries(monitor)) {
         if (allowedFields.has(key)) {
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Dynamic key assignment for field-filtering.
-            (filtered as unknown as UnknownRecord)[key] = value;
+
+            (filtered as UnknownRecord)[key] = value;
         }
     }
 

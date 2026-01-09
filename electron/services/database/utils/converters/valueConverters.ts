@@ -18,6 +18,34 @@
 export type DbValue = null | number | string;
 
 /**
+ * Converts an unknown input to a SQLite-bindable {@link DbValue}.
+ *
+ * @remarks
+ * - `string` and `number` pass through
+ * - `boolean` becomes `1`/`0`
+ * - `null` becomes `null`
+ * - `undefined` and all other types return `undefined` (caller decides whether
+ *   to skip the field or coerce to `null`)
+ *
+ * Prefer this helper instead of ad-hoc `typeof` chains so the conversion rules
+ * stay consistent across repositories and mappers.
+ */
+// eslint-disable-next-line sonarjs/function-return-type -- DbValue is intentionally a union (null | number | string) and this helper returns DbValue | undefined.
+export function convertToDbValue(value: unknown): DbValue | undefined {
+    let result: DbValue | undefined = undefined;
+
+    if (value === null) {
+        result = null;
+    } else if (typeof value === "string" || typeof value === "number") {
+        result = value;
+    } else if (typeof value === "boolean") {
+        result = value ? 1 : 0;
+    }
+
+    return result;
+}
+
+/**
  * Add a boolean field to update arrays if the value is defined.
  *
  * @remarks

@@ -49,7 +49,7 @@
     "postbuild": "npm run copy-wasm",
     "build:electron": "tsc --build tsconfig.electron.json",
     "build:electron-main": "npm run build",
-    "build:electron-vite": "tsc --build tsconfig.json && vite build --config ./vite.config.ts",
+    "build:electron-vite": "cross-env NODE_OPTIONS=--max_old_space_size=16384 tsc --build tsconfig.json && cross-env NODE_OPTIONS=--max_old_space_size=16384 vite build --config ./vite.config.ts",
     "build:eslint-inspector": "npx @eslint/config-inspector build --outDir \"docs/docusaurus/static/eslint-inspector\" --base \"/Uptime-Watcher/eslint-inspector/\"",
     "build:eslint-inspector:local": "npm run build:eslint-inspector",
     "build:playwright-coverage": "npm run build:playwright-coverage:vite && npm run copy-wasm",

@@ -14,7 +14,10 @@
 
 import type { UnknownRecord } from "type-fest";
 
-import { DEFAULT_MAX_BACKUP_SIZE_BYTES } from "@shared/constants/backup";
+import {
+    MAX_IPC_JSON_IMPORT_BYTES,
+    MAX_IPC_SQLITE_RESTORE_BYTES,
+} from "@shared/constants/backup";
 import { normalizePathSeparatorsToPosix } from "@shared/utils/pathSeparators";
 import { hasAsciiControlCharacters } from "@shared/utils/stringSafety";
 import { isRecord } from "@shared/utils/typeHelpers";
@@ -37,118 +40,14 @@ import {
     SITE_IDENTIFIER_TOO_LONG_MESSAGE,
 } from "@shared/validation/siteFieldConstants";
 
-import type { IpcParameterValidator } from "./types";
+import type { IpcParameterValidator } from "../types";
 
 import {
     getUtfByteLength,
     MAX_DIAGNOSTICS_METADATA_BYTES,
     MAX_DIAGNOSTICS_PAYLOAD_PREVIEW_BYTES,
-} from "./diagnosticsLimits";
-import { IpcValidators } from "./utils";
-
-/**
- * Interface for data handler validators.
- */
-interface DataHandlerValidatorsInterface {
-    downloadSqliteBackup: IpcParameterValidator;
-    exportData: IpcParameterValidator;
-    importData: IpcParameterValidator;
-    restoreSqliteBackup: IpcParameterValidator;
-    saveSqliteBackup: IpcParameterValidator;
-}
-
-/**
- * Interface for cloud handler validators.
- */
-interface CloudHandlerValidatorsInterface {
-    clearEncryptionKey: IpcParameterValidator;
-    configureFilesystemProvider: IpcParameterValidator;
-    connectDropbox: IpcParameterValidator;
-    connectGoogleDrive: IpcParameterValidator;
-    deleteBackup: IpcParameterValidator;
-    disconnect: IpcParameterValidator;
-    enableSync: IpcParameterValidator;
-    getStatus: IpcParameterValidator;
-    listBackups: IpcParameterValidator;
-    migrateBackups: IpcParameterValidator;
-    previewResetRemoteSyncState: IpcParameterValidator;
-    requestSyncNow: IpcParameterValidator;
-    resetRemoteSyncState: IpcParameterValidator;
-    restoreBackup: IpcParameterValidator;
-    setEncryptionPassphrase: IpcParameterValidator;
-    uploadLatestBackup: IpcParameterValidator;
-}
-
-/**
- * Interface for settings handler validators.
- */
-interface SettingsHandlerValidatorsInterface {
-    getHistoryLimit: IpcParameterValidator;
-    resetSettings: IpcParameterValidator;
-    updateHistoryLimit: IpcParameterValidator;
-}
-
-/**
- * Interface for monitoring handler validators.
- */
-interface MonitoringHandlerValidatorsInterface {
-    checkSiteNow: IpcParameterValidator;
-    startMonitoring: IpcParameterValidator;
-    startMonitoringForMonitor: IpcParameterValidator;
-    startMonitoringForSite: IpcParameterValidator;
-    stopMonitoring: IpcParameterValidator;
-    stopMonitoringForMonitor: IpcParameterValidator;
-    stopMonitoringForSite: IpcParameterValidator;
-}
-
-/**
- * Interface for monitor type handler validators.
- */
-interface MonitorTypeHandlerValidatorsInterface {
-    formatMonitorDetail: IpcParameterValidator;
-    formatMonitorTitleSuffix: IpcParameterValidator;
-    getMonitorTypes: IpcParameterValidator;
-    validateMonitorData: IpcParameterValidator;
-}
-
-/**
- * Interface for notification handler validators.
- */
-interface NotificationHandlerValidatorsInterface {
-    notifyAppEvent: IpcParameterValidator;
-    updatePreferences: IpcParameterValidator;
-}
-
-/**
- * Interface for site handler validators.
- */
-interface SiteHandlerValidatorsInterface {
-    addSite: IpcParameterValidator;
-    deleteAllSites: IpcParameterValidator;
-    getSites: IpcParameterValidator;
-    removeMonitor: IpcParameterValidator;
-    removeSite: IpcParameterValidator;
-    updateSite: IpcParameterValidator;
-}
-
-/**
- * Interface for state sync handler validators.
- */
-interface StateSyncHandlerValidatorsInterface {
-    getSyncStatus: IpcParameterValidator;
-    requestFullSync: IpcParameterValidator;
-}
-
-/**
- * Interface for system handler validators.
- */
-interface SystemHandlerValidatorsInterface {
-    openExternal: IpcParameterValidator;
-    quitAndInstall: IpcParameterValidator;
-    reportPreloadGuard: IpcParameterValidator;
-    verifyIpcHandler: IpcParameterValidator;
-    writeClipboardText: IpcParameterValidator;
-}
+} from "../diagnosticsLimits";
+import { IpcValidators } from "../utils";
 
 type ParameterValueValidator = (
     value: unknown
@@ -162,7 +61,6 @@ function toValidationResult(
     if (error === null) {
         return null;
     }
-
     return typeof error === "string" ? [error] : error;
 }
 
@@ -205,7 +103,7 @@ interface CreateParamValidatorOptions {
  * this limit with the SQLite backup size policy to avoid "works on one path but
  * not the other" surprises.
  */
-const MAX_IMPORT_DATA_PAYLOAD_BYTES: number = DEFAULT_MAX_BACKUP_SIZE_BYTES;
+const MAX_IMPORT_DATA_PAYLOAD_BYTES: number = MAX_IPC_JSON_IMPORT_BYTES;
 
 /** Maximum byte budget accepted for cloud backup object keys. */
 const MAX_BACKUP_KEY_BYTES: number = 2048;
@@ -323,23 +221,20 @@ const validateSiteUpdatePayload: IpcParameterValidator = createParamValidator(
         (identifierCandidate): ParameterValueValidationResult =>
             validateSiteIdentifierCandidate(identifierCandidate, "identifier"),
         (updatesCandidate): ParameterValueValidationResult => {
-            const objectError = IpcValidators.requiredObject(
+            const recordResult = requireRecordParam(
                 updatesCandidate,
                 "updates"
             );
-            if (objectError) {
-                return toValidationResult(objectError);
+            if (isRequiredRecordError(recordResult)) {
+                return recordResult.error;
             }
 
             const errors: string[] = [];
-            if (
-                isRecord(updatesCandidate) &&
-                Object.keys(updatesCandidate).length === 0
-            ) {
+            if (Object.keys(recordResult.record).length === 0) {
                 errors.push("updates must not be empty");
             }
 
-            const validationResult = validateSiteUpdate(updatesCandidate);
+            const validationResult = validateSiteUpdate(recordResult.record);
             if (!validationResult.success) {
                 errors.push(...formatZodIssues(validationResult.error.issues));
             }
@@ -659,9 +554,9 @@ function validateRestoreBufferCandidate(candidate: unknown): string[] {
         return ["payload.buffer must not be empty"];
     }
 
-    if (candidate.byteLength > DEFAULT_MAX_BACKUP_SIZE_BYTES) {
+    if (candidate.byteLength > MAX_IPC_SQLITE_RESTORE_BYTES) {
         return [
-            `payload.buffer exceeds maximum allowed ${DEFAULT_MAX_BACKUP_SIZE_BYTES} bytes`,
+            `payload.buffer exceeds maximum allowed ${MAX_IPC_SQLITE_RESTORE_BYTES} bytes`,
         ];
     }
 
@@ -983,372 +878,27 @@ function createTwoStringValidator(
     ]);
 }
 
-/**
- * Parameter validators for site management IPC handlers.
- *
- * @remarks
- * Each property is a validator for a specific site-related IPC channel.
- * Validators ensure correct parameter count and types for each handler.
- *
- * @public
- */
-export const SiteHandlerValidators: SiteHandlerValidatorsInterface = {
-    /**
-     * Validates parameters for the "add-site" IPC handler.
-     *
-     * @remarks
-     * Expects a single parameter: a site object.
-     */
-    addSite: validateSitePayload,
-
-    /**
-     * Validates parameters for the "delete-all-sites" IPC handler.
-     *
-     * @remarks
-     * Expects no parameters.
-     */
-    deleteAllSites: createNoParamsValidator(),
-
-    /**
-     * Validates parameters for the "get-sites" IPC handler.
-     *
-     * @remarks
-     * Expects no parameters.
-     */
-    getSites: createNoParamsValidator(),
-
-    /**
-     * Validates parameters for the "remove-monitor" IPC handler.
-     *
-     * @remarks
-     * Expects two parameters: site identifier and monitor ID (both strings).
-     */
-    removeMonitor: createSiteIdentifierAndMonitorIdValidator(
-        "siteIdentifier",
-        "monitorId"
-    ),
-
-    /**
-     * Validates parameters for the "remove-site" IPC handler.
-     *
-     * @remarks
-     * Expects a single parameter: the site identifier (string).
-     */
-    removeSite: createSiteIdentifierValidator("identifier"),
-
-    /**
-     * Validates parameters for the "update-site" IPC handler.
-     *
-     * @remarks
-     * Expects two parameters: site identifier (string) and updates (object).
-     */
-    updateSite: validateSiteUpdatePayload,
-} as const;
-
-/**
- * Parameter validators for monitoring control IPC handlers.
- *
- * @remarks
- * Each property is a validator for a specific monitoring-related IPC channel.
- *
- * @public
- */
-export const MonitoringHandlerValidators: MonitoringHandlerValidatorsInterface =
-    {
-        /**
-         * Validates parameters for the "check-site-now" IPC handler.
-         *
-         * @remarks
-         * Expects two parameters: site identifier and monitor ID (both
-         * strings).
-         */
-        checkSiteNow: createSiteIdentifierAndMonitorIdValidator(
-            "identifier",
-            "monitorId"
-        ),
-
-        /**
-         * Validates parameters for the "start-monitoring" IPC handler.
-         *
-         * @remarks
-         * Expects no parameters.
-         */
-        startMonitoring: createNoParamsValidator(),
-
-        /**
-         * Validates parameters for the "start-monitoring-for-monitor" IPC
-         * handler.
-         *
-         * @remarks
-         * Expects two parameters: site identifier (string) and monitor ID
-         * (string).
-         */
-        startMonitoringForMonitor: createSiteIdentifierAndMonitorIdValidator(
-            "identifier",
-            "monitorId"
-        ),
-
-        /**
-         * Validates parameters for the "start-monitoring-for-site" IPC handler.
-         *
-         * @remarks
-         * Expects one parameter: site identifier (string).
-         */
-        startMonitoringForSite: createSiteIdentifierValidator("identifier"),
-
-        /**
-         * Validates parameters for the "stop-monitoring" IPC handler.
-         *
-         * @remarks
-         * Expects no parameters.
-         */
-        stopMonitoring: createNoParamsValidator(),
-
-        /**
-         * Validates parameters for the "stop-monitoring-for-monitor" IPC
-         * handler.
-         *
-         * @remarks
-         * Expects two parameters: site identifier (string) and monitor ID
-         * (string).
-         */
-        stopMonitoringForMonitor: createSiteIdentifierAndMonitorIdValidator(
-            "identifier",
-            "monitorId"
-        ),
-
-        /**
-         * Validates parameters for the "stop-monitoring-for-site" IPC handler.
-         *
-         * @remarks
-         * Expects one parameter: site identifier (string).
-         */
-        stopMonitoringForSite: createSiteIdentifierValidator("identifier"),
-    } as const;
-
-/**
- * Parameter validators for data management IPC handlers.
- *
- * @remarks
- * Each property is a validator for a specific data-related IPC channel.
- *
- * @public
- */
-export const DataHandlerValidators: DataHandlerValidatorsInterface = {
-    /**
-     * Validates parameters for the "download-sqlite-backup" IPC handler.
-     *
-     * @remarks
-     * Expects no parameters.
-     */
-    downloadSqliteBackup: createNoParamsValidator(),
-
-    /**
-     * Validates parameters for the "export-data" IPC handler.
-     *
-     * @remarks
-     * Expects no parameters.
-     */
-    exportData: createNoParamsValidator(),
-
-    /**
-     * Validates parameters for the "import-data" IPC handler.
-     *
-     * @remarks
-     * Expects a single parameter: the data string.
-     */
-    importData: validateImportDataPayload,
-
-    /**
-     * Validates parameters for the "restore-sqlite-backup" IPC handler.
-     */
-    restoreSqliteBackup: validateRestorePayload,
-
-    /**
-     * Validates parameters for the "save-sqlite-backup" IPC handler.
-     *
-     * @remarks
-     * Expects no parameters.
-     */
-    saveSqliteBackup: createNoParamsValidator(),
-} as const;
-
-/**
- * Parameter validators for cloud IPC handlers.
- */
-export const CloudHandlerValidators: CloudHandlerValidatorsInterface = {
-    clearEncryptionKey: createNoParamsValidator(),
-    configureFilesystemProvider: validateCloudFilesystemProviderConfig,
-    connectDropbox: createNoParamsValidator(),
-    connectGoogleDrive: createNoParamsValidator(),
-    deleteBackup: createBackupKeyValidator("key"),
-    disconnect: createNoParamsValidator(),
-    enableSync: validateCloudEnableSyncConfig,
-    getStatus: createNoParamsValidator(),
-    listBackups: createNoParamsValidator(),
-    migrateBackups: validateCloudBackupMigrationRequest,
-    previewResetRemoteSyncState: createNoParamsValidator(),
-    requestSyncNow: createNoParamsValidator(),
-    resetRemoteSyncState: createNoParamsValidator(),
-    restoreBackup: createBackupKeyValidator("key"),
-    setEncryptionPassphrase: validateEncryptionPassphrasePayload,
-    uploadLatestBackup: createNoParamsValidator(),
-} as const;
-
-/**
- * Parameter validators for settings IPC handlers.
- *
- * @remarks
- * Each property is a validator for a specific settings-related IPC channel.
- *
- * @public
- */
-export const SettingsHandlerValidators: SettingsHandlerValidatorsInterface = {
-    /**
-     * Validates parameters for the "get-history-limit" IPC handler.
-     *
-     * @remarks
-     * Expects no parameters.
-     */
-    getHistoryLimit: createNoParamsValidator(),
-
-    /**
-     * Validates parameters for the "reset-settings" IPC handler.
-     *
-     * @remarks
-     * Expects no parameters.
-     */
-    resetSettings: createNoParamsValidator(),
-
-    /**
-     * Validates parameters for the "update-history-limit" IPC handler.
-     *
-     * @remarks
-     * Expects a single parameter: the new history limit (number).
-     */
-    updateHistoryLimit: createSingleNumberValidator("limit"),
-} as const;
-
-/**
- * Parameter validators for monitor type IPC handlers.
- *
- * @remarks
- * Each property is a validator for a specific monitor type-related IPC channel.
- *
- * @public
- */
-export const MonitorTypeHandlerValidators: MonitorTypeHandlerValidatorsInterface =
-    {
-        /**
-         * Validates parameters for the "format-monitor-detail" IPC handler.
-         *
-         * @remarks
-         * Expects two parameters: monitor type (string) and details (string).
-         */
-        formatMonitorDetail: createTwoStringValidator("monitorType", "details"),
-
-        /**
-         * Validates parameters for the "format-monitor-title-suffix" IPC
-         * handler.
-         *
-         * @remarks
-         * Expects two parameters: monitor type (string) and monitor object.
-         */
-        formatMonitorTitleSuffix: createStringObjectValidator(
-            "monitorType",
-            "monitor"
-        ),
-
-        /**
-         * Validates parameters for the "get-monitor-types" IPC handler.
-         *
-         * @remarks
-         * Expects no parameters.
-         */
-        getMonitorTypes: createNoParamsValidator(),
-
-        /**
-         * Validates parameters for the "validate-monitor-data" IPC handler.
-         *
-         * @remarks
-         * Expects two parameters: monitor type (string) and data (any). Only
-         * the monitor type is validated for type.
-         */
-        validateMonitorData:
-            createStringWithUnvalidatedSecondValidator("monitorType"),
-    } as const;
-
-/**
- * Parameter validators for notification preference IPC handlers.
- *
- * @remarks
- * Ensures the renderer supplies a well-formed preference payload.
- *
- * @public
- */
-export const NotificationHandlerValidators: NotificationHandlerValidatorsInterface =
-    {
-        notifyAppEvent: validateNotifyAppEvent,
-        updatePreferences: validateNotificationPreferences,
-    } as const;
-
-/**
- * Parameter validators for state synchronization IPC handlers.
- *
- * @remarks
- * Each property is a validator for a specific state sync-related IPC channel.
- *
- * @public
- */
-export const StateSyncHandlerValidators: StateSyncHandlerValidatorsInterface = {
-    /**
-     * Validates parameters for the "get-sync-status" IPC handler.
-     *
-     * @remarks
-     * Expects no parameters.
-     */
-    getSyncStatus: createNoParamsValidator(),
-
-    /**
-     * Validates parameters for the "request-full-sync" IPC handler.
-     *
-     * @remarks
-     * Expects no parameters.
-     */
-    requestFullSync: createNoParamsValidator(),
-} as const;
-
-/**
- * System handler validators.
- *
- * @remarks
- * Provides parameter validation for system operations. Each property is a
- * validator for a specific system-related IPC channel.
- *
- * @public
- */
-export const SystemHandlerValidators: SystemHandlerValidatorsInterface = {
-    /**
-     * Validates parameters for the "open-external" IPC handler.
-     *
-     * @remarks
-     * Expects exactly one http(s) URL parameter (the destination to open).
-     */
-    openExternal: createSingleExternalOpenUrlValidator("url"),
-    /**
-     * Validates parameters for the "quit-and-install" IPC handler.
-     *
-     * @remarks
-     * Expects no parameters; handler simply triggers the updater.
-     */
-    quitAndInstall: createNoParamsValidator(),
-    reportPreloadGuard: createPreloadGuardReportValidator(),
-    /**
-     * Validates parameters for the diagnostics handler verification channel.
-     *
-     * @remarks
-     * Expects the target channel name as a single non-empty string.
-     */
-    verifyIpcHandler: createSingleStringValidator("channelName"),
-    writeClipboardText: createClipboardTextValidator(),
-} as const;
+export {
+    createBackupKeyValidator,
+    createClipboardTextValidator,
+    createNoParamsValidator,
+    createPreloadGuardReportValidator,
+    createSingleExternalOpenUrlValidator,
+    createSingleNumberValidator,
+    createSingleStringValidator,
+    createSiteIdentifierAndMonitorIdValidator,
+    createSiteIdentifierValidator,
+    createStringObjectValidator,
+    createStringWithUnvalidatedSecondValidator,
+    createTwoStringValidator,
+    validateCloudBackupMigrationRequest,
+    validateCloudEnableSyncConfig,
+    validateCloudFilesystemProviderConfig,
+    validateEncryptionPassphrasePayload,
+    validateImportDataPayload,
+    validateNotificationPreferences,
+    validateNotifyAppEvent,
+    validateRestorePayload,
+    validateSitePayload,
+    validateSiteUpdatePayload,
+};

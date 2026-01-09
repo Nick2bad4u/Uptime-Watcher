@@ -6,8 +6,27 @@ import { isFilesystemBaseDirectoryValid } from "@shared/validation/filesystemBas
 
 import type { CloudStorageProvider } from "../providers/CloudStorageProvider.types";
 
-import { DropboxCloudStorageProvider } from "../providers/dropbox/DropboxCloudStorageProvider";
 import { FilesystemCloudStorageProvider } from "../providers/FilesystemCloudStorageProvider";
+
+type CloudProviderWithAccountLabel = CloudStorageProvider & {
+    readonly getAccountLabel: () => Promise<string>;
+};
+
+function hasAccountLabel(
+    provider: CloudStorageProvider
+): provider is CloudProviderWithAccountLabel {
+    if (!("getAccountLabel" in provider)) {
+        return false;
+    }
+
+    const candidate = (
+        provider as CloudStorageProvider & {
+            readonly getAccountLabel?: unknown;
+        }
+    ).getAccountLabel;
+
+    return typeof candidate === "function";
+}
 
 /**
  * Common, provider-agnostic inputs used by the cloud status builder functions.
@@ -101,7 +120,7 @@ export async function buildDropboxStatus(args: {
     let connectionError: string | undefined = undefined;
     let accountLabel: string | undefined = undefined;
 
-    if (provider && provider instanceof DropboxCloudStorageProvider) {
+    if (provider?.kind === "dropbox" && hasAccountLabel(provider)) {
         try {
             accountLabel = await provider.getAccountLabel();
             connected = true;

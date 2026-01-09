@@ -14,9 +14,9 @@
  */
 
 import type { AxiosInstance, AxiosRequestConfig } from "axios";
-import type { UnknownRecord } from "type-fest";
 
 import { readNumberEnv } from "@shared/utils/environment";
+import { isRecord } from "@shared/utils/typeHelpers";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import axios from "axios";
 import * as http from "node:http";
@@ -234,10 +234,6 @@ function getSharedHttpsAgent(): https.Agent {
 }
 
 const ALLOWED_REDIRECT_PROTOCOLS = new Set(["http:", "https:"]);
-
-function isRecord(value: unknown): value is UnknownRecord {
-    return typeof value === "object" && value !== null && !Array.isArray(value);
-}
 
 /**
  * Prevent following redirects to unsupported schemes (e.g. file:, javascript:)

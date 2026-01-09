@@ -3,7 +3,7 @@ schema: "../../../config/schemas/doc-frontmatter.schema.json"
 title: "ADR-009: Layered Validation Strategy with Zod"
 summary: "Establishes a multi-layered validation architecture using Zod schemas for IPC boundaries, business rules in managers, and persistence constraints in repositories."
 created: "2025-11-25"
-last_reviewed: "2025-12-11"
+last_reviewed: "2026-01-08"
 category: "guide"
 author: "Nick2bad4u"
 tags:
@@ -372,7 +372,7 @@ export interface ValidationResult {
 IPC handlers use a two-stage validation approach:
 
 ```typescript
-// electron/services/ipc/validators.ts
+// electron/services/ipc/validators/sites.ts
 
 // Stage 1: Parameter count and basic type validation
 export const SiteHandlerValidators: SiteHandlerValidatorsInterface = {
@@ -386,8 +386,9 @@ export const SiteHandlerValidators: SiteHandlerValidatorsInterface = {
 
  getSites: createNoParamsValidator(),
 
- updateSite: createParamValidator(1, [
-  (value) => IpcValidators.requiredObject(value, "site update data"),
+ updateSite: createParamValidator(2, [
+  (value) => IpcValidators.requiredString(value, "identifier"),
+  (value) => IpcValidators.requiredObject(value, "updates"),
  ]),
 };
 
@@ -657,7 +658,7 @@ CREATE UNIQUE INDEX IF NOT EXISTS idx_monitors_site_id
 2. **Add IPC Validator**
 
    ```typescript
-   // electron/services/ipc/validators.ts
+   // electron/services/ipc/validators/sites.ts
    export const NewHandlerValidators = {
     createNew: createParamValidator(1, [
      (value) => IpcValidators.requiredObject(value, "new data"),
@@ -732,7 +733,7 @@ All data flows follow the layered validation strategy:
 ### Current Implementation Audit (2025-11-25)
 
 - Verified `shared/validation/schemas.ts` contains all monitor type schemas with strict mode
-- Confirmed `electron/services/ipc/validators.ts` provides parameter validators for all handler groups
+- Confirmed per-domain parameter validators under `electron/services/ipc/validators/*` cover all handler groups
 - Checked `shared/validation/guards.ts` exposes typed validation helpers using schemas
 - Validated managers throw `ApplicationError` for business rule violations
 - Reviewed repository normalization patterns in `SiteRepository` and `MonitorRepository`

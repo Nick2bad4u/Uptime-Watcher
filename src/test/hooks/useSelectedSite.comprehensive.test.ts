@@ -110,6 +110,8 @@ const createMockSitesStore = (
         success: true,
     }),
     modifySite: async () => {},
+    removeMonitorFromSite: async (_siteIdentifier: string, _monitorId: string) =>
+        {},
     restoreSqliteBackup: async () => ({
         metadata: {
             appVersion: "0.0.0-test",
@@ -123,7 +125,20 @@ const createMockSitesStore = (
         preRestoreFileName: "pre-restore.sqlite",
         restoredAt: Date.now(),
     }),
-    removeMonitorFromSite: async () => {},
+    saveSqliteBackup: async () => ({
+        canceled: false,
+        fileName: "backup.sqlite",
+        filePath: "C:/mock/backup.sqlite",
+        metadata: {
+            appVersion: "0.0.0-test",
+            checksum: "mock-checksum",
+            createdAt: Date.now(),
+            originalPath: "backup.sqlite",
+            retentionHintDays: 30,
+            schemaVersion: 1,
+            sizeBytes: 0,
+        },
+    }),
     removeSite: (_identifier: string) => {},
     retryStatusSubscription: async (
         _callback?: (update: StatusUpdate) => void
@@ -140,7 +155,9 @@ const createMockSitesStore = (
     setSelectedMonitorId: (_siteId: string, _monitorId: string) => {},
     setSites: (_sites: Site[]) => {},
     setStatusSubscriptionSummary: (_summary) => {},
-    setLastBackupMetadata: (_metadata: any) => {},
+    setLastBackupMetadata: (
+        _metadata: Parameters<SitesStore["setLastBackupMetadata"]>[0]
+    ) => {},
     recordSiteSyncDelta: (_delta) => {},
     startSiteMonitoring: async () => {},
     startSiteMonitorMonitoring: async () => {},
@@ -164,6 +181,9 @@ const createMockSitesStore = (
         success: true,
         unsubscribed: true,
     }),
+    applySiteSnapshot: (
+        _site: Parameters<SitesStore["applySiteSnapshot"]>[0]
+    ) => {},
     updateMonitorRetryAttempts: async () => {},
     updateMonitorTimeout: async () => {},
     updateSiteCheckInterval: async () => {},

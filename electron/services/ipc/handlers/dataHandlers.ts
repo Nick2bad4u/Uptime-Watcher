@@ -5,7 +5,7 @@ import type {
     SerializedDatabaseRestoreResult,
 } from "@shared/types/ipc";
 
-import { DEFAULT_MAX_IPC_BACKUP_TRANSFER_BYTES } from "@shared/constants/backup";
+import { MAX_IPC_SQLITE_BACKUP_TRANSFER_BYTES } from "@shared/constants/backup";
 import { DATA_CHANNELS } from "@shared/types/preload";
 import { createSingleFlight } from "@shared/utils/singleFlight";
 import { app, dialog } from "electron";
@@ -15,7 +15,7 @@ import type { UptimeOrchestrator } from "../../../UptimeOrchestrator";
 
 import { validateDatabaseBackupPayload } from "../../database/utils/backup/databaseBackup";
 import { createStandardizedIpcRegistrar, toClonedArrayBuffer } from "../utils";
-import { DataHandlerValidators } from "../validators";
+import { DataHandlerValidators } from "../validators/data";
 
 function ensureSqliteFileExtension(rawPath: string): string {
     const ext = path.extname(rawPath);
@@ -48,9 +48,9 @@ export function registerDataHandlers({
         validateDatabaseBackupPayload(result);
         const { buffer, fileName, metadata } = result;
 
-        if (buffer.byteLength > DEFAULT_MAX_IPC_BACKUP_TRANSFER_BYTES) {
+        if (buffer.byteLength > MAX_IPC_SQLITE_BACKUP_TRANSFER_BYTES) {
             throw new Error(
-                `SQLite backup is too large to transfer over IPC (${buffer.byteLength} > ${DEFAULT_MAX_IPC_BACKUP_TRANSFER_BYTES} bytes). Use the save-sqlite-backup flow instead.`
+                `SQLite backup is too large to transfer over IPC (${buffer.byteLength} > ${MAX_IPC_SQLITE_BACKUP_TRANSFER_BYTES} bytes). Use the save-sqlite-backup flow instead.`
             );
         }
         const arrayBuffer = toClonedArrayBuffer(buffer);

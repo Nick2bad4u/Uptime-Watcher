@@ -77,13 +77,7 @@ import { resetProviderCloudSyncState } from "./migrations/syncReset";
 import { buildCloudSyncResetPreview } from "./migrations/syncResetPreview";
 import { backupMetadataKeyForBackupKey } from "./providers/CloudBackupMetadataFile";
 import { isCloudProviderOperationError } from "./providers/cloudProviderErrors";
-import { DropboxAuthFlow } from "./providers/dropbox/DropboxAuthFlow";
-import { DropboxCloudStorageProvider } from "./providers/dropbox/DropboxCloudStorageProvider";
-import { DropboxTokenManager } from "./providers/dropbox/DropboxTokenManager";
 import { EncryptedSyncCloudStorageProvider } from "./providers/EncryptedSyncCloudStorageProvider";
-import { fetchGoogleAccountLabel } from "./providers/googleDrive/fetchGoogleAccountLabel";
-import { GoogleDriveAuthFlow } from "./providers/googleDrive/GoogleDriveAuthFlow";
-import { GoogleDriveTokenManager } from "./providers/googleDrive/GoogleDriveTokenManager";
 import {
     EphemeralSecretStore,
     FallbackSecretStore,
@@ -212,6 +206,18 @@ function parseNumberSetting(value: string | undefined): null | number {
     return Number.isFinite(parsed) ? parsed : null;
 }
 
+type DropboxProviderDeps = Readonly<{
+    DropboxAuthFlow: typeof import("./providers/dropbox/DropboxAuthFlow").DropboxAuthFlow;
+    DropboxCloudStorageProvider: typeof import("./providers/dropbox/DropboxCloudStorageProvider").DropboxCloudStorageProvider;
+    DropboxTokenManager: typeof import("./providers/dropbox/DropboxTokenManager").DropboxTokenManager;
+}>;
+
+type GoogleDriveProviderDeps = Readonly<{
+    fetchGoogleAccountLabel: typeof import("./providers/googleDrive/fetchGoogleAccountLabel").fetchGoogleAccountLabel;
+    GoogleDriveAuthFlow: typeof import("./providers/googleDrive/GoogleDriveAuthFlow").GoogleDriveAuthFlow;
+    GoogleDriveTokenManager: typeof import("./providers/googleDrive/GoogleDriveTokenManager").GoogleDriveTokenManager;
+}>;
+
 /**
  * Coordinates cloud provider configuration and remote backup operations.
  *
@@ -233,6 +239,10 @@ export class CloudService {
     private readonly syncEngine: CloudSyncEngine;
 
     private readonly secretStore: SecretStore;
+
+    private dropboxDepsPromise: Promise<DropboxProviderDeps> | undefined;
+
+    private googleDriveDepsPromise: Promise<GoogleDriveProviderDeps> | undefined;
 
     private async runCloudOperation<T>(
         operationName: string,
@@ -264,12 +274,13 @@ export class CloudService {
         }
     }
 
-    /** Disconnects from the configured provider and clears persisted config. */
-    public async disconnect(): Promise<CloudStatusSummary> {
+/** Disconnects from the configured provider and clears persisted config. */
+public async disconnect(): Promise<CloudStatusSummary> {
         return this.runCloudOperation("disconnect", async () => {
             const provider = await this.settings.get(SETTINGS_KEY_PROVIDER);
 
             if (provider === "dropbox") {
+                const { DropboxTokenManager } = await this.loadDropboxDeps();
                 const appKey = this.getDropboxAppKey();
                 const tokenManager = new DropboxTokenManager({
                     appKey,
@@ -281,6 +292,8 @@ export class CloudService {
             }
 
             if (provider === "google-drive") {
+                const { GoogleDriveTokenManager } =
+                    await this.loadGoogleDriveDeps();
                 const { clientId, clientSecret } =
                     resolveGoogleDriveOAuthConfig();
 
@@ -318,8 +331,8 @@ export class CloudService {
         });
     }
 
-    /** Enables or disables multi-device sync (when supported). */
-    public async enableSync(
+/** Enables or disables multi-device sync (when supported). */
+public async enableSync(
         config: CloudEnableSyncConfig
     ): Promise<CloudStatusSummary> {
         return this.runCloudOperation("enableSync", async () => {
@@ -336,12 +349,12 @@ export class CloudService {
         });
     }
 
-    /** Returns the current cloud configuration state. */
-    public async getStatus(): Promise<CloudStatusSummary> {
+/** Returns the current cloud configuration state. */
+public async getStatus(): Promise<CloudStatusSummary> {
         return this.buildStatusSummary();
     }
 
-    /**
+/**
      * Enables or unlocks passphrase-based encryption.
      *
      * @remarks
@@ -349,7 +362,7 @@ export class CloudService {
      * - Stores the derived key in {@link SecretStore} so the user is not prompted
      *   every run.
      */
-    public async setEncryptionPassphrase(
+public async setEncryptionPassphrase(
         passphrase: string
     ): Promise<CloudStatusSummary> {
         return this.runCloudOperation("setEncryptionPassphrase", async () => {
@@ -486,14 +499,14 @@ export class CloudService {
         });
     }
 
-    /**
+/**
      * Clears the locally cached derived encryption key.
      *
      * @remarks
      * This does not disable encryption remotely. It simply forces the user to
      * re-enter the passphrase on this device.
      */
-    public async clearEncryptionKey(): Promise<CloudStatusSummary> {
+public async clearEncryptionKey(): Promise<CloudStatusSummary> {
         return this.runCloudOperation("clearEncryptionKey", async () => {
             await this.secretStore.deleteSecret(
                 SECRET_KEY_ENCRYPTION_DERIVED_KEY
@@ -502,8 +515,8 @@ export class CloudService {
         });
     }
 
-    /** Requests a sync cycle as soon as possible. */
-    public async requestSyncNow(): Promise<undefined> {
+/** Requests a sync cycle as soon as possible. */
+public async requestSyncNow(): Promise<undefined> {
         await this.runCloudOperation("requestSyncNow", async () => {
             const syncEnabled = parseBooleanSetting(
                 await this.settings.get(SETTINGS_KEY_SYNC_ENABLED)
@@ -526,13 +539,13 @@ export class CloudService {
         return undefined;
     }
 
-    /**
+/**
      * Resets the remote sync history and re-seeds it from this device.
      *
      * @remarks
      * This is a destructive maintenance operation intended for advanced users.
      */
-    public async resetRemoteSyncState(): Promise<CloudSyncResetResult> {
+public async resetRemoteSyncState(): Promise<CloudSyncResetResult> {
         return this.runCloudOperation("resetRemoteSyncState", async () => {
             const syncEnabled = parseBooleanSetting(
                 await this.settings.get(SETTINGS_KEY_SYNC_ENABLED)
@@ -553,11 +566,11 @@ export class CloudService {
         });
     }
 
-    /**
+/**
      * Previews a remote sync reset by counting remote `sync/` objects and
      * reading the current manifest.
      */
-    public async previewResetRemoteSyncState(): Promise<CloudSyncResetPreview> {
+public async previewResetRemoteSyncState(): Promise<CloudSyncResetPreview> {
         return this.runCloudOperation(
             "previewResetRemoteSyncState",
             async () => {
@@ -576,8 +589,8 @@ export class CloudService {
         );
     }
 
-    /** Configures the filesystem provider to use the given base directory. */
-    public async configureFilesystemProvider(
+/** Configures the filesystem provider to use the given base directory. */
+public async configureFilesystemProvider(
         config: CloudFilesystemProviderConfig
     ): Promise<CloudStatusSummary> {
         return this.runCloudOperation(
@@ -685,12 +698,86 @@ export class CloudService {
             }
         );
     }
+private loadDropboxDeps(): Promise<DropboxProviderDeps> {
+        this.dropboxDepsPromise ??= (async () => {
+            const [authFlowModule, providerModule, tokenModule] =
+                await Promise.all([
+                    import("./providers/dropbox/DropboxAuthFlow"),
+                    import("./providers/dropbox/DropboxCloudStorageProvider"),
+                    import("./providers/dropbox/DropboxTokenManager"),
+                ]);
+
+            return {
+                DropboxAuthFlow: authFlowModule.DropboxAuthFlow,
+                DropboxCloudStorageProvider:
+                    providerModule.DropboxCloudStorageProvider,
+                DropboxTokenManager: tokenModule.DropboxTokenManager,
+            };
+        })();
+
+        return this.dropboxDepsPromise;
+    }
+
+    private loadGoogleDriveDeps(): Promise<GoogleDriveProviderDeps> {
+        this.googleDriveDepsPromise ??= (async () => {
+            const [authFlowModule, tokenModule, labelModule] =
+                await Promise.all([
+                    import("./providers/googleDrive/GoogleDriveAuthFlow"),
+                    import("./providers/googleDrive/GoogleDriveTokenManager"),
+                    import(
+                        "./providers/googleDrive/fetchGoogleAccountLabel"
+                    ),
+                ]);
+
+            return {
+                fetchGoogleAccountLabel: labelModule.fetchGoogleAccountLabel,
+                GoogleDriveAuthFlow: authFlowModule.GoogleDriveAuthFlow,
+                GoogleDriveTokenManager: tokenModule.GoogleDriveTokenManager,
+            };
+        })();
+
+        return this.googleDriveDepsPromise;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     /**
      * Connects the Dropbox provider via system-browser OAuth.
      */
     public async connectDropbox(): Promise<CloudStatusSummary> {
         return this.runCloudOperation("connectDropbox", async () => {
+            const {
+                DropboxAuthFlow,
+                DropboxCloudStorageProvider,
+                DropboxTokenManager,
+            } = await this.loadDropboxDeps();
             const appKey = this.getDropboxAppKey();
             const authFlow = new DropboxAuthFlow({ appKey });
             const tokens = await authFlow.connect();
@@ -737,6 +824,11 @@ export class CloudService {
 
     public async connectGoogleDrive(): Promise<CloudStatusSummary> {
         return this.runCloudOperation("connectGoogleDrive", async () => {
+            const {
+                fetchGoogleAccountLabel,
+                GoogleDriveAuthFlow,
+                GoogleDriveTokenManager,
+            } = await this.loadGoogleDriveDeps();
             const { clientId, clientSecret } = resolveGoogleDriveOAuthConfig();
 
             logger.info("[CloudService] Google Drive OAuth config selected", {

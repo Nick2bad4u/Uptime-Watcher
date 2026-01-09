@@ -12,6 +12,31 @@ import type { Site } from "@shared/types";
 import { siteSchema } from "@shared/validation/siteSchemas";
 import * as z from "zod";
 
+/**
+ * Minimal site snapshot used for state-sync *bookkeeping*.
+ *
+ * @remarks
+ * Some infrastructure layers (e.g. IPC status tracking) only need the site
+ * identifiers to compute counts and detect membership changes. Using this
+ * lightweight type avoids unsafe casts such as `({ identifier }) as Site`.
+ *
+ * This type is **not** a replacement for full {@link Site} payloads used by
+ * renderer state reconciliation.
+ *
+ * @public
+ */
+export type SiteIdentifierSnapshot = Pick<Site, "identifier">;
+
+/**
+ * Zod schema validating {@link SiteIdentifierSnapshot} payloads.
+ */
+export const siteIdentifierSnapshotSchema: z.ZodType<SiteIdentifierSnapshot> =
+    z
+        .object({
+            identifier: z.string().min(1),
+        })
+        .strict();
+
 const STATE_SYNC_SOURCE_VALUES = [
     "cache",
     "database",

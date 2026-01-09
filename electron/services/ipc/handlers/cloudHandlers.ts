@@ -7,7 +7,7 @@ import { createSingleFlight } from "@shared/utils/singleFlight";
 import type { CloudService } from "../../cloud/CloudService";
 
 import { createStandardizedIpcRegistrar } from "../utils";
-import { CloudHandlerValidators } from "../validators";
+import { CloudHandlerValidators } from "../validators/cloud";
 
 /**
  * Dependencies required for registering cloud IPC handlers.

@@ -445,7 +445,7 @@ describe("SiteService", () => {
 
             await expect(
                 SiteService.removeSite(identifier)
-            ).rejects.toThrowError(/Backend operation returned false/);
+            ).rejects.toThrowError(/backend returned false/i);
         });
 
         it("should handle removal errors", async ({ task, annotate }) => {

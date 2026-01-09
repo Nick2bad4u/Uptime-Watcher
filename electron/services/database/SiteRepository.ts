@@ -524,7 +524,7 @@ export class SiteRepository {
                 // Apply consistent data normalization
                 const name = site.name ?? SITE_DEFAULTS.NAME;
                 const monitoring = site.monitoring ?? SITE_DEFAULTS.MONITORING;
-                const monitoringValue = monitoring ? 1 : 0;
+                const monitoringValue: 0 | 1 = monitoring ? 1 : 0;
 
                 stmt.run([
                     site.identifier,
@@ -620,7 +620,7 @@ export class SiteRepository {
         assertValidSiteIdentifier(identifier, "SiteRepository.upsertInternal");
         const name = site.name ?? SITE_DEFAULTS.NAME;
         const monitoring = site.monitoring ?? SITE_DEFAULTS.MONITORING;
-        const monitoringValue = monitoring ? 1 : 0;
+        const monitoringValue: 0 | 1 = monitoring ? 1 : 0;
 
         db.run(SITE_QUERIES.UPSERT, [
             identifier,

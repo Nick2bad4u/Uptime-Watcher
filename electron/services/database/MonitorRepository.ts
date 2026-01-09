@@ -49,16 +49,19 @@
  *
  * @public
  */
-import type { Monitor, Site } from "@shared/types";
+import type { Site } from "@shared/types";
 import type { Database } from "node-sqlite3-wasm";
 import type { UnknownRecord } from "type-fest";
 
 import type { DatabaseService } from "./DatabaseService";
-import type { DbValue } from "./utils/converters/valueConverters";
 
 import { isDev } from "../../electronUtils";
 import { logger } from "../../utils/logger";
 import { withDatabaseOperation } from "../../utils/operationalHooks";
+import {
+    convertToDbValue,
+    type DbValue,
+} from "./utils/converters/valueConverters";
 import {
     buildMonitorParameters,
     rowsToMonitors,
@@ -890,19 +893,16 @@ export class MonitorRepository {
             );
         }
 
-        // Use dynamic row mapping to convert camelCase to snake_case
-        /* eslint-disable @typescript-eslint/no-unsafe-type-assertion -- Monitor row mapping requires type assertions for dynamic field conversion */
-        const row = mapMonitorToRow(monitor as Monitor);
+        const row = mapMonitorToRow(monitor);
 
         if (isDev()) {
             logger.debug(`[MonitorRepository] mapMonitorToRow result:`, row);
         }
 
         const { updateFields, updateValues } = this.buildUpdateFieldsAndValues(
-            row as unknown as UnknownRecord,
+            row,
             monitor
         );
-        /* eslint-enable @typescript-eslint/no-unsafe-type-assertion -- Re-enable after monitor field mapping with validated types */
 
         if (updateFields.length === 0) {
             if (isDev()) {
@@ -973,11 +973,9 @@ export class MonitorRepository {
         key: string,
         value: unknown
     ): DbValue | undefined {
-        if (typeof value === "string" || typeof value === "number") {
-            return value;
-        }
-        if (typeof value === "boolean") {
-            return value ? 1 : 0;
+        const converted = convertToDbValue(value);
+        if (converted !== undefined) {
+            return converted;
         }
 
         if (isDev()) {

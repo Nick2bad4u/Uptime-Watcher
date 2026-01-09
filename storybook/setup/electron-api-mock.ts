@@ -20,6 +20,8 @@ import type { CloudSyncResetPreview } from "@shared/types/cloudSyncResetPreview"
 import type { StateSyncEventData } from "@shared/types/events";
 import type {
     SerializedDatabaseBackupResult,
+    SerializedDatabaseBackupSaveResult,
+    SerializedDatabaseRestorePayload,
     SerializedDatabaseRestoreResult,
 } from "@shared/types/ipc";
 import type { MonitorTypeConfig } from "@shared/types/monitorTypes";
@@ -164,6 +166,7 @@ const stateSyncBase: StateSyncDomainBridge = {
         const sites = clone(mockState.sites);
         return {
             completedAt: Date.now(),
+            revision: 0,
             siteCount: sites.length,
             sites,
             source: "frontend",
@@ -376,13 +379,19 @@ const electronAPIMockDefinition = {
                 return false;
             }
         },
-        restoreSqliteBackup:
-            async (): Promise<SerializedDatabaseRestoreResult> => ({
+        restoreSqliteBackup: async (
+            payload?: SerializedDatabaseRestorePayload
+        ): Promise<SerializedDatabaseRestoreResult> => {
+            // Storybook mock currently ignores the actual bytes, but we still
+            // accept the payload to stay compatible with the preload contract.
+            const restoreSource = payload?.fileName ?? "mock-upload.sqlite";
+
+            return {
                 metadata: {
                     appVersion: "storybook-mock",
                     checksum: "mock-restore-checksum",
                     createdAt: Date.now(),
-                    originalPath: "mock-upload.sqlite",
+                    originalPath: restoreSource,
                     retentionHintDays: 30,
                     schemaVersion: 1,
                     sizeBytes: 0,
@@ -390,6 +399,22 @@ const electronAPIMockDefinition = {
                 preRestoreFileName:
                     "uptime-watcher-pre-restore-storybook.sqlite",
                 restoredAt: Date.now(),
+            };
+        },
+        saveSqliteBackup:
+            async (): Promise<SerializedDatabaseBackupSaveResult> => ({
+                canceled: false,
+                fileName: "uptime-watcher-backup.sqlite",
+                filePath: "C:/mock/uptime-watcher-backup.sqlite",
+                metadata: {
+                    appVersion: "storybook-mock",
+                    checksum: `mock-save-checksum-${Date.now()}`,
+                    createdAt: Date.now(),
+                    originalPath: "C:/mock/uptime-watcher.sqlite",
+                    retentionHintDays: 30,
+                    schemaVersion: 1,
+                    sizeBytes: 0,
+                },
             }),
     },
     events: {
@@ -461,18 +486,6 @@ const electronAPIMockDefinition = {
                 status: monitorSnapshot.status,
                 timestamp,
             };
-        },
-        removeMonitor: async (
-            siteIdentifier: string,
-            monitorId: string
-        ): Promise<boolean> => {
-            applySiteMutation(siteIdentifier, (site) => ({
-                ...site,
-                monitors: site.monitors.filter(
-                    (monitor) => monitor.id !== monitorId
-                ),
-            }));
-            return true;
         },
         startMonitoring: async (): Promise<MonitoringStartSummary> => {
             const siteCount = mockState.sites.length;
@@ -701,7 +714,10 @@ const electronAPIMockDefinition = {
                     : site.monitors,
             })),
     },
-    stateSync: stateSyncBase as ElectronAPI["stateSync"],
+    stateSync: {
+        ...stateSyncBase,
+        onStateSyncEvent: registerListener<StateSyncEventData>,
+    },
     system: {
         openExternal: async (url: string): Promise<boolean> =>
             typeof url === "string" && url.length > 0,
@@ -709,14 +725,9 @@ const electronAPIMockDefinition = {
         writeClipboardText: async (text: string): Promise<boolean> =>
             typeof text === "string",
     },
-} as ElectronAPI;
+} satisfies ElectronAPI;
 
 const electronAPIMock: ElectronAPI = electronAPIMockDefinition;
-Reflect.set(
-    electronAPIMock.stateSync as Record<string, unknown>,
-    "onStateSyncEvent",
-    registerListener<StateSyncEventData>
-);
 
 export { electronAPIMock };
 

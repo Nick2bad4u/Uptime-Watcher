@@ -3,7 +3,7 @@ schema: "../../config/schemas/doc-frontmatter.schema.json"
 title: "Sites Store Mutation and Sync Guide"
 summary: "Canonical guidance for mutating, synchronizing, and monitoring site data in the Zustand-based sites store."
 created: "2025-11-21"
-last_reviewed: "2025-11-22"
+last_reviewed: "2026-01-08"
 category: "guide"
 author: "Nick2bad4u"
 tags:
@@ -158,6 +158,17 @@ supported building blocks for mutations:
 When introducing additional mutations, **compose these helpers** instead of
 inventing new sync flows. This keeps monitor state transitions consistent and
 minimizes IPC chatter.
+
+#### Low-level state helpers (rare)
+
+The sites store also exposes a low-level state mutation helper named
+`applySiteSnapshot` (formerly `updateSite`).
+
+- Use `applySiteSnapshot` only when you already have an authoritative `Site`
+  snapshot and need to replace it in local state (replace-by-identifier).
+- Prefer `applySavedSiteToStore` for the common mutation pipeline because it
+  performs identifier de-duplication and logs anomalies before committing
+  state.
 
 ## Realtime subscription diagnostics
 

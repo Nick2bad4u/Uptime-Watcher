@@ -262,7 +262,9 @@ describe("IpcService - Comprehensive Coverage", () => {
             startMonitoring: vi.fn().mockResolvedValue(startSummary),
             stopMonitoring: vi.fn().mockResolvedValue(stopSummary),
             startMonitoringForSite: vi.fn().mockResolvedValue(true),
+            startMonitoringForMonitor: vi.fn().mockResolvedValue(true),
             stopMonitoringForSite: vi.fn().mockResolvedValue(true),
+            stopMonitoringForMonitor: vi.fn().mockResolvedValue(true),
             checkSiteManually: vi.fn().mockResolvedValue(true),
             exportData: vi.fn().mockResolvedValue("export-data"),
             importData: vi.fn().mockResolvedValue(true),
@@ -726,7 +728,7 @@ describe("IpcService - Comprehensive Coverage", () => {
             const result = await handler(mockIpcEvent, "site-id", "monitor-id");
 
             expect(
-                mockUptimeOrchestrator.startMonitoringForSite
+                mockUptimeOrchestrator.startMonitoringForMonitor
             ).toHaveBeenCalledWith("site-id", "monitor-id");
             expect(result).toEqual({
                 success: true,
@@ -790,7 +792,7 @@ describe("IpcService - Comprehensive Coverage", () => {
             const result = await handler(mockIpcEvent, "site-id", "monitor-id");
 
             expect(
-                mockUptimeOrchestrator.stopMonitoringForSite
+                mockUptimeOrchestrator.stopMonitoringForMonitor
             ).toHaveBeenCalledWith("site-id", "monitor-id");
             expect(result).toEqual({
                 success: true,
