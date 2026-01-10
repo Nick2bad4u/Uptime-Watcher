@@ -17,7 +17,6 @@ import type {
 } from "@shared/types/cloudBackupMigration";
 import type { CloudSyncResetResult } from "@shared/types/cloudSyncReset";
 import type { CloudSyncResetPreview } from "@shared/types/cloudSyncResetPreview";
-import type { StateSyncEventData } from "@shared/types/events";
 import type {
     SerializedDatabaseBackupResult,
     SerializedDatabaseBackupSaveResult,
@@ -716,7 +715,6 @@ const electronAPIMockDefinition = {
     },
     stateSync: {
         ...stateSyncBase,
-        onStateSyncEvent: registerListener<StateSyncEventData>,
     },
     system: {
         openExternal: async (url: string): Promise<boolean> =>

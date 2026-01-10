@@ -31,6 +31,7 @@ Google Drive uses **Google Drive appDataFolder** so backups and sync artifacts a
 - **OAuth 2.0 Authorization Code + PKCE**.
 - **Loopback redirect** (local HTTP server bound to a loopback interface) — no backend service.
 - **No secrets in the renderer**. Tokens and refresh tokens live in Electron main and are stored via the existing `SecretStore` abstraction.
+- **No `googleapis` SDK dependency**. The provider uses a lightweight Google Drive REST client (Axios) to avoid shipping heavy dependencies.
 
 ## What you will need (as the app maintainer)
 

@@ -9,8 +9,6 @@
  * seeding or increasing the number of generated cases).
  */
 
-import process from "node:process";
-
 /** Name of the environment variable controlling the fast-check seed. */
 const FAST_CHECK_SEED_ENV = "FAST_CHECK_SEED" as const;
 
@@ -33,8 +31,6 @@ export interface FastCheckEnvOverrides {
  * @param defaultNumRuns - Baseline run count used when the environment does not
  *   provide an override.
  *
- * @returns A configuration object that can be spread into
- *   {@link fc.configureGlobal}.
  */
 export function resolveFastCheckEnvOverrides(
     defaultNumRuns: number

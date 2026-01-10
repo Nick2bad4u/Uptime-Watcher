@@ -2,7 +2,7 @@
 import { spawn } from "node:child_process";
 import { existsSync, mkdirSync } from "node:fs";
 import { tmpdir } from "node:os";
-import path from "node:path";
+import * as path from "node:path";
 
 const cliEntryPoint = path.resolve(
     import.meta.dirname,

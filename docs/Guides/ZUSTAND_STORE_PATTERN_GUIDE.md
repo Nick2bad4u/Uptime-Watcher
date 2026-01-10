@@ -262,13 +262,13 @@ export const useStoreEventListeners = () => {
    cleanupFunctions = await Promise.all([
     // Sites events
     EventsService.onSiteAdded((data) => {
-     sitesStore.handleSiteAdded(data.site);
+     sitesStore.applySiteSnapshot(data.site);
     }),
     EventsService.onSiteRemoved((data) => {
-     sitesStore.handleSiteDeleted(data.siteIdentifier);
+     sitesStore.removeSite(data.siteIdentifier);
     }),
     EventsService.onSiteUpdated((data) => {
-     sitesStore.handleSiteUpdated(data.site);
+     sitesStore.applySiteSnapshot(data.site);
     }),
    ]);
   })();

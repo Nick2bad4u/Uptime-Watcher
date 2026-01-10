@@ -1,7 +1,7 @@
 import { ensureError } from "@shared/utils/errorHandling";
 import { randomUUID } from "node:crypto";
 import { existsSync, mkdirSync, renameSync } from "node:fs";
-import path from "node:path";
+import * as path from "node:path";
 
 const DATABASE_LOCK_ARTIFACT_SUFFIXES = Object.freeze([
     "-journal",

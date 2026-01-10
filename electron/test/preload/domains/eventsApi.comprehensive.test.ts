@@ -447,7 +447,7 @@ describe("Events Domain API", () => {
                 expect.objectContaining({
                     channel: "monitor:status-changed",
                     guard: expect.stringContaining("isMonitor"),
-                    reason: "monitor:status-changed",
+                    reason: "payload-validation",
                 })
             );
         });
@@ -523,7 +523,7 @@ describe("Events Domain API", () => {
                 expect.objectContaining({
                     channel: "monitor:check-completed",
                     guard: "isMonitorCheckCompletedEventDataPayload",
-                    reason: "monitor:check-completed",
+                    reason: "payload-validation",
                 })
             );
         });
@@ -586,7 +586,7 @@ describe("Events Domain API", () => {
                 expect.objectContaining({
                     channel: "settings:history-limit-updated",
                     guard: "isHistoryLimitUpdatedEventDataPayload",
-                    reason: "settings:history-limit-updated",
+                    reason: "payload-validation",
                 })
             );
         });
@@ -639,7 +639,7 @@ describe("Events Domain API", () => {
                 expect.objectContaining({
                     channel: "site:added",
                     guard: "isSiteAddedEventDataPayload",
-                    reason: "site:added",
+                    reason: "payload-validation",
                 })
             );
         });
@@ -689,7 +689,7 @@ describe("Events Domain API", () => {
                 expect.objectContaining({
                     channel: "site:removed",
                     guard: "isSiteRemovedEventDataPayload",
-                    reason: "site:removed",
+                    reason: "payload-validation",
                 })
             );
         });
@@ -744,7 +744,7 @@ describe("Events Domain API", () => {
                 expect.objectContaining({
                     channel: "site:updated",
                     guard: "isSiteUpdatedEventDataPayload",
-                    reason: "site:updated",
+                    reason: "payload-validation",
                 })
             );
         });

@@ -261,9 +261,13 @@ After imports, site synchronization flows through the same
    `StandardizedCache.replaceAll`.
 2. `DatabaseManager` and `SiteManager` coordinate subsequent
    `emitSitesStateSynchronized` calls when sites are mutated or refreshed.
-3. `UptimeOrchestrator` forwards `sites:state-synchronized` events to renderer
-   listeners (via TypedEventBus and IPC) so that Zustand stores and components
-   converge on the latest snapshot.
+3. `UptimeOrchestrator` forwards state sync payloads to renderer listeners by
+   rebroadcasting the internal `sites:state-synchronized` `StateSyncEventData`
+   payload over the
+   renderer IPC channel `state-sync-event` (consumed through
+   `StateSyncService.onStateSyncEvent`). This keeps `sites:state-synchronized`
+   as an internal main-process topic while still letting Zustand stores and
+   components converge on the latest snapshot.
 
 `ImportDataCommand` **no longer** emits `sites:state-synchronized` directly;
 that responsibility is owned by `SiteManager`/`UptimeOrchestrator` to ensure a
@@ -313,13 +317,14 @@ initialization and import orchestration described above.
    forwarded by `UptimeOrchestrator` to public renderer events:
    - `internal:site:added` → forwarded as `site:added` with
      `source: SITE_ADDED_SOURCE.USER`.
-   - Cache updates trigger `sites:state-synchronized` events carrying sanitized
-     site snapshots.
+   - Cache updates trigger internal `sites:state-synchronized` events carrying
+     sanitized site snapshots, which are forwarded to the renderer via
+     `state-sync-event`.
 
-6. **Renderer convergence** – Renderer stores subscribe to
-   `sites:state-synchronized` (via `EventsService` and `setupCacheSync`) and
-   update their in-memory state. Components such as `SiteList` and
-   `DashboardOverview` re-render based on store changes.
+6. **Renderer convergence** – Renderer stores subscribe to incremental state
+   sync events via `StateSyncService.onStateSyncEvent` (IPC channel:
+   `state-sync-event`) and update their in-memory state. Components such as
+   `SiteList` and `DashboardOverview` re-render based on store changes.
 
 ### Add Monitor to Existing Site
 

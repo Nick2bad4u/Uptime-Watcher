@@ -8,7 +8,7 @@ import "@testing-library/jest-dom";
 import fc from "fast-check";
 import { resolveFastCheckEnvOverrides } from "@shared/test/utils/fastCheckEnv";
 
-import EventEmitter from "node:events";
+import { EventEmitter } from "node:events";
 
 
 

@@ -191,7 +191,7 @@ The application uses a TypedEventBus for decoupled communication between compone
 
 ### Event Naming Convention
 
-- **Format**: `domain:action` (e.g., `sites:added`, `monitor:status-changed`)
+- **Format**: `domain:action` (e.g., `site:added`, `monitor:status-changed`)
 - **Domain**: Major category (sites, monitors, database, system)
 - **Action**: Specific action in past tense for completed events
 - **Consistency**: Use kebab-case for multi-word actions
@@ -1280,7 +1280,7 @@ The site mutation pipeline enforces a strict layering contract that keeps the da
 3. **SiteWriterService** performs the actual mutation through `updateSite` / `createSite` / `deleteSite`. All write operations are wrapped in `DatabaseService.executeTransaction()` and reuse shared helpers such as `updateMonitorsPreservingHistory()` to keep history tables intact.
 4. **Repository layer** executes the SQL statements. Internal synchronous methods (`*_Internal`) are the only functions allowed to call `Database#run` / `Database#all` directly.
 5. **Cache synchronization** happens inside `SiteWriterService`, which updates the `StandardizedCache` instance that backs `SiteManager`. Only sanitized copies are stored to avoid accidental mutations.
-6. **Event emission** completes the cycle: `SiteManager` publishes `internal:site:*` and `sites:state-synchronized` events so the renderer, orchestrator, and automation hooks receive consistent updates.
+6. **Event emission** completes the cycle: `SiteManager` publishes `internal:site:*` and the main-process state sync event (`sites:state-synchronized`). The orchestrator then rebroadcasts the same `StateSyncEventData` payload to renderers over the `state-sync-event` IPC channel so the UI and automation hooks receive consistent updates.
 
    ```mermaid
    sequenceDiagram
@@ -1291,13 +1291,13 @@ The site mutation pipeline enforces a strict layering contract that keeps the da
        participant Cache
        participant EventBus
 
-       Orchestrator->>SiteManager: removeMonitor(siteId, monitorId)
+      Orchestrator->>SiteManager: removeMonitor(siteIdentifier, monitorId)
        SiteManager->>SiteManager: getSiteSnapshotForMutation()
        SiteManager->>SiteManager: enforce invariants / validateSite()
        SiteManager->>SiteWriter: updateSite({ monitors })
        SiteWriter->>Database: executeTransaction(upsert/delete)
        Database-->>SiteWriter: commit
-       SiteWriter->>Cache: set(siteId, updatedSite)
+      SiteWriter->>Cache: set(siteIdentifier, updatedSite)
        SiteManager->>EventBus: emit internal:site:updated
        SiteManager->>EventBus: emit sites:state-synchronized
        EventBus-->>Orchestrator: broadcast update
@@ -1324,7 +1324,7 @@ The site mutation pipeline enforces a strict layering contract that keeps the da
 - ✅ Every mutation must pass through `SiteWriterService`; bypassing it forfeits transactional hooks and cache consistency.
 - ✅ Never allow a site to reach zero monitors; throw `ERROR_CATALOG.monitors.CANNOT_REMOVE_LAST` instead.
 - ✅ Run `validateSite()` with the candidate payload before invoking the writer to catch schema drift early.
-- ✅ Emit both `internal:site:*` and `sites:state-synchronized` events after successful commits to keep the renderer caches aligned.
+- ✅ Emit both `internal:site:*` and `sites:state-synchronized` after successful commits, and ensure the state sync payload is forwarded to renderers via the `state-sync-event` broadcast so renderer caches stay aligned.
 - ✅ Update unit and comprehensive tests whenever the pipeline changes to cover transaction outcomes and event emission.
 
 ### Usage Guidelines

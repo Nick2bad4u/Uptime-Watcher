@@ -9,7 +9,7 @@ import { codecovVitePlugin } from "@codecov/vite-plugin";
 import reactScan from "@react-scan/vite-plugin-react-scan";
 import react from "@vitejs/plugin-react";
 import { existsSync } from "node:fs";
-import path from "node:path";
+import * as path from "node:path";
 import { inspect } from "node:util";
 import pc from "picocolors";
 import { visualizer } from "rollup-plugin-visualizer";

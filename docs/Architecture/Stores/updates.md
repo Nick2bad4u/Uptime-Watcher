@@ -38,6 +38,11 @@ store can be migrated to `useErrorStore` + `createStoreErrorHandler`.
 
 - Any UI that displays update status or triggers update checks.
 
+This store also subscribes to update lifecycle broadcasts emitted from the main
+process over the `update-status` renderer event channel (see
+`shared/ipc/rendererEvents.ts`). The subscription is established via
+`EventsService.onUpdateStatus` inside `subscribeToUpdateStatusEvents()`.
+
 ## Testing
 
 - `src/test/stores/updates/*`

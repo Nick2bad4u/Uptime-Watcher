@@ -147,11 +147,21 @@ await databaseService.executeTransaction(async (db) => {
 
 ```typescript
 // Debug event emission
+import type { Site } from "@shared/types";
+
 eventBus.onTyped("site:updated", (data) => {
- console.log("Event received:", data._meta.correlationId);
+ console.log("Event received:", data._meta?.correlationId);
 });
 
-await eventBus.emitTyped("site:updated", { siteIdentifier: "123" });
+const previousSite = { identifier: "123", name: "Old" } as Site;
+const site = { ...previousSite, name: "New" } as Site;
+
+await eventBus.emitTyped("site:updated", {
+ previousSite,
+ site,
+ updatedFields: ["name"],
+ timestamp: Date.now(),
+});
 ```
 
 #### 2. IPC Events Not Crossing Boundary

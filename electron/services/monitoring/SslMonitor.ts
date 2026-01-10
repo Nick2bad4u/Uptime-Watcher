@@ -9,9 +9,10 @@
  */
 
 import type { MonitorType, Site } from "@shared/types";
+import type { PeerCertificate } from "node:tls";
 
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
-import tls, { type PeerCertificate } from "node:tls";
+import * as tls from "node:tls";
 
 import type {
     IMonitorService,

@@ -45,7 +45,7 @@ describe(validateServicePayload, () => {
 
     it("formats invalid payload errors with issues and handles unserializable diagnostics", () => {
         const diagnostics: Record<string, unknown> = {
-            siteId: "site-1",
+            siteIdentifier: "site-1",
         };
         diagnostics["self"] = diagnostics;
 

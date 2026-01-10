@@ -57,13 +57,14 @@ graph LR
 ### Basic Usage
 
 ```typescript
-import { TypedEventBus } from "@/events/TypedEventBus";
+import { TypedEventBus } from "./events/TypedEventBus";
+import type { StatusUpdate } from "@shared/types";
 
 // Define event contracts
 interface MyEvents {
  "user:login": { userId: string; timestamp: number };
  "data:updated": { table: string; records: number };
- "monitor:status": { monitorId: string; status: "up" | "down" };
+ "monitor:status-changed": StatusUpdate;
 }
 
 // Create typed event bus
@@ -97,7 +98,7 @@ const eventData = { userId: '123', timestamp: Date.now() };
   timestamp: Date.now(),
   _meta: {
     busId: 'my-service',
-    correlationId: 'evt_abc123',
+    correlationId: 'a1b2c3d4e5f6a7b8',
     eventName: 'user:login',
     timestamp: 1704067200000
   }
@@ -140,45 +141,31 @@ Event contracts are defined in `@shared/types/events.ts` to ensure type safety b
 ### Core Event Types
 
 ```typescript
-// State synchronization
-interface StateSyncEventData extends BaseEventData {
- action: "bulk-sync" | "delete" | "update";
- siteIdentifier?: string;
- sites: Site[];
- source: "cache" | "database" | "frontend";
-}
+import type { RendererEventPayloadMap } from "@shared/types/events";
 
-// Cache invalidation
-interface CacheInvalidatedEventData extends BaseEventData {
- type: "all" | "monitor" | "site";
- identifier?: string;
- reason: "delete" | "expiry" | "manual" | "update";
-}
+// Canonical renderer event payloads are keyed by IPC channel:
+type StateSyncEventData = RendererEventPayloadMap["state-sync-event"];
+type CacheInvalidatedEventData = RendererEventPayloadMap["cache:invalidated"];
 
-// Monitor status changes
-interface MonitorUpEventData extends BaseEventData {
- monitorId: string;
- siteIdentifier: string;
- responseTime: number;
- statusCode: number;
-}
-
-interface MonitorDownEventData extends BaseEventData {
- monitorId: string;
- siteIdentifier: string;
- error: string;
- statusCode?: number;
-}
+// Monitor status events reuse the shared StatusUpdate payload.
+type MonitorStatusChangedEventData =
+ RendererEventPayloadMap["monitor:status-changed"];
+type MonitorUpEventData = RendererEventPayloadMap["monitor:up"];
+type MonitorDownEventData = RendererEventPayloadMap["monitor:down"];
 ```
 
 ### Base Event Interface
 
-All events extend `BaseEventData`:
+Events that implement `BaseEventData` include a standard `timestamp: number` field:
 
 ```typescript
 interface BaseEventData {
  timestamp: number; // Unix timestamp when event occurred
 }
+
+// Note: not every renderer event uses BaseEventData. Status events such as
+// `monitor:status-changed`/`monitor:up`/`monitor:down` reuse `StatusUpdate`
+// instead (`StatusUpdate.timestamp` is an ISO string).
 ```
 
 ## EventsService Integration
@@ -456,7 +443,7 @@ Follow consistent naming patterns:
 ```typescript
 // Use namespace:action format
 "monitor:status-changed";
-"site:created";
+"site:added";
 "cache:invalidated";
 "user:authenticated";
 
@@ -466,6 +453,7 @@ Follow consistent naming patterns:
 
 "change"; // ❌ Too vague
 "monitor:down"; // ✅ Specific state
+```
 
 ### Layered Emission Strategy
 
@@ -488,7 +476,6 @@ Follow consistent naming patterns:
 - **Frontend listens only to orchestrator output.** `ApplicationService`
   subscribes to the orchestrator and uses `RendererEventBridge` to fan out to
   windows, guaranteeing every renderer sees the same sanitized payloads.
-```
 
 ### Event Data Design
 
@@ -497,14 +484,14 @@ Design event payloads to be self-contained:
 ```typescript
 // ✅ Good: Self-contained event data
 interface SiteUpdatedEventData {
- siteIdentifier: string;
- changes: Partial<Site>;
- updatedBy: string;
+ previousSite: Site;
+ site: Site;
+ updatedFields: string[];
  timestamp: number;
 }
 
 // ❌ Bad: Requires additional context
-interface SiteUpdatedEventData {
+interface SiteUpdatedEventDataBadExample {
  id: string; // Unclear what type of ID
  // Missing change details
 }
@@ -522,17 +509,13 @@ eventBus.onTyped("site:updated", async (data) => {
  } catch (error) {
   logger.error("Failed to process site update", {
    correlationId: data._meta.correlationId,
-   siteIdentifier: data.siteIdentifier,
+   siteIdentifier: data.site.identifier,
    error: ensureError(error),
   });
 
-  // Emit error event for monitoring
-  await eventBus.emitTyped("site:update-failed", {
-   siteIdentifier: data.siteIdentifier,
-   originalCorrelationId: data._meta.correlationId,
-   error: ensureError(error).message,
-   timestamp: Date.now(),
-  });
+  // Do not emit ad-hoc public events here.
+  // Prefer logging + triggering a recovery path (for example, request a full
+  // sync) so renderers converge back to the authoritative state.
  }
 });
 ```
@@ -549,7 +532,7 @@ useEffect(() => {
  const setupListeners = async () => {
   cleanupFunctions.push(
    await EventsService.onSiteUpdated(handleSiteUpdate),
-   await EventsService.onMonitorStatus(handleMonitorStatus)
+   await EventsService.onMonitorStatusChanged(handleMonitorStatus)
   );
  };
 
@@ -583,7 +566,7 @@ class MyService {
 
 ```typescript
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { TypedEventBus } from "@/events/TypedEventBus";
+import { TypedEventBus } from "./events/TypedEventBus";
 
 describe("Event System", () => {
  let eventBus: TypedEventBus<TestEvents>;
@@ -605,7 +588,7 @@ describe("Event System", () => {
    _meta: expect.objectContaining({
     busId: "test-bus",
     eventName: "test:event",
-    correlationId: expect.stringMatching(/^evt_/),
+    correlationId: expect.stringMatching(/^[0-9a-f]{16}$/),
     timestamp: expect.any(Number),
    }),
   });
@@ -653,7 +636,7 @@ import { EventsService } from "@/services/EventsService";
 const mockElectronAPI = {
  events: {
   onSiteUpdated: vi.fn(),
-  onMonitorStatus: vi.fn(),
+  onMonitorStatusChanged: vi.fn(),
   onCacheInvalidated: vi.fn(),
  },
 };

@@ -12,7 +12,7 @@ import type {
     UserConfigFn,
 } from "vite";
 
-import path from "node:path";
+import * as path from "node:path";
 import { defineConfig } from "vite";
 import { defaultExclude } from "vitest/config";
 

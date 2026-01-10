@@ -526,7 +526,11 @@ State changes are broadcast as events:
 
 ```typescript
 // Backend emits event
-await this.eventBus.emitTyped("sites:added", { site: newSite });
+await this.eventBus.emitTyped("site:added", {
+ site: newSite,
+ source: "user",
+ timestamp: Date.now(),
+});
 
 import { EventsService } from "@app/services/EventsService";
 

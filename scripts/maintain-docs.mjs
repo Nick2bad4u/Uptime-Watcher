@@ -18,7 +18,7 @@
  */
 
 import { readFile, writeFile, readdir } from "node:fs/promises";
-import path from "node:path";
+import * as path from "node:path";
 import { execSync } from "node:child_process";
 import { pathToFileURL } from "node:url";
 import { remark } from "remark";

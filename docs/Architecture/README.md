@@ -342,7 +342,7 @@ End-to-end walkthrough of the main-process site loading pipeline:
 - `DatabaseManager` startup and cache replacement flow
 - `SiteLoadingOrchestrator` responsibilities and metrics
 - Asynchronous `MonitoringConfig` guarantees (history limit, start/stop propagation)
-- Renderer synchronization (`sites:state-synchronized`) and background hydration logic
+- Renderer synchronization (`state-sync-event` / `StateSyncEventData`) and background hydration logic
 
 ### [Boundary Validation Strategy](./Patterns/BOUNDARY_VALIDATION_STRATEGY.md)
 
@@ -766,8 +766,10 @@ guidance in `docs/Architecture/Stores/sites.md`.
 
 7. **State-sync events as the payload carrier**
    - The actual site snapshots and deltas always flow through
-     `sites:state-synchronized` events and the state-sync IPC surface
-     (`STATE_SYNC_CHANNELS.requestFullSync` / `STATE_SYNC_CHANNELS.getSyncStatus`).
+     `state-sync-event` renderer broadcasts (payload: `StateSyncEventData`) and
+     the state-sync IPC surface (`STATE_SYNC_CHANNELS.requestFullSync` /
+     `STATE_SYNC_CHANNELS.getSyncStatus`). The renderer broadcasts originate
+     from internal `sites:state-synchronized` events in the main process.
    - Renderer consumers combine these **fine-grained** state-sync payloads
      with the **coarse** `cache:invalidated` triggers: invalidations prompt a
      refresh, while state-sync events provide the authoritative data used to

@@ -471,8 +471,9 @@ export class SiteService {
      const result = await this.siteRepository.create(validatedData, db);
 
      // Emit event for real-time updates
-     await this.eventBus.emitTyped("site:created", {
+     await this.eventBus.emitTyped("site:added", {
       site: result,
+      source: "user",
       timestamp: Date.now(),
      });
 
@@ -493,7 +494,7 @@ export class SiteService {
    async () => {
     // Validation
     if (!siteIdentifier || typeof siteIdentifier !== "string") {
-     throw new Error("Invalid site ID provided");
+     throw new Error("Invalid site identifier provided");
     }
 
     // Database operation
@@ -506,8 +507,10 @@ export class SiteService {
      await this.siteRepository.delete(siteIdentifier, db);
 
      // Emit event
-     await this.eventBus.emitTyped("site:deleted", {
+     await this.eventBus.emitTyped("site:removed", {
+      cascade: false,
       siteIdentifier,
+      siteName: site.name,
       timestamp: Date.now(),
      });
     });
@@ -563,14 +566,25 @@ export const registerSitesHandlers = ({
 ```typescript
 // Event system error handling
 export class UptimeService {
- async processMonitorCheck(monitor: Monitor): Promise<void> {
+ async processMonitorCheck(args: {
+  monitor: Monitor;
+  site: Site;
+  siteIdentifier: string;
+ }): Promise<void> {
+  const { monitor, site, siteIdentifier } = args;
   try {
    const result = await this.performCheck(monitor);
 
-   // Emit success event
+   // Emit completion event (renderer-facing contract).
    await this.eventBus.emitTyped("monitor:check-completed", {
-    monitor,
-    result,
+    checkType: "scheduled",
+    monitorId: monitor.id,
+    result: {
+     ...result,
+     monitor,
+     site,
+    },
+    siteIdentifier,
     timestamp: Date.now(),
    });
   } catch (error) {
@@ -579,17 +593,26 @@ export class UptimeService {
    // Log error
    logger.error("Monitor check failed:", errorInfo, {
     monitorId: monitor.id,
-    siteIdentifier: monitor.siteIdentifier,
+    siteIdentifier,
    });
 
-   // Emit error event for frontend notification
-   await this.eventBus.emitTyped("monitor:check-failed", {
-    monitor,
-    error: errorInfo.message,
+   // Represent failures as a completed check whose StatusUpdate is
+   // `down` with diagnostic details.
+   await this.eventBus.emitTyped("monitor:check-completed", {
+    checkType: "scheduled",
+    monitorId: monitor.id,
+    result: {
+     details: errorInfo.message,
+     monitorId: monitor.id,
+     monitor,
+     site,
+     siteIdentifier,
+     status: "down",
+     timestamp: new Date().toISOString(),
+    },
+    siteIdentifier,
     timestamp: Date.now(),
    });
-
-   // Don't re-throw - error has been handled and reported
   }
  }
 }
@@ -600,43 +623,20 @@ export const useMonitorEventIntegration = () => {
  const errorStore = useErrorStore();
 
  useEffect(() => {
-  const cleanupFunctions: Array<() => void> = [];
-
-  const setupEventListeners = async () => {
-   try {
-    // Success events
-    const successCleanup = await EventsService.onMonitorCheckCompleted(
-     (data) => {
-      sitesStore.updateMonitorResult(data.monitor.siteIdentifier, data.result);
-     }
+  // Prefer subscribing via the SitesStore sync layer.
+  // It encapsulates the underlying `EventsService` wiring and applies backend
+  // updates consistently.
+  const cleanup = sitesStore.subscribeToStatusUpdates((statusUpdate) => {
+   if (statusUpdate.status === "down") {
+    errorStore.setStoreError(
+     "monitoring",
+     `Monitor check failed for ${statusUpdate.siteIdentifier}: ${statusUpdate.details ?? "unknown error"}`
     );
-    cleanupFunctions.push(successCleanup);
-
-    // Error events
-    const errorCleanup = await EventsService.onMonitorCheckFailed((data) => {
-     // Update monitor state
-     sitesStore.updateMonitorError(data.monitor.siteIdentifier, data.error);
-
-     // Show user notification
-     errorStore.setStoreError(
-      "monitoring",
-      `Monitor check failed for ${data.monitor.name}: ${data.error}`
-     );
-    });
-    cleanupFunctions.push(errorCleanup);
-   } catch (error) {
-    logger.error(
-     "Failed to setup monitor event listeners:",
-     ensureError(error)
-    );
-    errorStore.setError("Failed to setup real-time monitoring updates");
    }
-  };
-
-  setupEventListeners();
+  });
 
   return () => {
-   cleanupFunctions.forEach((cleanup) => cleanup());
+   cleanup();
   };
  }, [sitesStore, errorStore]);
 };

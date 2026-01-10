@@ -1403,14 +1403,6 @@ export interface UptimeEvents extends Record<string, EventPayloadValue> {
     };
 
     /**
-     * Emitted when a site is added.
-     *
-     * @param site - The site object added.
-     * @param source - The source of the addition ("import", "migration", or
-     *   "user").
-     * @param timestamp - Unix timestamp (ms) when the site was added.
-     */
-    /**
      * Emitted when the database history retention limit changes.
      *
      * @remarks
@@ -1421,6 +1413,14 @@ export interface UptimeEvents extends Record<string, EventPayloadValue> {
      */
     "settings:history-limit-updated": UptimeEventPayload<HistoryLimitUpdatedEventData>;
 
+    /**
+     * Emitted when a site is added.
+     *
+     * @param site - The site object added.
+     * @param source - The source of the addition ("import", "migration", or
+     *   "user").
+     * @param timestamp - Unix timestamp (ms) when the site was added.
+     */
     "site:added": {
         /** The site object added. */
         site: Site;

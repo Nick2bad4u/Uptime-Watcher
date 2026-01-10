@@ -142,7 +142,7 @@ payloads (`string`, `Record<string, unknown>`, etc.) rather than shared types.
   literal union (or a tagged subtype).
 - Surface explicit "unknown type" states instead of returning empty arrays.
 - Thread typed identifiers through Zustand selectors and helper hooks so the UI
-  can no longer dispatch invalid `(siteId, monitorId)` tuples.
+  can no longer dispatch invalid `(siteIdentifier, monitorId)` tuples.
 
 ### 2.2 Renderer Types Typing Audit (2025-11-28)
 

@@ -47,8 +47,6 @@ interface AttachForwardedMetadataParams<TPayload extends object> {
     source: unknown;
 }
 
-
-
 /**
  * Attaches existing metadata from an internal event to the forwarded payload.
  *
@@ -161,10 +159,11 @@ export function stripForwardedEventMetadata<
         return clonedArray as unknown as StrippedForwardedEventMetadata<TPayload>;
     }
 
-        const candidate: unknown = payload;
-        if (typeof candidate !== "object" || candidate === null) {
+    const candidate: unknown = payload;
+
+    if (typeof candidate !== "object" || candidate === null) {
         throw new TypeError(
-                "Expected object/array payload for metadata stripping"
+            "Expected object/array payload for metadata stripping"
         );
     }
 

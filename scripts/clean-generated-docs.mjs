@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import { fileURLToPath } from "node:url";
-import path from "node:path";
+import * as path from "node:path";
 import { access, mkdir, readFile, rm, writeFile } from "node:fs/promises";
 
 const repositoryRoot = fileURLToPath(new URL("..", import.meta.url));

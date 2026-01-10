@@ -2,11 +2,15 @@
  * Service layer for handling state synchronization operations via Electron IPC.
  *
  * @remarks
- * Ensures all state synchronization interactions go through the typed
- * `stateSync` preload domain with proper initialization, logging, and error
- * handling. Provides typed wrappers for sync status retrieval, full sync
- * requests, and event subscriptions, so renderer code never touches the
- * `window.electronAPI.stateSync` bridge directly.
+ * Ensures all state synchronization interactions go through the typed preload
+ * bridge with proper initialization, logging, and error handling.
+ *
+ * - Invoke-style operations (`getSyncStatus`, `requestFullSync`) use the
+ *   `stateSync` preload domain.
+ * - Incremental sync event subscriptions use `events.onStateSyncEvent`.
+ *
+ * This keeps renderer code from touching the `window.electronAPI` bridge
+ * directly.
  *
  * For a store-level view of how these operations integrate with the sites
  * cache, see the "State sync pipeline" section in
@@ -81,12 +85,16 @@ interface StateSyncServiceContract {
  * sync events.
  *
  * @remarks
- * This service delegates to the typed `stateSync` preload domain via
- * {@link getIpcServiceHelpers}, and validates all IPC responses using the shared
- * snapshot helpers from `@shared/types/stateSync`. It also implements a guarded
- * subscription pipeline that recovers from malformed `state-sync-event`
- * payloads by triggering a full-sync and synthesizing a replacement `BULK_SYNC`
- * event.
+ * This service delegates to the typed preload bridge via
+ * {@link getIpcServiceHelpers}:
+ *
+ * - `stateSync.*` for invoke channels
+ * - `events.onStateSyncEvent` for broadcast subscriptions
+ *
+ * It validates all IPC responses using the shared snapshot helpers from
+ * `@shared/types/stateSync`. It also implements a guarded subscription pipeline
+ * that recovers from malformed `state-sync-event` payloads by triggering a
+ * full-sync and synthesizing a replacement `BULK_SYNC` event.
  */
 export const StateSyncService: StateSyncServiceContract = {
     /**

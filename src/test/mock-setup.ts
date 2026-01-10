@@ -3,7 +3,7 @@
  * configuration for consistent testing behavior
  */
 
-import EventEmitter from "node:events";
+import { EventEmitter } from "node:events";
 
 // Set max listeners to prevent memory leak warnings in tests
 const MAX_LISTENERS = 200; // Higher threshold for test environment

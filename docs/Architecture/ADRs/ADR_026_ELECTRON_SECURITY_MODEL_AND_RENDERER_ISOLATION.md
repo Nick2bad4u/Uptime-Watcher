@@ -60,9 +60,12 @@ BrowserWindow webPreferences must enforce:
 - `webSecurity: true`
 - `allowRunningInsecureContent: false`
 
-The app currently sets `sandbox: false` due to preload integration constraints.
+The app currently sets `sandbox: true` in the main window configuration.
 
-This is an explicit tradeoff and must be revisited when sandboxing is feasible without breaking the preload bridge.
+> Note: when the Chromium sandbox is enabled, the preload layer must remain
+> conservative about dependencies and should not rely on Node.js built-ins.
+> The preload bridge should continue to expose only the typed, minimal
+> `window.electronAPI` surface.
 
 ### 3) Navigation and window-opening
 
@@ -92,7 +95,7 @@ IPC must follow the standardized request/response handler model.
 
 - **Pro**: reduces blast radius of renderer compromise.
 - **Pro**: security decisions are reviewable and centralized.
-- **Con**: sandboxing is not enabled today; enabling it later may require preload refactors.
+- **Pro**: renderer sandboxing is enabled, reducing the blast radius of renderer compromise.
 
 ## Related ADRs
 

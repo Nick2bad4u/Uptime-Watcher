@@ -9,7 +9,7 @@ import { MAX_IPC_SQLITE_BACKUP_TRANSFER_BYTES } from "@shared/constants/backup";
 import { DATA_CHANNELS } from "@shared/types/preload";
 import { createSingleFlight } from "@shared/utils/singleFlight";
 import { app, dialog } from "electron";
-import path from "node:path";
+import * as path from "node:path";
 
 import type { UptimeOrchestrator } from "../../../UptimeOrchestrator";
 

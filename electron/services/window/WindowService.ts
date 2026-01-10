@@ -46,7 +46,6 @@ import {
     type HandlerDetails,
     type WebPreferences,
 } from "electron";
-// eslint-disable-next-line unicorn/import-style -- Need namespace import for path operations
 import * as path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -562,7 +561,7 @@ export class WindowService {
                 nodeIntegrationInWorker: false,
                 preload: this.getPreloadPath(), // Safe IPC bridge
                 // Security: enable Chromium sandbox for renderer hardening.
-                // Preload scripts still retain Node access when sandboxed.
+                // Keep the preload surface minimal and avoid Node.js built-ins.
                 sandbox: true,
                 webSecurity: true,
                 webviewTag: false,

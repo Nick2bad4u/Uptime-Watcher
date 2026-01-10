@@ -144,9 +144,9 @@ const mockElectronAPI = {
  },
  events: {
   onSiteUpdated: vi.fn(),
-  onMonitorStatus: vi.fn(),
+  onMonitorStatusChanged: vi.fn(),
   onCacheInvalidated: vi.fn(),
-  onStateSync: vi.fn(),
+  onStateSyncEvent: vi.fn(),
  },
  system: {
   getVersion: vi.fn(),
@@ -178,7 +178,7 @@ describe("SiteCard", () => {
   fireEvent.click(deleteButton);
 
   await waitFor(() => {
-   expect(removeSpy).toHaveBeenCalledWith(mockSite.id);
+   expect(removeSpy).toHaveBeenCalledWith(mockSite.identifier);
   });
  });
 });

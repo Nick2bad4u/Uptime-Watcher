@@ -8,9 +8,9 @@ import { isRecord } from "@shared/utils/typeHelpers";
 import { app } from "electron";
 import sqlite3 from "node-sqlite3-wasm";
 import { createHash, randomUUID } from "node:crypto";
-import fs from "node:fs/promises";
-import os from "node:os";
-import path from "node:path";
+import * as fs from "node:fs/promises";
+import * as os from "node:os";
+import * as path from "node:path";
 
 import type { UptimeEvents } from "../../events/eventTypes";
 import type { TypedEventBus } from "../../events/TypedEventBus";

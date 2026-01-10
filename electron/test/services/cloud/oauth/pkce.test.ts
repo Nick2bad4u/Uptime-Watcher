@@ -2,7 +2,7 @@
  * Tests for OAuth PKCE generation utilities.
  */
 
-import crypto from "node:crypto";
+import * as crypto from "node:crypto";
 
 import { describe, expect, it } from "vitest";
 

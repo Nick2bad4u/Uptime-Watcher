@@ -7,7 +7,7 @@ import {
 import { mkdtempSync, rmSync, writeFileSync, existsSync } from "node:fs";
 import * as fs from "node:fs";
 import { tmpdir } from "node:os";
-import path from "node:path";
+import * as path from "node:path";
 
 /**
  * Generates a unique temporary directory for each test.

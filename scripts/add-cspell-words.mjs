@@ -28,9 +28,9 @@
  */
 
 import { execSync } from "node:child_process";
-import fs from "node:fs/promises";
-import fsSync from "node:fs";
-import path from "node:path";
+import * as fs from "node:fs/promises";
+import * as fsSync from "node:fs";
+import * as path from "node:path";
 
 const __dirname = import.meta.dirname;
 

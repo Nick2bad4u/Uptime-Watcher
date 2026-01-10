@@ -20,8 +20,8 @@
  *   and a summary.
  */
 
-import fs from "node:fs";
-import path from "node:path";
+import * as fs from "node:fs";
+import * as path from "node:path";
 import { createRequire } from "node:module";
 // Small ANSI color helpers (avoid extra deps)
 const colors = {

@@ -73,19 +73,12 @@ sequenceDiagram
 
 ```typescript
 interface UptimeEvents extends Record<string, unknown> {
- "sites:added": {
+ "site:added": {
   site: Site;
+  source: SiteAddedSource;
   timestamp: number;
-  correlationId: string;
  };
- "monitor:status-changed": {
-  monitor: Monitor;
-  newStatus: "up" | "down";
-  previousStatus: "up" | "down";
-  timestamp: number;
-  responseTime?: number;
-  error?: string;
- };
+ "monitor:status-changed": StatusUpdate;
  "database:transaction-completed": {
   duration: number;
   operation: string;
@@ -102,10 +95,10 @@ interface UptimeEvents extends Record<string, unknown> {
 }
 
 // Usage with compile-time type checking
-await eventBus.emitTyped("sites:added", {
+await eventBus.emitTyped("site:added", {
  site: newSite,
+ source: "user",
  timestamp: Date.now(),
- correlationId: generateCorrelationId(),
 });
 ```
 
@@ -118,7 +111,7 @@ await eventBus.emitTyped("sites:added", {
 
 ### 3. Consistent Event Naming
 
-- **Domain-based naming**: `domain:action` (e.g., `sites:added`, `monitor:status-changed`)
+- **Domain-based naming**: `domain:action` (e.g., `site:added`, `monitor:status-changed`)
 - **Hierarchical structure**: Major category followed by specific action
 - **Past tense verbs** for completed actions
 
@@ -148,7 +141,7 @@ eventBus.use(
 eventBus.use(
  createValidationMiddleware({
   "monitor:status-changed": (data) => validateMonitorStatusData(data),
-  "sites:added": (data) => validateSiteData(data),
+  "site:added": (data) => validateSiteData(data),
  })
 );
 ```
@@ -207,7 +200,7 @@ Other Backend Services (via event listeners)
 - `site:added` - When a site is successfully added
 - `site:updated` - When site properties are modified
 - `site:removed` - When a site is deleted
-- `sites:state-synchronized` - When frontend and backend state are synchronized
+- `sites:state-synchronized` - Main-process state sync event (forwarded to the renderer as `state-sync-event`)
 
 _Historical note_: the former `site:cache-updated` and `site:cache-miss`
 topics were retired in favor of the internal namespace. Cache telemetry now
@@ -302,32 +295,32 @@ The following table summarizes the primary public events by domain. Internal
 events (`internal:*`) are documented inline in the sections above and are
 omitted here for brevity.
 
-| Domain              | Event name                       | Description                                           |
-| ------------------- | -------------------------------- | ----------------------------------------------------- |
-| Site                | `site:added`                     | When a site is successfully added.                    |
-| Site                | `site:updated`                   | When site properties are modified.                    |
-| Site                | `site:removed`                   | When a site is deleted.                               |
-| Site / State Sync   | `sites:state-synchronized`       | When frontend and backend site state are synchronized |
-| Monitor             | `monitor:added`                  | When a monitor is created.                            |
-| Monitor             | `monitor:removed`                | When a monitor is deleted.                            |
-| Monitor             | `monitor:status-changed`         | When monitor status changes.                          |
-| Monitor             | `monitor:up`                     | When a monitor detects service is online.             |
-| Monitor             | `monitor:down`                   | When a monitor detects service is offline.            |
-| Monitor             | `monitor:check-completed`        | When a health check finishes.                         |
-| Database            | `database:transaction-completed` | When database transactions finish.                    |
-| Database            | `database:error`                 | When database operations fail.                        |
-| Database            | `database:success`               | When database operations succeed.                     |
-| Database            | `database:retry`                 | When database operations are retried.                 |
-| Database            | `database:backup-created`        | When database backups are created.                    |
-| System / Monitoring | `monitoring:started`             | When the monitoring system starts.                    |
-| System / Monitoring | `monitoring:stopped`             | When the monitoring system stops.                     |
-| System              | `system:startup`                 | Application startup.                                  |
-| System              | `system:shutdown`                | Application shutdown.                                 |
-| System              | `system:error`                   | System-level errors.                                  |
-| Performance         | `performance:metric`             | Performance measurements.                             |
-| Performance         | `performance:warning`            | Performance threshold alerts.                         |
-| Configuration       | `config:changed`                 | Configuration changes.                                |
-| Cache               | `cache:invalidated`              | Cache invalidation events.                            |
+| Domain              | Event name                       | Description                                                                 |
+| ------------------- | -------------------------------- | --------------------------------------------------------------------------- |
+| Site                | `site:added`                     | When a site is successfully added.                                          |
+| Site                | `site:updated`                   | When site properties are modified.                                          |
+| Site                | `site:removed`                   | When a site is deleted.                                                     |
+| Site / State Sync   | `sites:state-synchronized`       | Main-process state sync event (forwarded to renderer as `state-sync-event`) |
+| Monitor             | `monitor:added`                  | When a monitor is created.                                                  |
+| Monitor             | `monitor:removed`                | When a monitor is deleted.                                                  |
+| Monitor             | `monitor:status-changed`         | When monitor status changes.                                                |
+| Monitor             | `monitor:up`                     | When a monitor detects service is online.                                   |
+| Monitor             | `monitor:down`                   | When a monitor detects service is offline.                                  |
+| Monitor             | `monitor:check-completed`        | When a health check finishes.                                               |
+| Database            | `database:transaction-completed` | When database transactions finish.                                          |
+| Database            | `database:error`                 | When database operations fail.                                              |
+| Database            | `database:success`               | When database operations succeed.                                           |
+| Database            | `database:retry`                 | When database operations are retried.                                       |
+| Database            | `database:backup-created`        | When database backups are created.                                          |
+| System / Monitoring | `monitoring:started`             | When the monitoring system starts.                                          |
+| System / Monitoring | `monitoring:stopped`             | When the monitoring system stops.                                           |
+| System              | `system:startup`                 | Application startup.                                                        |
+| System              | `system:shutdown`                | Application shutdown.                                                       |
+| System              | `system:error`                   | System-level errors.                                                        |
+| Performance         | `performance:metric`             | Performance measurements.                                                   |
+| Performance         | `performance:warning`            | Performance threshold alerts.                                               |
+| Configuration       | `config:changed`                 | Configuration changes.                                                      |
+| Cache               | `cache:invalidated`              | Cache invalidation events.                                                  |
 
 > **Event catalog note:** The table above intentionally focuses on the
 > externally relevant public events. The authoritative event payload types

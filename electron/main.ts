@@ -26,7 +26,6 @@ import {
 } from "electron-devtools-installer";
 import log from "electron-log/main";
 import { mkdirSync } from "node:fs";
-// eslint-disable-next-line unicorn/import-style -- Need namespace import for path resolution utilities
 import * as path from "node:path";
 
 import { isDev } from "./electronUtils";

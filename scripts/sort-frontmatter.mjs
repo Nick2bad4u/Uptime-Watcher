@@ -1,5 +1,5 @@
 // Sort-frontmatter.mjs
-import fs from "node:fs";
+import * as fs from "node:fs";
 
 /**
  * Desired key order for your front matter.

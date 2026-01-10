@@ -1,6 +1,6 @@
-import fs from "node:fs/promises";
-import os from "node:os";
-import path from "node:path";
+import * as fs from "node:fs/promises";
+import * as os from "node:os";
+import * as path from "node:path";
 
 import { FilesystemCloudStorageProvider } from "@electron/services/cloud/providers/FilesystemCloudStorageProvider";
 import { CLOUD_SYNC_SCHEMA_VERSION } from "@shared/types/cloudSync";

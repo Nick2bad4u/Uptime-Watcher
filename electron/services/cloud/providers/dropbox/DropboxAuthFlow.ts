@@ -3,8 +3,8 @@ import { tryGetErrorCode } from "@shared/utils/errorCodes";
 import { ensureError } from "@shared/utils/errorHandling";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import { DropboxAuth } from "dropbox";
-import crypto from "node:crypto";
-import http from "node:http";
+import * as crypto from "node:crypto";
+import * as http from "node:http";
 import * as z from "zod";
 
 import type { DropboxTokens } from "./DropboxTokens";

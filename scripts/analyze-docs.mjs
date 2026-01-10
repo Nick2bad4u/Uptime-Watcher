@@ -6,7 +6,7 @@
  */
 
 import { readFile, readdir } from "node:fs/promises";
-import path from "node:path";
+import * as path from "node:path";
 import { pathToFileURL } from "node:url";
 
 const __dirname = import.meta.dirname;

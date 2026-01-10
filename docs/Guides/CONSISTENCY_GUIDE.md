@@ -320,13 +320,14 @@ Use the TypedEventBus for inter-service communication:
 import { eventBus } from "@electron/events/EventBus";
 
 // Publishing events
-eventBus.publish("site:created", {
- siteIdentifier: site.id,
- timestamp: new Date().toISOString(),
+await eventBus.emitTyped("site:added", {
+ site,
+ source: "user",
+ timestamp: Date.now(),
 });
 
 // Subscribing to events
-eventBus.subscribe("monitor:status-changed", (event) => {
+eventBus.onTyped("monitor:status-changed", (event) => {
  logger.info("Monitor status changed", { event });
 });
 ```

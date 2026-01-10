@@ -6,7 +6,7 @@
  * specified markdown files include key reference strings.
  */
 
-import path from "node:path";
+import * as path from "node:path";
 
 /**
  * Normalizes a file path to use POSIX separators for consistent matching.

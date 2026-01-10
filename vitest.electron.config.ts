@@ -7,7 +7,7 @@
  * targets electron and shared files for backend testing.
  */
 
-import path from "node:path";
+import * as path from "node:path";
 import pc from "picocolors";
 import { normalizePath, type UserConfig } from "vite";
 import tsconfigPaths from "vite-tsconfig-paths";

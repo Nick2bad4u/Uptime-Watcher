@@ -28,7 +28,7 @@ import {
     validateFilesystemBaseDirectoryCandidate,
 } from "@shared/validation/filesystemBaseDirectoryValidation";
 import { promises as fs } from "node:fs";
-import path from "node:path";
+import * as path from "node:path";
 
 import type { UptimeOrchestrator } from "../../UptimeOrchestrator";
 import type {

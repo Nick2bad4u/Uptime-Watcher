@@ -42,7 +42,7 @@
  *   - Permission errors when attempting to delete directories (with --delete flag).
  */
 
-import path from "node:path";
+import * as path from "node:path";
 import { stat, readdir, rmdir } from "node:fs/promises";
 
 /**

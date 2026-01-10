@@ -6,7 +6,7 @@ import type { ElectronApplication, Page } from "@playwright/test";
 import { createCoverageMap } from "istanbul-lib-coverage";
 import type { CoverageMapData } from "istanbul-lib-coverage";
 import { mkdir, writeFile } from "node:fs/promises";
-import path from "node:path";
+import * as path from "node:path";
 
 const COVERAGE_ENV = "PLAYWRIGHT_COVERAGE";
 const COVERAGE_ROOT = path.resolve(process.cwd(), "coverage", "playwright");

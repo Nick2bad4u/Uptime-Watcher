@@ -1,4 +1,4 @@
-import path from "node:path";
+import * as path from "node:path";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { LOG_TEMPLATES } from "../../../../../shared/utils/logTemplates";

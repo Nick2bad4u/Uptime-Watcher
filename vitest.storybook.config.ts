@@ -7,7 +7,7 @@
 
 import { storybookTest } from "@storybook/addon-vitest/vitest-plugin";
 import { playwright } from "@vitest/browser-playwright";
-import path from "node:path";
+import * as path from "node:path";
 import {
     defineConfig,
     type ViteUserConfig,

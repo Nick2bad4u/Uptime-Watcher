@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // @ts-check
 import { readFile } from "node:fs/promises";
-import path from "node:path";
+import * as path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const PROJECT_ROOT = path.resolve(

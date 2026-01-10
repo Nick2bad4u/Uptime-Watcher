@@ -12,7 +12,7 @@ import { mkdir } from "node:fs/promises";
 // eslint-disable-next-line import-x/no-nodejs-modules -- Node module utilities are required for optional dependency resolution.
 import { createRequire } from "node:module";
 // eslint-disable-next-line import-x/no-nodejs-modules -- Path resolution executes within the Node.js runtime for build tooling.
-import path from "node:path";
+import * as path from "node:path";
 // eslint-disable-next-line import-x/no-nodejs-modules -- URL helpers are required to compute project-relative paths.
 import { fileURLToPath } from "node:url";
 // eslint-disable-next-line import-x/no-nodejs-modules -- Utility inspection assists with rich error diagnostics during build-time operations.

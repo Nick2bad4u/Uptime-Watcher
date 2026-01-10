@@ -330,21 +330,28 @@ ipcRenderer.on("site:updated", (event, data) => {
 ```typescript
 // Type-safe events with automatic metadata
 interface AppEvents {
- "site:updated": { siteIdentifier: string; changes: Partial<Site> };
+ "site:updated": {
+  previousSite: Site;
+  site: Site;
+  updatedFields: string[];
+  timestamp: number;
+ };
 }
 
 const eventBus = new TypedEventBus<AppEvents>("app-events");
 
 // Backend emission with automatic metadata
 await eventBus.emitTyped("site:updated", {
- siteIdentifier: "site_123",
- changes: { name: "New Name" },
+ previousSite,
+ site: updatedSite,
+ updatedFields: ["name"],
+ timestamp: Date.now(),
 });
 
 // Frontend handling via EventsService
 const cleanup = await EventsService.onSiteUpdated((data) => {
  // data is fully typed with automatic metadata
- console.log(`Site ${data.siteIdentifier} updated`, data._meta.correlationId);
+ console.log(`Site ${data.site.identifier} updated`, data._meta?.correlationId);
  handleSiteUpdate(data);
 });
 ```
@@ -421,7 +428,12 @@ uiManager.refreshSites(); // Manual coordination
 
 ```typescript
 // Loose coupling via events
-await eventBus.emitTyped("sites:updated", { site });
+await eventBus.emitTyped("site:updated", {
+ previousSite,
+ site,
+ timestamp: Date.now(),
+ updatedFields: ["name"],
+});
 // UI automatically updates via event subscription
 ```
 

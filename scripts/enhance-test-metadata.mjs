@@ -12,7 +12,7 @@
  */
 
 import { readFileSync, writeFileSync, readdirSync, statSync } from "node:fs";
-import path from "node:path";
+import * as path from "node:path";
 import minimatch from "minimatch";
 
 const __filename = import.meta.filename;

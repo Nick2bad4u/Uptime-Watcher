@@ -1,5 +1,5 @@
 import { tmpdir } from "node:os";
-import path from "node:path";
+import * as path from "node:path";
 
 import { DatabaseService } from "../../electron/services/database/DatabaseService";
 import { HistoryRepository } from "../../electron/services/database/HistoryRepository";

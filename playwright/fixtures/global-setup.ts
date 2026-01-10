@@ -10,7 +10,7 @@
 
 import type { FullConfig } from "@playwright/test";
 import { execSync } from "node:child_process";
-import path from "node:path";
+import * as path from "node:path";
 
 function withMaxOldSpaceSize(
     nodeOptions: string | undefined,

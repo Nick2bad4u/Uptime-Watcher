@@ -7,7 +7,7 @@ import "@testing-library/jest-dom";
 import fc from "fast-check";
 import { resolveFastCheckEnvOverrides } from "@shared/test/utils/fastCheckEnv";
 import { afterAll, beforeAll, vi } from "vitest";
-import EventEmitter from "node:events";
+import { EventEmitter } from "node:events";
 
 // Set max listeners to prevent memory leak warnings in tests
 const MAX_LISTENERS = 200; // Higher threshold for test environment

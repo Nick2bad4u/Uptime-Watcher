@@ -18,7 +18,7 @@
 import { spawn } from "node:child_process";
 import { _electron as electron } from "playwright";
 import { existsSync } from "node:fs";
-import path from "node:path";
+import * as path from "node:path";
 
 // Will be loaded dynamically in main()
 /** @type {function(string): string | undefined} */

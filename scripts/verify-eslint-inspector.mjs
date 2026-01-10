@@ -13,7 +13,7 @@
  */
 
 import { promises as fs } from "node:fs";
-import path from "node:path";
+import * as path from "node:path";
 
 const rootDir = path.resolve("./");
 const docusaurusDir = path.join(rootDir, "docs", "docusaurus");

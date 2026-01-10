@@ -1,7 +1,7 @@
 /**
  * Custom validation for Uptime Watcher documentation patterns
  */
-import path from "node:path";
+import * as path from "node:path";
 import { statSync } from "node:fs";
 import { visit } from "unist-util-visit";
 import { toString } from "mdast-util-to-string";

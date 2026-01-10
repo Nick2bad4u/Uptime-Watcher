@@ -5,7 +5,7 @@
  */
 
 import { readFileSync } from "node:fs";
-import path from "node:path";
+import * as path from "node:path";
 
 console.log("🔍 Vite Performance Configuration Validator\n");
 

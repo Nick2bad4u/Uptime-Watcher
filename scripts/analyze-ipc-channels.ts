@@ -11,7 +11,7 @@
  */
 
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import path from "node:path";
+import * as path from "node:path";
 
 /**
  * Represents an IPC channel definition extracted from the backend

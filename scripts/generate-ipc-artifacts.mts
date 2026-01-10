@@ -2,7 +2,7 @@
 
 import { createHash } from "node:crypto";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
-import path from "node:path";
+import * as path from "node:path";
 import prettier from "prettier";
 import type {
     JSDoc,

@@ -11,7 +11,7 @@
  */
 
 import { readFileSync, writeFileSync, readdirSync, statSync } from "node:fs";
-import path from "node:path";
+import * as path from "node:path";
 
 const __dirname = import.meta.dirname;
 

@@ -113,7 +113,7 @@ If direct Electron codegen doesn't work perfectly, create tests manually with th
  * Generated test template for Uptime-Watcher
  */
 import { test, expect, _electron as electron } from "@playwright/test";
-import path from "node:path";
+import * as path from "node:path";
 
 test.describe("My Generated Tests", () => {
  test("my generated test", async () => {
@@ -344,7 +344,7 @@ Here's what a completed generated test might look like:
 
 ```typescript
 import { test, expect, _electron as electron } from "@playwright/test";
-import path from "node:path";
+import * as path from "node:path";
 
 test.describe(
  "Add Site Workflow - Generated",

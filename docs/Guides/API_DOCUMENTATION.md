@@ -388,7 +388,12 @@ console.log(`Last sync: ${status.lastSyncAt}`);
 
 #### `requestFullSync(): Promise<StateSyncFullSyncResult>`
 
-Performs a full synchronization round-trip and returns the authoritative site snapshot. The call also emits a `sites:state-synchronized` event to all renderers.
+Performs a full synchronization round-trip and returns the authoritative site snapshot.
+
+Internally, the main process emits a typed `sites:state-synchronized` event on
+its event bus, and the renderer receives the corresponding broadcast via the
+`state-sync-event` IPC channel (consumed through
+`StateSyncService.onStateSyncEvent`).
 
 ```typescript
 const { sites } = await StateSyncService.requestFullSync();
@@ -522,16 +527,18 @@ All events include automatic metadata injection:
 
 ```typescript
 interface EventMetadata {
+ busId: string; // Event bus identifier
  correlationId: string; // Unique ID for tracing
- timestamp: number; // Event emission time
- source: string; // Service that emitted the event
+ eventName: string; // Name of the emitted event
+ timestamp: number; // Event emission time (ms since epoch)
 }
 
 interface SiteAddedEvent {
  site: Site;
+ source: "import" | "migration" | "user";
  timestamp: number;
- // Automatic metadata is available but not in the interface
- // Access via event._meta property
+ // Automatic metadata is available at runtime via the non-enumerable `event._meta` property.
+ // Note: `event._meta.timestamp` is the emission timestamp; payload `timestamp` may be captured earlier.
 }
 ```
 
@@ -588,14 +595,12 @@ interface UptimeEvents {
   timestamp: number;
   updatedFields: string[];
  };
- "sites:state-synchronized": {
-  action: "bulk-sync" | "delete" | "update";
-  siteIdentifier?: string;
-  sites: Site[];
-  source: "cache" | "database" | "frontend";
-  timestamp: number;
- };
+ "sites:state-synchronized": StateSyncEventData;
 }
+
+// Renderer-facing broadcast:
+// - IPC channel: `state-sync-event` (see `shared/ipc/rendererEvents.ts`)
+// - Payload: `StateSyncEventData`
 ```
 
 > **Historical note:** Prior to the bridge refactor, managers emitted `site:cache-miss` and `site:cache-updated`. These topics have been fully removed from the public API--cache telemetry now flows exclusively through the internal equivalents (`internal:site:cache-miss` / `internal:site:cache-updated`), and the orchestrator emits `cache:invalidated` when the renderer must react.
@@ -604,17 +609,7 @@ interface UptimeEvents {
 
 ```typescript
 interface UptimeEvents {
- "monitor:status-changed": {
-  monitorId: string;
-  siteIdentifier: string;
-  status: MonitorStatus;
-  previousStatus?: MonitorStatus;
-  responseTime?: number;
-  details?: string;
-  timestamp: number; // Unix timestamp (ms)
-  monitor?: Monitor;
-  site?: Site;
- };
+ "monitor:status-changed": StatusUpdate;
  "monitor:check-completed": {
   checkType: "manual" | "scheduled";
   monitorId: string;
@@ -627,18 +622,36 @@ interface UptimeEvents {
 }
 ```
 
-Monitor lifecycle events (`monitor:down`/`monitor:up`) reuse the shared `StatusUpdate` payload, so every downstream consumer sees the canonical `siteIdentifier`, `monitorId`, and Unix `timestamp` values (milliseconds since epoch) alongside populated `monitor` and `site` context.
+Monitor lifecycle events (`monitor:down`/`monitor:up`) reuse the shared
+`StatusUpdate` payload. `StatusUpdate.timestamp` is an ISO-8601 timestamp
+string, while wrapper events such as `monitor:check-completed` include their
+own `timestamp: number` field (milliseconds since epoch) for event ordering.
 
-#### Application Events
+#### Internal Main-Process Events
+
+The main process uses a typed event bus for internal orchestration. These event
+names are **not** renderer-facing IPC broadcasts.
+
+Examples (see `electron/events/eventTypes.ts`):
 
 ```typescript
-interface UptimeEvents {
- "app:ready": { timestamp: number };
- "app:before-quit": { timestamp: number };
- "database:initialized": { timestamp: number };
- "settings:updated": { settings: AppSettings; timestamp: number };
+interface InternalUptimeEvents {
+ "internal:database:initialized": {
+  operation: "initialized";
+  success: boolean;
+  timestamp: number;
+ };
+
+ "internal:database:history-limit-updated": {
+  limit: number;
+  operation: "history-limit-updated";
+  timestamp: number;
+ };
 }
 ```
+
+Renderer consumers subscribe to the corresponding broadcast events via
+`EventsService` (for example, `settings:history-limit-updated`).
 
 ### Event Listening (Backend Only)
 

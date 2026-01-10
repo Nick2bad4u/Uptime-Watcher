@@ -12,7 +12,7 @@ import {
     existsSync,
     writeFileSync,
 } from "node:fs";
-import path from "node:path";
+import * as path from "node:path";
 
 // Configuration
 const CONFIG = {

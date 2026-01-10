@@ -72,28 +72,35 @@ This document provides comprehensive guidelines for adding and modifying UI feat
 
 **Always use the shared validation schemas for consistent behavior:**
 
-```typescript
-// ✅ Good: Use shared validation schemas
-import {
- httpMonitorSchema,
- baseMonitorSchema,
-} from "shared/validation/schemas";
+````typescript
 
-const validateSiteForm = (formData: FormData) => {
- const result = httpMonitorSchema.safeParse(formData);
- if (!result.success) {
-  return { isValid: false, errors: result.error.errors };
- }
- return { isValid: true, data: result.data };
-};
 
-// ❌ Bad: Manual validation that differs from backend
-const validateSiteForm = (formData: FormData) => {
- if (!formData.identifier || formData.identifier.length < 2) {
-  return { isValid: false, errors: ["ID too short"] };
- }
-};
-```
+
+// ✅ Good: Use shared validation schemasimport {import { useEffect } from "react";import { setupCacheSync } from "@/utils/cacheSync";
+import { useSitesStore } from "@/stores/sites/useSitesStore";
+
+/**
+ * Establish site + monitor subscriptions once during app bootstrap.
+ *
+ * See `src/App.tsx` for the real integration.
+ */
+export function useSitesEventBootstrap(): void {
+ const sitesStore = useSitesStore();
+
+ useEffect(() => {
+  const cacheSyncCleanup = setupCacheSync();
+  const syncEventsCleanup = sitesStore.subscribeToSyncEvents();
+
+  // Monitor updates (down/up/status-changed + manual checks)
+  void sitesStore.subscribeToStatusUpdates();
+
+  return () => {
+   cacheSyncCleanup();
+   syncEventsCleanup();
+   sitesStore.unsubscribeFromStatusUpdates();
+  };
+ }, [sitesStore]);
+}
 
 **Benefits of Shared Validation:**
 
@@ -138,7 +145,7 @@ const useFormValidation = <T>(schema: z.ZodSchema<T>) => {
 
  return { errors, validateField };
 };
-```
+````
 
 ## Development Process
 
@@ -908,7 +915,7 @@ describe("useSitesStore", () => {
   const { result } = renderHook(() => useSitesStore());
 
   await act(async () => {
-   await result.current.syncSitesFromBackend();
+   await result.current.syncSites();
   });
 
   expect(result.current.sites.length).toBeGreaterThan(0);
@@ -1123,32 +1130,14 @@ export const useMonitorEventIntegration = () => {
 
    const initializeEventListeners = async () => {
     try {
-     // Monitor status change events
-     const statusCleanup = await EventsService.onMonitorStatusChanged(
-      (data) => {
-       sitesStore.updateMonitorStatus(data.siteIdentifier, data.monitor);
-      }
-     );
-     cleanupFunctions.push(statusCleanup);
+     // Cache invalidation recovery (scoped + full resync triggers)
+     cleanupFunctions.push(setupCacheSync());
 
-     // Monitor up/down events
-     const upCleanup = await EventsService.onMonitorUp((data) => {
-      sitesStore.handleMonitorUp(data.siteIdentifier, data.monitorId);
-     });
-     cleanupFunctions.push(upCleanup);
+     // State sync events (bulk + deltas)
+     cleanupFunctions.push(sitesStore.subscribeToSyncEvents());
 
-     const downCleanup = await EventsService.onMonitorDown((data) => {
-      sitesStore.handleMonitorDown(data.siteIdentifier, data.monitorId);
-     });
-     cleanupFunctions.push(downCleanup);
-
-     // Cache invalidation events
-     const cacheCleanup = await EventsService.onCacheInvalidated((data) => {
-      if (data.domain === "sites") {
-       sitesStore.syncSitesFromBackend();
-      }
-     });
-     cleanupFunctions.push(cacheCleanup);
+     // Monitor updates are handled by the sites store sync layer
+     await sitesStore.subscribeToStatusUpdates();
     } catch (error) {
      logger.error("Failed to setup event listeners:", error);
     }
@@ -1158,6 +1147,7 @@ export const useMonitorEventIntegration = () => {
 
    return function cleanup() {
     cleanupFunctions.forEach((cleanup) => cleanup());
+    sitesStore.unsubscribeFromStatusUpdates();
    };
   },
   [sitesStore]
@@ -1174,7 +1164,7 @@ import { setupCacheSync } from "../utils/cacheSync";
 useMount(
  useCallback(async function initializeApp() {
   // Initialize stores first
-  await sitesStore.syncSitesFromBackend();
+  await sitesStore.syncSites();
   await settingsStore.initializeSettings();
 
   // Setup automatic cache sync

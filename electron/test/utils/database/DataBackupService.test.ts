@@ -16,7 +16,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import path from "node:path";
+import * as path from "node:path";
 
 const mockFsPromises = vi.hoisted(() => ({
     copyFile: vi.fn(),

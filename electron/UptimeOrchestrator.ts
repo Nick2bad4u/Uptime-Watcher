@@ -45,12 +45,12 @@
  *
  * Events emitted:
  *
- * - Monitor:status-changed: When monitor status changes
- * - Monitor:down: When a monitor goes down
- * - Monitor:up: When a monitor comes back up
- * - System:error: When system operations fail
- * - Monitoring:started: When monitoring begins
- * - Monitoring:stopped: When monitoring stops
+ * - monitor:status-changed: When monitor status changes
+ * - monitor:down: When a monitor goes down
+ * - monitor:up: When a monitor comes back up
+ * - system:error: When system operations fail
+ * - monitoring:started: When monitoring begins
+ * - monitoring:stopped: When monitoring stops
  *
  * @example
  *

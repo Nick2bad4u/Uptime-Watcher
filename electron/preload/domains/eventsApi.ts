@@ -468,7 +468,6 @@ const isSiteUpdatedEventDataPayload = (
 interface GuardSubscriptionOptions {
     readonly domain?: string;
     readonly guardName?: string;
-    readonly reason?: string;
 }
 
 const subscribeWithGuard = <TPayload>(
@@ -507,7 +506,7 @@ const subscribeWithGuard = <TPayload>(
                     domain,
                     payloadType,
                 },
-                reason: options.reason ?? "payload-validation",
+                reason: "payload-validation",
                 ...(payloadPreview ? { payloadPreview } : {}),
             };
 
@@ -597,7 +596,6 @@ export function createEventsApi(): EventsApi {
                 callback,
                 {
                     guardName: "isCacheInvalidatedEventDataPayload",
-                    reason: RENDERER_EVENT_CHANNELS.CACHE_INVALIDATED,
                 }
             ),
         onHistoryLimitUpdated: (
@@ -610,7 +608,6 @@ export function createEventsApi(): EventsApi {
                 callback,
                 {
                     guardName: "isHistoryLimitUpdatedEventDataPayload",
-                    reason: RENDERER_EVENT_CHANNELS.SETTINGS_HISTORY_LIMIT_UPDATED,
                 }
             ),
         onMonitorCheckCompleted: (
@@ -623,7 +620,6 @@ export function createEventsApi(): EventsApi {
                 callback,
                 {
                     guardName: "isMonitorCheckCompletedEventDataPayload",
-                    reason: RENDERER_EVENT_CHANNELS.MONITOR_CHECK_COMPLETED,
                 }
             ),
         onMonitorDown: (
@@ -636,7 +632,6 @@ export function createEventsApi(): EventsApi {
                 callback,
                 {
                     guardName: "isMonitorDownEventDataPayload",
-                    reason: RENDERER_EVENT_CHANNELS.MONITOR_DOWN,
                 }
             ),
         onMonitoringStarted: (
@@ -649,7 +644,6 @@ export function createEventsApi(): EventsApi {
                 callback,
                 {
                     guardName: "isMonitoringStartedEventDataPayload",
-                    reason: RENDERER_EVENT_CHANNELS.MONITORING_STARTED,
                 }
             ),
         onMonitoringStopped: (
@@ -662,7 +656,6 @@ export function createEventsApi(): EventsApi {
                 callback,
                 {
                     guardName: "isMonitoringStoppedEventDataPayload",
-                    reason: RENDERER_EVENT_CHANNELS.MONITORING_STOPPED,
                 }
             ),
         onMonitorStatusChanged: (
@@ -675,7 +668,6 @@ export function createEventsApi(): EventsApi {
                 callback,
                 {
                     guardName: "isMonitorStatusChangedEventData",
-                    reason: RENDERER_EVENT_CHANNELS.MONITOR_STATUS_CHANGED,
                 }
             ),
         onMonitorUp: (
@@ -688,7 +680,6 @@ export function createEventsApi(): EventsApi {
                 callback,
                 {
                     guardName: "isMonitorUpEventDataPayload",
-                    reason: RENDERER_EVENT_CHANNELS.MONITOR_UP,
                 }
             ),
         onSiteAdded: (
@@ -701,7 +692,6 @@ export function createEventsApi(): EventsApi {
                 callback,
                 {
                     guardName: "isSiteAddedEventDataPayload",
-                    reason: RENDERER_EVENT_CHANNELS.SITE_ADDED,
                 }
             ),
         onSiteRemoved: (
@@ -714,7 +704,6 @@ export function createEventsApi(): EventsApi {
                 callback,
                 {
                     guardName: "isSiteRemovedEventDataPayload",
-                    reason: RENDERER_EVENT_CHANNELS.SITE_REMOVED,
                 }
             ),
         onSiteUpdated: (
@@ -727,7 +716,6 @@ export function createEventsApi(): EventsApi {
                 callback,
                 {
                     guardName: "isSiteUpdatedEventDataPayload",
-                    reason: RENDERER_EVENT_CHANNELS.SITE_UPDATED,
                 }
             ),
         onStateSyncEvent: (
@@ -740,7 +728,6 @@ export function createEventsApi(): EventsApi {
                 callback,
                 {
                     guardName: "isStateSyncEventDataPayload",
-                    reason: RENDERER_EVENT_CHANNELS.STATE_SYNC,
                 }
             ),
         onTestEvent: (callback: (data: TestEventData) => void): (() => void) =>
@@ -751,7 +738,6 @@ export function createEventsApi(): EventsApi {
                 callback,
                 {
                     guardName: "isTestEventDataPayload",
-                    reason: RENDERER_EVENT_CHANNELS.TEST_EVENT,
                 }
             ),
         onUpdateStatus: (
@@ -764,7 +750,6 @@ export function createEventsApi(): EventsApi {
                 callback,
                 {
                     guardName: "isUpdateStatusEventDataPayload",
-                    reason: RENDERER_EVENT_CHANNELS.UPDATE_STATUS,
                 }
             ),
         removeAllListeners: (...args: readonly unknown[]): void => {

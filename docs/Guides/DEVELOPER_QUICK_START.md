@@ -263,7 +263,7 @@ const handleCreateSite = async (siteData: SiteCreationData) => {
 
 ### 3. Optimistic Manual Monitor Checks
 
-Manual health checks resolve with enriched `StatusUpdate` payloads so the UI can update before the event bus broadcasts the completion event.
+Manual health checks resolve with validated `StatusUpdate` payloads so the UI can update before the event bus broadcasts the completion event.
 
 ```typescript
 // Renderer: src/stores/sites/useSiteMonitoring.ts
@@ -288,10 +288,10 @@ Cross-service communication uses type-safe events:
 
 ```typescript
 // Backend: Emit events for state changes
-await this.eventBus.emitTyped("sites:added", {
+await this.eventBus.emitTyped("site:added", {
  site: newSite,
+ source: "user",
  timestamp: Date.now(),
- correlationId: generateCorrelationId(),
 });
 
 import { EventsService } from "@app/services/EventsService";

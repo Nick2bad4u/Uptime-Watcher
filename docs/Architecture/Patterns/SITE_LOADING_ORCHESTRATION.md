@@ -69,7 +69,9 @@ These semantics enforce the guarantees described in ADR-003 (Error Handling Stra
 
 ## Cache Synchronization & Background Hydration
 
-- Initial loads replace the entire `StandardizedCache` and emit `sites:state-synchronized` with a sanitized snapshot.
+- Initial loads replace the entire `StandardizedCache` and emit the internal
+  `sites:state-synchronized` event with a sanitized snapshot. The payload is
+  then rebroadcast to renderers over the `state-sync-event` IPC channel.
 - `SiteManager.loadSiteInBackground` now hydrates a single site via `getSiteFromDatabase(identifier)`:
   - On success, it updates the cache, emits `STATE_SYNC_ACTION.UPDATE` through `emitSitesStateSynchronized`, and publishes `internal:site:cache-updated` for cross-process observers.
   - When the site is missing or hydration fails, it emits `internal:site:cache-miss` to trigger fallback flows.
@@ -78,7 +80,9 @@ This targeted hydration removes unnecessary full-table reads and guarantees rend
 
 ## Operational Invariants
 
-- Every cache mutation that hits the database must call `emitSitesStateSynchronized` so renderer stores receive delta payloads.
+- Every cache mutation that hits the database must call
+  `emitSitesStateSynchronized` so renderer stores receive delta payloads via
+  `state-sync-event`.
 - Monitoring-related event emissions (`start-/stop-monitoring-requested`) may **not** be swallowed; upstream orchestrators rely on propagated rejections for retries/backoff.
 - History-limit changes are transactional: the in-memory value, persisted setting, and pruning logic run in a single `withDatabaseOperation` invocation.
 
@@ -86,7 +90,9 @@ This targeted hydration removes unnecessary full-table reads and guarantees rend
 
 - [ ] Await `MonitoringConfig.setHistoryLimit` in any new loader or mutation.
 - [ ] Propagate monitoring start/stop rejections, logging before rethrowing.
-- [ ] When adding background hydration paths, emit both `sites:state-synchronized` and `internal:site:cache-updated`.
+- [ ] When adding background hydration paths, emit internal
+  `sites:state-synchronized` (forwarded to renderers as `state-sync-event`) and
+  `internal:site:cache-updated`.
 - [ ] Update this document when the orchestration flow or event contracts change.
 
 ## Current Implementation Audit (2025-11-04)

@@ -17,7 +17,7 @@
 
 import { describe, expect, it, vi, beforeEach } from "vitest";
 import * as fs from "node:fs";
-import path from "node:path";
+import * as path from "node:path";
 
 // Mock dependencies
 vi.mock("../utils/logger", () => ({

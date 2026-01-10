@@ -229,8 +229,6 @@ const createPathMock = async <T extends typeof import("node:path")>(
     return {
         ...actual,
         default: actual,
-        join: vi.fn((...args: string[]) => args.join("/")),
-        resolve: vi.fn((...args: string[]) => `/${args.join("/")}`),
     };
 };
 

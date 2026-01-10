@@ -9,9 +9,7 @@
  */
 
 import { readdir, readFile, stat } from "node:fs/promises";
-import path from "node:path";
-import process from "node:process";
-
+import * as path from "node:path";
 const __dirname = import.meta.dirname;
 const ROOT_DIRECTORY = path.resolve(__dirname, "..");
 const DOCS_DIRECTORIES = [

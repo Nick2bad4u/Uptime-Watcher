@@ -12,3 +12,6 @@ storybook-static/
 docs/docusaurus/build/
 docs/docusaurus/.docusaurus/
 docs/docusaurus/docs/
+
+# Auto-generated changelog (do not reformat during remark runs)
+CHANGELOG.md

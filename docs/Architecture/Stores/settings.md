@@ -27,6 +27,9 @@ Renderer and shared modules involved in settings and history-limit handling:
 - `src/stores/settings/useSettingsStore.ts` – Primary Zustand store for
   application settings, including `historyLimit` and notification
   preferences.
+- `src/stores/settings/operations.ts` – Settings operations and backend/event
+  synchronization. Subscribes to `settings:history-limit-updated` so the store
+  stays consistent when the backend changes the value.
 - `src/components/Settings/Settings.tsx` – Main settings UI, responsible for
   letting users choose a history limit and other preferences.
 - `src/constants.ts` – Exposes `DEFAULT_HISTORY_LIMIT` and
@@ -132,3 +135,15 @@ By following these rules, renderer code stays consistent with the backend
 semantics and the architecture documentation, avoiding subtle bugs where a
 user-selected "Unlimited" history limit is silently treated as a small
 finite value in one part of the UI.
+
+## Event Propagation and Store Synchronization
+
+History limit updates can originate from multiple sources (UI actions, imports,
+orchestrator migrations, or database maintenance). Renderer consumers should
+not assume the local UI is the only source of truth.
+
+To keep the in-memory settings store aligned, the settings operations layer
+subscribes to the `settings:history-limit-updated` renderer broadcast via
+`EventsService.onHistoryLimitUpdated`. That broadcast originates in the main
+process (see `electron/services/application/ApplicationService.ts`) and carries
+both the new `limit` and the `previousLimit` to support contextual messaging.

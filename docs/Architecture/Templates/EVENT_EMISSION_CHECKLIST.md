@@ -32,7 +32,7 @@ Use this checklist whenever adding or modifying events (main, renderer, or prelo
 
 - [ ] Channel name follows existing conventions (domain:action).
 - [ ] Payload type exists in `@shared/types/events` and is referenced by `RendererEventPayloadMap`.
-- [ ] CorrelationId and metadata included (`_meta` preserved on re-emit).
+- [ ] Metadata (`_meta`) is preserved on re-emit (correlation IDs belong in metadata, not the payload).
 - [ ] Validation at boundary (IPC handler or preload) before emission.
 - [ ] Renderer broadcast path defined (webContents.send + preload validation).
 - [ ] Logging/telemetry includes channel, correlationId, and outcome; no PII in logs.
@@ -46,7 +46,6 @@ import type { RendererEventPayload } from "@shared/ipc/rendererEvents";
 
 // main (orchestrator / manager event bus)
 await eventBus.emitTyped("site:added", {
- identifier: "example",
  site,
  source: "user",
  timestamp: Date.now(),

@@ -6,7 +6,7 @@
  * avoid collisions in CI and parallel test workers.
  */
 
-import http from "node:http";
+import * as http from "node:http";
 
 import { describe, expect, it, vi } from "vitest";
 

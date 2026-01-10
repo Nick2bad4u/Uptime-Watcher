@@ -101,7 +101,7 @@ In the current implementation:
 - `Monitor.id` is a generated UUID.
 
 This effectively satisfies the immutability requirement without introducing a
-separate `siteId` field.
+separate site ID field.
 
 ### 4) Tombstones
 

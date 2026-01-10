@@ -41,11 +41,11 @@ Skipping these steps results in stale settings panels, missing toast notificatio
 
 ## 2. Canonical IPC & Event Channels
 
-| Concern                | Invoke Channel(s)                                                           | Renderer Event(s)                             | Notes                                                                                                                   |
-| ---------------------- | --------------------------------------------------------------------------- | --------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
-| Settings retention     | `get-history-limit`, `update-history-limit`, `reset-settings`               | `settings:history-limit-updated`              | `update-history-limit` returns the canonical limit value; broadcast includes `previousLimit` for analytics.             |
-| Manual checks          | `check-site-now` _(renderer abstraction: `MonitoringService.checkSiteNow`)_ | `monitor:check-completed`                     | Event payload delivers enriched snapshots (site + monitor) so the renderer can reconcile history graphs and audit logs. |
-| Diagnostics & Metadata | `diagnostics-verify-ipc-handler`, `diagnostics-report-preload-guard`        | `cache:invalidated`, `state-sync-event`, etc. | No renames since 17.4.0, but keep generated inventory authoritative.                                                    |
+| Concern                | Invoke Channel(s)                                                           | Renderer Event(s)                             | Notes                                                                                                                                         |
+| ---------------------- | --------------------------------------------------------------------------- | --------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| Settings retention     | `get-history-limit`, `update-history-limit`, `reset-settings`               | `settings:history-limit-updated`              | `update-history-limit` returns the canonical limit value; broadcast includes `previousLimit` for analytics.                                   |
+| Manual checks          | `check-site-now` _(renderer abstraction: `MonitoringService.checkSiteNow`)_ | `monitor:check-completed`                     | Event payload delivers `monitorId`/`siteIdentifier` plus a `StatusUpdate` result so the renderer can reconcile history graphs and audit logs. |
+| Diagnostics & Metadata | `diagnostics-verify-ipc-handler`, `diagnostics-report-preload-guard`        | `cache:invalidated`, `state-sync-event`, etc. | No renames since 17.4.0, but keep generated inventory authoritative.                                                                          |
 
 > 🔗 Authoritative reference: `docs/Architecture/generated/IPC_CHANNEL_INVENTORY.md` (auto-generated; do **not** edit manually).
 
@@ -62,7 +62,7 @@ Skipping these steps results in stale settings panels, missing toast notificatio
 
 ### 3.1 Optimistic Renderer Updates
 
-`MonitoringService.checkSiteNow(siteIdentifier, monitorId)` now resolves with an enriched `StatusUpdate` when the backend completes the check synchronously. The renderer must:
+`MonitoringService.checkSiteNow(siteIdentifier, monitorId)` resolves with a validated `StatusUpdate` when the backend completes the check synchronously. The renderer must:
 
 1. **Apply the optimistic snapshot** immediately via `applyStatusUpdateSnapshot` (already wired in `createSiteMonitoringActions`).
 2. **Log telemetry** using `logStoreAction("SitesStore", "checkSiteNow", …)` to preserve parity with event-driven updates.
@@ -72,15 +72,25 @@ Skipping these steps results in stale settings panels, missing toast notificatio
 
 - `monitor:check-completed` always emits after the manual check finishes.
 - Payload shape: `{ checkType: "manual" | "scheduled", monitorId, siteIdentifier, result: StatusUpdate, timestamp }`.
-- When the payload lacks `site` or `monitor` snapshots, the orchestrator hydrates them from caches before emission. Renderer logic should trust this payload as authoritative.
+
+`monitor:check-completed` does **not** include separate `site` or `monitor`
+snapshot fields. `result` is a `StatusUpdate` and may optionally include
+`site`/`monitor` context when the backend can attach it. Treat this context as
+optional:
+
+- `data.result.monitor` (optional) – a monitor snapshot
+- `data.result.site` (optional) – a site snapshot
+
+If you only care about status transitions (toast notifications, banners), you
+can also subscribe to `monitor:down` / `monitor:up`.
 
 ### 3.3 Testing Guidance
 
-| Test Suite     | Command                                                                    | Purpose                                                      |
-| -------------- | -------------------------------------------------------------------------- | ------------------------------------------------------------ |
-| Renderer store | `vitest run src/test/stores/sites/useSiteMonitoring.comprehensive.test.ts` | Validates optimistic update path.                            |
-| Orchestrator   | `vitest run electron/test/UptimeOrchestrator.test.ts -t "manual-check"`    | Ensures rebroadcast carries enriched payload.                |
-| E2E            | `npm run test:playwright`                                                  | Confirms UI feedback is instant during manual health checks. |
+| Test Suite     | Command                                                                    | Purpose                                                            |
+| -------------- | -------------------------------------------------------------------------- | ------------------------------------------------------------------ |
+| Renderer store | `vitest run src/test/stores/sites/useSiteMonitoring.comprehensive.test.ts` | Validates optimistic update path.                                  |
+| Orchestrator   | `vitest run electron/test/UptimeOrchestrator.test.ts -t "manual-check"`    | Ensures the manual-check completion flow is rebroadcast correctly. |
+| E2E            | `npm run test:playwright`                                                  | Confirms UI feedback is instant during manual health checks.       |
 
 ---
 
@@ -89,12 +99,18 @@ Skipping these steps results in stale settings panels, missing toast notificatio
 ### 4.1 Event Payload Contract
 
 ```ts
-interface HistoryLimitUpdatedEventData {
- limit: number;
- previousLimit?: number;
- operation: "history-limit-updated";
- timestamp: number;
-}
+import type { RendererEventPayloadMap } from "@shared/types/events";
+
+type HistoryLimitUpdatedEventData =
+ RendererEventPayloadMap["settings:history-limit-updated"];
+
+// Shape (from `shared/types/events.ts`):
+// {
+//  limit: number;
+//  operation: "history-limit-updated";
+//  previousLimit?: number;
+//  timestamp: number;
+// }
 ```
 
 - The orchestrator tracks `previousLimit` internally to surface meaningful diffs.
@@ -123,7 +139,7 @@ interface HistoryLimitUpdatedEventData {
 | Normalize all invoke channels and preload bridges               | ✅      | Run `npm run generate:ipc` after refactors.                             |
 | Update renderer services (`EventsService`, `MonitoringService`) | ✅      | Ensure new listeners return cleanup functions.                          |
 | Wire optimistic manual-check handling into stores               | ✅      | Verify `createSiteMonitoringActions` is in use.                         |
-| Handle `settings:history-limit-updated` in all settings views   | ✅      | Remember to invalidate cached retention copy in Redux/Zustand wrappers. |
+| Handle `settings:history-limit-updated` in all settings views   | ✅      | Remember to invalidate cached retention copy in Zustand store/services. |
 | Add CI drift detection (`npm run check:ipc`)                    | ✅      | Integrate into lint/test workflows.                                     |
 | Update product docs & release notes                             | ✅      | Reference this guide and the changelog entry.                           |
 
@@ -141,14 +157,14 @@ Mark each item off during integration reviews. Pull requests must demonstrate au
 
 ## 7. Appendix: Reference Implementations
 
-| Component               | File                                                  | Responsibility                                                                               |
-| ----------------------- | ----------------------------------------------------- | -------------------------------------------------------------------------------------------- |
-| Orchestrator forwarding | `electron/UptimeOrchestrator.ts`                      | Rebroadcasts `monitor:check-completed` and `settings:history-limit-updated` with enrichment. |
-| Application bridge      | `electron/services/application/ApplicationService.ts` | Pipes orchestrator output to `RendererEventBridge`.                                          |
-| Preload guard           | `electron/preload/domains/eventsApi.ts`               | Validates renderer payloads and reports guard failures.                                      |
-| Renderer subscription   | `@app/services/EventsService.ts`                      | Provides typed listener helpers with automatic initialization.                               |
-| Settings store          | `src/stores/settings/operations.ts`                   | Applies history-limit updates and handles subscription lifecycle.                            |
-| Sites monitoring store  | `src/stores/sites/useSiteMonitoring.ts`               | Applies optimistic manual-check snapshots.                                                   |
+| Component               | File                                                  | Responsibility                                                                                      |
+| ----------------------- | ----------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| Orchestrator forwarding | `electron/UptimeOrchestrator.ts`                      | Rebroadcasts `monitor:check-completed` and `settings:history-limit-updated` for renderer consumers. |
+| Application bridge      | `electron/services/application/ApplicationService.ts` | Pipes orchestrator output to `RendererEventBridge`.                                                 |
+| Preload guard           | `electron/preload/domains/eventsApi.ts`               | Validates renderer payloads and reports guard failures.                                             |
+| Renderer subscription   | `@app/services/EventsService.ts`                      | Provides typed listener helpers with automatic initialization.                                      |
+| Settings store          | `src/stores/settings/operations.ts`                   | Applies history-limit updates and handles subscription lifecycle.                                   |
+| Sites monitoring store  | `src/stores/sites/useSiteMonitoring.ts`               | Applies optimistic manual-check snapshots.                                                          |
 
 Consult these modules when extending or troubleshooting integrations.
 

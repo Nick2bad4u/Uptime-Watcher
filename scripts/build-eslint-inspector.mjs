@@ -10,9 +10,7 @@
 import fs from "fs-extra";
 
 import { execSync } from "node:child_process";
-import path from "node:path";
-import process from "node:process";
-
+import * as path from "node:path";
 // Configuration - using process.cwd() since we'll run from project root
 const PROJECT_ROOT = process.cwd();
 const DOCUSAURUS_STATIC_DIR = path.join(

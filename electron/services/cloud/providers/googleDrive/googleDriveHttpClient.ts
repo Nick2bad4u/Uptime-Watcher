@@ -10,7 +10,7 @@
 import type { AxiosInstance } from "axios";
 
 import axios from "axios";
-import crypto from "node:crypto";
+import { randomUUID } from "node:crypto";
 
 import type { GoogleDriveTokenManager } from "./GoogleDriveTokenManager";
 
@@ -72,8 +72,8 @@ export type GoogleDriveFilesApi = Readonly<{
 }>;
 
 /**
- * Minimal client surface modeled after the subset of `drive_v3.Drive` used by
- * Uptime Watcher.
+ * Minimal client surface modeled after the subset of the Google Drive REST API
+ * that Uptime Watcher needs.
  */
 export type GoogleDriveClient = Readonly<{
     files: GoogleDriveFilesApi;
@@ -173,7 +173,7 @@ class GoogleDriveHttpClient {
                     return { data: response.data };
                 }
 
-                const boundary = `uptimewatcher_${crypto.randomUUID()}`;
+                const boundary = `uptimewatcher_${randomUUID()}`;
                 const body = GoogleDriveHttpClient.buildMultipartRelatedBody(
                     requestBody,
                     media.body,

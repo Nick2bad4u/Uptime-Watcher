@@ -51,8 +51,9 @@ Renderer and shared modules involved in site state management:
 - `SiteManager` and `UptimeOrchestrator` maintain the authoritative in-memory
   cache of `Site` entities.
 - When bulk or targeted sync operations complete, the orchestrator emits
-  `"sites:state-synchronized"` events using the shared
-  `StateSyncEventData` contract.
+  internal `sites:state-synchronized` events using the shared
+  `StateSyncEventData` contract. The payload is forwarded to renderers over the
+  `state-sync-event` IPC broadcast.
 - IPC handlers registered by `electron/services/ipc/IpcService.ts` expose
   `STATE_SYNC_CHANNELS.getSyncStatus` and
   `STATE_SYNC_CHANNELS.requestFullSync` for renderer callers. Both use
@@ -62,7 +63,8 @@ Renderer and shared modules involved in site state management:
 ### Preload bridge
 
 - `electron/preload/domains/eventsApi.ts` validates and forwards
-  `sites:state-synchronized` events to renderer listeners via the
+  `state-sync-event` broadcasts (originating from internal
+  `sites:state-synchronized` events) to renderer listeners via the
   `EventsApi` surface.
 - `electron/preload/domains/stateSyncApi.ts` (referenced from
   `electron/preload.ts`) exposes the `stateSync` IPC invoke methods
@@ -117,8 +119,9 @@ Renderer and shared modules involved in site state management:
 - The sites store uses a short debounce window so multiple invalidations
   result in a single `requestFullSync()` call when possible.
 - The **actual** data always flows through the state-sync IPC channels and
-  `sites:state-synchronized` events, keeping the main-process cache as the
-  source of truth.
+  the `state-sync-event` renderer broadcasts (payload: `StateSyncEventData`).
+  Those broadcasts originate from internal `sites:state-synchronized` events in
+  the main process, keeping the main-process cache as the source of truth.
 
 ## Error Handling and Recovery
 

@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 
-import path from "node:path";
+import * as path from "node:path";
 import ts from "typescript";
 
 const { readFileSync, readdirSync } =

@@ -10,12 +10,11 @@ import { createCoverageMap } from "istanbul-lib-coverage";
 import { createContext } from "istanbul-lib-report";
 import reports from "istanbul-reports";
 import { mkdir, readdir, readFile, rm } from "node:fs/promises";
-import path from "node:path";
-import process from "node:process";
+import { join, resolve } from "node:path";
 
-const COVERAGE_ROOT = path.resolve(process.cwd(), "coverage", "playwright");
-const NYC_OUTPUT_DIR = path.join(COVERAGE_ROOT, ".nyc_output");
-const REPORT_DIR = path.join(COVERAGE_ROOT, "reports");
+const COVERAGE_ROOT = resolve(process.cwd(), "coverage", "playwright");
+const NYC_OUTPUT_DIR = join(COVERAGE_ROOT, ".nyc_output");
+const REPORT_DIR = join(COVERAGE_ROOT, "reports");
 const THRESHOLD = Number(process.env["PLAYWRIGHT_COVERAGE_THRESHOLD"] ?? "100");
 
 /**
@@ -51,7 +50,7 @@ async function mergeCoverage(files: string[]): Promise<void> {
     const coverageMap = createCoverageMap({});
 
     for (const file of files) {
-        const fullPath = path.join(NYC_OUTPUT_DIR, file);
+        const fullPath = join(NYC_OUTPUT_DIR, file);
         const raw = await readFile(fullPath, "utf8");
         coverageMap.merge(JSON.parse(raw));
     }

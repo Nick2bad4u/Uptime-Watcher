@@ -12,7 +12,6 @@ import { LOG_TEMPLATES } from "@shared/utils/logTemplates";
 import { isSqliteLockedError } from "@shared/utils/sqliteErrors";
 import { app } from "electron";
 import { Database } from "node-sqlite3-wasm";
-// eslint-disable-next-line unicorn/import-style -- Need namespace import for both sync and async usage
 import * as path from "node:path";
 
 import { DB_FILE_NAME } from "../../constants";
