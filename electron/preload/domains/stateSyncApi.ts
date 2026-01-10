@@ -11,23 +11,12 @@
  * @packageDocumentation
  */
 
-import { RENDERER_EVENT_CHANNELS } from "@shared/ipc/rendererEvents";
-import {
-    safeParseStateSyncEventData,
-    type StateSyncEventData,
-} from "@shared/types/events";
 import {
     STATE_SYNC_CHANNELS,
-    type StateSyncApiSurface,
     type StateSyncDomainBridge,
 } from "@shared/types/preload";
 
-import { createEventManager, createTypedInvoker } from "../core/bridgeFactory";
-import {
-    buildPayloadPreview,
-    preloadDiagnosticsLogger,
-    reportPreloadGuardFailure,
-} from "../utils/preloadLogger";
+import { createTypedInvoker } from "../core/bridgeFactory";
 
 /**
  * Interface defining the state sync domain API operations.
@@ -43,17 +32,6 @@ export interface StateSyncApiInterface extends StateSyncDomainBridge {
     getSyncStatus: StateSyncDomainBridge["getSyncStatus"];
 
     /**
-     * Subscribe to state synchronization events
-     *
-     * @param callback - Function to call when sync events are received
-     *
-     * @returns Cleanup function to remove the event listener
-     */
-    onStateSyncEvent: (
-        callback: (data: StateSyncEventData) => void
-    ) => () => void;
-
-    /**
      * Requests a full synchronization of all data
      *
      * @returns Promise resolving to synchronized site data
@@ -66,69 +44,21 @@ export interface StateSyncApiInterface extends StateSyncDomainBridge {
  *
  * @public
  */
-const stateSyncEventManager = createEventManager(
-    RENDERER_EVENT_CHANNELS.STATE_SYNC
-);
-
 export const stateSyncApi: StateSyncApiInterface = {
     /**
      * Gets the current synchronization status
      *
      * @returns Promise resolving to current sync status information
      */
+    // eslint-disable-next-line ex/no-unhandled -- Accessing constant channel mapping.
     getSyncStatus: createTypedInvoker(STATE_SYNC_CHANNELS.getSyncStatus),
-
-    /**
-     * Subscribe to state synchronization events
-     *
-     * @param callback - Function to call when sync events are received
-     *
-     * @returns Cleanup function to remove the event listener
-     */
-    onStateSyncEvent: (
-        callback: (data: StateSyncEventData) => void
-    ): (() => void) =>
-        stateSyncEventManager.on((payload: unknown) => {
-            const parsed = safeParseStateSyncEventData(payload);
-
-            if (!parsed.success) {
-                const payloadPreview = buildPayloadPreview(payload);
-                const payloadType = Array.isArray(payload)
-                    ? "array"
-                    : typeof payload;
-
-                preloadDiagnosticsLogger.warn(
-                    "[stateSyncApi] Dropped malformed payload for 'state-sync-event'",
-                    {
-                        guard: "safeParseStateSyncEventData",
-                        payloadPreview,
-                        payloadType,
-                    }
-                );
-
-                void reportPreloadGuardFailure({
-                    channel: RENDERER_EVENT_CHANNELS.STATE_SYNC,
-                    guard: "safeParseStateSyncEventData",
-                    metadata: {
-                        domain: "stateSyncApi",
-                        payloadType,
-                    },
-                    ...(typeof payloadPreview === "string"
-                        ? { payloadPreview }
-                        : {}),
-                    reason: "payload-validation",
-                });
-                return;
-            }
-
-            callback(parsed.data);
-        }),
 
     /**
      * Requests a full synchronization of all data
      *
      * @returns Promise resolving to synchronized site data
      */
+    // eslint-disable-next-line ex/no-unhandled -- Accessing constant channel mapping.
     requestFullSync: createTypedInvoker(STATE_SYNC_CHANNELS.requestFullSync),
 } as const;
 
@@ -137,4 +67,4 @@ export const stateSyncApi: StateSyncApiInterface = {
  *
  * @public
  */
-export type StateSyncApi = StateSyncApiSurface;
+export type StateSyncApi = StateSyncDomainBridge;

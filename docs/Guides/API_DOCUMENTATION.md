@@ -372,9 +372,10 @@ const updatedLimit = await SettingsService.updateHistoryLimit(45);
 ### State Sync API (`StateSyncService`)
 
 > Primary entry point: `@app/services/StateSyncService`. Internally this uses
-> the typed `stateSync` domain from the preload bridge via
+> the typed `stateSync` invoke domain and the `events.onStateSyncEvent`
+> subscription surface from the preload bridge via
 > `getIpcServiceHelpers("StateSyncService")`, so renderer code never talks to
-> `window.electronAPI.stateSync` directly.
+> `window.electronAPI` directly.
 
 #### `getSyncStatus(): Promise<StateSyncStatusSummary>`
 

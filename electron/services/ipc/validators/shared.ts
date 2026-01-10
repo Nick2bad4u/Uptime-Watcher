@@ -30,15 +30,12 @@ import {
     validateSiteSnapshot,
     validateSiteUpdate,
 } from "@shared/validation/guards";
+import { monitorIdSchema } from "@shared/validation/monitorFieldSchemas";
 import {
     validateAppNotificationRequest,
     validateNotificationPreferenceUpdate,
 } from "@shared/validation/notifications";
-import {
-    SITE_IDENTIFIER_MAX_LENGTH,
-    SITE_IDENTIFIER_REQUIRED_MESSAGE,
-    SITE_IDENTIFIER_TOO_LONG_MESSAGE,
-} from "@shared/validation/siteFieldConstants";
+import { siteIdentifierSchema } from "@shared/validation/siteFieldSchemas";
 
 import type { IpcParameterValidator } from "../types";
 
@@ -170,15 +167,12 @@ const validateSiteIdentifierCandidate = (
         );
     }
 
-    if (value.trim().length === 0) {
-        return [SITE_IDENTIFIER_REQUIRED_MESSAGE];
+    const parsed = siteIdentifierSchema.safeParse(value);
+    if (parsed.success) {
+        return null;
     }
 
-    if (value.length > SITE_IDENTIFIER_MAX_LENGTH) {
-        return [SITE_IDENTIFIER_TOO_LONG_MESSAGE];
-    }
-
-    return null;
+    return formatZodIssues(parsed.error.issues);
 };
 
 function createSiteIdentifierValidator(
@@ -197,10 +191,18 @@ function createSiteIdentifierAndMonitorIdValidator(
     return createParamValidator(2, [
         (value): ParameterValueValidationResult =>
             validateSiteIdentifierCandidate(value, siteParamName),
-        (value): ParameterValueValidationResult =>
-            toValidationResult(
-                IpcValidators.requiredString(value, monitorParamName)
-            ),
+        (value): ParameterValueValidationResult => {
+            if (typeof value !== "string") {
+                return toValidationResult(
+                    IpcValidators.requiredString(value, monitorParamName)
+                );
+            }
+
+            const parsed = monitorIdSchema.safeParse(value);
+            return parsed.success
+                ? null
+                : formatZodIssues(parsed.error.issues);
+        },
     ]);
 }
 

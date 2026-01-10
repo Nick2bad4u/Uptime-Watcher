@@ -64,6 +64,7 @@ const logInvalidSnapshotAndThrow = (
  */
 interface SiteServiceContract {
     readonly addSite: (site: Site) => Promise<Site>;
+    readonly deleteAllSites: () => Promise<number>;
     readonly getSites: () => Promise<Site[]>;
     readonly initialize: () => Promise<void>;
     readonly removeMonitor: (
@@ -125,6 +126,17 @@ export const SiteService: SiteServiceContract = {
             `Site creation returned an invalid site snapshot for ${site.identifier}`
         );
     }),
+
+    /**
+     * Deletes all sites from the backend.
+     *
+     * @remarks
+     * This is a destructive operation. Callers should usually prefer importing
+     * or restoring a backup over wiping all sites.
+     *
+     * @returns The number of sites removed.
+     */
+    deleteAllSites: wrap("deleteAllSites", async (api) => api.sites.deleteAllSites()),
 
     /**
      * Retrieves all sites from the backend.

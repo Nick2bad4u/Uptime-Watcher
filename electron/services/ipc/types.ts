@@ -5,7 +5,6 @@
 
 import type {
     IpcResponse as SharedIpcResponse,
-    IpcValidationResponse as SharedIpcValidationResponse,
 } from "@shared/types/ipc";
 
 /**
@@ -14,12 +13,6 @@ import type {
  * @typeParam T - Payload type carried by a successful IPC response.
  */
 export type IpcResponse<T = unknown> = SharedIpcResponse<T>;
-
-/**
- * Validation response shape returned when IPC parameter validation runs before
- * invoking a handler.
- */
-export type IpcValidationResponse = SharedIpcValidationResponse;
 
 /**
  * Parameters for IPC handler wrapper configuration.

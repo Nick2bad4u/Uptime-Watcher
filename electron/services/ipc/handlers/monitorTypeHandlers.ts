@@ -13,7 +13,7 @@ import {
     getAllMonitorTypeConfigs,
     getMonitorTypeConfig,
 } from "../../monitoring/MonitorTypeRegistry";
-import { createStandardizedIpcRegistrar, createValidationResponse } from "../utils";
+import { createStandardizedIpcRegistrar } from "../utils";
 import { MonitorTypeHandlerValidators } from "../validators/monitorTypes";
 
 type BaseMonitorUiConfig = ReturnType<
@@ -307,20 +307,7 @@ export function registerMonitorTypeHandlers({
 
     register(
         MONITOR_TYPES_CHANNELS.validateMonitorData,
-        (monitorType, data) => {
-            const result = validateMonitorData(monitorType.trim(), data);
-
-            const metadata = isRecord(result.metadata)
-                ? result.metadata
-                : undefined;
-
-            return createValidationResponse(
-                result.success,
-                result.errors,
-                result.warnings,
-                metadata
-            );
-        },
+        (monitorType, data) => validateMonitorData(monitorType.trim(), data),
         MonitorTypeHandlerValidators.validateMonitorData
     );
 }

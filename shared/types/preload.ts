@@ -8,7 +8,6 @@
  * end-to-end alignment with ADR-005.
  */
 
-import type { StateSyncEventData } from "./events";
 import type {
     IpcInvokeChannel,
     IpcInvokeChannelParams,
@@ -377,17 +376,6 @@ export const STATE_SYNC_CHANNELS: StateSyncChannelMap =
 export type StateSyncDomainBridge = DomainBridge<typeof STATE_SYNC_CHANNELS>;
 
 /**
- * Combined state-sync API including the event subscription surface.
- *
- * @public
- */
-export type StateSyncApiSurface = StateSyncDomainBridge & {
-    readonly onStateSyncEvent: (
-        callback: (data: StateSyncEventData) => void
-    ) => () => void;
-};
-
-/**
  * Mapping from system domain methods to IPC channels.
  *
  * @internal
@@ -435,6 +423,6 @@ export interface ElectronBridgeApi<
     readonly notifications: NotificationsDomainBridge;
     readonly settings: SettingsDomainBridge;
     readonly sites: SitesDomainBridge;
-    readonly stateSync: StateSyncApiSurface;
+    readonly stateSync: StateSyncDomainBridge;
     readonly system: TSystemApi;
 }

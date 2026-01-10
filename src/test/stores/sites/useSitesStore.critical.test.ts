@@ -138,6 +138,9 @@ const createStopSummary = (
 });
 
 const mockElectronAPI = {
+    events: {
+        onStateSyncEvent: vi.fn().mockReturnValue(vi.fn()),
+    },
     sites: {
         addSite: vi.fn(),
         getSites: vi.fn(),
@@ -207,7 +210,6 @@ const mockElectronAPI = {
     },
     stateSync: {
         getSyncStatus: vi.fn(),
-        onStateSyncEvent: vi.fn(),
         requestFullSync: vi.fn().mockResolvedValue({
             completedAt: Date.now(),
             revision: 1,
@@ -368,7 +370,7 @@ describe("useSitesStore Function Coverage Tests", () => {
             source: "cache",
             synchronized: true,
         });
-        mockElectronAPI.stateSync.onStateSyncEvent.mockResolvedValue(vi.fn());
+        mockElectronAPI.events.onStateSyncEvent.mockReturnValue(vi.fn());
         mockElectronAPI.stateSync.requestFullSync.mockResolvedValue({
             completedAt: Date.now(),
             siteCount: 0,

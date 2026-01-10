@@ -720,9 +720,11 @@ guidance in `docs/Architecture/Stores/sites.md`.
    - `electron/preload/domains/eventsApi.ts` validates
      state-sync-related events using the `StateSyncEventData` guard from
      `@shared/types/events` before they reach renderer callbacks.
-   - The preload layer exposes `stateSync` IPC methods and event hooks on
+   - The preload layer exposes `stateSync` IPC invoke methods on
      `window.electronAPI.stateSync` according to the
-     `StateSyncDomainBridge` mapping in `shared/types/preload.ts`.
+     `StateSyncDomainBridge` mapping in `shared/types/preload.ts`, and
+     exposes the corresponding broadcast subscription via
+     `window.electronAPI.events.onStateSyncEvent`.
 
 **Renderer responsibilities**
 

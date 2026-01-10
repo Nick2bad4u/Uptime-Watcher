@@ -13,7 +13,6 @@ import {
     IpcValidators,
     createErrorResponse,
     createSuccessResponse,
-    createValidationResponse,
     registerStandardizedIpcHandler,
     toClonedArrayBuffer,
     withIpcHandler,
@@ -1049,125 +1048,6 @@ describe("IPC Utils - Comprehensive Coverage", () => {
             });
         });
 
-        describe(createValidationResponse, () => {
-            it("should create successful validation response with defaults", async ({
-                task,
-                annotate,
-            }) => {
-                await annotate(`Testing: ${task.name}`, "functional");
-                await annotate("Component: utils", "component");
-                await annotate("Category: Service", "category");
-                await annotate("Type: Constructor", "type");
-
-                const result = createValidationResponse(true);
-
-                expect(result).toEqual({
-                    success: true,
-                    errors: [],
-                    warnings: [],
-                    metadata: {},
-                });
-            });
-
-            it("should create failed validation response with errors", async ({
-                task,
-                annotate,
-            }) => {
-                await annotate(`Testing: ${task.name}`, "functional");
-                await annotate("Component: utils", "component");
-                await annotate("Category: Service", "category");
-                await annotate("Type: Constructor", "type");
-
-                const errors = ["Field is required", "Invalid format"];
-                const result = createValidationResponse(false, errors);
-
-                expect(result).toEqual({
-                    success: false,
-                    errors: ["Field is required", "Invalid format"],
-                    warnings: [],
-                    metadata: {},
-                });
-            });
-
-            it("should create validation response with warnings", async ({
-                task,
-                annotate,
-            }) => {
-                await annotate(`Testing: ${task.name}`, "functional");
-                await annotate("Component: utils", "component");
-                await annotate("Category: Service", "category");
-                await annotate("Type: Constructor", "type");
-
-                const errors = ["Critical error"];
-                const warnings = ["Deprecated field", "Performance warning"];
-                const result = createValidationResponse(
-                    false,
-                    errors,
-                    warnings
-                );
-
-                expect(result).toEqual({
-                    success: false,
-                    errors: ["Critical error"],
-                    warnings: ["Deprecated field", "Performance warning"],
-                    metadata: {},
-                });
-            });
-
-            it("should create validation response with metadata", async ({
-                task,
-                annotate,
-            }) => {
-                await annotate(`Testing: ${task.name}`, "functional");
-                await annotate("Component: utils", "component");
-                await annotate("Category: Service", "category");
-                await annotate("Type: Constructor", "type");
-
-                const errors: string[] = [];
-                const warnings: string[] = [];
-                const metadata = { validatedAt: "2024-01-01", fieldCount: 5 };
-                const result = createValidationResponse(
-                    true,
-                    errors,
-                    warnings,
-                    metadata
-                );
-
-                expect(result).toEqual({
-                    success: true,
-                    errors: [],
-                    warnings: [],
-                    metadata: { validatedAt: "2024-01-01", fieldCount: 5 },
-                });
-            });
-
-            it("should create complete validation response", async ({
-                task,
-                annotate,
-            }) => {
-                await annotate(`Testing: ${task.name}`, "functional");
-                await annotate("Component: utils", "component");
-                await annotate("Category: Service", "category");
-                await annotate("Type: Constructor", "type");
-
-                const errors = ["Error 1"];
-                const warnings = ["Warning 1", "Warning 2"];
-                const metadata = { source: "test", validated: true };
-                const result = createValidationResponse(
-                    false,
-                    errors,
-                    warnings,
-                    metadata
-                );
-
-                expect(result).toEqual({
-                    success: false,
-                    errors: ["Error 1"],
-                    warnings: ["Warning 1", "Warning 2"],
-                    metadata: { source: "test", validated: true },
-                });
-            });
-        });
     });
 
     describe("Handler Wrappers - Error Handling and Logging", () => {

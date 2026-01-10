@@ -159,7 +159,7 @@ export class IpcService {
 }
 ```
 
-> **Implementation note:** The production implementation reuses the shared helper in `electron/services/ipc/utils.ts`. That module exposes `registerStandardizedIpcHandler` and `createValidationResponse`, so every handler registration in `IpcService` passes the channel name, async handler, validator, and the shared `registeredIpcHandlers` set. The helper takes care of duplicate registration checks, timing diagnostics, and consistent logging.
+> **Implementation note:** The production implementation reuses the shared helpers in `electron/services/ipc/utils.ts`. That module exposes `registerStandardizedIpcHandler` / `createStandardizedIpcRegistrar` and the `withIpcHandler*` wrappers, so every handler registration in `IpcService` passes the channel name, handler, validator, and the shared `registeredIpcHandlers` set. The helpers take care of duplicate registration checks, timing diagnostics, and consistent logging.
 
 ### 2. Domain-Specific Handler Groups
 

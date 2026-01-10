@@ -90,16 +90,6 @@ export const isIpcCorrelationEnvelope = (
 };
 
 /**
- * Specialized response contract for validation handlers.
- */
-export interface IpcValidationResponse extends IpcResponse<ValidationResult> {
-    /** Validation error messages, when present. */
-    errors: readonly string[];
-    /** Whether the validation succeeded. */
-    success: boolean;
-}
-
-/**
  * Serialized database backup result returned to the renderer process.
  *
  * @remarks

@@ -159,10 +159,6 @@ vi.mock("../../../services/monitoring/MonitorTypeRegistry", () => ({
 }));
 
 vi.mock("./", () => ({
-    createValidationResponse: vi.fn((success, errors = []) => ({
-        success,
-        errors,
-    })),
     registerStandardizedIpcHandler: vi.fn((channel, handler, _validators) => {
         mockIpcMain.handle(channel, handler);
     }),

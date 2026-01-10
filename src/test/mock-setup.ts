@@ -647,9 +647,6 @@ const mockElectronAPI: DeepMocked<ElectronAPI> = {
         getSyncStatus: vi.fn<ElectronAPI["stateSync"]["getSyncStatus"]>(
             async () => ({ ...defaultStateSyncStatus })
         ),
-        onStateSyncEvent: vi.fn<ElectronAPI["stateSync"]["onStateSyncEvent"]>(
-            (_callback) => () => undefined
-        ),
         requestFullSync: vi.fn<ElectronAPI["stateSync"]["requestFullSync"]>(
             async () => ({
                 ...defaultFullSyncResult,

@@ -36,7 +36,8 @@ Renderer and shared modules involved in site state management:
   `StatusUpdateManager` and `applyStatusUpdateSnapshot`, applying incremental
   status updates from events and manual checks to the sites array.
 - `src/services/StateSyncService.ts` – Renderer IPC façade over the
-  `stateSync` preload domain, responsible for `getSyncStatus`,
+  `stateSync` preload domain (invoke methods) and the `events` preload domain
+  (broadcast subscriptions), responsible for `getSyncStatus`,
   `requestFullSync`, and `onStateSyncEvent`.
 - `shared/types/stateSync.ts` – Canonical contracts for
   `StateSyncStatusSummary`, `StateSyncFullSyncResult`, and related enums.
@@ -64,8 +65,8 @@ Renderer and shared modules involved in site state management:
   `sites:state-synchronized` events to renderer listeners via the
   `EventsApi` surface.
 - `electron/preload/domains/stateSyncApi.ts` (referenced from
-  `electron/preload.ts`) exposes the `stateSync` IPC methods and wraps the
-  underlying handlers with Zod-based validation.
+  `electron/preload.ts`) exposes the `stateSync` IPC invoke methods
+  (`getSyncStatus` and `requestFullSync`).
 
 ### Renderer services
 
@@ -76,9 +77,9 @@ Renderer and shared modules involved in site state management:
   - `requestFullSync()` calls `stateSync.requestFullSync()` and parses the
     payload with `parseStateSyncFullSyncResult`.
   - `onStateSyncEvent()` subscribes to incremental state sync events using
-    `safeParseStateSyncEventData`, schedules full-sync recovery when
-    malformed payloads are observed, and normalizes cleanup handlers
-    returned by the preload bridge.
+    `safeParseStateSyncEventData` via `events.onStateSyncEvent`, schedules
+    full-sync recovery when malformed payloads are observed, and normalizes
+    cleanup handlers returned by the preload bridge.
 
 ## Sites Store Integration
 

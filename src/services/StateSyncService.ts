@@ -39,9 +39,12 @@ const { ensureInitialized, wrap } = getIpcServiceHelpers("StateSyncService", {
             domain: "stateSync",
             methods: [
                 "getSyncStatus",
-                "onStateSyncEvent",
                 "requestFullSync",
             ],
+        },
+        {
+            domain: "events",
+            methods: ["onStateSyncEvent"],
         },
     ],
 });
@@ -277,7 +280,7 @@ export const StateSyncService: StateSyncServiceContract = {
             };
 
             const unsubscribeCandidate = await Promise.resolve(
-                api.stateSync.onStateSyncEvent((rawEvent) => {
+                api.events.onStateSyncEvent((rawEvent) => {
                     const parsedEvent = safeParseStateSyncEventData(rawEvent);
 
                     if (!parsedEvent.success) {

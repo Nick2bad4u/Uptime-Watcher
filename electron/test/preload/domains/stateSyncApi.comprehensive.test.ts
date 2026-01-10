@@ -28,7 +28,6 @@ import {
 } from "../../../preload/domains/stateSyncApi";
 import { STATE_SYNC_CHANNELS } from "@shared/types/preload";
 import type { Site } from "@shared/types";
-import type { StateSyncEventData } from "@shared/types/events";
 import type {
     StateSyncFullSyncResult,
     StateSyncStatusSummary,
@@ -43,12 +42,7 @@ function createIpcResponse<T>(data: T): IpcResponse<T> {
     };
 }
 
-const VALID_STATE_SYNC_ACTIONS: readonly StateSyncEventData["action"][] = [
-    "bulk-sync",
-    "delete",
-    "update",
-] as const;
-const VALID_STATE_SYNC_SOURCES: readonly StateSyncEventData["source"][] = [
+const VALID_STATE_SYNC_SOURCES = [
     "cache",
     "database",
     "frontend",
@@ -74,72 +68,6 @@ const createMinimalSite = (identifier: string): Site => ({
     name: `Site ${identifier}`,
 });
 
-const buildStateSyncEventData = (
-    action: StateSyncEventData["action"],
-    source: StateSyncEventData["source"],
-    timestamp: number,
-    siteIdentifier: string | null
-): StateSyncEventData => {
-    const effectiveSiteIdentifier = siteIdentifier ?? undefined;
-    const revision = Math.max(0, timestamp);
-
-    switch (action) {
-        case "bulk-sync": {
-            const sites: Site[] = [];
-            return {
-                action: "bulk-sync",
-                revision,
-                siteCount: sites.length,
-                ...(effectiveSiteIdentifier
-                    ? { siteIdentifier: effectiveSiteIdentifier }
-                    : {}),
-                sites,
-                source,
-                timestamp,
-            };
-        }
-
-        case "delete": {
-            return {
-                action: "delete",
-                delta: {
-                    addedSites: [],
-                    removedSiteIdentifiers: [effectiveSiteIdentifier ?? "site-1"],
-                    updatedSites: [],
-                },
-                revision,
-                ...(effectiveSiteIdentifier
-                    ? { siteIdentifier: effectiveSiteIdentifier }
-                    : {}),
-                source,
-                timestamp,
-            };
-        }
-
-        case "update": {
-            const site = createMinimalSite(effectiveSiteIdentifier ?? "site-1");
-            return {
-                action: "update",
-                delta: {
-                    addedSites: [],
-                    removedSiteIdentifiers: [],
-                    updatedSites: [site],
-                },
-                revision,
-                ...(effectiveSiteIdentifier
-                    ? { siteIdentifier: effectiveSiteIdentifier }
-                    : {}),
-                source,
-                timestamp,
-            };
-        }
-
-        default: {
-            throw new Error(`Unhandled state sync action: ${action}`);
-        }
-    }
-};
-
 describe("State Sync Domain API", () => {
     let api: StateSyncApiInterface;
 
@@ -156,7 +84,6 @@ describe("State Sync Domain API", () => {
         it("should expose all required state sync methods", () => {
             const expectedMethods = [
                 "getSyncStatus",
-                "onStateSyncEvent",
                 "requestFullSync",
             ];
 
@@ -331,165 +258,6 @@ describe("State Sync Domain API", () => {
         });
     });
 
-    describe("onStateSyncEvent", () => {
-        it("should register event listener and return cleanup function", () => {
-            const mockCallback = vi.fn();
-            mockIpcRenderer.on.mockReturnValue(undefined);
-
-            const cleanup = api.onStateSyncEvent(mockCallback);
-
-            expect(mockIpcRenderer.on).toHaveBeenCalledWith(
-                "state-sync-event",
-                expect.any(Function)
-            );
-            expect(typeof cleanup).toBe("function");
-        });
-
-        it("should call callback with valid StateSyncEventData", () => {
-            const mockCallback = vi.fn();
-            let registeredHandler: (
-                event: unknown,
-                ...args: unknown[]
-            ) => void = () => {};
-
-            mockIpcRenderer.on.mockImplementation((_, handler) => {
-                registeredHandler = handler;
-            });
-
-            api.onStateSyncEvent(mockCallback);
-
-            const validEventData: StateSyncEventData = {
-                action: "update",
-                delta: {
-                    addedSites: [],
-                    removedSiteIdentifiers: [],
-                    updatedSites: [createMinimalSite("test-site")],
-                },
-                revision: 1,
-                source: "database",
-                timestamp: Date.now(),
-                siteIdentifier: "test-site",
-            };
-
-            registeredHandler({}, validEventData);
-
-            expect(mockCallback).toHaveBeenCalledWith(validEventData);
-        });
-
-        it("should not call callback with invalid event data", () => {
-            const mockCallback = vi.fn();
-            let registeredHandler: (
-                event: unknown,
-                ...args: unknown[]
-            ) => void = () => {};
-
-            mockIpcRenderer.on.mockImplementation((_, handler) => {
-                registeredHandler = handler;
-            });
-
-            api.onStateSyncEvent(mockCallback);
-
-            const invalidEventData = {
-                invalidField: "invalid",
-                timestamp: "not-a-number",
-            };
-
-            registeredHandler({}, invalidEventData);
-
-            expect(mockCallback).not.toHaveBeenCalled();
-            expect(mockIpcRenderer.invoke).toHaveBeenCalledWith(
-                "diagnostics-report-preload-guard",
-                expect.objectContaining({
-                    channel: "state-sync-event",
-                    guard: "safeParseStateSyncEventData",
-                    metadata: expect.objectContaining({
-                        domain: "stateSyncApi",
-                    }),
-                    reason: "payload-validation",
-                })
-            );
-        });
-
-        it("should handle various event action types", () => {
-            const mockCallback = vi.fn();
-            let registeredHandler: (
-                event: unknown,
-                ...args: unknown[]
-            ) => void = () => {};
-
-            mockIpcRenderer.on.mockImplementation((_, handler) => {
-                registeredHandler = handler;
-            });
-
-            api.onStateSyncEvent(mockCallback);
-
-            const actions: StateSyncEventData["action"][] = [
-                "bulk-sync",
-                "delete",
-                "update",
-            ];
-
-            for (const action of actions) {
-                const eventData = buildStateSyncEventData(
-                    action,
-                    "database",
-                    Date.now(),
-                    "test-site"
-                );
-
-                registeredHandler({}, eventData);
-            }
-
-            expect(mockCallback).toHaveBeenCalledTimes(3);
-        });
-
-        it("should handle various event source types", () => {
-            const mockCallback = vi.fn();
-            let registeredHandler: (
-                event: unknown,
-                ...args: unknown[]
-            ) => void = () => {};
-
-            mockIpcRenderer.on.mockImplementation((_, handler) => {
-                registeredHandler = handler;
-            });
-
-            api.onStateSyncEvent(mockCallback);
-
-            const sources: StateSyncEventData["source"][] = [
-                "cache",
-                "database",
-                "frontend",
-            ];
-
-            for (const source of sources) {
-                const eventData = buildStateSyncEventData(
-                    "update",
-                    source,
-                    Date.now(),
-                    "test-site"
-                );
-
-                registeredHandler({}, eventData);
-            }
-
-            expect(mockCallback).toHaveBeenCalledTimes(3);
-        });
-
-        it("should cleanup event listeners when cleanup function is called", () => {
-            const mockCallback = vi.fn();
-            const mockCleanup = vi.fn();
-
-            mockIpcRenderer.on.mockReturnValue(mockCleanup);
-
-            const cleanup = api.onStateSyncEvent(mockCallback);
-            cleanup();
-
-            // Cleanup function should be called
-            expect(typeof cleanup).toBe("function");
-        });
-    });
-
     describe("Property-based testing with fast-check", () => {
         it("should handle various sync status responses", async () => {
             await fc.assert(
@@ -593,187 +361,9 @@ describe("State Sync Domain API", () => {
             );
         });
 
-        it("should validate StateSyncEventData with various configurations", () => {
-            const eventArb = fc
-                .tuple(
-                    fc.constantFrom(...VALID_STATE_SYNC_ACTIONS),
-                    fc.constantFrom(...VALID_STATE_SYNC_SOURCES),
-                    fc.integer({ min: 0 }),
-                    fc.option(fc.string({ minLength: 1 }))
-                )
-                .map(
-                    ([
-                        action,
-                        source,
-                        timestamp,
-                        siteIdentifier,
-                    ]) =>
-                        buildStateSyncEventData(
-                            action,
-                            source,
-                            timestamp,
-                            siteIdentifier
-                        )
-                );
-
-            fc.assert(
-                fc.property(eventArb, (eventData) => {
-                    vi.clearAllMocks();
-
-                    const mockCallback = vi.fn();
-                    let registeredHandler: (
-                        _event: unknown,
-                        ...args: unknown[]
-                    ) => void = () => {};
-
-                    mockIpcRenderer.on.mockImplementation((_, handler) => {
-                        registeredHandler = handler;
-                    });
-
-                    api.onStateSyncEvent(mockCallback);
-                    registeredHandler({}, eventData);
-
-                    expect(mockCallback).toHaveBeenCalledWith(eventData);
-                }),
-                { numRuns: 25 }
-            );
-        });
-
-        it("should reject invalid StateSyncEventData structures", () => {
-            const invalidActionArb = fc
-                .string()
-                .filter(
-                    (value) =>
-                        !VALID_STATE_SYNC_ACTIONS.includes(
-                            value as StateSyncEventData["action"]
-                        )
-                );
-            const invalidSourceArb = fc
-                .string()
-                .filter(
-                    (value) =>
-                        !VALID_STATE_SYNC_SOURCES.includes(
-                            value as StateSyncEventData["source"]
-                        )
-                );
-
-            fc.assert(
-                fc.property(
-                    fc.oneof(
-                        fc.record({
-                            action: invalidActionArb,
-                            source: fc.constantFrom(
-                                ...VALID_STATE_SYNC_SOURCES
-                            ),
-                            timestamp: fc.integer({ min: 0 }),
-                        }),
-                        fc.record({
-                            action: fc.constantFrom(
-                                ...VALID_STATE_SYNC_ACTIONS
-                            ),
-                            source: invalidSourceArb,
-                            timestamp: fc.integer({ min: 0 }),
-                        }),
-                        fc.record({
-                            action: fc.constantFrom(
-                                ...VALID_STATE_SYNC_ACTIONS
-                            ),
-                            source: fc.constantFrom(
-                                ...VALID_STATE_SYNC_SOURCES
-                            ),
-                            timestamp: fc.string(),
-                        }),
-                        fc.constant(null),
-                        fc.constant(undefined),
-                        fc.string(),
-                        fc.integer()
-                    ),
-                    (invalidEventData) => {
-                        const mockCallback = vi.fn();
-                        let registeredHandler: (
-                            _event: unknown,
-                            ...args: unknown[]
-                        ) => void = () => {};
-
-                        mockIpcRenderer.on.mockImplementation((_, handler) => {
-                            registeredHandler = handler;
-                        });
-
-                        api.onStateSyncEvent(mockCallback);
-                        registeredHandler({}, invalidEventData);
-
-                        expect(mockCallback).not.toHaveBeenCalled();
-                    }
-                ),
-                { numRuns: 25 }
-            );
-        });
     });
 
     describe("Integration and workflow scenarios", () => {
-        it("should handle complete sync workflow", async () => {
-            const mockCallback = vi.fn();
-            let registeredHandler: (
-                event: unknown,
-                ...args: unknown[]
-            ) => void = () => {};
-
-            mockIpcRenderer.on.mockImplementation((_, handler) => {
-                registeredHandler = handler;
-            });
-
-            const cleanup = api.onStateSyncEvent(mockCallback);
-
-            const initialStatus: StateSyncStatusSummary = {
-                lastSyncAt: Date.now(),
-                siteCount: 1,
-                source: "database",
-                synchronized: true,
-            };
-            mockIpcRenderer.invoke.mockResolvedValueOnce(
-                createIpcResponse(initialStatus)
-            );
-            const status = await api.getSyncStatus();
-            expect(status).toEqual(initialStatus);
-
-            const syncEvent: StateSyncEventData = {
-                action: "bulk-sync",
-                revision: 1,
-                siteCount: 0,
-                sites: [],
-                source: "database",
-                timestamp: Date.now(),
-                siteIdentifier: "new-site",
-            };
-            registeredHandler({}, syncEvent);
-            expect(mockCallback).toHaveBeenCalledWith(syncEvent);
-
-            const syncedSites: Site[] = [
-                {
-                    identifier: "new-site",
-                    name: "New Site",
-                    monitoring: true,
-                    monitors: [],
-                },
-            ];
-            const fullSyncResult: StateSyncFullSyncResult = {
-                completedAt: Date.now(),
-                revision: 2,
-                siteCount: syncedSites.length,
-                sites: syncedSites,
-                source: "database",
-                synchronized: true,
-            };
-            mockIpcRenderer.invoke.mockResolvedValueOnce(
-                createIpcResponse(fullSyncResult)
-            );
-            const fullSync = await api.requestFullSync();
-            expect(fullSync).toEqual(fullSyncResult);
-
-            cleanup();
-            expect(mockIpcRenderer.invoke).toHaveBeenCalledTimes(2);
-        });
-
         it("should handle sync conflicts and recovery", async () => {
             mockIpcRenderer.invoke.mockRejectedValueOnce(
                 new Error("Sync conflict")
@@ -874,73 +464,6 @@ describe("State Sync Domain API", () => {
             expect(result).toEqual(malformedData);
         });
 
-        it("should handle event listener errors gracefully", () => {
-            const throwingCallback = vi.fn().mockImplementation(() => {
-                throw new Error("Callback error");
-            });
-
-            let registeredHandler: (
-                event: unknown,
-                ...args: unknown[]
-            ) => void = () => {};
-
-            mockIpcRenderer.on.mockImplementation((_, handler) => {
-                registeredHandler = handler;
-            });
-
-            api.onStateSyncEvent(throwingCallback);
-
-            const validEventData: StateSyncEventData = {
-                action: "update",
-                delta: {
-                    addedSites: [],
-                    removedSiteIdentifiers: [],
-                    updatedSites: [createMinimalSite("site-1")],
-                },
-                revision: 1,
-                source: "database",
-                timestamp: Date.now(),
-            };
-
-            // Should not throw despite callback error
-            expect(() =>
-                registeredHandler({}, validEventData)
-            ).not.toThrowError();
-            expect(throwingCallback).toHaveBeenCalledWith(validEventData);
-        });
-
-        it("should handle rapid event sequences", () => {
-            const mockCallback = vi.fn();
-            let registeredHandler: (
-                event: unknown,
-                ...args: unknown[]
-            ) => void = () => {};
-
-            mockIpcRenderer.on.mockImplementation((_, handler) => {
-                registeredHandler = handler;
-            });
-
-            api.onStateSyncEvent(mockCallback);
-
-            // Send rapid sequence of events
-            const events: StateSyncEventData[] = Array.from(
-                { length: 100 },
-                (_, i) =>
-                    buildStateSyncEventData(
-                        "update",
-                        "database",
-                        Date.now() + i,
-                        `rapid-${i}`
-                    )
-            );
-
-            for (const event of events) {
-                registeredHandler({}, event);
-            }
-
-            expect(mockCallback).toHaveBeenCalledTimes(100);
-        });
-
         it("should maintain type safety with edge case data", async () => {
             const edgeCaseSites: Site[] = [
                 {
@@ -1023,7 +546,7 @@ describe("State Sync Domain API", () => {
         });
 
         it("should handle function context properly", async () => {
-            const { getSyncStatus, requestFullSync, onStateSyncEvent } = api;
+            const { getSyncStatus, requestFullSync } = api;
 
             const statusSummary: StateSyncStatusSummary = {
                 lastSyncAt: Date.now(),
@@ -1046,11 +569,9 @@ describe("State Sync Domain API", () => {
 
             const status = await getSyncStatus();
             const sync = await requestFullSync();
-            const cleanup = onStateSyncEvent(() => {});
 
             expect(status.siteCount).toBe(0);
             expect(sync.sites).toEqual([]);
-            expect(typeof cleanup).toBe("function");
         });
     });
 });

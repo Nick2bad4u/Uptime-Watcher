@@ -59,7 +59,6 @@ import type {
     IpcInvokeChannelMap as SharedIpcInvokeChannelMap,
     IpcInvokeChannelParams as SharedIpcInvokeChannelParams,
     IpcInvokeChannelResult as SharedIpcInvokeChannelResult,
-    IpcValidationResponse as SharedIpcValidationResponse,
     PreloadGuardDiagnosticsReport as SharedPreloadGuardDiagnosticsReport,
     SerializedDatabaseBackupResult as SharedSerializedDatabaseBackupResult,
     SerializedDatabaseRestorePayload as SharedSerializedDatabaseRestorePayload,
@@ -88,8 +87,6 @@ export type IpcInvokeChannelParams<TChannel extends IpcInvokeChannel> =
 /** Renderer view of invoke channel response payloads. */
 export type IpcInvokeChannelResult<TChannel extends IpcInvokeChannel> =
     SharedIpcInvokeChannelResult<TChannel>;
-/** Standard renderer validation response envelope. */
-export type IpcValidationResponse = SharedIpcValidationResponse;
 /** Diagnostics report emitted by preload guard instrumentation. */
 export type PreloadGuardDiagnosticsReport = SharedPreloadGuardDiagnosticsReport;
 /** Metadata accompanying serialized database backups. */

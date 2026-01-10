@@ -36,7 +36,7 @@ electron/services/ipc/
 ├── IpcService.ts           # Main IPC service
 ├── utils.ts               # IPC utility functions
 ├── types.ts               # IPC type definitions
-├── validators.ts          # Validation functions
+├── validators/            # Validation functions (one module per domain)
 └── handlers/              # Domain-specific handler modules
   └── *.ts
 ```
@@ -62,12 +62,12 @@ import { logger } from "../../utils/logger";
 
 import { registerStandardizedIpcHandler } from "../utils";
 
-// Import validation functions from validators.ts
+// Import validation functions from validators/[domain].ts
 import {
  isExampleCreateData,
  isExampleUpdateData,
  isExampleIdParams,
-} from "../validators";
+} from "../validators/example";
 
 /**
  * Registers all [DOMAIN]-related IPC handlers.
@@ -206,7 +206,7 @@ export function registerExampleHandlers(deps: {
 
 ## Validation Functions Template
 
-Add validation functions to `validators.ts` or import them from `../validation/exampleValidation.ts`:
+Add validation functions to `validators/example.ts` or import them from `../validation/exampleValidation.ts`:
 
 ````typescript
 
@@ -672,14 +672,12 @@ When creating new IPC handlers:
 
 ## Channel Naming Convention
 
-Follow these naming patterns:
+Follow these naming patterns (see ADR-005):
 
-- **GET operations**: `domain:get-all`, `domain:get-by-id`
-- **CREATE operations**: `domain:create`, `domain:bulk-create`
-- **UPDATE operations**: `domain:update`, `domain:bulk-update`
-- **DELETE operations**: `domain:delete`, `domain:delete-all`
-- **UTILITY operations**: `domain:validate-data`, `domain:export-data`
-- **EVENTS**: `domain:event-name` (past tense for completed events)
+- **Invoke (request/response) channels**: verb-first, hyphen-case
+  - Examples: `add-site`, `get-sites`, `remove-site`, `update-history-limit`
+- **Event/broadcast channels**: `domain:event-name` (past tense for completed events)
+  - Examples: `site:added`, `monitor:status-changed`
 
 ## Current Implementation Audit (2025-11-04)
 

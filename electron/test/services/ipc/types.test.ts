@@ -19,10 +19,8 @@ import { describe, it, expect, vi } from "vitest";
 import type {
     IpcHandlerConfig,
     IpcResponse,
-    IpcValidationResponse,
     IpcParameterValidator,
 } from "../../../services/ipc/types.js";
-import type { ValidationResult } from "@shared/types/validation";
 
 describe("IPC Types", () => {
     describe("IpcHandlerConfig", () => {
@@ -261,97 +259,6 @@ describe("IPC Types", () => {
 
             expect(response.success).toBeTruthy();
             expect(response.data).toBeUndefined();
-        });
-    });
-
-    describe("IpcValidationResponse", () => {
-        it("should create a successful validation response", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: types", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Constructor", "type");
-
-            const validationResult: ValidationResult = {
-                success: true,
-                errors: [],
-            };
-
-            const response: IpcValidationResponse = {
-                success: true,
-                data: validationResult,
-                errors: [],
-            };
-
-            expect(response.success).toBeTruthy();
-            expect(response.data).toEqual(validationResult);
-            expect(response.errors).toEqual([]);
-        });
-
-        it("should create a failed validation response", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: types", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Constructor", "type");
-
-            const validationResult: ValidationResult = {
-                success: false,
-                errors: ["Field is required", "Invalid format"],
-            };
-
-            const response: IpcValidationResponse = {
-                success: false,
-                data: validationResult,
-                errors: ["Field is required", "Invalid format"],
-            };
-
-            expect(response.success).toBeFalsy();
-            expect(response.data).toEqual(validationResult);
-            expect(response.errors).toEqual([
-                "Field is required",
-                "Invalid format",
-            ]);
-        });
-
-        it("should extend IpcResponse interface", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: types", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Business Logic", "type");
-
-            const response: IpcValidationResponse = {
-                success: false,
-                data: {
-                    success: false,
-                    errors: ["Validation failed"],
-                },
-                errors: ["Validation failed"],
-                error: "Validation process failed",
-                warnings: ["Data was modified during validation"],
-                metadata: {
-                    validatedAt: Date.now(),
-                },
-            };
-
-            // Should have all IpcResponse properties
-            expect(response.success).toBeFalsy();
-            expect(response.error).toBe("Validation process failed");
-            expect(response.warnings).toEqual([
-                "Data was modified during validation",
-            ]);
-            expect(response.metadata).toBeDefined();
-
-            // Should have IpcValidationResponse-specific properties
-            expect(response.errors).toEqual(["Validation failed"]);
-            expect(response.data).toBeDefined();
         });
     });
 

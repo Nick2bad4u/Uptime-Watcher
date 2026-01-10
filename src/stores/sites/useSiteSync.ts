@@ -47,6 +47,76 @@ import {
     type StatusUpdateSubscriptionResult,
 } from "./utils/statusUpdateHandler";
 
+const getUniqueStringsPreservingOrder = (values: readonly string[]): string[] => {
+    const seen = new Set<string>();
+    const result: string[] = [];
+
+    for (const value of values) {
+        if (!seen.has(value)) {
+            seen.add(value);
+            result.push(value);
+        }
+    }
+
+    return result;
+};
+
+const buildSanitizedIncomingSiteSyncDelta = (
+    delta: SiteSyncDelta
+): {
+    delta: SiteSyncDelta;
+    diagnostics: {
+        addedDuplicates: ReturnType<typeof deriveSiteSnapshot>["duplicates"];
+        overlapIdentifiers: string[];
+        updatedDuplicates: ReturnType<typeof deriveSiteSnapshot>["duplicates"];
+    };
+} => {
+    const removedSiteIdentifiers = getUniqueStringsPreservingOrder(
+        delta.removedSiteIdentifiers
+    );
+
+    const removedIdentifiers = new Set(removedSiteIdentifiers);
+
+    const addedSnapshot = deriveSiteSnapshot(delta.addedSites);
+    const updatedSnapshot = deriveSiteSnapshot(delta.updatedSites);
+
+    const updatedIdentifiers = new Set(
+        updatedSnapshot.sanitizedSites.map((site) => site.identifier)
+    );
+
+    const overlapIdentifiers: string[] = [];
+
+    const addedSites = addedSnapshot.sanitizedSites.filter((site) => {
+        if (removedIdentifiers.has(site.identifier)) {
+            return false;
+        }
+
+        if (updatedIdentifiers.has(site.identifier)) {
+            overlapIdentifiers.push(site.identifier);
+            return false;
+        }
+
+        return true;
+    });
+
+    const updatedSites = updatedSnapshot.sanitizedSites.filter(
+        (site) => !removedIdentifiers.has(site.identifier)
+    );
+
+    return {
+        delta: {
+            addedSites,
+            removedSiteIdentifiers,
+            updatedSites,
+        },
+        diagnostics: {
+            addedDuplicates: addedSnapshot.duplicates,
+            overlapIdentifiers: getUniqueStringsPreservingOrder(overlapIdentifiers),
+            updatedDuplicates: updatedSnapshot.duplicates,
+        },
+    };
+};
+
 /**
  * Site synchronization actions interface.
  *
@@ -654,7 +724,49 @@ export const createSiteSyncActions = (
                     timestamp,
                 } = event;
 
-                const hasChanges = hasSiteSyncChanges(delta);
+                const {
+                    delta: sanitizedDelta,
+                    diagnostics: {
+                        addedDuplicates,
+                        overlapIdentifiers,
+                        updatedDuplicates,
+                    },
+                } = buildSanitizedIncomingSiteSyncDelta(delta);
+
+                if (addedDuplicates.length > 0) {
+                    logger.error(
+                        "Duplicate site identifiers detected in incoming sync delta additions",
+                        {
+                            action,
+                            duplicates: addedDuplicates,
+                            source,
+                        }
+                    );
+                }
+
+                if (updatedDuplicates.length > 0) {
+                    logger.error(
+                        "Duplicate site identifiers detected in incoming sync delta updates",
+                        {
+                            action,
+                            duplicates: updatedDuplicates,
+                            source,
+                        }
+                    );
+                }
+
+                if (overlapIdentifiers.length > 0) {
+                    logger.error(
+                        "Incoming sync delta contains overlapping added/updated identifiers",
+                        {
+                            action,
+                            overlapIdentifiers,
+                            source,
+                        }
+                    );
+                }
+
+                const hasChanges = hasSiteSyncChanges(sanitizedDelta);
                 if (!hasChanges) {
                     logger.debug(
                         "Sync delta did not change site state; skipping store update",
@@ -666,28 +778,19 @@ export const createSiteSyncActions = (
                             timestamp,
                         }
                     );
-                    deps.onSiteDelta?.(delta);
+                    deps.onSiteDelta?.(sanitizedDelta);
                     return;
                 }
 
                 const currentSites = deps.getSites();
-                const removedIdentifiers = new Set(delta.removedSiteIdentifiers);
-                const { addedSites, removedSiteIdentifiers, updatedSites } = delta;
-
-                const deltaSnapshot = deriveSiteSnapshot([
-                    ...addedSites,
-                    ...updatedSites,
-                ]);
-                if (deltaSnapshot.duplicates.length > 0) {
-                    logger.error(
-                        "Duplicate site identifiers detected in incoming sync delta",
-                        {
-                            action,
-                            duplicates: deltaSnapshot.duplicates,
-                            source,
-                        }
-                    );
-                }
+                const removedIdentifiers = new Set(
+                    sanitizedDelta.removedSiteIdentifiers
+                );
+                const {
+                    addedSites,
+                    removedSiteIdentifiers,
+                    updatedSites,
+                } = sanitizedDelta;
 
                 const updatedByIdentifier = new Map(
                     updatedSites.map((site) => [site.identifier, site])
@@ -755,7 +858,7 @@ export const createSiteSyncActions = (
                 });
 
                 deps.setSites(sanitizedSites);
-                deps.onSiteDelta?.(delta);
+                deps.onSiteDelta?.(sanitizedDelta);
             };
 
             const handleEvent = (event: StateSyncEventData): void => {

@@ -30,9 +30,11 @@ const mockLogger = vi.hoisted(() => ({
 }));
 
 const mockElectronAPI = vi.hoisted(() => ({
+    events: {
+        onStateSyncEvent: vi.fn(),
+    },
     stateSync: {
         getSyncStatus: vi.fn(),
-        onStateSyncEvent: vi.fn(),
         requestFullSync: vi.fn(),
     },
 }));
@@ -73,11 +75,14 @@ describe("StateSyncService", () => {
 
         mockElectronAPI.stateSync = {
             getSyncStatus: vi.fn(),
+            requestFullSync: vi.fn(),
+        };
+
+        mockElectronAPI.events = {
             onStateSyncEvent: vi.fn((handler: (event: unknown) => void) => {
                 capturedHandler = handler;
                 return cleanupSpy;
             }),
-            requestFullSync: vi.fn(),
         };
 
         (globalThis as any).window = {
@@ -452,7 +457,7 @@ describe("StateSyncService", () => {
     ])(
         "wraps invalid cleanup candidates returned by the preload bridge",
         async (invalidCleanup) => {
-            mockElectronAPI.stateSync.onStateSyncEvent.mockImplementationOnce(
+            mockElectronAPI.events.onStateSyncEvent.mockImplementationOnce(
                 (handler: (event: unknown) => void) => {
                     capturedHandler = handler;
                     return invalidCleanup;
@@ -490,7 +495,7 @@ describe("StateSyncService", () => {
     ])(
         "reports cleanup errors through the logger while preserving control flow",
         async (cleanupError) => {
-            mockElectronAPI.stateSync.onStateSyncEvent.mockImplementationOnce(
+            mockElectronAPI.events.onStateSyncEvent.mockImplementationOnce(
                 (handler: (event: unknown) => void) => {
                     capturedHandler = handler;
                     return () => {

@@ -211,14 +211,6 @@ function assertInvokeArgsWithinBudget(channel: string, args: unknown[]): void {
     );
 }
 
-/**
- * Type guard for IPC response validation
- *
- * @param value - Value to check
- *
- * @returns True if value is a valid IPC response
- */
-
 async function verifyChannelOrThrow(channel: string): Promise<void> {
     if (verifiedChannels.has(channel) || channel === DIAGNOSTICS_CHANNEL) {
         return;

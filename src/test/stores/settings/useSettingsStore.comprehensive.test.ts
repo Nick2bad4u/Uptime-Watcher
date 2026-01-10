@@ -114,6 +114,9 @@ const mockElectronAPI = {
         onHistoryLimitUpdated: vi.fn<
             ElectronAPI["events"]["onHistoryLimitUpdated"]
         >(() => vi.fn()),
+        onStateSyncEvent: vi.fn<ElectronAPI["events"]["onStateSyncEvent"]>(
+            () => vi.fn()
+        ),
     },
     settings: {
         getHistoryLimit: vi.fn(),
@@ -123,9 +126,6 @@ const mockElectronAPI = {
     monitoring: {},
     sites: {
         removeMonitor: vi.fn(),
-    },
-    stateSync: {
-        onStateSyncEvent: vi.fn(),
     },
 };
 
@@ -171,7 +171,7 @@ describe(useSettingsStore, () => {
             monitors: [],
             name: "Settings Site",
         });
-        mockElectronAPI.stateSync.onStateSyncEvent.mockReturnValue(() => {});
+        mockElectronAPI.events.onStateSyncEvent.mockReturnValue(() => {});
 
         mockExtractIpcData.mockImplementation((response: any) => response.data);
         mockSafeExtractIpcData.mockImplementation(

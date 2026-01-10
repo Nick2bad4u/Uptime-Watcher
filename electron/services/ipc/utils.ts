@@ -31,7 +31,6 @@ import { ipcMain } from "electron";
 import type {
     IpcParameterValidator,
     IpcResponse,
-    IpcValidationResponse,
 } from "./types";
 
 import { isDev } from "../../electronUtils";
@@ -525,32 +524,6 @@ function createResponseFromExecution<T>(
         handler: channelName,
         ...(correlationId ? { correlationId } : {}),
     });
-}
-
-/**
- * Creates a standardized validation response for backward compatibility.
- *
- * @param success - Whether validation passed
- * @param errors - Validation errors
- * @param warnings - Validation warnings
- * @param metadata - Additional metadata
- *
- * @returns Standardized validation response
- *
- * @public
- */
-export function createValidationResponse(
-    success: boolean,
-    errors: readonly string[] = [],
-    warnings: readonly string[] = [],
-    metadata: UnknownRecord = {}
-): IpcValidationResponse {
-    return {
-        errors,
-        metadata,
-        success,
-        warnings,
-    };
 }
 
 /**
