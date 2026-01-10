@@ -44,6 +44,7 @@
 | `request-full-sync` | Handles `request-full-sync` invocations. | `[]` | `StateSyncFullSyncResult` |
 | `reset-settings` | Handles `reset-settings` invocations. | `[]` | `undefined` |
 | `restore-sqlite-backup` | Handles `restore-sqlite-backup` invocations. | `[payload: SerializedDatabaseRestorePayload]` | `SerializedDatabaseRestoreResult` |
+| `save-sqlite-backup` | Handles `save-sqlite-backup` invocations. | `[]` | `SerializedDatabaseBackupSaveResult` |
 | `start-monitoring` | Handles `start-monitoring` invocations. | `[]` | `MonitoringStartSummary` |
 | `start-monitoring-for-monitor` | Handles `start-monitoring-for-monitor` invocations. | `[siteIdentifier: string, monitorId: string]` | `boolean` |
 | `start-monitoring-for-site` | Handles `start-monitoring-for-site` invocations. | `[siteIdentifier: string]` | `boolean` |
