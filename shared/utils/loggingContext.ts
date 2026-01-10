@@ -1,3 +1,5 @@
+import type { UnknownRecord } from "type-fest";
+
 import { generateCorrelationId } from "@shared/utils/correlation";
 import { isRecord } from "@shared/utils/typeHelpers";
 
@@ -72,7 +74,6 @@ const SECRET_METADATA_KEYS = new Set([
     "authtoken",
     "bearer",
     "clientsecret",
-    "code",
     "codechallenge",
     "codeverifier",
     "cookie",
@@ -102,20 +103,94 @@ const toCanonicalSecretKey = (key: string): string =>
 const isSecretMetadataKey = (key: string): boolean =>
     SECRET_METADATA_KEYS.has(toCanonicalSecretKey(key));
 
-const SECRET_FIELD_PATTERNS = [
-    /bearer\s+[-\w.~+/]+=*/giu,
-    /api[_-]?key=[a-z0-9]+/giu,
-];
+type SecretReplacement = Readonly<{
+    endIndex: number;
+    replacement: string;
+    startIndex: number;
+}>;
+
+const collectSecretReplacements = (value: string): SecretReplacement[] => {
+    const lower = value.toLowerCase();
+    const replacements: SecretReplacement[] = [];
+
+    for (const key of SECRET_QUERY_KEYS) {
+        const needle = `${key}=`;
+        let index = 0;
+
+        while (index < lower.length) {
+            const matchIndex = lower.indexOf(needle, index);
+            if (matchIndex === -1) {
+                break;
+            }
+
+            const valueStart = matchIndex + needle.length;
+            let valueEnd = valueStart;
+
+            while (valueEnd < lower.length) {
+                const char = lower[valueEnd] ?? "";
+                if (char === "&" || /\s/u.test(char)) {
+                    break;
+                }
+                valueEnd += 1;
+            }
+
+            replacements.push({
+                endIndex: valueEnd,
+                replacement: `${key}=${SECRET_PLACEHOLDER}`,
+                startIndex: matchIndex,
+            });
+
+            index = valueEnd;
+        }
+    }
+
+    return replacements;
+};
+
+const applySecretReplacements = (
+    value: string,
+    replacements: readonly SecretReplacement[]
+): string => {
+    if (replacements.length === 0) {
+        return value;
+    }
+
+    const sorted = Array.from(replacements).toSorted(
+        (left, right) => right.startIndex - left.startIndex
+    );
+
+    let result = value;
+    for (const replacement of sorted) {
+        result =
+            result.slice(0, replacement.startIndex) +
+            replacement.replacement +
+            result.slice(replacement.endIndex);
+    }
+
+    return result;
+};
 
 const maskBearerTokens = (value: string): string => {
-    let sanitized = value;
-    for (const pattern of SECRET_FIELD_PATTERNS) {
-        sanitized = sanitized.replace(pattern, SECRET_PLACEHOLDER);
-    }
-    return sanitized;
+    const bearerMasked = value.replaceAll(
+        // Strip the entire scheme+token (policy/tests prefer not leaking even
+        // the presence of a Bearer header).
+        /bearer\s+[-\w.~+/]+=*/giu,
+        SECRET_PLACEHOLDER
+    );
+
+    return applySecretReplacements(
+        bearerMasked,
+        collectSecretReplacements(bearerMasked)
+    );
 };
 
 const maskUrlSecrets = (value: string): string => {
+    // Avoid treating arbitrary strings with a colon (e.g. `ReferenceError:`)
+    // as URLs. Only redact true URL-like values.
+    if (!/^(?:https?|wss?):\/\//iu.test(value)) {
+        return value;
+    }
+
     try {
         const url = new URL(value);
         if (url.username) {
@@ -163,27 +238,41 @@ const buildBaseLogContext = (
 });
 
 export const normalizeLogValue = (value: unknown): unknown => {
-    if (typeof value === "string") {
-        return normalizeLogString(value);
-    }
+    const seen = new WeakSet<object>();
 
-    if (Array.isArray(value)) {
-        return value.map((item) => normalizeLogValue(item));
-    }
-
-    if (isRecord(value)) {
-        const sanitizedRecord: Record<string, unknown> = {};
-        for (const [key, entry] of Object.entries(value)) {
-            if (isSecretMetadataKey(key)) {
-                sanitizedRecord[key] = SECRET_PLACEHOLDER;
-            } else {
-                sanitizedRecord[key] = normalizeLogValue(entry);
-            }
+    const normalize = (candidate: unknown): unknown => {
+        if (typeof candidate === "string") {
+            return normalizeLogString(candidate);
         }
-        return sanitizedRecord;
-    }
 
-    return value;
+        if (typeof candidate === "object" && candidate !== null) {
+            if (seen.has(candidate)) {
+                return "[Circular]";
+            }
+
+            seen.add(candidate);
+        }
+
+        if (Array.isArray(candidate)) {
+            return candidate.map((item) => normalize(item));
+        }
+
+        if (isRecord(candidate)) {
+            const sanitizedRecord: UnknownRecord = {};
+            for (const [key, entry] of Object.entries(candidate)) {
+                if (isSecretMetadataKey(key)) {
+                    sanitizedRecord[key] = SECRET_PLACEHOLDER;
+                } else {
+                    sanitizedRecord[key] = normalize(entry);
+                }
+            }
+            return sanitizedRecord;
+        }
+
+        return candidate;
+    };
+
+    return normalize(value);
 };
 
 const collectOptionalFields = (

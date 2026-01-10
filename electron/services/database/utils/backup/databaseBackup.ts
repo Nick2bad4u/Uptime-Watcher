@@ -1,6 +1,9 @@
+import type { UnknownRecord } from "type-fest";
+
 import { DEFAULT_MAX_BACKUP_SIZE_BYTES } from "@shared/constants/backup";
 import { ensureError } from "@shared/utils/errorHandling";
 import { app } from "electron";
+import sqlite3 from "node-sqlite3-wasm";
 import { createHash } from "node:crypto";
 import { promises as fs } from "node:fs";
 
@@ -73,8 +76,41 @@ interface CreateDatabaseBackupArgs {
 
 type CreateDatabaseBackupParams = CreateDatabaseBackupArgs | string;
 
-function computeBackupChecksum(buffer: Buffer): string {
+/**
+ * Computes the SHA-256 checksum of a backup buffer.
+ */
+export function computeDatabaseBackupChecksum(buffer: Buffer): string {
     return createHash("sha256").update(buffer).digest("hex");
+}
+
+/**
+ * Reads the SQLite `PRAGMA user_version` from a database file.
+ *
+ * @remarks
+ * Used when validating/annotating externally-provided backup payloads, where
+ * the schema version may differ from the currently running application.
+ */
+export function readDatabaseSchemaVersionFromFile(filePath: string): number {
+    const database = new sqlite3.Database(filePath, {
+        fileMustExist: true,
+    });
+
+    try {
+        const result: unknown = database.prepare("PRAGMA user_version").get();
+
+        if (result && typeof result === "object" && "user_version" in result) {
+            const version = (result as UnknownRecord)[
+                "user_version"
+            ];
+            if (typeof version === "number") {
+                return version;
+            }
+        }
+
+        return 0;
+    } finally {
+        database.close();
+    }
 }
 
 function buildBackupMetadata(
@@ -83,7 +119,7 @@ function buildBackupMetadata(
 ): DatabaseBackupMetadata {
     return {
         appVersion: app.getVersion(),
-        checksum: computeBackupChecksum(buffer),
+        checksum: computeDatabaseBackupChecksum(buffer),
         createdAt: Date.now(),
         originalPath: dbPath,
         retentionHintDays: DEFAULT_BACKUP_RETENTION_HINT_DAYS,
@@ -117,6 +153,17 @@ export async function createDatabaseBackup(
     const { dbPath, fileName = BACKUP_DB_FILE_NAME } =
         normalizeBackupArgs(params);
     try {
+        // DbPath originates from app-controlled directories (userData, temporary
+        // folders). Inline lint suppression documents the trusted origin.
+        // eslint-disable-next-line security/detect-non-literal-fs-filename -- temp directory path constructed from trusted OS paths and sanitized file names
+        const stats = await fs.stat(dbPath);
+
+        if (stats.size > DEFAULT_MAX_BACKUP_SIZE_BYTES) {
+            throw new Error(
+                `Database backup exceeds maximum allowed size (${stats.size} > ${DEFAULT_MAX_BACKUP_SIZE_BYTES} bytes)`
+            );
+        }
+
         // DbPath originates from app-controlled directories (userData, temporary
         // folders). Inline lint suppression documents the trusted origin.
         // eslint-disable-next-line security/detect-non-literal-fs-filename -- temp directory path constructed from trusted OS paths and sanitized file names
@@ -182,7 +229,7 @@ export function validateDatabaseBackupPayload(
         );
     }
 
-    const computedChecksum = computeBackupChecksum(buffer);
+    const computedChecksum = computeDatabaseBackupChecksum(buffer);
     if (metadata.checksum !== computedChecksum) {
         throw new Error("Backup checksum mismatch; payload may be corrupted");
     }

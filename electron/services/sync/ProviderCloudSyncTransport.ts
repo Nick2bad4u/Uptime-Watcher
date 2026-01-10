@@ -92,9 +92,30 @@ function isCloudSyncJsonValidationError(error: unknown): boolean {
     return resolved instanceof SyntaxError || resolved.name === "ZodError";
 }
 
+class CloudSyncSizeLimitError extends Error {
+    public readonly maxBytes: number;
+
+    public readonly actualBytes: number;
+
+    public readonly objectKind: "manifest" | "snapshot";
+
+    public constructor(args: {
+        actualBytes: number;
+        maxBytes: number;
+        objectKind: "manifest" | "snapshot";
+    }) {
+        super(
+            `Cloud sync ${args.objectKind} exceeds size limit of ${args.maxBytes} bytes. Actual: ${args.actualBytes} bytes.`
+        );
+        this.name = "CloudSyncSizeLimitError";
+        this.actualBytes = args.actualBytes;
+        this.maxBytes = args.maxBytes;
+        this.objectKind = args.objectKind;
+    }
+}
+
 function isCloudSyncSizeLimitError(error: unknown): boolean {
-    const resolved = ensureError(error);
-    return resolved.message.includes("exceeds size limit");
+    return ensureError(error) instanceof CloudSyncSizeLimitError;
 }
 
 function getSnapshotsPrefix(): string {
@@ -317,6 +338,30 @@ function parseNdjsonOperations(args: {
     return operations;
 }
 
+function parseOpsKeyExpectations(key: string): {
+    createdAt: number;
+    deviceId: string;
+    firstOpId: number;
+    lastOpId: number;
+} {
+    // Key is already validated by assertOpsObjectKey.
+    const segments = key.split("/");
+    const deviceId = segments[2] ?? "";
+    const fileName = segments[4] ?? "";
+
+    const parsed = parseOpsObjectFileNameMetadata(fileName);
+    if (!parsed) {
+        throw new Error(`Invalid sync operations object key filename: ${key}`);
+    }
+
+    return {
+        createdAt: parsed.createdAt,
+        deviceId,
+        firstOpId: parsed.firstOpId,
+        lastOpId: parsed.lastOpId,
+    };
+}
+
 function createEmptyManifest(): CloudSyncManifest {
     return {
         devices: {},
@@ -390,8 +435,26 @@ export class ProviderCloudSyncTransport implements CloudSyncTransport {
         }
 
         const createdAt = createdAtCandidate;
-        const firstOpId = operations[0]?.opId ?? 0;
-        const lastOpId = operations.at(-1)?.opId ?? firstOpId;
+
+        let minOpId = Number.POSITIVE_INFINITY;
+        let maxOpId = Number.NEGATIVE_INFINITY;
+        for (const op of operations) {
+            if (op.deviceId !== deviceId) {
+                throw new Error(
+                    "appendOperations requires all operations to match the supplied deviceId"
+                );
+            }
+
+            minOpId = Math.min(minOpId, op.opId);
+            maxOpId = Math.max(maxOpId, op.opId);
+        }
+
+        if (!Number.isFinite(minOpId) || !Number.isFinite(maxOpId)) {
+            throw new TypeError("appendOperations internal error (missing op ids)");
+        }
+
+        const firstOpId = minOpId;
+        const lastOpId = maxOpId;
 
         return this.provider.uploadObject({
             buffer: encodeUtf8(toNdjson(operations)),
@@ -432,9 +495,11 @@ export class ProviderCloudSyncTransport implements CloudSyncTransport {
             const buffer = await this.provider.downloadObject(MANIFEST_KEY);
             const maxBytes = getMaxManifestBytes();
             if (buffer.byteLength > maxBytes) {
-                throw new Error(
-                    `Cloud sync manifest exceeds size limit (${maxBytes} bytes)`
-                );
+                throw new CloudSyncSizeLimitError({
+                    actualBytes: buffer.byteLength,
+                    maxBytes,
+                    objectKind: "manifest",
+                });
             }
 
             const raw = decodeUtf8(buffer);
@@ -472,6 +537,8 @@ export class ProviderCloudSyncTransport implements CloudSyncTransport {
     ): Promise<CloudSyncOperation[]> {
         assertOpsObjectKey(key);
 
+        const expectations = parseOpsKeyExpectations(key);
+
         const buffer = await this.provider.downloadObject(key);
 
         const maxBytes = getMaxOpsObjectBytes();
@@ -486,12 +553,54 @@ export class ProviderCloudSyncTransport implements CloudSyncTransport {
         }
 
         const raw = decodeUtf8(buffer);
-        return parseNdjsonOperations({
+        const operations = parseNdjsonOperations({
             key,
             maxLineChars: getMaxOpsLineChars(),
             maxLines: getMaxOpsObjectLines(),
             raw,
         });
+
+        if (operations.length === 0) {
+            throw new CloudSyncCorruptRemoteObjectError(
+                `Cloud sync operation object '${key}' is empty`,
+                {
+                    key,
+                    kind: "operations",
+                }
+            );
+        }
+
+        let actualMinOpId = Number.POSITIVE_INFINITY;
+        let actualMaxOpId = Number.NEGATIVE_INFINITY;
+        for (const op of operations) {
+            if (op.deviceId !== expectations.deviceId) {
+                throw new CloudSyncCorruptRemoteObjectError(
+                    `Cloud sync operation object '${key}' contains operations for unexpected deviceId '${op.deviceId}'`,
+                    {
+                        key,
+                        kind: "operations",
+                    }
+                );
+            }
+
+            actualMinOpId = Math.min(actualMinOpId, op.opId);
+            actualMaxOpId = Math.max(actualMaxOpId, op.opId);
+        }
+
+        if (
+            actualMinOpId < expectations.firstOpId ||
+            actualMaxOpId > expectations.lastOpId
+        ) {
+            throw new CloudSyncCorruptRemoteObjectError(
+                `Cloud sync operation object '${key}' opId range is inconsistent with key metadata`,
+                {
+                    key,
+                    kind: "operations",
+                }
+            );
+        }
+
+        return operations;
     }
 
     public async readSnapshot(key: string): Promise<CloudSyncSnapshot> {

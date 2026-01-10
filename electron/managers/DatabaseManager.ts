@@ -56,6 +56,7 @@ import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import type { UptimeEvents } from "../events/eventTypes";
 import type { TypedEventBus } from "../events/TypedEventBus";
 import type {
+    DatabaseBackupMetadata,
     DatabaseBackupResult,
     DatabaseRestorePayload,
     DatabaseRestoreSummary,
@@ -70,6 +71,7 @@ import {
     ExportDataCommand,
     ImportDataCommand,
     RestoreBackupCommand,
+    SaveBackupToPathCommand,
 } from "../services/commands/DatabaseCommands";
 import { setHistoryLimit as setHistoryLimitUtil } from "../services/database/historyLimitManager";
 import { createSiteCache } from "../services/database/serviceFactory";
@@ -229,6 +231,27 @@ export class DatabaseManager {
             eventEmitter: this.eventEmitter,
             serviceFactory: this.serviceFactory,
         });
+        return this.commandExecutor.execute(command);
+    }
+
+    /**
+     * Saves a SQLite backup directly to disk.
+     *
+     * @remarks
+     * This method exists to support large backups without materializing the
+     * entire database backup in memory.
+     */
+    public async saveBackupToPath(
+        targetPath: string
+    ): Promise<DatabaseBackupMetadata> {
+        const command = new SaveBackupToPathCommand({
+            cache: this.siteCache,
+            configurationManager: this.configurationManager,
+            eventEmitter: this.eventEmitter,
+            serviceFactory: this.serviceFactory,
+            targetPath,
+        });
+
         return this.commandExecutor.execute(command);
     }
 

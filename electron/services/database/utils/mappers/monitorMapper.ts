@@ -11,19 +11,21 @@
 
 import type { Monitor, Site } from "@shared/types";
 import type { MonitorRow as DatabaseMonitorRow } from "@shared/types/database";
-import type { JsonValue, UnknownRecord  } from "type-fest";
+import type { JsonValue, UnknownRecord } from "type-fest";
 
 import { ensureError } from "@shared/utils/errorHandling";
 import { safeJsonParse } from "@shared/utils/jsonSafety";
 import { LOG_TEMPLATES } from "@shared/utils/logTemplates";
+import { requireRecordLike } from "@shared/utils/typeHelpers";
 import {
     isValidIdentifierArray,
     safeInteger,
 } from "@shared/validation/validatorUtils";
 
-import type { DbValue } from "../converters/valueConverters";
+import type { MonitorRowSource } from "../schema/dynamicSchema";
 
 import { logger } from "../../../../utils/logger";
+import { convertToDbValue, type DbValue } from "../converters/valueConverters";
 import {
     generateSqlParameters,
     mapMonitorToRow,
@@ -38,7 +40,7 @@ import {
  */
 function copyDynamicFields(
     monitor: Site["monitors"][0],
-    dynamicMonitor: Monitor
+        dynamicMonitor: UnknownRecord
 ): void {
     const excludedFields = new Set([
         "checkInterval",
@@ -62,13 +64,16 @@ function copyDynamicFields(
     ]);
 
     // Copy monitor-type specific fields
+    const monitorRecord = requireRecordLike(
+        monitor,
+        "Expected monitor to be record-like"
+    );
 
     for (const [key, value] of Object.entries(dynamicMonitor)) {
         if (!excludedFields.has(key)) {
             // Dynamic field assignment for monitor type system
             // Key is validated from dynamicMonitor which comes from typed database mapping
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Required for dynamic monitor field assignment system
-            (monitor as unknown as Record<string, unknown>)[key] = value;
+            monitorRecord[key] = value;
         }
     }
 }
@@ -238,21 +243,17 @@ export function buildMonitorParameters(
             createdAt: Date.now(),
             siteIdentifier,
             updatedAt: Date.now(),
-        };
+        } satisfies Partial<MonitorRowSource>;
 
-        const row = mapMonitorToRow(monitorWithMetadata as Monitor);
+        const row = mapMonitorToRow(monitorWithMetadata);
         const { columns } = generateSqlParameters();
 
         // Return values in the same order as columns
-        /* eslint-disable @typescript-eslint/no-unsafe-type-assertion, sonarjs/function-return-type -- Safe internal type conversions for database mapping. Row structure guaranteed by dynamic schema system. */
+        // eslint-disable-next-line sonarjs/function-return-type -- DbValue is intentionally a union (null | number | string) for SQLite parameters.
         return columns.map((column): DbValue => {
-            const value = (row as unknown as UnknownRecord)[column];
-            if (value === undefined || value === null) {
-                return null;
-            }
-            return value as DbValue;
+            const value = row[column];
+            return convertToDbValue(value) ?? null;
         });
-        /* eslint-enable @typescript-eslint/no-unsafe-type-assertion, sonarjs/function-return-type -- Re-enable rules after database value mapping with appropriate type conversion */
     } catch (error: unknown) {
         const normalizedError = ensureError(error);
         logger.error(
@@ -337,7 +338,13 @@ export function rowToMonitor(row: DatabaseMonitorRow): Site["monitors"][0] {
         }
 
         // Copy all dynamic fields (monitor type specific fields)
-        copyDynamicFields(monitor, dynamicMonitor);
+        copyDynamicFields(
+            monitor,
+            requireRecordLike(
+                dynamicMonitor,
+                "Expected dynamic monitor to be record-like"
+            )
+        );
 
         return monitor;
     } catch (error: unknown) {

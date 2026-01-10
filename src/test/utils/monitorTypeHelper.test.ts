@@ -16,6 +16,7 @@ import {
     getMonitorTypeOptions,
 } from "../../utils/monitorTypeHelper";
 import type { MonitorTypeConfig } from "@shared/types/monitorTypes";
+import { installElectronApiMock } from "./electronApiMock";
 
 // Mock the monitor types store
 const mockMonitorTypesStore = {
@@ -39,6 +40,16 @@ vi.mock("../../utils/cache", () => ({
             clear: vi.fn(),
         },
     },
+    getCachedOrFetch: vi.fn(async (cache, key, fetcher) => {
+        const cached = cache.get(key);
+        if (cached !== undefined) {
+            return cached;
+        }
+
+        const value = await fetcher();
+        cache.set(key, value);
+        return value;
+    }),
 }));
 
 vi.mock("../../types/ipc", () => ({
@@ -52,21 +63,25 @@ vi.mock("@shared/utils/errorHandling", () => ({
     withUtilityErrorHandling: vi.fn(),
 }));
 
-// Mock global electronAPI
-const mockElectronAPI = {
-    monitorTypes: {
-        getMonitorTypes: vi.fn(),
-    },
-};
+const getMonitorTypesMock = vi.fn();
 
-Object.defineProperty(globalThis, "window", {
-    value: {
-        electronAPI: mockElectronAPI,
-    },
-    writable: true,
-});
+let restoreElectronApi: (() => void) | undefined;
 
 describe("monitorTypeHelper", () => {
+    beforeEach(() => {
+        getMonitorTypesMock.mockReset();
+        ({ restore: restoreElectronApi } = installElectronApiMock({
+            monitorTypes: {
+                getMonitorTypes: getMonitorTypesMock,
+            },
+        }));
+    });
+
+    afterEach(() => {
+        restoreElectronApi?.();
+        restoreElectronApi = undefined;
+    });
+
     const mockMonitorTypes: MonitorTypeConfig[] = [
         {
             type: "http",
@@ -208,9 +223,7 @@ describe("monitorTypeHelper", () => {
             expect(AppCaches.monitorTypes.get).toHaveBeenCalledWith(
                 "config:all-monitor-types"
             );
-            expect(
-                mockElectronAPI.monitorTypes.getMonitorTypes
-            ).not.toHaveBeenCalled();
+            expect(getMonitorTypesMock).not.toHaveBeenCalled();
         });
 
         it("should fetch from backend when cache is empty", async ({
@@ -315,7 +328,7 @@ describe("monitorTypeHelper", () => {
             mockMonitorTypesStore.monitorTypes = [];
             mockMonitorTypesStore.isLoaded = true;
 
-            mockElectronAPI.monitorTypes.getMonitorTypes.mockResolvedValue({
+                getMonitorTypesMock.mockResolvedValue({
                 success: true,
                 data: [],
             });
@@ -554,6 +567,8 @@ describe("monitorTypeHelper", () => {
                 { label: "HTTP Monitor (Advanced)", value: "special-http" },
                 { label: "Custom Ping Service", value: "custom_ping" },
             ]);
+
+            expect(getMonitorTypesMock).not.toHaveBeenCalled();
         });
 
         it("should preserve order of monitor types from backend", async ({

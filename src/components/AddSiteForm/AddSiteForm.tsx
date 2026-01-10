@@ -25,6 +25,7 @@ import { ThemedButton } from "../../theme/components/ThemedButton";
 import { ThemedText } from "../../theme/components/ThemedText";
 import { generateUuid } from "../../utils/data/generateUuid";
 import { AppIcons } from "../../utils/icons";
+import { buildMonitorValidationFieldValues } from "../../utils/monitorValidationFields";
 import { ErrorAlert } from "../common/ErrorAlert/ErrorAlert";
 import { SurfaceContainer } from "../shared/SurfaceContainer";
 import { type FormMode, useAddSiteForm } from "../SiteDetails/useAddSiteForm";
@@ -82,6 +83,7 @@ const isValidAddMode = (value: string): value is FormMode =>
 
 const SiteTargetIcon = AppIcons.ui.link;
 const MonitorConfigIcon = AppIcons.metrics.monitor;
+const HelperInfoIcon = AppIcons.ui.info;
 
 /**
  * AddSiteForm component for creating new sites and adding monitors to existing
@@ -224,39 +226,126 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
 
         // Get dynamic help text for the current monitor type
         const helpTexts = useDynamicHelpText(monitorType);
+
+        const checkIntervalLabel = useMemo(() => {
+            const match = CHECK_INTERVALS.find(
+                (interval) => interval.value === checkIntervalMs
+            );
+            return match?.label ?? `${Math.round(checkIntervalMs / 60_000)} min`;
+        }, [checkIntervalMs]);
+
         const helperBullets = useMemo<HelperBullet[]>(() => {
+            const normalizeText = (value: string): string => {
+                const lower = value.trim().toLowerCase();
+                let collapsedWhitespace = "";
+                let lastWasWhitespace = false;
+
+                for (const character of lower) {
+                    const isWhitespace =
+                        character === " " ||
+                        character === "\n" ||
+                        character === "\t" ||
+                        character === "\r";
+
+                    if (isWhitespace) {
+                        if (!lastWasWhitespace) {
+                            collapsedWhitespace += " ";
+                            lastWasWhitespace = true;
+                        }
+                    } else {
+                        collapsedWhitespace += character;
+                        lastWasWhitespace = false;
+                    }
+                }
+
+                while (
+                    collapsedWhitespace.endsWith(".") ||
+                    collapsedWhitespace.endsWith("!")
+                ) {
+                    collapsedWhitespace = collapsedWhitespace.slice(0, -1);
+                }
+
+                return collapsedWhitespace;
+            };
+
+            const shouldHideFooterHelpText = (value: string): boolean => {
+                const normalized = normalizeText(value);
+
+                // URL guidance is already rendered directly beneath the URL
+                // field via field-level helpText.
+                if (
+                    normalized.includes("://") ||
+                    normalized.includes("full url")
+                ) {
+                    return true;
+                }
+
+                // Interval guidance is shown as an explicit, more actionable
+                // footer bullet below.
+                if (
+                    normalized.includes("monitoring interval") ||
+                    normalized.includes("check interval")
+                ) {
+                    return true;
+                }
+
+                return false;
+            };
+
+            const seen = new Set<string>();
+            const modeBulletText =
+                addMode === "new"
+                    ? "Provide a descriptive site name for new entries"
+                    : "Select a site to add the monitor to";
             const bullets: HelperBullet[] = [
                 {
                     id: "mode",
-                    text:
-                        addMode === "new"
-                            ? "Provide a descriptive site name for new entries"
-                            : "Select a site to add the monitor to",
+                    text: modeBulletText,
                 },
             ];
 
-            if (helpTexts.primary) {
-                bullets.push({
+            seen.add(normalizeText(modeBulletText));
+
+            const addUniqueBullet = (id: string, text: string): void => {
+                const normalized = normalizeText(text);
+                if (normalized.length === 0 || seen.has(normalized)) return;
+                seen.add(normalized);
+                bullets.push({ id, text });
+            };
+
+            let preferredHelpText: HelperBullet | null = null;
+
+            if (
+                helpTexts.primary &&
+                !shouldHideFooterHelpText(helpTexts.primary)
+            ) {
+                preferredHelpText = {
                     id: `primary-${helpTexts.primary}`,
                     text: helpTexts.primary,
-                });
-            }
-
-            if (helpTexts.secondary) {
-                bullets.push({
+                };
+            } else if (
+                helpTexts.secondary &&
+                !shouldHideFooterHelpText(helpTexts.secondary)
+            ) {
+                preferredHelpText = {
                     id: `secondary-${helpTexts.secondary}`,
                     text: helpTexts.secondary,
-                });
+                };
             }
 
-            bullets.push({
-                id: "interval",
-                text: "The monitor will be checked according to your monitoring interval",
-            });
+            if (preferredHelpText) {
+                addUniqueBullet(preferredHelpText.id, preferredHelpText.text);
+            }
+
+            addUniqueBullet(
+                "interval",
+                `Checks run every ${checkIntervalLabel}. You can change this later.`
+            );
 
             return bullets;
         }, [
             addMode,
+            checkIntervalLabel,
             helpTexts.primary,
             helpTexts.secondary,
         ]);
@@ -359,7 +448,9 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
                 maxReplicationLagSeconds: (value: number | string): void => {
                     setMaxReplicationLagSeconds(String(value));
                 },
-                maxResponseTimeMs: (value: number | string): void => {
+                // Canonical backend field is `maxResponseTime` (milliseconds).
+                // UI state uses `maxResponseTimeMs` for clarity.
+                maxResponseTime: (value: number | string): void => {
                     setMaxResponseTimeMs(String(value));
                 },
                 port: (value: number | string): void => {
@@ -409,61 +500,8 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
             ]
         );
 
-        // Dynamic monitor field values
-        const dynamicFieldValues = useMemo(
-            () => ({
-                baselineUrl,
-                bodyKeyword,
-                certificateWarningDays,
-                edgeLocations,
-                expectedHeaderValue,
-                expectedJsonValue,
-                expectedStatusCode,
-                expectedValue,
-                headerName,
-                heartbeatExpectedStatus,
-                heartbeatMaxDriftSeconds,
-                heartbeatStatusField,
-                heartbeatTimestampField,
-                host,
-                jsonPath,
-                maxPongDelayMs,
-                maxReplicationLagSeconds,
-                maxResponseTimeMs,
-                port,
-                primaryStatusUrl,
-                recordType,
-                replicaStatusUrl,
-                replicationTimestampField,
-                url,
-            }),
-            [
-                baselineUrl,
-                bodyKeyword,
-                certificateWarningDays,
-                edgeLocations,
-                expectedHeaderValue,
-                expectedJsonValue,
-                expectedStatusCode,
-                expectedValue,
-                headerName,
-                heartbeatExpectedStatus,
-                heartbeatMaxDriftSeconds,
-                heartbeatStatusField,
-                heartbeatTimestampField,
-                host,
-                jsonPath,
-                maxPongDelayMs,
-                maxReplicationLagSeconds,
-                maxResponseTimeMs,
-                port,
-                primaryStatusUrl,
-                recordType,
-                replicaStatusUrl,
-                replicationTimestampField,
-                url,
-            ]
-        );
+        // Dynamic monitor field values (canonical field names).
+        const dynamicFieldValues = buildMonitorValidationFieldValues(formState);
 
         // Delayed loading state for button spinner (managed by custom hook)
         const showButtonLoading = useDelayedButtonLoading(isLoading);
@@ -849,9 +887,19 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
                         <ul className="add-site-form__helper-list">
                             {helperBullets.map((bullet) => (
                                 <li key={`add-site-form-helper-${bullet.id}`}>
-                                    <ThemedText size="xs" variant="tertiary">
-                                        {`\u2022 ${bullet.text}`}
-                                    </ThemedText>
+                                    <div className="flex items-start gap-2">
+                                        <HelperInfoIcon
+                                            aria-hidden="true"
+                                            className="mt-0.5 h-4 w-4 shrink-0 opacity-70"
+                                        />
+                                        <ThemedText
+                                            className="leading-snug"
+                                            size="xs"
+                                            variant="tertiary"
+                                        >
+                                            {bullet.text}
+                                        </ThemedText>
+                                    </div>
                                 </li>
                             ))}
                         </ul>

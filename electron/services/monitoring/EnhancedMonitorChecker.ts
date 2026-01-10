@@ -43,6 +43,7 @@ import {
     interpolateLogTemplate,
     LOG_TEMPLATES,
 } from "@shared/utils/logTemplates";
+import { isRecord } from "@shared/utils/typeHelpers";
 
 import type { EnhancedMonitoringDependencies } from "./EnhancedMonitoringDependencies";
 import type {
@@ -201,15 +202,7 @@ export class EnhancedMonitorChecker {
      */
     private readonly servicesByType: Map<Monitor["type"], IMonitorService>;
 
-    private static isUnknownRecord(value: unknown): value is Record<string, unknown> {
-        return (
-            typeof value === "object" &&
-            value !== null &&
-            !Array.isArray(value)
-        );
-    }
-
-/**
+    /**
      * Performs a comprehensive monitor status check with advanced operation
      * correlation.
      *
@@ -297,7 +290,8 @@ export class EnhancedMonitorChecker {
     public async checkMonitor(
         site: Site,
         monitorId: string,
-        isManualCheck = false
+        isManualCheck = false,
+        signal?: AbortSignal
     ): Promise<StatusUpdate | undefined> {
         const monitor = site.monitors.find((m) => m.id === monitorId);
 
@@ -307,7 +301,7 @@ export class EnhancedMonitorChecker {
 
         // For manual checks, don't use operation correlation
         if (isManualCheck) {
-            return this.performDirectCheck(site, monitor, true);
+            return this.performDirectCheck(site, monitor, true, signal);
         }
 
         // Only proceed if monitor is currently monitoring
@@ -316,7 +310,7 @@ export class EnhancedMonitorChecker {
             return undefined;
         }
 
-        return this.performCorrelatedCheck(site, monitor, monitorId);
+        return this.performCorrelatedCheck(site, monitor, monitorId, signal);
     }
 
     /**
@@ -588,20 +582,25 @@ private async handleSuccessfulCheck(
 private async performCorrelatedCheck(
         site: Site,
         monitor: Site["monitors"][0],
-        monitorId: string
+        monitorId: string,
+        externalSignal?: AbortSignal
     ): Promise<StatusUpdate | undefined> {
-        const operationResult = await this.setupOperationCorrelation(monitor);
+        const operationResult = await this.setupOperationCorrelation(monitor, {
+            ...(externalSignal
+                ? { additionalSignals: [externalSignal] }
+                : {}),
+        });
         if (!operationResult) {
             return undefined;
         }
 
-        const { operationId, signal } = operationResult;
+        const { operationId, signal: operationSignal } = operationResult;
 
         const context: MonitorCheckContext & { operationId: string } = {
             ...createMonitorCheckContext({
                 monitor,
                 operationId,
-                signal,
+                signal: operationSignal,
                 site,
             }),
             operationId,
@@ -654,13 +653,15 @@ private async performCorrelatedCheck(
 private async performDirectCheck(
         site: Site,
         monitor: Monitor,
-        isManualCheck = false
+        isManualCheck = false,
+        signal?: AbortSignal
     ): Promise<StatusUpdate | undefined> {
         try {
             const context = createMonitorCheckContext({
                 isManualCheck,
                 monitor,
                 operationId: "direct-check",
+                ...(signal ? { signal } : {}),
                 site,
             });
 
@@ -845,10 +846,11 @@ private async saveHistoryEntry(
      *   failed
      */
 private async setupOperationCorrelation(
-        monitor: Monitor
+        monitor: Monitor,
+    options?: { readonly additionalSignals?: AbortSignal[] }
     ): Promise<undefined | { operationId: string; signal: AbortSignal }> {
         const handle =
-            await this.operationCoordinator.initiateOperation(monitor);
+            await this.operationCoordinator.initiateOperation(monitor, options);
 
         if (!handle) {
             return undefined;
@@ -890,7 +892,7 @@ private async runServiceCheck(args: {
         const isValidServiceResult = (
             value: unknown
         ): value is MonitorCheckResult => {
-            if (!EnhancedMonitorChecker.isUnknownRecord(value)) {
+            if (!isRecord(value)) {
                 return false;
             }
 

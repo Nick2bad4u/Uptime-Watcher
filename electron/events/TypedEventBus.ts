@@ -29,7 +29,7 @@
  */
 
 import type { EventMetadata } from "@shared/types/events";
-import type { Simplify } from "type-fest";
+import type { Simplify, UnknownRecord } from "type-fest";
 
 import { generateCorrelationId } from "@shared/utils/correlation";
 import {
@@ -229,7 +229,8 @@ type PrimitivePayload =
  * Non-array object payload shape used to distinguish plain objects from arrays.
  * The optional `length` exclusion prevents accidental array matches.
  */
-type NonArrayObjectPayload = Record<PropertyKey, unknown> & {
+// Use Type-Fest's canonical unknown-record typing for object payloads.
+type NonArrayObjectPayload = UnknownRecord & {
     readonly length?: never;
 };
 
@@ -261,20 +262,25 @@ export type EventKey<EventMap> = Extract<keyof EventMap, string>;
  * Payload enriched with metadata for downstream listeners.
  */
 export type EnhancedEventPayload<Payload extends EventPayloadValue> =
-    Payload extends ArrayPayload
-        ? Payload &
-              Readonly<{
-                  readonly _meta: EventMetadata;
-                  readonly _originalMeta?: EventMetadata;
-              }>
-        : Payload extends PrimitivePayload
-          ? PrimitiveEventPayload<Payload>
-          : Simplify<
-                Omit<Payload, "_meta" | "_originalMeta"> & {
-                    readonly _meta: EventMetadata;
-                    readonly _originalMeta?: EventMetadata;
-                }
-            >;
+    // Force distributive behaviour for union payloads so discriminated unions
+    // (e.g. StateSyncEventData) preserve their member shapes after metadata
+    // enrichment.
+    Payload extends unknown
+        ? Payload extends ArrayPayload
+            ? Payload &
+                  Readonly<{
+                      readonly _meta: EventMetadata;
+                      readonly _originalMeta?: EventMetadata;
+                  }>
+            : Payload extends PrimitivePayload
+              ? PrimitiveEventPayload<Payload>
+              : Simplify<
+                    Payload & {
+                        readonly _meta: EventMetadata;
+                        readonly _originalMeta?: EventMetadata;
+                    }
+                >
+        : never;
 
 /**
  * Function signature for strongly typed event listeners.

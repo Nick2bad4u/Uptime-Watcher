@@ -58,6 +58,7 @@ interface DataChannelMap {
     readonly exportData: "export-data";
     readonly importData: "import-data";
     readonly restoreSqliteBackup: "restore-sqlite-backup";
+    readonly saveSqliteBackup: "save-sqlite-backup";
 }
 
 const DATA_CHANNELS_DEFINITION: DataChannelMap = {
@@ -65,6 +66,7 @@ const DATA_CHANNELS_DEFINITION: DataChannelMap = {
     exportData: "export-data",
     importData: "import-data",
     restoreSqliteBackup: "restore-sqlite-backup",
+    saveSqliteBackup: "save-sqlite-backup",
 };
 
 /**

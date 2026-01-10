@@ -68,9 +68,15 @@ vi.mock("../../services/logger", () => ({
 }));
 
 const ensureErrorMock = vi.hoisted(() => vi.fn((error: unknown) => error));
-vi.mock("@shared/utils/errorHandling", () => ({
-    ensureError: ensureErrorMock,
-}));
+vi.mock("@shared/utils/errorHandling", async (importOriginal) => {
+    const actual =
+        await importOriginal<typeof import("@shared/utils/errorHandling")>();
+
+    return {
+        ...actual,
+        ensureError: ensureErrorMock,
+    };
+});
 
 import { MonitoringService } from "../../services/MonitoringService";
 
@@ -121,13 +127,14 @@ describe("MonitoringService edge cases", () => {
         };
         monitoringApi.startMonitoring.mockResolvedValueOnce(failureSummary);
 
-        await expect(MonitoringService.startMonitoring()).rejects.toMatchObject(
-            {
-                message:
-                    "Failed to start monitoring across all sites: 1/4 monitors activated.",
+        await expect(MonitoringService.startMonitoring()).rejects.toMatchObject({
+            code: "RENDERER_SERVICE_BACKEND_OPERATION_FAILED",
+            details: expect.objectContaining({
                 summary: failureSummary,
-            }
-        );
+            }),
+            message:
+                "[MonitoringService] Failed to start monitoring across all sites: 1/4 monitors activated.",
+        });
 
         expect(loggerMock.error).toHaveBeenCalledWith(
             "[MonitoringService] Global monitoring start failed",
@@ -140,9 +147,15 @@ describe("MonitoringService edge cases", () => {
 
         await expect(
             MonitoringService.startMonitoringForMonitor("site-x", "monitor-y")
-        ).rejects.toThrowError(
-            "Failed to start monitoring for monitor monitor-y of site site-x: Backend operation failed"
-        );
+        ).rejects.toMatchObject({
+            code: "RENDERER_SERVICE_BACKEND_OPERATION_FAILED",
+            details: expect.objectContaining({
+                monitorId: "monitor-y",
+                siteIdentifier: "site-x",
+            }),
+            message:
+                "[MonitoringService] Failed to start monitoring for monitor monitor-y of site site-x: backend returned false",
+        });
     });
 
     it("throws when startMonitoringForSite reports backend failure", async () => {
@@ -150,9 +163,14 @@ describe("MonitoringService edge cases", () => {
 
         await expect(
             MonitoringService.startMonitoringForSite("site-z")
-        ).rejects.toThrowError(
-            "Failed to start monitoring for site site-z: Backend operation failed"
-        );
+        ).rejects.toMatchObject({
+            code: "RENDERER_SERVICE_BACKEND_OPERATION_FAILED",
+            details: expect.objectContaining({
+                siteIdentifier: "site-z",
+            }),
+            message:
+                "[MonitoringService] Failed to start monitoring for site site-z: backend returned false",
+        });
     });
 
     it("warns about partial failures during stopMonitoring", async () => {
@@ -191,9 +209,12 @@ describe("MonitoringService edge cases", () => {
         monitoringApi.stopMonitoring.mockResolvedValueOnce(failureSummary);
 
         await expect(MonitoringService.stopMonitoring()).rejects.toMatchObject({
+            code: "RENDERER_SERVICE_BACKEND_OPERATION_FAILED",
+            details: expect.objectContaining({
+                summary: failureSummary,
+            }),
             message:
-                "Failed to stop monitoring across all sites: 1/3 monitors remained active.",
-            summary: failureSummary,
+                "[MonitoringService] Failed to stop monitoring across all sites: 1/3 monitors remained active.",
         });
 
         expect(loggerMock.error).toHaveBeenCalledWith(
@@ -210,9 +231,15 @@ describe("MonitoringService edge cases", () => {
                 "site-err",
                 "monitor-err"
             )
-        ).rejects.toThrowError(
-            "Failed to stop monitoring for monitor monitor-err of site site-err: Backend operation failed"
-        );
+        ).rejects.toMatchObject({
+            code: "RENDERER_SERVICE_BACKEND_OPERATION_FAILED",
+            details: expect.objectContaining({
+                monitorId: "monitor-err",
+                siteIdentifier: "site-err",
+            }),
+            message:
+                "[MonitoringService] Failed to stop monitoring for monitor monitor-err of site site-err: backend returned false",
+        });
     });
 
     it("throws when stopMonitoringForSite reports backend failure", async () => {
@@ -220,8 +247,13 @@ describe("MonitoringService edge cases", () => {
 
         await expect(
             MonitoringService.stopMonitoringForSite("site-stop")
-        ).rejects.toThrowError(
-            "Failed to stop monitoring for site site-stop: Backend operation failed"
-        );
+        ).rejects.toMatchObject({
+            code: "RENDERER_SERVICE_BACKEND_OPERATION_FAILED",
+            details: expect.objectContaining({
+                siteIdentifier: "site-stop",
+            }),
+            message:
+                "[MonitoringService] Failed to stop monitoring for site site-stop: backend returned false",
+        });
     });
 });

@@ -6,62 +6,29 @@
  * preload domain. All methods delegate to IPC endpoints defined in
  * {@link SerializedDatabaseBackupResult | shared IPC contracts} and use
  * {@link validateServicePayload} plus Zod schemas to validate payloads before
- * they are returned to callers. Errors are wrapped with
- * {@link ensureError | normalized error objects} and routed through
- * {@link withUtilityErrorHandling} for consistent diagnostics.
+ * they are returned to callers.
+ *
+ * Errors are normalized via {@link ensureError} and logged by
+ * {@link getIpcServiceHelpers} so renderer services share a consistent
+ * diagnostics pipeline.
  */
 
 import type {
     SerializedDatabaseBackupResult,
+    SerializedDatabaseBackupSaveResult,
     SerializedDatabaseRestorePayload,
     SerializedDatabaseRestoreResult,
 } from "@shared/types/ipc";
 
-import {
-    ensureError,
-    withUtilityErrorHandling,
-} from "@shared/utils/errorHandling";
+import { ensureError } from "@shared/utils/errorHandling";
 import {
     validateSerializedDatabaseBackupResult,
+    validateSerializedDatabaseBackupSaveResult,
     validateSerializedDatabaseRestoreResult,
 } from "@shared/validation/dataSchemas";
 
 import { getIpcServiceHelpers } from "./utils/createIpcServiceHelpers";
 import { validateServicePayload } from "./utils/validation";
-
-/**
- * Executes a data-domain operation with standardized diagnostics.
- *
- * @remarks
- * This helper wraps the supplied asynchronous {@link handler} with
- * {@link withUtilityErrorHandling}, tagging log entries with a prefix. The
- * prefix format is `"[DataService] <operation>"`. Errors are logged and then
- * rethrown so that callers can surface failures to the UI while still
- * benefiting from structured telemetry.
- *
- * @typeParam T - Result type returned by the wrapped handler.
- *
- * @param operation - Human-readable operation name used in diagnostic logs.
- * @param handler - Asynchronous callback that performs the underlying
- *   operation.
- *
- * @returns A promise that resolves with the value returned by {@link handler}
- *   when the operation succeeds.
- *
- * @throws {@link Error} When {@link handler} throws or rejects. The error is
- *   normalized via {@link ensureError} and rethrown by
- *   {@link withUtilityErrorHandling} after logging.
- */
-const runDataOperation = async <T>(
-    operation: string,
-    handler: () => Promise<T>
-): Promise<T> =>
-    withUtilityErrorHandling(
-        handler,
-        `[DataService] ${operation}`,
-        undefined,
-        true
-    );
 
 interface DataServiceContract {
     readonly downloadSqliteBackup: () => Promise<SerializedDatabaseBackupResult>;
@@ -71,6 +38,7 @@ interface DataServiceContract {
     readonly restoreSqliteBackup: (
         payload: SerializedDatabaseRestorePayload
     ) => Promise<SerializedDatabaseRestoreResult>;
+    readonly saveSqliteBackup: () => Promise<SerializedDatabaseBackupSaveResult>;
 }
 
 // eslint-disable-next-line ex/no-unhandled -- Module-level initialization should fail fast when preload wiring is invalid.
@@ -82,6 +50,7 @@ const { ensureInitialized, wrap } = getIpcServiceHelpers("DataService", {
                 "downloadSqliteBackup",
                 "exportData",
                 "importData",
+                "saveSqliteBackup",
                 "restoreSqliteBackup",
             ],
         },
@@ -94,9 +63,10 @@ const { ensureInitialized, wrap } = getIpcServiceHelpers("DataService", {
  * @remarks
  * All methods in this service delegate to the typed `data` preload domain using
  * {@link getIpcServiceHelpers}, and validate responses with the shared Zod
- * schemas from `@shared/validation/dataSchemas`. Operations are executed via
- * {@link runDataOperation}, which guarantees consistent logging and
- * error-normalization behaviour.
+ * schemas from `@shared/validation/dataSchemas`.
+ *
+ * Service-level error logging is handled consistently by
+ * {@link getIpcServiceHelpers}.
  */
 export const DataService: DataServiceContract = {
     /**
@@ -115,22 +85,20 @@ export const DataService: DataServiceContract = {
      *   rejects the backup request, or the returned payload fails schema
      *   validation.
      */
-    downloadSqliteBackup: wrap("downloadSqliteBackup", async (api) =>
-        runDataOperation("downloadSqliteBackup", async () => {
-            try {
-                return validateServicePayload(
-                    validateSerializedDatabaseBackupResult,
-                    await api.data.downloadSqliteBackup(),
-                    {
-                        operation: "downloadSqliteBackup",
-                        serviceName: "DataService",
-                    }
-                );
-            } catch (error: unknown) {
-                throw ensureError(error);
-            }
-        })
-    ),
+    downloadSqliteBackup: wrap("downloadSqliteBackup", async (api) => {
+        try {
+            return validateServicePayload(
+                validateSerializedDatabaseBackupResult,
+                await api.data.downloadSqliteBackup(),
+                {
+                    operation: "downloadSqliteBackup",
+                    serviceName: "DataService",
+                }
+            );
+        } catch (error: unknown) {
+            throw ensureError(error);
+        }
+    }),
 
     /**
      * Exports all application data as a serialized JSON string.
@@ -149,18 +117,16 @@ export const DataService: DataServiceContract = {
      * @throws {@link Error} For transport failures or unexpected backend
      *   errors.
      */
-    exportData: wrap("exportData", async (api) =>
-        runDataOperation("exportData", async () => {
-            const payload = await api.data.exportData();
-            if (typeof payload !== "string") {
-                throw new TypeError(
-                    "Export data payload must be a string representing serialized backup JSON"
-                );
-            }
+    exportData: wrap("exportData", async (api) => {
+        const payload = await api.data.exportData();
+        if (typeof payload !== "string") {
+            throw new TypeError(
+                "Export data payload must be a string representing serialized backup JSON"
+            );
+        }
 
-            return payload;
-        })
-    ),
+        return payload;
+    }),
 
     /**
      * Imports a JSON data snapshot previously produced by
@@ -177,18 +143,16 @@ export const DataService: DataServiceContract = {
      * @throws {@link Error} When the IPC bridge fails, the payload cannot be
      *   processed, or an unexpected backend error occurs.
      */
-    importData: wrap("importData", async (api, payload: string) =>
-        runDataOperation("importData", async () => {
-            const result = await api.data.importData(payload);
-            if (typeof result !== "boolean") {
-                throw new TypeError(
-                    "Import data response must be a boolean indicating success"
-                );
-            }
+    importData: wrap("importData", async (api, payload: string) => {
+        const result = await api.data.importData(payload);
+        if (typeof result !== "boolean") {
+            throw new TypeError(
+                "Import data response must be a boolean indicating success"
+            );
+        }
 
-            return result;
-        })
-    ),
+        return result;
+    }),
 
     /**
      * Ensures that the preload bridge for the `data` domain is initialized
@@ -235,13 +199,12 @@ export const DataService: DataServiceContract = {
             api,
             payload: SerializedDatabaseRestorePayload
         ): Promise<SerializedDatabaseRestoreResult> =>
-            runDataOperation("restoreSqliteBackup", async () => {
+            // The Zod schema already models `preRestoreFileName` as optional,
+            // so we can return the parsed result directly without reshaping.
+            // Callers can treat the absence of the property and an explicit
+            // `undefined` value equivalently when displaying restore summaries.
+            {
                 try {
-                    // The Zod schema already models `preRestoreFileName` as
-                    // optional, so we can return the parsed result directly
-                    // without reshaping. Callers can treat the absence of the
-                    // property and an explicit `undefined` value equivalently
-                    // when displaying restore summaries.
                     return validateServicePayload<SerializedDatabaseRestoreResult>(
                         validateSerializedDatabaseRestoreResult,
                         await api.data.restoreSqliteBackup(payload),
@@ -256,6 +219,29 @@ export const DataService: DataServiceContract = {
                 } catch (error: unknown) {
                     throw ensureError(error);
                 }
-            })
+            }
     ),
+
+    /**
+     * Saves a SQLite backup to disk via a native save dialog.
+     *
+     * @remarks
+     * This method exists to avoid transferring large backup buffers over IPC.
+     * The main process creates the backup, shows a save dialog, and writes the
+     * file on behalf of the renderer.
+     */
+    saveSqliteBackup: wrap("saveSqliteBackup", async (api) => {
+        try {
+            return validateServicePayload(
+                validateSerializedDatabaseBackupSaveResult,
+                await api.data.saveSqliteBackup(),
+                {
+                    operation: "saveSqliteBackup",
+                    serviceName: "DataService",
+                }
+            );
+        } catch (error: unknown) {
+            throw ensureError(error);
+        }
+    }),
 };

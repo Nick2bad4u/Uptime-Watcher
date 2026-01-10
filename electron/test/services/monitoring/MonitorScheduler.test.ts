@@ -55,7 +55,8 @@ const flushAsync = async (): Promise<void> => {
 
 type MonitorCheckCallback = (
     siteIdentifier: string,
-    monitorId: string
+    monitorId: string,
+    signal: AbortSignal
 ) => Promise<void>;
 
 const createCheckCallbackMock = () => vi.fn<MonitorCheckCallback>();
@@ -118,7 +119,11 @@ describe(MonitorScheduler, () => {
         const job = jobs.get("site-1|monitor-1");
 
         expect(job?.baseIntervalMs).toBe(MIN_CHECK_INTERVAL);
-        expect(mockCheckCallback).toHaveBeenCalledWith("site-1", "monitor-1");
+        expect(mockCheckCallback).toHaveBeenCalledWith(
+            "site-1",
+            "monitor-1",
+            expect.any(AbortSignal)
+        );
 
         const scheduleEvent = eventEmitter.emitTyped.mock.calls.find(
             ([eventName]) => eventName === "monitor:schedule-updated"

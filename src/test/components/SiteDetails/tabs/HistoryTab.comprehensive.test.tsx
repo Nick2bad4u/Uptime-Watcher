@@ -6,11 +6,19 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import type {
+    ButtonHTMLAttributes,
+    HTMLAttributes,
+    PropsWithChildren,
+    SelectHTMLAttributes,
+} from "react";
 
 import { HistoryTab } from "../../../../components/SiteDetails/tabs/HistoryTab";
 import type { HistoryTabProperties } from "../../../../components/SiteDetails/tabs/HistoryTab";
 import { useSettingsStore } from "../../../../stores/settings/useSettingsStore";
 import { useTheme } from "../../../../theme/useTheme";
+import { ThemeManager } from "../../../../theme/ThemeManager";
+import { themes } from "../../../../theme/themes";
 import type { Monitor } from "@shared/types";
 
 // Mock dependencies
@@ -32,33 +40,47 @@ vi.mock("../../../../theme/useTheme", () => ({
 }));
 
 // Mock themed components
+type StatusIndicatorMockProperties = PropsWithChildren<
+    HTMLAttributes<HTMLDivElement>
+>;
+
+type ThemedButtonMockProperties = PropsWithChildren<
+    ButtonHTMLAttributes<HTMLButtonElement>
+>;
+
+type ThemedCardMockProperties = PropsWithChildren<HTMLAttributes<HTMLDivElement>>;
+
+type ThemedSelectMockProperties = PropsWithChildren<
+    SelectHTMLAttributes<HTMLSelectElement>
+>;
+
+type ThemedTextMockProperties = PropsWithChildren<HTMLAttributes<HTMLSpanElement>>;
+
 vi.mock("../../../../theme/components", () => ({
-    StatusIndicator: ({ children, ...props }: any) => (
+    StatusIndicator: ({ children, ...props }: StatusIndicatorMockProperties) => (
         <div data-testid="status-indicator" {...props}>
             {children}
         </div>
     ),
-    ThemedButton: ({ children, onClick, ...props }: any) => (
-        <button data-testid="themed-button" onClick={onClick} {...props}>
+    ThemedButton: ({ children, ...props }: ThemedButtonMockProperties) => (
+        <button data-testid="themed-button" {...props}>
             {children}
         </button>
     ),
-    ThemedCard: ({ children, ...props }: any) => (
+    ThemedCard: ({ children, ...props }: ThemedCardMockProperties) => (
         <div data-testid="themed-card" {...props}>
             {children}
         </div>
     ),
-    ThemedSelect: ({ children, value, onChange, ...props }: any) => (
+    ThemedSelect: ({ children, ...props }: ThemedSelectMockProperties) => (
         <select
             data-testid="themed-select"
-            value={value}
-            onChange={onChange}
             {...props}
         >
             {children}
         </select>
     ),
-    ThemedText: ({ children, ...props }: any) => (
+    ThemedText: ({ children, ...props }: ThemedTextMockProperties) => (
         <span data-testid="themed-text" {...props}>
             {children}
         </span>
@@ -66,8 +88,10 @@ vi.mock("../../../../theme/components", () => ({
 }));
 
 // Mock MonitorUiComponents
+type DetailLabelMockProperties = PropsWithChildren<HTMLAttributes<HTMLDivElement>>;
+
 vi.mock("../../../../components/common/MonitorUiComponents", () => ({
-    DetailLabel: ({ children, ...props }: any) => (
+    DetailLabel: ({ children, ...props }: DetailLabelMockProperties) => (
         <div data-testid="detail-label" {...props}>
             {children}
         </div>
@@ -110,95 +134,35 @@ describe(HistoryTab, () => {
     beforeEach(() => {
         vi.clearAllMocks();
 
-        mockUseSettingsStore.mockReturnValue({
+        const settingsStoreState = {
             settings: { historyLimit: 25 },
-            initializeSettings: vi.fn(),
-            updateSettings: vi.fn(),
             exportSettings: vi.fn(),
             importSettings: vi.fn(),
-        });
+            initializeSettings: vi.fn(),
+            updateSettings: vi.fn(),
+        };
+
+        mockUseSettingsStore.mockImplementation((selector?: unknown) =>
+            typeof selector === "function"
+                ? (selector as (state: typeof settingsStoreState) => unknown)(
+                      settingsStoreState
+                  )
+                : settingsStoreState
+        );
 
         mockUseTheme.mockReturnValue({
             availableThemes: ["light", "dark"],
-            currentTheme: {
-                colors: {
-                    primary: {
-                        50: "#EFF6FF",
-                        100: "#DBEAFE",
-                        200: "#BFDBFE",
-                        300: "#93C5FD",
-                        400: "#60A5FA",
-                        500: "#3B82F6",
-                        600: "#2563EB",
-                        700: "#1D4ED8",
-                        800: "#1E40AF",
-                        900: "#1E3A8A",
-                    },
-                    warning: "#F59E0B",
-                    background: { primary: "#FFFFFF", secondary: "#F8FAFC" },
-                    border: { primary: "#E2E8F0", secondary: "#CBD5E1" },
-                    error: { 50: "#FEF2F2", 500: "#EF4444", 600: "#DC2626" },
-                    errorAlert: "#DC2626",
-                    info: "#3B82F6",
-                    success: "#10B981",
-                    successAlert: "#059669",
-                    text: { primary: "#1F2937", secondary: "#6B7280" },
-                    warningAlert: "#D97706",
-                },
-                spacing: {
-                    xs: "4px",
-                    sm: "8px",
-                    md: "16px",
-                    lg: "24px",
-                    xl: "32px",
-                },
-                borderRadius: {
-                    sm: "4px",
-                    md: "8px",
-                    lg: "12px",
-                    xl: "16px",
-                },
-                shadows: {
-                    sm: "0 1px 2px 0 rgba(0, 0, 0, 0.05)",
-                    md: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
-                    lg: "0 10px 15px -3px rgba(0, 0, 0, 0.1)",
-                    xl: "0 20px 25px -5px rgba(0, 0, 0, 0.1)",
-                },
-                typography: {
-                    fontFamily: {
-                        sans: ["Inter", "sans-serif"],
-                        mono: ["Fira Code", "monospace"],
-                    },
-                    fontSize: {
-                        xs: "12px",
-                        sm: "14px",
-                        md: "16px",
-                        lg: "18px",
-                        xl: "20px",
-                    },
-                    fontWeight: {
-                        normal: "400",
-                        medium: "500",
-                        semibold: "600",
-                        bold: "700",
-                    },
-                    lineHeight: {
-                        normal: "1.5",
-                        relaxed: "1.75",
-                        tight: "1.25",
-                    },
-                },
-            } as any,
+            currentTheme: themes.light,
             getColor: vi.fn(),
             getStatusColor: vi.fn(),
             isDark: false,
             setTheme: vi.fn(),
-            systemTheme: "light" as const,
-            themeManager: {} as any,
-            themeName: "light" as const,
+            systemTheme: "light",
+            themeManager: ThemeManager.getInstance(),
+            themeName: "light",
             themeVersion: 1,
             toggleTheme: vi.fn(),
-        });
+        } satisfies ReturnType<typeof useTheme>);
     });
 
     describe("Component Rendering", () => {
@@ -369,13 +333,21 @@ describe(HistoryTab, () => {
             annotate("Category: Component", "category");
             annotate("Type: Configuration", "type");
 
-            vi.mocked(useSettingsStore).mockReturnValue({
+            const settingsStoreState = {
                 settings: { historyLimit: 10 },
-                initializeSettings: vi.fn(),
-                updateSettings: vi.fn(),
                 exportSettings: vi.fn(),
                 importSettings: vi.fn(),
-            });
+                initializeSettings: vi.fn(),
+                updateSettings: vi.fn(),
+            };
+
+            mockUseSettingsStore.mockImplementation((selector?: unknown) =>
+                typeof selector === "function"
+                    ? (selector as (state: typeof settingsStoreState) => unknown)(
+                          settingsStoreState
+                      )
+                    : settingsStoreState
+            );
 
             const monitor = createMockMonitor(20);
             render(<HistoryTab {...defaultProps} selectedMonitor={monitor} />);
@@ -400,13 +372,21 @@ describe(HistoryTab, () => {
             annotate("Category: Component", "category");
             annotate("Type: Configuration", "type");
 
-            vi.mocked(useSettingsStore).mockReturnValue({
+            const settingsStoreState = {
                 settings: { historyLimit: 100 },
-                initializeSettings: vi.fn(),
-                updateSettings: vi.fn(),
                 exportSettings: vi.fn(),
                 importSettings: vi.fn(),
-            });
+                initializeSettings: vi.fn(),
+                updateSettings: vi.fn(),
+            };
+
+            mockUseSettingsStore.mockImplementation((selector?: unknown) =>
+                typeof selector === "function"
+                    ? (selector as (state: typeof settingsStoreState) => unknown)(
+                          settingsStoreState
+                      )
+                    : settingsStoreState
+            );
 
             const monitor = createMockMonitor(5);
             render(<HistoryTab {...defaultProps} selectedMonitor={monitor} />);
@@ -579,92 +559,17 @@ describe(HistoryTab, () => {
             // Change theme
             vi.mocked(useTheme).mockReturnValue({
                 availableThemes: ["light", "dark"],
-                currentTheme: {
-                    colors: {
-                        primary: {
-                            50: "#FEF2F2",
-                            100: "#FEE2E2",
-                            200: "#FECACA",
-                            300: "#FCA5A5",
-                            400: "#F87171",
-                            500: "#DC2626",
-                            600: "#B91C1C",
-                            700: "#991B1B",
-                            800: "#7F1D1D",
-                            900: "#7C2D12",
-                        },
-                        warning: "#F97316",
-                        background: {
-                            primary: "#000000",
-                            secondary: "#1F2937",
-                        },
-                        border: { primary: "#374151", secondary: "#4B5563" },
-                        error: {
-                            50: "#FEF2F2",
-                            500: "#EF4444",
-                            600: "#DC2626",
-                        },
-                        errorAlert: "#DC2626",
-                        info: "#3B82F6",
-                        success: "#10B981",
-                        successAlert: "#059669",
-                        text: { primary: "#F9FAFB", secondary: "#D1D5DB" },
-                        warningAlert: "#D97706",
-                    },
-                    spacing: {
-                        xs: "4px",
-                        sm: "8px",
-                        md: "16px",
-                        lg: "24px",
-                        xl: "32px",
-                    },
-                    borderRadius: {
-                        sm: "4px",
-                        md: "8px",
-                        lg: "12px",
-                        xl: "16px",
-                    },
-                    shadows: {
-                        sm: "0 1px 2px 0 rgba(0, 0, 0, 0.05)",
-                        md: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
-                        lg: "0 10px 15px -3px rgba(0, 0, 0, 0.1)",
-                        xl: "0 20px 25px -5px rgba(0, 0, 0, 0.1)",
-                    },
-                    typography: {
-                        fontFamily: {
-                            sans: ["Inter", "sans-serif"],
-                            mono: ["Fira Code", "monospace"],
-                        },
-                        fontSize: {
-                            xs: "12px",
-                            sm: "14px",
-                            md: "16px",
-                            lg: "18px",
-                            xl: "20px",
-                        },
-                        fontWeight: {
-                            normal: "400",
-                            medium: "500",
-                            semibold: "600",
-                            bold: "700",
-                        },
-                        lineHeight: {
-                            normal: "1.5",
-                            relaxed: "1.75",
-                            tight: "1.25",
-                        },
-                    },
-                } as any,
+                currentTheme: themes.dark,
                 getColor: vi.fn(),
                 getStatusColor: vi.fn(),
                 isDark: true,
                 setTheme: vi.fn(),
-                systemTheme: "dark" as const,
-                themeManager: {} as any,
-                themeName: "dark" as const,
+                systemTheme: "dark",
+                themeManager: ThemeManager.getInstance(),
+                themeName: "dark",
                 themeVersion: 2,
                 toggleTheme: vi.fn(),
-            });
+            } satisfies ReturnType<typeof useTheme>);
 
             rerender(<HistoryTab {...defaultProps} />);
 
@@ -764,7 +669,7 @@ describe(HistoryTab, () => {
                 timestamp: Date.now(),
                 status: "up",
                 // Missing responseTime
-            } as any;
+            } as unknown as Monitor["history"][number];
 
             expect(() =>
                 render(

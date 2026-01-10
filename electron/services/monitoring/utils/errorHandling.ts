@@ -15,6 +15,7 @@
 import type { AxiosError } from "axios";
 
 import { getUnknownErrorMessage } from "@shared/utils/errorCatalog";
+import { ensureError } from "@shared/utils/errorHandling";
 import axios from "axios";
 
 import type { MonitorCheckResult } from "../types";
@@ -69,12 +70,15 @@ export function createErrorResult(
     };
 }
 
-const CANCELLATION_ERROR_CODES = new Set(["ECONNABORTED", "ERR_CANCELED"]);
-const CANCELLATION_ERROR_NAMES = new Set([
-    "AbortError",
-    "CanceledError",
-    "TimeoutError",
-]);
+const CANCELLATION_ERROR_CODES = new Set(["ERR_CANCELED"]);
+const CANCELLATION_ERROR_NAMES = new Set(["AbortError", "CanceledError"]);
+
+const RESPONSE_TOO_LARGE_ERROR_MESSAGE =
+    "Response too large (exceeded maximum allowed size)";
+const REQUEST_TOO_LARGE_ERROR_MESSAGE =
+    "Request too large (exceeded maximum allowed size)";
+const TOO_MANY_REDIRECTS_ERROR_MESSAGE = "Too many redirects";
+const UNSUPPORTED_REDIRECT_ERROR_MESSAGE = "Redirected to an unsupported URL";
 
 function normalizeErrorCode(error: Error): string | undefined {
     const candidate: unknown = Reflect.get(error as object, "code");
@@ -150,15 +154,41 @@ export function handleAxiosError(
     responseTime: number,
     correlationId?: string
 ): MonitorCheckResult {
+    const messageText = typeof error.message === "string" ? error.message : "";
+    const messageTextLower = messageText.toLowerCase();
+
     // Network errors, timeouts, DNS failures, etc.
-    let errorMessage = error.message || "Network error";
+    let errorMessage = messageText || "Network error";
 
     const normalizedCode = normalizeErrorCode(error);
 
     if (isCancellationError(error)) {
         errorMessage = "Request canceled";
-    } else if (normalizedCode === "ECONNABORTED") {
-        errorMessage = "Request timed out";
+    } else {
+        switch (normalizedCode ?? "UNKNOWN") {
+            case "ECONNABORTED": {
+                errorMessage = "Request timed out";
+                break;
+            }
+            case "ERR_FR_TOO_MANY_REDIRECTS": {
+                errorMessage = TOO_MANY_REDIRECTS_ERROR_MESSAGE;
+                break;
+            }
+            case "UW_UNSUPPORTED_REDIRECT_AUTH":
+            case "UW_UNSUPPORTED_REDIRECT_PROTOCOL": {
+                errorMessage = UNSUPPORTED_REDIRECT_ERROR_MESSAGE;
+                break;
+            }
+            default: {
+                if (messageTextLower.includes("maxcontentlength")) {
+                    errorMessage = RESPONSE_TOO_LARGE_ERROR_MESSAGE;
+                } else if (messageTextLower.includes("maxbodylength")) {
+                    errorMessage = REQUEST_TOO_LARGE_ERROR_MESSAGE;
+                }
+
+                break;
+            }
+        }
     }
 
     if (isDev()) {
@@ -181,7 +211,6 @@ export function handleAxiosError(
  * non-Error objects, uses "Unknown error" as a fallback message. Logs all
  * errors for diagnostic purposes. Always returns a {@link MonitorCheckResult}
  * and never throws.
- *
  * @example
  *
  * ```typescript
@@ -208,6 +237,20 @@ export function handleCheckError(
     url: string,
     correlationId?: string
 ): MonitorCheckResult {
+    if (error instanceof Error) {
+        const normalizedCode = normalizeErrorCode(error);
+        if (
+            normalizedCode === "UW_UNSUPPORTED_REDIRECT_PROTOCOL" ||
+            normalizedCode === "UW_UNSUPPORTED_REDIRECT_AUTH"
+        ) {
+            return createErrorResult(
+                UNSUPPORTED_REDIRECT_ERROR_MESSAGE,
+                0,
+                correlationId
+            );
+        }
+    }
+
     const axiosError = axios.isAxiosError(error) ? error : undefined;
     const responseTime = axiosError?.responseTime ?? 0;
 
@@ -237,8 +280,21 @@ export function handleCheckError(
     // "Unknown error" fallback handles cases where thrown value isn't an Error
     // instance
     const errorMessage = getUnknownErrorMessage(error);
+    const normalizedError = ensureError(error);
+    const normalizedCode = normalizeErrorCode(normalizedError);
 
-    const logData = correlationId ? { correlationId, error } : { error };
+    const logData = correlationId
+        ? {
+              correlationId,
+              errorMessage: normalizedError.message,
+              errorName: normalizedError.name,
+              ...(normalizedCode ? { errorCode: normalizedCode } : {}),
+          }
+        : {
+              errorMessage: normalizedError.message,
+              errorName: normalizedError.name,
+              ...(normalizedCode ? { errorCode: normalizedCode } : {}),
+          };
     logger.error(`[HttpMonitor] Unexpected error checking ${url}`, logData);
 
     return createErrorResult(errorMessage, responseTime, correlationId);

@@ -5,7 +5,7 @@ import { MONITORING_CHANNELS } from "@shared/types/preload";
 import type { UptimeOrchestrator } from "../../../UptimeOrchestrator";
 
 import { createStandardizedIpcRegistrar } from "../utils";
-import { MonitoringHandlerValidators } from "../validators";
+import { MonitoringHandlerValidators } from "../validators/monitoring";
 
 /**
  * Dependencies required to register monitoring lifecycle IPC handlers.
@@ -46,7 +46,7 @@ export function registerMonitoringHandlers({
     register(
         MONITORING_CHANNELS.startMonitoringForMonitor,
         (siteIdentifier, monitorIdentifier) =>
-            uptimeOrchestrator.startMonitoringForSite(
+            uptimeOrchestrator.startMonitoringForMonitor(
                 siteIdentifier,
                 monitorIdentifier
             ),
@@ -63,7 +63,7 @@ export function registerMonitoringHandlers({
     register(
         MONITORING_CHANNELS.stopMonitoringForMonitor,
         (siteIdentifier, monitorIdentifier) =>
-            uptimeOrchestrator.stopMonitoringForSite(
+            uptimeOrchestrator.stopMonitoringForMonitor(
                 siteIdentifier,
                 monitorIdentifier
             ),

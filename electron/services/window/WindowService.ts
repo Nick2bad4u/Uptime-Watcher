@@ -1,4 +1,3 @@
-import type { Event, HandlerDetails } from "electron";
 /**
  * Window management service for Electron application windows.
  *
@@ -41,19 +40,57 @@ import { tryGetErrorCode } from "@shared/utils/errorCodes";
 import { ensureError, withErrorHandling } from "@shared/utils/errorHandling";
 import { validateExternalOpenUrlCandidate } from "@shared/utils/urlSafety";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
-import { BrowserWindow, shell } from "electron";
+import {
+    BrowserWindow,
+    type Event,
+    type HandlerDetails,
+    type WebPreferences,
+} from "electron";
 // eslint-disable-next-line unicorn/import-style -- Need namespace import for path operations
 import * as path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { isDev } from "../../electronUtils";
 import { logger } from "../../utils/logger";
+import { openExternalOrThrow } from "../shell/openExternalUtils";
 
 // ESM equivalent of currentDirectory
 // eslint-disable-next-line unicorn/prefer-import-meta-properties -- Electron main-process path resolution under ESM requires an __dirname equivalent
 const currentFilename = fileURLToPath(import.meta.url);
 // eslint-disable-next-line unicorn/prefer-import-meta-properties -- Electron main-process path resolution under ESM requires an __dirname equivalent
 const currentDirectory = path.dirname(currentFilename);
+
+const normalizePathForComparison = (value: string): string =>
+    process.platform === "win32" ? value.toLowerCase() : value;
+
+/**
+ * Returns true when `targetPath` is inside `directoryPath`.
+ *
+ * @remarks
+ * Used to ensure we never allow navigations to arbitrary `file://` URLs outside
+ * the packaged renderer bundle.
+ */
+const isPathWithinDirectory = (args: {
+    readonly directoryPath: string;
+    readonly targetPath: string;
+}): boolean => {
+    const resolvedTarget = normalizePathForComparison(
+        path.resolve(args.targetPath)
+    );
+    let resolvedDirectory = normalizePathForComparison(
+        path.resolve(args.directoryPath)
+    );
+
+    if (!resolvedDirectory.endsWith(path.sep)) {
+        resolvedDirectory = `${resolvedDirectory}${path.sep}`;
+    }
+
+    return resolvedTarget.startsWith(resolvedDirectory);
+};
+
+const PRODUCTION_DIST_DIRECTORY = path.resolve(
+    path.join(currentDirectory, "../dist")
+);
 
 /**
  * Service responsible for window management and lifecycle.
@@ -85,6 +122,23 @@ export class WindowService {
     /** Tracks whether production security headers were attached. */
     private hasAttachedProductionSecurityHeaders = false;
 
+    /**
+     * Named event handler for did-fail-load event
+     */
+    private readonly handleDidFailLoad: (
+        event: Event,
+        errorCode: number,
+        errorDescription: string
+    ) => void = (
+        _event: Event,
+        errorCode: number,
+        errorDescription: string
+    ): void => {
+        logger.error(
+            `[WindowService] Failed to load renderer: ${errorCode} - ${errorDescription}`
+        );
+    };
+
     private readonly handleWindowOpen = (
         details: HandlerDetails
     ): { action: "deny" } => {
@@ -108,6 +162,25 @@ export class WindowService {
 
         event.preventDefault();
         void this.openExternalIfSafe(url, "will-redirect");
+    };
+
+    /**
+     * Prevent attaching `<webview>` tags.
+     *
+     * @remarks
+     * Even with `webPreferences.webviewTag = false`, explicitly denying
+     * attachment provides defense-in-depth against unexpected Electron
+     * regressions or future configuration drift.
+     */
+    private readonly handleWillAttachWebview = (
+        event: Event,
+        _webPreferences: WebPreferences,
+        params: Record<string, string>
+    ): void => {
+        event.preventDefault();
+        logger.warn("[WindowService] Blocked webview attachment", {
+            src: typeof params["src"] === "string" ? params["src"] : "",
+        });
     };
 
     /**
@@ -148,19 +221,6 @@ export class WindowService {
     };
 
     /**
-     * Named event handler for did-fail-load event
-     */
-    private readonly handleDidFailLoad = (
-        _event: Event,
-        errorCode: number,
-        errorDescription: string
-    ): void => {
-        logger.error(
-            `[WindowService] Failed to load renderer: ${errorCode} - ${errorDescription}`
-        );
-    };
-
-    /**
      * Named event handler for closed event
      */
     private readonly handleClosed = (): void => {
@@ -174,25 +234,37 @@ export class WindowService {
     ): Promise<void> {
         const validation = validateExternalOpenUrlCandidate(targetUrl);
 
+        const safeUrlForLogging =
+            validation.safeUrlForLogging.length > 0
+                ? validation.safeUrlForLogging
+                : "[redacted]";
+
         if ("reason" in validation) {
             logger.warn("[WindowService] Blocked external navigation", {
                 context,
                 reason: validation.reason,
-                url: validation.safeUrlForLogging,
+                url: safeUrlForLogging,
             });
             return;
         }
 
         try {
-            await shell.openExternal(validation.normalizedUrl);
+            await openExternalOrThrow({
+                failureMessagePrefix:
+                    "[WindowService] Failed to open external navigation",
+                normalizedUrl: validation.normalizedUrl,
+                safeUrlForLogging,
+            });
         } catch (error: unknown) {
             const resolved = ensureError(error);
-            const code = tryGetErrorCode(error);
+            const code = tryGetErrorCode(
+                (resolved as { cause?: unknown }).cause ?? resolved
+            );
 
             logger.warn("[WindowService] Failed to open external navigation", {
                 context,
                 errorName: resolved.name,
-                url: validation.safeUrlForLogging,
+                url: safeUrlForLogging,
                 ...(typeof code === "string" && code.length > 0
                     ? { errorCode: code }
                     : {}),
@@ -331,16 +403,18 @@ export class WindowService {
                     controller.abort();
                 }, FETCH_TIMEOUT);
 
-                // eslint-disable-next-line no-await-in-loop -- Sequential server readiness check required
-                const response = await fetch(SERVER_URL, {
-                    signal: controller.signal,
-                });
+                try {
+                    // eslint-disable-next-line no-await-in-loop -- Sequential server readiness check required
+                    const response = await fetch(SERVER_URL, {
+                        signal: controller.signal,
+                    });
 
-                clearTimeout(timeoutId);
-
-                if (response.ok) {
-                    logger.debug("[WindowService] Vite dev server is ready");
-                    return;
+                    if (response.ok) {
+                        logger.debug("[WindowService] Vite dev server is ready");
+                        return;
+                    }
+                } finally {
+                    clearTimeout(timeoutId);
                 }
             } catch (error) {
                 // Log only significant errors or last attempt
@@ -409,7 +483,15 @@ export class WindowService {
             }
 
             if (!isDev()) {
-                return parsed.protocol === "file:";
+                if (parsed.protocol !== "file:") {
+                    return false;
+                }
+
+                const targetPath = fileURLToPath(parsed);
+                return isPathWithinDirectory({
+                    directoryPath: PRODUCTION_DIST_DIRECTORY,
+                    targetPath,
+                });
             }
 
             // In development, allow navigation within the Vite dev server origin.
@@ -497,8 +579,8 @@ export class WindowService {
             session.setPermissionCheckHandler(() => false);
             session.setPermissionRequestHandler(
                 (_webContents, _permission, callback) => {
-                    const denyPermission = false;
-                    callback(denyPermission);
+                    // eslint-disable-next-line n/no-callback-literal -- Electron permission callback expects a boolean grant flag.
+                    callback(false);
                 }
             );
 
@@ -549,6 +631,37 @@ export class WindowService {
             try {
                 const sess = this.mainWindow.webContents.session;
                 sess.webRequest.onHeadersReceived((details, callback) => {
+                    // Only documents should receive CSP and related headers.
+                    // When Electron provides resourceType, use it to avoid
+                    // mutating headers for non-document resources.
+                    if (
+                        typeof (details as { resourceType?: unknown })
+                            .resourceType === "string"
+                    ) {
+                        const { resourceType } = details as {
+                            resourceType: string;
+                        };
+                        if (
+                            resourceType !== "mainFrame" &&
+                            resourceType !== "subFrame"
+                        ) {
+                            const { responseHeaders } = details;
+                            if (!responseHeaders) {
+                                callback({ cancel: false });
+                                return;
+                            }
+
+                            callback({
+                                cancel: false,
+                                responseHeaders: responseHeaders as Record<
+                                    string,
+                                    string | string[]
+                                >,
+                            });
+                            return;
+                        }
+                    }
+
                     const headers = {
                         ...details.responseHeaders,
                     } as Record<string, string | string[]>;
@@ -668,7 +781,7 @@ export class WindowService {
      *
      * @returns Void - Method handles content loading asynchronously
      */
-    private loadContent(): void {
+    public loadContent(): void {
         if (!this.mainWindow) {
             logger.error(
                 "[WindowService] Cannot load content: main window not initialized"
@@ -736,6 +849,12 @@ export class WindowService {
             this.handleWillRedirect
         );
 
+        // Extra defense-in-depth: never allow webview tags.
+        this.mainWindow.webContents.on(
+            "will-attach-webview",
+            this.handleWillAttachWebview
+        );
+
         this.mainWindow.on("closed", this.handleClosed);
     }
 
@@ -771,6 +890,11 @@ export class WindowService {
         this.mainWindow.webContents.removeListener(
             "will-redirect",
             this.handleWillRedirect
+        );
+
+        this.mainWindow.webContents.removeListener(
+            "will-attach-webview",
+            this.handleWillAttachWebview
         );
 
         this.mainWindow.removeListener("closed", this.handleClosed);

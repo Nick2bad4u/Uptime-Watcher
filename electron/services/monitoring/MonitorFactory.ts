@@ -213,9 +213,11 @@ export function getMonitorWithResult(
 
     // Get or create service instance
     let instance = serviceInstances.get(type);
+    let didCreateInstance = false;
     if (!instance) {
         instance = factory();
         serviceInstances.set(type, instance);
+        didCreateInstance = true;
     }
 
     // Track configuration application status
@@ -224,10 +226,7 @@ export function getMonitorWithResult(
 
     // Apply configuration if provided and either forcing update or instance is
     // new
-    if (
-        config &&
-        (forceConfigUpdate || serviceInstances.get(type) === instance)
-    ) {
+    if (config && (forceConfigUpdate || didCreateInstance)) {
         try {
             instance.updateConfig(config);
             // ConfigurationApplied remains true
@@ -253,7 +252,7 @@ export function getMonitorWithResult(
         // Config was provided but not applied (existing instance, no force)
         configurationApplied = false;
         configurationError =
-            "Configuration not applied to existing instance (use forceConfigUpdate=true)";
+            "Configuration not applied to cached instance (use forceConfigUpdate=true)";
     }
 
     return {

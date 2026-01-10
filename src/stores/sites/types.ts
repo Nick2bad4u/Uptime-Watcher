@@ -8,21 +8,24 @@
  * @packageDocumentation
  */
 
-import type { Monitor, Site, StatusUpdate } from "@shared/types";
+import type { Site } from "@shared/types";
 import type {
     SerializedDatabaseBackupResult,
+    SerializedDatabaseBackupSaveResult,
     SerializedDatabaseRestorePayload,
     SerializedDatabaseRestoreResult,
 } from "@shared/types/ipc";
 import type {
     SiteSyncDelta,
-    StateSyncStatusSummary,
 } from "@shared/types/stateSync";
 import type { Simplify } from "type-fest";
 
 import type {
-    StatusUpdateSubscriptionSummary,
-    StatusUpdateUnsubscribeResult,
+    BaseSiteMonitoring,
+    BaseSiteOperations,
+    BaseSiteState,
+    BaseSiteSubscriptions,
+    BaseSiteSync,
 } from "./baseTypes";
 import type { SitesState as SitesStateShape } from "./useSitesState";
 
@@ -34,24 +37,7 @@ import type { SitesState as SitesStateShape } from "./useSitesState";
  * monitoring action factory ({@link createSiteMonitoringActions}). Keeping the
  * contract in one place prevents drift.
  */
-export interface SiteMonitoringActions {
-    /** Check a site now */
-    checkSiteNow: (siteIdentifier: string, monitorId: string) => Promise<void>;
-    /** Start monitoring for all monitors of a site */
-    startSiteMonitoring: (siteIdentifier: string) => Promise<void>;
-    /** Start monitoring for a site monitor */
-    startSiteMonitorMonitoring: (
-        siteIdentifier: string,
-        monitorId: string
-    ) => Promise<void>;
-    /** Stop monitoring for all monitors of a site */
-    stopSiteMonitoring: (siteIdentifier: string) => Promise<void>;
-    /** Stop monitoring for a site monitor */
-    stopSiteMonitorMonitoring: (
-        siteIdentifier: string,
-        monitorId: string
-    ) => Promise<void>;
-}
+export type SiteMonitoringActions = BaseSiteMonitoring;
 
 /**
  * Sites store actions interface for managing site operations.
@@ -62,29 +48,12 @@ export interface SiteMonitoringActions {
  *
  * @public
  */
-export interface SitesActions extends SiteMonitoringActions {
-    /** Add a monitor to an existing site */
-    addMonitorToSite: (
-        siteIdentifier: string,
-        monitor: Monitor
-    ) => Promise<void>;
-    /** Add a site to the store */
-    addSite: (site: Site) => void;
-    /** Create a new site */
-    createSite: (siteData: {
-        /** Unique site identifier used across layers */
-        identifier: string;
-        /** Optional initial monitoring state; defaults to enabled when omitted */
-        monitoring?: boolean;
-        /** Optional initial monitor configuration for the site */
-        monitors?: Monitor[];
-        /** Optional human-readable site name */
-        name?: string;
-    }) => Promise<void>;
-    /** Delete a site */
-    deleteSite: (identifier: string) => Promise<void>;
-    /** Download SQLite backup */
-    downloadSqliteBackup: () => Promise<SerializedDatabaseBackupResult>;
+export interface SitesActions
+    extends BaseSiteOperations,
+        BaseSiteState,
+        BaseSiteSubscriptions,
+        BaseSiteSync,
+        SiteMonitoringActions {
     /**
      * Performs complete resynchronization of all sites data from backend.
      *
@@ -95,13 +64,6 @@ export interface SitesActions extends SiteMonitoringActions {
      *
      * @returns Promise that resolves when full resync is complete
      */
-    fullResyncSites: () => Promise<void>;
-    /** Get selected monitor ID for a site */
-    getSelectedMonitorId: (siteIdentifier: string) => string | undefined;
-    /** Get the currently selected site */
-    getSelectedSite: () => Site | undefined;
-    /** Get sync status */
-    getSyncStatus: () => Promise<StateSyncStatusSummary>;
     /** Initialize sites data from backend */
     initializeSites: () => Promise<{
         /** Descriptive message about the initialization result */
@@ -115,91 +77,10 @@ export interface SitesActions extends SiteMonitoringActions {
     modifySite: (identifier: string, updates: Partial<Site>) => Promise<void>;
     /** Record latest site synchronization delta information */
     recordSiteSyncDelta: (delta: SiteSyncDelta | undefined) => void;
-    /** Remove a monitor from the store */
-    removeMonitorFromSite: (
-        siteIdentifier: string,
-        monitorId: string
-    ) => Promise<void>;
-    /** Remove a site from the store */
-    removeSite: (identifier: string) => void;
-    /** Restore SQLite backup */
-    restoreSqliteBackup: (
-        payload: SerializedDatabaseRestorePayload
-    ) => Promise<SerializedDatabaseRestoreResult>;
-    /** Retry status update subscription */
-    retryStatusSubscription: (
-        callback?: (update: StatusUpdate) => void
-    ) => Promise<StatusUpdateSubscriptionSummary>;
-    /**
-     * Selects a site for focused operations and UI display.
-     *
-     * @remarks
-     * Updates the currently selected site with proper state management. This
-     * method provides clear site selection semantics for better code
-     * readability.
-     *
-     * @param site - Site to select, or undefined to clear selection
-     */
-    selectSite: (site: Site | undefined) => void;
     /** Persist latest backup metadata for UI diagnostics */
     setLastBackupMetadata: (
         metadata: SerializedDatabaseBackupResult["metadata"] | undefined
     ) => void;
-    /** Set selected monitor ID for a site */
-    setSelectedMonitorId: (siteIdentifier: string, monitorId: string) => void;
-    /** Set sites data */
-    setSites: (sites: Site[]) => void;
-    /** Persist subscription diagnostics for status updates */
-    setStatusSubscriptionSummary: (
-        summary: StatusUpdateSubscriptionSummary | undefined
-    ) => void;
-    /** Subscribe to status updates */
-    subscribeToStatusUpdates: (
-        callback?: (update: StatusUpdate) => void
-    ) => Promise<StatusUpdateSubscriptionSummary>;
-    /** Subscribe to sync events */
-    subscribeToSyncEvents: () => () => void;
-    /**
-     * Synchronizes sites data with backend while preserving local state.
-     *
-     * @remarks
-     * Updates local sites data by fetching changes from the backend without
-     * clearing existing state. This method preserves local modifications and
-     * merges backend updates efficiently.
-     *
-     * @returns Promise that resolves when sync is complete
-     */
-    syncSites: () => Promise<void>;
-    /** Unsubscribe from status updates */
-    unsubscribeFromStatusUpdates: () => StatusUpdateUnsubscribeResult;
-    /** Update monitor retry attempts */
-    updateMonitorRetryAttempts: (
-        siteIdentifier: string,
-        monitorId: string,
-        /**
-         * New retry-attempts value. When `undefined`, the existing value is
-         * preserved while still going through the shared monitor update
-         * pipeline.
-         */
-        retryAttempts: number | undefined
-    ) => Promise<void>;
-    /** Update monitor timeout */
-    updateMonitorTimeout: (
-        siteIdentifier: string,
-        monitorId: string,
-        /**
-         * New timeout value in milliseconds. When `undefined`, the existing
-         * timeout is preserved while still exercising the shared update helpers
-         * for consistency and logging.
-         */
-        timeout: number | undefined
-    ) => Promise<void>;
-    /** Update site check interval */
-    updateSiteCheckInterval: (
-        siteIdentifier: string,
-        monitorId: string,
-        interval: number
-    ) => Promise<void>;
 }
 
 /**
@@ -255,7 +136,7 @@ export interface SiteOperationsServiceDependencies {
     /** Data export operations */
     data: Pick<
         DataBackupService,
-        "downloadSqliteBackup" | "restoreSqliteBackup"
+        "downloadSqliteBackup" | "restoreSqliteBackup" | "saveSqliteBackup"
     >;
     /** Site service operations */
     site: Pick<
@@ -277,4 +158,5 @@ interface DataBackupService {
     restoreSqliteBackup: (
         payload: SerializedDatabaseRestorePayload
     ) => Promise<SerializedDatabaseRestoreResult>;
+    saveSqliteBackup: () => Promise<SerializedDatabaseBackupSaveResult>;
 }

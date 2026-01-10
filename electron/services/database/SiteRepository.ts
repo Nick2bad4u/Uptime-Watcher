@@ -45,6 +45,7 @@
  * ```
  */
 import type { Database } from "node-sqlite3-wasm";
+import type { UnknownRecord } from "type-fest";
 
 import { DEFAULT_SITE_NAME } from "@shared/constants/sites";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
@@ -423,7 +424,7 @@ export class SiteRepository {
     private async runSiteReadOperation<TResult>(
         operationName: string,
         handler: (db: Database) => TResult,
-        metadata?: Record<string, unknown>
+        metadata?: UnknownRecord
     ): Promise<TResult> {
         return withDatabaseOperation(
             () => {
@@ -523,7 +524,7 @@ export class SiteRepository {
                 // Apply consistent data normalization
                 const name = site.name ?? SITE_DEFAULTS.NAME;
                 const monitoring = site.monitoring ?? SITE_DEFAULTS.MONITORING;
-                const monitoringValue = monitoring ? 1 : 0;
+                const monitoringValue: 0 | 1 = monitoring ? 1 : 0;
 
                 stmt.run([
                     site.identifier,
@@ -619,7 +620,7 @@ export class SiteRepository {
         assertValidSiteIdentifier(identifier, "SiteRepository.upsertInternal");
         const name = site.name ?? SITE_DEFAULTS.NAME;
         const monitoring = site.monitoring ?? SITE_DEFAULTS.MONITORING;
-        const monitoringValue = monitoring ? 1 : 0;
+        const monitoringValue: 0 | 1 = monitoring ? 1 : 0;
 
         db.run(SITE_QUERIES.UPSERT, [
             identifier,

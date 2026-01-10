@@ -9,7 +9,7 @@ import {
 import type { NotificationService } from "../../notifications/NotificationService";
 
 import { createStandardizedIpcRegistrar } from "../utils";
-import { NotificationHandlerValidators } from "../validators";
+import { NotificationHandlerValidators } from "../validators/notifications";
 
 interface NormalizedNotificationPreferences {
     readonly enabled: boolean;

@@ -11,57 +11,59 @@
 
 import { hasAsciiControlCharacters } from "@shared/utils/stringSafety";
 import { getUtfByteLength } from "@shared/utils/utfByteLength";
-import { isValidUrl } from "@shared/validation/validatorUtils";
+import validator from "validator";
 
 /** Maximum accepted UTF-8 byte budget for user-supplied external-open URLs. */
 const MAX_EXTERNAL_OPEN_URL_BYTES = 4096;
 
 const SAFE_URL_SUSPECT_SEGMENT_MIN_LENGTH = 32;
 
+/** Fallback placeholder when a user-supplied URL cannot be safely represented in logs. */
+const FALLBACK_SAFE_URL_FOR_LOGGING = "[redacted]";
+
 /**
  * Result of validating and normalizing a URL intended for external opening.
  *
- * @public
- */
-export type ExternalOpenUrlValidationResult =
-    | {
-          /** The trimmed, normalized URL string safe to pass to `openExternal`. */
-          readonly normalizedUrl: string;
-          readonly ok: true;
-          /** A redacted representation safe for logs and user-facing errors. */
-          readonly safeUrlForLogging: string;
-      }
-    | {
-          readonly ok: false;
-          /**
-           * A short message fragment starting with "must" suitable for
-           * prefixing with a field name (e.g. "url").
-           */
-          readonly reason: string;
-          /** A redacted representation safe for logs and user-facing errors. */
-          readonly safeUrlForLogging: string;
-      };
-
-/**
- * Validates and normalizes a URL intended to be opened via
- * `shell.openExternal`.
- *
  * @remarks
- * This helper is used at multiple trust boundaries (renderer input, IPC
- * validators, and main-process handlers). Keeping the policy here prevents
- * subtle inconsistencies (e.g. allowing `mailto:` in one layer but rejecting it
- * in another).
- *
- * Policy:
- *
- * - Allows only `http:`, `https:`, and `mailto:`.
- * - Rejects credentials.
- * - Rejects CR/LF characters.
- * - For `http(s)` additionally applies stricter URL validation
- *   ({@link isValidUrl}) with credentials disallowed.
- *
- * @param rawUrl - Untrusted URL candidate.
+ * `safeUrlForLogging` is always present, allowing callers to log failures
+ * without additional guards.
  */
+export type ExternalOpenUrlRejectedResult = Readonly<{
+    ok: false;
+    /**
+     * A short message fragment starting with "must" suitable for prefixing with
+     * a field name (e.g. "url").
+     */
+    reason: string;
+    /** A redacted representation safe for logs and user-facing errors. */
+    safeUrlForLogging: string;
+}>;
+
+/** Accepted result from {@link validateExternalOpenUrlCandidate}. */
+export type ExternalOpenUrlAcceptedResult = Readonly<{
+    /** A normalized URL safe to pass to Electron's `shell.openExternal()`. */
+    normalizedUrl: string;
+    ok: true;
+    /** A redacted representation safe for logs and user-facing errors. */
+    safeUrlForLogging: string;
+}>;
+
+/** Discriminated union result from {@link validateExternalOpenUrlCandidate}. */
+export type ExternalOpenUrlValidationResult =
+    | ExternalOpenUrlAcceptedResult
+    | ExternalOpenUrlRejectedResult;
+
+function getRedactedPathname(pathname: string): string {
+    return pathname
+        .split("/")
+        .map((segment) =>
+            segment.length >= SAFE_URL_SUSPECT_SEGMENT_MIN_LENGTH
+                ? "[redacted]"
+                : segment
+        )
+        .join("/");
+}
+
 /**
  * Removes sensitive URL parts so log lines don't leak credentials or tokens.
  *
@@ -90,19 +92,115 @@ export function getSafeUrlForLogging(rawUrl: string): string {
 
         // Remove query strings and hashes to avoid logging secrets.
         // Additionally, redact suspiciously-long path segments (tokens, IDs).
-        const safePath = url.pathname
-            .split("/")
-            .map((segment) =>
-                segment.length >= SAFE_URL_SUSPECT_SEGMENT_MIN_LENGTH
-                    ? "[redacted]"
-                    : segment
-            )
-            .join("/");
+        const safePath = getRedactedPathname(url.pathname);
 
         return `${url.origin}${safePath}`;
     } catch {
         return "[unparseable-url]";
     }
+}
+
+type HttpUrlNormalizationResult =
+    | ExternalOpenUrlAcceptedResult
+    | ExternalOpenUrlRejectedResult;
+
+function getFirstQueryOrHashIndex(url: string): number {
+    const queryIndex = url.indexOf("?");
+    const hashIndex = url.indexOf("#");
+
+    if (queryIndex === -1) {
+        return hashIndex;
+    }
+
+    if (hashIndex === -1) {
+        return queryIndex;
+    }
+
+    return Math.min(queryIndex, hashIndex);
+}
+
+function hasSpaceBeforeQueryOrHash(url: string): boolean {
+    const delimiterIndex = getFirstQueryOrHashIndex(url);
+    const prefix = delimiterIndex === -1 ? url : url.slice(0, delimiterIndex);
+    return prefix.includes(" ");
+}
+
+function isValidHttpUrlWithValidator(url: string): boolean {
+    return validator.isURL(url, {
+        allow_protocol_relative_urls: false,
+        disallow_auth: true,
+        protocols: ["http", "https"],
+        require_host: true,
+        require_protocol: true,
+        // Allow localhost-style hosts. We intentionally do *not* block
+        // private-network hosts for external opening.
+        require_tld: false,
+    });
+}
+
+function tryNormalizeHttpUrlViaWhatwg(url: string): null | string {
+    try {
+        return new URL(url).toString();
+    } catch {
+        return null;
+    }
+}
+
+function normalizeHttpUrlForExternalOpen(args: {
+    safeUrlForLogging: string;
+    url: string;
+}): HttpUrlNormalizationResult {
+    if (isValidHttpUrlWithValidator(args.url)) {
+        return {
+            normalizedUrl: args.url,
+            ok: true,
+            safeUrlForLogging: getSafeUrlForLogging(args.url),
+        };
+    }
+
+    // Keep a strict stance on path whitespace: if spaces appear before the
+    // query/hash delimiter, treat it as invalid rather than "fixing" it.
+    // This preserves our existing security posture and UX.
+    if (hasSpaceBeforeQueryOrHash(args.url)) {
+        return {
+            ok: false,
+            reason: "must be a valid http(s) URL",
+            safeUrlForLogging: args.safeUrlForLogging,
+        };
+    }
+
+    const normalizedViaWhatwg = tryNormalizeHttpUrlViaWhatwg(args.url);
+    if (!normalizedViaWhatwg) {
+        return {
+            ok: false,
+            reason: "must be a valid http(s) URL",
+            safeUrlForLogging: args.safeUrlForLogging,
+        };
+    }
+
+    // Encoding (e.g. spaces -> %20) can grow the URL slightly; enforce the
+    // byte budget on the normalized representation.
+    if (getUtfByteLength(normalizedViaWhatwg) > MAX_EXTERNAL_OPEN_URL_BYTES) {
+        return {
+            ok: false,
+            reason: `must not exceed ${MAX_EXTERNAL_OPEN_URL_BYTES} bytes`,
+            safeUrlForLogging: args.safeUrlForLogging,
+        };
+    }
+
+    if (!isValidHttpUrlWithValidator(normalizedViaWhatwg)) {
+        return {
+            ok: false,
+            reason: "must be a valid http(s) URL",
+            safeUrlForLogging: args.safeUrlForLogging,
+        };
+    }
+
+    return {
+        normalizedUrl: normalizedViaWhatwg,
+        ok: true,
+        safeUrlForLogging: getSafeUrlForLogging(normalizedViaWhatwg),
+    };
 }
 
 function toIpvOctets(
@@ -263,7 +361,7 @@ export function isAllowedExternalOpenUrl(rawUrl: string): boolean {
 export function validateExternalOpenUrlCandidate(
     rawUrl: unknown
 ): ExternalOpenUrlValidationResult {
-    let safeUrlForLogging = "";
+    let safeUrlForLogging = FALLBACK_SAFE_URL_FOR_LOGGING;
 
     if (typeof rawUrl !== "string") {
         return {
@@ -273,7 +371,7 @@ export function validateExternalOpenUrlCandidate(
         };
     }
 
-    const normalizedUrl = rawUrl.trim();
+    let normalizedUrl = rawUrl.trim();
 
     if (
         normalizedUrl.length > 0 &&
@@ -316,21 +414,6 @@ export function validateExternalOpenUrlCandidate(
         };
     }
 
-    // For hierarchical URLs, enforce the stricter validator.js checks.
-    if (
-        (normalizedUrl.startsWith("http:") ||
-            normalizedUrl.startsWith("https:")) &&
-        !isValidUrl(normalizedUrl, {
-            disallowAuth: true,
-        })
-    ) {
-        return {
-            ok: false,
-            reason: "must be a valid http(s) URL",
-            safeUrlForLogging,
-        };
-    }
-
     if (!isAllowedExternalOpenUrl(normalizedUrl)) {
         return {
             ok: false,
@@ -339,10 +422,43 @@ export function validateExternalOpenUrlCandidate(
         };
     }
 
+    const normalizedUrlLower = normalizedUrl.toLowerCase();
+
+    // For hierarchical URLs, enforce the stricter validator.js checks.
+    if (
+        normalizedUrlLower.startsWith("http:") ||
+        normalizedUrlLower.startsWith("https:")
+    ) {
+        const normalizedHttpUrl = normalizeHttpUrlForExternalOpen({
+            safeUrlForLogging,
+            url: normalizedUrl,
+        });
+
+        if (!normalizedHttpUrl.ok) {
+            return normalizedHttpUrl;
+        }
+
+        const { normalizedUrl: normalizedHttpUrlString } = normalizedHttpUrl;
+        normalizedUrl = normalizedHttpUrlString;
+    }
+
+    if (normalizedUrlLower.startsWith("mailto:")) {
+        const mailtoUrl = new URL(normalizedUrl);
+        const email = mailtoUrl.pathname;
+        if (!validator.isEmail(email)) {
+            return {
+                ok: false,
+                reason: "mailto URL must include a valid email address",
+                safeUrlForLogging,
+            };
+        }
+    }
+
     return {
         normalizedUrl,
         ok: true,
-        safeUrlForLogging,
+        // Ensure logging uses a canonical representation (query/hash stripped).
+        safeUrlForLogging: getSafeUrlForLogging(normalizedUrl),
     };
 }
 
@@ -485,4 +601,79 @@ export function isPrivateNetworkHostname(hostname: string): boolean {
     }
 
     return false;
+}
+
+/**
+ * Returns a sanitized HTTP(S) URL safe to send to third-party services.
+ *
+ * @remarks
+ * This is stricter than {@link getSafeUrlForLogging} because the output must
+ * be a *valid* URL that a third-party can request.
+ *
+ * - Allows only `http:` and `https:`.
+ * - Rejects credentials.
+ * - Rejects CR/LF and ASCII control characters.
+ * - Rejects private/local hostnames (see {@link isPrivateNetworkHostname}).
+ * - Strips query string and hash.
+ * - Redacts suspiciously-long path segments to reduce secret leakage.
+ *
+ * @param rawUrl - Untrusted URL candidate.
+ *
+ * @returns A safe URL string, or null when the input should not be sent.
+ */
+export function tryGetSafeThirdPartyHttpUrl(rawUrl: string): null | string {
+    if (typeof rawUrl !== "string") {
+        return null;
+    }
+
+    const normalized = rawUrl.trim();
+    if (normalized.length === 0) {
+        return null;
+    }
+
+    if (getUtfByteLength(normalized) > MAX_EXTERNAL_OPEN_URL_BYTES) {
+        return null;
+    }
+
+    if (/[\n\r]/u.test(normalized)) {
+        return null;
+    }
+
+    if (hasAsciiControlCharacters(normalized)) {
+        return null;
+    }
+
+    const parsed = ((): null | URL => {
+        try {
+            return new URL(normalized);
+        } catch {
+            return null;
+        }
+    })();
+
+    if (!parsed) {
+        return null;
+    }
+
+    if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
+        return null;
+    }
+
+    if (parsed.username.length > 0 || parsed.password.length > 0) {
+        return null;
+    }
+
+    if (parsed.hostname.length === 0) {
+        return null;
+    }
+
+    if (isPrivateNetworkHostname(parsed.hostname)) {
+        return null;
+    }
+
+    parsed.search = "";
+    parsed.hash = "";
+
+    const safePath = getRedactedPathname(parsed.pathname);
+    return `${parsed.origin}${safePath}`;
 }

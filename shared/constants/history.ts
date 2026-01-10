@@ -23,6 +23,28 @@ export interface HistoryLimitRules {
 }
 
 /**
+ * Error thrown when a history limit candidate exceeds the configured maximum.
+ *
+ * @remarks
+ * This is a specialized {@link RangeError} so callers can branch on the error
+ * type without parsing message strings.
+ */
+export class HistoryLimitMaximumExceededError extends RangeError {
+    public readonly maxLimit: number;
+
+    public readonly candidate: number;
+
+    public constructor(args: { candidate: number; maxLimit: number }) {
+        super(
+            `History limit exceeds maximum of ${args.maxLimit}, received: ${args.candidate}`
+        );
+        this.name = "HistoryLimitMaximumExceededError";
+        this.candidate = args.candidate;
+        this.maxLimit = args.maxLimit;
+    }
+}
+
+/**
  * Canonical history limit rules shared by all layers.
  */
 export const DEFAULT_HISTORY_LIMIT_RULES: HistoryLimitRules = Object.freeze({
@@ -44,7 +66,7 @@ export const DEFAULT_HISTORY_LIMIT: number =
  * Validates that the candidate is a finite number within the supported bounds,
  * then clamps values below the minimum to the configured minimum while treating
  * zero or negative inputs as "unlimited" (represented as `0`). Fractional
- * values above the minimum are preserved to avoid surprising the caller.
+ * values above the minimum are floored.
  *
  * @param candidate - History limit provided by a consumer.
  * @param rules - Rules to use when normalising the value. Defaults to the
@@ -52,8 +74,9 @@ export const DEFAULT_HISTORY_LIMIT: number =
  *
  * @returns The normalised history limit ready for persistence.
  *
- * @throws TypeError - When the candidate is not a finite number or integer.
- * @throws RangeError - When the candidate exceeds the configured maximum.
+ * @throws TypeError - When the candidate cannot be coerced into a number.
+ * @throws RangeError - When the candidate is non-finite (for example
+ *   `Infinity`) or exceeds the configured maximum.
  */
 export function normalizeHistoryLimit(
     candidate: number,
@@ -61,7 +84,7 @@ export function normalizeHistoryLimit(
 ): number {
     if (typeof candidate !== "number" || Number.isNaN(candidate)) {
         throw new TypeError(
-            `History limit must be a finite number, received: ${String(candidate)}`
+            `History limit must be a number, received: ${String(candidate)}`
         );
     }
 
@@ -72,9 +95,10 @@ export function normalizeHistoryLimit(
     }
 
     if (candidate > rules.maxLimit) {
-        throw new RangeError(
-            `History limit exceeds maximum of ${rules.maxLimit}, received: ${candidate}`
-        );
+        throw new HistoryLimitMaximumExceededError({
+            candidate,
+            maxLimit: rules.maxLimit,
+        });
     }
 
     if (candidate <= 0) {

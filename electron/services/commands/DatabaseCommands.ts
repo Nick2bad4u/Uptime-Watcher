@@ -28,6 +28,7 @@ import type { EventKey, TypedEventBus } from "../../events/TypedEventBus";
 import type { ConfigurationManager } from "../../managers/ConfigurationManager";
 import type { StandardizedCache } from "../../utils/cache/StandardizedCache";
 import type {
+    DatabaseBackupMetadata,
     DatabaseBackupResult,
     DatabaseRestorePayload,
     DatabaseRestoreSummary,
@@ -468,6 +469,52 @@ export class DownloadBackupCommand extends DatabaseCommand<DatabaseBackupResult>
 
     public getDescription(): string {
         return "Download SQLite database backup";
+    }
+}
+
+/**
+ * Command for saving a SQLite database backup directly to disk.
+ *
+ * @remarks
+ * This command exists to support backup workflows that should not load the
+ * entire backup into memory (e.g. large databases). The command delegates to
+ * {@link DataBackupService.saveDatabaseBackupToPath}.
+ */
+export class SaveBackupToPathCommand extends DatabaseCommand<DatabaseBackupMetadata> {
+    private readonly targetPath: string;
+
+    public async rollback(): Promise<void> {
+        // Backup save operations are best-effort; we do not attempt to delete
+        // user-written files automatically.
+    }
+
+public async validate(): Promise<{ errors: string[]; isValid: boolean }> {
+        await Promise.resolve();
+        return { errors: [], isValid: true };
+    }
+
+public async execute(): Promise<DatabaseBackupMetadata> {
+        const dataBackupService = this.serviceFactory.createBackupService();
+        return dataBackupService.saveDatabaseBackupToPath(this.targetPath);
+    }
+
+
+
+
+
+public constructor(context: DatabaseCommandContext & { targetPath: string }) {
+        super(context);
+        this.targetPath = context.targetPath;
+    }
+
+
+
+
+
+
+
+    public getDescription(): string {
+        return "Save SQLite database backup to disk";
     }
 }
 

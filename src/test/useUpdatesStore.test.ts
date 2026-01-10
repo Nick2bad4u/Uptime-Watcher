@@ -11,10 +11,14 @@ import type { UpdateStatus } from "../stores/types";
 
 import { useUpdatesStore } from "../stores/updates/useUpdatesStore";
 
-// Mock the logger
-vi.mock("../stores/utils", () => ({
-    logStoreAction: vi.fn(),
-}));
+// Mock the logger (partial) so createPersistConfig remains available.
+vi.mock("../stores/utils", async (importOriginal) => {
+    const actual = await importOriginal<typeof import("../stores/utils")>();
+    return {
+        ...actual,
+        logStoreAction: vi.fn(),
+    };
+});
 
 // Mock window.electronAPI with fresh mock function
 const mockElectronAPIQuitAndInstall = vi.fn();

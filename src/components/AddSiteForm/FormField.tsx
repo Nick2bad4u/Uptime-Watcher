@@ -42,6 +42,9 @@ import type { FormFieldBaseProperties } from "@shared/types/componentProps";
 import { memo, type NamedExoticComponent, type ReactNode } from "react";
 
 import { ThemedText } from "../../theme/components/ThemedText";
+import { AppIcons } from "../../utils/icons";
+
+const HelpIcon = AppIcons.ui.info;
 
 /**
  * Properties for the FormField component.
@@ -107,9 +110,16 @@ export const FormField: NamedExoticComponent<FormFieldProperties> = memo(
                     </div>
                 ) : null}
                 {helpText && !error ? (
-                    <div id={`${id}-help`}>
+                    <div
+                        className="mt-1 flex items-start gap-2"
+                        id={`${id}-help`}
+                    >
+                        <HelpIcon
+                            aria-hidden="true"
+                            className="mt-0.5 h-4 w-4 shrink-0 opacity-70"
+                        />
                         <ThemedText
-                            className="mt-1"
+                            className="leading-snug"
                             size="xs"
                             variant="tertiary"
                         >

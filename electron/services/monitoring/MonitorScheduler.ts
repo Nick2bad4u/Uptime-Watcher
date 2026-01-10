@@ -2,6 +2,7 @@ import type { Site } from "@shared/types";
 import type { Logger } from "@shared/utils/logger/interfaces";
 
 import { generateCorrelationId } from "@shared/utils/correlation";
+import { ensureError } from "@shared/utils/errorHandling";
 import { randomInt } from "node:crypto";
 
 import type { UptimeEvents } from "../../events/eventTypes";
@@ -28,22 +29,14 @@ const noopEventEmitter: MonitorSchedulerEventBus = {
     },
 };
 
-class MonitorJobTimeoutError extends Error {
-    public readonly timeoutMs: number;
-
-    public constructor(timeoutMs: number) {
-        super(`Monitor job exceeded timeout after ${timeoutMs}ms`);
-        this.name = "MonitorJobTimeoutError";
-        this.timeoutMs = timeoutMs;
-    }
-}
-
 interface MonitorJob {
+    abortController: AbortController | undefined;
     backoffAttempt: number;
     baseIntervalMs: number;
     correlationId: string;
     isRunning: boolean;
     monitorId: string;
+    needsReschedule: boolean;
     siteIdentifier: string;
     timeoutMs: number;
     timer: NodeJS.Timeout | undefined;
@@ -53,9 +46,11 @@ interface MonitorJobSnapshot {
     backoffAttempt: number;
     baseIntervalMs: number;
     correlationId: string;
+    hasAbortController: boolean;
     hasTimer: boolean;
     isRunning: boolean;
     monitorId: string;
+    needsReschedule: boolean;
     siteIdentifier: string;
     timeoutMs: number;
 }
@@ -73,7 +68,9 @@ interface MonitorJobSnapshot {
  *
  * ```typescript
  * const scheduler = new MonitorScheduler();
- * scheduler.setCheckCallback(async (siteIdentifier, monitorId) => { ... });
+ * scheduler.setCheckCallback(async (siteIdentifier, monitorId, signal) => {
+ *     // Optional: respect signal.aborted for timeouts.
+ * });
  * scheduler.startSite(siteObj);
  * ```
  *
@@ -105,14 +102,17 @@ export class MonitorScheduler {
      *
      * @param siteIdentifier - Unique identifier for the site.
      * @param monitorId - Unique identifier for the monitor.
-     *
-     * @returns Promise resolving when the check completes.
+    * @param signal - Abort signal that is aborted when the scheduler times out
+    *   (and also when monitoring is stopped for the job).
+    *
+    * @returns Promise resolving when the check completes.
      *
      * @internal
      */
     private onCheckCallback?: (
         siteIdentifier: string,
-        monitorId: string
+        monitorId: string,
+        signal: AbortSignal
     ) => Promise<void>;
 
     private async runJob(intervalKey: string): Promise<void> {
@@ -135,51 +135,125 @@ export class MonitorScheduler {
             this.logger.warn(
                 `[MonitorScheduler] Job already running; skipping overlapping trigger for ${intervalKey}`
             );
+            // Avoid timer churn: reschedule only once the in-flight check
+            // settles.
+            job.needsReschedule = true;
             return;
         }
 
         job.isRunning = true;
+        const abortController = new AbortController();
+        job.abortController = abortController;
+        const timeoutState = { timedOut: false };
+        const timeoutRef: { handle: NodeJS.Timeout | null } = { handle: null };
+
+        const checkPromise = (async (): Promise<
+            | { error: Error; kind: "error" }
+            | { kind: "cancelled" }
+            | { kind: "success" }
+        > => {
+            try {
+                await checkOperation(
+                    job.siteIdentifier,
+                    job.monitorId,
+                    abortController.signal
+                );
+                    return { kind: "success" };
+            } catch (error: unknown) {
+                // If a timeout has already fired, treat any subsequent errors
+                // as noise (often abort-related) and avoid double-counting.
+                if (timeoutState.timedOut) {
+                    return { kind: "success" };
+                }
+
+                if (abortController.signal.aborted) {
+                    return { kind: "cancelled" };
+                }
+
+                return { error: ensureError(error), kind: "error" };
+            } finally {
+                // Important: if we timed out, keep the job marked as running
+                // until the underlying async work settles so we don't run
+                // overlapping checks.
+                const currentJob = this.jobs.get(intervalKey);
+                if (currentJob === job) {
+                    currentJob.abortController = undefined;
+
+                    if (timeoutState.timedOut) {
+                        currentJob.isRunning = false;
+                        if (currentJob.needsReschedule) {
+                            currentJob.needsReschedule = false;
+                            this.scheduleNextRun(intervalKey);
+                        }
+                    }
+                }
+            }
+        })();
+
+        const timeoutPromise = new Promise<{ kind: "timeout" }>((resolve) => {
+            timeoutRef.handle = setTimeout(() => {
+                timeoutState.timedOut = true;
+                abortController.abort("Monitor job timed out");
+                resolve({ kind: "timeout" });
+            }, job.timeoutMs);
+        });
 
         try {
-            await this.executeWithTimeout(job, checkOperation);
-            job.backoffAttempt = 0;
-        } catch (error) {
-            if (error instanceof MonitorJobTimeoutError) {
-                this.emitMonitorTimeoutEvent(job, error.timeoutMs);
-            } else {
-                this.logger.error(
-                    `[MonitorScheduler] Error during monitor job for ${intervalKey}`,
-                    error
-                );
+            const result = await Promise.race([checkPromise, timeoutPromise]);
+
+            const currentJob = this.jobs.get(intervalKey);
+            if (currentJob !== job) {
+                return;
             }
 
-            job.backoffAttempt += 1;
+            switch (result.kind) {
+                case "cancelled": {
+                    currentJob.backoffAttempt = 0;
+                    break;
+                }
+                case "error": {
+                    this.logger.error(
+                        `[MonitorScheduler] Error during monitor job for ${intervalKey}`,
+                        result.error
+                    );
+                    currentJob.backoffAttempt += 1;
+                    break;
+                }
+                case "success": {
+                    currentJob.backoffAttempt = 0;
+                    break;
+                }
+                case "timeout": {
+                    this.emitMonitorTimeoutEvent(currentJob, currentJob.timeoutMs);
+                    currentJob.backoffAttempt += 1;
+                    currentJob.needsReschedule = true;
+                    break;
+                }
+                default: {
+                    currentJob.backoffAttempt += 1;
+                    break;
+                }
+            }
         } finally {
-            job.isRunning = false;
-            if (this.jobs.has(intervalKey)) {
+            if (timeoutRef.handle) {
+                clearTimeout(timeoutRef.handle);
+                timeoutRef.handle = null;
+            }
+
+            if (!timeoutState.timedOut) {
+                const currentJob = this.jobs.get(intervalKey);
+                if (currentJob === job) {
+                    currentJob.isRunning = false;
+                    currentJob.abortController = undefined;
+                }
+            }
+
+            const currentJob = this.jobs.get(intervalKey);
+            // If we timed out, rescheduling is deferred until the underlying
+            // check settles (see checkPromise.finally) to avoid timer churn.
+            if (currentJob === job && !timeoutState.timedOut) {
                 this.scheduleNextRun(intervalKey);
             }
-        }
-    }
-
-    private async executeWithTimeout(
-        job: MonitorJob,
-        checkOperation: (
-            siteIdentifier: string,
-            monitorId: string
-        ) => Promise<void>
-    ): Promise<void> {
-        const { clear, promise: timeoutPromise } = this.createTimeoutGuard(
-            job.timeoutMs
-        );
-
-        try {
-            await Promise.race([
-                checkOperation(job.siteIdentifier, job.monitorId),
-                timeoutPromise,
-            ]);
-        } finally {
-            clear();
         }
     }
 
@@ -215,7 +289,11 @@ export class MonitorScheduler {
         });
 
         try {
-            await this.onCheckCallback(siteIdentifier, monitorId);
+            await this.onCheckCallback(
+                siteIdentifier,
+                monitorId,
+                new AbortController().signal
+            );
         } catch (error) {
             this.logger.error(
                 `[MonitorScheduler] Error during immediate check for ${intervalKey}`,
@@ -236,28 +314,6 @@ export class MonitorScheduler {
                 error
             );
         }
-    }
-
-    private createTimeoutGuard(timeoutMs: number): {
-        clear: () => void;
-        promise: Promise<never>;
-    } {
-        let handle: NodeJS.Timeout | null = null;
-        const promise = new Promise<never>((_resolve, reject) => {
-            handle = setTimeout(() => {
-                reject(new MonitorJobTimeoutError(timeoutMs));
-            }, timeoutMs);
-        });
-
-        return {
-            clear: (): void => {
-                if (handle) {
-                    clearTimeout(handle);
-                    handle = null;
-                }
-            },
-            promise,
-        };
     }
 
     /**
@@ -314,9 +370,11 @@ export class MonitorScheduler {
                     backoffAttempt: job.backoffAttempt,
                     baseIntervalMs: job.baseIntervalMs,
                     correlationId: job.correlationId,
+                    hasAbortController: Boolean(job.abortController),
                     hasTimer: Boolean(job.timer),
                     isRunning: job.isRunning,
                     monitorId: job.monitorId,
+                    needsReschedule: job.needsReschedule,
                     siteIdentifier: job.siteIdentifier,
                     timeoutMs: job.timeoutMs,
                 },
@@ -385,7 +443,7 @@ export class MonitorScheduler {
      * @example
      *
      * ```typescript
-     * scheduler.setCheckCallback(async (siteIdentifier, monitorId) => {
+    * scheduler.setCheckCallback(async (siteIdentifier, monitorId, signal) => {
      *     // Custom check implementation
      * });
      * ```
@@ -396,7 +454,11 @@ export class MonitorScheduler {
      * @public
      */
     public setCheckCallback(
-        callback: (siteIdentifier: string, monitorId: string) => Promise<void>
+        callback: (
+            siteIdentifier: string,
+            monitorId: string,
+            signal: AbortSignal
+        ) => Promise<void>
     ): void {
         this.onCheckCallback = callback;
     }
@@ -446,11 +508,13 @@ export class MonitorScheduler {
         const timeoutMs = this.resolveTimeout(monitor.timeout);
 
         const job: MonitorJob = {
+            abortController: undefined,
             backoffAttempt: 0,
             baseIntervalMs,
             correlationId: generateCorrelationId(),
             isRunning: false,
             monitorId: monitor.id,
+            needsReschedule: false,
             siteIdentifier,
             timeoutMs,
             timer: undefined,
@@ -511,6 +575,9 @@ export class MonitorScheduler {
      */
     public stopAll(): void {
         for (const job of this.jobs.values()) {
+            job.abortController?.abort("Monitoring stopped");
+            job.abortController = undefined;
+            job.needsReschedule = false;
             this.clearJobTimer(job);
         }
         this.jobs.clear();
@@ -546,6 +613,10 @@ export class MonitorScheduler {
         if (!job) {
             return false;
         }
+
+        job.abortController?.abort("Monitoring stopped");
+        job.abortController = undefined;
+        job.needsReschedule = false;
 
         this.clearJobTimer(job);
         this.jobs.delete(intervalKey);

@@ -14,7 +14,7 @@ EventEmitter.defaultMaxListeners = MAX_LISTENERS;
 // Set max listeners specifically for the process object
 process.setMaxListeners(MAX_LISTENERS);
 
-import { vi } from "vitest";
+import { vi, type Mock } from "vitest";
 import fc from "fast-check";
 import { resolveFastCheckEnvOverrides } from "@shared/test/utils/fastCheckEnv";
 import type {
@@ -30,6 +30,23 @@ import type {
 } from "@shared/types/stateSync";
 import type { ValidationResult } from "@shared/types/validation";
 import type { ElectronAPI } from "../types";
+
+/**
+ * Deep-mock helper type for domain bridge objects.
+ *
+ * @remarks
+ * Vitest's built-in {@link Mocked} type is not deep for arbitrary nested
+ * objects, but our Electron preload bridge is nested by domain
+ * (`sites.getSites`, `monitoring.startMonitoringForSite`, etc.).
+ *
+ * This utility preserves Vitest mock helpers (e.g. `mockResolvedValue`) on all
+ * nested functions while remaining declaration-emit friendly.
+ */
+type DeepMocked<T> = T extends (...args: infer Args) => infer Return
+        ? Mock<(...args: Args) => Return>
+        : T extends object
+            ? { [Key in keyof T]: DeepMocked<T[Key]> }
+            : T;
 
 vi.mock("electron", () => ({
     app: {
@@ -191,13 +208,14 @@ const defaultStateSyncStatus: StateSyncStatusSummary = {
 
 const defaultFullSyncResult: StateSyncFullSyncResult = {
     completedAt: Date.now(),
+    revision: 1,
     siteCount: 1,
     sites: [cloneSite(defaultSite)],
     source: "frontend",
     synchronized: true,
 };
 
-const mockElectronAPI: ElectronAPI = {
+const mockElectronAPI: DeepMocked<ElectronAPI> = {
     cloud: {
         clearEncryptionKey: vi.fn<ElectronAPI["cloud"]["clearEncryptionKey"]>(
             async () => ({
@@ -403,6 +421,11 @@ const mockElectronAPI: ElectronAPI = {
                 sizeBytes: 8,
             },
         })),
+        saveSqliteBackup: vi.fn<ElectronAPI["data"]["saveSqliteBackup"]>(
+            async () => ({
+                canceled: true as const,
+            })
+        ),
         exportData: vi.fn<ElectronAPI["data"]["exportData"]>(async () => "{}"),
         importData: vi.fn<ElectronAPI["data"]["importData"]>(async () => true),
         restoreSqliteBackup: vi.fn<ElectronAPI["data"]["restoreSqliteBackup"]>(
@@ -648,7 +671,7 @@ const mockElectronAPI: ElectronAPI = {
             async (_text: string) => true
         ),
     },
-};
+} satisfies ElectronAPI;
 
 // Mock window.electronAPI
 Object.defineProperty(globalThis, "electronAPI", {

@@ -13,6 +13,7 @@ import {
     within,
 } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import type { UnknownRecord } from "type-fest";
 
 import { createSelectorHookMock } from "../../utils/createSelectorHookMock";
 import {
@@ -25,13 +26,74 @@ import {
 } from "../../utils/createSitesStoreMock";
 import type { ThemeName } from "../../../theme/types";
 
+const errorStoreState = {
+    clearError: vi.fn(),
+    isLoading: false,
+    lastError: null as null | string,
+    setError: vi.fn(),
+};
+
+const settingsStoreState = {
+    exportSettings: vi.fn(),
+    importSettings: vi.fn(),
+    initializeSettings: vi.fn(),
+    persistHistoryLimit: vi.fn().mockResolvedValue(undefined),
+    resetSettings: vi.fn(),
+    settings: {
+        historyLimit: 1000,
+        inAppAlertVolume: 1,
+        inAppAlertsEnabled: true,
+        inAppAlertsSoundEnabled: true,
+        systemNotificationsEnabled: true,
+        systemNotificationsSoundEnabled: true,
+        theme: "light" as const,
+    },
+    syncSettings: vi.fn(),
+    updateSetting: vi.fn(),
+    updateSettings: vi.fn(),
+};
+
+const useErrorStoreMock = createSelectorHookMock(errorStoreState);
+const useSettingsStoreMock = createSelectorHookMock(settingsStoreState);
+
+interface GlobalWithSettingsMocks extends UnknownRecord {
+    __useErrorStoreMock_settings__?: typeof useErrorStoreMock;
+    __useSettingsStoreMock_settings__?: typeof useSettingsStoreMock;
+    __useSitesStoreMock_settings__?: typeof useSitesStoreMock;
+}
+
+const globalWithSettingsMocks = globalThis as unknown as GlobalWithSettingsMocks;
+
+globalWithSettingsMocks.__useErrorStoreMock_settings__ = useErrorStoreMock;
+globalWithSettingsMocks.__useSettingsStoreMock_settings__ = useSettingsStoreMock;
+
 // Mock all dependencies
 vi.mock("../../../stores/error/useErrorStore", () => ({
-    useErrorStore: vi.fn(),
+    useErrorStore: <Result = typeof errorStoreState>(
+        selector?: (state: typeof errorStoreState) => Result,
+        equality?: (a: Result, b: Result) => boolean
+    ): Result | typeof errorStoreState => {
+        const hook = globalWithSettingsMocks.__useErrorStoreMock_settings__;
+        if (!hook) {
+            throw new Error("useErrorStore mock was not initialized");
+        }
+
+        return hook(selector, equality) as Result | typeof errorStoreState;
+    },
 }));
 
 vi.mock("../../../stores/settings/useSettingsStore", () => ({
-    useSettingsStore: vi.fn(),
+    useSettingsStore: <Result = typeof settingsStoreState>(
+        selector?: (state: typeof settingsStoreState) => Result,
+        equality?: (a: Result, b: Result) => boolean
+    ): Result | typeof settingsStoreState => {
+        const hook = globalWithSettingsMocks.__useSettingsStoreMock_settings__;
+        if (!hook) {
+            throw new Error("useSettingsStore mock was not initialized");
+        }
+
+        return hook(selector, equality) as Result | typeof settingsStoreState;
+    },
 }));
 
 // Cloud settings integration triggers side-effectful store operations and IPC
@@ -41,8 +103,13 @@ vi.mock("../../../components/Settings/CloudSettingsSection", () => ({
     CloudSettingsSection: (): null => null,
 }));
 
-const createDefaultDownloadBackup = () =>
-    vi.fn(async () => createSerializedBackupResult());
+const createDefaultSaveBackup = () =>
+    vi.fn(async () => ({
+        canceled: false as const,
+        fileName: "uptime-watcher-backup.sqlite",
+        filePath: "/tmp/uptime-watcher-backup.sqlite",
+        metadata: createSerializedBackupResult().metadata,
+    }));
 
 const createDefaultRestoreBackup = () =>
     vi.fn(async () => createSerializedRestoreResult());
@@ -51,7 +118,7 @@ const createDefaultFullResync = () => vi.fn(async () => undefined);
 
 // Standard creation bridged through global to avoid hoist-time import errors
 const sitesStoreState = createSitesStoreMock({
-    downloadSqliteBackup: createDefaultDownloadBackup(),
+    saveSqliteBackup: createDefaultSaveBackup(),
     restoreSqliteBackup: createDefaultRestoreBackup(),
     fullResyncSites: createDefaultFullResync(),
     lastBackupMetadata: createSerializedBackupResult().metadata,
@@ -60,19 +127,25 @@ const sitesStoreState = createSitesStoreMock({
 
 const useSitesStoreMock = createSelectorHookMock(sitesStoreState);
 
-(globalThis as any).__useSitesStoreMock_settings__ = useSitesStoreMock;
+globalWithSettingsMocks.__useSitesStoreMock_settings__ = useSitesStoreMock;
 
 vi.mock("../../../stores/sites/useSitesStore", () => ({
-    useSitesStore: (selector?: any, equality?: any) =>
-        (globalThis as any).__useSitesStoreMock_settings__?.(
-            selector,
-            equality
-        ),
+    useSitesStore: <Result = typeof sitesStoreState>(
+        selector?: (state: typeof sitesStoreState) => Result,
+        equality?: (a: Result, b: Result) => boolean
+    ): Result | typeof sitesStoreState => {
+        const hook = globalWithSettingsMocks.__useSitesStoreMock_settings__;
+        if (!hook) {
+            throw new Error("useSitesStore mock was not initialized");
+        }
+
+        return hook(selector, equality) as Result | typeof sitesStoreState;
+    },
 }));
 
 const resetSitesStoreState = (): void => {
     updateSitesStoreMock(sitesStoreState, {
-        downloadSqliteBackup: createDefaultDownloadBackup(),
+        saveSqliteBackup: createDefaultSaveBackup(),
         restoreSqliteBackup: createDefaultRestoreBackup(),
         fullResyncSites: createDefaultFullResync(),
         lastBackupMetadata: createSerializedBackupResult().metadata,
@@ -93,7 +166,7 @@ const defaultThemeForSelectors = {
     },
 };
 
-const themeState: { current: Record<string, unknown> } = {
+const themeState: { current: UnknownRecord } = {
     current: defaultThemeForSelectors,
 };
 
@@ -155,13 +228,9 @@ vi.mock("../../../hooks/ui/useConfirmDialog", () => ({
 // Import after mocks
 import { Settings } from "../../../components/Settings/Settings";
 import { playInAppAlertTone } from "../../../components/Alerts/alertCoordinator";
-import { useErrorStore } from "../../../stores/error/useErrorStore";
-import { useSettingsStore } from "../../../stores/settings/useSettingsStore";
 import { useTheme, useThemeClasses } from "../../../theme/useTheme";
 
 // Get mocked functions
-const mockUseErrorStore = vi.mocked(useErrorStore);
-const mockUseSettingsStore = vi.mocked(useSettingsStore);
 const mockUseTheme = vi.mocked(useTheme);
 const mockUseThemeClasses = vi.mocked(useThemeClasses);
 const mockPlayInAppAlertTone = vi.mocked(playInAppAlertTone);
@@ -276,10 +345,17 @@ describe("Settings Component", () => {
         mockSettingsStore.settings.inAppAlertsSoundEnabled = true;
         mockSettingsStore.settings.inAppAlertVolume = 1;
 
-        mockUseErrorStore.mockReturnValue(mockErrorStore);
-        mockUseSettingsStore.mockReturnValue(mockSettingsStore);
-        themeState.current = mockTheme as Record<string, unknown>;
-        mockUseTheme.mockReturnValue(themeState.current as any);
+        useErrorStoreMock.setState({
+            ...mockErrorStore,
+        });
+        useSettingsStoreMock.setState({
+            ...mockSettingsStore,
+            settings: mockSettingsStore.settings,
+        });
+        themeState.current = mockTheme as UnknownRecord;
+        mockUseTheme.mockReturnValue(
+            themeState.current as unknown as ReturnType<typeof useTheme>
+        );
         mockUseThemeClasses.mockReturnValue({
             getBackgroundClass: vi
                 .fn()
@@ -291,7 +367,7 @@ describe("Settings Component", () => {
             getSurfaceClass: vi
                 .fn()
                 .mockReturnValue({ backgroundColor: "#fff" }),
-        } as any);
+        } satisfies ReturnType<typeof useThemeClasses>);
     });
 
     it("should render settings modal", ({ task, annotate }) => {
@@ -350,8 +426,7 @@ describe("Settings Component", () => {
         annotate("Category: Component", "category");
         annotate("Type: Error Handling", "type");
 
-        const errorStore = { ...mockErrorStore, lastError: "Test error" };
-        mockUseErrorStore.mockReturnValue(errorStore);
+        useErrorStoreMock.setState({ lastError: "Test error" });
 
         render(<Settings onClose={mockOnClose} />);
 
@@ -477,7 +552,7 @@ describe("Settings Component", () => {
         expect(mockSitesStore.fullResyncSites).toHaveBeenCalled();
     });
 
-    it("should handle SQLite backup download", ({ task, annotate }) => {
+    it("should handle SQLite backup save", ({ task, annotate }) => {
         annotate(`Testing: ${task.name}`, "functional");
         annotate("Component: Settings", "component");
         annotate("Category: Component", "category");
@@ -495,7 +570,7 @@ describe("Settings Component", () => {
         });
         fireEvent.click(downloadButton);
 
-        expect(mockSitesStore.downloadSqliteBackup).toHaveBeenCalled();
+        expect(mockSitesStore.saveSqliteBackup).toHaveBeenCalled();
     });
 
     it("should handle theme changes", ({ task, annotate }) => {
@@ -554,10 +629,10 @@ describe("Settings Component", () => {
             ...mockSettingsStore,
             settings: {
                 ...mockSettingsStore.settings,
-                historyLimit: "500" as any,
+                historyLimit: "500" as unknown as number,
             },
         };
-        mockUseSettingsStore.mockReturnValue(settingsWithStringLimit);
+        useSettingsStoreMock.setState(settingsWithStringLimit);
 
         render(<Settings onClose={mockOnClose} />);
 
@@ -588,8 +663,10 @@ describe("Settings Component", () => {
                 isDark: true,
             },
         };
-        themeState.current = darkTheme as Record<string, unknown>;
-        mockUseTheme.mockReturnValue(themeState.current as any);
+        themeState.current = darkTheme as UnknownRecord;
+        mockUseTheme.mockReturnValue(
+            themeState.current as unknown as ReturnType<typeof useTheme>
+        );
 
         render(<Settings onClose={mockOnClose} />);
 

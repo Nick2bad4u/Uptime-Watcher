@@ -3,7 +3,7 @@ schema: "../../../config/schemas/doc-frontmatter.schema.json"
 title: "ADR-005: IPC Communication Protocol"
 summary: "Defines a standardized, type-safe IPC communication protocol using Electron's contextBridge with validation, error handling, and static guard rails."
 created: "2025-08-05"
-last_reviewed: "2025-12-11"
+last_reviewed: "2026-01-08"
 category: "guide"
 author: "Nick2bad4u"
 tags:
@@ -168,7 +168,7 @@ IPC handlers are organized by domain with consistent validation:
 ```typescript
 import { SITES_CHANNELS } from "@shared/types/preload";
 import { registerStandardizedIpcHandler } from "electron/services/ipc/utils";
-import { SiteHandlerValidators } from "electron/services/ipc/validators";
+import { SiteHandlerValidators } from "electron/services/ipc/validators/sites";
 
 private setupSiteHandlers(): void {
     registerStandardizedIpcHandler(
@@ -198,7 +198,7 @@ private setupSiteHandlers(): void {
 }
 ```
 
-Validators live in `electron/services/ipc/validators.ts` and, in turn, rely on the shared schema guards under `@shared/validation/*`. Keeping validation logic centralized prevents drift between IPC contracts and renderer-side TypeScript definitions.
+Validators live under `electron/services/ipc/validators/*` (one module per IPC domain) and reuse shared helpers from `electron/services/ipc/validators/shared.ts`. Keeping validation logic centralized prevents drift between IPC contracts and renderer-side TypeScript definitions.
 
 ### 3. Type-Safe Preload API
 

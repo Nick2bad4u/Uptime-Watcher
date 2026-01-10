@@ -16,6 +16,7 @@
 import type { AxiosInstance, AxiosRequestConfig } from "axios";
 
 import { readNumberEnv } from "@shared/utils/environment";
+import { isRecord } from "@shared/utils/typeHelpers";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import axios from "axios";
 import * as http from "node:http";
@@ -180,6 +181,86 @@ function normalizePositiveInteger(value: number, fallback: number): number {
     return Math.trunc(value);
 }
 
+const sharedAgents: {
+    http: http.Agent | null;
+    https: https.Agent | null;
+} = {
+    http: null,
+    https: null,
+};
+
+function getSharedHttpAgent(): http.Agent {
+    if (sharedAgents.http) {
+        return sharedAgents.http;
+    }
+
+    sharedAgents.http = new http.Agent({
+        keepAlive: true,
+        keepAliveMsecs: normalizePositiveInteger(
+            DEFAULT_AGENT_KEEP_ALIVE_MSECS,
+            1000
+        ),
+        maxFreeSockets: normalizePositiveInteger(
+            DEFAULT_AGENT_MAX_FREE_SOCKETS,
+            8
+        ),
+        maxSockets: normalizePositiveInteger(DEFAULT_AGENT_MAX_SOCKETS, 32),
+        scheduling: "lifo",
+    });
+
+    return sharedAgents.http;
+}
+
+function getSharedHttpsAgent(): https.Agent {
+    if (sharedAgents.https) {
+        return sharedAgents.https;
+    }
+
+    sharedAgents.https = new https.Agent({
+        keepAlive: true,
+        keepAliveMsecs: normalizePositiveInteger(
+            DEFAULT_AGENT_KEEP_ALIVE_MSECS,
+            1000
+        ),
+        maxFreeSockets: normalizePositiveInteger(
+            DEFAULT_AGENT_MAX_FREE_SOCKETS,
+            8
+        ),
+        maxSockets: normalizePositiveInteger(DEFAULT_AGENT_MAX_SOCKETS, 32),
+        scheduling: "lifo",
+    });
+
+    return sharedAgents.https;
+}
+
+const ALLOWED_REDIRECT_PROTOCOLS = new Set(["http:", "https:"]);
+
+/**
+ * Prevent following redirects to unsupported schemes (e.g. file:, javascript:)
+ * or redirects that include credentials.
+ */
+function enforceRedirectSafety(options: unknown): void {
+    if (!isRecord(options)) {
+        return;
+    }
+
+    const protocol =
+        typeof options["protocol"] === "string" ? options["protocol"] : "";
+    const auth = typeof options["auth"] === "string" ? options["auth"] : "";
+
+    if (protocol.length > 0 && !ALLOWED_REDIRECT_PROTOCOLS.has(protocol)) {
+        const error = new Error(`Unsupported redirect protocol: ${protocol}`);
+        Reflect.set(error, "code", "UW_UNSUPPORTED_REDIRECT_PROTOCOL");
+        throw error;
+    }
+
+    if (auth.length > 0) {
+        const error = new Error("Redirect URL must not include credentials");
+        Reflect.set(error, "code", "UW_UNSUPPORTED_REDIRECT_AUTH");
+        throw error;
+    }
+}
+
 /**
  * Creates a hardened Axios HTTP client instance suitable for monitor services.
  *
@@ -200,34 +281,11 @@ export function createHttpClient(config: MonitorServiceConfig): AxiosInstance {
     headers["Accept"] = "*/*";
 
     const createConfig: AxiosRequestConfig = {
+        beforeRedirect: enforceRedirectSafety,
         headers,
         // Connection pooling for better performance
-        httpAgent: new http.Agent({
-            keepAlive: true,
-            keepAliveMsecs: normalizePositiveInteger(
-                DEFAULT_AGENT_KEEP_ALIVE_MSECS,
-                1000
-            ),
-            maxFreeSockets: normalizePositiveInteger(
-                DEFAULT_AGENT_MAX_FREE_SOCKETS,
-                8
-            ),
-            maxSockets: normalizePositiveInteger(DEFAULT_AGENT_MAX_SOCKETS, 32),
-            scheduling: "lifo",
-        }),
-        httpsAgent: new https.Agent({
-            keepAlive: true,
-            keepAliveMsecs: normalizePositiveInteger(
-                DEFAULT_AGENT_KEEP_ALIVE_MSECS,
-                1000
-            ),
-            maxFreeSockets: normalizePositiveInteger(
-                DEFAULT_AGENT_MAX_FREE_SOCKETS,
-                8
-            ),
-            maxSockets: normalizePositiveInteger(DEFAULT_AGENT_MAX_SOCKETS, 32),
-            scheduling: "lifo",
-        }),
+        httpAgent: getSharedHttpAgent(),
+        httpsAgent: getSharedHttpsAgent(),
         maxBodyLength: DEFAULT_MAX_BODY_LENGTH, // Bounded request size
         maxContentLength: DEFAULT_MAX_CONTENT_LENGTH, // Bounded response size
         maxRedirects: DEFAULT_MAX_REDIRECTS,

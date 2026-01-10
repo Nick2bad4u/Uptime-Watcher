@@ -23,6 +23,7 @@ describe("MonitorFactory - Fixed", () => {
 
     beforeEach(() => {
         vi.clearAllMocks();
+        clearMonitorFactoryCache();
         mockMonitorConfig = {
             timeout: 5000,
             userAgent: "Test-Agent/1.0",
@@ -132,6 +133,24 @@ describe("MonitorFactory - Fixed", () => {
                 clearMonitorFactoryCache();
             }
         });
+    });
+
+    it("should not re-apply config to cached instance unless forced", () => {
+        const first = getMonitorWithResult("http", { timeout: 1000 });
+        expect(first.configurationApplied).toBeTruthy();
+
+        const instance = first.instance;
+        const updateSpy = vi.spyOn(instance, "updateConfig");
+        updateSpy.mockClear();
+
+        const second = getMonitorWithResult("http", { timeout: 2000 });
+        expect(second.configurationApplied).toBeFalsy();
+        expect(second.configurationError).toContain("cached instance");
+        expect(updateSpy).not.toHaveBeenCalled();
+
+        const forced = getMonitorWithResult("http", { timeout: 2000 }, true);
+        expect(forced.configurationApplied).toBeTruthy();
+        expect(updateSpy).toHaveBeenCalledTimes(1);
     });
 
     describe("getAvailableTypes", () => {

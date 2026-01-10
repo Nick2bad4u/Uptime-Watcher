@@ -45,11 +45,13 @@ export interface DynamicMonitorFieldsProperties {
     /**
      * Change handlers for each field, keyed by field name.
      */
-    readonly onChange: Record<string, (value: number | string) => void>;
+    readonly onChange: Readonly<
+        Record<string, (value: number | string) => void>
+    >;
     /**
      * Current values for each field, keyed by field name.
      */
-    readonly values: Record<string, number | string>;
+    readonly values: Readonly<Record<string, number | string>>;
 }
 
 /**
@@ -90,8 +92,21 @@ export const DynamicMonitorFields: NamedExoticComponent<DynamicMonitorFieldsProp
     }: DynamicMonitorFieldsProperties): JSX.Element {
         const monitorTypesError = useErrorStore(selectMonitorTypesError);
 
-        const { isLoaded, loadMonitorTypes, monitorTypes } =
-            useMonitorTypesStore();
+        type MonitorTypesStoreState = ReturnType<
+            typeof useMonitorTypesStore.getState
+        >;
+        const selectIsLoaded = useCallback((state: MonitorTypesStoreState): boolean =>
+            state.isLoaded, []);
+        const selectLoadMonitorTypes = useCallback((
+            state: MonitorTypesStoreState
+        ): MonitorTypesStoreState["loadMonitorTypes"] => state.loadMonitorTypes, []);
+        const selectMonitorTypes = useCallback((
+            state: MonitorTypesStoreState
+        ): MonitorTypesStoreState["monitorTypes"] => state.monitorTypes, []);
+
+        const isLoaded = useMonitorTypesStore(selectIsLoaded);
+        const loadMonitorTypes = useMonitorTypesStore(selectLoadMonitorTypes);
+        const monitorTypes = useMonitorTypesStore(selectMonitorTypes);
 
         // Find the config for the current monitor type
         const config = monitorTypes.find((type) => type.type === monitorType);

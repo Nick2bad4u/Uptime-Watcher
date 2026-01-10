@@ -1,11 +1,12 @@
 /**
  * @vitest-environment jsdom
  */
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { Site } from "@shared/types";
 
 import { SiteService } from "../../../services/SiteService";
+import { installElectronApiMock } from "../../utils/electronApiMock";
 
 const MOCK_BRIDGE_ERROR_MESSAGE =
     "ElectronAPI not available after maximum attempts. The application may not be running in an Electron environment.";
@@ -50,6 +51,9 @@ const mockElectronAPI = {
                 sizeBytes: 8,
             },
         }),
+        saveSqliteBackup: vi.fn().mockResolvedValue({
+            canceled: true as const,
+        }),
         exportData: vi.fn(),
     },
     sites: {
@@ -60,10 +64,7 @@ const mockElectronAPI = {
     },
 };
 
-Object.defineProperty(globalThis, "electronAPI", {
-    value: mockElectronAPI,
-    writable: true,
-});
+let restoreElectronApi: (() => void) | undefined;
 
 const createValidHttpMonitor = (
     id: string,
@@ -130,7 +131,16 @@ describe("SiteService", () => {
                 });
             }
         });
+
+            ({ restore: restoreElectronApi } = installElectronApiMock(mockElectronAPI, {
+                ensureWindow: true,
+            }));
     });
+
+        afterEach(() => {
+            restoreElectronApi?.();
+            restoreElectronApi = undefined;
+        });
 
     describe("getSites", () => {
         it("should retrieve all sites successfully", async ({
@@ -435,7 +445,7 @@ describe("SiteService", () => {
 
             await expect(
                 SiteService.removeSite(identifier)
-            ).rejects.toThrowError(/Backend operation returned false/);
+            ).rejects.toThrowError(/backend returned false/i);
         });
 
         it("should handle removal errors", async ({ task, annotate }) => {

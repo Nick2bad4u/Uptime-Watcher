@@ -9,6 +9,8 @@
  * or when the application is executed outside an Electron environment.
  */
 
+import type { UnknownRecord } from "type-fest";
+
 import { sleep } from "@shared/utils/abortUtils";
 
 const DEFAULT_MAX_ATTEMPTS = 50;
@@ -99,7 +101,7 @@ const getGlobalWindow = (): unknown => {
 
 const isNonNullObject = (
     value: unknown
-): value is Record<PropertyKey, unknown> =>
+): value is UnknownRecord =>
     typeof value === "object" && value !== null;
 
 const isBridgeRootCandidate = (value: unknown): value is BridgeRoot =>

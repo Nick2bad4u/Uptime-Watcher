@@ -14,6 +14,7 @@ import {
 } from "@shared/test/arbitraries/siteArbitraries";
 
 import { MonitoringService } from "../../../services/MonitoringService";
+import { installElectronApiMock } from "../../utils/electronApiMock";
 
 const MOCK_BRIDGE_ERROR_MESSAGE =
     "ElectronAPI not available after maximum attempts. The application may not be running in an Electron environment.";
@@ -83,10 +84,7 @@ const mockElectronAPI = {
     },
 };
 
-Object.defineProperty(globalThis, "electronAPI", {
-    value: mockElectronAPI,
-    writable: true,
-});
+let restoreElectronApi: (() => void) | undefined;
 
 const createMonitorFixture = () => ({
     activeOperations: [],
@@ -141,7 +139,15 @@ describe("MonitoringService", () => {
                 });
             }
         });
+            ({ restore: restoreElectronApi } = installElectronApiMock(mockElectronAPI, {
+                ensureWindow: true,
+            }));
     });
+
+        afterEach(() => {
+            restoreElectronApi?.();
+            restoreElectronApi = undefined;
+        });
 
     describe("checkSiteNow", () => {
         it("should return validated status updates", async ({
@@ -405,14 +411,17 @@ describe("MonitoringService", () => {
             await expect(
                 MonitoringService.startMonitoring()
             ).rejects.toMatchObject({
-                message:
-                    "Failed to start monitoring across all sites: 0/1 monitors activated.",
-                summary: expect.objectContaining({
-                    attempted: 1,
-                    failed: 1,
-                    succeeded: 0,
-                    isMonitoring: false,
+                code: "RENDERER_SERVICE_BACKEND_OPERATION_FAILED",
+                details: expect.objectContaining({
+                    summary: expect.objectContaining({
+                        attempted: 1,
+                        failed: 1,
+                        succeeded: 0,
+                        isMonitoring: false,
+                    }),
                 }),
+                message:
+                    "[MonitoringService] Failed to start monitoring across all sites: 0/1 monitors activated.",
             });
         });
 
@@ -626,14 +635,17 @@ describe("MonitoringService", () => {
             await expect(
                 MonitoringService.stopMonitoring()
             ).rejects.toMatchObject({
-                message:
-                    "Failed to stop monitoring across all sites: 2/2 monitors remained active.",
-                summary: expect.objectContaining({
-                    attempted: 2,
-                    failed: 2,
-                    succeeded: 0,
-                    isMonitoring: true,
+                code: "RENDERER_SERVICE_BACKEND_OPERATION_FAILED",
+                details: expect.objectContaining({
+                    summary: expect.objectContaining({
+                        attempted: 2,
+                        failed: 2,
+                        succeeded: 0,
+                        isMonitoring: true,
+                    }),
                 }),
+                message:
+                    "[MonitoringService] Failed to stop monitoring across all sites: 2/2 monitors remained active.",
             });
         });
 

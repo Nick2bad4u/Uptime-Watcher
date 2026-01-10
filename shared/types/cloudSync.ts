@@ -18,6 +18,8 @@
  * top of these primitives.
  */
 
+import type { JsonValue as TypeFestJsonValue } from "type-fest";
+
 import * as z from "zod";
 
 /**
@@ -35,13 +37,7 @@ const MAX_SAFE_INT = Number.MAX_SAFE_INTEGER;
  *
  * @public
  */
-export type JsonValue =
-    | boolean
-    | JsonValue[]
-    | null
-    | number
-    | string
-    | { [key: string]: JsonValue };
+export type JsonValue = TypeFestJsonValue;
 
 const jsonValueSchemaInternal: z.ZodType<JsonValue> = z.lazy(() =>
     z.union([

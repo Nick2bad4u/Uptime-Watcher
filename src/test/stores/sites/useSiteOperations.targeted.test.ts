@@ -145,6 +145,9 @@ describe("useSiteOperations - Targeted Coverage", () => {
                         sizeBytes: 1024,
                     },
                 }),
+                saveSqliteBackup: vi.fn().mockResolvedValue({
+                    canceled: true as const,
+                }),
             },
         };
 
@@ -162,6 +165,9 @@ describe("useSiteOperations - Targeted Coverage", () => {
         const dataService = {
             downloadSqliteBackup: vi.fn(async () =>
                 mockElectronAPI.data.downloadSqliteBackup()
+            ),
+            saveSqliteBackup: vi.fn(async () =>
+                mockElectronAPI.data.saveSqliteBackup()
             ),
             restoreSqliteBackup: vi.fn(async (payload) =>
                 mockElectronAPI.data.restoreSqliteBackup(payload)

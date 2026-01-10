@@ -66,7 +66,7 @@ export interface HistoryRow extends BaseRow {
  *
  * @public
  */
-export interface MonitorRow extends BaseRow {
+export interface MonitorRow extends BaseRow, UnknownRecord {
     /**
      * JSON string containing an array of active operation identifiers.
      */
@@ -100,14 +100,6 @@ export interface MonitorRow extends BaseRow {
      * Hostname or IP address being monitored.
      */
     host?: string;
-    /**
-     * Unique monitor ID.
-     *
-     * @remarks
-     * Schema versions may use numeric autoincrement ids or stable text ids
-     * depending on migration level.
-     */
-    id?: number | string;
     /**
      * Timestamp (epoch ms) of the last check.
      */

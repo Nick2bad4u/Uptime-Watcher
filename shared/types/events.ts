@@ -29,8 +29,6 @@ import * as z from "zod";
 import {
     type SiteSyncDelta,
     siteSyncDeltaSchema,
-    type StateSyncAction,
-    stateSyncActionSchema,
     type StateSyncSource,
     stateSyncSourceSchema,
 } from "./stateSync";
@@ -101,10 +99,7 @@ export const eventMetadataSchema: z.ZodType<EventMetadata> = z
  * Common base shape shared by all event payloads emitted through the typed
  * event bus.
  */
-export interface BaseEventData extends Record<PropertyKey, unknown> {
-    [key: string]: unknown;
-    [key: number]: unknown;
-    [key: symbol]: unknown;
+export interface BaseEventData extends UnknownRecord {
     /** The time (in milliseconds since epoch) when the event occurred. */
     readonly timestamp: number;
     /** Runtime metadata describing the emission context. */
@@ -192,34 +187,146 @@ export const SITE_ADDED_SOURCES: readonly SiteAddedSource[] = Object.freeze(
  *
  * @public
  */
-export interface StateSyncEventData extends BaseEventData {
+interface BaseStateSyncEventData extends BaseEventData {
     /** The synchronization action being performed */
-    readonly action: StateSyncAction;
-    /** Structured delta describing how the site collection changed */
-    readonly delta?: SiteSyncDelta | undefined;
+    readonly action: "bulk-sync" | "delete" | "update";
+    /**
+     * Monotonic revision counter incremented by the backend for each emitted
+     * state sync event.
+     */
+    readonly revision: number;
     /** Site identifier for targeted operations (delete, update) */
     readonly siteIdentifier?: string | undefined;
-    /** Complete site dataset after the sync operation */
-    readonly sites: Site[];
     /** Source system that triggered the sync */
     readonly source: StateSyncSource;
+    /** Indicates the backend omitted the payload due to a size budget. */
+    readonly truncated?: boolean | undefined;
 }
 
+/** Bulk sync event containing a full snapshot. */
+export interface BulkStateSyncEventData extends BaseStateSyncEventData {
+    readonly action: "bulk-sync";
+    /** Total number of sites in the snapshot. */
+    readonly siteCount: number;
+    /** Complete site dataset after the sync operation */
+    readonly sites: Site[];
+}
+
+/** Incremental update/delete event containing a delta. */
+export interface DeltaStateSyncEventData extends BaseStateSyncEventData {
+    readonly action: "delete" | "update";
+    /** Structured delta describing how the site collection changed */
+    readonly delta: SiteSyncDelta;
+    readonly truncated?: false | undefined;
+}
+
+/** Discriminated union of state sync event payloads. */
+export type StateSyncEventData =
+    | BulkStateSyncEventData
+    | DeltaStateSyncEventData;
+
 const stateSyncSitesArraySchema = siteSchema.array();
+
+const bulkStateSyncEventDataSchema = baseEventDataSchema
+    .extend({
+        action: z.literal("bulk-sync"),
+        revision: z.number().int().nonnegative(),
+        siteCount: z.number().int().nonnegative(),
+        siteIdentifier: z.string().min(1).optional(),
+        sites: stateSyncSitesArraySchema,
+        source: stateSyncSourceSchema,
+        truncated: z.boolean().optional(),
+    })
+    .strict()
+    .superRefine((value, ctx) => {
+        if (value.truncated === true) {
+            if (value.sites.length > 0) {
+                ctx.addIssue({
+                    code: "custom",
+                    message: "sites must be empty when truncated is true",
+                    path: ["sites"],
+                });
+            }
+            return;
+        }
+
+        if (value.siteCount !== value.sites.length) {
+            ctx.addIssue({
+                code: "custom",
+                message:
+                    "siteCount must equal the number of serialized sites",
+                path: ["siteCount"],
+            });
+        }
+    });
+
+const updateStateSyncEventDataSchema = baseEventDataSchema
+    .extend({
+        action: z.literal("update"),
+        delta: siteSyncDeltaSchema,
+        revision: z.number().int().nonnegative(),
+        siteIdentifier: z.string().min(1).optional(),
+        source: stateSyncSourceSchema,
+        truncated: z.literal(false).optional(),
+    })
+    .strict()
+    .superRefine((value, ctx) => {
+        const hasAnyChanges =
+            value.delta.addedSites.length > 0 ||
+            value.delta.updatedSites.length > 0 ||
+            value.delta.removedSiteIdentifiers.length > 0;
+
+        if (!hasAnyChanges) {
+            ctx.addIssue({
+                code: "custom",
+                message: "delta must contain at least one change",
+                path: ["delta"],
+            });
+        }
+    });
+
+const deleteStateSyncEventDataSchema = baseEventDataSchema
+    .extend({
+        action: z.literal("delete"),
+        delta: siteSyncDeltaSchema,
+        revision: z.number().int().nonnegative(),
+        siteIdentifier: z.string().min(1).optional(),
+        source: stateSyncSourceSchema,
+        truncated: z.literal(false).optional(),
+    })
+    .strict()
+    .superRefine((value, ctx) => {
+        const hasAnyChanges =
+            value.delta.addedSites.length > 0 ||
+            value.delta.updatedSites.length > 0 ||
+            value.delta.removedSiteIdentifiers.length > 0;
+
+        if (!hasAnyChanges) {
+            ctx.addIssue({
+                code: "custom",
+                message: "delta must contain at least one change",
+                path: ["delta"],
+            });
+        }
+
+        if (value.delta.removedSiteIdentifiers.length === 0) {
+            ctx.addIssue({
+                code: "custom",
+                message: "delete events must include removedSiteIdentifiers",
+                path: ["delta", "removedSiteIdentifiers"],
+            });
+        }
+    });
 
 /**
  * Zod schema describing valid {@link StateSyncEventData} payloads.
  */
 export const stateSyncEventDataSchema: z.ZodType<StateSyncEventData> =
-    baseEventDataSchema
-        .extend({
-            action: stateSyncActionSchema,
-            delta: siteSyncDeltaSchema.optional(),
-            siteIdentifier: z.string().min(1).optional(),
-            sites: stateSyncSitesArraySchema,
-            source: stateSyncSourceSchema,
-        })
-        .strict();
+    z.discriminatedUnion("action", [
+    bulkStateSyncEventDataSchema,
+    updateStateSyncEventDataSchema,
+    deleteStateSyncEventDataSchema,
+    ]);
 
 /**
  * Safe parse result for {@link StateSyncEventData}.

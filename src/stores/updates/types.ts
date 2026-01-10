@@ -51,6 +51,19 @@ export interface UpdatesStore {
 
     /** Set update progress */
     setUpdateProgress: (progress: number) => void;
+
+    /**
+     * Subscribes to backend update status events.
+     *
+     * @remarks
+     * This is intentionally store-owned so application bootstrap code can
+     * subscribe via the domain store (rather than wiring {@link EventsService}
+     * directly in the root component).
+     *
+     * The returned cleanup function is safe to call even if the async
+     * subscription has not yet finished establishing.
+     */
+    subscribeToUpdateStatusEvents: () => () => void;
     // Actions
     /** Update error message if any */
     updateError: string | undefined;

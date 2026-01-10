@@ -155,7 +155,12 @@
         "valid-values-engines": "off",
         "valid-values-license": [
             "error",
-            ["MIT", "Unlicense", "UnLicense", "UNLICENSED"]
+            [
+                "MIT",
+                "Unlicense",
+                "UnLicense",
+                "UNLICENSED"
+            ]
         ],
         "valid-values-name-scope": "off",
         "valid-values-private": ["error", [false, true]],

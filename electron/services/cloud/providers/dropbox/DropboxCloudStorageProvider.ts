@@ -103,7 +103,11 @@ function describeDropboxSdkErrorRich(error: unknown): string | undefined {
     return `HTTP ${error.status}`;
 }
 
-function hasNotFoundTag(value: unknown, visited: WeakSet<object>): boolean {
+function hasTag(
+    value: unknown,
+    tag: string,
+    visited: WeakSet<object>
+): boolean {
     if (typeof value !== "object" || value === null) {
         return false;
     }
@@ -113,43 +117,9 @@ function hasNotFoundTag(value: unknown, visited: WeakSet<object>): boolean {
     }
     visited.add(value);
 
-    if (!isRecord(value)) {
-        return false;
+    if (Array.isArray(value)) {
+        return value.some((item) => hasTag(item, tag, visited));
     }
-
-    const record = value;
-    if (record[".tag"] === "not_found") {
-        return true;
-    }
-
-    for (const next of Object.values(record)) {
-        if (Array.isArray(next)) {
-            for (const item of next) {
-                if (hasNotFoundTag(item, visited)) {
-                    return true;
-                }
-            }
-        } else if (
-            typeof next === "object" &&
-            next !== null &&
-            hasNotFoundTag(next, visited)
-        ) {
-            return true;
-        }
-    }
-
-    return false;
-}
-
-function hasTag(value: unknown, tag: string, visited: WeakSet<object>): boolean {
-    if (typeof value !== "object" || value === null) {
-        return false;
-    }
-
-    if (visited.has(value)) {
-        return false;
-    }
-    visited.add(value);
 
     if (!isRecord(value)) {
         return false;
@@ -161,18 +131,24 @@ function hasTag(value: unknown, tag: string, visited: WeakSet<object>): boolean 
     }
 
     for (const next of Object.values(record)) {
+        let hasMatchingTag = false;
+
         if (Array.isArray(next)) {
-            for (const item of next) {
-                if (hasTag(item, tag, visited)) {
-                    return true;
-                }
-            }
-        } else if (typeof next === "object" && next !== null && hasTag(next, tag, visited)) {
-                return true;
-            }
+            hasMatchingTag = next.some((item) => hasTag(item, tag, visited));
+        } else if (typeof next === "object" && next !== null) {
+            hasMatchingTag = hasTag(next, tag, visited);
+        }
+
+        if (hasMatchingTag) {
+            return true;
+        }
     }
 
     return false;
+}
+
+function hasTagInPayload(value: unknown, tag: string): boolean {
+    return hasTag(value, tag, new WeakSet());
 }
 
 function isDropboxNotFoundError(error: unknown): boolean {
@@ -184,7 +160,7 @@ function isDropboxNotFoundError(error: unknown): boolean {
         return false;
     }
 
-    return hasNotFoundTag(error.error, new WeakSet());
+    return hasTagInPayload(error.error, "not_found");
 }
 
 function isDropboxConflictError(error: unknown): boolean {
@@ -197,7 +173,7 @@ function isDropboxConflictError(error: unknown): boolean {
     }
 
     // Best-effort: recursively scan Dropbox's tagged error payload.
-    return hasTag(error.error, "conflict", new WeakSet());
+    return hasTagInPayload(error.error, "conflict");
 }
 
 async function convertDropboxDownloadedResultToBuffer(
@@ -338,7 +314,9 @@ export class DropboxCloudStorageProvider
 
             let invalidEntryCount = 0;
 
-            const mapEntryToCloudObject = (entry: unknown): {
+            const mapEntryToCloudObject = (
+                entry: unknown
+            ): {
                 cloudObject: CloudObjectEntry | null;
                 isInvalid: boolean;
             } => {
@@ -441,14 +419,19 @@ export class DropboxCloudStorageProvider
         const normalizedKey = normalizeKey(args.key);
         assertCloudObjectKey(normalizedKey);
 
+        let uploadMode: { ".tag": "add" } | { ".tag": "overwrite" } = {
+            ".tag": "add",
+        };
+        if (args.overwrite === true) {
+            uploadMode = { ".tag": "overwrite" };
+        }
+
         const response = await withDropboxRetry({
             fn: async () =>
                 client.filesUpload({
                     autorename: false,
                     contents: args.buffer,
-                    mode: args.overwrite
-                        ? { ".tag": "overwrite" }
-                        : { ".tag": "add" },
+                    mode: uploadMode,
                     mute: true,
                     path: toDropboxObjectPath(normalizedKey),
                     strict_conflict: false,
@@ -529,28 +512,29 @@ export class DropboxCloudStorageProvider
             operationName: "files/download",
         }).catch((error: unknown) => {
             if (isDropboxNotFoundError(error)) {
-                    throw new CloudProviderOperationError(
-                        `Dropbox object not found: ${normalizedKey}`,
-                        {
-                            code: "ENOENT",
-                            operation: "downloadObject",
-                            providerKind: this.kind,
-                            target: normalizedKey,
-                        }
-                    );
-            }
-
-            const described = describeDropboxSdkErrorRich(error);
-                const detail = described ?? ensureError(error).message;
                 throw new CloudProviderOperationError(
-                    `Dropbox download failed: ${detail}`,
+                    `Dropbox object not found: ${normalizedKey}`,
                     {
                         cause: error,
+                        code: "ENOENT",
                         operation: "downloadObject",
                         providerKind: this.kind,
                         target: normalizedKey,
                     }
                 );
+            }
+
+            const described = describeDropboxSdkErrorRich(error);
+            const detail = described ?? ensureError(error).message;
+            throw new CloudProviderOperationError(
+                `Dropbox download failed: ${detail}`,
+                {
+                    cause: error,
+                    operation: "downloadObject",
+                    providerKind: this.kind,
+                    target: normalizedKey,
+                }
+            );
         });
 
         return convertDropboxDownloadedResultToBuffer(response.result);
@@ -574,17 +558,17 @@ export class DropboxCloudStorageProvider
                 return;
             }
 
-                const described = describeDropboxSdkErrorRich(error);
-                const detail = described ?? ensureError(error).message;
-                throw new CloudProviderOperationError(
-                    `Dropbox delete failed: ${detail}`,
-                    {
-                        cause: error,
-                        operation: "deleteObject",
-                        providerKind: this.kind,
-                        target: normalizedKey,
-                    }
-                );
+            const described = describeDropboxSdkErrorRich(error);
+            const detail = described ?? ensureError(error).message;
+            throw new CloudProviderOperationError(
+                `Dropbox delete failed: ${detail}`,
+                {
+                    cause: error,
+                    operation: "deleteObject",
+                    providerKind: this.kind,
+                    target: normalizedKey,
+                }
+            );
         });
     }
 

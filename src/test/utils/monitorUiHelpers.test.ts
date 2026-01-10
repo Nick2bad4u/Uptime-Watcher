@@ -8,6 +8,7 @@ import * as monitorUiHelpers from "../../utils/monitorUiHelpers";
 import type { MonitorTypeConfig } from "@shared/types/monitorTypes";
 import { AppCaches } from "../../utils/cache";
 import { getMonitorTypeConfig } from "../../utils/monitorTypeHelper";
+import { installElectronApiMock } from "./electronApiMock";
 
 // Mock dependencies
 vi.mock("../../types/ipc", () => ({
@@ -90,18 +91,13 @@ function createMockConfig(overrides: Partial<MonitorTypeConfig> = {}) {
     } satisfies MonitorTypeConfig;
 }
 
-// Mock window.electronAPI
-const mockElectronAPI = {
+const monitorTypesApiMock = {
     monitorTypes: {
         formatMonitorDetail: vi.fn(),
         formatMonitorTitleSuffix: vi.fn(),
     },
 };
-
-Object.defineProperty(globalThis, "electronAPI", {
-    value: mockElectronAPI,
-    writable: true,
-});
+let restoreElectronApi: (() => void) | undefined;
 
 describe("Monitor UI Helpers", () => {
     beforeEach(() => {
@@ -111,11 +107,21 @@ describe("Monitor UI Helpers", () => {
         vi.mocked(getMonitorTypeConfig).mockImplementation(
             async () => undefined
         );
+        ({ restore: restoreElectronApi } = installElectronApiMock({
+            monitorTypes: {
+                formatMonitorDetail: monitorTypesApiMock.monitorTypes
+                    .formatMonitorDetail,
+                formatMonitorTitleSuffix: monitorTypesApiMock.monitorTypes
+                    .formatMonitorTitleSuffix,
+            },
+        }));
     });
 
     afterEach(() => {
         vi.clearAllMocks();
         AppCaches.uiHelpers.clear();
+        restoreElectronApi?.();
+        restoreElectronApi = undefined;
     });
 
     describe("allSupportsAdvancedAnalytics", () => {

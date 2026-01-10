@@ -31,18 +31,6 @@ vi.mock("../services/monitoring", () => ({
     MonitoringService: mockMonitoringService,
 }));
 
-// Mock electronAPI
-const mockElectronAPI = {
-    sites: {
-        sync: vi.fn(),
-    },
-};
-
-Object.defineProperty(globalThis, "electronAPI", {
-    value: mockElectronAPI,
-    writable: true,
-});
-
 const startSiteMonitoringMock = vi.fn(async () => undefined);
 const stopSiteMonitoringMock = vi.fn(async () => undefined);
 const startSiteMonitorMonitoringMock = vi.fn(async () => undefined);

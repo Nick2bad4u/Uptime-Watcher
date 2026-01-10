@@ -21,6 +21,7 @@ import path from "node:path";
 const mockFsPromises = vi.hoisted(() => ({
     copyFile: vi.fn(),
     mkdtemp: vi.fn(),
+    rename: vi.fn(),
     rm: vi.fn(),
     writeFile: vi.fn(),
 }));
@@ -39,9 +40,11 @@ const {
     const mockPrepare = vi.fn(() => ({ get: mockGet }));
     const mockInstance = {
         close: vi.fn(),
+        exec: vi.fn(),
         prepare: mockPrepare,
     } satisfies {
         close: ReturnType<typeof vi.fn>;
+        exec: ReturnType<typeof vi.fn>;
         prepare: typeof mockPrepare;
     };
     const mockCtor = vi.fn(function DatabaseMock() {
@@ -65,8 +68,10 @@ vi.mock("electron", () => ({
 
 vi.mock("../../../services/database/utils/backup/databaseBackup", () => ({
     createDatabaseBackup: vi.fn(),
+    computeDatabaseBackupChecksum: vi.fn(() => "mock-checksum"),
     validateDatabaseBackupPayload: vi.fn(),
     DEFAULT_BACKUP_RETENTION_HINT_DAYS: 30,
+    readDatabaseSchemaVersionFromFile: vi.fn(() => 1),
 }));
 
 vi.mock("../../../constants", () => ({
@@ -144,6 +149,7 @@ describe(DataBackupService, () => {
         mockFsPromises.mkdtemp.mockResolvedValue("/tmp/mock-dir");
         mockFsPromises.writeFile.mockResolvedValue(undefined as never);
         mockFsPromises.copyFile.mockResolvedValue(undefined as never);
+        mockFsPromises.rename.mockResolvedValue(undefined as never);
         mockFsPromises.rm.mockResolvedValue(undefined as never);
 
         // Reset app.getPath mock
@@ -248,13 +254,40 @@ describe(DataBackupService, () => {
             const result = await dataBackupService.downloadDatabaseBackup();
 
             // Assert
-            expect(result).toEqual(mockResult); // The implementation returns the full result
+            expect(result).toEqual({
+                ...mockResult,
+                metadata: {
+                    ...mockResult.metadata,
+                    originalPath: mockResult.fileName,
+                },
+            });
             expect(app.getPath).toHaveBeenCalledWith("userData");
+            // Snapshot creation should prefer leaving the primary connection
+            // open. Closing/reinitializing is reserved for SQLITE_BUSY/LOCKED
+            // fallback scenarios.
+            expect(mockDatabaseService.close).not.toHaveBeenCalled();
+            expect(mockDatabaseService.initialize).not.toHaveBeenCalled();
+            expect(mockFsPromises.mkdtemp).toHaveBeenCalled();
+            expect(mockDatabaseInstance.exec).toHaveBeenCalledWith(
+                expect.stringContaining("VACUUM INTO")
+            );
+            const expectedSnapshotPath = path.resolve(
+                "/tmp/mock-dir",
+                "backup-snapshot.sqlite"
+            );
+            expect(mockDatabaseInstance.exec).toHaveBeenCalledWith(
+                `VACUUM INTO '${expectedSnapshotPath}'`
+            );
             expect(createDatabaseBackup).toHaveBeenCalledWith({
-                dbPath: path.join("/test/userdata", "uptime-watcher.sqlite"),
+                dbPath: expectedSnapshotPath,
             });
             expect(validateDatabaseBackupPayload).toHaveBeenCalledWith(
-                mockResult
+                expect.objectContaining({
+                    fileName: mockResult.fileName,
+                    metadata: expect.objectContaining({
+                        originalPath: mockResult.fileName,
+                    }),
+                })
             );
             expect(mockLogger.info).toHaveBeenCalledWith(
                 "[DataBackupService] Created database backup",
@@ -265,6 +298,54 @@ describe(DataBackupService, () => {
                     sizeBytes: mockResult.metadata.sizeBytes,
                 })
             );
+        });
+
+        it("should close and reinitialize the primary DB when VACUUM INTO hits SQLITE_BUSY", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DataBackupService", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Backup Operation", "type");
+
+            const mockResult = {
+                buffer: Buffer.from("test database content"),
+                fileName: "uptime-watcher-backup.sqlite",
+                metadata: {
+                    appVersion: "0.0.0-test",
+                    checksum: "mock-checksum",
+                    createdAt: Date.now(),
+                    originalPath: "/test/userdata/uptime-watcher.sqlite",
+                    retentionHintDays: 30,
+                    schemaVersion: 1,
+                    sizeBytes: 1024,
+                },
+            };
+            vi.mocked(createDatabaseBackup).mockResolvedValue(mockResult);
+
+            let shouldFailVacuum = true;
+            const lockError = Object.assign(
+                new Error("SQLITE_BUSY: database is locked"),
+                { code: "SQLITE_BUSY" }
+            );
+
+            vi.mocked(mockDatabaseInstance.exec).mockImplementation((sql) => {
+                if (
+                    shouldFailVacuum &&
+                    typeof sql === "string" &&
+                    sql.includes("VACUUM INTO")
+                ) {
+                    shouldFailVacuum = false;
+                    throw lockError;
+                }
+                return undefined as never;
+            });
+
+            await dataBackupService.downloadDatabaseBackup();
+
+            expect(mockDatabaseService.close).toHaveBeenCalledTimes(1);
+            expect(mockDatabaseService.initialize).toHaveBeenCalledTimes(1);
         });
 
         it("should use correct database path", async ({ task, annotate }) => {
@@ -281,8 +362,12 @@ describe(DataBackupService, () => {
 
             // Assert
             expect(app.getPath).toHaveBeenCalledWith("userData");
+            const expectedSnapshotPath = path.resolve(
+                "/tmp/mock-dir",
+                "backup-snapshot.sqlite"
+            );
             expect(createDatabaseBackup).toHaveBeenCalledWith({
-                dbPath: path.join("/custom/path", "uptime-watcher.sqlite"),
+                dbPath: expectedSnapshotPath,
             });
         });
 
@@ -320,7 +405,12 @@ describe(DataBackupService, () => {
             expect(result.buffer).toEqual(customBackupResult.buffer);
             expect(result.fileName).toBe(customBackupResult.fileName);
             expect(validateDatabaseBackupPayload).toHaveBeenCalledWith(
-                customBackupResult
+                expect.objectContaining({
+                    fileName: customBackupResult.fileName,
+                    metadata: expect.objectContaining({
+                        originalPath: customBackupResult.fileName,
+                    }),
+                })
             );
             expect(mockLogger.info).toHaveBeenCalledWith(
                 "[DataBackupService] Created database backup",
@@ -609,9 +699,17 @@ describe(DataBackupService, () => {
             // Assert
             expect(result.buffer).toBe(backupResult.buffer);
             expect(result.fileName).toBe(backupResult.fileName);
-            expect(result.metadata).toEqual(backupResult.metadata);
+            expect(result.metadata).toEqual({
+                ...backupResult.metadata,
+                originalPath: backupResult.fileName,
+            });
             expect(validateDatabaseBackupPayload).toHaveBeenCalledWith(
-                backupResult
+                expect.objectContaining({
+                    fileName: backupResult.fileName,
+                    metadata: expect.objectContaining({
+                        originalPath: backupResult.fileName,
+                    }),
+                })
             );
         });
     });
@@ -704,11 +802,21 @@ describe(DataBackupService, () => {
             const metadata =
                 await dataBackupService.applyDatabaseBackupResult(backup);
 
-            expect(validateDatabaseBackupPayload).toHaveBeenCalledWith(backup);
+            expect(validateDatabaseBackupPayload).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    fileName: backup.fileName,
+                    metadata: expect.objectContaining({
+                        originalPath: backup.fileName,
+                    }),
+                })
+            );
             expect(mockDatabaseService.close).toHaveBeenCalled();
             expect(mockDatabaseService.initialize).toHaveBeenCalled();
             expect(mockFsPromises.copyFile).toHaveBeenCalled();
-            expect(metadata).toEqual(backup.metadata);
+            expect(metadata).toEqual({
+                ...backup.metadata,
+                originalPath: backup.fileName,
+            });
         });
 
         it("should attempt to reinitialize even when copy fails", async () => {
@@ -821,8 +929,12 @@ describe(DataBackupService, () => {
                 await dataBackupService.downloadDatabaseBackup();
 
                 // Assert
-                expect(createDatabaseBackup).toHaveBeenCalledWith({
-                    dbPath: path.join(testPath, "uptime-watcher.sqlite"),
+                const expectedSnapshotPath = path.resolve(
+                    "/tmp/mock-dir",
+                    "backup-snapshot.sqlite"
+                );
+                expect(createDatabaseBackup).toHaveBeenLastCalledWith({
+                    dbPath: expectedSnapshotPath,
                 });
             }
         });
@@ -865,7 +977,7 @@ describe(DataBackupService, () => {
             // Assert
             expect(result1.fileName).toBe("concurrent-backup.sqlite");
             expect(result2.fileName).toBe("concurrent-backup.sqlite");
-            expect(createDatabaseBackup).toHaveBeenCalledTimes(2);
+            expect(createDatabaseBackup).toHaveBeenCalledTimes(1);
         });
     });
 });

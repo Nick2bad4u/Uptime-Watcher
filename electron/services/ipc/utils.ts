@@ -171,9 +171,15 @@ function assertChannelParams<TChannel extends IpcInvokeChannel>(
     }
 
     const expectedParamCount = handler.length;
-    if (expectedParamCount > 0 && params.length < expectedParamCount) {
+    // NOTE: We only enforce arity when the handler declares an explicit
+    // parameter list.
+    //
+    // Vitest mocks and rest-parameter handlers commonly report `length === 0`
+    // even when they can accept parameters. In those cases, the runtime arity
+    // is not meaningful, so we skip strict enforcement here.
+    if (expectedParamCount > 0 && params.length !== expectedParamCount) {
         throw new Error(
-            `[IpcService] Channel ${channelName} expects at least ${expectedParamCount} parameter(s) but received ${params.length}`
+            `[IpcService] Channel ${channelName} expects exactly ${expectedParamCount} parameter(s) but received ${params.length}`
         );
     }
 }
@@ -428,6 +434,9 @@ export function toClonedArrayBuffer(view: ArrayBufferView): ArrayBuffer {
     const { buffer, byteLength, byteOffset } = view;
 
     if (buffer instanceof ArrayBuffer) {
+        if (byteOffset === 0 && byteLength === buffer.byteLength) {
+            return buffer;
+        }
         return buffer.slice(byteOffset, byteOffset + byteLength);
     }
 
@@ -754,6 +763,32 @@ export function registerStandardizedIpcHandler<
             const correlationMetadata =
                 correlationId === undefined ? {} : { correlationId };
 
+            // Preserve the dedicated error message for "no-param" channels that
+            // do not use validators.
+            if (validateParams === null && args.length > 0) {
+                logger.warn(
+                    "[IpcHandler] Rejected IPC invocation with unexpected parameters",
+                    withLogContext({
+                        channel: channelName,
+                        ...correlationMetadata,
+                        event: "ipc:handler:unexpected-params",
+                        severity: "warn",
+                    }),
+                    {
+                        paramCount: args.length,
+                    }
+                );
+
+                return createErrorResponse(
+                    `Unexpected IPC parameters for ${channelName}. This channel does not accept any parameters.`,
+                    {
+                        handler: channelName,
+                        ...correlationMetadata,
+                        paramCount: args.length,
+                    }
+                );
+            }
+
             try {
                 assertChannelParams(channelName, args, handler);
             } catch (error: unknown) {
@@ -797,30 +832,6 @@ export function registerStandardizedIpcHandler<
                       };
 
             if (validateParams === null) {
-                if (args.length > 0) {
-                    logger.warn(
-                        "[IpcHandler] Rejected IPC invocation with unexpected parameters",
-                        withLogContext({
-                            channel: channelName,
-                            ...correlationMetadata,
-                            event: "ipc:handler:unexpected-params",
-                            severity: "warn",
-                        }),
-                        {
-                            paramCount: args.length,
-                        }
-                    );
-
-                    return createErrorResponse(
-                        `Unexpected IPC parameters for ${channelName}. This channel does not accept any parameters.`,
-                        {
-                            handler: channelName,
-                            ...correlationMetadata,
-                            paramCount: args.length,
-                        }
-                    );
-                }
-
                 return withIpcHandler(
                     channelName,
                     () => handler(...args),

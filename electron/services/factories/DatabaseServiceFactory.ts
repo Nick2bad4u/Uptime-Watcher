@@ -70,6 +70,7 @@ export interface IDataBackupService {
     restoreDatabaseBackup: (
         payload: DatabaseRestorePayload
     ) => Promise<DatabaseRestoreResult>;
+    saveDatabaseBackupToPath: (targetPath: string) => Promise<DatabaseBackupMetadata>;
 }
 
 /**

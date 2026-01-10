@@ -1,5 +1,6 @@
 import type { Monitor, Site } from "@shared/types";
 import type { ApplicationError } from "@shared/utils/errorHandling";
+import type { UnknownRecord } from "type-fest";
 
 import type { UptimeEvents } from "../events/eventTypes";
 import type { MonitorManager } from "../managers/MonitorManager";
@@ -10,7 +11,7 @@ import { logger } from "../utils/logger";
 interface ContextualErrorInput {
     readonly cause: unknown;
     readonly code: string;
-    readonly details?: Record<string, unknown>;
+    readonly details?: UnknownRecord;
     readonly message: string;
     readonly operation: string;
 }

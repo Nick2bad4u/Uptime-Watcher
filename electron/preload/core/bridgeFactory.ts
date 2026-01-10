@@ -12,6 +12,7 @@
  */
 
 import type {
+    IpcHandlerVerificationResult,
     IpcInvokeChannel,
     IpcInvokeChannelParams,
     IpcInvokeChannelResult,
@@ -21,9 +22,21 @@ import type {
 import type { IpcRendererEvent } from "electron";
 import type { UnknownRecord } from "type-fest";
 
-import { createIpcCorrelationEnvelope } from "@shared/types/ipc";
-import { DIAGNOSTICS_CHANNELS } from "@shared/types/preload";
+import {
+    MAX_IPC_JSON_IMPORT_BYTES,
+    MAX_IPC_SQLITE_RESTORE_BYTES,
+} from "@shared/constants/backup";
+import {
+    createIpcCorrelationEnvelope,
+    isIpcHandlerVerificationResult,
+} from "@shared/types/ipc";
+import {
+    DATA_CHANNELS,
+    DIAGNOSTICS_CHANNELS,
+    MONITORING_CHANNELS,
+} from "@shared/types/preload";
 import { generateCorrelationId } from "@shared/utils/correlation";
+import { ensureError } from "@shared/utils/errorHandling";
 import {
     extractIpcResponseData,
     validateVoidIpcResponse,
@@ -31,6 +44,7 @@ import {
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import { ipcRenderer } from "electron";
 
+import { isJsonByteBudgetExceeded } from "../../utils/jsonByteBudget";
 import {
     preloadDiagnosticsLogger,
     preloadLogger,
@@ -55,20 +69,28 @@ const globalEnvCandidate: unknown =
         ? (Reflect.get(globalProcessCandidate, "env") as unknown)
         : undefined;
 
-function shouldAllowDiagnosticsFallback(): boolean {
-    const overrideFlag: unknown = Reflect.get(
-        globalThis,
-        "__UPTIME_ALLOW_IPC_DIAGNOSTICS_FALLBACK__"
-    );
-
-    if (overrideFlag === false) {
-        return false;
-    }
-
-    if (overrideFlag === true) {
+function isTruthyEnvFlag(value: unknown): boolean {
+    if (value === true) {
         return true;
     }
 
+    if (typeof value !== "string") {
+        return false;
+    }
+
+    switch (value.trim().toLowerCase()) {
+        case "1":
+        case "true":
+        case "yes": {
+            return true;
+        }
+        default: {
+            return false;
+        }
+    }
+}
+
+function shouldAllowDiagnosticsFallback(): boolean {
     const vitestFlag: unknown =
         typeof globalEnvCandidate === "object" && globalEnvCandidate !== null
             ? (Reflect.get(globalEnvCandidate, "VITEST") as unknown)
@@ -78,13 +100,18 @@ function shouldAllowDiagnosticsFallback(): boolean {
             ? (Reflect.get(globalEnvCandidate, "NODE_ENV") as unknown)
             : undefined;
 
-    return Boolean(vitestFlag) || nodeEnv === "test";
-}
+    const isTestEnv = isTruthyEnvFlag(vitestFlag) || nodeEnv === "test";
+    if (!isTestEnv) {
+        return false;
+    }
 
-interface HandlerVerificationResponse {
-    readonly availableChannels: readonly string[];
-    readonly channel: string;
-    readonly registered: boolean;
+    // Test-only override: allow targeted tests to force fallback off.
+    const overrideFlag: unknown = Reflect.get(
+        globalThis,
+        "__UPTIME_ALLOW_IPC_DIAGNOSTICS_FALLBACK__"
+    );
+
+    return overrideFlag !== false;
 }
 
 const verifiedChannels = new Set<string>([DIAGNOSTICS_CHANNEL]);
@@ -140,6 +167,50 @@ export class IpcError extends Error {
     }
 }
 
+const DEFAULT_MAX_INVOKE_ARGS_BYTES = 5_000_000;
+const MAX_IMPORT_DATA_ARGS_BYTES = MAX_IPC_JSON_IMPORT_BYTES;
+const MAX_SQLITE_RESTORE_ARGS_BYTES = MAX_IPC_SQLITE_RESTORE_BYTES;
+
+function getInvokeArgsByteBudget(channel: string): number {
+    switch (channel) {
+        case DATA_CHANNELS.importData: {
+            return MAX_IMPORT_DATA_ARGS_BYTES;
+        }
+        case DATA_CHANNELS.restoreSqliteBackup: {
+            return MAX_SQLITE_RESTORE_ARGS_BYTES;
+        }
+        default: {
+            return DEFAULT_MAX_INVOKE_ARGS_BYTES;
+        }
+    }
+}
+
+function assertInvokeArgsWithinBudget(channel: string, args: unknown[]): void {
+    const maxBytes = getInvokeArgsByteBudget(channel);
+
+    if (!isJsonByteBudgetExceeded(args, maxBytes)) {
+        return;
+    }
+
+    preloadDiagnosticsLogger.warn(
+        "[IPC Bridge] Rejected invoke payload (exceeds byte budget)",
+        undefined,
+        {
+            channel,
+            maxBytes,
+        }
+    );
+
+    throw new IpcError(
+        `IPC payload too large for channel '${channel}' (max ${maxBytes} bytes)`,
+        channel,
+        undefined,
+        {
+            maxBytes,
+        }
+    );
+}
+
 /**
  * Type guard for IPC response validation
  *
@@ -147,33 +218,6 @@ export class IpcError extends Error {
  *
  * @returns True if value is a valid IPC response
  */
-
-
-function isHandlerVerificationResponse(
-    value: unknown
-): value is HandlerVerificationResponse {
-    if (typeof value !== "object" || value === null) {
-        return false;
-    }
-
-    // We need a minimal structural read of unknown object properties.
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Guarded by the runtime object/null check above.
-    const record = value as Record<string, unknown>;
-
-    const { availableChannels, channel, registered } = record;
-
-    if (
-        typeof channel !== "string" ||
-        typeof registered !== "boolean" ||
-        !Array.isArray(availableChannels)
-    ) {
-        return false;
-    }
-
-    return availableChannels.every(
-        (availableChannel) => typeof availableChannel === "string"
-    );
-}
 
 async function verifyChannelOrThrow(channel: string): Promise<void> {
     if (verifiedChannels.has(channel) || channel === DIAGNOSTICS_CHANNEL) {
@@ -196,11 +240,11 @@ async function verifyChannelOrThrow(channel: string): Promise<void> {
                 );
 
                 const verificationResult =
-                    extractIpcResponseData<HandlerVerificationResponse>(
+                    extractIpcResponseData<IpcHandlerVerificationResult>(
                         rawResponse
                     );
 
-                if (!isHandlerVerificationResponse(verificationResult)) {
+                if (!isIpcHandlerVerificationResult(verificationResult)) {
                     throw new Error(
                         "Invalid diagnostics verification response"
                     );
@@ -232,13 +276,15 @@ async function verifyChannelOrThrow(channel: string): Promise<void> {
                     throw error;
                 }
 
+                const normalizedError = ensureError(error);
+
                 // eslint-disable-next-line ex/use-error-cause -- IpcError constructor preserves original error via dedicated field
                 throw new IpcError(
-                    `Failed verifying handler for channel '${channel}': ${
-                        getUserFacingErrorDetail(error)
-                    }`,
+                    `Failed verifying handler for channel '${channel}': ${getUserFacingErrorDetail(
+                        error
+                    )}`,
                     channel,
-                    error instanceof Error ? error : undefined
+                    normalizedError
                 );
             } finally {
                 pendingVerifications.delete(channel);
@@ -276,11 +322,12 @@ async function invokeWithValidation<T>(
         return validate(response);
     } catch (error) {
         const errorMessage = getUserFacingErrorDetail(error);
+        const normalizedError = ensureError(error);
         // eslint-disable-next-line ex/use-error-cause -- Using custom IpcError class with cause handling
         throw new IpcError(
             `IPC call failed for channel '${channel}': ${errorMessage}`,
             channel,
-            error instanceof Error ? error : undefined
+            normalizedError
         );
     }
 }
@@ -297,9 +344,18 @@ export function createTypedInvoker<TChannel extends IpcInvokeChannel>(
 ): (
     ...args: IpcInvokeChannelParams<TChannel>
 ) => Promise<IpcInvokeChannelResult<TChannel>> {
+    // Some IPC channels legitimately return `undefined` as a successful result
+    // (e.g. optional lookups). The main process standard helper
+    // `createSuccessResponse` omits the `data` field when the value is
+    // `undefined`, so the typed invoker must not require a `data` field for
+    // those channels.
+    const requireData = channel !== MONITORING_CHANNELS.checkSiteNow;
+
     return async function invokeTypedChannel(
         ...args: IpcInvokeChannelParams<TChannel>
     ): Promise<IpcInvokeChannelResult<TChannel>> {
+        assertInvokeArgsWithinBudget(channel, args as unknown[]);
+
         return invokeWithValidation(
             channel,
             (correlationId) =>
@@ -310,7 +366,8 @@ export function createTypedInvoker<TChannel extends IpcInvokeChannel>(
                 ),
             (response) =>
                 extractIpcResponseData<IpcInvokeChannelResult<TChannel>>(
-                    response
+                    response,
+                    { requireData }
                 )
         );
     };
@@ -330,6 +387,8 @@ export function createVoidInvoker<TChannel extends VoidIpcInvokeChannel>(
     return async function invokeVoidChannel(
         ...args: IpcInvokeChannelParams<TChannel>
     ): Promise<void> {
+        assertInvokeArgsWithinBudget(channel, args as unknown[]);
+
         await invokeWithValidation(
             channel,
             (correlationId) =>
@@ -357,30 +416,49 @@ export function createEventManager(channel: string): {
     once: (callback: EventCallback) => void;
     removeAll: () => void;
 } {
-    const createSafeEventCallback =
-        (callback: EventCallback) =>
-        (_event: IpcRendererEvent, ...args: unknown[]): void => {
-            try {
-                // eslint-disable-next-line n/callback-return -- Event handler callback, no return needed
-                callback(...args);
-            } catch (error) {
-                // Log callback errors but don't propagate them to prevent event system crashes
-                preloadLogger.warn("Event callback error", {
-                    channel,
-                    error,
-                });
-            }
-        };
+    const registeredHandlers = new Set<
+        (_event: IpcRendererEvent, ...args: unknown[]) => void
+    >();
+
+    const invokeSafely = (callback: EventCallback, args: unknown[]): void => {
+        try {
+            // eslint-disable-next-line n/callback-return -- Event handler callback, no return needed
+            callback(...args);
+        } catch (error) {
+            // Log callback errors but don't propagate them to prevent event system crashes.
+            const normalizedError = ensureError(error);
+            preloadLogger.warn("Event callback error", {
+                channel,
+                error: normalizedError,
+            });
+        }
+    };
+
+    const removeRegisteredHandler = (
+        handler: (_event: IpcRendererEvent, ...args: unknown[]) => void
+    ): void => {
+        if (!registeredHandlers.delete(handler)) {
+            return;
+        }
+
+        ipcRenderer.removeListener(channel, handler);
+    };
 
     return {
         /**
          * Add an event listener
          */
         on: (callback: EventCallback): RemoveListener => {
-            const handleEventCallback = createSafeEventCallback(callback);
+            const handleEventCallback = (
+                _event: IpcRendererEvent,
+                ...args: unknown[]
+            ): void => {
+                invokeSafely(callback, args);
+            };
+            registeredHandlers.add(handleEventCallback);
             ipcRenderer.on(channel, handleEventCallback);
             return (): void => {
-                ipcRenderer.removeListener(channel, handleEventCallback);
+                removeRegisteredHandler(handleEventCallback);
             };
         },
 
@@ -388,14 +466,26 @@ export function createEventManager(channel: string): {
          * Add a one-time event listener
          */
         once: (callback: EventCallback): void => {
-            ipcRenderer.once(channel, createSafeEventCallback(callback));
+            const handleEventCallback = (
+                _event: IpcRendererEvent,
+                ...args: unknown[]
+            ): void => {
+                removeRegisteredHandler(handleEventCallback);
+                invokeSafely(callback, args);
+            };
+
+            registeredHandlers.add(handleEventCallback);
+            ipcRenderer.on(channel, handleEventCallback);
         },
 
         /**
          * Remove all listeners for this channel
          */
         removeAll: (): void => {
-            ipcRenderer.removeAllListeners(channel);
+            for (const handler of registeredHandlers) {
+                ipcRenderer.removeListener(channel, handler);
+            }
+            registeredHandlers.clear();
         },
     };
 }

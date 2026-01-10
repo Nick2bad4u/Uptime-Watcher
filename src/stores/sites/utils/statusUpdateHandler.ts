@@ -11,6 +11,7 @@
  */
 import type { RendererEventPayloadMap } from "@shared/ipc/rendererEvents";
 import type { Site, StatusUpdate } from "@shared/types";
+import type { UnknownRecord } from "type-fest";
 
 import { isDevelopment } from "@shared/utils/environment";
 import { ensureError } from "@shared/utils/errorHandling";
@@ -504,14 +505,24 @@ export class StatusUpdateManager {
      * ```
      */
     public unsubscribe(): void {
-        // Clean up all event listeners
-        for (const cleanup of this.cleanupFunctions) {
-            cleanup();
-        }
+        // Reset state first to avoid re-entrancy issues where cleanup handlers
+        // indirectly trigger another unsubscribe call.
+        this.isListenerAttached = false;
+
+        const { cleanupFunctions } = this;
         this.cleanupFunctions = [];
 
-        // Reset state
-        this.isListenerAttached = false;
+        // Clean up all event listeners (best-effort).
+        for (const cleanup of cleanupFunctions) {
+            try {
+                cleanup();
+            } catch (error) {
+                logger.warn(
+                    "[StatusUpdateHandler] Listener cleanup threw during unsubscribe",
+                    ensureError(error)
+                );
+            }
+        }
     }
 
     private handleMonitoringLifecycleEvent(
@@ -530,7 +541,7 @@ export class StatusUpdateManager {
             | RendererEventPayloadMap["monitoring:started"]
             | RendererEventPayloadMap["monitoring:stopped"]
     ): void {
-        const logPayload: Record<string, unknown> = { phase };
+        const logPayload: UnknownRecord = { phase };
 
         if (event.monitorCount !== undefined) {
             logPayload["monitorCount"] = event.monitorCount;

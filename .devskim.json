@@ -4,7 +4,11 @@
     "BasePath": "",
     "CacheLocation": ".devskim-cache",
     "CommentsPath": "",
-    "Confidences": ["High", "Medium", "Low"],
+    "Confidences": [
+        "High",
+        "Medium",
+        "Low"
+    ],
     "ConsoleVerbosityLevel": "Information",
     "CrawlArchives": false,
     "DisableConsoleOutput": false,

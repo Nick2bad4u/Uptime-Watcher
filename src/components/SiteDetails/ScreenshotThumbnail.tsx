@@ -6,7 +6,9 @@
  * React portals for the overlay positioning.
  */
 
-import { isPrivateNetworkHostname } from "@shared/utils/urlSafety";
+import {
+    tryGetSafeThirdPartyHttpUrl,
+} from "@shared/utils/urlSafety";
 import { isValidUrl } from "@shared/validation/validatorUtils";
 import {
     type JSX,
@@ -96,17 +98,14 @@ export const ScreenshotThumbnail = ({
         [safeUrl]
     );
 
-    const isUrlSafeForScreenshot = useMemo(() => {
+    const screenshotTargetUrl = useMemo((): null | string => {
         if (!isUrlValid) {
-            return false;
+            return null;
         }
 
-        try {
-            const parsed = new URL(safeUrl);
-            return !isPrivateNetworkHostname(parsed.hostname);
-        } catch {
-            return false;
-        }
+        // TryGetSafeThirdPartyHttpUrl includes the private-hostname check and
+        // strips query/hash to avoid leaking secrets to third parties.
+        return tryGetSafeThirdPartyHttpUrl(safeUrl);
     }, [isUrlValid, safeUrl]);
 
     const safeSiteName = useMemo(
@@ -114,13 +113,13 @@ export const ScreenshotThumbnail = ({
         [siteName]
     );
 
-    const screenshotUrl = useMemo(
-        () =>
-            isUrlSafeForScreenshot
-                ? `https://api.microlink.io/?url=${encodeURIComponent(safeUrl)}&screenshot=true&meta=false&embed=screenshot.url&colorScheme=auto`
-                : undefined,
-        [isUrlSafeForScreenshot, safeUrl]
-    );
+    const screenshotUrl = useMemo((): string | undefined => {
+        if (!screenshotTargetUrl) {
+            return undefined;
+        }
+
+        return `https://api.microlink.io/?url=${encodeURIComponent(screenshotTargetUrl)}&screenshot=true&meta=false&embed=screenshot.url&colorScheme=auto`;
+    }, [screenshotTargetUrl]);
 
     const ariaLabel = useMemo(
         () => (isUrlValid ? `Open ${safeUrl} in browser` : "Open in browser"),

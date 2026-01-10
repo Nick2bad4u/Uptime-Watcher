@@ -99,11 +99,17 @@ const uiStoreState = vi.hoisted(() => ({
 }));
 
 vi.mock("../../stores/ui/useUiStore", () => ({
-    useUIStore: () => ({
-        setShowAddSiteModal: uiStoreState.setShowAddSiteModal,
-        setShowSettings: uiStoreState.setShowSettings,
-        siteListLayout: uiStoreState.layout,
-    }),
+    useUIStore: (selector?: unknown) => {
+        const state = {
+            setShowAddSiteModal: uiStoreState.setShowAddSiteModal,
+            setShowSettings: uiStoreState.setShowSettings,
+            siteListLayout: uiStoreState.layout,
+        };
+
+        return typeof selector === "function"
+            ? (selector as (value: typeof state) => unknown)(state)
+            : state;
+    },
 }));
 
 const themeState = vi.hoisted(() => ({

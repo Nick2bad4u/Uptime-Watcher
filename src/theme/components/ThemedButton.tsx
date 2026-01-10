@@ -143,6 +143,7 @@ const ThemedButtonComponent = ({
     type: providedType,
     value,
     variant = "primary",
+    ...domProps
 }: ThemedButtonProperties): JSX.Element => {
     const overrideTypeProps =
         providedType && providedType !== "button"
@@ -226,6 +227,7 @@ const ThemedButtonComponent = ({
             title={title}
             type="button"
             value={value}
+            {...domProps}
             {...overrideTypeProps}
         >
             {renderContent()}

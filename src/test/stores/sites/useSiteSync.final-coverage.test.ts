@@ -3,9 +3,10 @@
  * uncovered lines: 194-195, 207-220, 239
  */
 
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterAll, beforeEach, describe, expect, it, vi } from "vitest";
 import type { Site } from "@shared/types";
 import type { StateSyncStatusSummary } from "@shared/types/stateSync";
+import { installElectronApiMock } from "../../utils/electronApiMock";
 
 const LISTENER_NAMES = [
     "monitor:status-changed",
@@ -73,11 +74,13 @@ vi.mock("../../../services/StateSyncService", () => ({
 }));
 
 // Mock window.electronAPI
-Object.defineProperty(globalThis, "window", {
-    value: {
-        electronAPI: {},
-    },
-    writable: true,
+const { restore: restoreElectronApi } = installElectronApiMock(
+    {},
+    { ensureWindow: true }
+);
+
+afterAll(() => {
+    restoreElectronApi();
 });
 
 // Import after mocking
@@ -128,6 +131,7 @@ describe("useSiteSync - Final 100% Coverage", () => {
 
             const fullSyncResult = {
                 completedAt: Date.now(),
+                revision: 1,
                 siteCount: mockSites.length,
                 sites: mockSites,
                 source: "frontend" as const,

@@ -81,6 +81,7 @@ describe("httpMonitorCore followRedirects", () => {
             "https://example.com",
             expect.objectContaining({
                 maxRedirects: 0,
+                responseType: "stream",
                 timeout: 1000,
             })
         );
@@ -116,6 +117,7 @@ describe("httpMonitorCore followRedirects", () => {
         const requestConfig = call?.[1] as Record<string, unknown>;
 
         expect(requestConfig).toBeDefined();
+        expect(requestConfig["responseType"]).toBe("stream");
         expect(Object.hasOwn(requestConfig, "maxRedirects")).toBeFalsy();
     });
 });

@@ -89,7 +89,7 @@ const {
             state.error.error = null;
             state.error.lastError = undefined;
         }),
-        downloadSqliteBackup: vi.fn(async () => undefined),
+        saveSqliteBackup: vi.fn(async () => ({ canceled: true as const })),
         fullResyncSites: vi.fn(async () => undefined),
         onClose: vi.fn(),
         confirm: vi.fn(async () => true),
@@ -118,7 +118,7 @@ const {
         mocks.resetSettings.mockClear();
         mocks.setError.mockClear();
         mocks.clearError.mockClear();
-        mocks.downloadSqliteBackup.mockClear();
+        mocks.saveSqliteBackup.mockClear();
         mocks.fullResyncSites.mockClear();
         mocks.onClose.mockClear();
         mocks.confirm.mockClear();
@@ -178,18 +178,24 @@ vi.mock("../../../stores/settings/useSettingsStore", () => ({
 }));
 
 vi.mock("../../../stores/error/useErrorStore", () => ({
-    useErrorStore: () => ({
-        clearError: mocks.clearError,
-        isLoading: storeState.error.isLoading,
-        lastError: storeState.error.lastError ?? null,
-        setError: mocks.setError,
-    }),
+    useErrorStore: (selector?: unknown) => {
+        const state = {
+            clearError: mocks.clearError,
+            isLoading: storeState.error.isLoading,
+            lastError: storeState.error.lastError ?? null,
+            setError: mocks.setError,
+        };
+
+        return typeof selector === "function"
+            ? (selector as (value: typeof state) => unknown)(state)
+            : state;
+    },
 }));
 
 vi.mock("../../../stores/sites/useSitesStore", () => ({
     useSitesStore: (selector?: (state: unknown) => unknown) => {
         const state = {
-            downloadSqliteBackup: mocks.downloadSqliteBackup,
+            saveSqliteBackup: mocks.saveSqliteBackup,
             fullResyncSites: mocks.fullResyncSites,
         };
         return typeof selector === "function" ? selector(state) : state;

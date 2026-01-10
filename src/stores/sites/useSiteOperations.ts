@@ -11,9 +11,11 @@
 import type { Monitor, MonitorType, Site } from "@shared/types";
 import type {
     SerializedDatabaseBackupResult,
+    SerializedDatabaseBackupSaveResult,
     SerializedDatabaseRestorePayload,
     SerializedDatabaseRestoreResult,
 } from "@shared/types/ipc";
+import type { UnknownRecord } from "type-fest";
 
 import { DEFAULT_SITE_NAME } from "@shared/constants/sites";
 import { ERROR_CATALOG } from "@shared/utils/errorCatalog";
@@ -45,7 +47,7 @@ const updateMonitorNumericField = async (args: {
     monitorId: string;
     operationName: MonitorNumericUpdateOperationName;
     siteIdentifier: string;
-    telemetry: Record<string, unknown>;
+    telemetry: UnknownRecord;
     value: number | undefined;
 }): Promise<void> => {
     const { deps, field, monitorId, operationName, siteIdentifier, telemetry, value } =
@@ -124,6 +126,38 @@ const downloadSqliteBackupAction = (
         }
     );
 
+const saveSqliteBackupAction = (
+    deps: SiteOperationsDependencies
+): Promise<SerializedDatabaseBackupSaveResult> =>
+    withSiteOperationReturning(
+        "saveSqliteBackup",
+        async () => {
+            try {
+                const result = await deps.services.data.saveSqliteBackup();
+
+                if (!result.canceled) {
+                    deps.setLastBackupMetadata(result.metadata);
+                }
+
+                return result;
+            } catch (error: unknown) {
+                deps.setLastBackupMetadata(undefined);
+                const resolvedError = ensureError(error);
+                logger.error("Failed to save SQLite backup:", resolvedError);
+                throw resolvedError;
+            }
+        },
+        deps,
+        {
+            syncAfter: false,
+            telemetry: {
+                success: {
+                    message: "SQLite backup save completed",
+                },
+            },
+        }
+    );
+
 const restoreSqliteBackupAction = (
     deps: SiteOperationsDependencies,
     payload: SerializedDatabaseRestorePayload
@@ -182,10 +216,6 @@ export interface SiteOperationsActions extends BaseSiteOperations {
     }>;
     /** Modify an existing site */
     modifySite: (identifier: string, updates: Partial<Site>) => Promise<void>;
-    /** Restore SQLite backup */
-    restoreSqliteBackup: (
-        payload: SerializedDatabaseRestorePayload
-    ) => Promise<SerializedDatabaseRestoreResult>;
 }
 
 /**
@@ -371,6 +401,8 @@ export const createSiteOperationsActions = (
         payload: SerializedDatabaseRestorePayload
     ): Promise<SerializedDatabaseRestoreResult> =>
         restoreSqliteBackupAction(deps, payload),
+    saveSqliteBackup: async (): Promise<SerializedDatabaseBackupSaveResult> =>
+        saveSqliteBackupAction(deps),
     updateMonitorRetryAttempts: async (
         siteIdentifier: string,
         monitorId: string,

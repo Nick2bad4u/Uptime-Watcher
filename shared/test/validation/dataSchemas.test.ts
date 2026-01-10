@@ -4,6 +4,8 @@
 
 import { describe, expect, it } from "vitest";
 
+import { DEFAULT_MAX_IPC_BACKUP_TRANSFER_BYTES } from "@shared/constants/backup";
+
 import {
     validateMonitorTypeConfigArray,
     validateSerializedDatabaseBackupResult,
@@ -31,6 +33,26 @@ describe("dataSchemas", () => {
         });
 
         expect(parsed.success).toBeTruthy();
+    });
+
+    it("rejects serialized backup results that exceed the IPC transfer size", () => {
+        const buffer = new ArrayBuffer(DEFAULT_MAX_IPC_BACKUP_TRANSFER_BYTES + 1);
+
+        const parsed = validateSerializedDatabaseBackupResult({
+            buffer,
+            fileName: "backup.sqlite",
+            metadata: {
+                appVersion: "1.0.0",
+                checksum: "abc",
+                createdAt: 1,
+                originalPath: "C:/x",
+                retentionHintDays: 30,
+                schemaVersion: 1,
+                sizeBytes: buffer.byteLength,
+            },
+        });
+
+        expect(parsed.success).toBeFalsy();
     });
 
     it("rejects when the buffer is not transferable", () => {

@@ -163,6 +163,36 @@ const mockElectronAPI = {
             },
         }),
     },
+    data: {
+        downloadSqliteBackup: vi.fn().mockResolvedValue({
+            buffer: new ArrayBuffer(8),
+            fileName: "backup.db",
+            metadata: {
+                appVersion: "0.0.0-test",
+                checksum: "mock-checksum",
+                createdAt: 0,
+                originalPath: "/tmp/backup.db",
+                retentionHintDays: 30,
+                schemaVersion: 1,
+                sizeBytes: 8,
+            },
+        }),
+        saveSqliteBackup: vi.fn().mockResolvedValue({ canceled: true } as const),
+        exportData: vi.fn().mockResolvedValue("{}"),
+        importData: vi.fn().mockResolvedValue(true),
+        restoreSqliteBackup: vi.fn().mockResolvedValue({
+            metadata: {
+                appVersion: "0.0.0-test",
+                checksum: "mock-restore-checksum",
+                createdAt: 0,
+                originalPath: "/tmp/backup.db",
+                retentionHintDays: 30,
+                schemaVersion: 1,
+                sizeBytes: 8,
+            },
+            restoredAt: Date.now(),
+        }),
+    },
     settings: {
         getHistoryLimit: vi.fn().mockResolvedValue(1000),
     },
@@ -180,6 +210,7 @@ const mockElectronAPI = {
         onStateSyncEvent: vi.fn(),
         requestFullSync: vi.fn().mockResolvedValue({
             completedAt: Date.now(),
+            revision: 1,
             siteCount: 0,
             sites: [],
             source: "cache",
@@ -500,6 +531,7 @@ describe("useSitesStore Function Coverage Tests", () => {
 
             const fullSyncResult = {
                 completedAt: Date.now(),
+                revision: 1,
                 siteCount: 0,
                 sites: [],
                 source: "frontend" as const,

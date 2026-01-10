@@ -457,10 +457,17 @@ describe("AddSiteForm behavioral coverage", () => {
         expect(formStateRefs).toBeDefined();
         const { onChange } = dynamicMonitorFieldsProps!;
 
+        const getSetterName = (fieldName: string): keyof FormStateReferences => {
+            if (fieldName === "maxResponseTime") {
+                return "setMaxResponseTimeMs";
+            }
+
+            return `set${fieldName.charAt(0).toUpperCase()}${fieldName.slice(1)}` as keyof FormStateReferences;
+        };
+
         for (const [fieldName, handler] of Object.entries(onChange)) {
             handler(123);
-            const setterName =
-                `set${fieldName.charAt(0).toUpperCase()}${fieldName.slice(1)}` as keyof FormStateReferences;
+            const setterName = getSetterName(fieldName);
             const setter = (formStateRefs as FormStateReferences)[setterName];
             expect(setter).toBeDefined();
             expect(setter).toHaveBeenCalledWith("123");
@@ -488,8 +495,13 @@ describe("AddSiteForm behavioral coverage", () => {
             )
         ).toBeInTheDocument();
         expect(
-            within(screen.getByTestId("add-site-form")).getByText(
+            within(screen.getByTestId("add-site-form")).queryByText(
                 /secondary guidance/i
+            )
+        ).not.toBeInTheDocument();
+        expect(
+            within(screen.getByTestId("add-site-form")).getByText(
+                /checks run every/i
             )
         ).toBeInTheDocument();
     });

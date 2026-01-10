@@ -8,6 +8,7 @@ import type { UnknownRecord } from "type-fest";
 
 import { DIAGNOSTICS_CHANNELS } from "@shared/types/preload";
 import { generateCorrelationId } from "@shared/utils/correlation";
+import { readBooleanEnv } from "@shared/utils/environment";
 import {
     normalizeLogValue,
     withLogContext,
@@ -17,6 +18,7 @@ import { isRecord as isSharedRecord } from "@shared/utils/typeHelpers";
 import type { UptimeEvents } from "../../../events/eventTypes";
 import type { TypedEventBus } from "../../../events/TypedEventBus";
 
+import { isDev } from "../../../electronUtils";
 import { diagnosticsLogger, logger } from "../../../utils/logger";
 import {
     getUtfByteLength,
@@ -30,7 +32,10 @@ import {
     recordSuccessfulHandlerCheck,
 } from "../diagnosticsMetrics";
 import { createStandardizedIpcRegistrar } from "../utils";
-import { SystemHandlerValidators } from "../validators";
+import { SystemHandlerValidators } from "../validators/system";
+
+const shouldExposeChannelInventory = (): boolean =>
+    isDev() || readBooleanEnv("VITEST");
 
 const isUnknownRecord = (value: unknown): value is UnknownRecord =>
     isSharedRecord(value);
@@ -130,14 +135,17 @@ export function registerDiagnosticsHandlers({
                 throw new TypeError("Channel name must be a non-empty string");
             }
 
-            const availableChannels = Array.from(registeredHandlers).toSorted(
-                (left, right) => left.localeCompare(right)
-            );
+            // Do not expose the full channel inventory outside dev/test.
+            const includeInventory = shouldExposeChannelInventory();
 
-            const matchedChannel = availableChannels.find(
-                (registeredChannel) => registeredChannel === channelRaw
-            );
-            const isRegistered = matchedChannel !== undefined;
+            const registeredHandlerSet: ReadonlySet<string> = registeredHandlers;
+            const isRegistered = registeredHandlerSet.has(channelRaw);
+
+            const availableChannels = includeInventory
+                ? Array.from(registeredHandlers).toSorted((left, right) =>
+                      left.localeCompare(right)
+                  )
+                : [];
 
             if (isRegistered) {
                 recordSuccessfulHandlerCheck();

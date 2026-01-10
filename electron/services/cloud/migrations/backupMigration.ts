@@ -8,10 +8,7 @@ import { ensureError } from "@shared/utils/errorHandling";
 import type { CloudStorageProvider } from "../providers/CloudStorageProvider.types";
 
 import { decryptBuffer, encryptBuffer } from "../crypto/cloudCrypto";
-
-function backupMetadataKeyForBackupKey(backupKey: string): string {
-    return `${backupKey}.metadata.json`;
-}
+import { backupMetadataKeyForBackupKey } from "../providers/CloudBackupMetadataFile";
 
 function normalizeBackupFileName(args: {
     fileName: string;
@@ -73,6 +70,28 @@ export async function migrateProviderBackups(args: {
     const selected =
         typeof limit === "number" ? backups.slice(0, limit) : backups;
 
+    if (selected.length === 0) {
+        return {
+            completedAt: Date.now(),
+            deleteSource,
+            failures,
+            migrated,
+            processed,
+            skipped,
+            startedAt,
+            target,
+        };
+    }
+
+    // Preload existing backup object keys so we can refuse to overwrite an
+    // already-migrated target.
+    const backupsPrefix = selected[0]?.key.endsWith(selected[0].fileName)
+        ? selected[0].key.slice(0, -selected[0].fileName.length)
+        : "backups/";
+
+    const backupObjects = await provider.listObjects(backupsPrefix);
+    const existingBackupKeys = new Set(backupObjects.map((entry) => entry.key));
+
     const needsCryptoKey =
         targetEncrypted || selected.some((entry) => entry.encrypted);
     if (needsCryptoKey && encryptionKey === undefined) {
@@ -91,54 +110,81 @@ export async function migrateProviderBackups(args: {
         return encryptionKey;
     }
 
+    async function deleteSourceIfRequested(sourceKey: string): Promise<void> {
+        if (!deleteSource) {
+            return;
+        }
+
+        const deletions = await Promise.allSettled([
+            provider.deleteObject(sourceKey),
+            provider.deleteObject(backupMetadataKeyForBackupKey(sourceKey)),
+        ]);
+
+        const deletionErrors = deletions
+            .flatMap((result) =>
+                result.status === "rejected"
+                    ? [ensureError(result.reason).message]
+                    : []
+            )
+            .filter((message) => message.trim().length > 0);
+
+        if (deletionErrors.length > 0) {
+            failures.push({
+                key: sourceKey,
+                message: `Migration uploaded target but failed to delete source objects: ${deletionErrors.join(", ")}`,
+            });
+        }
+    }
+
     for (const entry of selected) {
         processed += 1;
 
         const needsMigration = entry.encrypted !== targetEncrypted;
         if (needsMigration) {
             try {
-                // eslint-disable-next-line no-await-in-loop -- Migration is intentionally sequential to reduce provider load and keep delete-after-upload semantics simple.
-                const downloaded = await provider.downloadBackup(entry.key);
-
-                const plaintext = downloaded.entry.encrypted
-                    ? decryptBuffer({
-                          ciphertext: downloaded.buffer,
-                          key: requireEncryptionKey(),
-                      })
-                    : downloaded.buffer;
-
-                const targetBuffer = targetEncrypted
-                    ? encryptBuffer({
-                          key: requireEncryptionKey(),
-                          plaintext,
-                      })
-                    : plaintext;
-
                 const targetFileName = normalizeBackupFileName({
                     fileName: entry.fileName,
                     target,
                 });
+                const targetKey = `${backupsPrefix}${targetFileName}`;
 
-                // eslint-disable-next-line no-await-in-loop -- Migration is intentionally sequential to reduce provider load and keep delete-after-upload semantics simple.
-                await provider.uploadBackup({
-                    buffer: targetBuffer,
-                    encrypted: targetEncrypted,
-                    fileName: targetFileName,
-                    metadata: entry.metadata,
-                });
+                if (existingBackupKeys.has(targetKey)) {
+                    failures.push({
+                        key: entry.key,
+                        message: `Target backup already exists (${targetKey}); refusing to overwrite`,
+                    });
+                } else {
+                    // eslint-disable-next-line no-await-in-loop -- Migration is intentionally sequential to reduce provider load and keep delete-after-upload semantics simple.
+                    const downloaded = await provider.downloadBackup(entry.key);
 
-                if (deleteSource) {
-                    const sourceMetadataKey = backupMetadataKeyForBackupKey(
-                        entry.key
-                    );
+                    const plaintext = downloaded.entry.encrypted
+                        ? decryptBuffer({
+                              ciphertext: downloaded.buffer,
+                              key: requireEncryptionKey(),
+                          })
+                        : downloaded.buffer;
+
+                    const targetBuffer = targetEncrypted
+                        ? encryptBuffer({
+                              key: requireEncryptionKey(),
+                              plaintext,
+                          })
+                        : plaintext;
+
+                    // eslint-disable-next-line no-await-in-loop -- Migration is intentionally sequential to reduce provider load and keep delete-after-upload semantics simple.
+                    await provider.uploadBackup({
+                        buffer: targetBuffer,
+                        encrypted: targetEncrypted,
+                        fileName: targetFileName,
+                        metadata: entry.metadata,
+                    });
+
+                    migrated += 1;
+                    existingBackupKeys.add(targetKey);
+
                     // eslint-disable-next-line no-await-in-loop -- Delete is conditional on the just-completed upload.
-                    await Promise.all([
-                        provider.deleteObject(entry.key),
-                        provider.deleteObject(sourceMetadataKey),
-                    ]);
+                    await deleteSourceIfRequested(entry.key);
                 }
-
-                migrated += 1;
             } catch (error) {
                 const resolved = ensureError(error);
                 failures.push({

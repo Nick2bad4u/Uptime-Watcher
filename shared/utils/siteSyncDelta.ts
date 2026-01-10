@@ -42,7 +42,7 @@ export function calculateSiteSyncDelta(
     }
 
     const addedSites: Site[] = [];
-    const updatedSites: SiteSyncDelta["updatedSites"] = [];
+    const updatedSites: Site[] = [];
 
     for (const [identifier, nextSite] of nextMap.entries()) {
         const previousSite = previousMap.get(identifier);
@@ -50,11 +50,7 @@ export function calculateSiteSyncDelta(
         if (!previousSite) {
             addedSites.push(nextSite);
         } else if (!areSitesEquivalent(previousSite, nextSite)) {
-            updatedSites.push({
-                identifier,
-                next: nextSite,
-                previous: previousSite,
-            });
+            updatedSites.push(nextSite);
         }
     }
 

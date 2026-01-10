@@ -24,6 +24,7 @@ import type { Monitor, MonitorType } from "@shared/types";
 import type { MonitorTypeConfig } from "@shared/types/monitorTypes";
 
 import { isMonitorTypeConfig } from "@shared/types/monitorTypes";
+import { isAbortError } from "@shared/utils/abortUtils";
 import { CacheKeys } from "@shared/utils/cacheKeys";
 import { withUtilityErrorHandling } from "@shared/utils/errorHandling";
 import { validateMonitorType } from "@shared/utils/validation";
@@ -86,7 +87,7 @@ async function getConfig(
     signal?: AbortSignal
 ): Promise<MonitorTypeConfig | undefined> {
     if (signal?.aborted) {
-        throw new Error("Operation aborted");
+        return undefined;
     }
 
     const buildMonitorConfigCacheKey = (monitorTypeName: MonitorType): string =>
@@ -102,7 +103,7 @@ async function getConfig(
 
     // Check abort signal again before backend call
     if (signal?.aborted) {
-        throw new Error("Operation aborted");
+        return undefined;
     }
 
     // Get from backend and cache
@@ -153,13 +154,23 @@ async function readMonitorUiConfigValue<T>(
     selector: (config: MonitorTypeConfig | undefined) => Promise<T> | T,
     signal?: AbortSignal
 ): Promise<T> {
-    return runMonitorUiOperation(description, fallback, async () => {
-        if (signal?.aborted) {
-            throw new Error("Operation aborted");
-        }
+    // If the caller already cancelled, return the fallback immediately.
+    // This avoids logging aborted work as an error.
+    if (signal?.aborted) {
+        return fallback;
+    }
 
-        const config = await getConfig(monitorType, signal);
-        return selector(config);
+    return runMonitorUiOperation(description, fallback, async () => {
+        try {
+            const config = await getConfig(monitorType, signal);
+            return await selector(config);
+        } catch (error: unknown) {
+            if (signal?.aborted === true || isAbortError(error)) {
+                return fallback;
+            }
+
+            throw error;
+        }
     });
 }
 

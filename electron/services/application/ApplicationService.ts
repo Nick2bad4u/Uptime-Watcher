@@ -752,12 +752,30 @@ export class ApplicationService {
                 data
             );
             try {
+                const sitesCount =
+                    payload.action === "bulk-sync" ? payload.sites.length : undefined;
+                const delta =
+                    payload.action === "bulk-sync" ? undefined : payload.delta;
+
                 logger.debug(
                     LOG_TEMPLATES.debug.APPLICATION_FORWARDING_STATE_SYNC,
                     {
                         action: payload.action,
+                        revision: payload.revision,
                         siteIdentifier: payload.siteIdentifier,
-                        sitesCount: payload.sites.length,
+                        ...(typeof sitesCount === "number"
+                            ? { sitesCount }
+                            : {}),
+                        ...(delta
+                            ? {
+                                  deltaAddedCount:
+                                      delta.addedSites.length,
+                                  deltaRemovedCount:
+                                      delta.removedSiteIdentifiers.length,
+                                  deltaUpdatedCount:
+                                      delta.updatedSites.length,
+                              }
+                            : {}),
                         source: payload.source,
                     }
                 );
@@ -811,12 +829,14 @@ export class ApplicationService {
         payload: EnhancedEventPayload<UptimeEvents[EventName]>
     ): UptimeEvents[EventName] {
         const isArrayPayload = Array.isArray(payload);
-        const sanitizedPayload = stripForwardedEventMetadata(payload);
 
-        this.logMetadataRemoval(eventName, isArrayPayload);
+        if (isArrayPayload) {
+            this.logMetadataRemoval(eventName, true);
+            return stripForwardedEventMetadata(payload);
+        }
 
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- After stripping metadata, the payload matches the event contract.
-        return sanitizedPayload as unknown as UptimeEvents[EventName];
+        this.logMetadataRemoval(eventName, false);
+        return stripForwardedEventMetadata(payload);
     }
 
     private logMetadataRemoval(

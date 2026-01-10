@@ -27,34 +27,46 @@ import type { MonitorTypeConfig } from "@shared/types/monitorTypes";
 import type { ValidationResult } from "@shared/types/validation";
 import { useMonitorTypesStore } from "../../../stores/monitor/useMonitorTypesStore";
 import { useErrorStore } from "../../../stores/error/useErrorStore";
+import { installElectronApiMock } from "../../utils/electronApiMock";
 
 // Store the original implementations to restore later
 const originalWithErrorHandling = vi.hoisted(() => vi.fn());
 const originalLogStoreAction = vi.hoisted(() => vi.fn());
 const originalSafeExtractIpcData = vi.hoisted(() => vi.fn());
 
-// Mock dependencies with full control over their behavior
-vi.mock("@shared/utils/errorHandling", () => ({
-    withErrorHandling: originalWithErrorHandling,
-    ensureError: vi.fn((error) => {
-        if (error instanceof Error) {
-            return error;
-        }
-        // Create an object that behaves like an Error for testing
-        const errorLike = {
-            name: "Error",
-            message: String(error),
-            stack: "",
-        };
-        // Make it pass instanceof Error check by setting the prototype
-        Object.setPrototypeOf(errorLike, Error.prototype);
-        return errorLike;
-    }),
-}));
+// Mock dependencies with full control over their behavior (partial mock to retain exports).
+vi.mock("@shared/utils/errorHandling", async (importOriginal) => {
+    const actual =
+        await importOriginal<typeof import("@shared/utils/errorHandling")>();
 
-vi.mock("../../../stores/utils", () => ({
-    logStoreAction: originalLogStoreAction,
-}));
+    return {
+        ...actual,
+        ensureError: vi.fn((error) => {
+            if (error instanceof Error) {
+                return error;
+            }
+            // Create an object that behaves like an Error for testing
+            const errorLike = {
+                name: "Error",
+                message: String(error),
+                stack: "",
+            };
+            // Make it pass instanceof Error check by setting the prototype
+            Object.setPrototypeOf(errorLike, Error.prototype);
+            return errorLike;
+        }),
+        withErrorHandling: originalWithErrorHandling,
+    };
+});
+
+vi.mock("../../../stores/utils", async (importOriginal) => {
+    const actual =
+        await importOriginal<typeof import("../../../stores/utils")>();
+    return {
+        ...actual,
+        logStoreAction: originalLogStoreAction,
+    };
+});
 
 vi.mock("../../../types/ipc", () => ({
     safeExtractIpcData: originalSafeExtractIpcData,
@@ -71,17 +83,17 @@ const mockElectronAPI = {
     monitoring: {},
 };
 
-// Properly mock window.electronAPI
-Object.defineProperty(globalThis, "window", {
-    value: {
-        electronAPI: mockElectronAPI,
-    },
-    writable: true,
+let restoreElectronApi: (() => void) | undefined;
+
+beforeEach(() => {
+    ({ restore: restoreElectronApi } = installElectronApiMock(mockElectronAPI, {
+        ensureWindow: true,
+    }));
 });
 
-// Mock window.electronAPI for global access
-vi.stubGlobal("window", {
-    electronAPI: mockElectronAPI,
+afterEach(() => {
+    restoreElectronApi?.();
+    restoreElectronApi = undefined;
 });
 
 const createMonitorTypeConfig = (

@@ -24,6 +24,7 @@ import type {
     CloudSyncFieldValue,
     CloudSyncState,
 } from "@shared/types/cloudSyncState";
+import type { UnknownRecord } from "type-fest";
 
 import {
     CLOUD_SYNC_SCHEMA_VERSION,
@@ -186,9 +187,9 @@ export function shouldSyncSettingKey(key: string): boolean {
 }
 
 function removeUndefinedEntries(
-    value: Record<string, unknown>
-): Record<string, unknown> {
-    const result: Record<string, unknown> = {};
+    value: UnknownRecord
+): UnknownRecord {
+    const result: UnknownRecord = {};
     for (const [key, entryValue] of Object.entries(value)) {
         if (entryValue !== undefined) {
             result[key] = entryValue;
@@ -381,7 +382,7 @@ export function buildDesiredMonitorsFromSyncState(
 
     for (const [monitorId, entity] of Object.entries(monitorState)) {
         if (entity.deleted === undefined) {
-            const candidate: Record<string, unknown> = { id: monitorId };
+            const candidate: UnknownRecord = { id: monitorId };
             for (const [field, fieldValue] of Object.entries(entity.fields)) {
                 if (field !== "id" && fieldValue.value !== null) {
                     candidate[field] = fieldValue.value;

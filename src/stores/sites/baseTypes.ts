@@ -8,6 +8,7 @@
 import type { Monitor, Site, StatusUpdate } from "@shared/types";
 import type {
     SerializedDatabaseBackupResult,
+    SerializedDatabaseBackupSaveResult,
     SerializedDatabaseRestorePayload,
     SerializedDatabaseRestoreResult,
 } from "@shared/types/ipc";
@@ -87,6 +88,8 @@ export interface BaseSiteOperations {
     restoreSqliteBackup: (
         payload: SerializedDatabaseRestorePayload
     ) => Promise<SerializedDatabaseRestoreResult>;
+    /** Save SQLite backup via main process */
+    saveSqliteBackup: () => Promise<SerializedDatabaseBackupSaveResult>;
     /** Update monitor retry attempts */
     updateMonitorRetryAttempts: (
         siteIdentifier: string,
@@ -168,6 +171,16 @@ export interface BaseSiteSync {
 export interface BaseSiteState {
     /** Add a site to the store */
     addSite: (site: Site) => void;
+    /**
+     * Apply a backend-provided (or otherwise authoritative) site snapshot to
+     * local state.
+     *
+     * @remarks
+     * This is a pure state mutation helper (replace-by-identifier). It is
+     * intentionally named to avoid confusion with the IPC-backed
+     * `SiteService.updateSite(...)` / `sites.update-site` mutation.
+     */
+    applySiteSnapshot: (site: Site) => void;
     /** Get selected monitor ID for a site */
     getSelectedMonitorId: (siteIdentifier: string) => string | undefined;
     /** Get the currently selected site */
@@ -184,8 +197,6 @@ export interface BaseSiteState {
     setStatusSubscriptionSummary: (
         summary: StatusUpdateSubscriptionSummary | undefined
     ) => void;
-    /** Update a site */
-    updateSite: (site: Site) => void;
 }
 
 /**

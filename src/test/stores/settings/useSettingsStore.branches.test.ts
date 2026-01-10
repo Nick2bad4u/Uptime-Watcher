@@ -57,56 +57,58 @@ vi.mock("../../../stores/error/useErrorStore", () => ({
     },
 }));
 
-// Mock store utils
-vi.mock("../../../stores/utils", () => ({
-    logStoreAction: vi.fn(),
-}));
+// Mock store utils (partial) so createPersistConfig remains available.
+vi.mock("../../../stores/utils", async (importOriginal) => {
+    const actual =
+        await importOriginal<typeof import("../../../stores/utils")>();
+    return {
+        ...actual,
+        logStoreAction: vi.fn(),
+    };
+});
 
-// Mock withErrorHandling from shared utils
-vi.mock("../../../../shared/utils/errorHandling", () => ({
-    withErrorHandling: vi.fn(),
-    ensureError: vi.fn((error) =>
-        error instanceof Error ? error : new Error(String(error))
-    ),
-}));
+// Mock withErrorHandling from shared utils (partial) to preserve ApplicationError, etc.
+vi.mock("../../../../shared/utils/errorHandling", async (importOriginal) => {
+    const actual =
+        await importOriginal<
+            typeof import("../../../../shared/utils/errorHandling")
+        >();
+
+    return {
+        ...actual,
+        ensureError: vi.fn((error) =>
+            error instanceof Error ? error : new Error(String(error))
+        ),
+        withErrorHandling: vi.fn(),
+    };
+});
 
 // Import mocked modules to get references
 import { safeExtractIpcData } from "../../../types/ipc";
 import { withErrorHandling } from "@shared/utils/errorHandling";
+import { installElectronApiMock } from "../../utils/electronApiMock";
 
 const mockSafeExtractIpcData = vi.mocked(safeExtractIpcData);
 const mockWithErrorHandling = vi.mocked(withErrorHandling);
 
 // Mock the entire electronAPI
 const mockElectronAPI = {
-    data: {
-        resetToDefaults: vi.fn(),
-        syncSettings: vi.fn(),
-    },
     settings: {
         getHistoryLimit: vi.fn(),
         updateHistoryLimit: vi.fn(),
     },
 };
 
-// Global mock for window.electronAPI
-if (globalThis.window === undefined) {
-    Object.defineProperty(globalThis, "electronAPI", {
-        value: mockElectronAPI,
-        writable: true,
-        configurable: true,
-    });
-} else {
-    Object.defineProperty(globalThis, "electronAPI", {
-        value: mockElectronAPI,
-        writable: true,
-    });
-}
+let restoreElectronApi: (() => void) | undefined;
 
 describe("useSettingsStore Branch Coverage Tests", () => {
     beforeEach(() => {
         // Reset all mocks
         vi.clearAllMocks();
+
+        ({ restore: restoreElectronApi } = installElectronApiMock(mockElectronAPI, {
+            ensureWindow: true,
+        }));
 
         mockWaitForElectronBridge.mockResolvedValue(undefined);
 
@@ -140,6 +142,11 @@ describe("useSettingsStore Branch Coverage Tests", () => {
                 }
             }
         );
+    });
+
+    afterEach(() => {
+        restoreElectronApi?.();
+        restoreElectronApi = undefined;
     });
 
     describe("syncSettingsAfterRehydration branches", () => {

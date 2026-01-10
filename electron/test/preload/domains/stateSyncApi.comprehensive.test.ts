@@ -54,27 +54,90 @@ const VALID_STATE_SYNC_SOURCES: readonly StateSyncEventData["source"][] = [
     "frontend",
 ] as const;
 
+const createMinimalSite = (identifier: string): Site => ({
+    identifier,
+    monitors: [
+        {
+            checkInterval: 30_000,
+            history: [],
+            id: `monitor-${identifier}`,
+            monitoring: true,
+            responseTime: -1,
+            retryAttempts: 0,
+            status: "up",
+            timeout: 1000,
+            type: "http",
+            url: "https://example.com",
+        },
+    ],
+    monitoring: true,
+    name: `Site ${identifier}`,
+});
+
 const buildStateSyncEventData = (
     action: StateSyncEventData["action"],
     source: StateSyncEventData["source"],
     timestamp: number,
     siteIdentifier: string | null
 ): StateSyncEventData => {
-    const baseEvent: StateSyncEventData = {
-        action,
-        sites: [],
-        source,
-        timestamp,
-    };
+    const effectiveSiteIdentifier = siteIdentifier ?? undefined;
+    const revision = Math.max(0, timestamp);
 
-    if (siteIdentifier === null) {
-        return baseEvent;
+    switch (action) {
+        case "bulk-sync": {
+            const sites: Site[] = [];
+            return {
+                action: "bulk-sync",
+                revision,
+                siteCount: sites.length,
+                ...(effectiveSiteIdentifier
+                    ? { siteIdentifier: effectiveSiteIdentifier }
+                    : {}),
+                sites,
+                source,
+                timestamp,
+            };
+        }
+
+        case "delete": {
+            return {
+                action: "delete",
+                delta: {
+                    addedSites: [],
+                    removedSiteIdentifiers: [effectiveSiteIdentifier ?? "site-1"],
+                    updatedSites: [],
+                },
+                revision,
+                ...(effectiveSiteIdentifier
+                    ? { siteIdentifier: effectiveSiteIdentifier }
+                    : {}),
+                source,
+                timestamp,
+            };
+        }
+
+        case "update": {
+            const site = createMinimalSite(effectiveSiteIdentifier ?? "site-1");
+            return {
+                action: "update",
+                delta: {
+                    addedSites: [],
+                    removedSiteIdentifiers: [],
+                    updatedSites: [site],
+                },
+                revision,
+                ...(effectiveSiteIdentifier
+                    ? { siteIdentifier: effectiveSiteIdentifier }
+                    : {}),
+                source,
+                timestamp,
+            };
+        }
+
+        default: {
+            throw new Error(`Unhandled state sync action: ${action}`);
+        }
     }
-
-    return {
-        ...baseEvent,
-        siteIdentifier,
-    };
 };
 
 describe("State Sync Domain API", () => {
@@ -196,6 +259,7 @@ describe("State Sync Domain API", () => {
 
             const mockResult: StateSyncFullSyncResult = {
                 completedAt: Date.now(),
+                revision: 1,
                 siteCount: mockSyncedSites.length,
                 sites: mockSyncedSites,
                 source: "frontend",
@@ -220,6 +284,7 @@ describe("State Sync Domain API", () => {
         it("should handle full sync with no sites", async () => {
             const emptyResult: StateSyncFullSyncResult = {
                 completedAt: Date.now(),
+                revision: 2,
                 siteCount: 0,
                 sites: [],
                 source: "cache",
@@ -295,7 +360,12 @@ describe("State Sync Domain API", () => {
 
             const validEventData: StateSyncEventData = {
                 action: "update",
-                sites: [],
+                delta: {
+                    addedSites: [],
+                    removedSiteIdentifiers: [],
+                    updatedSites: [createMinimalSite("test-site")],
+                },
+                revision: 1,
                 source: "database",
                 timestamp: Date.now(),
                 siteIdentifier: "test-site",
@@ -360,12 +430,12 @@ describe("State Sync Domain API", () => {
             ];
 
             for (const action of actions) {
-                const eventData: StateSyncEventData = {
+                const eventData = buildStateSyncEventData(
                     action,
-                    sites: [],
-                    source: "database",
-                    timestamp: Date.now(),
-                };
+                    "database",
+                    Date.now(),
+                    "test-site"
+                );
 
                 registeredHandler({}, eventData);
             }
@@ -393,12 +463,12 @@ describe("State Sync Domain API", () => {
             ];
 
             for (const source of sources) {
-                const eventData: StateSyncEventData = {
-                    action: "update",
-                    sites: [],
+                const eventData = buildStateSyncEventData(
+                    "update",
                     source,
-                    timestamp: Date.now(),
-                };
+                    Date.now(),
+                    "test-site"
+                );
 
                 registeredHandler({}, eventData);
             }
@@ -477,6 +547,7 @@ describe("State Sync Domain API", () => {
                     async (sites, completedAt, synchronized, source) => {
                         const fullSync: StateSyncFullSyncResult = {
                             completedAt,
+                            revision: Math.max(0, completedAt),
                             siteCount: sites.length,
                             sites,
                             source,
@@ -667,6 +738,8 @@ describe("State Sync Domain API", () => {
 
             const syncEvent: StateSyncEventData = {
                 action: "bulk-sync",
+                revision: 1,
+                siteCount: 0,
                 sites: [],
                 source: "database",
                 timestamp: Date.now(),
@@ -685,6 +758,7 @@ describe("State Sync Domain API", () => {
             ];
             const fullSyncResult: StateSyncFullSyncResult = {
                 completedAt: Date.now(),
+                revision: 2,
                 siteCount: syncedSites.length,
                 sites: syncedSites,
                 source: "database",
@@ -718,6 +792,7 @@ describe("State Sync Domain API", () => {
             ];
             const resolvedResult: StateSyncFullSyncResult = {
                 completedAt: Date.now(),
+                revision: 3,
                 siteCount: resolvedSites.length,
                 sites: resolvedSites,
                 source: "database",
@@ -739,6 +814,7 @@ describe("State Sync Domain API", () => {
             };
             const mockSync: StateSyncFullSyncResult = {
                 completedAt: Date.now(),
+                revision: 4,
                 siteCount: 2,
                 sites: [],
                 source: "database",
@@ -816,7 +892,12 @@ describe("State Sync Domain API", () => {
 
             const validEventData: StateSyncEventData = {
                 action: "update",
-                sites: [],
+                delta: {
+                    addedSites: [],
+                    removedSiteIdentifiers: [],
+                    updatedSites: [createMinimalSite("site-1")],
+                },
+                revision: 1,
                 source: "database",
                 timestamp: Date.now(),
             };
@@ -844,13 +925,13 @@ describe("State Sync Domain API", () => {
             // Send rapid sequence of events
             const events: StateSyncEventData[] = Array.from(
                 { length: 100 },
-                (_, i) => ({
-                    action: "update",
-                    sites: [],
-                    source: "database",
-                    timestamp: Date.now() + i,
-                    siteIdentifier: `rapid-${i}`,
-                })
+                (_, i) =>
+                    buildStateSyncEventData(
+                        "update",
+                        "database",
+                        Date.now() + i,
+                        `rapid-${i}`
+                    )
             );
 
             for (const event of events) {
@@ -862,12 +943,11 @@ describe("State Sync Domain API", () => {
 
         it("should maintain type safety with edge case data", async () => {
             const edgeCaseSites: Site[] = [
-                { identifier: "", name: "", monitoring: false, monitors: [] },
                 {
                     identifier: "a".repeat(1000),
                     name: "b".repeat(1000),
                     monitoring: true,
-                    monitors: [],
+                    monitors: createMinimalSite("edge-case").monitors,
                 },
             ];
 
@@ -879,6 +959,7 @@ describe("State Sync Domain API", () => {
             };
             const edgeCaseFullSync: StateSyncFullSyncResult = {
                 completedAt: Date.now(),
+                revision: 10,
                 siteCount: edgeCaseSites.length,
                 sites: edgeCaseSites,
                 source: "database",
@@ -916,6 +997,7 @@ describe("State Sync Domain API", () => {
             };
             const fullSyncResult: StateSyncFullSyncResult = {
                 completedAt: Date.now(),
+                revision: 11,
                 siteCount: mockSites.length,
                 sites: mockSites,
                 source: "database",
@@ -951,6 +1033,7 @@ describe("State Sync Domain API", () => {
             };
             const fullSyncResult: StateSyncFullSyncResult = {
                 completedAt: Date.now(),
+                revision: 12,
                 siteCount: 0,
                 sites: [],
                 source: "database",

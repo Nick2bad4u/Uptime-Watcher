@@ -15,13 +15,17 @@
  * @packageDocumentation
  */
 import type { Site, StatusUpdate } from "@shared/types";
-import type { StateSyncEventData } from "@shared/types/events";
+import type {
+    BulkStateSyncEventData,
+    DeltaStateSyncEventData,
+    StateSyncEventData,
+} from "@shared/types/events";
 import type {
     SiteSyncDelta,
     StateSyncStatusSummary,
 } from "@shared/types/stateSync";
+import type { UnknownRecord } from "type-fest";
 
-import { STATE_SYNC_ACTION } from "@shared/types/stateSync";
 import { ensureError, withErrorHandling } from "@shared/utils/errorHandling";
 import {
     deriveSiteSnapshot,
@@ -188,6 +192,23 @@ const statusUpdateManager: {
     instance?: StatusUpdateManager;
 } = {};
 
+/**
+ * Resets the module-level status update manager singleton.
+ *
+ * @remarks
+ * The sites sync module keeps a lazily-initialized singleton
+ * {@link StatusUpdateManager} instance. This helper exists to support
+ * deterministic testing and to avoid leaked event subscriptions when modules
+ * are reloaded in development.
+ *
+ * @internal
+ */
+export function resetStatusUpdateManagerForTesting(): void {
+    statusUpdateManager.instance?.unsubscribe();
+    delete statusUpdateManager.instance;
+    delete statusUpdateManager.callback;
+}
+
 const FALLBACK_EXPECTED_LISTENERS = 4;
 
 const resolveExpectedListenerCount = (): number => {
@@ -344,13 +365,12 @@ export const createSiteSyncActions = (
             if (!effectiveCallback) {
                 const message =
                     "Retry attempted without previously registered callback";
-                const fallbackSummary =
-                    buildStatusSubscriptionFailureSummary({
-                        errors: [message],
-                        expectedListeners: resolveExpectedListenerCount(),
-                        message:
-                            "Unable to retry status subscription without callback context",
-                    });
+                const fallbackSummary = buildStatusSubscriptionFailureSummary({
+                    errors: [message],
+                    expectedListeners: resolveExpectedListenerCount(),
+                    message:
+                        "Unable to retry status subscription without callback context",
+                });
 
                 deps.setStatusSubscriptionSummary(fallbackSummary);
                 errorHandler.setError(message);
@@ -386,13 +406,12 @@ export const createSiteSyncActions = (
             if (!effectiveCallback) {
                 const initializationMessage =
                     "Status update subscription attempted without a callback";
-                const fallbackSummary =
-                    buildStatusSubscriptionFailureSummary({
-                        errors: [initializationMessage],
-                        expectedListeners: resolveExpectedListenerCount(),
-                        message:
-                            "Failed to subscribe to status updates due to missing callback",
-                    });
+                const fallbackSummary = buildStatusSubscriptionFailureSummary({
+                    errors: [initializationMessage],
+                    expectedListeners: resolveExpectedListenerCount(),
+                    message:
+                        "Failed to subscribe to status updates due to missing callback",
+                });
 
                 deps.setStatusSubscriptionSummary(fallbackSummary);
                 errorHandler.setError(initializationMessage);
@@ -430,7 +449,8 @@ export const createSiteSyncActions = (
                         const fallbackSummary =
                             buildStatusSubscriptionFailureSummary({
                                 errors: [initializationMessage],
-                                expectedListeners: resolveExpectedListenerCount(),
+                                expectedListeners:
+                                    resolveExpectedListenerCount(),
                                 message:
                                     "Failed to subscribe to status updates",
                             });
@@ -537,87 +557,252 @@ export const createSiteSyncActions = (
             let cleanup: (() => void) | null = null;
             let disposed = false;
 
-            const handleEvent = (event: StateSyncEventData): void => {
-                const hasSnapshot = Array.isArray(event.sites);
+            const logSyncEventReceived = (event: StateSyncEventData): void => {
+                const {
+                    action,
+                    revision,
+                    siteIdentifier,
+                    source,
+                    timestamp,
+                } = event;
+
+                let sitesCount: number | undefined = undefined;
+                if (action === "bulk-sync") {
+                    const { sites } = event;
+                    sitesCount = sites.length;
+                }
 
                 logStoreAction("SitesStore", "syncEventReceived", {
-                    action: event.action,
-                    message: `Received sync event: ${event.action}`,
-                    siteIdentifier: event.siteIdentifier,
-                    source: event.source,
-                    timestamp: event.timestamp,
-                    ...(hasSnapshot && { sitesCount: event.sites.length }),
+                    action,
+                    message: `Received sync event: ${action}`,
+                    revision,
+                    siteIdentifier,
+                    source,
+                    timestamp,
+                    ...(typeof sitesCount === "number" ? { sitesCount } : {}),
+                });
+            };
+
+            const applySnapshotEvent = (event: BulkStateSyncEventData): void => {
+                const {
+                    action,
+                    revision,
+                    siteIdentifier,
+                    sites,
+                    source,
+                    timestamp,
+                } = event;
+
+                const snapshot = prepareSiteSyncSnapshot({
+                    previousSnapshot: deps.getSites(),
+                    sites,
                 });
 
-                if (!hasSnapshot) {
+                const { delta, duplicates, emissionSnapshot } = snapshot;
+
+                if (duplicates.length > 0) {
                     logger.error(
-                        "State sync event missing sites payload",
-                        event
+                        "Duplicate site identifiers detected in state sync snapshot",
+                        {
+                            action,
+                            duplicates,
+                            originalSiteCount: sites.length,
+                            sanitizedSiteCount: emissionSnapshot.length,
+                            source,
+                        }
                     );
+                }
+
+                const hasChanges = hasSiteSyncChanges(delta);
+
+                logStoreAction("SitesStore", "applySyncDelta", {
+                    action,
+                    addedCount: delta.addedSites.length,
+                    removedCount: delta.removedSiteIdentifiers.length,
+                    sanitizedSiteCount: emissionSnapshot.length,
+                    source,
+                    timestamp,
+                    updatedCount: delta.updatedSites.length,
+                });
+
+                if (!hasChanges) {
+                    logger.debug(
+                        "Sync snapshot did not change site state; skipping store update",
+                        {
+                            action,
+                            revision,
+                            siteIdentifier,
+                            source,
+                            timestamp,
+                        }
+                    );
+                    deps.onSiteDelta?.(delta);
                     return;
                 }
 
-                if (
-                    event.action === STATE_SYNC_ACTION.BULK_SYNC ||
-                    event.action === STATE_SYNC_ACTION.DELETE ||
-                    event.action === STATE_SYNC_ACTION.UPDATE
-                ) {
-                    const snapshot = prepareSiteSyncSnapshot({
-                        previousSnapshot: deps.getSites(),
-                        sites: event.sites,
-                    });
+                deps.setSites(emissionSnapshot);
+                deps.onSiteDelta?.(delta);
+            };
 
-                    if (snapshot.duplicates.length > 0) {
-                        logger.error(
-                            "Duplicate site identifiers detected in state sync event",
-                            {
-                                action: event.action,
-                                duplicates: snapshot.duplicates,
-                                originalSiteCount: event.sites.length,
-                                sanitizedSiteCount:
-                                    snapshot.emissionSnapshot.length,
-                                source: event.source,
-                            }
-                        );
+            const applyDeltaEvent = (event: DeltaStateSyncEventData): void => {
+                const {
+                    action,
+                    delta,
+                    revision,
+                    siteIdentifier,
+                    source,
+                    timestamp,
+                } = event;
+
+                const hasChanges = hasSiteSyncChanges(delta);
+                if (!hasChanges) {
+                    logger.debug(
+                        "Sync delta did not change site state; skipping store update",
+                        {
+                            action,
+                            revision,
+                            siteIdentifier,
+                            source,
+                            timestamp,
+                        }
+                    );
+                    deps.onSiteDelta?.(delta);
+                    return;
+                }
+
+                const currentSites = deps.getSites();
+                const removedIdentifiers = new Set(delta.removedSiteIdentifiers);
+                const { addedSites, removedSiteIdentifiers, updatedSites } = delta;
+
+                const deltaSnapshot = deriveSiteSnapshot([
+                    ...addedSites,
+                    ...updatedSites,
+                ]);
+                if (deltaSnapshot.duplicates.length > 0) {
+                    logger.error(
+                        "Duplicate site identifiers detected in incoming sync delta",
+                        {
+                            action,
+                            duplicates: deltaSnapshot.duplicates,
+                            source,
+                        }
+                    );
+                }
+
+                const updatedByIdentifier = new Map(
+                    updatedSites.map((site) => [site.identifier, site])
+                );
+
+                const nextSites: Site[] = [];
+                const seenIdentifiers = new Set<string>();
+
+                for (const site of currentSites) {
+                    const { identifier } = site;
+                    const removed = removedIdentifiers.has(identifier);
+                    if (!removed) {
+                        const updatedSite = updatedByIdentifier.get(identifier);
+                        nextSites.push(updatedSite ?? site);
+                        seenIdentifiers.add(identifier);
                     }
+                }
 
-                    const effectiveDelta = event.delta ?? snapshot.delta;
-                    const hasChanges =
-                        event.delta === undefined
-                            ? hasSiteSyncChanges(snapshot.delta)
-                            : hasSiteSyncChanges(event.delta);
+                for (const site of addedSites) {
+                    const { identifier } = site;
+                    const shouldAdd =
+                        !removedIdentifiers.has(identifier) &&
+                        !seenIdentifiers.has(identifier);
 
-                    logStoreAction("SitesStore", "applySyncDelta", {
-                        action: event.action,
-                        addedCount: effectiveDelta.addedSites.length,
-                        removedCount:
-                            effectiveDelta.removedSiteIdentifiers.length,
-                        sanitizedSiteCount: snapshot.emissionSnapshot.length,
-                        source: event.source,
-                        timestamp: event.timestamp,
-                        updatedCount: effectiveDelta.updatedSites.length,
-                    });
+                    if (shouldAdd) {
+                        nextSites.push(site);
+                        seenIdentifiers.add(identifier);
+                    }
+                }
 
-                    if (!hasChanges) {
-                        logger.debug(
-                            "Sync event did not change site state; skipping store update",
+                // Treat unknown updates as upserts.
+                for (const site of updatedSites) {
+                    const { identifier } = site;
+                    const shouldAdd =
+                        !removedIdentifiers.has(identifier) &&
+                        !seenIdentifiers.has(identifier);
+
+                    if (shouldAdd) {
+                        nextSites.push(site);
+                        seenIdentifiers.add(identifier);
+                    }
+                }
+
+                const snapshot = deriveSiteSnapshot(nextSites);
+                const { duplicates, sanitizedSites } = snapshot;
+                if (duplicates.length > 0) {
+                    logger.error(
+                        "Duplicate site identifiers detected after applying sync delta",
+                        {
+                            action,
+                            duplicates,
+                            source,
+                        }
+                    );
+                }
+
+                logStoreAction("SitesStore", "applySyncDelta", {
+                    action,
+                    addedCount: addedSites.length,
+                    removedCount: removedSiteIdentifiers.length,
+                    sanitizedSiteCount: sanitizedSites.length,
+                    source,
+                    timestamp,
+                    updatedCount: updatedSites.length,
+                });
+
+                deps.setSites(sanitizedSites);
+                deps.onSiteDelta?.(delta);
+            };
+
+            const handleEvent = (event: StateSyncEventData): void => {
+                try {
+                    logSyncEventReceived(event);
+
+                    if (event.truncated === true) {
+                        // Normally handled upstream by StateSyncService (full-sync recovery),
+                        // but keep this guard to avoid applying incomplete payloads.
+                        const {
+                            action,
+                            revision,
+                            siteIdentifier,
+                            source,
+                        } = event;
+                        logger.warn(
+                            "Ignoring truncated state sync event in SitesStore",
                             {
-                                action: event.action,
-                                siteIdentifier: event.siteIdentifier,
-                                source: event.source,
-                                timestamp: event.timestamp,
+                                action,
+                                revision,
+                                siteIdentifier,
+                                source,
                             }
                         );
-                        deps.onSiteDelta?.(effectiveDelta);
                         return;
                     }
 
-                    deps.setSites(snapshot.emissionSnapshot);
-                    deps.onSiteDelta?.(effectiveDelta);
-                    return;
-                }
+                    if (event.action === "bulk-sync") {
+                        applySnapshotEvent(event);
+                        return;
+                    }
 
-                logger.warn("Unknown sync event action:", event.action);
+                    applyDeltaEvent(event);
+                } catch (error: unknown) {
+                    const normalizedError = ensureError(error);
+                    const { action, revision, siteIdentifier, source } = event;
+                    logger.error(
+                        "Failed to apply state sync event",
+                        normalizedError,
+                        {
+                            action,
+                            revision,
+                            siteIdentifier,
+                            source,
+                        }
+                    );
+                }
             };
 
             void (async (): Promise<void> => {
@@ -716,7 +901,7 @@ export const createSiteSyncActions = (
                             );
                         }
 
-                        const telemetryPayload: Record<string, unknown> = {
+                        const telemetryPayload: UnknownRecord = {
                             completedAt,
                             message: synchronized
                                 ? "Sites synchronized from backend"

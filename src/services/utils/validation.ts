@@ -9,6 +9,9 @@
  * makes it easier to evolve diagnostics formatting over time.
  */
 
+import type { UnknownRecord } from "type-fest";
+
+import { ApplicationError } from "@shared/utils/errorHandling";
 import { isObject } from "@shared/utils/typeGuards";
 import {
     formatZodIssues,
@@ -60,7 +63,7 @@ interface ValidationContext {
      * troubleshooting. This object is JSON-stringified defensively; if
      * serialization fails a placeholder token is used instead.
      */
-    readonly diagnostics?: Record<string, unknown>;
+    readonly diagnostics?: UnknownRecord;
     /**
      * Logical operation name used when constructing error messages.
      *
@@ -76,7 +79,7 @@ interface ValidationContext {
 }
 
 const stringifyDiagnostics = (
-    diagnostics: Record<string, unknown> | undefined
+    diagnostics: undefined | UnknownRecord
 ): string => {
     if (!diagnostics) {
         return "";
@@ -89,6 +92,30 @@ const stringifyDiagnostics = (
     }
 };
 
+const describeValidationFailureReason = (
+    cause: unknown
+): string | undefined => {
+    if (typeof cause === "string") {
+        const trimmed = cause.trim();
+        return trimmed.length > 0 ? trimmed : undefined;
+    }
+
+    if (cause instanceof Error) {
+        const trimmed = cause.message.trim();
+        return trimmed.length > 0 ? trimmed : undefined;
+    }
+
+    if (isObject(cause)) {
+        const messageCandidate = cause["message"];
+        if (typeof messageCandidate === "string") {
+            const trimmed = messageCandidate.trim();
+            return trimmed.length > 0 ? trimmed : undefined;
+        }
+    }
+
+    return undefined;
+};
+
 /**
  * Validates a payload using a shared Zod schema and unwraps the typed result.
  *
@@ -97,14 +124,16 @@ const stringifyDiagnostics = (
  * following the pattern used by data-oriented services:
  *
  * - When the validator throws, the error message uses the form:
+ *
  *   - `"[ServiceName] <operation> threw during validation"`.
  * - When validation fails, the message uses the form:
+ *
  *   - `"[ServiceName] <operation> returned invalid payload: <issues>"`.
  *
  * In both cases, the original error (validator exception or Zod error) is
  * attached via `Error.cause`. Callers are expected to allow these errors to
- * propagate into the existing error-handling helpers such as
- * `withUtilityErrorHandling`.
+ * propagate into the existing service wrappers (for example
+ * `getIpcServiceHelpers().wrap()`), which handle logging and error surfacing.
  *
  * @param validator - Function returning a `safeParse`-style result.
  * @param value - Raw value to validate.
@@ -126,10 +155,18 @@ export function validateServicePayload<T>(
         } catch (error: unknown) {
             const diagnosticSuffix = stringifyDiagnostics(diagnostics);
 
-            throw new Error(
-                `[${serviceName}] ${operation} threw during validation${diagnosticSuffix}`,
-                { cause: error }
-            );
+            // eslint-disable-next-line ex/use-error-cause -- ApplicationError preserves the underlying cause via its constructor options.
+            throw new ApplicationError({
+                cause: error,
+                code: "RENDERER_SERVICE_VALIDATOR_THREW",
+                details: {
+                    ...(diagnostics ? { diagnostics } : {}),
+                    operation,
+                    serviceName,
+                },
+                message: `[${serviceName}] ${operation} threw during validation${diagnosticSuffix}`,
+                operation,
+            });
         }
     })();
 
@@ -139,15 +176,30 @@ export function validateServicePayload<T>(
             ? normalizeZodIssueLikeArray(errorForEnsure.issues)
             : [];
 
-        const messages = formatZodIssues(issues, { includePath: false }).join(
-            ", "
-        );
+        const formattedIssues = formatZodIssues(issues, {
+            includePath: false,
+        }).join(", ");
+
+        const fallbackReason = describeValidationFailureReason(errorForEnsure);
+
+        const messages =
+            formattedIssues.length > 0
+                ? formattedIssues
+                : (fallbackReason ?? "unknown validation error");
         const diagnosticSuffix = stringifyDiagnostics(diagnostics);
 
-        throw new Error(
-            `[${serviceName}] ${operation} returned invalid payload: ${messages}${diagnosticSuffix}`,
-            { cause: errorForEnsure }
-        );
+        throw new ApplicationError({
+            cause: errorForEnsure,
+            code: "RENDERER_SERVICE_INVALID_PAYLOAD",
+            details: {
+                ...(diagnostics ? { diagnostics } : {}),
+                issues: messages,
+                operation,
+                serviceName,
+            },
+            message: `[${serviceName}] ${operation} returned invalid payload: ${messages}${diagnosticSuffix}`,
+            operation,
+        });
     }
 
     return parsed.data;

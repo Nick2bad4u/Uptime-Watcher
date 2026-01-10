@@ -225,7 +225,7 @@ describe("databaseService strict coverage", () => {
         );
     });
 
-    it("executes operations inside existing transactions without starting a new one", async () => {
+    it("executes operations inside existing transactions using SAVEPOINT isolation", async () => {
         const { DatabaseService } =
             await import("../../../../../electron/services/database/DatabaseService");
 
@@ -242,11 +242,21 @@ describe("databaseService strict coverage", () => {
 
         expect(result).toBe("nested result");
         expect(operation).toHaveBeenCalledWith(db);
-        expect(db!.run).not.toHaveBeenCalled();
+        expect(db!.run).toHaveBeenCalledWith(
+            expect.stringMatching(/^SAVEPOINT uptime_watcher_sp_\d+$/u)
+        );
+        expect(db!.run).toHaveBeenCalledWith(
+            expect.stringMatching(/^RELEASE uptime_watcher_sp_\d+$/u)
+        );
         const logger = getLoggerMock();
 
         expect(logger.warn).toHaveBeenCalledWith(
-            expect.stringContaining("Nested transaction detected")
+            expect.stringContaining("Nested transaction detected"),
+            expect.objectContaining({
+                savepointName: expect.stringMatching(
+                    /^uptime_watcher_sp_\d+$/u
+                ),
+            })
         );
     });
 

@@ -231,27 +231,39 @@ const runSiteDetailsOperation = async (
  *
  * @see {@link UseSiteDetailsResult} for the complete return shape.
  */
-// eslint-disable-next-line complexity -- This orchestrator-style hook necessarily coordinates multiple concerns; further decomposition would add indirection without materially reducing complexity.
 export function useSiteDetails({
     site,
 }: UseSiteDetailsProperties): UseSiteDetailsResult {
-    const {
-        checkSiteNow,
-        deleteSite,
-        getSelectedMonitorId,
-        modifySite,
-        removeMonitorFromSite,
-        selectedMonitorIds,
-        setSelectedMonitorId,
-        sites,
-        startSiteMonitoring,
-        startSiteMonitorMonitoring,
-        stopSiteMonitoring,
-        stopSiteMonitorMonitoring,
-        updateMonitorRetryAttempts,
-        updateMonitorTimeout,
-        updateSiteCheckInterval,
-    } = useSitesStore();
+    const checkSiteNow = useSitesStore(useCallback((state) => state.checkSiteNow, []));
+    const deleteSite = useSitesStore(useCallback((state) => state.deleteSite, []));
+    const getSelectedMonitorId = useSitesStore(
+        useCallback((state) => state.getSelectedMonitorId, [])
+    );
+    const modifySite = useSitesStore(useCallback((state) => state.modifySite, []));
+    const removeMonitorFromSite = useSitesStore(
+        useCallback((state) => state.removeMonitorFromSite, [])
+    );
+    const setSelectedMonitorId = useSitesStore(
+        useCallback((state) => state.setSelectedMonitorId, [])
+    );
+    const sites = useSitesStore(useCallback((state) => state.sites, []));
+    const startSiteMonitoring = useSitesStore(useCallback((state) => state.startSiteMonitoring, []));
+    const startSiteMonitorMonitoring = useSitesStore(
+        useCallback((state) => state.startSiteMonitorMonitoring, [])
+    );
+    const stopSiteMonitoring = useSitesStore(useCallback((state) => state.stopSiteMonitoring, []));
+    const stopSiteMonitorMonitoring = useSitesStore(
+        useCallback((state) => state.stopSiteMonitorMonitoring, [])
+    );
+    const updateMonitorRetryAttempts = useSitesStore(
+        useCallback((state) => state.updateMonitorRetryAttempts, [])
+    );
+    const updateMonitorTimeout = useSitesStore(
+        useCallback((state) => state.updateMonitorTimeout, [])
+    );
+    const updateSiteCheckInterval = useSitesStore(
+        useCallback((state) => state.updateSiteCheckInterval, [])
+    );
 
     const { clearError, isLoading } = useErrorStore();
 
@@ -277,13 +289,9 @@ export function useSiteDetails({
 
     const monitorIds = currentSite.monitors.map((m) => m.id);
     const defaultMonitorId = getDefaultMonitorId(monitorIds);
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- Store may not yet have monitor selections keyed.
-    const selectedMonitorIdsBySite = selectedMonitorIds ?? {};
 
     let selectedMonitorId =
-        selectedMonitorIdsBySite[currentSite.identifier] ??
-        getSelectedMonitorId(currentSite.identifier) ??
-        defaultMonitorId;
+        getSelectedMonitorId(currentSite.identifier) ?? defaultMonitorId;
 
     useEffect(
         function synchronizeSiteDetailsTab(): void {

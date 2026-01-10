@@ -13,6 +13,7 @@
 import { vi } from "vitest";
 
 import type { StateSyncStatusSummary } from "@shared/types/stateSync";
+import type { PartialDeep } from "type-fest";
 
 import type {
     StatusUpdateSubscriptionSummary,
@@ -63,9 +64,11 @@ const createUnsubscribeResult = (): StatusUpdateUnsubscribeResult => ({
  * @returns A concrete {@link SitesStore} mock instance.
  */
 export const createSitesStoreMock = (
-    overrides: Partial<SitesStore> = {}
+    overrides: PartialDeep<SitesStore> = {}
 ): SitesStore => {
-    const asyncVoid = <Fn extends (...args: any[]) => Promise<unknown>>(): Fn =>
+    type AsyncVoidFn = (...args: readonly unknown[]) => Promise<void>;
+
+    const asyncVoid = <Fn extends AsyncVoidFn>(): Fn =>
         vi.fn(async () => undefined) as unknown as Fn;
 
     const store: SitesStore = {
@@ -86,6 +89,9 @@ export const createSitesStoreMock = (
                 schemaVersion: 1,
                 sizeBytes: 0,
             },
+        })),
+        saveSqliteBackup: vi.fn(async () => ({
+            canceled: true as const,
         })),
         fullResyncSites: asyncVoid(),
         getSelectedMonitorId: vi.fn(),
@@ -119,6 +125,7 @@ export const createSitesStoreMock = (
         updateMonitorRetryAttempts: asyncVoid(),
         updateMonitorTimeout: asyncVoid(),
         updateSiteCheckInterval: asyncVoid(),
+        applySiteSnapshot: vi.fn(),
         restoreSqliteBackup: vi.fn(async () => ({
             metadata: {
                 appVersion: "0.0.0-test",
@@ -142,7 +149,7 @@ export const createSitesStoreMock = (
         statusSubscriptionSummary: undefined,
     };
 
-    return Object.assign(store, overrides);
+    return Object.assign(store, overrides) as SitesStore;
 };
 
 /**
@@ -154,7 +161,7 @@ export const createSitesStoreMock = (
  */
 export const updateSitesStoreMock = (
     state: SitesStore,
-    partial: Partial<SitesStore>
+    partial: PartialDeep<SitesStore>
 ): void => {
     Object.assign(state, partial);
 };

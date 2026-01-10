@@ -139,6 +139,7 @@ describe("App Development Logging Coverage", () => {
             applyUpdate: vi.fn(),
             setUpdateError: vi.fn(),
             applyUpdateStatus: vi.fn(),
+            subscribeToUpdateStatusEvents: vi.fn(() => vi.fn()),
             updateError: null,
             updateStatus: "idle",
         });

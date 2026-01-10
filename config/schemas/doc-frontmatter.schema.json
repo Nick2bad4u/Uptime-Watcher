@@ -45,7 +45,11 @@
         },
         "status": {
             "description": "Optional lifecycle state of the document.",
-            "enum": ["draft", "active", "deprecated"],
+            "enum": [
+                "draft",
+                "active",
+                "deprecated"
+            ],
             "type": "string"
         },
         "summary": {

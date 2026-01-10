@@ -12,14 +12,13 @@
 
 import {
     DEFAULT_HISTORY_LIMIT_RULES,
+    HistoryLimitMaximumExceededError,
     normalizeHistoryLimit,
 } from "@shared/constants/history";
 import { ensureError } from "@shared/utils/errorHandling";
 
 import { logger } from "./logger";
 import { getIpcServiceHelpers } from "./utils/createIpcServiceHelpers";
-
-const HISTORY_LIMIT_MAXIMUM_ERROR_FRAGMENT = "History limit exceeds maximum";
 
 /**
  * Normalises thrown history limit errors into the public shape required by
@@ -45,11 +44,10 @@ const normalizeHistoryLimitError = (
 ): Error => {
     const primaryError = requestError ?? backendError;
 
-    if (
-        primaryError instanceof RangeError &&
-        primaryError.message.includes(HISTORY_LIMIT_MAXIMUM_ERROR_FRAGMENT)
-    ) {
-        return new TypeError(primaryError.message);
+    if (primaryError instanceof HistoryLimitMaximumExceededError) {
+        return new TypeError(
+            "History limit is too large to be represented. Please enter a smaller value."
+        );
     }
 
     return primaryError;

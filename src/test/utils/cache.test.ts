@@ -864,6 +864,88 @@ describe("Cache Utilities", () => {
             expect(result).toEqual(complexObject);
             expect(objectCache.get("complex")).toEqual(complexObject);
         });
+
+        it("should dedupe concurrent fetches for the same key", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: cache", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Concurrency", "type");
+
+            let resolvePromise: ((value: string) => void) | undefined;
+            const deferred = new Promise<string>((resolve) => {
+                resolvePromise = resolve;
+            });
+
+            mockFetcher.mockReturnValue(deferred);
+
+            const resultPromise1 = getCachedOrFetch(cache, "key1", mockFetcher);
+            const resultPromise2 = getCachedOrFetch(cache, "key1", mockFetcher);
+
+            expect(mockFetcher).toHaveBeenCalledTimes(1);
+
+            resolvePromise?.("fetched-value");
+
+            await expect(resultPromise1).resolves.toBe("fetched-value");
+            await expect(resultPromise2).resolves.toBe("fetched-value");
+            expect(cache.get("key1")).toBe("fetched-value");
+        });
+
+        it("should not overwrite newer cache values set during fetch", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: cache", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Concurrency", "type");
+
+            let resolvePromise: ((value: string) => void) | undefined;
+            const deferred = new Promise<string>((resolve) => {
+                resolvePromise = resolve;
+            });
+            mockFetcher.mockReturnValue(deferred);
+
+            const inFlight = getCachedOrFetch(cache, "key1", mockFetcher);
+
+            // Simulate some other code path populating a newer value.
+            cache.set("key1", "newer-value");
+
+            resolvePromise?.("stale-fetched-value");
+
+            await expect(inFlight).resolves.toBe("stale-fetched-value");
+            expect(cache.get("key1")).toBe("newer-value");
+        });
+
+        it("should not cache values fetched before cache.clear()", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: cache", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Invalidation", "type");
+
+            let resolvePromise: ((value: string) => void) | undefined;
+            const deferred = new Promise<string>((resolve) => {
+                resolvePromise = resolve;
+            });
+            mockFetcher.mockReturnValue(deferred);
+
+            const inFlight = getCachedOrFetch(cache, "key1", mockFetcher);
+
+            // Simulate invalidation during the fetch.
+            cache.clear();
+
+            resolvePromise?.("fetched-after-clear");
+            await expect(inFlight).resolves.toBe("fetched-after-clear");
+
+            // The caller still gets the value, but we avoid populating the
+            // cache with something that might now be stale.
+            expect(cache.get("key1")).toBeUndefined();
+        });
     });
 
     /**

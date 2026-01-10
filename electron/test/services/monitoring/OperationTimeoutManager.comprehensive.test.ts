@@ -164,9 +164,9 @@ describe("OperationTimeoutManager - Comprehensive Coverage", () => {
             operationTimeoutManager.scheduleTimeout(operationId, 1000);
             expect(vi.getTimerCount()).toBe(1);
 
-            // Schedule second timeout for same operation (old one still runs)
+            // Schedule second timeout for same operation (old one is cleared)
             operationTimeoutManager.scheduleTimeout(operationId, 2000);
-            expect(vi.getTimerCount()).toBe(2); // Both timeouts are active
+            expect(vi.getTimerCount()).toBe(1);
         });
     });
 

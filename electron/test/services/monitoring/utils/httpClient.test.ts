@@ -19,12 +19,12 @@ vi.mock("axios", () => ({
     },
 }));
 
-// Mock http and https agents
-vi.mock("http", () => ({
+// Mock http and https agents (node: specifiers match implementation)
+vi.mock("node:http", () => ({
     Agent: vi.fn(),
 }));
 
-vi.mock("https", () => ({
+vi.mock("node:https", () => ({
     Agent: vi.fn(),
 }));
 
@@ -74,6 +74,7 @@ describe("HTTP Client Utils", () => {
                 maxBodyLength: 8 * 1024, // 8KB default
                 maxContentLength: 1 * 1024 * 1024, // 1MB default
                 maxRedirects: 3, // Tightened default
+                beforeRedirect: expect.any(Function),
                 responseType: "text",
                 timeout: 5000,
                 validateStatus: expect.any(Function),
@@ -101,6 +102,7 @@ describe("HTTP Client Utils", () => {
                 maxBodyLength: 8 * 1024,
                 maxContentLength: 1 * 1024 * 1024,
                 maxRedirects: 3,
+                beforeRedirect: expect.any(Function),
                 responseType: "text",
                 validateStatus: expect.any(Function),
             });

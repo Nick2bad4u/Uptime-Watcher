@@ -7,9 +7,9 @@
  * database operations.
  */
 
-import { tryGetErrorCode } from "@shared/utils/errorCodes";
 import { ensureError } from "@shared/utils/errorHandling";
 import { LOG_TEMPLATES } from "@shared/utils/logTemplates";
+import { isSqliteLockedError } from "@shared/utils/sqliteErrors";
 import { app } from "electron";
 import { Database } from "node-sqlite3-wasm";
 // eslint-disable-next-line unicorn/import-style -- Need namespace import for both sync and async usage
@@ -85,6 +85,8 @@ export class DatabaseService {
     /** Singleton instance of the database service */
     private static readonly instance: DatabaseService = new DatabaseService();
 
+    private static savepointCounter = 0;
+
     /** SQLite database connection instance */
     private db: Database | undefined;
 
@@ -146,15 +148,40 @@ export class DatabaseService {
     ): Promise<T> {
         const db = this.getDatabase();
 
-        // Check if we're already in a transaction (nested transaction scenario)
+        // Nested transaction scenario: use SAVEPOINT so callers still get an
+        // atomic boundary even when already inside a broader transaction.
+        //
+        // SQLite doesn't support nested BEGIN/COMMIT, but savepoints are the
+        // supported mechanism.
         if (db.inTransaction) {
+            DatabaseService.savepointCounter += 1;
+            const savepointName = `uptime_watcher_sp_${DatabaseService.savepointCounter}`;
+
             logger.warn(
-                "[DatabaseService] Nested transaction detected - executing operation within existing transaction. " +
-                    "This may indicate a design issue where transaction boundaries are not properly managed."
+                "[DatabaseService] Nested transaction detected - using SAVEPOINT for isolation",
+                { savepointName }
             );
-            // If we're already in a transaction, just execute the operation
-            // without starting a new transaction (SQLite doesn't support nested transactions)
-            return operation(db);
+
+            db.run(`SAVEPOINT ${savepointName}`);
+
+            try {
+                return await operation(db).then((result) => {
+                    db.run(`RELEASE ${savepointName}`);
+                    return result;
+                });
+            } catch (error) {
+                const normalizedError = ensureError(error);
+                try {
+                    db.run(`ROLLBACK TO ${savepointName}`);
+                    db.run(`RELEASE ${savepointName}`);
+                } catch (rollbackError) {
+                    logger.error(
+                        "[DatabaseService] Failed to rollback savepoint",
+                        ensureError(rollbackError)
+                    );
+                }
+                throw normalizedError;
+            }
         }
 
         try {
@@ -171,10 +198,11 @@ export class DatabaseService {
                 return result;
             });
         } catch (error) {
+            const normalizedError = ensureError(error);
             // Enhanced error logging to understand what's causing transaction failures
             logger.error(
                 "[DatabaseService] Transaction operation failed",
-                error
+                normalizedError
             );
 
             // Only attempt rollback if a transaction is actually active
@@ -194,10 +222,10 @@ export class DatabaseService {
             } catch (rollbackError) {
                 logger.error(
                     "[DatabaseService] Failed to rollback active transaction",
-                    rollbackError
+                    ensureError(rollbackError)
                 );
             }
-            throw error;
+            throw normalizedError;
         }
     }
 
@@ -247,11 +275,12 @@ export class DatabaseService {
                 this.db = undefined;
                 logger.info(LOG_TEMPLATES.services.DATABASE_CONNECTION_CLOSED);
             } catch (error: unknown) {
+                const normalizedError = ensureError(error);
                 logger.error(
                     LOG_TEMPLATES.errors.DATABASE_CLOSE_FAILED,
-                    ensureError(error)
+                    normalizedError
                 );
-                throw error;
+                throw normalizedError;
             }
         }
         // Safe to call when already closed - no-op behavior
@@ -341,8 +370,9 @@ export class DatabaseService {
                 logger.info(LOG_TEMPLATES.services.DATABASE_INITIALIZED);
                 return this.db;
             } catch (error: unknown) {
+                const normalizedError = ensureError(error);
                 if (
-                    this.isDatabaseLockedError(error) &&
+                    isSqliteLockedError(error) &&
                     attempt < DATABASE_INITIALIZATION_MAX_ATTEMPTS
                 ) {
                     this.handleDatabaseLockedError(dbPath, attempt, error);
@@ -350,9 +380,9 @@ export class DatabaseService {
                     this.closeDatabaseSilently();
                     logger.error(
                         LOG_TEMPLATES.errors.DATABASE_SCHEMA_FAILED,
-                        ensureError(error)
+                        normalizedError
                     );
-                    throw error;
+                    throw normalizedError;
                 }
             }
         }
@@ -370,11 +400,12 @@ export class DatabaseService {
     private applyConnectionPragmas(db: Database): void {
         try {
             db.run(`PRAGMA busy_timeout = ${DATABASE_BUSY_TIMEOUT_MS}`);
-        } catch (error) {
+        } catch (error: unknown) {
+            const normalizedError = ensureError(error);
             logger.warn(
                 LOG_TEMPLATES.warnings.DATABASE_BUSY_TIMEOUT_PRAGMA_FAILED,
                 {
-                    message: ensureError(error).message,
+                    message: normalizedError.message,
                 }
             );
         }
@@ -383,16 +414,17 @@ export class DatabaseService {
             // WAL improves concurrent read/write behavior and generally
             // reduces "database is locked" frequency for desktop apps.
             db.get("PRAGMA journal_mode = WAL");
-        } catch (error) {
-            if (this.isDatabaseLockedError(error)) {
+        } catch (error: unknown) {
+            const normalizedError = ensureError(error);
+            if (isSqliteLockedError(error)) {
                 // Escalate to the caller so initialization retries with the
                 // lock recovery flow (busy_timeout + artifact relocation).
-                throw error;
+                throw normalizedError;
             }
             logger.warn(
                 "[DatabaseService] Failed to apply PRAGMA journal_mode",
                 {
-                    message: ensureError(error).message,
+                    message: normalizedError.message,
                 }
             );
         }
@@ -400,33 +432,36 @@ export class DatabaseService {
         try {
             // NORMAL is the typical performance/safety trade-off for WAL mode.
             db.get("PRAGMA synchronous = NORMAL");
-        } catch (error) {
-            if (this.isDatabaseLockedError(error)) {
-                throw error;
+        } catch (error: unknown) {
+            const normalizedError = ensureError(error);
+            if (isSqliteLockedError(error)) {
+                throw normalizedError;
             }
             logger.warn(
                 "[DatabaseService] Failed to apply PRAGMA synchronous",
                 {
-                    message: ensureError(error).message,
+                    message: normalizedError.message,
                 }
             );
         }
 
         try {
             db.get("PRAGMA temp_store = MEMORY");
-        } catch (error) {
+        } catch (error: unknown) {
+            const normalizedError = ensureError(error);
             logger.warn("[DatabaseService] Failed to apply PRAGMA temp_store", {
-                message: ensureError(error).message,
+                message: normalizedError.message,
             });
         }
 
         try {
             db.run("PRAGMA foreign_keys = ON");
-        } catch (error) {
+        } catch (error: unknown) {
+            const normalizedError = ensureError(error);
             logger.warn(
                 LOG_TEMPLATES.warnings.DATABASE_FOREIGN_KEYS_PRAGMA_FAILED,
                 {
-                    message: ensureError(error).message,
+                    message: normalizedError.message,
                 }
             );
         }
@@ -439,22 +474,6 @@ export class DatabaseService {
      *
      * @returns `true` when the error indicates an outstanding lock.
      */
-    private isDatabaseLockedError(error: unknown): boolean {
-        const code = tryGetErrorCode(error);
-        if (code === "SQLITE_BUSY" || code === "SQLITE_LOCKED") {
-            return true;
-        }
-
-        const normalized = ensureError(error);
-        const message = normalized.message.toLowerCase();
-
-        return (
-            message.includes("database is locked") ||
-            message.includes("sqlite_busy") ||
-            message.includes("sqlite_locked")
-        );
-    }
-
     /**
      * Handles lock-related initialization failures by relocating stale lock
      * artifacts and preparing for a retry.

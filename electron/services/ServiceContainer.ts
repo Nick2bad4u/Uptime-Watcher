@@ -1220,14 +1220,10 @@ export class ServiceContainer {
     ): UptimeEvents[EventName] {
         if (!this.isPayloadWithMetadata(payload)) {
             if (Array.isArray(payload)) {
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Array.from preserves the structural payload shape while dropping event metadata.
-                return Array.from(
-                    payload
-                ) as unknown as UptimeEvents[EventName];
+                return stripForwardedEventMetadata(payload);
             }
 
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Payload is already of the correct event type; we only need to assert away metadata.
-            return payload as unknown as UptimeEvents[EventName];
+            return stripForwardedEventMetadata(payload);
         }
 
         const payloadWithMeta: ForwardablePayloadWithMeta<EventName> = payload;
@@ -1254,8 +1250,7 @@ export class ServiceContainer {
             }
 
             this.applyForwardingMetadata(stripped, forwarded, original);
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- The metadata reattachment preserves the runtime payload shape.
-            return stripped as unknown as UptimeEvents[EventName];
+            return stripped;
         }
 
         const stripped = stripForwardedEventMetadata(payloadWithMeta);
@@ -1267,8 +1262,7 @@ export class ServiceContainer {
 
         this.applyForwardingMetadata(stripped, forwarded, original);
 
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- After metadata removal, the clone matches the event payload contract.
-        return stripped as unknown as UptimeEvents[EventName];
+        return stripped;
     }
 
     /**
@@ -1277,9 +1271,11 @@ export class ServiceContainer {
     private isPayloadWithMetadata<EventName extends EventKey<UptimeEvents>>(
         payload: ForwardableEventPayload<EventName>
     ): payload is ForwardablePayloadWithMeta<EventName> {
+        const maybeObject: unknown = payload;
         return (
-            typeof payload === "object" &&
-            FORWARDED_METADATA_PROPERTY_KEY in payload
+            typeof maybeObject === "object" &&
+            maybeObject !== null &&
+            FORWARDED_METADATA_PROPERTY_KEY in maybeObject
         );
     }
 

@@ -43,9 +43,19 @@ import { persist, type PersistOptions } from "zustand/middleware";
 import type { AppSettings } from "../types";
 import type { SettingsStore } from "./types";
 
+import { createPersistConfig } from "../utils";
 import { syncSettingsAfterRehydration } from "./hydration";
 import { createSettingsOperationsSlice } from "./operations";
 import { createSettingsStateSlice, normalizeAppSettings } from "./state";
+
+const SETTINGS_PERSIST_CONFIG = createPersistConfig<
+    SettingsStore,
+    {
+        settings: AppSettings;
+    }
+>("settings", (state) => ({
+    settings: state.settings,
+}));
 
 /**
  * Zustand store for managing application settings with persistence.
@@ -128,6 +138,7 @@ export const useSettingsStore: UseBoundStore<
             ...createSettingsOperationsSlice(set, get),
         }),
         {
+            ...SETTINGS_PERSIST_CONFIG,
             merge: (persistedState, currentState) => {
                 // Zustand's default merge is shallow, which can replace the
                 // entire `settings` object with an older partial shape.
@@ -151,7 +162,8 @@ export const useSettingsStore: UseBoundStore<
                     }),
                 };
             },
-            name: "uptime-watcher-settings",
+            // Re-state required fields explicitly for exactOptionalPropertyTypes.
+            name: SETTINGS_PERSIST_CONFIG.name,
             // After rehydration, sync critical settings from backend
             onRehydrateStorage: () => syncSettingsAfterRehydration,
             // Persistence configuration - only persist essential settings data
@@ -159,9 +171,6 @@ export const useSettingsStore: UseBoundStore<
             // functions If additional state properties are added in the future,
             // review this partialize function to ensure appropriate data is
             // persisted
-            partialize: (state) => ({
-                settings: state.settings,
-            }),
         }
     )
 );

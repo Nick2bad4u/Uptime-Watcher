@@ -27,12 +27,12 @@ import {
     MAX_FILESYSTEM_BASE_DIRECTORY_BYTES,
     validateFilesystemBaseDirectoryCandidate,
 } from "@shared/validation/filesystemBaseDirectoryValidation";
-import { safeStorage } from "electron";
 import { promises as fs } from "node:fs";
 import path from "node:path";
 
 import type { UptimeOrchestrator } from "../../UptimeOrchestrator";
 import type {
+    DatabaseBackupMetadata,
     DatabaseBackupResult,
     DatabaseRestorePayload,
 } from "../database/utils/backup/databaseBackup";
@@ -41,8 +41,8 @@ import type { CloudSettingsAdapter } from "./CloudService.types";
 import type { CloudStorageProvider } from "./providers/CloudStorageProvider.types";
 
 import { logger } from "../../utils/logger";
+import { validateDatabaseBackupPayload } from "../database/utils/backup/databaseBackup";
 import { ProviderCloudSyncTransport } from "../sync/ProviderCloudSyncTransport";
-import { normalizeCloudObjectKey } from "./cloudKeyNormalization";
 import {
     createKeyCheckBase64,
     decryptBuffer,
@@ -51,6 +51,14 @@ import {
     generateEncryptionSalt,
     verifyKeyCheckBase64,
 } from "./crypto/cloudCrypto";
+import {
+    assertBackupObjectKey,
+    decodeStrictBase64,
+    encodeBase64,
+    ENCRYPTION_KEY_BYTES,
+    ENCRYPTION_SALT_BYTES,
+    parseEncryptionMode,
+} from "./internal/cloudServicePrimitives";
 import {
     buildDropboxStatus,
     buildFilesystemStatus,
@@ -69,13 +77,7 @@ import { resetProviderCloudSyncState } from "./migrations/syncReset";
 import { buildCloudSyncResetPreview } from "./migrations/syncResetPreview";
 import { backupMetadataKeyForBackupKey } from "./providers/CloudBackupMetadataFile";
 import { isCloudProviderOperationError } from "./providers/cloudProviderErrors";
-import { DropboxAuthFlow } from "./providers/dropbox/DropboxAuthFlow";
-import { DropboxCloudStorageProvider } from "./providers/dropbox/DropboxCloudStorageProvider";
-import { DropboxTokenManager } from "./providers/dropbox/DropboxTokenManager";
 import { EncryptedSyncCloudStorageProvider } from "./providers/EncryptedSyncCloudStorageProvider";
-import { fetchGoogleAccountLabel } from "./providers/googleDrive/fetchGoogleAccountLabel";
-import { GoogleDriveAuthFlow } from "./providers/googleDrive/GoogleDriveAuthFlow";
-import { GoogleDriveTokenManager } from "./providers/googleDrive/GoogleDriveTokenManager";
 import {
     EphemeralSecretStore,
     FallbackSecretStore,
@@ -122,83 +124,7 @@ const SETTINGS_KEY_SYNC_ENABLED = "cloud.syncEnabled" as const;
 
 const SETTINGS_KEY_ENCRYPTION_MODE = "cloud.encryption.mode" as const;
 const SETTINGS_KEY_ENCRYPTION_SALT = "cloud.encryption.salt" as const;
-
 const SECRET_KEY_ENCRYPTION_DERIVED_KEY = "cloud.encryption.key.v1" as const;
-
-const BACKUP_KEY_PREFIX = "backups/" as const;
-
-const MAX_BACKUP_KEY_BYTES = 2048;
-
-function normalizeCloudKey(rawKey: string): string {
-    return normalizeCloudObjectKey(rawKey, {
-        forbidAsciiControlCharacters: false,
-        // Preserve existing behavior: traversal segments are rejected later by
-        // assertBackupObjectKey.
-        forbidTraversalSegments: false,
-        // Preserve leading slashes so assertBackupObjectKey can reject absolute
-        // keys.
-        stripLeadingSlashes: false,
-    });
-}
-
-function assertBackupObjectKey(rawKey: string): string {
-    if (typeof rawKey !== "string" || rawKey.trim().length === 0) {
-        throw new Error("Backup key must be a non-empty string");
-    }
-
-    const key = normalizeCloudKey(rawKey);
-
-    if (Buffer.byteLength(key, "utf8") > MAX_BACKUP_KEY_BYTES) {
-        throw new Error(
-            `Backup key must not exceed ${MAX_BACKUP_KEY_BYTES} bytes`
-        );
-    }
-
-    if (!key.startsWith(BACKUP_KEY_PREFIX)) {
-        throw new Error("Backup key must start with 'backups/'");
-    }
-
-    if (key === BACKUP_KEY_PREFIX || key.endsWith("/")) {
-        throw new Error("Backup key must reference a backup object key");
-    }
-
-    if (key.endsWith(".metadata.json")) {
-        throw new Error(
-            "Backup key must reference the backup object, not metadata"
-        );
-    }
-
-    if (hasAsciiControlCharacters(key)) {
-        throw new Error("Backup key must not contain control characters");
-    }
-
-    if (key.startsWith("/") || key.includes(":") || key.includes("://")) {
-        throw new Error("Backup key must be a relative provider key");
-    }
-
-    const segments = key.split("/");
-    if (segments.some((segment) => segment.length === 0)) {
-        throw new Error("Backup key must not contain empty path segments");
-    }
-
-    if (segments.some((segment) => segment === "." || segment === "..")) {
-        throw new Error("Backup key must not contain path traversal segments");
-    }
-
-    return key;
-}
-
-function parseEncryptionMode(value: string | undefined): CloudEncryptionMode {
-    return value === "passphrase" ? "passphrase" : "none";
-}
-
-function encodeBase64(buffer: Buffer): string {
-    return buffer.toString("base64");
-}
-
-function decodeBase64(value: string): Buffer {
-    return Buffer.from(value, "base64");
-}
 
 function determineBackupMigrationNeedsEncryptionKey(
     request: CloudBackupMigrationRequest,
@@ -222,18 +148,49 @@ async function clearLastError(settings: CloudSettingsAdapter): Promise<void> {
     await settings.set(SETTINGS_KEY_LAST_ERROR, "");
 }
 
+function deriveCloudBackupOriginalPath(fileName: string): string {
+    const trimmed = fileName.trim();
+    if (!trimmed) {
+        return "backup.sqlite";
+    }
+
+    // Avoid leaking local absolute paths into cloud metadata. Also handle both
+    // Windows and POSIX separators.
+    const segments = trimmed.split(/[\\/]/u).filter(Boolean);
+    return segments.at(-1) ?? "backup.sqlite";
+}
+
 function serializeBackupMetadata(
-    metadata: DatabaseBackupResult["metadata"]
+    args: {
+        readonly fileName: string;
+        readonly metadata: DatabaseBackupResult["metadata"];
+    }
 ): SerializedDatabaseBackupMetadata {
+    const { fileName, metadata } = args;
+
     return {
         appVersion: metadata.appVersion,
         checksum: metadata.checksum,
         createdAt: metadata.createdAt,
-        originalPath: metadata.originalPath,
+        originalPath: deriveCloudBackupOriginalPath(fileName),
         retentionHintDays: metadata.retentionHintDays,
         schemaVersion: metadata.schemaVersion,
         sizeBytes: metadata.sizeBytes,
     };
+}
+
+function toDatabaseBackupMetadata(
+    serialized: SerializedDatabaseBackupMetadata
+): DatabaseBackupMetadata {
+    return {
+        appVersion: serialized.appVersion,
+        checksum: serialized.checksum,
+        createdAt: serialized.createdAt,
+        originalPath: serialized.originalPath,
+        retentionHintDays: serialized.retentionHintDays,
+        schemaVersion: serialized.schemaVersion,
+        sizeBytes: serialized.sizeBytes,
+    } satisfies DatabaseBackupMetadata;
 }
 
 function parseBooleanSetting(value: string | undefined): boolean {
@@ -248,6 +205,18 @@ function parseNumberSetting(value: string | undefined): null | number {
     const parsed = Number(value);
     return Number.isFinite(parsed) ? parsed : null;
 }
+
+type DropboxProviderDeps = Readonly<{
+    DropboxAuthFlow: typeof import("./providers/dropbox/DropboxAuthFlow").DropboxAuthFlow;
+    DropboxCloudStorageProvider: typeof import("./providers/dropbox/DropboxCloudStorageProvider").DropboxCloudStorageProvider;
+    DropboxTokenManager: typeof import("./providers/dropbox/DropboxTokenManager").DropboxTokenManager;
+}>;
+
+type GoogleDriveProviderDeps = Readonly<{
+    fetchGoogleAccountLabel: typeof import("./providers/googleDrive/fetchGoogleAccountLabel").fetchGoogleAccountLabel;
+    GoogleDriveAuthFlow: typeof import("./providers/googleDrive/GoogleDriveAuthFlow").GoogleDriveAuthFlow;
+    GoogleDriveTokenManager: typeof import("./providers/googleDrive/GoogleDriveTokenManager").GoogleDriveTokenManager;
+}>;
 
 /**
  * Coordinates cloud provider configuration and remote backup operations.
@@ -270,6 +239,10 @@ export class CloudService {
     private readonly syncEngine: CloudSyncEngine;
 
     private readonly secretStore: SecretStore;
+
+    private dropboxDepsPromise: Promise<DropboxProviderDeps> | undefined;
+
+    private googleDriveDepsPromise: Promise<GoogleDriveProviderDeps> | undefined;
 
     private async runCloudOperation<T>(
         operationName: string,
@@ -301,12 +274,13 @@ export class CloudService {
         }
     }
 
-    /** Disconnects from the configured provider and clears persisted config. */
-    public async disconnect(): Promise<CloudStatusSummary> {
+/** Disconnects from the configured provider and clears persisted config. */
+public async disconnect(): Promise<CloudStatusSummary> {
         return this.runCloudOperation("disconnect", async () => {
             const provider = await this.settings.get(SETTINGS_KEY_PROVIDER);
 
             if (provider === "dropbox") {
+                const { DropboxTokenManager } = await this.loadDropboxDeps();
                 const appKey = this.getDropboxAppKey();
                 const tokenManager = new DropboxTokenManager({
                     appKey,
@@ -318,6 +292,8 @@ export class CloudService {
             }
 
             if (provider === "google-drive") {
+                const { GoogleDriveTokenManager } =
+                    await this.loadGoogleDriveDeps();
                 const { clientId, clientSecret } =
                     resolveGoogleDriveOAuthConfig();
 
@@ -355,8 +331,8 @@ export class CloudService {
         });
     }
 
-    /** Enables or disables multi-device sync (when supported). */
-    public async enableSync(
+/** Enables or disables multi-device sync (when supported). */
+public async enableSync(
         config: CloudEnableSyncConfig
     ): Promise<CloudStatusSummary> {
         return this.runCloudOperation("enableSync", async () => {
@@ -373,12 +349,12 @@ export class CloudService {
         });
     }
 
-    /** Returns the current cloud configuration state. */
-    public async getStatus(): Promise<CloudStatusSummary> {
+/** Returns the current cloud configuration state. */
+public async getStatus(): Promise<CloudStatusSummary> {
         return this.buildStatusSummary();
     }
 
-    /**
+/**
      * Enables or unlocks passphrase-based encryption.
      *
      * @remarks
@@ -386,7 +362,7 @@ export class CloudService {
      * - Stores the derived key in {@link SecretStore} so the user is not prompted
      *   every run.
      */
-    public async setEncryptionPassphrase(
+public async setEncryptionPassphrase(
         passphrase: string
     ): Promise<CloudStatusSummary> {
         return this.runCloudOperation("setEncryptionPassphrase", async () => {
@@ -425,7 +401,11 @@ export class CloudService {
             const remoteEncryption = manifest?.encryption;
 
             if (remoteEncryption?.mode === "passphrase") {
-                const salt = decodeBase64(remoteEncryption.saltBase64);
+                const salt = decodeStrictBase64({
+                    expectedBytes: ENCRYPTION_SALT_BYTES,
+                    label: "encryption salt",
+                    value: remoteEncryption.saltBase64,
+                });
                 const tryDeriveKey = async (
                     candidatePassphrase: string
                 ): Promise<Buffer | null> => {
@@ -519,14 +499,14 @@ export class CloudService {
         });
     }
 
-    /**
+/**
      * Clears the locally cached derived encryption key.
      *
      * @remarks
      * This does not disable encryption remotely. It simply forces the user to
      * re-enter the passphrase on this device.
      */
-    public async clearEncryptionKey(): Promise<CloudStatusSummary> {
+public async clearEncryptionKey(): Promise<CloudStatusSummary> {
         return this.runCloudOperation("clearEncryptionKey", async () => {
             await this.secretStore.deleteSecret(
                 SECRET_KEY_ENCRYPTION_DERIVED_KEY
@@ -535,8 +515,8 @@ export class CloudService {
         });
     }
 
-    /** Requests a sync cycle as soon as possible. */
-    public async requestSyncNow(): Promise<undefined> {
+/** Requests a sync cycle as soon as possible. */
+public async requestSyncNow(): Promise<undefined> {
         await this.runCloudOperation("requestSyncNow", async () => {
             const syncEnabled = parseBooleanSetting(
                 await this.settings.get(SETTINGS_KEY_SYNC_ENABLED)
@@ -559,13 +539,13 @@ export class CloudService {
         return undefined;
     }
 
-    /**
+/**
      * Resets the remote sync history and re-seeds it from this device.
      *
      * @remarks
      * This is a destructive maintenance operation intended for advanced users.
      */
-    public async resetRemoteSyncState(): Promise<CloudSyncResetResult> {
+public async resetRemoteSyncState(): Promise<CloudSyncResetResult> {
         return this.runCloudOperation("resetRemoteSyncState", async () => {
             const syncEnabled = parseBooleanSetting(
                 await this.settings.get(SETTINGS_KEY_SYNC_ENABLED)
@@ -586,11 +566,11 @@ export class CloudService {
         });
     }
 
-    /**
+/**
      * Previews a remote sync reset by counting remote `sync/` objects and
      * reading the current manifest.
      */
-    public async previewResetRemoteSyncState(): Promise<CloudSyncResetPreview> {
+public async previewResetRemoteSyncState(): Promise<CloudSyncResetPreview> {
         return this.runCloudOperation(
             "previewResetRemoteSyncState",
             async () => {
@@ -609,8 +589,8 @@ export class CloudService {
         );
     }
 
-    /** Configures the filesystem provider to use the given base directory. */
-    public async configureFilesystemProvider(
+/** Configures the filesystem provider to use the given base directory. */
+public async configureFilesystemProvider(
         config: CloudFilesystemProviderConfig
     ): Promise<CloudStatusSummary> {
         return this.runCloudOperation(
@@ -718,12 +698,86 @@ export class CloudService {
             }
         );
     }
+private loadDropboxDeps(): Promise<DropboxProviderDeps> {
+        this.dropboxDepsPromise ??= (async () => {
+            const [authFlowModule, providerModule, tokenModule] =
+                await Promise.all([
+                    import("./providers/dropbox/DropboxAuthFlow"),
+                    import("./providers/dropbox/DropboxCloudStorageProvider"),
+                    import("./providers/dropbox/DropboxTokenManager"),
+                ]);
+
+            return {
+                DropboxAuthFlow: authFlowModule.DropboxAuthFlow,
+                DropboxCloudStorageProvider:
+                    providerModule.DropboxCloudStorageProvider,
+                DropboxTokenManager: tokenModule.DropboxTokenManager,
+            };
+        })();
+
+        return this.dropboxDepsPromise;
+    }
+
+    private loadGoogleDriveDeps(): Promise<GoogleDriveProviderDeps> {
+        this.googleDriveDepsPromise ??= (async () => {
+            const [authFlowModule, tokenModule, labelModule] =
+                await Promise.all([
+                    import("./providers/googleDrive/GoogleDriveAuthFlow"),
+                    import("./providers/googleDrive/GoogleDriveTokenManager"),
+                    import(
+                        "./providers/googleDrive/fetchGoogleAccountLabel"
+                    ),
+                ]);
+
+            return {
+                fetchGoogleAccountLabel: labelModule.fetchGoogleAccountLabel,
+                GoogleDriveAuthFlow: authFlowModule.GoogleDriveAuthFlow,
+                GoogleDriveTokenManager: tokenModule.GoogleDriveTokenManager,
+            };
+        })();
+
+        return this.googleDriveDepsPromise;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     /**
      * Connects the Dropbox provider via system-browser OAuth.
      */
     public async connectDropbox(): Promise<CloudStatusSummary> {
         return this.runCloudOperation("connectDropbox", async () => {
+            const {
+                DropboxAuthFlow,
+                DropboxCloudStorageProvider,
+                DropboxTokenManager,
+            } = await this.loadDropboxDeps();
             const appKey = this.getDropboxAppKey();
             const authFlow = new DropboxAuthFlow({ appKey });
             const tokens = await authFlow.connect();
@@ -770,6 +824,11 @@ export class CloudService {
 
     public async connectGoogleDrive(): Promise<CloudStatusSummary> {
         return this.runCloudOperation("connectGoogleDrive", async () => {
+            const {
+                fetchGoogleAccountLabel,
+                GoogleDriveAuthFlow,
+                GoogleDriveTokenManager,
+            } = await this.loadGoogleDriveDeps();
             const { clientId, clientSecret } = resolveGoogleDriveOAuthConfig();
 
             logger.info("[CloudService] Google Drive OAuth config selected", {
@@ -894,7 +953,7 @@ export class CloudService {
             const provider = await this.resolveProviderOrThrow();
 
             const backup = await this.orchestrator.downloadBackup();
-            const metadata = serializeBackupMetadata(backup.metadata);
+            validateDatabaseBackupPayload(backup);
 
             const { encrypted, key } = await this.getEncryptionKeyMaybe();
             const shouldEncrypt = encrypted && key !== undefined;
@@ -905,8 +964,13 @@ export class CloudService {
             }
 
             const fileName = shouldEncrypt
-                ? `uptime-watcher-backup-${metadata.createdAt}.sqlite.enc`
-                : `uptime-watcher-backup-${metadata.createdAt}.sqlite`;
+                ? `uptime-watcher-backup-${backup.metadata.createdAt}.sqlite.enc`
+                : `uptime-watcher-backup-${backup.metadata.createdAt}.sqlite`;
+
+            const metadata = serializeBackupMetadata({
+                fileName,
+                metadata: backup.metadata,
+            });
 
             const payloadBuffer = shouldEncrypt
                 ? encryptBuffer({ key, plaintext: backup.buffer })
@@ -945,6 +1009,11 @@ export class CloudService {
                 ? await this.decryptBackupOrThrow(downloaded.buffer)
                 : downloaded.buffer;
 
+            validateDatabaseBackupPayload({
+                buffer,
+                metadata: toDatabaseBackupMetadata(downloaded.entry.metadata),
+            });
+
             const payload: DatabaseRestorePayload = {
                 buffer,
                 fileName: downloaded.entry.fileName,
@@ -953,7 +1022,10 @@ export class CloudService {
             const summary = await this.orchestrator.restoreBackup(payload);
 
             return {
-                metadata: serializeBackupMetadata(summary.metadata),
+                metadata: serializeBackupMetadata({
+                    fileName: downloaded.entry.fileName,
+                    metadata: summary.metadata,
+                }),
                 preRestoreFileName: summary.preRestoreFileName,
                 restoredAt: summary.restoredAt,
             };
@@ -1005,12 +1077,43 @@ export class CloudService {
             return provider;
         }
 
-        const key = decodeBase64(rawKey);
+        const key = await this.loadDerivedEncryptionKeyOrClear(rawKey);
+
+        if (!key) {
+            if (args?.requireEncryptionUnlocked ?? true) {
+                throw new Error(
+                    "Cloud encryption is enabled but locked on this device"
+                );
+            }
+
+            return provider;
+        }
 
         return new EncryptedSyncCloudStorageProvider({
             inner: provider,
             key,
         });
+    }
+
+    /**
+     * Decodes a derived encryption key and clears the stored secret when it is
+     * corrupted.
+     */
+    private async loadDerivedEncryptionKeyOrClear(
+        rawKeyBase64: string
+    ): Promise<Buffer | undefined> {
+        try {
+            return decodeStrictBase64({
+                expectedBytes: ENCRYPTION_KEY_BYTES,
+                label: "encryption key",
+                value: rawKeyBase64,
+            });
+        } catch {
+            await this.secretStore
+                .deleteSecret(SECRET_KEY_ENCRYPTION_DERIVED_KEY)
+                .catch(() => {});
+            return undefined;
+        }
     }
 
     private async resolveProviderOrNull(): Promise<CloudStorageProvider | null> {
@@ -1042,9 +1145,15 @@ export class CloudService {
             SECRET_KEY_ENCRYPTION_DERIVED_KEY
         );
 
+        if (!raw) {
+            return { encrypted: true, key: undefined };
+        }
+
+        const key = await this.loadDerivedEncryptionKeyOrClear(raw);
+
         return {
             encrypted: true,
-            key: raw ? decodeBase64(raw) : undefined,
+            key,
         };
     }
 
@@ -1058,7 +1167,14 @@ export class CloudService {
             );
         }
 
-        return decodeBase64(raw);
+        const key = await this.loadDerivedEncryptionKeyOrClear(raw);
+        if (!key) {
+            throw new Error(
+                "Cloud encryption is enabled but locked on this device"
+            );
+        }
+
+        return key;
     }
 
     private async decryptBackupOrThrow(buffer: Buffer): Promise<Buffer> {
@@ -1106,15 +1222,24 @@ export class CloudService {
         const localEncryptionMode = parseEncryptionMode(
             await this.settings.get(SETTINGS_KEY_ENCRYPTION_MODE)
         );
-        const localEncryptionKey = await this.secretStore.getSecret(
+        const localEncryptionKeyRaw = await this.secretStore.getSecret(
             SECRET_KEY_ENCRYPTION_DERIVED_KEY
         );
 
+        let hasLocalEncryptionKey = false;
+        if (typeof localEncryptionKeyRaw === "string") {
+            const candidateKey = await this.loadDerivedEncryptionKeyOrClear(
+                localEncryptionKeyRaw
+            );
+            hasLocalEncryptionKey = candidateKey !== undefined;
+            candidateKey?.fill(0);
+        }
+
         const common: CloudStatusCommonArgs = {
+            hasLocalEncryptionKey,
             lastBackupAt,
             lastError,
             lastSyncAt,
-            localEncryptionKey,
             localEncryptionMode,
             syncEnabled,
         };
@@ -1180,15 +1305,14 @@ export class CloudService {
                 settings: args.settings,
             });
 
-            // SafeStorage can be unavailable on some Linux environments without
-            // a keyring. Fall back to an in-memory store to keep the app usable
-            // (but secrets won't persist across restarts).
-            this.secretStore = safeStorage.isEncryptionAvailable()
-                ? persistent
-                : new FallbackSecretStore({
-                      fallback: new EphemeralSecretStore(),
-                      primary: persistent,
-                  });
+            // SafeStorage can be unavailable (or become unavailable) on some
+            // systems (e.g., missing/locked keyring). Always wrap with an
+            // in-memory fallback so cloud operations can remain usable even if
+            // secrets cannot be persisted.
+            this.secretStore = new FallbackSecretStore({
+                fallback: new EphemeralSecretStore(),
+                primary: persistent,
+            });
         }
     }
 }

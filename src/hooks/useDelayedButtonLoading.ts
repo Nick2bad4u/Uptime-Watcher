@@ -23,7 +23,6 @@
  * @returns The delayed loading state for button display
  *
  * @public
- * @public
  */
 
 import { useCallback, useEffect, useState } from "react";

@@ -20,6 +20,8 @@ import {
 import { renderHook } from "@testing-library/react";
 import { Component, useState, useEffect } from "react";
 
+import { installElectronApiMock } from "./utils/electronApiMock";
+
 // Import components that may have uncovered functions
 import { DefaultErrorFallback } from "../components/error/DefaultErrorFallback";
 import { withErrorBoundary } from "../stores/error/withErrorBoundary";
@@ -44,26 +46,28 @@ vi.mock("../services/logger", () => {
     };
 });
 
-// Mock window.electronAPI
-Object.defineProperty(window, "electronAPI", {
-    value: {
-        settings: {
-            resetSettings: vi.fn().mockResolvedValue({ success: true }),
-            updateHistoryLimit: vi.fn().mockResolvedValue({ success: true }),
-            getHistoryLimit: vi
-                .fn()
-                .mockResolvedValue({ success: true, data: 1000 }),
-        },
-    },
-    writable: true,
-});
+let restoreElectronApi: (() => void) | undefined;
 
 describe("Frontend Functions Coverage - Target 90%+ Threshold", () => {
     beforeEach(() => {
         vi.clearAllMocks();
+
+        ({ restore: restoreElectronApi } = installElectronApiMock({
+            settings: {
+                resetSettings: vi.fn().mockResolvedValue({ success: true }),
+                updateHistoryLimit: vi
+                    .fn()
+                    .mockResolvedValue({ success: true }),
+                getHistoryLimit: vi
+                    .fn()
+                    .mockResolvedValue({ success: true, data: 1000 }),
+            },
+        }));
     });
 
     afterEach(() => {
+        restoreElectronApi?.();
+        restoreElectronApi = undefined;
         vi.restoreAllMocks();
     });
 

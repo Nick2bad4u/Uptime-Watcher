@@ -15,6 +15,7 @@ import {
     createSuccessResponse,
     createValidationResponse,
     registerStandardizedIpcHandler,
+    toClonedArrayBuffer,
     withIpcHandler,
     withIpcHandlerValidation,
 } from "../../../services/ipc/utils";
@@ -712,6 +713,49 @@ describe("IPC Utils - Comprehensive Coverage", () => {
                 const result = IpcValidators.requiredString([], "testParam");
                 expect(result).toBe("testParam must be a non-empty string");
             });
+        });
+    });
+
+    describe(toClonedArrayBuffer, () => {
+        it("should return the original ArrayBuffer when the view spans the entire buffer", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: utils", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Performance", "type");
+
+            const buffer = new ArrayBuffer(8);
+            const view = new Uint8Array(buffer);
+            view.set([1, 2, 3, 4, 5, 6, 7, 8]);
+
+            const result = toClonedArrayBuffer(view);
+            expect(result).toBe(buffer);
+            expect(Array.from(new Uint8Array(result))).toEqual([
+                1, 2, 3, 4, 5, 6, 7, 8,
+            ]);
+        });
+
+        it("should clone a new ArrayBuffer when the view is a slice", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: utils", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
+            const buffer = new ArrayBuffer(8);
+            const view = new Uint8Array(buffer);
+            view.set([1, 2, 3, 4, 5, 6, 7, 8]);
+
+            const slice = new Uint8Array(buffer, 2, 4);
+            const result = toClonedArrayBuffer(slice);
+
+            expect(result).not.toBe(buffer);
+            expect(result.byteLength).toBe(4);
+            expect(Array.from(new Uint8Array(result))).toEqual([3, 4, 5, 6]);
         });
     });
 
@@ -1698,6 +1742,92 @@ describe("IPC Utils - Comprehensive Coverage", () => {
                 expect(mockHandler).toHaveBeenCalledWith("validArg");
                 expect(result.success).toBeTruthy();
                 expect(result.data).toBe("validated execution");
+            });
+
+            it("should reject extra args for validated handlers", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "regression");
+                await annotate("Component: utils", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Validation", "type");
+
+                let handlerCallCount = 0;
+                const handler = async (_value: string) => {
+                    handlerCallCount++;
+                    return "validated execution";
+                };
+                const mockValidator = vi.fn().mockReturnValue(null);
+                const registeredHandlers = new Set<TestChannel>();
+
+                registerStandardizedIpcHandler(
+                    CHANNELS_FOR_TESTS.validatedExecution,
+                    handler as never,
+                    mockValidator,
+                    registeredHandlers
+                );
+
+                const handleCall = vi
+                    .mocked(ipcMain.handle)
+                    .mock.calls.find(
+                        (call) =>
+                            call[0] === CHANNELS_FOR_TESTS.validatedExecution
+                    );
+                expect(handleCall).toBeDefined();
+
+                const registeredFunction = handleCall![1];
+                const result = await registeredFunction(
+                    {} as any,
+                    "validArg",
+                    "unexpected"
+                );
+
+                expect(mockValidator).not.toHaveBeenCalled();
+                expect(handlerCallCount).toBe(0);
+                expect(result.success).toBeFalsy();
+                expect(result.error).toContain("expects exactly");
+            });
+
+            it("should reject missing args for validated handlers", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "regression");
+                await annotate("Component: utils", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Validation", "type");
+
+                let handlerCallCount = 0;
+                const handler = async (_value: string) => {
+                    handlerCallCount++;
+                    return "validated execution";
+                };
+                const mockValidator = vi.fn().mockReturnValue(null);
+                const registeredHandlers = new Set<TestChannel>();
+
+                registerStandardizedIpcHandler(
+                    CHANNELS_FOR_TESTS.validatedExecution,
+                    handler as never,
+                    mockValidator,
+                    registeredHandlers
+                );
+
+                const handleCall = vi
+                    .mocked(ipcMain.handle)
+                    .mock.calls.find(
+                        (call) =>
+                            call[0] === CHANNELS_FOR_TESTS.validatedExecution
+                    );
+                expect(handleCall).toBeDefined();
+
+                const registeredFunction = handleCall![1];
+                const result = await registeredFunction({} as any);
+
+                expect(mockValidator).not.toHaveBeenCalled();
+                expect(handlerCallCount).toBe(0);
+                expect(result.success).toBeFalsy();
+                expect(result.error).toContain("expects exactly");
             });
 
             it("should track multiple registered handlers", async ({

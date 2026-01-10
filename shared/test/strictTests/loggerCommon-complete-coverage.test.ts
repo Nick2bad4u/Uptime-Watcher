@@ -60,6 +60,22 @@ describe(serializeError, () => {
                 serialized?.stack === undefined
         ).toBeTruthy();
     });
+
+    it("redacts secrets embedded in error messages and causes", () => {
+        const error = new Error(
+            "Request failed: GET https://example.com?access_token=abc&refresh_token=def"
+        );
+        (error as Error & { cause?: unknown }).cause =
+            "Authorization: Bearer secret";
+
+        const serialized = serializeError(error);
+
+        expect(serialized?.message).toContain("access_token=[redacted]");
+        expect(serialized?.message).toContain("refresh_token=[redacted]");
+        expect(serialized?.message).not.toContain("access_token=abc");
+        expect(serialized?.message).not.toContain("refresh_token=def");
+        expect(serialized?.cause).toBe("Authorization: [redacted]");
+    });
 });
 
 describe(buildLogArguments, () => {

@@ -5,19 +5,32 @@
 
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi, beforeEach } from "vitest";
+import type {
+    ButtonHTMLAttributes,
+    HTMLAttributes,
+    LabelHTMLAttributes,
+    PropsWithChildren,
+    SelectHTMLAttributes,
+} from "react";
 
 import { HistoryTab } from "../../../../components/SiteDetails/tabs/HistoryTab";
 import type { Monitor } from "@shared/types";
 
 // Mock all external dependencies
 vi.mock("../../../../stores/settings/useSettingsStore", () => ({
-    useSettingsStore: vi.fn(() => ({
-        settings: { historyLimit: 25 },
-        initializeSettings: vi.fn(),
-        updateSettings: vi.fn(),
-        exportSettings: vi.fn(),
-        importSettings: vi.fn(),
-    })),
+    useSettingsStore: (selector?: unknown) => {
+        const state = {
+            settings: { historyLimit: 25 },
+            exportSettings: vi.fn(),
+            importSettings: vi.fn(),
+            initializeSettings: vi.fn(),
+            updateSettings: vi.fn(),
+        };
+
+        return typeof selector === "function"
+            ? (selector as (value: typeof state) => unknown)(state)
+            : state;
+    },
 }));
 
 vi.mock("../../../../services/logger", () => ({
@@ -33,7 +46,7 @@ vi.mock("../../../../services/logger", () => ({
 }));
 
 vi.mock("../../../../theme/components/StatusIndicator", () => ({
-    StatusIndicator: ({ children, ...props }: any) => (
+    StatusIndicator: ({ children, ...props }: PropsWithChildren<HTMLAttributes<HTMLDivElement>>) => (
         <div data-testid="status-indicator" {...props}>
             {children}
         </div>
@@ -41,31 +54,31 @@ vi.mock("../../../../theme/components/StatusIndicator", () => ({
 }));
 
 vi.mock("../../../../theme/components/ThemedButton", () => ({
-    ThemedButton: ({ children, ...props }: any) => (
+    ThemedButton: ({ children, ...props }: PropsWithChildren<ButtonHTMLAttributes<HTMLButtonElement>>) => (
         <button {...props}>{children}</button>
     ),
 }));
 
 vi.mock("../../../../theme/components/ThemedCard", () => ({
-    ThemedCard: ({ children, ...props }: any) => (
+    ThemedCard: ({ children, ...props }: PropsWithChildren<HTMLAttributes<HTMLDivElement>>) => (
         <div {...props}>{children}</div>
     ),
 }));
 
 vi.mock("../../../../theme/components/ThemedSelect", () => ({
-    ThemedSelect: ({ children, ...props }: any) => (
+    ThemedSelect: ({ children, ...props }: PropsWithChildren<SelectHTMLAttributes<HTMLSelectElement>>) => (
         <select {...props}>{children}</select>
     ),
 }));
 
 vi.mock("../../../../theme/components/ThemedText", () => ({
-    ThemedText: ({ children, ...props }: any) => (
+    ThemedText: ({ children, ...props }: PropsWithChildren<HTMLAttributes<HTMLSpanElement>>) => (
         <span {...props}>{children}</span>
     ),
 }));
 
 vi.mock("../../common/MonitorUiComponents", () => ({
-    DetailLabel: ({ children, ...props }: any) => (
+    DetailLabel: ({ children, ...props }: PropsWithChildren<LabelHTMLAttributes<HTMLLabelElement>>) => (
         <label {...props}>{children}</label>
     ),
 }));
@@ -214,7 +227,7 @@ describe(HistoryTab, () => {
             const monitorWithUndefinedHistory = {
                 ...createMockMonitor(),
                 history: [],
-            } as any;
+            } as unknown as Monitor;
 
             expect(() =>
                 render(
@@ -246,7 +259,7 @@ describe(HistoryTab, () => {
                     { timestamp: Date.now(), status: "up" }, // Missing responseTime
                     { timestamp: Date.now() - 60_000 }, // Missing status and responseTime
                 ],
-            } as any;
+            } as unknown as Monitor;
 
             expect(() =>
                 render(

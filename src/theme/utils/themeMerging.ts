@@ -5,10 +5,12 @@
  * @packageDocumentation
  */
 
+import type { UnknownRecord } from "type-fest";
+
 import type { Theme } from "../types";
 
 // Helper function to merge objects, allowing explicit undefined to override
-const mergeWithExplicitUndefined = <T extends Record<string, unknown>>(
+const mergeWithExplicitUndefined = <T extends UnknownRecord>(
     base: T,
     override?: Partial<T>
 ): T => {

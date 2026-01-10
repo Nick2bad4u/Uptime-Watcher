@@ -9,11 +9,13 @@ import {
     vi,
     beforeEach,
     afterEach,
+    afterAll,
     type Mock,
 } from "vitest";
 import type { Site } from "@shared/types";
 import type { SiteOperationsDependencies } from "../../../../stores/sites/types";
 import { createMockFunction } from "../../../utils/mockFactories";
+import { installElectronApiMock } from "../../../utils/electronApiMock";
 
 // Mock the error catalog
 vi.mock("../../../../../shared/utils/errorCatalog", () => ({
@@ -60,6 +62,7 @@ vi.mock("../../../../stores/sites/utils/monitorOperations", () => ({
 const mockElectronAPI = {
     data: {
         downloadSqliteBackup: vi.fn(),
+        saveSqliteBackup: vi.fn(),
         restoreSqliteBackup: vi.fn(),
     },
     sites: {
@@ -67,9 +70,10 @@ const mockElectronAPI = {
     },
 };
 
-Object.defineProperty(globalThis, "electronAPI", {
-    value: mockElectronAPI,
-    writable: true,
+const { restore: restoreElectronApi } = installElectronApiMock(mockElectronAPI);
+
+afterAll(() => {
+    restoreElectronApi();
 });
 
 // Import after mocking
@@ -145,6 +149,9 @@ describe("OperationHelpers", () => {
                     schemaVersion: 1,
                     sizeBytes: 0,
                 },
+            })),
+            saveSqliteBackup: vi.fn(async () => ({
+                canceled: true as const,
             })),
             restoreSqliteBackup: vi.fn(async (payload) =>
                 mockElectronAPI.data.restoreSqliteBackup(payload)

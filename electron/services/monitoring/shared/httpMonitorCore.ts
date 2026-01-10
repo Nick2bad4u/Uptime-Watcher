@@ -16,6 +16,7 @@ import {
     interpolateLogTemplate,
     LOG_TEMPLATES,
 } from "@shared/utils/logTemplates";
+import { isRecord } from "@shared/utils/typeHelpers";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 
 import type {
@@ -35,7 +36,6 @@ import { withOperationalHooks } from "../../../utils/operationalHooks";
 import { handleCheckError, isCancellationError } from "../utils/errorHandling";
 import { createHttpClient } from "../utils/httpClient";
 import { getSharedHttpRateLimiter } from "../utils/httpRateLimiter";
-import { createTimeoutSignal } from "./abortSignalUtils";
 import {
     deriveMonitorTiming,
     ensureMonitorType,
@@ -46,6 +46,9 @@ import {
     createMonitorErrorResult,
     validateMonitorUrl,
 } from "./monitorServiceHelpers";
+
+const isCallable = (value: unknown): value is (...args: never[]) => unknown =>
+    typeof value === "function";
 
 declare module "axios" {
     interface AxiosError {
@@ -132,8 +135,8 @@ export function createHttpMonitorService<
 
     return class HttpMonitorServiceAdapter
         extends MonitorServiceAdapterBase<TType>
-        implements HttpMonitorServiceInstance {
-
+        implements HttpMonitorServiceInstance
+    {
         public async check(
             monitor: Site["monitors"][0],
             signal?: AbortSignal
@@ -228,9 +231,8 @@ export function createHttpMonitorService<
                         operationName,
                         ...(isDev() && {
                             onRetry: (attempt: number, error: Error): void => {
-                                const errorMessage = getUserFacingErrorDetail(
-                                    error
-                                );
+                                const errorMessage =
+                                    getUserFacingErrorDetail(error);
                                 logger.debug(
                                     `[${behavior.scope}] URL ${url} failed attempt ${attempt}/${totalAttempts}: ${errorMessage}`
                                 );
@@ -293,16 +295,43 @@ export function createHttpMonitorService<
             timeout: number,
             signal?: AbortSignal
         ): Promise<AxiosResponse> {
-            const requestSignal = createTimeoutSignal(timeout, signal);
-
             const shouldFollowRedirects =
                 Reflect.get(monitor, "followRedirects") !== false;
 
-            return this.axiosInstance.get(url, {
-                signal: requestSignal,
+            const response = await this.axiosInstance.get(url, {
+                ...(signal ? { signal } : {}),
+                responseType: "stream",
                 timeout,
                 ...(!shouldFollowRedirects && { maxRedirects: 0 }),
             });
+
+            this.cleanupAxiosResponseData(response.data);
+            return response;
+        }
+
+        private cleanupAxiosResponseData(data: unknown): void {
+            if (!isRecord(data)) {
+                return;
+            }
+
+            const resumeCandidate = data["resume"];
+            const destroyCandidate = data["destroy"];
+
+            try {
+                if (isCallable(resumeCandidate)) {
+                    resumeCandidate();
+                }
+            } catch {
+                // Ignore
+            }
+
+            try {
+                if (isCallable(destroyCandidate)) {
+                    destroyCandidate();
+                }
+            } catch {
+                // Ignore
+            }
         }
 
         public constructor(config: MonitorServiceConfig = {}) {

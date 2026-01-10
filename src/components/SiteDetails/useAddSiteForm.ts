@@ -49,6 +49,10 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { DEFAULT_CHECK_INTERVAL } from "../../constants";
 import { useMonitorFields } from "../../hooks/useMonitorFields";
 import { generateUuid } from "../../utils/data/generateUuid";
+import {
+    buildMonitorValidationFieldValues,
+    type MonitorValidationFieldValues,
+} from "../../utils/monitorValidationFields";
 
 /**
  * Form actions interface containing all form manipulation functions.
@@ -226,43 +230,9 @@ export type UseAddSiteFormReturnWithMonitorFields = UseAddSiteFormReturn & {
     monitorFieldsLoaded: boolean;
 };
 
-// Helper functions for add site form logic (reduces function length by
+// Helper types/functions for add site form logic (reduces function length by
 // composition)
-interface MonitorFieldValues {
-    [key: string]: string;
-    baselineUrl: string;
-    bodyKeyword: string;
-    certificateWarningDays: string;
-    edgeLocations: string;
-    expectedHeaderValue: string;
-    expectedJsonValue: string;
-    expectedStatusCode: string;
-    expectedValue: string;
-    headerName: string;
-    heartbeatExpectedStatus: string;
-    heartbeatMaxDriftSeconds: string;
-    heartbeatStatusField: string;
-    heartbeatTimestampField: string;
-    host: string;
-    jsonPath: string;
-    maxPongDelayMs: string;
-    maxReplicationLagSeconds: string;
-    /**
-     * Monitor-type field key (milliseconds).
-     *
-     * @remarks
-     * The monitor registry and dynamic validation use `maxResponseTime` as the
-     * canonical field name. The UI state uses `maxResponseTimeMs` for unit
-     * clarity and maps it into this key.
-     */
-    maxResponseTime: string;
-    port: string;
-    primaryStatusUrl: string;
-    recordType: string;
-    replicaStatusUrl: string;
-    replicationTimestampField: string;
-    url: string;
-}
+type MonitorFieldValues = MonitorValidationFieldValues;
 
 const resetFieldsForMonitorType = (
     currentFieldNames: Set<string>,
@@ -600,32 +570,33 @@ export function useAddSiteForm(): UseAddSiteFormReturnWithMonitorFields {
     );
 
     const monitorFieldValues = useMemo<MonitorFieldValues>(
-        () => ({
-            baselineUrl,
-            bodyKeyword,
-            certificateWarningDays,
-            edgeLocations,
-            expectedHeaderValue,
-            expectedJsonValue,
-            expectedStatusCode,
-            expectedValue,
-            headerName,
-            heartbeatExpectedStatus,
-            heartbeatMaxDriftSeconds,
-            heartbeatStatusField,
-            heartbeatTimestampField,
-            host,
-            jsonPath,
-            maxPongDelayMs,
-            maxReplicationLagSeconds,
-            maxResponseTime: maxResponseTimeMs,
-            port,
-            primaryStatusUrl,
-            recordType,
-            replicaStatusUrl,
-            replicationTimestampField,
-            url,
-        }),
+        () =>
+            buildMonitorValidationFieldValues({
+                baselineUrl,
+                bodyKeyword,
+                certificateWarningDays,
+                edgeLocations,
+                expectedHeaderValue,
+                expectedJsonValue,
+                expectedStatusCode,
+                expectedValue,
+                headerName,
+                heartbeatExpectedStatus,
+                heartbeatMaxDriftSeconds,
+                heartbeatStatusField,
+                heartbeatTimestampField,
+                host,
+                jsonPath,
+                maxPongDelayMs,
+                maxReplicationLagSeconds,
+                maxResponseTimeMs,
+                port,
+                primaryStatusUrl,
+                recordType,
+                replicaStatusUrl,
+                replicationTimestampField,
+                url,
+            }),
         [
             baselineUrl,
             bodyKeyword,

@@ -102,7 +102,7 @@ export class SnapshotSyncCoordinator {
         sites?: Site[];
         source: StateSyncSource;
         timestamp?: number;
-    }): Promise<Site[]> {
+    }): Promise<{ revision: number; sites: Site[] }> {
         return this.siteManager.emitSitesStateSynchronized(payload);
     }
 

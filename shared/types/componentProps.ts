@@ -20,7 +20,7 @@ import type {
     MouseEvent,
     ReactNode,
 } from "react";
-import type { UnknownRecord } from "type-fest";
+import type { SetOptional, SetRequired, UnknownRecord } from "type-fest";
 
 /**
  * Core set of structural properties shared by many UI components.
@@ -39,6 +39,34 @@ export interface CoreComponentProperties {
     /** Whether the component is disabled and non-interactive */
     readonly disabled?: boolean;
 }
+
+/**
+ * DOM identity properties commonly forwarded to native elements.
+ *
+ * @remarks
+ * `id` is frequently needed for accessibility, automation, and integration with
+ * browser APIs.
+ *
+ * @public
+ */
+export interface DomIdentityProperties {
+    /** Optional DOM id forwarded to the underlying element. */
+    readonly id?: string;
+}
+
+/**
+ * Strongly-typed `data-*` attributes for automation and diagnostics.
+ *
+ * @remarks
+ * These are intentionally limited to JSON-serializable primitives. React will
+ * stringify these values when emitting to the DOM.
+ *
+ * @public
+ */
+export type DataAttributeProperties = Readonly<
+    Partial<Record<`data-${string}`, boolean | number | string | undefined>>
+>;
+
 
 /**
  * Accessibility properties following ARIA standards.
@@ -149,7 +177,7 @@ export interface FormFieldBaseProperties {
 }
 
 /**
- * Icon integration properties.
+ * Icon-related properties for components that support icon rendering.
  *
  * @remarks
  * These props provide consistent icon integration patterns across components
@@ -320,6 +348,8 @@ export interface StandardButtonProperties
     extends
         AccessibilityProperties,
         CoreComponentProperties,
+        DataAttributeProperties,
+        DomIdentityProperties,
         IconProperties,
         StateProperties,
         StylingProperties {
@@ -557,7 +587,7 @@ export type ComponentProperties<TBase, TOverrides = UnknownRecord> = Omit<
  *
  * @public
  */
-export type RequireProperties<T, K extends keyof T> = Required<Pick<T, K>> & T;
+export type RequireProperties<T, K extends keyof T> = SetRequired<T, K>;
 
 /**
  * Utility type for making certain properties optional.
@@ -573,5 +603,4 @@ export type RequireProperties<T, K extends keyof T> = Required<Pick<T, K>> & T;
  *
  * @public
  */
-export type OptionalProperties<T, K extends keyof T> = Omit<T, K> &
-    Partial<Pick<T, K>>;
+export type OptionalProperties<T, K extends keyof T> = SetOptional<T, K>;

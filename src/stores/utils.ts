@@ -16,10 +16,10 @@ import { isDevelopment } from "@shared/utils/environment";
 /**
  * Creates a Zustand persist configuration object with a normalized storage key.
  */
-export const createPersistConfig = <T>(
+export const createPersistConfig = <TState, TPersisted = Partial<TState>>(
     storeName: string,
-    partialize?: (state: T) => Partial<T>
-): Partial<PersistOptions<T, Partial<T>>> => ({
+    partialize?: (state: TState) => TPersisted
+): PersistOptions<TState, TPersisted> => ({
     name: `uptime-watcher-${storeName}`,
     ...(partialize ? { partialize } : {}),
 });

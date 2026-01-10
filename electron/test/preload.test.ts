@@ -13,6 +13,7 @@ describe("Electron Preload Script", () => {
     let mockIpcRenderer: {
         invoke: ReturnType<typeof vi.fn>;
         on: ReturnType<typeof vi.fn>;
+        removeListener: ReturnType<typeof vi.fn>;
         removeAllListeners: ReturnType<typeof vi.fn>;
         send: ReturnType<typeof vi.fn>;
     };
@@ -73,6 +74,7 @@ describe("Electron Preload Script", () => {
         mockIpcRenderer = {
             invoke: invokeMock,
             on: vi.fn(),
+            removeListener: vi.fn(),
             removeAllListeners: vi.fn(),
             send: vi.fn(),
         };
@@ -854,6 +856,46 @@ describe("Electron Preload Script", () => {
                 );
                 expect(result).toEqual(mockBackupData);
             });
+
+            it("should properly invoke IPC for saveSqliteBackup", async ({
+                annotate,
+            }) => {
+                await annotate("Component: Data API", "component");
+                await annotate(
+                    "Test Type: Unit - IPC Bridge Validation",
+                    "test-type"
+                );
+                await annotate("Operation: SQLite Backup Save", "operation");
+                await annotate(
+                    "Priority: Critical - Database Backup",
+                    "priority"
+                );
+                await annotate(
+                    "Complexity: Low - No large payload",
+                    "complexity"
+                );
+                await annotate(
+                    "IPC Channel: save-sqlite-backup",
+                    "ipc-channel"
+                );
+
+                const mockResponse = {
+                    success: true,
+                    data: { canceled: true },
+                };
+                mockIpcRenderer.invoke.mockResolvedValueOnce(mockResponse);
+
+                await import("../preload");
+
+                const exposedAPI = getExposedAPI();
+
+                const result = await exposedAPI.data.saveSqliteBackup();
+
+                expect(mockIpcRenderer.invoke).toHaveBeenCalledWith(
+                    "save-sqlite-backup"
+                );
+                expect(result).toEqual({ canceled: true });
+            });
         });
 
         describe("Settings API", () => {
@@ -1143,10 +1185,18 @@ describe("Electron Preload Script", () => {
                 const exposedAPI = getExposedAPI();
                 const channel = "monitor:status-changed";
 
+                const callback = vi.fn();
+                exposedAPI.events.onMonitorStatusChanged(callback);
+                const handler = mockIpcRenderer.on.mock.calls.find(
+                    (call) => call[0] === channel
+                )?.[1];
+                expect(handler).toBeTypeOf("function");
+
                 exposedAPI.events.removeAllListeners(channel);
 
-                expect(mockIpcRenderer.removeAllListeners).toHaveBeenCalledWith(
-                    channel
+                expect(mockIpcRenderer.removeListener).toHaveBeenCalledWith(
+                    channel,
+                    handler
                 );
             });
 

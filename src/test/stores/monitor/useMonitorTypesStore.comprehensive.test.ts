@@ -5,7 +5,7 @@
  * all state management, actions, error handling, and IPC interactions.
  */
 
-import { describe, it, expect, beforeEach, vi } from "vitest";
+import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { act, renderHook } from "@testing-library/react";
 import type {
     Monitor,
@@ -16,38 +16,46 @@ import type { MonitorTypeConfig } from "@shared/types/monitorTypes";
 import type { ValidationResult } from "@shared/types/validation";
 import { useMonitorTypesStore } from "../../../stores/monitor/useMonitorTypesStore";
 import { useErrorStore } from "../../../stores/error/useErrorStore";
+import { installElectronApiMock } from "../../utils/electronApiMock";
 
-// Mock dependencies
-vi.mock("@shared/utils/errorHandling", () => ({
-    withErrorHandling: vi.fn(async (operation, store) => {
-        // Simulate the real withErrorHandling behavior
-        try {
-            store.clearError();
-            store.setLoading(true);
-            return await operation();
-        } catch (error: unknown) {
-            const errorMessage =
-                error instanceof Error ? error.message : String(error);
-            store.setError(errorMessage);
-            throw error;
-        } finally {
-            store.setLoading(false);
-        }
-    }),
-    ensureError: vi.fn((error) =>
-        error instanceof Error ? error : new Error(String(error))
-    ),
-}));
+// Mock dependencies (partial mock to preserve exports like ApplicationError)
+vi.mock("@shared/utils/errorHandling", async (importOriginal) => {
+    const actual =
+        await importOriginal<typeof import("@shared/utils/errorHandling")>();
 
-vi.mock("../../../stores/utils", () => ({
-    logStoreAction: vi.fn(),
-}));
+    return {
+        ...actual,
+        ensureError: vi.fn((error) =>
+            error instanceof Error ? error : new Error(String(error))
+        ),
+        withErrorHandling: vi.fn(async (operation, store) => {
+            // Simulate the real withErrorHandling behavior
+            try {
+                store.clearError();
+                store.setLoading(true);
+                return await operation();
+            } catch (error: unknown) {
+                const errorMessage =
+                    error instanceof Error ? error.message : String(error);
+                store.setError(errorMessage);
+                throw error;
+            } finally {
+                store.setLoading(false);
+            }
+        }),
+    };
+});
 
-vi.mock("../../../types/ipc", () => ({
-    safeExtractIpcData: vi.fn((response, fallback) => response || fallback),
-}));
+vi.mock("../../../stores/utils", async (importOriginal) => {
+    const actual = await importOriginal<typeof import("../../../stores/utils")>();
+    return {
+        ...actual,
+        logStoreAction: vi.fn(),
+    };
 
-// Mock ElectronAPI
+});
+
+
 const mockElectronAPI = {
     monitorTypes: {
         getMonitorTypes: vi.fn(),
@@ -55,17 +63,9 @@ const mockElectronAPI = {
         formatMonitorDetail: vi.fn(),
         formatMonitorTitleSuffix: vi.fn(),
     },
-    monitoring: {},
-};
+} as const;
 
-// Properly mock window.electronAPI
-Object.defineProperty(globalThis, "window", {
-    value: {
-        electronAPI: mockElectronAPI,
-    },
-    writable: true,
-});
-
+let restoreElectronApi: (() => void) | undefined;
 const createMonitorTypeConfig = (
     overrides: Partial<MonitorTypeConfig> = {}
 ): MonitorTypeConfig => ({
@@ -108,6 +108,15 @@ describe(useMonitorTypesStore, () => {
             fieldConfigs: {},
             isLoaded: false,
         });
+
+        ({ restore: restoreElectronApi } = installElectronApiMock({
+            monitorTypes: mockElectronAPI.monitorTypes,
+        }));
+    });
+
+    afterEach(() => {
+        restoreElectronApi?.();
+        restoreElectronApi = undefined;
     });
 
     describe("Initial State", () => {

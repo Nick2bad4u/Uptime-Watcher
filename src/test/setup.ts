@@ -7,18 +7,10 @@ import { beforeEach, vi, type MockInstance } from "vitest";
 import "@testing-library/jest-dom";
 import fc from "fast-check";
 import { resolveFastCheckEnvOverrides } from "@shared/test/utils/fastCheckEnv";
-import type {
-    MonitoringStartSummary,
-    MonitoringStopSummary,
-    Monitor,
-    StatusUpdate,
-} from "@shared/types";
-import type { ValidationResult } from "@shared/types/validation";
-import { createMonitorTypeConfig } from "./utils/createMonitorTypeConfig";
 
 import EventEmitter from "node:events";
 
-import "./mock-setup";
+
 
 import { useErrorStore } from "../stores/error/useErrorStore";
 
@@ -310,309 +302,6 @@ const ensureStorage = (storageKey: StorageKey): void => {
 ensureStorage("localStorage");
 ensureStorage("sessionStorage");
 
-// Global test configuration and mocks
-type AnyMock = MockInstance;
-type SubscriptionMock = MockInstance;
-
-const defaultStartSummary: MonitoringStartSummary = {
-    attempted: 2,
-    failed: 0,
-    partialFailures: false,
-    siteCount: 1,
-    skipped: 0,
-    succeeded: 2,
-    isMonitoring: true,
-    alreadyActive: false,
-};
-
-const defaultStopSummary: MonitoringStopSummary = {
-    attempted: 2,
-    failed: 0,
-    partialFailures: false,
-    siteCount: 1,
-    skipped: 0,
-    succeeded: 2,
-    isMonitoring: false,
-    alreadyInactive: false,
-};
-
-const mockElectronAPI: {
-    data: {
-        downloadSqliteBackup: AnyMock;
-        exportData: AnyMock;
-        importData: AnyMock;
-    };
-    events: {
-        onMonitorCheckCompleted: SubscriptionMock;
-        onHistoryLimitUpdated: SubscriptionMock;
-        onMonitorStatusChanged: SubscriptionMock;
-        onMonitorUp: SubscriptionMock;
-        onSiteAdded: SubscriptionMock;
-        onSiteRemoved: SubscriptionMock;
-        onSiteUpdated: SubscriptionMock;
-        onMonitorDown: SubscriptionMock;
-        onMonitoringStarted: SubscriptionMock;
-        onMonitoringStopped: SubscriptionMock;
-        onTestEvent: SubscriptionMock;
-        onUpdateStatus: SubscriptionMock;
-        removeAllListeners: AnyMock;
-    };
-    monitoring: {
-        checkSiteNow: AnyMock;
-        removeMonitor: AnyMock;
-        startMonitor: AnyMock;
-        startMonitoring: AnyMock;
-        startMonitoringForMonitor: AnyMock;
-        startMonitoringForSite: AnyMock;
-        stopMonitor: AnyMock;
-        stopMonitoring: AnyMock;
-        stopMonitoringForMonitor: AnyMock;
-        stopMonitoringForSite: AnyMock;
-        validateMonitorConfig: AnyMock;
-        formatHttpStatus: AnyMock;
-    };
-    monitorTypes: {
-        isLoaded: AnyMock;
-        formatMonitorDetail: AnyMock;
-        formatMonitorTitleSuffix: AnyMock;
-        getMonitorTypes: AnyMock;
-        validateMonitorData: AnyMock;
-    };
-    settings: {
-        getHistoryLimit: AnyMock;
-        updateHistoryLimit: AnyMock;
-    };
-    sites: {
-        addSite: AnyMock;
-        getSites: AnyMock;
-        removeMonitor: AnyMock;
-        removeSite: AnyMock;
-        updateSite: AnyMock;
-    };
-    stateSync: {
-        getSyncStatus: AnyMock;
-        onStateSyncEvent: SubscriptionMock;
-        requestFullSync: AnyMock;
-    };
-    system: {
-        openExternal: AnyMock;
-        quitAndInstall: AnyMock;
-        writeClipboardText: AnyMock;
-    };
-} = {
-    data: {
-        downloadSqliteBackup: vi.fn().mockResolvedValue({
-            buffer: new ArrayBuffer(8),
-            fileName: "test-backup.sqlite",
-            metadata: {
-                appVersion: "0.0.0-test",
-                checksum: "mock-checksum",
-                createdAt: Date.now(),
-                originalPath: "/tmp/test-backup.sqlite",
-                retentionHintDays: 30,
-                schemaVersion: 1,
-                sizeBytes: 8,
-            },
-        }),
-        exportData: vi.fn().mockResolvedValue("mock-data"),
-        importData: vi.fn().mockResolvedValue(true),
-    },
-    events: {
-        onMonitorCheckCompleted: vi.fn((_callback: any) =>
-            // Mock implementation - return cleanup function
-            vi.fn()
-        ),
-        onHistoryLimitUpdated: vi.fn((_callback: any) =>
-            // Mock implementation - return cleanup function
-            vi.fn()
-        ),
-        onMonitorStatusChanged: vi.fn((_callback: any) =>
-            // Mock implementation - return cleanup function
-            vi.fn()
-        ),
-        onMonitorUp: vi.fn((_callback: any) =>
-            // Mock implementation - return cleanup function
-            vi.fn()
-        ),
-        onSiteAdded: vi.fn((_callback: any) => vi.fn()),
-        onSiteRemoved: vi.fn((_callback: any) => vi.fn()),
-        onSiteUpdated: vi.fn((_callback: any) => vi.fn()),
-        onMonitorDown: vi.fn((_callback: any) =>
-            // Mock implementation - return cleanup function
-            vi.fn()
-        ),
-        onMonitoringStarted: vi.fn((_callback: any) =>
-            // Mock implementation - return cleanup function
-            vi.fn()
-        ),
-        onMonitoringStopped: vi.fn((_callback: any) =>
-            // Mock implementation - return cleanup function
-            vi.fn()
-        ),
-        onTestEvent: vi.fn((_callback: any) =>
-            // Mock implementation - return cleanup function
-            vi.fn()
-        ),
-        onUpdateStatus: vi.fn((_callback: any) =>
-            // Mock implementation - return cleanup function
-            vi.fn()
-        ),
-        removeAllListeners: vi.fn(),
-    },
-    monitoring: {
-        checkSiteNow: vi.fn().mockResolvedValue(
-            (() => {
-                const monitorSnapshot: Monitor = {
-                    checkInterval: 60_000,
-                    history: [],
-                    id: "monitor-1",
-                    monitoring: true,
-                    responseTime: 0,
-                    retryAttempts: 0,
-                    status: "up",
-                    timeout: 30_000,
-                    type: "http",
-                };
-
-                return {
-                    details: "Manual check completed",
-                    monitor: monitorSnapshot,
-                    monitorId: "monitor-1",
-                    previousStatus: "up",
-                    site: {
-                        identifier: "site-1",
-                        monitoring: true,
-                        monitors: [monitorSnapshot],
-                        name: "Test Site",
-                    },
-                    siteIdentifier: "site-1",
-                    status: "up",
-                    timestamp: new Date().toISOString(),
-                } satisfies StatusUpdate;
-            })()
-        ),
-        removeMonitor: vi.fn().mockResolvedValue({
-            identifier: "test-site",
-            monitoring: true,
-            monitors: [],
-            name: "Test Site",
-        }),
-        startMonitor: vi.fn().mockResolvedValue(true),
-        startMonitoring: vi.fn().mockResolvedValue(defaultStartSummary),
-        startMonitoringForMonitor: vi.fn().mockResolvedValue(true),
-        startMonitoringForSite: vi.fn().mockResolvedValue(true),
-        stopMonitor: vi.fn().mockResolvedValue(true),
-        stopMonitoring: vi.fn().mockResolvedValue(defaultStopSummary),
-        stopMonitoringForMonitor: vi.fn().mockResolvedValue(true),
-        stopMonitoringForSite: vi.fn().mockResolvedValue(true),
-        validateMonitorConfig: vi.fn().mockReturnValue(true),
-        formatHttpStatus: vi.fn().mockReturnValue("up"),
-    },
-    monitorTypes: {
-        isLoaded: vi.fn().mockResolvedValue(true),
-        formatMonitorDetail: vi.fn().mockResolvedValue("Mock formatted detail"),
-        formatMonitorTitleSuffix: vi
-            .fn()
-            .mockResolvedValue("Mock title suffix"),
-        getMonitorTypes: vi.fn().mockResolvedValue([
-            createMonitorTypeConfig({
-                description: "HTTP monitoring",
-                displayName: "HTTP",
-                fields: [
-                    {
-                        label: "URL",
-                        name: "url",
-                        placeholder: "https://example.com",
-                        required: true,
-                        type: "url",
-                    },
-                    {
-                        label: "Port",
-                        name: "port",
-                        required: false,
-                        type: "number",
-                    },
-                ],
-                type: "http",
-            }),
-            createMonitorTypeConfig({
-                description: "Port monitoring",
-                displayName: "Port",
-                fields: [
-                    {
-                        label: "Host",
-                        name: "host",
-                        required: true,
-                        type: "text",
-                    },
-                    {
-                        label: "Port",
-                        name: "port",
-                        required: true,
-                        type: "number",
-                    },
-                ],
-                type: "port",
-            }),
-        ]),
-        validateMonitorData: vi.fn().mockResolvedValue({
-            data: {},
-            errors: [],
-            metadata: {},
-            success: true,
-            warnings: [],
-        } satisfies ValidationResult),
-    },
-    settings: {
-        getHistoryLimit: vi.fn().mockResolvedValue(1000),
-        updateHistoryLimit: vi
-            .fn()
-            .mockImplementation(async (limit: number) => limit),
-    },
-    sites: {
-        addSite: vi.fn().mockResolvedValue({
-            identifier: "test-site",
-            monitoring: true,
-            monitors: [],
-            name: "Test Site",
-        }),
-        getSites: vi.fn().mockResolvedValue([]),
-        removeMonitor: vi.fn().mockResolvedValue({
-            identifier: "test-site",
-            monitoring: true,
-            monitors: [],
-            name: "Test Site",
-        }),
-        removeSite: vi.fn().mockResolvedValue(true),
-        updateSite: vi.fn().mockResolvedValue({
-            identifier: "test-site",
-            monitoring: true,
-            monitors: [],
-            name: "Test Site",
-        }),
-    },
-    stateSync: {
-        getSyncStatus: vi.fn().mockResolvedValue({
-            lastSyncAt: null,
-            siteCount: 0,
-            source: "cache",
-            synchronized: false,
-        }),
-        onStateSyncEvent: vi.fn((_callback: any) => vi.fn()),
-        requestFullSync: vi.fn().mockResolvedValue({
-            completedAt: Date.now(),
-            siteCount: 0,
-            sites: [],
-            source: "cache",
-            synchronized: false,
-        }),
-    },
-    system: {
-        openExternal: vi.fn().mockResolvedValue(true),
-        quitAndInstall: vi.fn().mockResolvedValue(true),
-        writeClipboardText: vi.fn().mockResolvedValue(true),
-    },
-};
 
 // Suppress noisy CSS parse errors emitted by JSDOM for modern CSS features
 const originalConsoleError = console.error;
@@ -647,12 +336,6 @@ const suppressCssParseWarning = <
 
 console.error = suppressCssParseWarning(originalConsoleError);
 console.warn = suppressCssParseWarning(originalConsoleWarn);
-
-// Mock window.electronAPI globally
-Object.defineProperty(globalThis, "electronAPI", {
-    value: mockElectronAPI,
-    writable: true,
-});
 
 // Mock window.matchMedia for theme tests
 Object.defineProperty(globalThis, "matchMedia", {
@@ -961,7 +644,7 @@ vi.mock("../theme/useTheme", () => ({
 }));
 
 // Export mocks for use in individual tests
-export { mockElectronAPI, mockTheme };
+export {  mockTheme };
 
 // Custom test context setup for task and annotate properties
 // Note: The actual type definitions are in src/types/vitest-context.d.ts
@@ -973,3 +656,5 @@ if ((globalThis as any).fail === undefined) {
         throw new Error(message ?? "Test failed");
     };
 }
+
+export {mockElectronAPI} from "./mock-setup";

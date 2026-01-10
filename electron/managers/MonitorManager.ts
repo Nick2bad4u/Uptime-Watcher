@@ -736,7 +736,8 @@ export class MonitorManager {
      */
     private async handleScheduledCheck(
         siteIdentifier: string,
-        monitorId: string
+        monitorId: string,
+        signal: AbortSignal
     ): Promise<void> {
         const site = this.dependencies.getSitesCache().get(siteIdentifier);
         if (!site) {
@@ -754,7 +755,8 @@ export class MonitorManager {
             await this.enhancedMonitoringServices.checker.checkMonitor(
                 site,
                 monitorId,
-                false
+                false,
+                signal
             );
         } catch (error) {
             logger.error(

@@ -3,7 +3,7 @@ schema: "../../config/schemas/doc-frontmatter.schema.json"
 title: "Vite Performance Profiling and Optimization Guide"
 summary: "Guide to profiling, warming, and optimizing Vite performance for the Uptime Watcher application."
 created: "2025-09-22"
-last_reviewed: "2025-11-17"
+last_reviewed: "2026-01-08"
 category: "guide"
 author: "Nick2bad4u"
 tags:
@@ -387,6 +387,23 @@ npm run build -- --reporter verbose
 - **Use --open**: Consider adding `server.open` for automatic warmup on startup
 
 ## 🚨 Troubleshooting
+
+### Production build fails with "JavaScript heap out of memory"
+
+If `npm run build` crashes during `vite build` with an out-of-memory error,
+increase Node.js heap size via `NODE_OPTIONS`.
+
+This repository already applies a larger heap for production builds via the
+`build:electron-vite` script:
+
+```json
+{
+ "build:electron-vite": "cross-env NODE_OPTIONS=--max_old_space_size=16384 tsc --build tsconfig.json && cross-env NODE_OPTIONS=--max_old_space_size=16384 vite build --config ./vite.config.ts"
+}
+```
+
+If you are running builds manually (or from a custom environment), ensure the
+equivalent setting is applied to the `vite build` process as well.
 
 ### Profile files not generating?
 

@@ -9,6 +9,8 @@ import * as fc from "fast-check";
 
 import type { MonitorType } from "@shared/types";
 
+import { installElectronApiMock } from "./electronApiMock";
+
 // Mock dependencies
 vi.mock("@shared/utils/errorHandling", () => ({
     ensureError: vi.fn(),
@@ -38,17 +40,8 @@ vi.mock("../../stores/monitor/useMonitorTypesStore", () => ({
     },
 }));
 
-// Mock electronAPI
-const mockElectronAPI = {
-    monitorTypes: {
-        validateMonitorData: vi.fn(),
-    },
-};
-
-Object.defineProperty(globalThis, "electronAPI", {
-    value: mockElectronAPI,
-    writable: true,
-});
+const validateMonitorDataIpcMock = vi.fn();
+let restoreElectronApi: (() => void) | undefined;
 
 import {
     createMonitorObject,
@@ -109,6 +102,12 @@ describe("Monitor Validation Utilities", () => {
     beforeEach(() => {
         vi.clearAllMocks();
 
+        ({ restore: restoreElectronApi } = installElectronApiMock({
+            monitorTypes: {
+                validateMonitorData: validateMonitorDataIpcMock,
+            },
+        }));
+
         // Mock the store method that validateMonitorData uses
         const mockStore = createMockStore();
 
@@ -138,6 +137,11 @@ describe("Monitor Validation Utilities", () => {
                 }
             }
         );
+    });
+
+    afterEach(() => {
+        restoreElectronApi?.();
+        restoreElectronApi = undefined;
     });
 
     afterEach(() => {
@@ -613,7 +617,7 @@ describe("Monitor Validation Utilities", () => {
     describe(validateMonitorField, () => {
         beforeEach(() => {
             // Mock validateMonitorData for use in validateMonitorField
-            mockElectronAPI.monitorTypes.validateMonitorData.mockResolvedValue({
+            validateMonitorDataIpcMock.mockResolvedValue({
                 data: undefined,
                 errors: [],
                 metadata: {},

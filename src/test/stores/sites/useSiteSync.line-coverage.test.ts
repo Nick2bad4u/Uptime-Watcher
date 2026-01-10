@@ -3,10 +3,11 @@
  * specifically identified by coverage analysis
  */
 
-import { beforeEach, describe, expect, it, vi, type Mock } from "vitest";
+import { afterAll, beforeEach, describe, expect, it, vi, type Mock } from "vitest";
 import type { Site } from "@shared/types";
 import type { StatusUpdateManager } from "../../../stores/sites/utils/statusUpdateHandler";
 import { createMockFunction } from "../../utils/mockFactories";
+import { installElectronApiMock } from "../../utils/electronApiMock";
 
 const LISTENER_NAMES = [
     "monitor:status-changed",
@@ -97,12 +98,13 @@ vi.mock("../../../services/StateSyncService", () => ({
     StateSyncService: mockStateSyncService,
 }));
 
-// Mock window.electronAPI
-Object.defineProperty(globalThis, "window", {
-    value: {
-        electronAPI: {},
-    },
-    writable: true,
+const { restore: restoreElectronApi } = installElectronApiMock(
+    {},
+    { ensureWindow: true }
+);
+
+afterAll(() => {
+    restoreElectronApi();
 });
 
 // Import after mocking
@@ -334,8 +336,13 @@ describe("useSiteSync - Line Coverage Completion", () => {
 
             const deleteEvent = {
                 action: "delete" as const,
-                siteIdentifier: "site-1",
-                sites: [],
+                delta: {
+                    addedSites: [],
+                    removedSiteIdentifiers: ["site-2"],
+                    updatedSites: [],
+                },
+                revision: 1,
+                siteIdentifier: "site-2",
                 source: "frontend" as const,
                 timestamp: Date.now(),
             };
@@ -344,7 +351,7 @@ describe("useSiteSync - Line Coverage Completion", () => {
             mockDeps.getSites.mockReturnValueOnce([buildSite("site-1")]);
             eventHandler(deleteEvent);
 
-            expect(mockDeps.setSites).toHaveBeenCalledWith([]);
+            expect(mockDeps.setSites).toHaveBeenCalledWith([buildSite("site-1")]);
         });
 
         it("should handle update event and apply provided snapshot", async ({
@@ -366,18 +373,23 @@ describe("useSiteSync - Line Coverage Completion", () => {
 
             syncActions.subscribeToSyncEvents();
 
-            const updateEvent = {
-                action: "update" as const,
-                siteIdentifier: "site-1",
-                sites: [
-                    {
-                        ...buildSite("site-1"),
-                        name: "Updated Site 1",
+                const updateEvent = {
+                    action: "update" as const,
+                    delta: {
+                        addedSites: [],
+                        removedSiteIdentifiers: [],
+                        updatedSites: [
+                            {
+                                ...buildSite("site-1"),
+                                name: "Updated Site 1",
+                            },
+                        ],
                     },
-                ],
-                source: "frontend" as const,
-                timestamp: Date.now(),
-            };
+                    revision: 2,
+                    siteIdentifier: "site-1",
+                    source: "frontend" as const,
+                    timestamp: Date.now(),
+                };
 
             // Trigger update event (line 296-297)
             mockDeps.getSites.mockReturnValueOnce([buildSite("site-1")]);
@@ -416,7 +428,7 @@ describe("useSiteSync - Line Coverage Completion", () => {
             const deleteEvent = {
                 action: "delete" as const,
                 siteIdentifier: "site-1",
-                sites: undefined,
+                revision: 99,
                 source: "frontend" as const,
                 timestamp: Date.now(),
             };
@@ -468,6 +480,7 @@ describe("useSiteSync - Line Coverage Completion", () => {
 
             const fullSyncResult = {
                 completedAt: Date.now(),
+                revision: 1,
                 siteCount: mockSites.length,
                 sites: mockSites,
                 source: "frontend" as const,

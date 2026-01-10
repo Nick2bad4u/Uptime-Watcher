@@ -6,22 +6,42 @@ import { isFilesystemBaseDirectoryValid } from "@shared/validation/filesystemBas
 
 import type { CloudStorageProvider } from "../providers/CloudStorageProvider.types";
 
-import { DropboxCloudStorageProvider } from "../providers/dropbox/DropboxCloudStorageProvider";
 import { FilesystemCloudStorageProvider } from "../providers/FilesystemCloudStorageProvider";
+
+type CloudProviderWithAccountLabel = CloudStorageProvider & {
+    readonly getAccountLabel: () => Promise<string>;
+};
+
+function hasAccountLabel(
+    provider: CloudStorageProvider
+): provider is CloudProviderWithAccountLabel {
+    if (!("getAccountLabel" in provider)) {
+        return false;
+    }
+
+    const candidate = (
+        provider as CloudStorageProvider & {
+            readonly getAccountLabel?: unknown;
+        }
+    ).getAccountLabel;
+
+    return typeof candidate === "function";
+}
 
 /**
  * Common, provider-agnostic inputs used by the cloud status builder functions.
  *
  * @remarks
  * The values are sourced by `CloudService` from settings and the configured
- * secret store (for `localEncryptionKey`). Keeping this type centralised keeps
- * all provider summaries consistent.
+ * secret store (for `hasLocalEncryptionKey`). Keeping this type centralised
+ * keeps all provider summaries consistent.
  */
 export type CloudStatusCommonArgs = Readonly<{
+    /** True when this device has a locally cached derived encryption key. */
+    hasLocalEncryptionKey: boolean;
     lastBackupAt: null | number;
     lastError: string | undefined;
     lastSyncAt: null | number;
-    localEncryptionKey: string | undefined;
     localEncryptionMode: CloudEncryptionMode;
     syncEnabled: boolean;
 }>;
@@ -61,7 +81,7 @@ const buildCloudStatusSummary = (
     overrides: CloudStatusBuildOverrides
 ): CloudStatusSummary => {
     const encryptionLocked =
-        overrides.encryptionMode === "passphrase" && !common.localEncryptionKey;
+        overrides.encryptionMode === "passphrase" && !common.hasLocalEncryptionKey;
 
     const lastError = overrides.lastError ?? common.lastError;
 
@@ -100,7 +120,7 @@ export async function buildDropboxStatus(args: {
     let connectionError: string | undefined = undefined;
     let accountLabel: string | undefined = undefined;
 
-    if (provider && provider instanceof DropboxCloudStorageProvider) {
+    if (provider?.kind === "dropbox" && hasAccountLabel(provider)) {
         try {
             accountLabel = await provider.getAccountLabel();
             connected = true;
@@ -119,7 +139,7 @@ export async function buildDropboxStatus(args: {
             : common.localEncryptionMode;
 
     const encryptionLocked =
-        encryptionMode === "passphrase" && !common.localEncryptionKey;
+        encryptionMode === "passphrase" && !common.hasLocalEncryptionKey;
 
     const lastError = common.lastError ?? connectionError;
 
@@ -166,7 +186,7 @@ export async function buildGoogleDriveStatus(args: {
             : common.localEncryptionMode;
 
     const encryptionLocked =
-        encryptionMode === "passphrase" && !common.localEncryptionKey;
+        encryptionMode === "passphrase" && !common.hasLocalEncryptionKey;
 
     return {
         backupsEnabled: connected,

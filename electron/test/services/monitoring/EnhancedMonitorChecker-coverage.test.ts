@@ -67,6 +67,11 @@ describe("EnhancedMonitorChecker Coverage Tests", () => {
             cancelOperations: vi.fn().mockReturnValue(undefined),
         };
 
+        mockOperationRegistry.initiateCheck.mockReturnValue({
+            operationId: "op-default",
+            signal: new AbortController().signal,
+        });
+
         mockTimeoutManager = {
             createTimeout: vi.fn(),
             scheduleTimeout: vi.fn(),
@@ -323,6 +328,46 @@ describe("EnhancedMonitorChecker Coverage Tests", () => {
             );
 
             expect(result).toBeUndefined();
+        });
+
+        it("should pass an external AbortSignal into operation correlation", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate(
+                "Component: EnhancedMonitorChecker-coverage-fixed",
+                "component"
+            );
+            await annotate("Category: Service", "category");
+            await annotate("Type: Cancellation", "type");
+
+            const external = new AbortController();
+            const operationId = "op-789";
+
+            mockOperationRegistry.initiateCheck.mockReturnValue({
+                operationId,
+                signal: new AbortController().signal,
+            });
+
+            (enhancedChecker as any).servicesByType
+                .get("http")
+                .check.mockResolvedValue({ status: "up", responseTime: 1 });
+            mockStatusUpdateService.updateMonitorStatus.mockResolvedValue(false);
+
+            await enhancedChecker.checkMonitor(
+                mockSite,
+                "monitor-1",
+                false,
+                external.signal
+            );
+
+            expect(mockOperationRegistry.initiateCheck).toHaveBeenCalledWith(
+                "monitor-1",
+                expect.objectContaining({
+                    additionalSignals: [external.signal],
+                })
+            );
         });
     });
 
@@ -585,7 +630,10 @@ describe("EnhancedMonitorChecker Coverage Tests", () => {
             await annotate("Type: Error Handling", "type");
 
             const operationId = "op-123";
-            mockOperationRegistry.initiateCheck.mockReturnValue(operationId);
+            mockOperationRegistry.initiateCheck.mockReturnValue({
+                operationId,
+                signal: new AbortController().signal,
+            });
             mockOperationRegistry.validateOperation.mockReturnValue(false);
 
             const mockSite: Site = {

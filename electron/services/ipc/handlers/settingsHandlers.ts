@@ -5,7 +5,7 @@ import { SETTINGS_CHANNELS } from "@shared/types/preload";
 import type { UptimeOrchestrator } from "../../../UptimeOrchestrator";
 
 import { createStandardizedIpcRegistrar } from "../utils";
-import { SettingsHandlerValidators } from "../validators";
+import { SettingsHandlerValidators } from "../validators/settings";
 
 /**
  * Dependencies required to register settings IPC handlers.

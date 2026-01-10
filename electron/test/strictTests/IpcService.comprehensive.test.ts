@@ -198,6 +198,7 @@ describe("IpcService - Comprehensive Coverage", () => {
 
     let startSummary: MonitoringStartSummary;
     let stopSummary: MonitoringStopSummary;
+    let stateSyncRevision = 0;
 
     beforeEach(() => {
         vi.clearAllMocks();
@@ -245,6 +246,8 @@ describe("IpcService - Comprehensive Coverage", () => {
             isMonitoring: false,
             alreadyInactive: false,
         };
+
+        stateSyncRevision = 0;
         mockUptimeOrchestrator = {
             addSite: vi.fn().mockResolvedValue(true),
             removeSite: vi.fn().mockResolvedValue(true),
@@ -255,7 +258,9 @@ describe("IpcService - Comprehensive Coverage", () => {
             startMonitoring: vi.fn().mockResolvedValue(startSummary),
             stopMonitoring: vi.fn().mockResolvedValue(stopSummary),
             startMonitoringForSite: vi.fn().mockResolvedValue(true),
+            startMonitoringForMonitor: vi.fn().mockResolvedValue(true),
             stopMonitoringForSite: vi.fn().mockResolvedValue(true),
+            stopMonitoringForMonitor: vi.fn().mockResolvedValue(true),
             checkSiteManually: vi.fn().mockResolvedValue(true),
             exportData: vi.fn().mockResolvedValue("export-data"),
             importData: vi.fn().mockResolvedValue(true),
@@ -273,11 +278,15 @@ describe("IpcService - Comprehensive Coverage", () => {
             }),
             emitSitesStateSynchronized: vi
                 .fn()
-                .mockImplementation(async ({ sites }) =>
-                    (sites ?? mockSites).map((site: Site) =>
-                        structuredClone(site)
-                    )
-                ),
+                .mockImplementation(async ({ sites }) => {
+                    stateSyncRevision += 1;
+                    return {
+                        revision: stateSyncRevision,
+                        sites: (sites ?? mockSites).map((site: Site) =>
+                            structuredClone(site)
+                        ),
+                    };
+                }),
             emitTyped: vi.fn().mockResolvedValue(undefined),
             onTyped: vi.fn(),
             off: vi.fn(),
@@ -398,6 +407,7 @@ describe("IpcService - Comprehensive Coverage", () => {
             expect(registeredChannels).toContain("export-data");
             expect(registeredChannels).toContain("import-data");
             expect(registeredChannels).toContain("download-sqlite-backup");
+            expect(registeredChannels).toContain("save-sqlite-backup");
 
             // Settings handlers
             expect(registeredChannels).toContain("update-history-limit");
@@ -708,7 +718,7 @@ describe("IpcService - Comprehensive Coverage", () => {
             const result = await handler(mockIpcEvent, "site-id", "monitor-id");
 
             expect(
-                mockUptimeOrchestrator.startMonitoringForSite
+                mockUptimeOrchestrator.startMonitoringForMonitor
             ).toHaveBeenCalledWith("site-id", "monitor-id");
             expect(result).toEqual({
                 success: true,
@@ -772,7 +782,7 @@ describe("IpcService - Comprehensive Coverage", () => {
             const result = await handler(mockIpcEvent, "site-id", "monitor-id");
 
             expect(
-                mockUptimeOrchestrator.stopMonitoringForSite
+                mockUptimeOrchestrator.stopMonitoringForMonitor
             ).toHaveBeenCalledWith("site-id", "monitor-id");
             expect(result).toEqual({
                 success: true,
@@ -1312,6 +1322,7 @@ describe("IpcService - Comprehensive Coverage", () => {
                 success: true,
                 data: expect.objectContaining({
                     completedAt: expect.any(Number),
+                    revision: expect.any(Number),
                     siteCount: 1,
                     sites: expect.any(Array),
                     source: "database",

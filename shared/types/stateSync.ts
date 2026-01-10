@@ -12,6 +12,31 @@ import type { Site } from "@shared/types";
 import { siteSchema } from "@shared/validation/siteSchemas";
 import * as z from "zod";
 
+/**
+ * Minimal site snapshot used for state-sync *bookkeeping*.
+ *
+ * @remarks
+ * Some infrastructure layers (e.g. IPC status tracking) only need the site
+ * identifiers to compute counts and detect membership changes. Using this
+ * lightweight type avoids unsafe casts such as `({ identifier }) as Site`.
+ *
+ * This type is **not** a replacement for full {@link Site} payloads used by
+ * renderer state reconciliation.
+ *
+ * @public
+ */
+export type SiteIdentifierSnapshot = Pick<Site, "identifier">;
+
+/**
+ * Zod schema validating {@link SiteIdentifierSnapshot} payloads.
+ */
+export const siteIdentifierSnapshotSchema: z.ZodType<SiteIdentifierSnapshot> =
+    z
+        .object({
+            identifier: z.string().min(1),
+        })
+        .strict();
+
 const STATE_SYNC_SOURCE_VALUES = [
     "cache",
     "database",
@@ -139,6 +164,7 @@ export const stateSyncStatusSummarySchema: typeof stateSyncStatusSummarySchemaIn
  */
 const stateSyncFullSyncResultSchemaInternal: z.ZodType<{
     completedAt: number;
+    revision: number;
     siteCount: number;
     sites: Site[];
     source: StateSyncSource;
@@ -146,6 +172,7 @@ const stateSyncFullSyncResultSchemaInternal: z.ZodType<{
 }> = z
     .object({
         completedAt: z.number().int().nonnegative(),
+        revision: z.number().int().nonnegative(),
         siteCount: z.number().int().nonnegative(),
         sites: stateSyncSitesSchema,
         source: stateSyncSourceSchema,
@@ -163,33 +190,15 @@ const stateSyncFullSyncResultSchemaInternal: z.ZodType<{
     });
 
 /**
- * Describes an updated site within a synchronization delta.
+ * Structured delta describing how the site collection changed during a sync.
  *
  * @remarks
- * Captures the previous and next snapshots alongside the identifier so that
- * consumers can reconcile precise differences for UI updates.
+ * This delta is intentionally lightweight: it contains only the *next* site
+ * snapshots for additions/updates and the identifiers for removals.
  *
- * @public
- */
-export interface SiteSyncDeltaUpdatedSite {
-    /** Stable site identifier shared across snapshots. */
-    identifier: string;
-    /** Next site snapshot received during synchronization. */
-    next: Site;
-    /** Previous site snapshot prior to synchronization. */
-    previous: Site;
-}
-
-const siteSyncDeltaUpdatedSiteSchema: z.ZodType<SiteSyncDeltaUpdatedSite> = z
-    .object({
-        identifier: z.string().min(1),
-        next: siteOutputSchema,
-        previous: siteOutputSchema,
-    })
-    .strict();
-
-/**
- * Structured delta describing how the site collection changed during a sync.
+ * Keeping deltas free of "previous" snapshots avoids duplicating large site
+ * payloads across IPC boundaries and encourages consumers to derive diffs
+ * locally when needed.
  *
  * @public
  */
@@ -198,15 +207,15 @@ export interface SiteSyncDelta {
     addedSites: Site[];
     /** Identifiers corresponding to removed sites. */
     removedSiteIdentifiers: string[];
-    /** Detailed snapshots for sites that changed between syncs. */
-    updatedSites: SiteSyncDeltaUpdatedSite[];
+    /** Next snapshots for sites that changed between syncs. */
+    updatedSites: Site[];
 }
 
 const siteSyncDeltaSchemaInternal: z.ZodType<SiteSyncDelta> = z
     .object({
         addedSites: stateSyncSitesSchema,
         removedSiteIdentifiers: z.array(z.string().min(1)),
-        updatedSites: z.array(siteSyncDeltaUpdatedSiteSchema),
+        updatedSites: stateSyncSitesSchema,
     })
     .strict();
 

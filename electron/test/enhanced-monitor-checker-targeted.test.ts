@@ -213,7 +213,7 @@ describe("EnhancedMonitorChecker Targeted Coverage", () => {
             // Set up pruning scenario: count > threshold
             // With limit 50, buffer = max(floor(50 * 0.2), 5) = 10, so threshold = 60
             // With count 65, should trigger pruning
-            mockConfig.getHistoryLimit = vi.fn().mockReturnValue(50);
+            vi.spyOn(mockConfig, "getHistoryLimit").mockReturnValue(50);
             mockConfig.historyRepository.getHistoryCount = vi
                 .fn()
                 .mockResolvedValue(65); // Over threshold

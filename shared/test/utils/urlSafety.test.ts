@@ -8,6 +8,7 @@ import {
     getSafeUrlForLogging,
     isAllowedExternalOpenUrl,
     isPrivateNetworkHostname,
+    tryGetSafeThirdPartyHttpUrl,
     validateExternalOpenUrlCandidate,
 } from "../../utils/urlSafety";
 
@@ -138,6 +139,21 @@ describe("urlSafety", () => {
             expect(
                 validateExternalOpenUrlCandidate("mailto:test@example.com").ok
             ).toBeTruthy();
+
+            // Scheme checks should be case-insensitive.
+            expect(
+                validateExternalOpenUrlCandidate("HTTP://example.com").ok
+            ).toBeTruthy();
+            expect(
+                validateExternalOpenUrlCandidate("MAILTO:test@example.com").ok
+            ).toBeTruthy();
+        });
+
+        it("rejects uppercase mailto when email is invalid", () => {
+            const result = validateExternalOpenUrlCandidate(
+                "MAILTO:not-an-email"
+            );
+            expect(result.ok).toBeFalsy();
         });
 
         it("rejects javascript/file URLs", () => {
@@ -178,6 +194,36 @@ describe("urlSafety", () => {
             const result = validateExternalOpenUrlCandidate(url);
             expect(result.ok).toBeFalsy();
         });
+
+        it("normalizes URLs with unescaped spaces (Dropbox OAuth scope)", () => {
+            // Dropbox's SDK currently generates an OAuth authorize URL where
+            // the `scope` query parameter is space-delimited without
+            // percent-encoding. Browsers are typically lenient, but our safety
+            // helpers should normalize it to a canonical URL.
+            const rawDropboxAuthorizeUrl =
+                "https://dropbox.com/oauth2/authorize?response_type=code&client_id=app-key&redirect_uri=http://localhost:53682/oauth2/callback&state=STATE&token_access_type=offline&scope=account_info.read files.content.read files.content.write files.metadata.read";
+
+            const result = validateExternalOpenUrlCandidate(
+                rawDropboxAuthorizeUrl
+            );
+
+            expect(result.ok).toBeTruthy();
+            if (result.ok === false) {
+                throw new Error(
+                    `Expected ok result, got rejection: ${result.reason}`
+                );
+            }
+
+            // Ensure the spaces in the scope param were encoded.
+            expect(result.normalizedUrl).toContain(
+                "scope=account_info.read%20files.content.read%20files.content.write%20files.metadata.read"
+            );
+
+            // Query is stripped for logs.
+            expect(result.safeUrlForLogging).toBe(
+                "https://dropbox.com/oauth2/authorize"
+            );
+        });
     });
 
     describe(getSafeUrlForLogging, () => {
@@ -214,6 +260,49 @@ describe("urlSafety", () => {
             expect(
                 getSafeUrlForLogging("file:///C:/Users/Nick/Secrets.txt")
             ).toBe("file:[redacted]");
+        });
+    });
+
+    describe(tryGetSafeThirdPartyHttpUrl, () => {
+        it("returns null for non-http(s) URLs", () => {
+            expect(tryGetSafeThirdPartyHttpUrl("mailto:test@example.com")).toBe(
+                null
+            );
+            expect(tryGetSafeThirdPartyHttpUrl("file:///C:/Windows")).toBe(
+                null
+            );
+        });
+
+        it("returns null for private/local hostnames", () => {
+            expect(tryGetSafeThirdPartyHttpUrl("http://localhost")).toBe(
+                null
+            );
+            expect(tryGetSafeThirdPartyHttpUrl("https://192.168.1.1")).toBe(
+                null
+            );
+        });
+
+        it("returns null for URLs with credentials", () => {
+            expect(
+                tryGetSafeThirdPartyHttpUrl("https://user:pass@example.com")
+            ).toBe(null);
+        });
+
+        it("strips query strings and hashes", () => {
+            expect(
+                tryGetSafeThirdPartyHttpUrl(
+                    "https://example.com/path?token=secret#section"
+                )
+            ).toBe("https://example.com/path");
+        });
+
+        it("redacts suspicious long path segments", () => {
+            const tokenSegment = "A1".repeat(40);
+            const result = tryGetSafeThirdPartyHttpUrl(
+                `https://example.com/reset/${tokenSegment}`
+            );
+
+            expect(result).toBe("https://example.com/reset/[redacted]");
         });
     });
 });

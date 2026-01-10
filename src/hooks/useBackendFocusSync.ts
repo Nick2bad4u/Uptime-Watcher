@@ -50,6 +50,12 @@ export function useBackendFocusSync(enabled = false): void {
 
     useEffect(
         function handleBackendFocusSync(): () => void {
+            if (!enabled || typeof window === "undefined") {
+                return () => {
+                    // No-op: focus sync disabled or window unavailable.
+                };
+            }
+
             const handleFocus = (): void => {
                 // Use full sync on focus to ensure complete data consistency
                 // since the user may have been away for a while
@@ -59,14 +65,10 @@ export function useBackendFocusSync(enabled = false): void {
                 void fullResyncSites();
             };
 
-            if (enabled) {
-                window.addEventListener("focus", handleFocus);
-            }
+            window.addEventListener("focus", handleFocus);
 
             return function cleanup(): void {
-                if (enabled) {
-                    window.removeEventListener("focus", handleFocus);
-                }
+                window.removeEventListener("focus", handleFocus);
             };
         },
         [enabled, fullResyncSites]

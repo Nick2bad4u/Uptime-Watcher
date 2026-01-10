@@ -103,6 +103,7 @@ import type { DatabaseManager } from "./managers/DatabaseManager";
 import type { MonitorManager } from "./managers/MonitorManager";
 import type { SiteManager } from "./managers/SiteManager";
 import type {
+    DatabaseBackupMetadata,
     DatabaseBackupResult,
     DatabaseRestorePayload,
     DatabaseRestoreSummary,
@@ -658,6 +659,26 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
     }
 
     /**
+     * Saves a backup of the SQLite database directly to disk.
+     *
+     * @remarks
+     * Prefer this over {@link downloadBackup} for large databases because it
+     * avoids materializing the backup as a large in-memory buffer.
+     */
+    public async saveBackupToPath(
+        targetPath: string
+    ): Promise<DatabaseBackupMetadata> {
+        return this.runWithContext(
+            () => this.databaseManager.saveBackupToPath(targetPath),
+            {
+                code: "ORCHESTRATOR_SAVE_BACKUP_FAILED",
+                message: "Failed to save SQLite backup",
+                operation: "orchestrator.saveBackupToPath",
+            }
+        );
+    }
+
+    /**
      * Restores the database from a provided backup payload.
      */
     public async restoreBackup(
@@ -817,7 +838,7 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
         sites?: Site[];
         source: StateSyncSource;
         timestamp?: number;
-    }): Promise<Site[]> {
+    }): Promise<{ revision: number; sites: Site[] }> {
         return this.runWithContext(
             () =>
                 this.snapshotSyncCoordinator.emitSitesStateSynchronized(
@@ -1030,6 +1051,21 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
     }
 
     /**
+     * Starts monitoring for a specific monitor on a site.
+     *
+     * @remarks
+     * This method exists primarily for naming clarity at call sites (e.g. IPC
+     * handlers) so that monitor-scoped operations do not route through a
+     * `*ForSite` method with an optional monitor identifier.
+     */
+    public async startMonitoringForMonitor(
+        identifier: string,
+        monitorId: string
+    ): Promise<boolean> {
+        return this.startMonitoringForSite(identifier, monitorId);
+    }
+
+    /**
      * Stops monitoring for all sites.
      *
      * @returns Promise that resolves when monitoring has stopped.
@@ -1082,6 +1118,19 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
                 operation,
             }
         );
+    }
+
+    /**
+     * Stops monitoring for a specific monitor on a site.
+     *
+     * @remarks
+     * Naming clarity wrapper around {@link stopMonitoringForSite}.
+     */
+    public async stopMonitoringForMonitor(
+        identifier: string,
+        monitorId: string
+    ): Promise<boolean> {
+        return this.stopMonitoringForSite(identifier, monitorId);
     }
 
     /**

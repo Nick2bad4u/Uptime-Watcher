@@ -230,9 +230,8 @@ describe("File Download Utility", () => {
 
             // The fallback will try the same createAndTriggerDownload again, so append will fail again
             // This means the fallback also fails and should throw "File download failed"
-            expect(() => downloadFile({ buffer, fileName })).toThrowError(
-                "File download failed"
-            );
+                // Fallback retry uses a direct click without DOM attachment.
+                expect(() => downloadFile({ buffer, fileName })).not.toThrowError();
 
             // Verify that append was called (indicating both primary and fallback attempts)
             expect(globalThis.document.body.append).toHaveBeenCalled();

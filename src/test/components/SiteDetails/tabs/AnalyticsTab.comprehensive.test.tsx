@@ -1,6 +1,13 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import type { ChartOptions } from "chart.js";
+import type {
+    ButtonHTMLAttributes,
+    HTMLAttributes,
+    PropsWithChildren,
+    ReactNode,
+} from "react";
+import type { UnknownRecord } from "type-fest";
 
 import {
     AnalyticsTab,
@@ -40,7 +47,15 @@ vi.mock("../../../../services/logger", () => ({
 }));
 
 vi.mock("../../../../theme/components", () => ({
-    ThemedBadge: ({ children, variant, ...props }: any) => {
+    ThemedBadge: ({
+        children,
+        variant,
+        ...props
+    }: PropsWithChildren<
+        HTMLAttributes<HTMLSpanElement> &
+            Readonly<{ variant?: string }> &
+            UnknownRecord
+    >) => {
         const { iconColor, hoverable, showLabel, ...cleanProps } = props;
         return (
             <span
@@ -52,7 +67,16 @@ vi.mock("../../../../theme/components", () => ({
             </span>
         );
     },
-    ThemedButton: ({ children, onClick, variant, ...props }: any) => {
+    ThemedButton: ({
+        children,
+        onClick,
+        variant,
+        ...props
+    }: PropsWithChildren<
+        ButtonHTMLAttributes<HTMLButtonElement> &
+            Readonly<{ variant?: string }> &
+            UnknownRecord
+    >) => {
         const { iconColor, hoverable, showLabel, ...cleanProps } = props;
         return (
             <button
@@ -65,7 +89,16 @@ vi.mock("../../../../theme/components", () => ({
             </button>
         );
     },
-    ThemedCard: ({ children, icon, title, ...props }: any) => {
+    ThemedCard: ({
+        children,
+        icon,
+        title,
+        ...props
+    }: PropsWithChildren<
+        HTMLAttributes<HTMLDivElement> &
+            Readonly<{ icon?: ReactNode; title?: ReactNode }> &
+            UnknownRecord
+    >) => {
         const { iconColor, hoverable, showLabel, ...cleanProps } = props;
         return (
             <div data-testid="themed-card" data-title={title} {...cleanProps}>
@@ -75,7 +108,13 @@ vi.mock("../../../../theme/components", () => ({
             </div>
         );
     },
-    ThemedProgress: ({ value, variant, ...props }: any) => {
+    ThemedProgress: ({
+        value,
+        variant,
+        ...props
+    }: HTMLAttributes<HTMLDivElement> &
+        Readonly<{ value?: number; variant?: string }> &
+        UnknownRecord) => {
         const { iconColor, hoverable, showLabel, ...cleanProps } = props;
         return (
             <div
@@ -88,7 +127,16 @@ vi.mock("../../../../theme/components", () => ({
             </div>
         );
     },
-    ThemedText: ({ children, size, variant, ...props }: any) => {
+    ThemedText: ({
+        children,
+        size,
+        variant,
+        ...props
+    }: PropsWithChildren<
+        HTMLAttributes<HTMLSpanElement> &
+            Readonly<{ size?: string; variant?: string }> &
+            UnknownRecord
+    >) => {
         const { iconColor, hoverable, showLabel, ...cleanProps } = props;
         return (
             <span
@@ -104,7 +152,10 @@ vi.mock("../../../../theme/components", () => ({
 }));
 
 vi.mock("../../../../components/common/MonitorUiComponents", () => ({
-    ConditionalResponseTime: ({ children, monitorType }: any) => (
+    ConditionalResponseTime: ({
+        children,
+        monitorType,
+    }: PropsWithChildren<Readonly<{ monitorType: string }>>) => (
         // Always show children (assumes response time is supported for test simplicity)
         <div
             data-testid="conditional-response-time"

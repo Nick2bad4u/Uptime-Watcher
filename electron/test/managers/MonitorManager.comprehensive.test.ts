@@ -1027,7 +1027,12 @@ describe("MonitorManager - Comprehensive Coverage", () => {
                 const checkCallback = callbackArgs[0];
 
                 // Call the callback with a site that won't be found
-                await checkCallback("non-existent-site", "monitor-1");
+                const abortController = new AbortController();
+                await checkCallback(
+                    "non-existent-site",
+                    "monitor-1",
+                    abortController.signal
+                );
             }
 
             // Should complete without errors (site not found is handled gracefully)

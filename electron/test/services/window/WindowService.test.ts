@@ -73,10 +73,9 @@ vi.mock("../../../electronUtils", () => ({
 
 // Mock shared utils
 vi.mock("../../../../shared/utils/environment", async () => {
-    const actual =
-        await vi.importActual<typeof import("../../../../shared/utils/environment")>(
-            "../../../../shared/utils/environment"
-        );
+    const actual = await vi.importActual<
+        typeof import("../../../../shared/utils/environment")
+    >("../../../../shared/utils/environment");
 
     return {
         ...actual,
@@ -86,14 +85,9 @@ vi.mock("../../../../shared/utils/environment", async () => {
 });
 
 // Mock node modules
-vi.mock("node:path", () => ({
-    dirname: vi.fn(() => "/mock/path"),
-    join: vi.fn((...args) => args.join("/")),
-}));
-
-vi.mock("node:url", () => ({
-    fileURLToPath: vi.fn(() => "/mock/file.js"),
-}));
+// NOTE: Do not mock node:path/node:url here.
+// WindowService relies on real path and file URL behaviour for production
+// navigation hardening (e.g., path.resolve + fileURLToPath).
 
 // Mock global fetch for Vite server checking
 globalThis.fetch = vi.fn();
@@ -263,6 +257,10 @@ describe(WindowService, () => {
                 "will-redirect",
                 expect.any(Function)
             );
+            expect(window.webContents.on).toHaveBeenCalledWith(
+                "will-attach-webview",
+                expect.any(Function)
+            );
             expect(
                 window.webContents.setWindowOpenHandler
             ).toHaveBeenCalledWith(expect.any(Function));
@@ -417,7 +415,10 @@ describe(WindowService, () => {
             const window = windowService.createMainWindow();
 
             const onCalls = vi.mocked(window.webContents.on).mock
-                .calls as unknown as [string, (event: any, url: string) => void][];
+                .calls as unknown as [
+                string,
+                (event: any, url: string) => void,
+            ][];
             const willNavigateHandler = onCalls.find(
                 ([eventName]) => eventName === "will-navigate"
             )?.[1];
@@ -440,6 +441,42 @@ describe(WindowService, () => {
             );
         });
 
+        it("blocks file:// navigations outside the packaged renderer bundle", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: WindowService", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Security", "type");
+
+            vi.mocked(isDev).mockReturnValue(false);
+
+            const window = windowService.createMainWindow();
+
+            const onCalls = vi.mocked(window.webContents.on).mock
+                .calls as unknown as [
+                string,
+                (event: any, url: string) => void,
+            ][];
+            const willNavigateHandler = onCalls.find(
+                ([eventName]) => eventName === "will-navigate"
+            )?.[1];
+
+            expect(willNavigateHandler).toBeTypeOf("function");
+
+            const event = {
+                preventDefault: vi.fn(),
+            };
+
+            willNavigateHandler?.(event, "file:///etc/passwd");
+
+            await Promise.resolve();
+
+            expect(event.preventDefault).toHaveBeenCalledTimes(1);
+            expect(shell.openExternal).not.toHaveBeenCalled();
+        });
+
         it("prevents disallowed will-redirect and opens safe URLs externally", async ({
             task,
             annotate,
@@ -454,7 +491,10 @@ describe(WindowService, () => {
             const window = windowService.createMainWindow();
 
             const onCalls = vi.mocked(window.webContents.on).mock
-                .calls as unknown as [string, (event: any, url: string) => void][];
+                .calls as unknown as [
+                string,
+                (event: any, url: string) => void,
+            ][];
             const willRedirectHandler = onCalls.find(
                 ([eventName]) => eventName === "will-redirect"
             )?.[1];
@@ -956,6 +996,48 @@ describe(WindowService, () => {
             );
         });
 
+        it("should not inject CSP into non-document resources", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "regression");
+            await annotate("Component: WindowService", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Security", "type");
+
+            vi.mocked(isDev).mockReturnValue(false);
+
+            const mockWindowRef = (
+                BrowserWindow as unknown as { __mockWindow: any }
+            ).__mockWindow;
+            const headerSpy = vi.mocked(
+                mockWindowRef.webContents.session.webRequest.onHeadersReceived
+            );
+
+            windowService.createMainWindow();
+
+            expect(headerSpy).toHaveBeenCalledWith(expect.any(Function));
+            const [handler] = headerSpy.mock.calls[0];
+            const callback = vi.fn();
+
+            const originalHeaders = {
+                "Cache-Control": ["max-age=3600"],
+            };
+
+            handler(
+                {
+                    resourceType: "image",
+                    responseHeaders: originalHeaders,
+                } as any,
+                callback
+            );
+
+            expect(callback).toHaveBeenCalledWith({
+                cancel: false,
+                responseHeaders: originalHeaders,
+            });
+        });
+
         it("should warn when applying security middleware fails", async ({
             task,
             annotate,
@@ -1062,6 +1144,18 @@ describe(WindowService, () => {
             );
             expect(window.webContents.removeListener).toHaveBeenCalledWith(
                 "did-fail-load",
+                expect.any(Function)
+            );
+            expect(window.webContents.removeListener).toHaveBeenCalledWith(
+                "will-navigate",
+                expect.any(Function)
+            );
+            expect(window.webContents.removeListener).toHaveBeenCalledWith(
+                "will-redirect",
+                expect.any(Function)
+            );
+            expect(window.webContents.removeListener).toHaveBeenCalledWith(
+                "will-attach-webview",
                 expect.any(Function)
             );
             expect(window.removeListener).toHaveBeenCalledWith(

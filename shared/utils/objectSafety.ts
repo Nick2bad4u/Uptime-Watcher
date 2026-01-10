@@ -6,6 +6,8 @@
  * Object.entries operations with proper type checking and validation.
  */
 
+import type { UnknownRecord } from "type-fest";
+
 import { isObject } from "./typeGuards";
 
 /**
@@ -46,10 +48,7 @@ export function safeObjectAccess<T>(
         return fallback;
     }
 
-    // Cast obj to Record type after validation for safe property access
-    const typedObj = obj as Record<PropertyKey, unknown>;
-
-    const value = typedObj[key];
+    const value = obj[key];
 
     if (validator) {
         return validator(value) ? value : fallback;
@@ -119,7 +118,7 @@ export function safeObjectIteration(
  * @returns New object without the specified keys
  */
 export function safeObjectOmit<
-    T extends Record<PropertyKey, unknown>,
+    T extends UnknownRecord,
     K extends keyof T,
 >(obj: null | T | undefined, keys: readonly K[]): Omit<T, K> {
     // Handle null/undefined inputs by returning empty object
@@ -195,7 +194,7 @@ export function safeObjectOmit<
  * @returns New object with only the specified keys
  */
 export function safeObjectPick<
-    T extends Record<PropertyKey, unknown>,
+    T extends UnknownRecord,
     K extends keyof T,
 >(obj: T, keys: readonly K[]): Pick<T, K> {
     // IMPORTANT: Use a null-prototype object and defineProperty to avoid
@@ -239,7 +238,7 @@ export function safeObjectPick<
  *
  * @returns Array of [key, value] tuples with proper typing
  */
-export function typedObjectEntries<T extends Record<PropertyKey, unknown>>(
+export function typedObjectEntries<T extends UnknownRecord>(
     obj: T
 ): Array<[keyof T, T[keyof T]]> {
     // Type assertion is safe as Object.entries returns correct key-value pairs for the object
@@ -269,7 +268,7 @@ export function typedObjectEntries<T extends Record<PropertyKey, unknown>>(
  *
  * @returns Array of keys with proper typing
  */
-export function typedObjectKeys<T extends Record<PropertyKey, unknown>>(
+export function typedObjectKeys<T extends UnknownRecord>(
     obj: T
 ): Array<keyof T> {
     return Object.keys(obj) as Array<keyof T>;
@@ -297,7 +296,7 @@ export function typedObjectKeys<T extends Record<PropertyKey, unknown>>(
  *
  * @returns Array of values with proper typing
  */
-export function typedObjectValues<T extends Record<PropertyKey, unknown>>(
+export function typedObjectValues<T extends UnknownRecord>(
     obj: T
 ): Array<T[keyof T]> {
     // Type assertion is safe as Object.values returns correct values for the object

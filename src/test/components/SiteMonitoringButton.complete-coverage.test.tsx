@@ -6,11 +6,18 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import React from "react";
+import type { ButtonHTMLAttributes, PropsWithChildren, ReactElement } from "react";
 import { SiteMonitoringButton } from "../../components/common/SiteMonitoringButton/SiteMonitoringButton";
 import { ThemeProvider } from "../../theme/components/ThemeProvider";
 
 // Mock ThemedButton component
+type ThemedButtonMockProperties = PropsWithChildren<
+    ButtonHTMLAttributes<HTMLButtonElement> & {
+        readonly size?: string;
+        readonly variant?: string;
+    }
+>;
+
 vi.mock("../../theme/components/ThemedButton", () => ({
     ThemedButton: ({
         children,
@@ -21,7 +28,7 @@ vi.mock("../../theme/components/ThemedButton", () => ({
         size,
         variant,
         ...props
-    }: any) => (
+    }: ThemedButtonMockProperties) => (
         <button
             onClick={onClick}
             disabled={disabled}
@@ -87,7 +94,7 @@ vi.mock("../../utils/icons", () => {
 /**
  * Test wrapper with theme provider
  */
-const renderWithTheme = (ui: React.ReactElement) =>
+const renderWithTheme = (ui: ReactElement) =>
     render(<ThemeProvider>{ui}</ThemeProvider>);
 const expectButtonIcon = (button: HTMLElement, iconName: string): void => {
     const icon = button.querySelector(`svg[data-icon="${iconName}"]`);
@@ -1010,9 +1017,12 @@ describe("SiteMonitoringButton - Complete Coverage", () => {
             annotate("Type: Business Logic", "type");
 
             // React.memo with function name preserves displayName (may have number suffix in testing)
+            const memoTypeName = (
+                SiteMonitoringButton as unknown as { type?: { name?: string } }
+            ).type?.name;
             const displayName =
                 SiteMonitoringButton.displayName ||
-                (SiteMonitoringButton as any).type?.name;
+                memoTypeName;
             expect(displayName).toMatch(/^SiteMonitoringButton\d*$/);
         });
 
@@ -1048,7 +1058,7 @@ describe("SiteMonitoringButton - Complete Coverage", () => {
             );
 
             const firstButton = screen.getByTestId("themed-button");
-            const firstOnClick = (firstButton as any).onclick;
+            const firstOnClick = (firstButton as HTMLButtonElement).onclick;
 
             // Re-render with same props
             rerender(
@@ -1060,7 +1070,7 @@ describe("SiteMonitoringButton - Complete Coverage", () => {
             );
 
             const secondButton = screen.getByTestId("themed-button");
-            const secondOnClick = (secondButton as any).onclick;
+            const secondOnClick = (secondButton as HTMLButtonElement).onclick;
 
             // UseCallback should maintain reference stability
             expect(firstOnClick).toBe(secondOnClick);

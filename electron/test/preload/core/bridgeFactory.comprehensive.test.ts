@@ -125,6 +125,24 @@ describe("bridgeFactory", function describeBridgeFactorySuite() {
             expect(result).toBe("detail");
         });
 
+        it("allows success responses without data for optional-result channels", async () => {
+            const missingDataResponse: IpcResponse = {
+                success: true,
+            };
+
+            vi.mocked(ipcRenderer.invoke)
+                .mockResolvedValueOnce(
+                    createHandshakeSuccess(MONITORING_CHANNELS.checkSiteNow)
+                )
+                .mockResolvedValueOnce(missingDataResponse);
+
+            const invoke = createTypedInvoker(MONITORING_CHANNELS.checkSiteNow);
+
+            await expect(
+                invoke("site-id", "monitor-id")
+            ).resolves.toBeUndefined();
+        });
+
         it("throws an IpcError when the response is unsuccessful", async () => {
             const errorResponse: IpcResponse = {
                 success: false,
@@ -196,6 +214,33 @@ describe("bridgeFactory", function describeBridgeFactorySuite() {
                 DIAGNOSTICS_CHANNELS.verifyIpcHandler,
                 missingChannel
             );
+        });
+
+        it("rejects oversized invoke arguments before any IPC calls", async () => {
+            const invoke = createTypedInvoker(formatDetailChannel);
+
+            const huge = "a".repeat(6_000_000);
+            await expect(invoke("http", huge)).rejects.toBeInstanceOf(IpcError);
+
+            expect(ipcRenderer.invoke).not.toHaveBeenCalled();
+        });
+
+        it("allows larger payloads for import-data within its budget", async () => {
+            const response: IpcResponse<boolean> = {
+                success: true,
+                data: true,
+            };
+
+            vi.mocked(ipcRenderer.invoke)
+                .mockResolvedValueOnce(
+                    createHandshakeSuccess(DATA_CHANNELS.importData)
+                )
+                .mockResolvedValueOnce(response);
+
+            const invoke = createTypedInvoker(DATA_CHANNELS.importData);
+            const payload = "a".repeat(6_000_000);
+
+            await expect(invoke(payload)).resolves.toBeTruthy();
         });
     });
 

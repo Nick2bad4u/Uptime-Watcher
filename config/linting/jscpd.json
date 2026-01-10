@@ -82,7 +82,6 @@
     },
     "silent": false,
     "skipLocal": false,
-    "store": "leveldb",
     "threshold": 50,
     "verbose": false
 }

@@ -9,6 +9,8 @@
  * anywhere a strongly typed middleware chain is required.
  */
 
+import type { UnknownRecord } from "type-fest";
+
 import { isDevelopment } from "@shared/utils/environment";
 import { ensureError } from "@shared/utils/errorHandling";
 import { collectOwnPropertyValuesSafely } from "@shared/utils/objectIntrospection";
@@ -88,7 +90,7 @@ const cloneObjectForLogging = (
         return clonedArray;
     }
 
-    const clonedObject: Record<PropertyKey, unknown> = {};
+    const clonedObject: UnknownRecord = {};
     clones.set(target, clonedObject);
 
     for (const key of Reflect.ownKeys(value)) {

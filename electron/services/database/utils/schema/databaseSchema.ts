@@ -1,10 +1,15 @@
 import type { Database } from "node-sqlite3-wasm";
 
+import { ensureError } from "@shared/utils/errorHandling";
 import { LOG_TEMPLATES } from "@shared/utils/logTemplates";
 
 import { logger } from "../../../../utils/logger";
 import { getRegisteredMonitorTypes } from "../../../monitoring/MonitorTypeRegistry";
-import { generateMonitorTableSchema } from "./dynamicSchema";
+import {
+    generateDatabaseFieldDefinitions,
+    generateMonitorTableSchema,
+} from "./dynamicSchema";
+
 
 /**
  * Utilities for managing the SQLite database schema, including table and index
@@ -77,6 +82,67 @@ const SCHEMA_QUERIES = {
 
 export const DATABASE_SCHEMA_VERSION = 3;
 
+function assertSafeSqlIdentifier(identifier: string): void {
+    const isSafe = /^[A-Za-z_]\w*$/u.test(identifier);
+    if (!isSafe) {
+        throw new Error(
+            `Unsafe SQL identifier rejected while migrating schema: '${identifier}'`
+        );
+    }
+}
+
+function escapeSqlIdentifier(identifier: string): string {
+    assertSafeSqlIdentifier(identifier);
+    return `"${identifier}"`;
+}
+
+type TableInfoRow = Readonly<{
+    name?: unknown;
+}>;
+
+function parseTableInfoRows(value: unknown): TableInfoRow[] {
+    if (!Array.isArray(value)) {
+        return [];
+    }
+
+    return value.filter((row): row is TableInfoRow =>
+        typeof row === "object" && row !== null
+    );
+}
+
+/**
+ * Ensures dynamic monitor columns exist on the `monitors` table.
+ *
+ * @remarks
+ * The monitors table uses dynamic columns generated from the monitor type
+ * registry. `CREATE TABLE IF NOT EXISTS` does not add new columns when the
+ * table already exists, so forward schema upgrades must add missing columns
+ * explicitly.
+ */
+function ensureMonitorDynamicColumns(database: Database): void {
+    const tableInfoRaw: unknown = database.all("PRAGMA table_info(monitors)");
+    const rows = parseTableInfoRows(tableInfoRaw);
+
+    const existingColumns = new Set<string>();
+    for (const row of rows) {
+        const columnName = (row).name;
+        if (typeof columnName === "string" && columnName.length > 0) {
+            existingColumns.add(columnName);
+        }
+    }
+
+    const fieldDefs = generateDatabaseFieldDefinitions();
+    for (const def of fieldDefs) {
+        if (!existingColumns.has(def.columnName)) {
+            const column = escapeSqlIdentifier(def.columnName);
+            const sqlType = def.sqlType === "INTEGER" ? "INTEGER" : "TEXT";
+
+            database.run(`ALTER TABLE monitors ADD COLUMN ${column} ${sqlType}`);
+            existingColumns.add(def.columnName);
+        }
+    }
+}
+
 /**
  * Ensures the SQLite user_version matches the application schema version.
  */
@@ -108,38 +174,6 @@ function validateGeneratedSchema(schema: string): void {
     }
     if (schema.includes("undefined") || schema.includes("null")) {
         throw new Error("Generated schema contains undefined or null values");
-    }
-}
-
-/**
- * Ensures the PRAGMA user_version reflects the currently deployed schema.
- */
-export function synchronizeDatabaseSchemaVersion(database: Database): void {
-    const pragmaResult: unknown = database.get("PRAGMA user_version");
-
-    const userVersionValue = hasUserVersionProperty(pragmaResult)
-        ? pragmaResult.user_version
-        : undefined;
-
-    const currentVersion =
-        typeof userVersionValue === "number" ? userVersionValue : 0;
-
-    // Development policy: we intentionally do NOT run migrations.
-    // - Fresh databases may have user_version unset (0); initialize it.
-    // - Any other mismatch requires recreating the database.
-    if (currentVersion === 0) {
-        logger.info(
-            `[DatabaseSchema] Initializing schema user_version to ${DATABASE_SCHEMA_VERSION}`
-        );
-        database.run(`PRAGMA user_version = ${DATABASE_SCHEMA_VERSION}`);
-        return;
-    }
-
-    if (currentVersion !== DATABASE_SCHEMA_VERSION) {
-        throw new Error(
-            `Database schema version ${currentVersion} is not supported in this development build (expected ${DATABASE_SCHEMA_VERSION}). ` +
-                "Delete the database file and restart the app to recreate it."
-        );
     }
 }
 
@@ -177,8 +211,12 @@ export function createDatabaseIndexes(db: Database): void {
 
         logger.debug(LOG_TEMPLATES.services.DATABASE_INDEXES_CREATED);
     } catch (error) {
-        logger.error(LOG_TEMPLATES.errors.DATABASE_INDEXES_FAILED, error);
-        throw error;
+        const normalizedError = ensureError(error);
+        logger.error(
+            LOG_TEMPLATES.errors.DATABASE_INDEXES_FAILED,
+            normalizedError
+        );
+        throw normalizedError;
     }
 }
 
@@ -229,8 +267,12 @@ export function createDatabaseTables(db: Database): void {
 
         logger.info(LOG_TEMPLATES.services.DATABASE_TABLES_CREATED);
     } catch (error) {
-        logger.error(LOG_TEMPLATES.errors.DATABASE_TABLES_FAILED, error);
-        throw error;
+        const normalizedError = ensureError(error);
+        logger.error(
+            LOG_TEMPLATES.errors.DATABASE_TABLES_FAILED,
+            normalizedError
+        );
+        throw normalizedError;
     }
 }
 
@@ -326,5 +368,69 @@ export function createDatabaseSchema(db: Database): void {
     } catch (error) {
         logger.error(LOG_TEMPLATES.errors.DATABASE_SCHEMA_FAILED, error);
         throw error;
+    }
+}
+
+/**
+ * Ensures the PRAGMA user_version reflects the currently deployed schema.
+ */
+export function synchronizeDatabaseSchemaVersion(database: Database): void {
+    const pragmaResult: unknown = database.get("PRAGMA user_version");
+
+    const userVersionValue = hasUserVersionProperty(pragmaResult)
+        ? pragmaResult.user_version
+        : undefined;
+
+    const currentVersion =
+        typeof userVersionValue === "number" ? userVersionValue : 0;
+
+    if (currentVersion === 0) {
+        logger.info(
+            `[DatabaseSchema] Initializing schema user_version to ${DATABASE_SCHEMA_VERSION}`
+        );
+        database.run(`PRAGMA user_version = ${DATABASE_SCHEMA_VERSION}`);
+        return;
+    }
+
+    if (currentVersion > DATABASE_SCHEMA_VERSION) {
+        throw new Error(
+            `Database schema version ${currentVersion} is newer than this build (expected ${DATABASE_SCHEMA_VERSION}). ` +
+                "Update the application to a newer version."
+        );
+    }
+
+    if (currentVersion === DATABASE_SCHEMA_VERSION) {
+        return;
+    }
+
+    logger.warn("[DatabaseSchema] Upgrading schema", {
+        currentVersion,
+        targetVersion: DATABASE_SCHEMA_VERSION,
+    });
+
+    try {
+        database.run(SCHEMA_QUERIES.BEGIN_TRANSACTION);
+        try {
+            // Forward-compatible upgrades: ensure tables/indexes exist and
+            // add any missing dynamic monitor columns.
+            createDatabaseTables(database);
+            createDatabaseIndexes(database);
+            ensureMonitorDynamicColumns(database);
+
+            database.run(`PRAGMA user_version = ${DATABASE_SCHEMA_VERSION}`);
+            database.run(SCHEMA_QUERIES.COMMIT);
+
+            logger.info("[DatabaseSchema] Schema upgrade complete", {
+                currentVersion,
+                targetVersion: DATABASE_SCHEMA_VERSION,
+            });
+        } catch (error) {
+            database.run(SCHEMA_QUERIES.ROLLBACK);
+            throw error;
+        }
+    } catch (error) {
+        const normalizedError = ensureError(error);
+        logger.error("[DatabaseSchema] Schema upgrade failed", normalizedError);
+        throw normalizedError;
     }
 }

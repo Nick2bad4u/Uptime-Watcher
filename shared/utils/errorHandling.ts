@@ -25,6 +25,8 @@
  * @packageDocumentation
  */
 
+import type { UnknownRecord } from "type-fest";
+
 /**
  * Options for constructing an {@link ApplicationError} instance.
  */
@@ -34,7 +36,7 @@ export interface ApplicationErrorOptions {
     /** Machine-readable error code for diagnostics. */
     code: string;
     /** Additional structured metadata for debugging. */
-    details?: Record<string, unknown>;
+    details?: UnknownRecord;
     /** Human-readable error message. */
     message: string;
     /** Optional identifier of the operation that failed. */
@@ -89,7 +91,7 @@ function normalizeErrorCause(cause: unknown): Error | undefined {
     }
 
     const message = formatUnknownErrorCause(cause);
-    return new Error(message);
+    return new Error(message, { cause });
 }
 
 /**
@@ -109,7 +111,7 @@ export class ApplicationError extends Error {
     public readonly operation: string | undefined;
 
     /** Structured diagnostic metadata. */
-    public readonly details: Readonly<Record<string, unknown>> | undefined;
+    public readonly details: Readonly<UnknownRecord> | undefined;
 
     /** Underlying cause of the error chain. */
     public override readonly cause: unknown;
@@ -289,7 +291,7 @@ export function convertError(error: unknown): ErrorConversionResult {
     }
 
     return {
-        error: new Error(errorMessage),
+        error: new Error(errorMessage, { cause: error }),
         originalType: typeof error,
         wasError: false,
     };

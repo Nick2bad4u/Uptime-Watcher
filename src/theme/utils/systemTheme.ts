@@ -6,6 +6,11 @@
  * detection and subscription semantics stay consistent across the app.
  */
 
+import {
+    getMediaQueryMatches,
+    subscribeToMediaQueryMatches,
+} from "../../utils/mediaQueries";
+
 export const PREFERS_DARK_MEDIA_QUERY = "(prefers-color-scheme: dark)" as const;
 
 const noop = (): void => {};
@@ -18,18 +23,7 @@ const noop = (): void => {};
  * - Defensive against `matchMedia` throwing
  */
 export function getPrefersDarkMode(): boolean {
-    if (
-        typeof window === "undefined" ||
-        typeof window.matchMedia !== "function"
-    ) {
-        return false;
-    }
-
-    try {
-        return window.matchMedia(PREFERS_DARK_MEDIA_QUERY).matches;
-    } catch {
-        return false;
-    }
+    return getMediaQueryMatches(PREFERS_DARK_MEDIA_QUERY);
 }
 
 /**
@@ -46,28 +40,8 @@ export function getPrefersDarkMode(): boolean {
 export function subscribePrefersDarkModeChange(
     onChange: (isDarkMode: boolean) => void
 ): () => void {
-    if (
-        typeof window === "undefined" ||
-        typeof window.matchMedia !== "function"
-    ) {
-        return noop;
-    }
-
     try {
-        const mediaQuery = window.matchMedia(PREFERS_DARK_MEDIA_QUERY);
-        const handler = (event: MediaQueryListEvent): void => {
-            onChange(event.matches);
-        };
-
-        mediaQuery.addEventListener("change", handler);
-
-        return () => {
-            try {
-                mediaQuery.removeEventListener("change", handler);
-            } catch {
-                // Ignore cleanup errors.
-            }
-        };
+        return subscribeToMediaQueryMatches(PREFERS_DARK_MEDIA_QUERY, onChange);
     } catch {
         return noop;
     }

@@ -37,8 +37,10 @@ import type {
     MonitoringStopSummary,
     StatusUpdate,
 } from "@shared/types";
+import type { UnknownRecord } from "type-fest";
 import type { ZodError } from "zod";
 
+import { ApplicationError } from "@shared/utils/errorHandling";
 import { validateStatusUpdate } from "@shared/validation/guards";
 
 import { logger } from "./logger";
@@ -106,7 +108,7 @@ const resolveIdentifier = (candidate: unknown, fallback: string): string => {
  */
 const logInvalidStatusUpdateAndThrow = (
     error: ZodError,
-    metadata: Record<string, unknown>
+    metadata: UnknownRecord
 ): never => {
     logger.error(
         "[MonitoringService] Invalid status update returned after checkSiteNow",
@@ -120,10 +122,17 @@ const logInvalidStatusUpdateAndThrow = (
     const { monitorId, siteIdentifier } = metadata;
     const resolvedMonitorId = resolveIdentifier(monitorId, "unknown");
     const resolvedSiteIdentifier = resolveIdentifier(siteIdentifier, "unknown");
-    throw new Error(
-        `checkSiteNow returned an invalid status update for monitor ${resolvedMonitorId} of site ${resolvedSiteIdentifier}`,
-        { cause: error }
-    );
+    throw new ApplicationError({
+        cause: error,
+        code: "RENDERER_SERVICE_INVALID_PAYLOAD",
+        details: {
+            ...metadata,
+            issues: error.issues,
+            operation: "checkSiteNow",
+            serviceName: "MonitoringService",
+        },
+        message: `[MonitoringService] checkSiteNow returned an invalid status update for monitor ${resolvedMonitorId} of site ${resolvedSiteIdentifier}`,
+    });
 };
 
 /**
@@ -313,10 +322,15 @@ export const MonitoringService: MonitoringServiceContract = {
                     summary
                 );
 
-                const error = new Error(message);
-                (error as Error & { summary?: typeof summary }).summary =
-                    summary;
-                throw error;
+                throw new ApplicationError({
+                    code: "RENDERER_SERVICE_BACKEND_OPERATION_FAILED",
+                    details: {
+                        operation: "startMonitoring",
+                        serviceName: "MonitoringService",
+                        summary,
+                    },
+                    message: `[MonitoringService] ${message}`,
+                });
             }
 
             return { ...summary };
@@ -346,9 +360,16 @@ export const MonitoringService: MonitoringServiceContract = {
             );
 
             if (!success) {
-                throw new Error(
-                    `Failed to start monitoring for monitor ${monitorId} of site ${siteIdentifier}: Backend operation failed`
-                );
+                throw new ApplicationError({
+                    code: "RENDERER_SERVICE_BACKEND_OPERATION_FAILED",
+                    details: {
+                        monitorId,
+                        operation: "startMonitoringForMonitor",
+                        serviceName: "MonitoringService",
+                        siteIdentifier,
+                    },
+                    message: `[MonitoringService] Failed to start monitoring for monitor ${monitorId} of site ${siteIdentifier}: backend returned false`,
+                });
             }
         }
     ),
@@ -369,9 +390,15 @@ export const MonitoringService: MonitoringServiceContract = {
                 await api.monitoring.startMonitoringForSite(siteIdentifier);
 
             if (!success) {
-                throw new Error(
-                    `Failed to start monitoring for site ${siteIdentifier}: Backend operation failed`
-                );
+                throw new ApplicationError({
+                    code: "RENDERER_SERVICE_BACKEND_OPERATION_FAILED",
+                    details: {
+                        operation: "startMonitoringForSite",
+                        serviceName: "MonitoringService",
+                        siteIdentifier,
+                    },
+                    message: `[MonitoringService] Failed to start monitoring for site ${siteIdentifier}: backend returned false`,
+                });
             }
         }
     ),
@@ -415,10 +442,15 @@ export const MonitoringService: MonitoringServiceContract = {
                     summary
                 );
 
-                const error = new Error(message);
-                (error as Error & { summary?: typeof summary }).summary =
-                    summary;
-                throw error;
+                throw new ApplicationError({
+                    code: "RENDERER_SERVICE_BACKEND_OPERATION_FAILED",
+                    details: {
+                        operation: "stopMonitoring",
+                        serviceName: "MonitoringService",
+                        summary,
+                    },
+                    message: `[MonitoringService] ${message}`,
+                });
             }
 
             return { ...summary };
@@ -448,9 +480,16 @@ export const MonitoringService: MonitoringServiceContract = {
             );
 
             if (!success) {
-                throw new Error(
-                    `Failed to stop monitoring for monitor ${monitorId} of site ${siteIdentifier}: Backend operation failed`
-                );
+                throw new ApplicationError({
+                    code: "RENDERER_SERVICE_BACKEND_OPERATION_FAILED",
+                    details: {
+                        monitorId,
+                        operation: "stopMonitoringForMonitor",
+                        serviceName: "MonitoringService",
+                        siteIdentifier,
+                    },
+                    message: `[MonitoringService] Failed to stop monitoring for monitor ${monitorId} of site ${siteIdentifier}: backend returned false`,
+                });
             }
         }
     ),
@@ -471,9 +510,15 @@ export const MonitoringService: MonitoringServiceContract = {
                 await api.monitoring.stopMonitoringForSite(siteIdentifier);
 
             if (!success) {
-                throw new Error(
-                    `Failed to stop monitoring for site ${siteIdentifier}: Backend operation failed`
-                );
+                throw new ApplicationError({
+                    code: "RENDERER_SERVICE_BACKEND_OPERATION_FAILED",
+                    details: {
+                        operation: "stopMonitoringForSite",
+                        serviceName: "MonitoringService",
+                        siteIdentifier,
+                    },
+                    message: `[MonitoringService] Failed to stop monitoring for site ${siteIdentifier}: backend returned false`,
+                });
             }
         }
     ),

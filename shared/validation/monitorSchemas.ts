@@ -929,6 +929,23 @@ function getMonitorSchema(
  * @throws Error If the field name is unknown for the monitor type.
  * @throws {@link z.ZodError} If validation fails for the supplied value.
  */
+/**
+ * Error thrown when a monitor field name is not part of the schema for a given
+ * monitor type.
+ */
+export class MonitorUnknownFieldError extends Error {
+    public readonly fieldName: string;
+
+    public readonly monitorType: string;
+
+    public constructor(args: { fieldName: string; monitorType: string }) {
+        super(`Unknown field: ${args.fieldName}`);
+        this.name = "MonitorUnknownFieldError";
+        this.fieldName = args.fieldName;
+        this.monitorType = args.monitorType;
+    }
+}
+
 function validateFieldWithSchema(
     type: string,
     fieldName: string,
@@ -965,7 +982,10 @@ function validateFieldWithSchema(
             .parse(testData);
     }
 
-    throw new Error(`Unknown field: ${fieldName}`);
+    throw new MonitorUnknownFieldError({
+        fieldName,
+        monitorType: type,
+    });
 }
 
 /**
@@ -1155,7 +1175,7 @@ export function validateMonitorField(
         }
 
         // Re-throw unknown field errors as documented in JSDoc
-        if (error instanceof Error && error.message.includes("Unknown field")) {
+        if (error instanceof MonitorUnknownFieldError) {
             throw error;
         }
 

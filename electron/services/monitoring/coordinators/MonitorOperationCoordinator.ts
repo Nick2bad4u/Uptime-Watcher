@@ -41,7 +41,8 @@ export class MonitorOperationCoordinator {
     private readonly timeoutManager: MonitorOperationCoordinatorConfig["timeoutManager"];
 
     public async initiateOperation(
-        monitor: Monitor
+        monitor: Monitor,
+        options?: { readonly additionalSignals?: AbortSignal[] }
     ): Promise<MonitorOperationHandle | undefined> {
         if (!monitor.id) {
             logger.error("Cannot initiate operation for monitor without ID");
@@ -53,6 +54,9 @@ export class MonitorOperationCoordinator {
             monitor.id,
             {
                 timeoutMs,
+                ...(options?.additionalSignals
+                    ? { additionalSignals: options.additionalSignals }
+                    : {}),
             }
         );
 

@@ -928,6 +928,17 @@ export async function validateMonitorFormData<TType extends MonitorType>(
             warnings: [],
         };
     }
+
+    // Defensive runtime guard: even though this function is typed, tests and
+    // fuzzing may call it with invalid inputs via `any`/`unknown`.
+    const dataUnknown: unknown = data;
+    if (typeof dataUnknown !== "object" || dataUnknown === null) {
+        return {
+            errors: ["Invalid monitor form data"],
+            success: false,
+            warnings: [],
+        };
+    }
     return runMonitorValidationOperation(
         "Form data validation",
         {

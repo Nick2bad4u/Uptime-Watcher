@@ -3,7 +3,7 @@ schema: "../../config/schemas/doc-frontmatter.schema.json"
 title: "Architecture Documentation Index"
 summary: ">-"
 created: "2025-08-05"
-last_reviewed: "2025-12-29"
+last_reviewed: "2026-01-08"
 category: "guide"
 author: "Nick2bad4u"
 tags:
@@ -437,9 +437,9 @@ For full implementation details, see the code references listed in
      `SETTINGS_CHANNELS.updateHistoryLimit` handler through
      `registerStandardizedIpcHandler`, delegating to
      `DatabaseManager.setHistoryLimit` on the orchestrator.
-   - The IPC handler uses the shared parameter validators in
-     `electron/services/ipc/validators.ts` to enforce a numeric payload before
-     invoking the manager.
+   - The IPC handler uses the per-domain parameter validators in
+     `electron/services/ipc/validators/settings.ts` to enforce a numeric payload
+     before invoking the manager.
 
 3. **Database history limit update**
    - `electron/managers/DatabaseManager.ts` normalizes the limit using the

@@ -7,12 +7,22 @@
 import { describe, expect, it, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import type { ButtonHTMLAttributes, PropsWithChildren, ReactNode } from "react";
 import {
     SaveButton,
     type SaveButtonProperties,
 } from "../../../components/shared/SaveButton";
 
 // Mock themed components and react-icons
+type ThemedButtonMockProperties = PropsWithChildren<
+    Omit<ButtonHTMLAttributes<HTMLButtonElement>, "onClick"> & {
+        readonly icon?: ReactNode;
+        readonly onClick?: (event: unknown) => void;
+        readonly size?: string;
+        readonly variant?: string;
+    }
+>;
+
 vi.mock("../../../theme/components/ThemedButton", () => ({
     ThemedButton: ({
         children,
@@ -24,7 +34,7 @@ vi.mock("../../../theme/components/ThemedButton", () => ({
         variant,
         "aria-label": ariaLabel,
         ...props
-    }: any) => (
+    }: ThemedButtonMockProperties) => (
         <button
             data-testid="themed-button"
             className={className}
@@ -521,11 +531,12 @@ describe(SaveButton, () => {
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
-            const SaveButtonWithProps = (props: any) => (
-                <SaveButton {...defaultProps} {...props} />
+            render(
+                <SaveButton
+                    {...defaultProps}
+                    data-testattribute="test-value"
+                />
             );
-
-            render(<SaveButtonWithProps data-testattribute="test-value" />);
 
             const button = screen.getByTestId("themed-button");
             expect(button).toHaveAttribute("data-testattribute", "test-value");
@@ -542,11 +553,7 @@ describe(SaveButton, () => {
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
-            const SaveButtonWithId = (props: any) => (
-                <SaveButton {...defaultProps} {...props} />
-            );
-
-            render(<SaveButtonWithId id="save-button-id" />);
+            render(<SaveButton {...defaultProps} id="save-button-id" />);
 
             expect(screen.getByTestId("themed-button")).toHaveAttribute(
                 "id",
@@ -565,12 +572,9 @@ describe(SaveButton, () => {
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
-            const SaveButtonWithData = (props: any) => (
-                <SaveButton {...defaultProps} {...props} />
-            );
-
             render(
-                <SaveButtonWithData
+                <SaveButton
+                    {...defaultProps}
                     data-cy="save-btn"
                     data-automation-id="save-button"
                 />
@@ -927,12 +931,9 @@ describe(SaveButton, () => {
 
             const user = userEvent.setup();
             const mockOnClick = vi.fn();
-            const SaveButtonIntegration = (props: any) => (
-                <SaveButton {...props} />
-            );
 
             render(
-                <SaveButtonIntegration
+                <SaveButton
                     onClick={mockOnClick}
                     aria-label="Custom save label"
                     className="integration-test"

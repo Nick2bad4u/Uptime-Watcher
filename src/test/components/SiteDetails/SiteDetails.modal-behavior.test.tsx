@@ -3,8 +3,14 @@ import "@testing-library/jest-dom";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import type { Site } from "@shared/types";
-import type { ReactNode } from "react";
+import type { HTMLAttributes, PropsWithChildren, ReactNode } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import type { AnalyticsTabProperties } from "../../../components/SiteDetails/tabs/AnalyticsTab";
+import type { HistoryTabProperties } from "../../../components/SiteDetails/tabs/HistoryTab";
+import type { OverviewTabProperties } from "../../../components/SiteDetails/tabs/OverviewTab";
+import type { SettingsTabProperties } from "../../../components/SiteDetails/tabs/SettingsTab";
+import type { SiteOverviewTabProperties } from "../../../components/SiteDetails/tabs/SiteOverviewTab";
 
 import { SiteDetails } from "../../../components/SiteDetails/SiteDetails";
 import { useSiteDetails } from "../../../hooks/site/useSiteDetails";
@@ -52,11 +58,11 @@ vi.mock("../../../services/chartConfig", () => ({
     },
 }));
 
-const siteOverviewTabProps: any[] = [];
-const overviewTabProps: any[] = [];
-const analyticsTabProps: any[] = [];
-const historyTabProps: any[] = [];
-const settingsTabProps: any[] = [];
+const siteOverviewTabProps: SiteOverviewTabProperties[] = [];
+const overviewTabProps: OverviewTabProperties[] = [];
+const analyticsTabProps: AnalyticsTabProperties[] = [];
+const historyTabProps: HistoryTabProperties[] = [];
+const settingsTabProps: SettingsTabProperties[] = [];
 
 vi.mock("../../../components/SiteDetails/SiteDetailsHeader", () => ({
     SiteDetailsHeader: ({ children }: { readonly children?: ReactNode }) => (
@@ -77,7 +83,10 @@ vi.mock("../../../components/shared/SurfaceContainer", () => ({
 }));
 
 vi.mock("../../../theme/components/ThemedBox", () => ({
-    ThemedBox: ({ children, ...props }: any) => (
+    ThemedBox: ({
+        children,
+        ...props
+    }: PropsWithChildren<HTMLAttributes<HTMLDivElement>>) => (
         <div data-testid="themed-box" {...props}>
             {children}
         </div>
@@ -85,35 +94,35 @@ vi.mock("../../../theme/components/ThemedBox", () => ({
 }));
 
 vi.mock("../../../components/SiteDetails/tabs/SiteOverviewTab", () => ({
-    SiteOverviewTab: (props: any) => {
+    SiteOverviewTab: (props: SiteOverviewTabProperties) => {
         siteOverviewTabProps.push(props);
         return <div data-testid="site-overview-tab">site overview</div>;
     },
 }));
 
 vi.mock("../../../components/SiteDetails/tabs/OverviewTab", () => ({
-    OverviewTab: (props: any) => {
+    OverviewTab: (props: OverviewTabProperties) => {
         overviewTabProps.push(props);
         return <div data-testid="monitor-overview-tab">overview</div>;
     },
 }));
 
 vi.mock("../../../components/SiteDetails/tabs/AnalyticsTab", () => ({
-    AnalyticsTab: (props: any) => {
+    AnalyticsTab: (props: AnalyticsTabProperties) => {
         analyticsTabProps.push(props);
         return <div data-testid="analytics-tab">analytics</div>;
     },
 }));
 
 vi.mock("../../../components/SiteDetails/tabs/HistoryTab", () => ({
-    HistoryTab: (props: any) => {
+    HistoryTab: (props: HistoryTabProperties) => {
         historyTabProps.push(props);
         return <div data-testid="history-tab">history</div>;
     },
 }));
 
 vi.mock("../../../components/SiteDetails/tabs/SettingsTab", () => ({
-    SettingsTab: (props: any) => {
+    SettingsTab: (props: SettingsTabProperties) => {
         settingsTabProps.push(props);
         return <div data-testid="settings-tab">settings</div>;
     },
@@ -140,7 +149,9 @@ const baseMonitor = {
     type: "http" as const,
 };
 
-const createHookState = (overrides: Record<string, unknown> = {}) => {
+const createHookState = (
+    overrides: Record<string, unknown> = {}
+): ReturnType<typeof useSiteDetails> => {
     const { analytics: analyticsOverride, ...restOverrides } = overrides;
     const analyticsOverrides = analyticsOverride as
         | Record<string, unknown>
@@ -240,7 +251,7 @@ const createHookState = (overrides: Record<string, unknown> = {}) => {
         siteExists: true,
         timeoutChanged: false,
         ...restOverrides,
-    } as any;
+    } as unknown as ReturnType<typeof useSiteDetails>;
 };
 
 const renderSiteDetails = (hookOverrides?: Record<string, unknown>) => {
@@ -355,12 +366,18 @@ describe(SiteDetails, () => {
         expect(screen.getByTestId("analytics-tab")).toBeInTheDocument();
         expect(analyticsTabProps).toHaveLength(1);
         const props = analyticsTabProps[0];
+        if (!props) {
+            throw new Error("Expected AnalyticsTab to have been rendered");
+        }
         expect(props.lineChartData.datasets[0]?.data).toEqual([
             filteredHistory[0]?.responseTime,
         ]);
-        expect(props.lineChartData.labels[0]).toEqual(
-            new Date(filteredHistory[0]?.timestamp ?? 0)
-        );
+        const firstLabel = props.lineChartData.labels?.[0];
+        if (!firstLabel) {
+            throw new Error("Expected AnalyticsTab lineChartData.labels[0]");
+        }
+
+        expect(firstLabel).toEqual(new Date(filteredHistory[0]?.timestamp ?? 0));
     });
 
     it("renders the history tab when selected", () => {
@@ -382,6 +399,10 @@ describe(SiteDetails, () => {
 
         expect(screen.getByTestId("settings-tab")).toBeInTheDocument();
         const props = settingsTabProps.at(-1);
+        if (!props) {
+            throw new Error("Expected SettingsTab to have been rendered");
+        }
+
         expect(typeof props.handleSaveInterval).toBe("function");
 
         props.handleSaveInterval();

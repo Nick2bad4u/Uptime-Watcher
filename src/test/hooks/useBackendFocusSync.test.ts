@@ -40,6 +40,7 @@ const createMockStore = (): Partial<SitesStore> => ({
             sizeBytes: 8,
         },
     }),
+    saveSqliteBackup: vi.fn().mockResolvedValue({ canceled: true } as const),
     getSelectedMonitorId: vi.fn(),
     getSelectedSite: vi.fn(),
     getSyncStatus: vi.fn(),

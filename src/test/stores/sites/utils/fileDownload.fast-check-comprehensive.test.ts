@@ -163,22 +163,19 @@ describe("fileDownload utilities - Comprehensive Fast-Check Coverage", () => {
                             fileName,
                         };
 
-                        // Mock appendChild error on first call, success on second
-                        let callCount = 0;
+                        // Mock DOM attachment failure.
                         mockDocument.body.append.mockImplementation(() => {
-                            callCount++;
-                            if (callCount === 1) {
-                                throw new Error("appendChild failed");
-                            }
+                            throw new Error("appendChild failed");
                         });
 
-                        // Should not throw as fallback should work
+                        // Should not throw as the implementation falls back to a direct click
+                        // without requiring DOM attachment.
                         expect(() => downloadFile(options)).not.toThrowError();
 
-                        // Should be called at least once for original attempt and once for fallback
-                        expect(
-                            mockDocument.createElement
-                        ).toHaveBeenCalledTimes(2);
+                        // Primary attempt + fallback attempt.
+                        expect(mockDocument.createElement).toHaveBeenCalledTimes(
+                            2
+                        );
                     }
                 ),
                 { numRuns: 5 } // Limit runs to avoid mock conflicts
@@ -282,7 +279,7 @@ describe("fileDownload utilities - Comprehensive Fast-Check Coverage", () => {
             );
         });
 
-        it("should handle fallback method failures", () => {
+        it("should handle persistent DOM attachment failures", () => {
             fc.assert(
                 fc.property(
                     fc.uint8Array({ minLength: 1, maxLength: 100 }),
@@ -294,14 +291,12 @@ describe("fileDownload utilities - Comprehensive Fast-Check Coverage", () => {
                             fileName,
                         };
 
-                        // Mock both original and fallback to fail with appendChild
+                        // Persistent DOM attachment failure should still succeed via direct click.
                         mockDocument.body.append.mockImplementation(() => {
                             throw new Error("appendChild failed");
                         });
 
-                        expect(() => downloadFile(options)).toThrowError(
-                            "File download failed"
-                        );
+                        expect(() => downloadFile(options)).not.toThrowError();
                     }
                 )
             );

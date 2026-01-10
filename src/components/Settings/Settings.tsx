@@ -76,9 +76,9 @@ import "./Settings.css";
 
 type SitesStoreState = ReturnType<typeof useSitesStore.getState>;
 
-const selectDownloadSqliteBackup = (
+const selectSaveSqliteBackup = (
     state: SitesStoreState
-): SitesStoreState["downloadSqliteBackup"] => state.downloadSqliteBackup;
+): SitesStoreState["saveSqliteBackup"] => state.saveSqliteBackup;
 const selectRestoreSqliteBackup = (
     state: SitesStoreState
 ): SitesStoreState["restoreSqliteBackup"] => state.restoreSqliteBackup;
@@ -166,10 +166,44 @@ export interface SettingsProperties {
 export const Settings = ({
     onClose,
 }: Readonly<SettingsProperties>): ReactElement => {
-    const { clearError, isLoading, lastError, setError } = useErrorStore();
-    const { persistHistoryLimit, resetSettings, settings, updateSettings } =
-        useSettingsStore();
-    const downloadSqliteBackup = useSitesStore(selectDownloadSqliteBackup);
+    type ErrorStoreState = ReturnType<typeof useErrorStore.getState>;
+    type SettingsStoreState = ReturnType<typeof useSettingsStore.getState>;
+
+    const selectClearError = useCallback((
+        state: ErrorStoreState
+    ): ErrorStoreState["clearError"] => state.clearError, []);
+    const selectIsLoading = useCallback((state: ErrorStoreState): boolean =>
+        state.isLoading, []);
+    const selectLastError = useCallback((
+        state: ErrorStoreState
+    ): ErrorStoreState["lastError"] => state.lastError, []);
+    const selectSetError = useCallback((
+        state: ErrorStoreState
+    ): ErrorStoreState["setError"] => state.setError, []);
+
+    const clearError = useErrorStore(selectClearError);
+    const isLoading = useErrorStore(selectIsLoading);
+    const lastError = useErrorStore(selectLastError);
+    const setError = useErrorStore(selectSetError);
+
+    const selectPersistHistoryLimit = useCallback((
+        state: SettingsStoreState
+    ): SettingsStoreState["persistHistoryLimit"] => state.persistHistoryLimit, []);
+    const selectResetSettings = useCallback((
+        state: SettingsStoreState
+    ): SettingsStoreState["resetSettings"] => state.resetSettings, []);
+    const selectSettings = useCallback((
+        state: SettingsStoreState
+    ): SettingsStoreState["settings"] => state.settings, []);
+    const selectUpdateSettings = useCallback((
+        state: SettingsStoreState
+    ): SettingsStoreState["updateSettings"] => state.updateSettings, []);
+
+    const persistHistoryLimit = useSettingsStore(selectPersistHistoryLimit);
+    const resetSettings = useSettingsStore(selectResetSettings);
+    const settings = useSettingsStore(selectSettings);
+    const updateSettings = useSettingsStore(selectUpdateSettings);
+    const saveSqliteBackup = useSitesStore(selectSaveSqliteBackup);
     const restoreSqliteBackup = useSitesStore(selectRestoreSqliteBackup);
     const lastBackupMetadata = useSitesStore(selectLastBackupMetadata);
 
@@ -764,24 +798,31 @@ export const Settings = ({
     const handleDownloadSQLite = useCallback(async () => {
         clearError();
         try {
-            const backup = await downloadSqliteBackup();
-            logger.user.action("Downloaded SQLite backup", {
-                checksum: backup.metadata.checksum,
-                schemaVersion: backup.metadata.schemaVersion,
-                sizeBytes: backup.metadata.sizeBytes,
+            const result = await saveSqliteBackup();
+
+            if (result.canceled) {
+                logger.user.action("Canceled SQLite backup save");
+                return;
+            }
+
+            logger.user.action("Saved SQLite backup", {
+                checksum: result.metadata.checksum,
+                filePath: result.filePath,
+                schemaVersion: result.metadata.schemaVersion,
+                sizeBytes: result.metadata.sizeBytes,
             });
         } catch (error: unknown) {
             logger.error(
-                "Failed to download SQLite backup",
+                "Failed to save SQLite backup",
                 ensureError(error)
             );
             setError(
-                `Failed to download SQLite backup: ${getUserFacingErrorDetail(error)}`
+                `Failed to save SQLite backup: ${getUserFacingErrorDetail(error)}`
             );
         }
     }, [
         clearError,
-        downloadSqliteBackup,
+        saveSqliteBackup,
         setError,
     ]);
 

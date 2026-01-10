@@ -23,17 +23,28 @@ const mockWithErrorHandling = vi.hoisted(() => vi.fn());
 const mockLogStoreAction = vi.hoisted(() => vi.fn());
 const mockSafeExtractIpcData = vi.hoisted(() => vi.fn());
 
-// Mock dependencies
-vi.mock("@shared/utils/errorHandling", () => ({
-    withErrorHandling: mockWithErrorHandling,
-    ensureError: vi.fn((error) =>
-        error instanceof Error ? error : new Error(String(error))
-    ),
-}));
+// Mock dependencies (partial mock to preserve exports like ApplicationError)
+vi.mock("@shared/utils/errorHandling", async (importOriginal) => {
+    const actual =
+        await importOriginal<typeof import("@shared/utils/errorHandling")>();
 
-vi.mock("../../../stores/utils", () => ({
-    logStoreAction: mockLogStoreAction,
-}));
+    return {
+        ...actual,
+        ensureError: vi.fn((error) =>
+            error instanceof Error ? error : new Error(String(error))
+        ),
+        withErrorHandling: mockWithErrorHandling,
+    };
+});
+
+vi.mock("../../../stores/utils", async (importOriginal) => {
+    const actual =
+        await importOriginal<typeof import("../../../stores/utils")>();
+    return {
+        ...actual,
+        logStoreAction: mockLogStoreAction,
+    };
+});
 
 vi.mock("../../../types/ipc", () => ({
     safeExtractIpcData: mockSafeExtractIpcData,

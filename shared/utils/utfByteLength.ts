@@ -16,8 +16,21 @@ const textEncoder =
  * Returns the UTF-8 encoded byte length of a string.
  */
 export function getUtfByteLength(value: string): number {
-    // IMPORTANT: The fallback branch mirrors the existing diagnosticsLimits
-    // behavior, keeping this helper robust in environments that may not
-    // provide TextEncoder (primarily older runtimes).
-    return textEncoder ? textEncoder.encode(value).length : value.length * 2;
+    if (textEncoder) {
+        return textEncoder.encode(value).length;
+    }
+
+    // Prefer Buffer.byteLength in Node-like environments where TextEncoder may
+    // be unavailable.
+    if (
+        typeof Buffer !== "undefined" &&
+        typeof Buffer.byteLength === "function"
+    ) {
+        return Buffer.byteLength(value, "utf8");
+    }
+
+    // Last-resort approximation for rare environments without TextEncoder or
+    // Buffer. Keeps behavior deterministic but may be imprecise for astral
+    // code points.
+    return value.length * 2;
 }

@@ -11,7 +11,7 @@ import { clipboard } from "electron";
 import type { AutoUpdaterService } from "../../updater/AutoUpdaterService";
 
 import { createStandardizedIpcRegistrar } from "../utils";
-import { SystemHandlerValidators } from "../validators";
+import { SystemHandlerValidators } from "../validators/system";
 
 /**
  * Dependencies required to register system-level IPC handlers.

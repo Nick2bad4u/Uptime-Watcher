@@ -10,6 +10,10 @@ import { describe, expect, it, vi, beforeEach } from "vitest";
 import React from "react";
 import { useSiteDetails } from "../../../hooks/site/useSiteDetails";
 
+import type { SelectorHookMock } from "../../utils/createSelectorHookMock";
+
+import { createSitesStoreMock } from "../../utils/createSitesStoreMock";
+
 // Define types locally since they are not exported from types
 interface Site {
     identifier: string;
@@ -66,24 +70,24 @@ const mockUpdateMonitorRetryAttempts = vi.fn();
 const mockUpdateMonitorTimeout = vi.fn();
 const mockUpdateSiteCheckInterval = vi.fn();
 
-vi.mock("../../../stores/sites/useSitesStore", () => ({
-    useSitesStore: vi.fn(() => ({
-        checkSiteNow: mockCheckSiteNow,
-        deleteSite: mockDeleteSite,
-        getSelectedMonitorId: vi.fn(() => "monitor-1"),
-        modifySite: mockModifySite,
-        removeMonitorFromSite: mockRemoveMonitorFromSite,
-        setSelectedMonitorId: vi.fn(),
-        sites: [],
-        startSiteMonitoring: mockStartSiteMonitoring,
-        startSiteMonitorMonitoring: mockStartSiteMonitorMonitoring,
-        stopSiteMonitoring: mockStopSiteMonitoring,
-        stopSiteMonitorMonitoring: mockStopSiteMonitorMonitoring,
-        updateMonitorRetryAttempts: mockUpdateMonitorRetryAttempts,
-        updateMonitorTimeout: mockUpdateMonitorTimeout,
-        updateSiteCheckInterval: mockUpdateSiteCheckInterval,
-    })),
+const useSitesStoreMockRef = vi.hoisted(() => ({
+    current: undefined as SelectorHookMock<any> | undefined,
 }));
+
+vi.mock("../../../stores/sites/useSitesStore", async () => {
+    const { createSelectorHookMock } = await import(
+        "../../utils/createSelectorHookMock"
+    );
+    const { createSitesStoreMock } = await import("../../utils/createSitesStoreMock");
+
+    useSitesStoreMockRef.current = createSelectorHookMock(
+        createSitesStoreMock({ sites: [] })
+    );
+
+    return {
+        useSitesStore: useSitesStoreMockRef.current,
+    };
+});
 
 vi.mock("../../../stores/error/useErrorStore", () => ({
     useErrorStore: vi.fn(() => ({
@@ -122,7 +126,6 @@ Object.defineProperty(globalThis, "confirm", {
     value: vi.fn(() => true),
 });
 
-import { useSitesStore } from "../../../stores/sites/useSitesStore";
 import { useErrorStore } from "../../../stores/error/useErrorStore";
 import { useUIStore } from "../../../stores/ui/useUiStore";
 import { useSiteAnalytics } from "../../../hooks/site/useSiteAnalytics";
@@ -154,25 +157,24 @@ describe("useSiteDetails Hook - Basic Coverage", () => {
         mockUseConfirmDialog.mockReturnValue(vi.fn(async () => true));
 
         // Mock sites store to return the current site
-        (useSitesStore as any).mockReturnValue({
-            checkSiteNow: mockCheckSiteNow,
-            deleteSite: vi.fn(),
-            getSelectedMonitorId: vi.fn(() => "monitor-1"),
-            modifySite: vi.fn(),
-            removeMonitorFromSite: vi.fn(),
-            setSelectedMonitorId: vi.fn(),
-            sites: [mockSite],
-            startSiteMonitoring: vi.fn(),
-            startSiteMonitorMonitoring: vi.fn(),
-            stopSiteMonitoring: vi.fn(),
-            stopSiteMonitorMonitoring: vi.fn(),
-            updateMonitorRetryAttempts: vi.fn(),
-            updateMonitorTimeout: vi.fn(),
-            updateSiteCheckInterval: vi.fn(),
-            selectedMonitorIds: {
-                [mockSite.identifier]: mockSite.monitors[0]!.id,
-            },
-        });
+        useSitesStoreMockRef.current!.setState(
+            createSitesStoreMock({
+                checkSiteNow: mockCheckSiteNow,
+                deleteSite: mockDeleteSite,
+                getSelectedMonitorId: vi.fn(() => "monitor-1"),
+                modifySite: mockModifySite,
+                removeMonitorFromSite: mockRemoveMonitorFromSite,
+                setSelectedMonitorId: vi.fn(),
+                sites: [mockSite],
+                startSiteMonitoring: mockStartSiteMonitoring,
+                startSiteMonitorMonitoring: mockStartSiteMonitorMonitoring,
+                stopSiteMonitoring: mockStopSiteMonitoring,
+                stopSiteMonitorMonitoring: mockStopSiteMonitorMonitoring,
+                updateMonitorRetryAttempts: mockUpdateMonitorRetryAttempts,
+                updateMonitorTimeout: mockUpdateMonitorTimeout,
+                updateSiteCheckInterval: mockUpdateSiteCheckInterval,
+            })
+        );
     });
 
     describe("Hook Initialization", () => {
@@ -205,23 +207,12 @@ describe("useSiteDetails Hook - Basic Coverage", () => {
                 monitors: [],
             };
 
-            // Mock empty sites array for this test
-            (useSitesStore as any).mockReturnValue({
-                checkSiteNow: vi.fn(),
-                deleteSite: vi.fn(),
-                getSelectedMonitorId: vi.fn(() => null),
-                modifySite: vi.fn(),
-                removeMonitorFromSite: vi.fn(),
-                setSelectedMonitorId: vi.fn(),
-                sites: [siteWithNoMonitors],
-                startSiteMonitoring: vi.fn(),
-                startSiteMonitorMonitoring: vi.fn(),
-                stopSiteMonitoring: vi.fn(),
-                stopSiteMonitorMonitoring: vi.fn(),
-                updateMonitorRetryAttempts: vi.fn(),
-                updateMonitorTimeout: vi.fn(),
-                updateSiteCheckInterval: vi.fn(),
-            });
+            useSitesStoreMockRef.current!.setState(
+                createSitesStoreMock({
+                    getSelectedMonitorId: vi.fn(() => undefined),
+                    sites: [siteWithNoMonitors],
+                })
+            );
 
             const { result } = renderHook(() =>
                 useSiteDetails({ site: siteWithNoMonitors })
@@ -240,22 +231,12 @@ describe("useSiteDetails Hook - Basic Coverage", () => {
             await annotate("Category: Hook", "category");
             await annotate("Type: Business Logic", "type");
 
-            (useSitesStore as any).mockReturnValue({
-                checkSiteNow: vi.fn(),
-                deleteSite: vi.fn(),
-                getSelectedMonitorId: vi.fn(() => null),
-                modifySite: vi.fn(),
-                removeMonitorFromSite: vi.fn(),
-                setSelectedMonitorId: vi.fn(),
-                sites: [], // Empty sites array
-                startSiteMonitoring: vi.fn(),
-                startSiteMonitorMonitoring: vi.fn(),
-                stopSiteMonitoring: vi.fn(),
-                stopSiteMonitorMonitoring: vi.fn(),
-                updateMonitorRetryAttempts: vi.fn(),
-                updateMonitorTimeout: vi.fn(),
-                updateSiteCheckInterval: vi.fn(),
-            });
+            useSitesStoreMockRef.current!.setState(
+                createSitesStoreMock({
+                    getSelectedMonitorId: vi.fn(() => undefined),
+                    sites: [],
+                })
+            );
 
             const { result } = renderHook(() =>
                 useSiteDetails({ site: mockSite })
@@ -444,22 +425,13 @@ describe("useSiteDetails Hook - Basic Coverage", () => {
             const mockSetSelectedMonitorId = vi.fn();
             const mockSetActiveSiteDetailsTab = vi.fn();
 
-            (useSitesStore as any).mockReturnValue({
-                checkSiteNow: vi.fn(),
-                deleteSite: vi.fn(),
-                getSelectedMonitorId: vi.fn(() => "monitor-1"),
-                modifySite: vi.fn(),
-                removeMonitorFromSite: vi.fn(),
-                setSelectedMonitorId: mockSetSelectedMonitorId,
-                sites: [mockSite],
-                startSiteMonitoring: vi.fn(),
-                startSiteMonitorMonitoring: vi.fn(),
-                stopSiteMonitoring: vi.fn(),
-                stopSiteMonitorMonitoring: vi.fn(),
-                updateMonitorRetryAttempts: vi.fn(),
-                updateMonitorTimeout: vi.fn(),
-                updateSiteCheckInterval: vi.fn(),
-            });
+            useSitesStoreMockRef.current!.setState(
+                createSitesStoreMock({
+                    getSelectedMonitorId: vi.fn(() => "monitor-1"),
+                    setSelectedMonitorId: mockSetSelectedMonitorId,
+                    sites: [mockSite],
+                })
+            );
 
             (useUIStore as any).mockReturnValue({
                 activeSiteDetailsTab: "monitor-1-analytics",
@@ -528,22 +500,12 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
         mockUseConfirmDialog.mockReturnValue(vi.fn(async () => true));
 
         // Mock sites store with default values
-        (useSitesStore as any).mockReturnValue({
-            checkSiteNow: vi.fn(),
-            deleteSite: vi.fn(),
-            getSelectedMonitorId: vi.fn(() => "monitor-1"),
-            modifySite: vi.fn(),
-            removeMonitorFromSite: vi.fn(),
-            setSelectedMonitorId: vi.fn(),
-            sites: [mockSite],
-            startSiteMonitoring: vi.fn(),
-            startSiteMonitorMonitoring: vi.fn(),
-            stopSiteMonitoring: vi.fn(),
-            stopSiteMonitorMonitoring: vi.fn(),
-            updateMonitorRetryAttempts: vi.fn(),
-            updateMonitorTimeout: vi.fn(),
-            updateSiteCheckInterval: vi.fn(),
-        });
+        useSitesStoreMockRef.current!.setState(
+            createSitesStoreMock({
+                getSelectedMonitorId: vi.fn(() => "monitor-1"),
+                sites: [mockSite],
+            })
+        );
 
         // Reset error store mock
         (useErrorStore as any).mockReturnValue({
@@ -594,22 +556,12 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
             await annotate("Category: Hook", "category");
             await annotate("Type: Monitoring", "type");
 
-            (useSitesStore as any).mockReturnValue({
-                checkSiteNow: vi.fn(),
-                deleteSite: vi.fn(),
-                getSelectedMonitorId: vi.fn(() => null),
-                modifySite: vi.fn(),
-                removeMonitorFromSite: vi.fn(),
-                setSelectedMonitorId: vi.fn(),
-                sites: [mockSite],
-                startSiteMonitoring: vi.fn(),
-                startSiteMonitorMonitoring: vi.fn(),
-                stopSiteMonitoring: vi.fn(),
-                stopSiteMonitorMonitoring: vi.fn(),
-                updateMonitorRetryAttempts: vi.fn(),
-                updateMonitorTimeout: vi.fn(),
-                updateSiteCheckInterval: vi.fn(),
-            });
+            useSitesStoreMockRef.current!.setState(
+                createSitesStoreMock({
+                    getSelectedMonitorId: vi.fn(() => undefined),
+                    sites: [mockSite],
+                })
+            );
 
             const { result } = renderHook(() =>
                 useSiteDetails({ site: mockSite })
@@ -634,22 +586,13 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
 
             const mockUpdateSiteCheckInterval = vi.fn();
 
-            (useSitesStore as any).mockReturnValue({
-                checkSiteNow: vi.fn(),
-                deleteSite: vi.fn(),
-                getSelectedMonitorId: vi.fn(() => "monitor-1"),
-                modifySite: vi.fn(),
-                removeMonitorFromSite: vi.fn(),
-                setSelectedMonitorId: vi.fn(),
-                sites: [mockSite],
-                startSiteMonitoring: vi.fn(),
-                startSiteMonitorMonitoring: vi.fn(),
-                stopSiteMonitoring: vi.fn(),
-                stopSiteMonitorMonitoring: vi.fn(),
-                updateMonitorRetryAttempts: vi.fn(),
-                updateMonitorTimeout: vi.fn(),
-                updateSiteCheckInterval: mockUpdateSiteCheckInterval,
-            });
+            useSitesStoreMockRef.current!.setState(
+                createSitesStoreMock({
+                    getSelectedMonitorId: vi.fn(() => "monitor-1"),
+                    sites: [mockSite],
+                    updateSiteCheckInterval: mockUpdateSiteCheckInterval,
+                })
+            );
 
             const { result } = renderHook(() =>
                 useSiteDetails({ site: mockSite })
@@ -687,22 +630,13 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
 
             const mockUpdateSiteCheckInterval = vi.fn();
 
-            (useSitesStore as any).mockReturnValue({
-                checkSiteNow: vi.fn(),
-                deleteSite: vi.fn(),
-                getSelectedMonitorId: vi.fn(() => "monitor-1"),
-                modifySite: vi.fn(),
-                removeMonitorFromSite: vi.fn(),
-                setSelectedMonitorId: vi.fn(),
-                sites: [mockSite],
-                startSiteMonitoring: vi.fn(),
-                startSiteMonitorMonitoring: vi.fn(),
-                stopSiteMonitoring: vi.fn(),
-                stopSiteMonitorMonitoring: vi.fn(),
-                updateMonitorRetryAttempts: vi.fn(),
-                updateMonitorTimeout: vi.fn(),
-                updateSiteCheckInterval: mockUpdateSiteCheckInterval,
-            });
+            useSitesStoreMockRef.current!.setState(
+                createSitesStoreMock({
+                    getSelectedMonitorId: vi.fn(() => "monitor-1"),
+                    sites: [mockSite],
+                    updateSiteCheckInterval: mockUpdateSiteCheckInterval,
+                })
+            );
 
             const { result } = renderHook(() =>
                 useSiteDetails({ site: mockSite })
@@ -739,22 +673,13 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
 
             const mockUpdateMonitorTimeout = vi.fn();
 
-            (useSitesStore as any).mockReturnValue({
-                checkSiteNow: vi.fn(),
-                deleteSite: vi.fn(),
-                getSelectedMonitorId: vi.fn(() => "monitor-1"),
-                modifySite: vi.fn(),
-                removeMonitorFromSite: vi.fn(),
-                setSelectedMonitorId: vi.fn(),
-                sites: [mockSite],
-                startSiteMonitoring: vi.fn(),
-                startSiteMonitorMonitoring: vi.fn(),
-                stopSiteMonitoring: vi.fn(),
-                stopSiteMonitorMonitoring: vi.fn(),
-                updateMonitorRetryAttempts: vi.fn(),
-                updateMonitorTimeout: mockUpdateMonitorTimeout,
-                updateSiteCheckInterval: vi.fn(),
-            });
+            useSitesStoreMockRef.current!.setState(
+                createSitesStoreMock({
+                    getSelectedMonitorId: vi.fn(() => "monitor-1"),
+                    sites: [mockSite],
+                    updateMonitorTimeout: mockUpdateMonitorTimeout,
+                })
+            );
 
             const { result } = renderHook(() =>
                 useSiteDetails({ site: mockSite })
@@ -792,22 +717,13 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
 
             const mockUpdateMonitorTimeout = vi.fn();
 
-            (useSitesStore as any).mockReturnValue({
-                checkSiteNow: vi.fn(),
-                deleteSite: vi.fn(),
-                getSelectedMonitorId: vi.fn(() => "monitor-1"),
-                modifySite: vi.fn(),
-                removeMonitorFromSite: vi.fn(),
-                setSelectedMonitorId: vi.fn(),
-                sites: [mockSite],
-                startSiteMonitoring: vi.fn(),
-                startSiteMonitorMonitoring: vi.fn(),
-                stopSiteMonitoring: vi.fn(),
-                stopSiteMonitorMonitoring: vi.fn(),
-                updateMonitorRetryAttempts: vi.fn(),
-                updateMonitorTimeout: mockUpdateMonitorTimeout,
-                updateSiteCheckInterval: vi.fn(),
-            });
+            useSitesStoreMockRef.current!.setState(
+                createSitesStoreMock({
+                    getSelectedMonitorId: vi.fn(() => "monitor-1"),
+                    sites: [mockSite],
+                    updateMonitorTimeout: mockUpdateMonitorTimeout,
+                })
+            );
 
             const { result } = renderHook(() =>
                 useSiteDetails({ site: mockSite })
@@ -844,22 +760,13 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
 
             const mockUpdateMonitorRetryAttempts = vi.fn();
 
-            (useSitesStore as any).mockReturnValue({
-                checkSiteNow: vi.fn(),
-                deleteSite: vi.fn(),
-                getSelectedMonitorId: vi.fn(() => "monitor-1"),
-                modifySite: vi.fn(),
-                removeMonitorFromSite: vi.fn(),
-                setSelectedMonitorId: vi.fn(),
-                sites: [mockSite],
-                startSiteMonitoring: vi.fn(),
-                startSiteMonitorMonitoring: vi.fn(),
-                stopSiteMonitoring: vi.fn(),
-                stopSiteMonitorMonitoring: vi.fn(),
-                updateMonitorRetryAttempts: mockUpdateMonitorRetryAttempts,
-                updateMonitorTimeout: vi.fn(),
-                updateSiteCheckInterval: vi.fn(),
-            });
+            useSitesStoreMockRef.current!.setState(
+                createSitesStoreMock({
+                    getSelectedMonitorId: vi.fn(() => "monitor-1"),
+                    sites: [mockSite],
+                    updateMonitorRetryAttempts: mockUpdateMonitorRetryAttempts,
+                })
+            );
 
             const { result } = renderHook(() =>
                 useSiteDetails({ site: mockSite })
@@ -897,22 +804,13 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
 
             const mockUpdateMonitorRetryAttempts = vi.fn();
 
-            (useSitesStore as any).mockReturnValue({
-                checkSiteNow: vi.fn(),
-                deleteSite: vi.fn(),
-                getSelectedMonitorId: vi.fn(() => "monitor-1"),
-                modifySite: vi.fn(),
-                removeMonitorFromSite: vi.fn(),
-                setSelectedMonitorId: vi.fn(),
-                sites: [mockSite],
-                startSiteMonitoring: vi.fn(),
-                startSiteMonitorMonitoring: vi.fn(),
-                stopSiteMonitoring: vi.fn(),
-                stopSiteMonitorMonitoring: vi.fn(),
-                updateMonitorRetryAttempts: mockUpdateMonitorRetryAttempts,
-                updateMonitorTimeout: vi.fn(),
-                updateSiteCheckInterval: vi.fn(),
-            });
+            useSitesStoreMockRef.current!.setState(
+                createSitesStoreMock({
+                    getSelectedMonitorId: vi.fn(() => "monitor-1"),
+                    sites: [mockSite],
+                    updateMonitorRetryAttempts: mockUpdateMonitorRetryAttempts,
+                })
+            );
 
             const { result } = renderHook(() =>
                 useSiteDetails({ site: mockSite })
@@ -979,22 +877,13 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
 
             const mockModifySite = vi.fn();
 
-            (useSitesStore as any).mockReturnValue({
-                checkSiteNow: vi.fn(),
-                deleteSite: vi.fn(),
-                getSelectedMonitorId: vi.fn(() => "monitor-1"),
-                modifySite: mockModifySite,
-                removeMonitorFromSite: vi.fn(),
-                setSelectedMonitorId: vi.fn(),
-                sites: [mockSite],
-                startSiteMonitoring: vi.fn(),
-                startSiteMonitorMonitoring: vi.fn(),
-                stopSiteMonitoring: vi.fn(),
-                stopSiteMonitorMonitoring: vi.fn(),
-                updateMonitorRetryAttempts: vi.fn(),
-                updateMonitorTimeout: vi.fn(),
-                updateSiteCheckInterval: vi.fn(),
-            });
+            useSitesStoreMockRef.current!.setState(
+                createSitesStoreMock({
+                    getSelectedMonitorId: vi.fn(() => "monitor-1"),
+                    modifySite: mockModifySite,
+                    sites: [mockSite],
+                })
+            );
 
             const { result } = renderHook(() =>
                 useSiteDetails({ site: mockSite })
@@ -1045,22 +934,13 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
             // Mock confirmation dialog to return false (user cancels)
             mockUseConfirmDialog.mockReturnValue(vi.fn(async () => false));
 
-            (useSitesStore as any).mockReturnValue({
-                checkSiteNow: vi.fn(),
-                deleteSite: vi.fn(),
-                getSelectedMonitorId: vi.fn(() => "monitor-1"),
-                modifySite: vi.fn(),
-                removeMonitorFromSite: mockRemoveMonitorFromSite,
-                setSelectedMonitorId: vi.fn(),
-                sites: [mockSite],
-                startSiteMonitoring: vi.fn(),
-                startSiteMonitorMonitoring: vi.fn(),
-                stopSiteMonitoring: vi.fn(),
-                stopSiteMonitorMonitoring: vi.fn(),
-                updateMonitorRetryAttempts: vi.fn(),
-                updateMonitorTimeout: vi.fn(),
-                updateSiteCheckInterval: vi.fn(),
-            });
+            useSitesStoreMockRef.current!.setState(
+                createSitesStoreMock({
+                    getSelectedMonitorId: vi.fn(() => "monitor-1"),
+                    removeMonitorFromSite: mockRemoveMonitorFromSite,
+                    sites: [mockSite],
+                })
+            );
 
             const { result } = renderHook(() =>
                 useSiteDetails({ site: mockSite })
@@ -1109,22 +989,13 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
             // Mock confirmation dialog to return false (user cancels)
             mockUseConfirmDialog.mockReturnValue(vi.fn(async () => false));
 
-            (useSitesStore as any).mockReturnValue({
-                checkSiteNow: vi.fn(),
-                deleteSite: mockDeleteSite,
-                getSelectedMonitorId: vi.fn(() => "monitor-1"),
-                modifySite: vi.fn(),
-                removeMonitorFromSite: vi.fn(),
-                setSelectedMonitorId: vi.fn(),
-                sites: [mockSite],
-                startSiteMonitoring: vi.fn(),
-                startSiteMonitorMonitoring: vi.fn(),
-                stopSiteMonitoring: vi.fn(),
-                stopSiteMonitorMonitoring: vi.fn(),
-                updateMonitorRetryAttempts: vi.fn(),
-                updateMonitorTimeout: vi.fn(),
-                updateSiteCheckInterval: vi.fn(),
-            });
+            useSitesStoreMockRef.current!.setState(
+                createSitesStoreMock({
+                    deleteSite: mockDeleteSite,
+                    getSelectedMonitorId: vi.fn(() => "monitor-1"),
+                    sites: [mockSite],
+                })
+            );
 
             const { result } = renderHook(() =>
                 useSiteDetails({ site: mockSite })
@@ -1243,22 +1114,13 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
             const mockSetSelectedMonitorId = vi.fn();
             const mockSetActiveSiteDetailsTab = vi.fn();
 
-            (useSitesStore as any).mockReturnValue({
-                checkSiteNow: vi.fn(),
-                deleteSite: vi.fn(),
-                getSelectedMonitorId: vi.fn(() => "monitor-1"),
-                modifySite: vi.fn(),
-                removeMonitorFromSite: vi.fn(),
-                setSelectedMonitorId: mockSetSelectedMonitorId,
-                sites: [mockSite],
-                startSiteMonitoring: vi.fn(),
-                startSiteMonitorMonitoring: vi.fn(),
-                stopSiteMonitoring: vi.fn(),
-                stopSiteMonitorMonitoring: vi.fn(),
-                updateMonitorRetryAttempts: vi.fn(),
-                updateMonitorTimeout: vi.fn(),
-                updateSiteCheckInterval: vi.fn(),
-            });
+            useSitesStoreMockRef.current!.setState(
+                createSitesStoreMock({
+                    getSelectedMonitorId: vi.fn(() => "monitor-1"),
+                    setSelectedMonitorId: mockSetSelectedMonitorId,
+                    sites: [mockSite],
+                })
+            );
 
             (useUIStore as any).mockReturnValue({
                 activeSiteDetailsTab: "monitor-1-analytics",
@@ -1307,22 +1169,13 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
                 monitors: [mockSite.monitors[1]], // Only monitor-2 remains
             };
 
-            (useSitesStore as any).mockReturnValue({
-                checkSiteNow: vi.fn(),
-                deleteSite: vi.fn(),
-                getSelectedMonitorId: vi.fn(() => "monitor-1"), // Stale ID
-                modifySite: vi.fn(),
-                removeMonitorFromSite: vi.fn(),
-                setSelectedMonitorId: mockSetSelectedMonitorId,
-                sites: [siteWithRemovedMonitor],
-                startSiteMonitoring: vi.fn(),
-                startSiteMonitorMonitoring: vi.fn(),
-                stopSiteMonitoring: vi.fn(),
-                stopSiteMonitorMonitoring: vi.fn(),
-                updateMonitorRetryAttempts: vi.fn(),
-                updateMonitorTimeout: vi.fn(),
-                updateSiteCheckInterval: vi.fn(),
-            });
+            useSitesStoreMockRef.current!.setState(
+                createSitesStoreMock({
+                    getSelectedMonitorId: vi.fn(() => "monitor-1"),
+                    setSelectedMonitorId: mockSetSelectedMonitorId,
+                    sites: [siteWithRemovedMonitor],
+                })
+            );
 
             renderHook(() => useSiteDetails({ site: siteWithRemovedMonitor }));
 
@@ -1437,22 +1290,13 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
 
             const mockUpdateSiteCheckInterval = vi.fn();
 
-            (useSitesStore as any).mockReturnValue({
-                checkSiteNow: vi.fn(),
-                deleteSite: vi.fn(),
-                getSelectedMonitorId: vi.fn(() => "monitor-1"),
-                modifySite: vi.fn(),
-                removeMonitorFromSite: vi.fn(),
-                setSelectedMonitorId: vi.fn(),
-                sites: [mockSite],
-                startSiteMonitoring: vi.fn(),
-                startSiteMonitorMonitoring: vi.fn(),
-                stopSiteMonitoring: vi.fn(),
-                stopSiteMonitorMonitoring: vi.fn(),
-                updateMonitorRetryAttempts: vi.fn(),
-                updateMonitorTimeout: vi.fn(),
-                updateSiteCheckInterval: mockUpdateSiteCheckInterval,
-            });
+            useSitesStoreMockRef.current!.setState(
+                createSitesStoreMock({
+                    getSelectedMonitorId: vi.fn(() => "monitor-1"),
+                    sites: [mockSite],
+                    updateSiteCheckInterval: mockUpdateSiteCheckInterval,
+                })
+            );
 
             const { result } = renderHook(() =>
                 useSiteDetails({ site: mockSite })

@@ -52,7 +52,6 @@ export async function initDatabase(
             operation: "initialize-database",
             timestamp: Date.now(),
         });
-        // Re-throw original error to preserve upstream expectations
-        throw error;
+        throw normalizedError;
     }
 }

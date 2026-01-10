@@ -85,11 +85,11 @@ describe("useSitesStore Function Coverage Tests", () => {
         vi.clearAllMocks();
 
         // Set up default mock responses to prevent hanging
-        mockElectronAPI.sites.getSites.mockResolvedValue([]);
-        mockElectronAPI.sites.addSite.mockResolvedValue(
+        vi.mocked(mockElectronAPI.sites.getSites).mockResolvedValue([]);
+        vi.mocked(mockElectronAPI.sites.addSite).mockResolvedValue(
             createValidSite("new-site")
         );
-        mockElectronAPI.sites.updateSite.mockImplementation(
+        vi.mocked(mockElectronAPI.sites.updateSite).mockImplementation(
             async (identifier: string, updates: Partial<Site>) =>
                 createValidSite(identifier, {
                     ...updates,
@@ -99,7 +99,7 @@ describe("useSitesStore Function Coverage Tests", () => {
                             : "Updated Site",
                 })
         );
-        mockElectronAPI.sites.removeSite.mockResolvedValue(true);
+        vi.mocked(mockElectronAPI.sites.removeSite).mockResolvedValue(true);
         mockStateSyncService.getSyncStatus.mockResolvedValue({
             lastSyncAt: Date.now(),
             siteCount: 0,
@@ -264,7 +264,12 @@ describe("useSitesStore Function Coverage Tests", () => {
     describe("Async Operations Function Coverage", () => {
         it("should exercise createSite operation", async () => {
             // Mock successful IPC response
-            mockElectronAPI.sites.addSite.mockResolvedValueOnce(undefined);
+            vi.mocked(mockElectronAPI.sites.addSite).mockResolvedValueOnce({
+                identifier: "new-site",
+                monitoring: true,
+                monitors: [],
+                name: "New Site",
+            });
 
             const store = useSitesStore.getState();
 
@@ -344,8 +349,10 @@ describe("useSitesStore Function Coverage Tests", () => {
             const updatedSite = createValidSite("site-id", {
                 name: "Updated Name",
             });
-            mockElectronAPI.sites.updateSite.mockResolvedValueOnce(updatedSite);
-            mockElectronAPI.sites.getSites.mockResolvedValueOnce([]);
+            vi.mocked(mockElectronAPI.sites.updateSite).mockResolvedValueOnce(
+                updatedSite
+            );
+            vi.mocked(mockElectronAPI.sites.getSites).mockResolvedValueOnce([]);
 
             const store = useSitesStore.getState();
 
@@ -383,11 +390,13 @@ describe("useSitesStore Function Coverage Tests", () => {
             store.addSite(testSite);
 
             // Mock deletion responses
-            mockElectronAPI.monitoring.stopMonitoringForSite.mockResolvedValueOnce(
+            vi.mocked(
+                mockElectronAPI.monitoring.stopMonitoringForSite
+            ).mockResolvedValueOnce(true);
+            vi.mocked(mockElectronAPI.sites.removeSite).mockResolvedValueOnce(
                 true
             );
-            mockElectronAPI.sites.removeSite.mockResolvedValueOnce(true);
-            mockElectronAPI.sites.getSites.mockResolvedValueOnce([]);
+            vi.mocked(mockElectronAPI.sites.getSites).mockResolvedValueOnce([]);
 
             // Test deleteSite
             await store.deleteSite("delete-site");

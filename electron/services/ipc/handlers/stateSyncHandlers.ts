@@ -11,7 +11,7 @@ import type { UptimeOrchestrator } from "../../../UptimeOrchestrator";
 
 import { logger } from "../../../utils/logger";
 import { createStandardizedIpcRegistrar } from "../utils";
-import { StateSyncHandlerValidators } from "../validators";
+import { StateSyncHandlerValidators } from "../validators/stateSync";
 
 /**
  * Dependencies required to register state synchronization IPC handlers.
@@ -40,7 +40,7 @@ export function registerStateSyncHandlers({
             const sites = await uptimeOrchestrator.getSites();
             const timestamp = Date.now();
 
-            const sanitizedSites =
+            const { revision, sites: sanitizedSites } =
                 await uptimeOrchestrator.emitSitesStateSynchronized({
                     action: STATE_SYNC_ACTION.BULK_SYNC,
                     siteIdentifier: "all",
@@ -66,6 +66,7 @@ export function registerStateSyncHandlers({
 
             return {
                 completedAt: timestamp,
+                revision,
                 siteCount: responseSites.length,
                 sites: responseSites,
                 source: STATE_SYNC_SOURCE.DATABASE,
@@ -107,7 +108,10 @@ export function registerStateSyncHandlers({
                   }
                 : {
                       lastSyncAt,
-                      siteCount: normalizedCachedSiteCount,
+                      siteCount: Math.max(
+                          normalizedCachedSiteCount,
+                          normalizedSiteCount
+                      ),
                       source: STATE_SYNC_SOURCE.CACHE,
                       synchronized: false,
                   };

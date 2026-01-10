@@ -8,7 +8,6 @@
  */
 
 import type { StatusUpdate } from "@shared/types";
-import type { UpdateStatusEventData } from "@shared/types/events";
 import type { JSX } from "react/jsx-runtime";
 
 import { isDevelopment, isProduction } from "@shared/utils/environment";
@@ -45,11 +44,11 @@ import { SidebarRevealButton } from "./components/Layout/SidebarRevealButton/Sid
 import { Settings } from "./components/Settings/Settings";
 import { SiteDetails } from "./components/SiteDetails/SiteDetails";
 import { UI_DELAYS } from "./constants";
+import { SIDEBAR_COLLAPSE_MEDIA_QUERY } from "./constants/layout";
 import { useBackendFocusSync } from "./hooks/useBackendFocusSync";
 import { useGlobalMonitoringMetrics } from "./hooks/useGlobalMonitoringMetrics";
 import { useMount } from "./hooks/useMount";
 import { useSelectedSite } from "./hooks/useSelectedSite";
-import { EventsService } from "./services/EventsService";
 import { logger } from "./services/logger";
 import { NotificationPreferenceService } from "./services/NotificationPreferenceService";
 import { useAlertStore } from "./stores/alerts/useAlertStore";
@@ -68,6 +67,10 @@ import { ThemeProvider } from "./theme/components/ThemeProvider";
 import { useTheme } from "./theme/useTheme";
 import { setupCacheSync } from "./utils/cacheSync";
 import { AppIcons } from "./utils/icons";
+import {
+    subscribeToMediaQueryListChanges,
+    tryGetMediaQueryList,
+} from "./utils/mediaQueries";
 
 // UI Message constants for consistency and future localization
 const UI_MESSAGES = {
@@ -81,8 +84,6 @@ const UI_MESSAGES = {
     UPDATE_ERROR_FALLBACK: "Update failed.",
     UPDATE_RESTART_BUTTON: "Restart Now",
 } as const;
-
-const SIDEBAR_COLLAPSE_MEDIA_QUERY = "(max-width: 1280px)";
 
 const warnMissingImplementation = (message: string): void => {
     if (isDevelopment()) {
@@ -223,6 +224,7 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
         applyUpdate,
         applyUpdateStatus,
         setUpdateError,
+        subscribeToUpdateStatusEvents,
         updateError,
         updateStatus,
     } = useUpdatesStore();
@@ -248,7 +250,9 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
     // Ref to store cache sync cleanup function
     const cacheSyncCleanupRef = useRef<(() => void) | null>(null);
     const syncEventsCleanupRef = useRef<(() => void) | null>(null);
+    const updateStatusEventsCleanupRef = useRef<(() => void) | null>(null);
     const sidebarMediaQueryRef = useRef<MediaQueryList | null>(null);
+    const sidebarMediaQueryUnsubscribeRef = useRef<(() => void) | null>(null);
     const settingsSubscriptionRef = useRef<(() => void) | null>(null);
     const debugSubscriptionsRef = useRef<Array<() => void>>([]);
     const settingsUpdateCountRef = useRef(0);
@@ -457,6 +461,14 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
                 );
             }
 
+            // Subscribe to app update status events (store-owned subscription)
+            logger.debug("[App:init] subscribing to update status events");
+            updateStatusEventsCleanupRef.current =
+                subscribeToUpdateStatusEvents();
+            logger.debug(
+                "[App:init] update status events subscription established"
+            );
+
             // Mark initialization as complete to enable loading overlay for future operations
             logger.debug(
                 "[App:init] initialization pipeline finished, marking initialized"
@@ -483,7 +495,7 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
                         "Failed to initialize application. Please restart and try again."
                 );
         }
-    }, []);
+    }, [subscribeToUpdateStatusEvents]);
 
     /**
      * Cleans up application resources when the component unmounts.
@@ -518,6 +530,11 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
         if (syncEventsCleanupRef.current) {
             syncEventsCleanupRef.current();
             syncEventsCleanupRef.current = null;
+        }
+
+        if (updateStatusEventsCleanupRef.current) {
+            updateStatusEventsCleanupRef.current();
+            updateStatusEventsCleanupRef.current = null;
         }
     }, []);
 
@@ -671,78 +688,8 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
         [systemNotificationsEnabled, systemNotificationsSoundEnabled]
     );
 
-    useEffect(
-        function subscribeToUpdateStatusEvents(): () => void {
-            const cleanupHandleRef: {
-                current: (() => void) | undefined;
-            } = {
-                current: undefined,
-            };
-            const cleanupRequestedRef: { current: boolean } = {
-                current: false,
-            };
-
-            const subscriptionPromise = (async (): Promise<
-                (() => void) | undefined
-            > => {
-                try {
-                    const cleanup = await EventsService.onUpdateStatus(
-                        ({ error, status }: UpdateStatusEventData) => {
-                            applyUpdateStatus(status);
-                            setUpdateError(error);
-                        }
-                    );
-
-                    if (cleanupRequestedRef.current) {
-                        cleanup();
-                        return cleanup;
-                    }
-
-                    cleanupHandleRef.current = cleanup;
-                    return cleanup;
-                } catch (error: unknown) {
-                    logger.error(
-                        "[App] Failed to subscribe to update status events",
-                        ensureError(error)
-                    );
-                    return undefined;
-                }
-            })();
-
-            return (): void => {
-                cleanupRequestedRef.current = true;
-
-                const cleanupHandle = cleanupHandleRef.current;
-                if (typeof cleanupHandle === "function") {
-                    try {
-                        cleanupHandle();
-                    } catch (error: unknown) {
-                        logger.error(
-                            "[App] Failed to cleanup update status subscription",
-                            ensureError(error)
-                        );
-                    }
-
-                    return;
-                }
-
-                void (async (): Promise<void> => {
-                    try {
-                        const deferredCleanup = await subscriptionPromise;
-                        if (typeof deferredCleanup === "function") {
-                            deferredCleanup();
-                        }
-                    } catch (error: unknown) {
-                        logger.error(
-                            "[App] Failed to cleanup deferred update status subscription",
-                            ensureError(error)
-                        );
-                    }
-                })();
-            };
-        },
-        [applyUpdateStatus, setUpdateError]
-    );
+    // Update status events are subscribed during the initialization pipeline
+    // via the UpdatesStore to keep event ownership consistent.
 
     // Focus-based state synchronization (disabled by default for performance)
     // eslint-disable-next-line n/no-sync -- Function name contains 'sync' but is not a synchronous file operation
@@ -759,30 +706,20 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
     );
 
     const cleanupSidebarListener = useCallback(() => {
-        const mediaQuery = sidebarMediaQueryRef.current;
-        if (!mediaQuery) {
-            return;
-        }
-
-        if (typeof mediaQuery.removeEventListener === "function") {
-            mediaQuery.removeEventListener(
-                "change",
-                handleSidebarBreakpointChange
-            );
-        }
+        sidebarMediaQueryUnsubscribeRef.current?.();
+        sidebarMediaQueryUnsubscribeRef.current = null;
         sidebarMediaQueryRef.current = null;
-    }, [handleSidebarBreakpointChange]);
+    }, []);
 
     useMount(
         useCallback(() => {
-            const { matchMedia } = globalThis as typeof globalThis & {
-                matchMedia?: (query: string) => MediaQueryList;
-            };
-            if (typeof matchMedia !== "function") {
+            const mediaQuery = tryGetMediaQueryList(
+                SIDEBAR_COLLAPSE_MEDIA_QUERY
+            );
+            if (!mediaQuery) {
                 return;
             }
 
-            const mediaQuery = matchMedia(SIDEBAR_COLLAPSE_MEDIA_QUERY);
             sidebarMediaQueryRef.current = mediaQuery;
             const { matches } = mediaQuery;
             if (typeof matches === "boolean") {
@@ -792,12 +729,11 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
                 }
             }
 
-            if (typeof mediaQuery.addEventListener === "function") {
-                mediaQuery.addEventListener(
-                    "change",
+            sidebarMediaQueryUnsubscribeRef.current =
+                subscribeToMediaQueryListChanges(
+                    mediaQuery,
                     handleSidebarBreakpointChange
                 );
-            }
         }, [handleSidebarBreakpointChange]),
         cleanupSidebarListener
     );
@@ -805,14 +741,9 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
     // Auto-dismiss the navigation drawer on compact viewports once focus leaves it.
     useEffect(
         function handleCompactSidebarAutoDismissal(): () => void {
-            const { matchMedia } = globalThis as typeof globalThis & {
-                matchMedia?: (query: string) => MediaQueryList;
-            };
             const mediaQuery =
                 sidebarMediaQueryRef.current ??
-                (typeof matchMedia === "function"
-                    ? matchMedia(SIDEBAR_COLLAPSE_MEDIA_QUERY)
-                    : undefined);
+                tryGetMediaQueryList(SIDEBAR_COLLAPSE_MEDIA_QUERY);
 
             if (!isSidebarOpen || !(mediaQuery?.matches ?? false)) {
                 return () => {};
