@@ -529,7 +529,7 @@ describe("Console Statement Remediation", () => {
 // Example replacement script (manual review required)
 function replaceConsoleStatements(fileContent: string): string {
     let result = fileContent;
-    
+
     // Add logger import if not present
     if (!result.includes('import logger') && !result.includes('from "../services/logger"')) {
         const importSection = result.match(/^(import[^;]+;\s*)+/m);
@@ -537,7 +537,7 @@ function replaceConsoleStatements(fileContent: string): string {
             result = result.replace(importSection[0], importSection[0] + 'import logger from "../services/logger";\n');
         }
     }
-    
+
     // Apply replacements (requires manual review)
     ${replacementPatterns
         .map(
@@ -545,7 +545,7 @@ function replaceConsoleStatements(fileContent: string): string {
                 `result = result.replace(${pattern}, '${replacement}');`
         )
         .join(String.raw`\n    `)}
-    
+
     return result;
 }
 `;

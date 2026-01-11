@@ -224,7 +224,7 @@ import globals from "globals";
 import jsoncEslintParser from "jsonc-eslint-parser";
 import { createRequire } from "node:module";
 import * as path from "node:path";
-import tomlEslintParser from "toml-eslint-parser";
+import * as tomlEslintParser from "toml-eslint-parser";
 import yamlEslintParser from "yaml-eslint-parser";
 
 import uptimeWatcherPlugin from "./config/linting/plugins/uptime-watcher.mjs";
@@ -2540,6 +2540,46 @@ export default /** @type {EslintConfig} */[
             "sort-destructure-keys/sort-destructure-keys": "off",
             "sort-imports": "off",
             "sort-keys": "off",
+            "unicorn/import-style": [
+                "error",
+                {
+                  styles: {
+                    // ─────────────────────────────────────────────────────────────
+                    // Node “path-like” modules: allow ONLY namespace imports
+                    // (prevents `import path from "node:path"` which relies on default interop)
+                    // ─────────────────────────────────────────────────────────────
+                    "node:path": { default: false, namespace: true },
+                    "path": { default: false, namespace: true }, // just in case any non-node: path remains
+                    "node:path/posix": { default: false, namespace: true },
+                    "node:path/win32": { default: false, namespace: true },
+
+                    // ─────────────────────────────────────────────────────────────
+                    // Filesystem: disallow default imports, but allow named + namespace
+                    // (named is ergonomic; namespace is useful for vi.spyOn(fs, "..."))
+                    // ─────────────────────────────────────────────────────────────
+                    "node:fs": { default: false, named: true, namespace: true },
+                    "fs": { default: false, named: true, namespace: true },
+                    "node:fs/promises": { default: false, named: true, namespace: true },
+
+                    // ─────────────────────────────────────────────────────────────
+                    // util: keep unicorn’s intent (named only)
+                    // ─────────────────────────────────────────────────────────────
+                    "node:util": { named: true },
+                    "util": { named: true },
+
+                    // ─────────────────────────────────────────────────────────────
+                    // timers/promises: named is the common usage
+                    // ─────────────────────────────────────────────────────────────
+                    "node:timers/promises": { named: true },
+
+                    // ─────────────────────────────────────────────────────────────
+                    // crypto: disallow default imports, allow named + namespace
+                    // (named is most common; namespace is sometimes handy)
+                    // ─────────────────────────────────────────────────────────────
+                    "node:crypto": { default: false, named: true, namespace: true },
+                  },
+                },
+              ],
             "sort-keys-fix/sort-keys-fix": "off",
             "sql-template/no-unsafe-query": "error",
             "ssr-friendly/no-dom-globals-in-constructor": "error",
@@ -4117,6 +4157,46 @@ export default /** @type {EslintConfig} */[
             "sort-destructure-keys/sort-destructure-keys": "off",
             "sort-imports": "off",
             "sort-keys": "off",
+            "unicorn/import-style": [
+                "error",
+                {
+                  styles: {
+                    // ─────────────────────────────────────────────────────────────
+                    // Node “path-like” modules: allow ONLY namespace imports
+                    // (prevents `import path from "node:path"` which relies on default interop)
+                    // ─────────────────────────────────────────────────────────────
+                    "node:path": { default: false, namespace: true },
+                    "path": { default: false, namespace: true }, // just in case any non-node: path remains
+                    "node:path/posix": { default: false, namespace: true },
+                    "node:path/win32": { default: false, namespace: true },
+
+                    // ─────────────────────────────────────────────────────────────
+                    // Filesystem: disallow default imports, but allow named + namespace
+                    // (named is ergonomic; namespace is useful for vi.spyOn(fs, "..."))
+                    // ─────────────────────────────────────────────────────────────
+                    "node:fs": { default: false, named: true, namespace: true },
+                    "fs": { default: false, named: true, namespace: true },
+                    "node:fs/promises": { default: false, named: true, namespace: true },
+
+                    // ─────────────────────────────────────────────────────────────
+                    // util: keep unicorn’s intent (named only)
+                    // ─────────────────────────────────────────────────────────────
+                    "node:util": { named: true },
+                    "util": { named: true },
+
+                    // ─────────────────────────────────────────────────────────────
+                    // timers/promises: named is the common usage
+                    // ─────────────────────────────────────────────────────────────
+                    "node:timers/promises": { named: true },
+
+                    // ─────────────────────────────────────────────────────────────
+                    // crypto: disallow default imports, allow named + namespace
+                    // (named is most common; namespace is sometimes handy)
+                    // ─────────────────────────────────────────────────────────────
+                    "node:crypto": { default: false, named: true, namespace: true },
+                  },
+                },
+              ],
             "sort-keys-fix/sort-keys-fix": "off",
             "sort-react-dependency-arrays/sort": "error",
             "sql-template/no-unsafe-query": "error",
@@ -5515,6 +5595,46 @@ export default /** @type {EslintConfig} */[
             "sort-destructure-keys/sort-destructure-keys": "off",
             "sort-imports": "off",
             "sort-keys": "off",
+            "unicorn/import-style": [
+                "error",
+                {
+                  styles: {
+                    // ─────────────────────────────────────────────────────────────
+                    // Node “path-like” modules: allow ONLY namespace imports
+                    // (prevents `import path from "node:path"` which relies on default interop)
+                    // ─────────────────────────────────────────────────────────────
+                    "node:path": { default: false, namespace: true },
+                    "path": { default: false, namespace: true }, // just in case any non-node: path remains
+                    "node:path/posix": { default: false, namespace: true },
+                    "node:path/win32": { default: false, namespace: true },
+
+                    // ─────────────────────────────────────────────────────────────
+                    // Filesystem: disallow default imports, but allow named + namespace
+                    // (named is ergonomic; namespace is useful for vi.spyOn(fs, "..."))
+                    // ─────────────────────────────────────────────────────────────
+                    "node:fs": { default: false, named: true, namespace: true },
+                    "fs": { default: false, named: true, namespace: true },
+                    "node:fs/promises": { default: false, named: true, namespace: true },
+
+                    // ─────────────────────────────────────────────────────────────
+                    // util: keep unicorn’s intent (named only)
+                    // ─────────────────────────────────────────────────────────────
+                    "node:util": { named: true },
+                    "util": { named: true },
+
+                    // ─────────────────────────────────────────────────────────────
+                    // timers/promises: named is the common usage
+                    // ─────────────────────────────────────────────────────────────
+                    "node:timers/promises": { named: true },
+
+                    // ─────────────────────────────────────────────────────────────
+                    // crypto: disallow default imports, allow named + namespace
+                    // (named is most common; namespace is sometimes handy)
+                    // ─────────────────────────────────────────────────────────────
+                    "node:crypto": { default: false, named: true, namespace: true },
+                  },
+                },
+              ],
             "sort-keys-fix/sort-keys-fix": "off",
             "sql-template/no-unsafe-query": "error",
             "ssr-friendly/no-dom-globals-in-constructor": "error",
@@ -7123,6 +7243,46 @@ export default /** @type {EslintConfig} */[
             "sort-destructure-keys/sort-destructure-keys": "off",
             "sort-imports": "off",
             "sort-keys": "off",
+            "unicorn/import-style": [
+                "error",
+                {
+                  styles: {
+                    // ─────────────────────────────────────────────────────────────
+                    // Node “path-like” modules: allow ONLY namespace imports
+                    // (prevents `import path from "node:path"` which relies on default interop)
+                    // ─────────────────────────────────────────────────────────────
+                    "node:path": { default: false, namespace: true },
+                    "path": { default: false, namespace: true }, // just in case any non-node: path remains
+                    "node:path/posix": { default: false, namespace: true },
+                    "node:path/win32": { default: false, namespace: true },
+
+                    // ─────────────────────────────────────────────────────────────
+                    // Filesystem: disallow default imports, but allow named + namespace
+                    // (named is ergonomic; namespace is useful for vi.spyOn(fs, "..."))
+                    // ─────────────────────────────────────────────────────────────
+                    "node:fs": { default: false, named: true, namespace: true },
+                    "fs": { default: false, named: true, namespace: true },
+                    "node:fs/promises": { default: false, named: true, namespace: true },
+
+                    // ─────────────────────────────────────────────────────────────
+                    // util: keep unicorn’s intent (named only)
+                    // ─────────────────────────────────────────────────────────────
+                    "node:util": { named: true },
+                    "util": { named: true },
+
+                    // ─────────────────────────────────────────────────────────────
+                    // timers/promises: named is the common usage
+                    // ─────────────────────────────────────────────────────────────
+                    "node:timers/promises": { named: true },
+
+                    // ─────────────────────────────────────────────────────────────
+                    // crypto: disallow default imports, allow named + namespace
+                    // (named is most common; namespace is sometimes handy)
+                    // ─────────────────────────────────────────────────────────────
+                    "node:crypto": { default: false, named: true, namespace: true },
+                  },
+                },
+              ],
             "sort-keys-fix/sort-keys-fix": "off",
             "sort-react-dependency-arrays/sort": "error",
             "sql-template/no-unsafe-query": "error",
@@ -7464,6 +7624,46 @@ export default /** @type {EslintConfig} */[
             "require-unicode-regexp": "off",
             "sort-imports": "off",
             "sort-keys": "off",
+            "unicorn/import-style": [
+                "error",
+                {
+                  styles: {
+                    // ─────────────────────────────────────────────────────────────
+                    // Node “path-like” modules: allow ONLY namespace imports
+                    // (prevents `import path from "node:path"` which relies on default interop)
+                    // ─────────────────────────────────────────────────────────────
+                    "node:path": { default: false, namespace: true },
+                    "path": { default: false, namespace: true }, // just in case any non-node: path remains
+                    "node:path/posix": { default: false, namespace: true },
+                    "node:path/win32": { default: false, namespace: true },
+
+                    // ─────────────────────────────────────────────────────────────
+                    // Filesystem: disallow default imports, but allow named + namespace
+                    // (named is ergonomic; namespace is useful for vi.spyOn(fs, "..."))
+                    // ─────────────────────────────────────────────────────────────
+                    "node:fs": { default: false, named: true, namespace: true },
+                    "fs": { default: false, named: true, namespace: true },
+                    "node:fs/promises": { default: false, named: true, namespace: true },
+
+                    // ─────────────────────────────────────────────────────────────
+                    // util: keep unicorn’s intent (named only)
+                    // ─────────────────────────────────────────────────────────────
+                    "node:util": { named: true },
+                    "util": { named: true },
+
+                    // ─────────────────────────────────────────────────────────────
+                    // timers/promises: named is the common usage
+                    // ─────────────────────────────────────────────────────────────
+                    "node:timers/promises": { named: true },
+
+                    // ─────────────────────────────────────────────────────────────
+                    // crypto: disallow default imports, allow named + namespace
+                    // (named is most common; namespace is sometimes handy)
+                    // ─────────────────────────────────────────────────────────────
+                    "node:crypto": { default: false, named: true, namespace: true },
+                  },
+                },
+              ],
             "testing-library/await-async-queries": "error",
             "testing-library/no-await-sync-queries": "error",
             "testing-library/no-debugging-utils": "off",
@@ -7697,6 +7897,46 @@ export default /** @type {EslintConfig} */[
             "require-unicode-regexp": "off",
             "sort-imports": "off",
             "sort-keys": "off",
+            "unicorn/import-style": [
+                "error",
+                {
+                  styles: {
+                    // ─────────────────────────────────────────────────────────────
+                    // Node “path-like” modules: allow ONLY namespace imports
+                    // (prevents `import path from "node:path"` which relies on default interop)
+                    // ─────────────────────────────────────────────────────────────
+                    "node:path": { default: false, namespace: true },
+                    "path": { default: false, namespace: true }, // just in case any non-node: path remains
+                    "node:path/posix": { default: false, namespace: true },
+                    "node:path/win32": { default: false, namespace: true },
+
+                    // ─────────────────────────────────────────────────────────────
+                    // Filesystem: disallow default imports, but allow named + namespace
+                    // (named is ergonomic; namespace is useful for vi.spyOn(fs, "..."))
+                    // ─────────────────────────────────────────────────────────────
+                    "node:fs": { default: false, named: true, namespace: true },
+                    "fs": { default: false, named: true, namespace: true },
+                    "node:fs/promises": { default: false, named: true, namespace: true },
+
+                    // ─────────────────────────────────────────────────────────────
+                    // util: keep unicorn’s intent (named only)
+                    // ─────────────────────────────────────────────────────────────
+                    "node:util": { named: true },
+                    "util": { named: true },
+
+                    // ─────────────────────────────────────────────────────────────
+                    // timers/promises: named is the common usage
+                    // ─────────────────────────────────────────────────────────────
+                    "node:timers/promises": { named: true },
+
+                    // ─────────────────────────────────────────────────────────────
+                    // crypto: disallow default imports, allow named + namespace
+                    // (named is most common; namespace is sometimes handy)
+                    // ─────────────────────────────────────────────────────────────
+                    "node:crypto": { default: false, named: true, namespace: true },
+                  },
+                },
+              ],
             "testing-library/await-async-queries": "error",
             "testing-library/no-await-sync-queries": "error",
             "testing-library/no-debugging-utils": "off",
@@ -7905,6 +8145,46 @@ export default /** @type {EslintConfig} */[
             "require-unicode-regexp": "off",
             "sort-imports": "off",
             "sort-keys": "off",
+            "unicorn/import-style": [
+                "error",
+                {
+                  styles: {
+                    // ─────────────────────────────────────────────────────────────
+                    // Node “path-like” modules: allow ONLY namespace imports
+                    // (prevents `import path from "node:path"` which relies on default interop)
+                    // ─────────────────────────────────────────────────────────────
+                    "node:path": { default: false, namespace: true },
+                    "path": { default: false, namespace: true }, // just in case any non-node: path remains
+                    "node:path/posix": { default: false, namespace: true },
+                    "node:path/win32": { default: false, namespace: true },
+
+                    // ─────────────────────────────────────────────────────────────
+                    // Filesystem: disallow default imports, but allow named + namespace
+                    // (named is ergonomic; namespace is useful for vi.spyOn(fs, "..."))
+                    // ─────────────────────────────────────────────────────────────
+                    "node:fs": { default: false, named: true, namespace: true },
+                    "fs": { default: false, named: true, namespace: true },
+                    "node:fs/promises": { default: false, named: true, namespace: true },
+
+                    // ─────────────────────────────────────────────────────────────
+                    // util: keep unicorn’s intent (named only)
+                    // ─────────────────────────────────────────────────────────────
+                    "node:util": { named: true },
+                    "util": { named: true },
+
+                    // ─────────────────────────────────────────────────────────────
+                    // timers/promises: named is the common usage
+                    // ─────────────────────────────────────────────────────────────
+                    "node:timers/promises": { named: true },
+
+                    // ─────────────────────────────────────────────────────────────
+                    // crypto: disallow default imports, allow named + namespace
+                    // (named is most common; namespace is sometimes handy)
+                    // ─────────────────────────────────────────────────────────────
+                    "node:crypto": { default: false, named: true, namespace: true },
+                  },
+                },
+              ],
             "testing-library/await-async-queries": "error",
             "testing-library/no-await-sync-queries": "error",
             "testing-library/no-debugging-utils": "off",
@@ -8139,6 +8419,46 @@ export default /** @type {EslintConfig} */[
             "require-unicode-regexp": "off",
             "sort-imports": "off",
             "sort-keys": "off",
+            "unicorn/import-style": [
+                "error",
+                {
+                  styles: {
+                    // ─────────────────────────────────────────────────────────────
+                    // Node “path-like” modules: allow ONLY namespace imports
+                    // (prevents `import path from "node:path"` which relies on default interop)
+                    // ─────────────────────────────────────────────────────────────
+                    "node:path": { default: false, namespace: true },
+                    "path": { default: false, namespace: true }, // just in case any non-node: path remains
+                    "node:path/posix": { default: false, namespace: true },
+                    "node:path/win32": { default: false, namespace: true },
+
+                    // ─────────────────────────────────────────────────────────────
+                    // Filesystem: disallow default imports, but allow named + namespace
+                    // (named is ergonomic; namespace is useful for vi.spyOn(fs, "..."))
+                    // ─────────────────────────────────────────────────────────────
+                    "node:fs": { default: false, named: true, namespace: true },
+                    "fs": { default: false, named: true, namespace: true },
+                    "node:fs/promises": { default: false, named: true, namespace: true },
+
+                    // ─────────────────────────────────────────────────────────────
+                    // util: keep unicorn’s intent (named only)
+                    // ─────────────────────────────────────────────────────────────
+                    "node:util": { named: true },
+                    "util": { named: true },
+
+                    // ─────────────────────────────────────────────────────────────
+                    // timers/promises: named is the common usage
+                    // ─────────────────────────────────────────────────────────────
+                    "node:timers/promises": { named: true },
+
+                    // ─────────────────────────────────────────────────────────────
+                    // crypto: disallow default imports, allow named + namespace
+                    // (named is most common; namespace is sometimes handy)
+                    // ─────────────────────────────────────────────────────────────
+                    "node:crypto": { default: false, named: true, namespace: true },
+                  },
+                },
+              ],
             "unicorn/consistent-function-scoping": "off",
             "unicorn/filename-case": "off", // Allow benchmark files to have any case
 
@@ -8705,6 +9025,46 @@ export default /** @type {EslintConfig} */[
             "sonarjs/too-many-break-or-continue-in-loop": "warn",
             "sort-imports": "off",
             "sort-keys": "off",
+            "unicorn/import-style": [
+                "error",
+                {
+                  styles: {
+                    // ─────────────────────────────────────────────────────────────
+                    // Node “path-like” modules: allow ONLY namespace imports
+                    // (prevents `import path from "node:path"` which relies on default interop)
+                    // ─────────────────────────────────────────────────────────────
+                    "node:path": { default: false, namespace: true },
+                    "path": { default: false, namespace: true }, // just in case any non-node: path remains
+                    "node:path/posix": { default: false, namespace: true },
+                    "node:path/win32": { default: false, namespace: true },
+
+                    // ─────────────────────────────────────────────────────────────
+                    // Filesystem: disallow default imports, but allow named + namespace
+                    // (named is ergonomic; namespace is useful for vi.spyOn(fs, "..."))
+                    // ─────────────────────────────────────────────────────────────
+                    "node:fs": { default: false, named: true, namespace: true },
+                    "fs": { default: false, named: true, namespace: true },
+                    "node:fs/promises": { default: false, named: true, namespace: true },
+
+                    // ─────────────────────────────────────────────────────────────
+                    // util: keep unicorn’s intent (named only)
+                    // ─────────────────────────────────────────────────────────────
+                    "node:util": { named: true },
+                    "util": { named: true },
+
+                    // ─────────────────────────────────────────────────────────────
+                    // timers/promises: named is the common usage
+                    // ─────────────────────────────────────────────────────────────
+                    "node:timers/promises": { named: true },
+
+                    // ─────────────────────────────────────────────────────────────
+                    // crypto: disallow default imports, allow named + namespace
+                    // (named is most common; namespace is sometimes handy)
+                    // ─────────────────────────────────────────────────────────────
+                    "node:crypto": { default: false, named: true, namespace: true },
+                  },
+                },
+              ],
             "tsdoc-require/require": "warn", // Backend-specific unicorn rules
             // Documentation
             "tsdoc/syntax": "warn",
@@ -8902,6 +9262,46 @@ export default /** @type {EslintConfig} */[
             "require-unicode-regexp": "off",
             "sort-imports": "off",
             "sort-keys": "off",
+            "unicorn/import-style": [
+                "error",
+                {
+                  styles: {
+                    // ─────────────────────────────────────────────────────────────
+                    // Node “path-like” modules: allow ONLY namespace imports
+                    // (prevents `import path from "node:path"` which relies on default interop)
+                    // ─────────────────────────────────────────────────────────────
+                    "node:path": { default: false, namespace: true },
+                    "path": { default: false, namespace: true }, // just in case any non-node: path remains
+                    "node:path/posix": { default: false, namespace: true },
+                    "node:path/win32": { default: false, namespace: true },
+
+                    // ─────────────────────────────────────────────────────────────
+                    // Filesystem: disallow default imports, but allow named + namespace
+                    // (named is ergonomic; namespace is useful for vi.spyOn(fs, "..."))
+                    // ─────────────────────────────────────────────────────────────
+                    "node:fs": { default: false, named: true, namespace: true },
+                    "fs": { default: false, named: true, namespace: true },
+                    "node:fs/promises": { default: false, named: true, namespace: true },
+
+                    // ─────────────────────────────────────────────────────────────
+                    // util: keep unicorn’s intent (named only)
+                    // ─────────────────────────────────────────────────────────────
+                    "node:util": { named: true },
+                    "util": { named: true },
+
+                    // ─────────────────────────────────────────────────────────────
+                    // timers/promises: named is the common usage
+                    // ─────────────────────────────────────────────────────────────
+                    "node:timers/promises": { named: true },
+
+                    // ─────────────────────────────────────────────────────────────
+                    // crypto: disallow default imports, allow named + namespace
+                    // (named is most common; namespace is sometimes handy)
+                    // ─────────────────────────────────────────────────────────────
+                    "node:crypto": { default: false, named: true, namespace: true },
+                  },
+                },
+              ],
             "unicorn/consistent-function-scoping": "off",
             "unicorn/filename-case": "off", // Allow benchmark files to have any case
 
@@ -9210,6 +9610,46 @@ export default /** @type {EslintConfig} */[
             "sonarjs/too-many-break-or-continue-in-loop": "warn",
             "sort-imports": "off",
             "sort-keys": "off",
+            "unicorn/import-style": [
+                "error",
+                {
+                  styles: {
+                    // ─────────────────────────────────────────────────────────────
+                    // Node “path-like” modules: allow ONLY namespace imports
+                    // (prevents `import path from "node:path"` which relies on default interop)
+                    // ─────────────────────────────────────────────────────────────
+                    "node:path": { default: false, namespace: true },
+                    "path": { default: false, namespace: true }, // just in case any non-node: path remains
+                    "node:path/posix": { default: false, namespace: true },
+                    "node:path/win32": { default: false, namespace: true },
+
+                    // ─────────────────────────────────────────────────────────────
+                    // Filesystem: disallow default imports, but allow named + namespace
+                    // (named is ergonomic; namespace is useful for vi.spyOn(fs, "..."))
+                    // ─────────────────────────────────────────────────────────────
+                    "node:fs": { default: false, named: true, namespace: true },
+                    "fs": { default: false, named: true, namespace: true },
+                    "node:fs/promises": { default: false, named: true, namespace: true },
+
+                    // ─────────────────────────────────────────────────────────────
+                    // util: keep unicorn’s intent (named only)
+                    // ─────────────────────────────────────────────────────────────
+                    "node:util": { named: true },
+                    "util": { named: true },
+
+                    // ─────────────────────────────────────────────────────────────
+                    // timers/promises: named is the common usage
+                    // ─────────────────────────────────────────────────────────────
+                    "node:timers/promises": { named: true },
+
+                    // ─────────────────────────────────────────────────────────────
+                    // crypto: disallow default imports, allow named + namespace
+                    // (named is most common; namespace is sometimes handy)
+                    // ─────────────────────────────────────────────────────────────
+                    "node:crypto": { default: false, named: true, namespace: true },
+                  },
+                },
+              ],
             "unicorn/consistent-function-scoping": "off", // Configs often use different scoping
             "unicorn/filename-case": "off", // Allow config files to have any case
             "unicorn/no-await-expression-member": "off", // Allow await in config expressions
@@ -9807,33 +10247,7 @@ export default /** @type {EslintConfig} */[
             "unicorn/no-instanceof-array": "off",
             "unicorn/no-length-as-slice-end": "off",
             "unicorn/prefer-spread": "off", // Prefer Array.from
-            "unicorn/import-style": [
-                "error",
-                {
-                  styles: {
-                    // Node “path-like” modules: prefer namespace import, allow only that.
-                    "node:path": { namespace: true },
-                    "path": { namespace: true }, // in case some file still uses non-node: specifier
-                    "node:path/posix": { namespace: true },
-                    "node:path/win32": { namespace: true },
 
-                    // Filesystem: namespace import is also fine/consistent with our approach.
-                    "node:fs": { namespace: true },
-                    "fs": { namespace: true },
-                    "node:fs/promises": { namespace: true },
-
-                    // Let util stay “named only” (unicorn default) OR explicitly require named:
-                    "node:util": { named: true },
-                    "util": { named: true },
-
-                    // Timers/promises is typically named imports (`setTimeout as sleep`, etc.)
-                    "node:timers/promises": { named: true },
-
-                    // Crypto: usually named imports (randomUUID, createHash, etc.)
-                    "node:crypto": { named: true },
-                  },
-                },
-              ],
             "write-good-comments/write-good-comments": "off", // Too strict
         },
     }, // eslint-config-prettier MUST be last to override conflicting rules
