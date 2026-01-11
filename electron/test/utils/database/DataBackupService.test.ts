@@ -21,6 +21,10 @@ import * as path from "node:path";
 const mockFsPromises = vi.hoisted(() => ({
     copyFile: vi.fn(),
     mkdtemp: vi.fn(),
+    open: vi.fn(async () => ({
+        close: vi.fn(async () => undefined),
+        sync: vi.fn(async () => undefined),
+    })),
     rename: vi.fn(),
     rm: vi.fn(),
     writeFile: vi.fn(),

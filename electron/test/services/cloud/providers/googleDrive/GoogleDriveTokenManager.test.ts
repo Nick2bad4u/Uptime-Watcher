@@ -7,6 +7,10 @@ const axiosPost = vi.hoisted(() => vi.fn());
 
 vi.mock("axios", () => ({
     default: {
+        isAxiosError: (candidate: unknown): boolean =>
+            typeof candidate === "object" &&
+            candidate !== null &&
+            Boolean((candidate as { isAxiosError?: unknown }).isAxiosError),
         post: axiosPost,
     },
 }));
@@ -72,6 +76,42 @@ describe(GoogleDriveTokenManager, () => {
         );
     });
 
+    it("deduplicates concurrent refreshes", async () => {
+        vi.useFakeTimers();
+        vi.setSystemTime(new Date("2025-01-01T00:00:00.000Z"));
+
+        const secretStore = new InMemorySecretStore();
+        const manager = new GoogleDriveTokenManager({
+            clientId: "client-id",
+            secretStore,
+            storageKey: "cloud.googleDrive.tokens",
+        });
+
+        await manager.setTokens({
+            accessToken: "old-access",
+            expiresAt: Date.now() - 1,
+            refreshToken: "refresh",
+        });
+
+        axiosPost.mockResolvedValueOnce({
+            data: {
+                access_token: "new-access",
+                expires_in: 3600,
+            },
+        });
+
+        const [token1, token2] = await Promise.all([
+            manager.getValidAccessToken(),
+            manager.getValidAccessToken(),
+        ]);
+
+        expect(token1).toBe("new-access");
+        expect(token2).toBe("new-access");
+        expect(axiosPost).toHaveBeenCalledTimes(1);
+
+        vi.useRealTimers();
+    });
+
     it("revoke is best-effort and always clears stored tokens", async () => {
         const secretStore = new InMemorySecretStore();
         const manager = new GoogleDriveTokenManager({
@@ -120,5 +160,44 @@ describe(GoogleDriveTokenManager, () => {
         );
 
         await expect(manager.getTokens()).resolves.toBeUndefined();
+    });
+
+    it("redacts secrets from OAuth refresh error details", async () => {
+        const secretStore = new InMemorySecretStore();
+        const manager = new GoogleDriveTokenManager({
+            clientId: "client-id",
+            secretStore,
+            storageKey: "cloud.googleDrive.tokens",
+        });
+
+        await manager.setTokens({
+            accessToken: "old-access",
+            expiresAt: Date.now() - 1,
+            refreshToken: "SUPER_SECRET_REFRESH_TOKEN",
+        });
+
+        axiosPost.mockRejectedValueOnce({
+            isAxiosError: true,
+            response: {
+                data: {
+                    error: "invalid_grant",
+                    error_description:
+                        "refresh_token=SUPER_SECRET_REFRESH_TOKEN was rejected",
+                },
+            },
+        });
+
+        let thrown: unknown;
+        try {
+            await manager.getValidAccessToken();
+        } catch (error) {
+            thrown = error;
+        }
+
+        expect(thrown).toBeInstanceOf(Error);
+        const message = (thrown as Error).message;
+        expect(message).toMatch(/google oauth refresh failed/i);
+        expect(message).not.toContain("SUPER_SECRET_REFRESH_TOKEN");
+        expect(message).toContain("refresh_token=[redacted]");
     });
 });

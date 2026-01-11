@@ -1,4 +1,5 @@
 import { ERROR_CATALOG } from "./errorCatalog";
+import { normalizeLogValue } from "./loggingContext";
 import { isRecord } from "./typeHelpers";
 
 /**
@@ -15,18 +16,21 @@ import { isRecord } from "./typeHelpers";
  */
 export function getUserFacingErrorDetail(error: unknown): string {
     if (error instanceof Error) {
-        return error.message;
+        const normalized = normalizeLogValue(error.message);
+        return typeof normalized === "string" ? normalized : error.message;
     }
 
     if (isRecord(error)) {
         const messageCandidate = error["message"];
         if (typeof messageCandidate === "string") {
-            return messageCandidate;
+            const normalized = normalizeLogValue(messageCandidate);
+            return typeof normalized === "string" ? normalized : messageCandidate;
         }
     }
 
     if (typeof error === "string") {
-        return error;
+        const normalized = normalizeLogValue(error);
+        return typeof normalized === "string" ? normalized : error;
     }
 
     if (typeof error === "number" || typeof error === "bigint") {

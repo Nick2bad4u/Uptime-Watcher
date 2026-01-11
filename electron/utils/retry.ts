@@ -3,7 +3,7 @@
  * operations.
  *
  * @remarks
- * Provides configurable retry logic with exponential backoff for robust error
+ * Provides configurable retry logic with a fixed delay between attempts for robust error
  * handling in backend operations. Useful for dealing with temporary network
  * issues, database locks, or other transient failures.
  *
@@ -56,12 +56,21 @@ export async function withRetry<T>(
         operationName?: string;
     } = {}
 ): Promise<T> {
-    const {
-        delayMs = 300,
-        maxRetries = 5,
-        onError,
-        operationName = "operation",
-    } = options;
+    const operationName = options.operationName ?? "operation";
+    const {onError} = options;
+
+    // Treat negative delays as 0 to avoid scheduling oddities.
+    const delayMs = Math.max(0, options.delayMs ?? 300);
+
+    // `maxRetries` is actually the maximum number of attempts (including the
+    // first attempt). A value <= 0 would otherwise result in a silent
+    // `throw undefined` and makes the retry contract nonsensical.
+    const maxRetries = options.maxRetries ?? 5;
+    if (!Number.isFinite(maxRetries) || maxRetries <= 0) {
+        throw new Error(
+            `[withRetry] maxRetries must be a positive number (received ${String(maxRetries)})`
+        );
+    }
 
     const errors: unknown[] = [];
 
@@ -73,7 +82,14 @@ export async function withRetry<T>(
             errors.push(error);
 
             if (onError) {
-                onError(error, attempt + 1);
+                try {
+                    onError(error, attempt + 1);
+                } catch (callbackError) {
+                    dbLogger.error(
+                        `${operationName} onError callback threw (attempt ${attempt + 1}/${maxRetries})`,
+                        callbackError
+                    );
+                }
             } else {
                 dbLogger.error(
                     `${operationName} failed (attempt ${attempt + 1}/${maxRetries})`,

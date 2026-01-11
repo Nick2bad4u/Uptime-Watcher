@@ -73,6 +73,53 @@ describe(DropboxTokenManager, () => {
         vi.useRealTimers();
     });
 
+    it("deduplicates concurrent refreshes", async () => {
+        vi.useFakeTimers();
+        vi.setSystemTime(new Date("2025-01-01T00:00:00.000Z"));
+
+        const secretStore = new InMemorySecretStore();
+
+        const refreshAccessToken = vi.fn(async () => undefined);
+        const getAccessToken = vi.fn(() => "new-access");
+        const getAccessTokenExpiresAt = vi.fn(
+            () => new Date(Date.now() + 3_600_000)
+        );
+
+        const manager = new DropboxTokenManager({
+            appKey: "app-key",
+            secretStore,
+            tokenStorageKey: "cloud.dropbox.tokens",
+            authFactory: () =>
+                ({
+                    getAccessToken,
+                    getAccessTokenExpiresAt,
+                    getRefreshToken: () => "refresh",
+                    refreshAccessToken,
+                    setAccessToken: () => {},
+                    setAccessTokenExpiresAt: () => {},
+                    setClientId: () => {},
+                    setRefreshToken: () => {},
+                }) as never,
+        });
+
+        await manager.storeTokens({
+            accessToken: "old-access",
+            expiresAtEpochMs: Date.now() - 1,
+            refreshToken: "refresh",
+        });
+
+        const [token1, token2] = await Promise.all([
+            manager.getAccessToken(),
+            manager.getAccessToken(),
+        ]);
+
+        expect(token1).toBe("new-access");
+        expect(token2).toBe("new-access");
+        expect(refreshAccessToken).toHaveBeenCalledTimes(1);
+
+        vi.useRealTimers();
+    });
+
     it("treats invalid stored JSON as disconnected", async () => {
         const secretStore = new InMemorySecretStore();
 

@@ -587,11 +587,18 @@ export class DataBackupService {
         let copyError: Error | undefined = undefined;
 
         try {
+            // Stage the incoming DB first to reduce the time window where
+            // `targetPath` is missing. This also ensures we never move the live
+            // DB aside unless we have a fully-written replacement ready.
+            await fs.copyFile(sourcePath, incomingPath);
+            await this.syncFileSafely(incomingPath);
+
             // Move the existing DB out of the way (so rename into place is safe).
             try {
                 // eslint-disable-next-line security/detect-non-literal-fs-filename -- rollbackPath is derived from the trusted DB path with a controlled suffix.
                 await fs.rename(targetPath, rollbackPath);
                 hadExistingTarget = true;
+                await this.syncDirectorySafely(targetDir);
             } catch (error) {
                 if (isErrnoWithCode(error) && error.code === "ENOENT") {
                     // No existing file.
@@ -600,9 +607,9 @@ export class DataBackupService {
                 }
             }
 
-            await fs.copyFile(sourcePath, incomingPath);
             // eslint-disable-next-line security/detect-non-literal-fs-filename -- incomingPath/targetPath are within app-controlled userData directory.
             await fs.rename(incomingPath, targetPath);
+            await this.syncDirectorySafely(targetDir);
         } catch (error: unknown) {
             copyError = ensureError(error);
         }
@@ -659,6 +666,48 @@ export class DataBackupService {
         }
     }
 
+    /**
+     * Best-effort `fsync()` for a file path.
+     *
+     * @remarks
+     * This reduces the chance of ending up with a zero-length/partially-written
+     * replacement DB if the machine crashes or loses power around the rename.
+     */
+    private async syncFileSafely(filePath: string): Promise<void> {
+        try {
+            // eslint-disable-next-line security/detect-non-literal-fs-filename -- caller ensures filePath is derived from app-controlled paths.
+            const handle = await fs.open(filePath, "r");
+            try {
+                await handle.sync();
+            } finally {
+                await handle.close();
+            }
+        } catch {
+            // Best-effort only.
+        }
+    }
+
+    /**
+     * Best-effort `fsync()` for a directory path.
+     *
+     * @remarks
+     * Helps persist rename operations on POSIX filesystems. On Windows,
+     * directory handles may not be syncable; we treat failures as non-fatal.
+     */
+    private async syncDirectorySafely(directoryPath: string): Promise<void> {
+        try {
+            // eslint-disable-next-line security/detect-non-literal-fs-filename -- caller ensures directoryPath is derived from app-controlled paths.
+            const handle = await fs.open(directoryPath, "r");
+            try {
+                await handle.sync();
+            } finally {
+                await handle.close();
+            }
+        } catch {
+            // Best-effort only.
+        }
+    }
+
 private async createTempDirectory(prefix: string): Promise<string> {
         const osTempPath = os.tmpdir();
         return fs.mkdtemp(path.join(osTempPath, prefix));
@@ -688,9 +737,51 @@ private async removeDirectorySafe(
             baseDirectory,
             fileName
         );
-        // Path is validated by resolvePathWithinDirectory to prevent traversal.
-        // eslint-disable-next-line security/detect-non-literal-fs-filename -- targetPath is sanitized and confined to baseDirectory.
-        await fs.writeFile(targetPath, contents);
+
+        const tmpPath = this.resolvePathWithinDirectory(
+            baseDirectory,
+            `${fileName}.tmp-${randomUUID()}`
+        );
+        const rollbackPath = this.resolvePathWithinDirectory(
+            baseDirectory,
+            `${fileName}.rollback-${randomUUID()}`
+        );
+
+        try {
+            // Path is validated by resolvePathWithinDirectory to prevent traversal.
+            // eslint-disable-next-line security/detect-non-literal-fs-filename -- tmpPath is sanitized and confined to baseDirectory.
+            await fs.writeFile(tmpPath, contents);
+            await this.syncFileSafely(tmpPath);
+
+            try {
+                // eslint-disable-next-line security/detect-non-literal-fs-filename -- targetPath/rollbackPath are sanitized and confined to baseDirectory.
+                await fs.rename(targetPath, rollbackPath);
+            } catch (error) {
+                if (isErrnoWithCode(error) && error.code === "ENOENT") {
+                    // No existing file.
+                } else {
+                    throw ensureError(error);
+                }
+            }
+
+            // eslint-disable-next-line security/detect-non-literal-fs-filename -- tmpPath/targetPath are sanitized and confined to baseDirectory.
+            await fs.rename(tmpPath, targetPath);
+            await this.syncDirectorySafely(baseDirectory);
+        } catch (error) {
+            // Best-effort cleanup.
+            await fs.rm(tmpPath, { force: true }).catch(() => {});
+
+            // Best-effort rollback (no-op if rollback doesn't exist).
+            // eslint-disable-next-line security/detect-non-literal-fs-filename -- rollbackPath/targetPath are sanitized and confined to baseDirectory.
+            await fs.rename(rollbackPath, targetPath).catch(() => {});
+            await this.syncDirectorySafely(baseDirectory);
+
+            throw ensureError(error);
+        } finally {
+            // Best-effort cleanup (no-op if rollback doesn't exist).
+            await fs.rm(rollbackPath, { force: true }).catch(() => {});
+        }
+
         return targetPath;
     }
 

@@ -79,6 +79,7 @@ export abstract class BaseCloudStorageProvider implements Pick<
             return await uploadBackupWithMetadata({
                 ...args,
                 backupsPrefix: this.backupsPrefix,
+                deleteObject: (deleteKey) => this.deleteObject(deleteKey),
                 uploadObject: (uploadArgs) => this.uploadObject(uploadArgs),
             });
         } catch (error) {
@@ -131,6 +132,9 @@ export abstract class BaseCloudStorageProvider implements Pick<
 
     /** Provider-specific primitive: list objects for the given prefix. */
     public abstract listObjects(prefix: string): Promise<CloudObjectEntry[]>;
+
+    /** Provider-specific primitive: delete a raw object. */
+    public abstract deleteObject(key: string): Promise<void>;
 
     /** Provider-specific primitive: download a raw object buffer. */
     public abstract downloadObject(key: string): Promise<Buffer>;

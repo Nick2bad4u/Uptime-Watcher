@@ -109,25 +109,26 @@ type SecretReplacement = Readonly<{
     startIndex: number;
 }>;
 
-const collectSecretReplacements = (value: string): SecretReplacement[] => {
-    const lower = value.toLowerCase();
+const collectSecretReplacementsForKey = (args: {
+    isBoundaryBeforeKey: (matchIndex: number) => boolean;
+    key: string;
+    lower: string;
+}): SecretReplacement[] => {
     const replacements: SecretReplacement[] = [];
+    const needle = `${args.key}=`;
 
-    for (const key of SECRET_QUERY_KEYS) {
-        const needle = `${key}=`;
-        let index = 0;
+    let index = 0;
+    while (index < args.lower.length) {
+        const matchIndex = args.lower.indexOf(needle, index);
+        if (matchIndex === -1) {
+            break;
+        }
 
-        while (index < lower.length) {
-            const matchIndex = lower.indexOf(needle, index);
-            if (matchIndex === -1) {
-                break;
-            }
-
-            const valueStart = matchIndex + needle.length;
+        const valueStart = matchIndex + needle.length;
+        if (args.isBoundaryBeforeKey(matchIndex)) {
             let valueEnd = valueStart;
-
-            while (valueEnd < lower.length) {
-                const char = lower[valueEnd] ?? "";
+            while (valueEnd < args.lower.length) {
+                const char = args.lower[valueEnd] ?? "";
                 if (char === "&" || /\s/u.test(char)) {
                     break;
                 }
@@ -136,12 +137,43 @@ const collectSecretReplacements = (value: string): SecretReplacement[] => {
 
             replacements.push({
                 endIndex: valueEnd,
-                replacement: `${key}=${SECRET_PLACEHOLDER}`,
+                replacement: `${args.key}=${SECRET_PLACEHOLDER}`,
                 startIndex: matchIndex,
             });
 
             index = valueEnd;
+        } else {
+            index = valueStart;
         }
+    }
+
+    return replacements;
+};
+
+const collectSecretReplacements = (value: string): SecretReplacement[] => {
+    const lower = value.toLowerCase();
+    const replacements: SecretReplacement[] = [];
+
+    const isBoundaryBeforeKey = (matchIndex: number): boolean => {
+        if (matchIndex === 0) {
+            return true;
+        }
+
+        const previousChar = lower[matchIndex - 1] ?? "";
+        // Only treat `key=` patterns as secret-bearing when they appear at a
+        // boundary (i.e., not in the middle of another identifier). This
+        // prevents substring matches such as `token=` inside `access_token=`.
+        return !/[a-z0-9_]/u.test(previousChar);
+    };
+
+    for (const key of SECRET_QUERY_KEYS) {
+        replacements.push(
+            ...collectSecretReplacementsForKey({
+                isBoundaryBeforeKey,
+                key,
+                lower,
+            })
+        );
     }
 
     return replacements;

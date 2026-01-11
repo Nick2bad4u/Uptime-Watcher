@@ -305,7 +305,8 @@ export function useOverflowMarquee<
         [runOverflowEvaluation]
     );
 
-    useEffect(function manageOverflowObservation() {
+    useEffect(
+        function manageOverflowObservation() {
         runOverflowEvaluation();
 
         const element = latestContainerRef.current.current;
@@ -372,7 +373,9 @@ export function useOverflowMarquee<
                 observedElementRef.current = null;
             }
         };
-    });
+        },
+        [/* effect dep */ containerRef, runOverflowEvaluation]
+    );
 
     useEffect(
         function reevaluateOnDependencyChange() {

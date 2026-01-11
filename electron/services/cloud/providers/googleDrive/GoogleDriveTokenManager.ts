@@ -1,3 +1,5 @@
+import { normalizeLogValue } from "@shared/utils/loggingContext";
+import { createSingleFlight } from "@shared/utils/singleFlight";
 import axios from "axios";
 import * as z from "zod";
 
@@ -6,7 +8,10 @@ import type { SecretStore } from "../../secrets/SecretStore";
 import { logger } from "../../../../utils/logger";
 import { readStoredJsonSecret } from "../oauthStoredTokens";
 import { GOOGLE_OAUTH_REQUEST_TIMEOUT_MS } from "./googleDriveOAuthConstants";
-import { googleTokenResponseSchema } from "./googleDriveTokenSchemas";
+import {
+    googleTokenResponseSchema,
+    tryParseGoogleOAuthErrorResponse,
+} from "./googleDriveTokenSchemas";
 
 /**
  * Persisted Google Drive OAuth tokens.
@@ -40,6 +45,12 @@ export class GoogleDriveTokenManager {
     private readonly secretStore: SecretStore;
 
     private readonly storageKey: string;
+
+    /**
+     * Single-flight wrapper to prevent concurrent refresh storms when multiple
+     * call sites request an access token at the same time.
+     */
+    private readonly refreshSingleFlight: () => Promise<string>;
 
     public async clear(): Promise<void> {
         await this.secretStore.deleteSecret(this.storageKey);
@@ -83,21 +94,7 @@ export class GoogleDriveTokenManager {
             return tokens.accessToken;
         }
 
-        const refreshed = await this.refresh(tokens.refreshToken);
-        const nextScope = refreshed.scope ?? tokens.scope;
-        const nextTokenType = refreshed.token_type ?? tokens.tokenType;
-
-        await this.setTokens({
-            accessToken: refreshed.access_token,
-            expiresAt: now + (refreshed.expires_in ?? 3600) * 1000,
-            refreshToken: refreshed.refresh_token ?? tokens.refreshToken,
-            ...(nextScope === undefined ? {} : { scope: nextScope }),
-            ...(nextTokenType === undefined
-                ? {}
-                : { tokenType: nextTokenType }),
-        });
-
-        return refreshed.access_token;
+        return this.refreshSingleFlight();
     }
 
     private async refresh(
@@ -113,18 +110,41 @@ export class GoogleDriveTokenManager {
             body.set("client_secret", this.clientSecret);
         }
 
-        const response = await axios.post(
-            "https://oauth2.googleapis.com/token",
-            body.toString(),
-            {
-                headers: {
-                    "Content-Type": "application/x-www-form-urlencoded",
-                },
-                timeout: GOOGLE_OAUTH_REQUEST_TIMEOUT_MS,
-            }
-        );
+        try {
+            const response = await axios.post(
+                "https://oauth2.googleapis.com/token",
+                body.toString(),
+                {
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded",
+                    },
+                    timeout: GOOGLE_OAUTH_REQUEST_TIMEOUT_MS,
+                }
+            );
 
-        return googleTokenResponseSchema.parse(response.data);
+            return googleTokenResponseSchema.parse(response.data);
+        } catch (error) {
+            if (axios.isAxiosError(error)) {
+                const oauthError = tryParseGoogleOAuthErrorResponse(
+                    error.response?.data
+                );
+
+                if (oauthError) {
+                    const details = oauthError.error_description
+                        ? `${oauthError.error} (${oauthError.error_description})`
+                        : oauthError.error;
+                    const sanitized = normalizeLogValue(details);
+                    const safeDetails =
+                        typeof sanitized === "string" ? sanitized : oauthError.error;
+
+                    throw new Error(`Google OAuth refresh failed: ${safeDetails}`, {
+                        cause: error,
+                    });
+                }
+            }
+
+            throw error;
+        }
     }
 
     public async revoke(): Promise<void> {
@@ -161,5 +181,31 @@ export class GoogleDriveTokenManager {
         this.clientSecret = args.clientSecret;
         this.secretStore = args.secretStore;
         this.storageKey = args.storageKey;
+
+        this.refreshSingleFlight = createSingleFlight(async () => {
+            const tokens = await this.getTokens();
+            if (!tokens) {
+                throw new Error("Google Drive is not connected.");
+            }
+
+            const refreshed = await this.refresh(tokens.refreshToken);
+            const nextScope = refreshed.scope ?? tokens.scope;
+            const nextTokenType = refreshed.token_type ?? tokens.tokenType;
+
+            const now = Date.now();
+            const expiresInSeconds = refreshed.expires_in ?? 3600;
+
+            await this.setTokens({
+                accessToken: refreshed.access_token,
+                expiresAt: now + expiresInSeconds * 1000,
+                refreshToken: refreshed.refresh_token ?? tokens.refreshToken,
+                ...(nextScope === undefined ? {} : { scope: nextScope }),
+                ...(nextTokenType === undefined
+                    ? {}
+                    : { tokenType: nextTokenType }),
+            });
+
+            return refreshed.access_token;
+        });
     }
 }

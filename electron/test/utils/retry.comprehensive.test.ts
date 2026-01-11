@@ -351,7 +351,7 @@ describe("Retry Utilities", () => {
                 const resultPromise = withRetry(operation, { maxRetries: 0 });
 
                 await expect(resultPromise).rejects.toThrowError(
-                    "immediate failure"
+                    "maxRetries must be a positive"
                 );
                 expect(operation).not.toHaveBeenCalled();
             });

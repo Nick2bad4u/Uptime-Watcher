@@ -1,3 +1,4 @@
+import { createSingleFlight } from "@shared/utils/singleFlight";
 import { Dropbox, DropboxAuth } from "dropbox";
 
 import type { SecretStore } from "../../secrets/SecretStore";
@@ -50,6 +51,12 @@ export class DropboxTokenManager {
         accessToken: string
     ) => Pick<Dropbox, "authTokenRevoke">;
 
+    /**
+     * Single-flight wrapper to prevent concurrent refresh storms when multiple
+     * call sites request an access token at the same time.
+     */
+    private readonly refreshSingleFlight: () => Promise<DropboxTokens>;
+
     public async getStoredTokens(): Promise<DropboxTokens | undefined> {
         return readStoredJsonSecret({
             clear: () => this.clearTokens(),
@@ -83,8 +90,7 @@ export class DropboxTokenManager {
             return tokens.accessToken;
         }
 
-        const refreshed = await this.refreshTokens(tokens);
-        await this.storeTokens(refreshed);
+        const refreshed = await this.refreshSingleFlight();
         return refreshed.accessToken;
     }
 
@@ -196,5 +202,16 @@ export class DropboxTokenManager {
                 new Dropbox({
                     accessToken,
                 }));
+
+        this.refreshSingleFlight = createSingleFlight(async () => {
+            const tokens = await this.getStoredTokens();
+            if (!tokens) {
+                throw new Error("Dropbox is not connected");
+            }
+
+            const refreshed = await this.refreshTokens(tokens);
+            await this.storeTokens(refreshed);
+            return refreshed;
+        });
     }
 }

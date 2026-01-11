@@ -37,12 +37,21 @@ export async function uploadBackupWithMetadata(args: {
     readonly backupsPrefix: string;
     /** Raw SQLite backup bytes (encrypted or plaintext). */
     readonly buffer: Buffer;
+    /**
+     * Optional provider delete primitive.
+     *
+     * @remarks
+     * Used for best-effort cleanup if the metadata sidecar upload fails after
+     * uploading the backup bytes.
+     */
+    readonly deleteObject?: (key: string) => Promise<unknown>;
     /** Indicates whether the stored backup is encrypted. */
     readonly encrypted: boolean;
     /** User-facing file name used as the backup object name. */
     readonly fileName: string;
     /** Metadata describing the backup. */
     readonly metadata: SerializedDatabaseBackupMetadata;
+
     /** Provider upload primitive. Must accept POSIX-style keys. */
     readonly uploadObject: (args: {
         buffer: Buffer;
@@ -66,11 +75,24 @@ export async function uploadBackupWithMetadata(args: {
     });
 
     const metadataKey = backupMetadataKeyForBackupKey(backupKey);
-    await args.uploadObject({
-        buffer: Buffer.from(serializeCloudBackupMetadataFile(entry), "utf8"),
-        key: metadataKey,
-        overwrite: true,
-    });
+    try {
+        await args.uploadObject({
+            buffer: Buffer.from(
+                serializeCloudBackupMetadataFile(entry),
+                "utf8"
+            ),
+            key: metadataKey,
+            overwrite: true,
+        });
+    } catch (error) {
+        // Best-effort cleanup: a backup object without its metadata sidecar is
+        // effectively undiscoverable via listBackups(), so try to remove it.
+        if (args.deleteObject) {
+            await args.deleteObject(backupKey).catch(() => {});
+        }
+
+        throw error;
+    }
 
     return entry;
 }

@@ -2,7 +2,10 @@ import { describe, expect, it, vi } from "vitest";
 
 import type { CloudBackupEntry } from "@shared/types/cloud";
 
-import { downloadBackupWithMetadata } from "../../../../services/cloud/providers/cloudBackupIo";
+import {
+    downloadBackupWithMetadata,
+    uploadBackupWithMetadata,
+} from "../../../../services/cloud/providers/cloudBackupIo";
 
 describe(downloadBackupWithMetadata, () => {
     it("throws when metadata key does not match the requested key", async () => {
@@ -67,5 +70,40 @@ describe(downloadBackupWithMetadata, () => {
         await expect(
             downloadBackupWithMetadata({ downloadObject, key })
         ).rejects.toThrowError(/filename/i);
+    });
+});
+
+describe(uploadBackupWithMetadata, () => {
+    it("attempts to delete the backup when metadata upload fails", async () => {
+        const uploadObject = vi
+            .fn<(args: { buffer: Buffer; key: string }) => Promise<void>>()
+            .mockResolvedValueOnce(undefined)
+            .mockRejectedValueOnce(new Error("metadata upload failed"));
+
+        const deleteObject = vi
+            .fn<(key: string) => Promise<void>>()
+            .mockResolvedValue(undefined);
+
+        await expect(
+            uploadBackupWithMetadata({
+                backupsPrefix: "backups/",
+                buffer: Buffer.from("backup", "utf8"),
+                deleteObject,
+                encrypted: false,
+                fileName: "backup.sqlite",
+                metadata: {
+                    appVersion: "1.0.0",
+                    checksum: "abc",
+                    createdAt: 1,
+                    originalPath: "backup.sqlite",
+                    retentionHintDays: 30,
+                    schemaVersion: 1,
+                    sizeBytes: 6,
+                },
+                uploadObject,
+            })
+        ).rejects.toThrowError(/metadata upload failed/i);
+
+        expect(deleteObject).toHaveBeenCalledWith("backups/backup.sqlite");
     });
 });

@@ -10,7 +10,6 @@
  */
 
 import type {
-    BrowserWindow,
     Event,
     RenderProcessGoneDetails,
     WebContents,
@@ -18,7 +17,7 @@ import type {
 
 import { readProcessEnv } from "@shared/utils/environment";
 import { ensureError } from "@shared/utils/errorHandling";
-import { app } from "electron";
+import { app, BrowserWindow } from "electron";
 import {
     installExtension,
     REACT_DEVELOPER_TOOLS,
@@ -32,6 +31,10 @@ import { isDev } from "./electronUtils";
 import { ApplicationService } from "./services/application/ApplicationService";
 import { ServiceContainer } from "./services/ServiceContainer";
 import { logger } from "./utils/logger";
+
+function isPlainRecord(value: unknown): value is Record<string, unknown> {
+    return typeof value === "object" && value !== null && !Array.isArray(value);
+}
 
 /**
  * Environment variable keys that can override Electron's userData path during
@@ -496,11 +499,57 @@ class Main {
         webContents: WebContents,
         details: RenderProcessGoneDetails
     ): void => {
+        const ownerWindow = BrowserWindow.fromWebContents(webContents);
         logger.error("[Main] Renderer process gone", {
             exitCode: details.exitCode,
             reason: details.reason,
             url: webContents.getURL(),
+            webContentsId: webContents.id,
+            windowId: ownerWindow?.id,
         });
+    };
+
+    private readonly handleChildProcessGone = (
+        _event: Event,
+        details: unknown
+    ): void => {
+        const record = isPlainRecord(details) ? details : undefined;
+
+        logger.error("[Main] Child process gone", {
+            exitCode: record?.["exitCode"],
+            name: record?.["name"],
+            reason: record?.["reason"],
+            serviceName: record?.["serviceName"],
+            type: record?.["type"],
+        });
+    };
+
+    private readonly handleBrowserWindowCreated = (
+        _event: Event,
+        window: BrowserWindow
+    ): void => {
+        function handleUnresponsive(): void {
+            logger.warn("[Main] BrowserWindow became unresponsive", {
+                url: window.webContents.getURL(),
+                windowId: window.id,
+            });
+        }
+
+        function handleResponsive(): void {
+            logger.info("[Main] BrowserWindow became responsive", {
+                url: window.webContents.getURL(),
+                windowId: window.id,
+            });
+        }
+
+        function cleanup(): void {
+            window.off("unresponsive", handleUnresponsive);
+            window.off("responsive", handleResponsive);
+        }
+
+        window.on("unresponsive", handleUnresponsive);
+        window.on("responsive", handleResponsive);
+        window.once("closed", cleanup);
     };
 
     /**
@@ -636,6 +685,8 @@ private async performFatalShutdown(
 
         // Log renderer crashes (useful for diagnosing GPU/JS crashes).
         app.on("render-process-gone", this.handleRenderProcessGone);
+        app.on("child-process-gone", this.handleChildProcessGone);
+        app.on("browser-window-created", this.handleBrowserWindowCreated);
 
         // Setup cleanup on Node.js process exit to ensure graceful shutdown.
         // Note: 'beforeExit' may not fire in all shutdown scenarios (e.g.,
@@ -661,6 +712,8 @@ private async performFatalShutdown(
         process.off("unhandledRejection", this.handleUnhandledRejection);
         process.off("uncaughtException", this.handleUncaughtException);
         app.off("render-process-gone", this.handleRenderProcessGone);
+        app.off("child-process-gone", this.handleChildProcessGone);
+        app.off("browser-window-created", this.handleBrowserWindowCreated);
     }
 }
 

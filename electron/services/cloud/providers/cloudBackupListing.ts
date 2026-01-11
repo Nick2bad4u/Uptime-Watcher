@@ -24,6 +24,8 @@ export async function listBackupsFromMetadataObjects(args: {
     readonly downloadObjectBuffer: (key: string) => Promise<Buffer>;
     readonly objects: readonly CloudObjectEntry[];
 }): Promise<CloudBackupEntry[]> {
+    const objectKeys = new Set(args.objects.map((entry) => entry.key));
+
     const metadataObjects = args.objects.filter((entry) =>
         entry.key.endsWith(".metadata.json")
     );
@@ -32,6 +34,26 @@ export async function listBackupsFromMetadataObjects(args: {
         metadataObjects.map(
             async (metadataObject): Promise<CloudBackupEntry | null> => {
                 try {
+                    const backupKey = metadataObject.key.slice(
+                        0,
+                        -".metadata.json".length
+                    );
+
+                    // If the underlying backup blob is missing, the metadata is
+                    // effectively orphaned and the backup cannot be restored.
+                    // Hide it from the UI to avoid offering broken restore paths.
+                    if (!objectKeys.has(backupKey)) {
+                        logger.warn(
+                            "[cloudBackupListing] Backup metadata is orphaned; skipping",
+                            {
+                                backupKey,
+                                key: metadataObject.key,
+                                message: "Metadata sidecar exists without the corresponding backup object.",
+                            }
+                        );
+                        return null;
+                    }
+
                     const metadataBuffer = await args.downloadObjectBuffer(
                         metadataObject.key
                     );

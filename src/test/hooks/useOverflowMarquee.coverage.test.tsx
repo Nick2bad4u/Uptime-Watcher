@@ -3,7 +3,7 @@
  * detection logic handles overflow, dependency updates, and lifecycle hooks.
  */
 
-import { renderHook, waitFor } from "@testing-library/react";
+import { act, renderHook, waitFor } from "@testing-library/react";
 import {
     afterAll,
     afterEach,
@@ -92,6 +92,8 @@ describe(useOverflowMarquee, () => {
         const element = document.createElement("div");
         setDimensions(element, { clientWidth: 100, scrollWidth: 180 });
 
+        const externalRef = { current: element };
+
         let resizeListener: ((event: Event) => void) | null = null;
 
         const addEventListenerSpy = vi.spyOn(window, "addEventListener");
@@ -105,15 +107,21 @@ describe(useOverflowMarquee, () => {
         const removeEventListenerSpy = vi.spyOn(window, "removeEventListener");
 
         const { result, unmount } = renderHook(() =>
-            useOverflowMarquee({ ref: { current: element } })
+            useOverflowMarquee({ ref: externalRef })
         );
 
         await waitFor(() => {
             expect(result.current.isOverflowing).toBeTruthy();
         });
 
+        // The hook should not re-register the resize listener on every render.
+        // It should attach once per mount and remove once on unmount.
+        expect(addEventListenerSpy).toHaveBeenCalledTimes(1);
+
         if (resizeListener) {
-            (resizeListener as (event: Event) => void)(new Event("resize"));
+            act(() => {
+                (resizeListener as (event: Event) => void)(new Event("resize"));
+            });
         }
 
         await waitFor(() => {
@@ -130,6 +138,7 @@ describe(useOverflowMarquee, () => {
 
         unmount();
 
+        expect(removeEventListenerSpy).toHaveBeenCalledTimes(1);
         expect(removeEventListenerSpy).toHaveBeenCalledWith(
             "resize",
             resizeListener
