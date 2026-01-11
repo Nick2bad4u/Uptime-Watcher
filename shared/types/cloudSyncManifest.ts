@@ -15,24 +15,19 @@ const MAX_SAFE_INT = Number.MAX_SAFE_INTEGER;
 
 const deviceCompactionSchema = z
     .object({
-        compactedUpToOpId: z.number().int().min(-1).max(MAX_SAFE_INT),
-        lastSeenAt: z.number().int().nonnegative().max(MAX_SAFE_INT),
+        compactedUpToOpId: z.int().min(-1).max(MAX_SAFE_INT),
+        lastSeenAt: z.int().nonnegative().max(MAX_SAFE_INT),
     })
     .strict();
 
-const cloudSyncManifestSchemaInternal = z
+const cloudSyncManifestInternalSchema = z
     .object({
         devices: z.record(z.string().min(1), deviceCompactionSchema),
         encryption: cloudEncryptionConfigSchema.optional(),
-        lastCompactionAt: z
-            .number()
-            .int()
-            .nonnegative()
-            .max(MAX_SAFE_INT)
-            .optional(),
+        lastCompactionAt: z.int().nonnegative().max(MAX_SAFE_INT).optional(),
         latestSnapshotKey: z.string().min(1).optional(),
         manifestVersion: z.literal(CLOUD_SYNC_MANIFEST_VERSION),
-        resetAt: z.number().int().nonnegative().max(MAX_SAFE_INT).optional(),
+        resetAt: z.int().nonnegative().max(MAX_SAFE_INT).optional(),
         syncSchemaVersion: z.literal(CLOUD_SYNC_SCHEMA_VERSION),
     })
     .strict();
@@ -70,11 +65,11 @@ export interface CloudSyncManifest {
  * Runtime schema for validating {@link CloudSyncManifest}.
  */
 export const cloudSyncManifestSchema: z.ZodType<CloudSyncManifest> =
-    cloudSyncManifestSchemaInternal;
+    cloudSyncManifestInternalSchema;
 
 /**
  * Parses and validates a manifest payload.
  */
 export function parseCloudSyncManifest(candidate: unknown): CloudSyncManifest {
-    return cloudSyncManifestSchemaInternal.parse(candidate);
+    return cloudSyncManifestInternalSchema.parse(candidate);
 }

@@ -81,11 +81,6 @@ const resolveDefaultLogger = (): LoggerLike | null => {
         return lowercaseCandidate;
     }
 
-    const uppercaseCandidate = safeGetModuleExport(loggerModule, "Logger");
-    if (isLoggerLike(uppercaseCandidate)) {
-        return uppercaseCandidate;
-    }
-
     return null;
 };
 

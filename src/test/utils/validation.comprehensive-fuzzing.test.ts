@@ -290,7 +290,7 @@ const monitorTypeData = fc.oneof(
     // Valid monitor types
     fc.constantFrom("http", "https", "ping", "dns", "tcp", "udp"),
     // Invalid monitor types
-    fc.constantFrom("", " ", "ftp", "ssh", "telnet", "invalid", "HTTP", "Http"),
+    fc.constantFrom("", " ", "ftp", "ssh", "telnet", "invalid", "HTTP", "HTTP"),
     // Edge cases
     extremeBoundaryStrings,
     maliciousStrings

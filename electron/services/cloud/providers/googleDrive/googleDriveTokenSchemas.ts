@@ -19,7 +19,7 @@ export interface GoogleTokenResponse {
 export const googleTokenResponseSchema: z.ZodType<GoogleTokenResponse> =
     z.looseObject({
         access_token: z.string().min(1),
-        expires_in: z.number().int().positive().optional(),
+        expires_in: z.int().positive().optional(),
         refresh_token: z.string().min(1).optional(),
         scope: z.string().optional(),
         token_type: z.string().optional(),

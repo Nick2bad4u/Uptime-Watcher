@@ -418,6 +418,33 @@ const MONITOR_TYPE_LABELS = new Map<string, string>([
 ]);
 
 /**
+ * Acronyms that should remain uppercase when generating labels from unknown
+ * monitor type strings.
+ *
+ * @remarks
+ * This is intentionally small and focused on common, user-facing terms.
+ */
+const MONITOR_TYPE_ACRONYMS = new Set(["api", "dns", "http"]);
+
+function formatMonitorTypeSegment(segment: string): string {
+    if (!segment) {
+        return "";
+    }
+
+    // Preserve already-uppercase segments (e.g. `HTTP`).
+    if (/^[A-Z0-9]+$/u.test(segment)) {
+        return segment;
+    }
+
+    const lower = segment.toLowerCase();
+    if (MONITOR_TYPE_ACRONYMS.has(lower)) {
+        return lower.toUpperCase();
+    }
+
+    return `${segment.charAt(0).toUpperCase()}${segment.slice(1).toLowerCase()}`;
+}
+
+/**
  * Generate display label for monitor type dynamically. Replaces hardcoded
  * backward compatibility patterns.
  *
@@ -461,9 +488,7 @@ export function getMonitorTypeDisplayLabel(monitorType: string): string {
                     .replaceAll(/(?<=[a-z])(?=[A-Z])/gu, " ") // Add space before capitals
                     .split(" ")
                     .map(
-                        (word) =>
-                            word.charAt(0).toUpperCase() +
-                            word.slice(1).toLowerCase()
+                        (word) => formatMonitorTypeSegment(word)
                     )
                     .join(" ");
 

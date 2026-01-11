@@ -90,7 +90,7 @@ export const monitorTypeConfigSchema: z.ZodType<MonitorTypeConfig> =
     z.custom<MonitorTypeConfig>(
         (value): value is MonitorTypeConfig => isMonitorTypeConfig(value),
         {
-            message: "Invalid monitor type configuration",
+            error: "Invalid monitor type configuration",
         }
     );
 

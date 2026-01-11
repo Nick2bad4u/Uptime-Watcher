@@ -50,15 +50,15 @@ const STATE_SYNC_SOURCE_VALUES = [
  */
 export type StateSyncSource = (typeof STATE_SYNC_SOURCE_VALUES)[number];
 
-const stateSyncSourceSchemaInternal: z.ZodType<StateSyncSource> = z.enum(
+const stateSyncSourceInternalSchema: z.ZodType<StateSyncSource> = z.enum(
     STATE_SYNC_SOURCE_VALUES
 );
 
 /**
  * Zod schema describing valid state synchronization sources.
  */
-export const stateSyncSourceSchema: typeof stateSyncSourceSchemaInternal =
-    stateSyncSourceSchemaInternal;
+export const stateSyncSourceSchema: typeof stateSyncSourceInternalSchema =
+    stateSyncSourceInternalSchema;
 
 /**
  * Enumerated state synchronization sources for cross-layer consistency.
@@ -97,15 +97,15 @@ const STATE_SYNC_ACTION_VALUES = [
  */
 export type StateSyncAction = (typeof STATE_SYNC_ACTION_VALUES)[number];
 
-const stateSyncActionSchemaInternal: z.ZodType<StateSyncAction> = z.enum(
+const stateSyncActionInternalSchema: z.ZodType<StateSyncAction> = z.enum(
     STATE_SYNC_ACTION_VALUES
 );
 
 /**
  * Zod schema describing valid state synchronization lifecycle actions.
  */
-export const stateSyncActionSchema: typeof stateSyncActionSchemaInternal =
-    stateSyncActionSchemaInternal;
+export const stateSyncActionSchema: typeof stateSyncActionInternalSchema =
+    stateSyncActionInternalSchema;
 
 /**
  * Enumerated state synchronization lifecycle actions.
@@ -139,15 +139,15 @@ const stateSyncSitesSchema: z.ZodType<Site[]> = z.array(siteOutputSchema);
 /**
  * Zod schema validating state synchronization status summaries.
  */
-const stateSyncStatusSummarySchemaInternal: z.ZodType<{
+const stateSyncStatusSummaryInternalSchema: z.ZodType<{
     lastSyncAt?: null | number;
     siteCount: number;
     source: StateSyncSource;
     synchronized: boolean;
 }> = z
     .object({
-        lastSyncAt: z.number().int().nonnegative().nullable(),
-        siteCount: z.number().int().nonnegative(),
+        lastSyncAt: z.int().nonnegative().nullable(),
+        siteCount: z.int().nonnegative(),
         source: stateSyncSourceSchema,
         synchronized: z.boolean(),
     })
@@ -156,13 +156,13 @@ const stateSyncStatusSummarySchemaInternal: z.ZodType<{
 /**
  * Zod schema validating state synchronization status summaries.
  */
-export const stateSyncStatusSummarySchema: typeof stateSyncStatusSummarySchemaInternal =
-    stateSyncStatusSummarySchemaInternal;
+export const stateSyncStatusSummarySchema: typeof stateSyncStatusSummaryInternalSchema =
+    stateSyncStatusSummaryInternalSchema;
 
 /**
  * Zod schema validating full synchronization results.
  */
-const stateSyncFullSyncResultSchemaInternal: z.ZodType<{
+const stateSyncFullSyncResultInternalSchema: z.ZodType<{
     completedAt: number;
     revision: number;
     siteCount: number;
@@ -171,9 +171,9 @@ const stateSyncFullSyncResultSchemaInternal: z.ZodType<{
     synchronized: boolean;
 }> = z
     .object({
-        completedAt: z.number().int().nonnegative(),
-        revision: z.number().int().nonnegative(),
-        siteCount: z.number().int().nonnegative(),
+        completedAt: z.int().nonnegative(),
+        revision: z.int().nonnegative(),
+        siteCount: z.int().nonnegative(),
         sites: stateSyncSitesSchema,
         source: stateSyncSourceSchema,
         synchronized: z.boolean(),
@@ -211,7 +211,7 @@ export interface SiteSyncDelta {
     updatedSites: Site[];
 }
 
-const siteSyncDeltaSchemaInternal: z.ZodType<SiteSyncDelta> = z
+const siteSyncDeltaInternalSchema: z.ZodType<SiteSyncDelta> = z
     .object({
         addedSites: stateSyncSitesSchema,
         removedSiteIdentifiers: z.array(z.string().min(1)),
@@ -222,14 +222,14 @@ const siteSyncDeltaSchemaInternal: z.ZodType<SiteSyncDelta> = z
 /**
  * Zod schema validating full synchronization results.
  */
-export const stateSyncFullSyncResultSchema: typeof stateSyncFullSyncResultSchemaInternal =
-    stateSyncFullSyncResultSchemaInternal;
+export const stateSyncFullSyncResultSchema: typeof stateSyncFullSyncResultInternalSchema =
+    stateSyncFullSyncResultInternalSchema;
 
 /**
  * Zod schema describing valid {@link SiteSyncDelta} payloads.
  */
-export const siteSyncDeltaSchema: typeof siteSyncDeltaSchemaInternal =
-    siteSyncDeltaSchemaInternal;
+export const siteSyncDeltaSchema: typeof siteSyncDeltaInternalSchema =
+    siteSyncDeltaInternalSchema;
 
 /**
  * Summary returned from a `getSyncStatus` request.

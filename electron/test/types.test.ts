@@ -759,7 +759,7 @@ describe("Electron Types", () => {
                 "Complexity: Low - Primitive Type Check",
                 "complexity"
             );
-            await annotate("Data Type: Number (Unix timestamp)", "data-type");
+            await annotate("Data Type: Number (UNIX timestamp)", "data-type");
             await annotate(
                 "Purpose: Ensure temporal data is stored as numbers",
                 "purpose"

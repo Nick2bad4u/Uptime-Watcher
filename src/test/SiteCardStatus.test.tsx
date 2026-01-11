@@ -18,7 +18,7 @@ describe(SiteCardStatus, () => {
     it("renders correct label and status for 'up'", () => {
         render(<SiteCardStatus selectedMonitorId="http" status="up" />);
         const badge = screen.getByTestId("status-badge");
-        expect(badge).toHaveAttribute("data-label", "Http Status");
+        expect(badge).toHaveAttribute("data-label", "HTTP Status");
         expect(badge).toHaveAttribute("data-status", "up");
         expect(badge).toHaveAttribute("data-size", "sm");
     });

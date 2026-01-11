@@ -1355,7 +1355,7 @@ describe("Fallback Utilities", () => {
                 await annotate("Type: Business Logic", "type");
 
                 expect(getMonitorTypeDisplayLabel("apiEndpoint")).toBe(
-                    "Api Endpoint Monitor"
+                    "API Endpoint Monitor"
                 );
             });
 
@@ -1377,7 +1377,7 @@ describe("Fallback Utilities", () => {
                 await annotate("Type: Business Logic", "type");
 
                 expect(getMonitorTypeDisplayLabel("dns-lookup")).toBe(
-                    "Dns Lookup Monitor"
+                    "DNS Lookup Monitor"
                 );
             });
 
@@ -1388,7 +1388,7 @@ describe("Fallback Utilities", () => {
                 await annotate("Type: Business Logic", "type");
 
                 expect(getMonitorTypeDisplayLabel("customAPI_Monitor")).toBe(
-                    "Custom Api Monitor Monitor"
+                    "Custom API Monitor Monitor"
                 );
             });
 
@@ -1407,7 +1407,7 @@ describe("Fallback Utilities", () => {
                 await annotate("Category: Utility", "category");
                 await annotate("Type: Business Logic", "type");
 
-                expect(getMonitorTypeDisplayLabel("API")).toBe("Api Monitor");
+                expect(getMonitorTypeDisplayLabel("API")).toBe("API Monitor");
             });
 
             it("should handle lowercase", async ({ task, annotate }) => {

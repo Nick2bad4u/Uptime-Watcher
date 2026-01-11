@@ -918,7 +918,7 @@ describe(DataBackupService, () => {
             const testPaths = [
                 "/home/user/.config/uptime-watcher",
                 String.raw`C:\Users\User\AppData\Roaming\uptime-watcher`,
-                "/Applications/Uptime Watcher.app/Contents/MacOS",
+                "/Applications/Uptime Watcher.app/Contents/macOS",
             ];
 
             for (const testPath of testPaths) {

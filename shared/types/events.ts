@@ -70,7 +70,7 @@ export const correlationIdSchema: z.ZodType<CorrelationId> = z
             (value): value is CorrelationId =>
                 typeof value === "string" && value.length > 0,
             {
-                message: "Correlation ID must be a non-empty string",
+                error: "Correlation ID must be a non-empty string",
             }
         )
     );
@@ -80,7 +80,7 @@ export const eventMetadataSchema: z.ZodType<EventMetadata> = z
         busId: z.string().min(1),
         correlationId: correlationIdSchema,
         eventName: z.string().min(1),
-        timestamp: z.number().int().nonnegative(),
+        timestamp: z.int().nonnegative(),
     })
     .strict();
 
@@ -113,7 +113,7 @@ const baseEventDataSchema = z
     .object({
         _meta: eventMetadataSchema.optional(),
         _originalMeta: eventMetadataSchema.optional(),
-        timestamp: z.number().int().nonnegative(),
+        timestamp: z.int().nonnegative(),
     })
     .strict();
 
@@ -230,8 +230,8 @@ const stateSyncSitesArraySchema = siteSchema.array();
 const bulkStateSyncEventDataSchema = baseEventDataSchema
     .extend({
         action: z.literal("bulk-sync"),
-        revision: z.number().int().nonnegative(),
-        siteCount: z.number().int().nonnegative(),
+        revision: z.int().nonnegative(),
+        siteCount: z.int().nonnegative(),
         siteIdentifier: z.string().min(1).optional(),
         sites: stateSyncSitesArraySchema,
         source: stateSyncSourceSchema,
@@ -264,7 +264,7 @@ const updateStateSyncEventDataSchema = baseEventDataSchema
     .extend({
         action: z.literal("update"),
         delta: siteSyncDeltaSchema,
-        revision: z.number().int().nonnegative(),
+        revision: z.int().nonnegative(),
         siteIdentifier: z.string().min(1).optional(),
         source: stateSyncSourceSchema,
         truncated: z.literal(false).optional(),
@@ -289,7 +289,7 @@ const deleteStateSyncEventDataSchema = baseEventDataSchema
     .extend({
         action: z.literal("delete"),
         delta: siteSyncDeltaSchema,
-        revision: z.number().int().nonnegative(),
+        revision: z.int().nonnegative(),
         siteIdentifier: z.string().min(1).optional(),
         source: stateSyncSourceSchema,
         truncated: z.literal(false).optional(),

@@ -49,18 +49,18 @@ export interface CloudBackupMigrationResult {
 
 const cloudBackupMigrationTargetSchema = z.enum(["plaintext", "encrypted"]);
 
-const cloudBackupMigrationRequestSchemaInternal: z.ZodType<CloudBackupMigrationRequest> =
+const cloudBackupMigrationRequestInternalSchema: z.ZodType<CloudBackupMigrationRequest> =
     z
         .object({
             deleteSource: z.boolean(),
-            limit: z.number().int().positive().optional(),
+            limit: z.int().positive().optional(),
             target: cloudBackupMigrationTargetSchema,
         })
         .strict();
 
 /** Zod schema for {@link CloudBackupMigrationRequest}. */
 export const cloudBackupMigrationRequestSchema: z.ZodType<CloudBackupMigrationRequest> =
-    cloudBackupMigrationRequestSchemaInternal;
+    cloudBackupMigrationRequestInternalSchema;
 
 /**
  * Parses and validates a migration request.
@@ -68,5 +68,5 @@ export const cloudBackupMigrationRequestSchema: z.ZodType<CloudBackupMigrationRe
 export function parseCloudBackupMigrationRequest(
     candidate: unknown
 ): CloudBackupMigrationRequest {
-    return cloudBackupMigrationRequestSchemaInternal.parse(candidate);
+    return cloudBackupMigrationRequestInternalSchema.parse(candidate);
 }

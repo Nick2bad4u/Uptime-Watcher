@@ -101,6 +101,7 @@ const jsonSchemaValidatorPlugins = enableJsonSchemaValidation
 const jsonSchemaValidatorRules = enableJsonSchemaValidation
     ? { "json-schema-validator/no-invalid": "error" }
     : {};
+import pluginCasePolice from "eslint-plugin-case-police";
 import eslintPluginJsonc from "eslint-plugin-jsonc";
 import jsxA11y from "eslint-plugin-jsx-a11y";
 // @ts-expect-error -- No Types for this Package
@@ -149,6 +150,7 @@ import pluginPrettier from "eslint-plugin-prettier";
 // @ts-expect-error -- No Types for this Package
 import pluginPromise from "eslint-plugin-promise";
 import pluginReact from "eslint-plugin-react";
+import react19upgrade from "eslint-plugin-react-19-upgrade"
 import reactCompiler from "eslint-plugin-react-compiler";
 import eslintReactDom from "eslint-plugin-react-dom";
 // @ts-expect-error -- No Types for this Package
@@ -220,6 +222,7 @@ import pluginWriteGood from "eslint-plugin-write-good-comments";
 import xss from "eslint-plugin-xss";
 import eslintPluginYml from "eslint-plugin-yml";
 import zod from "eslint-plugin-zod";
+import eslintPluginZodX from 'eslint-plugin-zod-x';
 import globals from "globals";
 import jsoncEslintParser from "jsonc-eslint-parser";
 import { createRequire } from "node:module";
@@ -292,6 +295,7 @@ export default /** @type {EslintConfig} */[
     gitignore( {
         name: "Global .gitignore Rules",
         root: true,
+        strict: true,
     } ), // MARK: Global Configs and Rules
     sharedContractInterfaceGuard,
     {
@@ -438,7 +442,20 @@ export default /** @type {EslintConfig} */[
     nitpick.configs.recommended,
     pluginComments.recommended,
     arrayFunc.configs.all,
+    eslintPluginZodX.configs.recommended,
+    {
+        files: ["**/*.{ts,tsx,mts,cts,js,jsx,mjs,cjs}"],
+        name: "Zod-X overrides",
+        rules: {
+            // This repo intentionally allows both `import * as z from "zod"`
+            // and fine-grained type-only imports (e.g. `import type { ZodType }`).
+            // Forcing a namespace import everywhere creates noisy churn without
+            // improving runtime safety.
+            "zod-x/prefer-namespace-import": "off",
+        },
+    },
     ...storybook.configs[ "flat/recommended" ],
+    ...pluginCasePolice.configs.recommended,
     // ═══════════════════════════════════════════════════════════════════════════════
     // MARK: Global Ignore Patterns
     // Add patterns here to ignore files and directories globally
@@ -1238,8 +1255,9 @@ export default /** @type {EslintConfig} */[
             "better-tailwindcss": pluginBetterTailwindcss,
             css: css,
             "no-hardcoded-strings": pluginNoHardcoded,
+            "react-19-upgrade": react19upgrade,
             tailwind: tailwind,
-            "undefined-css-classes": pluginUndefinedCss,
+            "undefined-css-classes": pluginUndefinedCss
         },
         rules: {
             // TypeScript rules
@@ -1262,6 +1280,11 @@ export default /** @type {EslintConfig} */[
                     detectComponentClasses: true,
                 },
             ],
+            "react-19-upgrade/no-default-props": "error",
+            "react-19-upgrade/no-factories": "error",
+            "react-19-upgrade/no-legacy-context": "error",
+            "react-19-upgrade/no-prop-types": "warn",
+            "react-19-upgrade/no-string-refs": "error",
             // No Hardcoded Strings Plugin Rules (no-hardcoded-strings/*)
             // "no-hardcoded-strings/no-hardcoded-strings": [
             //     "warn",
@@ -2828,6 +2851,7 @@ export default /** @type {EslintConfig} */[
             prettier: pluginPrettier,
             promise: pluginPromise,
             react: pluginReact,
+            "react-19-upgrade": react19upgrade,
             "react-compiler": reactCompiler,
             "react-form-fields": pluginReactFormFields,
             "react-hook-form": pluginReactHookForm,
@@ -2863,7 +2887,7 @@ export default /** @type {EslintConfig} */[
             "validate-jsx-nesting": pluginValidateJSX,
             "write-good-comments": pluginWriteGood,
             xss: xss,
-            zod: zod,
+            zod: zod
         },
         rules: {
             // TypeScript rules
@@ -2918,6 +2942,7 @@ export default /** @type {EslintConfig} */[
             ...etc.configs.recommended.rules,
             // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
             ...pluginBetterTailwindcss.configs[ "correctness" ].rules,
+
             "@arthurgeron/react-usememo/require-memo": "off",
             "@arthurgeron/react-usememo/require-usememo": "error",
             "@arthurgeron/react-usememo/require-usememo-children": "off",
@@ -3805,6 +3830,11 @@ export default /** @type {EslintConfig} */[
             "promise/prefer-await-to-then": "warn",
             "promise/prefer-catch": "warn",
             "promise/spec-only": "warn",
+            "react-19-upgrade/no-default-props": "error",
+            "react-19-upgrade/no-factories": "error",
+            "react-19-upgrade/no-legacy-context": "error",
+            "react-19-upgrade/no-prop-types": "warn",
+            "react-19-upgrade/no-string-refs": "error",
             "react-form-fields/no-mix-controlled-with-uncontrolled": "error",
             "react-form-fields/no-only-value-prop": "error",
             "react-form-fields/styled-no-mix-controlled-with-uncontrolled":
@@ -5887,6 +5917,7 @@ export default /** @type {EslintConfig} */[
             prettier: pluginPrettier,
             promise: pluginPromise,
             react: pluginReact,
+            "react-19-upgrade": react19upgrade,
             "react-compiler": reactCompiler,
             "react-form-fields": pluginReactFormFields,
             "react-hook-form": pluginReactHookForm,
@@ -5921,7 +5952,7 @@ export default /** @type {EslintConfig} */[
             "validate-jsx-nesting": pluginValidateJSX,
             "write-good-comments": pluginWriteGood,
             xss: xss,
-            zod: zod,
+            zod: zod
         },
         rules: {
             // TypeScript rules
@@ -6891,6 +6922,11 @@ export default /** @type {EslintConfig} */[
             "promise/prefer-await-to-then": "warn",
             "promise/prefer-catch": "warn",
             "promise/spec-only": "warn",
+            "react-19-upgrade/no-default-props": "error",
+            "react-19-upgrade/no-factories": "error",
+            "react-19-upgrade/no-legacy-context": "error",
+            "react-19-upgrade/no-prop-types": "warn",
+            "react-19-upgrade/no-string-refs": "error",
             "react-form-fields/no-mix-controlled-with-uncontrolled": "error",
             "react-form-fields/no-only-value-prop": "error",
             "react-form-fields/styled-no-mix-controlled-with-uncontrolled":
@@ -9369,7 +9405,7 @@ export default /** @type {EslintConfig} */[
                 require: "readonly",
             },
         },
-        name: "JS JsDoc - **/*.{JS,CJS}",
+        name: "JS JSDoc - **/*.{JS,CJS}",
         plugins: {
             jsdoc: jsdoc,
         },
@@ -9984,7 +10020,7 @@ export default /** @type {EslintConfig} */[
             "**/.spellcheck.yml",
             "**/.pre-commit-config.yaml",
         ],
-        name: "YAML/YML Github Workflows - Disables",
+        name: "YAML/YML GitHub Workflows - Disables",
         rules: {
             "yml/block-mapping-colon-indicator-newline": "off",
             "yml/no-empty-key": "off",
@@ -10007,7 +10043,7 @@ export default /** @type {EslintConfig} */[
     },
     {
         files: [ "**/.vscode/**" ],
-        name: "Vscode Files - Disables",
+        name: "VS Code Files - Disables",
         rules: {
             "jsonc/array-bracket-newline": "off",
         },

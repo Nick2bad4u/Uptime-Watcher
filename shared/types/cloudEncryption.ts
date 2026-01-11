@@ -46,7 +46,7 @@ export type CloudEncryptionConfig =
     | CloudEncryptionConfigNone
     | CloudEncryptionConfigPassphrase;
 
-const cloudEncryptionConfigSchemaInternal = z.discriminatedUnion("mode", [
+const cloudEncryptionConfigInternalSchema = z.discriminatedUnion("mode", [
     z
         .object({
             configVersion: z.literal(CLOUD_ENCRYPTION_CONFIG_VERSION),
@@ -66,11 +66,11 @@ const cloudEncryptionConfigSchemaInternal = z.discriminatedUnion("mode", [
 
 /** Zod schema for {@link CloudEncryptionConfig}. */
 export const cloudEncryptionConfigSchema: z.ZodType<CloudEncryptionConfig> =
-    cloudEncryptionConfigSchemaInternal;
+    cloudEncryptionConfigInternalSchema;
 
 /** Parses and validates a {@link CloudEncryptionConfig}. */
 export function parseCloudEncryptionConfig(
     candidate: unknown
 ): CloudEncryptionConfig {
-    return cloudEncryptionConfigSchemaInternal.parse(candidate);
+    return cloudEncryptionConfigInternalSchema.parse(candidate);
 }

@@ -676,7 +676,7 @@ describe("Fallback Utils Property-Based Tests", () => {
 
         it("should handle camelCase and snake_case type names", () => {
             const testCases = [
-                ["httpApi", "Http Api Monitor"],
+                ["httpApi", "HTTP API Monitor"],
                 ["ssl_certificate", "Ssl Certificate Monitor"],
                 ["databaseConnection", "Database Connection Monitor"],
                 ["web_service", "Web Service Monitor"],

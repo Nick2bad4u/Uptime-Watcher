@@ -30,7 +30,7 @@ const cloudSyncEntityStateSchema = z
     })
     .strict();
 
-const cloudSyncStateSchemaInternal = z
+const cloudSyncStateInternalSchema = z
     .object({
         monitor: z.record(z.string().min(1), cloudSyncEntityStateSchema),
         settings: z.record(z.string().min(1), cloudSyncEntityStateSchema),
@@ -40,7 +40,7 @@ const cloudSyncStateSchemaInternal = z
 
 /** Runtime schema for validating {@link CloudSyncState}. */
 export const cloudSyncStateSchema: z.ZodType<CloudSyncState> =
-    cloudSyncStateSchemaInternal;
+    cloudSyncStateInternalSchema;
 
 /**
  * A compacted snapshot of the derived sync state.
@@ -55,7 +55,7 @@ export interface CloudSyncSnapshot {
 /** Runtime schema for validating {@link CloudSyncSnapshot}. */
 export const cloudSyncSnapshotSchema: z.ZodType<CloudSyncSnapshot> = z
     .object({
-        createdAt: z.number().int().nonnegative(),
+        createdAt: z.int().nonnegative(),
         snapshotVersion: z.literal(CLOUD_SYNC_SNAPSHOT_VERSION),
         state: cloudSyncStateSchema,
         syncSchemaVersion: z.literal(CLOUD_SYNC_SCHEMA_VERSION),

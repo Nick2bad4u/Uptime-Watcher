@@ -3,7 +3,7 @@ schema: "../../../config/schemas/doc-frontmatter.schema.json"
 title: "ADR-009: Layered Validation Strategy with Zod"
 summary: "Establishes a multi-layered validation architecture using Zod schemas for IPC boundaries, business rules in managers, and persistence constraints in repositories."
 created: "2025-11-25"
-last_reviewed: "2026-01-08"
+last_reviewed: "2026-01-11"
 category: "guide"
 author: "Nick2bad4u"
 tags:
@@ -459,7 +459,7 @@ export function registerStandardizedIpcHandler<
 // Example usage (in a handler module):
 registerStandardizedIpcHandler(
  SITES_CHANNELS.addSite,
- withIgnoredIpcEvent((site) => uptimeOrchestrator.addSite(site)),
+ async (site) => uptimeOrchestrator.addSite(site),
  SiteHandlerValidators.addSite,
  registeredHandlers
 );

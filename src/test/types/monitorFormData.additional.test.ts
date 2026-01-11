@@ -537,8 +537,8 @@ describe("monitorFormData functions - Additional Coverage", () => {
             const result1 = (createDefaultFormData as any)("DNS");
             expect(result1.type).toBe("DNS");
 
-            const result2 = (createDefaultFormData as any)("Http");
-            expect(result2.type).toBe("Http");
+            const result2 = (createDefaultFormData as any)("HTTP");
+            expect(result2.type).toBe("HTTP");
         });
 
         it("should handle empty string type", async ({ task, annotate }) => {

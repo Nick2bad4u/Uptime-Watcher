@@ -21,8 +21,25 @@ export interface SiteCardStatusProperties {
     readonly status: MonitorStatus;
 }
 
-const toTitleCase = (value: string): string =>
-    `${value.charAt(0).toUpperCase()}${value.slice(1).toLowerCase()}`;
+const STATUS_LABEL_ACRONYMS = new Set(["api", "dns", "http"]);
+
+const toTitleCase = (value: string): string => {
+    if (!value) {
+        return "";
+    }
+
+    // Preserve already-uppercase segments.
+    if (/^[A-Z0-9]+$/u.test(value)) {
+        return value;
+    }
+
+    const lower = value.toLowerCase();
+    if (STATUS_LABEL_ACRONYMS.has(lower)) {
+        return lower.toUpperCase();
+    }
+
+    return `${value.charAt(0).toUpperCase()}${value.slice(1).toLowerCase()}`;
+};
 
 /**
  * Status section component for site card displaying current monitor status.

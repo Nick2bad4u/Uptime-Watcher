@@ -3,7 +3,7 @@ schema: "../../config/schemas/doc-frontmatter.schema.json"
 title: "API & IPC Documentation"
 summary: "Comprehensive reference for Uptime Watcher's IPC communication and API surface."
 created: "2025-09-22"
-last_reviewed: "2025-12-14"
+last_reviewed: "2026-01-11"
 category: "guide"
 author: "Nick2bad4u"
 tags:
@@ -915,44 +915,41 @@ interface HistoryEntry {
 
 ### Monitor Type Configurations
 
-Every monitor configuration extends `BaseMonitorConfig` and adds type-specific fields. The full set of interfaces lives in [`shared/types/monitorConfig.ts`](../../shared/types/monitorConfig.ts) and is surfaced to both the Electron backend and the renderer through IPC.
+Monitor configuration is represented by the shared {@link Monitor} domain model
+(defined in [`shared/types.ts`](../../shared/types.ts)). Instead of maintaining
+separate per-type config interfaces, the `Monitor` model uses a discriminating
+`type` field plus optional, type-specific properties.
 
-```typescript
-type MonitorConfig =
- | HttpMonitorConfig
- | HttpStatusMonitorConfig
- | HttpHeaderMonitorConfig
- | HttpKeywordMonitorConfig
- | HttpJsonMonitorConfig
- | HttpLatencyMonitorConfig
- | PingMonitorConfig
- | PortMonitorConfig
- | DnsMonitorConfig
- | SslMonitorConfig
- | CdnEdgeConsistencyMonitorConfig
- | ReplicationMonitorConfig
- | ServerHeartbeatMonitorConfig
- | WebsocketKeepaliveMonitorConfig;
-```
+The authoritative runtime validation for those properties lives in the shared
+Zod schema graph:
 
-| Monitor type (`type` field) | Configuration interface | Key fields |
-| --- | --- | --- |
-| `http` | `HttpMonitorConfig` | `url`, `method`, `expectedStatusCodes`, optional `auth`/`headers`/`requestBody` |
-| `http-status` | `HttpStatusMonitorConfig` | `url`, `expectedStatusCode` |
-| `http-header` | `HttpHeaderMonitorConfig` | `url`, `headerName`, `expectedHeaderValue` |
-| `http-keyword` | `HttpKeywordMonitorConfig` | `url`, `bodyKeyword` |
-| `http-json` | `HttpJsonMonitorConfig` | `url`, `jsonPath`, `expectedJsonValue` |
-| `http-latency` | `HttpLatencyMonitorConfig` | `url`, `maxResponseTime` |
-| `ping` | `PingMonitorConfig` | `host`, `packetCount`, `packetSize`, optional `maxPacketLoss` |
-| `port` | `PortMonitorConfig` | `host`, `port`, optional `protocol.expectedResponse`/`useTls` |
-| `dns` | `Monitor` domain fields | `host`, `recordType`, optional `expectedValue` |
-| `ssl` | `SslMonitorConfig` | `host`, `port`, `certificateWarningDays` |
-| `cdn-edge-consistency` | `CdnEdgeConsistencyMonitorConfig` | `baselineUrl`, `edgeLocations` (newline or comma separated list) |
-| `replication` | `ReplicationMonitorConfig` | `primaryStatusUrl`, `replicaStatusUrl`, `replicationTimestampField`, `maxReplicationLagSeconds` |
-| `server-heartbeat` | `ServerHeartbeatMonitorConfig` | `url`, `heartbeatStatusField`, `heartbeatExpectedStatus`, `heartbeatTimestampField`, `heartbeatMaxDriftSeconds` |
-| `websocket-keepalive` | `WebsocketKeepaliveMonitorConfig` | `url`, `maxPongDelayMs` |
+- Monitor schemas: [`shared/validation/monitorSchemas.ts`](../../shared/validation/monitorSchemas.ts)
+- Field primitives (IDs, URL/host constraints, etc.): [`shared/validation/monitorFieldSchemas.ts`](../../shared/validation/monitorFieldSchemas.ts)
 
-All configuration interfaces also inherit scheduling, retry, and timeout controls from `BaseMonitorConfig`, ensuring consistent behaviour across the monitoring pipeline.
+For an IPC-backed validation entry point, use
+`MonitorTypesService.validateMonitorData(...)` (documented above) which mirrors
+the backend validation layer.
+
+| Monitor type (`Monitor.type`) | Primary fields on {@link Monitor} |
+| --- | --- |
+| `http` | `url`, `checkInterval`, optional `followRedirects` |
+| `http-status` | `url`, `expectedStatusCode` |
+| `http-header` | `url`, `headerName`, `expectedHeaderValue` |
+| `http-keyword` | `url`, `bodyKeyword` |
+| `http-json` | `url`, `expectedJsonValue` |
+| `http-latency` | `url` |
+| `ping` | `host` |
+| `port` | `host`, `port` |
+| `dns` | `host`, `expectedValue` |
+| `ssl` | `host`, `port`, `certificateWarningDays` |
+| `cdn-edge-consistency` | `baselineUrl`, `edgeLocations` |
+| `replication` | replication URLs + lag budget fields (see schema) |
+| `server-heartbeat` | heartbeat URLs + drift budget fields (see schema) |
+| `websocket-keepalive` | websocket URL + timeout fields (see schema) |
+
+> **Schema note:** The table above is intentionally high level. Refer to the
+> shared Zod schemas for the exact required fields and constraints per monitor
+> type.
 
 ## 🛠️ Error Handling
 

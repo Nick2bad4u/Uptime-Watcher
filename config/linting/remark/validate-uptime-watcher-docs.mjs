@@ -465,7 +465,7 @@ const validateUptimeWatcherDocs = () => {
                 npm: "npm",
                 git: "Git",
                 docker: "Docker",
-                webpack: "Webpack",
+                webpack: "webpack",
                 babel: "Babel",
                 eslint: "ESLint",
                 prettier: "Prettier",

@@ -12,16 +12,16 @@ export function createNonWhitespaceStringSchema(args: {
     readonly maxLengthMessage?: string;
     readonly requiredMessage: string;
 }): z.ZodString {
-    const base = z.string();
+    const baseSchema = z.string();
 
     const withMax =
         typeof args.maxLength === "number"
-            ? base.max(
+            ? baseSchema.max(
                   args.maxLength,
                   args.maxLengthMessage ??
                       `Must be at most ${args.maxLength} characters`
               )
-            : base;
+            : baseSchema;
 
     return withMax.regex(/\S/u, args.requiredMessage);
 }

@@ -3,7 +3,7 @@ schema: "../../../config/schemas/doc-frontmatter.schema.json"
 title: "ADR-016: Multi-Device Sync Data Model"
 summary: "Defines the canonical sync model, conflict detection/merge rules, and payload boundaries for true multi-device sync without syncing raw SQLite files."
 created: "2025-12-12"
-last_reviewed: "2025-12-14"
+last_reviewed: "2026-01-11"
 category: "guide"
 author: "Nick2bad4u"
 tags:
@@ -34,7 +34,7 @@ tags:
 
 Accepted (implemented — complete)
 
-> **Implementation status (as of 2025-12-14)**
+> **Implementation status (as of 2026-01-11)**
 >
 > - ✅ Canonical sync domain types implemented under:
 >   - `shared/types/cloudSync*.ts`
@@ -86,7 +86,7 @@ The local SQLite DB remains the authoritative on-device persistence layer, but i
 
 We will implement a provider-backed sync transport (ADR-015) using:
 
-- An append-only **per-device operation log** (`.ndjson` or chunked JSON arrays)
+- An append-only **per-device operation log** stored as **NDJSON** (`.ndjson`)
 - Periodic **compacted snapshots** to bound replay time
 
 This reduces write conflicts, because logs are written to per-device keys.
@@ -115,11 +115,19 @@ In code this is represented as:
 
 ### 5) Versioning
 
-- Every sync payload includes:
+- Sync **operations** include:
   - `syncSchemaVersion`
-  - `appVersion`
   - `deviceId`
   - monotonic `opId` per device
+  - `timestamp` (epoch ms)
+
+- Sync **snapshots** and the **manifest** include:
+  - `syncSchemaVersion`
+  - their own version fields (`snapshotVersion`, `manifestVersion`)
+
+> Note: the current implementation does **not** include `appVersion` in the
+> sync payload model. If we add it later, it should be treated as metadata for
+> diagnostics/compatibility reporting, not as part of the deterministic merge.
 
 Migration rules:
 
@@ -132,8 +140,10 @@ Migration rules:
 
 V1 uses a deterministic merge strategy:
 
-- **Last-write-wins per field** using `updatedAt` timestamps.
-- A tie-breaker uses `(timestamp, deviceId)` to ensure determinism.
+- **Last-write-wins per field** using the {@link CloudSyncWriteKey} ordering.
+  In practice this is `(timestamp, deviceId, opId)`.
+- This ensures determinism even when multiple devices write concurrently or
+  remote objects are listed/applied in different orders.
 
 ### Special cases
 

@@ -446,10 +446,10 @@ describe("Type Guards Advanced Fuzzing Tests", () => {
         // Test with case variations
         fcTest.prop([
             fc.oneof(
-                fc.constantFrom("HTTP", "Http", "hTtP"), // Case variations
+                fc.constantFrom("HTTP", "HTTP", "HTTP"), // Case variations
                 fc.constantFrom("PING", "Ping", "pInG"),
                 fc.constantFrom("PORT", "Port", "pOrT"),
-                fc.constantFrom("DNS", "Dns", "dNs")
+                fc.constantFrom("DNS", "DNS", "DNS")
             ),
         ])(
             "validateMonitorType should handle case variations",

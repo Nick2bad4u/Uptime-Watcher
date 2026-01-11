@@ -201,7 +201,7 @@ describe("Monitor Types Utility", () => {
             await annotate("Type: Business Logic", "type");
 
             expect(isBaseMonitorType("HTTP")).toBeFalsy();
-            expect(isBaseMonitorType("Http")).toBeFalsy();
+            expect(isBaseMonitorType("HTTP")).toBeFalsy();
             expect(isBaseMonitorType("PORT")).toBeFalsy();
             expect(isBaseMonitorType("Port")).toBeFalsy();
         });

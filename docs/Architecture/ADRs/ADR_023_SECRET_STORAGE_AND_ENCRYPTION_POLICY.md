@@ -3,7 +3,7 @@ schema: "../../../config/schemas/doc-frontmatter.schema.json"
 title: "ADR-023: Secret Storage and Encryption Policy"
 summary: "Defines how the app stores OAuth tokens and other secrets for cloud providers, including encryption-at-rest expectations, safe fallbacks, and logging redaction rules."
 created: "2025-12-15"
-last_reviewed: "2025-12-16"
+last_reviewed: "2026-01-11"
 category: "guide"
 author: "Nick2bad4u"
 tags:
@@ -113,7 +113,8 @@ Users can:
 
 - Secret storage:
   - `electron/services/cloud/secrets/SecretStore.ts`
-    - includes `SafeStorageSecretStore` and `EphemeralSecretStore`
+    - includes `SafeStorageSecretStore`, `EphemeralSecretStore`, and
+      `FallbackSecretStore`
 - Dropbox tokens:
   - `electron/services/cloud/providers/dropbox/DropboxTokenManager.ts`
 

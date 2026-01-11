@@ -12,7 +12,7 @@ export interface DropboxTokens {
 const dropboxTokensSchema: z.ZodType<DropboxTokens> = z
     .object({
         accessToken: z.string().min(1),
-        expiresAtEpochMs: z.number().int().nonnegative(),
+        expiresAtEpochMs: z.int().nonnegative(),
         refreshToken: z.string().min(1),
     })
     .strict();

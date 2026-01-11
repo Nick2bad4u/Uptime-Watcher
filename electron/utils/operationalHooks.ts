@@ -121,7 +121,7 @@ const operationIdSchema = z.custom<OperationId>(
         value.startsWith("op_") &&
         value.length > 3,
     {
-        message: "Operation ID must be a non-empty string starting with 'op_'",
+        error: "Operation ID must be a non-empty string starting with 'op_'",
     }
 );
 

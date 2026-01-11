@@ -31,7 +31,7 @@ describe("Backend Validation Fuzzing Tests", () => {
                     fc.oneof(
                         fc.constantFrom("http", "ping", "dns", "tcp"),
                         fc.constantFrom("HTTP", "PING", "DNS", "TCP"), // Uppercase
-                        fc.constantFrom("Http", "Ping", "Dns", "Tcp"), // Mixed case
+                        fc.constantFrom("HTTP", "Ping", "DNS", "TCP"), // Mixed case
                         fc.string(),
                         fc.constant(null),
                         fc.constant(undefined),

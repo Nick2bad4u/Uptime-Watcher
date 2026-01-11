@@ -364,7 +364,7 @@ const config: Config = {
                         },
                         {
                             href: "https://nick2bad4u.github.io/Uptime-Watcher/eslint-inspector/",
-                            label: "🧪 ESlint Config",
+                            label: "🧪 ESLint Config",
                         },
                         {
                             label: "📝 TSDoc Standards",

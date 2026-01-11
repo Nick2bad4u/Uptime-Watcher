@@ -305,7 +305,7 @@ const httpHeaderNameSchema = z
     .min(1, "Header name is required")
     .max(256, "Header name must be 256 characters or fewer")
     .refine(isValidHeaderName, {
-        message:
+        error:
             "Header name must use valid HTTP token characters (letters, digits, and !#$%&'*+.^_`|~-)",
     });
 
@@ -317,7 +317,7 @@ const httpHeaderValueSchema = z
     .min(1, "Expected header value is required")
     .max(2048, "Expected header value must be 2048 characters or fewer")
     .refine((value) => value.trim().length > 0, {
-        message: "Expected header value is required",
+        error: "Expected header value is required",
     });
 
 /**
@@ -373,7 +373,7 @@ const jsonPathSchema = z
     .min(1, "JSON path is required")
     .max(512, "JSON path must be 512 characters or fewer")
     .refine(isValidJsonPath, {
-        message:
+        error:
             "JSON path must use dot notation without spaces or empty segments",
     });
 
@@ -401,7 +401,7 @@ const createDotPathSchema = (fieldLabel: string): z.ZodString =>
         .min(1, `${fieldLabel} is required`)
         .max(256, `${fieldLabel} must be 256 characters or fewer`)
         .refine(isValidDotPath, {
-            message: `${fieldLabel} must use dot notation without spaces or empty segments`,
+            error: `${fieldLabel} must use dot notation without spaces or empty segments`,
         });
 
 /**
@@ -477,7 +477,7 @@ export const httpKeywordMonitorSchema: HttpKeywordMonitorSchemaType =
                 .min(1, "Keyword is required")
                 .max(1024, "Keyword must be 1024 characters or fewer")
                 .refine((keyword) => keyword.trim().length > 0, {
-                    message: "Keyword is required",
+                    error: "Keyword is required",
                 }),
             followRedirects: z.boolean().optional(),
             type: z.literal("http-keyword"),
@@ -503,7 +503,7 @@ export const httpJsonMonitorSchema: HttpJsonMonitorSchemaType =
                     "Expected JSON value must be 2048 characters or fewer"
                 )
                 .refine((value) => value.trim().length > 0, {
-                    message: "Expected JSON value is required",
+                    error: "Expected JSON value is required",
                 }),
             followRedirects: z.boolean().optional(),
             jsonPath: jsonPathSchema,
@@ -523,7 +523,6 @@ export const httpStatusMonitorSchema: HttpStatusMonitorSchemaType =
     baseMonitorSchema
         .extend({
             expectedStatusCode: z
-                .number()
                 .int("Status code must be an integer")
                 .min(100, "Status code must be between 100 and 599")
                 .max(599, "Status code must be between 100 and 599"),
@@ -678,7 +677,7 @@ export const serverHeartbeatMonitorSchema: ServerHeartbeatMonitorSchemaType =
                 .min(1, "Expected status is required")
                 .max(128, "Expected status must be 128 characters or fewer")
                 .refine((value) => value.trim().length > 0, {
-                    message: "Expected status is required",
+                    error: "Expected status is required",
                 }),
             heartbeatMaxDriftSeconds: z
                 .number()

@@ -39,21 +39,21 @@ const MAX_SAFE_INT = Number.MAX_SAFE_INTEGER;
  */
 export type JsonValue = TypeFestJsonValue;
 
-const jsonValueSchemaInternal: z.ZodType<JsonValue> = z.lazy(() =>
+const jsonValueInternalSchema: z.ZodType<JsonValue> = z.lazy(() =>
     z.union([
         z.string(),
         z.number(),
         z.boolean(),
         z.null(),
-        z.array(jsonValueSchemaInternal),
-        z.record(z.string(), jsonValueSchemaInternal),
+        z.array(jsonValueInternalSchema),
+        z.record(z.string(), jsonValueInternalSchema),
     ])
 );
 
 /**
  * Zod schema validating {@link JsonValue}.
  */
-export const jsonValueSchema: z.ZodType<JsonValue> = jsonValueSchemaInternal;
+export const jsonValueSchema: z.ZodType<JsonValue> = jsonValueInternalSchema;
 
 const entityTypeValues = [
     "site",
@@ -69,14 +69,14 @@ const entityTypeValues = [
  */
 export type CloudSyncEntityType = (typeof entityTypeValues)[number];
 
-const cloudSyncEntityTypeSchemaInternal: z.ZodType<CloudSyncEntityType> =
+const cloudSyncEntityTypeInternalSchema: z.ZodType<CloudSyncEntityType> =
     z.enum(entityTypeValues);
 
 /**
  * Zod schema validating {@link CloudSyncEntityType}.
  */
-export const cloudSyncEntityTypeSchema: typeof cloudSyncEntityTypeSchemaInternal =
-    cloudSyncEntityTypeSchemaInternal;
+export const cloudSyncEntityTypeSchema: typeof cloudSyncEntityTypeInternalSchema =
+    cloudSyncEntityTypeInternalSchema;
 
 /**
  * Common write ordering key.
@@ -97,11 +97,11 @@ export interface CloudSyncWriteKey {
     readonly timestamp: number;
 }
 
-const cloudSyncWriteKeySchemaInternal: z.ZodType<CloudSyncWriteKey> = z
+const cloudSyncWriteKeyInternalSchema: z.ZodType<CloudSyncWriteKey> = z
     .object({
         deviceId: z.string().min(1),
-        opId: z.number().int().nonnegative().max(MAX_SAFE_INT),
-        timestamp: z.number().int().nonnegative().max(MAX_SAFE_INT),
+        opId: z.int().nonnegative().max(MAX_SAFE_INT),
+        timestamp: z.int().nonnegative().max(MAX_SAFE_INT),
     })
     .strict();
 
@@ -109,7 +109,7 @@ const cloudSyncWriteKeySchemaInternal: z.ZodType<CloudSyncWriteKey> = z
  * Zod schema validating {@link CloudSyncWriteKey}.
  */
 export const cloudSyncWriteKeySchema: z.ZodType<CloudSyncWriteKey> =
-    cloudSyncWriteKeySchemaInternal;
+    cloudSyncWriteKeyInternalSchema;
 /**
  * Operation emitted to the per-device append-only log.
  */
@@ -149,10 +149,10 @@ const setFieldOperationSchema = z
     .object({
         deviceId: z.string().min(1),
         entityId: z.string().min(1),
-        entityType: cloudSyncEntityTypeSchemaInternal,
-        opId: z.number().int().nonnegative().max(MAX_SAFE_INT),
+        entityType: cloudSyncEntityTypeInternalSchema,
+        opId: z.int().nonnegative().max(MAX_SAFE_INT),
         syncSchemaVersion: z.literal(CLOUD_SYNC_SCHEMA_VERSION),
-        timestamp: z.number().int().nonnegative().max(MAX_SAFE_INT),
+        timestamp: z.int().nonnegative().max(MAX_SAFE_INT),
     })
     .strict();
 
@@ -162,7 +162,7 @@ const setFieldOperationSchemaTyped = cloudSyncBaseOperationSchema
     .extend({
         field: z.string().min(1),
         kind: z.literal("set-field"),
-        value: jsonValueSchemaInternal,
+        value: jsonValueInternalSchema,
     })
     .strict() satisfies z.ZodType<CloudSyncSetFieldOperation>;
 
@@ -172,7 +172,7 @@ const deleteEntityOperationSchema = cloudSyncBaseOperationSchema
     })
     .strict() satisfies z.ZodType<CloudSyncDeleteEntityOperation>;
 
-const cloudSyncOperationSchemaInternal: z.ZodType<CloudSyncOperation> =
+const cloudSyncOperationInternalSchema: z.ZodType<CloudSyncOperation> =
     z.discriminatedUnion("kind", [
         deleteEntityOperationSchema,
         setFieldOperationSchemaTyped,
@@ -181,8 +181,8 @@ const cloudSyncOperationSchemaInternal: z.ZodType<CloudSyncOperation> =
 /**
  * Zod schema validating {@link CloudSyncOperation}.
  */
-export const cloudSyncOperationSchema: typeof cloudSyncOperationSchemaInternal =
-    cloudSyncOperationSchemaInternal;
+export const cloudSyncOperationSchema: typeof cloudSyncOperationInternalSchema =
+    cloudSyncOperationInternalSchema;
 
 /**
  * Parses a candidate into a {@link CloudSyncOperation}.

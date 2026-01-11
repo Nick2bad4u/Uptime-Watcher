@@ -429,7 +429,7 @@ describe("MonitorSelector - Complete Coverage", () => {
 
             // For non-standard types, component falls back to generated label and URL identifier
             const option = screen.getByText(
-                "Http Monitor: https://example.com"
+                "HTTP Monitor: https://example.com"
             );
             expect(option).toBeInTheDocument();
         });

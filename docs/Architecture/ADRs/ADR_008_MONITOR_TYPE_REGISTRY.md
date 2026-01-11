@@ -1,9 +1,9 @@
 ---
 schema: "../../../config/schemas/doc-frontmatter.schema.json"
 title: "ADR-008: Monitor Type Registry and Plugin Architecture"
-summary: "Establishes an extensible plugin-based system for registering monitor types with dynamic validation schemas, UI configuration, service factories, and version migration support."
+summary: "Establishes an extensible plugin-based system for registering monitor types with dynamic validation schemas, UI configuration, service factories, and version tagging (for future migration support)."
 created: "2025-11-25"
-last_reviewed: "2025-11-25"
+last_reviewed: "2026-01-11"
 category: "guide"
 author: "Nick2bad4u"
 tags:
@@ -68,7 +68,7 @@ We will implement a **Plugin-Based Monitor Type Registry** that centralizes moni
 2. **Zod schema binding** for runtime validation
 3. **Dynamic field definitions** for UI form generation
 4. **Service factory pattern** for monitor instantiation
-5. **Version management** with migration support
+5. **Version tagging** (reserved for future migration support)
 
 ### Monitor Type Registry Overview
 
@@ -115,7 +115,7 @@ graph TB
     end
 
     subgraph "Consumer Layers"
-        IPC["IpcService<br/>(get-all-monitor-types)"]
+        IPC["IpcService<br/>(get-monitor-types)"]
         Frontend["MonitorTypesService"]
         Validation["Monitor Validation"]
         Services["Monitor Services"]
@@ -171,7 +171,13 @@ graph TB
 
 ### 1. BaseMonitorConfig Interface
 
-Each monitor type provides a comprehensive configuration object:
+Each monitor type provides a comprehensive configuration object.
+
+> **Scope note:** In the current implementation, the shared contract exposed to
+> the renderer is {@link MonitorTypeConfig} (`shared/types/monitorTypes.ts`).
+> The Electron main-process registry extends that contract with main-only
+> concerns (service factories and Zod schemas) via {@link BaseMonitorConfig} in
+> `electron/services/monitoring/MonitorTypeRegistry.ts`.
 
 ```typescript
 export interface BaseMonitorConfig {
@@ -462,101 +468,28 @@ interface MonitorUIConfig {
 
 ## Migration System
 
-The registry includes a versioned migration system for evolving monitor configurations:
+Monitor type configs include a `version` string to support future evolution.
 
-### Migration Architecture
+**Current implementation status:** automatic monitor configuration migrations
+are **not implemented** yet (see the note in
+`electron/services/monitoring/MonitorTypeRegistry.ts`).
 
-```mermaid
-flowchart TB
-    subgraph "Migration Components"
-        Registry["MigrationRegistry"]
-        Orchestrator["MigrationOrchestrator"]
-        VersionMgr["VersionManager"]
-    end
+### What we do today
 
-    subgraph "Migration Rule"
-        From["fromVersion: '1.0.0'"]
-        To["toVersion: '1.1.0'"]
-        Transform["transform: async (data) => {...}"]
-        Breaking["isBreaking: boolean"]
-        Description["description: string"]
-    end
+- Keep monitor config schemas **strict** and **validated** at boundaries.
+- Prefer backwards-compatible schema evolution when possible (optional fields
+  with sane defaults).
+- When a breaking change is unavoidable, handle migration explicitly in the
+  import/upgrade path (not silently inside the registry).
 
-    subgraph "Migration Flow"
-        Input["Monitor Data<br/>v1.0.0"]
-        Path["Find Migration Path"]
-        Apply["Apply Transforms"]
-        Output["Monitor Data<br/>v1.1.0"]
-    end
+### Planned direction (future work)
 
-    Registry --> Orchestrator
-    VersionMgr --> Orchestrator
+If/when we add migrations, they should be:
 
-    From --> Transform
-    To --> Transform
-    Breaking --> Transform
-    Description --> Transform
-
-    Input --> Path
-    Path --> Apply
-    Apply --> Output
-
-    Orchestrator -->|"getMigrationPath()"| Path
-    Orchestrator -->|"applyTransform()"| Apply
-
-    classDef component fill:#dbeafe,stroke:#2563eb,stroke-width:2px
-    classDef rule fill:#dcfce7,stroke:#16a34a,stroke-width:2px
-    classDef flow fill:#fef3c7,stroke:#d97706,stroke-width:2px
-
-    class Registry,Orchestrator,VersionMgr component
-    class From,To,Transform,Breaking,Description rule
-    class Input,Path,Apply,Output flow
-```
-
-### Migration Rule Interface
-
-```typescript
-export interface MigrationRule {
- /** Source version for the migration */
- fromVersion: string;
-
- /** Target version for the migration */
- toVersion: string;
-
- /** Human-readable description */
- description: string;
-
- /** Whether migration may require user intervention */
- isBreaking: boolean;
-
- /** Transformation function */
- transform: (data: UnknownRecord) => Promise<UnknownRecord>;
-}
-```
-
-### Migration Usage
-
-```typescript
-// Register migration
-migrationRegistry.registerMigration("http", {
- fromVersion: "1.0.0",
- toVersion: "1.1.0",
- description: "Add timeout field with default value",
- isBreaking: false,
- transform: async (data) => ({
-  ...data,
-  timeout: data.timeout ?? 30000,
- }),
-});
-
-// Apply migration
-const result = await migrateMonitorType("http", "1.0.0", "1.1.0", monitorData);
-
-if (result.success) {
- console.log("Applied migrations:", result.appliedMigrations);
- return result.data;
-}
-```
+- **typed per monitor type**
+- **explicitly versioned**
+- **auditable** (log applied migrations)
+- **safe by default** (fail closed for unknown versions)
 
 ## Frontend Integration
 
@@ -567,15 +500,19 @@ channel map:
 
 ```typescript
 // electron/services/ipc/handlers/monitorTypeHandlers.ts
-registerStandardizedIpcHandler(
- MONITOR_TYPES_CHANNELS.getMonitorTypes,
- withIgnoredIpcEvent(() => {
-  const configs = getAllMonitorTypeConfigs();
-  return configs.map((config) => serializeMonitorTypeConfig(config));
- }),
- MonitorTypeHandlerValidators.getMonitorTypes,
- registeredHandlers
-);
+export function registerMonitorTypeHandlers({
+ registeredHandlers,
+}: {
+ registeredHandlers: Set<IpcInvokeChannel>;
+}): void {
+ const register = createStandardizedIpcRegistrar(registeredHandlers);
+
+ register(
+  MONITOR_TYPES_CHANNELS.getMonitorTypes,
+  () => getAllMonitorTypeConfigs().map(serializeMonitorTypeConfig),
+  MonitorTypeHandlerValidators.getMonitorTypes
+ );
+}
 ```
 
 ### Frontend Service
@@ -728,7 +665,7 @@ export async function getMonitorTypeConfig(
 - **Type safety**: Zod schemas provide compile-time and runtime validation
 - **Dynamic UI**: Forms generated from field definitions
 - **Extensibility**: New types require no changes to existing code
-- **Version support**: Migration system handles schema evolution
+- **Version support**: Version fields make future schema evolution possible
 - **Consistency**: All types follow the same registration pattern
 - **Testability**: Registry functions are easily unit tested
 
@@ -762,7 +699,7 @@ export async function getMonitorTypeConfig(
 2. **Define the Zod Schema**
 
    ```typescript
-   // shared/validation/schemas.ts
+   // shared/validation/monitorSchemas.ts
    export const myNewMonitorSchema = baseMonitorSchema
     .extend({
      type: z.literal("my-new-type"),

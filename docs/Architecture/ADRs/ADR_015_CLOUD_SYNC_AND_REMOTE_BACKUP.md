@@ -1,9 +1,9 @@
 ---
 schema: "../../../config/schemas/doc-frontmatter.schema.json"
 title: "ADR-015: Cloud Sync and Remote Backup Providers"
-summary: "Defines an opt-in cloud sync + remote backup architecture using provider-backed storage (Dropbox/Google Drive/WebDAV), secure auth, and validated payloads."
+summary: "Defines an opt-in cloud sync + remote backup architecture using provider-backed storage (Dropbox/Google Drive/Filesystem), secure auth, validated payloads, and a roadmap for WebDAV."
 created: "2025-12-12"
-last_reviewed: "2025-12-14"
+last_reviewed: "2026-01-11"
 category: "guide"
 author: "Nick2bad4u"
 tags:
@@ -36,9 +36,9 @@ tags:
 
 ## Status
 
-Accepted (implemented — complete)
+Accepted (implemented for Dropbox/Google Drive/Filesystem; WebDAV planned)
 
-> **Implementation status (as of 2025-12-14)**
+> **Implementation status (as of 2026-01-11)**
 >
 > - ✅ Provider-backed object store abstraction implemented via
 >   `electron/services/cloud/providers/CloudStorageProvider.types.ts`.
@@ -49,6 +49,8 @@ Accepted (implemented — complete)
 >   `electron/services/cloud/providers/googleDrive/`.
 > - ✅ Filesystem provider implemented (sandboxed under `uptime-watcher/`)
 >   under `electron/services/cloud/providers/FilesystemCloudStorageProvider.ts`.
+> - ⏳ WebDAV provider not implemented yet (UI + provider kind exist; provider
+>   implementation is deferred).
 > - ✅ Cloud orchestration implemented in
 >   `electron/services/cloud/CloudService.ts` (connect/disconnect, backups,
 >   sync-now).
@@ -89,7 +91,7 @@ They share a provider/transport, but have different correctness requirements.
 
 1. **Offline-first**: the app must remain fully usable without internet.
 2. **No always-on Uptime Watcher server** (at least for V1): prefer provider-backed storage.
-3. **Security**: OAuth via system browser, no secrets in renderer, tokens stored in OS keychain.
+3. **Security**: OAuth via system browser, no secrets in renderer, tokens stored via Electron `safeStorage`.
 4. **Consistency**: minimize duplicated codepaths; keep validation at service boundaries.
 5. **Recoverability**: a user must be able to restore state even if sync is broken.
 6. **Determinism**: multi-device merges must converge (see ADR-016).
@@ -127,9 +129,10 @@ In code this is split into:
 
 Initial target providers:
 
-- **Dropbox** (MVP)
-- **Google Drive** (MVP parity)
-- **WebDAV** (power-user follow-up)
+- **Dropbox** (implemented)
+- **Google Drive** (implemented)
+- **Local folder / Filesystem provider** (implemented)
+- **WebDAV** (planned power-user follow-up; not implemented)
 
 ### 3) Storage layout (provider folder convention)
 
@@ -218,10 +221,11 @@ This is user-initiated and does not run automatically.
   - Writes `manifest.resetAt` and re-seeds remote state from the current device.
 
 The sync engine ignores any operation-log objects whose embedded
-`createdAtEpochMs` is older than `manifest.resetAt`, preventing older plaintext
+`createdAt` (epoch ms, encoded in the op-log object key) is older than
+`manifest.resetAt`, preventing older plaintext
 ops from resurfacing even if remote deletions are incomplete.
 
-### 7) Retry, backoff, and rate limiting
+### 8) Retry, backoff, and rate limiting
 
 - Dropbox network operations are wrapped in a retry/backoff policy that:
   - retries 429/5xx/network failures
@@ -231,7 +235,7 @@ ops from resurfacing even if remote deletions are incomplete.
 Chunked/resumable uploads are a follow-up (not required for the current SQLite
 backup sizes).
 
-### 8) Renderer integration
+### 9) Renderer integration
 
 Renderer must not call provider SDKs directly.
 
@@ -375,19 +379,22 @@ Phase 3 (hardening + usability):
 
 - Robust retries/resume for large files.
 - Conflict UI and diagnostics.
-- Google Drive / WebDAV follow-ups.
+- Google Drive parity hardening + WebDAV follow-ups.
 
 High-level modules (names indicative, not final):
 
 - `electron/services/cloud/`
-  - `CloudService` (orchestrates providers + jobs)
-  - `providers/DropboxProvider`
-  - `providers/GoogleDriveProvider`
-  - `providers/WebDavProvider`
-  - `secrets/CredentialStore`
-  - `crypto/CloudCrypto` (encrypt/decrypt)
-- `shared/types/cloud/` (provider-neutral request/response contracts)
-- `shared/validation/cloud/` (Zod schemas)
+  - `CloudService.ts` (orchestrates providers + jobs)
+  - `CloudSyncScheduler.ts` (polling/jitter/backoff)
+  - `providers/dropbox/` (Dropbox provider)
+  - `providers/googleDrive/` (Google Drive provider)
+  - `providers/FilesystemCloudStorageProvider.ts` (local folder provider)
+  - _(planned)_ `providers/webdav/` (WebDAV provider)
+  - `secrets/SecretStore.ts` (Electron `safeStorage`-backed secret storage)
+  - `crypto/cloudCrypto.ts` (encrypt/decrypt)
+- `shared/types/cloudSync*.ts` (sync domain contracts)
+- `shared/types/ipc.ts` + `shared/types/preload.ts` (IPC contracts/channels)
+- `shared/validation/cloudBackupSchemas.ts` (backup validation schemas)
 - `src/services/CloudService.ts` (renderer facade)
 - `src/stores/settings/` additions for sync config and status
 

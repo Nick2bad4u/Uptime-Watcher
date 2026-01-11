@@ -3,7 +3,7 @@ schema: "../../../config/schemas/doc-frontmatter.schema.json"
 title: "ADR-021: Cloud Provider Selection and Settings UI"
 summary: "Defines a provider-tabbed Cloud settings UX, enforces a single active provider at a time, and documents a roadmap for future providers (e.g. WebDAV)."
 created: "2025-12-15"
-last_reviewed: "2025-12-16"
+last_reviewed: "2026-01-11"
 category: "guide"
 author: "Nick2bad4u"
 tags:
@@ -68,7 +68,7 @@ The Cloud settings section exposes providers using a single tabbed selector:
 
 - Dropbox
 - Google Drive
-- WebDAV (coming soon)
+- WebDAV (planned — UI tab exists, provider implementation deferred)
 - Local folder (filesystem provider)
 
 Tabs act as an information architecture boundary: provider-specific setup lives inside the tab panel.

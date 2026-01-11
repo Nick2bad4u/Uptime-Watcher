@@ -30,7 +30,7 @@ export interface CloudSyncBaseline {
 export const cloudSyncBaselineSchema: z.ZodType<CloudSyncBaseline> = z
     .object({
         baselineVersion: z.literal(CLOUD_SYNC_BASELINE_VERSION),
-        createdAt: z.number().int().nonnegative(),
+        createdAt: z.int().nonnegative(),
         monitors: z.record(z.string().min(1), cloudSyncMonitorConfigSchema),
         settings: cloudSyncSettingsConfigSchema,
         sites: z.record(z.string().min(1), cloudSyncSiteConfigSchema),
