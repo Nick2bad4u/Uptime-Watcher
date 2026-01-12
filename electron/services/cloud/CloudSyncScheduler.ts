@@ -6,7 +6,11 @@ import type { CloudService } from "./CloudService";
 import { logger } from "../../utils/logger";
 
 const DEFAULT_SYNC_INTERVAL_MS = 10 * 60_000;
-const MAX_BACKOFF_DELAY_MS = 10 * 60_000;
+
+// Backoff must be able to exceed the default interval, otherwise repeated
+// failures will never slow down (which contradicts ADR-015 and can amplify
+// provider rate-limiting issues).
+const MAX_BACKOFF_DELAY_MS = 60 * 60_000;
 const JITTER_PERCENTAGE = 0.1;
 
 /**

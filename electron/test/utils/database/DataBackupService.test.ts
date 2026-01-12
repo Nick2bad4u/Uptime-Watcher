@@ -71,6 +71,7 @@ vi.mock("electron", () => ({
 }));
 
 vi.mock("../../../services/database/utils/backup/databaseBackup", () => ({
+    assertSqliteDatabaseIntegrity: vi.fn(),
     createDatabaseBackup: vi.fn(),
     computeDatabaseBackupChecksum: vi.fn(() => "mock-checksum"),
     validateDatabaseBackupPayload: vi.fn(),
@@ -102,6 +103,7 @@ import { DataBackupService } from "../../../services/database/DataBackupService"
 import { SiteLoadingError } from "../../../services/database/interfaces";
 import { app } from "electron";
 import {
+    assertSqliteDatabaseIntegrity,
     createDatabaseBackup,
     validateDatabaseBackupPayload,
 } from "../../../services/database/utils/backup/databaseBackup";
@@ -748,6 +750,12 @@ describe(DataBackupService, () => {
                     }),
                 })
             );
+            expect(assertSqliteDatabaseIntegrity).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    filePath: expect.stringContaining("restore.sqlite"),
+                    mode: "quick_check",
+                })
+            );
             expect(mockDatabaseService.close).toHaveBeenCalled();
             expect(mockDatabaseService.initialize).toHaveBeenCalled();
             expect(mockEventEmitter.emitTyped).toHaveBeenCalledWith(
@@ -762,6 +770,31 @@ describe(DataBackupService, () => {
                 })
             );
             expect(summary.metadata.sizeBytes).toBe(buffer.length);
+        });
+
+        it("rejects structurally invalid SQLite payloads before snapshotting", async () => {
+            const buffer = Buffer.concat([
+                Buffer.from("SQLite format 3\0", "ascii"),
+                Buffer.from("corrupt-but-has-header"),
+            ]);
+
+            vi.mocked(assertSqliteDatabaseIntegrity).mockImplementationOnce(() => {
+                throw new Error("SQLite quick_check failed: database disk image is malformed");
+            });
+
+            await expect(
+                dataBackupService.restoreDatabaseBackup({
+                    buffer,
+                    fileName: "restore.sqlite",
+                })
+            ).rejects.toThrowError(/quick_check failed/u);
+
+            // We wrote the incoming file, but never created a snapshot or
+            // attempted to swap in the corrupted database.
+            expect(mockFsPromises.mkdtemp).toHaveBeenCalledTimes(1);
+            expect(createDatabaseBackup).not.toHaveBeenCalled();
+            expect(mockDatabaseService.close).not.toHaveBeenCalled();
+            expect(mockDatabaseService.initialize).not.toHaveBeenCalled();
         });
 
         it("should reject non-SQLite payloads before writing temp files", async () => {
@@ -899,12 +932,21 @@ describe(DataBackupService, () => {
             mockEventEmitter.emitTyped.mockRejectedValue(emitError);
 
             // Act & Assert
-            // When event emission fails, the emission error is thrown instead of SiteLoadingError
+            // Event emission must be best-effort; the original backup failure
+            // should still be surfaced.
             await expect(
                 dataBackupService.downloadDatabaseBackup()
-            ).rejects.toThrowError("Event emission failed");
+            ).rejects.toThrowError(SiteLoadingError);
 
-            expect(mockLogger.error).not.toHaveBeenCalled();
+            expect(mockLogger.error).toHaveBeenCalledWith(
+                "Failed to download database backup: Backup failed",
+                expect.objectContaining({ message: "Backup failed" })
+            );
+            expect(mockLogger.warn).toHaveBeenCalledWith(
+                "[DataBackupService] Failed to emit database:error event",
+                expect.objectContaining({ message: "Event emission failed" }),
+                expect.objectContaining({ operation: "download-backup" })
+            );
         });
     });
 

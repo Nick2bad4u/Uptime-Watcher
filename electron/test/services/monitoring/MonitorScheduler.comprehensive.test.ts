@@ -140,8 +140,8 @@ describe("MonitorScheduler – comprehensive", () => {
         expect(jobAfterSecondRun?.backoffAttempt).toBe(0);
     });
 
-    it("caps exponential backoff to five minutes", async () => {
-        const baseInterval = 90_000;
+    it("caps exponential backoff to sixty minutes", async () => {
+        const baseInterval = 30 * 60_000;
         mockCheckCallback = createCheckCallbackMock().mockRejectedValue(
             new Error("fail")
         );
@@ -151,11 +151,9 @@ describe("MonitorScheduler – comprehensive", () => {
             createMonitor({ checkInterval: baseInterval })
         );
 
-        const expectedDelays = [
-            baseInterval * 2,
-            300_000,
-            300_000,
-        ];
+        // With exponential backoff, delays grow until they hit the global cap
+        // (60 minutes). Jitter is deterministic in this test (randomInt=0).
+        const expectedDelays = [3_600_000, 3_600_000, 3_600_000];
 
         for (const expectedDelay of expectedDelays) {
             await flushAsync();

@@ -1,3 +1,4 @@
+import type { CloudStatusSummary } from "@shared/types/cloud";
 import type { CloudSyncResetResult } from "@shared/types/cloudSyncReset";
 import type { CloudSyncResetPreview } from "@shared/types/cloudSyncResetPreview";
 import type { JSX } from "react";
@@ -452,6 +453,7 @@ const OperationLogsDetails = (props: {
 
 const ToolsCard = (props: {
     readonly copyIcon: JSX.Element;
+    readonly copyJsonIcon: JSX.Element;
     readonly copyResult:
         | null
         | {
@@ -463,8 +465,18 @@ const ToolsCard = (props: {
           };
     readonly disabled: boolean;
     readonly onCopy: () => void;
+    readonly onCopyJson: () => void;
+    readonly previewText: null | string;
 }): JSX.Element => {
-    const { copyIcon, copyResult, disabled, onCopy } = props;
+    const {
+        copyIcon,
+        copyJsonIcon,
+        copyResult,
+        disabled,
+        onCopy,
+        onCopyJson,
+        previewText,
+    } = props;
 
     return (
         <div className="settings-subcard settings-subcard--compact settings-maintenance__tools">
@@ -488,8 +500,42 @@ const ToolsCard = (props: {
                     >
                         Copy diagnostics
                     </ThemedButton>
+
+                    <ThemedButton
+                        disabled={disabled}
+                        icon={copyJsonIcon}
+                        onClick={onCopyJson}
+                        size="sm"
+                        variant="secondary"
+                    >
+                        Copy JSON
+                    </ThemedButton>
                 </div>
             </div>
+
+            <ThemedText as="p" className="mt-2" size="xs" variant="tertiary">
+                Includes provider status and remote sync preview. Does not
+                include passphrases, encryption keys, or OAuth tokens.
+            </ThemedText>
+
+            {previewText ? (
+                <details className="settings-details mt-3">
+                    <summary className="settings-details__summary">
+                        <span className="settings-details__summary-inner">
+                            <ThemedText
+                                as="span"
+                                size="xs"
+                                variant="secondary"
+                                weight="medium"
+                            >
+                                Preview copied text
+                            </ThemedText>
+                        </span>
+                    </summary>
+
+                    <pre className="settings-mono-block">{previewText}</pre>
+                </details>
+            ) : null}
 
             {copyResult ? (
                 <div className="mt-2">
@@ -550,6 +596,161 @@ async function copyTextToClipboard(text: string): Promise<void> {
     await SystemService.writeClipboardText(text);
 }
 
+function extractBasenameForDiagnostics(path: string): string {
+    const normalized = path.replaceAll("\\", "/");
+    const parts = normalized.split("/").filter((part) => part.length > 0);
+    return parts.at(-1) ?? path;
+}
+
+function buildProviderDetailsForDiagnostics(
+    status: CloudStatusSummary | null
+): unknown {
+    const provider = status?.provider;
+    const details = status?.providerDetails;
+
+    if (!provider || !details) {
+        return undefined;
+    }
+
+    switch (details.kind) {
+        case "dropbox":
+        case "google-drive":
+        case "webdav": {
+            return {
+                hasAccountLabel: typeof details.accountLabel === "string",
+                kind: details.kind,
+            };
+        }
+        case "filesystem": {
+            return {
+                baseDirectoryBasename: extractBasenameForDiagnostics(
+                    details.baseDirectory
+                ),
+                kind: details.kind,
+            };
+        }
+        default: {
+            return undefined;
+        }
+    }
+}
+
+interface DiagnosticsPayload {
+    readonly computedPreview: {
+        readonly mismatchText: null | string;
+        readonly otherObjectsText: null | string;
+        readonly previewText: string;
+    };
+    readonly context: {
+        readonly configured: boolean;
+        readonly connected: boolean;
+        readonly encryptionLocked: boolean;
+        readonly encryptionMode: CloudStatusSummary["encryptionMode"];
+        readonly lastBackupAt: null | number;
+        readonly lastError?: string;
+        readonly lastSyncAt: null | number;
+        readonly provider: CloudStatusSummary["provider"] | null;
+        readonly providerDetails?: unknown;
+        readonly syncEnabled: boolean;
+    };
+    readonly generatedAtEpochMs: number;
+    readonly lastResetResult: CloudSyncResetResult | null;
+    readonly preview: CloudSyncResetPreview | null;
+    readonly resetMaintenance: {
+        readonly canReset: boolean;
+        readonly statusText: string;
+        readonly summary: null | string;
+    };
+    readonly schemaVersion: 1;
+}
+
+function buildDiagnosticsPayload(args: {
+    readonly canReset: boolean;
+    readonly encryptionLocked: boolean;
+    readonly encryptionMode: "none" | "passphrase";
+    readonly generatedAtEpochMs: number;
+    readonly lastResult: CloudSyncResetResult | null;
+    readonly preview: CloudSyncResetPreview | null;
+    readonly status: CloudStatusSummary | null;
+    readonly statusText: string;
+    readonly summary: null | string;
+    readonly syncEnabled: boolean;
+}): DiagnosticsPayload {
+    const providerDetails = buildProviderDetailsForDiagnostics(args.status);
+    const computedPreview = buildPreviewViewModel(args.preview);
+
+    return {
+        computedPreview: {
+            mismatchText: computedPreview.mismatchText,
+            otherObjectsText: computedPreview.otherObjectsText,
+            previewText: computedPreview.previewText,
+        },
+        context: {
+            provider: args.status?.provider ?? null,
+            ...(providerDetails ? { providerDetails } : {}),
+            configured: args.status?.configured ?? false,
+            connected: args.status?.connected ?? false,
+            encryptionLocked: args.encryptionLocked,
+            encryptionMode: args.status?.encryptionMode ?? args.encryptionMode,
+            lastBackupAt: args.status?.lastBackupAt ?? null,
+            lastSyncAt: args.status?.lastSyncAt ?? null,
+            syncEnabled: args.syncEnabled,
+            ...(args.status?.lastError ? { lastError: args.status.lastError } : {}),
+        },
+        generatedAtEpochMs: args.generatedAtEpochMs,
+        lastResetResult: args.lastResult,
+        preview: args.preview,
+        resetMaintenance: {
+            canReset: args.canReset,
+            statusText: args.statusText,
+            summary: args.summary,
+        },
+        schemaVersion: 1,
+    };
+}
+
+function buildDiagnosticsText(args: {
+    readonly payload: DiagnosticsPayload;
+}): { readonly json: string; readonly text: string; } {
+    const json = JSON.stringify(args.payload, null, 2);
+    const generatedAt =
+        args.payload.generatedAtEpochMs > 0
+            ? formatFullTimestamp(args.payload.generatedAtEpochMs)
+            : "—";
+
+    const lines: string[] = [
+        "Uptime Watcher — Cloud Sync Diagnostics",
+        "(No secrets; does not include passphrases, encryption keys, or OAuth tokens)",
+        "",
+        `Generated: ${generatedAt}`,
+        "",
+        "Context",
+        `- Provider: ${args.payload.context.provider ?? "none"}`,
+        `- Connected: ${args.payload.context.connected}`,
+        `- Configured: ${args.payload.context.configured}`,
+        `- Sync enabled: ${args.payload.context.syncEnabled}`,
+        `- Encryption: ${args.payload.context.encryptionMode} (locked: ${args.payload.context.encryptionLocked})`,
+        `- Last sync: ${args.payload.context.lastSyncAt === null ? "—" : formatFullTimestamp(args.payload.context.lastSyncAt)}`,
+        `- Last backup: ${args.payload.context.lastBackupAt === null ? "—" : formatFullTimestamp(args.payload.context.lastBackupAt)}`,
+        `- Last error: ${args.payload.context.lastError ?? "—"}`,
+        "",
+        "Reset maintenance",
+        `- Can reset now: ${args.payload.resetMaintenance.canReset}`,
+        `- Status: ${args.payload.resetMaintenance.statusText}`,
+        `- Last reset summary: ${args.payload.resetMaintenance.summary ?? "—"}`,
+        "",
+        "Remote preview",
+        `- ${args.payload.computedPreview.previewText}`,
+        `- Mismatch: ${args.payload.computedPreview.mismatchText ?? "—"}`,
+        `- Other objects note: ${args.payload.computedPreview.otherObjectsText ?? "—"}`,
+        "",
+        "Raw JSON",
+        json,
+    ];
+
+    return { json, text: lines.join("\n") };
+}
+
 /**
  * Props for {@link SyncMaintenancePanel}.
  */
@@ -572,6 +773,9 @@ export interface SyncMaintenancePanelProperties {
     readonly onResetRemoteSyncState: () => void;
     /** Latest preview of remote sync state. */
     readonly preview: CloudSyncResetPreview | null;
+
+    /** Optional cloud status summary for richer diagnostics context. */
+    readonly status: CloudStatusSummary | null;
     /** Whether sync is currently enabled. */
     readonly syncEnabled: boolean;
 }
@@ -589,6 +793,7 @@ export const SyncMaintenancePanel = ({
     onRefreshPreview,
     onResetRemoteSyncState,
     preview,
+    status,
     syncEnabled,
 }: SyncMaintenancePanelProperties): JSX.Element => {
     const hasPreview = preview !== null;
@@ -605,6 +810,10 @@ export const SyncMaintenancePanel = ({
         [buttonIconSize, RefreshIcon]
     );
     const copyIcon = useMemo(
+        () => <CopyIcon aria-hidden size={buttonIconSize} />,
+        [buttonIconSize, CopyIcon]
+    );
+    const copyJsonIcon = useMemo(
         () => <CopyIcon aria-hidden size={buttonIconSize} />,
         [buttonIconSize, CopyIcon]
     );
@@ -665,27 +874,39 @@ export const SyncMaintenancePanel = ({
         };
     }, [preview]);
 
+    const buildCurrentDiagnostics = useCallback(
+        (generatedAtEpochMs: number): { json: string; text: string; } => {
+            const payload = buildDiagnosticsPayload({
+                canReset,
+                encryptionLocked,
+                encryptionMode,
+                generatedAtEpochMs,
+                lastResult,
+                preview,
+                status,
+                statusText,
+                summary,
+                syncEnabled,
+            });
+
+            return buildDiagnosticsText({ payload });
+        },
+        [
+            canReset,
+            encryptionLocked,
+            encryptionMode,
+            lastResult,
+            preview,
+            status,
+            statusText,
+            summary,
+            syncEnabled,
+        ]
+    );
+
     const copyDiagnostics = useCallback(
         async function copyDiagnostics(): Promise<void> {
-            const computedPreview = buildPreviewViewModel(preview);
-            const payload = {
-                computed: {
-                    mismatchText: computedPreview.mismatchText,
-                    otherObjectsText: computedPreview.otherObjectsText,
-                    previewText: computedPreview.previewText,
-                },
-                generatedAtEpochMs: Date.now(),
-                lastResetResult: lastResult,
-                preview,
-            };
-
-            const text =
-                `Uptime-Watcher Cloud Sync Reset Diagnostics\n` +
-                `(No secrets; does not include passphrases or keys)\n\n${JSON.stringify(
-                    payload,
-                    null,
-                    2
-                )}`;
+            const { text } = buildCurrentDiagnostics(Date.now());
 
             setCopyResult(null);
 
@@ -699,7 +920,26 @@ export const SyncMaintenancePanel = ({
                 });
             }
         },
-        [lastResult, preview]
+        [buildCurrentDiagnostics]
+    );
+
+    const copyDiagnosticsJson = useCallback(
+        async function copyDiagnosticsJson(): Promise<void> {
+            const { json } = buildCurrentDiagnostics(Date.now());
+
+            setCopyResult(null);
+
+            try {
+                await copyTextToClipboard(json);
+                setCopyResult({ kind: "success" });
+            } catch (error: unknown) {
+                setCopyResult({
+                    kind: "error",
+                    message: getUserFacingErrorDetail(error),
+                });
+            }
+        },
+        [buildCurrentDiagnostics]
     );
 
     const handleCopyDiagnostics = useCallback(
@@ -707,6 +947,30 @@ export const SyncMaintenancePanel = ({
             void copyDiagnostics();
         },
         [copyDiagnostics]
+    );
+
+    const handleCopyDiagnosticsJson = useCallback(
+        function handleCopyDiagnosticsJson(): void {
+            void copyDiagnosticsJson();
+        },
+        [copyDiagnosticsJson]
+    );
+
+    const previewGeneratedAtEpochMs = useMemo(() => {
+        if (preview) {
+            return preview.fetchedAt;
+        }
+
+        if (lastResult) {
+            return lastResult.completedAt;
+        }
+
+        return 0;
+    }, [lastResult, preview]);
+
+    const diagnosticsPreview = useMemo(
+        () => buildCurrentDiagnostics(previewGeneratedAtEpochMs).text,
+        [buildCurrentDiagnostics, previewGeneratedAtEpochMs]
     );
 
     const tone: MaintenanceTone = connected && syncEnabled ? "warning" : "info";
@@ -749,9 +1013,12 @@ export const SyncMaintenancePanel = ({
 
             <ToolsCard
                 copyIcon={copyIcon}
+                copyJsonIcon={copyJsonIcon}
                 copyResult={copyResult}
-                disabled={!hasPreview}
+                disabled={false}
                 onCopy={handleCopyDiagnostics}
+                onCopyJson={handleCopyDiagnosticsJson}
+                previewText={diagnosticsPreview}
             />
 
             <DangerZoneCard

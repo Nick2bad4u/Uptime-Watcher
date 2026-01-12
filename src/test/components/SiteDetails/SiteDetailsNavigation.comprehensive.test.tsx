@@ -536,7 +536,7 @@ describe("SiteDetailsNavigation Navigation Tests", () => {
                 activeSiteDetailsTab: "site-overview",
             });
 
-            const siteOverviewButton = screen.getByRole("button", {
+            const siteOverviewButton = screen.getByRole("tab", {
                 name: /site overview/i,
             });
             expect(siteOverviewButton).toHaveClass("themed-button--primary");
@@ -560,7 +560,7 @@ describe("SiteDetailsNavigation Navigation Tests", () => {
                 activeSiteDetailsTab: "settings",
             });
 
-            const settingsButton = screen.getByRole("button", {
+            const settingsButton = screen.getByRole("tab", {
                 name: /settings/i,
             });
             expect(settingsButton).toHaveClass("themed-button--primary");
@@ -581,7 +581,7 @@ describe("SiteDetailsNavigation Navigation Tests", () => {
                 activeSiteDetailsTab: "history",
             });
 
-            const historyButton = screen.getByRole("button", {
+            const historyButton = screen.getByRole("tab", {
                 name: /history/i,
             });
             expect(historyButton).toHaveClass("themed-button--primary");
@@ -605,7 +605,7 @@ describe("SiteDetailsNavigation Navigation Tests", () => {
                 activeSiteDetailsTab: `${httpMonitorId}-analytics`,
             });
 
-            const monitorButton = screen.getByRole("button", {
+            const monitorButton = screen.getByRole("tab", {
                 name: /website url analytics/i,
             });
             expect(monitorButton).toHaveClass("themed-button--primary");

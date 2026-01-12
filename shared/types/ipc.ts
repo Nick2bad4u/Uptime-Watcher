@@ -483,17 +483,18 @@ export type IpcInvokeChannel = keyof IpcInvokeChannelMap;
  *
  * @internal
  */
-type MutableTuple<TTuple extends readonly unknown[]> = {
-    -readonly [Index in keyof TTuple]: TTuple[Index];
-};
-
 /**
  * Helper type extracting the parameter tuple for a specific IPC channel.
+ *
+ * @remarks
+ * Parameters are modeled as readonly tuples. This keeps the channel contract
+ * accurate while avoiding mapped-type instantiation edge cases that can
+ * confuse downstream tooling.
  *
  * @public
  */
 export type IpcInvokeChannelParams<TChannel extends IpcInvokeChannel> =
-    MutableTuple<IpcInvokeChannelMap[TChannel]["params"]>;
+    IpcInvokeChannelMap[TChannel]["params"];
 
 /**
  * Helper type extracting the result payload for a specific IPC channel.

@@ -17,6 +17,7 @@ import {
     LOG_TEMPLATES,
 } from "@shared/utils/logTemplates";
 import { isRecord } from "@shared/utils/typeHelpers";
+import { getSafeUrlForLogging } from "@shared/utils/urlSafety";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 
 import type {
@@ -204,6 +205,7 @@ export function createHttpMonitorService<
 
                 const totalAttempts = maxRetries + 1;
                 const operationName = `${behavior.operationLabel} for ${url}`;
+                const safeUrlForLogging = getSafeUrlForLogging(url);
 
                 const singleCheckParams = {
                     context,
@@ -234,7 +236,7 @@ export function createHttpMonitorService<
                                 const errorMessage =
                                     getUserFacingErrorDetail(error);
                                 logger.debug(
-                                    `[${behavior.scope}] URL ${url} failed attempt ${attempt}/${totalAttempts}: ${errorMessage}`
+                                    `[${behavior.scope}] URL ${safeUrlForLogging} failed attempt ${attempt}/${totalAttempts}: ${errorMessage}`
                                 );
                             },
                         }),
@@ -249,9 +251,12 @@ export function createHttpMonitorService<
             params: SingleCheckParams
         ): Promise<MonitorCheckResult> {
             const { context, monitor, signal, timeout, url } = params;
-            if (isDev()) {
+
+            const safeUrlForLogging = isDev() ? getSafeUrlForLogging(url) : null;
+
+            if (safeUrlForLogging) {
                 logger.debug(
-                    `[${behavior.scope}] Checking URL: ${url} with timeout: ${timeout}ms`
+                    `[${behavior.scope}] Checking URL: ${safeUrlForLogging} with timeout: ${timeout}ms`
                 );
             }
             const response = await this.makeRequest(
@@ -262,14 +267,14 @@ export function createHttpMonitorService<
             );
             const responseTime = response.responseTime ?? 0;
 
-            if (isDev()) {
+            if (safeUrlForLogging) {
                 logger.debug(
                     interpolateLogTemplate(
                         LOG_TEMPLATES.debug.MONITOR_RESPONSE_TIME,
                         {
                             responseTime,
                             status: response.status,
-                            url,
+                            url: safeUrlForLogging,
                         }
                     )
                 );

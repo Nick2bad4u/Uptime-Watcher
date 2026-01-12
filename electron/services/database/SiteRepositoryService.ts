@@ -289,12 +289,22 @@ export class SiteRepositoryService {
             this.logger.error(message, error);
 
             // Emit typed error event
-            await this.eventEmitter.emitTyped("database:error", {
-                details: message,
-                error: toSerializedError(normalizedError),
-                operation: "load-sites-into-cache",
-                timestamp: Date.now(),
-            });
+            try {
+                await this.eventEmitter.emitTyped("database:error", {
+                    details: message,
+                    error: toSerializedError(normalizedError),
+                    operation: "load-sites-into-cache",
+                    timestamp: Date.now(),
+                });
+            } catch (emitError: unknown) {
+                this.logger.warn(
+                    "[SiteRepositoryService] Failed to emit database:error event",
+                    ensureError(emitError),
+                    {
+                        operation: "load-sites-into-cache",
+                    }
+                );
+            }
 
             throw normalizedError;
         }

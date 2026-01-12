@@ -22,6 +22,10 @@ import type {
 
 import { ensureError } from "@shared/utils/errorHandling";
 import {
+    assertJsonImportPayloadWithinIpcBudget,
+    assertSqliteRestorePayloadWithinIpcBudget,
+} from "@shared/utils/ipcPayloadBudgets";
+import {
     validateSerializedDatabaseBackupResult,
     validateSerializedDatabaseBackupSaveResult,
     validateSerializedDatabaseRestoreResult,
@@ -144,6 +148,8 @@ export const DataService: DataServiceContract = {
      *   processed, or an unexpected backend error occurs.
      */
     importData: wrap("importData", async (api, payload: string) => {
+        assertJsonImportPayloadWithinIpcBudget(payload);
+
         const result = await api.data.importData(payload);
         if (typeof result !== "boolean") {
             throw new TypeError(
@@ -153,21 +159,6 @@ export const DataService: DataServiceContract = {
 
         return result;
     }),
-
-    /**
-     * Ensures that the preload bridge for the `data` domain is initialized
-     * before any IPC operations are performed.
-     *
-     * @remarks
-     * Callers should invoke this method during application startup to avoid
-     * paying the initialization cost on the first data operation.
-     *
-     * @returns A promise that resolves when the underlying bridge is ready for
-     *   use.
-     *
-     * @throws {@link Error} When the Electron environment is unavailable or the
-     *   preload bridge cannot be initialized.
-     */
     initialize: ensureInitialized,
 
     /**
@@ -205,9 +196,13 @@ export const DataService: DataServiceContract = {
             // `undefined` value equivalently when displaying restore summaries.
             {
                 try {
+                    assertSqliteRestorePayloadWithinIpcBudget(payload);
+
+                    const response = await api.data.restoreSqliteBackup(payload);
+
                     return validateServicePayload<SerializedDatabaseRestoreResult>(
                         validateSerializedDatabaseRestoreResult,
-                        await api.data.restoreSqliteBackup(payload),
+                        response,
                         {
                             diagnostics: {
                                 payloadFileName: payload.fileName,

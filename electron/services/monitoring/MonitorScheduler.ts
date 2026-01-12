@@ -19,7 +19,14 @@ import {
 } from "./constants";
 
 const JITTER_PERCENTAGE = 0.1;
-const MAX_BACKOFF_DELAY_MS = 5 * 60 * 1000; // 5 minutes
+
+// Backoff must be able to exceed typical monitoring intervals; otherwise
+// repeated failures won't slow down and can amplify provider throttling or
+// local resource contention.
+//
+// NOTE: This is a global cap. The effective cap is `max(baseIntervalMs, cap)`
+// so user-configured intervals are never reduced by the backoff logic.
+const MAX_BACKOFF_DELAY_MS = 60 * 60_000; // 60 minutes
 
 type MonitorSchedulerEventBus = Pick<TypedEventBus<UptimeEvents>, "emitTyped">;
 
@@ -809,6 +816,10 @@ export class MonitorScheduler {
 
         this.clearJobTimer(job);
 
+        // We are about to schedule a new run; clear any pending reschedule
+        // requests that may have been set by overlapping triggers.
+        job.needsReschedule = false;
+
         const delayMs = this.computeNextDelay(job);
         job.correlationId = generateCorrelationId();
 
@@ -816,6 +827,11 @@ export class MonitorScheduler {
             job.timer = undefined;
             void this.runJob(intervalKey);
         }, delayMs);
+
+        // Avoid keeping the Node/Electron process alive solely because of a
+        // scheduled monitor check. This matters for graceful shutdown and for
+        // tests.
+        job.timer.unref();
 
         if (job.backoffAttempt > 0) {
             this.emitBackoffAppliedEvent(job, delayMs);
@@ -826,9 +842,13 @@ export class MonitorScheduler {
 
     private computeNextDelay(job: MonitorJob): number {
         const backoffMultiplier = 2 ** job.backoffAttempt;
+
+        // Never reduce the user-configured base interval by applying a global
+        // cap that is smaller than it.
+        const maxDelayMs = Math.max(job.baseIntervalMs, MAX_BACKOFF_DELAY_MS);
         const targetInterval = Math.min(
             job.baseIntervalMs * backoffMultiplier,
-            MAX_BACKOFF_DELAY_MS
+            maxDelayMs
         );
         const jitteredInterval = this.applyJitter(targetInterval);
         return Math.max(MIN_CHECK_INTERVAL, jitteredInterval);

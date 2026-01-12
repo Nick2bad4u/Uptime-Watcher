@@ -656,14 +656,14 @@ describe("HttpMonitor - Comprehensive Coverage", () => {
             );
 
             expect(logger.debug).toHaveBeenCalledWith(
-                "[HttpMonitor] Checking URL: https://example.com with timeout: 5000ms"
+                "[HttpMonitor] Checking URL: https://example.com/ with timeout: 5000ms"
             );
             expect(interpolateLogTemplate).toHaveBeenCalledWith(
                 LOG_TEMPLATES.debug.MONITOR_RESPONSE_TIME,
                 {
                     responseTime: 150,
                     status: 200,
-                    url: "https://example.com",
+                    url: "https://example.com/",
                 }
             );
             expect(logger.debug).toHaveBeenCalledWith(

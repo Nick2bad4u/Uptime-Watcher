@@ -69,6 +69,15 @@ export interface DatabaseRestoreSummary {
     restoredAt: number;
 }
 
+/**
+ * Mode used for SQLite file integrity checks.
+ *
+ * @remarks
+ * - `quick_check` is faster and should be used for most validation.
+ * - `integrity_check` is more thorough but can be slower on large databases.
+ */
+export type SqliteIntegrityCheckMode = "integrity_check" | "quick_check";
+
 interface CreateDatabaseBackupArgs {
     dbPath: string;
     fileName?: string;
@@ -108,6 +117,65 @@ export function readDatabaseSchemaVersionFromFile(filePath: string): number {
         }
 
         return 0;
+    } finally {
+        database.close();
+    }
+}
+
+function extractPragmaMessages(
+    rows: unknown,
+    column: string
+): readonly string[] {
+    if (!Array.isArray(rows)) {
+        return [];
+    }
+
+    const messages: string[] = [];
+
+    for (const row of rows) {
+        if (row && typeof row === "object") {
+            const value: unknown = Reflect.get(row, column);
+
+            if (typeof value === "string" && value.length > 0) {
+                messages.push(value);
+            }
+        }
+    }
+
+    return messages;
+}
+
+/**
+ * Asserts that the SQLite database file passes an integrity check.
+ *
+ * @remarks
+ * This is intended for validating **untrusted** external backups before they
+ * are swapped into the live database path.
+ */
+export function assertSqliteDatabaseIntegrity(args: {
+    readonly filePath: string;
+    readonly mode?: SqliteIntegrityCheckMode;
+}): void {
+    const mode = args.mode ?? "quick_check";
+    const pragma = mode === "integrity_check" ? "integrity_check" : "quick_check";
+    const statement = `PRAGMA ${pragma}`;
+
+    const database = new sqlite3.Database(args.filePath, {
+        fileMustExist: true,
+    });
+
+    try {
+        const rows: unknown = database.prepare(statement).all();
+        const messages = extractPragmaMessages(rows, pragma);
+
+        // When healthy, the pragma returns a single row with value "ok".
+        if (messages.length === 1 && messages[0]?.toLowerCase() === "ok") {
+            return;
+        }
+
+        // If SQLite returns multiple rows or non-ok messages, surface them.
+        const details = messages.length > 0 ? messages.join("; ") : "unknown";
+        throw new Error(`SQLite ${pragma} failed: ${details}`);
     } finally {
         database.close();
     }

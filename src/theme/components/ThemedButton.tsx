@@ -85,6 +85,8 @@ export type ThemedButtonProperties = ComponentProperties<
         readonly "data-testid"?: string;
         /** Click handler for the button */
         onClick?: EventHandlers.ClickWithEvent<HTMLButtonElement>;
+        /** Key down handler for keyboard navigation patterns (e.g., ARIA tabs). */
+        onKeyDown?: EventHandlers.KeyPress<HTMLButtonElement>;
         /** Size variant for the button */
         size?: ButtonSize;
         /** Visual variant for the button styling */

@@ -320,6 +320,22 @@ export class DropboxCloudStorageProvider
                 cloudObject: CloudObjectEntry | null;
                 isInvalid: boolean;
             } => {
+                // `filesListFolder` returns a mix of file and folder entries.
+                // Folder entries are expected (especially with recursive
+                // listing) and should not be treated as schema/validation
+                // failures.
+                if (isRecord(entry)) {
+                    const tag = entry[".tag"];
+
+                    if (tag === "folder" || tag === "deleted") {
+                        return { cloudObject: null, isInvalid: false };
+                    }
+
+                    if (typeof tag === "string" && tag !== "file") {
+                        return { cloudObject: null, isInvalid: true };
+                    }
+                }
+
                 const parsed = tryParseDropboxListFolderFileEntry(entry);
                 if (!parsed) {
                     return { cloudObject: null, isInvalid: true };

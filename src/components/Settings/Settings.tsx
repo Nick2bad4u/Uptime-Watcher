@@ -34,8 +34,9 @@
  * @public
  */
 
-import type { ChangeEvent, MouseEvent, ReactElement } from "react";
+import type { ChangeEvent, ReactElement } from "react";
 
+import { MAX_IPC_SQLITE_RESTORE_BYTES } from "@shared/constants/backup";
 import { DEFAULT_HISTORY_LIMIT_RULES } from "@shared/constants/history";
 import { ensureError } from "@shared/utils/errorHandling";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
@@ -52,7 +53,6 @@ import { logger } from "../../services/logger";
 import { useErrorStore } from "../../stores/error/useErrorStore";
 import { useSettingsStore } from "../../stores/settings/useSettingsStore";
 import { useSitesStore } from "../../stores/sites/useSitesStore";
-import { ThemedBox } from "../../theme/components/ThemedBox";
 import { ThemedButton } from "../../theme/components/ThemedButton";
 import { ThemedCheckbox } from "../../theme/components/ThemedCheckbox";
 import { ThemedSlider } from "../../theme/components/ThemedSlider";
@@ -64,6 +64,7 @@ import { waitForAnimation } from "../../utils/time/waitForAnimation";
 import { playInAppAlertTone } from "../Alerts/alertCoordinator";
 import { ErrorAlert } from "../common/ErrorAlert/ErrorAlert";
 import { GalaxyBackground } from "../common/GalaxyBackground/GalaxyBackground";
+import { Modal } from "../common/Modal/Modal";
 import { CloudSettingsSection } from "./CloudSettingsSection";
 import {
     ApplicationSection,
@@ -830,6 +831,16 @@ export const Settings = ({
         async (file: File) => {
             clearError();
             try {
+                if (file.size === 0) {
+                    throw new Error("Selected SQLite backup file is empty");
+                }
+
+                if (file.size > MAX_IPC_SQLITE_RESTORE_BYTES) {
+                    throw new Error(
+                        `Selected SQLite backup is too large to restore (${file.size} > ${MAX_IPC_SQLITE_RESTORE_BYTES} bytes).`
+                    );
+                }
+
                 const payload = {
                     buffer: await file.arrayBuffer(),
                     fileName: file.name,
@@ -910,20 +921,6 @@ export const Settings = ({
         void handleReset();
     }, [handleReset]);
 
-    /**
-     * Handles overlay clicks to support closing the modal when the user clicks
-     * outside the dialog content.
-     */
-    const handleOverlayClick = useCallback(
-        (event: MouseEvent<HTMLDivElement>) => {
-            if (event.target === event.currentTarget) {
-                void handleClose();
-            }
-        },
-        [handleClose]
-    );
-
-    const CloseIcon = AppIcons.ui.close;
     const SettingsHeaderIcon = AppIcons.settings.gearFilled;
     const SuccessIcon = AppIcons.status.upFilled;
     const MonitoringIcon = AppIcons.metrics.monitor;
@@ -943,149 +940,122 @@ export const Settings = ({
     const resetButtonIcon = useMemo(() => <ResetIcon size={16} />, [ResetIcon]);
     const showSyncSuccessBanner = syncSuccess && !lastError;
 
+    const headerBackground = useMemo(
+        () => (
+            <GalaxyBackground
+                className="galaxy-background--banner galaxy-background--banner-compact"
+                isDark={isDark}
+            />
+        ),
+        [isDark]
+    );
+
+    const headerIcon = useMemo(
+        () => <SettingsHeaderIcon size={22} />,
+        [SettingsHeaderIcon]
+    );
+
+    const subtitle = useMemo(
+        () => (
+            <ThemedText size="sm" variant="secondary">
+                Fine-tune monitoring, notifications, and data workflows.
+            </ThemedText>
+        ),
+        []
+    );
     return (
-        // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions -- Modal backdrop requires click handler for UX; keyboard support provided by modal focus management
-        <div
-            className={`modal-overlay modal-overlay--frosted ${
-                isDark ? "dark" : ""
-            } ${isClosing ? "modal-overlay--closing" : ""}`}
-            data-testid="settings-modal-overlay"
-            onClick={handleOverlayClick}
+        <Modal
+            accent="success"
+            closeButtonAriaLabel="Close settings"
+            closeButtonTestId="settings-modal-close"
+            escapePriority={120}
+            headerBackground={headerBackground}
+            headerIcon={headerIcon}
+            isBlocking
+            isOpen
+            modalTestId="settings-modal"
+            onRequestClose={handleCloseButtonClick}
+            overlayClassName={`${isDark ? "dark" : ""} ${
+                isClosing ? "modal-overlay--closing" : ""
+            }`}
+            overlayTestId="settings-modal-overlay"
+            overlayVariant="default"
+            shellClassName={`settings-modal ${
+                isClosing ? "modal-shell--closing" : ""
+            }`}
+            subtitle={subtitle}
+            title="Settings"
+            variant="form"
         >
-            <ThemedBox
-                as="dialog"
-                className={`modal-shell modal-shell--form modal-shell--accent-success settings-modal ${
-                    isClosing ? "modal-shell--closing" : ""
-                }`}
-                data-testid="settings-modal"
-                open
-                padding="xl"
-                rounded="xl"
-                shadow="xl"
-                surface="overlay"
-            >
-                <div className="modal-shell__header settings-modal__header">
-                    <GalaxyBackground
-                        className="galaxy-background--banner galaxy-background--banner-compact"
-                        isDark={isDark}
+            {lastError ? (
+                <ErrorAlert
+                    message={lastError}
+                    onDismiss={clearError}
+                    variant="error"
+                />
+            ) : null}
+
+            {showSyncSuccessBanner ? (
+                <output
+                    aria-live="polite"
+                    className="settings-modal__banner settings-modal__banner--success"
+                    data-testid="settings-sync-success"
+                >
+                    <SuccessIcon
+                        aria-hidden="true"
+                        className="settings-modal__banner-icon"
+                        size={18}
                     />
-                    <div className="modal-shell__header-content">
-                        <div className="modal-shell__title-group">
-                            <div className="flex items-center gap-2">
-                                <div className="modal-shell__accent-icon settings-modal__header-icon">
-                                    <SettingsHeaderIcon size={22} />
-                                </div>
-                                {/* eslint-disable-next-line jsx-a11y/prefer-tag-over-role -- Modal header requires explicit role for testing and assistive tech */}
-                                <ThemedText
-                                    aria-level={1}
-                                    as="h2"
-                                    className="modal-shell__title"
-                                    role="heading"
-                                    size="xl"
-                                    weight="semibold"
-                                >
-                                    Settings
-                                </ThemedText>
-                            </div>
-                            <ThemedText
-                                className="modal-shell__subtitle"
-                                size="sm"
-                                variant="secondary"
-                            >
-                                Fine-tune monitoring, notifications, and data
-                                workflows.
-                            </ThemedText>
-                        </div>
-                        <div className="modal-shell__actions">
-                            <button
-                                aria-label="Close settings"
-                                className="modal-shell__close"
-                                data-testid="settings-modal-close"
-                                onClick={handleCloseButtonClick}
-                                title="Close"
-                                type="button"
-                            >
-                                <CloseIcon size={18} />
-                            </button>
-                        </div>
+                    <div>
+                        <ThemedText size="sm" weight="medium">
+                            Sync complete
+                        </ThemedText>
+                        <ThemedText size="xs" variant="secondary">
+                            Latest data loaded from the monitoring database.
+                        </ThemedText>
                     </div>
-                </div>
+                </output>
+            ) : null}
 
-                <div className="modal-shell__body modal-shell__body-scrollable">
-                    {lastError ? (
-                        <ErrorAlert
-                            message={lastError}
-                            onDismiss={clearError}
-                            variant="error"
-                        />
-                    ) : null}
+            <div className="settings-modal__sections">
+                <ApplicationSection
+                    autoStartControl={autoStartControl}
+                    availableThemes={availableThemes}
+                    currentThemeName={currentThemeName}
+                    icon={ApplicationIcon}
+                    isLoading={isLoading}
+                    minimizeToTrayControl={minimizeToTrayControl}
+                    onThemeChange={handleThemeSelectChange}
+                />
 
-                    {showSyncSuccessBanner ? (
-                        <output
-                            aria-live="polite"
-                            className="settings-modal__banner settings-modal__banner--success"
-                            data-testid="settings-sync-success"
-                        >
-                            <SuccessIcon
-                                aria-hidden="true"
-                                className="settings-modal__banner-icon"
-                                size={18}
-                            />
-                            <div>
-                                <ThemedText size="sm" weight="medium">
-                                    Sync complete
-                                </ThemedText>
-                                <ThemedText size="xs" variant="secondary">
-                                    Latest data loaded from the monitoring
-                                    database.
-                                </ThemedText>
-                            </div>
-                        </output>
-                    ) : null}
+                <NotificationSection {...notificationSectionProps} />
 
-                    <div className="settings-modal__sections">
-                        <ApplicationSection
-                            autoStartControl={autoStartControl}
-                            availableThemes={availableThemes}
-                            currentThemeName={currentThemeName}
-                            icon={ApplicationIcon}
-                            isLoading={isLoading}
-                            minimizeToTrayControl={minimizeToTrayControl}
-                            onThemeChange={handleThemeSelectChange}
-                        />
+                <MonitoringSection
+                    currentHistoryLimit={currentHistoryLimit}
+                    icon={MonitoringIcon}
+                    isLoading={isLoading}
+                    onHistoryLimitChange={handleHistoryLimitSelectChange}
+                />
 
-                        <NotificationSection {...notificationSectionProps} />
+                <CloudSettingsSection />
 
-                        <MonitoringSection
-                            currentHistoryLimit={currentHistoryLimit}
-                            icon={MonitoringIcon}
-                            isLoading={isLoading}
-                            onHistoryLimitChange={
-                                handleHistoryLimitSelectChange
-                            }
-                        />
-
-                        <CloudSettingsSection />
-
-                        <MaintenanceSection
-                            backupSummary={backupSummary}
-                            downloadButtonIcon={downloadButtonIcon}
-                            icon={MaintenanceIcon}
-                            isLoading={isLoading}
-                            onDownloadBackup={handleDownloadSQLiteClick}
-                            onRefreshHistory={handleSyncNowClick}
-                            onResetData={handleResetClick}
-                            onRestoreClick={handleRestoreSQLiteClick}
-                            onRestoreFileChange={handleRestoreInputChange}
-                            refreshButtonIcon={refreshButtonIcon}
-                            resetButtonIcon={resetButtonIcon}
-                            restoreFileInputRef={restoreFileInputRef}
-                            showButtonLoading={showButtonLoading}
-                            uploadButtonIcon={uploadButtonIcon}
-                        />
-                    </div>
-                </div>
-            </ThemedBox>
-        </div>
+                <MaintenanceSection
+                    backupSummary={backupSummary}
+                    downloadButtonIcon={downloadButtonIcon}
+                    icon={MaintenanceIcon}
+                    isLoading={isLoading}
+                    onDownloadBackup={handleDownloadSQLiteClick}
+                    onRefreshHistory={handleSyncNowClick}
+                    onResetData={handleResetClick}
+                    onRestoreClick={handleRestoreSQLiteClick}
+                    onRestoreFileChange={handleRestoreInputChange}
+                    refreshButtonIcon={refreshButtonIcon}
+                    resetButtonIcon={resetButtonIcon}
+                    restoreFileInputRef={restoreFileInputRef}
+                    showButtonLoading={showButtonLoading}
+                    uploadButtonIcon={uploadButtonIcon}
+                />
+            </div>
+        </Modal>
     );
 };

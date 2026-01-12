@@ -51,6 +51,9 @@ export interface ModalProperties {
     /** Accessible label for the close (X) button. */
     readonly closeButtonAriaLabel?: string;
 
+    /** Optional test id for the close (X) button. */
+    readonly closeButtonTestId?: string;
+
     /** If true, clicking the overlay closes the modal (default: true). */
     readonly closeOnOverlayClick?: boolean;
 
@@ -63,6 +66,9 @@ export interface ModalProperties {
 
     /** Optional footer content rendered below the scrollable body. */
     readonly footer?: ReactNode;
+
+    /** Optional decorative content rendered behind the header content. */
+    readonly headerBackground?: ReactNode;
 
     /** Optional accent icon rendered next to the modal title. */
     readonly headerIcon?: ReactNode;
@@ -94,6 +100,9 @@ export interface ModalProperties {
      */
     readonly onRequestClose: () => void;
 
+    /** Optional extra class name(s) applied to the modal overlay. */
+    readonly overlayClassName?: string;
+
     /** Optional test id for the overlay. */
     readonly overlayTestId?: string;
 
@@ -107,6 +116,9 @@ export interface ModalProperties {
      */
     readonly role?: "alertdialog" | "dialog";
 
+    /** Optional extra class name(s) applied to the modal shell. */
+    readonly shellClassName?: string;
+
     /** If true, the close (X) button is shown in the header. */
     readonly showCloseButton?: boolean;
 
@@ -116,6 +128,9 @@ export interface ModalProperties {
      * @defaultValue "md"
      */
     readonly size?: ModalSize;
+
+    /** Optional subtitle/description rendered below the title. */
+    readonly subtitle?: ReactNode;
 
     /** Modal title shown in the header and used for aria-labelledby. */
     readonly title: string;
@@ -201,6 +216,70 @@ function getFocusableElements(container: HTMLElement): HTMLElement[] {
     );
 }
 
+function renderModalHeader(args: {
+    readonly closeButtonAriaLabel: string;
+    readonly closeButtonTestId: string | undefined;
+    readonly closeIcon: JSX.Element;
+    readonly headerBackground: ReactNode | undefined;
+    readonly headerIcon: ReactNode | undefined;
+    readonly onClose: () => void;
+    readonly showCloseButton: boolean;
+    readonly subtitle: ReactNode | undefined;
+    readonly title: string;
+    readonly titleId: string;
+}): JSX.Element {
+    const {
+        closeButtonAriaLabel,
+        closeButtonTestId,
+        closeIcon,
+        headerBackground,
+        headerIcon,
+        onClose,
+        showCloseButton,
+        subtitle,
+        title,
+        titleId,
+    } = args;
+
+    return (
+        <div className="modal-shell__header">
+            {headerBackground}
+            <div className="modal-shell__header-content">
+                <div className="modal-shell__title-group">
+                    <div className="modal-shell__title-row">
+                        {headerIcon ? (
+                            <div className="modal-shell__accent-icon">
+                                {headerIcon}
+                            </div>
+                        ) : null}
+                        <h3 className="modal-shell__title" id={titleId}>
+                            {title}
+                        </h3>
+                    </div>
+
+                    {subtitle ? (
+                        <div className="modal-shell__subtitle">{subtitle}</div>
+                    ) : null}
+                </div>
+
+                {showCloseButton ? (
+                    <div className="modal-shell__actions">
+                        <button
+                            aria-label={closeButtonAriaLabel}
+                            className="modal-shell__close"
+                            data-testid={closeButtonTestId}
+                            onClick={onClose}
+                            type="button"
+                        >
+                            {closeIcon}
+                        </button>
+                    </div>
+                ) : null}
+            </div>
+        </div>
+    );
+}
+
 /**
  * Shared, accessible modal dialog.
  *
@@ -216,25 +295,33 @@ export const Modal = ({
     ariaDescribedById,
     children,
     closeButtonAriaLabel = "Close dialog",
+    closeButtonTestId,
     closeOnOverlayClick = true,
     escapePriority = 100,
     footer,
+    headerBackground,
     headerIcon,
     isBlocking = true,
     isBodyScrollable = true,
     isOpen,
     modalTestId,
     onRequestClose,
+    overlayClassName,
     overlayTestId,
     overlayVariant = "confirm",
     role = "dialog",
+    shellClassName,
     showCloseButton = true,
     size = "md",
+    subtitle,
     title,
     variant = "default",
 }: ModalProperties): JSX.Element | null => {
     const modalId = useMemo(() => allocateModalId(), []);
     const titleId = useId();
+
+    const CloseIcon = AppIcons.ui.close;
+    const closeIconElement = useMemo(() => <CloseIcon size={18} />, [CloseIcon]);
 
     const portalRoot = useMemo<HTMLElement | null>(() => {
         if (typeof document === "undefined") {
@@ -436,13 +523,12 @@ export const Modal = ({
         return null;
     }
 
-    const CloseIcon = AppIcons.ui.close;
-
     const shellClassNames = [
         "modal-shell",
         resolveModalShellAccentClass(accent),
         resolveModalShellSizeClass(size),
         resolveModalShellVariantClass(variant),
+        shellClassName ?? "",
     ]
         .filter(Boolean)
         .join(" ");
@@ -451,6 +537,7 @@ export const Modal = ({
         "modal-overlay",
         "modal-overlay--frosted",
         resolveOverlayVariantClass(overlayVariant),
+        overlayClassName ?? "",
     ]
         .filter(Boolean)
         .join(" ");
@@ -479,34 +566,18 @@ export const Modal = ({
                 ref={modalRef}
                 role={role}
             >
-                <div className="modal-shell__header">
-                    <div className="modal-shell__header-content">
-                        <div className="modal-shell__title-group">
-                            <div className="modal-shell__title-row">
-                                {headerIcon ? (
-                                    <div className="modal-shell__accent-icon">
-                                        {headerIcon}
-                                    </div>
-                                ) : null}
-                                <h3 className="modal-shell__title" id={titleId}>
-                                    {title}
-                                </h3>
-                            </div>
-                        </div>
-                        {showCloseButton ? (
-                            <div className="modal-shell__actions">
-                                <button
-                                    aria-label={closeButtonAriaLabel}
-                                    className="modal-shell__close"
-                                    onClick={handleCloseButtonClick}
-                                    type="button"
-                                >
-                                    <CloseIcon size={18} />
-                                </button>
-                            </div>
-                        ) : null}
-                    </div>
-                </div>
+                {renderModalHeader({
+                    closeButtonAriaLabel,
+                    closeButtonTestId,
+                    closeIcon: closeIconElement,
+                    headerBackground,
+                    headerIcon,
+                    onClose: handleCloseButtonClick,
+                    showCloseButton,
+                    subtitle,
+                    title,
+                    titleId,
+                })}
 
                 <div className={bodyClassNames}>{children}</div>
 

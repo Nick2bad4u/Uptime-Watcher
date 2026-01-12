@@ -517,6 +517,7 @@ export const CloudSection = ({
                     onRefreshPreview={onRefreshRemoteSyncResetPreview}
                     onResetRemoteSyncState={onResetRemoteSyncState}
                     preview={remoteSyncResetPreview}
+                    status={status}
                     syncEnabled={syncEnabled}
                 />
 

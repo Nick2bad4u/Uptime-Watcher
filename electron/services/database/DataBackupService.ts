@@ -20,6 +20,7 @@ import { DB_FILE_NAME } from "../../constants";
 import { toSerializedError } from "../../utils/errorSerialization";
 import { SiteLoadingError } from "./interfaces";
 import {
+    assertSqliteDatabaseIntegrity,
     computeDatabaseBackupChecksum,
     createDatabaseBackup,
     type DatabaseBackupMetadata,
@@ -367,12 +368,22 @@ export class DataBackupService {
                     const normalizedError = ensureError(error);
                     const message = `Failed to download database backup: ${normalizedError.message}`;
 
-                    await this.eventEmitter.emitTyped("database:error", {
-                        details: message,
-                        error: toSerializedError(normalizedError),
-                        operation: "download-backup",
-                        timestamp: Date.now(),
-                    });
+                    try {
+                        await this.eventEmitter.emitTyped("database:error", {
+                            details: message,
+                            error: toSerializedError(normalizedError),
+                            operation: "download-backup",
+                            timestamp: Date.now(),
+                        });
+                    } catch (emitError: unknown) {
+                        this.logger.warn(
+                            "[DataBackupService] Failed to emit database:error event",
+                            ensureError(emitError),
+                            {
+                                operation: "download-backup",
+                            }
+                        );
+                    }
 
                     this.logger.error(message, normalizedError);
                     throw new SiteLoadingError(message, {
@@ -434,6 +445,14 @@ export class DataBackupService {
                         safeTempFileName
                     );
                     validateDatabaseBackupPayload({ buffer, metadata });
+
+                    // Untrusted restore validation: ensure the incoming SQLite
+                    // file is structurally sound before we create snapshots or
+                    // swap it into place.
+                    assertSqliteDatabaseIntegrity({
+                        filePath: tempFilePath,
+                        mode: "quick_check",
+                    });
 
                     preRestoreSnapshotDir = await this.createTempDirectory(
                         BACKUP_TEMP_PREFIX
@@ -499,12 +518,22 @@ export class DataBackupService {
                     const message =
                         "Failed to restore database backup. Original database has been preserved.";
 
-                    await this.eventEmitter.emitTyped("database:error", {
-                        details: message,
-                        error: toSerializedError(normalizedError),
-                        operation: "restore-backup",
-                        timestamp: Date.now(),
-                    });
+                    try {
+                        await this.eventEmitter.emitTyped("database:error", {
+                            details: message,
+                            error: toSerializedError(normalizedError),
+                            operation: "restore-backup",
+                            timestamp: Date.now(),
+                        });
+                    } catch (emitError: unknown) {
+                        this.logger.warn(
+                            "[DataBackupService] Failed to emit database:error event",
+                            ensureError(emitError),
+                            {
+                                operation: "restore-backup",
+                            }
+                        );
+                    }
 
                     this.logger.error(message, normalizedError);
                     throw normalizedError;

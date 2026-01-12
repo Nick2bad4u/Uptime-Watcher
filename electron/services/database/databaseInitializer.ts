@@ -46,12 +46,20 @@ export async function initDatabase(
     } catch (error) {
         const normalizedError = ensureError(error);
         logger.error("Failed to initialize database", normalizedError);
-        await eventEmitter.emitTyped("database:error", {
-            details: "Failed to initialize database",
-            error: toSerializedError(normalizedError),
-            operation: "initialize-database",
-            timestamp: Date.now(),
-        });
+
+        try {
+            await eventEmitter.emitTyped("database:error", {
+                details: "Failed to initialize database",
+                error: toSerializedError(normalizedError),
+                operation: "initialize-database",
+                timestamp: Date.now(),
+            });
+        } catch (emitError: unknown) {
+            logger.warn(
+                "Failed to emit database initialization error event",
+                ensureError(emitError)
+            );
+        }
         throw normalizedError;
     }
 }

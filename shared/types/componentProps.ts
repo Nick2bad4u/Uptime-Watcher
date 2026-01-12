@@ -363,6 +363,9 @@ export interface StandardButtonProperties
     readonly form?: string;
     /** Click handler for button interactions */
     readonly onClick?: ClickHandler;
+
+    /** Key down handler for keyboard interactions (e.g., arrow-key tab navigation). */
+    readonly onKeyDown?: KeyPressHandler<HTMLButtonElement>;
     /** Tooltip text for hover states */
     readonly title?: string;
     /** HTML button type */

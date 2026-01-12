@@ -27,12 +27,16 @@ type BridgeResult<TChannel extends IpcInvokeChannel> =
 /**
  * Function signature for invoking a typed IPC channel.
  *
+ * @remarks
+ * Uses a rest tuple for parameters (including the empty tuple `[]`) instead of
+ * conditional typing. This keeps the signature precise while avoiding
+ * conditional-type instantiation edge cases that can confuse tooling.
+ *
  * @public
  */
-export type IpcBridgeMethod<TChannel extends IpcInvokeChannel> =
-    IpcInvokeChannelParams<TChannel> extends []
-        ? () => BridgeResult<TChannel>
-        : (...args: IpcInvokeChannelParams<TChannel>) => BridgeResult<TChannel>;
+export type IpcBridgeMethod<TChannel extends IpcInvokeChannel> = (
+    ...args: IpcInvokeChannelParams<TChannel>
+) => BridgeResult<TChannel>;
 
 /**
  * Creates a typed preload bridge from a domain/channel mapping.

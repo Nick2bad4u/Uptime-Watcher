@@ -16,6 +16,7 @@ import type { AxiosError } from "axios";
 
 import { getUnknownErrorMessage } from "@shared/utils/errorCatalog";
 import { ensureError } from "@shared/utils/errorHandling";
+import { getSafeUrlForLogging } from "@shared/utils/urlSafety";
 import axios from "axios";
 
 import type { MonitorCheckResult } from "../types";
@@ -90,6 +91,31 @@ function normalizeErrorCode(error: Error): string | undefined {
     return undefined;
 }
 
+function buildSafeErrorLogData(args: {
+    readonly correlationId?: string;
+    readonly error: Error;
+    readonly httpStatus?: number;
+    readonly isAxiosError: boolean;
+    readonly safeUrlForLogging: string;
+}): Record<string, unknown> {
+    const normalizedCode = normalizeErrorCode(args.error);
+
+    const base: Record<string, unknown> = {
+        errorMessage: args.error.message,
+        errorName: args.error.name,
+        ...(normalizedCode ? { errorCode: normalizedCode } : {}),
+        isAxiosError: args.isAxiosError,
+        url: args.safeUrlForLogging,
+        ...(typeof args.httpStatus === "number"
+            ? { httpStatus: args.httpStatus }
+            : {}),
+    };
+
+    return args.correlationId
+        ? { correlationId: args.correlationId, ...base }
+        : base;
+}
+
 /**
  * Determine whether an error represents an expected cancellation scenario.
  */
@@ -158,6 +184,7 @@ export function handleAxiosError(
     const messageTextLower = messageText.toLowerCase();
 
     // Network errors, timeouts, DNS failures, etc.
+    const safeUrlForLogging = getSafeUrlForLogging(url);
     let errorMessage = messageText || "Network error";
 
     const normalizedCode = normalizeErrorCode(error);
@@ -192,9 +219,15 @@ export function handleAxiosError(
     }
 
     if (isDev()) {
-        const logData = correlationId ? { correlationId, error } : { error };
+        const logData = buildSafeErrorLogData({
+            correlationId,
+            error,
+            httpStatus: error.response?.status,
+            isAxiosError: true,
+            safeUrlForLogging,
+        });
         logger.debug(
-            `[HttpMonitor] Network error for ${url}: ${errorMessage}`,
+            `[HttpMonitor] Network error for ${safeUrlForLogging}: ${errorMessage}`,
             logData
         );
     }
@@ -237,6 +270,7 @@ export function handleCheckError(
     url: string,
     correlationId?: string
 ): MonitorCheckResult {
+    const safeUrlForLogging = getSafeUrlForLogging(url);
     if (error instanceof Error) {
         const normalizedCode = normalizeErrorCode(error);
         if (
@@ -256,11 +290,14 @@ export function handleCheckError(
 
     if (isCancellationError(error)) {
         if (isDev()) {
-            const logContext = correlationId
-                ? { correlationId, error }
-                : { error };
+            const logContext = buildSafeErrorLogData({
+                correlationId,
+                error: ensureError(error),
+                isAxiosError: axios.isAxiosError(error),
+                safeUrlForLogging,
+            });
             logger.debug(
-                `[HttpMonitor] Request for ${url} was canceled before completion`,
+                `[HttpMonitor] Request for ${safeUrlForLogging} was canceled before completion`,
                 logContext
             );
         }
@@ -295,7 +332,10 @@ export function handleCheckError(
               errorName: normalizedError.name,
               ...(normalizedCode ? { errorCode: normalizedCode } : {}),
           };
-    logger.error(`[HttpMonitor] Unexpected error checking ${url}`, logData);
+    logger.error(
+        `[HttpMonitor] Unexpected error checking ${safeUrlForLogging}`,
+        logData
+    );
 
     return createErrorResult(errorMessage, responseTime, correlationId);
 }

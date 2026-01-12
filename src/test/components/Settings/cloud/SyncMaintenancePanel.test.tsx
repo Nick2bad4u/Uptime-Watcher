@@ -14,6 +14,7 @@ import "@testing-library/jest-dom";
 
 import type { CloudSyncResetPreview } from "@shared/types/cloudSyncResetPreview";
 import type { CloudSyncResetResult } from "@shared/types/cloudSyncReset";
+import type { CloudStatusSummary } from "@shared/types/cloud";
 
 const formatFullTimestampMock = vi.hoisted(() => vi.fn(() => "2025-01-01"));
 
@@ -58,6 +59,25 @@ function createPreview(
     };
 }
 
+const createStatus = (
+    overrides: Partial<CloudStatusSummary> = {}
+): CloudStatusSummary => ({
+    backupsEnabled: true,
+    configured: true,
+    connected: true,
+    encryptionLocked: false,
+    encryptionMode: "none",
+    lastBackupAt: null,
+    lastSyncAt: null,
+    provider: "dropbox",
+    providerDetails: {
+        kind: "dropbox",
+        accountLabel: "someone@example.com",
+    },
+    syncEnabled: true,
+    ...overrides,
+});
+
 describe(SyncMaintenancePanel, () => {
     it("renders connection and sync gating status text", () => {
         const onRefresh = vi.fn();
@@ -74,6 +94,7 @@ describe(SyncMaintenancePanel, () => {
                 onRefreshPreview={onRefresh}
                 onResetRemoteSyncState={onReset}
                 preview={null}
+                status={createStatus({ connected: false, provider: null })}
                 syncEnabled={false}
             />
         );
@@ -93,6 +114,7 @@ describe(SyncMaintenancePanel, () => {
                 onRefreshPreview={onRefresh}
                 onResetRemoteSyncState={onReset}
                 preview={null}
+                status={createStatus({ syncEnabled: false })}
                 syncEnabled={false}
             />
         );
@@ -116,6 +138,7 @@ describe(SyncMaintenancePanel, () => {
                 onRefreshPreview={vi.fn()}
                 onResetRemoteSyncState={vi.fn()}
                 preview={preview}
+                status={createStatus()}
                 syncEnabled={true}
             />
         );
@@ -219,6 +242,7 @@ describe(SyncMaintenancePanel, () => {
                 onRefreshPreview={vi.fn()}
                 onResetRemoteSyncState={vi.fn()}
                 preview={preview}
+                status={createStatus()}
                 syncEnabled={true}
             />
         );
@@ -233,9 +257,7 @@ describe(SyncMaintenancePanel, () => {
 
         expect(writeClipboardTextMock).toHaveBeenCalledTimes(1);
         const payload = writeClipboardTextMock.mock.calls[0]?.[0];
-        expect(payload).toContain(
-            "Uptime-Watcher Cloud Sync Reset Diagnostics"
-        );
+        expect(payload).toContain("Cloud Sync Diagnostics");
         expect(payload).toContain("No secrets");
         expect(payload).toContain("seededSnapshotKey");
     });
@@ -256,6 +278,7 @@ describe(SyncMaintenancePanel, () => {
                 onRefreshPreview={vi.fn()}
                 onResetRemoteSyncState={vi.fn()}
                 preview={createPreview()}
+                status={createStatus()}
                 syncEnabled={true}
             />
         );

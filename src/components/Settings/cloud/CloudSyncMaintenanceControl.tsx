@@ -1,3 +1,4 @@
+import type { CloudStatusSummary } from "@shared/types/cloud";
 import type { CloudSyncResetResult } from "@shared/types/cloudSyncReset";
 import type { CloudSyncResetPreview } from "@shared/types/cloudSyncResetPreview";
 import type { JSX } from "react/jsx-runtime";
@@ -23,6 +24,7 @@ export interface CloudSyncMaintenanceControlProperties {
     readonly onRefreshPreview: () => void;
     readonly onResetRemoteSyncState: () => void;
     readonly preview: CloudSyncResetPreview | null;
+    readonly status: CloudStatusSummary | null;
     readonly syncEnabled: boolean;
 }
 
@@ -40,6 +42,7 @@ export const CloudSyncMaintenanceControl = ({
     onRefreshPreview,
     onResetRemoteSyncState,
     preview,
+    status,
     syncEnabled,
 }: CloudSyncMaintenanceControlProperties): JSX.Element => {
     const buttonIconSize = getIconSize("sm");
@@ -110,6 +113,7 @@ export const CloudSyncMaintenanceControl = ({
                     onRefreshPreview={onRefreshPreview}
                     onResetRemoteSyncState={onResetRemoteSyncState}
                     preview={preview}
+                    status={status}
                     syncEnabled={syncEnabled}
                 />
             </Modal>

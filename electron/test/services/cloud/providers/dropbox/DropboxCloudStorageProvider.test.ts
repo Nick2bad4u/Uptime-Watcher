@@ -5,6 +5,65 @@ import { CloudProviderOperationError } from "@electron/services/cloud/providers/
 import { DropboxResponseError } from "dropbox";
 
 describe(DropboxCloudStorageProvider, () => {
+    it("ignores folder entries returned by list_folder without warning", async () => {
+        const tokenManager = {
+            getAccessToken: vi.fn().mockResolvedValue("token"),
+        };
+
+        const filesListFolder = vi.fn().mockResolvedValue({
+            result: {
+                cursor: "cursor",
+                entries: [
+                    {
+                        ".tag": "folder",
+                        path_display: "/uptime-watcher/backups",
+                    },
+                    {
+                        ".tag": "file",
+                        path_display: "/uptime-watcher/backups/b.sqlite",
+                        server_modified: "2025-01-01T00:00:00Z",
+                        size: 20,
+                    },
+                ],
+                has_more: false,
+            },
+        });
+
+        const provider = new DropboxCloudStorageProvider({
+            clientFactory: () =>
+                ({
+                    filesListFolder,
+                    filesListFolderContinue: vi.fn(),
+                    filesUpload: vi.fn(),
+                    filesDownload: vi.fn(),
+                    filesDeleteV2: vi.fn(),
+                    usersGetCurrentAccount: vi.fn(),
+                    authTokenRevoke: vi.fn(),
+                }) as never,
+            tokenManager: tokenManager as never,
+        });
+
+        const electronLogModule = await import("electron-log/main");
+        const mockLog = electronLogModule.default;
+        vi.mocked(mockLog.warn).mockClear();
+
+        const entries = await provider.listObjects("backups/");
+
+        expect(entries).toHaveLength(1);
+        expect(entries[0]?.key).toBe("backups/b.sqlite");
+        expect(
+            vi
+                .mocked(mockLog.warn)
+                .mock
+                .calls
+                .some((call) =>
+                    String(call[0]).includes(
+                        "Skipped invalid Dropbox list-folder entries"
+                    )
+                )
+        ).toBeFalsy();
+    });
+
     it("lists objects under the app root and filters by prefix", async () => {
         const tokenManager = {
             getAccessToken: vi.fn().mockResolvedValue("token"),

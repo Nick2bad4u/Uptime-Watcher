@@ -428,6 +428,11 @@ export const SiteDetails = ({
             />
         ) : null;
 
+    const activeTabId = useMemo(
+        () => `site-details-tab-${activeSiteDetailsTab}`,
+        [activeSiteDetailsTab]
+    );
+
     // Don't render if site doesn't exist
     if (!siteExists) {
         return null;
@@ -486,8 +491,11 @@ export const SiteDetails = ({
                         />
 
                         <SurfaceContainer
+                            aria-labelledby={activeTabId}
                             className={`site-details-modal__content flex flex-col gap-6${isDark ? "dark" : ""}`}
+                            id="site-details-tabpanel"
                             padding="xl"
+                            role="tabpanel"
                             rounded="lg"
                             surface="elevated"
                             variant="primary"

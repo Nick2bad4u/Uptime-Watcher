@@ -12,6 +12,7 @@ import {
     type ChangeEvent,
     memo,
     type NamedExoticComponent,
+    type KeyboardEvent as ReactKeyboardEvent,
     useCallback,
     useMemo,
 } from "react";
@@ -59,6 +60,34 @@ export interface SiteDetailsNavigationProperties {
     readonly selectedMonitorId: string;
     /** Function to set the active tab */
     readonly setActiveSiteDetailsTab: (tab: SiteDetailsTab) => void;
+}
+
+function resolveSiteDetailsTabId(tabKey: string): string {
+    return `site-details-tab-${tabKey}`;
+}
+
+function resolveNextTabIndex(args: {
+    readonly currentIndex: number;
+    readonly key: string;
+    readonly tabCount: number;
+}): null | number {
+    switch (args.key) {
+        case "ArrowLeft": {
+            return (args.currentIndex - 1 + args.tabCount) % args.tabCount;
+        }
+        case "ArrowRight": {
+            return (args.currentIndex + 1) % args.tabCount;
+        }
+        case "End": {
+            return args.tabCount - 1;
+        }
+        case "Home": {
+            return 0;
+        }
+        default: {
+            return null;
+        }
+    }
 }
 
 /**
@@ -210,6 +239,75 @@ export const SiteDetailsNavigation: NamedExoticComponent<SiteDetailsNavigationPr
             [isLoading]
         );
 
+        const analyticsTabKey = `${selectedMonitorId}-analytics`;
+        const tabKeys = useMemo(
+            () =>
+                [
+                    "site-overview",
+                    "monitor-overview",
+                    analyticsTabKey,
+                    "history",
+                    "settings",
+                ] as const,
+            [analyticsTabKey]
+        );
+
+        const tabActions = useMemo(() => new Map<string, () => void>([
+                ["history", handleHistoryClick],
+                ["monitor-overview", handleMonitorOverviewClick],
+                ["settings", handleSettingsClick],
+                ["site-overview", handleSiteOverviewClick],
+                [analyticsTabKey, handleMonitorAnalyticsClick],
+            ]), [
+            analyticsTabKey,
+            handleHistoryClick,
+            handleMonitorAnalyticsClick,
+            handleMonitorOverviewClick,
+            handleSettingsClick,
+            handleSiteOverviewClick,
+        ]);
+
+        const handleTabKeyDown = useCallback(
+            (event: ReactKeyboardEvent<HTMLButtonElement>): void => {
+                const currentIndex = tabKeys.indexOf(activeSiteDetailsTab);
+                if (currentIndex === -1) {
+                    return;
+                }
+
+                const nextIndex = resolveNextTabIndex({
+                    currentIndex,
+                    key: event.key,
+                    tabCount: tabKeys.length,
+                });
+
+                if (nextIndex === null) {
+                    return;
+                }
+
+                const nextKey = tabKeys[nextIndex];
+                if (!nextKey) {
+                    return;
+                }
+
+                const action = tabActions.get(nextKey);
+                if (!action) {
+                    return;
+                }
+
+                event.preventDefault();
+                action();
+
+                queueMicrotask(() => {
+                    document
+                        .querySelector<HTMLElement>(
+                            `[id="${resolveSiteDetailsTabId(nextKey)}"]`
+                        )
+                        ?.focus();
+                });
+            },
+            [activeSiteDetailsTab, tabActions, tabKeys]
+        );
+
         return (
             <SurfaceContainer
                 className="site-details-navigation"
@@ -219,11 +317,25 @@ export const SiteDetailsNavigation: NamedExoticComponent<SiteDetailsNavigationPr
                 {/* Tab Navigation and Monitor Selection */}
                 <div className="site-details-navigation__grid">
                     {/* Tab navigation buttons (left) */}
-                    <div className="site-details-navigation__tabs">
+                    <div
+                        aria-label="Site details tabs"
+                        className="site-details-navigation__tabs"
+                        role="tablist"
+                    >
                         <ThemedButton
+                            aria-controls="site-details-tabpanel"
+                            aria-selected={activeSiteDetailsTab === "site-overview"}
                             className="flex items-center gap-2"
+                            id={resolveSiteDetailsTabId("site-overview")}
                             onClick={handleSiteOverviewClick}
+                            onKeyDown={handleTabKeyDown}
+                            role="tab"
                             size="sm"
+                            tabIndex={
+                                activeSiteDetailsTab === "site-overview"
+                                    ? 0
+                                    : -1
+                            }
                             variant={
                                 activeSiteDetailsTab === "site-overview"
                                     ? BUTTON_VARIANT_PRIMARY
@@ -234,9 +346,21 @@ export const SiteDetailsNavigation: NamedExoticComponent<SiteDetailsNavigationPr
                             <span>Site Overview</span>
                         </ThemedButton>
                         <ThemedButton
+                            aria-controls="site-details-tabpanel"
+                            aria-selected={
+                                activeSiteDetailsTab === "monitor-overview"
+                            }
                             className="flex items-center gap-2"
+                            id={resolveSiteDetailsTabId("monitor-overview")}
                             onClick={handleMonitorOverviewClick}
+                            onKeyDown={handleTabKeyDown}
+                            role="tab"
                             size="sm"
+                            tabIndex={
+                                activeSiteDetailsTab === "monitor-overview"
+                                    ? 0
+                                    : -1
+                            }
                             variant={
                                 activeSiteDetailsTab === "monitor-overview"
                                     ? BUTTON_VARIANT_PRIMARY
@@ -248,12 +372,21 @@ export const SiteDetailsNavigation: NamedExoticComponent<SiteDetailsNavigationPr
                         </ThemedButton>
                         {/* Render analytics tab for selected monitor type only */}
                         <ThemedButton
+                            aria-controls="site-details-tabpanel"
+                            aria-selected={activeSiteDetailsTab === analyticsTabKey}
                             className="flex items-center gap-2"
+                            id={resolveSiteDetailsTabId(analyticsTabKey)}
                             onClick={handleMonitorAnalyticsClick}
+                            onKeyDown={handleTabKeyDown}
+                            role="tab"
                             size="sm"
+                            tabIndex={
+                                activeSiteDetailsTab === analyticsTabKey
+                                    ? 0
+                                    : -1
+                            }
                             variant={
-                                activeSiteDetailsTab ===
-                                `${selectedMonitorId}-analytics`
+                                activeSiteDetailsTab === analyticsTabKey
                                     ? BUTTON_VARIANT_PRIMARY
                                     : BUTTON_VARIANT_SECONDARY
                             }
@@ -262,9 +395,17 @@ export const SiteDetailsNavigation: NamedExoticComponent<SiteDetailsNavigationPr
                             <span>{`${monitorTypeLabel} Analytics`}</span>
                         </ThemedButton>
                         <ThemedButton
+                            aria-controls="site-details-tabpanel"
+                            aria-selected={activeSiteDetailsTab === "history"}
                             className="flex items-center gap-2"
+                            id={resolveSiteDetailsTabId("history")}
                             onClick={handleHistoryClick}
+                            onKeyDown={handleTabKeyDown}
+                            role="tab"
                             size="sm"
+                            tabIndex={
+                                activeSiteDetailsTab === "history" ? 0 : -1
+                            }
                             variant={
                                 activeSiteDetailsTab === "history"
                                     ? BUTTON_VARIANT_PRIMARY
@@ -275,9 +416,17 @@ export const SiteDetailsNavigation: NamedExoticComponent<SiteDetailsNavigationPr
                             <span>History</span>
                         </ThemedButton>
                         <ThemedButton
+                            aria-controls="site-details-tabpanel"
+                            aria-selected={activeSiteDetailsTab === "settings"}
                             className="flex items-center gap-2"
+                            id={resolveSiteDetailsTabId("settings")}
                             onClick={handleSettingsClick}
+                            onKeyDown={handleTabKeyDown}
+                            role="tab"
                             size="sm"
+                            tabIndex={
+                                activeSiteDetailsTab === "settings" ? 0 : -1
+                            }
                             variant={
                                 activeSiteDetailsTab === "settings"
                                     ? BUTTON_VARIANT_PRIMARY
