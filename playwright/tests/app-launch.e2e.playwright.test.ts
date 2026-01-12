@@ -23,6 +23,7 @@ test.describe(
     },
     () => {
         test.setTimeout(45_000);
+
         test(
             "should launch the app successfully",
             {

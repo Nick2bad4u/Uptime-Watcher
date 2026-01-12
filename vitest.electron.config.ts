@@ -78,6 +78,9 @@ const vitestConfig = defineConfig({
                 "**/index.{ts,tsx}", // Root + nested index.ts / index.tsx
                 "**/types.{ts,tsx}", // Single-file types
                 "**/types/**", // Types directories
+                // Electron tests are not production code and should not affect coverage.
+                "electron/test/**",
+                "electron/**/test/**",
                 "shared/test/**", // Covers file + dir form
                 "src/**",
                 "release/**",

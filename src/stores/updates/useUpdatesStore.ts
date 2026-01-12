@@ -190,7 +190,6 @@ export const useUpdatesStore: UpdatesStoreWithPersist = create<UpdatesStore>()(
 
                         // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- disposed may flip while awaiting subscription.
                         if (disposed) {
-                            serviceCleanup();
                             return serviceCleanup;
                         }
 
