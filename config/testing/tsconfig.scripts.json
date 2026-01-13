@@ -11,7 +11,7 @@
         "checkJs": true,
         "composite": true,
         "declaration": true,
-        "declarationDir": ".cache/builds/scripts/types",
+        "declarationDir": "../../.cache/builds/scripts/types",
         "declarationMap": true,
         "disableSizeLimit": true,
         "downlevelIteration": true,
@@ -34,7 +34,7 @@
         "noUncheckedSideEffectImports": true,
         "noUnusedLocals": true,
         "noUnusedParameters": true,
-        "outDir": ".cache/builds/scripts",
+        "outDir": "../../.cache/builds/scripts",
         "pretty": true,
         "removeComments": false,
         "resolveJsonModule": true,
@@ -50,8 +50,10 @@
         "strictFunctionTypes": true,
         "strictNullChecks": true,
         "strictPropertyInitialization": true,
-        "tsBuildInfoFile": "./.cache/tsconfig.scripts.tsbuildinfo",
-        "types": ["node"],
+        "tsBuildInfoFile": "../../.cache/tsconfig.scripts.tsbuildinfo",
+        "types": [
+            "node"
+        ],
         "useDefineForClassFields": true,
         "useUnknownInCatchVariables": true
     },

@@ -3,18 +3,29 @@
     "compilerOptions": {
         "baseUrl": "../..",
         "composite": true,
-        "declarationDir": ".cache/builds/test/test/types",
+        "declarationDir": "../../.cache/builds/test/test/types",
         "incremental": true,
         "paths": {
-            "@app/*": ["src/*"],
-            "@assets/*": ["assets/*"],
-            "@electron/*": ["electron/*"],
-            "@shared/*": ["shared/*"]
+            "@app/*": [
+                "src/*"
+            ],
+            "@assets/*": [
+                "assets/*"
+            ],
+            "@electron/*": [
+                "electron/*"
+            ],
+            "@shared/*": [
+                "shared/*"
+            ]
         },
         "rootDir": "../..",
-        "tsBuildInfoFile": "../../dist/tsconfig.test.tsbuildinfo"
+        "tsBuildInfoFile": "../../.cache/tsconfig.test.tsbuildinfo"
     },
-    "exclude": ["../../electron/**/*.test.ts", "../../electron/**/*.test.tsx"],
+    "exclude": [
+        "../../electron/**/*.test.ts",
+        "../../electron/**/*.test.tsx"
+    ],
     "extends": "../../tsconfig.json",
     "include": [
         "../../.storybook/**/*",

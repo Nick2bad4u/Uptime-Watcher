@@ -7,8 +7,7 @@
 import type { Monitor, Site } from "@shared/types";
 import type { ChangeEvent, JSX } from "react";
 
-import { withUtilityErrorHandling } from "@shared/utils/errorHandling";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo } from "react";
 
 import {
     CHECK_INTERVALS,
@@ -25,14 +24,14 @@ import { ThemedInput } from "../../../theme/components/ThemedInput";
 import { ThemedSelect } from "../../../theme/components/ThemedSelect";
 import { ThemedText } from "../../../theme/components/ThemedText";
 import { useTheme } from "../../../theme/useTheme";
-import {
-    getMonitorDisplayIdentifier,
-    getMonitorTypeDisplayLabel,
-    UiDefaults,
-} from "../../../utils/fallbacks";
 import { AppIcons, getIconSize } from "../../../utils/icons";
-import { getMonitorTypeConfig } from "../../../utils/monitorTypeHelper";
 import { formatRetryAttemptsText, getIntervalLabel } from "../../../utils/time";
+import {
+    calculateMaxCheckDurationSeconds,
+    formatSecondsWithMinutes,
+    getDisplayIdentifier,
+    useIdentifierLabel,
+} from "./SettingsTab.utils";
 import { SiteSettingsHelpText } from "./SiteSettingsHelpText";
 import { SiteSettingsNumberField } from "./SiteSettingsNumberField";
 
@@ -54,52 +53,6 @@ const SettingsIcon = AppIcons.settings.gear;
 const TrashIcon = AppIcons.actions.remove;
 
 const CHECK_INTERVAL_INFLIGHT_WARNING_SECONDS = 15;
-
-function formatSecondsWithMinutes(totalSeconds: number): string {
-    const safeSeconds = Number.isFinite(totalSeconds)
-        ? Math.max(0, Math.round(totalSeconds))
-        : 0;
-
-    if (safeSeconds < 60) {
-        return `${safeSeconds}s`;
-    }
-
-    const minutes = Math.floor(safeSeconds / 60);
-    const seconds = safeSeconds % 60;
-    return `${safeSeconds}s (${minutes}m ${seconds}s)`;
-}
-
-function calculateBackoffSeconds(retryAttempts: number): number {
-    if (retryAttempts <= 0) {
-        return 0;
-    }
-
-    let backoffSeconds = 0;
-    for (let i = 0; i < retryAttempts; i += 1) {
-        backoffSeconds += 2 ** i;
-    }
-
-    return backoffSeconds;
-}
-
-function calculateMaxCheckDurationSeconds(args: {
-    retryAttempts: number;
-    timeoutSeconds: number;
-}): {
-    readonly backoffSeconds: number;
-    readonly totalAttempts: number;
-    readonly totalSeconds: number;
-} {
-    const totalAttempts = args.retryAttempts + 1;
-    const backoffSeconds = calculateBackoffSeconds(args.retryAttempts);
-    const totalSeconds = args.timeoutSeconds * totalAttempts + backoffSeconds;
-
-    return {
-        backoffSeconds,
-        totalAttempts,
-        totalSeconds,
-    };
-}
 
 /**
  * Props for the SettingsTab component.
@@ -153,81 +106,6 @@ export interface SettingsTabProperties {
     readonly timeoutChanged: boolean;
 }
 
-/**
- * Generate a display identifier based on the monitor type. Uses dynamic utility
- * instead of hardcoded backward compatibility patterns.
- */
-function getDisplayIdentifier(
-    currentSite: Site,
-    selectedMonitor: Monitor
-): string {
-    return getMonitorDisplayIdentifier(selectedMonitor, currentSite.identifier);
-}
-
-/**
- * Generate a display label for the identifier field based on monitor type.
- */
-async function getIdentifierLabel(selectedMonitor: Monitor): Promise<string> {
-    return withUtilityErrorHandling(
-        async () => {
-            const config = await getMonitorTypeConfig(selectedMonitor.type);
-            if (config?.fields) {
-                // Generate label based on primary field(s)
-                const primaryField = config.fields.find(
-                    (field) => field.required
-                );
-                if (primaryField) {
-                    return primaryField.label;
-                }
-                // Fallback to first field
-                if (config.fields.length > 0 && config.fields[0]) {
-                    return config.fields[0].label;
-                }
-            }
-            // Use dynamic utility instead of hardcoded backward compatibility
-            // patterns
-            return getMonitorTypeDisplayLabel(selectedMonitor.type);
-        },
-        "Get identifier label for monitor type",
-        UiDefaults.unknownLabel
-    );
-}
-
-/**
- * Computes the primary identifier label for the selected monitor type and keeps
- * it in sync as monitor configuration is loaded.
- *
- * @param selectedMonitor - Monitor whose identifier metadata should be
- *   displayed.
- *
- * @returns Localised label string for the monitor identifier field.
- */
-function useIdentifierLabel(selectedMonitor: Monitor): string {
-    const [label, setLabel] = useState<string>(UiDefaults.loadingLabel);
-
-    useEffect(
-        function loadLabelWithCleanup() {
-            let isCancelled = false;
-
-            const loadLabel = async (): Promise<void> => {
-                const identifierLabel =
-                    await getIdentifierLabel(selectedMonitor);
-                if (!isCancelled) {
-                    setLabel(identifierLabel);
-                }
-            };
-
-            void loadLabel();
-
-            return (): void => {
-                isCancelled = true;
-            };
-        },
-        [selectedMonitor]
-    );
-
-    return label;
-}
 
 /**
  * Settings tab component providing site configuration interface.

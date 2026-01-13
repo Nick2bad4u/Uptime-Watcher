@@ -5,7 +5,7 @@ import { generateCorrelationId } from "@shared/utils/correlation";
 import { ensureError } from "@shared/utils/errorHandling";
 import { randomInt } from "node:crypto";
 
-import type { UptimeEvents } from "../../events/eventTypes";
+import type { UptimeEventName, UptimeEvents } from "../../events/eventTypes";
 import type { TypedEventBus } from "../../events/TypedEventBus";
 
 import { DEFAULT_CHECK_INTERVAL } from "../../constants";
@@ -309,12 +309,12 @@ export class MonitorScheduler {
         }
     }
 
-    private async emitEvent<K extends keyof UptimeEvents>(
+    private async emitEvent<K extends UptimeEventName>(
         eventName: K,
         payload: UptimeEvents[K]
     ): Promise<void> {
         try {
-            await this.eventEmitter.emitTyped(String(eventName), payload);
+            await this.eventEmitter.emitTyped(eventName, payload);
         } catch (error: unknown) {
             this.logger.error(
                 `[MonitorScheduler] Failed to emit ${eventName}`,

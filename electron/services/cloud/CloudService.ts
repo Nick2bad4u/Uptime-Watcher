@@ -11,7 +11,6 @@ import type {
 import type { CloudSyncManifest } from "@shared/types/cloudSyncManifest";
 import type { CloudSyncResetResult } from "@shared/types/cloudSyncReset";
 import type { CloudSyncResetPreview } from "@shared/types/cloudSyncResetPreview";
-import type { SerializedDatabaseBackupMetadata } from "@shared/types/databaseBackup";
 import type { SerializedDatabaseRestoreResult } from "@shared/types/ipc";
 
 import {
@@ -20,7 +19,6 @@ import {
     type CloudEncryptionMode,
 } from "@shared/types/cloudEncryption";
 import { readProcessEnv } from "@shared/utils/environment";
-import { tryGetErrorCode } from "@shared/utils/errorCodes";
 import { ensureError } from "@shared/utils/errorHandling";
 import { hasAsciiControlCharacters } from "@shared/utils/stringSafety";
 import {
@@ -32,8 +30,6 @@ import * as path from "node:path";
 
 import type { UptimeOrchestrator } from "../../UptimeOrchestrator";
 import type {
-    DatabaseBackupMetadata,
-    DatabaseBackupResult,
     DatabaseRestorePayload,
 } from "../database/utils/backup/databaseBackup";
 import type { CloudSyncEngine } from "../sync/SyncEngine";
@@ -57,6 +53,9 @@ import {
     loadDropboxProviderDeps,
     loadGoogleDriveProviderDeps,
 } from "./internal/cloudProviderDeps";
+import { serializeBackupMetadata, toDatabaseBackupMetadata } from "./internal/cloudServiceBackupMetadata";
+import { ignoreENOENT } from "./internal/cloudServiceFsUtils";
+import { determineBackupMigrationNeedsEncryptionKey } from "./internal/cloudServiceMigrationUtils";
 import {
     assertBackupObjectKey,
     decodeStrictBase64,
@@ -65,6 +64,25 @@ import {
     ENCRYPTION_SALT_BYTES,
     parseEncryptionMode,
 } from "./internal/cloudServicePrimitives";
+import {
+    clearLastError,
+    DEFAULT_DROPBOX_APP_KEY,
+    parseBooleanSetting,
+    parseNumberSetting,
+    SECRET_KEY_ENCRYPTION_DERIVED_KEY,
+    setLastError,
+    SETTINGS_KEY_DROPBOX_TOKENS,
+    SETTINGS_KEY_ENCRYPTION_MODE,
+    SETTINGS_KEY_ENCRYPTION_SALT,
+    SETTINGS_KEY_FILESYSTEM_BASE_DIRECTORY,
+    SETTINGS_KEY_GOOGLE_DRIVE_ACCOUNT_LABEL,
+    SETTINGS_KEY_GOOGLE_DRIVE_TOKENS,
+    SETTINGS_KEY_LAST_BACKUP_AT,
+    SETTINGS_KEY_LAST_ERROR,
+    SETTINGS_KEY_LAST_SYNC_AT,
+    SETTINGS_KEY_PROVIDER,
+    SETTINGS_KEY_SYNC_ENABLED,
+} from "./internal/cloudServiceSettings";
 import {
     buildDropboxStatus,
     buildFilesystemStatus,
@@ -90,128 +108,6 @@ import {
     SafeStorageSecretStore,
     type SecretStore,
 } from "./secrets/SecretStore";
-
-async function ignoreENOENT(fn: () => Promise<void>): Promise<void> {
-    try {
-        await fn();
-    } catch (error) {
-        if (tryGetErrorCode(error) === "ENOENT") {
-            return;
-        }
-        throw ensureError(error);
-    }
-}
-
-/**
- * Default Dropbox OAuth app key (client_id) shipped with the app.
- *
- * @remarks
- * This is **not** a secret. Desktop apps using OAuth + PKCE are public clients
- * and cannot keep an app secret confidential. The app key identifies the
- * Dropbox OAuth application.
- *
- * Developers can override the key for local testing/builds via
- * `UPTIME_WATCHER_DROPBOX_APP_KEY`.
- */
-const DEFAULT_DROPBOX_APP_KEY = "c6wroqtgxztzq9t" as const;
-
-const SETTINGS_KEY_LAST_BACKUP_AT = "cloud.lastBackupAt" as const;
-const SETTINGS_KEY_LAST_SYNC_AT = "cloud.lastSyncAt" as const;
-const SETTINGS_KEY_LAST_ERROR = "cloud.lastError" as const;
-const SETTINGS_KEY_SYNC_ENABLED = "cloud.syncEnabled" as const;
-
-const SETTINGS_KEY_PROVIDER = "cloud.provider" as const;
-const SETTINGS_KEY_FILESYSTEM_BASE_DIRECTORY =
-    "cloud.filesystem.baseDirectory" as const;
-
-const SETTINGS_KEY_DROPBOX_TOKENS = "cloud.dropbox.tokens" as const;
-const SETTINGS_KEY_GOOGLE_DRIVE_TOKENS = "cloud.googleDrive.tokens" as const;
-const SETTINGS_KEY_GOOGLE_DRIVE_ACCOUNT_LABEL =
-    "cloud.googleDrive.accountLabel" as const;
-
-const SETTINGS_KEY_ENCRYPTION_MODE = "cloud.encryption.mode" as const;
-const SETTINGS_KEY_ENCRYPTION_SALT = "cloud.encryption.salt" as const;
-const SECRET_KEY_ENCRYPTION_DERIVED_KEY = "cloud.encryption.key.v1" as const;
-
-function determineBackupMigrationNeedsEncryptionKey(
-    request: CloudBackupMigrationRequest,
-    backups: readonly CloudBackupEntry[]
-): boolean {
-    if (request.target === "encrypted") {
-        return true;
-    }
-
-    return backups.some((entry) => entry.encrypted);
-}
-
-async function setLastError(
-    settings: CloudSettingsAdapter,
-    message: string
-): Promise<void> {
-    await settings.set(SETTINGS_KEY_LAST_ERROR, message);
-}
-
-async function clearLastError(settings: CloudSettingsAdapter): Promise<void> {
-    await settings.set(SETTINGS_KEY_LAST_ERROR, "");
-}
-
-function deriveCloudBackupOriginalPath(fileName: string): string {
-    const trimmed = fileName.trim();
-    if (!trimmed) {
-        return "backup.sqlite";
-    }
-
-    // Avoid leaking local absolute paths into cloud metadata. Also handle both
-    // Windows and POSIX separators.
-    const segments = trimmed.split(/[\\/]/u).filter(Boolean);
-    return segments.at(-1) ?? "backup.sqlite";
-}
-
-function serializeBackupMetadata(
-    args: {
-        readonly fileName: string;
-        readonly metadata: DatabaseBackupResult["metadata"];
-    }
-): SerializedDatabaseBackupMetadata {
-    const { fileName, metadata } = args;
-
-    return {
-        appVersion: metadata.appVersion,
-        checksum: metadata.checksum,
-        createdAt: metadata.createdAt,
-        originalPath: deriveCloudBackupOriginalPath(fileName),
-        retentionHintDays: metadata.retentionHintDays,
-        schemaVersion: metadata.schemaVersion,
-        sizeBytes: metadata.sizeBytes,
-    };
-}
-
-function toDatabaseBackupMetadata(
-    serialized: SerializedDatabaseBackupMetadata
-): DatabaseBackupMetadata {
-    return {
-        appVersion: serialized.appVersion,
-        checksum: serialized.checksum,
-        createdAt: serialized.createdAt,
-        originalPath: serialized.originalPath,
-        retentionHintDays: serialized.retentionHintDays,
-        schemaVersion: serialized.schemaVersion,
-        sizeBytes: serialized.sizeBytes,
-    } satisfies DatabaseBackupMetadata;
-}
-
-function parseBooleanSetting(value: string | undefined): boolean {
-    return value === "true";
-}
-
-function parseNumberSetting(value: string | undefined): null | number {
-    if (value === undefined) {
-        return null;
-    }
-
-    const parsed = Number(value);
-    return Number.isFinite(parsed) ? parsed : null;
-}
 
 /**
  * Coordinates cloud provider configuration and remote backup operations.

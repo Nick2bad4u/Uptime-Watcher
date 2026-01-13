@@ -3,14 +3,17 @@
     "compilerOptions": {
         "composite": true,
         "declaration": true,
-        "declarationDir": ".cache/builds/test/shared/types",
+        "declarationDir": "../../.cache/builds/test/shared/types",
         "incremental": true,
         "isolatedDeclarations": false,
         "noEmit": false,
         "outDir": "../../.cache/builds/test/shared",
         "rootDir": "../..",
         "tsBuildInfoFile": "../../.cache/tsconfig.shared.test.tsbuildinfo",
-        "types": ["node", "vitest/globals"]
+        "types": [
+            "node",
+            "vitest/globals"
+        ]
     },
     "exclude": [
         "../../node_modules",

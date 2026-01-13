@@ -15,31 +15,20 @@
  * @public
  */
 import type { Site } from "@shared/types";
-import type { EventMetadata } from "@shared/types/events";
 import type { UnknownRecord } from "type-fest";
 
-import { ensureError } from "@shared/utils/errorHandling";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 
-import type { UptimeEventName, UptimeEvents } from "../events/eventTypes";
-import type { EnhancedEventPayload, EventKey } from "../events/TypedEventBus";
-import type { IMonitoringOperations } from "../managers/SiteManager";
+import type { UptimeEvents } from "../events/eventTypes";
+import type { IMonitoringOperations } from "../managers/SiteManager.types";
 import type { StandardizedCache } from "../utils/cache/StandardizedCache";
 
-import {
-    ORIGINAL_METADATA_SYMBOL,
-    TypedEventBus,
-} from "../events/TypedEventBus";
+import { TypedEventBus } from "../events/TypedEventBus";
 import { ConfigurationManager } from "../managers/ConfigurationManager";
 import { DatabaseManager } from "../managers/DatabaseManager";
 import { MonitorManager } from "../managers/MonitorManager";
 import { SiteManager } from "../managers/SiteManager";
 import { UptimeOrchestrator } from "../UptimeOrchestrator";
-import {
-    FORWARDED_METADATA_PROPERTY_KEY,
-    ORIGINAL_METADATA_PROPERTY_KEY,
-    stripForwardedEventMetadata,
-} from "../utils/eventMetadataForwarding";
 import { logger } from "../utils/logger";
 import { CloudService } from "./cloud/CloudService";
 import { CloudSyncScheduler } from "./cloud/CloudSyncScheduler";
@@ -53,81 +42,14 @@ import { IpcService } from "./ipc/IpcService";
 import { EnhancedMonitoringServiceFactory } from "./monitoring/EnhancedMonitoringServiceFactory";
 import { MonitorOperationRegistry } from "./monitoring/MonitorOperationRegistry";
 import { NotificationService } from "./notifications/NotificationService";
+import {
+    hasInitializeMethod,
+    isPromiseLike,
+} from "./ServiceContainer.utils";
+import { ServiceContainerEventForwarder } from "./ServiceContainerEventForwarder";
 import { SyncEngine } from "./sync/SyncEngine";
 import { AutoUpdaterService } from "./updater/AutoUpdaterService";
 import { WindowService } from "./window/WindowService";
-
-/**
- * Represents a service that optionally exposes an {@link initialize} method.
- */
-interface PossiblyInitializableService {
-    /** Optional initializer invoked during container bootstrap. */
-    initialize?: (() => Promise<void>) | (() => unknown);
-}
-
-/**
- * Type guard that determines if a service exposes an {@link initialize} method.
- *
- * @param value - Potential service instance to inspect.
- *
- * @returns True when the service defines an {@link initialize} method that can
- *   be invoked safely.
- */
-function hasInitializeMethod(
-    value: unknown
-): value is PossiblyInitializableService & {
-    initialize: () => unknown;
-} {
-    if (typeof value !== "object" || value === null) {
-        return false;
-    }
-
-    const candidate = value as PossiblyInitializableService;
-    return typeof candidate.initialize === "function";
-}
-
-/**
- * Supported payload formats for manager events forwarded to the orchestrator.
- *
- * @remarks
- * Manager event buses attach metadata to payloads via {@link EventMetadata}. The
- * orchestrator should receive the original payload shape without
- * EventEmitter-specific metadata. This helper type captures both
- * representations so forwarding helpers can normalize payloads safely while
- * preserving type safety.
- */
-type ForwardablePayloadBase<EventName extends EventKey<UptimeEvents>> = Omit<
-    UptimeEvents[EventName],
-    "_meta" | "_originalMeta"
->;
-
-type ForwardableEventPayload<EventName extends EventKey<UptimeEvents>> =
-    ForwardablePayloadBase<EventName> & {
-        _meta?: EventMetadata;
-        _originalMeta?: EventMetadata;
-    };
-
-type ForwardablePayloadWithMeta<EventName extends EventKey<UptimeEvents>> =
-    ForwardablePayloadBase<EventName> & {
-        _meta: EventMetadata;
-        _originalMeta?: EventMetadata;
-    };
-
-const toForwardablePayload = <EventName extends EventKey<UptimeEvents>>(
-    payload: EnhancedEventPayload<UptimeEvents[EventName]>
-): ForwardableEventPayload<EventName> => payload;
-
-function isPromiseLike(value: unknown): value is PromiseLike<unknown> {
-    if (
-        (typeof value !== "object" && typeof value !== "function") ||
-        value === null
-    ) {
-        return false;
-    }
-
-    const { then } = value as { then?: unknown };
-    return typeof then === "function";
-}
 
 /**
  * Configuration options for {@link ServiceContainer}.
@@ -239,6 +161,9 @@ export class ServiceContainer {
      * @internal
      */
     private readonly config: ServiceContainerConfig;
+
+    /** Forwards manager event bus emissions into the orchestrator bus. */
+    private readonly eventForwarder: ServiceContainerEventForwarder;
 
     /**
      * Singleton instance of {@link ConfigurationManager}.
@@ -498,6 +423,13 @@ export class ServiceContainer {
      */
     private constructor(config: ServiceContainerConfig = {}) {
         this.config = config;
+
+        this.eventForwarder = new ServiceContainerEventForwarder({
+            enableDebugLogging: this.config.enableDebugLogging === true,
+            getMainOrchestrator: (): null | UptimeOrchestrator =>
+                this.getMainOrchestrator(),
+        });
+
         if (config.enableDebugLogging) {
             logger.debug("[ServiceContainer] Creating new service container");
         }
@@ -558,7 +490,10 @@ export class ServiceContainer {
                     site: this.getSiteRepository(),
                 },
             });
-            this.setupEventForwarding(databaseEventBus, "DatabaseManager");
+            this.eventForwarder.setupEventForwarding(
+                databaseEventBus,
+                "DatabaseManager"
+            );
             if (this.config.enableDebugLogging) {
                 logger.debug(
                     "[ServiceContainer] Created DatabaseManager with dependencies"
@@ -789,7 +724,10 @@ export class ServiceContainer {
                 },
                 enhancedServices
             );
-            this.setupEventForwarding(monitorEventBus, "MonitorManager");
+            this.eventForwarder.setupEventForwarding(
+                monitorEventBus,
+                "MonitorManager"
+            );
             if (this.config.enableDebugLogging) {
                 logger.debug(
                     "[ServiceContainer] Created MonitorManager with dependencies"
@@ -966,7 +904,7 @@ export class ServiceContainer {
                 settingsRepository: this.getSettingsRepository(),
                 siteRepository: this.getSiteRepository(),
             });
-            this.setupEventForwarding(siteEventBus, "SiteManager");
+            this.eventForwarder.setupEventForwarding(siteEventBus, "SiteManager");
             if (this.config.enableDebugLogging) {
                 logger.debug(
                     "[ServiceContainer] Created SiteManager with dependencies"
@@ -1051,331 +989,13 @@ export class ServiceContainer {
      * Gets the main orchestrator if initialized.
      *
      * @remarks
-     * Used internally for event forwarding.
-     *
-     * @returns The {@link UptimeOrchestrator} instance, or null if not
-     *   initialized.
+     * Retained for the ServiceContainer test suite.
      *
      * @internal
      */
+
     private getMainOrchestrator(): null | UptimeOrchestrator {
         return this.uptimeOrchestrator ?? null;
     }
 
-    /**
-     * Sets up event forwarding from a manager's event bus to the main
-     * orchestrator.
-     *
-     * @remarks
-     * Ensures frontend status updates work properly while maintaining
-     * dependency isolation.
-     *
-     * @param managerEventBus - The {@link TypedEventBus} to forward events from.
-     * @param managerName - The name of the manager for logging.
-     */
-    private setupEventForwarding(
-        managerEventBus: TypedEventBus<UptimeEvents>,
-        managerName: string
-    ): void {
-        const eventsToForward = [
-            "monitor:status-changed",
-            "monitor:up",
-            "monitor:down",
-            "internal:monitor:started",
-            "internal:monitor:stopped",
-            "internal:monitor:manual-check-completed",
-            "internal:monitor:site-setup-completed",
-            "internal:site:added",
-            "internal:site:removed",
-            "internal:site:updated",
-            "sites:state-synchronized",
-            "internal:database:data-imported",
-            "internal:database:history-limit-updated",
-            "internal:database:sites-refreshed",
-            "internal:database:update-sites-cache-requested",
-            "system:error",
-        ] as const satisfies readonly UptimeEventName[];
-
-        const maybeTypedBus = managerEventBus as {
-            on?: TypedEventBus<UptimeEvents>["on"];
-            onTyped?: TypedEventBus<UptimeEvents>["onTyped"];
-        };
-
-        if (typeof maybeTypedBus.onTyped === "function") {
-            for (const eventName of eventsToForward) {
-                maybeTypedBus.onTyped(
-                    eventName,
-                    (
-                        payloadWithMeta: EnhancedEventPayload<
-                            UptimeEvents[typeof eventName]
-                        >
-                    ): void => {
-                        const forwardablePayload =
-                            toForwardablePayload(payloadWithMeta);
-                        this.emitForwardedEvent(
-                            eventName,
-                            forwardablePayload,
-                            managerName
-                        );
-                    }
-                );
-            }
-        } else {
-            for (const eventName of eventsToForward) {
-                const rawOn = (
-                    managerEventBus as {
-                        on?: TypedEventBus<UptimeEvents>["on"];
-                    }
-                ).on;
-
-                if (typeof rawOn === "function") {
-                    rawOn.call(
-                        managerEventBus,
-                        eventName,
-                        (
-                            payload: ForwardableEventPayload<typeof eventName>
-                        ): void => {
-                            this.emitForwardedEvent(
-                                eventName,
-                                payload,
-                                managerName
-                            );
-                        }
-                    );
-                } else if (this.config.enableDebugLogging) {
-                    logger.warn(
-                        `[ServiceContainer] Skipping forwarding for ${eventName} because manager event bus for ${managerName} lacks an on() method`
-                    );
-                }
-            }
-        }
-
-        if (this.config.enableDebugLogging) {
-            logger.debug(
-                `[ServiceContainer] Set up event forwarding for ${managerName} (${eventsToForward.length} events)`
-            );
-        }
-    }
-
-    /**
-     * Emits a manager event through the main orchestrator after metadata
-     * cleanup.
-     *
-     * @typeParam EventName - Event identifier forwarded to the orchestrator.
-     *
-     * @param eventName - Name of the event being forwarded.
-     * @param payload - Raw payload emitted by the manager event bus.
-     * @param managerName - Name of the originating manager for diagnostics.
-     */
-    private emitForwardedEvent<EventName extends EventKey<UptimeEvents>>(
-        eventName: EventName,
-        payload: ForwardableEventPayload<EventName>,
-        managerName: string
-    ): void {
-        const mainOrchestrator = this.getMainOrchestrator();
-        if (!mainOrchestrator) {
-            return;
-        }
-
-        const sanitizedPayload = this.stripEventMetadata(eventName, payload);
-        const eventLabel = eventName;
-
-        void (async (): Promise<void> => {
-            try {
-                await mainOrchestrator.emitTyped(eventName, sanitizedPayload);
-            } catch (error: unknown) {
-                const normalizedError = ensureError(error);
-                logger.error(
-                    `[ServiceContainer] Error forwarding ${eventLabel} from ${managerName}`,
-                    normalizedError,
-                    {
-                        event: eventLabel,
-                        manager: managerName,
-                    }
-                );
-            }
-        })();
-
-        if (this.config.enableDebugLogging) {
-            logger.debug(
-                `[ServiceContainer] Forwarded ${eventLabel} from ${managerName} to main orchestrator`
-            );
-        }
-    }
-
-    /**
-     * Removes event bus metadata from a payload before forwarding it upstream.
-     *
-     * @typeParam EventName - Event identifier forwarded to the orchestrator.
-     *
-     * @param eventName - Name of the event being forwarded (for logging
-     *   context).
-     * @param payload - Payload that may include event bus metadata artifacts.
-     *
-     * @returns Payload suitable for {@link UptimeOrchestrator.emitTyped}.
-     */
-    private stripEventMetadata<EventName extends EventKey<UptimeEvents>>(
-        eventName: EventName,
-        payload: ForwardableEventPayload<EventName>
-    ): UptimeEvents[EventName] {
-        if (!this.isPayloadWithMetadata(payload)) {
-            if (Array.isArray(payload)) {
-                return stripForwardedEventMetadata(payload);
-            }
-
-            return stripForwardedEventMetadata(payload);
-        }
-
-        const payloadWithMeta: ForwardablePayloadWithMeta<EventName> = payload;
-        const { forwarded, original } =
-            this.extractForwardingMetadata(payloadWithMeta);
-
-        if (this.config.enableDebugLogging) {
-            const eventLabel = eventName;
-            logger.debug(
-                `[ServiceContainer] Stripped metadata from ${eventLabel} payload before forwarding`,
-                {
-                    metadata: forwarded,
-                    originalMetadata: original,
-                }
-            );
-        }
-
-        if (Array.isArray(payloadWithMeta)) {
-            const stripped = stripForwardedEventMetadata(payloadWithMeta);
-            if (!Array.isArray(stripped)) {
-                throw new TypeError(
-                    "Unexpected non-array payload after metadata stripping"
-                );
-            }
-
-            this.applyForwardingMetadata(stripped, forwarded, original);
-            return stripped;
-        }
-
-        const stripped = stripForwardedEventMetadata(payloadWithMeta);
-        if (Array.isArray(stripped)) {
-            throw new TypeError(
-                "Unexpected array payload after metadata stripping"
-            );
-        }
-
-        this.applyForwardingMetadata(stripped, forwarded, original);
-
-        return stripped;
-    }
-
-    /**
-     * Determines whether a payload contains event bus metadata properties.
-     */
-    private isPayloadWithMetadata<EventName extends EventKey<UptimeEvents>>(
-        payload: ForwardableEventPayload<EventName>
-    ): payload is ForwardablePayloadWithMeta<EventName> {
-        const maybeObject: unknown = payload;
-        return (
-            typeof maybeObject === "object" &&
-            maybeObject !== null &&
-            FORWARDED_METADATA_PROPERTY_KEY in maybeObject
-        );
-    }
-
-    private normalizeEventMetadata(
-        candidate: unknown
-    ): EventMetadata | undefined {
-        if (candidate === null || typeof candidate !== "object") {
-            return undefined;
-        }
-
-        const maybeMetadata = candidate as Partial<EventMetadata>;
-
-        if (
-            typeof maybeMetadata.busId !== "string" ||
-            typeof maybeMetadata.correlationId !== "string" ||
-            typeof maybeMetadata.eventName !== "string" ||
-            typeof maybeMetadata.timestamp !== "number"
-        ) {
-            return undefined;
-        }
-
-        return {
-            busId: maybeMetadata.busId,
-            correlationId: maybeMetadata.correlationId,
-            eventName: maybeMetadata.eventName,
-            timestamp: maybeMetadata.timestamp,
-        } satisfies EventMetadata;
-    }
-
-    private extractForwardingMetadata<EventName extends EventKey<UptimeEvents>>(
-        payload: ForwardablePayloadWithMeta<EventName>
-    ): {
-        forwarded?: EventMetadata;
-        original?: EventMetadata;
-    } {
-        const forwarded = this.normalizeEventMetadata(
-            Reflect.get(payload, FORWARDED_METADATA_PROPERTY_KEY)
-        );
-
-        const originalFromProperty = this.normalizeEventMetadata(
-            Reflect.has(payload, ORIGINAL_METADATA_PROPERTY_KEY)
-                ? Reflect.get(payload, ORIGINAL_METADATA_PROPERTY_KEY)
-                : undefined
-        );
-
-        const originalFromSymbol = this.normalizeEventMetadata(
-            Reflect.has(payload, ORIGINAL_METADATA_SYMBOL)
-                ? Reflect.get(payload, ORIGINAL_METADATA_SYMBOL)
-                : undefined
-        );
-
-        const original =
-            originalFromSymbol ?? originalFromProperty ?? forwarded;
-
-        const result: {
-            forwarded?: EventMetadata;
-            original?: EventMetadata;
-        } = {};
-
-        if (forwarded) {
-            result.forwarded = forwarded;
-        }
-
-        if (original) {
-            result.original = original;
-        }
-
-        return result;
-    }
-
-    private applyForwardingMetadata(
-        target: object,
-        forwarded: EventMetadata | undefined,
-        original: EventMetadata | undefined
-    ): void {
-        if (!forwarded) {
-            return;
-        }
-
-        const resolvedOriginal = original ?? forwarded;
-
-        Object.defineProperty(target, FORWARDED_METADATA_PROPERTY_KEY, {
-            configurable: true,
-            enumerable: false,
-            value: forwarded,
-            writable: false,
-        });
-
-        Object.defineProperty(target, ORIGINAL_METADATA_PROPERTY_KEY, {
-            configurable: true,
-            enumerable: false,
-            value: resolvedOriginal,
-            writable: false,
-        });
-
-        Object.defineProperty(target, ORIGINAL_METADATA_SYMBOL, {
-            configurable: true,
-            enumerable: false,
-            value: resolvedOriginal,
-            writable: false,
-        });
-    }
 }

@@ -8,10 +8,8 @@ import type { Site, Monitor } from "@shared/types";
 import { ERROR_CATALOG } from "@shared/utils/errorCatalog";
 import { SITE_ADDED_SOURCE } from "@shared/types/events";
 import { STATE_SYNC_ACTION, STATE_SYNC_SOURCE } from "@shared/types/stateSync";
-import {
-    SiteManager,
-    type IMonitoringOperations,
-} from "../../managers/SiteManager";
+import { SiteManager } from "../../managers/SiteManager";
+import type { IMonitoringOperations } from "../../managers/SiteManager.types";
 
 /**
  * Helper function to create a complete Monitor object with all required

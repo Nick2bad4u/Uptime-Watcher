@@ -58,9 +58,11 @@ describe("MonitorScheduler backoff regressions", () => {
     beforeEach(() => {
         eventEmitter = { emitTyped: vi.fn().mockResolvedValue(undefined) };
         scheduler = new MonitorScheduler(logger, eventEmitter as any);
-        scheduler.setCheckCallback(vi.fn(async () => {
-            throw new Error("fail");
-        }));
+        scheduler.setCheckCallback(
+            vi.fn(async () => {
+                throw new Error("fail");
+            })
+        );
     });
 
     afterEach(() => {
@@ -93,11 +95,11 @@ describe("MonitorScheduler backoff regressions", () => {
 
         expect(scheduleEvent).toBeDefined();
 
-                const payloadCandidate = scheduleEvent?.[1];
-                const payload =
-                    payloadCandidate && typeof payloadCandidate === "object"
-                        ? (payloadCandidate as { delayMs?: unknown })
-                        : undefined;
+        const payloadCandidate = scheduleEvent?.[1];
+        const payload =
+            payloadCandidate && typeof payloadCandidate === "object"
+                ? (payloadCandidate as { delayMs?: unknown })
+                : undefined;
 
         // After a failure, backoffAttempt=1 so the delay should be ~2x the base
         // Interval (40 minutes), never clamped down below the base.

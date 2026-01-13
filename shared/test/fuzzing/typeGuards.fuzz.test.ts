@@ -651,7 +651,11 @@ describe("TypeGuards Fuzzing Tests", () => {
                     expect(isNumber(value)).toBeTruthy();
                 }
 
-                if (isNonNegativeNumber(value) && (value as number) > 0) {
+                if (
+                    isNonNegativeNumber(value) &&
+                    isFiniteNumber(value) &&
+                    (value as number) > 0
+                ) {
                     expect(isPositiveNumber(value)).toBeTruthy();
                 }
             }

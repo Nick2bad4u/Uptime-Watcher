@@ -4,15 +4,21 @@
         "baseUrl": "../..",
         "composite": true,
         "declaration": true,
-        "declarationDir": ".cache/builds/configs/types",
+        "declarationDir": "../../.cache/builds/configs/types",
         "incremental": true,
         "isolatedDeclarations": false,
         "noEmit": false,
         "outDir": "../../.cache/builds/configs",
         "paths": {
-            "@app/*": [".cache/builds/app/types/src/*"],
-            "@electron/*": [".cache/builds/app/types/electron/*"],
-            "@shared/*": [".cache/builds/app/types/shared/*"]
+            "@app/*": [
+                ".cache/builds/app/types/src/*"
+            ],
+            "@electron/*": [
+                ".cache/builds/app/types/electron/*"
+            ],
+            "@shared/*": [
+                ".cache/builds/app/types/shared/*"
+            ]
         },
         "rootDir": "../..",
         "tsBuildInfoFile": "../../.cache/tsconfig.configs.tsbuildinfo"

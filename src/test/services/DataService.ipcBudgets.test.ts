@@ -4,7 +4,9 @@
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const mockWaitForElectronBridge = vi.hoisted(() => vi.fn(async () => undefined));
+const mockWaitForElectronBridge = vi.hoisted(() =>
+    vi.fn(async () => undefined)
+);
 
 vi.mock("../../services/utils/electronBridgeReadiness", () => ({
     ElectronBridgeNotReadyError: class ElectronBridgeNotReadyError extends Error {
@@ -86,7 +88,6 @@ describe("DataService IPC payload budgets", () => {
     it("rejects restore payloads with non-ArrayBuffer buffer", async () => {
         await expect(
             DataService.restoreSqliteBackup({
-
                 buffer: {} as unknown as ArrayBuffer,
                 fileName: "restore.sqlite",
             })

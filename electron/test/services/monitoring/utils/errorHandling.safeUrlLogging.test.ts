@@ -21,9 +21,8 @@ vi.mock("../../../../utils/logger", () => ({
 
 describe("monitoring errorHandling safe URL logging", () => {
     it("redacts query/hash/auth for cancellation debug logs", async () => {
-        const { handleCheckError } = await import(
-            "../../../../services/monitoring/utils/errorHandling"
-        );
+        const { handleCheckError } =
+            await import("../../../../services/monitoring/utils/errorHandling");
 
         const url = "https://user:pass@example.com/path?token=secret#frag";
         const error = new Error("aborted");
@@ -35,14 +34,15 @@ describe("monitoring errorHandling safe URL logging", () => {
             String(call[0])
         );
 
-        expect(debugMessages.some((message) => message.includes("token=secret")))
-            .toBeFalsy();
-        expect(debugMessages.some((message) => message.includes("user:pass"))).toBeFalsy(
-
-        );
-        expect(debugMessages.some((message) => message.includes("#frag"))).toBeFalsy(
-
-        );
+        expect(
+            debugMessages.some((message) => message.includes("token=secret"))
+        ).toBeFalsy();
+        expect(
+            debugMessages.some((message) => message.includes("user:pass"))
+        ).toBeFalsy();
+        expect(
+            debugMessages.some((message) => message.includes("#frag"))
+        ).toBeFalsy();
         expect(
             debugMessages.some((message) =>
                 message.includes("https://example.com/path")
@@ -51,9 +51,8 @@ describe("monitoring errorHandling safe URL logging", () => {
     });
 
     it("redacts query/hash/auth for unexpected error logs", async () => {
-        const { handleCheckError } = await import(
-            "../../../../services/monitoring/utils/errorHandling"
-        );
+        const { handleCheckError } =
+            await import("../../../../services/monitoring/utils/errorHandling");
 
         const url = "https://user:pass@example.com/path?token=secret#frag";
 
@@ -63,14 +62,15 @@ describe("monitoring errorHandling safe URL logging", () => {
             String(call[0])
         );
 
-        expect(errorMessages.some((message) => message.includes("token=secret")))
-            .toBeFalsy();
-        expect(errorMessages.some((message) => message.includes("user:pass"))).toBeFalsy(
-
-        );
-        expect(errorMessages.some((message) => message.includes("#frag"))).toBeFalsy(
-
-        );
+        expect(
+            errorMessages.some((message) => message.includes("token=secret"))
+        ).toBeFalsy();
+        expect(
+            errorMessages.some((message) => message.includes("user:pass"))
+        ).toBeFalsy();
+        expect(
+            errorMessages.some((message) => message.includes("#frag"))
+        ).toBeFalsy();
         expect(
             errorMessages.some((message) =>
                 message.includes("https://example.com/path")

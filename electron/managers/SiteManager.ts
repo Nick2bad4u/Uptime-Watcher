@@ -1,4 +1,4 @@
-    /**
+/**
  * Site management service responsible for site CRUD operations and monitoring
  * coordination.
  *
@@ -44,8 +44,6 @@
  * ```
  *
  * @public
- * Site management coordinator for CRUD operations and cache synchronization.
- *
  * @packageDocumentation
  */
 
@@ -72,6 +70,10 @@ import type { TypedEventBus } from "../events/TypedEventBus";
 import type { MonitoringConfig } from "../services/database/interfaces";
 import type { ConfigurationManager } from "./ConfigurationManager";
 import type { SiteManagerRepositories } from "./databaseRepositorySets";
+import type {
+    IMonitoringOperations,
+    SiteManagerDependencies,
+} from "./SiteManager.types";
 
 import { LoggerAdapter } from "../services/database/serviceFactory";
 import { SiteRepositoryService } from "../services/database/SiteRepositoryService";
@@ -79,88 +81,7 @@ import { SiteWriterService } from "../services/database/SiteWriterService";
 import { StandardizedCache } from "../utils/cache/StandardizedCache";
 import { logger } from "../utils/logger";
 
-    /**
- * @remarks
- * Defines the contract for monitoring operations that can be performed in
- * coordination with site management. This allows loose coupling between the
- * SiteManager and MonitorManager while enabling coordinated operations.
- *
- * @public
- * Interface for monitoring operations integration.
- */
-export interface IMonitoringOperations {
-    /**
-     * Update the global history limit setting.
-     *
-     * @param limit - The new history limit value.
-     *
-     * @returns A promise that resolves when the limit is updated.
-     */
-    setHistoryLimit: (limit: number) => Promise<void>;
-    /**
-     * Set up monitoring for newly created monitors.
-     *
-     * @param site - The site containing new monitors.
-     * @param newMonitorIds - Array of new monitor IDs to set up.
-     *
-     * @returns A promise that resolves when setup is complete.
-     */
-    setupNewMonitors: (site: Site, newMonitorIds: string[]) => Promise<void>;
-    /**
-     * Start monitoring for a specific site and monitor.
-     *
-     * @param identifier - The site identifier.
-     * @param monitorId - The monitor ID to start monitoring for.
-     *
-     * @returns A promise that resolves to true if monitoring started, false
-     *   otherwise.
-     */
-    startMonitoringForSite: (
-        identifier: string,
-        monitorId: string
-    ) => Promise<boolean>;
-    /**
-     * Stop monitoring for a specific site and monitor.
-     *
-     * @param identifier - The site identifier.
-     * @param monitorId - The monitor ID to stop monitoring for.
-     *
-     * @returns A promise that resolves to true if monitoring stopped, false
-     *   otherwise.
-     */
-    stopMonitoringForSite: (
-        identifier: string,
-        monitorId: string
-    ) => Promise<boolean>;
-}
 
-    /**
- * @remarks
- * Provides all required dependencies for SiteManager operation, including
- * repository services, database access, event communication, and optional
- * monitoring integration for coordinated operations.
- *
- * @public
- * Dependency injection configuration for {@link SiteManager}.
- */
-export interface SiteManagerDependencies {
-    /** Configuration manager for business rules and validation. */
-    configurationManager: ConfigurationManager;
-    /** Database service for transaction management. */
-    databaseService: SiteManagerRepositories["databaseService"];
-    /** Event emitter for system-wide communication. */
-    eventEmitter: TypedEventBus<UptimeEvents>;
-    /** History repository for status history management. */
-    historyRepository: SiteManagerRepositories["historyRepository"];
-    /** Optional MonitorManager dependency for coordinated operations. */
-    monitoringOperations?: IMonitoringOperations;
-    /** Monitor repository for monitor-related operations. */
-    monitorRepository: SiteManagerRepositories["monitorRepository"];
-    /** Settings repository for configuration management. */
-    settingsRepository: SiteManagerRepositories["settingsRepository"];
-    /** Site repository for database operations. */
-    siteRepository: SiteManagerRepositories["siteRepository"];
-}
 
 interface UpdateSitesCacheOptions {
     readonly action?: StateSyncAction;

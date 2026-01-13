@@ -1,6 +1,6 @@
 /**
- * Ensures HTTP monitor logs never include sensitive URL components (auth, query,
- * hash).
+ * Ensures HTTP monitor logs never include sensitive URL components (auth,
+ * query, hash).
  */
 
 import { beforeEach, describe, expect, it, vi } from "vitest";

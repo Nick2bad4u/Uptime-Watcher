@@ -86,7 +86,6 @@ import type {
     StatusUpdate,
 } from "@shared/types";
 
-import { SITE_ADDED_SOURCE } from "@shared/types/events";
 import {
     STATE_SYNC_ACTION,
     STATE_SYNC_SOURCE,
@@ -112,7 +111,6 @@ import type {
     IsMonitoringActiveRequestData,
     OrchestratorEvents,
     RestartMonitoringRequestData,
-    SiteEventData,
     StartMonitoringRequestData,
     StopMonitoringRequestData,
     UpdateSitesCacheRequestData,
@@ -121,6 +119,7 @@ import type {
 
 import { HistoryLimitCoordinator } from "./coordinators/HistoryLimitCoordinator";
 import { MonitoringLifecycleCoordinator } from "./coordinators/MonitoringLifecycleCoordinator";
+import { OrchestratorEventForwardingCoordinator } from "./coordinators/OrchestratorEventForwardingCoordinator";
 import { SiteLifecycleCoordinator } from "./coordinators/SiteLifecycleCoordinator";
 import { SnapshotSyncCoordinator } from "./coordinators/SnapshotSyncCoordinator";
 import {
@@ -128,28 +127,11 @@ import {
     createLoggingMiddleware,
 } from "./events/middleware";
 import { TypedEventBus } from "./events/TypedEventBus";
-import { attachForwardedMetadata } from "./utils/eventMetadataForwarding";
 import { diagnosticsLogger, logger } from "./utils/logger";
 
 /** Logical event bus identifier applied to forwarded renderer events. */
 const ORCHESTRATOR_BUS_ID = "UptimeOrchestrator" as const;
 
-type MonitoringOperationScope = "global" | "monitor" | "site";
-
-const determineMonitoringScope = (
-    identifier: string,
-    monitorId?: string
-): MonitoringOperationScope => {
-    if (identifier === "all") {
-        return "global";
-    }
-
-    if (typeof monitorId === "string" && monitorId.length > 0) {
-        return "monitor";
-    }
-
-    return "site";
-};
 /**
  * Core application orchestrator responsible for wiring together the monitoring,
  * database, and event-bus subsystems in the Electron main process.
@@ -198,6 +180,9 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
 
     /** Coordinator for snapshot/state synchronization and cache-related flows. */
     private readonly snapshotSyncCoordinator: SnapshotSyncCoordinator;
+
+    /** Coordinator for forwarding internal manager events to renderer consumers. */
+    private readonly eventForwardingCoordinator: OrchestratorEventForwardingCoordinator;
 
     /**
      * Cached initialization promise for idempotent startup.
@@ -250,248 +235,6 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
             } catch (error) {
                 logger.error(
                     "[UptimeOrchestrator] Error handling internal:database:initialized:",
-                    error
-                );
-            }
-        })();
-    };
-
-    /** Event handler for site addition events */
-    private readonly handleSiteAddedEvent = (
-        data: SiteEventData & { _meta?: unknown }
-    ): void => {
-        void (async (): Promise<void> => {
-            if (!data.site) {
-                logger.error(
-                    "[UptimeOrchestrator] Received internal:site:added without site payload",
-                    { identifier: data.identifier }
-                );
-                return;
-            }
-            // Extract original data without _meta to prevent conflicts
-            const source = data.source ?? SITE_ADDED_SOURCE.USER;
-            const payload = {
-                site: data.site,
-                source,
-                timestamp: data.timestamp,
-            } satisfies UptimeEvents["site:added"];
-
-            attachForwardedMetadata({
-                busId: ORCHESTRATOR_BUS_ID,
-                forwardedEvent: "site:added",
-                payload,
-                source: data,
-            });
-
-            await this.emitTyped("site:added", payload);
-        })();
-    };
-
-    /**
-     * Event handler for site removal events.
-     *
-     * @remarks
-     * Handles site removal events and forwards them to the frontend via the
-     * public event system. This is an arrow function property to maintain
-     * proper 'this' binding when used as an event handler callback.
-     *
-     * @param data - Site event data containing site information and metadata
-     *
-     * @internal
-     */
-    private readonly handleSiteRemovedEvent = (
-        data: SiteEventData & { _meta?: unknown }
-    ): void => {
-        void (async (): Promise<void> => {
-            const siteIdentifier =
-                data.identifier ?? data.site?.identifier ?? "unknown-site";
-            const siteName = data.site?.name ?? "Unknown";
-            const cascade = data.cascade === true;
-
-            if (!data.site) {
-                logger.warn(
-                    "[UptimeOrchestrator] internal:site:removed emitted without site snapshot; using fallback values",
-                    { siteIdentifier }
-                );
-            }
-
-            const payload = {
-                cascade,
-                siteIdentifier,
-                siteName,
-                timestamp: data.timestamp,
-            } satisfies UptimeEvents["site:removed"];
-
-            attachForwardedMetadata({
-                busId: ORCHESTRATOR_BUS_ID,
-                forwardedEvent: "site:removed",
-                payload,
-                source: data,
-            });
-
-            await this.emitTyped("site:removed", payload);
-        })();
-    };
-
-    /**
-     * Event handler for site update events.
-     *
-     * @remarks
-     * Handles site update events and forwards them to the frontend via the
-     * public event system. This is an arrow function property to maintain
-     * proper 'this' binding when used as an event handler callback.
-     *
-     * @param data - Site event data containing site information, metadata, and
-     *   previous state
-     *
-     * @internal
-     */
-    private readonly handleSiteUpdatedEvent = (
-        data: SiteEventData & { _meta?: unknown; previousSite?: Site }
-    ): void => {
-        void (async (): Promise<void> => {
-            if (!data.site) {
-                logger.error(
-                    "[UptimeOrchestrator] Received internal:site:updated without site payload",
-                    { identifier: data.identifier }
-                );
-                return;
-            }
-            // Extract original data without _meta to prevent conflicts
-            const payload = {
-                previousSite: data.previousSite ?? data.site,
-                site: data.site,
-                timestamp: data.timestamp,
-                updatedFields: data.updatedFields ?? [],
-            } satisfies UptimeEvents["site:updated"];
-
-            attachForwardedMetadata({
-                busId: ORCHESTRATOR_BUS_ID,
-                forwardedEvent: "site:updated",
-                payload,
-                source: data,
-            });
-
-            await this.emitTyped("site:updated", payload);
-        })();
-    };
-
-    /** Event handler for monitor start events */
-    private readonly handleMonitorStartedEvent = (
-        eventData: UptimeEvents["internal:monitor:started"] & {
-            _meta?: unknown;
-        }
-    ): void => {
-        void (async (): Promise<void> => {
-            try {
-                const { identifier, monitorId, summary } = eventData;
-                const scope = determineMonitoringScope(identifier, monitorId);
-
-                if (scope === "global") {
-                    const sites = this.siteManager.getSitesFromCache();
-
-                    const siteCount = summary?.siteCount ?? sites.length;
-                    const monitorCount =
-                        summary?.succeeded ??
-                        sites.reduce(
-                            (total: number, site: Site) =>
-                                total + site.monitors.length,
-                            0
-                        );
-
-                    const payloadBase = {
-                        monitorCount,
-                        siteCount,
-                        timestamp: Date.now(),
-                    };
-
-                    const payload: UptimeEvents["monitoring:started"] = summary
-                        ? { ...payloadBase, summary }
-                        : payloadBase;
-
-                    attachForwardedMetadata({
-                        busId: ORCHESTRATOR_BUS_ID,
-                        forwardedEvent: "monitoring:started",
-                        payload,
-                        source: eventData,
-                    });
-
-                    await this.emitTyped("monitoring:started", payload);
-                } else {
-                    logger.debug(
-                        "[UptimeOrchestrator] Skipping monitoring:started broadcast for scoped operation",
-                        { identifier, monitorId, scope }
-                    );
-                }
-            } catch (error) {
-                logger.error(
-                    "[UptimeOrchestrator] Error handling internal:monitor:started:",
-                    error
-                );
-            }
-        })();
-    };
-
-    /**
-     * Event handler for monitor stop events.
-     *
-     * @remarks
-     * Handles monitor stop events and manages monitoring state updates. Emits
-     * monitoring:stopped events to notify the frontend of changes in monitoring
-     * state. This is an arrow function property to maintain proper 'this'
-     * binding when used as an event handler callback.
-     *
-     * @param eventData - Monitor stop event data with timing and reason
-     *   information
-     *
-     * @internal
-     */
-    private readonly handleMonitorStoppedEvent = (
-        eventData: UptimeEvents["internal:monitor:stopped"] & {
-            _meta?: unknown;
-        }
-    ): void => {
-        void (async (): Promise<void> => {
-            try {
-                const { identifier, monitorId, reason, summary } = eventData;
-                const scope = determineMonitoringScope(identifier, monitorId);
-
-                if (scope === "global") {
-                    // Always get the actual active monitor count from scheduler
-                    // instead of relying on global monitoring state flag
-                    const activeMonitors =
-                        this.monitorManager.getActiveMonitorCount();
-
-                    const stopPayloadBase = {
-                        activeMonitors,
-                        reason,
-                        timestamp: Date.now(),
-                    };
-
-                    const payload: UptimeEvents["monitoring:stopped"] = summary
-                        ? {
-                              ...stopPayloadBase,
-                              summary,
-                          }
-                        : stopPayloadBase;
-
-                    attachForwardedMetadata({
-                        busId: ORCHESTRATOR_BUS_ID,
-                        forwardedEvent: "monitoring:stopped",
-                        payload,
-                        source: eventData,
-                    });
-
-                    await this.emitTyped("monitoring:stopped", payload);
-                } else {
-                    logger.debug(
-                        "[UptimeOrchestrator] Skipping monitoring:stopped broadcast for scoped operation",
-                        { identifier, monitorId, scope }
-                    );
-                }
-            } catch (error) {
-                logger.error(
-                    "[UptimeOrchestrator] Error handling internal:monitor:stopped:",
                     error
                 );
             }
@@ -1265,6 +1008,7 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
      */
     private removeEventHandlers(): void {
         this.historyLimitCoordinator.unregister();
+        this.eventForwardingCoordinator.unregister();
 
         // Remove database event handlers
         this.off(
@@ -1280,14 +1024,7 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
             this.handleDatabaseInitializedEvent
         );
 
-        // Remove site event handlers
-        this.off("internal:site:added", this.handleSiteAddedEvent);
-        this.off("internal:site:removed", this.handleSiteRemovedEvent);
-        this.off("internal:site:updated", this.handleSiteUpdatedEvent);
-
         // Remove monitoring event handlers
-        this.off("internal:monitor:started", this.handleMonitorStartedEvent);
-        this.off("internal:monitor:stopped", this.handleMonitorStoppedEvent);
         this.off(
             "internal:monitor:manual-check-completed",
             this.handleManualCheckCompletedEvent
@@ -1384,6 +1121,15 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
             siteManager: this.siteManager,
         });
 
+        this.eventForwardingCoordinator = new OrchestratorEventForwardingCoordinator(
+            {
+                busId: ORCHESTRATOR_BUS_ID,
+                eventBus: this,
+                monitorManager: this.monitorManager,
+                siteManager: this.siteManager,
+            }
+        );
+
         // Set up event-driven communication between managers
         this.setupEventHandlers();
     }
@@ -1427,26 +1173,12 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
     }
 
     /**
-     * Set up event forwarding from internal events to public frontend events.
-     */
-    private setupEventForwarding(): void {
-        // eslint-disable-next-line listeners/no-missing-remove-event-listener -- Event forwarding listeners are intentionally persistent for the lifetime of the orchestrator
-        this.on("internal:site:added", this.handleSiteAddedEvent);
-
-        // eslint-disable-next-line listeners/no-missing-remove-event-listener -- Event forwarding listeners are intentionally persistent for the lifetime of the orchestrator
-        this.on("internal:site:removed", this.handleSiteRemovedEvent);
-
-        // eslint-disable-next-line listeners/no-missing-remove-event-listener -- Event forwarding listeners are intentionally persistent for the lifetime of the orchestrator
-        this.on("internal:site:updated", this.handleSiteUpdatedEvent);
-    }
-
-    /**
      * Set up event handlers for inter-manager communication.
      */
     private setupEventHandlers(): void {
         this.setupDatabaseEventHandlers();
         this.historyLimitCoordinator.register();
-        this.setupEventForwarding();
+        this.eventForwardingCoordinator.register();
         this.setupMonitoringEventHandlers();
         this.setupSiteEventHandlers();
     }
@@ -1470,12 +1202,6 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
      * Set up monitoring event handlers.
      */
     private setupMonitoringEventHandlers(): void {
-        // eslint-disable-next-line listeners/no-missing-remove-event-listener -- Monitoring event listeners are intentionally persistent for the lifetime of the orchestrator
-        this.on("internal:monitor:started", this.handleMonitorStartedEvent);
-
-        // eslint-disable-next-line listeners/no-missing-remove-event-listener -- Monitoring event listeners are intentionally persistent for the lifetime of the orchestrator
-        this.on("internal:monitor:stopped", this.handleMonitorStoppedEvent);
-
         // eslint-disable-next-line listeners/no-missing-remove-event-listener -- Monitoring event listeners are intentionally persistent for the lifetime of the orchestrator
         this.on(
             "internal:monitor:manual-check-completed",

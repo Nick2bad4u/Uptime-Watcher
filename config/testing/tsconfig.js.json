@@ -6,7 +6,7 @@
         "checkJs": true,
         "composite": true,
         "declaration": true,
-        "declarationDir": ".cache/builds/test/js/types",
+        "declarationDir": "../../.cache/builds/test/js/types",
         "incremental": true,
         "isolatedDeclarations": false,
         "noEmit": false,
@@ -15,10 +15,18 @@
         "noUncheckedIndexedAccess": false,
         "outDir": "../../.cache/builds/test/js",
         "paths": {
-            "@app/*": ["src/*"],
-            "@assets/*": ["assets/*"],
-            "@electron/*": ["electron/*"],
-            "@shared/*": ["shared/*"]
+            "@app/*": [
+                "src/*"
+            ],
+            "@assets/*": [
+                "assets/*"
+            ],
+            "@electron/*": [
+                "electron/*"
+            ],
+            "@shared/*": [
+                "shared/*"
+            ]
         },
         "rootDir": "../..",
         "tsBuildInfoFile": "../../.cache/tsconfig.js.tsbuildinfo"

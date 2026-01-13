@@ -7,13 +7,9 @@
  * state management.
  */
 
-import type { StatusUpdate } from "@shared/types";
 import type { JSX } from "react/jsx-runtime";
 
-import { isDevelopment, isProduction } from "@shared/utils/environment";
-import { ensureError } from "@shared/utils/errorHandling";
 import { useEscapeKeyModalHandler } from "@shared/utils/modalHandlers";
-import { isRecord } from "@shared/utils/typeHelpers";
 import {
     memo,
     type NamedExoticComponent,
@@ -24,11 +20,21 @@ import {
     useState,
 } from "react";
 
-import type { StatusUpdateSubscriptionSummary } from "./stores/sites/baseTypes";
-
+import { UI_MESSAGES } from "./app/appUiMessages";
+import {
+    cleanupAppBootstrap,
+    runAppBootstrap,
+} from "./app/bootstrap/appBootstrap";
+import {
+    cleanupDebugStoreSubscriptions as cleanupDebugStoreSubscriptionsImpl,
+    subscribeToDebugStores as subscribeToDebugStoresImpl,
+} from "./app/debug/debugStoreSubscriptions";
+import {
+    cleanupSidebarMediaQueryListener,
+    setupSidebarMediaQueryListener,
+} from "./app/sidebar/sidebarMediaQueryListener";
 import { AddSiteModal } from "./components/AddSiteForm/AddSiteModal";
 import {
-    enqueueAlertFromStatusUpdate,
     synchronizeNotificationPreferences,
 } from "./components/Alerts/alertCoordinator";
 import { StatusAlertToaster } from "./components/Alerts/StatusAlertToaster";
@@ -50,12 +56,9 @@ import { useGlobalMonitoringMetrics } from "./hooks/useGlobalMonitoringMetrics";
 import { useMount } from "./hooks/useMount";
 import { useSelectedSite } from "./hooks/useSelectedSite";
 import { logger } from "./services/logger";
-import { NotificationPreferenceService } from "./services/NotificationPreferenceService";
-import { useAlertStore } from "./stores/alerts/useAlertStore";
 import { ErrorBoundary } from "./stores/error/ErrorBoundary";
 import { useErrorStore } from "./stores/error/useErrorStore";
 import { useSettingsStore } from "./stores/settings/useSettingsStore";
-import { useSitesStore } from "./stores/sites/useSitesStore";
 import { useConfirmDialogVisibility } from "./stores/ui/useConfirmDialogStore";
 import { usePromptDialogVisibility } from "./stores/ui/usePromptDialogStore";
 import { useUIStore } from "./stores/ui/useUiStore";
@@ -65,88 +68,12 @@ import { ThemedButton } from "./theme/components/ThemedButton";
 import { ThemedText } from "./theme/components/ThemedText";
 import { ThemeProvider } from "./theme/components/ThemeProvider";
 import { useTheme } from "./theme/useTheme";
-import { setupCacheSync } from "./utils/cacheSync";
 import { AppIcons } from "./utils/icons";
 import {
-    subscribeToMediaQueryListChanges,
     tryGetMediaQueryList,
 } from "./utils/mediaQueries";
 
-// UI Message constants for consistency and future localization
-const UI_MESSAGES = {
-    ERROR_CLOSE_BUTTON: "Close",
-    LOADING: "Loading...",
-    SITE_COUNT_LABEL: "Monitored Sites",
-    UPDATE_AVAILABLE: "A new update is available. Downloading...",
-    UPDATE_DISMISS_BUTTON: "Dismiss",
-    UPDATE_DOWNLOADED: "Update downloaded! Restart to apply.",
-    UPDATE_DOWNLOADING: "Update is downloading...",
-    UPDATE_ERROR_FALLBACK: "Update failed.",
-    UPDATE_RESTART_BUTTON: "Restart Now",
-} as const;
 
-const warnMissingImplementation = (message: string): void => {
-    if (isDevelopment()) {
-        logger.warn(message);
-    }
-};
-
-const resolveStatusUpdateSiteIdentifier = (update: StatusUpdate): string => {
-    const siteCandidate = isRecord(update) ? update.site : undefined;
-    let siteIdentifierFromSite = "";
-
-    if (isRecord(siteCandidate)) {
-        const identifierCandidate = siteCandidate.identifier;
-        if (typeof identifierCandidate === "string") {
-            const trimmedIdentifier = identifierCandidate.trim();
-            if (trimmedIdentifier.length > 0) {
-                siteIdentifierFromSite = trimmedIdentifier;
-            }
-        }
-    }
-
-    if (siteIdentifierFromSite.length > 0) {
-        return siteIdentifierFromSite;
-    }
-
-    const siteIdentifierFromEvent = update.siteIdentifier.trim();
-    if (siteIdentifierFromEvent.length > 0) {
-        return siteIdentifierFromEvent;
-    }
-
-    return "unknown-site";
-};
-
-const logStatusUpdateDebugInfo = (update: StatusUpdate): void => {
-    if (!isDevelopment()) {
-        return;
-    }
-
-    const timestamp = new Date().toLocaleTimeString();
-    const resolvedIdentifier = resolveStatusUpdateSiteIdentifier(update);
-
-    logger.debug(
-        `[${timestamp}] Status update received for site: ${resolvedIdentifier}`
-    );
-};
-
-const reportSubscriptionDiagnostics = (
-    summary: StatusUpdateSubscriptionSummary | undefined
-): void => {
-    if (!summary) {
-        logger.warn("Status update subscription resolved without diagnostics");
-        return;
-    }
-
-    if (summary.success) {
-        return;
-    }
-
-    logger.warn("Status update subscription encountered issues", {
-        errors: summary.errors,
-        listenersAttached: summary.listenersAttached,
-    });
-};
 
 /**
  * Main application component that serves as the root of the Uptime Watcher app.
@@ -355,146 +282,23 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
      * @throws Error When store initialization fails
      */
     const initializeApp = useCallback(async () => {
-        logger.debug("[App:init] initializeApp invoked");
-        if (isProduction()) {
-            logger.app.started();
-        }
-
-        try {
-            // Get fresh references to avoid stale closures
-            const sitesStoreGetter =
-                typeof useSitesStore.getState === "function"
-                    ? useSitesStore.getState
-                    : undefined;
-            const settingsStoreGetter =
-                typeof useSettingsStore.getState === "function"
-                    ? useSettingsStore.getState
-                    : undefined;
-
-            const sitesStore = sitesStoreGetter?.();
-            const settingsStore = settingsStoreGetter?.();
-
-            // Initialize stores sequentially to avoid state conflicts during startup
-            const initializeSettings = settingsStore?.initializeSettings;
-            if (typeof initializeSettings === "function") {
-                logger.debug("[App:init] invoking settings initialize");
-                await initializeSettings.call(settingsStore);
-                logger.debug("[App:init] settings initialized");
-            } else {
-                warnMissingImplementation(
-                    "Settings store missing initializeSettings implementation during app bootstrap"
-                );
-            }
-
-            try {
-                logger.debug(
-                    "[App:init] initializing notification preference bridge"
-                );
-                await NotificationPreferenceService.initialize();
-            } catch (error) {
-                logger.warn(
-                    "Failed to initialize notification preference bridge",
-                    ensureError(error)
-                );
-            }
-
-            logger.debug(
-                "[App:init] running initial notification preference synchronization"
-            );
-            await synchronizeNotificationPreferences();
-            logger.debug(
-                "[App:init] initial notification preference synchronization completed"
-            );
-
-            const initializeSites = sitesStore?.initializeSites;
-            if (typeof initializeSites === "function") {
-                logger.debug("[App:init] invoking sites initialize");
-                await initializeSites.call(sitesStore);
-                logger.debug("[App:init] sites initialized");
-            } else {
-                warnMissingImplementation(
-                    "Sites store missing initializeSites implementation during app bootstrap"
-                );
-            }
-
-            // Set up cache synchronization with backend and store cleanup
-            // function
-            logger.debug("[App:init] setting up cache synchronization");
-            // eslint-disable-next-line n/no-sync -- Function name contains 'sync' but is not a synchronous file operation
-            const cacheSyncCleanup = setupCacheSync();
-            logger.debug("[App:init] cache synchronization enabled");
-            cacheSyncCleanupRef.current = cacheSyncCleanup;
-
-            // Subscribe to state sync events
-            const subscribeToSyncEvents = sitesStore?.subscribeToSyncEvents;
-
-            if (typeof subscribeToSyncEvents === "function") {
-                logger.debug("[App:init] subscribing to sync events");
-                syncEventsCleanupRef.current = subscribeToSyncEvents();
-                logger.debug("[App:init] sync events subscription established");
-            } else {
-                warnMissingImplementation(
-                    "Sites store missing subscribeToSyncEvents implementation during app bootstrap"
-                );
-            }
-
-            // Subscribe to status updates
-            const subscribeToStatusUpdates =
-                sitesStore?.subscribeToStatusUpdates;
-
-            if (typeof subscribeToStatusUpdates === "function") {
-                logger.debug("[App:init] subscribing to status updates");
-                const subscriptionResult = (await subscribeToStatusUpdates(
-                    (update: StatusUpdate) => {
-                        enqueueAlertFromStatusUpdate(update);
-                        logStatusUpdateDebugInfo(update);
-                    }
-                )) as StatusUpdateSubscriptionSummary | undefined;
-
-                reportSubscriptionDiagnostics(subscriptionResult);
-                logger.debug(
-                    "[App:init] status updates subscription completed"
-                );
-            } else {
-                warnMissingImplementation(
-                    "Sites store missing subscribeToStatusUpdates implementation during app bootstrap"
-                );
-            }
-
-            // Subscribe to app update status events (store-owned subscription)
-            logger.debug("[App:init] subscribing to update status events");
-            updateStatusEventsCleanupRef.current =
-                subscribeToUpdateStatusEvents();
-            logger.debug(
-                "[App:init] update status events subscription established"
-            );
-
-            // Mark initialization as complete to enable loading overlay for future operations
-            logger.debug(
-                "[App:init] initialization pipeline finished, marking initialized"
-            );
-            setIsInitialized(true);
-            logger.info("[App:init] store update counts after initialization", {
-                alertUpdates: alertsUpdateCountRef.current,
-                errorUpdates: errorUpdateCountRef.current,
-                settingsUpdates: settingsUpdateCountRef.current,
-                siteUpdates: sitesUpdateCountRef.current,
-                uiUpdates: uiUpdateCountRef.current,
-                updatesStoreUpdates: updatesUpdateCountRef.current,
-            });
-        } catch (error) {
-            const normalizedError = ensureError(error);
-            logger.error(
-                "[App:init] Unhandled error during initialization pipeline",
-                normalizedError
-            );
-            useErrorStore
-                .getState()
-                .setError(
-                    normalizedError.message ||
-                        "Failed to initialize application. Please restart and try again."
-                );
-        }
+        await runAppBootstrap({
+            cleanupRefs: {
+                cacheSyncCleanupRef,
+                syncEventsCleanupRef,
+                updateStatusEventsCleanupRef,
+            },
+            setIsInitialized,
+            subscribeToUpdateStatusEvents,
+            updateCountRefs: {
+                alertsUpdateCountRef,
+                errorUpdateCountRef,
+                settingsUpdateCountRef,
+                sitesUpdateCountRef,
+                uiUpdateCountRef,
+                updatesUpdateCountRef,
+            },
+        });
     }, [subscribeToUpdateStatusEvents]);
 
     /**
@@ -505,174 +309,38 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
      * prevent memory leaks and background operations.
      */
     const cleanupApp = useCallback(() => {
-        const currentSitesStore =
-            typeof useSitesStore.getState === "function"
-                ? useSitesStore.getState()
-                : undefined;
-
-        const unsubscribeFromStatusUpdates =
-            currentSitesStore?.unsubscribeFromStatusUpdates;
-
-        if (typeof unsubscribeFromStatusUpdates === "function") {
-            unsubscribeFromStatusUpdates();
-        } else if (isDevelopment()) {
-            logger.warn(
-                "Sites store missing unsubscribeFromStatusUpdates implementation during app cleanup"
-            );
-        }
-
-        // Clean up cache sync
-        if (cacheSyncCleanupRef.current) {
-            cacheSyncCleanupRef.current();
-            cacheSyncCleanupRef.current = null;
-        }
-
-        if (syncEventsCleanupRef.current) {
-            syncEventsCleanupRef.current();
-            syncEventsCleanupRef.current = null;
-        }
-
-        if (updateStatusEventsCleanupRef.current) {
-            updateStatusEventsCleanupRef.current();
-            updateStatusEventsCleanupRef.current = null;
-        }
+        cleanupAppBootstrap({
+            cleanupRefs: {
+                cacheSyncCleanupRef,
+                syncEventsCleanupRef,
+                updateStatusEventsCleanupRef,
+            },
+        });
     }, []);
 
     useMount(initializeApp, cleanupApp);
 
     const subscribeToDebugStores = useCallback((): void => {
-        const nextSubscriptions: Array<() => void> = [];
-
-        const isCleanupFunction = (
-            candidate: unknown
-        ): candidate is () => void => typeof candidate === "function";
-
-        const isUnsubscribeContainer = (
-            candidate: unknown
-        ): candidate is { unsubscribe: () => void } => {
-            if (!isRecord(candidate)) {
-                return false;
-            }
-
-            const { unsubscribe } = candidate as {
-                unsubscribe?: unknown;
-            };
-            return typeof unsubscribe === "function";
-        };
-
-        const registerSubscription = (
-            unsubscribeCandidate: unknown,
-            storeIdentifier: string
-        ): void => {
-            if (isCleanupFunction(unsubscribeCandidate)) {
-                nextSubscriptions.push(unsubscribeCandidate);
-                return;
-            }
-
-            if (isUnsubscribeContainer(unsubscribeCandidate)) {
-                const { unsubscribe } = unsubscribeCandidate;
-                nextSubscriptions.push(() => {
-                    unsubscribe.call(unsubscribeCandidate);
-                });
-                return;
-            }
-
-            logger.warn(
-                "[App:debug] store subscribe did not return a callable unsubscribe",
-                {
-                    storeIdentifier,
-                    type: typeof unsubscribeCandidate,
-                }
-            );
-        };
-
-        const sitesUnsubscribe = useSitesStore.subscribe((state) => {
-            if (!isDevelopment()) {
-                return;
-            }
-            sitesUpdateCountRef.current += 1;
-            logger.info("[App:debug] sites store update", {
-                count: sitesUpdateCountRef.current,
-                siteCount: state.sites.length,
-            });
+        subscribeToDebugStoresImpl({
+            countRefs: {
+                alertsUpdateCountRef,
+                errorUpdateCountRef,
+                sitesUpdateCountRef,
+                uiUpdateCountRef,
+                updatesUpdateCountRef,
+            },
+            refs: {
+                subscriptionsRef: debugSubscriptionsRef,
+            },
         });
-        registerSubscription(sitesUnsubscribe, "sites");
-
-        const uiUnsubscribe = useUIStore.subscribe((state) => {
-            if (!isDevelopment()) {
-                return;
-            }
-            uiUpdateCountRef.current += 1;
-            logger.info("[App:debug] ui store update", {
-                count: uiUpdateCountRef.current,
-                showAddSiteModal: state.showAddSiteModal,
-                showSettings: state.showSettings,
-                showSiteDetails: state.showSiteDetails,
-            });
-        });
-        registerSubscription(uiUnsubscribe, "ui");
-
-        const errorUnsubscribe = useErrorStore.subscribe((state) => {
-            if (!isDevelopment()) {
-                return;
-            }
-            errorUpdateCountRef.current += 1;
-            logger.info("[App:debug] error store update", {
-                count: errorUpdateCountRef.current,
-                isLoading: state.isLoading,
-                lastError: state.lastError,
-            });
-        });
-        registerSubscription(errorUnsubscribe, "error");
-
-        const updatesUnsubscribe = useUpdatesStore.subscribe((state) => {
-            if (!isDevelopment()) {
-                return;
-            }
-            updatesUpdateCountRef.current += 1;
-            logger.info("[App:debug] updates store update", {
-                count: updatesUpdateCountRef.current,
-                updateError: state.updateError,
-                updateStatus: state.updateStatus,
-            });
-        });
-        registerSubscription(updatesUnsubscribe, "updates");
-
-        const alertsUnsubscribe = useAlertStore.subscribe((state) => {
-            if (!isDevelopment()) {
-                return;
-            }
-            alertsUpdateCountRef.current += 1;
-            logger.info("[App:debug] alerts store update", {
-                alertCount: state.alerts.length,
-                count: alertsUpdateCountRef.current,
-            });
-        });
-        registerSubscription(alertsUnsubscribe, "alerts");
-
-        debugSubscriptionsRef.current = nextSubscriptions;
     }, []);
 
     const cleanupDebugStoreSubscriptions = useCallback((): void => {
-        debugSubscriptionsRef.current.forEach((unsubscribe, index) => {
-            if (typeof unsubscribe !== "function") {
-                logger.warn(
-                    "[App:debug] encountered a non-function during debug subscription cleanup",
-                    { index, type: typeof unsubscribe }
-                );
-                return;
-            }
-
-            try {
-                unsubscribe();
-            } catch (error) {
-                logger.error(
-                    "[App:debug] failed to unsubscribe from store",
-                    ensureError(error)
-                );
-            }
+        cleanupDebugStoreSubscriptionsImpl({
+            refs: {
+                subscriptionsRef: debugSubscriptionsRef,
+            },
         });
-        debugSubscriptionsRef.current = [];
     }, []);
 
     useMount(subscribeToDebugStores, cleanupDebugStoreSubscriptions);
@@ -706,34 +374,27 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
     );
 
     const cleanupSidebarListener = useCallback(() => {
-        sidebarMediaQueryUnsubscribeRef.current?.();
-        sidebarMediaQueryUnsubscribeRef.current = null;
-        sidebarMediaQueryRef.current = null;
+        cleanupSidebarMediaQueryListener({
+            refs: {
+                mediaQueryRef: sidebarMediaQueryRef,
+                unsubscribeRef: sidebarMediaQueryUnsubscribeRef,
+            },
+        });
     }, []);
 
     useMount(
         useCallback(() => {
-            const mediaQuery = tryGetMediaQueryList(
-                SIDEBAR_COLLAPSE_MEDIA_QUERY
-            );
-            if (!mediaQuery) {
-                return;
-            }
-
-            sidebarMediaQueryRef.current = mediaQuery;
-            const { matches } = mediaQuery;
-            if (typeof matches === "boolean") {
-                setIsCompactViewport(matches);
-                if (matches) {
+            setupSidebarMediaQueryListener({
+                closeCompactSidebar: () => {
                     setCompactSidebarOpen(false);
-                }
-            }
-
-            sidebarMediaQueryUnsubscribeRef.current =
-                subscribeToMediaQueryListChanges(
-                    mediaQuery,
-                    handleSidebarBreakpointChange
-                );
+                },
+                onBreakpointChange: handleSidebarBreakpointChange,
+                refs: {
+                    mediaQueryRef: sidebarMediaQueryRef,
+                    unsubscribeRef: sidebarMediaQueryUnsubscribeRef,
+                },
+                setIsCompactViewport,
+            });
         }, [handleSidebarBreakpointChange]),
         cleanupSidebarListener
     );

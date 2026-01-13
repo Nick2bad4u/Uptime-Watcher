@@ -185,7 +185,10 @@ function getInvokeArgsByteBudget(channel: string): number {
     }
 }
 
-function assertInvokeArgsWithinBudget(channel: string, args: unknown[]): void {
+function assertInvokeArgsWithinBudget(
+    channel: string,
+    args: readonly unknown[]
+): void {
     const maxBytes = getInvokeArgsByteBudget(channel);
 
     if (!isJsonByteBudgetExceeded(args, maxBytes)) {
@@ -346,7 +349,7 @@ export function createTypedInvoker<TChannel extends IpcInvokeChannel>(
     return async function invokeTypedChannel(
         ...args: IpcInvokeChannelParams<TChannel>
     ): Promise<IpcInvokeChannelResult<TChannel>> {
-        assertInvokeArgsWithinBudget(channel, args as unknown[]);
+        assertInvokeArgsWithinBudget(channel, args);
 
         return invokeWithValidation(
             channel,
@@ -379,7 +382,7 @@ export function createVoidInvoker<TChannel extends VoidIpcInvokeChannel>(
     return async function invokeVoidChannel(
         ...args: IpcInvokeChannelParams<TChannel>
     ): Promise<void> {
-        assertInvokeArgsWithinBudget(channel, args as unknown[]);
+        assertInvokeArgsWithinBudget(channel, args);
 
         await invokeWithValidation(
             channel,

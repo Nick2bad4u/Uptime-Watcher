@@ -5,16 +5,25 @@
         "checkJs": true,
         "composite": true,
         "declaration": true,
-        "declarationDir": ".cache/builds/AllOtherRoot/types",
+        "declarationDir": "../../.cache/builds/AllOtherRoot/types",
         "incremental": true,
+        "outDir": "../../.cache/builds/AllOtherRoot",
         "paths": {
-            "@app/*": ["src/*"],
-            "@assets/*": ["assets/*"],
-            "@electron/*": ["electron/*"],
-            "@shared/*": ["shared/*"]
+            "@app/*": [
+                "src/*"
+            ],
+            "@assets/*": [
+                "assets/*"
+            ],
+            "@electron/*": [
+                "electron/*"
+            ],
+            "@shared/*": [
+                "shared/*"
+            ]
         },
         "rootDir": "../..",
-        "tsBuildInfoFile": "../../dist/tsconfig.AllOtherRoot.tsbuildinfo"
+        "tsBuildInfoFile": "../../.cache/tsconfig.AllOtherRoot.tsbuildinfo"
     },
     "exclude": [
         "../../electron/**/*.test.ts",

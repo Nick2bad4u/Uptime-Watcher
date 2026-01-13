@@ -150,6 +150,7 @@ import pluginPrettier from "eslint-plugin-prettier";
 // @ts-expect-error -- No Types for this Package
 import pluginPromise from "eslint-plugin-promise";
 import pluginReact from "eslint-plugin-react";
+// @ts-expect-error -- No Types for this Package
 import react19upgrade from "eslint-plugin-react-19-upgrade"
 import reactCompiler from "eslint-plugin-react-compiler";
 import eslintReactDom from "eslint-plugin-react-dom";
@@ -1273,6 +1274,7 @@ export default /** @type {EslintConfig} */[
             "better-tailwindcss/no-deprecated-classes": "warn",
             "better-tailwindcss/no-duplicate-classes": "warn",
             "better-tailwindcss/no-restricted-classes": "warn",
+            "better-tailwindcss/no-unknown-classes": "off",
             "better-tailwindcss/no-unnecessary-whitespace": "warn",
             "better-tailwindcss/no-unregistered-classes": [
                 "off",
@@ -3318,6 +3320,7 @@ export default /** @type {EslintConfig} */[
             "better-tailwindcss/no-deprecated-classes": "warn",
             "better-tailwindcss/no-duplicate-classes": "warn",
             "better-tailwindcss/no-restricted-classes": "warn",
+            "better-tailwindcss/no-unknown-classes": "off",
             "better-tailwindcss/no-unnecessary-whitespace": "warn",
             "better-tailwindcss/no-unregistered-classes": [
                 "off",

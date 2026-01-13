@@ -394,14 +394,19 @@ describe("ServiceContainer - Working Tests", () => {
             eventName: string,
             payload: unknown
         ): unknown => {
-            const { stripEventMetadata } = container as unknown as {
-                stripEventMetadata: (
-                    eventName: string,
-                    payload: unknown
-                ) => unknown;
+            const { eventForwarder } = container as unknown as {
+                eventForwarder: {
+                    stripEventMetadataForForwarding: (
+                        eventName: string,
+                        payload: unknown
+                    ) => unknown;
+                };
             };
 
-            return stripEventMetadata.call(container, eventName, payload);
+            return eventForwarder.stripEventMetadataForForwarding(
+                eventName,
+                payload
+            );
         };
 
         it("should reattach metadata for object payloads as non-enumerable properties", () => {

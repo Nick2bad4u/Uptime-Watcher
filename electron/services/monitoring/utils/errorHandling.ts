@@ -219,10 +219,11 @@ export function handleAxiosError(
     }
 
     if (isDev()) {
+        const httpStatus = error.response?.status;
         const logData = buildSafeErrorLogData({
-            correlationId,
+            ...(correlationId ? { correlationId } : {}),
             error,
-            httpStatus: error.response?.status,
+            ...(typeof httpStatus === "number" ? { httpStatus } : {}),
             isAxiosError: true,
             safeUrlForLogging,
         });
@@ -291,7 +292,7 @@ export function handleCheckError(
     if (isCancellationError(error)) {
         if (isDev()) {
             const logContext = buildSafeErrorLogData({
-                correlationId,
+                ...(correlationId ? { correlationId } : {}),
                 error: ensureError(error),
                 isAxiosError: axios.isAxiosError(error),
                 safeUrlForLogging,

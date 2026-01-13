@@ -15,8 +15,8 @@
  * 3. Direct `window.electronAPI` usage must not appear outside of approved
  *    locations (tests and explicit helper/type-definition files).
  * 4. Event names passed to `.emitTyped()` / `.onTyped()` / `.offTyped()` /
- *    `.onceTyped()` in production code must be defined in
- *    `electron/events/eventTypes.ts`.
+ *    `.onceTyped()` in production code must be defined in the event catalogue
+ *    (`electron/events/eventTypes.ts` and `electron/events/eventTypes.catalogue.*.ts`).
  */
 
 import { readFile, readdir } from "node:fs/promises";
@@ -106,23 +106,43 @@ function isSrcTestFile(filePath) {
  * @returns {Promise<Set<string>>}
  */
 async function loadKnownEventNames() {
-    const eventTypesPath = path.resolve(
-        ROOT_DIRECTORY,
-        "electron/events/eventTypes.ts"
+    const eventsDirectory = path.resolve(ROOT_DIRECTORY, "electron/events");
+
+    const baseEventTypesPath = path.resolve(eventsDirectory, "eventTypes.ts");
+
+    const entries = await readdir(eventsDirectory, { withFileTypes: true });
+    const partFiles = entries
+        .filter((entry) => {
+            if (!entry.isFile()) {
+                return false;
+            }
+
+            return /^eventTypes\.catalogue\..+\.ts$/u.test(entry.name);
+        })
+        .map((entry) => path.resolve(eventsDirectory, entry.name))
+        .toSorted();
+
+    const contentByFile = await Promise.all(
+        [baseEventTypesPath, ...partFiles].map((filePath) =>
+            readFile(filePath, "utf8")
+        )
     );
-    const content = await readFile(eventTypesPath, "utf8");
 
     /** @type {Set<string>} */
     const names = new Set();
 
     const pattern = /"(?<name>[^"]+)":/g;
-    let match;
 
-    while ((match = pattern.exec(content)) !== null) {
-        const groups = match.groups;
-        const name = groups?.["name"];
-        if (typeof name === "string") {
-            names.add(name);
+    for (const content of contentByFile) {
+        pattern.lastIndex = 0;
+        let match;
+
+        while ((match = pattern.exec(content)) !== null) {
+            const groups = match.groups;
+            const name = groups?.["name"];
+            if (typeof name === "string") {
+                names.add(name);
+            }
         }
     }
 

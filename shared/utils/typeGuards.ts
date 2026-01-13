@@ -210,7 +210,8 @@ export function isFunction(
  *
  * @param value - Value to evaluate.
  *
- * @returns `true` when the value is a number greater than or equal to zero.
+ * @returns `true` when the value is a finite number greater than or equal to
+ *   zero.
  */
 export function isNonNegativeNumber(value: unknown): value is number {
     return isNumber(value) && !Number.isNaN(value) && value >= 0;

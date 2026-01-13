@@ -2,13 +2,13 @@
  * IPC payload size budget helpers.
  *
  * @remarks
- * These utilities enforce byte budgets at trust boundaries (renderer  main
- * IPC calls). While the Electron main process already validates IPC payloads,
- * doing a cheap preflight in the renderer helps avoid:
+ * These utilities enforce byte budgets at trust boundaries (renderer  main IPC
+ * calls). While the Electron main process already validates IPC payloads, doing
+ * a cheap preflight in the renderer helps avoid:
  *
- * - allocating huge buffers (e.g., `File.arrayBuffer()`) unnecessarily
- * - transferring large blobs that will be rejected by validators anyway
- * - confusing "IPC failed" errors that are really "payload too large"
+ * - Allocating huge buffers (e.g., `File.arrayBuffer()`) unnecessarily
+ * - Transferring large blobs that will be rejected by validators anyway
+ * - Confusing "IPC failed" errors that are really "payload too large"
  */
 
 import type { SerializedDatabaseRestorePayload } from "@shared/types/ipc";
