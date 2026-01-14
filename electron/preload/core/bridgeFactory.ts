@@ -46,8 +46,10 @@ import { ipcRenderer } from "electron";
 
 import { isJsonByteBudgetExceeded } from "../../utils/jsonByteBudget";
 import {
+    buildPayloadPreview,
     preloadDiagnosticsLogger,
     preloadLogger,
+    reportPreloadGuardFailure,
 } from "../utils/preloadLogger";
 
 /**
@@ -56,6 +58,42 @@ import {
  * @typeParam T - Payload type carried by a successful IPC response.
  */
 export type IpcResponse<T = unknown> = SharedIpcResponse<T>;
+
+/**
+ * Minimal "safe parse" shape compatible with Zod's `safeParse` return type.
+ *
+ * @remarks
+ * Preload bridges often reuse shared Zod schemas/guards to validate IPC
+ * payloads. This type allows domain modules to pass either Zod safe parsers or
+ * custom validators into {@link createValidatedInvoker}.
+ */
+export type SafeParseLike<T> =
+    | {
+          readonly data: T;
+          readonly success: true;
+      }
+    | {
+          readonly error: unknown;
+          readonly success: false;
+      };
+
+/**
+ * Options controlling how validation failures are logged and reported.
+ */
+export interface ResultValidationOptions {
+    /** Optional domain label to help group diagnostics in logs. */
+    readonly domain?: string;
+    /** Override for the validator name displayed in diagnostics. */
+    readonly guardName?: string;
+    /** Optional reason string forwarded to diagnostics. */
+    readonly reason?: string;
+}
+
+function isSafeParseFailure<T>(
+    value: SafeParseLike<T>
+): value is Extract<SafeParseLike<T>, { readonly success: false }> {
+    return !value.success;
+}
 
 const DIAGNOSTICS_CHANNEL = DIAGNOSTICS_CHANNELS.verifyIpcHandler;
 
@@ -394,6 +432,93 @@ export function createVoidInvoker<TChannel extends VoidIpcInvokeChannel>(
                 ),
             (response) => {
                 validateVoidIpcResponse(response);
+            }
+        );
+    };
+}
+
+/**
+ * Creates a typed IPC invoker that additionally validates the successful
+ * response payload.
+ *
+ * @remarks
+ * The main process is generally trusted, but this adds defense-in-depth against
+ * malformed payloads caused by:
+ *
+ * - Handler bugs/regressions,
+ * - Database corruption producing invalid domain objects,
+ * - Version skew during development hot reload.
+ *
+ * When validation fails, this helper:
+ *
+ * 1. Logs a structured warning in preload diagnostics,
+ * 2. Forwards a diagnostics report to the main process,
+ * 3. Throws an {@link IpcError} so the renderer can surface the failure.
+ */
+export function createValidatedInvoker<TChannel extends IpcInvokeChannel>(
+    channel: TChannel,
+    validateResult: (
+        candidate: unknown
+    ) => SafeParseLike<IpcInvokeChannelResult<TChannel>>,
+    options: ResultValidationOptions = {}
+): (
+    ...args: IpcInvokeChannelParams<TChannel>
+) => Promise<IpcInvokeChannelResult<TChannel>> {
+    const invoke = createTypedInvoker(channel);
+
+    return async (
+        ...args: IpcInvokeChannelParams<TChannel>
+    ): Promise<IpcInvokeChannelResult<TChannel>> => {
+        const result = await invoke(...args);
+        const parsed = validateResult(result);
+
+        if (!isSafeParseFailure(parsed)) {
+            return parsed.data;
+        }
+
+        const guardName =
+            options.guardName ??
+            (validateResult.name.length > 0 ? validateResult.name : "anonymous");
+        const domain = options.domain ?? "preload";
+        const payloadPreview = buildPayloadPreview(result);
+        const normalizedError = ensureError(parsed.error);
+
+        preloadDiagnosticsLogger.warn(
+            "[IPC Bridge] Rejected malformed response payload",
+            {
+                channel,
+                domain,
+                guard: guardName,
+                payloadType: Array.isArray(result) ? "array" : typeof result,
+                ...(payloadPreview ? { payloadPreview } : {}),
+                reason: options.reason ?? "response-validation",
+            }
+        );
+
+        preloadDiagnosticsLogger.debug(
+            "[IPC Bridge] Response validation failure details",
+            normalizedError
+        );
+
+        void reportPreloadGuardFailure({
+            channel,
+            guard: guardName,
+            metadata: {
+                domain,
+                phase: "invoke-result-validation",
+            },
+            ...(payloadPreview ? { payloadPreview } : {}),
+            reason: options.reason ?? "response-validation",
+        });
+
+
+        throw new IpcError(
+            `IPC response payload failed validation for channel '${channel}'`,
+            channel,
+            normalizedError,
+            {
+                domain,
+                guard: guardName,
             }
         );
     };

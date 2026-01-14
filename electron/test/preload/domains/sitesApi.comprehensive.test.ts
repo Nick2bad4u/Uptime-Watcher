@@ -3,7 +3,7 @@ import { ipcRenderer } from "electron";
 
 import { sitesApi } from "../../../preload/domains/sitesApi";
 import { SITES_CHANNELS } from "@shared/types/preload";
-import type { Site } from "@shared/types";
+import type { Monitor, Site } from "@shared/types";
 
 const ipcRendererMock = vi.hoisted(() => ({
     invoke: vi.fn(),
@@ -18,10 +18,29 @@ const ipcContext = expect.objectContaining({
 });
 
 describe("sitesApi", () => {
+    const baseMonitor1: Monitor = {
+        checkInterval: 30_000,
+        history: [],
+        id: "monitor-1",
+        monitoring: true,
+        responseTime: -1,
+        retryAttempts: 0,
+        status: "up",
+        timeout: 1000,
+        type: "http",
+        url: "https://example.com",
+    };
+
+    const baseMonitor2: Monitor = {
+        ...baseMonitor1,
+        id: "monitor-2",
+        url: "https://example.com/health",
+    };
+
     const baseSite: Site = {
         identifier: "site-1",
         monitoring: true,
-        monitors: [],
+        monitors: [baseMonitor1, baseMonitor2],
         name: "Main Site",
     };
 
@@ -63,12 +82,12 @@ describe("sitesApi", () => {
     it("removes a site by identifier", async () => {
         vi.mocked(ipcRenderer.invoke).mockResolvedValueOnce({
             success: true,
-            data: baseSite,
+            data: true,
         });
 
         const result = await sitesApi.removeSite(baseSite.identifier);
 
-        expect(result).toEqual(baseSite);
+        expect(result).toBeTruthy();
         expect(ipcRenderer.invoke).toHaveBeenCalledWith(
             SITES_CHANNELS.removeSite,
             baseSite.identifier,
@@ -77,9 +96,14 @@ describe("sitesApi", () => {
     });
 
     it("removes a monitor from a site", async () => {
+        const updatedSite: Site = {
+            ...baseSite,
+            monitors: [baseMonitor2],
+        };
+
         vi.mocked(ipcRenderer.invoke).mockResolvedValueOnce({
             success: true,
-            data: true,
+            data: updatedSite,
         });
 
         const result = await sitesApi.removeMonitor(
@@ -87,7 +111,7 @@ describe("sitesApi", () => {
             "monitor-1"
         );
 
-        expect(result).toBeTruthy();
+        expect(result).toEqual(updatedSite);
         expect(ipcRenderer.invoke).toHaveBeenCalledWith(
             SITES_CHANNELS.removeMonitor,
             baseSite.identifier,
@@ -136,6 +160,17 @@ describe("sitesApi", () => {
 
         await expect(sitesApi.getSites()).rejects.toThrowError(
             /ipc operation failed/i
+        );
+    });
+
+    it("throws when the response payload fails validation", async () => {
+        vi.mocked(ipcRenderer.invoke).mockResolvedValueOnce({
+            success: true,
+            data: "not-a-boolean",
+        });
+
+        await expect(sitesApi.removeSite(baseSite.identifier)).rejects.toThrowError(
+            /failed validation/i
         );
     });
 });

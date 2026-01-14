@@ -509,21 +509,21 @@ export function createSuccessResponse<T>(
 function createResponseFromExecution<T>(
     channelName: string,
     execution: HandlerExecutionResult<T>,
-    correlationId?: CorrelationId
+    correlationId?: CorrelationId,
+    metadata?: IpcHandlerMetadata
 ): IpcResponse<T> {
-    if (execution.outcome === "success") {
-        return createSuccessResponse(execution.value, {
-            duration: execution.duration,
-            handler: channelName,
-            ...(correlationId ? { correlationId } : {}),
-        });
-    }
-
-    return createErrorResponse<T>(execution.errorMessage, {
+    const responseMetadata: IpcHandlerMetadata = {
+        ...metadata,
         duration: execution.duration,
         handler: channelName,
         ...(correlationId ? { correlationId } : {}),
-    });
+    };
+
+    if (execution.outcome === "success") {
+        return createSuccessResponse(execution.value, responseMetadata);
+    }
+
+    return createErrorResponse<T>(execution.errorMessage, responseMetadata);
 }
 
 /**
@@ -562,7 +562,8 @@ export async function withIpcHandler<T>(
     return createResponseFromExecution(
         channelName,
         execution,
-        options?.correlationId
+        options?.correlationId,
+        options?.metadata
     );
 }
 
@@ -612,6 +613,15 @@ export async function withIpcHandlerValidation<
     const correlationMetadata = correlationId ? { correlationId } : {};
     if (validationErrors.length > 0) {
         const errorMessage = `Parameter validation failed: ${validationErrors.join(", ")}`;
+
+        const responseMetadata: IpcHandlerMetadata = {
+            ...options?.metadata,
+            handler: channelName,
+            ...correlationMetadata,
+            paramCount: params.length,
+            validationErrors,
+        };
+
         logger.warn(
             `[IpcHandler] Validation failed ${channelName}`,
             withLogContext({
@@ -624,11 +634,7 @@ export async function withIpcHandlerValidation<
                 errors: validationErrors,
             }
         );
-        return createErrorResponse<T>(errorMessage, {
-            handler: channelName,
-            ...correlationMetadata,
-            validationErrors,
-        });
+        return createErrorResponse<T>(errorMessage, responseMetadata);
     }
 
     const metadata: IpcHandlerMetadata = {
@@ -649,7 +655,7 @@ export async function withIpcHandlerValidation<
         () => handler(...params),
         executionOptions
     );
-    return createResponseFromExecution(channelName, execution, correlationId);
+    return createResponseFromExecution(channelName, execution, correlationId, metadata);
 }
 
 /**

@@ -1260,6 +1260,7 @@ describe("IPC Utils - Comprehensive Coverage", () => {
                     metadata: {
                         duration: expect.any(Number),
                         handler: "valid-channel",
+                        paramCount: 2,
                     },
                 });
             });
@@ -1293,6 +1294,7 @@ describe("IPC Utils - Comprehensive Coverage", () => {
                     error: "Parameter validation failed: Invalid param1, Invalid param2",
                     metadata: {
                         handler: "invalid-channel",
+                        paramCount: 2,
                         validationErrors: ["Invalid param1", "Invalid param2"],
                     },
                 });
@@ -1351,6 +1353,7 @@ describe("IPC Utils - Comprehensive Coverage", () => {
                     metadata: {
                         duration: expect.any(Number),
                         handler: "error-validated-channel",
+                        paramCount: 1,
                     },
                 });
             });

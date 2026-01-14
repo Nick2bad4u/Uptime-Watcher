@@ -21,7 +21,6 @@
 // @ts-expect-error -- No Types for this Package
 import pluginUseMemo2 from "@arthurgeron/eslint-plugin-react-usememo";
 import pluginDocusaurus from "@docusaurus/eslint-plugin";
-// @ts-expect-error -- No Types for this Package
 import pluginComments from "@eslint-community/eslint-plugin-eslint-comments/configs";
 import eslintReact from "@eslint-react/eslint-plugin";
 import { fixupPluginRules } from "@eslint/compat";

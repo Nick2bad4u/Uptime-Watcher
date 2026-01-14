@@ -121,6 +121,12 @@ export class WindowService {
     /** Tracks whether production security headers were attached. */
     private hasAttachedProductionSecurityHeaders = false;
 
+    /** Tracks permission types we've already logged to avoid log spam. */
+    private readonly loggedDeniedPermissions = new Set<string>();
+
+    /** Tracks whether display media denial has been logged. */
+    private hasLoggedDisplayMediaDenial = false;
+
     /**
      * Named event handler for did-fail-load event
      */
@@ -547,6 +553,15 @@ export class WindowService {
      * @returns The created BrowserWindow instance
      */
     public createMainWindow(): BrowserWindow {
+        if (this.hasMainWindow()) {
+            logger.warn(
+                "[WindowService] Main window already exists; returning existing instance"
+            );
+            // `hasMainWindow()` ensures `this.mainWindow` is non-null.
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- Guaranteed by hasMainWindow().
+            return this.mainWindow!;
+        }
+
         this.mainWindow = new BrowserWindow({
             height: 800,
             minHeight: 600,
@@ -577,7 +592,15 @@ export class WindowService {
 
             session.setPermissionCheckHandler(() => false);
             session.setPermissionRequestHandler(
-                (_webContents, _permission, callback) => {
+                (_webContents, permission, callback) => {
+                    if (!this.loggedDeniedPermissions.has(permission)) {
+                        this.loggedDeniedPermissions.add(permission);
+                        logger.warn(
+                            "[WindowService] Denied permission request",
+                            { permission }
+                        );
+                    }
+
                     // eslint-disable-next-line n/no-callback-literal -- Electron permission callback expects a boolean grant flag.
                     callback(false);
                 }
@@ -590,8 +613,18 @@ export class WindowService {
 
             if (typeof session.setDisplayMediaRequestHandler === "function") {
                 session.setDisplayMediaRequestHandler((_request, callback) => {
-                    const denyResponse = {};
-                    callback(denyResponse);
+                    if (!this.hasLoggedDisplayMediaDenial) {
+                        this.hasLoggedDisplayMediaDenial = true;
+                        logger.warn(
+                            "[WindowService] Denied display media (screen capture) request"
+                        );
+                    }
+
+                    // Deny by providing no stream targets.
+                    // (With exactOptionalPropertyTypes enabled, explicitly
+                    // assigning `undefined` is not allowed for optional
+                    // properties. Omitting the keys is the typed way to deny.)
+                    callback({});
                 });
             }
         } catch (error: unknown) {

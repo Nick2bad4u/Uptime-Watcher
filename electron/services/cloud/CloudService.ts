@@ -8,44 +8,49 @@ import type {
     CloudBackupMigrationRequest,
     CloudBackupMigrationResult,
 } from "@shared/types/cloudBackupMigration";
-import type { CloudSyncManifest } from "@shared/types/cloudSyncManifest";
+import type {
+    CloudEncryptionMode,
+} from "@shared/types/cloudEncryption";
 import type { CloudSyncResetResult } from "@shared/types/cloudSyncReset";
 import type { CloudSyncResetPreview } from "@shared/types/cloudSyncResetPreview";
 import type { SerializedDatabaseRestoreResult } from "@shared/types/ipc";
 
-import {
-    CLOUD_ENCRYPTION_CONFIG_VERSION,
-    type CloudEncryptionConfigPassphrase,
-    type CloudEncryptionMode,
-} from "@shared/types/cloudEncryption";
 import { readProcessEnv } from "@shared/utils/environment";
 import { ensureError } from "@shared/utils/errorHandling";
-import { hasAsciiControlCharacters } from "@shared/utils/stringSafety";
-import {
-    MAX_FILESYSTEM_BASE_DIRECTORY_BYTES,
-    validateFilesystemBaseDirectoryCandidate,
-} from "@shared/validation/filesystemBaseDirectoryValidation";
-import { promises as fs } from "node:fs";
-import * as path from "node:path";
 
 import type { UptimeOrchestrator } from "../../UptimeOrchestrator";
-import type {
-    DatabaseRestorePayload,
-} from "../database/utils/backup/databaseBackup";
 import type { CloudSyncEngine } from "../sync/SyncEngine";
+import type { CloudServiceOperationContext } from "./CloudService.operationContext";
 import type { CloudSettingsAdapter } from "./CloudService.types";
 import type { CloudStorageProvider } from "./providers/CloudStorageProvider.types";
 
 import { logger } from "../../utils/logger";
-import { validateDatabaseBackupPayload } from "../database/utils/backup/databaseBackup";
 import { ProviderCloudSyncTransport } from "../sync/ProviderCloudSyncTransport";
 import {
-    createKeyCheckBase64,
+    deleteBackup as deleteBackupOperation,
+    listBackups as listBackupsOperation,
+    migrateBackups as migrateBackupsOperation,
+    restoreBackup as restoreBackupOperation,
+    uploadLatestBackup as uploadLatestBackupOperation,
+} from "./CloudService.backupOperations";
+import {
+    clearEncryptionKey as clearEncryptionKeyOperation,
+    setEncryptionPassphrase as setEncryptionPassphraseOperation,
+} from "./CloudService.encryptionOperations";
+import {
+    configureFilesystemProvider as configureFilesystemProviderOperation,
+    connectDropbox as connectDropboxOperation,
+    connectGoogleDrive as connectGoogleDriveOperation,
+    disconnect as disconnectOperation,
+} from "./CloudService.providerOperations";
+import {
+    enableSync as enableSyncOperation,
+    previewResetRemoteSyncState as previewResetRemoteSyncStateOperation,
+    requestSyncNow as requestSyncNowOperation,
+    resetRemoteSyncState as resetRemoteSyncStateOperation,
+} from "./CloudService.syncOperations";
+import {
     decryptBuffer,
-    derivePassphraseKey,
-    encryptBuffer,
-    generateEncryptionSalt,
-    verifyKeyCheckBase64,
 } from "./crypto/cloudCrypto";
 import {
     type DropboxProviderDeps,
@@ -53,15 +58,9 @@ import {
     loadDropboxProviderDeps,
     loadGoogleDriveProviderDeps,
 } from "./internal/cloudProviderDeps";
-import { serializeBackupMetadata, toDatabaseBackupMetadata } from "./internal/cloudServiceBackupMetadata";
-import { ignoreENOENT } from "./internal/cloudServiceFsUtils";
-import { determineBackupMigrationNeedsEncryptionKey } from "./internal/cloudServiceMigrationUtils";
 import {
-    assertBackupObjectKey,
     decodeStrictBase64,
-    encodeBase64,
     ENCRYPTION_KEY_BYTES,
-    ENCRYPTION_SALT_BYTES,
     parseEncryptionMode,
 } from "./internal/cloudServicePrimitives";
 import {
@@ -73,7 +72,6 @@ import {
     setLastError,
     SETTINGS_KEY_DROPBOX_TOKENS,
     SETTINGS_KEY_ENCRYPTION_MODE,
-    SETTINGS_KEY_ENCRYPTION_SALT,
     SETTINGS_KEY_FILESYSTEM_BASE_DIRECTORY,
     SETTINGS_KEY_GOOGLE_DRIVE_ACCOUNT_LABEL,
     SETTINGS_KEY_GOOGLE_DRIVE_TOKENS,
@@ -91,15 +89,7 @@ import {
     buildUnsupportedProviderStatus,
     type CloudStatusCommonArgs,
 } from "./internal/CloudStatusBuilders";
-import {
-    DEFAULT_GOOGLE_DRIVE_CLIENT_ID,
-    resolveGoogleDriveOAuthConfig,
-} from "./internal/googleOAuthConfig";
 import { resolveCloudProviderOrNull } from "./internal/resolveCloudProviderOrNull";
-import { migrateProviderBackups } from "./migrations/backupMigration";
-import { resetProviderCloudSyncState } from "./migrations/syncReset";
-import { buildCloudSyncResetPreview } from "./migrations/syncResetPreview";
-import { backupMetadataKeyForBackupKey } from "./providers/CloudBackupMetadataFile";
 import { isCloudProviderOperationError } from "./providers/cloudProviderErrors";
 import { EncryptedSyncCloudStorageProvider } from "./providers/EncryptedSyncCloudStorageProvider";
 import {
@@ -165,83 +155,20 @@ export class CloudService {
         }
     }
 
-/** Disconnects from the configured provider and clears persisted config. */
-public async disconnect(): Promise<CloudStatusSummary> {
-        return this.runCloudOperation("disconnect", async () => {
-            const provider = await this.settings.get(SETTINGS_KEY_PROVIDER);
-
-            if (provider === "dropbox") {
-                const { DropboxTokenManager } = await this.loadDropboxDeps();
-                const appKey = this.getDropboxAppKey();
-                const tokenManager = new DropboxTokenManager({
-                    appKey,
-                    secretStore: this.secretStore,
-                    tokenStorageKey: SETTINGS_KEY_DROPBOX_TOKENS,
-                });
-
-                await tokenManager.revokeStoredTokens().catch(() => {});
-            }
-
-            if (provider === "google-drive") {
-                const { GoogleDriveTokenManager } =
-                    await this.loadGoogleDriveDeps();
-                const { clientId, clientSecret } =
-                    resolveGoogleDriveOAuthConfig();
-
-                const tokenManager = new GoogleDriveTokenManager({
-                    clientId,
-                    ...(clientSecret ? { clientSecret } : {}),
-                    secretStore: this.secretStore,
-                    storageKey: SETTINGS_KEY_GOOGLE_DRIVE_TOKENS,
-                });
-
-                await tokenManager.revoke().catch(() => {});
-
-                await this.settings.set(
-                    SETTINGS_KEY_GOOGLE_DRIVE_ACCOUNT_LABEL,
-                    ""
-                );
-            }
-
-            // Do not run these in parallel; settings are transaction-backed.
-            await this.settings.set(SETTINGS_KEY_PROVIDER, "");
-            await this.settings.set(SETTINGS_KEY_FILESYSTEM_BASE_DIRECTORY, "");
-            await this.settings.set(SETTINGS_KEY_ENCRYPTION_MODE, "");
-            await this.settings.set(SETTINGS_KEY_ENCRYPTION_SALT, "");
-
-            await this.secretStore.deleteSecret(SETTINGS_KEY_DROPBOX_TOKENS);
-            await this.secretStore.deleteSecret(
-                SETTINGS_KEY_GOOGLE_DRIVE_TOKENS
-            );
-            await this.secretStore.deleteSecret(
-                SECRET_KEY_ENCRYPTION_DERIVED_KEY
-            );
-
-            logger.info("[CloudService] Disconnected cloud provider");
-            return this.buildStatusSummary();
-        });
+    /** Disconnects from the configured provider and clears persisted config. */
+    public async disconnect(): Promise<CloudStatusSummary> {
+        return disconnectOperation(this.createOperationContext());
     }
 
-/** Enables or disables multi-device sync (when supported). */
-public async enableSync(
+    /** Enables or disables multi-device sync (when supported). */
+    public async enableSync(
         config: CloudEnableSyncConfig
     ): Promise<CloudStatusSummary> {
-        return this.runCloudOperation("enableSync", async () => {
-            await this.settings.set(
-                SETTINGS_KEY_SYNC_ENABLED,
-                config.enabled ? "true" : "false"
-            );
-
-            logger.info("[CloudService] Updated sync enabled flag", {
-                enabled: config.enabled,
-            });
-
-            return this.buildStatusSummary();
-        });
+        return enableSyncOperation(this.createOperationContext(), config);
     }
 
-/** Returns the current cloud configuration state. */
-public async getStatus(): Promise<CloudStatusSummary> {
+    /** Returns the current cloud configuration state. */
+    public async getStatus(): Promise<CloudStatusSummary> {
         return this.buildStatusSummary();
     }
 
@@ -253,141 +180,13 @@ public async getStatus(): Promise<CloudStatusSummary> {
      * - Stores the derived key in {@link SecretStore} so the user is not prompted
      *   every run.
      */
-public async setEncryptionPassphrase(
+    public async setEncryptionPassphrase(
         passphrase: string
     ): Promise<CloudStatusSummary> {
-        return this.runCloudOperation("setEncryptionPassphrase", async () => {
-            if (typeof passphrase !== "string") {
-                throw new TypeError("Passphrase must be a string");
-            }
-
-            if (hasAsciiControlCharacters(passphrase)) {
-                throw new Error(
-                    "Passphrase must not contain control characters"
-                );
-            }
-
-            const trimmedPassphrase = passphrase.trim();
-            if (trimmedPassphrase.length < 8) {
-                throw new Error(
-                    "Passphrase must be at least 8 characters (after trimming)"
-                );
-            }
-
-            const passphraseCandidates: readonly [string, string?] =
-                passphrase === trimmedPassphrase
-                    ? [passphrase]
-                    : [passphrase, trimmedPassphrase];
-
-            const provider = await this.resolveProviderOrThrow({
-                requireEncryptionUnlocked: false,
-            });
-
-            const transport = ProviderCloudSyncTransport.create(provider);
-            const manifest: CloudSyncManifest | null = await transport
-                .readManifest()
-                .catch((error: unknown) => {
-                    throw ensureError(error);
-                });
-            const remoteEncryption = manifest?.encryption;
-
-            if (remoteEncryption?.mode === "passphrase") {
-                const salt = decodeStrictBase64({
-                    expectedBytes: ENCRYPTION_SALT_BYTES,
-                    label: "encryption salt",
-                    value: remoteEncryption.saltBase64,
-                });
-                const tryDeriveKey = async (
-                    candidatePassphrase: string
-                ): Promise<Buffer | null> => {
-                    const candidateKey = await derivePassphraseKey({
-                        passphrase: candidatePassphrase,
-                        salt,
-                    });
-
-                    const valid = verifyKeyCheckBase64({
-                        key: candidateKey,
-                        keyCheckBase64: remoteEncryption.keyCheckBase64,
-                    });
-
-                    if (valid) {
-                        return candidateKey;
-                    }
-
-                    candidateKey.fill(0);
-                    return null;
-                };
-
-                // At most two candidates (raw + trimmed); avoid `no-await-in-loop`.
-                const [primaryCandidate, secondaryCandidate] =
-                    passphraseCandidates;
-
-                let derivedKey = await tryDeriveKey(primaryCandidate);
-                if (!derivedKey && secondaryCandidate) {
-                    derivedKey = await tryDeriveKey(secondaryCandidate);
-                }
-
-                if (!derivedKey) {
-                    throw new Error("Incorrect encryption passphrase");
-                }
-
-                // NOTE: Do not run settings writes in parallel.
-                // Some settings adapters are transaction-backed and parallel
-                // writes can trigger nested-transaction warnings.
-                await this.settings.set(
-                    SETTINGS_KEY_ENCRYPTION_MODE,
-                    "passphrase"
-                );
-                await this.settings.set(
-                    SETTINGS_KEY_ENCRYPTION_SALT,
-                    remoteEncryption.saltBase64
-                );
-                await this.secretStore.setSecret(
-                    SECRET_KEY_ENCRYPTION_DERIVED_KEY,
-                    encodeBase64(derivedKey)
-                );
-
-                derivedKey.fill(0);
-
-                return this.buildStatusSummary();
-            }
-
-            const salt = generateEncryptionSalt();
-            const key = await derivePassphraseKey({
-                passphrase: trimmedPassphrase,
-                salt,
-            });
-            const encryptionConfig: CloudEncryptionConfigPassphrase = {
-                configVersion: CLOUD_ENCRYPTION_CONFIG_VERSION,
-                kdf: "scrypt",
-                keyCheckBase64: createKeyCheckBase64(key),
-                mode: "passphrase",
-                saltBase64: encodeBase64(salt),
-            };
-
-            const nextManifest: CloudSyncManifest = {
-                ...(manifest ??
-                    ProviderCloudSyncTransport.createEmptyManifest()),
-                encryption: encryptionConfig,
-            };
-
-            await transport.writeManifest(nextManifest);
-
-            // NOTE: Do not run settings writes in parallel.
-            await this.settings.set(SETTINGS_KEY_ENCRYPTION_MODE, "passphrase");
-            await this.settings.set(
-                SETTINGS_KEY_ENCRYPTION_SALT,
-                encodeBase64(salt)
-            );
-            await this.secretStore.setSecret(
-                SECRET_KEY_ENCRYPTION_DERIVED_KEY,
-                encodeBase64(key)
-            );
-
-            key.fill(0);
-
-            return this.buildStatusSummary();
-        });
+        return setEncryptionPassphraseOperation(
+            this.createOperationContext(),
+            passphrase
+        );
     }
 
 /**
@@ -397,36 +196,13 @@ public async setEncryptionPassphrase(
      * This does not disable encryption remotely. It simply forces the user to
      * re-enter the passphrase on this device.
      */
-public async clearEncryptionKey(): Promise<CloudStatusSummary> {
-        return this.runCloudOperation("clearEncryptionKey", async () => {
-            await this.secretStore.deleteSecret(
-                SECRET_KEY_ENCRYPTION_DERIVED_KEY
-            );
-            return this.buildStatusSummary();
-        });
+    public async clearEncryptionKey(): Promise<CloudStatusSummary> {
+        return clearEncryptionKeyOperation(this.createOperationContext());
     }
 
 /** Requests a sync cycle as soon as possible. */
-public async requestSyncNow(): Promise<undefined> {
-        await this.runCloudOperation("requestSyncNow", async () => {
-            const syncEnabled = parseBooleanSetting(
-                await this.settings.get(SETTINGS_KEY_SYNC_ENABLED)
-            );
-
-            if (!syncEnabled) {
-                throw new Error("Cloud sync is disabled");
-            }
-
-            const provider = await this.resolveProviderOrThrow();
-            await this.syncEngine.syncNow(provider);
-            await this.settings.set(
-                SETTINGS_KEY_LAST_SYNC_AT,
-                String(Date.now())
-            );
-
-            logger.info("[CloudService] Sync completed");
-        });
-
+    public async requestSyncNow(): Promise<undefined> {
+        await requestSyncNowOperation(this.createOperationContext());
         return undefined;
     }
 
@@ -436,279 +212,44 @@ public async requestSyncNow(): Promise<undefined> {
      * @remarks
      * This is a destructive maintenance operation intended for advanced users.
      */
-public async resetRemoteSyncState(): Promise<CloudSyncResetResult> {
-        return this.runCloudOperation("resetRemoteSyncState", async () => {
-            const syncEnabled = parseBooleanSetting(
-                await this.settings.get(SETTINGS_KEY_SYNC_ENABLED)
-            );
-
-            if (!syncEnabled) {
-                throw new Error("Sync must be enabled to reset remote sync");
-            }
-
-            const provider = await this.resolveProviderOrThrow({
-                requireEncryptionUnlocked: true,
-            });
-
-            return resetProviderCloudSyncState({
-                provider,
-                syncEngine: this.syncEngine,
-            });
-        });
+    public async resetRemoteSyncState(): Promise<CloudSyncResetResult> {
+        return resetRemoteSyncStateOperation(this.createOperationContext());
     }
 
 /**
      * Previews a remote sync reset by counting remote `sync/` objects and
      * reading the current manifest.
      */
-public async previewResetRemoteSyncState(): Promise<CloudSyncResetPreview> {
-        return this.runCloudOperation(
-            "previewResetRemoteSyncState",
-            async () => {
-                const provider = await this.resolveProviderOrThrow({
-                    requireEncryptionUnlocked: false,
-                });
-
-                const transport = ProviderCloudSyncTransport.create(provider);
-                const manifest =
-                    (await transport.readManifest()) ??
-                    ProviderCloudSyncTransport.createEmptyManifest();
-
-                const syncObjects = await provider.listObjects("sync/");
-                return buildCloudSyncResetPreview({ manifest, syncObjects });
-            }
+    public async previewResetRemoteSyncState(): Promise<CloudSyncResetPreview> {
+        return previewResetRemoteSyncStateOperation(
+            this.createOperationContext()
         );
     }
 
 /** Configures the filesystem provider to use the given base directory. */
-public async configureFilesystemProvider(
+    public async configureFilesystemProvider(
         config: CloudFilesystemProviderConfig
     ): Promise<CloudStatusSummary> {
-        return this.runCloudOperation(
-            "configureFilesystemProvider",
-            async () => {
-                const issues = validateFilesystemBaseDirectoryCandidate(
-                    config.baseDirectory,
-                    { maxBytes: MAX_FILESYSTEM_BASE_DIRECTORY_BYTES }
-                );
-
-                if (issues.length > 0) {
-                    const [issue] = issues;
-                    if (!issue) {
-                        throw new Error("Filesystem base directory is invalid");
-                    }
-                    const candidate = config.baseDirectory;
-
-                    switch (issue.code) {
-                        case "not-string": {
-                            throw new TypeError(
-                                "Filesystem base directory must be a string"
-                            );
-                        }
-                        case "empty": {
-                            throw new Error(
-                                "Filesystem base directory must not be empty"
-                            );
-                        }
-                        case "whitespace": {
-                            throw new Error(
-                                "Filesystem base directory must not have leading or trailing whitespace"
-                            );
-                        }
-                        case "too-large": {
-                            throw new Error(
-                                `Filesystem base directory must not exceed ${issue.maxBytes} bytes`
-                            );
-                        }
-                        case "control-chars": {
-                            throw new Error(
-                                "Filesystem base directory must not contain control characters"
-                            );
-                        }
-                        case "null-byte": {
-                            throw new Error(
-                                "Filesystem base directory must not contain a null byte"
-                            );
-                        }
-                        case "windows-device-namespace": {
-                            throw new Error(
-                                String.raw`Filesystem base directory must not use Windows device namespace paths (\\?\ or \\.\)`
-                            );
-                        }
-                        case "not-absolute": {
-                            throw new Error(
-                                `Filesystem base directory must be absolute. Received '${candidate}'`
-                            );
-                        }
-                        default: {
-                            throw new Error(
-                                "Filesystem base directory is invalid"
-                            );
-                        }
-                    }
-                }
-
-                const { baseDirectory } = config;
-                const resolved = path.resolve(baseDirectory);
-
-                await fs.mkdir(resolved, { recursive: true }); // eslint-disable-line security/detect-non-literal-fs-filename -- Dynamic but validated path supplied by the user.
-                const stat = await fs.stat(resolved); // eslint-disable-line security/detect-non-literal-fs-filename -- Dynamic but validated path supplied by the user.
-                if (!stat.isDirectory()) {
-                    throw new Error(
-                        "Filesystem base directory must be a directory"
-                    );
-                }
-
-                const canonical = await fs.realpath(resolved); // eslint-disable-line security/detect-non-literal-fs-filename -- Dynamic but validated path supplied by the user.
-
-                const canonicalIssues =
-                    validateFilesystemBaseDirectoryCandidate(canonical, {
-                        maxBytes: MAX_FILESYSTEM_BASE_DIRECTORY_BYTES,
-                    });
-                if (canonicalIssues.length > 0) {
-                    throw new Error(
-                        "Filesystem base directory resolved to an invalid canonical path"
-                    );
-                }
-
-                await this.settings.set(SETTINGS_KEY_PROVIDER, "filesystem");
-                await this.settings.set(
-                    SETTINGS_KEY_FILESYSTEM_BASE_DIRECTORY,
-                    canonical
-                );
-
-                await this.secretStore.deleteSecret(
-                    SETTINGS_KEY_DROPBOX_TOKENS
-                );
-
-                logger.info("[CloudService] Configured filesystem provider", {
-                    baseDirectory: canonical,
-                });
-
-                return this.buildStatusSummary();
-            }
+        return configureFilesystemProviderOperation(
+            this.createOperationContext(),
+            config
         );
     }
 
 /**
      * Connects the Dropbox provider via system-browser OAuth.
      */
-public async connectDropbox(): Promise<CloudStatusSummary> {
-        return this.runCloudOperation("connectDropbox", async () => {
-            const {
-                DropboxAuthFlow,
-                DropboxCloudStorageProvider,
-                DropboxTokenManager,
-            } = await this.loadDropboxDeps();
-            const appKey = this.getDropboxAppKey();
-            const authFlow = new DropboxAuthFlow({ appKey });
-            const tokens = await authFlow.connect();
-
-            const tokenManager = new DropboxTokenManager({
-                appKey,
-                secretStore: this.secretStore,
-                tokenStorageKey: SETTINGS_KEY_DROPBOX_TOKENS,
-            });
-
-            await tokenManager.storeTokens(tokens);
-            await this.settings.set(SETTINGS_KEY_PROVIDER, "dropbox");
-            await this.settings.set(SETTINGS_KEY_FILESYSTEM_BASE_DIRECTORY, "");
-
-            // Verify the connection immediately so the UI doesn't end up in a
-            // confusing "configured but down" state.
-            try {
-                const provider = new DropboxCloudStorageProvider({
-                    tokenManager,
-                });
-                await provider.getAccountLabel();
-            } catch (error) {
-                // Roll back any partial config so the user can retry cleanly.
-                await this.settings.set(SETTINGS_KEY_PROVIDER, "");
-                await this.settings.set(
-                    SETTINGS_KEY_FILESYSTEM_BASE_DIRECTORY,
-                    ""
-                );
-                await this.secretStore.deleteSecret(
-                    SETTINGS_KEY_DROPBOX_TOKENS
-                );
-
-                const resolved = ensureError(error);
-                throw new Error(
-                    `Dropbox connection verification failed: ${resolved.message}`,
-                    { cause: error }
-                );
-            }
-
-            logger.info("[CloudService] Connected Dropbox provider");
-            return this.buildStatusSummary();
-        });
+    public async connectDropbox(): Promise<CloudStatusSummary> {
+        return connectDropboxOperation(this.createOperationContext());
     }
 
-public async connectGoogleDrive(): Promise<CloudStatusSummary> {
-        return this.runCloudOperation("connectGoogleDrive", async () => {
-            const {
-                fetchGoogleAccountLabel,
-                GoogleDriveAuthFlow,
-                GoogleDriveTokenManager,
-            } = await this.loadGoogleDriveDeps();
-            const { clientId, clientSecret } = resolveGoogleDriveOAuthConfig();
-
-            logger.info("[CloudService] Google Drive OAuth config selected", {
-                clientIdSource:
-                    clientId === DEFAULT_GOOGLE_DRIVE_CLIENT_ID
-                        ? "default"
-                        : "env",
-                clientIdSuffix: clientId.slice(-8),
-                hasClientSecret: Boolean(clientSecret),
-            });
-
-            const tokenManager = new GoogleDriveTokenManager({
-                clientId,
-                ...(clientSecret ? { clientSecret } : {}),
-                secretStore: this.secretStore,
-                storageKey: SETTINGS_KEY_GOOGLE_DRIVE_TOKENS,
-            });
-
-            const authFlow = new GoogleDriveAuthFlow({
-                clientId,
-                ...(clientSecret ? { clientSecret } : {}),
-            });
-            const auth = await authFlow.run();
-
-            await tokenManager.setTokens({
-                accessToken: auth.accessToken,
-                expiresAt: auth.expiresAt,
-                refreshToken: auth.refreshToken,
-                scope: auth.scope,
-                tokenType: auth.tokenType,
-            });
-
-            const accountLabel = await fetchGoogleAccountLabel(
-                auth.accessToken
-            );
-            if (accountLabel) {
-                await this.settings.set(
-                    SETTINGS_KEY_GOOGLE_DRIVE_ACCOUNT_LABEL,
-                    accountLabel
-                );
-            }
-
-            await this.settings.set(SETTINGS_KEY_FILESYSTEM_BASE_DIRECTORY, "");
-            await this.secretStore.deleteSecret(SETTINGS_KEY_DROPBOX_TOKENS);
-
-            await this.settings.set(SETTINGS_KEY_PROVIDER, "google-drive");
-
-            logger.info("[CloudService] Connected Google Drive provider");
-            return this.buildStatusSummary();
-        });
+    public async connectGoogleDrive(): Promise<CloudStatusSummary> {
+        return connectGoogleDriveOperation(this.createOperationContext());
     }
 
 /** Lists all backups stored in the configured provider. */
-public async listBackups(): Promise<CloudBackupEntry[]> {
-        return this.runCloudOperation("listBackups", async () => {
-            const provider = await this.resolveProviderOrThrow();
-            return provider.listBackups();
-        });
+    public async listBackups(): Promise<CloudBackupEntry[]> {
+        return listBackupsOperation(this.createOperationContext());
     }
 
 /**
@@ -717,155 +258,27 @@ public async listBackups(): Promise<CloudBackupEntry[]> {
      * @remarks
      * This operation only affects `backups/` objects (not `sync/`).
      */
-public async migrateBackups(
+    public async migrateBackups(
         request: CloudBackupMigrationRequest
     ): Promise<CloudBackupMigrationResult> {
-        return this.runCloudOperation("migrateBackups", async () => {
-            const provider = await this.resolveProviderOrThrow({
-                requireEncryptionUnlocked: false,
-            });
-
-            const backups = await provider.listBackups();
-            const needsKey = determineBackupMigrationNeedsEncryptionKey(
-                request,
-                backups
-            );
-
-            const localEncryptionMode = parseEncryptionMode(
-                await this.settings.get(SETTINGS_KEY_ENCRYPTION_MODE)
-            );
-
-            if (needsKey && localEncryptionMode !== "passphrase") {
-                throw new Error(
-                    "Passphrase encryption must be enabled/unlocked on this device to migrate encrypted backups"
-                );
-            }
-
-            const encryptionKey = needsKey
-                ? await this.getEncryptionKeyOrThrow()
-                : undefined;
-
-            const result = await migrateProviderBackups({
-                encryptionKey,
-                provider,
-                request,
-            });
-
-            if (result.migrated > 0) {
-                await this.settings.set(
-                    SETTINGS_KEY_LAST_BACKUP_AT,
-                    String(Date.now())
-                );
-            }
-
-            logger.info("[CloudService] Backup migration finished", {
-                failures: result.failures.length,
-                migrated: result.migrated,
-                processed: result.processed,
-                target: result.target,
-            });
-
-            return result;
-        });
+        return migrateBackupsOperation(this.createOperationContext(), request);
     }
 
 /** Creates a fresh SQLite backup and uploads it to the configured provider. */
-public async uploadLatestBackup(): Promise<CloudBackupEntry> {
-        return this.runCloudOperation("uploadLatestBackup", async () => {
-            const provider = await this.resolveProviderOrThrow();
-
-            const backup = await this.orchestrator.downloadBackup();
-            validateDatabaseBackupPayload(backup);
-
-            const { encrypted, key } = await this.getEncryptionKeyMaybe();
-            const shouldEncrypt = encrypted && key !== undefined;
-            if (encrypted && !key) {
-                throw new Error(
-                    "Cloud encryption is enabled but locked on this device"
-                );
-            }
-
-            const fileName = shouldEncrypt
-                ? `uptime-watcher-backup-${backup.metadata.createdAt}.sqlite.enc`
-                : `uptime-watcher-backup-${backup.metadata.createdAt}.sqlite`;
-
-            const metadata = serializeBackupMetadata({
-                fileName,
-                metadata: backup.metadata,
-            });
-
-            const payloadBuffer = shouldEncrypt
-                ? encryptBuffer({ key, plaintext: backup.buffer })
-                : backup.buffer;
-
-            const entry = await provider.uploadBackup({
-                buffer: payloadBuffer,
-                encrypted: shouldEncrypt,
-                fileName,
-                metadata,
-            });
-
-            logger.info("[CloudService] Uploaded backup", {
-                createdAt: entry.metadata.createdAt,
-                key: entry.key,
-            });
-
-            await this.settings.set(
-                SETTINGS_KEY_LAST_BACKUP_AT,
-                String(Date.now())
-            );
-            return entry;
-        });
+    public async uploadLatestBackup(): Promise<CloudBackupEntry> {
+        return uploadLatestBackupOperation(this.createOperationContext());
     }
 
 /** Downloads the specified backup from the provider and restores it. */
-public async restoreBackup(
+    public async restoreBackup(
         key: string
     ): Promise<SerializedDatabaseRestoreResult> {
-        return this.runCloudOperation("restoreBackup", async () => {
-            const provider = await this.resolveProviderOrThrow();
-            const normalizedKey = assertBackupObjectKey(key);
-            const downloaded = await provider.downloadBackup(normalizedKey);
-
-            const buffer = downloaded.entry.encrypted
-                ? await this.decryptBackupOrThrow(downloaded.buffer)
-                : downloaded.buffer;
-
-            validateDatabaseBackupPayload({
-                buffer,
-                metadata: toDatabaseBackupMetadata(downloaded.entry.metadata),
-            });
-
-            const payload: DatabaseRestorePayload = {
-                buffer,
-                fileName: downloaded.entry.fileName,
-            };
-
-            const summary = await this.orchestrator.restoreBackup(payload);
-
-            return {
-                metadata: serializeBackupMetadata({
-                    fileName: downloaded.entry.fileName,
-                    metadata: summary.metadata,
-                }),
-                preRestoreFileName: summary.preRestoreFileName,
-                restoredAt: summary.restoredAt,
-            };
-        });
+        return restoreBackupOperation(this.createOperationContext(), key);
     }
 
 /** Deletes the specified remote backup and its metadata sidecar. */
-public async deleteBackup(key: string): Promise<CloudBackupEntry[]> {
-        return this.runCloudOperation("deleteBackup", async () => {
-            const provider = await this.resolveProviderOrThrow();
-            const normalizedKey = assertBackupObjectKey(key);
-            const metadataKey = backupMetadataKeyForBackupKey(normalizedKey);
-
-            await ignoreENOENT(() => provider.deleteObject(normalizedKey));
-            await ignoreENOENT(() => provider.deleteObject(metadataKey));
-
-            return provider.listBackups();
-        });
+    public async deleteBackup(key: string): Promise<CloudBackupEntry[]> {
+        return deleteBackupOperation(this.createOperationContext(), key);
     }
 
 private async resolveProviderOrThrow(args?: {
@@ -1108,6 +521,28 @@ private async loadDropboxDeps(): Promise<DropboxProviderDeps> {
     private async loadGoogleDriveDeps(): Promise<GoogleDriveProviderDeps> {
         this.googleDriveDepsPromise ??= loadGoogleDriveProviderDeps();
         return this.googleDriveDepsPromise;
+    }
+
+    /**
+     * Builds the internal operation context used by split-out operation modules.
+     */
+    private createOperationContext(): CloudServiceOperationContext {
+        return {
+            buildStatusSummary: () => this.buildStatusSummary(),
+            decryptBackupOrThrow: (buffer) => this.decryptBackupOrThrow(buffer),
+            getDropboxAppKey: () => this.getDropboxAppKey(),
+            getEncryptionKeyMaybe: () => this.getEncryptionKeyMaybe(),
+            getEncryptionKeyOrThrow: () => this.getEncryptionKeyOrThrow(),
+            loadDropboxDeps: () => this.loadDropboxDeps(),
+            loadGoogleDriveDeps: () => this.loadGoogleDriveDeps(),
+            orchestrator: this.orchestrator,
+            resolveProviderOrThrow: (args) => this.resolveProviderOrThrow(args),
+            runCloudOperation: (operationName, operation) =>
+                this.runCloudOperation(operationName, operation),
+            secretStore: this.secretStore,
+            settings: this.settings,
+            syncEngine: this.syncEngine,
+        };
     }
 
 

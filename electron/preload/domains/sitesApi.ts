@@ -13,8 +13,61 @@
 /* eslint-disable ex/no-unhandled -- Domain APIs are thin wrappers that don't handle exceptions */
 
 import { SITES_CHANNELS, type SitesDomainBridge } from "@shared/types/preload";
+import { validateSiteSnapshot, validateSiteSnapshots } from "@shared/validation/guards";
 
-import { createTypedInvoker } from "../core/bridgeFactory";
+import {
+    createTypedInvoker,
+    createValidatedInvoker,
+    type SafeParseLike,
+} from "../core/bridgeFactory";
+
+function safeParseBoolean(candidate: unknown): SafeParseLike<boolean> {
+    if (typeof candidate !== "boolean") {
+        return {
+            error: new Error(
+                `Expected boolean response payload, received ${
+                    Array.isArray(candidate) ? "array" : typeof candidate
+                }`
+            ),
+            success: false,
+        };
+    }
+
+    return { data: candidate, success: true };
+}
+
+function safeParseSiteArray(candidate: unknown): SafeParseLike<
+    SitesDomainBridge["getSites"] extends () => Promise<infer TResult>
+        ? TResult
+        : never
+> {
+    if (!Array.isArray(candidate)) {
+        return {
+            error: new Error(
+                `Expected array response payload, received ${typeof candidate}`
+            ),
+            success: false,
+        };
+    }
+
+    const parsed = validateSiteSnapshots(candidate);
+    if (parsed.status === "success") {
+        return { data: parsed.data, success: true };
+    }
+
+    const exampleIssue = parsed.errors.at(0);
+    const message =
+        exampleIssue === undefined
+            ? "Invalid site snapshots returned from main process"
+            : `Invalid site snapshots returned from main process (first failure at index ${exampleIssue.index})`;
+
+    return {
+        error: new Error(message, {
+            cause: exampleIssue?.error,
+        }),
+        success: false,
+    };
+}
 
 /**
  * Interface defining the sites domain API operations.
@@ -79,7 +132,14 @@ export const sitesApi: SitesApiInterface = {
      *
      * @returns Promise resolving to the created site
      */
-    addSite: createTypedInvoker(SITES_CHANNELS.addSite),
+    addSite: createValidatedInvoker(
+        SITES_CHANNELS.addSite,
+        validateSiteSnapshot,
+        {
+            domain: "sitesApi",
+            guardName: "validateSiteSnapshot",
+        }
+    ),
 
     /**
      * Deletes all sites (dangerous operation)
@@ -93,7 +153,10 @@ export const sitesApi: SitesApiInterface = {
      *
      * @returns Promise resolving to array of all sites
      */
-    getSites: createTypedInvoker(SITES_CHANNELS.getSites),
+    getSites: createValidatedInvoker(SITES_CHANNELS.getSites, safeParseSiteArray, {
+        domain: "sitesApi",
+        guardName: "validateSiteSnapshots",
+    }),
 
     /**
      * Removes a monitor from a site
@@ -104,7 +167,14 @@ export const sitesApi: SitesApiInterface = {
      * @returns Promise resolving to the updated site snapshot emitted by the
      *   backend after removal
      */
-    removeMonitor: createTypedInvoker(SITES_CHANNELS.removeMonitor),
+    removeMonitor: createValidatedInvoker(
+        SITES_CHANNELS.removeMonitor,
+        validateSiteSnapshot,
+        {
+            domain: "sitesApi",
+            guardName: "validateSiteSnapshot",
+        }
+    ),
 
     /**
      * Removes a site from monitoring
@@ -113,7 +183,10 @@ export const sitesApi: SitesApiInterface = {
      *
      * @returns Promise resolving to a boolean indicating removal success
      */
-    removeSite: createTypedInvoker(SITES_CHANNELS.removeSite),
+    removeSite: createValidatedInvoker(SITES_CHANNELS.removeSite, safeParseBoolean, {
+        domain: "sitesApi",
+        guardName: "safeParseBoolean",
+    }),
 
     /**
      * Updates an existing site's configuration.
@@ -123,7 +196,14 @@ export const sitesApi: SitesApiInterface = {
      *
      * @returns Promise resolving to the updated site.
      */
-    updateSite: createTypedInvoker(SITES_CHANNELS.updateSite),
+    updateSite: createValidatedInvoker(
+        SITES_CHANNELS.updateSite,
+        validateSiteSnapshot,
+        {
+            domain: "sitesApi",
+            guardName: "validateSiteSnapshot",
+        }
+    ),
 } as const;
 
 /**

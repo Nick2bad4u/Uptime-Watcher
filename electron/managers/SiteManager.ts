@@ -1,8 +1,6 @@
 /**
  * Site management service responsible for site CRUD operations and monitoring
  * coordination.
- *
- * @remarks
  * The SiteManager serves as the primary interface for all site-related
  * operations, providing a unified API for site creation, updates, deletion, and
  * monitoring coordination. It maintains an in-memory cache for performance
@@ -61,8 +59,6 @@ import {
 } from "@shared/utils/logTemplates";
 import {
     deriveSiteSnapshot,
-    hasSiteSyncChanges,
-    prepareSiteSyncSnapshot,
 } from "@shared/utils/siteSnapshots";
 
 import type { UptimeEvents } from "../events/eventTypes";
@@ -80,8 +76,7 @@ import { SiteRepositoryService } from "../services/database/SiteRepositoryServic
 import { SiteWriterService } from "../services/database/SiteWriterService";
 import { StandardizedCache } from "../utils/cache/StandardizedCache";
 import { logger } from "../utils/logger";
-
-
+import { SiteManagerStateSync } from "./SiteManagerStateSync";
 
 interface UpdateSitesCacheOptions {
     readonly action?: StateSyncAction;
@@ -98,7 +93,6 @@ interface UpdateSitesCacheOptions {
  * the uptime monitoring system. It provides a high-level API that abstracts the
  * complexity of database operations, cache management, and cross-component
  * coordination while ensuring data consistency and performance.
- *
  * The manager maintains a synchronized in-memory cache of all sites for fast
  * access patterns while ensuring all mutations go through proper database
  * transactions. Event emission keeps other system components informed of site
@@ -129,11 +123,8 @@ export class SiteManager {
     /** Service for writing and updating site data */
     private readonly siteWriterService: SiteWriterService;
 
-    /** Cached snapshot from the most recent state sync emission. */
-    private lastStateSyncSnapshot: Site[] = [];
-
-    /** Monotonic revision incremented for each emitted state sync event. */
-    private stateSyncRevision = 0;
+    /** Handles state-sync revision + snapshot bookkeeping. */
+    private readonly sitesStateSynchronizer: SiteManagerStateSync;
 
     /**
      * Emits a cache-miss event without allowing failures to crash the caller.
@@ -239,69 +230,6 @@ export class SiteManager {
     }
 
     /**
-     * Emits the canonical site-removed event.
-     *
-     * @remarks
-     * Used by both single-site and bulk deletion flows.
-     */
-    private async emitSiteRemovedEvent(args: {
-        cascade: boolean;
-        identifier: string;
-        site?: Site;
-        timestamp?: number;
-    }): Promise<void> {
-        const timestamp = args.timestamp ?? Date.now();
-
-        await this.eventEmitter.emitTyped("internal:site:removed", {
-            cascade: args.cascade,
-            identifier: args.identifier,
-            operation: "removed",
-            ...(args.site ? { site: structuredClone(args.site) } : {}),
-            timestamp,
-        });
-    }
-
-    private async applySiteDeletionFinalization(args: {
-        cascade: boolean;
-        removed: ReadonlyArray<{ identifier: string; site?: Site }>;
-        sitesAfter: Site[];
-        syncAction: StateSyncAction;
-        syncSiteIdentifier: string;
-        /**
-         * Optional timestamp override.
-         *
-         * @remarks
-         * When provided, the same timestamp will be used for removed-event
-         * emissions and the correlated state-sync event.
-         */
-        timestamp?: number;
-    }): Promise<void> {
-        const syncTimestamp =
-            typeof args.timestamp === "number" ? args.timestamp : Date.now();
-
-        /* eslint-disable no-await-in-loop -- Sequential event emission required for consistency */
-        for (const entry of args.removed) {
-            await this.emitSiteRemovedEvent({
-                cascade: args.cascade,
-                identifier: entry.identifier,
-                ...(entry.site ? { site: entry.site } : {}),
-                ...(typeof args.timestamp === "number"
-                    ? { timestamp: args.timestamp }
-                    : {}),
-            });
-        }
-        /* eslint-enable no-await-in-loop -- Re-enable after controlled sequential event processing */
-
-        await this.emitSitesStateSynchronized({
-            action: args.syncAction,
-            siteIdentifier: args.syncSiteIdentifier,
-            sites: args.sitesAfter,
-            source: STATE_SYNC_SOURCE.DATABASE,
-            timestamp: syncTimestamp,
-        });
-    }
-
-    /**
      * Emits a `sites:state-synchronized` event using the modern sync contract.
      *
      * @remarks
@@ -326,92 +254,15 @@ export class SiteManager {
         source: StateSyncSource;
         timestamp?: number;
     }): Promise<{ revision: number; sites: Site[] }> {
-        const candidateSites = sites ?? this.getSitesSnapshot();
-        const { delta, duplicates, emissionSnapshot } = prepareSiteSyncSnapshot(
-            {
-                previousSnapshot: this.lastStateSyncSnapshot,
-                sites: candidateSites,
-            }
-        );
+        const emitArgs = {
+            action,
+            siteIdentifier,
+            source,
+            ...(Array.isArray(sites) ? { sites } : {}),
+            ...(typeof timestamp === "number" ? { timestamp } : {}),
+        };
 
-        if (duplicates.length > 0) {
-            logger.error(
-                "[SiteManager] Duplicate site identifiers detected while emitting state sync event",
-                {
-                    action,
-                    duplicates,
-                    siteIdentifier,
-                    source,
-                }
-            );
-        }
-
-        const effectiveTimestamp = timestamp ?? Date.now();
-
-        let effectiveDelta = delta;
-        let hasChanges = hasSiteSyncChanges(effectiveDelta);
-
-        // If a delete happens before we've ever emitted a baseline snapshot,
-        // the computed delta can be empty (previous snapshot empty, next empty),
-        // but consumers still need a remove signal.
-        if (action === "delete" && !hasChanges && siteIdentifier.length > 0) {
-            effectiveDelta = {
-                addedSites: [],
-                removedSiteIdentifiers: [siteIdentifier],
-                updatedSites: [],
-            };
-            hasChanges = true;
-        }
-
-        const shouldEmit = action === "bulk-sync" || hasChanges;
-
-        if (!shouldEmit) {
-            logger.debug(
-                "[SiteManager] Skipping state sync emission (no changes)",
-                {
-                    action,
-                    siteIdentifier,
-                    source,
-                    timestamp: effectiveTimestamp,
-                }
-            );
-
-            this.lastStateSyncSnapshot = emissionSnapshot.map((site) =>
-                structuredClone(site)
-            );
-
-            return { revision: this.stateSyncRevision, sites: emissionSnapshot };
-        }
-
-        this.stateSyncRevision += 1;
-        const revision = this.stateSyncRevision;
-
-        if (action === "bulk-sync") {
-            await this.eventEmitter.emitTyped("sites:state-synchronized", {
-                action: "bulk-sync",
-                revision,
-                siteCount: emissionSnapshot.length,
-                siteIdentifier,
-                sites: emissionSnapshot,
-                source,
-                timestamp: effectiveTimestamp,
-            });
-        } else {
-            await this.eventEmitter.emitTyped("sites:state-synchronized", {
-                action,
-                delta: effectiveDelta,
-                revision,
-                siteIdentifier,
-                source,
-                timestamp: effectiveTimestamp,
-            });
-        }
-
-        this.lastStateSyncSnapshot = emissionSnapshot.map((site) =>
-            structuredClone(site)
-        );
-
-        return { revision, sites: emissionSnapshot };
+        return this.sitesStateSynchronizer.emitSitesStateSynchronized(emitArgs);
     }
 
     /**
@@ -564,6 +415,101 @@ export class SiteManager {
     }
 
     /**
+     * Removes a site and all associated records.
+     *
+     * @remarks
+     * Delegates the transactional deletion to {@link SiteWriterService}. When
+     * deletion succeeds, emits:
+     * - `internal:site:removed`
+     * - `sites:state-synchronized` with action `delete`
+     *
+     * No events are emitted when the site does not exist.
+     *
+     * @param identifier - Site identifier to remove.
+     *
+     * @returns `true` when the site existed and was deleted; otherwise `false`.
+     */
+    public async removeSite(identifier: string): Promise<boolean> {
+        const siteBeforeRemoval = this.sitesCache.get(identifier);
+
+        const removed = await this.siteWriterService.deleteSite(
+            this.sitesCache,
+            identifier
+        );
+
+        if (!removed) {
+            return false;
+        }
+
+        const timestamp = Date.now();
+
+        await this.eventEmitter.emitTyped("internal:site:removed", {
+            cascade: false,
+            identifier,
+            operation: "removed",
+            ...(siteBeforeRemoval
+                ? { site: structuredClone(siteBeforeRemoval) }
+                : {}),
+            timestamp,
+        });
+
+        await this.emitSitesStateSynchronized({
+            action: STATE_SYNC_ACTION.DELETE,
+            siteIdentifier: identifier,
+            source: STATE_SYNC_SOURCE.DATABASE,
+            timestamp,
+        });
+
+        return true;
+    }
+
+    /**
+     * Deletes all sites from the database and in-memory cache.
+     *
+     * @remarks
+     * This method emits the same events as deleting sites individually:
+     * - `internal:site:removed` (for each removed site)
+     * - `sites:state-synchronized` delete deltas (for each removed site)
+     *
+     * The {@link SiteLifecycleCoordinator} relies on this for the
+     * `UptimeOrchestrator.deleteAllSites()` workflow.
+     *
+     * @returns The number of deleted sites.
+     */
+    public async deleteAllSites(): Promise<number> {
+        const { deletedCount, deletedSites } =
+            await this.siteWriterService.deleteAllSites(this.sitesCache);
+
+        if (deletedCount === 0) {
+            return 0;
+        }
+
+        const timestamp = Date.now();
+
+        // Preserve event ordering for downstream consumers.
+        for (const site of deletedSites) {
+            // eslint-disable-next-line no-await-in-loop -- Event ordering is important for downstream consumers.
+            await this.eventEmitter.emitTyped("internal:site:removed", {
+                cascade: false,
+                identifier: site.identifier,
+                operation: "removed",
+                site: structuredClone(site),
+                timestamp,
+            });
+
+            // eslint-disable-next-line no-await-in-loop -- Event ordering is important for downstream consumers.
+            await this.emitSitesStateSynchronized({
+                action: STATE_SYNC_ACTION.DELETE,
+                siteIdentifier: site.identifier,
+                source: STATE_SYNC_SOURCE.DATABASE,
+                timestamp,
+            });
+        }
+
+        return deletedCount;
+    }
+
+    /**
      * Removes a monitor from a site.
      *
      * @example
@@ -636,148 +582,12 @@ export class SiteManager {
     }
 
     /**
-     * Removes a site from the database and cache.
-     *
-     * @example
-     *
-     * ```typescript
-     * const success = await siteManager.removeSite("site_123");
-     * ```
-     *
-     * @param identifier - The site identifier to remove.
-     *
-     * @returns True if the site was removed, false otherwise.
-     *
-     * @throws If database or cache update fails.
-     */
-    public async removeSite(identifier: string): Promise<boolean> {
-        // Get site information BEFORE deletion for accurate event data
-        const siteToRemove = this.sitesCache.get(identifier);
-        const sanitizedRemovedSite = siteToRemove
-            ? structuredClone(siteToRemove)
-            : undefined;
-
-        const result = await this.siteWriterService.deleteSite(
-            this.sitesCache,
-            identifier
-        );
-
-        if (result) {
-            const sitesAfterRemoval = this.getSitesSnapshot();
-            await this.updateSitesCache(
-                sitesAfterRemoval,
-                "SiteManager.removeSite"
-            );
-            const timestamp = Date.now();
-
-            await this.applySiteDeletionFinalization({
-                cascade: false,
-                removed: [
-                    {
-                        identifier,
-                        ...(sanitizedRemovedSite
-                            ? { site: sanitizedRemovedSite }
-                            : {}),
-                    },
-                ],
-                sitesAfter: sitesAfterRemoval,
-                syncAction: STATE_SYNC_ACTION.DELETE,
-                syncSiteIdentifier: identifier,
-                timestamp,
-            });
-        }
-
-        return result;
-    }
-
-/**
-     * Removes all sites from the database and cache.
-     *
-     * @remarks
-     * This method is primarily intended for testing purposes to ensure clean
-     * test state. It performs atomic deletion of all sites and their associated
-     * monitors using a database transaction. The operation clears both the
-     * database and the in-memory cache.
-     *
-     * All monitoring for all sites will be stopped before deletion occurs.
-     * Event notifications are emitted for each site removal to maintain
-     * consistency with the event system.
-     *
-     * @example
-     *
-     * ```typescript
-     * import { logger } from "../utils/logger";
-     *
-     * const deletedCount = await siteManager.deleteAllSites();
-     * logger.info("Deleted sites", { count: deletedCount });
-     * ```
-     *
-     * @returns Promise resolving to the number of sites deleted.
-     *
-     * @throws If database operation fails.
-     */
-    public async deleteAllSites(): Promise<number> {
-        // Capture snapshot prior to deletion for consistent logging and
-        // downstream event emission.
-        const sitesSnapshot = this.sitesCache.getAll();
-        const snapshotCount = sitesSnapshot.length;
-
-        if (snapshotCount === 0) {
-            logger.debug("[SiteManager] No sites to delete");
-            return 0;
-        }
-
-        logger.info(`[SiteManager] Deleting all ${snapshotCount} sites`);
-
-        const { deletedCount, deletedSites } =
-            await this.siteWriterService.deleteAllSites(this.sitesCache);
-
-        if (deletedCount === 0) {
-            logger.warn(
-                `[SiteManager] Bulk delete reported zero deletions despite ${snapshotCount} cached sites`
-            );
-            return 0;
-        }
-
-        const eventSites =
-            deletedSites.length > 0 ? deletedSites : sitesSnapshot;
-
-        await this.updateSitesCache([], "SiteManager.clearSites");
-
-        await this.applySiteDeletionFinalization({
-            cascade: true,
-            removed: eventSites.map((site) => ({
-                identifier: site.identifier,
-                site,
-            })),
-            sitesAfter: [],
-            syncAction: STATE_SYNC_ACTION.BULK_SYNC,
-            syncSiteIdentifier: "all",
-        });
-
-        logger.info(
-            `[SiteManager] Successfully deleted all ${deletedCount} sites`
-        );
-        return deletedCount;
-    }
-
-    /**
-     * Updates a site in the database and cache.
-     *
-     * @example
-     *
-     * ```typescript
-     * const updatedSite = await siteManager.updateSite("site_123", {
-     *     name: "New Name",
-     * });
-     * ```
+     * Update a site's persisted fields and refresh the caches.
      *
      * @param identifier - The site identifier to update.
      * @param updates - Partial site data to update.
      *
      * @returns The updated site object.
-     *
-     * @throws If validation, database, or cache update fails.
      */
     public async updateSite(
         identifier: string,
@@ -1097,7 +907,7 @@ export class SiteManager {
 
     /** Returns the current monotonic state sync revision. */
     public getStateSyncRevision(): number {
-        return this.stateSyncRevision;
+        return this.sitesStateSynchronizer.getStateSyncRevision();
     }
 
 
@@ -1208,6 +1018,11 @@ export class SiteManager {
         });
 
         logger.info(LOG_TEMPLATES.services.SITE_MANAGER_INITIALIZED_WITH_CACHE);
+
+        this.sitesStateSynchronizer = new SiteManagerStateSync({
+            eventEmitter: this.eventEmitter,
+            getSitesSnapshot: (): Site[] => this.getSitesSnapshot(),
+        });
     }
 
     /**

@@ -97,7 +97,6 @@ import {
     type ApplicationErrorOptions,
 } from "@shared/utils/errorHandling";
 
-import type { UptimeEvents } from "./events/eventTypes";
 import type { DatabaseManager } from "./managers/DatabaseManager";
 import type { MonitorManager } from "./managers/MonitorManager";
 import type { SiteManager } from "./managers/SiteManager";
@@ -108,12 +107,7 @@ import type {
     DatabaseRestoreSummary,
 } from "./services/database/utils/backup/databaseBackup";
 import type {
-    IsMonitoringActiveRequestData,
     OrchestratorEvents,
-    RestartMonitoringRequestData,
-    StartMonitoringRequestData,
-    StopMonitoringRequestData,
-    UpdateSitesCacheRequestData,
     UptimeOrchestratorDependencies,
 } from "./UptimeOrchestrator.types";
 
@@ -127,6 +121,7 @@ import {
     createLoggingMiddleware,
 } from "./events/middleware";
 import { TypedEventBus } from "./events/TypedEventBus";
+import { UptimeOrchestratorEventHandlers } from "./UptimeOrchestratorEventHandlers";
 import { diagnosticsLogger, logger } from "./utils/logger";
 
 /** Logical event bus identifier applied to forwarded renderer events. */
@@ -184,6 +179,9 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
     /** Coordinator for forwarding internal manager events to renderer consumers. */
     private readonly eventForwardingCoordinator: OrchestratorEventForwardingCoordinator;
 
+    /** Bound event-handler callbacks for internal orchestration events. */
+    private readonly eventHandlers: UptimeOrchestratorEventHandlers;
+
     /**
      * Cached initialization promise for idempotent startup.
      *
@@ -194,123 +192,6 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
      * retry.
      */
     private initializationPromise: Promise<void> | undefined;
-
-    /** Event handler for sites cache update requests */
-    private readonly handleUpdateSitesCacheRequestedEvent = (
-        data: UpdateSitesCacheRequestData
-    ): void => {
-        this.snapshotSyncCoordinator.handleUpdateSitesCacheRequestedEvent(data);
-    };
-
-    /**
-     * Event handler for retrieving sites from cache.
-     *
-     * @remarks
-     * Handles internal cache retrieval requests and manages error logging. This
-     * is an arrow function property to maintain proper 'this' binding when used
-     * as an event handler callback. Delegates the actual work to the
-     * handleGetSitesFromCacheRequest method.
-     *
-     * @internal
-     */
-    private readonly handleGetSitesFromCacheRequestedEvent = (): void => {
-        this.snapshotSyncCoordinator.handleGetSitesFromCacheRequestedEvent();
-    };
-
-    /**
-     * Event handler for database initialization completion.
-     *
-     * @remarks
-     * Handles notification when database initialization is complete and manages
-     * error logging. This is an arrow function property to maintain proper
-     * 'this' binding when used as an event handler callback. Delegates the
-     * actual work to the handleDatabaseInitialized method.
-     *
-     * @internal
-     */
-    private readonly handleDatabaseInitializedEvent = (): void => {
-        void (async (): Promise<void> => {
-            try {
-                await this.handleDatabaseInitialized();
-            } catch (error) {
-                logger.error(
-                    "[UptimeOrchestrator] Error handling internal:database:initialized:",
-                    error
-                );
-            }
-        })();
-    };
-
-    /** Event handler for manual monitor check completion events */
-    private readonly handleManualCheckCompletedEvent = (
-        eventData: UptimeEvents["internal:monitor:manual-check-completed"] & {
-            _meta?: unknown;
-        }
-    ): void => {
-        this.snapshotSyncCoordinator.handleManualCheckCompletedEvent(eventData);
-    };
-
-    /** Event handler for monitoring start requests */
-    private readonly handleStartMonitoringRequestedEvent = (
-        data: StartMonitoringRequestData
-    ): void => {
-        this.monitoringLifecycleCoordinator.handleStartMonitoringRequestedEvent(
-            data
-        );
-    };
-
-    /**
-     * Event handler for monitoring stop requests.
-     *
-     * @remarks
-     * Handles requests to stop monitoring for specific sites or monitors.
-     * Delegates to the monitor manager and provides response events with
-     * success status. This is an arrow function property to maintain proper
-     * 'this' binding when used as an event handler callback.
-     *
-     * @param data - Stop monitoring request data with site and monitor
-     *   identifiers
-     *
-     * @internal
-     */
-    private readonly handleStopMonitoringRequestedEvent = (
-        data: StopMonitoringRequestData
-    ): void => {
-        this.monitoringLifecycleCoordinator.handleStopMonitoringRequestedEvent(
-            data
-        );
-    };
-
-    /**
-     * Event handler for monitoring status check requests.
-     *
-     * @remarks
-     * Handles requests to check if monitoring is active for specific sites or
-     * monitors. Queries the monitor manager and provides response events with
-     * current status. This is an arrow function property to maintain proper
-     * 'this' binding when used as an event handler callback.
-     *
-     * @param data - Monitoring status check request data with site and monitor
-     *   identifiers
-     *
-     * @internal
-     */
-    private readonly handleIsMonitoringActiveRequestedEvent = (
-        data: IsMonitoringActiveRequestData
-    ): void => {
-        this.monitoringLifecycleCoordinator.handleIsMonitoringActiveRequestedEvent(
-            data
-        );
-    };
-
-    /** Event handler for monitoring restart requests */
-    private readonly handleRestartMonitoringRequestedEvent = (
-        data: RestartMonitoringRequestData
-    ): void => {
-        this.monitoringLifecycleCoordinator.handleRestartMonitoringRequestedEvent(
-            data
-        );
-    };
 
     /**
      * Executes an operation and normalizes thrown errors via
@@ -1013,39 +894,39 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
         // Remove database event handlers
         this.off(
             "internal:database:update-sites-cache-requested",
-            this.handleUpdateSitesCacheRequestedEvent
+            this.eventHandlers.handleUpdateSitesCacheRequestedEvent
         );
         this.off(
             "internal:database:get-sites-from-cache-requested",
-            this.handleGetSitesFromCacheRequestedEvent
+            this.eventHandlers.handleGetSitesFromCacheRequestedEvent
         );
         this.off(
             "internal:database:initialized",
-            this.handleDatabaseInitializedEvent
+            this.eventHandlers.handleDatabaseInitializedEvent
         );
 
         // Remove monitoring event handlers
         this.off(
             "internal:monitor:manual-check-completed",
-            this.handleManualCheckCompletedEvent
+            this.eventHandlers.handleManualCheckCompletedEvent
         );
 
         // Remove site management event handlers
         this.off(
             "internal:site:start-monitoring-requested",
-            this.handleStartMonitoringRequestedEvent
+            this.eventHandlers.handleStartMonitoringRequestedEvent
         );
         this.off(
             "internal:site:stop-monitoring-requested",
-            this.handleStopMonitoringRequestedEvent
+            this.eventHandlers.handleStopMonitoringRequestedEvent
         );
         this.off(
             "internal:site:is-monitoring-active-requested",
-            this.handleIsMonitoringActiveRequestedEvent
+            this.eventHandlers.handleIsMonitoringActiveRequestedEvent
         );
         this.off(
             "internal:site:restart-monitoring-requested",
-            this.handleRestartMonitoringRequestedEvent
+            this.eventHandlers.handleRestartMonitoringRequestedEvent
         );
     }
 
@@ -1130,6 +1011,13 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
             }
         );
 
+        this.eventHandlers = new UptimeOrchestratorEventHandlers({
+            monitoringLifecycleCoordinator: this.monitoringLifecycleCoordinator,
+            onDatabaseInitialized: async (): Promise<void> =>
+                this.handleDatabaseInitialized(),
+            snapshotSyncCoordinator: this.snapshotSyncCoordinator,
+        });
+
         // Set up event-driven communication between managers
         this.setupEventHandlers();
     }
@@ -1156,19 +1044,19 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
         // eslint-disable-next-line listeners/no-missing-remove-event-listener -- Database event listeners are intentionally persistent for the lifetime of the orchestrator
         this.on(
             "internal:database:update-sites-cache-requested",
-            this.handleUpdateSitesCacheRequestedEvent
+            this.eventHandlers.handleUpdateSitesCacheRequestedEvent
         );
 
         // eslint-disable-next-line listeners/no-missing-remove-event-listener -- Database event listeners are intentionally persistent for the lifetime of the orchestrator
         this.on(
             "internal:database:get-sites-from-cache-requested",
-            this.handleGetSitesFromCacheRequestedEvent
+            this.eventHandlers.handleGetSitesFromCacheRequestedEvent
         );
 
         // eslint-disable-next-line listeners/no-missing-remove-event-listener -- Database event listeners are intentionally persistent for the lifetime of the orchestrator
         this.on(
             "internal:database:initialized",
-            this.handleDatabaseInitializedEvent
+            this.eventHandlers.handleDatabaseInitializedEvent
         );
     }
 
@@ -1205,7 +1093,7 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
         // eslint-disable-next-line listeners/no-missing-remove-event-listener -- Monitoring event listeners are intentionally persistent for the lifetime of the orchestrator
         this.on(
             "internal:monitor:manual-check-completed",
-            this.handleManualCheckCompletedEvent
+            this.eventHandlers.handleManualCheckCompletedEvent
         );
     }
 
@@ -1216,25 +1104,25 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
         // eslint-disable-next-line listeners/no-missing-remove-event-listener -- Site management event listeners are intentionally persistent for the lifetime of the orchestrator
         this.on(
             "internal:site:start-monitoring-requested",
-            this.handleStartMonitoringRequestedEvent
+            this.eventHandlers.handleStartMonitoringRequestedEvent
         );
 
         // eslint-disable-next-line listeners/no-missing-remove-event-listener -- Site management event listeners are intentionally persistent for the lifetime of the orchestrator
         this.on(
             "internal:site:stop-monitoring-requested",
-            this.handleStopMonitoringRequestedEvent
+            this.eventHandlers.handleStopMonitoringRequestedEvent
         );
 
         // eslint-disable-next-line listeners/no-missing-remove-event-listener -- Site management event listeners are intentionally persistent for the lifetime of the orchestrator
         this.on(
             "internal:site:is-monitoring-active-requested",
-            this.handleIsMonitoringActiveRequestedEvent
+            this.eventHandlers.handleIsMonitoringActiveRequestedEvent
         );
 
         // eslint-disable-next-line listeners/no-missing-remove-event-listener -- Site management event listeners are intentionally persistent for the lifetime of the orchestrator
         this.on(
             "internal:site:restart-monitoring-requested",
-            this.handleRestartMonitoringRequestedEvent
+            this.eventHandlers.handleRestartMonitoringRequestedEvent
         );
     }
 

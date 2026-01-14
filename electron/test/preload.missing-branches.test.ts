@@ -280,7 +280,7 @@ describe("preload.ts - Missing Branch Coverage", () => {
             mockIpcRenderer.invoke
                 .mockResolvedValueOnce({ success: true, data: [mockSite] }) // GetSites success
                 .mockRejectedValueOnce(new Error("Error 2")) // AddSite failure
-                .mockResolvedValueOnce({ success: true, data: true }) // GetMonitorTypes success
+                .mockResolvedValueOnce({ success: true, data: [] }) // GetMonitorTypes success
                 .mockRejectedValueOnce(new Error("Error 4")); // ExportData failure
 
             // Test mixed success/failure
@@ -292,7 +292,7 @@ describe("preload.ts - Missing Branch Coverage", () => {
             );
             await expect(
                 exposedAPI.monitorTypes.getMonitorTypes()
-            ).resolves.toBeTruthy(); // Returns extracted data, not raw response
+            ).resolves.toEqual([]); // Returns extracted data, not raw response
             await expect(exposedAPI.data.exportData()).rejects.toThrowError(
                 "Error 4"
             );

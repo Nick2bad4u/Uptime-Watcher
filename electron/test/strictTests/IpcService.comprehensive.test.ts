@@ -475,10 +475,11 @@ describe("IpcService - Comprehensive Coverage", () => {
             expect(result).toEqual({
                 success: true,
                 data: true,
-                metadata: {
+                metadata: expect.objectContaining({
                     duration: expect.any(Number),
                     handler: "add-site",
-                },
+                    paramCount: expect.any(Number),
+                }),
             });
         });
 
@@ -505,10 +506,11 @@ describe("IpcService - Comprehensive Coverage", () => {
             expect(result).toEqual({
                 success: true,
                 data: true,
-                metadata: {
+                metadata: expect.objectContaining({
                     duration: expect.any(Number),
                     handler: "remove-site",
-                },
+                    paramCount: expect.any(Number),
+                }),
             });
         });
 
@@ -533,10 +535,11 @@ describe("IpcService - Comprehensive Coverage", () => {
             expect(result).toEqual({
                 success: true,
                 data: mockSites,
-                metadata: {
+                metadata: expect.objectContaining({
                     duration: expect.any(Number),
                     handler: "get-sites",
-                },
+                    paramCount: expect.any(Number),
+                }),
             });
         });
 
@@ -566,10 +569,11 @@ describe("IpcService - Comprehensive Coverage", () => {
             expect(result).toEqual({
                 success: true,
                 data: mockSites[0],
-                metadata: {
+                metadata: expect.objectContaining({
                     duration: expect.any(Number),
                     handler: expect.any(String),
-                },
+                    paramCount: expect.any(Number),
+                }),
             });
         });
 
@@ -597,10 +601,11 @@ describe("IpcService - Comprehensive Coverage", () => {
             expect(result).toEqual({
                 success: true,
                 data: mockSites[0],
-                metadata: {
+                metadata: expect.objectContaining({
                     duration: expect.any(Number),
                     handler: expect.any(String),
-                },
+                    paramCount: expect.any(Number),
+                }),
             });
         });
     });
@@ -631,10 +636,11 @@ describe("IpcService - Comprehensive Coverage", () => {
             expect(result).toEqual({
                 success: true,
                 data: startSummary,
-                metadata: {
+                metadata: expect.objectContaining({
                     duration: expect.any(Number),
                     handler: expect.any(String),
-                },
+                    paramCount: expect.any(Number),
+                }),
             });
         });
 
@@ -659,10 +665,11 @@ describe("IpcService - Comprehensive Coverage", () => {
             expect(result).toEqual({
                 success: true,
                 data: stopSummary,
-                metadata: {
+                metadata: expect.objectContaining({
                     duration: expect.any(Number),
                     handler: expect.any(String),
-                },
+                    paramCount: expect.any(Number),
+                }),
             });
         });
 
@@ -691,10 +698,11 @@ describe("IpcService - Comprehensive Coverage", () => {
             expect(result).toEqual({
                 success: true,
                 data: true,
-                metadata: {
+                metadata: expect.objectContaining({
                     duration: expect.any(Number),
                     handler: expect.any(String),
-                },
+                    paramCount: expect.any(Number),
+                }),
             });
         });
 
@@ -723,10 +731,11 @@ describe("IpcService - Comprehensive Coverage", () => {
             expect(result).toEqual({
                 success: true,
                 data: true,
-                metadata: {
+                metadata: expect.objectContaining({
                     duration: expect.any(Number),
                     handler: expect.any(String),
-                },
+                    paramCount: expect.any(Number),
+                }),
             });
         });
 
@@ -755,10 +764,11 @@ describe("IpcService - Comprehensive Coverage", () => {
             expect(result).toEqual({
                 success: true,
                 data: true,
-                metadata: {
+                metadata: expect.objectContaining({
                     duration: expect.any(Number),
                     handler: expect.any(String),
-                },
+                    paramCount: expect.any(Number),
+                }),
             });
         });
 
@@ -787,10 +797,11 @@ describe("IpcService - Comprehensive Coverage", () => {
             expect(result).toEqual({
                 success: true,
                 data: true,
-                metadata: {
+                metadata: expect.objectContaining({
                     duration: expect.any(Number),
                     handler: expect.any(String),
-                },
+                    paramCount: expect.any(Number),
+                }),
             });
         });
 
@@ -817,10 +828,11 @@ describe("IpcService - Comprehensive Coverage", () => {
             expect(result).toEqual({
                 success: true,
                 data: true,
-                metadata: {
+                metadata: expect.objectContaining({
                     duration: expect.any(Number),
                     handler: expect.any(String),
-                },
+                    paramCount: expect.any(Number),
+                }),
             });
         });
     });
@@ -896,10 +908,11 @@ describe("IpcService - Comprehensive Coverage", () => {
             expect(result).toEqual({
                 success: true,
                 data: "Response Code: test details",
-                metadata: {
+                metadata: expect.objectContaining({
                     duration: expect.any(Number),
                     handler: "format-monitor-detail",
-                },
+                    paramCount: expect.any(Number),
+                }),
             });
         });
 
@@ -927,10 +940,11 @@ describe("IpcService - Comprehensive Coverage", () => {
             expect(result).toEqual({
                 success: true,
                 data: "test details",
-                metadata: {
+                metadata: expect.objectContaining({
                     duration: expect.any(Number),
                     handler: "format-monitor-detail",
-                },
+                    paramCount: expect.any(Number),
+                }),
             });
         });
 
@@ -969,10 +983,11 @@ describe("IpcService - Comprehensive Coverage", () => {
             expect(result).toEqual({
                 success: true,
                 data: " (https://example.com)",
-                metadata: {
+                metadata: expect.objectContaining({
                     duration: expect.any(Number),
                     handler: "format-monitor-title-suffix",
-                },
+                    paramCount: expect.any(Number),
+                }),
             });
         });
 
@@ -1011,10 +1026,11 @@ describe("IpcService - Comprehensive Coverage", () => {
             expect(result).toEqual({
                 success: true,
                 data: "",
-                metadata: {
+                metadata: expect.objectContaining({
                     duration: expect.any(Number),
                     handler: "format-monitor-title-suffix",
-                },
+                    paramCount: expect.any(Number),
+                }),
             });
         });
 
@@ -1119,10 +1135,11 @@ describe("IpcService - Comprehensive Coverage", () => {
             expect(result).toEqual({
                 success: true,
                 data: "export-data",
-                metadata: {
+                metadata: expect.objectContaining({
                     duration: expect.any(Number),
                     handler: "export-data",
-                },
+                    paramCount: expect.any(Number),
+                }),
             });
         });
 
@@ -1149,10 +1166,11 @@ describe("IpcService - Comprehensive Coverage", () => {
             expect(result).toEqual({
                 success: true,
                 data: true,
-                metadata: {
+                metadata: expect.objectContaining({
                     duration: expect.any(Number),
                     handler: expect.any(String),
-                },
+                    paramCount: expect.any(Number),
+                }),
             });
         });
 
@@ -1179,10 +1197,11 @@ describe("IpcService - Comprehensive Coverage", () => {
             expect(result).toEqual({
                 success: true,
                 data: 5000,
-                metadata: {
+                metadata: expect.objectContaining({
                     duration: expect.any(Number),
                     handler: "update-history-limit",
-                },
+                    paramCount: expect.any(Number),
+                }),
             });
         });
 
@@ -1207,10 +1226,11 @@ describe("IpcService - Comprehensive Coverage", () => {
             expect(result).toEqual({
                 success: true,
                 data: 1000,
-                metadata: {
+                metadata: expect.objectContaining({
                     duration: expect.any(Number),
                     handler: "get-history-limit",
-                },
+                    paramCount: expect.any(Number),
+                }),
             });
         });
 
@@ -1234,10 +1254,11 @@ describe("IpcService - Comprehensive Coverage", () => {
             expect(mockUptimeOrchestrator.resetSettings).toHaveBeenCalled();
             expect(result).toEqual({
                 success: true,
-                metadata: {
+                metadata: expect.objectContaining({
                     duration: expect.any(Number),
                     handler: "reset-settings",
-                },
+                    paramCount: expect.any(Number),
+                }),
             });
         });
 
@@ -1274,10 +1295,11 @@ describe("IpcService - Comprehensive Coverage", () => {
                         sizeBytes: mockBackupMetadata.sizeBytes,
                     }),
                 },
-                metadata: {
+                metadata: expect.objectContaining({
                     duration: expect.any(Number),
                     handler: "download-sqlite-backup",
-                },
+                    paramCount: expect.any(Number),
+                }),
             });
         });
     });
@@ -1328,10 +1350,11 @@ describe("IpcService - Comprehensive Coverage", () => {
                     source: "database",
                     synchronized: true,
                 }),
-                metadata: {
+                metadata: expect.objectContaining({
                     duration: expect.any(Number),
                     handler: "request-full-sync",
-                },
+                    paramCount: expect.any(Number),
+                }),
             });
 
             const responseSites = result.data?.sites as Site[] | undefined;
@@ -1663,10 +1686,11 @@ describe("IpcService - Comprehensive Coverage", () => {
             expect(result).toEqual({
                 success: true,
                 data: " (example.com)",
-                metadata: {
+                metadata: expect.objectContaining({
                     duration: expect.any(Number),
                     handler: "format-monitor-title-suffix",
-                },
+                    paramCount: expect.any(Number),
+                }),
             });
         });
 
@@ -1692,10 +1716,11 @@ describe("IpcService - Comprehensive Coverage", () => {
             expect(result).toEqual({
                 success: true,
                 data: "Response Code: test details",
-                metadata: {
+                metadata: expect.objectContaining({
                     duration: expect.any(Number),
                     handler: "format-monitor-detail",
-                },
+                    paramCount: expect.any(Number),
+                }),
             });
         });
     });

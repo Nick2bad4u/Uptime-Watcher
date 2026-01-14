@@ -1427,7 +1427,7 @@ describe("IPC Validators - Exported Validator Groups", () => {
                 expect(isValidationSuccess(result)).toBeTruthy();
             });
 
-            it("should accept any type for second parameter", async ({
+            it("should reject non-object second parameter", async ({
                 task,
                 annotate,
             }) => {
@@ -1436,26 +1436,33 @@ describe("IPC Validators - Exported Validator Groups", () => {
                 await annotate("Category: Core", "category");
                 await annotate("Type: Business Logic", "type");
 
-                const result1 =
-                    MonitorTypeHandlerValidators.validateMonitorData([
-                        "http",
-                        null,
-                    ]);
+                const result1 = MonitorTypeHandlerValidators.validateMonitorData(
+                    ["http", null]
+                );
+                const result2 = MonitorTypeHandlerValidators.validateMonitorData(
+                    ["ping", 42]
+                );
+                const result3 = MonitorTypeHandlerValidators.validateMonitorData(
+                    ["dns", "string"]
+                );
 
-                const result2 =
-                    MonitorTypeHandlerValidators.validateMonitorData([
-                        "ping",
-                        42,
-                    ]);
-                const result3 =
-                    MonitorTypeHandlerValidators.validateMonitorData([
-                        "dns",
-                        "string",
-                    ]);
+                expect(isValidationFailure(result1)).toBeTruthy();
+                expect(isValidationFailure(result2)).toBeTruthy();
+                expect(isValidationFailure(result3)).toBeTruthy();
+            });
 
-                expect(isValidationSuccess(result1)).toBeTruthy();
-                expect(isValidationSuccess(result2)).toBeTruthy();
-                expect(isValidationSuccess(result3)).toBeTruthy();
+            it("should reject oversized payloads", async ({ task, annotate }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: validators.complete", "component");
+                await annotate("Category: Core", "category");
+                await annotate("Type: Security", "type");
+
+                const largeString = "x".repeat(300 * 1024);
+                const result = MonitorTypeHandlerValidators.validateMonitorData(
+                    ["http", { blob: largeString }]
+                );
+
+                expect(isValidationFailure(result)).toBeTruthy();
             });
 
             it("should return error array for invalid parameter count", async ({

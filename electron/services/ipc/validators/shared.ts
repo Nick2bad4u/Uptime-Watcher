@@ -39,6 +39,7 @@ import { siteIdentifierSchema } from "@shared/validation/siteFieldSchemas";
 
 import type { IpcParameterValidator } from "../types";
 
+import { isJsonByteBudgetExceeded } from "../../../utils/jsonByteBudget";
 import {
     getUtfByteLength,
     MAX_DIAGNOSTICS_METADATA_BYTES,
@@ -113,6 +114,9 @@ const MAX_CLIPBOARD_TEXT_BYTES: number = 5 * 1024 * 1024;
 
 /** Maximum byte budget accepted for user-supplied restore filenames. */
 const MAX_RESTORE_FILE_NAME_BYTES: number = 512;
+
+/** Maximum byte budget accepted for monitor validation payloads over IPC. */
+const MAX_MONITOR_VALIDATION_DATA_BYTES: number = 256 * 1024;
 
 // NOTE: filesystem path validation helpers are centralized in
 // @shared/validation/filesystemBaseDirectoryValidation.
@@ -856,6 +860,52 @@ function createStringWithUnvalidatedSecondValidator(
 }
 
 /**
+ * Helper function to create validators for handlers expecting a string
+ * parameter and a record-like object payload with a strict byte budget.
+ *
+ * @remarks
+ * This is intended for renderer-supplied objects that should be treated as
+ * untrusted input even though they originate from the app UI.
+ */
+function createStringWithBudgetedObjectValidator(
+    stringParamName: string,
+    objectParamName: string,
+    maxBytes: number
+): IpcParameterValidator {
+    return createParamValidator(2, [
+        (value): ParameterValueValidationResult =>
+            toValidationResult(
+                IpcValidators.requiredString(value, stringParamName)
+            ),
+        (value): ParameterValueValidationResult => {
+            const recordResult = requireRecordParam(value, objectParamName);
+            if (isRequiredRecordError(recordResult)) {
+                return recordResult.error;
+            }
+
+            if (isJsonByteBudgetExceeded(recordResult.record, maxBytes)) {
+                return toValidationResult(
+                    `${objectParamName} must not exceed ${maxBytes} bytes`
+                );
+            }
+
+            return null;
+        },
+    ]);
+}
+
+function createMonitorValidationPayloadValidator(
+    monitorTypeParamName: string,
+    dataParamName: string
+): IpcParameterValidator {
+    return createStringWithBudgetedObjectValidator(
+        monitorTypeParamName,
+        dataParamName,
+        MAX_MONITOR_VALIDATION_DATA_BYTES
+    );
+}
+
+/**
  * Helper function to create validators for handlers expecting two string
  * parameters.
  *
@@ -883,6 +933,7 @@ function createTwoStringValidator(
 export {
     createBackupKeyValidator,
     createClipboardTextValidator,
+    createMonitorValidationPayloadValidator,
     createNoParamsValidator,
     createPreloadGuardReportValidator,
     createSingleExternalOpenUrlValidator,
@@ -891,6 +942,7 @@ export {
     createSiteIdentifierAndMonitorIdValidator,
     createSiteIdentifierValidator,
     createStringObjectValidator,
+    createStringWithBudgetedObjectValidator,
     createStringWithUnvalidatedSecondValidator,
     createTwoStringValidator,
     validateCloudBackupMigrationRequest,

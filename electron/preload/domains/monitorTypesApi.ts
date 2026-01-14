@@ -12,12 +12,47 @@
 
 /* eslint-disable ex/no-unhandled -- Domain APIs are thin wrappers that don't handle exceptions */
 
+import type { MonitorTypeConfig } from "@shared/types/monitorTypes";
+
+import { isMonitorTypeConfig } from "@shared/types/monitorTypes";
 import {
     MONITOR_TYPES_CHANNELS,
     type MonitorTypesDomainBridge,
 } from "@shared/types/preload";
 
-import { createTypedInvoker } from "../core/bridgeFactory";
+import {
+    createTypedInvoker,
+    createValidatedInvoker,
+    type SafeParseLike,
+} from "../core/bridgeFactory";
+
+function safeParseMonitorTypeConfigs(
+    candidate: unknown
+): SafeParseLike<MonitorTypeConfig[]> {
+    if (!Array.isArray(candidate)) {
+        return {
+            error: new Error(
+                `Expected monitor type configuration array, received ${typeof candidate}`
+            ),
+            success: false,
+        };
+    }
+
+    const typedConfigs = candidate.filter(isMonitorTypeConfig);
+    if (typedConfigs.length !== candidate.length) {
+        return {
+            error: new Error(
+                "Monitor type configuration array contained invalid entries"
+            ),
+            success: false,
+        };
+    }
+
+    return {
+        data: typedConfigs,
+        success: true,
+    };
+}
 
 /**
  * Interface defining the monitor types domain API operations.
@@ -70,7 +105,14 @@ export const monitorTypesApi: MonitorTypesApiInterface = {
      *
      * @returns Promise resolving to monitor types registry
      */
-    getMonitorTypes: createTypedInvoker(MONITOR_TYPES_CHANNELS.getMonitorTypes),
+    getMonitorTypes: createValidatedInvoker(
+        MONITOR_TYPES_CHANNELS.getMonitorTypes,
+        safeParseMonitorTypeConfigs,
+        {
+            domain: "monitorTypesApi",
+            guardName: "safeParseMonitorTypeConfigs",
+        }
+    ),
 
     /**
      * Validates monitor configuration data.

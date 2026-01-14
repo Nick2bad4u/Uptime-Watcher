@@ -15,8 +15,12 @@ import {
     STATE_SYNC_CHANNELS,
     type StateSyncDomainBridge,
 } from "@shared/types/preload";
+import {
+    safeParseStateSyncFullSyncResult,
+    safeParseStateSyncStatusSummary,
+} from "@shared/types/stateSync";
 
-import { createTypedInvoker } from "../core/bridgeFactory";
+import { createValidatedInvoker } from "../core/bridgeFactory";
 
 /**
  * Interface defining the state sync domain API operations.
@@ -51,7 +55,14 @@ export const stateSyncApi: StateSyncApiInterface = {
      * @returns Promise resolving to current sync status information
      */
     // eslint-disable-next-line ex/no-unhandled -- Accessing constant channel mapping.
-    getSyncStatus: createTypedInvoker(STATE_SYNC_CHANNELS.getSyncStatus),
+    getSyncStatus: createValidatedInvoker(
+        STATE_SYNC_CHANNELS.getSyncStatus,
+        safeParseStateSyncStatusSummary,
+        {
+            domain: "stateSyncApi",
+            guardName: "safeParseStateSyncStatusSummary",
+        }
+    ),
 
     /**
      * Requests a full synchronization of all data
@@ -59,7 +70,14 @@ export const stateSyncApi: StateSyncApiInterface = {
      * @returns Promise resolving to synchronized site data
      */
     // eslint-disable-next-line ex/no-unhandled -- Accessing constant channel mapping.
-    requestFullSync: createTypedInvoker(STATE_SYNC_CHANNELS.requestFullSync),
+    requestFullSync: createValidatedInvoker(
+        STATE_SYNC_CHANNELS.requestFullSync,
+        safeParseStateSyncFullSyncResult,
+        {
+            domain: "stateSyncApi",
+            guardName: "safeParseStateSyncFullSyncResult",
+        }
+    ),
 } as const;
 
 /**
