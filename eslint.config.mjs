@@ -222,11 +222,11 @@ import pluginWriteGood from "eslint-plugin-write-good-comments";
 import xss from "eslint-plugin-xss";
 import eslintPluginYml from "eslint-plugin-yml";
 import zod from "eslint-plugin-zod";
-import eslintPluginZodX from 'eslint-plugin-zod-x';
 import globals from "globals";
 import jsoncEslintParser from "jsonc-eslint-parser";
 import { createRequire } from "node:module";
 import * as path from "node:path";
+// @ts-expect-error -- No Types for this Package
 import * as tomlEslintParser from "toml-eslint-parser";
 import yamlEslintParser from "yaml-eslint-parser";
 
@@ -442,18 +442,6 @@ export default /** @type {EslintConfig} */[
     nitpick.configs.recommended,
     pluginComments.recommended,
     arrayFunc.configs.all,
-    eslintPluginZodX.configs.recommended,
-    {
-        files: ["**/*.{ts,tsx,mts,cts,js,jsx,mjs,cjs}"],
-        name: "Zod-X overrides",
-        rules: {
-            // This repo intentionally allows both `import * as z from "zod"`
-            // and fine-grained type-only imports (e.g. `import type { ZodType }`).
-            // Forcing a namespace import everywhere creates noisy churn without
-            // improving runtime safety.
-            "zod-x/prefer-namespace-import": "off",
-        },
-    },
     ...storybook.configs[ "flat/recommended" ],
     ...pluginCasePolice.configs.recommended,
     // ═══════════════════════════════════════════════════════════════════════════════
@@ -1472,7 +1460,6 @@ export default /** @type {EslintConfig} */[
             ...importX.flatConfigs.electron.rules,
             ...pluginPromise.configs[ "flat/recommended" ].rules,
             ...pluginUnicorn.configs.all.rules,
-
             ...pluginReact.configs.all.rules,
             ...reactHooks.configs[ "recommended-latest" ].rules,
             ...jsxA11y.flatConfigs.strict.rules,
@@ -1499,6 +1486,7 @@ export default /** @type {EslintConfig} */[
             ...pluginTotalFunctions.configs.recommended.rules,
             ...styledA11y.flatConfigs.strict.rules,
             ...etc.configs.recommended.rules,
+            ...zod.configs.recommended.rules,
             "@docusaurus/no-html-links": "warn",
             "@docusaurus/no-untranslated-text": "off",
             "@docusaurus/prefer-docusaurus-heading": "warn",
@@ -2608,7 +2596,6 @@ export default /** @type {EslintConfig} */[
                     // ─────────────────────────────────────────────────────────────
                     "node:fs": { default: false, named: true, namespace: true },
                     "node:fs/promises": { default: false, named: true, namespace: true },
-
                     // ─────────────────────────────────────────────────────────────
                     // Node “path-like” modules: allow ONLY namespace imports
                     // (prevents `import path from "node:path"` which relies on default interop)
@@ -2616,7 +2603,6 @@ export default /** @type {EslintConfig} */[
                     "node:path": { default: false, namespace: true },
                     "node:path/posix": { default: false, namespace: true },
                     "node:path/win32": { default: false, namespace: true },
-
                     // ─────────────────────────────────────────────────────────────
                     // timers/promises: named is the common usage
                     // ─────────────────────────────────────────────────────────────
@@ -2625,9 +2611,7 @@ export default /** @type {EslintConfig} */[
                     // util: keep unicorn’s intent (named only)
                     // ─────────────────────────────────────────────────────────────
                     "node:util": { named: true },
-
                     "path": { default: false, namespace: true }, // Just in case any non-node: path remains
-
                     "util": { named: true },
                   },
                 },
@@ -2673,9 +2657,7 @@ export default /** @type {EslintConfig} */[
             ],
             "usememo-recommendations/detect-heavy-operations": "warn",
             "validate-jsx-nesting/no-invalid-jsx-nesting": "error",
-            "xss/no-location-href-assign": "error",
-            "zod/prefer-enum": "error",
-            "zod/require-strict": "error",
+            "xss/no-location-href-assign": "error"
         },
         settings: {
             "import-x/resolver": {
@@ -2910,7 +2892,6 @@ export default /** @type {EslintConfig} */[
             ...importX.flatConfigs.typescript.rules,
             ...pluginPromise.configs[ "flat/recommended" ].rules,
             ...pluginUnicorn.configs.all.rules,
-
             ...pluginReact.configs.all.rules,
             ...reactHooks.configs[ "recommended-latest" ].rules,
             ...jsxA11y.flatConfigs.strict.rules,
@@ -2943,7 +2924,7 @@ export default /** @type {EslintConfig} */[
             ...etc.configs.recommended.rules,
             // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
             ...pluginBetterTailwindcss.configs[ "correctness" ].rules,
-
+            ...zod.configs.recommended.rules,
             "@arthurgeron/react-usememo/require-memo": "off",
             "@arthurgeron/react-usememo/require-usememo": "error",
             "@arthurgeron/react-usememo/require-usememo-children": "off",
@@ -4254,7 +4235,6 @@ export default /** @type {EslintConfig} */[
                     // ─────────────────────────────────────────────────────────────
                     "node:fs": { default: false, named: true, namespace: true },
                     "node:fs/promises": { default: false, named: true, namespace: true },
-
                     // ─────────────────────────────────────────────────────────────
                     // Node “path-like” modules: allow ONLY namespace imports
                     // (prevents `import path from "node:path"` which relies on default interop)
@@ -4262,7 +4242,6 @@ export default /** @type {EslintConfig} */[
                     "node:path": { default: false, namespace: true },
                     "node:path/posix": { default: false, namespace: true },
                     "node:path/win32": { default: false, namespace: true },
-
                     // ─────────────────────────────────────────────────────────────
                     // timers/promises: named is the common usage
                     // ─────────────────────────────────────────────────────────────
@@ -4271,9 +4250,7 @@ export default /** @type {EslintConfig} */[
                     // util: keep unicorn’s intent (named only)
                     // ─────────────────────────────────────────────────────────────
                     "node:util": { named: true },
-
                     "path": { default: false, namespace: true }, // Just in case any non-node: path remains
-
                     "util": { named: true },
                   },
                 },
@@ -4319,9 +4296,7 @@ export default /** @type {EslintConfig} */[
             ],
             "usememo-recommendations/detect-heavy-operations": "warn",
             "validate-jsx-nesting/no-invalid-jsx-nesting": "error",
-            "xss/no-location-href-assign": "error",
-            "zod/prefer-enum": "error",
-            "zod/require-strict": "error",
+            "xss/no-location-href-assign": "error"
         },
         settings: {
             "better-tailwindcss": {
@@ -4541,7 +4516,6 @@ export default /** @type {EslintConfig} */[
             ...importX.flatConfigs.electron.rules,
             ...pluginPromise.configs[ "flat/recommended" ].rules,
             ...pluginUnicorn.configs.all.rules,
-
             ...pluginReact.configs.all.rules,
             ...reactHooks.configs[ "recommended-latest" ].rules,
             ...jsxA11y.flatConfigs.strict.rules,
@@ -4569,6 +4543,7 @@ export default /** @type {EslintConfig} */[
             ...pluginTotalFunctions.configs.recommended.rules,
             ...styledA11y.flatConfigs.strict.rules,
             ...etc.configs.recommended.rules,
+            ...zod.configs.recommended.rules,
             "@eslint-community/eslint-comments/no-restricted-disable": "warn",
             "@eslint-community/eslint-comments/no-unused-disable": "warn",
             "@eslint-community/eslint-comments/no-use": "off",
@@ -5670,7 +5645,6 @@ export default /** @type {EslintConfig} */[
                     // ─────────────────────────────────────────────────────────────
                     "node:fs": { default: false, named: true, namespace: true },
                     "node:fs/promises": { default: false, named: true, namespace: true },
-
                     // ─────────────────────────────────────────────────────────────
                     // Node “path-like” modules: allow ONLY namespace imports
                     // (prevents `import path from "node:path"` which relies on default interop)
@@ -5678,7 +5652,6 @@ export default /** @type {EslintConfig} */[
                     "node:path": { default: false, namespace: true },
                     "node:path/posix": { default: false, namespace: true },
                     "node:path/win32": { default: false, namespace: true },
-
                     // ─────────────────────────────────────────────────────────────
                     // timers/promises: named is the common usage
                     // ─────────────────────────────────────────────────────────────
@@ -5687,9 +5660,7 @@ export default /** @type {EslintConfig} */[
                     // util: keep unicorn’s intent (named only)
                     // ─────────────────────────────────────────────────────────────
                     "node:util": { named: true },
-
                     "path": { default: false, namespace: true }, // Just in case any non-node: path remains
-
                     "util": { named: true },
                   },
                 },
@@ -5735,9 +5706,7 @@ export default /** @type {EslintConfig} */[
             ],
             "usememo-recommendations/detect-heavy-operations": "warn",
             "validate-jsx-nesting/no-invalid-jsx-nesting": "error",
-            "xss/no-location-href-assign": "error",
-            "zod/prefer-enum": "error",
-            "zod/require-strict": "error",
+            "xss/no-location-href-assign": "error"
         },
         settings: {
             "boundaries/elements": [
@@ -5976,7 +5945,6 @@ export default /** @type {EslintConfig} */[
             ...importX.flatConfigs.typescript.rules,
             ...pluginPromise.configs[ "flat/recommended" ].rules,
             ...pluginUnicorn.configs.all.rules,
-
             ...pluginReact.configs.all.rules,
             ...reactHooks.configs[ "recommended-latest" ].rules,
             ...jsxA11y.flatConfigs.strict.rules,
@@ -6007,6 +5975,7 @@ export default /** @type {EslintConfig} */[
             ...pluginReactHookForm.configs.recommended.rules,
             ...reactPerfPlugin.configs.all.rules,
             ...etc.configs.recommended.rules,
+            ...zod.configs.recommended.rules,
             "@arthurgeron/react-usememo/require-memo": "warn",
             "@arthurgeron/react-usememo/require-usememo": "error",
             "@arthurgeron/react-usememo/require-usememo-children": "warn",
@@ -7346,7 +7315,6 @@ export default /** @type {EslintConfig} */[
                     // ─────────────────────────────────────────────────────────────
                     "node:fs": { default: false, named: true, namespace: true },
                     "node:fs/promises": { default: false, named: true, namespace: true },
-
                     // ─────────────────────────────────────────────────────────────
                     // Node “path-like” modules: allow ONLY namespace imports
                     // (prevents `import path from "node:path"` which relies on default interop)
@@ -7354,7 +7322,6 @@ export default /** @type {EslintConfig} */[
                     "node:path": { default: false, namespace: true },
                     "node:path/posix": { default: false, namespace: true },
                     "node:path/win32": { default: false, namespace: true },
-
                     // ─────────────────────────────────────────────────────────────
                     // timers/promises: named is the common usage
                     // ─────────────────────────────────────────────────────────────
@@ -7363,9 +7330,7 @@ export default /** @type {EslintConfig} */[
                     // util: keep unicorn’s intent (named only)
                     // ─────────────────────────────────────────────────────────────
                     "node:util": { named: true },
-
                     "path": { default: false, namespace: true }, // Just in case any non-node: path remains
-
                     "util": { named: true },
                   },
                 },
@@ -7411,9 +7376,7 @@ export default /** @type {EslintConfig} */[
             ],
             "usememo-recommendations/detect-heavy-operations": "warn",
             "validate-jsx-nesting/no-invalid-jsx-nesting": "error",
-            "xss/no-location-href-assign": "error",
-            "zod/prefer-enum": "error",
-            "zod/require-strict": "error",
+            "xss/no-location-href-assign": "error"
         },
         settings: {
             "better-tailwindcss": {
@@ -7686,7 +7649,6 @@ export default /** @type {EslintConfig} */[
                     // ─────────────────────────────────────────────────────────────
                     "node:fs": { default: false, named: true, namespace: true },
                     "node:fs/promises": { default: false, named: true, namespace: true },
-
                     // ─────────────────────────────────────────────────────────────
                     // Node “path-like” modules: allow ONLY namespace imports
                     // (prevents `import path from "node:path"` which relies on default interop)
@@ -7694,7 +7656,6 @@ export default /** @type {EslintConfig} */[
                     "node:path": { default: false, namespace: true },
                     "node:path/posix": { default: false, namespace: true },
                     "node:path/win32": { default: false, namespace: true },
-
                     // ─────────────────────────────────────────────────────────────
                     // timers/promises: named is the common usage
                     // ─────────────────────────────────────────────────────────────
@@ -7703,14 +7664,11 @@ export default /** @type {EslintConfig} */[
                     // util: keep unicorn’s intent (named only)
                     // ─────────────────────────────────────────────────────────────
                     "node:util": { named: true },
-
                     "path": { default: false, namespace: true }, // Just in case any non-node: path remains
-
                     "util": { named: true },
                   },
                 },
               ],
-
             "unicorn/no-await-expression-member": "off", // Allow await in test expressions
             "unicorn/no-keyword-prefix": [
                 "error",
@@ -7853,7 +7811,6 @@ export default /** @type {EslintConfig} */[
             ...tseslint.configs[ "stylistic" ].rules,
             ...vitest.configs.recommended.rules,
             ...pluginUnicorn.configs.all.rules,
-
             ...pluginTestingLibrary.configs[ "flat/react" ].rules,
             "@jcoreio/implicit-dependencies/no-implicit": "off",
             "@typescript-eslint/no-empty-function": "off", // Empty mocks/stubs are common
@@ -7958,7 +7915,6 @@ export default /** @type {EslintConfig} */[
                     // ─────────────────────────────────────────────────────────────
                     "node:fs": { default: false, named: true, namespace: true },
                     "node:fs/promises": { default: false, named: true, namespace: true },
-
                     // ─────────────────────────────────────────────────────────────
                     // Node “path-like” modules: allow ONLY namespace imports
                     // (prevents `import path from "node:path"` which relies on default interop)
@@ -7966,7 +7922,6 @@ export default /** @type {EslintConfig} */[
                     "node:path": { default: false, namespace: true },
                     "node:path/posix": { default: false, namespace: true },
                     "node:path/win32": { default: false, namespace: true },
-
                     // ─────────────────────────────────────────────────────────────
                     // timers/promises: named is the common usage
                     // ─────────────────────────────────────────────────────────────
@@ -7975,9 +7930,7 @@ export default /** @type {EslintConfig} */[
                     // util: keep unicorn’s intent (named only)
                     // ─────────────────────────────────────────────────────────────
                     "node:util": { named: true },
-
                     "path": { default: false, namespace: true }, // Just in case any non-node: path remains
-
                     "util": { named: true },
                   },
                 },
@@ -8207,7 +8160,6 @@ export default /** @type {EslintConfig} */[
                     // ─────────────────────────────────────────────────────────────
                     "node:fs": { default: false, named: true, namespace: true },
                     "node:fs/promises": { default: false, named: true, namespace: true },
-
                     // ─────────────────────────────────────────────────────────────
                     // Node “path-like” modules: allow ONLY namespace imports
                     // (prevents `import path from "node:path"` which relies on default interop)
@@ -8215,7 +8167,6 @@ export default /** @type {EslintConfig} */[
                     "node:path": { default: false, namespace: true },
                     "node:path/posix": { default: false, namespace: true },
                     "node:path/win32": { default: false, namespace: true },
-
                     // ─────────────────────────────────────────────────────────────
                     // timers/promises: named is the common usage
                     // ─────────────────────────────────────────────────────────────
@@ -8224,14 +8175,11 @@ export default /** @type {EslintConfig} */[
                     // util: keep unicorn’s intent (named only)
                     // ─────────────────────────────────────────────────────────────
                     "node:util": { named: true },
-
                     "path": { default: false, namespace: true }, // Just in case any non-node: path remains
-
                     "util": { named: true },
                   },
                 },
               ],
-
             "unicorn/no-await-expression-member": "off", // Allow await in test expressions
             "unicorn/no-keyword-prefix": [
                 "error",
@@ -8475,7 +8423,6 @@ export default /** @type {EslintConfig} */[
                     // ─────────────────────────────────────────────────────────────
                     "node:fs": { default: false, named: true, namespace: true },
                     "node:fs/promises": { default: false, named: true, namespace: true },
-
                     // ─────────────────────────────────────────────────────────────
                     // Node “path-like” modules: allow ONLY namespace imports
                     // (prevents `import path from "node:path"` which relies on default interop)
@@ -8483,7 +8430,6 @@ export default /** @type {EslintConfig} */[
                     "node:path": { default: false, namespace: true },
                     "node:path/posix": { default: false, namespace: true },
                     "node:path/win32": { default: false, namespace: true },
-
                     // ─────────────────────────────────────────────────────────────
                     // timers/promises: named is the common usage
                     // ─────────────────────────────────────────────────────────────
@@ -8492,14 +8438,11 @@ export default /** @type {EslintConfig} */[
                     // util: keep unicorn’s intent (named only)
                     // ─────────────────────────────────────────────────────────────
                     "node:util": { named: true },
-
                     "path": { default: false, namespace: true }, // Just in case any non-node: path remains
-
                     "util": { named: true },
                   },
                 },
               ],
-
             "unicorn/no-array-for-each": "off", // Benchmarks may use forEach for testing
             "unicorn/no-array-reduce": "off", // Benchmarks may test reduce performance
             "unicorn/no-await-expression-member": "off",
@@ -8662,7 +8605,6 @@ export default /** @type {EslintConfig} */[
             ...importX.flatConfigs.typescript.rules,
             ...pluginPromise.configs[ "flat/recommended" ].rules,
             ...pluginUnicorn.configs.all.rules,
-
             ...jsxA11y.flatConfigs.strict.rules,
             ...pluginSonarjs.configs.recommended.rules,
             ...pluginPerfectionist.configs[ "recommended-natural" ].rules,
@@ -9091,7 +9033,6 @@ export default /** @type {EslintConfig} */[
                     // ─────────────────────────────────────────────────────────────
                     "node:fs": { default: false, named: true, namespace: true },
                     "node:fs/promises": { default: false, named: true, namespace: true },
-
                     // ─────────────────────────────────────────────────────────────
                     // Node “path-like” modules: allow ONLY namespace imports
                     // (prevents `import path from "node:path"` which relies on default interop)
@@ -9099,7 +9040,6 @@ export default /** @type {EslintConfig} */[
                     "node:path": { default: false, namespace: true },
                     "node:path/posix": { default: false, namespace: true },
                     "node:path/win32": { default: false, namespace: true },
-
                     // ─────────────────────────────────────────────────────────────
                     // timers/promises: named is the common usage
                     // ─────────────────────────────────────────────────────────────
@@ -9108,9 +9048,7 @@ export default /** @type {EslintConfig} */[
                     // util: keep unicorn’s intent (named only)
                     // ─────────────────────────────────────────────────────────────
                     "node:util": { named: true },
-
                     "path": { default: false, namespace: true }, // Just in case any non-node: path remains
-
                     "util": { named: true },
                   },
                 },
@@ -9318,7 +9256,6 @@ export default /** @type {EslintConfig} */[
                     // ─────────────────────────────────────────────────────────────
                     "node:fs": { default: false, named: true, namespace: true },
                     "node:fs/promises": { default: false, named: true, namespace: true },
-
                     // ─────────────────────────────────────────────────────────────
                     // Node “path-like” modules: allow ONLY namespace imports
                     // (prevents `import path from "node:path"` which relies on default interop)
@@ -9326,7 +9263,6 @@ export default /** @type {EslintConfig} */[
                     "node:path": { default: false, namespace: true },
                     "node:path/posix": { default: false, namespace: true },
                     "node:path/win32": { default: false, namespace: true },
-
                     // ─────────────────────────────────────────────────────────────
                     // timers/promises: named is the common usage
                     // ─────────────────────────────────────────────────────────────
@@ -9335,14 +9271,11 @@ export default /** @type {EslintConfig} */[
                     // util: keep unicorn’s intent (named only)
                     // ─────────────────────────────────────────────────────────────
                     "node:util": { named: true },
-
                     "path": { default: false, namespace: true }, // Just in case any non-node: path remains
-
                     "util": { named: true },
                   },
                 },
               ],
-
             "unicorn/no-array-for-each": "off", // Benchmarks may use forEach for testing
             "unicorn/no-array-reduce": "off", // Benchmarks may test reduce performance
             "unicorn/no-await-expression-member": "off",
@@ -9548,7 +9481,6 @@ export default /** @type {EslintConfig} */[
             ...importX.flatConfigs.typescript.rules,
             ...pluginPromise.configs[ "flat/recommended" ].rules,
             ...pluginUnicorn.configs.all.rules,
-
             ...pluginReact.configs.all.rules,
             ...reactHooks.configs[ "recommended-latest" ].rules,
             ...jsxA11y.flatConfigs.strict.rules,
@@ -9666,7 +9598,6 @@ export default /** @type {EslintConfig} */[
                     // ─────────────────────────────────────────────────────────────
                     "node:fs": { default: false, named: true, namespace: true },
                     "node:fs/promises": { default: false, named: true, namespace: true },
-
                     // ─────────────────────────────────────────────────────────────
                     // Node “path-like” modules: allow ONLY namespace imports
                     // (prevents `import path from "node:path"` which relies on default interop)
@@ -9674,7 +9605,6 @@ export default /** @type {EslintConfig} */[
                     "node:path": { default: false, namespace: true },
                     "node:path/posix": { default: false, namespace: true },
                     "node:path/win32": { default: false, namespace: true },
-
                     // ─────────────────────────────────────────────────────────────
                     // timers/promises: named is the common usage
                     // ─────────────────────────────────────────────────────────────
@@ -9683,9 +9613,7 @@ export default /** @type {EslintConfig} */[
                     // util: keep unicorn’s intent (named only)
                     // ─────────────────────────────────────────────────────────────
                     "node:util": { named: true },
-
                     "path": { default: false, namespace: true }, // Just in case any non-node: path remains
-
                     "util": { named: true },
                   },
                 },
@@ -10285,7 +10213,6 @@ export default /** @type {EslintConfig} */[
             "unicorn/no-instanceof-array": "off",
             "unicorn/no-length-as-slice-end": "off",
             "unicorn/prefer-spread": "off", // Prefer Array.from
-
             "write-good-comments/write-good-comments": "off", // Too strict
         },
     }, // eslint-config-prettier MUST be last to override conflicting rules
