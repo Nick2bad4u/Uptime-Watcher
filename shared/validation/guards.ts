@@ -7,7 +7,7 @@
  */
 
 import type { ExclusifyUnion } from "type-fest";
-import type { ZodError, ZodType } from "zod";
+import type * as z from "zod";
 
 import type { Site } from "../types";
 
@@ -27,7 +27,7 @@ type SiteUpdate = {
     readonly [Key in keyof SiteUpdateBase]?: SiteUpdateBase[Key] | undefined;
 };
 
-const siteUpdateSchema: ZodType<SiteUpdate> = siteSchema
+const siteUpdateSchema: z.ZodType<SiteUpdate> = siteSchema
     .omit({ identifier: true })
     .partial()
     .strict();
@@ -70,7 +70,7 @@ export const validateStatusUpdate = (value: unknown): StatusUpdateParseResult =>
  */
 export interface SiteSnapshotValidationIssue {
     /** Detailed Zod error information for diagnostics. */
-    readonly error: ZodError<Site>;
+    readonly error: z.ZodError<Site>;
     /** Index of the invalid snapshot within the original collection. */
     readonly index: number;
     /** The original value that failed validation. */

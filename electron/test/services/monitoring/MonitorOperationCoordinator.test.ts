@@ -28,6 +28,8 @@ describe(MonitorOperationCoordinator, () => {
     let monitorRepository: MonitorRepository;
     let operationRegistryInitiateCheck: ReturnType<typeof vi.fn>;
     let operationRegistryCompleteOperation: ReturnType<typeof vi.fn>;
+    let operationRegistryHasOutstanding: ReturnType<typeof vi.fn>;
+    let operationRegistryGetOutstandingIds: ReturnType<typeof vi.fn>;
     let operationRegistry: MonitorOperationRegistry;
     let timeoutManagerSchedule: ReturnType<typeof vi.fn>;
     let timeoutManagerClear: ReturnType<typeof vi.fn>;
@@ -45,8 +47,12 @@ describe(MonitorOperationCoordinator, () => {
             operationId: "operation-123",
             signal: createAbortSignal(),
         });
+        operationRegistryHasOutstanding = vi.fn().mockReturnValue(false);
+        operationRegistryGetOutstandingIds = vi.fn().mockReturnValue([]);
         operationRegistry = {
             completeOperation: operationRegistryCompleteOperation,
+            getOutstandingOperationIds: operationRegistryGetOutstandingIds,
+            hasOutstandingOperation: operationRegistryHasOutstanding,
             initiateCheck: operationRegistryInitiateCheck,
         } as unknown as MonitorOperationRegistry;
 
@@ -103,5 +109,18 @@ describe(MonitorOperationCoordinator, () => {
             "operation-xyz"
         );
         expect(timeoutManagerClear).toHaveBeenCalledWith("operation-xyz");
+    });
+
+    it("skips initiation when an outstanding operation exists", async () => {
+        const monitor = createMonitor();
+        operationRegistryHasOutstanding.mockReturnValue(true);
+        operationRegistryGetOutstandingIds.mockReturnValue(["op-existing"]);
+
+        const handle = await coordinator.initiateOperation(monitor);
+
+        expect(handle).toBeUndefined();
+        expect(operationRegistryInitiateCheck).not.toHaveBeenCalled();
+        expect(timeoutManagerSchedule).not.toHaveBeenCalled();
+        expect(monitorRepositoryUpdate).not.toHaveBeenCalled();
     });
 });

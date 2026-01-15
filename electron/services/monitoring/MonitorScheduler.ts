@@ -12,11 +12,9 @@ import { DEFAULT_CHECK_INTERVAL } from "../../constants";
 import { isDev } from "../../electronUtils";
 import { logger as backendLogger } from "../../utils/logger";
 import {
-    DEFAULT_MONITOR_TIMEOUT_SECONDS,
     MIN_CHECK_INTERVAL,
-    MONITOR_TIMEOUT_BUFFER_MS,
-    SECONDS_TO_MS_MULTIPLIER,
 } from "./constants";
+import { resolveMonitorOperationTimeoutMs } from "./shared/timeoutUtils";
 
 const JITTER_PERCENTAGE = 0.1;
 
@@ -788,17 +786,7 @@ export class MonitorScheduler {
     }
 
     private resolveTimeout(timeoutMs?: number): number {
-        if (
-            typeof timeoutMs === "number" &&
-            Number.isFinite(timeoutMs) &&
-            timeoutMs > 0
-        ) {
-            return timeoutMs + MONITOR_TIMEOUT_BUFFER_MS;
-        }
-
-        const defaultTimeoutMs =
-            DEFAULT_MONITOR_TIMEOUT_SECONDS * SECONDS_TO_MS_MULTIPLIER;
-        return defaultTimeoutMs + MONITOR_TIMEOUT_BUFFER_MS;
+        return resolveMonitorOperationTimeoutMs(timeoutMs);
     }
 
     private clearJobTimer(job: MonitorJob): void {

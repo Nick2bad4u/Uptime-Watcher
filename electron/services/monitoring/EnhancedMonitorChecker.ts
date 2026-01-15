@@ -60,6 +60,8 @@ import {
 } from "./checkContext";
 import { MonitorOperationCoordinator } from "./coordinators/MonitorOperationCoordinator";
 import { getMonitor } from "./MonitorFactory";
+import { createTimeoutSignal } from "./shared/abortSignalUtils";
+import { resolveMonitorBaseTimeoutMs } from "./shared/timeoutUtils";
 import {
     createMonitorStrategyRegistry,
     type MonitorStrategyRegistry,
@@ -202,6 +204,15 @@ export class EnhancedMonitorChecker {
      */
     private readonly servicesByType: Map<Monitor["type"], IMonitorService>;
 
+    private readonly historyPruneState = new Map<
+        string,
+        {
+            hasPerformedCountCheck: boolean;
+            lastHistoryLimit: number;
+            pendingWritesSinceCountCheck: number;
+        }
+    >();
+
     /**
      * Performs a comprehensive monitor status check with advanced operation
      * correlation.
@@ -309,7 +320,12 @@ export class EnhancedMonitorChecker {
             // operation never settles.
             await this.config.monitorRepository.clearActiveOperations(monitorId);
 
-            return this.performDirectCheck(site, monitor, true, signal);
+            const timeoutSignal = createTimeoutSignal(
+                resolveMonitorBaseTimeoutMs(monitor.timeout),
+                signal
+            );
+
+            return this.performDirectCheck(site, monitor, true, timeoutSignal);
         }
 
         // Only proceed if monitor is currently monitoring
@@ -813,23 +829,58 @@ private async saveHistoryEntry(
             const historyLimit = this.config.getHistoryLimit();
             if (historyLimit > 0) {
                 // Use a buffer strategy: only prune when we exceed limit +
-                // buffer
+                // buffer.
                 const bufferSize = Math.max(Math.floor(historyLimit * 0.2), 5);
                 const pruneThreshold = historyLimit + bufferSize;
-                const currentCount =
-                    await this.config.historyRepository.getHistoryCount(
-                        monitor.id
-                    );
 
-                if (pruneThreshold < currentCount) {
-                    await this.config.historyRepository.pruneHistory(
-                        monitor.id,
-                        historyLimit
-                    );
-                    logger.debug(
-                        `[EnhancedMonitorChecker] Pruned history for monitor ${monitor.id}: ${currentCount} -> ${historyLimit} entries`
-                    );
+                const previousState = this.historyPruneState.get(monitor.id);
+                const state =
+                    previousState ??
+                    {
+                        hasPerformedCountCheck: false,
+                        lastHistoryLimit: historyLimit,
+                        pendingWritesSinceCountCheck: 0,
+                    };
+
+                // If the configured history limit changed, reset the pruning
+                // state so the new configuration is applied quickly.
+                if (state.lastHistoryLimit !== historyLimit) {
+                    state.lastHistoryLimit = historyLimit;
+                    state.pendingWritesSinceCountCheck = 0;
+                    state.hasPerformedCountCheck = false;
                 }
+
+                state.pendingWritesSinceCountCheck += 1;
+
+                const shouldCheckCount =
+                    !state.hasPerformedCountCheck ||
+                    state.pendingWritesSinceCountCheck >= bufferSize;
+
+                if (shouldCheckCount) {
+                    state.pendingWritesSinceCountCheck = 0;
+                    state.hasPerformedCountCheck = true;
+                    this.historyPruneState.set(monitor.id, state);
+
+                    const currentCount =
+                        await this.config.historyRepository.getHistoryCount(
+                            monitor.id
+                        );
+
+                    if (currentCount > pruneThreshold) {
+                        await this.config.historyRepository.pruneHistory(
+                            monitor.id,
+                            historyLimit
+                        );
+                        logger.debug(
+                            `[EnhancedMonitorChecker] Pruned history for monitor ${monitor.id}: ${currentCount} -> ${historyLimit} entries`
+                        );
+                    }
+                } else {
+                    this.historyPruneState.set(monitor.id, state);
+                }
+            } else {
+                // Avoid unbounded memory usage if the history limit is disabled.
+                this.historyPruneState.delete(monitor.id);
             }
 
             logger.debug(

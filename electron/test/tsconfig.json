@@ -1,22 +1,19 @@
 {
     "$schema": "https://www.schemastore.org/tsconfig.json",
-    "compilerOptions": {
-        "tsBuildInfoFile": "../../dist/tsconfig.electron-test.tsbuildinfo"
-    },
-    "exclude": [],
-    "extends": "../../config/testing/tsconfig.test.json",
+    "exclude": ["../../node_modules"],
+    "extends": "../../config/testing/tsconfig.electron.test.json",
     "include": [
         "./**/*.ts",
         "./**/*.tsx",
         "./**/*.mts",
         "./**/*.cts",
-        "../../electron/**/*.ts",
-        "../../electron/**/*.tsx",
-        "../../electron/**/*.mts",
-        "../../electron/**/*.cts",
-        "../../shared/**/*.ts",
-        "../../shared/**/*.tsx",
-        "../../shared/**/*.mts",
-        "../../shared/**/*.cts"
+        "../**/*.ts",
+        "../**/*.tsx",
+        "../**/*.mts",
+        "../**/*.cts",
+        "../preload/**/*.ts",
+        "../preload/**/*.tsx",
+        "../preload/**/*.mts",
+        "../preload/**/*.cts"
     ]
 }

@@ -290,12 +290,8 @@ describe("State Sync Domain API", () => {
             const siteArrayArb = fc
                 .array(
                     fc.record({
-                        identifier: fc
-                            .string({ minLength: 1, maxLength: 50 })
-                            .filter((value) => /\S/u.test(value)),
-                        name: fc
-                            .string({ minLength: 1, maxLength: 120 })
-                            .filter((value) => /\S/u.test(value)),
+                        identifier: fc.string({ minLength: 1, maxLength: 50 }),
+                        name: fc.string({ minLength: 1, maxLength: 120 }),
                         monitoring: fc.boolean(),
                     }),
                     { maxLength: 40 }

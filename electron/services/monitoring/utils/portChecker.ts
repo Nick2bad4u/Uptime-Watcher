@@ -1,4 +1,3 @@
-import { raceWithAbort } from "@shared/utils/abortUtils";
 import isPortReachable from "is-port-reachable";
 
 import type { MonitorCheckResult } from "../types";
@@ -91,8 +90,7 @@ import { PORT_NOT_REACHABLE, PortCheckError } from "./portErrorHandling";
 export async function performSinglePortCheck(
     host: string,
     port: number,
-    timeout: number,
-    signal?: AbortSignal
+    timeout: number
 ): Promise<MonitorCheckResult> {
     // Start high-precision timing for response time measurement
     const startTime = performance.now();
@@ -104,14 +102,10 @@ export async function performSinglePortCheck(
     }
 
     // Test TCP connectivity using is-port-reachable library
-    const checkPromise = isPortReachable(port, {
+    const isReachable = await isPortReachable(port, {
         host: host,
         timeout: timeout,
     });
-
-    const isReachable = signal
-        ? await raceWithAbort(checkPromise, signal)
-        : await checkPromise;
 
     // Calculate precise response time in milliseconds
     const responseTime = Math.round(performance.now() - startTime);

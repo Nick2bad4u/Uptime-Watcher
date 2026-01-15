@@ -5,11 +5,7 @@ import type { MonitorOperationRegistry } from "../MonitorOperationRegistry";
 import type { OperationTimeoutManager } from "../OperationTimeoutManager";
 
 import { monitorLogger as logger } from "../../../utils/logger";
-import {
-    DEFAULT_MONITOR_TIMEOUT_SECONDS,
-    MONITOR_TIMEOUT_BUFFER_MS,
-    SECONDS_TO_MS_MULTIPLIER,
-} from "../constants";
+import { resolveMonitorOperationTimeoutMs } from "../shared/timeoutUtils";
 
 /**
  * Dependencies required for coordinating monitor operations.
@@ -46,6 +42,20 @@ export class MonitorOperationCoordinator {
     ): Promise<MonitorOperationHandle | undefined> {
         if (!monitor.id) {
             logger.error("Cannot initiate operation for monitor without ID");
+            return undefined;
+        }
+
+        if (this.operationRegistry.hasOutstandingOperation(monitor.id)) {
+            logger.debug(
+                "Skipping correlated operation because an outstanding operation already exists",
+                {
+                    monitorId: monitor.id,
+                    operationIds:
+                        this.operationRegistry.getOutstandingOperationIds(
+                            monitor.id
+                        ),
+                }
+            );
             return undefined;
         }
 
@@ -102,9 +112,6 @@ export class MonitorOperationCoordinator {
     }
 
     private resolveTimeout(monitor: Monitor): number {
-        const monitorTimeoutMs =
-            monitor.timeout ||
-            DEFAULT_MONITOR_TIMEOUT_SECONDS * SECONDS_TO_MS_MULTIPLIER;
-        return monitorTimeoutMs + MONITOR_TIMEOUT_BUFFER_MS;
+        return resolveMonitorOperationTimeoutMs(monitor.timeout);
     }
 }

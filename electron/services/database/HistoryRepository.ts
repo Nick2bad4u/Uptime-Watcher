@@ -637,11 +637,11 @@ export class HistoryRepository {
 
         // Prune history for each monitor
         for (const row of monitorRows) {
-            // Validate monitor ID is a positive number before using it
-            const monitorId = Number(row.id);
-            if (Number.isFinite(monitorId) && monitorId > 0) {
-                pruneHistoryForMonitor(db, String(monitorId), limit);
-            }
+            const monitorId =
+                typeof row.id === "string" ? row.id : String(row.id);
+
+            // `queryForIds` already enforces non-empty strings and finite numbers.
+            pruneHistoryForMonitor(db, monitorId, limit);
         }
 
         if (isDev()) {

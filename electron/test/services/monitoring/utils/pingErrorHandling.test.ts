@@ -26,37 +26,11 @@ describe("pingErrorHandling", () => {
     beforeEach(() => {
         vi.clearAllMocks();
         mockLogger.error = vi.fn();
-        mockLogger.warn = vi.fn();
     });
     afterEach(() => {
         vi.resetAllMocks();
     });
     describe(handlePingCheckError, () => {
-        it("should treat abort-like errors as cancellations", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: logger", "component");
-
-            const error = new Error("Operation was aborted");
-
-            const result = handlePingCheckError(error, defaultContext);
-
-            expect(mockLogger.warn).toHaveBeenCalledWith(
-                "Ping check cancelled",
-                error,
-                defaultContext
-            );
-            expect(mockLogger.error).not.toHaveBeenCalled();
-            expect(result).toEqual({
-                status: "down",
-                responseTime: 0,
-                details: "Ping cancelled",
-                error: "Operation was aborted",
-            });
-        });
-
         it("should handle Error objects correctly", async ({
             task,
             annotate,

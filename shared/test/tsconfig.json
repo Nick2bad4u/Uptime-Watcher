@@ -1,18 +1,15 @@
 {
     "$schema": "https://www.schemastore.org/tsconfig.json",
-    "compilerOptions": {
-        "tsBuildInfoFile": "../../dist/tsconfig.shared-test.tsbuildinfo"
-    },
-    "exclude": [],
-    "extends": "../../config/testing/tsconfig.test.json",
+    "exclude": ["../../node_modules"],
+    "extends": "../../config/testing/tsconfig.shared.test.json",
     "include": [
         "./**/*.ts",
         "./**/*.tsx",
         "./**/*.mts",
         "./**/*.cts",
-        "../constants/**/*.ts",
-        "../utils/**/*.ts",
-        "../validation/**/*.ts",
-        "../types/**/*.ts"
+        "../**/*.ts",
+        "../**/*.tsx",
+        "../**/*.mts",
+        "../**/*.cts"
     ]
 }

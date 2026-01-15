@@ -111,10 +111,7 @@ export async function performPortCheckWithRetry(
             : baseConfig;
 
         return await withOperationalHooks(
-            () =>
-                signal
-                    ? performSinglePortCheck(host, port, timeout, signal)
-                    : performSinglePortCheck(host, port, timeout),
+            () => performSinglePortCheck(host, port, timeout),
             {
                 ...config,
                 ...(signal ? { signal } : {}),

@@ -175,7 +175,7 @@ class ErrorBoundaryBase extends Component<
             );
         }
 
-        // eslint-disable-next-line @eslint-react/no-unnecessary-key -- Intentional: force remount after retry.
+         
         return <div key={retryCount}>{children}</div>;
     }
 }

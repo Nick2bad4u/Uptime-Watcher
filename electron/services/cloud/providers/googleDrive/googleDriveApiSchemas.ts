@@ -1,7 +1,7 @@
-import type { ZodType } from "zod";
-
 import { formatZodIssues } from "@shared/utils/zodIssueFormatting";
 import * as z from "zod";
+
+
 
 /**
  * Minimal payload returned by Drive `files.create()` when requesting
@@ -48,7 +48,7 @@ export interface GoogleDriveListResponse {
     readonly nextPageToken: null | string;
 }
 
-const googleDriveCreateResponseSchema: ZodType<GoogleDriveCreateResponse> =
+const googleDriveCreateResponseSchema: z.ZodType<GoogleDriveCreateResponse> =
     z.looseObject({
         id: z.string().min(1),
     });
@@ -70,7 +70,7 @@ export function parseGoogleDriveCreateResponse(
     return { id: parsed.data.id };
 }
 
-const googleDriveFileMetadataSchema: ZodType<GoogleDriveFileMetadata> =
+const googleDriveFileMetadataSchema: z.ZodType<GoogleDriveFileMetadata> =
     z.looseObject({
         modifiedTime: z.string().optional(),
         size: z.union([z.string(), z.number()]).optional(),
@@ -96,7 +96,7 @@ export function parseGoogleDriveFileMetadata(
     };
 }
 
-const googleDriveFileSchema: ZodType<GoogleDriveListedFile> = z.looseObject({
+const googleDriveFileSchema: z.ZodType<GoogleDriveListedFile> = z.looseObject({
     id: z.string().optional(),
     mimeType: z.string().optional(),
     modifiedTime: z.string().optional(),
@@ -104,7 +104,7 @@ const googleDriveFileSchema: ZodType<GoogleDriveListedFile> = z.looseObject({
     size: z.union([z.string(), z.number()]).optional(),
 });
 
-const googleDriveListResponseSchema: ZodType<{
+const googleDriveListResponseSchema: z.ZodType<{
     files?: GoogleDriveListedFile[] | undefined;
     nextPageToken?: null | string | undefined;
 }> = z.looseObject({

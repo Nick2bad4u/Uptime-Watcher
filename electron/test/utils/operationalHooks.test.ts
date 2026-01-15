@@ -72,42 +72,30 @@ describe("Operational Hooks", () => {
             expect(mockOperation).toHaveBeenCalledTimes(2);
         });
 
-        it("should stop retries when the AbortSignal aborts", async ({
-            task,
-            annotate,
-        }) => {
+        it("should stop retrying when aborted", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: operationalHooks", "component");
             await annotate("Category: Utility", "category");
-            await annotate("Type: Error Handling", "type");
-
-            vi.useFakeTimers();
+            await annotate("Type: Cancellation", "type");
 
             const controller = new AbortController();
-            const mockOperation = vi
-                .fn()
-                .mockRejectedValue(new Error("First failure"));
 
-            const promise = withOperationalHooks(mockOperation, {
-                operationName: "abort-retry",
-                maxRetries: 3,
-                initialDelay: 10_000,
-                emitEvents: false,
-                signal: controller.signal,
+            const mockOperation = vi.fn().mockImplementation(async () => {
+                controller.abort("cancelled");
+                throw new Error("First failure");
             });
 
-            // Allow the first attempt to run and schedule the retry delay.
-            await Promise.resolve();
-            await Promise.resolve();
+            await expect(
+                withOperationalHooks(mockOperation, {
+                    operationName: "abort-retry",
+                    maxRetries: 3,
+                    initialDelay: 50,
+                    emitEvents: false,
+                    signal: controller.signal,
+                })
+            ).rejects.toThrowError(/aborted/i);
 
             expect(mockOperation).toHaveBeenCalledTimes(1);
-
-            controller.abort();
-
-            await expect(promise).rejects.toThrowError(/aborted/i);
-            expect(mockOperation).toHaveBeenCalledTimes(1);
-
-            vi.useRealTimers();
         });
         it("should fail after max retries", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");

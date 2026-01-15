@@ -66,6 +66,8 @@ describe("EnhancedMonitorChecker Coverage Tests", () => {
             validateOperation: vi.fn(),
             completeOperation: vi.fn(),
             cancelOperations: vi.fn().mockReturnValue(undefined),
+            hasOutstandingOperation: vi.fn().mockReturnValue(false),
+            getOutstandingOperationIds: vi.fn().mockReturnValue([]),
         };
 
         mockOperationRegistry.initiateCheck.mockReturnValue({
@@ -207,6 +209,96 @@ describe("EnhancedMonitorChecker Coverage Tests", () => {
                 mockMonitorRepository.clearActiveOperations
             ).toHaveBeenCalledWith("monitor-1");
             expect(mockMonitorRepository.update).toHaveBeenCalled();
+        });
+
+        it("should abort manual checks after the monitor timeout", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate(
+                "Component: EnhancedMonitorChecker-coverage-fixed",
+                "component"
+            );
+            await annotate("Category: Service", "category");
+            await annotate("Type: Cancellation", "type");
+
+            const baseMonitor = mockSite.monitors[0];
+            expect(baseMonitor).toBeDefined();
+
+            const fastTimeoutSite: Site = {
+                ...mockSite,
+                monitors: [
+                    {
+                        ...baseMonitor!,
+                        timeout: 50,
+                    },
+                ],
+            };
+
+            mockMonitorRepository.update.mockResolvedValue(true);
+            mockMonitorRepository.findByIdentifier.mockResolvedValue({
+                ...fastTimeoutSite.monitors[0]!,
+                status: "down",
+                lastChecked: new Date(),
+                responseTime: 0,
+            });
+            mockHistoryRepository.create.mockResolvedValue(undefined);
+
+            const checkMock = vi
+                .fn()
+                .mockImplementation(
+                    async (_monitor: unknown, signal?: AbortSignal) => {
+                        if (!signal) {
+                            throw new Error("Missing AbortSignal");
+                        }
+
+                        await Promise.race([
+                            new Promise<void>((resolve) => {
+                                signal.addEventListener(
+                                    "abort",
+                                    () => {
+                                        resolve();
+                                    },
+                                    { once: true }
+                                );
+                            }),
+                            new Promise<void>((_resolve, reject) => {
+                                setTimeout(() => {
+                                    reject(
+                                        new Error(
+                                            "Manual check did not abort within test window"
+                                        )
+                                    );
+                                }, 500);
+                            }),
+                        ]);
+
+                        return {
+                            details: "aborted",
+                            responseTime: 0,
+                            status: "down" as const,
+                        };
+                    }
+                );
+
+            (enhancedChecker as any).servicesByType
+                .get("http")
+                .check.mockImplementation(checkMock);
+
+            const result = await enhancedChecker.checkMonitor(
+                fastTimeoutSite,
+                "monitor-1",
+                true
+            );
+
+            expect(checkMock).toHaveBeenCalledTimes(1);
+            const signal = checkMock.mock.calls[0]?.[1] as
+                | AbortSignal
+                | undefined;
+            expect(signal).toBeDefined();
+            expect(signal?.aborted).toBeTruthy();
+            expect(result?.status).toBe("down");
         });
 
         it("should return undefined for non-existent monitor", async ({

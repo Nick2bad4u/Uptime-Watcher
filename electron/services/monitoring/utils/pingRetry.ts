@@ -94,19 +94,17 @@ export async function performSinglePingCheck(
     timeout: number,
     signal?: AbortSignal
 ): Promise<MonitorCheckResult> {
+    if (signal?.aborted) {
+        throw new Error("Operation was aborted");
+    }
+
     try {
         // Determine check type based on host format
         const isHttpUrl = isValidUrl(host);
 
         // Use native connectivity check instead of ping package
-        if (isHttpUrl) {
-            return signal
-                ? await checkHttpConnectivity(host, timeout, signal)
-                : await checkHttpConnectivity(host, timeout);
-        }
-
-        return signal
-            ? await checkConnectivity(host, { retries: 0, timeout }, signal)
+        return isHttpUrl
+            ? await checkHttpConnectivity(host, timeout)
             : await checkConnectivity(host, { retries: 0, timeout });
     } catch (error) {
         const errorMessage = getUserFacingErrorDetail(error);
@@ -199,10 +197,7 @@ export async function performPingCheckWithRetry(
 
     try {
         return await withOperationalHooks(
-            async () =>
-                signal
-                    ? performSinglePingCheck(host, timeout, signal)
-                    : performSinglePingCheck(host, timeout),
+            async () => performSinglePingCheck(host, timeout, signal),
             {
                 initialDelay: RETRY_BACKOFF.INITIAL_DELAY,
                 maxRetries: totalAttempts,

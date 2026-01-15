@@ -261,12 +261,12 @@ export interface OperationalHooksConfig<T = unknown> {
     operationName: string;
 
     /**
-     * Optional AbortSignal used to cancel retries and backoff delays.
+     * Optional cancellation signal.
      *
      * @remarks
-     * When provided, the hook loop will:
-     * - stop before starting a new attempt if the signal is already aborted
-     * - abort any pending retry delay window
+     * When provided, retries and retry delays will stop as soon as the signal
+     * aborts. This is primarily used by monitoring to prevent wasted work
+     * after a monitor is stopped/cancelled.
      */
     signal?: AbortSignal;
 
@@ -489,10 +489,6 @@ async function handleRetry<T>(
 ): Promise<void> {
     const { onRetry, signal } = config;
 
-    if (signal?.aborted) {
-        throw new Error("Operation was aborted");
-    }
-
     if (onRetry) {
         try {
             await onRetry(attempt, error);
@@ -506,6 +502,10 @@ async function handleRetry<T>(
 
     const delay = calculateDelay(attempt, initialDelay, backoff);
 
+    if (signal?.aborted) {
+        throw new Error("Operation was aborted");
+    }
+
     if (delay > 0) {
         /* V8 ignore next 2 */ logger.debug(
             `[OperationalHooks] Retrying ${operationName} in ${delay}ms`,
@@ -515,7 +515,15 @@ async function handleRetry<T>(
             }
         );
 
-        await sleep(delay, signal);
+        try {
+            await sleep(delay, signal);
+        } catch {
+            if (signal?.aborted) {
+                throw new Error("Operation was aborted");
+            }
+
+            throw error;
+        }
     }
 }
 
@@ -594,7 +602,6 @@ export async function withOperationalHooks<T>(
         initialDelay = 100,
         maxRetries = 3,
         operationName,
-        signal,
         throwOnFailure = true,
     } = config;
 
@@ -609,9 +616,22 @@ export async function withOperationalHooks<T>(
 
     let lastError: Error | null = null;
 
+    const { signal } = config;
+
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
         if (signal?.aborted) {
-            throw new Error("Operation was aborted");
+            const abortError = new Error("Operation was aborted");
+            return handleFailure(
+                abortError,
+                config,
+                operationName,
+                startTime,
+                attempt - 1,
+                operationId,
+                context,
+                throwOnFailure,
+                "warn"
+            );
         }
 
         try {
@@ -637,6 +657,26 @@ export async function withOperationalHooks<T>(
             );
         } catch (error) {
             lastError = ensureError(error);
+
+            if (signal?.aborted) {
+                // Prefer a consistent cancellation message over surfacing an
+                // unrelated exception that happened to be thrown around the
+                // same time the signal aborted.
+                const abortError = new Error("Operation was aborted", {
+                    cause: lastError,
+                });
+                return handleFailure(
+                    abortError,
+                    config,
+                    operationName,
+                    startTime,
+                    attempt,
+                    operationId,
+                    context,
+                    throwOnFailure,
+                    "warn"
+                );
+            }
 
             /* V8 ignore next 2 */ logger.debug(
                 `[OperationalHooks] ${operationName} failed on attempt ${attempt}/${maxRetries}`,
@@ -670,16 +710,31 @@ export async function withOperationalHooks<T>(
             }
 
             // Handle retry - intentionally sequential for retry logic
-            // eslint-disable-next-line no-await-in-loop -- retry handling requires sequential await
-            await handleRetry(
-                lastError,
-                config,
-                operationName,
-                attempt,
-                operationId,
-                backoff,
-                initialDelay
-            );
+            try {
+                // eslint-disable-next-line no-await-in-loop -- retry handling requires sequential await
+                await handleRetry(
+                    lastError,
+                    config,
+                    operationName,
+                    attempt,
+                    operationId,
+                    backoff,
+                    initialDelay
+                );
+            } catch (retryError) {
+                const normalizedRetryError = ensureError(retryError);
+                return handleFailure(
+                    normalizedRetryError,
+                    config,
+                    operationName,
+                    startTime,
+                    attempt,
+                    operationId,
+                    context,
+                    throwOnFailure,
+                    signal?.aborted ? "warn" : "error"
+                );
+            }
         }
     }
 
