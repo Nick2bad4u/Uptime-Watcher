@@ -91,15 +91,22 @@ import { handlePingCheckError } from "./pingErrorHandling";
  */
 export async function performSinglePingCheck(
     host: string,
-    timeout: number
+    timeout: number,
+    signal?: AbortSignal
 ): Promise<MonitorCheckResult> {
     try {
         // Determine check type based on host format
         const isHttpUrl = isValidUrl(host);
 
         // Use native connectivity check instead of ping package
-        return isHttpUrl
-            ? await checkHttpConnectivity(host, timeout)
+        if (isHttpUrl) {
+            return signal
+                ? await checkHttpConnectivity(host, timeout, signal)
+                : await checkHttpConnectivity(host, timeout);
+        }
+
+        return signal
+            ? await checkConnectivity(host, { retries: 0, timeout }, signal)
             : await checkConnectivity(host, { retries: 0, timeout });
     } catch (error) {
         const errorMessage = getUserFacingErrorDetail(error);
@@ -168,7 +175,8 @@ export async function performSinglePingCheck(
 export async function performPingCheckWithRetry(
     host: string,
     timeout: number,
-    maxRetries: number
+    maxRetries: number,
+    signal?: AbortSignal
 ): Promise<MonitorCheckResult> {
     const normalizedRetries =
         typeof maxRetries === "number" && Number.isFinite(maxRetries)
@@ -191,11 +199,15 @@ export async function performPingCheckWithRetry(
 
     try {
         return await withOperationalHooks(
-            async () => performSinglePingCheck(host, timeout),
+            async () =>
+                signal
+                    ? performSinglePingCheck(host, timeout, signal)
+                    : performSinglePingCheck(host, timeout),
             {
                 initialDelay: RETRY_BACKOFF.INITIAL_DELAY,
                 maxRetries: totalAttempts,
                 operationName: "connectivity-check",
+                ...(signal ? { signal } : {}),
             }
         );
     } catch (error) {

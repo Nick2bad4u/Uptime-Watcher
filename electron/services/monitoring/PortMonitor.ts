@@ -87,7 +87,8 @@ export class PortMonitor implements IMonitorService {
      * @throws {@link Error} When monitor type is not "port"
      */
     public async check(
-        monitor: Site["monitors"][0]
+        monitor: Site["monitors"][0],
+        signal?: AbortSignal
     ): Promise<MonitorCheckResult> {
         if (monitor.type !== "port") {
             throw new Error(
@@ -120,7 +121,8 @@ export class PortMonitor implements IMonitorService {
             host,
             monitor.port,
             timeout,
-            retryAttempts
+            retryAttempts,
+            signal
         );
     }
 

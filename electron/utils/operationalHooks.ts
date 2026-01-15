@@ -261,6 +261,16 @@ export interface OperationalHooksConfig<T = unknown> {
     operationName: string;
 
     /**
+     * Optional AbortSignal used to cancel retries and backoff delays.
+     *
+     * @remarks
+     * When provided, the hook loop will:
+     * - stop before starting a new attempt if the signal is already aborted
+     * - abort any pending retry delay window
+     */
+    signal?: AbortSignal;
+
+    /**
      * Whether to throw on final failure.
      *
      * @defaultValue true
@@ -477,7 +487,11 @@ async function handleRetry<T>(
     backoff: "exponential" | "linear" = "exponential",
     initialDelay: number = 100
 ): Promise<void> {
-    const { onRetry } = config;
+    const { onRetry, signal } = config;
+
+    if (signal?.aborted) {
+        throw new Error("Operation was aborted");
+    }
 
     if (onRetry) {
         try {
@@ -501,7 +515,7 @@ async function handleRetry<T>(
             }
         );
 
-        await sleep(delay);
+        await sleep(delay, signal);
     }
 }
 
@@ -580,6 +594,7 @@ export async function withOperationalHooks<T>(
         initialDelay = 100,
         maxRetries = 3,
         operationName,
+        signal,
         throwOnFailure = true,
     } = config;
 
@@ -595,6 +610,10 @@ export async function withOperationalHooks<T>(
     let lastError: Error | null = null;
 
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
+        if (signal?.aborted) {
+            throw new Error("Operation was aborted");
+        }
+
         try {
             /* V8 ignore next 2 */ logger.debug(
                 `[OperationalHooks] ${operationName} attempt ${attempt}/${maxRetries}`,

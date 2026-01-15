@@ -512,14 +512,23 @@ describe("AbortUtils Fuzzing Tests", () => {
                 controller.signal,
                 "addEventListener"
             );
+            const removeEventListenerSpy = vi.spyOn(
+                controller.signal,
+                "removeEventListener"
+            );
 
             const result = await raceWithAbort(operation, controller.signal);
 
             expect(result).toBe("result");
-            expect(addEventListenerSpy).toHaveBeenCalledWith(
+
+            expect(addEventListenerSpy).toHaveBeenCalledTimes(1);
+            const [eventType, handler] = addEventListenerSpy.mock.calls[0] ?? [];
+            expect(eventType).toBe("abort");
+            expect(handler).toEqual(expect.any(Function));
+
+            expect(removeEventListenerSpy).toHaveBeenCalledWith(
                 "abort",
-                expect.any(Function),
-                { once: true }
+                handler
             );
         });
     });

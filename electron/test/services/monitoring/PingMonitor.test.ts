@@ -201,7 +201,8 @@ describe(PingMonitor, () => {
             expect(mockPerformPingCheckWithRetry).toHaveBeenCalledWith(
                 "google.com",
                 5000,
-                2
+                2,
+                undefined,
             );
         });
 
@@ -279,7 +280,8 @@ describe(PingMonitor, () => {
             expect(mockPerformPingCheckWithRetry).toHaveBeenCalledWith(
                 "test.example.com",
                 8000,
-                5
+                5,
+                undefined,
             );
         });
 
@@ -304,7 +306,8 @@ describe(PingMonitor, () => {
                 expect(mockPerformPingCheckWithRetry).toHaveBeenCalledWith(
                     testCase.host,
                     expect.any(Number),
-                    expect.any(Number)
+                    expect.any(Number),
+                    undefined,
                 );
             }
         });
@@ -346,7 +349,8 @@ describe(PingMonitor, () => {
             expect(mockPerformPingCheckWithRetry).toHaveBeenCalledWith(
                 "example.com",
                 defaultConfig.timeout,
-                expect.any(Number)
+                expect.any(Number),
+                undefined,
             );
         });
 
@@ -369,7 +373,8 @@ describe(PingMonitor, () => {
             expect(mockPerformPingCheckWithRetry).toHaveBeenCalledWith(
                 "example.com",
                 expect.any(Number),
-                3 // DEFAULT_RETRY_ATTEMPTS
+                3, // DEFAULT_RETRY_ATTEMPTS
+                undefined,
             );
         });
     });

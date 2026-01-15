@@ -301,6 +301,14 @@ export class EnhancedMonitorChecker {
 
         // For manual checks, don't use operation correlation
         if (isManualCheck) {
+            // Manual checks can race with scheduled correlated checks.
+            // Cancel correlated operations to avoid overlapping writes.
+            this.config.operationRegistry.cancelOperations(monitorId);
+
+            // Ensure active operation IDs don't accumulate if a cancelled
+            // operation never settles.
+            await this.config.monitorRepository.clearActiveOperations(monitorId);
+
             return this.performDirectCheck(site, monitor, true, signal);
         }
 

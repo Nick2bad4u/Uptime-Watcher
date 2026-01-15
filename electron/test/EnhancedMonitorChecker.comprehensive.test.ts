@@ -82,6 +82,7 @@ describe(EnhancedMonitorChecker, () => {
                 findById: vi.fn(),
                 findBySiteId: vi.fn(),
                 findAll: vi.fn(),
+                clearActiveOperations: vi.fn().mockResolvedValue(undefined),
                 update: vi.fn().mockResolvedValue(undefined),
                 delete: vi.fn(),
                 deleteAll: vi.fn(),

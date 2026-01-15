@@ -93,6 +93,31 @@ describe("pingRetry utilities", () => {
         expect(result).toEqual(MOCK_RESULT);
     });
 
+    it("threads AbortSignal through checkHttpConnectivity", async () => {
+        const module =
+            await import("../../../../../../electron/services/monitoring/utils/pingRetry");
+        const { performSinglePingCheck } = module;
+
+        const controller = new AbortController();
+
+        const result = await performSinglePingCheck(
+            "https://api.example.com",
+            1000,
+            controller.signal
+        );
+
+        const connectivity = vi.mocked(
+            await import("../../../../../../electron/services/monitoring/utils/nativeConnectivity")
+        );
+
+        expect(connectivity.checkHttpConnectivity).toHaveBeenCalledWith(
+            "https://api.example.com",
+            1000,
+            controller.signal
+        );
+        expect(result).toEqual(MOCK_RESULT);
+    });
+
     it("routes non-HTTP hosts through checkConnectivity", async () => {
         const module =
             await import("../../../../../../electron/services/monitoring/utils/pingRetry");
@@ -112,6 +137,33 @@ describe("pingRetry utilities", () => {
             }
         );
         expect(connectivity.checkHttpConnectivity).not.toHaveBeenCalled();
+        expect(result).toEqual(MOCK_RESULT);
+    });
+
+    it("threads AbortSignal through checkConnectivity", async () => {
+        const module =
+            await import("../../../../../../electron/services/monitoring/utils/pingRetry");
+        const { performSinglePingCheck } = module;
+
+        const controller = new AbortController();
+        const result = await performSinglePingCheck(
+            "example.com",
+            2500,
+            controller.signal
+        );
+
+        const connectivity = vi.mocked(
+            await import("../../../../../../electron/services/monitoring/utils/nativeConnectivity")
+        );
+
+        expect(connectivity.checkConnectivity).toHaveBeenCalledWith(
+            "example.com",
+            {
+                retries: 0,
+                timeout: 2500,
+            },
+            controller.signal
+        );
         expect(result).toEqual(MOCK_RESULT);
     });
 

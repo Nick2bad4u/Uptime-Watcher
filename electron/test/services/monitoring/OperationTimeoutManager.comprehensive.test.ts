@@ -13,6 +13,7 @@ import type {
     MonitorCheckOperation,
     MonitorOperationRegistry,
 } from "../../../services/monitoring/MonitorOperationRegistry";
+import type { MonitorRepository } from "../../../services/database/MonitorRepository";
 
 // Mock the logger
 vi.mock("../../../utils/logger", () => {
@@ -52,6 +53,7 @@ vi.mock("@shared/utils/logTemplates", () => ({
 describe("OperationTimeoutManager - Comprehensive Coverage", () => {
     let operationTimeoutManager: OperationTimeoutManager;
     let mockOperationRegistry: MonitorOperationRegistry;
+    let mockMonitorRepository: MonitorRepository;
 
     beforeEach(() => {
         vi.clearAllMocks();
@@ -61,10 +63,16 @@ describe("OperationTimeoutManager - Comprehensive Coverage", () => {
         mockOperationRegistry = {
             getOperation: vi.fn(),
             cancelOperations: vi.fn(),
+            completeOperation: vi.fn(),
         } as unknown as MonitorOperationRegistry;
 
+        mockMonitorRepository = {
+            clearActiveOperations: vi.fn().mockResolvedValue(undefined),
+        } as unknown as MonitorRepository;
+
         operationTimeoutManager = new OperationTimeoutManager(
-            mockOperationRegistry
+            mockOperationRegistry,
+            mockMonitorRepository
         );
     });
 
@@ -287,6 +295,8 @@ describe("OperationTimeoutManager - Comprehensive Coverage", () => {
 
             // Fast-forward time to trigger timeout
             vi.advanceTimersByTime(1000);
+            await Promise.resolve();
+            await Promise.resolve();
 
             // Verify operation was retrieved
             expect(mockOperationRegistry.getOperation).toHaveBeenCalledWith(
@@ -303,6 +313,13 @@ describe("OperationTimeoutManager - Comprehensive Coverage", () => {
             // Verify operation was cancelled
             expect(mockOperationRegistry.cancelOperations).toHaveBeenCalledWith(
                 monitorId
+            );
+
+            expect(
+                vi.mocked(mockMonitorRepository.clearActiveOperations)
+            ).toHaveBeenCalledWith(monitorId);
+            expect(mockOperationRegistry.completeOperation).toHaveBeenCalledWith(
+                operationId
             );
         });
 
@@ -338,6 +355,8 @@ describe("OperationTimeoutManager - Comprehensive Coverage", () => {
 
             // Fast-forward time to trigger timeout
             vi.advanceTimersByTime(1000);
+            await Promise.resolve();
+            await Promise.resolve();
 
             // Verify operation was retrieved
             expect(mockOperationRegistry.getOperation).toHaveBeenCalledWith(
@@ -348,6 +367,14 @@ describe("OperationTimeoutManager - Comprehensive Coverage", () => {
             expect(
                 mockOperationRegistry.cancelOperations
             ).not.toHaveBeenCalled();
+
+            // Still cleans up registry + persistent state.
+            expect(
+                vi.mocked(mockMonitorRepository.clearActiveOperations)
+            ).toHaveBeenCalledWith(monitorId);
+            expect(mockOperationRegistry.completeOperation).toHaveBeenCalledWith(
+                operationId
+            );
         });
 
         it("should handle timeout for non-existent operation", async ({
@@ -371,6 +398,8 @@ describe("OperationTimeoutManager - Comprehensive Coverage", () => {
 
             // Fast-forward time to trigger timeout
             vi.advanceTimersByTime(1000);
+            await Promise.resolve();
+            await Promise.resolve();
 
             // Verify operation was retrieved
             expect(mockOperationRegistry.getOperation).toHaveBeenCalledWith(
@@ -381,6 +410,11 @@ describe("OperationTimeoutManager - Comprehensive Coverage", () => {
             expect(
                 mockOperationRegistry.cancelOperations
             ).not.toHaveBeenCalled();
+
+            expect(
+                vi.mocked(mockMonitorRepository.clearActiveOperations)
+            ).not.toHaveBeenCalled();
+            expect(mockOperationRegistry.completeOperation).not.toHaveBeenCalled();
         });
 
         it("should clear timeout after handling timeout", async ({
@@ -414,6 +448,8 @@ describe("OperationTimeoutManager - Comprehensive Coverage", () => {
 
             // Fast-forward time to trigger timeout
             vi.advanceTimersByTime(1000);
+            await Promise.resolve();
+            await Promise.resolve();
 
             // Verify timeout was cleared after handling
             expect(vi.getTimerCount()).toBe(0);

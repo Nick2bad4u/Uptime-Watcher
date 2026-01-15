@@ -231,6 +231,7 @@ export function createHttpMonitorService<
                         initialDelay: RETRY_BACKOFF.INITIAL_DELAY,
                         maxRetries: totalAttempts,
                         operationName,
+                        ...(signal ? { signal } : {}),
                         ...(isDev() && {
                             onRetry: (attempt: number, error: Error): void => {
                                 const errorMessage =

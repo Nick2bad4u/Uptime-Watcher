@@ -15,6 +15,7 @@
  * @see {@link handlePortCheckError}
  */
 
+import { isAbortError } from "@shared/utils/abortUtils";
 import { getUnknownErrorMessage } from "@shared/utils/errorCatalog";
 
 import { isDev } from "../../../electronUtils";
@@ -173,6 +174,21 @@ export function handlePortCheckError(
     host: string,
     port: number
 ): PortCheckErrorResult {
+    if (isAbortError(error)) {
+        if (isDev()) {
+            logger.debug(
+                `[PortMonitor] Port check cancelled for ${host}:${port}`
+            );
+        }
+
+        return {
+            details: String(port),
+            error: "Operation was aborted",
+            responseTime: 0,
+            status: "down",
+        };
+    }
+
     const errorMessage = getUnknownErrorMessage(error);
     // Extract response time from custom error if available, use -1 for unknown
     // timing

@@ -87,6 +87,7 @@ describe(MonitorStatusUpdateService, () => {
     let mockOperationRegistry: any;
     let mockMonitorRepository: any;
     let mockSitesCache: any;
+    let mockTimeoutManager: any;
 
     beforeEach(() => {
         // Reset all mocks
@@ -109,10 +110,15 @@ describe(MonitorStatusUpdateService, () => {
             get: vi.fn(),
         };
 
+        mockTimeoutManager = {
+            clearTimeout: vi.fn(),
+        };
+
         service = new MonitorStatusUpdateService(
             mockOperationRegistry,
             mockMonitorRepository,
-            mockSitesCache
+            mockSitesCache,
+            mockTimeoutManager
         );
     });
 
@@ -184,6 +190,9 @@ describe(MonitorStatusUpdateService, () => {
             expect(
                 mockOperationRegistry.completeOperation
             ).toHaveBeenCalledWith("op-123");
+            expect(mockTimeoutManager.clearTimeout).toHaveBeenCalledWith(
+                "op-123"
+            );
         });
 
         it("should return false when operation is invalid", async ({
@@ -201,6 +210,10 @@ describe(MonitorStatusUpdateService, () => {
             // Arrange
             const testResult = createTestResult();
             mockOperationRegistry.validateOperation.mockReturnValue(false);
+            const testMonitor = createTestMonitor();
+            mockMonitorRepository.findByIdentifier.mockResolvedValue(
+                testMonitor
+            );
 
             // Act
             const result = await service.updateMonitorStatus(testResult);
@@ -210,9 +223,18 @@ describe(MonitorStatusUpdateService, () => {
             expect(
                 mockOperationRegistry.validateOperation
             ).toHaveBeenCalledWith("op-123");
-            expect(
-                mockMonitorRepository.findByIdentifier
-            ).not.toHaveBeenCalled();
+            expect(mockMonitorRepository.findByIdentifier).toHaveBeenCalledWith(
+                "test-monitor-1"
+            );
+            expect(mockMonitorRepository.update).toHaveBeenCalledWith(
+                "test-monitor-1",
+                expect.objectContaining({
+                    activeOperations: [],
+                })
+            );
+            expect(mockTimeoutManager.clearTimeout).toHaveBeenCalledWith(
+                "op-123"
+            );
         });
 
         it("should return false when monitor is not found", async ({
@@ -240,6 +262,9 @@ describe(MonitorStatusUpdateService, () => {
             expect(
                 mockOperationRegistry.completeOperation
             ).toHaveBeenCalledWith("op-123");
+            expect(mockTimeoutManager.clearTimeout).toHaveBeenCalledWith(
+                "op-123"
+            );
         });
 
         it("should return false when monitor is not actively monitoring", async ({
@@ -270,6 +295,15 @@ describe(MonitorStatusUpdateService, () => {
             expect(
                 mockOperationRegistry.completeOperation
             ).toHaveBeenCalledWith("op-123");
+            expect(mockMonitorRepository.update).toHaveBeenCalledWith(
+                "test-monitor-1",
+                expect.objectContaining({
+                    activeOperations: [],
+                })
+            );
+            expect(mockTimeoutManager.clearTimeout).toHaveBeenCalledWith(
+                "op-123"
+            );
         });
 
         it("should handle 'down' status correctly", async ({
@@ -385,6 +419,9 @@ describe(MonitorStatusUpdateService, () => {
             expect(
                 mockOperationRegistry.completeOperation
             ).toHaveBeenCalledWith("op-123");
+            expect(mockTimeoutManager.clearTimeout).toHaveBeenCalledWith(
+                "op-123"
+            );
         });
 
         it("should handle site not found in cache", async ({

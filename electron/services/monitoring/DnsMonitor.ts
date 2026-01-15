@@ -44,6 +44,7 @@
 
 import type { MonitorType, Site } from "@shared/types";
 
+import { raceWithAbort, sleepUnref } from "@shared/utils/abortUtils";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import {
     resolve4,
@@ -164,7 +165,8 @@ export class DnsMonitor implements IMonitorService {
      * @see {@link performDnsCheckWithRetry} - Core DNS functionality
      */
     public async check(
-        monitor: Site["monitors"][0]
+        monitor: Site["monitors"][0],
+        signal?: AbortSignal
     ): Promise<MonitorCheckResult> {
         if (monitor.type !== "dns") {
             throw new Error(
@@ -195,7 +197,8 @@ export class DnsMonitor implements IMonitorService {
             monitor.recordType,
             monitor.expectedValue,
             timeout,
-            retryAttempts
+            retryAttempts,
+            signal
         );
     }
 
@@ -222,7 +225,8 @@ export class DnsMonitor implements IMonitorService {
         recordType: string,
         expectedValue: string | undefined,
         timeout: number,
-        retryAttempts: number
+        retryAttempts: number,
+        signal?: AbortSignal
     ): Promise<MonitorCheckResult> {
         const startTime = performance.now();
 
@@ -231,11 +235,22 @@ export class DnsMonitor implements IMonitorService {
             attemptNumber: number
         ): Promise<MonitorCheckResult> => {
             try {
+                if (signal?.aborted) {
+                    const responseTime = performance.now() - startTime;
+                    return {
+                        details: "DNS check cancelled",
+                        error: "Operation was aborted",
+                        responseTime: Math.round(responseTime),
+                        status: "down",
+                    };
+                }
+
                 const result = await this.performSingleDnsCheck(
                     host,
                     recordType,
                     expectedValue,
-                    timeout
+                    timeout,
+                    signal
                 );
 
                 const responseTime = performance.now() - startTime;
@@ -246,18 +261,19 @@ export class DnsMonitor implements IMonitorService {
                     status: result.success ? "up" : "down",
                 };
             } catch (error) {
+                if (signal?.aborted) {
+                    const responseTime = performance.now() - startTime;
+                    return {
+                        details: "DNS check cancelled",
+                        error: "Operation was aborted",
+                        responseTime: Math.round(responseTime),
+                        status: "down",
+                    };
+                }
+
                 // If we have retries left, wait and try again
                 if (attemptNumber < retryAttempts) {
-                    await new Promise<void>((resolve) => {
-                        // Timer will complete when Promise resolves, cleanup not needed
-                        // eslint-disable-next-line clean-timer/assign-timer-id -- Timer completes with Promise resolution
-                        setTimeout(
-                            () => {
-                                resolve();
-                            },
-                            2 ** attemptNumber * 1000
-                        );
-                    });
+                    await sleepUnref(2 ** attemptNumber * 1000, signal);
                     return attemptDnsCheck(attemptNumber + 1);
                 }
 
@@ -295,7 +311,8 @@ export class DnsMonitor implements IMonitorService {
         host: string,
         recordType: string,
         expectedValue: string | undefined,
-        timeout: number
+        timeout: number,
+        signal?: AbortSignal
     ): Promise<{ details?: string; error?: string; success: boolean }> {
         // Create timeout promise with cleanup capability
         let timeoutId: NodeJS.Timeout | undefined = undefined;
@@ -317,8 +334,14 @@ export class DnsMonitor implements IMonitorService {
                 };
             }
 
-            // Race between DNS resolution and timeout
-            const result = await Promise.race([resolvePromise, timeoutPromise]);
+            const operationPromise = Promise.race([
+                resolvePromise,
+                timeoutPromise,
+            ]);
+
+            const result = signal
+                ? await raceWithAbort(operationPromise, signal)
+                : await operationPromise;
 
             // Clear timeout since operation completed successfully
             clearTimeout(timeoutId);

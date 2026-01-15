@@ -12,6 +12,7 @@
  * @see {@link handlePingCheckError}
  */
 
+import { isAbortError } from "@shared/utils/abortUtils";
 import { ensureError } from "@shared/utils/errorHandling";
 
 import type { MonitorCheckResult } from "../types";
@@ -56,6 +57,16 @@ export function handlePingCheckError(
 ): MonitorCheckResult {
     const normalizedError = ensureError(error);
     const errorMessage = normalizedError.message;
+
+    if (isAbortError(normalizedError)) {
+        logger.warn("Ping check cancelled", normalizedError, context);
+        return {
+            details: "Ping cancelled",
+            error: "Operation was aborted",
+            responseTime: 0,
+            status: "down",
+        };
+    }
 
     logger.error("Ping check failed", normalizedError, context);
 

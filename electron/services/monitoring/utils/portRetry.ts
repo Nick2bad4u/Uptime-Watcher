@@ -81,7 +81,8 @@ export async function performPortCheckWithRetry(
     host: string,
     port: number,
     timeout: number,
-    maxRetries: number
+    maxRetries: number,
+    signal?: AbortSignal
 ): Promise<MonitorCheckResult> {
     try {
         // Convert "additional retries" to "total attempts" for
@@ -110,8 +111,14 @@ export async function performPortCheckWithRetry(
             : baseConfig;
 
         return await withOperationalHooks(
-            () => performSinglePortCheck(host, port, timeout),
-            config
+            () =>
+                signal
+                    ? performSinglePortCheck(host, port, timeout, signal)
+                    : performSinglePortCheck(host, port, timeout),
+            {
+                ...config,
+                ...(signal ? { signal } : {}),
+            }
         );
     } catch (error) {
         // Standardize error result for frontend consumption

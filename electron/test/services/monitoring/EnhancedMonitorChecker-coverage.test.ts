@@ -38,6 +38,7 @@ describe("EnhancedMonitorChecker Coverage Tests", () => {
 
         mockMonitorRepository = {
             update: vi.fn().mockResolvedValue(true),
+            clearActiveOperations: vi.fn().mockResolvedValue(undefined),
             findByIdentifier: vi.fn().mockResolvedValue({
                 id: "monitor-1",
                 type: "http",
@@ -199,6 +200,12 @@ describe("EnhancedMonitorChecker Coverage Tests", () => {
             expect(result).toBeDefined();
             expect(result?.status).toBe("up");
             expect(result?.monitorId).toBe("monitor-1");
+            expect(mockOperationRegistry.cancelOperations).toHaveBeenCalledWith(
+                "monitor-1"
+            );
+            expect(
+                mockMonitorRepository.clearActiveOperations
+            ).toHaveBeenCalledWith("monitor-1");
             expect(mockMonitorRepository.update).toHaveBeenCalled();
         });
 

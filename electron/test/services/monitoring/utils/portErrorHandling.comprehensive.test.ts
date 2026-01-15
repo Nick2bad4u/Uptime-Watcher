@@ -368,6 +368,24 @@ describe("Port Error Handling", () => {
         });
 
         describe("Standard Error input", () => {
+            it("should normalize cancellation errors", async ({ task, annotate }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: portErrorHandling", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Error Handling", "type");
+
+                const error = new Error("Operation was aborted");
+
+                const result = handlePortCheckError(error, "example.com", 443);
+
+                expect(result).toEqual({
+                    details: "443",
+                    error: "Operation was aborted",
+                    responseTime: 0,
+                    status: "down",
+                });
+            });
+
             it("should handle standard Error with -1 response time", async ({
                 task,
                 annotate,

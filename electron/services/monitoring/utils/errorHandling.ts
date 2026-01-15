@@ -135,6 +135,14 @@ export function isCancellationError(
         return true;
     }
 
+    // Some internal helpers (e.g. abort-aware sleep/race) reject with generic
+    // Error instances but include standardized abort language in the message.
+    // Treat those as cancellations to avoid noisy error logs + retries.
+    const messageLower = error.message.toLowerCase();
+    if (messageLower.includes("aborted") || messageLower.includes("cancelled")) {
+        return true;
+    }
+
     if (axios.isAxiosError(error)) {
         const axiosCode = normalizeErrorCode(error);
         if (axiosCode && CANCELLATION_ERROR_CODES.has(axiosCode)) {
