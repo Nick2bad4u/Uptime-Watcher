@@ -226,7 +226,6 @@ import globals from "globals";
 import jsoncEslintParser from "jsonc-eslint-parser";
 import { createRequire } from "node:module";
 import * as path from "node:path";
-// @ts-expect-error -- No Types for this Package
 import * as tomlEslintParser from "toml-eslint-parser";
 import yamlEslintParser from "yaml-eslint-parser";
 
@@ -870,33 +869,6 @@ export default /** @type {EslintConfig} */[
             // React rules for MDX components
             "react/react-in-jsx-scope": "off",
         },
-        settings: {
-            processor: mdx.createRemarkProcessor( {
-                // Enable remark configuration file (.remarkrc.js) for comprehensive linting
-                ignoreRemarkConfig: false,
-                // Language mapper for code blocks
-                languageMapper: {
-                    // Map file extensions to languages for better code block processing
-                    cjs: "javascript",
-                    cts: "typescript",
-                    js: "javascript",
-                    json: "json",
-                    jsx: "javascript",
-                    md: "markdown",
-                    mdx: "mdx",
-                    mjs: "javascript",
-                    mts: "typescript",
-                    ts: "typescript",
-                    tsx: "typescript",
-                    yaml: "yaml",
-                    yml: "yaml",
-                },
-                // Enable code block linting within MDX
-                lintCodeBlocks: true,
-                // Path to remark config (optional, will auto-discover .remarkrc.js)
-                remarkConfigPath: ".remarkrc.mjs",
-            } ),
-        },
     },
     // ═══════════════════════════════════════════════════════════════════════════════
     // MARK: MDX CodeBlocks
@@ -1015,12 +987,6 @@ export default /** @type {EslintConfig} */[
         ],
         ignores: [],
         name: "JSONC - **/*.JSONC",
-        plugins: {
-            eslintPluginJsonc: eslintPluginJsonc,
-            json: json,
-            ...jsonSchemaValidatorPlugins,
-            "no-secrets": noSecrets,
-        },
         // ═══════════════════════════════════════════════════════════════════════════════
         // Plugin Config for eslint-plugin-jsonc to enable Prettier formatting
         // ═══════════════════════════════════════════════════════════════════════════════
@@ -1029,6 +995,12 @@ export default /** @type {EslintConfig} */[
         languageOptions: {
             parser: jsoncEslintParser,
             parserOptions: { jsonSyntax: "JSON" },
+        },
+        plugins: {
+            json: json,
+            jsonc: eslintPluginJsonc,
+            ...jsonSchemaValidatorPlugins,
+            "no-secrets": noSecrets,
         },
         rules: {
             ...json.configs.recommended.rules,
