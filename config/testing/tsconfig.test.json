@@ -20,7 +20,7 @@
             ]
         },
         "rootDir": "../..",
-        "tsBuildInfoFile": "../../.cache/tsconfig.test.tsbuildinfo"
+        "tsBuildInfoFile": "../../.cache/tsbuildinfo/tsconfig.test.tsbuildinfo"
     },
     "exclude": [
         "../../electron/**/*.test.ts",
