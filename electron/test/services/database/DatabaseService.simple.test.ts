@@ -111,6 +111,80 @@ describe("DatabaseService Coverage Tests", () => {
         expect(instance1).toBeDefined();
     });
 
+    it("should apply connection pragmas on initialize", async ({
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "unit");
+        await annotate("Component: DatabaseService", "component");
+        await annotate("Feature: Pragmas", "feature");
+
+        vi.resetModules();
+
+        const { DatabaseService } =
+            await import("../../../services/database/DatabaseService");
+
+        const service = DatabaseService.getInstance();
+        await service.initialize();
+
+        const { Database } = await import("node-sqlite3-wasm");
+        const dbInstance = vi.mocked(Database).mock.results.at(-1)?.value as
+            | {
+                    get: ReturnType<typeof vi.fn>;
+                    run: ReturnType<typeof vi.fn>;
+              }
+            | undefined;
+
+        expect(dbInstance).toBeDefined();
+        expect(dbInstance?.run).toHaveBeenCalledWith(
+            "PRAGMA busy_timeout = 5000"
+        );
+        expect(dbInstance?.get).toHaveBeenCalledWith(
+            "PRAGMA journal_mode = WAL"
+        );
+        expect(dbInstance?.get).toHaveBeenCalledWith(
+            "PRAGMA synchronous = NORMAL"
+        );
+        expect(dbInstance?.get).toHaveBeenCalledWith(
+            "PRAGMA temp_store = MEMORY"
+        );
+        expect(dbInstance?.run).toHaveBeenCalledWith("PRAGMA foreign_keys = ON");
+    });
+
+    it("should attempt WAL checkpoint and optimize on close", async ({
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "unit");
+        await annotate("Component: DatabaseService", "component");
+        await annotate("Feature: Shutdown", "feature");
+
+        vi.resetModules();
+
+        const { DatabaseService } =
+            await import("../../../services/database/DatabaseService");
+
+        const service = DatabaseService.getInstance();
+        await service.initialize();
+
+        const { Database } = await import("node-sqlite3-wasm");
+        const dbInstance = vi.mocked(Database).mock.results.at(-1)?.value as
+            | {
+                    close: ReturnType<typeof vi.fn>;
+                    get: ReturnType<typeof vi.fn>;
+              }
+            | undefined;
+
+        service.close();
+
+        expect(dbInstance).toBeDefined();
+        expect(dbInstance?.get).toHaveBeenCalledWith(
+            "PRAGMA wal_checkpoint(TRUNCATE)"
+        );
+        expect(dbInstance?.get).toHaveBeenCalledWith("PRAGMA optimize");
+        expect(dbInstance?.close).toHaveBeenCalled();
+    });
+
     it("should handle initialization", async ({ task, annotate }) => {
         // Add test metadata
         await annotate(`Testing: ${task.name}`, "integration");
@@ -188,6 +262,62 @@ describe("DatabaseService Coverage Tests", () => {
         } catch (error) {
             // Transaction might fail in test environment
             expect(error).toBeInstanceOf(Error);
+        }
+    });
+
+    it("should retry top-level transactions when SQLite is busy", async ({
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "unit");
+        await annotate("Component: DatabaseService", "component");
+        await annotate("Feature: Transaction retry", "feature");
+
+        vi.useFakeTimers();
+
+        try {
+            vi.resetModules();
+
+            const { DatabaseService } =
+                await import("../../../services/database/DatabaseService");
+
+            const instance = DatabaseService.getInstance();
+            await instance.initialize();
+
+            const { Database } = await import("node-sqlite3-wasm");
+            const dbInstance = vi.mocked(Database).mock.results.at(-1)?.value as
+                | {
+                        run: ReturnType<typeof vi.fn>;
+                  }
+                | undefined;
+
+            expect(dbInstance).toBeDefined();
+
+            let beginCalls = 0;
+            dbInstance!.run.mockImplementation((sql: string) => {
+                if (sql === "BEGIN TRANSACTION") {
+                    beginCalls += 1;
+                    if (beginCalls === 1) {
+                        throw Object.assign(
+                            new Error("SQLITE_BUSY: database is locked"),
+                            { code: "SQLITE_BUSY" }
+                        );
+                    }
+                }
+
+                return undefined;
+            });
+
+            const operation = vi.fn().mockResolvedValue("ok");
+            const promise = instance.executeTransaction(operation);
+
+            await vi.advanceTimersByTimeAsync(5000);
+
+            await expect(promise).resolves.toBe("ok");
+            expect(operation).toHaveBeenCalledTimes(1);
+            expect(beginCalls).toBe(2);
+        } finally {
+            vi.useRealTimers();
         }
     });
     it("should handle cleanup operations", async () => {

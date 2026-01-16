@@ -967,11 +967,7 @@ describe("History Manipulation Utilities", () => {
             await annotate("Priority: High", "priority");
 
             // Arrange
-            const excessEntries = [
-                { id: 10 },
-                { id: 11 },
-                { id: 12 },
-            ];
+                const excessEntries = [{ id: 10 }];
             mockDb.all = vi.fn().mockReturnValue(excessEntries);
             mockDb.run = vi.fn();
             mockIsDev.mockReturnValue(false);
@@ -981,17 +977,13 @@ describe("History Manipulation Utilities", () => {
 
             // Assert
             expect(mockDb.all).toHaveBeenCalledWith(
-                "SELECT id FROM history WHERE monitor_id = ? ORDER BY timestamp DESC LIMIT -1 OFFSET ?",
+                    "SELECT id FROM history WHERE monitor_id = ? ORDER BY timestamp DESC LIMIT 1 OFFSET ?",
                 [monitorId, 5]
             );
 
             expect(mockDb.run).toHaveBeenCalledWith(
-                "DELETE FROM history WHERE id IN (?,?,?)",
-                [
-                    10,
-                    11,
-                    12,
-                ]
+                    "DELETE FROM history WHERE id IN (SELECT id FROM history WHERE monitor_id = ? ORDER BY timestamp DESC LIMIT -1 OFFSET ?)",
+                    [monitorId, 5]
             );
         });
 
@@ -1009,72 +1001,28 @@ describe("History Manipulation Utilities", () => {
 
             // Assert
             expect(mockDb.all).toHaveBeenCalledWith(
-                "SELECT id FROM history WHERE monitor_id = ? ORDER BY timestamp DESC LIMIT -1 OFFSET ?",
+                "SELECT id FROM history WHERE monitor_id = ? ORDER BY timestamp DESC LIMIT 1 OFFSET ?",
                 [monitorId, 10]
             );
             expect(mockDb.run).not.toHaveBeenCalled();
         });
 
-        it("should filter out invalid IDs", async ({ task, annotate }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: historyManipulation", "component");
-            await annotate("Function: pruneHistoryForMonitor", "function");
-            await annotate("Edge case: Invalid IDs", "edge-case");
-
-            // Arrange
-            const entriesWithInvalidIds = [
-                { id: 1 },
-                { id: null },
-                { id: undefined },
-                { id: 0 },
-                { id: -1 },
-                { id: 5.5 },
-                { id: Infinity },
-                { id: Number.NaN },
-                { id: 3 },
-            ];
-            mockDb.all = vi.fn().mockReturnValue(entriesWithInvalidIds);
-            mockDb.run = vi.fn();
-
-            // Act
-            pruneHistoryForMonitor(mockDb, monitorId, 5);
-
-            // Assert - should only include valid positive finite integers
-            expect(mockDb.run).toHaveBeenCalledWith(
-                "DELETE FROM history WHERE id IN (?,?,?)",
-                [
-                    1,
-                    5.5,
-                    3,
-                ] // 5.5 would be included as it's finite, but 0, negative, null, undefined, Infinity, NaN are filtered out
-            );
-        });
-
-        it("should handle all invalid IDs gracefully", async ({
+        it("should handle malformed probe rows by skipping delete", async ({
             task,
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: historyManipulation", "component");
             await annotate("Function: pruneHistoryForMonitor", "function");
-            await annotate("Edge case: All invalid IDs", "edge-case");
+            await annotate("Edge case: Malformed probe row", "edge-case");
 
             // Arrange
-            const entriesWithAllInvalidIds = [
-                { id: null },
-                { id: undefined },
-                { id: 0 },
-                { id: -1 },
-                { id: Infinity },
-                { id: Number.NaN },
-            ];
-            mockDb.all = vi.fn().mockReturnValue(entriesWithAllInvalidIds);
+            mockDb.all = vi.fn().mockReturnValue([{ notId: 123 }]);
+            mockDb.run = vi.fn();
 
             // Act
             pruneHistoryForMonitor(mockDb, monitorId, 5);
 
-            // Assert - should not make delete call when no valid IDs
-            expect(mockDb.all).toHaveBeenCalled();
             expect(mockDb.run).not.toHaveBeenCalled();
         });
 
@@ -1088,7 +1036,7 @@ describe("History Manipulation Utilities", () => {
             await annotate("Feature: Debug logging", "feature");
 
             // Arrange
-            const excessEntries = [{ id: 1 }, { id: 2 }];
+            const excessEntries = [{ id: 1 }];
             mockDb.all = vi.fn().mockReturnValue(excessEntries);
             mockDb.run = vi.fn();
             mockIsDev.mockReturnValue(true);
@@ -1098,7 +1046,7 @@ describe("History Manipulation Utilities", () => {
 
             // Assert
             expect(mockLogger.debug).toHaveBeenCalledWith(
-                "[HistoryManipulation] Pruned 2 old history entries for monitor: test-monitor-123"
+                `[HistoryManipulation] Pruned history entries for monitor: ${monitorId} (limit: 5)`
             );
         });
 
@@ -1182,7 +1130,7 @@ describe("History Manipulation Utilities", () => {
                         expect(mockDb.run).not.toHaveBeenCalled();
                     } else {
                         expect(mockDb.all).toHaveBeenCalledWith(
-                            "SELECT id FROM history WHERE monitor_id = ? ORDER BY timestamp DESC LIMIT -1 OFFSET ?",
+                            "SELECT id FROM history WHERE monitor_id = ? ORDER BY timestamp DESC LIMIT 1 OFFSET ?",
                             [testMonitorId, limit]
                         );
                     }
@@ -1215,25 +1163,27 @@ describe("History Manipulation Utilities", () => {
                     mockDb.run = vi.fn();
                     mockIsDev.mockReturnValue(false);
 
-                    // Calculate expected valid IDs
-                    const validIds = historyEntries
-                        .map((entry) => entry.id)
-                        .filter(
-                            (id) =>
-                                typeof id === "number" &&
-                                Number.isFinite(id) &&
-                                id > 0
+                    const hasAnyValidId = historyEntries.some((entry) => {
+                        const id = (entry as { id?: unknown }).id;
+                        return (
+                            (typeof id === "number" && Number.isFinite(id)) ||
+                            (typeof id === "string" && id.length > 0)
                         );
+                    });
 
                     // Act
                     pruneHistoryForMonitor(mockDb, testMonitorId, limit);
 
                     // Assert
-                    if (validIds.length > 0) {
-                        const placeholders = validIds.map(() => "?").join(",");
+                    expect(mockDb.all).toHaveBeenCalledWith(
+                        "SELECT id FROM history WHERE monitor_id = ? ORDER BY timestamp DESC LIMIT 1 OFFSET ?",
+                        [testMonitorId, limit]
+                    );
+
+                    if (hasAnyValidId) {
                         expect(mockDb.run).toHaveBeenCalledWith(
-                            `DELETE FROM history WHERE id IN (${placeholders})`,
-                            validIds
+                            "DELETE FROM history WHERE id IN (SELECT id FROM history WHERE monitor_id = ? ORDER BY timestamp DESC LIMIT -1 OFFSET ?)",
+                            [testMonitorId, limit]
                         );
                     } else {
                         // No valid IDs should mean no delete call
@@ -1266,7 +1216,7 @@ describe("History Manipulation Utilities", () => {
                     // Assert
                     if (isDevEnvironment) {
                         expect(mockLogger.debug).toHaveBeenCalledWith(
-                            `[HistoryManipulation] Pruned ${validEntries.length} old history entries for monitor: ${testMonitorId}`
+                            `[HistoryManipulation] Pruned history entries for monitor: ${testMonitorId} (limit: ${limit})`
                         );
                     } else {
                         expect(mockLogger.debug).not.toHaveBeenCalled();
@@ -1359,7 +1309,7 @@ describe("History Manipulation Utilities", () => {
 
                     // Assert
                     expect(mockDb.all).toHaveBeenCalledWith(
-                        "SELECT id FROM history WHERE monitor_id = ? ORDER BY timestamp DESC LIMIT -1 OFFSET ?",
+                        "SELECT id FROM history WHERE monitor_id = ? ORDER BY timestamp DESC LIMIT 1 OFFSET ?",
                         [testMonitorId, largeLimit]
                     );
 

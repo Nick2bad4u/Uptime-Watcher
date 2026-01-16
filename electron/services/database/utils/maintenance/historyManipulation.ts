@@ -24,31 +24,30 @@ import { queryForIds } from "../queries/typedQueries";
 /**
  * Common SQL queries for history manipulation operations.
  *
- * @remarks
- * Centralizes query strings for maintainability and consistency. This constant
- * is internal to the utility module and not exported.
- *
  * @internal
  */
 const HISTORY_MANIPULATION_QUERIES = {
     DELETE_ALL: "DELETE FROM history",
-    DELETE_BY_IDS: "DELETE FROM history WHERE id IN",
     DELETE_BY_MONITOR: "DELETE FROM history WHERE monitor_id = ?",
+    // Avoid building huge IN (...) lists (which can hit SQLite's
+    // SQLITE_MAX_VARIABLE_NUMBER limit). This deletes all rows beyond the
+    // newest `limit` entries for the monitor.
+    DELETE_EXCESS_ENTRIES:
+        "DELETE FROM history WHERE id IN (SELECT id FROM history WHERE monitor_id = ? ORDER BY timestamp DESC LIMIT -1 OFFSET ?)",
     INSERT_ENTRY:
         "INSERT INTO history (monitor_id, timestamp, status, responseTime, details) VALUES (?, ?, ?, ?, ?)",
+
+    // Cheap probe to determine whether any rows exist beyond the newest `limit`.
     SELECT_EXCESS_ENTRIES:
-        "SELECT id FROM history WHERE monitor_id = ? ORDER BY timestamp DESC LIMIT -1 OFFSET ?",
+        "SELECT id FROM history WHERE monitor_id = ? ORDER BY timestamp DESC LIMIT 1 OFFSET ?",
 } as const;
 
 /**
  * Add a new history entry for a monitor.
  *
  * @remarks
- * **Transaction Context**: This utility function is designed to be called from
- * repository methods that manage transaction context and error handling.
- *
- * **Usage Pattern**: Always called from HistoryRepository.addEntryInternal()
- * within an existing transaction context for proper atomicity.
+ * Designed to be called from repository methods that manage transaction
+ * context and error handling.
  *
  * @param db - Database connection instance
  * @param monitorId - Unique identifier of the monitor
@@ -71,7 +70,6 @@ export function addHistoryEntry(
             entry.timestamp,
             entry.status,
             entry.responseTime,
-
             details ?? null,
         ]);
 
@@ -98,20 +96,12 @@ export function addHistoryEntry(
  * Bulk insert history entries (for import functionality).
  *
  * @remarks
- * **Transaction Context**: Assumes it's called within an existing transaction
- * context. Uses a prepared statement for better performance during bulk
- * operations.
- *
- * **Performance**: Optimized for large datasets with prepared statement reuse.
- * The statement is properly finalized in the finally block to prevent resource
- * leaks.
- *
- * **Status Validation**: StatusHistory.status can be "up", "down", or
- * "degraded" per domain contract.
+ * Assumes it's called within an existing transaction context. Uses a prepared
+ * statement for better performance during bulk operations.
  *
  * @param db - Database connection instance
  * @param monitorId - Unique identifier of the monitor
- * @param historyEntries - Array of StatusHistory objects with optional details
+ * @param historyEntries - Array of StatusHistory objects
  *
  * @throws {@link Error} When database bulk insertion fails
  *
@@ -135,20 +125,17 @@ export function bulkInsertHistory(
                 stmt.run([
                     monitorId,
                     entry.timestamp,
-                    entry.status, // StatusHistory.status can be "up", "down", or "degraded" per domain contract
+                    entry.status,
                     entry.responseTime,
                     entry.details ?? null,
                 ]);
             }
 
             logger.info(
-                interpolateLogTemplate(
-                    LOG_TEMPLATES.services.HISTORY_BULK_INSERT,
-                    {
-                        count: historyEntries.length,
-                        monitorId,
-                    }
-                )
+                interpolateLogTemplate(LOG_TEMPLATES.services.HISTORY_BULK_INSERT, {
+                    count: historyEntries.length,
+                    monitorId,
+                })
             );
         } finally {
             stmt.finalize();
@@ -169,11 +156,7 @@ export function bulkInsertHistory(
  * Clear all history from the database.
  *
  * @remarks
- * **WARNING**: This operation is destructive and irreversible.
- *
- * **Transaction Context**: Designed to be called from repository methods that
- * manage transaction context. Always used within
- * HistoryRepository.deleteAllInternal().
+ * WARNING: This operation is destructive and irreversible.
  *
  * @param db - Database connection instance
  *
@@ -188,21 +171,13 @@ export function deleteAllHistory(db: Database): void {
             logger.debug("[HistoryManipulation] Cleared all history");
         }
     } catch (error) {
-        logger.error(
-            "[HistoryManipulation] Failed to clear all history",
-            error
-        );
+        logger.error("[HistoryManipulation] Failed to clear all history", error);
         throw error;
     }
 }
 
 /**
  * Delete history entries for a specific monitor.
- *
- * @remarks
- * **Transaction Context**: Designed to be called from repository methods that
- * manage transaction context. Used within
- * HistoryRepository.deleteByMonitorIdInternal().
  *
  * @param db - Database connection instance
  * @param monitorId - Unique identifier of the monitor
@@ -211,10 +186,7 @@ export function deleteAllHistory(db: Database): void {
  *
  * @internal
  */
-export function deleteHistoryByMonitorId(
-    db: Database,
-    monitorId: string
-): void {
+export function deleteHistoryByMonitorId(db: Database, monitorId: string): void {
     try {
         db.run(HISTORY_MANIPULATION_QUERIES.DELETE_BY_MONITOR, [monitorId]);
         if (isDev()) {
@@ -238,16 +210,12 @@ export function deleteHistoryByMonitorId(
  * entries.
  *
  * @remarks
- * **Algorithm**: Uses `LIMIT -1 OFFSET ?` to select all entries beyond the most
- * recent `limit` entries. In SQLite, `LIMIT -1` means "no limit", and combined
- * with `OFFSET`, this efficiently identifies excess entries for deletion.
+ * Uses a cheap probe query (`LIMIT 1 OFFSET ?`) to determine whether pruning is
+ * necessary. When pruning is needed, performs a single DELETE statement with a
+ * subquery.
  *
- * **Transaction Context**: Designed to be called from repository methods within
- * transaction context. Used by HistoryRepository.pruneHistoryInternal() and
- * HistoryRepository.pruneAllHistoryInternal().
- *
- * **Performance**: Only executes DELETE when excess entries exist to avoid
- * unnecessary operations.
+ * This avoids building huge parameter lists that can hit SQLite's variable
+ * limit.
  *
  * @param db - Database connection instance
  * @param monitorId - Unique identifier of the monitor
@@ -267,33 +235,25 @@ export function pruneHistoryForMonitor(
     }
 
     try {
-        // Get entries to delete (keep only the most recent 'limit' entries)
-        const excess = queryForIds(
+        const excessProbe = queryForIds(
             db,
             HISTORY_MANIPULATION_QUERIES.SELECT_EXCESS_ENTRIES,
             [monitorId, limit]
         );
 
-        if (excess.length > 0) {
-            // Convert numeric IDs to ensure type safety and validate they are
-            // numbers
-            const excessIds = excess
-                .map((row) => Number(row.id))
-                .filter((id): id is number => Number.isFinite(id) && id > 0);
+        if (excessProbe.length === 0) {
+            return;
+        }
 
-            if (excessIds.length > 0) {
-                // Use parameterized query to avoid SQL injection
-                const placeholders = excessIds.map(() => "?").join(",");
-                db.run(
-                    `${HISTORY_MANIPULATION_QUERIES.DELETE_BY_IDS} (${placeholders})`,
-                    excessIds
-                );
-                if (isDev()) {
-                    logger.debug(
-                        `[HistoryManipulation] Pruned ${excessIds.length} old history entries for monitor: ${monitorId}`
-                    );
-                }
-            }
+        db.run(HISTORY_MANIPULATION_QUERIES.DELETE_EXCESS_ENTRIES, [
+            monitorId,
+            limit,
+        ]);
+
+        if (isDev()) {
+            logger.debug(
+                `[HistoryManipulation] Pruned history entries for monitor: ${monitorId} (limit: ${limit})`
+            );
         }
     } catch (error) {
         logger.error(

@@ -25,8 +25,13 @@ import { isValidUrl } from "@shared/validation/validatorUtils";
 import * as dns from "node:dns/promises";
 import * as net from "node:net";
 import { performance } from "node:perf_hooks";
+import { setTimeout as delay } from "node:timers/promises";
 
 import type { MonitorCheckResult } from "../types";
+
+import { createTimeoutSignal } from "../shared/abortSignalUtils";
+
+/* eslint-disable @microsoft/sdl/no-insecure-url -- Scheme literals are used only for stripping input; they are not used as navigated/executed URLs. */
 
 const stripHttpScheme = (value: string): string => {
     const normalized = value.trim();
@@ -36,25 +41,14 @@ const stripHttpScheme = (value: string): string => {
         return normalized.slice("https://".length);
     }
 
-        if (lower.startsWith("https://")) {
-            return normalized.slice("https://".length);
+    if (lower.startsWith("http://")) {
+        return normalized.slice("http://".length);
     }
 
     return normalized;
 };
 
-/**
- * Clears a timeout if the provided handle has been set.
- *
- * @param timerHandle - The timeout handle to clear, when available.
- */
-function clearTimeoutIfPresent(
-    timerHandle?: ReturnType<typeof setTimeout>
-): void {
-    if (timerHandle !== undefined) {
-        clearTimeout(timerHandle);
-    }
-}
+/* eslint-enable @microsoft/sdl/no-insecure-url -- End scheme stripping section. */
 
 /**
  * Configuration options for connectivity checking
@@ -128,7 +122,8 @@ interface DnsCheckResult {
 async function checkTcpPort(
     host: string,
     port: number,
-    timeout: number
+    timeout: number,
+    signal?: AbortSignal
 ): Promise<TcpCheckResult> {
     const startTime = performance.now();
 
@@ -136,16 +131,40 @@ async function checkTcpPort(
         const socket = new net.Socket();
         let resolved = false;
 
-        const cleanup = (): void => {
+        const cleanup = (listener?: () => void): void => {
             if (!resolved) {
                 resolved = true;
                 socket.removeAllListeners();
                 socket.destroy();
+                if (signal && listener) {
+                    signal.removeEventListener("abort", listener);
+                }
             }
         };
 
+        const resolveFailure = (listener?: () => void): void => {
+            cleanup(listener);
+            resolve({
+                alive: false,
+                responseTime: performance.now() - startTime,
+            });
+        };
+
+        const abortListener = (): void => {
+            resolveFailure(abortListener);
+        };
+
+        if (signal?.aborted) {
+            abortListener();
+            return;
+        }
+
+        if (signal) {
+            signal.addEventListener("abort", abortListener, { once: true });
+        }
+
         const handleConnect = (): void => {
-            cleanup();
+            cleanup(abortListener);
             resolve({
                 alive: true,
                 port,
@@ -154,11 +173,7 @@ async function checkTcpPort(
         };
 
         const handleTimeout = (): void => {
-            cleanup();
-            resolve({
-                alive: false,
-                responseTime: performance.now() - startTime,
-            });
+            resolveFailure(abortListener);
         };
 
         const handleError = handleTimeout;
@@ -184,21 +199,42 @@ async function checkTcpPort(
  */
 async function checkDnsResolution(
     host: string,
-    timeout: number
+    timeout: number,
+    signal?: AbortSignal
 ): Promise<DnsCheckResult> {
     const startTime = performance.now();
-    let timeoutId: ReturnType<typeof setTimeout> | undefined = undefined;
+
+    const timeoutSignal = AbortSignal.timeout(timeout);
+    const combinedSignal = signal
+        ? AbortSignal.any([timeoutSignal, signal])
+        : timeoutSignal;
+    let abortReject: ((reason?: unknown) => void) | undefined = undefined;
+
+    const handleAbort = (): void => {
+        const error = signal?.aborted
+            ? new Error("Operation was aborted")
+            : new Error(`DNS resolution timeout after ${timeout}ms`);
+
+        abortReject?.(error);
+    };
 
     try {
-        const timeoutPromise = new Promise<string[]>((_resolve, reject) => {
-            timeoutId = setTimeout(() => {
-                reject(new Error(`DNS resolution timeout after ${timeout}ms`));
-            }, timeout);
+        const abortPromise = new Promise<string[]>((_resolve, reject): void => {
+            abortReject = reject;
+
+            if (combinedSignal.aborted) {
+                handleAbort();
+                return;
+            }
+
+            combinedSignal.addEventListener("abort", handleAbort, {
+                once: true,
+            });
         });
 
         const addresses = await Promise.race([
             dns.resolve4(host),
-            timeoutPromise,
+            abortPromise,
         ]);
 
         return {
@@ -212,7 +248,8 @@ async function checkDnsResolution(
             responseTime: performance.now() - startTime,
         };
     } finally {
-        clearTimeoutIfPresent(timeoutId);
+        abortReject = undefined;
+        combinedSignal.removeEventListener("abort", handleAbort);
     }
 }
 
@@ -231,7 +268,8 @@ async function checkDnsResolution(
 async function checkTcpPorts(
     host: string,
     ports: number[],
-    timeout: number
+    timeout: number,
+    signal?: AbortSignal
 ): Promise<MonitorCheckResult | null> {
     // Check ports sequentially using recursion to avoid await-in-loop
     const checkPortsRecursively = async (
@@ -245,7 +283,7 @@ async function checkTcpPorts(
         if (port === undefined) {
             return null;
         }
-        const result = await checkTcpPort(host, port, timeout);
+        const result = await checkTcpPort(host, port, timeout, signal);
 
         if (result.alive) {
             return {
@@ -288,25 +326,19 @@ async function checkTcpPorts(
  */
 export async function checkHttpConnectivity(
     url: string,
-    timeout: number = 5000
+    timeout: number = 5000,
+    signal?: AbortSignal
 ): Promise<MonitorCheckResult> {
     const startTime = performance.now();
 
     try {
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => {
-            controller.abort();
-        }, timeout);
-
         const response = await fetch(url, {
             headers: {
                 "User-Agent": "Uptime-Watcher/15.4.0",
             },
             method: "HEAD",
-            signal: controller.signal,
+            signal: createTimeoutSignal(timeout, signal),
         });
-
-        clearTimeout(timeoutId);
         const responseTime = Math.round(performance.now() - startTime);
 
         if (response.ok) {
@@ -372,7 +404,8 @@ export async function checkHttpConnectivity(
  */
 export async function checkConnectivity(
     host: string,
-    options: ConnectivityOptions = {}
+    options: ConnectivityOptions = {},
+    signal?: AbortSignal
 ): Promise<MonitorCheckResult> {
     const opts = { ...DEFAULT_OPTIONS, ...options };
     const startTime = performance.now();
@@ -380,7 +413,7 @@ export async function checkConnectivity(
     const normalizedHost: string = host.trim();
 
     if (isValidUrl(normalizedHost)) {
-        return checkHttpConnectivity(normalizedHost, opts.timeout);
+        return checkHttpConnectivity(normalizedHost, opts.timeout, signal);
     }
 
     const cleanHost: string = stripHttpScheme(normalizedHost);
@@ -390,7 +423,8 @@ export async function checkConnectivity(
             const tcpResult = await checkTcpPorts(
                 cleanHost,
                 opts.ports,
-                opts.timeout
+                opts.timeout,
+                signal
             );
 
             if (tcpResult) {
@@ -407,7 +441,11 @@ export async function checkConnectivity(
     }
 
     if (opts.method === "dns" || opts.method === "tcp") {
-        const dnsResult = await checkDnsResolution(cleanHost, opts.timeout);
+        const dnsResult = await checkDnsResolution(
+            cleanHost,
+            opts.timeout,
+            signal
+        );
 
         if (dnsResult.alive) {
             return {
@@ -447,36 +485,42 @@ export async function checkConnectivity(
  */
 export async function checkConnectivityWithRetry(
     host: string,
-    options: ConnectivityOptions = {}
+    options: ConnectivityOptions = {},
+    signal?: AbortSignal
 ): Promise<MonitorCheckResult> {
     const opts = { ...DEFAULT_OPTIONS, ...options };
 
     const attemptCheck = async (
         attemptsLeft: number
     ): Promise<MonitorCheckResult> => {
+        if (signal?.aborted) {
+            throw new Error("Operation was aborted");
+        }
+
         try {
             const result = await checkConnectivity(host, {
                 ...opts,
                 retries: 0, // Prevent nested retries
-            });
+            }, signal);
 
             if (result.status === "up" || attemptsLeft === 0) {
                 return result;
             }
 
             // Wait before retry
-            await new Promise<void>((resolve) => {
-                // eslint-disable-next-line clean-timer/assign-timer-id -- Timer cleanup not needed for simple delay
-                setTimeout(
-                    () => {
-                        resolve();
-                    },
-                    opts.retryDelay * (opts.retries - attemptsLeft + 2)
-                );
-            });
+            const retryDelayMs =
+                opts.retryDelay * (opts.retries - attemptsLeft + 2);
+            if (signal) {
+                await delay(retryDelayMs, undefined, { signal });
+            } else {
+                await delay(retryDelayMs);
+            }
 
             return await attemptCheck(attemptsLeft - 1);
         } catch (error) {
+            if (signal?.aborted) {
+                throw new Error("Operation was aborted", { cause: error });
+            }
             const errorResult: MonitorCheckResult = {
                 details: `Check failed on attempt ${opts.retries - attemptsLeft + 2}`,
                 error: getUserFacingErrorDetail(error),
@@ -489,15 +533,13 @@ export async function checkConnectivityWithRetry(
             }
 
             // Wait before retry
-            await new Promise<void>((resolve) => {
-                // eslint-disable-next-line clean-timer/assign-timer-id -- Timer cleanup not needed for simple delay
-                setTimeout(
-                    () => {
-                        resolve();
-                    },
-                    opts.retryDelay * (opts.retries - attemptsLeft + 2)
-                );
-            });
+            const retryDelayMs =
+                opts.retryDelay * (opts.retries - attemptsLeft + 2);
+            if (signal) {
+                await delay(retryDelayMs, undefined, { signal });
+            } else {
+                await delay(retryDelayMs);
+            }
 
             return attemptCheck(attemptsLeft - 1);
         }

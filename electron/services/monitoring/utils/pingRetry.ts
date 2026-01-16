@@ -103,9 +103,36 @@ export async function performSinglePingCheck(
         const isHttpUrl = isValidUrl(host);
 
         // Use native connectivity check instead of ping package
-        return isHttpUrl
-            ? await checkHttpConnectivity(host, timeout)
+        if (isHttpUrl) {
+            const result = signal
+                ? await checkHttpConnectivity(host, timeout, signal)
+                : await checkHttpConnectivity(host, timeout);
+
+            // `withOperationalHooks` only retries when an operation throws.
+            // For ping connectivity checks, non-up statuses should be treated as
+            // failures to enable retry/backoff behavior.
+            if (result.status !== "up") {
+                throw new Error(
+                    result.error ??
+                        result.details ??
+                        "Connectivity check failed"
+                );
+            }
+
+            return result;
+        }
+
+        const result = signal
+            ? await checkConnectivity(host, { retries: 0, timeout }, signal)
             : await checkConnectivity(host, { retries: 0, timeout });
+
+        if (result.status !== "up") {
+            throw new Error(
+                result.error ?? result.details ?? "Connectivity check failed"
+            );
+        }
+
+        return result;
     } catch (error) {
         const errorMessage = getUserFacingErrorDetail(error);
 

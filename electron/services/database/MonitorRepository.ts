@@ -124,9 +124,12 @@ export interface MonitorRepositoryTransactionAdapter {
  */
 const MONITOR_QUERIES = {
     DELETE_ALL: "DELETE FROM monitors",
+    DELETE_ALL_HISTORY: "DELETE FROM history",
     DELETE_BY_ID: "DELETE FROM monitors WHERE id = ?",
     DELETE_BY_SITE: "DELETE FROM monitors WHERE site_identifier = ?",
     DELETE_HISTORY_BY_MONITOR: "DELETE FROM history WHERE monitor_id = ?",
+    DELETE_HISTORY_BY_SITE:
+        "DELETE FROM history WHERE monitor_id IN (SELECT id FROM monitors WHERE site_identifier = ?)",
     SELECT_ALL_IDS: "SELECT id FROM monitors",
     SELECT_BY_ID: "SELECT * FROM monitors WHERE id = ?",
     SELECT_BY_SITE: "SELECT * FROM monitors WHERE site_identifier = ?",
@@ -785,13 +788,9 @@ export class MonitorRepository {
      * @returns Void
      */
     private deleteAllInternal(db: Database): void {
-        // Get all monitor IDs first
-        const monitorRows = queryForIds(db, MONITOR_QUERIES.SELECT_ALL_IDS);
-
-        // Delete history for all monitors first (foreign key constraint)
-        for (const row of monitorRows) {
-            db.run(MONITOR_QUERIES.DELETE_HISTORY_BY_MONITOR, [row.id]);
-        }
+        // Delete all history first to avoid orphaned rows.
+        // This is safe because history belongs exclusively to monitors.
+        db.run(MONITOR_QUERIES.DELETE_ALL_HISTORY);
 
         // Then delete all monitors
         db.run(MONITOR_QUERIES.DELETE_ALL);
@@ -820,17 +819,8 @@ export class MonitorRepository {
             return;
         }
 
-        // Get all monitor IDs for this site
-        const monitorRows = queryForIds(
-            db,
-            MONITOR_QUERIES.SELECT_IDS_BY_SITE,
-            [siteIdentifier]
-        );
-
-        // Delete history for all monitors
-        for (const row of monitorRows) {
-            db.run(MONITOR_QUERIES.DELETE_HISTORY_BY_MONITOR, [row.id]);
-        }
+        // Delete history for all monitors belonging to this site.
+        db.run(MONITOR_QUERIES.DELETE_HISTORY_BY_SITE, [siteIdentifier]);
 
         // Delete all monitors for this site
         db.run(MONITOR_QUERIES.DELETE_BY_SITE, [siteIdentifier]);

@@ -121,7 +121,10 @@ export const useConfirmDialogStore: UseBoundStore<
     };
 });
 
-if (typeof window !== "undefined") {
+const shouldExposeConfirmDialogAutomationHooks =
+    typeof window !== "undefined" && import.meta.env.MODE !== "production";
+
+if (shouldExposeConfirmDialogAutomationHooks) {
     const automationTarget = globalThis as typeof globalThis & {
         playwrightConfirmDialog?: {
             cancel: () => void;

@@ -81,6 +81,10 @@ describe("DynamicSchema Regex Mutations", () => {
             expect(columnNames).toContain("max_retry_count");
             expect(columnNames).toContain("enable_http_logging");
 
+            // Reserved/static monitor columns must never be emitted as dynamic
+            // fields (would create duplicate columns in the monitors table).
+            expect(columnNames).not.toContain("timeout");
+
             // These assertions would fail if the first regex /^[A-Z]/u is mutated
             // Verify the conversion didn't leave any uppercase letters at the start
             for (const field of fieldDefinitions) {

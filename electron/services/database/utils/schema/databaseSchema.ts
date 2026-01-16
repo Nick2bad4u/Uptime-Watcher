@@ -37,6 +37,8 @@ const SCHEMA_QUERIES = {
     COMMIT: "COMMIT",
     CREATE_INDEX_HISTORY_MONITOR_ID:
         "CREATE INDEX IF NOT EXISTS idx_history_monitor_id ON history(monitor_id)",
+    CREATE_INDEX_HISTORY_MONITOR_TIMESTAMP:
+        "CREATE INDEX IF NOT EXISTS idx_history_monitor_timestamp ON history(monitor_id, timestamp DESC)",
     CREATE_INDEX_HISTORY_TIMESTAMP:
         "CREATE INDEX IF NOT EXISTS idx_history_timestamp ON history(timestamp)",
     CREATE_INDEX_MONITORS_SITE_IDENTIFIER:
@@ -205,6 +207,11 @@ export function createDatabaseIndexes(db: Database): void {
 
         // Index on history monitor_id for faster history queries
         db.run(SCHEMA_QUERIES.CREATE_INDEX_HISTORY_MONITOR_ID);
+
+        // Composite index to accelerate the common pattern:
+        //   WHERE monitor_id = ? ORDER BY timestamp DESC
+        // This is heavily used by history pruning and latest-entry queries.
+        db.run(SCHEMA_QUERIES.CREATE_INDEX_HISTORY_MONITOR_TIMESTAMP);
 
         // Index on history timestamp for time-based queries
         db.run(SCHEMA_QUERIES.CREATE_INDEX_HISTORY_TIMESTAMP);

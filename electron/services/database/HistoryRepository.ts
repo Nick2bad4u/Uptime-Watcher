@@ -32,23 +32,10 @@
  * });
  *
  * // Get history for a monitor
- * const history = await historyRepo.getHistoryByMonitorId("monitor123", {
- *     limit: 100,
- *     offset: 0,
- * });
+ * const history = await historyRepo.findByMonitorId("monitor123");
  * ```
  *
- * @example History management:
- *
- * ```typescript
- * // Prune old history entries
- * await historyRepo.pruneHistoryForMonitor("monitor123", 1000);
- *
- * // Get latest status
- * const latest = await historyRepo.getLatestHistoryEntry("monitor123");
- * ```
- *
- * @packageDocumentation
+ * @public
  */
 import type { StatusHistory } from "@shared/types";
 import type { Database } from "node-sqlite3-wasm";
@@ -72,14 +59,7 @@ import {
 import { queryForIds } from "./utils/queries/typedQueries";
 
 /**
- * Defines the dependencies required by the {@link HistoryRepository} for
- * managing history data persistence.
- *
- * @remarks
- * Provides the required {@link DatabaseService} for all history operations. This
- * interface is used for dependency injection.
- *
- * @public
+ * Dependencies required to construct a {@link HistoryRepository}.
  */
 export interface HistoryRepositoryDependencies {
     /**
@@ -406,44 +386,14 @@ export class HistoryRepository {
      * @throws Error if the database operation fails.
      */
     public async pruneAllHistory(limit: number): Promise<void> {
-        if (limit <= 0) return;
+        if (limit <= 0) {
+            return;
+        }
 
         await withDatabaseOperation(
             () =>
-                // Use executeTransaction for atomic multi-monitor operation
                 this.databaseService.executeTransaction((db) => {
-                    const monitors = queryForIds(
-                        db,
-                        HISTORY_QUERIES.SELECT_MONITOR_IDS
-                    );
-                    for (const monitor of monitors) {
-                        // Type assertion is safe: SQL query "SELECT id FROM
-                        // history..." guarantees { id: number } structure
-
-                        /* eslint-disable @typescript-eslint/no-unsafe-type-assertion -- Database queries return known structures from controlled SQL */
-                        const excessEntries = db.all(
-                            HISTORY_QUERIES.SELECT_EXCESS_ENTRIES,
-                            [String(monitor.id), limit]
-                        ) as Array<{ id: number }>;
-                        /* eslint-enable @typescript-eslint/no-unsafe-type-assertion -- re-enable unsafe type assertion warnings */
-                        if (excessEntries.length > 0) {
-                            // Convert numeric IDs to ensure type safety and
-                            // validate they are numbers
-                            const excessIds = excessEntries
-                                .map((e) => e.id)
-                                .filter((id) => Number.isFinite(id) && id > 0);
-
-                            if (excessIds.length > 0) {
-                                const placeholders = excessIds
-                                    .map(() => "?")
-                                    .join(",");
-                                db.run(
-                                    `${HISTORY_QUERIES.DELETE_BY_IDS} (${placeholders})`,
-                                    excessIds
-                                );
-                            }
-                        }
-                    }
+                    this.pruneAllHistoryInternal(db, limit);
                     return Promise.resolve();
                 }),
             "history-prune-all",
