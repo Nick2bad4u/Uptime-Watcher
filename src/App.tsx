@@ -1,3 +1,4 @@
+import type { JSX } from "react/jsx-runtime";
 /**
  * Main App component for Uptime Watcher application.
  *
@@ -6,8 +7,6 @@
  * layout. Coordinates between different views and handles application-wide
  * state management.
  */
-
-import type { JSX } from "react/jsx-runtime";
 
 import { useEscapeKeyModalHandler } from "@shared/utils/modalHandlers";
 import {
@@ -19,6 +18,10 @@ import {
     useRef,
     useState,
 } from "react";
+import { useShallow } from "zustand/react/shallow";
+
+import type { UIStore } from "./stores/ui/types";
+import type { UpdatesStore } from "./stores/updates/types";
 
 import { UI_MESSAGES } from "./app/appUiMessages";
 import {
@@ -138,7 +141,25 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
         showSiteDetails,
         sidebarCollapsedPreference,
         siteListLayout,
-    } = useUIStore();
+    } = useUIStore(
+        useShallow(
+            useCallback(
+                (state: UIStore) => ({
+                    setShowAddSiteModal: state.setShowAddSiteModal,
+                    setShowSettings: state.setShowSettings,
+                    setShowSiteDetails: state.setShowSiteDetails,
+                    setSidebarCollapsedPreference:
+                        state.setSidebarCollapsedPreference,
+                    showAddSiteModal: state.showAddSiteModal,
+                    showSettings: state.showSettings,
+                    showSiteDetails: state.showSiteDetails,
+                    sidebarCollapsedPreference: state.sidebarCollapsedPreference,
+                    siteListLayout: state.siteListLayout,
+                }),
+                []
+            )
+        )
+    );
 
     const { cancel: closeConfirmDialog, isOpen: isConfirmDialogOpen } =
         useConfirmDialogVisibility();
@@ -154,7 +175,22 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
         subscribeToUpdateStatusEvents,
         updateError,
         updateStatus,
-    } = useUpdatesStore();
+    } = useUpdatesStore(
+        useShallow(
+            useCallback(
+                (state: UpdatesStore) => ({
+                    applyUpdate: state.applyUpdate,
+                    applyUpdateStatus: state.applyUpdateStatus,
+                    setUpdateError: state.setUpdateError,
+                    subscribeToUpdateStatusEvents:
+                        state.subscribeToUpdateStatusEvents,
+                    updateError: state.updateError,
+                    updateStatus: state.updateStatus,
+                }),
+                []
+            )
+        )
+    );
 
     const { isDark } = useTheme();
 

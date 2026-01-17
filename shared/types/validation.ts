@@ -10,6 +10,8 @@
 
 import type { UnknownRecord } from "type-fest";
 
+import { isRecord } from "../utils/typeHelpers";
+
 /**
  * Base validation result interface.
  *
@@ -176,18 +178,44 @@ export function createSuccessResult(
  */
 export function isValidationResult(
     result: unknown
-): result is BaseValidationResult {
-    if (typeof result !== "object" || result === null) {
-        return false;
-    }
-
-    // Safe property access using 'in' operator with proper type narrowing
-    const hasRequiredProperties = "errors" in result && "success" in result;
-    if (!hasRequiredProperties) {
+): result is ValidationResult {
+    if (!isRecord(result)) {
         return false;
     }
 
     // Type-safe property access after narrowing
-    const obj = result as UnknownRecord;
-    return Array.isArray(obj["errors"]) && typeof obj["success"] === "boolean";
+    const obj: UnknownRecord = result;
+
+    if (!("errors" in obj) || !("success" in obj)) {
+        return false;
+    }
+
+    const { errors, metadata, success, warnings } = obj;
+
+    if (typeof success !== "boolean") {
+        return false;
+    }
+
+    if (!Array.isArray(errors) || errors.some((value) => typeof value !== "string")) {
+        return false;
+    }
+
+    if (
+        warnings !== undefined &&
+        (!Array.isArray(warnings) ||
+            warnings.some((value) => typeof value !== "string"))
+    ) {
+        return false;
+    }
+
+    if (
+        metadata !== undefined &&
+        (typeof metadata !== "object" ||
+            metadata === null ||
+            Array.isArray(metadata))
+    ) {
+        return false;
+    }
+
+    return true;
 }

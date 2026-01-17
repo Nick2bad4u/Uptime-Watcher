@@ -12,7 +12,7 @@ import type * as z from "zod";
 import type { Site } from "../types";
 
 import { siteSchema } from "./siteSchemas";
-import { statusUpdateSchema } from "./statusUpdateSchemas";
+import { typedStatusUpdateSchema as statusUpdateSchema } from "./statusUpdateSchemas";
 
 /**
  * Canonical schema for site update payloads.

@@ -660,7 +660,22 @@ describe("Electron Preload Script", () => {
 
                 const exposedAPI = getExposedAPI();
                 const identifier = "test-site-123";
-                const monitorId = "http-monitor";
+                const monitorId = mockSite.monitors[0]?.id ?? "http-monitor";
+
+                const monitor = mockSite.monitors[0] as Monitor;
+                const update: StatusUpdate = {
+                    monitor,
+                    monitorId,
+                    site: mockSite,
+                    siteIdentifier: mockSite.identifier,
+                    status: "up",
+                    timestamp: new Date().toISOString(),
+                };
+
+                mockIpcRenderer.invoke.mockResolvedValueOnce({
+                    success: true,
+                    data: update,
+                });
 
                 await exposedAPI.monitoring.checkSiteNow(identifier, monitorId);
 
@@ -832,8 +847,12 @@ describe("Electron Preload Script", () => {
                     buffer: new ArrayBuffer(1024),
                     fileName: "backup_test.db",
                     metadata: {
+                        appVersion: "1.0.0",
+                        checksum: "abc",
                         createdAt: 1_700_000_500_000,
                         originalPath: "/tmp/uptime-watcher.db",
+                        retentionHintDays: 30,
+                        schemaVersion: 1,
                         sizeBytes: 1024,
                     },
                 };

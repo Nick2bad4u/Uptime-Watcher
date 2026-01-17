@@ -10,31 +10,23 @@
  * @packageDocumentation
  */
 
-/* eslint-disable ex/no-unhandled -- Domain APIs are thin wrappers that don't handle exceptions */
+
 
 import { SITES_CHANNELS, type SitesDomainBridge } from "@shared/types/preload";
-import { validateSiteSnapshot, validateSiteSnapshots } from "@shared/validation/guards";
+import {
+    validateSiteSnapshot,
+    validateSiteSnapshots,
+} from "@shared/validation/guards";
 
 import {
-    createTypedInvoker,
+    createSafeParseAdapter,
     createValidatedInvoker,
+    safeParseBooleanResult,
     type SafeParseLike,
+    safeParseNonNegativeIntResult,
 } from "../core/bridgeFactory";
 
-function safeParseBoolean(candidate: unknown): SafeParseLike<boolean> {
-    if (typeof candidate !== "boolean") {
-        return {
-            error: new Error(
-                `Expected boolean response payload, received ${
-                    Array.isArray(candidate) ? "array" : typeof candidate
-                }`
-            ),
-            success: false,
-        };
-    }
-
-    return { data: candidate, success: true };
-}
+const safeParseSiteSnapshot = createSafeParseAdapter(validateSiteSnapshot);
 
 function safeParseSiteArray(candidate: unknown): SafeParseLike<
     SitesDomainBridge["getSites"] extends () => Promise<infer TResult>
@@ -134,7 +126,7 @@ export const sitesApi: SitesApiInterface = {
      */
     addSite: createValidatedInvoker(
         SITES_CHANNELS.addSite,
-        validateSiteSnapshot,
+        safeParseSiteSnapshot,
         {
             domain: "sitesApi",
             guardName: "validateSiteSnapshot",
@@ -146,7 +138,14 @@ export const sitesApi: SitesApiInterface = {
      *
      * @returns Promise resolving to the number of removed sites
      */
-    deleteAllSites: createTypedInvoker(SITES_CHANNELS.deleteAllSites),
+    deleteAllSites: createValidatedInvoker(
+        SITES_CHANNELS.deleteAllSites,
+        safeParseNonNegativeIntResult,
+        {
+            domain: "sitesApi",
+            guardName: "safeParseNonNegativeIntResult",
+        }
+    ),
 
     /**
      * Retrieves all sites from the database
@@ -169,7 +168,7 @@ export const sitesApi: SitesApiInterface = {
      */
     removeMonitor: createValidatedInvoker(
         SITES_CHANNELS.removeMonitor,
-        validateSiteSnapshot,
+        safeParseSiteSnapshot,
         {
             domain: "sitesApi",
             guardName: "validateSiteSnapshot",
@@ -183,10 +182,14 @@ export const sitesApi: SitesApiInterface = {
      *
      * @returns Promise resolving to a boolean indicating removal success
      */
-    removeSite: createValidatedInvoker(SITES_CHANNELS.removeSite, safeParseBoolean, {
-        domain: "sitesApi",
-        guardName: "safeParseBoolean",
-    }),
+    removeSite: createValidatedInvoker(
+        SITES_CHANNELS.removeSite,
+        safeParseBooleanResult,
+        {
+            domain: "sitesApi",
+            guardName: "safeParseBooleanResult",
+        }
+    ),
 
     /**
      * Updates an existing site's configuration.
@@ -198,7 +201,7 @@ export const sitesApi: SitesApiInterface = {
      */
     updateSite: createValidatedInvoker(
         SITES_CHANNELS.updateSite,
-        validateSiteSnapshot,
+        safeParseSiteSnapshot,
         {
             domain: "sitesApi",
             guardName: "validateSiteSnapshot",
@@ -212,5 +215,3 @@ export const sitesApi: SitesApiInterface = {
  * @public
  */
 export type SitesApi = SitesDomainBridge;
-
-/* eslint-enable ex/no-unhandled -- Re-enable exception handling warnings */

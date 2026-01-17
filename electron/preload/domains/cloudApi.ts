@@ -8,11 +8,44 @@
  * @packageDocumentation
  */
 
-/* eslint-disable ex/no-unhandled -- Domain APIs are thin wrappers that don't handle exceptions */
 
+
+import { safeParseCloudBackupMigrationResult as safeParseCloudBackupMigrationResultImpl } from "@shared/types/cloudBackupMigration";
 import { CLOUD_CHANNELS, type CloudDomainBridge } from "@shared/types/preload";
+import {
+    validateCloudBackupEntry,
+    validateCloudBackupEntryArray,
+} from "@shared/validation/cloudBackupSchemas";
+import {
+    validateCloudStatusSummary,
+    validateCloudSyncResetPreview,
+    validateCloudSyncResetResult,
+} from "@shared/validation/cloudSchemas";
+import { validateSerializedDatabaseRestoreResult } from "@shared/validation/dataSchemas";
 
-import { createTypedInvoker, createVoidInvoker } from "../core/bridgeFactory";
+import {
+    createSafeParseAdapter,
+    createValidatedInvoker,
+    createVoidInvoker,
+} from "../core/bridgeFactory";
+
+const safeParseCloudStatusSummary = createSafeParseAdapter(validateCloudStatusSummary);
+const safeParseCloudBackupEntry = createSafeParseAdapter(validateCloudBackupEntry);
+const safeParseCloudBackupEntryArray = createSafeParseAdapter(
+    validateCloudBackupEntryArray
+);
+const safeParseCloudSyncResetPreview = createSafeParseAdapter(
+    validateCloudSyncResetPreview
+);
+const safeParseCloudSyncResetResult = createSafeParseAdapter(
+    validateCloudSyncResetResult
+);
+const safeParseCloudBackupMigrationResult = createSafeParseAdapter(
+    safeParseCloudBackupMigrationResultImpl
+);
+const safeParseSerializedDatabaseRestoreResult = createSafeParseAdapter(
+    validateSerializedDatabaseRestoreResult
+);
 
 /**
  * Interface defining the cloud domain API operations.
@@ -44,30 +77,127 @@ export interface CloudApiInterface extends CloudDomainBridge {
  * @public
  */
 export const cloudApi: CloudApiInterface = {
-    clearEncryptionKey: createTypedInvoker(CLOUD_CHANNELS.clearEncryptionKey),
-    configureFilesystemProvider: createTypedInvoker(
-        CLOUD_CHANNELS.configureFilesystemProvider
+    clearEncryptionKey: createValidatedInvoker(
+        CLOUD_CHANNELS.clearEncryptionKey,
+        safeParseCloudStatusSummary,
+        {
+            domain: "cloudApi",
+            guardName: "validateCloudStatusSummary",
+        }
     ),
-    connectDropbox: createTypedInvoker(CLOUD_CHANNELS.connectDropbox),
-    connectGoogleDrive: createTypedInvoker(CLOUD_CHANNELS.connectGoogleDrive),
-    deleteBackup: createTypedInvoker(CLOUD_CHANNELS.deleteBackup),
-    disconnect: createTypedInvoker(CLOUD_CHANNELS.disconnect),
-    enableSync: createTypedInvoker(CLOUD_CHANNELS.enableSync),
-    getStatus: createTypedInvoker(CLOUD_CHANNELS.getStatus),
-    listBackups: createTypedInvoker(CLOUD_CHANNELS.listBackups),
-    migrateBackups: createTypedInvoker(CLOUD_CHANNELS.migrateBackups),
-    previewResetRemoteSyncState: createTypedInvoker(
-        CLOUD_CHANNELS.previewResetRemoteSyncState
+    configureFilesystemProvider: createValidatedInvoker(
+        CLOUD_CHANNELS.configureFilesystemProvider,
+        safeParseCloudStatusSummary,
+        {
+            domain: "cloudApi",
+            guardName: "validateCloudStatusSummary",
+        }
+    ),
+    connectDropbox: createValidatedInvoker(
+        CLOUD_CHANNELS.connectDropbox,
+        safeParseCloudStatusSummary,
+        {
+            domain: "cloudApi",
+            guardName: "validateCloudStatusSummary",
+        }
+    ),
+    connectGoogleDrive: createValidatedInvoker(
+        CLOUD_CHANNELS.connectGoogleDrive,
+        safeParseCloudStatusSummary,
+        {
+            domain: "cloudApi",
+            guardName: "validateCloudStatusSummary",
+        }
+    ),
+    deleteBackup: createValidatedInvoker(
+        CLOUD_CHANNELS.deleteBackup,
+        safeParseCloudBackupEntryArray,
+        {
+            domain: "cloudApi",
+            guardName: "validateCloudBackupEntryArray",
+        }
+    ),
+    disconnect: createValidatedInvoker(
+        CLOUD_CHANNELS.disconnect,
+        safeParseCloudStatusSummary,
+        {
+            domain: "cloudApi",
+            guardName: "validateCloudStatusSummary",
+        }
+    ),
+    enableSync: createValidatedInvoker(
+        CLOUD_CHANNELS.enableSync,
+        safeParseCloudStatusSummary,
+        {
+            domain: "cloudApi",
+            guardName: "validateCloudStatusSummary",
+        }
+    ),
+    getStatus: createValidatedInvoker(
+        CLOUD_CHANNELS.getStatus,
+        safeParseCloudStatusSummary,
+        {
+            domain: "cloudApi",
+            guardName: "validateCloudStatusSummary",
+        }
+    ),
+    listBackups: createValidatedInvoker(
+        CLOUD_CHANNELS.listBackups,
+        safeParseCloudBackupEntryArray,
+        {
+            domain: "cloudApi",
+            guardName: "validateCloudBackupEntryArray",
+        }
+    ),
+    migrateBackups: createValidatedInvoker(
+        CLOUD_CHANNELS.migrateBackups,
+        safeParseCloudBackupMigrationResult,
+        {
+            domain: "cloudApi",
+            guardName: "safeParseCloudBackupMigrationResult",
+        }
+    ),
+    previewResetRemoteSyncState: createValidatedInvoker(
+        CLOUD_CHANNELS.previewResetRemoteSyncState,
+        safeParseCloudSyncResetPreview,
+        {
+            domain: "cloudApi",
+            guardName: "validateCloudSyncResetPreview",
+        }
     ),
     requestSyncNow: createVoidInvoker(CLOUD_CHANNELS.requestSyncNow),
-    resetRemoteSyncState: createTypedInvoker(
-        CLOUD_CHANNELS.resetRemoteSyncState
+    resetRemoteSyncState: createValidatedInvoker(
+        CLOUD_CHANNELS.resetRemoteSyncState,
+        safeParseCloudSyncResetResult,
+        {
+            domain: "cloudApi",
+            guardName: "validateCloudSyncResetResult",
+        }
     ),
-    restoreBackup: createTypedInvoker(CLOUD_CHANNELS.restoreBackup),
-    setEncryptionPassphrase: createTypedInvoker(
-        CLOUD_CHANNELS.setEncryptionPassphrase
+    restoreBackup: createValidatedInvoker(
+        CLOUD_CHANNELS.restoreBackup,
+        safeParseSerializedDatabaseRestoreResult,
+        {
+            domain: "cloudApi",
+            guardName: "validateSerializedDatabaseRestoreResult",
+        }
     ),
-    uploadLatestBackup: createTypedInvoker(CLOUD_CHANNELS.uploadLatestBackup),
+    setEncryptionPassphrase: createValidatedInvoker(
+        CLOUD_CHANNELS.setEncryptionPassphrase,
+        safeParseCloudStatusSummary,
+        {
+            domain: "cloudApi",
+            guardName: "validateCloudStatusSummary",
+        }
+    ),
+    uploadLatestBackup: createValidatedInvoker(
+        CLOUD_CHANNELS.uploadLatestBackup,
+        safeParseCloudBackupEntry,
+        {
+            domain: "cloudApi",
+            guardName: "validateCloudBackupEntry",
+        }
+    ),
 } as const;
 
 /**
@@ -76,5 +206,3 @@ export const cloudApi: CloudApiInterface = {
  * @public
  */
 export type CloudApi = CloudDomainBridge;
-
-/* eslint-enable ex/no-unhandled -- Re-enable exception handling warnings */

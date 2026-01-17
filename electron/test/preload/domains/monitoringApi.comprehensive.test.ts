@@ -95,6 +95,7 @@ describe("monitoringApi", () => {
             status: "up",
             timeout: 30_000,
             type: "http",
+            url: "https://example.com",
         };
 
         const site: Site = {

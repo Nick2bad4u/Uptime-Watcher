@@ -15,8 +15,17 @@
 /* eslint-disable ex/no-unhandled -- Domain APIs are thin wrappers that don't handle exceptions */
 
 import { DATA_CHANNELS, type DataDomainBridge } from "@shared/types/preload";
+import {
+    validateSerializedDatabaseBackupResult,
+    validateSerializedDatabaseBackupSaveResult,
+    validateSerializedDatabaseRestoreResult,
+} from "@shared/validation/dataSchemas";
 
-import { createTypedInvoker } from "../core/bridgeFactory";
+import {
+    createValidatedInvoker,
+    safeParseBooleanResult,
+    safeParseStringResult,
+} from "../core/bridgeFactory";
 
 /**
  * Interface defining the data domain API operations.
@@ -71,8 +80,13 @@ export const dataApi: DataApiInterface = {
      *
      * @returns Promise resolving to backup buffer data
      */
-    downloadSqliteBackup: createTypedInvoker(
-        DATA_CHANNELS.downloadSqliteBackup
+    downloadSqliteBackup: createValidatedInvoker(
+        DATA_CHANNELS.downloadSqliteBackup,
+        validateSerializedDatabaseBackupResult,
+        {
+            domain: "dataApi",
+            guardName: "validateSerializedDatabaseBackupResult",
+        }
     ),
 
     /**
@@ -80,7 +94,14 @@ export const dataApi: DataApiInterface = {
      *
      * @returns Promise resolving to exported data as JSON string
      */
-    exportData: createTypedInvoker(DATA_CHANNELS.exportData),
+    exportData: createValidatedInvoker(
+        DATA_CHANNELS.exportData,
+        safeParseStringResult,
+        {
+        domain: "dataApi",
+        guardName: "safeParseStringResult",
+        }
+    ),
 
     /**
      * Imports application data from a JSON string
@@ -89,13 +110,34 @@ export const dataApi: DataApiInterface = {
      *
      * @returns Promise resolving to a boolean success flag
      */
-    importData: createTypedInvoker(DATA_CHANNELS.importData),
+    importData: createValidatedInvoker(
+        DATA_CHANNELS.importData,
+        safeParseBooleanResult,
+        {
+        domain: "dataApi",
+        guardName: "safeParseBooleanResult",
+        }
+    ),
 
     /** Restores a SQLite backup from an uploaded file */
-    restoreSqliteBackup: createTypedInvoker(DATA_CHANNELS.restoreSqliteBackup),
+    restoreSqliteBackup: createValidatedInvoker(
+        DATA_CHANNELS.restoreSqliteBackup,
+        validateSerializedDatabaseRestoreResult,
+        {
+            domain: "dataApi",
+            guardName: "validateSerializedDatabaseRestoreResult",
+        }
+    ),
 
     /** Saves a SQLite backup to disk via the main process. */
-    saveSqliteBackup: createTypedInvoker(DATA_CHANNELS.saveSqliteBackup),
+    saveSqliteBackup: createValidatedInvoker(
+        DATA_CHANNELS.saveSqliteBackup,
+        validateSerializedDatabaseBackupSaveResult,
+        {
+            domain: "dataApi",
+            guardName: "validateSerializedDatabaseBackupSaveResult",
+        }
+    ),
 } as const;
 
 /**

@@ -26,3 +26,17 @@ export const validateCloudBackupEntry = (
     value: unknown
 ): ReturnType<typeof cloudBackupEntrySchema.safeParse> =>
     cloudBackupEntrySchema.safeParse(value);
+
+/**
+ * Schema for a list of {@link CloudBackupEntry} values.
+ *
+ * @remarks
+ * This is primarily used for IPC response validation in the preload bridge.
+ */
+export const cloudBackupEntryArraySchema: z.ZodType<CloudBackupEntry[]> = z
+    .array(cloudBackupEntrySchema);
+
+export const validateCloudBackupEntryArray = (
+    value: unknown
+): ReturnType<typeof cloudBackupEntryArraySchema.safeParse> =>
+    cloudBackupEntryArraySchema.safeParse(value);

@@ -24,9 +24,10 @@ import { DEFAULT_SITE_NAME } from "@shared/constants/sites";
 import { ensureError } from "@shared/utils/errorHandling";
 import { safeInteger } from "@shared/validation/validatorUtils";
 import { type ChangeEvent, useCallback, useEffect, useState } from "react";
+import { useShallow } from "zustand/react/shallow";
 
 import type { ChartTimeRange } from "../../constants";
-import type { SiteDetailsTab } from "../../stores/ui/types";
+import type { SiteDetailsTab, UIStore } from "../../stores/ui/types";
 
 import { DEFAULT_CHECK_INTERVAL, RETRY_CONSTRAINTS } from "../../constants";
 import { logger } from "../../services/logger";
@@ -275,7 +276,23 @@ export function useSiteDetails({
         showAdvancedMetrics,
         siteDetailsChartTimeRange,
         syncActiveSiteDetailsTab,
-    } = useUIStore();
+    } = useUIStore(
+        useShallow(
+            useCallback(
+                (state: UIStore) => ({
+                    activeSiteDetailsTab: state.activeSiteDetailsTab,
+                    setActiveSiteDetailsTab: state.setActiveSiteDetailsTab,
+                    setShowAdvancedMetrics: state.setShowAdvancedMetrics,
+                    setSiteDetailsChartTimeRange:
+                        state.setSiteDetailsChartTimeRange,
+                    showAdvancedMetrics: state.showAdvancedMetrics,
+                    siteDetailsChartTimeRange: state.siteDetailsChartTimeRange,
+                    syncActiveSiteDetailsTab: state.syncActiveSiteDetailsTab,
+                }),
+                []
+            )
+        )
+    );
 
     const requestConfirmation = useConfirmDialog();
 

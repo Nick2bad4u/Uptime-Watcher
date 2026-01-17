@@ -916,6 +916,29 @@ describe("IPC Validators - Exported Validator Groups", () => {
                 ]);
                 expect(isValidationFailure(result)).toBeTruthy();
             });
+
+            it("should reject reserved prototype keys in restore payload", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: validators.complete", "component");
+                await annotate("Category: Core", "category");
+                await annotate("Type: Security", "type");
+
+                const payload = Object.create(null) as Record<string, unknown>;
+                payload["buffer"] = new ArrayBuffer(8);
+                Object.defineProperty(payload, "__proto__", {
+                    enumerable: true,
+                    value: { polluted: true },
+                });
+
+                const result = DataHandlerValidators.restoreSqliteBackup([
+                    payload,
+                ]);
+
+                expect(isValidationFailure(result)).toBeTruthy();
+            });
         });
     });
 
@@ -1017,6 +1040,27 @@ describe("IPC Validators - Exported Validator Groups", () => {
                     CloudHandlerValidators.configureFilesystemProvider([
                         { baseDirectory: " C:/Backups" },
                     ]);
+                expect(isValidationFailure(result)).toBeTruthy();
+            });
+
+            it("rejects reserved prototype keys", async ({ task, annotate }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: validators.complete", "component");
+                await annotate("Category: Core", "category");
+                await annotate("Type: Security", "type");
+
+                const config = Object.create(null) as Record<string, unknown>;
+                config["baseDirectory"] = "C:/Backups";
+                Object.defineProperty(config, "__proto__", {
+                    enumerable: true,
+                    value: { polluted: true },
+                });
+
+                const result =
+                    CloudHandlerValidators.configureFilesystemProvider([
+                        config,
+                    ]);
+
                 expect(isValidationFailure(result)).toBeTruthy();
             });
         });

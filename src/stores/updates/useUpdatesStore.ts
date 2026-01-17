@@ -51,6 +51,18 @@ import { logger } from "../../services/logger";
 import { SystemService } from "../../services/SystemService";
 import { createPersistConfig, logStoreAction } from "../utils";
 
+interface UpdateStatusEventsSubscriptionState {
+    cleanup: (() => void) | undefined;
+    pending: Promise<void> | undefined;
+    refCount: number;
+}
+
+const updateStatusEventsSubscription: UpdateStatusEventsSubscriptionState = {
+    cleanup: undefined,
+    pending: undefined,
+    refCount: 0,
+};
+
 /**
  * Interface for the updates store with persistence capabilities.
  */
@@ -169,78 +181,86 @@ export const useUpdatesStore: UpdatesStoreWithPersist = create<UpdatesStore>()(
             },
 
             subscribeToUpdateStatusEvents: (): (() => void) => {
-                let disposed = false;
-                let cleanup: (() => void) | null = null;
-                let cleanupExecuted = false;
+                updateStatusEventsSubscription.refCount += 1;
 
-                const subscriptionPromise = (async (): Promise<
-                    (() => void) | undefined
-                > => {
+                const safeCleanup = (): void => {
+                    const { cleanup } = updateStatusEventsSubscription;
+                    if (!cleanup) {
+                        return;
+                    }
+
                     try {
-                        const serviceCleanup =
-                            await EventsService.onUpdateStatus(
-                                ({ error, status }: UpdateStatusEventData) => {
-                                    // Read the latest actions to avoid stale
-                                    // closures if tests replace store methods.
-                                    const store = get();
-                                    store.applyUpdateStatus(status);
-                                    store.setUpdateError(error);
-                                }
-                            );
-
-                        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- disposed may flip while awaiting subscription.
-                        if (disposed) {
-                            return serviceCleanup;
-                        }
-
-                        cleanup = serviceCleanup;
-                        return serviceCleanup;
+                        cleanup();
                     } catch (error: unknown) {
                         logger.error(
-                            "[UpdatesStore] Failed to subscribe to update status events",
+                            "[UpdatesStore] Failed to cleanup update status subscription",
                             ensureError(error)
                         );
-                        return undefined;
+                    } finally {
+                        updateStatusEventsSubscription.cleanup = undefined;
                     }
-                })();
+                };
+
+                const hasActiveSubscription =
+                    updateStatusEventsSubscription.cleanup !== undefined;
+                const hasPendingSubscription =
+                    updateStatusEventsSubscription.pending !== undefined;
+
+                if (!hasActiveSubscription && !hasPendingSubscription) {
+                    updateStatusEventsSubscription.pending =
+                        (async (): Promise<void> => {
+                            try {
+                                const serviceCleanup =
+                                    await EventsService.onUpdateStatus(
+                                        ({
+                                            error,
+                                            status,
+                                        }: UpdateStatusEventData) => {
+                                            // Read the latest actions to avoid stale
+                                            // closures if tests replace store methods.
+                                            const store = get();
+                                            store.applyUpdateStatus(status);
+                                            store.setUpdateError(error);
+                                        }
+                                    );
+
+                                updateStatusEventsSubscription.cleanup =
+                                    serviceCleanup;
+                            } catch (error: unknown) {
+                                const resolved = ensureError(error);
+                                logger.error(
+                                    "[UpdatesStore] Failed to subscribe to update status events",
+                                    resolved
+                                );
+
+                                get().setUpdateError(resolved.message);
+                            } finally {
+                                updateStatusEventsSubscription.pending =
+                                    undefined;
+
+                                if (
+                                    updateStatusEventsSubscription.refCount ===
+                                    0
+                                ) {
+                                    safeCleanup();
+                                }
+                            }
+                        })();
+                }
 
                 return (): void => {
-                    disposed = true;
+                    updateStatusEventsSubscription.refCount = Math.max(
+                        0,
+                        updateStatusEventsSubscription.refCount - 1
+                    );
 
-                    if (cleanupExecuted) {
+                    if (updateStatusEventsSubscription.refCount > 0) {
                         return;
                     }
 
-                    cleanupExecuted = true;
-
-                    if (cleanup) {
-                        try {
-                            cleanup();
-                        } catch (error: unknown) {
-                            logger.error(
-                                "[UpdatesStore] Failed to cleanup update status subscription",
-                                ensureError(error)
-                            );
-                        } finally {
-                            cleanup = null;
-                        }
-
-                        return;
+                    if (updateStatusEventsSubscription.cleanup) {
+                        safeCleanup();
                     }
-
-                    void (async (): Promise<void> => {
-                        try {
-                            const deferredCleanup = await subscriptionPromise;
-                            if (typeof deferredCleanup === "function") {
-                                deferredCleanup();
-                            }
-                        } catch (error: unknown) {
-                            logger.error(
-                                "[UpdatesStore] Failed to cleanup deferred update status subscription",
-                                ensureError(error)
-                            );
-                        }
-                    })();
                 };
             },
             updateError: undefined,

@@ -562,6 +562,11 @@ export const createSiteSyncActions = (
         },
         subscribeToSyncEvents: (): (() => void) => {
             syncEventSubscription.refCount += 1;
+
+            // A previous cleanup request can set `shouldCleanupOnReady` while
+            // subscription setup is still pending. If a new subscriber attaches
+            // before setup completes, we must not auto-cleanup on completion.
+            syncEventSubscription.shouldCleanupOnReady = false;
             let released = false;
 
             const shouldAttachSubscription =
@@ -859,10 +864,7 @@ export const createSiteSyncActions = (
                     const serviceCleanup =
                         await StateSyncService.onStateSyncEvent(handleEvent);
 
-                    if (
-                        syncEventSubscription.refCount === 0 ||
-                        syncEventSubscription.shouldCleanupOnReady
-                    ) {
+                    if (syncEventSubscription.refCount === 0) {
                         serviceCleanup();
                         syncEventSubscription.shouldCleanupOnReady = false;
                         return;

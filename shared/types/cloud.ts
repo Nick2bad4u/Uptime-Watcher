@@ -57,13 +57,13 @@ export interface CloudStatusSummary {
     /** Optional last backup timestamp (epoch ms) known to the app. */
     lastBackupAt: null | number;
     /** Optional last error message for UI display. */
-    lastError?: string;
+    lastError?: string | undefined;
     /** Optional last sync timestamp (epoch ms) known to the app. */
     lastSyncAt: null | number;
     /** Configured provider kind, or null when disconnected. */
     provider: CloudProviderKind | null;
     /** Provider-specific configuration hints safe to show in UI. */
-    providerDetails?: CloudProviderDetails;
+    providerDetails?: CloudProviderDetails | undefined;
     /** True when multi-device sync is enabled. */
     syncEnabled: boolean;
 }
@@ -79,7 +79,7 @@ export type CloudProviderDetails =
            * @remarks
            * Optional because providers may not supply one.
            */
-          accountLabel?: string;
+          accountLabel?: string | undefined;
           kind:
               | typeof CLOUD_PROVIDER_KIND.DROPBOX
               | typeof CLOUD_PROVIDER_KIND.GOOGLE_DRIVE

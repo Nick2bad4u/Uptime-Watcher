@@ -4,12 +4,13 @@
  */
 
 import { act, renderHook } from "@testing-library/react";
-import { describe, it, expect, beforeEach, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { UnknownRecord } from "type-fest";
 
 import type { UpdateStatus } from "../stores/types";
 
 import { useUpdatesStore } from "../stores/updates/useUpdatesStore";
+import { EventsService } from "../services/EventsService";
 
 // Mock the logger (partial) so createPersistConfig remains available.
 vi.mock("../stores/utils", async (importOriginal) => {
@@ -42,6 +43,9 @@ setupElectronAPIMock({
 });
 
 describe(useUpdatesStore, () => {
+    afterEach(() => {
+        vi.restoreAllMocks();
+    });
     beforeEach(() => {
         // Reset the store before each test
         useUpdatesStore.setState({
@@ -588,6 +592,85 @@ describe(useUpdatesStore, () => {
                     success: true,
                 }
             );
+        });
+    });
+
+    describe("subscribeToUpdateStatusEvents", () => {
+        it("does not register duplicate listeners for multiple subscribers", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useUpdatesStore", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Consistency", "type");
+
+            const cleanup = vi.fn();
+            const onUpdateStatusSpy = vi
+                .spyOn(EventsService, "onUpdateStatus")
+                .mockResolvedValue(cleanup);
+
+            const unsubscribe1 = useUpdatesStore
+                .getState()
+                .subscribeToUpdateStatusEvents();
+            const unsubscribe2 = useUpdatesStore
+                .getState()
+                .subscribeToUpdateStatusEvents();
+
+            expect(onUpdateStatusSpy).toHaveBeenCalledTimes(1);
+
+            unsubscribe1();
+            expect(cleanup).not.toHaveBeenCalled();
+
+            unsubscribe2();
+
+            // Allow async subscription to settle.
+            await Promise.resolve();
+            await Promise.resolve();
+
+            expect(cleanup).toHaveBeenCalledTimes(1);
+        });
+
+        it("allows retry after an initial subscription failure", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useUpdatesStore", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Reliability", "type");
+
+            const error = new Error("boom");
+            const cleanup = vi.fn();
+
+            const onUpdateStatusSpy = vi
+                .spyOn(EventsService, "onUpdateStatus")
+                .mockRejectedValueOnce(error)
+                .mockResolvedValueOnce(cleanup);
+
+            const unsubscribe1 = useUpdatesStore
+                .getState()
+                .subscribeToUpdateStatusEvents();
+
+            await Promise.resolve();
+            await Promise.resolve();
+
+            expect(useUpdatesStore.getState().updateError).toBe("boom");
+
+            unsubscribe1();
+
+            const unsubscribe2 = useUpdatesStore
+                .getState()
+                .subscribeToUpdateStatusEvents();
+
+            expect(onUpdateStatusSpy).toHaveBeenCalledTimes(2);
+
+            unsubscribe2();
+
+            await Promise.resolve();
+            await Promise.resolve();
+
+            expect(cleanup).toHaveBeenCalledTimes(1);
         });
     });
 });

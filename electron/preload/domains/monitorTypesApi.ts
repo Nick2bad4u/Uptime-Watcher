@@ -13,18 +13,37 @@
 /* eslint-disable ex/no-unhandled -- Domain APIs are thin wrappers that don't handle exceptions */
 
 import type { MonitorTypeConfig } from "@shared/types/monitorTypes";
+import type { ValidationResult } from "@shared/types/validation";
 
 import { isMonitorTypeConfig } from "@shared/types/monitorTypes";
 import {
     MONITOR_TYPES_CHANNELS,
     type MonitorTypesDomainBridge,
 } from "@shared/types/preload";
+import { isValidationResult } from "@shared/types/validation";
 
 import {
-    createTypedInvoker,
     createValidatedInvoker,
     type SafeParseLike,
+    safeParseStringResult,
 } from "../core/bridgeFactory";
+
+function safeParseValidationResult(
+    candidate: unknown
+): SafeParseLike<ValidationResult> {
+    if (!isValidationResult(candidate)) {
+        return {
+            error: new Error(
+                `Expected ValidationResult response payload, received ${
+                    Array.isArray(candidate) ? "array" : typeof candidate
+                }`
+            ),
+            success: false,
+        };
+    }
+
+    return { data: candidate, success: true };
+}
 
 function safeParseMonitorTypeConfigs(
     candidate: unknown
@@ -89,15 +108,25 @@ export const monitorTypesApi: MonitorTypesApiInterface = {
     /**
      * Formats monitor detail information for display.
      */
-    formatMonitorDetail: createTypedInvoker(
-        MONITOR_TYPES_CHANNELS.formatMonitorDetail
+    formatMonitorDetail: createValidatedInvoker(
+        MONITOR_TYPES_CHANNELS.formatMonitorDetail,
+        safeParseStringResult,
+        {
+            domain: "monitorTypesApi",
+            guardName: "safeParseStringResult",
+        }
     ),
 
     /**
      * Formats monitor title suffix for display.
      */
-    formatMonitorTitleSuffix: createTypedInvoker(
-        MONITOR_TYPES_CHANNELS.formatMonitorTitleSuffix
+    formatMonitorTitleSuffix: createValidatedInvoker(
+        MONITOR_TYPES_CHANNELS.formatMonitorTitleSuffix,
+        safeParseStringResult,
+        {
+            domain: "monitorTypesApi",
+            guardName: "safeParseStringResult",
+        }
     ),
 
     /**
@@ -117,8 +146,13 @@ export const monitorTypesApi: MonitorTypesApiInterface = {
     /**
      * Validates monitor configuration data.
      */
-    validateMonitorData: createTypedInvoker(
-        MONITOR_TYPES_CHANNELS.validateMonitorData
+    validateMonitorData: createValidatedInvoker(
+        MONITOR_TYPES_CHANNELS.validateMonitorData,
+        safeParseValidationResult,
+        {
+            domain: "monitorTypesApi",
+            guardName: "safeParseValidationResult",
+        }
     ),
 } as const;
 

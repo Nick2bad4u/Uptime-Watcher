@@ -17,7 +17,10 @@ import {
     type SystemDomainBridge,
 } from "@shared/types/preload";
 
-import { createTypedInvoker } from "../core/bridgeFactory";
+import {
+    createValidatedInvoker,
+    safeParseBooleanResult,
+} from "../core/bridgeFactory";
 
 /**
  * Type alias defining the system domain API operations.
@@ -39,7 +42,14 @@ export const systemApi: SystemApiInterface = {
      *
      * @returns Promise resolving to true if URL was opened successfully
      */
-    openExternal: createTypedInvoker(SYSTEM_CHANNELS.openExternal),
+    openExternal: createValidatedInvoker(
+        SYSTEM_CHANNELS.openExternal,
+        safeParseBooleanResult,
+        {
+            domain: "systemApi",
+            guardName: "safeParseBooleanResult",
+        }
+    ),
 
     /**
      * Quits the application and installs a pending update
@@ -49,7 +59,14 @@ export const systemApi: SystemApiInterface = {
      * downloaded update. This is typically called after the user confirms they
      * want to install an available update.
      */
-    quitAndInstall: createTypedInvoker(SYSTEM_CHANNELS.quitAndInstall),
+    quitAndInstall: createValidatedInvoker(
+        SYSTEM_CHANNELS.quitAndInstall,
+        safeParseBooleanResult,
+        {
+            domain: "systemApi",
+            guardName: "safeParseBooleanResult",
+        }
+    ),
 
     /**
      * Writes the provided string to the OS clipboard.
@@ -58,7 +75,14 @@ export const systemApi: SystemApiInterface = {
      * Uses Electron's main-process clipboard API to avoid browser clipboard
      * permission issues in hardened Electron contexts.
      */
-    writeClipboardText: createTypedInvoker(SYSTEM_CHANNELS.writeClipboardText),
+    writeClipboardText: createValidatedInvoker(
+        SYSTEM_CHANNELS.writeClipboardText,
+        safeParseBooleanResult,
+        {
+            domain: "systemApi",
+            guardName: "safeParseBooleanResult",
+        }
+    ),
 } as const;
 
 /**

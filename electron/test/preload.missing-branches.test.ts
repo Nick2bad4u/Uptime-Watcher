@@ -219,19 +219,25 @@ describe("preload.ts - Missing Branch Coverage", () => {
                 return Promise.resolve({ success: true, data: null });
             });
 
-            // Test with invalid numeric parameters - bridge still mirrors backend data
+            // Test with invalid numeric parameters - bridge now validates response payloads
             await expect(
                 exposedAPI.settings.updateHistoryLimit(-1)
-            ).resolves.toBe(-1);
+            ).rejects.toThrowError(
+                /failed validation for channel 'update-history-limit'/i
+            );
             await expect(
                 exposedAPI.settings.updateHistoryLimit(0)
             ).resolves.toBe(0);
             await expect(
                 exposedAPI.settings.updateHistoryLimit(Infinity)
-            ).resolves.toBe(Infinity);
+            ).rejects.toThrowError(
+                /failed validation for channel 'update-history-limit'/i
+            );
             await expect(
                 exposedAPI.settings.updateHistoryLimit(Number.NaN)
-            ).resolves.toSatisfy(Number.isNaN);
+            ).rejects.toThrowError(
+                /failed validation for channel 'update-history-limit'/i
+            );
         });
     });
     describe("Concurrent Operations", () => {
