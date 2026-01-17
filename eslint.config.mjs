@@ -227,7 +227,7 @@ import jsoncEslintParser from "jsonc-eslint-parser";
 import { createRequire } from "node:module";
 import * as path from "node:path";
 import * as tomlEslintParser from "toml-eslint-parser";
-import yamlEslintParser from "yaml-eslint-parser";
+import * as yamlEslintParser from "yaml-eslint-parser";
 
 import uptimeWatcherPlugin from "./config/linting/plugins/uptime-watcher.mjs";
 import sharedContractInterfaceGuard from "./config/linting/rules/shared-contract-interfaces.mjs";
@@ -639,7 +639,6 @@ export default /** @type {EslintConfig} */[
             xss: xss,
         },
         rules: {
-            // @ts-expect-error -- No Types for this Package
             ...html.configs.recommended.rules,
             "html/id-naming-convention": "warn",
             "html/indent": "error",
@@ -714,7 +713,6 @@ export default /** @type {EslintConfig} */[
         },
         rules: {
             // HTML Eslint Plugin Rules (html/*)
-            // @ts-expect-error -- No Types for this Package
             ...html.configs.recommended.rules,
             "html/indent": "error",
             "html/no-extra-spacing-attrs": [
