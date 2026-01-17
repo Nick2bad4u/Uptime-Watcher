@@ -4,6 +4,7 @@ import { randomInt } from "node:crypto";
 import type { CloudService } from "./CloudService";
 
 import { logger } from "../../utils/logger";
+import { isCloudProviderOperationError } from "./providers/cloudProviderErrors";
 
 const DEFAULT_SYNC_INTERVAL_MS = 10 * 60_000;
 
@@ -51,7 +52,24 @@ export class CloudSyncScheduler {
             success = true;
         } catch (error) {
             const resolved = ensureError(error);
-            logger.warn("[CloudSyncScheduler] Sync cycle failed", resolved);
+
+            const providerDetails = isCloudProviderOperationError(resolved)
+                ? {
+                      code: resolved.code,
+                      operation: resolved.operation,
+                      providerKind: resolved.providerKind,
+                      target: resolved.target,
+                  }
+                : undefined;
+
+            // Never log raw error objects here: provider SDKs/HTTP clients can
+            // attach sensitive request config (headers, body) containing
+            // Authorization tokens.
+            logger.warn("[CloudSyncScheduler] Sync cycle failed", {
+                message: resolved.message,
+                name: resolved.name,
+                ...(providerDetails ? { providerDetails } : {}),
+            });
         } finally {
             this.isRunning = false;
             this.scheduleNextRun(this.computeDelayMs(success));

@@ -6,6 +6,14 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { CloudSyncScheduler } from "@electron/services/cloud/CloudSyncScheduler";
 
+const mockLogger = vi.hoisted(() => ({
+    warn: vi.fn(),
+}));
+
+vi.mock("../../../utils/logger", () => ({
+    logger: mockLogger,
+}));
+
 vi.mock("node:crypto", () => ({
     randomInt: vi.fn(() => 0),
 }));
@@ -120,5 +128,60 @@ describe(CloudSyncScheduler, () => {
         expect(delays[1]).toBe(10 * 60_000);
 
         expect(cloudService.requestSyncNow).toHaveBeenCalledTimes(2);
+    });
+
+    it("does not log raw error objects (no token leaks)", async () => {
+        const cloudService = {
+            getStatus: vi.fn(async () => ({
+                backupsEnabled: false,
+                configured: true,
+                connected: true,
+                encryptionLocked: false,
+                encryptionMode: "none",
+                lastBackupAt: null,
+                lastError: undefined,
+                lastSyncAt: null,
+                provider: "dropbox",
+                providerDetails: {
+                    kind: "dropbox",
+                    accountLabel: "acct",
+                },
+                syncEnabled: true,
+            })),
+            requestSyncNow: vi.fn(async () => {
+                const error = new Error("boom");
+                // Simulate an axios-style error shape which could include
+                // sensitive headers/body.
+                (error as any).config = {
+                    headers: {
+                        Authorization: "Bearer VERY_SECRET_TOKEN",
+                    },
+                    data: "refresh_token=VERY_SECRET_TOKEN",
+                };
+                throw error;
+            }),
+        };
+
+        const scheduler = new CloudSyncScheduler({
+            cloudService: cloudService as never,
+        });
+
+        scheduler.initialize();
+
+        await vi.runOnlyPendingTimersAsync();
+
+        expect(mockLogger.warn).toHaveBeenCalledWith(
+            "[CloudSyncScheduler] Sync cycle failed",
+            expect.objectContaining({
+                message: "boom",
+                name: "Error",
+            })
+        );
+
+        const loggedPayload = mockLogger.warn.mock.calls[0]?.[1];
+        expect(loggedPayload).not.toBeInstanceOf(Error);
+        expect(JSON.stringify(loggedPayload)).not.toContain(
+            "VERY_SECRET_TOKEN"
+        );
     });
 });

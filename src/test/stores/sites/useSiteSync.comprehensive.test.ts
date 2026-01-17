@@ -481,6 +481,65 @@ describe("useSiteSync", () => {
             expect(typeof result).toBe("function");
         });
 
+        it("should be idempotent and ref-counted", async ({ task, annotate }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteSyncActions", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Subscription", "type");
+
+            const cleanupSpy = vi.fn();
+            mockStateSyncService.onStateSyncEvent.mockResolvedValue(cleanupSpy);
+
+            const unsubscribe1 = syncActions.subscribeToSyncEvents();
+            const unsubscribe2 = syncActions.subscribeToSyncEvents();
+
+            expect(mockStateSyncService.onStateSyncEvent).toHaveBeenCalledTimes(
+                1
+            );
+
+            // Let the async subscription resolve.
+            await Promise.resolve();
+            await Promise.resolve();
+
+            unsubscribe1();
+            expect(cleanupSpy).not.toHaveBeenCalled();
+
+            unsubscribe2();
+            expect(cleanupSpy).toHaveBeenCalledTimes(1);
+        });
+
+        it("should cleanup even if unsubscribed before subscription resolves", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteSyncActions", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Subscription", "type");
+
+            const cleanupSpy = vi.fn();
+            let resolveCleanup:
+                | ((cleanup: () => void) => void)
+                | undefined;
+
+            mockStateSyncService.onStateSyncEvent.mockImplementation(
+                () =>
+                    new Promise<() => void>((resolve) => {
+                        resolveCleanup = resolve;
+                    })
+            );
+
+            const unsubscribe = syncActions.subscribeToSyncEvents();
+            unsubscribe();
+
+            // Subscription resolves later.
+            resolveCleanup?.(cleanupSpy);
+            await Promise.resolve();
+            await Promise.resolve();
+
+            expect(cleanupSpy).toHaveBeenCalledTimes(1);
+        });
+
         it("should handle bulk-sync events", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useSiteSync", "component");

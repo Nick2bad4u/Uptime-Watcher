@@ -51,8 +51,6 @@ import {
 /**
  * Site synchronization actions interface.
  *
- * @remarks
- * Defines all available site synchronization operations that can be performed.
  * These actions are designed to work within the Zustand store architecture and
  * provide consistent error handling and logging.
  *
@@ -156,8 +154,6 @@ export interface SiteSyncActions {
 }
 
 /**
- * Dependencies required for site synchronization operations.
- *
  * @remarks
  * These dependencies are injected into the sync actions to maintain separation
  * of concerns and enable easier testing. The dependencies provide access to the
@@ -269,6 +265,16 @@ export const createSiteSyncActions = (
 ): SiteSyncActions => {
     // Synchronization state to prevent concurrent syncs
     let pendingSyncPromise: null | Promise<void> = null;
+
+    const syncEventSubscription: {
+        cleanup?: () => void;
+        pending?: Promise<void>;
+        refCount: number;
+        shouldCleanupOnReady: boolean;
+    } = {
+        refCount: 0,
+        shouldCleanupOnReady: false,
+    };
 
     /**
      * Normalizes backend site snapshots by removing duplicate identifiers while
@@ -555,10 +561,17 @@ export const createSiteSyncActions = (
             return withErrorHandling(executeSubscription, errorHandler);
         },
         subscribeToSyncEvents: (): (() => void) => {
-            let cleanup: (() => void) | null = null;
-            let disposed = false;
+            syncEventSubscription.refCount += 1;
+            let released = false;
 
-            const logSyncEventReceived = (event: StateSyncEventData): void => {
+            const shouldAttachSubscription =
+                syncEventSubscription.cleanup === undefined &&
+                syncEventSubscription.pending === undefined;
+
+            if (shouldAttachSubscription) {
+                const logSyncEventReceived = (
+                    event: StateSyncEventData
+                ): void => {
                 const {
                     action,
                     revision,
@@ -573,16 +586,18 @@ export const createSiteSyncActions = (
                     sitesCount = sites.length;
                 }
 
-                logStoreAction("SitesStore", "syncEventReceived", {
-                    action,
-                    message: `Received sync event: ${action}`,
-                    revision,
-                    siteIdentifier,
-                    source,
-                    timestamp,
-                    ...(typeof sitesCount === "number" ? { sitesCount } : {}),
-                });
-            };
+                    logStoreAction("SitesStore", "syncEventReceived", {
+                        action,
+                        message: `Received sync event: ${action}`,
+                        revision,
+                        siteIdentifier,
+                        source,
+                        timestamp,
+                        ...(typeof sitesCount === "number"
+                            ? { sitesCount }
+                            : {}),
+                    });
+                };
 
             const applySnapshotEvent = (event: BulkStateSyncEventData): void => {
                 const {
@@ -723,8 +738,8 @@ export const createSiteSyncActions = (
                     updatedSites,
                 } = sanitizedDelta;
 
-                const updatedByIdentifier = new Map(
-                    updatedSites.map((site) => [site.identifier, site])
+                    const updatedByIdentifier = new Map(
+                        updatedSites.map((site) => [site.identifier, site] as const)
                 );
 
                 const nextSites: Site[] = [];
@@ -839,18 +854,21 @@ export const createSiteSyncActions = (
                 }
             };
 
-            void (async (): Promise<void> => {
+                syncEventSubscription.pending = (async (): Promise<void> => {
                 try {
                     const serviceCleanup =
                         await StateSyncService.onStateSyncEvent(handleEvent);
 
-                    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- disposed may flip while awaiting subscription.
-                    if (disposed) {
+                    if (
+                        syncEventSubscription.refCount === 0 ||
+                        syncEventSubscription.shouldCleanupOnReady
+                    ) {
                         serviceCleanup();
+                        syncEventSubscription.shouldCleanupOnReady = false;
                         return;
                     }
 
-                    cleanup = serviceCleanup;
+                    syncEventSubscription.cleanup = serviceCleanup;
                     logStoreAction("SitesStore", "subscribeToSyncEvents", {
                         message: "Sync event subscription setup completed",
                         status: "success",
@@ -868,19 +886,53 @@ export const createSiteSyncActions = (
                         status: "failure",
                         success: false,
                     });
-                }
-            })();
 
-            logStoreAction("SitesStore", "subscribeToSyncEvents", {
-                message: "Sync event subscription setup initiated",
-                status: "pending",
-            });
+                    syncEventSubscription.refCount = 0;
+                    syncEventSubscription.shouldCleanupOnReady = false;
+                } finally {
+                    delete syncEventSubscription.pending;
+
+                    if (
+                        syncEventSubscription.refCount === 0 &&
+                        syncEventSubscription.cleanup
+                    ) {
+                        syncEventSubscription.cleanup();
+                        delete syncEventSubscription.cleanup;
+                        syncEventSubscription.shouldCleanupOnReady = false;
+                    }
+                }
+                })();
+
+                logStoreAction("SitesStore", "subscribeToSyncEvents", {
+                    message: "Sync event subscription setup initiated",
+                    status: "pending",
+                });
+            }
 
             return (): void => {
-                disposed = true;
-                if (cleanup) {
-                    cleanup();
-                    cleanup = null;
+                if (released) {
+                    return;
+                }
+
+                released = true;
+                syncEventSubscription.refCount = Math.max(
+                    0,
+                    syncEventSubscription.refCount - 1
+                );
+
+                if (syncEventSubscription.refCount > 0) {
+                    return;
+                }
+
+                if (syncEventSubscription.cleanup) {
+                    syncEventSubscription.cleanup();
+                    delete syncEventSubscription.cleanup;
+                    syncEventSubscription.shouldCleanupOnReady = false;
+                    return;
+                }
+
+                if (syncEventSubscription.pending) {
+                    syncEventSubscription.shouldCleanupOnReady = true;
                 }
             };
         },

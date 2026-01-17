@@ -43,6 +43,15 @@ vi.mock("../../../../shared/utils/jsonSafety", () => ({
     safeJsonStringifyWithFallback: vi.fn(),
 }));
 
+vi.mock("../../../../shared/utils/utfByteLength", async (importOriginal) => {
+    const actual = await importOriginal<typeof import("../../../../shared/utils/utfByteLength")>();
+
+    return {
+        ...actual,
+        getUtfByteLength: vi.fn(actual.getUtfByteLength),
+    };
+});
+
 vi.mock("../../../utils/operationalHooks", () => ({
     withDatabaseOperation: vi.fn(),
 }));
@@ -229,7 +238,16 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
                     monitors: [],
                 },
             ];
-            const mockSettings = { theme: "dark", historyLimit: "1000" };
+            const mockSettings = {
+                theme: "dark",
+                historyLimit: "1000",
+                "cloud.dropbox.tokens": "ciphertext",
+                "cloud.sync.deviceId": "device",
+            };
+            const expectedSettings = {
+                theme: "dark",
+                historyLimit: "1000",
+            };
 
             mockRepositories.site.exportAllRows.mockResolvedValue(mockSites);
             mockRepositories.settings.getAll.mockResolvedValue(mockSettings);
@@ -244,7 +262,7 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             expect(safeJsonStringifyWithFallback).toHaveBeenCalledWith(
                 expect.objectContaining({
                     sites: mockSites,
-                    settings: mockSettings,
+                    settings: expectedSettings,
                     version: "1.0",
                     exportedAt: expect.any(String),
                 }),
@@ -346,6 +364,51 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
                 settingsError
             );
         });
+
+        it("should reject exports that exceed the IPC byte budget", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DataImportExportService", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Security", "type");
+
+            const { safeJsonStringifyWithFallback } =
+                await import("../../../../shared/utils/jsonSafety");
+            const { getUtfByteLength } =
+                await import("../../../../shared/utils/utfByteLength");
+            const { MAX_IPC_JSON_EXPORT_BYTES } =
+                await import("../../../../shared/constants/backup");
+
+            mockRepositories.site.exportAllRows.mockResolvedValue([]);
+            mockRepositories.settings.getAll.mockResolvedValue({});
+            (safeJsonStringifyWithFallback as MockedFunction<any>).mockReturnValue(
+                "{\"exported\":true}"
+            );
+
+            (getUtfByteLength as MockedFunction<any>).mockReturnValue(
+                MAX_IPC_JSON_EXPORT_BYTES + 1
+            );
+
+            const exportPromise = service.exportAllData();
+            await expect(exportPromise).rejects.toThrowError(
+                DataImportExportError
+            );
+            await expect(exportPromise).rejects.toThrowError(
+                /Failed to export data: Export payload is too large/u
+            );
+
+            expect(getUtfByteLength).toHaveBeenCalledWith(
+                "{\"exported\":true}"
+            );
+            expect(mockEventEmitter.emitTyped).toHaveBeenCalledWith(
+                "database:error",
+                expect.objectContaining({
+                    operation: "export-data",
+                })
+            );
+        });
     });
 
     describe("importDataFromJson", () => {
@@ -363,7 +426,10 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             const mockJsonData = '{"sites": [], "settings": {}}';
             const mockParsedData = {
                 sites: [{ identifier: "test-site", name: "Test Site" }],
-                settings: { theme: "dark" },
+                settings: {
+                    theme: "dark",
+                    "cloud.dropbox.tokens": "ciphertext",
+                },
             };
 
             (safeJsonParse as MockedFunction<any>).mockReturnValue({
@@ -380,7 +446,9 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             );
             expect(result).toEqual({
                 sites: mockParsedData.sites,
-                settings: mockParsedData.settings,
+                settings: {
+                    theme: "dark",
+                },
             });
         });
 
@@ -823,7 +891,7 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             ).not.toHaveBeenCalled();
         });
 
-        it("should handle monitor creation errors and continue with other sites", async ({
+        it("should abort the import when monitor creation fails", async ({
             task,
             annotate,
         }) => {
@@ -871,14 +939,19 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
                 async (operation: any) => await operation()
             );
 
-            await service.persistImportedData(mockSites, {});
+            await expect(
+                service.persistImportedData(mockSites, {})
+            ).rejects.toThrowError(/Monitor import failed for site 'site1'/u);
 
             expect(mockLogger.error).toHaveBeenCalledWith(
                 "[DataImportExportService] Failed to import monitors for site site1:",
                 createError
             );
-            expect(mockLogger.debug).toHaveBeenCalledWith(
-                "[DataImportExportService] Imported 1 monitors for site: site2"
+
+            // Fail-fast behavior: we should not attempt to import the second
+            // site once a monitor import fails.
+            expect(mockRepositories.monitor.createInternal).toHaveBeenCalledTimes(
+                1
             );
         });
 

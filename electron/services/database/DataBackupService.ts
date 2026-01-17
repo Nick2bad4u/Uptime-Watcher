@@ -565,6 +565,19 @@ export class DataBackupService {
                 const normalizedBackup =
                     this.normalizeBackupResultMetadata(backup);
                 validateDatabaseBackupPayload(normalizedBackup);
+
+                const buffer = Buffer.from(normalizedBackup.buffer);
+                if (
+                    buffer.length < SQLITE_HEADER.length ||
+                    !buffer
+                        .subarray(0, SQLITE_HEADER.length)
+                        .equals(SQLITE_HEADER)
+                ) {
+                    throw new Error(
+                        "Backup payload is not a valid SQLite database file"
+                    );
+                }
+
                 const tempDir = await this.createTempDirectory(
                     ROLLBACK_TEMP_PREFIX
                 );
@@ -580,8 +593,17 @@ export class DataBackupService {
                     const tempFilePath = await this.writeFileWithinDirectory(
                         tempDir,
                         safeFileName,
-                        normalizedBackup.buffer
+                        buffer
                     );
+
+                    // Even for internally-produced backups, validate that the
+                    // replacement database file is structurally sound before
+                    // swapping it into place.
+                    assertSqliteDatabaseIntegrity({
+                        filePath: tempFilePath,
+                        mode: "quick_check",
+                    });
+
                     await this.replaceDatabaseFile(tempFilePath, dbPath);
                     return normalizedBackup.metadata;
                 } finally {

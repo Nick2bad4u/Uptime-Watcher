@@ -10,6 +10,7 @@ import type { Site, StatusHistory } from "@shared/types";
 import type { Logger } from "@shared/utils/logger/interfaces";
 import type { Jsonifiable, JsonValue } from "type-fest";
 
+import { MAX_IPC_JSON_EXPORT_BYTES } from "@shared/constants/backup";
 import { MIN_MONITOR_CHECK_INTERVAL_MS } from "@shared/constants/monitoring";
 import { DEFAULT_SITE_NAME } from "@shared/constants/sites";
 import { ERROR_CATALOG } from "@shared/utils/errorCatalog";
@@ -18,6 +19,7 @@ import {
     safeJsonStringifyWithFallback,
 } from "@shared/utils/jsonSafety";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
+import { getUtfByteLength } from "@shared/utils/utfByteLength";
 import {
     type ExportData,
     type ImportSite,
@@ -139,6 +141,16 @@ const toJsonifiable = (value: unknown): Jsonifiable => {
 export class DataImportExportService {
     private static readonly DATABASE_ERROR_EVENT = "database:error" as const;
 
+    /**
+     * Prefix for settings keys that are internal to cloud providers/sync.
+     *
+     * @remarks
+     * These keys may include encrypted secrets (e.g. OAuth tokens) or
+     * machine-specific state (device identifiers, sync cursors) that should not
+     * be transferred via the user-facing JSON import/export flow.
+     */
+    private static readonly CLOUD_SETTINGS_PREFIX = "cloud." as const;
+
     private readonly databaseService: DatabaseService;
 
     private readonly eventEmitter: TypedEventBus<UptimeEvents>;
@@ -192,7 +204,8 @@ export class DataImportExportService {
                     } satisfies Site;
                 })
             );
-            const settings = await this.repositories.settings.getAll();
+            const rawSettings = await this.repositories.settings.getAll();
+            const settings = this.stripCloudSettings(rawSettings, "export");
 
             const exportPayload: ExportData = {
                 exportedAt: new Date().toISOString(),
@@ -210,7 +223,15 @@ export class DataImportExportService {
 
             const exportData = toJsonifiable(exportPayload);
 
-            return safeJsonStringifyWithFallback(exportData, "{}", 2);
+            const json = safeJsonStringifyWithFallback(exportData, "{}", 2);
+            const bytes = getUtfByteLength(json);
+            if (bytes > MAX_IPC_JSON_EXPORT_BYTES) {
+                throw new Error(
+                    `Export payload is too large (${bytes} > ${MAX_IPC_JSON_EXPORT_BYTES} bytes). Use SQLite backup/restore for large snapshots.`
+                );
+            }
+
+            return json;
         } catch (error) {
             return this.handleDataOperationFailure(
                 "export-data",
@@ -249,7 +270,10 @@ export class DataImportExportService {
             const validatedData = validation.value;
 
             return {
-                settings: validatedData.settings ?? {},
+                settings: this.stripCloudSettings(
+                    validatedData.settings ?? {},
+                    "import"
+                ),
                 sites: validatedData.sites,
             };
         } catch (error) {
@@ -269,7 +293,7 @@ export class DataImportExportService {
         sites: ImportSite[],
         settings: null | Record<string, string> | undefined
     ): Promise<void> {
-        const safeSettings = settings ?? {};
+        const safeSettings = this.stripCloudSettings(settings ?? {}, "persist");
         const normalizedSites = sites.map((site) =>
             this.normalizeImportSite(site)
         );
@@ -357,7 +381,7 @@ export class DataImportExportService {
         throw new DataImportExportError(message, { cause: normalizedError });
     }
 
-    /**
+/**
      * Executes a database transaction with import-specific repository adapters.
      *
      * @typeParam T - Result returned by the transactional operation.
@@ -380,6 +404,34 @@ export class DataImportExportService {
         );
     }
 
+    private stripCloudSettings(
+        settings: Record<string, string>,
+        context: "export" | "import" | "persist"
+    ): Record<string, string> {
+        const result: Record<string, string> = {};
+        const strippedKeys: string[] = [];
+
+        for (const [key, value] of Object.entries(settings)) {
+            if (key.startsWith(DataImportExportService.CLOUD_SETTINGS_PREFIX)) {
+                strippedKeys.push(key);
+            } else {
+                result[key] = value;
+            }
+        }
+
+        if (strippedKeys.length > 0) {
+            this.logger.info(
+                `[DataImportExportService] Stripped ${strippedKeys.length} cloud settings keys during ${context}`,
+                {
+                    keysPreview: strippedKeys.slice(0, 5),
+                }
+            );
+        }
+
+        return result;
+    }
+
+
     /**
      * Import monitors with their history for all sites. Private helper method
      * for monitor data persistence.
@@ -389,23 +441,16 @@ export class DataImportExportService {
         monitorRepositoryTransaction: MonitorRepositoryTransactionAdapter,
         sites: ImportSite[]
     ): void {
-        let failures = 0;
-
         for (const site of sites) {
             const { identifier } = site;
+            const monitors = Array.isArray(site.monitors) ? site.monitors : [];
+
+            if (monitors.length === 0) {
+                // No monitors to import for this site.
+                continue; // eslint-disable-line no-continue -- Early exit keeps the main logic flatter and avoids deeply nested blocks.
+            }
 
             try {
-                const monitors = Array.isArray(site.monitors)
-                    ? site.monitors
-                    : [];
-
-                if (monitors.length === 0) {
-                    // No monitors to import for this site; skip without
-                    // treating as a failure to preserve the original import
-                    // semantics.
-                    continue; // eslint-disable-line no-continue -- Early exit keeps the main logic flatter and avoids deeply nested blocks.
-                }
-
                 const createdMonitors = monitors.map((monitor) => {
                     const newId = monitorRepositoryTransaction.create(
                         identifier,
@@ -428,18 +473,24 @@ export class DataImportExportService {
                     `[DataImportExportService] Imported ${createdMonitors.length} monitors for site: ${identifier}`
                 );
             } catch (error) {
-                failures += 1;
+                // This entire import is destructive (deleteAll + bulkInsert).
+                // If any site fails to import monitors/history, abort so the
+                // transaction can rollback and the existing dataset remains
+                // intact.
                 this.logger.error(
                     `[DataImportExportService] Failed to import monitors for site ${identifier}:`,
                     error
                 );
-            }
-        }
 
-        if (failures > 0) {
-            this.logger.warn(
-                `[DataImportExportService] ${failures} out of ${sites.length} site monitor imports failed`
-            );
+                const errorDetail = getUserFacingErrorDetail(error);
+
+                throw new Error(
+                    `Monitor import failed for site '${identifier}': ${errorDetail}`,
+                    {
+                        cause: error,
+                    }
+                );
+            }
         }
     }
 

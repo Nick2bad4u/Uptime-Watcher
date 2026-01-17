@@ -286,15 +286,25 @@ describe("State Sync Domain API", () => {
             );
         });
 
+        // Must match the shared Zod schemas:
+        // - identifier: /^[\dA-Z:_-]+$/i
+        // - name: /^[\dA-Z .:_-]+$/i
+        const siteIdentifierArb = fc.stringMatching(
+            /^[\w:-]{1,50}$/
+        );
+        const siteNameArb = fc
+            .stringMatching(/^[\w .:-]{1,120}$/)
+            .filter((name) => name.trim().length > 0);
+
         it("should handle various full sync scenarios", async () => {
             const siteArrayArb = fc
                 .array(
                     fc.record({
-                        identifier: fc.string({ minLength: 1, maxLength: 50 }),
-                        name: fc.string({ minLength: 1, maxLength: 120 }),
+                        identifier: siteIdentifierArb,
+                        name: siteNameArb,
                         monitoring: fc.boolean(),
                     }),
-                    { maxLength: 40 }
+                    { minLength: 0, maxLength: 40 }
                 )
                 .map((sites) =>
                     sites.map((site) => ({
