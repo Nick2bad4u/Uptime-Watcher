@@ -352,8 +352,8 @@ export const AnalyticsTab = ({
                     variant="secondary"
                 >
                     <ThemedText size="sm" variant="secondary">
-                        Run a check (or wait for scheduled checks) to populate uptime and
-                        response-time charts.
+                        Run a check (or wait for scheduled checks) to populate
+                        uptime and response-time charts.
                     </ThemedText>
                 </ThemedCard>
             ) : null}
@@ -367,7 +367,9 @@ export const AnalyticsTab = ({
                     <div className="flex gap-2">
                         {CHART_TIME_RANGES.map((range) => (
                             <ThemedButton
-                                aria-pressed={siteDetailsChartTimeRange === range}
+                                aria-pressed={
+                                    siteDetailsChartTimeRange === range
+                                }
                                 key={range}
                                 onClick={createTimeRangeHandler(range)}
                                 size="sm"

@@ -88,7 +88,11 @@ export const SiteTableRow: NamedExoticComponent<SiteTableRowProperties> = memo(
                 monitors: latestSite.monitors,
                 siteIdentifier: site.identifier,
             }),
-            [latestSite.monitors, latestSite.name, site.identifier]
+            [
+                latestSite.monitors,
+                latestSite.name,
+                site.identifier,
+            ]
         );
 
         const {

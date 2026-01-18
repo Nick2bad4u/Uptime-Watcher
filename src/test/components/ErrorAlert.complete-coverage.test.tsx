@@ -384,8 +384,8 @@ describe("ErrorAlert - Complete Coverage", () => {
 
             // Find the specific message paragraph element, not by text content
             const alertElement = screen.getByRole("alert");
-                const messageElement = alertElement.querySelector(
-                    "p.text-sm.font-medium.wrap-break-word"
+            const messageElement = alertElement.querySelector(
+                "p.text-sm.font-medium.wrap-break-word"
             );
             expect(messageElement).toBeInTheDocument();
             expect(messageElement).toHaveTextContent("");

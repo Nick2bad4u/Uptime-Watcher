@@ -18,8 +18,8 @@ export function getElectronErrorCodeSuffix(error: unknown): string {
  * Opens a validated external URL via `shell.openExternal`.
  *
  * @remarks
- * This helper centralizes error formatting so that failures never echo the
- * full URL (which may contain secrets). Callers must pass a pre-redacted
+ * This helper centralizes error formatting so that failures never echo the full
+ * URL (which may contain secrets). Callers must pass a pre-redacted
  * `safeUrlForLogging`.
  */
 export async function openExternalOrThrow(args: {

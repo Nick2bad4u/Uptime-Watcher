@@ -10,8 +10,6 @@ import { resolveFastCheckEnvOverrides } from "@shared/test/utils/fastCheckEnv";
 
 import { EventEmitter } from "node:events";
 
-
-
 import { useErrorStore } from "../stores/error/useErrorStore";
 
 // Stub problematic aria-query literal-role metadata to avoid SyntaxError
@@ -301,7 +299,6 @@ const ensureStorage = (storageKey: StorageKey): void => {
 
 ensureStorage("localStorage");
 ensureStorage("sessionStorage");
-
 
 // Suppress noisy CSS parse errors emitted by JSDOM for modern CSS features
 const originalConsoleError = console.error;
@@ -644,7 +641,7 @@ vi.mock("../theme/useTheme", () => ({
 }));
 
 // Export mocks for use in individual tests
-export {  mockTheme };
+export { mockTheme };
 
 // Custom test context setup for task and annotate properties
 // Note: The actual type definitions are in src/types/vitest-context.d.ts
@@ -657,4 +654,4 @@ if ((globalThis as any).fail === undefined) {
     };
 }
 
-export {mockElectronAPI} from "./mock-setup";
+export { mockElectronAPI } from "./mock-setup";

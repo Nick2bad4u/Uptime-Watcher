@@ -457,7 +457,9 @@ describe("AddSiteForm behavioral coverage", () => {
         expect(formStateRefs).toBeDefined();
         const { onChange } = dynamicMonitorFieldsProps!;
 
-        const getSetterName = (fieldName: string): keyof FormStateReferences => {
+        const getSetterName = (
+            fieldName: string
+        ): keyof FormStateReferences => {
             if (fieldName === "maxResponseTime") {
                 return "setMaxResponseTimeMs";
             }

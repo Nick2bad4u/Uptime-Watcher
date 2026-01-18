@@ -154,7 +154,9 @@ describe(resetProviderCloudSyncState, () => {
         );
 
         // Unknown extensions are ignored during cleanup.
-        await expect(provider.downloadObject("sync/other.bin")).resolves.toBeTruthy();
+        await expect(
+            provider.downloadObject("sync/other.bin")
+        ).resolves.toBeTruthy();
 
         expect(syncEngine.syncNow).toHaveBeenCalledTimes(1);
         expect(syncEngine.syncNow).toHaveBeenCalledWith(provider);

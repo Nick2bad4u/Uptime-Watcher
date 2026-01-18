@@ -47,14 +47,13 @@ vi.mock("@shared/utils/errorHandling", async (importOriginal) => {
 });
 
 vi.mock("../../../stores/utils", async (importOriginal) => {
-    const actual = await importOriginal<typeof import("../../../stores/utils")>();
+    const actual =
+        await importOriginal<typeof import("../../../stores/utils")>();
     return {
         ...actual,
         logStoreAction: vi.fn(),
     };
-
 });
-
 
 const mockElectronAPI = {
     monitorTypes: {

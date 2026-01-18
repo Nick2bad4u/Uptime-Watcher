@@ -63,8 +63,8 @@ export interface DataApiInterface extends DataDomainBridge {
      * Saves a SQLite database backup using an Electron save dialog.
      *
      * @remarks
-     * This method exists to avoid transferring large backup buffers across
-     * IPC. The backup is created and written on the main process.
+     * This method exists to avoid transferring large backup buffers across IPC.
+     * The backup is created and written on the main process.
      */
     saveSqliteBackup: DataDomainBridge["saveSqliteBackup"];
 }
@@ -98,8 +98,8 @@ export const dataApi: DataApiInterface = {
         DATA_CHANNELS.exportData,
         safeParseStringResult,
         {
-        domain: "dataApi",
-        guardName: "safeParseStringResult",
+            domain: "dataApi",
+            guardName: "safeParseStringResult",
         }
     ),
 
@@ -114,8 +114,8 @@ export const dataApi: DataApiInterface = {
         DATA_CHANNELS.importData,
         safeParseBooleanResult,
         {
-        domain: "dataApi",
-        guardName: "safeParseBooleanResult",
+            domain: "dataApi",
+            guardName: "safeParseBooleanResult",
         }
     ),
 

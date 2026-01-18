@@ -10,7 +10,6 @@ import {
     generateMonitorTableSchema,
 } from "./dynamicSchema";
 
-
 /**
  * Utilities for managing the SQLite database schema, including table and index
  * creation and validation setup.
@@ -107,8 +106,8 @@ function parseTableInfoRows(value: unknown): TableInfoRow[] {
         return [];
     }
 
-    return value.filter((row): row is TableInfoRow =>
-        typeof row === "object" && row !== null
+    return value.filter(
+        (row): row is TableInfoRow => typeof row === "object" && row !== null
     );
 }
 
@@ -127,7 +126,7 @@ function ensureMonitorDynamicColumns(database: Database): void {
 
     const existingColumns = new Set<string>();
     for (const row of rows) {
-        const columnName = (row).name;
+        const columnName = row.name;
         if (typeof columnName === "string" && columnName.length > 0) {
             existingColumns.add(columnName);
         }
@@ -139,7 +138,9 @@ function ensureMonitorDynamicColumns(database: Database): void {
             const column = escapeSqlIdentifier(def.columnName);
             const sqlType = def.sqlType === "INTEGER" ? "INTEGER" : "TEXT";
 
-            database.run(`ALTER TABLE monitors ADD COLUMN ${column} ${sqlType}`);
+            database.run(
+                `ALTER TABLE monitors ADD COLUMN ${column} ${sqlType}`
+            );
             existingColumns.add(def.columnName);
         }
     }

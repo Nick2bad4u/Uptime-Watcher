@@ -488,30 +488,22 @@ export class SaveBackupToPathCommand extends DatabaseCommand<DatabaseBackupMetad
         // user-written files automatically.
     }
 
-public async validate(): Promise<{ errors: string[]; isValid: boolean }> {
+    public async validate(): Promise<{ errors: string[]; isValid: boolean }> {
         await Promise.resolve();
         return { errors: [], isValid: true };
     }
 
-public async execute(): Promise<DatabaseBackupMetadata> {
+    public async execute(): Promise<DatabaseBackupMetadata> {
         const dataBackupService = this.serviceFactory.createBackupService();
         return dataBackupService.saveDatabaseBackupToPath(this.targetPath);
     }
 
-
-
-
-
-public constructor(context: DatabaseCommandContext & { targetPath: string }) {
+    public constructor(
+        context: DatabaseCommandContext & { targetPath: string }
+    ) {
         super(context);
         this.targetPath = context.targetPath;
     }
-
-
-
-
-
-
 
     public getDescription(): string {
         return "Save SQLite database backup to disk";
@@ -567,8 +559,8 @@ export class ExportDataCommand extends DatabaseCommand<string> {
  * Encapsulates the logic for importing data, updating the cache, and emitting a
  * success event. Also emits a `cache:invalidated` event so renderer caches can
  * resynchronize with freshly imported data. Rollback restores the previous
- * cache state. Validation checks for non-empty JSON plus schema compliance
- * via the shared import/export Zod schemas.
+ * cache state. Validation checks for non-empty JSON plus schema compliance via
+ * the shared import/export Zod schemas.
  *
  * @public
  */

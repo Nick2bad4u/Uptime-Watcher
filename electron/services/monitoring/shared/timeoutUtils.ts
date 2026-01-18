@@ -20,11 +20,7 @@ import {
 } from "../constants";
 
 function isValidTimeoutMs(value: unknown): value is number {
-    return (
-        typeof value === "number" &&
-        Number.isFinite(value) &&
-        value > 0
-    );
+    return typeof value === "number" && Number.isFinite(value) && value > 0;
 }
 
 /**

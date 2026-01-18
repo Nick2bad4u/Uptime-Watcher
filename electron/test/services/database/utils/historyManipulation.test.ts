@@ -967,7 +967,7 @@ describe("History Manipulation Utilities", () => {
             await annotate("Priority: High", "priority");
 
             // Arrange
-                const excessEntries = [{ id: 10 }];
+            const excessEntries = [{ id: 10 }];
             mockDb.all = vi.fn().mockReturnValue(excessEntries);
             mockDb.run = vi.fn();
             mockIsDev.mockReturnValue(false);
@@ -977,13 +977,13 @@ describe("History Manipulation Utilities", () => {
 
             // Assert
             expect(mockDb.all).toHaveBeenCalledWith(
-                    "SELECT id FROM history WHERE monitor_id = ? ORDER BY timestamp DESC LIMIT 1 OFFSET ?",
+                "SELECT id FROM history WHERE monitor_id = ? ORDER BY timestamp DESC LIMIT 1 OFFSET ?",
                 [monitorId, 5]
             );
 
             expect(mockDb.run).toHaveBeenCalledWith(
-                    "DELETE FROM history WHERE id IN (SELECT id FROM history WHERE monitor_id = ? ORDER BY timestamp DESC LIMIT -1 OFFSET ?)",
-                    [monitorId, 5]
+                "DELETE FROM history WHERE id IN (SELECT id FROM history WHERE monitor_id = ? ORDER BY timestamp DESC LIMIT -1 OFFSET ?)",
+                [monitorId, 5]
             );
         });
 

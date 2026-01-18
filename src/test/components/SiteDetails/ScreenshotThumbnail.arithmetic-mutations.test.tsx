@@ -52,7 +52,9 @@ vi.mock("../../../theme/useTheme", () => ({
 
 // Mock useUIStore (following existing pattern)
 vi.mock("../../../stores/ui/useUiStore", () => ({
-    useUIStore: (selector?: (state: { openExternal: () => void }) => unknown) => {
+    useUIStore: (
+        selector?: (state: { openExternal: () => void }) => unknown
+    ) => {
         const state = {
             openExternal: vi.fn(),
         };

@@ -8,8 +8,6 @@
  * @packageDocumentation
  */
 
-
-
 import { safeParseCloudBackupMigrationResult as safeParseCloudBackupMigrationResultImpl } from "@shared/types/cloudBackupMigration";
 import { CLOUD_CHANNELS, type CloudDomainBridge } from "@shared/types/preload";
 import {
@@ -29,8 +27,12 @@ import {
     createVoidInvoker,
 } from "../core/bridgeFactory";
 
-const safeParseCloudStatusSummary = createSafeParseAdapter(validateCloudStatusSummary);
-const safeParseCloudBackupEntry = createSafeParseAdapter(validateCloudBackupEntry);
+const safeParseCloudStatusSummary = createSafeParseAdapter(
+    validateCloudStatusSummary
+);
+const safeParseCloudBackupEntry = createSafeParseAdapter(
+    validateCloudBackupEntry
+);
 const safeParseCloudBackupEntryArray = createSafeParseAdapter(
     validateCloudBackupEntryArray
 );

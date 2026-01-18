@@ -202,7 +202,7 @@ describe(PingMonitor, () => {
                 "google.com",
                 5000,
                 2,
-                undefined,
+                undefined
             );
         });
 
@@ -281,7 +281,7 @@ describe(PingMonitor, () => {
                 "test.example.com",
                 8000,
                 5,
-                undefined,
+                undefined
             );
         });
 
@@ -307,7 +307,7 @@ describe(PingMonitor, () => {
                     testCase.host,
                     expect.any(Number),
                     expect.any(Number),
-                    undefined,
+                    undefined
                 );
             }
         });
@@ -350,7 +350,7 @@ describe(PingMonitor, () => {
                 "example.com",
                 defaultConfig.timeout,
                 expect.any(Number),
-                undefined,
+                undefined
             );
         });
 
@@ -374,7 +374,7 @@ describe(PingMonitor, () => {
                 "example.com",
                 expect.any(Number),
                 3, // DEFAULT_RETRY_ATTEMPTS
-                undefined,
+                undefined
             );
         });
     });

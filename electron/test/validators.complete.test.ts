@@ -1,7 +1,8 @@
 /**
  * Provides complete test coverage for all exported validator groups in the
- * per-domain validator modules using isolated testing with comprehensive dependency
- * mocking. Tests the actual validator behavior and parameter validation logic.
+ * per-domain validator modules using isolated testing with comprehensive
+ * dependency mocking. Tests the actual validator behavior and parameter
+ * validation logic.
  *
  * @module ValidatorsTest
  *
@@ -1043,7 +1044,10 @@ describe("IPC Validators - Exported Validator Groups", () => {
                 expect(isValidationFailure(result)).toBeTruthy();
             });
 
-            it("rejects reserved prototype keys", async ({ task, annotate }) => {
+            it("rejects reserved prototype keys", async ({
+                task,
+                annotate,
+            }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: validators.complete", "component");
                 await annotate("Category: Core", "category");
@@ -1480,22 +1484,31 @@ describe("IPC Validators - Exported Validator Groups", () => {
                 await annotate("Category: Core", "category");
                 await annotate("Type: Business Logic", "type");
 
-                const result1 = MonitorTypeHandlerValidators.validateMonitorData(
-                    ["http", null]
-                );
-                const result2 = MonitorTypeHandlerValidators.validateMonitorData(
-                    ["ping", 42]
-                );
-                const result3 = MonitorTypeHandlerValidators.validateMonitorData(
-                    ["dns", "string"]
-                );
+                const result1 =
+                    MonitorTypeHandlerValidators.validateMonitorData([
+                        "http",
+                        null,
+                    ]);
+                const result2 =
+                    MonitorTypeHandlerValidators.validateMonitorData([
+                        "ping",
+                        42,
+                    ]);
+                const result3 =
+                    MonitorTypeHandlerValidators.validateMonitorData([
+                        "dns",
+                        "string",
+                    ]);
 
                 expect(isValidationFailure(result1)).toBeTruthy();
                 expect(isValidationFailure(result2)).toBeTruthy();
                 expect(isValidationFailure(result3)).toBeTruthy();
             });
 
-            it("should reject oversized payloads", async ({ task, annotate }) => {
+            it("should reject oversized payloads", async ({
+                task,
+                annotate,
+            }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: validators.complete", "component");
                 await annotate("Category: Core", "category");

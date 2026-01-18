@@ -76,11 +76,10 @@ This document provides comprehensive guidelines for adding and modifying UI feat
 
 
 
-// ✅ Good: Use shared validation schemasimport {import { useEffect } from "react";import { setupCacheSync } from "@/utils/cacheSync";
-import { useSitesStore } from "@/stores/sites/useSitesStore";
 
-/**
- * Establish site + monitor subscriptions once during app bootstrap.
+
+
+// ✅ Good: Use shared validation schemasimport {import { useEffect } from "react";import { setupCacheSync } from "@/utils/cacheSync";import { useSitesStore } from "@/stores/sites/useSitesStore";/** * Establish site + monitor subscriptions once during app bootstrap.
  *
  * See `src/App.tsx` for the real integration.
  */

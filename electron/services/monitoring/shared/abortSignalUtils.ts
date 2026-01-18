@@ -28,9 +28,10 @@ export function withOptionalAbortSignal(signal: AbortSignal | undefined): {
  *
  * @remarks
  * Several monitoring modules need to merge:
- * - a mandatory base signal (e.g. operation AbortController)
- * - zero-or-more additional signals
- * - an optional timeout signal
+ *
+ * - A mandatory base signal (e.g. operation AbortController)
+ * - Zero-or-more additional signals
+ * - An optional timeout signal
  *
  * Centralizing the combination avoids drift and repeated `AbortSignal.any`
  * scaffolding.

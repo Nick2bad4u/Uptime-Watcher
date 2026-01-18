@@ -51,14 +51,20 @@ import { StatusSummary } from "./StatusSummary";
 export const Header = (): JSX.Element => {
     type UiStoreState = ReturnType<typeof useUIStore.getState>;
 
-    const selectSetShowAddSiteModal = useCallback((
-        state: UiStoreState
-    ): UiStoreState["setShowAddSiteModal"] => state.setShowAddSiteModal, []);
-    const selectSetShowSettings = useCallback((
-        state: UiStoreState
-    ): UiStoreState["setShowSettings"] => state.setShowSettings, []);
-    const selectSiteListLayout = useCallback((state: UiStoreState): SiteListLayoutMode =>
-        state.siteListLayout, []);
+    const selectSetShowAddSiteModal = useCallback(
+        (state: UiStoreState): UiStoreState["setShowAddSiteModal"] =>
+            state.setShowAddSiteModal,
+        []
+    );
+    const selectSetShowSettings = useCallback(
+        (state: UiStoreState): UiStoreState["setShowSettings"] =>
+            state.setShowSettings,
+        []
+    );
+    const selectSiteListLayout = useCallback(
+        (state: UiStoreState): SiteListLayoutMode => state.siteListLayout,
+        []
+    );
 
     const setShowAddSiteModal = useUIStore(selectSetShowAddSiteModal);
     const setShowSettings = useUIStore(selectSetShowSettings);

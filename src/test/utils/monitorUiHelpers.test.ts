@@ -109,10 +109,10 @@ describe("Monitor UI Helpers", () => {
         );
         ({ restore: restoreElectronApi } = installElectronApiMock({
             monitorTypes: {
-                formatMonitorDetail: monitorTypesApiMock.monitorTypes
-                    .formatMonitorDetail,
-                formatMonitorTitleSuffix: monitorTypesApiMock.monitorTypes
-                    .formatMonitorTitleSuffix,
+                formatMonitorDetail:
+                    monitorTypesApiMock.monitorTypes.formatMonitorDetail,
+                formatMonitorTitleSuffix:
+                    monitorTypesApiMock.monitorTypes.formatMonitorTitleSuffix,
             },
         }));
     });

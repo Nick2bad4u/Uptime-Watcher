@@ -112,7 +112,8 @@ describe("useSettingsStore - Targeted Coverage", () => {
     beforeEach(() => {
         vi.clearAllMocks();
 
-        ({ restore: restoreElectronApi } = installElectronApiMock(mockElectronAPI));
+        ({ restore: restoreElectronApi } =
+            installElectronApiMock(mockElectronAPI));
 
         mockWaitForElectronBridge.mockResolvedValue(undefined);
 

@@ -24,9 +24,7 @@ import { useAvailabilityColors, useTheme } from "../../../theme/useTheme";
 import { AppIcons } from "../../../utils/icons";
 import { parseUptimeValue } from "../../../utils/monitoring/dataValidation";
 import { getIntervalLabel } from "../../../utils/time";
-import {
-    useResponseTimeColorFromThemeColors,
-} from "../utils/responseTimeColors";
+import { useResponseTimeColorFromThemeColors } from "../utils/responseTimeColors";
 
 const MonitorIcon = AppIcons.metrics.monitor;
 const TimeIcon = AppIcons.metrics.time;

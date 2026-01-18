@@ -186,9 +186,7 @@ export function shouldSyncSettingKey(key: string): boolean {
     return !key.startsWith(SETTINGS_KEY_PREFIX_CLOUD);
 }
 
-function removeUndefinedEntries(
-    value: UnknownRecord
-): UnknownRecord {
+function removeUndefinedEntries(value: UnknownRecord): UnknownRecord {
     const result: UnknownRecord = {};
     for (const [key, entryValue] of Object.entries(value)) {
         if (entryValue !== undefined) {

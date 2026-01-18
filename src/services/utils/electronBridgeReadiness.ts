@@ -99,9 +99,7 @@ const getGlobalWindow = (): unknown => {
     return globalObject.window;
 };
 
-const isNonNullObject = (
-    value: unknown
-): value is UnknownRecord =>
+const isNonNullObject = (value: unknown): value is UnknownRecord =>
     typeof value === "object" && value !== null;
 
 const isBridgeRootCandidate = (value: unknown): value is BridgeRoot =>

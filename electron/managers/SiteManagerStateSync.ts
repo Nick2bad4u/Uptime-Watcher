@@ -77,10 +77,12 @@ export class SiteManagerStateSync {
     ): Promise<SiteManagerStateSyncEmitResult> {
         const candidateSites = args.sites ?? this.getSitesSnapshot();
 
-        const { delta, duplicates, emissionSnapshot } = prepareSiteSyncSnapshot({
-            previousSnapshot: this.lastStateSyncSnapshot,
-            sites: candidateSites,
-        });
+        const { delta, duplicates, emissionSnapshot } = prepareSiteSyncSnapshot(
+            {
+                previousSnapshot: this.lastStateSyncSnapshot,
+                sites: candidateSites,
+            }
+        );
 
         if (duplicates.length > 0) {
             logger.error("Duplicate site identifiers detected in state sync", {
@@ -110,7 +112,10 @@ export class SiteManagerStateSync {
                 structuredClone(site)
             );
 
-            return { revision: this.stateSyncRevision, sites: emissionSnapshot };
+            return {
+                revision: this.stateSyncRevision,
+                sites: emissionSnapshot,
+            };
         }
 
         this.stateSyncRevision += 1;

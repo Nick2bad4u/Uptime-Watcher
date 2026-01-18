@@ -9,11 +9,7 @@
  * @packageDocumentation
  */
 
-import type {
-    Event,
-    RenderProcessGoneDetails,
-    WebContents,
-} from "electron";
+import type { Event, RenderProcessGoneDetails, WebContents } from "electron";
 
 import { readProcessEnv } from "@shared/utils/environment";
 import { ensureError } from "@shared/utils/errorHandling";
@@ -129,8 +125,10 @@ if (isDev()) {
 
     void (async (): Promise<void> => {
         try {
-            // eslint-disable-next-line n/no-unpublished-import -- Dev-only dependency loaded only in development mode.
-            const module: unknown = await import(/* webpackChunkName: "electron-debug" */ "electron-debug");
+             
+            const module: unknown = await import(
+                /* WebpackChunkName: "electron-debug" */ "electron-debug"
+            );
 
             if (!isElectronDebugModule(module)) {
                 logger.warn(
@@ -474,13 +472,11 @@ if (isDev()) {
 class Main {
     private static readonly FATAL_SHUTDOWN_TIMEOUT_MS = 5000;
 
-/** Application service instance for managing app lifecycle and features */
+    /** Application service instance for managing app lifecycle and features */
     private readonly applicationService: ApplicationService;
 
     /** Flag to ensure cleanup is only called once */
     private cleanedUp = false;
-
-
 
     private readonly handleUnhandledRejection = (reason: unknown): void => {
         const normalizedError = ensureError(reason);
@@ -555,7 +551,7 @@ class Main {
     /**
      * Named event handler for safe cleanup on process exit.
      */
-private readonly handleProcessExit = (): void => {
+    private readonly handleProcessExit = (): void => {
         if (!this.cleanedUp) {
             this.cleanedUp = true;
             // Handle cleanup asynchronously without blocking process exit
@@ -576,10 +572,10 @@ private readonly handleProcessExit = (): void => {
         }
     };
 
-/**
+    /**
      * Named event handler for safe cleanup on app quit.
      */
-private readonly handleAppQuit = (): void => {
+    private readonly handleAppQuit = (): void => {
         if (!this.cleanedUp) {
             this.cleanedUp = true;
             // Handle cleanup asynchronously during app quit
@@ -600,7 +596,7 @@ private readonly handleAppQuit = (): void => {
         }
     };
 
-private async performFatalShutdown(
+    private async performFatalShutdown(
         reason: "uncaughtException" | "unhandledRejection",
         error: Error
     ): Promise<void> {
@@ -639,12 +635,6 @@ private async performFatalShutdown(
 
         app.exit(1);
     }
-
-
-
-
-
-
 
     /**
      * Performs cleanup of application service.

@@ -231,7 +231,9 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
             const match = CHECK_INTERVALS.find(
                 (interval) => interval.value === checkIntervalMs
             );
-            return match?.label ?? `${Math.round(checkIntervalMs / 60_000)} min`;
+            return (
+                match?.label ?? `${Math.round(checkIntervalMs / 60_000)} min`
+            );
         }, [checkIntervalMs]);
 
         const helperBullets = useMemo<HelperBullet[]>(() => {

@@ -175,7 +175,6 @@ class ErrorBoundaryBase extends Component<
             );
         }
 
-         
         return <div key={retryCount}>{children}</div>;
     }
 }

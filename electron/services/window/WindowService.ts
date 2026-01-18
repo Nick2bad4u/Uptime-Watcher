@@ -415,7 +415,9 @@ export class WindowService {
                     });
 
                     if (response.ok) {
-                        logger.debug("[WindowService] Vite dev server is ready");
+                        logger.debug(
+                            "[WindowService] Vite dev server is ready"
+                        );
                         return;
                     }
                 } finally {

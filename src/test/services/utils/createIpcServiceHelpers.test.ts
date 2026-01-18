@@ -194,7 +194,10 @@ describe("createIpcServiceHelpers", () => {
         const helpers = module.createIpcServiceHelpers("HistoryService");
         const handlerError = new Error("handler failed");
         const handler = vi.fn(
-            async (_api: typeof window.electronAPI, _siteIdentifier: string) => {
+            async (
+                _api: typeof window.electronAPI,
+                _siteIdentifier: string
+            ) => {
                 throw handlerError;
             }
         );

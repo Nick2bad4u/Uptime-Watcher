@@ -450,7 +450,9 @@ export class ProviderCloudSyncTransport implements CloudSyncTransport {
         }
 
         if (!Number.isFinite(minOpId) || !Number.isFinite(maxOpId)) {
-            throw new TypeError("appendOperations internal error (missing op ids)");
+            throw new TypeError(
+                "appendOperations internal error (missing op ids)"
+            );
         }
 
         const firstOpId = minOpId;

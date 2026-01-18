@@ -8,9 +8,7 @@ import type {
     CloudBackupMigrationRequest,
     CloudBackupMigrationResult,
 } from "@shared/types/cloudBackupMigration";
-import type {
-    CloudEncryptionMode,
-} from "@shared/types/cloudEncryption";
+import type { CloudEncryptionMode } from "@shared/types/cloudEncryption";
 import type { CloudSyncResetResult } from "@shared/types/cloudSyncReset";
 import type { CloudSyncResetPreview } from "@shared/types/cloudSyncResetPreview";
 import type { SerializedDatabaseRestoreResult } from "@shared/types/ipc";
@@ -49,9 +47,7 @@ import {
     requestSyncNow as requestSyncNowOperation,
     resetRemoteSyncState as resetRemoteSyncStateOperation,
 } from "./CloudService.syncOperations";
-import {
-    decryptBuffer,
-} from "./crypto/cloudCrypto";
+import { decryptBuffer } from "./crypto/cloudCrypto";
 import {
     type DropboxProviderDeps,
     type GoogleDriveProviderDeps,
@@ -123,7 +119,9 @@ export class CloudService {
 
     private dropboxDepsPromise: Promise<DropboxProviderDeps> | undefined;
 
-    private googleDriveDepsPromise: Promise<GoogleDriveProviderDeps> | undefined;
+    private googleDriveDepsPromise:
+        | Promise<GoogleDriveProviderDeps>
+        | undefined;
 
     private async runCloudOperation<T>(
         operationName: string,
@@ -172,7 +170,7 @@ export class CloudService {
         return this.buildStatusSummary();
     }
 
-/**
+    /**
      * Enables or unlocks passphrase-based encryption.
      *
      * @remarks
@@ -189,7 +187,7 @@ export class CloudService {
         );
     }
 
-/**
+    /**
      * Clears the locally cached derived encryption key.
      *
      * @remarks
@@ -200,13 +198,13 @@ export class CloudService {
         return clearEncryptionKeyOperation(this.createOperationContext());
     }
 
-/** Requests a sync cycle as soon as possible. */
+    /** Requests a sync cycle as soon as possible. */
     public async requestSyncNow(): Promise<undefined> {
         await requestSyncNowOperation(this.createOperationContext());
         return undefined;
     }
 
-/**
+    /**
      * Resets the remote sync history and re-seeds it from this device.
      *
      * @remarks
@@ -216,7 +214,7 @@ export class CloudService {
         return resetRemoteSyncStateOperation(this.createOperationContext());
     }
 
-/**
+    /**
      * Previews a remote sync reset by counting remote `sync/` objects and
      * reading the current manifest.
      */
@@ -226,7 +224,7 @@ export class CloudService {
         );
     }
 
-/** Configures the filesystem provider to use the given base directory. */
+    /** Configures the filesystem provider to use the given base directory. */
     public async configureFilesystemProvider(
         config: CloudFilesystemProviderConfig
     ): Promise<CloudStatusSummary> {
@@ -236,7 +234,7 @@ export class CloudService {
         );
     }
 
-/**
+    /**
      * Connects the Dropbox provider via system-browser OAuth.
      */
     public async connectDropbox(): Promise<CloudStatusSummary> {
@@ -247,12 +245,12 @@ export class CloudService {
         return connectGoogleDriveOperation(this.createOperationContext());
     }
 
-/** Lists all backups stored in the configured provider. */
+    /** Lists all backups stored in the configured provider. */
     public async listBackups(): Promise<CloudBackupEntry[]> {
         return listBackupsOperation(this.createOperationContext());
     }
 
-/**
+    /**
      * Migrates remote backups between plaintext and encrypted forms.
      *
      * @remarks
@@ -264,24 +262,24 @@ export class CloudService {
         return migrateBackupsOperation(this.createOperationContext(), request);
     }
 
-/** Creates a fresh SQLite backup and uploads it to the configured provider. */
+    /** Creates a fresh SQLite backup and uploads it to the configured provider. */
     public async uploadLatestBackup(): Promise<CloudBackupEntry> {
         return uploadLatestBackupOperation(this.createOperationContext());
     }
 
-/** Downloads the specified backup from the provider and restores it. */
+    /** Downloads the specified backup from the provider and restores it. */
     public async restoreBackup(
         key: string
     ): Promise<SerializedDatabaseRestoreResult> {
         return restoreBackupOperation(this.createOperationContext(), key);
     }
 
-/** Deletes the specified remote backup and its metadata sidecar. */
+    /** Deletes the specified remote backup and its metadata sidecar. */
     public async deleteBackup(key: string): Promise<CloudBackupEntry[]> {
         return deleteBackupOperation(this.createOperationContext(), key);
     }
 
-private async resolveProviderOrThrow(args?: {
+    private async resolveProviderOrThrow(args?: {
         requireEncryptionUnlocked?: boolean;
     }): Promise<CloudStorageProvider> {
         const provider = await this.resolveProviderOrNull();
@@ -330,11 +328,11 @@ private async resolveProviderOrThrow(args?: {
         });
     }
 
-/**
+    /**
      * Decodes a derived encryption key and clears the stored secret when it is
      * corrupted.
      */
-private async loadDerivedEncryptionKeyOrClear(
+    private async loadDerivedEncryptionKeyOrClear(
         rawKeyBase64: string
     ): Promise<Buffer | undefined> {
         try {
@@ -392,7 +390,7 @@ private async loadDerivedEncryptionKeyOrClear(
         };
     }
 
-private async getEncryptionKeyOrThrow(): Promise<Buffer> {
+    private async getEncryptionKeyOrThrow(): Promise<Buffer> {
         const raw = await this.secretStore.getSecret(
             SECRET_KEY_ENCRYPTION_DERIVED_KEY
         );
@@ -412,12 +410,12 @@ private async getEncryptionKeyOrThrow(): Promise<Buffer> {
         return key;
     }
 
-private async decryptBackupOrThrow(buffer: Buffer): Promise<Buffer> {
+    private async decryptBackupOrThrow(buffer: Buffer): Promise<Buffer> {
         const key = await this.getEncryptionKeyOrThrow();
         return decryptBuffer({ ciphertext: buffer, key });
     }
 
-private async getEffectiveEncryptionMode(
+    private async getEffectiveEncryptionMode(
         provider: CloudStorageProvider
     ): Promise<CloudEncryptionMode> {
         const localMode = parseEncryptionMode(
@@ -437,7 +435,7 @@ private async getEffectiveEncryptionMode(
         }
     }
 
-private async buildStatusSummary(): Promise<CloudStatusSummary> {
+    private async buildStatusSummary(): Promise<CloudStatusSummary> {
         const providerKind = await this.settings.get(SETTINGS_KEY_PROVIDER);
         const syncEnabled = parseBooleanSetting(
             await this.settings.get(SETTINGS_KEY_SYNC_ENABLED)
@@ -513,7 +511,7 @@ private async buildStatusSummary(): Promise<CloudStatusSummary> {
         }
     }
 
-private async loadDropboxDeps(): Promise<DropboxProviderDeps> {
+    private async loadDropboxDeps(): Promise<DropboxProviderDeps> {
         this.dropboxDepsPromise ??= loadDropboxProviderDeps();
         return this.dropboxDepsPromise;
     }
@@ -524,7 +522,8 @@ private async loadDropboxDeps(): Promise<DropboxProviderDeps> {
     }
 
     /**
-     * Builds the internal operation context used by split-out operation modules.
+     * Builds the internal operation context used by split-out operation
+     * modules.
      */
     private createOperationContext(): CloudServiceOperationContext {
         return {
@@ -544,17 +543,6 @@ private async loadDropboxDeps(): Promise<DropboxProviderDeps> {
             syncEngine: this.syncEngine,
         };
     }
-
-
-
-
-
-
-
-
-
-
-
 
     private getDropboxAppKeyOverrideMaybe(): string | undefined {
         const value = readProcessEnv("UPTIME_WATCHER_DROPBOX_APP_KEY");

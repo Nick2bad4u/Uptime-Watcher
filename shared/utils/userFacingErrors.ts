@@ -24,7 +24,9 @@ export function getUserFacingErrorDetail(error: unknown): string {
         const messageCandidate = error["message"];
         if (typeof messageCandidate === "string") {
             const normalized = normalizeLogValue(messageCandidate);
-            return typeof normalized === "string" ? normalized : messageCandidate;
+            return typeof normalized === "string"
+                ? normalized
+                : messageCandidate;
         }
     }
 

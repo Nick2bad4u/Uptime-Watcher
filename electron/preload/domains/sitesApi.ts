@@ -10,8 +10,6 @@
  * @packageDocumentation
  */
 
-
-
 import { SITES_CHANNELS, type SitesDomainBridge } from "@shared/types/preload";
 import {
     validateSiteSnapshot,
@@ -28,7 +26,9 @@ import {
 
 const safeParseSiteSnapshot = createSafeParseAdapter(validateSiteSnapshot);
 
-function safeParseSiteArray(candidate: unknown): SafeParseLike<
+function safeParseSiteArray(
+    candidate: unknown
+): SafeParseLike<
     SitesDomainBridge["getSites"] extends () => Promise<infer TResult>
         ? TResult
         : never
@@ -152,10 +152,14 @@ export const sitesApi: SitesApiInterface = {
      *
      * @returns Promise resolving to array of all sites
      */
-    getSites: createValidatedInvoker(SITES_CHANNELS.getSites, safeParseSiteArray, {
-        domain: "sitesApi",
-        guardName: "validateSiteSnapshots",
-    }),
+    getSites: createValidatedInvoker(
+        SITES_CHANNELS.getSites,
+        safeParseSiteArray,
+        {
+            domain: "sitesApi",
+            guardName: "validateSiteSnapshots",
+        }
+    ),
 
     /**
      * Removes a monitor from a site

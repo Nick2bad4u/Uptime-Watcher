@@ -75,11 +75,20 @@ export const SiteCompactCard: NamedExoticComponent<SiteCompactCardProperties> =
             marqueeDependencies,
             runningCount: runningMonitors,
             totalCount: totalMonitors,
-        } = useDashboardSiteSummaryMeta(useMemo(() => ({
-            latestSiteName: latestSite.name,
-            monitors: latestSite.monitors,
-            siteIdentifier: site.identifier,
-        }), [latestSite.monitors, latestSite.name, site.identifier]));
+        } = useDashboardSiteSummaryMeta(
+            useMemo(
+                () => ({
+                    latestSiteName: latestSite.name,
+                    monitors: latestSite.monitors,
+                    siteIdentifier: site.identifier,
+                }),
+                [
+                    latestSite.monitors,
+                    latestSite.name,
+                    site.identifier,
+                ]
+            )
+        );
 
         const monitorSummary = useMemo(() => {
             if (!monitor) {

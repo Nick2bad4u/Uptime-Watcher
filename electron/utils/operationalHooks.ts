@@ -79,7 +79,8 @@ interface OperationalErrorMetadata {
 
 function toOperationalErrorMetadata(error: Error): OperationalErrorMetadata {
     const codeCandidate: unknown = Reflect.get(error as object, "code");
-    const errorCode = typeof codeCandidate === "string" ? codeCandidate : undefined;
+    const errorCode =
+        typeof codeCandidate === "string" ? codeCandidate : undefined;
 
     const { cause, message: errorMessage, name: errorName } = error;
 
@@ -265,8 +266,8 @@ export interface OperationalHooksConfig<T = unknown> {
      *
      * @remarks
      * When provided, retries and retry delays will stop as soon as the signal
-     * aborts. This is primarily used by monitoring to prevent wasted work
-     * after a monitor is stopped/cancelled.
+     * aborts. This is primarily used by monitoring to prevent wasted work after
+     * a monitor is stopped/cancelled.
      */
     signal?: AbortSignal;
 

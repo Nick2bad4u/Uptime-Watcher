@@ -796,9 +796,13 @@ describe(DataBackupService, () => {
                 Buffer.from("corrupt-but-has-header"),
             ]);
 
-            vi.mocked(assertSqliteDatabaseIntegrity).mockImplementationOnce(() => {
-                throw new Error("SQLite quick_check failed: database disk image is malformed");
-            });
+            vi.mocked(assertSqliteDatabaseIntegrity).mockImplementationOnce(
+                () => {
+                    throw new Error(
+                        "SQLite quick_check failed: database disk image is malformed"
+                    );
+                }
+            );
 
             await expect(
                 dataBackupService.restoreDatabaseBackup({

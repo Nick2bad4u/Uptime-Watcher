@@ -124,7 +124,10 @@ function assertNotEmptyIfDisallowed(value: string, allowEmpty: boolean): void {
     }
 }
 
-function assertWithinByteLengthBudget(value: string, maxByteLength: number): void {
+function assertWithinByteLengthBudget(
+    value: string,
+    maxByteLength: number
+): void {
     if (getUtfByteLength(value) > maxByteLength) {
         throw new Error(`Cloud key must not exceed ${maxByteLength} bytes`);
     }
@@ -187,7 +190,10 @@ export function normalizeCloudObjectKey(
     }
 
     assertNotEmptyIfDisallowed(normalized, allowEmpty);
-    assertNoControlCharactersIfEnabled(normalized, forbidAsciiControlCharacters);
+    assertNoControlCharactersIfEnabled(
+        normalized,
+        forbidAsciiControlCharacters
+    );
     assertNoTraversalSegmentsIfEnabled(normalized, forbidTraversalSegments);
     assertWithinByteLengthBudgetIfValid(normalized, maxByteLength);
 

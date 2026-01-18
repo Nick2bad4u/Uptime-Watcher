@@ -270,9 +270,7 @@ describe("SettingsTab arithmetic mutations", () => {
         localTimeoutSeconds: 30,
     };
 
-    describe(
-        "Line 466: Math.round(localCheckIntervalMs / 1000) mutation",
-        () => {
+    describe("Line 466: Math.round(localCheckIntervalMs / 1000) mutation", () => {
         it("should correctly convert 60000ms to 60s (kills / -> * mutation)", () => {
             const props = {
                 ...defaultProps,
@@ -299,7 +297,9 @@ describe("SettingsTab arithmetic mutations", () => {
 
             // (Math.round(0.5) = 1)
             expect(
-                screen.getByText(/How often Uptime Watcher runs a check for this monitor/u)
+                screen.getByText(
+                    /How often Uptime Watcher runs a check for this monitor/u
+                )
             ).toBeInTheDocument();
 
             // Mutation (/ 1000 -> * 1000) would yield 500,000 which would be incorrect

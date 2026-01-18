@@ -18,7 +18,8 @@ const MAX_EXTERNAL_OPEN_URL_BYTES = 4096;
 
 const SAFE_URL_SUSPECT_SEGMENT_MIN_LENGTH = 32;
 
-/** Fallback placeholder when a user-supplied URL cannot be safely represented in logs. */
+/** Fallback placeholder when a user-supplied URL cannot be safely represented in
+logs. */
 const FALLBACK_SAFE_URL_FOR_LOGGING = "[redacted]";
 
 /**
@@ -607,8 +608,8 @@ export function isPrivateNetworkHostname(hostname: string): boolean {
  * Returns a sanitized HTTP(S) URL safe to send to third-party services.
  *
  * @remarks
- * This is stricter than {@link getSafeUrlForLogging} because the output must
- * be a *valid* URL that a third-party can request.
+ * This is stricter than {@link getSafeUrlForLogging} because the output must be
+ * a _valid_ URL that a third-party can request.
  *
  * - Allows only `http:` and `https:`.
  * - Rejects credentials.

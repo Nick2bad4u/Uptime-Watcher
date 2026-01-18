@@ -308,7 +308,12 @@ describe("IPC Communication - 100% Fast-Check Fuzzing Coverage", () => {
                         : ["Input must be a non-null object"];
 
                 const handlerSet = new Set<IpcInvokeChannel>();
-                registerTestHandler(channel, handler, validateParams, handlerSet);
+                registerTestHandler(
+                    channel,
+                    handler,
+                    validateParams,
+                    handlerSet
+                );
 
                 // Get the registered handler function
                 const registeredHandler = mockIpcMain.handle.mock.calls.find(

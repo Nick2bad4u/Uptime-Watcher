@@ -136,9 +136,11 @@ export class NotificationService {
      * Applies shared suppression logic for monitor status notifications.
      *
      * @remarks
-     * Consolidates the duplicated code paths used by both down/up notifications:
-     * - site muting
-     * - per-monitor cooldown suppression
+     * Consolidates the duplicated code paths used by both down/up
+     * notifications:
+     *
+     * - Site muting
+     * - Per-monitor cooldown suppression
      */
     private shouldDispatchMonitorStatusNotification(args: {
         monitorId: string;

@@ -328,7 +328,7 @@ describe("monitorTypeHelper", () => {
             mockMonitorTypesStore.monitorTypes = [];
             mockMonitorTypesStore.isLoaded = true;
 
-                getMonitorTypesMock.mockResolvedValue({
+            getMonitorTypesMock.mockResolvedValue({
                 success: true,
                 data: [],
             });

@@ -166,7 +166,10 @@ export const AppSidebar: NamedExoticComponent = memo(function AppSidebar() {
 
             setShowSiteDetails(true);
 
-            if (getMediaQueryMatches(SIDEBAR_COLLAPSE_MEDIA_QUERY) && isSidebarOpen) {
+            if (
+                getMediaQueryMatches(SIDEBAR_COLLAPSE_MEDIA_QUERY) &&
+                isSidebarOpen
+            ) {
                 toggleSidebar();
             }
 

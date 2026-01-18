@@ -453,7 +453,9 @@ describe("useSitesState", () => {
             const delta = {
                 addedSites: [cloneSite(mockSite)],
                 removedSiteIdentifiers: ["removed-site"],
-                    updatedSites: [{ ...cloneSite(mockSite), name: "Updated Site" }],
+                updatedSites: [
+                    { ...cloneSite(mockSite), name: "Updated Site" },
+                ],
             } satisfies SiteSyncDelta;
 
             stateActions.recordSiteSyncDelta(delta);

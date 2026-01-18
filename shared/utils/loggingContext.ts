@@ -291,12 +291,14 @@ function normalizeNonPlainObject(
         return {
             kind: "normalized",
             value: {
-            message: normalizeLogString(candidate.message),
-            name: normalizeLogString(candidate.name),
-            ...(candidate.stack ? { stack: normalizeLogString(candidate.stack) } : {}),
-            ...("cause" in errorWithCause
-                ? { cause: normalize(errorWithCause.cause) }
-                : {}),
+                message: normalizeLogString(candidate.message),
+                name: normalizeLogString(candidate.name),
+                ...(candidate.stack
+                    ? { stack: normalizeLogString(candidate.stack) }
+                    : {}),
+                ...("cause" in errorWithCause
+                    ? { cause: normalize(errorWithCause.cause) }
+                    : {}),
             } satisfies UnknownRecord,
         };
     }
@@ -305,8 +307,8 @@ function normalizeNonPlainObject(
         return {
             kind: "normalized",
             value: {
-            byteLength: candidate.byteLength,
-            type: "ArrayBuffer",
+                byteLength: candidate.byteLength,
+                type: "ArrayBuffer",
             } satisfies UnknownRecord,
         };
     }
@@ -315,8 +317,8 @@ function normalizeNonPlainObject(
         return {
             kind: "normalized",
             value: {
-            size: candidate.size,
-            type: "Map",
+                size: candidate.size,
+                type: "Map",
             } satisfies UnknownRecord,
         };
     }
@@ -325,8 +327,8 @@ function normalizeNonPlainObject(
         return {
             kind: "normalized",
             value: {
-            size: candidate.size,
-            type: "Set",
+                size: candidate.size,
+                type: "Set",
             } satisfies UnknownRecord,
         };
     }

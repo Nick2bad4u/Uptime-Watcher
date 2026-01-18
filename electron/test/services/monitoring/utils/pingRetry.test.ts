@@ -45,8 +45,14 @@ vi.mock("../../../../constants", () => ({
     },
 }));
 
-import { performPingCheckWithRetry, performSinglePingCheck } from "../../../../services/monitoring/utils/pingRetry";
-import { checkConnectivity, checkHttpConnectivity } from "../../../../services/monitoring/utils/nativeConnectivity";
+import {
+    performPingCheckWithRetry,
+    performSinglePingCheck,
+} from "../../../../services/monitoring/utils/pingRetry";
+import {
+    checkConnectivity,
+    checkHttpConnectivity,
+} from "../../../../services/monitoring/utils/nativeConnectivity";
 import { withOperationalHooks } from "../../../../utils/operationalHooks";
 
 const upResult: MonitorCheckResult = {
@@ -128,7 +134,10 @@ describe("pingRetry", () => {
             );
         });
 
-        it("throws when connectivity is degraded", async ({ task, annotate }) => {
+        it("throws when connectivity is degraded", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: pingRetry", "component");
             await annotate("Category: Monitoring", "category");

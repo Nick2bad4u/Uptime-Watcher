@@ -229,7 +229,6 @@ export class DatabaseService {
                 // Only attempt rollback if a transaction is actually active.
                 // This prevents "cannot rollback - no transaction is active" errors.
                 try {
-
                     if (db.inTransaction) {
                         db.run(DATABASE_SERVICE_QUERIES.ROLLBACK);
                         logger.debug(

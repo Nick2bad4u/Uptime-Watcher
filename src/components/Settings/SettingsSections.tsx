@@ -1,8 +1,4 @@
-import type {
-    ChangeEvent,
-    ReactNode,
-    RefObject,
-} from "react";
+import type { ChangeEvent, ReactNode, RefObject } from "react";
 import type { IconType } from "react-icons";
 import type { JSX } from "react/jsx-runtime";
 

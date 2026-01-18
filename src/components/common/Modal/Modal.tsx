@@ -321,7 +321,10 @@ export const Modal = ({
     const titleId = useId();
 
     const CloseIcon = AppIcons.ui.close;
-    const closeIconElement = useMemo(() => <CloseIcon size={18} />, [CloseIcon]);
+    const closeIconElement = useMemo(
+        () => <CloseIcon size={18} />,
+        [CloseIcon]
+    );
 
     const portalRoot = useMemo<HTMLElement | null>(() => {
         if (typeof document === "undefined") {

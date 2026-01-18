@@ -48,7 +48,8 @@ export async function listBackupsFromMetadataObjects(args: {
                             {
                                 backupKey,
                                 key: metadataObject.key,
-                                message: "Metadata sidecar exists without the corresponding backup object.",
+                                message:
+                                    "Metadata sidecar exists without the corresponding backup object.",
                             }
                         );
                         return null;
@@ -58,16 +59,16 @@ export async function listBackupsFromMetadataObjects(args: {
                         metadataObject.key
                     );
 
-                    const parsed = tryParseCloudBackupMetadataFileBuffer(
-                        metadataBuffer
-                    );
+                    const parsed =
+                        tryParseCloudBackupMetadataFileBuffer(metadataBuffer);
 
                     if (!parsed) {
                         logger.warn(
                             "[cloudBackupListing] Backup metadata is invalid; skipping",
                             {
                                 key: metadataObject.key,
-                                message: "Backup metadata buffer contained invalid JSON or did not match the expected schema.",
+                                message:
+                                    "Backup metadata buffer contained invalid JSON or did not match the expected schema.",
                             }
                         );
                         return null;

@@ -25,7 +25,8 @@ class SpyAbortSignal {
         readonly listener: EventListenerOrEventListenerObject;
     }[] = [];
 
-    private readonly abortListeners = new Set<EventListenerOrEventListenerObject>();
+    private readonly abortListeners =
+        new Set<EventListenerOrEventListenerObject>();
 
     public addEventListener(
         type: string,
@@ -223,8 +224,12 @@ describe("AbortUtils Function Coverage Tests", () => {
 
             expect(result).toBe("ok");
             expect(signal.getAbortListenerCount()).toBe(0);
-            expect(signal.addCalls.filter((call) => call.type === "abort")).toHaveLength(1);
-            expect(signal.removeCalls.filter((call) => call.type === "abort")).toHaveLength(1);
+            expect(
+                signal.addCalls.filter((call) => call.type === "abort")
+            ).toHaveLength(1);
+            expect(
+                signal.removeCalls.filter((call) => call.type === "abort")
+            ).toHaveLength(1);
         });
 
         test("should remove abort listener when operation rejects", async () => {
@@ -238,8 +243,12 @@ describe("AbortUtils Function Coverage Tests", () => {
             ).rejects.toThrowError("boom");
 
             expect(signal.getAbortListenerCount()).toBe(0);
-            expect(signal.addCalls.filter((call) => call.type === "abort")).toHaveLength(1);
-            expect(signal.removeCalls.filter((call) => call.type === "abort")).toHaveLength(1);
+            expect(
+                signal.addCalls.filter((call) => call.type === "abort")
+            ).toHaveLength(1);
+            expect(
+                signal.removeCalls.filter((call) => call.type === "abort")
+            ).toHaveLength(1);
         });
 
         test("should remove abort listener when aborted", async () => {
@@ -257,8 +266,12 @@ describe("AbortUtils Function Coverage Tests", () => {
 
             await expect(promise).rejects.toThrowError("Operation was aborted");
             expect(signal.getAbortListenerCount()).toBe(0);
-            expect(signal.addCalls.filter((call) => call.type === "abort")).toHaveLength(1);
-            expect(signal.removeCalls.filter((call) => call.type === "abort")).toHaveLength(1);
+            expect(
+                signal.addCalls.filter((call) => call.type === "abort")
+            ).toHaveLength(1);
+            expect(
+                signal.removeCalls.filter((call) => call.type === "abort")
+            ).toHaveLength(1);
         });
 
         test("should not attach abort listener when already aborted", async () => {
@@ -273,8 +286,12 @@ describe("AbortUtils Function Coverage Tests", () => {
             ).rejects.toThrowError("Operation was aborted");
 
             expect(signal.getAbortListenerCount()).toBe(0);
-            expect(signal.addCalls.filter((call) => call.type === "abort")).toHaveLength(0);
-            expect(signal.removeCalls.filter((call) => call.type === "abort")).toHaveLength(0);
+            expect(
+                signal.addCalls.filter((call) => call.type === "abort")
+            ).toHaveLength(0);
+            expect(
+                signal.removeCalls.filter((call) => call.type === "abort")
+            ).toHaveLength(0);
         });
     });
 });

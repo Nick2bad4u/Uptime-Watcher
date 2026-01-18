@@ -46,10 +46,12 @@ export async function syncFileSafely(filePath: string): Promise<void> {
  * Best-effort `fsync()` for a directory path.
  *
  * @remarks
- * Helps persist rename operations on POSIX filesystems. On Windows,
- * directory handles may not be syncable; we treat failures as non-fatal.
+ * Helps persist rename operations on POSIX filesystems. On Windows, directory
+ * handles may not be syncable; we treat failures as non-fatal.
  */
-export async function syncDirectorySafely(directoryPath: string): Promise<void> {
+export async function syncDirectorySafely(
+    directoryPath: string
+): Promise<void> {
     try {
         // eslint-disable-next-line security/detect-non-literal-fs-filename -- caller ensures directoryPath is derived from app-controlled paths.
         const handle = await fs.open(directoryPath, "r");

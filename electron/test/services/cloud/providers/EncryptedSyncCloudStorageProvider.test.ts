@@ -176,7 +176,9 @@ describe(EncryptedSyncCloudStorageProvider, () => {
             expect(typed.operation).toBe("downloadObject");
             expect(typed.providerKind).toBe("filesystem");
             expect(typed.target).toBe("sync/devices/a/ops/30-1-1.ndjson");
-            expect(typed.message).toMatch(/refusing to read unencrypted sync object/i);
+            expect(typed.message).toMatch(
+                /refusing to read unencrypted sync object/i
+            );
         }
     });
 });

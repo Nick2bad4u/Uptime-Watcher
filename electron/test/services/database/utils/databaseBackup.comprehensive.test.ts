@@ -226,7 +226,9 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
                     "[DatabaseBackup] Failed to create database backup",
                     expect.objectContaining({
                         dbPath: testDbPath,
-                        error: expect.stringMatching(/exceeds maximum allowed size/i),
+                        error: expect.stringMatching(
+                            /exceeds maximum allowed size/i
+                        ),
                         fileName: BACKUP_DB_FILE_NAME,
                     })
                 );

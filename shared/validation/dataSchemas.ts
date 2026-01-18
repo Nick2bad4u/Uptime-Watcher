@@ -17,16 +17,16 @@ const arrayBufferSchema: z.ZodType<ArrayBuffer> = z.custom<ArrayBuffer>(
 
 export const serializedDatabaseBackupMetadataSchema: z.ZodType<SerializedDatabaseBackupMetadata> =
     z
-    .object({
-        appVersion: z.string().min(1),
-        checksum: z.string().min(1),
-        createdAt: z.number(),
-        originalPath: z.string().min(1),
-        retentionHintDays: z.number(),
-        schemaVersion: z.number(),
-        sizeBytes: z.number(),
-    })
-    .strict();
+        .object({
+            appVersion: z.string().min(1),
+            checksum: z.string().min(1),
+            createdAt: z.number(),
+            originalPath: z.string().min(1),
+            retentionHintDays: z.number(),
+            schemaVersion: z.number(),
+            sizeBytes: z.number(),
+        })
+        .strict();
 
 export const serializedDatabaseBackupResultSchema: z.ZodType<{
     buffer: ArrayBuffer;
@@ -35,7 +35,8 @@ export const serializedDatabaseBackupResultSchema: z.ZodType<{
 }> = z
     .object({
         buffer: arrayBufferSchema.refine(
-            (buffer) => buffer.byteLength <= DEFAULT_MAX_IPC_BACKUP_TRANSFER_BYTES,
+            (buffer) =>
+                buffer.byteLength <= DEFAULT_MAX_IPC_BACKUP_TRANSFER_BYTES,
             {
                 message: `Backup buffer exceeds maximum IPC transfer size (${DEFAULT_MAX_IPC_BACKUP_TRANSFER_BYTES} bytes)`,
             }

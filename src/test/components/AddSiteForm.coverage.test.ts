@@ -113,7 +113,9 @@ describe("AddSiteForm Component Coverage Tests", () => {
             mockHandlers.resetForm();
 
             expect(mockHandlers.setAddMode).toHaveBeenCalledWith("existing");
-            expect(mockHandlers.setCheckIntervalMs).toHaveBeenCalledWith(10_000);
+            expect(mockHandlers.setCheckIntervalMs).toHaveBeenCalledWith(
+                10_000
+            );
             expect(mockHandlers.setMonitorType).toHaveBeenCalledWith("port");
             expect(mockHandlers.resetForm).toHaveBeenCalled();
         });

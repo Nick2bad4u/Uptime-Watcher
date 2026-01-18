@@ -42,9 +42,7 @@ class JsonValidationError extends TypeError {
  * Use this when you need best-effort extraction from third-party payloads (e.g.
  * OAuth error bodies) without throwing.
  */
-export function tryParseJsonRecord(
-    text: string
-): null | UnknownRecord {
+export function tryParseJsonRecord(text: string): null | UnknownRecord {
     try {
         const parsed: unknown = JSON.parse(text);
         return isObject(parsed) ? parsed : null;

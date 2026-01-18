@@ -136,7 +136,9 @@ export const SiteService: SiteServiceContract = {
      *
      * @returns The number of sites removed.
      */
-    deleteAllSites: wrap("deleteAllSites", async (api) => api.sites.deleteAllSites()),
+    deleteAllSites: wrap("deleteAllSites", async (api) =>
+        api.sites.deleteAllSites()
+    ),
 
     /**
      * Retrieves all sites from the backend.

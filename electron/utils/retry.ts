@@ -3,9 +3,9 @@
  * operations.
  *
  * @remarks
- * Provides configurable retry logic with a fixed delay between attempts for robust error
- * handling in backend operations. Useful for dealing with temporary network
- * issues, database locks, or other transient failures.
+ * Provides configurable retry logic with a fixed delay between attempts for
+ * robust error handling in backend operations. Useful for dealing with
+ * temporary network issues, database locks, or other transient failures.
  *
  * @example
  *

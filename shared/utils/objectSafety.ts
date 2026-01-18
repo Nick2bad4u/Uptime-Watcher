@@ -117,10 +117,10 @@ export function safeObjectIteration(
  *
  * @returns New object without the specified keys
  */
-export function safeObjectOmit<
-    T extends UnknownRecord,
-    K extends keyof T,
->(obj: null | T | undefined, keys: readonly K[]): Omit<T, K> {
+export function safeObjectOmit<T extends UnknownRecord, K extends keyof T>(
+    obj: null | T | undefined,
+    keys: readonly K[]
+): Omit<T, K> {
     // Handle null/undefined inputs by returning empty object
     if (obj === null || obj === undefined) {
         // Type assertion is safe as we're creating an empty object to match the expected structure
@@ -193,10 +193,10 @@ export function safeObjectOmit<
  *
  * @returns New object with only the specified keys
  */
-export function safeObjectPick<
-    T extends UnknownRecord,
-    K extends keyof T,
->(obj: T, keys: readonly K[]): Pick<T, K> {
+export function safeObjectPick<T extends UnknownRecord, K extends keyof T>(
+    obj: T,
+    keys: readonly K[]
+): Pick<T, K> {
     // IMPORTANT: Use a null-prototype object and defineProperty to avoid
     // prototype-pollution edge cases such as "__proto__".
     //

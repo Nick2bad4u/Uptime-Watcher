@@ -9,33 +9,29 @@ import React from "react";
 
 // Mock all dependencies
 vi.mock("../../../stores/error/useErrorStore", () => ({
-    useErrorStore: vi.fn(
-        (selector?: (state: unknown) => unknown) => {
-            const state = {
-                clearError: vi.fn(),
-                isLoading: false,
-                lastError: undefined,
-                setError: vi.fn(),
-            };
+    useErrorStore: vi.fn((selector?: (state: unknown) => unknown) => {
+        const state = {
+            clearError: vi.fn(),
+            isLoading: false,
+            lastError: undefined,
+            setError: vi.fn(),
+        };
 
-            return typeof selector === "function" ? selector(state) : state;
-        }
-    ),
+        return typeof selector === "function" ? selector(state) : state;
+    }),
 }));
 
 vi.mock("../../../stores/sites/useSitesStore", () => ({
-    useSitesStore: vi.fn(
-        (selector?: (state: unknown) => unknown) => {
-            const state = {
-                addMonitorToSite: vi.fn().mockResolvedValue(undefined),
-                createSite: vi.fn().mockResolvedValue(undefined),
-                isLoading: false,
-                sites: [],
-            };
+    useSitesStore: vi.fn((selector?: (state: unknown) => unknown) => {
+        const state = {
+            addMonitorToSite: vi.fn().mockResolvedValue(undefined),
+            createSite: vi.fn().mockResolvedValue(undefined),
+            isLoading: false,
+            sites: [],
+        };
 
-            return typeof selector === "function" ? selector(state) : state;
-        }
-    ),
+        return typeof selector === "function" ? selector(state) : state;
+    }),
 }));
 
 vi.mock("../../../components/SiteDetails/useAddSiteForm", () => ({

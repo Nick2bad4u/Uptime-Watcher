@@ -599,7 +599,11 @@ const OAuthProviderPanel = ({
                     </ThemedText>
 
                     <div className="settings-subcard__actions">
-                        <Tooltip content={description} maxWidth={520} position="top">
+                        <Tooltip
+                            content={description}
+                            maxWidth={520}
+                            position="top"
+                        >
                             {(trigger) => (
                                 <button
                                     aria-label="Authorization details"
@@ -701,8 +705,8 @@ function renderFilesystemProviderPanel(args: {
 
                 {args.connected ? (
                     <ThemedText as="p" size="xs" variant="tertiary">
-                        To use a different folder, clear configuration above
-                        and set it again.
+                        To use a different folder, clear configuration above and
+                        set it again.
                     </ThemedText>
                 ) : null}
             </div>
@@ -982,7 +986,12 @@ export const CloudProviderSetupPanel = ({
             <div className="settings-subcard__header">
                 <div className="settings-subcard__title">
                     {providerHeaderIcon}
-                    <ThemedText as="h4" size="sm" variant="secondary" weight="medium">
+                    <ThemedText
+                        as="h4"
+                        size="sm"
+                        variant="secondary"
+                        weight="medium"
+                    >
                         Provider
                     </ThemedText>
                 </div>

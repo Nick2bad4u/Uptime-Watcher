@@ -1,4 +1,7 @@
-import type { CloudFilesystemProviderConfig, CloudStatusSummary } from "@shared/types/cloud";
+import type {
+    CloudFilesystemProviderConfig,
+    CloudStatusSummary,
+} from "@shared/types/cloud";
 
 import { ensureError } from "@shared/utils/errorHandling";
 import {
@@ -167,7 +170,10 @@ export async function configureFilesystemProvider(
         }
 
         await ctx.settings.set(SETTINGS_KEY_PROVIDER, "filesystem");
-        await ctx.settings.set(SETTINGS_KEY_FILESYSTEM_BASE_DIRECTORY, canonical);
+        await ctx.settings.set(
+            SETTINGS_KEY_FILESYSTEM_BASE_DIRECTORY,
+            canonical
+        );
 
         await ctx.secretStore.deleteSecret(SETTINGS_KEY_DROPBOX_TOKENS);
 

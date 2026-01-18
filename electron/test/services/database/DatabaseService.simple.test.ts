@@ -130,8 +130,8 @@ describe("DatabaseService Coverage Tests", () => {
         const { Database } = await import("node-sqlite3-wasm");
         const dbInstance = vi.mocked(Database).mock.results.at(-1)?.value as
             | {
-                    get: ReturnType<typeof vi.fn>;
-                    run: ReturnType<typeof vi.fn>;
+                  get: ReturnType<typeof vi.fn>;
+                  run: ReturnType<typeof vi.fn>;
               }
             | undefined;
 
@@ -148,7 +148,9 @@ describe("DatabaseService Coverage Tests", () => {
         expect(dbInstance?.get).toHaveBeenCalledWith(
             "PRAGMA temp_store = MEMORY"
         );
-        expect(dbInstance?.run).toHaveBeenCalledWith("PRAGMA foreign_keys = ON");
+        expect(dbInstance?.run).toHaveBeenCalledWith(
+            "PRAGMA foreign_keys = ON"
+        );
     });
 
     it("should attempt WAL checkpoint and optimize on close", async ({
@@ -170,8 +172,8 @@ describe("DatabaseService Coverage Tests", () => {
         const { Database } = await import("node-sqlite3-wasm");
         const dbInstance = vi.mocked(Database).mock.results.at(-1)?.value as
             | {
-                    close: ReturnType<typeof vi.fn>;
-                    get: ReturnType<typeof vi.fn>;
+                  close: ReturnType<typeof vi.fn>;
+                  get: ReturnType<typeof vi.fn>;
               }
             | undefined;
 
@@ -285,9 +287,10 @@ describe("DatabaseService Coverage Tests", () => {
             await instance.initialize();
 
             const { Database } = await import("node-sqlite3-wasm");
-            const dbInstance = vi.mocked(Database).mock.results.at(-1)?.value as
+            const dbInstance = vi.mocked(Database).mock.results.at(-1)
+                ?.value as
                 | {
-                        run: ReturnType<typeof vi.fn>;
+                      run: ReturnType<typeof vi.fn>;
                   }
                 | undefined;
 

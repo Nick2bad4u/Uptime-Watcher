@@ -220,7 +220,8 @@ describe("ProviderCloudSyncTransport.readOperationsObject limits", () => {
         } satisfies CloudSyncOperation);
 
         const provider = createProvider({
-            downloadObject: async () => Buffer.from(`${operationLine}\r\n`, "utf8"),
+            downloadObject: async () =>
+                Buffer.from(`${operationLine}\r\n`, "utf8"),
         });
 
         const transport = ProviderCloudSyncTransport.create(provider);
@@ -279,7 +280,8 @@ describe("ProviderCloudSyncTransport.readOperationsObject limits", () => {
         } satisfies CloudSyncOperation);
 
         const provider = createProvider({
-            downloadObject: async () => Buffer.from(`${operationLine}\n`, "utf8"),
+            downloadObject: async () =>
+                Buffer.from(`${operationLine}\n`, "utf8"),
         });
 
         const transport = ProviderCloudSyncTransport.create(provider);
@@ -303,7 +305,8 @@ describe("ProviderCloudSyncTransport.readOperationsObject limits", () => {
         } satisfies CloudSyncOperation);
 
         const provider = createProvider({
-            downloadObject: async () => Buffer.from(`${operationLine}\n`, "utf8"),
+            downloadObject: async () =>
+                Buffer.from(`${operationLine}\n`, "utf8"),
         });
 
         const transport = ProviderCloudSyncTransport.create(provider);

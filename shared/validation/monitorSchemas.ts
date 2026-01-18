@@ -63,55 +63,62 @@ const jsonPathSchema = createJsonPathSchema();
 const websocketUrlSchema = createWebsocketUrlSchema();
 const edgeLocationListSchema = createEdgeLocationListSchema();
 
-export const baseMonitorSchema: BaseMonitorSchemaType = createBaseMonitorSchema();
+export const baseMonitorSchema: BaseMonitorSchemaType =
+    createBaseMonitorSchema();
 
-export const httpMonitorSchema: HttpMonitorSchemaType = createHttpMonitorSchema({
-    baseMonitorSchema,
-    httpUrlSchema,
-});
+export const httpMonitorSchema: HttpMonitorSchemaType = createHttpMonitorSchema(
+    {
+        baseMonitorSchema,
+        httpUrlSchema,
+    }
+);
 
 export const httpHeaderMonitorSchema: HttpHeaderMonitorSchemaType =
     createHttpHeaderMonitorSchema({
-    baseMonitorSchema,
-    httpHeaderNameSchema,
-    httpHeaderValueSchema,
-    httpUrlSchema,
-});
+        baseMonitorSchema,
+        httpHeaderNameSchema,
+        httpHeaderValueSchema,
+        httpUrlSchema,
+    });
 
 export const httpKeywordMonitorSchema: HttpKeywordMonitorSchemaType =
     createHttpKeywordMonitorSchema({
-    baseMonitorSchema,
-    httpUrlSchema,
-});
+        baseMonitorSchema,
+        httpUrlSchema,
+    });
 
 export const httpJsonMonitorSchema: HttpJsonMonitorSchemaType =
     createHttpJsonMonitorSchema({
-    baseMonitorSchema,
-    httpUrlSchema,
-    jsonPathSchema,
-});
+        baseMonitorSchema,
+        httpUrlSchema,
+        jsonPathSchema,
+    });
 
 export const httpStatusMonitorSchema: HttpStatusMonitorSchemaType =
     createHttpStatusMonitorSchema({
-    baseMonitorSchema,
-    httpUrlSchema,
-});
+        baseMonitorSchema,
+        httpUrlSchema,
+    });
 
 export const httpLatencyMonitorSchema: HttpLatencyMonitorSchemaType =
     createHttpLatencyMonitorSchema({
-    baseMonitorSchema,
-    httpUrlSchema,
-});
+        baseMonitorSchema,
+        httpUrlSchema,
+    });
 
-export const portMonitorSchema: PortMonitorSchemaType = createPortMonitorSchema({
-    baseMonitorSchema,
-    hostValidationSchema,
-});
+export const portMonitorSchema: PortMonitorSchemaType = createPortMonitorSchema(
+    {
+        baseMonitorSchema,
+        hostValidationSchema,
+    }
+);
 
-export const pingMonitorSchema: PingMonitorSchemaType = createPingMonitorSchema({
-    baseMonitorSchema,
-    hostValidationSchema,
-});
+export const pingMonitorSchema: PingMonitorSchemaType = createPingMonitorSchema(
+    {
+        baseMonitorSchema,
+        hostValidationSchema,
+    }
+);
 
 export const dnsMonitorSchema: DnsMonitorSchemaType = createDnsMonitorSchema({
     baseMonitorSchema,
@@ -134,21 +141,21 @@ export const cdnEdgeConsistencyMonitorSchema: CdnEdgeConsistencyMonitorSchemaTyp
 
 export const replicationMonitorSchema: ReplicationMonitorSchemaType =
     createReplicationMonitorSchema({
-    baseMonitorSchema,
-    createDotPathSchema: createDotPathSchemaFactory,
-    edgeLocationListSchema,
-    httpUrlSchema,
-    websocketUrlSchema,
-});
+        baseMonitorSchema,
+        createDotPathSchema: createDotPathSchemaFactory,
+        edgeLocationListSchema,
+        httpUrlSchema,
+        websocketUrlSchema,
+    });
 
 export const serverHeartbeatMonitorSchema: ServerHeartbeatMonitorSchemaType =
     createServerHeartbeatMonitorSchema({
-    baseMonitorSchema,
-    createDotPathSchema: createDotPathSchemaFactory,
-    edgeLocationListSchema,
-    httpUrlSchema,
-    websocketUrlSchema,
-});
+        baseMonitorSchema,
+        createDotPathSchema: createDotPathSchemaFactory,
+        edgeLocationListSchema,
+        httpUrlSchema,
+        websocketUrlSchema,
+    });
 
 export const websocketKeepaliveMonitorSchema: WebsocketKeepaliveMonitorSchemaType =
     createWebsocketKeepaliveMonitorSchema({

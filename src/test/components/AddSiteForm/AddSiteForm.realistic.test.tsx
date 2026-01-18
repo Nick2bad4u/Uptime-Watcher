@@ -498,7 +498,9 @@ describe("AddSiteForm Comprehensive Tests", () => {
             });
             await user.selectOptions(checkIntervalSelect, "300000");
 
-            expect(mockFormHook.setCheckIntervalMs).toHaveBeenCalledWith(300_000);
+            expect(mockFormHook.setCheckIntervalMs).toHaveBeenCalledWith(
+                300_000
+            );
         });
     });
 

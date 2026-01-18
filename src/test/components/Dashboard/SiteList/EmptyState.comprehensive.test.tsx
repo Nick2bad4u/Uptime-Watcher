@@ -1,9 +1,10 @@
 /**
  * Comprehensive tests for EmptyState component.
  *
- * These tests intentionally avoid asserting on internal themed CSS classes.
- * The EmptyState is an app-level component; its contract is the visible text
- * + the presence of decorative icons.
+ * These tests intentionally avoid asserting on internal themed CSS classes. The
+ * EmptyState is an app-level component; its contract is the visible text
+ *
+ * - The presence of decorative icons.
  */
 
 import { render, screen } from "@testing-library/react";

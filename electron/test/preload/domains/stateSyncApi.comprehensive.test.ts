@@ -82,10 +82,7 @@ describe("State Sync Domain API", () => {
 
     describe("API Structure Validation", () => {
         it("should expose all required state sync methods", () => {
-            const expectedMethods = [
-                "getSyncStatus",
-                "requestFullSync",
-            ];
+            const expectedMethods = ["getSyncStatus", "requestFullSync"];
 
             for (const method of expectedMethods) {
                 expect(api).toHaveProperty(method);
@@ -289,9 +286,7 @@ describe("State Sync Domain API", () => {
         // Must match the shared Zod schemas:
         // - identifier: /^[\dA-Z:_-]+$/i
         // - name: /^[\dA-Z .:_-]+$/i
-        const siteIdentifierArb = fc.stringMatching(
-            /^[\w:-]{1,50}$/
-        );
+        const siteIdentifierArb = fc.stringMatching(/^[\w:-]{1,50}$/);
         const siteNameArb = fc
             .stringMatching(/^[\w .:-]{1,120}$/)
             .filter((name) => name.trim().length > 0);
@@ -323,7 +318,13 @@ describe("State Sync Domain API", () => {
                     fc.integer({ min: 0, max: 2_147_483_647 }),
                     fc.boolean(),
                     fc.constantFrom(...VALID_STATE_SYNC_SOURCES),
-                    async (sites, completedAt, revision, synchronized, source) => {
+                    async (
+                        sites,
+                        completedAt,
+                        revision,
+                        synchronized,
+                        source
+                    ) => {
                         const fullSync: StateSyncFullSyncResult = {
                             completedAt,
                             revision,
@@ -371,7 +372,6 @@ describe("State Sync Domain API", () => {
                 { numRuns: 10 }
             );
         });
-
     });
 
     describe("Integration and workflow scenarios", () => {
@@ -474,7 +474,9 @@ describe("State Sync Domain API", () => {
                 createIpcResponse(malformedData)
             );
 
-            await expect(api.getSyncStatus()).rejects.toThrowError(/failed validation/i);
+            await expect(api.getSyncStatus()).rejects.toThrowError(
+                /failed validation/i
+            );
         });
 
         it("should maintain type safety with edge case data", async () => {

@@ -106,7 +106,6 @@ export interface SettingsTabProperties {
     readonly timeoutChanged: boolean;
 }
 
-
 /**
  * Settings tab component providing site configuration interface.
  *
@@ -150,14 +149,19 @@ export const SettingsTab = ({
     const { currentTheme } = useTheme();
     type SettingsStoreState = ReturnType<typeof useSettingsStore.getState>;
 
-    const selectMutedSiteNotificationIdentifiers = useCallback((
-        state: SettingsStoreState
-    ): SettingsStoreState["settings"]["mutedSiteNotificationIdentifiers"] =>
-        state.settings.mutedSiteNotificationIdentifiers, []);
+    const selectMutedSiteNotificationIdentifiers = useCallback(
+        (
+            state: SettingsStoreState
+        ): SettingsStoreState["settings"]["mutedSiteNotificationIdentifiers"] =>
+            state.settings.mutedSiteNotificationIdentifiers,
+        []
+    );
 
-    const selectUpdateSettings = useCallback((
-        state: SettingsStoreState
-    ): SettingsStoreState["updateSettings"] => state.updateSettings, []);
+    const selectUpdateSettings = useCallback(
+        (state: SettingsStoreState): SettingsStoreState["updateSettings"] =>
+            state.updateSettings,
+        []
+    );
 
     const mutedSiteNotificationIdentifiers = useSettingsStore(
         selectMutedSiteNotificationIdentifiers
@@ -191,13 +195,15 @@ export const SettingsTab = ({
             siteIdentifier: currentSite.identifier,
         });
         await handleSaveName();
-    }, [currentSite.identifier, currentSite.name, handleSaveName, trimmedSiteName]);
+    }, [
+        currentSite.identifier,
+        currentSite.name,
+        handleSaveName,
+        trimmedSiteName,
+    ]);
 
     const isSiteMuted = useMemo(
-        () =>
-            mutedSiteNotificationIdentifiers.includes(
-                currentSite.identifier
-            ),
+        () => mutedSiteNotificationIdentifiers.includes(currentSite.identifier),
         [currentSite.identifier, mutedSiteNotificationIdentifiers]
     );
 
@@ -394,11 +400,17 @@ export const SettingsTab = ({
     );
 
     const maxDurationVariant = useMemo(() => {
-        if (maxCheckDuration.backoffSeconds >= 16 || maxCheckDuration.totalSeconds >= 180) {
+        if (
+            maxCheckDuration.backoffSeconds >= 16 ||
+            maxCheckDuration.totalSeconds >= 180
+        ) {
             return "error";
         }
 
-        if (maxCheckDuration.backoffSeconds >= 8 || maxCheckDuration.totalSeconds >= 60) {
+        if (
+            maxCheckDuration.backoffSeconds >= 8 ||
+            maxCheckDuration.totalSeconds >= 60
+        ) {
             return "warning";
         }
 
@@ -517,11 +529,12 @@ export const SettingsTab = ({
                                 selectedMonitor
                             )}
                         />
-                            <div className="mt-2">
-                                <SiteSettingsHelpText icon={InfoIcon}>
-                                    Generated when this site is created and cannot be changed.
-                                </SiteSettingsHelpText>
-                            </div>
+                        <div className="mt-2">
+                            <SiteSettingsHelpText icon={InfoIcon}>
+                                Generated when this site is created and cannot
+                                be changed.
+                            </SiteSettingsHelpText>
+                        </div>
                     </div>
                 </div>
             </ThemedCard>
@@ -606,10 +619,12 @@ export const SettingsTab = ({
                         </div>
                         <div className="mt-2">
                             <SiteSettingsHelpText>
-                                How often Uptime Watcher runs a check for this monitor.
+                                How often Uptime Watcher runs a check for this
+                                monitor.
                                 <span className="ml-2 inline-flex items-center gap-1 font-medium">
                                     <DurationIcon aria-hidden size={14} />
-                                    Current: {formatSecondsWithMinutes(
+                                    Current:{" "}
+                                    {formatSecondsWithMinutes(
                                         Math.round(localCheckIntervalMs / 1000)
                                     )}
                                 </span>
@@ -623,9 +638,11 @@ export const SettingsTab = ({
                                     icon={WarningIcon}
                                     tone="warning"
                                 >
-                                    Intervals below {CHECK_INTERVAL_INFLIGHT_WARNING_SECONDS}s may
-                                    cause multiple in-flight checks if a request takes longer than
-                                    the interval. Not recommended.
+                                    Intervals below{" "}
+                                    {CHECK_INTERVAL_INFLIGHT_WARNING_SECONDS}s
+                                    may cause multiple in-flight checks if a
+                                    request takes longer than the interval. Not
+                                    recommended.
                                 </SiteSettingsHelpText>
                             </div>
                         ) : null}
@@ -673,64 +690,80 @@ export const SettingsTab = ({
                             rounded="lg"
                             variant="tertiary"
                         >
-                        <div className="site-settings-duration__body">
-                            <span
-                                aria-hidden="true"
-                                className="site-settings-duration__icon"
-                            >
-                                <DurationIcon size={18} />
-                            </span>
-                            <div className="site-settings-duration__content">
-                                <div className="flex flex-wrap items-center gap-2">
+                            <div className="site-settings-duration__body">
+                                <span
+                                    aria-hidden="true"
+                                    className="site-settings-duration__icon"
+                                >
+                                    <DurationIcon size={18} />
+                                </span>
+                                <div className="site-settings-duration__content">
+                                    <div className="flex flex-wrap items-center gap-2">
+                                        <ThemedText
+                                            size="sm"
+                                            variant="secondary"
+                                            weight="medium"
+                                        >
+                                            Maximum check duration
+                                        </ThemedText>
+                                        <ThemedBadge
+                                            className="shrink-0"
+                                            size="sm"
+                                            variant={maxDurationVariant}
+                                        >
+                                            <span className="inline-flex items-center gap-1">
+                                                <DurationIcon
+                                                    aria-hidden
+                                                    size={14}
+                                                />
+                                                ~ {maxDurationLabel}
+                                            </span>
+                                        </ThemedBadge>
+                                    </div>
                                     <ThemedText
-                                        size="sm"
+                                        className="site-settings-duration__meta"
+                                        size="xs"
                                         variant="secondary"
-                                        weight="medium"
-                                    >
-                                        Maximum check duration
-                                    </ThemedText>
-                                    <ThemedBadge
-                                        className="shrink-0"
-                                        size="sm"
-                                        variant={maxDurationVariant}
                                     >
                                         <span className="inline-flex items-center gap-1">
-                                            <DurationIcon aria-hidden size={14} />
-                                            ~ {maxDurationLabel}
+                                            <DurationIcon
+                                                aria-hidden
+                                                size={14}
+                                            />
+                                            {formatSecondsWithMinutes(
+                                                localTimeoutSeconds
+                                            )}
                                         </span>
-                                    </ThemedBadge>
-                                </div>
-                                <ThemedText
-                                    className="site-settings-duration__meta"
-                                    size="xs"
-                                    variant="secondary"
-                                >
-                                    <span className="inline-flex items-center gap-1">
-                                        <DurationIcon aria-hidden size={14} />
-                                        {formatSecondsWithMinutes(localTimeoutSeconds)}
-                                    </span>
-                                    <span> per attempt</span>
-                                    <span className="mx-1">×</span>
-                                    <span className="inline-flex items-center gap-1">
-                                        <RetryIcon aria-hidden size={14} />
-                                        {maxCheckDuration.totalAttempts} attempts
-                                    </span>
-                                    <span className="mx-1">+</span>
-                                    <span className="inline-flex items-center gap-1">
-                                        <LastCheckedIcon aria-hidden size={14} />
-                                        {formatSecondsWithMinutes(
-                                            maxCheckDuration.backoffSeconds
-                                        )} backoff
-                                    </span>
-                                </ThemedText>
-                                <div className="mt-2">
-                                    <SiteSettingsHelpText icon={InfoIcon}>
-                                        This estimate updates automatically based on Timeout and
-                                        Retry attempts above.
-                                    </SiteSettingsHelpText>
+                                        <span> per attempt</span>
+                                        <span className="mx-1">×</span>
+                                        <span className="inline-flex items-center gap-1">
+                                            <RetryIcon aria-hidden size={14} />
+                                            {
+                                                maxCheckDuration.totalAttempts
+                                            }{" "}
+                                            attempts
+                                        </span>
+                                        <span className="mx-1">+</span>
+                                        <span className="inline-flex items-center gap-1">
+                                            <LastCheckedIcon
+                                                aria-hidden
+                                                size={14}
+                                            />
+                                            {formatSecondsWithMinutes(
+                                                maxCheckDuration.backoffSeconds
+                                            )}{" "}
+                                            backoff
+                                        </span>
+                                    </ThemedText>
+                                    <div className="mt-2">
+                                        <SiteSettingsHelpText icon={InfoIcon}>
+                                            This estimate updates automatically
+                                            based on Timeout and Retry attempts
+                                            above.
+                                        </SiteSettingsHelpText>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
                         </ThemedBox>
                     ) : null}
                 </div>

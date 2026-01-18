@@ -86,7 +86,7 @@ const globalWithMock = globalThis as unknown as GlobalWithSitesStoreMock;
 globalWithMock.__useSitesStoreMock_uncovered__ = useSitesStoreMock;
 
 vi.mock("../../../stores/sites/useSitesStore", () => ({
-    useSitesStore: <Result = typeof sitesStoreState>(
+    useSitesStore: <Result = typeof sitesStoreState,>(
         selector?: (state: typeof sitesStoreState) => Result,
         equality?: (a: Result, b: Result) => boolean
     ): Result | typeof sitesStoreState => {
@@ -122,7 +122,14 @@ vi.mock("../../../stores/monitor/useMonitorTypesStore", () => ({
 
 vi.mock("../../../stores/error/useErrorStore", () => ({
     useErrorStore: vi.fn(
-        (selector?: (state: { clearError: () => void; isLoading: boolean; lastError: string | undefined; formError?: unknown }) => unknown) => {
+        (
+            selector?: (state: {
+                clearError: () => void;
+                isLoading: boolean;
+                lastError: string | undefined;
+                formError?: unknown;
+            }) => unknown
+        ) => {
             const state = {
                 clearError: vi.fn(),
                 formError: undefined,
@@ -281,7 +288,9 @@ type DynamicMonitorFieldsMockProperties = Readonly<{
 }>;
 
 vi.mock("../../../components/AddSiteForm/DynamicMonitorFields", () => ({
-    DynamicMonitorFields: ({ monitorType: _monitorType }: DynamicMonitorFieldsMockProperties) => (
+    DynamicMonitorFields: ({
+        monitorType: _monitorType,
+    }: DynamicMonitorFieldsMockProperties) => (
         <div data-testid="dynamic-monitor-fields">
             <input data-testid="host" />
             <input data-testid="port" type="number" />
@@ -334,11 +343,15 @@ vi.mock("../../../hooks/useDelayedButtonLoading", () => ({
     useDelayedButtonLoading: () => false,
 }));
 
-type ThemedBoxMockProperties = PropsWithChildren<HTMLAttributes<HTMLDivElement>>;
+type ThemedBoxMockProperties = PropsWithChildren<
+    HTMLAttributes<HTMLDivElement>
+>;
 type ThemedButtonMockProperties = PropsWithChildren<
     ButtonHTMLAttributes<HTMLButtonElement>
 >;
-type ThemedTextMockProperties = PropsWithChildren<HTMLAttributes<HTMLSpanElement>>;
+type ThemedTextMockProperties = PropsWithChildren<
+    HTMLAttributes<HTMLSpanElement>
+>;
 type ErrorAlertMockProperties = Readonly<{
     message: string;
     onDismiss: () => void;

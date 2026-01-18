@@ -153,7 +153,11 @@ describe("MonitorScheduler – comprehensive", () => {
 
         // With exponential backoff, delays grow until they hit the global cap
         // (60 minutes). Jitter is deterministic in this test (randomInt=0).
-        const expectedDelays = [3_600_000, 3_600_000, 3_600_000];
+        const expectedDelays = [
+            3_600_000,
+            3_600_000,
+            3_600_000,
+        ];
 
         for (const expectedDelay of expectedDelays) {
             await flushAsync();
@@ -212,9 +216,8 @@ describe("MonitorScheduler – comprehensive", () => {
         const timeoutMs = 120;
         const neverSettles = new Promise<void>(() => {});
 
-        mockCheckCallback = createCheckCallbackMock().mockReturnValue(
-            neverSettles
-        );
+        mockCheckCallback =
+            createCheckCallbackMock().mockReturnValue(neverSettles);
         scheduler.setCheckCallback(mockCheckCallback);
 
         scheduler.startMonitor(

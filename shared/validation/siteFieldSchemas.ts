@@ -19,11 +19,12 @@ import { createNonWhitespaceStringSchema } from "./stringSchemas";
  * contexts such as IPC parameter validators and runtime guards without pulling
  * in heavy schema graphs.
  */
-export const siteIdentifierSchema: z.ZodString = createNonWhitespaceStringSchema({
-    maxLength: SITE_IDENTIFIER_MAX_LENGTH,
-    maxLengthMessage: SITE_IDENTIFIER_TOO_LONG_MESSAGE,
-    requiredMessage: SITE_IDENTIFIER_REQUIRED_MESSAGE,
-});
+export const siteIdentifierSchema: z.ZodString =
+    createNonWhitespaceStringSchema({
+        maxLength: SITE_IDENTIFIER_MAX_LENGTH,
+        maxLengthMessage: SITE_IDENTIFIER_TOO_LONG_MESSAGE,
+        requiredMessage: SITE_IDENTIFIER_REQUIRED_MESSAGE,
+    });
 
 /**
  * Canonical validation schema for a user-visible site name.

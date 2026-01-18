@@ -332,8 +332,12 @@ describe("MonitorRepository - Comprehensive Coverage", () => {
 
             expect(mockDatabaseService.executeTransaction).toHaveBeenCalled();
             // Optimized: clears history in one statement, then deletes monitors.
-            expect(mockDatabase.run).toHaveBeenCalledWith("DELETE FROM history");
-            expect(mockDatabase.run).toHaveBeenCalledWith("DELETE FROM monitors");
+            expect(mockDatabase.run).toHaveBeenCalledWith(
+                "DELETE FROM history"
+            );
+            expect(mockDatabase.run).toHaveBeenCalledWith(
+                "DELETE FROM monitors"
+            );
         });
         it("should handle delete all errors", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");

@@ -149,7 +149,10 @@ export async function setEncryptionPassphrase(
 
         // NOTE: Do not run settings writes in parallel.
         await ctx.settings.set(SETTINGS_KEY_ENCRYPTION_MODE, "passphrase");
-        await ctx.settings.set(SETTINGS_KEY_ENCRYPTION_SALT, encodeBase64(salt));
+        await ctx.settings.set(
+            SETTINGS_KEY_ENCRYPTION_SALT,
+            encodeBase64(salt)
+        );
         await ctx.secretStore.setSecret(
             SECRET_KEY_ENCRYPTION_DERIVED_KEY,
             encodeBase64(key)

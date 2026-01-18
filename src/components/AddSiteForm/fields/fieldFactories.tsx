@@ -101,22 +101,20 @@ export function createStringField<
             [onChange]
         );
 
-        return (
-            renderBaseFormField(
-                buildBaseFormFieldProps({
-                    error,
-                    helpText,
-                    id,
-                    label,
-                    required,
-                }),
-                (ariaProps) =>
-                    options.renderControl({
-                        ariaProps,
-                        handleChange,
-                        props,
-                    })
-            )
+        return renderBaseFormField(
+            buildBaseFormFieldProps({
+                error,
+                helpText,
+                id,
+                label,
+                required,
+            }),
+            (ariaProps) =>
+                options.renderControl({
+                    ariaProps,
+                    handleChange,
+                    props,
+                })
         );
     });
 

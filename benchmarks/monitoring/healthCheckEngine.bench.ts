@@ -161,14 +161,14 @@ describe("Enhanced Monitor Checker Performance", () => {
             }
         );
 
-        vi.mocked(mockMonitorRepository.clearActiveOperations).mockImplementation(
-            async (monitorId: string) => {
-                const monitor = monitorById.get(monitorId);
-                if (monitor) {
-                    monitor.activeOperations = [];
-                }
+        vi.mocked(
+            mockMonitorRepository.clearActiveOperations
+        ).mockImplementation(async (monitorId: string) => {
+            const monitor = monitorById.get(monitorId);
+            if (monitor) {
+                monitor.activeOperations = [];
             }
-        );
+        });
     });
 
     bench(

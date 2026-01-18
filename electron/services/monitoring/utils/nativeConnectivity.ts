@@ -498,10 +498,14 @@ export async function checkConnectivityWithRetry(
         }
 
         try {
-            const result = await checkConnectivity(host, {
-                ...opts,
-                retries: 0, // Prevent nested retries
-            }, signal);
+            const result = await checkConnectivity(
+                host,
+                {
+                    ...opts,
+                    retries: 0, // Prevent nested retries
+                },
+                signal
+            );
 
             if (result.status === "up" || attemptsLeft === 0) {
                 return result;

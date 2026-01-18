@@ -20,9 +20,8 @@ const cloudProviderKindSchema = z.enum([
 
 const cloudEncryptionModeSchema = z.enum(["none", "passphrase"]);
 
-const cloudProviderDetailsSchema: z.ZodType<CloudProviderDetails> = z.discriminatedUnion(
-    "kind",
-    [
+const cloudProviderDetailsSchema: z.ZodType<CloudProviderDetails> =
+    z.discriminatedUnion("kind", [
         z
             .object({
                 baseDirectory: z.string().min(1),
@@ -39,8 +38,7 @@ const cloudProviderDetailsSchema: z.ZodType<CloudProviderDetails> = z.discrimina
                 ]),
             })
             .strict(),
-    ]
-);
+    ]);
 
 // NOTE: Zod v4's type-level object inference + strict TS settings can produce
 // spurious optional properties for nullable fields. The runtime schema is the
@@ -126,7 +124,6 @@ const cloudSyncResetResultInternalSchema = z
         startedAt: z.number(),
     })
     .strict();
-
 
 export const cloudSyncResetResultSchema: z.ZodType<CloudSyncResetResult> =
     // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Runtime schema enforces the interface; cast works around Zod typing noise.

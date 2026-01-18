@@ -40,7 +40,7 @@ import {
  */
 function copyDynamicFields(
     monitor: Site["monitors"][0],
-        dynamicMonitor: UnknownRecord
+    dynamicMonitor: UnknownRecord
 ): void {
     const excludedFields = new Set([
         "checkInterval",

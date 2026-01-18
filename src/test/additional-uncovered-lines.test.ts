@@ -64,7 +64,6 @@ describe("Additional Uncovered Lines Tests", () => {
             await annotate("Category: Hook", "category");
             await annotate("Type: Edge Case", "type");
 
-
             const mockSite: Site = {
                 identifier: "test-site-id",
                 monitors: [

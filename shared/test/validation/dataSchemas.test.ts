@@ -36,7 +36,9 @@ describe("dataSchemas", () => {
     });
 
     it("rejects serialized backup results that exceed the IPC transfer size", () => {
-        const buffer = new ArrayBuffer(DEFAULT_MAX_IPC_BACKUP_TRANSFER_BYTES + 1);
+        const buffer = new ArrayBuffer(
+            DEFAULT_MAX_IPC_BACKUP_TRANSFER_BYTES + 1
+        );
 
         const parsed = validateSerializedDatabaseBackupResult({
             buffer,

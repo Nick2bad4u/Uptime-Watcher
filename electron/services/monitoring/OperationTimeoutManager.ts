@@ -42,7 +42,7 @@ export class OperationTimeoutManager {
      *
      * @param operationId - ID of operation that timed out
      */
-private async handleTimeout(operationId: string): Promise<void> {
+    private async handleTimeout(operationId: string): Promise<void> {
         const operation = this.operationRegistry.getOperation(operationId);
         if (!operation) {
             this.clearTimeout(operationId);
@@ -81,11 +81,12 @@ private async handleTimeout(operationId: string): Promise<void> {
         }
     }
 
-/**
+    /**
      * Creates a new OperationTimeoutManager.
      *
      * @param operationRegistry - Registry for managing operations
-     * @param monitorRepository - Repository used to clear stale active operation IDs
+     * @param monitorRepository - Repository used to clear stale active
+     *   operation IDs
      */
     public constructor(
         operationRegistry: MonitorOperationRegistry,
@@ -133,7 +134,4 @@ private async handleTimeout(operationId: string): Promise<void> {
             )
         );
     }
-
-
-
 }

@@ -150,8 +150,9 @@ export class DataBackupService {
      *
      * @remarks
      * These operations must not overlap. Concurrent execution can lead to:
-     * - closing the shared connection while another operation is using it,
-     * - partially replaced files being opened,
+     *
+     * - Closing the shared connection while another operation is using it,
+     * - Partially replaced files being opened,
      * - Windows rename/locking issues.
      */
     private async withExclusiveDatabaseFileOperation<T>(
@@ -184,9 +185,10 @@ export class DataBackupService {
      * @remarks
      * This avoids materializing the backup as a large in-memory Buffer.
      * Internally it:
-     * 1) creates a consistent snapshot via `VACUUM INTO` in a temp directory,
-     * 2) copies the snapshot into the destination directory under a temp name,
-     * 3) swaps the destination file atomically (rename with a backup fallback).
+     *
+     * 1. Creates a consistent snapshot via `VACUUM INTO` in a temp directory,
+     * 2. Copies the snapshot into the destination directory under a temp name,
+     * 3. Swaps the destination file atomically (rename with a backup fallback).
      */
     public async saveDatabaseBackupToPath(
         targetPath: string
@@ -213,9 +215,8 @@ export class DataBackupService {
 
                 let snapshotDir: null | string = null;
                 try {
-                    snapshotDir = await this.createTempDirectory(
-                        BACKUP_TEMP_PREFIX
-                    );
+                    snapshotDir =
+                        await this.createTempDirectory(BACKUP_TEMP_PREFIX);
                     const snapshotPath = this.createConsistentSnapshot({
                         dbPath,
                         snapshotDir,
@@ -337,9 +338,8 @@ export class DataBackupService {
                         app.getPath("userData"),
                         DB_FILE_NAME
                     );
-                    snapshotDir = await this.createTempDirectory(
-                        BACKUP_TEMP_PREFIX
-                    );
+                    snapshotDir =
+                        await this.createTempDirectory(BACKUP_TEMP_PREFIX);
                     const snapshotPath = this.createConsistentSnapshot({
                         dbPath,
                         snapshotDir,
@@ -349,7 +349,8 @@ export class DataBackupService {
                     const rawResult = await createDatabaseBackup({
                         dbPath: snapshotPath,
                     });
-                    const result = this.normalizeBackupResultMetadata(rawResult);
+                    const result =
+                        this.normalizeBackupResultMetadata(rawResult);
                     validateDatabaseBackupPayload(result);
                     this.logger.info(
                         "[DataBackupService] Created database backup",
@@ -422,7 +423,8 @@ export class DataBackupService {
                         );
                     }
 
-                    tempDir = await this.createTempDirectory(RESTORE_TEMP_PREFIX);
+                    tempDir =
+                        await this.createTempDirectory(RESTORE_TEMP_PREFIX);
                     const incomingFileName = payload.fileName?.trim();
                     const tempFileName =
                         incomingFileName && incomingFileName.length > 0
@@ -451,9 +453,8 @@ export class DataBackupService {
                         mode: "quick_check",
                     });
 
-                    preRestoreSnapshotDir = await this.createTempDirectory(
-                        BACKUP_TEMP_PREFIX
-                    );
+                    preRestoreSnapshotDir =
+                        await this.createTempDirectory(BACKUP_TEMP_PREFIX);
                     const preRestoreSnapshotPath =
                         this.createConsistentSnapshot({
                             dbPath,
@@ -575,16 +576,12 @@ export class DataBackupService {
                     );
                 }
 
-                const tempDir = await this.createTempDirectory(
-                    ROLLBACK_TEMP_PREFIX
-                );
+                const tempDir =
+                    await this.createTempDirectory(ROLLBACK_TEMP_PREFIX);
                 const safeFileName = createSanitizedFileName(
                     normalizedBackup.fileName
                 );
-                const dbPath = path.join(
-                    app.getPath("userData"),
-                    DB_FILE_NAME
-                );
+                const dbPath = path.join(app.getPath("userData"), DB_FILE_NAME);
 
                 try {
                     const tempFilePath = await this.writeFileWithinDirectory(
@@ -735,7 +732,9 @@ export class DataBackupService {
                 await fs.rm(rollbackPath, { force: true }).catch(() => {});
                 await fs.rm(rollbackWalPath, { force: true }).catch(() => {});
                 await fs.rm(rollbackShmPath, { force: true }).catch(() => {});
-                await fs.rm(rollbackJournalPath, { force: true }).catch(() => {});
+                await fs
+                    .rm(rollbackJournalPath, { force: true })
+                    .catch(() => {});
             }
         }
 
@@ -832,7 +831,9 @@ export class DataBackupService {
         });
         try {
             try {
-                tempDb.exec(`PRAGMA busy_timeout = ${SNAPSHOT_BUSY_TIMEOUT_MS}`);
+                tempDb.exec(
+                    `PRAGMA busy_timeout = ${SNAPSHOT_BUSY_TIMEOUT_MS}`
+                );
             } catch {
                 // Best-effort; snapshot still works without it.
             }
@@ -844,14 +845,6 @@ export class DataBackupService {
             tempDb.close();
         }
     }
-
-
-
-
-
-
-
-
 
     private createConsistentSnapshot(args: {
         dbPath: string;

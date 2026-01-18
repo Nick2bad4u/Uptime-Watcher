@@ -46,7 +46,10 @@ vi.mock("../../../../services/logger", () => ({
 }));
 
 vi.mock("../../../../theme/components/StatusIndicator", () => ({
-    StatusIndicator: ({ children, ...props }: PropsWithChildren<HTMLAttributes<HTMLDivElement>>) => (
+    StatusIndicator: ({
+        children,
+        ...props
+    }: PropsWithChildren<HTMLAttributes<HTMLDivElement>>) => (
         <div data-testid="status-indicator" {...props}>
             {children}
         </div>
@@ -54,31 +57,46 @@ vi.mock("../../../../theme/components/StatusIndicator", () => ({
 }));
 
 vi.mock("../../../../theme/components/ThemedButton", () => ({
-    ThemedButton: ({ children, ...props }: PropsWithChildren<ButtonHTMLAttributes<HTMLButtonElement>>) => (
+    ThemedButton: ({
+        children,
+        ...props
+    }: PropsWithChildren<ButtonHTMLAttributes<HTMLButtonElement>>) => (
         <button {...props}>{children}</button>
     ),
 }));
 
 vi.mock("../../../../theme/components/ThemedCard", () => ({
-    ThemedCard: ({ children, ...props }: PropsWithChildren<HTMLAttributes<HTMLDivElement>>) => (
+    ThemedCard: ({
+        children,
+        ...props
+    }: PropsWithChildren<HTMLAttributes<HTMLDivElement>>) => (
         <div {...props}>{children}</div>
     ),
 }));
 
 vi.mock("../../../../theme/components/ThemedSelect", () => ({
-    ThemedSelect: ({ children, ...props }: PropsWithChildren<SelectHTMLAttributes<HTMLSelectElement>>) => (
+    ThemedSelect: ({
+        children,
+        ...props
+    }: PropsWithChildren<SelectHTMLAttributes<HTMLSelectElement>>) => (
         <select {...props}>{children}</select>
     ),
 }));
 
 vi.mock("../../../../theme/components/ThemedText", () => ({
-    ThemedText: ({ children, ...props }: PropsWithChildren<HTMLAttributes<HTMLSpanElement>>) => (
+    ThemedText: ({
+        children,
+        ...props
+    }: PropsWithChildren<HTMLAttributes<HTMLSpanElement>>) => (
         <span {...props}>{children}</span>
     ),
 }));
 
 vi.mock("../../common/MonitorUiComponents", () => ({
-    DetailLabel: ({ children, ...props }: PropsWithChildren<LabelHTMLAttributes<HTMLLabelElement>>) => (
+    DetailLabel: ({
+        children,
+        ...props
+    }: PropsWithChildren<LabelHTMLAttributes<HTMLLabelElement>>) => (
         <label {...props}>{children}</label>
     ),
 }));

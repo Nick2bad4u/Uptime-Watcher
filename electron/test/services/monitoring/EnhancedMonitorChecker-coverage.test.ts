@@ -99,8 +99,10 @@ describe("EnhancedMonitorChecker Coverage Tests", () => {
         });
 
         // Replace monitor service implementations with deterministic mocks.
-        const servicesByType = (enhancedChecker as any)
-            .servicesByType as Map<string, any>;
+        const servicesByType = (enhancedChecker as any).servicesByType as Map<
+            string,
+            any
+        >;
 
         servicesByType.set("http", { check: vi.fn() });
         servicesByType.set("ping", { check: vi.fn() });
@@ -452,7 +454,9 @@ describe("EnhancedMonitorChecker Coverage Tests", () => {
             (enhancedChecker as any).servicesByType
                 .get("http")
                 .check.mockResolvedValue({ status: "up", responseTime: 1 });
-            mockStatusUpdateService.updateMonitorStatus.mockResolvedValue(false);
+            mockStatusUpdateService.updateMonitorStatus.mockResolvedValue(
+                false
+            );
 
             await enhancedChecker.checkMonitor(
                 mockSite,

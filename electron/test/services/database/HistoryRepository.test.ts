@@ -458,10 +458,7 @@ describe(HistoryRepository, () => {
             await annotate("Type: Configuration", "type");
 
             const limit = 100;
-            const mockMonitors = [
-                { id: "monitor-1" },
-                { id: "monitor-2" },
-            ];
+            const mockMonitors = [{ id: "monitor-1" }, { id: "monitor-2" }];
 
             vi.mocked(mockDatabase.all).mockReturnValue(mockMonitors);
 
@@ -520,7 +517,6 @@ describe(HistoryRepository, () => {
 
             await historyRepository.pruneAllHistory(limit);
 
-
             expect(
                 historyManipulation.pruneHistoryForMonitor
             ).not.toHaveBeenCalled();
@@ -544,7 +540,6 @@ describe(HistoryRepository, () => {
 
             await historyRepository.pruneAllHistory(limit);
 
-
             expect(
                 historyManipulation.pruneHistoryForMonitor
             ).toHaveBeenCalledWith(mockDatabase, "monitor-1", limit);
@@ -567,10 +562,7 @@ describe(HistoryRepository, () => {
             await annotate("Type: Business Logic", "type");
 
             const limit = 100;
-            const mockMonitors = [
-                { id: "monitor-1" },
-                { id: "monitor-2" },
-            ];
+            const mockMonitors = [{ id: "monitor-1" }, { id: "monitor-2" }];
 
             vi.mocked(mockDatabase.all).mockReturnValue(mockMonitors);
 

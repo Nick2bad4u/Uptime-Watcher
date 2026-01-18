@@ -13,13 +13,15 @@ type SettingsStoreState = ReturnType<typeof useSettingsStore.getState>;
 
 type SitesStoreState = ReturnType<typeof useSitesStore.getState>;
 
-const selectClearError = (state: ErrorStoreState): ErrorStoreState["clearError"] =>
-    state.clearError;
+const selectClearError = (
+    state: ErrorStoreState
+): ErrorStoreState["clearError"] => state.clearError;
 
 const selectIsLoading = (state: ErrorStoreState): boolean => state.isLoading;
 
-const selectLastError = (state: ErrorStoreState): ErrorStoreState["lastError"] =>
-    state.lastError;
+const selectLastError = (
+    state: ErrorStoreState
+): ErrorStoreState["lastError"] => state.lastError;
 
 const selectSetError = (state: ErrorStoreState): ErrorStoreState["setError"] =>
     state.setError;
@@ -32,8 +34,9 @@ const selectResetSettings = (
     state: SettingsStoreState
 ): SettingsStoreState["resetSettings"] => state.resetSettings;
 
-const selectSettings = (state: SettingsStoreState): SettingsStoreState["settings"] =>
-    state.settings;
+const selectSettings = (
+    state: SettingsStoreState
+): SettingsStoreState["settings"] => state.settings;
 
 const selectUpdateSettings = (
     state: SettingsStoreState

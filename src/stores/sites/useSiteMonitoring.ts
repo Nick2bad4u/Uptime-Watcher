@@ -165,9 +165,27 @@ export const createSiteMonitoringActions = (
     const applyOptimisticUpdate = (statusUpdate: StatusUpdate): void => {
         try {
             const currentSites = getSites();
+            const snapshotPayload: StatusUpdateSnapshotPayload = {
+                monitor: statusUpdate.monitor,
+                monitorId: statusUpdate.monitorId,
+                site: statusUpdate.site,
+                siteIdentifier: statusUpdate.siteIdentifier,
+                status: statusUpdate.status,
+                timestamp: statusUpdate.timestamp,
+                ...(statusUpdate.details === undefined
+                    ? {}
+                    : { error: statusUpdate.details }),
+                ...(statusUpdate.previousStatus === undefined
+                    ? {}
+                    : { previousStatus: statusUpdate.previousStatus }),
+                ...(statusUpdate.responseTime === undefined
+                    ? {}
+                    : { responseTime: statusUpdate.responseTime }),
+            };
+
             const updatedSites = safeApplyStatusUpdate(
                 currentSites,
-                statusUpdate
+                snapshotPayload
             );
             setSites(updatedSites);
 
@@ -484,7 +502,8 @@ export const createSiteMonitoringActions = (
                 )
             );
         },
-        startSiteMonitoring: (siteIdentifier: string): Promise<void> => runMonitoringLifecycleAction(
+        startSiteMonitoring: (siteIdentifier: string): Promise<void> =>
+            runMonitoringLifecycleAction(
                 "startSiteMonitoring",
                 siteIdentifier,
                 true,
@@ -493,7 +512,8 @@ export const createSiteMonitoringActions = (
         startSiteMonitorMonitoring: (
             siteIdentifier: string,
             monitorId: string
-        ): Promise<void> => runMonitoringLifecycleAction(
+        ): Promise<void> =>
+            runMonitoringLifecycleAction(
                 "startSiteMonitorMonitoring",
                 siteIdentifier,
                 true,
@@ -504,7 +524,8 @@ export const createSiteMonitoringActions = (
                     ),
                 monitorId
             ),
-        stopSiteMonitoring: (siteIdentifier: string): Promise<void> => runMonitoringLifecycleAction(
+        stopSiteMonitoring: (siteIdentifier: string): Promise<void> =>
+            runMonitoringLifecycleAction(
                 "stopSiteMonitoring",
                 siteIdentifier,
                 false,
@@ -513,7 +534,8 @@ export const createSiteMonitoringActions = (
         stopSiteMonitorMonitoring: (
             siteIdentifier: string,
             monitorId: string
-        ): Promise<void> => runMonitoringLifecycleAction(
+        ): Promise<void> =>
+            runMonitoringLifecycleAction(
                 "stopSiteMonitorMonitoring",
                 siteIdentifier,
                 false,

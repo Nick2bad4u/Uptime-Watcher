@@ -115,9 +115,9 @@ function splitKey(key: string): { dirSegments: string[]; fileName: string } {
  * Escapes a value for inclusion inside a Google Drive query string literal.
  *
  * @remarks
- * Drive query strings use single quotes to delimit string literals.
- * Unescaped input (especially names with `'` or `\`) can break queries and
- * lead to incorrect lookups.
+ * Drive query strings use single quotes to delimit string literals. Unescaped
+ * input (especially names with `'` or `\`) can break queries and lead to
+ * incorrect lookups.
  */
 function escapeGoogleDriveQueryStringLiteral(value: string): string {
     return value.replaceAll("\\", "\\\\").replaceAll("'", String.raw`\'`);
@@ -355,7 +355,8 @@ export class GoogleDriveCloudStorageProvider
                 : Date.now();
 
             const sizeFromApi = Number(parsedMetadata.size ?? 0);
-            const sizeBytes = sizeFromApi > 0 ? sizeFromApi : args.buffer.length;
+            const sizeBytes =
+                sizeFromApi > 0 ? sizeFromApi : args.buffer.length;
 
             return {
                 key: normalizedKey,
@@ -599,9 +600,7 @@ export class GoogleDriveCloudStorageProvider
         return this.drive;
     }
 
-    public constructor(args: {
-        tokenManager: GoogleDriveTokenManager;
-    }) {
+    public constructor(args: { tokenManager: GoogleDriveTokenManager }) {
         super(BACKUPS_PREFIX);
         this.tokenManager = args.tokenManager;
         this.drive = createGoogleDriveClient(args.tokenManager);

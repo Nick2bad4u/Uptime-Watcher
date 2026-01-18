@@ -99,8 +99,7 @@ export class MonitorOperationRegistry {
     }
 
     /**
-     * Returns the operation IDs currently associated with the provided
-     * monitor.
+     * Returns the operation IDs currently associated with the provided monitor.
      */
     public getOutstandingOperationIds(monitorId: string): string[] {
         const ids: string[] = [];

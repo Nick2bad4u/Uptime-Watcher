@@ -11,9 +11,7 @@ import type { TypedEventBus } from "../../events/TypedEventBus";
 import { DEFAULT_CHECK_INTERVAL } from "../../constants";
 import { isDev } from "../../electronUtils";
 import { logger as backendLogger } from "../../utils/logger";
-import {
-    MIN_CHECK_INTERVAL,
-} from "./constants";
+import { MIN_CHECK_INTERVAL } from "./constants";
 import { resolveMonitorOperationTimeoutMs } from "./shared/timeoutUtils";
 
 const JITTER_PERCENTAGE = 0.1;
@@ -107,10 +105,10 @@ export class MonitorScheduler {
      *
      * @param siteIdentifier - Unique identifier for the site.
      * @param monitorId - Unique identifier for the monitor.
-    * @param signal - Abort signal that is aborted when the scheduler times out
-    *   (and also when monitoring is stopped for the job).
-    *
-    * @returns Promise resolving when the check completes.
+     * @param signal - Abort signal that is aborted when the scheduler times out
+     *   (and also when monitoring is stopped for the job).
+     *
+     * @returns Promise resolving when the check completes.
      *
      * @internal
      */
@@ -163,7 +161,7 @@ export class MonitorScheduler {
                     job.monitorId,
                     abortController.signal
                 );
-                    return { kind: "success" };
+                return { kind: "success" };
             } catch (error: unknown) {
                 // If a timeout has already fired, treat any subsequent errors
                 // as noise (often abort-related) and avoid double-counting.
@@ -229,7 +227,10 @@ export class MonitorScheduler {
                     break;
                 }
                 case "timeout": {
-                    this.emitMonitorTimeoutEvent(currentJob, currentJob.timeoutMs);
+                    this.emitMonitorTimeoutEvent(
+                        currentJob,
+                        currentJob.timeoutMs
+                    );
                     currentJob.backoffAttempt += 1;
                     currentJob.needsReschedule = true;
                     break;
@@ -448,9 +449,11 @@ export class MonitorScheduler {
      * @example
      *
      * ```typescript
-    * scheduler.setCheckCallback(async (siteIdentifier, monitorId, signal) => {
-     *     // Custom check implementation
-     * });
+     * scheduler.setCheckCallback(
+     *     async (siteIdentifier, monitorId, signal) => {
+     *         // Custom check implementation
+     *     }
+     * );
      * ```
      *
      * @param callback - Function to execute for each scheduled monitor check.

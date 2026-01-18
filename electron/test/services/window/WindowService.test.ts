@@ -1104,7 +1104,9 @@ describe(WindowService, () => {
             expect(BrowserWindow).toHaveBeenCalledWith(
                 expect.objectContaining({
                     webPreferences: expect.objectContaining({
-                        preload: expect.stringMatching(/dist[\\/]preload\.js$/u),
+                        preload: expect.stringMatching(
+                            /dist[\\/]preload\.js$/u
+                        ),
                     }),
                 })
             );

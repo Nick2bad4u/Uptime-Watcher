@@ -40,7 +40,9 @@ describe("CloudService", () => {
 
     it("configures filesystem provider and uploads backup", async () => {
         const backupBuffer = Buffer.from("backup");
-        const checksum = createHash("sha256").update(backupBuffer).digest("hex");
+        const checksum = createHash("sha256")
+            .update(backupBuffer)
+            .digest("hex");
 
         const settings = new Map<string, string>();
         const syncEngine = {

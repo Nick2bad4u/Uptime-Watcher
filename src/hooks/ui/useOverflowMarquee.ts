@@ -307,72 +307,73 @@ export function useOverflowMarquee<
 
     useEffect(
         function manageOverflowObservation() {
-        runOverflowEvaluation();
+            runOverflowEvaluation();
 
-        const element = latestContainerRef.current.current;
-        const hasWindow = typeof window !== "undefined";
-        const shouldAttachWindowListener = hasWindow && element !== null;
+            const element = latestContainerRef.current.current;
+            const hasWindow = typeof window !== "undefined";
+            const shouldAttachWindowListener = hasWindow && element !== null;
 
-        const handleResize = (): void => {
-            runOverflowEvaluationRef.current();
-        };
+            const handleResize = (): void => {
+                runOverflowEvaluationRef.current();
+            };
 
-        if (shouldAttachWindowListener) {
-            window.addEventListener("resize", handleResize);
-        }
-
-        const supportsResizeObserver = typeof ResizeObserver !== "undefined";
-        const subscriber = supportsResizeObserver
-            ? ensureObserverSubscriber(
-                  observerSubscriberRef,
-                  runOverflowEvaluationRef
-              )
-            : undefined;
-
-        if (supportsResizeObserver && subscriber) {
-            const previouslyObserved = observedElementRef.current;
-
-            if (previouslyObserved && previouslyObserved !== element) {
-                unregisterOverflowObserver(previouslyObserved, subscriber);
-                observedElementRef.current = null;
-            }
-
-            if (element) {
-                registerOverflowObserver(element, subscriber);
-                observedElementRef.current = element;
-            }
-        }
-
-        if (!supportsResizeObserver && observedElementRef.current) {
-            const fallbackSubscriber = observerSubscriberRef.current;
-            const previouslyObserved = observedElementRef.current;
-
-            if (typeof fallbackSubscriber === "function") {
-                unregisterOverflowObserver(
-                    previouslyObserved,
-                    fallbackSubscriber
-                );
-            }
-
-            observedElementRef.current = null;
-        }
-
-        return function cleanupOverflowObservation(): void {
             if (shouldAttachWindowListener) {
-                window.removeEventListener("resize", handleResize);
+                window.addEventListener("resize", handleResize);
             }
 
-            if (!supportsResizeObserver || !subscriber) {
-                return;
+            const supportsResizeObserver =
+                typeof ResizeObserver !== "undefined";
+            const subscriber = supportsResizeObserver
+                ? ensureObserverSubscriber(
+                      observerSubscriberRef,
+                      runOverflowEvaluationRef
+                  )
+                : undefined;
+
+            if (supportsResizeObserver && subscriber) {
+                const previouslyObserved = observedElementRef.current;
+
+                if (previouslyObserved && previouslyObserved !== element) {
+                    unregisterOverflowObserver(previouslyObserved, subscriber);
+                    observedElementRef.current = null;
+                }
+
+                if (element) {
+                    registerOverflowObserver(element, subscriber);
+                    observedElementRef.current = element;
+                }
             }
 
-            const observedElement = observedElementRef.current;
+            if (!supportsResizeObserver && observedElementRef.current) {
+                const fallbackSubscriber = observerSubscriberRef.current;
+                const previouslyObserved = observedElementRef.current;
 
-            if (observedElement) {
-                unregisterOverflowObserver(observedElement, subscriber);
+                if (typeof fallbackSubscriber === "function") {
+                    unregisterOverflowObserver(
+                        previouslyObserved,
+                        fallbackSubscriber
+                    );
+                }
+
                 observedElementRef.current = null;
             }
-        };
+
+            return function cleanupOverflowObservation(): void {
+                if (shouldAttachWindowListener) {
+                    window.removeEventListener("resize", handleResize);
+                }
+
+                if (!supportsResizeObserver || !subscriber) {
+                    return;
+                }
+
+                const observedElement = observedElementRef.current;
+
+                if (observedElement) {
+                    unregisterOverflowObserver(observedElement, subscriber);
+                    observedElementRef.current = null;
+                }
+            };
         },
         [/* effect dep */ containerRef, runOverflowEvaluation]
     );

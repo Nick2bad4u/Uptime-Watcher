@@ -28,10 +28,7 @@ import {
 } from "@shared/validation/validatorUtils";
 import { ipcMain } from "electron";
 
-import type {
-    IpcParameterValidator,
-    IpcResponse,
-} from "./types";
+import type { IpcParameterValidator, IpcResponse } from "./types";
 
 import { isDev } from "../../electronUtils";
 import { logger } from "../../utils/logger";
@@ -655,7 +652,12 @@ export async function withIpcHandlerValidation<
         () => handler(...params),
         executionOptions
     );
-    return createResponseFromExecution(channelName, execution, correlationId, metadata);
+    return createResponseFromExecution(
+        channelName,
+        execution,
+        correlationId,
+        metadata
+    );
 }
 
 /**

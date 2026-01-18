@@ -11,8 +11,6 @@
  * @packageDocumentation
  */
 
-
-
 import type { StatusUpdate } from "@shared/types";
 
 import {

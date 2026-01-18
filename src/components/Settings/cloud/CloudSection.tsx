@@ -346,7 +346,13 @@ export const CloudSection = ({
                 ? UnlockIcon
                 : LockIcon;
         return <IconComponent aria-hidden size={buttonIconSize} />;
-    }, [buttonIconSize, encryptionLocked, encryptionMode, LockIcon, UnlockIcon]);
+    }, [
+        buttonIconSize,
+        encryptionLocked,
+        encryptionMode,
+        LockIcon,
+        UnlockIcon,
+    ]);
 
     const notConfiguredHint = renderCloudNotConfiguredHint({ configured });
 
@@ -381,7 +387,11 @@ export const CloudSection = ({
                 <div className="settings-subcard">
                     <div className="flex items-center gap-2">
                         {connectionHeaderIcon}
-                        <ThemedText size="sm" variant="secondary" weight="medium">
+                        <ThemedText
+                            size="sm"
+                            variant="secondary"
+                            weight="medium"
+                        >
                             Connection & Status
                         </ThemedText>
                     </div>
@@ -406,7 +416,11 @@ export const CloudSection = ({
                 <div className="settings-subcard">
                     <div className="flex items-center gap-2">
                         {syncHeaderIcon}
-                        <ThemedText size="sm" variant="secondary" weight="medium">
+                        <ThemedText
+                            size="sm"
+                            variant="secondary"
+                            weight="medium"
+                        >
                             Sync
                         </ThemedText>
                     </div>
@@ -436,7 +450,11 @@ export const CloudSection = ({
                 <div className="settings-subcard">
                     <div className="flex items-center gap-2">
                         {encryptionHeaderIcon}
-                        <ThemedText size="sm" variant="secondary" weight="medium">
+                        <ThemedText
+                            size="sm"
+                            variant="secondary"
+                            weight="medium"
+                        >
                             Encryption
                         </ThemedText>
                     </div>

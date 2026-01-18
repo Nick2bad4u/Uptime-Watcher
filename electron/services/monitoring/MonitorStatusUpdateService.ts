@@ -96,7 +96,7 @@ export class MonitorStatusUpdateService {
         });
     }
 
-/**
+    /**
      * Update monitor status only if the operation is still valid.
      *
      * @param result - Check result with operation correlation
@@ -104,7 +104,7 @@ export class MonitorStatusUpdateService {
      * @returns Promise resolving to true if update was applied, false if
      *   ignored
      */
-public async updateMonitorStatus(
+    public async updateMonitorStatus(
         result: StatusUpdateMonitorCheckResult
     ): Promise<boolean> {
         try {
@@ -200,9 +200,7 @@ public async updateMonitorStatus(
      *
      * @param monitorId - ID of the monitor whose site cache should be refreshed
      */
-    private async refreshSiteCacheForMonitor(
-        monitorId: string
-    ): Promise<void> {
+    private async refreshSiteCacheForMonitor(monitorId: string): Promise<void> {
         try {
             // Find the site containing this monitor
             const sites = this.sites.getAll();

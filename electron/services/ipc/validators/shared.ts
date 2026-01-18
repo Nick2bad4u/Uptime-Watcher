@@ -85,9 +85,7 @@ function getForbiddenRecordKeyErrors(
 
     for (const key of FORBIDDEN_RECORD_KEYS) {
         if (Object.hasOwn(record, key)) {
-            errors.push(
-                `${paramName} must not include reserved key '${key}'`
-            );
+            errors.push(`${paramName} must not include reserved key '${key}'`);
         }
     }
 
@@ -100,9 +98,7 @@ const requireRecordParam = (
 ): RequiredRecordResult => {
     if (!isRecord(value)) {
         return {
-            error: toValidationResult(
-                `${paramName} must be a valid object`
-            ),
+            error: toValidationResult(`${paramName} must be a valid object`),
             ok: false,
         };
     }
@@ -234,9 +230,7 @@ function createSiteIdentifierAndMonitorIdValidator(
             }
 
             const parsed = monitorIdSchema.safeParse(value);
-            return parsed.success
-                ? null
-                : formatZodIssues(parsed.error.issues);
+            return parsed.success ? null : formatZodIssues(parsed.error.issues);
         },
     ]);
 }

@@ -112,5 +112,4 @@ export class UptimeOrchestratorEventHandlers {
         this.onDatabaseInitialized = options.onDatabaseInitialized;
         this.snapshotSyncCoordinator = options.snapshotSyncCoordinator;
     }
-
 }

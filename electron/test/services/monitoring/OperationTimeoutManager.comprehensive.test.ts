@@ -318,9 +318,9 @@ describe("OperationTimeoutManager - Comprehensive Coverage", () => {
             expect(
                 vi.mocked(mockMonitorRepository.clearActiveOperations)
             ).toHaveBeenCalledWith(monitorId);
-            expect(mockOperationRegistry.completeOperation).toHaveBeenCalledWith(
-                operationId
-            );
+            expect(
+                mockOperationRegistry.completeOperation
+            ).toHaveBeenCalledWith(operationId);
         });
 
         it("should not cancel already cancelled operation", async ({
@@ -372,9 +372,9 @@ describe("OperationTimeoutManager - Comprehensive Coverage", () => {
             expect(
                 vi.mocked(mockMonitorRepository.clearActiveOperations)
             ).toHaveBeenCalledWith(monitorId);
-            expect(mockOperationRegistry.completeOperation).toHaveBeenCalledWith(
-                operationId
-            );
+            expect(
+                mockOperationRegistry.completeOperation
+            ).toHaveBeenCalledWith(operationId);
         });
 
         it("should handle timeout for non-existent operation", async ({
@@ -414,7 +414,9 @@ describe("OperationTimeoutManager - Comprehensive Coverage", () => {
             expect(
                 vi.mocked(mockMonitorRepository.clearActiveOperations)
             ).not.toHaveBeenCalled();
-            expect(mockOperationRegistry.completeOperation).not.toHaveBeenCalled();
+            expect(
+                mockOperationRegistry.completeOperation
+            ).not.toHaveBeenCalled();
         });
 
         it("should clear timeout after handling timeout", async ({

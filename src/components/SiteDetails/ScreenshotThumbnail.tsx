@@ -6,9 +6,7 @@
  * React portals for the overlay positioning.
  */
 
-import {
-    tryGetSafeThirdPartyHttpUrl,
-} from "@shared/utils/urlSafety";
+import { tryGetSafeThirdPartyHttpUrl } from "@shared/utils/urlSafety";
 import { isValidUrl } from "@shared/validation/validatorUtils";
 import {
     type JSX,

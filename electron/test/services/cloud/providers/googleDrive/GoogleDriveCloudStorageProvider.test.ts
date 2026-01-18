@@ -56,12 +56,16 @@ describe(GoogleDriveCloudStorageProvider, () => {
         expect(result).toEqual([]);
 
         // It must search in appDataFolder.
-        expect(googleDriveClientMocks.driveStub.files.list).toHaveBeenCalledWith(
+        expect(
+            googleDriveClientMocks.driveStub.files.list
+        ).toHaveBeenCalledWith(
             expect.objectContaining({ spaces: "appDataFolder" })
         );
 
         // It must create root folder under appDataFolder parents.
-        expect(googleDriveClientMocks.driveStub.files.create).toHaveBeenCalledWith(
+        expect(
+            googleDriveClientMocks.driveStub.files.create
+        ).toHaveBeenCalledWith(
             expect.objectContaining({
                 requestBody: expect.objectContaining({
                     mimeType: "application/vnd.google-apps.folder",
@@ -71,9 +75,9 @@ describe(GoogleDriveCloudStorageProvider, () => {
             })
         );
 
-        expect(googleDriveClientMocks.createGoogleDriveClient).toHaveBeenCalledWith(
-            tokenManager
-        );
+        expect(
+            googleDriveClientMocks.createGoogleDriveClient
+        ).toHaveBeenCalledWith(tokenManager);
     });
 
     it("throws ENOENT when downloading a missing object", async () => {

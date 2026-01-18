@@ -81,7 +81,12 @@ export const EmptyState = (): JSX.Element => {
                         No sites are being monitored
                     </ThemedText>
 
-                    <ThemedText align="center" as="p" size="base" variant="secondary">
+                    <ThemedText
+                        align="center"
+                        as="p"
+                        size="base"
+                        variant="secondary"
+                    >
                         Add your first website to start monitoring its uptime.
                     </ThemedText>
                 </div>

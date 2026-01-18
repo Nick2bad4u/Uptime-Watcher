@@ -164,7 +164,12 @@ const MaintenanceStatusCard = (props: {
             </ThemedText>
 
             {summary ? (
-                <ThemedText as="p" className="mt-2" size="xs" variant="tertiary">
+                <ThemedText
+                    as="p"
+                    className="mt-2"
+                    size="xs"
+                    variant="tertiary"
+                >
                     {summary}
                 </ThemedText>
             ) : null}
@@ -315,20 +320,35 @@ const PreviewSummaryCard = (props: {
             {previewStats ? (
                 <PreviewMetrics stats={previewStats} />
             ) : (
-                <ThemedText as="p" className="mt-3" size="xs" variant="tertiary">
+                <ThemedText
+                    as="p"
+                    className="mt-3"
+                    size="xs"
+                    variant="tertiary"
+                >
                     {previewView.previewText}
                 </ThemedText>
             )}
 
             {preview?.operationObjectCount === 0 ? (
-                <ThemedText as="p" className="mt-3" size="xs" variant="tertiary">
+                <ThemedText
+                    as="p"
+                    className="mt-3"
+                    size="xs"
+                    variant="tertiary"
+                >
                     No change history has been uploaded yet. This is normal on
                     the first device until you make changes with Sync enabled.
                 </ThemedText>
             ) : null}
 
             {previewView.otherObjectsText ? (
-                <ThemedText as="p" className="mt-2" size="xs" variant="tertiary">
+                <ThemedText
+                    as="p"
+                    className="mt-2"
+                    size="xs"
+                    variant="tertiary"
+                >
                     {previewView.otherObjectsText}
                 </ThemedText>
             ) : null}
@@ -695,7 +715,9 @@ function buildDiagnosticsPayload(args: {
             lastBackupAt: args.status?.lastBackupAt ?? null,
             lastSyncAt: args.status?.lastSyncAt ?? null,
             syncEnabled: args.syncEnabled,
-            ...(args.status?.lastError ? { lastError: args.status.lastError } : {}),
+            ...(args.status?.lastError
+                ? { lastError: args.status.lastError }
+                : {}),
         },
         generatedAtEpochMs: args.generatedAtEpochMs,
         lastResetResult: args.lastResult,
@@ -709,9 +731,10 @@ function buildDiagnosticsPayload(args: {
     };
 }
 
-function buildDiagnosticsText(args: {
-    readonly payload: DiagnosticsPayload;
-}): { readonly json: string; readonly text: string; } {
+function buildDiagnosticsText(args: { readonly payload: DiagnosticsPayload }): {
+    readonly json: string;
+    readonly text: string;
+} {
     const json = JSON.stringify(args.payload, null, 2);
     const generatedAt =
         args.payload.generatedAtEpochMs > 0
@@ -875,7 +898,7 @@ export const SyncMaintenancePanel = ({
     }, [preview]);
 
     const buildCurrentDiagnostics = useCallback(
-        (generatedAtEpochMs: number): { json: string; text: string; } => {
+        (generatedAtEpochMs: number): { json: string; text: string } => {
             const payload = buildDiagnosticsPayload({
                 canReset,
                 encryptionLocked,
@@ -1004,11 +1027,17 @@ export const SyncMaintenancePanel = ({
             ) : null}
 
             {preview && preview.deviceIds.length > 0 ? (
-                <DeviceIdsDetails deviceIds={preview.deviceIds} infoIcon={infoIcon} />
+                <DeviceIdsDetails
+                    deviceIds={preview.deviceIds}
+                    infoIcon={infoIcon}
+                />
             ) : null}
 
             {previewView.perDevice.length > 0 ? (
-                <OperationLogsDetails infoIcon={infoIcon} perDevice={previewView.perDevice} />
+                <OperationLogsDetails
+                    infoIcon={infoIcon}
+                    perDevice={previewView.perDevice}
+                />
             ) : null}
 
             <ToolsCard

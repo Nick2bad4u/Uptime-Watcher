@@ -87,7 +87,6 @@ function evaluateTimestamp(
             `${role} timestamp field '${field}' missing or invalid`,
             responseTime
         );
-
     }
 
     return { kind: "ok", timestamp };

@@ -138,10 +138,15 @@ interface UseThemeReturn {
  */
 export function useTheme(): UseThemeReturn {
     const { storedTheme, updateSettings } = useSettingsStore(
-        useShallow(useCallback((state) => ({
-            storedTheme: state.settings.theme,
-            updateSettings: state.updateSettings,
-        }), []))
+        useShallow(
+            useCallback(
+                (state) => ({
+                    storedTheme: state.settings.theme,
+                    updateSettings: state.updateSettings,
+                }),
+                []
+            )
+        )
     );
     const [systemTheme, setSystemTheme] = useState<SystemThemePreference>(
         // Initialize with actual system preference to avoid flashing
@@ -316,7 +321,7 @@ export function useTheme(): UseThemeReturn {
         /** ThemeManager instance for advanced operations */
         themeManager,
         /** Current theme name */
-            themeName: storedTheme,
+        themeName: storedTheme,
         /** Version counter that increments when theme changes */
         themeVersion,
         /** Toggle between light and dark themes */

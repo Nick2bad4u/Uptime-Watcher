@@ -55,7 +55,7 @@ export class TypedQueryRowValidationError extends Error {
 
     public constructor(
         message: string,
-        args: { context?: string | undefined; label?: string | undefined; } = {}
+        args: { context?: string | undefined; label?: string | undefined } = {}
     ) {
         super(message);
         this.name = "TypedQueryRowValidationError";

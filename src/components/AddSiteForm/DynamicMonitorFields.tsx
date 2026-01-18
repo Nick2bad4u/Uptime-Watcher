@@ -95,14 +95,23 @@ export const DynamicMonitorFields: NamedExoticComponent<DynamicMonitorFieldsProp
         type MonitorTypesStoreState = ReturnType<
             typeof useMonitorTypesStore.getState
         >;
-        const selectIsLoaded = useCallback((state: MonitorTypesStoreState): boolean =>
-            state.isLoaded, []);
-        const selectLoadMonitorTypes = useCallback((
-            state: MonitorTypesStoreState
-        ): MonitorTypesStoreState["loadMonitorTypes"] => state.loadMonitorTypes, []);
-        const selectMonitorTypes = useCallback((
-            state: MonitorTypesStoreState
-        ): MonitorTypesStoreState["monitorTypes"] => state.monitorTypes, []);
+        const selectIsLoaded = useCallback(
+            (state: MonitorTypesStoreState): boolean => state.isLoaded,
+            []
+        );
+        const selectLoadMonitorTypes = useCallback(
+            (
+                state: MonitorTypesStoreState
+            ): MonitorTypesStoreState["loadMonitorTypes"] =>
+                state.loadMonitorTypes,
+            []
+        );
+        const selectMonitorTypes = useCallback(
+            (
+                state: MonitorTypesStoreState
+            ): MonitorTypesStoreState["monitorTypes"] => state.monitorTypes,
+            []
+        );
 
         const isLoaded = useMonitorTypesStore(selectIsLoaded);
         const loadMonitorTypes = useMonitorTypesStore(selectLoadMonitorTypes);

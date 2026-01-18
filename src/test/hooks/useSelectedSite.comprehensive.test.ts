@@ -110,8 +110,10 @@ const createMockSitesStore = (
         success: true,
     }),
     modifySite: async () => {},
-    removeMonitorFromSite: async (_siteIdentifier: string, _monitorId: string) =>
-        {},
+    removeMonitorFromSite: async (
+        _siteIdentifier: string,
+        _monitorId: string
+    ) => {},
     restoreSqliteBackup: async () => ({
         metadata: {
             appVersion: "0.0.0-test",

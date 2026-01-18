@@ -89,9 +89,8 @@ export function registerDataHandlers({
 
             const targetPath = ensureSqliteFileExtension(dialogResult.filePath);
 
-            const metadata = await uptimeOrchestrator.saveBackupToPath(
-                targetPath
-            );
+            const metadata =
+                await uptimeOrchestrator.saveBackupToPath(targetPath);
 
             return {
                 canceled: false,

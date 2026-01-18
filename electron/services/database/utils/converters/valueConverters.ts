@@ -24,8 +24,8 @@ export type DbValue = null | number | string;
  * - `string` and `number` pass through
  * - `boolean` becomes `1`/`0`
  * - `null` becomes `null`
- * - `undefined` and all other types return `undefined` (caller decides whether
- *   to skip the field or coerce to `null`)
+ * - `undefined` and all other types return `undefined` (caller decides whether to
+ *   skip the field or coerce to `null`)
  *
  * Prefer this helper instead of ad-hoc `typeof` chains so the conversion rules
  * stay consistent across repositories and mappers.

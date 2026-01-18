@@ -5,7 +5,7 @@
  * This suite verifies that the preload bridge enforces the shared IPC contract:
  *
  * - `getMonitorTypes` resolves to `MonitorTypeConfig[]`
- * - malformed payloads from the main process are rejected
+ * - Malformed payloads from the main process are rejected
  */
 
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -152,7 +152,9 @@ describe("monitorTypesApi", () => {
                 },
             ];
 
-            mockIpcRenderer.invoke.mockResolvedValue(createIpcResponse(configs));
+            mockIpcRenderer.invoke.mockResolvedValue(
+                createIpcResponse(configs)
+            );
 
             const result = await api.getMonitorTypes();
 
@@ -233,7 +235,9 @@ describe("monitorTypesApi", () => {
                 },
             ];
 
-            mockIpcRenderer.invoke.mockResolvedValue(createIpcResponse(configs));
+            mockIpcRenderer.invoke.mockResolvedValue(
+                createIpcResponse(configs)
+            );
 
             const results = await Promise.all([
                 api.getMonitorTypes(),
@@ -249,7 +253,10 @@ describe("monitorTypesApi", () => {
         it("property: resolves to the mocked valid configs", async () => {
             await fc.assert(
                 fc.asyncProperty(
-                    fc.array(monitorTypeConfigArb, { minLength: 0, maxLength: 20 }),
+                    fc.array(monitorTypeConfigArb, {
+                        minLength: 0,
+                        maxLength: 20,
+                    }),
                     async (configs) => {
                         vi.clearAllMocks();
                         mockIpcRenderer.invoke.mockResolvedValue(

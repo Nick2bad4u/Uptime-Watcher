@@ -253,7 +253,9 @@ export function createHttpMonitorService<
         ): Promise<MonitorCheckResult> {
             const { context, monitor, signal, timeout, url } = params;
 
-            const safeUrlForLogging = isDev() ? getSafeUrlForLogging(url) : null;
+            const safeUrlForLogging = isDev()
+                ? getSafeUrlForLogging(url)
+                : null;
 
             if (safeUrlForLogging) {
                 logger.debug(

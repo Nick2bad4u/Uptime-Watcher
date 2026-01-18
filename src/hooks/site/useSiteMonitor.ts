@@ -4,7 +4,12 @@
  * @public
  */
 
-import type { Monitor, MonitorStatus, Site, StatusHistory } from "@shared/types";
+import type {
+    Monitor,
+    MonitorStatus,
+    Site,
+    StatusHistory,
+} from "@shared/types";
 import type { ChangeEvent } from "react";
 
 import { DEFAULT_MONITOR_STATUS } from "@shared/types";
@@ -57,8 +62,8 @@ export interface SiteMonitorResult {
  * Hook to manage monitor selection and state for a specific site.
  *
  * @remarks
- * Uses per-field selectors (Zustand v5) to avoid re-renders from unrelated store
- * updates.
+ * Uses per-field selectors (Zustand v5) to avoid re-renders from unrelated
+ * store updates.
  */
 export function useSiteMonitor(site: Site): SiteMonitorResult {
     const sites = useSitesStore(useCallback((state) => state.sites, []));

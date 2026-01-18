@@ -37,9 +37,7 @@ import {
     setupSidebarMediaQueryListener,
 } from "./app/sidebar/sidebarMediaQueryListener";
 import { AddSiteModal } from "./components/AddSiteForm/AddSiteModal";
-import {
-    synchronizeNotificationPreferences,
-} from "./components/Alerts/alertCoordinator";
+import { synchronizeNotificationPreferences } from "./components/Alerts/alertCoordinator";
 import { StatusAlertToaster } from "./components/Alerts/StatusAlertToaster";
 import { ConfirmDialog } from "./components/common/ConfirmDialog/ConfirmDialog";
 import { ErrorAlert } from "./components/common/ErrorAlert/ErrorAlert";
@@ -72,17 +70,13 @@ import { ThemedText } from "./theme/components/ThemedText";
 import { ThemeProvider } from "./theme/components/ThemeProvider";
 import { useTheme } from "./theme/useTheme";
 import { AppIcons } from "./utils/icons";
-import {
-    tryGetMediaQueryList,
-} from "./utils/mediaQueries";
+import { tryGetMediaQueryList } from "./utils/mediaQueries";
 
 const SIDEBAR_DISMISS_INTERACTIVE_SELECTORS = [
     ".app-sidebar",
     ".app-topbar__sidebar-toggle",
     ".sidebar-reveal-button",
 ] as const;
-
-
 
 /**
  * Main application component that serves as the root of the Uptime Watcher app.
@@ -159,7 +153,8 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
                     showAddSiteModal: state.showAddSiteModal,
                     showSettings: state.showSettings,
                     showSiteDetails: state.showSiteDetails,
-                    sidebarCollapsedPreference: state.sidebarCollapsedPreference,
+                    sidebarCollapsedPreference:
+                        state.sidebarCollapsedPreference,
                     siteListLayout: state.siteListLayout,
                 }),
                 []

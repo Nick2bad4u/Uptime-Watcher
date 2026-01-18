@@ -71,7 +71,9 @@ export async function migrateBackups(
             );
         }
 
-        const encryptionKey = needsKey ? await ctx.getEncryptionKeyOrThrow() : undefined;
+        const encryptionKey = needsKey
+            ? await ctx.getEncryptionKeyOrThrow()
+            : undefined;
 
         const result = await migrateProviderBackups({
             encryptionKey,
@@ -80,7 +82,10 @@ export async function migrateBackups(
         });
 
         if (result.migrated > 0) {
-            await ctx.settings.set(SETTINGS_KEY_LAST_BACKUP_AT, String(Date.now()));
+            await ctx.settings.set(
+                SETTINGS_KEY_LAST_BACKUP_AT,
+                String(Date.now())
+            );
         }
 
         logger.info("[CloudService] Backup migration finished", {
@@ -109,7 +114,9 @@ export async function uploadLatestBackup(
         const { encrypted, key } = await ctx.getEncryptionKeyMaybe();
         const shouldEncrypt = encrypted && key !== undefined;
         if (encrypted && !key) {
-            throw new Error("Cloud encryption is enabled but locked on this device");
+            throw new Error(
+                "Cloud encryption is enabled but locked on this device"
+            );
         }
 
         const fileName = shouldEncrypt

@@ -288,7 +288,9 @@ describe("EnhancedMonitorChecker Targeted Coverage", () => {
             // It checks on the first write, then batches count checks using
             // buffer size.
             expect(getHistoryCount).toHaveBeenCalledTimes(1);
-            expect(mockConfig.historyRepository.pruneHistory).not.toHaveBeenCalled();
+            expect(
+                mockConfig.historyRepository.pruneHistory
+            ).not.toHaveBeenCalled();
         });
     });
 

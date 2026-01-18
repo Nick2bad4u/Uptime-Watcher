@@ -116,8 +116,9 @@ export class IpcService {
         return candidate
             .filter(isRecord)
             .map((siteCandidate) => siteCandidate["identifier"])
-            .filter((identifier): identifier is string =>
-                typeof identifier === "string"
+            .filter(
+                (identifier): identifier is string =>
+                    typeof identifier === "string"
             )
             .map((identifier) => ({ identifier }));
     }
@@ -127,9 +128,9 @@ export class IpcService {
      * IPC layer can safely consume.
      *
      * @remarks
-     * We intentionally avoid validating full site payloads here.
-     * State sync events can be high-frequency and large, and IPC only needs
-     * identifiers and counts to maintain {@link StateSyncStatusSummary}.
+     * We intentionally avoid validating full site payloads here. State sync
+     * events can be high-frequency and large, and IPC only needs identifiers
+     * and counts to maintain {@link StateSyncStatusSummary}.
      */
     private normalizeStateSyncPayload(
         candidate: unknown
@@ -141,7 +142,9 @@ export class IpcService {
         const { action, revision, source, timestamp } = candidate;
 
         if (
-            (action !== "bulk-sync" && action !== "delete" && action !== "update") ||
+            (action !== "bulk-sync" &&
+                action !== "delete" &&
+                action !== "update") ||
             !IpcService.isValidStateSyncSource(source) ||
             typeof timestamp !== "number" ||
             !Number.isFinite(timestamp) ||
@@ -202,9 +205,8 @@ export class IpcService {
             return null;
         }
 
-        const addedSites = IpcService.buildIdentifierOnlySites(
-            addedSitesCandidate
-        );
+        const addedSites =
+            IpcService.buildIdentifierOnlySites(addedSitesCandidate);
         const updatedSites = IpcService.buildIdentifierOnlySites(
             updatedSitesCandidate
         );
@@ -224,8 +226,6 @@ export class IpcService {
             timestamp,
         };
     }
-
-
 
     public constructor(
         uptimeOrchestrator: UptimeOrchestrator,

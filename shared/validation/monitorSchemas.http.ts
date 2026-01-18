@@ -92,7 +92,10 @@ export function createHttpJsonMonitorSchema(
             expectedJsonValue: z
                 .string()
                 .min(1, "Expected JSON value is required")
-                .max(2048, "Expected JSON value must be 2048 characters or fewer")
+                .max(
+                    2048,
+                    "Expected JSON value must be 2048 characters or fewer"
+                )
                 .refine((value) => value.trim().length > 0, {
                     error: "Expected JSON value is required",
                 }),

@@ -63,7 +63,10 @@ const generateBoxShadow = (
     return value.slice(0, -2);
 };
 
-function createBandPlanetGradientIds(uniquePrefix: string, planetNumber: 1 | 2): {
+function createBandPlanetGradientIds(
+    uniquePrefix: string,
+    planetNumber: 1 | 2
+): {
     readonly bands: string;
     readonly core: string;
     readonly highlight: string;
@@ -598,12 +601,12 @@ export const GalaxyBackground: React.FC<GalaxyBackgroundProperties> = ({
                                     stopColor="rgb(22 163 74)"
                                 />
                             </radialGradient>
-                                {createPlanetHighlightGradient({
-                                    cx: "0.25",
-                                    cy: "0.2",
-                                    id: planetThreeIds.highlight,
-                                    r: "0.5",
-                                })}
+                            {createPlanetHighlightGradient({
+                                cx: "0.25",
+                                cy: "0.2",
+                                id: planetThreeIds.highlight,
+                                r: "0.5",
+                            })}
                             <radialGradient
                                 cx="0.5"
                                 cy="0.5"

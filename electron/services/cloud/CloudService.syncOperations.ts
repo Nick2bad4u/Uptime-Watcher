@@ -1,4 +1,7 @@
-import type { CloudEnableSyncConfig, CloudStatusSummary } from "@shared/types/cloud";
+import type {
+    CloudEnableSyncConfig,
+    CloudStatusSummary,
+} from "@shared/types/cloud";
 import type { CloudSyncResetResult } from "@shared/types/cloudSyncReset";
 import type { CloudSyncResetPreview } from "@shared/types/cloudSyncResetPreview";
 

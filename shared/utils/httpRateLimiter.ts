@@ -31,7 +31,7 @@ export interface HttpRateLimiterConfig {
     /**
      * Optional key derivation function.
      *
-     * @defaultValue (url) =\> new URL(url).host
+     * @defaultValue (url) =\> new URL(url)
      */
     readonly toKey?: (url: string) => string;
 }
@@ -52,7 +52,10 @@ export class HttpRateLimiter {
 
     private readonly config: HttpRateLimiterConfig;
 
-    public async schedule<T>(url: string, operation: () => Promise<T>): Promise<T> {
+    public async schedule<T>(
+        url: string,
+        operation: () => Promise<T>
+    ): Promise<T> {
         const key = this.toKey(url);
         const startWaitMs = Date.now();
 

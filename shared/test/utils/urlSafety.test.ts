@@ -274,9 +274,7 @@ describe("urlSafety", () => {
         });
 
         it("returns null for private/local hostnames", () => {
-            expect(tryGetSafeThirdPartyHttpUrl("http://localhost")).toBe(
-                null
-            );
+            expect(tryGetSafeThirdPartyHttpUrl("http://localhost")).toBe(null);
             expect(tryGetSafeThirdPartyHttpUrl("https://192.168.1.1")).toBe(
                 null
             );

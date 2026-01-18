@@ -81,7 +81,8 @@ const buildCloudStatusSummary = (
     overrides: CloudStatusBuildOverrides
 ): CloudStatusSummary => {
     const encryptionLocked =
-        overrides.encryptionMode === "passphrase" && !common.hasLocalEncryptionKey;
+        overrides.encryptionMode === "passphrase" &&
+        !common.hasLocalEncryptionKey;
 
     const lastError = overrides.lastError ?? common.lastError;
 

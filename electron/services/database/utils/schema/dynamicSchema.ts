@@ -715,8 +715,13 @@ export function generateSqlParameters(): SqlParameters {
  *
  * @returns Database row object suitable for SQL operations.
  */
-export function mapMonitorToRow(monitor: Partial<MonitorRowSource>): MonitorRow {
-    const monitorRecord = requireRecordLike(monitor, "Expected monitor to be record-like");
+export function mapMonitorToRow(
+    monitor: Partial<MonitorRowSource>
+): MonitorRow {
+    const monitorRecord = requireRecordLike(
+        monitor,
+        "Expected monitor to be record-like"
+    );
     const row: MonitorRow = {};
 
     // Map standard fields first
@@ -782,7 +787,10 @@ export function mapRowToMonitor(row: MonitorRow): Monitor {
 
     if (monitorTypeConfig) {
         // Create a mutable version for dynamic field assignment
-        const mutableMonitor = requireRecordLike(monitor, "Expected monitor to be record-like");
+        const mutableMonitor = requireRecordLike(
+            monitor,
+            "Expected monitor to be record-like"
+        );
 
         // Only add fields that are specifically defined for this monitor type
         for (const field of monitorTypeConfig.fields) {

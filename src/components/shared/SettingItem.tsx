@@ -26,9 +26,11 @@ export interface SettingItemProperties extends CoreComponentProperties {
     readonly disabled?: boolean;
     /** Optional leading icon for the setting title */
     readonly icon?: ReactNode;
-    /** Optional className forwarded to the icon element (e.g., settings accent colors). */
+    /** Optional className forwarded to the icon element (e.g., settings accent
+colors). */
     readonly iconClassName?: string;
-    /** Preferred icon API: pass an IconType instead of JSX to avoid jsx-as-prop perf lint issues. */
+    /** Preferred icon API: pass an IconType instead of JSX to avoid jsx-as-prop
+perf lint issues. */
     readonly iconComponent?: IconType;
     /** Optional icon size (px). Defaults to 16. */
     readonly iconSize?: number;
@@ -70,7 +72,9 @@ export const SettingItem: FC<SettingItemProperties> = ({
     title,
 }) => {
     const resolvedControl =
-        typeof control === "function" ? (control as () => ReactNode)() : control;
+        typeof control === "function"
+            ? (control as () => ReactNode)()
+            : control;
 
     const resolvedIconNode = IconComponent ? (
         <IconComponent

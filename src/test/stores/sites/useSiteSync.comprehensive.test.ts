@@ -185,7 +185,7 @@ describe("useSiteSync", () => {
 
             const fullSyncResult = {
                 completedAt: Date.now(),
-                   revision: 1,
+                revision: 1,
                 siteCount: mockSites.length,
                 sites: mockSites,
                 source: "frontend" as const,
@@ -554,7 +554,10 @@ describe("useSiteSync", () => {
             expect(typeof result).toBe("function");
         });
 
-        it("should be idempotent and ref-counted", async ({ task, annotate }) => {
+        it("should be idempotent and ref-counted", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: SiteSyncActions", "component");
             await annotate("Category: Store", "category");
@@ -591,9 +594,7 @@ describe("useSiteSync", () => {
             await annotate("Type: Subscription", "type");
 
             const cleanupSpy = vi.fn();
-            let resolveCleanup:
-                | ((cleanup: () => void) => void)
-                | undefined;
+            let resolveCleanup: ((cleanup: () => void) => void) | undefined;
 
             mockStateSyncService.onStateSyncEvent.mockImplementation(
                 () =>
@@ -628,14 +629,14 @@ describe("useSiteSync", () => {
 
             syncActions.subscribeToSyncEvents();
 
-                const bulkSyncEvent = {
-                    action: "bulk-sync",
-                    revision: 1,
-                    siteCount: mockSites.length,
-                    sites: mockSites,
-                    source: "database",
-                    timestamp: Date.now(),
-                };
+            const bulkSyncEvent = {
+                action: "bulk-sync",
+                revision: 1,
+                siteCount: mockSites.length,
+                sites: mockSites,
+                source: "database",
+                timestamp: Date.now(),
+            };
 
             mockDeps.getSites.mockReturnValueOnce([]);
             eventHandler(bulkSyncEvent);
@@ -666,18 +667,18 @@ describe("useSiteSync", () => {
 
             syncActions.subscribeToSyncEvents();
 
-                const deleteEvent = {
-                    action: "delete" as const,
-                    siteIdentifier: "site-1",
-                    delta: {
-                        addedSites: [],
-                        removedSiteIdentifiers: ["site-1"],
-                        updatedSites: [],
-                    },
-                    revision: 2,
-                    source: "frontend" as const,
-                    timestamp: Date.now(),
-                };
+            const deleteEvent = {
+                action: "delete" as const,
+                siteIdentifier: "site-1",
+                delta: {
+                    addedSites: [],
+                    removedSiteIdentifiers: ["site-1"],
+                    updatedSites: [],
+                },
+                revision: 2,
+                source: "frontend" as const,
+                timestamp: Date.now(),
+            };
 
             mockDeps.getSites.mockReturnValueOnce([buildSite("site-1")]);
             eventHandler(deleteEvent);
@@ -787,23 +788,23 @@ describe("useSiteSync", () => {
 
             syncActions.subscribeToSyncEvents();
 
-                const updateEvent = {
-                    action: "update" as const,
-                    siteIdentifier: "site-1",
-                    delta: {
-                        addedSites: [],
-                        removedSiteIdentifiers: [],
-                        updatedSites: [
-                            {
-                                ...buildSite("site-1"),
-                                name: "Updated Site 1",
-                            },
-                        ],
-                    },
-                    revision: 4,
-                    source: "frontend" as const,
-                    timestamp: Date.now(),
-                };
+            const updateEvent = {
+                action: "update" as const,
+                siteIdentifier: "site-1",
+                delta: {
+                    addedSites: [],
+                    removedSiteIdentifiers: [],
+                    updatedSites: [
+                        {
+                            ...buildSite("site-1"),
+                            name: "Updated Site 1",
+                        },
+                    ],
+                },
+                revision: 4,
+                source: "frontend" as const,
+                timestamp: Date.now(),
+            };
 
             mockDeps.getSites.mockReturnValueOnce([buildSite("site-1")]);
             eventHandler(updateEvent);

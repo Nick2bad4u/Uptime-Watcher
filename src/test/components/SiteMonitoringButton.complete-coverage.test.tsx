@@ -6,7 +6,11 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import type { ButtonHTMLAttributes, PropsWithChildren, ReactElement } from "react";
+import type {
+    ButtonHTMLAttributes,
+    PropsWithChildren,
+    ReactElement,
+} from "react";
 import { SiteMonitoringButton } from "../../components/common/SiteMonitoringButton/SiteMonitoringButton";
 import { ThemeProvider } from "../../theme/components/ThemeProvider";
 
@@ -1021,8 +1025,7 @@ describe("SiteMonitoringButton - Complete Coverage", () => {
                 SiteMonitoringButton as unknown as { type?: { name?: string } }
             ).type?.name;
             const displayName =
-                SiteMonitoringButton.displayName ||
-                memoTypeName;
+                SiteMonitoringButton.displayName || memoTypeName;
             expect(displayName).toMatch(/^SiteMonitoringButton\d*$/);
         });
 

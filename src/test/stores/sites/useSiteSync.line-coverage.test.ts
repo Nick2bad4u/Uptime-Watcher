@@ -3,7 +3,15 @@
  * specifically identified by coverage analysis
  */
 
-import { afterAll, beforeEach, describe, expect, it, vi, type Mock } from "vitest";
+import {
+    afterAll,
+    beforeEach,
+    describe,
+    expect,
+    it,
+    vi,
+    type Mock,
+} from "vitest";
 import type { Site } from "@shared/types";
 import type { StatusUpdateManager } from "../../../stores/sites/utils/statusUpdateHandler";
 import { createMockFunction } from "../../utils/mockFactories";
@@ -351,7 +359,9 @@ describe("useSiteSync - Line Coverage Completion", () => {
             mockDeps.getSites.mockReturnValueOnce([buildSite("site-1")]);
             eventHandler(deleteEvent);
 
-            expect(mockDeps.setSites).toHaveBeenCalledWith([buildSite("site-1")]);
+            expect(mockDeps.setSites).toHaveBeenCalledWith([
+                buildSite("site-1"),
+            ]);
         });
 
         it("should handle update event and apply provided snapshot", async ({
@@ -373,23 +383,23 @@ describe("useSiteSync - Line Coverage Completion", () => {
 
             syncActions.subscribeToSyncEvents();
 
-                const updateEvent = {
-                    action: "update" as const,
-                    delta: {
-                        addedSites: [],
-                        removedSiteIdentifiers: [],
-                        updatedSites: [
-                            {
-                                ...buildSite("site-1"),
-                                name: "Updated Site 1",
-                            },
-                        ],
-                    },
-                    revision: 2,
-                    siteIdentifier: "site-1",
-                    source: "frontend" as const,
-                    timestamp: Date.now(),
-                };
+            const updateEvent = {
+                action: "update" as const,
+                delta: {
+                    addedSites: [],
+                    removedSiteIdentifiers: [],
+                    updatedSites: [
+                        {
+                            ...buildSite("site-1"),
+                            name: "Updated Site 1",
+                        },
+                    ],
+                },
+                revision: 2,
+                siteIdentifier: "site-1",
+                source: "frontend" as const,
+                timestamp: Date.now(),
+            };
 
             // Trigger update event (line 296-297)
             mockDeps.getSites.mockReturnValueOnce([buildSite("site-1")]);

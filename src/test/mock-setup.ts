@@ -43,10 +43,10 @@ import type { ElectronAPI } from "../types";
  * nested functions while remaining declaration-emit friendly.
  */
 type DeepMocked<T> = T extends (...args: infer Args) => infer Return
-        ? Mock<(...args: Args) => Return>
-        : T extends object
-            ? { [Key in keyof T]: DeepMocked<T[Key]> }
-            : T;
+    ? Mock<(...args: Args) => Return>
+    : T extends object
+      ? { [Key in keyof T]: DeepMocked<T[Key]> }
+      : T;
 
 vi.mock("electron", () => ({
     app: {

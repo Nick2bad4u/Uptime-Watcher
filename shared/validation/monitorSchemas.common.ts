@@ -278,8 +278,7 @@ const httpHeaderNameSchema = z
     .min(1, "Header name is required")
     .max(256, "Header name must be 256 characters or fewer")
     .refine(isValidHeaderName, {
-        error:
-            "Header name must use valid HTTP token characters (letters, digits, and !#$%&'*+.^_`|~-)",
+        error: "Header name must use valid HTTP token characters (letters, digits, and !#$%&'*+.^_`|~-)",
     });
 
 /** Shared schema constraining monitored header values. */
@@ -323,8 +322,7 @@ const jsonPathSchema = z
     .min(1, "JSON path is required")
     .max(512, "JSON path must be 512 characters or fewer")
     .refine(isValidJsonPath, {
-        error:
-            "JSON path must use dot notation without spaces or empty segments",
+        error: "JSON path must use dot notation without spaces or empty segments",
     });
 
 const isValidDotPath = (value: string): boolean =>

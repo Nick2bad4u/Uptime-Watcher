@@ -1475,9 +1475,9 @@ describe("IpcService - Comprehensive Coverage", () => {
             expect(stateSyncListener).toBeDefined();
 
             // Simulate the orchestrator cache not being populated yet.
-            vi.mocked(mockUptimeOrchestrator.getCachedSiteCount).mockReturnValue(
-                0
-            );
+            vi.mocked(
+                mockUptimeOrchestrator.getCachedSiteCount
+            ).mockReturnValue(0);
 
             const timestamp = Date.now();
             stateSyncListener?.({

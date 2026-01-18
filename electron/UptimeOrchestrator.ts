@@ -45,12 +45,12 @@
  *
  * Events emitted:
  *
- * - monitor:status-changed: When monitor status changes
- * - monitor:down: When a monitor goes down
- * - monitor:up: When a monitor comes back up
- * - system:error: When system operations fail
- * - monitoring:started: When monitoring begins
- * - monitoring:stopped: When monitoring stops
+ * - Monitor:status-changed: When monitor status changes
+ * - Monitor:down: When a monitor goes down
+ * - Monitor:up: When a monitor comes back up
+ * - System:error: When system operations fail
+ * - Monitoring:started: When monitoring begins
+ * - Monitoring:stopped: When monitoring stops
  *
  * @example
  *
@@ -1002,14 +1002,13 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
             siteManager: this.siteManager,
         });
 
-        this.eventForwardingCoordinator = new OrchestratorEventForwardingCoordinator(
-            {
+        this.eventForwardingCoordinator =
+            new OrchestratorEventForwardingCoordinator({
                 busId: ORCHESTRATOR_BUS_ID,
                 eventBus: this,
                 monitorManager: this.monitorManager,
                 siteManager: this.siteManager,
-            }
-        );
+            });
 
         this.eventHandlers = new UptimeOrchestratorEventHandlers({
             monitoringLifecycleCoordinator: this.monitoringLifecycleCoordinator,

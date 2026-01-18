@@ -33,8 +33,8 @@ export const validateCloudBackupEntry = (
  * @remarks
  * This is primarily used for IPC response validation in the preload bridge.
  */
-export const cloudBackupEntryArraySchema: z.ZodType<CloudBackupEntry[]> = z
-    .array(cloudBackupEntrySchema);
+export const cloudBackupEntryArraySchema: z.ZodType<CloudBackupEntry[]> =
+    z.array(cloudBackupEntrySchema);
 
 export const validateCloudBackupEntryArray = (
     value: unknown

@@ -48,16 +48,23 @@ type ThemedButtonMockProperties = PropsWithChildren<
     ButtonHTMLAttributes<HTMLButtonElement>
 >;
 
-type ThemedCardMockProperties = PropsWithChildren<HTMLAttributes<HTMLDivElement>>;
+type ThemedCardMockProperties = PropsWithChildren<
+    HTMLAttributes<HTMLDivElement>
+>;
 
 type ThemedSelectMockProperties = PropsWithChildren<
     SelectHTMLAttributes<HTMLSelectElement>
 >;
 
-type ThemedTextMockProperties = PropsWithChildren<HTMLAttributes<HTMLSpanElement>>;
+type ThemedTextMockProperties = PropsWithChildren<
+    HTMLAttributes<HTMLSpanElement>
+>;
 
 vi.mock("../../../../theme/components", () => ({
-    StatusIndicator: ({ children, ...props }: StatusIndicatorMockProperties) => (
+    StatusIndicator: ({
+        children,
+        ...props
+    }: StatusIndicatorMockProperties) => (
         <div data-testid="status-indicator" {...props}>
             {children}
         </div>
@@ -73,10 +80,7 @@ vi.mock("../../../../theme/components", () => ({
         </div>
     ),
     ThemedSelect: ({ children, ...props }: ThemedSelectMockProperties) => (
-        <select
-            data-testid="themed-select"
-            {...props}
-        >
+        <select data-testid="themed-select" {...props}>
             {children}
         </select>
     ),
@@ -88,7 +92,9 @@ vi.mock("../../../../theme/components", () => ({
 }));
 
 // Mock MonitorUiComponents
-type DetailLabelMockProperties = PropsWithChildren<HTMLAttributes<HTMLDivElement>>;
+type DetailLabelMockProperties = PropsWithChildren<
+    HTMLAttributes<HTMLDivElement>
+>;
 
 vi.mock("../../../../components/common/MonitorUiComponents", () => ({
     DetailLabel: ({ children, ...props }: DetailLabelMockProperties) => (
@@ -343,9 +349,11 @@ describe(HistoryTab, () => {
 
             mockUseSettingsStore.mockImplementation((selector?: unknown) =>
                 typeof selector === "function"
-                    ? (selector as (state: typeof settingsStoreState) => unknown)(
-                          settingsStoreState
-                      )
+                    ? (
+                          selector as (
+                              state: typeof settingsStoreState
+                          ) => unknown
+                      )(settingsStoreState)
                     : settingsStoreState
             );
 
@@ -382,9 +390,11 @@ describe(HistoryTab, () => {
 
             mockUseSettingsStore.mockImplementation((selector?: unknown) =>
                 typeof selector === "function"
-                    ? (selector as (state: typeof settingsStoreState) => unknown)(
-                          settingsStoreState
-                      )
+                    ? (
+                          selector as (
+                              state: typeof settingsStoreState
+                          ) => unknown
+                      )(settingsStoreState)
                     : settingsStoreState
             );
 

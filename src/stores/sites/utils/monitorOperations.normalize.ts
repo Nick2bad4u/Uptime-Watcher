@@ -2,8 +2,8 @@
  * Monitor normalization helper.
  *
  * @remarks
- * This module contains the implementation details for `normalizeMonitor`.
- * It is separated from `monitorOperations.ts` to keep the public utility module
+ * This module contains the implementation details for `normalizeMonitor`. It is
+ * separated from `monitorOperations.ts` to keep the public utility module
  * smaller and easier to navigate.
  *
  * @internal
@@ -465,7 +465,10 @@ function applyHttpLatencyMonitorDefaults(
     };
 
     let numericLatency = HTTP_LATENCY_DEFAULT_MAX_RESPONSE_MS;
-    if (typeof maxResponseTime === "number" && Number.isFinite(maxResponseTime)) {
+    if (
+        typeof maxResponseTime === "number" &&
+        Number.isFinite(maxResponseTime)
+    ) {
         numericLatency = Math.trunc(maxResponseTime);
     } else if (typeof maxResponseTime === "string") {
         const parsed = Number.parseFloat(maxResponseTime);
@@ -492,7 +495,10 @@ function applyWebsocketKeepaliveMonitorDefaults(
         }
     ).maxPongDelayMs;
     let maxPongDelay = WEBSOCKET_KEEPALIVE_DEFAULT_MAX_PONG_MS;
-    if (typeof maxPongDelayValue === "number" && Number.isFinite(maxPongDelayValue)) {
+    if (
+        typeof maxPongDelayValue === "number" &&
+        Number.isFinite(maxPongDelayValue)
+    ) {
         maxPongDelay = Math.trunc(maxPongDelayValue);
     } else if (typeof maxPongDelayValue === "string") {
         const parsed = Number.parseInt(maxPongDelayValue, 10);
@@ -578,7 +584,10 @@ function applyReplicationMonitorDefaults(
         }
     }
 
-    monitor.maxReplicationLagSeconds = Math.min(Math.max(maxLagSeconds, 0), 86_400);
+    monitor.maxReplicationLagSeconds = Math.min(
+        Math.max(maxLagSeconds, 0),
+        86_400
+    );
 }
 
 function applyCdnEdgeConsistencyMonitorDefaults(
@@ -657,7 +666,9 @@ function applyTypeSpecificDefaults(
             break;
         }
         default: {
-            throw new Error(`Unsupported monitor type: ${String(monitor.type)}`);
+            throw new Error(
+                `Unsupported monitor type: ${String(monitor.type)}`
+            );
         }
     }
 }

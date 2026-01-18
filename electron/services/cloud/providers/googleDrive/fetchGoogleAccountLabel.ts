@@ -18,15 +18,12 @@ export async function fetchGoogleAccountLabel(
     accessToken: string
 ): Promise<string | undefined> {
     try {
-        const response = await fetch(
-            GOOGLE_USERINFO_URL,
-            {
-                headers: {
-                    Authorization: `Bearer ${accessToken}`,
-                },
-                signal: AbortSignal.timeout(GOOGLE_USERINFO_TIMEOUT_MS),
-            }
-        );
+        const response = await fetch(GOOGLE_USERINFO_URL, {
+            headers: {
+                Authorization: `Bearer ${accessToken}`,
+            },
+            signal: AbortSignal.timeout(GOOGLE_USERINFO_TIMEOUT_MS),
+        });
 
         if (!response.ok) {
             return undefined;

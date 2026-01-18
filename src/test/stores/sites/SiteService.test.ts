@@ -132,15 +132,18 @@ describe("SiteService", () => {
             }
         });
 
-            ({ restore: restoreElectronApi } = installElectronApiMock(mockElectronAPI, {
+        ({ restore: restoreElectronApi } = installElectronApiMock(
+            mockElectronAPI,
+            {
                 ensureWindow: true,
-            }));
+            }
+        ));
     });
 
-        afterEach(() => {
-            restoreElectronApi?.();
-            restoreElectronApi = undefined;
-        });
+    afterEach(() => {
+        restoreElectronApi?.();
+        restoreElectronApi = undefined;
+    });
 
     describe("getSites", () => {
         it("should retrieve all sites successfully", async ({

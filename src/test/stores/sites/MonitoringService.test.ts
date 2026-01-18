@@ -139,15 +139,18 @@ describe("MonitoringService", () => {
                 });
             }
         });
-            ({ restore: restoreElectronApi } = installElectronApiMock(mockElectronAPI, {
+        ({ restore: restoreElectronApi } = installElectronApiMock(
+            mockElectronAPI,
+            {
                 ensureWindow: true,
-            }));
+            }
+        ));
     });
 
-        afterEach(() => {
-            restoreElectronApi?.();
-            restoreElectronApi = undefined;
-        });
+    afterEach(() => {
+        restoreElectronApi?.();
+        restoreElectronApi = undefined;
+    });
 
     describe("checkSiteNow", () => {
         it("should return validated status updates", async ({

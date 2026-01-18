@@ -739,9 +739,7 @@ export const Settings = ({
                 "Failed to sync data from backend",
                 ensureError(error)
             );
-            setError(
-                `Failed to sync data: ${getUserFacingErrorDetail(error)}`
-            );
+            setError(`Failed to sync data: ${getUserFacingErrorDetail(error)}`);
         }
     }, [fullResyncSites, setError]);
 
@@ -762,10 +760,7 @@ export const Settings = ({
                 sizeBytes: result.metadata.sizeBytes,
             });
         } catch (error: unknown) {
-            logger.error(
-                "Failed to save SQLite backup",
-                ensureError(error)
-            );
+            logger.error("Failed to save SQLite backup", ensureError(error));
             setError(
                 `Failed to save SQLite backup: ${getUserFacingErrorDetail(error)}`
             );

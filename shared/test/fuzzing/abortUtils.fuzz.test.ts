@@ -522,7 +522,8 @@ describe("AbortUtils Fuzzing Tests", () => {
             expect(result).toBe("result");
 
             expect(addEventListenerSpy).toHaveBeenCalledTimes(1);
-            const [eventType, handler] = addEventListenerSpy.mock.calls[0] ?? [];
+            const [eventType, handler] =
+                addEventListenerSpy.mock.calls[0] ?? [];
             expect(eventType).toBe("abort");
             expect(handler).toEqual(expect.any(Function));
 

@@ -196,7 +196,10 @@ export function isValidationResult(
         return false;
     }
 
-    if (!Array.isArray(errors) || errors.some((value) => typeof value !== "string")) {
+    if (
+        !Array.isArray(errors) ||
+        errors.some((value) => typeof value !== "string")
+    ) {
         return false;
     }
 

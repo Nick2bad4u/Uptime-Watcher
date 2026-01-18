@@ -242,7 +242,7 @@ export class MonitoringLifecycleCoordinator {
         }
     }
 
-public constructor(
+    public constructor(
         dependencies: MonitoringLifecycleCoordinatorDependencies
     ) {
         this.monitorManager = dependencies.monitorManager;
@@ -291,8 +291,6 @@ public constructor(
             timestamp: Date.now(),
         };
     }
-
-
 
     /** Event handler for monitoring start requests. */
     public handleStartMonitoringRequestedEvent(

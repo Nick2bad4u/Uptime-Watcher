@@ -145,9 +145,12 @@ export interface DropboxCurrentAccount {
 }
 
 /**
- * Parses and validates the Dropbox SDK `usersGetCurrentAccount()` result payload.
+ * Parses and validates the Dropbox SDK `usersGetCurrentAccount()` result
+ * payload.
  */
-export function parseDropboxCurrentAccount(value: unknown): DropboxCurrentAccount {
+export function parseDropboxCurrentAccount(
+    value: unknown
+): DropboxCurrentAccount {
     const parsed = dropboxCurrentAccountSchema.safeParse(value);
     if (!parsed.success) {
         const issues = formatZodIssues(parsed.error.issues);

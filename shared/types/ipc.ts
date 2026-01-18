@@ -488,8 +488,8 @@ export type IpcInvokeChannel = keyof IpcInvokeChannelMap;
  *
  * @remarks
  * Parameters are modeled as readonly tuples. This keeps the channel contract
- * accurate while avoiding mapped-type instantiation edge cases that can
- * confuse downstream tooling.
+ * accurate while avoiding mapped-type instantiation edge cases that can confuse
+ * downstream tooling.
  *
  * @public
  */

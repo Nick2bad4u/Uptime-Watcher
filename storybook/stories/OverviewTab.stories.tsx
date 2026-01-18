@@ -37,9 +37,8 @@ const OverviewTabStory = ({
     timeoutChanged,
     ...rest
 }: ComponentProps<typeof OverviewTab>): ReactElement => {
-    const [checkIntervalMs, setCheckIntervalMs] = useState(
-        localCheckIntervalMs
-    );
+    const [checkIntervalMs, setCheckIntervalMs] =
+        useState(localCheckIntervalMs);
     const [timeoutSeconds, setTimeoutSeconds] = useState(localTimeoutSeconds);
     const [intervalDirty, setIntervalDirty] = useState(intervalChanged);
     const [timeoutDirty, setTimeoutDirty] = useState(timeoutChanged);

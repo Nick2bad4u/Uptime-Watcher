@@ -62,22 +62,24 @@ describe(useMonitorFields, () => {
         errorState = {
             monitorTypesError: undefined,
             getStoreError: (key) =>
-                key === "monitor-types" ? errorState.monitorTypesError : undefined,
+                key === "monitor-types"
+                    ? errorState.monitorTypesError
+                    : undefined,
         };
 
-        vi.mocked(useMonitorTypesStore).mockImplementation(
-            ((selector?: (state: MonitorTypesState) => unknown) =>
-                typeof selector === "function"
-                    ? selector(monitorTypesState)
-                    : (monitorTypesState as unknown)) as unknown as typeof useMonitorTypesStore
-        );
+        vi.mocked(useMonitorTypesStore).mockImplementation(((
+            selector?: (state: MonitorTypesState) => unknown
+        ) =>
+            typeof selector === "function"
+                ? selector(monitorTypesState)
+                : (monitorTypesState as unknown)) as unknown as typeof useMonitorTypesStore);
 
-        vi.mocked(useErrorStore).mockImplementation(
-            ((selector?: (state: ErrorState) => unknown) =>
-                typeof selector === "function"
-                    ? selector(errorState)
-                    : (errorState as unknown)) as unknown as typeof useErrorStore
-        );
+        vi.mocked(useErrorStore).mockImplementation(((
+            selector?: (state: ErrorState) => unknown
+        ) =>
+            typeof selector === "function"
+                ? selector(errorState)
+                : (errorState as unknown)) as unknown as typeof useErrorStore);
     });
 
     afterEach(() => {

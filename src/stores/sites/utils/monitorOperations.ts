@@ -72,7 +72,9 @@ export function normalizeMonitor(monitor: Partial<Monitor>): Monitor {
  *
  * @public
  */
-export function createDefaultMonitor(overrides: Partial<Monitor> = {}): Monitor {
+export function createDefaultMonitor(
+    overrides: Partial<Monitor> = {}
+): Monitor {
     // Delegate to normalizeMonitor to avoid divergence in default/validation logic.
     return normalizeMonitor(overrides);
 }
@@ -223,7 +225,10 @@ export const monitorOperations = {
     }),
 
     /** Update monitor retry attempts. */
-    updateRetryAttempts: (monitor: Monitor, retryAttempts: number): Monitor => ({
+    updateRetryAttempts: (
+        monitor: Monitor,
+        retryAttempts: number
+    ): Monitor => ({
         ...monitor,
         retryAttempts,
     }),

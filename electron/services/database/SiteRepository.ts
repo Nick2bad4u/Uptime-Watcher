@@ -58,7 +58,11 @@ import type { DatabaseService } from "./DatabaseService";
 
 import { logger } from "../../utils/logger";
 import { withDatabaseOperation } from "../../utils/operationalHooks";
-import { rowsToSites, rowToSite, type SiteRow } from "./utils/mappers/siteMapper";
+import {
+    rowsToSites,
+    rowToSite,
+    type SiteRow,
+} from "./utils/mappers/siteMapper";
 import { querySiteRow, querySiteRows } from "./utils/queries/typedQueries";
 
 /**
@@ -304,8 +308,8 @@ export class SiteRepository {
      * Retrieves all sites from the database.
      *
      * @remarks
-     * Functionally identical to {@link exportAllRows}, but intended for
-     * general querying.
+     * Functionally identical to {@link exportAllRows}, but intended for general
+     * querying.
      *
      * @example
      *
@@ -526,11 +530,7 @@ export class SiteRepository {
                 const monitoring = site.monitoring ?? SITE_DEFAULTS.MONITORING;
                 const monitoringValue: 0 | 1 = monitoring ? 1 : 0;
 
-                stmt.run([
-                    site.identifier,
-                    name,
-                    monitoringValue,
-                ]);
+                stmt.run([site.identifier, name, monitoringValue]);
             }
 
             logger.debug(
@@ -622,11 +622,7 @@ export class SiteRepository {
         const monitoring = site.monitoring ?? SITE_DEFAULTS.MONITORING;
         const monitoringValue: 0 | 1 = monitoring ? 1 : 0;
 
-        db.run(SITE_QUERIES.UPSERT, [
-            identifier,
-            name,
-            monitoringValue,
-        ]);
+        db.run(SITE_QUERIES.UPSERT, [identifier, name, monitoringValue]);
         logger.debug(
             `[SiteRepository] Upserted site (internal): ${identifier}`
         );

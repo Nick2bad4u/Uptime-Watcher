@@ -65,9 +65,12 @@ describe("useSiteMonitoring", () => {
 
     beforeEach(() => {
         vi.clearAllMocks();
-        ({ restore: restoreElectronApi } = installElectronApiMock(mockElectronAPI, {
-            ensureWindow: true,
-        }));
+        ({ restore: restoreElectronApi } = installElectronApiMock(
+            mockElectronAPI,
+            {
+                ensureWindow: true,
+            }
+        ));
         currentSites = [];
         mockGetSites = createMockFunction(() => currentSites);
         mockSetSites = createMockFunction<(sites: Site[]) => void>((sites) => {

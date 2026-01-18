@@ -236,10 +236,13 @@ export const HistoryTab: NamedExoticComponent<HistoryTabProperties> = memo(
         selectedMonitor,
     }: HistoryTabProperties): JSX.Element {
         type SettingsStoreState = ReturnType<typeof useSettingsStore.getState>;
-        const selectHistoryLimit = useCallback((
-            state: SettingsStoreState
-        ): SettingsStoreState["settings"]["historyLimit"] =>
-            state.settings.historyLimit, []);
+        const selectHistoryLimit = useCallback(
+            (
+                state: SettingsStoreState
+            ): SettingsStoreState["settings"]["historyLimit"] =>
+                state.settings.historyLimit,
+            []
+        );
 
         const historyLimitSetting = useSettingsStore(selectHistoryLimit);
         const historyDensity = useUIStore(selectSurfaceDensity);
@@ -381,7 +384,11 @@ export const HistoryTab: NamedExoticComponent<HistoryTabProperties> = memo(
                             record.status === historyFilter
                     )
                     .slice(0, safeHistoryLimit),
-            [historyFilter, safeHistoryLimit, selectedMonitor.history]
+            [
+                historyFilter,
+                safeHistoryLimit,
+                selectedMonitor.history,
+            ]
         );
 
         // Helper to render details with label using dynamic formatting
@@ -395,10 +402,7 @@ export const HistoryTab: NamedExoticComponent<HistoryTabProperties> = memo(
                 statusCode === null ? null : getHttpStatusIcon(statusCode);
 
             const statusIconNode = StatusCodeIcon ? (
-                <StatusCodeIcon
-                    aria-hidden="true"
-                    className="h-4 w-4"
-                />
+                <StatusCodeIcon aria-hidden="true" className="h-4 w-4" />
             ) : null;
 
             return (
@@ -491,23 +495,10 @@ export const HistoryTab: NamedExoticComponent<HistoryTabProperties> = memo(
 
             return {
                 comfortable: (
-                    <ComfortableDensityIcon
-                        aria-hidden
-                        className="h-4 w-4"
-                    />
+                    <ComfortableDensityIcon aria-hidden className="h-4 w-4" />
                 ),
-                compact: (
-                    <CompactDensityIcon
-                        aria-hidden
-                        className="h-4 w-4"
-                    />
-                ),
-                cozy: (
-                    <CozyDensityIcon
-                        aria-hidden
-                        className="h-4 w-4"
-                    />
-                ),
+                compact: <CompactDensityIcon aria-hidden className="h-4 w-4" />,
+                cozy: <CozyDensityIcon aria-hidden className="h-4 w-4" />,
             } satisfies Record<InterfaceDensity, ReactElement>;
         }, []);
 
@@ -529,7 +520,11 @@ export const HistoryTab: NamedExoticComponent<HistoryTabProperties> = memo(
                         </ThemedButton>
                     );
                 }),
-            [createDensityHandler, densityIconNodes, historyDensity]
+            [
+                createDensityHandler,
+                densityIconNodes,
+                historyDensity,
+            ]
         );
 
         const historyTabClassName = `space-y-6 history-tab history-tab--${historyDensity} density--${historyDensity}`;

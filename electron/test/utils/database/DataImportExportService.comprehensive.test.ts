@@ -44,7 +44,10 @@ vi.mock("../../../../shared/utils/jsonSafety", () => ({
 }));
 
 vi.mock("../../../../shared/utils/utfByteLength", async (importOriginal) => {
-    const actual = await importOriginal<typeof import("../../../../shared/utils/utfByteLength")>();
+    const actual =
+        await importOriginal<
+            typeof import("../../../../shared/utils/utfByteLength")
+        >();
 
     return {
         ...actual,
@@ -257,7 +260,9 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
 
             const result = await service.exportAllData();
 
-            expect(mockRepositories.site.exportAllRows).toHaveBeenCalledTimes(1);
+            expect(mockRepositories.site.exportAllRows).toHaveBeenCalledTimes(
+                1
+            );
             expect(mockRepositories.settings.getAll).toHaveBeenCalledTimes(1);
             expect(safeJsonStringifyWithFallback).toHaveBeenCalledWith(
                 expect.objectContaining({
@@ -319,7 +324,9 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             await annotate("Type: Error Handling", "type");
 
             const nonErrorObject = "String error message";
-            mockRepositories.site.exportAllRows.mockRejectedValue(nonErrorObject);
+            mockRepositories.site.exportAllRows.mockRejectedValue(
+                nonErrorObject
+            );
 
             await expect(service.exportAllData()).rejects.toThrowError(
                 DataImportExportError
@@ -383,9 +390,9 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
 
             mockRepositories.site.exportAllRows.mockResolvedValue([]);
             mockRepositories.settings.getAll.mockResolvedValue({});
-            (safeJsonStringifyWithFallback as MockedFunction<any>).mockReturnValue(
-                "{\"exported\":true}"
-            );
+            (
+                safeJsonStringifyWithFallback as MockedFunction<any>
+            ).mockReturnValue('{"exported":true}');
 
             (getUtfByteLength as MockedFunction<any>).mockReturnValue(
                 MAX_IPC_JSON_EXPORT_BYTES + 1
@@ -399,9 +406,7 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
                 /Failed to export data: Export payload is too large/u
             );
 
-            expect(getUtfByteLength).toHaveBeenCalledWith(
-                "{\"exported\":true}"
-            );
+            expect(getUtfByteLength).toHaveBeenCalledWith('{"exported":true}');
             expect(mockEventEmitter.emitTyped).toHaveBeenCalledWith(
                 "database:error",
                 expect.objectContaining({
@@ -950,9 +955,9 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
 
             // Fail-fast behavior: we should not attempt to import the second
             // site once a monitor import fails.
-            expect(mockRepositories.monitor.createInternal).toHaveBeenCalledTimes(
-                1
-            );
+            expect(
+                mockRepositories.monitor.createInternal
+            ).toHaveBeenCalledTimes(1);
         });
 
         it("should match monitors correctly for history import", async ({
@@ -1313,7 +1318,9 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             originalError.stack =
                 "Error: Original database error\n    at someFunction";
 
-            mockRepositories.site.exportAllRows.mockRejectedValue(originalError);
+            mockRepositories.site.exportAllRows.mockRejectedValue(
+                originalError
+            );
 
             try {
                 await service.exportAllData();

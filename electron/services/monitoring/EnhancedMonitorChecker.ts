@@ -95,8 +95,7 @@ import {
  *
  * @public
  */
-export interface EnhancedMonitorCheckConfig
-    extends EnhancedMonitoringDependencies {
+export interface EnhancedMonitorCheckConfig extends EnhancedMonitoringDependencies {
     /**
      * Status update service for safe concurrent status updates.
      *
@@ -318,7 +317,9 @@ export class EnhancedMonitorChecker {
 
             // Ensure active operation IDs don't accumulate if a cancelled
             // operation never settles.
-            await this.config.monitorRepository.clearActiveOperations(monitorId);
+            await this.config.monitorRepository.clearActiveOperations(
+                monitorId
+            );
 
             const timeoutSignal = createTimeoutSignal(
                 resolveMonitorBaseTimeoutMs(monitor.timeout),
@@ -521,7 +522,7 @@ export class EnhancedMonitorChecker {
      *
      * @returns Monitor check result with correlation
      */
-private async executeMonitorCheck(
+    private async executeMonitorCheck(
         context: MonitorCheckContext & { operationId: string }
     ): Promise<StatusUpdateMonitorCheckResult> {
         const { checkResult } = await this.runServiceCheck({
@@ -532,7 +533,7 @@ private async executeMonitorCheck(
         return checkResult;
     }
 
-/**
+    /**
      * Handle a successful monitor check and emit events.
      *
      * @param site - Site containing the monitor
@@ -543,13 +544,14 @@ private async executeMonitorCheck(
      *
      * @internal
      */
-private async handleSuccessfulCheck(
+    private async handleSuccessfulCheck(
         site: Site,
         monitor: Site["monitors"][0],
         checkResult: StatusUpdateMonitorCheckResult
     ): Promise<StatusUpdate | undefined> {
-        const freshMonitorWithHistory =
-            await this.fetchFreshMonitorWithHistory(checkResult.monitorId);
+        const freshMonitorWithHistory = await this.fetchFreshMonitorWithHistory(
+            checkResult.monitorId
+        );
 
         if (!freshMonitorWithHistory) {
             return undefined;
@@ -571,7 +573,8 @@ private async handleSuccessfulCheck(
             timestamp: checkResult.timestamp.toISOString(),
         };
 
-        const didStatusChange = statusUpdate.status !== statusUpdate.previousStatus;
+        const didStatusChange =
+            statusUpdate.status !== statusUpdate.previousStatus;
 
         // Emit proper typed events like the traditional monitoring system
         if (didStatusChange) {
@@ -592,7 +595,7 @@ private async handleSuccessfulCheck(
         return statusUpdate;
     }
 
-/**
+    /**
      * Perform a correlated check with operation tracking.
      *
      * @param site - Site containing the monitor
@@ -603,16 +606,14 @@ private async handleSuccessfulCheck(
      *
      * @internal
      */
-private async performCorrelatedCheck(
+    private async performCorrelatedCheck(
         site: Site,
         monitor: Site["monitors"][0],
         monitorId: string,
         externalSignal?: AbortSignal
     ): Promise<StatusUpdate | undefined> {
         const operationResult = await this.setupOperationCorrelation(monitor, {
-            ...(externalSignal
-                ? { additionalSignals: [externalSignal] }
-                : {}),
+            ...(externalSignal ? { additionalSignals: [externalSignal] } : {}),
         });
         if (!operationResult) {
             return undefined;
@@ -666,7 +667,7 @@ private async performCorrelatedCheck(
         return undefined;
     }
 
-/**
+    /**
      * Perform direct check without operation correlation (for manual checks).
      *
      * @param site - Site containing the monitor
@@ -674,7 +675,7 @@ private async performCorrelatedCheck(
      *
      * @returns Status update if successful
      */
-private async performDirectCheck(
+    private async performDirectCheck(
         site: Site,
         monitor: Monitor,
         isManualCheck = false,
@@ -775,7 +776,10 @@ private async performDirectCheck(
             //
             // Preserve existing behavior: manual checks on paused monitors do
             // not emit up/down events.
-            if (didStatusChange && (!isManualCheck || monitor.status !== "paused")) {
+            if (
+                didStatusChange &&
+                (!isManualCheck || monitor.status !== "paused")
+            ) {
                 await this.emitStatusChangeEvents(
                     site,
                     monitor,
@@ -794,13 +798,13 @@ private async performDirectCheck(
         }
     }
 
-/**
+    /**
      * Saves a history entry for a monitor check result.
      *
      * @param monitor - Monitor that was checked
      * @param checkResult - Result of the monitor check
      */
-private async saveHistoryEntry(
+    private async saveHistoryEntry(
         monitor: Monitor,
         checkResult: StatusUpdateMonitorCheckResult
     ): Promise<void> {
@@ -834,13 +838,11 @@ private async saveHistoryEntry(
                 const pruneThreshold = historyLimit + bufferSize;
 
                 const previousState = this.historyPruneState.get(monitor.id);
-                const state =
-                    previousState ??
-                    {
-                        hasPerformedCountCheck: false,
-                        lastHistoryLimit: historyLimit,
-                        pendingWritesSinceCountCheck: 0,
-                    };
+                const state = previousState ?? {
+                    hasPerformedCountCheck: false,
+                    lastHistoryLimit: historyLimit,
+                    pendingWritesSinceCountCheck: 0,
+                };
 
                 // If the configured history limit changed, reset the pruning
                 // state so the new configuration is applied quickly.
@@ -896,7 +898,7 @@ private async saveHistoryEntry(
         }
     }
 
-/**
+    /**
      * Sets up operation correlation for a monitor check.
      *
      * @param monitor - Monitor being checked
@@ -904,12 +906,14 @@ private async saveHistoryEntry(
      * @returns Operation result with ID and signal if successful, undefined if
      *   failed
      */
-private async setupOperationCorrelation(
+    private async setupOperationCorrelation(
         monitor: Monitor,
-    options?: { readonly additionalSignals?: AbortSignal[] }
+        options?: { readonly additionalSignals?: AbortSignal[] }
     ): Promise<undefined | { operationId: string; signal: AbortSignal }> {
-        const handle =
-            await this.operationCoordinator.initiateOperation(monitor, options);
+        const handle = await this.operationCoordinator.initiateOperation(
+            monitor,
+            options
+        );
 
         if (!handle) {
             return undefined;
@@ -921,9 +925,7 @@ private async setupOperationCorrelation(
         };
     }
 
-
-
-/**
+    /**
      * Executes the monitor check and returns both the raw service result and
      * the normalized {@link StatusUpdateMonitorCheckResult}.
      *
@@ -935,7 +937,7 @@ private async setupOperationCorrelation(
      * services) can return invalid values like `null`. This helper normalizes
      * invalid results into a stable `down` result.
      */
-private async runServiceCheck(args: {
+    private async runServiceCheck(args: {
         readonly context: MonitorCheckContext;
         readonly operationId: string;
     }): Promise<{
@@ -958,7 +960,9 @@ private async runServiceCheck(args: {
             const { responseTime, status } = value;
 
             return (
-                (status === "up" || status === "down" || status === "degraded") &&
+                (status === "up" ||
+                    status === "down" ||
+                    status === "degraded") &&
                 typeof responseTime === "number"
             );
         };
@@ -1002,7 +1006,7 @@ private async runServiceCheck(args: {
         }
     }
 
-/**
+    /**
      * Builds a status-update check result from the raw service result.
      *
      * @remarks
@@ -1029,28 +1033,7 @@ private async runServiceCheck(args: {
         };
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/**
+    /**
      * Resolves the human-facing details string used in status update events.
      *
      * @remarks
@@ -1090,24 +1073,6 @@ private async runServiceCheck(args: {
         }
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     public constructor(config: EnhancedMonitorCheckConfig) {
         this.config = config;
         this.operationCoordinator = new MonitorOperationCoordinator({
@@ -1128,8 +1093,7 @@ private async runServiceCheck(args: {
 
         this.strategyRegistry = createMonitorStrategyRegistry(
             registeredTypes.map((type) => ({
-                getService: (): IMonitorService =>
-                    this.getServiceOrThrow(type),
+                getService: (): IMonitorService => this.getServiceOrThrow(type),
                 type,
             }))
         );

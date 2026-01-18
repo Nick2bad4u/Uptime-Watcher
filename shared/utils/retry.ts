@@ -62,8 +62,8 @@ export interface RetryOptions {
      * Optional hook invoked after a failed attempt.
      *
      * @remarks
-     * Errors thrown by this callback are swallowed to avoid masking the original
-     * failure.
+     * Errors thrown by this callback are swallowed to avoid masking the
+     * original failure.
      */
     onError?: (error: unknown, attempt: number) => void;
 

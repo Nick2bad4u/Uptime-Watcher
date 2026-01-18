@@ -727,12 +727,28 @@ describe("IPC Utils - Comprehensive Coverage", () => {
 
             const buffer = new ArrayBuffer(8);
             const view = new Uint8Array(buffer);
-            view.set([1, 2, 3, 4, 5, 6, 7, 8]);
+            view.set([
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8,
+            ]);
 
             const result = toClonedArrayBuffer(view);
             expect(result).toBe(buffer);
             expect(Array.from(new Uint8Array(result))).toEqual([
-                1, 2, 3, 4, 5, 6, 7, 8,
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8,
             ]);
         });
 
@@ -747,14 +763,28 @@ describe("IPC Utils - Comprehensive Coverage", () => {
 
             const buffer = new ArrayBuffer(8);
             const view = new Uint8Array(buffer);
-            view.set([1, 2, 3, 4, 5, 6, 7, 8]);
+            view.set([
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8,
+            ]);
 
             const slice = new Uint8Array(buffer, 2, 4);
             const result = toClonedArrayBuffer(slice);
 
             expect(result).not.toBe(buffer);
             expect(result.byteLength).toBe(4);
-            expect(Array.from(new Uint8Array(result))).toEqual([3, 4, 5, 6]);
+            expect(Array.from(new Uint8Array(result))).toEqual([
+                3,
+                4,
+                5,
+                6,
+            ]);
         });
     });
 
@@ -1047,7 +1077,6 @@ describe("IPC Utils - Comprehensive Coverage", () => {
                 });
             });
         });
-
     });
 
     describe("Handler Wrappers - Error Handling and Logging", () => {
@@ -1557,9 +1586,7 @@ describe("IPC Utils - Comprehensive Coverage", () => {
 
                 expect(mockHandler).not.toHaveBeenCalled();
                 expect(result.success).toBeFalsy();
-                expect(result.error).toContain(
-                    "Unexpected IPC parameters"
-                );
+                expect(result.error).toContain("Unexpected IPC parameters");
             });
 
             it("should throw when handler expects params but validateParams is null", async ({
@@ -1574,8 +1601,7 @@ describe("IPC Utils - Comprehensive Coverage", () => {
                 const registeredHandlers = new Set<TestChannel>();
 
                 // Function length must be > 0 to trigger the guard.
-                const paramHandler = async (_value: string) =>
-                    "param handler";
+                const paramHandler = async (_value: string) => "param handler";
 
                 expect(() =>
                     registerStandardizedIpcHandler(

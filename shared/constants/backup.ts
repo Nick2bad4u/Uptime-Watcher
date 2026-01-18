@@ -38,7 +38,7 @@ export const DEFAULT_MAX_IPC_BACKUP_TRANSFER_BYTES: number = 10 * 1024 * 1024;
  * transport checks where the operation context matters.
  */
 export const MAX_IPC_SQLITE_BACKUP_TRANSFER_BYTES: number =
-	DEFAULT_MAX_IPC_BACKUP_TRANSFER_BYTES;
+    DEFAULT_MAX_IPC_BACKUP_TRANSFER_BYTES;
 
 /**
  * Maximum size (bytes) accepted for SQLite restore payloads sent over IPC.
@@ -48,7 +48,8 @@ export const MAX_IPC_SQLITE_BACKUP_TRANSFER_BYTES: number =
  * kept aligned with the renderer-side byte budget enforced in the preload
  * bridge.
  */
-export const MAX_IPC_SQLITE_RESTORE_BYTES: number = DEFAULT_MAX_BACKUP_SIZE_BYTES;
+export const MAX_IPC_SQLITE_RESTORE_BYTES: number =
+    DEFAULT_MAX_BACKUP_SIZE_BYTES;
 
 /**
  * Maximum size (bytes) accepted for JSON import payloads transported over IPC.

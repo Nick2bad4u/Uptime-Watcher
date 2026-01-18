@@ -448,8 +448,8 @@ export function isKnownErrorMessage(message: string): message is ErrorMessage {
  * implementation so that fallback strings come from the centralized
  * {@link ERROR_CATALOG}.
  *
- * - When the supplied value is an {@link Error} instance, the underlying
- *   `message` property is returned.
+ * - When the supplied value is an {@link Error} instance, the underlying `message`
+ *   property is returned.
  * - All other values yield the provided fallback string.
  */
 export function getUnknownErrorMessage(

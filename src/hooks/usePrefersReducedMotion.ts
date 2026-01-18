@@ -30,8 +30,7 @@ const readPreference = (): boolean => getMediaQueryMatches(MEDIA_QUERY);
  */
 const subscribeToPreferenceChanges = (
     setPreference: (value: boolean) => void
-): (() => void) =>
-    subscribeToMediaQueryMatches(MEDIA_QUERY, setPreference);
+): (() => void) => subscribeToMediaQueryMatches(MEDIA_QUERY, setPreference);
 
 /**
  * React hook that returns whether the user requests reduced motion.

@@ -81,7 +81,7 @@ export type SafeParseLike<T> =
  * Generic safe-parse result shape used by Zod and compatible validators.
  *
  * @remarks
- * This is intentionally *not* tied to Zod's concrete types to avoid coupling
+ * This is intentionally _not_ tied to Zod's concrete types to avoid coupling
  * shared validation modules to preload infrastructure.
  */
 export type SafeParseResultLike<T> =
@@ -150,7 +150,9 @@ export function createSafeParseAdapter<T>(
 /**
  * Runtime validator for boolean IPC responses.
  */
-export function safeParseBooleanResult(candidate: unknown): SafeParseLike<boolean> {
+export function safeParseBooleanResult(
+    candidate: unknown
+): SafeParseLike<boolean> {
     if (typeof candidate === "boolean") {
         return { data: candidate, success: true };
     }
@@ -166,7 +168,9 @@ export function safeParseBooleanResult(candidate: unknown): SafeParseLike<boolea
 /**
  * Runtime validator for string IPC responses.
  */
-export function safeParseStringResult(candidate: unknown): SafeParseLike<string> {
+export function safeParseStringResult(
+    candidate: unknown
+): SafeParseLike<string> {
     if (typeof candidate === "string") {
         return { data: candidate, success: true };
     }
@@ -182,7 +186,9 @@ export function safeParseStringResult(candidate: unknown): SafeParseLike<string>
 /**
  * Runtime validator for numeric IPC responses.
  */
-export function safeParseNumberResult(candidate: unknown): SafeParseLike<number> {
+export function safeParseNumberResult(
+    candidate: unknown
+): SafeParseLike<number> {
     if (typeof candidate === "number" && Number.isFinite(candidate)) {
         return { data: candidate, success: true };
     }
@@ -601,7 +607,9 @@ export function createValidatedInvoker<TChannel extends IpcInvokeChannel>(
 
         const guardName =
             options.guardName ??
-            (validateResult.name.length > 0 ? validateResult.name : "anonymous");
+            (validateResult.name.length > 0
+                ? validateResult.name
+                : "anonymous");
         const domain = options.domain ?? "preload";
         const payloadPreview = buildPayloadPreview(result);
         const normalizedError = ensureError(parsed.error);
@@ -633,7 +641,6 @@ export function createValidatedInvoker<TChannel extends IpcInvokeChannel>(
             ...(payloadPreview ? { payloadPreview } : {}),
             reason: options.reason ?? "response-validation",
         });
-
 
         throw new IpcError(
             `IPC response payload failed validation for channel '${channel}'`,

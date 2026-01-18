@@ -24,9 +24,7 @@ import { ThemedText } from "../../../theme/components/ThemedText";
 import { useAvailabilityColors, useTheme } from "../../../theme/useTheme";
 import { AppIcons } from "../../../utils/icons";
 import { formatDuration, formatResponseTime } from "../../../utils/time";
-import {
-    useResponseTimeColorFromThemeColors,
-} from "../utils/responseTimeColors";
+import { useResponseTimeColorFromThemeColors } from "../utils/responseTimeColors";
 
 /**
  * Props for the SiteOverviewTab component
@@ -517,7 +515,8 @@ export const SiteOverviewTab = ({
                                 size="sm"
                                 variant="secondary"
                             >
-                                Stopped: {site.monitors.length - runningMonitors.length}
+                                Stopped:{" "}
+                                {site.monitors.length - runningMonitors.length}
                             </ThemedBadge>
                         </div>
                     </div>

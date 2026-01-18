@@ -46,8 +46,8 @@ const HISTORY_MANIPULATION_QUERIES = {
  * Add a new history entry for a monitor.
  *
  * @remarks
- * Designed to be called from repository methods that manage transaction
- * context and error handling.
+ * Designed to be called from repository methods that manage transaction context
+ * and error handling.
  *
  * @param db - Database connection instance
  * @param monitorId - Unique identifier of the monitor
@@ -132,10 +132,13 @@ export function bulkInsertHistory(
             }
 
             logger.info(
-                interpolateLogTemplate(LOG_TEMPLATES.services.HISTORY_BULK_INSERT, {
-                    count: historyEntries.length,
-                    monitorId,
-                })
+                interpolateLogTemplate(
+                    LOG_TEMPLATES.services.HISTORY_BULK_INSERT,
+                    {
+                        count: historyEntries.length,
+                        monitorId,
+                    }
+                )
             );
         } finally {
             stmt.finalize();
@@ -171,7 +174,10 @@ export function deleteAllHistory(db: Database): void {
             logger.debug("[HistoryManipulation] Cleared all history");
         }
     } catch (error) {
-        logger.error("[HistoryManipulation] Failed to clear all history", error);
+        logger.error(
+            "[HistoryManipulation] Failed to clear all history",
+            error
+        );
         throw error;
     }
 }
@@ -186,7 +192,10 @@ export function deleteAllHistory(db: Database): void {
  *
  * @internal
  */
-export function deleteHistoryByMonitorId(db: Database, monitorId: string): void {
+export function deleteHistoryByMonitorId(
+    db: Database,
+    monitorId: string
+): void {
     try {
         db.run(HISTORY_MANIPULATION_QUERIES.DELETE_BY_MONITOR, [monitorId]);
         if (isDev()) {

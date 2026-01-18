@@ -42,10 +42,7 @@ import { IpcService } from "./ipc/IpcService";
 import { EnhancedMonitoringServiceFactory } from "./monitoring/EnhancedMonitoringServiceFactory";
 import { MonitorOperationRegistry } from "./monitoring/MonitorOperationRegistry";
 import { NotificationService } from "./notifications/NotificationService";
-import {
-    hasInitializeMethod,
-    isPromiseLike,
-} from "./ServiceContainer.utils";
+import { hasInitializeMethod, isPromiseLike } from "./ServiceContainer.utils";
 import { ServiceContainerEventForwarder } from "./ServiceContainerEventForwarder";
 import { SyncEngine } from "./sync/SyncEngine";
 import { AutoUpdaterService } from "./updater/AutoUpdaterService";
@@ -904,7 +901,10 @@ export class ServiceContainer {
                 settingsRepository: this.getSettingsRepository(),
                 siteRepository: this.getSiteRepository(),
             });
-            this.eventForwarder.setupEventForwarding(siteEventBus, "SiteManager");
+            this.eventForwarder.setupEventForwarding(
+                siteEventBus,
+                "SiteManager"
+            );
             if (this.config.enableDebugLogging) {
                 logger.debug(
                     "[ServiceContainer] Created SiteManager with dependencies"
@@ -997,5 +997,4 @@ export class ServiceContainer {
     private getMainOrchestrator(): null | UptimeOrchestrator {
         return this.uptimeOrchestrator ?? null;
     }
-
 }

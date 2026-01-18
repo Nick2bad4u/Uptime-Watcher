@@ -3,7 +3,10 @@ import type { CloudStatusSummary } from "@shared/types/cloud";
 import type { UptimeOrchestrator } from "../../UptimeOrchestrator";
 import type { CloudSyncEngine } from "../sync/SyncEngine";
 import type { CloudSettingsAdapter } from "./CloudService.types";
-import type { DropboxProviderDeps, GoogleDriveProviderDeps } from "./internal/cloudProviderDeps";
+import type {
+    DropboxProviderDeps,
+    GoogleDriveProviderDeps,
+} from "./internal/cloudProviderDeps";
 import type { CloudStorageProvider } from "./providers/CloudStorageProvider.types";
 import type { SecretStore } from "./secrets/SecretStore";
 

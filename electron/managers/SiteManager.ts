@@ -1,11 +1,10 @@
 /**
  * Site management service responsible for site CRUD operations and monitoring
- * coordination.
- * The SiteManager serves as the primary interface for all site-related
- * operations, providing a unified API for site creation, updates, deletion, and
- * monitoring coordination. It maintains an in-memory cache for performance
- * while ensuring data consistency with the underlying database through
- * transactional operations.
+ * coordination. The SiteManager serves as the primary interface for all
+ * site-related operations, providing a unified API for site creation, updates,
+ * deletion, and monitoring coordination. It maintains an in-memory cache for
+ * performance while ensuring data consistency with the underlying database
+ * through transactional operations.
  *
  * Key responsibilities:
  *
@@ -42,6 +41,7 @@
  * ```
  *
  * @public
+ *
  * @packageDocumentation
  */
 
@@ -57,9 +57,7 @@ import {
     interpolateLogTemplate,
     LOG_TEMPLATES,
 } from "@shared/utils/logTemplates";
-import {
-    deriveSiteSnapshot,
-} from "@shared/utils/siteSnapshots";
+import { deriveSiteSnapshot } from "@shared/utils/siteSnapshots";
 
 import type { UptimeEvents } from "../events/eventTypes";
 import type { TypedEventBus } from "../events/TypedEventBus";
@@ -92,9 +90,9 @@ interface UpdateSitesCacheOptions {
  * The SiteManager is the central coordinator for all site-related operations in
  * the uptime monitoring system. It provides a high-level API that abstracts the
  * complexity of database operations, cache management, and cross-component
- * coordination while ensuring data consistency and performance.
- * The manager maintains a synchronized in-memory cache of all sites for fast
- * access patterns while ensuring all mutations go through proper database
+ * coordination while ensuring data consistency and performance. The manager
+ * maintains a synchronized in-memory cache of all sites for fast access
+ * patterns while ensuring all mutations go through proper database
  * transactions. Event emission keeps other system components informed of site
  * changes and enables reactive UI updates.
  *
@@ -234,7 +232,7 @@ export class SiteManager {
      *
      * @remarks
      * - `bulk-sync` emits a full snapshot (`sites`) and `siteCount`.
-     * - `update`/`delete` emit *delta-only* payloads.
+     * - `update`/`delete` emit _delta-only_ payloads.
      * - A monotonic `revision` is incremented for every emitted sync event so
      *   renderers can detect gaps and trigger a full-sync recovery.
      *
@@ -420,6 +418,7 @@ export class SiteManager {
      * @remarks
      * Delegates the transactional deletion to {@link SiteWriterService}. When
      * deletion succeeds, emits:
+     *
      * - `internal:site:removed`
      * - `sites:state-synchronized` with action `delete`
      *
@@ -468,6 +467,7 @@ export class SiteManager {
      *
      * @remarks
      * This method emits the same events as deleting sites individually:
+     *
      * - `internal:site:removed` (for each removed site)
      * - `sites:state-synchronized` delete deltas (for each removed site)
      *
@@ -671,7 +671,7 @@ export class SiteManager {
         return refreshedSite;
     }
 
-/**
+    /**
      * Updates the sites cache with new data, replacing all existing entries
      * atomically.
      *
@@ -850,7 +850,7 @@ export class SiteManager {
         }
     }
 
-/**
+    /**
      * Retrieves a mutable site snapshot for mutation operations.
      *
      * @remarks
@@ -862,7 +862,9 @@ export class SiteManager {
      *
      * @returns A cloned {@link Site} snapshot ready for mutation.
      */
-    private async getSiteSnapshotForMutation(identifier: string): Promise<Site> {
+    private async getSiteSnapshotForMutation(
+        identifier: string
+    ): Promise<Site> {
         const cachedSite = this.sitesCache.get(identifier);
         if (cachedSite) {
             return structuredClone(cachedSite);
@@ -909,54 +911,6 @@ export class SiteManager {
     public getStateSyncRevision(): number {
         return this.sitesStateSynchronizer.getStateSyncRevision();
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     /**
      * Constructs a new SiteManager instance.
