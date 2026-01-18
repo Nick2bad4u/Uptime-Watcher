@@ -18,6 +18,7 @@ import {
     MAX_IPC_JSON_IMPORT_BYTES,
     MAX_IPC_SQLITE_RESTORE_BYTES,
 } from "@shared/constants/backup";
+import { isJsonByteBudgetExceeded } from "@shared/utils/jsonByteBudget";
 import { normalizePathSeparatorsToPosix } from "@shared/utils/pathSeparators";
 import { hasAsciiControlCharacters } from "@shared/utils/stringSafety";
 import { isRecord } from "@shared/utils/typeHelpers";
@@ -39,7 +40,6 @@ import { siteIdentifierSchema } from "@shared/validation/siteFieldSchemas";
 
 import type { IpcParameterValidator } from "../types";
 
-import { isJsonByteBudgetExceeded } from "../../../utils/jsonByteBudget";
 import {
     getUtfByteLength,
     MAX_DIAGNOSTICS_METADATA_BYTES,

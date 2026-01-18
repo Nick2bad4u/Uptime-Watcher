@@ -1,9 +1,9 @@
 /**
- * Approximate JSON byte budgeting utilities for Electron main.
+ * Approximate JSON byte budgeting utilities.
  *
  * @remarks
- * This is used as a defense-in-depth guard before broadcasting potentially
- * large snapshots (e.g. state sync) to renderers.
+ * Used as a defense-in-depth guard before sending potentially large snapshots
+ * (e.g. state sync payloads) across process boundaries.
  *
  * The estimate is conservative and stops early once the budget is exceeded.
  */

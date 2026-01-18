@@ -55,7 +55,7 @@ vi.mock("../../../services/monitoring/utils/httpClient", () => ({
     createHttpClient: vi.fn(),
 }));
 
-vi.mock("../../../services/monitoring/utils/httpStatusUtils", () => ({
+vi.mock("@shared/utils/httpStatusUtils", () => ({
     determineMonitorStatus: vi.fn(),
 }));
 

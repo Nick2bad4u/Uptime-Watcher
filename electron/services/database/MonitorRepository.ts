@@ -52,6 +52,13 @@
 import type { Site } from "@shared/types";
 import type { Database } from "node-sqlite3-wasm";
 
+import {
+    assertValidMonitorId,
+    assertValidSiteIdentifier,
+    isValidMonitorId,
+    isValidSiteIdentifier,
+} from "@shared/validation/identifierValidation";
+
 import type { DatabaseService } from "./DatabaseService";
 
 import { isDev } from "../../electronUtils";
@@ -74,12 +81,6 @@ import {
     queryMonitorRows,
 } from "./utils/queries/typedQueries";
 import { generateSqlParameters, mapMonitorToRow } from "./utils/schema/dynamicSchema";
-import {
-    assertValidMonitorId,
-    assertValidSiteIdentifier,
-    isValidMonitorId,
-    isValidSiteIdentifier,
-} from "./utils/validation/identifierValidation";
 
 /**
  * Repository dependencies for managing monitor data persistence.

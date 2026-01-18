@@ -1,5 +1,9 @@
 import type { DropboxResponse, files, users } from "dropbox";
 
+import {
+    assertCloudObjectKey,
+    normalizeProviderObjectKey,
+} from "@shared/utils/cloudKeyNormalization";
 import { ensureError } from "@shared/utils/errorHandling";
 import { normalizePathSeparatorsToPosix } from "@shared/utils/pathSeparators";
 import { isRecord } from "@shared/utils/typeHelpers";
@@ -12,10 +16,6 @@ import type {
 import type { DropboxTokenManager } from "./DropboxTokenManager";
 
 import { logger } from "../../../../utils/logger";
-import {
-    assertCloudObjectKey,
-    normalizeProviderObjectKey,
-} from "../../cloudKeyNormalization";
 import { BaseCloudStorageProvider } from "../BaseCloudStorageProvider";
 import { CloudProviderOperationError } from "../cloudProviderErrors";
 import { tryParseDropboxErrorSummary } from "./dropboxErrorSchemas";

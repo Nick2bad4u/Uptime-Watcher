@@ -41,10 +41,10 @@ import {
     extractIpcResponseData,
     validateVoidIpcResponse,
 } from "@shared/utils/ipcResponse";
+import { isJsonByteBudgetExceeded } from "@shared/utils/jsonByteBudget";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import { ipcRenderer } from "electron";
 
-import { isJsonByteBudgetExceeded } from "../../utils/jsonByteBudget";
 import {
     buildPayloadPreview,
     preloadDiagnosticsLogger,

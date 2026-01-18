@@ -1,8 +1,7 @@
 import type { CloudEncryptionMode } from "@shared/types/cloudEncryption";
 
+import { normalizeCloudObjectKey } from "@shared/utils/cloudKeyNormalization";
 import { hasAsciiControlCharacters } from "@shared/utils/stringSafety";
-
-import { normalizeCloudObjectKey } from "../cloudKeyNormalization";
 
 const BACKUP_KEY_PREFIX = "backups/" as const;
 const MAX_BACKUP_KEY_BYTES = 2048;

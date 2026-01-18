@@ -10,12 +10,12 @@
  */
 
 import { ensureError } from "@shared/utils/errorHandling";
+import { toSerializedError } from "@shared/utils/errorSerialization";
 
 import type { UptimeEvents } from "../../events/eventTypes";
 import type { TypedEventBus } from "../../events/TypedEventBus";
 import type { DatabaseService } from "./DatabaseService";
 
-import { toSerializedError } from "../../utils/errorSerialization";
 import { monitorLogger as logger } from "../../utils/logger";
 import { withDatabaseOperation } from "../../utils/operationalHooks";
 

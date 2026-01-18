@@ -12,14 +12,14 @@ import {
     readNumberEnv,
 } from "@shared/utils/environment";
 import { ensureError } from "@shared/utils/errorHandling";
+import {
+    getJsonByteLengthUpTo,
+    isJsonByteBudgetExceeded,
+} from "@shared/utils/jsonByteBudget";
 import { getUtfByteLength } from "@shared/utils/utfByteLength";
 
 import type { WindowService } from "../window/WindowService";
 
-import {
-    getJsonByteLengthUpTo,
-    isJsonByteBudgetExceeded,
-} from "../../utils/jsonByteBudget";
 import { logger } from "../../utils/logger";
 
 const DEFAULT_MAX_STATE_SYNC_EVENT_BYTES = 1e7;

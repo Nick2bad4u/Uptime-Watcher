@@ -15,7 +15,6 @@ import {
     SITE_IDENTIFIER_REQUIRED_MESSAGE,
     SITE_IDENTIFIER_TOO_LONG_MESSAGE,
 } from "@shared/validation/siteFieldConstants";
-import type { Monitor, Site } from "@shared/types";
 
 /**
  * Returns whether a site identifier is acceptable for repository operations.

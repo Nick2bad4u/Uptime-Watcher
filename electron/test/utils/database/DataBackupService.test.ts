@@ -757,6 +757,24 @@ describe(DataBackupService, () => {
                 })
             );
             expect(mockDatabaseService.close).toHaveBeenCalled();
+
+            // WAL/SHM sidecars must not be applied to the restored DB.
+            const expectedDbPath = path.join(
+                "/test/userdata",
+                "uptime-watcher.sqlite"
+            );
+            expect(mockFsPromises.rename).toHaveBeenCalledWith(
+                `${expectedDbPath}-wal`,
+                expect.stringMatching(
+                    /uptime-watcher\.sqlite\.rollback-\d+-wal$/u
+                )
+            );
+            expect(mockFsPromises.rename).toHaveBeenCalledWith(
+                `${expectedDbPath}-shm`,
+                expect.stringMatching(
+                    /uptime-watcher\.sqlite\.rollback-\d+-shm$/u
+                )
+            );
             expect(mockDatabaseService.initialize).toHaveBeenCalled();
             expect(mockEventEmitter.emitTyped).toHaveBeenCalledWith(
                 "database:backup-restored",

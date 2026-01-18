@@ -180,14 +180,22 @@ export interface SiteSyncDependencies {
     ) => void;
 }
 
-// Create a shared status update manager instance - will be initialized when
-// first used
 // Singleton instance management for status updates, lazily initialized to
-// avoid unnecessary object creation
+// avoid unnecessary object creation.
+//
+// IMPORTANT: Callbacks can change between subscriptions (different components),
+// so the manager must not capture a stale callback reference.
 const statusUpdateManager: {
-    callback?: (update: StatusUpdate) => void;
-    instance?: StatusUpdateManager;
-} = {};
+    callback: ((update: StatusUpdate) => void) | undefined;
+    instance: StatusUpdateManager | undefined;
+} = {
+    callback: undefined,
+    instance: undefined,
+};
+
+function dispatchStatusUpdate(update: StatusUpdate): void {
+    statusUpdateManager.callback?.(update);
+}
 
 /**
  * Resets the module-level status update manager singleton.
@@ -202,8 +210,8 @@ const statusUpdateManager: {
  */
 export function resetStatusUpdateManagerForTesting(): void {
     statusUpdateManager.instance?.unsubscribe();
-    delete statusUpdateManager.instance;
-    delete statusUpdateManager.callback;
+    statusUpdateManager.instance = undefined;
+    statusUpdateManager.callback = undefined;
 }
 
 const FALLBACK_EXPECTED_LISTENERS = 4;
@@ -394,7 +402,7 @@ export const createSiteSyncActions = (
 
             if (statusUpdateManager.instance) {
                 statusUpdateManager.instance.unsubscribe();
-                delete statusUpdateManager.instance;
+                statusUpdateManager.instance = undefined;
             }
 
             deps.setStatusSubscriptionSummary(undefined);
@@ -437,7 +445,7 @@ export const createSiteSyncActions = (
             statusUpdateManager.instance ??= new StatusUpdateManager({
                 fullResyncSites: actions.fullResyncSites,
                 getSites: deps.getSites,
-                onUpdate: effectiveCallback,
+                onUpdate: dispatchStatusUpdate,
                 setSites: deps.setSites,
             });
 
@@ -1026,8 +1034,8 @@ export const createSiteSyncActions = (
         },
         unsubscribeFromStatusUpdates: () => {
             statusUpdateManager.instance?.unsubscribe();
-            delete statusUpdateManager.instance;
-            delete statusUpdateManager.callback;
+            statusUpdateManager.instance = undefined;
+            statusUpdateManager.callback = undefined;
             deps.setStatusSubscriptionSummary(undefined);
             const result: StatusUpdateUnsubscribeResult = {
                 message: "Successfully unsubscribed from status updates",

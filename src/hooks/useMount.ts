@@ -10,7 +10,7 @@
  *
  * Key features:
  *
- * - Prevents duplicate execution in React StrictMode
+ * - Compatible with React StrictMode's extra setup/cleanup cycle
  * - Supports both synchronous and asynchronous mount callbacks
  * - Provides automatic error handling with logging
  * - Ensures cleanup functions run exactly once on unmount
@@ -103,14 +103,9 @@ export function useMount(
 
     // eslint-disable-next-line canonical/prefer-use-mount -- This IS the useMount hook implementation; cannot use itself
     useEffect(function handleMountLifecycle() {
-        // Prevent duplicate mount in StrictMode
-        if (hasMountedRef.current) {
-            // Return empty cleanup function for consistency
-            return (): void => {
-                // No-op cleanup for duplicate mount prevention
-            };
-        }
-
+        // Mark this effect cycle as mounted. We intentionally reset this flag
+        // in the cleanup so React StrictMode's extra setup/cleanup cycle can
+        // re-run mount logic after cleanup.
         hasMountedRef.current = true;
 
         // Execute mount callback with proper async/await handling
@@ -130,6 +125,8 @@ export function useMount(
 
         // Always return cleanup function for consistent return pattern
         return (): void => {
+            hasMountedRef.current = false;
+
             // Only call unmount callback if it exists
             if (unmountCallbackRef.current) {
                 unmountCallbackRef.current();

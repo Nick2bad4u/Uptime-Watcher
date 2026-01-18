@@ -42,6 +42,7 @@ import {
 } from "@shared/constants/history";
 import { getUnknownErrorMessage } from "@shared/utils/errorCatalog";
 import { ensureError } from "@shared/utils/errorHandling";
+import { toSerializedError } from "@shared/utils/errorSerialization";
 
 import type { UptimeEvents } from "../../events/eventTypes";
 import type { TypedEventBus } from "../../events/TypedEventBus";
@@ -54,7 +55,6 @@ import type { SiteRepository } from "./SiteRepository";
 import type { SiteRow } from "./utils/mappers/siteMapper";
 
 import { DEFAULT_SITE_NAME } from "../../constants";
-import { toSerializedError } from "../../utils/errorSerialization";
 import { SiteLoadingError } from "./interfaces";
 
 /**

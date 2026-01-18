@@ -49,6 +49,10 @@ import type { UnknownRecord } from "type-fest";
 
 import { DEFAULT_SITE_NAME } from "@shared/constants/sites";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
+import {
+    assertValidSiteIdentifier,
+    isValidSiteIdentifier,
+} from "@shared/validation/identifierValidation";
 
 import type { DatabaseService } from "./DatabaseService";
 
@@ -56,10 +60,6 @@ import { logger } from "../../utils/logger";
 import { withDatabaseOperation } from "../../utils/operationalHooks";
 import { rowsToSites, rowToSite, type SiteRow } from "./utils/mappers/siteMapper";
 import { querySiteRow, querySiteRows } from "./utils/queries/typedQueries";
-import {
-    assertValidSiteIdentifier,
-    isValidSiteIdentifier,
-} from "./utils/validation/identifierValidation";
 
 /**
  * Defines the dependencies required by the {@link SiteRepository} for managing

@@ -76,6 +76,12 @@ import {
     tryGetMediaQueryList,
 } from "./utils/mediaQueries";
 
+const SIDEBAR_DISMISS_INTERACTIVE_SELECTORS = [
+    ".app-sidebar",
+    ".app-topbar__sidebar-toggle",
+    ".sidebar-reveal-button",
+] as const;
+
 
 
 /**
@@ -274,12 +280,14 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
             // Only proceed if app is initialized
             if (isInitialized) {
                 if (!isLoading) {
-                    // Use timeout to defer state update to avoid direct call in
-                    // useEffect
+                    // Defer the state update to comply with the project
+                    // lint rule that forbids setState calls directly within an
+                    // effect.
                     const clearTimeoutId = setTimeout(
                         clearLoadingOverlay,
                         UI_DELAYS.STATE_UPDATE_DEFER
                     );
+
                     return (): void => {
                         clearTimeout(clearTimeoutId);
                     };
@@ -452,15 +460,10 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
                     return;
                 }
 
-                const interactiveSelectors: readonly string[] = [
-                    ".app-sidebar",
-                    ".app-topbar__sidebar-toggle",
-                    ".sidebar-reveal-button",
-                ];
-
-                const interactedWithinSidebar = interactiveSelectors.some(
-                    (selector) => target.closest(selector) !== null
-                );
+                const interactedWithinSidebar =
+                    SIDEBAR_DISMISS_INTERACTIVE_SELECTORS.some(
+                        (selector) => target.closest(selector) !== null
+                    );
 
                 if (interactedWithinSidebar) {
                     return;

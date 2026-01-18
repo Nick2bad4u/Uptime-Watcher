@@ -14,6 +14,7 @@ import { MAX_IPC_JSON_EXPORT_BYTES } from "@shared/constants/backup";
 import { MIN_MONITOR_CHECK_INTERVAL_MS } from "@shared/constants/monitoring";
 import { DEFAULT_SITE_NAME } from "@shared/constants/sites";
 import { ERROR_CATALOG } from "@shared/utils/errorCatalog";
+import { toSerializedError } from "@shared/utils/errorSerialization";
 import {
     safeJsonParse,
     safeJsonStringifyWithFallback,
@@ -47,7 +48,6 @@ import type {
     SiteRepositoryTransactionAdapter,
 } from "./SiteRepository";
 
-import { toSerializedError } from "../../utils/errorSerialization";
 import { withDatabaseOperation } from "../../utils/operationalHooks";
 import { createMonitorConfig } from "../monitoring/createMonitorConfig";
 import { DataImportExportError } from "./interfaces";

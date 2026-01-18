@@ -74,6 +74,77 @@ export type NormalizeCloudKeyOptions = Readonly<{
     trim?: boolean;
 }>;
 
+function collapseConsecutiveSlashes(value: string): string {
+    // Collapse redundant slashes deterministically without regex.
+    let normalized = value;
+    while (normalized.includes("//")) {
+        normalized = normalized.replaceAll("//", "/");
+    }
+    return normalized;
+}
+
+function assertNoTraversalSegments(value: string): void {
+    const segments = value.split("/");
+    if (segments.some((segment) => segment === "." || segment === "..")) {
+        throw new Error("Cloud key must not contain path traversal segments");
+    }
+}
+
+function assertNoTraversalSegmentsIfEnabled(
+    value: string,
+    enabled: boolean
+): void {
+    if (!enabled) {
+        return;
+    }
+
+    assertNoTraversalSegments(value);
+}
+
+function assertNoControlCharactersIfEnabled(
+    value: string,
+    enabled: boolean
+): void {
+    if (!enabled) {
+        return;
+    }
+
+    if (hasAsciiControlCharacters(value)) {
+        throw new Error("Cloud key must not contain control characters");
+    }
+}
+
+function assertNotEmptyIfDisallowed(value: string, allowEmpty: boolean): void {
+    if (allowEmpty) {
+        return;
+    }
+
+    if (value.length === 0) {
+        throw new Error("Cloud key must not be empty");
+    }
+}
+
+function assertWithinByteLengthBudget(value: string, maxByteLength: number): void {
+    if (getUtfByteLength(value) > maxByteLength) {
+        throw new Error(`Cloud key must not exceed ${maxByteLength} bytes`);
+    }
+}
+
+function assertWithinByteLengthBudgetIfValid(
+    value: string,
+    maxByteLength: number | undefined
+): void {
+    if (
+        typeof maxByteLength !== "number" ||
+        !Number.isFinite(maxByteLength) ||
+        maxByteLength <= 0
+    ) {
+        return;
+    }
+
+    assertWithinByteLengthBudget(value, maxByteLength);
+}
+
 /**
  * Normalizes provider object keys into a canonical POSIX-ish representation.
  *
@@ -112,37 +183,13 @@ export function normalizeCloudObjectKey(
     }
 
     if (collapseSlashes) {
-        // Collapse redundant slashes deterministically without regex.
-        while (normalized.includes("//")) {
-            normalized = normalized.replaceAll("//", "/");
-        }
+        normalized = collapseConsecutiveSlashes(normalized);
     }
 
-    if (!allowEmpty && normalized.length === 0) {
-        throw new Error("Cloud key must not be empty");
-    }
-
-    if (forbidAsciiControlCharacters && hasAsciiControlCharacters(normalized)) {
-        throw new Error("Cloud key must not contain control characters");
-    }
-
-    if (forbidTraversalSegments) {
-        const segments = normalized.split("/");
-        if (segments.some((segment) => segment === "." || segment === "..")) {
-            throw new Error(
-                "Cloud key must not contain path traversal segments"
-            );
-        }
-    }
-
-    if (
-        typeof maxByteLength === "number" &&
-        Number.isFinite(maxByteLength) &&
-        maxByteLength > 0 &&
-        getUtfByteLength(normalized) > maxByteLength
-    ) {
-        throw new Error(`Cloud key must not exceed ${maxByteLength} bytes`);
-    }
+    assertNotEmptyIfDisallowed(normalized, allowEmpty);
+    assertNoControlCharactersIfEnabled(normalized, forbidAsciiControlCharacters);
+    assertNoTraversalSegmentsIfEnabled(normalized, forbidTraversalSegments);
+    assertWithinByteLengthBudgetIfValid(normalized, maxByteLength);
 
     return normalized;
 }

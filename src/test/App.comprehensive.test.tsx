@@ -1265,9 +1265,11 @@ describe("App Component - Comprehensive Coverage", () => {
 
             await renderApp();
 
-            expect(
-                mockBackendFocusSync.useBackendFocusSync
-            ).toHaveBeenCalledWith(false);
+            await waitFor(() => {
+                expect(
+                    mockBackendFocusSync.useBackendFocusSync
+                ).toHaveBeenCalledWith(false);
+            });
         });
     });
 
@@ -1321,8 +1323,11 @@ describe("App Component - Comprehensive Coverage", () => {
 
             await renderApp();
 
-            // Wait a bit to ensure initialization completes
-            await new Promise((resolve) => setTimeout(resolve, 50));
+            // Flush pending microtasks so App initialization effects settle
+            // without leaking state updates outside of act(...).
+            await act(async () => {
+                await Promise.resolve();
+            });
 
             expect(mockLogger.logger.app.started).not.toHaveBeenCalled();
         });

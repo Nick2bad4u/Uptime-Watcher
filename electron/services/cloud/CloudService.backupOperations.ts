@@ -5,6 +5,9 @@ import type {
 } from "@shared/types/cloudBackupMigration";
 import type { SerializedDatabaseRestoreResult } from "@shared/types/ipc";
 
+import { serializeBackupMetadata } from "@shared/utils/cloudBackupMetadata";
+import { determineBackupMigrationNeedsEncryptionKey } from "@shared/utils/cloudBackupMigration";
+
 import type { CloudServiceOperationContext } from "./CloudService.operationContext";
 
 import { logger } from "../../utils/logger";
@@ -13,12 +16,7 @@ import {
     validateDatabaseBackupPayload,
 } from "../database/utils/backup/databaseBackup";
 import { encryptBuffer } from "./crypto/cloudCrypto";
-import {
-    serializeBackupMetadata,
-    toDatabaseBackupMetadata,
-} from "./internal/cloudServiceBackupMetadata";
 import { ignoreENOENT } from "./internal/cloudServiceFsUtils";
-import { determineBackupMigrationNeedsEncryptionKey } from "./internal/cloudServiceMigrationUtils";
 import {
     assertBackupObjectKey,
     parseEncryptionMode,
@@ -162,7 +160,7 @@ export async function restoreBackup(
 
         validateDatabaseBackupPayload({
             buffer,
-            metadata: toDatabaseBackupMetadata(downloaded.entry.metadata),
+            metadata: downloaded.entry.metadata,
         });
 
         const payload: DatabaseRestorePayload = {

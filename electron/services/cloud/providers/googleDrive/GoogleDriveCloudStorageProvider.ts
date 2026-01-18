@@ -1,5 +1,10 @@
 import type { CloudProviderKind } from "@shared/types/cloud";
 
+import {
+    assertCloudObjectKey,
+    normalizeCloudObjectKey,
+    normalizeProviderObjectKey,
+} from "@shared/utils/cloudKeyNormalization";
 import { tryGetErrorCode } from "@shared/utils/errorCodes";
 import { ensureError } from "@shared/utils/errorHandling";
 import { normalizePathSeparatorsToPosix } from "@shared/utils/pathSeparators";
@@ -11,11 +16,6 @@ import type {
 import type { GoogleDriveClient } from "./googleDriveHttpClient";
 import type { GoogleDriveTokenManager } from "./GoogleDriveTokenManager";
 
-import {
-    assertCloudObjectKey,
-    normalizeCloudObjectKey,
-    normalizeProviderObjectKey,
-} from "../../cloudKeyNormalization";
 import { BaseCloudStorageProvider } from "../BaseCloudStorageProvider";
 import { CloudProviderOperationError } from "../cloudProviderErrors";
 import {

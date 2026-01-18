@@ -87,7 +87,6 @@ const vitestConfig = defineConfig({
                 "scripts/**",
                 "report/**",
                 "**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx,css}",
-                "**/electron/utils/interfaces.ts",
                 "**/html/**",
                 "**/enhanced-testUtilities.ts/**",
                 "electron/test/utils/enhanced-testUtilities.ts", // Specific file exclude due to usage in tests

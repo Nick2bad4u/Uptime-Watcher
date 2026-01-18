@@ -32,7 +32,14 @@
     font-weight: var(--font-weight-medium);
     gap: var(--spacing-xs);
     text-align: center;
-    transform: translateY(0);
+    /*
+     * Use a 3D transform to keep the button on a composited layer.
+     *
+     * @remarks
+     * Prevents occasional one-frame text rasterization glitches when the
+     * button transitions between hover/active/focus states.
+     */
+    transform: translate3d(0, 0, 0);
     transition:
         transform var(--transition-normal),
         box-shadow var(--transition-normal),
@@ -67,12 +74,12 @@
     }
 
     &:hover,
-    &:focus {
+    &:focus-visible {
         box-shadow:
             0 26px 48px
                 color-mix(in srgb, var(--themed-button-accent) 24%, transparent),
             var(--shadow-elevation-2);
-        transform: translateY(-1px);
+        transform: translate3d(0, -1px, 0);
 
         &::after {
             opacity: 0.18;
@@ -82,7 +89,7 @@
 
     &:active {
         box-shadow: var(--shadow-elevation-1);
-        transform: translateY(0);
+        transform: translate3d(0, 0, 0);
         transition:
             transform var(--transition-fast),
             box-shadow var(--transition-fast);
@@ -100,7 +107,7 @@
                 color-mix(in srgb, var(--themed-button-accent) 70%, transparent),
             0 24px 52px
                 color-mix(in srgb, var(--themed-button-accent) 26%, transparent);
-        transform: translateY(-1px);
+        transform: translate3d(0, -1px, 0);
     }
 }
 
@@ -114,7 +121,7 @@
 
 .themed-button:disabled {
     box-shadow: var(--shadow-elevation-1);
-    transform: translateY(0);
+    transform: translate3d(0, 0, 0);
 
     &::after {
         display: none;
@@ -307,7 +314,6 @@
     transition:
         box-shadow var(--transition-normal),
         transform var(--transition-normal);
-
     & .icon {
         font-size: 1.125rem;
         line-height: 1;
@@ -348,7 +354,6 @@
         & .icon {
             transition: none;
         }
-
         &::before {
             transition: none;
         }
