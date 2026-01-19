@@ -694,11 +694,40 @@ export function createEventManager(channel: string): {
         ipcRenderer.removeListener(channel, handler);
     };
 
+    const shouldRegisterCallback = (
+        callback: unknown,
+        mode: "on" | "once"
+    ): callback is EventCallback => {
+        if (typeof callback === "function") {
+            return true;
+        }
+
+        // Defense-in-depth: the renderer can still call this API with invalid
+        // values at runtime. Rejecting here avoids permanently registering a
+        // listener that would spam diagnostics on every event.
+        preloadDiagnosticsLogger.warn(
+            "[IPC Bridge] Rejected non-function event callback",
+            {
+                callbackType: typeof callback,
+                channel,
+                mode,
+            }
+        );
+
+        return false;
+    };
+
     return {
         /**
          * Add an event listener
          */
         on: (callback: EventCallback): RemoveListener => {
+            if (!shouldRegisterCallback(callback, "on")) {
+                return (): void => {
+                    // No-op: listener was not registered.
+                };
+            }
+
             const handleEventCallback = (
                 _event: IpcRendererEvent,
                 ...args: unknown[]
@@ -716,6 +745,12 @@ export function createEventManager(channel: string): {
          * Add a one-time event listener
          */
         once: (callback: EventCallback): RemoveListener => {
+            if (!shouldRegisterCallback(callback, "once")) {
+                return (): void => {
+                    // No-op: listener was not registered.
+                };
+            }
+
             const handleEventCallback = (
                 _event: IpcRendererEvent,
                 ...args: unknown[]

@@ -248,7 +248,10 @@ function renderModalHeader(args: {
                 <div className="modal-shell__title-group">
                     <div className="modal-shell__title-row">
                         {headerIcon ? (
-                            <div className="modal-shell__accent-icon">
+                            <div
+                                className="modal-shell__accent-icon"
+                                data-testid="modal-accent-icon"
+                            >
                                 {headerIcon}
                             </div>
                         ) : null}

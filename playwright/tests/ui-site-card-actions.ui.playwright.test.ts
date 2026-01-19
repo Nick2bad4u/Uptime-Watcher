@@ -212,10 +212,11 @@ test.describe(
                     timeout: WAIT_TIMEOUTS.MEDIUM,
                 });
 
-                const dismissButton = recoveredToastEntry.getByRole("button", {
-                    name: "Dismiss alert",
+                // The toast itself is a button that dismisses on click.
+                await recoveredToastEntry.click({ timeout: WAIT_TIMEOUTS.MEDIUM });
+                await expect(recoveredToastEntry).toBeHidden({
+                    timeout: WAIT_TIMEOUTS.MEDIUM,
                 });
-                await dismissButton.click();
             }
         );
     }

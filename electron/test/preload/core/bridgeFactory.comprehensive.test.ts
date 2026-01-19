@@ -306,6 +306,20 @@ describe("bridgeFactory", function describeBridgeFactorySuite() {
                 expect.any(Function)
             );
         });
+
+        it("does not register non-function listeners", () => {
+            const { on } = createEventManager("sites-updated");
+
+            const dispose = on(
+                // Renderer code can still call with invalid values at runtime.
+                // Cast through unknown to simulate that misuse.
+                "not-a-function" as unknown as (...args: unknown[]) => void
+            );
+
+            expect(ipcRenderer.on).not.toHaveBeenCalled();
+            dispose();
+            expect(ipcRenderer.removeListener).not.toHaveBeenCalled();
+        });
     });
 
     describe("typed channel utility", () => {

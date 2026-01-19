@@ -92,21 +92,21 @@ test.describe(
                 ).toBeVisible({ timeout: WAIT_TIMEOUTS.MEDIUM });
 
                 await siteDetailsModal
-                    .getByRole("button", { name: "Monitor Overview" })
+                    .getByRole("tab", { name: "Monitor Overview" })
                     .click();
                 await expect(
                     siteDetailsModal.getByTestId("overview-tab")
                 ).toBeVisible({ timeout: WAIT_TIMEOUTS.MEDIUM });
 
                 await siteDetailsModal
-                    .getByRole("button", { name: ANALYTICS_BUTTON_REGEX })
+                    .getByRole("tab", { name: ANALYTICS_BUTTON_REGEX })
                     .click();
                 await expect(
                     siteDetailsModal.getByTestId("analytics-tab")
                 ).toBeVisible({ timeout: WAIT_TIMEOUTS.MEDIUM });
 
                 const historyButton = siteDetailsModal
-                    .getByRole("button", {
+                    .getByRole("tab", {
                         name: "History",
                     })
                     .first();

@@ -48,12 +48,8 @@ export async function resolveCloudProviderOrNull(args: {
 
             const [{ DropboxTokenManager }, { DropboxCloudStorageProvider }] =
                 await Promise.all([
-                    import(
-                        /* WebpackChunkName: "cloud-dropbox-tokens" */ "../providers/dropbox/DropboxTokenManager"
-                    ),
-                    import(
-                        /* WebpackChunkName: "cloud-dropbox-provider" */ "../providers/dropbox/DropboxCloudStorageProvider"
-                    ),
+                    import(/* webpackChunkName: "cloudDropboxTokens" */ "../providers/dropbox/DropboxTokenManager"),
+                    import(/* webpackChunkName: "cloudDropboxProvider" */ "../providers/dropbox/DropboxCloudStorageProvider"),
                 ]);
 
             const tokenManager = new DropboxTokenManager({
@@ -95,12 +91,8 @@ export async function resolveCloudProviderOrNull(args: {
                 { GoogleDriveTokenManager },
                 { GoogleDriveCloudStorageProvider },
             ] = await Promise.all([
-                import(
-                    /* WebpackChunkName: "cloud-gdrive-tokens" */ "../providers/googleDrive/GoogleDriveTokenManager"
-                ),
-                import(
-                    /* WebpackChunkName: "cloud-gdrive-provider" */ "../providers/googleDrive/GoogleDriveCloudStorageProvider"
-                ),
+                import(/* webpackChunkName: "cloudGdriveTokens" */ "../providers/googleDrive/GoogleDriveTokenManager"),
+                import(/* webpackChunkName: "cloudGdriveProvider" */ "../providers/googleDrive/GoogleDriveCloudStorageProvider"),
             ]);
 
             const tokenManager = new GoogleDriveTokenManager({

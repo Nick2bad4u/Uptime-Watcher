@@ -165,6 +165,11 @@ export const createSiteMonitoringActions = (
     const applyOptimisticUpdate = (statusUpdate: StatusUpdate): void => {
         try {
             const currentSites = getSites();
+
+            // Build a snapshot payload that avoids passing explicit
+            // `undefined` values for optional keys. With
+            // `exactOptionalPropertyTypes`, `foo?: string` is *not* equivalent
+            // to `foo: string | undefined`.
             const snapshotPayload: StatusUpdateSnapshotPayload = {
                 monitor: statusUpdate.monitor,
                 monitorId: statusUpdate.monitorId,
@@ -174,7 +179,7 @@ export const createSiteMonitoringActions = (
                 timestamp: statusUpdate.timestamp,
                 ...(statusUpdate.details === undefined
                     ? {}
-                    : { error: statusUpdate.details }),
+                    : { details: statusUpdate.details }),
                 ...(statusUpdate.previousStatus === undefined
                     ? {}
                     : { previousStatus: statusUpdate.previousStatus }),

@@ -101,12 +101,7 @@ test.describe(
                 await expect(modal).toBeVisible();
                 await expect(modal).toHaveClass(/modal-shell--accent-success/);
 
-                const headerIconPresent = await modal.evaluate((element) =>
-                    Boolean(
-                        element.querySelector(".settings-modal__header-icon")
-                    )
-                );
-                expect(headerIconPresent).toBe(true);
+                await expect(modal.getByTestId("modal-accent-icon")).toBeVisible();
 
                 const accentValue = await modal.evaluate((element) =>
                     getComputedStyle(element).getPropertyValue("--modal-accent")

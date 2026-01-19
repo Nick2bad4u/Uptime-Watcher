@@ -617,7 +617,10 @@ export default /** @type {EslintConfig} */ [
             "yml/plain-scalar": "off",
             "yml/quotes": "error",
             "yml/require-string-key": "error",
-            "yml/sort-keys": "error",
+            // Disabled: eslint-plugin-yml currently crashes during auto-fix on
+            // Windows/Node 25 (TypeError: diff is not a function), which breaks
+            // `lint:fix` entirely. Re-enable once upstream is fixed.
+            "yml/sort-keys": "off",
             "yml/sort-sequence-values": "off",
             "yml/spaced-comment": "warn",
             "yml/vue-custom-block/no-parsing-error": "warn",
@@ -1073,6 +1076,9 @@ export default /** @type {EslintConfig} */ [
                     ],
                     pathPattern: "^$", // Hits the root properties
                 },
+            // Disabled: eslint-plugin-yml currently crashes during auto-fix on
+            // Windows/Node 25 (TypeError: diff is not a function), which breaks
+            // `lint:fix` entirely. Re-enable once upstream is fixed.
                 {
                     order: { type: "asc" },
                     pathPattern:

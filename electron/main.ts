@@ -125,10 +125,9 @@ if (isDev()) {
 
     void (async (): Promise<void> => {
         try {
-             
-            const module: unknown = await import(
-                /* WebpackChunkName: "electron-debug" */ "electron-debug"
-            );
+
+            // eslint-disable-next-line n/no-unpublished-import -- Dev-only dynamic import; dependency is a devDependency and is not required/packed for production builds.
+            const module: unknown = await import(/* webpackChunkName: "electronDebug" */ "electron-debug");
 
             if (!isElectronDebugModule(module)) {
                 logger.warn(
