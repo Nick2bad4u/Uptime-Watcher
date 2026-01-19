@@ -82,6 +82,7 @@ import importZod from "eslint-plugin-import-zod";
 // @ts-expect-error -- No Types for this Package
 import istanbul from "eslint-plugin-istanbul";
 // eslint-disable-next-line import-x/no-named-as-default -- required
+// @ts-expect-error -- eslint-plugin-jsdoc does not ship TypeScript declarations.
 import jsdoc from "eslint-plugin-jsdoc";
 // NOTE: eslint-plugin-json-schema-validator may attempt to fetch remote schemas
 // at lint time. That makes linting flaky/offline-hostile.
@@ -89,9 +90,12 @@ import jsdoc from "eslint-plugin-jsdoc";
 const enableJsonSchemaValidation =
     process.env["UW_ENABLE_JSON_SCHEMA_VALIDATION"] === "1";
 
-const eslintPluginJsonSchemaValidator = enableJsonSchemaValidation
-    ? (await import("eslint-plugin-json-schema-validator")).default
-    : undefined;
+let eslintPluginJsonSchemaValidator = undefined;
+
+if (enableJsonSchemaValidation) {
+    // @ts-expect-error -- eslint-plugin-json-schema-validator does not ship TypeScript declarations.
+    eslintPluginJsonSchemaValidator = (await import("eslint-plugin-json-schema-validator")).default;
+}
 
 const jsonSchemaValidatorPlugins = enableJsonSchemaValidation
     ? { "json-schema-validator": eslintPluginJsonSchemaValidator }
@@ -220,6 +224,7 @@ import pluginValidateJSX from "eslint-plugin-validate-jsx-nesting";
 import pluginWriteGood from "eslint-plugin-write-good-comments";
 // @ts-expect-error -- No Types for this Package
 import xss from "eslint-plugin-xss";
+// @ts-expect-error -- eslint-plugin-yml does not ship TypeScript declarations.
 import eslintPluginYml from "eslint-plugin-yml";
 import zod from "eslint-plugin-zod";
 import globals from "globals";
@@ -579,6 +584,7 @@ export default /** @type {EslintConfig} */ [
     {
         files: ["**/*.{yaml,yml}"],
         ignores: [],
+        language: "yml/yaml",
         languageOptions: {
             parser: yamlEslintParser,
             // Options used with yaml-eslint-parser.
@@ -645,7 +651,10 @@ export default /** @type {EslintConfig} */ [
             "html/id-naming-convention": "warn",
             "html/indent": "error",
             "html/lowercase": "warn",
+            "html/no-whitespace-only-children": "warn",
+            "html/class-spacing": "warn",
             "html/max-element-depth": "warn",
+            "html/css-no-empty-blocks": "warn",
             "html/no-abstract-roles": "warn",
             "html/no-accesskey-attrs": "warn",
             "html/no-aria-hidden-body": "warn",
@@ -777,10 +786,10 @@ export default /** @type {EslintConfig} */ [
         plugins: { json: json, "package-json": packageJson },
         rules: {
             ...json.configs.recommended.rules,
+            // Package.json Plugin Rules (package-json/*)
             "package-json/bin-name-casing": "warn",
             "package-json/exports-subpaths-style": "warn",
             "package-json/no-empty-fields": "warn",
-            // Package.json Plugin Rules (package-json/*)
             "package-json/no-redundant-files": "warn",
             "package-json/no-redundant-publishConfig": "warn",
             "package-json/order-properties": "warn",
@@ -789,6 +798,10 @@ export default /** @type {EslintConfig} */ [
             "package-json/require-author": "warn",
             "package-json/require-bugs": "warn",
             "package-json/require-bundleDependencies": "off",
+            "package-json/require-homepage": "warn",
+            "package-json/require-repository": "error",
+            "package-json/require-scripts": "warn",
+            "package-json/valid-module": "warn",
             "package-json/require-dependencies": "warn",
             "package-json/require-description": "warn",
             "package-json/require-devDependencies": "warn",
@@ -1229,6 +1242,7 @@ export default /** @type {EslintConfig} */ [
             // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
             ...pluginBetterTailwindcss.configs["correctness"].rules,
             "better-tailwindcss/enforce-consistent-class-order": "warn",
+            "better-tailwindcss/enforce-canonical-classes": "warn",
             "better-tailwindcss/enforce-consistent-important-position": "warn",
             "better-tailwindcss/enforce-consistent-line-wrapping": "off",
             "better-tailwindcss/enforce-consistent-variable-syntax": "warn",
@@ -1471,6 +1485,8 @@ export default /** @type {EslintConfig} */ [
             "@eslint-community/eslint-comments/no-use": "off",
             "@eslint-community/eslint-comments/require-description": "warn",
             "@eslint-react/avoid-shorthand-boolean": "off",
+            "@eslint-react/no-duplicate-key": "warn",
+            "@eslint-react/no-unnecessary-use-ref": "warn",
             "@eslint-react/dom/no-missing-button-type": "warn",
             "@eslint-react/dom/no-missing-iframe-sandbox": "warn",
             "@eslint-react/dom/no-string-style-prop": "error",
@@ -2124,6 +2140,10 @@ export default /** @type {EslintConfig} */ [
             "import-x/prefer-namespace-import": "off",
             "import-x/unambiguous": "warn",
             "import-zod/prefer-zod-namespace": "error",
+            "zod/consistent-import-source": "error",
+            "zod/consistent-object-schema-type": "error",
+            "zod/no-unknown-schema": "error",
+            "zod/schema-error-property-style": "error",
             "init-declarations": "off",
             "istanbul/no-ignore-file": "error",
             "istanbul/prefer-ignore-reason": "error",
@@ -2921,6 +2941,8 @@ export default /** @type {EslintConfig} */ [
             "@eslint-community/eslint-comments/no-use": "off",
             "@eslint-community/eslint-comments/require-description": "warn",
             "@eslint-react/avoid-shorthand-boolean": "off",
+            "@eslint-react/no-duplicate-key": "warn",
+            "@eslint-react/no-unnecessary-use-ref": "warn",
             "@eslint-react/dom/no-missing-button-type": "warn",
             "@eslint-react/dom/no-missing-iframe-sandbox": "warn",
             "@eslint-react/dom/no-unknown-property": "warn",
@@ -3280,6 +3302,7 @@ export default /** @type {EslintConfig} */ [
             "antfu/no-ts-export-equal": "error",
             "antfu/top-level-function": "off",
             "better-tailwindcss/enforce-consistent-class-order": "warn",
+            "better-tailwindcss/enforce-canonical-classes": "warn",
             "better-tailwindcss/enforce-consistent-important-position": "warn",
             "better-tailwindcss/enforce-consistent-line-wrapping": "off",
             "better-tailwindcss/enforce-consistent-variable-syntax": "warn",
@@ -3509,6 +3532,10 @@ export default /** @type {EslintConfig} */ [
             "import-x/prefer-namespace-import": "off",
             "import-x/unambiguous": "warn",
             "import-zod/prefer-zod-namespace": "error",
+            "zod/consistent-import-source": "error",
+            "zod/consistent-object-schema-type": "error",
+            "zod/no-unknown-schema": "error",
+            "zod/schema-error-property-style": "error",
             "init-declarations": "off",
             "istanbul/no-ignore-file": "error",
             "istanbul/prefer-ignore-reason": "error",
@@ -4548,6 +4575,8 @@ export default /** @type {EslintConfig} */ [
             "@eslint-community/eslint-comments/no-use": "off",
             "@eslint-community/eslint-comments/require-description": "warn",
             "@eslint-react/avoid-shorthand-boolean": "off",
+            "@eslint-react/no-duplicate-key": "warn",
+            "@eslint-react/no-unnecessary-use-ref": "warn",
             "@eslint-react/dom/no-missing-button-type": "warn",
             "@eslint-react/dom/no-missing-iframe-sandbox": "warn",
             "@eslint-react/dom/no-unknown-property": "warn",
@@ -5212,6 +5241,10 @@ export default /** @type {EslintConfig} */ [
             "import-x/prefer-namespace-import": "off",
             "import-x/unambiguous": "warn",
             "import-zod/prefer-zod-namespace": "error",
+            "zod/consistent-import-source": "error",
+            "zod/consistent-object-schema-type": "error",
+            "zod/no-unknown-schema": "error",
+            "zod/schema-error-property-style": "error",
             "init-declarations": "off",
             "istanbul/no-ignore-file": "error",
             "istanbul/prefer-ignore-reason": "error",
@@ -5995,6 +6028,8 @@ export default /** @type {EslintConfig} */ [
             "@eslint-community/eslint-comments/no-use": "off",
             "@eslint-community/eslint-comments/require-description": "warn",
             "@eslint-react/avoid-shorthand-boolean": "off",
+            "@eslint-react/no-duplicate-key": "warn",
+            "@eslint-react/no-unnecessary-use-ref": "warn",
             "@eslint-react/dom/no-missing-button-type": "warn",
             "@eslint-react/dom/no-missing-iframe-sandbox": "warn",
             "@eslint-react/dom/no-unknown-property": "warn",
@@ -6612,6 +6647,10 @@ export default /** @type {EslintConfig} */ [
             "import-x/prefer-namespace-import": "off",
             "import-x/unambiguous": "warn",
             "import-zod/prefer-zod-namespace": "error",
+            "zod/consistent-import-source": "error",
+            "zod/consistent-object-schema-type": "error",
+            "zod/no-unknown-schema": "error",
+            "zod/schema-error-property-style": "error",
             "init-declarations": "off",
             "istanbul/no-ignore-file": "error",
             "istanbul/prefer-ignore-reason": "error",
@@ -7573,6 +7612,8 @@ export default /** @type {EslintConfig} */ [
             // Relaxed function rules for tests (explicit for clarity)
             "@typescript-eslint/no-empty-function": "off", // Empty mocks/stubs are common
             "@typescript-eslint/no-explicit-any": "off",
+            "@typescript-eslint/no-useless-default-assignment": "warn",
+            "@typescript-eslint/strict-void-return": "warn",
             "@typescript-eslint/no-inferrable-types": "off", // Allow explicit types for React components
             "@typescript-eslint/no-non-null-assertion": "off",
             "@typescript-eslint/no-restricted-types": "off", // Tests may need generic Function types
@@ -7649,6 +7690,7 @@ export default /** @type {EslintConfig} */ [
             "sort-imports": "off",
             "sort-keys": "off",
             "testing-library/await-async-queries": "error",
+            "testing-library/prefer-user-event-setup": "warn",
             "testing-library/no-await-sync-queries": "error",
             "testing-library/no-debugging-utils": "off",
             "testing-library/no-node-access": "off",
@@ -7850,6 +7892,8 @@ export default /** @type {EslintConfig} */ [
             "@jcoreio/implicit-dependencies/no-implicit": "off",
             "@typescript-eslint/no-empty-function": "off", // Empty mocks/stubs are common
             "@typescript-eslint/no-explicit-any": "off",
+            "@typescript-eslint/no-useless-default-assignment": "warn",
+            "@typescript-eslint/strict-void-return": "warn",
             "@typescript-eslint/no-inferrable-types": "off", // Allow explicit types for React components
             "@typescript-eslint/no-non-null-assertion": "off",
             "@typescript-eslint/no-restricted-types": "off", // Tests may need generic Function types
@@ -7928,6 +7972,7 @@ export default /** @type {EslintConfig} */ [
             "sort-imports": "off",
             "sort-keys": "off",
             "testing-library/await-async-queries": "error",
+            "testing-library/prefer-user-event-setup": "warn",
             "testing-library/no-await-sync-queries": "error",
             "testing-library/no-debugging-utils": "off",
             "testing-library/no-node-access": "off",
@@ -8129,6 +8174,8 @@ export default /** @type {EslintConfig} */ [
             "@jcoreio/implicit-dependencies/no-implicit": "off",
             "@typescript-eslint/no-empty-function": "off", // Empty mocks/stubs are common
             "@typescript-eslint/no-explicit-any": "off",
+            "@typescript-eslint/no-useless-default-assignment": "warn",
+            "@typescript-eslint/strict-void-return": "warn",
             "@typescript-eslint/no-non-null-assertion": "off",
             "@typescript-eslint/no-restricted-types": "off", // Tests may need generic Function types
             "@typescript-eslint/no-unsafe-function-type": "off", // Tests may use generic handlers
@@ -8184,6 +8231,7 @@ export default /** @type {EslintConfig} */ [
             "sort-imports": "off",
             "sort-keys": "off",
             "testing-library/await-async-queries": "error",
+            "testing-library/prefer-user-event-setup": "warn",
             "testing-library/no-await-sync-queries": "error",
             "testing-library/no-debugging-utils": "off",
             "testing-library/no-node-access": "off",
@@ -8384,6 +8432,8 @@ export default /** @type {EslintConfig} */ [
             "@typescript-eslint/no-empty-function": "off",
             // Allow flexible patterns for benchmark mock implementations
             "@typescript-eslint/no-explicit-any": "off",
+            "@typescript-eslint/no-useless-default-assignment": "warn",
+            "@typescript-eslint/strict-void-return": "warn",
             "@typescript-eslint/no-floating-promises": "off", // Benchmarks may not await all promises
             "@typescript-eslint/no-inferrable-types": "off", // Allow explicit types for React components
             "@typescript-eslint/no-misused-promises": "off",
@@ -9242,6 +9292,8 @@ export default /** @type {EslintConfig} */ [
             "@typescript-eslint/no-empty-function": "off",
             // Allow flexible patterns for benchmark mock implementations
             "@typescript-eslint/no-explicit-any": "off",
+            "@typescript-eslint/no-useless-default-assignment": "warn",
+            "@typescript-eslint/strict-void-return": "warn",
             "@typescript-eslint/no-floating-promises": "off", // Scripts may not await all promises
             "@typescript-eslint/no-inferrable-types": "off", // Allow explicit types for React components
             "@typescript-eslint/no-misused-promises": "off",
@@ -9984,6 +10036,8 @@ export default /** @type {EslintConfig} */ [
             "@typescript-eslint/explicit-module-boundary-types": "off",
             "@typescript-eslint/no-confusing-void-expression": "off",
             "@typescript-eslint/no-explicit-any": "off",
+            "@typescript-eslint/no-useless-default-assignment": "warn",
+            "@typescript-eslint/strict-void-return": "warn",
             "@typescript-eslint/no-shadow": "off",
             "@typescript-eslint/no-unnecessary-condition": "off",
             "@typescript-eslint/no-unnecessary-type-parameters": "off",
@@ -10369,6 +10423,8 @@ export default /** @type {EslintConfig} */ [
         },
         rules: {
             "@typescript-eslint/no-explicit-any": "off",
+            "@typescript-eslint/no-useless-default-assignment": "warn",
+            "@typescript-eslint/strict-void-return": "warn",
             "canonical/no-re-export": "off",
         },
     },
