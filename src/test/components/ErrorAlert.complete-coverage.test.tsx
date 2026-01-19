@@ -256,7 +256,7 @@ describe("ErrorAlert - Complete Coverage", () => {
 
             const icon = screen.getByTestId("alert-circle-icon");
             expect(icon).toBeInTheDocument();
-            expect(icon).toHaveClass("h-5", "w-5", "shrink-0");
+                expect(icon).toHaveClass("size-5", "shrink-0");
         });
 
         it("should render correct icon for warning variant", ({
@@ -277,7 +277,7 @@ describe("ErrorAlert - Complete Coverage", () => {
 
             const icon = screen.getByTestId("alert-triangle-icon");
             expect(icon).toBeInTheDocument();
-            expect(icon).toHaveClass("h-5", "w-5", "shrink-0");
+                expect(icon).toHaveClass("size-5", "shrink-0");
         });
 
         it("should render correct icon for info variant", ({
@@ -298,7 +298,7 @@ describe("ErrorAlert - Complete Coverage", () => {
 
             const icon = screen.getByTestId("info-icon");
             expect(icon).toBeInTheDocument();
-            expect(icon).toHaveClass("h-5", "w-5", "shrink-0");
+                expect(icon).toHaveClass("size-5", "shrink-0");
         });
 
         it("should render default icon for undefined variant", ({
@@ -319,7 +319,7 @@ describe("ErrorAlert - Complete Coverage", () => {
 
             const icon = screen.getByTestId("alert-circle-icon");
             expect(icon).toBeInTheDocument();
-            expect(icon).toHaveClass("h-5", "w-5", "shrink-0");
+                expect(icon).toHaveClass("size-5", "shrink-0");
         });
     });
 
@@ -643,7 +643,7 @@ describe("ErrorAlert - Complete Coverage", () => {
             const dismissButton = screen.getByLabelText("Dismiss error");
             const svg = dismissButton.querySelector("svg");
             expect(svg).not.toBeNull();
-            expect(svg).toHaveClass("h-4", "w-4");
+            expect(svg).toHaveClass("size-4");
         });
     });
 

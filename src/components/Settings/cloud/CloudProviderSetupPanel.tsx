@@ -565,16 +565,16 @@ const OAuthProviderPanel = ({
     const InfoIcon = AppIcons.ui.info;
 
     const providerIconNode = useMemo(
-        () => <ProviderIcon aria-hidden className="h-4 w-4" />,
+        () => <ProviderIcon aria-hidden className="size-4" />,
         [ProviderIcon]
     );
     const connectedIconNode = useMemo(
-        () => <ConnectedIcon aria-hidden className="h-4 w-4" />,
+        () => <ConnectedIcon aria-hidden className="size-4" />,
         [ConnectedIcon]
     );
 
     const infoIconNode = useMemo(
-        () => <InfoIcon aria-hidden className="h-4 w-4" />,
+        () => <InfoIcon aria-hidden className="size-4" />,
         [InfoIcon]
     );
 
@@ -974,7 +974,7 @@ export const CloudProviderSetupPanel = ({
         () => (
             <ProviderIcon
                 aria-hidden
-                className="settings-accent--primary h-5 w-5"
+                className="settings-accent--primary size-5"
             />
         ),
         [ProviderIcon]

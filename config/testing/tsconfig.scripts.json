@@ -71,6 +71,8 @@
         "../../scripts/**/*.mjs",
         "../../scripts/**/*.cjs",
         "../../scripts/**/*.js",
+        "../../scripts/**/*.mts",
+        "../../scripts/**/*.cts",
         "../../scripts/**/*.ts",
         "../../scripts/**/*.tsx",
         "../../scripts/**/*.jsx",

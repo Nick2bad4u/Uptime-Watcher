@@ -267,7 +267,7 @@ export const CloudSection = ({
         () => (
             <CloudIcon
                 aria-hidden
-                className="settings-accent--primary h-5 w-5"
+                className="settings-accent--primary size-5"
             />
         ),
         [CloudIcon]
@@ -276,7 +276,7 @@ export const CloudSection = ({
         () => (
             <SyncIcon
                 aria-hidden
-                className="settings-accent--success h-5 w-5"
+                className="settings-accent--success size-5"
             />
         ),
         [SyncIcon]
@@ -285,7 +285,7 @@ export const CloudSection = ({
         () => (
             <LockIcon
                 aria-hidden
-                className="settings-accent--highlight h-5 w-5"
+                className="settings-accent--highlight size-5"
             />
         ),
         [LockIcon]

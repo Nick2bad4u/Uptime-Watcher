@@ -273,7 +273,6 @@ export const createSiteSyncActions = (
 ): SiteSyncActions => {
     // Synchronization state to prevent concurrent syncs
     let pendingSyncPromise: null | Promise<void> = null;
-    let pendingResyncRequested = false;
 
     const syncEventSubscription: {
         cleanup?: () => void;
@@ -298,7 +297,6 @@ export const createSiteSyncActions = (
         fullResyncSites: async (): Promise<void> => {
             // If sync is already in progress, return the existing promise
             if (pendingSyncPromise) {
-                pendingResyncRequested = true;
                 logStoreAction("SitesStore", "fullResyncSites", {
                     coalesced: true,
                     message: "Coalesced site resync request",
@@ -330,16 +328,6 @@ export const createSiteSyncActions = (
                 } finally {
                     // Clear the pending promise when done (success or failure)
                     pendingSyncPromise = null;
-
-                    if (pendingResyncRequested) {
-                        pendingResyncRequested = false;
-                        logStoreAction("SitesStore", "fullResyncSites", {
-                            message:
-                                "Scheduling follow-up resync after coalesced request",
-                            status: "pending",
-                        });
-                        void actions.fullResyncSites();
-                    }
                 }
             })();
 

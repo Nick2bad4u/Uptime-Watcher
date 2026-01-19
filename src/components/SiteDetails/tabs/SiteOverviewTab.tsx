@@ -285,49 +285,49 @@ export const SiteOverviewTab = ({
     );
 
     const copyIcon = useMemo(
-        () => <CopyIcon className="h-4 w-4" />,
+        () => <CopyIcon className="size-4" />,
         [CopyIcon]
     );
 
     const siteNameIcon = useMemo(
-        () => <SiteIcon className="h-5 w-5" />,
+        () => <SiteIcon className="size-5" />,
         [SiteIcon]
     );
     const siteIdIcon = useMemo(
-        () => <DatabaseIcon className="h-4 w-4" />,
+        () => <DatabaseIcon className="size-4" />,
         [DatabaseIcon]
     );
     const siteLinkIcon = useMemo(
-        () => <LinkIcon className="h-4 w-4" />,
+        () => <LinkIcon className="size-4" />,
         [LinkIcon]
     );
     const monitorsCountIcon = useMemo(
-        () => <MonitorIcon className="h-4 w-4" />,
+        () => <MonitorIcon className="size-4" />,
         [MonitorIcon]
     );
     const monitorsTotalIcon = useMemo(
-        () => <ListIcon className="h-4 w-4" />,
+        () => <ListIcon className="size-4" />,
         [ListIcon]
     );
     const monitorsRunningIcon = useMemo(
-        () => <StartIcon className="h-4 w-4" />,
+        () => <StartIcon className="size-4" />,
         [StartIcon]
     );
     const monitorsStoppedIcon = useMemo(
-        () => <StopIcon className="h-4 w-4" />,
+        () => <StopIcon className="size-4" />,
         [StopIcon]
     );
 
     const stopSiteMonitoringIcon = useMemo(
-        () => <StopIcon className="h-4 w-4" />,
+        () => <StopIcon className="size-4" />,
         [StopIcon]
     );
     const startSiteMonitoringIcon = useMemo(
-        () => <StartIcon className="h-4 w-4" />,
+        () => <StartIcon className="size-4" />,
         [StartIcon]
     );
     const removeSiteIcon = useMemo(
-        () => <TrashIcon className="h-4 w-4" />,
+        () => <TrashIcon className="size-4" />,
         [TrashIcon]
     );
     return (

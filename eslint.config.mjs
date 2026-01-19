@@ -81,7 +81,7 @@ import { importX } from "eslint-plugin-import-x";
 import importZod from "eslint-plugin-import-zod";
 // @ts-expect-error -- No Types for this Package
 import istanbul from "eslint-plugin-istanbul";
-import jsdoc from "eslint-plugin-jsdoc";
+import eslintPluginJsdoc from "eslint-plugin-jsdoc";
 // NOTE: eslint-plugin-json-schema-validator may attempt to fetch remote schemas
 // at lint time. That makes linting flaky/offline-hostile.
 // Keep it opt-in via UW_ENABLE_JSON_SCHEMA_VALIDATION=1.
@@ -91,7 +91,9 @@ const enableJsonSchemaValidation =
 let eslintPluginJsonSchemaValidator = undefined;
 
 if (enableJsonSchemaValidation) {
-    eslintPluginJsonSchemaValidator = (await import("eslint-plugin-json-schema-validator")).default;
+    eslintPluginJsonSchemaValidator = (
+        await import("eslint-plugin-json-schema-validator")
+    ).default;
 }
 
 const jsonSchemaValidatorPlugins = enableJsonSchemaValidation
@@ -1084,9 +1086,6 @@ export default /** @type {EslintConfig} */ [
                     ],
                     pathPattern: "^$", // Hits the root properties
                 },
-            // Disabled: eslint-plugin-yml currently crashes during auto-fix on
-            // Windows/Node 25 (TypeError: diff is not a function), which breaks
-            // `lint:fix` entirely. Re-enable once upstream is fixed.
                 {
                     order: { type: "asc" },
                     pathPattern:
@@ -9265,7 +9264,9 @@ export default /** @type {EslintConfig} */ [
             parser: tseslintParser,
             parserOptions: {
                 ecmaVersion: "latest",
+                project: "config/testing/tsconfig.scripts.json",
                 sourceType: "module",
+                tsconfigRootDir: path.resolve(import.meta.dirname),
             },
         },
         name: "Scripts - scripts/**/*.{TS,TSX,CTS,MTS,MJS,JS,JSX,CJS}",
@@ -9485,7 +9486,7 @@ export default /** @type {EslintConfig} */ [
         },
         name: "JS JSDoc - **/*.{JS,CJS}",
         plugins: {
-            jsdoc: jsdoc,
+            jsdoc: eslintPluginJsdoc,
         },
         rules: {
             "jsdoc/check-access": "warn", // Recommended
@@ -10422,6 +10423,34 @@ export default /** @type {EslintConfig} */ [
             "@typescript-eslint/no-useless-default-assignment": "warn",
             "@typescript-eslint/strict-void-return": "warn",
             "canonical/no-re-export": "off",
+        },
+    },
+    {
+        files: [
+            "**/*.test.{ts,tsx}",
+            "**/*.spec.{ts,tsx}",
+            "src/test/**/*.{ts,tsx}",
+            "tests/**/*.{ts,tsx}",
+        ],
+        name: "Tests - relax strict void rules",
+        rules: {
+            // This rule is extremely noisy in tests (especially property-based
+            // tests) where callback return values are often incidental.
+            "@typescript-eslint/strict-void-return": "off",
+        },
+    },
+    {
+        files: [
+            "benchmarks/**/*.{ts,tsx}",
+            "electron/test/**/*.{ts,tsx}",
+            "scripts/**/*.{ts,tsx,mts,cts,js,jsx,mjs,cjs}",
+        ],
+        name: "Benchmarks/Scripts - relax strict void rules",
+        rules: {
+            // Benchmarks frequently return measurement values from callbacks.
+            // Scripts commonly use void/Promise-returning callbacks where the
+            // return value is intentionally ignored.
+            "@typescript-eslint/strict-void-return": "off",
         },
     },
     eslintConfigPrettier,

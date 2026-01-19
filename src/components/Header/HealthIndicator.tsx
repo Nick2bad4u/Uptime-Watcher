@@ -39,7 +39,7 @@ export const HealthIndicator = ({
             data-health-color={healthColor}
         >
             <div
-                className="health-dot h-3 w-3 animate-pulse rounded-full"
+                className="health-dot size-3 animate-pulse rounded-full"
                 data-health-color={healthColor}
             />
             <div className="flex flex-col">

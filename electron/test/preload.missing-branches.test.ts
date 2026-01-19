@@ -65,6 +65,38 @@ describe("preload.ts - Missing Branch Coverage", () => {
             if (channel === "update-history-limit") {
                 return Promise.resolve({ success: true, data: null });
             }
+            // Monitoring start/stop summary operations return structured
+            // summaries (not booleans).
+            if (channel === "start-monitoring") {
+                return Promise.resolve({
+                    data: {
+                        alreadyActive: false,
+                        attempted: 0,
+                        failed: 0,
+                        isMonitoring: true,
+                        partialFailures: false,
+                        siteCount: 0,
+                        skipped: 0,
+                        succeeded: 0,
+                    },
+                    success: true,
+                });
+            }
+            if (channel === "stop-monitoring") {
+                return Promise.resolve({
+                    data: {
+                        alreadyInactive: false,
+                        attempted: 0,
+                        failed: 0,
+                        isMonitoring: false,
+                        partialFailures: false,
+                        siteCount: 0,
+                        skipped: 0,
+                        succeeded: 0,
+                    },
+                    success: true,
+                });
+            }
             // For other operations, return generic success
             return Promise.resolve({ success: true, data: true });
         });

@@ -182,10 +182,12 @@ describe("ActionButtonGroup - Complete Coverage", () => {
             const onCheckNow = vi.fn();
             renderActionButtonGroup({ onCheckNow });
 
+            const user = userEvent.setup();
+
             const checkButton = screen.getByRole("button", {
                 name: "Check Now",
             });
-            await userEvent.click(checkButton);
+            await user.click(checkButton);
 
             expect(onCheckNow).toHaveBeenCalledTimes(1);
         });
@@ -406,10 +408,12 @@ describe("ActionButtonGroup - Complete Coverage", () => {
             const onStartMonitoring = vi.fn();
             renderActionButtonGroup({ isMonitoring: false, onStartMonitoring });
 
+            const user = userEvent.setup();
+
             const startButton = screen.getByRole("button", {
                 name: "Start Monitoring",
             });
-            await userEvent.click(startButton);
+            await user.click(startButton);
 
             expect(onStartMonitoring).toHaveBeenCalledTimes(1);
         });
@@ -437,10 +441,12 @@ describe("ActionButtonGroup - Complete Coverage", () => {
             const onStopMonitoring = vi.fn();
             renderActionButtonGroup({ isMonitoring: true, onStopMonitoring });
 
+            const user = userEvent.setup();
+
             const stopButton = screen.getByRole("button", {
                 name: "Stop Monitoring",
             });
-            await userEvent.click(stopButton);
+            await user.click(stopButton);
 
             expect(onStopMonitoring).toHaveBeenCalledTimes(1);
         });
@@ -692,8 +698,10 @@ describe("ActionButtonGroup - Complete Coverage", () => {
                 onStartSiteMonitoring,
             });
 
+            const user = userEvent.setup();
+
             const siteAction = screen.getByTestId("site-monitoring-action");
-            await userEvent.click(siteAction);
+            await user.click(siteAction);
 
             expect(onStartSiteMonitoring).toHaveBeenCalledTimes(1);
         });
@@ -724,8 +732,10 @@ describe("ActionButtonGroup - Complete Coverage", () => {
                 onStopSiteMonitoring,
             });
 
+            const user = userEvent.setup();
+
             const siteAction = screen.getByTestId("site-monitoring-action");
-            await userEvent.click(siteAction);
+            await user.click(siteAction);
 
             expect(onStopSiteMonitoring).toHaveBeenCalledTimes(1);
         });

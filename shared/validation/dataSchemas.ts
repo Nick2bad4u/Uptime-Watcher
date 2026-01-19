@@ -10,6 +10,10 @@ import { DEFAULT_MAX_IPC_BACKUP_TRANSFER_BYTES } from "@shared/constants/backup"
 import { isMonitorTypeConfig } from "@shared/types/monitorTypes";
 import * as z from "zod";
 
+const anyValueSchema = z.custom<unknown>(() => true, {
+    error: "Any value",
+});
+
 const arrayBufferSchema: z.ZodType<ArrayBuffer> = z.custom<ArrayBuffer>(
     (value): value is ArrayBuffer => value instanceof ArrayBuffer,
     "Expected transferable ArrayBuffer"
@@ -107,9 +111,9 @@ export const validationResultSchema: z.ZodType<{
     warnings?: string[] | undefined;
 }> = z
     .object({
-        data: z.unknown().optional(),
+        data: anyValueSchema.optional(),
         errors: z.array(z.string()),
-        metadata: z.record(z.string(), z.unknown()).optional(),
+        metadata: z.record(z.string(), anyValueSchema).optional(),
         success: z.boolean(),
         warnings: z.array(z.string()).optional(),
     })

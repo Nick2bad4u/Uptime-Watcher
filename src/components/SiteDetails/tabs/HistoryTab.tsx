@@ -35,7 +35,7 @@ import type { IconType } from "react-icons";
 import type { JSX } from "react/jsx-runtime";
 
 import { DEFAULT_HISTORY_LIMIT_RULES } from "@shared/constants/history";
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { memo, useCallback, useEffect, useMemo, useState } from "react";
 
 import type { InterfaceDensity } from "../../../stores/ui/types";
 
@@ -259,13 +259,6 @@ export const HistoryTab: NamedExoticComponent<HistoryTabProperties> = memo(
             historyLength
         );
 
-        // Track the last monitor ID and type we logged for to prevent duplicate
-        // logging
-        const lastLoggedMonitorRef = useRef<null | {
-            id: string;
-            type: string;
-        }>(null);
-
         // Icon colors configuration
         const getIconColors = (): {
             filters: string;
@@ -340,31 +333,13 @@ export const HistoryTab: NamedExoticComponent<HistoryTabProperties> = memo(
         // Log when history tab is viewed - only when monitor actually changes
         useEffect(
             function logHistoryTabViewed() {
-                const currentMonitor = {
-                    id: selectedMonitor.id,
-                    type: selectedMonitor.type,
-                };
-                const lastLogged = lastLoggedMonitorRef.current;
-
-                // Only log if monitor ID or type has changed (not just history
-                // length)
-                if (
-                    lastLogged?.id !== currentMonitor.id ||
-                    lastLogged.type !== currentMonitor.type
-                ) {
-                    logger.user.action("History tab viewed", {
-                        monitorId: selectedMonitor.id,
-                        monitorType: selectedMonitor.type,
-                        totalRecords: selectedMonitor.history.length,
-                    });
-                    lastLoggedMonitorRef.current = currentMonitor;
-                }
+                logger.user.action("History tab viewed", {
+                    monitorId: selectedMonitor.id,
+                    monitorType: selectedMonitor.type,
+                    totalRecords: selectedMonitor.history.length,
+                });
             },
-            [
-                selectedMonitor.history.length,
-                selectedMonitor.id,
-                selectedMonitor.type,
-            ]
+            [selectedMonitor.id, selectedMonitor.type]
         );
 
         const recordIndexByTimestamp = useMemo(() => {
@@ -402,7 +377,7 @@ export const HistoryTab: NamedExoticComponent<HistoryTabProperties> = memo(
                 statusCode === null ? null : getHttpStatusIcon(statusCode);
 
             const statusIconNode = StatusCodeIcon ? (
-                <StatusCodeIcon aria-hidden="true" className="h-4 w-4" />
+                <StatusCodeIcon aria-hidden="true" className="size-4" />
             ) : null;
 
             return (
@@ -495,10 +470,10 @@ export const HistoryTab: NamedExoticComponent<HistoryTabProperties> = memo(
 
             return {
                 comfortable: (
-                    <ComfortableDensityIcon aria-hidden className="h-4 w-4" />
+                    <ComfortableDensityIcon aria-hidden className="size-4" />
                 ),
-                compact: <CompactDensityIcon aria-hidden className="h-4 w-4" />,
-                cozy: <CozyDensityIcon aria-hidden className="h-4 w-4" />,
+                compact: <CompactDensityIcon aria-hidden className="size-4" />,
+                cozy: <CozyDensityIcon aria-hidden className="size-4" />,
             } satisfies Record<InterfaceDensity, ReactElement>;
         }, []);
 

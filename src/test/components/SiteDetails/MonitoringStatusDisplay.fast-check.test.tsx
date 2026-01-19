@@ -123,7 +123,7 @@ describe("MonitoringStatusDisplay fast-check coverage", () => {
 
         for (const monitor of monitors) {
             const item = screen.getByTestId(`monitor-status-${monitor.id}`);
-            const indicator = item.querySelector<HTMLDivElement>(".h-2.w-2");
+            const indicator = item.querySelector<HTMLDivElement>(".size-2");
             expect(indicator).not.toBeNull();
             const expectedIndicatorClass = monitor.monitoring
                 ? "themed-status-up"

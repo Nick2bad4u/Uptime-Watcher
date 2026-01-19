@@ -65,7 +65,7 @@ export const EmptyState = (): JSX.Element => {
                 <div className="flex items-center justify-center">
                     <MonitorIcon
                         aria-hidden="true"
-                        className="h-14 w-14 opacity-70"
+                        className="size-14 opacity-70"
                         data-testid="empty-state-monitor-icon"
                     />
                 </div>

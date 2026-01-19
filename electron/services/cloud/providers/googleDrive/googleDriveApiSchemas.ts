@@ -47,9 +47,11 @@ export interface GoogleDriveListResponse {
 }
 
 const googleDriveCreateResponseSchema: z.ZodType<GoogleDriveCreateResponse> =
-    z.looseObject({
-        id: z.string().min(1),
-    });
+    z
+        .object({
+            id: z.string().min(1),
+        })
+        .loose();
 
 /**
  * Parses and validates the `drive.files.create()` response data.
@@ -69,10 +71,12 @@ export function parseGoogleDriveCreateResponse(
 }
 
 const googleDriveFileMetadataSchema: z.ZodType<GoogleDriveFileMetadata> =
-    z.looseObject({
-        modifiedTime: z.string().optional(),
-        size: z.union([z.string(), z.number()]).optional(),
-    });
+    z
+        .object({
+            modifiedTime: z.string().optional(),
+            size: z.union([z.string(), z.number()]).optional(),
+        })
+        .loose();
 
 /**
  * Parses and validates the `drive.files.get()` response data.
@@ -94,21 +98,25 @@ export function parseGoogleDriveFileMetadata(
     };
 }
 
-const googleDriveFileSchema: z.ZodType<GoogleDriveListedFile> = z.looseObject({
-    id: z.string().optional(),
-    mimeType: z.string().optional(),
-    modifiedTime: z.string().optional(),
-    name: z.string().optional(),
-    size: z.union([z.string(), z.number()]).optional(),
-});
+const googleDriveFileSchema: z.ZodType<GoogleDriveListedFile> = z
+    .object({
+        id: z.string().optional(),
+        mimeType: z.string().optional(),
+        modifiedTime: z.string().optional(),
+        name: z.string().optional(),
+        size: z.union([z.string(), z.number()]).optional(),
+    })
+    .loose();
 
 const googleDriveListResponseSchema: z.ZodType<{
     files?: GoogleDriveListedFile[] | undefined;
     nextPageToken?: null | string | undefined;
-}> = z.looseObject({
+}> = z
+    .object({
     files: z.array(googleDriveFileSchema).optional(),
     nextPageToken: z.union([z.string(), z.null()]).optional(),
-});
+    })
+    .loose();
 
 /**
  * Parses and validates the `drive.files.list()` response data.

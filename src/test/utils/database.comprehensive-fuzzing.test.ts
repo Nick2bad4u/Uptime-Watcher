@@ -469,7 +469,7 @@ const resourceConstraintScenarios = fc.record({
 // Database Operation Fuzzing Tests
 // =============================================================================
 
-// eslint-disable-next-line max-lines-per-function -- Comprehensive 100% fuzzing coverage requires extensive test suite
+ 
 describe("Comprehensive Database Operations Fuzzing", () => {
     let performanceMetrics: {
         operation: string;

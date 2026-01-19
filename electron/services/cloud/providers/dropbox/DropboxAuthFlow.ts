@@ -36,11 +36,13 @@ const DROPBOX_SCOPES = [
     "files.metadata.read",
 ] as const;
 
-const dropboxTokenExchangeResponseSchema = z.looseObject({
+const dropboxTokenExchangeResponseSchema = z
+    .object({
     access_token: z.string().min(1),
     expires_in: z.number().positive(),
     refresh_token: z.string().min(1),
-});
+    })
+    .loose();
 
 function createRandomState(): string {
     return crypto.randomBytes(16).toString("hex");

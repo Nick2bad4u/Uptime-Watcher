@@ -47,7 +47,7 @@ vi.mock("../../../utils/errorHandling", () => ({
         async (
             fn,
             operationName,
-            fallbackValue = undefined,
+            fallbackValue,
             shouldThrow = false
         ) => {
             try {

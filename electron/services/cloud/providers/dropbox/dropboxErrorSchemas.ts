@@ -6,13 +6,14 @@ import * as z from "zod";
  * Minimal subset of a Dropbox API error payload.
  */
 interface DropboxErrorSummaryPayload {
-    readonly error_summary: string;
+    readonly error_summary?: string | undefined;
 }
 
-const dropboxErrorSummarySchema: z.ZodType<DropboxErrorSummaryPayload> =
-    z.looseObject({
-        error_summary: z.string().min(1),
-    });
+const dropboxErrorSummarySchema: z.ZodType<DropboxErrorSummaryPayload> = z
+    .object({
+        error_summary: z.string().min(1).optional(),
+    })
+    .loose();
 
 function tryParseDropboxErrorSummaryFromObject(
     value: unknown

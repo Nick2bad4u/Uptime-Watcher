@@ -31,8 +31,7 @@ const monitoringOperationSummaryInternalSchema = z
 
 /** Zod schema for {@link MonitoringOperationSummary}. */
 export const monitoringOperationSummarySchema: z.ZodType<MonitoringOperationSummary> =
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Runtime schema enforces the interface.
-    monitoringOperationSummaryInternalSchema as unknown as z.ZodType<MonitoringOperationSummary>;
+    monitoringOperationSummaryInternalSchema;
 
 const monitoringStartSummaryInternalSchema =
     monitoringOperationSummaryInternalSchema
@@ -43,8 +42,7 @@ const monitoringStartSummaryInternalSchema =
 
 /** Zod schema for {@link MonitoringStartSummary}. */
 export const monitoringStartSummarySchema: z.ZodType<MonitoringStartSummary> =
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Runtime schema enforces the interface.
-    monitoringStartSummaryInternalSchema as unknown as z.ZodType<MonitoringStartSummary>;
+    monitoringStartSummaryInternalSchema;
 
 const monitoringStopSummaryInternalSchema =
     monitoringOperationSummaryInternalSchema
@@ -55,8 +53,7 @@ const monitoringStopSummaryInternalSchema =
 
 /** Zod schema for {@link MonitoringStopSummary}. */
 export const monitoringStopSummarySchema: z.ZodType<MonitoringStopSummary> =
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Runtime schema enforces the interface.
-    monitoringStopSummaryInternalSchema as unknown as z.ZodType<MonitoringStopSummary>;
+    monitoringStopSummaryInternalSchema;
 
 /**
  * Validates an unknown payload against {@link MonitoringOperationSummary}.

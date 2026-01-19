@@ -492,8 +492,10 @@ describe("MonitorSelector - Complete Coverage", () => {
             const onChange = vi.fn();
             renderMonitorSelector({ onChange });
 
+            const user = userEvent.setup();
+
             const select = screen.getByTestId("themed-select");
-            await userEvent.selectOptions(select, "monitor-2");
+            await user.selectOptions(select, "monitor-2");
 
             expect(onChange).toHaveBeenCalled();
         });
@@ -516,6 +518,8 @@ describe("MonitorSelector - Complete Coverage", () => {
             annotate("Type: Event Processing", "type");
 
             renderMonitorSelector();
+
+            const user = userEvent.setup();
 
             const select = screen.getByTestId("themed-select");
             const stopPropagation = vi.fn();
@@ -1109,7 +1113,7 @@ describe("MonitorSelector - Complete Coverage", () => {
             expect(select).toHaveFocus();
 
             // Should be able to change selection with keyboard
-            await userEvent.keyboard("{ArrowDown}");
+            await user.keyboard("{ArrowDown}");
             // The actual selection change depends on the select implementation
         });
 

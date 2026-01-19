@@ -632,7 +632,7 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
             return (
                 <div
                     aria-live="assertive"
-                    className="fixed top-12 right-0 left-0 z-50"
+                    className="fixed inset-x-0 top-12 z-50"
                     role="alert"
                 >
                     <ThemedBox
@@ -670,7 +670,7 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
         return (
             <output
                 aria-live="polite"
-                className="fixed top-12 right-0 left-0 z-50"
+                className="fixed inset-x-0 top-12 z-50"
             >
                 <ThemedBox
                     className={`update-alert update-alert--${updateStatus}`}
@@ -766,7 +766,7 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
                             ) : null}
 
                             {lastError ? (
-                                <div className="fixed top-0 right-0 left-0 z-50 p-4">
+                                <div className="fixed inset-x-0 top-0 z-50 p-4">
                                     <ErrorAlert
                                         message={lastError}
                                         onDismiss={clearError}

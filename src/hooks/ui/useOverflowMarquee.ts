@@ -37,9 +37,6 @@ interface ElementObserverRecord {
 /**
  * Minimal writable ref shape used internally to share stateful callbacks.
  */
-interface WritableRef<ValueType> {
-    current: ValueType;
-}
 
 /**
  * Registry mapping elements to the active observer metadata used for overflow
@@ -174,20 +171,9 @@ const unregisterOverflowObserver = (
     scheduleRecordCleanup(element, record);
 };
 
-/**
- * Ensures a stable subscriber instance for the active resize observer that will
- * always invoke the latest overflow evaluation callback.
- */
-const ensureObserverSubscriber = (
-    subscriberRef: WritableRef<OverflowSubscriber | undefined>,
-    evaluationRef: WritableRef<() => void>
-): OverflowSubscriber => {
-    subscriberRef.current ??= (): void => {
-        evaluationRef.current();
-    };
-
-    return subscriberRef.current;
-};
+// NOTE: We intentionally avoid ref-synchronization here. The hook uses
+// standard React dependency management so linting rules like
+// @eslint-react/no-unnecessary-use-ref remain satisfied.
 
 /**
  * Return type for {@link useOverflowMarquee}.
@@ -267,22 +253,6 @@ export function useOverflowMarquee<
         []
     );
 
-    const latestContainerRef =
-        useRef<RefObject<ElementType | null>>(containerRef);
-    const observedElementRef = useRef<ElementType | null>(null);
-    const observerSubscriberRef = useRef<OverflowSubscriber | undefined>(
-        undefined
-    );
-    const runOverflowEvaluationRef = useRef<() => void>(() => {
-        /* Placeholder reassigned in effect */
-    });
-
-    const runOverflowEvaluation = useCallback(() => {
-        const element = latestContainerRef.current.current;
-        const next = measureOverflow(element);
-        dispatchOverflow(next);
-    }, [measureOverflow]);
-
     const dependencyFingerprint = useMemo(() => {
         try {
             return JSON.stringify(dependencies);
@@ -292,29 +262,21 @@ export function useOverflowMarquee<
     }, [dependencies]);
 
     useEffect(
-        function syncLatestContainerRef() {
-            latestContainerRef.current = containerRef;
-        },
-        [containerRef]
-    );
-
-    useEffect(
-        function updateOverflowEvaluator() {
-            runOverflowEvaluationRef.current = runOverflowEvaluation;
-        },
-        [runOverflowEvaluation]
-    );
-
-    useEffect(
         function manageOverflowObservation() {
-            runOverflowEvaluation();
+            const evaluateOverflow = (): void => {
+                const element = containerRef.current;
+                const next = measureOverflow(element);
+                dispatchOverflow(next);
+            };
 
-            const element = latestContainerRef.current.current;
+            evaluateOverflow();
+
+            const element = containerRef.current;
             const hasWindow = typeof window !== "undefined";
             const shouldAttachWindowListener = hasWindow && element !== null;
 
             const handleResize = (): void => {
-                runOverflowEvaluationRef.current();
+                evaluateOverflow();
             };
 
             if (shouldAttachWindowListener) {
@@ -323,39 +285,13 @@ export function useOverflowMarquee<
 
             const supportsResizeObserver =
                 typeof ResizeObserver !== "undefined";
-            const subscriber = supportsResizeObserver
-                ? ensureObserverSubscriber(
-                      observerSubscriberRef,
-                      runOverflowEvaluationRef
-                  )
-                : undefined;
 
-            if (supportsResizeObserver && subscriber) {
-                const previouslyObserved = observedElementRef.current;
+            const handleOverflowObserverUpdate: OverflowSubscriber = (): void => {
+                evaluateOverflow();
+            };
 
-                if (previouslyObserved && previouslyObserved !== element) {
-                    unregisterOverflowObserver(previouslyObserved, subscriber);
-                    observedElementRef.current = null;
-                }
-
-                if (element) {
-                    registerOverflowObserver(element, subscriber);
-                    observedElementRef.current = element;
-                }
-            }
-
-            if (!supportsResizeObserver && observedElementRef.current) {
-                const fallbackSubscriber = observerSubscriberRef.current;
-                const previouslyObserved = observedElementRef.current;
-
-                if (typeof fallbackSubscriber === "function") {
-                    unregisterOverflowObserver(
-                        previouslyObserved,
-                        fallbackSubscriber
-                    );
-                }
-
-                observedElementRef.current = null;
+            if (supportsResizeObserver && element) {
+                registerOverflowObserver(element, handleOverflowObserverUpdate);
             }
 
             return function cleanupOverflowObservation(): void {
@@ -363,28 +299,14 @@ export function useOverflowMarquee<
                     window.removeEventListener("resize", handleResize);
                 }
 
-                if (!supportsResizeObserver || !subscriber) {
+                if (!supportsResizeObserver || !element) {
                     return;
                 }
 
-                const observedElement = observedElementRef.current;
-
-                if (observedElement) {
-                    unregisterOverflowObserver(observedElement, subscriber);
-                    observedElementRef.current = null;
-                }
+                unregisterOverflowObserver(element, handleOverflowObserverUpdate);
             };
         },
-        [/* effect dep */ containerRef, runOverflowEvaluation]
-    );
-
-    useEffect(
-        function reevaluateOnDependencyChange() {
-            // eslint-disable-next-line sonarjs/void-use -- Access fingerprint to note dependency usage without additional logic.
-            void dependencyFingerprint;
-            runOverflowEvaluation();
-        },
-        [dependencyFingerprint, runOverflowEvaluation]
+        [containerRef, dependencyFingerprint, measureOverflow]
     );
 
     return {

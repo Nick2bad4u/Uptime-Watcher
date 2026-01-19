@@ -27,7 +27,7 @@ export const SyncMaintenanceCard = (props: {
                         aria-hidden
                         className="settings-maintenance__icon settings-accent--warning"
                     >
-                        <MaintenanceIcon className="h-5 w-5" />
+                        <MaintenanceIcon className="size-5" />
                     </span>
                     <ThemedText
                         as="h4"

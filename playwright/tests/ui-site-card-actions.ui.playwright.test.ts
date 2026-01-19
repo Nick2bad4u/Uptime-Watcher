@@ -212,9 +212,10 @@ test.describe(
                     timeout: WAIT_TIMEOUTS.MEDIUM,
                 });
 
-                // The toast itself is a button that dismisses on click.
-                await recoveredToastEntry.click({ timeout: WAIT_TIMEOUTS.MEDIUM });
-                await expect(recoveredToastEntry).toBeHidden({
+                await recoveredToastEntry.click();
+
+                // Wait for the toast to be removed after dismissal.
+                await expect(recoveredToastEntry).toHaveCount(0, {
                     timeout: WAIT_TIMEOUTS.MEDIUM,
                 });
             }

@@ -522,7 +522,22 @@ describe("withErrorHandling frontend fuzz integration", () => {
                     withErrorHandling(async () => {
                         throw errorValue;
                     }, store)
-                ).rejects.toBe(errorValue);
+                ).rejects.toSatisfy((rejection: unknown) => {
+                    if (errorValue instanceof Error) {
+                        return rejection === errorValue;
+                    }
+
+                    if (!(rejection instanceof Error)) {
+                        return false;
+                    }
+
+                    return (
+                        rejection.message ===
+                            convertError(errorValue).error.message &&
+                        (rejection as Error & { cause?: unknown }).cause ===
+                            errorValue
+                    );
+                });
 
                 const setErrorCall = store.calls.find(
                     (call) => call.method === "setError"

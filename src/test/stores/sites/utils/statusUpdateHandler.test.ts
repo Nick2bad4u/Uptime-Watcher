@@ -132,7 +132,7 @@ describe("StatusUpdateHandler", () => {
             async (
                 fn: () => Promise<any>,
                 operationName: string,
-                fallbackValue = undefined,
+                fallbackValue,
                 shouldThrow = false
             ) => {
                 try {
@@ -713,7 +713,7 @@ describe("StatusUpdateHandler", () => {
                 async (
                     fn: () => Promise<any>,
                     _operationName: string,
-                    fallbackValue = undefined,
+                    fallbackValue,
                     shouldThrow = false
                 ) => {
                     try {

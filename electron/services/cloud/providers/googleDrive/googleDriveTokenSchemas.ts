@@ -17,13 +17,15 @@ export interface GoogleTokenResponse {
 }
 
 export const googleTokenResponseSchema: z.ZodType<GoogleTokenResponse> =
-    z.looseObject({
-        access_token: z.string().min(1),
-        expires_in: z.int().positive().optional(),
-        refresh_token: z.string().min(1).optional(),
-        scope: z.string().optional(),
-        token_type: z.string().optional(),
-    });
+    z
+        .object({
+            access_token: z.string().min(1),
+            expires_in: z.int().positive().optional(),
+            refresh_token: z.string().min(1).optional(),
+            scope: z.string().optional(),
+            token_type: z.string().optional(),
+        })
+        .loose();
 
 /**
  * Minimal error payload shape returned by Google's OAuth token endpoint.
@@ -34,10 +36,12 @@ export interface GoogleOAuthErrorResponse {
 }
 
 const googleOAuthErrorResponseSchema: z.ZodType<GoogleOAuthErrorResponse> =
-    z.looseObject({
-        error: z.string().min(1),
-        error_description: z.string().optional(),
-    });
+    z
+        .object({
+            error: z.string().min(1),
+            error_description: z.string().optional(),
+        })
+        .loose();
 
 /**
  * Best-effort parser for OAuth token exchange errors.

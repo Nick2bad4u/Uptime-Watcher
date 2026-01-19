@@ -7,11 +7,13 @@ import * as z from "zod";
  * @remarks
  * Dropbox may add fields over time; we validate only the fields we depend on.
  */
-const dropboxFilesUploadResultSchema = z.looseObject({
+const dropboxFilesUploadResultSchema = z
+    .object({
     path_display: z.string().min(1),
     server_modified: z.string().min(1),
     size: z.number(),
-});
+    })
+    .loose();
 
 /**
  * Normalized subset of the Dropbox upload response.
@@ -46,10 +48,34 @@ export function parseDropboxFilesUploadResult(
     };
 }
 
-const dropboxFilesDownloadResultSchema = z.looseObject({
-    fileBinary: z.unknown().optional(),
-    fileBlob: z.unknown().optional(),
-});
+const dropboxFileBinarySchema = z.custom<unknown>(
+    (value) => value instanceof Uint8Array || value instanceof ArrayBuffer,
+    {
+        error: "Expected Dropbox fileBinary to be a Uint8Array or ArrayBuffer",
+    }
+);
+
+const dropboxFileBlobSchema = z.custom<unknown>(
+    (value) => {
+        const BlobConstructor = (globalThis as { Blob?: unknown }).Blob;
+        if (typeof BlobConstructor !== "function") {
+            return false;
+        }
+
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument -- Runtime instanceof check against a global constructor.
+        return value instanceof (BlobConstructor as new (...args: never[]) => object);
+    },
+    {
+        error: "Expected Dropbox fileBlob to be a Blob",
+    }
+);
+
+const dropboxFilesDownloadResultSchema = z
+    .object({
+        fileBinary: dropboxFileBinarySchema.optional(),
+        fileBlob: dropboxFileBlobSchema.optional(),
+    })
+    .loose();
 
 /**
  * Normalized subset of the Dropbox download response.
@@ -90,12 +116,14 @@ export function parseDropboxFilesDownloadResult(
     };
 }
 
-const dropboxListFolderFileEntrySchema = z.looseObject({
+const dropboxListFolderFileEntrySchema = z
+    .object({
     ".tag": z.literal("file"),
     path_display: z.string().min(1),
     server_modified: z.string().min(1),
     size: z.number(),
-});
+    })
+    .loose();
 
 /**
  * Normalized subset of a Dropbox list-folder file entry.
@@ -127,12 +155,16 @@ export function tryParseDropboxListFolderFileEntry(
     };
 }
 
-const dropboxCurrentAccountSchema = z.looseObject({
+const dropboxCurrentAccountSchema = z
+    .object({
     email: z.string().min(1),
-    name: z.looseObject({
-        display_name: z.string().min(1),
-    }),
-});
+        name: z
+            .object({
+                display_name: z.string().min(1),
+            })
+            .loose(),
+    })
+    .loose();
 
 /**
  * Minimal subset of the current Dropbox account payload.

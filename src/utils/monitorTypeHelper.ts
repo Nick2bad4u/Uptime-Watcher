@@ -13,6 +13,7 @@ import type {
 import { CacheKeys } from "@shared/utils/cacheKeys";
 import { withUtilityErrorHandling } from "@shared/utils/errorHandling";
 
+import { logger } from "../services/logger";
 import { useMonitorTypesStore } from "../stores/monitor/useMonitorTypesStore";
 import { AppCaches } from "./cache";
 
@@ -81,7 +82,9 @@ export async function getAvailableMonitorTypes(): Promise<MonitorTypeConfig[]> {
     const latestStore = useMonitorTypesStore.getState();
 
     if (!latestStore.isLoaded) {
-        return types;
+        logger.warn(
+            "Monitor types store failed to load; caching fallback value"
+        );
     }
 
     AppCaches.monitorTypes.set(cacheKey, types);

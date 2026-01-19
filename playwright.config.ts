@@ -171,7 +171,6 @@ const config: PlaywrightTestConfig = defineConfig({
     globalTeardown: "./playwright/fixtures/global-teardown.ts",
     outputDir: "playwright/test-results/",
     projects: mergedProjects,
-
     reporter: [
         ["list"],
         [
@@ -196,10 +195,11 @@ const config: PlaywrightTestConfig = defineConfig({
         "**/coverage/**",
         "**/dist*/**",
     ],
+
     testMatch: ["**/*.playwright.test.ts"],
     timeout: 20 * 1000,
-
     tsconfig: "./playwright/tsconfig.json",
+
     use: {
         acceptDownloads: true,
         actionTimeout: 20 * 1000,
@@ -224,7 +224,6 @@ const config: PlaywrightTestConfig = defineConfig({
             : "off",
         viewport: { height: 720, width: 1280 },
     },
-
     workers: totalWorkerCount,
 });
 

@@ -11,10 +11,12 @@ export interface GoogleUserInfoResponse {
     readonly name?: string | undefined;
 }
 
-const googleUserInfoSchema: z.ZodType<GoogleUserInfoResponse> = z.looseObject({
-    email: z.string().min(1).optional(),
-    name: z.string().min(1).optional(),
-});
+const googleUserInfoSchema: z.ZodType<GoogleUserInfoResponse> = z
+    .object({
+        email: z.string().min(1).optional(),
+        name: z.string().min(1).optional(),
+    })
+    .loose();
 
 /**
  * Parses the Google OpenID Connect `userinfo` response.

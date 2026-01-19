@@ -9,7 +9,8 @@
 
 import { _electron as electron } from "@playwright/test";
 import type { ElectronApplication, Page } from "@playwright/test";
-import { mkdtemp, rm } from "node:fs/promises";
+import { createWriteStream, type WriteStream } from "node:fs";
+import { copyFile, mkdir, mkdtemp, readdir, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import * as path from "node:path";
 
@@ -50,6 +51,24 @@ export async function launchElectronApp(
         path.join(tmpdir(), "uptime-watcher-playwright-")
     );
 
+    const logsOutputDir = path.join(
+        process.cwd(),
+        "playwright",
+        "test-results",
+        "runtime-logs",
+        path.basename(userDataDir)
+    );
+    await mkdir(logsOutputDir, { recursive: true });
+
+    const stdoutStream: WriteStream = createWriteStream(
+        path.join(logsOutputDir, "electron-stdout.log"),
+        { flags: "a" }
+    );
+    const stderrStream: WriteStream = createWriteStream(
+        path.join(logsOutputDir, "electron-stderr.log"),
+        { flags: "a" }
+    );
+
     const existingNodeOptions = process.env["NODE_OPTIONS"] ?? "";
     const disableWarningOption = "--disable-warning=DEP0190";
     const nodeOptions = existingNodeOptions.includes(disableWarningOption)
@@ -58,7 +77,67 @@ export async function launchElectronApp(
 
     const cleanupTasks: Array<() => Promise<void>> = [
         async () => {
+            // Persist Electron log files for debugging flaky Playwright failures.
+            // These live under userData (which we delete after each run).
             try {
+                const copyRelevantFiles = async (
+                    directory: string,
+                    relativePrefix: string
+                ): Promise<void> => {
+                    const entries = await readdir(directory, {
+                        withFileTypes: true,
+                    });
+
+                    await Promise.all(
+                        entries.map(async (entry) => {
+                            const source = path.join(directory, entry.name);
+                            const relative = path.join(relativePrefix, entry.name);
+
+                            if (entry.isDirectory()) {
+                                await copyRelevantFiles(source, relative);
+                                return;
+                            }
+
+                            if (
+                                !entry.isFile() ||
+                                (!entry.name.endsWith(".log") &&
+                                    !entry.name.endsWith(".json"))
+                            ) {
+                                return;
+                            }
+
+                            const destination = path.join(logsOutputDir, relative);
+                            await mkdir(path.dirname(destination), {
+                                recursive: true,
+                            });
+                            await copyFile(source, destination);
+                        })
+                    );
+                };
+
+                await copyRelevantFiles(userDataDir, ".");
+            } catch (error) {
+                console.warn(
+                    "[Playwright] Failed to collect Electron userData logs",
+                    {
+                        directory: userDataDir,
+                        error,
+                    }
+                );
+            }
+        },
+        async () => {
+            await Promise.allSettled([
+                new Promise<void>((resolve) => stdoutStream.end(() => resolve())),
+                new Promise<void>((resolve) => stderrStream.end(() => resolve())),
+            ]);
+        },
+        async () => {
+            try {
+                if (process.env["PLAYWRIGHT_PRESERVE_USER_DATA_DIR"] === "1") {
+                    return;
+                }
+
                 await rm(userDataDir, { recursive: true, force: true });
             } catch (error) {
                 console.warn(
@@ -119,6 +198,14 @@ export async function launchElectronApp(
             ...customEnv,
         },
         timeout: 30000, // Add timeout like codegen script
+    });
+
+    const electronProcess = app.process();
+    electronProcess?.stdout?.on("data", (chunk: Buffer) => {
+        stdoutStream.write(chunk);
+    });
+    electronProcess?.stderr?.on("data", (chunk: Buffer) => {
+        stderrStream.write(chunk);
     });
 
     const attachWindowMetadata = (page: Page): void => {

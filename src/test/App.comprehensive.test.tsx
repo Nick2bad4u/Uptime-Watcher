@@ -381,6 +381,10 @@ describe("App Component - Comprehensive Coverage", () => {
 
             await renderApp();
 
+            const user = userEvent.setup();
+
+            const user = userEvent.setup();
+
             expect(screen.getByTestId("header")).toBeInTheDocument();
             expect(screen.getByTestId("site-list")).toBeInTheDocument();
             expect(getMonitoredSitesCardValue()).toBe("0");
@@ -605,8 +609,10 @@ describe("App Component - Comprehensive Coverage", () => {
 
             await renderApp();
 
+            const user = userEvent.setup();
+
             const closeButton = screen.getByLabelText("Dismiss error");
-            await userEvent.click(closeButton);
+            await user.click(closeButton);
 
             expect(clearError).toHaveBeenCalledTimes(1);
         });
@@ -828,8 +834,10 @@ describe("App Component - Comprehensive Coverage", () => {
 
             await renderApp();
 
+            const user = userEvent.setup();
+
             const restartButton = screen.getByText("Restart Now");
-            await userEvent.click(restartButton);
+            await user.click(restartButton);
 
             expect(applyUpdate).toHaveBeenCalledTimes(1);
         });
@@ -860,8 +868,10 @@ describe("App Component - Comprehensive Coverage", () => {
 
             await renderApp();
 
+            const user = userEvent.setup();
+
             const dismissButton = screen.getByText("Dismiss");
-            await userEvent.click(dismissButton);
+            await user.click(dismissButton);
 
             expect(applyUpdateStatus).toHaveBeenCalledWith("idle");
             expect(setUpdateError).toHaveBeenCalledWith(undefined);
@@ -945,7 +955,7 @@ describe("App Component - Comprehensive Coverage", () => {
             await renderApp();
 
             const closeButton = screen.getByTestId("close-settings");
-            await userEvent.click(closeButton);
+            await user.click(closeButton);
 
             expect(setShowSettings).toHaveBeenCalledWith(false);
         });
@@ -1050,7 +1060,7 @@ describe("App Component - Comprehensive Coverage", () => {
             await renderApp();
 
             const closeButton = screen.getByTestId("close-site-details");
-            await userEvent.click(closeButton);
+            await user.click(closeButton);
 
             expect(setShowSiteDetails).toHaveBeenCalledWith(false);
         });

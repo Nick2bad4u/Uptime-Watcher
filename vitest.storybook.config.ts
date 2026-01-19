@@ -118,6 +118,36 @@ const createStorybookVitestConfig = async (): Promise<ViteUserConfig> => {
     return {
         ...baseViteConfig,
         cacheDir: "./.cache/vitest/storybook",
+        optimizeDeps: {
+            ...baseViteConfig.optimizeDeps,
+            include: [
+                ...(baseViteConfig.optimizeDeps?.include ?? []),
+                // Storybook + vitest addon internals used by portable stories.
+                "@storybook/addon-vitest/internal/test-utils",
+                "storybook/actions",
+                "storybook/test",
+                "storybook/theming",
+                "storybook/viewport",
+                // Utility deps pulled in by Storybook/theming/actions.
+                "fast-deep-equal",
+                // Charts used by analytics stories.
+                "chart.js",
+                "chartjs-adapter-date-fns",
+                "chartjs-plugin-zoom",
+                // Icons referenced by various stories.
+                "react-icons/bi",
+                "react-icons/bs",
+                "react-icons/fi",
+                "react-icons/go",
+                "react-icons/hi2",
+                "react-icons/io5",
+                "react-icons/md",
+                "react-icons/ri",
+                "react-icons/si",
+                "react-icons/tb",
+                "react-icons/vsc",
+            ],
+        },
         plugins: createStorybookPlugins({
             additionalPlugins: [createStorybookStoriesTransformPlugin()],
             reactOptions: reactPluginOptions,

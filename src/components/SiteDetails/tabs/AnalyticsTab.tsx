@@ -291,11 +291,11 @@ export const AnalyticsTab = ({
     const expandIcon = useMemo(() => <ExpandIcon />, [ExpandIcon]);
     const collapseIcon = useMemo(() => <CollapseIcon />, [CollapseIcon]);
     const upCountIcon = useMemo(
-        () => <UpIcon aria-hidden className="h-4 w-4" />,
+        () => <UpIcon aria-hidden className="size-4" />,
         [UpIcon]
     );
     const downCountIcon = useMemo(
-        () => <DownIcon aria-hidden className="h-4 w-4" />,
+        () => <DownIcon aria-hidden className="size-4" />,
         [DownIcon]
     );
 
